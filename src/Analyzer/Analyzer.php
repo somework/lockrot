@@ -218,7 +218,7 @@ final class Analyzer
 
     private function dataDate(?PackageMetadata $meta, ?RepositoryActivity $activity): ?\DateTimeImmutable
     {
-        $metaDate = $meta !== null ? $meta->fetchedAt() : null;
+        $metaDate = $meta !== null ? $meta->dataDate() : null;
         $activityDate = $activity !== null ? $activity->fetchedAt() : null;
         if ($metaDate === null) {
             return $activityDate;
