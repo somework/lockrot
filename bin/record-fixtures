@@ -4,6 +4,11 @@
 declare(strict_types=1);
 // Records Composer repository (p2) and GitHub responses for the acceptance fixtures so tests run
 // offline. Usage: GITHUB_TOKEN=... bin/record-fixtures [fixtureDir ...]
+//
+// p2 bodies are trimmed to KEEP (below) before being written; GitHub repo bodies are trimmed
+// separately to the keys the GitHubClient reads. An envelope already on disk is only reused when
+// its recorded `status` is not 0 — status 0 means the previous recording run hit a transport
+// failure (timeout, DNS, etc.), so it is treated as not-yet-recorded and fetched again.
 require __DIR__.'/../vendor/autoload.php';
 
 use Composer\Factory;
@@ -16,7 +21,7 @@ use Lockrot\Data\Http\HttpResult;
 use Lockrot\Data\Http\RecordedHttpClient;
 use Lockrot\Lock\LockFile;
 
-const KEEP = ['name', 'version', 'version_normalized', 'time', 'abandoned', 'source', 'require', 'type'];
+const KEEP = ['name', 'version', 'version_normalized', 'time', 'abandoned', 'source', 'require', 'type', 'extra'];
 const REPOSITORY_BASE_URL = 'https://repo.packagist.org/p2/';
 
 $root = \dirname(__DIR__);
@@ -55,6 +60,14 @@ $trim = static function (string $body, string $name): string {
     unset($json['security-advisories']);
     return json_encode($json, \JSON_UNESCAPED_SLASHES);
 };
+$isRecorded = static function (string $path): bool {
+    if (!is_file($path)) {
+        return false;
+    }
+    $envelope = json_decode((string) file_get_contents($path), true);
+
+    return \is_array($envelope) && ($envelope['status'] ?? 0) !== 0; // status 0 = transport failure while recording: fetch again
+};
 $io = new NullIO();
 $composerConfig = Factory::createConfig($io);
 $repositoryHttp = new ComposerHttpClient(Factory::createHttpDownloader($io, $composerConfig), new Clock());
@@ -69,7 +82,7 @@ foreach ($fixtures as $fixture) {
         foreach ([false, true] as $dev) {
             $url = REPOSITORY_BASE_URL.$package->name().($dev ? '~dev' : '').'.json';
             $path = RecordedHttpClient::pathFor($p2Dir, $url);
-            if (is_file($path)) {
+            if ($isRecorded($path)) {
                 continue;
             }
             $result = $repositoryHttp->fetchAll([$url])[$url];
@@ -86,7 +99,7 @@ foreach ($fixtures as $fixture) {
 foreach (array_keys($repos) as $repo) {
     $url = $github->url($repo);
     $path = RecordedHttpClient::pathFor($ghDir, $url);
-    if (is_file($path)) {
+    if ($isRecorded($path)) {
         continue;
     }
     $result = $fetch($url, $github->headers());

@@ -7,14 +7,28 @@ Expected results: see docs/RESEARCH.md.
 
 ## HTTP fixtures (`http/p2`, `http/github`)
 
-Recorded 2026-09-14 with `GITHUB_TOKEN=$(gh auth token) bin/record-fixtures` against the five
-default acceptance fixtures (wallabag/wallabag, nextcloud/3rdparty, matomo-org/matomo,
-laravel/laravel, BookStackApp/BookStack). Packagist p2 bodies are trimmed to the keys lockrot
-reads (`name`, `version`, `version_normalized`, `time`, `abandoned`, `source`, `require`, `type`)
-and GitHub repo bodies are trimmed to `full_name`, `archived`, `disabled`, `pushed_at`,
-`default_branch`; `security-advisories` is stripped from p2 responses. Re-run the recorder to add
-more fixture directories: `GITHUB_TOKEN=$(gh auth token) bin/record-fixtures [fixtureDir ...]` —
-it skips files that are already recorded, so it only fetches what is missing.
+p2 re-recorded 2026-09-15, GitHub re-recorded 2026-09-15 (kept — see below), both with
+`GITHUB_TOKEN=$(gh auth token) bin/record-fixtures` against the five default acceptance fixtures
+(wallabag/wallabag, nextcloud/3rdparty, matomo-org/matomo, laravel/laravel,
+BookStackApp/BookStack). Packagist p2 bodies are trimmed to the keys lockrot reads (`name`,
+`version`, `version_normalized`, `time`, `abandoned`, `source`, `require`, `type`, `extra`) and
+GitHub repo bodies are trimmed to `full_name`, `archived`, `disabled`, `pushed_at`,
+`default_branch`; `security-advisories` is stripped from p2 responses. Both `{name}.json` and
+`{name}~dev.json` are recorded for every package name in the fixture lock files, including 404s
+and empty bodies (the status is stored in the envelope), so the fixture server can answer either
+file for any name without falling through to the real Packagist endpoint. `extra` is kept
+specifically so `extra.branch-alias` reaches the fixture server, since Composer's
+`ComposerRepository` unwraps `AliasPackage` entries from it.
+
+Re-run the recorder to add more fixture directories or fill in gaps:
+`GITHUB_TOKEN=$(gh auth token) bin/record-fixtures [fixtureDir ...]` — it reuses any envelope
+already on disk whose recorded `status` is not `0`; a `status: 0` envelope means a previous
+recording run hit a transport failure (timeout, DNS, ...) and is fetched again rather than treated
+as recorded.
+
+The 2026-09-15 GitHub re-recording changed 31 of 327 envelope bodies (mostly `pushed_at` moving
+forward on actively maintained repos) but did not change any `AcceptanceTest` verdict or evidence
+string, so the re-recorded set was kept rather than reverted to the 2026-09-14 one.
 
 Packagist/GitHub data moves over time. If an acceptance assertion in
 `tests/Integration/AcceptanceTest.php` needs updating after a re-recording, diff the affected

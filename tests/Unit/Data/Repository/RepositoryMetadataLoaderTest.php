@@ -503,6 +503,25 @@ final class RepositoryMetadataLoaderTest extends TestCase
         }
     }
 
+    /**
+     * Real-fixture counterpart to testDevOnlyBranchAliasIsUnwrappedAndCountedOnce(): wallabag/rulerz
+     * has no tagged release at all (its `wallabag/rulerz.json` stable file lists zero versions for
+     * the name), so it resolves entirely through the loader's dev-only pass against the recorded
+     * `wallabag/rulerz~dev.json`. Recorded 2026-09-15: that file's `packages["wallabag/rulerz"]` has
+     * 2 entries (dev-master, dev-support-symfony-7), and dev-master carries `extra.branch-alias`
+     * (dev-master => 1.0.x-dev). ComposerRepository::loadPackages() unwraps that into a separate
+     * AliasPackage entry alongside the package it aliases, so without the loader's own dedup this
+     * would count 3 releases instead of 2.
+     */
+    public function testRealDevOnlyPackageWithBranchAliasIsCountedOnce(): void
+    {
+        $meta = $this->loader()->load(['wallabag/rulerz'])->metadata()['wallabag/rulerz'] ?? null;
+
+        self::assertNotNull($meta);
+        self::assertFalse($meta->hasStableRelease());
+        self::assertSame(2, $meta->releaseCount());
+    }
+
     public function testDeadlineAlreadyPastMarksEveryNameFailedWithTheBudgetReason(): void
     {
         // $fake returns 100.0 on the first call (Deadline::inSeconds()'s own construction call,
