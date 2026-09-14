@@ -158,6 +158,46 @@ The same run with `--format=json` (first ~25 lines, up to the first flagged pack
 }
 ```
 
+## Install-time summary
+
+With the plugin installed, `composer require`, `composer update` and `composer install` print a
+compact block for the packages that transaction is about to install or update — the new package and
+everything it drags in, not the whole lock file. Composer fires the event lockrot listens on before
+it prints its own operations list, so the block appears above it. This is the real stderr of
+`composer require phpzip/phpzip:2.0.8` in a fresh project:
+
+```
+Writing lock file
+Installing dependencies from lock file (including require-dev)
+lockrot: dependency rot in 4 of 4 changed packages
+  silent      grandt/binstring 1.0.0: last release 2015-08-13 (11.1 years ago); last push 2015-08-13 (11.1 years ago); released 2015-08-13, before PHP 8.4 GA (2024-11-21); php constraint ">=5.0" has no upper bound (via phpzip/phpzip)
+  silent      grandt/phpzipmerge 1.0.4: last release 2015-08-18 (11.1 years ago); last push 2015-08-18 (11.1 years ago); released 2015-08-18, before PHP 8.4 GA (2024-11-21); php constraint ">=5.3.0" has no upper bound (via phpzip/phpzip)
+  silent      grandt/relativepath 1.0.2: last release 2015-05-14 (11.3 years ago); last push 2020-04-01 (6.5 years ago); released 2015-05-14, before PHP 8.4 GA (2024-11-21); php constraint ">=5.0" has no upper bound (via phpzip/phpzip)
+  silent      phpzip/phpzip 2.0.8: last release 2015-11-16 (10.8 years ago); last push 2015-11-16 (10.8 years ago); released 2015-11-16, before PHP 8.4 GA (2024-11-21); php constraint ">=5.3.0" has no upper bound
+Run composer lockrot for details.
+Package operations: 4 installs, 0 updates, 0 removals
+```
+
+- **At most 10 lines**, always: header, one line per flagged package (most severe first), at most
+  two notes, footer. Beyond that the list is cut with `… and N more`.
+- **Silent when nothing is flagged.** A clean transaction prints nothing at all.
+- **Never fails the install.** Anything unexpected — an unreachable repository, a malformed
+  `extra.lockrot`, a bug in lockrot — becomes a single `lockrot: install-time check skipped: …`
+  line and the install continues. The only exception is `install-time-strict`, below.
+- **5-second budget.** The install-time pass has a hard time budget so it cannot hold up a
+  `composer install`. When it runs out, the report says so rather than reporting a clean result:
+  packages whose metadata was never requested get `not checked: install-time budget exhausted`, and
+  a skipped GitHub round gets the note `repository activity not checked: install-time budget
+  exhausted`. In practice `composer require`/`update` is served from the metadata Composer has just
+  fetched for the same packages, in the same process; only a cold `composer install` from an
+  existing lock starts from nothing.
+- **Turning it off:** `extra.lockrot.install-time: "off"` in `composer.json` disables it for the
+  project; `LOCKROT_DISABLE=1` disables all of lockrot for a single command.
+
+`install-time-strict: true` turns the summary into a gate: when a finding reaches the `fail-on`
+threshold, lockrot stops the transaction before any operation runs — see [Exit
+codes](#exit-codes) for exactly what that leaves behind.
+
 ## What the verdicts mean
 
 | Verdict | Meaning | Signals |
@@ -192,6 +232,8 @@ must be JSON integers (`3`, not `"3"`).
 | `target-php` | running PHP / `config.platform.php` | PHP version used for the S5 "old promise" check, e.g. `"8.4"` |
 | `format` | `table` | `table` or `json` |
 | `include-dev` | `false` | Also check `packages-dev` |
+| `install-time` | `on` | `on` or `off`: print the [install-time summary](#install-time-summary) during `composer require`/`update`/`install` |
+| `install-time-strict` | `false` | Apply `fail-on` at install time too, stopping the transaction instead of only reporting |
 | `release-warn-years` / `release-high-years` | `3` / `5` | Integer thresholds for "no stable release" (S2) |
 | `push-warn-years` / `push-high-years` | `3` / `5` | Integer thresholds for "no repository push" (S4) |
 | `ignore` | `[]` | Project allowlist, see [Allowlist](#allowlist) below |
@@ -259,6 +301,16 @@ failure, not silently skipped. A `composer.lock` entry that Composer's own loade
 (missing `name`/`version`, an unnormalizable version, or a malformed entry) stops the report with
 exit `2` rather than being skipped.
 
+These codes are `composer lockrot`'s own. The [install-time summary](#install-time-summary) never
+sets an exit code — it only prints — unless `install-time-strict` is on, in which case lockrot
+stops the transaction and `composer require`/`update`/`install` exits `1` through Composer's own
+error handling. What that leaves behind is Composer's behaviour, not lockrot's, and is worth
+knowing: by the time the check runs, `composer require` has already added the package to
+`composer.json` and written the new `composer.lock`, and Composer's automatic revert of those two
+files is already disarmed at that point. So a blocked `composer require` leaves `composer.json` and
+`composer.lock` updated with nothing installed in `vendor/`; `composer install` (or
+`git checkout composer.json composer.lock`) is the way back.
+
 ## CI snippet
 
 Any CI, with the plugin installed:
@@ -313,9 +365,6 @@ pattern and a one-line reason — the same shape as the existing entries.
 
 ## Limitations (v0.1)
 
-- No install-time warning yet (`composer require`/`update` runs without a lockrot summary); that
-  is `composer lockrot` run manually or in CI. Install-time integration (`PRE_OPERATIONS_EXEC`) is
-  planned for v0.2.
 - Repository activity (S3/S4) is checked on GitHub only. GitLab and Bitbucket are not queried
   (planned for v0.3).
 - Without a GitHub token, only packages that already look like release candidates for `silent`
@@ -330,8 +379,8 @@ pattern and a one-line reason — the same shape as the existing entries.
 
 ## Roadmap
 
-- **v0.2**: install-time warnings via Composer's `PRE_OPERATIONS_EXEC`, a baseline file so CI can
-  fail only on new or worsened findings, `--format=sarif`/`github`/`gitlab`, and a GitHub Action.
+- **v0.2**: a baseline file so CI can fail only on new or worsened findings,
+  `--format=sarif`/`github`/`gitlab`, and a GitHub Action.
 - **v0.3**: transitive exposure on parent packages (S7), `--format=markdown` for PR comments,
   GitLab/Bitbucket repository activity, and inspecting the `vendor/*/composer.lock` of bundled
   PHAR tools.

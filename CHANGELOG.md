@@ -7,6 +7,14 @@
   old release with an open-ended PHP constraint, and pinned branch/hash snapshots.
 - Built-in finished-package allowlist (`resources/finished-packages.json`) plus a project-level
   `extra.lockrot.ignore` list with mandatory reason and optional expiry.
+- Install-time summary on Composer's `PRE_OPERATIONS_EXEC`: `composer require`/`update`/`install`
+  print a block of at most 10 lines for the packages the transaction is about to install or update,
+  above Composer's own operations list. Silent when nothing is flagged, bounded by a 5-second
+  budget, and it never fails an install — an unexpected failure becomes one
+  `lockrot: install-time check skipped: …` line.
+- Two new `extra.lockrot` keys: `install-time` (`on`/`off`, default `on`) and `install-time-strict`
+  (default `false`), which applies `fail-on` at install time and stops the transaction before any
+  operation runs. `LOCKROT_DISABLE=1` still silences everything.
 - `table` (default) and `--format=json` output.
 - Exit codes 0/1/2 driven by `--fail-on`, with network failures defaulting to exit 0 unless
   `--strict-network` is set.
