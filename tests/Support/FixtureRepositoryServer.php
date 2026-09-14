@@ -166,6 +166,37 @@ final class FixtureRepositoryServer
         return $contents === false ? '' : $contents;
     }
 
+    /**
+     * Counts requests answered so far. php -S logs one `Accepted`/`Closing` pair per connection to
+     * its access log, and the router sends `Connection: close` on every response, so each
+     * connection the log records corresponds to exactly one request — counting `Accepted` lines
+     * therefore counts requests. Returns 0 before start() (no log file yet) or once stop() has
+     * removed it.
+     */
+    public function requestCount(): int
+    {
+        $log = $this->readLog();
+        if ($log === '') {
+            return 0;
+        }
+        $count = 0;
+        foreach (explode("\n", $log) as $line) {
+            if (strpos($line, 'Accepted') !== false) {
+                ++$count;
+            }
+        }
+
+        return $count;
+    }
+
+    /** Truncates the access log so a subsequent requestCount() reflects only requests made after this call. */
+    public function resetRequestCount(): void
+    {
+        if ($this->logFile !== null) {
+            file_put_contents($this->logFile, '');
+        }
+    }
+
     public function __destruct()
     {
         $this->stop();

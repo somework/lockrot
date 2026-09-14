@@ -12,6 +12,7 @@ use Lockrot\Clock;
 use Lockrot\Data\Http\RecordedHttpClient;
 use Lockrot\Data\Repository\MetadataLoaderInterface;
 use Lockrot\Data\Repository\RepositoryMetadataLoader;
+use Lockrot\Deadline;
 use Lockrot\Lock\LockFile;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
@@ -94,14 +95,52 @@ final class RepositoryMetadataLoaderTest extends TestCase
         self::assertFalse($meta->isAbandoned());
     }
 
-    public function testLoxXhprofIsFoundViaDevAndIsAbandonedWithNoStableRelease(): void
+    public function testTaglessPackageIsLoadedFromTheDevFileOnly(): void
     {
+        // lox/xhprof has no tagged release at all, so the loader's pass 1 (stable stabilities)
+        // finds nothing for it and it is resolved entirely from {name}~dev.json in pass 2.
         $batch = $this->loader()->load(['lox/xhprof']);
 
         $meta = $batch->metadata()['lox/xhprof'] ?? null;
         self::assertNotNull($meta);
         self::assertTrue($meta->isAbandoned());
         self::assertFalse($meta->hasStableRelease());
+    }
+
+    /**
+     * Baseline measured against the pre-change loader (single pass over ALL_STABILITIES, so
+     * Composer fetched both {name}.json and {name}~dev.json for every name): loading these same
+     * 201 names cost 403 requests, measured with `git stash` on the loader source and re-running
+     * this test (see task-1-report.md). The two-pass loader instead fetches the stable file for
+     * every name once, and the dev file only for names with no tagged release — 206 requests for
+     * the same 201 names (1 packages.json + 201 stable files + 4 dev-only files).
+     */
+    public function testFullWallabagLoadRequestsOneFilePerNamePlusDevForTaglessNames(): void
+    {
+        // Dedicated server, never the shared class-level self::$server: counting requests against
+        // a server other tests have already been hitting would not reflect this load alone.
+        $server = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK, self::MATOMO_LOCK]);
+        $server->start();
+        try {
+            $names = array_merge($this->wallabagNames(), ['lox/xhprof']);
+            $loader = new RepositoryMetadataLoader($server->repositories(), Clock::fixed(self::FIXED));
+            $server->resetRequestCount();
+
+            $batch = $loader->load($names);
+
+            foreach ($names as $name) {
+                self::assertArrayHasKey($name, $batch->metadata(), $name.' should have resolved');
+            }
+            self::assertSame([], $batch->failed());
+
+            $requestCount = $server->requestCount();
+            self::assertGreaterThanOrEqual(\count($names), $requestCount);
+            // +1 packages.json, +4 ~dev files for the tagless names (wallabag/rulerz,
+            // wallabag/rulerz-bridge, wallabag/rulerz-bundle, lox/xhprof), +2 slack.
+            self::assertLessThanOrEqual(\count($names) + 1 + 4 + 2, $requestCount);
+        } finally {
+            $server->stop();
+        }
     }
 
     public function testWallabagRulerzHasNoStableRelease(): void
@@ -200,10 +239,12 @@ final class RepositoryMetadataLoaderTest extends TestCase
 
     public function testNameFoundWithNoVersionsIsTreatedAsFailed(): void
     {
-        // A repository whose only envelope for this name has an entry (so Composer marks the name
-        // as "found") but an empty version list — e.g. every version filtered out, or the p2 entry
-        // itself is empty. There is nothing to build a PackageMetadata from, so this must land in
-        // failed(), not metadata() or notFound().
+        // A repository whose only envelopes for this name each have an entry (so Composer marks
+        // the name as "found") but an empty version list — e.g. every version filtered out, or the
+        // p2 entry itself is empty. There is nothing to build a PackageMetadata from, so this must
+        // land in failed(), not metadata() or notFound(). Both the stable and the ~dev file are
+        // empty here (a package registered with no releases and no branches at all), so the loader
+        // reaches this outcome from pass 2 after pass 1's stable file routes it to $needDev.
         $dir = sys_get_temp_dir().'/lockrot-empty-versions-'.uniqid('', true);
         $envelopeDir = $dir.'/envelopes';
         self::assertNotFalse(mkdir($envelopeDir, 0777, true));
@@ -213,13 +254,18 @@ final class RepositoryMetadataLoaderTest extends TestCase
             'packages' => [['name' => 'test/empty-versions', 'version' => '1.0.0']],
         ]));
 
-        $url = 'https://repo.packagist.org/p2/test/empty-versions.json';
-        file_put_contents(RecordedHttpClient::pathFor($envelopeDir, $url), (string) json_encode([
-            'status' => 200,
-            'fetched_at' => self::FIXED,
-            'body' => json_encode(['packages' => ['test/empty-versions' => []]]),
-            'error' => null,
-        ]));
+        $urls = [
+            'https://repo.packagist.org/p2/test/empty-versions.json',
+            'https://repo.packagist.org/p2/test/empty-versions~dev.json',
+        ];
+        foreach ($urls as $url) {
+            file_put_contents(RecordedHttpClient::pathFor($envelopeDir, $url), (string) json_encode([
+                'status' => 200,
+                'fetched_at' => self::FIXED,
+                'body' => json_encode(['packages' => ['test/empty-versions' => []]]),
+                'error' => null,
+            ]));
+        }
 
         $server = FixtureRepositoryServer::fromLockFiles([$lockPath], $envelopeDir);
         $server->start();
@@ -235,7 +281,9 @@ final class RepositoryMetadataLoaderTest extends TestCase
         );
 
         $server->stop();
-        unlink(RecordedHttpClient::pathFor($envelopeDir, $url));
+        foreach ($urls as $url) {
+            unlink(RecordedHttpClient::pathFor($envelopeDir, $url));
+        }
         rmdir($envelopeDir);
         unlink($lockPath);
         rmdir($dir);
@@ -424,17 +472,19 @@ final class RepositoryMetadataLoaderTest extends TestCase
         }
     }
 
-    public function testBranchAliasVersionsAreCountedOnce(): void
+    public function testDevOnlyBranchAliasIsUnwrappedAndCountedOnce(): void
     {
         // ComposerRepository::loadPackages() returns an AliasPackage built from extra.branch-alias
         // *and*, as a separate entry, the package it aliases (2.10.3
         // src/Composer/Repository/ComposerRepository.php:1348-1352, 2.2.25 :960-964), so
-        // unwrapping aliases without deduplicating counts that release twice. The recorded p2
-        // fixtures have `extra` stripped, hence the hand-written envelopes here.
+        // unwrapping aliases without deduplicating counts that release twice. This package has no
+        // stable file at all (lox/xhprof-style: registered, but tagless), so it resolves entirely
+        // through the loader's dev-only pass, where the same dedup must still apply. The recorded
+        // p2 fixtures have `extra` stripped, hence the hand-written envelope here.
         $server = $this->syntheticServer([
-            'alias/pkg' => [$this->p2Version('alias/pkg', '1.0.0', ['abandoned' => 'other/pkg'])],
             'alias/pkg~dev' => [$this->p2Version('alias/pkg', 'dev-main', [
                 'extra' => ['branch-alias' => ['dev-main' => '2.0.x-dev']],
+                'abandoned' => 'other/pkg',
             ])],
         ]);
         $server->start();
@@ -444,9 +494,78 @@ final class RepositoryMetadataLoaderTest extends TestCase
             $meta = $loader->load(['alias/pkg'])->metadata()['alias/pkg'] ?? null;
 
             self::assertNotNull($meta);
-            self::assertSame(2, $meta->releaseCount());
+            self::assertSame(1, $meta->releaseCount());
+            self::assertFalse($meta->hasStableRelease());
             self::assertTrue($meta->isAbandoned());
             self::assertSame('other/pkg', $meta->replacement());
+        } finally {
+            $server->stop();
+        }
+    }
+
+    public function testDeadlineAlreadyPastMarksEveryNameFailedWithTheBudgetReason(): void
+    {
+        // $fake returns 100.0 on the first call (Deadline::inSeconds()'s own construction call,
+        // which computes expiresAt = 105.0) and 200.0 on every call after that, so the very first
+        // isPast() check inside loadFromRepository() already reports past.
+        $calls = 0;
+        $fake = static function () use (&$calls): float {
+            ++$calls;
+
+            return $calls === 1 ? 100.0 : 200.0;
+        };
+        $deadline = Deadline::inSeconds(5.0, $fake);
+
+        $server = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK]);
+        $server->start();
+        try {
+            $loader = new RepositoryMetadataLoader($server->repositories(), Clock::fixed(self::FIXED), false, $deadline);
+            $server->resetRequestCount();
+
+            $batch = $loader->load(['phpzip/phpzip', 'lox/xhprof']);
+
+            self::assertSame([], $batch->metadata());
+            self::assertSame([], $batch->notFound());
+            foreach (['phpzip/phpzip', 'lox/xhprof'] as $name) {
+                self::assertSame(MetadataLoaderInterface::BUDGET_REASON, $batch->failed()[$name] ?? null);
+            }
+            self::assertSame(0, $server->requestCount(), 'no chunk should have been started once the deadline was already past');
+        } finally {
+            $server->stop();
+        }
+    }
+
+    public function testDeadlinePassingMidLoadFailsOnlyTheUnstartedChunks(): void
+    {
+        // $fake returns 100.0 for its first 3 calls (construction, then the isPast() check before
+        // each of the first two chunks of CHUNK_SIZE=10) and 200.0 from the 4th call onward (the
+        // isPast() check before the third chunk), so the first two chunks (20 names) resolve
+        // normally and the third chunk (5 names) never starts.
+        $calls = 0;
+        $fake = static function () use (&$calls): float {
+            ++$calls;
+
+            return $calls <= 3 ? 100.0 : 200.0;
+        };
+        $deadline = Deadline::inSeconds(5.0, $fake);
+
+        $server = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK]);
+        $server->start();
+        try {
+            $names = \array_slice($this->wallabagNames(), 0, 25);
+            $loader = new RepositoryMetadataLoader($server->repositories(), Clock::fixed(self::FIXED), false, $deadline);
+
+            $batch = $loader->load($names);
+
+            self::assertCount(20, $batch->metadata());
+            $failed = $batch->failed();
+            self::assertCount(5, $failed);
+            foreach (\array_slice($names, 20) as $name) {
+                self::assertSame(MetadataLoaderInterface::BUDGET_REASON, $failed[$name] ?? null, $name.' should be an unstarted chunk');
+            }
+            foreach (\array_slice($names, 0, 20) as $name) {
+                self::assertArrayHasKey($name, $batch->metadata(), $name.' is in an already-started chunk');
+            }
         } finally {
             $server->stop();
         }

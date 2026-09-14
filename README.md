@@ -113,7 +113,9 @@ default, but Private Packagist, Satis instances and mirrors are honoured the sam
 Composer's own authentication and proxy settings. Composer's metadata cache is reused and
 revalidated (`If-Modified-Since`) on every run, which is why the repository side of "Data as of"
 tracks the run itself; GitHub repository-activity data keeps the timestamp of its own 24-hour cache
-and can lag behind by up to a day.
+and can lag behind by up to a day. Metadata is fetched in two passes — tagged releases first, then
+the `~dev` branch file only for packages with no tagged release at all — roughly halving requests
+on a cold cache.
 
 Only repositories that publish a `metadata-url` (the Composer v2 "p2" protocol) are read one
 package file at a time, which is what keeps memory flat on a large lock file. A repository without

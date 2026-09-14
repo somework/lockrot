@@ -17,6 +17,14 @@ interface MetadataLoaderInterface
      */
     public const OFFLINE_NOT_FOUND_REASON = 'offline: not present in Composer\'s cache';
 
+    /**
+     * Reported for a name the loader never got to query against a repository at all because the
+     * install-time budget ({@see \Lockrot\Deadline}) had already run out. Distinct from every
+     * other failure reason: those describe an answer (or the lack of one) the repository actually
+     * gave; this one means the repository was never asked.
+     */
+    public const BUDGET_REASON = 'not checked: install-time budget exhausted';
+
     /** @param list<string> $names */
     public function load(array $names): MetadataBatch;
 }

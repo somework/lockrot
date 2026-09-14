@@ -17,6 +17,9 @@
   repository that could not answer hands the name on to the next one. Composer's own metadata cache
   is reused and revalidated on every run; GitHub repository-activity responses keep a fixed 24-hour
   cache in Composer's cache directory.
+- Repository metadata is loaded in two passes: tagged releases first, the `~dev` branch file only
+  for packages with no tagged release — roughly half the requests on a cold cache (wallabag:
+  403 → 206).
 - `--offline` serves both from cache and never opens a connection, including when lockrot runs as a
   Composer plugin. A package with no cached metadata is reported as unavailable rather than as
   absent from the repository, so an empty cache cannot read as a clean result.
