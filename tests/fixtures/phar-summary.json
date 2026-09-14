@@ -1,7 +1,7 @@
 {
  "box-project_box": {
   "prod": 57,
-  "not_on_packagist": 0,
+  "not_from_composer_repository": 0,
   "flagged": 0,
   "unflagged_no_release_5y": 2,
   "unflagged_no_release_no_push_5y": 0,
@@ -10,7 +10,7 @@
  },
  "composer_composer": {
   "prod": 30,
-  "not_on_packagist": 0,
+  "not_from_composer_repository": 0,
   "flagged": 0,
   "unflagged_no_release_5y": 0,
   "unflagged_no_release_no_push_5y": 0,
@@ -19,7 +19,7 @@
  },
  "infection_infection": {
   "prod": 34,
-  "not_on_packagist": 0,
+  "not_from_composer_repository": 0,
   "flagged": 0,
   "unflagged_no_release_5y": 0,
   "unflagged_no_release_no_push_5y": 0,
@@ -28,7 +28,7 @@
  },
  "phpDocumentor_phpDocumentor": {
   "prod": 74,
-  "not_on_packagist": 0,
+  "not_from_composer_repository": 0,
   "flagged": 0,
   "unflagged_no_release_5y": 3,
   "unflagged_no_release_no_push_5y": 0,
@@ -37,7 +37,7 @@
  },
  "phpstan_phpstan-src": {
   "prod": 67,
-  "not_on_packagist": 0,
+  "not_from_composer_repository": 0,
   "flagged": 14,
   "unflagged_no_release_5y": 1,
   "unflagged_no_release_no_push_5y": 1,

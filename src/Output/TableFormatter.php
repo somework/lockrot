@@ -26,7 +26,7 @@ final class TableFormatter implements FormatterInterface
             $table->render();
         }
         $output->writeln($this->summary($report));
-        $output->writeln(\sprintf('Data as of %s (Packagist, GitHub). Run composer lockrot --format=json for details.', $report->generatedAt()->format('Y-m-d')));
+        $output->writeln(\sprintf('Data as of %s (package repositories, GitHub). Run composer lockrot --format=json for details.', $report->generatedAt()->format('Y-m-d')));
         foreach ($report->notes() as $note) {
             $output->writeln('note: '.$note);
         }

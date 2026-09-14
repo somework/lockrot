@@ -142,7 +142,7 @@ final class AnalyzerTest extends TestCase
         self::assertSame(Verdict::UNKNOWN, $byName['private/thing']->verdict());
         self::assertSame('not from a Composer repository, not checked', $byName['private/thing']->evidence());
         self::assertSame(4, $report->packagesChecked());
-        self::assertSame(1, $report->notOnPackagist());
+        self::assertSame(1, $report->notFromComposerRepository());
         self::assertFalse($report->hadNetworkFailures());
         // Sort order is severity desc, name asc: SILENT(50) > PINNED(40) > OLD_PROMISE(30) > UNKNOWN(10).
         self::assertSame(['vendor/transitive', 'vendor/snapshot', 'vendor/direct', 'private/thing'], array_map(static fn ($f) => $f->package(), $report->findings()));
@@ -166,7 +166,33 @@ final class AnalyzerTest extends TestCase
         $report = $this->analyzer($this->loader([], [], ['vendor/direct' => 'HTTP 503']), $this->http([]), true, new Allowlist([]))->analyze($lock, ProjectConfig::empty(), false);
         self::assertSame(Verdict::UNKNOWN, $report->findings()[0]->verdict());
         self::assertTrue($report->hadNetworkFailures());
-        self::assertStringContainsString('Repository metadata unavailable', implode(' ', $report->notes()));
+        self::assertContains('Repository metadata unavailable for 1 package: HTTP 503', $report->notes());
+        self::assertSame('Repository metadata unavailable: HTTP 503', $report->findings()[0]->evidence());
+    }
+
+    public function testTwoFailedPackagesAreCountedInThePlural(): void
+    {
+        $lock = LockFile::fromArray(['packages' => [
+            ['name' => 'vendor/a', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/'],
+            ['name' => 'vendor/b', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/'],
+        ]]);
+        $failed = ['vendor/a' => 'HTTP 503', 'vendor/b' => 'HTTP 503'];
+
+        $report = $this->analyzer($this->loader([], [], $failed), $this->http([]), true, new Allowlist([]))->analyze($lock, ProjectConfig::empty(), false);
+
+        self::assertContains('Repository metadata unavailable for 2 packages: HTTP 503', $report->notes());
+    }
+
+    public function testTheOfflineReasonIsReportedWithoutASecondPrefix(): void
+    {
+        // OFFLINE_NOT_FOUND_REASON already reads as a complete statement, so prefixing it would
+        // produce "Repository metadata unavailable: offline: not present in Composer's cache".
+        $lock = LockFile::fromArray(['packages' => [['name' => 'vendor/direct', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/']]]);
+        $failed = ['vendor/direct' => MetadataLoaderInterface::OFFLINE_NOT_FOUND_REASON];
+
+        $report = $this->analyzer($this->loader([], [], $failed), $this->http([]), true, new Allowlist([]), true)->analyze($lock, ProjectConfig::empty(), false);
+
+        self::assertSame(MetadataLoaderInterface::OFFLINE_NOT_FOUND_REASON, $report->findings()[0]->evidence());
     }
 
     /**

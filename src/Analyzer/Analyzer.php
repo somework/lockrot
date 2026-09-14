@@ -78,7 +78,12 @@ final class Analyzer
         $metadata = $batch->metadata();
         $metadataFailed = $batch->failed();
         if ($metadataFailed !== []) {
-            $notes[] = \sprintf('Repository metadata unavailable for %d packages: %s', \count($metadataFailed), (string) reset($metadataFailed));
+            $count = \count($metadataFailed);
+            $notes[] = \sprintf(
+                'Repository metadata unavailable for %s: %s',
+                $count === 1 ? '1 package' : $count.' packages',
+                (string) reset($metadataFailed)
+            );
         }
 
         [$allowlisted, $repoByPackage, $candidateByPackage] = $this->classify($packages, $metadata, $now);
@@ -187,7 +192,7 @@ final class Analyzer
         if (!$package->isFromComposerRepository()) {
             $note = self::NOTE_NOT_IN_REPOSITORY;
         } elseif ($meta === null && isset($batch->failed()[$package->name()])) {
-            $note = 'Repository metadata unavailable: '.$batch->failed()[$package->name()];
+            $note = $this->metadataFailureNote($batch->failed()[$package->name()]);
         } elseif ($meta === null) {
             $note = 'not found in the repository';
         }
@@ -202,6 +207,18 @@ final class Analyzer
             $this->dataDate($meta, $activity),
             $note
         );
+    }
+
+    /**
+     * The offline reason already states why the metadata is missing, so prefixing it would read as
+     * "Repository metadata unavailable: offline: ...". Every other reason is a bare transport or
+     * repository message that needs the prefix to make sense on a finding.
+     */
+    private function metadataFailureNote(string $reason): string
+    {
+        return $reason === MetadataLoaderInterface::OFFLINE_NOT_FOUND_REASON
+            ? $reason
+            : 'Repository metadata unavailable: '.$reason;
     }
 
     /** @return list<string> */

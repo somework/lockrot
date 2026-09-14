@@ -11,6 +11,7 @@ use Composer\Factory;
 use Composer\IO\IOInterface;
 use Composer\Repository\RepositoryFactory;
 use Composer\Repository\RepositoryInterface;
+use Composer\Util\Platform;
 use Lockrot\Allowlist\ProjectIgnoreList;
 use Lockrot\Analyzer\Analyzer;
 use Lockrot\Clock;
@@ -62,10 +63,14 @@ final class LockrotCommand extends BaseCommand
      * documents a malformed manifest as a configuration error (exit 2, README "Exit codes"), so the
      * file is checked here first and the failure is carried into execute()'s error handling instead.
      *
-     * --offline must disable the network before parent::initialize() runs: that call builds the
-     * Composer instance (and so its HttpDownloader) via Factory::createComposer(), and
-     * HttpDownloader reads COMPOSER_DISABLE_NETWORK from the environment in its own constructor —
-     * setting it any later would be too late for repository lookups to see it.
+     * --offline sets COMPOSER_DISABLE_NETWORK as early as this command can, but that alone is not
+     * the mechanism, and cannot be: HttpDownloader reads the variable once, in its own constructor
+     * (2.10.3 src/Composer/Util/HttpDownloader.php:73, 2.2.25 :74), and in plugin mode
+     * Composer\Console\Application::doRun() has already built the Composer instance — with its
+     * HttpDownloader and RepositoryManager — while collecting plugin commands
+     * (getPluginCommands() -> getComposer()), long before any command's initialize() runs. What
+     * makes --offline effective is composerBootstrap() rebuilding the repositories afterwards, so
+     * that they get an HttpDownloader constructed after this point.
      */
     protected function initialize(InputInterface $input, OutputInterface $output): void
     {
@@ -78,7 +83,9 @@ final class LockrotCommand extends BaseCommand
             return;
         }
         if ($input->getOption('offline') === true) {
-            putenv('COMPOSER_DISABLE_NETWORK=1');
+            // Platform::putEnv() rather than putenv(): Composer reads its environment through
+            // Platform::getEnv(), which consults $_SERVER and $_ENV first.
+            Platform::putEnv('COMPOSER_DISABLE_NETWORK', '1');
         }
         parent::initialize($input, $output);
     }
@@ -147,29 +154,41 @@ final class LockrotCommand extends BaseCommand
     }
 
     /**
-     * Reuses the project's own Composer instance (and so its configured repositories, in their
-     * configured order — Packagist by default, but Private Packagist, Satis and mirrors are
-     * honoured the same way) when one is available; falls back to Composer's own defaults
-     * (RepositoryFactory::defaultRepos()) for a lock-only directory with no Composer instance to
-     * reuse, e.g. inside the standalone PHAR.
+     * Reuses the project's own Composer configuration (and so its configured repositories, in their
+     * configured order — the public package repository by default, but private repositories, Satis
+     * instances and mirrors are honoured the same way) when a Composer instance is available; falls
+     * back to Composer's own defaults for a lock-only directory with no Composer instance to reuse,
+     * e.g. inside the standalone PHAR.
+     *
+     * The repositories are rebuilt from that Config rather than taken from the instance's
+     * RepositoryManager, because in plugin mode the manager and its HttpDownloader predate this
+     * command entirely (see initialize()), so --offline could never reach them.
+     * RepositoryFactory::defaultRepos() reads Config::getRepositories() — the same list, in the
+     * same order, that Composer itself builds the manager from (2.10.3
+     * src/Composer/Repository/RepositoryFactory.php:81-100, 2.2.25 :96-104).
      *
      * @return array{0: Config, 1: list<RepositoryInterface>}
      */
     private function composerBootstrap(IOInterface $io, bool $hasComposerJson): array
+    {
+        $config = $this->composerConfig($io, $hasComposerJson);
+        $manager = RepositoryFactory::manager($io, $config, Factory::createHttpDownloader($io, $config));
+
+        return [$config, array_values(RepositoryFactory::defaultRepos($io, $config, $manager))];
+    }
+
+    private function composerConfig(IOInterface $io, bool $hasComposerJson): Config
     {
         if ($hasComposerJson) {
             // Composer >= 2.3 has tryComposer(); 2.2 LTS only has getComposer(bool $required) (BaseCommand.php:124 vs 2.2 :59)
             // @phpstan-ignore function.alreadyNarrowedType (tryComposer() does not exist in Composer 2.2 LTS; guard is load-bearing there)
             $composer = method_exists($this, 'tryComposer') ? $this->tryComposer() : $this->getComposer(false);
             if ($composer instanceof Composer) {
-                return [$composer->getConfig(), array_values($composer->getRepositoryManager()->getRepositories())];
+                return $composer->getConfig();
             }
         }
 
-        $config = Factory::createConfig($io);
-        $manager = RepositoryFactory::manager($io, $config, Factory::createHttpDownloader($io, $config));
-
-        return [$config, array_values(RepositoryFactory::defaultRepos($io, $config, $manager))];
+        return Factory::createConfig($io);
     }
 
     /** @param array<string, mixed> $env */

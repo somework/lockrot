@@ -25,7 +25,7 @@ final class PinnedRuleTest extends TestCase
     {
         $signal = (new PinnedRule())->evaluate(F::facts(F::package(['version' => '1.0.0']), F::metadata([['dev-master', '2015-01-01']])));
         self::assertNotNull($signal);
-        self::assertSame('no tagged release on Packagist', $signal->summary());
+        self::assertSame('no tagged release in its repository', $signal->summary());
         self::assertSame(['version' => '1.0.0'], $signal->data());
     }
 

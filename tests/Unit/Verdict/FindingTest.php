@@ -38,8 +38,8 @@ final class FindingTest extends TestCase
 
     public function testNoteWhenNoSignals(): void
     {
-        $finding = new Finding('private/thing', '3.0.0', Verdict::UNKNOWN, [], [], null, null, 'not on Packagist, not checked');
-        self::assertSame('not on Packagist, not checked', $finding->evidence());
+        $finding = new Finding('private/thing', '3.0.0', Verdict::UNKNOWN, [], [], null, null, 'not from a Composer repository, not checked');
+        self::assertSame('not from a Composer repository, not checked', $finding->evidence());
         self::assertNull($finding->toArray()['data_date']);
     }
 

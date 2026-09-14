@@ -171,6 +171,7 @@ final class FixtureRepositoryServer
         $this->stop();
     }
 
+    /** @return non-empty-string */
     public function url(): string
     {
         return 'http://127.0.0.1:'.$this->port;

@@ -1,7 +1,7 @@
 {
  "drupal_drupal": {
   "prod": 64,
-  "not_on_packagist": 0,
+  "not_from_composer_repository": 0,
   "flagged": 0,
   "unflagged_no_release_5y": 3,
   "unflagged_no_release_no_push_5y": 1,
@@ -17,7 +17,7 @@
  },
  "magento_magento2": {
   "prod": 148,
-  "not_on_packagist": 0,
+  "not_from_composer_repository": 0,
   "flagged": 4,
   "unflagged_no_release_5y": 5,
   "unflagged_no_release_no_push_5y": 1,
@@ -38,7 +38,7 @@
  },
  "nextcloud_3rdparty": {
   "prod": 94,
-  "not_on_packagist": 0,
+  "not_from_composer_repository": 0,
   "flagged": 1,
   "unflagged_no_release_5y": 6,
   "unflagged_no_release_no_push_5y": 3,

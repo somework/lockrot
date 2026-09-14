@@ -10,12 +10,16 @@
 - `table` (default) and `--format=json` output.
 - Exit codes 0/1/2 driven by `--fail-on`, with network failures defaulting to exit 0 unless
   `--strict-network` is set.
-- Package metadata loaded through the repositories configured for the project
-  (`ComposerRepository::loadPackages()`), Packagist by default, reusing and revalidating Composer's
-  own metadata cache; GitHub repository-activity responses keep a fixed 24-hour cache in Composer's
-  cache directory. `--offline` serves both from cache without touching the network; `--refresh` and
-  the `cache-ttl` config key are gone — there is no longer a user-facing knob to bypass or resize the
-  cache.
+- Package metadata is loaded through the repositories configured for the project
+  (`ComposerRepository::loadPackages()`), in their configured order — Packagist by default, but
+  Private Packagist, Satis instances and mirrors are honoured the same way, with Composer's own
+  authentication and proxy settings. The first repository to answer for a package name wins, and a
+  repository that could not answer hands the name on to the next one. Composer's own metadata cache
+  is reused and revalidated on every run; GitHub repository-activity responses keep a fixed 24-hour
+  cache in Composer's cache directory.
+- `--offline` serves both from cache and never opens a connection, including when lockrot runs as a
+  Composer plugin. A package with no cached metadata is reported as unavailable rather than as
+  absent from the repository, so an empty cache cannot read as a clean result.
 - Optional GitHub token (`GITHUB_TOKEN`/`LOCKROT_GITHUB_TOKEN`/Composer `github-oauth`) for
   repository activity signals; runs without one at a reduced candidate budget.
 - Standalone PHAR build (`build/lockrot.phar`) for use without adding a Composer dependency.

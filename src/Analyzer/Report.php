@@ -15,14 +15,14 @@ final class Report
     private array $notes;
     private \DateTimeImmutable $generatedAt;
     private int $packagesChecked;
-    private int $notOnPackagist;
+    private int $notFromComposerRepository;
     private bool $hadNetworkFailures;
 
     /**
      * @param list<Finding> $findings
      * @param list<string> $notes
      */
-    public function __construct(array $findings, array $notes, \DateTimeImmutable $generatedAt, int $packagesChecked, int $notOnPackagist, bool $hadNetworkFailures)
+    public function __construct(array $findings, array $notes, \DateTimeImmutable $generatedAt, int $packagesChecked, int $notFromComposerRepository, bool $hadNetworkFailures)
     {
         usort($findings, static function (Finding $a, Finding $b): int {
             return [Verdict::severity($b->verdict()), $a->package()] <=> [Verdict::severity($a->verdict()), $b->package()];
@@ -31,7 +31,7 @@ final class Report
         $this->notes = $notes;
         $this->generatedAt = $generatedAt;
         $this->packagesChecked = $packagesChecked;
-        $this->notOnPackagist = $notOnPackagist;
+        $this->notFromComposerRepository = $notFromComposerRepository;
         $this->hadNetworkFailures = $hadNetworkFailures;
     }
 
@@ -71,9 +71,9 @@ final class Report
     {
         return $this->packagesChecked;
     }
-    public function notOnPackagist(): int
+    public function notFromComposerRepository(): int
     {
-        return $this->notOnPackagist;
+        return $this->notFromComposerRepository;
     }
     public function hadNetworkFailures(): bool
     {
@@ -86,7 +86,7 @@ final class Report
         return [
             'generated_at' => $this->generatedAt->format(\DATE_ATOM),
             'packages_checked' => $this->packagesChecked,
-            'not_on_packagist' => $this->notOnPackagist,
+            'not_from_composer_repository' => $this->notFromComposerRepository,
             'network_failures' => $this->hadNetworkFailures,
             'counts' => $this->byVerdict(),
             'notes' => $this->notes,

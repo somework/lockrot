@@ -112,12 +112,12 @@ final class ReportTest extends TestCase
         );
         $array = $report->toArray();
         self::assertSame(
-            ['generated_at', 'packages_checked', 'not_on_packagist', 'network_failures', 'counts', 'notes', 'findings'],
+            ['generated_at', 'packages_checked', 'not_from_composer_repository', 'network_failures', 'counts', 'notes', 'findings'],
             array_keys($array)
         );
         self::assertSame('2026-09-14T00:00:00+00:00', $array['generated_at']);
         self::assertSame(5, $array['packages_checked']);
-        self::assertSame(1, $array['not_on_packagist']);
+        self::assertSame(1, $array['not_from_composer_repository']);
         self::assertTrue($array['network_failures']);
         self::assertSame(['a note'], $array['notes']);
         self::assertIsArray($array['findings']);

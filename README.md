@@ -61,51 +61,51 @@ GITHUB_TOKEN=$(gh auth token) php bin/lockrot -d tests/fixtures/apps/wallabag_wa
 +--------------------------------------+------------+-------------+--------------------------------------------------------------+-------------------------------------------------------------+
 | Package                              | Version    | Verdict     | Evidence                                                     | Via                                                         |
 +--------------------------------------+------------+-------------+--------------------------------------------------------------+-------------------------------------------------------------+
-| behat/transliterator                 | v1.5.0     | abandoned   | flagged abandoned on Packagist; last release 2022-03-30 (4.5 | stof/doctrine-extensions-bundle > gedmo/doctrine-extensions |
-|                                      |            |             | years ago); repository archived on GitHub; released          |                                                             |
+| behat/transliterator                 | v1.5.0     | abandoned   | flagged abandoned by its repository; last release 2022-03-30 | stof/doctrine-extensions-bundle > gedmo/doctrine-extensions |
+|                                      |            |             | (4.5 years ago); repository archived on GitHub; released     |                                                             |
 |                                      |            |             | 2022-03-30, before PHP 8.4 GA (2024-11-21); php constraint   |                                                             |
 |                                      |            |             | ">=7.2" has no upper bound                                   |                                                             |
-| doctrine/annotations                 | 2.0.2      | abandoned   | flagged abandoned on Packagist                               | sensio/framework-extra-bundle                               |
-| doctrine/cache                       | 2.2.0      | abandoned   | flagged abandoned on Packagist; last release 2022-05-20 (4.3 | doctrine/doctrine-bundle                                    |
-|                                      |            |             | years ago)                                                   |                                                             |
-| hoa/compiler                         | 3.17.08.08 | abandoned   | flagged abandoned on Packagist; last release 2017-08-08 (9.1 | wallabag/rulerz > hoa/ruler                                 |
-|                                      |            |             | years ago); repository archived on GitHub; last push         |                                                             |
+| doctrine/annotations                 | 2.0.2      | abandoned   | flagged abandoned by its repository                          | sensio/framework-extra-bundle                               |
+| doctrine/cache                       | 2.2.0      | abandoned   | flagged abandoned by its repository; last release 2022-05-20 | doctrine/doctrine-bundle                                    |
+|                                      |            |             | (4.3 years ago)                                              |                                                             |
+| hoa/compiler                         | 3.17.08.08 | abandoned   | flagged abandoned by its repository; last release 2017-08-08 | wallabag/rulerz > hoa/ruler                                 |
+|                                      |            |             | (9.1 years ago); repository archived on GitHub; last push    |                                                             |
 |                                      |            |             | 2021-04-29 (5.4 years ago)                                   |                                                             |
-| hoa/consistency                      | 1.17.05.02 | abandoned   | flagged abandoned on Packagist; last release 2017-08-29 (9.0 | wallabag/rulerz                                             |
-|                                      |            |             | years ago); repository archived on GitHub; last push         |                                                             |
+| hoa/consistency                      | 1.17.05.02 | abandoned   | flagged abandoned by its repository; last release 2017-08-29 | wallabag/rulerz                                             |
+|                                      |            |             | (9.0 years ago); repository archived on GitHub; last push    |                                                             |
 |                                      |            |             | 2021-04-28 (5.4 years ago); released 2017-05-02, before PHP  |                                                             |
 |                                      |            |             | 8.4 GA (2024-11-21); php constraint ">=5.5.0" has no upper   |                                                             |
 |                                      |            |             | bound                                                        |                                                             |
-| hoa/event                            | 1.17.01.13 | abandoned   | flagged abandoned on Packagist; last release 2017-08-30 (9.0 | wallabag/rulerz > hoa/consistency > hoa/exception           |
-|                                      |            |             | years ago); repository archived on GitHub; last push         |                                                             |
+| hoa/event                            | 1.17.01.13 | abandoned   | flagged abandoned by its repository; last release 2017-08-30 | wallabag/rulerz > hoa/consistency > hoa/exception           |
+|                                      |            |             | (9.0 years ago); repository archived on GitHub; last push    |                                                             |
 |                                      |            |             | 2021-04-29 (5.4 years ago)                                   |                                                             |
-| hoa/exception                        | 1.17.01.16 | abandoned   | flagged abandoned on Packagist; last release 2017-08-30 (9.0 | wallabag/rulerz > hoa/consistency                           |
-|                                      |            |             | years ago); repository archived on GitHub; last push         |                                                             |
+| hoa/exception                        | 1.17.01.16 | abandoned   | flagged abandoned by its repository; last release 2017-08-30 | wallabag/rulerz > hoa/consistency                           |
+|                                      |            |             | (9.0 years ago); repository archived on GitHub; last push    |                                                             |
 |                                      |            |             | 2021-04-29 (5.4 years ago)                                   |                                                             |
-| hoa/file                             | 1.17.07.11 | abandoned   | flagged abandoned on Packagist; last release 2017-07-11 (9.2 | wallabag/rulerz > hoa/ruler                                 |
-|                                      |            |             | years ago); repository archived on GitHub; last push         |                                                             |
+| hoa/file                             | 1.17.07.11 | abandoned   | flagged abandoned by its repository; last release 2017-07-11 | wallabag/rulerz > hoa/ruler                                 |
+|                                      |            |             | (9.2 years ago); repository archived on GitHub; last push    |                                                             |
 |                                      |            |             | 2018-01-23 (8.6 years ago)                                   |                                                             |
-| hoa/iterator                         | 2.17.01.10 | abandoned   | flagged abandoned on Packagist; last release 2017-01-10 (9.7 | wallabag/rulerz > hoa/ruler > hoa/compiler                  |
-|                                      |            |             | years ago); repository archived on GitHub; last push         |                                                             |
+| hoa/iterator                         | 2.17.01.10 | abandoned   | flagged abandoned by its repository; last release 2017-01-10 | wallabag/rulerz > hoa/ruler > hoa/compiler                  |
+|                                      |            |             | (9.7 years ago); repository archived on GitHub; last push    |                                                             |
 |                                      |            |             | 2021-04-29 (5.4 years ago)                                   |                                                             |
-| hoa/math                             | 1.17.05.16 | abandoned   | flagged abandoned on Packagist; last release 2017-05-16 (9.3 | wallabag/rulerz > hoa/ruler > hoa/compiler                  |
-|                                      |            |             | years ago); repository archived on GitHub; last push         |                                                             |
+| hoa/math                             | 1.17.05.16 | abandoned   | flagged abandoned by its repository; last release 2017-05-16 | wallabag/rulerz > hoa/ruler > hoa/compiler                  |
+|                                      |            |             | (9.3 years ago); repository archived on GitHub; last push    |                                                             |
 |                                      |            |             | 2021-04-29 (5.4 years ago)                                   |                                                             |
-| hoa/protocol                         | 1.17.01.14 | abandoned   | flagged abandoned on Packagist; last release 2017-01-14 (9.7 | wallabag/rulerz > hoa/ruler                                 |
-|                                      |            |             | years ago); repository archived on GitHub; last push         |                                                             |
+| hoa/protocol                         | 1.17.01.14 | abandoned   | flagged abandoned by its repository; last release 2017-01-14 | wallabag/rulerz > hoa/ruler                                 |
+|                                      |            |             | (9.7 years ago); repository archived on GitHub; last push    |                                                             |
 |                                      |            |             | 2021-04-29 (5.4 years ago)                                   |                                                             |
-| hoa/regex                            | 1.17.01.13 | abandoned   | flagged abandoned on Packagist; last release 2017-01-13 (9.7 | wallabag/rulerz > hoa/ruler > hoa/compiler                  |
-|                                      |            |             | years ago); repository archived on GitHub; last push         |                                                             |
+| hoa/regex                            | 1.17.01.13 | abandoned   | flagged abandoned by its repository; last release 2017-01-13 | wallabag/rulerz > hoa/ruler > hoa/compiler                  |
+|                                      |            |             | (9.7 years ago); repository archived on GitHub; last push    |                                                             |
 |                                      |            |             | 2018-07-20 (8.2 years ago)                                   |                                                             |
 +--------------------------------------+------------+-------------+--------------------------------------------------------------+-------------------------------------------------------------+
 ... (188 more rows omitted)
 +--------------------------------------+------------+-------------+--------------------------------------------------------------+-------------------------------------------------------------+
 200 packages checked · abandoned 19 · silent 8 · pinned 4 · old-promise 41 · stale 3 · unknown 0 · finished 18 · ok 107
-Data as of 2026-09-13 (Packagist, GitHub). Run composer lockrot --format=json for details.
+Data as of 2026-09-13 (package repositories, GitHub). Run composer lockrot --format=json for details.
 ```
 
-"Data as of" is the date the report was generated (UTC) — here 2026-09-13, the recording used for
-this run. wallabag is used because its lock file is public and large, not to single it out.
+"Data as of" is the date the report was generated (UTC). wallabag is used because its lock file is
+public and large, not to single it out.
 
 Package metadata comes from the repositories configured in the project's `composer.json`, read
 through Composer's own repository layer (`ComposerRepository::loadPackages()`) — Packagist by
@@ -114,6 +114,12 @@ Composer's own authentication and proxy settings. Composer's metadata cache is r
 revalidated (`If-Modified-Since`) on every run, which is why the repository side of "Data as of"
 tracks the run itself; GitHub repository-activity data keeps the timestamp of its own 24-hour cache
 and can lag behind by up to a day.
+
+Only repositories that publish a `metadata-url` (the Composer v2 "p2" protocol) are read one
+package file at a time, which is what keeps memory flat on a large lock file. A repository without
+one — a Composer v1-style or static repository, including `packages.json`-only Satis output — is
+loaded whole by Composer before any name can be looked up, so its full package list is held in
+memory for the run.
 
 The same run with `--format=json` (first ~25 lines, up to the first flagged package):
 
@@ -125,7 +131,7 @@ The same run with `--format=json` (first ~25 lines, up to the first flagged pack
     },
     "generated_at": "2026-09-13T22:52:46+00:00",
     "packages_checked": 200,
-    "not_on_packagist": 0,
+    "not_from_composer_repository": 0,
     "network_failures": false,
     "counts": {
         "abandoned": 19,
@@ -220,7 +226,7 @@ must be JSON integers (`3`, not `"3"`).
 | `--target-php=8.4` | PHP version for the S5 check |
 | `--dev` | Include `packages-dev` |
 | `--all` | Show every checked package, not only flagged ones |
-| `--offline` | Never reach the network: sets `COMPOSER_DISABLE_NETWORK=1` before Composer boots, so repository metadata is served from Composer's own cache and GitHub activity from lockrot's cache |
+| `--offline` | Never reach the network: lockrot sets `COMPOSER_DISABLE_NETWORK=1` and rebuilds the configured repositories behind it (in plugin mode Composer has already built its own, network-enabled ones before any command runs), so repository metadata is served from Composer's own cache and GitHub activity from lockrot's cache. A package missing from the cache is reported as unavailable, not as absent from the repository |
 | `--strict-network` | Exit 1 (see [Exit codes](#exit-codes)) when a configured repository or GitHub could not be reached |
 
 Repository metadata is cached and revalidated by Composer itself, under Composer's own cache

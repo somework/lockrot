@@ -17,7 +17,7 @@ final class AbandonedRule implements SignalRule
             if (!$metadata->isAbandoned()) {
                 return null;
             }
-            $summary = 'flagged abandoned on Packagist';
+            $summary = 'flagged abandoned by its repository';
             if ($metadata->replacement() !== null) {
                 $summary .= ', replacement: '.$metadata->replacement();
             }

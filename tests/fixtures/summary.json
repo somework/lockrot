@@ -1,7 +1,7 @@
 {
  "BookStackApp_BookStack": {
   "prod": 113,
-  "not_on_packagist": 0,
+  "not_from_composer_repository": 0,
   "flagged": 0,
   "unflagged_no_release_5y": 3,
   "unflagged_no_release_no_push_5y": 1,
@@ -17,7 +17,7 @@
  },
  "PrestaShop_PrestaShop": {
   "prod": 228,
-  "not_on_packagist": 0,
+  "not_from_composer_repository": 0,
   "flagged": 3,
   "unflagged_no_release_5y": 10,
   "unflagged_no_release_no_push_5y": 3,
@@ -49,7 +49,7 @@
  },
  "firefly-iii_firefly-iii": {
   "prod": 133,
-  "not_on_packagist": 0,
+  "not_from_composer_repository": 0,
   "flagged": 0,
   "unflagged_no_release_5y": 5,
   "unflagged_no_release_no_push_5y": 2,
@@ -71,7 +71,7 @@
  },
  "grokability_snipe-it": {
   "prod": 167,
-  "not_on_packagist": 0,
+  "not_from_composer_repository": 0,
   "flagged": 1,
   "unflagged_no_release_5y": 12,
   "unflagged_no_release_no_push_5y": 6,
@@ -119,7 +119,7 @@
  },
  "koel_koel": {
   "prod": 156,
-  "not_on_packagist": 0,
+  "not_from_composer_repository": 0,
   "flagged": 0,
   "unflagged_no_release_5y": 3,
   "unflagged_no_release_no_push_5y": 2,
@@ -141,7 +141,7 @@
  },
  "matomo-org_matomo": {
   "prod": 52,
-  "not_on_packagist": 0,
+  "not_from_composer_repository": 0,
   "flagged": 0,
   "unflagged_no_release_5y": 4,
   "unflagged_no_release_no_push_5y": 2,
@@ -163,7 +163,7 @@
  },
  "mautic_mautic": {
   "prod": 193,
-  "not_on_packagist": 0,
+  "not_from_composer_repository": 0,
   "flagged": 2,
   "unflagged_no_release_5y": 9,
   "unflagged_no_release_no_push_5y": 4,
@@ -200,7 +200,7 @@
  },
  "monicahq_monica": {
   "prod": 165,
-  "not_on_packagist": 0,
+  "not_from_composer_repository": 0,
   "flagged": 1,
   "unflagged_no_release_5y": 8,
   "unflagged_no_release_no_push_5y": 2,
@@ -224,7 +224,7 @@
  },
  "wallabag_wallabag": {
   "prod": 200,
-  "not_on_packagist": 0,
+  "not_from_composer_repository": 0,
   "flagged": 19,
   "unflagged_no_release_5y": 16,
   "unflagged_no_release_no_push_5y": 9,

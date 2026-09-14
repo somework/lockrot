@@ -1,7 +1,7 @@
 {
  "bedrock": {
   "prod": 15,
-  "not_on_packagist": 1,
+  "not_from_composer_repository": 1,
   "flagged": 0,
   "unflagged_no_release_5y": 0,
   "unflagged_no_release_no_push_5y": 0,
@@ -10,7 +10,7 @@
  },
  "cakephp": {
   "prod": 20,
-  "not_on_packagist": 0,
+  "not_from_composer_repository": 0,
   "flagged": 0,
   "unflagged_no_release_5y": 2,
   "unflagged_no_release_no_push_5y": 0,
@@ -19,7 +19,7 @@
  },
  "drupal": {
   "prod": 68,
-  "not_on_packagist": 0,
+  "not_from_composer_repository": 0,
   "flagged": 0,
   "unflagged_no_release_5y": 4,
   "unflagged_no_release_no_push_5y": 2,
@@ -41,7 +41,7 @@
  },
  "laminas": {
   "prod": 22,
-  "not_on_packagist": 0,
+  "not_from_composer_repository": 0,
   "flagged": 3,
   "unflagged_no_release_5y": 1,
   "unflagged_no_release_no_push_5y": 0,
@@ -54,7 +54,7 @@
  },
  "laravel": {
   "prod": 76,
-  "not_on_packagist": 0,
+  "not_from_composer_repository": 0,
   "flagged": 0,
   "unflagged_no_release_5y": 1,
   "unflagged_no_release_no_push_5y": 0,
@@ -63,7 +63,7 @@
  },
  "shopware": {
   "prod": 174,
-  "not_on_packagist": 0,
+  "not_from_composer_repository": 0,
   "flagged": 0,
   "unflagged_no_release_5y": 5,
   "unflagged_no_release_no_push_5y": 1,
@@ -79,7 +79,7 @@
  },
  "sylius": {
   "prod": 196,
-  "not_on_packagist": 0,
+  "not_from_composer_repository": 0,
   "flagged": 3,
   "unflagged_no_release_5y": 6,
   "unflagged_no_release_no_push_5y": 1,
@@ -99,7 +99,7 @@
  },
  "symfony-webapp": {
   "prod": 133,
-  "not_on_packagist": 0,
+  "not_from_composer_repository": 0,
   "flagged": 0,
   "unflagged_no_release_5y": 6,
   "unflagged_no_release_no_push_5y": 2,
@@ -121,7 +121,7 @@
  },
  "yii2": {
   "prod": 25,
-  "not_on_packagist": 4,
+  "not_from_composer_repository": 4,
   "flagged": 0,
   "unflagged_no_release_5y": 2,
   "unflagged_no_release_no_push_5y": 0,

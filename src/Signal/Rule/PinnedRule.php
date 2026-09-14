@@ -18,7 +18,7 @@ final class PinnedRule implements SignalRule
         }
         $metadata = $facts->metadata();
         if ($metadata !== null && !$metadata->hasStableRelease()) {
-            return new Signal(Signal::S6, Signal::LEVEL_WARN, 'no tagged release on Packagist', ['version' => $package->version()]);
+            return new Signal(Signal::S6, Signal::LEVEL_WARN, 'no tagged release in its repository', ['version' => $package->version()]);
         }
 
         return null;

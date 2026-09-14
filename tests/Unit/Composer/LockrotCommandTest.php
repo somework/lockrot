@@ -7,10 +7,12 @@ namespace Lockrot\Tests\Unit\Composer;
 use Composer\Config;
 use Composer\Console\Application;
 use Composer\IO\IOInterface;
+use Composer\Util\Platform;
 use Lockrot\Allowlist\BuiltinAllowlist;
 use Lockrot\Analyzer\Analyzer;
 use Lockrot\Clock;
 use Lockrot\Composer\LockrotCommand;
+use Lockrot\Composer\ServiceFactory;
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Data\GitHub\GitHubClient;
 use Lockrot\Data\GitHub\GitHubFetchPlanner;
@@ -40,6 +42,8 @@ final class LockrotCommandTest extends TestCase
     private static ?RepositoryMetadataLoader $loader = null;
 
     private string $cwd;
+    /** @var list<string> */
+    private array $tempDirs = [];
 
     public static function setUpBeforeClass(): void
     {
@@ -67,6 +71,10 @@ final class LockrotCommandTest extends TestCase
     protected function tearDown(): void
     {
         chdir($this->cwd);
+        foreach ($this->tempDirs as $dir) {
+            self::removeTree($dir);
+        }
+        $this->tempDirs = [];
     }
 
     private function loader(): RepositoryMetadataLoader
@@ -294,33 +302,126 @@ final class LockrotCommandTest extends TestCase
         self::assertStringContainsString('fail-on', $stderr);
     }
 
-    public function testOfflineOptionSetsComposerDisableNetworkEnvBeforeAnalyzerFactoryRuns(): void
+    /**
+     * The end-to-end guarantee behind --offline, exercised through the real
+     * ServiceFactory::createAnalyzer (not the in-memory test loader) against a project whose
+     * composer.json points at the class-level fixture repository: with a cold Composer cache,
+     * nothing at all may be fetched.
+     *
+     * Setting COMPOSER_DISABLE_NETWORK is on its own not enough, and this is the condition that
+     * shows it: in plugin mode Composer\Console\Application::doRun() builds the Composer instance
+     * while collecting plugin commands (getPluginCommands() -> getComposer()), so its
+     * HttpDownloader — which latches COMPOSER_DISABLE_NETWORK in its own constructor — and its
+     * RepositoryManager both exist before any command's initialize() runs. The
+     * $app->getComposer(false, false) call below is exactly that call, reproduced here because
+     * CommandTester invokes Command::run() directly and would otherwise never trigger it.
+     */
+    public function testOfflineInPluginModeFetchesNothingIntoComposersCache(): void
     {
-        chdir(__DIR__.'/../../fixtures/skeletons/laravel');
-        putenv('COMPOSER_DISABLE_NETWORK');
-        $observed = null;
-        $loader = $this->emptyLoader();
-        $factory = function (IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, ?string $token, Clock $clock) use ($loader, &$observed): Analyzer {
-            $observed = getenv('COMPOSER_DISABLE_NETWORK');
+        $server = self::$server;
+        self::assertNotNull($server);
 
-            return new Analyzer(
-                $loader,
-                new GitHubClient(new RecordedHttpClient(__DIR__.'/../../fixtures/http/github'), 'recorded'),
-                new GitHubFetchPlanner(true),
-                BuiltinAllowlist::load(),
-                SignalSet::default($clock, $lockrot->thresholds(), $lockrot->targetPhp(), PhpReleaseDates::load()),
-                new VerdictEngine(),
-                $clock,
-                $lockrot->offline()
-            );
-        };
+        $project = $this->tempDir('lockrot-offline-project-');
+        $cacheDir = $this->tempDir('lockrot-offline-cache-');
+        $home = $this->tempDir('lockrot-offline-home-');
+        file_put_contents($project.'/composer.json', (string) json_encode([
+            'name' => 'lockrot/offline-plugin-mode-test',
+            'config' => ['secure-http' => false],
+            'repositories' => ['packagist.org' => false, 'fixture' => ['type' => 'composer', 'url' => $server->url()]],
+        ]));
+        file_put_contents($project.'/composer.lock', (string) json_encode([
+            'packages' => [['name' => 'phpzip/phpzip', 'version' => '2.0.8', 'notification-url' => 'https://packagist.org/downloads/']],
+        ]));
+
+        chdir($project);
+        Platform::putEnv('COMPOSER_CACHE_DIR', $cacheDir);
+        Platform::putEnv('COMPOSER_HOME', $home);
         try {
-            $tester = new CommandTester($this->buildCommand($factory));
-            $tester->execute(['--offline' => true, '--fail-on' => 'silent', '--target-php' => '8.4']);
-            self::assertSame('1', $observed);
+            $command = $this->buildCommand([ServiceFactory::class, 'createAnalyzer']);
+            $application = $command->getApplication();
+            self::assertInstanceOf(Application::class, $application);
+            $application->getComposer(false, false);
+
+            $tester = new CommandTester($command);
+            $code = $tester->execute(['--offline' => true, '--format' => 'json']);
+
+            self::assertSame(0, $code, $tester->getDisplay());
+            self::assertSame([], $this->fetchedFilesUnder($cacheDir), 'nothing may be fetched while offline');
+            $json = json_decode($tester->getDisplay(), true);
+            self::assertIsArray($json);
+            self::assertIsArray($json['notes']);
+            $unavailable = array_values(array_filter(
+                $json['notes'],
+                static fn ($note): bool => \is_string($note) && strpos($note, 'Repository metadata unavailable') === 0
+            ));
+            self::assertCount(1, $unavailable, (string) json_encode($json['notes']));
         } finally {
-            putenv('COMPOSER_DISABLE_NETWORK');
+            Platform::clearEnv('COMPOSER_CACHE_DIR');
+            Platform::clearEnv('COMPOSER_HOME');
+            Platform::clearEnv('COMPOSER_DISABLE_NETWORK');
         }
+    }
+
+    /**
+     * Relative paths of everything Composer wrote under its cache directory, minus the `.htaccess`
+     * guard Factory::createConfig() drops into every Composer directory it creates regardless of
+     * any request being made.
+     *
+     * @return list<string>
+     */
+    private function fetchedFilesUnder(string $dir): array
+    {
+        $found = [];
+        $items = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS)
+        );
+        foreach ($items as $item) {
+            if (!$item instanceof \SplFileInfo || !$item->isFile()) {
+                continue;
+            }
+            $relative = substr($item->getPathname(), \strlen($dir) + 1);
+            if ($relative === '.htaccess') {
+                continue;
+            }
+            $found[] = $relative;
+        }
+        sort($found);
+
+        return $found;
+    }
+
+    private function tempDir(string $prefix): string
+    {
+        $dir = sys_get_temp_dir().'/'.$prefix.uniqid('', true);
+        if (!mkdir($dir, 0777, true) && !is_dir($dir)) {
+            throw new \RuntimeException('cannot create temp dir: '.$dir);
+        }
+        $this->tempDirs[] = $dir;
+
+        return $dir;
+    }
+
+    private static function removeTree(string $dir): void
+    {
+        if (!is_dir($dir)) {
+            return;
+        }
+        $items = scandir($dir);
+        if ($items === false) {
+            return;
+        }
+        foreach ($items as $item) {
+            if ($item === '.' || $item === '..') {
+                continue;
+            }
+            $path = $dir.'/'.$item;
+            if (is_dir($path) && !is_link($path)) {
+                self::removeTree($path);
+            } else {
+                unlink($path);
+            }
+        }
+        rmdir($dir);
     }
 
     public function testWithoutOfflineOptionComposerDisableNetworkEnvStaysUnset(): void

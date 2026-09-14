@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Data\Repository;
 
+use Composer\Factory;
+use Composer\IO\NullIO;
+use Composer\Package\BasePackage;
+use Composer\Repository\ComposerRepository;
 use Lockrot\Clock;
 use Lockrot\Data\Http\RecordedHttpClient;
 use Lockrot\Data\Repository\RepositoryMetadataLoader;
@@ -14,12 +18,25 @@ use PHPUnit\Framework\TestCase;
 
 final class RepositoryMetadataLoaderTest extends TestCase
 {
+    public const CHUNK_FAILURE = 'the file for this package could not be read';
+
     private const WALLABAG_LOCK = __DIR__.'/../../../fixtures/apps/wallabag_wallabag/composer.lock';
     private const MATOMO_LOCK = __DIR__.'/../../../fixtures/apps/matomo-org_matomo/composer.lock';
     private const FIXED = '2026-09-14T00:00:00+00:00';
 
     private static ?FixtureRepositoryServer $server = null;
     private static ?RepositoryMetadataLoader $loader = null;
+
+    /** @var list<string> */
+    private array $tempDirs = [];
+
+    protected function tearDown(): void
+    {
+        foreach ($this->tempDirs as $dir) {
+            self::removeTree($dir);
+        }
+        $this->tempDirs = [];
+    }
 
     public static function setUpBeforeClass(): void
     {
@@ -304,5 +321,254 @@ final class RepositoryMetadataLoaderTest extends TestCase
         $meta = $batch->metadata()['phpzip/phpzip'] ?? null;
         self::assertNotNull($meta);
         self::assertSame(self::FIXED, $meta->dataDate()->format(\DATE_ATOM));
+    }
+
+    public function testNamesThatFailedAgainstTheFirstRepositoryAreStillOfferedToTheSecond(): void
+    {
+        // A never-started server (unbound port, empty cache) ahead of a working one: every name
+        // fails against the first repository. A repository that could not answer has not
+        // established that the package is absent from the next one, so the names must fall through.
+        $unreachable = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK]);
+        $working = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK]);
+        $working->start();
+        try {
+            $loader = new RepositoryMetadataLoader(
+                array_merge($unreachable->repositories(), $working->repositories()),
+                Clock::fixed(self::FIXED)
+            );
+
+            $batch = $loader->load(['phpzip/phpzip', 'wallabag/rulerz']);
+
+            self::assertSame([], $batch->failed());
+            self::assertSame([], $batch->notFound());
+            self::assertArrayHasKey('phpzip/phpzip', $batch->metadata());
+            self::assertArrayHasKey('wallabag/rulerz', $batch->metadata());
+        } finally {
+            $working->stop();
+            $unreachable->stop();
+        }
+    }
+
+    public function testAnUnreachableSecondRepositoryIsNeverConsultedOnceTheFirstResolved(): void
+    {
+        $working = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK]);
+        $working->start();
+        $unreachable = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK]);
+        try {
+            $loader = new RepositoryMetadataLoader(
+                array_merge($working->repositories(), $unreachable->repositories()),
+                Clock::fixed(self::FIXED)
+            );
+
+            $batch = $loader->load(['phpzip/phpzip']);
+
+            self::assertSame([], $batch->failed());
+            self::assertSame([], $batch->notFound());
+            self::assertArrayHasKey('phpzip/phpzip', $batch->metadata());
+        } finally {
+            $working->stop();
+            $unreachable->stop();
+        }
+    }
+
+    public function testTheFirstRepositoryServingANameWins(): void
+    {
+        $first = $this->syntheticServer(['dup/pkg' => [$this->p2Version('dup/pkg', '1.0.0')]]);
+        $second = $this->syntheticServer(['dup/pkg' => [
+            $this->p2Version('dup/pkg', '1.0.0'),
+            $this->p2Version('dup/pkg', '2.0.0'),
+        ]]);
+        $first->start();
+        $second->start();
+        try {
+            $loader = new RepositoryMetadataLoader(
+                array_merge($first->repositories(), $second->repositories()),
+                Clock::fixed(self::FIXED)
+            );
+
+            $meta = $loader->load(['dup/pkg'])->metadata()['dup/pkg'] ?? null;
+
+            self::assertNotNull($meta);
+            self::assertSame('1.0.0', $meta->lastStableVersion());
+            self::assertSame(1, $meta->releaseCount());
+        } finally {
+            $first->stop();
+            $second->stop();
+        }
+    }
+
+    public function testOneFailingChunkLeavesTheOtherChunksResolvable(): void
+    {
+        // Names are queried in chunks of CHUNK_SIZE; a chunk that throws must fail only its own
+        // names, not the whole load.
+        $server = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK]);
+        $server->start();
+        try {
+            $names = \array_slice($this->wallabagNames(), 0, RepositoryMetadataLoader::CHUNK_SIZE + 5);
+            $firstChunk = \array_slice($names, 0, RepositoryMetadataLoader::CHUNK_SIZE);
+            $laterChunk = \array_slice($names, RepositoryMetadataLoader::CHUNK_SIZE);
+            $loader = new RepositoryMetadataLoader([$this->repositoryFailingFor($server, $names[0])], Clock::fixed(self::FIXED));
+
+            $batch = $loader->load($names);
+
+            foreach ($firstChunk as $name) {
+                self::assertSame(self::CHUNK_FAILURE, $batch->failed()[$name] ?? null, $name.' shares the failing chunk');
+            }
+            foreach ($laterChunk as $name) {
+                self::assertArrayHasKey($name, $batch->metadata(), $name.' is in a later chunk and should resolve');
+            }
+            self::assertSame([], $batch->notFound());
+        } finally {
+            $server->stop();
+        }
+    }
+
+    public function testBranchAliasVersionsAreCountedOnce(): void
+    {
+        // ComposerRepository::loadPackages() returns an AliasPackage built from extra.branch-alias
+        // *and*, as a separate entry, the package it aliases (2.10.3
+        // src/Composer/Repository/ComposerRepository.php:1348-1352, 2.2.25 :960-964), so
+        // unwrapping aliases without deduplicating counts that release twice. The recorded p2
+        // fixtures have `extra` stripped, hence the hand-written envelopes here.
+        $server = $this->syntheticServer([
+            'alias/pkg' => [$this->p2Version('alias/pkg', '1.0.0', ['abandoned' => 'other/pkg'])],
+            'alias/pkg~dev' => [$this->p2Version('alias/pkg', 'dev-main', [
+                'extra' => ['branch-alias' => ['dev-main' => '2.0.x-dev']],
+            ])],
+        ]);
+        $server->start();
+        try {
+            $loader = new RepositoryMetadataLoader($server->repositories(), Clock::fixed(self::FIXED));
+
+            $meta = $loader->load(['alias/pkg'])->metadata()['alias/pkg'] ?? null;
+
+            self::assertNotNull($meta);
+            self::assertSame(2, $meta->releaseCount());
+            self::assertTrue($meta->isAbandoned());
+            self::assertSame('other/pkg', $meta->replacement());
+        } finally {
+            $server->stop();
+        }
+    }
+
+    /**
+     * A real ComposerRepository against the given fixture server that throws for every chunk
+     * containing $name, standing in for a repository whose root metadata is readable but whose
+     * file for one package is not.
+     */
+    private function repositoryFailingFor(FixtureRepositoryServer $server, string $name): ComposerRepository
+    {
+        $io = new NullIO();
+        $config = $server->config();
+        $repository = new class (['type' => 'composer', 'url' => $server->url()], $io, $config, Factory::createHttpDownloader($io, $config)) extends ComposerRepository {
+            public string $failFor = '';
+
+            /**
+             * @param array<string, \Composer\Semver\Constraint\ConstraintInterface|null> $packageNameMap
+             * @param array<'alpha'|'beta'|'dev'|'RC'|'stable', 0|5|10|15|20>             $acceptableStabilities
+             * @param array<string, 0|5|10|15|20>                                         $stabilityFlags
+             * @param array<string, array<string, \Composer\Package\PackageInterface>>    $alreadyLoaded
+             *
+             * @return array{namesFound: array<string>, packages: array<BasePackage>}
+             */
+            public function loadPackages(array $packageNameMap, array $acceptableStabilities, array $stabilityFlags, array $alreadyLoaded = [])
+            {
+                // The map is name => constraint-or-null, so isset() would miss every entry.
+                if (\array_key_exists($this->failFor, $packageNameMap)) {
+                    throw new \RuntimeException(RepositoryMetadataLoaderTest::CHUNK_FAILURE);
+                }
+
+                return parent::loadPackages($packageNameMap, $acceptableStabilities, $stabilityFlags, $alreadyLoaded);
+            }
+        };
+        $repository->failFor = $name;
+
+        return $repository;
+    }
+
+    /**
+     * A fixture repository server serving hand-written p2 envelopes, for the cases the recorded
+     * fixtures cannot express. Keys are package names, optionally suffixed `~dev` to land in the
+     * dev half of the p2 pair.
+     *
+     * @param array<string, list<array<string, mixed>>> $versionsByFile
+     */
+    private function syntheticServer(array $versionsByFile): FixtureRepositoryServer
+    {
+        $dir = $this->tempDir('lockrot-synthetic-repo-');
+        $envelopeDir = $dir.'/envelopes';
+        if (!mkdir($envelopeDir, 0777, true) && !is_dir($envelopeDir)) {
+            throw new \RuntimeException('cannot create temp dir: '.$envelopeDir);
+        }
+
+        $lockPackages = [];
+        foreach ($versionsByFile as $file => $versions) {
+            $name = (string) preg_replace('{~dev$}', '', $file);
+            $lockPackages[$name] = ['name' => $name, 'version' => '1.0.0'];
+            $url = 'https://repo.packagist.org/p2/'.$file.'.json';
+            file_put_contents(RecordedHttpClient::pathFor($envelopeDir, $url), (string) json_encode([
+                'status' => 200,
+                'fetched_at' => self::FIXED,
+                'body' => json_encode(['packages' => [$name => $versions]]),
+                'error' => null,
+            ]));
+        }
+        $lockPath = $dir.'/composer.lock';
+        file_put_contents($lockPath, (string) json_encode(['packages' => array_values($lockPackages)]));
+
+        return FixtureRepositoryServer::fromLockFiles([$lockPath], $envelopeDir);
+    }
+
+    /**
+     * One p2 version entry. `version_normalized` is deliberately left out so Composer's own
+     * VersionParser derives it, which is what keeps `dev-*` entries valid.
+     *
+     * @param array<string, mixed> $overrides
+     *
+     * @return array<string, mixed>
+     */
+    private function p2Version(string $name, string $version, array $overrides = []): array
+    {
+        return array_merge([
+            'name' => $name,
+            'version' => $version,
+            'type' => 'library',
+            'time' => '2020-01-01T00:00:00+00:00',
+            'source' => ['type' => 'git', 'url' => 'https://github.com/'.$name.'.git', 'reference' => str_repeat('a', 40)],
+        ], $overrides);
+    }
+
+    private function tempDir(string $prefix): string
+    {
+        $dir = sys_get_temp_dir().'/'.$prefix.uniqid('', true);
+        if (!mkdir($dir, 0777, true) && !is_dir($dir)) {
+            throw new \RuntimeException('cannot create temp dir: '.$dir);
+        }
+        $this->tempDirs[] = $dir;
+
+        return $dir;
+    }
+
+    private static function removeTree(string $dir): void
+    {
+        if (!is_dir($dir)) {
+            return;
+        }
+        $items = scandir($dir);
+        if ($items === false) {
+            return;
+        }
+        foreach ($items as $item) {
+            if ($item === '.' || $item === '..') {
+                continue;
+            }
+            $path = $dir.'/'.$item;
+            if (is_dir($path) && !is_link($path)) {
+                self::removeTree($path);
+            } else {
+                unlink($path);
+            }
+        }
+        rmdir($dir);
     }
 }

@@ -15,13 +15,20 @@ final class RepositoryMetadataLoader implements MetadataLoaderInterface
     public const CHUNK_SIZE = 10;
 
     /**
-     * Composer's ComposerRepository::asyncFetchFile() turns a "network disabled" transport error
-     * into a synthetic 404 whenever it has no cached copy to fall back on (no last-modified date to
-     * revalidate against) — so a name that comes back genuinely `notFound` while offline is
-     * indistinguishable from one that simply was never cached. Since that can't be trusted as "this
-     * package really doesn't exist", every such name is reported failed instead, not notFound.
+     * Every stability, i.e. no stability filtering at all: lockrot reports on what the lock file
+     * has already resolved, so a pre-release or branch version must still be readable here.
+     * Composer\Package\BasePackage::$stabilities is deprecated in 2.10 in favour of the
+     * BasePackage::STABILITIES constant, which 2.2 LTS does not have; the individual
+     * BasePackage::STABILITY_* constants exist in both (2.10.3 src/Composer/Package/BasePackage.php:37-41,
+     * 2.2.25 :37-41), so the map is spelled out from those.
      */
-    public const OFFLINE_NOT_FOUND_REASON = 'offline: not present in Composer\'s cache';
+    private const ALL_STABILITIES = [
+        'stable' => BasePackage::STABILITY_STABLE,
+        'RC' => BasePackage::STABILITY_RC,
+        'beta' => BasePackage::STABILITY_BETA,
+        'alpha' => BasePackage::STABILITY_ALPHA,
+        'dev' => BasePackage::STABILITY_DEV,
+    ];
 
     /** @var list<RepositoryInterface> */
     private array $repositories;
@@ -36,12 +43,20 @@ final class RepositoryMetadataLoader implements MetadataLoaderInterface
         $this->offline = $offline;
     }
 
-    /** @param list<string> $names */
+    /**
+     * Repositories are consulted in their configured order and the first one to resolve a name
+     * wins. A name a repository could not answer for — absent from it, or a failure against it —
+     * stays in the queue for the repositories behind it: one repository being unable to answer
+     * says nothing about whether the next one holds the package. A failure reason is therefore only
+     * reported once every repository has been given the name and none of them resolved it.
+     *
+     * @param list<string> $names
+     */
     public function load(array $names): MetadataBatch
     {
         $remaining = array_values(array_unique($names));
         $metadata = [];
-        $failed = [];
+        $reasons = [];
 
         foreach ($this->repositories as $repository) {
             if ($remaining === [] || !$repository instanceof ComposerRepository) {
@@ -49,17 +64,21 @@ final class RepositoryMetadataLoader implements MetadataLoaderInterface
             }
             $batch = $this->loadFromRepository($repository, $remaining);
             $metadata += $batch->metadata();
-            $failed += $batch->failed();
-            $remaining = $batch->notFound();
+            foreach ($batch->failed() as $name => $reason) {
+                $reasons[$name] = $reason;
+            }
+            $remaining = $this->unresolved($remaining, $metadata);
         }
 
         $notFound = [];
+        $failed = [];
         foreach ($remaining as $name) {
-            if (isset($failed[$name])) {
+            if (isset($reasons[$name])) {
+                $failed[$name] = $reasons[$name];
                 continue;
             }
             if ($this->offline) {
-                $failed[$name] = self::OFFLINE_NOT_FOUND_REASON;
+                $failed[$name] = MetadataLoaderInterface::OFFLINE_NOT_FOUND_REASON;
                 continue;
             }
             $notFound[] = $name;
@@ -69,10 +88,30 @@ final class RepositoryMetadataLoader implements MetadataLoaderInterface
     }
 
     /**
+     * @param list<string>                   $names
+     * @param array<string, PackageMetadata> $metadata everything resolved so far, by any repository
+     *
+     * @return list<string>
+     */
+    private function unresolved(array $names, array $metadata): array
+    {
+        $still = [];
+        foreach ($names as $name) {
+            if (!isset($metadata[$name])) {
+                $still[] = $name;
+            }
+        }
+
+        return $still;
+    }
+
+    /**
      * @param list<string> $remaining names to query against this one repository
      *
-     * @return MetadataBatch metadata()/failed() resolved in this pass; notFound() carries the
-     *                       names still unresolved (and not failed) to hand to the next repository
+     * @return MetadataBatch metadata()/failed() as this one repository answered them; notFound()
+     *                       carries the names it reported as absent. load() rebuilds the queue for
+     *                       the next repository from what has been resolved, so both the absent and
+     *                       the failed names are offered on.
      */
     private function loadFromRepository(ComposerRepository $repository, array $remaining): MetadataBatch
     {
@@ -82,7 +121,7 @@ final class RepositoryMetadataLoader implements MetadataLoaderInterface
 
         foreach (array_chunk($remaining, self::CHUNK_SIZE) as $chunk) {
             try {
-                $result = $repository->loadPackages(array_fill_keys($chunk, null), BasePackage::$stabilities, []);
+                $result = $repository->loadPackages(array_fill_keys($chunk, null), self::ALL_STABILITIES, []);
             } catch (\RuntimeException $e) {
                 foreach ($chunk as $name) {
                     $failed[$name] = $e->getMessage();
@@ -128,13 +167,23 @@ final class RepositoryMetadataLoader implements MetadataLoaderInterface
     private function groupByName(array $packages): array
     {
         $byName = [];
+        $seen = [];
         foreach ($packages as $package) {
             if ($package instanceof AliasPackage) {
+                // loadPackages() returns an AliasPackage built from extra.branch-alias *and*, as a
+                // separate entry, the package it aliases (2.10.3
+                // src/Composer/Repository/ComposerRepository.php:1348-1352, 2.2.25 :960-964), so
+                // unwrapping without deduplicating would count that release twice.
                 $package = $package->getAliasOf();
             }
             if (!$package instanceof BasePackage) {
                 continue;
             }
+            $id = spl_object_id($package);
+            if (isset($seen[$id])) {
+                continue;
+            }
+            $seen[$id] = true;
             $byName[$package->getName()][] = $package;
         }
 

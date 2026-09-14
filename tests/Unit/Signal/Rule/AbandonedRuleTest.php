@@ -17,7 +17,7 @@ final class AbandonedRuleTest extends TestCase
         self::assertNotNull($signal);
         self::assertSame(Signal::S1, $signal->id());
         self::assertSame(Signal::LEVEL_HIGH, $signal->level());
-        self::assertSame('flagged abandoned on Packagist, replacement: other/pkg', $signal->summary());
+        self::assertSame('flagged abandoned by its repository, replacement: other/pkg', $signal->summary());
         self::assertSame('other/pkg', $signal->data()['replacement']);
     }
 
