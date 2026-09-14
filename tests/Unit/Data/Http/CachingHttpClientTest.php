@@ -100,28 +100,6 @@ final class CachingHttpClientTest extends TestCase
         self::assertSame(0, $calls);
     }
 
-    public function testOfflineIgnoresRefresh(): void
-    {
-        $calls = 0;
-        $clock = Clock::fixed('2026-09-14T00:00:00+00:00');
-        $cache = new ArrayCache();
-        $cache->set('https://a', new HttpResult('https://a', 200, 'old', $clock->now()->modify('-30 days')));
-        $client = new CachingHttpClient($this->inner([], $calls), $cache, self::TTL, $clock, true, true);
-        $result = $client->fetchAll(['https://a'])['https://a'];
-        self::assertSame('old', $result->body());
-        self::assertSame(0, $calls);
-    }
-
-    public function testRefreshIgnoresFreshCache(): void
-    {
-        $calls = 0;
-        $clock = Clock::fixed('2026-09-14T00:00:00+00:00');
-        $cache = new ArrayCache();
-        $cache->set('https://a', new HttpResult('https://a', 200, 'old', $clock->now()));
-        $client = new CachingHttpClient($this->inner(['https://a' => new HttpResult('https://a', 200, 'new', $clock->now())], $calls), $cache, self::TTL, $clock, false, true);
-        self::assertSame('new', $client->fetchAll(['https://a'])['https://a']->body());
-    }
-
     public function testFailedRefetchFallsBackToStaleCache(): void
     {
         $calls = 0;

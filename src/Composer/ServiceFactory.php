@@ -31,7 +31,7 @@ final class ServiceFactory
         $http = self::createHttp($io, $config, $lockrot, $clock);
 
         return new Analyzer(
-            new RepositoryMetadataLoader($repositories, $clock),
+            new RepositoryMetadataLoader($repositories, $clock, $lockrot->offline()),
             new GitHubClient($http, $githubToken),
             new GitHubFetchPlanner($githubToken !== null),
             BuiltinAllowlist::load(),

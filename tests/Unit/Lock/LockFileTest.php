@@ -59,6 +59,18 @@ final class LockFileTest extends TestCase
         self::assertTrue($devtool->isDev());
     }
 
+    public function testEmptyNotificationUrlIsNotFromComposerRepository(): void
+    {
+        $lock = LockFile::fromArray([
+            'packages' => [
+                ['name' => 'a/b', 'version' => '1.0.0', 'notification-url' => ''],
+            ],
+        ]);
+        $pkg = $lock->find('a/b');
+        self::assertNotNull($pkg);
+        self::assertFalse($pkg->isFromComposerRepository());
+    }
+
     public function testRequiresExcludePlatformPackages(): void
     {
         $lock = LockFile::fromArray([

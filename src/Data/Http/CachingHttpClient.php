@@ -14,16 +14,14 @@ final class CachingHttpClient implements HttpClientInterface
     private int $ttl;
     private Clock $clock;
     private bool $offline;
-    private bool $refresh;
 
-    public function __construct(HttpClientInterface $inner, CacheInterface $cache, int $ttlSeconds, Clock $clock, bool $offline = false, bool $refresh = false)
+    public function __construct(HttpClientInterface $inner, CacheInterface $cache, int $ttlSeconds, Clock $clock, bool $offline = false)
     {
         $this->inner = $inner;
         $this->cache = $cache;
         $this->ttl = $ttlSeconds;
         $this->clock = $clock;
         $this->offline = $offline;
-        $this->refresh = $refresh;
     }
 
     /**
@@ -41,7 +39,7 @@ final class CachingHttpClient implements HttpClientInterface
         foreach ($urls as $url) {
             $cached = $this->cache->get($url);
             $isFresh = $cached !== null && $now - $cached->fetchedAt()->getTimestamp() < $this->ttl;
-            if ($cached !== null && ($this->offline || (!$this->refresh && $isFresh))) {
+            if ($cached !== null && ($this->offline || $isFresh)) {
                 $results[$url] = $cached;
                 continue;
             }

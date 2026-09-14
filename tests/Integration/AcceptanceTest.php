@@ -28,37 +28,57 @@ final class AcceptanceTest extends TestCase
 {
     private const FIXTURES = __DIR__.'/../fixtures/';
     private const NOW = '2026-09-14T00:00:00+00:00';
+    private const DIRS = ['apps/wallabag_wallabag', 'apps/nextcloud_3rdparty', 'skeletons/laravel', 'apps/matomo-org_matomo'];
+
+    private static ?FixtureRepositoryServer $server = null;
+    private static ?RepositoryMetadataLoader $loader = null;
+
+    public static function setUpBeforeClass(): void
+    {
+        $lockFiles = array_map(static fn (string $dir): string => self::FIXTURES.$dir.'/composer.lock', self::DIRS);
+        self::$server = FixtureRepositoryServer::fromLockFiles($lockFiles);
+        self::$server->start();
+        // One loader shared across every test in this class, matching how a real analyzer run uses
+        // it: one instance queried repeatedly rather than rebuilt per call.
+        self::$loader = new RepositoryMetadataLoader(self::$server->repositories(), Clock::fixed(self::NOW));
+    }
+
+    public static function tearDownAfterClass(): void
+    {
+        if (self::$server !== null) {
+            self::$server->stop();
+            self::$server = null;
+        }
+        self::$loader = null;
+    }
+
+    private function loader(): RepositoryMetadataLoader
+    {
+        $loader = self::$loader;
+        self::assertNotNull($loader);
+
+        return $loader;
+    }
 
     /**
-     * Builds a single-use fixture repository server for just this one lock file, runs one analysis
-     * against it, then stops it. A server is deliberately not shared/reused across test methods
-     * here: this class queries the 200-package wallabag lock through analyze() from three different
-     * tests, and reusing one long-lived `php -S` process (or one loader) across that many full loads
-     * was measured to wedge the server (the same reliability limit documented on
-     * RepositoryMetadataLoaderTest and FixtureRepositoryServer) — a server used for exactly one load
-     * and then stopped avoids it entirely, at the cost of one extra server start per test.
+     * $loader defaults to the shared class-level loader built in setUpBeforeClass(); testWallabag()
+     * passes its own private one instead, since it runs in a separate process where that static
+     * state was never built (see the comment on that test).
      */
-    private function analyze(string $dir): Report
+    private function analyze(string $dir, ?RepositoryMetadataLoader $loader = null): Report
     {
-        $server = FixtureRepositoryServer::fromLockFiles([self::FIXTURES.$dir.'/composer.lock']);
-        $server->start();
+        $clock = Clock::fixed(self::NOW);
+        $analyzer = new Analyzer(
+            $loader ?? $this->loader(),
+            new GitHubClient(new RecordedHttpClient(self::FIXTURES.'http/github'), 'recorded'),
+            new GitHubFetchPlanner(true),
+            BuiltinAllowlist::load(),
+            SignalSet::default($clock, new Thresholds(), '8.4', PhpReleaseDates::load()),
+            new VerdictEngine(),
+            $clock
+        );
 
-        try {
-            $clock = Clock::fixed(self::NOW);
-            $analyzer = new Analyzer(
-                new RepositoryMetadataLoader($server->repositories(), $clock),
-                new GitHubClient(new RecordedHttpClient(self::FIXTURES.'http/github'), 'recorded'),
-                new GitHubFetchPlanner(true),
-                BuiltinAllowlist::load(),
-                SignalSet::default($clock, new Thresholds(), '8.4', PhpReleaseDates::load()),
-                new VerdictEngine(),
-                $clock
-            );
-
-            return $analyzer->analyze(LockFile::fromFile(self::FIXTURES.$dir.'/composer.lock'), ProjectConfig::fromFile(self::FIXTURES.$dir.'/composer.json'), false);
-        } finally {
-            $server->stop();
-        }
+        return $analyzer->analyze(LockFile::fromFile(self::FIXTURES.$dir.'/composer.lock'), ProjectConfig::fromFile(self::FIXTURES.$dir.'/composer.json'), false);
     }
 
     /** @return array<string, Finding> */
@@ -78,30 +98,42 @@ final class AcceptanceTest extends TestCase
     // testing "how much did the entire run allocate before this point", not this analysis alone
     // — and it now sits close enough to the 64 MB budget that unrelated suite growth trips it.
     // Isolating it in its own process makes the peak reflect only this test again, matching the
-    // comment's actual intent (a PHAR-OOM regression guard for this one analysis).
+    // comment's actual intent (a PHAR-OOM regression guard for this one analysis). Process
+    // isolation runs this method in a brand-new PHP process that never calls setUpBeforeClass()
+    // (PHPUnit's method-isolation template instantiates the test case and calls run() directly),
+    // so the class-level $server/$loader built there do not exist here — this test builds its own
+    // private single-use server instead.
     /** @runInSeparateProcess */
     #[RunInSeparateProcess]
     public function testWallabag(): void
     {
-        $report = $this->analyze('apps/wallabag_wallabag');
-        $f = $this->byName($report);
-        self::assertSame(200, $report->packagesChecked());
-        // Recorded 2026-09-14: Packagist data moves over time, so the abandoned count is pinned to
-        // this recording rather than the 2026-09-14 research snapshot behind the spec. If this
-        // assertion needs updating again, print byVerdict() and diff the package names before
-        // touching the number.
-        self::assertSame(19, $report->byVerdict()[Verdict::ABANDONED], 'flagged abandoned 19 of 200 prod');
-        self::assertSame(Verdict::SILENT, $f['phpzip/phpzip']->verdict());
-        self::assertStringContainsString('last release 2015-11-16', $f['phpzip/phpzip']->evidence());
-        self::assertStringContainsString('last push 2015-11-16', $f['phpzip/phpzip']->evidence());
-        self::assertNotSame(Verdict::SILENT, $f['psr/cache']->verdict());
-        self::assertSame(Verdict::FINISHED, $f['ralouphie/getallheaders']->verdict());
-        self::assertSame(Verdict::PINNED, $f['wallabag/rulerz']->verdict());
-        self::assertSame(Verdict::ABANDONED, $f['hoa/ruler']->verdict());
-        self::assertFalse($report->hadNetworkFailures(), implode("\n", $report->notes()));
-        // Regression guard for the PHAR OOM at PHP's default 128M memory_limit: analysing a
-        // 200-package lock must not retain the expanded Packagist release history.
-        self::assertLessThan(64 * 1024 * 1024, memory_get_peak_usage(true), 'peak memory');
+        $server = FixtureRepositoryServer::fromLockFiles([self::FIXTURES.'apps/wallabag_wallabag/composer.lock']);
+        $server->start();
+        $loader = new RepositoryMetadataLoader($server->repositories(), Clock::fixed(self::NOW));
+
+        try {
+            $report = $this->analyze('apps/wallabag_wallabag', $loader);
+            $f = $this->byName($report);
+            self::assertSame(200, $report->packagesChecked());
+            // Recorded 2026-09-14: Packagist data moves over time, so the abandoned count is pinned to
+            // this recording rather than the 2026-09-14 research snapshot behind the spec. If this
+            // assertion needs updating again, print byVerdict() and diff the package names before
+            // touching the number.
+            self::assertSame(19, $report->byVerdict()[Verdict::ABANDONED], 'flagged abandoned 19 of 200 prod');
+            self::assertSame(Verdict::SILENT, $f['phpzip/phpzip']->verdict());
+            self::assertStringContainsString('last release 2015-11-16', $f['phpzip/phpzip']->evidence());
+            self::assertStringContainsString('last push 2015-11-16', $f['phpzip/phpzip']->evidence());
+            self::assertNotSame(Verdict::SILENT, $f['psr/cache']->verdict());
+            self::assertSame(Verdict::FINISHED, $f['ralouphie/getallheaders']->verdict());
+            self::assertSame(Verdict::PINNED, $f['wallabag/rulerz']->verdict());
+            self::assertSame(Verdict::ABANDONED, $f['hoa/ruler']->verdict());
+            self::assertFalse($report->hadNetworkFailures(), implode("\n", $report->notes()));
+            // Regression guard for the PHAR OOM at PHP's default 128M memory_limit: analysing a
+            // 200-package lock must not retain the expanded Packagist release history.
+            self::assertLessThan(64 * 1024 * 1024, memory_get_peak_usage(true), 'peak memory');
+        } finally {
+            $server->stop();
+        }
     }
 
     public function testNextcloud3rdparty(): void

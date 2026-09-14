@@ -30,30 +30,36 @@ final class FixtureRepositoryServer
     private const ROUTER_FILENAME = 'router.php';
 
     /**
-     * php -S's static file mode reuses keep-alive connections in a way that measurably stalls
-     * (not merely slows down) once a Composer repository issues enough sequential requests over
-     * the same connection pool — a 200-package load chunked at 10 reliably wedged after ~16
-     * chunks in local testing. A tiny router script that forces `Connection: close` on every
-     * response (falling through to the built-in static handler via `return false`) makes curl
-     * open a fresh connection per request instead of reusing a stale one, which eliminates the
-     * stall entirely; static-only serving (`-t docroot` with no router) is not used here for that
-     * reason.
+     * Serves every request itself rather than falling through to php -S's built-in static
+     * handler (`return false`): that built-in handler resets the response headers it generates,
+     * discarding anything the router already sent via `header()` — measured directly, a
+     * `Last-Modified` header set before `return false` never reaches the client. Composer's
+     * ComposerRepository caches that header on a first fetch and revalidates against it on later
+     * ones (offline, a cached `last-modified` is what lets it fake a 304 rather than a synthetic
+     * 404), so without a router that sends it itself, an offline re-fetch of an already-cached
+     * file could never be told apart from one that was never cached at all. `Connection: close`
+     * on every response makes curl open a fresh connection per request instead of reusing one
+     * across the whole load.
      */
     private const ROUTER_SCRIPT = <<<'PHP'
         <?php
         header('Connection: close');
         $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
         $file = $path === null ? null : __DIR__.$path;
-        if ($file !== null && is_file($file)) {
-            return false;
+        if ($file === null || !is_file($file)) {
+            http_response_code(404);
+            exit;
         }
-        http_response_code(404);
+        header('Content-Type: application/json');
+        header('Last-Modified: '.gmdate('D, d M Y H:i:s', filemtime($file)).' GMT');
+        readfile($file);
         PHP;
 
     private string $docroot;
     private string $cacheDir;
     private int $port;
     private ?Process $process = null;
+    private ?string $logFile = null;
 
     private function __construct(string $docroot, string $cacheDir, int $port)
     {
@@ -81,20 +87,44 @@ final class FixtureRepositoryServer
 
     public function start(): void
     {
-        // Deliberately not setting PHP_CLI_SERVER_WORKERS: the pcntl-forked worker pool it enables
-        // was measured to make concurrent Composer downloads *less* reliable here (dropped
-        // connections under a 200+ package load), while php -S's plain single-process event loop
-        // serves the same load in well under a second once ROUTER_SCRIPT forces connections closed.
-        $this->process = new Process([
-            \PHP_BINARY, '-S', '127.0.0.1:'.$this->port, '-t', $this->docroot, $this->docroot.'/'.self::ROUTER_FILENAME,
-        ]);
+        $logFile = tempnam(sys_get_temp_dir(), 'lockrot-fixture-log-');
+        if ($logFile === false) {
+            throw new \RuntimeException('cannot create a log file for the fixture repository server');
+        }
+        $this->logFile = $logFile;
+
+        // php -S writes one access-log line per request to stderr. Symfony\Process normally pipes
+        // a child process's stdout/stderr through the OS's pipe buffer (~64 KiB on macOS/Linux, a
+        // few hundred requests' worth of log lines) and only drains it when something calls back
+        // into the Process object (isRunning(), wait(), ...); once the startup poll loop below
+        // returns, nothing does that again until stop() runs at the end of the test. A real load
+        // (a 200-package analysis is ~1000 requests) fills that pipe and php -S then blocks in
+        // write(2) — a genuine, silent hang, not a slowdown, and nothing to do with keep-alive or
+        // connection reuse. Running through a shell with `> logfile 2>&1` redirects both streams
+        // straight to a file at the OS level, so there is no pipe for php -S to ever fill.
+        //
+        // The leading `exec` matters: without it, `/bin/sh -c '... > logfile 2>&1'` on this system
+        // forks php -S as a *child* of the shell rather than replacing the shell process, so the PID
+        // Symfony\Process tracks is the shell's — stop() then kills the shell and php -S is silently
+        // orphaned (reparented to init) and keeps running and holding the port forever. `exec`
+        // forces the shell to replace itself with php -S, so the tracked PID is the real one.
+        $command = \sprintf(
+            'exec %s -S 127.0.0.1:%d -t %s %s > %s 2>&1',
+            escapeshellarg(\PHP_BINARY),
+            $this->port,
+            escapeshellarg($this->docroot),
+            escapeshellarg($this->docroot.'/'.self::ROUTER_FILENAME),
+            escapeshellarg($logFile)
+        );
+        $this->process = Process::fromShellCommandline($command);
+        $this->process->setTimeout(null);
         $this->process->start();
 
         $context = stream_context_create(['http' => ['timeout' => 0.2, 'ignore_errors' => true]]);
         $deadline = microtime(true) + self::START_TIMEOUT_SECONDS;
         while (microtime(true) < $deadline) {
             if (!$this->process->isRunning()) {
-                $error = $this->process->getErrorOutput();
+                $error = $this->readLog();
                 $this->process = null;
                 throw new \RuntimeException('fixture repository server exited before it started answering: '.$error);
             }
@@ -105,8 +135,9 @@ final class FixtureRepositoryServer
             usleep(self::POLL_INTERVAL_MICROSECONDS);
         }
 
+        $error = $this->readLog();
         $this->stop();
-        throw new \RuntimeException('fixture repository server did not answer packages.json within '.self::START_TIMEOUT_SECONDS.'s');
+        throw new \RuntimeException('fixture repository server did not answer packages.json within '.self::START_TIMEOUT_SECONDS.'s: '.$error);
     }
 
     public function stop(): void
@@ -115,8 +146,24 @@ final class FixtureRepositoryServer
             $this->process->stop();
             $this->process = null;
         }
+        if ($this->logFile !== null) {
+            if (is_file($this->logFile)) {
+                unlink($this->logFile);
+            }
+            $this->logFile = null;
+        }
         self::removeDir($this->docroot);
         self::removeDir($this->cacheDir);
+    }
+
+    private function readLog(): string
+    {
+        if ($this->logFile === null || !is_file($this->logFile)) {
+            return '';
+        }
+        $contents = file_get_contents($this->logFile);
+
+        return $contents === false ? '' : $contents;
     }
 
     public function __destruct()

@@ -80,7 +80,7 @@ final class AnalyzerTest extends TestCase
         };
     }
 
-    private function analyzer(MetadataLoaderInterface $metadata, HttpClientInterface $http, bool $token, Allowlist $allowlist): Analyzer
+    private function analyzer(MetadataLoaderInterface $metadata, HttpClientInterface $http, bool $token, Allowlist $allowlist, bool $offline = false): Analyzer
     {
         $clock = Clock::fixed(F::NOW);
         return new Analyzer(
@@ -90,8 +90,21 @@ final class AnalyzerTest extends TestCase
             $allowlist,
             SignalSet::default($clock, new Thresholds(), '8.4', PhpReleaseDates::load()),
             new VerdictEngine(),
-            $clock
+            $clock,
+            $offline
         );
+    }
+
+    public function testOfflineNoteAppearsOnlyWhenOfflineFlagIsSet(): void
+    {
+        $lock = LockFile::fromArray(['packages' => []]);
+        $offlineReport = $this->analyzer($this->loader(), $this->http([]), true, new Allowlist([]), true)
+            ->analyze($lock, ProjectConfig::empty(), false);
+        $onlineReport = $this->analyzer($this->loader(), $this->http([]), true, new Allowlist([]), false)
+            ->analyze($lock, ProjectConfig::empty(), false);
+
+        self::assertContains("offline: repository metadata served from Composer's cache", $offlineReport->notes());
+        self::assertNotContains("offline: repository metadata served from Composer's cache", $onlineReport->notes());
     }
 
     public function testMiniProjectVerdicts(): void

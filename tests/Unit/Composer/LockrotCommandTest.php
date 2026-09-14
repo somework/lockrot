@@ -36,7 +36,28 @@ final class LockrotCommandTest extends TestCase
     private const LARAVEL_LOCK = __DIR__.'/../../fixtures/skeletons/laravel/composer.lock';
     private const FIXED_NOW = '2026-09-14T00:00:00+00:00';
 
+    private static ?FixtureRepositoryServer $server = null;
+    private static ?RepositoryMetadataLoader $loader = null;
+
     private string $cwd;
+
+    public static function setUpBeforeClass(): void
+    {
+        self::$server = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK, self::LARAVEL_LOCK]);
+        self::$server->start();
+        // One loader shared across every test in this class, matching how a real analyzer run uses
+        // it: one instance queried repeatedly rather than rebuilt per call.
+        self::$loader = new RepositoryMetadataLoader(self::$server->repositories(), Clock::fixed(self::FIXED_NOW));
+    }
+
+    public static function tearDownAfterClass(): void
+    {
+        if (self::$server !== null) {
+            self::$server->stop();
+            self::$server = null;
+        }
+        self::$loader = null;
+    }
 
     protected function setUp(): void
     {
@@ -46,6 +67,14 @@ final class LockrotCommandTest extends TestCase
     protected function tearDown(): void
     {
         chdir($this->cwd);
+    }
+
+    private function loader(): RepositoryMetadataLoader
+    {
+        $loader = self::$loader;
+        self::assertNotNull($loader);
+
+        return $loader;
     }
 
     /**
@@ -60,26 +89,6 @@ final class LockrotCommandTest extends TestCase
                 return new MetadataBatch([], $names, []);
             }
         };
-    }
-
-    /**
-     * Runs $body against a command wired to a fixture-server-backed loader for $lockFile, built and
-     * torn down just for this one call. Each of the three tests that actually run a full analysis
-     * needs its own private, single-use server: reusing one `php -S` process (or one loader) across
-     * more than one full ~200-package load was measured to wedge the server (see
-     * RepositoryMetadataLoaderTest and AcceptanceTest::testWallabag for the same constraint) — a
-     * server used for exactly one load, then stopped, avoids it entirely.
-     */
-    private function withRealMetadata(string $lockFile, callable $body): void
-    {
-        $server = FixtureRepositoryServer::fromLockFiles([$lockFile]);
-        $server->start();
-        try {
-            $loader = new RepositoryMetadataLoader($server->repositories(), Clock::fixed(self::FIXED_NOW));
-            $body($this->tester($loader));
-        } finally {
-            $server->stop();
-        }
     }
 
     private function command(?MetadataLoaderInterface $loader = null): LockrotCommand
@@ -97,6 +106,13 @@ final class LockrotCommandTest extends TestCase
                 $lockrot->offline()
             );
         };
+
+        return $this->buildCommand($factory);
+    }
+
+    /** @param callable(IOInterface, Config, list<\Composer\Repository\RepositoryInterface>, LockrotConfig, ?string, Clock): Analyzer $factory */
+    private function buildCommand(callable $factory): LockrotCommand
+    {
         $app = new Application();
         $app->setAutoExit(false);
         $command = new LockrotCommand($factory);
@@ -162,35 +178,32 @@ final class LockrotCommandTest extends TestCase
     public function testTableOutputAndExitCodeOnWallabag(): void
     {
         chdir(__DIR__.'/../../fixtures/apps/wallabag_wallabag');
-        $this->withRealMetadata(self::WALLABAG_LOCK, function (CommandTester $tester): void {
-            $code = $tester->execute(['--fail-on' => 'silent', '--target-php' => '8.4']);
-            self::assertSame(1, $code, $tester->getDisplay());
-            self::assertStringContainsString('phpzip/phpzip', $tester->getDisplay());
-            self::assertStringContainsString('200 packages checked', $tester->getDisplay());
-        });
+        $tester = $this->tester($this->loader());
+        $code = $tester->execute(['--fail-on' => 'silent', '--target-php' => '8.4']);
+        self::assertSame(1, $code, $tester->getDisplay());
+        self::assertStringContainsString('phpzip/phpzip', $tester->getDisplay());
+        self::assertStringContainsString('200 packages checked', $tester->getDisplay());
     }
 
     public function testJsonOutputAndDefaultExitZero(): void
     {
         chdir(__DIR__.'/../../fixtures/apps/wallabag_wallabag');
-        $this->withRealMetadata(self::WALLABAG_LOCK, function (CommandTester $tester): void {
-            $code = $tester->execute(['--format' => 'json', '--target-php' => '8.4']);
-            self::assertSame(0, $code);
-            $json = json_decode($tester->getDisplay(), true);
-            self::assertIsArray($json);
-            self::assertIsArray($json['lockrot']);
-            self::assertIsArray($json['counts']);
-            self::assertSame(1, $json['lockrot']['schema']);
-            self::assertSame(19, $json['counts']['abandoned']);
-        });
+        $tester = $this->tester($this->loader());
+        $code = $tester->execute(['--format' => 'json', '--target-php' => '8.4']);
+        self::assertSame(0, $code);
+        $json = json_decode($tester->getDisplay(), true);
+        self::assertIsArray($json);
+        self::assertIsArray($json['lockrot']);
+        self::assertIsArray($json['counts']);
+        self::assertSame(1, $json['lockrot']['schema']);
+        self::assertSame(19, $json['counts']['abandoned']);
     }
 
     public function testCleanProjectExitZero(): void
     {
         chdir(__DIR__.'/../../fixtures/skeletons/laravel');
-        $this->withRealMetadata(self::LARAVEL_LOCK, function (CommandTester $tester): void {
-            self::assertSame(0, $tester->execute(['--fail-on' => 'silent', '--target-php' => '8.4']));
-        });
+        $tester = $this->tester($this->loader());
+        self::assertSame(0, $tester->execute(['--fail-on' => 'silent', '--target-php' => '8.4']));
     }
 
     public function testMissingLockIsExit2(): void
@@ -279,5 +292,63 @@ final class LockrotCommandTest extends TestCase
         self::assertSame(2, $code);
         self::assertSame('', $stdout);
         self::assertStringContainsString('fail-on', $stderr);
+    }
+
+    public function testOfflineOptionSetsComposerDisableNetworkEnvBeforeAnalyzerFactoryRuns(): void
+    {
+        chdir(__DIR__.'/../../fixtures/skeletons/laravel');
+        putenv('COMPOSER_DISABLE_NETWORK');
+        $observed = null;
+        $loader = $this->emptyLoader();
+        $factory = function (IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, ?string $token, Clock $clock) use ($loader, &$observed): Analyzer {
+            $observed = getenv('COMPOSER_DISABLE_NETWORK');
+
+            return new Analyzer(
+                $loader,
+                new GitHubClient(new RecordedHttpClient(__DIR__.'/../../fixtures/http/github'), 'recorded'),
+                new GitHubFetchPlanner(true),
+                BuiltinAllowlist::load(),
+                SignalSet::default($clock, $lockrot->thresholds(), $lockrot->targetPhp(), PhpReleaseDates::load()),
+                new VerdictEngine(),
+                $clock,
+                $lockrot->offline()
+            );
+        };
+        try {
+            $tester = new CommandTester($this->buildCommand($factory));
+            $tester->execute(['--offline' => true, '--fail-on' => 'silent', '--target-php' => '8.4']);
+            self::assertSame('1', $observed);
+        } finally {
+            putenv('COMPOSER_DISABLE_NETWORK');
+        }
+    }
+
+    public function testWithoutOfflineOptionComposerDisableNetworkEnvStaysUnset(): void
+    {
+        chdir(__DIR__.'/../../fixtures/skeletons/laravel');
+        putenv('COMPOSER_DISABLE_NETWORK');
+        $observed = 'factory not called';
+        $loader = $this->emptyLoader();
+        $factory = function (IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, ?string $token, Clock $clock) use ($loader, &$observed): Analyzer {
+            $observed = getenv('COMPOSER_DISABLE_NETWORK');
+
+            return new Analyzer(
+                $loader,
+                new GitHubClient(new RecordedHttpClient(__DIR__.'/../../fixtures/http/github'), 'recorded'),
+                new GitHubFetchPlanner(true),
+                BuiltinAllowlist::load(),
+                SignalSet::default($clock, $lockrot->thresholds(), $lockrot->targetPhp(), PhpReleaseDates::load()),
+                new VerdictEngine(),
+                $clock,
+                $lockrot->offline()
+            );
+        };
+        try {
+            $tester = new CommandTester($this->buildCommand($factory));
+            $tester->execute(['--fail-on' => 'silent', '--target-php' => '8.4']);
+            self::assertFalse($observed);
+        } finally {
+            putenv('COMPOSER_DISABLE_NETWORK');
+        }
     }
 }

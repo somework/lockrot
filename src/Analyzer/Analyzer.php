@@ -85,7 +85,8 @@ final class Analyzer
 
         $plan = $this->planner->select($repoByPackage, $candidateByPackage);
         $repos = $plan->repos();
-        $githubBatch = $this->fetchGitHub($plan, $repoByPackage !== [], $notes);
+        [$githubBatch, $githubNotes] = $this->fetchGitHub($plan, $repoByPackage !== []);
+        $notes = array_merge($notes, $githubNotes);
         $activity = $githubBatch->activity();
 
         $findings = [];
@@ -101,7 +102,7 @@ final class Analyzer
                 ++$notInRepository;
             }
         }
-        $this->notes($notes, $notInRepository);
+        $notes = array_merge($notes, $this->notInRepositoryNotes($notInRepository));
 
         $hadNetworkFailures = $batch->failed() !== [] || $githubBatch->failed() !== [];
 
@@ -148,12 +149,14 @@ final class Analyzer
     }
 
     /**
-     * @param bool         $anyGitHubRepo whether any package resolved to a GitHub repository at all
-     * @param list<string> $notes
+     * @param bool $anyGitHubRepo whether any package resolved to a GitHub repository at all
+     *
+     * @return array{0: GitHubBatch, 1: list<string>}
      */
-    private function fetchGitHub(GitHubFetchPlan $plan, bool $anyGitHubRepo, array &$notes): GitHubBatch
+    private function fetchGitHub(GitHubFetchPlan $plan, bool $anyGitHubRepo): array
     {
         $githubBatch = $this->github->fetch($plan->repos());
+        $notes = [];
         // Without a token the planner both filters to candidates and caps the request count; the
         // report states the total left unchecked so a zero-candidate run does not look like a
         // complete one.
@@ -171,7 +174,7 @@ final class Analyzer
             $notes[] = \sprintf('GitHub unreachable for %d repositories: %s', \count($githubFailed), (string) reset($githubFailed));
         }
 
-        return $githubBatch;
+        return [$githubBatch, $notes];
     }
 
     private function buildFinding(LockedPackage $package, ?PackageMetadata $meta, ?RepositoryActivity $activity, bool $checked, ?AllowlistEntry $entry, DependencyGraph $graph, MetadataBatch $batch): Finding
@@ -201,14 +204,17 @@ final class Analyzer
         );
     }
 
-    /** @param list<string> $notes */
-    private function notes(array &$notes, int $notInRepository): void
+    /** @return list<string> */
+    private function notInRepositoryNotes(int $notInRepository): array
     {
         if ($notInRepository === 1) {
-            $notes[] = '1 package is not from a Composer repository and was not checked';
-        } elseif ($notInRepository > 1) {
-            $notes[] = \sprintf('%d packages are not from a Composer repository and were not checked', $notInRepository);
+            return ['1 package is not from a Composer repository and was not checked'];
         }
+        if ($notInRepository > 1) {
+            return [\sprintf('%d packages are not from a Composer repository and were not checked', $notInRepository)];
+        }
+
+        return [];
     }
 
     /** @param list<Signal> $signals */

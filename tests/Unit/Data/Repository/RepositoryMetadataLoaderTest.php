@@ -115,6 +115,27 @@ final class RepositoryMetadataLoaderTest extends TestCase
         self::assertSame([], $batch->failed());
     }
 
+    /**
+     * Regression test for a real hang: php -S writes one access-log line per request to stderr,
+     * and Symfony\Process only drains that pipe while something calls back into the Process object
+     * (which the startup poll loop does, but nothing does afterward). A single ~200-package load is
+     * already ~1000 requests; three of them back-to-back through the one shared loader/server this
+     * class builds in setUpBeforeClass() is ~3000 requests and previously wedged the server well
+     * before completing. FixtureRepositoryServer::start() now redirects the child's stdout/stderr to
+     * a file instead of a pipe, which removes the pipe to fill in the first place.
+     */
+    public function testThreeConsecutiveFullWallabagLoadsThroughSharedServerAllResolve(): void
+    {
+        $names = $this->wallabagNames();
+
+        for ($i = 1; $i <= 3; ++$i) {
+            $batch = $this->loader()->load($names);
+
+            self::assertCount(\count($names), $batch->metadata(), 'load #'.$i.' should resolve every name');
+            self::assertSame([], $batch->failed(), 'load #'.$i.' should have no failures');
+        }
+    }
+
     // memory_get_peak_usage(true) is a whole-process high-water mark that PHPUnit never resets
     // between tests, so this assertion is order-dependent on whatever else already ran earlier in
     // the same process (same root cause as AcceptanceTest::testWallabag's identical isolation).
@@ -200,6 +221,69 @@ final class RepositoryMetadataLoaderTest extends TestCase
         rmdir($envelopeDir);
         unlink($lockPath);
         rmdir($dir);
+    }
+
+    public function testOfflineWithColdCacheFailsEveryNameWithNetworkDisabledReason(): void
+    {
+        // Warm just the repository's root metadata online first (any successful load does that),
+        // but never touch the two names queried below — those stay cold at the per-package level.
+        // Composer\Repository\ComposerRepository::asyncFetchFile() (used for the per-package p2
+        // file, unlike the root file's own synchronous fetch) turns the "network disabled" transport
+        // error into a synthetic 404 when it has no last-modified date for that file to revalidate
+        // against, so these come back as plain `notFound` from Composer's own API — not trustworthy
+        // while offline, hence the loader's own reclassification into failed().
+        $server = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK]);
+        $server->start();
+        try {
+            $onlineLoader = new RepositoryMetadataLoader($server->repositories(), Clock::fixed(self::FIXED));
+            $onlineLoader->load(['ralouphie/getallheaders']);
+
+            putenv('COMPOSER_DISABLE_NETWORK=1');
+            try {
+                $loader = new RepositoryMetadataLoader($server->repositories(), Clock::fixed(self::FIXED), true);
+
+                $batch = $loader->load(['phpzip/phpzip', 'lox/xhprof']);
+
+                self::assertSame([], $batch->metadata());
+                self::assertSame([], $batch->notFound());
+                foreach (['phpzip/phpzip', 'lox/xhprof'] as $name) {
+                    self::assertSame(RepositoryMetadataLoader::OFFLINE_NOT_FOUND_REASON, $batch->failed()[$name] ?? null);
+                }
+            } finally {
+                putenv('COMPOSER_DISABLE_NETWORK');
+            }
+        } finally {
+            $server->stop();
+        }
+    }
+
+    public function testOfflineWithWarmCacheResolvesFromCache(): void
+    {
+        // Warm Composer's on-disk cache with one real (online) load against the running fixture
+        // server first, then repeat the same load offline against a fresh loader built from the same
+        // cache-dir config: ComposerRepository::asyncFetchFile() sees a last-modified date from the
+        // cached copy and fakes a 304, so this must resolve from cache rather than fail or notFound.
+        $server = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK]);
+        $server->start();
+        try {
+            $onlineLoader = new RepositoryMetadataLoader($server->repositories(), Clock::fixed(self::FIXED));
+            $warm = $onlineLoader->load(['phpzip/phpzip']);
+            self::assertArrayHasKey('phpzip/phpzip', $warm->metadata());
+
+            putenv('COMPOSER_DISABLE_NETWORK=1');
+            try {
+                $offlineLoader = new RepositoryMetadataLoader($server->repositories(), Clock::fixed(self::FIXED), true);
+                $batch = $offlineLoader->load(['phpzip/phpzip']);
+
+                self::assertSame([], $batch->failed());
+                self::assertSame([], $batch->notFound());
+                self::assertArrayHasKey('phpzip/phpzip', $batch->metadata());
+            } finally {
+                putenv('COMPOSER_DISABLE_NETWORK');
+            }
+        } finally {
+            $server->stop();
+        }
     }
 
     public function testNoRepositoriesMeansEveryNameIsNotFound(): void

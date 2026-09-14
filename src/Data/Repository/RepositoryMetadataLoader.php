@@ -14,15 +14,26 @@ final class RepositoryMetadataLoader implements MetadataLoaderInterface
 {
     public const CHUNK_SIZE = 10;
 
+    /**
+     * Composer's ComposerRepository::asyncFetchFile() turns a "network disabled" transport error
+     * into a synthetic 404 whenever it has no cached copy to fall back on (no last-modified date to
+     * revalidate against) — so a name that comes back genuinely `notFound` while offline is
+     * indistinguishable from one that simply was never cached. Since that can't be trusted as "this
+     * package really doesn't exist", every such name is reported failed instead, not notFound.
+     */
+    public const OFFLINE_NOT_FOUND_REASON = 'offline: not present in Composer\'s cache';
+
     /** @var list<RepositoryInterface> */
     private array $repositories;
     private Clock $clock;
+    private bool $offline;
 
     /** @param list<RepositoryInterface> $repositories only ComposerRepository instances are queried */
-    public function __construct(array $repositories, Clock $clock)
+    public function __construct(array $repositories, Clock $clock, bool $offline = false)
     {
         $this->repositories = $repositories;
         $this->clock = $clock;
+        $this->offline = $offline;
     }
 
     /** @param list<string> $names */
@@ -44,9 +55,14 @@ final class RepositoryMetadataLoader implements MetadataLoaderInterface
 
         $notFound = [];
         foreach ($remaining as $name) {
-            if (!isset($failed[$name])) {
-                $notFound[] = $name;
+            if (isset($failed[$name])) {
+                continue;
             }
+            if ($this->offline) {
+                $failed[$name] = self::OFFLINE_NOT_FOUND_REASON;
+                continue;
+            }
+            $notFound[] = $name;
         }
 
         return new MetadataBatch($metadata, $notFound, $failed);
