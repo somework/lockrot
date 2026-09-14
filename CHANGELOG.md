@@ -16,3 +16,5 @@
 - Standalone PHAR build (`build/lockrot.phar`) for use without adding a Composer dependency.
 - Configuration in `extra.lockrot` is validated against `resources/lockrot-config.schema.json`;
   threshold values must be integers.
+- Releases publish `lockrot.phar` with a `lockrot.phar.sha256` checksum; GPG signing and a Docker
+  image are deferred to a later release.

@@ -20,10 +20,9 @@ final class ConfigSchema
     /** @param array<string, mixed> $lockrotExtra contents of composer.json extra.lockrot */
     public static function validate(array $lockrotExtra): void
     {
-        // PHP decodes an empty JSON object ({}) the same way it decodes an empty JSON array ([]) —
-        // json_decode(..., true) turns both into []. So an empty extra.lockrot has already lost the
-        // "this was an object" information by the time it reaches here, and arrayToObjectRecursive()
-        // has nothing left to distinguish it from a list with; a bare stdClass hands the validator an
+        // json_decode(..., true) turns both an empty JSON object ({}) and an empty JSON array ([]) into
+        // [], so by the time an empty extra.lockrot reaches here the "this was an object" information is
+        // gone and arrayToObjectRecursive() cannot restore it. A bare stdClass hands the validator an
         // explicit object for this one case where the type would otherwise be ambiguous.
         $data = $lockrotExtra === [] ? new \stdClass() : BaseConstraint::arrayToObjectRecursive($lockrotExtra);
 

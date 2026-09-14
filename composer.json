@@ -4,6 +4,14 @@
     "type": "composer-plugin",
     "license": "MIT",
     "keywords": ["composer", "plugin", "dependencies", "maintenance", "abandoned"],
+    "homepage": "https://github.com/somework/lockrot",
+    "authors": [
+        {"name": "Igor Pinchuk", "email": "i.pinchuk.personal@gmail.com"}
+    ],
+    "support": {
+        "issues": "https://github.com/somework/lockrot/issues",
+        "source": "https://github.com/somework/lockrot"
+    },
     "require": {
         "php": "^7.4 || ^8.0",
         "composer-plugin-api": "^2.2"

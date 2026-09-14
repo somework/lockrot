@@ -16,7 +16,19 @@ jobs:
       - run: LOCKROT_E2E=1 vendor/bin/phpunit --group e2e --filter PharTest
       - uses: actions/upload-artifact@v4
         with: {name: lockrot.phar, path: 'build/lockrot.phar*'}
-      # TODO(release): sign with GPG
+      # GPG signing and a Docker image are deferred to a later release; the checksum ships with the PHAR.
       - if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with: {files: 'build/lockrot.phar*'}
+  # The PHAR is built on PHP 8.4 but must run on the plugin's floor; run it once on PHP 7.4.
+  smoke-php74:
+    needs: phar
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with: {php-version: '7.4'}
+      - uses: actions/download-artifact@v4
+        with: {name: lockrot.phar, path: build}
+      - run: php build/lockrot.phar --version
+      - run: php build/lockrot.phar -d tests/fixtures/skeletons/laravel --format=json --target-php=8.4 --offline > /dev/null

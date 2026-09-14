@@ -34,6 +34,10 @@ php lockrot.phar -d /path/to/project --target-php=8.4
 php lockrot.phar --version   # prints: lockrot 0.1.0
 ```
 
+Every release ships `lockrot.phar.sha256` next to the PHAR; verify the download with
+`sha256sum -c lockrot.phar.sha256`. GPG signatures and a Docker image are planned for a later
+release.
+
 The PHAR always runs the inspected project with `--no-plugins`: it reads `composer.lock` and
 `composer.json` and never needs that project's Composer plugins. It also never writes to
 `composer.json` or `composer.lock`.
