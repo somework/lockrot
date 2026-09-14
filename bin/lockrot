@@ -1,0 +1,94 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+// 70205 is composer/composer's own floor ("php": "^7.2.5 || ^8.0",
+// vendor/composer/composer/composer.json:25), not lockrot's: the PHAR bundles Composer, so it can
+// only run where the bundled Composer runs. The PHAR itself is built against platform PHP 7.4.0
+// (build/phar/composer.json) to match the plugin's floor — do not "fix" this number upwards.
+if (\PHP_VERSION_ID < 70205) {
+    fwrite(\STDERR, "lockrot.phar requires PHP 7.2.5 or newer\n");
+    exit(2);
+}
+
+foreach ([
+    __DIR__.'/../vendor/autoload.php',
+    __DIR__.'/../../../autoload.php',
+    __DIR__.'/../build/phar/vendor/autoload.php',
+] as $autoload) {
+    if (is_file($autoload)) {
+        require $autoload;
+        break;
+    }
+}
+
+if (!class_exists(\Composer\Console\Application::class)) {
+    fwrite(\STDERR, "composer/composer is not installed; run composer install in build/phar\n");
+    exit(2);
+}
+
+putenv('COMPOSER_DISABLE_XDEBUG_WARN=1');
+
+// Raise memory_limit the way Composer's own binary does before it builds the Application:
+// vendor/composer/composer/bin/composer:66-94 (2.10.3) — honour COMPOSER_MEMORY_LIMIT when set,
+// otherwise lift a limit lower than 1.5G up to 1536M and leave an unlimited (-1) limit alone.
+// Without this the PHAR dies on large lock files at PHP's default 128M, where the plugin path
+// inherits the bump from `composer` itself.
+$lockrotMemoryLimit = getenv('COMPOSER_MEMORY_LIMIT');
+if (\is_string($lockrotMemoryLimit) && $lockrotMemoryLimit !== '') {
+    @ini_set('memory_limit', $lockrotMemoryLimit);
+} else {
+    $lockrotMemoryInBytes = static function (string $value): int {
+        $multipliers = ['g' => 1024 * 1024 * 1024, 'm' => 1024 * 1024, 'k' => 1024];
+        $unit = strtolower(substr($value, -1, 1));
+
+        return (int) $value * ($multipliers[$unit] ?? 1);
+    };
+    $lockrotCurrentLimit = trim((string) \ini_get('memory_limit'));
+    if ($lockrotCurrentLimit !== '-1' && $lockrotMemoryInBytes($lockrotCurrentLimit) < 1024 * 1024 * 1536) {
+        @ini_set('memory_limit', '1536M');
+    }
+    unset($lockrotMemoryInBytes, $lockrotCurrentLimit);
+}
+unset($lockrotMemoryLimit);
+
+// The PHAR inspects someone else's project; booting that project's Composer plugins would run
+// third-party code lockrot never needs. Composer reads $_SERVER['argv'] itself (Application::run()
+// builds its own ArgvInput), so --no-plugins is injected here rather than parsed. The plugin path
+// (composer lockrot) is unaffected: this file is the PHAR entry point only.
+$lockrotArgv = $_SERVER['argv'] ?? [];
+if (\is_array($lockrotArgv) && !\in_array('--no-plugins', $lockrotArgv, true)) {
+    array_splice($lockrotArgv, 1, 0, ['--no-plugins']);
+    $_SERVER['argv'] = $lockrotArgv;
+    $_SERVER['argc'] = \count($lockrotArgv);
+}
+unset($lockrotArgv);
+
+// `lockrot.phar --version` should print one line about lockrot. Composer's Application
+// getLongVersion() appends Composer's own release date (Application.php:753 in 2.10.3, :541 in
+// 2.2.25) and its doRun() adds a PHP-version line plus a "diagnose" hint after the version is
+// printed (Application.php:459-462). Both are untyped in 2.2.25, so narrowing the return types in
+// this subclass is allowed.
+$application = new class () extends \Composer\Console\Application {
+    public function getLongVersion(): string
+    {
+        return 'lockrot '.\Lockrot\Output\JsonFormatter::VERSION;
+    }
+
+    public function doRun(\Symfony\Component\Console\Input\InputInterface $input, \Symfony\Component\Console\Output\OutputInterface $output): int
+    {
+        if ($input->hasParameterOption(['--version', '-V'], true)) {
+            $output->writeln($this->getLongVersion());
+
+            return 0;
+        }
+
+        return parent::doRun($input, $output);
+    }
+};
+$application->setName('lockrot');
+$application->setVersion(\Lockrot\Output\JsonFormatter::VERSION);
+$application->add(new \Lockrot\Composer\LockrotCommand());
+$application->setDefaultCommand('lockrot', true);
+exit($application->run());

@@ -1,0 +1,25 @@
+{
+    "_readme": ["mini fixture"],
+    "content-hash": "abc123",
+    "packages": [
+        {"name": "vendor/direct", "version": "1.2.3", "type": "library", "time": "2024-01-10T10:00:00+00:00",
+         "require": {"php": ">=7.4", "vendor/transitive": "^2.0", "ext-json": "*"},
+         "source": {"type": "git", "url": "https://github.com/vendor/direct.git", "reference": "aaa"},
+         "notification-url": "https://packagist.org/downloads/"},
+        {"name": "vendor/transitive", "version": "2.0.0", "type": "library", "time": "2015-11-16T16:30:51+00:00",
+         "require": {"php": ">=5.3.0"},
+         "source": {"type": "git", "url": "https://github.com/vendor/transitive.git", "reference": "bbb"},
+         "notification-url": "https://packagist.org/downloads/", "abandoned": true},
+        {"name": "vendor/snapshot", "version": "dev-master", "type": "library", "time": "2015-08-31T22:07:48+00:00",
+         "require": {"php": ">=5.2.0"},
+         "source": {"type": "git", "url": "https://github.com/vendor/snapshot.git", "reference": "ccc"},
+         "notification-url": "https://packagist.org/downloads/"},
+        {"name": "private/thing", "version": "3.0.0", "type": "library",
+         "source": {"type": "git", "url": "https://git.example.com/private/thing.git", "reference": "ddd"}}
+    ],
+    "packages-dev": [
+        {"name": "vendor/devtool", "version": "0.9.0", "type": "library", "time": "2020-01-01T00:00:00+00:00",
+         "require": {"vendor/direct": "^1.0"}, "notification-url": "https://packagist.org/downloads/"}
+    ],
+    "platform": {"php": ">=7.4"}
+}

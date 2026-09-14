@@ -1,0 +1,105 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+// Records Packagist p2 and GitHub responses for the acceptance fixtures so tests run offline.
+// Usage: GITHUB_TOKEN=... bin/record-fixtures [fixtureDir ...]
+require __DIR__.'/../vendor/autoload.php';
+
+use Lockrot\Data\GitHub\GitHubClient;
+use Lockrot\Data\GitHub\RepoLocator;
+use Lockrot\Data\Http\HttpResult;
+use Lockrot\Data\Http\RecordedHttpClient;
+use Lockrot\Data\Packagist\P2Expander;
+use Lockrot\Data\Packagist\PackagistClient;
+use Lockrot\Lock\LockFile;
+
+const KEEP = ['name', 'version', 'version_normalized', 'time', 'abandoned', 'source', 'require', 'type'];
+$root = \dirname(__DIR__);
+$fixtures = $argv;
+array_shift($fixtures);
+if ($fixtures === []) {
+    $fixtures = [
+        'tests/fixtures/apps/wallabag_wallabag', 'tests/fixtures/apps/nextcloud_3rdparty', 'tests/fixtures/apps/matomo-org_matomo',
+        'tests/fixtures/skeletons/laravel', 'tests/fixtures/apps/BookStackApp_BookStack',
+    ];
+}
+$p2Dir = $root.'/tests/fixtures/http/p2';
+$ghDir = $root.'/tests/fixtures/http/github';
+foreach ([$p2Dir, $ghDir] as $dir) {
+    if (!is_dir($dir)) {
+        mkdir($dir, 0777, true);
+    }
+}
+$fetch = static function (string $url, array $headers): HttpResult {
+    $ctx = stream_context_create(['http' => ['method' => 'GET', 'header' => implode("\r\n", array_merge(['User-Agent: lockrot-recorder'], $headers)), 'ignore_errors' => true, 'timeout' => 30]]);
+    $body = @file_get_contents($url, false, $ctx);
+    $status = 0;
+    foreach ($http_response_header ?? [] as $line) {
+        if (preg_match('{^HTTP/\S+\s+(\d{3})}', $line, $m) === 1) {
+            $status = (int) $m[1];
+        }
+    }
+    return new HttpResult($url, $status, $body === false ? null : $body, new \DateTimeImmutable('now', new \DateTimeZone('UTC')));
+};
+$trim = static function (string $body, string $name): string {
+    $json = json_decode($body, true);
+    if (!\is_array($json) || !isset($json['packages'][$name])) {
+        return $body;
+    }
+    $json['packages'][$name] = array_map(static fn (array $v): array => array_intersect_key($v, array_flip(KEEP)), $json['packages'][$name]);
+    unset($json['security-advisories']);
+    return json_encode($json, \JSON_UNESCAPED_SLASHES);
+};
+$packagist = new PackagistClient(new RecordedHttpClient($p2Dir));
+$github = new GitHubClient(new RecordedHttpClient($ghDir), getenv('GITHUB_TOKEN') ?: null);
+$repos = [];
+foreach ($fixtures as $fixture) {
+    $lock = LockFile::fromFile($root.'/'.$fixture.'/composer.lock');
+    foreach ($lock->packages(false) as $package) {
+        if (!$package->isOnPackagist()) {
+            continue;
+        }
+        $url = $packagist->url($package->name());
+        $path = RecordedHttpClient::pathFor($p2Dir, $url);
+        if (!is_file($path)) {
+            $result = $fetch($url, []);
+            $body = $result->body() === null ? null : $trim($result->body(), $package->name());
+            file_put_contents($path, json_encode((new HttpResult($url, $result->status(), $body, $result->fetchedAt()))->toEnvelope(), \JSON_UNESCAPED_SLASHES));
+            fwrite(STDERR, "p2 {$package->name()} {$result->status()}\n");
+        }
+        $env = json_decode((string) file_get_contents($path), true);
+        $expanded = \is_array($env) && \is_string($env['body']) ? P2Expander::expandResponse((array) json_decode($env['body'], true), $package->name()) : [];
+        if ($expanded === [] || $package->isBranchSnapshot()) {
+            $devUrl = $packagist->url($package->name(), true);
+            $devPath = RecordedHttpClient::pathFor($p2Dir, $devUrl);
+            if (!is_file($devPath)) {
+                $result = $fetch($devUrl, []);
+                $body = $result->body() === null ? null : $trim($result->body(), $package->name());
+                file_put_contents($devPath, json_encode((new HttpResult($devUrl, $result->status(), $body, $result->fetchedAt()))->toEnvelope(), \JSON_UNESCAPED_SLASHES));
+            }
+        }
+        $source = $expanded[0]['source']['url'] ?? $package->sourceUrl();
+        $repo = RepoLocator::github(\is_string($source) ? $source : null);
+        if ($repo !== null) {
+            $repos[$repo] = true;
+        }
+    }
+}
+foreach (array_keys($repos) as $repo) {
+    $url = $github->url($repo);
+    $path = RecordedHttpClient::pathFor($ghDir, $url);
+    if (is_file($path)) {
+        continue;
+    }
+    $result = $fetch($url, $github->headers());
+    $json = $result->body() === null ? null : json_decode($result->body(), true);
+    $body = \is_array($json) ? json_encode(array_intersect_key($json, array_flip(['full_name', 'archived', 'disabled', 'pushed_at', 'default_branch'])), \JSON_UNESCAPED_SLASHES) : $result->body();
+    file_put_contents($path, json_encode((new HttpResult($url, $result->status(), $body === false ? null : $body, $result->fetchedAt()))->toEnvelope(), \JSON_UNESCAPED_SLASHES));
+    fwrite(STDERR, "github {$repo} {$result->status()}\n");
+    if ($result->status() === 403) {
+        fwrite(STDERR, "rate limited; set GITHUB_TOKEN and re-run\n");
+        exit(1);
+    }
+}
+echo "recorded into tests/fixtures/http\n";

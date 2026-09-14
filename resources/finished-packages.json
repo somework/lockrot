@@ -1,0 +1,12 @@
+{
+    "_schema": "list of {pattern, version?, reason}; pattern supports * wildcards; version pins one exact release",
+    "entries": [
+        {"pattern": "psr/*", "reason": "PHP-FIG interface packages are complete by design; versions change only when the interface changes"},
+        {"pattern": "fig/*", "reason": "PHP-FIG utility packages are complete by design"},
+        {"pattern": "symfony/polyfill-*", "reason": "polyfills for older PHP versions; intentionally frozen once the target PHP is covered"},
+        {"pattern": "symfony/*-pack", "reason": "Symfony packs are metapackages that only list dependencies"},
+        {"pattern": "ralouphie/getallheaders", "reason": "single-function polyfill for getallheaders(); complete"},
+        {"pattern": "paragonie/random_compat", "version": "9.99.100", "reason": "intentionally empty package: PHP 7+ has random_bytes() built in"},
+        {"pattern": "paragonie/random_compat", "version": "9.99.99", "reason": "intentionally empty package: PHP 7+ has random_bytes() built in"}
+    ]
+}

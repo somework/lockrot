@@ -1,0 +1,65 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "properties": {
+        "fail-on": {
+            "type": "string",
+            "enum": ["none", "abandoned", "silent", "pinned", "old-promise", "stale"]
+        },
+        "target-php": {
+            "type": "string",
+            "pattern": "^\\d+(\\.\\d+)?$"
+        },
+        "format": {
+            "type": "string",
+            "enum": ["table", "json"]
+        },
+        "include-dev": {
+            "type": "boolean"
+        },
+        "cache-ttl": {
+            "type": "integer",
+            "minimum": 0
+        },
+        "release-warn-years": {
+            "type": "integer",
+            "minimum": 1
+        },
+        "release-high-years": {
+            "type": "integer",
+            "minimum": 1
+        },
+        "push-warn-years": {
+            "type": "integer",
+            "minimum": 1
+        },
+        "push-high-years": {
+            "type": "integer",
+            "minimum": 1
+        },
+        "ignore": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "package": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "reason": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "version": {
+                        "type": "string"
+                    },
+                    "expires": {
+                        "type": "string",
+                        "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                    }
+                },
+                "required": ["package", "reason"]
+            }
+        }
+    }
+}

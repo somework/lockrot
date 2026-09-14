@@ -1,0 +1,7 @@
+{
+    "name": "acme/app",
+    "require": {"php": "^7.4 || ^8.0", "vendor/direct": "^1.0"},
+    "require-dev": {"vendor/devtool": "^0.9"},
+    "config": {"platform": {"php": "8.1.0"}},
+    "extra": {"lockrot": {"fail-on": "silent", "ignore": [{"package": "private/thing", "reason": "in-house"}]}}
+}
