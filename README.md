@@ -104,9 +104,16 @@ GITHUB_TOKEN=$(gh auth token) php bin/lockrot -d tests/fixtures/apps/wallabag_wa
 Data as of 2026-09-13 (Packagist, GitHub). Run composer lockrot --format=json for details.
 ```
 
-"Data as of" is the date the Packagist and GitHub data behind the report were fetched (UTC) — here
-2026-09-13, the recording used for this run — not the date of the run itself. wallabag is used
-because its lock file is public and large, not to single it out.
+"Data as of" is the date the report was generated (UTC) — here 2026-09-13, the recording used for
+this run. wallabag is used because its lock file is public and large, not to single it out.
+
+Package metadata comes from the repositories configured in the project's `composer.json`, read
+through Composer's own repository layer (`ComposerRepository::loadPackages()`) — Packagist by
+default, but Private Packagist, Satis instances and mirrors are honoured the same way, along with
+Composer's own authentication and proxy settings. Composer's metadata cache is reused and
+revalidated (`If-Modified-Since`) on every run, which is why the repository side of "Data as of"
+tracks the run itself; GitHub repository-activity data keeps the timestamp of its own 24-hour cache
+and can lag behind by up to a day.
 
 The same run with `--format=json` (first ~25 lines, up to the first flagged package):
 
@@ -147,12 +154,12 @@ The same run with `--format=json` (first ~25 lines, up to the first flagged pack
 
 | Verdict | Meaning | Signals |
 |---|---|---|
-| `abandoned` | Packagist flags it abandoned, or its GitHub repository is archived | S1 or S3 |
+| `abandoned` | The package's Composer repository flags it abandoned (Packagist by default), or its GitHub repository is archived | S1 or S3 |
 | `silent` | No stable release for at least `release-high-years` (default 5y) **and** no repository push for at least `push-high-years` (default 5y); an archived repository is reported as `abandoned` instead | S2 high AND S4 high, NOT S1, NOT S3 |
 | `pinned` | Installed version is a branch snapshot (`dev-*` or `#hash`), or the package has no stable release at all | S6 |
 | `old-promise` | The installed version was released before the target PHP's GA date, and its `require.php` constraint is open-ended (`>=N`, `*`) for that target | S5 |
 | `stale` | Old release or old push, but not old enough (or not on both fronts) for `silent` | one of S2/S4 |
-| `unknown` | No data could be obtained (not on Packagist, or all lookups failed) | — |
+| `unknown` | No data could be obtained (not found in any configured Composer repository, or all lookups failed) | — |
 | `finished` | Matched the built-in or project allowlist — the package is complete by design, not neglected | allowlist match |
 | `ok` | None of the above | — |
 
@@ -177,7 +184,6 @@ must be JSON integers (`3`, not `"3"`).
 | `target-php` | running PHP / `config.platform.php` | PHP version used for the S5 "old promise" check, e.g. `"8.4"` |
 | `format` | `table` | `table` or `json` |
 | `include-dev` | `false` | Also check `packages-dev` |
-| `cache-ttl` | `86400` (24h, seconds) | How long cached Packagist/GitHub responses are reused |
 | `release-warn-years` / `release-high-years` | `3` / `5` | Integer thresholds for "no stable release" (S2) |
 | `push-warn-years` / `push-high-years` | `3` / `5` | Integer thresholds for "no repository push" (S4) |
 | `ignore` | `[]` | Project allowlist, see [Allowlist](#allowlist) below |
@@ -188,7 +194,6 @@ must be JSON integers (`3`, not `"3"`).
         "lockrot": {
             "fail-on": "silent",
             "target-php": "8.4",
-            "cache-ttl": 43200,
             "ignore": [
                 { "package": "acme/legacy-bridge", "reason": "internal fork, tracked in ACME-123", "expires": "2027-01-01" }
             ]
@@ -215,13 +220,15 @@ must be JSON integers (`3`, not `"3"`).
 | `--target-php=8.4` | PHP version for the S5 check |
 | `--dev` | Include `packages-dev` |
 | `--all` | Show every checked package, not only flagged ones |
-| `--offline` | Use cached data only, never reach the network |
-| `--refresh` | Ignore the cache and fetch fresh data |
-| `--strict-network` | Exit 1 (see [Exit codes](#exit-codes)) when Packagist or GitHub could not be reached |
+| `--offline` | Never reach the network: sets `COMPOSER_DISABLE_NETWORK=1` before Composer boots, so repository metadata is served from Composer's own cache and GitHub activity from lockrot's cache |
+| `--strict-network` | Exit 1 (see [Exit codes](#exit-codes)) when a configured repository or GitHub could not be reached |
 
-Cached Packagist/GitHub responses live under Composer's own cache directory, in a `lockrot/`
-subfolder, with a 24-hour default TTL. When Composer's cache is disabled (`composer --no-cache`),
-responses are kept in memory for the run only and nothing is written to disk.
+Repository metadata is cached and revalidated by Composer itself, under Composer's own cache
+directory — lockrot adds no cache of its own for it, and there is no `--refresh` or `cache-ttl` knob
+to bypass or resize it. GitHub repository-activity responses are cached separately under Composer's
+cache directory, in a `lockrot/` subfolder, with a fixed 24-hour TTL. When Composer's cache is
+disabled (`composer --no-cache`), GitHub responses are kept in memory for the run only and nothing
+is written to disk.
 
 ### Testing hooks
 
@@ -236,11 +243,13 @@ calculation; it is used by the test suite and is not part of the configuration c
 | `1` | A finding reached or exceeded the `fail-on` threshold |
 | `2` | Tool or configuration error (bad `composer.json`/`composer.lock`, invalid config value) |
 
-A network failure (Packagist or GitHub unreachable) never turns into a non-zero exit code on its
-own — it is reported as a note and the checks that could not run are treated as absent evidence —
-unless `--strict-network` is passed, in which case it exits `1`. A `composer.lock` entry that
-Composer's own loader cannot load (missing `name`/`version`, an unnormalizable version, or a
-malformed entry) stops the report with exit `2` rather than being skipped.
+A network failure (a configured Composer repository or GitHub unreachable) never turns into a
+non-zero exit code on its own — it is reported as a note and the checks that could not run are
+treated as absent evidence — unless `--strict-network` is passed, in which case it exits `1`. This
+also covers `--offline` runs where a locked package has no cached metadata: it is reported as a
+failure, not silently skipped. A `composer.lock` entry that Composer's own loader cannot load
+(missing `name`/`version`, an unnormalizable version, or a malformed entry) stops the report with
+exit `2` rather than being skipped.
 
 ## CI snippet
 

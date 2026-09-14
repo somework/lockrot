@@ -10,7 +10,12 @@
 - `table` (default) and `--format=json` output.
 - Exit codes 0/1/2 driven by `--fail-on`, with network failures defaulting to exit 0 unless
   `--strict-network` is set.
-- 24-hour response cache in Composer's cache directory, with `--offline` and `--refresh`.
+- Package metadata loaded through the repositories configured for the project
+  (`ComposerRepository::loadPackages()`), Packagist by default, reusing and revalidating Composer's
+  own metadata cache; GitHub repository-activity responses keep a fixed 24-hour cache in Composer's
+  cache directory. `--offline` serves both from cache without touching the network; `--refresh` and
+  the `cache-ttl` config key are gone — there is no longer a user-facing knob to bypass or resize the
+  cache.
 - Optional GitHub token (`GITHUB_TOKEN`/`LOCKROT_GITHUB_TOKEN`/Composer `github-oauth`) for
   repository activity signals; runs without one at a reduced candidate budget.
 - Standalone PHAR build (`build/lockrot.phar`) for use without adding a Composer dependency.
