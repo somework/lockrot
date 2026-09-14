@@ -10,6 +10,7 @@ use Composer\Package\BasePackage;
 use Composer\Repository\ComposerRepository;
 use Lockrot\Clock;
 use Lockrot\Data\Http\RecordedHttpClient;
+use Lockrot\Data\Repository\MetadataLoaderInterface;
 use Lockrot\Data\Repository\RepositoryMetadataLoader;
 use Lockrot\Lock\LockFile;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
@@ -264,7 +265,7 @@ final class RepositoryMetadataLoaderTest extends TestCase
                 self::assertSame([], $batch->metadata());
                 self::assertSame([], $batch->notFound());
                 foreach (['phpzip/phpzip', 'lox/xhprof'] as $name) {
-                    self::assertSame(RepositoryMetadataLoader::OFFLINE_NOT_FOUND_REASON, $batch->failed()[$name] ?? null);
+                    self::assertSame(MetadataLoaderInterface::OFFLINE_NOT_FOUND_REASON, $batch->failed()[$name] ?? null);
                 }
             } finally {
                 putenv('COMPOSER_DISABLE_NETWORK');

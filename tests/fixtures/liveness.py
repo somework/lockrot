@@ -32,7 +32,7 @@ for proj in sorted(os.listdir(base)):
     for n in stale5:
         g=gh(meta[n]['src'])
         if g and (g['archived'] or yrs(g['pushed'])>=5): dead.append((meta[n]['last'][:10],(g['pushed'] or '')[:10],g['archived'],n))
-    res[proj]=dict(prod=len(names),not_on_packagist=len(notp),flagged=len(flag),unflagged_no_release_5y=len(stale5),unflagged_no_release_no_push_5y=len(dead),dead=sorted(dead),flagged_list=flag)
-    print(f"{proj}: prod={len(names)} flagged={len(flag)} noRelease5y={len(stale5)} noRelease+noPush5y={len(dead)} notOnPackagist={len(notp)}")
+    res[proj]=dict(prod=len(names),not_from_composer_repository=len(notp),flagged=len(flag),unflagged_no_release_5y=len(stale5),unflagged_no_release_no_push_5y=len(dead),dead=sorted(dead),flagged_list=flag)
+    print(f"{proj}: prod={len(names)} flagged={len(flag)} noRelease5y={len(stale5)} noRelease+noPush5y={len(dead)} notFromComposerRepository={len(notp)}")
     for r in sorted(dead): print('   ',r)
 json.dump(res,open(os.path.join(base,'summary.json'),'w'),indent=1)

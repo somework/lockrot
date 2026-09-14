@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Composer;
 
+use Composer\Composer;
 use Composer\Config;
 use Composer\Console\Application;
 use Composer\IO\IOInterface;
+use Composer\Plugin\PluginEvents;
 use Composer\Util\Platform;
 use Lockrot\Allowlist\BuiltinAllowlist;
 use Lockrot\Analyzer\Analyzer;
@@ -334,6 +336,11 @@ final class LockrotCommandTest extends TestCase
         ]));
 
         chdir($project);
+        // Restore whatever the surrounding environment had before this test, rather than
+        // unconditionally clearing: a caller running with these already set (e.g. a nested Composer
+        // invocation) would otherwise have them wiped instead of restored.
+        $previousCacheDir = Platform::getEnv('COMPOSER_CACHE_DIR');
+        $previousHome = Platform::getEnv('COMPOSER_HOME');
         Platform::putEnv('COMPOSER_CACHE_DIR', $cacheDir);
         Platform::putEnv('COMPOSER_HOME', $home);
         try {
@@ -356,9 +363,76 @@ final class LockrotCommandTest extends TestCase
             ));
             self::assertCount(1, $unavailable, (string) json_encode($json['notes']));
         } finally {
+            if ($previousCacheDir === false) {
+                Platform::clearEnv('COMPOSER_CACHE_DIR');
+            } else {
+                Platform::putEnv('COMPOSER_CACHE_DIR', $previousCacheDir);
+            }
+            if ($previousHome === false) {
+                Platform::clearEnv('COMPOSER_HOME');
+            } else {
+                Platform::putEnv('COMPOSER_HOME', $previousHome);
+            }
+            Platform::clearEnv('COMPOSER_DISABLE_NETWORK');
+        }
+    }
+
+    /**
+     * In plugin mode, Composer\Console\Application::doRun() builds the Composer instance (and its
+     * EventDispatcher) before this command's initialize() ever runs — see composerBootstrap()'s
+     * docblock. composerBootstrap() rebuilds the RepositoryManager from Config alone, so unless that
+     * instance's EventDispatcher is threaded through, mirror/proxy/CDN plugins listening for
+     * PluginEvents::PRE_FILE_DOWNLOAD never see lockrot's own repository metadata requests. This
+     * registers such a listener directly on $composer->getEventDispatcher() and runs the command
+     * online (no --offline) against the fixture repository, asserting the listener actually fires.
+     */
+    public function testPluginModeThreadsEventDispatcherThroughRebuiltRepositories(): void
+    {
+        $server = self::$server;
+        self::assertNotNull($server);
+
+        $project = $this->tempDir('lockrot-dispatcher-project-');
+        $cacheDir = $this->tempDir('lockrot-dispatcher-cache-');
+        $home = $this->tempDir('lockrot-dispatcher-home-');
+        file_put_contents($project.'/composer.json', (string) json_encode([
+            'name' => 'lockrot/plugin-mode-dispatcher-test',
+            'config' => ['secure-http' => false],
+            'repositories' => ['packagist.org' => false, 'fixture' => ['type' => 'composer', 'url' => $server->url()]],
+        ]));
+        file_put_contents($project.'/composer.lock', (string) json_encode([
+            'packages' => [['name' => 'phpzip/phpzip', 'version' => '2.0.8', 'notification-url' => 'https://packagist.org/downloads/']],
+        ]));
+
+        chdir($project);
+        Platform::putEnv('COMPOSER_CACHE_DIR', $cacheDir);
+        Platform::putEnv('COMPOSER_HOME', $home);
+        try {
+            $command = $this->buildCommand([ServiceFactory::class, 'createAnalyzer']);
+            $application = $command->getApplication();
+            self::assertInstanceOf(Application::class, $application);
+            $composer = $application->getComposer(false, false);
+            self::assertInstanceOf(Composer::class, $composer);
+
+            $invocations = 0;
+            $composer->getEventDispatcher()->addListener(
+                PluginEvents::PRE_FILE_DOWNLOAD,
+                static function () use (&$invocations): void {
+                    ++$invocations;
+                }
+            );
+
+            $tester = new CommandTester($command);
+            $code = $tester->execute(['--format' => 'json']);
+
+            self::assertSame(0, $code, $tester->getDisplay());
+            self::assertGreaterThan(
+                0,
+                $invocations,
+                'a PRE_FILE_DOWNLOAD listener registered on the Composer instance must see lockrot\'s own repository metadata requests'
+            );
+        } finally {
             Platform::clearEnv('COMPOSER_CACHE_DIR');
             Platform::clearEnv('COMPOSER_HOME');
-            Platform::clearEnv('COMPOSER_DISABLE_NETWORK');
         }
     }
 

@@ -171,24 +171,29 @@ final class LockrotCommand extends BaseCommand
      */
     private function composerBootstrap(IOInterface $io, bool $hasComposerJson): array
     {
-        $config = $this->composerConfig($io, $hasComposerJson);
-        $manager = RepositoryFactory::manager($io, $config, Factory::createHttpDownloader($io, $config));
+        $composer = $this->resolveComposer($hasComposerJson);
+        $config = $composer instanceof Composer ? $composer->getConfig() : Factory::createConfig($io);
+        // Thread the project's own EventDispatcher through so plugins hooking
+        // PRE_FILE_DOWNLOAD/POST_FILE_DOWNLOAD (mirror/proxy/CDN plugins) still see lockrot's
+        // metadata requests on the rebuilt manager; the lock-only path (no Composer instance) has no
+        // plugins loaded to reach anyway, so it keeps rebuilding without one.
+        $eventDispatcher = $composer instanceof Composer ? $composer->getEventDispatcher() : null;
+        $manager = RepositoryFactory::manager($io, $config, Factory::createHttpDownloader($io, $config), $eventDispatcher);
 
         return [$config, array_values(RepositoryFactory::defaultRepos($io, $config, $manager))];
     }
 
-    private function composerConfig(IOInterface $io, bool $hasComposerJson): Config
+    private function resolveComposer(bool $hasComposerJson): ?Composer
     {
-        if ($hasComposerJson) {
-            // Composer >= 2.3 has tryComposer(); 2.2 LTS only has getComposer(bool $required) (BaseCommand.php:124 vs 2.2 :59)
-            // @phpstan-ignore function.alreadyNarrowedType (tryComposer() does not exist in Composer 2.2 LTS; guard is load-bearing there)
-            $composer = method_exists($this, 'tryComposer') ? $this->tryComposer() : $this->getComposer(false);
-            if ($composer instanceof Composer) {
-                return $composer->getConfig();
-            }
+        if (!$hasComposerJson) {
+            return null;
         }
 
-        return Factory::createConfig($io);
+        // Composer >= 2.3 has tryComposer(); 2.2 LTS only has getComposer(bool $required) (BaseCommand.php:124 vs 2.2 :59)
+        // @phpstan-ignore function.alreadyNarrowedType (tryComposer() does not exist in Composer 2.2 LTS; guard is load-bearing there)
+        $composer = method_exists($this, 'tryComposer') ? $this->tryComposer() : $this->getComposer(false);
+
+        return $composer instanceof Composer ? $composer : null;
     }
 
     /** @param array<string, mixed> $env */
