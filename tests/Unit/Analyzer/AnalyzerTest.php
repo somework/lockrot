@@ -17,6 +17,7 @@ use Lockrot\Data\Php\PhpReleaseDates;
 use Lockrot\Data\Repository\MetadataBatch;
 use Lockrot\Data\Repository\MetadataLoaderInterface;
 use Lockrot\Data\Repository\PackageMetadata;
+use Lockrot\Deadline;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Signal\SignalSet;
@@ -277,6 +278,72 @@ final class AnalyzerTest extends TestCase
         $allowlist = new Allowlist([new AllowlistEntry('vendor/*', null, 'complete', null, 'builtin')]);
         $analyzer = $this->analyzer($this->loader(), $this->http([]), true, $allowlist);
         self::assertSame($allowlist, $analyzer->allowlist());
+    }
+
+    /**
+     * Install time checks only the packages in the transaction, but the chain still has to be
+     * resolved through the whole lock file — the mini fixture's vendor/transitive is pulled in by
+     * vendor/direct, which is not part of the subset handed to analyzePackages().
+     */
+    public function testAnalyzePackagesChecksOnlyTheSubsetButResolvesChainsThroughTheFullLock(): void
+    {
+        $lock = LockFile::fromFile(__DIR__.'/../../fixtures/mini/composer.lock');
+        $project = ProjectConfig::fromFile(__DIR__.'/../../fixtures/mini/composer.json');
+        $transitive = $lock->find('vendor/transitive');
+        self::assertNotNull($transitive);
+        $metadata = [
+            'vendor/transitive' => new PackageMetadata('vendor/transitive', false, null, true, new \DateTimeImmutable('2015-11-16T16:30:51+00:00'), '2.0.0', 1, 'https://github.com/vendor/transitive.git', 'library', new \DateTimeImmutable(F::NOW)),
+        ];
+        $http = $this->http([
+            'https://api.github.com/repos/vendor/transitive' => [200, '{"archived":false,"pushed_at":"2015-11-16T16:31:37Z"}'],
+        ]);
+
+        $report = $this->analyzer($this->loader($metadata), $http, true, new Allowlist([]))
+            ->analyzePackages([$transitive], $lock, $project, false);
+
+        self::assertSame(1, $report->packagesChecked());
+        self::assertCount(1, $report->findings());
+        self::assertSame('vendor/transitive', $report->findings()[0]->package());
+        self::assertSame(['vendor/direct', 'vendor/transitive'], $report->findings()[0]->chain());
+    }
+
+    public function testAnExhaustedDeadlineSkipsTheGitHubCallAndSaysSo(): void
+    {
+        $lock = LockFile::fromArray(['packages' => [['name' => 'vendor/pkg', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/']]]);
+        $http = new class () implements HttpClientInterface {
+            public int $calls = 0;
+
+            public function fetchAll(array $urls, array $headers = []): array
+            {
+                ++$this->calls;
+
+                return [];
+            }
+        };
+        $analyzer = $this->analyzer($this->loader(['vendor/pkg' => $this->ancient()]), $http, true, new Allowlist([]))
+            ->withDeadline(Deadline::inSeconds(0.0, static fn (): float => 0.0));
+
+        $report = $analyzer->analyze($lock, ProjectConfig::empty(), false);
+
+        self::assertSame(0, $http->calls);
+        self::assertContains('repository activity not checked: install-time budget exhausted', $report->notes());
+    }
+
+    public function testWithDeadlineReturnsAClonedInstance(): void
+    {
+        $analyzer = $this->analyzer($this->loader(), $this->http([]), true, new Allowlist([]));
+
+        self::assertNotSame($analyzer, $analyzer->withDeadline(Deadline::inSeconds(5.0)));
+    }
+
+    public function testTheBudgetReasonIsReportedWithoutASecondPrefix(): void
+    {
+        $lock = LockFile::fromArray(['packages' => [['name' => 'vendor/direct', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/']]]);
+        $failed = ['vendor/direct' => MetadataLoaderInterface::BUDGET_REASON];
+
+        $report = $this->analyzer($this->loader([], [], $failed), $this->http([]), true, new Allowlist([]))->analyze($lock, ProjectConfig::empty(), false);
+
+        self::assertSame(MetadataLoaderInterface::BUDGET_REASON, $report->findings()[0]->evidence());
     }
 
     public function testWithAllowlistReturnsClonedInstanceLeavingOriginalUnchanged(): void

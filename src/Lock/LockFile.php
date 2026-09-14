@@ -79,6 +79,24 @@ final class LockFile
         return new self($packages, \is_string($hash) ? $hash : null);
     }
 
+    /**
+     * A lock built from packages already in memory rather than from a file on disk — the
+     * install-time path uses it as the dependency-chain source when the project has no
+     * composer.lock yet (the very first `composer require` in a fresh directory). There is no
+     * content hash to carry, since nothing was read from a lock file.
+     *
+     * @param list<LockedPackage> $packages
+     */
+    public static function fromPackages(array $packages): self
+    {
+        $byName = [];
+        foreach ($packages as $package) {
+            $byName[$package->name()] = $package;
+        }
+
+        return new self($byName, null);
+    }
+
     /** @return list<LockedPackage> */
     public function packages(bool $includeDev): array
     {

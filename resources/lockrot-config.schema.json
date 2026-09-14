@@ -17,6 +17,13 @@
         "include-dev": {
             "type": "boolean"
         },
+        "install-time": {
+            "type": "string",
+            "enum": ["on", "off"]
+        },
+        "install-time-strict": {
+            "type": "boolean"
+        },
         "release-warn-years": {
             "type": "integer",
             "minimum": 1

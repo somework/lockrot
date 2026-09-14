@@ -18,6 +18,7 @@ use Lockrot\Clock;
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Config\Policy;
 use Lockrot\Data\GitHub\TokenResolver;
+use Lockrot\Deadline;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
@@ -29,13 +30,13 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 final class LockrotCommand extends BaseCommand
 {
-    /** @var callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, ?string, Clock): Analyzer */
+    /** @var callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, ?string, Clock, Deadline): Analyzer */
     private $analyzerFactory;
 
     /** Set by initialize() when the project manifest is unusable; rethrown inside execute(). */
     private ?ConfigException $bootstrapError = null;
 
-    /** @param null|callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, ?string, Clock): Analyzer $analyzerFactory */
+    /** @param null|callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, ?string, Clock, Deadline): Analyzer $analyzerFactory */
     public function __construct(?callable $analyzerFactory = null)
     {
         $this->analyzerFactory = $analyzerFactory ?? [ServiceFactory::class, 'createAnalyzer'];
@@ -108,9 +109,11 @@ final class LockrotCommand extends BaseCommand
                 return Policy::EXIT_OK;
             }
             $lock = LockFile::fromFile($cwd.'/composer.lock');
-            $clock = $this->clock($env);
+            $clock = Clock::fromEnvironment($env);
             $token = TokenResolver::resolve($env, ServiceFactory::githubTokenFromComposer($config));
-            $analyzer = ($this->analyzerFactory)($io, $config, $repositories, $lockrot, $token, $clock);
+            // `composer lockrot` is the deliberate, full run: no time budget, unlike the
+            // install-time summary (SPEC F2.6).
+            $analyzer = ($this->analyzerFactory)($io, $config, $repositories, $lockrot, $token, $clock, Deadline::never());
             $analyzer = $analyzer->withAllowlist($analyzer->allowlist()->merge(ProjectIgnoreList::fromExtra($project->lockrotExtra())));
             $report = $analyzer->analyze($lock, $project, $lockrot->includeDev());
             $output->write(Formatters::for($lockrot->format())->format($report, $input->getOption('all') === true));
@@ -194,13 +197,5 @@ final class LockrotCommand extends BaseCommand
         $composer = method_exists($this, 'tryComposer') ? $this->tryComposer() : $this->getComposer(false);
 
         return $composer instanceof Composer ? $composer : null;
-    }
-
-    /** @param array<string, mixed> $env */
-    private function clock(array $env): Clock
-    {
-        $today = $env['LOCKROT_TODAY'] ?? null;
-
-        return \is_string($today) && $today !== '' ? Clock::fixed($today) : new Clock();
     }
 }

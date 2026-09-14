@@ -28,4 +28,19 @@ final class ClockTest extends TestCase
         $now = (new Clock())->now()->getTimestamp();
         self::assertGreaterThanOrEqual($before, $now);
     }
+
+    public function testFromEnvironmentPinsTheClockToLockrotToday(): void
+    {
+        self::assertSame(
+            '2026-09-14',
+            Clock::fromEnvironment(['LOCKROT_TODAY' => '2026-09-14T00:00:00+00:00'])->now()->format('Y-m-d')
+        );
+    }
+
+    public function testFromEnvironmentFallsBackToNowWhenLockrotTodayIsUnusable(): void
+    {
+        $before = time();
+        self::assertGreaterThanOrEqual($before, Clock::fromEnvironment([])->now()->getTimestamp());
+        self::assertGreaterThanOrEqual($before, Clock::fromEnvironment(['LOCKROT_TODAY' => ''])->now()->getTimestamp());
+    }
 }

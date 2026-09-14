@@ -16,6 +16,7 @@ use Lockrot\Data\GitHub\RepositoryActivity;
 use Lockrot\Data\Repository\MetadataBatch;
 use Lockrot\Data\Repository\MetadataLoaderInterface;
 use Lockrot\Data\Repository\PackageMetadata;
+use Lockrot\Deadline;
 use Lockrot\Graph\DependencyGraph;
 use Lockrot\Lock\LockedPackage;
 use Lockrot\Lock\LockFile;
@@ -38,6 +39,7 @@ final class Analyzer
     private VerdictEngine $engine;
     private Clock $clock;
     private bool $offline;
+    private Deadline $deadline;
 
     public function __construct(MetadataLoaderInterface $metadata, GitHubClient $github, GitHubFetchPlanner $planner, Allowlist $allowlist, SignalSet $signals, VerdictEngine $engine, Clock $clock, bool $offline = false)
     {
@@ -49,6 +51,8 @@ final class Analyzer
         $this->engine = $engine;
         $this->clock = $clock;
         $this->offline = $offline;
+        // Only the install-time path sets a budget; `composer lockrot` runs unbounded.
+        $this->deadline = Deadline::never();
     }
 
     public function allowlist(): Allowlist
@@ -64,9 +68,34 @@ final class Analyzer
         return $clone;
     }
 
+    /**
+     * The budget that bounds an install-time run ({@see Deadline}). It reaches the GitHub half of
+     * the analysis here and the repository half through the metadata loader, which takes its own
+     * copy; both are given the same instance by {@see \Lockrot\Composer\ServiceFactory}.
+     */
+    public function withDeadline(Deadline $deadline): self
+    {
+        $clone = clone $this;
+        $clone->deadline = $deadline;
+
+        return $clone;
+    }
+
     public function analyze(LockFile $lock, ProjectConfig $project, bool $includeDev): Report
     {
-        $packages = $lock->packages($includeDev);
+        return $this->analyzePackages($lock->packages($includeDev), $lock, $project, $includeDev);
+    }
+
+    /**
+     * Checks only $packages — the install-time path passes the transaction's packages, not the whole
+     * lock. $lock, $project and $includeDev are still the full picture: they build the dependency
+     * graph, so a package's "via" chain is resolved through every locked package, not only the
+     * changed ones.
+     *
+     * @param list<LockedPackage> $packages
+     */
+    public function analyzePackages(array $packages, LockFile $lock, ProjectConfig $project, bool $includeDev): Report
+    {
         $graph = DependencyGraph::fromLock($lock, $project, $includeDev);
         $now = $this->clock->now();
         $notes = [];
@@ -90,7 +119,15 @@ final class Analyzer
 
         $plan = $this->planner->select($repoByPackage, $candidateByPackage);
         $repos = $plan->repos();
-        [$githubBatch, $githubNotes] = $this->fetchGitHub($plan, $repoByPackage !== []);
+        if ($this->deadline->isPast()) {
+            // The metadata pass already used the whole budget. Starting the GitHub round-trips now
+            // would push the install past it, so the activity signals are dropped and the report
+            // says so rather than reading as "checked, nothing found".
+            $githubBatch = GitHubBatch::empty();
+            $githubNotes = ['repository activity not checked: install-time budget exhausted'];
+        } else {
+            [$githubBatch, $githubNotes] = $this->fetchGitHub($plan, $repoByPackage !== []);
+        }
         $notes = array_merge($notes, $githubNotes);
         $activity = $githubBatch->activity();
 
@@ -210,13 +247,15 @@ final class Analyzer
     }
 
     /**
-     * The offline reason already states why the metadata is missing, so prefixing it would read as
-     * "Repository metadata unavailable: offline: ...". Every other reason is a bare transport or
-     * repository message that needs the prefix to make sense on a finding.
+     * The offline and budget reasons already state why the metadata is missing, so prefixing them
+     * would read as "Repository metadata unavailable: offline: ...". Every other reason is a bare
+     * transport or repository message that needs the prefix to make sense on a finding.
      */
     private function metadataFailureNote(string $reason): string
     {
-        return $reason === MetadataLoaderInterface::OFFLINE_NOT_FOUND_REASON
+        $selfExplanatory = [MetadataLoaderInterface::OFFLINE_NOT_FOUND_REASON, MetadataLoaderInterface::BUDGET_REASON];
+
+        return \in_array($reason, $selfExplanatory, true)
             ? $reason
             : 'Repository metadata unavailable: '.$reason;
     }

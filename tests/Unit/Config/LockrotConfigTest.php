@@ -19,6 +19,27 @@ final class LockrotConfigTest extends TestCase
         self::assertSame('table', $cfg->format());
         self::assertFalse($cfg->isDisabled());
         self::assertSame(3, $cfg->thresholds()->releaseWarnYears());
+        self::assertTrue($cfg->installTime());
+        self::assertFalse($cfg->installTimeStrict());
+    }
+
+    public function testInstallTimeCanBeTurnedOff(): void
+    {
+        self::assertFalse(LockrotConfig::fromSources(['install-time' => 'off'], [], [], '8.5.10', null)->installTime());
+        self::assertTrue(LockrotConfig::fromSources(['install-time' => 'on'], [], [], '8.5.10', null)->installTime());
+    }
+
+    public function testInstallTimeStrictComesFromExtraOnly(): void
+    {
+        self::assertTrue(LockrotConfig::fromSources(['install-time-strict' => true], [], [], '8.5.10', null)->installTimeStrict());
+        self::assertFalse(LockrotConfig::fromSources(['install-time-strict' => false], [], [], '8.5.10', null)->installTimeStrict());
+    }
+
+    public function testInvalidInstallTime(): void
+    {
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('install-time must be one of on, off; got "summary"');
+        LockrotConfig::fromSources(['install-time' => 'summary'], [], [], '8.5.10', null);
     }
 
     public function testPlatformPhpBeatsRuntime(): void

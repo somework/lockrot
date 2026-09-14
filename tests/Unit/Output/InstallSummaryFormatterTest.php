@@ -1,0 +1,101 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Lockrot\Tests\Unit\Output;
+
+use Lockrot\Analyzer\Report;
+use Lockrot\Output\InstallSummaryFormatter;
+use Lockrot\Verdict\Finding;
+use Lockrot\Verdict\Verdict;
+use PHPUnit\Framework\TestCase;
+
+final class InstallSummaryFormatterTest extends TestCase
+{
+    private const NOW = '2026-09-14T00:00:00+00:00';
+
+    /** Words the spec (F5.3) bans from every piece of lockrot output. */
+    private const BANNED_WORDS = ['vulnerable', 'broken', 'insecure', 'dead'];
+
+    /** @param list<string> $chain */
+    private function finding(string $package, string $version, string $verdict, string $evidence, array $chain = []): Finding
+    {
+        // No signals: Finding::evidence() then falls back to the note, which keeps these cases
+        // independent of the signal wording.
+        return new Finding($package, $version, $verdict, [], $chain, null, null, $evidence);
+    }
+
+    /**
+     * @param list<Finding> $findings
+     * @param list<string>  $notes
+     */
+    private function report(array $findings, array $notes = [], ?int $packagesChecked = null): Report
+    {
+        return new Report($findings, $notes, new \DateTimeImmutable(self::NOW), $packagesChecked ?? \count($findings), 0, false);
+    }
+
+    public function testNothingFlaggedProducesNoLinesAtAll(): void
+    {
+        $report = $this->report([$this->finding('vendor/a', '1.0.0', Verdict::OK, '')]);
+
+        self::assertSame([], (new InstallSummaryFormatter())->format($report));
+    }
+
+    public function testTwoFlaggedPackagesRenderHeaderFindingsAndFooter(): void
+    {
+        $report = $this->report([
+            $this->finding('vendor/a', '1.0.0', Verdict::SILENT, 'last release 2015-11-16 (10.8 years ago)'),
+            $this->finding('vendor/b', '2.0.0', Verdict::ABANDONED, 'flagged abandoned by its repository', ['vendor/a', 'vendor/b']),
+        ], [], 5);
+
+        self::assertSame([
+            '<warning>lockrot: dependency rot in 2 of 5 changed packages</warning>',
+            '  <comment>abandoned   </comment>vendor/b 2.0.0: flagged abandoned by its repository (via vendor/a)',
+            '  <comment>silent      </comment>vendor/a 1.0.0: last release 2015-11-16 (10.8 years ago)',
+            'Run composer lockrot for details.',
+        ], (new InstallSummaryFormatter())->format($report));
+    }
+
+    public function testTwelveFindingsAndNotesAreCappedAtTenLines(): void
+    {
+        $findings = [];
+        for ($i = 1; $i <= 12; ++$i) {
+            $findings[] = $this->finding(\sprintf('vendor/p%02d', $i), '1.0.0', Verdict::SILENT, 'no stable release');
+        }
+        $report = $this->report($findings, ['first note', 'second note', 'third note'], 12);
+
+        $lines = (new InstallSummaryFormatter())->format($report);
+
+        self::assertCount(InstallSummaryFormatter::MAX_LINES, $lines);
+        self::assertSame('<warning>lockrot: dependency rot in 12 of 12 changed packages</warning>', $lines[0]);
+        self::assertSame('  … and 7 more', $lines[6]);
+        self::assertSame('  note: first note', $lines[7]);
+        self::assertSame('  note: second note', $lines[8]);
+        self::assertSame('Run composer lockrot for details.', $lines[9]);
+    }
+
+    public function testASingleChangedPackageUsesTheSingularNoun(): void
+    {
+        $report = $this->report([$this->finding('vendor/a', '1.0.0', Verdict::SILENT, 'no stable release')], [], 1);
+
+        self::assertSame(
+            '<warning>lockrot: dependency rot in 1 of 1 changed package</warning>',
+            (new InstallSummaryFormatter())->format($report)[0]
+        );
+    }
+
+    public function testTheBlockUsesNoneOfTheBannedSeverityWords(): void
+    {
+        $report = $this->report([
+            $this->finding('vendor/a', '1.0.0', Verdict::SILENT, 'last release 2015-11-16; last push 2015-11-16'),
+            $this->finding('vendor/b', '2.0.0', Verdict::ABANDONED, 'flagged abandoned by its repository', ['vendor/a', 'vendor/b']),
+            $this->finding('vendor/c', 'dev-main', Verdict::PINNED, 'installed version is a branch snapshot'),
+        ], ['GitHub token not set: repository activity checked for 0 candidate packages'], 3);
+
+        $text = strtolower(implode("\n", (new InstallSummaryFormatter())->format($report)));
+
+        foreach (self::BANNED_WORDS as $word) {
+            self::assertStringNotContainsString($word, $text);
+        }
+    }
+}

@@ -14,6 +14,14 @@ final class LockrotConfig
     public const FAIL_ON_NONE = 'none';
     public const FORMATS = ['table', 'json'];
 
+    /**
+     * The spec's third value, `summary`, is not implemented in 0.1: the compact block *is* the only
+     * install-time output there is, so `summary` would be indistinguishable from `on` (SPEC F6,
+     * amended).
+     */
+    public const INSTALL_TIME_VALUES = ['on', 'off'];
+    public const INSTALL_TIME_ON = 'on';
+
     private string $failOn;
     private string $targetPhp;
     private bool $includeDev;
@@ -21,9 +29,11 @@ final class LockrotConfig
     private bool $strictNetwork;
     private string $format;
     private bool $disabled;
+    private bool $installTime;
+    private bool $installTimeStrict;
     private Thresholds $thresholds;
 
-    private function __construct(string $failOn, string $targetPhp, bool $includeDev, bool $offline, bool $strictNetwork, string $format, bool $disabled, Thresholds $thresholds)
+    private function __construct(string $failOn, string $targetPhp, bool $includeDev, bool $offline, bool $strictNetwork, string $format, bool $disabled, bool $installTime, bool $installTimeStrict, Thresholds $thresholds)
     {
         $this->failOn = $failOn;
         $this->targetPhp = $targetPhp;
@@ -32,6 +42,8 @@ final class LockrotConfig
         $this->strictNetwork = $strictNetwork;
         $this->format = $format;
         $this->disabled = $disabled;
+        $this->installTime = $installTime;
+        $this->installTimeStrict = $installTimeStrict;
         $this->thresholds = $thresholds;
     }
 
@@ -55,8 +67,30 @@ final class LockrotConfig
             ($cli['strict-network'] ?? null) === true,
             $format,
             ($env['LOCKROT_DISABLE'] ?? null) === '1' || ($env['LOCKROT_DISABLE'] ?? null) === 'true',
+            self::resolveInstallTime($extra),
+            ($extra['install-time-strict'] ?? false) === true,
             Thresholds::fromArray($extra)
         );
+    }
+
+    /**
+     * Neither install-time key has a CLI option or an environment override: the install-time summary
+     * is a per-project decision, and LOCKROT_DISABLE already covers the "not right now" case.
+     *
+     * @param array<string, mixed> $extra
+     */
+    private static function resolveInstallTime(array $extra): bool
+    {
+        $installTime = self::pick([$extra['install-time'] ?? null], self::INSTALL_TIME_ON);
+        if (!\in_array($installTime, self::INSTALL_TIME_VALUES, true)) {
+            throw new ConfigException(\sprintf(
+                'install-time must be one of %s; got "%s"',
+                implode(', ', self::INSTALL_TIME_VALUES),
+                $installTime
+            ));
+        }
+
+        return $installTime === self::INSTALL_TIME_ON;
     }
 
     /**
@@ -143,6 +177,14 @@ final class LockrotConfig
     public function isDisabled(): bool
     {
         return $this->disabled;
+    }
+    public function installTime(): bool
+    {
+        return $this->installTime;
+    }
+    public function installTimeStrict(): bool
+    {
+        return $this->installTimeStrict;
     }
     public function thresholds(): Thresholds
     {

@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Lock;
 
+use Composer\Package\BasePackage;
+use Composer\Package\CompletePackage;
+use Composer\Package\Loader\ArrayLoader;
 use Lockrot\Exception\ConfigException;
+use Lockrot\Lock\LockedPackage;
 use Lockrot\Lock\LockFile;
 use PHPUnit\Framework\TestCase;
 
@@ -167,6 +171,28 @@ final class LockFileTest extends TestCase
         } finally {
             unlink($path);
         }
+    }
+
+    public function testFromPackagesBuildsALockWithoutAContentHash(): void
+    {
+        $loader = new ArrayLoader();
+        $a = LockedPackage::fromPackage(self::complete($loader->load(['name' => 'vendor/a', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/'])), false);
+        $b = LockedPackage::fromPackage(self::complete($loader->load(['name' => 'vendor/b', 'version' => '2.0.0', 'notification-url' => 'https://packagist.org/downloads/'])), false);
+
+        $lock = LockFile::fromPackages([$a, $b]);
+
+        self::assertCount(2, $lock->packages(true));
+        self::assertNull($lock->contentHash());
+        $found = $lock->find('vendor/b');
+        self::assertNotNull($found);
+        self::assertSame('2.0.0', $found->version());
+    }
+
+    private static function complete(BasePackage $package): CompletePackage
+    {
+        self::assertInstanceOf(CompletePackage::class, $package);
+
+        return $package;
     }
 
     public function testRealFixtureCounts(): void

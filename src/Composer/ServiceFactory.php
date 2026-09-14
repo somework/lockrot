@@ -20,18 +20,23 @@ use Lockrot\Data\GitHub\GitHubFetchPlanner;
 use Lockrot\Data\Http\CachingHttpClient;
 use Lockrot\Data\Php\PhpReleaseDates;
 use Lockrot\Data\Repository\RepositoryMetadataLoader;
+use Lockrot\Deadline;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Verdict\VerdictEngine;
 
 final class ServiceFactory
 {
-    /** @param list<RepositoryInterface> $repositories the project's configured Composer repositories, in lookup order */
-    public static function createAnalyzer(IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, ?string $githubToken, Clock $clock): Analyzer
+    /**
+     * @param list<RepositoryInterface> $repositories the project's configured Composer repositories, in lookup order
+     * @param ?Deadline                 $deadline     install-time budget; null (and `composer lockrot`) means unlimited
+     */
+    public static function createAnalyzer(IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, ?string $githubToken, Clock $clock, ?Deadline $deadline = null): Analyzer
     {
-        $http = self::createHttp($io, $config, $lockrot, $clock);
+        $deadline ??= Deadline::never();
+        $http = self::createHttp($io, $config, $lockrot, $clock, $deadline);
 
-        return new Analyzer(
-            new RepositoryMetadataLoader($repositories, $clock, $lockrot->offline()),
+        $analyzer = new Analyzer(
+            new RepositoryMetadataLoader($repositories, $clock, $lockrot->offline(), $deadline),
             new GitHubClient($http, $githubToken),
             new GitHubFetchPlanner($githubToken !== null),
             BuiltinAllowlist::load(),
@@ -40,14 +45,28 @@ final class ServiceFactory
             $clock,
             $lockrot->offline()
         );
+
+        return $analyzer->withDeadline($deadline);
     }
 
-    /** GitHub activity only: repository metadata now goes through Composer's own repository layer (RepositoryMetadataLoader), which has its own cache via Composer's HttpDownloader. */
-    public static function createHttp(IOInterface $io, Config $config, LockrotConfig $lockrot, Clock $clock): CachingHttpClient
+    /**
+     * GitHub activity only: repository metadata now goes through Composer's own repository layer
+     * (RepositoryMetadataLoader), which has its own cache via Composer's HttpDownloader.
+     *
+     * A deadline shortens the per-request timeout of the GitHub calls to what is left of the budget,
+     * so a single slow response cannot outlast it. The repository half cannot be bounded the same
+     * way: those requests are issued by the project's own ComposerRepository instances through the
+     * HttpDownloader Composer built for them, whose timeouts lockrot does not get to set — there,
+     * the between-chunk deadline check in RepositoryMetadataLoader is the only bound.
+     */
+    public static function createHttp(IOInterface $io, Config $config, LockrotConfig $lockrot, Clock $clock, ?Deadline $deadline = null): CachingHttpClient
     {
         $downloader = Factory::createHttpDownloader($io, $config);
+        $timeout = $deadline === null || $deadline->isNever()
+            ? ComposerHttpClient::DEFAULT_TIMEOUT
+            : max(1, (int) ceil($deadline->remainingSeconds()));
 
-        return new CachingHttpClient(new ComposerHttpClient($downloader, $clock), self::createCache($io, $config), GitHubClient::CACHE_TTL, $clock, $lockrot->offline());
+        return new CachingHttpClient(new ComposerHttpClient($downloader, $clock, $timeout), self::createCache($io, $config), GitHubClient::CACHE_TTL, $clock, $lockrot->offline());
     }
 
     /**

@@ -24,6 +24,8 @@ final class ConfigSchemaTest extends TestCase
             'target-php' => '8.4',
             'format' => 'json',
             'include-dev' => true,
+            'install-time' => 'off',
+            'install-time-strict' => true,
             'release-warn-years' => 2,
             'release-high-years' => 4,
             'push-warn-years' => 2,
@@ -65,6 +67,9 @@ final class ConfigSchemaTest extends TestCase
         yield 'target-php bad pattern' => [['target-php' => 'v8.4'], 'target-php'];
         yield 'format not in enum' => [['format' => 'xml'], 'format'];
         yield 'include-dev wrong type' => [['include-dev' => 'yes'], 'include-dev'];
+        // The spec's third install-time value, `summary`, is not implemented in 0.1 (SPEC F6).
+        yield 'install-time not in enum' => [['install-time' => 'summary'], 'install-time'];
+        yield 'install-time-strict wrong type' => [['install-time-strict' => 'yes'], 'install-time-strict'];
         yield 'release-warn-years digit string' => [['release-warn-years' => '4'], 'release-warn-years'];
         yield 'release-warn-years below minimum' => [['release-warn-years' => 0], 'release-warn-years'];
         yield 'release-high-years wrong type' => [['release-high-years' => 'many'], 'release-high-years'];
