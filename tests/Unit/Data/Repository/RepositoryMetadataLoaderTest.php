@@ -572,6 +572,56 @@ final class RepositoryMetadataLoaderTest extends TestCase
     }
 
     /**
+     * Regression test: a tagless name (wallabag/rulerz) that lands in pass 1's $needDev *before*
+     * the budget expires must not be silently dropped. $fake returns 100.0 for its first 2 calls
+     * (construction, then the isPast() check before chunk 1) and 200.0 from the 3rd call onward
+     * (the isPast() check before chunk 2), so chunk 1 (10 names, including wallabag/rulerz as its
+     * last name) is processed normally and chunk 2 (5 names) never starts. wallabag/rulerz has no
+     * tagged release, so pass 1's stable-file query finds it with zero versions and would normally
+     * hand it to pass 2 — but pass 2 never runs here, so it must be reported failed with
+     * BUDGET_REASON (never asked for its dev file) rather than vanishing into notFound().
+     */
+    public function testDeadlinePassingMidPassOneLeavesATaglessNameFailedNotDropped(): void
+    {
+        $calls = 0;
+        $fake = static function () use (&$calls): float {
+            ++$calls;
+
+            return $calls <= 2 ? 100.0 : 200.0;
+        };
+        $deadline = Deadline::inSeconds(5.0, $fake);
+
+        $server = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK]);
+        $server->start();
+        try {
+            $all = $this->wallabagNames();
+            $firstChunk = array_merge(\array_slice($all, 0, 9), ['wallabag/rulerz']);
+            $secondChunk = \array_slice($all, 9, 5);
+            $names = array_merge($firstChunk, $secondChunk);
+            $loader = new RepositoryMetadataLoader($server->repositories(), Clock::fixed(self::FIXED), false, $deadline);
+
+            $batch = $loader->load($names);
+
+            self::assertSame([], $batch->notFound());
+            foreach (\array_slice($firstChunk, 0, 9) as $name) {
+                self::assertArrayHasKey($name, $batch->metadata(), $name.' is in the started chunk and should resolve');
+            }
+            $failed = $batch->failed();
+            self::assertSame(
+                MetadataLoaderInterface::BUDGET_REASON,
+                $failed['wallabag/rulerz'] ?? null,
+                'a tagless name found mid-chunk before the deadline expired must not be dropped'
+            );
+            foreach ($secondChunk as $name) {
+                self::assertSame(MetadataLoaderInterface::BUDGET_REASON, $failed[$name] ?? null, $name.' should be an unstarted chunk');
+            }
+            self::assertCount(6, $failed);
+        } finally {
+            $server->stop();
+        }
+    }
+
+    /**
      * A real ComposerRepository against the given fixture server that throws for every chunk
      * containing $name, standing in for a repository whose root metadata is readable but whose
      * file for one package is not.

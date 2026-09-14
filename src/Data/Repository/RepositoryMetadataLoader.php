@@ -147,8 +147,17 @@ final class RepositoryMetadataLoader implements MetadataLoaderInterface
         $pass1 = $this->loadChunked($repository, $remaining, self::STABLE_STABILITIES);
         if ($pass1['budgetExhausted']) {
             // Every name pass 1 could not get to is already in $pass1['failed']; pass 2 must not
-            // run at all, per the "stop, break out of both loops" behaviour.
-            return new MetadataBatch($pass1['metadata'], $pass1['stillRemaining'], $pass1['failed']);
+            // run at all, per the "stop, break out of both loops" behaviour. A name pass 1 *did*
+            // get to before the deadline hit but that needed pass 2 (found tagless, or not found
+            // at all) is sitting in $pass1['needDev'] — it was never asked for its dev file either,
+            // so it belongs in $failed with BUDGET_REASON too, not silently dropped (which would
+            // otherwise surface it as notFound() once load() runs out of repositories).
+            $failed = $pass1['failed'];
+            foreach ($pass1['needDev'] as $name) {
+                $failed[$name] = MetadataLoaderInterface::BUDGET_REASON;
+            }
+
+            return new MetadataBatch($pass1['metadata'], $pass1['stillRemaining'], $failed);
         }
 
         $pass2 = $this->loadChunked($repository, $pass1['needDev'], self::DEV_ONLY_STABILITIES);
