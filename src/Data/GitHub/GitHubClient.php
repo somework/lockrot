@@ -9,6 +9,8 @@ use Lockrot\Data\Http\HttpClientInterface;
 final class GitHubClient
 {
     public const DEFAULT_API_BASE = 'https://api.github.com/repos/';
+    /** Fixed cache TTL for GitHub repository activity; no user-facing knob (ruling: --refresh/cache-ttl removed). */
+    public const CACHE_TTL = 86400;
 
     private HttpClientInterface $http;
     private ?string $token;

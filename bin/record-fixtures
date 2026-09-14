@@ -2,19 +2,23 @@
 <?php
 
 declare(strict_types=1);
-// Records Packagist p2 and GitHub responses for the acceptance fixtures so tests run offline.
-// Usage: GITHUB_TOKEN=... bin/record-fixtures [fixtureDir ...]
+// Records Composer repository (p2) and GitHub responses for the acceptance fixtures so tests run
+// offline. Usage: GITHUB_TOKEN=... bin/record-fixtures [fixtureDir ...]
 require __DIR__.'/../vendor/autoload.php';
 
+use Composer\Factory;
+use Composer\IO\NullIO;
+use Lockrot\Clock;
+use Lockrot\Composer\ComposerHttpClient;
 use Lockrot\Data\GitHub\GitHubClient;
 use Lockrot\Data\GitHub\RepoLocator;
 use Lockrot\Data\Http\HttpResult;
 use Lockrot\Data\Http\RecordedHttpClient;
-use Lockrot\Data\Packagist\P2Expander;
-use Lockrot\Data\Packagist\PackagistClient;
 use Lockrot\Lock\LockFile;
 
 const KEEP = ['name', 'version', 'version_normalized', 'time', 'abandoned', 'source', 'require', 'type'];
+const REPOSITORY_BASE_URL = 'https://repo.packagist.org/p2/';
+
 $root = \dirname(__DIR__);
 $fixtures = $argv;
 array_shift($fixtures);
@@ -51,36 +55,29 @@ $trim = static function (string $body, string $name): string {
     unset($json['security-advisories']);
     return json_encode($json, \JSON_UNESCAPED_SLASHES);
 };
-$packagist = new PackagistClient(new RecordedHttpClient($p2Dir));
+$io = new NullIO();
+$composerConfig = Factory::createConfig($io);
+$repositoryHttp = new ComposerHttpClient(Factory::createHttpDownloader($io, $composerConfig), new Clock());
 $github = new GitHubClient(new RecordedHttpClient($ghDir), getenv('GITHUB_TOKEN') ?: null);
 $repos = [];
 foreach ($fixtures as $fixture) {
     $lock = LockFile::fromFile($root.'/'.$fixture.'/composer.lock');
     foreach ($lock->packages(false) as $package) {
-        if (!$package->isOnPackagist()) {
+        if (!$package->isFromComposerRepository()) {
             continue;
         }
-        $url = $packagist->url($package->name());
-        $path = RecordedHttpClient::pathFor($p2Dir, $url);
-        if (!is_file($path)) {
-            $result = $fetch($url, []);
+        foreach ([false, true] as $dev) {
+            $url = REPOSITORY_BASE_URL.$package->name().($dev ? '~dev' : '').'.json';
+            $path = RecordedHttpClient::pathFor($p2Dir, $url);
+            if (is_file($path)) {
+                continue;
+            }
+            $result = $repositoryHttp->fetchAll([$url])[$url];
             $body = $result->body() === null ? null : $trim($result->body(), $package->name());
             file_put_contents($path, json_encode((new HttpResult($url, $result->status(), $body, $result->fetchedAt()))->toEnvelope(), \JSON_UNESCAPED_SLASHES));
-            fwrite(STDERR, "p2 {$package->name()} {$result->status()}\n");
+            fwrite(STDERR, \sprintf("p2 %s%s %d\n", $package->name(), $dev ? '~dev' : '', $result->status()));
         }
-        $env = json_decode((string) file_get_contents($path), true);
-        $expanded = \is_array($env) && \is_string($env['body']) ? P2Expander::expandResponse((array) json_decode($env['body'], true), $package->name()) : [];
-        if ($expanded === [] || $package->isBranchSnapshot()) {
-            $devUrl = $packagist->url($package->name(), true);
-            $devPath = RecordedHttpClient::pathFor($p2Dir, $devUrl);
-            if (!is_file($devPath)) {
-                $result = $fetch($devUrl, []);
-                $body = $result->body() === null ? null : $trim($result->body(), $package->name());
-                file_put_contents($devPath, json_encode((new HttpResult($devUrl, $result->status(), $body, $result->fetchedAt()))->toEnvelope(), \JSON_UNESCAPED_SLASHES));
-            }
-        }
-        $source = $expanded[0]['source']['url'] ?? $package->sourceUrl();
-        $repo = RepoLocator::github(\is_string($source) ? $source : null);
+        $repo = RepoLocator::github($package->sourceUrl());
         if ($repo !== null) {
             $repos[$repo] = true;
         }

@@ -9,6 +9,7 @@ use Lockrot\Data\Http\RecordedHttpClient;
 use Lockrot\Data\Repository\RepositoryMetadataLoader;
 use Lockrot\Lock\LockFile;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 
 final class RepositoryMetadataLoaderTest extends TestCase
@@ -114,14 +115,29 @@ final class RepositoryMetadataLoaderTest extends TestCase
         self::assertSame([], $batch->failed());
     }
 
+    // memory_get_peak_usage(true) is a whole-process high-water mark that PHPUnit never resets
+    // between tests, so this assertion is order-dependent on whatever else already ran earlier in
+    // the same process (same root cause as AcceptanceTest::testWallabag's identical isolation).
+    // Running this one test in its own process makes the peak reflect only this load again; that
+    // process never runs setUpBeforeClass(), so this test builds its own single-use server instead
+    // of reaching for the class-level self::$server/self::$loader.
+    /** @runInSeparateProcess */
+    #[RunInSeparateProcess]
     public function testFullWallabagListResolvesUnderMemoryBudget(): void
     {
         $names = $this->wallabagNames();
+        $server = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK]);
+        $server->start();
 
-        $batch = $this->loader()->load($names);
+        try {
+            $loader = new RepositoryMetadataLoader($server->repositories(), Clock::fixed(self::FIXED));
+            $batch = $loader->load($names);
 
-        self::assertCount(\count($names), $batch->metadata());
-        self::assertLessThan(64 * 1024 * 1024, memory_get_peak_usage(true));
+            self::assertCount(\count($names), $batch->metadata());
+            self::assertLessThan(64 * 1024 * 1024, memory_get_peak_usage(true));
+        } finally {
+            $server->stop();
+        }
     }
 
     public function testUnreachableServerWithEmptyCacheMarksEveryNameFailed(): void

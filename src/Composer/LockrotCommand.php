@@ -9,6 +9,8 @@ use Composer\Composer;
 use Composer\Config;
 use Composer\Factory;
 use Composer\IO\IOInterface;
+use Composer\Repository\RepositoryFactory;
+use Composer\Repository\RepositoryInterface;
 use Lockrot\Allowlist\ProjectIgnoreList;
 use Lockrot\Analyzer\Analyzer;
 use Lockrot\Clock;
@@ -26,13 +28,13 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 final class LockrotCommand extends BaseCommand
 {
-    /** @var callable(IOInterface, Config, LockrotConfig, ?string, Clock): Analyzer */
+    /** @var callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, ?string, Clock): Analyzer */
     private $analyzerFactory;
 
     /** Set by initialize() when the project manifest is unusable; rethrown inside execute(). */
     private ?ConfigException $bootstrapError = null;
 
-    /** @param null|callable(IOInterface, Config, LockrotConfig, ?string, Clock): Analyzer $analyzerFactory */
+    /** @param null|callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, ?string, Clock): Analyzer $analyzerFactory */
     public function __construct(?callable $analyzerFactory = null)
     {
         $this->analyzerFactory = $analyzerFactory ?? [ServiceFactory::class, 'createAnalyzer'];
@@ -50,8 +52,7 @@ final class LockrotCommand extends BaseCommand
             ->addOption('dev', null, InputOption::VALUE_NONE, 'Include packages-dev')
             ->addOption('all', null, InputOption::VALUE_NONE, 'Show every package, not only flagged ones')
             ->addOption('offline', null, InputOption::VALUE_NONE, 'Use cached data only, never go to the network')
-            ->addOption('refresh', null, InputOption::VALUE_NONE, 'Ignore cached data and fetch again')
-            ->addOption('strict-network', null, InputOption::VALUE_NONE, 'Exit 1 when Packagist or GitHub could not be reached');
+            ->addOption('strict-network', null, InputOption::VALUE_NONE, 'Exit 1 when the repository or GitHub could not be reached');
     }
 
     /**
@@ -60,6 +61,11 @@ final class LockrotCommand extends BaseCommand
      * parse error escape as a Composer crash — exit 1, before execute() is ever reached. lockrot
      * documents a malformed manifest as a configuration error (exit 2, README "Exit codes"), so the
      * file is checked here first and the failure is carried into execute()'s error handling instead.
+     *
+     * --offline must disable the network before parent::initialize() runs: that call builds the
+     * Composer instance (and so its HttpDownloader) via Factory::createComposer(), and
+     * HttpDownloader reads COMPOSER_DISABLE_NETWORK from the environment in its own constructor —
+     * setting it any later would be too late for repository lookups to see it.
      */
     protected function initialize(InputInterface $input, OutputInterface $output): void
     {
@@ -70,6 +76,9 @@ final class LockrotCommand extends BaseCommand
             $this->bootstrapError = $e;
 
             return;
+        }
+        if ($input->getOption('offline') === true) {
+            putenv('COMPOSER_DISABLE_NETWORK=1');
         }
         parent::initialize($input, $output);
     }
@@ -84,7 +93,7 @@ final class LockrotCommand extends BaseCommand
             $env = getenv();
             $cwd = (string) getcwd();
             $project = ProjectConfig::fromFile($cwd.'/composer.json');
-            $config = $this->composerConfig($io, is_file($cwd.'/composer.json'));
+            [$config, $repositories] = $this->composerBootstrap($io, is_file($cwd.'/composer.json'));
             $lockrot = LockrotConfig::fromSources($project->lockrotExtra(), $env, $this->cliOptions($input), \PHP_VERSION, $project->platformPhp());
             if ($lockrot->isDisabled()) {
                 $this->writeError($output, 'lockrot disabled via LOCKROT_DISABLE');
@@ -94,7 +103,7 @@ final class LockrotCommand extends BaseCommand
             $lock = LockFile::fromFile($cwd.'/composer.lock');
             $clock = $this->clock($env);
             $token = TokenResolver::resolve($env, ServiceFactory::githubTokenFromComposer($config));
-            $analyzer = ($this->analyzerFactory)($io, $config, $lockrot, $token, $clock);
+            $analyzer = ($this->analyzerFactory)($io, $config, $repositories, $lockrot, $token, $clock);
             $analyzer = $analyzer->withAllowlist($analyzer->allowlist()->merge(ProjectIgnoreList::fromExtra($project->lockrotExtra())));
             $report = $analyzer->analyze($lock, $project, $lockrot->includeDev());
             $output->write(Formatters::for($lockrot->format())->format($report, $input->getOption('all') === true));
@@ -133,23 +142,34 @@ final class LockrotCommand extends BaseCommand
             'target-php' => \is_string($targetPhp) ? $targetPhp : null,
             'dev' => $input->getOption('dev') === true,
             'offline' => $input->getOption('offline') === true,
-            'refresh' => $input->getOption('refresh') === true,
             'strict-network' => $input->getOption('strict-network') === true,
         ];
     }
 
-    private function composerConfig(IOInterface $io, bool $hasComposerJson): Config
+    /**
+     * Reuses the project's own Composer instance (and so its configured repositories, in their
+     * configured order — Packagist by default, but Private Packagist, Satis and mirrors are
+     * honoured the same way) when one is available; falls back to Composer's own defaults
+     * (RepositoryFactory::defaultRepos()) for a lock-only directory with no Composer instance to
+     * reuse, e.g. inside the standalone PHAR.
+     *
+     * @return array{0: Config, 1: list<RepositoryInterface>}
+     */
+    private function composerBootstrap(IOInterface $io, bool $hasComposerJson): array
     {
         if ($hasComposerJson) {
             // Composer >= 2.3 has tryComposer(); 2.2 LTS only has getComposer(bool $required) (BaseCommand.php:124 vs 2.2 :59)
             // @phpstan-ignore function.alreadyNarrowedType (tryComposer() does not exist in Composer 2.2 LTS; guard is load-bearing there)
             $composer = method_exists($this, 'tryComposer') ? $this->tryComposer() : $this->getComposer(false);
             if ($composer instanceof Composer) {
-                return $composer->getConfig();
+                return [$composer->getConfig(), array_values($composer->getRepositoryManager()->getRepositories())];
             }
         }
 
-        return Factory::createConfig($io);
+        $config = Factory::createConfig($io);
+        $manager = RepositoryFactory::manager($io, $config, Factory::createHttpDownloader($io, $config));
+
+        return [$config, array_values(RepositoryFactory::defaultRepos($io, $config, $manager))];
     }
 
     /** @param array<string, mixed> $env */

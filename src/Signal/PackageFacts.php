@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Signal;
 
 use Lockrot\Data\GitHub\RepositoryActivity;
-use Lockrot\Data\Packagist\PackageMetadata;
+use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Lock\LockedPackage;
 
 final class PackageFacts

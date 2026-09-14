@@ -16,7 +16,6 @@ final class LockrotConfigTest extends TestCase
         self::assertSame('none', $cfg->failOn());
         self::assertSame('8.5', $cfg->targetPhp());
         self::assertFalse($cfg->includeDev());
-        self::assertSame(86400, $cfg->cacheTtl());
         self::assertSame('table', $cfg->format());
         self::assertFalse($cfg->isDisabled());
         self::assertSame(3, $cfg->thresholds()->releaseWarnYears());
@@ -38,11 +37,10 @@ final class LockrotConfigTest extends TestCase
 
     public function testCliFlags(): void
     {
-        $cfg = LockrotConfig::fromSources([], [], ['dev' => true, 'offline' => true, 'strict-network' => true, 'refresh' => true, 'format' => 'json'], '8.5.10', null);
+        $cfg = LockrotConfig::fromSources([], [], ['dev' => true, 'offline' => true, 'strict-network' => true, 'format' => 'json'], '8.5.10', null);
         self::assertTrue($cfg->includeDev());
         self::assertTrue($cfg->offline());
         self::assertTrue($cfg->strictNetwork());
-        self::assertTrue($cfg->refresh());
         self::assertSame('json', $cfg->format());
     }
 
@@ -62,21 +60,6 @@ final class LockrotConfigTest extends TestCase
     {
         $this->expectException(ConfigException::class);
         LockrotConfig::fromSources([], [], ['format' => 'xml'], '8.5.10', null);
-    }
-
-    public function testCacheTtlFromExtra(): void
-    {
-        self::assertSame(3600, LockrotConfig::fromSources(['cache-ttl' => 3600], [], [], '8.5.10', null)->cacheTtl());
-    }
-
-    public function testInvalidCacheTtlThrows(): void
-    {
-        // extra.lockrot is schema-validated before it reaches here in the real CLI path, but
-        // resolveCacheTtl() must still fail fast rather than silently default when called directly
-        // with a non-int value (a digit string is not accepted, same ruling as Thresholds).
-        $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage('extra.lockrot.cache-ttl must be a non-negative integer of seconds');
-        LockrotConfig::fromSources(['cache-ttl' => '3600'], [], [], '8.5.10', null);
     }
 
     public function testIncludeDevFromExtraAndCli(): void

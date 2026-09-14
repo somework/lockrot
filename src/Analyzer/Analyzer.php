@@ -13,9 +13,9 @@ use Lockrot\Data\GitHub\GitHubFetchPlan;
 use Lockrot\Data\GitHub\GitHubFetchPlanner;
 use Lockrot\Data\GitHub\RepoLocator;
 use Lockrot\Data\GitHub\RepositoryActivity;
-use Lockrot\Data\Packagist\PackageMetadata;
-use Lockrot\Data\Packagist\PackagistBatch;
-use Lockrot\Data\Packagist\PackagistClient;
+use Lockrot\Data\Repository\MetadataBatch;
+use Lockrot\Data\Repository\MetadataLoaderInterface;
+use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Graph\DependencyGraph;
 use Lockrot\Lock\LockedPackage;
 use Lockrot\Lock\LockFile;
@@ -28,25 +28,27 @@ use Lockrot\Verdict\VerdictEngine;
 
 final class Analyzer
 {
-    public const NOTE_NOT_ON_PACKAGIST = 'not on Packagist, not checked';
+    public const NOTE_NOT_IN_REPOSITORY = 'not from a Composer repository, not checked';
 
-    private PackagistClient $packagist;
+    private MetadataLoaderInterface $metadata;
     private GitHubClient $github;
     private GitHubFetchPlanner $planner;
     private Allowlist $allowlist;
     private SignalSet $signals;
     private VerdictEngine $engine;
     private Clock $clock;
+    private bool $offline;
 
-    public function __construct(PackagistClient $packagist, GitHubClient $github, GitHubFetchPlanner $planner, Allowlist $allowlist, SignalSet $signals, VerdictEngine $engine, Clock $clock)
+    public function __construct(MetadataLoaderInterface $metadata, GitHubClient $github, GitHubFetchPlanner $planner, Allowlist $allowlist, SignalSet $signals, VerdictEngine $engine, Clock $clock, bool $offline = false)
     {
-        $this->packagist = $packagist;
+        $this->metadata = $metadata;
         $this->github = $github;
         $this->planner = $planner;
         $this->allowlist = $allowlist;
         $this->signals = $signals;
         $this->engine = $engine;
         $this->clock = $clock;
+        $this->offline = $offline;
     }
 
     public function allowlist(): Allowlist
@@ -68,12 +70,15 @@ final class Analyzer
         $graph = DependencyGraph::fromLock($lock, $project, $includeDev);
         $now = $this->clock->now();
         $notes = [];
+        if ($this->offline) {
+            $notes[] = "offline: repository metadata served from Composer's cache";
+        }
 
         $batch = $this->fetchMetadata($packages);
         $metadata = $batch->metadata();
-        $packagistFailed = $batch->failed();
-        if ($packagistFailed !== []) {
-            $notes[] = \sprintf('Packagist unreachable for %d packages: %s', \count($packagistFailed), (string) reset($packagistFailed));
+        $metadataFailed = $batch->failed();
+        if ($metadataFailed !== []) {
+            $notes[] = \sprintf('Repository metadata unavailable for %d packages: %s', \count($metadataFailed), (string) reset($metadataFailed));
         }
 
         [$allowlisted, $repoByPackage, $candidateByPackage] = $this->classify($packages, $metadata, $now);
@@ -84,7 +89,7 @@ final class Analyzer
         $activity = $githubBatch->activity();
 
         $findings = [];
-        $notOnPackagist = 0;
+        $notInRepository = 0;
         foreach ($packages as $package) {
             $meta = $metadata[$package->name()] ?? null;
             $repo = $repoByPackage[$package->name()] ?? null;
@@ -92,28 +97,28 @@ final class Analyzer
             $checked = $repo !== null && \in_array($repo, $repos, true);
             $entry = $allowlisted[$package->name()];
             $findings[] = $this->buildFinding($package, $meta, $act, $checked, $entry, $graph, $batch);
-            if (!$package->isOnPackagist()) {
-                ++$notOnPackagist;
+            if (!$package->isFromComposerRepository()) {
+                ++$notInRepository;
             }
         }
-        $this->notes($notes, $notOnPackagist);
+        $this->notes($notes, $notInRepository);
 
         $hadNetworkFailures = $batch->failed() !== [] || $githubBatch->failed() !== [];
 
-        return new Report($findings, $notes, $now, \count($packages), $notOnPackagist, $hadNetworkFailures);
+        return new Report($findings, $notes, $now, \count($packages), $notInRepository, $hadNetworkFailures);
     }
 
     /** @param list<LockedPackage> $packages */
-    private function fetchMetadata(array $packages): PackagistBatch
+    private function fetchMetadata(array $packages): MetadataBatch
     {
-        $onPackagist = [];
+        $names = [];
         foreach ($packages as $package) {
-            if ($package->isOnPackagist()) {
-                $onPackagist[] = $package->name();
+            if ($package->isFromComposerRepository()) {
+                $names[] = $package->name();
             }
         }
 
-        return $this->packagist->fetch($onPackagist);
+        return $this->metadata->load($names);
     }
 
     /**
@@ -131,7 +136,7 @@ final class Analyzer
             $meta = $metadata[$package->name()] ?? null;
             $allowlisted[$package->name()] = $this->allowlist->match($package, $meta, $now);
             $repo = RepoLocator::github($meta !== null ? ($meta->sourceUrl() ?? $package->sourceUrl()) : $package->sourceUrl());
-            if ($repo === null || $allowlisted[$package->name()] !== null || !$package->isOnPackagist()) {
+            if ($repo === null || $allowlisted[$package->name()] !== null || !$package->isFromComposerRepository()) {
                 continue;
             }
             $repoByPackage[$package->name()] = $repo;
@@ -169,19 +174,19 @@ final class Analyzer
         return $githubBatch;
     }
 
-    private function buildFinding(LockedPackage $package, ?PackageMetadata $meta, ?RepositoryActivity $activity, bool $checked, ?AllowlistEntry $entry, DependencyGraph $graph, PackagistBatch $batch): Finding
+    private function buildFinding(LockedPackage $package, ?PackageMetadata $meta, ?RepositoryActivity $activity, bool $checked, ?AllowlistEntry $entry, DependencyGraph $graph, MetadataBatch $batch): Finding
     {
         $facts = new PackageFacts($package, $meta, $activity, $checked);
         $signals = $this->signals->evaluate($facts);
         $verdict = $this->engine->decide($signals, $entry !== null, $meta !== null);
 
         $note = null;
-        if (!$package->isOnPackagist()) {
-            $note = self::NOTE_NOT_ON_PACKAGIST;
+        if (!$package->isFromComposerRepository()) {
+            $note = self::NOTE_NOT_IN_REPOSITORY;
         } elseif ($meta === null && isset($batch->failed()[$package->name()])) {
-            $note = 'Packagist data unavailable: '.$batch->failed()[$package->name()];
+            $note = 'Repository metadata unavailable: '.$batch->failed()[$package->name()];
         } elseif ($meta === null) {
-            $note = 'not found on Packagist';
+            $note = 'not found in the repository';
         }
 
         return new Finding(
@@ -197,10 +202,12 @@ final class Analyzer
     }
 
     /** @param list<string> $notes */
-    private function notes(array &$notes, int $notOnPackagist): void
+    private function notes(array &$notes, int $notInRepository): void
     {
-        if ($notOnPackagist > 0) {
-            $notes[] = \sprintf('%d packages are not on Packagist and were not checked', $notOnPackagist);
+        if ($notInRepository === 1) {
+            $notes[] = '1 package is not from a Composer repository and was not checked';
+        } elseif ($notInRepository > 1) {
+            $notes[] = \sprintf('%d packages are not from a Composer repository and were not checked', $notInRepository);
         }
     }
 

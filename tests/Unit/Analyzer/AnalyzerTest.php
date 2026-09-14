@@ -13,8 +13,10 @@ use Lockrot\Data\GitHub\GitHubClient;
 use Lockrot\Data\GitHub\GitHubFetchPlanner;
 use Lockrot\Data\Http\HttpClientInterface;
 use Lockrot\Data\Http\HttpResult;
-use Lockrot\Data\Packagist\PackagistClient;
 use Lockrot\Data\Php\PhpReleaseDates;
+use Lockrot\Data\Repository\MetadataBatch;
+use Lockrot\Data\Repository\MetadataLoaderInterface;
+use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Signal\SignalSet;
@@ -50,19 +52,39 @@ final class AnalyzerTest extends TestCase
         };
     }
 
-    /** @param list<array<string, mixed>> $versions */
-    private function p2(string $name, array $versions): string
+    /**
+     * A fake metadata loader that ignores the requested names and always returns the same
+     * prepared batch — the analyzer only ever calls load() once per analyze(), so there is nothing
+     * to distinguish between calls in these tests.
+     *
+     * @param array<string, PackageMetadata> $metadata
+     * @param list<string>                   $notFound
+     * @param array<string, string>          $failed
+     */
+    private function loader(array $metadata = [], array $notFound = [], array $failed = []): MetadataLoaderInterface
     {
-        $json = json_encode(['packages' => [$name => $versions], 'minified' => 'composer/2.0']);
+        $batch = new MetadataBatch($metadata, $notFound, $failed);
 
-        return $json === false ? '' : $json;
+        return new class ($batch) implements MetadataLoaderInterface {
+            private MetadataBatch $batch;
+
+            public function __construct(MetadataBatch $batch)
+            {
+                $this->batch = $batch;
+            }
+
+            public function load(array $names): MetadataBatch
+            {
+                return $this->batch;
+            }
+        };
     }
 
-    private function analyzer(HttpClientInterface $http, bool $token, Allowlist $allowlist): Analyzer
+    private function analyzer(MetadataLoaderInterface $metadata, HttpClientInterface $http, bool $token, Allowlist $allowlist): Analyzer
     {
         $clock = Clock::fixed(F::NOW);
         return new Analyzer(
-            new PackagistClient($http),
+            $metadata,
             new GitHubClient($http, $token ? 't' : null),
             new GitHubFetchPlanner($token),
             $allowlist,
@@ -74,14 +96,16 @@ final class AnalyzerTest extends TestCase
 
     public function testMiniProjectVerdicts(): void
     {
+        $dataDate = new \DateTimeImmutable('2026-09-14T06:00:00+00:00');
+        $metadata = [
+            'vendor/direct' => new PackageMetadata('vendor/direct', false, null, true, new \DateTimeImmutable('2024-01-10T10:00:00+00:00'), '1.2.3', 1, 'https://github.com/vendor/direct.git', 'library', $dataDate),
+            'vendor/transitive' => new PackageMetadata('vendor/transitive', false, null, true, new \DateTimeImmutable('2015-11-16T16:30:51+00:00'), '2.0.0', 1, 'https://github.com/vendor/transitive.git', 'library', $dataDate),
+            'vendor/snapshot' => new PackageMetadata('vendor/snapshot', false, null, false, null, null, 1, null, 'library', $dataDate),
+        ];
         $http = $this->http([
-            'https://repo.packagist.org/p2/vendor/direct.json' => [200, $this->p2('vendor/direct', [['name' => 'vendor/direct', 'version' => '1.2.3', 'time' => '2024-01-10T10:00:00+00:00', 'source' => ['url' => 'https://github.com/vendor/direct.git']]])],
-            'https://repo.packagist.org/p2/vendor/transitive.json' => [200, $this->p2('vendor/transitive', [['name' => 'vendor/transitive', 'version' => '2.0.0', 'time' => '2015-11-16T16:30:51+00:00', 'source' => ['url' => 'https://github.com/vendor/transitive.git']]])],
-            'https://repo.packagist.org/p2/vendor/snapshot.json' => [200, $this->p2('vendor/snapshot', [])],
-            'https://repo.packagist.org/p2/vendor/snapshot~dev.json' => [200, $this->p2('vendor/snapshot', [['name' => 'vendor/snapshot', 'version' => 'dev-master', 'time' => '2015-08-31T22:07:48+00:00']])],
             'https://api.github.com/repos/vendor/transitive' => [200, '{"archived":false,"pushed_at":"2015-11-16T16:31:37Z"}'],
         ]);
-        $report = $this->analyzer($http, false, new Allowlist([]))->analyze(
+        $report = $this->analyzer($this->loader($metadata), $http, false, new Allowlist([]))->analyze(
             LockFile::fromFile(__DIR__.'/../../fixtures/mini/composer.lock'),
             ProjectConfig::fromFile(__DIR__.'/../../fixtures/mini/composer.json'),
             false
@@ -103,7 +127,7 @@ final class AnalyzerTest extends TestCase
         self::assertSame('2026-09-14T06:00:00+00:00', $byName['vendor/transitive']->dataDate()->format(\DATE_ATOM));
         self::assertSame(Verdict::PINNED, $byName['vendor/snapshot']->verdict());
         self::assertSame(Verdict::UNKNOWN, $byName['private/thing']->verdict());
-        self::assertSame('not on Packagist, not checked', $byName['private/thing']->evidence());
+        self::assertSame('not from a Composer repository, not checked', $byName['private/thing']->evidence());
         self::assertSame(4, $report->packagesChecked());
         self::assertSame(1, $report->notOnPackagist());
         self::assertFalse($report->hadNetworkFailures());
@@ -114,52 +138,58 @@ final class AnalyzerTest extends TestCase
 
     public function testAllowlistedIsFinishedAndNotFetchedFromGitHub(): void
     {
-        $http = $this->http([
-            'https://repo.packagist.org/p2/vendor/transitive.json' => [200, $this->p2('vendor/transitive', [['name' => 'vendor/transitive', 'version' => '2.0.0', 'time' => '2015-11-16T16:30:51+00:00', 'source' => ['url' => 'https://github.com/vendor/transitive.git']]])],
-        ]);
+        $metadata = [
+            'vendor/transitive' => new PackageMetadata('vendor/transitive', false, null, true, new \DateTimeImmutable('2015-11-16T16:30:51+00:00'), '2.0.0', 1, 'https://github.com/vendor/transitive.git', 'library', new \DateTimeImmutable('2026-09-14T06:00:00+00:00')),
+        ];
         $lock = LockFile::fromArray(['packages' => [['name' => 'vendor/transitive', 'version' => '2.0.0', 'notification-url' => 'https://packagist.org/downloads/']]]);
-        $report = $this->analyzer($http, false, new Allowlist([new AllowlistEntry('vendor/*', null, 'complete', null, 'builtin')]))->analyze($lock, ProjectConfig::empty(), false);
+        $report = $this->analyzer($this->loader($metadata), $this->http([]), false, new Allowlist([new AllowlistEntry('vendor/*', null, 'complete', null, 'builtin')]))->analyze($lock, ProjectConfig::empty(), false);
         self::assertSame(Verdict::FINISHED, $report->findings()[0]->verdict());
         self::assertSame('complete', $report->findings()[0]->allowlistReason());
     }
 
-    public function testPackagistFailureIsUnknownWithNoteAndNetworkFlag(): void
+    public function testRepositoryMetadataFailureIsUnknownWithNoteAndNetworkFlag(): void
     {
-        $http = $this->http(['https://repo.packagist.org/p2/vendor/direct.json' => [503, '']]);
         $lock = LockFile::fromArray(['packages' => [['name' => 'vendor/direct', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/']]]);
-        $report = $this->analyzer($http, true, new Allowlist([]))->analyze($lock, ProjectConfig::empty(), false);
+        $report = $this->analyzer($this->loader([], [], ['vendor/direct' => 'HTTP 503']), $this->http([]), true, new Allowlist([]))->analyze($lock, ProjectConfig::empty(), false);
         self::assertSame(Verdict::UNKNOWN, $report->findings()[0]->verdict());
         self::assertTrue($report->hadNetworkFailures());
-        self::assertStringContainsString('Packagist', implode(' ', $report->notes()));
+        self::assertStringContainsString('Repository metadata unavailable', implode(' ', $report->notes()));
     }
 
     /**
-     * One package on Packagist with a GitHub source, optionally with a canned GitHub response.
+     * One package from a Composer repository with a GitHub source, optionally with a canned
+     * GitHub response.
      *
-     * @param list<array<string, mixed>> $versions
-     * @param array{int, string}|null    $github   status and body for api.github.com/repos/vendor/pkg
+     * @param array{int, string}|null $github status and body for api.github.com/repos/vendor/pkg
      */
-    private function singlePackageReport(array $versions, bool $token, ?array $github = null): Report
+    private function singlePackageReport(PackageMetadata $meta, bool $token, ?array $github = null): Report
     {
-        $map = ['https://repo.packagist.org/p2/vendor/pkg.json' => [200, $this->p2('vendor/pkg', $versions)]];
+        $map = [];
         if ($github !== null) {
             $map['https://api.github.com/repos/vendor/pkg'] = $github;
         }
         $lock = LockFile::fromArray(['packages' => [['name' => 'vendor/pkg', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/']]]);
 
-        return $this->analyzer($this->http($map), $token, new Allowlist([]))->analyze($lock, ProjectConfig::empty(), false);
+        return $this->analyzer($this->loader(['vendor/pkg' => $meta]), $this->http($map), $token, new Allowlist([]))->analyze($lock, ProjectConfig::empty(), false);
     }
 
-    /** @return list<array<string, mixed>> a release recent enough that S2 never fires (not a candidate) */
-    private function recent(): array
+    private function metadataFor(?string $releasedAt): PackageMetadata
     {
-        return [['name' => 'vendor/pkg', 'version' => '1.0.0', 'time' => '2026-08-01T00:00:00+00:00', 'source' => ['url' => 'https://github.com/vendor/pkg.git']]];
+        $releaseAt = $releasedAt === null ? null : new \DateTimeImmutable($releasedAt);
+
+        return new PackageMetadata('vendor/pkg', false, null, true, $releaseAt, '1.0.0', 1, 'https://github.com/vendor/pkg.git', 'library', new \DateTimeImmutable(F::NOW));
     }
 
-    /** @return list<array<string, mixed>> a release old enough that S2 fires (a candidate for the activity check) */
-    private function ancient(): array
+    /** @return PackageMetadata a release recent enough that S2 never fires (not a candidate) */
+    private function recent(): PackageMetadata
     {
-        return [['name' => 'vendor/pkg', 'version' => '1.0.0', 'time' => '2015-01-01T00:00:00+00:00', 'source' => ['url' => 'https://github.com/vendor/pkg.git']]];
+        return $this->metadataFor('2026-08-01T00:00:00+00:00');
+    }
+
+    /** @return PackageMetadata a release old enough that S2 fires (a candidate for the activity check) */
+    private function ancient(): PackageMetadata
+    {
+        return $this->metadataFor('2015-01-01T00:00:00+00:00');
     }
 
     public function testWithoutTokenAndNoCandidatesTheSkippedPackagesAreStillReported(): void
@@ -199,14 +229,14 @@ final class AnalyzerTest extends TestCase
 
     public function testCountsByVerdictCoverAllVerdicts(): void
     {
-        $report = $this->analyzer($this->http([]), true, new Allowlist([]))->analyze(LockFile::fromArray(['packages' => []]), ProjectConfig::empty(), false);
+        $report = $this->analyzer($this->loader(), $this->http([]), true, new Allowlist([]))->analyze(LockFile::fromArray(['packages' => []]), ProjectConfig::empty(), false);
         self::assertSame(array_fill_keys(Verdict::all(), 0), $report->byVerdict());
     }
 
     public function testAllowlistAccessorReturnsConstructorValue(): void
     {
         $allowlist = new Allowlist([new AllowlistEntry('vendor/*', null, 'complete', null, 'builtin')]);
-        $analyzer = $this->analyzer($this->http([]), true, $allowlist);
+        $analyzer = $this->analyzer($this->loader(), $this->http([]), true, $allowlist);
         self::assertSame($allowlist, $analyzer->allowlist());
     }
 
@@ -214,7 +244,7 @@ final class AnalyzerTest extends TestCase
     {
         $original = new Allowlist([]);
         $replacement = new Allowlist([new AllowlistEntry('vendor/*', null, 'complete', null, 'builtin')]);
-        $analyzer = $this->analyzer($this->http([]), true, $original);
+        $analyzer = $this->analyzer($this->loader(), $this->http([]), true, $original);
 
         $withReplacement = $analyzer->withAllowlist($replacement);
 

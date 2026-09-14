@@ -10,8 +10,6 @@ use Composer\Semver\VersionParser;
 
 final class LockedPackage
 {
-    private const PACKAGIST_NOTIFICATION_URL = 'https://packagist.org/downloads/';
-
     private string $name;
     private string $version;
     private ?\DateTimeImmutable $time;
@@ -20,7 +18,7 @@ final class LockedPackage
     private array $requires;
     private ?string $sourceUrl;
     private string $type;
-    private bool $onPackagist;
+    private bool $fromComposerRepository;
     private bool $dev;
     /** @var bool|string */
     private $abandonedInLock;
@@ -37,7 +35,7 @@ final class LockedPackage
         array $requires,
         ?string $sourceUrl,
         string $type,
-        bool $onPackagist,
+        bool $fromComposerRepository,
         bool $dev,
         $abandonedInLock
     ) {
@@ -48,7 +46,7 @@ final class LockedPackage
         $this->requires = $requires;
         $this->sourceUrl = $sourceUrl;
         $this->type = $type;
-        $this->onPackagist = $onPackagist;
+        $this->fromComposerRepository = $fromComposerRepository;
         $this->dev = $dev;
         $this->abandonedInLock = $abandonedInLock;
     }
@@ -73,6 +71,8 @@ final class LockedPackage
             }
         }
 
+        $notificationUrl = $package->getNotificationUrl();
+
         return new self(
             $package->getName(),
             $package->getPrettyVersion(),
@@ -81,7 +81,7 @@ final class LockedPackage
             $requires,
             $package->getSourceUrl(),
             $package->getType(),
-            $package->getNotificationUrl() === self::PACKAGIST_NOTIFICATION_URL,
+            $notificationUrl !== null && $notificationUrl !== '',
             $dev,
             $package->isAbandoned() ? ($package->getReplacementPackage() ?? true) : false
         );
@@ -116,9 +116,9 @@ final class LockedPackage
     {
         return $this->type;
     }
-    public function isOnPackagist(): bool
+    public function isFromComposerRepository(): bool
     {
-        return $this->onPackagist;
+        return $this->fromComposerRepository;
     }
     public function isDev(): bool
     {

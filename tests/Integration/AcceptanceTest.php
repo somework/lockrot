@@ -11,12 +11,13 @@ use Lockrot\Clock;
 use Lockrot\Data\GitHub\GitHubClient;
 use Lockrot\Data\GitHub\GitHubFetchPlanner;
 use Lockrot\Data\Http\RecordedHttpClient;
-use Lockrot\Data\Packagist\PackagistClient;
 use Lockrot\Data\Php\PhpReleaseDates;
+use Lockrot\Data\Repository\RepositoryMetadataLoader;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
+use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
 use Lockrot\Verdict\VerdictEngine;
@@ -28,20 +29,36 @@ final class AcceptanceTest extends TestCase
     private const FIXTURES = __DIR__.'/../fixtures/';
     private const NOW = '2026-09-14T00:00:00+00:00';
 
+    /**
+     * Builds a single-use fixture repository server for just this one lock file, runs one analysis
+     * against it, then stops it. A server is deliberately not shared/reused across test methods
+     * here: this class queries the 200-package wallabag lock through analyze() from three different
+     * tests, and reusing one long-lived `php -S` process (or one loader) across that many full loads
+     * was measured to wedge the server (the same reliability limit documented on
+     * RepositoryMetadataLoaderTest and FixtureRepositoryServer) — a server used for exactly one load
+     * and then stopped avoids it entirely, at the cost of one extra server start per test.
+     */
     private function analyze(string $dir): Report
     {
-        $clock = Clock::fixed(self::NOW);
-        $analyzer = new Analyzer(
-            new PackagistClient(new RecordedHttpClient(self::FIXTURES.'http/p2')),
-            new GitHubClient(new RecordedHttpClient(self::FIXTURES.'http/github'), 'recorded'),
-            new GitHubFetchPlanner(true),
-            BuiltinAllowlist::load(),
-            SignalSet::default($clock, new Thresholds(), '8.4', PhpReleaseDates::load()),
-            new VerdictEngine(),
-            $clock
-        );
+        $server = FixtureRepositoryServer::fromLockFiles([self::FIXTURES.$dir.'/composer.lock']);
+        $server->start();
 
-        return $analyzer->analyze(LockFile::fromFile(self::FIXTURES.$dir.'/composer.lock'), ProjectConfig::fromFile(self::FIXTURES.$dir.'/composer.json'), false);
+        try {
+            $clock = Clock::fixed(self::NOW);
+            $analyzer = new Analyzer(
+                new RepositoryMetadataLoader($server->repositories(), $clock),
+                new GitHubClient(new RecordedHttpClient(self::FIXTURES.'http/github'), 'recorded'),
+                new GitHubFetchPlanner(true),
+                BuiltinAllowlist::load(),
+                SignalSet::default($clock, new Thresholds(), '8.4', PhpReleaseDates::load()),
+                new VerdictEngine(),
+                $clock
+            );
+
+            return $analyzer->analyze(LockFile::fromFile(self::FIXTURES.$dir.'/composer.lock'), ProjectConfig::fromFile(self::FIXTURES.$dir.'/composer.json'), false);
+        } finally {
+            $server->stop();
+        }
     }
 
     /** @return array<string, Finding> */

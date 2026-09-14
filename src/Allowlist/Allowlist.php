@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Allowlist;
 
-use Lockrot\Data\Packagist\PackageMetadata;
+use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Lock\LockedPackage;
 
 final class Allowlist

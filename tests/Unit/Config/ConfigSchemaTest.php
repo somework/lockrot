@@ -24,7 +24,6 @@ final class ConfigSchemaTest extends TestCase
             'target-php' => '8.4',
             'format' => 'json',
             'include-dev' => true,
-            'cache-ttl' => 3600,
             'release-warn-years' => 2,
             'release-high-years' => 4,
             'push-warn-years' => 2,
@@ -66,8 +65,6 @@ final class ConfigSchemaTest extends TestCase
         yield 'target-php bad pattern' => [['target-php' => 'v8.4'], 'target-php'];
         yield 'format not in enum' => [['format' => 'xml'], 'format'];
         yield 'include-dev wrong type' => [['include-dev' => 'yes'], 'include-dev'];
-        yield 'cache-ttl negative' => [['cache-ttl' => -1], 'cache-ttl'];
-        yield 'cache-ttl digit string' => [['cache-ttl' => '3600'], 'cache-ttl'];
         yield 'release-warn-years digit string' => [['release-warn-years' => '4'], 'release-warn-years'];
         yield 'release-warn-years below minimum' => [['release-warn-years' => 0], 'release-warn-years'];
         yield 'release-high-years wrong type' => [['release-high-years' => 'many'], 'release-high-years'];

@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Lockrot\Data\Packagist;
+namespace Lockrot\Data\Repository;
 
 use Composer\Package\BasePackage;
 use Composer\Package\CompletePackage;
 
 /**
- * Memory: the expanded p2 version list is folded into scalars in a single pass inside fromP2() and
- * then dropped. Nothing here retains a per-release object, so a 200-package lock costs kilobytes
- * rather than the tens of megabytes the full release history would.
+ * Memory: fromPackages() folds the given package objects into scalars in a single pass and
+ * retains nothing beyond them. Nothing here retains a per-release object, so a 200-package lock
+ * costs kilobytes rather than the tens of megabytes the full release history would.
  */
 final class PackageMetadata
 {
@@ -50,56 +50,9 @@ final class PackageMetadata
     }
 
     /**
-     * @param list<array<string, mixed>> $stableVersions expanded p2 versions from {name}.json
-     * @param list<array<string, mixed>> $devVersions expanded p2 versions from {name}~dev.json
-     */
-    public static function fromP2(string $name, array $stableVersions, array $devVersions, \DateTimeImmutable $fetchedAt): self
-    {
-        $first = $stableVersions[0] ?? $devVersions[0] ?? [];
-        $abandonedRaw = $first['abandoned'] ?? false;
-        $abandoned = $abandonedRaw === true || (\is_string($abandonedRaw) && $abandonedRaw !== '');
-        $replacement = \is_string($abandonedRaw) && $abandonedRaw !== '' ? $abandonedRaw : null;
-        $source = \is_array($first['source'] ?? null) ? ($first['source']['url'] ?? null) : null;
-        $type = $first['type'] ?? 'library';
-
-        $hasStableRelease = false;
-        $lastStableReleaseAt = null;
-        $lastStableVersion = null;
-        $releaseCount = 0;
-        foreach ([$stableVersions, $devVersions] as $versions) {
-            foreach ($versions as $version) {
-                ++$releaseCount;
-                $release = Release::fromP2Version($version);
-                if ($release->isDev()) {
-                    continue;
-                }
-                $hasStableRelease = true;
-                $time = $release->time();
-                if ($time !== null && ($lastStableReleaseAt === null || $time > $lastStableReleaseAt)) {
-                    $lastStableReleaseAt = $time;
-                    $lastStableVersion = $release->version();
-                }
-            }
-        }
-
-        return new self(
-            $name,
-            $abandoned,
-            $replacement,
-            $hasStableRelease,
-            $lastStableReleaseAt,
-            $lastStableVersion,
-            $releaseCount,
-            \is_string($source) ? $source : null,
-            \is_string($type) ? $type : 'library',
-            $fetchedAt
-        );
-    }
-
-    /**
-     * Same semantics as fromP2(), derived directly from Composer's own package objects instead of
-     * raw p2 JSON. $versions is already unwrapped (no AliasPackage) — that is the caller's job,
-     * since only the caller knows how to group loadPackages()'s flat package list by name.
+     * Derived directly from Composer's own package objects for one package name. $versions is
+     * already unwrapped (no AliasPackage) — that is the caller's job, since only the caller knows
+     * how to group loadPackages()'s flat package list by name.
      *
      * @param list<BasePackage> $versions
      */

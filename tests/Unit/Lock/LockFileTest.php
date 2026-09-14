@@ -31,7 +31,7 @@ final class LockFileTest extends TestCase
         self::assertSame('>=7.4', $pkg->requirePhp());
         self::assertSame(['vendor/transitive'], $pkg->requires());
         self::assertSame('https://github.com/vendor/direct.git', $pkg->sourceUrl());
-        self::assertTrue($pkg->isOnPackagist());
+        self::assertTrue($pkg->isFromComposerRepository());
         self::assertFalse($pkg->isDev());
         self::assertFalse($pkg->isBranchSnapshot());
         self::assertFalse($pkg->abandonedInLock());
@@ -47,7 +47,7 @@ final class LockFileTest extends TestCase
 
         $private = $lock->find('private/thing');
         self::assertNotNull($private);
-        self::assertFalse($private->isOnPackagist());
+        self::assertFalse($private->isFromComposerRepository());
         self::assertNull($private->time());
 
         $transitive = $lock->find('vendor/transitive');

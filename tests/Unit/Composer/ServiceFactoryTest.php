@@ -45,7 +45,7 @@ final class ServiceFactoryTest extends TestCase
         $config = new Config(false, sys_get_temp_dir());
         $config->merge(['config' => ['cache-dir' => $this->tempCacheDir(), 'home' => sys_get_temp_dir()]]);
         $lockrot = LockrotConfig::fromSources([], [], [], '8.4.0', null);
-        $analyzer = ServiceFactory::createAnalyzer(new NullIO(), $config, $lockrot, null, Clock::fixed('2026-09-14T00:00:00+00:00'));
+        $analyzer = ServiceFactory::createAnalyzer(new NullIO(), $config, [], $lockrot, null, Clock::fixed('2026-09-14T00:00:00+00:00'));
         self::assertInstanceOf(Analyzer::class, $analyzer);
     }
 

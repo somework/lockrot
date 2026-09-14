@@ -17,10 +17,6 @@
         "include-dev": {
             "type": "boolean"
         },
-        "cache-ttl": {
-            "type": "integer",
-            "minimum": 0
-        },
         "release-warn-years": {
             "type": "integer",
             "minimum": 1

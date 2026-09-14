@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Signal;
 
 use Lockrot\Data\GitHub\RepositoryActivity;
-use Lockrot\Data\Packagist\PackageMetadata;
+use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Lock\LockedPackage;
 use Lockrot\Signal\PackageFacts;
 
@@ -39,7 +39,7 @@ final class FactsBuilder
             $requires,
             \is_string($source) ? $source : null,
             \is_string($type) ? $type : 'library',
-            \is_bool($o['onPackagist'] ?? null) ? $o['onPackagist'] : true,
+            \is_bool($o['fromComposerRepository'] ?? null) ? $o['fromComposerRepository'] : true,
             \is_bool($o['dev'] ?? null) ? $o['dev'] : false,
             \is_bool($abandonedInLock) || \is_string($abandonedInLock) ? $abandonedInLock : false
         );

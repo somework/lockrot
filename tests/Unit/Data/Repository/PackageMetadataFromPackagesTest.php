@@ -6,7 +6,7 @@ namespace Lockrot\Tests\Unit\Data\Repository;
 
 use Composer\Package\CompletePackage;
 use Composer\Package\Loader\ArrayLoader;
-use Lockrot\Data\Packagist\PackageMetadata;
+use Lockrot\Data\Repository\PackageMetadata;
 use PHPUnit\Framework\TestCase;
 
 final class PackageMetadataFromPackagesTest extends TestCase

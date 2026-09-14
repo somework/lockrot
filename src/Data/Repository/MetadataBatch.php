@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Lockrot\Data\Repository;
 
-use Lockrot\Data\Packagist\PackageMetadata;
-
 final class MetadataBatch
 {
     /** @var array<string, PackageMetadata> */

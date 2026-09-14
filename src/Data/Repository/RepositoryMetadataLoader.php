@@ -9,7 +9,6 @@ use Composer\Package\BasePackage;
 use Composer\Repository\ComposerRepository;
 use Composer\Repository\RepositoryInterface;
 use Lockrot\Clock;
-use Lockrot\Data\Packagist\PackageMetadata;
 
 final class RepositoryMetadataLoader implements MetadataLoaderInterface
 {
