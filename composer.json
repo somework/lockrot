@@ -1,0 +1,37 @@
+{
+    "name": "somework/lockrot",
+    "description": "Shows dependency rot in composer.lock: abandoned, silent, pinned and old-promise packages.",
+    "type": "composer-plugin",
+    "license": "MIT",
+    "keywords": ["composer", "plugin", "dependencies", "maintenance", "abandoned"],
+    "require": {
+        "php": "^7.4 || ^8.0",
+        "composer-plugin-api": "^2.2"
+    },
+    "require-dev": {
+        "composer/composer": "^2.2",
+        "phpunit/phpunit": "^9.6 || ^10.5 || ^11.5",
+        "phpstan/phpstan": "^2.1",
+        "friendsofphp/php-cs-fixer": "^3.70",
+        "symfony/console": "^5.4",
+        "symfony/process": "^5.4"
+    },
+    "autoload": { "psr-4": { "Lockrot\\": "src/" } },
+    "autoload-dev": { "psr-4": { "Lockrot\\Tests\\": "tests/" } },
+    "extra": {
+        "class": "Lockrot\\Composer\\LockrotPlugin",
+        "plugin-modifies-downloads": false
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "scripts": {
+        "test": "phpunit",
+        "stan": [
+            "phpstan analyse --memory-limit=1G",
+            "phpstan analyse -c phpstan.tests.neon.dist --memory-limit=1G"
+        ],
+        "cs": "php-cs-fixer fix --dry-run --diff",
+        "cs-fix": "php-cs-fixer fix"
+    }
+}

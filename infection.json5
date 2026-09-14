@@ -1,0 +1,13 @@
+{
+    "source": {
+        "directories": ["src/Verdict", "src/Signal"]
+    },
+    "logs": {
+        "text": "build/infection.log"
+    },
+    "mutators": {
+        "@default": true
+    },
+    "minMsi": 85,
+    "minCoveredMsi": 90
+}

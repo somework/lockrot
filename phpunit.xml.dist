@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         bootstrap="vendor/autoload.php" colors="true" failOnWarning="true"
+         beStrictAboutOutputDuringTests="true">
+    <testsuites>
+        <testsuite name="unit"><directory>tests/Unit</directory></testsuite>
+        <testsuite name="integration"><directory>tests/Integration</directory></testsuite>
+        <testsuite name="e2e"><directory>tests/E2E</directory></testsuite>
+    </testsuites>
+    <groups><exclude><group>e2e</group><group>network</group></exclude></groups>
+    <php><env name="LOCKROT_TODAY" value="2026-09-14T00:00:00+00:00"/></php>
+    <source><include><directory>src</directory></include></source>
+</phpunit>
