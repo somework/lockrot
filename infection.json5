@@ -8,6 +8,8 @@
     "mutators": {
         "@default": true
     },
+    // Baseline at commit d82ff77 (2026-09-15): MSI = Covered MSI = 97.99% (100% mutation coverage,
+    // src/Verdict + src/Signal). Threshold = floor(measured %) - 3 = floor(97.99) - 3 = 94.
     "minMsi": 94,
     "minCoveredMsi": 94
 }
