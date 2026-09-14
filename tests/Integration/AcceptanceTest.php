@@ -20,6 +20,7 @@ use Lockrot\Signal\Thresholds;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
 use Lockrot\Verdict\VerdictEngine;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 
 final class AcceptanceTest extends TestCase
@@ -54,6 +55,15 @@ final class AcceptanceTest extends TestCase
         return $out;
     }
 
+    // The peak-memory assertion below reads memory_get_peak_usage(true), a whole-process
+    // high-water mark that PHPUnit never resets between tests. With every other suite test
+    // (Unit runs before Integration) contributing to that same peak, this assertion is really
+    // testing "how much did the entire run allocate before this point", not this analysis alone
+    // — and it now sits close enough to the 64 MB budget that unrelated suite growth trips it.
+    // Isolating it in its own process makes the peak reflect only this test again, matching the
+    // comment's actual intent (a PHAR-OOM regression guard for this one analysis).
+    /** @runInSeparateProcess */
+    #[RunInSeparateProcess]
     public function testWallabag(): void
     {
         $report = $this->analyze('apps/wallabag_wallabag');

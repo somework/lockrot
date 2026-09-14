@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Data\Repository;
 
 use Lockrot\Clock;
+use Lockrot\Data\Http\RecordedHttpClient;
 use Lockrot\Data\Repository\RepositoryMetadataLoader;
 use Lockrot\Lock\LockFile;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
@@ -140,6 +141,49 @@ final class RepositoryMetadataLoaderTest extends TestCase
         }
 
         $server->stop();
+    }
+
+    public function testNameFoundWithNoVersionsIsTreatedAsFailed(): void
+    {
+        // A repository whose only envelope for this name has an entry (so Composer marks the name
+        // as "found") but an empty version list — e.g. every version filtered out, or the p2 entry
+        // itself is empty. There is nothing to build a PackageMetadata from, so this must land in
+        // failed(), not metadata() or notFound().
+        $dir = sys_get_temp_dir().'/lockrot-empty-versions-'.uniqid('', true);
+        $envelopeDir = $dir.'/envelopes';
+        self::assertNotFalse(mkdir($envelopeDir, 0777, true));
+
+        $lockPath = $dir.'/composer.lock';
+        file_put_contents($lockPath, (string) json_encode([
+            'packages' => [['name' => 'test/empty-versions', 'version' => '1.0.0']],
+        ]));
+
+        $url = 'https://repo.packagist.org/p2/test/empty-versions.json';
+        file_put_contents(RecordedHttpClient::pathFor($envelopeDir, $url), (string) json_encode([
+            'status' => 200,
+            'fetched_at' => self::FIXED,
+            'body' => json_encode(['packages' => ['test/empty-versions' => []]]),
+            'error' => null,
+        ]));
+
+        $server = FixtureRepositoryServer::fromLockFiles([$lockPath], $envelopeDir);
+        $server->start();
+        $loader = new RepositoryMetadataLoader($server->repositories(), Clock::fixed(self::FIXED));
+
+        $batch = $loader->load(['test/empty-versions']);
+
+        self::assertSame([], $batch->notFound());
+        self::assertSame([], $batch->metadata());
+        self::assertSame(
+            ['test/empty-versions' => 'repository listed the package but returned no versions'],
+            $batch->failed()
+        );
+
+        $server->stop();
+        unlink(RecordedHttpClient::pathFor($envelopeDir, $url));
+        rmdir($envelopeDir);
+        unlink($lockPath);
+        rmdir($dir);
     }
 
     public function testNoRepositoriesMeansEveryNameIsNotFound(): void

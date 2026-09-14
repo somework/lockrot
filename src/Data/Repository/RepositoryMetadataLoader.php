@@ -37,7 +37,10 @@ final class RepositoryMetadataLoader implements MetadataLoaderInterface
             if ($remaining === [] || !$repository instanceof ComposerRepository) {
                 continue;
             }
-            $remaining = $this->loadFromRepository($repository, $remaining, $metadata, $failed);
+            $batch = $this->loadFromRepository($repository, $remaining);
+            $metadata += $batch->metadata();
+            $failed += $batch->failed();
+            $remaining = $batch->notFound();
         }
 
         $notFound = [];
@@ -51,15 +54,17 @@ final class RepositoryMetadataLoader implements MetadataLoaderInterface
     }
 
     /**
-     * @param list<string>                   $remaining
-     * @param array<string, PackageMetadata> $metadata   appended to in place
-     * @param array<string, string>          $failed     appended to in place
+     * @param list<string> $remaining names to query against this one repository
      *
-     * @return list<string> names still unresolved after querying this repository
+     * @return MetadataBatch metadata()/failed() resolved in this pass; notFound() carries the
+     *                       names still unresolved (and not failed) to hand to the next repository
      */
-    private function loadFromRepository(ComposerRepository $repository, array $remaining, array &$metadata, array &$failed): array
+    private function loadFromRepository(ComposerRepository $repository, array $remaining): MetadataBatch
     {
+        $metadata = [];
+        $failed = [];
         $stillRemaining = [];
+
         foreach (array_chunk($remaining, self::CHUNK_SIZE) as $chunk) {
             try {
                 $result = $repository->loadPackages(array_fill_keys($chunk, null), BasePackage::$stabilities, []);
@@ -85,11 +90,19 @@ final class RepositoryMetadataLoader implements MetadataLoaderInterface
                     $stillRemaining[] = $name;
                     continue;
                 }
-                $metadata[$name] = PackageMetadata::fromPackages($name, $versionsByName[$name] ?? [], $now);
+                $versions = $versionsByName[$name] ?? [];
+                if ($versions === []) {
+                    // The repository reported this name as found (it has an entry in at least one
+                    // of {name}.json / {name}~dev.json) but every version was filtered out or the
+                    // entry was empty, so there is nothing to build a PackageMetadata from.
+                    $failed[$name] = 'repository listed the package but returned no versions';
+                    continue;
+                }
+                $metadata[$name] = PackageMetadata::fromPackages($name, $versions, $now);
             }
         }
 
-        return $stillRemaining;
+        return new MetadataBatch($metadata, $stillRemaining, $failed);
     }
 
     /**
