@@ -29,16 +29,55 @@ final class InstallSummaryFormatterTest extends TestCase
      * @param list<Finding> $findings
      * @param list<string>  $notes
      */
-    private function report(array $findings, array $notes = [], ?int $packagesChecked = null): Report
+    private function report(array $findings, array $notes = [], ?int $packagesChecked = null, bool $hadNetworkFailures = false): Report
     {
-        return new Report($findings, $notes, new \DateTimeImmutable(self::NOW), $packagesChecked ?? \count($findings), 0, false);
+        return new Report($findings, $notes, new \DateTimeImmutable(self::NOW), $packagesChecked ?? \count($findings), 0, $hadNetworkFailures);
     }
 
-    public function testNothingFlaggedProducesNoLinesAtAll(): void
+    public function testNothingFlaggedAndNothingFailedProducesNoLinesAtAll(): void
     {
         $report = $this->report([$this->finding('vendor/a', '1.0.0', Verdict::OK, '')]);
 
         self::assertSame([], (new InstallSummaryFormatter())->format($report));
+    }
+
+    /**
+     * An exhausted budget (or an unreachable repository) leaves every affected package `unknown`,
+     * which is below the flagged threshold — so without this block the install would print nothing
+     * and read as clean when in fact nothing was checked.
+     */
+    public function testNothingFlaggedButAFailedLookupReportsTheUncheckedPackages(): void
+    {
+        $report = $this->report(
+            [$this->finding('vendor/a', '1.0.0', Verdict::UNKNOWN, 'not checked: install-time budget exhausted')],
+            ['Repository metadata unavailable for 1 package: not checked: install-time budget exhausted'],
+            1,
+            true
+        );
+
+        self::assertSame([
+            '<warning>lockrot: 1 of 1 changed package could not be checked</warning>',
+            '  note: Repository metadata unavailable for 1 package: not checked: install-time budget exhausted',
+            'Run composer lockrot for details.',
+        ], (new InstallSummaryFormatter())->format($report));
+    }
+
+    public function testTheUncheckedBlockCountsOnlyUnknownFindingsAndCapsItsNotes(): void
+    {
+        $report = $this->report([
+            $this->finding('vendor/a', '1.0.0', Verdict::UNKNOWN, 'not checked: install-time budget exhausted'),
+            $this->finding('vendor/b', '2.0.0', Verdict::UNKNOWN, 'not checked: install-time budget exhausted'),
+            $this->finding('vendor/c', '3.0.0', Verdict::OK, ''),
+        ], ['first note', 'second note', 'third note'], 3, true);
+
+        $lines = (new InstallSummaryFormatter())->format($report);
+
+        self::assertSame([
+            '<warning>lockrot: 2 of 3 changed packages could not be checked</warning>',
+            '  note: first note',
+            '  note: second note',
+            'Run composer lockrot for details.',
+        ], $lines);
     }
 
     public function testTwoFlaggedPackagesRenderHeaderFindingsAndFooter(): void
@@ -72,6 +111,21 @@ final class InstallSummaryFormatterTest extends TestCase
         self::assertSame('  note: first note', $lines[7]);
         self::assertSame('  note: second note', $lines[8]);
         self::assertSame('Run composer lockrot for details.', $lines[9]);
+    }
+
+    public function testFlaggedPackagesKeepTheirBlockEvenWhenSomeLookupsFailed(): void
+    {
+        $report = $this->report([
+            $this->finding('vendor/a', '1.0.0', Verdict::SILENT, 'no stable release'),
+            $this->finding('vendor/b', '2.0.0', Verdict::UNKNOWN, 'not checked: install-time budget exhausted'),
+        ], ['Repository metadata unavailable for 1 package: not checked: install-time budget exhausted'], 2, true);
+
+        self::assertSame([
+            '<warning>lockrot: dependency rot in 1 of 2 changed packages</warning>',
+            '  <comment>silent      </comment>vendor/a 1.0.0: no stable release',
+            '  note: Repository metadata unavailable for 1 package: not checked: install-time budget exhausted',
+            'Run composer lockrot for details.',
+        ], (new InstallSummaryFormatter())->format($report));
     }
 
     public function testASingleChangedPackageUsesTheSingularNoun(): void

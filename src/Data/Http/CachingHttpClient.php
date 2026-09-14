@@ -24,6 +24,12 @@ final class CachingHttpClient implements HttpClientInterface
         $this->offline = $offline;
     }
 
+    /** The client every cache miss is served by, so callers can inspect how it was configured. */
+    public function inner(): HttpClientInterface
+    {
+        return $this->inner;
+    }
+
     /**
      * @param list<string> $urls
      * @param list<string> $headers forwarded to the inner client for every request in the batch

@@ -180,17 +180,28 @@ Package operations: 4 installs, 0 updates, 0 removals
 
 - **At most 10 lines**, always: header, one line per flagged package (most severe first), at most
   two notes, footer. Beyond that the list is cut with `… and N more`.
-- **Silent when nothing is flagged.** A clean transaction prints nothing at all.
-- **Never fails the install.** Anything unexpected — an unreachable repository, a malformed
-  `extra.lockrot`, a bug in lockrot — becomes a single `lockrot: install-time check skipped: …`
-  line and the install continues. The only exception is `install-time-strict`, below.
+- **Silent only when the transaction was both checked and clean.** A package whose metadata never
+  arrived is reported as `unknown`, which is not a finding — so if nothing is flagged *but* a lookup
+  failed, a shorter block is printed instead of nothing, and silence never has to be second-guessed:
+
+  ```
+  lockrot: 4 of 4 changed packages could not be checked
+    note: Repository metadata unavailable for 4 packages: not checked: install-time budget exhausted
+  Run composer lockrot for details.
+  ```
+
 - **5-second budget.** The install-time pass has a hard time budget so it cannot hold up a
-  `composer install`. When it runs out, the report says so rather than reporting a clean result:
-  packages whose metadata was never requested get `not checked: install-time budget exhausted`, and
-  a skipped GitHub round gets the note `repository activity not checked: install-time budget
-  exhausted`. In practice `composer require`/`update` is served from the metadata Composer has just
+  `composer install`. A package whose metadata was never requested is reported as
+  `not checked: install-time budget exhausted`, and a skipped GitHub round adds the note
+  `repository activity not checked: install-time budget exhausted`; both reach you through the block
+  above. In practice `composer require`/`update` is served from the metadata Composer has just
   fetched for the same packages, in the same process; only a cold `composer install` from an
   existing lock starts from nothing.
+- **Never fails the install.** A failed lookup — an unreachable repository, an exhausted budget — is
+  reported, not raised: it is data lockrot did not get, not a reason to stop. Only an error lockrot
+  cannot interpret at all (a malformed `extra.lockrot`, an unreadable `composer.lock`, a bug in
+  lockrot) becomes a single `lockrot: install-time check skipped: …` line — and even then the
+  install continues. The one exception is `install-time-strict`, below.
 - **Turning it off:** `extra.lockrot.install-time: "off"` in `composer.json` disables it for the
   project; `LOCKROT_DISABLE=1` disables all of lockrot for a single command.
 

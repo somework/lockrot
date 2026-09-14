@@ -6,11 +6,15 @@ namespace Lockrot\Output;
 
 use Lockrot\Analyzer\Report;
 use Lockrot\Verdict\Finding;
+use Lockrot\Verdict\Verdict;
 
 /**
  * The install-time block (SPEC F5.1): a report compressed into at most ten Composer IO lines, meant
- * to be read in passing while `composer require` runs, not studied. Nothing is flagged -> nothing is
- * printed.
+ * to be read in passing while `composer require` runs, not studied.
+ *
+ * Two blocks, never both: the flagged one, and — when nothing is flagged but a lookup failed — a
+ * shorter "could not be checked" one. Only a run where nothing is flagged *and* every lookup
+ * succeeded prints nothing at all, so silence always means "checked, and clean".
  *
  * Unlike {@see TableFormatter} this returns lines rather than a rendered string, because
  * IOInterface::writeError() takes string|string[] (2.10.3 IO/IOInterface.php:86, 2.2.25 :86) and
@@ -24,12 +28,20 @@ final class InstallSummaryFormatter
     /** Header and footer always take one line each; the rest is shared by findings and notes. */
     private const FIXED_LINES = 2;
 
-    /** @return list<string> Composer IO-formatted lines; [] when nothing is flagged */
+    private const FOOTER = 'Run composer lockrot for details.';
+
+    /**
+     * @return list<string> Composer IO-formatted lines; [] only when nothing is flagged *and*
+     *                      every lookup succeeded
+     */
     public function format(Report $report): array
     {
         $flagged = $report->flagged();
         if ($flagged === []) {
-            return [];
+            // A package whose metadata never arrived is `unknown`, which sits below the flagged
+            // threshold — so an exhausted budget or an unreachable repository would otherwise print
+            // nothing at all and read as a clean install. Say what could not be checked instead.
+            return $report->hadNetworkFailures() ? $this->uncheckedLines($report) : [];
         }
 
         $notes = \array_slice($report->notes(), 0, self::MAX_NOTES);
@@ -53,7 +65,30 @@ final class InstallSummaryFormatter
         foreach ($notes as $note) {
             $lines[] = '  note: '.$note;
         }
-        $lines[] = 'Run composer lockrot for details.';
+        $lines[] = self::FOOTER;
+
+        return $lines;
+    }
+
+    /**
+     * Header, the notes carrying the reason (e.g. "Repository metadata unavailable for 4 packages:
+     * not checked: install-time budget exhausted"), footer — at most 4 lines.
+     *
+     * @return list<string>
+     */
+    private function uncheckedLines(Report $report): array
+    {
+        $checked = $report->packagesChecked();
+        $lines = [\sprintf(
+            '<warning>lockrot: %d of %d changed %s could not be checked</warning>',
+            $report->byVerdict()[Verdict::UNKNOWN] ?? 0,
+            $checked,
+            $checked === 1 ? 'package' : 'packages'
+        )];
+        foreach (\array_slice($report->notes(), 0, self::MAX_NOTES) as $note) {
+            $lines[] = '  note: '.$note;
+        }
+        $lines[] = self::FOOTER;
 
         return $lines;
     }

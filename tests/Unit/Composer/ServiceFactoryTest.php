@@ -9,13 +9,20 @@ use Composer\IO\NullIO;
 use Lockrot\Analyzer\Analyzer;
 use Lockrot\Clock;
 use Lockrot\Composer\ComposerCacheAdapter;
+use Lockrot\Composer\ComposerHttpClient;
 use Lockrot\Composer\ServiceFactory;
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Data\Cache\ArrayCache;
+use Lockrot\Data\Http\CachingHttpClient;
+use Lockrot\Deadline;
+use Lockrot\Lock\LockFile;
+use Lockrot\Lock\ProjectConfig;
 use PHPUnit\Framework\TestCase;
 
 final class ServiceFactoryTest extends TestCase
 {
+    private const NOW = '2026-09-14T00:00:00+00:00';
+
     /** @var list<string> */
     private array $cacheDirs = [];
 
@@ -47,6 +54,113 @@ final class ServiceFactoryTest extends TestCase
         $lockrot = LockrotConfig::fromSources([], [], [], '8.4.0', null);
         $analyzer = ServiceFactory::createAnalyzer(new NullIO(), $config, [], $lockrot, null, Clock::fixed('2026-09-14T00:00:00+00:00'));
         self::assertInstanceOf(Analyzer::class, $analyzer);
+    }
+
+    /**
+     * A Deadline driven by a scripted monotonic clock instead of hrtime(): the first reading (0.0)
+     * is the one Deadline::inSeconds() uses to fix the expiry, every later reading is what
+     * isPast()/remainingSeconds() then see. No real time passes in these tests.
+     */
+    private static function deadline(float $seconds, float $laterReadings): Deadline
+    {
+        $reading = 0.0;
+        $now = static function () use (&$reading, $laterReadings): float {
+            $current = $reading;
+            $reading = $laterReadings;
+
+            return $current;
+        };
+
+        return Deadline::inSeconds($seconds, $now);
+    }
+
+    private function configWithTempCache(): Config
+    {
+        $config = new Config(false, sys_get_temp_dir());
+        $config->merge(['config' => ['cache-dir' => $this->tempCacheDir(), 'home' => sys_get_temp_dir()]]);
+
+        return $config;
+    }
+
+    /** ServiceFactory::createHttp() must wrap a ComposerHttpClient; this reads back its request timeout. */
+    private static function timeoutOf(CachingHttpClient $client): int
+    {
+        $inner = $client->inner();
+
+        return $inner instanceof ComposerHttpClient
+            ? $inner->timeoutSeconds()
+            : self::fail('ServiceFactory::createHttp() must wrap a ComposerHttpClient, got '.\get_class($inner));
+    }
+
+    /**
+     * The deadline has to travel all the way into the Analyzer (via withDeadline()), not only into
+     * the metadata loader — an exhausted budget must stop the GitHub round too. Nothing here can
+     * reach the network: the repository list is empty and the GitHub branch is the one being skipped.
+     */
+    public function testAnExhaustedDeadlineReachesTheAnalyzerAndSkipsTheGitHubRound(): void
+    {
+        $lockrot = LockrotConfig::fromSources([], [], [], '8.4.0', null);
+        $analyzer = ServiceFactory::createAnalyzer(
+            new NullIO(),
+            $this->configWithTempCache(),
+            [],
+            $lockrot,
+            null,
+            Clock::fixed(self::NOW),
+            self::deadline(5.0, 1000.0)
+        );
+
+        $report = $analyzer->analyze($this->singlePackageLock(), ProjectConfig::empty(), false);
+
+        self::assertContains('repository activity not checked: install-time budget exhausted', $report->notes());
+    }
+
+    public function testWithoutADeadlineTheAnalyzerRunsUnbounded(): void
+    {
+        $lockrot = LockrotConfig::fromSources([], [], [], '8.4.0', null);
+        $analyzer = ServiceFactory::createAnalyzer(new NullIO(), $this->configWithTempCache(), [], $lockrot, null, Clock::fixed(self::NOW));
+
+        // An empty lock keeps this off the network while still running the branch the deadline guards.
+        $report = $analyzer->analyze(LockFile::fromArray(['packages' => []]), ProjectConfig::empty(), false);
+
+        self::assertNotContains('repository activity not checked: install-time budget exhausted', $report->notes());
+    }
+
+    public function testAnExhaustedDeadlineShortensTheGitHubRequestTimeoutToOneSecond(): void
+    {
+        $lockrot = LockrotConfig::fromSources([], [], [], '8.4.0', null);
+        $http = ServiceFactory::createHttp(new NullIO(), $this->configWithTempCache(), $lockrot, Clock::fixed(self::NOW), self::deadline(5.0, 1000.0));
+
+        self::assertSame(1, self::timeoutOf($http));
+    }
+
+    public function testAPartlySpentDeadlineRoundsTheRequestTimeoutUp(): void
+    {
+        // 5s budget, 2.6s already gone -> 2.4s left -> a 3s request timeout.
+        $lockrot = LockrotConfig::fromSources([], [], [], '8.4.0', null);
+        $http = ServiceFactory::createHttp(new NullIO(), $this->configWithTempCache(), $lockrot, Clock::fixed(self::NOW), self::deadline(5.0, 2.6));
+
+        self::assertSame(3, self::timeoutOf($http));
+    }
+
+    public function testWithoutADeadlineTheDefaultRequestTimeoutIsUsed(): void
+    {
+        $lockrot = LockrotConfig::fromSources([], [], [], '8.4.0', null);
+        $config = $this->configWithTempCache();
+        $clock = Clock::fixed(self::NOW);
+
+        self::assertSame(ComposerHttpClient::DEFAULT_TIMEOUT, self::timeoutOf(ServiceFactory::createHttp(new NullIO(), $config, $lockrot, $clock)));
+        self::assertSame(ComposerHttpClient::DEFAULT_TIMEOUT, self::timeoutOf(ServiceFactory::createHttp(new NullIO(), $config, $lockrot, $clock, Deadline::never())));
+    }
+
+    private function singlePackageLock(): LockFile
+    {
+        return LockFile::fromArray(['packages' => [[
+            'name' => 'vendor/pkg',
+            'version' => '1.0.0',
+            'notification-url' => 'https://packagist.org/downloads/',
+            'source' => ['type' => 'git', 'url' => 'https://github.com/vendor/pkg.git', 'reference' => 'abc123'],
+        ]]]);
     }
 
     public function testEnabledComposerCacheIsUsedForStorage(): void

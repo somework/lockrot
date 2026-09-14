@@ -25,6 +25,8 @@ use Lockrot\Data\GitHub\GitHubClient;
 use Lockrot\Data\GitHub\GitHubFetchPlanner;
 use Lockrot\Data\Http\RecordedHttpClient;
 use Lockrot\Data\Php\PhpReleaseDates;
+use Lockrot\Data\Repository\MetadataBatch;
+use Lockrot\Data\Repository\MetadataLoaderInterface;
 use Lockrot\Data\Repository\RepositoryMetadataLoader;
 use Lockrot\Deadline;
 use Lockrot\Exception\InstallBlockedException;
@@ -58,6 +60,20 @@ final class InstallTimeSummaryTest extends TestCase
         'type' => 'library',
         'notification-url' => 'https://packagist.org/downloads/',
         'time' => '2021-05-03T11:20:27+00:00',
+    ];
+
+    /**
+     * A package nothing can be said about without repository metadata: released recently, a bounded
+     * `php` constraint (so S5 never fires) and no source URL (so no GitHub round is even planned).
+     * With the metadata missing it lands on `unknown`, which is *below* the flagged threshold.
+     */
+    private const UNCHECKABLE = [
+        'name' => 'vendor/fresh',
+        'version' => '1.0.0',
+        'require' => ['php' => '^8.1'],
+        'type' => 'library',
+        'notification-url' => 'https://packagist.org/downloads/',
+        'time' => '2026-08-01T00:00:00+00:00',
     ];
 
     private static ?FixtureRepositoryServer $server = null;
@@ -143,15 +159,39 @@ final class InstallTimeSummaryTest extends TestCase
     }
 
     /**
+     * A loader that reaches no repository at all and reports every name failed with the same reason
+     * — what the install-time path sees when the budget runs out before the first chunk, or when
+     * every configured repository is unreachable.
+     */
+    private function failingLoader(string $reason): MetadataLoaderInterface
+    {
+        return new class ($reason) implements MetadataLoaderInterface {
+            private string $reason;
+
+            public function __construct(string $reason)
+            {
+                $this->reason = $reason;
+            }
+
+            public function load(array $names): MetadataBatch
+            {
+                return new MetadataBatch([], [], array_fill_keys($names, $this->reason));
+            }
+        };
+    }
+
+    /**
      * The same shape LockrotCommandTest::command() uses: the class-level fixture-server loader for
      * repository metadata and recorded GitHub envelopes, so no test in this class touches the network.
      *
      * @return callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, ?string, Clock, Deadline): Analyzer
      */
-    private function analyzerFactory(): callable
+    private function analyzerFactory(?MetadataLoaderInterface $loader = null): callable
     {
-        $loader = self::$loader;
-        self::assertNotNull($loader);
+        if ($loader === null) {
+            $loader = self::$loader;
+            self::assertNotNull($loader);
+        }
 
         return static function (IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, ?string $token, Clock $clock, Deadline $deadline) use ($loader): Analyzer {
             return new Analyzer(
@@ -191,6 +231,25 @@ final class InstallTimeSummaryTest extends TestCase
         (new InstallTimeSummary($this->analyzerFactory()))->onPreOperationsExec($event);
 
         self::assertSame('', $io->getOutput());
+    }
+
+    /**
+     * A package whose metadata was never fetched is `unknown`, which is below the flagged threshold.
+     * Silence would read as a clean install, so the summary says what could not be checked instead.
+     */
+    public function testAnExhaustedBudgetPrintsWhatCouldNotBeCheckedRatherThanNothing(): void
+    {
+        $this->project([], [self::UNCHECKABLE]);
+        $io = new BufferIO();
+        $event = $this->event($io, new Transaction([], [$this->loadPackage(self::UNCHECKABLE)]));
+        $factory = $this->analyzerFactory($this->failingLoader(MetadataLoaderInterface::BUDGET_REASON));
+
+        (new InstallTimeSummary($factory))->onPreOperationsExec($event);
+
+        $output = $io->getOutput();
+        self::assertStringContainsString('lockrot: 1 of 1 changed package could not be checked', $output);
+        self::assertStringContainsString('not checked: install-time budget exhausted', $output);
+        self::assertStringContainsString('Run composer lockrot for details.', $output);
     }
 
     public function testLockrotDisableSilencesTheSummaryCompletely(): void

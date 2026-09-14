@@ -40,6 +40,12 @@ final class ComposerHttpClient implements HttpClientInterface
         $this->timeout = $timeoutSeconds;
     }
 
+    /** The per-request timeout this client was configured with; shortened to the remaining install-time budget by {@see ServiceFactory::createHttp()}. */
+    public function timeoutSeconds(): int
+    {
+        return $this->timeout;
+    }
+
     public function fetchAll(array $urls, array $headers = []): array
     {
         /** @var array<string, HttpResult> $results */
