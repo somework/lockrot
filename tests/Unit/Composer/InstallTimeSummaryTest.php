@@ -340,6 +340,23 @@ final class InstallTimeSummaryTest extends TestCase
         self::assertStringContainsString('lockrot: install-time check skipped: boom', $io->getOutput());
     }
 
+    /** A multi-line exception message (a wrapped exception's chain, a library's own multi-line error) must not split the one promised warning line into several. */
+    public function testAMultilineExceptionMessageStaysOnOneWarningLine(): void
+    {
+        $this->project();
+        $io = new BufferIO();
+        $event = $this->event($io, new Transaction([], [$this->loadPackage(self::PHPZIP)]));
+        $factory = static function (): Analyzer {
+            throw new \RuntimeException("boom\nsecond line\n  third line  ");
+        };
+
+        (new InstallTimeSummary($factory))->onPreOperationsExec($event);
+
+        $output = $io->getOutput();
+        self::assertStringContainsString('lockrot: install-time check skipped: boom second line third line', $output);
+        self::assertCount(1, array_filter(explode("\n", trim($output))), $output);
+    }
+
     public function testAnUninstallOnlyTransactionNeverBuildsAnAnalyzer(): void
     {
         $this->project();
@@ -380,6 +397,45 @@ final class InstallTimeSummaryTest extends TestCase
         (new InstallTimeSummary($this->analyzerFactory()))->onPreOperationsExec($event);
 
         self::assertStringContainsString('phpzip/phpzip', $io->getOutput());
+    }
+
+    /**
+     * The pre-transaction lock on disk knows nothing about the transaction's own new packages or
+     * requirements — the normal state during a `--dry-run`, or whenever the lock has not caught up
+     * yet. Before LockFile::withPackages() was applied to the chain source, a package new to the
+     * graph resolved no "via" chain at all; this asserts it now does.
+     */
+    public function testAPreTransactionLockMissingTheTransitivePackageStillShowsTheViaChain(): void
+    {
+        $dir = $this->project([], [[
+            'name' => 'vendor/direct-req',
+            'version' => '1.0.0',
+            'require' => ['php' => '>=5.3.0'],
+            'type' => 'library',
+            'notification-url' => 'https://packagist.org/downloads/',
+            'time' => '2026-01-01T00:00:00+00:00',
+        ]]);
+        file_put_contents($dir.'/composer.json', (string) json_encode([
+            'name' => 'lockrot/install-time-test',
+            'require' => ['vendor/direct-req' => '1.1.0'],
+            'extra' => ['lockrot' => ['target-php' => '8.4']],
+        ]));
+        $io = new BufferIO();
+        $updatedDirectReq = $this->loadPackage([
+            'name' => 'vendor/direct-req',
+            'version' => '1.1.0',
+            'require' => ['php' => '>=5.3.0', 'phpzip/phpzip' => '2.0.8'],
+            'type' => 'library',
+            'notification-url' => 'https://packagist.org/downloads/',
+            'time' => '2026-01-01T00:00:00+00:00',
+        ]);
+        $event = $this->event($io, new Transaction([], [$updatedDirectReq, $this->loadPackage(self::PHPZIP)]));
+
+        (new InstallTimeSummary($this->analyzerFactory()))->onPreOperationsExec($event);
+
+        $output = $io->getOutput();
+        self::assertStringContainsString('phpzip/phpzip 2.0.8', $output);
+        self::assertStringContainsString('(via vendor/direct-req)', $output);
     }
 
     public function testInstallTimeBudgetComesFromConfig(): void

@@ -107,12 +107,7 @@ final class Analyzer
         $metadata = $batch->metadata();
         $metadataFailed = $batch->failed();
         if ($metadataFailed !== []) {
-            $count = \count($metadataFailed);
-            $notes[] = \sprintf(
-                'Repository metadata unavailable for %s: %s',
-                $count === 1 ? '1 package' : $count.' packages',
-                (string) reset($metadataFailed)
-            );
+            $notes[] = $this->metadataUnavailableNote($metadataFailed);
         }
 
         [$allowlisted, $repoByPackage, $candidateByPackage] = $this->classify($packages, $metadata, $now);
@@ -244,6 +239,35 @@ final class Analyzer
             $this->dataDate($meta, $activity),
             $note
         );
+    }
+
+    /**
+     * One reason across every failed package reads as today: "Repository metadata unavailable for
+     * N packages: <reason>". Several distinct reasons are broken out with their own counts instead
+     * of only ever naming the first one reached, e.g. "Repository metadata unavailable for 4
+     * packages: not checked: install-time budget exhausted (3); connection refused (1)" — reasons
+     * appear in the order {@see MetadataBatch::failed()} reports them.
+     *
+     * @param array<string, string> $metadataFailed package name => reason
+     */
+    private function metadataUnavailableNote(array $metadataFailed): string
+    {
+        $label = \count($metadataFailed) === 1 ? '1 package' : \count($metadataFailed).' packages';
+
+        $countByReason = [];
+        foreach ($metadataFailed as $reason) {
+            $countByReason[$reason] = ($countByReason[$reason] ?? 0) + 1;
+        }
+        if (\count($countByReason) === 1) {
+            return \sprintf('Repository metadata unavailable for %s: %s', $label, (string) array_key_first($countByReason));
+        }
+
+        $parts = [];
+        foreach ($countByReason as $reason => $reasonCount) {
+            $parts[] = \sprintf('%s (%d)', $reason, $reasonCount);
+        }
+
+        return \sprintf('Repository metadata unavailable for %s: %s', $label, implode('; ', $parts));
     }
 
     /**

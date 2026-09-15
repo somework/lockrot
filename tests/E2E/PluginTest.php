@@ -19,9 +19,6 @@ final class PluginTest extends TestCase
         if (getenv('LOCKROT_E2E') !== '1') {
             self::markTestSkipped('set LOCKROT_E2E=1 to run the e2e plugin test (needs network and the composer binary)');
         }
-        if (getenv('GITHUB_TOKEN') === false || getenv('GITHUB_TOKEN') === '') {
-            self::markTestSkipped('set GITHUB_TOKEN: anonymous GitHub requests hit the 60/h rate limit and change the expected verdicts');
-        }
         $this->dir = sys_get_temp_dir().'/lockrot-e2e-'.uniqid();
         mkdir($this->dir);
     }
@@ -75,6 +72,12 @@ final class PluginTest extends TestCase
 
     public function testComposerLockrotRunsThroughThePlugin(): void
     {
+        // The only e2e test whose assertions depend on the GitHub-derived verdict for phpzip/phpzip
+        // (see the rate-limit fallback below); the other three assert on generic shapes that hold
+        // regardless of GitHub activity data, so they run locally without a token.
+        if (getenv('GITHUB_TOKEN') === false || getenv('GITHUB_TOKEN') === '') {
+            self::markTestSkipped('set GITHUB_TOKEN: anonymous GitHub requests hit the 60/h rate limit and change the expected verdicts');
+        }
         $this->createProject([], ['somework/lockrot' => '*', 'phpzip/phpzip' => '2.0.8']);
         $this->install();
 

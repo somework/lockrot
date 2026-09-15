@@ -188,6 +188,42 @@ final class LockFileTest extends TestCase
         self::assertSame('2.0.0', $found->version());
     }
 
+    public function testEmptyBuildsALockWithNoPackagesAndNoContentHash(): void
+    {
+        $lock = LockFile::empty();
+
+        self::assertSame([], $lock->packages(true));
+        self::assertNull($lock->contentHash());
+    }
+
+    public function testWithPackagesOverridesByNamePreservingDevFlagAndLeavesTheOriginalUntouched(): void
+    {
+        $lock = LockFile::fromFile(self::MINI);
+        $loader = new ArrayLoader();
+        $updatedDirect = LockedPackage::fromPackage(self::complete($loader->load([
+            'name' => 'vendor/direct', 'version' => '9.9.9', 'notification-url' => 'https://packagist.org/downloads/',
+        ])), false);
+        $newDevPackage = LockedPackage::fromPackage(self::complete($loader->load([
+            'name' => 'vendor/brand-new-dev', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/',
+        ])), true);
+
+        $updated = $lock->withPackages([$updatedDirect, $newDevPackage]);
+
+        $foundDirect = $updated->find('vendor/direct');
+        self::assertNotNull($foundDirect);
+        self::assertSame('9.9.9', $foundDirect->version());
+        $foundNew = $updated->find('vendor/brand-new-dev');
+        self::assertNotNull($foundNew);
+        self::assertTrue($foundNew->isDev());
+        self::assertNotNull($updated->find('vendor/transitive'), 'every other entry is carried over unchanged');
+        self::assertSame('abc123', $updated->contentHash(), 'the content hash is carried over unchanged');
+
+        $originalDirect = $lock->find('vendor/direct');
+        self::assertNotNull($originalDirect);
+        self::assertSame('1.2.3', $originalDirect->version(), 'the original instance must not be mutated');
+        self::assertNull($lock->find('vendor/brand-new-dev'));
+    }
+
     private static function complete(BasePackage $package): CompletePackage
     {
         self::assertInstanceOf(CompletePackage::class, $package);

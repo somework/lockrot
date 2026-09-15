@@ -144,30 +144,30 @@ final class RepositoryMetadataLoader implements MetadataLoaderInterface
      */
     private function loadFromRepository(ComposerRepository $repository, array $remaining): MetadataBatch
     {
-        $pass1 = $this->loadChunked($repository, $remaining, self::STABLE_STABILITIES);
-        if ($pass1['budgetExhausted']) {
-            // Every name pass 1 could not get to is already in $pass1['failed']; pass 2 must not
+        $pass1 = $this->loadChunked($repository, $remaining, self::STABLE_STABILITIES, false);
+        if ($pass1->budgetExhausted()) {
+            // Every name pass 1 could not get to is already in $pass1->failed(); pass 2 must not
             // run at all, per the "stop, break out of both loops" behaviour. A name pass 1 *did*
             // get to before the deadline hit but that needed pass 2 (found tagless, or not found
-            // at all) is sitting in $pass1['needDev'] — it was never asked for its dev file either,
+            // at all) is sitting in $pass1->needDev() — it was never asked for its dev file either,
             // so it belongs in $failed with BUDGET_REASON too, not silently dropped (which would
             // otherwise surface it as notFound() once load() runs out of repositories).
-            $failed = $pass1['failed'];
-            foreach ($pass1['needDev'] as $name) {
+            $failed = $pass1->failed();
+            foreach ($pass1->needDev() as $name) {
                 $failed[$name] = MetadataLoaderInterface::BUDGET_REASON;
             }
 
-            return new MetadataBatch($pass1['metadata'], $pass1['stillRemaining'], $failed);
+            return new MetadataBatch($pass1->metadata(), $pass1->stillRemaining(), $failed);
         }
 
-        $pass2 = $this->loadChunked($repository, $pass1['needDev'], self::DEV_ONLY_STABILITIES);
+        $pass2 = $this->loadChunked($repository, $pass1->needDev(), self::DEV_ONLY_STABILITIES, true);
 
         // Neither array can share a key with the other: a name only reaches pass 2 via pass 1's
         // needDev list, which is disjoint from pass 1's own metadata/failed.
         return new MetadataBatch(
-            $pass1['metadata'] + $pass2['metadata'],
-            $pass2['stillRemaining'],
-            $pass1['failed'] + $pass2['failed']
+            $pass1->metadata() + $pass2->metadata(),
+            $pass2->stillRemaining(),
+            $pass1->failed() + $pass2->failed()
         );
     }
 
@@ -180,20 +180,13 @@ final class RepositoryMetadataLoader implements MetadataLoaderInterface
      * @param list<string>                $names
      * @param array<'alpha'|'beta'|'dev'|'RC'|'stable', 0|5|10|15|20> $acceptableStabilities self::STABLE_STABILITIES
      *                                                                                        for pass 1, self::DEV_ONLY_STABILITIES for pass 2
-     *
-     * @return array{
-     *     metadata: array<string, PackageMetadata>,
-     *     failed: array<string, string>,
-     *     stillRemaining: list<string>,
-     *     needDev: list<string>,
-     *     budgetExhausted: bool
-     * } needDev and stillRemaining are mutually exclusive: pass 1 only ever populates needDev
-     *   (stillRemaining stays empty), pass 2 only ever populates stillRemaining (needDev stays
-     *   empty)
+     * @param bool                        $isDevOnlyPass whether this is pass 2 (dev-only); needDev and stillRemaining
+     *                                                    are mutually exclusive: pass 1 only ever populates needDev
+     *                                                    (stillRemaining stays empty), pass 2 only ever populates
+     *                                                    stillRemaining (needDev stays empty)
      */
-    private function loadChunked(ComposerRepository $repository, array $names, array $acceptableStabilities): array
+    private function loadChunked(ComposerRepository $repository, array $names, array $acceptableStabilities, bool $isDevOnlyPass): ChunkPassResult
     {
-        $isDevOnlyPass = self::DEV_ONLY_STABILITIES === $acceptableStabilities;
         $metadata = [];
         $failed = [];
         $stillRemaining = [];
@@ -206,13 +199,7 @@ final class RepositoryMetadataLoader implements MetadataLoaderInterface
                     $failed[$name] = MetadataLoaderInterface::BUDGET_REASON;
                 }
 
-                return [
-                    'metadata' => $metadata,
-                    'failed' => $failed,
-                    'stillRemaining' => $stillRemaining,
-                    'needDev' => $needDev,
-                    'budgetExhausted' => true,
-                ];
+                return new ChunkPassResult($metadata, $failed, $stillRemaining, $needDev, true);
             }
 
             $chunk = array_splice($toChunk, 0, self::CHUNK_SIZE);
@@ -260,13 +247,7 @@ final class RepositoryMetadataLoader implements MetadataLoaderInterface
             }
         }
 
-        return [
-            'metadata' => $metadata,
-            'failed' => $failed,
-            'stillRemaining' => $stillRemaining,
-            'needDev' => $needDev,
-            'budgetExhausted' => false,
-        ];
+        return new ChunkPassResult($metadata, $failed, $stillRemaining, $needDev, false);
     }
 
     /**

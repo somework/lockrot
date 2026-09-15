@@ -79,6 +79,12 @@ final class LockFile
         return new self($packages, \is_string($hash) ? $hash : null);
     }
 
+    /** A lock with no packages and no content hash — the base {@see withPackages()} builds onto. */
+    public static function empty(): self
+    {
+        return new self([], null);
+    }
+
     /**
      * A lock built from packages already in memory rather than from a file on disk — the
      * install-time path uses it as the dependency-chain source when the project has no
@@ -89,12 +95,25 @@ final class LockFile
      */
     public static function fromPackages(array $packages): self
     {
-        $byName = [];
+        return self::empty()->withPackages($packages);
+    }
+
+    /**
+     * A new lock where each given package replaces (by name) or adds to this one's entries; every
+     * other entry, and this instance itself, is left unchanged. The install-time path uses this to
+     * make a Composer transaction's own packages part of the dependency-chain source regardless of
+     * whether a lock existed on disk or was stale — see {@see \Lockrot\Composer\InstallTimeSummary}.
+     *
+     * @param list<LockedPackage> $packages
+     */
+    public function withPackages(array $packages): self
+    {
+        $merged = $this->packages;
         foreach ($packages as $package) {
-            $byName[$package->name()] = $package;
+            $merged[$package->name()] = $package;
         }
 
-        return new self($byName, null);
+        return new self($merged, $this->contentHash);
     }
 
     /** @return list<LockedPackage> */

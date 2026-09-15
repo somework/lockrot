@@ -20,6 +20,13 @@
 - The install-time pass's time budget is configurable via `extra.lockrot.install-time-budget`
   (integer seconds, 1–120, default 5); like the other install-time keys it has no CLI option or
   environment override.
+- The install-time summary's `via` chain now resolves even when the lock on disk predates the
+  transaction's own packages — a `--dry-run` update, or a project's very first lock — instead of
+  showing no chain for a package new to the dependency graph.
+- The "Repository metadata unavailable" note now breaks out each distinct reason with its own
+  count when a run hits more than one, e.g. `Repository metadata unavailable for 4 packages: not
+  checked: install-time budget exhausted (3); connection refused (1)`, instead of only naming the
+  first reason it reached.
 - `table` (default) and `--format=json` output.
 - `--format=github` prints GitHub Actions workflow commands, one per finding, so flagged packages
   appear as annotations on their own line of `composer.lock` in a pull request; findings at or

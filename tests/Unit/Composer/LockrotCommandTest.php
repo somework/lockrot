@@ -545,6 +545,50 @@ final class LockrotCommandTest extends TestCase
         rmdir($dir);
     }
 
+    /** @param string|false $value */
+    private function restoreGlobalEnv(string $name, $value): void
+    {
+        if ($value === false) {
+            Platform::clearEnv($name);
+        } else {
+            Platform::putEnv($name, $value);
+        }
+    }
+
+    public function testOfflineOptionRestoresComposerEnvironmentAfterExecute(): void
+    {
+        chdir(__DIR__.'/../../fixtures/skeletons/laravel');
+        $previousDisableNetwork = Platform::getEnv('COMPOSER_DISABLE_NETWORK');
+        $previousRootVersion = Platform::getEnv('COMPOSER_ROOT_VERSION');
+        Platform::clearEnv('COMPOSER_DISABLE_NETWORK');
+        Platform::clearEnv('COMPOSER_ROOT_VERSION');
+        try {
+            $tester = $this->tester($this->loader());
+            $tester->execute(['--offline' => true, '--fail-on' => 'silent', '--target-php' => '8.4']);
+
+            self::assertFalse(Platform::getEnv('COMPOSER_DISABLE_NETWORK'), 'COMPOSER_DISABLE_NETWORK must be unset again once execute() returns');
+            self::assertFalse(Platform::getEnv('COMPOSER_ROOT_VERSION'), 'COMPOSER_ROOT_VERSION must be unset again once execute() returns');
+        } finally {
+            $this->restoreGlobalEnv('COMPOSER_DISABLE_NETWORK', $previousDisableNetwork);
+            $this->restoreGlobalEnv('COMPOSER_ROOT_VERSION', $previousRootVersion);
+        }
+    }
+
+    public function testAPreExistingComposerRootVersionSurvivesExecute(): void
+    {
+        chdir(__DIR__.'/../../fixtures/skeletons/laravel');
+        $previous = Platform::getEnv('COMPOSER_ROOT_VERSION');
+        Platform::putEnv('COMPOSER_ROOT_VERSION', '9.9.9');
+        try {
+            $tester = $this->tester($this->loader());
+            $tester->execute(['--fail-on' => 'silent', '--target-php' => '8.4']);
+
+            self::assertSame('9.9.9', Platform::getEnv('COMPOSER_ROOT_VERSION'), 'a value the caller already set must be restored, not cleared');
+        } finally {
+            $this->restoreGlobalEnv('COMPOSER_ROOT_VERSION', $previous);
+        }
+    }
+
     public function testWithoutOfflineOptionComposerDisableNetworkEnvStaysUnset(): void
     {
         chdir(__DIR__.'/../../fixtures/skeletons/laravel');

@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Shares testsuites/groups/php with phpunit.xml.dist (the everyday suite); its own <source>
+     narrows to the fully unit-tested "core" for the coverage gate below. PHPUnit's CLI coverage
+     filter option is repeatable on 9.6 and 11.5 but maps to directories only (11.5
+     Cli/Builder.php:1109 to Configuration/Merger.php:795-797 to FilterDirectory), and this list
+     includes single files, so a duplicate source block stays the only way to express it (ruling,
+     .superpowers/sdd/2026-09-15-lockrot-v0.1.0-final/progress.md). -->
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          bootstrap="vendor/autoload.php" colors="true" failOnWarning="true"
          beStrictAboutOutputDuringTests="true">
@@ -20,6 +26,7 @@
                  (LockrotPlugin, CommandProvider, LockrotCommand, ServiceFactory) is exercised by the
                  e2e group, which this gate excludes, so it stays in the informational run only -->
             <file>src/Deadline.php</file>
+            <file>src/Composer/AnalyzerBootstrap.php</file>
             <file>src/Composer/InstallTimeSummary.php</file>
             <file>src/Composer/TransactionPackages.php</file>
             <file>src/Output/InstallSummaryFormatter.php</file>

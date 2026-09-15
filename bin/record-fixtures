@@ -61,10 +61,14 @@ $trim = static function (string $body, string $name): string {
     return json_encode($json, \JSON_UNESCAPED_SLASHES);
 };
 $isRecorded = static function (string $path): bool {
-    if (!is_file($path)) {
+    if (!is_file($path) || !is_readable($path)) {
         return false;
     }
-    $envelope = json_decode((string) file_get_contents($path), true);
+    $body = file_get_contents($path);
+    if ($body === false) {
+        return false;
+    }
+    $envelope = json_decode($body, true);
 
     return \is_array($envelope) && ($envelope['status'] ?? 0) !== 0; // status 0 = transport failure while recording: fetch again
 };

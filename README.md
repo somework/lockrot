@@ -179,7 +179,9 @@ Package operations: 4 installs, 0 updates, 0 removals
 ```
 
 - **At most 10 lines**, always: header, one line per flagged package (most severe first), at most
-  two notes, footer. Beyond that the list is cut with `… and N more`.
+  two notes, footer. Beyond that the list is cut with `… and N more`. The budget counts lines as
+  written, not rendered terminal rows — a long evidence line may still wrap past one row in a
+  narrow terminal.
 - **Silent only when the transaction was both checked and clean.** A package whose metadata never
   arrived is reported as `unknown`, which is not a finding — so if nothing is flagged *but* a lookup
   failed, a shorter block is printed instead of nothing, and silence never has to be second-guessed:

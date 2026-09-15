@@ -184,6 +184,29 @@ final class AnalyzerTest extends TestCase
         self::assertContains('Repository metadata unavailable for 2 packages: HTTP 503', $report->notes());
     }
 
+    public function testMultipleFailureReasonsAreGroupedWithCountsInsteadOfOnlyNamingTheFirst(): void
+    {
+        $lock = LockFile::fromArray(['packages' => [
+            ['name' => 'vendor/a', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/'],
+            ['name' => 'vendor/b', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/'],
+            ['name' => 'vendor/c', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/'],
+            ['name' => 'vendor/d', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/'],
+        ]]);
+        $failed = [
+            'vendor/a' => MetadataLoaderInterface::BUDGET_REASON,
+            'vendor/b' => MetadataLoaderInterface::BUDGET_REASON,
+            'vendor/c' => MetadataLoaderInterface::BUDGET_REASON,
+            'vendor/d' => 'connection refused',
+        ];
+
+        $report = $this->analyzer($this->loader([], [], $failed), $this->http([]), true, new Allowlist([]))->analyze($lock, ProjectConfig::empty(), false);
+
+        self::assertContains(
+            'Repository metadata unavailable for 4 packages: '.MetadataLoaderInterface::BUDGET_REASON.' (3); connection refused (1)',
+            $report->notes()
+        );
+    }
+
     public function testTheOfflineReasonIsReportedWithoutASecondPrefix(): void
     {
         // OFFLINE_NOT_FOUND_REASON already reads as a complete statement, so prefixing it would

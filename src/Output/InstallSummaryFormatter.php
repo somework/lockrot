@@ -16,6 +16,10 @@ use Lockrot\Verdict\Verdict;
  * shorter "could not be checked" one. Only a run where nothing is flagged *and* every lookup
  * succeeded prints nothing at all, so silence always means "checked, and clean".
  *
+ * {@see MAX_LINES} counts logical lines — one array entry in the returned list, one line as
+ * IOInterface::writeError() writes it — not rendered terminal rows; a long evidence line can still
+ * wrap past one row in a narrow terminal.
+ *
  * Unlike {@see TableFormatter} this returns lines rather than a rendered string, because
  * IOInterface::writeError() takes string|string[] (2.10.3 IO/IOInterface.php:86, 2.2.25 :86) and
  * applies Composer's own styling to each.

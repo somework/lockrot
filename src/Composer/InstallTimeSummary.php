@@ -9,12 +9,10 @@ use Composer\Factory;
 use Composer\Installer\InstallerEvent;
 use Composer\IO\IOInterface;
 use Composer\Repository\RepositoryInterface;
-use Lockrot\Allowlist\ProjectIgnoreList;
 use Lockrot\Analyzer\Analyzer;
 use Lockrot\Clock;
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Config\Policy;
-use Lockrot\Data\GitHub\TokenResolver;
 use Lockrot\Deadline;
 use Lockrot\Exception\InstallBlockedException;
 use Lockrot\Lock\LockFile;
@@ -60,9 +58,16 @@ final class InstallTimeSummary
         } catch (\Throwable $e) {
             // Never break an install by default (SPEC F6): anything unexpected — a malformed
             // extra.lockrot, an unreachable repository, a bug in lockrot itself — becomes one
-            // stderr line and the install continues.
-            $io->writeError('<warning>lockrot: install-time check skipped: '.$e->getMessage().'</warning>');
+            // stderr line and the install continues. Collapsed to one line: some exception
+            // messages (a wrapped exception's chain, a multi-line library error) embed newlines of
+            // their own, which would otherwise split this into more than the one line promised.
+            $io->writeError('<warning>lockrot: install-time check skipped: '.$this->oneLine($e->getMessage()).'</warning>');
         }
+    }
+
+    private function oneLine(string $message): string
+    {
+        return trim((string) preg_replace('/\s+/', ' ', $message));
     }
 
     private function run(InstallerEvent $event): void
@@ -92,23 +97,21 @@ final class InstallTimeSummary
         // By the time this event fires, `composer require`/`update` has already written the new lock
         // (Installer::doUpdate() writes it at 2.10.3 :681 / 2.2.25 :575 and only then calls
         // doInstall(), which dispatches this event at 2.10.3 :838 / 2.2.25 :723), so the file on
-        // disk is the post-transaction state and is the right chain source. A project with no lock
-        // at all falls back to the transaction itself. Known limit: `--dry-run` writes no lock
+        // disk is normally the post-transaction state already. `--dry-run` writes no lock at all
         // (Installer::doUpdate() guards the write with writeLock && executeOperations, 2.10.3 :679),
-        // so there the chain source is the pre-transaction lock and a package new to the graph shows
-        // no `via` chain; signals and verdicts are unaffected.
+        // so there — and for a project with no lock yet — the file on disk (or an empty lock) is the
+        // pre-transaction state. Either way, LockFile::withPackages() overlays the transaction's own
+        // packages onto whatever was read, so a package new to the graph always gets a node to chain
+        // through, dry-run included.
         $lockPath = Factory::getLockFile($composerFile);
-        $lock = is_file($lockPath) ? LockFile::fromFile($lockPath) : LockFile::fromPackages($packages);
+        $lock = (is_file($lockPath) ? LockFile::fromFile($lockPath) : LockFile::empty())->withPackages($packages);
 
         $deadline = Deadline::inSeconds((float) $lockrot->installTimeBudgetSeconds());
-        $clock = Clock::fromEnvironment($env);
         $composer = $event->getComposer();
         $config = $composer->getConfig();
-        $token = TokenResolver::resolve($env, ServiceFactory::githubTokenFromComposer($config));
         $repositories = array_values($composer->getRepositoryManager()->getRepositories());
 
-        $analyzer = ($this->analyzerFactory)($event->getIO(), $config, $repositories, $lockrot, $token, $clock, $deadline);
-        $analyzer = $analyzer->withAllowlist($analyzer->allowlist()->merge(ProjectIgnoreList::fromExtra($project->lockrotExtra())));
+        $analyzer = AnalyzerBootstrap::create($this->analyzerFactory, $event->getIO(), $config, $repositories, $project, $lockrot, $env, $deadline);
 
         $report = $analyzer->analyzePackages($packages, $lock, $project, $event->isDevMode());
         $lines = (new InstallSummaryFormatter())->format($report);

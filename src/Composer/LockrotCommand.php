@@ -12,12 +12,10 @@ use Composer\IO\IOInterface;
 use Composer\Repository\RepositoryFactory;
 use Composer\Repository\RepositoryInterface;
 use Composer\Util\Platform;
-use Lockrot\Allowlist\ProjectIgnoreList;
 use Lockrot\Analyzer\Analyzer;
 use Lockrot\Clock;
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Config\Policy;
-use Lockrot\Data\GitHub\TokenResolver;
 use Lockrot\Deadline;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Lock\LockFile;
@@ -37,6 +35,16 @@ final class LockrotCommand extends BaseCommand
 
     /** Set by initialize() when the project manifest is unusable; rethrown inside execute(). */
     private ?ConfigException $bootstrapError = null;
+
+    /**
+     * Snapshot of COMPOSER_DISABLE_NETWORK/COMPOSER_ROOT_VERSION taken at the top of initialize(),
+     * before either is set; execute() restores exactly these values in a finally block so a
+     * lockrot invocation never leaves the process environment changed behind it. null only before
+     * initialize() has run.
+     *
+     * @var array<string, string|false>|null
+     */
+    private ?array $envSnapshot = null;
 
     /** @param null|callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, ?string, Clock, Deadline): Analyzer $analyzerFactory */
     public function __construct(?callable $analyzerFactory = null)
@@ -78,6 +86,12 @@ final class LockrotCommand extends BaseCommand
     protected function initialize(InputInterface $input, OutputInterface $output): void
     {
         $this->bootstrapError = null;
+        // Captured before either variable is touched below, so execute()'s finally block can put
+        // the environment back exactly as it found it regardless of which branches ran.
+        $this->envSnapshot = [
+            'COMPOSER_DISABLE_NETWORK' => Platform::getEnv('COMPOSER_DISABLE_NETWORK'),
+            'COMPOSER_ROOT_VERSION' => Platform::getEnv('COMPOSER_ROOT_VERSION'),
+        ];
         try {
             ProjectConfig::fromFile((string) getcwd().'/composer.json');
         } catch (ConfigException $e) {
@@ -143,12 +157,9 @@ final class LockrotCommand extends BaseCommand
             }
             $lockPath = $cwd.'/composer.lock';
             $lock = LockFile::fromFile($lockPath);
-            $clock = Clock::fromEnvironment($env);
-            $token = TokenResolver::resolve($env, ServiceFactory::githubTokenFromComposer($config));
             // `composer lockrot` is the deliberate, full run: no time budget, unlike the
             // install-time summary (SPEC F2.6).
-            $analyzer = ($this->analyzerFactory)($io, $config, $repositories, $lockrot, $token, $clock, Deadline::never());
-            $analyzer = $analyzer->withAllowlist($analyzer->allowlist()->merge(ProjectIgnoreList::fromExtra($project->lockrotExtra())));
+            $analyzer = AnalyzerBootstrap::create($this->analyzerFactory, $io, $config, $repositories, $project, $lockrot, $env, Deadline::never());
             $report = $analyzer->analyze($lock, $project, $lockrot->includeDev());
             // The annotation formats point back at the lock they were computed from; an unreadable
             // one throws ConfigException from here, which the catch below turns into exit 2 the
@@ -168,7 +179,30 @@ final class LockrotCommand extends BaseCommand
             }
 
             return Policy::EXIT_ERROR;
+        } finally {
+            $this->restoreEnv();
         }
+    }
+
+    /**
+     * Puts COMPOSER_DISABLE_NETWORK/COMPOSER_ROOT_VERSION back exactly as initialize() found them:
+     * putEnv() when the snapshot was a string, clearEnv() when it was unset. Runs from execute()'s
+     * finally block, so --offline's network guard is still in place for the whole run and only
+     * disappears once this command is done with it.
+     */
+    private function restoreEnv(): void
+    {
+        if ($this->envSnapshot === null) {
+            return;
+        }
+        foreach ($this->envSnapshot as $name => $value) {
+            if ($value === false) {
+                Platform::clearEnv($name);
+            } else {
+                Platform::putEnv($name, $value);
+            }
+        }
+        $this->envSnapshot = null;
     }
 
     private function writeError(OutputInterface $output, string $message): void
