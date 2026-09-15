@@ -120,6 +120,15 @@ final class LockedPackage
     {
         return $this->fromComposerRepository;
     }
+    /** The same locked entry flagged as a `packages-dev` (or `packages`) member; this instance is left unchanged. */
+    public function withDev(bool $dev): self
+    {
+        $copy = clone $this;
+        $copy->dev = $dev;
+
+        return $copy;
+    }
+
     public function isDev(): bool
     {
         return $this->dev;

@@ -173,13 +173,13 @@ final class LockFileTest extends TestCase
         }
     }
 
-    public function testFromPackagesBuildsALockWithoutAContentHash(): void
+    public function testEmptyWithPackagesBuildsALockWithoutAContentHash(): void
     {
         $loader = new ArrayLoader();
         $a = LockedPackage::fromPackage(self::complete($loader->load(['name' => 'vendor/a', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/'])), false);
         $b = LockedPackage::fromPackage(self::complete($loader->load(['name' => 'vendor/b', 'version' => '2.0.0', 'notification-url' => 'https://packagist.org/downloads/'])), false);
 
-        $lock = LockFile::fromPackages([$a, $b]);
+        $lock = LockFile::empty()->withPackages([$a, $b]);
 
         self::assertCount(2, $lock->packages(true));
         self::assertNull($lock->contentHash());
@@ -222,6 +222,28 @@ final class LockFileTest extends TestCase
         self::assertNotNull($originalDirect);
         self::assertSame('1.2.3', $originalDirect->version(), 'the original instance must not be mutated');
         self::assertNull($lock->find('vendor/brand-new-dev'));
+    }
+
+    /**
+     * TransactionPackages::fromTransaction() cannot know a package's dev-ness and always says
+     * false; an entry the lock already lists under packages-dev must stay dev when overlaid, or
+     * `--no-dev` chain building would start seeing it.
+     */
+    public function testWithPackagesKeepsTheExistingEntrysDevFlagWhenOverridden(): void
+    {
+        $lock = LockFile::fromFile(self::MINI);
+        $loader = new ArrayLoader();
+        $updatedDevtool = LockedPackage::fromPackage(self::complete($loader->load([
+            'name' => 'vendor/devtool', 'version' => '5.0.0', 'notification-url' => 'https://packagist.org/downloads/',
+        ])), false);
+
+        $updated = $lock->withPackages([$updatedDevtool]);
+
+        $found = $updated->find('vendor/devtool');
+        self::assertNotNull($found);
+        self::assertSame('5.0.0', $found->version(), 'the transaction version wins');
+        self::assertTrue($found->isDev(), 'the lock knows it is a packages-dev entry; the transaction does not');
+        self::assertCount(4, $updated->packages(false), 'still excluded from a no-dev listing');
     }
 
     private static function complete(BasePackage $package): CompletePackage

@@ -25,7 +25,7 @@ final class TableFormatter implements FormatterInterface
             }
             $table->render();
         }
-        $output->writeln($this->summary($report));
+        $output->writeln($report->summaryLine());
         $output->writeln(\sprintf('Data as of %s (package repositories, GitHub). Run composer lockrot --format=json for details.', $report->generatedAt()->format('Y-m-d')));
         foreach ($report->notes() as $note) {
             $output->writeln('note: '.$note);
@@ -53,15 +53,5 @@ final class TableFormatter implements FormatterInterface
         array_pop($chain);
 
         return $chain === [] ? 'direct' : implode(' > ', $chain);
-    }
-
-    private function summary(Report $report): string
-    {
-        $parts = [\sprintf('%d packages checked', $report->packagesChecked())];
-        foreach ($report->byVerdict() as $verdict => $count) {
-            $parts[] = $verdict.' '.$count;
-        }
-
-        return implode(' · ', $parts);
     }
 }

@@ -46,7 +46,7 @@ final class GithubFormatter implements FormatterInterface
         foreach ($report->notes() as $note) {
             $lines[] = '::notice title=lockrot::'.self::escapeData($note);
         }
-        $lines[] = $this->summary($report);
+        $lines[] = $report->summaryLine();
 
         return implode("\n", $lines)."\n";
     }
@@ -95,19 +95,6 @@ final class GithubFormatter implements FormatterInterface
         return $message;
     }
 
-    /**
-     * Deliberately identical to TableFormatter::summary(); GithubFormatterTest pins the two
-     * together so neither can drift without a failing test.
-     */
-    private function summary(Report $report): string
-    {
-        $parts = [\sprintf('%d packages checked', $report->packagesChecked())];
-        foreach ($report->byVerdict() as $verdict => $count) {
-            $parts[] = $verdict.' '.$count;
-        }
-
-        return implode(' · ', $parts);
-    }
 
     private static function escapeData(string $value): string
     {

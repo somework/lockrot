@@ -80,6 +80,17 @@ final class Report
         return $this->hadNetworkFailures;
     }
 
+    /** One-line totals, e.g. `200 packages checked · abandoned 19 · silent 1 · …`, shared by the table and GitHub formats. */
+    public function summaryLine(): string
+    {
+        $parts = [\sprintf('%d packages checked', $this->packagesChecked)];
+        foreach ($this->byVerdict() as $verdict => $count) {
+            $parts[] = $verdict.' '.$count;
+        }
+
+        return implode(' · ', $parts);
+    }
+
     /** @return array<string, mixed> */
     public function toArray(): array
     {
