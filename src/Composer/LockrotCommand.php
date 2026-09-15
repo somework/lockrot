@@ -59,7 +59,7 @@ final class LockrotCommand extends BaseCommand
 
     /**
      * Composer's BaseCommand::initialize() bootstraps a Composer instance from the project's
-     * composer.json (2.10.3 src/Composer/Command/BaseCommand.php:240, 2.2.25 :140) and lets a JSON
+     * composer.json (2.10.3 src/Composer/Command/BaseCommand.php:240, 2.2.25 :159) and lets a JSON
      * parse error escape as a Composer crash — exit 1, before execute() is ever reached. lockrot
      * documents a malformed manifest as a configuration error (exit 2, README "Exit codes"), so the
      * file is checked here first and the failure is carried into execute()'s error handling instead.

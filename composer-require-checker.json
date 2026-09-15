@@ -13,7 +13,6 @@
         "Composer\\EventDispatcher\\EventSubscriberInterface",
         "Composer\\Factory",
         "Composer\\IO\\IOInterface",
-        "Composer\\IO\\NullIO",
         "Composer\\Installer\\InstallerEvent",
         "Composer\\Installer\\InstallerEvents",
         "Composer\\Json\\JsonFile",
