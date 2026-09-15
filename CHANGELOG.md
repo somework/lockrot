@@ -17,8 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `--format=markdown` renders everything that comes from the project or from package metadata as
   plain text: names, versions, evidence (including an abandoned package's replacement string),
   notes and the baseline file name are backslash-escaped, so a crafted `composer.lock` can no
-  longer put a link, an image or an HTML tag into the pull-request comment or job summary the
-  report is posted to. A package name containing a backtick gets a code-span fence longer than
+  longer put an image, an HTML tag or Markdown link markup into the pull-request comment or job
+  summary the report is posted to (a bare URL still autolinks, as plain text does on GitHub). A package name containing a backtick gets a code-span fence longer than
   the name can close.
 - Repository-activity checks no longer fail with `HTTP/2 401` ("Bad credentials") when Composer
   has a `github-oauth` token for github.com — in `auth.json`, in `COMPOSER_AUTH`, or written by

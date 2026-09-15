@@ -89,8 +89,9 @@ final class ComposerHttpClient implements HttpClientInterface
      */
     public static function withoutRedundantAuthorization(IOInterface $io, string $url, array $headers): array
     {
-        $host = parse_url($url, \PHP_URL_HOST);
-        if (!\is_string($host) || strcasecmp($host, 'api.github.com') !== 0) {
+        // Exact, like Composer's own origin lookup: a host spelled any other way is one Composer
+        // adds no header for, so lockrot's has to stay.
+        if (parse_url($url, \PHP_URL_HOST) !== 'api.github.com') {
             return $headers;
         }
         if (!$io->hasAuthentication('github.com')) {

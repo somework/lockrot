@@ -152,7 +152,7 @@ gh pr comment --body-file comment.md
 
 The evidence cells are abridged here; the real cells carry every signal. Everything that comes from the project or
 from package metadata is rendered as plain text — Markdown and HTML punctuation is backslash-escaped — so a
-`composer.lock` under someone else's control cannot put a link, an image or a tag into the comment. Rows keep the
+`composer.lock` under someone else's control cannot put an image, a tag or link markup into the comment. Rows keep the
 report's order, so a reviewer reads down the first column and stops where the rows stop applying. A clean run prints
 `### lockrot: no dependency rot found in N packages` and no table. With a [baseline](baseline.md) in place, a second
 line under the heading carries the same `known`/`new`/`worsened`/`stale` counts as the table format, and a verdict is

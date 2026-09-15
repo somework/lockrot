@@ -29,7 +29,8 @@ use Lockrot\Verdict\Finding;
  * replacement string of an abandoned package, notes, the baseline file name — is rendered as plain
  * text: line breaks become a single space, and every Markdown or HTML punctuation character is
  * backslash-escaped, `|` included, so a crafted composer.lock can neither break the table nor put
- * a link, an image or a tag of its own into a pull-request comment or a job summary. The package
+ * an image, a tag or link markup of its own into a pull-request comment or a job summary (a bare
+ * URL still autolinks, as it does in any GitHub comment). The package
  * name is a code span, delimited by more backticks than the name itself contains. The verdict cell
  * is bold only when FormatContext::levelOf() is not `note` — the same rule GitHub annotations and
  * GitLab severities use, so a reviewer's eye is drawn to exactly the findings that can fail the

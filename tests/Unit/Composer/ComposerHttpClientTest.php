@@ -52,13 +52,17 @@ final class ComposerHttpClientTest extends TestCase
         self::assertSame(self::HEADERS, ComposerHttpClient::withoutRedundantAuthorization($io, self::GITHUB, self::HEADERS));
     }
 
-    public function testTheHeaderNameIsMatchedCaseInsensitively(): void
+    /**
+     * The header name is matched case-insensitively; the host is not, because Composer's own
+     * origin lookup is exact and adds nothing for `API.GITHUB.COM` — so lockrot's header stays.
+     */
+    public function testTheHeaderNameIsMatchedCaseInsensitivelyAndTheHostExactly(): void
     {
         $io = new BufferIO();
         $io->setAuthentication('github.com', 'composer-token', 'x-oauth-basic');
 
         self::assertSame(['User-Agent: lockrot'], ComposerHttpClient::withoutRedundantAuthorization($io, self::GITHUB, ['User-Agent: lockrot', 'authorization: token x']));
-        self::assertSame(['User-Agent: lockrot'], ComposerHttpClient::withoutRedundantAuthorization($io, 'https://API.GITHUB.COM/repos/x/y', ['User-Agent: lockrot', 'AUTHORIZATION: token x']));
+        self::assertSame(['User-Agent: lockrot', 'AUTHORIZATION: token x'], ComposerHttpClient::withoutRedundantAuthorization($io, 'https://API.GITHUB.COM/repos/x/y', ['User-Agent: lockrot', 'AUTHORIZATION: token x']));
     }
 
     public function testOtherHostsKeepTheirHeadersWhateverComposerKnows(): void
