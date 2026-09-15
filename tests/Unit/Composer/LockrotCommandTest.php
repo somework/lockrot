@@ -484,6 +484,73 @@ final class LockrotCommandTest extends TestCase
     }
 
     /**
+     * Symfony's Command::run() calls initialize() with no try/catch of its own
+     * (vendor/symfony/console/Command/Command.php:263), so a failure inside Composer's own
+     * BaseCommand::initialize() — here, a plugin's PRE_COMMAND_RUN listener throwing, which
+     * BaseCommand::initialize() dispatches at src/Composer/Command/BaseCommand.php:246-249, itself
+     * uncaught by Composer — must still leave COMPOSER_DISABLE_NETWORK/COMPOSER_ROOT_VERSION as
+     * initialize() found them, even though execute() (and its own finally) never runs. Reuses the
+     * plugin-mode setup from testPluginModeThreadsEventDispatcherThroughRebuiltRepositories(): a
+     * Composer instance built ahead of time via Application::getComposer() so tryComposer() inside
+     * BaseCommand::initialize() returns it non-null, which is what makes the PRE_COMMAND_RUN
+     * dispatch (and so the listener) run at all.
+     */
+    public function testInitializeRestoresTheEnvironmentWhenAPreCommandRunListenerThrows(): void
+    {
+        $server = self::$server;
+        self::assertNotNull($server);
+
+        $project = $this->tempDir('lockrot-initialize-throws-project-');
+        $cacheDir = $this->tempDir('lockrot-initialize-throws-cache-');
+        $home = $this->tempDir('lockrot-initialize-throws-home-');
+        file_put_contents($project.'/composer.json', (string) json_encode([
+            'name' => 'lockrot/initialize-throws-test',
+            'config' => ['secure-http' => false],
+            'repositories' => ['packagist.org' => false, 'fixture' => ['type' => 'composer', 'url' => $server->url()]],
+        ]));
+        file_put_contents($project.'/composer.lock', (string) json_encode([
+            'packages' => [['name' => 'phpzip/phpzip', 'version' => '2.0.8', 'notification-url' => 'https://packagist.org/downloads/']],
+        ]));
+
+        chdir($project);
+        $this->withComposerEnv($cacheDir, $home, function (): void {
+            $command = $this->buildCommand([ServiceFactory::class, 'createAnalyzer']);
+            $application = $command->getApplication();
+            self::assertInstanceOf(Application::class, $application);
+            $composer = $application->getComposer(false, false);
+            self::assertInstanceOf(Composer::class, $composer);
+            $composer->getEventDispatcher()->addListener(
+                PluginEvents::PRE_COMMAND_RUN,
+                static function (): void {
+                    throw new \RuntimeException('a plugin listener blew up during initialize()');
+                }
+            );
+
+            $previousDisableNetwork = Platform::getEnv('COMPOSER_DISABLE_NETWORK');
+            $previousRootVersion = Platform::getEnv('COMPOSER_ROOT_VERSION');
+            Platform::clearEnv('COMPOSER_DISABLE_NETWORK');
+            Platform::clearEnv('COMPOSER_ROOT_VERSION');
+            try {
+                $input = new ArrayInput(['--offline' => true, '--format' => 'json'], $command->getDefinition());
+                $thrown = null;
+                try {
+                    $command->run($input, new BufferedOutput());
+                } catch (\RuntimeException $e) {
+                    $thrown = $e;
+                }
+
+                self::assertNotNull($thrown, 'a PRE_COMMAND_RUN listener throwing must propagate out of Command::run(), not be swallowed');
+                self::assertSame('a plugin listener blew up during initialize()', $thrown->getMessage());
+                self::assertFalse(Platform::getEnv('COMPOSER_DISABLE_NETWORK'), 'the environment must be restored even though execute() never ran');
+                self::assertFalse(Platform::getEnv('COMPOSER_ROOT_VERSION'), 'the environment must be restored even though execute() never ran');
+            } finally {
+                $this->restoreGlobalEnv('COMPOSER_DISABLE_NETWORK', $previousDisableNetwork);
+                $this->restoreGlobalEnv('COMPOSER_ROOT_VERSION', $previousRootVersion);
+            }
+        });
+    }
+
+    /**
      * Relative paths of everything Composer wrote under its cache directory, minus the `.htaccess`
      * guard Factory::createConfig() drops into every Composer directory it creates regardless of
      * any request being made.

@@ -105,7 +105,18 @@ final class LockrotCommand extends BaseCommand
             Platform::putEnv('COMPOSER_DISABLE_NETWORK', '1');
         }
         $this->quietRootVersionGuessing();
-        parent::initialize($input, $output);
+        try {
+            parent::initialize($input, $output);
+        } catch (\Throwable $e) {
+            // Symfony's Command::run() calls initialize() outside any try/catch of its own
+            // (vendor/symfony/console/Command/Command.php:264 in the console version 2.10.3/2.2.25
+            // bundle), so a failure here would otherwise skip execute() entirely — and with it the
+            // finally block that normally restores the environment. Restored here instead, then
+            // rethrown unchanged so Composer's own error handling still sees the original failure.
+            $this->restoreEnv();
+
+            throw $e;
+        }
     }
 
     /**
