@@ -7,9 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-09-16
+
 ### Fixed
 
-- `self-update` no longer ends with `include(): zlib: data error` and exit 255 after successfully
+- `self-update` no longer ends with `include(): zlib: data error` (or `internal corruption of phar`) and exit 255 after successfully
   replacing the archive: nothing that runs after the swap needs code from the old PHAR any more. The
   file was replaced correctly before; only the process's exit was wrong.
 
@@ -167,6 +169,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The "GitHub token not set" note counts packages whose repository activity was checked, not
   distinct repositories, so packages sharing one repository are no longer under-reported.
 
-[Unreleased]: https://github.com/somework/lockrot/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/somework/lockrot/compare/v0.2.1...HEAD
+[0.2.1]: https://github.com/somework/lockrot/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/somework/lockrot/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/somework/lockrot/releases/tag/v0.1.0
