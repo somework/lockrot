@@ -237,7 +237,8 @@ final class Analyzer
             $graph->shortestChain($package->name()),
             $entry !== null ? $entry->reason() : null,
             $this->dataDate($meta, $activity),
-            $note
+            $note,
+            $package->isDev()
         );
     }
 

@@ -23,6 +23,7 @@ use Lockrot\Lock\ProjectConfig;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
+use Lockrot\Verdict\Priority;
 use Lockrot\Verdict\Verdict;
 use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\TestCase;
@@ -145,9 +146,48 @@ final class AnalyzerTest extends TestCase
         self::assertSame(4, $report->packagesChecked());
         self::assertSame(1, $report->notFromComposerRepository());
         self::assertFalse($report->hadNetworkFailures());
-        // Sort order is severity desc, name asc: SILENT(50) > PINNED(40) > OLD_PROMISE(30) > UNKNOWN(10).
-        self::assertSame(['vendor/transitive', 'vendor/snapshot', 'vendor/direct', 'private/thing'], array_map(static fn ($f) => $f->package(), $report->findings()));
+        // Sort order is priority desc, then severity desc, then direct first, then name asc. Priority
+        // outranks the verdict here: vendor/snapshot is PINNED(40) but nothing in the lock reaches it,
+        // so its chain is empty, it counts as transitive and its `high` base drops to `medium` — below
+        // vendor/direct, which is only OLD_PROMISE(30) but is a root require and stays `high`.
+        self::assertSame(Priority::HIGH, $byName['vendor/transitive']->priority());
+        self::assertSame(Priority::HIGH, $byName['vendor/direct']->priority());
+        self::assertSame([], $byName['vendor/snapshot']->chain());
+        self::assertSame(Priority::MEDIUM, $byName['vendor/snapshot']->priority());
+        self::assertSame(Priority::NONE, $byName['private/thing']->priority());
+        self::assertSame(['vendor/transitive', 'vendor/direct', 'vendor/snapshot', 'private/thing'], array_map(static fn ($f) => $f->package(), $report->findings()));
         self::assertNotEmpty(array_filter($report->notes(), static fn (string $n): bool => strpos($n, 'GitHub token not set') !== false));
+    }
+
+    public function testADevPackageCarriesTheDevFlagAndGetsALowerPriorityThanTheSameProdPackage(): void
+    {
+        $dataDate = new \DateTimeImmutable('2026-09-14T06:00:00+00:00');
+        $silent = static fn (string $name): PackageMetadata => new PackageMetadata($name, false, null, true, new \DateTimeImmutable('2015-11-16T16:30:51+00:00'), '2.0.0', 1, 'https://github.com/'.$name.'.git', 'library', $dataDate);
+        $metadata = ['vendor/prod' => $silent('vendor/prod'), 'vendor/devtool' => $silent('vendor/devtool')];
+        $http = $this->http([
+            'https://api.github.com/repos/vendor/prod' => [200, '{"archived":false,"pushed_at":"2015-11-16T16:31:37Z"}'],
+            'https://api.github.com/repos/vendor/devtool' => [200, '{"archived":false,"pushed_at":"2015-11-16T16:31:37Z"}'],
+        ]);
+        $lock = LockFile::fromArray([
+            'packages' => [['name' => 'vendor/prod', 'version' => '2.0.0', 'notification-url' => 'https://packagist.org/downloads/']],
+            'packages-dev' => [['name' => 'vendor/devtool', 'version' => '2.0.0', 'notification-url' => 'https://packagist.org/downloads/']],
+        ]);
+        $project = ProjectConfig::fromArray(['require' => ['vendor/prod' => '^2.0'], 'require-dev' => ['vendor/devtool' => '^2.0']]);
+
+        $report = $this->analyzer($this->loader($metadata), $http, false, new Allowlist([]))->analyze($lock, $project, true);
+        $byName = [];
+        foreach ($report->findings() as $finding) {
+            $byName[$finding->package()] = $finding;
+        }
+
+        self::assertSame(Verdict::SILENT, $byName['vendor/prod']->verdict());
+        self::assertSame(Verdict::SILENT, $byName['vendor/devtool']->verdict());
+        self::assertFalse($byName['vendor/prod']->isDev());
+        self::assertTrue($byName['vendor/devtool']->isDev());
+        self::assertSame(Priority::CRITICAL, $byName['vendor/prod']->priority());
+        self::assertSame(Priority::HIGH, $byName['vendor/devtool']->priority());
+        // Priority orders the report: the prod row comes first even though the two verdicts are equal.
+        self::assertSame(['vendor/prod', 'vendor/devtool'], array_map(static fn ($f) => $f->package(), $report->findings()));
     }
 
     public function testAllowlistedIsFinishedAndNotFetchedFromGitHub(): void

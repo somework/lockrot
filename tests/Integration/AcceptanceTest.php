@@ -19,6 +19,7 @@ use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Verdict\Finding;
+use Lockrot\Verdict\Priority;
 use Lockrot\Verdict\Verdict;
 use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
@@ -127,6 +128,20 @@ final class AcceptanceTest extends TestCase
             self::assertSame(Verdict::FINISHED, $f['ralouphie/getallheaders']->verdict());
             self::assertSame(Verdict::PINNED, $f['wallabag/rulerz']->verdict());
             self::assertSame(Verdict::ABANDONED, $f['hoa/ruler']->verdict());
+            // Priority, read off this fixture: wallabag/rulerz is a root require (chain length 1) and
+            // pinned -> high; hoa/ruler is reached through wallabag/rulerz and abandoned -> critical
+            // lowered one step for being transitive -> high; phpzip/phpzip is reached through
+            // wallabag/phpepub and silent -> the same one-step drop to high. The lock is analysed with
+            // includeDev = false, so every row here is a prod row.
+            self::assertSame(Priority::HIGH, $f['wallabag/rulerz']->priority());
+            self::assertTrue($f['wallabag/rulerz']->isDirect());
+            self::assertSame(Priority::HIGH, $f['hoa/ruler']->priority());
+            self::assertSame(['wallabag/rulerz', 'hoa/ruler'], $f['hoa/ruler']->chain());
+            self::assertSame(Priority::HIGH, $f['phpzip/phpzip']->priority());
+            self::assertSame(['wallabag/phpepub', 'phpzip/phpzip'], $f['phpzip/phpzip']->chain());
+            self::assertFalse($f['phpzip/phpzip']->isDev());
+            // The report leads with its critical rows: nothing may sort above a critical priority.
+            self::assertSame(Priority::CRITICAL, $report->findings()[0]->priority());
             self::assertFalse($report->hadNetworkFailures(), implode("\n", $report->notes()));
             // Regression guard for the PHAR OOM at PHP's default 128M memory_limit: analysing a
             // 200-package lock must not retain the expanded Packagist release history.

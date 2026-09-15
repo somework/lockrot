@@ -30,6 +30,38 @@ final class JsonFormatterTest extends TestCase
         self::assertSame(1, $json['counts']['stale']);
     }
 
+    public function testJsonCarriesThePriorityOnEveryFindingAndTheReportTotals(): void
+    {
+        $at = new \DateTimeImmutable('2026-09-14T00:00:00+00:00');
+        $report = new Report(
+            [
+                new Finding('a/direct', '1.0.0', Verdict::ABANDONED, [], ['a/direct'], null, $at),
+                new Finding('a/dev', '1.0.0', Verdict::ABANDONED, [], ['a/root', 'a/dev'], null, $at, null, true),
+            ],
+            [],
+            $at,
+            2,
+            0,
+            false
+        );
+        $json = json_decode((new JsonFormatter())->format($report), true);
+        self::assertIsArray($json);
+        self::assertIsArray($json['findings']);
+        self::assertIsArray($json['findings'][0]);
+        self::assertIsArray($json['findings'][1]);
+        self::assertSame('critical', $json['findings'][0]['priority']);
+        self::assertTrue($json['findings'][0]['direct']);
+        self::assertFalse($json['findings'][0]['dev']);
+        self::assertSame('medium', $json['findings'][1]['priority']);
+        self::assertFalse($json['findings'][1]['direct']);
+        self::assertTrue($json['findings'][1]['dev']);
+        self::assertIsArray($json['priorities']);
+        self::assertSame(['critical' => 1, 'high' => 0, 'medium' => 1, 'low' => 0, 'none' => 0], $json['priorities']);
+        // The additions are backward compatible, so the schema number does not move.
+        self::assertIsArray($json['lockrot']);
+        self::assertSame(1, $json['lockrot']['schema']);
+    }
+
     public function testFactory(): void
     {
         self::assertInstanceOf(TableFormatter::class, Formatters::for('table'));

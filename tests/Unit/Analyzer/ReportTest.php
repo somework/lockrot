@@ -9,6 +9,7 @@ use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Baseline\BaselineEntry;
 use Lockrot\Verdict\Finding;
+use Lockrot\Verdict\Priority;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\TestCase;
 
@@ -19,7 +20,64 @@ final class ReportTest extends TestCase
         return new Finding($package, '1.0.0', $verdict, [], [$package], null, null);
     }
 
-    public function testFindingsAreSortedBySeverityDescThenPackageAsc(): void
+    /** A transitive finding: the chain is a root plus the package itself, so isDirect() is false. */
+    private function transitive(string $package, string $verdict, bool $dev = false): Finding
+    {
+        return new Finding($package, '1.0.0', $verdict, [], ['vendor/root', $package], null, null, null, $dev);
+    }
+
+    private function report(Finding ...$findings): Report
+    {
+        return new Report(array_values($findings), [], new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), \count($findings), 0, false);
+    }
+
+    /** @return list<string> */
+    private function names(Report $report): array
+    {
+        return array_map(static fn (Finding $f): string => $f->package(), $report->findings());
+    }
+
+    public function testFindingsAreSortedByPriorityThenSeverityThenDirectThenName(): void
+    {
+        // abandoned transitive dev -> medium; pinned direct prod -> high, so the pinned row sorts first
+        // even though abandoned outranks pinned on verdict severity.
+        $report = $this->report(
+            $this->transitive('vendor/abandoned-transitive-dev', Verdict::ABANDONED, true),
+            $this->finding('vendor/pinned-direct', Verdict::PINNED),
+            $this->finding('vendor/abandoned-direct', Verdict::ABANDONED),
+            $this->finding('vendor/ok', Verdict::OK)
+        );
+
+        self::assertSame(
+            ['vendor/abandoned-direct', 'vendor/pinned-direct', 'vendor/abandoned-transitive-dev', 'vendor/ok'],
+            $this->names($report)
+        );
+    }
+
+    public function testWithinOnePriorityTheHigherVerdictSeverityComesFirst(): void
+    {
+        // Both are high: silent transitive prod and pinned direct prod. Silent (50) outranks pinned (40).
+        $report = $this->report(
+            $this->finding('vendor/pinned-direct', Verdict::PINNED),
+            $this->transitive('vendor/silent-transitive', Verdict::SILENT)
+        );
+
+        self::assertSame(['vendor/silent-transitive', 'vendor/pinned-direct'], $this->names($report));
+    }
+
+    public function testWithinOnePriorityAndVerdictDirectComesBeforeTransitive(): void
+    {
+        // Both dev and stale, so both land on the `low` floor: the only thing left to order them by
+        // is direct-before-transitive, which has to beat the alphabetical package name.
+        $report = $this->report(
+            $this->transitive('vendor/aaa-transitive', Verdict::STALE, true),
+            new Finding('vendor/zzz-direct', '1.0.0', Verdict::STALE, [], ['vendor/zzz-direct'], null, null, null, true)
+        );
+
+        self::assertSame(['vendor/zzz-direct', 'vendor/aaa-transitive'], $this->names($report));
+    }
+
+    public function testBySeverityStillBreaksTiesByPackageNameAscending(): void
     {
         $report = new Report(
             [
@@ -103,6 +161,53 @@ final class ReportTest extends TestCase
         self::assertSame(0, $counts[Verdict::ABANDONED]);
     }
 
+    public function testByPriorityHasAllFiveKeysWithZeros(): void
+    {
+        $report = new Report([], [], new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), 0, 0, false);
+        self::assertSame(
+            [
+                Priority::CRITICAL => 0,
+                Priority::HIGH => 0,
+                Priority::MEDIUM => 0,
+                Priority::LOW => 0,
+                Priority::NONE => 0,
+            ],
+            $report->byPriority()
+        );
+    }
+
+    public function testByPriorityCountsFindings(): void
+    {
+        $report = $this->report(
+            $this->finding('vendor/a', Verdict::ABANDONED),
+            $this->transitive('vendor/b', Verdict::ABANDONED),
+            $this->transitive('vendor/c', Verdict::STALE),
+            $this->finding('vendor/d', Verdict::OK)
+        );
+        self::assertSame(
+            [Priority::CRITICAL => 1, Priority::HIGH => 1, Priority::MEDIUM => 0, Priority::LOW => 1, Priority::NONE => 1],
+            $report->byPriority()
+        );
+    }
+
+    public function testPrioritySummaryLineNamesTheFourFlaggedLevelsOnly(): void
+    {
+        $report = $this->report(
+            $this->finding('vendor/a', Verdict::ABANDONED),
+            $this->transitive('vendor/b', Verdict::ABANDONED),
+            $this->finding('vendor/c', Verdict::STALE),
+            $this->transitive('vendor/d', Verdict::STALE),
+            $this->finding('vendor/e', Verdict::OK)
+        );
+        self::assertSame('priority: critical 1 · high 1 · medium 1 · low 1', $report->prioritySummaryLine());
+    }
+
+    public function testPrioritySummaryLineOnAnEmptyReport(): void
+    {
+        $report = new Report([], [], new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), 0, 0, false);
+        self::assertSame('priority: critical 0 · high 0 · medium 0 · low 0', $report->prioritySummaryLine());
+    }
+
     public function testToArrayKeys(): void
     {
         $report = new Report(
@@ -115,9 +220,15 @@ final class ReportTest extends TestCase
         );
         $array = $report->toArray();
         self::assertSame(
-            ['generated_at', 'packages_checked', 'not_from_composer_repository', 'network_failures', 'counts', 'baseline', 'notes', 'findings'],
+            ['generated_at', 'packages_checked', 'not_from_composer_repository', 'network_failures', 'counts', 'priorities', 'baseline', 'notes', 'findings'],
             array_keys($array)
         );
+        self::assertIsArray($array['priorities']);
+        self::assertSame(
+            [Priority::CRITICAL, Priority::HIGH, Priority::MEDIUM, Priority::LOW, Priority::NONE],
+            array_keys($array['priorities'])
+        );
+        self::assertSame(1, $array['priorities'][Priority::CRITICAL]);
         self::assertSame('2026-09-14T00:00:00+00:00', $array['generated_at']);
         self::assertSame(5, $array['packages_checked']);
         self::assertSame(1, $array['not_from_composer_repository']);

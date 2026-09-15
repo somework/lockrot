@@ -18,12 +18,14 @@ final class Finding
     private ?string $allowlistReason;
     private ?\DateTimeImmutable $dataDate;
     private ?string $note;
+    /** Whether the package is installed only for development (`packages-dev` in the lock). */
+    private bool $dev;
 
     /**
      * @param list<Signal> $signals
      * @param list<string> $chain
      */
-    public function __construct(string $package, string $version, string $verdict, array $signals, array $chain, ?string $allowlistReason, ?\DateTimeImmutable $dataDate, ?string $note = null)
+    public function __construct(string $package, string $version, string $verdict, array $signals, array $chain, ?string $allowlistReason, ?\DateTimeImmutable $dataDate, ?string $note = null, bool $dev = false)
     {
         $this->package = $package;
         $this->version = $version;
@@ -33,6 +35,7 @@ final class Finding
         $this->allowlistReason = $allowlistReason;
         $this->dataDate = $dataDate;
         $this->note = $note;
+        $this->dev = $dev;
     }
 
     public function package(): string
@@ -82,6 +85,17 @@ final class Finding
         return \count($this->chain) === 1;
     }
 
+    public function isDev(): bool
+    {
+        return $this->dev;
+    }
+
+    /** Derived, never stored: the priority is a view of the verdict, the chain and the dev flag. */
+    public function priority(): string
+    {
+        return Priority::of($this->verdict, $this->isDirect(), $this->dev);
+    }
+
     public function evidence(): string
     {
         if ($this->signals === []) {
@@ -105,6 +119,7 @@ final class Finding
 
         return [
             'package' => $this->package, 'version' => $this->version, 'verdict' => $this->verdict,
+            'priority' => $this->priority(), 'direct' => $this->isDirect(), 'dev' => $this->dev,
             'signals' => $signals, 'chain' => $this->chain, 'evidence' => $this->evidence(),
             'allowlist_reason' => $this->allowlistReason, 'note' => $this->note,
             'data_date' => $this->dataDate === null ? null : $this->dataDate->format(\DATE_ATOM),

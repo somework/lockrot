@@ -6,6 +6,7 @@ namespace Lockrot\Tests\Unit\Verdict;
 
 use Lockrot\Signal\Signal;
 use Lockrot\Verdict\Finding;
+use Lockrot\Verdict\Priority;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\TestCase;
 
@@ -60,5 +61,53 @@ final class FindingTest extends TestCase
         self::assertSame('audited by security team', $array['allowlist_reason']);
         self::assertSame('no signals fired', $array['note']);
         self::assertSame(['vendor/pkg'], $array['chain']);
+    }
+
+    public function testFindingsAreProdByDefault(): void
+    {
+        $finding = new Finding('vendor/pkg', '1.2.3', Verdict::ABANDONED, [], ['vendor/pkg'], null, null);
+        self::assertFalse($finding->isDev());
+        self::assertTrue($finding->isDirect());
+        self::assertSame(Priority::CRITICAL, $finding->priority());
+    }
+
+    public function testDevIsTheLastConstructorParameterAndLowersThePriority(): void
+    {
+        $finding = new Finding('vendor/pkg', '1.2.3', Verdict::ABANDONED, [], ['vendor/pkg'], null, null, null, true);
+        self::assertTrue($finding->isDev());
+        self::assertSame(Priority::HIGH, $finding->priority());
+    }
+
+    public function testATransitiveDevFindingIsLoweredTwice(): void
+    {
+        $finding = new Finding('vendor/pkg', '1.2.3', Verdict::ABANDONED, [], ['vendor/root', 'vendor/pkg'], null, null, null, true);
+        self::assertFalse($finding->isDirect());
+        self::assertSame(Priority::MEDIUM, $finding->priority());
+    }
+
+    public function testAnEmptyChainCountsAsTransitive(): void
+    {
+        $finding = new Finding('vendor/pkg', '1.2.3', Verdict::ABANDONED, [], [], null, null);
+        self::assertFalse($finding->isDirect());
+        self::assertSame(Priority::HIGH, $finding->priority());
+    }
+
+    public function testAnUnflaggedFindingHasNoPriority(): void
+    {
+        $finding = new Finding('vendor/pkg', '1.2.3', Verdict::OK, [], ['vendor/pkg'], null, null);
+        self::assertSame(Priority::NONE, $finding->priority());
+    }
+
+    public function testToArrayCarriesPriorityDirectAndDevRightAfterTheVerdict(): void
+    {
+        $finding = new Finding('vendor/pkg', '1.2.3', Verdict::STALE, [], ['vendor/root', 'vendor/pkg'], null, null, null, true);
+        $array = $finding->toArray();
+        self::assertSame(
+            ['package', 'version', 'verdict', 'priority', 'direct', 'dev', 'signals', 'chain', 'evidence', 'allowlist_reason', 'note', 'data_date'],
+            array_keys($array)
+        );
+        self::assertSame(Priority::LOW, $array['priority']);
+        self::assertFalse($array['direct']);
+        self::assertTrue($array['dev']);
     }
 }

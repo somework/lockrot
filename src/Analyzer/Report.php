@@ -6,6 +6,7 @@ namespace Lockrot\Analyzer;
 
 use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Verdict\Finding;
+use Lockrot\Verdict\Priority;
 use Lockrot\Verdict\Verdict;
 
 final class Report
@@ -27,8 +28,12 @@ final class Report
      */
     public function __construct(array $findings, array $notes, \DateTimeImmutable $generatedAt, int $packagesChecked, int $notFromComposerRepository, bool $hadNetworkFailures, ?BaselineComparison $baseline = null)
     {
+        // Priority first, then the verdict's own severity, then direct dependencies ahead of
+        // transitive ones, then the package name — a total order, so the report reads the same way on
+        // every run. Descending keys take the other finding's value, ascending ones take their own.
         usort($findings, static function (Finding $a, Finding $b): int {
-            return [Verdict::severity($b->verdict()), $a->package()] <=> [Verdict::severity($a->verdict()), $b->package()];
+            return [Priority::rank($b->priority()), Verdict::severity($b->verdict()), self::directRank($b), $a->package()]
+                <=> [Priority::rank($a->priority()), Verdict::severity($a->verdict()), self::directRank($a), $b->package()];
         });
         $this->findings = $findings;
         $this->notes = $notes;
@@ -37,6 +42,12 @@ final class Report
         $this->notFromComposerRepository = $notFromComposerRepository;
         $this->hadNetworkFailures = $hadNetworkFailures;
         $this->baseline = $baseline;
+    }
+
+    /** Sort weight of the third ordering key: a direct dependency outranks a transitive one. */
+    private static function directRank(Finding $finding): int
+    {
+        return $finding->isDirect() ? 1 : 0;
     }
 
     /**
@@ -84,6 +95,17 @@ final class Report
         return $counts;
     }
 
+    /** @return array<string, int> */
+    public function byPriority(): array
+    {
+        $counts = array_fill_keys(Priority::all(), 0);
+        foreach ($this->findings as $finding) {
+            ++$counts[$finding->priority()];
+        }
+
+        return $counts;
+    }
+
     /** @return list<string> */
     public function notes(): array
     {
@@ -117,6 +139,21 @@ final class Report
         return implode(' · ', $parts);
     }
 
+    /**
+     * The four flagged levels, e.g. `priority: critical 2 · high 12 · medium 5 · low 3`. `none` is left
+     * out: it counts the rows the report does not flag, which {@see summaryLine()} already totals.
+     */
+    public function prioritySummaryLine(): string
+    {
+        $counts = $this->byPriority();
+        $parts = [];
+        foreach ([Priority::CRITICAL, Priority::HIGH, Priority::MEDIUM, Priority::LOW] as $level) {
+            $parts[] = $level.' '.$counts[$level];
+        }
+
+        return 'priority: '.implode(' · ', $parts);
+    }
+
     /** @return array<string, mixed> */
     public function toArray(): array
     {
@@ -126,6 +163,7 @@ final class Report
             'not_from_composer_repository' => $this->notFromComposerRepository,
             'network_failures' => $this->hadNetworkFailures,
             'counts' => $this->byVerdict(),
+            'priorities' => $this->byPriority(),
             'baseline' => $this->baseline === null ? null : $this->baseline->toArray(),
             'notes' => $this->notes,
             'findings' => array_map(static fn (Finding $f): array => $f->toArray(), $this->findings),

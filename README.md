@@ -277,6 +277,39 @@ Every finding's evidence line states the concrete fact (release date, push date,
 string) and the report footer states the data date — no severity words beyond the verdict names
 above.
 
+## Priority
+
+The verdict says what was observed about a package. The priority says how much that applies to
+*your* project — a package flagged the same way matters less when nothing in the project requires
+it directly, and less again when it is only ever installed for development.
+
+Three rules, in order:
+
+1. A package the report does not flag (`unknown`, `finished`, `ok`) has priority `none`.
+2. Otherwise the verdict sets the base level: `abandoned` and `silent` start at **critical**,
+   `pinned` and `old-promise` at **high**, `stale` at **medium**.
+3. The base drops one step when the package is transitive (nothing you require names it) and one
+   more step when it is a development dependency. It never drops below **low**.
+
+| Verdict | direct, prod | transitive, prod | direct, dev | transitive, dev |
+|---|---|---|---|---|
+| `abandoned`, `silent` | `critical` | `high` | `high` | `medium` |
+| `pinned`, `old-promise` | `high` | `medium` | `medium` | `low` |
+| `stale` | `medium` | `low` | `low` | `low` |
+| `unknown`, `finished`, `ok` | `none` | `none` | `none` | `none` |
+
+A package nothing in your `require`/`require-dev` can reach counts as transitive.
+
+The priority orders the report — highest first, then by verdict severity, then direct dependencies
+ahead of transitive ones, then by package name — and is carried in every format. **The exit code
+and `--fail-on` stay on the verdict**: priority is there to tell you what to read first, not to
+decide whether the build fails. `--dev` is what brings dev packages into the run at all; once they
+are in, each of them sits one step below the same finding on a prod package.
+
+In `--format=json` each finding carries `priority`, `direct` and `dev`, and the report carries a
+`priorities` object with all five counts next to `counts`. The JSON `schema` number stays `1` —
+these are additions, so anything already reading the document keeps working.
+
 ## Configuration
 
 All keys live under `extra.lockrot` in `composer.json`. CLI options win over environment
@@ -329,7 +362,7 @@ must be JSON integers (`3`, not `"3"`).
 | `--format=table\|json\|github\|sarif\|gitlab\|markdown` | Output format. `github` prints GitHub Actions workflow commands so findings become annotations on `composer.lock`; `sarif` prints a SARIF 2.1.0 document for `upload-sarif` — see [GitHub Actions](#github-actions). `gitlab` prints a GitLab Code Quality JSON report — see [GitLab CI](#gitlab-ci). `markdown` prints a PR-comment-shaped report — see [Posting a PR comment](#posting-a-pr-comment). The format changes the output only; the exit code is the same for all six |
 | `--fail-on=none\|abandoned\|silent\|pinned\|old-promise\|stale` | Exit-1 threshold for this run |
 | `--target-php=8.4` | PHP version for the S5 check |
-| `--dev` | Include `packages-dev` |
+| `--dev` | Include `packages-dev`. A dev package is flagged the same way a prod one is, but it gets one priority step lower — see [Priority](#priority) |
 | `--all` | Show every checked package, not only flagged ones |
 | `--offline` | Never reach the network: lockrot sets `COMPOSER_DISABLE_NETWORK=1` and rebuilds the configured repositories behind it (in plugin mode Composer has already built its own, network-enabled ones before any command runs), so repository metadata is served from Composer's own cache and GitHub activity from lockrot's cache. A package missing from the cache is reported as unavailable, not as absent from the repository |
 | `--strict-network` | Exit 1 (see [Exit codes](#exit-codes)) when a configured repository or GitHub could not be reached |

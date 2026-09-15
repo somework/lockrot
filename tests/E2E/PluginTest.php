@@ -99,6 +99,18 @@ final class PluginTest extends TestCase
             self::assertSame('silent', $verdicts['phpzip/phpzip']);
         }
         self::assertSame($verdicts['phpzip/phpzip'] === 'silent' ? 1 : 0, $run->getExitCode());
+        // Every finding carries a priority, and the report carries the five totals. The exact level of
+        // any one package depends on the same rate-limit dice as the verdict above, so this asserts the
+        // field is present and valid rather than pinning a value.
+        self::assertIsArray($json['priorities']);
+        self::assertSame(['critical', 'high', 'medium', 'low', 'none'], array_keys($json['priorities']));
+        foreach ($json['findings'] as $finding) {
+            self::assertIsArray($finding);
+            self::assertArrayHasKey('priority', $finding);
+            self::assertContains($finding['priority'], ['critical', 'high', 'medium', 'low', 'none']);
+            self::assertIsBool($finding['direct']);
+            self::assertIsBool($finding['dev']);
+        }
 
         $alias = $this->composer(['rot', '--format=json'], [], 120);
         self::assertSame(0, $alias->getExitCode(), $alias->getErrorOutput());

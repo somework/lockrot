@@ -1,5 +1,20 @@
 # Changelog
 
+## Unreleased
+
+- Every finding now carries a **priority** next to its verdict: `critical`, `high`, `medium`, `low`,
+  or `none` for a package the report does not flag. The verdict sets a base level — `abandoned` and
+  `silent` start at `critical`, `pinned` and `old-promise` at `high`, `stale` at `medium` — which
+  drops one step for a transitive package and one more for a development-only one, never below
+  `low`. A package nothing in the project reaches counts as transitive.
+- The report is ordered by priority first, then verdict severity, then direct dependencies ahead of
+  transitive ones, then package name. The install-time summary shows the same order, so its 10-line
+  budget now goes to the packages that apply most directly to the project.
+- `--format=json`: each finding gains `priority`, `direct` and `dev`, and the document gains a
+  `priorities` object with all five counts next to `counts`. These are additions, so the `schema`
+  number stays `1`.
+- The exit code, `--fail-on` and the baseline are unchanged and still read the verdict alone.
+
 ## 0.1.0 (2026-09-15)
 
 - `composer lockrot` (alias `composer rot`) command reporting dependency rot in `composer.lock`.
