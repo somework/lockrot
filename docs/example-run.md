@@ -1,0 +1,325 @@
+# Example run
+
+This is what one run prints, start to finish. To produce your own:
+
+```bash
+php lockrot.phar -d path/to/project --target-php=8.4
+```
+
+The output below comes from `tests/fixtures/apps/wallabag_wallabag`, a real, public 200-package
+`composer.lock` carried in this repository for integration tests. wallabag is used because its lock
+file is public and large, not to single it out. The run had `GITHUB_TOKEN` set, so repository
+activity was checked for every candidate package, and `COLUMNS` was fixed at 120 so the wrapping is
+reproducible.
+
+## The table format
+
+Findings are grouped by [priority](verdicts.md), highest first, and every line — rows and the closing
+summary alike — wraps to the width of the terminal, so nothing has to be read sideways. The width
+comes from `COLUMNS` when it is set, otherwise from the console itself, falling back to 120 columns
+and never going below 40. `--all` adds a final `not flagged` group with everything else in the lock.
+
+"Data as of" in the footer is the date the report was generated, in UTC. On a real terminal the
+`critical` and `high` rows are marked in red and the `medium` rows in yellow.
+
+```text
+critical (3)
+  abandoned    sensio/framework-extra-bundle v6.2.10  direct
+               marked abandoned by its repository, replacement: Symfony; last release 2023-02-24 (3.6 years ago);
+               repository archived on GitHub; last push 2023-02-24 (3.6 years ago); released 2023-02-24, before PHP 8.4
+               GA (2024-11-21); php constraint ">=7.2.5" has no upper bound
+  silent       javibravo/simpleue 2.1.0  direct
+               last release 2017-11-15 (8.8 years ago); last push 2017-11-18 (8.8 years ago); released 2017-11-15,
+               before PHP 8.4 GA (2024-11-21); php constraint ">=5.5" has no upper bound
+  silent       mnapoli/piwik-twig-extension 3.0.0  direct
+               last release 2020-04-24 (6.4 years ago); last push 2020-04-28 (6.4 years ago); released 2020-04-24,
+               before PHP 8.4 GA (2024-11-21); php constraint ">=7.0" has no upper bound
+
+high (58)
+  abandoned    behat/transliterator v1.5.0  via stof/doctrine-extensions-bundle › gedmo/doctrine-extensions
+               marked abandoned by its repository; last release 2022-03-30 (4.5 years ago); repository archived on
+               GitHub; released 2022-03-30, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2" has no upper bound
+  abandoned    doctrine/annotations 2.0.2  via sensio/framework-extra-bundle
+               marked abandoned by its repository
+  abandoned    doctrine/cache 2.2.0  via doctrine/doctrine-bundle
+               marked abandoned by its repository; last release 2022-05-20 (4.3 years ago)
+  abandoned    hoa/compiler 3.17.08.08  via wallabag/rulerz › hoa/ruler
+               marked abandoned by its repository; last release 2017-08-08 (9.1 years ago); repository archived on
+               GitHub; last push 2021-04-29 (5.4 years ago)
+  abandoned    hoa/consistency 1.17.05.02  via wallabag/rulerz
+               marked abandoned by its repository; last release 2017-08-29 (9.0 years ago); repository archived on
+               GitHub; last push 2021-04-28 (5.4 years ago); released 2017-05-02, before PHP 8.4 GA (2024-11-21); php
+               constraint ">=5.5.0" has no upper bound
+  abandoned    hoa/event 1.17.01.13  via wallabag/rulerz › hoa/consistency › hoa/exception
+               marked abandoned by its repository; last release 2017-08-30 (9.0 years ago); repository archived on
+               GitHub; last push 2021-04-29 (5.4 years ago)
+  abandoned    hoa/exception 1.17.01.16  via wallabag/rulerz › hoa/consistency
+               marked abandoned by its repository; last release 2017-08-30 (9.0 years ago); repository archived on
+               GitHub; last push 2021-04-29 (5.4 years ago)
+  abandoned    hoa/file 1.17.07.11  via wallabag/rulerz › hoa/ruler
+               marked abandoned by its repository; last release 2017-07-11 (9.2 years ago); repository archived on
+               GitHub; last push 2018-01-23 (8.6 years ago)
+  abandoned    hoa/iterator 2.17.01.10  via wallabag/rulerz › hoa/ruler › hoa/compiler
+               marked abandoned by its repository; last release 2017-01-10 (9.7 years ago); repository archived on
+               GitHub; last push 2021-04-29 (5.4 years ago)
+  abandoned    hoa/math 1.17.05.16  via wallabag/rulerz › hoa/ruler › hoa/compiler
+               marked abandoned by its repository; last release 2017-05-16 (9.3 years ago); repository archived on
+               GitHub; last push 2021-04-29 (5.4 years ago)
+  abandoned    hoa/protocol 1.17.01.14  via wallabag/rulerz › hoa/ruler
+               marked abandoned by its repository; last release 2017-01-14 (9.7 years ago); repository archived on
+               GitHub; last push 2021-04-29 (5.4 years ago)
+  abandoned    hoa/regex 1.17.01.13  via wallabag/rulerz › hoa/ruler › hoa/compiler
+               marked abandoned by its repository; last release 2017-01-13 (9.7 years ago); repository archived on
+               GitHub; last push 2018-07-20 (8.2 years ago)
+  abandoned    hoa/ruler 2.17.05.16  via wallabag/rulerz
+               marked abandoned by its repository; last release 2017-05-16 (9.3 years ago); repository archived on
+               GitHub; last push 2021-07-10 (5.2 years ago)
+  abandoned    hoa/stream 1.17.02.21  via wallabag/rulerz › hoa/ruler › hoa/file
+               marked abandoned by its repository; last release 2017-02-21 (9.6 years ago); repository archived on
+               GitHub; last push 2021-08-09 (5.1 years ago)
+  abandoned    hoa/ustring 4.17.01.16  via wallabag/rulerz › hoa/ruler › hoa/compiler › hoa/regex
+               marked abandoned by its repository; last release 2017-01-16 (9.7 years ago); repository archived on
+               GitHub; last push 2021-04-29 (5.4 years ago)
+  abandoned    hoa/visitor 2.17.01.16  via wallabag/rulerz › hoa/ruler
+               marked abandoned by its repository; last release 2017-01-16 (9.7 years ago); repository archived on
+               GitHub; last push 2021-04-28 (5.4 years ago)
+  abandoned    hoa/zformat 1.17.01.10  via wallabag/rulerz › hoa/ruler › hoa/compiler › hoa/math
+               marked abandoned by its repository; last release 2017-01-10 (9.7 years ago); repository archived on
+               GitHub; last push 2018-02-12 (8.6 years ago)
+  abandoned    symfony/security-guard v5.4.45  via symfony/security-bundle
+               marked abandoned by its repository; repository archived on GitHub; released 2024-09-25, before PHP 8.4 GA
+               (2024-11-21); php constraint ">=7.2.5" has no upper bound
+  silent       grandt/binstring 1.0.0  via wallabag/phpepub › grandt/phpresizegif
+               last release 2015-08-13 (11.1 years ago); last push 2015-08-13 (11.1 years ago); released 2015-08-13,
+               before PHP 8.4 GA (2024-11-21); php constraint ">=5.0" has no upper bound
+  silent       grandt/phpresizegif 1.0.3  via wallabag/phpepub
+               last release 2015-05-10 (11.4 years ago); last push 2015-08-13 (11.1 years ago); released 2015-05-10,
+               before PHP 8.4 GA (2024-11-21); php constraint ">=5.3.0" has no upper bound
+  silent       grandt/phpzipmerge 1.0.4  via wallabag/phpepub › phpzip/phpzip
+               last release 2015-08-18 (11.1 years ago); last push 2015-08-18 (11.1 years ago); released 2015-08-18,
+               before PHP 8.4 GA (2024-11-21); php constraint ">=5.3.0" has no upper bound
+  silent       grandt/relativepath 1.0.2  via wallabag/phpepub
+               last release 2015-05-14 (11.3 years ago); last push 2020-04-01 (6.5 years ago); released 2015-05-14,
+               before PHP 8.4 GA (2024-11-21); php constraint ">=5.0" has no upper bound
+  silent       phpzip/phpzip 2.0.8  via wallabag/phpepub
+               last release 2015-11-16 (10.8 years ago); last push 2015-11-16 (10.8 years ago); released 2015-11-16,
+               before PHP 8.4 GA (2024-11-21); php constraint ">=5.3.0" has no upper bound
+  silent       pragmarx/random v0.2.2  via pragmarx/recovery
+               last release 2017-11-21 (8.8 years ago); last push 2017-12-18 (8.7 years ago); released 2017-11-21,
+               before PHP 8.4 GA (2024-11-21); php constraint ">=7.0" has no upper bound
+  pinned       friendsofsymfony/oauth-server-bundle dev-master  direct
+               last release 2019-01-23 (7.6 years ago); pinned to branch snapshot dev-master
+  pinned       wallabag/rulerz dev-master  direct
+               released 2023-12-24, before PHP 8.4 GA (2024-11-21); php constraint ">=7.4" has no upper bound; pinned to
+               branch snapshot dev-master
+  pinned       wallabag/rulerz-bundle dev-master  direct
+               released 2023-12-24, before PHP 8.4 GA (2024-11-21); php constraint ">=7.4" has no upper bound; pinned to
+               branch snapshot dev-master
+  old-promise  defuse/php-encryption v2.4.0  direct
+               last release 2023-06-19 (3.2 years ago); released 2023-06-19, before PHP 8.4 GA (2024-11-21); php
+               constraint ">=5.6.0" has no upper bound
+  old-promise  gregwar/captcha-bundle v2.2.0  direct
+               released 2022-01-11, before PHP 8.4 GA (2024-11-21); php constraint ">=7.1.3" has no upper bound
+  old-promise  mgargano/simplehtmldom 1.5  direct
+               last release 2014-01-05 (12.7 years ago); last push 2022-08-04 (4.1 years ago); released 2014-01-05,
+               before PHP 8.4 GA (2024-11-21); php constraint ">=5.3.0" has no upper bound
+  old-promise  pragmarx/recovery v0.2.1  direct
+               last release 2021-08-15 (5.1 years ago); released 2021-08-15, before PHP 8.4 GA (2024-11-21); php
+               constraint ">=7.0" has no upper bound
+  old-promise  scheb/2fa-bundle v5.13.2  direct
+               released 2022-04-16, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound
+  old-promise  spiriitlabs/form-filter-bundle v10.0.2  direct
+               released 2024-08-23, before PHP 8.4 GA (2024-11-21); php constraint ">=7.4" has no upper bound
+  old-promise  symfony/asset v5.4.45  direct
+               released 2024-10-22, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound
+  old-promise  symfony/browser-kit v5.4.45  direct
+               released 2024-10-22, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound
+  old-promise  symfony/config v5.4.46  direct
+               released 2024-10-30, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound
+  old-promise  symfony/console v5.4.47  direct
+               released 2024-11-06, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound
+  old-promise  symfony/dependency-injection v5.4.48  direct
+               released 2024-11-20, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound
+  old-promise  symfony/doctrine-bridge v5.4.48  direct
+               released 2024-11-20, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound
+  old-promise  symfony/error-handler v5.4.46  direct
+               released 2024-11-05, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound
+  old-promise  symfony/event-dispatcher v5.4.45  direct
+               released 2024-09-25, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound
+  old-promise  symfony/event-dispatcher-contracts v2.5.4  direct
+               released 2024-09-25, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound
+  old-promise  symfony/expression-language v5.4.45  direct
+               released 2024-10-04, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound
+  old-promise  symfony/filesystem v5.4.45  direct
+               released 2024-10-22, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound
+  old-promise  symfony/finder v5.4.45  direct
+               released 2024-09-28, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound
+  old-promise  symfony/form v5.4.45  direct
+               released 2024-10-08, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound
+  old-promise  symfony/framework-bundle v5.4.45  direct
+               released 2024-10-22, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound
+  old-promise  symfony/google-mailer v5.4.45  direct
+               released 2024-09-25, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound
+  old-promise  symfony/intl v5.4.47  direct
+               released 2024-11-08, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound
+  old-promise  symfony/monolog-bundle v3.10.0  direct
+               released 2023-11-06, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound
+  old-promise  symfony/options-resolver v5.4.45  direct
+               released 2024-09-25, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound
+  old-promise  symfony/proxy-manager-bridge v5.4.45  direct
+               released 2024-09-25, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound
+  old-promise  symfony/security-bundle v5.4.45  direct
+               released 2024-09-25, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound
+  old-promise  symfony/templating v5.4.45  direct
+               released 2024-10-22, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound
+  old-promise  symfony/translation-contracts v2.5.4  direct
+               released 2024-09-25, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound
+  old-promise  symfony/twig-bundle v5.4.45  direct
+               released 2024-09-25, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound
+  old-promise  symfony/webpack-encore-bundle v1.17.2  direct
+               released 2023-09-26, before PHP 8.4 GA (2024-11-21); php constraint ">=7.1.3" has no upper bound
+  old-promise  wallabag/phpepub 4.0.10  direct
+               last release 2022-03-21 (4.5 years ago); released 2022-03-21, before PHP 8.4 GA (2024-11-21); php
+               constraint ">=5.3.0" has no upper bound
+
+medium (11)
+  pinned       wallabag/rulerz-bridge dev-master  via wallabag/rulerz-bundle
+               released 2023-12-24, before PHP 8.4 GA (2024-11-21); php constraint ">=7.4" has no upper bound; pinned to
+               branch snapshot dev-master
+  old-promise  clue/stream-filter v1.7.0  via j0k3r/graby › php-http/message
+               released 2023-12-20, before PHP 8.4 GA (2024-11-21); php constraint ">=5.3" has no upper bound
+  old-promise  friendsofphp/proxy-manager-lts v1.0.18  via symfony/proxy-manager-bridge
+               released 2024-03-20, before PHP 8.4 GA (2024-11-21); php constraint ">=7.1" has no upper bound
+  old-promise  smalot/pdfparser v1.1.0  via j0k3r/graby
+               released 2021-08-03, before PHP 8.4 GA (2024-11-21); php constraint ">=7.1" has no upper bound
+  old-promise  symfony/property-access v5.4.45  via babdev/pagerfanta-bundle
+               released 2024-09-25, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound
+  old-promise  symfony/psr-http-message-bridge v2.3.1  via sentry/sentry-symfony
+               released 2023-07-26, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound
+  old-promise  symfony/serializer v5.4.45  via friendsofsymfony/jsrouting-bundle
+               released 2024-09-25, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound
+  old-promise  symfony/service-contracts v2.5.4  via doctrine/doctrine-bundle
+               released 2024-09-25, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound
+  old-promise  symfony/var-dumper v5.4.48  via symfony/error-handler
+               released 2024-11-08, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound
+  old-promise  willdurand/jsonp-callback-validator v2.0.0  via friendsofsymfony/jsrouting-bundle
+               last release 2022-01-30 (4.6 years ago); last push 2023-07-29 (3.1 years ago); released 2022-01-30,
+               before PHP 8.4 GA (2024-11-21); php constraint ">=7.1.0" has no upper bound
+  old-promise  willdurand/negotiation 3.1.0  via friendsofsymfony/rest-bundle
+               last release 2022-01-30 (4.6 years ago); last push 2023-08-03 (3.1 years ago); released 2022-01-30,
+               before PHP 8.4 GA (2024-11-21); php constraint ">=7.1.0" has no upper bound
+
+low (2)
+  stale        friendsofsymfony/oauth2-php 1.3.1  via friendsofsymfony/oauth-server-bundle
+               last release 2021-04-06 (5.4 years ago)
+  stale        phpdocumentor/reflection-common 2.2.0  via nelmio/api-doc-bundle › phpdocumentor/reflection-docblock
+               last release 2020-06-27 (6.2 years ago)
+
+200 packages checked · abandoned 19 · silent 8 · pinned 4 · old-promise 41 · stale 2 · unknown 0 · finished 18 ·
+ok 108
+priority: critical 3 · high 58 · medium 11 · low 2
+Data as of 2026-09-15 (package repositories, GitHub). Run composer lockrot --format=json for details.
+```
+
+## The same run as JSON
+
+`--format=json` is the only format that carries every field. Below is the document header and the
+first finding, complete except for signals S3, S4 and S5, which `…` stands in for:
+
+```json
+{
+    "lockrot": {
+        "version": "0.1.0",
+        "schema": 1
+    },
+    "generated_at": "2026-09-15T17:31:32+00:00",
+    "packages_checked": 200,
+    "not_from_composer_repository": 0,
+    "network_failures": false,
+    "counts": {
+        "abandoned": 19,
+        "silent": 8,
+        "pinned": 4,
+        "old-promise": 41,
+        "stale": 2,
+        "unknown": 0,
+        "finished": 18,
+        "ok": 108
+    },
+    "priorities": {
+        "critical": 3,
+        "high": 58,
+        "medium": 11,
+        "low": 2,
+        "none": 126
+    },
+    "baseline": null,
+    "notes": [],
+    "findings": [
+        {
+            "package": "sensio/framework-extra-bundle",
+            "version": "v6.2.10",
+            "verdict": "abandoned",
+            "priority": "critical",
+            "direct": true,
+            "dev": false,
+            "signals": [
+                {
+                    "id": "S1",
+                    "level": "high",
+                    "summary": "marked abandoned by its repository, replacement: Symfony",
+                    "data": {
+                        "replacement": "Symfony"
+                    }
+                },
+                {
+                    "id": "S2",
+                    "level": "warn",
+                    "summary": "last release 2023-02-24 (3.6 years ago)",
+                    "data": {
+                        "last_release": "2023-02-24T14:57:12+00:00",
+                        "last_version": "v6.2.10",
+                        "years": 3.6
+                    }
+                },
+                …
+            ],
+            "chain": [
+                "sensio/framework-extra-bundle"
+            ],
+            "evidence": "marked abandoned by its repository, replacement: Symfony; last release 2023-02-24 (3.6 years ago); repository archived on GitHub; last push 2023-02-24 (3.6 years ago); released 2023-02-24, before PHP 8.4 GA (2024-11-21); php constraint \">=7.2.5\" has no upper bound",
+            "allowlist_reason": null,
+            "note": null,
+            "data_date": "2026-09-15T17:31:32+00:00"
+        },
+        …
+    ]
+}
+```
+
+The three cut signals have the same shape as S1 and S2. So do the other 199 findings, each with its
+own `priority`, `direct`, `dev`, `signals`, `chain`, `evidence`, `allowlist_reason`, `note` and
+`data_date`.
+
+## A clean run
+
+Most projects are not wallabag. Run against `tests/fixtures/skeletons/cakephp`, a 20-package lock
+with nothing to report, the same command prints:
+
+```text
+No dependency rot found in 20 packages.
+
+20 packages checked · abandoned 0 · silent 0 · pinned 0 · old-promise 0 · stale 0 · unknown 0
+· finished 11 · ok 9
+Data as of 2026-09-15 (package repositories, GitHub). Run composer lockrot --format=json for
+details.
+```
+
+The `priority:` line is printed only when the run flagged something, so a clean run does not carry
+one. The exit code is `0`; see [ci.md](ci.md).
+
+## Related
+
+- [verdicts.md](verdicts.md) — what each verdict and priority means
+- [ci.md](ci.md) — the other five output formats
+- [baseline.md](baseline.md) — accepting the findings above so CI fails only on new ones

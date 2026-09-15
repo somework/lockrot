@@ -1,0 +1,146 @@
+# Running lockrot in CI
+
+Add one step to the pipeline and pick the threshold that should fail it:
+
+```bash
+composer lockrot --fail-on=silent --target-php=8.4
+```
+
+With a committed [baseline](baseline.md) the same command fails only on new or worsened findings; no extra flag is
+needed, the file is picked up automatically. To run without installing the plugin, use the PHAR — [phar.md](phar.md)
+has the CI snippet.
+
+## Exit codes
+
+| Code | Meaning |
+|---|---|
+| `0` | No finding reached the `fail-on` threshold (or `fail-on=none`) |
+| `1` | A finding reached or exceeded the `fail-on` threshold |
+| `2` | Tool or configuration error (unparsable `composer.json`/`composer.lock`, invalid config value, unreadable or unwritable [baseline](baseline.md)) |
+
+A network failure — a configured Composer repository or GitHub unreachable — never turns into a non-zero exit code on
+its own. It is reported as a note, and the checks that could not run are treated as absent evidence.
+`--strict-network` changes that to exit `1`. This also covers `--offline` runs where a locked package has no cached
+metadata: it is reported as a failure, not silently skipped. A `composer.lock` entry that Composer's own loader cannot
+load (missing `name`/`version`, an unnormalizable version, a malformed entry) stops the report with exit `2` rather
+than being skipped.
+
+As a Composer plugin, a `composer.json` that Composer itself cannot parse never reaches lockrot at all: Composer parses
+the project's manifest while collecting plugin commands, before any plugin class is loaded, so it stops with its own
+exit `1` first. `composer lockrot` on an unparsable `composer.json` exits `1`, not `2`. The standalone PHAR reads and
+validates `composer.json` itself, so the same failure there is exit `2`. `lockrot.phar self-update` uses the same three
+codes with its own meanings; see [phar.md](phar.md).
+
+The [install-time summary](install-time.md) never sets an exit code unless `install-time-strict` is on. The exit code
+is identical for every output format below; only the output changes.
+
+## `--format=github`
+
+Workflow commands, one per finding, so every flagged package becomes an annotation on its own line of `composer.lock`
+in the pull request's Files changed view:
+
+```yaml
+- name: lockrot
+  run: composer lockrot --format=github --fail-on=silent --target-php=8.4
+  env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
+
+```text
+::error file=composer.lock,line=8010,title=lockrot%3A abandoned (critical)::sensio/framework-extra-bundle v6.2.10: marked abandoned by its repository, replacement: Symfony; …
+```
+
+Findings at or above `--fail-on` are annotated as errors, everything else flagged as warnings, and the rows that only
+`--all` shows as notices — so the annotation colour matches the exit code. The report's own notes are printed as
+notices too, so a run can emit notices without `--all`. The [priority](verdicts.md) never changes any of that: a
+`critical` finding below `--fail-on` is still a warning. With a [baseline](baseline.md) in place, findings it already
+carries drop to notices for the same reason. GitHub renders only a limited number of annotations per step, so
+on a large lock file the annotations are the headline and the step's own log holds every finding. The summary line at
+the end of the output always states the full counts, and `--format=sarif` uploads the complete set.
+
+## `--format=sarif`
+
+A [SARIF 2.1.0](https://json.schemastore.org/sarif-2.1.0.json) document for GitHub code scanning, which keeps the
+findings in the repository's Security tab and tracks them across runs. The upload step needs the
+`security-events: write` permission:
+
+```yaml
+permissions:
+  contents: read
+  security-events: write
+
+steps:
+  - uses: actions/checkout@v4
+  - name: lockrot
+    run: composer lockrot --format=sarif --fail-on=silent --target-php=8.4 > lockrot.sarif
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  - name: Upload SARIF
+    if: always()
+    uses: github/codeql-action/upload-sarif@v4
+    with:
+      sarif_file: lockrot.sarif
+```
+
+`if: always()` keeps the upload running when `--fail-on` already failed the step. Each result carries the
+[priority](verdicts.md) as `rank`, the field SARIF 2.1.0 defines for it, and the same result's `properties` carry
+`priority`, `direct` and `dev` by name. The rule a result points at and its `level` follow the verdict. Both `github`
+and `sarif` point at `composer.lock` in the checkout root, so run them from the directory that holds the lock file.
+
+## `--format=gitlab`
+
+A [GitLab Code Quality](https://docs.gitlab.com/ci/testing/code_quality/#implement-a-custom-tool) report: a JSON array
+with one issue per flagged finding (every finding with `--all`), so a merge request shows them inline in the diff of
+`composer.lock`. Publish it as a `codequality` artifact:
+
+```yaml
+lockrot:
+  script:
+    - composer lockrot --format=gitlab --fail-on=silent --target-php=8.4 > lockrot-codequality.json
+  artifacts:
+    reports:
+      codequality: lockrot-codequality.json
+```
+
+Code Quality has no title field of its own, so each issue's description opens with the package, the version and the
+same `<verdict> (<priority>)` phrase the GitHub annotation title uses:
+
+```text
+sensio/framework-extra-bundle v6.2.10 — abandoned (critical): marked abandoned by its repository, replacement: Symfony; …
+```
+
+Severity follows the same rule as the GitHub and SARIF level: a finding at or above `--fail-on` is `major`, any other
+flagged verdict `minor`, and a row only `--all` shows (or one a [baseline](baseline.md) already knows) `info`. Each
+issue's fingerprint is a stable hash of the package name and verdict, so a version bump that keeps the same verdict —
+or a reformatted lock that moves the entry to a different line — keeps the same GitLab issue identity. The priority is
+deliberately not part of it, so moving a package from `require` to `require-dev` does not open a second issue for a
+finding GitLab already tracks. GitLab's Code Quality format has no field for a document-level note, so notes are
+dropped here; use `--format=json` when you need them.
+
+## `--format=markdown`
+
+A report shaped for a pull-request comment: a heading with the flagged/checked counts, a table of the findings led by
+their [priority](verdicts.md), the report's notes as a bullet list, and a `<sub>` footer with the full summary.
+
+```bash
+composer lockrot --format=markdown --fail-on=silent --target-php=8.4 > comment.md
+gh pr comment --body-file comment.md
+```
+
+```markdown
+| Priority | Package | Version | Verdict | Evidence | Via |
+|---|---|---|---|---|---|
+| critical | `sensio/framework-extra-bundle` | v6.2.10 | **abandoned** | marked abandoned by its repository, replacement: Symfony; … | direct |
+| high | `friendsofsymfony/oauth-server-bundle` | dev-master | **pinned** | last release 2019-01-23 (7.6 years ago); pinned to branch snapshot dev-master | direct |
+```
+
+The evidence cells are abridged here; the real cells carry every signal. Rows keep the report's order, so a reviewer
+reads down the first column and stops where the rows stop applying. A clean run prints
+`### lockrot: no dependency rot found in N packages` and no table. With a [baseline](baseline.md) in place, a second
+line under the heading carries the same `known`/`new`/`worsened`/`stale` counts as the table format, and a verdict is
+bold only when the baseline has not already accepted it.
+
+## `--format=json`
+
+The complete report, and the only format that carries every field: per-finding `signals`, `chain`, `evidence` and
+`data_date`, plus the document's `notes`. [example-run.md](example-run.md) has a worked excerpt.
