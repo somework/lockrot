@@ -19,7 +19,9 @@
     // every mutant actually run: 269 mutants over src/Verdict + src/Signal, 264 killed, 5 escaped,
     // 0 timed out -> MSI = Covered MSI = 98.14%, 1m21s on 4 threads. The 5 escapes are all in
     // src/Signal/ConstraintOpenness.php (:46 CastInt, :48 CastInt/IncrementInteger/DecrementInteger,
-    // :62 ConcatOperandRemoval) and are pre-existing gaps the old timeout had been hiding.
+    // :62 ConcatOperandRemoval); each was checked by hand and is equivalent (numeric strings compare
+    // numerically, every mutated integer stays below any PHP major, and normalize("8.4") equals
+    // normalize("8.4.0")), so they are the honest floor of this scope, not a test gap.
     //
     // Extending source.directories to src/Output + src/Analyzer was measured and rejected for now:
     // 1007 mutants, 941 killed, 66 escaped, 0 timed out -> 93.45%, 3m42s, below this threshold. 59

@@ -218,8 +218,10 @@ final class TableFormatter implements FormatterInterface
     }
 
     /**
-     * Wrapped to $wrap columns, long words cut rather than allowed to overflow, each resulting line
-     * escaped. Wrapping happens before escaping: escaping inserts backslashes the terminal never
+     * Wrapped to $wrap columns, each resulting line escaped. With $cut a word longer than the width
+     * is cut rather than allowed to overflow — what the rows need, so a row is never wider than the
+     * terminal. The summary block passes false: its only long tokens are paths (a baseline file in
+     * a note), and a path split across two lines cannot be copied, so there the line may overflow. Wrapping happens before escaping: escaping inserts backslashes the terminal never
      * shows, and counting those would wrap early. Lines are right-trimmed — a run of spaces in the
      * source text can otherwise end a line with invisible padding.
      *
@@ -233,10 +235,10 @@ final class TableFormatter implements FormatterInterface
      *
      * @return list<string>
      */
-    private static function wrap(string $text, int $wrap): array
+    private static function wrap(string $text, int $wrap, bool $cut = true): array
     {
         $lines = [];
-        foreach (explode("\n", wordwrap($text, $wrap, "\n", true)) as $line) {
+        foreach (explode("\n", wordwrap($text, $wrap, "\n", $cut)) as $line) {
             $lines[] = self::escape(rtrim($line));
         }
 
@@ -247,8 +249,9 @@ final class TableFormatter implements FormatterInterface
      * The block every run ends with: the counts, the priority totals, what the baseline made of the
      * run, the data date, and the notes.
      *
-     * Wrapped like the rows, but to the full width and with no indent: these lines are facts in
-     * their own right rather than continuations of a label, so nothing hangs under a column. The
+     * Wrapped like the rows, but to the full width, with no indent, and without cutting a long
+     * token (see {@see wrap()}): these lines are facts in their own right rather than continuations
+     * of a label, so nothing hangs under a column. The
      * strings themselves are untouched — {@see Report::summaryLine()} is shared with the `github`
      * format, which pins itself against it, so only this renderer decides where it folds.
      *
@@ -281,7 +284,7 @@ final class TableFormatter implements FormatterInterface
         $wrap = max(self::MIN_WRAP_WIDTH, $this->context->terminalWidth());
         $lines = [];
         foreach ($texts as $text) {
-            foreach (self::wrap($text, $wrap) as $line) {
+            foreach (self::wrap($text, $wrap, false) as $line) {
                 $lines[] = $line;
             }
         }

@@ -289,6 +289,23 @@ final class TableFormatterTest extends TestCase
         self::assertStringContainsString("note: GitHub token not set: repository activity checked only\nfor 2 candidate packages", $plain);
     }
 
+    /**
+     * A summary line folds at spaces only: a single token longer than the width — an absolute
+     * baseline path in a note — is kept whole on its own line rather than cut mid-path, which
+     * would leave the reader unable to copy it. Rows keep cutting long tokens, so they never exceed
+     * the terminal; the summary block trades that guarantee for an intact path.
+     */
+    public function testALongTokenInTheSummaryBlockIsNeverCut(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $path = '/Users/someone/projects/with/a/rather/long/directory/name/lockrot-baseline.json';
+        $report = new Report([new Finding('vendor/ok', '1.0.0', Verdict::OK, [], ['vendor/ok'], null, $at)], ['baseline written to '.$path], $at, 1, 0, false);
+        $lines = $this->plainLines($this->formatter(60)->format($report));
+
+        self::assertContains($path, $lines, 'the path stays one whole line');
+        self::assertContains('note: baseline written to', $lines);
+    }
+
     public function testCleanReport(): void
     {
         $at = new \DateTimeImmutable(self::AT);
