@@ -138,6 +138,36 @@ final class LockrotCommandTest extends TestCase
     }
 
     /**
+     * Snapshots COMPOSER_CACHE_DIR/COMPOSER_HOME, sets them to $cacheDir/$home for the duration of
+     * $body, and restores each in a finally block — putEnv() when the previous value was a string,
+     * clearEnv() when it was false — so a caller running with these already set (e.g. a nested
+     * Composer invocation) is left the way it found them rather than wiped.
+     *
+     * @param callable(): void $body
+     */
+    private function withComposerEnv(string $cacheDir, string $home, callable $body): void
+    {
+        $previousCacheDir = Platform::getEnv('COMPOSER_CACHE_DIR');
+        $previousHome = Platform::getEnv('COMPOSER_HOME');
+        Platform::putEnv('COMPOSER_CACHE_DIR', $cacheDir);
+        Platform::putEnv('COMPOSER_HOME', $home);
+        try {
+            $body();
+        } finally {
+            if ($previousCacheDir === false) {
+                Platform::clearEnv('COMPOSER_CACHE_DIR');
+            } else {
+                Platform::putEnv('COMPOSER_CACHE_DIR', $previousCacheDir);
+            }
+            if ($previousHome === false) {
+                Platform::clearEnv('COMPOSER_HOME');
+            } else {
+                Platform::putEnv('COMPOSER_HOME', $previousHome);
+            }
+        }
+    }
+
+    /**
      * Runs the command with genuinely separate stdout/stderr streams, without
      * CommandTester's `capture_stderr_separately` option: on PHP 8.5 that option
      * triggers a `ReflectionProperty::setAccessible()` deprecation inside
@@ -336,43 +366,28 @@ final class LockrotCommandTest extends TestCase
         ]));
 
         chdir($project);
-        // Restore whatever the surrounding environment had before this test, rather than
-        // unconditionally clearing: a caller running with these already set (e.g. a nested Composer
-        // invocation) would otherwise have them wiped instead of restored.
-        $previousCacheDir = Platform::getEnv('COMPOSER_CACHE_DIR');
-        $previousHome = Platform::getEnv('COMPOSER_HOME');
-        Platform::putEnv('COMPOSER_CACHE_DIR', $cacheDir);
-        Platform::putEnv('COMPOSER_HOME', $home);
         try {
-            $command = $this->buildCommand([ServiceFactory::class, 'createAnalyzer']);
-            $application = $command->getApplication();
-            self::assertInstanceOf(Application::class, $application);
-            $application->getComposer(false, false);
+            $this->withComposerEnv($cacheDir, $home, function () use ($cacheDir): void {
+                $command = $this->buildCommand([ServiceFactory::class, 'createAnalyzer']);
+                $application = $command->getApplication();
+                self::assertInstanceOf(Application::class, $application);
+                $application->getComposer(false, false);
 
-            $tester = new CommandTester($command);
-            $code = $tester->execute(['--offline' => true, '--format' => 'json']);
+                $tester = new CommandTester($command);
+                $code = $tester->execute(['--offline' => true, '--format' => 'json']);
 
-            self::assertSame(0, $code, $tester->getDisplay());
-            self::assertSame([], $this->fetchedFilesUnder($cacheDir), 'nothing may be fetched while offline');
-            $json = json_decode($tester->getDisplay(), true);
-            self::assertIsArray($json);
-            self::assertIsArray($json['notes']);
-            $unavailable = array_values(array_filter(
-                $json['notes'],
-                static fn ($note): bool => \is_string($note) && strpos($note, 'Repository metadata unavailable') === 0
-            ));
-            self::assertCount(1, $unavailable, (string) json_encode($json['notes']));
+                self::assertSame(0, $code, $tester->getDisplay());
+                self::assertSame([], $this->fetchedFilesUnder($cacheDir), 'nothing may be fetched while offline');
+                $json = json_decode($tester->getDisplay(), true);
+                self::assertIsArray($json);
+                self::assertIsArray($json['notes']);
+                $unavailable = array_values(array_filter(
+                    $json['notes'],
+                    static fn ($note): bool => \is_string($note) && strpos($note, 'Repository metadata unavailable') === 0
+                ));
+                self::assertCount(1, $unavailable, (string) json_encode($json['notes']));
+            });
         } finally {
-            if ($previousCacheDir === false) {
-                Platform::clearEnv('COMPOSER_CACHE_DIR');
-            } else {
-                Platform::putEnv('COMPOSER_CACHE_DIR', $previousCacheDir);
-            }
-            if ($previousHome === false) {
-                Platform::clearEnv('COMPOSER_HOME');
-            } else {
-                Platform::putEnv('COMPOSER_HOME', $previousHome);
-            }
             Platform::clearEnv('COMPOSER_DISABLE_NETWORK');
         }
     }
@@ -404,9 +419,7 @@ final class LockrotCommandTest extends TestCase
         ]));
 
         chdir($project);
-        Platform::putEnv('COMPOSER_CACHE_DIR', $cacheDir);
-        Platform::putEnv('COMPOSER_HOME', $home);
-        try {
+        $this->withComposerEnv($cacheDir, $home, function (): void {
             $command = $this->buildCommand([ServiceFactory::class, 'createAnalyzer']);
             $application = $command->getApplication();
             self::assertInstanceOf(Application::class, $application);
@@ -430,10 +443,7 @@ final class LockrotCommandTest extends TestCase
                 $invocations,
                 'a PRE_FILE_DOWNLOAD listener registered on the Composer instance must see lockrot\'s own repository metadata requests'
             );
-        } finally {
-            Platform::clearEnv('COMPOSER_CACHE_DIR');
-            Platform::clearEnv('COMPOSER_HOME');
-        }
+        });
     }
 
     /**

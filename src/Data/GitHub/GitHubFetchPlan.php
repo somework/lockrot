@@ -16,13 +16,15 @@ final class GitHubFetchPlan
 {
     /** @var list<string> */
     private array $repos;
+    private int $checkedPackages;
     private int $skippedNoToken;
     private int $skippedBudget;
 
     /** @param list<string> $repos unique repos, ordered by package name */
-    public function __construct(array $repos, int $skippedNoToken, int $skippedBudget)
+    public function __construct(array $repos, int $checkedPackages, int $skippedNoToken, int $skippedBudget)
     {
         $this->repos = $repos;
+        $this->checkedPackages = $checkedPackages;
         $this->skippedNoToken = $skippedNoToken;
         $this->skippedBudget = $skippedBudget;
     }
@@ -31,6 +33,16 @@ final class GitHubFetchPlan
     public function repos(): array
     {
         return $this->repos;
+    }
+
+    /**
+     * Packages that will receive activity data: every package whose repository was selected, plus
+     * every package that shares a repository already selected by an earlier package. Two packages
+     * from the same repository both count here even though repos() lists that repository once.
+     */
+    public function checkedPackages(): int
+    {
+        return $this->checkedPackages;
     }
 
     /** Packages skipped because no token is set and they are not candidates for an activity verdict. */

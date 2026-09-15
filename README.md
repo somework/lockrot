@@ -312,6 +312,12 @@ failure, not silently skipped. A `composer.lock` entry that Composer's own loade
 (missing `name`/`version`, an unnormalizable version, or a malformed entry) stops the report with
 exit `2` rather than being skipped.
 
+As a Composer plugin, a `composer.json` that Composer itself cannot parse never reaches lockrot at
+all: Composer parses the project's manifest while collecting plugin commands, before any plugin
+class is loaded, so it stops with its own exit `1` first — `composer lockrot` on a broken
+`composer.json` exits `1`, not `2`. The standalone PHAR reads and validates `composer.json` itself,
+so the same failure there is exit `2`.
+
 These codes are `composer lockrot`'s own. The [install-time summary](#install-time-summary) never
 sets an exit code — it only prints — unless `install-time-strict` is on, in which case lockrot
 stops the transaction and `composer require`/`update`/`install` exits `1` through Composer's own

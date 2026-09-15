@@ -40,3 +40,10 @@
   threshold values must be integers.
 - Releases publish `lockrot.phar` with a `lockrot.phar.sha256` checksum; GPG signing and a Docker
   image are deferred to a later release.
+- The standalone PHAR (and any lock-only run without an existing Composer instance) sets
+  `COMPOSER_ROOT_VERSION=1.0.0` when the variable is unset: lockrot never reads the root package's
+  version, so Composer's VCS probing (`git`/`hg`/`fossil`/`svn`, about 5 of the 6 seconds a PHAR run
+  took on a lock-only directory) and its "could not detect the root package version" warning on
+  stderr are skipped.
+- The "GitHub token not set" note counts packages whose repository activity was checked, not
+  distinct repositories, so packages sharing one repository are no longer under-reported.

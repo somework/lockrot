@@ -27,6 +27,7 @@ final class GitHubFetchPlanner
         $repos = [];
         /** @var array<string, true> $seen */
         $seen = [];
+        $checkedPackages = 0;
         $skippedNoToken = 0;
         $skippedBudget = 0;
         foreach ($repoByPackage as $package => $repo) {
@@ -35,6 +36,9 @@ final class GitHubFetchPlanner
                 continue;
             }
             if (isset($seen[$repo])) {
+                // A repository already selected by an earlier package: this package receives the
+                // same activity data without adding another request.
+                ++$checkedPackages;
                 continue;
             }
             if (!$this->hasToken && \count($repos) >= $this->budget) {
@@ -43,8 +47,9 @@ final class GitHubFetchPlanner
             }
             $seen[$repo] = true;
             $repos[] = $repo;
+            ++$checkedPackages;
         }
 
-        return new GitHubFetchPlan($repos, $skippedNoToken, $skippedBudget);
+        return new GitHubFetchPlan($repos, $checkedPackages, $skippedNoToken, $skippedBudget);
     }
 }

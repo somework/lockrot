@@ -19,6 +19,9 @@ final class PluginTest extends TestCase
         if (getenv('LOCKROT_E2E') !== '1') {
             self::markTestSkipped('set LOCKROT_E2E=1 to run the e2e plugin test (needs network and the composer binary)');
         }
+        if (getenv('GITHUB_TOKEN') === false || getenv('GITHUB_TOKEN') === '') {
+            self::markTestSkipped('set GITHUB_TOKEN: anonymous GitHub requests hit the 60/h rate limit and change the expected verdicts');
+        }
         $this->dir = sys_get_temp_dir().'/lockrot-e2e-'.uniqid();
         mkdir($this->dir);
     }
@@ -79,8 +82,19 @@ final class PluginTest extends TestCase
         $json = json_decode($run->getOutput(), true);
         self::assertIsArray($json, $run->getErrorOutput().$run->getOutput());
         self::assertIsArray($json['findings']);
+        self::assertIsArray($json['notes']);
         $verdicts = array_column($json['findings'], 'verdict', 'package');
-        self::assertContains($verdicts['phpzip/phpzip'], ['silent', 'stale'], 'without a GitHub token phpzip may be stale instead of silent');
+        // Even with GITHUB_TOKEN set, a shared CI token can be rate-limited by the time this runs,
+        // which drops the S4 (repository push) signal. S2 (no stable release) and S5 (old release,
+        // open-ended constraint) still fire on their own, giving old-promise rather than silent — and
+        // old-promise outranks stale in verdict precedence, so those are the only two verdicts phpzip
+        // can land on here.
+        $rateLimited = (bool) preg_grep('/rate limit/', $json['notes']);
+        if ($rateLimited) {
+            self::assertSame('old-promise', $verdicts['phpzip/phpzip'], (string) json_encode($json['notes']));
+        } else {
+            self::assertSame('silent', $verdicts['phpzip/phpzip']);
+        }
         self::assertSame($verdicts['phpzip/phpzip'] === 'silent' ? 1 : 0, $run->getExitCode());
 
         $alias = $this->composer(['rot', '--format=json'], [], 120);

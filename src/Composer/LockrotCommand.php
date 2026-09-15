@@ -88,7 +88,38 @@ final class LockrotCommand extends BaseCommand
             // Platform::getEnv(), which consults $_SERVER and $_ENV first.
             Platform::putEnv('COMPOSER_DISABLE_NETWORK', '1');
         }
+        $this->quietRootVersionGuessing();
         parent::initialize($input, $output);
+    }
+
+    /**
+     * lockrot never reads the root package's own version (it inspects composer.lock, not the
+     * project's own release), so there is nothing for it to lose by pre-empting Composer's guess.
+     * Without COMPOSER_ROOT_VERSION set, RootPackageLoader falls back to VersionGuesser, which
+     * shells out to git/hg/fossil/svn looking for a tag/branch to derive a version from (2.10.3
+     * Package/Loader/RootPackageLoader.php:95-96, warning at :108-113; 2.2.25 :88-89, default
+     * :100), and then warns "could not detect the root package version, defaulting to '1.0.0'".
+     * Setting the variable to that same default up front skips both the probing and the warning.
+     *
+     * This has to run here, before parent::initialize(), rather than in resolveComposer(): Composer's
+     * own BaseCommand::initialize() (called via parent::initialize() below) already builds the first
+     * Composer instance itself, through tryComposer()/getComposer(false) (2.10.3
+     * Command/BaseCommand.php:240, 2.2.25 :159) — before this command's execute() and
+     * composerBootstrap()/resolveComposer() ever run. By the time resolveComposer() calls
+     * tryComposer() again, that instance already exists and is returned as-is, so setting the
+     * variable there is too late to prevent the guess that already happened during initialize().
+     *
+     * In plugin mode a Composer instance already exists by the time any of this runs — built while
+     * Composer's own Console\Application::doRun() was collecting plugin commands, long before
+     * initialize() — so tryComposer() here only returns that cached instance and never re-triggers
+     * VersionGuesser regardless. This guard therefore only takes effect on the path that has no
+     * pre-existing instance to reuse: the standalone PHAR, or any other lock-only invocation.
+     */
+    private function quietRootVersionGuessing(): void
+    {
+        if (Platform::getEnv('COMPOSER_ROOT_VERSION') === false || Platform::getEnv('COMPOSER_ROOT_VERSION') === '') {
+            Platform::putEnv('COMPOSER_ROOT_VERSION', '1.0.0');
+        }
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

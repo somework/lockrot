@@ -205,7 +205,7 @@ final class Analyzer
         if (!$this->github->hasToken() && $anyGitHubRepo) {
             $notes[] = \sprintf(
                 'GitHub token not set: repository activity checked for %d candidate packages, %d packages skipped (set GITHUB_TOKEN to check all)',
-                \count($plan->repos()),
+                $plan->checkedPackages(),
                 $plan->skippedNoToken() + $plan->skippedBudget()
             );
         }

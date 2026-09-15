@@ -25,6 +25,7 @@ final class GitHubFetchPlannerTest extends TestCase
         self::assertSame(['o/a'], $plan->repos());
         self::assertSame(1, $plan->skippedBudget(), 'b/b is a candidate but the budget was spent');
         self::assertSame(1, $plan->skippedNoToken(), 'c/c is not a candidate and there is no token');
+        self::assertSame(1, $plan->checkedPackages(), 'only a/a actually receives activity data');
     }
 
     public function testWithoutTokenAndNoCandidatesFetchesNothingAndCountsEveryPackage(): void
@@ -39,6 +40,8 @@ final class GitHubFetchPlannerTest extends TestCase
     public function testDeduplicatesRepos(): void
     {
         $planner = new GitHubFetchPlanner(true);
-        self::assertSame(['o/mono'], $planner->select(['a/a' => 'o/mono', 'a/b' => 'o/mono'], [])->repos());
+        $plan = $planner->select(['a/a' => 'o/mono', 'a/b' => 'o/mono'], []);
+        self::assertSame(['o/mono'], $plan->repos());
+        self::assertSame(2, $plan->checkedPackages(), 'both packages receive the shared repository\'s activity data');
     }
 }
