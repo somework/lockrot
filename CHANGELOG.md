@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-09-16
+
 ### Added
 
 - Every finding now carries a **priority** next to its verdict: `critical`, `high`, `medium`, `low`,
@@ -159,5 +161,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The "GitHub token not set" note counts packages whose repository activity was checked, not
   distinct repositories, so packages sharing one repository are no longer under-reported.
 
-[Unreleased]: https://github.com/somework/lockrot/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/somework/lockrot/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/somework/lockrot/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/somework/lockrot/releases/tag/v0.1.0
