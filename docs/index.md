@@ -106,9 +106,10 @@ against. It reads `composer.lock` and `composer.json`, and it writes to neither.
 ## In CI
 
 Nothing fails a build until you ask it to: `fail-on` is `none` by default, exit `1` means a finding
-reached the threshold you chose, and exit `2` is reserved for lockrot's own errors. Recipes for
-GitHub Actions, GitLab CI and PR comments are in [In CI](ci.md); a
-[baseline](baseline.md) lets you accept what you have today and fail only on what arrives tomorrow.
+reached the threshold you chose, and exit `2` is reserved for lockrot's own errors. On GitHub
+Actions, `uses: somework/lockrot-action@v1` is the whole step. Recipes for that, GitLab CI and PR
+comments are in [In CI](ci.md); a [baseline](baseline.md) lets you accept what you have today and
+fail only on what arrives tomorrow.
 
 ## Read on
 

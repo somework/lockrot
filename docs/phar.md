@@ -35,7 +35,10 @@ stays on `github.com`.
 > rather than silent. To close it, resolve the tag once through
 > `GET /repos/somework/lockrot/releases/latest` and download both assets from that pinned tag.
 
-GPG signatures and a Docker image are planned for a later release.
+A Docker image, `ghcr.io/somework/lockrot`, is published from the
+[lockrot-action](https://github.com/somework/lockrot-action#docker-image) repository: the same
+verified archive on the official PHP CLI image, signed with cosign. GPG signatures for the PHAR
+itself are planned for a later release.
 
 ## What the PHAR does and does not do
 
@@ -96,6 +99,9 @@ exists so a scheduled job notices.
 On `2` the running `lockrot.phar` is untouched.
 
 ## In CI
+
+On GitHub Actions, [somework/lockrot-action](https://github.com/somework/lockrot-action) does the
+download, the checksum and the run in one step — see [ci.md](ci.md). Anywhere else:
 
 ```yaml
 - name: lockrot

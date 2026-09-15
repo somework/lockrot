@@ -116,14 +116,17 @@ A network failure is reported as a note and never fails the run on its own, unle
 uploads them to the Security tab, `--format=gitlab` into a Code Quality report and
 `--format=markdown` into a PR comment.
 
+On GitHub Actions, [somework/lockrot-action](https://github.com/somework/lockrot-action) runs the
+verified release with annotations, a job summary and a metadata cache in one step:
+
 ```yaml
-- name: lockrot
-  run: |
-    curl -fsSL -o lockrot.phar https://lockrot.dev/lockrot.phar
-    php lockrot.phar --fail-on=silent --target-php=8.4
-  env:
-    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+- uses: somework/lockrot-action@v1
+  with:
+    target-php: '8.4'
+    fail-on: silent
 ```
+
+Everywhere else, the PHAR or the Docker image `ghcr.io/somework/lockrot` does the same job.
 
 [Exit codes and every output format →](https://lockrot.dev/ci/)
 
@@ -208,8 +211,8 @@ Everything is at [lockrot.dev](https://lockrot.dev).
 
 ## Roadmap
 
-Next up: a GitHub Action, transitive exposure on parent packages, and GitLab and Bitbucket
-repository activity. Tracked in [issues](https://github.com/somework/lockrot/issues).
+Next up: transitive exposure on parent packages, and GitLab and Bitbucket repository activity.
+Tracked in [issues](https://github.com/somework/lockrot/issues).
 
 ## Contributing
 

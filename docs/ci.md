@@ -10,6 +10,22 @@ With a committed [baseline](baseline.md) the same command fails only on new or w
 needed, the file is picked up automatically. To run without installing the plugin, use the PHAR — [phar.md](phar.md)
 has the CI snippet.
 
+## GitHub Action
+
+[somework/lockrot-action](https://github.com/somework/lockrot-action) is the one-step form for GitHub Actions: it
+downloads the release it pins, checks the archive's sha256, uses the runner's PHP (or installs one), caches repository
+metadata between runs, writes the report to the job summary and applies lockrot's exit code.
+
+```yaml
+- uses: somework/lockrot-action@v1
+  with:
+    target-php: '8.4'
+    fail-on: silent
+```
+
+Every lockrot option is an input; its README has recipes for SARIF, pull-request comments, baselines and projects in a
+subdirectory. The same repository publishes `ghcr.io/somework/lockrot`, a signed image for GitLab CI and other systems.
+
 ## Exit codes
 
 | Code | Meaning |

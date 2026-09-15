@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Documentation for the GitHub Action, [somework/lockrot-action](https://github.com/somework/lockrot-action),
+  and the Docker image it publishes, `ghcr.io/somework/lockrot`.
+
 ### Fixed
 
 - Repository-activity checks no longer fail with `HTTP/2 401` ("Bad credentials") when Composer
