@@ -46,7 +46,7 @@ final class TableFormatter implements FormatterInterface
         $baseline = $report->baseline();
         $rows = $showAll ? $report->findings() : $report->flagged();
         $lines = $rows === []
-            ? [self::escape(\sprintf('No dependency rot found in %d packages.', $report->packagesChecked()))]
+            ? [self::escape(\sprintf('No dependency rot found in %d packages.', $report->packagesChecked())), '']
             : $this->groupLines($rows, $baseline);
         foreach ($this->summaryLines($report, $baseline) as $line) {
             $lines[] = $line;
@@ -56,7 +56,8 @@ final class TableFormatter implements FormatterInterface
     }
 
     /**
-     * The grouped rows, followed by the blank line that separates them from the summary block.
+     * The grouped rows, followed by the blank line that separates them from the summary block — the
+     * same blank line the clean report puts under its one line, so both shapes read alike.
      *
      * @param list<Finding> $rows
      *
@@ -220,6 +221,14 @@ final class TableFormatter implements FormatterInterface
      * escaped. Wrapping happens before escaping: escaping inserts backslashes the terminal never
      * shows, and counting those would wrap early. Lines are right-trimmed — a run of spaces in the
      * source text can otherwise end a line with invisible padding.
+     *
+     * `wordwrap()` counts bytes, which is deliberate here: measuring bytes can only ever wrap a
+     * line *earlier* than its display width demands, so a row is never wider than the terminal.
+     * The chain separator is the one routine multi-byte character and is always its own
+     * space-delimited token, so it is never cut. A single non-ASCII word longer than $wrap — only
+     * reachable through an allowlist reason written in `extra.lockrot` — would be cut
+     * mid-codepoint; that is the known limit of doing this without ext-mbstring, which lockrot
+     * does not require.
      *
      * @return list<string>
      */

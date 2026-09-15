@@ -55,8 +55,29 @@ final class TerminalWidthTest extends TestCase
 
     public function testWithoutColumnsTheConsoleTerminalDecides(): void
     {
-        self::assertSame((new Terminal())->getWidth(), TerminalWidth::fromConsoleTerminal());
+        self::assertSame((new Terminal())->getWidth(), TerminalWidth::fromConsoleTerminal([]));
         self::assertSame(max(FormatContext::MIN_WIDTH, (new Terminal())->getWidth()), TerminalWidth::detect([], null));
+    }
+
+    /**
+     * symfony's Terminal reads COLUMNS itself, and far more leniently than step 1 does:
+     * `(int) trim(getenv('COLUMNS'))` turns `abc` into 0 (Terminal.php:27-29). Handing it a value
+     * step 1 has already rejected would answer 0, and the clamp would turn that into the narrowest
+     * width lockrot accepts rather than the documented default. So a COLUMNS that is present but
+     * unusable takes the whole variable out of play.
+     */
+    public function testAnUnusableColumnsIsNotHandedToTheConsoleTerminalEither(): void
+    {
+        self::assertNull(TerminalWidth::fromConsoleTerminal(['COLUMNS' => 'abc']));
+        self::assertNull(TerminalWidth::fromConsoleTerminal(['COLUMNS' => '0']));
+        self::assertSame(FormatContext::DEFAULT_WIDTH, TerminalWidth::detect(['COLUMNS' => 'abc'], null));
+        self::assertSame(FormatContext::DEFAULT_WIDTH, TerminalWidth::detect(['COLUMNS' => ''], null));
+    }
+
+    /** With COLUMNS out of play, an older console's own answer is what decides — the 2.8 path. */
+    public function testAnUnusableColumnsFallsThroughToTheApplication(): void
+    {
+        self::assertSame(72, TerminalWidth::detect(['COLUMNS' => '80.5'], $this->applicationReporting(72, 24)));
     }
 
     public function testAConsoleApplicationWithoutTheOlderDimensionsMethodSaysNothing(): void

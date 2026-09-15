@@ -140,29 +140,46 @@ final class TableFormatterTest extends TestCase
     }
 
     /**
-     * Only the rows are wrapped; the summary block is one line per fact by design, the way it has
-     * always been, and a terminal soft-wraps those itself.
+     * Every rendered row of every group: everything above the blank line that separates the last
+     * group from the summary block. Only the rows are wrapped — the summary block is one line per
+     * fact by design, the way it has always been, and a terminal soft-wraps those itself — so the
+     * blank lines *between* groups have to stay inside the region, which means slicing at the last
+     * one rather than the first.
      *
      * @return list<string>
      */
     private function rowRegion(string $out): array
     {
         $lines = $this->plainLines($out);
-        $end = array_search('', $lines, true);
-        self::assertIsInt($end);
+        $blanks = array_keys($lines, '', true);
+        self::assertNotSame([], $blanks, 'the summary block is always preceded by a blank line');
 
-        return \array_slice($lines, 0, $end);
+        return \array_slice($lines, 0, $blanks[\count($blanks) - 1]);
     }
 
     public function testEvidenceAndTheFirstLineAreWrappedToTheTerminalWidth(): void
     {
         $out = $this->formatter(60)->format($this->report(), true);
-        foreach ($this->rowRegion($out) as $line) {
+        $rows = $this->rowRegion($out);
+
+        // every row of every group, not just the first one: the tail of line 1 only wraps on a row
+        // with a long chain, and those sit below the critical group
+        foreach (['critical (1)', 'high (1)', 'medium (1)', 'low (1)', 'not flagged (2)'] as $header) {
+            self::assertContains($header, $rows, 'the measured region has to span every group');
+        }
+        foreach ($rows as $line) {
             self::assertLessThanOrEqual(60, \strlen($line), 'line wider than the terminal: '.$line);
         }
-        self::assertGreaterThan(2, \count($this->rowRegion($out)), 'the evidence has to have wrapped for this to prove anything');
-        // and the wrapped evidence keeps the 15-character continuation indent
-        self::assertMatchesRegularExpression('/\n {15}\S/', $this->plain($out));
+        // the chain on line 1 wrapped, and the continuation carries the 15-character indent
+        self::assertStringContainsString(
+            "  abandoned    hoa/compiler 3.17.08.08  via wallabag/rulerz\n".str_repeat(' ', 15)."› hoa/ruler\n",
+            $this->plain($out)
+        );
+        // and so did the evidence underneath it
+        self::assertStringContainsString(
+            str_repeat(' ', 15)."flagged abandoned by its repository; last\n".str_repeat(' ', 15).'release 2022-05-20',
+            $this->plain($out)
+        );
     }
 
     /**
@@ -236,7 +253,11 @@ final class TableFormatterTest extends TestCase
 
         self::assertStringContainsString('vendor/<info>weird', $this->plain($out));
         self::assertStringContainsString('note with <comment> in it', $this->plain($out));
-        self::assertStringNotContainsString('<info>', str_replace('\\<info>', '', $out));
+        // and the raw string carries symfony's own escaping of them, whichever form this console
+        // version produces — 5.4 escapes `>` as well as `<`, 2.8 only `<`
+        self::assertStringContainsString(OutputFormatter::escape('vendor/<info>weird'), $out);
+        self::assertStringContainsString(OutputFormatter::escape('note with <comment> in it'), $out);
+        self::assertStringNotContainsString('vendor/<info>weird', $out);
     }
 
     public function testTheSummaryBlockKeepsItsOrderWithThePriorityLineAfterTheCounts(): void
@@ -257,8 +278,10 @@ final class TableFormatterTest extends TestCase
         $lines = $this->plainLines($this->formatter()->format($report));
 
         self::assertSame('No dependency rot found in 1 packages.', $lines[0]);
-        self::assertStringContainsString(' packages checked', $lines[1]);
-        self::assertStringStartsWith('priority: ', $lines[2]);
+        // the same blank line a grouped report puts before its summary block
+        self::assertSame('', $lines[1]);
+        self::assertStringContainsString(' packages checked', $lines[2]);
+        self::assertStringStartsWith('priority: ', $lines[3]);
     }
 
     public function testWordingAvoidsBannedTerms(): void

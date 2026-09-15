@@ -117,9 +117,17 @@ final class PluginTest extends TestCase
 
         // The table path is the only code that touches symfony/console's style tags and its terminal-width
         // API. Composer 2.2 LTS bundles symfony/console 2.8.52 while require-dev resolves 5.4, so only a run
-        // through the real binary covers 2.8 — including the Application::getTerminalDimensions() fallback,
-        // which 5.4 does not have and this suite therefore cannot reach any other way.
-        $table = $this->composer(['lockrot', '--target-php=8.4'], ['COLUMNS' => '100'], 120);
+        // through the real binary covers 2.8. COLUMNS is deliberately NOT set here: with it set,
+        // TerminalWidth::detect() answers at step 1 and neither console's own width lookup is ever entered.
+        // Without it, and with this test driving composer through Symfony Process rather than a terminal,
+        // the run exercises step 2 on Composer 2.10.3 — symfony/console 5.4's Terminal::getWidth() finds
+        // no COLUMNS and no stty and returns its own 80 fallback (Terminal.php:25-37) — and step 3 on
+        // Composer 2.2.25, where there is no Terminal class at all: 2.8.52's
+        // Application::getTerminalDimensions() (Application.php:736) shells out to `stty -a | grep columns`
+        // with the inherited non-TTY stdin (getSttyColumns(), :945-961), gets an empty string, and returns
+        // [null, null] at :764 — so lockrot falls through to FormatContext::DEFAULT_WIDTH, 120. Both
+        // branches were checked by hand; every assertion below is width-agnostic for exactly that reason.
+        $table = $this->composer(['lockrot', '--target-php=8.4'], [], 120);
         $stdout = $table->getOutput();
         self::assertSame(0, $table->getExitCode(), $table->getErrorOutput().$stdout);
         self::assertMatchesRegularExpression('/^(critical|high|medium|low) \(\d+\)$/m', $stdout, $stdout);

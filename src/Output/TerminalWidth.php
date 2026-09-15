@@ -28,7 +28,7 @@ final class TerminalWidth
      */
     public static function detect(array $env, ?Application $application): int
     {
-        $width = self::fromEnv($env) ?? self::fromConsoleTerminal() ?? self::fromApplication($application) ?? FormatContext::DEFAULT_WIDTH;
+        $width = self::fromEnv($env) ?? self::fromConsoleTerminal($env) ?? self::fromApplication($application) ?? FormatContext::DEFAULT_WIDTH;
 
         return max(FormatContext::MIN_WIDTH, $width);
     }
@@ -49,10 +49,21 @@ final class TerminalWidth
         return (int) $columns;
     }
 
-    /** symfony/console 5.4 `Terminal::getWidth()` (Terminal.php:25); the class does not exist in 2.8. */
-    public static function fromConsoleTerminal(): ?int
+    /**
+     * symfony/console 5.4 `Terminal::getWidth()` (Terminal.php:25); the class does not exist in 2.8.
+     *
+     * Terminal reads `COLUMNS` itself, and far more leniently than {@see fromEnv()} does — whenever
+     * the variable is merely present it answers `(int) trim($value)` (Terminal.php:27-29), so `abc`
+     * becomes 0 and the clamp in {@see detect()} would turn that into the narrowest width lockrot
+     * accepts instead of the documented default. A `COLUMNS` step 1 has already looked at and
+     * rejected is therefore out of play for this step too: handing it over would only get the same
+     * junk read a second time, by a reader that does not check it.
+     *
+     * @param array<string, string> $env
+     */
+    public static function fromConsoleTerminal(array $env): ?int
     {
-        if (!class_exists(Terminal::class)) {
+        if (isset($env['COLUMNS']) || !class_exists(Terminal::class)) {
             return null;
         }
 
