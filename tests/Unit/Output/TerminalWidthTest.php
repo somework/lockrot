@@ -103,6 +103,24 @@ final class TerminalWidthTest extends TestCase
         self::assertNull(TerminalWidth::fromApplication($this->applicationReporting(0, 24)));
     }
 
+    /** Only the first element is the width; a console that knows it but not the height still answers. */
+    public function testAnApplicationThatKnowsTheWidthButNotTheHeightStillAnswers(): void
+    {
+        self::assertSame(72, TerminalWidth::fromApplication($this->applicationReporting(72, null)));
+    }
+
+    /**
+     * Where both sources exist the newer one decides. Nothing in this suite runs without a Terminal
+     * class, so without this the two steps could be swapped and every test would still pass.
+     */
+    public function testTheConsoleTerminalOutranksAnOlderApplication(): void
+    {
+        $detected = TerminalWidth::detect([], $this->applicationReporting(4242, 24));
+
+        self::assertSame(max(FormatContext::MIN_WIDTH, (new Terminal())->getWidth()), $detected);
+        self::assertNotSame(4242, $detected);
+    }
+
     public function testTheResultNeverFallsBelowTheMinimum(): void
     {
         self::assertSame(FormatContext::MIN_WIDTH, TerminalWidth::detect(['COLUMNS' => '10'], null));

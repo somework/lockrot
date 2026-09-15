@@ -321,6 +321,31 @@ final class TableFormatterTest extends TestCase
         self::assertStringContainsString('priority:', $this->plain($this->formatter()->format($this->report())));
     }
 
+    /**
+     * The report is written straight to the output with no trailing newline of its own, so the
+     * document has to end with one or the shell prompt lands on the last line.
+     */
+    public function testEveryRenderedReportEndsWithASingleNewline(): void
+    {
+        foreach ([$this->formatter()->format($this->report()), $this->formatter()->format($this->report(), true)] as $out) {
+            self::assertStringEndsWith("\n", $out);
+            self::assertStringEndsNotWith("\n\n", $out);
+        }
+    }
+
+    /**
+     * wordwrap() breaks at the first of a run of spaces and leaves the rest at the end of the line,
+     * so the two-space gutter before `direct` would otherwise trail invisibly off several rows.
+     */
+    public function testNoRenderedLineEndsWithWhitespace(): void
+    {
+        foreach ([40, 60, 120] as $width) {
+            foreach ($this->plainLines($this->formatter($width)->format($this->report(), true)) as $line) {
+                self::assertSame(rtrim($line), $line, 'trailing whitespace at width '.$width.': "'.$line.'"');
+            }
+        }
+    }
+
     public function testWordingAvoidsBannedTerms(): void
     {
         $out = strtolower($this->plain($this->formatter()->format($this->allVerdictsReport(), true)));

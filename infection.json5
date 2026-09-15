@@ -2,14 +2,33 @@
     "source": {
         "directories": ["src/Verdict", "src/Signal"]
     },
+    // The full suite takes ~30s on a developer machine, well past Infection's 10s default, so
+    // without this every mutant whose covering tests reach the integration suite came back as
+    // "required more time than configured" — which Infection counts as *detected*. Measured at
+    // c66dd85 with the default timeout: 253 of 269 mutants timed out, 16 were actually killed, and
+    // the gate still reported MSI 100% and exited 0, i.e. it could not fail. A timeout has to
+    // exceed the slowest covering test run, not the fastest. With 180 no mutant times out.
+    "timeout": 180,
     "logs": {
         "text": "build/infection.log"
     },
     "mutators": {
         "@default": true
     },
-    // Baseline at commit d82ff77 (2026-09-15): MSI = Covered MSI = 97.99% (100% mutation coverage,
-    // src/Verdict + src/Signal). Threshold = floor(measured %) - 3 = floor(97.99) - 3 = 94.
+    // Baseline at commit ce2b617 (2026-09-16), first measurement taken with a timeout that lets
+    // every mutant actually run: 269 mutants over src/Verdict + src/Signal, 264 killed, 5 escaped,
+    // 0 timed out -> MSI = Covered MSI = 98.14%, 1m21s on 4 threads. The 5 escapes are all in
+    // src/Signal/ConstraintOpenness.php (:46 CastInt, :48 CastInt/IncrementInteger/DecrementInteger,
+    // :62 ConcatOperandRemoval) and are pre-existing gaps the old timeout had been hiding.
+    //
+    // Extending source.directories to src/Output + src/Analyzer was measured and rejected for now:
+    // 1007 mutants, 941 killed, 66 escaped, 0 timed out -> 93.45%, 3m42s, below this threshold. 59
+    // of the 66 are in files no recent branch touched (24 in Analyzer.php alone) and the 7 that are
+    // not are equivalent mutants. Widening the scope therefore means closing those 59 first; it is
+    // a task of its own, not a config flip. See task-2-report.md, "Final fix wave".
+    //
+    // Threshold stays 94 (floor(98.14) - 3 would be 95; 94 is kept so the number does not move
+    // every time a test is added).
     "minMsi": 94,
     "minCoveredMsi": 94
 }
