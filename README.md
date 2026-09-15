@@ -41,7 +41,9 @@ release.
 The PHAR always runs the inspected project with `--no-plugins`: it reads `composer.lock` and
 `composer.json` and never needs that project's Composer plugins. It also never writes to
 `composer.json` or `composer.lock`. The only commands it offers are `lockrot` (the default, so the
-name can be left out) and `self-update`; `php lockrot.phar list` shows them.
+name can be left out) and `self-update`; `php lockrot.phar list` shows them. Unlike `composer`, the
+PHAR never walks up to a parent directory's project (Composer's `use-parent-dir` setting is not
+honoured): run it from the project root or point it there with `-d`.
 
 (Releases do not exist yet — this URL will resolve once the first tag is published.)
 

@@ -173,6 +173,11 @@ final class LockrotCommand extends BaseCommand
                 return Policy::EXIT_OK;
             }
             $lockPath = $cwd.'/composer.lock';
+            if (!is_file($lockPath)) {
+                // Unlike `composer`, lockrot never walks up to a parent project (the PHAR hides the
+                // manifest from Composer's preamble, see bin/lockrot), so say where it looked.
+                throw new ConfigException('composer.lock not found in '.$cwd.'; lockrot does not look in parent directories: run it from the project root or pass -d <dir>');
+            }
             $lock = LockFile::fromFile($lockPath);
             // Resolved and read before the analysis so a missing explicit path or an unreadable
             // file fails immediately, rather than after a full repository round. A generate run is the
