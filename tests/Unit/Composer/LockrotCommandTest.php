@@ -280,6 +280,35 @@ final class LockrotCommandTest extends TestCase
         self::assertStringEndsWith('/wallabag_wallabag/', $srcRoot);
     }
 
+    public function testGitlabOutputOnWallabag(): void
+    {
+        chdir(__DIR__.'/../../fixtures/apps/wallabag_wallabag');
+        $tester = $this->tester($this->loader());
+        $code = $tester->execute(['--format' => 'gitlab', '--fail-on' => 'silent', '--target-php' => '8.4']);
+        $display = $tester->getDisplay();
+
+        self::assertSame(1, $code, $display);
+        self::assertStringStartsWith('[', $display);
+        $issues = json_decode($display, true);
+        self::assertIsArray($issues);
+        self::assertNotSame([], $issues);
+        self::assertSame('issue', JsonPath::stringAt($issues, [0, 'type']));
+        self::assertStringStartsWith('lockrot/', JsonPath::stringAt($issues, [0, 'check_name']));
+        self::assertSame('composer.lock', JsonPath::stringAt($issues, [0, 'location', 'path']));
+    }
+
+    public function testMarkdownOutputOnWallabag(): void
+    {
+        chdir(__DIR__.'/../../fixtures/apps/wallabag_wallabag');
+        $tester = $this->tester($this->loader());
+        $code = $tester->execute(['--format' => 'markdown', '--fail-on' => 'silent', '--target-php' => '8.4']);
+        $display = $tester->getDisplay();
+
+        self::assertSame(1, $code, $display);
+        self::assertStringStartsWith('### lockrot: dependency rot in 75 of 200 packages', $display);
+        self::assertStringContainsString('| Package | Version | Verdict | Evidence | Via |', $display);
+    }
+
     public function testCleanProjectExitZero(): void
     {
         chdir(__DIR__.'/../../fixtures/skeletons/laravel');

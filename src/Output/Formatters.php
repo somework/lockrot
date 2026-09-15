@@ -25,6 +25,10 @@ final class Formatters
                 return new GithubFormatter($context);
             case 'sarif':
                 return new SarifFormatter($context);
+            case 'gitlab':
+                return new GitlabFormatter($context);
+            case 'markdown':
+                return new MarkdownFormatter($context);
             default:
                 throw new ConfigException('Unknown output format "'.$format.'"');
         }

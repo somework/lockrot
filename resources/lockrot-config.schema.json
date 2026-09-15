@@ -12,7 +12,7 @@
         },
         "format": {
             "type": "string",
-            "enum": ["table", "json", "github", "sarif"]
+            "enum": ["table", "json", "github", "sarif", "gitlab", "markdown"]
         },
         "include-dev": {
             "type": "boolean"

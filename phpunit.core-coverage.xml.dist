@@ -37,6 +37,10 @@
             <file>src/Output/FormatContext.php</file>
             <file>src/Output/GithubFormatter.php</file>
             <file>src/Output/SarifFormatter.php</file>
+            <!-- gitlab + markdown formats (added on feat/v0.1.0-extras): pure formatters over a
+                 Report, fully unit-tested, same as GithubFormatter/SarifFormatter above -->
+            <file>src/Output/GitlabFormatter.php</file>
+            <file>src/Output/MarkdownFormatter.php</file>
             <!-- baseline file (added on feat/v0.1.0-extras): value objects plus the one file lockrot
                  ever writes, all reachable from unit tests -->
             <directory>src/Baseline</directory>

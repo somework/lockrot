@@ -47,6 +47,17 @@
   `install-time-strict` honours the same comparison. The baseline is the only file lockrot writes,
   only on that explicit flag, and it is written atomically; an unreadable, schema-invalid or
   unwritable baseline is exit 2, never a silently ungated run.
+- `--format=gitlab` prints a GitLab Code Quality JSON report (one issue per flagged finding, every
+  finding with `--all`), so `artifacts.reports.codequality` puts findings inline in a merge
+  request's diff. Severity mirrors the GitHub/SARIF level (`major`/`minor`/`info`); each issue's
+  fingerprint is a stable hash of the package name and verdict so it survives a version bump or a
+  reformatted lock. Report notes are not representable in this format and are dropped; use
+  `--format=json` for them.
+- `--format=markdown` prints a PR-comment-shaped report — heading, a findings table, notes as
+  bullets, a `<sub>` summary footer — for `composer lockrot --format=markdown > comment.md` piped
+  into `gh pr comment --body-file`. A clean run prints a one-line heading with no table; with a
+  baseline, a second line carries the same known/new/worsened/stale counts as the table format, and
+  a verdict is bold only when it is not already accepted by the baseline.
 - Exit codes 0/1/2 driven by `--fail-on`, with network failures defaulting to exit 0 unless
   `--strict-network` is set.
 - Package metadata is loaded through the repositories configured for the project

@@ -286,7 +286,7 @@ must be JSON integers (`3`, not `"3"`).
 
 | Option | Meaning |
 |---|---|
-| `--format=table\|json\|github\|sarif` | Output format. `github` prints GitHub Actions workflow commands so findings become annotations on `composer.lock`; `sarif` prints a SARIF 2.1.0 document for `upload-sarif` — see [GitHub Actions](#github-actions). The format changes the output only; the exit code is the same for all four |
+| `--format=table\|json\|github\|sarif\|gitlab\|markdown` | Output format. `github` prints GitHub Actions workflow commands so findings become annotations on `composer.lock`; `sarif` prints a SARIF 2.1.0 document for `upload-sarif` — see [GitHub Actions](#github-actions). `gitlab` prints a GitLab Code Quality JSON report — see [GitLab CI](#gitlab-ci). `markdown` prints a PR-comment-shaped report — see [Posting a PR comment](#posting-a-pr-comment). The format changes the output only; the exit code is the same for all six |
 | `--fail-on=none\|abandoned\|silent\|pinned\|old-promise\|stale` | Exit-1 threshold for this run |
 | `--target-php=8.4` | PHP version for the S5 check |
 | `--dev` | Include `packages-dev` |
@@ -496,6 +496,46 @@ are the same for every format (see [Exit codes](#exit-codes)); only the output c
 formats point at `composer.lock` in the checkout root, so run them from the directory that holds
 the lock file.
 
+### GitLab CI
+
+`--format=gitlab` prints a [GitLab Code
+Quality](https://docs.gitlab.com/ci/testing/code_quality/#implement-a-custom-tool) report: a JSON
+array with one issue per flagged finding (every finding with `--all`), so a merge request shows
+them inline in the diff of `composer.lock`. Publish it as a `codequality` artifact:
+
+```yaml
+lockrot:
+  script:
+    - composer lockrot --format=gitlab --fail-on=silent --target-php=8.4 > lockrot-codequality.json
+  artifacts:
+    reports:
+      codequality: lockrot-codequality.json
+```
+
+Severity follows the same rule as the GitHub/SARIF level: a finding at or above `--fail-on` is
+`major`, any other flagged verdict `minor`, and a row only `--all` shows (or one a
+[baseline](#baseline) already knows) `info`. Each issue's fingerprint is a stable hash of the
+package name and verdict, so a version bump that keeps the same verdict — or a reformatted lock
+that moves the entry to a different line — keeps the same GitLab issue identity. `Report::notes()`
+has no field to carry a document-level note in this format, so notes are dropped here; use
+`--format=json` when you need them. The exit code is unchanged.
+
+### Posting a PR comment
+
+`--format=markdown` prints a report shaped for a pull-request comment: a heading with the
+flagged/checked counts, a table of the findings, the report's notes as a bullet list, and a `<sub>`
+footer with the full summary. Post it with the GitHub CLI:
+
+```bash
+composer lockrot --format=markdown --fail-on=silent --target-php=8.4 > comment.md
+gh pr comment --body-file comment.md
+```
+
+A clean run prints `### lockrot: no dependency rot found in N packages` and no table. With a
+[baseline](#baseline) in place, a second line under the heading carries the same
+`known`/`new`/`worsened`/`stale` counts as the table format, and a verdict is bold only when it is
+not already accepted by the baseline. The exit code is unchanged.
+
 ## Allowlist
 
 Packages that are "finished by design" (an interface package that will not release again, a
@@ -542,10 +582,9 @@ pattern and a one-line reason — the same shape as the existing entries.
 
 ## Roadmap
 
-- **v0.2**: `--format=gitlab` (Code Quality JSON) and a GitHub Action.
-- **v0.3**: transitive exposure on parent packages (S7), `--format=markdown` for PR comments,
-  GitLab/Bitbucket repository activity, and inspecting the `vendor/*/composer.lock` of bundled
-  PHAR tools.
+- **v0.2**: a GitHub Action.
+- **v0.3**: transitive exposure on parent packages (S7), GitLab/Bitbucket repository activity, and
+  inspecting the `vendor/*/composer.lock` of bundled PHAR tools.
 
 ## Documentation
 
