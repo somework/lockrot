@@ -126,7 +126,8 @@ high (58)
                constraint ">=5.5.0" has no upper bound
 ... (66 more rows omitted)
 
-200 packages checked · abandoned 19 · silent 8 · pinned 4 · old-promise 41 · stale 2 · unknown 0 · finished 18 · ok 108
+200 packages checked · abandoned 19 · silent 8 · pinned 4 · old-promise 41 · stale 2 · unknown 0 · finished 18 ·
+ok 108
 priority: critical 3 · high 58 · medium 11 · low 2
 Data as of 2026-09-15 (package repositories, GitHub). Run composer lockrot --format=json for details.
 ```
@@ -560,7 +561,7 @@ Each annotation's title is `lockrot: <verdict> (<priority>)`, e.g. `lockrot: aba
 so the [priority](#priority) is visible on the line itself:
 
 ```text
-::error file=composer.lock,line=8010,title=lockrot%3A abandoned (critical)::sensio/framework-extra-bundle v6.2.10: flagged abandoned by its repository, replacement: Symfony
+::error file=composer.lock,line=8010,title=lockrot%3A abandoned (critical)::sensio/framework-extra-bundle v6.2.10: flagged abandoned by its repository, replacement: Symfony; …
 ```
 
 Findings at or above `--fail-on` are annotated as errors, everything else flagged as warnings, and
@@ -626,7 +627,7 @@ Code Quality has no title field of its own, so each issue's description opens wi
 version and the same `<verdict> (<priority>)` phrase the GitHub annotation title uses:
 
 ```text
-sensio/framework-extra-bundle v6.2.10 — abandoned (critical): flagged abandoned by its repository, replacement: Symfony
+sensio/framework-extra-bundle v6.2.10 — abandoned (critical): flagged abandoned by its repository, replacement: Symfony; …
 ```
 
 Severity follows the same rule as the GitHub/SARIF level: a finding at or above `--fail-on` is
@@ -710,6 +711,10 @@ pattern and a one-line reason — the same shape as the existing entries.
   shows how it was pulled in, not the other direction.
 - The [baseline](#baseline) matches by package name only, and never rewrites itself: entries for
   packages that have left the lock are reported as stale, not removed.
+- The install-time block reads a package's development flag from the lock the transaction is about
+  to leave behind. Under `composer require --dev … --dry-run` no such lock is written, so a package
+  that is not in the lock yet is treated as production and its [priority](#priority) can read one
+  step high. `composer lockrot` on the real lock always has the flag.
 
 ## Roadmap
 

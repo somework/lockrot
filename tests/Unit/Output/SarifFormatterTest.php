@@ -233,8 +233,9 @@ final class SarifFormatterTest extends TestCase
     }
 
     /**
-     * A report whose four rows land on four different priorities: critical, medium (transitive and
-     * development-only), low (transitive stale) and none (not flagged at all).
+     * A report whose five rows land on all five priorities: critical, high (transitive production),
+     * medium (transitive and development-only), low (transitive stale) and none (not flagged at
+     * all) — so every step of the rank scale has a row behind it.
      */
     private function priorityReport(): Report
     {
@@ -242,10 +243,11 @@ final class SarifFormatterTest extends TestCase
 
         return new Report([
             new Finding('acme/abandoned', '1.0.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'flagged abandoned by its repository')], ['acme/abandoned'], null, $at),
+            new Finding('acme/transitive', '5.0.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'flagged abandoned by its repository')], ['a/parent', 'acme/transitive'], null, $at),
             new Finding('acme/dev-only', '2.0.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'flagged abandoned by its repository')], ['a/parent', 'acme/dev-only'], null, $at, null, true),
             new Finding('acme/stale', '3.0.0', Verdict::STALE, [new Signal('S2', 'warn', 'last release 2022-05-20')], ['a/parent', 'acme/stale'], null, $at),
             new Finding('acme/fine', '4.0.0', Verdict::OK, [], ['acme/fine'], null, $at),
-        ], [], $at, 4, 0, false);
+        ], [], $at, 5, 0, false);
     }
 
     /**
@@ -258,12 +260,13 @@ final class SarifFormatterTest extends TestCase
         $this->assertValidSarif($sarif);
         $run = $this->singleRun($sarif);
 
-        self::assertSame(['acme/abandoned', 'acme/dev-only', 'acme/stale', 'acme/fine'], self::propertyColumn($run, 'package'));
-        self::assertSame([100.0, 50.0, 25.0, 0.0], JsonPath::column($run, ['results'], 'rank'));
+        self::assertSame(['acme/abandoned', 'acme/transitive', 'acme/dev-only', 'acme/stale', 'acme/fine'], self::propertyColumn($run, 'package'));
+        self::assertSame([100.0, 75.0, 50.0, 25.0, 0.0], JsonPath::column($run, ['results'], 'rank'));
 
         // A whole number is still a JSON float here: SARIF types rank as a number, and an integer
         // 100 would read as a different type to a strict consumer.
         self::assertStringContainsString('"rank": 100.0', $sarif);
+        self::assertStringContainsString('"rank": 75.0', $sarif);
         self::assertStringContainsString('"rank": 0.0', $sarif);
     }
 
@@ -271,12 +274,15 @@ final class SarifFormatterTest extends TestCase
     {
         $run = $this->singleRun($this->formatter(LockrotConfig::FAIL_ON_NONE, null)->format($this->priorityReport(), true));
 
-        self::assertSame(['critical', 'medium', 'low', 'none'], self::propertyColumn($run, 'priority'));
+        self::assertSame(['critical', 'high', 'medium', 'low', 'none'], self::propertyColumn($run, 'priority'));
 
         self::assertTrue(JsonPath::boolAt($run, ['results', 0, 'properties', 'direct']));
         self::assertFalse(JsonPath::boolAt($run, ['results', 0, 'properties', 'dev']));
+        // the high row: transitive but production, which is what puts it a step above the dev one
         self::assertFalse(JsonPath::boolAt($run, ['results', 1, 'properties', 'direct']));
-        self::assertTrue(JsonPath::boolAt($run, ['results', 1, 'properties', 'dev']));
+        self::assertFalse(JsonPath::boolAt($run, ['results', 1, 'properties', 'dev']));
+        self::assertFalse(JsonPath::boolAt($run, ['results', 2, 'properties', 'direct']));
+        self::assertTrue(JsonPath::boolAt($run, ['results', 2, 'properties', 'dev']));
     }
 
     /** The priority informs the reader; the rule and the level stay on the verdict alone. */
@@ -285,10 +291,10 @@ final class SarifFormatterTest extends TestCase
         $run = $this->singleRun($this->formatter(Verdict::ABANDONED, null)->format($this->priorityReport(), true));
 
         self::assertSame(
-            ['lockrot/abandoned', 'lockrot/abandoned', 'lockrot/stale', 'lockrot/ok'],
+            ['lockrot/abandoned', 'lockrot/abandoned', 'lockrot/abandoned', 'lockrot/stale', 'lockrot/ok'],
             JsonPath::column($run, ['results'], 'ruleId')
         );
-        self::assertSame(['error', 'error', 'warning', 'note'], JsonPath::column($run, ['results'], 'level'));
+        self::assertSame(['error', 'error', 'error', 'warning', 'note'], JsonPath::column($run, ['results'], 'level'));
     }
 
     /**

@@ -44,11 +44,12 @@ final class TableFormatter implements FormatterInterface
     public function format(Report $report, bool $showAll = false): string
     {
         $baseline = $report->baseline();
-        $rows = $showAll ? $report->findings() : $report->flagged();
+        $flagged = $report->flagged();
+        $rows = $showAll ? $report->findings() : $flagged;
         $lines = $rows === []
             ? [self::escape(\sprintf('No dependency rot found in %d packages.', $report->packagesChecked())), '']
             : $this->groupLines($rows, $baseline);
-        foreach ($this->summaryLines($report, $baseline) as $line) {
+        foreach ($this->summaryLines($report, $baseline, $flagged !== []) as $line) {
             $lines[] = $line;
         }
 
@@ -246,24 +247,43 @@ final class TableFormatter implements FormatterInterface
      * The block every run ends with: the counts, the priority totals, what the baseline made of the
      * run, the data date, and the notes.
      *
+     * Wrapped like the rows, but to the full width and with no indent: these lines are facts in
+     * their own right rather than continuations of a label, so nothing hangs under a column. The
+     * strings themselves are untouched — {@see Report::summaryLine()} is shared with the `github`
+     * format, which pins itself against it, so only this renderer decides where it folds.
+     *
+     * The priority totals are printed only when there is something flagged to total. On a clean
+     * report `critical 0 · high 0 · medium 0 · low 0` is four zeros under "No dependency rot
+     * found", which is noise on the one report that should be shortest.
+     *
      * @return list<string>
      */
-    private function summaryLines(Report $report, ?BaselineComparison $baseline): array
+    private function summaryLines(Report $report, ?BaselineComparison $baseline, bool $hasFlagged): array
     {
-        $lines = [self::escape($report->summaryLine()), self::escape($report->prioritySummaryLine())];
-        if ($baseline !== null) {
-            $lines[] = self::escape($baseline->summaryLine());
+        $texts = [$report->summaryLine()];
+        if ($hasFlagged) {
+            $texts[] = $report->prioritySummaryLine();
         }
-        $lines[] = self::escape(\sprintf(
+        if ($baseline !== null) {
+            $texts[] = $baseline->summaryLine();
+        }
+        $texts[] = \sprintf(
             'Data as of %s (package repositories, GitHub). Run composer lockrot --format=json for details.',
             $report->generatedAt()->format('Y-m-d')
-        ));
+        );
         foreach ($report->notes() as $note) {
-            $lines[] = 'note: '.self::escape($note);
+            $texts[] = 'note: '.$note;
         }
         $stale = $baseline === null ? null : $baseline->staleNote();
         if ($stale !== null) {
-            $lines[] = 'note: '.self::escape($stale);
+            $texts[] = 'note: '.$stale;
+        }
+        $wrap = max(self::MIN_WRAP_WIDTH, $this->context->terminalWidth());
+        $lines = [];
+        foreach ($texts as $text) {
+            foreach (self::wrap($text, $wrap) as $line) {
+                $lines[] = $line;
+            }
         }
 
         return $lines;

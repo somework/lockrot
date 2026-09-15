@@ -260,15 +260,33 @@ final class TableFormatterTest extends TestCase
         self::assertStringNotContainsString('vendor/<info>weird', $out);
     }
 
+    /** Rendered wide enough that no summary line folds, so the order can be asserted line for line. */
     public function testTheSummaryBlockKeepsItsOrderWithThePriorityLineAfterTheCounts(): void
     {
-        $lines = $this->plainLines($this->formatter()->format($this->report()));
+        $lines = $this->plainLines($this->formatter(200)->format($this->report()));
         $tail = \array_slice($lines, -4);
 
         self::assertSame('6 packages checked · abandoned 2 · silent 0 · pinned 0 · old-promise 0 · stale 2 · unknown 0 · finished 1 · ok 1', $tail[0]);
         self::assertSame('priority: critical 1 · high 1 · medium 1 · low 1', $tail[1]);
         self::assertSame('Data as of 2026-09-14 (package repositories, GitHub). Run composer lockrot --format=json for details.', $tail[2]);
         self::assertSame('note: GitHub token not set: repository activity checked only for 2 candidate packages (0 skipped); set GITHUB_TOKEN to check all', $tail[3]);
+    }
+
+    /**
+     * The summary block is part of a width-aware report too: its lines fold at the full width with
+     * no indent, since each is a fact of its own rather than a continuation hanging under a label.
+     */
+    public function testTheSummaryBlockIsWrappedToTheTerminalWidth(): void
+    {
+        $lines = $this->plainLines($this->formatter(60)->format($this->report()));
+
+        foreach ($lines as $line) {
+            self::assertLessThanOrEqual(60, \strlen($line), 'line wider than the terminal: '.$line);
+        }
+        // the counts line and the note folded, and each continuation starts in column 1
+        $plain = implode("\n", $lines);
+        self::assertStringContainsString("6 packages checked · abandoned 2 · silent 0 · pinned 0 ·\nold-promise 0 ·", $plain);
+        self::assertStringContainsString("note: GitHub token not set: repository activity checked only\nfor 2 candidate packages", $plain);
     }
 
     public function testCleanReport(): void
@@ -281,7 +299,26 @@ final class TableFormatterTest extends TestCase
         // the same blank line a grouped report puts before its summary block
         self::assertSame('', $lines[1]);
         self::assertStringContainsString(' packages checked', $lines[2]);
-        self::assertStringStartsWith('priority: ', $lines[3]);
+        // and no `priority: critical 0 · high 0 · medium 0 · low 0` under it
+        self::assertStringStartsWith('Data as of ', $lines[3]);
+    }
+
+    /**
+     * The priority totals count flagged findings, so a report with none has nothing to total. Under
+     * --all the rows are still listed, in their `not flagged` group, and the line is still absent.
+     */
+    public function testThePriorityTotalsAppearOnlyWhenSomethingIsFlagged(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $clean = new Report([
+            new Finding('vendor/ok', '1.0.0', Verdict::OK, [], ['vendor/ok'], null, $at),
+            new Finding('psr/cache', '3.0.0', Verdict::FINISHED, [], ['psr/cache'], 'interfaces', $at),
+        ], [], $at, 2, 0, false);
+
+        self::assertStringNotContainsString('priority:', $this->plain($this->formatter()->format($clean)));
+        self::assertStringNotContainsString('priority:', $this->plain($this->formatter()->format($clean, true)));
+        self::assertStringContainsString('not flagged (2)', $this->plain($this->formatter()->format($clean, true)));
+        self::assertStringContainsString('priority:', $this->plain($this->formatter()->format($this->report())));
     }
 
     public function testWordingAvoidsBannedTerms(): void

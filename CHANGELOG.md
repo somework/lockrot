@@ -19,8 +19,10 @@
   their level and count (`not flagged (N)` for the rows `--all` adds); each finding takes one line
   for its verdict, package, version and requirement chain and as many as it needs for its evidence,
   wrapped to the terminal with continuation lines indented past the verdict column. Critical and
-  high rows are marked in red, medium in yellow. The format id, the summary block and the machine
-  formats are unchanged, and `priority: …` joins the summary right after the counts line.
+  high rows are marked in red, medium in yellow. The summary block keeps its wording and order and
+  gains a `priority: …` line right after the counts, printed whenever the run flagged anything; its
+  lines wrap to the terminal too, at the full width and with no indent. The format id and the
+  machine formats are unchanged.
 - The terminal width is taken from `COLUMNS` when it is set, otherwise from the console itself,
   falling back to 120 columns and never going below 40.
 - `--format=json`, `sarif`, `gitlab`, `github` and `markdown` are now written raw, so a `<` in a

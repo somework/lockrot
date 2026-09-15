@@ -15,7 +15,7 @@ use Symfony\Component\Console\Terminal;
  * The four sources are exposed as named methods rather than hidden inside detect(), because two of
  * them cannot be reached through detect() from this test suite: symfony/console 5.4 is what
  * require-dev resolves, so Terminal always exists here and always answers, which makes the
- * Application and default steps dead ends until the plugin runs under Composer 2.2.25's bundled
+ * Application and default steps unreachable until the plugin runs under Composer 2.2.25's bundled
  * 2.8. Testing each source directly is what keeps them covered on this side.
  */
 final class TerminalWidthTest extends TestCase
