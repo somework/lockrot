@@ -7,6 +7,10 @@ namespace Lockrot\Output;
 use Lockrot\Analyzer\Report;
 use Lockrot\Version;
 
+/**
+ * The machine-readable report: Report::toArray() under a `lockrot` envelope carrying the tool
+ * version and the document schema number, which only changes when a field is removed or renamed.
+ */
 final class JsonFormatter implements FormatterInterface
 {
     /** @see Version::STRING — lockrot's release number lives there; this stays as its published alias. */

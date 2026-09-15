@@ -11,7 +11,7 @@ jobs:
         exclude:
           - {php: '8.5', composer: '2.2'}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
@@ -44,7 +44,7 @@ jobs:
   quality:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: shivammathur/setup-php@v2
         with: {php-version: '8.4', coverage: pcov}
       - run: composer install --no-interaction
@@ -80,7 +80,7 @@ jobs:
   e2e:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: shivammathur/setup-php@v2
         with: {php-version: '8.4'}
       - run: composer install --no-interaction
@@ -93,7 +93,7 @@ jobs:
   phar:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: shivammathur/setup-php@v2
         with: {php-version: '8.4'}
       - run: composer install --no-interaction
