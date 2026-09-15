@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace Lockrot\Output;
 
 use Lockrot\Analyzer\Report;
+use Lockrot\Version;
 
 final class JsonFormatter implements FormatterInterface
 {
-    public const VERSION = '0.1.0';
+    /** @see Version::STRING — lockrot's release number lives there; this stays as its published alias. */
+    public const VERSION = Version::STRING;
     public const SCHEMA = 1;
 
     public function format(Report $report, bool $showAll = false): string

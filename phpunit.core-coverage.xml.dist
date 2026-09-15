@@ -24,6 +24,12 @@
             <file>src/Composer/TransactionPackages.php</file>
             <file>src/Output/InstallSummaryFormatter.php</file>
             <file>src/Exception/InstallBlockedException.php</file>
+            <!-- annotation formats (added on feat/v0.1.0-final): pure formatters over a Report, fully
+                 unit-tested. LockLineIndex needs no entry of its own — src/Lock above already covers
+                 it — and src/Version.php holds a constant with no executable line to measure -->
+            <file>src/Output/FormatContext.php</file>
+            <file>src/Output/GithubFormatter.php</file>
+            <file>src/Output/SarifFormatter.php</file>
         </include>
     </source>
 </phpunit>

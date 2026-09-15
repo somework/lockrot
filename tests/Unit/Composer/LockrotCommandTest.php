@@ -25,6 +25,7 @@ use Lockrot\Data\Repository\MetadataLoaderInterface;
 use Lockrot\Data\Repository\RepositoryMetadataLoader;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
+use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -237,6 +238,42 @@ final class LockrotCommandTest extends TestCase
         self::assertIsArray($json['counts']);
         self::assertSame(1, $json['lockrot']['schema']);
         self::assertSame(19, $json['counts']['abandoned']);
+    }
+
+    public function testGithubAnnotationsOnWallabag(): void
+    {
+        chdir(__DIR__.'/../../fixtures/apps/wallabag_wallabag');
+        $tester = $this->tester($this->loader());
+        $code = $tester->execute(['--format' => 'github', '--fail-on' => 'silent', '--target-php' => '8.4']);
+        $display = $tester->getDisplay();
+        $lines = explode("\n", trim($display));
+
+        self::assertSame(1, $code, $display);
+        self::assertMatchesRegularExpression('{^::error file=composer\.lock,line=\d+,title=lockrot%3A abandoned::}', $lines[0]);
+        self::assertStringContainsString('phpzip/phpzip', $display);
+        self::assertStringStartsWith('200 packages checked · abandoned 19 · ', $lines[\count($lines) - 1]);
+    }
+
+    public function testSarifOutputOnWallabag(): void
+    {
+        chdir(__DIR__.'/../../fixtures/apps/wallabag_wallabag');
+        $tester = $this->tester($this->loader());
+        $code = $tester->execute(['--format' => 'sarif', '--target-php' => '8.4']);
+        $display = $tester->getDisplay();
+
+        self::assertSame(0, $code, $display);
+        self::assertStringStartsWith('{', $display);
+        $sarif = json_decode($display, true);
+        self::assertIsArray($sarif);
+        self::assertSame('2.1.0', JsonPath::stringAt($sarif, ['version']));
+        self::assertCount(1, JsonPath::arrayAt($sarif, ['runs']));
+        self::assertSame('lockrot', JsonPath::stringAt($sarif, ['runs', 0, 'tool', 'driver', 'name']));
+        self::assertNotSame([], JsonPath::arrayAt($sarif, ['runs', 0, 'results']));
+        self::assertSame('composer.lock', JsonPath::stringAt($sarif, ['runs', 0, 'results', 0, 'locations', 0, 'physicalLocation', 'artifactLocation', 'uri']));
+        self::assertGreaterThan(0, JsonPath::intAt($sarif, ['runs', 0, 'results', 0, 'locations', 0, 'physicalLocation', 'region', 'startLine']));
+        $srcRoot = JsonPath::stringAt($sarif, ['runs', 0, 'originalUriBaseIds', '%SRCROOT%', 'uri']);
+        self::assertStringStartsWith('file:///', $srcRoot);
+        self::assertStringEndsWith('/wallabag_wallabag/', $srcRoot);
     }
 
     public function testCleanProjectExitZero(): void

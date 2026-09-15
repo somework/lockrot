@@ -247,7 +247,7 @@ must be JSON integers (`3`, not `"3"`).
 |---|---|---|
 | `fail-on` | `none` | Exit 1 threshold: `none`, `stale`, `old-promise`, `pinned`, `silent`, `abandoned` |
 | `target-php` | running PHP / `config.platform.php` | PHP version used for the S5 "old promise" check, e.g. `"8.4"` |
-| `format` | `table` | `table` or `json` |
+| `format` | `table` | `table`, `json`, `github` (workflow annotations) or `sarif` (SARIF 2.1.0), see [GitHub Actions](#github-actions) |
 | `include-dev` | `false` | Also check `packages-dev` |
 | `install-time` | `on` | `on` or `off`: print the [install-time summary](#install-time-summary) during `composer require`/`update`/`install` |
 | `install-time-strict` | `false` | Apply `fail-on` at install time too, stopping the transaction instead of only reporting |
@@ -283,7 +283,7 @@ must be JSON integers (`3`, not `"3"`).
 
 | Option | Meaning |
 |---|---|
-| `--format=table\|json` | Output format |
+| `--format=table\|json\|github\|sarif` | Output format. `github` prints GitHub Actions workflow commands so findings become annotations on `composer.lock`; `sarif` prints a SARIF 2.1.0 document for `upload-sarif` — see [GitHub Actions](#github-actions). The format changes the output only; the exit code is the same for all four |
 | `--fail-on=none\|abandoned\|silent\|pinned\|old-promise\|stale` | Exit-1 threshold for this run |
 | `--target-php=8.4` | PHP version for the S5 check |
 | `--dev` | Include `packages-dev` |
@@ -357,6 +357,50 @@ GitHub Actions, using the PHAR (no plugin installed, no dependency added to the 
 Setting `GITHUB_TOKEN` lets lockrot check repository activity (S3/S4) for every candidate package
 instead of the no-token budget described below.
 
+### GitHub Actions
+
+`--format=github` prints [workflow
+commands](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/workflow-commands-for-github-actions),
+one per finding, so every flagged package shows up as an annotation on its own line of
+`composer.lock` in the pull request's Files changed view:
+
+```yaml
+- name: lockrot
+  run: composer lockrot --format=github --fail-on=silent --target-php=8.4
+  env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
+
+Findings at or above `--fail-on` are annotated as errors, everything else flagged as warnings, and
+the rows that only `--all` shows as notices — so the annotation colour matches the exit code.
+
+`--format=sarif` prints a [SARIF 2.1.0](https://json.schemastore.org/sarif-2.1.0.json) document for
+GitHub code scanning, which keeps the findings in the repository's Security tab and tracks them
+across runs. The upload step needs the `security-events: write` permission:
+
+```yaml
+permissions:
+  contents: read
+  security-events: write
+
+steps:
+  - uses: actions/checkout@v4
+  - name: lockrot
+    run: composer lockrot --format=sarif --fail-on=silent --target-php=8.4 > lockrot.sarif
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  - name: Upload SARIF
+    if: always()
+    uses: github/codeql-action/upload-sarif@v3
+    with:
+      sarif_file: lockrot.sarif
+```
+
+`if: always()` keeps the upload running when `--fail-on` already failed the step. The exit codes
+are the same for every format (see [Exit codes](#exit-codes)); only the output changes. Both
+formats point at `composer.lock` in the checkout root, so run them from the directory that holds
+the lock file.
+
 ## Allowlist
 
 Packages that are "finished by design" (an interface package that will not release again, a
@@ -403,8 +447,8 @@ pattern and a one-line reason — the same shape as the existing entries.
 
 ## Roadmap
 
-- **v0.2**: a baseline file so CI can fail only on new or worsened findings,
-  `--format=sarif`/`github`/`gitlab`, and a GitHub Action.
+- **v0.2**: a baseline file so CI can fail only on new or worsened findings, `--format=gitlab`
+  (Code Quality JSON), and a GitHub Action.
 - **v0.3**: transitive exposure on parent packages (S7), `--format=markdown` for PR comments,
   GitLab/Bitbucket repository activity, and inspecting the `vendor/*/composer.lock` of bundled
   PHAR tools.

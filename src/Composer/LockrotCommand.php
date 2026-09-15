@@ -22,7 +22,9 @@ use Lockrot\Deadline;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
+use Lockrot\Output\FormatContext;
 use Lockrot\Output\Formatters;
+use Lockrot\Version;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
@@ -48,7 +50,7 @@ final class LockrotCommand extends BaseCommand
         $this
             ->setAliases(['rot'])
             ->setDescription('Shows dependency rot in composer.lock: abandoned, silent, pinned and old-promise packages')
-            ->addOption('format', null, InputOption::VALUE_REQUIRED, 'Output format: table or json')
+            ->addOption('format', null, InputOption::VALUE_REQUIRED, 'Output format: table, json, github (workflow annotations) or sarif (SARIF 2.1.0)')
             ->addOption('fail-on', null, InputOption::VALUE_REQUIRED, 'Exit 1 when a finding reaches this verdict: none, abandoned, silent, pinned, old-promise, stale')
             ->addOption('target-php', null, InputOption::VALUE_REQUIRED, 'PHP version the project targets, e.g. 8.4 (default: config.platform.php or the running PHP)')
             ->addOption('dev', null, InputOption::VALUE_NONE, 'Include packages-dev')
@@ -139,7 +141,8 @@ final class LockrotCommand extends BaseCommand
 
                 return Policy::EXIT_OK;
             }
-            $lock = LockFile::fromFile($cwd.'/composer.lock');
+            $lockPath = $cwd.'/composer.lock';
+            $lock = LockFile::fromFile($lockPath);
             $clock = Clock::fromEnvironment($env);
             $token = TokenResolver::resolve($env, ServiceFactory::githubTokenFromComposer($config));
             // `composer lockrot` is the deliberate, full run: no time budget, unlike the
@@ -147,7 +150,11 @@ final class LockrotCommand extends BaseCommand
             $analyzer = ($this->analyzerFactory)($io, $config, $repositories, $lockrot, $token, $clock, Deadline::never());
             $analyzer = $analyzer->withAllowlist($analyzer->allowlist()->merge(ProjectIgnoreList::fromExtra($project->lockrotExtra())));
             $report = $analyzer->analyze($lock, $project, $lockrot->includeDev());
-            $output->write(Formatters::for($lockrot->format())->format($report, $input->getOption('all') === true));
+            // The annotation formats point back at the lock they were computed from; an unreadable
+            // one throws ConfigException from here, which the catch below turns into exit 2 the
+            // same way an unreadable lock does a few lines up.
+            $context = FormatContext::create($lockPath, $lockrot->failOn(), Version::STRING);
+            $output->write(Formatters::for($lockrot->format(), $context)->format($report, $input->getOption('all') === true));
 
             return Policy::exitCode($report, $lockrot);
         } catch (ConfigException $e) {

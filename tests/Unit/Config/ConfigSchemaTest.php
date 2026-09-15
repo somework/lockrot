@@ -38,6 +38,22 @@ final class ConfigSchemaTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
+    /** @dataProvider schemaFormats */
+    #[DataProvider('schemaFormats')]
+    public function testEveryDocumentedFormatPassesTheSchema(string $format): void
+    {
+        ConfigSchema::validate(['format' => $format]);
+        $this->addToAssertionCount(1);
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function schemaFormats(): iterable
+    {
+        foreach (['table', 'json', 'github', 'sarif'] as $format) {
+            yield $format => [$format];
+        }
+    }
+
     public function testUnknownKeysAreAllowed(): void
     {
         ConfigSchema::validate(['totally-unknown-key' => 'value']);

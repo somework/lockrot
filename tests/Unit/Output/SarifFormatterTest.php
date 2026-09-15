@@ -1,0 +1,277 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Lockrot\Tests\Unit\Output;
+
+use JsonSchema\Validator;
+use Lockrot\Analyzer\Report;
+use Lockrot\Config\LockrotConfig;
+use Lockrot\Output\FormatContext;
+use Lockrot\Output\Formatters;
+use Lockrot\Output\SarifFormatter;
+use Lockrot\Signal\Signal;
+use Lockrot\Tests\Support\JsonPath;
+use Lockrot\Verdict\Finding;
+use Lockrot\Verdict\Verdict;
+use Lockrot\Version;
+use PHPUnit\Framework\TestCase;
+
+final class SarifFormatterTest extends TestCase
+{
+    /**
+     * The official SARIF 2.1.0 JSON schema, downloaded on 2026-09-15 from
+     * https://json.schemastore.org/sarif-2.1.0.json and committed unchanged, so this test never
+     * depends on the network.
+     */
+    private const SCHEMA = __DIR__.'/../../fixtures/sarif/sarif-schema-2.1.0.json';
+    private const AT = '2026-09-14T06:00:00+00:00';
+
+    /** @var list<string> */
+    private array $tempDirs = [];
+
+    protected function tearDown(): void
+    {
+        foreach ($this->tempDirs as $dir) {
+            if (is_file($dir.'/composer.lock')) {
+                unlink($dir.'/composer.lock');
+            }
+            if (is_dir($dir)) {
+                rmdir($dir);
+            }
+        }
+        $this->tempDirs = [];
+    }
+
+    /** acme/abandoned is on line 4 of the lock written here, acme/silent on line 8. */
+    private function lockPath(): string
+    {
+        $dir = sys_get_temp_dir().'/lockrot-sarif-'.uniqid('', true);
+        if (!mkdir($dir, 0777, true) && !is_dir($dir)) {
+            throw new \RuntimeException('cannot create temp dir: '.$dir);
+        }
+        $this->tempDirs[] = $dir;
+        file_put_contents($dir.'/composer.lock', <<<'JSON'
+            {
+                "packages": [
+                    {
+                        "name": "acme/abandoned",
+                        "version": "1.0.0"
+                    },
+                    {
+                        "name": "acme/silent",
+                        "version": "2.0.8"
+                    }
+                ],
+                "packages-dev": []
+            }
+            JSON);
+
+        return $dir.'/composer.lock';
+    }
+
+    private function report(): Report
+    {
+        $at = new \DateTimeImmutable(self::AT);
+
+        return new Report([
+            new Finding('acme/abandoned', '1.0.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'flagged abandoned by its repository')], ['acme/abandoned'], null, $at),
+            new Finding('acme/also-abandoned', '1.1.0', Verdict::ABANDONED, [new Signal('S3', 'high', 'repository archived')], ['acme/also-abandoned'], null, $at),
+            new Finding('acme/silent', '2.0.8', Verdict::SILENT, [new Signal('S2', 'high', 'last release 2015-11-16'), new Signal('S4', 'high', 'last push 2015-11-16')], ['a/parent', 'acme/silent'], null, $at),
+            new Finding('acme/fine', '4.0.0', Verdict::OK, [], ['acme/fine'], null, $at),
+        ], ['GitHub token not set: repository activity checked only for 2 candidate packages'], $at, 4, 0, false);
+    }
+
+    private function formatter(string $failOn, ?string $lockPath): SarifFormatter
+    {
+        return new SarifFormatter(FormatContext::create($lockPath, $failOn));
+    }
+
+    /**
+     * The single run of a formatted report, as a decoded array.
+     *
+     * @return array<mixed, mixed>
+     */
+    private function singleRun(string $sarif): array
+    {
+        self::assertStringEndsWith("\n", $sarif);
+        $decoded = json_decode($sarif, true);
+        self::assertIsArray($decoded);
+        self::assertCount(1, JsonPath::arrayAt($decoded, ['runs']));
+
+        return JsonPath::arrayAt($decoded, ['runs', 0]);
+    }
+
+    private function assertValidSarif(string $sarif): void
+    {
+        $schema = json_decode((string) file_get_contents(self::SCHEMA));
+        self::assertIsObject($schema);
+        $document = json_decode($sarif);
+        self::assertIsObject($document);
+
+        $validator = new Validator();
+        $validator->validate($document, $schema);
+
+        $messages = [];
+        foreach ($validator->getErrors() as $error) {
+            if (\is_array($error) && \is_string($error['property'] ?? null) && \is_string($error['message'] ?? null)) {
+                $messages[] = $error['property'].': '.$error['message'];
+            }
+        }
+        self::assertTrue($validator->isValid(), implode("\n", $messages));
+    }
+
+    public function testFlaggedReportIsValidSarif(): void
+    {
+        $this->assertValidSarif($this->formatter(Verdict::SILENT, $this->lockPath())->format($this->report()));
+    }
+
+    public function testShowAllReportIsValidSarif(): void
+    {
+        $this->assertValidSarif($this->formatter(Verdict::SILENT, $this->lockPath())->format($this->report(), true));
+    }
+
+    public function testEmptyReportIsValidSarif(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $sarif = $this->formatter(LockrotConfig::FAIL_ON_NONE, null)->format(new Report([], [], $at, 0, 0, false));
+        $this->assertValidSarif($sarif);
+
+        $run = $this->singleRun($sarif);
+        self::assertSame([], JsonPath::arrayAt($run, ['results']));
+        self::assertSame([], JsonPath::arrayAt($run, ['tool', 'driver', 'rules']));
+        self::assertFalse(JsonPath::has($run, ['originalUriBaseIds']));
+        self::assertFalse(JsonPath::has($run, ['invocations', 0, 'toolExecutionNotifications']));
+    }
+
+    public function testEnvelope(): void
+    {
+        $sarif = $this->formatter(Verdict::SILENT, $this->lockPath())->format($this->report());
+        $decoded = json_decode($sarif, true);
+        self::assertIsArray($decoded);
+
+        self::assertSame('2.1.0', JsonPath::stringAt($decoded, ['version']));
+        self::assertSame('https://json.schemastore.org/sarif-2.1.0.json', JsonPath::stringAt($decoded, ['$schema']));
+
+        $run = $this->singleRun($sarif);
+        self::assertSame('lockrot', JsonPath::stringAt($run, ['tool', 'driver', 'name']));
+        self::assertSame(Version::STRING, JsonPath::stringAt($run, ['tool', 'driver', 'version']));
+        self::assertSame('https://github.com/somework/lockrot', JsonPath::stringAt($run, ['tool', 'driver', 'informationUri']));
+        self::assertSame('utf16CodeUnits', JsonPath::stringAt($run, ['columnKind']));
+        self::assertTrue(JsonPath::boolAt($run, ['invocations', 0, 'executionSuccessful']));
+        self::assertSame('note', JsonPath::stringAt($run, ['invocations', 0, 'toolExecutionNotifications', 0, 'level']));
+        self::assertStringStartsWith(
+            'GitHub token not set',
+            JsonPath::stringAt($run, ['invocations', 0, 'toolExecutionNotifications', 0, 'message', 'text'])
+        );
+    }
+
+    public function testRulesAreDeduplicatedAndIndexed(): void
+    {
+        $run = $this->singleRun($this->formatter(Verdict::SILENT, $this->lockPath())->format($this->report()));
+
+        self::assertSame(['lockrot/abandoned', 'lockrot/silent'], JsonPath::column($run, ['tool', 'driver', 'rules'], 'id'));
+        self::assertSame('warning', JsonPath::stringAt($run, ['tool', 'driver', 'rules', 0, 'defaultConfiguration', 'level']));
+        self::assertStringContainsString('abandoned', JsonPath::stringAt($run, ['tool', 'driver', 'rules', 0, 'shortDescription', 'text']));
+        self::assertStringContainsString('archived', JsonPath::stringAt($run, ['tool', 'driver', 'rules', 0, 'fullDescription', 'text']));
+        self::assertSame('https://github.com/somework/lockrot#what-the-verdicts-mean', JsonPath::stringAt($run, ['tool', 'driver', 'rules', 0, 'helpUri']));
+
+        self::assertCount(3, JsonPath::arrayAt($run, ['results']));
+        self::assertSame([0, 0, 1], JsonPath::column($run, ['results'], 'ruleIndex'));
+        self::assertSame(['lockrot/abandoned', 'lockrot/abandoned', 'lockrot/silent'], JsonPath::column($run, ['results'], 'ruleId'));
+    }
+
+    public function testLevelMappingAtTheFailOnBoundary(): void
+    {
+        $lockPath = $this->lockPath();
+
+        $atSilent = $this->singleRun($this->formatter(Verdict::SILENT, $lockPath)->format($this->report(), true));
+        self::assertSame(['error', 'error', 'error', 'note'], JsonPath::column($atSilent, ['results'], 'level'));
+
+        $atAbandoned = $this->singleRun($this->formatter(Verdict::ABANDONED, $lockPath)->format($this->report(), true));
+        self::assertSame(['error', 'error', 'warning', 'note'], JsonPath::column($atAbandoned, ['results'], 'level'));
+
+        $atNone = $this->singleRun($this->formatter(LockrotConfig::FAIL_ON_NONE, $lockPath)->format($this->report(), true));
+        self::assertSame(['warning', 'warning', 'warning', 'note'], JsonPath::column($atNone, ['results'], 'level'));
+    }
+
+    public function testResultLocationsRegionsAndProperties(): void
+    {
+        $lockPath = $this->lockPath();
+        $run = $this->singleRun($this->formatter(Verdict::SILENT, $lockPath)->format($this->report()));
+
+        self::assertSame('acme/abandoned 1.0.0: flagged abandoned by its repository', JsonPath::stringAt($run, ['results', 0, 'message', 'text']));
+        self::assertSame('composer.lock', JsonPath::stringAt($run, ['results', 0, 'locations', 0, 'physicalLocation', 'artifactLocation', 'uri']));
+        self::assertSame('%SRCROOT%', JsonPath::stringAt($run, ['results', 0, 'locations', 0, 'physicalLocation', 'artifactLocation', 'uriBaseId']));
+        self::assertSame(4, JsonPath::intAt($run, ['results', 0, 'locations', 0, 'physicalLocation', 'region', 'startLine']));
+        self::assertSame(8, JsonPath::intAt($run, ['results', 2, 'locations', 0, 'physicalLocation', 'region', 'startLine']));
+        self::assertSame(['lockrot/package' => 'acme/abandoned'], JsonPath::arrayAt($run, ['results', 0, 'partialFingerprints']));
+        self::assertSame([
+            'package' => 'acme/abandoned',
+            'version' => '1.0.0',
+            'verdict' => 'abandoned',
+            'signals' => ['S1'],
+            'chain' => ['acme/abandoned'],
+            'data_date' => '2026-09-14T06:00:00+00:00',
+        ], JsonPath::arrayAt($run, ['results', 0, 'properties']));
+        self::assertSame(['S2', 'S4'], JsonPath::arrayAt($run, ['results', 2, 'properties', 'signals']));
+        self::assertSame(['a/parent', 'acme/silent'], JsonPath::arrayAt($run, ['results', 2, 'properties', 'chain']));
+
+        // acme/also-abandoned is not in the lock, so its location carries no region at all.
+        self::assertFalse(JsonPath::has($run, ['results', 1, 'locations', 0, 'physicalLocation', 'region']));
+
+        self::assertSame(
+            'file://'.rtrim(str_replace('\\', '/', \dirname($lockPath)), '/').'/',
+            JsonPath::stringAt($run, ['originalUriBaseIds', '%SRCROOT%', 'uri'])
+        );
+    }
+
+    public function testWithoutALockPathThereIsNoUriBaseId(): void
+    {
+        $run = $this->singleRun($this->formatter(Verdict::SILENT, null)->format($this->report()));
+
+        self::assertFalse(JsonPath::has($run, ['originalUriBaseIds']));
+        self::assertFalse(JsonPath::has($run, ['results', 0, 'locations', 0, 'physicalLocation', 'artifactLocation', 'uriBaseId']));
+        self::assertFalse(JsonPath::has($run, ['results', 0, 'locations', 0, 'physicalLocation', 'region']));
+        self::assertSame('composer.lock', JsonPath::stringAt($run, ['results', 0, 'locations', 0, 'physicalLocation', 'artifactLocation', 'uri']));
+    }
+
+    public function testWordingAvoidsBannedTerms(): void
+    {
+        $out = strtolower($this->formatter(Verdict::SILENT, $this->lockPath())->format($this->allVerdictsReport(), true));
+        foreach (['vulnerable', 'broken', 'insecure', 'dead'] as $banned) {
+            self::assertStringNotContainsString($banned, $out);
+        }
+    }
+
+    public function testEveryVerdictProducesAValidDocumentWithItsOwnRule(): void
+    {
+        $sarif = $this->formatter(Verdict::STALE, $this->lockPath())->format($this->allVerdictsReport(), true);
+        $this->assertValidSarif($sarif);
+
+        $expected = [];
+        foreach (Verdict::all() as $verdict) {
+            $expected[] = 'lockrot/'.$verdict;
+        }
+        self::assertSame($expected, JsonPath::column($this->singleRun($sarif), ['tool', 'driver', 'rules'], 'id'));
+    }
+
+    private function allVerdictsReport(): Report
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $findings = [];
+        foreach (Verdict::all() as $index => $verdict) {
+            $findings[] = new Finding('acme/pkg'.$index, '1.0.'.$index, $verdict, [new Signal('S2', 'warn', 'last release 2015-11-16')], ['acme/pkg'.$index], null, $at);
+        }
+
+        return new Report($findings, [], $at, \count($findings), 0, false);
+    }
+
+    public function testFactory(): void
+    {
+        self::assertInstanceOf(
+            SarifFormatter::class,
+            Formatters::for('sarif', FormatContext::create(null, LockrotConfig::FAIL_ON_NONE))
+        );
+    }
+}

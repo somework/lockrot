@@ -21,6 +21,13 @@
   (integer seconds, 1–120, default 5); like the other install-time keys it has no CLI option or
   environment override.
 - `table` (default) and `--format=json` output.
+- `--format=github` prints GitHub Actions workflow commands, one per finding, so flagged packages
+  appear as annotations on their own line of `composer.lock` in a pull request; findings at or
+  above `fail-on` are annotated as errors, the rest of the flagged ones as warnings, and the rows
+  only `--all` shows as notices.
+- `--format=sarif` prints a SARIF 2.1.0 document for `github/codeql-action/upload-sarif`, with one
+  rule per verdict, `composer.lock` line numbers, and stable per-package fingerprints so code
+  scanning can track a finding across runs. Exit codes are unchanged by the chosen format.
 - Exit codes 0/1/2 driven by `--fail-on`, with network failures defaulting to exit 0 unless
   `--strict-network` is set.
 - Package metadata is loaded through the repositories configured for the project

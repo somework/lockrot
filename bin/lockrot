@@ -73,7 +73,7 @@ unset($lockrotArgv);
 $application = new class () extends \Composer\Console\Application {
     public function getLongVersion(): string
     {
-        return 'lockrot '.\Lockrot\Output\JsonFormatter::VERSION;
+        return 'lockrot '.\Lockrot\Version::STRING;
     }
 
     public function doRun(\Symfony\Component\Console\Input\InputInterface $input, \Symfony\Component\Console\Output\OutputInterface $output): int
@@ -88,7 +88,7 @@ $application = new class () extends \Composer\Console\Application {
     }
 };
 $application->setName('lockrot');
-$application->setVersion(\Lockrot\Output\JsonFormatter::VERSION);
+$application->setVersion(\Lockrot\Version::STRING);
 $application->add(new \Lockrot\Composer\LockrotCommand());
 $application->setDefaultCommand('lockrot', true);
 exit($application->run());

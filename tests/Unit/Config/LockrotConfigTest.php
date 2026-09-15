@@ -107,6 +107,27 @@ final class LockrotConfigTest extends TestCase
         LockrotConfig::fromSources([], [], ['fail-on' => 'dead'], '8.5.10', null);
     }
 
+    /** @dataProvider formats */
+    #[DataProvider('formats')]
+    public function testEveryDocumentedFormatIsAccepted(string $format): void
+    {
+        self::assertSame($format, LockrotConfig::fromSources([], [], ['format' => $format], '8.5.10', null)->format());
+        self::assertSame($format, LockrotConfig::fromSources(['format' => $format], [], [], '8.5.10', null)->format());
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function formats(): iterable
+    {
+        foreach (LockrotConfig::FORMATS as $format) {
+            yield $format => [$format];
+        }
+    }
+
+    public function testFormatsCoverTheNewOutputs(): void
+    {
+        self::assertSame(['table', 'json', 'github', 'sarif'], LockrotConfig::FORMATS);
+    }
+
     public function testInvalidFormat(): void
     {
         $this->expectException(ConfigException::class);
