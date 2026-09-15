@@ -58,10 +58,11 @@ final class LockLineIndexTest extends TestCase
     }
 
     /**
-     * Author blocks carry a "name" member too, but an author name is not a package name (no
-     * vendor/ prefix), so it never lands in the index and can never shadow a real package.
+     * A package entry is not the only object in a lock with a "name" member: authors have one, and
+     * so does `extra.thanks`, whose value is a real package name. Only the member of the entry
+     * itself counts.
      */
-    public function testAuthorNamesAreNotIndexed(): void
+    public function testNestedNameMembersAreNotIndexed(): void
     {
         $json = <<<'JSON'
             {
@@ -80,6 +81,91 @@ final class LockLineIndexTest extends TestCase
         $index = LockLineIndex::fromString($json);
         self::assertSame(4, $index->lineOf('acme/pkg'));
         self::assertNull($index->lineOf('KyleKatarn'));
+    }
+
+    /**
+     * `extra.thanks.name` names another package entirely, and it is spelled exactly like a package
+     * name, so "first occurrence wins" alone would map that package to the wrong line — here to a
+     * line inside a different entry, 6 lines above its own.
+     */
+    public function testThanksTargetDoesNotShadowTheRealEntry(): void
+    {
+        $json = <<<'JSON'
+            {
+                "packages": [
+                    {
+                        "name": "acme/first",
+                        "extra": {
+                            "thanks": {
+                                "name": "acme/later",
+                                "url": "https://example.test/acme/later"
+                            }
+                        }
+                    },
+                    {
+                        "name": "acme/later",
+                        "version": "2.0.0"
+                    }
+                ],
+                "packages-dev": []
+            }
+            JSON;
+        $index = LockLineIndex::fromString($json);
+        self::assertSame(4, $index->lineOf('acme/first'));
+        self::assertSame(13, $index->lineOf('acme/later'));
+    }
+
+    /** A "name" outside packages/packages-dev is not a package entry either. */
+    public function testTopLevelSectionsOtherThanPackagesAreIgnored(): void
+    {
+        $json = <<<'JSON'
+            {
+                "aliases": [
+                    {
+                        "name": "acme/aliased",
+                        "alias": "1.0.0"
+                    }
+                ],
+                "packages": [
+                    {
+                        "name": "acme/real",
+                        "version": "1.0.0"
+                    }
+                ]
+            }
+            JSON;
+        $index = LockLineIndex::fromString($json);
+        self::assertNull($index->lineOf('acme/aliased'));
+        self::assertSame(10, $index->lineOf('acme/real'));
+    }
+
+    /**
+     * Braces inside a string value must not move the nesting depth the scan tracks; a description
+     * full of them would otherwise push every later entry out of reach.
+     */
+    public function testBracesInsideStringValuesDoNotConfuseTheScan(): void
+    {
+        $json = <<<'JSON'
+            {
+                "packages": [
+                    {
+                        "description": "a {{ templating }} engine [with] brackets",
+                        "name": "acme/braces",
+                        "version": "1.0.0"
+                    }
+                ]
+            }
+            JSON;
+        self::assertSame(5, LockLineIndex::fromString($json)->lineOf('acme/braces'));
+    }
+
+    /**
+     * A lock written on one line carries no line to point at; the index is empty rather than wrong,
+     * and the formatters simply omit the line from their annotations.
+     */
+    public function testMinifiedLockYieldsNoLines(): void
+    {
+        self::assertNull(LockLineIndex::fromString('{"packages":[{"name":"acme/pkg"}]}')->lineOf('acme/pkg'));
     }
 
     public function testMissingFileThrows(): void

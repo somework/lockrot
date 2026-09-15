@@ -15,6 +15,18 @@ use Lockrot\Exception\ConfigException;
  * structure with no line information at all, and the reverse mapping only needs the one member.
  * Both `packages` and `packages-dev` are covered by a single pass; `packages-dev` comes second in
  * the file, so a name present in both (impossible in a lock Composer wrote) resolves to the first.
+ *
+ * A `"name"` member alone does not identify a package entry — `authors[]` has one, and
+ * `extra.thanks.name` holds the name of a *different* package, so matching on the member alone can
+ * map a package to a line inside someone else's entry. The scan therefore tracks nesting depth
+ * (string literals blanked first, so a brace inside a description cannot shift it) and accepts the
+ * member only where a package entry's own members live: depth 3, inside the top-level `packages` or
+ * `packages-dev` array. That anchor is independent of indentation, so a reformatted lock still
+ * resolves correctly.
+ *
+ * The index is best-effort by design: a lock with no line breaks (minified, or one entry per line)
+ * yields no lines at all rather than wrong ones, and the formatters then emit their annotations
+ * without a line number.
  */
 final class LockLineIndex
 {
@@ -51,19 +63,37 @@ final class LockLineIndex
         return self::fromString($contents);
     }
 
+    /** Top-level keys whose array elements are package entries. */
+    private const PACKAGE_SECTIONS = ['packages', 'packages-dev'];
+
+    /** The nesting depth of a package entry's own members: root object > section array > entry. */
+    private const ENTRY_DEPTH = 3;
+
     public static function fromString(string $json): self
     {
         $lines = [];
-        // Package names always carry a vendor prefix, so requiring the slash keeps the index to
-        // package entries: the "name" members of author blocks (which sit deeper inside an entry,
-        // after its own name) can never shadow a package of the same spelling.
+        $section = null;
+        $depth = 0;
+
         foreach (preg_split('/\r\n|\n|\r/', $json) ?: [] as $index => $line) {
-            if (preg_match('/^\s*"name":\s*"([^"]+\/[^"]+)"\s*,?\s*$/', $line, $match) !== 1) {
-                continue;
+            // Blank every string literal before anything structural is read off the line, so neither
+            // a brace inside a description nor a colon inside a URL can be mistaken for syntax.
+            $structure = preg_replace('/"(?:[^"\\\\]|\\\\.)*"/', '""', $line) ?? '';
+
+            if ($depth === 1 && preg_match('/^\s*"([^"]+)"\s*:/', $line, $key) === 1) {
+                $section = $key[1];
             }
-            if (!isset($lines[$match[1]])) {
+            if (
+                $depth === self::ENTRY_DEPTH
+                && \in_array($section, self::PACKAGE_SECTIONS, true)
+                && preg_match('/^\s*"name":\s*"([^"]+)"\s*,?\s*$/', $line, $match) === 1
+                && !isset($lines[$match[1]])
+            ) {
                 $lines[$match[1]] = $index + 1;
             }
+
+            $depth += substr_count($structure, '{') + substr_count($structure, '[')
+                - substr_count($structure, '}') - substr_count($structure, ']');
         }
 
         return new self($lines);

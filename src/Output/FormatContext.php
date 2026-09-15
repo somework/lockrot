@@ -64,9 +64,14 @@ final class FormatContext
 
     /**
      * The annotation severity a finding is reported at, shared by every format that has one, so the
-     * colour a reviewer sees matches the exit code the same run produces: anything that would make
-     * `composer lockrot` exit 1 is an error, anything else flagged is a warning, and the rows that
-     * only appear under --all are notes.
+     * colour a reviewer sees matches the exit code the same run produces: a finding that on its own
+     * would make `composer lockrot` exit 1 is an error, anything else flagged is a warning, and the
+     * rows that only appear under --all are notes.
+     *
+     * The match is with the fail-on threshold, not with the exit code in every case: --strict-network
+     * exits 1 on an unreachable repository or GitHub even when nothing is flagged (see
+     * Policy::exitCode()), and no individual finding is the cause of that, so none is marked error
+     * for it. The reason is carried by the report notes instead, which both formats emit.
      *
      * SARIF spells the third level `note` (its own enum); the GitHub workflow command for it is
      * `notice`, which GithubFormatter translates.

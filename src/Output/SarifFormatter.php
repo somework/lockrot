@@ -198,12 +198,22 @@ final class SarifFormatter implements FormatterInterface
     /**
      * The `originalUriBaseIds` entry for %SRCROOT%: an absolute file URI for the directory the lock
      * was read from, with the trailing slash SARIF 2.1.0 §3.4.4 requires of a directory URI.
+     *
+     * Each path segment is percent-encoded on its own so the separators survive: a checkout
+     * directory may legally hold a space, `#`, `?` or non-ASCII, none of which a URI can carry raw.
      */
     private static function directoryUri(string $lockPath): string
     {
         $directory = rtrim(str_replace('\\', '/', \dirname($lockPath)), '/');
 
-        return 'file:///'.ltrim($directory, '/').'/';
+        $segments = [];
+        foreach (explode('/', ltrim($directory, '/')) as $segment) {
+            // rawurlencode() also escapes ":", which RFC 3986 allows unescaped inside a path segment
+            // and which a Windows drive letter needs — file:///C:/project/, not file:///C%3A/project/.
+            $segments[] = str_replace('%3A', ':', rawurlencode($segment));
+        }
+
+        return 'file:///'.implode('/', $segments).'/';
     }
 
     /** @param array<string, mixed> $document */

@@ -374,6 +374,11 @@ one per finding, so every flagged package shows up as an annotation on its own l
 Findings at or above `--fail-on` are annotated as errors, everything else flagged as warnings, and
 the rows that only `--all` shows as notices — so the annotation colour matches the exit code.
 
+GitHub renders only a limited number of annotations per step, so on a large lock file the
+annotations are the headline and the step's own log holds every finding. The summary line at the
+end of the output always states the full counts, and `--format=sarif` below uploads the complete
+set.
+
 `--format=sarif` prints a [SARIF 2.1.0](https://json.schemastore.org/sarif-2.1.0.json) document for
 GitHub code scanning, which keeps the findings in the repository's Security tab and tracks them
 across runs. The upload step needs the `security-events: write` permission:

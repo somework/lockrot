@@ -226,6 +226,35 @@ final class SarifFormatterTest extends TestCase
         );
     }
 
+    /**
+     * A checkout directory may legally contain characters a URI cannot carry raw. The bundled
+     * validator's `uri-reference` format check is lenient enough to accept a raw space, so this
+     * asserts the encoding directly rather than relying on schema validation to catch it.
+     */
+    public function testDirectoryUriIsPercentEncoded(): void
+    {
+        $dir = sys_get_temp_dir().'/lockrot sarif #uri-'.uniqid('', true);
+        if (!mkdir($dir, 0777, true) && !is_dir($dir)) {
+            throw new \RuntimeException('cannot create temp dir: '.$dir);
+        }
+        $this->tempDirs[] = $dir;
+        file_put_contents($dir.'/composer.lock', '{"packages":[]}');
+
+        $at = new \DateTimeImmutable(self::AT);
+        $sarif = $this->formatter(LockrotConfig::FAIL_ON_NONE, $dir.'/composer.lock')
+            ->format(new Report([], [], $at, 0, 0, false));
+        $this->assertValidSarif($sarif);
+
+        $uri = JsonPath::stringAt($this->singleRun($sarif), ['originalUriBaseIds', '%SRCROOT%', 'uri']);
+        self::assertStringStartsWith('file:///', $uri);
+        self::assertStringEndsWith('/', $uri);
+        self::assertStringContainsString('/lockrot%20sarif%20%23uri-', $uri);
+        self::assertStringNotContainsString(' ', $uri);
+        self::assertStringNotContainsString('#', $uri);
+        // ":" is a legal path character and a Windows drive letter needs it, so it stays raw.
+        self::assertStringNotContainsString('%3A', $uri);
+    }
+
     public function testWithoutALockPathThereIsNoUriBaseId(): void
     {
         $run = $this->singleRun($this->formatter(Verdict::SILENT, null)->format($this->report()));
