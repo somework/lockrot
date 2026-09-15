@@ -84,12 +84,12 @@ final class InstallSummaryFormatterTest extends TestCase
     {
         $report = $this->report([
             $this->finding('vendor/a', '1.0.0', Verdict::SILENT, 'last release 2015-11-16 (10.8 years ago)'),
-            $this->finding('vendor/b', '2.0.0', Verdict::ABANDONED, 'flagged abandoned by its repository', ['vendor/a', 'vendor/b']),
+            $this->finding('vendor/b', '2.0.0', Verdict::ABANDONED, 'marked abandoned by its repository', ['vendor/a', 'vendor/b']),
         ], [], 5);
 
         self::assertSame([
             '<warning>lockrot: dependency rot in 2 of 5 changed packages</warning>',
-            '  <comment>abandoned   </comment>vendor/b 2.0.0: flagged abandoned by its repository (via vendor/a)',
+            '  <comment>abandoned   </comment>vendor/b 2.0.0: marked abandoned by its repository (via vendor/a)',
             '  <comment>silent      </comment>vendor/a 1.0.0: last release 2015-11-16 (10.8 years ago)',
             'Run composer lockrot for details.',
         ], (new InstallSummaryFormatter())->format($report));
@@ -142,7 +142,7 @@ final class InstallSummaryFormatterTest extends TestCase
     {
         $report = $this->report([
             $this->finding('vendor/a', '1.0.0', Verdict::SILENT, 'last release 2015-11-16; last push 2015-11-16'),
-            $this->finding('vendor/b', '2.0.0', Verdict::ABANDONED, 'flagged abandoned by its repository', ['vendor/a', 'vendor/b']),
+            $this->finding('vendor/b', '2.0.0', Verdict::ABANDONED, 'marked abandoned by its repository', ['vendor/a', 'vendor/b']),
             $this->finding('vendor/c', 'dev-main', Verdict::PINNED, 'installed version is a branch snapshot'),
         ], ['GitHub token not set: repository activity checked for 0 candidate packages'], 3);
 

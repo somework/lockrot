@@ -17,7 +17,7 @@ final class AbandonedRuleTest extends TestCase
         self::assertNotNull($signal);
         self::assertSame(Signal::S1, $signal->id());
         self::assertSame(Signal::LEVEL_HIGH, $signal->level());
-        self::assertSame('flagged abandoned by its repository, replacement: other/pkg', $signal->summary());
+        self::assertSame('marked abandoned by its repository, replacement: other/pkg', $signal->summary());
         self::assertSame('other/pkg', $signal->data()['replacement']);
     }
 
@@ -30,7 +30,7 @@ final class AbandonedRuleTest extends TestCase
     {
         $signal = (new AbandonedRule())->evaluate(F::facts(F::package(['abandonedInLock' => true])));
         self::assertNotNull($signal);
-        self::assertStringContainsString('(from composer.lock)', $signal->summary());
+        self::assertStringContainsString('in composer.lock', $signal->summary());
         self::assertNull((new AbandonedRule())->evaluate(F::facts(F::package())));
     }
 
@@ -39,7 +39,7 @@ final class AbandonedRuleTest extends TestCase
         $signal = (new AbandonedRule())->evaluate(F::facts(F::package(['abandonedInLock' => 'other/pkg'])));
         self::assertNotNull($signal);
         self::assertSame(Signal::S1, $signal->id());
-        self::assertSame('flagged abandoned (from composer.lock), replacement: other/pkg', $signal->summary());
+        self::assertSame('marked abandoned in composer.lock, replacement: other/pkg', $signal->summary());
         self::assertSame(['replacement' => 'other/pkg'], $signal->data());
     }
 }

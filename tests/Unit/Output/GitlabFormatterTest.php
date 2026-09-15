@@ -71,7 +71,7 @@ final class GitlabFormatterTest extends TestCase
         $at = new \DateTimeImmutable(self::AT);
 
         return new Report([
-            new Finding('acme/abandoned', '1.0.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'flagged abandoned by its repository')], ['acme/abandoned'], null, $at),
+            new Finding('acme/abandoned', '1.0.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'marked abandoned by its repository')], ['acme/abandoned'], null, $at),
             new Finding('acme/silent', '2.0.8', Verdict::SILENT, [new Signal('S2', 'high', 'last release 2015-11-16 (10.8 years ago)')], ['a/parent', 'acme/silent'], null, $at),
             new Finding('acme/absent', '3.0.0', Verdict::STALE, [new Signal('S2', 'warn', 'last release 2022-05-20 (4.3 years ago)')], ['acme/absent'], null, $at),
             new Finding('acme/fine', '4.0.0', Verdict::OK, [], ['acme/fine'], null, $at),
@@ -103,7 +103,7 @@ final class GitlabFormatterTest extends TestCase
         $first = $issues[0];
         self::assertSame('issue', $first['type']);
         self::assertSame('lockrot/abandoned', $first['check_name']);
-        self::assertSame('acme/abandoned 1.0.0 — abandoned (critical): flagged abandoned by its repository', $first['description']);
+        self::assertSame('acme/abandoned 1.0.0 — abandoned (critical): marked abandoned by its repository', $first['description']);
         self::assertSame(['Bug Risk'], $first['categories']);
         self::assertSame('major', $first['severity']);
         self::assertSame(hash('sha256', 'lockrot|acme/abandoned|abandoned'), $first['fingerprint']);
@@ -194,7 +194,7 @@ final class GitlabFormatterTest extends TestCase
     public function testFingerprintIgnoresTheVersionAndTheLockLine(): void
     {
         $at = new \DateTimeImmutable(self::AT);
-        $signal = new Signal('S1', 'high', 'flagged abandoned by its repository');
+        $signal = new Signal('S1', 'high', 'marked abandoned by its repository');
         $before = new Report([new Finding('acme/abandoned', '1.0.0', Verdict::ABANDONED, [$signal], ['acme/abandoned'], null, $at)], [], $at, 1, 0, false);
         $after = new Report([new Finding('acme/abandoned', '9.9.9', Verdict::ABANDONED, [$signal], ['acme/abandoned'], null, $at)], [], $at, 1, 0, false);
 
@@ -251,17 +251,17 @@ final class GitlabFormatterTest extends TestCase
     {
         $at = new \DateTimeImmutable(self::AT);
         $report = new Report([
-            new Finding('acme/abandoned', '1.0.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'flagged abandoned by its repository')], ['acme/abandoned'], null, $at),
+            new Finding('acme/abandoned', '1.0.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'marked abandoned by its repository')], ['acme/abandoned'], null, $at),
             // Transitive and development-only: two steps below critical.
-            new Finding('acme/silent', '2.0.8', Verdict::ABANDONED, [new Signal('S1', 'high', 'flagged abandoned by its repository')], ['a/parent', 'acme/silent'], null, $at, null, true),
+            new Finding('acme/silent', '2.0.8', Verdict::ABANDONED, [new Signal('S1', 'high', 'marked abandoned by its repository')], ['a/parent', 'acme/silent'], null, $at, null, true),
             new Finding('acme/fine', '4.0.0', Verdict::OK, [], ['acme/fine'], null, $at),
         ], [], $at, 3, 0, false);
 
         $issues = $this->decode($this->formatter(LockrotConfig::FAIL_ON_NONE, null)->format($report, true));
 
         self::assertSame([
-            'acme/abandoned 1.0.0 — abandoned (critical): flagged abandoned by its repository',
-            'acme/silent 2.0.8 — abandoned (medium): flagged abandoned by its repository (via a/parent)',
+            'acme/abandoned 1.0.0 — abandoned (critical): marked abandoned by its repository',
+            'acme/silent 2.0.8 — abandoned (medium): marked abandoned by its repository (via a/parent)',
             'acme/fine 4.0.0 — ok (none)',
         ], array_column($issues, 'description'));
 

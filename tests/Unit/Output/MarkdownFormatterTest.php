@@ -27,7 +27,7 @@ final class MarkdownFormatterTest extends TestCase
         $at = new \DateTimeImmutable(self::AT);
 
         return new Report([
-            new Finding('doctrine/cache', '1.13.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'flagged abandoned by its repository')], ['doctrine/cache'], null, $at),
+            new Finding('doctrine/cache', '1.13.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'marked abandoned by its repository')], ['doctrine/cache'], null, $at),
             new Finding('phpzip/phpzip', '2.0.8', Verdict::SILENT, [new Signal('S2', 'high', 'last release 2015-11-16 (10.8 years ago)')], ['wallabag/wallabag', 'grandt/phpepub', 'phpzip/phpzip'], null, $at),
             new Finding('vendor/ok', '1.0.0', Verdict::OK, [], ['vendor/ok'], null, $at),
         ], ['GitHub token not set: repository activity checked only for 2 candidate packages'], $at, 3, 0, false);
@@ -57,9 +57,9 @@ final class MarkdownFormatterTest extends TestCase
     {
         $at = new \DateTimeImmutable(self::AT);
         $report = new Report([
-            new Finding('doctrine/cache', '1.13.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'flagged abandoned by its repository')], ['doctrine/cache'], null, $at),
+            new Finding('doctrine/cache', '1.13.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'marked abandoned by its repository')], ['doctrine/cache'], null, $at),
             // Transitive and development-only: two steps below critical.
-            new Finding('acme/dev-only', '2.0.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'flagged abandoned by its repository')], ['a/parent', 'acme/dev-only'], null, $at, null, true),
+            new Finding('acme/dev-only', '2.0.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'marked abandoned by its repository')], ['a/parent', 'acme/dev-only'], null, $at, null, true),
             new Finding('vendor/ok', '1.0.0', Verdict::OK, [], ['vendor/ok'], null, $at),
         ], [], $at, 3, 0, false);
 
@@ -67,8 +67,8 @@ final class MarkdownFormatterTest extends TestCase
         $rows = array_values(array_filter($lines, static fn (string $line): bool => strpos($line, '` |') !== false));
 
         self::assertSame([
-            '| critical | `doctrine/cache` | 1.13.0 | **abandoned** | flagged abandoned by its repository | direct |',
-            '| medium | `acme/dev-only` | 2.0.0 | **abandoned** | flagged abandoned by its repository | a/parent |',
+            '| critical | `doctrine/cache` | 1.13.0 | **abandoned** | marked abandoned by its repository | direct |',
+            '| medium | `acme/dev-only` | 2.0.0 | **abandoned** | marked abandoned by its repository | a/parent |',
             '| none | `vendor/ok` | 1.0.0 | ok |  | direct |',
         ], $rows);
     }

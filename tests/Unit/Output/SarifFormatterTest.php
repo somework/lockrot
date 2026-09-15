@@ -78,7 +78,7 @@ final class SarifFormatterTest extends TestCase
         $at = new \DateTimeImmutable(self::AT);
 
         return new Report([
-            new Finding('acme/abandoned', '1.0.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'flagged abandoned by its repository')], ['acme/abandoned'], null, $at),
+            new Finding('acme/abandoned', '1.0.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'marked abandoned by its repository')], ['acme/abandoned'], null, $at),
             new Finding('acme/also-abandoned', '1.1.0', Verdict::ABANDONED, [new Signal('S3', 'high', 'repository archived')], ['acme/also-abandoned'], null, $at),
             new Finding('acme/silent', '2.0.8', Verdict::SILENT, [new Signal('S2', 'high', 'last release 2015-11-16'), new Signal('S4', 'high', 'last push 2015-11-16')], ['a/parent', 'acme/silent'], null, $at),
             new Finding('acme/fine', '4.0.0', Verdict::OK, [], ['acme/fine'], null, $at),
@@ -203,7 +203,7 @@ final class SarifFormatterTest extends TestCase
         $lockPath = $this->lockPath();
         $run = $this->singleRun($this->formatter(Verdict::SILENT, $lockPath)->format($this->report()));
 
-        self::assertSame('acme/abandoned 1.0.0: flagged abandoned by its repository', JsonPath::stringAt($run, ['results', 0, 'message', 'text']));
+        self::assertSame('acme/abandoned 1.0.0: marked abandoned by its repository', JsonPath::stringAt($run, ['results', 0, 'message', 'text']));
         self::assertSame('composer.lock', JsonPath::stringAt($run, ['results', 0, 'locations', 0, 'physicalLocation', 'artifactLocation', 'uri']));
         self::assertSame('%SRCROOT%', JsonPath::stringAt($run, ['results', 0, 'locations', 0, 'physicalLocation', 'artifactLocation', 'uriBaseId']));
         self::assertSame(4, JsonPath::intAt($run, ['results', 0, 'locations', 0, 'physicalLocation', 'region', 'startLine']));
@@ -242,9 +242,9 @@ final class SarifFormatterTest extends TestCase
         $at = new \DateTimeImmutable(self::AT);
 
         return new Report([
-            new Finding('acme/abandoned', '1.0.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'flagged abandoned by its repository')], ['acme/abandoned'], null, $at),
-            new Finding('acme/transitive', '5.0.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'flagged abandoned by its repository')], ['a/parent', 'acme/transitive'], null, $at),
-            new Finding('acme/dev-only', '2.0.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'flagged abandoned by its repository')], ['a/parent', 'acme/dev-only'], null, $at, null, true),
+            new Finding('acme/abandoned', '1.0.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'marked abandoned by its repository')], ['acme/abandoned'], null, $at),
+            new Finding('acme/transitive', '5.0.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'marked abandoned by its repository')], ['a/parent', 'acme/transitive'], null, $at),
+            new Finding('acme/dev-only', '2.0.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'marked abandoned by its repository')], ['a/parent', 'acme/dev-only'], null, $at, null, true),
             new Finding('acme/stale', '3.0.0', Verdict::STALE, [new Signal('S2', 'warn', 'last release 2022-05-20')], ['a/parent', 'acme/stale'], null, $at),
             new Finding('acme/fine', '4.0.0', Verdict::OK, [], ['acme/fine'], null, $at),
         ], [], $at, 5, 0, false);

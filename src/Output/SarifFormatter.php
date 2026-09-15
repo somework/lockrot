@@ -50,7 +50,7 @@ final class SarifFormatter implements FormatterInterface
      */
     private const DESCRIPTIONS = [
         Verdict::ABANDONED => [
-            'Package is flagged abandoned, or its repository is archived',
+            'Package is marked abandoned by its repository, or its repository is archived',
             "The package's Composer repository flags it abandoned (Packagist by default), or its GitHub repository is archived.",
         ],
         Verdict::SILENT => [

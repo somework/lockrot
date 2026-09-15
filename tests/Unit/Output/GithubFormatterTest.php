@@ -74,7 +74,7 @@ final class GithubFormatterTest extends TestCase
         $at = new \DateTimeImmutable(self::AT);
 
         return new Report([
-            new Finding('acme/abandoned', '1.0.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'flagged abandoned by its repository')], ['acme/abandoned'], null, $at),
+            new Finding('acme/abandoned', '1.0.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'marked abandoned by its repository')], ['acme/abandoned'], null, $at),
             new Finding('acme/silent', '2.0.8', Verdict::SILENT, [new Signal('S2', 'high', 'last release 2015-11-16 (10.8 years ago)')], ['a/parent', 'acme/silent'], null, $at),
             new Finding('acme/absent', '3.0.0', Verdict::STALE, [new Signal('S2', 'warn', 'last release 2022-05-20 (4.3 years ago)')], ['acme/absent'], null, $at),
             new Finding('acme/fine', '4.0.0', Verdict::OK, [], ['acme/fine'], null, $at),
@@ -91,7 +91,7 @@ final class GithubFormatterTest extends TestCase
         $out = $this->formatter(Verdict::SILENT, $this->lockPath())->format($this->report(), true);
         $lines = explode("\n", trim($out));
 
-        self::assertSame('::error file=composer.lock,line=4,title=lockrot%3A abandoned (critical)::acme/abandoned 1.0.0: flagged abandoned by its repository', $lines[0]);
+        self::assertSame('::error file=composer.lock,line=4,title=lockrot%3A abandoned (critical)::acme/abandoned 1.0.0: marked abandoned by its repository', $lines[0]);
         self::assertSame('::error file=composer.lock,line=8,title=lockrot%3A silent (high)::acme/silent 2.0.8: last release 2015-11-16 (10.8 years ago) (via a/parent)', $lines[1]);
         self::assertSame('::warning file=composer.lock,title=lockrot%3A stale (medium)::acme/absent 3.0.0: last release 2022-05-20 (4.3 years ago)', $lines[2]);
         self::assertSame('::notice file=composer.lock,title=lockrot%3A ok (none)::acme/fine 4.0.0', $lines[3]);
@@ -106,9 +106,9 @@ final class GithubFormatterTest extends TestCase
     {
         $at = new \DateTimeImmutable(self::AT);
         $report = new Report([
-            new Finding('acme/abandoned', '1.0.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'flagged abandoned by its repository')], ['acme/abandoned'], null, $at),
+            new Finding('acme/abandoned', '1.0.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'marked abandoned by its repository')], ['acme/abandoned'], null, $at),
             // Transitive and development-only: two steps below critical.
-            new Finding('acme/silent', '2.0.8', Verdict::ABANDONED, [new Signal('S1', 'high', 'flagged abandoned by its repository')], ['a/parent', 'acme/silent'], null, $at, null, true),
+            new Finding('acme/silent', '2.0.8', Verdict::ABANDONED, [new Signal('S1', 'high', 'marked abandoned by its repository')], ['a/parent', 'acme/silent'], null, $at, null, true),
             new Finding('acme/fine', '4.0.0', Verdict::OK, [], ['acme/fine'], null, $at),
         ], [], $at, 3, 0, false);
 

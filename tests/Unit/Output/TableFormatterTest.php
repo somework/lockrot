@@ -50,8 +50,8 @@ final class TableFormatterTest extends TestCase
         $at = new \DateTimeImmutable(self::AT);
 
         return new Report([
-            new Finding('doctrine/cache', '2.2.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'flagged abandoned by its repository'), new Signal('S2', 'high', 'last release 2022-05-20 (4.3 years ago)')], ['doctrine/cache'], null, $at),
-            new Finding('hoa/compiler', '3.17.08.08', Verdict::ABANDONED, [new Signal('S1', 'high', 'flagged abandoned by its repository'), new Signal('S4', 'high', 'repository archived on GitHub; last push 2021-04-29 (5.4 years ago)')], ['wallabag/rulerz', 'hoa/ruler', 'hoa/compiler'], null, $at),
+            new Finding('doctrine/cache', '2.2.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'marked abandoned by its repository'), new Signal('S2', 'high', 'last release 2022-05-20 (4.3 years ago)')], ['doctrine/cache'], null, $at),
+            new Finding('hoa/compiler', '3.17.08.08', Verdict::ABANDONED, [new Signal('S1', 'high', 'marked abandoned by its repository'), new Signal('S4', 'high', 'repository archived on GitHub; last push 2021-04-29 (5.4 years ago)')], ['wallabag/rulerz', 'hoa/ruler', 'hoa/compiler'], null, $at),
             new Finding('vendor/stale-direct', '2.1.0', Verdict::STALE, [new Signal('S2', 'warn', 'last release 2022-05-20 (4.3 years ago)')], ['vendor/stale-direct'], null, $at),
             new Finding('vendor/stale-deep', '1.0.0', Verdict::STALE, [new Signal('S2', 'warn', 'last release 2022-01-04 (4.7 years ago)')], ['vendor/root', 'vendor/stale-deep'], null, $at),
             new Finding('psr/cache', '3.0.0', Verdict::FINISHED, [], ['psr/cache'], 'interfaces', $at),
@@ -108,7 +108,7 @@ final class TableFormatterTest extends TestCase
 
         // label width is the 11-character minimum here, so the indent is 2 + 11 + 2 = 15
         self::assertSame('  abandoned    doctrine/cache 2.2.0  direct', $lines[1]);
-        self::assertSame('               flagged abandoned by its repository; last release 2022-05-20 (4.3 years ago)', $lines[2]);
+        self::assertSame('               marked abandoned by its repository; last release 2022-05-20 (4.3 years ago)', $lines[2]);
         self::assertSame('', $lines[3]);
         self::assertSame('high (1)', $lines[4]);
         self::assertSame('  abandoned    hoa/compiler 3.17.08.08  via wallabag/rulerz › hoa/ruler', $lines[5]);
@@ -177,7 +177,7 @@ final class TableFormatterTest extends TestCase
         );
         // and so did the evidence underneath it
         self::assertStringContainsString(
-            str_repeat(' ', 15)."flagged abandoned by its repository; last\n".str_repeat(' ', 15).'release 2022-05-20',
+            str_repeat(' ', 15)."marked abandoned by its repository; last\n".str_repeat(' ', 15).'release 2022-05-20',
             $this->plain($out)
         );
     }
@@ -246,7 +246,7 @@ final class TableFormatterTest extends TestCase
     {
         $at = new \DateTimeImmutable(self::AT);
         $report = new Report([
-            new Finding('vendor/<info>weird', '1.0.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'flagged abandoned by its repository')], ['vendor/<info>weird'], null, $at),
+            new Finding('vendor/<info>weird', '1.0.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'marked abandoned by its repository')], ['vendor/<info>weird'], null, $at),
         ], ['note with <comment> in it'], $at, 1, 0, false);
 
         $out = (new TableFormatter(FormatContext::create(null, LockrotConfig::FAIL_ON_NONE, '0.1.0', 200)))->format($report);
@@ -439,11 +439,11 @@ final class TableFormatterTest extends TestCase
     {
         $at = new \DateTimeImmutable(self::AT);
         $report = new Report([
-            new Finding('vendor/allowed', '1.0.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'flagged abandoned by its repository')], ['vendor/allowed'], 'replaced upstream', $at),
+            new Finding('vendor/allowed', '1.0.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'marked abandoned by its repository')], ['vendor/allowed'], 'replaced upstream', $at),
         ], [], $at, 1, 0, false);
 
         self::assertStringContainsString(
-            'flagged abandoned by its repository; allowlisted: replaced upstream',
+            'marked abandoned by its repository; allowlisted: replaced upstream',
             $this->plain($this->formatter()->format($report))
         );
     }

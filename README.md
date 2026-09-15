@@ -99,7 +99,7 @@ COLUMNS=120 GITHUB_TOKEN=$(gh auth token) php bin/lockrot -d tests/fixtures/apps
 ```
 critical (3)
   abandoned    sensio/framework-extra-bundle v6.2.10  direct
-               flagged abandoned by its repository, replacement: Symfony; last release 2023-02-24 (3.6 years ago);
+               marked abandoned by its repository, replacement: Symfony; last release 2023-02-24 (3.6 years ago);
                repository archived on GitHub; last push 2023-02-24 (3.6 years ago); released 2023-02-24, before PHP 8.4
                GA (2024-11-21); php constraint ">=7.2.5" has no upper bound
   silent       javibravo/simpleue 2.1.0  direct
@@ -111,17 +111,17 @@ critical (3)
 
 high (58)
   abandoned    behat/transliterator v1.5.0  via stof/doctrine-extensions-bundle › gedmo/doctrine-extensions
-               flagged abandoned by its repository; last release 2022-03-30 (4.5 years ago); repository archived on
+               marked abandoned by its repository; last release 2022-03-30 (4.5 years ago); repository archived on
                GitHub; released 2022-03-30, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2" has no upper bound
   abandoned    doctrine/annotations 2.0.2  via sensio/framework-extra-bundle
-               flagged abandoned by its repository
+               marked abandoned by its repository
   abandoned    doctrine/cache 2.2.0  via doctrine/doctrine-bundle
-               flagged abandoned by its repository; last release 2022-05-20 (4.3 years ago)
+               marked abandoned by its repository; last release 2022-05-20 (4.3 years ago)
   abandoned    hoa/compiler 3.17.08.08  via wallabag/rulerz › hoa/ruler
-               flagged abandoned by its repository; last release 2017-08-08 (9.1 years ago); repository archived on
+               marked abandoned by its repository; last release 2017-08-08 (9.1 years ago); repository archived on
                GitHub; last push 2021-04-29 (5.4 years ago)
   abandoned    hoa/consistency 1.17.05.02  via wallabag/rulerz
-               flagged abandoned by its repository; last release 2017-08-29 (9.0 years ago); repository archived on
+               marked abandoned by its repository; last release 2017-08-29 (9.0 years ago); repository archived on
                GitHub; last push 2021-04-28 (5.4 years ago); released 2017-05-02, before PHP 8.4 GA (2024-11-21); php
                constraint ">=5.5.0" has no upper bound
 ... (66 more rows omitted)
@@ -563,7 +563,7 @@ Each annotation's title is `lockrot: <verdict> (<priority>)`, e.g. `lockrot: aba
 so the [priority](#priority) is visible on the line itself:
 
 ```text
-::error file=composer.lock,line=8010,title=lockrot%3A abandoned (critical)::sensio/framework-extra-bundle v6.2.10: flagged abandoned by its repository, replacement: Symfony; …
+::error file=composer.lock,line=8010,title=lockrot%3A abandoned (critical)::sensio/framework-extra-bundle v6.2.10: marked abandoned by its repository, replacement: Symfony; …
 ```
 
 Findings at or above `--fail-on` are annotated as errors, everything else flagged as warnings, and
@@ -629,7 +629,7 @@ Code Quality has no title field of its own, so each issue's description opens wi
 version and the same `<verdict> (<priority>)` phrase the GitHub annotation title uses:
 
 ```text
-sensio/framework-extra-bundle v6.2.10 — abandoned (critical): flagged abandoned by its repository, replacement: Symfony; …
+sensio/framework-extra-bundle v6.2.10 — abandoned (critical): marked abandoned by its repository, replacement: Symfony; …
 ```
 
 Severity follows the same rule as the GitHub/SARIF level: a finding at or above `--fail-on` is
@@ -651,8 +651,8 @@ notes as a bullet list, and a `<sub>` footer with the full summary:
 ```markdown
 | Priority | Package | Version | Verdict | Evidence | Via |
 |---|---|---|---|---|---|
-| critical | `sensio/framework-extra-bundle` | v6.2.10 | **abandoned** | flagged abandoned by its repository, replacement: Symfony; last release 2023-02-24 (3.6 years ago); … | direct |
-| high | `doctrine/annotations` | 2.0.2 | **abandoned** | flagged abandoned by its repository | sensio/framework-extra-bundle |
+| critical | `sensio/framework-extra-bundle` | v6.2.10 | **abandoned** | marked abandoned by its repository, replacement: Symfony; last release 2023-02-24 (3.6 years ago); … | direct |
+| high | `doctrine/annotations` | 2.0.2 | **abandoned** | marked abandoned by its repository | sensio/framework-extra-bundle |
 | high | `friendsofsymfony/oauth-server-bundle` | dev-master | **pinned** | last release 2019-01-23 (7.6 years ago); pinned to branch snapshot dev-master | direct |
 ```
 

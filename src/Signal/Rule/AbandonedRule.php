@@ -17,7 +17,7 @@ final class AbandonedRule implements SignalRule
             if (!$metadata->isAbandoned()) {
                 return null;
             }
-            $summary = 'flagged abandoned by its repository';
+            $summary = 'marked abandoned by its repository';
             if ($metadata->replacement() !== null) {
                 $summary .= ', replacement: '.$metadata->replacement();
             }
@@ -26,7 +26,7 @@ final class AbandonedRule implements SignalRule
         }
         $inLock = $facts->package()->abandonedInLock();
         if ($inLock === true || (\is_string($inLock) && $inLock !== '')) {
-            $summary = 'flagged abandoned (from composer.lock)';
+            $summary = 'marked abandoned in composer.lock';
             if (\is_string($inLock)) {
                 $summary .= ', replacement: '.$inLock;
             }
