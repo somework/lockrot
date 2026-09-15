@@ -221,9 +221,10 @@ final class TableFormatter implements FormatterInterface
      * Wrapped to $wrap columns, each resulting line escaped. With $cut a word longer than the width
      * is cut rather than allowed to overflow — what the rows need, so a row is never wider than the
      * terminal. The summary block passes false: its only long tokens are paths (a baseline file in
-     * a note), and a path split across two lines cannot be copied, so there the line may overflow. Wrapping happens before escaping: escaping inserts backslashes the terminal never
-     * shows, and counting those would wrap early. Lines are right-trimmed — a run of spaces in the
-     * source text can otherwise end a line with invisible padding.
+     * a note), and a path split across two lines cannot be copied, so there the line may overflow.
+     * Wrapping happens before escaping: escaping inserts backslashes the terminal never shows, and
+     * counting those would wrap early. Lines are right-trimmed — a run of spaces in the source text
+     * can otherwise end a line with invisible padding.
      *
      * `wordwrap()` counts bytes, which is deliberate here: measuring bytes can only ever wrap a
      * line *earlier* than its display width demands, so a row is never wider than the terminal.
@@ -251,9 +252,9 @@ final class TableFormatter implements FormatterInterface
      *
      * Wrapped like the rows, but to the full width, with no indent, and without cutting a long
      * token (see {@see wrap()}): these lines are facts in their own right rather than continuations
-     * of a label, so nothing hangs under a column. The
-     * strings themselves are untouched — {@see Report::summaryLine()} is shared with the `github`
-     * format, which pins itself against it, so only this renderer decides where it folds.
+     * of a label, so nothing hangs under a column. The strings themselves are untouched —
+     * {@see Report::summaryLine()} is shared with the `github` format, which pins itself against it,
+     * so only this renderer decides where it folds.
      *
      * The priority totals are printed only when there is something flagged to total. On a clean
      * report `critical 0 · high 0 · medium 0 · low 0` is four zeros under "No dependency rot
@@ -292,10 +293,6 @@ final class TableFormatter implements FormatterInterface
         return $lines;
     }
 
-    /**
-     * symfony/console's own escaping, which both bundled versions ship (5.4.47
-     * Formatter/OutputFormatter.php:43, 2.8.52 same file:34).
-     */
     private static function escape(string $text): string
     {
         return OutputFormatter::escape($text);

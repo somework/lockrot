@@ -14,10 +14,10 @@ use Lockrot\Verdict\Verdict;
  * anything in the lock.
  *
  * Matching is by **package name only** — the baselined version is informational, so a version bump
- * that keeps the same verdict stays accepted (ruling, SPEC F7). A finding whose severity is at or
- * below the baselined verdict's is `known`; anything above it is `worsened` and carries the verdict
- * it was accepted at. Stale entries are reported, never failed on: a package leaving the lock is
- * good news, and lockrot never edits the baseline on a normal run.
+ * that keeps the same verdict stays accepted. A finding whose severity is at or below the baselined
+ * verdict's is `known`; anything above it is `worsened` and carries the verdict it was accepted at.
+ * Stale entries are reported, never failed on: a package leaving the lock is good news, and lockrot
+ * never edits the baseline on a normal run.
  */
 final class BaselineComparison
 {

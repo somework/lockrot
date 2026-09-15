@@ -33,6 +33,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/** `composer lockrot` — analyses composer.lock and prints a report in the configured format. */
 final class LockrotCommand extends BaseCommand
 {
     /** @var callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, ?string, Clock, Deadline): Analyzer */
@@ -76,19 +77,18 @@ final class LockrotCommand extends BaseCommand
 
     /**
      * Composer's BaseCommand::initialize() bootstraps a Composer instance from the project's
-     * composer.json (2.10.3 src/Composer/Command/BaseCommand.php:240, 2.2.25 :159) and lets a JSON
-     * parse error escape as a Composer crash — exit 1, before execute() is ever reached. lockrot
-     * documents a malformed manifest as a configuration error (exit 2, README "Exit codes"), so the
-     * file is checked here first and the failure is carried into execute()'s error handling instead.
+     * composer.json and lets a JSON parse error escape as a Composer crash — exit 1, before
+     * execute() is ever reached. lockrot documents a malformed manifest as a configuration error
+     * (exit 2, README "Exit codes"), so the file is checked here first and the failure is carried
+     * into execute()'s error handling instead.
      *
      * --offline sets COMPOSER_DISABLE_NETWORK as early as this command can, but that alone is not
-     * the mechanism, and cannot be: HttpDownloader reads the variable once, in its own constructor
-     * (2.10.3 src/Composer/Util/HttpDownloader.php:73, 2.2.25 :74), and in plugin mode
-     * Composer\Console\Application::doRun() has already built the Composer instance — with its
-     * HttpDownloader and RepositoryManager — while collecting plugin commands
-     * (getPluginCommands() -> getComposer()), long before any command's initialize() runs. What
-     * makes --offline effective is composerBootstrap() rebuilding the repositories afterwards, so
-     * that they get an HttpDownloader constructed after this point.
+     * the mechanism, and cannot be: HttpDownloader reads the variable once, in its own constructor,
+     * and in plugin mode Composer\Console\Application::doRun() has already built the Composer
+     * instance — with its HttpDownloader and RepositoryManager — while collecting plugin commands,
+     * long before any command's initialize() runs. What makes --offline effective is
+     * composerBootstrap() rebuilding the repositories afterwards, so that they get an
+     * HttpDownloader constructed after this point.
      */
     protected function initialize(InputInterface $input, OutputInterface $output): void
     {
@@ -115,11 +115,10 @@ final class LockrotCommand extends BaseCommand
         try {
             parent::initialize($input, $output);
         } catch (\Throwable $e) {
-            // Symfony's Command::run() calls initialize() outside any try/catch of its own
-            // (vendor/symfony/console/Command/Command.php:264 in the console version 2.10.3/2.2.25
-            // bundle), so a failure here would otherwise skip execute() entirely — and with it the
-            // finally block that normally restores the environment. Restored here instead, then
-            // rethrown unchanged so Composer's own error handling still sees the original failure.
+            // Symfony's Command::run() calls initialize() outside any try/catch of its own, so a
+            // failure here would otherwise skip execute() entirely — and with it the finally block
+            // that normally restores the environment. Restored here instead, then rethrown
+            // unchanged so Composer's own error handling still sees the original failure.
             $this->restoreEnv();
 
             throw $e;
@@ -130,24 +129,18 @@ final class LockrotCommand extends BaseCommand
      * lockrot never reads the root package's own version (it inspects composer.lock, not the
      * project's own release), so there is nothing for it to lose by pre-empting Composer's guess.
      * Without COMPOSER_ROOT_VERSION set, RootPackageLoader falls back to VersionGuesser, which
-     * shells out to git/hg/fossil/svn looking for a tag/branch to derive a version from (2.10.3
-     * Package/Loader/RootPackageLoader.php:95-96, warning at :108-113; 2.2.25 :88-89, default
-     * :100), and then warns "could not detect the root package version, defaulting to '1.0.0'".
-     * Setting the variable to that same default up front skips both the probing and the warning.
+     * shells out to git/hg/fossil/svn looking for a tag or branch to derive a version from, and
+     * then warns "could not detect the root package version, defaulting to '1.0.0'". Setting the
+     * variable to that same default up front skips both the probing and the warning.
      *
-     * This has to run here, before parent::initialize(), rather than in resolveComposer(): Composer's
-     * own BaseCommand::initialize() (called via parent::initialize() below) already builds the first
-     * Composer instance itself, through tryComposer()/getComposer(false) (2.10.3
-     * Command/BaseCommand.php:240, 2.2.25 :159) — before this command's execute() and
-     * composerBootstrap()/resolveComposer() ever run. By the time resolveComposer() calls
-     * tryComposer() again, that instance already exists and is returned as-is, so setting the
-     * variable there is too late to prevent the guess that already happened during initialize().
+     * This has to run before parent::initialize() rather than in resolveComposer(): Composer's own
+     * BaseCommand::initialize() already builds the first Composer instance itself, so by the time
+     * resolveComposer() runs that instance exists and is returned as-is.
      *
-     * In plugin mode a Composer instance already exists by the time any of this runs — built while
-     * Composer's own Console\Application::doRun() was collecting plugin commands, long before
-     * initialize() — so tryComposer() here only returns that cached instance and never re-triggers
-     * VersionGuesser regardless. This guard therefore only takes effect on the path that has no
-     * pre-existing instance to reuse: the standalone PHAR, or any other lock-only invocation.
+     * In plugin mode a Composer instance already exists before any of this runs — built while
+     * Composer's own Application was collecting plugin commands — so the guess never re-triggers
+     * there regardless. This guard therefore only takes effect on the path that has no pre-existing
+     * instance to reuse: the standalone PHAR, or any other lock-only invocation.
      */
     private function quietRootVersionGuessing(): void
     {
@@ -187,7 +180,7 @@ final class LockrotCommand extends BaseCommand
             $baselineFile = BaselineFile::resolve($cwd, $lockrot->baseline());
             $existingBaseline = $this->readBaseline($baselineFile, $lockrot->baseline() !== null && !$generate);
             // `composer lockrot` is the deliberate, full run: no time budget, unlike the
-            // install-time summary (SPEC F2.6).
+            // install-time summary.
             $analyzer = AnalyzerBootstrap::create($this->analyzerFactory, $io, $config, $repositories, $project, $lockrot, $env, Deadline::never());
             $report = $analyzer->analyze($lock, $project, $lockrot->includeDev());
 
@@ -208,10 +201,9 @@ final class LockrotCommand extends BaseCommand
             // same way an unreadable lock does a few lines up.
             $context = FormatContext::create($lockPath, $lockrot->failOn(), Version::STRING, TerminalWidth::detect($env, $this->getApplication()));
             $format = $lockrot->format();
-            // Only `table` is meant to go through the tag formatter; every machine-readable format is
-            // written raw, so a `<` in a constraint or a package name reaches the parser on the other
-            // end untouched (OutputInterface::OUTPUT_RAW = 2 in symfony/console 5.4.47 and 2.8.52,
-            // Output/OutputInterface.php:30 in both).
+            // Only `table` is meant to go through the tag formatter; every machine-readable format
+            // is written raw, so a `<` in a constraint or a package name reaches the parser on the
+            // other end untouched.
             $output->write(
                 Formatters::for($format, $context)->format($report, $input->getOption('all') === true),
                 false,
@@ -242,7 +234,7 @@ final class LockrotCommand extends BaseCommand
      * A path the project asked for explicitly is different: a typo in `--baseline` or in
      * `extra.lockrot.baseline` would otherwise silently turn a gated build into an ungated one, so
      * a missing file there is a configuration error. So is a file that exists but cannot be read:
-     * an unreadable baseline is never treated as an empty one (SPEC F7).
+     * an unreadable baseline is never treated as an empty one.
      */
     private function readBaseline(BaselineFile $file, bool $explicit): ?Baseline
     {
@@ -353,8 +345,7 @@ final class LockrotCommand extends BaseCommand
      * RepositoryManager, because in plugin mode the manager and its HttpDownloader predate this
      * command entirely (see initialize()), so --offline could never reach them.
      * RepositoryFactory::defaultRepos() reads Config::getRepositories() — the same list, in the
-     * same order, that Composer itself builds the manager from (2.10.3
-     * src/Composer/Repository/RepositoryFactory.php:81-100, 2.2.25 :96-104).
+     * same order, that Composer itself builds the manager from.
      *
      * @return array{0: Config, 1: list<RepositoryInterface>}
      */
@@ -378,7 +369,7 @@ final class LockrotCommand extends BaseCommand
             return null;
         }
 
-        // Composer >= 2.3 has tryComposer(); 2.2 LTS only has getComposer(bool $required) (BaseCommand.php:124 vs 2.2 :59)
+        // Composer >= 2.3 has tryComposer(); 2.2 LTS only has getComposer(bool $required).
         // @phpstan-ignore function.alreadyNarrowedType (tryComposer() does not exist in Composer 2.2 LTS; guard is load-bearing there)
         $composer = method_exists($this, 'tryComposer') ? $this->tryComposer() : $this->getComposer(false);
 

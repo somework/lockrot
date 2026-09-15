@@ -19,7 +19,6 @@ jobs:
       - run: LOCKROT_E2E=1 vendor/bin/phpunit --group e2e --filter PharTest
       - uses: actions/upload-artifact@v4
         with: {name: lockrot.phar, path: 'build/lockrot.phar*'}
-      # GPG signing and a Docker image are deferred to a later release; the checksum ships with the PHAR.
       - if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with: {files: 'build/lockrot.phar*'}

@@ -26,7 +26,7 @@ final class Policy
         foreach ($report->findings() as $finding) {
             // With a baseline present only new and worsened findings are measured against fail-on:
             // a finding the project has already accepted never fails a build again, and a baseline
-            // entry whose package has left the lock is reported as stale, not failed on (SPEC F7).
+            // entry whose package has left the lock is reported as stale, not failed on.
             if ($baseline !== null && $baseline->isKnown($finding->package())) {
                 continue;
             }

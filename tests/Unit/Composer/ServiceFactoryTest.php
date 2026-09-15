@@ -191,7 +191,7 @@ final class ServiceFactoryTest extends TestCase
     public function testDisabledComposerCacheFallsBackToRequestScopedCache(): void
     {
         // `composer --no-cache` sets COMPOSER_CACHE_DIR=/dev/null, which Composer\Cache::isUsable()
-        // (Cache.php:82) rejects -> isEnabled() false.
+        // rejects -> isEnabled() false.
         $config = new Config(false, sys_get_temp_dir());
         $config->merge(['config' => ['cache-dir' => '/dev/null', 'home' => sys_get_temp_dir()]]);
         self::assertInstanceOf(ArrayCache::class, ServiceFactory::createCache(new NullIO(), $config));

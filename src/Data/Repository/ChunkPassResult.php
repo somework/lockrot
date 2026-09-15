@@ -6,9 +6,8 @@ namespace Lockrot\Data\Repository;
 
 /**
  * What one pass of {@see RepositoryMetadataLoader::loadChunked()} resolved. `needDev` and
- * `stillRemaining` are mutually exclusive: the stable-stabilities pass only ever populates
- * `needDev` (`stillRemaining` stays empty), the dev-only pass only ever populates `stillRemaining`
- * (`needDev` stays empty) — see {@see RepositoryMetadataLoader::loadChunked()}'s own docblock.
+ * `stillRemaining` are mutually exclusive; that method's own docblock says which pass populates
+ * which.
  */
 final class ChunkPassResult
 {

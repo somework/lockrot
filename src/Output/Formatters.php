@@ -6,6 +6,7 @@ namespace Lockrot\Output;
 
 use Lockrot\Exception\ConfigException;
 
+/** Resolves a format name to its formatter. */
 final class Formatters
 {
     /**

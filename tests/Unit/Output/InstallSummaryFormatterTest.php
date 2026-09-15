@@ -14,7 +14,7 @@ final class InstallSummaryFormatterTest extends TestCase
 {
     private const NOW = '2026-09-14T00:00:00+00:00';
 
-    /** Words the spec (F5.3) bans from every piece of lockrot output. */
+    /** Words banned from every piece of lockrot output. */
     private const BANNED_WORDS = ['vulnerable', 'broken', 'insecure', 'dead'];
 
     /** @param list<string> $chain */

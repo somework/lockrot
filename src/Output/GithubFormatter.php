@@ -27,9 +27,9 @@ use Lockrot\Verdict\Finding;
  * root, so an absolute path from the runner's filesystem would not match a file in the diff.
  *
  * The title carries `lockrot: <verdict> (<priority>)` — the same phrase every other format uses
- * where it names a verdict next to a finding (SPEC F5.2/F5.4). The command (`error`/`warning`/
- * `notice`) is unchanged by the priority: it comes from FormatContext::levelOf(), so the colour of
- * an annotation keeps matching the exit code.
+ * where it names a verdict next to a finding. The command (`error`/`warning`/`notice`) is unchanged
+ * by the priority: it comes from FormatContext::levelOf(), so the colour of an annotation keeps
+ * matching the exit code.
  */
 final class GithubFormatter implements FormatterInterface
 {

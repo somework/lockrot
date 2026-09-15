@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace Lockrot;
 
 /**
- * A budget for how long a piece of work (metadata loading, in Task 4's usage) may keep going.
+ * A budget for how long a piece of work may keep going.
+ *
  * Built on a monotonic clock rather than {@see Clock}/wall-clock time: a budget must not be
- * shortened or extended by a system-clock adjustment (NTP sync, DST) happening mid-run.
- * `$now` is injectable so tests can drive it with a fake counter instead of real elapsed time.
+ * shortened or extended by a system-clock adjustment (NTP sync, DST) happening mid-run. `$now` is
+ * injectable so a caller can drive it from a counter of its own.
  */
 final class Deadline
 {

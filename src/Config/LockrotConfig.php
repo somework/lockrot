@@ -17,11 +17,7 @@ final class LockrotConfig
     private const INSTALL_TIME_BUDGET_MIN = 1;
     private const INSTALL_TIME_BUDGET_MAX = 120;
 
-    /**
-     * The spec's third value, `summary`, is not implemented in 0.1: the compact block *is* the only
-     * install-time output there is, so `summary` would be indistinguishable from `on` (SPEC F6,
-     * amended).
-     */
+    /** `on` prints the install-time block, `off` silences it. */
     public const INSTALL_TIME_VALUES = ['on', 'off'];
     public const INSTALL_TIME_ON = 'on';
 

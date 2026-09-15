@@ -29,17 +29,16 @@ use Lockrot\Output\InstallSummaryFormatter;
  * it analyses only the packages the transaction is about to install or update and prints a compact
  * block to Composer's error output.
  *
- * Composer fires the event before it prints its own "Package operations: …" line (2.10.3
- * Installer.php:838 vs :851-862, 2.2.25 :723 vs :741-749), so the block appears above that list.
+ * Composer fires the event before it prints its own "Package operations: …" line, so the block
+ * appears above that list.
  *
  * Two properties make this affordable. The analysis runs against the project's *own*
  * RepositoryManager repositories: during `composer update`/`require` those ComposerRepository
  * instances have just fetched metadata for exactly these packages, and each one remembers the files
- * it fetched in this process (`freshMetadataUrls`, 2.10.3 Repository/ComposerRepository.php:133,
- * short-circuit at :1916-1922; 2.2.25 :115, :1488-1491) — so a re-read is served without a request. And
- * a `composer install` from an existing lock, which starts cold, is bounded by
+ * it fetched in this process, so a re-read is served without a request. And a `composer install`
+ * from an existing lock, which starts cold, is bounded by
  * {@see LockrotConfig::installTimeBudgetSeconds()} ({@see LockrotConfig::DEFAULT_INSTALL_TIME_BUDGET}
- * seconds unless the project sets `extra.lockrot.install-time-budget`; SPEC F2.6).
+ * seconds unless the project sets `extra.lockrot.install-time-budget`).
  */
 final class InstallTimeSummary
 {
@@ -61,11 +60,11 @@ final class InstallTimeSummary
             // The one failure the project asked for: install-time-strict stops the install.
             throw $e;
         } catch (\Throwable $e) {
-            // Never break an install by default (SPEC F6): anything unexpected — a malformed
-            // extra.lockrot, an unreachable repository, a bug in lockrot itself — becomes one
-            // stderr line and the install continues. Collapsed to one line: some exception
-            // messages (a wrapped exception's chain, a multi-line library error) embed newlines of
-            // their own, which would otherwise split this into more than the one line promised.
+            // Never break an install by default: anything unexpected — a malformed extra.lockrot,
+            // an unreachable repository, a bug in lockrot itself — becomes one stderr line and the
+            // install continues. Collapsed to one line: some exception messages (a wrapped
+            // exception's chain, a multi-line library error) embed newlines of their own, which
+            // would otherwise split this into more than the one line promised.
             $io->writeError('<warning>lockrot: install-time check skipped: '.$this->oneLine($e->getMessage()).'</warning>');
         }
     }
@@ -100,14 +99,12 @@ final class InstallTimeSummary
         }
 
         // By the time this event fires, `composer require`/`update` has already written the new lock
-        // (Installer::doUpdate() writes it at 2.10.3 :681 / 2.2.25 :575 and only then calls
-        // doInstall(), which dispatches this event at 2.10.3 :838 / 2.2.25 :723), so the file on
-        // disk is normally the post-transaction state already. `--dry-run` writes no lock at all
-        // (Installer::doUpdate() guards the write with writeLock && executeOperations, 2.10.3 :679),
-        // so there — and for a project with no lock yet — the file on disk (or an empty lock) is the
-        // pre-transaction state. Either way, LockFile::withPackages() overlays the transaction's own
-        // packages onto whatever was read, so a package new to the graph always gets a node to chain
-        // through, dry-run included.
+        // (Installer::doUpdate() writes it before calling doInstall(), which dispatches this event),
+        // so the file on disk is normally the post-transaction state already. `--dry-run` writes no
+        // lock at all, so there — and for a project with no lock yet — the file on disk (or an empty
+        // lock) is the pre-transaction state. Either way, LockFile::withPackages() overlays the
+        // transaction's own packages onto whatever was read, so a package new to the graph always
+        // gets a node to chain through, dry-run included.
         $lockPath = Factory::getLockFile($composerFile);
         $lock = (is_file($lockPath) ? LockFile::fromFile($lockPath) : LockFile::empty())->withPackages($packages);
         $packages = self::withDevFlagsFrom($lock, $packages);
@@ -122,7 +119,7 @@ final class InstallTimeSummary
         $report = $analyzer->analyzePackages($packages, $lock, $project, $event->isDevMode());
         // The block itself does not change — it reports what this transaction brings in either way.
         // The comparison only reaches Policy::exitCode() below, so install-time-strict gates on what
-        // the project has not already accepted (ruling, SPEC F7).
+        // the project has not already accepted.
         $report = $this->withBaseline($report, \dirname($composerFile), $lockrot, $lock);
         $lines = (new InstallSummaryFormatter())->format($report);
         if ($lines !== []) {

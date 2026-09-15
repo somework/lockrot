@@ -57,7 +57,7 @@ final class JsonFormatterTest extends TestCase
         self::assertTrue($json['findings'][1]['dev']);
         self::assertIsArray($json['priorities']);
         self::assertSame(['critical' => 1, 'high' => 0, 'medium' => 1, 'low' => 0, 'none' => 0], $json['priorities']);
-        // The additions are backward compatible, so the schema number does not move.
+        // Both fields are additive, so the schema number does not move.
         self::assertIsArray($json['lockrot']);
         self::assertSame(1, $json['lockrot']['schema']);
     }

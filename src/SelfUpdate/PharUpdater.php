@@ -15,20 +15,18 @@ use Lockrot\Version;
  * Downloads a {@see Release}, verifies it against its published sha256, and replaces the running
  * PHAR with it.
  *
- * The shape of the replace follows Composer's own self-update (2.10.3
- * src/Composer/Command/SelfUpdateCommand.php:458-505): write next to the target, carry the target's
- * permissions onto the new file, check that the runtime can open it, then `rename()` — except on
- * Windows, where `copy()` + `unlink()` is used because `rename()` keeps the source file's
- * permissions and can lock other users out (Composer's own reason, same lines; 2.2.25 :436,:464).
+ * The shape of the replace follows Composer's own self-update: write next to the target, carry the
+ * target's permissions onto the new file, check that the runtime can open it, then `rename()` —
+ * except on Windows, where `copy()` + `unlink()` is used because `rename()` keeps the source file's
+ * permissions and can lock other users out (Composer's own reason).
  *
  * Two things this deliberately does not do:
  *
  * - No cache-directory fallback for the temporary file. It is written beside the PHAR or not at
  *   all, so a successful download is always one `rename()` away from being installed and an
- *   unwritable directory is reported before anything is fetched (ruling,
- *   .superpowers/sdd/2026-09-15-lockrot-self-update/progress.md).
- * - No backup of the replaced PHAR and so no rollback in 0.1. Every previous release stays
- *   downloadable from GitHub, which is the documented way back (same ruling).
+ *   unwritable directory is reported before anything is fetched.
+ * - No backup of the replaced PHAR, and so no rollback. Every previous release stays downloadable
+ *   from GitHub, which is the documented way back.
  *
  * On any failure the running PHAR is left exactly as it was and the temporary file is removed.
  */
@@ -71,9 +69,8 @@ final class PharUpdater
     /**
      * Whether $release is strictly newer than the running build.
      *
-     * `Composer\Semver\Comparator::greaterThan()` (vendor/composer/semver/src/Comparator.php:26,
-     * semver 3.x, bundled by Composer 2.2.25 and 2.10.3 alike) rather than a string compare, so
-     * 0.10.0 is correctly newer than 0.9.0.
+     * `Composer\Semver\Comparator::greaterThan()` rather than a string compare, so 0.10.0 is
+     * correctly newer than 0.9.0.
      */
     public function isUpdateAvailable(Release $release): bool
     {
@@ -205,7 +202,7 @@ final class PharUpdater
     {
         if (Platform::isWindows()) {
             // copy() applies the destination's own permissions; rename() would carry the temporary
-            // file's across instead — Composer's reason, SelfUpdateCommand.php:485-487.
+            // file's across instead — Composer's own reason for doing it this way on Windows.
             if (!@copy($temporary, $this->runningPhar)) {
                 throw new ConfigException('could not copy '.$temporary.' onto '.$this->runningPhar);
             }
@@ -245,10 +242,9 @@ final class PharUpdater
     /**
      * The sha256 the release publishes, read as the first 64-hex token of the `.sha256` file.
      *
-     * The file is `sha256sum` output — `<hex>  <name>` — and the name half has changed across
-     * releases (it used to read `build/lockrot.phar`), so only the hash is relied on. The archive
-     * being verified is the one just downloaded from the URL the same release listed, not a file
-     * picked by name.
+     * The file is `sha256sum` output — `<hex>  <name>` — and the name half is not stable across
+     * releases, so only the hash is relied on. The archive being verified is the one just
+     * downloaded from the URL the same release listed, not a file picked by name.
      */
     private static function expectedHash(string $checksumFile, string $url): string
     {

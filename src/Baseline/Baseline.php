@@ -12,7 +12,7 @@ use Lockrot\Version;
 
 /**
  * The findings a project has already accepted, as read from — or about to be written to —
- * `lockrot-baseline.json` (SPEC F7).
+ * `lockrot-baseline.json`.
  *
  * Only flagged verdicts are recorded: `ok`, `finished` and `unknown` are not findings, so accepting
  * them would mean nothing. Entries are keyed and sorted by package name, which keeps the file's

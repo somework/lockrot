@@ -14,8 +14,7 @@ use Lockrot\Exception\ConfigException;
  * Reads `GET /repos/somework/lockrot/releases/latest` and turns it into a {@see Release}.
  *
  * Pre-releases are out of scope by construction: GitHub's `releases/latest` endpoint already
- * excludes drafts and pre-releases, so there is no channel to pick (ruling,
- * .superpowers/sdd/2026-09-15-lockrot-self-update/progress.md).
+ * excludes drafts and pre-releases, so there is no channel to pick.
  *
  * The request carries the same headers the analyzer's GitHub calls do
  * ({@see GitHubClient::headersFor()}), so `GITHUB_TOKEN`, `LOCKROT_GITHUB_TOKEN` and Composer's

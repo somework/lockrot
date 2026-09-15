@@ -121,12 +121,11 @@ final class PluginTest extends TestCase
         // TerminalWidth::detect() answers at step 1 and neither console's own width lookup is ever entered.
         // Without it, and with this test driving composer through Symfony Process rather than a terminal,
         // the run exercises step 2 on Composer 2.10.3 — symfony/console 5.4's Terminal::getWidth() finds
-        // no COLUMNS and no stty and returns its own 80 fallback (Terminal.php:25-37) — and step 3 on
-        // Composer 2.2.25, where there is no Terminal class at all: 2.8.52's
-        // Application::getTerminalDimensions() (Application.php:736) shells out to `stty -a | grep columns`
-        // with the inherited non-TTY stdin (getSttyColumns(), :945-961), gets an empty string, and returns
-        // [null, null] at :764 — so lockrot falls through to FormatContext::DEFAULT_WIDTH, 120. Both
-        // branches were checked by hand; every assertion below is width-agnostic for exactly that reason.
+        // no COLUMNS and no stty and returns its own 80 fallback — and step 3 on Composer 2.2.25, where
+        // there is no Terminal class at all: 2.8.52's Application::getTerminalDimensions() shells out to
+        // `stty -a | grep columns` with the inherited non-TTY stdin, gets an empty string, and returns
+        // [null, null] — so lockrot falls through to FormatContext::DEFAULT_WIDTH, 120. Every assertion
+        // below is width-agnostic for exactly that reason.
         $table = $this->composer(['lockrot', '--target-php=8.4'], [], 120);
         $stdout = $table->getOutput();
         self::assertSame(0, $table->getExitCode(), $table->getErrorOutput().$stdout);
@@ -155,7 +154,7 @@ final class PluginTest extends TestCase
         self::assertStringContainsString('phpzip/phpzip 2.0.8', $stderr);
         self::assertStringContainsString('Run composer lockrot for details.', $stderr);
         // Composer fires PRE_OPERATIONS_EXEC before printing its own operations list, so the block
-        // appears above it (2.10.3 Installer.php:838 vs :851-862, 2.2.25 :723 vs :741-749).
+        // appears above it.
         $blockAt = strpos($stderr, 'lockrot: dependency rot in');
         $operationsAt = strpos($stderr, 'Package operations:');
         self::assertIsInt($blockAt, $stderr);
@@ -169,13 +168,12 @@ final class PluginTest extends TestCase
      *
      * What it does NOT do is make Composer undo the manifest edit. RequireCommand::doUpdate()
      * registers its own PRE_OPERATIONS_EXEC listener at priority 10000 which sets
-     * `dependencyResolutionCompleted = true` (2.10.3 Command/RequireCommand.php:412-415, 2.2.25
-     * :363-364), and its catch block only calls revertComposerFile() while that flag is false
-     * (2.10.3 :343-346, 2.2.25 :289-292). A plugin listener on the same event always runs after
-     * Composer's own, so by the time InstallBlockedException is thrown the revert path is already
-     * disarmed. Composer has also written the new lock by then (Installer::doUpdate() at 2.10.3
-     * :681 / 2.2.25 :575, before doInstall() dispatches the event). Verified against Composer
-     * 2.10.3: exit 1, composer.json and composer.lock updated, vendor/phpzip absent.
+     * `dependencyResolutionCompleted = true`, and its catch block only calls revertComposerFile()
+     * while that flag is false. A plugin listener on the same event always runs after Composer's own,
+     * so by the time InstallBlockedException is thrown the revert path is already disarmed. Composer
+     * has also written the new lock by then, in Installer::doUpdate(), before doInstall() dispatches
+     * the event. The outcome is exit 1 with composer.json and composer.lock updated and
+     * vendor/phpzip absent.
      */
     public function testInstallTimeStrictStopsTheRequire(): void
     {

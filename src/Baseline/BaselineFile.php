@@ -11,8 +11,8 @@ use Lockrot\Json\JsonReader;
 /**
  * Where the baseline lives and how it is read and written.
  *
- * This is the only file lockrot ever writes, and only on an explicit `--generate-baseline`
- * (SPEC "Non-functional": never modify composer.json/composer.lock).
+ * This is the only file lockrot ever writes, and only on an explicit `--generate-baseline`; it
+ * never modifies composer.json or composer.lock.
  *
  * Two paths are kept apart on purpose. {@see path()} is what the filesystem needs — absolute, so
  * the file lands next to the project's composer.json whatever the process's working directory is.
@@ -88,12 +88,11 @@ final class BaselineFile
      * is then renamed over the target, so a run interrupted mid-write can never leave a truncated
      * baseline behind — which would read as "these findings were never accepted" on the next CI run.
      *
-     * Composer's own JsonFile::write() is not used for the write itself: it calls file_put_contents()
-     * without checking the result (2.10.3 src/Composer/Json/JsonFile.php:163,181-189; 2.2.25
-     * :153,173-181), so an unwritable target returns silently. JsonFile::encode() is used for the
-     * encoding, so the file is laid out exactly like composer.json — 4-space indent, unescaped
-     * slashes and unicode — and the trailing newline JsonFile::write() appends for a pretty-printed
-     * document is added here too.
+     * Composer's own JsonFile::write() is not used for the write itself: it calls
+     * file_put_contents() without checking the result, so an unwritable target returns silently.
+     * JsonFile::encode() is used for the encoding, so the file is laid out exactly like
+     * composer.json — 4-space indent, unescaped slashes and unicode — and the trailing newline
+     * JsonFile::write() appends for a pretty-printed document is added here too.
      *
      * @throws ConfigException when the target cannot be written
      */

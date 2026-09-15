@@ -93,17 +93,13 @@ final class AcceptanceTest extends TestCase
         return $out;
     }
 
-    // The peak-memory assertion below reads memory_get_peak_usage(true), a whole-process
-    // high-water mark that PHPUnit never resets between tests. With every other suite test
-    // (Unit runs before Integration) contributing to that same peak, this assertion is really
-    // testing "how much did the entire run allocate before this point", not this analysis alone
-    // — and it now sits close enough to the 64 MB budget that unrelated suite growth trips it.
-    // Isolating it in its own process makes the peak reflect only this test again, matching the
-    // comment's actual intent (a PHAR-OOM regression guard for this one analysis). Process
-    // isolation runs this method in a brand-new PHP process that never calls setUpBeforeClass()
-    // (PHPUnit's method-isolation template instantiates the test case and calls run() directly),
-    // so the class-level $server/$loader built there do not exist here — this test builds its own
-    // private single-use server instead.
+    // The peak-memory assertion below reads memory_get_peak_usage(true), a whole-process high-water
+    // mark that PHPUnit never resets between tests. With every other suite test contributing to that
+    // same peak, the assertion would measure how much the entire run allocated before this point
+    // rather than this analysis alone, and it sits close enough to the 64 MB budget that unrelated
+    // suite growth trips it. Isolating it in its own process makes the peak reflect only this test.
+    // That process never calls setUpBeforeClass(), so the class-level $server/$loader do not exist
+    // here and this test builds its own private single-use server instead.
     /** @runInSeparateProcess */
     #[RunInSeparateProcess]
     public function testWallabag(): void
@@ -116,10 +112,9 @@ final class AcceptanceTest extends TestCase
             $report = $this->analyze('apps/wallabag_wallabag', $loader);
             $f = $this->byName($report);
             self::assertSame(200, $report->packagesChecked());
-            // Recorded 2026-09-14: Packagist data moves over time, so the abandoned count is pinned to
-            // this recording rather than the 2026-09-14 research snapshot behind the spec. If this
-            // assertion needs updating again, print byVerdict() and diff the package names before
-            // touching the number.
+            // Packagist data moves over time, so the abandoned count is pinned to the recorded
+            // fixtures. If this assertion needs updating after a re-recording, print byVerdict() and
+            // diff the package names before touching the number.
             self::assertSame(19, $report->byVerdict()[Verdict::ABANDONED], 'flagged abandoned 19 of 200 prod');
             self::assertSame(Verdict::SILENT, $f['phpzip/phpzip']->verdict());
             self::assertStringContainsString('last release 2015-11-16', $f['phpzip/phpzip']->evidence());
@@ -177,11 +172,9 @@ final class AcceptanceTest extends TestCase
     public function testMatomoXhprofIsPinned(): void
     {
         $f = $this->byName($this->analyze('apps/matomo-org_matomo'));
-        // Recorded 2026-09-14: lox/xhprof is now marked abandoned on Packagist (S1) and its GitHub
-        // repo is archived (S3), which outrank the S6 "pinned to dev-master" signal in VerdictEngine
-        // precedence -> ABANDONED rather than PINNED. It was PINNED at the time the spec's research
-        // was written; Packagist/GitHub state has moved since, so this documents the delta rather than
-        // hand-editing the recorded fixture. The S6 signal (dev-master pin) still fires underneath.
+        // lox/xhprof is marked abandoned on Packagist (S1) and its GitHub repo is archived (S3),
+        // which outrank the S6 "pinned to dev-master" signal in VerdictEngine precedence ->
+        // ABANDONED rather than PINNED. The S6 signal (dev-master pin) still fires underneath.
         self::assertSame(Verdict::ABANDONED, $f['lox/xhprof']->verdict());
         self::assertStringContainsString('dev-master', $f['lox/xhprof']->evidence());
         $ids = array_map(static fn ($s) => $s->id(), $f['lox/xhprof']->signals());

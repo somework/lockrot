@@ -130,11 +130,10 @@ final class AnalyzerTest extends TestCase
             $byName[$finding->package()] = $finding;
         }
         // vendor/direct is released 2024-01-10 with an open-ended "php": ">=7.4" constraint, which
-        // predates the PHP 8.4 GA (2024-11-21) used as targetPhp below -> S5 fires per the spec
-        // ("installed version released before target PHP GA while its constraint is open-ended"),
-        // giving OLD_PROMISE rather than OK. The mini fixture (tests/fixtures/mini/composer.lock) is
-        // shared with LockFileTest/DependencyGraphTest/ProjectConfigTest and predates the OldPromiseRule
-        // design, so this is documented here instead of edited into the fixture.
+        // predates the PHP 8.4 GA (2024-11-21) used as targetPhp below, so S5 fires and the verdict
+        // is OLD_PROMISE rather than OK. The mini fixture is shared with
+        // LockFileTest/DependencyGraphTest/ProjectConfigTest, so the interaction is documented here
+        // instead of edited into the fixture.
         self::assertSame(Verdict::OLD_PROMISE, $byName['vendor/direct']->verdict());
         self::assertSame(Verdict::SILENT, $byName['vendor/transitive']->verdict());
         self::assertSame(['vendor/direct', 'vendor/transitive'], $byName['vendor/transitive']->chain());

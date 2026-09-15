@@ -3,10 +3,9 @@
 
 declare(strict_types=1);
 
-// 70205 is composer/composer's own floor ("php": "^7.2.5 || ^8.0",
-// vendor/composer/composer/composer.json:25), not lockrot's: the PHAR bundles Composer, so it can
-// only run where the bundled Composer runs. The PHAR itself is built against platform PHP 7.4.0
-// (build/phar/composer.json) to match the plugin's floor — do not "fix" this number upwards.
+// 70205 is composer/composer's own floor ("php": "^7.2.5 || ^8.0"), not lockrot's: the PHAR bundles
+// Composer, so it can only run where the bundled Composer runs. The PHAR itself is built against
+// platform PHP 7.4.0 (build/phar/composer.json) to match the plugin's floor.
 if (\PHP_VERSION_ID < 70205) {
     fwrite(\STDERR, "lockrot.phar requires PHP 7.2.5 or newer\n");
     exit(2);
@@ -30,11 +29,10 @@ if (!class_exists(\Composer\Console\Application::class)) {
 
 putenv('COMPOSER_DISABLE_XDEBUG_WARN=1');
 
-// Raise memory_limit the way Composer's own binary does before it builds the Application:
-// vendor/composer/composer/bin/composer:66-94 (2.10.3) — honour COMPOSER_MEMORY_LIMIT when set,
-// otherwise lift a limit lower than 1.5G up to 1536M and leave an unlimited (-1) limit alone.
-// Without this the PHAR dies on large lock files at PHP's default 128M, where the plugin path
-// inherits the bump from `composer` itself.
+// Raise memory_limit the way Composer's own binary does before it builds the Application: honour
+// COMPOSER_MEMORY_LIMIT when set, otherwise lift a limit lower than 1.5G up to 1536M and leave an
+// unlimited (-1) limit alone. Without this the PHAR dies on large lock files at PHP's default 128M,
+// where the plugin path inherits the bump from `composer` itself.
 $lockrotMemoryLimit = getenv('COMPOSER_MEMORY_LIMIT');
 if (\is_string($lockrotMemoryLimit) && $lockrotMemoryLimit !== '') {
     @ini_set('memory_limit', $lockrotMemoryLimit);
@@ -66,10 +64,9 @@ if (\is_array($lockrotArgv) && !\in_array('--no-plugins', $lockrotArgv, true)) {
 unset($lockrotArgv);
 
 // `lockrot.phar --version` should print one line about lockrot. Composer's Application
-// getLongVersion() appends Composer's own release date (Application.php:753 in 2.10.3, :541 in
-// 2.2.25) and its doRun() adds a PHP-version line plus a "diagnose" hint after the version is
-// printed (Application.php:459-462). Both are untyped in 2.2.25, so narrowing the return types in
-// this subclass is allowed.
+// getLongVersion() appends Composer's own release date, and its doRun() adds a PHP-version line
+// plus a "diagnose" hint after the version is printed. Both are untyped in the older supported
+// Composer, so narrowing the return types in this subclass is allowed.
 $application = new class () extends \Composer\Console\Application {
     /**
      * Every command name this build answers to: lockrot's own two, plus Symfony's help, listing and
@@ -86,17 +83,15 @@ $application = new class () extends \Composer\Console\Application {
 
     /**
      * The PHAR is built on Composer's Application, which registers Composer's whole command set —
-     * install, update, require, self-update and the rest. Until `self-update` existed, the entry
-     * point hid all of them by declaring itself a single-command application, so `lockrot.phar`
-     * only ever ran `lockrot`. That is no longer possible: a single-command application has no
-     * command names at all, so `lockrot.phar self-update` could not be reached.
+     * install, update, require, self-update and the rest. The commands are filtered rather than
+     * hidden, because a single-command application has no command names at all and
+     * `lockrot.phar self-update` could not then be reached.
      *
-     * The commands are therefore filtered instead of hidden. Symfony's own help/list/completion
-     * commands are kept (the `list` output is how a user finds `self-update` at all), every
-     * Composer project command is dropped — `lockrot.phar update` must never run a Composer update
-     * on the project being inspected — and lockrot's two commands are added. Dropping Composer's
-     * `self-update` here is also what frees both `self-update` and its `selfupdate` alias for
-     * lockrot's own command.
+     * Symfony's own help/list/completion commands are kept (the `list` output is how a user finds
+     * `self-update` at all), every Composer project command is dropped — `lockrot.phar update` must
+     * never run a Composer update on the project being inspected — and lockrot's two commands are
+     * added. Dropping Composer's `self-update` here is also what frees both `self-update` and its
+     * `selfupdate` alias for lockrot's own command.
      *
      * @return list<\Symfony\Component\Console\Command\Command>
      */
@@ -117,15 +112,15 @@ $application = new class () extends \Composer\Console\Application {
     /**
      * The same allowlist applied to every later registration, because getDefaultCommands() is not
      * the only source: Composer\Console\Application::doRun() turns each entry of the inspected
-     * project's `scripts` into a runnable command (2.10.3 Application.php:376-435, 2.2.25 :306-325).
-     * lockrot reads that project, it does not run it, so those never become lockrot commands.
+     * project's `scripts` into a runnable command. lockrot reads that project, it does not run it,
+     * so those never become lockrot commands.
      *
      * Both spellings are declared. symfony/console < 7.4 registers through add() and Composer picks
-     * it with `method_exists($this, 'addCommand') ? $this->addCommand(...) : $this->add(...)`
-     * (2.10.3 Application.php:292,433); 7.4 and later add addCommand() and deprecate add(). Since
-     * declaring addCommand() here makes Composer's `method_exists()` true on every version, add()
-     * forwards to it and addCommand() picks the registration path the running symfony/console
-     * actually has — so the filter cannot be bypassed by a future resolution, and nothing recurses.
+     * it with `method_exists($this, 'addCommand') ? $this->addCommand(...) : $this->add(...)`; 7.4
+     * and later add addCommand() and deprecate add(). Since declaring addCommand() here makes
+     * Composer's `method_exists()` true on every version, add() forwards to it and addCommand()
+     * picks the registration path the running symfony/console actually has — so the filter cannot
+     * be bypassed by a future resolution, and nothing recurses.
      */
     public function add(\Symfony\Component\Console\Command\Command $command): ?\Symfony\Component\Console\Command\Command
     {
@@ -152,18 +147,17 @@ $application = new class () extends \Composer\Console\Application {
      * Composer's doRun() preamble reads the inspected project's composer.json before any command
      * runs, and on Composer >= 2.9 that is not a read-only act: for every `scripts` entry whose
      * value looks like a class name it registers the project's own autoloader and calls
-     * `class_exists()` on it (2.10.3 Application.php:395-410, the `class_exists($dummy)` at :410),
-     * which loads the project's file and executes whatever sits at its top level — inside lockrot,
-     * with `--no-plugins` offering no protection because this is not the plugin path. 2.2.25 stops
-     * short of that (its loop only builds `ScriptAliasCommand`s, :306-325) but still reads the file.
+     * `class_exists()` on it, which loads the project's file and executes whatever sits at its top
+     * level — inside lockrot, with `--no-plugins` offering no protection because this is not the
+     * plugin path. The 2.2 LTS line stops short of that (its loop only builds `ScriptAliasCommand`s)
+     * but still reads the file.
      *
      * Both loops are gated on `is_file(Factory::getComposerFile())`, and that resolves through the
-     * COMPOSER environment variable (2.10.3 Factory.php:224-239, 2.2.25 :250). So the manifest is
-     * hidden for the length of the preamble by pointing COMPOSER at the null device — not a regular
-     * file, so `is_file()` is false and the loop never starts, yet `file_exists()` is true, so the
-     * "no composer.json in current directory" walk-up (2.10.3 Application.php:192-196, 2.2.25 :179)
-     * stays quiet as well. Composer sets COMPOSER_CACHE_DIR the same way for `--no-cache`
-     * (Application.php:166).
+     * COMPOSER environment variable. So the manifest is hidden for the length of the preamble by
+     * pointing COMPOSER at the null device — not a regular file, so `is_file()` is false and the
+     * loop never starts, yet `file_exists()` is true, so the "no composer.json in current
+     * directory" walk-up stays quiet as well. Composer sets COMPOSER_CACHE_DIR the same way for
+     * `--no-cache`.
      *
      * doRunCommand() puts the variable back before the command itself runs, so `lockrot` still sees
      * the project through `tryComposer()` and keeps its configured repositories; the finally covers
@@ -218,8 +212,7 @@ $application = new class () extends \Composer\Console\Application {
 };
 $application->setName('lockrot');
 $application->setVersion(\Lockrot\Version::STRING);
-// Not a single-command application any more (see getDefaultCommands() above): `lockrot` is what
-// runs when no command is named, which keeps `lockrot.phar -d project --format=json` working while
-// leaving `self-update`, `list` and `help` reachable by name.
+// `lockrot` is what runs when no command is named, which keeps `lockrot.phar -d project
+// --format=json` working while leaving `self-update`, `list` and `help` reachable by name.
 $application->setDefaultCommand('lockrot', false);
 exit($application->run());

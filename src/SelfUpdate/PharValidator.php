@@ -6,8 +6,7 @@ namespace Lockrot\SelfUpdate;
 
 /**
  * Opens the downloaded file as a PHP archive, the same check Composer's own self-update runs before
- * it swaps the file in (`Composer\Command\SelfUpdateCommand::validatePhar()`, 2.10.3
- * src/Composer/Command/SelfUpdateCommand.php:712).
+ * it swaps the file in (`Composer\Command\SelfUpdateCommand::validatePhar()`).
  *
  * Two deliberate differences from Composer's version:
  *
@@ -16,13 +15,13 @@ namespace Lockrot\SelfUpdate;
  *   archive is a read, which `phar.readonly` does not restrict.
  * - Only `UnexpectedValueException` is turned into a message. Composer also catches `PharException`,
  *   but `Phar::__construct()` is not declared to throw it, so PHPStan max rejects that catch as
- *   unreachable. Anything else propagates, exactly as Composer lets it: {@see PharUpdater::install()} has
- *   already removed the temporary file by then and the running archive is untouched, so the command
- *   reports the failure rather than treating an unknown fault as "the download is damaged".
+ *   unreachable. Anything else propagates, exactly as Composer lets it: {@see PharUpdater::install()}
+ *   has already removed the temporary file by then and the running archive is untouched, so the
+ *   command reports the failure rather than treating an unknown fault as "the download is damaged".
  *
  * The file being checked is a copy of an archive whose alias may already be mapped by the running
  * PHAR. That is not a conflict: PHP only rejects a duplicate alias when it is being registered, not
- * when an archive is opened for reading (covered by PharValidatorTest).
+ * when an archive is opened for reading.
  */
 final class PharValidator implements PharValidatorInterface
 {

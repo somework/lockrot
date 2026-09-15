@@ -581,8 +581,8 @@ final class InstallTimeSummaryTest extends TestCase
     /**
      * The pre-transaction lock on disk knows nothing about the transaction's own new packages or
      * requirements — the normal state during a `--dry-run`, or whenever the lock has not caught up
-     * yet. Before LockFile::withPackages() was applied to the chain source, a package new to the
-     * graph resolved no "via" chain at all; this asserts it now does.
+     * yet. LockFile::withPackages() overlays the transaction onto the chain source so that a package
+     * new to the graph still resolves a "via" chain.
      */
     public function testAPreTransactionLockMissingTheTransitivePackageStillShowsTheViaChain(): void
     {

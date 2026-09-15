@@ -8,7 +8,7 @@ use Composer\Cache;
 use Lockrot\Data\Cache\CacheInterface;
 use Lockrot\Data\Http\HttpResult;
 
-/** Stores HTTP envelopes in Composer's cache dir (Composer\Cache read/write/isEnabled — Cache.php:121,138,90). */
+/** Stores HTTP envelopes in Composer's own cache directory, through Composer\Cache. */
 final class ComposerCacheAdapter implements CacheInterface
 {
     private Cache $cache;

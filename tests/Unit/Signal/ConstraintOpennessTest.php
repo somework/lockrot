@@ -39,7 +39,7 @@ final class ConstraintOpennessTest extends TestCase
     /** @return iterable<string, array{string, bool}> */
     public static function constraints(): iterable
     {
-        // real strings from research: open-ended promises written before PHP 8
+        // open-ended promises written before PHP 8
         yield '>=5.3.0' => ['>=5.3.0', true];
         yield '>=5.0' => ['>=5.0', true];
         yield '>= 7' => ['>= 7', true];

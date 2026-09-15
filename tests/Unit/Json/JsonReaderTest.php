@@ -39,16 +39,15 @@ final class JsonReaderTest extends TestCase
     }
 
     /**
-     * Composer's JsonFile::read() throws \RuntimeException when the file cannot be read
-     * (as opposed to not existing at all). A directory path is rejected earlier by our own
-     * is_file() "not found" check (is_file() is false for directories too), so to exercise
-     * this branch for real we need a path that IS a regular file but is not readable.
-     * chmod(0000) does not stop root, so skip there.
+     * Composer's JsonFile::read() throws \RuntimeException when the file cannot be read (as opposed
+     * to not existing at all). A directory path is rejected earlier by the "not found" check
+     * (is_file() is false for directories too), so this branch needs a path that IS a regular file
+     * but is not readable. chmod(0000) does not stop root, hence the skip.
      *
      * Composer's own permission probe (Filesystem::isReadable(), via Silencer) triggers a
-     * "Permission denied" PHP warning that its error_reporting-based suppression does not
-     * keep from PHPUnit (failOnWarning is on for this project); a temporary no-op error
-     * handler keeps that warning from ever reaching PHPUnit's handler.
+     * "Permission denied" PHP warning that its error_reporting-based suppression does not keep from
+     * PHPUnit (failOnWarning is on for this project); the temporary no-op error handler keeps that
+     * warning from ever reaching PHPUnit's handler.
      */
     public function testUnreadableFileThrows(): void
     {

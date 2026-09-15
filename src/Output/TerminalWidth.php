@@ -11,12 +11,11 @@ use Symfony\Component\Console\Terminal;
  * How wide the terminal `composer lockrot` is printing into is, in the four places the answer can
  * come from, best first.
  *
- * lockrot runs under two very different symfony/console versions: 5.4 under Composer 2.10, and
- * 2.8.52 inside the Composer 2.2 LTS PHAR. 2.8 has no Terminal class at all — it answers the same
- * question through Application::getTerminalDimensions() (2.8.52 Application.php:736), a method 5.4
- * no longer has. Neither call can be made unconditionally, so each source is guarded and each is a
- * method of its own: under 5.4 the Terminal step always answers, which makes the two later steps
- * unreachable from this side, and testing them at all means testing them directly.
+ * lockrot runs under two very different symfony/console versions: 5.4 under Composer 2.10, and 2.8
+ * inside the Composer 2.2 LTS PHAR. 2.8 has no Terminal class at all — it answers the same question
+ * through Application::getTerminalDimensions(), a method 5.4 does not have. Neither call can be
+ * made unconditionally, so each source is guarded and each is a method of its own: under 5.4 the
+ * Terminal step always answers, which makes the two later steps unreachable from this side.
  */
 final class TerminalWidth
 {
@@ -50,14 +49,14 @@ final class TerminalWidth
     }
 
     /**
-     * symfony/console 5.4 `Terminal::getWidth()` (Terminal.php:25); the class does not exist in 2.8.
+     * symfony/console 5.4 `Terminal::getWidth()`; the class does not exist in 2.8.
      *
      * Terminal reads `COLUMNS` itself, and far more leniently than {@see fromEnv()} does — whenever
-     * the variable is merely present it answers `(int) trim($value)` (Terminal.php:27-29), so `abc`
-     * becomes 0 and the clamp in {@see detect()} would turn that into the narrowest width lockrot
-     * accepts instead of the documented default. A `COLUMNS` step 1 has already looked at and
-     * rejected is therefore out of play for this step too: handing it over would only get the same
-     * junk read a second time, by a reader that does not check it.
+     * the variable is merely present it answers `(int) trim($value)`, so `abc` becomes 0 and the
+     * clamp in {@see detect()} would turn that into the narrowest width lockrot accepts instead of
+     * the documented default. A `COLUMNS` step 1 has already looked at and rejected is therefore
+     * out of play for this step too: handing it over would only get the same junk read a second
+     * time, by a reader that does not check it.
      *
      * @param array<string, string> $env
      */
@@ -71,10 +70,10 @@ final class TerminalWidth
     }
 
     /**
-     * symfony/console 2.8 `Application::getTerminalDimensions(): array{width, height}`
-     * (2.8.52 Application.php:736), which returns `[null, null]` when it could not tell. The method
-     * is gone in 5.4, so it is reached through reflection rather than named on a type that no longer
-     * declares it — a `method_exists()` guard alone would leave the call itself unresolvable.
+     * symfony/console 2.8 `Application::getTerminalDimensions(): array{width, height}`, which
+     * returns `[null, null]` when it could not tell. The method is gone in 5.4, so it is reached
+     * through reflection rather than named on a type that no longer declares it — a
+     * `method_exists()` guard alone would leave the call itself unresolvable.
      */
     public static function fromApplication(?Application $application): ?int
     {

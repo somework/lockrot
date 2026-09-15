@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Shares testsuites/groups/php with phpunit.xml.dist (the everyday suite); its own <source>
      narrows to the fully unit-tested "core" for the coverage gate below. PHPUnit's CLI coverage
-     filter option is repeatable on 9.6 and 11.5 but maps to directories only (11.5
-     Cli/Builder.php:1109 to Configuration/Merger.php:795-797 to FilterDirectory), and this list
-     includes single files, so a duplicate source block stays the only way to express it (ruling,
-     .superpowers/sdd/2026-09-15-lockrot-v0.1.0-final/progress.md). -->
+     filter option is repeatable on 9.6 and 11.5 but maps to directories only, and this list
+     includes single files, so a duplicate source block is the only way to express it. -->
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          bootstrap="vendor/autoload.php" colors="true" failOnWarning="true"
          beStrictAboutOutputDuringTests="true">
@@ -22,39 +20,38 @@
             <directory>src/Analyzer</directory>
             <directory>src/Data/Repository</directory>
             <directory>src/Lock</directory>
-            <!-- install-time summary (added on feat/v0.1.0-prep): the plugin bootstrap around it
-                 (LockrotPlugin, CommandProvider, LockrotCommand, ServiceFactory) is exercised by the
-                 e2e group, which this gate excludes, so it stays in the informational run only -->
+            <!-- install-time summary: the plugin bootstrap around it (LockrotPlugin, CommandProvider,
+                 LockrotCommand, ServiceFactory) is exercised by the e2e group, which this gate
+                 excludes, so it stays in the informational run only -->
             <file>src/Deadline.php</file>
             <file>src/Composer/AnalyzerBootstrap.php</file>
             <file>src/Composer/InstallTimeSummary.php</file>
             <file>src/Composer/TransactionPackages.php</file>
             <file>src/Output/InstallSummaryFormatter.php</file>
             <file>src/Exception/InstallBlockedException.php</file>
-            <!-- annotation formats (added on feat/v0.1.0-final): pure formatters over a Report, fully
-                 unit-tested. LockLineIndex needs no entry of its own — src/Lock above already covers
-                 it — and src/Version.php holds a constant with no executable line to measure -->
+            <!-- annotation formats: pure formatters over a Report, fully unit-tested. LockLineIndex
+                 needs no entry of its own — src/Lock above already covers it — and src/Version.php
+                 holds a constant with no executable line to measure -->
             <file>src/Output/FormatContext.php</file>
             <file>src/Output/GithubFormatter.php</file>
             <file>src/Output/SarifFormatter.php</file>
-            <!-- gitlab + markdown formats (added on feat/v0.1.0-extras): pure formatters over a
-                 Report, fully unit-tested, same as GithubFormatter/SarifFormatter above -->
+            <!-- gitlab + markdown formats: pure formatters over a Report, fully unit-tested, same as
+                 GithubFormatter/SarifFormatter above -->
             <file>src/Output/GitlabFormatter.php</file>
             <file>src/Output/MarkdownFormatter.php</file>
-            <!-- the grouped `table` list and its width detection (added on
-                 feat/priority-and-list-output): pure rendering over a Report plus a four-source
-                 lookup, both driven from unit tests. TerminalWidth's symfony/console 2.8 branch
-                 cannot be reached under the 5.4 require-dev resolves, so each source is a method of
-                 its own and is tested directly -->
+            <!-- the grouped `table` list and its width detection: pure rendering over a Report plus a
+                 four-source lookup, both driven from unit tests. TerminalWidth's symfony/console 2.8
+                 branch cannot be reached under the 5.4 require-dev resolves, so each source is a
+                 method of its own and is tested directly -->
             <file>src/Output/TableFormatter.php</file>
             <file>src/Output/TerminalWidth.php</file>
-            <!-- baseline file (added on feat/v0.1.0-extras): value objects plus the one file lockrot
-                 ever writes, all reachable from unit tests -->
+            <!-- baseline file: value objects plus the one file lockrot ever writes, all reachable
+                 from unit tests -->
             <directory>src/Baseline</directory>
-            <!-- self-update (added on feat/self-update): the release lookup, the download/verify/
-                 replace mechanics and the Phar check, all driven from unit tests with a fake HTTP
-                 client and a temporary file. src/Composer/SelfUpdateCommand.php stays out, like
-                 LockrotCommand, because its Composer wiring is only exercised by the e2e group -->
+            <!-- self-update: the release lookup, the download/verify/replace mechanics and the Phar
+                 check, all driven from unit tests with a fake HTTP client and a temporary file.
+                 src/Composer/SelfUpdateCommand.php stays out, like LockrotCommand, because its
+                 Composer wiring is only exercised by the e2e group -->
             <file>src/SelfUpdate/Release.php</file>
             <file>src/SelfUpdate/ReleaseLocator.php</file>
             <file>src/SelfUpdate/PharUpdater.php</file>

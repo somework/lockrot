@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Data\Http;
 
+/** Replays HTTP responses recorded on disk, so an acceptance run needs no network. */
 final class RecordedHttpClient implements HttpClientInterface
 {
     private string $dir;

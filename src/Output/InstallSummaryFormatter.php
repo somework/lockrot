@@ -9,8 +9,8 @@ use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
 
 /**
- * The install-time block (SPEC F5.1): a report compressed into at most ten Composer IO lines, meant
- * to be read in passing while `composer require` runs, not studied.
+ * The install-time block: a report compressed into at most ten Composer IO lines, meant to be read
+ * in passing while `composer require` runs, not studied.
  *
  * Two blocks, never both: the flagged one, and — when nothing is flagged but a lookup failed — a
  * shorter "could not be checked" one. Only a run where nothing is flagged *and* every lookup
@@ -21,8 +21,7 @@ use Lockrot\Verdict\Verdict;
  * wrap past one row in a narrow terminal.
  *
  * Unlike {@see TableFormatter} this returns lines rather than a rendered string, because
- * IOInterface::writeError() takes string|string[] (2.10.3 IO/IOInterface.php:86, 2.2.25 :86) and
- * applies Composer's own styling to each.
+ * IOInterface::writeError() takes string|string[] and applies Composer's own styling to each.
  */
 final class InstallSummaryFormatter
 {

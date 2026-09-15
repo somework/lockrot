@@ -13,6 +13,7 @@ use Composer\Plugin\Capability\CommandProvider as CommandProviderCapability;
 use Composer\Plugin\Capable;
 use Composer\Plugin\PluginInterface;
 
+/** The Composer plugin entry point: registers the install-time listener and the `composer lockrot` command. */
 final class LockrotPlugin implements PluginInterface, Capable, EventSubscriberInterface
 {
     public function activate(Composer $composer, IOInterface $io): void
@@ -28,12 +29,11 @@ final class LockrotPlugin implements PluginInterface, Capable, EventSubscriberIn
     }
 
     /**
-     * Composer\Plugin\PluginManager registers a plugin implementing EventSubscriberInterface with
-     * the event dispatcher right after activate() (2.10.3 Plugin/PluginManager.php:437-438, 2.2.25
-     * :422-423), so no wiring is needed in activate() itself.
+     * Composer's PluginManager registers a plugin implementing EventSubscriberInterface with the
+     * event dispatcher right after activate(), so no wiring is needed in activate() itself.
      *
-     * The interface declares getSubscribedEvents() without a return type in both trees
-     * (EventDispatcher/EventSubscriberInterface.php:47), which allows adding one here.
+     * The interface declares getSubscribedEvents() without a return type in both supported Composer
+     * trees, which allows adding one here.
      *
      * @return array<string, string>
      */

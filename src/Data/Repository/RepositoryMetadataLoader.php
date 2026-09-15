@@ -20,10 +20,9 @@ final class RepositoryMetadataLoader implements MetadataLoaderInterface
      * releases, so a name with at least one tag never needs its `~dev` file just to see that flag.
      * Pass 1 therefore asks only for these stabilities first; a name Composer reports as found here
      * with at least one version is fully resolved without ever touching {name}~dev.json.
-     * Composer\Package\BasePackage::$stabilities is deprecated in 2.10 in favour of the
-     * BasePackage::STABILITIES constant, which 2.2 LTS does not have; the individual
-     * BasePackage::STABILITY_* constants exist in both (2.10.3 src/Composer/Package/BasePackage.php:37-41,
-     * 2.2.25 :37-41), so the map is spelled out from those.
+     *
+     * The map is spelled out from the individual BasePackage::STABILITY_* constants because those
+     * exist in every supported Composer, while the BasePackage::STABILITIES constant does not.
      */
     private const STABLE_STABILITIES = [
         'stable' => BasePackage::STABILITY_STABLE,
@@ -33,13 +32,12 @@ final class RepositoryMetadataLoader implements MetadataLoaderInterface
     ];
 
     /**
-     * Pass 2, queried only for names pass 1 could not resolve — a package with no tagged release
-     * at all (e.g. lox/xhprof, wallabag/rulerz). Requesting only `dev` here matters: Composer's own
+     * Pass 2, queried only for names pass 1 could not resolve — a package with no tagged release at
+     * all. Requesting only `dev` here matters: Composer's own
      * ComposerRepository::loadAsyncPackages() adds `{name}~dev` to the request list whenever `dev`
-     * is an acceptable stability (2.10.3 Repository/ComposerRepository.php:1292-1296, 2.2.25
-     * :889-893), and skips the non-dev `{name}` file entirely when `dev` is the *only* acceptable
-     * stability (2.10.3 :1297-1300, 2.2.25 :894-897) — so this constant alone is what keeps pass 2
-     * from re-fetching the stable file pass 1 already asked for.
+     * is an acceptable stability, and skips the non-dev `{name}` file entirely when `dev` is the
+     * *only* acceptable stability — so this constant alone is what keeps pass 2 from re-fetching
+     * the stable file pass 1 already asked for.
      */
     private const DEV_ONLY_STABILITIES = [
         'dev' => BasePackage::STABILITY_DEV,
@@ -262,9 +260,8 @@ final class RepositoryMetadataLoader implements MetadataLoaderInterface
         foreach ($packages as $package) {
             if ($package instanceof AliasPackage) {
                 // loadPackages() returns an AliasPackage built from extra.branch-alias *and*, as a
-                // separate entry, the package it aliases (2.10.3
-                // src/Composer/Repository/ComposerRepository.php:1348-1352, 2.2.25 :960-964), so
-                // unwrapping without deduplicating would count that release twice.
+                // separate entry, the package it aliases, so unwrapping without deduplicating would
+                // count that release twice.
                 $package = $package->getAliasOf();
             }
             if (!$package instanceof BasePackage) {

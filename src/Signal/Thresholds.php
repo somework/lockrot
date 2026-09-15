@@ -27,12 +27,10 @@ final class Thresholds
     }
 
     /**
-     * @param array<string, mixed> $extra composer.json extra.lockrot; the schema (when this comes
-     *                                    through ProjectConfig) already requires each key here to be
-     *                                    a JSON integer, but this still fails fast rather than trust
-     *                                    that for a caller that bypasses it — it just no longer
-     *                                    duplicates the schema's own leniency (a digit string like
-     *                                    "4" is rejected, not silently accepted via ctype_digit)
+     * @param array<string, mixed> $extra composer.json extra.lockrot; each key here must be a JSON
+     *                                     integer, re-checked rather than trusted from the config
+     *                                     schema for callers that bypass it (a digit string like
+     *                                     "4" is rejected)
      */
     public static function fromArray(array $extra): self
     {

@@ -142,9 +142,8 @@ final class TableFormatterTest extends TestCase
     /**
      * Every rendered row of every group: everything above the blank line that separates the last
      * group from the summary block. Only the rows are wrapped — the summary block is one line per
-     * fact by design, the way it has always been, and a terminal soft-wraps those itself — so the
-     * blank lines *between* groups have to stay inside the region, which means slicing at the last
-     * one rather than the first.
+     * fact by design, and a terminal soft-wraps those itself — so the blank lines *between* groups
+     * have to stay inside the region, which means slicing at the last one rather than the first.
      *
      * @return list<string>
      */

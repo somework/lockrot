@@ -16,7 +16,7 @@ final class LockrotPluginTest extends TestCase
     public function testThePluginIsAnEventSubscriber(): void
     {
         // Composer\Plugin\PluginManager registers a plugin implementing this interface with the
-        // event dispatcher (2.10.3 Plugin/PluginManager.php:437-438, 2.2.25 :422-423).
+        // event dispatcher.
         self::assertInstanceOf(EventSubscriberInterface::class, new LockrotPlugin());
     }
 

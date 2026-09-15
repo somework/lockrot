@@ -46,9 +46,9 @@ final class RepositoryMetadataLoaderTest extends TestCase
         self::$server->start();
         // One loader (and so one HttpDownloader/curl-multi handle) shared across every test in this
         // class: repeatedly building a fresh RepositoryManager against the same long-lived php -S
-        // process left stale connections behind that eventually wedged the server, measured while
-        // writing this test — reusing a single loader avoids that and matches how a real analyzer
-        // run would use it (one instance queried many times).
+        // process leaves stale connections behind that eventually wedge the server. Reusing a single
+        // loader avoids that and matches how a real analyzer run uses it (one instance queried many
+        // times).
         self::$loader = new RepositoryMetadataLoader(self::$server->repositories(), Clock::fixed(self::FIXED));
     }
 
@@ -108,12 +108,10 @@ final class RepositoryMetadataLoaderTest extends TestCase
     }
 
     /**
-     * Baseline measured against the pre-change loader (single pass over ALL_STABILITIES, so
-     * Composer fetched both {name}.json and {name}~dev.json for every name): loading these same
-     * 201 names cost 403 requests, measured with `git stash` on the loader source and re-running
-     * this test (see task-1-report.md). The two-pass loader instead fetches the stable file for
-     * every name once, and the dev file only for names with no tagged release — 206 requests for
-     * the same 201 names (1 packages.json + 201 stable files + 4 dev-only files).
+     * A single pass over ALL_STABILITIES makes Composer fetch both {name}.json and {name}~dev.json
+     * for every name: 403 requests for these 201 names. The two-pass loader instead fetches the
+     * stable file for every name once, and the dev file only for names with no tagged release — 206
+     * requests for the same 201 names (1 packages.json + 201 stable files + 4 dev-only files).
      */
     public function testFullWallabagLoadRequestsOneFilePerNamePlusDevForTaglessNames(): void
     {
@@ -173,13 +171,13 @@ final class RepositoryMetadataLoaderTest extends TestCase
     }
 
     /**
-     * Regression test for a real hang: php -S writes one access-log line per request to stderr,
-     * and Symfony\Process only drains that pipe while something calls back into the Process object
+     * Regression test for a real hang: php -S writes one access-log line per request to stderr, and
+     * Symfony\Process only drains that pipe while something calls back into the Process object
      * (which the startup poll loop does, but nothing does afterward). A single ~200-package load is
      * already ~1000 requests; three of them back-to-back through the one shared loader/server this
-     * class builds in setUpBeforeClass() is ~3000 requests and previously wedged the server well
-     * before completing. FixtureRepositoryServer::start() now redirects the child's stdout/stderr to
-     * a file instead of a pipe, which removes the pipe to fill in the first place.
+     * class builds in setUpBeforeClass() is ~3000 requests, which filled the pipe and wedged the
+     * server well before completing. FixtureRepositoryServer::start() redirects the child's
+     * stdout/stderr to a file instead of a pipe, which removes the pipe to fill in the first place.
      */
     public function testThreeConsecutiveFullWallabagLoadsThroughSharedServerAllResolve(): void
     {
@@ -475,12 +473,11 @@ final class RepositoryMetadataLoaderTest extends TestCase
     public function testDevOnlyBranchAliasIsUnwrappedAndCountedOnce(): void
     {
         // ComposerRepository::loadPackages() returns an AliasPackage built from extra.branch-alias
-        // *and*, as a separate entry, the package it aliases (2.10.3
-        // src/Composer/Repository/ComposerRepository.php:1348-1352, 2.2.25 :960-964), so
-        // unwrapping aliases without deduplicating counts that release twice. This package has no
-        // stable file at all (lox/xhprof-style: registered, but tagless), so it resolves entirely
-        // through the loader's dev-only pass, where the same dedup must still apply. The recorded
-        // p2 fixtures have `extra` stripped, hence the hand-written envelope here.
+        // *and*, as a separate entry, the package it aliases, so unwrapping aliases without
+        // deduplicating counts that release twice. This package has no stable file at all
+        // (lox/xhprof-style: registered, but tagless), so it resolves entirely through the loader's
+        // dev-only pass, where the same dedup must still apply. The recorded p2 fixtures have
+        // `extra` stripped, hence the hand-written envelope here.
         $server = $this->syntheticServer([
             'alias/pkg~dev' => [$this->p2Version('alias/pkg', 'dev-main', [
                 'extra' => ['branch-alias' => ['dev-main' => '2.0.x-dev']],
@@ -507,8 +504,8 @@ final class RepositoryMetadataLoaderTest extends TestCase
      * Real-fixture counterpart to testDevOnlyBranchAliasIsUnwrappedAndCountedOnce(): wallabag/rulerz
      * has no tagged release at all (its `wallabag/rulerz.json` stable file lists zero versions for
      * the name), so it resolves entirely through the loader's dev-only pass against the recorded
-     * `wallabag/rulerz~dev.json`. Recorded 2026-09-15: that file's `packages["wallabag/rulerz"]` has
-     * 2 entries (dev-master, dev-support-symfony-7), and dev-master carries `extra.branch-alias`
+     * `wallabag/rulerz~dev.json`. That file's `packages["wallabag/rulerz"]` has 2 entries
+     * (dev-master, dev-support-symfony-7), and dev-master carries `extra.branch-alias`
      * (dev-master => 1.0.x-dev). ComposerRepository::loadPackages() unwraps that into a separate
      * AliasPackage entry alongside the package it aliases, so without the loader's own dedup this
      * would count 3 releases instead of 2.

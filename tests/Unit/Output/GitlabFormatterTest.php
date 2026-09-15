@@ -189,7 +189,7 @@ final class GitlabFormatterTest extends TestCase
 
     /**
      * The identity GitLab tracks an issue by must survive a version bump and a reformatted lock:
-     * the fingerprint is the package and the verdict, nothing else (SPEC F5.2).
+     * the fingerprint is the package and the verdict, nothing else.
      */
     public function testFingerprintIgnoresTheVersionAndTheLockLine(): void
     {

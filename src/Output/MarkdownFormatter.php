@@ -23,14 +23,14 @@ use Lockrot\Verdict\Finding;
  *
  * Priority leads the row: the table keeps the report's own order, which is by priority, so a
  * reviewer reads down the first column and stops where the rows stop applying to the project. The
- * verdict keeps its own column next to it — the two axes answer different questions (SPEC F5.4).
+ * verdict keeps its own column next to it — the two axes answer different questions.
  *
  * Table cells escape the two characters that would otherwise break a Markdown table or collapse
  * multiple logical rows into one: `|` becomes `\|`, and any line break becomes a single space. The
  * verdict cell is bold only when FormatContext::levelOf() is not `note` — the same rule GitHub
  * annotations and GitLab severities use, so a reviewer's eye is drawn to exactly the findings that
- * can fail the build. The `Via` chain is joined with "›" rather than TableFormatter's plain "&gt;",
- * which reads more naturally inline in a table cell (design, plan Task 2).
+ * can fail the build. The `Via` chain is joined with "›", which reads more naturally inline in a
+ * table cell than the plain ">" the annotation formats use.
  */
 final class MarkdownFormatter implements FormatterInterface
 {

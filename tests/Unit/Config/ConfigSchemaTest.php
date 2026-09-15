@@ -85,7 +85,7 @@ final class ConfigSchemaTest extends TestCase
         yield 'target-php bad pattern' => [['target-php' => 'v8.4'], 'target-php'];
         yield 'format not in enum' => [['format' => 'xml'], 'format'];
         yield 'include-dev wrong type' => [['include-dev' => 'yes'], 'include-dev'];
-        // The spec's third install-time value, `summary`, is not implemented in 0.1 (SPEC F6).
+        // `summary` is not an accepted install-time value.
         yield 'install-time not in enum' => [['install-time' => 'summary'], 'install-time'];
         yield 'install-time-strict wrong type' => [['install-time-strict' => 'yes'], 'install-time-strict'];
         yield 'install-time-budget wrong type' => [['install-time-budget' => '5'], 'install-time-budget'];

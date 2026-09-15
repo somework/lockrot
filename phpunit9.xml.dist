@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Identical to phpunit.xml.dist except for the coverage element: PHPUnit 9.6, which the PHP 7.4
+     and 8.0 matrix legs resolve, reads <coverage><include>, while 10+ reads <source><include>.
+     ci.yml picks this file on those two legs. -->
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          bootstrap="vendor/autoload.php" colors="true" failOnWarning="true"
          beStrictAboutOutputDuringTests="true">

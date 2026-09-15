@@ -27,6 +27,7 @@ use Lockrot\Signal\SignalSet;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\VerdictEngine;
 
+/** The analysis itself: metadata, repository activity, signals and verdicts for a set of locked packages. */
 final class Analyzer
 {
     public const NOTE_NOT_IN_REPOSITORY = 'not from a Composer repository, not checked';
@@ -243,11 +244,10 @@ final class Analyzer
     }
 
     /**
-     * One reason across every failed package reads as today: "Repository metadata unavailable for
-     * N packages: <reason>". Several distinct reasons are broken out with their own counts instead
-     * of only ever naming the first one reached, e.g. "Repository metadata unavailable for 4
-     * packages: not checked: install-time budget exhausted (3); connection refused (1)" — reasons
-     * appear in the order {@see MetadataBatch::failed()} reports them.
+     * One reason across every failed package reads as "Repository metadata unavailable for N
+     * packages: <reason>". Several distinct reasons each get their own count instead of only ever
+     * naming the first one reached — reasons appear in the order {@see MetadataBatch::failed()}
+     * reports them.
      *
      * @param array<string, string> $metadataFailed package name => reason
      */

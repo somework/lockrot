@@ -14,17 +14,14 @@ use Lockrot\Data\Http\HttpResult;
 use Lockrot\Deadline;
 
 /**
- * Parallel HTTP through Composer's HttpDownloader (curl multi when available).
- * API: HttpDownloader::add()/wait() — Composer 2.10.3 src/Composer/Util/HttpDownloader.php:131,363; 2.2.25 :143,370.
+ * Parallel HTTP through Composer's HttpDownloader (curl multi when available), using its
+ * add()/wait() pair.
  *
- * A HttpDownloader returned by Factory::createHttpDownloader() defaults to sync-only
- * mode: add() throws LogicException("...must use the HttpDownloader instance which is
- * part of a Composer\Loop instance...") until async is enabled. Composer enables it by
- * wrapping the downloader in Composer\Util\Loop, whose constructor calls
- * HttpDownloader::enableAsync() — Composer 2.10.3 src/Composer/Util/Loop.php:32,34 and
- * getHttpDownloader() :42; 2.2.25 same file :33,36 and :47. We go through Loop rather than
- * calling the @internal-marked enableAsync() ourselves; the process-executor half of Loop
- * stays unused (we only need add()/wait()).
+ * A HttpDownloader returned by Factory::createHttpDownloader() defaults to sync-only mode: add()
+ * throws a LogicException until async is enabled. Composer enables it by wrapping the downloader in
+ * Composer\Util\Loop, whose constructor calls HttpDownloader::enableAsync(). Loop is used here for
+ * that reason rather than calling enableAsync() directly, which Composer marks internal; the
+ * process-executor half of Loop stays unused.
  */
 final class ComposerHttpClient implements HttpClientInterface
 {

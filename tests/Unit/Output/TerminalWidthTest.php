@@ -61,10 +61,10 @@ final class TerminalWidthTest extends TestCase
 
     /**
      * symfony's Terminal reads COLUMNS itself, and far more leniently than step 1 does:
-     * `(int) trim(getenv('COLUMNS'))` turns `abc` into 0 (Terminal.php:27-29). Handing it a value
-     * step 1 has already rejected would answer 0, and the clamp would turn that into the narrowest
-     * width lockrot accepts rather than the documented default. So a COLUMNS that is present but
-     * unusable takes the whole variable out of play.
+     * `(int) trim(getenv('COLUMNS'))` turns `abc` into 0. Handing it a value step 1 has already
+     * rejected would answer 0, and the clamp would turn that into the narrowest width lockrot
+     * accepts rather than the documented default. So a COLUMNS that is present but unusable takes
+     * the whole variable out of play.
      */
     public function testAnUnusableColumnsIsNotHandedToTheConsoleTerminalEither(): void
     {
@@ -88,9 +88,9 @@ final class TerminalWidthTest extends TestCase
 
     /**
      * symfony/console 2.8 has no Terminal class and reports the width through
-     * Application::getTerminalDimensions() instead (2.8.52 Application.php:736). 5.4 dropped the
-     * method, so the only way to exercise the branch on this side is an application that declares
-     * it — which is exactly the shape the 2.8 class has.
+     * Application::getTerminalDimensions() instead. 5.4 dropped the method, so the only way to
+     * exercise the branch on this side is an application that declares it — which is exactly the
+     * shape the 2.8 class has.
      */
     public function testAnApplicationThatStillReportsDimensionsSuppliesTheWidth(): void
     {

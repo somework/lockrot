@@ -14,10 +14,9 @@ use Lockrot\Verdict\Finding;
  * that publishes `artifacts.reports.codequality` so findings show up as inline diff annotations on
  * a merge request.
  *
- * Shape verified on 2026-09-15 against
- * https://docs.gitlab.com/ci/testing/code_quality/#implement-a-custom-tool ("Implement a custom
- * tool"): each issue needs `description`, `check_name`, `fingerprint`, `severity` (one of `info`,
- * `minor`, `major`, `critical`, `blocker`) and a location with either `lines.begin` or
+ * Shape per https://docs.gitlab.com/ci/testing/code_quality/#implement-a-custom-tool ("Implement a
+ * custom tool"): each issue needs `description`, `check_name`, `fingerprint`, `severity` (one of
+ * `info`, `minor`, `major`, `critical`, `blocker`) and a location with either `lines.begin` or
  * `positions.begin.line`; `type` and `categories` are accepted but not required by GitLab's own
  * parser — kept here for compatibility with tools that still expect the CodeClimate shape GitLab's
  * format is descended from.
@@ -27,8 +26,8 @@ use Lockrot\Verdict\Finding;
  * or an unflagged row only visible under `--all`) -> `info`.
  *
  * Report::notes() has no field to carry a document-level note in this shape, so notes are dropped
- * here (ruling; the README says to use `--format=json` for them). `--strict-network` still drives
- * the exit code independently of the chosen format.
+ * here; use `--format=json` for them. `--strict-network` still drives the exit code independently
+ * of the chosen format.
  *
  * The fingerprint is `sha256("lockrot|<package>|<verdict>")`: stable across machines and runs, and
  * deliberately excludes the line number and version, so a version bump that keeps the same verdict

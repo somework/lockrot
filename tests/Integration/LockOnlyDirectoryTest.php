@@ -8,13 +8,13 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
 /**
- * Regression coverage for LockrotCommand::quietRootVersionGuessing() (called from initialize()) (see its
- * docblock): a lock-only directory with no .git and a composer.json that carries neither `version`
- * nor `type` is exactly the shape that previously made Composer's RootPackageLoader fall back to
- * VersionGuesser, which shells out to git/hg/fossil/svn looking for something to derive a version
- * from, and then warns "could not detect the root package version". Only a real subprocess through
- * bin/lockrot exercises this: the unit-level CommandTester never builds a fresh Composer instance
- * from scratch the way this lock-only path does.
+ * Regression coverage for LockrotCommand::quietRootVersionGuessing(), called from initialize(): a
+ * lock-only directory with no .git and a composer.json that carries neither `version` nor `type` is
+ * exactly the shape that makes Composer's RootPackageLoader fall back to VersionGuesser, which
+ * shells out to git/hg/fossil/svn looking for something to derive a version from and then warns
+ * "could not detect the root package version". Only a real subprocess through bin/lockrot exercises
+ * this: the unit-level CommandTester never builds a fresh Composer instance from scratch the way
+ * this lock-only path does.
  */
 final class LockOnlyDirectoryTest extends TestCase
 {

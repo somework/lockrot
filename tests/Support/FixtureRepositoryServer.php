@@ -30,16 +30,15 @@ final class FixtureRepositoryServer
     private const ROUTER_FILENAME = 'router.php';
 
     /**
-     * Serves every request itself rather than falling through to php -S's built-in static
-     * handler (`return false`): that built-in handler resets the response headers it generates,
-     * discarding anything the router already sent via `header()` — measured directly, a
-     * `Last-Modified` header set before `return false` never reaches the client. Composer's
-     * ComposerRepository caches that header on a first fetch and revalidates against it on later
-     * ones (offline, a cached `last-modified` is what lets it fake a 304 rather than a synthetic
-     * 404), so without a router that sends it itself, an offline re-fetch of an already-cached
-     * file could never be told apart from one that was never cached at all. `Connection: close`
-     * on every response makes curl open a fresh connection per request instead of reusing one
-     * across the whole load.
+     * Serves every request itself rather than falling through to php -S's built-in static handler
+     * (`return false`): that built-in handler resets the response headers it generates, discarding
+     * anything the router already sent via `header()`, so a `Last-Modified` header set before
+     * `return false` never reaches the client. Composer's ComposerRepository caches that header on a
+     * first fetch and revalidates against it on later ones (offline, a cached `last-modified` is
+     * what lets it fake a 304 rather than a synthetic 404), so without a router that sends it itself,
+     * an offline re-fetch of an already-cached file could never be told apart from one that was
+     * never cached at all. `Connection: close` on every response makes curl open a fresh connection
+     * per request instead of reusing one across the whole load.
      */
     private const ROUTER_SCRIPT = <<<'PHP'
         <?php

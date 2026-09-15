@@ -32,8 +32,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * Exit codes follow the rest of lockrot: 0 for a successful update or an already-current build, 2
  * for every error. `--check` adds one case of its own — exit 1 when an update is available — so a
- * scheduled CI job can notice a new release without this command ever writing to disk (ruling,
- * .superpowers/sdd/2026-09-15-lockrot-self-update/progress.md).
+ * scheduled CI job can notice a new release without this command ever writing to disk.
  *
  * Every message goes to stderr; stdout stays empty, as it does for every lockrot run that produces
  * no report.
@@ -43,9 +42,9 @@ final class SelfUpdateCommand extends BaseCommand
     /**
      * How long the whole self-update round may take. {@see ComposerHttpClient} turns this into the
      * per-request timeout, which Composer maps to curl's CURLOPT_TIMEOUT — the *total* transfer
-     * time, not just the connect time (2.10.3 src/Composer/Util/Http/CurlDownloader.php:76). A
-     * never-expiring deadline would leave {@see ComposerHttpClient::DEFAULT_TIMEOUT} at 10 seconds,
-     * which is ample for the release JSON but not for a megabyte of PHAR on a slow link.
+     * time, not just the connect time. A never-expiring deadline would leave
+     * {@see ComposerHttpClient::DEFAULT_TIMEOUT} at 10 seconds, which is ample for the release JSON
+     * but not for a megabyte of PHAR on a slow link.
      */
     private const BUDGET_SECONDS = 120.0;
 
@@ -99,10 +98,9 @@ final class SelfUpdateCommand extends BaseCommand
 
     /**
      * Composer's BaseCommand::initialize() builds a Composer instance from the current directory,
-     * falling back to the global one (2.10.3 src/Composer/Command/BaseCommand.php:240-244, 2.2.25
-     * :159-162). self-update needs none of it — it reads no project — and going through it would
-     * make updating the PHAR depend on whatever composer.json happens to sit in the working
-     * directory. Overridden empty so `lockrot.phar self-update` works from anywhere.
+     * falling back to the global one. self-update needs none of it — it reads no project — and
+     * going through it would make updating the PHAR depend on whatever composer.json happens to sit
+     * in the working directory. Overridden empty so `lockrot.phar self-update` works from anywhere.
      */
     protected function initialize(InputInterface $input, OutputInterface $output): void
     {
@@ -167,10 +165,9 @@ final class SelfUpdateCommand extends BaseCommand
 
     /**
      * The HTTP client and the GitHub token, built the way the analyzer builds them: Composer's own
-     * Config (`Factory::createConfig()` — 2.10.3 src/Composer/Factory.php:165, 2.2.25 :178) and its
-     * HttpDownloader, with the token resolved from LOCKROT_GITHUB_TOKEN, GITHUB_TOKEN or Composer's
-     * `github-oauth`, so a self-update is not the one lockrot call that hits the anonymous rate
-     * limit.
+     * Config and HttpDownloader, with the token resolved from LOCKROT_GITHUB_TOKEN, GITHUB_TOKEN or
+     * Composer's `github-oauth`, so a self-update is not the one lockrot call that hits the
+     * anonymous rate limit.
      *
      * @return array{0: HttpClientInterface, 1: ?string}
      */

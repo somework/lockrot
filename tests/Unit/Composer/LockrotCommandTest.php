@@ -143,9 +143,8 @@ final class LockrotCommandTest extends TestCase
 
     /**
      * Snapshots COMPOSER_CACHE_DIR/COMPOSER_HOME, sets them to $cacheDir/$home for the duration of
-     * $body, and restores each in a finally block — putEnv() when the previous value was a string,
-     * clearEnv() when it was false — so a caller running with these already set (e.g. a nested
-     * Composer invocation) is left the way it found them rather than wiped.
+     * $body, and restores both in a finally block, so a caller running with these already set (e.g.
+     * a nested Composer invocation) is left the way it found them rather than wiped.
      *
      * @param callable(): void $body
      */
@@ -172,14 +171,12 @@ final class LockrotCommandTest extends TestCase
     }
 
     /**
-     * Runs the command with genuinely separate stdout/stderr streams, without
-     * CommandTester's `capture_stderr_separately` option: on PHP 8.5 that option
-     * triggers a `ReflectionProperty::setAccessible()` deprecation inside
-     * Symfony\Component\Console\Tester\TesterTrait::initOutput() (the property has
-     * been public-by-effect since PHP 8.1, but the call itself is only now
-     * deprecated), which would pollute otherwise-pristine test output. Command::run()
-     * only needs an InputInterface and an OutputInterface, so a minimal
-     * ConsoleOutputInterface double gives the same stream separation directly.
+     * Runs the command with genuinely separate stdout/stderr streams, without CommandTester's
+     * `capture_stderr_separately` option: on PHP 8.5 that option triggers a
+     * `ReflectionProperty::setAccessible()` deprecation inside
+     * Symfony\Component\Console\Tester\TesterTrait::initOutput(), which would pollute otherwise
+     * pristine test output. Command::run() only needs an InputInterface and an OutputInterface, so a
+     * minimal ConsoleOutputInterface double gives the same stream separation directly.
      *
      * @param array<string, mixed> $args
      *
@@ -286,8 +283,8 @@ final class LockrotCommandTest extends TestCase
     /**
      * Only `table` is written through the tag formatter; every machine-readable format goes out
      * with OUTPUT_RAW, so a `<` in a constraint or a package name can never be eaten as a console
-     * tag on its way to a parser (OutputInterface::OUTPUT_RAW = 2 in symfony/console 5.4.47
-     * Output/OutputInterface.php:30 and 2.8.52 same file, same line).
+     * tag on its way to a parser (OutputInterface::OUTPUT_RAW is 2 in both symfony/console 5.4 and
+     * 2.8).
      */
     public function testTheTableFormatIsWrittenThroughTheFormatter(): void
     {
@@ -618,16 +615,15 @@ final class LockrotCommandTest extends TestCase
     }
 
     /**
-     * Symfony's Command::run() calls initialize() with no try/catch of its own
-     * (vendor/symfony/console/Command/Command.php:263), so a failure inside Composer's own
-     * BaseCommand::initialize() — here, a plugin's PRE_COMMAND_RUN listener throwing, which
-     * BaseCommand::initialize() dispatches at src/Composer/Command/BaseCommand.php:246-249, itself
-     * uncaught by Composer — must still leave COMPOSER_DISABLE_NETWORK/COMPOSER_ROOT_VERSION as
-     * initialize() found them, even though execute() (and its own finally) never runs. Reuses the
-     * plugin-mode setup from testPluginModeThreadsEventDispatcherThroughRebuiltRepositories(): a
-     * Composer instance built ahead of time via Application::getComposer() so tryComposer() inside
-     * BaseCommand::initialize() returns it non-null, which is what makes the PRE_COMMAND_RUN
-     * dispatch (and so the listener) run at all.
+     * Symfony's Command::run() calls initialize() with no try/catch of its own, so a failure inside
+     * Composer's own BaseCommand::initialize() — here, a plugin's PRE_COMMAND_RUN listener throwing,
+     * which BaseCommand::initialize() dispatches and Composer itself does not catch — must still
+     * leave COMPOSER_DISABLE_NETWORK/COMPOSER_ROOT_VERSION as initialize() found them, even though
+     * execute() (and its own finally) never runs. Reuses the plugin-mode setup from
+     * testPluginModeThreadsEventDispatcherThroughRebuiltRepositories(): a Composer instance built
+     * ahead of time via Application::getComposer() so tryComposer() inside BaseCommand::initialize()
+     * returns it non-null, which is what makes the PRE_COMMAND_RUN dispatch (and so the listener)
+     * run at all.
      */
     public function testInitializeRestoresTheEnvironmentWhenAPreCommandRunListenerThrows(): void
     {

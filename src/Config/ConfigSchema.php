@@ -9,9 +9,9 @@ use JsonSchema\Validator;
 use Lockrot\Exception\ConfigException;
 
 /**
- * Validates the shape of composer.json's extra.lockrot against resources/lockrot-config.schema.json
- * using Composer's own bundled justinrainbow/json-schema validator, so callers no longer hand-check
- * the shape of each key themselves.
+ * Validates the shape of composer.json's extra.lockrot against
+ * resources/lockrot-config.schema.json, using Composer's own bundled justinrainbow/json-schema
+ * validator.
  */
 final class ConfigSchema
 {

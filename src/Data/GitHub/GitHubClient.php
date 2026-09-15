@@ -9,7 +9,7 @@ use Lockrot\Data\Http\HttpClientInterface;
 final class GitHubClient
 {
     public const DEFAULT_API_BASE = 'https://api.github.com/repos/';
-    /** Fixed cache TTL for GitHub repository activity; no user-facing knob (ruling: --refresh/cache-ttl removed). */
+    /** Fixed cache TTL for GitHub repository activity; there is no user-facing knob for it. */
     public const CACHE_TTL = 86400;
 
     private HttpClientInterface $http;
@@ -52,8 +52,7 @@ final class GitHubClient
     {
         $headers = ['Accept: application/vnd.github+json', 'User-Agent: lockrot'];
         if ($token !== null && $token !== '') {
-            // Same scheme Composer itself uses for api.github.com — Composer 2.10.3
-            // src/Composer/Util/AuthHelper.php:302.
+            // Same scheme Composer itself uses for api.github.com (see its AuthHelper).
             $headers[] = 'Authorization: token '.$token;
         }
 

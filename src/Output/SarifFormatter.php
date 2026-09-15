@@ -17,9 +17,8 @@ use Lockrot\Verdict\Verdict;
  * Security tab and on the pull request.
  *
  * One run, one rule per verdict actually present in the report, one result per finding, each
- * located on the `"name"` line of the package's composer.lock entry. The document is validated
- * against the official schema in SarifFormatterTest; `results` keeps the report's own
- * priority-then-severity-then-name order so two runs over the same lock produce byte-identical
+ * located on the `"name"` line of the package's composer.lock entry. `results` keeps the report's
+ * own priority-then-severity-then-name order so two runs over the same lock produce byte-identical
  * output.
  *
  * A result carries the priority twice, for the two ways a consumer reads it: as `rank`, the numeric

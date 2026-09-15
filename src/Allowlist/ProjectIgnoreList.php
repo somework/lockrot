@@ -10,14 +10,9 @@ use Lockrot\Json\JsonReader;
 final class ProjectIgnoreList
 {
     /**
-     * @param array<string, mixed> $lockrotExtra contents of composer.json extra.lockrot; the schema
-     *                                            (when this comes through ProjectConfig) already
-     *                                            requires "ignore" to be a list of objects with a
-     *                                            non-empty "package" and "reason", but this still
-     *                                            fails fast rather than trust that for a caller that
-     *                                            bypasses it — it just no longer enumerates the
-     *                                            expected shape in its own messages, only names the
-     *                                            offending index
+     * @param array<string, mixed> $lockrotExtra contents of composer.json extra.lockrot; the shape is
+     *                                            re-checked here rather than trusted from the config
+     *                                            schema, for a caller that bypasses it
      */
     public static function fromExtra(array $lockrotExtra): Allowlist
     {
