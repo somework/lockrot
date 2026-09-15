@@ -57,7 +57,11 @@ PHAR.
 ```bash
 php lockrot.phar self-update          # download, verify the sha256, replace this file
 php lockrot.phar self-update --check  # report only; exits 1 when an update is available
+php lockrot.phar self-update --force  # reinstall the latest release even when it is the one running
 ```
+
+`selfupdate` is accepted as an alias. `--offline` (or `COMPOSER_DISABLE_NETWORK=1`) makes the command
+refuse to run rather than fail half-way: an update cannot happen without the network.
 
 `self-update` reads `releases/latest` from the GitHub API directly, not through `lockrot.dev`. It
 downloads the release's `lockrot.phar.sha256` alongside the archive, refuses to install anything

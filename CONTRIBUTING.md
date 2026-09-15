@@ -6,7 +6,7 @@
     cd lockrot
     composer install
 
-Four commands make up the local check suite; CI runs the same ones:
+Four commands make up the local check suite. CI runs them on every PHP/Composer pair of the matrix and adds three gates on top: a coverage threshold over the core directories (`phpunit.core-coverage.xml.dist`, 94 % of clover elements), an Infection mutation-score threshold (`infection.json5`, MSI 94), and composer-require-checker (`composer-require-checker.json`):
 
 | Command | What it does |
 |---|---|

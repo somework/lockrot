@@ -6,6 +6,7 @@
     "keywords": [
         "composer",
         "composer-plugin",
+        "composer.lock",
         "dependencies",
         "dependency-management",
         "abandoned",

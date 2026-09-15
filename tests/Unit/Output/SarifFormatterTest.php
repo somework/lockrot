@@ -177,7 +177,7 @@ final class SarifFormatterTest extends TestCase
         self::assertSame('warning', JsonPath::stringAt($run, ['tool', 'driver', 'rules', 0, 'defaultConfiguration', 'level']));
         self::assertStringContainsString('abandoned', JsonPath::stringAt($run, ['tool', 'driver', 'rules', 0, 'shortDescription', 'text']));
         self::assertStringContainsString('archived', JsonPath::stringAt($run, ['tool', 'driver', 'rules', 0, 'fullDescription', 'text']));
-        self::assertSame('https://github.com/somework/lockrot#what-the-verdicts-mean', JsonPath::stringAt($run, ['tool', 'driver', 'rules', 0, 'helpUri']));
+        self::assertSame('https://lockrot.dev/verdicts/', JsonPath::stringAt($run, ['tool', 'driver', 'rules', 0, 'helpUri']));
 
         self::assertCount(3, JsonPath::arrayAt($run, ['results']));
         self::assertSame([0, 0, 1], JsonPath::column($run, ['results'], 'ruleIndex'));

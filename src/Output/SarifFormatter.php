@@ -30,7 +30,7 @@ final class SarifFormatter implements FormatterInterface
 {
     private const SCHEMA_URI = 'https://json.schemastore.org/sarif-2.1.0.json';
     private const INFORMATION_URI = 'https://github.com/somework/lockrot';
-    private const HELP_URI = 'https://github.com/somework/lockrot#what-the-verdicts-mean';
+    private const HELP_URI = 'https://lockrot.dev/verdicts/';
     private const ARTIFACT_URI = 'composer.lock';
     private const URI_BASE_ID = '%SRCROOT%';
 
@@ -42,15 +42,15 @@ final class SarifFormatter implements FormatterInterface
     private const RANK_STEP = 25.0;
 
     /**
-     * The README's "What the verdicts mean" table, as {short, full} per verdict. Kept in the same
-     * wording so a code-scanning alert says exactly what the README says.
+     * The README's verdict table, as {short, full} per verdict. Kept in the same wording so a
+     * code-scanning alert says exactly what the README says.
      *
      * @var array<string, array{0: string, 1: string}>
      */
     private const DESCRIPTIONS = [
         Verdict::ABANDONED => [
             'Package is marked abandoned by its repository, or its repository is archived',
-            "The package's Composer repository flags it abandoned (Packagist by default), or its GitHub repository is archived.",
+            "The package's Composer repository marks it abandoned (Packagist by default), or its GitHub repository is archived.",
         ],
         Verdict::SILENT => [
             'No stable release and no repository push for a long time',

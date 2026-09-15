@@ -58,7 +58,9 @@ above.
 for the same packages, in the same process, and fits comfortably. A `composer install` into an empty
 `vendor/` on a large lock — a fresh clone, a CI job — is the case that does not: the budget can run
 out before every package is checked, because Composer revalidates its metadata cache in sequential
-batches. The block then says how many were not checked rather than reading as clean.
+batches. In our runs the default budget covered roughly 140–170 packages of a 200-package lock, cold
+or warm, so from about 150 packages expect the block to say how many were not checked rather than
+read as clean.
 
 Raise it for a large lock that consistently runs out of time, or lower it for a stricter cap on
 install latency:
