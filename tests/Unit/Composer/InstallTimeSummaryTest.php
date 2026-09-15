@@ -326,6 +326,80 @@ final class InstallTimeSummaryTest extends TestCase
         self::assertStringContainsString('lockrot: dependency rot in 1 of 1 changed package', $io->getOutput());
     }
 
+    /**
+     * install-time-strict is a gate on what the project has not already accepted: a finding the
+     * baseline carries must not stop the transaction, while the compact block itself still lists it.
+     */
+    public function testStrictModeDoesNotBlockAFindingTheBaselineAlreadyCarries(): void
+    {
+        $dir = $this->project(['install-time-strict' => true, 'fail-on' => 'old-promise']);
+        $this->writeBaseline($dir.'/lockrot-baseline.json', ['phpzip/phpzip' => 'silent']);
+        $io = new BufferIO();
+        $event = $this->event($io, new Transaction([], [$this->loadPackage(self::PHPZIP)]));
+
+        (new InstallTimeSummary($this->analyzerFactory()))->onPreOperationsExec($event);
+
+        self::assertStringContainsString('lockrot: dependency rot in 1 of 1 changed package', $io->getOutput());
+    }
+
+    public function testStrictModeStillBlocksAFindingWorseThanTheBaselinedOne(): void
+    {
+        $dir = $this->project(['install-time-strict' => true, 'fail-on' => 'old-promise']);
+        $this->writeBaseline($dir.'/lockrot-baseline.json', ['phpzip/phpzip' => 'stale']);
+        $io = new BufferIO();
+        $event = $this->event($io, new Transaction([], [$this->loadPackage(self::PHPZIP)]));
+
+        $thrown = null;
+        try {
+            (new InstallTimeSummary($this->analyzerFactory()))->onPreOperationsExec($event);
+        } catch (InstallBlockedException $e) {
+            $thrown = $e;
+        }
+
+        self::assertInstanceOf(InstallBlockedException::class, $thrown);
+    }
+
+    public function testAConfiguredBaselinePathIsHonouredAtInstallTime(): void
+    {
+        $dir = $this->project(['install-time-strict' => true, 'fail-on' => 'old-promise', 'baseline' => 'ci/rot.json']);
+        mkdir($dir.'/ci');
+        $this->writeBaseline($dir.'/ci/rot.json', ['phpzip/phpzip' => 'silent']);
+        $io = new BufferIO();
+        $event = $this->event($io, new Transaction([], [$this->loadPackage(self::PHPZIP)]));
+
+        (new InstallTimeSummary($this->analyzerFactory()))->onPreOperationsExec($event);
+
+        self::assertStringContainsString('lockrot: dependency rot in 1 of 1 changed package', $io->getOutput());
+    }
+
+    public function testAMalformedBaselineIsReportedAsASkippedCheckAndNeverBreaksTheInstall(): void
+    {
+        $dir = $this->project();
+        file_put_contents($dir.'/lockrot-baseline.json', '{"findings": ');
+        $io = new BufferIO();
+        $event = $this->event($io, new Transaction([], [$this->loadPackage(self::PHPZIP)]));
+
+        (new InstallTimeSummary($this->analyzerFactory()))->onPreOperationsExec($event);
+
+        $output = $io->getOutput();
+        self::assertStringContainsString('lockrot: install-time check skipped:', $output);
+        self::assertStringContainsString('is not valid JSON', $output);
+    }
+
+    /** @param array<string, string> $verdicts package => verdict */
+    private function writeBaseline(string $path, array $verdicts): void
+    {
+        $findings = [];
+        foreach ($verdicts as $package => $verdict) {
+            $findings[$package] = ['version' => '2.0.8', 'verdict' => $verdict, 'first_seen' => '2026-01-15'];
+        }
+        file_put_contents($path, (string) json_encode([
+            'lockrot' => ['version' => '0.1.0', 'schema' => 1],
+            'generated_at' => self::FIXED_NOW,
+            'findings' => $findings,
+        ], \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES)."\n");
+    }
+
     public function testAnUnexpectedFailureBecomesOneWarningLineAndNeverBreaksTheInstall(): void
     {
         $this->project();

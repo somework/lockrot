@@ -23,6 +23,20 @@ final class LockrotConfigTest extends TestCase
         self::assertTrue($cfg->installTime());
         self::assertFalse($cfg->installTimeStrict());
         self::assertSame(5, $cfg->installTimeBudgetSeconds());
+        self::assertNull($cfg->baseline());
+    }
+
+    public function testBaselinePathFromExtraAndCliWithCliWinning(): void
+    {
+        self::assertSame(
+            'ci/rot.json',
+            LockrotConfig::fromSources(['baseline' => 'ci/rot.json'], [], [], '8.5.10', null)->baseline()
+        );
+        self::assertSame(
+            'from-cli.json',
+            LockrotConfig::fromSources(['baseline' => 'ci/rot.json'], [], ['baseline' => 'from-cli.json'], '8.5.10', null)->baseline()
+        );
+        self::assertNull(LockrotConfig::fromSources(['baseline' => ''], [], ['baseline' => null], '8.5.10', null)->baseline());
     }
 
     public function testInstallTimeBudgetFromExtra(): void

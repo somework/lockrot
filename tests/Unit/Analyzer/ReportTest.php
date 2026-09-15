@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Analyzer;
 
 use Lockrot\Analyzer\Report;
+use Lockrot\Baseline\Baseline;
+use Lockrot\Baseline\BaselineComparison;
+use Lockrot\Baseline\BaselineEntry;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\TestCase;
@@ -112,15 +115,45 @@ final class ReportTest extends TestCase
         );
         $array = $report->toArray();
         self::assertSame(
-            ['generated_at', 'packages_checked', 'not_from_composer_repository', 'network_failures', 'counts', 'notes', 'findings'],
+            ['generated_at', 'packages_checked', 'not_from_composer_repository', 'network_failures', 'counts', 'baseline', 'notes', 'findings'],
             array_keys($array)
         );
         self::assertSame('2026-09-14T00:00:00+00:00', $array['generated_at']);
         self::assertSame(5, $array['packages_checked']);
         self::assertSame(1, $array['not_from_composer_repository']);
         self::assertTrue($array['network_failures']);
+        self::assertNull($array['baseline']);
         self::assertSame(['a note'], $array['notes']);
         self::assertIsArray($array['findings']);
         self::assertCount(1, $array['findings']);
+    }
+
+    public function testWithBaselineLeavesTheOriginalReportUntouched(): void
+    {
+        $report = new Report(
+            [$this->finding('vendor/a', Verdict::SILENT)],
+            [],
+            new \DateTimeImmutable('2026-09-14T00:00:00+00:00'),
+            1,
+            0,
+            false
+        );
+        $comparison = BaselineComparison::compare(
+            Baseline::of([new BaselineEntry('vendor/a', '1.0.0', Verdict::SILENT, '2026-01-15')], '2026-09-14T00:00:00+00:00'),
+            $report,
+            'lockrot-baseline.json',
+            ['vendor/a']
+        );
+
+        $withBaseline = $report->withBaseline($comparison);
+
+        self::assertNull($report->baseline());
+        self::assertNotSame($report, $withBaseline);
+        self::assertSame($comparison, $withBaseline->baseline());
+        self::assertSame(
+            ['path' => 'lockrot-baseline.json', 'known' => 1, 'new' => 0, 'worsened' => 0, 'stale' => []],
+            $withBaseline->toArray()['baseline']
+        );
+        self::assertSame($report->summaryLine(), $withBaseline->summaryLine());
     }
 }

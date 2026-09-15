@@ -31,13 +31,14 @@ final class LockrotConfig
     private bool $offline;
     private bool $strictNetwork;
     private string $format;
+    private ?string $baseline;
     private bool $disabled;
     private bool $installTime;
     private bool $installTimeStrict;
     private int $installTimeBudgetSeconds;
     private Thresholds $thresholds;
 
-    private function __construct(string $failOn, string $targetPhp, bool $includeDev, bool $offline, bool $strictNetwork, string $format, bool $disabled, bool $installTime, bool $installTimeStrict, int $installTimeBudgetSeconds, Thresholds $thresholds)
+    private function __construct(string $failOn, string $targetPhp, bool $includeDev, bool $offline, bool $strictNetwork, string $format, ?string $baseline, bool $disabled, bool $installTime, bool $installTimeStrict, int $installTimeBudgetSeconds, Thresholds $thresholds)
     {
         $this->failOn = $failOn;
         $this->targetPhp = $targetPhp;
@@ -45,6 +46,7 @@ final class LockrotConfig
         $this->offline = $offline;
         $this->strictNetwork = $strictNetwork;
         $this->format = $format;
+        $this->baseline = $baseline;
         $this->disabled = $disabled;
         $this->installTime = $installTime;
         $this->installTimeStrict = $installTimeStrict;
@@ -55,7 +57,7 @@ final class LockrotConfig
     /**
      * @param array<string, mixed> $extra composer.json extra.lockrot
      * @param array<string, mixed> $env environment variables
-     * @param array<string, mixed> $cli command-line options (fail-on, target-php, dev, offline, strict-network, format)
+     * @param array<string, mixed> $cli command-line options (fail-on, target-php, dev, offline, strict-network, format, baseline)
      */
     public static function fromSources(array $extra, array $env, array $cli, string $runtimePhp, ?string $platformPhp): self
     {
@@ -71,6 +73,7 @@ final class LockrotConfig
             ($cli['offline'] ?? null) === true,
             ($cli['strict-network'] ?? null) === true,
             $format,
+            self::resolveBaseline($extra, $cli),
             self::isDisabledByEnvironment($env),
             self::resolveInstallTime($extra),
             ($extra['install-time-strict'] ?? false) === true,
@@ -179,6 +182,25 @@ final class LockrotConfig
         return $format;
     }
 
+    /**
+     * The baseline file's path, or null for the default `lockrot-baseline.json` next to
+     * composer.json. No environment override: which findings a project has accepted is a property
+     * of the project, not of the machine the run happens on.
+     *
+     * @param array<string, mixed> $extra
+     * @param array<string, mixed> $cli
+     */
+    private static function resolveBaseline(array $extra, array $cli): ?string
+    {
+        foreach ([$cli['baseline'] ?? null, $extra['baseline'] ?? null] as $candidate) {
+            if (\is_string($candidate) && $candidate !== '') {
+                return $candidate;
+            }
+        }
+
+        return null;
+    }
+
     /** @param list<mixed> $candidates */
     private static function pick(array $candidates, string $default): string
     {
@@ -214,6 +236,11 @@ final class LockrotConfig
     public function format(): string
     {
         return $this->format;
+    }
+    /** The configured baseline path, or null when the default file name applies. */
+    public function baseline(): ?string
+    {
+        return $this->baseline;
     }
     public function isDisabled(): bool
     {

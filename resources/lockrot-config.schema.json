@@ -29,6 +29,10 @@
             "minimum": 1,
             "maximum": 120
         },
+        "baseline": {
+            "type": "string",
+            "minLength": 1
+        },
         "release-warn-years": {
             "type": "integer",
             "minimum": 1

@@ -13,6 +13,10 @@ use Composer\Repository\RepositoryFactory;
 use Composer\Repository\RepositoryInterface;
 use Composer\Util\Platform;
 use Lockrot\Analyzer\Analyzer;
+use Lockrot\Analyzer\Report;
+use Lockrot\Baseline\Baseline;
+use Lockrot\Baseline\BaselineComparison;
+use Lockrot\Baseline\BaselineFile;
 use Lockrot\Clock;
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Config\Policy;
@@ -64,7 +68,9 @@ final class LockrotCommand extends BaseCommand
             ->addOption('dev', null, InputOption::VALUE_NONE, 'Include packages-dev')
             ->addOption('all', null, InputOption::VALUE_NONE, 'Show every package, not only flagged ones')
             ->addOption('offline', null, InputOption::VALUE_NONE, 'Use cached data only, never go to the network')
-            ->addOption('strict-network', null, InputOption::VALUE_NONE, 'Exit 1 when the repository or GitHub could not be reached');
+            ->addOption('strict-network', null, InputOption::VALUE_NONE, 'Exit 1 when the repository or GitHub could not be reached')
+            ->addOption('baseline', null, InputOption::VALUE_REQUIRED, 'Baseline file to read or write (default: lockrot-baseline.json next to composer.json)')
+            ->addOption('generate-baseline', null, InputOption::VALUE_NONE, 'Write the current findings to the baseline file and exit 0');
     }
 
     /**
@@ -168,10 +174,29 @@ final class LockrotCommand extends BaseCommand
             }
             $lockPath = $cwd.'/composer.lock';
             $lock = LockFile::fromFile($lockPath);
+            // Resolved and read before the analysis so a missing explicit path or an unreadable
+            // file fails immediately, rather than after a full repository round. A generate run is the
+            // one case where the target is allowed not to exist yet: it is about to be created.
+            $generate = $input->getOption('generate-baseline') === true;
+            $baselineFile = BaselineFile::resolve($cwd, $lockrot->baseline());
+            $existingBaseline = $this->readBaseline($baselineFile, $lockrot->baseline() !== null && !$generate);
             // `composer lockrot` is the deliberate, full run: no time budget, unlike the
             // install-time summary (SPEC F2.6).
             $analyzer = AnalyzerBootstrap::create($this->analyzerFactory, $io, $config, $repositories, $project, $lockrot, $env, Deadline::never());
             $report = $analyzer->analyze($lock, $project, $lockrot->includeDev());
+
+            if ($generate) {
+                return $this->generateBaseline($output, $baselineFile, $report, $existingBaseline, $lockrot);
+            }
+            if ($existingBaseline !== null) {
+                $report = $report->withBaseline(BaselineComparison::compare(
+                    $existingBaseline,
+                    $report,
+                    $baselineFile->displayPath(),
+                    self::packageNames($report)
+                ));
+            }
+
             // The annotation formats point back at the lock they were computed from; an unreadable
             // one throws ConfigException from here, which the catch below turns into exit 2 the
             // same way an unreadable lock does a few lines up.
@@ -193,6 +218,63 @@ final class LockrotCommand extends BaseCommand
         } finally {
             $this->restoreEnv();
         }
+    }
+
+    /**
+     * The baseline on disk, or null when the default file simply does not exist yet — the state of
+     * every project that has not generated one.
+     *
+     * A path the project asked for explicitly is different: a typo in `--baseline` or in
+     * `extra.lockrot.baseline` would otherwise silently turn a gated build into an ungated one, so
+     * a missing file there is a configuration error. So is a file that exists but cannot be read:
+     * an unreadable baseline is never treated as an empty one (SPEC F7).
+     */
+    private function readBaseline(BaselineFile $file, bool $explicit): ?Baseline
+    {
+        if (!$file->exists()) {
+            if ($explicit) {
+                throw new ConfigException($file->displayPath().' not found');
+            }
+
+            return null;
+        }
+
+        return $file->read();
+    }
+
+    /**
+     * `--generate-baseline`: write what this run found, say so on stderr, print nothing on stdout,
+     * and exit 0 whatever `fail-on` says — the point of the run is to record the findings, not to
+     * judge them. `--strict-network` still applies: a baseline written from metadata that never
+     * arrived would accept findings lockrot could not actually check.
+     */
+    private function generateBaseline(OutputInterface $output, BaselineFile $file, Report $report, ?Baseline $existing, LockrotConfig $lockrot): int
+    {
+        $baseline = Baseline::fromReport($report, $existing);
+        $file->write($baseline);
+        $this->writeError($output, \sprintf(
+            'lockrot: baseline written to %s (%d findings)',
+            $file->displayPath(),
+            $baseline->count()
+        ));
+
+        return Policy::strictNetworkTripped($report, $lockrot) ? Policy::EXIT_FINDINGS : Policy::EXIT_OK;
+    }
+
+    /**
+     * Every package the run analysed, flagged or not: a baselined package that is now `ok` is still
+     * in the lock and must not be reported as a stale baseline entry.
+     *
+     * @return list<string>
+     */
+    private static function packageNames(Report $report): array
+    {
+        $names = [];
+        foreach ($report->findings() as $finding) {
+            $names[] = $finding->package();
+        }
+
+        return $names;
     }
 
     /**
@@ -228,11 +310,13 @@ final class LockrotCommand extends BaseCommand
         $format = $input->getOption('format');
         $failOn = $input->getOption('fail-on');
         $targetPhp = $input->getOption('target-php');
+        $baseline = $input->getOption('baseline');
 
         return [
             'format' => \is_string($format) ? $format : null,
             'fail-on' => \is_string($failOn) ? $failOn : null,
             'target-php' => \is_string($targetPhp) ? $targetPhp : null,
+            'baseline' => \is_string($baseline) ? $baseline : null,
             'dev' => $input->getOption('dev') === true,
             'offline' => $input->getOption('offline') === true,
             'strict-network' => $input->getOption('strict-network') === true,

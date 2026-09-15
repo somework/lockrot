@@ -27,6 +27,7 @@ final class ConfigSchemaTest extends TestCase
             'install-time' => 'off',
             'install-time-strict' => true,
             'install-time-budget' => 45,
+            'baseline' => 'ci/lockrot-baseline.json',
             'release-warn-years' => 2,
             'release-high-years' => 4,
             'push-warn-years' => 2,
@@ -90,6 +91,8 @@ final class ConfigSchemaTest extends TestCase
         yield 'install-time-budget wrong type' => [['install-time-budget' => '5'], 'install-time-budget'];
         yield 'install-time-budget below minimum' => [['install-time-budget' => 0], 'install-time-budget'];
         yield 'install-time-budget above maximum' => [['install-time-budget' => 121], 'install-time-budget'];
+        yield 'baseline wrong type' => [['baseline' => true], 'baseline'];
+        yield 'baseline empty string' => [['baseline' => ''], 'baseline'];
         yield 'release-warn-years digit string' => [['release-warn-years' => '4'], 'release-warn-years'];
         yield 'release-warn-years below minimum' => [['release-warn-years' => 0], 'release-warn-years'];
         yield 'release-high-years wrong type' => [['release-high-years' => 'many'], 'release-high-years'];

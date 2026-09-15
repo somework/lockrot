@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Output;
 
 use Lockrot\Analyzer\Report;
+use Lockrot\Baseline\Baseline;
+use Lockrot\Baseline\BaselineComparison;
+use Lockrot\Baseline\BaselineEntry;
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Output\FormatContext;
@@ -190,6 +193,27 @@ final class GithubFormatterTest extends TestCase
         foreach (['vulnerable', 'broken', 'insecure', 'dead'] as $banned) {
             self::assertStringNotContainsString($banned, $out);
         }
+    }
+
+    /** A finding the baseline already carries is annotated as a notice, so the colour still matches the exit code. */
+    public function testABaselinedFindingIsAnnotatedAsANotice(): void
+    {
+        $report = $this->report();
+        $names = [];
+        foreach ($report->findings() as $finding) {
+            $names[] = $finding->package();
+        }
+        $baseline = Baseline::of([
+            new BaselineEntry('acme/abandoned', '1.0.0', Verdict::ABANDONED, '2026-01-15'),
+            new BaselineEntry('acme/silent', '2.0.8', Verdict::STALE, '2026-01-15'),
+        ], self::AT);
+        $withBaseline = $report->withBaseline(BaselineComparison::compare($baseline, $report, 'lockrot-baseline.json', $names));
+
+        $lines = explode("\n", trim($this->formatter(Verdict::SILENT, $this->lockPath())->format($withBaseline)));
+
+        self::assertStringStartsWith('::notice file=composer.lock,line=4,', $lines[0], 'known: demoted to a notice');
+        self::assertStringStartsWith('::error file=composer.lock,line=8,', $lines[1], 'worsened: still an error');
+        self::assertStringStartsWith('::warning file=composer.lock,', $lines[2], 'new but below fail-on: a warning');
     }
 
     public function testFactory(): void

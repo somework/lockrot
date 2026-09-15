@@ -6,6 +6,9 @@ namespace Lockrot\Tests\Unit\Output;
 
 use JsonSchema\Validator;
 use Lockrot\Analyzer\Report;
+use Lockrot\Baseline\Baseline;
+use Lockrot\Baseline\BaselineComparison;
+use Lockrot\Baseline\BaselineEntry;
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Output\FormatContext;
 use Lockrot\Output\Formatters;
@@ -302,5 +305,69 @@ final class SarifFormatterTest extends TestCase
             SarifFormatter::class,
             Formatters::for('sarif', FormatContext::create(null, LockrotConfig::FAIL_ON_NONE))
         );
+    }
+
+    /**
+     * The four-finding report compared against a baseline that knows acme/abandoned as it is,
+     * acme/silent as only stale (worsened now) and nothing about acme/also-abandoned (new).
+     */
+    private function baselinedReport(): Report
+    {
+        $report = $this->report();
+        $names = [];
+        foreach ($report->findings() as $finding) {
+            $names[] = $finding->package();
+        }
+        $baseline = Baseline::of([
+            new BaselineEntry('acme/abandoned', '1.0.0', Verdict::ABANDONED, '2026-01-15'),
+            new BaselineEntry('acme/silent', '2.0.8', Verdict::STALE, '2026-01-15'),
+        ], self::AT);
+
+        return $report->withBaseline(BaselineComparison::compare($baseline, $report, 'lockrot-baseline.json', $names));
+    }
+
+    public function testBaselineStatusIsCarriedAsAResultProperty(): void
+    {
+        $run = $this->singleRun($this->formatter(Verdict::SILENT, $this->lockPath())->format($this->baselinedReport()));
+        $statuses = [];
+        foreach (JsonPath::arrayAt($run, ['results']) as $result) {
+            self::assertIsArray($result);
+            $statuses[JsonPath::stringAt($result, ['properties', 'package'])] = JsonPath::stringAt($result, ['properties', 'baseline']);
+        }
+
+        self::assertSame([
+            'acme/abandoned' => 'known',
+            'acme/also-abandoned' => 'new',
+            'acme/silent' => 'worsened',
+        ], $statuses);
+    }
+
+    public function testABaselinedResultIsReportedAtNoteLevel(): void
+    {
+        $run = $this->singleRun($this->formatter(Verdict::SILENT, $this->lockPath())->format($this->baselinedReport()));
+        $levels = [];
+        foreach (JsonPath::arrayAt($run, ['results']) as $result) {
+            self::assertIsArray($result);
+            $levels[JsonPath::stringAt($result, ['properties', 'package'])] = JsonPath::stringAt($result, ['level']);
+        }
+
+        self::assertSame([
+            'acme/abandoned' => FormatContext::LEVEL_NOTE,
+            'acme/also-abandoned' => FormatContext::LEVEL_ERROR,
+            'acme/silent' => FormatContext::LEVEL_ERROR,
+        ], $levels);
+    }
+
+    public function testABaselinedReportIsStillValidSarif(): void
+    {
+        $this->assertValidSarif($this->formatter(Verdict::SILENT, $this->lockPath())->format($this->baselinedReport()));
+    }
+
+    public function testWithoutABaselineNoBaselinePropertyIsEmitted(): void
+    {
+        $run = $this->singleRun($this->formatter(Verdict::SILENT, $this->lockPath())->format($this->report()));
+        $first = JsonPath::arrayAt($run, ['results', 0, 'properties']);
+
+        self::assertArrayNotHasKey('baseline', $first);
     }
 }

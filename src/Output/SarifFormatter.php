@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Output;
 
 use Lockrot\Analyzer\Report;
+use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Lock\LockLineIndex;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
@@ -80,6 +81,7 @@ final class SarifFormatter implements FormatterInterface
         $lockPath = $this->context->lockPath();
         $index = $lockPath === null ? LockLineIndex::empty() : LockLineIndex::fromFile($lockPath);
 
+        $baseline = $report->baseline();
         $rules = [];
         $ruleIndexes = [];
         $results = [];
@@ -89,7 +91,7 @@ final class SarifFormatter implements FormatterInterface
                 $ruleIndexes[$verdict] = \count($rules);
                 $rules[] = $this->rule($verdict);
             }
-            $results[] = $this->result($finding, $ruleIndexes[$verdict], $index->lineOf($finding->package()));
+            $results[] = $this->result($finding, $ruleIndexes[$verdict], $index->lineOf($finding->package()), $baseline);
         }
 
         $run = [
@@ -128,7 +130,7 @@ final class SarifFormatter implements FormatterInterface
     }
 
     /** @return array<string, mixed> */
-    private function result(Finding $finding, int $ruleIndex, ?int $line): array
+    private function result(Finding $finding, int $ruleIndex, ?int $line, ?BaselineComparison $baseline): array
     {
         $artifactLocation = ['uri' => self::ARTIFACT_URI];
         if ($this->context->lockPath() !== null) {
@@ -145,23 +147,31 @@ final class SarifFormatter implements FormatterInterface
         }
         $dataDate = $finding->dataDate();
 
+        $properties = [
+            'package' => $finding->package(),
+            'version' => $finding->version(),
+            'verdict' => $finding->verdict(),
+            'signals' => $signals,
+            'chain' => $finding->chain(),
+            'data_date' => $dataDate === null ? null : $dataDate->format(\DATE_ATOM),
+        ];
+        // Only when the run actually had a baseline to compare against: a null here would read as
+        // "compared and unclassified" rather than "not compared at all".
+        $status = $baseline === null ? null : $baseline->statusOf($finding->package());
+        if ($status !== null) {
+            $properties['baseline'] = $status;
+        }
+
         return [
             'ruleId' => 'lockrot/'.$finding->verdict(),
             'ruleIndex' => $ruleIndex,
-            'level' => $this->context->levelOf($finding->verdict()),
+            'level' => $this->context->levelOf($finding, $baseline),
             'message' => ['text' => $this->message($finding)],
             'locations' => [['physicalLocation' => $physicalLocation]],
             // The package name alone identifies a finding across runs: one result per package, and
             // the line it sits on moves whenever anything above it in the lock changes.
             'partialFingerprints' => ['lockrot/package' => $finding->package()],
-            'properties' => [
-                'package' => $finding->package(),
-                'version' => $finding->version(),
-                'verdict' => $finding->verdict(),
-                'signals' => $signals,
-                'chain' => $finding->chain(),
-                'data_date' => $dataDate === null ? null : $dataDate->format(\DATE_ATOM),
-            ],
+            'properties' => $properties,
         ];
     }
 
@@ -172,8 +182,15 @@ final class SarifFormatter implements FormatterInterface
         // notes below and by the `unknown` verdict, never by claiming the tool itself failed.
         $invocation = ['executionSuccessful' => true];
 
+        $notes = $report->notes();
+        $baseline = $report->baseline();
+        $stale = $baseline === null ? null : $baseline->staleNote();
+        if ($stale !== null) {
+            $notes[] = $stale;
+        }
+
         $notifications = [];
-        foreach ($report->notes() as $note) {
+        foreach ($notes as $note) {
             $notifications[] = ['level' => FormatContext::LEVEL_NOTE, 'message' => ['text' => $note]];
         }
         if ($notifications !== []) {

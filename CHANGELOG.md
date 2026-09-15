@@ -35,6 +35,18 @@
 - `--format=sarif` prints a SARIF 2.1.0 document for `github/codeql-action/upload-sarif`, with one
   rule per verdict, `composer.lock` line numbers, and stable per-package fingerprints so code
   scanning can track a finding across runs. Exit codes are unchanged by the chosen format.
+- Baseline file: `composer lockrot --generate-baseline` writes `lockrot-baseline.json` next to
+  `composer.json` (path configurable via `--baseline` or `extra.lockrot.baseline`), and every later
+  run compares against it, so `--fail-on` only trips on findings that are new or worse than the
+  ones the project accepted. Matching is by package name, so a version bump that keeps the same
+  verdict stays accepted; `first_seen` survives regeneration; baseline entries whose package has
+  left the lock are reported as stale, never failed on. The table gains a
+  `baseline: N known · M new · K worsened · S stale` line and marks rows `(baseline)`/`(was stale)`,
+  the JSON report a `baseline` object, and SARIF a `properties.baseline` per result — with known
+  findings reported at notice/note level so annotations keep matching the exit code.
+  `install-time-strict` honours the same comparison. The baseline is the only file lockrot writes,
+  only on that explicit flag, and it is written atomically; an unreadable, schema-invalid or
+  unwritable baseline is exit 2, never a silently ungated run.
 - Exit codes 0/1/2 driven by `--fail-on`, with network failures defaulting to exit 0 unless
   `--strict-network` is set.
 - Package metadata is loaded through the repositories configured for the project

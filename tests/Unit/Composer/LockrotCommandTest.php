@@ -23,10 +23,12 @@ use Lockrot\Data\Php\PhpReleaseDates;
 use Lockrot\Data\Repository\MetadataBatch;
 use Lockrot\Data\Repository\MetadataLoaderInterface;
 use Lockrot\Data\Repository\RepositoryMetadataLoader;
+use Lockrot\Json\JsonReader;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Verdict\VerdictEngine;
+use Lockrot\Version;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -181,10 +183,12 @@ final class LockrotCommandTest extends TestCase
      * @param array<string, mixed> $args
      *
      * @return array{0: int, 1: string, 2: string} exit code, stdout, stderr
+     *
+     * @param null|MetadataLoaderInterface $loader the in-memory default when null, as in tester()
      */
-    private function runWithSplitStreams(array $args): array
+    private function runWithSplitStreams(array $args, ?MetadataLoaderInterface $loader = null): array
     {
-        $command = $this->command();
+        $command = $this->command($loader);
         $input = new ArrayInput($args, $command->getDefinition());
         $errorOutput = new BufferedOutput();
         $output = new class ($errorOutput) extends BufferedOutput implements ConsoleOutputInterface {
@@ -654,6 +658,206 @@ final class LockrotCommandTest extends TestCase
         } finally {
             $this->restoreGlobalEnv('COMPOSER_ROOT_VERSION', $previous);
         }
+    }
+
+    /**
+     * A writable copy of the wallabag fixture: the baseline file is written next to composer.json,
+     * and the fixture directory itself is checked in, so every baseline test runs on a copy.
+     */
+    private function wallabagCopy(): string
+    {
+        $dir = $this->tempDir('lockrot-baseline-project-');
+        $source = \dirname(self::WALLABAG_LOCK);
+        copy($source.'/composer.json', $dir.'/composer.json');
+        copy($source.'/composer.lock', $dir.'/composer.lock');
+        chdir($dir);
+
+        return $dir;
+    }
+
+    /** @return array<string, mixed> */
+    private function readJsonFile(string $path): array
+    {
+        $decoded = json_decode((string) file_get_contents($path), true);
+        self::assertIsArray($decoded);
+
+        return JsonReader::stringKeyed($decoded);
+    }
+
+    /**
+     * The `findings` map of a written baseline, with every entry narrowed to the three strings the
+     * schema guarantees, so the tests below can read and rewrite it without fighting `mixed`.
+     *
+     * @return array<string, array<string, string>>
+     */
+    private function baselineFindings(string $path): array
+    {
+        $findings = $this->readJsonFile($path)['findings'] ?? null;
+        self::assertIsArray($findings);
+
+        $entries = [];
+        foreach ($findings as $package => $entry) {
+            self::assertIsString($package);
+            self::assertIsArray($entry);
+            $entries[$package] = [
+                'version' => JsonPath::stringAt($entry, ['version']),
+                'verdict' => JsonPath::stringAt($entry, ['verdict']),
+                'first_seen' => JsonPath::stringAt($entry, ['first_seen']),
+            ];
+        }
+
+        return $entries;
+    }
+
+    /** @param array<string, array<string, string>> $findings */
+    private function writeBaselineFile(string $path, array $findings): void
+    {
+        file_put_contents($path, (string) json_encode([
+            'lockrot' => ['version' => Version::STRING, 'schema' => 1],
+            'generated_at' => self::FIXED_NOW,
+            'findings' => $findings,
+        ], \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES)."\n");
+    }
+
+    public function testGenerateBaselineWritesTheFileAndExitsZeroDespiteFailOn(): void
+    {
+        $dir = $this->wallabagCopy();
+
+        [$code, $stdout, $stderr] = $this->runWithSplitStreams(
+            ['--generate-baseline' => true, '--fail-on' => 'stale', '--target-php' => '8.4'],
+            $this->loader()
+        );
+
+        self::assertSame(0, $code, $stderr);
+        self::assertSame('', $stdout, 'a generate run prints nothing on stdout');
+        self::assertMatchesRegularExpression(
+            '/^lockrot: baseline written to lockrot-baseline\.json \(\d+ findings\)$/m',
+            $stderr
+        );
+        self::assertFileExists($dir.'/lockrot-baseline.json');
+
+        $findings = $this->baselineFindings($dir.'/lockrot-baseline.json');
+        self::assertNotSame([], $findings);
+        self::assertStringContainsString('('.\count($findings).' findings)', $stderr);
+        self::assertStringEndsWith("}\n", (string) file_get_contents($dir.'/lockrot-baseline.json'));
+    }
+
+    public function testASecondRunWithTheGeneratedBaselinePresentExitsZero(): void
+    {
+        $this->wallabagCopy();
+        self::assertSame(0, $this->tester($this->loader())->execute(['--generate-baseline' => true, '--target-php' => '8.4']));
+
+        $tester = $this->tester($this->loader());
+        $code = $tester->execute(['--fail-on' => 'stale', '--target-php' => '8.4']);
+
+        self::assertSame(0, $code, $tester->getDisplay());
+        self::assertStringContainsString('baseline: ', $tester->getDisplay());
+        self::assertStringContainsString('0 new · 0 worsened', $tester->getDisplay());
+    }
+
+    public function testAWorsenedFindingExitsOneEvenWithABaseline(): void
+    {
+        $dir = $this->wallabagCopy();
+        self::assertSame(0, $this->tester($this->loader())->execute(['--generate-baseline' => true, '--target-php' => '8.4']));
+
+        $findings = $this->baselineFindings($dir.'/lockrot-baseline.json');
+        self::assertSame('abandoned', $findings['doctrine/annotations']['verdict']);
+        $findings['doctrine/annotations']['verdict'] = 'stale';
+        $this->writeBaselineFile($dir.'/lockrot-baseline.json', $findings);
+
+        $tester = $this->tester($this->loader());
+        $code = $tester->execute(['--fail-on' => 'silent', '--target-php' => '8.4']);
+
+        self::assertSame(1, $code, $tester->getDisplay());
+        self::assertStringContainsString('1 worsened', $tester->getDisplay());
+        self::assertStringContainsString('abandoned (was stale)', $tester->getDisplay());
+    }
+
+    public function testRegeneratingCarriesFirstSeenOver(): void
+    {
+        $dir = $this->wallabagCopy();
+        self::assertSame(0, $this->tester($this->loader())->execute(['--generate-baseline' => true, '--target-php' => '8.4']));
+
+        $findings = $this->baselineFindings($dir.'/lockrot-baseline.json');
+        $findings['doctrine/annotations']['first_seen'] = '2024-01-02';
+        $this->writeBaselineFile($dir.'/lockrot-baseline.json', $findings);
+
+        self::assertSame(0, $this->tester($this->loader())->execute(['--generate-baseline' => true, '--target-php' => '8.4']));
+
+        $regenerated = $this->baselineFindings($dir.'/lockrot-baseline.json');
+        self::assertSame('2024-01-02', $regenerated['doctrine/annotations']['first_seen']);
+        self::assertSame('2026-09-14', $regenerated['doctrine/cache']['first_seen']);
+    }
+
+    public function testJsonOutputCarriesTheBaselineBlock(): void
+    {
+        $this->wallabagCopy();
+        self::assertSame(0, $this->tester($this->loader())->execute(['--generate-baseline' => true, '--target-php' => '8.4']));
+
+        $tester = $this->tester($this->loader());
+        $tester->execute(['--format' => 'json', '--target-php' => '8.4']);
+        $json = json_decode($tester->getDisplay(), true);
+
+        self::assertIsArray($json);
+        self::assertIsArray($json['baseline']);
+        self::assertSame('lockrot-baseline.json', $json['baseline']['path']);
+        self::assertSame(0, $json['baseline']['new']);
+        self::assertSame(0, $json['baseline']['worsened']);
+        self::assertSame([], $json['baseline']['stale']);
+        self::assertGreaterThan(0, $json['baseline']['known']);
+    }
+
+    public function testWithoutABaselineFileTheJsonBaselineBlockIsNull(): void
+    {
+        $this->wallabagCopy();
+        $tester = $this->tester($this->loader());
+        $tester->execute(['--format' => 'json', '--target-php' => '8.4']);
+        $json = json_decode($tester->getDisplay(), true);
+
+        self::assertIsArray($json);
+        self::assertNull($json['baseline']);
+    }
+
+    public function testAnExplicitBaselinePathThatDoesNotExistIsExit2(): void
+    {
+        $this->wallabagCopy();
+
+        [$code, $stdout, $stderr] = $this->runWithSplitStreams(
+            ['--baseline' => 'ci/missing.json', '--target-php' => '8.4'],
+            $this->loader()
+        );
+
+        self::assertSame(2, $code);
+        self::assertSame('', $stdout);
+        self::assertStringContainsString('ci/missing.json', $stderr);
+    }
+
+    public function testAMalformedBaselineFileIsExit2(): void
+    {
+        $dir = $this->wallabagCopy();
+        file_put_contents($dir.'/lockrot-baseline.json', '{"findings": ');
+
+        [$code, $stdout, $stderr] = $this->runWithSplitStreams(['--target-php' => '8.4'], $this->loader());
+
+        self::assertSame(2, $code);
+        self::assertSame('', $stdout);
+        self::assertStringContainsString('is not valid JSON', $stderr);
+    }
+
+    public function testAnExplicitBaselinePathIsHonouredAndReportedRelative(): void
+    {
+        $dir = $this->wallabagCopy();
+        mkdir($dir.'/ci');
+
+        [$code, , $stderr] = $this->runWithSplitStreams(
+            ['--generate-baseline' => true, '--baseline' => 'ci/rot.json', '--target-php' => '8.4'],
+            $this->loader()
+        );
+
+        self::assertSame(0, $code, $stderr);
+        self::assertFileExists($dir.'/ci/rot.json');
+        self::assertFileDoesNotExist($dir.'/lockrot-baseline.json');
+        self::assertStringContainsString('baseline written to ci/rot.json', $stderr);
     }
 
     public function testWithoutOfflineOptionComposerDisableNetworkEnvStaysUnset(): void

@@ -10,10 +10,14 @@ use Composer\Installer\InstallerEvent;
 use Composer\IO\IOInterface;
 use Composer\Repository\RepositoryInterface;
 use Lockrot\Analyzer\Analyzer;
+use Lockrot\Analyzer\Report;
+use Lockrot\Baseline\BaselineComparison;
+use Lockrot\Baseline\BaselineFile;
 use Lockrot\Clock;
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Config\Policy;
 use Lockrot\Deadline;
+use Lockrot\Exception\ConfigException;
 use Lockrot\Exception\InstallBlockedException;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
@@ -114,6 +118,10 @@ final class InstallTimeSummary
         $analyzer = AnalyzerBootstrap::create($this->analyzerFactory, $event->getIO(), $config, $repositories, $project, $lockrot, $env, $deadline);
 
         $report = $analyzer->analyzePackages($packages, $lock, $project, $event->isDevMode());
+        // The block itself does not change — it reports what this transaction brings in either way.
+        // The comparison only reaches Policy::exitCode() below, so install-time-strict gates on what
+        // the project has not already accepted (ruling, SPEC F7).
+        $report = $this->withBaseline($report, \dirname($composerFile), $lockrot, $lock);
         $lines = (new InstallSummaryFormatter())->format($report);
         if ($lines !== []) {
             $event->getIO()->writeError($lines);
@@ -127,5 +135,32 @@ final class InstallTimeSummary
                 $lockrot->failOn()
             ));
         }
+    }
+
+    /**
+     * The report seen next to the project's baseline, or the report unchanged when there is no
+     * baseline file. A file that exists but cannot be read throws, which onPreOperationsExec()
+     * turns into the one "install-time check skipped" line — never a blocked install.
+     *
+     * Staleness is measured against the lock rather than against this transaction's own packages:
+     * the transaction touches a handful of packages, so the rest of the lock is present, not gone.
+     */
+    private function withBaseline(Report $report, string $projectDir, LockrotConfig $lockrot, LockFile $lock): Report
+    {
+        $file = BaselineFile::resolve($projectDir, $lockrot->baseline());
+        if (!$file->exists()) {
+            if ($lockrot->baseline() !== null) {
+                throw new ConfigException($file->displayPath().' not found');
+            }
+
+            return $report;
+        }
+
+        $names = [];
+        foreach ($lock->packages(true) as $package) {
+            $names[] = $package->name();
+        }
+
+        return $report->withBaseline(BaselineComparison::compare($file->read(), $report, $file->displayPath(), $names));
     }
 }

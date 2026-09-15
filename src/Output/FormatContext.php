@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Lockrot\Output;
 
+use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Config\LockrotConfig;
+use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
 use Lockrot\Version;
 
@@ -75,9 +77,19 @@ final class FormatContext
      *
      * SARIF spells the third level `note` (its own enum); the GitHub workflow command for it is
      * `notice`, which GithubFormatter translates.
+     *
+     * A baseline narrows the same rule rather than changing it: a finding the project has already
+     * accepted cannot fail the run (see Policy::exitCode()), so it is reported at `note` too —
+     * annotation severity keeps matching the exit code. New and worsened findings map as usual.
+     *
+     * @param null|BaselineComparison $baseline the run's comparison, from Report::baseline()
      */
-    public function levelOf(string $verdict): string
+    public function levelOf(Finding $finding, ?BaselineComparison $baseline = null): string
     {
+        if ($baseline !== null && $baseline->isKnown($finding->package())) {
+            return self::LEVEL_NOTE;
+        }
+        $verdict = $finding->verdict();
         if ($this->failOn !== LockrotConfig::FAIL_ON_NONE && Verdict::severity($verdict) >= Verdict::severity($this->failOn)) {
             return self::LEVEL_ERROR;
         }

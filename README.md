@@ -254,6 +254,7 @@ must be JSON integers (`3`, not `"3"`).
 | `install-time` | `on` | `on` or `off`: print the [install-time summary](#install-time-summary) during `composer require`/`update`/`install` |
 | `install-time-strict` | `false` | Apply `fail-on` at install time too, stopping the transaction instead of only reporting |
 | `install-time-budget` | `5` | Integer seconds (1–120): the install-time pass's hard time budget, see [Install-time summary](#install-time-summary) |
+| `baseline` | `lockrot-baseline.json` | Path to the baseline file, relative to `composer.json` or absolute, see [Baseline](#baseline) |
 | `release-warn-years` / `release-high-years` | `3` / `5` | Integer thresholds for "no stable release" (S2) |
 | `push-warn-years` / `push-high-years` | `3` / `5` | Integer thresholds for "no repository push" (S4) |
 | `ignore` | `[]` | Project allowlist, see [Allowlist](#allowlist) below |
@@ -292,6 +293,8 @@ must be JSON integers (`3`, not `"3"`).
 | `--all` | Show every checked package, not only flagged ones |
 | `--offline` | Never reach the network: lockrot sets `COMPOSER_DISABLE_NETWORK=1` and rebuilds the configured repositories behind it (in plugin mode Composer has already built its own, network-enabled ones before any command runs), so repository metadata is served from Composer's own cache and GitHub activity from lockrot's cache. A package missing from the cache is reported as unavailable, not as absent from the repository |
 | `--strict-network` | Exit 1 (see [Exit codes](#exit-codes)) when a configured repository or GitHub could not be reached |
+| `--generate-baseline` | Write this run's findings to the baseline file and exit 0, whatever `--fail-on` says. See [Baseline](#baseline) |
+| `--baseline=<path>` | Baseline file to read (or, with `--generate-baseline`, to write); relative to `composer.json` or absolute. Wins over `extra.lockrot.baseline` |
 
 Repository metadata is cached and revalidated by Composer itself, under Composer's own cache
 directory — lockrot adds no cache of its own for it, and there is no `--refresh` or `cache-ttl` knob
@@ -311,7 +314,7 @@ calculation; it is used by the test suite and is not part of the configuration c
 |---|---|
 | `0` | No finding reached the `fail-on` threshold (or `fail-on=none`) |
 | `1` | A finding reached or exceeded the `fail-on` threshold |
-| `2` | Tool or configuration error (bad `composer.json`/`composer.lock`, invalid config value) |
+| `2` | Tool or configuration error (bad `composer.json`/`composer.lock`, invalid config value, unreadable or unwritable [baseline](#baseline)) |
 
 A network failure (a configured Composer repository or GitHub unreachable) never turns into a
 non-zero exit code on its own — it is reported as a note and the checks that could not run are
@@ -337,12 +340,86 @@ files is already disarmed at that point. So a blocked `composer require` leaves 
 `composer.lock` updated with nothing installed in `vendor/`; `composer install` (or
 `git checkout composer.json composer.lock`) is the way back.
 
+## Baseline
+
+A large project rarely starts clean. The baseline file records the findings you have already seen
+and decided to live with, so CI fails only on what is **new** or has got **worse** since — without
+turning `--fail-on` off and losing the check entirely.
+
+```bash
+composer lockrot --target-php=8.4 --generate-baseline
+git add lockrot-baseline.json && git commit -m "chore: accept current dependency rot"
+```
+
+That writes `lockrot-baseline.json` next to `composer.json`, prints one line on stderr
+(`lockrot: baseline written to lockrot-baseline.json (75 findings)`), nothing on stdout, and exits
+`0` whatever `--fail-on` says — the run records findings, it does not judge them. **Commit the
+file**: it is a statement about the project, and it is worth reviewing in a pull request like any
+other change. It is also the only file lockrot ever writes, and only on this explicit flag.
+
+```json
+{
+    "lockrot": {
+        "version": "0.1.0",
+        "schema": 1
+    },
+    "generated_at": "2026-09-14T00:00:00+00:00",
+    "findings": {
+        "behat/transliterator": {
+            "version": "v1.5.0",
+            "verdict": "abandoned",
+            "first_seen": "2026-09-14"
+        }
+    }
+}
+```
+
+Only flagged verdicts are recorded (`ok`, `finished` and `unknown` are not findings), entries are
+sorted by package name so the diff stays reviewable, and `first_seen` is carried over when you
+regenerate — the file keeps saying how long each finding has been tolerated.
+
+Once the file exists, every normal run compares against it and says so:
+
+```
+200 packages checked · abandoned 19 · silent 8 · pinned 4 · old-promise 41 · stale 3 · unknown 0 · finished 18 · ok 107
+baseline: 73 known · 1 new · 1 worsened · 0 stale (lockrot-baseline.json)
+```
+
+| Bucket | Meaning | Effect on the exit code |
+|---|---|---|
+| `known` | The baseline holds this package at this verdict or a worse one | Never fails the build. The table shows `abandoned (baseline)`, annotations drop to notice/note |
+| `new` | Flagged now, absent from the baseline | Compared against `--fail-on` as usual |
+| `worsened` | In the baseline, but at a lower verdict than today's | Compared against `--fail-on`. The table shows `abandoned (was stale)` |
+| `stale` | In the baseline, no longer in `composer.lock` | Never fails the build. Reported as a note so you know the entry can go |
+
+Matching is **by package name only**. The recorded version is informational, so bumping
+`vendor/pkg` from `1.2.3` to `1.3.0` while it stays abandoned keeps it accepted; a package that
+gets *worse* (`stale` → `abandoned`) is reported as worsened and fails the build again. Stale
+entries are never cleaned up behind your back — regenerate the baseline when you want them gone.
+
+A baseline lockrot cannot read is a configuration error, not an absent baseline: a malformed or
+schema-invalid file, or a `--baseline`/`extra.lockrot.baseline` path that does not exist, exits `2`
+rather than silently running ungated. (The default path simply not existing is not an error — that
+is every project before its first `--generate-baseline`.) To start over from a file that has been
+corrupted, delete it and generate a new one.
+
+`install-time-strict` uses the same comparison: a finding the baseline already carries does not stop
+a `composer require`. The compact block still lists it.
+
 ## CI snippet
 
 Any CI, with the plugin installed:
 
 ```bash
 composer lockrot --fail-on=silent --target-php=8.4 --format=json
+```
+
+With a committed baseline, the same command fails only on new or worsened findings — no extra flag
+is needed, the file is picked up automatically:
+
+```bash
+composer lockrot --fail-on=silent --target-php=8.4        # exit 1 only on new or worsened findings
+composer lockrot --fail-on=silent --target-php=8.4 --generate-baseline   # accept today's findings
 ```
 
 GitHub Actions, using the PHAR (no plugin installed, no dependency added to the project):
@@ -374,7 +451,8 @@ one per finding, so every flagged package shows up as an annotation on its own l
 ```
 
 Findings at or above `--fail-on` are annotated as errors, everything else flagged as warnings, and
-the rows that only `--all` shows as notices — so the annotation colour matches the exit code.
+the rows that only `--all` shows as notices — so the annotation colour matches the exit code. With a
+[baseline](#baseline) in place, findings it already carries drop to notices for the same reason.
 
 GitHub renders only a limited number of annotations per step, so on a large lock file the
 annotations are the headline and the step's own log holds every finding. The summary line at the
@@ -449,13 +527,12 @@ pattern and a one-line reason — the same shape as the existing entries.
 - No transitive-exposure signal (S7: a package flagged because a package *it* depends on is
   abandoned/archived/silent) — only the flagged package itself is shown; the `Via`/`chain` column
   shows how it was pulled in, not the other direction.
-- No baseline file (`--generate-baseline`) yet, so CI cannot yet accept existing findings while
-  failing only on new ones — every run re-evaluates the full lock file against `fail-on`.
+- The [baseline](#baseline) matches by package name only, and never rewrites itself: entries for
+  packages that have left the lock are reported as stale, not removed.
 
 ## Roadmap
 
-- **v0.2**: a baseline file so CI can fail only on new or worsened findings, `--format=gitlab`
-  (Code Quality JSON), and a GitHub Action.
+- **v0.2**: `--format=gitlab` (Code Quality JSON) and a GitHub Action.
 - **v0.3**: transitive exposure on parent packages (S7), `--format=markdown` for PR comments,
   GitLab/Bitbucket repository activity, and inspecting the `vendor/*/composer.lock` of bundled
   PHAR tools.

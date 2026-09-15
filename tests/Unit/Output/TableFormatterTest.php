@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Output;
 
 use Lockrot\Analyzer\Report;
+use Lockrot\Baseline\Baseline;
+use Lockrot\Baseline\BaselineComparison;
+use Lockrot\Baseline\BaselineEntry;
 use Lockrot\Output\TableFormatter;
 use Lockrot\Signal\Signal;
 use Lockrot\Verdict\Finding;
@@ -61,6 +64,71 @@ final class TableFormatterTest extends TestCase
         foreach (['vulnerable', 'broken', 'insecure', 'dead'] as $banned) {
             self::assertStringNotContainsString($banned, $out);
         }
+    }
+
+    /**
+     * The four-finding report of {@see report()} compared against a baseline that knows
+     * doctrine/cache as abandoned, phpzip/phpzip as only stale (so it is worsened now) and one
+     * package that has since left the lock.
+     */
+    private function baselinedReport(): Report
+    {
+        $report = $this->report();
+        $names = [];
+        foreach ($report->findings() as $finding) {
+            $names[] = $finding->package();
+        }
+        $baseline = Baseline::of([
+            new BaselineEntry('doctrine/cache', '1.13.0', Verdict::ABANDONED, '2026-01-15'),
+            new BaselineEntry('phpzip/phpzip', '2.0.8', Verdict::STALE, '2026-01-15'),
+            new BaselineEntry('vendor/departed', '1.0.0', Verdict::SILENT, '2026-01-15'),
+        ], '2026-09-14T06:00:00+00:00');
+
+        return $report->withBaseline(BaselineComparison::compare($baseline, $report, 'lockrot-baseline.json', $names));
+    }
+
+    public function testBaselineSummaryLineFollowsTheCountsLine(): void
+    {
+        $out = (new TableFormatter())->format($this->baselinedReport());
+        $lines = array_values(array_filter(explode("\n", $out), static fn (string $line): bool => $line !== ''));
+        $index = null;
+        foreach ($lines as $i => $line) {
+            if (strpos($line, ' packages checked') !== false) {
+                $index = $i;
+            }
+        }
+
+        self::assertNotNull($index);
+        self::assertSame(
+            'baseline: 1 known · 0 new · 1 worsened · 1 stale (lockrot-baseline.json)',
+            $lines[$index + 1]
+        );
+    }
+
+    public function testBaselineStaleEntriesBecomeANote(): void
+    {
+        $out = (new TableFormatter())->format($this->baselinedReport());
+
+        self::assertStringContainsString(
+            'note: baseline lists 1 package no longer in composer.lock: vendor/departed',
+            $out
+        );
+    }
+
+    public function testVerdictColumnMarksKnownAndWorsenedRows(): void
+    {
+        $out = (new TableFormatter())->format($this->baselinedReport());
+
+        self::assertStringContainsString('abandoned (baseline)', $out);
+        self::assertStringContainsString('silent (was stale)', $out);
+    }
+
+    public function testWithoutABaselineTheVerdictColumnIsUnchanged(): void
+    {
+        $out = (new TableFormatter())->format($this->report());
+
+        self::assertStringNotContainsString('(baseline)', $out);
+        self::assertStringNotContainsString('baseline:', $out);
     }
 
     private function allVerdictsReport(): Report

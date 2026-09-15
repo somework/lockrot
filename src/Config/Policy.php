@@ -15,19 +15,35 @@ final class Policy
 
     public static function exitCode(Report $report, LockrotConfig $config): int
     {
-        if ($config->strictNetwork() && $report->hadNetworkFailures()) {
+        if (self::strictNetworkTripped($report, $config)) {
             return self::EXIT_FINDINGS;
         }
         if ($config->failOn() === LockrotConfig::FAIL_ON_NONE) {
             return self::EXIT_OK;
         }
+        $baseline = $report->baseline();
         $threshold = Verdict::severity($config->failOn());
         foreach ($report->findings() as $finding) {
+            // With a baseline present only new and worsened findings are measured against fail-on:
+            // a finding the project has already accepted never fails a build again, and a baseline
+            // entry whose package has left the lock is reported as stale, not failed on (SPEC F7).
+            if ($baseline !== null && $baseline->isKnown($finding->package())) {
+                continue;
+            }
             if (Verdict::severity($finding->verdict()) >= $threshold) {
                 return self::EXIT_FINDINGS;
             }
         }
 
         return self::EXIT_OK;
+    }
+
+    /**
+     * Whether --strict-network alone already decides the exit code. Shared with the
+     * `--generate-baseline` path, which ignores fail-on entirely but still honours this.
+     */
+    public static function strictNetworkTripped(Report $report, LockrotConfig $config): bool
+    {
+        return $config->strictNetwork() && $report->hadNetworkFailures();
     }
 }

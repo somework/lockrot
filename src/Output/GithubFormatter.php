@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Output;
 
 use Lockrot\Analyzer\Report;
+use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Lock\LockLineIndex;
 use Lockrot\Verdict\Finding;
 
@@ -39,11 +40,12 @@ final class GithubFormatter implements FormatterInterface
         $lockPath = $this->context->lockPath();
         $index = $lockPath === null ? LockLineIndex::empty() : LockLineIndex::fromFile($lockPath);
 
+        $baseline = $report->baseline();
         $lines = [];
         foreach ($showAll ? $report->findings() : $report->flagged() as $finding) {
-            $lines[] = $this->annotation($finding, $index->lineOf($finding->package()));
+            $lines[] = $this->annotation($finding, $index->lineOf($finding->package()), $baseline);
         }
-        foreach ($report->notes() as $note) {
+        foreach ($this->notes($report) as $note) {
             $lines[] = '::notice title=lockrot::'.self::escapeData($note);
         }
         $lines[] = $report->summaryLine();
@@ -51,7 +53,20 @@ final class GithubFormatter implements FormatterInterface
         return implode("\n", $lines)."\n";
     }
 
-    private function annotation(Finding $finding, ?int $line): string
+    /** @return list<string> */
+    private function notes(Report $report): array
+    {
+        $notes = $report->notes();
+        $baseline = $report->baseline();
+        $stale = $baseline === null ? null : $baseline->staleNote();
+        if ($stale !== null) {
+            $notes[] = $stale;
+        }
+
+        return $notes;
+    }
+
+    private function annotation(Finding $finding, ?int $line, ?BaselineComparison $baseline): string
     {
         $properties = ['file=composer.lock'];
         if ($line !== null) {
@@ -61,15 +76,15 @@ final class GithubFormatter implements FormatterInterface
 
         return \sprintf(
             '::%s %s::%s',
-            $this->command($finding->verdict()),
+            $this->command($finding, $baseline),
             implode(',', $properties),
             self::escapeData($this->message($finding))
         );
     }
 
-    private function command(string $verdict): string
+    private function command(Finding $finding, ?BaselineComparison $baseline): string
     {
-        $level = $this->context->levelOf($verdict);
+        $level = $this->context->levelOf($finding, $baseline);
 
         return $level === FormatContext::LEVEL_NOTE ? 'notice' : $level;
     }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Analyzer;
 
+use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
 
@@ -17,12 +18,14 @@ final class Report
     private int $packagesChecked;
     private int $notFromComposerRepository;
     private bool $hadNetworkFailures;
+    /** Null when the project has no baseline file, which is every run until one is generated. */
+    private ?BaselineComparison $baseline;
 
     /**
      * @param list<Finding> $findings
      * @param list<string> $notes
      */
-    public function __construct(array $findings, array $notes, \DateTimeImmutable $generatedAt, int $packagesChecked, int $notFromComposerRepository, bool $hadNetworkFailures)
+    public function __construct(array $findings, array $notes, \DateTimeImmutable $generatedAt, int $packagesChecked, int $notFromComposerRepository, bool $hadNetworkFailures, ?BaselineComparison $baseline = null)
     {
         usort($findings, static function (Finding $a, Finding $b): int {
             return [Verdict::severity($b->verdict()), $a->package()] <=> [Verdict::severity($a->verdict()), $b->package()];
@@ -33,6 +36,29 @@ final class Report
         $this->packagesChecked = $packagesChecked;
         $this->notFromComposerRepository = $notFromComposerRepository;
         $this->hadNetworkFailures = $hadNetworkFailures;
+        $this->baseline = $baseline;
+    }
+
+    /**
+     * The same report, seen next to the project's baseline. A new instance rather than a mutation,
+     * so a caller that already handed the report somewhere else keeps the report it handed over.
+     */
+    public function withBaseline(BaselineComparison $baseline): self
+    {
+        return new self(
+            $this->findings,
+            $this->notes,
+            $this->generatedAt,
+            $this->packagesChecked,
+            $this->notFromComposerRepository,
+            $this->hadNetworkFailures,
+            $baseline
+        );
+    }
+
+    public function baseline(): ?BaselineComparison
+    {
+        return $this->baseline;
     }
 
     /** @return list<Finding> */
@@ -100,6 +126,7 @@ final class Report
             'not_from_composer_repository' => $this->notFromComposerRepository,
             'network_failures' => $this->hadNetworkFailures,
             'counts' => $this->byVerdict(),
+            'baseline' => $this->baseline === null ? null : $this->baseline->toArray(),
             'notes' => $this->notes,
             'findings' => array_map(static fn (Finding $f): array => $f->toArray(), $this->findings),
         ];
