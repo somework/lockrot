@@ -6,6 +6,7 @@ namespace Lockrot\Tests\Unit\Config;
 
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Exception\ConfigException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class LockrotConfigTest extends TestCase
@@ -21,6 +22,35 @@ final class LockrotConfigTest extends TestCase
         self::assertSame(3, $cfg->thresholds()->releaseWarnYears());
         self::assertTrue($cfg->installTime());
         self::assertFalse($cfg->installTimeStrict());
+        self::assertSame(5, $cfg->installTimeBudgetSeconds());
+    }
+
+    public function testInstallTimeBudgetFromExtra(): void
+    {
+        self::assertSame(30, LockrotConfig::fromSources(['install-time-budget' => 30], [], [], '8.5.10', null)->installTimeBudgetSeconds());
+    }
+
+    /**
+     * @param mixed $value
+     *
+     * @dataProvider invalidInstallTimeBudgets
+     */
+    #[DataProvider('invalidInstallTimeBudgets')]
+    public function testInvalidInstallTimeBudget($value): void
+    {
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessageMatches('/install-time-budget must be an integer between 1 and 120/');
+        LockrotConfig::fromSources(['install-time-budget' => $value], [], [], '8.5.10', null);
+    }
+
+    /** @return iterable<string, array{mixed}> */
+    public static function invalidInstallTimeBudgets(): iterable
+    {
+        yield 'below minimum' => [0];
+        yield 'above maximum' => [121];
+        yield 'digit string' => ['5'];
+        yield 'float' => [5.5];
+        yield 'boolean' => [true];
     }
 
     public function testInstallTimeCanBeTurnedOff(): void

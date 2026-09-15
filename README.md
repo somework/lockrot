@@ -190,8 +190,8 @@ Package operations: 4 installs, 0 updates, 0 removals
   Run composer lockrot for details.
   ```
 
-- **5-second budget.** The install-time pass has a hard time budget so it cannot hold up a
-  `composer install`. A package whose metadata was never requested is reported as
+- **Time budget** (default 5 seconds). The install-time pass has a hard time budget so it cannot
+  hold up a `composer install`. A package whose metadata was never requested is reported as
   `not checked: install-time budget exhausted`, and a skipped GitHub round adds the note
   `repository activity not checked: install-time budget exhausted`; both reach you through the block
   above. `composer require`/`update` of a few packages is served from the metadata Composer has
@@ -200,7 +200,9 @@ Package operations: 4 installs, 0 updates, 0 removals
   about 150 packages the budget runs out before every package is checked (a 200-package lock checks
   roughly 140–170 of them in 5 seconds, cold or warm, because Composer revalidates its metadata
   cache in sequential batches), and the block then says how many were not checked rather than
-  reading as clean.
+  reading as clean. The budget is configurable via `extra.lockrot.install-time-budget` (integer
+  seconds, 1–120; see [Configuration](#configuration)) — raise it for a large lock that consistently
+  runs out of time, or lower it for a stricter cap on install latency.
 - **Never fails the install.** A failed lookup — an unreachable repository, an exhausted budget — is
   reported, not raised: it is data lockrot did not get, not a reason to stop. Only an error lockrot
   cannot interpret at all (a malformed `extra.lockrot`, an unreadable `composer.lock`, a bug in
@@ -249,6 +251,7 @@ must be JSON integers (`3`, not `"3"`).
 | `include-dev` | `false` | Also check `packages-dev` |
 | `install-time` | `on` | `on` or `off`: print the [install-time summary](#install-time-summary) during `composer require`/`update`/`install` |
 | `install-time-strict` | `false` | Apply `fail-on` at install time too, stopping the transaction instead of only reporting |
+| `install-time-budget` | `5` | Integer seconds (1–120): the install-time pass's hard time budget, see [Install-time summary](#install-time-summary) |
 | `release-warn-years` / `release-high-years` | `3` / `5` | Integer thresholds for "no stable release" (S2) |
 | `push-warn-years` / `push-high-years` | `3` / `5` | Integer thresholds for "no repository push" (S4) |
 | `ignore` | `[]` | Project allowlist, see [Allowlist](#allowlist) below |

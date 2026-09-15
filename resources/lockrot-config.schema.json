@@ -24,6 +24,11 @@
         "install-time-strict": {
             "type": "boolean"
         },
+        "install-time-budget": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 120
+        },
         "release-warn-years": {
             "type": "integer",
             "minimum": 1

@@ -26,6 +26,7 @@ final class ConfigSchemaTest extends TestCase
             'include-dev' => true,
             'install-time' => 'off',
             'install-time-strict' => true,
+            'install-time-budget' => 45,
             'release-warn-years' => 2,
             'release-high-years' => 4,
             'push-warn-years' => 2,
@@ -70,6 +71,9 @@ final class ConfigSchemaTest extends TestCase
         // The spec's third install-time value, `summary`, is not implemented in 0.1 (SPEC F6).
         yield 'install-time not in enum' => [['install-time' => 'summary'], 'install-time'];
         yield 'install-time-strict wrong type' => [['install-time-strict' => 'yes'], 'install-time-strict'];
+        yield 'install-time-budget wrong type' => [['install-time-budget' => '5'], 'install-time-budget'];
+        yield 'install-time-budget below minimum' => [['install-time-budget' => 0], 'install-time-budget'];
+        yield 'install-time-budget above maximum' => [['install-time-budget' => 121], 'install-time-budget'];
         yield 'release-warn-years digit string' => [['release-warn-years' => '4'], 'release-warn-years'];
         yield 'release-warn-years below minimum' => [['release-warn-years' => 0], 'release-warn-years'];
         yield 'release-high-years wrong type' => [['release-high-years' => 'many'], 'release-high-years'];

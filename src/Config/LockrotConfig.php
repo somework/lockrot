@@ -13,6 +13,9 @@ final class LockrotConfig
 {
     public const FAIL_ON_NONE = 'none';
     public const FORMATS = ['table', 'json'];
+    public const DEFAULT_INSTALL_TIME_BUDGET = 5;
+    private const INSTALL_TIME_BUDGET_MIN = 1;
+    private const INSTALL_TIME_BUDGET_MAX = 120;
 
     /**
      * The spec's third value, `summary`, is not implemented in 0.1: the compact block *is* the only
@@ -31,9 +34,10 @@ final class LockrotConfig
     private bool $disabled;
     private bool $installTime;
     private bool $installTimeStrict;
+    private int $installTimeBudgetSeconds;
     private Thresholds $thresholds;
 
-    private function __construct(string $failOn, string $targetPhp, bool $includeDev, bool $offline, bool $strictNetwork, string $format, bool $disabled, bool $installTime, bool $installTimeStrict, Thresholds $thresholds)
+    private function __construct(string $failOn, string $targetPhp, bool $includeDev, bool $offline, bool $strictNetwork, string $format, bool $disabled, bool $installTime, bool $installTimeStrict, int $installTimeBudgetSeconds, Thresholds $thresholds)
     {
         $this->failOn = $failOn;
         $this->targetPhp = $targetPhp;
@@ -44,6 +48,7 @@ final class LockrotConfig
         $this->disabled = $disabled;
         $this->installTime = $installTime;
         $this->installTimeStrict = $installTimeStrict;
+        $this->installTimeBudgetSeconds = $installTimeBudgetSeconds;
         $this->thresholds = $thresholds;
     }
 
@@ -69,6 +74,7 @@ final class LockrotConfig
             self::isDisabledByEnvironment($env),
             self::resolveInstallTime($extra),
             ($extra['install-time-strict'] ?? false) === true,
+            self::resolveInstallTimeBudget($extra),
             Thresholds::fromArray($extra)
         );
     }
@@ -86,8 +92,9 @@ final class LockrotConfig
     }
 
     /**
-     * Neither install-time key has a CLI option or an environment override: the install-time summary
-     * is a per-project decision, and LOCKROT_DISABLE already covers the "not right now" case.
+     * Neither install-time key — nor install-time-budget, below — has a CLI option or an environment
+     * override: the install-time summary is a per-project decision, and LOCKROT_DISABLE already
+     * covers the "not right now" case.
      *
      * @param array<string, mixed> $extra
      */
@@ -103,6 +110,28 @@ final class LockrotConfig
         }
 
         return $installTime === self::INSTALL_TIME_ON;
+    }
+
+    /**
+     * See the docblock on {@see resolveInstallTime()}: no CLI option or environment override.
+     * Mirrors {@see Thresholds::fromArray()}'s integer-only rule (a digit string like "5" is
+     * rejected, not silently accepted).
+     *
+     * @param array<string, mixed> $extra
+     */
+    private static function resolveInstallTimeBudget(array $extra): int
+    {
+        $value = $extra['install-time-budget'] ?? self::DEFAULT_INSTALL_TIME_BUDGET;
+        if (!\is_int($value) || $value < self::INSTALL_TIME_BUDGET_MIN || $value > self::INSTALL_TIME_BUDGET_MAX) {
+            throw new ConfigException(\sprintf(
+                'install-time-budget must be an integer between %d and %d; got %s',
+                self::INSTALL_TIME_BUDGET_MIN,
+                self::INSTALL_TIME_BUDGET_MAX,
+                var_export($value, true)
+            ));
+        }
+
+        return $value;
     }
 
     /**
@@ -197,6 +226,10 @@ final class LockrotConfig
     public function installTimeStrict(): bool
     {
         return $this->installTimeStrict;
+    }
+    public function installTimeBudgetSeconds(): int
+    {
+        return $this->installTimeBudgetSeconds;
     }
     public function thresholds(): Thresholds
     {

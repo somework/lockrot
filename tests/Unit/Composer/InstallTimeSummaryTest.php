@@ -382,6 +382,51 @@ final class InstallTimeSummaryTest extends TestCase
         self::assertStringContainsString('phpzip/phpzip', $io->getOutput());
     }
 
+    public function testInstallTimeBudgetComesFromConfig(): void
+    {
+        $this->project(['install-time-budget' => 1]);
+        $io = new BufferIO();
+        $event = $this->event($io, new Transaction([], [$this->loadPackage(self::PHPZIP)]));
+
+        $deadline = $this->recordDeadline($event);
+
+        self::assertNotNull($deadline);
+        self::assertGreaterThan(0.0, $deadline->remainingSeconds());
+        self::assertLessThanOrEqual(1.0, $deadline->remainingSeconds());
+    }
+
+    public function testInstallTimeBudgetDefaultsToFiveSeconds(): void
+    {
+        $this->project();
+        $io = new BufferIO();
+        $event = $this->event($io, new Transaction([], [$this->loadPackage(self::PHPZIP)]));
+
+        $deadline = $this->recordDeadline($event);
+
+        self::assertNotNull($deadline);
+        self::assertGreaterThan(4.0, $deadline->remainingSeconds());
+        self::assertLessThanOrEqual(5.0, $deadline->remainingSeconds());
+    }
+
+    /** Set by {@see recordingAnalyzerFactory()} while {@see recordDeadline()} runs. */
+    private ?Deadline $recordedDeadline = null;
+
+    /** Runs the summary with a factory that records the {@see Deadline} it is handed, then returns it. */
+    private function recordDeadline(InstallerEvent $event): ?Deadline
+    {
+        (new InstallTimeSummary(\Closure::fromCallable([$this, 'recordingAnalyzerFactory'])))->onPreOperationsExec($event);
+
+        return $this->recordedDeadline;
+    }
+
+    /** @param list<RepositoryInterface> $repositories */
+    private function recordingAnalyzerFactory(IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, ?string $token, Clock $clock, Deadline $deadline): Analyzer
+    {
+        $this->recordedDeadline = $deadline;
+
+        return ($this->analyzerFactory())($io, $config, $repositories, $lockrot, $token, $clock, $deadline);
+    }
+
     private function tempDir(string $prefix): string
     {
         $dir = sys_get_temp_dir().'/'.$prefix.uniqid('', true);

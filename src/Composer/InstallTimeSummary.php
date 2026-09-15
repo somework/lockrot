@@ -35,22 +35,18 @@ use Lockrot\Output\InstallSummaryFormatter;
  * it fetched in this process (`freshMetadataUrls`, 2.10.3 Repository/ComposerRepository.php:133,
  * short-circuit at :1916-1922; 2.2.25 :115, :1488-1491) — so a re-read is served without a request. And
  * a `composer install` from an existing lock, which starts cold, is bounded by
- * {@see self::DEFAULT_BUDGET_SECONDS}.
+ * {@see LockrotConfig::installTimeBudgetSeconds()} ({@see LockrotConfig::DEFAULT_INSTALL_TIME_BUDGET}
+ * seconds unless the project sets `extra.lockrot.install-time-budget`; SPEC F2.6).
  */
 final class InstallTimeSummary
 {
-    /** SPEC F2.6: an install must never wait more than a few seconds for lockrot. */
-    public const DEFAULT_BUDGET_SECONDS = 5.0;
-
     /** @var callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, ?string, Clock, Deadline): Analyzer */
     private $analyzerFactory;
-    private float $budgetSeconds;
 
     /** @param null|callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, ?string, Clock, Deadline): Analyzer $analyzerFactory */
-    public function __construct(?callable $analyzerFactory = null, float $budgetSeconds = self::DEFAULT_BUDGET_SECONDS)
+    public function __construct(?callable $analyzerFactory = null)
     {
         $this->analyzerFactory = $analyzerFactory ?? [ServiceFactory::class, 'createAnalyzer'];
-        $this->budgetSeconds = $budgetSeconds;
     }
 
     public function onPreOperationsExec(InstallerEvent $event): void
@@ -104,7 +100,7 @@ final class InstallTimeSummary
         $lockPath = Factory::getLockFile($composerFile);
         $lock = is_file($lockPath) ? LockFile::fromFile($lockPath) : LockFile::fromPackages($packages);
 
-        $deadline = Deadline::inSeconds($this->budgetSeconds);
+        $deadline = Deadline::inSeconds((float) $lockrot->installTimeBudgetSeconds());
         $clock = Clock::fromEnvironment($env);
         $composer = $event->getComposer();
         $config = $composer->getConfig();

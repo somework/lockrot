@@ -17,6 +17,9 @@
 - Two new `extra.lockrot` keys: `install-time` (`on`/`off`, default `on`) and `install-time-strict`
   (default `false`), which applies `fail-on` at install time and stops the transaction before any
   operation runs. `LOCKROT_DISABLE=1` still silences everything.
+- The install-time pass's time budget is configurable via `extra.lockrot.install-time-budget`
+  (integer seconds, 1–120, default 5); like the other install-time keys it has no CLI option or
+  environment override.
 - `table` (default) and `--format=json` output.
 - Exit codes 0/1/2 driven by `--fail-on`, with network failures defaulting to exit 0 unless
   `--strict-network` is set.
