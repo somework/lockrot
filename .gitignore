@@ -11,3 +11,5 @@
 /composer.lock
 /.superpowers/
 /.private/
+/site/
+/.venv/

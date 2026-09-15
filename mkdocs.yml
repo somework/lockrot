@@ -1,0 +1,89 @@
+site_name: lockrot
+site_url: https://lockrot.dev/
+site_description: >-
+  Find the packages in composer.lock that stopped moving: marked abandoned, silent for years, branch-pinned, or released before the PHP you target.
+site_author: Igor Pinchuk
+copyright: Released under the MIT licence. Copyright Igor Pinchuk.
+
+repo_url: https://github.com/somework/lockrot
+repo_name: somework/lockrot
+edit_uri: edit/main/docs/
+
+docs_dir: docs
+site_dir: site
+
+exclude_docs: |
+  overrides/
+  requirements.txt
+
+theme:
+  name: material
+  custom_dir: docs/overrides
+  language: en
+  icon:
+    repo: fontawesome/brands/github
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: black
+      accent: teal
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: black
+      accent: teal
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  features:
+    - navigation.sections
+    - navigation.top
+    - navigation.footer
+    - content.code.copy
+    - content.tabs.link
+    - search.suggest
+    - toc.follow
+
+nav:
+  - Home: index.md
+  - What it reports: verdicts.md
+  - Configuration: configuration.md
+  - In CI: ci.md
+  - Baseline: baseline.md
+  - Install-time summary: install-time.md
+  - PHAR and self-update: phar.md
+  - Example run: example-run.md
+  - How it fetches metadata: internals.md
+  - Changelog: changelog.md
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - toc:
+      permalink: true
+
+plugins:
+  - search
+  - include-markdown:
+      comments: false
+
+extra_css:
+  - assets/extra.css
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/somework/lockrot
+      name: lockrot on GitHub
+    - icon: fontawesome/solid/box-open
+      link: https://packagist.org/packages/somework/lockrot
+      name: somework/lockrot on Packagist

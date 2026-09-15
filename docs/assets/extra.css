@@ -1,0 +1,45 @@
+/* The report is colour-coded and a fenced code block throws that away.
+   These rules exist so the landing page can show the real thing.
+   `.md-typeset pre` is (0,2,1), so the selector has to match it and win on
+   order — a bare `.lockrot-term` loses its colour and its scrolling. */
+.md-typeset pre.lockrot-term {
+  margin: 0;
+  padding: 1.1rem 1.2rem;
+  overflow-x: auto;
+  border-radius: 0.2rem;
+  font-family: var(--md-code-font-family, monospace);
+  font-size: 0.62rem;
+  line-height: 1.55;
+  color: #d4d4d4;
+  background: #1c1c1c;
+  white-space: pre;
+  tab-size: 4;
+  -webkit-overflow-scrolling: touch;
+}
+
+.md-typeset pre.lockrot-term .r { color: #f14c4c; }
+.md-typeset pre.lockrot-term .y { color: #e5c07b; }
+.md-typeset pre.lockrot-term .b { font-weight: 700; color: #fff; }
+
+/* Caption under the sample. */
+.md-typeset .lockrot-caption {
+  margin: 0.5rem 0 0;
+  font-size: 0.68rem;
+  line-height: 1.5;
+  color: var(--md-default-fg-color--light);
+}
+
+/* Material derives the body link colour from `primary`, and `primary: black`
+   falls back to its indigo — so the palette's teal accent would only ever show
+   on hover. These pin the link colour to the accent family, one value per
+   scheme, each measured against that scheme's background:
+   #00695f on white is 6.6:1, #26c6b8 on slate is 7.6:1, both past WCAG AA.
+   `body[...]` is needed to outrank Material's own `[data-md-color-primary=black]`. */
+body[data-md-color-primary="black"] {
+  --md-typeset-a-color: #00695f;
+}
+
+body[data-md-color-scheme="slate"][data-md-color-primary="black"],
+body[data-md-color-scheme="slate"] {
+  --md-typeset-a-color: #26c6b8;
+}

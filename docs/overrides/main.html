@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{#-
+  Material appends " - {site_name}" even when a page sets `title:` itself. The
+  landing page's title already opens with the name, so the suffix would repeat
+  it. A page-level `title:` is taken verbatim; everything else keeps Material's
+  own rule.
+-#}
+{% block htmltitle %}
+  {%- if page.meta and page.meta.title -%}
+    <title>{{ page.meta.title }}</title>
+  {%- elif page.title and not page.is_homepage -%}
+    <title>{{ page.title | striptags }} - {{ config.site_name }}</title>
+  {%- else -%}
+    <title>{{ config.site_name }}</title>
+  {%- endif -%}
+{% endblock %}
+
+{#-
+  Material emits OpenGraph tags only through its `social` plugin, which needs a
+  native image-processing stack (Cairo, FreeType, libjpeg, libpng) in the build
+  image. We ship one hand-made card instead and declare the tags here.
+-#}
+{% block extrahead %}
+  {%- if page.meta and page.meta.title -%}
+    {%- set og_title = page.meta.title -%}
+  {%- elif page.title and not page.is_homepage -%}
+    {%- set og_title = (page.title | striptags) ~ " - " ~ config.site_name -%}
+  {%- else -%}
+    {%- set og_title = config.site_name -%}
+  {%- endif -%}
+  {%- if page.meta and page.meta.og_description -%}
+    {%- set og_description = page.meta.og_description -%}
+  {%- elif page.meta and page.meta.description -%}
+    {%- set og_description = page.meta.description -%}
+  {%- else -%}
+    {%- set og_description = config.site_description -%}
+  {%- endif -%}
+  {%- set og_image = config.site_url ~ "assets/og.png" -%}
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="{{ config.site_name }}">
+  <meta property="og:title" content="{{ og_title }}">
+  <meta property="og:description" content="{{ og_description }}">
+  <meta property="og:url" content="{{ page.canonical_url }}">
+  <meta property="og:image" content="{{ og_image }}">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="The lockrot wordmark above four lines of its report, two findings marked in red.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{ og_title }}">
+  <meta name="twitter:description" content="{{ og_description }}">
+  <meta name="twitter:image" content="{{ og_image }}">
+{% endblock %}
