@@ -45,8 +45,6 @@ name can be left out) and `self-update`; `php lockrot.phar list` shows them. Unl
 PHAR never walks up to a parent directory's project (Composer's `use-parent-dir` setting is not
 honoured): run it from the project root or point it there with `-d`.
 
-(Releases do not exist yet — this URL will resolve once the first tag is published.)
-
 #### Keeping it updated
 
 The PHAR updates itself from the latest GitHub release:

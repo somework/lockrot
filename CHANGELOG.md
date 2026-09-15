@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.0 (unreleased)
+## 0.1.0 (2026-09-15)
 
 - `composer lockrot` (alias `composer rot`) command reporting dependency rot in `composer.lock`.
 - Signals S1–S6: abandoned flag, no stable release, repository archived, no repository push,
