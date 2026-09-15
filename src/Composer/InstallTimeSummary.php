@@ -19,6 +19,7 @@ use Lockrot\Config\Policy;
 use Lockrot\Deadline;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Exception\InstallBlockedException;
+use Lockrot\Lock\LockedPackage;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Output\InstallSummaryFormatter;
@@ -109,6 +110,7 @@ final class InstallTimeSummary
         // through, dry-run included.
         $lockPath = Factory::getLockFile($composerFile);
         $lock = (is_file($lockPath) ? LockFile::fromFile($lockPath) : LockFile::empty())->withPackages($packages);
+        $packages = self::withDevFlagsFrom($lock, $packages);
 
         $deadline = Deadline::inSeconds((float) $lockrot->installTimeBudgetSeconds());
         $composer = $event->getComposer();
@@ -135,6 +137,32 @@ final class InstallTimeSummary
                 $lockrot->failOn()
             ));
         }
+    }
+
+    /**
+     * The same packages, each carrying the `packages`/`packages-dev` membership the merged lock
+     * records for it. A Composer transaction cannot say which section a package belongs to — see
+     * {@see TransactionPackages::fromTransaction()} — so every entry arrives as prod, and a finding
+     * on a `composer require --dev` package would otherwise be ranked one priority step too high.
+     *
+     * The merged lock is the only source that knows. By this event Composer has normally already
+     * written the post-transaction lock, so the flag is the one the install is about to leave behind;
+     * under `--dry-run`, or in a project with no lock yet, there is nothing on disk to read it from
+     * and the package stays prod — the same limitation {@see LockFile::withPackages()} documents.
+     *
+     * @param list<LockedPackage> $packages
+     *
+     * @return list<LockedPackage>
+     */
+    private static function withDevFlagsFrom(LockFile $lock, array $packages): array
+    {
+        $out = [];
+        foreach ($packages as $package) {
+            $merged = $lock->find($package->name());
+            $out[] = $merged === null ? $package : $package->withDev($merged->isDev());
+        }
+
+        return $out;
     }
 
     /**

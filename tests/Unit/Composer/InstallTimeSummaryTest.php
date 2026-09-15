@@ -51,6 +51,22 @@ final class InstallTimeSummaryTest extends TestCase
         'time' => '2015-11-16T16:30:51+00:00',
     ];
 
+    /**
+     * grandt/binstring 1.0.0 as it appears in the wallabag lock: last release 2015-08-13, and its
+     * GitHub repository is recorded in tests/fixtures/http/github. Same `silent` verdict as
+     * {@see self::PHPZIP}, and its name sorts *before* it — so the two rows can only be told apart
+     * by the priority, which is the point of the dev-flag test below.
+     */
+    private const BINSTRING = [
+        'name' => 'grandt/binstring',
+        'version' => '1.0.0',
+        'source' => ['type' => 'git', 'url' => 'https://github.com/Grandt/PHPBinString.git', 'reference' => '825fe2ac8a68190f651fc2dbc07b6edde18bc431'],
+        'require' => ['php' => '>=5.0'],
+        'type' => 'library',
+        'notification-url' => 'https://packagist.org/downloads/',
+        'time' => '2015-08-13T06:14:41+00:00',
+    ];
+
     /** psr/log 1.1.4 — matched by the built-in allowlist (`psr/*`), so it can never be flagged. */
     private const PSR_LOG = [
         'name' => 'psr/log',
@@ -140,13 +156,60 @@ final class InstallTimeSummaryTest extends TestCase
         return $dir;
     }
 
+    /**
+     * A project that requires one package for production and one for development, with both already
+     * in their own section of the lock — the state Composer leaves behind after `composer require
+     * --dev`, which writes the new lock before dispatching PRE_OPERATIONS_EXEC.
+     *
+     * @param array<string, mixed> $prodPackage entry for `require` and `packages`
+     * @param array<string, mixed> $devPackage  entry for `require-dev` and `packages-dev`
+     */
+    private function projectWithDevRequire(array $prodPackage, array $devPackage): string
+    {
+        $dir = $this->tempDir('lockrot-install-time-dev-');
+        [$prodName, $prodVersion] = self::nameAndVersionOf($prodPackage);
+        [$devName, $devVersion] = self::nameAndVersionOf($devPackage);
+        file_put_contents($dir.'/composer.json', (string) json_encode([
+            'name' => 'lockrot/install-time-dev-test',
+            'require' => [$prodName => $prodVersion],
+            'require-dev' => [$devName => $devVersion],
+            'extra' => ['lockrot' => ['target-php' => '8.4']],
+        ]));
+        file_put_contents($dir.'/composer.lock', (string) json_encode([
+            'content-hash' => 'install-time-dev-test',
+            'packages' => [$prodPackage],
+            'packages-dev' => [$devPackage],
+        ]));
+        chdir($dir);
+
+        return $dir;
+    }
+
+    /**
+     * The two fields a lock entry has to carry to be turned into a root requirement.
+     *
+     * @param array<string, mixed> $entry
+     *
+     * @return array{0: string, 1: string} name, version
+     */
+    private static function nameAndVersionOf(array $entry): array
+    {
+        $name = $entry['name'] ?? null;
+        $version = $entry['version'] ?? null;
+        if (!\is_string($name) || !\is_string($version)) {
+            throw new \InvalidArgumentException('a lock entry needs a string name and version');
+        }
+
+        return [$name, $version];
+    }
+
     /** @param array<string, mixed> $entry */
     private function loadPackage(array $entry): BasePackage
     {
         return (new ArrayLoader())->load($entry);
     }
 
-    private function event(BufferIO $io, Transaction $transaction, bool $executeOperations = true): InstallerEvent
+    private function event(BufferIO $io, Transaction $transaction, bool $executeOperations = true, bool $devMode = false): InstallerEvent
     {
         $server = self::$server;
         self::assertNotNull($server);
@@ -155,7 +218,7 @@ final class InstallTimeSummaryTest extends TestCase
         $composer->setConfig($config);
         $composer->setRepositoryManager(RepositoryFactory::manager($io, $config, Factory::createHttpDownloader($io, $config)));
 
-        return new InstallerEvent(InstallerEvents::PRE_OPERATIONS_EXEC, $composer, $io, false, $executeOperations, $transaction);
+        return new InstallerEvent(InstallerEvents::PRE_OPERATIONS_EXEC, $composer, $io, $devMode, $executeOperations, $transaction);
     }
 
     /**
@@ -220,6 +283,30 @@ final class InstallTimeSummaryTest extends TestCase
         self::assertStringContainsString('phpzip/phpzip 2.0.8', $output);
         self::assertStringContainsString('Run composer lockrot for details.', $output);
         self::assertLessThanOrEqual(10, \count(array_filter(explode("\n", trim($output)))), $output);
+    }
+
+    /**
+     * A Composer transaction carries no `require-dev` membership, so the packages it hands over are
+     * all prod until the lock is consulted. Both rows here are `silent` and both are root requires,
+     * which leaves the priority as the only thing that can order them: grandt/binstring is a dev
+     * requirement, so it drops `critical → high` and sits below phpzip/phpzip even though its name
+     * sorts first. Read the wrong way round, the dev row would come first on the name tie-break.
+     */
+    public function testADevRequirementInTheTransactionIsRankedBelowAnEqualProdRequirement(): void
+    {
+        $this->projectWithDevRequire(self::PHPZIP, self::BINSTRING);
+        $io = new BufferIO();
+        $transaction = new Transaction([], [$this->loadPackage(self::BINSTRING), $this->loadPackage(self::PHPZIP)]);
+        $event = $this->event($io, $transaction, true, true);
+
+        (new InstallTimeSummary($this->analyzerFactory()))->onPreOperationsExec($event);
+
+        $output = $io->getOutput();
+        $prod = strpos($output, 'phpzip/phpzip');
+        $dev = strpos($output, 'grandt/binstring');
+        self::assertIsInt($prod, $output);
+        self::assertIsInt($dev, $output);
+        self::assertLessThan($dev, $prod, 'the prod requirement outranks the equally flagged dev one:'."\n".$output);
     }
 
     public function testAPackageWithNothingToFlagPrintsNothing(): void

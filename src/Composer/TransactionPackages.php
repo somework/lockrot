@@ -25,8 +25,23 @@ use Lockrot\Lock\LockedPackage;
 final class TransactionPackages
 {
     /**
-     * @return list<LockedPackage> packages being installed or updated, in operation order;
-     *                             uninstall and alias-marker operations are ignored
+     * Every entry comes back flagged as a production package, and that is not something this class
+     * can improve on: a transaction is built from two flat package lists (`presentPackages`,
+     * `resultPackages` — 2.10.3 DependencyResolver/Transaction.php:54, 2.2.25 :53) and exposes only
+     * `getOperations()`, while the operations themselves expose only the packages
+     * (`InstallOperation::getPackage()`, `UpdateOperation::getTargetPackage()`). Nothing in that
+     * chain records which of the root's `require` / `require-dev` sections pulled a package in.
+     *
+     * `PackageInterface::isDev()` is not that flag either — it answers "is this a development
+     * *virtual* package or a concrete one", i.e. whether the version is a branch snapshot
+     * (2.10.3 Package/PackageInterface.php:72-75, 2.2.25 :74-79), which is the `pinned` verdict's
+     * question, not this one.
+     *
+     * So the lock is the only source that knows, and the caller re-resolves the flag through it —
+     * see {@see InstallTimeSummary::withDevFlagsFrom()}.
+     *
+     * @return list<LockedPackage> packages being installed or updated, in operation order, all
+     *                             flagged prod; uninstall and alias-marker operations are ignored
      */
     public static function fromTransaction(Transaction $transaction): array
     {

@@ -140,7 +140,15 @@ final class AcceptanceTest extends TestCase
             self::assertSame(Priority::HIGH, $f['phpzip/phpzip']->priority());
             self::assertSame(['wallabag/phpepub', 'phpzip/phpzip'], $f['phpzip/phpzip']->chain());
             self::assertFalse($f['phpzip/phpzip']->isDev());
-            // The report leads with its critical rows: nothing may sort above a critical priority.
+            // The report leads with its critical rows. sensio/framework-extra-bundle is the fixture's
+            // only root require whose GitHub repository is recorded as archived
+            // (sensiolabs/SensioFrameworkExtraBundle in tests/fixtures/http/github), so it is the one
+            // package here that is abandoned *and* direct *and* prod — the only way to reach
+            // critical. Named rather than asserted positionally so a shift in the recorded data says
+            // which package moved.
+            self::assertSame(Priority::CRITICAL, $f['sensio/framework-extra-bundle']->priority());
+            self::assertTrue($f['sensio/framework-extra-bundle']->isDirect());
+            self::assertSame('sensio/framework-extra-bundle', $report->findings()[0]->package());
             self::assertSame(Priority::CRITICAL, $report->findings()[0]->priority());
             self::assertFalse($report->hadNetworkFailures(), implode("\n", $report->notes()));
             // Regression guard for the PHAR OOM at PHP's default 128M memory_limit: analysing a

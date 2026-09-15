@@ -155,7 +155,7 @@ one — a Composer v1-style or static repository, including `packages.json`-only
 loaded whole by Composer before any name can be looked up, so its full package list is held in
 memory for the run.
 
-The same run with `--format=json` (first ~25 lines, up to the first flagged package):
+The same run with `--format=json` (first ~35 lines, up to the first flagged package):
 
 ```json
 {
@@ -163,7 +163,7 @@ The same run with `--format=json` (first ~25 lines, up to the first flagged pack
         "version": "0.1.0",
         "schema": 1
     },
-    "generated_at": "2026-09-13T22:52:46+00:00",
+    "generated_at": "2026-09-15T15:33:04+00:00",
     "packages_checked": 200,
     "not_from_composer_repository": 0,
     "network_failures": false,
@@ -172,21 +172,32 @@ The same run with `--format=json` (first ~25 lines, up to the first flagged pack
         "silent": 8,
         "pinned": 4,
         "old-promise": 41,
-        "stale": 3,
+        "stale": 2,
         "unknown": 0,
         "finished": 18,
-        "ok": 107
+        "ok": 108
+    },
+    "priorities": {
+        "critical": 3,
+        "high": 58,
+        "medium": 11,
+        "low": 2,
+        "none": 126
     },
     "baseline": null,
     "notes": [],
     "findings": [
         {
-            "package": "behat/transliterator",
-            "version": "v1.5.0",
+            "package": "sensio/framework-extra-bundle",
+            "version": "v6.2.10",
             "verdict": "abandoned",
+            "priority": "critical",
+            "direct": true,
+            "dev": false,
             ...
         }
-        // ... 199 more findings, each with its own "signals", "chain", "evidence" and "data_date"
+        // ... 199 more findings, each with its own "priority", "direct", "dev", "signals",
+        // "chain", "evidence" and "data_date"
     ]
 }
 ```
