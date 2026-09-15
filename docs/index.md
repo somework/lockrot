@@ -7,7 +7,8 @@ hide:
 
 # lockrot
 
-**Finds the dependencies in `composer.lock` that quietly stopped being maintained.**
+**Finds abandoned, unmaintained and branch-pinned packages in `composer.lock` — and releases that
+promise a PHP version they were never tested against.**
 
 ## Install
 

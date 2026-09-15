@@ -1,7 +1,7 @@
 site_name: lockrot
 site_url: https://lockrot.dev/
 site_description: >-
-  Find the packages in composer.lock that stopped moving: marked abandoned, silent for years, branch-pinned, or released before the PHP you target.
+  Find abandoned, unmaintained and branch-pinned packages in composer.lock. Composer plugin and PHAR with evidence, priority, baseline and CI exit codes.
 site_author: Igor Pinchuk
 copyright: Released under the MIT licence. Copyright Igor Pinchuk.
 
