@@ -156,13 +156,26 @@ final class BaselineFileTest extends TestCase
         }
     }
 
-    public function testAMissingDirectoryIsAConfigException(): void
+    /**
+     * The reported reason must be the write that actually failed, not the cleanup that follows it:
+     * with no directory to write into there is no temp file to remove either, so an unlink() run
+     * before the reason is read would overwrite the real error with its own.
+     */
+    public function testAMissingDirectoryReportsTheFailedWriteAndNotTheCleanup(): void
     {
         $file = BaselineFile::resolve($this->tempDir().'/no/such/dir', null);
 
-        $this->expectException(ConfigException::class);
-        $this->expectExceptionMessageMatches('/Cannot write /');
-        $file->write($this->baseline());
+        $thrown = null;
+        try {
+            $file->write($this->baseline());
+        } catch (ConfigException $e) {
+            $thrown = $e;
+        }
+
+        self::assertInstanceOf(ConfigException::class, $thrown);
+        self::assertStringContainsString('Cannot write ', $thrown->getMessage());
+        self::assertStringContainsString('file_put_contents', $thrown->getMessage());
+        self::assertStringNotContainsString('unlink', $thrown->getMessage());
     }
 
     public function testReadingAMalformedFileIsAConfigException(): void

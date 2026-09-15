@@ -293,7 +293,7 @@ must be JSON integers (`3`, not `"3"`).
 | `--all` | Show every checked package, not only flagged ones |
 | `--offline` | Never reach the network: lockrot sets `COMPOSER_DISABLE_NETWORK=1` and rebuilds the configured repositories behind it (in plugin mode Composer has already built its own, network-enabled ones before any command runs), so repository metadata is served from Composer's own cache and GitHub activity from lockrot's cache. A package missing from the cache is reported as unavailable, not as absent from the repository |
 | `--strict-network` | Exit 1 (see [Exit codes](#exit-codes)) when a configured repository or GitHub could not be reached |
-| `--generate-baseline` | Write this run's findings to the baseline file and exit 0, whatever `--fail-on` says. See [Baseline](#baseline) |
+| `--generate-baseline` | Write this run's findings to the baseline file and exit 0, whatever `--fail-on` says — `--strict-network` is the one exception. See [Baseline](#baseline) |
 | `--baseline=<path>` | Baseline file to read (or, with `--generate-baseline`, to write); relative to `composer.json` or absolute. Wins over `extra.lockrot.baseline` |
 
 Repository metadata is cached and revalidated by Composer itself, under Composer's own cache
@@ -357,6 +357,10 @@ That writes `lockrot-baseline.json` next to `composer.json`, prints one line on 
 file**: it is a statement about the project, and it is worth reviewing in a pull request like any
 other change. It is also the only file lockrot ever writes, and only on this explicit flag.
 
+`--strict-network` is the one exception to that exit `0`: if a configured repository or GitHub could
+not be reached, the run still exits `1` after writing the file. A baseline generated from metadata
+that never arrived would accept findings lockrot was not actually able to check.
+
 ```json
 {
     "lockrot": {
@@ -405,6 +409,12 @@ corrupted, delete it and generate a new one.
 
 `install-time-strict` uses the same comparison: a finding the baseline already carries does not stop
 a `composer require`. The compact block still lists it.
+
+Install time never fails on a configuration problem, so it handles a bad baseline differently from
+`composer lockrot`: an `extra.lockrot.baseline` pointing at a missing or unreadable file becomes the
+usual single `lockrot: install-time check skipped: …` line, and because the check was skipped the
+`install-time-strict` gate does not run for that install either. Fix the path or remove the key —
+`composer lockrot` reports the same problem as exit `2` and is the quicker way to see it.
 
 ## CI snippet
 

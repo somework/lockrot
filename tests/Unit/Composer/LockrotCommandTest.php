@@ -832,6 +832,20 @@ final class LockrotCommandTest extends TestCase
         self::assertStringContainsString('ci/missing.json', $stderr);
     }
 
+    public function testAnEmptyBaselineOptionIsExit2(): void
+    {
+        $this->wallabagCopy();
+
+        [$code, $stdout, $stderr] = $this->runWithSplitStreams(
+            ['--baseline' => '', '--target-php' => '8.4'],
+            $this->loader()
+        );
+
+        self::assertSame(2, $code);
+        self::assertSame('', $stdout);
+        self::assertStringContainsString('--baseline must not be empty', $stderr);
+    }
+
     public function testAMalformedBaselineFileIsExit2(): void
     {
         $dir = $this->wallabagCopy();

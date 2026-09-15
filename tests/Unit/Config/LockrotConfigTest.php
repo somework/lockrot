@@ -39,6 +39,17 @@ final class LockrotConfigTest extends TestCase
         self::assertNull(LockrotConfig::fromSources(['baseline' => ''], [], ['baseline' => null], '8.5.10', null)->baseline());
     }
 
+    /**
+     * `--baseline=` reaches here as an empty string. Falling through to the default path would mean
+     * a typo silently gates against a different file than the one the caller named.
+     */
+    public function testAnEmptyCliBaselineIsRejected(): void
+    {
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('--baseline must not be empty');
+        LockrotConfig::fromSources([], [], ['baseline' => ''], '8.5.10', null);
+    }
+
     public function testInstallTimeBudgetFromExtra(): void
     {
         self::assertSame(30, LockrotConfig::fromSources(['install-time-budget' => 30], [], [], '8.5.10', null)->installTimeBudgetSeconds());

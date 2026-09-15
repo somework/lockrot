@@ -106,14 +106,18 @@ final class BaselineFile
         error_clear_last();
         $written = @file_put_contents($temporary, $json);
         if ($written !== \strlen($json)) {
+            // Read before the cleanup: unlink() on a temp file that was never created records a
+            // failure of its own, which would otherwise replace the reason the caller needs.
+            $reason = $this->reason();
             @unlink($temporary);
 
-            throw new ConfigException('Cannot write '.$this->displayPath.': '.$this->reason());
+            throw new ConfigException('Cannot write '.$this->displayPath.': '.$reason);
         }
         if (!@rename($temporary, $this->path)) {
+            $reason = $this->reason();
             @unlink($temporary);
 
-            throw new ConfigException('Cannot write '.$this->displayPath.': '.$this->reason());
+            throw new ConfigException('Cannot write '.$this->displayPath.': '.$reason);
         }
     }
 

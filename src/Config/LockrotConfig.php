@@ -192,6 +192,14 @@ final class LockrotConfig
      */
     private static function resolveBaseline(array $extra, array $cli): ?string
     {
+        // `--baseline=` arrives as an empty string. Falling through to the default file would mean a
+        // typo silently gates the build against a file the caller never named, so it is rejected
+        // instead. An empty `extra.lockrot.baseline` is caught earlier, by the config schema's
+        // minLength, and is left to fall through here.
+        if (($cli['baseline'] ?? null) === '') {
+            throw new ConfigException('--baseline must not be empty');
+        }
+
         foreach ([$cli['baseline'] ?? null, $extra['baseline'] ?? null] as $candidate) {
             if (\is_string($candidate) && $candidate !== '') {
                 return $candidate;
