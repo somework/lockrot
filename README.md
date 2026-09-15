@@ -132,10 +132,10 @@ priority: critical 3 · high 58 · medium 11 · low 2
 Data as of 2026-09-15 (package repositories, GitHub). Run composer lockrot --format=json for details.
 ```
 
-Findings are grouped by [priority](#priority), highest first, and each row wraps to the width of
-the terminal, so nothing has to be read sideways. The width comes from `COLUMNS` when it is set,
-otherwise from the console itself, falling back to 120 columns. `--all` adds a final `not flagged`
-group with everything else in the lock.
+Findings are grouped by [priority](#priority), highest first, and every line — rows and the closing
+summary alike — wraps to the width of the terminal, so nothing has to be read sideways. The width
+comes from `COLUMNS` when it is set, otherwise from the console itself, falling back to 120 columns.
+`--all` adds a final `not flagged` group with everything else in the lock.
 
 "Data as of" is the date the report was generated (UTC). wallabag is used because its lock file is
 public and large, not to single it out.
