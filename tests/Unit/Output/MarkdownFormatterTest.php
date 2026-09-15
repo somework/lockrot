@@ -203,6 +203,40 @@ final class MarkdownFormatterTest extends TestCase
         self::assertStringNotContainsString('baseline:', $out);
     }
 
+    /**
+     * A composer.lock is under the control of whoever opens the pull request, and the report is
+     * posted into that pull request or its job summary: nothing a package carries may render as
+     * markup there.
+     */
+    public function testPackageMetadataCannotInjectMarkup(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $report = new Report([
+            new Finding('acme/ev`il', '1.0.0 <b>x</b>', Verdict::ABANDONED, [new Signal('S1', 'high', 'marked abandoned, replacement: <img src=x onerror=alert(1)> [fine](https://example.com) *ok* &lt;b&gt; #1')], ['acme/ev`il'], null, $at),
+        ], ['GitHub unreachable: <script>alert(1)</script> [x](y)'], $at, 1, 0, false);
+
+        $out = $this->formatter()->format($report);
+
+        self::assertStringContainsString('| `` acme/ev`il `` | 1.0.0 \<b\>x\</b\> |', $out);
+        self::assertStringContainsString('replacement: \<img src=x onerror=alert(1)\> \[fine\](https://example.com) \*ok\* \&lt;b\&gt; \#1', $out);
+        self::assertStringContainsString('- note: GitHub unreachable: \<script\>alert(1)\</script\> \[x\](y)', $out);
+        self::assertSame(0, preg_match('/(?<!\\\\)<(img|script|b)/', $out), 'every < from package metadata is escaped');
+    }
+
+    public function testCodeSpanFencesGrowPastTheLongestBacktickRun(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $report = new Report([
+            new Finding('acme/a``b', '1.0.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'x')], ['acme/a``b'], null, $at),
+            new Finding('acme/plain', '1.0.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'x')], ['acme/plain'], null, $at),
+        ], [], $at, 2, 0, false);
+
+        $out = $this->formatter()->format($report);
+
+        self::assertStringContainsString('| ``` acme/a``b ``` |', $out);
+        self::assertStringContainsString('| `acme/plain` |', $out);
+    }
+
     public function testWordingAvoidsBannedTerms(): void
     {
         $out = strtolower($this->formatter(Verdict::SILENT)->format($this->report(), true));

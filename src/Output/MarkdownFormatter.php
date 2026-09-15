@@ -25,12 +25,16 @@ use Lockrot\Verdict\Finding;
  * reviewer reads down the first column and stops where the rows stop applying to the project. The
  * verdict keeps its own column next to it — the two axes answer different questions.
  *
- * Table cells escape the two characters that would otherwise break a Markdown table or collapse
- * multiple logical rows into one: `|` becomes `\|`, and any line break becomes a single space. The
- * verdict cell is bold only when FormatContext::levelOf() is not `note` — the same rule GitHub
- * annotations and GitLab severities use, so a reviewer's eye is drawn to exactly the findings that
- * can fail the build. The `Via` chain is joined with "›", which reads more naturally inline in a
- * table cell than the plain ">" the annotation formats use.
+ * Everything that comes from the project or from package metadata — names, versions, evidence, the
+ * replacement string of an abandoned package, notes, the baseline file name — is rendered as plain
+ * text: line breaks become a single space, and every Markdown or HTML punctuation character is
+ * backslash-escaped, `|` included, so a crafted composer.lock can neither break the table nor put
+ * a link, an image or a tag of its own into a pull-request comment or a job summary. The package
+ * name is a code span, delimited by more backticks than the name itself contains. The verdict cell
+ * is bold only when FormatContext::levelOf() is not `note` — the same rule GitHub annotations and
+ * GitLab severities use, so a reviewer's eye is drawn to exactly the findings that can fail the
+ * build. The `Via` chain is joined with "›", which reads more naturally inline in a table cell than
+ * the plain ">" the annotation formats use.
  */
 final class MarkdownFormatter implements FormatterInterface
 {
@@ -51,7 +55,7 @@ final class MarkdownFormatter implements FormatterInterface
 
         $lines = [$this->heading($report)];
         if ($baseline !== null) {
-            $lines[] = $baseline->summaryLine();
+            $lines[] = self::text($baseline->summaryLine());
         }
 
         if ($rows !== []) {
@@ -67,7 +71,7 @@ final class MarkdownFormatter implements FormatterInterface
         if ($notes !== []) {
             $lines[] = '';
             foreach ($notes as $note) {
-                $lines[] = '- note: '.$note;
+                $lines[] = '- note: '.self::text($note);
             }
         }
 
@@ -92,8 +96,8 @@ final class MarkdownFormatter implements FormatterInterface
         $level = $this->context->levelOf($finding, $baseline);
         $verdict = $level === FormatContext::LEVEL_NOTE ? $finding->verdict() : '**'.$finding->verdict().'**';
 
-        return '| '.$finding->priority().' | `'.self::cell($finding->package()).'` | '.self::cell($finding->version())
-            .' | '.$verdict.' | '.self::cell($this->evidence($finding)).' | '.self::cell($this->via($finding)).' |';
+        return '| '.$finding->priority().' | '.self::code($finding->package()).' | '.self::text($finding->version())
+            .' | '.$verdict.' | '.self::text($this->evidence($finding)).' | '.self::text($this->via($finding)).' |';
     }
 
     private function evidence(Finding $finding): string
@@ -135,11 +139,46 @@ final class MarkdownFormatter implements FormatterInterface
             .'. Run `composer lockrot --format=json` for details.</sub>';
     }
 
-    /** Escapes the two characters that would otherwise break a Markdown table cell. */
-    private static function cell(string $value): string
+    /**
+     * The characters that carry meaning in Markdown or start HTML, each backslash-escaped. CommonMark
+     * lets any ASCII punctuation be escaped this way, and GitHub renders `\<` as a literal `<`, so an
+     * `<img>` or a `[link](…)` in package metadata comes out as the text it is. `&` is escaped too,
+     * so an entity such as `&lt;` cannot smuggle a tag past the `<` escape.
+     */
+    private const ESCAPED = ['\\', '|', '`', '*', '_', '[', ']', '<', '>', '&', '~', '#'];
+
+    /** Plain text for a table cell or a bullet: one line, nothing that renders as markup. */
+    private static function text(string $value): string
     {
         $value = str_replace(["\r\n", "\r", "\n"], ' ', $value);
+        foreach (self::ESCAPED as $character) {
+            $value = str_replace($character, '\\'.$character, $value);
+        }
 
-        return str_replace('|', '\\|', $value);
+        return $value;
+    }
+
+    /**
+     * A code span. Backslash escapes do not apply inside one, so a backtick in the content is
+     * handled the CommonMark way: the delimiter is one backtick longer than the longest run inside,
+     * and a leading or trailing backtick gets a space of padding. `|` still has to be escaped, as
+     * GitHub's table parser reads it before the code span does.
+     */
+    private static function code(string $value): string
+    {
+        $value = str_replace(["\r\n", "\r", "\n"], ' ', $value);
+        $value = str_replace('|', '\\|', $value);
+        $longest = 0;
+        if (preg_match_all('/`+/', $value, $runs) > 0) {
+            foreach ($runs[0] as $run) {
+                $longest = max($longest, \strlen($run));
+            }
+        }
+        $fence = str_repeat('`', $longest + 1);
+        if ($longest > 0) {
+            $value = ' '.$value.' ';
+        }
+
+        return $fence.$value.$fence;
     }
 }
