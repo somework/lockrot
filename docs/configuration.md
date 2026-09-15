@@ -19,7 +19,7 @@ Put project settings under `extra.lockrot` in `composer.json`:
 CLI options win over environment variables, which win over `composer.json`.
 
 The shape of `extra.lockrot` is validated against
-[`resources/lockrot-config.schema.json`](../resources/lockrot-config.schema.json). Unknown keys are
+[`resources/lockrot-config.schema.json`](https://github.com/somework/lockrot/blob/main/resources/lockrot-config.schema.json). Unknown keys are
 allowed, but the keys below must have the listed type — in particular, the four threshold keys must
 be JSON integers (`3`, not `"3"`).
 
@@ -79,7 +79,7 @@ to disk. More in [internals.md](internals.md).
 
 Packages that are finished by design — an interface package that will not release again, a polyfill
 that is deliberately frozen, a metapackage — are not dependency rot. lockrot ships a built-in
-allowlist at [`resources/finished-packages.json`](../resources/finished-packages.json): `psr/*`,
+allowlist at [`resources/finished-packages.json`](https://github.com/somework/lockrot/blob/main/resources/finished-packages.json): `psr/*`,
 `fig/*`, `symfony/polyfill-*`, `symfony/*-pack`, `ralouphie/getallheaders`, and two pinned releases
 of `paragonie/random_compat` (`9.99.99` and `9.99.100`, which are intentionally empty). Packages of
 Composer type `metapackage` or `symfony-pack` count as finished automatically. An allowlist match is

@@ -19,8 +19,10 @@ was observed about the package. The priority says how much that applies to *your
 Severity order among the signal-derived verdicts, used by `--fail-on` and the baseline:
 `abandoned > silent > pinned > old-promise > stale > unknown > ok`.
 
-An allowlist match never competes in that order. It is checked first and always wins, so an
-allowlisted package reports `finished` whatever its signals say — see
+`finished` and `ok` sit equal and lowest in that ordering, and neither is ever a finding.
+
+An allowlist match never competes in the order at all. It is checked before any signal is read and
+always wins, so an allowlisted package reports `finished` whatever its signals say — see
 [configuration.md](configuration.md).
 
 ## The signals
