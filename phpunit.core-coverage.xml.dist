@@ -44,6 +44,15 @@
             <!-- baseline file (added on feat/v0.1.0-extras): value objects plus the one file lockrot
                  ever writes, all reachable from unit tests -->
             <directory>src/Baseline</directory>
+            <!-- self-update (added on feat/self-update): the release lookup, the download/verify/
+                 replace mechanics and the Phar check, all driven from unit tests with a fake HTTP
+                 client and a temporary file. src/Composer/SelfUpdateCommand.php stays out, like
+                 LockrotCommand, because its Composer wiring is only exercised by the e2e group -->
+            <file>src/SelfUpdate/Release.php</file>
+            <file>src/SelfUpdate/ReleaseLocator.php</file>
+            <file>src/SelfUpdate/PharUpdater.php</file>
+            <file>src/SelfUpdate/PharValidator.php</file>
+            <file>src/SelfUpdate/PharValidatorInterface.php</file>
         </include>
     </source>
 </phpunit>

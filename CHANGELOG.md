@@ -76,6 +76,20 @@
 - Optional GitHub token (`GITHUB_TOKEN`/`LOCKROT_GITHUB_TOKEN`/Composer `github-oauth`) for
   repository activity signals; runs without one at a reduced candidate budget.
 - Standalone PHAR build (`build/lockrot.phar`) for use without adding a Composer dependency.
+- `lockrot.phar self-update` replaces the running PHAR with the latest GitHub release: it reads
+  `releases/latest`, compares the tag against the running version with Composer's own semver, then
+  downloads the archive and the `lockrot.phar.sha256` published beside it, refuses any download
+  whose hash does not match, checks that the PHP runtime can open it, and swaps it in with the old
+  file's permissions. `--check` reports without downloading and exits 1 when an update is available,
+  so CI can notice a release; `--force` reinstalls the current version. Every failure is exit 2 with
+  the running PHAR untouched and the temporary file removed; there is no rollback in 0.1, since
+  earlier releases stay downloadable from GitHub. The command exists only in the PHAR — a plugin
+  install is updated with `composer update somework/lockrot` — and it needs write access to the
+  PHAR's own directory and nothing else.
+- The PHAR now answers to command names (`lockrot`, still the default, and `self-update`) instead of
+  being a single-command application. Composer's own commands and the inspected project's
+  `composer.json` scripts are deliberately not registered, so `lockrot.phar list` shows lockrot's
+  two commands and nothing in that project can be installed, updated or executed through the PHAR.
 - Configuration in `extra.lockrot` is validated against `resources/lockrot-config.schema.json`;
   threshold values must be integers.
 - Releases publish `lockrot.phar` with a `lockrot.phar.sha256` checksum; GPG signing and a Docker

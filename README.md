@@ -40,9 +40,44 @@ release.
 
 The PHAR always runs the inspected project with `--no-plugins`: it reads `composer.lock` and
 `composer.json` and never needs that project's Composer plugins. It also never writes to
-`composer.json` or `composer.lock`.
+`composer.json` or `composer.lock`. The only commands it offers are `lockrot` (the default, so the
+name can be left out) and `self-update`; `php lockrot.phar list` shows them.
 
 (Releases do not exist yet — this URL will resolve once the first tag is published.)
+
+#### Keeping it updated
+
+The PHAR updates itself from the latest GitHub release:
+
+```bash
+php lockrot.phar self-update          # download, verify the sha256, replace this file
+php lockrot.phar self-update --check  # report only; exits 1 when an update is available
+```
+
+`self-update` downloads the release's `lockrot.phar.sha256` alongside the archive, refuses to
+install anything whose hash does not match, and checks that the PHP runtime can open the download
+before it replaces the running file. It needs write access to the directory the PHAR sits in — a
+PHAR in `/usr/local/bin` wants `sudo`, or a manual download — and it writes nothing else. If the
+update fails at any step, the running `lockrot.phar` is left exactly as it was; there is no
+rollback in 0.1, because every earlier release stays downloadable from GitHub. Set `GITHUB_TOKEN`
+or `LOCKROT_GITHUB_TOKEN` to lift GitHub's 60-requests-per-hour anonymous limit if you check often.
+
+`--check` is the CI-friendly half: it never downloads the archive, and exits `1` when a newer
+release exists so a scheduled job notices.
+
+The alternative to a downloaded PHAR is a global plugin install, which `composer global update`
+keeps current:
+
+```bash
+composer global require somework/lockrot
+composer global config allow-plugins.somework/lockrot true
+```
+
+That is a plugin, not a PHAR, so it also enables lockrot's install-time summary in **every** project
+you run Composer in. `extra.lockrot` is read from the project being installed, not from the global
+`composer.json`, so a global `install-time: off` has no effect: turn the summary off per project
+with `"extra": {"lockrot": {"install-time": "off"}}`, or everywhere with `LOCKROT_DISABLE=1` in your
+environment.
 
 ## One-command demo
 
@@ -330,6 +365,12 @@ all: Composer parses the project's manifest while collecting plugin commands, be
 class is loaded, so it stops with its own exit `1` first — `composer lockrot` on a broken
 `composer.json` exits `1`, not `2`. The standalone PHAR reads and validates `composer.json` itself,
 so the same failure there is exit `2`.
+
+`lockrot.phar self-update` uses the same three codes with its own meanings: `0` for an installed
+update or a build that is already current, `1` only for `--check` when a newer release exists, and
+`2` for every failure (no published release, GitHub unreachable, checksum mismatch, an archive the
+runtime cannot open, an unwritable directory, or running outside the PHAR). On `2` the running
+`lockrot.phar` is untouched.
 
 These codes are `composer lockrot`'s own. The [install-time summary](#install-time-summary) never
 sets an exit code — it only prints — unless `install-time-strict` is on, in which case lockrot

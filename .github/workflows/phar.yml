@@ -12,7 +12,10 @@ jobs:
         with: {php-version: '8.4'}
       - run: composer install --no-interaction
       - run: build/build-phar.sh
-      - run: sha256sum build/lockrot.phar > build/lockrot.phar.sha256
+      # Written from inside build/ so the file reads "<hex>  lockrot.phar": `sha256sum -c` is run by
+      # whoever downloaded the PHAR, next to their own copy, not against a build/ path that only
+      # exists here. lockrot.phar self-update reads the hash and ignores the name either way.
+      - run: cd build && sha256sum lockrot.phar > lockrot.phar.sha256
       - run: LOCKROT_E2E=1 vendor/bin/phpunit --group e2e --filter PharTest
       - uses: actions/upload-artifact@v4
         with: {name: lockrot.phar, path: 'build/lockrot.phar*'}

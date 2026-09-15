@@ -36,11 +36,25 @@ final class GitHubClient
     /** @return list<string> */
     public function headers(): array
     {
+        return self::headersFor($this->token);
+    }
+
+    /**
+     * The headers every lockrot call to api.github.com carries.
+     *
+     * Static because self-update reaches the same API without an analyzer behind it
+     * ({@see \Lockrot\SelfUpdate\ReleaseLocator}), and the authorization scheme must not be written
+     * down in two places.
+     *
+     * @return list<string>
+     */
+    public static function headersFor(?string $token): array
+    {
         $headers = ['Accept: application/vnd.github+json', 'User-Agent: lockrot'];
-        if ($this->hasToken()) {
+        if ($token !== null && $token !== '') {
             // Same scheme Composer itself uses for api.github.com — Composer 2.10.3
             // src/Composer/Util/AuthHelper.php:302.
-            $headers[] = 'Authorization: token '.$this->token;
+            $headers[] = 'Authorization: token '.$token;
         }
 
         return $headers;

@@ -63,7 +63,9 @@ jobs:
       # 96.41% elements; re-measured after the formats and install-time files were added (2026-09-15): 96.36%.
       # Re-measured on feat/v0.1.0-extras after the baseline, gitlab and markdown files joined the gate
       # (2026-09-15): 96.26% elements (1443/1499).
-      # Threshold = floor(measured elements %) - 2 = floor(96.26) - 2 = 94.
+      # Re-measured on feat/self-update after src/SelfUpdate joined the gate (2026-09-15): 96.06%
+      # elements (1561/1625).
+      # Threshold = floor(measured elements %) - 2 = floor(96.06) - 2 = 94.
       - name: Core coverage gate
         run: |
           vendor/bin/phpunit -c phpunit.core-coverage.xml.dist --coverage-clover build/clover-core.xml

@@ -1,0 +1,18 @@
+{
+    "url": "https://api.github.com/repos/somework/lockrot/releases/100000002",
+    "tag_name": "v0.2.0",
+    "name": "0.2.0",
+    "draft": false,
+    "prerelease": false,
+    "published_at": "2026-10-01T09:12:44Z",
+    "assets": [
+        {
+            "name": "lockrot.phar.sha256",
+            "label": null,
+            "content_type": "text/plain",
+            "state": "uploaded",
+            "size": 82,
+            "browser_download_url": "https://github.com/somework/lockrot/releases/download/v0.2.0/lockrot.phar.sha256"
+        }
+    ]
+}

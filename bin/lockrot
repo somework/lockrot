@@ -71,6 +71,61 @@ unset($lockrotArgv);
 // printed (Application.php:459-462). Both are untyped in 2.2.25, so narrowing the return types in
 // this subclass is allowed.
 $application = new class () extends \Composer\Console\Application {
+    /**
+     * Every command name this build answers to: lockrot's own two, plus Symfony's help, listing and
+     * shell-completion commands. Aliases (`rot`, `selfupdate`) travel with their command and are
+     * registered by Symfony, so only the primary names appear here.
+     */
+    private const KEEP = ['lockrot', 'self-update', 'help', 'list', 'completion', '_complete'];
+
+    /**
+     * The PHAR is built on Composer's Application, which registers Composer's whole command set —
+     * install, update, require, self-update and the rest. Until `self-update` existed, the entry
+     * point hid all of them by declaring itself a single-command application, so `lockrot.phar`
+     * only ever ran `lockrot`. That is no longer possible: a single-command application has no
+     * command names at all, so `lockrot.phar self-update` could not be reached.
+     *
+     * The commands are therefore filtered instead of hidden. Symfony's own help/list/completion
+     * commands are kept (the `list` output is how a user finds `self-update` at all), every
+     * Composer project command is dropped — `lockrot.phar update` must never run a Composer update
+     * on the project being inspected — and lockrot's two commands are added. Dropping Composer's
+     * `self-update` here is also what frees both `self-update` and its `selfupdate` alias for
+     * lockrot's own command.
+     *
+     * @return list<\Symfony\Component\Console\Command\Command>
+     */
+    protected function getDefaultCommands(): array
+    {
+        $commands = [];
+        foreach (parent::getDefaultCommands() as $command) {
+            if (\in_array((string) $command->getName(), self::KEEP, true)) {
+                $commands[] = $command;
+            }
+        }
+        $commands[] = new \Lockrot\Composer\LockrotCommand();
+        $commands[] = new \Lockrot\Composer\SelfUpdateCommand();
+
+        return $commands;
+    }
+
+    /**
+     * The same allowlist applied to every later registration, because getDefaultCommands() is not
+     * the only source: Composer\Console\Application::doRun() turns each entry of the inspected
+     * project's `scripts` into a runnable command whenever no known command was named — `list` and
+     * `help` included (Application.php:377-393 in 2.10.3). lockrot reads that project, it does not
+     * run it, so those never become lockrot commands: they are dropped here rather than listed and
+     * then refused.
+     *
+     * Composer calls addCommand() instead of add() where symfony/console >= 7.4 provides it; both
+     * this tree and the PHAR build pin symfony/console 5.4 through composer/composer, where add()
+     * is the only path. PharTest covers it from the built archive.
+     *
+     */
+    public function add(\Symfony\Component\Console\Command\Command $command): ?\Symfony\Component\Console\Command\Command
+    {
+        return \in_array((string) $command->getName(), self::KEEP, true) ? parent::add($command) : null;
+    }
+
     public function getLongVersion(): string
     {
         return 'lockrot '.\Lockrot\Version::STRING;
@@ -89,6 +144,8 @@ $application = new class () extends \Composer\Console\Application {
 };
 $application->setName('lockrot');
 $application->setVersion(\Lockrot\Version::STRING);
-$application->add(new \Lockrot\Composer\LockrotCommand());
-$application->setDefaultCommand('lockrot', true);
+// Not a single-command application any more (see getDefaultCommands() above): `lockrot` is what
+// runs when no command is named, which keeps `lockrot.phar -d project --format=json` working while
+// leaving `self-update`, `list` and `help` reachable by name.
+$application->setDefaultCommand('lockrot', false);
 exit($application->run());
