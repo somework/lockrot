@@ -1,0 +1,13 @@
+// Cloudflare Workers configuration for the documentation site at https://lockrot.dev.
+// The site is static: MkDocs writes it to ./site (see mkdocs.yml), and the Worker serves that
+// directory as assets, with docs/_redirects applied for the PHAR download URLs. No Worker script.
+{
+    "$schema": "https://developers.cloudflare.com/schemas/wrangler.json",
+    "name": "lockrot",
+    "compatibility_date": "2026-09-16",
+    "assets": {
+        "directory": "./site",
+        "html_handling": "auto-trailing-slash",
+        "not_found_handling": "404-page"
+    }
+}
