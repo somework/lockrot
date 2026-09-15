@@ -476,8 +476,10 @@ regenerate — the file keeps saying how long each finding has been tolerated.
 Once the file exists, every normal run compares against it and says so:
 
 ```
-200 packages checked · abandoned 19 · silent 8 · pinned 4 · old-promise 41 · stale 3 · unknown 0 · finished 18 · ok 107
-baseline: 73 known · 1 new · 1 worsened · 0 stale (lockrot-baseline.json)
+200 packages checked · abandoned 19 · silent 8 · pinned 4 · old-promise 41 · stale 2 · unknown 0 · finished 18 ·
+ok 108
+priority: critical 3 · high 58 · medium 11 · low 2
+baseline: 72 known · 1 new · 1 worsened · 0 stale (lockrot-baseline.json)
 ```
 
 | Bucket | Meaning | Effect on the exit code |
