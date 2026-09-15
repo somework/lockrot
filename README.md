@@ -62,6 +62,10 @@ update fails at any step, the running `lockrot.phar` is left exactly as it was; 
 rollback in 0.1, because every earlier release stays downloadable from GitHub. Set `GITHUB_TOKEN`
 or `LOCKROT_GITHUB_TOKEN` to lift GitHub's 60-requests-per-hour anonymous limit if you check often.
 
+An update killed part-way through (a `Ctrl-C` between the download and the replace) can leave a
+`lockrot.phar.<pid>-<id>.tmp.phar` file next to the PHAR. It is inert, and the next `self-update`
+deletes any such file older than an hour, so there is nothing to clean up by hand.
+
 `--check` is the CI-friendly half: it never downloads the archive, and exits `1` when a newer
 release exists so a scheduled job notices.
 

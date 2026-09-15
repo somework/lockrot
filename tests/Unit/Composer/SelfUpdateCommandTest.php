@@ -197,7 +197,7 @@ final class SelfUpdateCommandTest extends TestCase
         [$code, , $stderr] = $this->runCommand($this->command($http, $phar), ['--force' => true]);
 
         self::assertSame(0, $code, $stderr);
-        self::assertStringContainsString('lockrot updated from '.Version::STRING.' to '.Version::STRING, $stderr);
+        self::assertStringContainsString('lockrot reinstalled '.Version::STRING, $stderr);
         self::assertSame(self::NEW_PHAR, file_get_contents($phar));
     }
 

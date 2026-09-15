@@ -1,3 +1,6 @@
+# Test fixtures include a small PHP archive; never let it through line-ending normalisation.
+*.phar binary
+
 /tests export-ignore
 /build export-ignore
 /.github export-ignore

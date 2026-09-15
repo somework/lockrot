@@ -15,8 +15,8 @@ namespace Lockrot\SelfUpdate;
  *   default, so in practice its check rarely runs. lockrot always runs it: opening an existing
  *   archive is a read, which `phar.readonly` does not restrict.
  * - Only `UnexpectedValueException` is turned into a message. Composer also catches `PharException`,
- *   but `Phar::__construct()` is not declared to throw it, so a catch for it here is dead code.
- *   Anything else propagates, exactly as Composer lets it: {@see PharUpdater::install()} has
+ *   but `Phar::__construct()` is not declared to throw it, so PHPStan max rejects that catch as
+ *   unreachable. Anything else propagates, exactly as Composer lets it: {@see PharUpdater::install()} has
  *   already removed the temporary file by then and the running archive is untouched, so the command
  *   reports the failure rather than treating an unknown fault as "the download is damaged".
  *

@@ -64,8 +64,12 @@ jobs:
       # Re-measured on feat/v0.1.0-extras after the baseline, gitlab and markdown files joined the gate
       # (2026-09-15): 96.26% elements (1443/1499).
       # Re-measured on feat/self-update after src/SelfUpdate joined the gate (2026-09-15): 96.06%
-      # elements (1561/1625).
-      # Threshold = floor(measured elements %) - 2 = floor(96.06) - 2 = 94.
+      # elements (1561/1625); after the fix round added the temp-file sweep, the chmod report and the
+      # force wording (2026-09-15): 95.92% (1576/1643). The eleven uncovered PharUpdater elements are
+      # the Windows copy() branch, the short-write branch and the chmod-refused branch, none of which
+      # can be provoked on the runner.
+      # The formula would now give floor(95.92) - 2 = 93; the gate stays at 94 rather than being
+      # lowered, since the suite clears it with ~1.9 points to spare.
       - name: Core coverage gate
         run: |
           vendor/bin/phpunit -c phpunit.core-coverage.xml.dist --coverage-clover build/clover-core.xml
@@ -89,3 +93,15 @@ jobs:
       - run: LOCKROT_E2E=1 vendor/bin/phpunit --group e2e --filter PluginTest
         env: {GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'}
       - run: vendor/bin/phpunit --group network
+  # PharTest is the only check that the PHAR still exposes lockrot's two commands and nothing else,
+  # and that it never loads the inspected project's classes. phar.yml builds on tags alone, so
+  # without this job a regression in bin/lockrot would merge green and surface at release time.
+  phar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with: {php-version: '8.4'}
+      - run: composer install --no-interaction
+      - run: build/build-phar.sh
+      - run: LOCKROT_E2E=1 vendor/bin/phpunit --group e2e --filter PharTest

@@ -162,18 +162,6 @@ final class PharUpdaterTest extends TestCase
         self::assertSame(self::NEW_PHAR, file_get_contents($phar));
     }
 
-    public function testForceReplacesEvenWhenTheVersionIsTheSame(): void
-    {
-        $dir = $this->tempDir();
-        $phar = $this->installedPhar($dir);
-        $http = $this->http(self::checksumFileFor(self::NEW_PHAR));
-
-        $message = $this->updater($http, $phar)->update($this->release('0.1.0'), true);
-
-        self::assertSame('lockrot updated from 0.1.0 to 0.1.0', $message);
-        self::assertSame(self::NEW_PHAR, file_get_contents($phar));
-    }
-
     public function testAChecksumMismatchReplacesNothingAndLeavesNoTemporaryFile(): void
     {
         $dir = $this->tempDir();
@@ -289,6 +277,53 @@ final class PharUpdaterTest extends TestCase
         }
 
         self::assertSame([], self::filesIn($dir), 'the temporary file must be gone');
+    }
+
+    public function testForceOnTheSameVersionSaysReinstalledRatherThanUpdated(): void
+    {
+        $dir = $this->tempDir();
+        $phar = $this->installedPhar($dir);
+        $http = $this->http(self::checksumFileFor(self::NEW_PHAR));
+
+        $message = $this->updater($http, $phar)->update($this->release('0.1.0'), true);
+
+        self::assertSame('lockrot reinstalled 0.1.0', $message);
+        self::assertSame(self::NEW_PHAR, file_get_contents($phar));
+    }
+
+    public function testForceOnAnOlderReleaseSaysWhatItReplacedWithWhat(): void
+    {
+        $dir = $this->tempDir();
+        $phar = $this->installedPhar($dir);
+        $http = $this->http(self::checksumFileFor(self::NEW_PHAR));
+
+        $message = $this->updater($http, $phar, null, '0.2.0')->update($this->release('0.1.0'), true);
+
+        self::assertSame('lockrot replaced 0.2.0 with 0.1.0', $message);
+        self::assertSame(self::NEW_PHAR, file_get_contents($phar));
+    }
+
+    /**
+     * A process killed between the write and the rename leaves its temporary archive behind for
+     * good. The next install clears them out — but only the ones old enough that no other process
+     * could still be writing one.
+     */
+    public function testAnInstallSweepsTemporaryArchivesLeftByAnInterruptedRun(): void
+    {
+        $dir = $this->tempDir();
+        $phar = $this->installedPhar($dir);
+        $stale = $dir.'/lockrot.phar.404-abandoned.tmp.phar';
+        $inFlight = $dir.'/lockrot.phar.405-running.tmp.phar';
+        $unrelated = $dir.'/notes.txt';
+        foreach ([$stale, $inFlight, $unrelated] as $file) {
+            file_put_contents($file, 'x');
+        }
+        touch($stale, time() - 2 * PharUpdater::STALE_TEMPORARY_SECONDS);
+        $http = $this->http(self::checksumFileFor(self::NEW_PHAR));
+
+        $this->updater($http, $phar)->update($this->release('0.2.0'), false);
+
+        self::assertSame(['lockrot.phar', basename($inFlight), 'notes.txt'], self::filesIn($dir));
     }
 
     public function testTheDownloadIsNotSentTheGithubApiAcceptHeaderOrAToken(): void

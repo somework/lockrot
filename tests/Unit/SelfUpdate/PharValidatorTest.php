@@ -11,7 +11,8 @@ final class PharValidatorTest extends TestCase
 {
     /**
      * A 254-byte archive built once with `php -d phar.readonly=0` and checked in, because
-     * phar.readonly defaults to On and a test cannot create a phar at runtime.
+     * phar.readonly defaults to On and a test cannot create a phar at runtime. The exact command
+     * that produced it is in tests/fixtures/phar/README.md.
      */
     private const MINIMAL_PHAR = __DIR__.'/../../fixtures/phar/minimal.phar';
 

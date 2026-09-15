@@ -41,6 +41,16 @@ final class PharUpdater
      */
     public const DOWNLOAD_HEADERS = ['User-Agent: lockrot'];
 
+    /**
+     * How old a leftover `*.tmp.phar` beside the PHAR has to be before an install sweeps it.
+     *
+     * A run killed between the write and the `rename()` leaves its temporary archive behind for
+     * good, and nothing else ever removes it. An hour keeps the sweep away from a second
+     * self-update that is downloading right now: its file is minutes old at most, and deleting it
+     * mid-flight would turn someone else's working update into a failure.
+     */
+    public const STALE_TEMPORARY_SECONDS = 3600;
+
     private HttpClientInterface $http;
     private PharValidatorInterface $validator;
     private string $runningPhar;
@@ -109,17 +119,44 @@ final class PharUpdater
             ));
         }
 
-        $this->install($phar);
+        return $this->outcome($release, $this->install($phar));
+    }
 
-        return \sprintf('lockrot updated from %s to %s', $this->currentVersion, $release->version());
+    /**
+     * What to report once the archive is in place. `--force` can install a release that is not
+     * newer — the same version, to repair an install, or an older one from a dev build ahead of the
+     * latest release — and neither of those is an update, so neither is called one.
+     *
+     * @param ?int $unappliedMode the file mode that could not be carried over, null when it was
+     */
+    private function outcome(Release $release, ?int $unappliedMode): string
+    {
+        if (Comparator::greaterThan($release->version(), $this->currentVersion)) {
+            $message = \sprintf('lockrot updated from %s to %s', $this->currentVersion, $release->version());
+        } elseif ($release->version() === $this->currentVersion) {
+            $message = 'lockrot reinstalled '.$release->version();
+        } else {
+            $message = \sprintf('lockrot replaced %s with %s', $this->currentVersion, $release->version());
+        }
+        if ($unappliedMode !== null) {
+            $message .= \sprintf(' (the previous file mode %04o could not be applied to the new file)', $unappliedMode);
+        }
+
+        return $message;
     }
 
     /**
      * Writes $phar beside the running archive, validates it, and swaps it in. The temporary file is
      * removed on every path out of here except the successful `rename()`, which consumes it.
+     *
+     * @return int|null the mode `chmod()` refused to apply, null when the permissions carried over
+     *                  (or when the running archive had none to read). An executable `./lockrot.phar`
+     *                  that silently came back non-executable would be worse than a noisy one, so
+     *                  this is reported — but it never fails an update that has otherwise succeeded.
      */
-    private function install(string $phar): void
+    private function install(string $phar): ?int
     {
+        $this->sweepStaleTemporaries();
         $temporary = $this->temporaryPath();
         if (file_put_contents($temporary, $phar) !== \strlen($phar)) {
             @unlink($temporary);
@@ -127,19 +164,40 @@ final class PharUpdater
             throw new ConfigException('could not write '.$temporary);
         }
         try {
+            $unapplied = null;
             $permissions = @fileperms($this->runningPhar);
-            if ($permissions !== false) {
-                @chmod($temporary, $permissions & 0777);
+            if ($permissions !== false && !@chmod($temporary, $permissions & 0777)) {
+                $unapplied = $permissions & 0777;
             }
             $error = $this->validator->validate($temporary);
             if ($error !== null) {
                 throw new ConfigException('the downloaded lockrot.phar is not a readable archive ('.$error.'); nothing was replaced');
             }
             $this->replace($temporary);
+
+            return $unapplied;
         } catch (\Throwable $e) {
             @unlink($temporary);
 
             throw $e;
+        }
+    }
+
+    /**
+     * Removes temporary archives an earlier run left behind. Only files matching this class's own
+     * naming, only in the PHAR's own directory, and only ones older than
+     * {@see STALE_TEMPORARY_SECONDS}; a file that disappears between the listing and the unlink —
+     * another process sweeping the same directory — is not an error.
+     */
+    private function sweepStaleTemporaries(): void
+    {
+        $pattern = \dirname($this->runningPhar).'/'.basename($this->runningPhar).'.*.tmp.phar';
+        $cutoff = time() - self::STALE_TEMPORARY_SECONDS;
+        foreach (glob($pattern) ?: [] as $leftover) {
+            $modified = @filemtime($leftover);
+            if ($modified !== false && $modified < $cutoff) {
+                @unlink($leftover);
+            }
         }
     }
 
