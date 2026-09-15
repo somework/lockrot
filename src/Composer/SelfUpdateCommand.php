@@ -108,6 +108,16 @@ final class SelfUpdateCommand extends BaseCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        // Read before anything can replace the archive this process is running from. After the
+        // swap the running process can no longer load a class it has not already used, and
+        // `Policy::EXIT_OK` in a return statement below would be exactly that — the first use of
+        // Policy in a self-update run, resolved too late to succeed. Everything else on the way out
+        // is already in memory: writeError() only calls `instanceof`, which never triggers the
+        // autoloader, and `writeln()` on an output object built before the command ran.
+        $exitOk = Policy::EXIT_OK;
+        $exitError = Policy::EXIT_ERROR;
+        $exitFindings = Policy::EXIT_FINDINGS;
+
         try {
             $phar = $this->runningPhar ?? \Phar::running(false);
             if ($phar === '') {
@@ -125,7 +135,7 @@ final class SelfUpdateCommand extends BaseCommand
                 if (!$updater->isUpdateAvailable($release)) {
                     $this->writeError($output, 'lockrot '.Version::STRING.' is up to date');
 
-                    return Policy::EXIT_OK;
+                    return $exitOk;
                 }
                 $this->writeError($output, \sprintf(
                     'lockrot %s is available (installed: %s); run lockrot.phar self-update',
@@ -133,21 +143,21 @@ final class SelfUpdateCommand extends BaseCommand
                     Version::STRING
                 ));
 
-                return Policy::EXIT_FINDINGS;
+                return $exitFindings;
             }
 
             $message = $updater->update($release, $input->getOption('force') === true);
             $this->writeError($output, $message ?? 'lockrot '.Version::STRING.' is up to date');
 
-            return Policy::EXIT_OK;
+            return $exitOk;
         } catch (ConfigException $e) {
             $this->writeError($output, '<error>lockrot: '.$e->getMessage().'</error>');
 
-            return Policy::EXIT_ERROR;
+            return $exitError;
         } catch (\Throwable $e) {
             $this->writeError($output, '<error>lockrot self-update failed: '.$e->getMessage().'</error>');
 
-            return Policy::EXIT_ERROR;
+            return $exitError;
         }
     }
 

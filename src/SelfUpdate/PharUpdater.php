@@ -29,6 +29,13 @@ use Lockrot\Version;
  *   from GitHub, which is the documented way back.
  *
  * On any failure the running PHAR is left exactly as it was and the temporary file is removed.
+ *
+ * The order of the steps is part of the contract, not an accident. A PHP process that is executing
+ * a PHAR keeps reading further classes out of that file on demand, against the manifest it read at
+ * startup; once the file underneath has been swapped for a different archive, every class the
+ * process has not already loaded is gone. So the swap is the last thing that touches the runtime:
+ * the temporary archive is written, permissioned and validated first, the message to report is
+ * built while the old bytes are still there, and only then is the file replaced.
  */
 final class PharUpdater
 {
@@ -116,7 +123,19 @@ final class PharUpdater
             ));
         }
 
-        return $this->outcome($release, $this->install($phar));
+        [$temporary, $unappliedMode] = $this->stage($phar);
+        try {
+            // Built here rather than after the replace: composing it needs Comparator, and with
+            // --force nothing has loaded that class yet.
+            $message = $this->outcome($release, $unappliedMode);
+            $this->replace($temporary);
+        } catch (\Throwable $e) {
+            @unlink($temporary);
+
+            throw $e;
+        }
+
+        return $message;
     }
 
     /**
@@ -143,15 +162,19 @@ final class PharUpdater
     }
 
     /**
-     * Writes $phar beside the running archive, validates it, and swaps it in. The temporary file is
-     * removed on every path out of here except the successful `rename()`, which consumes it.
+     * Writes $phar beside the running archive, carries the target's permissions onto it and checks
+     * that the runtime can open it — everything an install does short of the swap itself. The
+     * temporary file is removed on every path out of here that throws; a caller that gets a path
+     * back owns it, and either replaces with it or removes it.
      *
-     * @return int|null the mode `chmod()` refused to apply, null when the permissions carried over
-     *                  (or when the running archive had none to read). An executable `./lockrot.phar`
-     *                  that silently came back non-executable would be worse than a noisy one, so
-     *                  this is reported — but it never fails an update that has otherwise succeeded.
+     * @return array{0: string, 1: ?int} the staged path, and the mode `chmod()` refused to apply
+     *                                   (null when the permissions carried over, or when the running
+     *                                   archive had none to read). An executable `./lockrot.phar`
+     *                                   that silently came back non-executable would be worse than a
+     *                                   noisy one, so this is reported — but it never fails an update
+     *                                   that has otherwise succeeded.
      */
-    private function install(string $phar): ?int
+    private function stage(string $phar): array
     {
         $this->sweepStaleTemporaries();
         $temporary = $this->temporaryPath();
@@ -170,9 +193,8 @@ final class PharUpdater
             if ($error !== null) {
                 throw new ConfigException('the downloaded lockrot.phar is not a readable archive ('.$error.'); nothing was replaced');
             }
-            $this->replace($temporary);
 
-            return $unapplied;
+            return [$temporary, $unapplied];
         } catch (\Throwable $e) {
             @unlink($temporary);
 

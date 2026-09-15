@@ -108,5 +108,9 @@ pattern and a one-line reason, the same shape as the existing entries.
 
 ## Testing hooks
 
-`LOCKROT_TODAY` (e.g. `2026-09-14`) fixes the reference date used for every "years ago"
-calculation. It is used by the test suite and is not part of the configuration contract.
+Neither of these is part of the configuration contract.
+
+| Variable | Effect |
+|---|---|
+| `LOCKROT_TODAY` (e.g. `2026-09-14`) | Fixes the reference date used for every "years ago" calculation |
+| `LOCKROT_RELEASE_URL` | Sends `lockrot.phar self-update` to this release document instead of GitHub's; for lockrot's own tests |

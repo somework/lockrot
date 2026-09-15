@@ -104,7 +104,7 @@ $application = new class () extends \Composer\Console\Application {
             }
         }
         $commands[] = new \Lockrot\Composer\LockrotCommand();
-        $commands[] = new \Lockrot\Composer\SelfUpdateCommand();
+        $commands[] = new \Lockrot\Composer\SelfUpdateCommand(null, null, null, self::releaseUrlOverride());
 
         return $commands;
     }
@@ -136,6 +136,18 @@ $application = new class () extends \Composer\Console\Application {
         return method_exists(\Composer\Console\Application::class, 'addCommand')
             ? parent::addCommand($command)
             : parent::add($command);
+    }
+
+    /**
+     * Where `self-update` looks for the release document, so lockrot's own end-to-end test can point
+     * a real PHAR at a local server and watch it replace itself. Empty or unset means GitHub, which
+     * is the only value any install ever uses.
+     */
+    private static function releaseUrlOverride(): ?string
+    {
+        $url = \Composer\Util\Platform::getEnv('LOCKROT_RELEASE_URL');
+
+        return \is_string($url) && $url !== '' ? $url : null;
     }
 
     public function getLongVersion(): string

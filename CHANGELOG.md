@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- `self-update` no longer ends with `include(): zlib: data error` and exit 255 after successfully
+  replacing the archive: nothing that runs after the swap needs code from the old PHAR any more. The
+  file was replaced correctly before; only the process's exit was wrong.
+
 ## [0.2.0] - 2026-09-16
 
 ### Added

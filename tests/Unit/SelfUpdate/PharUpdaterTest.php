@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\SelfUpdate;
 
+use Composer\Semver\Comparator;
 use Lockrot\Exception\ConfigException;
 use Lockrot\SelfUpdate\PharUpdater;
 use Lockrot\SelfUpdate\PharValidatorInterface;
 use Lockrot\SelfUpdate\Release;
 use Lockrot\Tests\Support\FakeHttpClient;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 
 final class PharUpdaterTest extends TestCase
@@ -324,6 +327,86 @@ final class PharUpdaterTest extends TestCase
         $this->updater($http, $phar)->update($this->release('0.2.0'), false);
 
         self::assertSame(['lockrot.phar', basename($inFlight), 'notes.txt'], self::filesIn($dir));
+    }
+
+    /**
+     * A process running from a PHAR loses every class it has not already loaded the moment that file
+     * is swapped, so the swap has to be the last step: the archive is staged and the message is
+     * built while the old bytes are still readable.
+     *
+     * Watched at the seam the failure actually happened on. Composing the message is the only work
+     * left between staging and the swap, and it is the one step that reaches for a class of its own,
+     * `Composer\Semver\Comparator`. A prepended autoloader records what the target file held the
+     * moment that class was resolved: the old bytes if the message came first, the new ones if the
+     * swap did. `--force` is the case the report came from, because it skips isUpdateAvailable() and
+     * so leaves the message as the run's first use of the comparison — hence the separate process,
+     * where nothing has loaded it yet.
+     *
+     * @runInSeparateProcess
+     *
+     * @preserveGlobalState disabled
+     */
+    #[PreserveGlobalState(false)]
+    #[RunInSeparateProcess]
+    public function testTheMessageIsBuiltWhileTheOldArchiveIsStillInPlace(): void
+    {
+        $dir = $this->tempDir();
+        $phar = $this->installedPhar($dir);
+        $http = $this->http(self::checksumFileFor(self::NEW_PHAR));
+        self::assertFalse(class_exists(Comparator::class, false), 'the comparison must still be unresolved here');
+
+        $targetWhenCompared = null;
+        $spy = static function (string $class) use (&$targetWhenCompared, $phar): void {
+            if ($class === Comparator::class) {
+                $targetWhenCompared = file_get_contents($phar);
+            }
+        };
+        spl_autoload_register($spy, true, true);
+        try {
+            $message = $this->updater($http, $phar)->update($this->release('0.1.0'), true);
+        } finally {
+            spl_autoload_unregister($spy);
+        }
+
+        self::assertSame('lockrot reinstalled 0.1.0', $message);
+        self::assertSame(self::INSTALLED, $targetWhenCompared, 'the message must be built before the archive is replaced');
+        self::assertSame(self::NEW_PHAR, file_get_contents($phar));
+    }
+
+    /** The other half of the same order: the download is checked while the running archive is untouched. */
+    public function testTheDownloadIsValidatedWhileTheOldArchiveIsStillInPlace(): void
+    {
+        $dir = $this->tempDir();
+        $phar = $this->installedPhar($dir);
+        /** @var list<string> $seen */
+        $seen = [];
+        $validator = new class ($phar, $seen) implements PharValidatorInterface {
+            private string $target;
+
+            /** @var list<string> */
+            public array $seen;
+
+            /** @param list<string> $seen */
+            public function __construct(string $target, array $seen)
+            {
+                $this->target = $target;
+                $this->seen = $seen;
+            }
+
+            public function validate(string $path): ?string
+            {
+                $this->seen[] = (string) file_get_contents($this->target);
+
+                return null;
+            }
+        };
+
+        $message = (new PharUpdater($this->http(self::checksumFileFor(self::NEW_PHAR)), $validator, $phar, '0.1.0'))
+            ->update($this->release('0.2.0'), false);
+
+        self::assertSame('lockrot updated from 0.1.0 to 0.2.0', $message);
+        self::assertSame([self::INSTALLED], $validator->seen);
+        self::assertSame(self::NEW_PHAR, file_get_contents($phar));
     }
 
     public function testTheDownloadIsNotSentTheGithubApiAcceptHeaderOrAToken(): void
