@@ -372,6 +372,24 @@ final class InstallTimeSummaryTest extends TestCase
         self::assertStringContainsString('lockrot: dependency rot in 1 of 1 changed package', $io->getOutput());
     }
 
+    /**
+     * A configured baseline path that does not exist is exit 2 for `composer lockrot`, but install
+     * time never fails on a configuration problem: it becomes the one "check skipped" line, the
+     * install continues, and the install-time-strict gate does not run for that install.
+     */
+    public function testAConfiguredButMissingBaselineIsReportedAsASkippedCheckAndDoesNotBlock(): void
+    {
+        $this->project(['install-time-strict' => true, 'fail-on' => 'old-promise', 'baseline' => 'ci/rot.json']);
+        $io = new BufferIO();
+        $event = $this->event($io, new Transaction([], [$this->loadPackage(self::PHPZIP)]));
+
+        (new InstallTimeSummary($this->analyzerFactory()))->onPreOperationsExec($event);
+
+        $output = $io->getOutput();
+        self::assertStringContainsString('lockrot: install-time check skipped:', $output);
+        self::assertStringContainsString('ci/rot.json not found', $output);
+    }
+
     public function testAMalformedBaselineIsReportedAsASkippedCheckAndNeverBreaksTheInstall(): void
     {
         $dir = $this->project();

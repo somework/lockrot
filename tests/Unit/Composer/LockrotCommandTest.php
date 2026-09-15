@@ -847,6 +847,27 @@ final class LockrotCommandTest extends TestCase
         self::assertNull($json['baseline']);
     }
 
+    /**
+     * Staleness is a question about composer.lock, not about the current run's scope. A baseline
+     * generated with --dev holds packages-dev findings; a later run without --dev does not analyse
+     * them, but they are still in the lock, so reporting them as "no longer in composer.lock" would
+     * be false.
+     */
+    public function testABaselineGeneratedWithDevReportsNoStaleEntriesOnARunWithoutDev(): void
+    {
+        $this->wallabagCopy();
+        self::assertSame(0, $this->tester($this->loader())->execute(['--generate-baseline' => true, '--dev' => true, '--target-php' => '8.4']));
+
+        $tester = $this->tester($this->loader());
+        $tester->execute(['--format' => 'json', '--target-php' => '8.4']);
+        $json = json_decode($tester->getDisplay(), true);
+
+        self::assertIsArray($json);
+        self::assertIsArray($json['baseline']);
+        self::assertSame([], $json['baseline']['stale'], 'packages-dev entries are in the lock, not gone');
+        self::assertStringNotContainsString('no longer in composer.lock', $tester->getDisplay());
+    }
+
     public function testAnExplicitBaselinePathThatDoesNotExistIsExit2(): void
     {
         $this->wallabagCopy();

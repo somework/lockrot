@@ -216,6 +216,20 @@ final class GithubFormatterTest extends TestCase
         self::assertStringStartsWith('::warning file=composer.lock,', $lines[2], 'new but below fail-on: a warning');
     }
 
+    public function testBaselineStaleEntriesBecomeANotice(): void
+    {
+        $report = $this->report();
+        $baseline = Baseline::of([
+            new BaselineEntry('acme/departed', '1.0.0', Verdict::ABANDONED, '2026-01-15'),
+        ], self::AT);
+        $withBaseline = $report->withBaseline(BaselineComparison::compare($baseline, $report, 'lockrot-baseline.json', []));
+
+        self::assertStringContainsString(
+            '::notice title=lockrot::baseline lists 1 package no longer in composer.lock: acme/departed',
+            $this->formatter(Verdict::SILENT, $this->lockPath())->format($withBaseline)
+        );
+    }
+
     public function testFactory(): void
     {
         self::assertInstanceOf(

@@ -159,6 +159,20 @@ final class MarkdownFormatterTest extends TestCase
         self::assertSame($comparison->summaryLine(), $lines[1]);
     }
 
+    public function testBaselineStaleEntriesBecomeANoteBullet(): void
+    {
+        $report = $this->report();
+        $baseline = Baseline::of([
+            new BaselineEntry('vendor/departed', '1.0.0', Verdict::SILENT, '2026-01-15'),
+        ], self::AT);
+        $withBaseline = $report->withBaseline(BaselineComparison::compare($baseline, $report, 'lockrot-baseline.json', []));
+
+        self::assertStringContainsString(
+            '- note: baseline lists 1 package no longer in composer.lock: vendor/departed',
+            $this->formatter()->format($withBaseline)
+        );
+    }
+
     public function testWithoutABaselineNoBaselineLineIsEmitted(): void
     {
         $out = $this->formatter()->format($this->report());

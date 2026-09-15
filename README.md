@@ -145,6 +145,7 @@ The same run with `--format=json` (first ~25 lines, up to the first flagged pack
         "finished": 18,
         "ok": 107
     },
+    "baseline": null,
     "notes": [],
     "findings": [
         {
@@ -294,7 +295,7 @@ must be JSON integers (`3`, not `"3"`).
 | `--offline` | Never reach the network: lockrot sets `COMPOSER_DISABLE_NETWORK=1` and rebuilds the configured repositories behind it (in plugin mode Composer has already built its own, network-enabled ones before any command runs), so repository metadata is served from Composer's own cache and GitHub activity from lockrot's cache. A package missing from the cache is reported as unavailable, not as absent from the repository |
 | `--strict-network` | Exit 1 (see [Exit codes](#exit-codes)) when a configured repository or GitHub could not be reached |
 | `--generate-baseline` | Write this run's findings to the baseline file and exit 0, whatever `--fail-on` says — `--strict-network` is the one exception. See [Baseline](#baseline) |
-| `--baseline=<path>` | Baseline file to read (or, with `--generate-baseline`, to write); relative to `composer.json` or absolute. Wins over `extra.lockrot.baseline` |
+| `--baseline=<path>` | Baseline file to read (or, with `--generate-baseline`, to write); relative to `composer.json` or absolute. Wins over `extra.lockrot.baseline`. An empty `--baseline=` is a configuration error (exit `2`), never a silent fall-back to the default file |
 
 Repository metadata is cached and revalidated by Composer itself, under Composer's own cache
 directory — lockrot adds no cache of its own for it, and there is no `--refresh` or `cache-ttl` knob
@@ -400,6 +401,12 @@ Matching is **by package name only**. The recorded version is informational, so 
 `vendor/pkg` from `1.2.3` to `1.3.0` while it stays abandoned keeps it accepted; a package that
 gets *worse* (`stale` → `abandoned`) is reported as worsened and fails the build again. Stale
 entries are never cleaned up behind your back — regenerate the baseline when you want them gone.
+
+**Generate the baseline with the same `--dev` setting your CI run uses.** `--dev` widens what is
+*analysed*, not what counts as present: staleness is measured against the whole `composer.lock`,
+`packages-dev` included, so a baseline generated with `--dev` never reports its dev entries as stale
+on a run without it. The other direction does matter — a baseline generated *without* `--dev`
+contains no dev findings, so a `--dev` run reports every one of them as new and fails.
 
 A baseline lockrot cannot read is a configuration error, not an absent baseline: a malformed or
 schema-invalid file, or a `--baseline`/`extra.lockrot.baseline` path that does not exist, exits `2`

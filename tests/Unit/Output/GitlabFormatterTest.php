@@ -157,6 +157,67 @@ final class GitlabFormatterTest extends TestCase
         self::assertNotSame($first[0]['fingerprint'], $first[1]['fingerprint'], 'different verdicts must not collide');
     }
 
+    /**
+     * The same lock with one extra package above acme/abandoned, so the package GitLab is told about
+     * sits on line 8 here rather than line 4.
+     */
+    private function shiftedLockPath(): string
+    {
+        $dir = sys_get_temp_dir().'/lockrot-gitlab-'.uniqid('', true);
+        if (!mkdir($dir, 0777, true) && !is_dir($dir)) {
+            throw new \RuntimeException('cannot create temp dir: '.$dir);
+        }
+        $this->tempDirs[] = $dir;
+        file_put_contents($dir.'/composer.lock', <<<'JSON'
+            {
+                "packages": [
+                    {
+                        "name": "acme/newcomer",
+                        "version": "1.0.0"
+                    },
+                    {
+                        "name": "acme/abandoned",
+                        "version": "9.9.9"
+                    }
+                ],
+                "packages-dev": []
+            }
+            JSON);
+
+        return $dir.'/composer.lock';
+    }
+
+    /**
+     * The identity GitLab tracks an issue by must survive a version bump and a reformatted lock:
+     * the fingerprint is the package and the verdict, nothing else (SPEC F5.2).
+     */
+    public function testFingerprintIgnoresTheVersionAndTheLockLine(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $signal = new Signal('S1', 'high', 'flagged abandoned by its repository');
+        $before = new Report([new Finding('acme/abandoned', '1.0.0', Verdict::ABANDONED, [$signal], ['acme/abandoned'], null, $at)], [], $at, 1, 0, false);
+        $after = new Report([new Finding('acme/abandoned', '9.9.9', Verdict::ABANDONED, [$signal], ['acme/abandoned'], null, $at)], [], $at, 1, 0, false);
+
+        $first = $this->decode($this->formatter(Verdict::SILENT, $this->lockPath())->format($before));
+        $second = $this->decode($this->formatter(Verdict::SILENT, $this->shiftedLockPath())->format($after));
+
+        self::assertSame(4, JsonPath::intAt($first[0], ['location', 'lines', 'begin']));
+        self::assertSame(8, JsonPath::intAt($second[0], ['location', 'lines', 'begin']));
+        self::assertNotSame($first[0]['description'], $second[0]['description'], 'the version really did change');
+        self::assertSame($first[0]['fingerprint'], $second[0]['fingerprint']);
+    }
+
+    public function testTheBaselineStaleNoteIsNotRepresentableAndIsDropped(): void
+    {
+        $report = $this->report();
+        $baseline = Baseline::of([new BaselineEntry('acme/departed', '1.0.0', Verdict::ABANDONED, '2026-01-15')], self::AT);
+        $withBaseline = $report->withBaseline(BaselineComparison::compare($baseline, $report, 'lockrot-baseline.json', ['acme/abandoned']));
+
+        $out = $this->formatter(Verdict::SILENT, $this->lockPath())->format($withBaseline);
+
+        self::assertStringNotContainsString('acme/departed', $out, 'GitLab Code Quality has no field for a document-level note');
+    }
+
     public function testLinesBeginFallsBackToOneWithoutALockPath(): void
     {
         $issues = $this->decode($this->formatter(Verdict::SILENT, null)->format($this->report()));

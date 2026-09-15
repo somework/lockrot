@@ -144,12 +144,6 @@ final class Baseline
         return $this->entries[$package] ?? null;
     }
 
-    /** @return array<string, BaselineEntry> package name => entry, sorted by name */
-    public function entries(): array
-    {
-        return $this->entries;
-    }
-
     /** @return list<string> the baselined package names, sorted */
     public function packages(): array
     {
@@ -159,12 +153,6 @@ final class Baseline
     public function count(): int
     {
         return \count($this->entries);
-    }
-
-    /** The ISO-8601 timestamp of the run that wrote this baseline; empty when the file carried none. */
-    public function generatedAt(): string
-    {
-        return $this->generatedAt;
     }
 
     /** @return array<string, mixed> */

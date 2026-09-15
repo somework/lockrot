@@ -16,8 +16,12 @@ use Lockrot\Json\JsonReader;
  *
  * Two paths are kept apart on purpose. {@see path()} is what the filesystem needs — absolute, so
  * the file lands next to the project's composer.json whatever the process's working directory is.
- * {@see displayPath()} is what reports print: the configured value, or the default file name, both
- * relative, so two machines analysing the same project produce byte-identical output.
+ * {@see displayPath()} is what reports print: the path exactly as it was configured, or the default
+ * file name. Both of those are relative, so two machines analysing the same project produce
+ * byte-identical output; a project that configures an *absolute* baseline path gives up that
+ * property, since the table line and the JSON `baseline.path` then carry the absolute path it asked
+ * for. Printing it as given is the deliberate choice: a path the reader recognises beats a
+ * relativised one they have to reconstruct.
  */
 final class BaselineFile
 {
@@ -96,11 +100,14 @@ final class BaselineFile
     public function write(Baseline $baseline): void
     {
         $json = JsonFile::encode(
-            $baseline->toArray(),
+            self::document($baseline),
             \JSON_UNESCAPED_SLASHES | \JSON_PRETTY_PRINT | \JSON_UNESCAPED_UNICODE
         )."\n";
 
-        $temporary = $this->path.'.tmp';
+        // Unique per run, and in the target's own directory so the rename below stays within one
+        // filesystem and therefore atomic: two concurrent --generate-baseline runs in the same
+        // workspace must not be able to rename each other's half-written file.
+        $temporary = \sprintf('%s.%d-%s.tmp', $this->path, getmypid(), uniqid('', true));
         // Cleared first so reason() below reports this write's own failure and never an unrelated
         // warning some earlier part of the run left behind.
         error_clear_last();
@@ -119,6 +126,24 @@ final class BaselineFile
 
             throw new ConfigException('Cannot write '.$this->displayPath.': '.$reason);
         }
+    }
+
+    /**
+     * The baseline as JSON sees it. `Baseline::toArray()` is the PHP view, where an empty findings
+     * map is an empty array — and `json_encode()` writes that as `[]`, which
+     * resources/lockrot-baseline.schema.json rejects, since it requires an object there. An explicit
+     * stdClass keeps a baseline with nothing in it valid against its own schema.
+     *
+     * @return array<string, mixed>
+     */
+    private static function document(Baseline $baseline): array
+    {
+        $document = $baseline->toArray();
+        if ($document['findings'] === []) {
+            $document['findings'] = new \stdClass();
+        }
+
+        return $document;
     }
 
     /** The last filesystem failure PHP recorded, or a generic reason when it recorded none. */

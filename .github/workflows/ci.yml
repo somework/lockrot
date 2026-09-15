@@ -61,7 +61,9 @@ jobs:
       # combined), not PHPUnit's "Lines" %. Baseline at commit d82ff77 (2026-09-15): 96.48% elements
       # (97.50% lines); re-measured after adding the install-time files to the gate (2026-09-15):
       # 96.41% elements; re-measured after the formats and install-time files were added (2026-09-15): 96.36%.
-      # Threshold = floor(measured elements %) - 2 = floor(96.36) - 2 = 94.
+      # Re-measured on feat/v0.1.0-extras after the baseline, gitlab and markdown files joined the gate
+      # (2026-09-15): 96.26% elements (1443/1499).
+      # Threshold = floor(measured elements %) - 2 = floor(96.26) - 2 = 94.
       - name: Core coverage gate
         run: |
           vendor/bin/phpunit -c phpunit.core-coverage.xml.dist --coverage-clover build/clover-core.xml

@@ -15,9 +15,11 @@ use Lockrot\Verdict\Finding;
  * `composer lockrot --format=markdown > comment.md` piped into `gh pr comment --body-file`.
  *
  * The heading always uses the same flagged/checked counts as the install-time block
- * (InstallSummaryFormatter::header()); the table underneath follows TableFormatter's own rule for
- * when there is nothing to show: no table (and the "no dependency rot found" heading) exactly when
- * the rows this call would print — flagged only, or every finding under `--all` — are empty.
+ * (InstallSummaryFormatter::header()), so it follows `Report::flagged()` alone. The table follows
+ * the rows this call would actually print — flagged only, or every finding under `--all` — and is
+ * omitted when those are empty. The two conditions are not the same one: `--all` on a report with
+ * nothing flagged prints the "no dependency rot found in N packages" heading *and* a full table of
+ * every checked package underneath, which is what `--all` was asked for.
  *
  * Table cells escape the two characters that would otherwise break a Markdown table or collapse
  * multiple logical rows into one: `|` becomes `\|`, and any line break becomes a single space. The

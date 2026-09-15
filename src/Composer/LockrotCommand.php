@@ -193,7 +193,7 @@ final class LockrotCommand extends BaseCommand
                     $existingBaseline,
                     $report,
                     $baselineFile->displayPath(),
-                    self::packageNames($report)
+                    self::lockPackageNames($lock)
                 ));
             }
 
@@ -262,16 +262,20 @@ final class LockrotCommand extends BaseCommand
     }
 
     /**
-     * Every package the run analysed, flagged or not: a baselined package that is now `ok` is still
-     * in the lock and must not be reported as a stale baseline entry.
+     * Every package the lock holds, `packages-dev` included and whatever this run's `--dev` says.
+     *
+     * "Stale" is a statement about composer.lock, not about the scope of one run: a baselined
+     * package that is now `ok`, and a dev package a run without `--dev` never analysed, are both
+     * still in the lock and must not be reported as gone. {@see InstallTimeSummary::withBaseline()}
+     * measures it the same way, for the same reason.
      *
      * @return list<string>
      */
-    private static function packageNames(Report $report): array
+    private static function lockPackageNames(LockFile $lock): array
     {
         $names = [];
-        foreach ($report->findings() as $finding) {
-            $names[] = $finding->package();
+        foreach ($lock->packages(true) as $package) {
+            $names[] = $package->name();
         }
 
         return $names;

@@ -90,11 +90,6 @@ final class BaselineComparison
             : self::KNOWN;
     }
 
-    public function path(): string
-    {
-        return $this->path;
-    }
-
     /** True when the baseline already accepted this package at this severity or worse. */
     public function isKnown(string $package): bool
     {

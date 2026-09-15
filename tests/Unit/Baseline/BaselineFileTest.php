@@ -178,6 +178,72 @@ final class BaselineFileTest extends TestCase
         self::assertStringNotContainsString('unlink', $thrown->getMessage());
     }
 
+    /**
+     * A baseline with nothing in it must still satisfy resources/lockrot-baseline.schema.json, which
+     * requires `findings` to be an object. PHP encodes an empty array as `[]`, so the empty map is
+     * written as an explicit `{}` instead.
+     */
+    public function testAnEmptyBaselineWritesFindingsAsAnObject(): void
+    {
+        $file = BaselineFile::resolve($this->tempDir(), null);
+        $file->write(Baseline::of([], self::AT));
+        $contents = (string) file_get_contents($file->path());
+
+        self::assertStringContainsString('"findings": {}', $contents);
+        self::assertStringNotContainsString('"findings": []', $contents);
+        self::assertSame(0, $file->read()->count());
+    }
+
+    /**
+     * rename() fails when the target is an existing non-empty directory, which exercises the second
+     * failure branch of the only write lockrot performs: the temp file is written successfully and
+     * only the move fails.
+     */
+    public function testAFailingRenameIsAConfigExceptionAndLeavesNoTemporaryFile(): void
+    {
+        $dir = $this->tempDir();
+        mkdir($dir.'/lockrot-baseline.json');
+        file_put_contents($dir.'/lockrot-baseline.json/occupied', 'x');
+        $file = BaselineFile::resolve($dir, null);
+
+        $thrown = null;
+        try {
+            $file->write($this->baseline());
+        } catch (ConfigException $e) {
+            $thrown = $e;
+        }
+
+        self::assertInstanceOf(ConfigException::class, $thrown);
+        self::assertStringContainsString('Cannot write lockrot-baseline.json', $thrown->getMessage());
+        self::assertStringNotContainsString('unlink', $thrown->getMessage());
+        self::assertSame(
+            ['lockrot-baseline.json'],
+            array_values(array_diff((array) scandir($dir), ['.', '..'])),
+            'the temporary file must be cleaned up'
+        );
+    }
+
+    /** Two runs in the same directory must not be able to rename each other's half-written file. */
+    public function testTheTemporaryFileNameIsUniquePerRun(): void
+    {
+        // The temp file is gone by the time a successful write() returns, so the name is observed
+        // through the failure message of a write that cannot complete instead.
+        $file = BaselineFile::resolve($this->tempDir().'/missing', null);
+
+        $messages = [];
+        for ($i = 0; $i < 2; ++$i) {
+            try {
+                $file->write($this->baseline());
+                self::fail('writing into a missing directory must fail');
+            } catch (ConfigException $e) {
+                $messages[] = $e->getMessage();
+            }
+        }
+
+        self::assertStringContainsString('.tmp', $messages[0]);
+        self::assertNotSame($messages[0], $messages[1], 'the temporary file name must differ between runs');
+    }
+
     public function testReadingAMalformedFileIsAConfigException(): void
     {
         $file = BaselineFile::resolve(self::FIXTURES, 'malformed.json');
