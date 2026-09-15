@@ -70,7 +70,7 @@ permissions:
   security-events: write
 
 steps:
-  - uses: actions/checkout@v4
+  - uses: actions/checkout@v7
   - name: lockrot
     run: composer lockrot --format=sarif --fail-on=silent --target-php=8.4 > lockrot.sarif
     env:
