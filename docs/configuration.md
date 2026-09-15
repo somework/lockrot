@@ -46,7 +46,7 @@ be JSON integers (`3`, not `"3"`).
 | `LOCKROT_DISABLE=1` (or `true`) | Skips lockrot entirely, exits 0 |
 | `LOCKROT_FAIL_ON` | `fail-on` |
 | `LOCKROT_TARGET_PHP` | `target-php` |
-| `LOCKROT_GITHUB_TOKEN` / `GITHUB_TOKEN` | GitHub token for repository-activity signals (S3/S4); Composer's `github-oauth.github.com` auth is used as a fallback if neither is set |
+| `LOCKROT_GITHUB_TOKEN` / `GITHUB_TOKEN` | GitHub token for repository-activity signals (S3/S4); Composer's `github-oauth.github.com` auth is used as a fallback if neither is set. When Composer has that auth, its token is the one sent — see [internals.md](internals.md) |
 
 ## CLI options
 

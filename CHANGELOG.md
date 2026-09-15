@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Repository-activity checks no longer fail with `HTTP/2 401` ("Bad credentials") when Composer
+  has a `github-oauth` token for github.com — in `auth.json`, in `COMPOSER_AUTH`, or written by
+  setup-php on a CI runner. Composer adds its own `Authorization` header to every
+  api.github.com request in that case, lockrot added a second one, and GitHub refuses a request
+  that carries two. lockrot now sends none of its own when Composer does; the token resolved from
+  `GITHUB_TOKEN`/`LOCKROT_GITHUB_TOKEN` still lifts the 50-package cap. Before this, every run on
+  a machine with `github-oauth` configured reported `GitHub unreachable` for every repository.
+
 ## [0.2.1] - 2026-09-16
 
 ### Fixed

@@ -65,7 +65,7 @@ final class ServiceFactory
     {
         $downloader = Factory::createHttpDownloader($io, $config);
 
-        return new CachingHttpClient(new ComposerHttpClient($downloader, $clock, $deadline), self::createCache($io, $config), GitHubClient::CACHE_TTL, $clock, $lockrot->offline());
+        return new CachingHttpClient(new ComposerHttpClient($downloader, $io, $clock, $deadline), self::createCache($io, $config), GitHubClient::CACHE_TTL, $clock, $lockrot->offline());
     }
 
     /**

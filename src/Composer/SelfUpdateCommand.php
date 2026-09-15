@@ -191,6 +191,7 @@ final class SelfUpdateCommand extends BaseCommand
         $env = getenv();
         $client = new ComposerHttpClient(
             Factory::createHttpDownloader($io, $config),
+            $io,
             Clock::fromEnvironment($env),
             Deadline::inSeconds(self::BUDGET_SECONDS)
         );

@@ -64,6 +64,12 @@ Without a token, only packages that already look stale on release age — no sta
 Set `GITHUB_TOKEN` or `LOCKROT_GITHUB_TOKEN` to lift the cap. Composer's own
 `github-oauth.github.com` authentication is used as a fallback if neither is set.
 
+When Composer has credentials for github.com — `github-oauth` in `auth.json` or `COMPOSER_AUTH`,
+or what setup-php configures on a CI runner — Composer adds its own `Authorization` header to
+every api.github.com request, and that token is the one on the wire: lockrot then sends no
+header of its own, because a request carrying two is refused by GitHub. The environment token
+still lifts the cap.
+
 Repository activity is checked on GitHub only. GitLab and Bitbucket are not queried.
 
 ## Related
