@@ -35,7 +35,8 @@ final class ComposerHttpClient implements HttpClientInterface
 
     /**
      * @param IOInterface $io       the IO the downloader was built with: its authentications are what
-     *                              Composer's AuthHelper adds to requests, see {@see headersFor()}
+     *                              Composer's AuthHelper adds to requests, see
+     *                              {@see withoutRedundantAuthorization()}
      * @param ?Deadline   $deadline install-time budget; null (and a never-expiring deadline) keeps {@see DEFAULT_TIMEOUT}
      */
     public function __construct(HttpDownloader $downloader, IOInterface $io, Clock $clock, ?Deadline $deadline = null)
@@ -74,19 +75,25 @@ final class ComposerHttpClient implements HttpClientInterface
      * dropped here. The token lockrot resolved still decides whether the repository-activity cap
      * is lifted; only the header changes.
      *
-     * api.github.com is looked up under both names because AuthHelper does the same: credentials
-     * stored for `api.github.com` count, and so do the canonical `github.com` ones.
+     * The predicate is AuthHelper's own. HttpDownloader hands it the origin from
+     * `Url::getOrigin()`, which folds every `*.github.com` host into `github.com`, so what decides
+     * is `hasAuthentication('github.com')` and nothing else: credentials stored under
+     * `api.github.com` never reach AuthHelper and are left alone here too. Two shapes of github.com
+     * credentials make AuthHelper add something other than an Authorization header
+     * (`client-certificate`, an undecodable `custom-headers`); they are not told apart, and a
+     * request under them goes out without lockrot's token.
      *
      * @param list<string> $headers
      *
      * @return list<string>
      */
-    public static function headersFor(IOInterface $io, string $url, array $headers): array
+    public static function withoutRedundantAuthorization(IOInterface $io, string $url, array $headers): array
     {
-        if (parse_url($url, \PHP_URL_HOST) !== 'api.github.com') {
+        $host = parse_url($url, \PHP_URL_HOST);
+        if (!\is_string($host) || strcasecmp($host, 'api.github.com') !== 0) {
             return $headers;
         }
-        if (!$io->hasAuthentication('github.com') && !$io->hasAuthentication('api.github.com')) {
+        if (!$io->hasAuthentication('github.com')) {
             return $headers;
         }
 
@@ -102,7 +109,7 @@ final class ComposerHttpClient implements HttpClientInterface
         $timeout = $this->timeoutSeconds();
         foreach (array_unique($urls) as $url) {
             $options = [
-                'http' => ['timeout' => $timeout, 'header' => self::headersFor($this->io, $url, $headers)],
+                'http' => ['timeout' => $timeout, 'header' => self::withoutRedundantAuthorization($this->io, $url, $headers)],
                 'retry-auth-failure' => false,
             ];
             $promise = $this->downloader->add($url, $options);
