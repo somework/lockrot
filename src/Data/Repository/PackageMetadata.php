@@ -125,6 +125,11 @@ final class PackageMetadata
     {
         return $this->replacement;
     }
+    /**
+     * Versions seen for this package. Since the two-pass loader, dev branches are only counted for a
+     * package with no tagged release (the `~dev` file is not fetched otherwise); no signal or output
+     * consumer depends on this number.
+     */
     public function releaseCount(): int
     {
         return $this->releaseCount;

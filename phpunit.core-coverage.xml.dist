@@ -16,6 +16,14 @@
             <directory>src/Analyzer</directory>
             <directory>src/Data/Repository</directory>
             <directory>src/Lock</directory>
+            <!-- install-time summary (added on feat/v0.1.0-prep): the plugin bootstrap around it
+                 (LockrotPlugin, CommandProvider, LockrotCommand, ServiceFactory) is exercised by the
+                 e2e group, which this gate excludes, so it stays in the informational run only -->
+            <file>src/Deadline.php</file>
+            <file>src/Composer/InstallTimeSummary.php</file>
+            <file>src/Composer/TransactionPackages.php</file>
+            <file>src/Output/InstallSummaryFormatter.php</file>
+            <file>src/Exception/InstallBlockedException.php</file>
         </include>
     </source>
 </phpunit>

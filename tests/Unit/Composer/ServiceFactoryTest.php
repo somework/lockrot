@@ -143,6 +143,24 @@ final class ServiceFactoryTest extends TestCase
         self::assertSame(3, self::timeoutOf($http));
     }
 
+    /**
+     * The timeout must track the budget at request time, not at construction time: the metadata pass
+     * runs between createHttp() and the GitHub round, so a value frozen at construction would let the
+     * GitHub round outlast the budget by a whole request timeout.
+     */
+    public function testTheGitHubRequestTimeoutFollowsTheDeadlineAsItDrains(): void
+    {
+        $readings = [0.0, 1.0, 4.5, 4.5];
+        $now = static function () use (&$readings): float {
+            return \count($readings) > 1 ? array_shift($readings) : $readings[0];
+        };
+        $lockrot = LockrotConfig::fromSources([], [], [], '8.4.0', null);
+        $http = ServiceFactory::createHttp(new NullIO(), $this->configWithTempCache(), $lockrot, Clock::fixed(self::NOW), Deadline::inSeconds(5.0, $now));
+
+        self::assertSame(4, self::timeoutOf($http), '1.0s gone -> 4.0s left');
+        self::assertSame(1, self::timeoutOf($http), '4.5s gone -> 0.5s left, rounded up to the 1s floor');
+    }
+
     public function testWithoutADeadlineTheDefaultRequestTimeoutIsUsed(): void
     {
         $lockrot = LockrotConfig::fromSources([], [], [], '8.4.0', null);

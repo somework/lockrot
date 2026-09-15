@@ -66,11 +66,23 @@ final class LockrotConfig
             ($cli['offline'] ?? null) === true,
             ($cli['strict-network'] ?? null) === true,
             $format,
-            ($env['LOCKROT_DISABLE'] ?? null) === '1' || ($env['LOCKROT_DISABLE'] ?? null) === 'true',
+            self::isDisabledByEnvironment($env),
             self::resolveInstallTime($extra),
             ($extra['install-time-strict'] ?? false) === true,
             Thresholds::fromArray($extra)
         );
+    }
+
+    /**
+     * LOCKROT_DISABLE=1 (or `true`) silences all of lockrot for one command. Exposed on its own so
+     * the install-time hook can honour it before it parses `extra.lockrot` at all — otherwise a
+     * malformed config would still print a "check skipped" line on every install.
+     *
+     * @param array<string, mixed> $env
+     */
+    public static function isDisabledByEnvironment(array $env): bool
+    {
+        return ($env['LOCKROT_DISABLE'] ?? null) === '1' || ($env['LOCKROT_DISABLE'] ?? null) === 'true';
     }
 
     /**

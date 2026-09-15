@@ -194,9 +194,13 @@ Package operations: 4 installs, 0 updates, 0 removals
   `composer install`. A package whose metadata was never requested is reported as
   `not checked: install-time budget exhausted`, and a skipped GitHub round adds the note
   `repository activity not checked: install-time budget exhausted`; both reach you through the block
-  above. In practice `composer require`/`update` is served from the metadata Composer has just
-  fetched for the same packages, in the same process; only a cold `composer install` from an
-  existing lock starts from nothing.
+  above. `composer require`/`update` of a few packages is served from the metadata Composer has
+  just fetched for the same packages, in the same process, and fits comfortably. A `composer install`
+  into an empty `vendor/` on a large lock — a fresh clone, a CI job — is the case that does not: from
+  about 150 packages the budget runs out before every package is checked (a 200-package lock checks
+  roughly 140–170 of them in 5 seconds, cold or warm, because Composer revalidates its metadata
+  cache in sequential batches), and the block then says how many were not checked rather than
+  reading as clean.
 - **Never fails the install.** A failed lookup — an unreachable repository, an exhausted budget — is
   reported, not raised: it is data lockrot did not get, not a reason to stop. Only an error lockrot
   cannot interpret at all (a malformed `extra.lockrot`, an unreadable `composer.lock`, a bug in

@@ -53,8 +53,9 @@ final class ServiceFactory
      * GitHub activity only: repository metadata now goes through Composer's own repository layer
      * (RepositoryMetadataLoader), which has its own cache via Composer's HttpDownloader.
      *
-     * A deadline shortens the per-request timeout of the GitHub calls to what is left of the budget,
-     * so a single slow response cannot outlast it. The repository half cannot be bounded the same
+     * A deadline shortens the per-request timeout of the GitHub calls to what is left of the budget
+     * at the moment the calls are issued ({@see ComposerHttpClient::timeoutSeconds()}), so a single
+     * slow response cannot outlast it. The repository half cannot be bounded the same
      * way: those requests are issued by the project's own ComposerRepository instances through the
      * HttpDownloader Composer built for them, whose timeouts lockrot does not get to set — there,
      * the between-chunk deadline check in RepositoryMetadataLoader is the only bound.
@@ -62,11 +63,8 @@ final class ServiceFactory
     public static function createHttp(IOInterface $io, Config $config, LockrotConfig $lockrot, Clock $clock, ?Deadline $deadline = null): CachingHttpClient
     {
         $downloader = Factory::createHttpDownloader($io, $config);
-        $timeout = $deadline === null || $deadline->isNever()
-            ? ComposerHttpClient::DEFAULT_TIMEOUT
-            : max(1, (int) ceil($deadline->remainingSeconds()));
 
-        return new CachingHttpClient(new ComposerHttpClient($downloader, $clock, $timeout), self::createCache($io, $config), GitHubClient::CACHE_TTL, $clock, $lockrot->offline());
+        return new CachingHttpClient(new ComposerHttpClient($downloader, $clock, $deadline), self::createCache($io, $config), GitHubClient::CACHE_TTL, $clock, $lockrot->offline());
     }
 
     /**

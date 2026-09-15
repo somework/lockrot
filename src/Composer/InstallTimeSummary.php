@@ -72,6 +72,11 @@ final class InstallTimeSummary
     private function run(InstallerEvent $event): void
     {
         $env = getenv();
+        if (LockrotConfig::isDisabledByEnvironment($env)) {
+            // Before reading extra.lockrot: LOCKROT_DISABLE must silence even the "check skipped"
+            // line a malformed config would otherwise produce on every install.
+            return;
+        }
         $composerFile = Factory::getComposerFile();
         $project = ProjectConfig::fromFile($composerFile);
         $lockrot = LockrotConfig::fromSources($project->lockrotExtra(), $env, [], \PHP_VERSION, $project->platformPhp());
@@ -92,7 +97,10 @@ final class InstallTimeSummary
         // (Installer::doUpdate() writes it at 2.10.3 :681 / 2.2.25 :575 and only then calls
         // doInstall(), which dispatches this event at 2.10.3 :838 / 2.2.25 :723), so the file on
         // disk is the post-transaction state and is the right chain source. A project with no lock
-        // at all falls back to the transaction itself.
+        // at all falls back to the transaction itself. Known limit: `--dry-run` writes no lock
+        // (Installer::doUpdate() guards the write with writeLock && executeOperations, 2.10.3 :679),
+        // so there the chain source is the pre-transaction lock and a package new to the graph shows
+        // no `via` chain; signals and verdicts are unaffected.
         $lockPath = Factory::getLockFile($composerFile);
         $lock = is_file($lockPath) ? LockFile::fromFile($lockPath) : LockFile::fromPackages($packages);
 

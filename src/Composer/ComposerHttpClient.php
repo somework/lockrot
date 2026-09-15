@@ -11,6 +11,7 @@ use Composer\Util\Loop;
 use Lockrot\Clock;
 use Lockrot\Data\Http\HttpClientInterface;
 use Lockrot\Data\Http\HttpResult;
+use Lockrot\Deadline;
 
 /**
  * Parallel HTTP through Composer's HttpDownloader (curl multi when available).
@@ -31,26 +32,36 @@ final class ComposerHttpClient implements HttpClientInterface
 
     private HttpDownloader $downloader;
     private Clock $clock;
-    private int $timeout;
+    private Deadline $deadline;
 
-    public function __construct(HttpDownloader $downloader, Clock $clock, int $timeoutSeconds = self::DEFAULT_TIMEOUT)
+    /** @param ?Deadline $deadline install-time budget; null (and a never-expiring deadline) keeps {@see DEFAULT_TIMEOUT} */
+    public function __construct(HttpDownloader $downloader, Clock $clock, ?Deadline $deadline = null)
     {
         $this->downloader = (new Loop($downloader))->getHttpDownloader();
         $this->clock = $clock;
-        $this->timeout = $timeoutSeconds;
+        $this->deadline = $deadline ?? Deadline::never();
     }
 
-    /** The per-request timeout this client was configured with; shortened to the remaining install-time budget by {@see ServiceFactory::createHttp()}. */
+    /**
+     * The per-request timeout for the next fetchAll(): the default, or what is left of the
+     * install-time budget at this moment (never below one second). Computed at request time rather
+     * than at construction because the repository-metadata pass runs in between — a value frozen
+     * when the client was built would let the GitHub round outlast the budget by a whole timeout.
+     */
     public function timeoutSeconds(): int
     {
-        return $this->timeout;
+        if ($this->deadline->isNever()) {
+            return self::DEFAULT_TIMEOUT;
+        }
+
+        return max(1, (int) ceil($this->deadline->remainingSeconds()));
     }
 
     public function fetchAll(array $urls, array $headers = []): array
     {
         /** @var array<string, HttpResult> $results */
         $results = [];
-        $options = ['http' => ['timeout' => $this->timeout, 'header' => $headers], 'retry-auth-failure' => false];
+        $options = ['http' => ['timeout' => $this->timeoutSeconds(), 'header' => $headers], 'retry-auth-failure' => false];
         foreach (array_unique($urls) as $url) {
             $promise = $this->downloader->add($url, $options);
             $promise->then(

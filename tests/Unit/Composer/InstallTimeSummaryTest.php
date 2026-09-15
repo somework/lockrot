@@ -268,6 +268,23 @@ final class InstallTimeSummaryTest extends TestCase
         self::assertSame('', $io->getOutput());
     }
 
+    /** LOCKROT_DISABLE promises to silence all of lockrot — including the "check skipped" line a malformed extra.lockrot would otherwise print on every install. */
+    public function testLockrotDisableAlsoSilencesAMalformedConfig(): void
+    {
+        $this->project(['fail-on' => 'dead']);
+        $io = new BufferIO();
+        $event = $this->event($io, new Transaction([], [$this->loadPackage(self::PHPZIP)]));
+
+        putenv('LOCKROT_DISABLE=1');
+        try {
+            (new InstallTimeSummary($this->analyzerFactory()))->onPreOperationsExec($event);
+        } finally {
+            putenv('LOCKROT_DISABLE');
+        }
+
+        self::assertSame('', $io->getOutput());
+    }
+
     public function testInstallTimeOffSilencesTheSummaryCompletely(): void
     {
         $this->project(['install-time' => 'off']);
