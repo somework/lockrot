@@ -20,8 +20,8 @@ promise a PHP version they were never tested against.**
     composer lockrot --target-php=8.4
     ```
 
-    Adds one dev dependency and one command. It also prints a short summary after
-    `composer install` and `composer update` — see
+    Adds one dev dependency and one command. It also prints a short summary during
+    `composer require`, `update` and `install`, above the operations list — see
     [Install-time summary](install-time.md).
 
 === "PHAR"
@@ -118,7 +118,7 @@ GitHub Actions, GitLab CI and PR comments are in [In CI](ci.md); a
 | [Configuration](configuration.md) | `extra.lockrot`, every option, and the command-line flags |
 | [In CI](ci.md) | GitHub Actions, GitLab CI, SARIF, PR comments |
 | [Baseline](baseline.md) | Accept today's findings, fail on new and worsened ones |
-| [Install-time summary](install-time.md) | What the plugin prints after `install` and `update`, and how to silence it |
+| [Install-time summary](install-time.md) | What the plugin prints during `install`/`update`, and how to silence it |
 | [PHAR and self-update](phar.md) | Verified download, `self-update`, the global-plugin alternative |
 | [Example run](example-run.md) | The full 200-package report the sample above is cut from |
 | [How it fetches metadata](internals.md) | Composer repositories, the GitHub API, caching, `--offline` |
