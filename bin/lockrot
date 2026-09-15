@@ -3,11 +3,11 @@
 
 declare(strict_types=1);
 
-// 70205 is composer/composer's own floor ("php": "^7.2.5 || ^8.0"), not lockrot's: the PHAR bundles
-// Composer, so it can only run where the bundled Composer runs. The PHAR itself is built against
-// platform PHP 7.4.0 (build/phar/composer.json) to match the plugin's floor.
-if (\PHP_VERSION_ID < 70205) {
-    fwrite(\STDERR, "lockrot.phar requires PHP 7.2.5 or newer\n");
+// The same floor as the plugin ("php": "^7.4 || ^8.0" in composer.json) and as the PHAR's own
+// requirement check (it is built against platform PHP 7.4.0, see build/phar/composer.json), so a
+// checkout run on an older PHP fails the same way the PHAR does, with one line instead of a parse error.
+if (\PHP_VERSION_ID < 70400) {
+    fwrite(\STDERR, "lockrot requires PHP 7.4 or newer\n");
     exit(2);
 }
 

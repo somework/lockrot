@@ -54,7 +54,7 @@ sha256sum -c lockrot.phar.sha256   # shasum -a 256 -c on macOS
 ## First run
 
 ```bash
-composer rot --target-php=8.4
+composer lockrot --target-php=8.4
 ```
 
 ```text
