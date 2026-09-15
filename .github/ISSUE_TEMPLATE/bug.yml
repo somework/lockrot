@@ -1,0 +1,65 @@
+name: Bug report
+description: Something lockrot reported wrongly, or a crash
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened, and what did you expect instead?
+    validations:
+      required: true
+
+  - type: input
+    id: lockrot-version
+    attributes:
+      label: lockrot version
+      description: "`composer show somework/lockrot` for the plugin, `php lockrot.phar --version` for the PHAR"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: how-run
+    attributes:
+      label: How are you running it?
+      options:
+        - Composer plugin (composer lockrot)
+        - Standalone PHAR
+        - Install-time summary
+    validations:
+      required: true
+
+  - type: input
+    id: command
+    attributes:
+      label: The command you ran
+      description: The whole line, with every option
+      placeholder: composer lockrot --format=json --fail-on=high
+    validations:
+      required: true
+
+  - type: input
+    id: composer-version
+    attributes:
+      label: Composer version
+      description: Output of `composer -V`
+    validations:
+      required: true
+
+  - type: input
+    id: php-version
+    attributes:
+      label: PHP version
+      description: Output of `php -v` (first line)
+    validations:
+      required: true
+
+  - type: textarea
+    id: json-output
+    attributes:
+      label: JSON output
+      description: >
+        The relevant part of `composer lockrot --format=json` (or
+        `php lockrot.phar --format=json`). Redact package names if you need to.
+      render: json
+    validations:
+      required: false

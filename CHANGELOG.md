@@ -1,19 +1,38 @@
 # Changelog
 
-## Unreleased
+All notable changes to this project are documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+### Added
 
 - Every finding now carries a **priority** next to its verdict: `critical`, `high`, `medium`, `low`,
   or `none` for a package the report does not flag. The verdict sets a base level — `abandoned` and
   `silent` start at `critical`, `pinned` and `old-promise` at `high`, `stale` at `medium` — which
   drops one step for a transitive package and one more for a development-only one, never below
   `low`. A package nothing in the project reaches counts as transitive.
-- The report is ordered by priority first, then verdict severity, then direct dependencies ahead of
-  transitive ones, then package name. The install-time summary shows the same order, so its 10-line
-  budget now goes to the packages that apply most directly to the project.
 - `--format=json`: each finding gains `priority`, `direct` and `dev`, and the document gains a
   `priorities` object with all five counts next to `counts`. These are additions, so the `schema`
   number stays `1`.
 - The exit code, `--fail-on` and the baseline are unchanged and still read the verdict alone.
+- Every remaining format now names the priority next to the verdict, always as
+  `<verdict> (<priority>)`. `--format=github` puts it in each annotation's title
+  (`lockrot: abandoned (critical)`); `--format=gitlab` opens each issue's description with it;
+  `--format=markdown` gains a `Priority` first column; and `--format=sarif` carries each result's
+  priority as `rank` — the 0.0–100.0 number SARIF 2.1.0 defines for it, `critical` being `100.0` —
+  alongside `properties.priority`, `properties.direct` and `properties.dev`.
+- Nothing that decides an outcome reads the priority: the annotation level, the GitLab severity and
+  fingerprint, and the SARIF `ruleId` and `level` all still follow the verdict alone, and the SARIF
+  document still validates against the official 2.1.0 schema.
+
+### Changed
+
+- The report is ordered by priority first, then verdict severity, then direct dependencies ahead of
+  transitive ones, then package name. The install-time summary shows the same order, so its 10-line
+  budget now goes to the packages that apply most directly to the project.
 - The default `table` format is now a width-aware list grouped by priority instead of a five-column
   box table that only read on a very wide terminal. Groups come highest priority first, headed by
   their level and count (`not flagged (N)` for the rows `--all` adds); each finding takes one line
@@ -25,19 +44,20 @@
   machine formats are unchanged.
 - The terminal width is taken from `COLUMNS` when it is set, otherwise from the console itself,
   falling back to 120 columns and never going below 40.
+- The evidence for the `abandoned` verdict now reads `marked abandoned by its repository` or
+  `marked abandoned in composer.lock`, and the SARIF rule description says the same, so *flagged*
+  carries one meaning across lockrot's output: a finding lockrot itself raised.
+- Package metadata and community files for the first Packagist release: a `description` and
+  `keywords` written for search, a `homepage`, `support.docs` and `support.security`, plus
+  `SECURITY.md`, `CONTRIBUTING.md`, issue and pull-request templates, and a Dependabot
+  configuration.
+
+### Fixed
+
 - `--format=json`, `sarif`, `gitlab`, `github` and `markdown` are now written raw, so a `<` in a
   constraint or a package name reaches the parser on the other end exactly as lockrot produced it.
-- Every remaining format now names the priority next to the verdict, always as
-  `<verdict> (<priority>)`. `--format=github` puts it in each annotation's title
-  (`lockrot: abandoned (critical)`); `--format=gitlab` opens each issue's description with it;
-  `--format=markdown` gains a `Priority` first column; and `--format=sarif` carries each result's
-  priority as `rank` — the 0.0–100.0 number SARIF 2.1.0 defines for it, `critical` being `100.0` —
-  alongside `properties.priority`, `properties.direct` and `properties.dev`.
-- Nothing that decides an outcome reads the priority: the annotation level, the GitLab severity and
-  fingerprint, and the SARIF `ruleId` and `level` all still follow the verdict alone, and the SARIF
-  document still validates against the official 2.1.0 schema.
 
-## 0.1.0 (2026-09-15)
+## [0.1.0] - 2026-09-15
 
 - `composer lockrot` (alias `composer rot`) command reporting dependency rot in `composer.lock`.
 - Signals S1–S6: abandoned flag, no stable release, repository archived, no repository push,
@@ -138,3 +158,6 @@
   stderr are skipped.
 - The "GitHub token not set" note counts packages whose repository activity was checked, not
   distinct repositories, so packages sharing one repository are no longer under-reported.
+
+[Unreleased]: https://github.com/somework/lockrot/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/somework/lockrot/releases/tag/v0.1.0

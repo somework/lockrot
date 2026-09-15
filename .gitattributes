@@ -8,6 +8,7 @@
 /phpstan*.neon.dist export-ignore
 /.php-cs-fixer.dist.php export-ignore
 /infection.json5 export-ignore
+/composer-require-checker.json export-ignore
 /.editorconfig export-ignore
 /.gitattributes export-ignore
 /bin/record-fixtures export-ignore

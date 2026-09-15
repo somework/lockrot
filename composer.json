@@ -1,16 +1,36 @@
 {
     "name": "somework/lockrot",
-    "description": "Shows dependency rot in composer.lock: abandoned, silent, pinned and old-promise packages.",
+    "description": "Finds abandoned, unmaintained and branch-pinned packages in composer.lock. Composer plugin and standalone PHAR with CI exit codes.",
     "type": "composer-plugin",
     "license": "MIT",
-    "keywords": ["composer", "plugin", "dependencies", "maintenance", "abandoned"],
-    "homepage": "https://github.com/somework/lockrot",
+    "keywords": [
+        "composer",
+        "composer-plugin",
+        "dependencies",
+        "dependency-management",
+        "abandoned",
+        "unmaintained",
+        "maintenance",
+        "stale",
+        "audit",
+        "dependency-rot",
+        "supply-chain",
+        "ci",
+        "sarif"
+    ],
+    "homepage": "https://lockrot.dev",
     "authors": [
-        {"name": "Igor Pinchuk", "email": "i.pinchuk.personal@gmail.com"}
+        {
+            "name": "Igor Pinchuk",
+            "email": "i.pinchuk.work@gmail.com",
+            "homepage": "https://github.com/somework"
+        }
     ],
     "support": {
         "issues": "https://github.com/somework/lockrot/issues",
-        "source": "https://github.com/somework/lockrot"
+        "source": "https://github.com/somework/lockrot",
+        "docs": "https://lockrot.dev/",
+        "security": "https://github.com/somework/lockrot/security/policy"
     },
     "require": {
         "php": "^7.4 || ^8.0",
