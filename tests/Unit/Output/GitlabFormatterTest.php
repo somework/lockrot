@@ -103,7 +103,7 @@ final class GitlabFormatterTest extends TestCase
         $first = $issues[0];
         self::assertSame('issue', $first['type']);
         self::assertSame('lockrot/abandoned', $first['check_name']);
-        self::assertSame('acme/abandoned 1.0.0: flagged abandoned by its repository', $first['description']);
+        self::assertSame('acme/abandoned 1.0.0 — abandoned (critical): flagged abandoned by its repository', $first['description']);
         self::assertSame(['Bug Risk'], $first['categories']);
         self::assertSame('major', $first['severity']);
         self::assertSame(hash('sha256', 'lockrot|acme/abandoned|abandoned'), $first['fingerprint']);
@@ -111,7 +111,7 @@ final class GitlabFormatterTest extends TestCase
         self::assertSame(4, JsonPath::intAt($first, ['location', 'lines', 'begin']));
 
         $second = $issues[1];
-        self::assertSame('acme/silent 2.0.8: last release 2015-11-16 (10.8 years ago) (via a/parent)', $second['description']);
+        self::assertSame('acme/silent 2.0.8 — silent (high): last release 2015-11-16 (10.8 years ago) (via a/parent)', $second['description']);
         self::assertSame(8, JsonPath::intAt($second, ['location', 'lines', 'begin']));
     }
 
@@ -242,6 +242,37 @@ final class GitlabFormatterTest extends TestCase
         self::assertSame('lockrot/ok', $issues[3]['check_name']);
     }
 
+    /**
+     * Code Quality has no title field of its own, so the description carries the same
+     * `<verdict> (<priority>)` phrase the GitHub annotation title does. Severity and fingerprint are
+     * untouched by it: both still follow the verdict alone.
+     */
+    public function testTheDescriptionNamesThePriority(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $report = new Report([
+            new Finding('acme/abandoned', '1.0.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'flagged abandoned by its repository')], ['acme/abandoned'], null, $at),
+            // Transitive and development-only: two steps below critical.
+            new Finding('acme/silent', '2.0.8', Verdict::ABANDONED, [new Signal('S1', 'high', 'flagged abandoned by its repository')], ['a/parent', 'acme/silent'], null, $at, null, true),
+            new Finding('acme/fine', '4.0.0', Verdict::OK, [], ['acme/fine'], null, $at),
+        ], [], $at, 3, 0, false);
+
+        $issues = $this->decode($this->formatter(LockrotConfig::FAIL_ON_NONE, null)->format($report, true));
+
+        self::assertSame([
+            'acme/abandoned 1.0.0 — abandoned (critical): flagged abandoned by its repository',
+            'acme/silent 2.0.8 — abandoned (medium): flagged abandoned by its repository (via a/parent)',
+            'acme/fine 4.0.0 — ok (none)',
+        ], array_column($issues, 'description'));
+
+        self::assertSame(['minor', 'minor', 'info'], array_column($issues, 'severity'), 'severity still follows the verdict and fail-on');
+        self::assertSame(
+            hash('sha256', 'lockrot|acme/abandoned|abandoned'),
+            $issues[0]['fingerprint'],
+            'the priority must not enter the issue identity'
+        );
+    }
+
     public function testUnflaggedRowsAreOmittedWithoutShowAll(): void
     {
         $issues = $this->decode($this->formatter(Verdict::SILENT, $this->lockPath())->format($this->report()));
@@ -258,7 +289,7 @@ final class GitlabFormatterTest extends TestCase
 
         $issues = $this->decode($this->formatter(Verdict::SILENT, $this->lockPath())->format($report, true));
 
-        self::assertSame('acme/abandoned 1.0.0: allowlisted: interfaces', $issues[0]['description']);
+        self::assertSame('acme/abandoned 1.0.0 — finished (none): allowlisted: interfaces', $issues[0]['description']);
     }
 
     /** Report notes are not representable in this format and must never leak into an issue's fields. */

@@ -8,6 +8,7 @@ use Lockrot\Analyzer\Report;
 use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Lock\LockLineIndex;
 use Lockrot\Verdict\Finding;
+use Lockrot\Verdict\Priority;
 use Lockrot\Verdict\Verdict;
 
 /**
@@ -18,7 +19,13 @@ use Lockrot\Verdict\Verdict;
  * One run, one rule per verdict actually present in the report, one result per finding, each
  * located on the `"name"` line of the package's composer.lock entry. The document is validated
  * against the official schema in SarifFormatterTest; `results` keeps the report's own
- * severity-then-name order so two runs over the same lock produce byte-identical output.
+ * priority-then-severity-then-name order so two runs over the same lock produce byte-identical
+ * output.
+ *
+ * A result carries the priority twice, for the two ways a consumer reads it: as `rank`, the numeric
+ * field SARIF defines for exactly this, and as `properties.priority` next to `properties.direct`
+ * and `properties.dev`, the two facts it is derived from. `ruleId` and `level` stay on the verdict,
+ * so a code-scanning alert's rule and severity are unchanged by it.
  */
 final class SarifFormatter implements FormatterInterface
 {
@@ -27,6 +34,13 @@ final class SarifFormatter implements FormatterInterface
     private const HELP_URI = 'https://github.com/somework/lockrot#what-the-verdicts-mean';
     private const ARTIFACT_URI = 'composer.lock';
     private const URI_BASE_ID = '%SRCROOT%';
+
+    /**
+     * SARIF 2.1.0 §3.27.20 types `result.rank` as a number from 0.0 to 100.0. The five priority
+     * levels are evenly spaced over it, so `none` is 0.0 and `critical` 100.0 and a consumer that
+     * sorts by rank reads the report in the order lockrot prints it.
+     */
+    private const RANK_STEP = 25.0;
 
     /**
      * The README's "What the verdicts mean" table, as {short, full} per verdict. Kept in the same
@@ -151,6 +165,9 @@ final class SarifFormatter implements FormatterInterface
             'package' => $finding->package(),
             'version' => $finding->version(),
             'verdict' => $finding->verdict(),
+            'priority' => $finding->priority(),
+            'direct' => $finding->isDirect(),
+            'dev' => $finding->isDev(),
             'signals' => $signals,
             'chain' => $finding->chain(),
             'data_date' => $dataDate === null ? null : $dataDate->format(\DATE_ATOM),
@@ -166,6 +183,7 @@ final class SarifFormatter implements FormatterInterface
             'ruleId' => 'lockrot/'.$finding->verdict(),
             'ruleIndex' => $ruleIndex,
             'level' => $this->context->levelOf($finding, $baseline),
+            'rank' => Priority::rank($finding->priority()) * self::RANK_STEP,
             'message' => ['text' => $this->message($finding)],
             'locations' => [['physicalLocation' => $physicalLocation]],
             // The package name alone identifies a finding across runs: one result per package, and
@@ -236,7 +254,9 @@ final class SarifFormatter implements FormatterInterface
     /** @param array<string, mixed> $document */
     private static function encode(array $document): string
     {
-        $json = json_encode($document, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES);
+        // PRESERVE_ZERO_FRACTION keeps `rank` a JSON number with a fraction — 100.0, not 100 — so a
+        // consumer that distinguishes the two reads every rank as the float SARIF types it as.
+        $json = json_encode($document, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_PRESERVE_ZERO_FRACTION);
         // Everything above is scalars, lists and string-keyed arrays built from Report data, so this
         // is unreachable in practice; guarded explicitly so a future encoding failure fails loudly
         // instead of silently emitting the string "false" (same guard as JsonFormatter).

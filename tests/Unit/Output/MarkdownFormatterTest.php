@@ -43,10 +43,34 @@ final class MarkdownFormatterTest extends TestCase
         $out = $this->formatter()->format($this->report());
 
         self::assertStringContainsString('### lockrot: dependency rot in 2 of 3 packages', $out);
-        self::assertStringContainsString('| Package | Version | Verdict | Evidence | Via |', $out);
-        self::assertStringContainsString('|---|---|---|---|---|', $out);
-        self::assertStringContainsString('| `doctrine/cache` | 1.13.0 |', $out);
+        self::assertStringContainsString('| Priority | Package | Version | Verdict | Evidence | Via |', $out);
+        self::assertStringContainsString('|---|---|---|---|---|---|', $out);
+        self::assertStringContainsString('| critical | `doctrine/cache` | 1.13.0 |', $out);
         self::assertStringNotContainsString('vendor/ok', $out);
+    }
+
+    /**
+     * Priority leads the row, so a reviewer scanning the comment reads the rows that apply most to
+     * the project first — the table keeps the report's own order, which is by priority.
+     */
+    public function testPriorityIsTheFirstColumn(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $report = new Report([
+            new Finding('doctrine/cache', '1.13.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'flagged abandoned by its repository')], ['doctrine/cache'], null, $at),
+            // Transitive and development-only: two steps below critical.
+            new Finding('acme/dev-only', '2.0.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'flagged abandoned by its repository')], ['a/parent', 'acme/dev-only'], null, $at, null, true),
+            new Finding('vendor/ok', '1.0.0', Verdict::OK, [], ['vendor/ok'], null, $at),
+        ], [], $at, 3, 0, false);
+
+        $lines = explode("\n", trim($this->formatter(Verdict::SILENT)->format($report, true)));
+        $rows = array_values(array_filter($lines, static fn (string $line): bool => strpos($line, '` |') !== false));
+
+        self::assertSame([
+            '| critical | `doctrine/cache` | 1.13.0 | **abandoned** | flagged abandoned by its repository | direct |',
+            '| medium | `acme/dev-only` | 2.0.0 | **abandoned** | flagged abandoned by its repository | a/parent |',
+            '| none | `vendor/ok` | 1.0.0 | ok |  | direct |',
+        ], $rows);
     }
 
     public function testZeroFlaggedHeadingHasNoTable(): void

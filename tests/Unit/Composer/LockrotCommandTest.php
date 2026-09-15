@@ -354,7 +354,7 @@ final class LockrotCommandTest extends TestCase
         $lines = explode("\n", trim($display));
 
         self::assertSame(1, $code, $display);
-        self::assertMatchesRegularExpression('{^::error file=composer\.lock,line=\d+,title=lockrot%3A abandoned::}', $lines[0]);
+        self::assertMatchesRegularExpression('{^::error file=composer\.lock,line=\d+,title=lockrot%3A abandoned \(critical\)::}', $lines[0]);
         self::assertStringContainsString('phpzip/phpzip', $display);
         self::assertStringStartsWith('200 packages checked · abandoned 19 · ', $lines[\count($lines) - 1]);
     }

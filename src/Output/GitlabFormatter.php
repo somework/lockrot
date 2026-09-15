@@ -33,7 +33,9 @@ use Lockrot\Verdict\Finding;
  * The fingerprint is `sha256("lockrot|<package>|<verdict>")`: stable across machines and runs, and
  * deliberately excludes the line number and version, so a version bump that keeps the same verdict
  * — or a reformatted composer.lock that moves the entry to a different line — keeps the same GitLab
- * issue identity instead of appearing as a new one.
+ * issue identity instead of appearing as a new one. The priority is deliberately not part of it:
+ * a package that moves from a `require` to a `require-dev` would otherwise open a second issue for
+ * a finding GitLab already tracks.
  */
 final class GitlabFormatter implements FormatterInterface
 {
@@ -99,7 +101,10 @@ final class GitlabFormatter implements FormatterInterface
             $evidence = ($evidence === '' ? '' : $evidence.'; ').'allowlisted: '.$finding->allowlistReason();
         }
 
-        $message = $finding->package().' '.$finding->version();
+        // Code Quality has no title field of its own, so the verdict and priority ride in the
+        // description — the same `<verdict> (<priority>)` phrase the GitHub annotation title uses.
+        $message = $finding->package().' '.$finding->version()
+            .' — '.$finding->verdict().' ('.$finding->priority().')';
         if ($evidence !== '') {
             $message .= ': '.$evidence;
         }

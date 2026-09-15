@@ -25,6 +25,15 @@
   falling back to 120 columns and never going below 40.
 - `--format=json`, `sarif`, `gitlab`, `github` and `markdown` are now written raw, so a `<` in a
   constraint or a package name reaches the parser on the other end exactly as lockrot produced it.
+- Every remaining format now names the priority next to the verdict, always as
+  `<verdict> (<priority>)`. `--format=github` puts it in each annotation's title
+  (`lockrot: abandoned (critical)`); `--format=gitlab` opens each issue's description with it;
+  `--format=markdown` gains a `Priority` first column; and `--format=sarif` carries each result's
+  priority as `rank` — the 0.0–100.0 number SARIF 2.1.0 defines for it, `critical` being `100.0` —
+  alongside `properties.priority`, `properties.direct` and `properties.dev`.
+- Nothing that decides an outcome reads the priority: the annotation level, the GitLab severity and
+  fingerprint, and the SARIF `ruleId` and `level` all still follow the verdict alone, and the SARIF
+  document still validates against the official 2.1.0 schema.
 
 ## 0.1.0 (2026-09-15)
 

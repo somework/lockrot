@@ -91,18 +91,41 @@ final class GithubFormatterTest extends TestCase
         $out = $this->formatter(Verdict::SILENT, $this->lockPath())->format($this->report(), true);
         $lines = explode("\n", trim($out));
 
-        self::assertSame('::error file=composer.lock,line=4,title=lockrot%3A abandoned::acme/abandoned 1.0.0: flagged abandoned by its repository', $lines[0]);
-        self::assertSame('::error file=composer.lock,line=8,title=lockrot%3A silent::acme/silent 2.0.8: last release 2015-11-16 (10.8 years ago) (via a/parent)', $lines[1]);
-        self::assertSame('::warning file=composer.lock,title=lockrot%3A stale::acme/absent 3.0.0: last release 2022-05-20 (4.3 years ago)', $lines[2]);
-        self::assertSame('::notice file=composer.lock,title=lockrot%3A ok::acme/fine 4.0.0', $lines[3]);
+        self::assertSame('::error file=composer.lock,line=4,title=lockrot%3A abandoned (critical)::acme/abandoned 1.0.0: flagged abandoned by its repository', $lines[0]);
+        self::assertSame('::error file=composer.lock,line=8,title=lockrot%3A silent (high)::acme/silent 2.0.8: last release 2015-11-16 (10.8 years ago) (via a/parent)', $lines[1]);
+        self::assertSame('::warning file=composer.lock,title=lockrot%3A stale (medium)::acme/absent 3.0.0: last release 2022-05-20 (4.3 years ago)', $lines[2]);
+        self::assertSame('::notice file=composer.lock,title=lockrot%3A ok (none)::acme/fine 4.0.0', $lines[3]);
+    }
+
+    /**
+     * The title carries both axes: the verdict says what was observed, the priority how much it
+     * applies to this project. The level stays on the verdict alone, so a critical row below
+     * `--fail-on` is still only a warning.
+     */
+    public function testTheAnnotationTitleCarriesThePriority(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $report = new Report([
+            new Finding('acme/abandoned', '1.0.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'flagged abandoned by its repository')], ['acme/abandoned'], null, $at),
+            // Transitive and development-only: two steps below critical.
+            new Finding('acme/silent', '2.0.8', Verdict::ABANDONED, [new Signal('S1', 'high', 'flagged abandoned by its repository')], ['a/parent', 'acme/silent'], null, $at, null, true),
+            new Finding('acme/fine', '4.0.0', Verdict::OK, [], ['acme/fine'], null, $at),
+        ], [], $at, 3, 0, false);
+
+        $out = $this->formatter(LockrotConfig::FAIL_ON_NONE, null)->format($report, true);
+
+        self::assertStringContainsString('title=lockrot%3A abandoned (critical)::acme/abandoned', $out);
+        self::assertStringContainsString('title=lockrot%3A abandoned (medium)::acme/silent', $out);
+        self::assertStringContainsString('title=lockrot%3A ok (none)::acme/fine', $out);
+        self::assertStringNotContainsString('::error ', $out, 'the level still follows the verdict and fail-on, not the priority');
     }
 
     public function testFailOnNoneNeverProducesAnError(): void
     {
         $out = $this->formatter(LockrotConfig::FAIL_ON_NONE, $this->lockPath())->format($this->report());
         self::assertStringNotContainsString('::error ', $out);
-        self::assertStringContainsString('::warning file=composer.lock,line=4,title=lockrot%3A abandoned::', $out);
-        self::assertStringContainsString('::warning file=composer.lock,line=8,title=lockrot%3A silent::', $out);
+        self::assertStringContainsString('::warning file=composer.lock,line=4,title=lockrot%3A abandoned (critical)::', $out);
+        self::assertStringContainsString('::warning file=composer.lock,line=8,title=lockrot%3A silent (high)::', $out);
     }
 
     public function testUnflaggedRowsAreOmittedWithoutShowAll(): void
@@ -158,7 +181,7 @@ final class GithubFormatterTest extends TestCase
 
         // Message values escape % CR LF only; ":" and "," stay literal there.
         self::assertSame(
-            '::warning file=composer.lock,line=4,title=lockrot%3A stale::acme/abandoned 1.0.0: 100%25 behind, see http://x:8080, line 1%0Aline 2',
+            '::warning file=composer.lock,line=4,title=lockrot%3A stale (medium)::acme/abandoned 1.0.0: 100%25 behind, see http://x:8080, line 1%0Aline 2',
             $lines[0]
         );
         self::assertSame(
@@ -175,7 +198,7 @@ final class GithubFormatterTest extends TestCase
         ], [], $at, 1, 0, false);
 
         self::assertStringContainsString(
-            '::notice file=composer.lock,line=4,title=lockrot%3A finished::acme/abandoned 1.0.0: allowlisted: interfaces',
+            '::notice file=composer.lock,line=4,title=lockrot%3A finished (none)::acme/abandoned 1.0.0: allowlisted: interfaces',
             $this->formatter(Verdict::SILENT, $this->lockPath())->format($report, true)
         );
     }
@@ -184,7 +207,7 @@ final class GithubFormatterTest extends TestCase
     {
         $out = $this->formatter(Verdict::SILENT, null)->format($this->report());
         self::assertStringNotContainsString('line=', $out);
-        self::assertStringContainsString('file=composer.lock,title=lockrot%3A abandoned::', $out);
+        self::assertStringContainsString('file=composer.lock,title=lockrot%3A abandoned (critical)::', $out);
     }
 
     public function testWordingAvoidsBannedTerms(): void

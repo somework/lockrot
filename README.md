@@ -314,6 +314,13 @@ In `--format=json` each finding carries `priority`, `direct` and `dev`, and the 
 `priorities` object with all five counts next to `counts`. The JSON `schema` number stays `1` —
 these are additions, so anything already reading the document keeps working.
 
+Every other format names it too, always as `<verdict> (<priority>)`: `table` groups the findings
+under it, `github` puts it in each annotation's title, `gitlab` in each issue's description,
+`markdown` in a first `Priority` column, and `sarif` carries it both as the result's `rank`
+(0.0–100.0) and as `properties.priority`, `properties.direct` and `properties.dev`. Nothing that
+decides an outcome moved: the annotation level, the GitLab severity, the SARIF `ruleId` and `level`
+and the GitLab fingerprint all still read the verdict alone.
+
 ## Configuration
 
 All keys live under `extra.lockrot` in `composer.json`. CLI options win over environment
@@ -363,7 +370,7 @@ must be JSON integers (`3`, not `"3"`).
 
 | Option | Meaning |
 |---|---|
-| `--format=table\|json\|github\|sarif\|gitlab\|markdown` | Output format. `table` (the default) is a width-aware list grouped by priority, not a box table — see [One-command demo](#one-command-demo). `github` prints GitHub Actions workflow commands so findings become annotations on `composer.lock`; `sarif` prints a SARIF 2.1.0 document for `upload-sarif` — see [GitHub Actions](#github-actions). `gitlab` prints a GitLab Code Quality JSON report — see [GitLab CI](#gitlab-ci). `markdown` prints a PR-comment-shaped report — see [Posting a PR comment](#posting-a-pr-comment). The format changes the output only; the exit code is the same for all six |
+| `--format=table\|json\|github\|sarif\|gitlab\|markdown` | Output format. `table` (the default) is a width-aware list grouped by priority, not a box table — see [One-command demo](#one-command-demo). `github` prints GitHub Actions workflow commands so findings become annotations on `composer.lock`; `sarif` prints a SARIF 2.1.0 document for `upload-sarif` — see [GitHub Actions](#github-actions). `gitlab` prints a GitLab Code Quality JSON report — see [GitLab CI](#gitlab-ci). `markdown` prints a PR-comment-shaped report with `Priority` as its first column — see [Posting a PR comment](#posting-a-pr-comment). All six name the [priority](#priority) next to the verdict. The format changes the output only; the exit code is the same for all six |
 | `--fail-on=none\|abandoned\|silent\|pinned\|old-promise\|stale` | Exit-1 threshold for this run |
 | `--target-php=8.4` | PHP version for the S5 check |
 | `--dev` | Include `packages-dev`. A dev package is flagged the same way a prod one is, but it gets one priority step lower — see [Priority](#priority) |
@@ -549,8 +556,16 @@ one per finding, so every flagged package shows up as an annotation on its own l
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
+Each annotation's title is `lockrot: <verdict> (<priority>)`, e.g. `lockrot: abandoned (critical)`,
+so the [priority](#priority) is visible on the line itself:
+
+```text
+::error file=composer.lock,line=8010,title=lockrot%3A abandoned (critical)::sensio/framework-extra-bundle v6.2.10: flagged abandoned by its repository, replacement: Symfony
+```
+
 Findings at or above `--fail-on` are annotated as errors, everything else flagged as warnings, and
-the rows that only `--all` shows as notices — so the annotation colour matches the exit code. With a
+the rows that only `--all` shows as notices — so the annotation colour matches the exit code. The
+priority never changes that: a `critical` finding below `--fail-on` is still a warning. With a
 [baseline](#baseline) in place, findings it already carries drop to notices for the same reason.
 
 GitHub renders only a limited number of annotations per step, so on a large lock file the
@@ -585,6 +600,12 @@ are the same for every format (see [Exit codes](#exit-codes)); only the output c
 formats point at `composer.lock` in the checkout root, so run them from the directory that holds
 the lock file.
 
+Each SARIF result carries the [priority](#priority) as `rank`, the field SARIF 2.1.0 defines for
+it: `critical` is `100.0`, `high` `75.0`, `medium` `50.0`, `low` `25.0` and `none` `0.0`, so a
+consumer that sorts by rank reads the findings in the order lockrot prints them. The same result's
+`properties` carry `priority`, `direct` and `dev` by name. The rule a result points at and its
+`level` are unchanged and still follow the verdict.
+
 ### GitLab CI
 
 `--format=gitlab` prints a [GitLab Code
@@ -601,19 +622,40 @@ lockrot:
       codequality: lockrot-codequality.json
 ```
 
+Code Quality has no title field of its own, so each issue's description opens with the package, the
+version and the same `<verdict> (<priority>)` phrase the GitHub annotation title uses:
+
+```text
+sensio/framework-extra-bundle v6.2.10 — abandoned (critical): flagged abandoned by its repository, replacement: Symfony
+```
+
 Severity follows the same rule as the GitHub/SARIF level: a finding at or above `--fail-on` is
 `major`, any other flagged verdict `minor`, and a row only `--all` shows (or one a
 [baseline](#baseline) already knows) `info`. Each issue's fingerprint is a stable hash of the
 package name and verdict, so a version bump that keeps the same verdict — or a reformatted lock
-that moves the entry to a different line — keeps the same GitLab issue identity. `Report::notes()`
+that moves the entry to a different line — keeps the same GitLab issue identity. The priority is
+deliberately not part of it, so moving a package from `require` to `require-dev` does not open a
+second issue for a finding GitLab already tracks. `Report::notes()`
 has no field to carry a document-level note in this format, so notes are dropped here; use
 `--format=json` when you need them. The exit code is unchanged.
 
 ### Posting a PR comment
 
 `--format=markdown` prints a report shaped for a pull-request comment: a heading with the
-flagged/checked counts, a table of the findings, the report's notes as a bullet list, and a `<sub>`
-footer with the full summary. Post it with the GitHub CLI:
+flagged/checked counts, a table of the findings led by their [priority](#priority), the report's
+notes as a bullet list, and a `<sub>` footer with the full summary:
+
+```markdown
+| Priority | Package | Version | Verdict | Evidence | Via |
+|---|---|---|---|---|---|
+| critical | `sensio/framework-extra-bundle` | v6.2.10 | **abandoned** | flagged abandoned by its repository, replacement: Symfony; last release 2023-02-24 (3.6 years ago); … | direct |
+| high | `doctrine/annotations` | 2.0.2 | **abandoned** | flagged abandoned by its repository | sensio/framework-extra-bundle |
+| high | `friendsofsymfony/oauth-server-bundle` | dev-master | **pinned** | last release 2019-01-23 (7.6 years ago); pinned to branch snapshot dev-master | direct |
+```
+
+(The first row's evidence is abridged here; the real cell carries every signal.) The rows keep the
+report's order, so a reviewer reads down the first column and stops where the rows stop applying.
+Post it with the GitHub CLI:
 
 ```bash
 composer lockrot --format=markdown --fail-on=silent --target-php=8.4 > comment.md

@@ -25,6 +25,11 @@ use Lockrot\Verdict\Finding;
  *
  * `file=` is always the literal `composer.lock`: annotations are resolved against the checkout
  * root, so an absolute path from the runner's filesystem would not match a file in the diff.
+ *
+ * The title carries `lockrot: <verdict> (<priority>)` — the same phrase every other format uses
+ * where it names a verdict next to a finding (SPEC F5.2/F5.4). The command (`error`/`warning`/
+ * `notice`) is unchanged by the priority: it comes from FormatContext::levelOf(), so the colour of
+ * an annotation keeps matching the exit code.
  */
 final class GithubFormatter implements FormatterInterface
 {
@@ -72,7 +77,10 @@ final class GithubFormatter implements FormatterInterface
         if ($line !== null) {
             $properties[] = 'line='.$line;
         }
-        $properties[] = 'title='.self::escapeProperty('lockrot: '.$finding->verdict());
+        // Both axes in the one field GitHub shows above the annotation body: the verdict says what
+        // was observed, the priority how much it applies to this project. The command below stays on
+        // the verdict, so the annotation's colour still tracks the exit code.
+        $properties[] = 'title='.self::escapeProperty('lockrot: '.$finding->verdict().' ('.$finding->priority().')');
 
         return \sprintf(
             '::%s %s::%s',
