@@ -104,5 +104,32 @@ final class FormatContextTest extends TestCase
         self::assertNull($context->lockPath());
         self::assertSame(LockrotConfig::FAIL_ON_NONE, $context->failOn());
         self::assertSame(Version::STRING, $context->toolVersion());
+        self::assertSame(FormatContext::DEFAULT_WIDTH, $context->terminalWidth());
+    }
+
+    public function testTheTerminalWidthDefaultsToOneHundredAndTwenty(): void
+    {
+        self::assertSame(120, FormatContext::DEFAULT_WIDTH);
+        self::assertSame(
+            FormatContext::DEFAULT_WIDTH,
+            FormatContext::create(null, LockrotConfig::FAIL_ON_NONE, Version::STRING)->terminalWidth()
+        );
+    }
+
+    public function testTheTerminalWidthIsCarried(): void
+    {
+        self::assertSame(
+            72,
+            FormatContext::create(null, LockrotConfig::FAIL_ON_NONE, Version::STRING, 72)->terminalWidth()
+        );
+    }
+
+    public function testATerminalTooNarrowToRenderIntoIsClampedToTheMinimum(): void
+    {
+        self::assertSame(40, FormatContext::MIN_WIDTH);
+        self::assertSame(
+            FormatContext::MIN_WIDTH,
+            FormatContext::create(null, LockrotConfig::FAIL_ON_NONE, Version::STRING, 3)->terminalWidth()
+        );
     }
 }

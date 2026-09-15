@@ -39,13 +39,14 @@
         "JsonSchema\\Constraints\\BaseConstraint",
         "JsonSchema\\Validator",
         "Seld\\JsonLint\\ParsingException",
+        "Symfony\\Component\\Console\\Application",
         "Symfony\\Component\\Console\\Command\\Command",
-        "Symfony\\Component\\Console\\Helper\\Table",
+        "Symfony\\Component\\Console\\Formatter\\OutputFormatter",
         "Symfony\\Component\\Console\\Input\\InputInterface",
         "Symfony\\Component\\Console\\Input\\InputOption",
-        "Symfony\\Component\\Console\\Output\\BufferedOutput",
         "Symfony\\Component\\Console\\Output\\ConsoleOutputInterface",
-        "Symfony\\Component\\Console\\Output\\OutputInterface"
+        "Symfony\\Component\\Console\\Output\\OutputInterface",
+        "Symfony\\Component\\Console\\Terminal"
     ],
     "scan-files": ["bin/lockrot"]
 }

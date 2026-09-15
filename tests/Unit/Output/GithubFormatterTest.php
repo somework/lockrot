@@ -128,7 +128,7 @@ final class GithubFormatterTest extends TestCase
     public function testSummaryLineMatchesTheTableFormatter(): void
     {
         $github = explode("\n", trim($this->formatter(LockrotConfig::FAIL_ON_NONE, null)->format($this->report())));
-        $table = explode("\n", trim((new TableFormatter())->format($this->report())));
+        $table = explode("\n", trim((new TableFormatter(FormatContext::unknown()))->format($this->report())));
         $summary = array_values(array_filter($table, static fn (string $line): bool => strpos($line, ' packages checked') !== false));
 
         self::assertSame($summary[0], $github[\count($github) - 1]);

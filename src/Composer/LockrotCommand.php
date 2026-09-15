@@ -26,6 +26,7 @@ use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Output\FormatContext;
 use Lockrot\Output\Formatters;
+use Lockrot\Output\TerminalWidth;
 use Lockrot\Version;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -205,8 +206,17 @@ final class LockrotCommand extends BaseCommand
             // The annotation formats point back at the lock they were computed from; an unreadable
             // one throws ConfigException from here, which the catch below turns into exit 2 the
             // same way an unreadable lock does a few lines up.
-            $context = FormatContext::create($lockPath, $lockrot->failOn(), Version::STRING);
-            $output->write(Formatters::for($lockrot->format(), $context)->format($report, $input->getOption('all') === true));
+            $context = FormatContext::create($lockPath, $lockrot->failOn(), Version::STRING, TerminalWidth::detect($env, $this->getApplication()));
+            $format = $lockrot->format();
+            // Only `table` is meant to go through the tag formatter; every machine-readable format is
+            // written raw, so a `<` in a constraint or a package name reaches the parser on the other
+            // end untouched (OutputInterface::OUTPUT_RAW = 2 in symfony/console 5.4.47 and 2.8.52,
+            // Output/OutputInterface.php:30 in both).
+            $output->write(
+                Formatters::for($format, $context)->format($report, $input->getOption('all') === true),
+                false,
+                $format === 'table' ? OutputInterface::OUTPUT_NORMAL : OutputInterface::OUTPUT_RAW
+            );
 
             return Policy::exitCode($report, $lockrot);
         } catch (ConfigException $e) {

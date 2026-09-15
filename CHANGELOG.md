@@ -14,6 +14,17 @@
   `priorities` object with all five counts next to `counts`. These are additions, so the `schema`
   number stays `1`.
 - The exit code, `--fail-on` and the baseline are unchanged and still read the verdict alone.
+- The default `table` format is now a width-aware list grouped by priority instead of a five-column
+  box table that only read on a very wide terminal. Groups come highest priority first, headed by
+  their level and count (`not flagged (N)` for the rows `--all` adds); each finding takes one line
+  for its verdict, package, version and requirement chain and as many as it needs for its evidence,
+  wrapped to the terminal with continuation lines indented past the verdict column. Critical and
+  high rows are marked in red, medium in yellow. The format id, the summary block and the machine
+  formats are unchanged, and `priority: …` joins the summary right after the counts line.
+- The terminal width is taken from `COLUMNS` when it is set, otherwise from the console itself,
+  falling back to 120 columns and never going below 40.
+- `--format=json`, `sarif`, `gitlab`, `github` and `markdown` are now written raw, so a `<` in a
+  constraint or a package name reaches the parser on the other end exactly as lockrot produced it.
 
 ## 0.1.0 (2026-09-15)
 

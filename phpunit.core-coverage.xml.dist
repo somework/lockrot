@@ -41,6 +41,13 @@
                  Report, fully unit-tested, same as GithubFormatter/SarifFormatter above -->
             <file>src/Output/GitlabFormatter.php</file>
             <file>src/Output/MarkdownFormatter.php</file>
+            <!-- the grouped `table` list and its width detection (added on
+                 feat/priority-and-list-output): pure rendering over a Report plus a four-source
+                 lookup, both driven from unit tests. TerminalWidth's symfony/console 2.8 branch
+                 cannot be reached under the 5.4 require-dev resolves, so each source is a method of
+                 its own and is tested directly -->
+            <file>src/Output/TableFormatter.php</file>
+            <file>src/Output/TerminalWidth.php</file>
             <!-- baseline file (added on feat/v0.1.0-extras): value objects plus the one file lockrot
                  ever writes, all reachable from unit tests -->
             <directory>src/Baseline</directory>

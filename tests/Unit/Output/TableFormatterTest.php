@@ -8,68 +8,271 @@ use Lockrot\Analyzer\Report;
 use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Baseline\BaselineEntry;
+use Lockrot\Config\LockrotConfig;
+use Lockrot\Output\FormatContext;
 use Lockrot\Output\TableFormatter;
 use Lockrot\Signal\Signal;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Formatter\OutputFormatter;
 
 final class TableFormatterTest extends TestCase
 {
+    private const AT = '2026-09-14T06:00:00+00:00';
+
+    private function formatter(int $width = 120): TableFormatter
+    {
+        return new TableFormatter(FormatContext::create(null, LockrotConfig::FAIL_ON_NONE, '0.1.0', $width));
+    }
+
+    /** The text a terminal shows: every style tag resolved away, every `\<` escape undone. */
+    private function plain(string $out): string
+    {
+        $plain = (new OutputFormatter(false))->format($out);
+        self::assertIsString($plain);
+
+        return $plain;
+    }
+
+    /** @return list<string> */
+    private function plainLines(string $out): array
+    {
+        return explode("\n", rtrim($this->plain($out), "\n"));
+    }
+
+    /**
+     * One row per priority level plus two unflagged ones, so every group header and every label
+     * style has a row to sit on.
+     */
     private function report(): Report
     {
-        $at = new \DateTimeImmutable('2026-09-14T06:00:00+00:00');
+        $at = new \DateTimeImmutable(self::AT);
+
         return new Report([
-            new Finding('phpzip/phpzip', '2.0.8', Verdict::SILENT, [new Signal('S2', 'high', 'last release 2015-11-16 (10.8 years ago)'), new Signal('S4', 'high', 'last push 2015-11-16 (10.8 years ago)')], ['grandt/phpepub', 'phpzip/phpzip'], null, $at),
-            new Finding('doctrine/cache', '1.13.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'flagged abandoned by its repository')], ['doctrine/cache'], null, $at),
+            new Finding('doctrine/cache', '2.2.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'flagged abandoned by its repository'), new Signal('S2', 'high', 'last release 2022-05-20 (4.3 years ago)')], ['doctrine/cache'], null, $at),
+            new Finding('hoa/compiler', '3.17.08.08', Verdict::ABANDONED, [new Signal('S1', 'high', 'flagged abandoned by its repository'), new Signal('S4', 'high', 'repository archived on GitHub; last push 2021-04-29 (5.4 years ago)')], ['wallabag/rulerz', 'hoa/ruler', 'hoa/compiler'], null, $at),
+            new Finding('vendor/stale-direct', '2.1.0', Verdict::STALE, [new Signal('S2', 'warn', 'last release 2022-05-20 (4.3 years ago)')], ['vendor/stale-direct'], null, $at),
+            new Finding('vendor/stale-deep', '1.0.0', Verdict::STALE, [new Signal('S2', 'warn', 'last release 2022-01-04 (4.7 years ago)')], ['vendor/root', 'vendor/stale-deep'], null, $at),
             new Finding('psr/cache', '3.0.0', Verdict::FINISHED, [], ['psr/cache'], 'interfaces', $at),
             new Finding('vendor/ok', '1.0.0', Verdict::OK, [], ['vendor/ok'], null, $at),
-        ], ['GitHub token not set: repository activity checked only for 2 candidate packages (0 skipped); set GITHUB_TOKEN to check all'], $at, 4, 0, false);
+        ], ['GitHub token not set: repository activity checked only for 2 candidate packages (0 skipped); set GITHUB_TOKEN to check all'], $at, 6, 0, false);
     }
 
-    public function testFlaggedRowsSummaryAndNotes(): void
+    public function testGroupsComeInPriorityOrderWithTheirCountInTheHeader(): void
     {
-        $out = (new TableFormatter())->format($this->report());
-        self::assertStringContainsString('doctrine/cache', $out);
-        self::assertStringContainsString('phpzip/phpzip', $out);
-        self::assertStringContainsString('grandt/phpepub', $out);
-        self::assertStringContainsString('direct', $out);
-        self::assertStringNotContainsString('vendor/ok', $out);
-        self::assertStringNotContainsString('psr/cache', $out);
-        self::assertStringContainsString('4 packages checked', $out);
-        self::assertStringContainsString('abandoned 1', $out);
-        self::assertStringContainsString('finished 1', $out);
-        self::assertStringContainsString('Data as of 2026-09-14', $out);
-        self::assertStringContainsString('note: GitHub token not set', $out);
-        self::assertLessThan(strpos($out, 'phpzip/phpzip'), strpos($out, 'doctrine/cache'), 'abandoned sorts before silent');
+        $lines = $this->plainLines($this->formatter()->format($this->report()));
+        $headers = array_values(array_filter($lines, static fn (string $l): bool => preg_match('/^\S.*\(\d+\)$/', $l) === 1));
+
+        self::assertSame(['critical (1)', 'high (1)', 'medium (1)', 'low (1)'], $headers);
     }
 
-    public function testShowAllIncludesOkRows(): void
+    public function testOnlyNonEmptyGroupsGetAHeader(): void
     {
-        $out = (new TableFormatter())->format($this->report(), true);
-        self::assertStringContainsString('vendor/ok', $out);
-        self::assertStringContainsString('psr/cache', $out);
+        $at = new \DateTimeImmutable(self::AT);
+        $report = new Report([
+            new Finding('vendor/stale-deep', '1.0.0', Verdict::STALE, [new Signal('S2', 'warn', 'last release 2022-01-04 (4.7 years ago)')], ['vendor/root', 'vendor/stale-deep'], null, $at),
+        ], [], $at, 1, 0, false);
+        $out = $this->plain($this->formatter()->format($report));
+
+        self::assertStringContainsString('low (1)', $out);
+        foreach (['critical (', 'high (', 'medium (', 'not flagged ('] as $absent) {
+            self::assertStringNotContainsString($absent, $out);
+        }
+    }
+
+    public function testShowAllAddsTheNotFlaggedGroupLast(): void
+    {
+        $lines = $this->plainLines($this->formatter()->format($this->report(), true));
+        $headers = array_values(array_filter($lines, static fn (string $l): bool => preg_match('/^\S.*\(\d+\)$/', $l) === 1));
+
+        self::assertSame(['critical (1)', 'high (1)', 'medium (1)', 'low (1)', 'not flagged (2)'], $headers);
+    }
+
+    public function testOneBlankLineSeparatesGroupsAndTheSummaryButNoneComesFirst(): void
+    {
+        $lines = $this->plainLines($this->formatter()->format($this->report()));
+
+        self::assertSame('critical (1)', $lines[0]);
+        $blanks = array_keys($lines, '', true);
+        // three between the four groups, one before the summary block
+        self::assertCount(4, $blanks);
+        foreach ($blanks as $index) {
+            self::assertNotSame('', $lines[$index - 1], 'no two blank lines in a row');
+        }
+    }
+
+    public function testARowPutsTheLabelPackageVersionAndChainOnOneLineAndIndentsTheEvidence(): void
+    {
+        $lines = $this->plainLines($this->formatter()->format($this->report()));
+
+        // label width is the 11-character minimum here, so the indent is 2 + 11 + 2 = 15
+        self::assertSame('  abandoned    doctrine/cache 2.2.0  direct', $lines[1]);
+        self::assertSame('               flagged abandoned by its repository; last release 2022-05-20 (4.3 years ago)', $lines[2]);
+        self::assertSame('', $lines[3]);
+        self::assertSame('high (1)', $lines[4]);
+        self::assertSame('  abandoned    hoa/compiler 3.17.08.08  via wallabag/rulerz › hoa/ruler', $lines[5]);
+    }
+
+    public function testAnUnplaceablePackageShowsAQuestionMarkInsteadOfAChain(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $report = new Report([
+            new Finding('vendor/orphan', '1.0.0', Verdict::PINNED, [new Signal('S6', 'warn', 'pinned to branch snapshot dev-master')], [], null, $at),
+        ], [], $at, 1, 0, false);
+
+        self::assertStringContainsString('  pinned       vendor/orphan 1.0.0  ?', $this->plain($this->formatter()->format($report)));
+    }
+
+    public function testTheLabelColumnGrowsWithTheLongestLabel(): void
+    {
+        $lines = $this->plainLines($this->formatter()->format($this->baselinedReport()));
+        $row = null;
+        foreach ($lines as $line) {
+            if (strpos($line, 'hoa/compiler') !== false) {
+                $row = $line;
+            }
+        }
+        self::assertNotNull($row);
+        // "abandoned (was stale)" is 21 characters, so every label is padded to 21 and the indent is 25
+        self::assertSame('  abandoned (baseline)   doctrine/cache 2.2.0  direct', $lines[1]);
+        self::assertSame('  abandoned (was stale)  hoa/compiler 3.17.08.08  via wallabag/rulerz › hoa/ruler', $row);
+    }
+
+    /**
+     * Only the rows are wrapped; the summary block is one line per fact by design, the way it has
+     * always been, and a terminal soft-wraps those itself.
+     *
+     * @return list<string>
+     */
+    private function rowRegion(string $out): array
+    {
+        $lines = $this->plainLines($out);
+        $end = array_search('', $lines, true);
+        self::assertIsInt($end);
+
+        return \array_slice($lines, 0, $end);
+    }
+
+    public function testEvidenceAndTheFirstLineAreWrappedToTheTerminalWidth(): void
+    {
+        $out = $this->formatter(60)->format($this->report(), true);
+        foreach ($this->rowRegion($out) as $line) {
+            self::assertLessThanOrEqual(60, \strlen($line), 'line wider than the terminal: '.$line);
+        }
+        self::assertGreaterThan(2, \count($this->rowRegion($out)), 'the evidence has to have wrapped for this to prove anything');
+        // and the wrapped evidence keeps the 15-character continuation indent
+        self::assertMatchesRegularExpression('/\n {15}\S/', $this->plain($out));
+    }
+
+    /**
+     * Baseline annotations push the label column to 21, so the indent is 25 and the narrowest
+     * terminal lockrot accepts would leave 15 columns for the text. The floor takes over at 20 and
+     * the row overruns the terminal, rather than the text being squeezed into nothing.
+     */
+    public function testAVeryNarrowTerminalStillLeavesTwentyColumnsForTheText(): void
+    {
+        $out = (new TableFormatter(FormatContext::create(null, LockrotConfig::FAIL_ON_NONE, '0.1.0', 40)))->format($this->baselinedReport());
+        $rows = $this->rowRegion($out);
+
+        self::assertStringContainsString('doctrine/cache', implode("\n", $rows));
+        foreach ($rows as $line) {
+            self::assertLessThanOrEqual(25 + 20, \strlen($line), 'line wider than indent plus the wrap floor: '.$line);
+        }
+        self::assertNotSame(
+            [],
+            array_filter($rows, static fn (string $line): bool => \strlen($line) > 40),
+            'the floor, not the terminal width, is what decided the wrap here'
+        );
+    }
+
+    public function testCriticalAndHighLabelsAreRedMediumIsYellowAndLowIsUnstyled(): void
+    {
+        $out = $this->formatter()->format($this->report(), true);
+
+        self::assertStringContainsString('<fg=red>abandoned</fg=red>', $out);
+        self::assertStringContainsString('<fg=yellow>stale</fg=yellow>', $out);
+        self::assertStringNotContainsString('<fg=red>stale</fg=red>', $out);
+        self::assertStringNotContainsString('<fg=yellow>abandoned</fg=yellow>', $out);
+        // the low row and the unflagged rows carry no colour at all
+        self::assertSame(2, substr_count($out, '<fg=red>'));
+        self::assertSame(1, substr_count($out, '<fg=yellow>'));
+        self::assertStringContainsString('<options=bold>critical (1)</options=bold>', $out);
+        self::assertStringNotContainsString('</>', $out);
+    }
+
+    /**
+     * A php constraint is the one piece of evidence that routinely looks like a console tag. The
+     * text has to come out of a *decorated* formatter byte-for-byte, styles aside: the label is
+     * coloured, the constraint is not touched.
+     */
+    public function testAPhpConstraintInEvidenceSurvivesADecoratedFormatter(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $evidence = 'released 2017-05-02, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2" has no upper bound; sibling pins "<8.0"';
+        $report = new Report([
+            new Finding('vendor/constraint', '1.0.0', Verdict::OLD_PROMISE, [new Signal('S5', 'warn', $evidence)], ['vendor/constraint'], null, $at),
+        ], [], $at, 1, 0, false);
+
+        $raw = (new TableFormatter(FormatContext::create(null, LockrotConfig::FAIL_ON_NONE, '0.1.0', 200)))->format($report);
+
+        foreach ([new OutputFormatter(true), new OutputFormatter(false)] as $formatter) {
+            $rendered = $formatter->format($raw);
+            self::assertIsString($rendered);
+            self::assertStringContainsString($evidence, $rendered);
+            self::assertStringContainsString('>=7.2', $rendered);
+            self::assertStringContainsString('<8.0', $rendered);
+        }
+    }
+
+    public function testAPackageNameThatLooksLikeATagIsEscaped(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $report = new Report([
+            new Finding('vendor/<info>weird', '1.0.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'flagged abandoned by its repository')], ['vendor/<info>weird'], null, $at),
+        ], ['note with <comment> in it'], $at, 1, 0, false);
+
+        $out = (new TableFormatter(FormatContext::create(null, LockrotConfig::FAIL_ON_NONE, '0.1.0', 200)))->format($report);
+
+        self::assertStringContainsString('vendor/<info>weird', $this->plain($out));
+        self::assertStringContainsString('note with <comment> in it', $this->plain($out));
+        self::assertStringNotContainsString('<info>', str_replace('\\<info>', '', $out));
+    }
+
+    public function testTheSummaryBlockKeepsItsOrderWithThePriorityLineAfterTheCounts(): void
+    {
+        $lines = $this->plainLines($this->formatter()->format($this->report()));
+        $tail = \array_slice($lines, -4);
+
+        self::assertSame('6 packages checked · abandoned 2 · silent 0 · pinned 0 · old-promise 0 · stale 2 · unknown 0 · finished 1 · ok 1', $tail[0]);
+        self::assertSame('priority: critical 1 · high 1 · medium 1 · low 1', $tail[1]);
+        self::assertSame('Data as of 2026-09-14 (package repositories, GitHub). Run composer lockrot --format=json for details.', $tail[2]);
+        self::assertSame('note: GitHub token not set: repository activity checked only for 2 candidate packages (0 skipped); set GITHUB_TOKEN to check all', $tail[3]);
     }
 
     public function testCleanReport(): void
     {
-        $report = new Report([new Finding('vendor/ok', '1.0.0', Verdict::OK, [], ['vendor/ok'], null, new \DateTimeImmutable('2026-09-14T00:00:00+00:00'))], [], new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), 1, 0, false);
-        $out = (new TableFormatter())->format($report);
-        self::assertStringContainsString('No dependency rot found in 1 packages', $out);
+        $at = new \DateTimeImmutable(self::AT);
+        $report = new Report([new Finding('vendor/ok', '1.0.0', Verdict::OK, [], ['vendor/ok'], null, $at)], [], $at, 1, 0, false);
+        $lines = $this->plainLines($this->formatter()->format($report));
+
+        self::assertSame('No dependency rot found in 1 packages.', $lines[0]);
+        self::assertStringContainsString(' packages checked', $lines[1]);
+        self::assertStringStartsWith('priority: ', $lines[2]);
     }
 
     public function testWordingAvoidsBannedTerms(): void
     {
-        $out = strtolower((new TableFormatter())->format($this->allVerdictsReport(), true));
+        $out = strtolower($this->plain($this->formatter()->format($this->allVerdictsReport(), true)));
         foreach (['vulnerable', 'broken', 'insecure', 'dead'] as $banned) {
             self::assertStringNotContainsString($banned, $out);
         }
     }
 
     /**
-     * The four-finding report of {@see report()} compared against a baseline that knows
-     * doctrine/cache as abandoned, phpzip/phpzip as only stale (so it is worsened now) and one
-     * package that has since left the lock.
+     * The report of {@see report()} compared against a baseline that knows doctrine/cache as
+     * abandoned, vendor/stale-direct as worse than it was, and one package that has since left the
+     * lock.
      */
     private function baselinedReport(): Report
     {
@@ -79,35 +282,34 @@ final class TableFormatterTest extends TestCase
             $names[] = $finding->package();
         }
         $baseline = Baseline::of([
-            new BaselineEntry('doctrine/cache', '1.13.0', Verdict::ABANDONED, '2026-01-15'),
-            new BaselineEntry('phpzip/phpzip', '2.0.8', Verdict::STALE, '2026-01-15'),
+            new BaselineEntry('doctrine/cache', '2.2.0', Verdict::ABANDONED, '2026-01-15'),
+            new BaselineEntry('hoa/compiler', '3.17.08.08', Verdict::STALE, '2026-01-15'),
             new BaselineEntry('vendor/departed', '1.0.0', Verdict::SILENT, '2026-01-15'),
         ], '2026-09-14T06:00:00+00:00');
 
         return $report->withBaseline(BaselineComparison::compare($baseline, $report, 'lockrot-baseline.json', $names));
     }
 
-    public function testBaselineSummaryLineFollowsTheCountsLine(): void
+    public function testBaselineSummaryLineFollowsThePriorityLine(): void
     {
-        $out = (new TableFormatter())->format($this->baselinedReport());
-        $lines = array_values(array_filter(explode("\n", $out), static fn (string $line): bool => $line !== ''));
+        $lines = $this->plainLines($this->formatter()->format($this->baselinedReport()));
         $index = null;
         foreach ($lines as $i => $line) {
-            if (strpos($line, ' packages checked') !== false) {
+            if (strpos($line, 'priority: ') === 0) {
                 $index = $i;
             }
         }
 
         self::assertNotNull($index);
         self::assertSame(
-            'baseline: 1 known · 0 new · 1 worsened · 1 stale (lockrot-baseline.json)',
+            'baseline: 1 known · 2 new · 1 worsened · 1 stale (lockrot-baseline.json)',
             $lines[$index + 1]
         );
     }
 
     public function testBaselineStaleEntriesBecomeANote(): void
     {
-        $out = (new TableFormatter())->format($this->baselinedReport());
+        $out = $this->plain($this->formatter()->format($this->baselinedReport()));
 
         self::assertStringContainsString(
             'note: baseline lists 1 package no longer in composer.lock: vendor/departed',
@@ -115,29 +317,42 @@ final class TableFormatterTest extends TestCase
         );
     }
 
-    public function testVerdictColumnMarksKnownAndWorsenedRows(): void
+    public function testTheLabelMarksKnownAndWorsenedRows(): void
     {
-        $out = (new TableFormatter())->format($this->baselinedReport());
+        $out = $this->plain($this->formatter()->format($this->baselinedReport()));
 
         self::assertStringContainsString('abandoned (baseline)', $out);
-        self::assertStringContainsString('silent (was stale)', $out);
+        self::assertStringContainsString('abandoned (was stale)', $out);
     }
 
-    public function testWithoutABaselineTheVerdictColumnIsUnchanged(): void
+    public function testWithoutABaselineTheLabelIsTheBareVerdict(): void
     {
-        $out = (new TableFormatter())->format($this->report());
+        $out = $this->plain($this->formatter()->format($this->report()));
 
         self::assertStringNotContainsString('(baseline)', $out);
         self::assertStringNotContainsString('baseline:', $out);
     }
 
+    public function testAllowlistedRowsSayWhy(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $report = new Report([
+            new Finding('vendor/allowed', '1.0.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'flagged abandoned by its repository')], ['vendor/allowed'], 'replaced upstream', $at),
+        ], [], $at, 1, 0, false);
+
+        self::assertStringContainsString(
+            'flagged abandoned by its repository; allowlisted: replaced upstream',
+            $this->plain($this->formatter()->format($report))
+        );
+    }
+
     private function allVerdictsReport(): Report
     {
-        $at = new \DateTimeImmutable('2026-09-14T06:00:00+00:00');
+        $at = new \DateTimeImmutable(self::AT);
         $findings = array_merge($this->report()->findings(), [
             new Finding('vendor/pinned', '1.2.3', Verdict::PINNED, [new Signal('S6', 'warn', 'pinned to branch snapshot dev-master')], ['vendor/pinned'], null, $at),
             new Finding('vendor/old-promise', '0.9.0', Verdict::OLD_PROMISE, [new Signal('S5', 'warn', 'released 2015-11-16, before PHP 8.4 GA (2024-11-21); php constraint ">=5.3.0" has no upper bound')], ['vendor/old-promise'], null, $at),
-            new Finding('vendor/stale', '2.1.0', Verdict::STALE, [new Signal('S2', 'warn', 'last release 2022-05-20 (4.3 years ago)')], ['vendor/stale'], null, $at),
+            new Finding('vendor/silent', '2.0.8', Verdict::SILENT, [new Signal('S2', 'high', 'last release 2015-11-16 (10.8 years ago)')], ['vendor/root', 'vendor/silent'], null, $at),
             new Finding('vendor/unknown', '1.0.0', Verdict::UNKNOWN, [new Signal('S3', 'info', 'not from a Composer repository, not checked')], ['vendor/unknown'], null, $at),
         ]);
 

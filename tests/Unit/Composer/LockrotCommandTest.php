@@ -29,6 +29,7 @@ use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Verdict\VerdictEngine;
 use Lockrot\Version;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -228,6 +229,106 @@ final class LockrotCommandTest extends TestCase
         self::assertSame(1, $code, $tester->getDisplay());
         self::assertStringContainsString('phpzip/phpzip', $tester->getDisplay());
         self::assertStringContainsString('200 packages checked', $tester->getDisplay());
+    }
+
+    /**
+     * The options every stdout write() of one run was made with, in order.
+     *
+     * The report is the only thing this command writes to stdout (errors go to the error output of
+     * a ConsoleOutputInterface), so the single entry this returns is the report write itself.
+     *
+     * @param array<string, mixed> $args
+     *
+     * @return array{0: int, 1: string, 2: list<int>} exit code, stdout, the options of each write
+     */
+    private function runRecordingWriteOptions(array $args, ?MetadataLoaderInterface $loader = null): array
+    {
+        $command = $this->command($loader);
+        $input = new ArrayInput($args, $command->getDefinition());
+        $output = new class (new BufferedOutput()) extends BufferedOutput implements ConsoleOutputInterface {
+            /** @var list<int> */
+            public array $writeOptions = [];
+            private OutputInterface $errorOutput;
+
+            public function __construct(OutputInterface $errorOutput)
+            {
+                parent::__construct();
+                $this->errorOutput = $errorOutput;
+            }
+
+            /** @param iterable<string>|string $messages */
+            public function write($messages, bool $newline = false, int $options = self::OUTPUT_NORMAL): void
+            {
+                $this->writeOptions[] = $options;
+                parent::write($messages, $newline, $options);
+            }
+
+            public function getErrorOutput(): OutputInterface
+            {
+                return $this->errorOutput;
+            }
+
+            public function setErrorOutput(OutputInterface $error): void
+            {
+                $this->errorOutput = $error;
+            }
+
+            public function section(): ConsoleSectionOutput
+            {
+                throw new \LogicException('ConsoleSectionOutput is not supported by this test double');
+            }
+        };
+        $code = $command->run($input, $output);
+
+        return [$code, $output->fetch(), $output->writeOptions];
+    }
+
+    /**
+     * Only `table` is written through the tag formatter; every machine-readable format goes out
+     * with OUTPUT_RAW, so a `<` in a constraint or a package name can never be eaten as a console
+     * tag on its way to a parser (OutputInterface::OUTPUT_RAW = 2 in symfony/console 5.4.47
+     * Output/OutputInterface.php:30 and 2.8.52 same file, same line).
+     */
+    public function testTheTableFormatIsWrittenThroughTheFormatter(): void
+    {
+        chdir(__DIR__.'/../../fixtures/apps/wallabag_wallabag');
+        [$code, $stdout, $options] = $this->runRecordingWriteOptions(['--target-php' => '8.4'], $this->loader());
+
+        self::assertSame(0, $code, $stdout);
+        self::assertSame([OutputInterface::OUTPUT_NORMAL], $options);
+    }
+
+    /** @return iterable<string, array{0: string}> */
+    public static function machineReadableFormatProvider(): iterable
+    {
+        yield 'json' => ['json'];
+        yield 'sarif' => ['sarif'];
+        yield 'gitlab' => ['gitlab'];
+        yield 'github' => ['github'];
+        yield 'markdown' => ['markdown'];
+    }
+
+    /**
+     * @dataProvider machineReadableFormatProvider
+     */
+    #[DataProvider('machineReadableFormatProvider')]
+    public function testEveryOtherFormatIsWrittenRaw(string $format): void
+    {
+        chdir(__DIR__.'/../../fixtures/apps/wallabag_wallabag');
+        [$code, $stdout, $options] = $this->runRecordingWriteOptions(['--format' => $format, '--target-php' => '8.4'], $this->loader());
+
+        self::assertSame(0, $code, $stdout);
+        self::assertSame([OutputInterface::OUTPUT_RAW], $options);
+    }
+
+    public function testJsonStaysByteValidWhenEvidenceCarriesAngleBrackets(): void
+    {
+        chdir(__DIR__.'/../../fixtures/apps/wallabag_wallabag');
+        [, $stdout] = $this->runRecordingWriteOptions(['--format' => 'json', '--target-php' => '8.4'], $this->loader());
+
+        self::assertIsArray(json_decode($stdout, true), $stdout);
+        // the wallabag lock is full of open-ended php constraints, which is where a `<` shows up
+        self::assertStringContainsString('php constraint', $stdout);
     }
 
     public function testJsonOutputAndDefaultExitZero(): void

@@ -14,8 +14,9 @@ use Lockrot\Version;
  * Everything a formatter needs about the run itself rather than about the report: which file was
  * analysed, which verdict the run would fail on, and which lockrot produced it.
  *
- * `table` and `json` ignore it; `github` and `sarif` need it to point their annotations at
- * composer.lock and to decide which findings are reported as errors rather than warnings.
+ * `json` ignores it; `github` and `sarif` need it to point their annotations at composer.lock and
+ * to decide which findings are reported as errors rather than warnings; `table` needs the width of
+ * the terminal it is about to be printed on.
  */
 final class FormatContext
 {
@@ -23,30 +24,43 @@ final class FormatContext
     public const LEVEL_WARNING = 'warning';
     public const LEVEL_NOTE = 'note';
 
+    /** The width `table` renders into when nothing could be detected. */
+    public const DEFAULT_WIDTH = 120;
+
+    /**
+     * Narrower than this and the list stops being a list, so the value is treated as a failed
+     * detection rather than an instruction. {@see TerminalWidth::detect()} applies the same floor to
+     * what it reads from the environment; this one guards every other way a width can arrive.
+     */
+    public const MIN_WIDTH = 40;
+
     private ?string $lockPath;
     private string $failOn;
     private string $toolVersion;
+    private int $terminalWidth;
 
-    private function __construct(?string $lockPath, string $failOn, string $toolVersion)
+    private function __construct(?string $lockPath, string $failOn, string $toolVersion, int $terminalWidth)
     {
         $this->lockPath = $lockPath;
         $this->failOn = $failOn;
         $this->toolVersion = $toolVersion;
+        $this->terminalWidth = max(self::MIN_WIDTH, $terminalWidth);
     }
 
     /**
-     * @param null|string $lockPath absolute path of the analysed composer.lock, null when unknown
-     * @param string      $failOn   the resolved fail-on, LockrotConfig::FAIL_ON_NONE when none
+     * @param null|string $lockPath      absolute path of the analysed composer.lock, null when unknown
+     * @param string      $failOn        the resolved fail-on, LockrotConfig::FAIL_ON_NONE when none
+     * @param int         $terminalWidth columns available for `table`, clamped to MIN_WIDTH
      */
-    public static function create(?string $lockPath, string $failOn, string $toolVersion = Version::STRING): self
+    public static function create(?string $lockPath, string $failOn, string $toolVersion = Version::STRING, int $terminalWidth = self::DEFAULT_WIDTH): self
     {
-        return new self($lockPath, $failOn, $toolVersion);
+        return new self($lockPath, $failOn, $toolVersion, $terminalWidth);
     }
 
-    /** The context for a run with nothing to say: no lock path, no fail-on threshold. */
+    /** The context for a run with nothing to say: no lock path, no fail-on threshold, default width. */
     public static function unknown(): self
     {
-        return new self(null, LockrotConfig::FAIL_ON_NONE, Version::STRING);
+        return new self(null, LockrotConfig::FAIL_ON_NONE, Version::STRING, self::DEFAULT_WIDTH);
     }
 
     public function lockPath(): ?string
@@ -62,6 +76,12 @@ final class FormatContext
     public function toolVersion(): string
     {
         return $this->toolVersion;
+    }
+
+    /** Columns the `table` format may use, never below MIN_WIDTH. */
+    public function terminalWidth(): int
+    {
+        return $this->terminalWidth;
     }
 
     /**

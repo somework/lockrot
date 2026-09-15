@@ -9,16 +9,16 @@ use Lockrot\Exception\ConfigException;
 final class Formatters
 {
     /**
-     * `table` and `json` need nothing about the run itself, so the context is optional and defaults
-     * to FormatContext::unknown() for callers that only want one of those two; `github` and `sarif`
-     * read the lock path and the fail-on threshold out of it.
+     * `json` needs nothing about the run itself, so the context is optional and defaults to
+     * FormatContext::unknown() for a caller that only wants that one; `table` reads the terminal
+     * width out of it, and `github` and `sarif` the lock path and the fail-on threshold.
      */
     public static function for(string $format, ?FormatContext $context = null): FormatterInterface
     {
         $context ??= FormatContext::unknown();
         switch ($format) {
             case 'table':
-                return new TableFormatter();
+                return new TableFormatter($context);
             case 'json':
                 return new JsonFormatter();
             case 'github':

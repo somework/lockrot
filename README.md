@@ -93,55 +93,48 @@ Run against `tests/fixtures/apps/wallabag_wallabag` (a real, public `composer.lo
 actual output:
 
 ```
-GITHUB_TOKEN=$(gh auth token) php bin/lockrot -d tests/fixtures/apps/wallabag_wallabag --target-php=8.4
+COLUMNS=120 GITHUB_TOKEN=$(gh auth token) php bin/lockrot -d tests/fixtures/apps/wallabag_wallabag --target-php=8.4
 ```
 
 ```
-+--------------------------------------+------------+-------------+--------------------------------------------------------------+-------------------------------------------------------------+
-| Package                              | Version    | Verdict     | Evidence                                                     | Via                                                         |
-+--------------------------------------+------------+-------------+--------------------------------------------------------------+-------------------------------------------------------------+
-| behat/transliterator                 | v1.5.0     | abandoned   | flagged abandoned by its repository; last release 2022-03-30 | stof/doctrine-extensions-bundle > gedmo/doctrine-extensions |
-|                                      |            |             | (4.5 years ago); repository archived on GitHub; released     |                                                             |
-|                                      |            |             | 2022-03-30, before PHP 8.4 GA (2024-11-21); php constraint   |                                                             |
-|                                      |            |             | ">=7.2" has no upper bound                                   |                                                             |
-| doctrine/annotations                 | 2.0.2      | abandoned   | flagged abandoned by its repository                          | sensio/framework-extra-bundle                               |
-| doctrine/cache                       | 2.2.0      | abandoned   | flagged abandoned by its repository; last release 2022-05-20 | doctrine/doctrine-bundle                                    |
-|                                      |            |             | (4.3 years ago)                                              |                                                             |
-| hoa/compiler                         | 3.17.08.08 | abandoned   | flagged abandoned by its repository; last release 2017-08-08 | wallabag/rulerz > hoa/ruler                                 |
-|                                      |            |             | (9.1 years ago); repository archived on GitHub; last push    |                                                             |
-|                                      |            |             | 2021-04-29 (5.4 years ago)                                   |                                                             |
-| hoa/consistency                      | 1.17.05.02 | abandoned   | flagged abandoned by its repository; last release 2017-08-29 | wallabag/rulerz                                             |
-|                                      |            |             | (9.0 years ago); repository archived on GitHub; last push    |                                                             |
-|                                      |            |             | 2021-04-28 (5.4 years ago); released 2017-05-02, before PHP  |                                                             |
-|                                      |            |             | 8.4 GA (2024-11-21); php constraint ">=5.5.0" has no upper   |                                                             |
-|                                      |            |             | bound                                                        |                                                             |
-| hoa/event                            | 1.17.01.13 | abandoned   | flagged abandoned by its repository; last release 2017-08-30 | wallabag/rulerz > hoa/consistency > hoa/exception           |
-|                                      |            |             | (9.0 years ago); repository archived on GitHub; last push    |                                                             |
-|                                      |            |             | 2021-04-29 (5.4 years ago)                                   |                                                             |
-| hoa/exception                        | 1.17.01.16 | abandoned   | flagged abandoned by its repository; last release 2017-08-30 | wallabag/rulerz > hoa/consistency                           |
-|                                      |            |             | (9.0 years ago); repository archived on GitHub; last push    |                                                             |
-|                                      |            |             | 2021-04-29 (5.4 years ago)                                   |                                                             |
-| hoa/file                             | 1.17.07.11 | abandoned   | flagged abandoned by its repository; last release 2017-07-11 | wallabag/rulerz > hoa/ruler                                 |
-|                                      |            |             | (9.2 years ago); repository archived on GitHub; last push    |                                                             |
-|                                      |            |             | 2018-01-23 (8.6 years ago)                                   |                                                             |
-| hoa/iterator                         | 2.17.01.10 | abandoned   | flagged abandoned by its repository; last release 2017-01-10 | wallabag/rulerz > hoa/ruler > hoa/compiler                  |
-|                                      |            |             | (9.7 years ago); repository archived on GitHub; last push    |                                                             |
-|                                      |            |             | 2021-04-29 (5.4 years ago)                                   |                                                             |
-| hoa/math                             | 1.17.05.16 | abandoned   | flagged abandoned by its repository; last release 2017-05-16 | wallabag/rulerz > hoa/ruler > hoa/compiler                  |
-|                                      |            |             | (9.3 years ago); repository archived on GitHub; last push    |                                                             |
-|                                      |            |             | 2021-04-29 (5.4 years ago)                                   |                                                             |
-| hoa/protocol                         | 1.17.01.14 | abandoned   | flagged abandoned by its repository; last release 2017-01-14 | wallabag/rulerz > hoa/ruler                                 |
-|                                      |            |             | (9.7 years ago); repository archived on GitHub; last push    |                                                             |
-|                                      |            |             | 2021-04-29 (5.4 years ago)                                   |                                                             |
-| hoa/regex                            | 1.17.01.13 | abandoned   | flagged abandoned by its repository; last release 2017-01-13 | wallabag/rulerz > hoa/ruler > hoa/compiler                  |
-|                                      |            |             | (9.7 years ago); repository archived on GitHub; last push    |                                                             |
-|                                      |            |             | 2018-07-20 (8.2 years ago)                                   |                                                             |
-+--------------------------------------+------------+-------------+--------------------------------------------------------------+-------------------------------------------------------------+
-... (188 more rows omitted)
-+--------------------------------------+------------+-------------+--------------------------------------------------------------+-------------------------------------------------------------+
-200 packages checked · abandoned 19 · silent 8 · pinned 4 · old-promise 41 · stale 3 · unknown 0 · finished 18 · ok 107
-Data as of 2026-09-13 (package repositories, GitHub). Run composer lockrot --format=json for details.
+critical (3)
+  abandoned    sensio/framework-extra-bundle v6.2.10  direct
+               flagged abandoned by its repository, replacement: Symfony; last release 2023-02-24 (3.6 years ago);
+               repository archived on GitHub; last push 2023-02-24 (3.6 years ago); released 2023-02-24, before PHP 8.4
+               GA (2024-11-21); php constraint ">=7.2.5" has no upper bound
+  silent       javibravo/simpleue 2.1.0  direct
+               last release 2017-11-15 (8.8 years ago); last push 2017-11-18 (8.8 years ago); released 2017-11-15,
+               before PHP 8.4 GA (2024-11-21); php constraint ">=5.5" has no upper bound
+  silent       mnapoli/piwik-twig-extension 3.0.0  direct
+               last release 2020-04-24 (6.4 years ago); last push 2020-04-28 (6.4 years ago); released 2020-04-24,
+               before PHP 8.4 GA (2024-11-21); php constraint ">=7.0" has no upper bound
+
+high (58)
+  abandoned    behat/transliterator v1.5.0  via stof/doctrine-extensions-bundle › gedmo/doctrine-extensions
+               flagged abandoned by its repository; last release 2022-03-30 (4.5 years ago); repository archived on
+               GitHub; released 2022-03-30, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2" has no upper bound
+  abandoned    doctrine/annotations 2.0.2  via sensio/framework-extra-bundle
+               flagged abandoned by its repository
+  abandoned    doctrine/cache 2.2.0  via doctrine/doctrine-bundle
+               flagged abandoned by its repository; last release 2022-05-20 (4.3 years ago)
+  abandoned    hoa/compiler 3.17.08.08  via wallabag/rulerz › hoa/ruler
+               flagged abandoned by its repository; last release 2017-08-08 (9.1 years ago); repository archived on
+               GitHub; last push 2021-04-29 (5.4 years ago)
+  abandoned    hoa/consistency 1.17.05.02  via wallabag/rulerz
+               flagged abandoned by its repository; last release 2017-08-29 (9.0 years ago); repository archived on
+               GitHub; last push 2021-04-28 (5.4 years ago); released 2017-05-02, before PHP 8.4 GA (2024-11-21); php
+               constraint ">=5.5.0" has no upper bound
+... (66 more rows omitted)
+
+200 packages checked · abandoned 19 · silent 8 · pinned 4 · old-promise 41 · stale 2 · unknown 0 · finished 18 · ok 108
+priority: critical 3 · high 58 · medium 11 · low 2
+Data as of 2026-09-15 (package repositories, GitHub). Run composer lockrot --format=json for details.
 ```
+
+Findings are grouped by [priority](#priority), highest first, and each row wraps to the width of
+the terminal, so nothing has to be read sideways. The width comes from `COLUMNS` when it is set,
+otherwise from the console itself, falling back to 120 columns. `--all` adds a final `not flagged`
+group with everything else in the lock.
 
 "Data as of" is the date the report was generated (UTC). wallabag is used because its lock file is
 public and large, not to single it out.
@@ -359,7 +352,7 @@ must be JSON integers (`3`, not `"3"`).
 
 | Option | Meaning |
 |---|---|
-| `--format=table\|json\|github\|sarif\|gitlab\|markdown` | Output format. `github` prints GitHub Actions workflow commands so findings become annotations on `composer.lock`; `sarif` prints a SARIF 2.1.0 document for `upload-sarif` — see [GitHub Actions](#github-actions). `gitlab` prints a GitLab Code Quality JSON report — see [GitLab CI](#gitlab-ci). `markdown` prints a PR-comment-shaped report — see [Posting a PR comment](#posting-a-pr-comment). The format changes the output only; the exit code is the same for all six |
+| `--format=table\|json\|github\|sarif\|gitlab\|markdown` | Output format. `table` (the default) is a width-aware list grouped by priority, not a box table — see [One-command demo](#one-command-demo). `github` prints GitHub Actions workflow commands so findings become annotations on `composer.lock`; `sarif` prints a SARIF 2.1.0 document for `upload-sarif` — see [GitHub Actions](#github-actions). `gitlab` prints a GitLab Code Quality JSON report — see [GitLab CI](#gitlab-ci). `markdown` prints a PR-comment-shaped report — see [Posting a PR comment](#posting-a-pr-comment). The format changes the output only; the exit code is the same for all six |
 | `--fail-on=none\|abandoned\|silent\|pinned\|old-promise\|stale` | Exit-1 threshold for this run |
 | `--target-php=8.4` | PHP version for the S5 check |
 | `--dev` | Include `packages-dev`. A dev package is flagged the same way a prod one is, but it gets one priority step lower — see [Priority](#priority) |

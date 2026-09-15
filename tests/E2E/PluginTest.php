@@ -115,14 +115,21 @@ final class PluginTest extends TestCase
         $alias = $this->composer(['rot', '--format=json'], [], 120);
         self::assertSame(0, $alias->getExitCode(), $alias->getErrorOutput());
 
-        // The table path is the only code that touches symfony/console's Table API. Composer 2.2 LTS bundles
-        // symfony/console 2.8.52 while require-dev resolves 5.4, so only a run through the real binary covers it.
-        $table = $this->composer(['lockrot', '--target-php=8.4'], [], 120);
+        // The table path is the only code that touches symfony/console's style tags and its terminal-width
+        // API. Composer 2.2 LTS bundles symfony/console 2.8.52 while require-dev resolves 5.4, so only a run
+        // through the real binary covers 2.8 — including the Application::getTerminalDimensions() fallback,
+        // which 5.4 does not have and this suite therefore cannot reach any other way.
+        $table = $this->composer(['lockrot', '--target-php=8.4'], ['COLUMNS' => '100'], 120);
         $stdout = $table->getOutput();
         self::assertSame(0, $table->getExitCode(), $table->getErrorOutput().$stdout);
-        self::assertMatchesRegularExpression('/Package\s+\|\s+Version\s+\|\s+Verdict\s+\|\s+Evidence\s+\|\s+Via/', $stdout);
+        self::assertMatchesRegularExpression('/^(critical|high|medium|low) \(\d+\)$/m', $stdout, $stdout);
+        self::assertMatchesRegularExpression('/^ {2}(abandoned|silent|pinned|old-promise|stale) +\S+ \S/m', $stdout, $stdout);
         self::assertStringContainsString('phpzip/phpzip', $stdout);
         self::assertMatchesRegularExpression('/\d+ packages checked/', $stdout);
+        self::assertMatchesRegularExpression('/^priority: critical \d+ · high \d+ · medium \d+ · low \d+$/m', $stdout);
+        // no style tag reaches a redirected (non-TTY) stdout, and nothing is left half-rendered
+        self::assertStringNotContainsString('<fg=', $stdout);
+        self::assertStringNotContainsString('<options=', $stdout);
     }
 
     public function testComposerRequirePrintsTheInstallTimeSummary(): void
