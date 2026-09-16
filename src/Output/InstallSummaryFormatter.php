@@ -106,6 +106,11 @@ final class InstallSummaryFormatter
         );
     }
 
+    /**
+     * The verdict, the package, what was observed about it and the chain it arrives by. Neither the
+     * other direct requirements that reach it nor what it pulls in (S7) belong here: the block is
+     * read while `composer require` runs, and both answer questions asked over the full report.
+     */
     private function findingLine(Finding $finding): string
     {
         return \sprintf(
@@ -113,8 +118,8 @@ final class InstallSummaryFormatter
             $finding->verdict(),
             $finding->package(),
             $finding->version(),
-            $finding->evidence(),
-            Via::suffix($finding, ' > ')
+            $finding->ownEvidence(),
+            Via::suffix($finding, ' > ', false)
         );
     }
 }

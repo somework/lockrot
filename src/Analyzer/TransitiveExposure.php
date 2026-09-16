@@ -27,11 +27,38 @@ final class TransitiveExposure
     public const SUMMARY_NAMES = 5;
 
     /**
-     * The same findings, with S7 attached to every direct requirement that pulls in a flagged
-     * transitive one. A flagged package the project requires directly is nobody's exposure, whoever
-     * else reaches it ({@see Report::exposure()} draws the same line). Only findings in $findings
-     * can be annotated: at install time that is the transaction, so a parent left untouched by the
-     * transaction is not in the list and gets nothing.
+     * A flagged transitive package reached from more direct requirements than this is shared
+     * infrastructure — in a framework application its framework's own contracts, reached from every
+     * bundle — and nobody's to remove, so it is attributed to no parent. On a 200-package Symfony
+     * lock the fan-in of flagged transitive packages was 1 or 2 for 32 of 37, then 6, 8, 16, 33 and
+     * 44: the cap sits in the gap. The package keeps its own row, with `also via … and N more`, and
+     * `direct_dependents` in the JSON document names every parent.
+     */
+    public const MAX_FAN_IN = 8;
+
+    /**
+     * Whether a finding is exposure some direct requirement is answerable for: flagged, transitive,
+     * and reached from at least one and at most {@see MAX_FAN_IN} direct requirements. The one rule
+     * behind S7 and {@see Report::exposure()}, so the signal's count and the `pulled in by:` line
+     * always agree.
+     */
+    public static function attributable(Finding $finding): bool
+    {
+        $parents = \count($finding->directDependents());
+
+        return Verdict::flagged($finding->verdict())
+            && !$finding->isDirect()
+            && $parents > 0
+            && $parents <= self::MAX_FAN_IN;
+    }
+
+    /**
+     * The same findings, with S7 attached to every direct requirement that pulls in an
+     * {@see attributable()} one. A flagged package the project requires directly is nobody's
+     * exposure, whoever else reaches it, and neither is one every bundle reaches
+     * ({@see Report::exposure()} draws the same line). Only findings in $findings can be annotated:
+     * at install time that is the transaction, so a parent left untouched by the transaction is
+     * not in the list and gets nothing.
      *
      * @param list<Finding> $findings
      *
@@ -53,8 +80,8 @@ final class TransitiveExposure
     }
 
     /**
-     * Parent => the flagged transitive findings reachable from it, each paired with the shortest
-     * chain from the parent, in report order.
+     * Parent => the attributable findings reachable from it, each paired with the shortest chain
+     * from the parent, in report order.
      *
      * @param list<Finding> $findings
      *
@@ -62,7 +89,7 @@ final class TransitiveExposure
      */
     private static function byParent(array $findings, DependencyGraph $graph): array
     {
-        $flagged = array_filter($findings, static fn (Finding $f): bool => Verdict::flagged($f->verdict()) && !$f->isDirect());
+        $flagged = array_filter($findings, [self::class, 'attributable']);
         usort($flagged, [Report::class, 'compare']);
         $byParent = [];
         foreach ($flagged as $finding) {

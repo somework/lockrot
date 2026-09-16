@@ -16,8 +16,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   transitive packages gets an informational signal `S7` listing them, with the shortest chain from
   that requirement to each, so its evidence reads `…; pulls in 18 flagged packages: hoa/compiler
   (abandoned), …`. A `pulled in by:` line in the summary block (table, GitHub, markdown) and an
-  `exposure` list in the JSON document sum that up per direct requirement. S7 never decides a
-  verdict, a priority, the exit code or the baseline comparison; the JSON `schema` number stays `1`.
+  `exposure` list in the JSON document sum that up per direct requirement. A flagged transitive
+  package reached from more than eight direct requirements is shared infrastructure and is left out
+  of both. S7 never decides a verdict, a priority, the exit code or the baseline comparison; the JSON
+  `schema` number stays `1` (a consumer that validates `signals[].id` against `S1`–`S6` will meet
+  the new value `S7`).
+
+### Changed
+
+- `--format=github` prints the `pulled in by:` line as a plain log line before the summary line;
+  `--format=markdown` prints it as a paragraph between the table and the notes. The install-time
+  block is unchanged: it shows neither the other parents nor S7.
 
 ## [0.2.2] - 2026-09-16
 

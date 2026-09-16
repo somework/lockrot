@@ -22,7 +22,7 @@ and never going below 40. `--all` adds a final `not flagged` group with everythi
 A transitive row names the direct requirement its shortest chain starts from, then — after
 `also via` — the other direct requirements that reach it too, so `hoa/ruler` is shown to stay
 installed as long as either `wallabag/rulerz` or `wallabag/rulerz-bundle` does. A direct
-requirement that pulls flagged packages in says so in its evidence (`pulls in 3 flagged packages:
+requirement that pulls flagged packages in says so in its evidence (`pulls in 15 flagged packages:
 …`), and the `pulled in by:` line in the summary sums that up per direct requirement — see
 [verdicts.md](verdicts.md#transitive-exposure).
 
@@ -34,9 +34,8 @@ critical (3)
   abandoned    sensio/framework-extra-bundle v6.2.10  direct
                marked abandoned by its repository, replacement: Symfony; last release 2023-02-24 (3.6 years ago);
                repository archived on GitHub; last push 2023-02-24 (3.6 years ago); released 2023-02-24, before PHP 8.4
-               GA (2024-11-21); php constraint ">=7.2.5" has no upper bound; pulls in 3 flagged packages:
-               doctrine/annotations (abandoned), symfony/service-contracts (old-promise), symfony/var-dumper
-               (old-promise)
+               GA (2024-11-21); php constraint ">=7.2.5" has no upper bound; pulls in 1 flagged package:
+               doctrine/annotations (abandoned)
   silent       javibravo/simpleue 2.1.0  direct
                last release 2017-11-15 (8.8 years ago); last push 2017-11-18 (8.8 years ago); released 2017-11-15,
                before PHP 8.4 GA (2024-11-21); php constraint ">=5.5" has no upper bound
@@ -123,25 +122,21 @@ high (58)
                last release 2017-11-21 (8.8 years ago); last push 2017-12-18 (8.7 years ago); released 2017-11-21,
                before PHP 8.4 GA (2024-11-21); php constraint ">=7.0" has no upper bound
   pinned       friendsofsymfony/oauth-server-bundle dev-master  direct
-               last release 2019-01-23 (7.6 years ago); pinned to branch snapshot dev-master; pulls in 5 flagged
-               packages: symfony/security-guard (abandoned), symfony/property-access (old-promise),
-               symfony/service-contracts (old-promise), symfony/var-dumper (old-promise), friendsofsymfony/oauth2-php
-               (stale)
+               last release 2019-01-23 (7.6 years ago); pinned to branch snapshot dev-master; pulls in 2 flagged
+               packages: symfony/security-guard (abandoned), friendsofsymfony/oauth2-php (stale)
   pinned       wallabag/rulerz dev-master  direct
+               released 2023-12-24, before PHP 8.4 GA (2024-11-21); php constraint ">=7.4" has no upper bound; pinned to
+               branch snapshot dev-master; pulls in 14 flagged packages: hoa/compiler (abandoned), hoa/consistency
+               (abandoned), hoa/event (abandoned), hoa/exception (abandoned), hoa/file (abandoned) and 9 more
+  pinned       wallabag/rulerz-bundle dev-master  direct
                released 2023-12-24, before PHP 8.4 GA (2024-11-21); php constraint ">=7.4" has no upper bound; pinned to
                branch snapshot dev-master; pulls in 15 flagged packages: hoa/compiler (abandoned), hoa/consistency
                (abandoned), hoa/event (abandoned), hoa/exception (abandoned), hoa/file (abandoned) and 10 more
-  pinned       wallabag/rulerz-bundle dev-master  direct
-               released 2023-12-24, before PHP 8.4 GA (2024-11-21); php constraint ">=7.4" has no upper bound; pinned to
-               branch snapshot dev-master; pulls in 18 flagged packages: hoa/compiler (abandoned), hoa/consistency
-               (abandoned), hoa/event (abandoned), hoa/exception (abandoned), hoa/file (abandoned) and 13 more
   old-promise  defuse/php-encryption v2.4.0  direct
                last release 2023-06-19 (3.2 years ago); released 2023-06-19, before PHP 8.4 GA (2024-11-21); php
                constraint ">=5.6.0" has no upper bound
   old-promise  gregwar/captcha-bundle v2.2.0  direct
-               released 2022-01-11, before PHP 8.4 GA (2024-11-21); php constraint ">=7.1.3" has no upper bound; pulls
-               in 3 flagged packages: symfony/property-access (old-promise), symfony/service-contracts (old-promise),
-               symfony/var-dumper (old-promise)
+               released 2022-01-11, before PHP 8.4 GA (2024-11-21); php constraint ">=7.1.3" has no upper bound
   old-promise  mgargano/simplehtmldom 1.5  direct
                last release 2014-01-05 (12.7 years ago); last push 2022-08-04 (4.1 years ago); released 2014-01-05,
                before PHP 8.4 GA (2024-11-21); php constraint ">=5.3.0" has no upper bound
@@ -150,12 +145,10 @@ high (58)
                constraint ">=7.0" has no upper bound; pulls in 1 flagged package: pragmarx/random (silent)
   old-promise  scheb/2fa-bundle v5.13.2  direct
                released 2022-04-16, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound; pulls
-               in 4 flagged packages: symfony/security-guard (abandoned), symfony/property-access (old-promise),
-               symfony/service-contracts (old-promise), symfony/var-dumper (old-promise)
+               in 1 flagged package: symfony/security-guard (abandoned)
   old-promise  spiriitlabs/form-filter-bundle v10.0.2  direct
                released 2024-08-23, before PHP 8.4 GA (2024-11-21); php constraint ">=7.4" has no upper bound; pulls in
-               4 flagged packages: doctrine/cache (abandoned), symfony/property-access (old-promise),
-               symfony/service-contracts (old-promise), symfony/var-dumper (old-promise)
+               1 flagged package: doctrine/cache (abandoned)
   old-promise  symfony/asset v5.4.45  direct
                released 2024-10-22, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound
   old-promise  symfony/browser-kit v5.4.45  direct
@@ -163,62 +156,49 @@ high (58)
   old-promise  symfony/config v5.4.46  direct
                released 2024-10-30, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound
   old-promise  symfony/console v5.4.47  direct
-               released 2024-11-06, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound; pulls
-               in 1 flagged package: symfony/service-contracts (old-promise)
+               released 2024-11-06, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound
   old-promise  symfony/dependency-injection v5.4.48  direct
-               released 2024-11-20, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound; pulls
-               in 1 flagged package: symfony/service-contracts (old-promise)
+               released 2024-11-20, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound
   old-promise  symfony/doctrine-bridge v5.4.48  direct
-               released 2024-11-20, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound; pulls
-               in 1 flagged package: symfony/service-contracts (old-promise)
+               released 2024-11-20, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound
   old-promise  symfony/error-handler v5.4.46  direct
-               released 2024-11-05, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound; pulls
-               in 1 flagged package: symfony/var-dumper (old-promise)
+               released 2024-11-05, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound
   old-promise  symfony/event-dispatcher v5.4.45  direct
                released 2024-09-25, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound
   old-promise  symfony/event-dispatcher-contracts v2.5.4  direct
                released 2024-09-25, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound
   old-promise  symfony/expression-language v5.4.45  direct
-               released 2024-10-04, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound; pulls
-               in 1 flagged package: symfony/service-contracts (old-promise)
+               released 2024-10-04, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound
   old-promise  symfony/filesystem v5.4.45  direct
                released 2024-10-22, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound
   old-promise  symfony/finder v5.4.45  direct
                released 2024-09-28, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound
   old-promise  symfony/form v5.4.45  direct
-               released 2024-10-08, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound; pulls
-               in 2 flagged packages: symfony/property-access (old-promise), symfony/service-contracts (old-promise)
+               released 2024-10-08, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound
   old-promise  symfony/framework-bundle v5.4.45  direct
-               released 2024-10-22, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound; pulls
-               in 2 flagged packages: symfony/service-contracts (old-promise), symfony/var-dumper (old-promise)
+               released 2024-10-22, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound
   old-promise  symfony/google-mailer v5.4.45  direct
-               released 2024-09-25, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound; pulls
-               in 1 flagged package: symfony/service-contracts (old-promise)
+               released 2024-09-25, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound
   old-promise  symfony/intl v5.4.47  direct
                released 2024-11-08, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound
   old-promise  symfony/monolog-bundle v3.10.0  direct
-               released 2023-11-06, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound; pulls
-               in 2 flagged packages: symfony/service-contracts (old-promise), symfony/var-dumper (old-promise)
+               released 2023-11-06, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound
   old-promise  symfony/options-resolver v5.4.45  direct
                released 2024-09-25, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound
   old-promise  symfony/proxy-manager-bridge v5.4.45  direct
                released 2024-09-25, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound; pulls
-               in 2 flagged packages: friendsofphp/proxy-manager-lts (old-promise), symfony/service-contracts
-               (old-promise)
+               in 1 flagged package: friendsofphp/proxy-manager-lts (old-promise)
   old-promise  symfony/security-bundle v5.4.45  direct
                released 2024-09-25, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound; pulls
-               in 4 flagged packages: symfony/security-guard (abandoned), symfony/property-access (old-promise),
-               symfony/service-contracts (old-promise), symfony/var-dumper (old-promise)
+               in 1 flagged package: symfony/security-guard (abandoned)
   old-promise  symfony/templating v5.4.45  direct
                released 2024-10-22, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound
   old-promise  symfony/translation-contracts v2.5.4  direct
                released 2024-09-25, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound
   old-promise  symfony/twig-bundle v5.4.45  direct
-               released 2024-09-25, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound; pulls
-               in 1 flagged package: symfony/var-dumper (old-promise)
+               released 2024-09-25, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound
   old-promise  symfony/webpack-encore-bundle v1.17.2  direct
-               released 2023-09-26, before PHP 8.4 GA (2024-11-21); php constraint ">=7.1.3" has no upper bound; pulls
-               in 2 flagged packages: symfony/service-contracts (old-promise), symfony/var-dumper (old-promise)
+               released 2023-09-26, before PHP 8.4 GA (2024-11-21); php constraint ">=7.1.3" has no upper bound
   old-promise  wallabag/phpepub 4.0.10  direct
                last release 2022-03-21 (4.5 years ago); released 2022-03-21, before PHP 8.4 GA (2024-11-21); php
                constraint ">=5.3.0" has no upper bound; pulls in 5 flagged packages: grandt/binstring (silent),
@@ -256,9 +236,7 @@ medium (12)
                last release 2022-01-30 (4.6 years ago); last push 2023-08-03 (3.1 years ago); released 2022-01-30,
                before PHP 8.4 GA (2024-11-21); php constraint ">=7.1.0" has no upper bound
   stale        craue/config-bundle 2.7.0  direct
-               last release 2023-08-06 (3.1 years ago); pulls in 4 flagged packages: doctrine/cache (abandoned),
-               symfony/property-access (old-promise), symfony/service-contracts (old-promise), symfony/var-dumper
-               (old-promise)
+               last release 2023-08-06 (3.1 years ago); pulls in 1 flagged package: doctrine/cache (abandoned)
 
 low (2)
   stale        friendsofsymfony/oauth2-php 1.3.1  via friendsofsymfony/oauth-server-bundle
@@ -269,16 +247,16 @@ low (2)
 200 packages checked · abandoned 19 · silent 8 · pinned 4 · old-promise 41 · stale 3 · unknown 0 · finished 18 ·
 ok 107
 priority: critical 3 · high 58 · medium 12 · low 2
-pulled in by: wallabag/rulerz-bundle 18 · wallabag/rulerz 15 · friendsofsymfony/oauth-server-bundle 5 ·
-wallabag/phpepub 5 · craue/config-bundle 4 · … and 46 more
+pulled in by: wallabag/rulerz-bundle 15 · wallabag/rulerz 14 · wallabag/phpepub 5 · friendsofsymfony/jsrouting-bundle
+2 · friendsofsymfony/oauth-server-bundle 2 · … and 21 more
 Data as of 2026-09-15 (package repositories, GitHub). Run composer lockrot --format=json for details.
 ```
 
 ## The same run as JSON
 
 `--format=json` is the only format that carries every field. Below is the document header and the
-first finding, complete except for signals S3, S4, S5 and S7 and the rest of the `exposure` list,
-which `…` stands in for:
+first finding, complete except for signals S3, S4, S5 and S7, and for the rest of the `exposure`
+list, which `…` stands in for:
 
 ```json
 {
@@ -310,14 +288,14 @@ which `…` stands in for:
     "exposure": [
         {
             "package": "wallabag/rulerz-bundle",
-            "flagged": 18
-        },
-        {
-            "package": "wallabag/rulerz",
             "flagged": 15
         },
         {
-            "package": "friendsofsymfony/oauth-server-bundle",
+            "package": "wallabag/rulerz",
+            "flagged": 14
+        },
+        {
+            "package": "wallabag/phpepub",
             "flagged": 5
         },
         …
@@ -350,7 +328,7 @@ which `…` stands in for:
                         "last_version": "v6.2.10",
                         "years": 3.6
                     }
-                }
+                },
                 …
             ],
             "chain": [
@@ -359,7 +337,7 @@ which `…` stands in for:
             "direct_dependents": [
                 "sensio/framework-extra-bundle"
             ],
-            "evidence": "marked abandoned by its repository, replacement: Symfony; last release 2023-02-24 (3.6 years ago); repository archived on GitHub; last push 2023-02-24 (3.6 years ago); released 2023-02-24, before PHP 8.4 GA (2024-11-21); php constraint \">=7.2.5\" has no upper bound; pulls in 3 flagged packages: doctrine/annotations (abandoned), symfony/service-contracts (old-promise), symfony/var-dumper (old-promise)",
+            "evidence": "marked abandoned by its repository, replacement: Symfony; last release 2023-02-24 (3.6 years ago); repository archived on GitHub; last push 2023-02-24 (3.6 years ago); released 2023-02-24, before PHP 8.4 GA (2024-11-21); php constraint \">=7.2.5\" has no upper bound; pulls in 1 flagged package: doctrine/annotations (abandoned)",
             "allowlist_reason": null,
             "note": null,
             "data_date": "2026-09-15T17:31:32+00:00"
@@ -369,7 +347,7 @@ which `…` stands in for:
 }
 ```
 
-The cut signals have the same shape as S1 and S2, S7 carrying the packages it names under `data`. So
+The cut signals have the same shape as S1 and S2; S7 carries the packages it names under `data`. So
 do the other 199 findings, each with its own `priority`, `direct`, `dev`, `signals`, `chain`,
 `direct_dependents`, `evidence`, `allowlist_reason`, `note` and `data_date`. `exposure` is the
 `pulled in by:` line in full — every direct requirement that pulls in a flagged transitive package,

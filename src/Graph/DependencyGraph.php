@@ -137,12 +137,10 @@ final class DependencyGraph
     private function unwind(array $parent, string $target): array
     {
         $chain = [];
-        $node = $target;
-        while ($node !== null) {
-            array_unshift($chain, $node);
-            $node = $parent[$node];
+        for ($node = $target; $node !== null; $node = $parent[$node]) {
+            $chain[] = $node;
         }
 
-        return $chain;
+        return array_reverse($chain);
     }
 }

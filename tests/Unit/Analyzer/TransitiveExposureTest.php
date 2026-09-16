@@ -183,4 +183,42 @@ final class TransitiveExposureTest extends TestCase
         self::assertIsArray($pulledIn);
         self::assertCount(7, $pulledIn);
     }
+
+    public function testAPackageReachedFromMoreThanTheCapIsNobodysExposure(): void
+    {
+        $roots = [];
+        $packages = [['name' => 'vendor/shared', 'version' => '1.0.0'], ['name' => 'vendor/leaf', 'version' => '1.0.0']];
+        for ($i = 1; $i <= TransitiveExposure::MAX_FAN_IN + 1; ++$i) {
+            $root = \sprintf('root/r%02d', $i);
+            $roots[$root] = '^1';
+            // Every root reaches the shared package; only the first also reaches the leaf.
+            $packages[] = ['name' => $root, 'version' => '1.0.0', 'require' => $i === 1 ? ['vendor/shared' => '^1', 'vendor/leaf' => '^1'] : ['vendor/shared' => '^1']];
+        }
+        $graph = DependencyGraph::fromLock(LockFile::fromArray(['packages' => $packages]), ProjectConfig::fromArray(['require' => $roots]), false);
+        $stale = new Signal(Signal::S2, Signal::LEVEL_WARN, 'old');
+        $findings = [$this->finding($graph, 'vendor/shared', Verdict::STALE, [$stale]), $this->finding($graph, 'vendor/leaf', Verdict::STALE, [$stale])];
+        foreach (array_keys($roots) as $root) {
+            $findings[] = $this->finding($graph, $root, Verdict::OK);
+        }
+
+        self::assertCount(TransitiveExposure::MAX_FAN_IN + 1, $findings[0]->directDependents());
+        self::assertFalse(TransitiveExposure::attributable($findings[0]));
+        self::assertTrue(TransitiveExposure::attributable($findings[1]));
+
+        $f = $this->byName(TransitiveExposure::attach($findings, $graph));
+        $first = self::s7($f['root/r01']);
+        self::assertNotNull($first);
+        self::assertSame('pulls in 1 flagged package: vendor/leaf (stale)', $first->summary());
+        self::assertNull(self::s7($f['root/r02']));
+    }
+
+    public function testAttributableRequiresFlaggedAndTransitive(): void
+    {
+        $graph = $this->graph();
+        self::assertTrue(TransitiveExposure::attributable($this->finding($graph, 'vendor/leaf', Verdict::STALE)));
+        self::assertFalse(TransitiveExposure::attributable($this->finding($graph, 'vendor/leaf', Verdict::OK)));
+        self::assertFalse(TransitiveExposure::attributable($this->finding($graph, 'vendor/leaf', Verdict::UNKNOWN)));
+        self::assertFalse(TransitiveExposure::attributable($this->finding($graph, 'root/a', Verdict::STALE)));
+        self::assertFalse(TransitiveExposure::attributable($this->finding($graph, 'vendor/lonely', Verdict::STALE)), 'nothing reaches it, so nobody is answerable');
+    }
 }

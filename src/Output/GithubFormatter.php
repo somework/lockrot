@@ -53,11 +53,14 @@ final class GithubFormatter implements FormatterInterface
         foreach ($this->notes($report) as $note) {
             $lines[] = '::notice title=lockrot::'.self::escapeData($note);
         }
-        // Plain log lines, not annotations: they describe the run, and no line of composer.lock is
-        // the place for them.
+        // A plain log line, not an annotation: it describes the run, and no line of composer.lock is
+        // the place for it. It carries package names, and a name is read from the lock unvalidated,
+        // so a line break inside one would start a new line — and a `::` after it would be run as a
+        // workflow command. The breaks are folded into spaces; escapeData() is for command payloads
+        // and would leave a literal `%25` in a plain line.
         $exposure = $report->exposureSummaryLine();
         if ($exposure !== '') {
-            $lines[] = $exposure;
+            $lines[] = str_replace(["\r\n", "\r", "\n"], ' ', $exposure);
         }
         $lines[] = $report->summaryLine();
 

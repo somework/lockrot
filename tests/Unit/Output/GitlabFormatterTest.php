@@ -336,4 +336,16 @@ final class GitlabFormatterTest extends TestCase
         // The fingerprint is untouched by where the package is reached from.
         self::assertSame(hash('sha256', 'lockrot|acme/leaf|stale'), $issues[0]['fingerprint']);
     }
+
+    public function testS7RidesInTheDescriptionLikeAnyOtherSignal(): void
+    {
+        $at = new \DateTimeImmutable('2026-09-14T06:00:00+00:00');
+        $report = new Report([
+            new Finding('acme/root', '1.0.0', Verdict::STALE, [new Signal('S2', 'warn', 'old'), new Signal(Signal::S7, Signal::LEVEL_INFO, 'pulls in 1 flagged package: acme/leaf (stale)', ['flagged' => 1, 'packages' => []])], ['acme/root'], null, $at, null, false, ['acme/root']),
+        ], [], $at, 1, 0, false);
+        $issues = self::decode((new GitlabFormatter(FormatContext::create(null, LockrotConfig::FAIL_ON_NONE)))->format($report));
+
+        self::assertSame('acme/root 1.0.0 — stale (medium): old; pulls in 1 flagged package: acme/leaf (stale)', $issues[0]['description']);
+        self::assertSame(hash('sha256', 'lockrot|acme/root|stale'), $issues[0]['fingerprint']);
+    }
 }

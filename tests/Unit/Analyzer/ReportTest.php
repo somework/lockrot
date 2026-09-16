@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Analyzer;
 
 use Lockrot\Analyzer\Report;
+use Lockrot\Analyzer\TransitiveExposure;
 use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Baseline\BaselineEntry;
@@ -314,5 +315,20 @@ final class ReportTest extends TestCase
         self::assertStringStartsWith('pulled in by: root/r01 1 · root/r02 1 · ', $line);
         self::assertStringEndsWith(' · root/r05 1 · … and 2 more', $line);
         self::assertStringNotContainsString('root/r06', $line);
+    }
+
+    public function testExposureLeavesOutAPackageReachedFromMoreRootsThanTheCap(): void
+    {
+        $many = [];
+        for ($i = 1; $i <= TransitiveExposure::MAX_FAN_IN + 1; ++$i) {
+            $many[] = \sprintf('root/r%02d', $i);
+        }
+        $report = $this->report(
+            $this->reachedFrom('vendor/shared', Verdict::ABANDONED, ...$many),
+            $this->reachedFrom('vendor/leaf', Verdict::STALE, 'root/r01')
+        );
+
+        self::assertSame(['root/r01' => 1], $report->exposure());
+        self::assertSame('pulled in by: root/r01 1', $report->exposureSummaryLine());
     }
 }

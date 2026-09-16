@@ -119,4 +119,18 @@ final class DependencyGraphTest extends TestCase
             false
         );
     }
+
+    public function testChainsToTerminatesOnCyclesAndIgnoresASelfRequire(): void
+    {
+        $lock = LockFile::fromArray(['packages' => [
+            ['name' => 'root/a', 'version' => '1.0.0', 'require' => ['vendor/x' => '^1']],
+            ['name' => 'vendor/x', 'version' => '1.0.0', 'require' => ['vendor/y' => '^1', 'vendor/x' => '^1']],
+            ['name' => 'vendor/y', 'version' => '1.0.0', 'require' => ['vendor/x' => '^1', 'root/a' => '^1']],
+        ]]);
+        $graph = DependencyGraph::fromLock($lock, ProjectConfig::fromArray(['require' => ['root/a' => '^1']]), false);
+
+        self::assertSame(['root/a' => ['root/a', 'vendor/x', 'vendor/y']], $graph->chainsTo('vendor/y'));
+        self::assertSame(['root/a' => ['root/a', 'vendor/x']], $graph->chainsTo('vendor/x'));
+        self::assertSame(['root/a' => ['root/a']], $graph->chainsTo('root/a'));
+    }
 }

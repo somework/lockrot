@@ -61,7 +61,8 @@ composer lockrot --target-php=8.4
 critical (3)
   abandoned    sensio/framework-extra-bundle v6.2.10  direct
                marked abandoned by its repository, replacement: Symfony; last release 2023-02-24
-               (3.6 years ago); repository archived on GitHub; …
+               (3.6 years ago); repository archived on GitHub; …; pulls in 1 flagged package:
+               doctrine/annotations (abandoned)
   silent       javibravo/simpleue 2.1.0  direct
                last release 2017-11-15 (8.8 years ago); last push 2017-11-18 (8.8 years ago); …
   …
@@ -74,7 +75,7 @@ high (58)
   …
 200 packages checked · abandoned 19 · silent 8 · pinned 4 · old-promise 41 · stale 3 · …
 priority: critical 3 · high 58 · medium 12 · low 2
-pulled in by: wallabag/rulerz-bundle 18 · wallabag/rulerz 15 · friendsofsymfony/oauth-server-bundle 5 · …
+pulled in by: wallabag/rulerz-bundle 15 · wallabag/rulerz 14 · wallabag/phpepub 5 · …
 …
 ```
 
@@ -106,8 +107,8 @@ and is carried in every format. **The exit code and `--fail-on` stay on the verd
 what to read first, not whether the build fails.
 
 A transitive finding names every direct requirement it is reachable from (`via a › b, also via c`),
-not only the shortest chain, and each direct requirement's evidence says what flagged packages it
-pulls in. The `pulled in by:` summary line sums that up — [transitive
+not only the one its shortest chain starts from, and each direct requirement's evidence says what
+flagged packages it pulls in. The `pulled in by:` summary line sums that up — [transitive
 exposure](https://lockrot.dev/verdicts/#transitive-exposure).
 
 [Every verdict, signal and priority rule →](https://lockrot.dev/verdicts/)
@@ -192,7 +193,7 @@ cache. Repository activity comes from GitHub and is cached for 24 hours.
 
 Everything is at [lockrot.dev](https://lockrot.dev).
 
-- [Verdicts](https://lockrot.dev/verdicts/) — the eight verdicts, the six signals, and how priority is derived
+- [Verdicts](https://lockrot.dev/verdicts/) — the eight verdicts, the seven signals, and how priority is derived
 - [Configuration](https://lockrot.dev/configuration/) — every `extra.lockrot` key, environment variable and CLI option
 - [CI](https://lockrot.dev/ci/) — exit codes and all six output formats, with GitHub and GitLab snippets
 - [Baseline](https://lockrot.dev/baseline/) — generating one, the four buckets, and how matching works

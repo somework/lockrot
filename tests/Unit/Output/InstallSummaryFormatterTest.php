@@ -6,6 +6,7 @@ namespace Lockrot\Tests\Unit\Output;
 
 use Lockrot\Analyzer\Report;
 use Lockrot\Output\InstallSummaryFormatter;
+use Lockrot\Signal\Signal;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\TestCase;
@@ -153,15 +154,17 @@ final class InstallSummaryFormatterTest extends TestCase
         }
     }
 
-    public function testAFindingLineNamesTheOtherDirectDependents(): void
+    /** The block is read in passing: the chain stays, the other parents and what a package pulls in (S7) do not. */
+    public function testAFindingLineKeepsTheChainButNeitherTheOtherParentsNorS7(): void
     {
+        $s7 = new Signal(Signal::S7, Signal::LEVEL_INFO, 'pulls in 1 flagged package: vendor/b (abandoned)', ['flagged' => 1, 'packages' => []]);
         $report = $this->report([
             new Finding('vendor/b', '2.0.0', Verdict::ABANDONED, [], ['vendor/a', 'vendor/b'], null, null, 'marked abandoned by its repository', false, ['vendor/a', 'vendor/c']),
+            new Finding('vendor/a', '1.0.0', Verdict::STALE, [new Signal('S2', 'warn', 'last release 2022-05-20 (4.3 years ago)'), $s7], ['vendor/a'], null, null, null, false, ['vendor/a']),
         ], [], 3);
 
-        self::assertSame(
-            '  <comment>abandoned   </comment>vendor/b 2.0.0: marked abandoned by its repository (via vendor/a, also via vendor/c)',
-            (new InstallSummaryFormatter())->format($report)[1]
-        );
+        $lines = (new InstallSummaryFormatter())->format($report);
+        self::assertSame('  <comment>abandoned   </comment>vendor/b 2.0.0: marked abandoned by its repository (via vendor/a)', $lines[1]);
+        self::assertSame('  <comment>stale       </comment>vendor/a 1.0.0: last release 2022-05-20 (4.3 years ago)', $lines[2]);
     }
 }

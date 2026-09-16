@@ -34,10 +34,10 @@ long evidence line may still wrap past one row in a narrow terminal.
 The order is the report's own: [priority](verdicts.md) first, so the ten lines go to the packages
 that apply most directly to the project.
 
-Each line ends with the chain the package is pulled in by and, for a transitive package, the other direct
-requirements that reach it (`(via a > b, also via c)`), resolved through the whole lock. Signal S7 — what a direct
-requirement pulls in, see [verdicts.md](verdicts.md#transitive-exposure) — is attached only to packages the
-transaction itself touches, since only those are analysed here.
+A transitive package's line ends with the chain it is pulled in by, resolved through the whole lock. The block
+stops there: neither the other direct requirements that reach the package nor what a direct requirement pulls in
+(signal S7, see [verdicts.md](verdicts.md#transitive-exposure)) is printed here — both answer questions asked over
+the full report, and `composer lockrot` has them.
 
 ## Silent only when the transaction was both checked and clean
 

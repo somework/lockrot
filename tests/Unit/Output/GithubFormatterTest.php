@@ -290,4 +290,33 @@ final class GithubFormatterTest extends TestCase
         $lines = explode("\n", trim($this->formatter(LockrotConfig::FAIL_ON_NONE, null)->format($this->report())));
         self::assertSame([], array_filter($lines, static fn (string $l): bool => strpos($l, 'pulled in by:') === 0));
     }
+
+    public function testALineBreakInAPackageNameCannotStartAWorkflowCommandFromTheExposureLine(): void
+    {
+        $at = new \DateTimeImmutable('2026-09-14T06:00:00+00:00');
+        $evil = "evil/root\n::error file=.github/workflows/ci.yml,line=1::injected";
+        $report = new Report([
+            new Finding('acme/leaf', '1.0.0', Verdict::STALE, [new Signal('S2', 'warn', 'old')], [$evil, 'acme/leaf'], null, $at, null, false, [$evil]),
+        ], [], $at, 1, 0, false);
+        $lines = explode("\n", trim($this->formatter(LockrotConfig::FAIL_ON_NONE, null)->format($report)));
+
+        // The runner reads a command only at the start of a line: the annotation carries the break
+        // as %0A, and the plain line folds it into a space, so no line begins with the forged command.
+        foreach ($lines as $line) {
+            self::assertStringStartsNotWith('::error', $line);
+        }
+        self::assertStringContainsString('via evil/root%0A::error', $lines[0]);
+        self::assertSame('pulled in by: evil/root ::error file=.github/workflows/ci.yml,line=1::injected 1', $lines[1]);
+    }
+
+    public function testS7RidesInTheAnnotationBodyLikeAnyOtherSignal(): void
+    {
+        $at = new \DateTimeImmutable('2026-09-14T06:00:00+00:00');
+        $report = new Report([
+            new Finding('acme/root', '1.0.0', Verdict::STALE, [new Signal('S2', 'warn', 'old'), new Signal(Signal::S7, Signal::LEVEL_INFO, 'pulls in 1 flagged package: acme/leaf (stale)', ['flagged' => 1, 'packages' => []])], ['acme/root'], null, $at, null, false, ['acme/root']),
+        ], [], $at, 1, 0, false);
+        $lines = explode("\n", trim($this->formatter(LockrotConfig::FAIL_ON_NONE, null)->format($report)));
+
+        self::assertStringEndsWith('::acme/root 1.0.0: old; pulls in 1 flagged package: acme/leaf (stale)', $lines[0]);
+    }
 }

@@ -102,10 +102,11 @@ steps:
 ```
 
 `if: always()` keeps the upload running when `--fail-on` already failed the step. Each result carries the
-[priority](verdicts.md) as `rank`, the field SARIF 2.1.0 defines for it, and the same result's `properties` carry
-`priority`, `direct`, `dev`, `chain` and `direct_dependents` (every direct requirement the package is reachable from,
-see [transitive exposure](verdicts.md#transitive-exposure)) by name. The rule a result points at and its `level` follow the verdict. Both `github`
-and `sarif` point at `composer.lock` in the checkout root, so run them from the directory that holds the lock file.
+[priority](verdicts.md) as `rank`, the field SARIF 2.1.0 defines for it, and the same result's `properties` carry,
+among others, `priority`, `direct`, `dev`, `chain` and `direct_dependents` — every direct requirement the package is
+reachable from, see [transitive exposure](verdicts.md#transitive-exposure). The rule a result points at and its
+`level` follow the verdict. Both `github` and `sarif` point at `composer.lock` in the checkout root, so run them from
+the directory that holds the lock file.
 
 ## `--format=gitlab`
 
@@ -129,11 +130,10 @@ same `<verdict> (<priority>)` phrase the GitHub annotation title uses:
 sensio/framework-extra-bundle v6.2.10 — abandoned (critical): marked abandoned by its repository, replacement: Symfony; …
 ```
 
-The description ends with the chain and, for a transitive package, the other direct requirements that reach it
+For a transitive package the description ends with the chain and the other direct requirements that reach it
 (`(via a > b, also via c, d)`). Severity follows the same rule as the GitHub and SARIF level: a finding at or above
 `--fail-on` is `major`, any other flagged verdict `minor`, and a row only `--all` shows (or one a
-[baseline](baseline.md) already knows) `info`. Each
-issue's fingerprint is a stable hash of the package name and verdict, so a version bump that keeps the same verdict —
+[baseline](baseline.md) already knows) `info`. Each issue's fingerprint is a stable hash of the package name and verdict, so a version bump that keeps the same verdict —
 or a reformatted lock that moves the entry to a different line — keeps the same GitLab issue identity. The priority is
 deliberately not part of it, so moving a package from `require` to `require-dev` does not open a second issue for a
 finding GitLab already tracks. GitLab's Code Quality format has no field for a document-level note, so notes are
@@ -155,7 +155,10 @@ gh pr comment --body-file comment.md
 | Priority | Package | Version | Verdict | Evidence | Via |
 |---|---|---|---|---|---|
 | critical | `sensio/framework-extra-bundle` | v6.2.10 | **abandoned** | marked abandoned by its repository, replacement: Symfony; … | direct |
-| high | `friendsofsymfony/oauth-server-bundle` | dev-master | **pinned** | last release 2019-01-23 (7.6 years ago); pinned to branch snapshot dev-master | direct |
+| high | `friendsofsymfony/oauth-server-bundle` | dev-master | **pinned** | last release 2019-01-23 (7.6 years ago); pinned to branch snapshot dev-master; pulls in 2 flagged packages: symfony/security-guard (abandoned), … | direct |
+| high | `hoa/ruler` | 2.17.05.16 | **abandoned** | marked abandoned by its repository; … | wallabag/rulerz, also via wallabag/rulerz-bundle |
+
+pulled in by: wallabag/rulerz-bundle 15 · wallabag/rulerz 14 · wallabag/phpepub 5 · …
 ```
 
 The evidence cells are abridged here; the real cells carry every signal. Everything that comes from the project or
@@ -168,5 +171,8 @@ bold only when the baseline has not already accepted it.
 
 ## `--format=json`
 
-The complete report, and the only format that carries every field: per-finding `signals`, `chain`, `evidence` and
-`data_date`, plus the document's `notes`. [example-run.md](example-run.md) has a worked excerpt.
+The complete report, and the only format that carries every field: per-finding `signals`, `chain`,
+`direct_dependents`, `evidence` and `data_date`, plus the document's `exposure` and `notes`.
+[example-run.md](example-run.md) has a worked excerpt. Signal `S7` on a direct requirement carries every package it
+pulls in, each with its chain, under `data.packages` — uncapped, so on a lock with many direct requirements and much
+transitive rot that part of the document is the large one.

@@ -195,6 +195,9 @@ final class AnalyzerTest extends TestCase
         self::assertSame(Priority::HIGH, $byName['vendor/devtool']->priority());
         // Priority orders the report: the prod row comes first even though the two verdicts are equal.
         self::assertSame(['vendor/prod', 'vendor/devtool'], array_map(static fn ($f) => $f->package(), $report->findings()));
+        // A dev root is a parent like any other once --dev brings it in.
+        self::assertSame(['vendor/devtool'], $byName['vendor/devtool']->directDependents());
+        self::assertSame(['vendor/prod'], $byName['vendor/prod']->directDependents());
     }
 
     public function testAllowlistedIsFinishedAndNotFetchedFromGitHub(): void

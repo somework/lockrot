@@ -123,7 +123,7 @@ final class Finding
 
     /**
      * The direct requirements the chain does not already name: the other ways the project reaches
-     * the package. For a direct package that is every other root that also requires it; for a
+     * the package. For a direct package that is every other root that also reaches it; for a
      * transitive one every root but the one its chain starts from. Removing the chain's root from
      * composer.json would leave the package installed through any of these.
      *
@@ -142,14 +142,41 @@ final class Finding
         return Priority::of($this->verdict, $this->isDirect(), $this->dev);
     }
 
-    public function evidence(): string
+    /**
+     * What was observed about the package itself — every signal but S7 — and, when nothing was, the
+     * note that says why (not from a Composer repository, metadata unavailable, …).
+     */
+    public function ownEvidence(): string
     {
-        if ($this->signals === []) {
-            return $this->note ?? '';
-        }
         $parts = [];
         foreach ($this->signals as $signal) {
-            $parts[] = $signal->summary();
+            if ($signal->id() !== Signal::S7) {
+                $parts[] = $signal->summary();
+            }
+        }
+        if ($parts === []) {
+            return $this->note ?? '';
+        }
+
+        return implode('; ', $parts);
+    }
+
+    /**
+     * {@see ownEvidence()} followed by what the package pulls in (S7), when it is a direct
+     * requirement that does. The note is kept ahead of S7 rather than replaced by it: a path or VCS
+     * package that pulls in flagged packages is still "not from a Composer repository, not checked".
+     */
+    public function evidence(): string
+    {
+        $parts = [];
+        $own = $this->ownEvidence();
+        if ($own !== '') {
+            $parts[] = $own;
+        }
+        foreach ($this->signals as $signal) {
+            if ($signal->id() === Signal::S7) {
+                $parts[] = $signal->summary();
+            }
         }
 
         return implode('; ', $parts);

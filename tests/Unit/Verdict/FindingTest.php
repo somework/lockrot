@@ -150,4 +150,21 @@ final class FindingTest extends TestCase
         self::assertSame($at, $annotated->dataDate());
         self::assertSame(['vendor/pkg'], $annotated->directDependents());
     }
+
+    public function testTheNoteSurvivesS7AndOwnEvidenceLeavesS7Out(): void
+    {
+        $s7 = new Signal(Signal::S7, Signal::LEVEL_INFO, 'pulls in 2 flagged packages: a/b (stale), c/d (stale)', ['flagged' => 2, 'packages' => []]);
+        $unchecked = new Finding('local/pkg', 'dev-main', Verdict::UNKNOWN, [$s7], ['local/pkg'], null, null, 'not from a Composer repository, not checked');
+        self::assertSame('not from a Composer repository, not checked; pulls in 2 flagged packages: a/b (stale), c/d (stale)', $unchecked->evidence());
+        self::assertSame('not from a Composer repository, not checked', $unchecked->ownEvidence());
+
+        $own = new Signal('S2', 'warn', 'last release 2022-05-20 (4.3 years ago)');
+        $stale = new Finding('vendor/pkg', '1.0.0', Verdict::STALE, [$own, $s7], ['vendor/pkg'], null, null, 'a note nobody reads');
+        self::assertSame('last release 2022-05-20 (4.3 years ago); pulls in 2 flagged packages: a/b (stale), c/d (stale)', $stale->evidence());
+        self::assertSame('last release 2022-05-20 (4.3 years ago)', $stale->ownEvidence());
+
+        $clean = new Finding('vendor/ok', '1.0.0', Verdict::OK, [], ['vendor/ok'], null, null);
+        self::assertSame('', $clean->evidence());
+        self::assertSame('', $clean->ownEvidence());
+    }
 }

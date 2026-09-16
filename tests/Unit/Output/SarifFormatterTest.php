@@ -487,4 +487,19 @@ final class SarifFormatterTest extends TestCase
 
         self::assertSame(['a/parent', 'b/parent'], JsonPath::arrayAt($this->singleRun($sarif), ['results', 0, 'properties', 'direct_dependents']));
     }
+
+    public function testS7RidesInTheMessageAndTheSignalListLikeAnyOtherSignal(): void
+    {
+        $at = new \DateTimeImmutable('2026-09-14T06:00:00+00:00');
+        $report = new Report([
+            new Finding('acme/root', '1.0.0', Verdict::STALE, [new Signal('S2', 'warn', 'old'), new Signal(Signal::S7, Signal::LEVEL_INFO, 'pulls in 1 flagged package: acme/leaf (stale)', ['flagged' => 1, 'packages' => []])], ['acme/root'], null, $at, null, false, ['acme/root']),
+        ], [], $at, 1, 0, false);
+        $sarif = $this->formatter(LockrotConfig::FAIL_ON_NONE, null)->format($report);
+        $this->assertValidSarif($sarif);
+        $run = $this->singleRun($sarif);
+
+        self::assertSame('acme/root 1.0.0: old; pulls in 1 flagged package: acme/leaf (stale)', JsonPath::stringAt($run, ['results', 0, 'message', 'text']));
+        self::assertSame(['S2', 'S7'], JsonPath::arrayAt($run, ['results', 0, 'properties', 'signals']));
+        self::assertSame('lockrot/stale', JsonPath::stringAt($run, ['results', 0, 'ruleId']));
+    }
 }

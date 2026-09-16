@@ -106,8 +106,9 @@ from one direct requirement. When others reach the package too, the row says so:
 ```
 
 Dropping `wallabag/rulerz` alone would leave `hoa/ruler` installed through `wallabag/rulerz-bundle`.
-Up to three other requirements are named, then counted (`and 12 more`); `--format=json` carries the
-full list as `direct_dependents` on every finding, the package itself included when it is direct.
+The first three other requirements by name are named, then the rest counted (`and 12 more`);
+`--format=json` carries the full list as `direct_dependents` on every finding, the package itself
+included when it is direct.
 A direct requirement's own row stays `direct`, even when other requirements reach it as well — in
 a framework application every bundle reaches the framework's own packages, and naming them there
 would say nothing.
@@ -119,21 +120,28 @@ report order, with the shortest chain from that requirement to each:
 ```text
   pinned       wallabag/rulerz-bundle dev-master  direct
                released 2023-12-24, before PHP 8.4 GA (2024-11-21); php constraint ">=7.4" has no
-               upper bound; pinned to branch snapshot dev-master; pulls in 18 flagged packages:
+               upper bound; pinned to branch snapshot dev-master; pulls in 15 flagged packages:
                hoa/compiler (abandoned), hoa/consistency (abandoned), hoa/event (abandoned),
-               hoa/exception (abandoned), hoa/file (abandoned) and 13 more
+               hoa/exception (abandoned), hoa/file (abandoned) and 10 more
 ```
 
 Five are named in the evidence; `--format=json` carries them all under the signal's `data`, each
 with its `verdict` and `chain`. A requirement whose own verdict is `ok` carries S7 too, so `--all`
-shows what a clean-looking requirement is responsible for.
+shows what a clean-looking requirement is responsible for — as does an allowlisted one, whose
+`finished` row is likewise only printed under `--all` while the `pulled in by:` line below still
+counts it.
+
+A flagged transitive package reached from **more than eight** direct requirements is shared
+infrastructure — in a framework application, the framework's own contracts, reached from every
+bundle — and nobody's to remove, so it is left out of S7 and of the `pulled in by:` line. It keeps
+its own row, with `also via … and N more`, and `direct_dependents` still names every parent.
 
 **The `pulled in by:` line.** The summary block sums the same thing up per direct requirement,
 most first:
 
 ```text
-pulled in by: wallabag/rulerz-bundle 18 · wallabag/rulerz 15 · friendsofsymfony/oauth-server-bundle 5 ·
-wallabag/phpepub 5 · craue/config-bundle 4 · … and 46 more
+pulled in by: wallabag/rulerz-bundle 15 · wallabag/rulerz 14 · wallabag/phpepub 5 · friendsofsymfony/jsrouting-bundle
+2 · friendsofsymfony/oauth-server-bundle 2 · … and 21 more
 ```
 
 Five requirements are named, then the rest counted; the JSON document carries the whole list as
@@ -144,9 +152,14 @@ Five requirements are named, then the rest counted; the JSON document carries th
 > the priority does. A flagged package the project requires directly is its own row's business
 > and counts under nobody, whoever else reaches it.
 
+The graph is the lock's `require` edges. A requirement satisfied through `replace` or `provide` — a
+virtual package such as `psr/log-implementation`, or a package another one replaces — contributes
+no edge, so the provider can have fewer parents listed than actually pull it in. That case renders
+`?` in the `via` column when nothing else reaches the package.
+
 At install time only the packages the transaction touches are analysed, so a direct requirement
-gets S7 only when it is itself part of the transaction; `composer lockrot` on the full lock always
-has the whole picture.
+gets S7 only when it is itself part of the transaction, and the compact block does not print S7 or
+the other parents at all; `composer lockrot` on the full lock always has the whole picture.
 
 ## Related
 

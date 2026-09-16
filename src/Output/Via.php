@@ -70,15 +70,19 @@ final class Via
         return self::withAlso(self::chain($finding, $separator), $finding);
     }
 
-    /** For a one-line message: ` (via a > b)` or ` (via a > b, also via c)`; nothing for a direct or unplaceable package. */
-    public static function suffix(Finding $finding, string $separator): string
+    /**
+     * For a one-line message: ` (via a > b)` or ` (via a > b, also via c)`; nothing for a direct or
+     * unplaceable package. With $withOthers false the other roots are left out — what the
+     * install-time block wants, whose lines are read in passing and already long.
+     */
+    public static function suffix(Finding $finding, string $separator, bool $withOthers = true): string
     {
         $chain = self::chain($finding, $separator);
         $parts = [];
         if ($chain !== 'direct' && $chain !== '?') {
             $parts[] = 'via '.$chain;
         }
-        $also = self::also($finding);
+        $also = $withOthers ? self::also($finding) : '';
         if ($also !== '') {
             $parts[] = $also;
         }
