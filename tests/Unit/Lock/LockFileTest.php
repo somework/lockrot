@@ -49,6 +49,7 @@ final class LockFileTest extends TestCase
             ['name' => 'a/both', 'version' => '1.0.0', 'source' => ['type' => 'git', 'url' => 'https://github.com/a/both.git', 'reference' => 'x'], 'support' => ['source' => 'https://github.com/a/other']],
             ['name' => 'a/empty', 'version' => '1.0.0', 'support' => ['source' => '']],
             ['name' => 'a/none', 'version' => '1.0.0'],
+            ['name' => 'a/tree', 'version' => '1.0.0', 'support' => ['source' => 'https://github.com/a/tree/tree/1.0.0']],
         ]]);
 
         $urls = [];
@@ -60,6 +61,7 @@ final class LockFileTest extends TestCase
             'a/both' => 'https://github.com/a/both.git',
             'a/empty' => null,
             'a/none' => null,
+            'a/tree' => 'https://github.com/a/tree',
         ], $urls);
     }
 

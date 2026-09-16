@@ -7,8 +7,9 @@ namespace Lockrot\Data\Forge;
 use Composer\Config;
 
 /**
- * Turns a package's source URL into a {@see RepoRef}, or null when the URL points somewhere lockrot
- * does not ask about activity.
+ * Turns a package's repository URL — its clone URL, or a `support.source` already reduced to the
+ * repository by {@see SupportSource} — into a {@see RepoRef}, or null when the URL points somewhere
+ * lockrot does not ask about activity.
  *
  * `github.com` and `bitbucket.org` are fixed. GitLab hosts come from Composer's own
  * `gitlab-domains` setting (`gitlab.com` by default), so a self-hosted instance the project already

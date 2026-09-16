@@ -7,6 +7,7 @@ namespace Lockrot\Lock;
 use Composer\Package\CompletePackage;
 use Composer\Repository\PlatformRepository;
 use Composer\Semver\VersionParser;
+use Lockrot\Data\Forge\SupportSource;
 
 final class LockedPackage
 {
@@ -74,8 +75,7 @@ final class LockedPackage
         $notificationUrl = $package->getNotificationUrl();
         $repositoryUrl = $package->getSourceUrl();
         if ($repositoryUrl === null || $repositoryUrl === '') {
-            $support = $package->getSupport()['source'] ?? null;
-            $repositoryUrl = \is_string($support) && $support !== '' ? $support : null;
+            $repositoryUrl = SupportSource::url($package->getSupport());
         }
 
         return new self(
@@ -114,8 +114,8 @@ final class LockedPackage
         return $this->requires;
     }
     /**
-     * The lock entry's `source` URL, else its `support.source`. Consulted only when the
-     * repository metadata names no repository for the newest release
+     * The lock entry's `source` URL, else its `support.source` reduced to the repository. Consulted
+     * only when the repository metadata names no repository for the highest release
      * ({@see \Lockrot\Data\Repository\PackageMetadata::repositoryUrl()}).
      */
     public function repositoryUrl(): ?string

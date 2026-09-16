@@ -63,10 +63,11 @@ A package missing from the cache is reported as unavailable, not as absent from 
 
 ## Repository hosts and credentials
 
-The package's repository decides which host is asked — the `source` URL of its newest release,
-else that release's `support.source`, else the lock entry's `source` or `support.source`; an older
-release's `source` is never substituted, so a package whose newest release names no repository
-is judged on its release dates alone. The host is `github.com`, `bitbucket.org`, or a GitLab
+The package's repository decides which host is asked — the `source` URL of its highest stable
+release, else that release's `support.source` (a `…/tree/<ref>` page address is reduced to the
+repository), else the lock entry's `source` or `support.source`; an older release's `source` is
+never substituted, so a package whose newest release names no repository gets no activity check
+at all. The host is `github.com`, `bitbucket.org`, or a GitLab
 instance — `gitlab.com` and every entry of Composer's own `gitlab-domains` setting, so a self-hosted
 GitLab the project already installs from needs no lockrot configuration of its own. GitHub
 Enterprise (`github-domains`) and Bitbucket Server are not queried.

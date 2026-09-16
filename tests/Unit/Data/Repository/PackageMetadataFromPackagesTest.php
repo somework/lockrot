@@ -83,19 +83,19 @@ final class PackageMetadataFromPackagesTest extends TestCase
         self::assertNull($meta->lastStableVersion());
     }
 
-    public function testTypeAndRepositoryComeFromTheFirstVersionWhenNothingIsDated(): void
+    public function testTypeComesFromTheFirstVersionAndTheRepositoryFromTheHighest(): void
     {
         $first = $this->load([
             'name' => 'a/b',
-            'version' => '2.0.0',
+            'version' => '1.0.0',
             'type' => 'symfony-bundle',
-            'source' => ['type' => 'git', 'url' => 'https://example.test/a/b.git', 'reference' => 'abc'],
+            'source' => ['type' => 'git', 'url' => 'https://example.test/old/b.git', 'reference' => 'abc'],
         ]);
-        $second = $this->load(['name' => 'a/b', 'version' => '1.0.0', 'source' => ['type' => 'git', 'url' => 'https://example.test/old/b.git', 'reference' => 'abc']]);
+        $second = $this->load(['name' => 'a/b', 'version' => '2.0.0', 'type' => 'library', 'source' => ['type' => 'git', 'url' => 'https://example.test/a/b.git', 'reference' => 'abc']]);
 
         $meta = PackageMetadata::fromPackages('a/b', [$first, $second], new \DateTimeImmutable(self::FIXED));
 
-        self::assertSame('https://example.test/a/b.git', $meta->repositoryUrl(), 'Packagist lists newest first');
+        self::assertSame('https://example.test/a/b.git', $meta->repositoryUrl());
         self::assertSame('symfony-bundle', $meta->type());
     }
 
@@ -124,8 +124,8 @@ final class PackageMetadataFromPackagesTest extends TestCase
         self::assertSame('https://github.com/phpstan/phpstan-src', $meta->repositoryUrl());
     }
 
-    /** A renamed repository: the newest release names the new home, older ones the old. */
-    public function testTheNewestReleasesSourceWinsWhateverTheOrder(): void
+    /** A renamed repository: the highest release names the new home, older ones the old. */
+    public function testTheHighestReleasesSourceWinsWhateverTheOrder(): void
     {
         $old = $this->load(['name' => 'a/b', 'version' => '1.0.0', 'time' => '2019-01-01T00:00:00+00:00', 'source' => ['type' => 'git', 'url' => 'https://github.com/Old/Name.git', 'reference' => 'a']]);
         $new = $this->load(['name' => 'a/b', 'version' => '3.0.0', 'time' => '2026-01-01T00:00:00+00:00', 'source' => ['type' => 'git', 'url' => 'https://github.com/new/name.git', 'reference' => 'b']]);
@@ -134,7 +134,7 @@ final class PackageMetadataFromPackagesTest extends TestCase
         self::assertSame('https://github.com/new/name.git', PackageMetadata::fromPackages('a/b', [$new, $old], new \DateTimeImmutable(self::FIXED))->repositoryUrl());
     }
 
-    public function testTheNewestReleasesSourceOutranksItsSupportSource(): void
+    public function testTheHighestReleasesSourceOutranksItsSupportSource(): void
     {
         $newest = $this->load([
             'name' => 'a/b',
@@ -147,7 +147,7 @@ final class PackageMetadataFromPackagesTest extends TestCase
         self::assertSame('https://github.com/a/b.git', PackageMetadata::fromPackages('a/b', [$newest], new \DateTimeImmutable(self::FIXED))->repositoryUrl());
     }
 
-    /** An older release's source is never substituted: a package whose newest release names no repository has none here. */
+    /** An older release's source is never substituted: a package whose highest release names no repository has none here. */
     public function testAnOlderReleasesSourceIsNotSubstituted(): void
     {
         $newest = $this->load(['name' => 'a/b', 'version' => '2.0.0', 'time' => '2026-01-01T00:00:00+00:00', 'support' => ['issues' => 'https://github.com/a/b/issues']]);
@@ -156,13 +156,26 @@ final class PackageMetadataFromPackagesTest extends TestCase
         self::assertNull(PackageMetadata::fromPackages('a/b', [$old, $newest], new \DateTimeImmutable(self::FIXED))->repositoryUrl());
     }
 
-    /** A dated release is the anchor even when an undated one comes first in the list. */
-    public function testADatedReleaseOutranksAnUndatedOne(): void
+    /**
+     * The release is picked by version: neither a `time` (optional, and mixed up in hand-written
+     * repositories) nor the list order (Packagist newest first, others unspecified) decides.
+     */
+    public function testTheHighestVersionIsTheAnchorWhateverTheDatesOrTheOrder(): void
     {
-        $undated = $this->load(['name' => 'a/b', 'version' => '9.0.0', 'source' => ['type' => 'git', 'url' => 'https://github.com/a/undated.git', 'reference' => 'a']]);
-        $dated = $this->load(['name' => 'a/b', 'version' => '1.0.0', 'time' => '2020-01-01T00:00:00+00:00', 'source' => ['type' => 'git', 'url' => 'https://github.com/a/dated.git', 'reference' => 'a']]);
+        $undated = $this->load(['name' => 'a/b', 'version' => '2.0.0', 'source' => ['type' => 'git', 'url' => 'https://github.com/a/new.git', 'reference' => 'a']]);
+        $dated = $this->load(['name' => 'a/b', 'version' => '1.0.0', 'time' => '2020-01-01T00:00:00+00:00', 'source' => ['type' => 'git', 'url' => 'https://github.com/a/old-archived.git', 'reference' => 'a']]);
+        $lts = $this->load(['name' => 'a/b', 'version' => '1.0.1', 'time' => '2026-01-01T00:00:00+00:00', 'source' => ['type' => 'git', 'url' => 'https://github.com/a/old-archived.git', 'reference' => 'a']]);
 
-        self::assertSame('https://github.com/a/dated.git', PackageMetadata::fromPackages('a/b', [$undated, $dated], new \DateTimeImmutable(self::FIXED))->repositoryUrl());
+        self::assertSame('https://github.com/a/new.git', PackageMetadata::fromPackages('a/b', [$dated, $lts, $undated], new \DateTimeImmutable(self::FIXED))->repositoryUrl(), 'a later LTS patch does not move the anchor');
+        self::assertSame('1.0.1', PackageMetadata::fromPackages('a/b', [$dated, $lts, $undated], new \DateTimeImmutable(self::FIXED))->lastStableVersion(), 'the age signal still reads the latest date');
+    }
+
+    /** Packagist's default `support.source` is a `/tree/<version>` page; the repository is what is kept. */
+    public function testAPackagistDefaultSupportSourceIsReducedToTheRepository(): void
+    {
+        $newest = $this->load(['name' => 'phpunit/phpunit', 'version' => '13.3.4', 'support' => ['source' => 'https://github.com/sebastianbergmann/phpunit/tree/13.3.4']]);
+
+        self::assertSame('https://github.com/sebastianbergmann/phpunit', PackageMetadata::fromPackages('phpunit/phpunit', [$newest], new \DateTimeImmutable(self::FIXED))->repositoryUrl());
     }
 
     public function testADevOnlyPackageIsReadFromItsFirstBranch(): void

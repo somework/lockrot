@@ -7,16 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Fixed
-
-- A package is no longer `abandoned` because an *older* release points at an archived repository.
-  The repository asked about activity is the one the newest release names — its `source`, else its
-  `support.source` — then the lock entry's, and when none of those names one the package is judged
-  on its release dates alone. phpstan/phpstan was reported `abandoned` on every project that runs
-  lockrot with a GitHub token: its recent releases carry no `source`, `support.source` names the
-  live phpstan/phpstan-src, and three old releases point at a one-off build repository that has
-  since been archived.
-
 ### Added
 
 - Releases are signed. From this release on, `lockrot.phar.asc` ships next to the PHAR, a detached
@@ -26,6 +16,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   release workflow verifies its own signature against the committed public key before it publishes
   anything. `phive install somework/lockrot` now works. The sha256 checksum and `self-update` are
   unchanged: `self-update` still verifies the checksum only.
+
+### Fixed
+
+- A package is no longer `abandoned` because an *older* release points at an archived repository.
+  The repository asked about activity is the one the newest release names — its `source`, else its
+  `support.source` — then the lock entry's, and when none of those names one the package is judged
+  without a repository-activity check (Packagist's own `abandoned` flag still counts). phpstan/phpstan was reported `abandoned` on every project that runs
+  lockrot with a GitHub token: its recent releases carry no `source`, `support.source` names the
+  live phpstan/phpstan-src, and three old releases point at a one-off build repository that has
+  since been archived. A `support.source` in the shape Packagist fills in by default,
+  `<repository>/tree/<version>`, is reduced to the repository first.
 
 ## [0.4.0] - 2026-09-16
 

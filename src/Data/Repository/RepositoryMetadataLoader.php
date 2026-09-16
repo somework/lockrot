@@ -122,7 +122,7 @@ final class RepositoryMetadataLoader implements MetadataLoaderInterface
 
     /**
      * Two passes over this one repository. Pass 1 asks only for tagged-release stabilities; a name
-     * with at least one version there is fully resolved — abandonment, replacement, source URL and
+     * with at least one version there is fully resolved — abandonment, replacement, repository URL and
      * type all come from a tagged release's own metadata, so nothing further is needed. A name
      * pass 1 could not resolve (absent, or found with an empty version list) goes to pass 2, which
      * asks only for `dev` — Composer then requests just {name}~dev.json, never re-fetching the
