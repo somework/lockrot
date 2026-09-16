@@ -221,4 +221,52 @@ final class TransitiveExposureTest extends TestCase
         self::assertFalse(TransitiveExposure::attributable($this->finding($graph, 'root/a', Verdict::STALE)));
         self::assertFalse(TransitiveExposure::attributable($this->finding($graph, 'vendor/lonely', Verdict::STALE)), 'nothing reaches it, so nobody is answerable');
     }
+
+    public function testAPackageReachedFromExactlyAsManyRootsAsTheCapIsStillEveryRootsExposure(): void
+    {
+        $roots = [];
+        $packages = [['name' => 'vendor/shared', 'version' => '1.0.0']];
+        for ($i = 1; $i <= TransitiveExposure::MAX_FAN_IN; ++$i) {
+            $root = \sprintf('root/r%02d', $i);
+            $roots[$root] = '^1';
+            $packages[] = ['name' => $root, 'version' => '1.0.0', 'require' => ['vendor/shared' => '^1']];
+        }
+        $graph = DependencyGraph::fromLock(LockFile::fromArray(['packages' => $packages]), ProjectConfig::fromArray(['require' => $roots]), false);
+        $findings = [$this->finding($graph, 'vendor/shared', Verdict::STALE, [new Signal(Signal::S2, Signal::LEVEL_WARN, 'old')])];
+        foreach (array_keys($roots) as $root) {
+            $findings[] = $this->finding($graph, $root, Verdict::OK);
+        }
+
+        self::assertCount(TransitiveExposure::MAX_FAN_IN, $findings[0]->directDependents());
+        self::assertTrue(TransitiveExposure::attributable($findings[0]));
+        $parents = \array_slice(TransitiveExposure::attach($findings, $graph), 1);
+        self::assertCount(TransitiveExposure::MAX_FAN_IN, $parents);
+        foreach ($parents as $parent) {
+            $s7 = self::s7($parent);
+            self::assertNotNull($s7);
+            self::assertSame('pulls in 1 flagged package: vendor/shared (stale)', $s7->summary());
+        }
+    }
+
+    public function testASummaryWithExactlyFiveDescendantsNamesThemAllAndCountsNothing(): void
+    {
+        $packages = [['name' => 'root/a', 'version' => '1.0.0', 'require' => []]];
+        $names = ['vendor/a-stale', 'vendor/b-stale', 'vendor/c-stale', 'vendor/d-stale', 'vendor/e-stale'];
+        foreach ($names as $name) {
+            $packages[0]['require'][$name] = '^1';
+            $packages[] = ['name' => $name, 'version' => '1.0.0'];
+        }
+        $graph = DependencyGraph::fromLock(LockFile::fromArray(['packages' => $packages]), ProjectConfig::fromArray(['require' => ['root/a' => '^1']]), false);
+        $findings = [$this->finding($graph, 'root/a', Verdict::OK)];
+        foreach ($names as $name) {
+            $findings[] = $this->finding($graph, $name, Verdict::STALE);
+        }
+
+        $s7 = self::s7($this->byName(TransitiveExposure::attach($findings, $graph))['root/a']);
+        self::assertNotNull($s7);
+        self::assertSame(
+            'pulls in 5 flagged packages: vendor/a-stale (stale), vendor/b-stale (stale), vendor/c-stale (stale), vendor/d-stale (stale), vendor/e-stale (stale)',
+            $s7->summary()
+        );
+    }
 }

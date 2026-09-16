@@ -292,4 +292,26 @@ final class MarkdownFormatterTest extends TestCase
         }
         self::fail('no line contains "'.$needle.'"');
     }
+
+    public function testTheDocumentEndsWithExactlyOneNewline(): void
+    {
+        $out = $this->formatter()->format($this->report());
+
+        self::assertStringEndsWith("</sub>\n", $out);
+        self::assertStringEndsNotWith("\n\n", $out);
+    }
+
+    public function testEveryKindOfLineBreakInACellFoldsIntoOneSpaceAndAPipeInACodeCellIsEscaped(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $package = "acme/pk\r\ng|x";
+        $report = new Report([
+            new Finding($package, '1.0.0', Verdict::STALE, [new Signal('S2', 'warn', "first\r\nsecond\rthird\nfourth")], [$package], null, $at),
+        ], ["note\r\nline"], $at, 1, 0, false);
+
+        $out = $this->formatter()->format($report);
+
+        self::assertStringContainsString('| medium | `acme/pk g\|x` | 1.0.0 | **stale** | first second third fourth | direct |', $out);
+        self::assertStringContainsString('- note: note line', $out);
+    }
 }

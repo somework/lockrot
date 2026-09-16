@@ -108,6 +108,8 @@ final class InstallSummaryFormatterTest extends TestCase
 
         self::assertCount(InstallSummaryFormatter::MAX_LINES, $lines);
         self::assertSame('<warning>lockrot: dependency rot in 12 of 12 changed packages</warning>', $lines[0]);
+        self::assertStringContainsString('vendor/p01 1.0.0', $lines[1]);
+        self::assertStringContainsString('vendor/p05 1.0.0', $lines[5]);
         self::assertSame('  … and 7 more', $lines[6]);
         self::assertSame('  note: first note', $lines[7]);
         self::assertSame('  note: second note', $lines[8]);
@@ -166,5 +168,23 @@ final class InstallSummaryFormatterTest extends TestCase
         $lines = (new InstallSummaryFormatter())->format($report);
         self::assertSame('  <comment>abandoned   </comment>vendor/b 2.0.0: marked abandoned by its repository (via vendor/a)', $lines[1]);
         self::assertSame('  <comment>stale       </comment>vendor/a 1.0.0: last release 2022-05-20 (4.3 years ago)', $lines[2]);
+    }
+
+    /** Header and footer take two of the lines; with no notes, exactly eight findings fit and none is counted away. */
+    public function testExactlyAsManyFindingsAsThereAreSlotsAreAllShownWithoutACountLine(): void
+    {
+        $slots = InstallSummaryFormatter::MAX_LINES - 2;
+        $findings = [];
+        for ($i = 1; $i <= $slots; ++$i) {
+            $findings[] = $this->finding(\sprintf('vendor/p%02d', $i), '1.0.0', Verdict::SILENT, 'no stable release');
+        }
+
+        $lines = (new InstallSummaryFormatter())->format($this->report($findings));
+
+        self::assertCount(InstallSummaryFormatter::MAX_LINES, $lines);
+        self::assertStringContainsString('vendor/p01 1.0.0', $lines[1]);
+        self::assertStringContainsString(\sprintf('vendor/p%02d 1.0.0', $slots), $lines[$slots]);
+        self::assertSame('Run composer lockrot for details.', $lines[$slots + 1]);
+        self::assertSame([], preg_grep('/ more$/', $lines));
     }
 }

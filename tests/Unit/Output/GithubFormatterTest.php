@@ -319,4 +319,17 @@ final class GithubFormatterTest extends TestCase
 
         self::assertStringEndsWith('::acme/root 1.0.0: old; pulls in 1 flagged package: acme/leaf (stale)', $lines[0]);
     }
+
+    public function testThePlainLineFoldsAWindowsLineBreakIntoOneSpace(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $parent = "evil/root\r\ninjected";
+        $report = new Report([
+            new Finding('acme/leaf', '1.0.0', Verdict::STALE, [new Signal('S2', 'warn', 'old')], [$parent, 'acme/leaf'], null, $at, null, false, [$parent]),
+        ], [], $at, 1, 0, false);
+
+        $lines = explode("\n", trim($this->formatter(LockrotConfig::FAIL_ON_NONE, null)->format($report)));
+
+        self::assertSame('pulled in by: evil/root injected 1', $lines[1]);
+    }
 }

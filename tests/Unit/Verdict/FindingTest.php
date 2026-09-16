@@ -167,4 +167,20 @@ final class FindingTest extends TestCase
         self::assertSame('', $clean->evidence());
         self::assertSame('', $clean->ownEvidence());
     }
+
+    public function testEvidenceLineAppendsTheAllowlistReasonAfterEverythingElse(): void
+    {
+        $own = new Signal('S2', 'warn', 'last release 2022-05-20 (4.3 years ago)');
+        $s7 = new Signal(Signal::S7, 'info', 'pulls in 1 flagged package: vendor/leaf (stale)');
+        $allowlisted = new Finding('vendor/pkg', '1.0.0', Verdict::FINISHED, [$own, $s7], ['vendor/pkg'], 'interfaces', null);
+        $allowlistedWithoutEvidence = new Finding('vendor/pkg', '1.0.0', Verdict::FINISHED, [], ['vendor/pkg'], 'interfaces', null);
+        $notAllowlisted = new Finding('vendor/pkg', '1.0.0', Verdict::STALE, [$own], ['vendor/pkg'], null, null);
+
+        self::assertSame(
+            'last release 2022-05-20 (4.3 years ago); pulls in 1 flagged package: vendor/leaf (stale); allowlisted: interfaces',
+            $allowlisted->evidenceLine()
+        );
+        self::assertSame('allowlisted: interfaces', $allowlistedWithoutEvidence->evidenceLine());
+        self::assertSame('last release 2022-05-20 (4.3 years ago)', $notAllowlisted->evidenceLine());
+    }
 }

@@ -30,22 +30,34 @@ use PHPUnit\Framework\TestCase;
 
 final class AnalyzerTest extends TestCase
 {
-    /** @param array<string, array{int, string}> $map url => [status, body] */
-    private function http(array $map): HttpClientInterface
+    /**
+     * @param array<string, array{int, string}> $map       url => [status, body]
+     * @param \ArrayObject<int, string>|null    $requested receives every URL asked for, in order
+     */
+    private function http(array $map, ?\ArrayObject $requested = null): HttpClientInterface
     {
-        return new class ($map) implements HttpClientInterface {
+        return new class ($map, $requested) implements HttpClientInterface {
             /** @var array<string, array{int, string}> */
             private array $map;
+            /** @var \ArrayObject<int, string>|null */
+            private ?\ArrayObject $requested;
 
-            /** @param array<string, array{int, string}> $map */
-            public function __construct(array $map)
+            /**
+             * @param array<string, array{int, string}> $map
+             * @param \ArrayObject<int, string>|null    $requested
+             */
+            public function __construct(array $map, ?\ArrayObject $requested)
             {
                 $this->map = $map;
+                $this->requested = $requested;
             }
             public function fetchAll(array $urls, array $headers = []): array
             {
                 $out = [];
                 foreach ($urls as $url) {
+                    if ($this->requested !== null) {
+                        $this->requested->append($url);
+                    }
                     [$status, $body] = $this->map[$url] ?? [404, ''];
                     $out[$url] = new HttpResult($url, $status, $body, new \DateTimeImmutable('2026-09-14T06:00:00+00:00'));
                 }
@@ -82,13 +94,13 @@ final class AnalyzerTest extends TestCase
         };
     }
 
-    private function analyzer(MetadataLoaderInterface $metadata, HttpClientInterface $http, bool $token, Allowlist $allowlist, bool $offline = false): Analyzer
+    private function analyzer(MetadataLoaderInterface $metadata, HttpClientInterface $http, bool $token, Allowlist $allowlist, bool $offline = false, int $noTokenBudget = GitHubFetchPlanner::DEFAULT_NO_TOKEN_BUDGET): Analyzer
     {
         $clock = Clock::fixed(F::NOW);
         return new Analyzer(
             $metadata,
             new GitHubClient($http, $token ? 't' : null),
-            new GitHubFetchPlanner($token),
+            new GitHubFetchPlanner($token, $noTokenBudget),
             $allowlist,
             SignalSet::default($clock, new Thresholds(), '8.4', PhpReleaseDates::load()),
             new VerdictEngine(),
@@ -435,5 +447,157 @@ final class AnalyzerTest extends TestCase
         self::assertNotSame($analyzer, $withReplacement);
         self::assertSame($replacement, $withReplacement->allowlist());
         self::assertSame($original, $analyzer->allowlist());
+    }
+
+    /** @return array<string, mixed> a lock entry that a Composer repository serves, with the lock's own source URL when given */
+    private static function locked(string $name, ?string $sourceUrl = null): array
+    {
+        $entry = ['name' => $name, 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/'];
+        if ($sourceUrl !== null) {
+            $entry['source'] = ['type' => 'git', 'url' => $sourceUrl, 'reference' => 'a'];
+        }
+
+        return $entry;
+    }
+
+    /** @return array<string, mixed> a lock entry from a VCS repository, so not checked */
+    private static function unlocked(string $name, string $sourceUrl): array
+    {
+        return ['name' => $name, 'version' => '1.0.0', 'source' => ['type' => 'git', 'url' => $sourceUrl, 'reference' => 'a']];
+    }
+
+    private function metadataNamed(string $name, ?string $sourceUrl, string $releasedAt = '2015-01-01T00:00:00+00:00', string $dataDate = F::NOW): PackageMetadata
+    {
+        return new PackageMetadata($name, false, null, true, new \DateTimeImmutable($releasedAt), '1.0.0', 1, $sourceUrl, 'library', new \DateTimeImmutable($dataDate));
+    }
+
+    /** @return array<string, \Lockrot\Verdict\Finding> */
+    private static function byName(Report $report): array
+    {
+        $byName = [];
+        foreach ($report->findings() as $finding) {
+            $byName[$finding->package()] = $finding;
+        }
+
+        return $byName;
+    }
+
+    /** @param list<array<string, mixed>> $packages */
+    private function analyzeLock(array $packages, MetadataLoaderInterface $loader, HttpClientInterface $http, bool $token, ?Allowlist $allowlist = null, int $noTokenBudget = GitHubFetchPlanner::DEFAULT_NO_TOKEN_BUDGET): Report
+    {
+        return $this->analyzer($loader, $http, $token, $allowlist ?? new Allowlist([]), false, $noTokenBudget)
+            ->analyze(LockFile::fromArray(['packages' => $packages]), ProjectConfig::empty(), false);
+    }
+
+    public function testPackagesNotFromAComposerRepositoryAreCountedInOneNote(): void
+    {
+        $one = self::unlocked('private/one', 'https://git.example.com/private/one.git');
+        $two = self::unlocked('private/two', 'https://git.example.com/private/two.git');
+
+        self::assertSame([], $this->analyzeLock([], $this->loader(), $this->http([]), true)->notes());
+        self::assertSame(
+            ['1 package is not from a Composer repository and was not checked'],
+            $this->analyzeLock([$one], $this->loader(), $this->http([]), true)->notes()
+        );
+        $report = $this->analyzeLock([$one, $two], $this->loader(), $this->http([]), true);
+        self::assertSame(['2 packages are not from a Composer repository and were not checked'], $report->notes());
+        self::assertSame(2, $report->notFromComposerRepository());
+    }
+
+    public function testAPackageTheRepositoryDoesNotKnowIsUnknownWithANoteAndAKnownQuietOneHasNoEvidence(): void
+    {
+        $metadata = ['vendor/fine' => $this->metadataNamed('vendor/fine', null, '2026-08-01T00:00:00+00:00')];
+        $report = $this->analyzeLock([self::locked('vendor/gone'), self::locked('vendor/fine')], $this->loader($metadata, ['vendor/gone']), $this->http([]), true);
+        $byName = self::byName($report);
+
+        self::assertSame(Verdict::UNKNOWN, $byName['vendor/gone']->verdict());
+        self::assertSame('not found in the repository', $byName['vendor/gone']->evidence());
+        self::assertSame(Verdict::OK, $byName['vendor/fine']->verdict());
+        self::assertSame('', $byName['vendor/fine']->evidence());
+        self::assertFalse($report->hadNetworkFailures());
+        self::assertSame([], $report->notes());
+    }
+
+    public function testAnAllowlistedOrNonRepositoryPackageIsNeverLookedUpOnGitHub(): void
+    {
+        $requested = new \ArrayObject();
+        $packages = [
+            self::locked('vendor/allowlisted', 'https://github.com/vendor/allowlisted.git'),
+            self::unlocked('private/mirror', 'https://github.com/private/mirror.git'),
+        ];
+        $metadata = ['vendor/allowlisted' => $this->metadataNamed('vendor/allowlisted', 'https://github.com/vendor/allowlisted.git')];
+        $allowlist = new Allowlist([new AllowlistEntry('vendor/allowlisted', null, 'complete', null, 'builtin')]);
+
+        $byName = self::byName($this->analyzeLock($packages, $this->loader($metadata), $this->http([], $requested), true, $allowlist));
+
+        self::assertSame([], $requested->getArrayCopy());
+        self::assertSame(Verdict::FINISHED, $byName['vendor/allowlisted']->verdict());
+        self::assertSame(Verdict::UNKNOWN, $byName['private/mirror']->verdict());
+    }
+
+    public function testTheRepositorysSourceUrlOutranksTheLocksAndTheLocksIsTheFallback(): void
+    {
+        $packages = [self::locked('vendor/pkg', 'https://github.com/old-owner/pkg.git')];
+        $answer = [200, '{"archived":false,"pushed_at":"2026-08-01T00:00:00Z"}'];
+
+        $requested = new \ArrayObject();
+        $loader = $this->loader(['vendor/pkg' => $this->metadataNamed('vendor/pkg', 'https://github.com/new-owner/pkg.git')]);
+        $report = $this->analyzeLock($packages, $loader, $this->http(['https://api.github.com/repos/new-owner/pkg' => $answer], $requested), true);
+        self::assertSame(['https://api.github.com/repos/new-owner/pkg'], $requested->getArrayCopy());
+        self::assertFalse($report->hadNetworkFailures());
+
+        $requested = new \ArrayObject();
+        $loader = $this->loader(['vendor/pkg' => $this->metadataNamed('vendor/pkg', null)]);
+        $report = $this->analyzeLock($packages, $loader, $this->http(['https://api.github.com/repos/old-owner/pkg' => $answer], $requested), true);
+        self::assertSame(['https://api.github.com/repos/old-owner/pkg'], $requested->getArrayCopy());
+        self::assertFalse($report->hadNetworkFailures());
+    }
+
+    public function testWithoutATokenTheCandidatesBeyondTheBudgetCountAsSkippedToo(): void
+    {
+        $packages = [];
+        $metadata = [];
+        $answers = [];
+        foreach (['vendor/one', 'vendor/two', 'vendor/three'] as $name) {
+            $packages[] = self::locked($name);
+            $metadata[$name] = $this->metadataNamed($name, 'https://github.com/'.$name.'.git');
+            $answers['https://api.github.com/repos/'.$name] = [200, '{"archived":false,"pushed_at":"2015-01-01T00:00:00Z"}'];
+        }
+
+        // Three candidates (released 2015, so S2 fires for each), a budget of two: one is skipped for
+        // the budget, none for the token, and the note counts both kinds together.
+        $report = $this->analyzeLock($packages, $this->loader($metadata), $this->http($answers), false, null, 2);
+
+        self::assertContains(
+            'GitHub token not set: repository activity checked for 2 candidate packages, 1 packages skipped (set GITHUB_TOKEN to check all)',
+            $report->notes()
+        );
+    }
+
+    public function testTheDataDateIsTheNewerOfTheMetadataAndTheRepositoryActivity(): void
+    {
+        // The HTTP fake stamps every answer 2026-09-14T06:00:00+00:00: that is when the activity was fetched.
+        $answer = [200, '{"archived":false,"pushed_at":"2026-08-01T00:00:00Z"}'];
+        $github = 'https://github.com/vendor/pkg.git';
+
+        $activityOnly = $this->analyzeLock([self::locked('vendor/pkg', $github)], $this->loader([], ['vendor/pkg']), $this->http(['https://api.github.com/repos/vendor/pkg' => $answer]), true);
+        self::assertSame('2026-09-14T06:00:00+00:00', self::dataDateOf($activityOnly));
+
+        $metadataOnly = $this->singlePackageReport($this->metadataNamed('vendor/pkg', null, '2026-08-01T00:00:00+00:00', '2026-09-14T12:00:00+00:00'), true);
+        self::assertSame('2026-09-14T12:00:00+00:00', self::dataDateOf($metadataOnly));
+
+        $activityNewer = $this->singlePackageReport($this->metadataNamed('vendor/pkg', $github, '2026-08-01T00:00:00+00:00', '2026-09-14T00:00:00+00:00'), true, $answer);
+        self::assertSame('2026-09-14T06:00:00+00:00', self::dataDateOf($activityNewer));
+
+        $metadataNewer = $this->singlePackageReport($this->metadataNamed('vendor/pkg', $github, '2026-08-01T00:00:00+00:00', '2026-09-14T12:00:00+00:00'), true, $answer);
+        self::assertSame('2026-09-14T12:00:00+00:00', self::dataDateOf($metadataNewer));
+    }
+
+    private static function dataDateOf(Report $report): string
+    {
+        $date = $report->findings()[0]->dataDate();
+        self::assertNotNull($date);
+
+        return $date->format(\DATE_ATOM);
     }
 }

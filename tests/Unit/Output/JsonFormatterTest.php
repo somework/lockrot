@@ -10,6 +10,7 @@ use Lockrot\Output\JsonFormatter;
 use Lockrot\Output\TableFormatter;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
+use Lockrot\Version;
 use PHPUnit\Framework\TestCase;
 
 final class JsonFormatterTest extends TestCase
@@ -91,5 +92,17 @@ final class JsonFormatterTest extends TestCase
 
         $empty = new Report([new Finding('a/root', '1.0.0', Verdict::OK, [], ['a/root'], null, $at, null, false, ['a/root'])], [], $at, 1, 0, false);
         self::assertStringContainsString('"exposure": []', (new JsonFormatter())->format($empty));
+    }
+
+    public function testTheEnvelopeNamesTheVersionAndTheDocumentIsOnePrettyObjectEndingInANewline(): void
+    {
+        $at = new \DateTimeImmutable('2026-09-14T00:00:00+00:00');
+        $out = (new JsonFormatter())->format(new Report([], [], $at, 0, 0, false));
+
+        self::assertStringStartsWith("{\n", $out);
+        self::assertStringEndsWith("}\n", $out);
+        $json = json_decode($out, true);
+        self::assertIsArray($json);
+        self::assertSame(['version' => Version::STRING, 'schema' => 1], $json['lockrot']);
     }
 }

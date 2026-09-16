@@ -71,4 +71,11 @@ final class ViaTest extends TestCase
         self::assertSame('via r/one', Via::inline($f, ' › '));
         self::assertSame(' (via r/one)', Via::suffix($f, ' > '));
     }
+
+    public function testExactlyThreeOtherRootsAreAllNamedAndNothingIsCounted(): void
+    {
+        $f = self::finding(['r/one', 'acme/pkg'], ['r/four', 'r/one', 'r/three', 'r/two']);
+        self::assertSame('also via r/four, r/three, r/two', Via::also($f));
+        self::assertSame('via r/one, also via r/four, r/three, r/two', Via::inline($f, ' › '));
+    }
 }

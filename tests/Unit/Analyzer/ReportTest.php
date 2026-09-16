@@ -331,4 +331,25 @@ final class ReportTest extends TestCase
         self::assertSame(['root/r01' => 1], $report->exposure());
         self::assertSame('pulled in by: root/r01 1', $report->exposureSummaryLine());
     }
+
+    public function testExposureSummaryLineWithExactlyFiveParentsNamesThemAllAndCountsNothing(): void
+    {
+        $findings = [];
+        for ($i = 1; $i <= 5; ++$i) {
+            $findings[] = $this->reachedFrom(\sprintf('vendor/p%02d', $i), Verdict::STALE, \sprintf('root/r%02d', $i));
+        }
+
+        self::assertSame('pulled in by: root/r01 1 · root/r02 1 · root/r03 1 · root/r04 1 · root/r05 1', $this->report(...$findings)->exposureSummaryLine());
+    }
+
+    public function testExposureKeepsAPackageReachedFromExactlyAsManyRootsAsTheCap(): void
+    {
+        $roots = [];
+        for ($i = 1; $i <= TransitiveExposure::MAX_FAN_IN; ++$i) {
+            $roots[] = \sprintf('root/r%02d', $i);
+        }
+        $report = $this->report($this->reachedFrom('vendor/shared', Verdict::ABANDONED, ...$roots));
+
+        self::assertSame(array_fill_keys($roots, 1), $report->exposure());
+    }
 }

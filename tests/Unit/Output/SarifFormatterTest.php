@@ -502,4 +502,53 @@ final class SarifFormatterTest extends TestCase
         self::assertSame(['S2', 'S7'], JsonPath::arrayAt($run, ['results', 0, 'properties', 'signals']));
         self::assertSame('lockrot/stale', JsonPath::stringAt($run, ['results', 0, 'ruleId']));
     }
+
+    public function testARuleDescribesItsVerdictInOneLine(): void
+    {
+        $run = $this->singleRun($this->formatter(Verdict::SILENT, null)->format($this->report()));
+
+        self::assertSame(
+            'abandoned: Package is marked abandoned by its repository, or its repository is archived',
+            JsonPath::stringAt($run, ['tool', 'driver', 'rules', 0, 'shortDescription', 'text'])
+        );
+    }
+
+    /** Every result needs a rule for the document to validate, whatever verdict a finding carries. */
+    public function testAVerdictWithoutADescriptionStillGetsAValidRule(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $report = new Report([new Finding('acme/odd', '1.0.0', 'unheard-of', [], ['acme/odd'], null, $at)], [], $at, 1, 0, false);
+
+        $sarif = $this->formatter(LockrotConfig::FAIL_ON_NONE, null)->format($report, true);
+
+        $this->assertValidSarif($sarif);
+        $rule = JsonPath::arrayAt($this->singleRun($sarif), ['tool', 'driver', 'rules', 0]);
+        self::assertSame('lockrot/unheard-of', $rule['id']);
+        self::assertSame(['text' => 'unheard-of: Dependency rot'], $rule['shortDescription']);
+        self::assertSame(['text' => 'A lockrot verdict.'], $rule['fullDescription']);
+    }
+
+    /**
+     * A backslash is a legal character in a POSIX directory name; lockrot reads it as the separator
+     * it is on Windows, on every platform, and never encodes a colon. The URI starts with exactly
+     * three slashes: the directory's leading one is the authority/path boundary, not a segment.
+     */
+    public function testDirectoryUriKeepsAColonAndTreatsABackslashAsASeparator(): void
+    {
+        $suffix = uniqid('', true);
+        $dir = sys_get_temp_dir().'/lockrot-sarif-c:\\drive-'.$suffix;
+        if (!mkdir($dir, 0777, true) && !is_dir($dir)) {
+            throw new \RuntimeException('cannot create temp dir: '.$dir);
+        }
+        $this->tempDirs[] = $dir;
+        file_put_contents($dir.'/composer.lock', '{"packages":[]}');
+
+        $at = new \DateTimeImmutable(self::AT);
+        $sarif = $this->formatter(LockrotConfig::FAIL_ON_NONE, $dir.'/composer.lock')->format(new Report([], [], $at, 0, 0, false));
+        $uri = JsonPath::stringAt($this->singleRun($sarif), ['originalUriBaseIds', '%SRCROOT%', 'uri']);
+
+        self::assertStringStartsWith('file:///', $uri);
+        self::assertStringStartsNotWith('file:////', $uri);
+        self::assertStringEndsWith('/lockrot-sarif-c:/drive-'.$suffix.'/', $uri);
+    }
 }

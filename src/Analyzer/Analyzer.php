@@ -288,14 +288,13 @@ final class Analyzer
     /** @return list<string> */
     private function notInRepositoryNotes(int $notInRepository): array
     {
-        if ($notInRepository === 1) {
-            return ['1 package is not from a Composer repository and was not checked'];
-        }
-        if ($notInRepository > 1) {
-            return [\sprintf('%d packages are not from a Composer repository and were not checked', $notInRepository)];
+        if ($notInRepository === 0) {
+            return [];
         }
 
-        return [];
+        return [$notInRepository === 1
+            ? '1 package is not from a Composer repository and was not checked'
+            : \sprintf('%d packages are not from a Composer repository and were not checked', $notInRepository)];
     }
 
     /** @param list<Signal> $signals */
@@ -310,17 +309,9 @@ final class Analyzer
         return false;
     }
 
+    /** The newer of the two dates, or the one there is: null compares below any object, so max() is exactly that. */
     private function dataDate(?PackageMetadata $meta, ?RepositoryActivity $activity): ?\DateTimeImmutable
     {
-        $metaDate = $meta !== null ? $meta->dataDate() : null;
-        $activityDate = $activity !== null ? $activity->fetchedAt() : null;
-        if ($metaDate === null) {
-            return $activityDate;
-        }
-        if ($activityDate === null) {
-            return $metaDate;
-        }
-
-        return $activityDate > $metaDate ? $activityDate : $metaDate;
+        return max($meta !== null ? $meta->dataDate() : null, $activity !== null ? $activity->fetchedAt() : null);
     }
 }

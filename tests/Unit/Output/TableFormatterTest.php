@@ -305,6 +305,24 @@ final class TableFormatterTest extends TestCase
         self::assertContains('note: baseline written to', $lines);
     }
 
+    /** The other half of the rule above: a row never exceeds the terminal, whatever token it carries. */
+    public function testALongTokenInARowIsCutSoTheRowNeverExceedsTheWidth(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $package = 'vendor/'.str_repeat('a', 60);
+        $evidence = 'marked abandoned, replacement: https://example.com/'.str_repeat('b', 60);
+        $report = new Report([new Finding($package, '1.0.0', Verdict::ABANDONED, [new Signal('S1', 'high', $evidence)], [$package], null, $at)], [], $at, 1, 0, false);
+        $lines = $this->plainLines($this->formatter(40)->format($report));
+
+        $rows = array_values(array_filter($lines, static fn (string $line): bool => strpos($line, '  ') === 0));
+        self::assertNotEmpty($rows);
+        foreach ($rows as $row) {
+            self::assertLessThanOrEqual(40, \strlen($row), $row);
+        }
+        self::assertStringContainsString($package, implode('', array_map('trim', $rows)));
+        self::assertStringContainsString(str_repeat('b', 60), implode('', array_map('trim', $rows)));
+    }
+
     public function testCleanReport(): void
     {
         $at = new \DateTimeImmutable(self::AT);

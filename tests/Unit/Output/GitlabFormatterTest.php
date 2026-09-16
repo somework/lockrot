@@ -348,4 +348,14 @@ final class GitlabFormatterTest extends TestCase
         self::assertSame('acme/root 1.0.0 — stale (medium): old; pulls in 1 flagged package: acme/leaf (stale)', $issues[0]['description']);
         self::assertSame(hash('sha256', 'lockrot|acme/root|stale'), $issues[0]['fingerprint']);
     }
+
+    /** GitLab reads compact JSON as well; the pretty, slash-unescaped form is for the human diffing the artifact. */
+    public function testTheDocumentIsPrettyPrintedWithSlashesLeftAlone(): void
+    {
+        $json = $this->formatter(LockrotConfig::FAIL_ON_NONE, null)->format($this->report());
+
+        self::assertStringStartsWith("[\n    {\n", $json);
+        self::assertStringContainsString('"acme/abandoned 1.0.0', $json);
+        self::assertStringNotContainsString('\/', $json);
+    }
 }

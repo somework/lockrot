@@ -146,4 +146,49 @@ final class TerminalWidthTest extends TestCase
             }
         };
     }
+
+    /**
+     * @return iterable<string, array{mixed}>
+     */
+    public static function answersThatAreNotAWidth(): iterable
+    {
+        yield 'not an array' => ['80x24'];
+        yield 'empty array' => [[]];
+        yield 'a numeric string' => [['80', 24]];
+        yield 'a float' => [[80.0, 24]];
+        yield 'negative' => [[-1, 24]];
+    }
+
+    /**
+     * @dataProvider answersThatAreNotAWidth
+     *
+     * @param mixed $answer
+     */
+    #[DataProvider('answersThatAreNotAWidth')]
+    public function testAnApplicationAnsweringAnythingButAPositiveIntegerWidthSaysNothing($answer): void
+    {
+        self::assertNull(TerminalWidth::fromApplication($this->applicationAnswering($answer)));
+    }
+
+    /** @param mixed $answer whatever getTerminalDimensions() returns, no shape promised */
+    private function applicationAnswering($answer): Application
+    {
+        return new class ($answer) extends Application {
+            /** @var mixed */
+            private $answer;
+
+            /** @param mixed $answer */
+            public function __construct($answer)
+            {
+                parent::__construct();
+                $this->answer = $answer;
+            }
+
+            /** @return mixed */
+            public function getTerminalDimensions()
+            {
+                return $this->answer;
+            }
+        };
+    }
 }
