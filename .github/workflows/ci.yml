@@ -58,10 +58,10 @@ jobs:
       - name: Tests with coverage (whole src, informational)
         run: vendor/bin/phpunit --coverage-text --only-summary-for-coverage-text
       # coverage-check reads the clover <metrics> "elements" attribute (methods + statements + conditionals
-      # combined), not PHPUnit's "Lines" %. The gated set measures 97.13% elements (2198/2263, 2026-09-16, src/Data/Forge included);
+      # combined), not PHPUnit's "Lines" %. The gated set measures 97.31% elements (2204/2265, 2026-09-16, src/Data/Forge included);
       # among the uncovered ones are PharUpdater's Windows copy() branch, short-write branch and
       # chmod-refused branch, none of which can be provoked on the runner.
-      # The formula would give floor(97.13) - 2 = 95; the gate stays at 94, which the suite clears with
+      # The formula would give floor(97.31) - 2 = 95; the gate stays at 94, which the suite clears with
       # ~3 points to spare, so the number does not move every time a file is added.
       - name: Core coverage gate
         run: |
@@ -73,8 +73,8 @@ jobs:
           composer global config --no-plugins allow-plugins.infection/extension-installer true
           composer global require "infection/infection:^0.35"
       # Infection 0.35 dropped --only-covered (uncovered code is skipped by default; --with-uncovered opts in).
-      # Scope src/Verdict + src/Signal + src/Output + src/Analyzer: 1165 mutants, 9 equivalent escapes,
-      # 0 timed out -> MSI = Covered MSI 99.23%, ~1m43s on 8 threads (2026-09-16, with FailOn and the forge notes). Threshold 97, matching
+      # Scope src/Verdict + src/Signal + src/Output + src/Analyzer: 1155 mutants, 9 equivalent escapes,
+      # 0 timed out -> MSI = Covered MSI 99.22%, ~1m39s on 8 threads (2026-09-16, with FailOn and the forge notes). Threshold 97, matching
       # infection.json5, which records why the timeout is 180 and which escapes are equivalent.
       - run: $(composer global config bin-dir --absolute)/infection --threads=4 --min-msi=97 --logger-github
   e2e:

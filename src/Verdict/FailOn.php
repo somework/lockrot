@@ -24,30 +24,22 @@ final class FailOn
     public const NONE = 'none';
 
     private string $value;
-    private bool $byPriority;
 
-    private function __construct(string $value, bool $byPriority)
+    private function __construct(string $value)
     {
         $this->value = $value;
-        $this->byPriority = $byPriority;
     }
 
     public static function none(): self
     {
-        return new self(self::NONE, false);
+        return new self(self::NONE);
     }
 
     /** @throws ConfigException when $value is neither `none`, a flagged verdict nor a priority */
     public static function fromString(string $value): self
     {
-        if ($value === self::NONE) {
-            return self::none();
-        }
-        if (Verdict::isValid($value) && Verdict::flagged($value)) {
-            return new self($value, false);
-        }
-        if (\in_array($value, self::priorities(), true)) {
-            return new self($value, true);
+        if (\in_array($value, self::allowed(), true)) {
+            return new self($value);
         }
 
         throw new ConfigException(\sprintf('fail-on must be one of %s; got "%s"', implode(', ', self::allowed()), $value));
@@ -100,7 +92,7 @@ final class FailOn
         if ($this->isNone()) {
             return false;
         }
-        if ($this->byPriority) {
+        if (\in_array($this->value, self::priorities(), true)) {
             return Priority::rank($finding->priority()) >= Priority::rank($this->value);
         }
 
