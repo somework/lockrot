@@ -10,8 +10,9 @@ namespace Lockrot\Data\Forge;
  *
  * `support.source` is a web address, not a clone URL. Packagist fills it in for every package
  * whose composer.json leaves it out, as `<repository>/tree/<version>` — phpunit, php-cs-fixer,
- * rector all carry that shape — and GitLab's own pages read `<repository>/-/tree/<ref>`. Those
- * tails are cut here, once, so the locator only ever sees the repository. A maintainer-set value
+ * rector all carry that shape — GitLab's own pages read `<repository>/-/tree/<ref>` and
+ * Bitbucket's `<repository>/src/<ref>`. Those tails are cut here, once, so the locator only ever
+ * sees the repository. A maintainer-set value
  * such as phpstan's `https://github.com/phpstan/phpstan-src` passes through unchanged.
  */
 final class SupportSource
@@ -24,7 +25,7 @@ final class SupportSource
             return null;
         }
         $url = rtrim($url, '/');
-        $url = (string) preg_replace('{/(?:-/)?tree/[^/]+$}', '', $url);
+        $url = (string) preg_replace('{/(?:-/)?(?:tree|src)/[^/]+$}', '', $url);
 
         return $url === '' ? null : $url;
     }

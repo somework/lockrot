@@ -17,6 +17,7 @@ final class SupportSourceTest extends TestCase
         yield 'packagist default /tree/<version>' => [['source' => 'https://github.com/sebastianbergmann/phpunit/tree/13.3.4'], 'https://github.com/sebastianbergmann/phpunit'];
         yield 'gitlab /-/tree/<ref>' => [['source' => 'https://gitlab.com/g/sub/p/-/tree/v1.2'], 'https://gitlab.com/g/sub/p'];
         yield 'gitlab old-style /tree/<ref>' => [['source' => 'https://gitlab.com/g/p/tree/main'], 'https://gitlab.com/g/p'];
+        yield 'bitbucket /src/<ref>' => [['source' => 'https://bitbucket.org/o/r/src/main/'], 'https://bitbucket.org/o/r'];
         yield 'trailing slash' => [['source' => 'https://github.com/a/b/'], 'https://github.com/a/b'];
         yield 'a repository literally named tree keeps its last segment' => [['source' => 'https://github.com/a/tree'], 'https://github.com/a/tree'];
         yield 'empty' => [['source' => ''], null];
