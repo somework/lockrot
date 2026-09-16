@@ -87,6 +87,7 @@ final class RepoLocatorTest extends TestCase
 
         $trailing = (new RepoLocator(['gitlab.example.com/gitlab/']))->locate('https://gitlab.example.com/gitlab/group/project.git');
         self::assertNotNull($trailing, 'a trailing slash on the entry is tolerated');
+        self::assertSame('gitlab.example.com/gitlab', $trailing->host(), 'and kept out of the API base');
         self::assertSame('group/project', $trailing->path());
 
         $ported = $locator->locate('https://gitlab.example.com:8443/gitlab/group/project.git');

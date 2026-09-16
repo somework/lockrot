@@ -154,7 +154,7 @@ final class RepoLocator
             return null;
         }
 
-        return new RepoRef(RepoRef::GITLAB, $lowerHost.$prefix, $path);
+        return new RepoRef(RepoRef::GITLAB, $lowerHost.rtrim($prefix, '/'), $path);
     }
 
     /** Without a trailing slash or `.git`, with one leading slash. */
