@@ -39,6 +39,8 @@
                  GithubFormatter/SarifFormatter above -->
             <file>src/Output/GitlabFormatter.php</file>
             <file>src/Output/MarkdownFormatter.php</file>
+            <!-- the shared "via …, also via …" phrase every format renders, driven from ViaTest -->
+            <file>src/Output/Via.php</file>
             <!-- the grouped `table` list and its width detection: pure rendering over a Report plus a
                  four-source lookup, both driven from unit tests. TerminalWidth's symfony/console 2.8
                  branch cannot be reached under the 5.4 require-dev resolves, so each source is a
