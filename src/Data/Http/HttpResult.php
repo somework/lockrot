@@ -28,11 +28,21 @@ final class HttpResult
         return new self($url, 0, null, $at, $error);
     }
 
-    /** @param array<string, mixed> $envelope */
-    public static function fromEnvelope(string $url, array $envelope): self
+    /**
+     * The result an envelope describes, or null when the envelope cannot be one: no `fetched_at`,
+     * or one that does not parse. A stored answer without a readable fetch time has no age, and an
+     * age is what every reader of a cached answer needs ({@see CachingHttpClient} decides freshness
+     * by it, the report prints it), so such an envelope is not an answer at all.
+     *
+     * @param array<string, mixed> $envelope
+     */
+    public static function fromEnvelope(string $url, array $envelope): ?self
     {
         $fetchedAt = $envelope['fetched_at'] ?? null;
-        $at = \is_string($fetchedAt) ? self::parseDate($fetchedAt) : new \DateTimeImmutable('@0');
+        $at = \is_string($fetchedAt) ? self::parseDate($fetchedAt) : null;
+        if ($at === null) {
+            return null;
+        }
         $body = $envelope['body'] ?? null;
         $error = $envelope['error'] ?? null;
         $status = $envelope['status'] ?? 0;
@@ -41,8 +51,9 @@ final class HttpResult
     }
 
     /**
-     * Decodes a raw JSON envelope and returns the HttpResult it describes, or null
-     * when the JSON is invalid, not an object, or missing the required `status` field.
+     * Decodes a raw JSON envelope and returns the HttpResult it describes, or null when the JSON
+     * is invalid, not an object, missing the required `status` field, or without a readable
+     * `fetched_at` ({@see fromEnvelope()}).
      */
     public static function fromEnvelopeJson(string $url, ?string $raw): ?self
     {
@@ -59,12 +70,12 @@ final class HttpResult
         return self::fromEnvelope($url, $envelope);
     }
 
-    private static function parseDate(string $iso): \DateTimeImmutable
+    private static function parseDate(string $iso): ?\DateTimeImmutable
     {
         try {
             return new \DateTimeImmutable($iso);
         } catch (\Exception $e) {
-            return new \DateTimeImmutable('@0');
+            return null;
         }
     }
 

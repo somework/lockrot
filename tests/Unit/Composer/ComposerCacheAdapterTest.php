@@ -26,6 +26,20 @@ final class ComposerCacheAdapterTest extends TestCase
         rmdir($dir);
     }
 
+    /** A stored envelope whose fetch time cannot be read is a miss, never an answer of unknowable age. */
+    public function testAnEnvelopeWithoutAReadableFetchTimeIsAMiss(): void
+    {
+        $dir = sys_get_temp_dir().'/lockrot-ccache-'.uniqid().'/';
+        $cache = new Cache(new NullIO(), $dir);
+        $adapter = new ComposerCacheAdapter($cache);
+        $cache->write(sha1('https://a').'.json', '{"status":200,"fetched_at":"garbage","body":"{}","error":null}');
+        self::assertNull($adapter->get('https://a'));
+        $cache->write(sha1('https://b').'.json', '{"status":200,"body":"{}","error":null}');
+        self::assertNull($adapter->get('https://b'));
+        array_map('unlink', glob($dir.'*') ?: []);
+        rmdir($dir);
+    }
+
     public function testDisabledCacheIsAlwaysMiss(): void
     {
         $cache = new Cache(new NullIO(), '/dev/null/nope');

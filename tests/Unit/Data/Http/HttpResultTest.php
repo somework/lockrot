@@ -27,16 +27,20 @@ final class HttpResultTest extends TestCase
         $result = new HttpResult('https://x/y.json', 200, '{"a":1}', $at);
         self::assertSame(['a' => 1], $result->json());
         $copy = HttpResult::fromEnvelope('https://x/y.json', $result->toEnvelope());
+        self::assertNotNull($copy);
         self::assertSame(200, $copy->status());
         self::assertSame('{"a":1}', $copy->body());
         self::assertSame('2026-09-14T12:34:56+00:00', $copy->fetchedAt()->format(\DATE_ATOM));
         self::assertNull((new HttpResult('u', 200, 'not json', $at))->json());
     }
 
-    public function testFromEnvelopeToleratesMalformedFetchedAt(): void
+    /** An envelope without a readable fetch time has no age, so it is not an answer. */
+    public function testAnEnvelopeWithoutAReadableFetchedAtIsNotAResult(): void
     {
-        $result = HttpResult::fromEnvelope('u', ['status' => 200, 'fetched_at' => 'garbage', 'body' => null, 'error' => null]);
-        self::assertSame(0, $result->fetchedAt()->getTimestamp());
+        self::assertNull(HttpResult::fromEnvelope('u', ['status' => 200, 'fetched_at' => 'garbage', 'body' => null, 'error' => null]));
+        self::assertNull(HttpResult::fromEnvelope('u', ['status' => 200, 'body' => '{}']));
+        self::assertNull(HttpResult::fromEnvelope('u', ['status' => 200, 'fetched_at' => 0, 'body' => '{}']));
+        self::assertNull(HttpResult::fromEnvelopeJson('u', '{"status":200,"fetched_at":"garbage","body":"{}"}'));
     }
 
     public function testFromEnvelopeJson(): void
@@ -63,7 +67,9 @@ final class HttpResultTest extends TestCase
         self::assertTrue($cached->fromCache());
         self::assertNotSame($result, $cached);
         self::assertSame($result->toEnvelope(), $cached->toEnvelope());
-        self::assertFalse(HttpResult::fromEnvelope('https://a', $cached->toEnvelope())->fromCache());
+        $reread = HttpResult::fromEnvelope('https://a', $cached->toEnvelope());
+        self::assertNotNull($reread);
+        self::assertFalse($reread->fromCache());
         self::assertSame('2026-09-14T00:00:00+00:00', $cached->fetchedAt()->format(\DATE_ATOM));
     }
 }
