@@ -131,9 +131,9 @@ final class RepoLocator
      */
     private static function gitlab(string $domain, string $lowerHost, string $path): ?RepoRef
     {
-        $slash = strpos($domain, '/');
-        $domainHost = strtolower($slash === false ? $domain : substr($domain, 0, $slash));
-        $prefix = $slash === false ? '' : substr($domain, $slash);
+        $parts = explode('/', $domain, 2);
+        $domainHost = strtolower($parts[0]);
+        $prefix = isset($parts[1]) ? rtrim('/'.$parts[1], '/') : '';
         if ($lowerHost !== $domainHost) {
             $bareHost = (string) preg_replace('{:\d+$}', '', $lowerHost);
             if ($bareHost === $lowerHost || $bareHost !== $domainHost) {
@@ -142,7 +142,7 @@ final class RepoLocator
         }
         $path = self::normalise($path);
         if ($prefix !== '') {
-            if (strpos($path, rtrim($prefix, '/').'/') !== 0) {
+            if (strpos($path, $prefix.'/') !== 0) {
                 return null;
             }
             $path = substr($path, \strlen($prefix));
@@ -154,7 +154,7 @@ final class RepoLocator
             return null;
         }
 
-        return new RepoRef(RepoRef::GITLAB, $lowerHost.rtrim($prefix, '/'), $path);
+        return new RepoRef(RepoRef::GITLAB, $lowerHost.$prefix, $path);
     }
 
     /** Without a trailing slash or `.git`, with one leading slash. */
