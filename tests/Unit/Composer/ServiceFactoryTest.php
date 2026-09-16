@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Composer;
 
 use Composer\Config;
+use Composer\Factory;
 use Composer\IO\NullIO;
 use Lockrot\Analyzer\Analyzer;
 use Lockrot\Clock;
@@ -196,6 +197,30 @@ final class ServiceFactoryTest extends TestCase
         $config = new Config(false, sys_get_temp_dir());
         $config->merge(['config' => ['cache-dir' => '/dev/null', 'home' => sys_get_temp_dir()]]);
         self::assertInstanceOf(ArrayCache::class, ServiceFactory::createCache(new NullIO(), $config));
+    }
+
+    /**
+     * The three shapes that need no exchange: nothing stored, a bearer token already, and
+     * credentials that are not the configured consumer (http-basic with an API token). The consumer
+     * exchange itself talks to bitbucket.org and is left to the network group.
+     */
+    public function testTheBitbucketAuthorizerOnlyExchangesAConfiguredConsumer(): void
+    {
+        $config = new Config(false, sys_get_temp_dir());
+        $config->merge(['config' => ['bitbucket-oauth' => ['bitbucket.org' => ['consumer-key' => 'key', 'consumer-secret' => 'secret']]]]);
+        $downloader = Factory::createHttpDownloader(new NullIO(), $config);
+
+        $io = new NullIO();
+        self::assertFalse(ServiceFactory::bitbucketAuthorizer($io, $config, $downloader)(), 'no credentials at all');
+
+        $io = new NullIO();
+        $io->setAuthentication('bitbucket.org', 'x-token-auth', 'bearer');
+        self::assertTrue(ServiceFactory::bitbucketAuthorizer($io, $config, $downloader)(), 'already a bearer token');
+
+        $io = new NullIO();
+        $io->setAuthentication('bitbucket.org', 'me@example.com', 'atlassian-api-token');
+        self::assertTrue(ServiceFactory::bitbucketAuthorizer($io, $config, $downloader)(), 'http-basic: AuthHelper sends it as it is');
+        self::assertSame(['username' => 'me@example.com', 'password' => 'atlassian-api-token'], $io->getAuthentication('bitbucket.org'), 'left untouched');
     }
 
     public function testGithubTokenFromComposerConfig(): void

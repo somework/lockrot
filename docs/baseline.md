@@ -20,7 +20,7 @@ It writes `lockrot-baseline.json` next to `composer.json`, prints one line on st
 **Commit the file.** It is a statement about the project, and it is worth reviewing in a pull request
 like any other change. It is also the only file lockrot ever writes, and only on this explicit flag.
 
-`--strict-network` is the one exception to that exit `0`: if a configured repository or GitHub could
+`--strict-network` is the one exception to that exit `0`: if a configured repository or a repository host could
 not be reached, the run still exits `1` after writing the file. A baseline generated from metadata
 that never arrived would accept findings lockrot was not actually able to check.
 

@@ -55,7 +55,7 @@ Run composer lockrot for details.
 
 The install-time pass has a hard time budget, 5 seconds by default, so it cannot hold up a
 `composer install`. A package whose metadata was never requested is reported as
-`not checked: install-time budget exhausted`, and a skipped GitHub round adds the note
+`not checked: install-time budget exhausted`, and a skipped activity round adds the note
 `repository activity not checked: install-time budget exhausted`; both reach you through the block
 above.
 

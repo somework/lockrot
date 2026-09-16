@@ -78,7 +78,7 @@ its 75 findings — [read the whole report](example-run.md).
 ## What it looks for
 
 - **`abandoned`** — the package's own repository says so: Packagist carries the `abandoned` marker a
-  maintainer set by hand, or GitHub shows the repository archived.
+  maintainer set by hand, or the repository is archived on GitHub or GitLab.
 - **`silent`** — five years with no stable release *and* five years with no push to the repository,
   on the default thresholds. Nobody announced anything; the package simply stopped.
 - **`pinned`** — your lock file holds a branch snapshot or a commit hash instead of a released
@@ -123,7 +123,7 @@ fail only on what arrives tomorrow.
 | [Install-time summary](install-time.md) | What the plugin prints during `install`/`update`, and how to silence it |
 | [PHAR and self-update](phar.md) | Verified download, `self-update`, the global-plugin alternative |
 | [Example run](example-run.md) | The full 200-package report the sample above is cut from |
-| [How it fetches metadata](internals.md) | Composer repositories, the GitHub API, caching, `--offline` |
+| [How it fetches metadata](internals.md) | Composer repositories, the GitHub, GitLab and Bitbucket APIs, caching, `--offline` |
 | [Changelog](changelog.md) | What changed, release by release |
 
 Source and issues live on [GitHub](https://github.com/somework/lockrot); the package is

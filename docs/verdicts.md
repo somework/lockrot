@@ -7,7 +7,7 @@ was observed about the package. The priority says how much that applies to *your
 
 | Verdict | Meaning | Signals |
 |---|---|---|
-| `abandoned` | The package's Composer repository marks it abandoned (Packagist by default), or its GitHub repository is archived | S1 or S3 |
+| `abandoned` | The package's Composer repository marks it abandoned (Packagist by default), or its repository is archived on GitHub or GitLab | S1 or S3 |
 | `silent` | No stable release for at least `release-high-years` (default 5y) **and** no repository push for at least `push-high-years` (default 5y); an archived repository is reported as `abandoned` instead | S2 high AND S4 high, NOT S1, NOT S3 |
 | `pinned` | Installed version is a branch snapshot (`dev-*` or `#hash`), or the package has no stable release at all | S6 |
 | `old-promise` | The installed version was released before the target PHP's GA date, and its `require.php` constraint is open-ended (`>=N`, `*`) for that target | S5 |
@@ -31,14 +31,15 @@ always wins, so an allowlisted package reports `finished` whatever its signals s
 |---|---|
 | S1 | The Composer repository marks the package abandoned, sometimes naming a replacement |
 | S2 | Time since the last stable release, against `release-warn-years` / `release-high-years` |
-| S3 | The GitHub repository is archived |
-| S4 | Time since the last repository push, against `push-warn-years` / `push-high-years` |
+| S3 | The repository is archived — on GitHub, or on GitLab when the run has credentials there (the anonymous API hides the flag); Bitbucket Cloud has no archived state |
+| S4 | Time since the last push to any branch (GitHub) or the newest commit on any branch (GitLab, Bitbucket), against `push-warn-years` / `push-high-years` |
 | S5 | The installed release predates the target PHP's GA date and the `require.php` constraint has no upper bound |
 | S6 | The installed version is a branch snapshot (`dev-*`, `#hash`), or the package has no stable release |
 | S7 | A direct requirement pulls in flagged transitive packages — informational, never a verdict; see [Transitive exposure](#transitive-exposure) |
 
-S3 and S4 come from GitHub and need network access; see [internals.md](internals.md) for how that
-data is fetched and cached, and [configuration.md](configuration.md) for the thresholds.
+S3 and S4 come from the repository host — GitHub, GitLab or Bitbucket — and need network access;
+see [internals.md](internals.md) for how that data is fetched and cached, which host reads what, and
+[configuration.md](configuration.md) for the thresholds.
 
 Every finding's evidence line states the concrete fact — release date, push date, constraint string
 — and the report footer states the data date. There are no severity words beyond the verdict names
@@ -69,8 +70,11 @@ A package nothing in your `require`/`require-dev` can reach counts as transitive
 The priority orders the report — highest first, then by verdict severity, then direct dependencies
 ahead of transitive ones, then by package name — and it is carried in every format.
 
-> **The exit code and `--fail-on` stay on the verdict.** Priority is there to tell you what to read
-> first, not to decide whether the build fails.
+> **`--fail-on` takes a verdict or a priority.** `--fail-on=silent` fails on what was observed,
+> wherever the package sits; `--fail-on=high` fails on a `critical` or `high` finding and lets the
+> same verdict pass on a transitive development package. Both are inclusive. The
+> [baseline](baseline.md) stays on the verdict: a finding it already carries never fails a run,
+> whichever kind of threshold is set.
 
 `--dev` is what brings development packages into the run at all. Once they are in, each of them sits
 one step below the same finding on a production package.
@@ -89,8 +93,9 @@ one step below the same finding on a production package.
 The JSON `schema` number stays `1` — these are additions, so anything already reading the document
 keeps working.
 
-Nothing that decides an outcome moved. The GitHub annotation level, the GitLab severity and
-fingerprint, and the SARIF `ruleId` and `level` all still read the verdict alone.
+The GitLab fingerprint and the SARIF `ruleId` read the verdict alone. The GitHub annotation level,
+the GitLab severity and the SARIF `level` follow `--fail-on`, whichever kind of threshold it names,
+so the colour a reviewer sees matches the exit code either way.
 
 ## Transitive exposure
 

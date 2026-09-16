@@ -7,8 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Repository activity from GitLab and Bitbucket, next to GitHub. A package whose source lives on
+  gitlab.com, on any instance in Composer's `gitlab-domains`, or on bitbucket.org now gets the S4
+  signal — the newest commit on any branch, `last commit …` in the evidence — and, on GitLab when
+  the run has credentials there, the archived flag behind S3 (`repository archived on GitLab`).
+  GitLab is never capped anonymously; Bitbucket is capped like GitHub until Composer has
+  credentials for it. Credentials: Composer's own `gitlab-token`, `gitlab-oauth`, `http-basic` and
+  `bitbucket-oauth` entries are used as they are, and `GITLAB_TOKEN`/`LOCKROT_GITLAB_TOKEN` serve
+  gitlab.com the way `GITHUB_TOKEN` serves github.com. S3 and S4 carry the host in their JSON
+  `data`; every existing key is unchanged and the JSON `schema` stays `1`.
+- `--fail-on` (and `extra.lockrot.fail-on`, `LOCKROT_FAIL_ON`) accepts a priority — `critical`,
+  `high`, `medium` or `low` — next to the verdicts, so a build can fail on an abandoned direct
+  production requirement and pass on the same verdict in a transitive development package. The
+  error/warning line of the github, sarif and gitlab formats follows the same threshold; the
+  baseline stays keyed by verdict.
+
 ### Changed
 
+- The table footer reads `Data as of … (package repositories, repository hosts)` instead of naming
+  GitHub alone.
 - The mutation-testing gate now covers the analyzer and every output format as well as the verdict
   engine and the signals (MSI threshold 97, from 94 over the narrower scope). No behaviour changes;
   the code the mutants proved unreachable or redundant is gone, and the behaviour they proved untested is

@@ -6,6 +6,10 @@ Add one step to the pipeline and pick the threshold that should fail it:
 composer lockrot --fail-on=silent --target-php=8.4
 ```
 
+`--fail-on` takes a verdict (`silent`: fail on what was observed, wherever the package sits) or a
+[priority](verdicts.md#priority) (`high`: fail on how much it applies to this project — an abandoned
+direct production requirement fails, the same verdict on a transitive development package does not).
+
 With a committed [baseline](baseline.md) the same command fails only on new or worsened findings; no extra flag is
 needed, the file is picked up automatically. To run without installing the plugin, use the PHAR — [phar.md](phar.md)
 has the CI snippet.
@@ -34,7 +38,7 @@ subdirectory. The same repository publishes `ghcr.io/somework/lockrot`, a signed
 | `1` | A finding reached or exceeded the `fail-on` threshold |
 | `2` | Tool or configuration error (unparsable `composer.json`/`composer.lock`, invalid config value, unreadable or unwritable [baseline](baseline.md)) |
 
-A network failure — a configured Composer repository or GitHub unreachable — never turns into a non-zero exit code on
+A network failure — a configured Composer repository or a repository host (GitHub, GitLab, Bitbucket) unreachable — never turns into a non-zero exit code on
 its own. It is reported as a note, and the checks that could not run are treated as absent evidence.
 `--strict-network` changes that to exit `1`. This also covers `--offline` runs where a locked package has no cached
 metadata: it is reported as a failure, not silently skipped. A `composer.lock` entry that Composer's own loader cannot
@@ -68,8 +72,10 @@ in the pull request's Files changed view:
 
 Findings at or above `--fail-on` are annotated as errors, everything else flagged as warnings, and the rows that only
 `--all` shows as notices — so the annotation colour matches the exit code. The report's own notes are printed as
-notices too, so a run can emit notices without `--all`. The [priority](verdicts.md) never changes any of that: a
-`critical` finding below `--fail-on` is still a warning. With a [baseline](baseline.md) in place, findings it already
+notices too, so a run can emit notices without `--all`. Under a verdict threshold the [priority](verdicts.md) changes
+none of that: a `critical` finding below `--fail-on=silent` is still a warning. Under a priority threshold
+(`--fail-on=high`) the line between error and warning is drawn by priority instead, in every format alike. With a
+[baseline](baseline.md) in place, findings it already
 carries drop to notices for the same reason. GitHub renders only a limited number of annotations per step, so
 on a large lock file the annotations are the headline and the step's own log holds every finding. The summary line at
 the end of the output always states the full counts, and `--format=sarif` uploads the complete set. A transitive

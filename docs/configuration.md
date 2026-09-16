@@ -27,7 +27,7 @@ be JSON integers (`3`, not `"3"`).
 
 | Key | Default | Meaning |
 |---|---|---|
-| `fail-on` | `none` | Exit 1 threshold: `none`, `stale`, `old-promise`, `pinned`, `silent`, `abandoned` |
+| `fail-on` | `none` | Exit 1 threshold: a verdict (`stale`, `old-promise`, `pinned`, `silent`, `abandoned`) or a [priority](verdicts.md#priority) (`low`, `medium`, `high`, `critical`); `none` fails on nothing |
 | `target-php` | `config.platform.php`, else the running PHP | PHP version used for the S5 "old promise" check, e.g. `"8.4"` |
 | `format` | `table` | `table`, `json`, `github`, `sarif`, `gitlab` or `markdown`; see [ci.md](ci.md) |
 | `include-dev` | `false` | Also check `packages-dev` (CLI: `--dev`) |
@@ -36,7 +36,7 @@ be JSON integers (`3`, not `"3"`).
 | `install-time-budget` | `5` | Integer seconds (1–120): the install-time pass's hard time budget |
 | `baseline` | `lockrot-baseline.json` | Path to the [baseline](baseline.md) file, relative to `composer.json` or absolute |
 | `release-warn-years` / `release-high-years` | `3` / `5` | Integer thresholds for "no stable release" (S2) |
-| `push-warn-years` / `push-high-years` | `3` / `5` | Integer thresholds for "no repository push" (S4) |
+| `push-warn-years` / `push-high-years` | `3` / `5` | Integer thresholds for "no repository push or commit" (S4) |
 | `ignore` | `[]` | Project allowlist, see below |
 
 ## Environment overrides
@@ -46,19 +46,20 @@ be JSON integers (`3`, not `"3"`).
 | `LOCKROT_DISABLE=1` (or `true`) | Skips lockrot entirely, exits 0 |
 | `LOCKROT_FAIL_ON` | `fail-on` |
 | `LOCKROT_TARGET_PHP` | `target-php` |
-| `LOCKROT_GITHUB_TOKEN` / `GITHUB_TOKEN` | GitHub token for repository-activity signals (S3/S4); Composer's `github-oauth.github.com` auth is used as a fallback if neither is set. When Composer has that auth, its token is the one sent — see [internals.md](internals.md) |
+| `LOCKROT_GITHUB_TOKEN` / `GITHUB_TOKEN` | GitHub token for the repository-activity signals (S3/S4) on github.com; Composer's `github-oauth.github.com` auth is the fallback. When Composer has that auth, its token is the one sent — see [internals.md](internals.md) |
+| `LOCKROT_GITLAB_TOKEN` / `GITLAB_TOKEN` | GitLab personal access token for gitlab.com only. GitLab is never capped, but its API hides the archived flag (S3) from anonymous callers. Self-hosted instances take Composer's `gitlab-token`/`gitlab-oauth` — see [internals.md](internals.md) |
 
 ## CLI options
 
 | Option | Meaning |
 |---|---|
 | `--format=table\|json\|github\|sarif\|gitlab\|markdown` | Output format. `table` (the default) is a width-aware list grouped by priority, not a box table. The format changes the output only; the exit code is the same for all six. See [ci.md](ci.md) |
-| `--fail-on=none\|abandoned\|silent\|pinned\|old-promise\|stale` | Exit-1 threshold for this run |
+| `--fail-on=<verdict or priority>` | Exit-1 threshold for this run: `none`, a verdict (`abandoned`, `silent`, `pinned`, `old-promise`, `stale`) or a [priority](verdicts.md#priority) (`critical`, `high`, `medium`, `low`) |
 | `--target-php=8.4` | PHP version for the S5 check |
 | `--dev` | Include `packages-dev`. A development package is reported the same way a production one is, but it gets one [priority](verdicts.md) step lower |
 | `--all` | Show every checked package, not only flagged ones. Adds a final `not flagged` group |
-| `--offline` | Never reach the network: lockrot sets `COMPOSER_DISABLE_NETWORK=1` and rebuilds the configured repositories behind it (in plugin mode Composer has already built its own, network-enabled ones before any command runs), so repository metadata is served from Composer's own cache and GitHub activity from lockrot's cache. A package missing from the cache is reported as unavailable, not as absent from the repository |
-| `--strict-network` | Exit 1 (see [ci.md](ci.md)) when a configured repository or GitHub could not be reached |
+| `--offline` | Never reach the network: lockrot sets `COMPOSER_DISABLE_NETWORK=1` and rebuilds the configured repositories behind it (in plugin mode Composer has already built its own, network-enabled ones before any command runs), so repository metadata is served from Composer's own cache and repository activity from lockrot's cache. A package missing from the cache is reported as unavailable, not as absent from the repository |
+| `--strict-network` | Exit 1 (see [ci.md](ci.md)) when a configured repository or a repository host (GitHub, GitLab, Bitbucket) could not be reached |
 | `--generate-baseline` | Write this run's findings to the [baseline](baseline.md) file and exit 0, whatever `--fail-on` says — `--strict-network` is the one exception |
 | `--baseline=<path>` | Baseline file to read (or, with `--generate-baseline`, to write); relative to `composer.json` or absolute. Wins over `extra.lockrot.baseline`. An empty `--baseline=` is a configuration error (exit `2`), never a silent fall-back to the default file |
 
@@ -70,10 +71,10 @@ Repository metadata is cached and revalidated by Composer itself, under Composer
 directory. lockrot adds no cache of its own for it, and there is no `--refresh` or `cache-ttl` knob
 to bypass or resize it.
 
-GitHub repository-activity responses are cached separately under Composer's cache directory, in a
-`lockrot/` subfolder, with a fixed 24-hour TTL. When Composer's cache is disabled
-(`composer --no-cache`), GitHub responses are kept in memory for the run only and nothing is written
-to disk. More in [internals.md](internals.md).
+Repository-activity responses — GitHub, GitLab and Bitbucket alike — are cached separately under
+Composer's cache directory, in a `lockrot/` subfolder, with a fixed 24-hour TTL. When Composer's
+cache is disabled (`composer --no-cache`), they are kept in memory for the run only and nothing is
+written to disk. More in [internals.md](internals.md).
 
 ## The allowlist
 

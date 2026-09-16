@@ -60,13 +60,27 @@ final class FailOn
      */
     public static function allowed(): array
     {
-        return array_merge([self::NONE], array_values(array_filter(Verdict::all(), static fn (string $verdict): bool => Verdict::flagged($verdict))), self::priorities());
+        $verdicts = [];
+        foreach (Verdict::all() as $verdict) {
+            if (Verdict::flagged($verdict)) {
+                $verdicts[] = $verdict;
+            }
+        }
+
+        return array_merge([self::NONE], $verdicts, self::priorities());
     }
 
     /** @return list<string> the priorities a threshold can name — every level but `none`, which is no threshold */
     private static function priorities(): array
     {
-        return array_values(array_filter(Priority::all(), static fn (string $priority): bool => $priority !== Priority::NONE));
+        $priorities = [];
+        foreach (Priority::all() as $priority) {
+            if ($priority !== Priority::NONE) {
+                $priorities[] = $priority;
+            }
+        }
+
+        return $priorities;
     }
 
     public function value(): string

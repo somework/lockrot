@@ -91,7 +91,7 @@ Abridged — `…` marks where lines were cut. [The full run →](https://lockro
 
 | Verdict | Meaning |
 |---|---|
-| `abandoned` | The package's Composer repository marks it abandoned (Packagist by default), or its GitHub repository is archived |
+| `abandoned` | The package's Composer repository marks it abandoned (Packagist by default), or its repository is archived on GitHub or GitLab |
 | `silent` | No stable release for at least 5 years **and** no repository push for at least 5 years; an archived repository is reported as `abandoned` instead |
 | `pinned` | Installed version is a branch snapshot (`dev-*` or `#hash`), or the package has no stable release at all |
 | `old-promise` | The installed version was released before the target PHP's GA date, and its `require.php` constraint is open-ended (`>=N`, `*`) for that target |
@@ -103,8 +103,9 @@ Abridged — `…` marks where lines were cut. [The full run →](https://lockro
 Each finding also carries a priority — `critical`, `high`, `medium`, `low`, or `none` for a package
 the report does not flag. The verdict sets a base level, which drops one step for a transitive
 package and one more for a development-only one, never below `low`. The priority orders the report
-and is carried in every format. **The exit code and `--fail-on` stay on the verdict**: it tells you
-what to read first, not whether the build fails.
+and is carried in every format. **`--fail-on` takes either a verdict or a priority**: `--fail-on=silent`
+fails on what was observed, wherever the package sits; `--fail-on=high` fails on how much it applies
+to this project. The baseline stays on the verdict.
 
 A transitive finding names every direct requirement it is reachable from (`via a › b, also via c`),
 not only the one its shortest chain starts from, and each direct requirement's evidence says what
@@ -171,7 +172,7 @@ which win over `composer.json`.
 
 | `extra.lockrot` key | CLI option | Default | Meaning |
 |---|---|---|---|
-| `fail-on` | `--fail-on=<verdict>` | `none` | Exit 1 threshold: `none`, `stale`, `old-promise`, `pinned`, `silent`, `abandoned` |
+| `fail-on` | `--fail-on=<verdict or priority>` | `none` | Exit 1 threshold: a verdict (`stale`, `old-promise`, `pinned`, `silent`, `abandoned`) or a priority (`low`, `medium`, `high`, `critical`) |
 | `target-php` | `--target-php=8.4` | `config.platform.php`, else the running PHP | PHP version used for the `old-promise` check |
 | `format` | `--format=<name>` | `table` | `table`, `json`, `github`, `sarif`, `gitlab` or `markdown` |
 | `include-dev` | `--dev` | `false` | Also check `packages-dev`, one priority step lower |
@@ -205,10 +206,15 @@ Everything is at [lockrot.dev](https://lockrot.dev).
 
 ## Limitations
 
-- Repository activity is checked on GitHub only. GitLab and Bitbucket are not queried.
+- Repository activity is checked on GitHub, on GitLab (gitlab.com and every instance in Composer's
+  `gitlab-domains`) and on Bitbucket Cloud. GitHub Enterprise and Bitbucket Server are not queried.
 - Without a GitHub token, only packages that already look stale on release age (no stable release
   within `release-warn-years`, default 3y, and not already `abandoned`) are checked against GitHub,
-  capped at 50 per run; set `GITHUB_TOKEN` to lift the cap. lockrot reports how many this affected.
+  capped at 50 per run; set `GITHUB_TOKEN` to lift the cap. The same cap applies on Bitbucket until
+  Composer has credentials for `bitbucket.org`. lockrot reports how many packages this affected.
+- GitLab is never capped, but its API hides the archived flag from anonymous callers: without
+  `GITLAB_TOKEN` (or Composer's `gitlab-token`) a GitLab package can be `silent` but is never
+  `abandoned` for being archived. Bitbucket Cloud has no archived state at all.
 - A package is never flagged for what *it* depends on. A direct requirement that pulls in flagged
   packages says so in its evidence (signal S7) and on the `pulled in by:` line, but its own verdict,
   the priority, `--fail-on` and the exit code read only what was observed about the package itself.
@@ -221,8 +227,8 @@ Everything is at [lockrot.dev](https://lockrot.dev).
 
 ## Roadmap
 
-Next up: GitLab and Bitbucket repository activity, and reading the lock files bundled inside PHAR
-tools. Tracked in [issues](https://github.com/somework/lockrot/issues).
+Next up: reading the lock files bundled inside PHAR tools, and signed releases. Tracked in
+[issues](https://github.com/somework/lockrot/issues).
 
 ## Contributing
 

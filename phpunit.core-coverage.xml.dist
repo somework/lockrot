@@ -19,6 +19,9 @@
             <directory>src/Signal</directory>
             <directory>src/Analyzer</directory>
             <directory>src/Data/Repository</directory>
+            <!-- repository activity: the locator, the per-forge APIs, the client and the planner, all
+                 driven from unit tests with a fake HTTP client -->
+            <directory>src/Data/Forge</directory>
             <directory>src/Lock</directory>
             <!-- install-time summary: the plugin bootstrap around it (LockrotPlugin, CommandProvider,
                  LockrotCommand, ServiceFactory) is exercised by the e2e group, which this gate
