@@ -24,6 +24,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   error/warning line of the github, sarif and gitlab formats follows the same threshold; the
   baseline stays keyed by verdict.
 
+- The report says how old its repository-activity data is. When any activity answer came from
+  lockrot's 24-hour cache, the table and markdown footers read `(package repositories; repository
+  activity from lockrot's cache, up to 23 h old)` instead of `(package repositories, repository
+  hosts)`, and `--format=json` carries the oldest cached answer's fetch time as
+  `activity_cache_oldest_at` (null when everything was fetched in the run). Schema stays `1`.
+
 ### Changed
 
 - `--strict-network` now also trips when GitLab or Bitbucket is unreachable or rate-limits the

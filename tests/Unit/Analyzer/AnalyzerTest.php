@@ -727,6 +727,54 @@ final class AnalyzerTest extends TestCase
         self::assertSame('2026-09-14T12:00:00+00:00', self::dataDateOf($metadataNewer));
     }
 
+    /** The report states the oldest cached activity answer, and nothing when every answer was fetched in this run. */
+    public function testTheReportCarriesTheOldestCachedActivityAnswer(): void
+    {
+        $packages = [self::locked('vendor/a'), self::locked('vendor/b'), self::locked('vendor/c')];
+        $metadata = [];
+        foreach (['a', 'b', 'c'] as $n) {
+            $metadata['vendor/'.$n] = $this->metadataNamed('vendor/'.$n, 'https://github.com/vendor/'.$n.'.git');
+        }
+        $body = '{"archived":false,"pushed_at":"2015-01-01T00:00:00Z"}';
+        $answer = static fn (string $n, string $fetchedAt, bool $cached): HttpResult => $cached
+            ? (new HttpResult('https://api.github.com/repos/vendor/'.$n, 200, $body, new \DateTimeImmutable($fetchedAt)))->asCached()
+            : new HttpResult('https://api.github.com/repos/vendor/'.$n, 200, $body, new \DateTimeImmutable($fetchedAt));
+        /** @param array<string, HttpResult> $results */
+        $http = static fn (array $results): HttpClientInterface => new class ($results) implements HttpClientInterface {
+            /** @var array<string, HttpResult> */
+            private array $results;
+
+            /** @param array<string, HttpResult> $results */
+            public function __construct(array $results)
+            {
+                $this->results = $results;
+            }
+
+            public function fetchAll(array $urls, array $headers = []): array
+            {
+                return $this->results;
+            }
+        };
+
+        $mixed = $this->analyzeLock($packages, $this->loader($metadata), $http([
+            'https://api.github.com/repos/vendor/a' => $answer('a', '2026-09-13T22:00:00+00:00', true),
+            'https://api.github.com/repos/vendor/b' => $answer('b', '2026-09-13T04:00:00+00:00', true),
+            'https://api.github.com/repos/vendor/c' => $answer('c', '2026-09-12T00:00:00+00:00', false),
+        ]), true);
+        $oldest = $mixed->activityCacheOldestAt();
+        self::assertNotNull($oldest);
+        self::assertSame('2026-09-13T04:00:00+00:00', $oldest->format(\DATE_ATOM), 'the oldest cached one; the older fresh answer does not count');
+        self::assertSame("package repositories; repository activity from lockrot's cache, up to 20 h old", $mixed->dataSourcesClause());
+
+        $fresh = $this->analyzeLock($packages, $this->loader($metadata), $http([
+            'https://api.github.com/repos/vendor/a' => $answer('a', '2026-09-14T00:00:00+00:00', false),
+            'https://api.github.com/repos/vendor/b' => $answer('b', '2026-09-14T00:00:00+00:00', false),
+            'https://api.github.com/repos/vendor/c' => $answer('c', '2026-09-14T00:00:00+00:00', false),
+        ]), true);
+        self::assertNull($fresh->activityCacheOldestAt());
+        self::assertSame('package repositories, repository hosts', $fresh->dataSourcesClause());
+    }
+
     private static function dataDateOf(Report $report): string
     {
         $date = $report->findings()[0]->dataDate();

@@ -11,6 +11,8 @@ final class HttpResult
     private ?string $body;
     private \DateTimeImmutable $fetchedAt;
     private ?string $error;
+    /** Set on the copy {@see asCached()} returns; never part of the envelope. */
+    private bool $fromCache = false;
 
     public function __construct(string $url, int $status, ?string $body, \DateTimeImmutable $fetchedAt, ?string $error = null)
     {
@@ -91,6 +93,21 @@ final class HttpResult
     public function error(): ?string
     {
         return $this->error;
+    }
+
+    /** Whether this answer was served from lockrot's cache rather than fetched in this run. */
+    public function fromCache(): bool
+    {
+        return $this->fromCache;
+    }
+
+    /** The same answer, marked as served from the cache; this instance is left unchanged. */
+    public function asCached(): self
+    {
+        $copy = clone $this;
+        $copy->fromCache = true;
+
+        return $copy;
     }
 
     public function isOk(): bool

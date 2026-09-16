@@ -49,12 +49,12 @@ final class GitLabApi implements ForgeApi
         return $result->status() === 429;
     }
 
-    public function activity(RepoRef $repo, array $json, \DateTimeImmutable $fetchedAt): RepositoryActivity
+    public function activity(RepoRef $repo, array $json, \DateTimeImmutable $fetchedAt, bool $fromCache): RepositoryActivity
     {
         $newest = $json['commits'][0] ?? null;
         $committedAt = \is_array($newest) ? JsonDate::parse($newest['committed_date'] ?? null) : null;
         $archived = (($json['project'] ?? [])['archived'] ?? false) === true;
 
-        return new RepositoryActivity($repo, $archived, $committedAt, $fetchedAt);
+        return new RepositoryActivity($repo, $archived, $committedAt, $fetchedAt, $fromCache);
     }
 }

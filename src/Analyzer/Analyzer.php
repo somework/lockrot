@@ -155,7 +155,25 @@ final class Analyzer
 
         $hadNetworkFailures = $batch->failed() !== [] || $activityBatch->failed() !== [];
 
-        return new Report($findings, $notes, $now, \count($packages), $notInRepository, $hadNetworkFailures);
+        return new Report($findings, $notes, $now, \count($packages), $notInRepository, $hadNetworkFailures, null, self::oldestCachedActivity($activity));
+    }
+
+    /**
+     * The fetch time of the oldest activity answer that came from lockrot's cache, or null when
+     * every answer was fetched in this run: what the report's footer states as the data's age.
+     *
+     * @param array<string, RepositoryActivity> $activity
+     */
+    private static function oldestCachedActivity(array $activity): ?\DateTimeImmutable
+    {
+        $oldest = null;
+        foreach ($activity as $record) {
+            if ($record->fromCache() && ($oldest === null || $record->fetchedAt() < $oldest)) {
+                $oldest = $record->fetchedAt();
+            }
+        }
+
+        return $oldest;
     }
 
     /** @param list<LockedPackage> $packages */

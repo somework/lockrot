@@ -11,13 +11,16 @@ final class RepositoryActivity
     private bool $archived;
     private ?\DateTimeImmutable $pushedAt;
     private \DateTimeImmutable $fetchedAt;
+    private bool $fromCache;
 
-    public function __construct(RepoRef $ref, bool $archived, ?\DateTimeImmutable $pushedAt, \DateTimeImmutable $fetchedAt)
+    /** @param bool $fromCache whether the answer came from lockrot's cache, so $fetchedAt may be up to a day before the run */
+    public function __construct(RepoRef $ref, bool $archived, ?\DateTimeImmutable $pushedAt, \DateTimeImmutable $fetchedAt, bool $fromCache = false)
     {
         $this->ref = $ref;
         $this->archived = $archived;
         $this->pushedAt = $pushedAt;
         $this->fetchedAt = $fetchedAt;
+        $this->fromCache = $fromCache;
     }
 
     public function ref(): RepoRef
@@ -42,8 +45,14 @@ final class RepositoryActivity
         return $this->pushedAt;
     }
 
+    /** When the forge answered — in this run, or, when {@see fromCache()}, up to a day earlier. */
     public function fetchedAt(): \DateTimeImmutable
     {
         return $this->fetchedAt;
+    }
+
+    public function fromCache(): bool
+    {
+        return $this->fromCache;
     }
 }

@@ -62,6 +62,7 @@ final class ActivityClient
                 $forge = $repo->forge();
                 $json = [];
                 $fetchedAt = null;
+                $fromCache = false;
                 foreach ($requests[$repo->key()] as $role => $url) {
                     $result = $responses[$url];
                     $decoded = $result->isOk() ? $result->json() : null;
@@ -83,12 +84,13 @@ final class ActivityClient
                             continue 2;
                         }
                         $fetchedAt = $result->fetchedAt();
+                        $fromCache = $result->fromCache();
                     }
                     if ($decoded !== null) {
                         $json[$role] = $decoded;
                     }
                 }
-                $activity[$repo->key()] = $api->activity($repo, $json, $fetchedAt ?? $this->neverFetched());
+                $activity[$repo->key()] = $api->activity($repo, $json, $fetchedAt ?? $this->neverFetched(), $fromCache);
             }
         }
 

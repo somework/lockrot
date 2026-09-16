@@ -116,6 +116,19 @@ final class ActivityClientTest extends TestCase
         self::assertSame(['github.com/Grandt/PHPZip' => 'timed out'], $client->fetch([self::github()])->failed());
     }
 
+    public function testAnAnswerFromTheCacheMarksTheActivity(): void
+    {
+        $cached = (new HttpResult(self::GH_URL, 200, '{"archived":false,"pushed_at":"2020-01-01T00:00:00Z"}', new \DateTimeImmutable('2026-09-13T20:00:00+00:00')))->asCached();
+        $client = new ActivityClient($this->http([self::GH_URL => $cached], new \ArrayObject()), ForgeAuth::anonymous());
+
+        $activity = $client->fetch([self::github()])->activity()['github.com/Grandt/PHPZip'];
+
+        self::assertTrue($activity->fromCache());
+        self::assertSame('2026-09-13T20:00:00+00:00', $activity->fetchedAt()->format(\DATE_ATOM));
+        $fresh = (new ActivityClient($this->http([self::GH_URL => [200, '{"archived":false}']], new \ArrayObject()), ForgeAuth::anonymous()))->fetch([self::github()])->activity()['github.com/Grandt/PHPZip'];
+        self::assertFalse($fresh->fromCache());
+    }
+
     public function testGithubArchived(): void
     {
         $client = new ActivityClient($this->http([self::GH_URL => [200, '{"archived":true,"pushed_at":"2020-01-01T00:00:00Z"}']], new \ArrayObject()), ForgeAuth::anonymous());

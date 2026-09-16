@@ -271,6 +271,14 @@ final class TableFormatterTest extends TestCase
         self::assertSame('note: GitHub token not set: repository activity checked only for 2 candidate packages (0 skipped); set GITHUB_TOKEN to check all', $tail[3]);
     }
 
+    public function testTheFooterStatesTheAgeOfCachedActivity(): void
+    {
+        $at = new \DateTimeImmutable('2026-09-14T00:00:00+00:00');
+        $report = new Report([], [], $at, 0, 0, false, null, new \DateTimeImmutable('2026-09-13T05:00:00+00:00'));
+
+        self::assertStringContainsString("Data as of 2026-09-14 (package repositories; repository activity from lockrot's cache, up to 19 h old). Run composer lockrot --format=json for details.", implode("\n", $this->plainLines($this->formatter(200)->format($report))));
+    }
+
     /**
      * The summary block is part of a width-aware report too: its lines fold at the full width with
      * no indent, since each is a fact of its own rather than a continuation hanging under a label.

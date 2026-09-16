@@ -42,11 +42,11 @@ final class BitbucketApi implements ForgeApi
         return $result->status() === 429;
     }
 
-    public function activity(RepoRef $repo, array $json, \DateTimeImmutable $fetchedAt): RepositoryActivity
+    public function activity(RepoRef $repo, array $json, \DateTimeImmutable $fetchedAt, bool $fromCache): RepositoryActivity
     {
         $values = $json['commits']['values'] ?? null;
         $newest = \is_array($values) ? ($values[0] ?? null) : null;
 
-        return new RepositoryActivity($repo, false, \is_array($newest) ? JsonDate::parse($newest['date'] ?? null) : null, $fetchedAt);
+        return new RepositoryActivity($repo, false, \is_array($newest) ? JsonDate::parse($newest['date'] ?? null) : null, $fetchedAt, $fromCache);
     }
 }

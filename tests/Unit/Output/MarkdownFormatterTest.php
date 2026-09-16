@@ -139,9 +139,17 @@ final class MarkdownFormatterTest extends TestCase
     {
         $out = $this->formatter()->format($this->report());
         self::assertStringContainsString(
-            '<sub>'.$this->report()->summaryLine().' — data as of 2026-09-14. Run `composer lockrot --format=json` for details.</sub>',
+            '<sub>'.$this->report()->summaryLine().' — data as of 2026-09-14 (package repositories, repository hosts). Run `composer lockrot --format=json` for details.</sub>',
             $out
         );
+    }
+
+    public function testTheFooterStatesTheAgeOfCachedActivity(): void
+    {
+        $at = new \DateTimeImmutable('2026-09-14T00:00:00+00:00');
+        $report = new Report([], [], $at, 0, 0, false, null, new \DateTimeImmutable('2026-09-13T05:00:00+00:00'));
+
+        self::assertStringContainsString(" — data as of 2026-09-14 (package repositories; repository activity from lockrot's cache, up to 19 h old). Run", $this->formatter()->format($report));
     }
 
     public function testCellEscapesPipesAndNewlines(): void

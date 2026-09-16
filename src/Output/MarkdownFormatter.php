@@ -124,7 +124,7 @@ final class MarkdownFormatter implements FormatterInterface
     private function footer(Report $report): string
     {
         return '<sub>'.$report->summaryLine().' — data as of '.$report->generatedAt()->format('Y-m-d')
-            .'. Run `composer lockrot --format=json` for details.</sub>';
+            .' ('.$report->dataSourcesClause().'). Run `composer lockrot --format=json` for details.</sub>';
     }
 
     /**

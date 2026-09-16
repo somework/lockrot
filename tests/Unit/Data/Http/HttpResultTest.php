@@ -52,4 +52,18 @@ final class HttpResultTest extends TestCase
         self::assertSame(200, $result->status());
         self::assertSame('{"a":1}', $result->body());
     }
+
+    /** The cache flag lives on a copy and never in the envelope, so a cached answer re-stored reads as fresh again. */
+    public function testAsCachedMarksACopyAndLeavesTheEnvelopeAlone(): void
+    {
+        $result = new HttpResult('https://a', 200, '{}', new \DateTimeImmutable('2026-09-14T00:00:00+00:00'));
+        $cached = $result->asCached();
+
+        self::assertFalse($result->fromCache());
+        self::assertTrue($cached->fromCache());
+        self::assertNotSame($result, $cached);
+        self::assertSame($result->toEnvelope(), $cached->toEnvelope());
+        self::assertFalse(HttpResult::fromEnvelope('https://a', $cached->toEnvelope())->fromCache());
+        self::assertSame('2026-09-14T00:00:00+00:00', $cached->fetchedAt()->format(\DATE_ATOM));
+    }
 }

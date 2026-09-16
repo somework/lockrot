@@ -24,12 +24,18 @@ final class Report
     private bool $hadNetworkFailures;
     /** Null when the project has no baseline file, which is every run until one is generated. */
     private ?BaselineComparison $baseline;
+    /**
+     * When the oldest repository-activity answer served from lockrot's 24-hour cache was fetched;
+     * null when every answer was fetched in this run (or none was needed). Repository metadata is
+     * revalidated on every run, so this is the one source whose age the report has to state.
+     */
+    private ?\DateTimeImmutable $activityCacheOldestAt;
 
     /**
      * @param list<Finding> $findings
      * @param list<string> $notes
      */
-    public function __construct(array $findings, array $notes, \DateTimeImmutable $generatedAt, int $packagesChecked, int $notFromComposerRepository, bool $hadNetworkFailures, ?BaselineComparison $baseline = null)
+    public function __construct(array $findings, array $notes, \DateTimeImmutable $generatedAt, int $packagesChecked, int $notFromComposerRepository, bool $hadNetworkFailures, ?BaselineComparison $baseline = null, ?\DateTimeImmutable $activityCacheOldestAt = null)
     {
         usort($findings, [self::class, 'compare']);
         $this->findings = $findings;
@@ -39,6 +45,7 @@ final class Report
         $this->notFromComposerRepository = $notFromComposerRepository;
         $this->hadNetworkFailures = $hadNetworkFailures;
         $this->baseline = $baseline;
+        $this->activityCacheOldestAt = $activityCacheOldestAt;
     }
 
     /**
@@ -66,7 +73,8 @@ final class Report
             $this->packagesChecked,
             $this->notFromComposerRepository,
             $this->hadNetworkFailures,
-            $baseline
+            $baseline,
+            $this->activityCacheOldestAt
         );
     }
 
@@ -185,6 +193,27 @@ final class Report
         return $this->hadNetworkFailures;
     }
 
+    public function activityCacheOldestAt(): ?\DateTimeImmutable
+    {
+        return $this->activityCacheOldestAt;
+    }
+
+    /**
+     * How the footer describes the sources behind the report: the plain pair when everything was
+     * fetched in this run, otherwise how old the oldest cached activity answer is, in whole hours
+     * rounded up (never below one) — the cache keeps an answer for a day, so this reads up to 24.
+     * The wording is shared by the table and markdown footers.
+     */
+    public function dataSourcesClause(): string
+    {
+        if ($this->activityCacheOldestAt === null) {
+            return 'package repositories, repository hosts';
+        }
+        $seconds = max(0, $this->generatedAt->getTimestamp() - $this->activityCacheOldestAt->getTimestamp());
+
+        return \sprintf('package repositories; repository activity from lockrot\'s cache, up to %d h old', max(1, (int) ceil($seconds / 3600)));
+    }
+
     /** One-line totals, e.g. `200 packages checked · abandoned 19 · silent 1 · …`, shared by the table and GitHub formats. */
     public function summaryLine(): string
     {
@@ -232,6 +261,7 @@ final class Report
     {
         return [
             'generated_at' => $this->generatedAt->format(\DATE_ATOM),
+            'activity_cache_oldest_at' => $this->activityCacheOldestAt === null ? null : $this->activityCacheOldestAt->format(\DATE_ATOM),
             'packages_checked' => $this->packagesChecked,
             'not_from_composer_repository' => $this->notFromComposerRepository,
             'network_failures' => $this->hadNetworkFailures,

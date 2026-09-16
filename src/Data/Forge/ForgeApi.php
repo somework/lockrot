@@ -30,7 +30,9 @@ interface ForgeApi
     public function isRateLimited(HttpResult $result): bool;
 
     /**
-     * @param array<string, array<string, mixed>> $json decoded body per role, every role of requests() present
+     * @param array<string, array<string, mixed>> $json      decoded body per role: the deciding role always, a later one when it answered
+     * @param \DateTimeImmutable                  $fetchedAt when the deciding answer was fetched
+     * @param bool                                $fromCache whether that answer came from lockrot's cache
      */
-    public function activity(RepoRef $repo, array $json, \DateTimeImmutable $fetchedAt): RepositoryActivity;
+    public function activity(RepoRef $repo, array $json, \DateTimeImmutable $fetchedAt, bool $fromCache): RepositoryActivity;
 }

@@ -46,7 +46,7 @@ final class CachingHttpClient implements HttpClientInterface
             $cached = $this->cache->get($url);
             $isFresh = $cached !== null && $now - $cached->fetchedAt()->getTimestamp() < $this->ttl;
             if ($cached !== null && ($this->offline || $isFresh)) {
-                $results[$url] = $cached;
+                $results[$url] = $cached->asCached();
                 continue;
             }
             if ($this->offline) {
@@ -61,7 +61,7 @@ final class CachingHttpClient implements HttpClientInterface
         if ($toFetch !== []) {
             foreach ($this->inner->fetchAll($toFetch, $headers) as $url => $result) {
                 if ($result->isFailure()) {
-                    $results[$url] = $stale[$url] ?? $result;
+                    $results[$url] = isset($stale[$url]) ? $stale[$url]->asCached() : $result;
                     continue;
                 }
                 $this->cache->set($url, $result);

@@ -137,4 +137,27 @@ final class CachingHttpClientTest extends TestCase
         $client->fetchAll(['https://a'], ['Authorization: token abc']);
         self::assertSame(['Authorization: token abc'], $inner->seenHeaders);
     }
+
+    /** A hit, an offline hit and the stale-on-failure fallback all say so; a fetch does not. */
+    public function testAnswersServedFromTheCacheAreMarkedAsSuch(): void
+    {
+        $clock = Clock::fixed('2026-09-14T12:00:00+00:00');
+        $cache = new ArrayCache();
+        $cache->set('https://fresh', new HttpResult('https://fresh', 200, '{}', new \DateTimeImmutable('2026-09-14T00:00:00+00:00')));
+        $cache->set('https://stale', new HttpResult('https://stale', 200, '{}', new \DateTimeImmutable('2026-09-12T00:00:00+00:00')));
+        $calls = 0;
+        $inner = $this->inner([
+            'https://stale' => HttpResult::failure('https://stale', 'timeout', $clock->now()),
+            'https://new' => new HttpResult('https://new', 200, '{}', $clock->now()),
+        ], $calls);
+
+        $results = (new CachingHttpClient($inner, $cache, self::TTL, $clock))->fetchAll(['https://fresh', 'https://stale', 'https://new']);
+        self::assertTrue($results['https://fresh']->fromCache(), 'fresh hit');
+        self::assertTrue($results['https://stale']->fromCache(), 'stale entry served because the refetch failed');
+        self::assertSame('2026-09-12T00:00:00+00:00', $results['https://stale']->fetchedAt()->format(\DATE_ATOM));
+        self::assertFalse($results['https://new']->fromCache(), 'fetched in this run');
+
+        $offline = (new CachingHttpClient($this->inner([], $calls), $cache, self::TTL, $clock, true))->fetchAll(['https://stale']);
+        self::assertTrue($offline['https://stale']->fromCache(), 'offline hit, however old');
+    }
 }

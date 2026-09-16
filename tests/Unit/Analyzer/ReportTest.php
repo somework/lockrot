@@ -221,7 +221,7 @@ final class ReportTest extends TestCase
         );
         $array = $report->toArray();
         self::assertSame(
-            ['generated_at', 'packages_checked', 'not_from_composer_repository', 'network_failures', 'counts', 'priorities', 'exposure', 'baseline', 'notes', 'findings'],
+            ['generated_at', 'activity_cache_oldest_at', 'packages_checked', 'not_from_composer_repository', 'network_failures', 'counts', 'priorities', 'exposure', 'baseline', 'notes', 'findings'],
             array_keys($array)
         );
         self::assertIsArray($array['priorities']);
@@ -231,6 +231,7 @@ final class ReportTest extends TestCase
         );
         self::assertSame(1, $array['priorities'][Priority::CRITICAL]);
         self::assertSame('2026-09-14T00:00:00+00:00', $array['generated_at']);
+        self::assertNull($array['activity_cache_oldest_at']);
         self::assertSame(5, $array['packages_checked']);
         self::assertSame(1, $array['not_from_composer_repository']);
         self::assertTrue($array['network_failures']);
@@ -351,5 +352,34 @@ final class ReportTest extends TestCase
         $report = $this->report($this->reachedFrom('vendor/shared', Verdict::ABANDONED, ...$roots));
 
         self::assertSame(array_fill_keys($roots, 1), $report->exposure());
+    }
+
+    /**
+     * The footer's source clause: the plain pair when every activity answer was fetched in this
+     * run, otherwise the age of the oldest cached one in whole hours rounded up, never below one.
+     */
+    public function testTheDataSourcesClauseStatesTheAgeOfCachedActivity(): void
+    {
+        $at = new \DateTimeImmutable('2026-09-14T12:00:00+00:00');
+        $report = static fn (?string $oldest): Report => new Report([], [], $at, 0, 0, false, null, $oldest === null ? null : new \DateTimeImmutable($oldest));
+
+        self::assertSame('package repositories, repository hosts', $report(null)->dataSourcesClause());
+        self::assertSame("package repositories; repository activity from lockrot's cache, up to 1 h old", $report('2026-09-14T11:30:00+00:00')->dataSourcesClause(), '30 minutes rounds up to one hour');
+        self::assertSame("package repositories; repository activity from lockrot's cache, up to 1 h old", $report('2026-09-14T12:00:00+00:00')->dataSourcesClause(), 'fetched this second, still at least one hour');
+        self::assertSame("package repositories; repository activity from lockrot's cache, up to 23 h old", $report('2026-09-13T13:00:00+00:00')->dataSourcesClause(), 'exactly 23 hours');
+        self::assertSame("package repositories; repository activity from lockrot's cache, up to 24 h old", $report('2026-09-13T12:59:00+00:00')->dataSourcesClause(), '23 hours and a minute rounds up to 24');
+        self::assertSame("package repositories; repository activity from lockrot's cache, up to 1 h old", $report('2026-09-14T13:00:00+00:00')->dataSourcesClause(), 'a clock that ran backwards is not a negative age');
+    }
+
+    public function testTheCacheDateIsCarriedIntoTheArrayAndAcrossWithBaseline(): void
+    {
+        $at = new \DateTimeImmutable('2026-09-14T12:00:00+00:00');
+        $oldest = new \DateTimeImmutable('2026-09-13T20:00:00+00:00');
+        $report = new Report([], [], $at, 0, 0, false, null, $oldest);
+
+        self::assertSame($oldest, $report->activityCacheOldestAt());
+        self::assertSame('2026-09-13T20:00:00+00:00', $report->toArray()['activity_cache_oldest_at']);
+        $withBaseline = $report->withBaseline(BaselineComparison::compare(Baseline::of([], '2026-09-14T00:00:00+00:00'), $report, 'lockrot-baseline.json', []));
+        self::assertSame($oldest, $withBaseline->activityCacheOldestAt());
     }
 }

@@ -26,7 +26,11 @@ requirement that pulls flagged packages in says so in its evidence (`pulls in 15
 …`), and the `pulled in by:` line in the summary sums that up per direct requirement — see
 [verdicts.md](verdicts.md#transitive-exposure).
 
-"Data as of" in the footer is the date the report was generated, in UTC. On a real terminal the
+"Data as of" in the footer is the date the report was generated, in UTC. Repository metadata is
+revalidated on every run; repository activity comes from lockrot's 24-hour cache when it is fresh
+enough, and when any of it did the footer says so and how old the oldest cached answer is —
+`(package repositories; repository activity from lockrot's cache, up to 23 h old)` — with the
+timestamp itself under `activity_cache_oldest_at` in `--format=json`. On a real terminal the
 `critical` and `high` rows are marked in red and the `medium` rows in yellow.
 
 ```text
