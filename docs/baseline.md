@@ -27,7 +27,7 @@ that never arrived would accept findings lockrot was not actually able to check.
 ```json
 {
     "lockrot": {
-        "version": "0.2.1",
+        "version": "0.2.2",
         "schema": 1
     },
     "generated_at": "2026-09-14T00:00:00+00:00",
