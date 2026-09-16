@@ -37,6 +37,10 @@ them with `bin/record-fixtures` (it takes `GITHUB_TOKEN` from the environment); 
 recorded lock file or a recorded response — a fixture that no longer matches the source it was taken
 from is worth less than no fixture.
 
+The README demo (`docs/assets/lockrot-demo.gif`) is recorded the same way, from a real run:
+`docs/assets/lockrot-demo.sh` captures it with asciinema and renders it with agg — its header says
+what to export first. Re-record it when the table output changes shape, not for every release.
+
 ## Contributing a finished package
 
 `resources/finished-packages.json` is the built-in allowlist of packages that are complete rather

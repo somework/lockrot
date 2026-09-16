@@ -81,7 +81,7 @@ pulled in by: wallabag/rulerz-bundle 15 · wallabag/rulerz 14 · wallabag/phpepu
 
 Abridged — `…` marks where lines were cut. [The full run →](https://lockrot.dev/example-run/)
 
-![lockrot output](docs/assets/first-run.png)
+![composer lockrot on a real project: the grouped list, the summary block and the footer](docs/assets/lockrot-demo.gif)
 
 > **Set `GITHUB_TOKEN` for a complete run.** Without one, repository-activity checks are capped at 50
 > packages, and lockrot reports how many were affected. Development dependencies are not checked
