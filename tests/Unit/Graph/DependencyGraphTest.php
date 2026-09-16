@@ -43,13 +43,80 @@ final class DependencyGraphTest extends TestCase
 
     public function testWallabagChainEndsWithPackage(): void
     {
-        $graph = DependencyGraph::fromLock(
+        $graph = $this->wallabag();
+        $chain = $graph->shortestChain('phpzip/phpzip');
+        self::assertNotSame([], $chain);
+        self::assertSame('phpzip/phpzip', end($chain));
+    }
+
+    public function testChainsToDirectPackageIsItself(): void
+    {
+        self::assertSame(['vendor/direct' => ['vendor/direct']], $this->graph(false)->chainsTo('vendor/direct'));
+    }
+
+    public function testChainsToTransitiveNamesEveryRootThatReachesIt(): void
+    {
+        self::assertSame(
+            ['vendor/direct' => ['vendor/direct', 'vendor/transitive']],
+            $this->graph(false)->chainsTo('vendor/transitive')
+        );
+        // With dev roots in, the dev tool reaches the same package through the direct one — two
+        // roots, sorted by name, each with its own chain.
+        self::assertSame(
+            [
+                'vendor/devtool' => ['vendor/devtool', 'vendor/direct', 'vendor/transitive'],
+                'vendor/direct' => ['vendor/direct', 'vendor/transitive'],
+            ],
+            $this->graph(true)->chainsTo('vendor/transitive')
+        );
+    }
+
+    public function testChainsToDirectPackageAlsoReachedThroughAnotherRoot(): void
+    {
+        self::assertSame(
+            ['vendor/devtool' => ['vendor/devtool', 'vendor/direct'], 'vendor/direct' => ['vendor/direct']],
+            $this->graph(true)->chainsTo('vendor/direct')
+        );
+    }
+
+    public function testChainsToUnreachableIsEmpty(): void
+    {
+        self::assertSame([], $this->graph(false)->chainsTo('vendor/snapshot'));
+        self::assertSame([], $this->graph(false)->chainsTo('vendor/not-in-lock'));
+    }
+
+    public function testChainsToIsStableAcrossCalls(): void
+    {
+        $graph = $this->graph(true);
+        self::assertSame($graph->chainsTo('vendor/transitive'), $graph->chainsTo('vendor/transitive'));
+        self::assertSame(['vendor/direct', 'vendor/transitive'], $graph->shortestChain('vendor/transitive'));
+    }
+
+    public function testWallabagChainsToAgreeWithShortestChain(): void
+    {
+        $graph = $this->wallabag();
+        foreach (['phpzip/phpzip', 'hoa/ruler', 'hoa/event', 'symfony/security-guard'] as $target) {
+            $shortest = $graph->shortestChain($target);
+            $chains = $graph->chainsTo($target);
+            self::assertArrayHasKey($shortest[0], $chains, $target);
+            self::assertCount(\count($shortest), $chains[$shortest[0]], $target);
+            foreach ($chains as $root => $chain) {
+                self::assertSame($root, $chain[0], $target);
+                self::assertSame($target, end($chain), $target);
+                self::assertGreaterThanOrEqual(\count($shortest), \count($chain), $target);
+            }
+        }
+        // hoa/ruler is reached from two root requires: the shortest chain starts at wallabag/rulerz,
+        // and wallabag/rulerz-bundle reaches it too — the second parent is what chainsTo() adds.
+        self::assertSame(['wallabag/rulerz', 'wallabag/rulerz-bundle'], array_keys($graph->chainsTo('hoa/ruler')));
+    }
+
+    private function wallabag(): DependencyGraph
+    {
+        return DependencyGraph::fromLock(
             LockFile::fromFile(__DIR__.'/../../fixtures/apps/wallabag_wallabag/composer.lock'),
             ProjectConfig::fromFile(__DIR__.'/../../fixtures/apps/wallabag_wallabag/composer.json'),
             false
         );
-        $chain = $graph->shortestChain('phpzip/phpzip');
-        self::assertNotSame([], $chain);
-        self::assertSame('phpzip/phpzip', end($chain));
     }
 }

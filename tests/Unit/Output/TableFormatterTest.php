@@ -459,4 +459,28 @@ final class TableFormatterTest extends TestCase
 
         return new Report($findings, $this->report()->notes(), $at, \count($findings), 1, false);
     }
+
+    public function testARowNamesTheOtherDirectDependentsAndTheSummaryGetsThePulledInByLine(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $report = new Report([
+            new Finding('hoa/ruler', '2.17.05.16', Verdict::ABANDONED, [new Signal('S1', 'high', 'marked abandoned by its repository')], ['wallabag/rulerz', 'hoa/ruler'], null, $at, null, false, ['wallabag/rulerz', 'wallabag/rulerz-bundle']),
+            new Finding('vendor/twice', '1.0.0', Verdict::STALE, [new Signal('S2', 'warn', 'last release 2022-05-20 (4.3 years ago)')], ['vendor/twice'], null, $at, null, false, ['vendor/other', 'vendor/twice']),
+            new Finding('vendor/many', '1.0.0', Verdict::STALE, [new Signal('S2', 'warn', 'last release 2022-05-20 (4.3 years ago)')], ['r/a', 'vendor/many'], null, $at, null, false, ['r/a', 'r/b', 'r/c', 'r/d', 'r/e']),
+        ], [], $at, 3, 0, false);
+        $lines = $this->plainLines($this->formatter(200)->format($report));
+
+        self::assertSame('  abandoned    hoa/ruler 2.17.05.16  via wallabag/rulerz, also via wallabag/rulerz-bundle', $lines[1]);
+        self::assertContains('  stale        vendor/twice 1.0.0  direct, also via vendor/other', $lines);
+        self::assertContains('  stale        vendor/many 1.0.0  via r/a, also via r/b, r/c, r/d and 1 more', $lines);
+        self::assertContains('pulled in by: r/a 1 · r/b 1 · r/c 1 · r/d 1 · r/e 1 · vendor/other 1 · wallabag/rulerz 1 · wallabag/rulerz-bundle 1', $lines);
+        $priority = array_search('priority: critical 0 · high 1 · medium 1 · low 1', $lines, true);
+        self::assertNotFalse($priority);
+        self::assertStringStartsWith('pulled in by: ', $lines[$priority + 1]);
+    }
+
+    public function testNoPulledInByLineWhenNothingIsReachedThroughAnotherPackage(): void
+    {
+        self::assertStringNotContainsString('pulled in by:', $this->plain($this->formatter()->format($this->report())));
+    }
 }

@@ -105,6 +105,30 @@ final class MarkdownFormatterTest extends TestCase
         self::assertStringContainsString('| direct |', $line);
     }
 
+    public function testViaCellNamesTheOtherDirectDependentsAndTheExposureLineFollowsTheTable(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $report = new Report([
+            new Finding('acme/leaf', '1.0.0', Verdict::STALE, [new Signal('S2', 'warn', 'old')], ['a/parent', 'acme/leaf'], null, $at, null, false, ['a/parent', 'b/parent']),
+            new Finding('acme/twice', '1.0.0', Verdict::STALE, [new Signal('S2', 'warn', 'old')], ['acme/twice'], null, $at, null, false, ['acme/twice', 'b/parent']),
+        ], ['a note'], $at, 2, 0, false);
+        $out = $this->formatter()->format($report);
+        $lines = explode("\n", $out);
+
+        self::assertStringContainsString('| a/parent, also via b/parent |', self::findLine($out, '| `acme/leaf`'));
+        self::assertStringContainsString('| direct, also via b/parent |', self::findLine($out, '| `acme/twice`'));
+        $exposure = array_search('pulled in by: b/parent 2 · a/parent 1', $lines, true);
+        self::assertNotFalse($exposure);
+        self::assertSame('', $lines[$exposure - 1], 'a blank line separates it from the table');
+        self::assertSame('', $lines[$exposure + 1]);
+        self::assertSame('- note: a note', $lines[$exposure + 2]);
+    }
+
+    public function testNoExposureLineWhenNothingIsPulledInThroughAnotherPackage(): void
+    {
+        self::assertStringNotContainsString('pulled in by:', $this->formatter()->format($this->report()));
+    }
+
     public function testNotesAreListedAsBullets(): void
     {
         $out = $this->formatter()->format($this->report());

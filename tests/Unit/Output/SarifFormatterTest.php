@@ -218,6 +218,7 @@ final class SarifFormatterTest extends TestCase
             'dev' => false,
             'signals' => ['S1'],
             'chain' => ['acme/abandoned'],
+            'direct_dependents' => [],
             'data_date' => '2026-09-14T06:00:00+00:00',
         ], JsonPath::arrayAt($run, ['results', 0, 'properties']));
         self::assertSame(['S2', 'S4'], JsonPath::arrayAt($run, ['results', 2, 'properties', 'signals']));
@@ -473,5 +474,17 @@ final class SarifFormatterTest extends TestCase
         $first = JsonPath::arrayAt($run, ['results', 0, 'properties']);
 
         self::assertArrayNotHasKey('baseline', $first);
+    }
+
+    public function testDirectDependentsAreCarriedAsAProperty(): void
+    {
+        $at = new \DateTimeImmutable('2026-09-14T06:00:00+00:00');
+        $report = new Report([
+            new Finding('acme/leaf', '1.0.0', Verdict::STALE, [], ['a/parent', 'acme/leaf'], null, $at, null, false, ['a/parent', 'b/parent']),
+        ], [], $at, 1, 0, false);
+        $sarif = $this->formatter(LockrotConfig::FAIL_ON_NONE, null)->format($report);
+        $this->assertValidSarif($sarif);
+
+        self::assertSame(['a/parent', 'b/parent'], JsonPath::arrayAt($this->singleRun($sarif), ['results', 0, 'properties', 'direct_dependents']));
     }
 }

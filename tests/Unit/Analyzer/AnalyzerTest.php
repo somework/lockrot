@@ -156,6 +156,14 @@ final class AnalyzerTest extends TestCase
         self::assertSame(Priority::NONE, $byName['private/thing']->priority());
         self::assertSame(['vendor/transitive', 'vendor/direct', 'vendor/snapshot', 'private/thing'], array_map(static fn ($f) => $f->package(), $report->findings()));
         self::assertNotEmpty(array_filter($report->notes(), static fn (string $n): bool => strpos($n, 'GitHub token not set') !== false));
+        // Transitive exposure: vendor/direct is the one root and pulls in the silent package, so it
+        // carries S7 next to its own S5 — with the verdict and priority it had without it.
+        self::assertSame(['vendor/direct'], $byName['vendor/transitive']->directDependents());
+        self::assertSame(['vendor/direct'], $byName['vendor/direct']->directDependents());
+        self::assertSame([], $byName['vendor/snapshot']->directDependents());
+        self::assertSame(['S5', 'S7'], array_map(static fn ($s) => $s->id(), $byName['vendor/direct']->signals()));
+        self::assertStringEndsWith('; pulls in 1 flagged package: vendor/transitive (silent)', $byName['vendor/direct']->evidence());
+        self::assertSame(['vendor/direct' => 1], $report->exposure());
     }
 
     public function testADevPackageCarriesTheDevFlagAndGetsALowerPriorityThanTheSameProdPackage(): void
@@ -367,6 +375,11 @@ final class AnalyzerTest extends TestCase
         self::assertCount(1, $report->findings());
         self::assertSame('vendor/transitive', $report->findings()[0]->package());
         self::assertSame(['vendor/direct', 'vendor/transitive'], $report->findings()[0]->chain());
+        // The parents are resolved through the full lock too, and the exposure line names the
+        // root even though it is not in the checked subset — the S7 signal, which needs a finding
+        // to sit on, is not invented for it.
+        self::assertSame(['vendor/direct'], $report->findings()[0]->directDependents());
+        self::assertSame(['vendor/direct' => 1], $report->exposure());
     }
 
     public function testAnExhaustedDeadlineSkipsTheGitHubCallAndSaysSo(): void

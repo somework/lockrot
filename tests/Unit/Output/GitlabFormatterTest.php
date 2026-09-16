@@ -320,4 +320,20 @@ final class GitlabFormatterTest extends TestCase
         $this->expectException(ConfigException::class);
         Formatters::for('xml', FormatContext::create(null, LockrotConfig::FAIL_ON_NONE));
     }
+
+    public function testTheDescriptionNamesTheOtherDirectDependents(): void
+    {
+        $at = new \DateTimeImmutable('2026-09-14T06:00:00+00:00');
+        $report = new Report([
+            new Finding('acme/leaf', '1.0.0', Verdict::STALE, [new Signal('S2', 'warn', 'last release 2022-05-20 (4.3 years ago)')], ['a/parent', 'acme/leaf'], null, $at, null, false, ['a/parent', 'b/parent', 'c/parent', 'd/parent', 'e/parent']),
+        ], [], $at, 1, 0, false);
+        $issues = self::decode((new GitlabFormatter(FormatContext::create(null, LockrotConfig::FAIL_ON_NONE)))->format($report));
+
+        self::assertSame(
+            'acme/leaf 1.0.0 — stale (low): last release 2022-05-20 (4.3 years ago) (via a/parent, also via b/parent, c/parent, d/parent and 1 more)',
+            $issues[0]['description']
+        );
+        // The fingerprint is untouched by where the package is reached from.
+        self::assertSame(hash('sha256', 'lockrot|acme/leaf|stale'), $issues[0]['fingerprint']);
+    }
 }

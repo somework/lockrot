@@ -20,12 +20,21 @@ final class Finding
     private ?string $note;
     /** Whether the package is installed only for development (`packages-dev` in the lock). */
     private bool $dev;
+    /**
+     * The project's direct requirements from which the package is reachable, sorted by name — the
+     * package itself among them when it is direct. Empty exactly when the chain is: nothing in the
+     * project reaches the package.
+     *
+     * @var list<string>
+     */
+    private array $directDependents;
 
     /**
      * @param list<Signal> $signals
      * @param list<string> $chain
+     * @param list<string> $directDependents
      */
-    public function __construct(string $package, string $version, string $verdict, array $signals, array $chain, ?string $allowlistReason, ?\DateTimeImmutable $dataDate, ?string $note = null, bool $dev = false)
+    public function __construct(string $package, string $version, string $verdict, array $signals, array $chain, ?string $allowlistReason, ?\DateTimeImmutable $dataDate, ?string $note = null, bool $dev = false, array $directDependents = [])
     {
         $this->package = $package;
         $this->version = $version;
@@ -36,6 +45,22 @@ final class Finding
         $this->dataDate = $dataDate;
         $this->note = $note;
         $this->dev = $dev;
+        $this->directDependents = $directDependents;
+    }
+
+    /**
+     * The same finding with a different signal list — how the transitive-exposure pass adds S7 to a
+     * direct requirement after every verdict is known. A new instance: the verdict, which was decided
+     * from the original signals, is deliberately left as it is.
+     *
+     * @param list<Signal> $signals
+     */
+    public function withSignals(array $signals): self
+    {
+        $clone = clone $this;
+        $clone->signals = $signals;
+
+        return $clone;
     }
 
     public function package(): string
@@ -90,6 +115,27 @@ final class Finding
         return $this->dev;
     }
 
+    /** @return list<string> */
+    public function directDependents(): array
+    {
+        return $this->directDependents;
+    }
+
+    /**
+     * The direct requirements the chain does not already name: the other ways the project reaches
+     * the package. For a direct package that is every other root that also requires it; for a
+     * transitive one every root but the one its chain starts from. Removing the chain's root from
+     * composer.json would leave the package installed through any of these.
+     *
+     * @return list<string>
+     */
+    public function otherDirectDependents(): array
+    {
+        $root = $this->chain[0] ?? null;
+
+        return array_values(array_filter($this->directDependents, static fn (string $name): bool => $name !== $root));
+    }
+
     /** Derived, never stored: the priority is a view of the verdict, the chain and the dev flag. */
     public function priority(): string
     {
@@ -120,7 +166,8 @@ final class Finding
         return [
             'package' => $this->package, 'version' => $this->version, 'verdict' => $this->verdict,
             'priority' => $this->priority(), 'direct' => $this->isDirect(), 'dev' => $this->dev,
-            'signals' => $signals, 'chain' => $this->chain, 'evidence' => $this->evidence(),
+            'signals' => $signals, 'chain' => $this->chain, 'direct_dependents' => $this->directDependents,
+            'evidence' => $this->evidence(),
             'allowlist_reason' => $this->allowlistReason, 'note' => $this->note,
             'data_date' => $this->dataDate === null ? null : $this->dataDate->format(\DATE_ATOM),
         ];

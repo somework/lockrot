@@ -268,4 +268,26 @@ final class GithubFormatterTest extends TestCase
         $this->expectExceptionMessage('Unknown output format "xml"');
         Formatters::for('xml', FormatContext::create(null, LockrotConfig::FAIL_ON_NONE));
     }
+
+    public function testTheMessageNamesTheOtherDirectDependentsAndTheExposureLinePrecedesTheSummary(): void
+    {
+        $at = new \DateTimeImmutable('2026-09-14T06:00:00+00:00');
+        $report = new Report([
+            new Finding('acme/leaf', '1.0.0', Verdict::STALE, [new Signal('S2', 'warn', 'last release 2022-05-20 (4.3 years ago)')], ['a/parent', 'acme/leaf'], null, $at, null, false, ['a/parent', 'b/parent']),
+            new Finding('acme/twice', '1.0.0', Verdict::STALE, [new Signal('S2', 'warn', 'last release 2022-05-20 (4.3 years ago)')], ['acme/twice'], null, $at, null, false, ['acme/twice', 'b/parent']),
+        ], [], $at, 2, 0, false);
+        $lines = explode("\n", trim($this->formatter(LockrotConfig::FAIL_ON_NONE, null)->format($report)));
+
+        // The direct row sorts first (priority medium over low).
+        self::assertStringEndsWith('::acme/twice 1.0.0: last release 2022-05-20 (4.3 years ago) (also via b/parent)', $lines[0]);
+        self::assertStringEndsWith('::acme/leaf 1.0.0: last release 2022-05-20 (4.3 years ago) (via a/parent, also via b/parent)', $lines[1]);
+        self::assertSame('pulled in by: b/parent 2 · a/parent 1', $lines[2]);
+        self::assertStringStartsWith('2 packages checked', $lines[3]);
+    }
+
+    public function testNoExposureLineWhenNothingIsPulledInThroughAnotherPackage(): void
+    {
+        $lines = explode("\n", trim($this->formatter(LockrotConfig::FAIL_ON_NONE, null)->format($this->report())));
+        self::assertSame([], array_filter($lines, static fn (string $l): bool => strpos($l, 'pulled in by:') === 0));
+    }
 }

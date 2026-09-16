@@ -35,7 +35,9 @@ use Lockrot\Verdict\Finding;
  * is bold only when FormatContext::levelOf() is not `note` — the same rule GitHub annotations and
  * GitLab severities use, so a reviewer's eye is drawn to exactly the findings that can fail the
  * build. The `Via` chain is joined with "›", which reads more naturally inline in a table cell than
- * the plain ">" the annotation formats use.
+ * the plain ">" the annotation formats use, and names the other direct requirements the package is
+ * reachable from (`, also via …`). The `pulled in by:` line under the table sums that up per direct
+ * requirement — see Report::exposureSummaryLine().
  */
 final class MarkdownFormatter implements FormatterInterface
 {
@@ -68,6 +70,12 @@ final class MarkdownFormatter implements FormatterInterface
             }
         }
 
+        $exposure = $report->exposureSummaryLine();
+        if ($exposure !== '') {
+            $lines[] = '';
+            $lines[] = self::text($exposure);
+        }
+
         $notes = $this->notes($report, $baseline);
         if ($notes !== []) {
             $lines[] = '';
@@ -98,7 +106,7 @@ final class MarkdownFormatter implements FormatterInterface
         $verdict = $level === FormatContext::LEVEL_NOTE ? $finding->verdict() : '**'.$finding->verdict().'**';
 
         return '| '.$finding->priority().' | '.self::code($finding->package()).' | '.self::text($finding->version())
-            .' | '.$verdict.' | '.self::text($this->evidence($finding)).' | '.self::text($this->via($finding)).' |';
+            .' | '.$verdict.' | '.self::text($this->evidence($finding)).' | '.self::text(Via::cell($finding, ' › ')).' |';
     }
 
     private function evidence(Finding $finding): string
@@ -109,17 +117,6 @@ final class MarkdownFormatter implements FormatterInterface
         }
 
         return $evidence;
-    }
-
-    private function via(Finding $finding): string
-    {
-        $chain = $finding->chain();
-        if ($chain === []) {
-            return '?';
-        }
-        array_pop($chain);
-
-        return $chain === [] ? 'direct' : implode(' › ', $chain);
     }
 
     /** @return list<string> */

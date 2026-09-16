@@ -53,6 +53,12 @@ final class GithubFormatter implements FormatterInterface
         foreach ($this->notes($report) as $note) {
             $lines[] = '::notice title=lockrot::'.self::escapeData($note);
         }
+        // Plain log lines, not annotations: they describe the run, and no line of composer.lock is
+        // the place for them.
+        $exposure = $report->exposureSummaryLine();
+        if ($exposure !== '') {
+            $lines[] = $exposure;
+        }
         $lines[] = $report->summaryLine();
 
         return implode("\n", $lines)."\n";
@@ -109,13 +115,7 @@ final class GithubFormatter implements FormatterInterface
             $message .= ': '.$evidence;
         }
 
-        $chain = $finding->chain();
-        array_pop($chain);
-        if ($chain !== []) {
-            $message .= ' (via '.implode(' > ', $chain).')';
-        }
-
-        return $message;
+        return $message.Via::suffix($finding, ' > ');
     }
 
 

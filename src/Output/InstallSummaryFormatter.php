@@ -114,19 +114,7 @@ final class InstallSummaryFormatter
             $finding->package(),
             $finding->version(),
             $finding->evidence(),
-            $this->via($finding)
+            Via::suffix($finding, ' > ')
         );
-    }
-
-    /** The chain without the package itself — empty for a direct requirement, which needs no "via". */
-    private function via(Finding $finding): string
-    {
-        $chain = $finding->chain();
-        if (\count($chain) < 2) {
-            return '';
-        }
-        array_pop($chain);
-
-        return ' (via '.implode(' > ', $chain).')';
     }
 }

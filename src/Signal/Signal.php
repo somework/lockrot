@@ -12,6 +12,8 @@ final class Signal
     public const S4 = 'S4';
     public const S5 = 'S5';
     public const S6 = 'S6';
+    /** Transitive exposure: attached to a direct requirement whose subtree holds flagged packages. Never decides a verdict. */
+    public const S7 = 'S7';
     public const LEVEL_INFO = 'info';
     public const LEVEL_WARN = 'warn';
     public const LEVEL_HIGH = 'high';

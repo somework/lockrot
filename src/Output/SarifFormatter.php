@@ -169,6 +169,7 @@ final class SarifFormatter implements FormatterInterface
             'dev' => $finding->isDev(),
             'signals' => $signals,
             'chain' => $finding->chain(),
+            'direct_dependents' => $finding->directDependents(),
             'data_date' => $dataDate === null ? null : $dataDate->format(\DATE_ATOM),
         ];
         // Only when the run actually had a baseline to compare against: a null here would read as

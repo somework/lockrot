@@ -152,4 +152,16 @@ final class InstallSummaryFormatterTest extends TestCase
             self::assertStringNotContainsString($word, $text);
         }
     }
+
+    public function testAFindingLineNamesTheOtherDirectDependents(): void
+    {
+        $report = $this->report([
+            new Finding('vendor/b', '2.0.0', Verdict::ABANDONED, [], ['vendor/a', 'vendor/b'], null, null, 'marked abandoned by its repository', false, ['vendor/a', 'vendor/c']),
+        ], [], 3);
+
+        self::assertSame(
+            '  <comment>abandoned   </comment>vendor/b 2.0.0: marked abandoned by its repository (via vendor/a, also via vendor/c)',
+            (new InstallSummaryFormatter())->format($report)[1]
+        );
+    }
 }

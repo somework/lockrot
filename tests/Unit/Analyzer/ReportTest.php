@@ -220,7 +220,7 @@ final class ReportTest extends TestCase
         );
         $array = $report->toArray();
         self::assertSame(
-            ['generated_at', 'packages_checked', 'not_from_composer_repository', 'network_failures', 'counts', 'priorities', 'baseline', 'notes', 'findings'],
+            ['generated_at', 'packages_checked', 'not_from_composer_repository', 'network_failures', 'counts', 'priorities', 'exposure', 'baseline', 'notes', 'findings'],
             array_keys($array)
         );
         self::assertIsArray($array['priorities']);
@@ -266,5 +266,53 @@ final class ReportTest extends TestCase
             $withBaseline->toArray()['baseline']
         );
         self::assertSame($report->summaryLine(), $withBaseline->summaryLine());
+    }
+
+    /** A finding reachable from the named roots; the chain starts at the first of them, or is empty without any. */
+    private function reachedFrom(string $package, string $verdict, string ...$roots): Finding
+    {
+        $chain = $roots === [] ? [] : ($roots[0] === $package ? [$package] : [$roots[0], $package]);
+
+        return new Finding($package, '1.0.0', $verdict, [], $chain, null, null, null, false, $roots);
+    }
+
+    public function testExposureCountsFlaggedFindingsPerParentMostFirstThenByName(): void
+    {
+        $report = $this->report(
+            $this->reachedFrom('vendor/a', Verdict::ABANDONED, 'root/one', 'root/two'),
+            $this->reachedFrom('vendor/b', Verdict::STALE, 'root/two'),
+            $this->reachedFrom('vendor/c', Verdict::SILENT, 'root/three'),
+            // Direct and also reached through another root: counted under the other root only.
+            $this->reachedFrom('root/three', Verdict::PINNED, 'root/one', 'root/three'),
+            // Unflagged rows never count, whoever pulls them in.
+            $this->reachedFrom('vendor/ok', Verdict::OK, 'root/one'),
+            $this->reachedFrom('vendor/unreached', Verdict::ABANDONED)
+        );
+        self::assertSame(['root/one' => 2, 'root/two' => 2, 'root/three' => 1], $report->exposure());
+        self::assertSame('pulled in by: root/one 2 · root/two 2 · root/three 1', $report->exposureSummaryLine());
+        self::assertSame(
+            [['package' => 'root/one', 'flagged' => 2], ['package' => 'root/two', 'flagged' => 2], ['package' => 'root/three', 'flagged' => 1]],
+            $report->toArray()['exposure']
+        );
+    }
+
+    public function testExposureIsEmptyWhenNothingFlaggedIsReachedThroughAnotherPackage(): void
+    {
+        $report = $this->report($this->reachedFrom('vendor/a', Verdict::ABANDONED, 'vendor/a'), $this->finding('vendor/b', Verdict::OK));
+        self::assertSame([], $report->exposure());
+        self::assertSame('', $report->exposureSummaryLine());
+        self::assertSame([], $report->toArray()['exposure']);
+    }
+
+    public function testExposureSummaryLineNamesTenParentsThenCountsTheRest(): void
+    {
+        $findings = [];
+        for ($i = 1; $i <= 12; ++$i) {
+            $findings[] = $this->reachedFrom(\sprintf('vendor/p%02d', $i), Verdict::STALE, \sprintf('root/r%02d', $i));
+        }
+        $line = $this->report(...$findings)->exposureSummaryLine();
+        self::assertStringStartsWith('pulled in by: root/r01 1 · root/r02 1 · ', $line);
+        self::assertStringEndsWith(' · root/r10 1 · … and 2 more', $line);
+        self::assertStringNotContainsString('root/r11', $line);
     }
 }

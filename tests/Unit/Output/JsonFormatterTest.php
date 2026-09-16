@@ -67,4 +67,27 @@ final class JsonFormatterTest extends TestCase
         self::assertInstanceOf(TableFormatter::class, Formatters::for('table'));
         self::assertInstanceOf(JsonFormatter::class, Formatters::for('json'));
     }
+
+    public function testJsonCarriesTheDirectDependentsAndTheExposureList(): void
+    {
+        $at = new \DateTimeImmutable('2026-09-14T00:00:00+00:00');
+        $report = new Report(
+            [
+                new Finding('a/leaf', '1.0.0', Verdict::STALE, [], ['a/root', 'a/leaf'], null, $at, null, false, ['a/root', 'b/root']),
+                new Finding('a/root', '1.0.0', Verdict::OK, [], ['a/root'], null, $at, null, false, ['a/root']),
+            ],
+            [],
+            $at,
+            2,
+            0,
+            false
+        );
+        $json = json_decode((new JsonFormatter())->format($report), true);
+        self::assertIsArray($json);
+        self::assertSame(['a/root', 'b/root'], $json['findings'][0]['direct_dependents']);
+        self::assertSame([['package' => 'a/root', 'flagged' => 1], ['package' => 'b/root', 'flagged' => 1]], $json['exposure']);
+
+        $empty = new Report([new Finding('a/root', '1.0.0', Verdict::OK, [], ['a/root'], null, $at, null, false, ['a/root'])], [], $at, 1, 0, false);
+        self::assertStringContainsString('"exposure": []', (new JsonFormatter())->format($empty));
+    }
 }

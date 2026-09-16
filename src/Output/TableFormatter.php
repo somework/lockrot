@@ -125,7 +125,7 @@ final class TableFormatter implements FormatterInterface
             .$this->styled($finding, self::escape($label))
             .str_repeat(' ', $labelWidth - \strlen($label) + self::GAP);
         $margin = str_repeat(' ', $indent);
-        $tail = self::wrap($finding->package().' '.$finding->version().'  '.self::via($finding), $wrap);
+        $tail = self::wrap($finding->package().' '.$finding->version().'  '.Via::inline($finding, ' › '), $wrap);
         $lines = [$head.array_shift($tail)];
         foreach ($tail as $line) {
             $lines[] = $margin.$line;
@@ -195,18 +195,6 @@ final class TableFormatter implements FormatterInterface
         return $escapedLabel;
     }
 
-    /** `direct`, `via a › b`, or `?` when nothing in the project reaches the package. */
-    private static function via(Finding $finding): string
-    {
-        $chain = $finding->chain();
-        if ($chain === []) {
-            return '?';
-        }
-        array_pop($chain);
-
-        return $chain === [] ? 'direct' : 'via '.implode(' › ', $chain);
-    }
-
     private static function evidence(Finding $finding): string
     {
         $evidence = $finding->evidence();
@@ -247,8 +235,9 @@ final class TableFormatter implements FormatterInterface
     }
 
     /**
-     * The block every run ends with: the counts, the priority totals, what the baseline made of the
-     * run, the data date, and the notes.
+     * The block every run ends with: the counts, the priority totals, which direct requirements the
+     * transitive findings are pulled in by, what the baseline made of the run, the data date, and
+     * the notes.
      *
      * Wrapped like the rows, but to the full width, with no indent, and without cutting a long
      * token (see {@see wrap()}): these lines are facts in their own right rather than continuations
@@ -267,6 +256,10 @@ final class TableFormatter implements FormatterInterface
         $texts = [$report->summaryLine()];
         if ($hasFlagged) {
             $texts[] = $report->prioritySummaryLine();
+        }
+        $exposure = $report->exposureSummaryLine();
+        if ($exposure !== '') {
+            $texts[] = $exposure;
         }
         if ($baseline !== null) {
             $texts[] = $baseline->summaryLine();

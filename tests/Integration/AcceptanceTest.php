@@ -15,6 +15,7 @@ use Lockrot\Data\Php\PhpReleaseDates;
 use Lockrot\Data\Repository\RepositoryMetadataLoader;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
+use Lockrot\Signal\Signal;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
@@ -59,6 +60,17 @@ final class AcceptanceTest extends TestCase
         self::assertNotNull($loader);
 
         return $loader;
+    }
+
+    private static function signal(Finding $finding, string $id): ?Signal
+    {
+        foreach ($finding->signals() as $signal) {
+            if ($signal->id() === $id) {
+                return $signal;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -135,6 +147,25 @@ final class AcceptanceTest extends TestCase
             self::assertSame(Priority::HIGH, $f['phpzip/phpzip']->priority());
             self::assertSame(['wallabag/phpepub', 'phpzip/phpzip'], $f['phpzip/phpzip']->chain());
             self::assertFalse($f['phpzip/phpzip']->isDev());
+            // Transitive exposure (S7). hoa/ruler is reached from two root requires, so the second
+            // one is what directDependents() adds over the chain; both roots carry S7 naming it, and
+            // wallabag/rulerz keeps the pinned verdict and high priority it had before the pass.
+            self::assertSame(['wallabag/rulerz', 'wallabag/rulerz-bundle'], $f['hoa/ruler']->directDependents());
+            self::assertSame(['wallabag/rulerz-bundle'], $f['hoa/ruler']->otherDirectDependents());
+            $rulerzS7 = self::signal($f['wallabag/rulerz'], Signal::S7);
+            self::assertNotNull($rulerzS7);
+            self::assertSame(Signal::LEVEL_INFO, $rulerzS7->level());
+            self::assertContains('hoa/ruler', array_column($rulerzS7->data()['packages'], 'package'));
+            self::assertSame(Verdict::PINNED, $f['wallabag/rulerz']->verdict());
+            self::assertNull(self::signal($f['hoa/ruler'], Signal::S7), 'a transitive package is not a parent');
+            $exposure = $report->exposure();
+            self::assertArrayHasKey('wallabag/rulerz', $exposure);
+            self::assertSame($rulerzS7->data()['flagged'], $exposure['wallabag/rulerz']);
+            $counts = array_values($exposure);
+            self::assertSame($counts, array_reverse(array_reverse($counts, false)), 'counts are a list');
+            for ($i = 1; $i < \count($counts); ++$i) {
+                self::assertGreaterThanOrEqual($counts[$i], $counts[$i - 1], 'exposure is ordered most first');
+            }
             // The report leads with its critical rows. sensio/framework-extra-bundle is the fixture's
             // only root require whose GitHub repository is recorded as archived
             // (sensiolabs/SensioFrameworkExtraBundle in tests/fixtures/http/github), so it is the one

@@ -11,6 +11,9 @@ use Lockrot\Verdict\Verdict;
 
 final class Report
 {
+    /** Parents named on the `pulled in by:` line before the rest is counted. */
+    public const EXPOSURE_NAMES = 10;
+
     /** @var list<Finding> */
     private array $findings;
     /** @var list<string> */
@@ -28,13 +31,7 @@ final class Report
      */
     public function __construct(array $findings, array $notes, \DateTimeImmutable $generatedAt, int $packagesChecked, int $notFromComposerRepository, bool $hadNetworkFailures, ?BaselineComparison $baseline = null)
     {
-        // Priority first, then the verdict's own severity, then direct dependencies ahead of
-        // transitive ones, then the package name — a total order, so the report reads the same way on
-        // every run. Descending keys take the other finding's value, ascending ones take their own.
-        usort($findings, static function (Finding $a, Finding $b): int {
-            return [Priority::rank($b->priority()), Verdict::severity($b->verdict()), self::directRank($b), $a->package()]
-                <=> [Priority::rank($a->priority()), Verdict::severity($a->verdict()), self::directRank($a), $b->package()];
-        });
+        usort($findings, [self::class, 'compare']);
         $this->findings = $findings;
         $this->notes = $notes;
         $this->generatedAt = $generatedAt;
@@ -42,6 +39,18 @@ final class Report
         $this->notFromComposerRepository = $notFromComposerRepository;
         $this->hadNetworkFailures = $hadNetworkFailures;
         $this->baseline = $baseline;
+    }
+
+    /**
+     * The report's order: priority first, then the verdict's own severity, then direct dependencies
+     * ahead of transitive ones, then the package name — a total order, so the report reads the same
+     * way on every run. Descending keys take the other finding's value, ascending ones take their
+     * own. Public so the transitive-exposure pass lists a parent's descendants the same way.
+     */
+    public static function compare(Finding $a, Finding $b): int
+    {
+        return [Priority::rank($b->priority()), Verdict::severity($b->verdict()), self::directRank($b), $a->package()]
+            <=> [Priority::rank($a->priority()), Verdict::severity($a->verdict()), self::directRank($a), $b->package()];
     }
 
     /** Sort weight of the third ordering key: a direct dependency outranks a transitive one. */
@@ -106,6 +115,51 @@ final class Report
         return $counts;
     }
 
+    /**
+     * Transitive exposure by direct requirement: each root require that pulls in a flagged package
+     * other than itself, with how many, most first and then by name. Derived from the findings'
+     * {@see Finding::directDependents()}, so it is as complete as the analysed set — the whole lock
+     * for `composer lockrot`, the transaction at install time.
+     *
+     * @return array<string, int> parent => flagged packages reachable from it
+     */
+    public function exposure(): array
+    {
+        $counts = [];
+        foreach ($this->flagged() as $finding) {
+            foreach ($finding->directDependents() as $parent) {
+                if ($parent !== $finding->package()) {
+                    $counts[$parent] = ($counts[$parent] ?? 0) + 1;
+                }
+            }
+        }
+        uksort($counts, static fn (string $a, string $b): int => [$counts[$b], $a] <=> [$counts[$a], $b]);
+
+        return $counts;
+    }
+
+    /**
+     * `pulled in by: wallabag/rulerz 16 · doctrine/doctrine-bundle 3`, naming at most
+     * {@see EXPOSURE_NAMES} parents before counting the rest; the empty string when no flagged
+     * package is reached through another one.
+     */
+    public function exposureSummaryLine(): string
+    {
+        $exposure = $this->exposure();
+        if ($exposure === []) {
+            return '';
+        }
+        $parts = [];
+        foreach (\array_slice($exposure, 0, self::EXPOSURE_NAMES, true) as $parent => $count) {
+            $parts[] = $parent.' '.$count;
+        }
+        if (\count($exposure) > self::EXPOSURE_NAMES) {
+            $parts[] = \sprintf('… and %d more', \count($exposure) - self::EXPOSURE_NAMES);
+        }
+
+        return 'pulled in by: '.implode(' · ', $parts);
+    }
+
     /** @return list<string> */
     public function notes(): array
     {
@@ -154,6 +208,22 @@ final class Report
         return 'priority: '.implode(' · ', $parts);
     }
 
+    /**
+     * {@see exposure()} as a list of objects, so an empty one encodes as `[]` rather than as a
+     * PHP array that would encode as `[]` when empty and as an object otherwise.
+     *
+     * @return list<array{package: string, flagged: int}>
+     */
+    private function exposureList(): array
+    {
+        $list = [];
+        foreach ($this->exposure() as $parent => $count) {
+            $list[] = ['package' => $parent, 'flagged' => $count];
+        }
+
+        return $list;
+    }
+
     /** @return array<string, mixed> */
     public function toArray(): array
     {
@@ -164,6 +234,7 @@ final class Report
             'network_failures' => $this->hadNetworkFailures,
             'counts' => $this->byVerdict(),
             'priorities' => $this->byPriority(),
+            'exposure' => $this->exposureList(),
             'baseline' => $this->baseline === null ? null : $this->baseline->toArray(),
             'notes' => $this->notes,
             'findings' => array_map(static fn (Finding $f): array => $f->toArray(), $this->findings),

@@ -108,13 +108,7 @@ final class GitlabFormatter implements FormatterInterface
             $message .= ': '.$evidence;
         }
 
-        $chain = $finding->chain();
-        array_pop($chain);
-        if ($chain !== []) {
-            $message .= ' (via '.implode(' > ', $chain).')';
-        }
-
-        return $message;
+        return $message.Via::suffix($finding, ' > ');
     }
 
     /** @param list<array<string, mixed>> $issues */

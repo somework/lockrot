@@ -141,6 +141,7 @@ final class Analyzer
             }
         }
         $notes = array_merge($notes, $this->notInRepositoryNotes($notInRepository));
+        $findings = TransitiveExposure::attach($findings, $graph);
 
         $hadNetworkFailures = $batch->failed() !== [] || $githubBatch->failed() !== [];
 
@@ -239,7 +240,8 @@ final class Analyzer
             $entry !== null ? $entry->reason() : null,
             $this->dataDate($meta, $activity),
             $note,
-            $package->isDev()
+            $package->isDev(),
+            array_keys($graph->chainsTo($package->name()))
         );
     }
 
