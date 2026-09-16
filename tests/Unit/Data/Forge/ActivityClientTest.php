@@ -125,8 +125,33 @@ final class ActivityClientTest extends TestCase
 
         self::assertTrue($activity->fromCache());
         self::assertSame('2026-09-13T20:00:00+00:00', $activity->fetchedAt()->format(\DATE_ATOM));
+        self::assertSame('2026-09-13T20:00:00+00:00', self::atom($activity->cachedAt()));
         $fresh = (new ActivityClient($this->http([self::GH_URL => [200, '{"archived":false}']], new \ArrayObject()), ForgeAuth::anonymous()))->fetch([self::github()])->activity()['github.com/Grandt/PHPZip'];
         self::assertFalse($fresh->fromCache());
+        self::assertNull($fresh->cachedAt());
+    }
+
+    /** A cached enrichment answer counts for the age even when the deciding answer was fetched now; the deciding time stays the deciding time. */
+    public function testACachedEnrichmentAnswerCountsForTheAge(): void
+    {
+        $project = (new HttpResult(self::GL_PROJECT, 200, '{"archived":true}', new \DateTimeImmutable('2026-09-13T06:00:00+00:00')))->asCached();
+        $client = new ActivityClient($this->http([self::GL_COMMITS => [200, '[{"committed_date":"2020-01-01T00:00:00Z"}]'], self::GL_PROJECT => $project], new \ArrayObject()), ForgeAuth::withTokens(new Tokens(null, 'glpat-x')));
+
+        $activity = $client->fetch([self::gitlab()])->activity()['gitlab.com/group/sub/project'];
+
+        self::assertTrue($activity->isArchived());
+        self::assertSame(self::FETCHED, $activity->fetchedAt()->format(\DATE_ATOM), 'the deciding (commits) answer was fetched in this run');
+        self::assertSame('2026-09-13T06:00:00+00:00', self::atom($activity->cachedAt()), 'the cached project answer sets the age');
+
+        // Both cached: the older of the two.
+        $commits = (new HttpResult(self::GL_COMMITS, 200, '[{"committed_date":"2020-01-01T00:00:00Z"}]', new \DateTimeImmutable('2026-09-13T01:00:00+00:00')))->asCached();
+        $client = new ActivityClient($this->http([self::GL_COMMITS => $commits, self::GL_PROJECT => $project], new \ArrayObject()), ForgeAuth::withTokens(new Tokens(null, 'glpat-x')));
+        self::assertSame('2026-09-13T01:00:00+00:00', self::atom($client->fetch([self::gitlab()])->activity()['gitlab.com/group/sub/project']->cachedAt()));
+    }
+
+    private static function atom(?\DateTimeImmutable $date): ?string
+    {
+        return $date === null ? null : $date->format(\DATE_ATOM);
     }
 
     public function testGithubArchived(): void

@@ -54,10 +54,10 @@ final class GitHubApi implements ForgeApi
         return $result->status() === 403 || $result->status() === 429;
     }
 
-    public function activity(RepoRef $repo, array $json, \DateTimeImmutable $fetchedAt, bool $fromCache): RepositoryActivity
+    public function activity(RepoRef $repo, array $json, \DateTimeImmutable $fetchedAt, ?\DateTimeImmutable $cachedAt): RepositoryActivity
     {
         $body = $json['repo'];
 
-        return new RepositoryActivity($repo, ($body['archived'] ?? false) === true, JsonDate::parse($body['pushed_at'] ?? null), $fetchedAt, $fromCache);
+        return new RepositoryActivity($repo, ($body['archived'] ?? false) === true, JsonDate::parse($body['pushed_at'] ?? null), $fetchedAt, $cachedAt);
     }
 }

@@ -44,6 +44,11 @@ final class CachingHttpClient implements HttpClientInterface
         $now = $this->clock->now()->getTimestamp();
         foreach ($urls as $url) {
             $cached = $this->cache->get($url);
+            if ($cached !== null && $cached->fetchedAt()->getTimestamp() === 0) {
+                // An envelope whose fetched_at could not be read ({@see HttpResult::fromEnvelope()}):
+                // a corrupt entry is a miss, never a stale answer of unknowable age.
+                $cached = null;
+            }
             $isFresh = $cached !== null && $now - $cached->fetchedAt()->getTimestamp() < $this->ttl;
             if ($cached !== null && ($this->offline || $isFresh)) {
                 $results[$url] = $cached->asCached();

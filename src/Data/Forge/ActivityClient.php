@@ -62,10 +62,14 @@ final class ActivityClient
                 $forge = $repo->forge();
                 $json = [];
                 $fetchedAt = null;
-                $fromCache = false;
+                $cachedAt = null;
                 foreach ($requests[$repo->key()] as $role => $url) {
                     $result = $responses[$url];
                     $decoded = $result->isOk() ? $result->json() : null;
+                    if ($decoded !== null && $result->fromCache() && ($cachedAt === null || $result->fetchedAt() < $cachedAt)) {
+                        // Every answer read into $json counts for the age, the enrichment ones too.
+                        $cachedAt = $result->fetchedAt();
+                    }
                     if ($fetchedAt === null) {
                         // The deciding request.
                         if ($result->isNotFound()) {
@@ -84,13 +88,12 @@ final class ActivityClient
                             continue 2;
                         }
                         $fetchedAt = $result->fetchedAt();
-                        $fromCache = $result->fromCache();
                     }
                     if ($decoded !== null) {
                         $json[$role] = $decoded;
                     }
                 }
-                $activity[$repo->key()] = $api->activity($repo, $json, $fetchedAt ?? $this->neverFetched(), $fromCache);
+                $activity[$repo->key()] = $api->activity($repo, $json, $fetchedAt ?? $this->neverFetched(), $cachedAt);
             }
         }
 

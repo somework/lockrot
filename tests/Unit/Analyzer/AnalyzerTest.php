@@ -9,11 +9,14 @@ use Lockrot\Allowlist\AllowlistEntry;
 use Lockrot\Analyzer\Analyzer;
 use Lockrot\Analyzer\Report;
 use Lockrot\Clock;
+use Lockrot\Config\LockrotConfig;
+use Lockrot\Data\Cache\ArrayCache;
 use Lockrot\Data\Forge\ActivityClient;
 use Lockrot\Data\Forge\ActivityFetchPlanner;
 use Lockrot\Data\Forge\ForgeAuth;
 use Lockrot\Data\Forge\RepoLocator;
 use Lockrot\Data\Forge\Tokens;
+use Lockrot\Data\Http\CachingHttpClient;
 use Lockrot\Data\Http\HttpClientInterface;
 use Lockrot\Data\Http\HttpResult;
 use Lockrot\Data\Php\PhpReleaseDates;
@@ -23,6 +26,8 @@ use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Deadline;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
+use Lockrot\Output\FormatContext;
+use Lockrot\Output\TableFormatter;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
@@ -756,6 +761,38 @@ final class AnalyzerTest extends TestCase
         ]), true);
         self::assertNull($fresh->activityCacheOldestAt());
         self::assertSame('package repositories, repository hosts', $fresh->dataSourcesClause());
+    }
+
+    /**
+     * The wired path, end to end: a seeded cache behind the real CachingHttpClient, through
+     * ActivityClient and the analyzer, out through the table footer.
+     */
+    public function testACachedActivityAnswerReachesTheTableFooterThroughTheRealCache(): void
+    {
+        $clock = Clock::fixed(F::NOW);
+        $cache = new ArrayCache();
+        $url = 'https://api.github.com/repos/vendor/pkg';
+        $cache->set($url, new HttpResult($url, 200, '{"archived":false,"pushed_at":"2015-01-01T00:00:00Z"}', new \DateTimeImmutable('2026-09-13T04:30:00+00:00')));
+        $never = new class () implements HttpClientInterface {
+            public function fetchAll(array $urls, array $headers = []): array
+            {
+                throw new \LogicException('the cache should have answered');
+            }
+        };
+        $http = new CachingHttpClient($never, $cache, ActivityClient::CACHE_TTL, $clock);
+        $loader = $this->loader(['vendor/pkg' => $this->metadataNamed('vendor/pkg', 'https://github.com/vendor/pkg.git')]);
+
+        $report = $this->analyzeLock([self::locked('vendor/pkg')], $loader, $http, true);
+
+        self::assertSame('2026-09-13T04:30:00+00:00', self::atomOf($report->activityCacheOldestAt()));
+        $table = (new TableFormatter(FormatContext::create(null, LockrotConfig::FAIL_ON_NONE, '0.4.0', 200)))->format($report);
+        self::assertStringContainsString("Data as of 2026-09-14 (package repositories; repository activity from lockrot's cache, up to 20 h old). Run composer lockrot --format=json for details.", $table);
+        self::assertSame('2026-09-13T04:30:00+00:00', $report->toArray()['activity_cache_oldest_at']);
+    }
+
+    private static function atomOf(?\DateTimeImmutable $date): ?string
+    {
+        return $date === null ? null : $date->format(\DATE_ATOM);
     }
 
     /**

@@ -16,10 +16,13 @@ This page explains what that means for freshness, memory and the "Data as of" li
 
 Composer's metadata cache is reused and revalidated (`If-Modified-Since`) on every run, which is why
 the repository side of "Data as of" tracks the run itself. Repository-activity data keeps the
-timestamp of its own 24-hour cache and can lag behind by up to a day — and when it does, the report
-says so: the footer's source clause becomes `repository activity from lockrot's cache, up to 23 h
-old` (the oldest cached answer, in whole hours rounded up), and `--format=json` carries that
-answer's fetch time as `activity_cache_oldest_at`, null when everything was fetched in this run.
+timestamp of its own 24-hour cache and can lag behind — by up to a day on a fresh hit, by more when
+a refetch failed and lockrot fell back to the stale entry, or under `--offline`, which serves the cache
+however old it is. When any of it did, the report says so: the footer's source clause becomes
+`repository activity from lockrot's cache, up to 23 h old` (the oldest cached answer, in whole hours
+rounded up; `1 h` is the floor, so a minutes-old hit reads as an hour too), and `--format=json`
+carries that answer's fetch time as `activity_cache_oldest_at`, null when everything was fetched in
+this run.
 
 "Data as of" in the report footer is the date the report was generated, in UTC.
 

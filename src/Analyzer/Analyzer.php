@@ -168,8 +168,8 @@ final class Analyzer
     {
         $cachedAt = [];
         foreach ($activity as $record) {
-            if ($record->fromCache()) {
-                $cachedAt[] = $record->fetchedAt();
+            if ($record->cachedAt() !== null) {
+                $cachedAt[] = $record->cachedAt();
             }
         }
 

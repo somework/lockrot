@@ -25,8 +25,9 @@ final class Report
     /** Null when the project has no baseline file, which is every run until one is generated. */
     private ?BaselineComparison $baseline;
     /**
-     * When the oldest repository-activity answer served from lockrot's 24-hour cache was fetched;
-     * null when every answer was fetched in this run (or none was needed). Repository metadata is
+     * When the oldest repository-activity answer served from lockrot's cache was fetched — usually
+     * within the last day, older after a failed refetch fell back to a stale entry or under
+     * `--offline`; null when every answer was fetched in this run (or none was needed). Repository metadata is
      * revalidated on every run, so this is the one source whose age the report has to state.
      */
     private ?\DateTimeImmutable $activityCacheOldestAt;
@@ -201,9 +202,10 @@ final class Report
     /**
      * How the footer describes the sources behind the report: the plain pair when everything was
      * fetched in this run, otherwise how old the oldest cached activity answer is, in whole hours
-     * rounded up and never below one (a clock that ran backwards reads as one hour too). The cache
-     * keeps an answer for a day, so online this reads up to 24; `--offline` serves the cache however
-     * old it is, and the count keeps going. The wording is shared by the table and markdown footers.
+     * rounded up and never below one (a minutes-old answer and a clock that ran backwards both read
+     * as one hour). A fresh hit is under a day old, so this usually reads up to 24; it goes past
+     * that when a refetch failed and lockrot fell back to a stale entry, or when `--offline` served
+     * the cache however old it was. The wording is shared by the table and markdown footers.
      */
     public function dataSourcesClause(): string
     {

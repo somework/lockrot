@@ -138,6 +138,24 @@ final class CachingHttpClientTest extends TestCase
         self::assertSame(['Authorization: token abc'], $inner->seenHeaders);
     }
 
+    /** An envelope whose fetched_at could not be read is a miss: refetched, and never served stale with an epoch-zero age. */
+    public function testACorruptEnvelopeIsAMissNotAStaleAnswer(): void
+    {
+        $clock = Clock::fixed('2026-09-14T12:00:00+00:00');
+        $cache = new ArrayCache();
+        $corrupt = HttpResult::fromEnvelope('https://a', ['status' => 200, 'body' => '{}', 'fetched_at' => 'garbage']);
+        $cache->set('https://a', $corrupt);
+        $calls = 0;
+
+        $refetched = (new CachingHttpClient($this->inner(['https://a' => HttpResult::failure('https://a', 'timeout', $clock->now())], $calls), $cache, self::TTL, $clock))->fetchAll(['https://a']);
+        self::assertSame(1, $calls);
+        self::assertTrue($refetched['https://a']->isFailure(), 'the failure stands; the corrupt entry is not a fallback');
+        self::assertFalse($refetched['https://a']->fromCache());
+
+        $offline = (new CachingHttpClient($this->inner([], $calls), $cache, self::TTL, $clock, true))->fetchAll(['https://a']);
+        self::assertTrue($offline['https://a']->isFailure(), 'offline, a corrupt entry is not an answer either');
+    }
+
     /** A hit, an offline hit and the stale-on-failure fallback all say so; a fetch does not. */
     public function testAnswersServedFromTheCacheAreMarkedAsSuch(): void
     {

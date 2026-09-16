@@ -32,7 +32,7 @@ interface ForgeApi
     /**
      * @param array<string, array<string, mixed>> $json      decoded body per role: the deciding role always, a later one when it answered
      * @param \DateTimeImmutable                  $fetchedAt when the deciding answer was fetched
-     * @param bool                                $fromCache whether that answer came from lockrot's cache
+     * @param ?\DateTimeImmutable                 $cachedAt  the oldest fetch time among the answers that came from lockrot's cache, null when none did
      */
-    public function activity(RepoRef $repo, array $json, \DateTimeImmutable $fetchedAt, bool $fromCache): RepositoryActivity;
+    public function activity(RepoRef $repo, array $json, \DateTimeImmutable $fetchedAt, ?\DateTimeImmutable $cachedAt): RepositoryActivity;
 }

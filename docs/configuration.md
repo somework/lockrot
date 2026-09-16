@@ -75,7 +75,8 @@ Repository-activity responses — GitHub, GitLab and Bitbucket alike — are cac
 Composer's cache directory, in a `lockrot/` subfolder, with a fixed 24-hour TTL. When Composer's
 cache is disabled (`composer --no-cache`), they are kept in memory for the run only and nothing is
 written to disk. A report built on cached activity says so in its footer, with the age of the oldest
-cached answer. More in [internals.md](internals.md).
+cached answer — under a day for a fresh hit, more when a failed refetch fell back to a stale entry or
+under `--offline`. More in [internals.md](internals.md).
 
 ## The allowlist
 

@@ -269,6 +269,7 @@ list, which `…` stands in for:
         "schema": 1
     },
     "generated_at": "2026-09-15T17:31:32+00:00",
+    "activity_cache_oldest_at": null,
     "packages_checked": 200,
     "not_from_composer_repository": 0,
     "network_failures": false,

@@ -25,10 +25,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   baseline stays keyed by verdict.
 
 - The report says how old its repository-activity data is. When any activity answer came from
-  lockrot's 24-hour cache, the table and markdown footers read `(package repositories; repository
-  activity from lockrot's cache, up to 23 h old)` instead of `(package repositories, repository
-  hosts)`, and `--format=json` carries the oldest cached answer's fetch time as
-  `activity_cache_oldest_at` (null when everything was fetched in the run). Schema stays `1`.
+  lockrot's cache, the footer's source clause reads `(package repositories; repository activity from
+  lockrot's cache, up to 23 h old)` — under a day for a fresh hit, more after a failed refetch fell
+  back to a stale entry or under `--offline` — instead of `(package repositories, repository
+  hosts)`. The table footer had that plain clause already; the markdown footer gains it. `--format=json`
+  carries the oldest cached answer's fetch time as `activity_cache_oldest_at` (null when everything
+  was fetched in the run). Schema stays `1`. A cache envelope whose fetch time cannot be read now
+  counts as a miss instead of an answer of unknowable age.
 
 ### Changed
 

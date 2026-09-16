@@ -10,7 +10,9 @@
 # printed one character at a time behind a bare prompt); the run itself is real.
 set -euo pipefail
 here=$(cd "$(dirname "$0")" && pwd)
-cast=$(mktemp -t lockrot-demo).cast
+work=$(mktemp -d -t lockrot-demo)
+trap 'rm -rf "$work"' EXIT
+cast="$work/demo.cast"
 : "${LOCKROT_DEMO_DIR:?export LOCKROT_DEMO_DIR}"
 
 session() {
@@ -27,7 +29,7 @@ session() {
 }
 export -f session
 
-asciinema rec --overwrite --quiet --window-size 100x33 --command 'session "php lockrot.phar --target-php=8.4"' "$cast"
+# The exported function only exists for bash, whatever the recorder's login shell is.
+SHELL=/bin/bash asciinema rec --overwrite --quiet --window-size 100x33 --command 'session "php lockrot.phar --target-php=8.4"' "$cast"
 agg --font-size 20 --line-height 1.3 --theme monokai --speed 1 --last-frame-duration 5 --fps-cap 20 "$cast" "$here/lockrot-demo.gif"
-rm -f "$cast"
 ls -la "$here/lockrot-demo.gif"
