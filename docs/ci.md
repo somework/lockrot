@@ -133,8 +133,9 @@ sensio/framework-extra-bundle v6.2.10 — abandoned (critical): marked abandoned
 For a transitive package the description ends with the chain and the other direct requirements that reach it
 (`(via a > b, also via c, d)`). Severity follows the same rule as the GitHub and SARIF level: a finding at or above
 `--fail-on` is `major`, any other flagged verdict `minor`, and a row only `--all` shows (or one a
-[baseline](baseline.md) already knows) `info`. Each issue's fingerprint is a stable hash of the package name and verdict, so a version bump that keeps the same verdict —
-or a reformatted lock that moves the entry to a different line — keeps the same GitLab issue identity. The priority is
+[baseline](baseline.md) already knows) `info`. Each issue's fingerprint is a stable hash of the package name and
+verdict, so a version bump that keeps the same verdict — or a reformatted lock that moves the entry to a different
+line — keeps the same GitLab issue identity. The priority is
 deliberately not part of it, so moving a package from `require` to `require-dev` does not open a second issue for a
 finding GitLab already tracks. GitLab's Code Quality format has no field for a document-level note, so notes are
 dropped here; use `--format=json` when you need them.
@@ -155,8 +156,8 @@ gh pr comment --body-file comment.md
 | Priority | Package | Version | Verdict | Evidence | Via |
 |---|---|---|---|---|---|
 | critical | `sensio/framework-extra-bundle` | v6.2.10 | **abandoned** | marked abandoned by its repository, replacement: Symfony; … | direct |
-| high | `friendsofsymfony/oauth-server-bundle` | dev-master | **pinned** | last release 2019-01-23 (7.6 years ago); pinned to branch snapshot dev-master; pulls in 2 flagged packages: symfony/security-guard (abandoned), … | direct |
 | high | `hoa/ruler` | 2.17.05.16 | **abandoned** | marked abandoned by its repository; … | wallabag/rulerz, also via wallabag/rulerz-bundle |
+| high | `friendsofsymfony/oauth-server-bundle` | dev-master | **pinned** | last release 2019-01-23 (7.6 years ago); pinned to branch snapshot dev-master; pulls in 2 flagged packages: symfony/security-guard (abandoned), … | direct |
 
 pulled in by: wallabag/rulerz-bundle 15 · wallabag/rulerz 14 · wallabag/phpepub 5 · …
 ```

@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the table, markdown, GitHub, GitLab and install-time formats, and `direct_dependents` on every
   finding in `--format=json` and in SARIF `properties`. Each direct requirement that pulls in flagged
   transitive packages gets an informational signal `S7` listing them, with the shortest chain from
-  that requirement to each, so its evidence reads `…; pulls in 18 flagged packages: hoa/compiler
+  that requirement to each, so its evidence reads `…; pulls in 15 flagged packages: hoa/compiler
   (abandoned), …`. A `pulled in by:` line in the summary block (table, GitHub, markdown) and an
   `exposure` list in the JSON document sum that up per direct requirement. A flagged transitive
   package reached from more than eight direct requirements is shared infrastructure and is left out
