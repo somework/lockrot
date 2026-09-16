@@ -84,6 +84,8 @@ final class JsonFormatterTest extends TestCase
         );
         $json = json_decode((new JsonFormatter())->format($report), true);
         self::assertIsArray($json);
+        self::assertIsArray($json['findings']);
+        self::assertIsArray($json['findings'][0]);
         self::assertSame(['a/root', 'b/root'], $json['findings'][0]['direct_dependents']);
         self::assertSame([['package' => 'a/root', 'flagged' => 1], ['package' => 'b/root', 'flagged' => 1]], $json['exposure']);
 

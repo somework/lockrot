@@ -27,9 +27,11 @@ final class TransitiveExposure
     public const SUMMARY_NAMES = 5;
 
     /**
-     * The same findings, with S7 attached to every direct requirement that pulls in a flagged one.
-     * Only findings in $findings can be annotated: at install time that is the transaction, so a
-     * parent left untouched by the transaction is not in the list and gets nothing.
+     * The same findings, with S7 attached to every direct requirement that pulls in a flagged
+     * transitive one. A flagged package the project requires directly is nobody's exposure, whoever
+     * else reaches it ({@see Report::exposure()} draws the same line). Only findings in $findings
+     * can be annotated: at install time that is the transaction, so a parent left untouched by the
+     * transaction is not in the list and gets nothing.
      *
      * @param list<Finding> $findings
      *
@@ -51,9 +53,8 @@ final class TransitiveExposure
     }
 
     /**
-     * Parent => the flagged findings reachable from it, each paired with the shortest chain from the
-     * parent, in report order. A flagged direct package is listed under every *other* root that
-     * reaches it, never under itself.
+     * Parent => the flagged transitive findings reachable from it, each paired with the shortest
+     * chain from the parent, in report order.
      *
      * @param list<Finding> $findings
      *
@@ -61,14 +62,12 @@ final class TransitiveExposure
      */
     private static function byParent(array $findings, DependencyGraph $graph): array
     {
-        $flagged = array_filter($findings, static fn (Finding $f): bool => Verdict::flagged($f->verdict()));
+        $flagged = array_filter($findings, static fn (Finding $f): bool => Verdict::flagged($f->verdict()) && !$f->isDirect());
         usort($flagged, [Report::class, 'compare']);
         $byParent = [];
         foreach ($flagged as $finding) {
             foreach ($graph->chainsTo($finding->package()) as $parent => $chain) {
-                if ($parent !== $finding->package()) {
-                    $byParent[$parent][] = [$finding, $chain];
-                }
+                $byParent[$parent][] = [$finding, $chain];
             }
         }
 

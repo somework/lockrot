@@ -12,7 +12,7 @@ use Lockrot\Verdict\Verdict;
 final class Report
 {
     /** Parents named on the `pulled in by:` line before the rest is counted. */
-    public const EXPOSURE_NAMES = 10;
+    public const EXPOSURE_NAMES = 5;
 
     /** @var list<Finding> */
     private array $findings;
@@ -116,21 +116,25 @@ final class Report
     }
 
     /**
-     * Transitive exposure by direct requirement: each root require that pulls in a flagged package
-     * other than itself, with how many, most first and then by name. Derived from the findings'
+     * Transitive exposure by direct requirement: each root require that pulls in a flagged
+     * *transitive* package, with how many, most first and then by name. A flagged package the
+     * project requires directly is its own responsibility and counts under nobody, however many
+     * other roots also reach it — in a framework application that is every one of them, and
+     * counting those would name every bundle for every core package. Derived from the findings'
      * {@see Finding::directDependents()}, so it is as complete as the analysed set — the whole lock
      * for `composer lockrot`, the transaction at install time.
      *
-     * @return array<string, int> parent => flagged packages reachable from it
+     * @return array<string, int> parent => flagged transitive packages reachable from it
      */
     public function exposure(): array
     {
         $counts = [];
         foreach ($this->flagged() as $finding) {
+            if ($finding->isDirect()) {
+                continue;
+            }
             foreach ($finding->directDependents() as $parent) {
-                if ($parent !== $finding->package()) {
-                    $counts[$parent] = ($counts[$parent] ?? 0) + 1;
-                }
+                $counts[$parent] = ($counts[$parent] ?? 0) + 1;
             }
         }
         uksort($counts, static fn (string $a, string $b): int => [$counts[$b], $a] <=> [$counts[$a], $b]);
@@ -140,8 +144,9 @@ final class Report
 
     /**
      * `pulled in by: wallabag/rulerz 16 · doctrine/doctrine-bundle 3`, naming at most
-     * {@see EXPOSURE_NAMES} parents before counting the rest; the empty string when no flagged
-     * package is reached through another one.
+     * {@see EXPOSURE_NAMES} parents before counting the rest — in a framework application a
+     * transitive core package is reached from every bundle, and the long tail of equal counts that
+     * makes is what `--format=json` is for; the empty string when no flagged package is transitive.
      */
     public function exposureSummaryLine(): string
     {

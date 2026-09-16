@@ -116,8 +116,8 @@ final class MarkdownFormatterTest extends TestCase
         $lines = explode("\n", $out);
 
         self::assertStringContainsString('| a/parent, also via b/parent |', self::findLine($out, '| `acme/leaf`'));
-        self::assertStringContainsString('| direct, also via b/parent |', self::findLine($out, '| `acme/twice`'));
-        $exposure = array_search('pulled in by: b/parent 2 · a/parent 1', $lines, true);
+        self::assertStringContainsString('| direct |', self::findLine($out, '| `acme/twice`'));
+        $exposure = array_search('pulled in by: a/parent 1 · b/parent 1', $lines, true);
         self::assertNotFalse($exposure);
         self::assertSame('', $lines[$exposure - 1], 'a blank line separates it from the table');
         self::assertSame('', $lines[$exposure + 1]);

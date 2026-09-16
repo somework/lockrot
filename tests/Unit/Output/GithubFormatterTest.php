@@ -278,10 +278,10 @@ final class GithubFormatterTest extends TestCase
         ], [], $at, 2, 0, false);
         $lines = explode("\n", trim($this->formatter(LockrotConfig::FAIL_ON_NONE, null)->format($report)));
 
-        // The direct row sorts first (priority medium over low).
-        self::assertStringEndsWith('::acme/twice 1.0.0: last release 2022-05-20 (4.3 years ago) (also via b/parent)', $lines[0]);
+        // The direct row sorts first (priority medium over low) and, being direct, names no other parent.
+        self::assertStringEndsWith('::acme/twice 1.0.0: last release 2022-05-20 (4.3 years ago)', $lines[0]);
         self::assertStringEndsWith('::acme/leaf 1.0.0: last release 2022-05-20 (4.3 years ago) (via a/parent, also via b/parent)', $lines[1]);
-        self::assertSame('pulled in by: b/parent 2 · a/parent 1', $lines[2]);
+        self::assertSame('pulled in by: a/parent 1 · b/parent 1', $lines[2]);
         self::assertStringStartsWith('2 packages checked', $lines[3]);
     }
 

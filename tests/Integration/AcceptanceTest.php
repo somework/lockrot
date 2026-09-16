@@ -155,7 +155,9 @@ final class AcceptanceTest extends TestCase
             $rulerzS7 = self::signal($f['wallabag/rulerz'], Signal::S7);
             self::assertNotNull($rulerzS7);
             self::assertSame(Signal::LEVEL_INFO, $rulerzS7->level());
-            self::assertContains('hoa/ruler', array_column($rulerzS7->data()['packages'], 'package'));
+            $pulledIn = $rulerzS7->data()['packages'];
+            self::assertIsArray($pulledIn);
+            self::assertContains('hoa/ruler', array_column($pulledIn, 'package'));
             self::assertSame(Verdict::PINNED, $f['wallabag/rulerz']->verdict());
             self::assertNull(self::signal($f['hoa/ruler'], Signal::S7), 'a transitive package is not a parent');
             $exposure = $report->exposure();

@@ -273,7 +273,7 @@ final class ReportTest extends TestCase
     {
         $chain = $roots === [] ? [] : ($roots[0] === $package ? [$package] : [$roots[0], $package]);
 
-        return new Finding($package, '1.0.0', $verdict, [], $chain, null, null, null, false, $roots);
+        return new Finding($package, '1.0.0', $verdict, [], $chain, null, null, null, false, array_values($roots));
     }
 
     public function testExposureCountsFlaggedFindingsPerParentMostFirstThenByName(): void
@@ -282,16 +282,16 @@ final class ReportTest extends TestCase
             $this->reachedFrom('vendor/a', Verdict::ABANDONED, 'root/one', 'root/two'),
             $this->reachedFrom('vendor/b', Verdict::STALE, 'root/two'),
             $this->reachedFrom('vendor/c', Verdict::SILENT, 'root/three'),
-            // Direct and also reached through another root: counted under the other root only.
-            $this->reachedFrom('root/three', Verdict::PINNED, 'root/one', 'root/three'),
+            // Direct, and also reached through another root: the project's own choice, counted nowhere.
+            $this->reachedFrom('root/three', Verdict::PINNED, 'root/three', 'root/one'),
             // Unflagged rows never count, whoever pulls them in.
             $this->reachedFrom('vendor/ok', Verdict::OK, 'root/one'),
             $this->reachedFrom('vendor/unreached', Verdict::ABANDONED)
         );
-        self::assertSame(['root/one' => 2, 'root/two' => 2, 'root/three' => 1], $report->exposure());
-        self::assertSame('pulled in by: root/one 2 · root/two 2 · root/three 1', $report->exposureSummaryLine());
+        self::assertSame(['root/two' => 2, 'root/one' => 1, 'root/three' => 1], $report->exposure());
+        self::assertSame('pulled in by: root/two 2 · root/one 1 · root/three 1', $report->exposureSummaryLine());
         self::assertSame(
-            [['package' => 'root/one', 'flagged' => 2], ['package' => 'root/two', 'flagged' => 2], ['package' => 'root/three', 'flagged' => 1]],
+            [['package' => 'root/two', 'flagged' => 2], ['package' => 'root/one', 'flagged' => 1], ['package' => 'root/three', 'flagged' => 1]],
             $report->toArray()['exposure']
         );
     }
@@ -304,15 +304,15 @@ final class ReportTest extends TestCase
         self::assertSame([], $report->toArray()['exposure']);
     }
 
-    public function testExposureSummaryLineNamesTenParentsThenCountsTheRest(): void
+    public function testExposureSummaryLineNamesFiveParentsThenCountsTheRest(): void
     {
         $findings = [];
-        for ($i = 1; $i <= 12; ++$i) {
+        for ($i = 1; $i <= 7; ++$i) {
             $findings[] = $this->reachedFrom(\sprintf('vendor/p%02d', $i), Verdict::STALE, \sprintf('root/r%02d', $i));
         }
         $line = $this->report(...$findings)->exposureSummaryLine();
         self::assertStringStartsWith('pulled in by: root/r01 1 · root/r02 1 · ', $line);
-        self::assertStringEndsWith(' · root/r10 1 · … and 2 more', $line);
-        self::assertStringNotContainsString('root/r11', $line);
+        self::assertStringEndsWith(' · root/r05 1 · … and 2 more', $line);
+        self::assertStringNotContainsString('root/r06', $line);
     }
 }

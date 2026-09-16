@@ -9,12 +9,13 @@ use Lockrot\Verdict\Finding;
 /**
  * How a finding says where the project requires it from, spelled once for every format.
  *
- * Three facts go into the phrase: the shortest chain (`direct`, `via a › b`, or `?` when nothing in
- * the project reaches the package), and — since the chain names only one root — the other direct
- * requirements the package is also reachable from ({@see Finding::otherDirectDependents()}), as
- * `also via c, d`. The second part is what tells a reader that dropping the chain's root would not
- * remove the package. Formats differ only in the separator between chain links and in whether the
- * phrase is inline, a table cell or a parenthesised suffix.
+ * Two facts go into the phrase: the shortest chain (`direct`, `via a › b`, or `?` when nothing in
+ * the project reaches the package), and — since the chain names only one root — for a transitive
+ * package the other direct requirements it is also reachable from
+ * ({@see Finding::otherDirectDependents()}), as `also via c, d`. The second part is what tells a
+ * reader that dropping the chain's root would not remove the package. Formats differ only in the
+ * separator between chain links and in whether the phrase is inline, a table cell or a
+ * parenthesised suffix.
  */
 final class Via
 {
@@ -33,10 +34,16 @@ final class Via
         return $chain === [] ? 'direct' : implode($separator, $chain);
     }
 
-    /** `also via c, d and 2 more`, or the empty string when the chain's root is the only one. */
+    /**
+     * `also via c, d and 2 more`, or the empty string when the chain's root is the only one — or
+     * when the package is direct: a direct requirement is where the project wants it, and in a
+     * framework application every other root reaches its core packages too, so naming them would
+     * put the same twenty bundles after every `direct`. {@see Finding::directDependents()} still
+     * carries them for the machine formats.
+     */
     public static function also(Finding $finding): string
     {
-        $others = $finding->otherDirectDependents();
+        $others = $finding->isDirect() ? [] : $finding->otherDirectDependents();
         if ($others === []) {
             return '';
         }
@@ -63,11 +70,7 @@ final class Via
         return self::withAlso(self::chain($finding, $separator), $finding);
     }
 
-    /**
-     * For a one-line message: ` (via a > b)`, ` (via a > b, also via c)`, ` (also via c)` for a
-     * direct package other roots reach too, and nothing at all for a direct or unplaceable package
-     * nothing else reaches.
-     */
+    /** For a one-line message: ` (via a > b)` or ` (via a > b, also via c)`; nothing for a direct or unplaceable package. */
     public static function suffix(Finding $finding, string $separator): string
     {
         $chain = self::chain($finding, $separator);

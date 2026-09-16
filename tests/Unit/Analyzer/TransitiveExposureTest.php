@@ -43,7 +43,11 @@ final class TransitiveExposureTest extends TestCase
         return new Finding($package, '1.0.0', $verdict, $signals, $graph->shortestChain($package), null, null, null, false, array_keys($graph->chainsTo($package)));
     }
 
-    /** @return array<string, Finding> */
+    /**
+     * @param list<Finding> $findings
+     *
+     * @return array<string, Finding>
+     */
     private function byName(array $findings): array
     {
         $byName = [];
@@ -114,7 +118,7 @@ final class TransitiveExposureTest extends TestCase
         self::assertSame('pinned to branch snapshot dev-main; pulls in 1 flagged package: vendor/leaf (abandoned)', $f['root/a']->evidence());
     }
 
-    public function testAFlaggedDirectPackageIsListedUnderTheOtherRootButNeverUnderItself(): void
+    public function testAFlaggedDirectPackageIsNobodysExposureEvenWhenAnotherRootReachesIt(): void
     {
         $graph = $this->graph();
         $findings = [
@@ -122,12 +126,8 @@ final class TransitiveExposureTest extends TestCase
             $this->finding($graph, 'root/b', Verdict::OK),
         ];
 
-        $f = $this->byName(TransitiveExposure::attach($findings, $graph));
-
-        self::assertNull(self::s7($f['root/a']));
-        $b = self::s7($f['root/b']);
-        self::assertNotNull($b);
-        self::assertSame([['package' => 'root/a', 'verdict' => Verdict::STALE, 'chain' => ['root/b', 'root/a']]], $b->data()['packages']);
+        self::assertSame(['root/a', 'root/b'], $findings[0]->directDependents());
+        self::assertSame($findings, TransitiveExposure::attach($findings, $graph));
     }
 
     public function testUnflaggedDescendantsDoNotCountAndUntouchedFindingsAreReturnedAsIs(): void
@@ -179,6 +179,8 @@ final class TransitiveExposureTest extends TestCase
             $s7->summary()
         );
         self::assertSame(7, $s7->data()['flagged']);
-        self::assertCount(7, $s7->data()['packages']);
+        $pulledIn = $s7->data()['packages'];
+        self::assertIsArray($pulledIn);
+        self::assertCount(7, $pulledIn);
     }
 }

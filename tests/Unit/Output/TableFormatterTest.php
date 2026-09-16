@@ -471,9 +471,9 @@ final class TableFormatterTest extends TestCase
         $lines = $this->plainLines($this->formatter(200)->format($report));
 
         self::assertSame('  abandoned    hoa/ruler 2.17.05.16  via wallabag/rulerz, also via wallabag/rulerz-bundle', $lines[1]);
-        self::assertContains('  stale        vendor/twice 1.0.0  direct, also via vendor/other', $lines);
+        self::assertContains('  stale        vendor/twice 1.0.0  direct', $lines);
         self::assertContains('  stale        vendor/many 1.0.0  via r/a, also via r/b, r/c, r/d and 1 more', $lines);
-        self::assertContains('pulled in by: r/a 1 · r/b 1 · r/c 1 · r/d 1 · r/e 1 · vendor/other 1 · wallabag/rulerz 1 · wallabag/rulerz-bundle 1', $lines);
+        self::assertContains('pulled in by: r/a 1 · r/b 1 · r/c 1 · r/d 1 · r/e 1 · … and 2 more', $lines);
         $priority = array_search('priority: critical 0 · high 1 · medium 1 · low 1', $lines, true);
         self::assertNotFalse($priority);
         self::assertStringStartsWith('pulled in by: ', $lines[$priority + 1]);

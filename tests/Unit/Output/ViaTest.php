@@ -30,12 +30,15 @@ final class ViaTest extends TestCase
         self::assertSame('', Via::suffix($f, ' > '));
     }
 
-    public function testDirectPackageAnotherRootAlsoReaches(): void
+    /** The other roots are still on the finding for the machine formats; the phrase leaves them out. */
+    public function testDirectPackageAnotherRootAlsoReachesStaysDirect(): void
     {
         $f = self::finding(['acme/pkg'], ['acme/pkg', 'r/one']);
-        self::assertSame('direct, also via r/one', Via::inline($f, ' › '));
-        self::assertSame('direct, also via r/one', Via::cell($f, ' › '));
-        self::assertSame(' (also via r/one)', Via::suffix($f, ' > '));
+        self::assertSame(['r/one'], $f->otherDirectDependents());
+        self::assertSame('', Via::also($f));
+        self::assertSame('direct', Via::inline($f, ' › '));
+        self::assertSame('direct', Via::cell($f, ' › '));
+        self::assertSame('', Via::suffix($f, ' > '));
     }
 
     public function testTransitivePackage(): void
