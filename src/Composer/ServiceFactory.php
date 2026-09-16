@@ -77,8 +77,11 @@ final class ServiceFactory
      * report never writes.
      *
      * Run at most once per run and only when a Bitbucket repository is actually planned
-     * ({@see ForgeAuth}), never once the install-time budget is spent ({@see Analyzer}); an exchange
-     * that fails leaves the run anonymous on Bitbucket, with a warning at -v.
+     * ({@see ForgeAuth}), never once the install-time budget is spent ({@see Analyzer}). An exchange
+     * that fails is reported at -v and the run counts as unauthenticated on Bitbucket (the cap
+     * applies); the consumer pair stays in the IO, where AuthHelper keeps sending it as HTTP Basic,
+     * so those requests are refused and land in the "Bitbucket unreachable" note rather than
+     * going out anonymous — one IO entry cannot be cleared through IOInterface.
      *
      * @param null|callable(): HttpDownloader $downloaderFactory the downloader to post with; Composer's own when null
      *

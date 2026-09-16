@@ -210,11 +210,7 @@ final class ServiceFactoryTest extends TestCase
         return $config;
     }
 
-    /**
-     * A downloader that answers the token URL from a script and records the request it saw in its
-     * public `$seen`, so the exchange runs without the network.
-     */
-    /** A downloader that answers the token URL from a script and records the request it saw, so the exchange runs without the network. */
+    /** A downloader that answers the token URL from a script and records the request it saw in its public `$seen`, so the exchange runs without the network. */
     private static function tokenDownloader(NullIO $io, Config $config, ?int $status, string $body): RecordingTokenDownloader
     {
         return new RecordingTokenDownloader($io, $config, $status, $body);
