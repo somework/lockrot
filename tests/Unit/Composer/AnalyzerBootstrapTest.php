@@ -46,7 +46,8 @@ final class AnalyzerBootstrapTest extends TestCase
             new Allowlist([new AllowlistEntry('vendor/builtin', null, 'builtin match', null, 'builtin')]),
             SignalSet::default($clock, $lockrot->thresholds(), '8.4', PhpReleaseDates::load()),
             new VerdictEngine(),
-            $clock
+            $clock,
+            false
         );
     }
 

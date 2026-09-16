@@ -84,6 +84,6 @@ final class FactsBuilder
 
     public static function facts(LockedPackage $p, ?PackageMetadata $m = null, ?RepositoryActivity $a = null): PackageFacts
     {
-        return new PackageFacts($p, $m, $a, $a !== null);
+        return new PackageFacts($p, $m, $a);
     }
 }

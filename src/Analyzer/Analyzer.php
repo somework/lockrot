@@ -42,7 +42,7 @@ final class Analyzer
     private bool $offline;
     private Deadline $deadline;
 
-    public function __construct(MetadataLoaderInterface $metadata, GitHubClient $github, GitHubFetchPlanner $planner, Allowlist $allowlist, SignalSet $signals, VerdictEngine $engine, Clock $clock, bool $offline = false)
+    public function __construct(MetadataLoaderInterface $metadata, GitHubClient $github, GitHubFetchPlanner $planner, Allowlist $allowlist, SignalSet $signals, VerdictEngine $engine, Clock $clock, bool $offline)
     {
         $this->metadata = $metadata;
         $this->github = $github;
@@ -114,7 +114,6 @@ final class Analyzer
         [$allowlisted, $repoByPackage, $candidateByPackage] = $this->classify($packages, $metadata, $now);
 
         $plan = $this->planner->select($repoByPackage, $candidateByPackage);
-        $repos = $plan->repos();
         if ($this->deadline->isPast()) {
             // The metadata pass already used the whole budget. Starting the GitHub round-trips now
             // would push the install past it, so the activity signals are dropped and the report
@@ -133,9 +132,8 @@ final class Analyzer
             $meta = $metadata[$package->name()] ?? null;
             $repo = $repoByPackage[$package->name()] ?? null;
             $act = $repo !== null ? ($activity[$repo] ?? null) : null;
-            $checked = $repo !== null && \in_array($repo, $repos, true);
             $entry = $allowlisted[$package->name()];
-            $findings[] = $this->buildFinding($package, $meta, $act, $checked, $entry, $graph, $batch);
+            $findings[] = $this->buildFinding($package, $meta, $act, $entry, $graph, $batch);
             if (!$package->isFromComposerRepository()) {
                 ++$notInRepository;
             }
@@ -180,7 +178,7 @@ final class Analyzer
                 continue;
             }
             $repoByPackage[$package->name()] = $repo;
-            $first = $this->signals->evaluate(new PackageFacts($package, $meta, null, false));
+            $first = $this->signals->evaluate(new PackageFacts($package, $meta, null));
             $candidateByPackage[$package->name()] = $this->hasSignal($first, Signal::S2) && !$this->hasSignal($first, Signal::S1);
         }
 
@@ -216,9 +214,9 @@ final class Analyzer
         return [$githubBatch, $notes];
     }
 
-    private function buildFinding(LockedPackage $package, ?PackageMetadata $meta, ?RepositoryActivity $activity, bool $checked, ?AllowlistEntry $entry, DependencyGraph $graph, MetadataBatch $batch): Finding
+    private function buildFinding(LockedPackage $package, ?PackageMetadata $meta, ?RepositoryActivity $activity, ?AllowlistEntry $entry, DependencyGraph $graph, MetadataBatch $batch): Finding
     {
-        $facts = new PackageFacts($package, $meta, $activity, $checked);
+        $facts = new PackageFacts($package, $meta, $activity);
         $signals = $this->signals->evaluate($facts);
         $verdict = $this->engine->decide($signals, $entry !== null, $meta !== null);
 

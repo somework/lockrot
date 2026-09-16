@@ -67,9 +67,6 @@ final class TransitiveExposure
     public static function attach(array $findings, DependencyGraph $graph): array
     {
         $exposed = self::byParent($findings, $graph);
-        if ($exposed === []) {
-            return $findings;
-        }
         $result = [];
         foreach ($findings as $finding) {
             $descendants = $exposed[$finding->package()] ?? [];

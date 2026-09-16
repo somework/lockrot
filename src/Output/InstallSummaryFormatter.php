@@ -50,13 +50,9 @@ final class InstallSummaryFormatter
         $notes = \array_slice($report->notes(), 0, self::MAX_NOTES);
         $slots = self::MAX_LINES - self::FIXED_LINES - \count($notes);
 
-        $shown = $flagged;
-        $omitted = 0;
-        if (\count($flagged) > $slots) {
-            // One slot goes to the "… and N more" line, so one fewer finding fits.
-            $shown = \array_slice($flagged, 0, $slots - 1);
-            $omitted = \count($flagged) - \count($shown);
-        }
+        // When they do not all fit, one slot goes to the "… and N more" line, so one fewer finding fits.
+        $shown = \count($flagged) > $slots ? \array_slice($flagged, 0, $slots - 1) : $flagged;
+        $omitted = \count($flagged) - \count($shown);
 
         $lines = [$this->header(\count($flagged), $report->packagesChecked())];
         foreach ($shown as $finding) {
@@ -84,7 +80,7 @@ final class InstallSummaryFormatter
         $checked = $report->packagesChecked();
         $lines = [\sprintf(
             '<warning>lockrot: %d of %d changed %s could not be checked</warning>',
-            $report->byVerdict()[Verdict::UNKNOWN] ?? 0,
+            $report->byVerdict()[Verdict::UNKNOWN],
             $checked,
             $checked === 1 ? 'package' : 'packages'
         )];

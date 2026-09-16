@@ -49,14 +49,8 @@ final class Report
      */
     public static function compare(Finding $a, Finding $b): int
     {
-        return [Priority::rank($b->priority()), Verdict::severity($b->verdict()), self::directRank($b), $a->package()]
-            <=> [Priority::rank($a->priority()), Verdict::severity($a->verdict()), self::directRank($a), $b->package()];
-    }
-
-    /** Sort weight of the third ordering key: a direct dependency outranks a transitive one. */
-    private static function directRank(Finding $finding): int
-    {
-        return $finding->isDirect() ? 1 : 0;
+        return [Priority::rank($b->priority()), Verdict::severity($b->verdict()), $b->isDirect(), $a->package()]
+            <=> [Priority::rank($a->priority()), Verdict::severity($a->verdict()), $a->isDirect(), $b->package()];
     }
 
     /**

@@ -95,10 +95,7 @@ final class GitlabFormatter implements FormatterInterface
 
     private function description(Finding $finding): string
     {
-        $evidence = $finding->evidence();
-        if ($finding->allowlistReason() !== null) {
-            $evidence = ($evidence === '' ? '' : $evidence.'; ').'allowlisted: '.$finding->allowlistReason();
-        }
+        $evidence = $finding->evidenceLine();
 
         // Code Quality has no title field of its own, so the verdict and priority ride in the
         // description — the same `<verdict> (<priority>)` phrase the GitHub annotation title uses.

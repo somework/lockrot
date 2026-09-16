@@ -182,6 +182,20 @@ final class Finding
         return implode('; ', $parts);
     }
 
+    /**
+     * {@see evidence()} followed by `allowlisted: <reason>` when an allowlist entry decided the
+     * verdict — the one line the table, markdown, github, gitlab and SARIF formats print.
+     */
+    public function evidenceLine(): string
+    {
+        if ($this->allowlistReason === null) {
+            return $this->evidence();
+        }
+        $evidence = $this->evidence();
+
+        return ($evidence === '' ? '' : $evidence.'; ').'allowlisted: '.$this->allowlistReason;
+    }
+
     /** @return array<string, mixed> */
     public function toArray(): array
     {

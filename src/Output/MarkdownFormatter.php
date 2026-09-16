@@ -106,17 +106,7 @@ final class MarkdownFormatter implements FormatterInterface
         $verdict = $level === FormatContext::LEVEL_NOTE ? $finding->verdict() : '**'.$finding->verdict().'**';
 
         return '| '.$finding->priority().' | '.self::code($finding->package()).' | '.self::text($finding->version())
-            .' | '.$verdict.' | '.self::text($this->evidence($finding)).' | '.self::text(Via::cell($finding, ' › ')).' |';
-    }
-
-    private function evidence(Finding $finding): string
-    {
-        $evidence = $finding->evidence();
-        if ($finding->allowlistReason() !== null) {
-            $evidence = ($evidence === '' ? '' : $evidence.'; ').'allowlisted: '.$finding->allowlistReason();
-        }
-
-        return $evidence;
+            .' | '.$verdict.' | '.self::text($finding->evidenceLine()).' | '.self::text(Via::cell($finding, ' › ')).' |';
     }
 
     /** @return list<string> */
@@ -167,10 +157,9 @@ final class MarkdownFormatter implements FormatterInterface
         $value = str_replace(["\r\n", "\r", "\n"], ' ', $value);
         $value = str_replace('|', '\\|', $value);
         $longest = 0;
-        if (preg_match_all('/`+/', $value, $runs) > 0) {
-            foreach ($runs[0] as $run) {
-                $longest = max($longest, \strlen($run));
-            }
+        preg_match_all('/`+/', $value, $runs);
+        foreach ($runs[0] as $run) {
+            $longest = max($longest, \strlen($run));
         }
         $fence = str_repeat('`', $longest + 1);
         if ($longest > 0) {

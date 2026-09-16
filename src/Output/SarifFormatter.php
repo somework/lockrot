@@ -220,10 +220,7 @@ final class SarifFormatter implements FormatterInterface
 
     private function message(Finding $finding): string
     {
-        $evidence = $finding->evidence();
-        if ($finding->allowlistReason() !== null) {
-            $evidence = ($evidence === '' ? '' : $evidence.'; ').'allowlisted: '.$finding->allowlistReason();
-        }
+        $evidence = $finding->evidenceLine();
 
         $message = $finding->package().' '.$finding->version();
 
@@ -239,10 +236,8 @@ final class SarifFormatter implements FormatterInterface
      */
     private static function directoryUri(string $lockPath): string
     {
-        $directory = rtrim(str_replace('\\', '/', \dirname($lockPath)), '/');
-
         $segments = [];
-        foreach (explode('/', ltrim($directory, '/')) as $segment) {
+        foreach (explode('/', trim(str_replace('\\', '/', \dirname($lockPath)), '/')) as $segment) {
             // rawurlencode() also escapes ":", which RFC 3986 allows unescaped inside a path segment
             // and which a Windows drive letter needs — file:///C:/project/, not file:///C%3A/project/.
             $segments[] = str_replace('%3A', ':', rawurlencode($segment));

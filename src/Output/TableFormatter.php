@@ -125,14 +125,14 @@ final class TableFormatter implements FormatterInterface
             .$this->styled($finding, self::escape($label))
             .str_repeat(' ', $labelWidth - \strlen($label) + self::GAP);
         $margin = str_repeat(' ', $indent);
-        $tail = self::wrap($finding->package().' '.$finding->version().'  '.Via::inline($finding, ' › '), $wrap);
+        $tail = self::wrap($finding->package().' '.$finding->version().'  '.Via::inline($finding, ' › '), $wrap, true);
         $lines = [$head.array_shift($tail)];
         foreach ($tail as $line) {
             $lines[] = $margin.$line;
         }
-        $evidence = self::evidence($finding);
+        $evidence = $finding->evidenceLine();
         if ($evidence !== '') {
-            foreach (self::wrap($evidence, $wrap) as $line) {
+            foreach (self::wrap($evidence, $wrap, true) as $line) {
                 $lines[] = $margin.$line;
             }
         }
@@ -195,16 +195,6 @@ final class TableFormatter implements FormatterInterface
         return $escapedLabel;
     }
 
-    private static function evidence(Finding $finding): string
-    {
-        $evidence = $finding->evidence();
-        if ($finding->allowlistReason() !== null) {
-            $evidence = ($evidence === '' ? '' : $evidence.'; ').'allowlisted: '.$finding->allowlistReason();
-        }
-
-        return $evidence;
-    }
-
     /**
      * Wrapped to $wrap columns, each resulting line escaped. With $cut a word longer than the width
      * is cut rather than allowed to overflow — what the rows need, so a row is never wider than the
@@ -224,7 +214,7 @@ final class TableFormatter implements FormatterInterface
      *
      * @return list<string>
      */
-    private static function wrap(string $text, int $wrap, bool $cut = true): array
+    private static function wrap(string $text, int $wrap, bool $cut): array
     {
         $lines = [];
         foreach (explode("\n", wordwrap($text, $wrap, "\n", $cut)) as $line) {

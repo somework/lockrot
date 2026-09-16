@@ -108,10 +108,7 @@ final class GithubFormatter implements FormatterInterface
 
     private function message(Finding $finding): string
     {
-        $evidence = $finding->evidence();
-        if ($finding->allowlistReason() !== null) {
-            $evidence = ($evidence === '' ? '' : $evidence.'; ').'allowlisted: '.$finding->allowlistReason();
-        }
+        $evidence = $finding->evidenceLine();
 
         $message = $finding->package().' '.$finding->version();
         if ($evidence !== '') {

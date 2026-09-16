@@ -13,14 +13,12 @@ final class PackageFacts
     private LockedPackage $package;
     private ?PackageMetadata $metadata;
     private ?RepositoryActivity $activity;
-    private bool $activityChecked;
 
-    public function __construct(LockedPackage $package, ?PackageMetadata $metadata, ?RepositoryActivity $activity, bool $activityChecked)
+    public function __construct(LockedPackage $package, ?PackageMetadata $metadata, ?RepositoryActivity $activity)
     {
         $this->package = $package;
         $this->metadata = $metadata;
         $this->activity = $activity;
-        $this->activityChecked = $activityChecked;
     }
 
     public function package(): LockedPackage
@@ -36,11 +34,6 @@ final class PackageFacts
     public function activity(): ?RepositoryActivity
     {
         return $this->activity;
-    }
-
-    public function activityChecked(): bool
-    {
-        return $this->activityChecked;
     }
 
     public function hasData(): bool
