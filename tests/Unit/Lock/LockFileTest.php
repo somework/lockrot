@@ -51,10 +51,16 @@ final class LockFileTest extends TestCase
             ['name' => 'a/none', 'version' => '1.0.0'],
         ]]);
 
-        self::assertSame('https://github.com/a/support-src', $lock->find('a/support')->repositoryUrl());
-        self::assertSame('https://github.com/a/both.git', $lock->find('a/both')->repositoryUrl());
-        self::assertNull($lock->find('a/empty')->repositoryUrl());
-        self::assertNull($lock->find('a/none')->repositoryUrl());
+        $urls = [];
+        foreach ($lock->packages(false) as $package) {
+            $urls[$package->name()] = $package->repositoryUrl();
+        }
+        self::assertSame([
+            'a/support' => 'https://github.com/a/support-src',
+            'a/both' => 'https://github.com/a/both.git',
+            'a/empty' => null,
+            'a/none' => null,
+        ], $urls);
     }
 
     public function testSnapshotAndPrivateDetection(): void
