@@ -56,6 +56,10 @@ final class RepoLocator
         }
         [$host, $path] = $parts;
         $lowerHost = strtolower($host);
+        if ($lowerHost === 'www.github.com') {
+            // Composer's GitHubDriver reads the www. form as github.com; so does lockrot.
+            $lowerHost = 'github.com';
+        }
         if ($lowerHost === 'github.com') {
             return self::twoSegments(RepoRef::GITHUB, 'github.com', $path);
         }
@@ -113,10 +117,14 @@ final class RepoLocator
     }
 
     /**
-     * The host is matched literally, port included, the way Composer's GitLabDriver matches a
-     * `gitlab-domains` entry against a clone URL: a URL that omits a port the entry spells out is
-     * not a GitLab URL for Composer, so it is not one for lockrot either. The entry then serves as
-     * the ref's host, which is both the API base and the key Composer files credentials under.
+     * Host and port are matched the way Composer's GitLabDriver matches a `gitlab-domains` entry
+     * against a clone URL ({@see \Composer\Repository\Vcs\GitLabDriver::determineOrigin()}): the
+     * entry matches the URL's host with its port, or its bare host when the entry names no port.
+     * A URL that omits a port the entry spells out is not that GitLab for Composer, so not for
+     * lockrot either. The ref's host is the URL's host, port included, plus the entry's path prefix
+     * — Composer's origin for the URL, which is both the API base and the key Composer files the
+     * credentials under. (So a `gitlab.com:443` URL is not `gitlab.com` to {@see ForgeAuth} and gets
+     * no `GITLAB_TOKEN`; Composer's origin has the same quirk.)
      *
      * @param string $domain    a `gitlab-domains` entry: `host`, `host:port` or `host[:port]/prefix`
      * @param string $lowerHost the URL's host, lowercased, with its port when it has one
@@ -127,7 +135,10 @@ final class RepoLocator
         $domainHost = strtolower($slash === false ? $domain : substr($domain, 0, $slash));
         $prefix = $slash === false ? '' : substr($domain, $slash);
         if ($lowerHost !== $domainHost) {
-            return null;
+            $bareHost = (string) preg_replace('{:\d+$}', '', $lowerHost);
+            if ($bareHost === $lowerHost || $bareHost !== $domainHost) {
+                return null;
+            }
         }
         $path = self::normalise($path);
         if ($prefix !== '') {
@@ -143,7 +154,7 @@ final class RepoLocator
             return null;
         }
 
-        return new RepoRef(RepoRef::GITLAB, $domain, $path);
+        return new RepoRef(RepoRef::GITLAB, $lowerHost.$prefix, $path);
     }
 
     /** Without a trailing slash or `.git`, with one leading slash. */

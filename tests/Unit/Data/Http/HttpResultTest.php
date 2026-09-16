@@ -40,7 +40,24 @@ final class HttpResultTest extends TestCase
         self::assertNull(HttpResult::fromEnvelope('u', ['status' => 200, 'fetched_at' => 'garbage', 'body' => null, 'error' => null]));
         self::assertNull(HttpResult::fromEnvelope('u', ['status' => 200, 'body' => '{}']));
         self::assertNull(HttpResult::fromEnvelope('u', ['status' => 200, 'fetched_at' => 0, 'body' => '{}']));
+        self::assertNull(HttpResult::fromEnvelope('u', ['status' => 200, 'fetched_at' => '', 'body' => '{}']), 'an empty string is not "now"');
+        self::assertNull(HttpResult::fromEnvelope('u', ['status' => 200, 'fetched_at' => '2026-09-14', 'body' => '{}']), 'only the format toEnvelope() writes');
         self::assertNull(HttpResult::fromEnvelopeJson('u', '{"status":200,"fetched_at":"garbage","body":"{}"}'));
+    }
+
+    /** Everything but the fetch time is tolerated: a missing or non-integer status reads as 0, the transport-failure status. */
+    public function testFromEnvelopeDefaultsWhatIsMissingOrMistyped(): void
+    {
+        $result = HttpResult::fromEnvelope('u', ['fetched_at' => '2026-09-14T12:00:00+00:00']);
+        self::assertNotNull($result);
+        self::assertSame(0, $result->status());
+        self::assertNull($result->body());
+        self::assertNull($result->error());
+        $result = HttpResult::fromEnvelope('u', ['status' => '200', 'fetched_at' => '2026-09-14T12:00:00+00:00', 'body' => 1, 'error' => []]);
+        self::assertNotNull($result);
+        self::assertSame(0, $result->status());
+        self::assertNull($result->body());
+        self::assertNull($result->error());
     }
 
     public function testFromEnvelopeJson(): void

@@ -38,6 +38,7 @@ final class RepoLocatorTest extends TestCase
         yield 'github owner with dot' => ['https://github.com/owner.name/repo', [RepoRef::GITHUB, 'github.com', 'owner.name/repo']];
         yield 'github trailing slash' => ['https://github.com/o/r/', [RepoRef::GITHUB, 'github.com', 'o/r']];
         yield 'github uppercase host' => ['https://GitHub.com/o/r.git', [RepoRef::GITHUB, 'github.com', 'o/r']];
+        yield 'github www' => ['https://www.github.com/o/r.git', [RepoRef::GITHUB, 'github.com', 'o/r']];
         yield 'github web page' => ['https://github.com/o/r/tree/main', null];
         yield 'github one segment' => ['https://github.com/o', null];
         yield 'github host only' => ['https://github.com', null];
@@ -87,12 +88,18 @@ final class RepoLocatorTest extends TestCase
         $trailing = (new RepoLocator(['gitlab.example.com/gitlab/']))->locate('https://gitlab.example.com/gitlab/group/project.git');
         self::assertNotNull($trailing, 'a trailing slash on the entry is tolerated');
         self::assertSame('group/project', $trailing->path());
+
+        $ported = $locator->locate('https://gitlab.example.com:8443/gitlab/group/project.git');
+        self::assertNotNull($ported, 'a URL port the entry omits, with the prefix');
+        self::assertSame('gitlab.example.com:8443/gitlab', $ported->host());
+        self::assertSame('group/project', $ported->path());
     }
 
     /**
-     * Host and port are matched literally, as Composer's GitLabDriver matches them: a URL that
-     * omits a port the entry names, or names one the entry omits, is not that GitLab. The ref's
-     * host is the entry, port included, so the API request and the credential lookup agree.
+     * Composer's rule: an entry matches the URL's host with its port, or the bare host when the
+     * entry names no port; a URL that omits a port the entry spells out is not that GitLab. The
+     * ref's host is the URL's host, port included — Composer's origin — so the API request and the
+     * credential lookup agree with Composer's own.
      */
     public function testPortsAreMatchedTheWayComposerMatchesThem(): void
     {
@@ -101,14 +108,19 @@ final class RepoLocatorTest extends TestCase
         self::assertNotNull($ref);
         self::assertSame('gitlab.example.com:8443', $ref->host());
         self::assertNull($locator->locate('https://gitlab.example.com/group/project.git'), 'no port in the URL: not the configured GitLab');
-        self::assertNull((new RepoLocator(['gitlab.example.com']))->locate('https://gitlab.example.com:8443/group/project.git'));
+
+        $bare = new RepoLocator(['gitlab.example.com']);
+        $ref = $bare->locate('https://gitlab.example.com:8443/group/project.git');
+        self::assertNotNull($ref, 'an entry without a port matches a URL that names one');
+        self::assertSame('gitlab.example.com:8443', $ref->host(), 'and the origin carries the URL\'s port');
+        self::assertNull($bare->locate('https://other.example.com:8443/group/project.git'));
     }
 
     public function testAConfiguredDomainIsMatchedCaseInsensitively(): void
     {
         $ref = (new RepoLocator(['GitLab.Example.com']))->locate('https://gitlab.example.com/group/project.git');
         self::assertNotNull($ref);
-        self::assertSame('GitLab.Example.com', $ref->host(), 'the entry as configured: it is the key Composer files credentials under');
+        self::assertSame('gitlab.example.com', $ref->host(), 'lowercased, as Composer lowercases its origin');
     }
 
     public function testFromConfigReadsGitlabDomainsAndIgnoresWhatIsNotAHost(): void

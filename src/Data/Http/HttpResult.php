@@ -70,13 +70,19 @@ final class HttpResult
         return self::fromEnvelope($url, $envelope);
     }
 
+    /**
+     * Strictly the format {@see toEnvelope()} writes: the loose constructor reads `""` as now and
+     * `"garbage"` as an exception, and a stored answer of unknown age must be neither.
+     */
     private static function parseDate(string $iso): ?\DateTimeImmutable
     {
-        try {
-            return new \DateTimeImmutable($iso);
-        } catch (\Exception $e) {
+        $at = \DateTimeImmutable::createFromFormat(\DATE_ATOM, $iso);
+        $errors = \DateTimeImmutable::getLastErrors();
+        if ($at === false || ($errors !== false && ($errors['warning_count'] > 0 || $errors['error_count'] > 0))) {
             return null;
         }
+
+        return $at;
     }
 
     /** @return array{status: int, fetched_at: string, body: ?string, error: ?string} */

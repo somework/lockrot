@@ -797,7 +797,7 @@ final class AnalyzerTest extends TestCase
 
     /**
      * A fake that hands back the prepared results for the URLs asked, as they are — cache flags
-     * included; a URL without a prepared result gets no entry, like a client that was never asked.
+     * included; a URL without a prepared result gets a failure, as the real clients answer.
      *
      * @param array<string, HttpResult> $results
      */
@@ -815,7 +815,12 @@ final class AnalyzerTest extends TestCase
 
             public function fetchAll(array $urls, array $headers = []): array
             {
-                return array_intersect_key($this->results, array_flip($urls));
+                $answers = [];
+                foreach ($urls as $url) {
+                    $answers[$url] = $this->results[$url] ?? HttpResult::failure($url, 'not prepared: '.$url, new \DateTimeImmutable('@0'));
+                }
+
+                return $answers;
             }
         };
     }
