@@ -170,6 +170,19 @@ final class PackageMetadataFromPackagesTest extends TestCase
         self::assertSame('1.0.1', PackageMetadata::fromPackages('a/b', [$dated, $lts, $undated], new \DateTimeImmutable(self::FIXED))->lastStableVersion(), 'the age signal still reads the latest date');
     }
 
+    /** An empty `source` URL is no repository; the release's `support.source` is read instead, and a mistyped one is nothing. */
+    public function testAnEmptySourceUrlFallsBackToSupportSourceAndAMistypedSupportSourceToNothing(): void
+    {
+        $empty = new CompletePackage('a/b', '1.0.0.0', '1.0.0');
+        $empty->setSourceUrl('');
+        $empty->setSupport(['source' => 'https://github.com/a/b']);
+        self::assertSame('https://github.com/a/b', PackageMetadata::fromPackages('a/b', [$empty], new \DateTimeImmutable(self::FIXED))->repositoryUrl());
+
+        // ArrayLoader hands `support` over unvalidated, so a mistyped value reaches the package object.
+        $mistyped = $this->load(['name' => 'a/b', 'version' => '1.0.0', 'support' => ['source' => ['url' => 'https://github.com/a/b']]]);
+        self::assertNull(PackageMetadata::fromPackages('a/b', [$mistyped], new \DateTimeImmutable(self::FIXED))->repositoryUrl());
+    }
+
     /** Packagist's default `support.source` is a `/tree/<version>` page; the repository is what is kept. */
     public function testAPackagistDefaultSupportSourceIsReducedToTheRepository(): void
     {
