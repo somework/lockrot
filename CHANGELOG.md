@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-09-16
+
 ### Added
 
 - Repository activity from GitLab and Bitbucket, next to GitHub. A package whose source lives on
@@ -23,7 +25,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   production requirement and pass on the same verdict in a transitive development package. The
   error/warning line of the github, sarif and gitlab formats follows the same threshold; the
   baseline stays keyed by verdict.
-
 - The report says how old its repository-activity data is. When any activity answer came from
   lockrot's cache, the footer's source clause reads `(package repositories; repository activity from
   lockrot's cache, up to 23 h old)` — under a day for a fresh hit, more after a failed refetch fell
@@ -257,7 +258,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The "GitHub token not set" note counts packages whose repository activity was checked, not
   distinct repositories, so packages sharing one repository are no longer under-reported.
 
-[Unreleased]: https://github.com/somework/lockrot/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/somework/lockrot/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/somework/lockrot/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/somework/lockrot/compare/v0.2.2...v0.3.0
 [0.2.2]: https://github.com/somework/lockrot/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/somework/lockrot/compare/v0.2.0...v0.2.1
