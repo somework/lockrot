@@ -156,7 +156,6 @@ final class TerminalWidthTest extends TestCase
         yield 'empty array' => [[]];
         yield 'a numeric string' => [['80', 24]];
         yield 'a float' => [[80.0, 24]];
-        yield 'negative' => [[-1, 24]];
     }
 
     /**

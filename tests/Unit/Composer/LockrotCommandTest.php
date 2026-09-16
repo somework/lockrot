@@ -77,6 +77,14 @@ final class LockrotCommandTest extends TestCase
     protected function tearDown(): void
     {
         chdir($this->cwd);
+        // The baseline tests write next to composer.json of the *copy* wallabagCopy() makes; if one
+        // ever runs in the tracked fixture instead (a lost chdir), the file is removed and the test
+        // fails here rather than the fixture directory quietly growing an untracked baseline.
+        $stray = \dirname(self::WALLABAG_LOCK).'/lockrot-baseline.json';
+        if (is_file($stray)) {
+            unlink($stray);
+            self::fail('a test wrote lockrot-baseline.json into the tracked wallabag fixture');
+        }
         foreach ($this->tempDirs as $dir) {
             self::removeTree($dir);
         }

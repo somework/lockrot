@@ -16,8 +16,8 @@
         "@default": true
     },
     // Scope widened to src/Output + src/Analyzer on 2026-09-16. Before: 1175 mutants, 76 escaped,
-    // MSI 93.53%; 59 of those were real gaps or dead code (see the tests and refactors of that
-    // date). After: 1130 mutants, 9 escaped, 0 timed out -> MSI = Covered MSI 99.2%, ~1m35s on
+    // MSI 93.53%; 67 of those were closed, most by tests and the rest by removing the code they sat
+    // in, and 4 more turned out to be equivalent (see the tests and refactors of that date). After: 1130 mutants, 9 escaped, 0 timed out -> MSI = Covered MSI 99.2%, ~1m35s on
     // 8 threads. Each escape was checked by hand and is equivalent, the honest floor of this scope:
     //  - src/Signal/ConstraintOpenness.php (5: CastInt x2, IncrementInteger, DecrementInteger,
     //    ConcatOperandRemoval): numeric strings compare numerically, every mutated integer stays
@@ -32,7 +32,7 @@
     //  - src/Output/TerminalWidth.php detect() Coalesce: step 2 (symfony Terminal) refuses whenever
     //    COLUMNS is set, so swapping it with step 1 (COLUMNS) is unobservable by design.
     //
-    // Threshold 97 = floor of the honest MSI minus 2, so ~20 new escapes fit before the gate
+    // Threshold 97 = floor of the honest MSI minus 2, so 24 new escapes fit before the gate
     // fails and the number does not move every time a test is added.
     "minMsi": 97,
     "minCoveredMsi": 97
