@@ -261,4 +261,17 @@ final class LockFileTest extends TestCase
         self::assertNotNull($rulerz);
         self::assertTrue($rulerz->isBranchSnapshot());
     }
+
+    public function testWithDevReturnsAFlaggedCopyAndLeavesTheOriginalAlone(): void
+    {
+        $lock = LockFile::fromArray(['packages' => [['name' => 'vendor/pkg', 'version' => '1.0.0']]]);
+        $prod = $lock->packages(false)[0];
+
+        $dev = $prod->withDev(true);
+
+        self::assertTrue($dev->isDev());
+        self::assertFalse($prod->isDev());
+        self::assertNotSame($prod, $dev);
+        self::assertSame('vendor/pkg', $dev->name());
+    }
 }
