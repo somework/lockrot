@@ -459,12 +459,15 @@ final class AnalyzerTest extends TestCase
         self::assertSame($original, $analyzer->allowlist());
     }
 
-    /** @return array<string, mixed> a lock entry that a Composer repository serves, with the lock's own source URL when given */
-    private static function locked(string $name, ?string $sourceUrl = null): array
+    /** @return array<string, mixed> a lock entry that a Composer repository serves, with the lock's own source URL and support.source when given */
+    private static function locked(string $name, ?string $sourceUrl = null, ?string $supportSource = null): array
     {
         $entry = ['name' => $name, 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/'];
         if ($sourceUrl !== null) {
             $entry['source'] = ['type' => 'git', 'url' => $sourceUrl, 'reference' => 'a'];
+        }
+        if ($supportSource !== null) {
+            $entry['support'] = ['source' => $supportSource];
         }
 
         return $entry;
@@ -560,6 +563,29 @@ final class AnalyzerTest extends TestCase
         $loader = $this->loader(['vendor/pkg' => $this->metadataNamed('vendor/pkg', null)]);
         $report = $this->analyzeLock($packages, $loader, $this->http(['https://api.github.com/repos/old-owner/pkg' => $answer], $requested), true);
         self::assertSame(['https://api.github.com/repos/old-owner/pkg'], $requested->getArrayCopy());
+        self::assertFalse($report->hadNetworkFailures());
+    }
+
+    /**
+     * The lock's `support.source` is the last place asked, and when nothing names a repository the
+     * package is judged on its release dates alone: no request, no S3, no `abandoned`.
+     */
+    public function testTheLocksSupportSourceIsTheLastResortAndNoRepositoryMeansNoRequest(): void
+    {
+        $answer = [200, '{"archived":true,"pushed_at":"2015-01-01T00:00:00Z"}'];
+
+        $requested = new \ArrayObject();
+        $packages = [self::locked('vendor/pkg', null, 'https://github.com/vendor/pkg-src')];
+        $loader = $this->loader(['vendor/pkg' => $this->metadataNamed('vendor/pkg', null)]);
+        $report = $this->analyzeLock($packages, $loader, $this->http(['https://api.github.com/repos/vendor/pkg-src' => $answer], $requested), true);
+        self::assertSame(['https://api.github.com/repos/vendor/pkg-src'], $requested->getArrayCopy());
+        self::assertSame(Verdict::ABANDONED, self::byName($report)['vendor/pkg']->verdict());
+
+        $requested = new \ArrayObject();
+        $packages = [self::locked('vendor/pkg')];
+        $report = $this->analyzeLock($packages, $loader, $this->http([], $requested), true);
+        self::assertSame([], $requested->getArrayCopy());
+        self::assertNotSame(Verdict::ABANDONED, self::byName($report)['vendor/pkg']->verdict());
         self::assertFalse($report->hadNetworkFailures());
     }
 

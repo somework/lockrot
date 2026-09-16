@@ -21,7 +21,7 @@ final class PackageMetadata
     private ?\DateTimeImmutable $lastStableReleaseAt;
     private ?string $lastStableVersion;
     private int $releaseCount;
-    private ?string $sourceUrl;
+    private ?string $repositoryUrl;
     private string $type;
     private \DateTimeImmutable $dataDate;
 
@@ -33,7 +33,7 @@ final class PackageMetadata
         ?\DateTimeImmutable $lastStableReleaseAt,
         ?string $lastStableVersion,
         int $releaseCount,
-        ?string $sourceUrl,
+        ?string $repositoryUrl,
         string $type,
         \DateTimeImmutable $dataDate
     ) {
@@ -44,7 +44,7 @@ final class PackageMetadata
         $this->lastStableReleaseAt = $lastStableReleaseAt;
         $this->lastStableVersion = $lastStableVersion;
         $this->releaseCount = $releaseCount;
-        $this->sourceUrl = $sourceUrl;
+        $this->repositoryUrl = $repositoryUrl;
         $this->type = $type;
         $this->dataDate = $dataDate;
     }
@@ -53,6 +53,15 @@ final class PackageMetadata
      * Derived directly from Composer's own package objects for one package name. $versions is
      * already unwrapped (no AliasPackage) — that is the caller's job, since only the caller knows
      * how to group loadPackages()'s flat package list by name.
+     *
+     * The repository URL is the newest stable release's, never an older release's. A package's
+     * home is where its *current* code lives: phpstan/phpstan publishes its recent releases with
+     * no `source` at all (`support.source` names phpstan/phpstan-src) and three old releases
+     * pointing at a one-off, since archived, build repository — reading "the first release with a
+     * source" made the package `abandoned`. When the newest release names no repository the lock
+     * entry is the next place to look ({@see \Lockrot\Lock\LockedPackage::repositoryUrl()}),
+     * and after that the activity check is skipped, because a false `abandoned` costs more than
+     * a missed one.
      *
      * @param list<BasePackage> $versions
      */
@@ -63,7 +72,8 @@ final class PackageMetadata
         $hasStableRelease = false;
         $lastStableReleaseAt = null;
         $lastStableVersion = null;
-        $sourceUrl = null;
+        $newestStable = null;
+        $firstStable = null;
         $type = null;
 
         foreach ($versions as $version) {
@@ -73,22 +83,24 @@ final class PackageMetadata
             }
             if (!$version->isDev()) {
                 $hasStableRelease = true;
+                $firstStable ??= $version;
                 $releaseDate = $version->getReleaseDate();
                 if ($releaseDate !== null) {
                     $releaseDate = self::toImmutable($releaseDate);
                     if ($lastStableReleaseAt === null || $releaseDate > $lastStableReleaseAt) {
                         $lastStableReleaseAt = $releaseDate;
                         $lastStableVersion = $version->getPrettyVersion();
+                        $newestStable = $version;
                     }
                 }
-            }
-            if ($sourceUrl === null && $version->getSourceUrl() !== null) {
-                $sourceUrl = $version->getSourceUrl();
             }
             if ($type === null) {
                 $type = $version->getType();
             }
         }
+        // Without release dates the repository's own order is the only "newest" there is; Packagist
+        // lists versions newest first. A package with dev branches only is read the same way.
+        $anchor = $newestStable ?? $firstStable ?? ($versions[0] ?? null);
 
         return new self(
             $name,
@@ -98,10 +110,23 @@ final class PackageMetadata
             $lastStableReleaseAt,
             $lastStableVersion,
             \count($versions),
-            $sourceUrl,
+            $anchor !== null ? self::repositoryOf($anchor) : null,
             $type ?? 'library',
             $dataDate
         );
+    }
+
+    /** The release's `source` URL, else its `support.source`, else null. */
+    private static function repositoryOf(BasePackage $version): ?string
+    {
+        $url = $version->getSourceUrl();
+        if ($url !== null && $url !== '') {
+            return $url;
+        }
+        $support = $version instanceof CompletePackage ? $version->getSupport() : [];
+        $url = $support['source'] ?? null;
+
+        return \is_string($url) && $url !== '' ? $url : null;
     }
 
     private static function toImmutable(\DateTimeInterface $date): \DateTimeImmutable
@@ -133,9 +158,13 @@ final class PackageMetadata
     {
         return $this->releaseCount;
     }
-    public function sourceUrl(): ?string
+    /**
+     * Where the package's current code lives: the newest release's `source` URL, else its
+     * `support.source`. Null when the newest release names neither.
+     */
+    public function repositoryUrl(): ?string
     {
-        return $this->sourceUrl;
+        return $this->repositoryUrl;
     }
     public function type(): string
     {

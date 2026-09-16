@@ -16,7 +16,7 @@ final class LockedPackage
     private ?string $requirePhp;
     /** @var list<string> */
     private array $requires;
-    private ?string $sourceUrl;
+    private ?string $repositoryUrl;
     private string $type;
     private bool $fromComposerRepository;
     private bool $dev;
@@ -33,7 +33,7 @@ final class LockedPackage
         ?\DateTimeImmutable $time,
         ?string $requirePhp,
         array $requires,
-        ?string $sourceUrl,
+        ?string $repositoryUrl,
         string $type,
         bool $fromComposerRepository,
         bool $dev,
@@ -44,7 +44,7 @@ final class LockedPackage
         $this->time = $time;
         $this->requirePhp = $requirePhp;
         $this->requires = $requires;
-        $this->sourceUrl = $sourceUrl;
+        $this->repositoryUrl = $repositoryUrl;
         $this->type = $type;
         $this->fromComposerRepository = $fromComposerRepository;
         $this->dev = $dev;
@@ -72,6 +72,11 @@ final class LockedPackage
         }
 
         $notificationUrl = $package->getNotificationUrl();
+        $repositoryUrl = $package->getSourceUrl();
+        if ($repositoryUrl === null || $repositoryUrl === '') {
+            $support = $package->getSupport()['source'] ?? null;
+            $repositoryUrl = \is_string($support) && $support !== '' ? $support : null;
+        }
 
         return new self(
             $package->getName(),
@@ -79,7 +84,7 @@ final class LockedPackage
             $time,
             $phpLink !== null ? $phpLink->getPrettyConstraint() : null,
             $requires,
-            $package->getSourceUrl(),
+            $repositoryUrl,
             $package->getType(),
             $notificationUrl !== null && $notificationUrl !== '',
             $dev,
@@ -108,9 +113,14 @@ final class LockedPackage
     {
         return $this->requires;
     }
-    public function sourceUrl(): ?string
+    /**
+     * The lock entry's `source` URL, else its `support.source`. Consulted only when the
+     * repository metadata names no repository for the newest release
+     * ({@see \Lockrot\Data\Repository\PackageMetadata::repositoryUrl()}).
+     */
+    public function repositoryUrl(): ?string
     {
-        return $this->sourceUrl;
+        return $this->repositoryUrl;
     }
     public function type(): string
     {

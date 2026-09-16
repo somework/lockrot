@@ -203,7 +203,7 @@ final class Analyzer
         foreach ($packages as $package) {
             $meta = $metadata[$package->name()] ?? null;
             $allowlisted[$package->name()] = $this->allowlist->match($package, $meta, $now);
-            $repo = $this->locator->locate($meta !== null ? ($meta->sourceUrl() ?? $package->sourceUrl()) : $package->sourceUrl());
+            $repo = $this->locator->locate(($meta !== null ? $meta->repositoryUrl() : null) ?? $package->repositoryUrl());
             if ($repo === null || $allowlisted[$package->name()] !== null || !$package->isFromComposerRepository()) {
                 continue;
             }

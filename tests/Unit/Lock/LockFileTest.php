@@ -34,11 +34,27 @@ final class LockFileTest extends TestCase
         self::assertSame('2024-01-10', $time->format('Y-m-d'));
         self::assertSame('>=7.4', $pkg->requirePhp());
         self::assertSame(['vendor/transitive'], $pkg->requires());
-        self::assertSame('https://github.com/vendor/direct.git', $pkg->sourceUrl());
+        self::assertSame('https://github.com/vendor/direct.git', $pkg->repositoryUrl());
         self::assertTrue($pkg->isFromComposerRepository());
         self::assertFalse($pkg->isDev());
         self::assertFalse($pkg->isBranchSnapshot());
         self::assertFalse($pkg->abandonedInLock());
+    }
+
+    /** The lock entry's `support.source` stands in for a missing `source`, and for nothing else. */
+    public function testRepositoryUrlFallsBackToSupportSource(): void
+    {
+        $lock = LockFile::fromArray(['packages' => [
+            ['name' => 'a/support', 'version' => '1.0.0', 'support' => ['source' => 'https://github.com/a/support-src', 'issues' => 'https://github.com/a/support/issues']],
+            ['name' => 'a/both', 'version' => '1.0.0', 'source' => ['type' => 'git', 'url' => 'https://github.com/a/both.git', 'reference' => 'x'], 'support' => ['source' => 'https://github.com/a/other']],
+            ['name' => 'a/empty', 'version' => '1.0.0', 'support' => ['source' => '']],
+            ['name' => 'a/none', 'version' => '1.0.0'],
+        ]]);
+
+        self::assertSame('https://github.com/a/support-src', $lock->find('a/support')->repositoryUrl());
+        self::assertSame('https://github.com/a/both.git', $lock->find('a/both')->repositoryUrl());
+        self::assertNull($lock->find('a/empty')->repositoryUrl());
+        self::assertNull($lock->find('a/none')->repositoryUrl());
     }
 
     public function testSnapshotAndPrivateDetection(): void
