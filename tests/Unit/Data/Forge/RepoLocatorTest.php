@@ -33,6 +33,8 @@ final class RepoLocatorTest extends TestCase
         yield 'github git://' => ['git://github.com/lox/xhprof.git', [RepoRef::GITHUB, 'github.com', 'lox/xhprof']];
         yield 'github dots' => ['https://github.com/owner/repo.with.dots.git', [RepoRef::GITHUB, 'github.com', 'owner/repo.with.dots']];
         yield 'github ssh://' => ['ssh://git@github.com/o/r.git', [RepoRef::GITHUB, 'github.com', 'o/r']];
+        yield 'github scp with a slash' => ['git@github.com/o/r.git', [RepoRef::GITHUB, 'github.com', 'o/r']];
+        yield 'bare host and path is not a clone url' => ['github.com/o/r.git', null];
         yield 'github owner with dot' => ['https://github.com/owner.name/repo', [RepoRef::GITHUB, 'github.com', 'owner.name/repo']];
         yield 'github trailing slash' => ['https://github.com/o/r/', [RepoRef::GITHUB, 'github.com', 'o/r']];
         yield 'github uppercase host' => ['https://GitHub.com/o/r.git', [RepoRef::GITHUB, 'github.com', 'o/r']];
@@ -41,6 +43,7 @@ final class RepoLocatorTest extends TestCase
         yield 'gitlab.com' => ['https://gitlab.com/owner/repo.git', [RepoRef::GITLAB, 'gitlab.com', 'owner/repo']];
         yield 'gitlab.com subgroups' => ['https://gitlab.com/group/sub/deeper/project.git', [RepoRef::GITLAB, 'gitlab.com', 'group/sub/deeper/project']];
         yield 'gitlab.com scp' => ['git@gitlab.com:group/sub/project.git', [RepoRef::GITLAB, 'gitlab.com', 'group/sub/project']];
+        yield 'gitlab.com scp with a slash' => ['git@gitlab.com/group/project.git', [RepoRef::GITLAB, 'gitlab.com', 'group/project']];
         yield 'gitlab.com web page' => ['https://gitlab.com/group/project/-/tree/main', null];
         yield 'gitlab.com one segment' => ['https://gitlab.com/group', null];
         yield 'bitbucket https' => ['https://bitbucket.org/workspace/repo.git', [RepoRef::BITBUCKET, 'bitbucket.org', 'workspace/repo']];
@@ -78,16 +81,18 @@ final class RepoLocatorTest extends TestCase
         self::assertNull($locator->locate('https://gitlab.example.com/gitlab/project.git'), 'the prefix alone leaves one segment');
     }
 
-    /** A configured domain may spell out a port the URL omits, and the URL may name one the domain lists. */
+    /**
+     * Host and port are matched literally, as Composer's GitLabDriver matches them: a URL that
+     * omits a port the entry names, or names one the entry omits, is not that GitLab. The ref's
+     * host is the entry, port included, so the API request and the credential lookup agree.
+     */
     public function testPortsAreMatchedTheWayComposerMatchesThem(): void
     {
         $locator = new RepoLocator(['gitlab.example.com:8443']);
         $ref = $locator->locate('https://gitlab.example.com:8443/group/project.git');
         self::assertNotNull($ref);
         self::assertSame('gitlab.example.com:8443', $ref->host());
-        $ref = $locator->locate('https://gitlab.example.com/group/project.git');
-        self::assertNotNull($ref);
-        self::assertSame('gitlab.example.com:8443', $ref->host());
+        self::assertNull($locator->locate('https://gitlab.example.com/group/project.git'), 'no port in the URL: not the configured GitLab');
         self::assertNull((new RepoLocator(['gitlab.example.com']))->locate('https://gitlab.example.com:8443/group/project.git'));
     }
 

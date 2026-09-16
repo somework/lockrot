@@ -75,7 +75,9 @@ final class RepoLocator
     /**
      * Host (with its port, when the URL names one) and path of a clone URL in any of the shapes a
      * lock file records: `https://host/path.git`, `https://user@host/path`, `git://host/path`,
-     * `ssh://git@host/path.git` and the scp-like `git@host:path.git`.
+     * `ssh://git@host/path.git` and the scp-like `git@host:path.git`. The slash-separated
+     * `git@host/path.git` is not a URL git accepts, but locks have carried it and earlier lockrot
+     * versions read it, so it stays readable; a bare `host/path` without the user part does not.
      *
      * @return array{0: string, 1: string}|null
      */
@@ -94,6 +96,9 @@ final class RepoLocator
         if (preg_match('{^(?:[A-Za-z0-9_.-]+@)?([A-Za-z0-9_.-]+):(.+)$}', $url, $m) === 1) {
             return [$m[1], $m[2]];
         }
+        if (preg_match('{^[A-Za-z0-9_.-]+@([A-Za-z0-9_.-]+)/(.+)$}', $url, $m) === 1) {
+            return [$m[1], $m[2]];
+        }
 
         return null;
     }
@@ -108,6 +113,11 @@ final class RepoLocator
     }
 
     /**
+     * The host is matched literally, port included, the way Composer's GitLabDriver matches a
+     * `gitlab-domains` entry against a clone URL: a URL that omits a port the entry spells out is
+     * not a GitLab URL for Composer, so it is not one for lockrot either. The entry then serves as
+     * the ref's host, which is both the API base and the key Composer files credentials under.
+     *
      * @param string $domain    a `gitlab-domains` entry: `host`, `host:port` or `host[:port]/prefix`
      * @param string $lowerHost the URL's host, lowercased, with its port when it has one
      */
@@ -116,8 +126,7 @@ final class RepoLocator
         $slash = strpos($domain, '/');
         $domainHost = strtolower($slash === false ? $domain : substr($domain, 0, $slash));
         $prefix = $slash === false ? '' : substr($domain, $slash);
-        // A configured domain may spell out a port the URL omits (Composer allows the same).
-        if ($lowerHost !== $domainHost && $lowerHost !== (string) preg_replace('{:\d+$}', '', $domainHost)) {
+        if ($lowerHost !== $domainHost) {
             return null;
         }
         $path = self::normalise($path);
