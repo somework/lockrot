@@ -8,7 +8,7 @@ use Composer\Factory;
 use Composer\IO\NullIO;
 use Lockrot\Clock;
 use Lockrot\Composer\ComposerHttpClient;
-use Lockrot\Data\GitHub\GitHubClient;
+use Lockrot\Data\Forge\GitHubApi;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
@@ -29,8 +29,8 @@ final class ComposerHttpClientNetworkTest extends TestCase
     public function testFetchesRealAndMissingUrlsOverHttp(): void
     {
         $io = new NullIO();
-        $downloader = Factory::createHttpDownloader($io, Factory::createConfig($io));
-        $client = new ComposerHttpClient($downloader, $io, new Clock());
+        $config = Factory::createConfig($io);
+        $client = new ComposerHttpClient(Factory::createHttpDownloader($io, $config), $io, $config, new Clock());
 
         $results = $client->fetchAll([self::OK_URL, self::MISSING_URL]);
 
@@ -55,9 +55,10 @@ final class ComposerHttpClientNetworkTest extends TestCase
         }
         $io = new NullIO();
         $io->setAuthentication('github.com', $token, 'x-oauth-basic');
-        $client = new ComposerHttpClient(Factory::createHttpDownloader($io, Factory::createConfig($io)), $io, new Clock());
+        $config = Factory::createConfig($io);
+        $client = new ComposerHttpClient(Factory::createHttpDownloader($io, $config), $io, $config, new Clock());
 
-        $result = $client->fetchAll([self::GITHUB_URL], GitHubClient::headersFor($token))[self::GITHUB_URL];
+        $result = $client->fetchAll([self::GITHUB_URL], GitHubApi::headersFor($token))[self::GITHUB_URL];
 
         self::assertSame(200, $result->status(), (string) $result->error());
     }

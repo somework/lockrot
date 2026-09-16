@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Signal;
 
-use Lockrot\Data\GitHub\RepositoryActivity;
+use Lockrot\Data\Forge\RepoRef;
+use Lockrot\Data\Forge\RepositoryActivity;
 use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Lock\LockedPackage;
 use Lockrot\Signal\PackageFacts;
@@ -77,9 +78,11 @@ final class FactsBuilder
         );
     }
 
-    public static function activity(bool $archived, ?string $pushedAt): RepositoryActivity
+    public static function activity(bool $archived, ?string $pushedAt, string $forge = RepoRef::GITHUB): RepositoryActivity
     {
-        return new RepositoryActivity('vendor/pkg', $archived, $pushedAt === null ? null : new \DateTimeImmutable($pushedAt), new \DateTimeImmutable(self::NOW));
+        $host = [RepoRef::GITHUB => 'github.com', RepoRef::GITLAB => 'gitlab.com', RepoRef::BITBUCKET => 'bitbucket.org'][$forge];
+
+        return new RepositoryActivity(new RepoRef($forge, $host, 'vendor/pkg'), $archived, $pushedAt === null ? null : new \DateTimeImmutable($pushedAt), new \DateTimeImmutable(self::NOW));
     }
 
     public static function facts(LockedPackage $p, ?PackageMetadata $m = null, ?RepositoryActivity $a = null): PackageFacts

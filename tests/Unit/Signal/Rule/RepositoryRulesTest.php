@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Signal\Rule;
 
 use Lockrot\Clock;
+use Lockrot\Data\Forge\RepoRef;
 use Lockrot\Signal\Rule\ArchivedRule;
 use Lockrot\Signal\Rule\NoPushRule;
 use Lockrot\Signal\Signal;
@@ -21,7 +22,7 @@ final class RepositoryRulesTest extends TestCase
         self::assertSame(Signal::S3, $signal->id());
         self::assertSame(Signal::LEVEL_HIGH, $signal->level());
         self::assertSame('repository archived on GitHub', $signal->summary());
-        self::assertSame(['repo' => 'vendor/pkg'], $signal->data());
+        self::assertSame(['repo' => 'vendor/pkg', 'host' => 'github.com'], $signal->data());
         self::assertNull((new ArchivedRule())->evaluate(F::facts(F::package(), null, F::activity(false, '2020-01-01'))));
         self::assertNull((new ArchivedRule())->evaluate(F::facts(F::package())));
     }
@@ -37,6 +38,7 @@ final class RepositoryRulesTest extends TestCase
         self::assertSame([
             'last_push' => '2015-11-16T16:31:37+00:00',
             'repo' => 'vendor/pkg',
+            'host' => 'github.com',
             'years' => 10.8,
         ], $high->data());
         $warn = $rule->evaluate(F::facts(F::package(), null, F::activity(false, '2022-01-01')));
@@ -45,6 +47,23 @@ final class RepositoryRulesTest extends TestCase
         self::assertNull($rule->evaluate(F::facts(F::package(), null, F::activity(false, '2025-08-01'))));
         self::assertNull($rule->evaluate(F::facts(F::package(), null, F::activity(false, null))));
         self::assertNull($rule->evaluate(F::facts(F::package())));
+    }
+
+    /** Each forge names what it measured: GitHub a push, GitLab and Bitbucket the newest commit. */
+    public function testTheSummariesNameTheForgeAndWhatItMeasured(): void
+    {
+        $archived = (new ArchivedRule())->evaluate(F::facts(F::package(), null, F::activity(true, '2020-01-01', RepoRef::GITLAB)));
+        self::assertNotNull($archived);
+        self::assertSame('repository archived on GitLab', $archived->summary());
+        self::assertSame(['repo' => 'vendor/pkg', 'host' => 'gitlab.com'], $archived->data());
+
+        $rule = new NoPushRule(Clock::fixed(F::NOW), new Thresholds());
+        foreach ([RepoRef::GITLAB => 'gitlab.com', RepoRef::BITBUCKET => 'bitbucket.org'] as $forge => $host) {
+            $signal = $rule->evaluate(F::facts(F::package(), null, F::activity(false, '2015-11-16T16:31:37Z', $forge)));
+            self::assertNotNull($signal);
+            self::assertSame('last commit 2015-11-16 (10.8 years ago)', $signal->summary(), $forge);
+            self::assertSame($host, $signal->data()['host'], $forge);
+        }
     }
 
     public function testCustomThresholds(): void

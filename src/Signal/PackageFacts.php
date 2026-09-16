@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Signal;
 
-use Lockrot\Data\GitHub\RepositoryActivity;
+use Lockrot\Data\Forge\RepositoryActivity;
 use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Lock\LockedPackage;
 

@@ -13,8 +13,11 @@ use Lockrot\Analyzer\Analyzer;
 use Lockrot\Clock;
 use Lockrot\Composer\AnalyzerBootstrap;
 use Lockrot\Config\LockrotConfig;
-use Lockrot\Data\GitHub\GitHubClient;
-use Lockrot\Data\GitHub\GitHubFetchPlanner;
+use Lockrot\Data\Forge\ActivityClient;
+use Lockrot\Data\Forge\ActivityFetchPlanner;
+use Lockrot\Data\Forge\ForgeAuth;
+use Lockrot\Data\Forge\RepoLocator;
+use Lockrot\Data\Forge\Tokens;
 use Lockrot\Data\Http\RecordedHttpClient;
 use Lockrot\Data\Php\PhpReleaseDates;
 use Lockrot\Data\Repository\MetadataBatch;
@@ -41,8 +44,9 @@ final class AnalyzerBootstrapTest extends TestCase
     {
         return new Analyzer(
             $this->emptyLoader(),
-            new GitHubClient(new RecordedHttpClient(__DIR__.'/../../fixtures/http/github'), null),
-            new GitHubFetchPlanner(false),
+            new ActivityClient(new RecordedHttpClient(__DIR__.'/../../fixtures/http/github'), ForgeAuth::anonymous()),
+            new ActivityFetchPlanner(ForgeAuth::anonymous()),
+            new RepoLocator(),
             new Allowlist([new AllowlistEntry('vendor/builtin', null, 'builtin match', null, 'builtin')]),
             SignalSet::default($clock, $lockrot->thresholds(), '8.4', PhpReleaseDates::load()),
             new VerdictEngine(),
@@ -54,7 +58,7 @@ final class AnalyzerBootstrapTest extends TestCase
     public function testCreateMergesTheProjectIgnoreListOntoTheFactoryBuiltAllowlist(): void
     {
         $lockrot = LockrotConfig::fromSources([], [], [], '8.4.0', null);
-        $factory = function (IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, ?string $token, Clock $clock, Deadline $deadline): Analyzer {
+        $factory = function (IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, Tokens $tokens, Clock $clock, Deadline $deadline): Analyzer {
             return $this->baseAnalyzer($clock, $lockrot);
         };
         $project = ProjectConfig::fromArray([
@@ -72,7 +76,7 @@ final class AnalyzerBootstrapTest extends TestCase
     {
         $lockrot = LockrotConfig::fromSources([], [], [], '8.4.0', null);
         $recorded = null;
-        $factory = function (IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, ?string $token, Clock $clock, Deadline $deadline) use (&$recorded): Analyzer {
+        $factory = function (IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, Tokens $tokens, Clock $clock, Deadline $deadline) use (&$recorded): Analyzer {
             $recorded = $deadline;
 
             return $this->baseAnalyzer($clock, $lockrot);

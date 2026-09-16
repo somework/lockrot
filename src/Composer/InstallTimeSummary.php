@@ -16,6 +16,7 @@ use Lockrot\Baseline\BaselineFile;
 use Lockrot\Clock;
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Config\Policy;
+use Lockrot\Data\Forge\Tokens;
 use Lockrot\Deadline;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Exception\InstallBlockedException;
@@ -42,10 +43,10 @@ use Lockrot\Output\InstallSummaryFormatter;
  */
 final class InstallTimeSummary
 {
-    /** @var callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, ?string, Clock, Deadline): Analyzer */
+    /** @var callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, Tokens, Clock, Deadline): Analyzer */
     private $analyzerFactory;
 
-    /** @param null|callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, ?string, Clock, Deadline): Analyzer $analyzerFactory */
+    /** @param null|callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, Tokens, Clock, Deadline): Analyzer $analyzerFactory */
     public function __construct(?callable $analyzerFactory = null)
     {
         $this->analyzerFactory = $analyzerFactory ?? [ServiceFactory::class, 'createAnalyzer'];

@@ -7,12 +7,13 @@ namespace Lockrot\Analyzer;
 use Lockrot\Allowlist\Allowlist;
 use Lockrot\Allowlist\AllowlistEntry;
 use Lockrot\Clock;
-use Lockrot\Data\GitHub\GitHubBatch;
-use Lockrot\Data\GitHub\GitHubClient;
-use Lockrot\Data\GitHub\GitHubFetchPlan;
-use Lockrot\Data\GitHub\GitHubFetchPlanner;
-use Lockrot\Data\GitHub\RepoLocator;
-use Lockrot\Data\GitHub\RepositoryActivity;
+use Lockrot\Data\Forge\ActivityBatch;
+use Lockrot\Data\Forge\ActivityClient;
+use Lockrot\Data\Forge\ActivityFetchPlan;
+use Lockrot\Data\Forge\ActivityFetchPlanner;
+use Lockrot\Data\Forge\RepoLocator;
+use Lockrot\Data\Forge\RepoRef;
+use Lockrot\Data\Forge\RepositoryActivity;
 use Lockrot\Data\Repository\MetadataBatch;
 use Lockrot\Data\Repository\MetadataLoaderInterface;
 use Lockrot\Data\Repository\PackageMetadata;
@@ -32,9 +33,19 @@ final class Analyzer
 {
     public const NOTE_NOT_IN_REPOSITORY = 'not from a Composer repository, not checked';
 
+    /**
+     * The note for a forge whose anonymous request cap shaped the run, so a zero-candidate run
+     * does not read as a complete one. GitLab has no cap and no note.
+     */
+    private const ANONYMOUS_CAP_NOTE = [
+        RepoRef::GITHUB => 'GitHub token not set: repository activity checked for %d candidate packages, %d packages skipped (set GITHUB_TOKEN to check all)',
+        RepoRef::BITBUCKET => 'Bitbucket credentials not set: repository activity checked for %d candidate packages, %d packages skipped (add bitbucket.org credentials to auth.json to check all)',
+    ];
+
     private MetadataLoaderInterface $metadata;
-    private GitHubClient $github;
-    private GitHubFetchPlanner $planner;
+    private ActivityClient $activity;
+    private ActivityFetchPlanner $planner;
+    private RepoLocator $locator;
     private Allowlist $allowlist;
     private SignalSet $signals;
     private VerdictEngine $engine;
@@ -42,11 +53,12 @@ final class Analyzer
     private bool $offline;
     private Deadline $deadline;
 
-    public function __construct(MetadataLoaderInterface $metadata, GitHubClient $github, GitHubFetchPlanner $planner, Allowlist $allowlist, SignalSet $signals, VerdictEngine $engine, Clock $clock, bool $offline)
+    public function __construct(MetadataLoaderInterface $metadata, ActivityClient $activity, ActivityFetchPlanner $planner, RepoLocator $locator, Allowlist $allowlist, SignalSet $signals, VerdictEngine $engine, Clock $clock, bool $offline)
     {
         $this->metadata = $metadata;
-        $this->github = $github;
+        $this->activity = $activity;
         $this->planner = $planner;
+        $this->locator = $locator;
         $this->allowlist = $allowlist;
         $this->signals = $signals;
         $this->engine = $engine;
@@ -70,7 +82,7 @@ final class Analyzer
     }
 
     /**
-     * The budget that bounds an install-time run ({@see Deadline}). It reaches the GitHub half of
+     * The budget that bounds an install-time run ({@see Deadline}). It reaches the activity half of
      * the analysis here and the repository half through the metadata loader, which takes its own
      * copy; both are given the same instance by {@see \Lockrot\Composer\ServiceFactory}.
      */
@@ -115,23 +127,23 @@ final class Analyzer
 
         $plan = $this->planner->select($repoByPackage, $candidateByPackage);
         if ($this->deadline->isPast()) {
-            // The metadata pass already used the whole budget. Starting the GitHub round-trips now
+            // The metadata pass already used the whole budget. Starting the forge round-trips now
             // would push the install past it, so the activity signals are dropped and the report
             // says so rather than reading as "checked, nothing found".
-            $githubBatch = GitHubBatch::empty();
-            $githubNotes = ['repository activity not checked: install-time budget exhausted'];
+            $activityBatch = ActivityBatch::empty();
+            $activityNotes = ['repository activity not checked: install-time budget exhausted'];
         } else {
-            [$githubBatch, $githubNotes] = $this->fetchGitHub($plan, $repoByPackage !== []);
+            [$activityBatch, $activityNotes] = $this->fetchActivity($plan);
         }
-        $notes = array_merge($notes, $githubNotes);
-        $activity = $githubBatch->activity();
+        $notes = array_merge($notes, $activityNotes);
+        $activity = $activityBatch->activity();
 
         $findings = [];
         $notInRepository = 0;
         foreach ($packages as $package) {
             $meta = $metadata[$package->name()] ?? null;
             $repo = $repoByPackage[$package->name()] ?? null;
-            $act = $repo !== null ? ($activity[$repo] ?? null) : null;
+            $act = $repo !== null ? ($activity[$repo->key()] ?? null) : null;
             $entry = $allowlisted[$package->name()];
             $findings[] = $this->buildFinding($package, $meta, $act, $entry, $graph, $batch);
             if (!$package->isFromComposerRepository()) {
@@ -141,7 +153,7 @@ final class Analyzer
         $notes = array_merge($notes, $this->notInRepositoryNotes($notInRepository));
         $findings = TransitiveExposure::attach($findings, $graph);
 
-        $hadNetworkFailures = $batch->failed() !== [] || $githubBatch->failed() !== [];
+        $hadNetworkFailures = $batch->failed() !== [] || $activityBatch->failed() !== [];
 
         return new Report($findings, $notes, $now, \count($packages), $notInRepository, $hadNetworkFailures);
     }
@@ -163,7 +175,7 @@ final class Analyzer
      * @param list<LockedPackage>              $packages
      * @param array<string, PackageMetadata>   $metadata
      *
-     * @return array{0: array<string, AllowlistEntry|null>, 1: array<string, string>, 2: array<string, bool>}
+     * @return array{0: array<string, AllowlistEntry|null>, 1: array<string, RepoRef>, 2: array<string, bool>}
      */
     private function classify(array $packages, array $metadata, \DateTimeImmutable $now): array
     {
@@ -173,7 +185,7 @@ final class Analyzer
         foreach ($packages as $package) {
             $meta = $metadata[$package->name()] ?? null;
             $allowlisted[$package->name()] = $this->allowlist->match($package, $meta, $now);
-            $repo = RepoLocator::github($meta !== null ? ($meta->sourceUrl() ?? $package->sourceUrl()) : $package->sourceUrl());
+            $repo = $this->locator->locate($meta !== null ? ($meta->sourceUrl() ?? $package->sourceUrl()) : $package->sourceUrl());
             if ($repo === null || $allowlisted[$package->name()] !== null || !$package->isFromComposerRepository()) {
                 continue;
             }
@@ -185,33 +197,26 @@ final class Analyzer
         return [$allowlisted, $repoByPackage, $candidateByPackage];
     }
 
-    /**
-     * @param bool $anyGitHubRepo whether any package resolved to a GitHub repository at all
-     *
-     * @return array{0: GitHubBatch, 1: list<string>}
-     */
-    private function fetchGitHub(GitHubFetchPlan $plan, bool $anyGitHubRepo): array
+    /** @return array{0: ActivityBatch, 1: list<string>} */
+    private function fetchActivity(ActivityFetchPlan $plan): array
     {
-        $githubBatch = $this->github->fetch($plan->repos());
+        $batch = $this->activity->fetch($plan->repos());
         $notes = [];
-        // Without a token the planner both filters to candidates and caps the request count; the
-        // report states the total left unchecked so a zero-candidate run does not look like a
-        // complete one.
-        if (!$this->github->hasToken() && $anyGitHubRepo) {
-            $notes[] = \sprintf(
-                'GitHub token not set: repository activity checked for %d candidate packages, %d packages skipped (set GITHUB_TOKEN to check all)',
-                $plan->checkedPackages(),
-                $plan->skippedNoToken() + $plan->skippedBudget()
-            );
+        // Anonymously the planner both filters to candidates and caps the request count on the
+        // forges that need it; the report states the total left unchecked per forge.
+        foreach ($plan->cappedForges() as $forge) {
+            $notes[] = \sprintf(self::ANONYMOUS_CAP_NOTE[$forge], $plan->checkedPackages($forge), $plan->skippedNoToken($forge) + $plan->skippedBudget($forge));
         }
-        $githubFailed = $githubBatch->failed();
-        if ($githubBatch->rateLimited()) {
-            $notes[] = \sprintf('GitHub API rate limit reached; repository activity missing for %d packages', \count($githubFailed));
-        } elseif ($githubFailed !== []) {
-            $notes[] = \sprintf('GitHub unreachable for %d repositories: %s', \count($githubFailed), (string) reset($githubFailed));
+        foreach (RepoRef::FORGES as $forge) {
+            $failed = $batch->failedOn($forge);
+            if ($batch->rateLimited($forge)) {
+                $notes[] = \sprintf('%s API rate limit reached; repository activity missing for %d packages', RepoRef::label($forge), \count($failed));
+            } elseif ($failed !== []) {
+                $notes[] = \sprintf('%s unreachable for %d repositories: %s', RepoRef::label($forge), \count($failed), (string) reset($failed));
+            }
         }
 
-        return [$githubBatch, $notes];
+        return [$batch, $notes];
     }
 
     private function buildFinding(LockedPackage $package, ?PackageMetadata $meta, ?RepositoryActivity $activity, ?AllowlistEntry $entry, DependencyGraph $graph, MetadataBatch $batch): Finding

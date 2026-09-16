@@ -6,7 +6,8 @@ declare(strict_types=1);
 // offline. Usage: GITHUB_TOKEN=... bin/record-fixtures [fixtureDir ...]
 //
 // p2 bodies are trimmed to KEEP (below) before being written; GitHub repo bodies are trimmed
-// separately to the keys the GitHubClient reads. An envelope already on disk is only reused when
+// separately to the keys GitHubApi reads. The fixtures hold GitHub-hosted packages only, so no
+// GitLab or Bitbucket answer is recorded. An envelope already on disk is only reused when
 // its recorded `status` is not 0 — status 0 means the previous recording run hit a transport
 // failure (timeout, DNS, etc.), so it is treated as not-yet-recorded and fetched again.
 require __DIR__.'/../vendor/autoload.php';
@@ -15,8 +16,9 @@ use Composer\Factory;
 use Composer\IO\NullIO;
 use Lockrot\Clock;
 use Lockrot\Composer\ComposerHttpClient;
-use Lockrot\Data\GitHub\GitHubClient;
-use Lockrot\Data\GitHub\RepoLocator;
+use Lockrot\Data\Forge\GitHubApi;
+use Lockrot\Data\Forge\RepoLocator;
+use Lockrot\Data\Forge\RepoRef;
 use Lockrot\Data\Http\HttpResult;
 use Lockrot\Data\Http\RecordedHttpClient;
 use Lockrot\Lock\LockFile;
@@ -74,8 +76,10 @@ $isRecorded = static function (string $path): bool {
 };
 $io = new NullIO();
 $composerConfig = Factory::createConfig($io);
-$repositoryHttp = new ComposerHttpClient(Factory::createHttpDownloader($io, $composerConfig), new Clock());
-$github = new GitHubClient(new RecordedHttpClient($ghDir), getenv('GITHUB_TOKEN') ?: null);
+$repositoryHttp = new ComposerHttpClient(Factory::createHttpDownloader($io, $composerConfig), $io, $composerConfig, new Clock());
+$github = new GitHubApi();
+$githubHeaders = GitHubApi::headersFor(getenv('GITHUB_TOKEN') ?: null);
+$locator = new RepoLocator();
 $repos = [];
 foreach ($fixtures as $fixture) {
     $lock = LockFile::fromFile($root.'/'.$fixture.'/composer.lock');
@@ -94,19 +98,19 @@ foreach ($fixtures as $fixture) {
             file_put_contents($path, json_encode((new HttpResult($url, $result->status(), $body, $result->fetchedAt()))->toEnvelope(), \JSON_UNESCAPED_SLASHES));
             fwrite(STDERR, \sprintf("p2 %s%s %d\n", $package->name(), $dev ? '~dev' : '', $result->status()));
         }
-        $repo = RepoLocator::github($package->sourceUrl());
-        if ($repo !== null) {
-            $repos[$repo] = true;
+        $repo = $locator->locate($package->sourceUrl());
+        if ($repo !== null && $repo->forge() === RepoRef::GITHUB) {
+            $repos[$repo->path()] = $repo;
         }
     }
 }
-foreach (array_keys($repos) as $repo) {
-    $url = $github->url($repo);
+foreach ($repos as $repo => $ref) {
+    $url = $github->requests($ref, false)['repo'];
     $path = RecordedHttpClient::pathFor($ghDir, $url);
     if ($isRecorded($path)) {
         continue;
     }
-    $result = $fetch($url, $github->headers());
+    $result = $fetch($url, $githubHeaders);
     $json = $result->body() === null ? null : json_decode($result->body(), true);
     $body = \is_array($json) ? json_encode(array_intersect_key($json, array_flip(['full_name', 'archived', 'disabled', 'pushed_at', 'default_branch'])), \JSON_UNESCAPED_SLASHES) : $result->body();
     file_put_contents($path, json_encode((new HttpResult($url, $result->status(), $body === false ? null : $body, $result->fetchedAt()))->toEnvelope(), \JSON_UNESCAPED_SLASHES));

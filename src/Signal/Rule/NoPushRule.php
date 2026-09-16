@@ -33,8 +33,8 @@ final class NoPushRule implements SignalRule
             return null;
         }
 
-        return new Signal(Signal::S4, $level, \sprintf('last push %s (%.1f years ago)', $activity->pushedAt()->format('Y-m-d'), $years), [
-            'last_push' => $activity->pushedAt()->format(\DATE_ATOM), 'repo' => $activity->repo(), 'years' => round($years, 1),
+        return new Signal(Signal::S4, $level, \sprintf('%s %s (%.1f years ago)', $activity->ref()->activityWording(), $activity->pushedAt()->format('Y-m-d'), $years), [
+            'last_push' => $activity->pushedAt()->format(\DATE_ATOM), 'repo' => $activity->repo(), 'host' => $activity->ref()->host(), 'years' => round($years, 1),
         ]);
     }
 }

@@ -9,8 +9,11 @@ use Lockrot\Allowlist\AllowlistEntry;
 use Lockrot\Analyzer\Analyzer;
 use Lockrot\Analyzer\Report;
 use Lockrot\Clock;
-use Lockrot\Data\GitHub\GitHubClient;
-use Lockrot\Data\GitHub\GitHubFetchPlanner;
+use Lockrot\Data\Forge\ActivityClient;
+use Lockrot\Data\Forge\ActivityFetchPlanner;
+use Lockrot\Data\Forge\ForgeAuth;
+use Lockrot\Data\Forge\RepoLocator;
+use Lockrot\Data\Forge\Tokens;
 use Lockrot\Data\Http\HttpClientInterface;
 use Lockrot\Data\Http\HttpResult;
 use Lockrot\Data\Php\PhpReleaseDates;
@@ -94,13 +97,15 @@ final class AnalyzerTest extends TestCase
         };
     }
 
-    private function analyzer(MetadataLoaderInterface $metadata, HttpClientInterface $http, bool $token, Allowlist $allowlist, bool $offline = false, int $noTokenBudget = GitHubFetchPlanner::DEFAULT_NO_TOKEN_BUDGET): Analyzer
+    private function analyzer(MetadataLoaderInterface $metadata, HttpClientInterface $http, bool $token, Allowlist $allowlist, bool $offline = false, int $noTokenBudget = ActivityFetchPlanner::DEFAULT_ANONYMOUS_BUDGET, ?ForgeAuth $auth = null): Analyzer
     {
         $clock = Clock::fixed(F::NOW);
+        $auth ??= ForgeAuth::withTokens(new Tokens($token ? 't' : null, null));
         return new Analyzer(
             $metadata,
-            new GitHubClient($http, $token ? 't' : null),
-            new GitHubFetchPlanner($token, $noTokenBudget),
+            new ActivityClient($http, $auth),
+            new ActivityFetchPlanner($auth, $noTokenBudget),
+            new RepoLocator(),
             $allowlist,
             SignalSet::default($clock, new Thresholds(), '8.4', PhpReleaseDates::load()),
             new VerdictEngine(),
@@ -483,9 +488,9 @@ final class AnalyzerTest extends TestCase
     }
 
     /** @param list<array<string, mixed>> $packages */
-    private function analyzeLock(array $packages, MetadataLoaderInterface $loader, HttpClientInterface $http, bool $token, ?Allowlist $allowlist = null, int $noTokenBudget = GitHubFetchPlanner::DEFAULT_NO_TOKEN_BUDGET): Report
+    private function analyzeLock(array $packages, MetadataLoaderInterface $loader, HttpClientInterface $http, bool $token, ?Allowlist $allowlist = null, int $noTokenBudget = ActivityFetchPlanner::DEFAULT_ANONYMOUS_BUDGET, ?ForgeAuth $auth = null): Report
     {
-        return $this->analyzer($loader, $http, $token, $allowlist ?? new Allowlist([]), false, $noTokenBudget)
+        return $this->analyzer($loader, $http, $token, $allowlist ?? new Allowlist([]), false, $noTokenBudget, $auth)
             ->analyze(LockFile::fromArray(['packages' => $packages]), ProjectConfig::empty(), false);
     }
 
@@ -572,6 +577,97 @@ final class AnalyzerTest extends TestCase
             'GitHub token not set: repository activity checked for 2 candidate packages, 1 packages skipped (set GITHUB_TOKEN to check all)',
             $report->notes()
         );
+    }
+
+    private const GL_COMMITS = 'https://gitlab.com/api/v4/projects/group%2Fpkg/repository/commits?all=true&per_page=1';
+    private const GL_PROJECT = 'https://gitlab.com/api/v4/projects/group%2Fpkg';
+    private const BB_COMMITS = 'https://api.bitbucket.org/2.0/repositories/workspace/pkg/commits?pagelen=1';
+
+    /** GitLab's anonymous limit needs no cap: every GitLab package is checked, candidate or not, and no note says otherwise. */
+    public function testGitlabPackagesAreCheckedAnonymouslyWithoutACapOrANote(): void
+    {
+        $requested = new \ArrayObject();
+        $packages = [self::locked('vendor/recent'), self::locked('vendor/old')];
+        $metadata = [
+            'vendor/recent' => $this->metadataNamed('vendor/recent', 'https://gitlab.com/group/recent.git', '2026-08-01T00:00:00+00:00'),
+            'vendor/old' => $this->metadataNamed('vendor/old', 'https://gitlab.com/group/old.git'),
+        ];
+        $answers = [
+            'https://gitlab.com/api/v4/projects/group%2Frecent/repository/commits?all=true&per_page=1' => [200, '[{"committed_date":"2026-08-01T00:00:00Z"}]'],
+            'https://gitlab.com/api/v4/projects/group%2Fold/repository/commits?all=true&per_page=1' => [200, '[{"committed_date":"2015-01-01T00:00:00Z"}]'],
+        ];
+
+        $report = $this->analyzeLock($packages, $this->loader($metadata), $this->http($answers, $requested), false, null, 1);
+
+        self::assertSame(array_reverse(array_keys($answers)), $requested->getArrayCopy(), 'both fetched (in package-name order), with a budget of one and no token');
+        self::assertSame([], $report->notes());
+        $byName = self::byName($report);
+        self::assertSame(Verdict::SILENT, $byName['vendor/old']->verdict());
+        self::assertSame(Verdict::OK, $byName['vendor/recent']->verdict());
+        self::assertStringContainsString('last commit 2015-01-01', $byName['vendor/old']->evidence());
+    }
+
+    /** Anonymously a GitLab repository can be silent but never archived: the flag needs credentials. */
+    public function testAnAuthenticatedGitlabRunReadsTheArchivedFlag(): void
+    {
+        $packages = [self::locked('vendor/pkg')];
+        $loader = $this->loader(['vendor/pkg' => $this->metadataNamed('vendor/pkg', 'https://gitlab.com/group/pkg.git')]);
+        $answers = [
+            self::GL_COMMITS => [200, '[{"committed_date":"2015-01-01T00:00:00Z"}]'],
+            self::GL_PROJECT => [200, '{"archived":true,"last_activity_at":"2026-09-01T00:00:00Z"}'],
+        ];
+
+        $requested = new \ArrayObject();
+        $anonymous = self::byName($this->analyzeLock($packages, $loader, $this->http($answers, $requested), false))['vendor/pkg'];
+        self::assertSame([self::GL_COMMITS], $requested->getArrayCopy());
+        self::assertSame(Verdict::SILENT, $anonymous->verdict());
+
+        $requested = new \ArrayObject();
+        $auth = ForgeAuth::withTokens(new Tokens(null, 'glpat-x'));
+        $withToken = self::byName($this->analyzeLock($packages, $loader, $this->http($answers, $requested), false, null, ActivityFetchPlanner::DEFAULT_ANONYMOUS_BUDGET, $auth))['vendor/pkg'];
+        self::assertSame([self::GL_COMMITS, self::GL_PROJECT], $requested->getArrayCopy());
+        self::assertSame(Verdict::ABANDONED, $withToken->verdict());
+        self::assertStringContainsString('repository archived on GitLab', $withToken->evidence());
+    }
+
+    /** Each forge reports its own cap and its own failures, GitHub first, then GitLab, then Bitbucket. */
+    public function testEveryForgeGetsItsOwnNotes(): void
+    {
+        $packages = [self::locked('vendor/gh'), self::locked('vendor/gl'), self::locked('vendor/bb')];
+        $metadata = [
+            'vendor/gh' => $this->metadataNamed('vendor/gh', 'https://github.com/owner/pkg.git'),
+            'vendor/gl' => $this->metadataNamed('vendor/gl', 'https://gitlab.com/group/pkg.git'),
+            'vendor/bb' => $this->metadataNamed('vendor/bb', 'https://bitbucket.org/workspace/pkg.git'),
+        ];
+        $answers = [
+            'https://api.github.com/repos/owner/pkg' => [500, ''],
+            self::GL_COMMITS => [429, ''],
+            self::BB_COMMITS => [403, ''],
+        ];
+
+        $report = $this->analyzeLock($packages, $this->loader($metadata), $this->http($answers), false);
+
+        self::assertSame([
+            'GitHub token not set: repository activity checked for 1 candidate packages, 0 packages skipped (set GITHUB_TOKEN to check all)',
+            'Bitbucket credentials not set: repository activity checked for 1 candidate packages, 0 packages skipped (add bitbucket.org credentials to auth.json to check all)',
+            'GitHub unreachable for 1 repositories: HTTP 500',
+            'GitLab API rate limit reached; repository activity missing for 1 packages',
+            'Bitbucket unreachable for 1 repositories: HTTP 403',
+        ], $report->notes());
+        self::assertTrue($report->hadNetworkFailures());
+    }
+
+    public function testBitbucketActivityFeedsS4WithItsOwnWording(): void
+    {
+        $packages = [self::locked('vendor/pkg')];
+        $loader = $this->loader(['vendor/pkg' => $this->metadataNamed('vendor/pkg', 'https://bitbucket.org/workspace/pkg.git')]);
+        $answers = [self::BB_COMMITS => [200, '{"values":[{"date":"2015-01-01T00:00:00+00:00"}]}']];
+
+        $finding = self::byName($this->analyzeLock($packages, $loader, $this->http($answers), true))['vendor/pkg'];
+
+        self::assertSame(Verdict::SILENT, $finding->verdict());
+        self::assertStringContainsString('last commit 2015-01-01 (11.7 years ago)', $finding->evidence());
+        self::assertSame('bitbucket.org', $finding->signals()[1]->data()['host']);
     }
 
     public function testTheDataDateIsTheNewerOfTheMetadataAndTheRepositoryActivity(): void

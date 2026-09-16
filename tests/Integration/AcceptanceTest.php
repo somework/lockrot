@@ -8,8 +8,11 @@ use Lockrot\Allowlist\BuiltinAllowlist;
 use Lockrot\Analyzer\Analyzer;
 use Lockrot\Analyzer\Report;
 use Lockrot\Clock;
-use Lockrot\Data\GitHub\GitHubClient;
-use Lockrot\Data\GitHub\GitHubFetchPlanner;
+use Lockrot\Data\Forge\ActivityClient;
+use Lockrot\Data\Forge\ActivityFetchPlanner;
+use Lockrot\Data\Forge\ForgeAuth;
+use Lockrot\Data\Forge\RepoLocator;
+use Lockrot\Data\Forge\Tokens;
 use Lockrot\Data\Http\RecordedHttpClient;
 use Lockrot\Data\Php\PhpReleaseDates;
 use Lockrot\Data\Repository\RepositoryMetadataLoader;
@@ -81,10 +84,12 @@ final class AcceptanceTest extends TestCase
     private function analyze(string $dir, ?RepositoryMetadataLoader $loader = null): Report
     {
         $clock = Clock::fixed(self::NOW);
+        $auth = ForgeAuth::withTokens(new Tokens('recorded', null));
         $analyzer = new Analyzer(
             $loader ?? $this->loader(),
-            new GitHubClient(new RecordedHttpClient(self::FIXTURES.'http/github'), 'recorded'),
-            new GitHubFetchPlanner(true),
+            new ActivityClient(new RecordedHttpClient(self::FIXTURES.'http/github'), $auth),
+            new ActivityFetchPlanner($auth),
+            new RepoLocator(),
             BuiltinAllowlist::load(),
             SignalSet::default($clock, new Thresholds(), '8.4', PhpReleaseDates::load()),
             new VerdictEngine(),

@@ -16,8 +16,11 @@ use Lockrot\Clock;
 use Lockrot\Composer\LockrotCommand;
 use Lockrot\Composer\ServiceFactory;
 use Lockrot\Config\LockrotConfig;
-use Lockrot\Data\GitHub\GitHubClient;
-use Lockrot\Data\GitHub\GitHubFetchPlanner;
+use Lockrot\Data\Forge\ActivityClient;
+use Lockrot\Data\Forge\ActivityFetchPlanner;
+use Lockrot\Data\Forge\ForgeAuth;
+use Lockrot\Data\Forge\RepoLocator;
+use Lockrot\Data\Forge\Tokens;
 use Lockrot\Data\Http\RecordedHttpClient;
 use Lockrot\Data\Php\PhpReleaseDates;
 use Lockrot\Data\Repository\MetadataBatch;
@@ -116,11 +119,14 @@ final class LockrotCommandTest extends TestCase
     private function command(?MetadataLoaderInterface $loader = null): LockrotCommand
     {
         $loader ??= $this->emptyLoader();
-        $factory = static function (IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, ?string $token, Clock $clock) use ($loader): Analyzer {
+        $factory = static function (IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, Tokens $tokens, Clock $clock) use ($loader): Analyzer {
+            $auth = ForgeAuth::withTokens(new Tokens('recorded', null));
+
             return new Analyzer(
                 $loader,
-                new GitHubClient(new RecordedHttpClient(__DIR__.'/../../fixtures/http/github'), 'recorded'),
-                new GitHubFetchPlanner(true),
+                new ActivityClient(new RecordedHttpClient(__DIR__.'/../../fixtures/http/github'), $auth),
+                new ActivityFetchPlanner($auth),
+                new RepoLocator(),
                 BuiltinAllowlist::load(),
                 SignalSet::default($clock, $lockrot->thresholds(), $lockrot->targetPhp(), PhpReleaseDates::load()),
                 new VerdictEngine(),
@@ -132,7 +138,7 @@ final class LockrotCommandTest extends TestCase
         return $this->buildCommand($factory);
     }
 
-    /** @param callable(IOInterface, Config, list<\Composer\Repository\RepositoryInterface>, LockrotConfig, ?string, Clock): Analyzer $factory */
+    /** @param callable(IOInterface, Config, list<\Composer\Repository\RepositoryInterface>, LockrotConfig, Tokens, Clock): Analyzer $factory */
     private function buildCommand(callable $factory): LockrotCommand
     {
         $app = new Application();
@@ -1035,13 +1041,15 @@ final class LockrotCommandTest extends TestCase
         putenv('COMPOSER_DISABLE_NETWORK');
         $observed = 'factory not called';
         $loader = $this->emptyLoader();
-        $factory = function (IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, ?string $token, Clock $clock) use ($loader, &$observed): Analyzer {
+        $factory = function (IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, Tokens $tokens, Clock $clock) use ($loader, &$observed): Analyzer {
             $observed = getenv('COMPOSER_DISABLE_NETWORK');
+            $auth = ForgeAuth::withTokens(new Tokens('recorded', null));
 
             return new Analyzer(
                 $loader,
-                new GitHubClient(new RecordedHttpClient(__DIR__.'/../../fixtures/http/github'), 'recorded'),
-                new GitHubFetchPlanner(true),
+                new ActivityClient(new RecordedHttpClient(__DIR__.'/../../fixtures/http/github'), $auth),
+                new ActivityFetchPlanner($auth),
+                new RepoLocator(),
                 BuiltinAllowlist::load(),
                 SignalSet::default($clock, $lockrot->thresholds(), $lockrot->targetPhp(), PhpReleaseDates::load()),
                 new VerdictEngine(),

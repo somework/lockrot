@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Composer;
 
+use Composer\Config;
 use Composer\IO\BufferIO;
 use Lockrot\Composer\ComposerHttpClient;
 use PHPUnit\Framework\TestCase;
@@ -11,12 +12,35 @@ use PHPUnit\Framework\TestCase;
 final class ComposerHttpClientTest extends TestCase
 {
     private const GITHUB = 'https://api.github.com/repos/vendor/name';
+    private const GITLAB = 'https://gitlab.com/api/v4/projects/vendor%2Fname/repository/commits?all=true&per_page=1';
+    private const BITBUCKET = 'https://api.bitbucket.org/2.0/repositories/vendor/name/commits?pagelen=1';
     private const HEADERS = ['Accept: application/vnd.github+json', 'User-Agent: lockrot', 'Authorization: token env-token'];
     private const WITHOUT_AUTHORIZATION = ['Accept: application/vnd.github+json', 'User-Agent: lockrot'];
+    private const GITLAB_HEADERS = ['Accept: application/json', 'User-Agent: lockrot', 'PRIVATE-TOKEN: env-token'];
+    private const GITLAB_WITHOUT_TOKEN = ['Accept: application/json', 'User-Agent: lockrot'];
+
+    /** @param list<string> $gitlabDomains */
+    private static function config(array $gitlabDomains = ['gitlab.com']): Config
+    {
+        $config = new Config(false);
+        $config->merge(['config' => ['gitlab-domains' => $gitlabDomains]]);
+
+        return $config;
+    }
+
+    /**
+     * @param list<string> $headers
+     *
+     * @return list<string>
+     */
+    private static function strip(BufferIO $io, string $url, array $headers, ?Config $config = null): array
+    {
+        return ComposerHttpClient::withoutRedundantAuthorization($io, $config ?? self::config(), $url, $headers);
+    }
 
     public function testHeadersPassThroughWhenComposerHasNoGithubCredentials(): void
     {
-        self::assertSame(self::HEADERS, ComposerHttpClient::withoutRedundantAuthorization(new BufferIO(), self::GITHUB, self::HEADERS));
+        self::assertSame(self::HEADERS, self::strip(new BufferIO(), self::GITHUB, self::HEADERS));
     }
 
     public function testAuthorizationIsDroppedWhenComposerAuthenticatesGithub(): void
@@ -24,7 +48,7 @@ final class ComposerHttpClientTest extends TestCase
         $io = new BufferIO();
         $io->setAuthentication('github.com', 'composer-token', 'x-oauth-basic');
 
-        self::assertSame(self::WITHOUT_AUTHORIZATION, ComposerHttpClient::withoutRedundantAuthorization($io, self::GITHUB, self::HEADERS));
+        self::assertSame(self::WITHOUT_AUTHORIZATION, self::strip($io, self::GITHUB, self::HEADERS));
     }
 
     /**
@@ -36,7 +60,7 @@ final class ComposerHttpClientTest extends TestCase
         $io = new BufferIO();
         $io->setAuthentication('github.com', 'user', 'secret');
 
-        self::assertSame(self::WITHOUT_AUTHORIZATION, ComposerHttpClient::withoutRedundantAuthorization($io, self::GITHUB, self::HEADERS));
+        self::assertSame(self::WITHOUT_AUTHORIZATION, self::strip($io, self::GITHUB, self::HEADERS));
     }
 
     /**
@@ -49,7 +73,7 @@ final class ComposerHttpClientTest extends TestCase
         $io = new BufferIO();
         $io->setAuthentication('api.github.com', 'composer-token', 'x-oauth-basic');
 
-        self::assertSame(self::HEADERS, ComposerHttpClient::withoutRedundantAuthorization($io, self::GITHUB, self::HEADERS));
+        self::assertSame(self::HEADERS, self::strip($io, self::GITHUB, self::HEADERS));
     }
 
     /**
@@ -61,8 +85,8 @@ final class ComposerHttpClientTest extends TestCase
         $io = new BufferIO();
         $io->setAuthentication('github.com', 'composer-token', 'x-oauth-basic');
 
-        self::assertSame(['User-Agent: lockrot'], ComposerHttpClient::withoutRedundantAuthorization($io, self::GITHUB, ['User-Agent: lockrot', 'authorization: token x']));
-        self::assertSame(['User-Agent: lockrot', 'AUTHORIZATION: token x'], ComposerHttpClient::withoutRedundantAuthorization($io, 'https://API.GITHUB.COM/repos/x/y', ['User-Agent: lockrot', 'AUTHORIZATION: token x']));
+        self::assertSame(['User-Agent: lockrot'], self::strip($io, self::GITHUB, ['User-Agent: lockrot', 'authorization: token x']));
+        self::assertSame(['User-Agent: lockrot', 'AUTHORIZATION: token x'], self::strip($io, 'https://API.GITHUB.COM/repos/x/y', ['User-Agent: lockrot', 'AUTHORIZATION: token x']));
     }
 
     public function testOtherHostsKeepTheirHeadersWhateverComposerKnows(): void
@@ -70,8 +94,8 @@ final class ComposerHttpClientTest extends TestCase
         $io = new BufferIO();
         $io->setAuthentication('github.com', 'composer-token', 'x-oauth-basic');
 
-        foreach (['https://github.com/somework/lockrot/releases/download/v0.2.1/lockrot.phar', 'https://repo.packagist.org/p2/psr/log.json', 'http://127.0.0.1:8080/repos/x/y', 'not a url'] as $url) {
-            self::assertSame(self::HEADERS, ComposerHttpClient::withoutRedundantAuthorization($io, $url, self::HEADERS), $url);
+        foreach (['https://github.com/somework/lockrot/releases/download/v0.2.1/lockrot.phar', 'https://repo.packagist.org/p2/psr/log.json', 'http://127.0.0.1:8080/repos/x/y', 'not a url', ''] as $url) {
+            self::assertSame(self::HEADERS, self::strip($io, $url, self::HEADERS), $url);
         }
     }
 
@@ -80,6 +104,50 @@ final class ComposerHttpClientTest extends TestCase
         $io = new BufferIO();
         $io->setAuthentication('repo.packagist.com', 'token', 'secret');
 
-        self::assertSame(self::HEADERS, ComposerHttpClient::withoutRedundantAuthorization($io, self::GITHUB, self::HEADERS));
+        self::assertSame(self::HEADERS, self::strip($io, self::GITHUB, self::HEADERS));
+    }
+
+    /** Composer's `gitlab-token` for gitlab.com becomes a PRIVATE-TOKEN header of its own; lockrot's goes. */
+    public function testThePrivateTokenIsDroppedWhenComposerAuthenticatesGitlab(): void
+    {
+        $io = new BufferIO();
+        $io->setAuthentication('gitlab.com', 'composer-token', 'private-token');
+
+        self::assertSame(self::GITLAB_WITHOUT_TOKEN, self::strip($io, self::GITLAB, self::GITLAB_HEADERS));
+        self::assertSame(self::GITLAB_HEADERS, self::strip(new BufferIO(), self::GITLAB, self::GITLAB_HEADERS));
+    }
+
+    /** A self-hosted instance counts only once it is a `gitlab-domains` entry Composer resolves the request to. */
+    public function testASelfHostedGitlabIsResolvedThroughTheConfiguredDomains(): void
+    {
+        $io = new BufferIO();
+        $io->setAuthentication('git.example.com', 'composer-token', 'private-token');
+        $url = 'https://git.example.com/api/v4/projects/group%2Fproject/repository/commits?all=true&per_page=1';
+
+        self::assertSame(self::GITLAB_WITHOUT_TOKEN, self::strip($io, $url, self::GITLAB_HEADERS, self::config(['gitlab.com', 'git.example.com'])));
+        // Credentials stored under a plain host are found the same way with or without the domain
+        // list — this is what AuthHelper's hasAuthentication($origin) does for any host.
+        self::assertSame(self::GITLAB_WITHOUT_TOKEN, self::strip($io, $url, self::GITLAB_HEADERS));
+    }
+
+    /** A domain in a non-root context (`gitlab.example.com/gitlab`) is what Composer stores the credentials under. */
+    public function testAGitlabDomainWithAPathPrefixIsTheOriginComposerResolves(): void
+    {
+        $io = new BufferIO();
+        $io->setAuthentication('gitlab.example.com/gitlab', 'composer-token', 'private-token');
+        $url = 'https://gitlab.example.com/gitlab/api/v4/projects/group%2Fproject/repository/commits?all=true&per_page=1';
+
+        self::assertSame(self::GITLAB_WITHOUT_TOKEN, self::strip($io, $url, self::GITLAB_HEADERS, self::config(['gitlab.example.com/gitlab'])));
+        self::assertSame(self::GITLAB_HEADERS, self::strip($io, $url, self::GITLAB_HEADERS, self::config(['gitlab.com'])));
+    }
+
+    /** Bitbucket credentials live under bitbucket.org while the API is api.bitbucket.org; AuthHelper bridges the two. */
+    public function testBitbucketCredentialsUnderTheSiteHostCoverTheApiHost(): void
+    {
+        $io = new BufferIO();
+        $io->setAuthentication('bitbucket.org', 'x-token-auth', 'bearer-token');
+
+        self::assertSame(['User-Agent: lockrot'], self::strip($io, self::BITBUCKET, ['User-Agent: lockrot', 'Authorization: Bearer mine']));
+        self::assertSame(['User-Agent: lockrot', 'Authorization: Bearer mine'], self::strip(new BufferIO(), self::BITBUCKET, ['User-Agent: lockrot', 'Authorization: Bearer mine']));
     }
 }

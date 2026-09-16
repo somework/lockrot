@@ -10,7 +10,7 @@ use Composer\IO\IOInterface;
 use Composer\Util\Platform;
 use Lockrot\Clock;
 use Lockrot\Config\Policy;
-use Lockrot\Data\GitHub\TokenResolver;
+use Lockrot\Data\Forge\Tokens;
 use Lockrot\Data\Http\HttpClientInterface;
 use Lockrot\Deadline;
 use Lockrot\Exception\ConfigException;
@@ -192,11 +192,12 @@ final class SelfUpdateCommand extends BaseCommand
         $client = new ComposerHttpClient(
             Factory::createHttpDownloader($io, $config),
             $io,
+            $config,
             Clock::fromEnvironment($env),
             Deadline::inSeconds(self::BUDGET_SECONDS)
         );
 
-        return [$client, TokenResolver::resolve($env, ServiceFactory::githubTokenFromComposer($config))];
+        return [$client, Tokens::fromEnvironment($env, ServiceFactory::githubTokenFromComposer($config))->github()];
     }
 
     private function writeError(OutputInterface $output, string $message): void

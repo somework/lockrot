@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\SelfUpdate;
 
 use Composer\Semver\VersionParser;
-use Lockrot\Data\GitHub\GitHubClient;
+use Lockrot\Data\Forge\GitHubApi;
 use Lockrot\Data\Http\HttpClientInterface;
 use Lockrot\Data\Http\HttpResult;
 use Lockrot\Exception\ConfigException;
@@ -17,7 +17,7 @@ use Lockrot\Exception\ConfigException;
  * excludes drafts and pre-releases, so there is no channel to pick.
  *
  * The request carries the same headers the analyzer's GitHub calls do
- * ({@see GitHubClient::headersFor()}), so `GITHUB_TOKEN`, `LOCKROT_GITHUB_TOKEN` and Composer's
+ * ({@see GitHubApi::headersFor()}), so `GITHUB_TOKEN`, `LOCKROT_GITHUB_TOKEN` and Composer's
  * `github-oauth` all lift the 60-requests-per-hour anonymous limit here too.
  *
  * Every failure — no release, an unreachable API, a body that is not JSON, a tag that is not a
@@ -69,7 +69,7 @@ final class ReleaseLocator
     /** @return array<string, mixed> the decoded `releases/latest` body */
     private function fetch(): array
     {
-        $result = $this->http->fetchAll([$this->url], GitHubClient::headersFor($this->token))[$this->url];
+        $result = $this->http->fetchAll([$this->url], GitHubApi::headersFor($this->token))[$this->url];
         if ($result->isNotFound()) {
             throw new ConfigException('no published release found');
         }

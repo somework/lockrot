@@ -13,6 +13,7 @@ use Lockrot\Composer\ComposerHttpClient;
 use Lockrot\Composer\ServiceFactory;
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Data\Cache\ArrayCache;
+use Lockrot\Data\Forge\Tokens;
 use Lockrot\Data\Http\CachingHttpClient;
 use Lockrot\Deadline;
 use Lockrot\Lock\LockFile;
@@ -52,7 +53,7 @@ final class ServiceFactoryTest extends TestCase
         $config = new Config(false, sys_get_temp_dir());
         $config->merge(['config' => ['cache-dir' => $this->tempCacheDir(), 'home' => sys_get_temp_dir()]]);
         $lockrot = LockrotConfig::fromSources([], [], [], '8.4.0', null);
-        $analyzer = ServiceFactory::createAnalyzer(new NullIO(), $config, [], $lockrot, null, Clock::fixed('2026-09-14T00:00:00+00:00'));
+        $analyzer = ServiceFactory::createAnalyzer(new NullIO(), $config, [], $lockrot, Tokens::none(), Clock::fixed('2026-09-14T00:00:00+00:00'));
         self::assertInstanceOf(Analyzer::class, $analyzer);
     }
 
@@ -105,7 +106,7 @@ final class ServiceFactoryTest extends TestCase
             $this->configWithTempCache(),
             [],
             $lockrot,
-            null,
+            Tokens::none(),
             Clock::fixed(self::NOW),
             self::deadline(5.0, 1000.0)
         );
@@ -118,7 +119,7 @@ final class ServiceFactoryTest extends TestCase
     public function testWithoutADeadlineTheAnalyzerRunsUnbounded(): void
     {
         $lockrot = LockrotConfig::fromSources([], [], [], '8.4.0', null);
-        $analyzer = ServiceFactory::createAnalyzer(new NullIO(), $this->configWithTempCache(), [], $lockrot, null, Clock::fixed(self::NOW));
+        $analyzer = ServiceFactory::createAnalyzer(new NullIO(), $this->configWithTempCache(), [], $lockrot, Tokens::none(), Clock::fixed(self::NOW));
 
         // An empty lock keeps this off the network while still running the branch the deadline guards.
         $report = $analyzer->analyze(LockFile::fromArray(['packages' => []]), ProjectConfig::empty(), false);

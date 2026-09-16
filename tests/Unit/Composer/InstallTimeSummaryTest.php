@@ -21,8 +21,11 @@ use Lockrot\Analyzer\Analyzer;
 use Lockrot\Clock;
 use Lockrot\Composer\InstallTimeSummary;
 use Lockrot\Config\LockrotConfig;
-use Lockrot\Data\GitHub\GitHubClient;
-use Lockrot\Data\GitHub\GitHubFetchPlanner;
+use Lockrot\Data\Forge\ActivityClient;
+use Lockrot\Data\Forge\ActivityFetchPlanner;
+use Lockrot\Data\Forge\ForgeAuth;
+use Lockrot\Data\Forge\RepoLocator;
+use Lockrot\Data\Forge\Tokens;
 use Lockrot\Data\Http\RecordedHttpClient;
 use Lockrot\Data\Php\PhpReleaseDates;
 use Lockrot\Data\Repository\MetadataBatch;
@@ -247,7 +250,7 @@ final class InstallTimeSummaryTest extends TestCase
      * The same shape LockrotCommandTest::command() uses: the class-level fixture-server loader for
      * repository metadata and recorded GitHub envelopes, so no test in this class touches the network.
      *
-     * @return callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, ?string, Clock, Deadline): Analyzer
+     * @return callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, Tokens, Clock, Deadline): Analyzer
      */
     private function analyzerFactory(?MetadataLoaderInterface $loader = null): callable
     {
@@ -256,11 +259,14 @@ final class InstallTimeSummaryTest extends TestCase
             self::assertNotNull($loader);
         }
 
-        return static function (IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, ?string $token, Clock $clock, Deadline $deadline) use ($loader): Analyzer {
+        return static function (IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, Tokens $tokens, Clock $clock, Deadline $deadline) use ($loader): Analyzer {
+            $auth = ForgeAuth::withTokens(new Tokens('recorded', null));
+
             return new Analyzer(
                 $loader,
-                new GitHubClient(new RecordedHttpClient(__DIR__.'/../../fixtures/http/github'), 'recorded'),
-                new GitHubFetchPlanner(true),
+                new ActivityClient(new RecordedHttpClient(__DIR__.'/../../fixtures/http/github'), $auth),
+                new ActivityFetchPlanner($auth),
+                new RepoLocator(),
                 BuiltinAllowlist::load(),
                 SignalSet::default($clock, $lockrot->thresholds(), $lockrot->targetPhp(), PhpReleaseDates::load()),
                 new VerdictEngine(),
@@ -655,11 +661,11 @@ final class InstallTimeSummaryTest extends TestCase
     }
 
     /** @param list<RepositoryInterface> $repositories */
-    private function recordingAnalyzerFactory(IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, ?string $token, Clock $clock, Deadline $deadline): Analyzer
+    private function recordingAnalyzerFactory(IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, Tokens $tokens, Clock $clock, Deadline $deadline): Analyzer
     {
         $this->recordedDeadline = $deadline;
 
-        return ($this->analyzerFactory())($io, $config, $repositories, $lockrot, $token, $clock, $deadline);
+        return ($this->analyzerFactory())($io, $config, $repositories, $lockrot, $tokens, $clock, $deadline);
     }
 
     private function tempDir(string $prefix): string
