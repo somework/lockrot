@@ -58,10 +58,10 @@ jobs:
       - name: Tests with coverage (whole src, informational)
         run: vendor/bin/phpunit --coverage-text --only-summary-for-coverage-text
       # coverage-check reads the clover <metrics> "elements" attribute (methods + statements + conditionals
-      # combined), not PHPUnit's "Lines" %. The gated set measures 97.33% elements (2221/2282, 2026-09-16, src/Data/Forge included);
+      # combined), not PHPUnit's "Lines" %. The gated set measures 97.42% elements (2232/2291, 2026-09-16, src/Data/Forge included);
       # among the uncovered ones are PharUpdater's Windows copy() branch, short-write branch and
       # chmod-refused branch, none of which can be provoked on the runner.
-      # The formula would give floor(97.33) - 2 = 95; the gate stays at 94, which the suite clears with
+      # The formula would give floor(97.42) - 2 = 95; the gate stays at 94, which the suite clears with
       # ~3 points to spare, so the number does not move every time a file is added.
       - name: Core coverage gate
         run: |
