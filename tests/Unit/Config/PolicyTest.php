@@ -11,6 +11,7 @@ use Lockrot\Baseline\BaselineEntry;
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Config\Policy;
 use Lockrot\Verdict\Finding;
+use Lockrot\Verdict\Priority;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\TestCase;
 
@@ -44,6 +45,37 @@ final class PolicyTest extends TestCase
         self::assertSame(0, Policy::exitCode($this->report([Verdict::STALE, Verdict::PINNED]), $this->config('silent')));
         self::assertSame(1, Policy::exitCode($this->report([Verdict::STALE]), $this->config('stale')));
         self::assertSame(0, Policy::exitCode($this->report([Verdict::UNKNOWN, Verdict::FINISHED, Verdict::OK]), $this->config('stale')));
+    }
+
+    /**
+     * A priority threshold reads where the package sits in the project, not only what was observed:
+     * the same `abandoned` verdict is `critical` on a direct production requirement and `medium` on
+     * a transitive development one.
+     */
+    public function testAPriorityThresholdReadsThePriorityNotTheVerdict(): void
+    {
+        $at = new \DateTimeImmutable('2026-09-14T00:00:00+00:00');
+        $directProd = new Finding('a/direct', '1.0.0', Verdict::ABANDONED, [], ['a/direct'], null, $at);
+        $transitiveDev = new Finding('a/deep', '1.0.0', Verdict::ABANDONED, [], ['a/root', 'a/deep'], null, $at, null, true);
+        self::assertSame(Priority::CRITICAL, $directProd->priority());
+        self::assertSame(Priority::MEDIUM, $transitiveDev->priority());
+        $report = static fn (Finding ...$findings): Report => new Report(array_values($findings), [], $at, \count($findings), 0, false);
+
+        self::assertSame(1, Policy::exitCode($report($directProd), $this->config('critical')));
+        self::assertSame(0, Policy::exitCode($report($transitiveDev), $this->config('critical')));
+        self::assertSame(0, Policy::exitCode($report($transitiveDev), $this->config('high')));
+        self::assertSame(1, Policy::exitCode($report($transitiveDev), $this->config('medium')), 'inclusive, like the verdict threshold');
+        self::assertSame(1, Policy::exitCode($report($transitiveDev), $this->config('low')));
+        self::assertSame(1, Policy::exitCode($report($transitiveDev, $directProd), $this->config('critical')), 'any one finding at the threshold fails the run');
+        self::assertSame(0, Policy::exitCode($this->report([Verdict::UNKNOWN, Verdict::OK]), $this->config('low')), 'an unflagged finding has no priority to reach');
+    }
+
+    public function testAnAcceptedFindingNeverFailsAPriorityThresholdEither(): void
+    {
+        $report = $this->baselinedReport([['a/known', Verdict::ABANDONED]], [['a/known', Verdict::ABANDONED], ['a/fresh', Verdict::STALE]]);
+
+        self::assertSame(0, Policy::exitCode($report, $this->config('critical')), 'a/known is critical but accepted; a/fresh is medium');
+        self::assertSame(1, Policy::exitCode($report, $this->config('medium')), 'a/fresh is new and medium');
     }
 
     public function testStrictNetwork(): void

@@ -4,7 +4,7 @@
     "properties": {
         "fail-on": {
             "type": "string",
-            "enum": ["none", "abandoned", "silent", "pinned", "old-promise", "stale"]
+            "enum": ["none", "abandoned", "silent", "pinned", "old-promise", "stale", "critical", "high", "medium", "low"]
         },
         "target-php": {
             "type": "string",

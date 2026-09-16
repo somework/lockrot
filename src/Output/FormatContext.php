@@ -6,6 +6,7 @@ namespace Lockrot\Output;
 
 use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Config\LockrotConfig;
+use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
 use Lockrot\Version;
@@ -35,21 +36,21 @@ final class FormatContext
     public const MIN_WIDTH = 40;
 
     private ?string $lockPath;
-    private string $failOn;
+    private FailOn $failOn;
     private string $toolVersion;
     private int $terminalWidth;
 
     private function __construct(?string $lockPath, string $failOn, string $toolVersion, int $terminalWidth)
     {
         $this->lockPath = $lockPath;
-        $this->failOn = $failOn;
+        $this->failOn = FailOn::fromString($failOn);
         $this->toolVersion = $toolVersion;
         $this->terminalWidth = max(self::MIN_WIDTH, $terminalWidth);
     }
 
     /**
      * @param null|string $lockPath      absolute path of the analysed composer.lock, null when unknown
-     * @param string      $failOn        the resolved fail-on, LockrotConfig::FAIL_ON_NONE when none
+     * @param string      $failOn        the resolved fail-on — a verdict, a priority or LockrotConfig::FAIL_ON_NONE
      * @param int         $terminalWidth columns available for `table`, clamped to MIN_WIDTH
      */
     public static function create(?string $lockPath, string $failOn, string $toolVersion = Version::STRING, int $terminalWidth = self::DEFAULT_WIDTH): self
@@ -70,7 +71,7 @@ final class FormatContext
 
     public function failOn(): string
     {
-        return $this->failOn;
+        return $this->failOn->value();
     }
 
     public function toolVersion(): string
@@ -87,8 +88,9 @@ final class FormatContext
     /**
      * The annotation severity a finding is reported at, shared by every format that has one, so the
      * colour a reviewer sees matches the exit code the same run produces: a finding that on its own
-     * would make `composer lockrot` exit 1 is an error, anything else flagged is a warning, and the
-     * rows that only appear under --all are notes.
+     * would make `composer lockrot` exit 1 is an error — at or above the fail-on verdict, or at or
+     * above the fail-on priority when the threshold is one — anything else flagged is a warning,
+     * and the rows that only appear under --all are notes.
      *
      * The match is with the fail-on threshold, not with the exit code in every case: --strict-network
      * exits 1 on an unreachable repository or GitHub even when nothing is flagged (see
@@ -109,11 +111,10 @@ final class FormatContext
         if ($baseline !== null && $baseline->isKnown($finding->package())) {
             return self::LEVEL_NOTE;
         }
-        $verdict = $finding->verdict();
-        if ($this->failOn !== LockrotConfig::FAIL_ON_NONE && Verdict::severity($verdict) >= Verdict::severity($this->failOn)) {
+        if ($this->failOn->reaches($finding)) {
             return self::LEVEL_ERROR;
         }
 
-        return Verdict::flagged($verdict) ? self::LEVEL_WARNING : self::LEVEL_NOTE;
+        return Verdict::flagged($finding->verdict()) ? self::LEVEL_WARNING : self::LEVEL_NOTE;
     }
 }

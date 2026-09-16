@@ -17,6 +17,14 @@ final class ConfigSchemaTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
+    public function testFailOnAcceptsThePrioritiesToo(): void
+    {
+        foreach (['critical', 'high', 'medium', 'low'] as $priority) {
+            ConfigSchema::validate(['fail-on' => $priority]);
+        }
+        $this->addToAssertionCount(4);
+    }
+
     public function testFullValidConfigIsValid(): void
     {
         ConfigSchema::validate([

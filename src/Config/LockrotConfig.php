@@ -7,11 +7,11 @@ namespace Lockrot\Config;
 use Lockrot\Data\Php\PhpReleaseDates;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Signal\Thresholds;
-use Lockrot\Verdict\Verdict;
+use Lockrot\Verdict\FailOn;
 
 final class LockrotConfig
 {
-    public const FAIL_ON_NONE = 'none';
+    public const FAIL_ON_NONE = FailOn::NONE;
     public const FORMATS = ['table', 'json', 'github', 'sarif', 'gitlab', 'markdown'];
     public const DEFAULT_INSTALL_TIME_BUDGET = 5;
     private const INSTALL_TIME_BUDGET_MIN = 1;
@@ -137,16 +137,12 @@ final class LockrotConfig
      * @param array<string, mixed> $extra
      * @param array<string, mixed> $env
      * @param array<string, mixed> $cli
+     *
+     * @return string a verdict, a priority or `none`; {@see FailOn::fromString()} rejects anything else
      */
     private static function resolveFailOn(array $extra, array $env, array $cli): string
     {
-        $failOn = self::pick([$cli['fail-on'] ?? null, $env['LOCKROT_FAIL_ON'] ?? null, $extra['fail-on'] ?? null], self::FAIL_ON_NONE);
-        if ($failOn !== self::FAIL_ON_NONE && (!Verdict::isValid($failOn) || !Verdict::flagged($failOn))) {
-            $allowed = implode(', ', array_values(array_filter(Verdict::all(), static fn (string $verdict): bool => Verdict::flagged($verdict))));
-            throw new ConfigException(\sprintf('fail-on must be one of none, %s; got "%s"', $allowed, $failOn));
-        }
-
-        return $failOn;
+        return FailOn::fromString(self::pick([$cli['fail-on'] ?? null, $env['LOCKROT_FAIL_ON'] ?? null, $extra['fail-on'] ?? null], self::FAIL_ON_NONE))->value();
     }
 
     /**
@@ -217,6 +213,7 @@ final class LockrotConfig
         return $default;
     }
 
+    /** The resolved `fail-on` value — a verdict, a priority or `none`; {@see FailOn::fromString()} reads it. */
     public function failOn(): string
     {
         return $this->failOn;

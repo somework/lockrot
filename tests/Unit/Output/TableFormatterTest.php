@@ -267,7 +267,7 @@ final class TableFormatterTest extends TestCase
 
         self::assertSame('6 packages checked · abandoned 2 · silent 0 · pinned 0 · old-promise 0 · stale 2 · unknown 0 · finished 1 · ok 1', $tail[0]);
         self::assertSame('priority: critical 1 · high 1 · medium 1 · low 1', $tail[1]);
-        self::assertSame('Data as of 2026-09-14 (package repositories, GitHub). Run composer lockrot --format=json for details.', $tail[2]);
+        self::assertSame('Data as of 2026-09-14 (package repositories, repository hosts). Run composer lockrot --format=json for details.', $tail[2]);
         self::assertSame('note: GitHub token not set: repository activity checked only for 2 candidate packages (0 skipped); set GITHUB_TOKEN to check all', $tail[3]);
     }
 

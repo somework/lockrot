@@ -421,6 +421,24 @@ final class LockrotCommandTest extends TestCase
         self::assertStringContainsString('| Package | Version | Verdict | Evidence | Via |', $display);
     }
 
+    /**
+     * The laravel skeleton's one finding is `stale` on a transitive package — priority `low`. The
+     * verdict threshold `stale` fails on it wherever it sits; the priority threshold `medium` lets
+     * it pass and `low` does not. wallabag has direct `critical` rows, so `critical` fails there.
+     */
+    public function testAPriorityFailOnDecidesTheExitCode(): void
+    {
+        chdir(__DIR__.'/../../fixtures/skeletons/laravel');
+        foreach (['stale' => 1, 'medium' => 0, 'low' => 1, 'none' => 0] as $failOn => $code) {
+            $tester = $this->tester($this->loader());
+            self::assertSame($code, $tester->execute(['--fail-on' => $failOn, '--target-php' => '8.4']), $failOn."\n".$tester->getDisplay());
+        }
+
+        chdir(__DIR__.'/../../fixtures/apps/wallabag_wallabag');
+        $tester = $this->tester($this->loader());
+        self::assertSame(1, $tester->execute(['--fail-on' => 'critical', '--target-php' => '8.4']), $tester->getDisplay());
+    }
+
     public function testCleanProjectExitZero(): void
     {
         chdir(__DIR__.'/../../fixtures/skeletons/laravel');

@@ -9,9 +9,9 @@ namespace Lockrot\Verdict;
  *
  * The verdict says *what* was observed about a package; the priority says *how loudly it applies to
  * this project*. A package flagged the same way matters less when nothing requires it directly, and
- * less again when it is only ever installed for development. Nothing keys a decision off the
- * priority: the exit code, `fail-on` and the baseline all stay on the verdict. The priority orders
- * the report and is carried in every output format.
+ * less again when it is only ever installed for development. The priority orders the report, is
+ * carried in every output format, and decides the exit code only when `fail-on` names a priority
+ * ({@see FailOn}); the baseline stays on the verdict.
  */
 final class Priority
 {

@@ -249,7 +249,7 @@ ok 107
 priority: critical 3 · high 58 · medium 12 · low 2
 pulled in by: wallabag/rulerz-bundle 15 · wallabag/rulerz 14 · wallabag/phpepub 5 · friendsofsymfony/jsrouting-bundle
 2 · friendsofsymfony/oauth-server-bundle 2 · … and 21 more
-Data as of 2026-09-15 (package repositories, GitHub). Run composer lockrot --format=json for details.
+Data as of 2026-09-15 (package repositories, repository hosts). Run composer lockrot --format=json for details.
 ```
 
 ## The same run as JSON
@@ -363,7 +363,7 @@ No dependency rot found in 20 packages.
 
 20 packages checked · abandoned 0 · silent 0 · pinned 0 · old-promise 0 · stale 0 · unknown 0
 · finished 11 · ok 9
-Data as of 2026-09-15 (package repositories, GitHub). Run composer lockrot --format=json for
+Data as of 2026-09-15 (package repositories, repository hosts). Run composer lockrot --format=json for
 details.
 ```
 

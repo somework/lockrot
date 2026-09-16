@@ -66,7 +66,7 @@ final class LockrotCommand extends BaseCommand
             ->setAliases(['rot'])
             ->setDescription('Shows dependency rot in composer.lock: abandoned, silent, pinned and old-promise packages')
             ->addOption('format', null, InputOption::VALUE_REQUIRED, 'Output format: table, json, github (workflow annotations), sarif (SARIF 2.1.0), gitlab (Code Quality JSON) or markdown (PR comment)')
-            ->addOption('fail-on', null, InputOption::VALUE_REQUIRED, 'Exit 1 when a finding reaches this verdict: none, abandoned, silent, pinned, old-promise, stale')
+            ->addOption('fail-on', null, InputOption::VALUE_REQUIRED, 'Exit 1 when a finding reaches this verdict (none, abandoned, silent, pinned, old-promise, stale) or priority (critical, high, medium, low)')
             ->addOption('target-php', null, InputOption::VALUE_REQUIRED, 'PHP version the project targets, e.g. 8.4 (default: config.platform.php or the running PHP)')
             ->addOption('dev', null, InputOption::VALUE_NONE, 'Include packages-dev')
             ->addOption('all', null, InputOption::VALUE_NONE, 'Show every package, not only flagged ones')

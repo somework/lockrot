@@ -102,6 +102,20 @@ final class LockrotConfigTest extends TestCase
         self::assertSame('8.1', LockrotConfig::fromSources([], [], [], '8.5.10', '8.1.0')->targetPhp());
     }
 
+    public function testFailOnAcceptsAPriorityFromEverySource(): void
+    {
+        self::assertSame('high', LockrotConfig::fromSources([], [], ['fail-on' => 'high'], '8.5.10', null)->failOn());
+        self::assertSame('low', LockrotConfig::fromSources([], ['LOCKROT_FAIL_ON' => 'low'], [], '8.5.10', null)->failOn());
+        self::assertSame('critical', LockrotConfig::fromSources(['fail-on' => 'critical'], [], [], '8.5.10', null)->failOn());
+        self::assertSame('medium', LockrotConfig::fromSources(['fail-on' => 'medium'], [], [], '8.5.10', null)->failOn());
+    }
+
+    /** `none` is the absence of a threshold, not a priority level a run can fail on. */
+    public function testThePriorityNoneIsTheSameNoneAsAlways(): void
+    {
+        self::assertSame(LockrotConfig::FAIL_ON_NONE, LockrotConfig::fromSources([], [], ['fail-on' => 'none'], '8.5.10', null)->failOn());
+    }
+
     public function testPrecedenceCliOverEnvOverExtra(): void
     {
         $cfg = LockrotConfig::fromSources(['fail-on' => 'stale', 'target-php' => '8.2'], ['LOCKROT_FAIL_ON' => 'silent', 'LOCKROT_TARGET_PHP' => '8.3'], ['fail-on' => 'abandoned'], '8.5.10', null);
@@ -129,6 +143,7 @@ final class LockrotConfigTest extends TestCase
     public function testInvalidFailOn(): void
     {
         $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('fail-on must be one of none, abandoned, silent, pinned, old-promise, stale, critical, high, medium, low; got "dead"');
         LockrotConfig::fromSources([], [], ['fail-on' => 'dead'], '8.5.10', null);
     }
 

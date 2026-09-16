@@ -9,6 +9,7 @@ use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Baseline\BaselineEntry;
 use Lockrot\Config\LockrotConfig;
+use Lockrot\Exception\ConfigException;
 use Lockrot\Output\FormatContext;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
@@ -52,6 +53,26 @@ final class FormatContextTest extends TestCase
         self::assertSame(FormatContext::LEVEL_ERROR, $context->levelOf($this->finding('a/b', Verdict::SILENT)));
         self::assertSame(FormatContext::LEVEL_WARNING, $context->levelOf($this->finding('a/b', Verdict::STALE)));
         self::assertSame(FormatContext::LEVEL_NOTE, $context->levelOf($this->finding('a/b', Verdict::OK)));
+    }
+
+    /** The annotation level follows a priority threshold the way it follows a verdict one. */
+    public function testAPriorityThresholdDrawsTheErrorLineByPriority(): void
+    {
+        $context = FormatContext::create(null, 'high', Version::STRING);
+        $directAbandoned = $this->finding('a/direct', Verdict::ABANDONED);
+        $transitiveStale = new Finding('a/deep', '1.0.0', Verdict::STALE, [], ['a/root', 'a/deep'], null, new \DateTimeImmutable(self::AT));
+
+        self::assertSame('high', $context->failOn());
+        self::assertSame(FormatContext::LEVEL_ERROR, $context->levelOf($directAbandoned));
+        self::assertSame(FormatContext::LEVEL_WARNING, $context->levelOf($transitiveStale));
+        self::assertSame(FormatContext::LEVEL_NOTE, $context->levelOf($this->finding('a/b', Verdict::OK)));
+        self::assertSame(FormatContext::LEVEL_NOTE, $context->levelOf($directAbandoned, $this->comparison([['a/direct', Verdict::ABANDONED]], $this->report($directAbandoned))), 'accepted stays a note');
+    }
+
+    public function testAThresholdThatIsNeitherAVerdictNorAPriorityIsRejected(): void
+    {
+        $this->expectException(ConfigException::class);
+        FormatContext::create(null, 'dead', Version::STRING);
     }
 
     public function testFailOnNoneNeverProducesAnError(): void

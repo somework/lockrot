@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Config;
 
 use Lockrot\Analyzer\Report;
-use Lockrot\Verdict\Verdict;
+use Lockrot\Verdict\FailOn;
 
 final class Policy
 {
@@ -18,19 +18,21 @@ final class Policy
         if (self::strictNetworkTripped($report, $config)) {
             return self::EXIT_FINDINGS;
         }
-        if ($config->failOn() === LockrotConfig::FAIL_ON_NONE) {
+        $threshold = FailOn::fromString($config->failOn());
+        if ($threshold->isNone()) {
             return self::EXIT_OK;
         }
         $baseline = $report->baseline();
-        $threshold = Verdict::severity($config->failOn());
         foreach ($report->findings() as $finding) {
             // With a baseline present only new and worsened findings are measured against fail-on:
             // a finding the project has already accepted never fails a build again, and a baseline
-            // entry whose package has left the lock is reported as stale, not failed on.
+            // entry whose package has left the lock is reported as stale, not failed on. The
+            // baseline is keyed by verdict; a priority threshold changes what is measured, not what
+            // counts as accepted.
             if ($baseline !== null && $baseline->isKnown($finding->package())) {
                 continue;
             }
-            if (Verdict::severity($finding->verdict()) >= $threshold) {
+            if ($threshold->reaches($finding)) {
                 return self::EXIT_FINDINGS;
             }
         }

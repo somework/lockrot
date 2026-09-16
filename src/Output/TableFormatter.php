@@ -255,7 +255,7 @@ final class TableFormatter implements FormatterInterface
             $texts[] = $baseline->summaryLine();
         }
         $texts[] = \sprintf(
-            'Data as of %s (package repositories, GitHub). Run composer lockrot --format=json for details.',
+            'Data as of %s (package repositories, repository hosts). Run composer lockrot --format=json for details.',
             $report->generatedAt()->format('Y-m-d')
         );
         foreach ($report->notes() as $note) {
