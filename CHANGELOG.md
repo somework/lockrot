@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- The mutation-testing gate now covers the analyzer and every output format as well as the verdict
+  engine and the signals (MSI threshold 97, from 94 over the narrower scope). No behaviour changes;
+  the code the mutants proved dead or redundant is gone, and the behaviour they proved untested is
+  now tested.
+
 ## [0.3.0] - 2026-09-16
 
 ### Added

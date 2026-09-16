@@ -1,6 +1,6 @@
 {
     "source": {
-        "directories": ["src/Verdict", "src/Signal"]
+        "directories": ["src/Verdict", "src/Signal", "src/Output", "src/Analyzer"]
     },
     // The full suite takes ~30s on a developer machine, well past Infection's 10s default. With that
     // default, every mutant whose covering tests reach the integration suite came back as "required
@@ -15,20 +15,25 @@
     "mutators": {
         "@default": true
     },
-    // Baseline over src/Verdict + src/Signal: 269 mutants, 264 killed, 5 escaped, 0 timed out ->
-    // MSI = Covered MSI = 98.14%, 1m21s on 4 threads. All 5 escapes are in
-    // src/Signal/ConstraintOpenness.php (CastInt, IncrementInteger, DecrementInteger,
-    // ConcatOperandRemoval); each was checked by hand and is equivalent (numeric strings compare
-    // numerically, every mutated integer stays below any PHP major, and normalize("8.4") equals
-    // normalize("8.4.0")), so they are the honest floor of this scope, not a test gap.
+    // Scope widened to src/Output + src/Analyzer on 2026-09-16. Before: 1175 mutants, 76 escaped,
+    // MSI 93.53%; 59 of those were real gaps or dead code (see the tests and refactors of that
+    // date). After: 1130 mutants, 9 escaped, 0 timed out -> MSI = Covered MSI 99.2%, ~1m35s on
+    // 8 threads. Each escape was checked by hand and is equivalent, the honest floor of this scope:
+    //  - src/Signal/ConstraintOpenness.php (5: CastInt x2, IncrementInteger, DecrementInteger,
+    //    ConcatOperandRemoval): numeric strings compare numerically, every mutated integer stays
+    //    below any PHP major, and normalize("8.4") equals normalize("8.4.0").
+    //  - src/Analyzer/Report.php flagged() UnwrapArrayValues: the findings are sorted and every
+    //    flagged one precedes every unflagged one, so the filtered keys are already 0..n; the
+    //    array_values() is what makes the `list` type true by construction.
+    //  - src/Output/JsonFormatter.php format() FalseValue: the `$showAll` default of the interface's
+    //    parameter, which the JSON document does not read (it always lists every finding).
+    //  - src/Output/TableFormatter.php label() CastString: previousVerdictOf() is never null once
+    //    the comparison says "worsened"; the cast is for the type, not for a case.
+    //  - src/Output/TerminalWidth.php detect() Coalesce: step 2 (symfony Terminal) refuses whenever
+    //    COLUMNS is set, so swapping it with step 1 (COLUMNS) is unobservable by design.
     //
-    // Extending source.directories to src/Output + src/Analyzer measures 1007 mutants, 941 killed,
-    // 66 escaped, 0 timed out -> 93.45%, 3m42s, below this threshold. 59 of the 66 escapes are in
-    // Analyzer.php and the formatters; the other 7 are equivalent mutants. Widening the scope means
-    // closing those 59 first, which is a task of its own rather than a config flip.
-    //
-    // Threshold stays 94 (floor(98.14) - 3 would be 95; 94 is kept so the number does not move
-    // every time a test is added).
-    "minMsi": 94,
-    "minCoveredMsi": 94
+    // Threshold 97 = floor of the honest MSI minus 2, so ~20 new escapes fit before the gate
+    // fails and the number does not move every time a test is added.
+    "minMsi": 97,
+    "minCoveredMsi": 97
 }
