@@ -12,6 +12,7 @@
 /.editorconfig export-ignore
 /.gitattributes export-ignore
 /bin/record-fixtures export-ignore
+/bin/record-demo export-ignore
 /docs export-ignore
 /mkdocs.yml export-ignore
 /wrangler.jsonc export-ignore

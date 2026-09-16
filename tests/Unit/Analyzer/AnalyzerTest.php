@@ -796,7 +796,8 @@ final class AnalyzerTest extends TestCase
     }
 
     /**
-     * A fake that hands back prepared results as they are — cache flags included — whatever is asked.
+     * A fake that hands back the prepared results for the URLs asked, as they are — cache flags
+     * included; a URL without a prepared result gets no entry, like a client that was never asked.
      *
      * @param array<string, HttpResult> $results
      */
@@ -814,7 +815,7 @@ final class AnalyzerTest extends TestCase
 
             public function fetchAll(array $urls, array $headers = []): array
             {
-                return $this->results;
+                return array_intersect_key($this->results, array_flip($urls));
             }
         };
     }
