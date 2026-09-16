@@ -15,3 +15,4 @@
 /.venv/
 /.playwright-mcp/
 .wrangler/
+/build/*.txt

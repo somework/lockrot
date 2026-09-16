@@ -32,7 +32,10 @@
     //  - src/Output/TerminalWidth.php detect() Coalesce: step 2 (symfony Terminal) refuses whenever
     //    COLUMNS is set, so swapping it with step 1 (COLUMNS) is unobservable by design.
     //
-    // Threshold 97 = floor of the honest MSI minus 2, so 24 new escapes fit before the gate
+    // Re-measured 2026-09-16 with FailOn and the per-forge analyzer notes in scope: 1165 mutants,
+    // the same 9 escapes, MSI = Covered MSI 99.23%, ~1m43s on 8 threads.
+    //
+    // Threshold 97 = floor of the honest MSI minus 2, so 25 new escapes fit before the gate
     // fails and the number does not move every time a test is added.
     "minMsi": 97,
     "minCoveredMsi": 97
