@@ -26,6 +26,8 @@ final class HttpResultTest extends TestCase
         $at = new \DateTimeImmutable('2026-09-14T12:34:56+00:00');
         $result = new HttpResult('https://x/y.json', 200, '{"a":1}', $at);
         self::assertSame(['a' => 1], $result->json());
+        self::assertSame(['status' => 200, 'fetched_at' => '2026-09-14T12:34:56+00:00', 'body' => '{"a":1}', 'error' => null], $result->toEnvelope());
+        self::assertSame('timeout', HttpResult::failure('u', 'timeout', $at)->toEnvelope()['error']);
         $copy = HttpResult::fromEnvelope('https://x/y.json', $result->toEnvelope());
         self::assertNotNull($copy);
         self::assertSame(200, $copy->status());
@@ -42,6 +44,8 @@ final class HttpResultTest extends TestCase
         self::assertNull(HttpResult::fromEnvelope('u', ['status' => 200, 'fetched_at' => 0, 'body' => '{}']));
         self::assertNull(HttpResult::fromEnvelope('u', ['status' => 200, 'fetched_at' => '', 'body' => '{}']), 'an empty string is not "now"');
         self::assertNull(HttpResult::fromEnvelope('u', ['status' => 200, 'fetched_at' => '2026-09-14', 'body' => '{}']), 'only the format toEnvelope() writes');
+        self::assertNull(HttpResult::fromEnvelope('u', ['status' => 200, 'fetched_at' => '2026-02-30T00:00:00+00:00', 'body' => '{}']), 'a date that parses but does not exist');
+        self::assertNull(HttpResult::fromEnvelopeJson('u', '{"fetched_at":"2026-09-14T12:00:00+00:00","body":"{}"}'), 'no status: not an envelope');
         self::assertNull(HttpResult::fromEnvelopeJson('u', '{"status":200,"fetched_at":"garbage","body":"{}"}'));
     }
 

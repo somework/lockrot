@@ -90,6 +90,11 @@ final class RepoLocatorTest extends TestCase
         self::assertSame('gitlab.example.com/gitlab', $trailing->host(), 'and kept out of the API base');
         self::assertSame('group/project', $trailing->path());
 
+        $deep = (new RepoLocator(['gitlab.example.com/git/lab']))->locate('https://gitlab.example.com/git/lab/group/project.git');
+        self::assertNotNull($deep, 'a prefix may have more than one segment');
+        self::assertSame('gitlab.example.com/git/lab', $deep->host());
+        self::assertSame('group/project', $deep->path());
+
         $ported = $locator->locate('https://gitlab.example.com:8443/gitlab/group/project.git');
         self::assertNotNull($ported, 'a URL port the entry omits, with the prefix');
         self::assertSame('gitlab.example.com:8443/gitlab', $ported->host());

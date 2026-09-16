@@ -72,13 +72,16 @@ final class HttpResult
 
     /**
      * Strictly the format {@see toEnvelope()} writes: the loose constructor reads `""` as now and
-     * `"garbage"` as an exception, and a stored answer of unknown age must be neither.
+     * `"garbage"` as an exception, and a stored answer of unknown age must be neither. A parse
+     * error makes createFromFormat() return false; a date that parses but is not real (a 30th of
+     * February) comes back as a date with a warning, which getLastErrors() reports (as an array
+     * on every PHP; before 8.2 also when there is nothing to report).
      */
     private static function parseDate(string $iso): ?\DateTimeImmutable
     {
         $at = \DateTimeImmutable::createFromFormat(\DATE_ATOM, $iso);
         $errors = \DateTimeImmutable::getLastErrors();
-        if ($at === false || ($errors !== false && ($errors['warning_count'] > 0 || $errors['error_count'] > 0))) {
+        if ($at === false || ($errors !== false && $errors['warning_count'] > 0)) {
             return null;
         }
 
