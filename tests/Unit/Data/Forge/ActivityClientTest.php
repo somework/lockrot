@@ -92,6 +92,7 @@ final class ActivityClientTest extends TestCase
         self::assertSame('2015-11-16', self::day($activity->pushedAt()));
         self::assertSame(self::FETCHED, $activity->fetchedAt()->format(\DATE_ATOM));
         self::assertSame(['github.com/gone/repo'], $batch->notFound());
+        self::assertSame(['github.com/gone/repo'], $batch->notFoundOn(RepoRef::GITHUB));
         self::assertSame([], $batch->failed());
         self::assertSame([[[self::GH_URL, 'https://api.github.com/repos/gone/repo'], ['Accept: application/vnd.github+json', 'User-Agent: lockrot', 'Authorization: token ghp_x']]], $batches->getArrayCopy());
     }
@@ -170,17 +171,29 @@ final class ActivityClientTest extends TestCase
         self::assertFalse($batch->rateLimited(RepoRef::GITHUB));
         self::assertSame(['gitlab.com/group/sub/project' => 'HTTP 429'], $batch->failedOn(RepoRef::GITLAB));
 
-        // The commits call succeeds but the project call does not: the repository is not answered.
-        $client = new ActivityClient($this->http([self::GL_COMMITS => [200, '[]'], self::GL_PROJECT => [401, '{"message":"401 Unauthorized"}']], new \ArrayObject()), ForgeAuth::withTokens(new Tokens(null, 'bad')));
+        // The commits call decides; the project call is enrichment. When it fails the commit date
+        // stands and the archived flag simply stays unknown (false) — nothing is lost that the
+        // anonymous run would have had.
+        $client = new ActivityClient($this->http([self::GL_COMMITS => [200, '[{"committed_date":"2012-01-11T17:34:28.000+01:00"}]'], self::GL_PROJECT => [403, '{"message":"403 Forbidden"}']], new \ArrayObject()), ForgeAuth::withTokens(new Tokens(null, 'glpat-x')));
+        $batch = $client->fetch([self::gitlab()]);
+        $activity = $batch->activity()['gitlab.com/group/sub/project'];
+        self::assertFalse($activity->isArchived());
+        self::assertSame('2012-01-11', self::day($activity->pushedAt()));
+        self::assertSame([], $batch->failed());
+
+        // A bad token fails the deciding call itself: the repository is not answered.
+        $client = new ActivityClient($this->http([self::GL_COMMITS => [401, '{"message":"401 Unauthorized"}'], self::GL_PROJECT => [401, '']], new \ArrayObject()), ForgeAuth::withTokens(new Tokens(null, 'bad')));
         $batch = $client->fetch([self::gitlab()]);
         self::assertSame([], $batch->activity());
         self::assertSame(['gitlab.com/group/sub/project' => 'HTTP 401'], $batch->failed());
         self::assertFalse($batch->rateLimited(RepoRef::GITLAB));
 
-        // A 404 on either call is "not found", whatever the other said.
-        $client = new ActivityClient($this->http([self::GL_COMMITS => [500, '']], new \ArrayObject()), ForgeAuth::withTokens(new Tokens(null, 'glpat-x')));
+        // A 404 on the deciding call is "not found", whatever the enrichment said.
+        $client = new ActivityClient($this->http([self::GL_PROJECT => [200, '{"archived":true}']], new \ArrayObject()), ForgeAuth::withTokens(new Tokens(null, 'glpat-x')));
         $batch = $client->fetch([self::gitlab()]);
         self::assertSame(['gitlab.com/group/sub/project'], $batch->notFound());
+        self::assertSame(['gitlab.com/group/sub/project'], $batch->notFoundOn(RepoRef::GITLAB));
+        self::assertSame([], $batch->notFoundOn(RepoRef::GITHUB));
         self::assertSame([], $batch->failed());
     }
 

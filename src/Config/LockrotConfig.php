@@ -142,6 +142,13 @@ final class LockrotConfig
      */
     private static function resolveFailOn(array $extra, array $env, array $cli): string
     {
+        // `--fail-on=` arrives as an empty string. Falling through to the next source (or to `none`)
+        // would let a typo silently turn a gated build into an ungated one, the way an empty
+        // `--baseline=` would point it at a file nobody named; both are rejected.
+        if (($cli['fail-on'] ?? null) === '') {
+            throw new ConfigException('--fail-on must not be empty');
+        }
+
         return FailOn::fromString(self::pick([$cli['fail-on'] ?? null, $env['LOCKROT_FAIL_ON'] ?? null, $extra['fail-on'] ?? null], self::FAIL_ON_NONE))->value();
     }
 

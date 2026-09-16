@@ -73,6 +73,8 @@ final class ForgeAuthTest extends TestCase
     {
         $auth = new ForgeAuth(Tokens::none(), static fn (string $host): bool => $host === 'bitbucket.org');
         self::assertTrue($auth->isAuthenticated(self::ref(self::BITBUCKET)));
+        $underApiHost = new ForgeAuth(Tokens::none(), static fn (string $host): bool => $host === 'api.bitbucket.org');
+        self::assertTrue($underApiHost->isAuthenticated(self::ref(self::BITBUCKET)), 'Composer finds credentials under the request host first');
         self::assertFalse(ForgeAuth::anonymous()->isAuthenticated(self::ref(self::BITBUCKET)));
     }
 }

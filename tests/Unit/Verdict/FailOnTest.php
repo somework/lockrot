@@ -55,7 +55,6 @@ final class FailOnTest extends TestCase
     {
         $none = FailOn::none();
         self::assertTrue($none->isNone());
-        self::assertFalse($none->isPriority());
         self::assertSame('none', $none->value());
         self::assertFalse($none->reaches(self::finding(Verdict::ABANDONED)));
         self::assertTrue(FailOn::fromString('none')->isNone());
@@ -64,7 +63,6 @@ final class FailOnTest extends TestCase
     public function testAVerdictThresholdIsInclusiveAndIgnoresWhereThePackageSits(): void
     {
         $silent = FailOn::fromString(Verdict::SILENT);
-        self::assertFalse($silent->isPriority());
         self::assertFalse($silent->isNone());
         self::assertTrue($silent->reaches(self::finding(Verdict::SILENT)));
         self::assertTrue($silent->reaches(self::finding(Verdict::ABANDONED)));
@@ -78,7 +76,6 @@ final class FailOnTest extends TestCase
     public function testAPriorityThresholdIsInclusiveAndReadsThePriority(): void
     {
         $high = FailOn::fromString(Priority::HIGH);
-        self::assertTrue($high->isPriority());
         self::assertFalse($high->isNone());
         self::assertTrue($high->reaches(self::finding(Verdict::ABANDONED)), 'critical reaches high');
         self::assertTrue($high->reaches(self::finding(Verdict::PINNED)), 'high, direct prod');

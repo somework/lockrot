@@ -344,7 +344,7 @@ final class AnalyzerTest extends TestCase
     public function testRateLimitedGitHubIsReportedAsANote(): void
     {
         $report = $this->singlePackageReport($this->ancient(), true, [403, '{"message":"API rate limit exceeded"}']);
-        self::assertStringContainsString('GitHub API rate limit reached; repository activity missing for 1 packages', implode("\n", $report->notes()));
+        self::assertStringContainsString('GitHub API rate limit reached; repository activity missing for 1 repositories', implode("\n", $report->notes()));
         self::assertTrue($report->hadNetworkFailures());
     }
 
@@ -651,10 +651,48 @@ final class AnalyzerTest extends TestCase
             'GitHub token not set: repository activity checked for 1 candidate packages, 0 packages skipped (set GITHUB_TOKEN to check all)',
             'Bitbucket credentials not set: repository activity checked for 1 candidate packages, 0 packages skipped (add bitbucket.org credentials to auth.json to check all)',
             'GitHub unreachable for 1 repositories: HTTP 500',
-            'GitLab API rate limit reached; repository activity missing for 1 packages',
+            'GitLab API rate limit reached; repository activity missing for 1 repositories',
             'Bitbucket unreachable for 1 repositories: HTTP 403',
         ], $report->notes());
         self::assertTrue($report->hadNetworkFailures());
+    }
+
+    /** A private repository answers 404 anonymously; without this note it would look like a healthy one. */
+    public function testARepositoryTheHostDoesNotAnswerForIsCountedInANote(): void
+    {
+        $packages = [self::locked('vendor/one'), self::locked('vendor/two'), self::locked('vendor/gl')];
+        $metadata = [
+            'vendor/one' => $this->metadataNamed('vendor/one', 'https://bitbucket.org/workspace/one.git'),
+            'vendor/two' => $this->metadataNamed('vendor/two', 'https://bitbucket.org/workspace/two.git'),
+            'vendor/gl' => $this->metadataNamed('vendor/gl', 'https://gitlab.com/group/pkg.git'),
+        ];
+
+        $report = $this->analyzeLock($packages, $this->loader($metadata), $this->http([]), true);
+
+        self::assertContains('Bitbucket did not answer for 2 repositories (private, renamed or removed); repository activity missing', $report->notes());
+        self::assertContains('GitLab did not answer for 1 repositories (private, renamed or removed); repository activity missing', $report->notes());
+        self::assertFalse($report->hadNetworkFailures(), 'a 404 is an answer, not a failure');
+        self::assertSame(Verdict::STALE, self::byName($report)['vendor/one']->verdict(), 'S2 alone, no S4');
+    }
+
+    /** The Bitbucket credential exchange is planning-time network work, so it must wait behind the budget check too. */
+    public function testAnExhaustedDeadlineNeverExchangesBitbucketCredentials(): void
+    {
+        $exchanges = 0;
+        $auth = new ForgeAuth(Tokens::none(), static fn (string $host): bool => false, static function () use (&$exchanges): bool {
+            ++$exchanges;
+
+            return true;
+        });
+        $packages = [self::locked('vendor/pkg')];
+        $loader = $this->loader(['vendor/pkg' => $this->metadataNamed('vendor/pkg', 'https://bitbucket.org/workspace/pkg.git')]);
+        $analyzer = $this->analyzer($loader, $this->http([]), false, new Allowlist([]), false, ActivityFetchPlanner::DEFAULT_ANONYMOUS_BUDGET, $auth)
+            ->withDeadline(Deadline::inSeconds(0.0, static fn (): float => 0.0));
+
+        $report = $analyzer->analyze(LockFile::fromArray(['packages' => $packages]), ProjectConfig::empty(), false);
+
+        self::assertSame(0, $exchanges);
+        self::assertContains('repository activity not checked: install-time budget exhausted', $report->notes());
     }
 
     public function testBitbucketActivityFeedsS4WithItsOwnWording(): void

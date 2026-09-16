@@ -185,7 +185,7 @@ which win over `composer.json`.
 [`resources/lockrot-config.schema.json`](resources/lockrot-config.schema.json). Package metadata comes
 from the repositories configured in your `composer.json`, through Composer's own repository layer —
 Private Packagist, Satis and mirrors included, with its authentication, proxy settings and metadata
-cache. Repository activity comes from GitHub and is cached for 24 hours.
+cache. Repository activity comes from GitHub, GitLab and Bitbucket Cloud and is cached for 24 hours.
 
 [Full configuration reference →](https://lockrot.dev/configuration/) ·
 [How lockrot fetches metadata →](https://lockrot.dev/internals/)
@@ -210,7 +210,7 @@ Everything is at [lockrot.dev](https://lockrot.dev).
   `gitlab-domains`) and on Bitbucket Cloud. GitHub Enterprise and Bitbucket Server are not queried.
 - Without a GitHub token, only packages that already look stale on release age (no stable release
   within `release-warn-years`, default 3y, and not already `abandoned`) are checked against GitHub,
-  capped at 50 per run; set `GITHUB_TOKEN` to lift the cap. The same cap applies on Bitbucket until
+  capped at 50 per host per run; set `GITHUB_TOKEN` to lift the cap. The same cap applies on Bitbucket until
   Composer has credentials for `bitbucket.org`. lockrot reports how many packages this affected.
 - GitLab is never capped, but its API hides the archived flag from anonymous callers: without
   `GITLAB_TOKEN` (or Composer's `gitlab-token`) a GitLab package can be `silent` but is never

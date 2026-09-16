@@ -5,12 +5,16 @@ declare(strict_types=1);
 namespace Lockrot\Data\Forge;
 
 use Lockrot\Data\Http\HttpClientInterface;
-use Lockrot\Data\Http\HttpResult;
 
 /**
  * Fetches repository activity from every forge in one go: the repositories are grouped by host
  * (headers differ per forge, and lockrot's GitLab token goes to gitlab.com alone), each group is
  * one parallel `fetchAll`, and each forge's {@see ForgeApi} reads its own answers.
+ *
+ * The first request an api lists for a repository is the one that decides: a 404 there is "not
+ * found", any other failure fails the repository. A later request is enrichment (GitLab's project
+ * document, for the archived flag) and is read when it answered; when it did not, the repository
+ * keeps what the first request said.
  */
 final class ActivityClient
 {
@@ -55,32 +59,34 @@ final class ActivityClient
             }
             $responses = $this->http->fetchAll($urls, $api->headers($this->auth->tokenFor($group[0])));
             foreach ($group as $repo) {
-                $results = [];
-                foreach ($requests[$repo->key()] as $role => $url) {
-                    $results[$role] = $responses[$url];
-                }
-                $problem = self::problem($results);
-                if ($problem !== null) {
-                    if ($problem->isNotFound()) {
-                        $notFound[] = $repo->key();
-                        continue;
-                    }
-                    if ($api->isRateLimited($problem)) {
-                        $rateLimited[$repo->forge()] = true;
-                    }
-                    $failed[$repo->forge()][$repo->key()] = $problem->error() ?? ('HTTP '.$problem->status());
-                    continue;
-                }
+                $forge = $repo->forge();
                 $json = [];
                 $fetchedAt = null;
-                foreach ($results as $role => $result) {
-                    $decoded = $result->json();
-                    if ($decoded === null) {
-                        $failed[$repo->forge()][$repo->key()] = 'invalid JSON from '.$result->url();
-                        continue 2;
+                foreach ($requests[$repo->key()] as $role => $url) {
+                    $result = $responses[$url];
+                    $decoded = $result->isOk() ? $result->json() : null;
+                    if ($fetchedAt === null) {
+                        // The deciding request.
+                        if ($result->isNotFound()) {
+                            $notFound[$forge][] = $repo->key();
+                            continue 2;
+                        }
+                        if (!$result->isOk()) {
+                            if ($api->isRateLimited($result)) {
+                                $rateLimited[$forge] = true;
+                            }
+                            $failed[$forge][$repo->key()] = $result->error() ?? ('HTTP '.$result->status());
+                            continue 2;
+                        }
+                        if ($decoded === null) {
+                            $failed[$forge][$repo->key()] = 'invalid JSON from '.$result->url();
+                            continue 2;
+                        }
+                        $fetchedAt = $result->fetchedAt();
                     }
-                    $json[$role] = $decoded;
-                    $fetchedAt ??= $result->fetchedAt();
+                    if ($decoded !== null) {
+                        $json[$role] = $decoded;
+                    }
                 }
                 $activity[$repo->key()] = $api->activity($repo, $json, $fetchedAt ?? $this->neverFetched());
             }
@@ -93,27 +99,6 @@ final class ActivityClient
     private function neverFetched(): \DateTimeImmutable
     {
         throw new \LogicException('a forge api listed no request');
-    }
-
-    /**
-     * The first answer that is not a success — a 404 ahead of any other failure, so a repository
-     * the forge does not know is "not found" whatever its second call said.
-     *
-     * @param array<string, HttpResult> $results
-     */
-    private static function problem(array $results): ?HttpResult
-    {
-        $problem = null;
-        foreach ($results as $result) {
-            if ($result->isNotFound()) {
-                return $result;
-            }
-            if (!$result->isOk() && $problem === null) {
-                $problem = $result;
-            }
-        }
-
-        return $problem;
     }
 
     /**

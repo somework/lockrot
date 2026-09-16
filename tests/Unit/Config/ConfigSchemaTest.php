@@ -6,6 +6,7 @@ namespace Lockrot\Tests\Unit\Config;
 
 use Lockrot\Config\ConfigSchema;
 use Lockrot\Exception\ConfigException;
+use Lockrot\Verdict\FailOn;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -23,6 +24,18 @@ final class ConfigSchemaTest extends TestCase
             ConfigSchema::validate(['fail-on' => $priority]);
         }
         $this->addToAssertionCount(4);
+    }
+
+    /** The schema's hand-written enum and the resolver's list are the same list, in both directions. */
+    public function testTheSchemaEnumIsExactlyWhatFailOnAccepts(): void
+    {
+        $schema = json_decode((string) file_get_contents(__DIR__.'/../../../resources/lockrot-config.schema.json'), true);
+        self::assertIsArray($schema);
+        $properties = $schema['properties'] ?? null;
+        self::assertIsArray($properties);
+        $failOn = $properties['fail-on'] ?? null;
+        self::assertIsArray($failOn);
+        self::assertSame(FailOn::allowed(), $failOn['enum'] ?? null);
     }
 
     public function testFullValidConfigIsValid(): void

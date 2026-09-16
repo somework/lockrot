@@ -93,7 +93,7 @@ final class FormatContext
      * and the rows that only appear under --all are notes.
      *
      * The match is with the fail-on threshold, not with the exit code in every case: --strict-network
-     * exits 1 on an unreachable repository or GitHub even when nothing is flagged (see
+     * exits 1 on an unreachable repository or repository host even when nothing is flagged (see
      * Policy::exitCode()), and no individual finding is the cause of that, so none is marked error
      * for it. The reason is carried by the report notes instead, which both formats emit.
      *

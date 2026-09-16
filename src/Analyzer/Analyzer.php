@@ -125,15 +125,15 @@ final class Analyzer
 
         [$allowlisted, $repoByPackage, $candidateByPackage] = $this->classify($packages, $metadata, $now);
 
-        $plan = $this->planner->select($repoByPackage, $candidateByPackage);
         if ($this->deadline->isPast()) {
             // The metadata pass already used the whole budget. Starting the forge round-trips now
             // would push the install past it, so the activity signals are dropped and the report
-            // says so rather than reading as "checked, nothing found".
+            // says so rather than reading as "checked, nothing found". Planning waits too: it may
+            // exchange Bitbucket credentials over the network ({@see ForgeAuth}).
             $activityBatch = ActivityBatch::empty();
             $activityNotes = ['repository activity not checked: install-time budget exhausted'];
         } else {
-            [$activityBatch, $activityNotes] = $this->fetchActivity($plan);
+            [$activityBatch, $activityNotes] = $this->fetchActivity($this->planner->select($repoByPackage, $candidateByPackage));
         }
         $notes = array_merge($notes, $activityNotes);
         $activity = $activityBatch->activity();
@@ -210,9 +210,15 @@ final class Analyzer
         foreach (RepoRef::FORGES as $forge) {
             $failed = $batch->failedOn($forge);
             if ($batch->rateLimited($forge)) {
-                $notes[] = \sprintf('%s API rate limit reached; repository activity missing for %d packages', RepoRef::label($forge), \count($failed));
+                $notes[] = \sprintf('%s API rate limit reached; repository activity missing for %d repositories', RepoRef::label($forge), \count($failed));
             } elseif ($failed !== []) {
                 $notes[] = \sprintf('%s unreachable for %d repositories: %s', RepoRef::label($forge), \count($failed), (string) reset($failed));
+            }
+            // A 404 is an answer, not a failure — but a private repository looks exactly like a
+            // healthy one without this line, so the report says it was not answered for.
+            $notFound = $batch->notFoundOn($forge);
+            if ($notFound !== []) {
+                $notes[] = \sprintf('%s did not answer for %d repositories (private, renamed or removed); repository activity missing', RepoRef::label($forge), \count($notFound));
             }
         }
 

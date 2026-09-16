@@ -13,7 +13,8 @@ use Lockrot\Exception\ConfigException;
  * `abandoned`, wherever the package sits in the project). A priority threshold reads how much that
  * applies to the project (`high` fails on a `critical` or `high` finding — an abandoned direct
  * production requirement, say — and lets the same verdict pass on a transitive development
- * package). `none` fails on nothing. The two vocabularies do not overlap, so one option serves both.
+ * package). `none` fails on nothing. The two vocabularies do not overlap — the priority level `none`
+ * is not a threshold and is not accepted as one — so one option serves both.
  *
  * The baseline is not consulted here: {@see \Lockrot\Config\Policy::exitCode()} skips a finding the
  * project has already accepted before asking, whichever kind of threshold is set.
@@ -91,12 +92,6 @@ final class FailOn
     public function isNone(): bool
     {
         return $this->value === self::NONE;
-    }
-
-    /** Whether the threshold names a priority rather than a verdict. */
-    public function isPriority(): bool
-    {
-        return $this->byPriority;
     }
 
     /** Whether $finding is at or above the threshold; never for `none`. */

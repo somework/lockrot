@@ -61,11 +61,17 @@ final class ComposerHttpClient implements HttpClientInterface
      */
     public function timeoutSeconds(): int
     {
-        if ($this->deadline->isNever()) {
+        return self::timeoutFor($this->deadline);
+    }
+
+    /** The per-request timeout a request issued now under $deadline may take, see {@see timeoutSeconds()}. */
+    public static function timeoutFor(Deadline $deadline): int
+    {
+        if ($deadline->isNever()) {
             return self::DEFAULT_TIMEOUT;
         }
 
-        return max(1, (int) ceil($this->deadline->remainingSeconds()));
+        return max(1, (int) ceil($deadline->remainingSeconds()));
     }
 
     /**
@@ -87,9 +93,10 @@ final class ComposerHttpClient implements HttpClientInterface
      * count when they are stored under that origin or, for `api.github.com`/`api.bitbucket.org`,
      * under the site host. Credentials stored under `api.github.com` alone never reach AuthHelper
      * and are left alone here too; a github.com OAuth token is added to api.github.com requests
-     * only, so a release download from github.com keeps lockrot's header. Two shapes of credentials make AuthHelper add something other
-     * than a header (`client-certificate`, an undecodable `custom-headers`); they are not told
-     * apart, and a request under them goes out without lockrot's token.
+     * only, so a release download from github.com keeps lockrot's header. Two shapes of credentials
+     * make AuthHelper add no credential header at all — `client-certificate` (an SSL option) and
+     * `custom-headers` whose lines carry no `Authorization`/`PRIVATE-TOKEN` — and under those
+     * lockrot's own header stays, since nothing else would authenticate the request.
      *
      * @param list<string> $headers
      *
@@ -97,25 +104,54 @@ final class ComposerHttpClient implements HttpClientInterface
      */
     public static function withoutRedundantAuthorization(IOInterface $io, Config $config, string $url, array $headers): array
     {
-        if ($url === "") {
+        if ($url === '') {
             return $headers;
         }
         $origin = Url::getOrigin($config, $url);
         if (!$io->hasAuthentication($origin)) {
+            // AuthHelper::findAuthOrigin()'s fallback, verbatim: `api.github.com` never arrives here
+            // (getOrigin() folds it into github.com) but stays listed so the two read the same.
             if (!\in_array($origin, ['api.bitbucket.org', 'api.github.com'], true) || !$io->hasAuthentication((string) substr($origin, 4))) {
                 return $headers;
             }
             $origin = (string) substr($origin, 4);
         }
+        $auth = $io->getAuthentication($origin);
         // AuthHelper's one exception: a github.com OAuth token is added to api.github.com requests
         // only, so on any other github.com URL (a release download, say) lockrot's header stays.
-        if ($origin === 'github.com' && $io->getAuthentication($origin)['password'] === 'x-oauth-basic' && preg_match('{^https?://api\.github\.com/}', $url) !== 1) {
+        if ($origin === 'github.com' && $auth['password'] === 'x-oauth-basic' && preg_match('{^https?://api\.github\.com/}', $url) !== 1) {
             return $headers;
         }
+        // Two shapes add no credential header: an SSL client certificate, and custom headers that
+        // do not carry one themselves.
+        if ($auth['username'] === 'client-certificate') {
+            return $headers;
+        }
+        if ($auth['password'] === 'custom-headers') {
+            $custom = json_decode((string) $auth['username'], true);
+            if (!\is_array($custom) || !self::carriesCredentials($custom)) {
+                return $headers;
+            }
+        }
 
-        return array_values(array_filter($headers, static function (string $header): bool {
-            return stripos($header, 'authorization:') !== 0 && stripos($header, 'private-token:') !== 0;
-        }));
+        return array_values(array_filter($headers, static fn (string $header): bool => !self::isCredentialHeader($header)));
+    }
+
+    /** @param array<mixed> $headers */
+    private static function carriesCredentials(array $headers): bool
+    {
+        foreach ($headers as $header) {
+            if (\is_string($header) && self::isCredentialHeader($header)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static function isCredentialHeader(string $header): bool
+    {
+        return stripos($header, 'authorization:') === 0 || stripos($header, 'private-token:') === 0;
     }
 
     public function fetchAll(array $urls, array $headers = []): array

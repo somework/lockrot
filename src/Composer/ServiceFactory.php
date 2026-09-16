@@ -10,6 +10,7 @@ use Composer\Factory;
 use Composer\IO\IOInterface;
 use Composer\Repository\RepositoryInterface;
 use Composer\Util\Bitbucket;
+use Composer\Util\Http\Response;
 use Composer\Util\HttpDownloader;
 use Lockrot\Allowlist\BuiltinAllowlist;
 use Lockrot\Analyzer\Analyzer;
@@ -43,7 +44,7 @@ final class ServiceFactory
         $auth = new ForgeAuth(
             $tokens,
             static fn (string $host): bool => $io->hasAuthentication($host),
-            $lockrot->offline() ? null : self::bitbucketAuthorizer($io, $config, Factory::createHttpDownloader($io, $config))
+            $lockrot->offline() ? null : self::bitbucketAuthorizer($io, $config, $deadline)
         );
 
         $analyzer = new Analyzer(
@@ -63,20 +64,32 @@ final class ServiceFactory
 
     /**
      * Composer's credentials for bitbucket.org, made sendable. `http-basic` (an Atlassian API token)
-     * and `bearer` entries need nothing: Composer's AuthHelper puts them on the wire. A
-     * `bitbucket-oauth` consumer is different — Composer loads it into the IO as a plain
-     * username/password pair and only exchanges it for a bearer token when a request comes back
-     * 401, a retry lockrot switches off ({@see ComposerHttpClient::fetchAll()}). So the exchange
-     * Composer would do on that challenge is done here, up front, with Composer's own
-     * {@see Bitbucket::requestToken()}, which stores the resulting token in the IO for AuthHelper
-     * to send. Run at most once per run and only when a Bitbucket repository is actually planned
-     * ({@see ForgeAuth}); an exchange that fails leaves the run anonymous on Bitbucket.
+     * and `bearer` entries, under either `bitbucket.org` or `api.bitbucket.org`, need nothing:
+     * Composer's AuthHelper puts them on the wire. A `bitbucket-oauth` consumer is different —
+     * Composer loads it into the IO as a plain username/password pair, and only exchanges it for a
+     * bearer token when a request comes back 401, a retry lockrot switches off
+     * ({@see ComposerHttpClient::fetchAll()}). So the exchange Composer would do on that challenge is
+     * done here, up front: the same `POST /site/oauth2/access_token` with `client_credentials` that
+     * {@see Bitbucket} sends, through a downloader whose AuthHelper adds the consumer pair as HTTP
+     * Basic, and the token is stored in the IO as `x-token-auth` — what AuthHelper sends as
+     * `Authorization: Bearer` on api.bitbucket.org from then on. Composer's own helper is not used
+     * for the exchange because it also rewrites `composer.json` and `auth.json` on the way, and a
+     * report never writes.
+     *
+     * Run at most once per run and only when a Bitbucket repository is actually planned
+     * ({@see ForgeAuth}), never once the install-time budget is spent ({@see Analyzer}); an exchange
+     * that fails leaves the run anonymous on Bitbucket, with a warning at -v.
+     *
+     * @param null|callable(): HttpDownloader $downloaderFactory the downloader to post with; Composer's own when null
      *
      * @return callable(): bool
      */
-    public static function bitbucketAuthorizer(IOInterface $io, Config $config, HttpDownloader $downloader): callable
+    public static function bitbucketAuthorizer(IOInterface $io, Config $config, Deadline $deadline, ?callable $downloaderFactory = null): callable
     {
-        return static function () use ($io, $config, $downloader): bool {
+        return static function () use ($io, $config, $deadline, $downloaderFactory): bool {
+            if ($io->hasAuthentication('api.bitbucket.org')) {
+                return true;
+            }
             if (!$io->hasAuthentication('bitbucket.org')) {
                 return false;
             }
@@ -89,11 +102,21 @@ final class ServiceFactory
                 return true;
             }
             try {
-                (new Bitbucket($io, $config, null, $downloader))->requestToken('bitbucket.org', (string) $auth['username'], (string) $auth['password']);
+                $downloader = $downloaderFactory !== null ? $downloaderFactory() : Factory::createHttpDownloader($io, $config);
+                $response = $downloader->get(Bitbucket::OAUTH2_ACCESS_TOKEN_URL, [
+                    'retry-auth-failure' => false,
+                    'http' => ['method' => 'POST', 'content' => 'grant_type=client_credentials', 'timeout' => ComposerHttpClient::timeoutFor($deadline)],
+                ]);
+                $decoded = $response instanceof Response ? $response->decodeJson() : null;
+                $token = \is_array($decoded) ? ($decoded['access_token'] ?? null) : null;
+                if (!\is_string($token) || $token === '') {
+                    throw new \RuntimeException('no access_token in the answer');
+                }
+                $io->setAuthentication('bitbucket.org', 'x-token-auth', $token);
 
                 return true;
             } catch (\Throwable $e) {
-                $io->writeError('<warning>lockrot: Bitbucket OAuth token request failed: '.$e->getMessage().'</warning>', true, IOInterface::VERBOSE);
+                $io->writeError('<warning>lockrot: Bitbucket OAuth token request failed, continuing without credentials: '.$e->getMessage().'</warning>', true, IOInterface::VERBOSE);
 
                 return false;
             }

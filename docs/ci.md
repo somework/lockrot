@@ -110,8 +110,8 @@ steps:
 `if: always()` keeps the upload running when `--fail-on` already failed the step. Each result carries the
 [priority](verdicts.md) as `rank`, the field SARIF 2.1.0 defines for it, and the same result's `properties` carry,
 among others, `priority`, `direct`, `dev`, `chain` and `direct_dependents` — every direct requirement the package is
-reachable from, see [transitive exposure](verdicts.md#transitive-exposure). The rule a result points at and its
-`level` follow the verdict. Both `github` and `sarif` point at `composer.lock` in the checkout root, so run them from
+reachable from, see [transitive exposure](verdicts.md#transitive-exposure). The rule a result points at follows the
+verdict; its `level` follows `--fail-on`, whichever kind of threshold it names. Both `github` and `sarif` point at `composer.lock` in the checkout root, so run them from
 the directory that holds the lock file.
 
 ## `--format=gitlab`

@@ -9,7 +9,7 @@ final class ActivityBatch
 {
     /** @var array<string, RepositoryActivity> */
     private array $activity;
-    /** @var list<string> */
+    /** @var array<string, list<string>> */
     private array $notFound;
     /** @var array<string, array<string, string>> */
     private array $failed;
@@ -17,10 +17,10 @@ final class ActivityBatch
     private array $rateLimited;
 
     /**
-     * @param array<string, RepositoryActivity>     $activity    keyed by {@see RepoRef::key()}
-     * @param list<string>                          $notFound    keys of repositories the forge does not know (or hides)
-     * @param array<string, array<string, string>>  $failed      forge => (key => reason)
-     * @param array<string, true>                   $rateLimited forges that answered "too many requests"
+     * @param array<string, RepositoryActivity>    $activity    keyed by {@see RepoRef::key()}
+     * @param array<string, list<string>>          $notFound    forge => keys of repositories the forge does not know (or hides)
+     * @param array<string, array<string, string>> $failed      forge => (key => reason)
+     * @param array<string, true>                  $rateLimited forges that answered "too many requests"
      */
     public function __construct(array $activity, array $notFound, array $failed, array $rateLimited)
     {
@@ -41,10 +41,16 @@ final class ActivityBatch
         return $this->activity;
     }
 
-    /** @return list<string> */
+    /** @return list<string> keys, across forges */
     public function notFound(): array
     {
-        return $this->notFound;
+        return array_merge([], ...array_values($this->notFound));
+    }
+
+    /** @return list<string> keys, for one forge */
+    public function notFoundOn(string $forge): array
+    {
+        return $this->notFound[$forge] ?? [];
     }
 
     /** @return array<string, string> key => reason, across forges */

@@ -23,8 +23,8 @@ use Lockrot\Verdict\Verdict;
  *
  * A result carries the priority twice, for the two ways a consumer reads it: as `rank`, the numeric
  * field SARIF defines for exactly this, and as `properties.priority` next to `properties.direct`
- * and `properties.dev`, the two facts it is derived from. `ruleId` and `level` stay on the verdict,
- * so a code-scanning alert's rule and severity are unchanged by it.
+ * and `properties.dev`, the two facts it is derived from. `ruleId` stays on the verdict; `level`
+ * follows the run's fail-on threshold ({@see FormatContext::levelOf()}), whichever kind it names.
  */
 final class SarifFormatter implements FormatterInterface
 {
@@ -50,7 +50,7 @@ final class SarifFormatter implements FormatterInterface
     private const DESCRIPTIONS = [
         Verdict::ABANDONED => [
             'Package is marked abandoned by its repository, or its repository is archived',
-            "The package's Composer repository marks it abandoned (Packagist by default), or its GitHub repository is archived.",
+            "The package's Composer repository marks it abandoned (Packagist by default), or its repository is archived on GitHub or GitLab.",
         ],
         Verdict::SILENT => [
             'No stable release and no repository push for a long time',

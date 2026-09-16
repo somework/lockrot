@@ -61,7 +61,7 @@ be JSON integers (`3`, not `"3"`).
 | `--offline` | Never reach the network: lockrot sets `COMPOSER_DISABLE_NETWORK=1` and rebuilds the configured repositories behind it (in plugin mode Composer has already built its own, network-enabled ones before any command runs), so repository metadata is served from Composer's own cache and repository activity from lockrot's cache. A package missing from the cache is reported as unavailable, not as absent from the repository |
 | `--strict-network` | Exit 1 (see [ci.md](ci.md)) when a configured repository or a repository host (GitHub, GitLab, Bitbucket) could not be reached |
 | `--generate-baseline` | Write this run's findings to the [baseline](baseline.md) file and exit 0, whatever `--fail-on` says — `--strict-network` is the one exception |
-| `--baseline=<path>` | Baseline file to read (or, with `--generate-baseline`, to write); relative to `composer.json` or absolute. Wins over `extra.lockrot.baseline`. An empty `--baseline=` is a configuration error (exit `2`), never a silent fall-back to the default file |
+| `--baseline=<path>` | Baseline file to read (or, with `--generate-baseline`, to write); relative to `composer.json` or absolute. Wins over `extra.lockrot.baseline`. An empty `--baseline=` is a configuration error (exit `2`), never a silent fall-back to the default file — as is an empty `--fail-on=` |
 
 `-d <dir>` points the standalone PHAR at a project; see [phar.md](phar.md).
 

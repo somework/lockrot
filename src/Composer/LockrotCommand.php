@@ -71,7 +71,7 @@ final class LockrotCommand extends BaseCommand
             ->addOption('dev', null, InputOption::VALUE_NONE, 'Include packages-dev')
             ->addOption('all', null, InputOption::VALUE_NONE, 'Show every package, not only flagged ones')
             ->addOption('offline', null, InputOption::VALUE_NONE, 'Use cached data only, never go to the network')
-            ->addOption('strict-network', null, InputOption::VALUE_NONE, 'Exit 1 when the repository or GitHub could not be reached')
+            ->addOption('strict-network', null, InputOption::VALUE_NONE, 'Exit 1 when a repository or a repository host (GitHub, GitLab, Bitbucket) could not be reached')
             ->addOption('baseline', null, InputOption::VALUE_REQUIRED, 'Baseline file to read or write (default: lockrot-baseline.json next to composer.json)')
             ->addOption('generate-baseline', null, InputOption::VALUE_NONE, 'Write the current findings to the baseline file and exit 0');
     }

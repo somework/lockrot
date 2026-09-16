@@ -82,9 +82,11 @@ final class ForgeAuth
     private function bitbucketAuthorized(): bool
     {
         if ($this->bitbucketAuthorized === null) {
+            // Composer looks credentials up under the request's own host first and then under the site
+            // host (AuthHelper::findAuthOrigin()), so either spelling authenticates the API call.
             $this->bitbucketAuthorized = $this->authorizeBitbucket !== null
                 ? ($this->authorizeBitbucket)()
-                : ($this->composerHasCredentials)('bitbucket.org');
+                : ($this->composerHasCredentials)('api.bitbucket.org') || ($this->composerHasCredentials)('bitbucket.org');
         }
 
         return $this->bitbucketAuthorized;

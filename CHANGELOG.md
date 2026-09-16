@@ -26,6 +26,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- `--strict-network` now also trips when GitLab or Bitbucket is unreachable or rate-limits the
+  run, the way it always has for GitHub. A repository a host does not answer for (private, renamed
+  or removed) is now counted in a note — `GitHub did not answer for 2 repositories …` — instead of
+  passing for a healthy one; the rate-limit note counts repositories, as it always did, and now
+  says so.
+- An empty `--fail-on=` is a configuration error (exit 2), like an empty `--baseline=`, instead of
+  silently falling back to the next source.
 - The table footer reads `Data as of … (package repositories, repository hosts)` instead of naming
   GitHub alone.
 - The mutation-testing gate now covers the analyzer and every output format as well as the verdict

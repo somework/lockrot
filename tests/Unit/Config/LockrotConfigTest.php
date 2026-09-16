@@ -110,6 +110,13 @@ final class LockrotConfigTest extends TestCase
         self::assertSame('medium', LockrotConfig::fromSources(['fail-on' => 'medium'], [], [], '8.5.10', null)->failOn());
     }
 
+    public function testAnEmptyCliFailOnIsRejectedRatherThanFallingThrough(): void
+    {
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('--fail-on must not be empty');
+        LockrotConfig::fromSources(['fail-on' => 'silent'], [], ['fail-on' => ''], '8.5.10', null);
+    }
+
     /** `none` is the absence of a threshold, not a priority level a run can fail on. */
     public function testThePriorityNoneIsTheSameNoneAsAlways(): void
     {

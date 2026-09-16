@@ -107,6 +107,30 @@ final class ComposerHttpClientTest extends TestCase
         self::assertSame(self::HEADERS, self::strip($io, self::GITHUB, self::HEADERS));
     }
 
+    /**
+     * Two credential shapes make AuthHelper add no credential header — an SSL client certificate,
+     * and custom headers without one — so lockrot's own token has to stay, or the request would go
+     * out anonymous while the cap is lifted.
+     */
+    public function testCredentialsThatAddNoCredentialHeaderLeaveLockrotsTokenAlone(): void
+    {
+        $io = new BufferIO();
+        $io->setAuthentication('github.com', 'client-certificate', '{"local_cert":"/tmp/c.pem"}');
+        self::assertSame(self::HEADERS, self::strip($io, self::GITHUB, self::HEADERS));
+
+        $io = new BufferIO();
+        $io->setAuthentication('github.com', '["X-Api-Key: k"]', 'custom-headers');
+        self::assertSame(self::HEADERS, self::strip($io, self::GITHUB, self::HEADERS));
+
+        $io = new BufferIO();
+        $io->setAuthentication('github.com', 'not json', 'custom-headers');
+        self::assertSame(self::HEADERS, self::strip($io, self::GITHUB, self::HEADERS));
+
+        $io = new BufferIO();
+        $io->setAuthentication('github.com', '["X-Api-Key: k", "Authorization: Bearer theirs"]', 'custom-headers');
+        self::assertSame(self::WITHOUT_AUTHORIZATION, self::strip($io, self::GITHUB, self::HEADERS), 'custom headers that do carry a credential replace lockrot\'s');
+    }
+
     /** Composer's `gitlab-token` for gitlab.com becomes a PRIVATE-TOKEN header of its own; lockrot's goes. */
     public function testThePrivateTokenIsDroppedWhenComposerAuthenticatesGitlab(): void
     {

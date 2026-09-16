@@ -26,6 +26,7 @@ final class GitLabApi implements ForgeApi
         $project = 'https://'.$repo->host().'/api/v4/projects/'.rawurlencode($repo->path());
         $requests = ['commits' => $project.'/repository/commits?all=true&per_page=1'];
         if ($authenticated) {
+            // Enrichment: read when it answers, and the commit date stands on its own when it does not.
             $requests['project'] = $project;
         }
 
