@@ -54,7 +54,8 @@ Requires PHP 7.4 or newer and Composer 2.2 or newer.
                marked abandoned by its repository, replacement: Symfony; last release 2023-02-24
                (3.6 years ago); repository archived on GitHub; last push 2023-02-24 (3.6 years ago);
                released 2023-02-24, before PHP 8.4 GA (2024-11-21); php constraint &quot;&gt;=7.2.5&quot; has no
-               upper bound
+               upper bound; pulls in 3 flagged packages: doctrine/annotations (abandoned),
+               symfony/service-contracts (old-promise), symfony/var-dumper (old-promise)
   <span class="r">silent</span>       javibravo/simpleue 2.1.0  direct
                last release 2017-11-15 (8.8 years ago); last push 2017-11-18 (8.8 years ago);
                released 2017-11-15, before PHP 8.4 GA (2024-11-21); php constraint &quot;&gt;=5.5&quot; has no
@@ -68,11 +69,10 @@ Requires PHP 7.4 or newer and Composer 2.2 or newer.
   <span class="r">abandoned</span>    behat/transliterator v1.5.0  via stof/doctrine-extensions-bundle ›
                gedmo/doctrine-extensions
                marked abandoned by its repository; last release 2022-03-30 (4.5 years ago);
-               repository archived on GitHub; released 2022-03-30, before PHP 8.4 GA (2024-11-21);
-               php constraint &quot;&gt;=7.2&quot; has no upper bound</pre>
+               repository archived on GitHub; released 2022-03-30, before PHP 8.4 GA (2024-11-21);</pre>
 
 The first 21 lines of a real run against wallabag's 200-package lock file, at 100 columns. Four of
-its 74 findings — [read the whole report](example-run.md).
+its 75 findings — [read the whole report](example-run.md).
 { .lockrot-caption }
 
 ## What it looks for
@@ -88,7 +88,8 @@ its 74 findings — [read the whole report](example-run.md).
 
 A fifth verdict, `stale`, catches a package that is old on one of those fronts but not both — worth
 knowing, rarely worth acting on. Every finding carries the evidence behind it, the date the data was
-read, and the chain of requirements that pulled the package in.
+read, and the chain of requirements that pulled the package in — every direct requirement it is
+reachable from, not only the shortest one, and each direct requirement says what it pulls in.
 [What it reports](verdicts.md) has all eight verdicts and the priority rules.
 
 ## "Composer already warns me about abandoned packages"

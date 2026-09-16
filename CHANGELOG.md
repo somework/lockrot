@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Transitive exposure (signal S7). A transitive finding now names every direct requirement it is
+  reachable from, not only the one its shortest chain starts from: `via a › b, also via c, d` in
+  the table, markdown, GitHub, GitLab and install-time formats, and `direct_dependents` on every
+  finding in `--format=json` and in SARIF `properties`. Each direct requirement that pulls in flagged
+  transitive packages gets an informational signal `S7` listing them, with the shortest chain from
+  that requirement to each, so its evidence reads `…; pulls in 18 flagged packages: hoa/compiler
+  (abandoned), …`. A `pulled in by:` line in the summary block (table, GitHub, markdown) and an
+  `exposure` list in the JSON document sum that up per direct requirement. S7 never decides a
+  verdict, a priority, the exit code or the baseline comparison; the JSON `schema` number stays `1`.
+
 ## [0.2.2] - 2026-09-16
 
 ### Added

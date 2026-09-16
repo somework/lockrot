@@ -34,6 +34,11 @@ long evidence line may still wrap past one row in a narrow terminal.
 The order is the report's own: [priority](verdicts.md) first, so the ten lines go to the packages
 that apply most directly to the project.
 
+Each line ends with the chain the package is pulled in by and, for a transitive package, the other direct
+requirements that reach it (`(via a > b, also via c)`), resolved through the whole lock. Signal S7 — what a direct
+requirement pulls in, see [verdicts.md](verdicts.md#transitive-exposure) — is attached only to packages the
+transaction itself touches, since only those are analysed here.
+
 ## Silent only when the transaction was both checked and clean
 
 A package whose metadata never arrived is reported as `unknown`, which is not a finding. So if

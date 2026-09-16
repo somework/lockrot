@@ -72,7 +72,10 @@ notices too, so a run can emit notices without `--all`. The [priority](verdicts.
 `critical` finding below `--fail-on` is still a warning. With a [baseline](baseline.md) in place, findings it already
 carries drop to notices for the same reason. GitHub renders only a limited number of annotations per step, so
 on a large lock file the annotations are the headline and the step's own log holds every finding. The summary line at
-the end of the output always states the full counts, and `--format=sarif` uploads the complete set.
+the end of the output always states the full counts, and `--format=sarif` uploads the complete set. A transitive
+finding's message names the direct requirements it is reachable from — `(via a > b, also via c, d)` — and the
+`pulled in by:` line before the summary sums that up per direct requirement, as a plain log line rather than an
+annotation ([transitive exposure](verdicts.md#transitive-exposure)).
 
 ## `--format=sarif`
 
@@ -100,7 +103,8 @@ steps:
 
 `if: always()` keeps the upload running when `--fail-on` already failed the step. Each result carries the
 [priority](verdicts.md) as `rank`, the field SARIF 2.1.0 defines for it, and the same result's `properties` carry
-`priority`, `direct` and `dev` by name. The rule a result points at and its `level` follow the verdict. Both `github`
+`priority`, `direct`, `dev`, `chain` and `direct_dependents` (every direct requirement the package is reachable from,
+see [transitive exposure](verdicts.md#transitive-exposure)) by name. The rule a result points at and its `level` follow the verdict. Both `github`
 and `sarif` point at `composer.lock` in the checkout root, so run them from the directory that holds the lock file.
 
 ## `--format=gitlab`
@@ -125,8 +129,10 @@ same `<verdict> (<priority>)` phrase the GitHub annotation title uses:
 sensio/framework-extra-bundle v6.2.10 — abandoned (critical): marked abandoned by its repository, replacement: Symfony; …
 ```
 
-Severity follows the same rule as the GitHub and SARIF level: a finding at or above `--fail-on` is `major`, any other
-flagged verdict `minor`, and a row only `--all` shows (or one a [baseline](baseline.md) already knows) `info`. Each
+The description ends with the chain and, for a transitive package, the other direct requirements that reach it
+(`(via a > b, also via c, d)`). Severity follows the same rule as the GitHub and SARIF level: a finding at or above
+`--fail-on` is `major`, any other flagged verdict `minor`, and a row only `--all` shows (or one a
+[baseline](baseline.md) already knows) `info`. Each
 issue's fingerprint is a stable hash of the package name and verdict, so a version bump that keeps the same verdict —
 or a reformatted lock that moves the entry to a different line — keeps the same GitLab issue identity. The priority is
 deliberately not part of it, so moving a package from `require` to `require-dev` does not open a second issue for a
@@ -136,7 +142,9 @@ dropped here; use `--format=json` when you need them.
 ## `--format=markdown`
 
 A report shaped for a pull-request comment: a heading with the flagged/checked counts, a table of the findings led by
-their [priority](verdicts.md), the report's notes as a bullet list, and a `<sub>` footer with the full summary.
+their [priority](verdicts.md) — its `Via` column naming every direct requirement a transitive package is reachable
+from — the `pulled in by:` line under the table, the report's notes as a bullet list, and a `<sub>` footer with the
+full summary.
 
 ```bash
 composer lockrot --format=markdown --fail-on=silent --target-php=8.4 > comment.md

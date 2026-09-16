@@ -35,6 +35,7 @@ always wins, so an allowlisted package reports `finished` whatever its signals s
 | S4 | Time since the last repository push, against `push-warn-years` / `push-high-years` |
 | S5 | The installed release predates the target PHP's GA date and the `require.php` constraint has no upper bound |
 | S6 | The installed version is a branch snapshot (`dev-*`, `#hash`), or the package has no stable release |
+| S7 | A direct requirement pulls in flagged transitive packages — informational, never a verdict; see [Transitive exposure](#transitive-exposure) |
 
 S3 and S4 come from GitHub and need network access; see [internals.md](internals.md) for how that
 data is fetched and cached, and [configuration.md](configuration.md) for the thresholds.
@@ -91,9 +92,65 @@ keeps working.
 Nothing that decides an outcome moved. The GitHub annotation level, the GitLab severity and
 fingerprint, and the SARIF `ruleId` and `level` all still read the verdict alone.
 
+## Transitive exposure
+
+You can only act on what `composer.json` names. So for a transitive finding the question is *which
+of my direct requirements pull this in*, and for a direct requirement *what does it drag in*. The
+report answers both.
+
+**Every direct requirement a package is reachable from.** The `via` chain names the shortest path
+from one direct requirement. When others reach the package too, the row says so:
+
+```text
+  abandoned    hoa/ruler 2.17.05.16  via wallabag/rulerz, also via wallabag/rulerz-bundle
+```
+
+Dropping `wallabag/rulerz` alone would leave `hoa/ruler` installed through `wallabag/rulerz-bundle`.
+Up to three other requirements are named, then counted (`and 12 more`); `--format=json` carries the
+full list as `direct_dependents` on every finding, the package itself included when it is direct.
+A direct requirement's own row stays `direct`, even when other requirements reach it as well — in
+a framework application every bundle reaches the framework's own packages, and naming them there
+would say nothing.
+
+**Signal S7 on the direct requirement.** After every verdict is known, each direct requirement
+whose subtree holds flagged transitive packages gets an informational signal listing them, in
+report order, with the shortest chain from that requirement to each:
+
+```text
+  pinned       wallabag/rulerz-bundle dev-master  direct
+               released 2023-12-24, before PHP 8.4 GA (2024-11-21); php constraint ">=7.4" has no
+               upper bound; pinned to branch snapshot dev-master; pulls in 18 flagged packages:
+               hoa/compiler (abandoned), hoa/consistency (abandoned), hoa/event (abandoned),
+               hoa/exception (abandoned), hoa/file (abandoned) and 13 more
+```
+
+Five are named in the evidence; `--format=json` carries them all under the signal's `data`, each
+with its `verdict` and `chain`. A requirement whose own verdict is `ok` carries S7 too, so `--all`
+shows what a clean-looking requirement is responsible for.
+
+**The `pulled in by:` line.** The summary block sums the same thing up per direct requirement,
+most first:
+
+```text
+pulled in by: wallabag/rulerz-bundle 18 · wallabag/rulerz 15 · friendsofsymfony/oauth-server-bundle 5 ·
+wallabag/phpepub 5 · craue/config-bundle 4 · … and 46 more
+```
+
+Five requirements are named, then the rest counted; the JSON document carries the whole list as
+`exposure`. The line is printed only when some flagged package is transitive.
+
+> **S7 decides nothing.** A package is never flagged for what it depends on. The verdict, the
+> priority, `--fail-on`, the exit code and the baseline all ignore S7; it describes, the same way
+> the priority does. A flagged package the project requires directly is its own row's business
+> and counts under nobody, whoever else reaches it.
+
+At install time only the packages the transaction touches are analysed, so a direct requirement
+gets S7 only when it is itself part of the transaction; `composer lockrot` on the full lock always
+has the whole picture.
+
 ## Related
 
 - [example-run.md](example-run.md) — a full run with every verdict in it
 - [configuration.md](configuration.md) — the thresholds behind S2 and S4, and the allowlist
 - [baseline.md](baseline.md) — accepting findings you have already decided to live with
-- [ci.md](ci.md) — exit codes and the six output formats
+- [ci.md](ci.md) — exit codes and the six output formats, and where each carries the exposure

@@ -66,11 +66,15 @@ critical (3)
                last release 2017-11-15 (8.8 years ago); last push 2017-11-18 (8.8 years ago); …
   …
 high (58)
-  abandoned    doctrine/cache 2.2.0  via doctrine/doctrine-bundle
+  abandoned    doctrine/cache 2.2.0  via doctrine/doctrine-bundle, also via craue/config-bundle,
+               doctrine/doctrine-migrations-bundle, doctrine/orm and 2 more
                marked abandoned by its repository; last release 2022-05-20 (4.3 years ago)
+  abandoned    hoa/ruler 2.17.05.16  via wallabag/rulerz, also via wallabag/rulerz-bundle
+               marked abandoned by its repository; last release 2017-05-16 (9.3 years ago); …
   …
-200 packages checked · abandoned 19 · silent 8 · pinned 4 · old-promise 41 · stale 2 · …
-priority: critical 3 · high 58 · medium 11 · low 2
+200 packages checked · abandoned 19 · silent 8 · pinned 4 · old-promise 41 · stale 3 · …
+priority: critical 3 · high 58 · medium 12 · low 2
+pulled in by: wallabag/rulerz-bundle 18 · wallabag/rulerz 15 · friendsofsymfony/oauth-server-bundle 5 · …
 …
 ```
 
@@ -100,6 +104,11 @@ the report does not flag. The verdict sets a base level, which drops one step fo
 package and one more for a development-only one, never below `low`. The priority orders the report
 and is carried in every format. **The exit code and `--fail-on` stay on the verdict**: it tells you
 what to read first, not whether the build fails.
+
+A transitive finding names every direct requirement it is reachable from (`via a › b, also via c`),
+not only the shortest chain, and each direct requirement's evidence says what flagged packages it
+pulls in. The `pulled in by:` summary line sums that up — [transitive
+exposure](https://lockrot.dev/verdicts/#transitive-exposure).
 
 [Every verdict, signal and priority rule →](https://lockrot.dev/verdicts/)
 
@@ -199,9 +208,9 @@ Everything is at [lockrot.dev](https://lockrot.dev).
 - Without a GitHub token, only packages that already look stale on release age (no stable release
   within `release-warn-years`, default 3y, and not already `abandoned`) are checked against GitHub,
   capped at 50 per run; set `GITHUB_TOKEN` to lift the cap. lockrot reports how many this affected.
-- No transitive-exposure signal: a package is not flagged because something *it* depends on is
-  abandoned, archived or silent. The `Via`/`chain` column shows how a package was pulled in, not the
-  other direction.
+- A package is never flagged for what *it* depends on. A direct requirement that pulls in flagged
+  packages says so in its evidence (signal S7) and on the `pulled in by:` line, but its own verdict,
+  the priority, `--fail-on` and the exit code read only what was observed about the package itself.
 - The baseline matches by package name only, and never rewrites itself — entries for packages that
   have left the lock are reported as stale, not removed.
 - The install-time block reads a package's development flag from the lock the transaction is about to
@@ -211,8 +220,8 @@ Everything is at [lockrot.dev](https://lockrot.dev).
 
 ## Roadmap
 
-Next up: transitive exposure on parent packages, and GitLab and Bitbucket repository activity.
-Tracked in [issues](https://github.com/somework/lockrot/issues).
+Next up: GitLab and Bitbucket repository activity, and reading the lock files bundled inside PHAR
+tools. Tracked in [issues](https://github.com/somework/lockrot/issues).
 
 ## Contributing
 
