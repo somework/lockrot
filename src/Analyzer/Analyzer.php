@@ -166,14 +166,14 @@ final class Analyzer
      */
     private static function oldestCachedActivity(array $activity): ?\DateTimeImmutable
     {
-        $oldest = null;
+        $cachedAt = [];
         foreach ($activity as $record) {
-            if ($record->fromCache() && ($oldest === null || $record->fetchedAt() < $oldest)) {
-                $oldest = $record->fetchedAt();
+            if ($record->fromCache()) {
+                $cachedAt[] = $record->fetchedAt();
             }
         }
 
-        return $oldest;
+        return $cachedAt === [] ? null : min($cachedAt);
     }
 
     /** @param list<LockedPackage> $packages */

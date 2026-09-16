@@ -368,7 +368,10 @@ final class ReportTest extends TestCase
         self::assertSame("package repositories; repository activity from lockrot's cache, up to 1 h old", $report('2026-09-14T12:00:00+00:00')->dataSourcesClause(), 'fetched this second, still at least one hour');
         self::assertSame("package repositories; repository activity from lockrot's cache, up to 23 h old", $report('2026-09-13T13:00:00+00:00')->dataSourcesClause(), 'exactly 23 hours');
         self::assertSame("package repositories; repository activity from lockrot's cache, up to 24 h old", $report('2026-09-13T12:59:00+00:00')->dataSourcesClause(), '23 hours and a minute rounds up to 24');
+        self::assertSame("package repositories; repository activity from lockrot's cache, up to 1 h old", $report('2026-09-14T11:00:00+00:00')->dataSourcesClause(), 'exactly one hour is one hour');
+        self::assertSame("package repositories; repository activity from lockrot's cache, up to 2 h old", $report('2026-09-14T10:59:59+00:00')->dataSourcesClause(), 'one second past the hour rounds up');
         self::assertSame("package repositories; repository activity from lockrot's cache, up to 1 h old", $report('2026-09-14T13:00:00+00:00')->dataSourcesClause(), 'a clock that ran backwards is not a negative age');
+        self::assertSame("package repositories; repository activity from lockrot's cache, up to 3601 h old", $report('2026-04-17T11:00:00+00:00')->dataSourcesClause(), 'an --offline run serves the cache however old it is; 3601 hours here');
     }
 
     public function testTheCacheDateIsCarriedIntoTheArrayAndAcrossWithBaseline(): void

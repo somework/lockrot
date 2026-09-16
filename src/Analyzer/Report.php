@@ -201,15 +201,16 @@ final class Report
     /**
      * How the footer describes the sources behind the report: the plain pair when everything was
      * fetched in this run, otherwise how old the oldest cached activity answer is, in whole hours
-     * rounded up (never below one) — the cache keeps an answer for a day, so this reads up to 24.
-     * The wording is shared by the table and markdown footers.
+     * rounded up and never below one (a clock that ran backwards reads as one hour too). The cache
+     * keeps an answer for a day, so online this reads up to 24; `--offline` serves the cache however
+     * old it is, and the count keeps going. The wording is shared by the table and markdown footers.
      */
     public function dataSourcesClause(): string
     {
         if ($this->activityCacheOldestAt === null) {
             return 'package repositories, repository hosts';
         }
-        $seconds = max(0, $this->generatedAt->getTimestamp() - $this->activityCacheOldestAt->getTimestamp());
+        $seconds = $this->generatedAt->getTimestamp() - $this->activityCacheOldestAt->getTimestamp();
 
         return \sprintf('package repositories; repository activity from lockrot\'s cache, up to %d h old', max(1, (int) ceil($seconds / 3600)));
     }
