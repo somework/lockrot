@@ -37,8 +37,8 @@ stays on `github.com`.
 
 ### GPG signature
 
-Every release also ships `lockrot.phar.asc`, a detached OpenPGP signature made by the lockrot
-release key:
+Every release from 0.5.0 on also ships `lockrot.phar.asc`, a detached OpenPGP signature made by
+the lockrot release key (earlier releases have the checksum only):
 
 ```text
 39EC C3F6 4AE8 D06A 9A63  FD99 AB6F 7F52 AE51 3141
@@ -58,17 +58,23 @@ gpg --verify lockrot.phar.asc lockrot.phar
 
 `gpg` prints `Good signature from "lockrot release signing …"`, followed by a warning that the key is
 not certified by a trusted signature — that is gpg saying nobody *you* trust has vouched for the
-key, not that the signature is bad. Check the fingerprint it prints against the one above.
+key, not that the signature is bad. Check the fingerprint it prints against the one above. Should
+the key ever be revoked, the revocation is published on the keyservers, `lockrot-release-key.asc`
+is replaced in the repository and the changelog names the new fingerprint — re-import from either.
 
-The checksum and the signature answer different questions. `sha256sum -c` proves the bytes are the
-ones the release workflow published; the signature proves they were signed with a key that only the
-release workflow holds, so it still holds if the release assets were replaced after the fact. The
-release workflow verifies its own signature against the committed public key before it uploads
-anything, so the key in the repository and the key in CI cannot silently drift apart.
+The checksum and the signature answer different questions. `sha256sum -c` proves the archive
+matches the checksum file next to it — that the download arrived intact, given that both files came
+from the same place. The signature proves the bytes were signed with the release key, which the
+release assets alone cannot fake: it still holds if the assets were replaced after the fact.
+`self-update` checks the checksum only; it downloads `lockrot.phar.sha256` from the same release, so
+it proves the archive arrived intact, not who published it. For the signature or the attestation,
+download by hand. The release workflow verifies its own signature against the committed public key
+before it uploads anything, so the key in the repository and the key in CI cannot silently drift
+apart.
 
 ### Build provenance
 
-Each build is also attested by GitHub: a signed statement that this exact archive was produced by
+Each release from 0.5.0 on is also attested by GitHub: a signed statement that this exact archive was produced by
 the `PHAR` workflow of `somework/lockrot` from a given commit. With the
 [GitHub CLI](https://cli.github.com/):
 
@@ -82,7 +88,7 @@ it the check to prefer in an environment that already has `gh`.
 ### Installing with PHIVE
 
 [PHIVE](https://phar.io/) downloads the release, verifies the signature and pins the version in
-`.phive/phars.xml`:
+`.phive/phars.xml` (0.5.0 or later; it refuses the unsigned earlier releases):
 
 ```bash
 phive install somework/lockrot --trust-gpg-keys 39ECC3F64AE8D06A9A63FD99AB6F7F52AE513141

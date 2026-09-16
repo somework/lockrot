@@ -8,8 +8,13 @@ on:
 # signature is checked here against the committed public key, so a key rotation that forgets to
 # update the file — or a secret that no longer matches it — fails the build instead of shipping
 # an archive nobody can verify with the documented key.
+#
+# Signing and attestation run for tags and for a dispatch from the default branch (a key rotation
+# is rehearsed there), never for a dispatch from another branch: a write-access dispatch must not
+# be able to mint a release-signed archive out of arbitrary code.
 env:
   LOCKROT_SIGNING_KEY: 39ECC3F64AE8D06A9A63FD99AB6F7F52AE513141
+  SIGN: ${{ startsWith(github.ref, 'refs/tags/') || github.ref == format('refs/heads/{0}', github.event.repository.default_branch) }}
 jobs:
   phar:
     runs-on: ubuntu-latest
@@ -30,25 +35,33 @@ jobs:
       # A throw-away GNUPGHOME per step: the signing key never touches the runner's default keyring,
       # and the passphrase travels over a pipe, never in an argument that `ps` could show.
       - name: Sign the PHAR with the release key
+        if: env.SIGN == 'true'
         env:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
         run: |
-          export GNUPGHOME="$(mktemp -d)"
+          GNUPGHOME="$(mktemp -d)"
+          export GNUPGHOME
           printf '%s\n' "$GPG_PRIVATE_KEY" | gpg --batch --quiet --import
           printf '%s\n' "$GPG_PASSPHRASE" | gpg --batch --quiet --pinentry-mode loopback --passphrase-fd 0 \
             --local-user "$LOCKROT_SIGNING_KEY" --armor --detach-sign \
             --output build/lockrot.phar.asc build/lockrot.phar
       - name: Verify the signature with the committed public key
+        if: env.SIGN == 'true'
         run: |
-          export GNUPGHOME="$(mktemp -d)"
+          GNUPGHOME="$(mktemp -d)"
+          export GNUPGHOME
           gpg --batch --quiet --import lockrot-release-key.asc
           gpg --batch --status-file build/gpg-status.txt --verify build/lockrot.phar.asc build/lockrot.phar
           # VALIDSIG ends with the primary key's fingerprint: the signature must come from *this* key,
-          # not merely from some key the keyring happens to hold.
+          # not merely from some key the keyring happens to hold. GOODSIG is the second anchor: an
+          # expired or revoked subkey still yields VALIDSIG and exit 0, but EXPKEYSIG/REVKEYSIG in
+          # place of GOODSIG — and a signature every downloader's gpg will complain about.
           grep -E "^\[GNUPG:\] VALIDSIG [0-9A-F]{40} .* ${LOCKROT_SIGNING_KEY}$" build/gpg-status.txt
+          grep -E "^\[GNUPG:\] GOODSIG " build/gpg-status.txt
       - run: LOCKROT_E2E=1 vendor/bin/phpunit --group e2e --filter PharTest
-      - uses: actions/attest-build-provenance@v4
+      - if: env.SIGN == 'true'
+        uses: actions/attest-build-provenance@v4
         with: {subject-path: build/lockrot.phar}
       - uses: actions/upload-artifact@v7
         with: {name: lockrot.phar, path: 'build/lockrot.phar*'}

@@ -49,9 +49,10 @@ curl -fsSL -O https://github.com/somework/lockrot/releases/latest/download/lockr
 sha256sum -c lockrot.phar.sha256   # shasum -a 256 -c on macOS
 ```
 
-Releases are also GPG-signed (`lockrot.phar.asc`, key `39EC C3F6 4AE8 D06A 9A63 FD99 AB6F 7F52
-AE51 3141`) and attested by GitHub (`gh attestation verify lockrot.phar --repo somework/lockrot`);
-`phive install somework/lockrot` does the download and the signature check in one step.
+Releases from 0.5.0 on are also GPG-signed (`lockrot.phar.asc`, key `39EC C3F6 4AE8 D06A 9A63
+FD99 AB6F 7F52 AE51 3141`) and attested by GitHub (`gh attestation verify lockrot.phar --repo
+somework/lockrot`); `phive install somework/lockrot` does the download and the signature check in
+one step.
 
 [The PHAR, signatures, `self-update` and the global plugin install →](https://lockrot.dev/phar/)
 
