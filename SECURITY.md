@@ -28,7 +28,19 @@ host as the release itself:
 alongside the archive, refuses to install anything whose hash does not match, verifies the PHP
 runtime can open the download, and leaves the running file in place if any step fails.
 
-GPG signatures are planned for a later release.
+Every release is also signed with the lockrot release key — `lockrot.phar.asc` next to the PHAR —
+and attested by GitHub:
+
+    gpg --keyserver hkps://keys.openpgp.org --recv-keys 39ECC3F64AE8D06A9A63FD99AB6F7F52AE513141
+    gpg --verify lockrot.phar.asc lockrot.phar
+    gh attestation verify lockrot.phar --repo somework/lockrot
+
+The key's fingerprint is `39EC C3F6 4AE8 D06A 9A63 FD99 AB6F 7F52 AE51 3141`
+(`lockrot release signing <i.pinchuk.work@gmail.com>`); its public half is `lockrot-release-key.asc`
+in this repository. Only a signing subkey is held by the release workflow, and it is rotated before
+it expires. A key that is lost or suspected compromised is revoked on the keyservers and announced
+in the changelog, together with the new fingerprint. See the [PHAR page](https://lockrot.dev/phar/)
+for the full verification walkthrough.
 
 ## What lockrot does and does not do
 

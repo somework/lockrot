@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Releases are signed. Every release ships `lockrot.phar.asc`, a detached OpenPGP signature by the
+  lockrot release key (`39EC C3F6 4AE8 D06A 9A63 FD99 AB6F 7F52 AE51 3141`, public half in
+  `lockrot-release-key.asc` and on `keys.openpgp.org`), and a GitHub build-provenance attestation
+  (`gh attestation verify lockrot.phar --repo somework/lockrot`). The release workflow verifies its
+  own signature against the committed public key before it publishes anything. `phive install
+  somework/lockrot` now works. The sha256 checksum and `self-update` are unchanged.
+
 ## [0.4.0] - 2026-09-16
 
 ### Added

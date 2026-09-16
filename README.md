@@ -49,7 +49,11 @@ curl -fsSL -O https://github.com/somework/lockrot/releases/latest/download/lockr
 sha256sum -c lockrot.phar.sha256   # shasum -a 256 -c on macOS
 ```
 
-[The PHAR, `self-update` and the global plugin install →](https://lockrot.dev/phar/)
+Releases are also GPG-signed (`lockrot.phar.asc`, key `39EC C3F6 4AE8 D06A 9A63 FD99 AB6F 7F52
+AE51 3141`) and attested by GitHub (`gh attestation verify lockrot.phar --repo somework/lockrot`);
+`phive install somework/lockrot` does the download and the signature check in one step.
+
+[The PHAR, signatures, `self-update` and the global plugin install →](https://lockrot.dev/phar/)
 
 ## First run
 
@@ -199,7 +203,7 @@ Everything is at [lockrot.dev](https://lockrot.dev).
 - [CI](https://lockrot.dev/ci/) — exit codes and all six output formats, with GitHub and GitLab snippets
 - [Baseline](https://lockrot.dev/baseline/) — generating one, the four buckets, and how matching works
 - [Install-time summary](https://lockrot.dev/install-time/) — the block Composer prints, its budgets, and the strict gate
-- [PHAR](https://lockrot.dev/phar/) — verified downloads, `self-update`, and the global plugin install
+- [PHAR](https://lockrot.dev/phar/) — verified and signed downloads, PHIVE, `self-update`, and the global plugin install
 - [Internals](https://lockrot.dev/internals/) — the repository layer, two-pass fetching, caching and `--offline`
 - [Example run](https://lockrot.dev/example-run/) — one full run in three formats, plus a clean one
 - [Changelog](https://lockrot.dev/changelog/) — what changed in each release
@@ -227,8 +231,8 @@ Everything is at [lockrot.dev](https://lockrot.dev).
 
 ## Roadmap
 
-Next up: reading the lock files bundled inside PHAR tools, and signed releases. Tracked in
-[issues](https://github.com/somework/lockrot/issues).
+Next up: repository activity from GitHub Enterprise hosts. Reading the lock files bundled inside
+PHAR tools is being evaluated.
 
 ## Contributing
 

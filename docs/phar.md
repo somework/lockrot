@@ -35,10 +35,65 @@ stays on `github.com`.
 > rather than silent. To close it, resolve the tag once through
 > `GET /repos/somework/lockrot/releases/latest` and download both assets from that pinned tag.
 
+### GPG signature
+
+Every release also ships `lockrot.phar.asc`, a detached OpenPGP signature made by the lockrot
+release key:
+
+```text
+39EC C3F6 4AE8 D06A 9A63  FD99 AB6F 7F52 AE51 3141
+lockrot release signing <i.pinchuk.work@gmail.com>
+```
+
+The public key is [`lockrot-release-key.asc`](https://github.com/somework/lockrot/blob/main/lockrot-release-key.asc)
+in the repository and on `keys.openpgp.org` and `keyserver.ubuntu.com`. The primary key only
+certifies; releases are signed by a subkey that expires and is rotated, so an import may pick up a
+newer subkey later while the fingerprint above stays the one to trust.
+
+```bash
+gpg --keyserver hkps://keys.openpgp.org --recv-keys 39ECC3F64AE8D06A9A63FD99AB6F7F52AE513141
+curl -fsSL -O https://github.com/somework/lockrot/releases/latest/download/lockrot.phar.asc
+gpg --verify lockrot.phar.asc lockrot.phar
+```
+
+`gpg` prints `Good signature from "lockrot release signing …"`, followed by a warning that the key is
+not certified by a trusted signature — that is gpg saying nobody *you* trust has vouched for the
+key, not that the signature is bad. Check the fingerprint it prints against the one above.
+
+The checksum and the signature answer different questions. `sha256sum -c` proves the bytes are the
+ones the release workflow published; the signature proves they were signed with a key that only the
+release workflow holds, so it still holds if the release assets were replaced after the fact. The
+release workflow verifies its own signature against the committed public key before it uploads
+anything, so the key in the repository and the key in CI cannot silently drift apart.
+
+### Build provenance
+
+Each build is also attested by GitHub: a signed statement that this exact archive was produced by
+the `PHAR` workflow of `somework/lockrot` from a given commit. With the
+[GitHub CLI](https://cli.github.com/):
+
+```bash
+gh attestation verify lockrot.phar --repo somework/lockrot
+```
+
+This needs no key of lockrot's at all — the trust root is GitHub's Sigstore instance — which makes
+it the check to prefer in an environment that already has `gh`.
+
+### Installing with PHIVE
+
+[PHIVE](https://phar.io/) downloads the release, verifies the signature and pins the version in
+`.phive/phars.xml`:
+
+```bash
+phive install somework/lockrot --trust-gpg-keys 39ECC3F64AE8D06A9A63FD99AB6F7F52AE513141
+tools/lockrot --target-php=8.4
+```
+
+### The Docker image
+
 A Docker image, `ghcr.io/somework/lockrot`, is published from the
 [lockrot-action](https://github.com/somework/lockrot-action#docker-image) repository: the same
-verified archive on the official PHP CLI image, signed with cosign. GPG signatures for the PHAR
-itself are planned for a later release.
+verified archive on the official PHP CLI image, signed with cosign.
 
 ## What the PHAR does and does not do
 
