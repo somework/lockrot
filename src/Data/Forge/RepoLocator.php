@@ -134,7 +134,7 @@ final class RepoLocator
             if (strpos($path, rtrim($prefix, '/').'/') !== 0) {
                 return null;
             }
-            $path = substr($path, \strlen(rtrim($prefix, '/')));
+            $path = substr($path, \strlen($prefix));
         }
         $path = ltrim($path, '/');
         // Two segments at least; a segment that is exactly `-` starts GitLab's web routes

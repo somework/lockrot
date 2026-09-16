@@ -40,6 +40,8 @@ final class RepoLocatorTest extends TestCase
         yield 'github uppercase host' => ['https://GitHub.com/o/r.git', [RepoRef::GITHUB, 'github.com', 'o/r']];
         yield 'github web page' => ['https://github.com/o/r/tree/main', null];
         yield 'github one segment' => ['https://github.com/o', null];
+        yield 'github host only' => ['https://github.com', null];
+        yield 'path repository url' => ['file:///srv/mirrors/repo.git', null];
         yield 'gitlab.com' => ['https://gitlab.com/owner/repo.git', [RepoRef::GITLAB, 'gitlab.com', 'owner/repo']];
         yield 'gitlab.com subgroups' => ['https://gitlab.com/group/sub/deeper/project.git', [RepoRef::GITLAB, 'gitlab.com', 'group/sub/deeper/project']];
         yield 'gitlab.com scp' => ['git@gitlab.com:group/sub/project.git', [RepoRef::GITLAB, 'gitlab.com', 'group/sub/project']];
@@ -79,6 +81,12 @@ final class RepoLocatorTest extends TestCase
         self::assertSame('group/project', $ref->path());
         self::assertNull($locator->locate('https://gitlab.example.com/group/project.git'), 'outside the prefix is not the instance');
         self::assertNull($locator->locate('https://gitlab.example.com/gitlab/project.git'), 'the prefix alone leaves one segment');
+        self::assertNull($locator->locate('https://gitlab.example.com/gitlabx/group/project.git'), 'the prefix is a segment, not a substring');
+        self::assertNull($locator->locate('https://gitlab.example.com/other/group/sub/project.git'), 'outside the prefix, however deep the path');
+
+        $trailing = (new RepoLocator(['gitlab.example.com/gitlab/']))->locate('https://gitlab.example.com/gitlab/group/project.git');
+        self::assertNotNull($trailing, 'a trailing slash on the entry is tolerated');
+        self::assertSame('group/project', $trailing->path());
     }
 
     /**
@@ -94,6 +102,13 @@ final class RepoLocatorTest extends TestCase
         self::assertSame('gitlab.example.com:8443', $ref->host());
         self::assertNull($locator->locate('https://gitlab.example.com/group/project.git'), 'no port in the URL: not the configured GitLab');
         self::assertNull((new RepoLocator(['gitlab.example.com']))->locate('https://gitlab.example.com:8443/group/project.git'));
+    }
+
+    public function testAConfiguredDomainIsMatchedCaseInsensitively(): void
+    {
+        $ref = (new RepoLocator(['GitLab.Example.com']))->locate('https://gitlab.example.com/group/project.git');
+        self::assertNotNull($ref);
+        self::assertSame('GitLab.Example.com', $ref->host(), 'the entry as configured: it is the key Composer files credentials under');
     }
 
     public function testFromConfigReadsGitlabDomainsAndIgnoresWhatIsNotAHost(): void
