@@ -13,6 +13,9 @@ final class HttpResultTest extends TestCase
     {
         $at = new \DateTimeImmutable('2026-09-14T00:00:00+00:00');
         self::assertTrue((new HttpResult('u', 200, '{}', $at))->isOk());
+        self::assertTrue((new HttpResult('u', 299, '{}', $at))->isOk());
+        self::assertFalse((new HttpResult('u', 300, '', $at))->isOk());
+        self::assertTrue((new HttpResult('u', 500, '', $at))->isFailure());
         self::assertTrue((new HttpResult('u', 404, '', $at))->isNotFound());
         self::assertFalse((new HttpResult('u', 404, '', $at))->isFailure());
         self::assertTrue((new HttpResult('u', 403, '', $at))->isFailure());
