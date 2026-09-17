@@ -1,8 +1,0 @@
-# Short download URLs for the PHAR. 302, never 301: the target is a "latest"
-# pointer that is temporary by definition, and a 301 is cached by browsers with
-# no way to invalidate it. The verified install snippet in README.md, SECURITY.md
-# and docs/phar.md keeps both github.com URLs on purpose — routing the checksum
-# through this domain would widen the trust story from "trust GitHub" to
-# "trust GitHub and whoever holds lockrot.dev".
-/lockrot.phar https://github.com/somework/lockrot/releases/latest/download/lockrot.phar 302
-/lockrot.phar.sha256 https://github.com/somework/lockrot/releases/latest/download/lockrot.phar.sha256 302

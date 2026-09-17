@@ -77,6 +77,16 @@ jobs:
       # 0 timed out -> MSI = Covered MSI 99.23%, ~1m40s on 8 threads (2026-09-16, with FailOn, the forge notes and the cache age). Threshold 97, matching
       # infection.json5, which records why the timeout is 180 and which escapes are equivalent.
       - run: $(composer global config bin-dir --absolute)/infection --threads=4 --min-msi=97 --logger-github
+  # docs/ is rendered at lockrot.dev from the newest tag by the somework/lockrot.dev repository;
+  # --strict here is the only place a broken link or a page outside the nav fails before a release.
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with: {python-version-file: .python-version, cache: pip, cache-dependency-path: docs/requirements.txt}
+      - run: pip install -r docs/requirements.txt
+      - run: mkdocs build --strict
   e2e:
     runs-on: ubuntu-latest
     steps:

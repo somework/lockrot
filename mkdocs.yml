@@ -13,12 +13,10 @@ docs_dir: docs
 site_dir: site
 
 exclude_docs: |
-  overrides/
   requirements.txt
 
 theme:
   name: material
-  custom_dir: docs/overrides
   language: en
   icon:
     repo: fontawesome/brands/github
@@ -76,14 +74,3 @@ plugins:
   - include-markdown:
       comments: false
 
-extra_css:
-  - assets/extra.css
-
-extra:
-  social:
-    - icon: fontawesome/brands/github
-      link: https://github.com/somework/lockrot
-      name: lockrot on GitHub
-    - icon: fontawesome/solid/box-open
-      link: https://packagist.org/packages/somework/lockrot
-      name: somework/lockrot on Packagist

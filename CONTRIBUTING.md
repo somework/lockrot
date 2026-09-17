@@ -66,3 +66,12 @@ Commit messages follow [Conventional Commits](https://www.conventionalcommits.or
 
 A pull request should say what changed and why, come with tests, update the README when it changes
 behaviour a user can see, and add a line to the `Unreleased` section of `CHANGELOG.md`.
+
+## Documentation
+
+`docs/` is the reference and changes with the code it describes: a new option, verdict or format
+lands with its page in the same branch. `mkdocs build --strict` (`pip install -r docs/requirements.txt`)
+is the linter CI runs on it. The public site, https://lockrot.dev, is built from the
+[somework/lockrot.dev](https://github.com/somework/lockrot.dev) repository, which checks this one out
+at its newest release tag — so a docs change appears there with the next release. The landing page
+and the blog live in that repository, not here.
