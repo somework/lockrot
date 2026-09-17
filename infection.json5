@@ -78,7 +78,8 @@
     //    everything and falls through to EXIT_OK), InstallTimeSummary.php:186 x2 (the stale list the
     //    names feed is never rendered on the install-time path; kept for a truthful comparison),
     //    SelfUpdateCommand.php:168 and :172 (an unclosed `</error>` renders byte-identically, the line
-    //    is the command's last write).
+    //    is the command's last write), ReleaseSignatureVerifier.php:51 (added 2026-09-18: the
+    //    openssl_verify() === -1 branch is openssl's own failure, which no input reaches).
     //
     // Threshold 97 = floor of the honest MSI minus 1: at 3201 mutants that leaves room for ~40 new
     // escapes before the gate fails — close to the ~25 the narrower scope allowed — without the

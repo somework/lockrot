@@ -68,8 +68,9 @@ jobs:
       # The second signature is for the archive's own self-update: an RSA (PKCS#1 v1.5, SHA-384)
       # signature over the same bytes, in Composer's `{"sha384": "<base64>"}` file format, checked
       # by Lockrot\SelfUpdate\ReleaseSignatureVerifier against the key built into the archive. The
-      # private key lives in a throw-away directory for the length of the step; the passphrase is
-      # read from the environment by openssl itself, never from an argument.
+      # private key lives in a throw-away directory for the length of the step — removed on every
+      # exit, a failed openssl included — and the passphrase is read from the environment by
+      # openssl itself, never from an argument.
       - name: Sign the PHAR for self-update
         if: env.SIGN == 'true'
         env:
@@ -77,9 +78,9 @@ jobs:
           SELFUPDATE_PASSPHRASE: ${{ secrets.SELFUPDATE_PASSPHRASE }}
         run: |
           KEYDIR="$(mktemp -d)"
+          trap 'rm -rf "$KEYDIR"' EXIT
           printf '%s\n' "$SELFUPDATE_PRIVATE_KEY" > "$KEYDIR/key.pem"
           openssl dgst -sha384 -sign "$KEYDIR/key.pem" -passin env:SELFUPDATE_PASSPHRASE -out build/lockrot.phar.sig.bin build/lockrot.phar
-          rm -rf "$KEYDIR"
           build/selfupdate-signature.php wrap build/lockrot.phar.sig.bin > build/lockrot.phar.sig
           rm build/lockrot.phar.sig.bin
       # Two checks: openssl against the published key file, and the archive's own verifier class

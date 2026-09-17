@@ -107,7 +107,7 @@ final class ReleaseSignatureVerifierTest extends TestCase
     public function testAKeyThatCannotBeLoadedIsReportedAsTheBuildsOwnFault(): void
     {
         $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage('the release key inside this lockrot.phar cannot be loaded');
+        $this->expectExceptionMessage('the public key self-update verifies releases with cannot be loaded');
         $this->verifier("-----BEGIN PUBLIC KEY-----\nnot a key\n-----END PUBLIC KEY-----\n")
             ->verify(self::ARCHIVE, SigningKeys::releaseSignatureFile(self::ARCHIVE), self::URL);
     }

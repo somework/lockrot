@@ -280,6 +280,25 @@ final class PharTest extends TestCase
     }
 
     /**
+     * Without the seam, the archive verifies with the key built into it — which proves that key
+     * is packed and loads: a release signed with the test key is then "does not match", never "the
+     * key cannot be loaded". A box.json that stopped packing ReleaseKey.php would fail here.
+     */
+    public function testWithoutTheSeamTheBuiltInKeyIsWhatTheArchiveVerifiesWith(): void
+    {
+        $directory = $this->freshDir();
+        $target = $this->installedCopy($directory);
+
+        $process = $this->runSelfUpdate($target, 'release', [], false);
+
+        self::assertSame(2, $process->getExitCode(), $process->getErrorOutput());
+        $reported = self::reported($process);
+        self::assertStringContainsString('does not match the downloaded archive', $reported);
+        self::assertStringNotContainsString('cannot be loaded', $reported);
+        self::assertSame(hash_file('sha256', $this->phar()), hash_file('sha256', $target));
+    }
+
+    /**
      * What lockrot itself said on stderr. Exactly one line is dropped: Composer warns once per run
      * that it is reaching 127.0.0.1 over plain http, which the test harness asked for and a real
      * install never sees. Nothing else is filtered, so a notice, a warning or a trace from the PHAR
@@ -294,23 +313,26 @@ final class PharTest extends TestCase
         );
     }
 
-    /** @param list<string> $options */
-    private function runSelfUpdate(string $target, string $channel, array $options = []): Process
+    /**
+     * @param list<string> $options
+     * @param bool         $testKey whether the archive verifies against the test key the channels are
+     *                              signed with (the seam), or against the key built into it
+     */
+    private function runSelfUpdate(string $target, string $channel, array $options = [], bool $testKey = true): Process
     {
-        $process = new Process(
-            array_merge(['php', $target, 'self-update'], $options),
-            \dirname($target),
-            [
-                'LOCKROT_RELEASE_URL' => self::server()->url().'/'.$channel.'/latest.json',
-                // The channels are signed with the test key, not the release key built into the
-                // archive; this is the seam that lets the built PHAR verify them.
-                'LOCKROT_RELEASE_KEY' => \dirname(__DIR__).'/fixtures/signing/release-key.pub',
-                // The release server is plain http on 127.0.0.1, which Composer's HttpDownloader
-                // refuses under its default secure-http. Relaxing it in a throwaway COMPOSER_HOME
-                // keeps that to the test process; nothing in lockrot itself lowers the bar.
-                'COMPOSER_HOME' => self::composerHome(),
-            ]
-        );
+        $environment = [
+            'LOCKROT_RELEASE_URL' => self::server()->url().'/'.$channel.'/latest.json',
+            // The release server is plain http on 127.0.0.1, which Composer's HttpDownloader
+            // refuses under its default secure-http. Relaxing it in a throwaway COMPOSER_HOME
+            // keeps that to the test process; nothing in lockrot itself lowers the bar.
+            'COMPOSER_HOME' => self::composerHome(),
+        ];
+        if ($testKey) {
+            // The channels are signed with the test key, not the release key built into the
+            // archive; this is the seam that lets the built PHAR verify them.
+            $environment['LOCKROT_RELEASE_KEY'] = \dirname(__DIR__).'/fixtures/signing/release-key.pub';
+        }
+        $process = new Process(array_merge(['php', $target, 'self-update'], $options), \dirname($target), $environment);
         $process->setTimeout(300)->run();
 
         return $process;

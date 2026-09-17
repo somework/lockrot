@@ -37,12 +37,25 @@ final class ReleaseSignatureVerifier implements SignatureVerifierInterface
         if (!\extension_loaded('openssl')) {
             throw new ConfigException('the openssl extension is needed to verify the release signature, and this PHP does not have it; nothing was written');
         }
+        if (!\in_array('sha384', openssl_get_md_methods(), true)) {
+            throw new ConfigException('the openssl extension of this PHP has no SHA-384, so the release signature cannot be checked; nothing was written');
+        }
         $signature = self::signatureIn($signatureFile, $signatureUrl);
         $key = openssl_pkey_get_public($this->publicKeyPem);
         if ($key === false) {
-            throw new ConfigException('the release key inside this lockrot.phar cannot be loaded; download the new release by hand and verify it');
+            throw new ConfigException('the public key self-update verifies releases with cannot be loaded; download the new release by hand and verify it');
         }
-        if (openssl_verify($archive, $signature, $key, \OPENSSL_ALGO_SHA384) !== 1) {
+        // 1 is a match, 0 a mismatch (a wrong key, other bytes, a signature of the wrong length —
+        // openssl reports them all as 0), -1 an error inside openssl itself. The last is this
+        // machine's fault, not the release's, and is reported as such rather than as a forgery; no
+        // input from outside reaches it, so no test can either.
+        $verified = openssl_verify($archive, $signature, $key, \OPENSSL_ALGO_SHA384);
+        if ($verified === -1) {
+            $reason = openssl_error_string();
+
+            throw new ConfigException('openssl could not check the release signature'.(\is_string($reason) ? ': '.$reason : '').'; nothing was written');
+        }
+        if ($verified !== 1) {
             throw new ConfigException(\sprintf(
                 'the signature in %s does not match the downloaded archive: either the release was signed with a key this lockrot.phar does not know, or the download is not the published archive; nothing was written',
                 $signatureUrl

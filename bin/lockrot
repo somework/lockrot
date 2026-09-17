@@ -155,6 +155,10 @@ $application = new class () extends \Composer\Console\Application {
      * end-to-end test can sign its local releases with a key of its own. Empty or unset means the
      * key built into this archive ({@see \Lockrot\SelfUpdate\ReleaseKey}), which is the only key any
      * install ever uses. Composer's self-update has the same seam in COMPOSER_HOME/keys.tags.pub.
+     *
+     * The file is read when a signature is checked, not here: every command goes through this
+     * factory, and an unreadable path must fail `self-update` through its own error channel, not
+     * `lockrot -d project` before it has read a lock.
      */
     private static function releaseKeyOverride(): ?\Lockrot\SelfUpdate\SignatureVerifierInterface
     {
@@ -162,13 +166,24 @@ $application = new class () extends \Composer\Console\Application {
         if (!\is_string($path) || $path === '') {
             return null;
         }
-        $pem = @file_get_contents($path);
-        if ($pem === false) {
-            fwrite(\STDERR, 'lockrot: LOCKROT_RELEASE_KEY names an unreadable file: '.$path."\n");
-            exit(2);
-        }
 
-        return new \Lockrot\SelfUpdate\ReleaseSignatureVerifier($pem);
+        return new class ($path) implements \Lockrot\SelfUpdate\SignatureVerifierInterface {
+            private string $path;
+
+            public function __construct(string $path)
+            {
+                $this->path = $path;
+            }
+
+            public function verify(string $archive, string $signatureFile, string $signatureUrl): void
+            {
+                $pem = @file_get_contents($this->path);
+                if ($pem === false) {
+                    throw new \Lockrot\Exception\ConfigException('LOCKROT_RELEASE_KEY names an unreadable file: '.$this->path);
+                }
+                (new \Lockrot\SelfUpdate\ReleaseSignatureVerifier($pem))->verify($archive, $signatureFile, $signatureUrl);
+            }
+        };
     }
 
     public function getLongVersion(): string
