@@ -71,11 +71,31 @@ The checksum and the signature answer different questions. `sha256sum -c` proves
 matches the checksum file next to it — that the download arrived intact, given that both files came
 from the same place. The signature proves the bytes were signed with the release key, which the
 release assets alone cannot fake: it still holds if the assets were replaced after the fact.
-`self-update` checks the checksum only; it downloads `lockrot.phar.sha256` from the same release, so
-it proves the archive arrived intact, not who published it. For the signature or the attestation,
-download by hand. The release workflow verifies its own signature against the committed public key
-before it uploads anything, so the key in the repository and the key in CI cannot silently drift
-apart.
+`self-update` checks the checksum, and from 0.6.0 on a signature of its own — see
+[Self-update signature](#self-update-signature) below. The release workflow verifies its own
+signatures against the committed public keys before it uploads anything, so the keys in the
+repository and the keys in CI cannot silently drift apart.
+
+### Self-update signature
+
+Every release from 0.6.0 on also publishes `lockrot.phar.sig`: an RSA signature (PKCS#1 v1.5 over
+SHA-384) by the lockrot self-update key, in the `{"sha384": "<base64>"}` file format Composer uses
+for `composer.phar`. It exists so that the archive can verify a release by itself — with
+`openssl_verify()` and the public key built into it, nothing installed on the machine — which an
+OpenPGP signature cannot give it without `gpg`. The key is RSA 4096 and separate from the GPG
+release key; its public half is `lockrot-selfupdate-key.pub` in the repository root. To check it
+by hand:
+
+```bash
+curl -fsSL -O https://github.com/somework/lockrot/releases/latest/download/lockrot.phar.sig
+curl -fsSL -O https://raw.githubusercontent.com/somework/lockrot/main/lockrot-selfupdate-key.pub
+php -r 'echo base64_decode(json_decode(file_get_contents("lockrot.phar.sig"), true)["sha384"]);' > lockrot.phar.sig.bin
+openssl dgst -sha384 -verify lockrot-selfupdate-key.pub -signature lockrot.phar.sig.bin lockrot.phar
+```
+
+For a person, the GPG signature or the attestation is the check to make: they do not depend on a
+key fetched from the same place as the archive. The self-update signature is for the archive
+already on the machine, whose key arrived with a download that was verified once.
 
 ### Build provenance
 
@@ -149,7 +169,7 @@ PHAR.
 ## Keeping it updated
 
 ```bash
-php lockrot.phar self-update          # download, verify the sha256, replace this file
+php lockrot.phar self-update          # download, verify the sha256 and the signature, replace this file
 php lockrot.phar self-update --check  # report only; exits 1 when an update is available
 php lockrot.phar self-update --force  # reinstall the latest release even when it is the one running
 ```
@@ -158,9 +178,12 @@ php lockrot.phar self-update --force  # reinstall the latest release even when i
 refuse to run rather than fail half-way: an update cannot happen without the network.
 
 `self-update` reads `releases/latest` from the GitHub API directly, not through `lockrot.dev`. It
-downloads the release's `lockrot.phar.sha256` alongside the archive, refuses to install anything
-whose hash does not match, and checks that the PHP runtime can open the download before it replaces
-the running file.
+downloads the release's `lockrot.phar.sha256` and `lockrot.phar.sig` alongside the archive, refuses
+to install anything whose hash does not match or whose signature does not verify against the key
+built into the running archive ([above](#self-update-signature)), and checks that the PHP runtime
+can open the download before it replaces the running file. The archive running 0.5.0 checks the
+checksum only when it updates to 0.6.0 — the verifier arrives with 0.6.0 — and releases before
+0.6.0 carry no signature, so a 0.6.0 archive cannot `--force` its way back to one.
 
 It needs write access to the directory the PHAR sits in — a PHAR in `/usr/local/bin` wants `sudo`, or
 a manual download — and it writes nothing else. If the update fails at any step, the running
@@ -185,7 +208,7 @@ exists so a scheduled job notices.
 |---|---|
 | `0` | An update was installed, or the build is already current |
 | `1` | `--check` only: a newer release exists |
-| `2` | Every failure: no published release, GitHub unreachable, a checksum mismatch, an archive the runtime cannot open, an unwritable directory, or running outside the PHAR |
+| `2` | Every failure: no published release, GitHub unreachable, a checksum mismatch, a signature that does not verify, an archive the runtime cannot open, an unwritable directory, or running outside the PHAR |
 
 On `2` the running `lockrot.phar` is untouched.
 

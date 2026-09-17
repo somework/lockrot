@@ -10,7 +10,9 @@ use Lockrot\Composer\SelfUpdateCommand;
 use Lockrot\Data\Http\HttpResult;
 use Lockrot\SelfUpdate\PharValidatorInterface;
 use Lockrot\SelfUpdate\ReleaseLocator;
+use Lockrot\SelfUpdate\ReleaseSignatureVerifier;
 use Lockrot\Tests\Support\FakeHttpClient;
+use Lockrot\Tests\Support\SigningKeys;
 use Lockrot\Tests\Support\SplitStreamOutput;
 use Lockrot\Version;
 use PHPUnit\Framework\TestCase;
@@ -81,10 +83,12 @@ final class SelfUpdateCommandTest extends TestCase
     {
         $phar = self::downloadUrl($tag, 'lockrot.phar');
         $checksum = self::downloadUrl($tag, 'lockrot.phar.sha256');
+        $signature = self::downloadUrl($tag, 'lockrot.phar.sig');
 
         return $this->httpFor($tag, array_merge([
             $phar => FakeHttpClient::ok($phar, self::NEW_PHAR),
             $checksum => FakeHttpClient::ok($checksum, hash('sha256', self::NEW_PHAR).'  lockrot.phar'."\n"),
+            $signature => FakeHttpClient::ok($signature, SigningKeys::releaseSignatureFile(self::NEW_PHAR)),
         ], $extra));
     }
 
@@ -113,7 +117,10 @@ final class SelfUpdateCommandTest extends TestCase
             },
             $this->validator(),
             $runningPhar,
-            $releaseUrl
+            $releaseUrl,
+            // The real verifier with the test key: the command's own wiring is what runs, only the
+            // key differs from the one built into a release.
+            new ReleaseSignatureVerifier(SigningKeys::releasePublicPem())
         ));
     }
 
@@ -317,6 +324,8 @@ final class SelfUpdateCommandTest extends TestCase
         foreach ([
             'from GitHub',
             'sha256 published beside it',
+            'against its signature',
+            'key built into this archive',
             'has to be writable',
             'leaves the running archive exactly as it was',
             "  php lockrot.phar self-update\n",

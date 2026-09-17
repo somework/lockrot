@@ -13,7 +13,7 @@ use Lockrot\Exception\ConfigException;
 use Lockrot\Version;
 
 /**
- * Downloads a {@see Release}, verifies it against its published sha256, and replaces the running
+ * Downloads a {@see Release}, verifies it against its published sha256 and its signature, and replaces the running
  * PHAR with it.
  *
  * The shape of the replace follows Composer's own self-update: write next to the target, carry the
@@ -59,6 +59,7 @@ final class PharUpdater
 
     private HttpClientInterface $http;
     private PharValidatorInterface $validator;
+    private SignatureVerifierInterface $signatures;
     private string $runningPhar;
     private string $currentVersion;
     private Clock $clock;
@@ -67,12 +68,14 @@ final class PharUpdater
     public function __construct(
         HttpClientInterface $http,
         PharValidatorInterface $validator,
+        SignatureVerifierInterface $signatures,
         string $runningPhar,
         string $currentVersion = Version::STRING,
         ?Clock $clock = null
     ) {
         $this->http = $http;
         $this->validator = $validator;
+        $this->signatures = $signatures;
         $this->runningPhar = $runningPhar;
         $this->currentVersion = $currentVersion;
         $this->clock = $clock ?? new Clock();
@@ -114,8 +117,12 @@ final class PharUpdater
             );
         }
 
-        $responses = $this->http->fetchAll([$release->checksumUrl(), $release->pharUrl()], self::DOWNLOAD_HEADERS);
+        $responses = $this->http->fetchAll(
+            [$release->checksumUrl(), $release->signatureUrl(), $release->pharUrl()],
+            self::DOWNLOAD_HEADERS
+        );
         $expected = self::expectedHash(self::body($responses[$release->checksumUrl()]), $release->checksumUrl());
+        $signature = self::body($responses[$release->signatureUrl()]);
         $phar = self::body($responses[$release->pharUrl()]);
         $actual = hash('sha256', $phar);
         if (!hash_equals($expected, $actual)) {
@@ -127,6 +134,9 @@ final class PharUpdater
                 $actual
             ));
         }
+        // Checksum first, signature second: a download that arrived damaged is reported as that,
+        // not as a forgery. Both before a byte is written next to the running archive.
+        $this->signatures->verify($phar, $signature, $release->signatureUrl());
 
         [$temporary, $unappliedMode] = $this->stage($phar);
         try {

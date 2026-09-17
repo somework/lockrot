@@ -2,13 +2,16 @@ name: PHAR
 on:
   push: {tags: ['v*']}
   workflow_dispatch:
-# Tag builds and default-branch dispatches are signed with the lockrot release key and attested
-# by GitHub. The key's public half
-# is lockrot-release-key.asc in the repository root (also on keys.openpgp.org and
+# Tag builds and default-branch dispatches are signed twice and attested by GitHub. The GPG
+# signature (lockrot.phar.asc) is for people and PHIVE: the key's public half is
+# lockrot-release-key.asc in the repository root (also on keys.openpgp.org and
 # keyserver.ubuntu.com); CI holds only its signing subkey (GPG_PRIVATE_KEY, GPG_PASSPHRASE). The
-# signature is checked here against the committed public key, so a key rotation that forgets to
-# update the file — or a secret that no longer matches it — fails the build instead of shipping
-# an archive nobody can verify with the documented key.
+# RSA signature (lockrot.phar.sig) is for the archive's own self-update, checked against the key
+# built into it (ReleaseKey::PEM, published as lockrot-selfupdate-key.pub); CI holds the private
+# half as SELFUPDATE_PRIVATE_KEY with SELFUPDATE_PASSPHRASE. Both signatures are checked here
+# against the committed public keys, so a key rotation that forgets to update a file — or a secret
+# that no longer matches it — fails the build instead of shipping an archive nobody can verify with
+# the documented key.
 #
 # Signing and attestation run for a tag (pushed or dispatched) and for a dispatch from the default
 # branch (a key rotation is rehearsed there), never for a dispatch from another branch: a
@@ -62,6 +65,33 @@ jobs:
           # place of GOODSIG — and a signature every downloader's gpg will complain about.
           grep -E "^\[GNUPG:\] VALIDSIG [0-9A-F]{40} .* ${LOCKROT_SIGNING_KEY}$" build/gpg-status.txt
           grep -E "^\[GNUPG:\] GOODSIG " build/gpg-status.txt
+      # The second signature is for the archive's own self-update: an RSA (PKCS#1 v1.5, SHA-384)
+      # signature over the same bytes, in Composer's `{"sha384": "<base64>"}` file format, checked
+      # by Lockrot\SelfUpdate\ReleaseSignatureVerifier against the key built into the archive. The
+      # private key lives in a throw-away directory for the length of the step; the passphrase is
+      # read from the environment by openssl itself, never from an argument.
+      - name: Sign the PHAR for self-update
+        if: env.SIGN == 'true'
+        env:
+          SELFUPDATE_PRIVATE_KEY: ${{ secrets.SELFUPDATE_PRIVATE_KEY }}
+          SELFUPDATE_PASSPHRASE: ${{ secrets.SELFUPDATE_PASSPHRASE }}
+        run: |
+          KEYDIR="$(mktemp -d)"
+          printf '%s\n' "$SELFUPDATE_PRIVATE_KEY" > "$KEYDIR/key.pem"
+          openssl dgst -sha384 -sign "$KEYDIR/key.pem" -passin env:SELFUPDATE_PASSPHRASE -out build/lockrot.phar.sig.bin build/lockrot.phar
+          rm -rf "$KEYDIR"
+          build/selfupdate-signature.php wrap build/lockrot.phar.sig.bin > build/lockrot.phar.sig
+          rm build/lockrot.phar.sig.bin
+      # Two checks: openssl against the published key file, and the archive's own verifier class
+      # against the key it carries — the second is what a user's self-update will run, so a key
+      # the workflow signs with that is not the one in ReleaseKey::PEM fails here, not on a user.
+      - name: Verify the self-update signature with the built-in key
+        if: env.SIGN == 'true'
+        run: |
+          build/selfupdate-signature.php unwrap build/lockrot.phar.sig > build/lockrot.phar.sig.bin
+          openssl dgst -sha384 -verify lockrot-selfupdate-key.pub -signature build/lockrot.phar.sig.bin build/lockrot.phar
+          rm build/lockrot.phar.sig.bin
+          build/selfupdate-signature.php verify build/lockrot.phar build/lockrot.phar.sig
       - run: LOCKROT_E2E=1 vendor/bin/phpunit --group e2e --filter PharTest
       - if: env.SIGN == 'true'
         uses: actions/attest-build-provenance@v4

@@ -65,7 +65,7 @@
     //    ((int) of the whole YYYY-MM-DD match is the year), HttpResult.php:84 (getLastErrors() is false
     //    on PHP >= 8.2 when clean; killed on the 7.4 leg), LockrotCommand.php:375 x2 (the Composer 2.2
     //    arm of the tryComposer() guard, never entered on the vendored Composer; covered by the Docker
-    //    7.4/2.2 run outside Infection), SelfUpdateCommand.php:122 (Phar::running(false) differs only
+    //    7.4/2.2 run outside Infection), SelfUpdateCommand.php:130 (Phar::running(false) differs only
     //    inside a running PHAR; covered by the e2e PharTest Infection does not run).
     //  - Same result by another route: ActivityClient.php:68 (`<` to `<=` assigns an equal value),
     //    ProjectIgnoreList.php:75 and PhpReleaseDates.php:29 Concat (PHP's date parser accepts the
@@ -77,7 +77,7 @@
     //    returns null anyway), Policy.php:23 (FailOn::reaches() is false for `none`, the loop rejects
     //    everything and falls through to EXIT_OK), InstallTimeSummary.php:186 x2 (the stale list the
     //    names feed is never rendered on the install-time path; kept for a truthful comparison),
-    //    SelfUpdateCommand.php:154 and :158 (an unclosed `</error>` renders byte-identically, the line
+    //    SelfUpdateCommand.php:168 and :172 (an unclosed `</error>` renders byte-identically, the line
     //    is the command's last write).
     //
     // Threshold 97 = floor of the honest MSI minus 1: at 3201 mutants that leaves room for ~40 new

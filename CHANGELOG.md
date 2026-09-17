@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `self-update` verifies the release signature. Every release from 0.6.0 on publishes
+  `lockrot.phar.sig` next to the archive — an RSA signature (PKCS#1 v1.5 over SHA-384) by the new
+  lockrot self-update key, in the `{"sha384": "<base64>"}` file format Composer uses for its own
+  self-update — and the archive checks it with `openssl_verify()` against the public key built into
+  itself before anything is written, after the sha256 check it already made. A release signed with a
+  key the archive does not know, a signature over other bytes, or a signature file that is not one
+  is reported and not installed. The key is RSA 4096, separate from the GPG release key (which
+  still signs `lockrot.phar.asc` for people and PHIVE), published as `lockrot-selfupdate-key.pub`
+  in the repository root; SECURITY.md says how it is rotated. The archive running 0.5.0 still
+  checks the checksum only when it updates to 0.6.0; releases before 0.6.0 carry no `.sig`, so a
+  0.6.0 archive cannot `--force` its way back to one.
 - The PHAR is built reproducibly. `build/build-phar.sh` on the tagged commit — with Box 4.7.0,
   which the script downloads and checks, and the Composer version the release workflow pins at
   that tag (`tools: composer:…` in `.github/workflows/phar.yml`) — produces the archive byte for

@@ -37,6 +37,7 @@ final class ReleaseLocatorTest extends TestCase
         self::assertSame('v0.2.0', $release->tag());
         self::assertSame('https://github.com/somework/lockrot/releases/download/v0.2.0/lockrot.phar', $release->pharUrl());
         self::assertSame('https://github.com/somework/lockrot/releases/download/v0.2.0/lockrot.phar.sha256', $release->checksumUrl());
+        self::assertSame('https://github.com/somework/lockrot/releases/download/v0.2.0/lockrot.phar.sig', $release->signatureUrl());
         self::assertSame([self::URL], $http->requested());
     }
 
@@ -129,6 +130,17 @@ final class ReleaseLocatorTest extends TestCase
     }
 
     /** An asset listed under the right name but with nothing to download from is no asset at all. */
+    /** A release from before signing (0.5.0 and earlier) is not one this build can install. */
+    public function testAReleaseWithoutTheSignatureAssetNamesTheTag(): void
+    {
+        $body = str_replace('lockrot.phar.sig', 'lockrot.phar.asc', self::fixture('latest.json'));
+        $http = new FakeHttpClient([self::URL => FakeHttpClient::ok(self::URL, $body)]);
+
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('release v0.2.0 has no lockrot.phar.sig asset');
+        (new ReleaseLocator($http))->locate();
+    }
+
     public function testAnAssetWithoutADownloadUrlCountsAsMissing(): void
     {
         $body = str_replace(

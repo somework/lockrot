@@ -21,14 +21,17 @@ use Lockrot\Exception\ConfigException;
  * `github-oauth` all lift the 60-requests-per-hour anonymous limit here too.
  *
  * Every failure — no release, an unreachable API, a body that is not JSON, a tag that is not a
- * version, a release missing either asset — is a {@see ConfigException}, which the command reports
- * on stderr and turns into exit 2.
+ * version, a release missing any of the three assets — is a {@see ConfigException}, which the
+ * command reports on stderr and turns into exit 2. Releases before 0.6.0 carry no signature, so
+ * `--force` cannot install one from a build that checks signatures; that is the one direction the
+ * check closes on purpose.
  */
 final class ReleaseLocator
 {
     public const DEFAULT_URL = 'https://api.github.com/repos/somework/lockrot/releases/latest';
     public const PHAR_ASSET = 'lockrot.phar';
     public const CHECKSUM_ASSET = 'lockrot.phar.sha256';
+    public const SIGNATURE_ASSET = 'lockrot.phar.sig';
 
     private HttpClientInterface $http;
     private ?string $token;
@@ -62,7 +65,8 @@ final class ReleaseLocator
             $version,
             $tag,
             $this->assetUrl($json, $tag, self::PHAR_ASSET),
-            $this->assetUrl($json, $tag, self::CHECKSUM_ASSET)
+            $this->assetUrl($json, $tag, self::CHECKSUM_ASSET),
+            $this->assetUrl($json, $tag, self::SIGNATURE_ASSET)
         );
     }
 

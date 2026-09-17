@@ -17,3 +17,4 @@
 /mkdocs.yml export-ignore
 /.python-version export-ignore
 /lockrot-release-key.asc export-ignore
+/lockrot-selfupdate-key.pub export-ignore

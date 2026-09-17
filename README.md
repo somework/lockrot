@@ -52,7 +52,8 @@ sha256sum -c lockrot.phar.sha256   # shasum -a 256 -c on macOS
 Releases from 0.5.0 on are also GPG-signed (`lockrot.phar.asc`, key `39EC C3F6 4AE8 D06A 9A63
 FD99 AB6F 7F52 AE51 3141`) and attested by GitHub (`gh attestation verify lockrot.phar --repo
 somework/lockrot`); `phive install somework/lockrot` does the download and the signature check in
-one step.
+one step. From 0.6.0 on `php lockrot.phar self-update` verifies each release's `lockrot.phar.sig`
+against the key built into the archive, with nothing installed on the machine.
 
 [The PHAR, signatures, `self-update` and the global plugin install →](https://lockrot.dev/phar/)
 

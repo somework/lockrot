@@ -104,7 +104,7 @@ $application = new class () extends \Composer\Console\Application {
             }
         }
         $commands[] = new \Lockrot\Composer\LockrotCommand();
-        $commands[] = new \Lockrot\Composer\SelfUpdateCommand(null, null, null, self::releaseUrlOverride());
+        $commands[] = new \Lockrot\Composer\SelfUpdateCommand(null, null, null, self::releaseUrlOverride(), self::releaseKeyOverride());
 
         return $commands;
     }
@@ -148,6 +148,27 @@ $application = new class () extends \Composer\Console\Application {
         $url = \Composer\Util\Platform::getEnv('LOCKROT_RELEASE_URL');
 
         return \is_string($url) && $url !== '' ? $url : null;
+    }
+
+    /**
+     * The public key `self-update` verifies releases against, as a path to a PEM file, so the same
+     * end-to-end test can sign its local releases with a key of its own. Empty or unset means the
+     * key built into this archive ({@see \Lockrot\SelfUpdate\ReleaseKey}), which is the only key any
+     * install ever uses. Composer's self-update has the same seam in COMPOSER_HOME/keys.tags.pub.
+     */
+    private static function releaseKeyOverride(): ?\Lockrot\SelfUpdate\SignatureVerifierInterface
+    {
+        $path = \Composer\Util\Platform::getEnv('LOCKROT_RELEASE_KEY');
+        if (!\is_string($path) || $path === '') {
+            return null;
+        }
+        $pem = @file_get_contents($path);
+        if ($pem === false) {
+            fwrite(\STDERR, 'lockrot: LOCKROT_RELEASE_KEY names an unreadable file: '.$path."\n");
+            exit(2);
+        }
+
+        return new \Lockrot\SelfUpdate\ReleaseSignatureVerifier($pem);
     }
 
     public function getLongVersion(): string

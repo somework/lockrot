@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\E2E;
 
+use Lockrot\Tests\Support\SigningKeys;
 use Lockrot\Tests\Support\StaticFileServer;
 use Lockrot\Version;
 use PHPUnit\Framework\Attributes\Group;
@@ -256,6 +257,29 @@ final class PharTest extends TestCase
     }
 
     /**
+     * The built archive enforcing its own signature check end to end: a release whose `.sig` is by
+     * a key the archive does not trust is reported on one line, exits 2, and leaves the running
+     * archive — bytes and permissions — and its directory exactly as they were.
+     */
+    public function testSelfUpdateRefusesAReleaseSignedWithAnotherKey(): void
+    {
+        $directory = $this->freshDir();
+        $target = $this->installedCopy($directory);
+        $before = hash_file('sha256', $target);
+
+        $process = $this->runSelfUpdate($target, 'forged');
+
+        self::assertSame('', $process->getOutput());
+        self::assertSame(2, $process->getExitCode(), $process->getErrorOutput());
+        $reported = self::reported($process);
+        self::assertStringContainsString('lockrot: the signature in '.self::server()->url().'/forged/lockrot.phar.sig does not match', $reported);
+        self::assertStringEndsWith("nothing was written\n", $reported);
+        self::assertSame(1, substr_count($reported, "\n"), 'one line and nothing else');
+        self::assertSame($before, hash_file('sha256', $target), 'the running archive must be untouched');
+        self::assertSame([$target], glob($directory.'/*') ?: [], 'nothing else may have been written next to it');
+    }
+
+    /**
      * What lockrot itself said on stderr. Exactly one line is dropped: Composer warns once per run
      * that it is reaching 127.0.0.1 over plain http, which the test harness asked for and a real
      * install never sees. Nothing else is filtered, so a notice, a warning or a trace from the PHAR
@@ -278,6 +302,9 @@ final class PharTest extends TestCase
             \dirname($target),
             [
                 'LOCKROT_RELEASE_URL' => self::server()->url().'/'.$channel.'/latest.json',
+                // The channels are signed with the test key, not the release key built into the
+                // archive; this is the seam that lets the built PHAR verify them.
+                'LOCKROT_RELEASE_KEY' => \dirname(__DIR__).'/fixtures/signing/release-key.pub',
                 // The release server is plain http on 127.0.0.1, which Composer's HttpDownloader
                 // refuses under its default secure-http. Relaxing it in a throwaway COMPOSER_HOME
                 // keeps that to the test process; nothing in lockrot itself lowers the bar.
@@ -334,14 +361,19 @@ final class PharTest extends TestCase
         $server = StaticFileServer::serving($docroot);
         self::publishChannel($docroot, $server->url(), 'release', self::minimalPhar(), self::OFFERED_VERSION);
         self::publishChannel($docroot, $server->url(), 'same', \dirname(__DIR__, 2).'/build/lockrot.phar', Version::STRING);
+        self::publishChannel($docroot, $server->url(), 'forged', self::minimalPhar(), self::OFFERED_VERSION, false);
         $server->start();
         self::$server = $server;
 
         return $server;
     }
 
-    /** Writes one channel: the archive, its `sha256sum` file, and a `releases/latest`-shaped document. */
-    private static function publishChannel(string $docroot, string $url, string $channel, string $archive, string $version): void
+    /**
+     * Writes one channel: the archive, its `sha256sum` file, its signature and a `releases/latest`-shaped
+     * document. The signature is by the test release key, or — for the channel that stands in for a
+     * substituted release — by a key of the same shape that is not it.
+     */
+    private static function publishChannel(string $docroot, string $url, string $channel, string $archive, string $version, bool $signedByReleaseKey = true): void
     {
         $directory = $docroot.'/'.$channel;
         if (!mkdir($directory, 0755, true) && !is_dir($directory)) {
@@ -352,6 +384,11 @@ final class PharTest extends TestCase
         }
         $hash = hash_file('sha256', $archive);
         file_put_contents($directory.'/lockrot.phar.sha256', $hash.'  lockrot.phar'."\n");
+        $bytes = (string) file_get_contents($archive);
+        file_put_contents(
+            $directory.'/lockrot.phar.sig',
+            $signedByReleaseKey ? SigningKeys::releaseSignatureFile($bytes) : SigningKeys::otherSignatureFile($bytes)
+        );
 
         $base = $url.'/'.$channel.'/';
         $latest = json_encode([
@@ -359,6 +396,7 @@ final class PharTest extends TestCase
             'assets' => [
                 ['name' => 'lockrot.phar', 'browser_download_url' => $base.'lockrot.phar'],
                 ['name' => 'lockrot.phar.sha256', 'browser_download_url' => $base.'lockrot.phar.sha256'],
+                ['name' => 'lockrot.phar.sig', 'browser_download_url' => $base.'lockrot.phar.sig'],
             ],
         ]);
         if ($latest === false) {

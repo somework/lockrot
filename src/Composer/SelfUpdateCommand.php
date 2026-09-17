@@ -17,7 +17,10 @@ use Lockrot\Exception\ConfigException;
 use Lockrot\SelfUpdate\PharUpdater;
 use Lockrot\SelfUpdate\PharValidator;
 use Lockrot\SelfUpdate\PharValidatorInterface;
+use Lockrot\SelfUpdate\ReleaseKey;
 use Lockrot\SelfUpdate\ReleaseLocator;
+use Lockrot\SelfUpdate\ReleaseSignatureVerifier;
+use Lockrot\SelfUpdate\SignatureVerifierInterface;
 use Lockrot\Version;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -54,6 +57,7 @@ final class SelfUpdateCommand extends BaseCommand
     private ?PharValidatorInterface $validator;
     private ?string $runningPhar;
     private string $releaseUrl;
+    private ?SignatureVerifierInterface $signatures;
 
     /**
      * @param null|callable(IOInterface): array{0: HttpClientInterface, 1: ?string} $httpFactory HTTP client plus the
@@ -61,17 +65,20 @@ final class SelfUpdateCommand extends BaseCommand
      *                                                                                          null builds both from
      *                                                                                          Composer's own config
      * @param ?string $runningPhar the archive to replace; null asks the runtime (`\Phar::running(false)`)
+     * @param ?SignatureVerifierInterface $signatures null checks against the release key built into this archive
      */
     public function __construct(
         ?callable $httpFactory = null,
         ?PharValidatorInterface $validator = null,
         ?string $runningPhar = null,
-        ?string $releaseUrl = null
+        ?string $releaseUrl = null,
+        ?SignatureVerifierInterface $signatures = null
     ) {
         $this->httpFactory = $httpFactory;
         $this->validator = $validator;
         $this->runningPhar = $runningPhar;
         $this->releaseUrl = $releaseUrl ?? ReleaseLocator::DEFAULT_URL;
+        $this->signatures = $signatures;
         parent::__construct('self-update');
     }
 
@@ -88,7 +95,8 @@ final class SelfUpdateCommand extends BaseCommand
             ->addOption('offline', null, InputOption::VALUE_NONE, 'Refuse to use the network (self-update cannot run without it)')
             ->setHelp(
                 "Downloads the newest release of lockrot.phar from GitHub, checks it against the\n"
-                ."sha256 published beside it, and replaces the running archive in place.\n\n"
+                ."sha256 published beside it and against its signature (verified with the release\n"
+                ."key built into this archive), and replaces the running archive in place.\n\n"
                 ."The PHAR's own directory has to be writable. Nothing else on disk is touched, and\n"
                 ."a failure at any step leaves the running archive exactly as it was.\n\n"
                 ."  php lockrot.phar self-update\n"
@@ -129,7 +137,13 @@ final class SelfUpdateCommand extends BaseCommand
 
             [$http, $token] = $this->httpAndToken();
             $release = (new ReleaseLocator($http, $token, $this->releaseUrl))->locate();
-            $updater = new PharUpdater($http, $this->validator ?? new PharValidator(), $phar, Version::STRING);
+            $updater = new PharUpdater(
+                $http,
+                $this->validator ?? new PharValidator(),
+                $this->signatures ?? new ReleaseSignatureVerifier(ReleaseKey::PEM),
+                $phar,
+                Version::STRING
+            );
 
             if ($input->getOption('check') === true) {
                 if (!$updater->isUpdateAvailable($release)) {

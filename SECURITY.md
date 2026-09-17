@@ -24,11 +24,26 @@ host as the release itself:
     curl -fsSL -O https://github.com/somework/lockrot/releases/latest/download/lockrot.phar.sha256
     sha256sum -c lockrot.phar.sha256
 
-`php lockrot.phar self-update` performs the same check automatically: it downloads the checksum
-alongside the archive, refuses to install anything whose hash does not match, verifies the PHP
-runtime can open the download, and leaves the running file in place if any step fails. That is the
-checksum only: `self-update` verifies neither the signature nor the attestation below, so an
-update that must be authenticated is a manual download.
+`php lockrot.phar self-update` performs the same check automatically, and from 0.6.0 on a second
+one: every release also publishes `lockrot.phar.sig`, an RSA signature (PKCS#1 v1.5 over SHA-384,
+in Composer's `{"sha384": "<base64>"}` file format) by the lockrot self-update key, and the
+archive verifies it with `openssl_verify()` against the public key built into itself
+(`Lockrot\SelfUpdate\ReleaseKey`, published as `lockrot-selfupdate-key.pub` in this repository).
+A download whose checksum or signature does not match, or that the PHP runtime cannot open, is not
+installed and the running file is left in place. Trust starts with the first download: verify that
+one by hand with the GPG signature or the attestation below, and every self-update after it is
+checked against the key that download carried. The archive running 0.5.0 still checks the checksum
+only when it updates to 0.6.0; from 0.6.0 on the signature is checked.
+
+The self-update key is RSA 4096 and separate from the GPG release key, the way Composer keeps its
+self-update keys apart from its maintainers' keys: the archive cannot verify OpenPGP without `gpg`
+on the machine, and `openssl_verify()` is in every PHP that can download over https. The private
+half is held by the release workflow (`SELFUPDATE_PRIVATE_KEY`, `SELFUPDATE_PASSPHRASE`); the
+workflow verifies every signature it makes against the committed public key and through the
+archive's own verifier before it publishes. A rotation ships the new key inside a release signed
+with the old one — so an archive in the field updates to it — and the changelog names the new
+key's SHA-256 fingerprint; a key suspected compromised is rotated the same way, and the release it
+signed is pulled.
 
 Every release from 0.5.0 on is also signed with the lockrot release key — `lockrot.phar.asc` next
 to the PHAR — and attested by GitHub:

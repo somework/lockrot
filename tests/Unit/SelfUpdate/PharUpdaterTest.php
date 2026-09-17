@@ -11,7 +11,9 @@ use Lockrot\Exception\ConfigException;
 use Lockrot\SelfUpdate\PharUpdater;
 use Lockrot\SelfUpdate\PharValidatorInterface;
 use Lockrot\SelfUpdate\Release;
+use Lockrot\SelfUpdate\ReleaseSignatureVerifier;
 use Lockrot\Tests\Support\FakeHttpClient;
+use Lockrot\Tests\Support\SigningKeys;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
@@ -21,6 +23,7 @@ final class PharUpdaterTest extends TestCase
 {
     private const PHAR_URL = 'https://github.com/somework/lockrot/releases/download/v0.2.0/lockrot.phar';
     private const CHECKSUM_URL = 'https://github.com/somework/lockrot/releases/download/v0.2.0/lockrot.phar.sha256';
+    private const SIGNATURE_URL = 'https://github.com/somework/lockrot/releases/download/v0.2.0/lockrot.phar.sig';
     private const NEW_PHAR = 'the bytes of a newer lockrot.phar';
     private const INSTALLED = 'the bytes of the running lockrot.phar';
 
@@ -65,15 +68,25 @@ final class PharUpdaterTest extends TestCase
 
     private function release(string $version = '0.2.0'): Release
     {
-        return new Release($version, 'v'.$version, self::PHAR_URL, self::CHECKSUM_URL);
+        return new Release($version, 'v'.$version, self::PHAR_URL, self::CHECKSUM_URL, self::SIGNATURE_URL);
     }
 
-    private function http(string $checksumBody, string $pharBody = self::NEW_PHAR): FakeHttpClient
+    /**
+     * The three downloads of a release, with the signature the release key would publish for the
+     * archive body unless $signatureBody says otherwise.
+     */
+    private function http(string $checksumBody, string $pharBody = self::NEW_PHAR, ?string $signatureBody = null): FakeHttpClient
     {
         return new FakeHttpClient([
             self::CHECKSUM_URL => FakeHttpClient::ok(self::CHECKSUM_URL, $checksumBody),
+            self::SIGNATURE_URL => FakeHttpClient::ok(self::SIGNATURE_URL, $signatureBody ?? SigningKeys::releaseSignatureFile($pharBody)),
             self::PHAR_URL => FakeHttpClient::ok(self::PHAR_URL, $pharBody),
         ]);
+    }
+
+    private static function signedOk(): \Lockrot\Data\Http\HttpResult
+    {
+        return FakeHttpClient::ok(self::SIGNATURE_URL, SigningKeys::releaseSignatureFile(self::NEW_PHAR));
     }
 
     private static function checksumFileFor(string $body, string $name = 'lockrot.phar'): string
@@ -100,7 +113,7 @@ final class PharUpdaterTest extends TestCase
 
     private function updater(FakeHttpClient $http, string $phar, ?string $validationError = null, string $installedVersion = '0.1.0', ?Clock $clock = null): PharUpdater
     {
-        return new PharUpdater($http, $this->validator($validationError), $phar, $installedVersion, $clock);
+        return new PharUpdater($http, $this->validator($validationError), new ReleaseSignatureVerifier(SigningKeys::releasePublicPem()), $phar, $installedVersion, $clock);
     }
 
     /** @return list<string> every file in $dir, sorted */
@@ -182,7 +195,7 @@ final class PharUpdaterTest extends TestCase
         self::assertSame(['lockrot.phar'], self::filesIn($dir), 'the temporary file must be gone');
         clearstatcache(true, $phar);
         self::assertSame($mode, fileperms($phar) & 0777);
-        self::assertSame([self::CHECKSUM_URL, self::PHAR_URL], $http->requested());
+        self::assertSame([self::CHECKSUM_URL, self::SIGNATURE_URL, self::PHAR_URL], $http->requested());
     }
 
     /** @return array<string, array{0: int}> */
@@ -299,6 +312,7 @@ final class PharUpdaterTest extends TestCase
         $phar = $this->installedPhar($dir);
         $http = new FakeHttpClient([
             self::CHECKSUM_URL => FakeHttpClient::ok(self::CHECKSUM_URL, self::checksumFileFor(self::NEW_PHAR)),
+            self::SIGNATURE_URL => self::signedOk(),
             self::PHAR_URL => FakeHttpClient::status(self::PHAR_URL, 404, 'Not Found'),
         ]);
 
@@ -323,6 +337,7 @@ final class PharUpdaterTest extends TestCase
         $phar = $this->installedPhar($dir);
         $http = new FakeHttpClient([
             self::CHECKSUM_URL => FakeHttpClient::ok(self::CHECKSUM_URL, self::checksumFileFor(self::NEW_PHAR)),
+            self::SIGNATURE_URL => self::signedOk(),
             self::PHAR_URL => FakeHttpClient::transportFailure(self::PHAR_URL, 'Could not resolve host: github.com'),
         ]);
 
@@ -521,7 +536,7 @@ final class PharUpdaterTest extends TestCase
             }
         };
 
-        $message = (new PharUpdater($this->http(self::checksumFileFor(self::NEW_PHAR)), $validator, $phar, '0.1.0'))
+        $message = (new PharUpdater($this->http(self::checksumFileFor(self::NEW_PHAR)), $validator, new ReleaseSignatureVerifier(SigningKeys::releasePublicPem()), $phar, '0.1.0'))
             ->update($this->release('0.2.0'), false);
 
         self::assertSame('lockrot updated from 0.1.0 to 0.2.0', $message);
@@ -540,5 +555,97 @@ final class PharUpdaterTest extends TestCase
         foreach ($http->headers() as $headers) {
             self::assertSame(['User-Agent: lockrot'], $headers);
         }
+    }
+
+    /**
+     * A release signed with a key this build does not know is not installed, whatever its
+     * checksum says: the checksum proves the download arrived intact, the signature proves who
+     * published it, and only the second one stops a substituted release.
+     */
+    public function testASignatureByAnotherKeyReplacesNothingAndLeavesNoTemporaryFile(): void
+    {
+        $dir = $this->tempDir();
+        $phar = $this->installedPhar($dir);
+        $http = $this->http(self::checksumFileFor(self::NEW_PHAR), self::NEW_PHAR, SigningKeys::otherSignatureFile(self::NEW_PHAR));
+
+        try {
+            $this->updater($http, $phar)->update($this->release('0.2.0'), false);
+            self::fail('a signature by another key must not be accepted');
+        } catch (ConfigException $e) {
+            self::assertFragmentsInOrder([self::SIGNATURE_URL, 'does not match', 'nothing was written'], $e->getMessage());
+        }
+
+        self::assertSame(self::INSTALLED, file_get_contents($phar));
+        self::assertSame(['lockrot.phar'], self::filesIn($dir));
+    }
+
+    /** The signature is checked before the archive is staged, so a forgery never touches the disk. */
+    public function testTheSignatureIsCheckedBeforeAnythingIsWrittenOrValidated(): void
+    {
+        $dir = $this->tempDir();
+        $phar = $this->installedPhar($dir);
+        $validator = new class () implements PharValidatorInterface {
+            public int $calls = 0;
+
+            public function validate(string $path): ?string
+            {
+                ++$this->calls;
+
+                return null;
+            }
+        };
+        $http = $this->http(self::checksumFileFor(self::NEW_PHAR), self::NEW_PHAR, SigningKeys::otherSignatureFile(self::NEW_PHAR));
+
+        try {
+            (new PharUpdater($http, $validator, new ReleaseSignatureVerifier(SigningKeys::releasePublicPem()), $phar, '0.1.0'))
+                ->update($this->release('0.2.0'), false);
+            self::fail('a signature by another key must not be accepted');
+        } catch (ConfigException $e) {
+        }
+
+        self::assertSame(0, $validator->calls);
+        self::assertSame(['lockrot.phar'], self::filesIn($dir));
+    }
+
+    /**
+     * A download that arrived damaged has a wrong checksum *and* a wrong signature. It is reported
+     * as the former: that is what it is, and "re-download" is the fix — not "someone else signed
+     * this".
+     */
+    public function testADamagedDownloadIsReportedAsAChecksumMismatchNotAsAForgery(): void
+    {
+        $dir = $this->tempDir();
+        $phar = $this->installedPhar($dir);
+        $http = $this->http(self::checksumFileFor(self::NEW_PHAR), 'a truncated download', SigningKeys::releaseSignatureFile(self::NEW_PHAR));
+
+        try {
+            $this->updater($http, $phar)->update($this->release('0.2.0'), false);
+            self::fail('a damaged download must not be installed');
+        } catch (ConfigException $e) {
+            self::assertStringStartsWith('checksum mismatch for '.self::PHAR_URL, $e->getMessage());
+        }
+
+        self::assertSame(self::INSTALLED, file_get_contents($phar));
+    }
+
+    public function testAFailedSignatureDownloadNamesTheUrlAndReplacesNothing(): void
+    {
+        $dir = $this->tempDir();
+        $phar = $this->installedPhar($dir);
+        $http = new FakeHttpClient([
+            self::CHECKSUM_URL => FakeHttpClient::ok(self::CHECKSUM_URL, self::checksumFileFor(self::NEW_PHAR)),
+            self::SIGNATURE_URL => FakeHttpClient::status(self::SIGNATURE_URL, 404, 'Not Found'),
+            self::PHAR_URL => FakeHttpClient::ok(self::PHAR_URL, self::NEW_PHAR),
+        ]);
+
+        try {
+            $this->updater($http, $phar)->update($this->release('0.2.0'), false);
+            self::fail('a missing signature must not be swallowed');
+        } catch (ConfigException $e) {
+            self::assertSame('could not download '.self::SIGNATURE_URL.': HTTP 404', $e->getMessage());
+        }
+
+        self::assertSame(self::INSTALLED, file_get_contents($phar));
+        self::assertSame(['lockrot.phar'], self::filesIn($dir));
     }
 }
