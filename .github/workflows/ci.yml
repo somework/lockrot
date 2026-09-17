@@ -146,6 +146,20 @@ jobs:
       - run: git diff --exit-code build/phar/composer.lock
       - run: build/build-phar.sh
       - run: LOCKROT_E2E=1 vendor/bin/phpunit --group e2e --filter PharTest
+      # The release workflow's signing helper, exercised on every commit with a throw-away key:
+      # wrap and unwrap must round-trip, openssl must accept the unwrapped bytes, and the archive's
+      # verifier must refuse a signature by a key that is not the release key.
+      - name: Self-update signature helper round trip
+        run: |
+          openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out /tmp/throwaway.pem
+          openssl pkey -in /tmp/throwaway.pem -pubout -out /tmp/throwaway.pub
+          openssl dgst -sha384 -sign /tmp/throwaway.pem -out /tmp/sig.bin build/lockrot.phar
+          build/selfupdate-signature.php wrap /tmp/sig.bin > /tmp/sig.json
+          build/selfupdate-signature.php unwrap /tmp/sig.json | cmp - /tmp/sig.bin
+          build/selfupdate-signature.php unwrap /tmp/sig.json > /tmp/sig2.bin
+          openssl dgst -sha384 -verify /tmp/throwaway.pub -signature /tmp/sig2.bin build/lockrot.phar
+          if build/selfupdate-signature.php verify build/lockrot.phar /tmp/sig.json; then echo "a foreign key must be refused" >&2; exit 1; fi
+          rm -f /tmp/throwaway.pem /tmp/throwaway.pub /tmp/sig.bin /tmp/sig.json /tmp/sig2.bin
       - uses: actions/upload-artifact@v7
         with: {name: lockrot.phar, path: build/lockrot.phar}
   # The build is reproducible (build/build-phar.sh says what is pinned): a second runner, on the

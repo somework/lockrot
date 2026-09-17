@@ -129,7 +129,6 @@ final class ReleaseLocatorTest extends TestCase
         $this->locator($http)->locate();
     }
 
-    /** An asset listed under the right name but with nothing to download from is no asset at all. */
     /** A release from before signing (0.5.0 and earlier) is not one this build can install. */
     public function testAReleaseWithoutTheSignatureAssetNamesTheTag(): void
     {
@@ -138,9 +137,10 @@ final class ReleaseLocatorTest extends TestCase
 
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage('release v0.2.0 has no lockrot.phar.sig asset');
-        (new ReleaseLocator($http))->locate();
+        $this->locator($http)->locate();
     }
 
+    /** An asset listed under the right name but with nothing to download from is no asset at all. */
     public function testAnAssetWithoutADownloadUrlCountsAsMissing(): void
     {
         $body = str_replace(

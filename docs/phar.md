@@ -95,7 +95,10 @@ openssl dgst -sha384 -verify lockrot-selfupdate-key.pub -signature lockrot.phar.
 
 For a person, the GPG signature or the attestation is the check to make: they do not depend on a
 key fetched from the same place as the archive. The self-update signature is for the archive
-already on the machine, whose key arrived with a download that was verified once.
+already on the machine, whose key arrived with a download that was verified once. Like every
+signature over an archive, it proves the bytes are a lockrot release, not that they are the newest
+one: the version comes from the release document, which `self-update` reads from GitHub's API over
+TLS. Composer's self-update has the same shape.
 
 ### Build provenance
 
