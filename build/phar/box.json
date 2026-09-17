@@ -44,6 +44,7 @@
         }
     ],
     "exclude-dev-files": true,
+    "dump-autoload": false,
     "exclude-composer-files": false,
     "files": [
         "composer.json",

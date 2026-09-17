@@ -93,10 +93,12 @@ it the check to prefer in an environment that already has `gh`.
 ### Rebuilding it yourself
 
 From 0.6.0 on the PHAR is [reproducible](https://reproducible-builds.org/): the tagged commit,
-Box 4.7.0 and the Composer minor the release was built with give the same bytes, so the archive on
-the release page can be checked against its own source rather than against the machine that built
-it. The script prints the PHP, Composer and Box versions it ran with; the release workflow's log
-shows the same line for the published archive.
+Box 4.7.0 and the Composer version the release was built with give the same bytes, so the archive
+on the release page can be checked against its own source rather than against the machine that
+built it. Box is downloaded and checked by the script; the Composer version is pinned in
+`.github/workflows/phar.yml` at the tag (`tools: composer:…`), and the script prints the PHP,
+Composer and Box versions it ran with. PHP is not part of the recipe: CI builds every commit on
+two PHP versions and compares the bytes.
 
 ```bash
 git clone https://github.com/somework/lockrot.git && cd lockrot

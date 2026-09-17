@@ -18,9 +18,10 @@
 #  - Box compiles the files in sorted order and is itself pinned by version and sha256;
 #  - only an allowlist of the lockrot package goes in (src, resources, bin/lockrot,
 #    composer.json), so an untracked file in the checkout cannot end up in the archive.
-# Not pinned, printed at the end instead: the PHP and Composer that ran the build. Composer writes
-# vendor/composer/*.php from its own source, so a rebuild needs the same Composer minor; PHP
-# only runs Box and has not changed the bytes between 8.4 and 8.5.
+# Composer writes vendor/composer/*.php from its own source, so the Composer that runs this script
+# is part of the recipe: the release workflow pins it (`tools: composer:<version>` in
+# .github/workflows/phar.yml, at the tag), and the script prints the version it ran with. PHP only
+# runs Box; CI builds on two PHP versions and compares, so the bytes are known not to depend on it.
 set -euo pipefail
 export COMPOSER_ROOT_VERSION="${COMPOSER_ROOT_VERSION:-dev-main}"
 cd "$(dirname "$0")/phar"
@@ -35,11 +36,19 @@ else
 fi
 
 rm -rf vendor
-composer install --no-interaction --no-dev --prefer-dist --optimize-autoloader
+# --no-plugins --no-scripts: nothing installed globally on the building machine runs inside the
+# build. The autoloader is dumped here, authoritative classmap as Box would, and box.json has
+# dump-autoload off, so Box does not call the host Composer a second time without these flags.
+composer install --no-interaction --no-dev --prefer-dist --classmap-authoritative --no-plugins --no-scripts
+# A cached box.phar is checked on every run, not only right after the download: a stale one from
+# before a BOX_VERSION bump, or a replaced one, is removed and fetched again.
+if [ -f box.phar ] && ! echo "${BOX_SHA256}  box.phar" | shasum -a 256 -c --status -; then
+  rm -f box.phar
+fi
 if [ ! -f box.phar ]; then
   curl -fsSL -o box.phar "https://github.com/box-project/box/releases/download/${BOX_VERSION}/box.phar"
-  echo "${BOX_SHA256}  box.phar" | shasum -a 256 -c -
 fi
+echo "${BOX_SHA256}  box.phar" | shasum -a 256 -c -
 # box.json plus the timestamp of this build; Box reads the timestamp from its configuration only.
 php -r '$c = json_decode(file_get_contents("box.json"), true); $c["timestamp"] = $argv[1]; file_put_contents("box.build.json", json_encode($c, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)."\n");' "$TIMESTAMP"
 php box.phar compile --no-parallel --sort-compiled-files --config box.build.json
