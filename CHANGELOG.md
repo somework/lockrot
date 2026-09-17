@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- The PHAR is built reproducibly. `build/build-phar.sh` on the tagged commit — with Box 4.7.0,
+  which the script downloads and checks, and a PHP of the release workflow's series — produces the
+  archive byte for byte, so a release can be verified against its own source without trusting the
+  builder: dependencies come from the committed `build/phar/composer.lock`, the autoloader suffix
+  and the PHAR alias are fixed, every file inside the archive carries the commit date of the build
+  (or `SOURCE_DATE_EPOCH`), and Box compiles the files in sorted order. CI rebuilds every commit on
+  a second machine and compares the bytes.
+
 ### Changed
 
 - The mutation-testing gate now covers the whole source tree — self-update, the Composer
@@ -16,6 +26,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   that no test could ever observe were removed as redundant — in the allowlist merge, the baseline
   comparison, the dependency graph, the Composer cache adapter, the recorded HTTP client and the
   activity client.
+- The PHAR's alias is `lockrot.phar` instead of the absolute path of the directory it was built
+  in, and its `installed.php` names lockrot as `dev-main` with no commit reference rather than the
+  branch and commit of the build checkout. Neither is read by anything; both were the kind of
+  build-machine detail a reproducible archive cannot carry.
 
 ## [0.5.0] - 2026-09-17
 

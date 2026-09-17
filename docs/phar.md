@@ -90,6 +90,26 @@ gh attestation verify lockrot.phar --repo somework/lockrot
 This needs no key of lockrot's at all — the trust root is GitHub's Sigstore instance — which makes
 it the check to prefer in an environment that already has `gh`.
 
+### Rebuilding it yourself
+
+From 0.6.0 on the PHAR is [reproducible](https://reproducible-builds.org/): the tagged commit,
+Box 4.7.0 and a PHP of the series the release workflow uses (8.4) give the same bytes, so the
+archive on the release page can be checked against its own source rather than against the machine
+that built it:
+
+```bash
+git clone https://github.com/somework/lockrot.git && cd lockrot
+git checkout v0.6.0
+build/build-phar.sh                     # downloads Box 4.7.0 and checks its sha256 on the way
+shasum -a 256 build/lockrot.phar        # compare with lockrot.phar.sha256 of the release
+```
+
+What the script pins is written at its top: the dependencies of the archive come from the committed
+`build/phar/composer.lock`, the autoloader suffix and the PHAR alias are fixed, every file inside
+the archive carries the commit date of the checkout (`SOURCE_DATE_EPOCH` overrides it), and Box
+compiles the files in sorted order. Every commit is also rebuilt on a second CI machine and compared
+byte for byte, so a change that ties the archive to the build machine fails before it is released.
+
 ### Installing with PHIVE
 
 [PHIVE](https://phar.io/) downloads the release, verifies the signature and pins the version in

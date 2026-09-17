@@ -2,11 +2,31 @@
     "name": "somework/lockrot-phar",
     "description": "Build manifest for lockrot.phar",
     "license": "MIT",
-    "repositories": [{"type": "path", "url": "../..", "options": {"symlink": false}}],
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../..",
+            "options": {
+                "symlink": false,
+                "reference": "none",
+                "versions": {
+                    "somework/lockrot": "dev-main"
+                }
+            }
+        }
+    ],
     "require": {
         "php": "^7.4 || ^8.0",
         "composer/composer": "^2.10",
         "somework/lockrot": "@dev"
     },
-    "config": {"platform": {"php": "7.4.0"}, "allow-plugins": {"somework/lockrot": false}}
+    "config": {
+        "platform": {
+            "php": "7.4.0"
+        },
+        "allow-plugins": {
+            "somework/lockrot": false
+        },
+        "autoloader-suffix": "Lockrot"
+    }
 }

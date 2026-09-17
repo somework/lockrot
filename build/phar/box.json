@@ -1,19 +1,53 @@
 {
     "main": "vendor/somework/lockrot/bin/lockrot",
     "output": "../lockrot.phar",
+    "alias": "lockrot.phar",
     "finder": [
         {
             "in": "vendor",
-            "exclude": ["tests", "Tests", "test", "docs", "doc", "examples", ".github"],
-            "notName": ["*.md", "*.markdown", "*.rst", "*.txt", "phpunit.xml*", "phpstan.neon*", ".php-cs-fixer*", "infection.json5", "CHANGELOG*", "UPGRADE*", "LICENSE*", "composer.lock"],
-            "notPath": ["somework/lockrot/vendor", "somework/lockrot/tests", "somework/lockrot/build", "somework/lockrot/docs", "somework/lockrot/.superpowers", "somework/lockrot/.git"]
+            "exclude": [
+                "tests",
+                "Tests",
+                "test",
+                "docs",
+                "doc",
+                "examples",
+                ".github"
+            ],
+            "notName": [
+                "*.md",
+                "*.markdown",
+                "*.rst",
+                "*.txt",
+                "phpunit.xml*",
+                "phpstan.neon*",
+                ".php-cs-fixer*",
+                "infection.json5",
+                "CHANGELOG*",
+                "UPGRADE*",
+                "LICENSE*",
+                "composer.lock"
+            ],
+            "notPath": [
+                "somework/lockrot/vendor",
+                "somework/lockrot/tests",
+                "somework/lockrot/build",
+                "somework/lockrot/docs",
+                "somework/lockrot/.superpowers",
+                "somework/lockrot/.git"
+            ]
         }
     ],
     "exclude-dev-files": true,
     "exclude-composer-files": false,
-    "files": ["composer.json"],
+    "files": [
+        "composer.json"
+    ],
     "compression": "GZ",
-    "compactors": ["KevinGH\\Box\\Compactor\\Php", "KevinGH\\Box\\Compactor\\Json"],
+    "compactors": [
+        "KevinGH\\Box\\Compactor\\Php",
+        "KevinGH\\Box\\Compactor\\Json"
+    ],
     "check-requirements": true,
     "stub": true
 }

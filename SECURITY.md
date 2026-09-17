@@ -45,6 +45,11 @@ suspected compromised is revoked with that certificate on both keyservers, `lock
 is replaced in the repository, and the changelog names the new fingerprint. See the
 [PHAR page](https://lockrot.dev/phar/) for the full verification walkthrough.
 
+From 0.6.0 on the archive is also reproducible: `build/build-phar.sh` on the tagged commit, with the
+Box release the script pins and a PHP of the release workflow's series, gives the published bytes,
+so the release can be checked against its source and not only against its signer. The
+[PHAR page](https://lockrot.dev/phar/#rebuilding-it-yourself) has the recipe.
+
 ## What lockrot does and does not do
 
 lockrot reads `composer.json` and `composer.lock` and never writes to either. The PHAR always runs

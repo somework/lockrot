@@ -1,7 +1,7 @@
 /vendor/
 /build/phar/vendor/
-/build/phar/composer.lock
 /build/phar/box.phar
+/build/phar/box.build.json
 /build/*.phar
 /build/infection.log
 /build/clover*.xml

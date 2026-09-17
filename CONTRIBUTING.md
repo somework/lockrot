@@ -67,6 +67,14 @@ Commit messages follow [Conventional Commits](https://www.conventionalcommits.or
 A pull request should say what changed and why, come with tests, update the README when it changes
 behaviour a user can see, and add a line to the `Unreleased` section of `CHANGELOG.md`.
 
+## The PHAR
+
+`build/build-phar.sh` builds `build/lockrot.phar` reproducibly; the comment at its top lists what
+it pins. The archive's dependencies are locked in `build/phar/composer.lock`, which is committed:
+when a dependency of the archive changes — a new requirement in `composer.json`, or a bump of
+`composer/composer` for the PHAR — run `composer update` in `build/phar/` and commit the lock with
+the change. CI builds the archive on two machines and fails when the bytes differ.
+
 ## Documentation
 
 `docs/` is the reference and changes with the code it describes: a new option, verdict or format
