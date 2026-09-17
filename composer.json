@@ -37,6 +37,9 @@
         "php": "^7.4 || ^8.0",
         "composer-plugin-api": "^2.2"
     },
+    "suggest": {
+        "ext-openssl": "Lets lockrot.phar self-update verify release signatures; checked at runtime, the plugin itself never needs it"
+    },
     "require-dev": {
         "composer/composer": "^2.2",
         "phpunit/phpunit": "^9.6 || ^10.5 || ^11.5",
