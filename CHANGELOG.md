@@ -10,8 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - The PHAR is built reproducibly. `build/build-phar.sh` on the tagged commit — with Box 4.7.0,
-  which the script downloads and checks, and the Composer minor the release was built with —
-  produces the archive byte for byte, so a release can be verified against its own source without
+  which the script downloads and checks, and the Composer version the release workflow pins at
+  that tag (`tools: composer:…` in `.github/workflows/phar.yml`) — produces the archive byte for
+  byte, whatever the PHP version, so a release can be verified against its own source without
   trusting the builder: dependencies come from the committed `build/phar/composer.lock`, the
   autoloader suffix, the PHAR alias and the recorded package versions are fixed, every file inside
   the archive carries the commit date of the build (or `SOURCE_DATE_EPOCH`), only an allowlist of
@@ -27,10 +28,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   that no test could ever observe were removed as redundant — in the allowlist merge, the baseline
   comparison, the dependency graph, the Composer cache adapter, the recorded HTTP client and the
   activity client.
-- The PHAR's alias is `lockrot.phar` instead of the absolute path of the directory it was built
-  in, and its `installed.php` names lockrot as `dev-main` with no commit reference rather than the
-  branch and commit of the build checkout. Neither is read by anything; both were the kind of
-  build-machine detail a reproducible archive cannot carry.
+- The PHAR's alias is `lockrot.phar`; Box used to generate a random
+  `box-auto-generated-alias-<hex>.phar` for every build, which alone made no two builds compare
+  equal. Its `installed.php` names lockrot as `dev-main` with no commit reference rather than the
+  branch and commit of the build checkout. lockrot reads neither — its version comes from
+  `src/Version.php` — and the stub's `phar://lockrot.phar/…` paths are the only use of the alias.
 
 ## [0.5.0] - 2026-09-17
 

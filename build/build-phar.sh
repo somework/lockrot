@@ -22,17 +22,29 @@
 # is part of the recipe: the release workflow pins it (`tools: composer:<version>` in
 # .github/workflows/phar.yml, at the tag), and the script prints the version it ran with. PHP only
 # runs Box; CI builds on two PHP versions and compares, so the bytes are known not to depend on it.
+# The lockrot composer.json inside the archive is not read at runtime; it stays in for parity with
+# the archives before the allowlist.
 set -euo pipefail
-export COMPOSER_ROOT_VERSION="${COMPOSER_ROOT_VERSION:-dev-main}"
+# Unconditional: the version of the build manifest's root is not a knob. A caller's exported value
+# (common when working with path repositories) would silently change installed.php and the hash.
+export COMPOSER_ROOT_VERSION=dev-main
 cd "$(dirname "$0")/phar"
+
+# sha256sum is coreutils; shasum is a Perl script that minimal images (the official php ones among
+# them) do not carry.
+sha256() { if command -v sha256sum >/dev/null 2>&1; then sha256sum "$@"; else shasum -a 256 "$@"; fi; }
 
 BOX_VERSION="4.7.0"
 BOX_SHA256="3d390eeaec33288098fe83f8a54c60cc575cb6be295f38ff4482b4b4f26f8d52"
 
 if [ -n "${SOURCE_DATE_EPOCH:-}" ]; then
   TIMESTAMP="$(php -r 'echo gmdate("Y-m-d\TH:i:s\Z", (int) $argv[1]);' "$SOURCE_DATE_EPOCH")"
+  TIMESTAMP_SOURCE="SOURCE_DATE_EPOCH"
+elif TIMESTAMP="$(TZ=UTC git -C ../.. log -1 --format=%cd --date=format-local:%Y-%m-%dT%H:%M:%SZ 2>/dev/null)" && [ -n "$TIMESTAMP" ]; then
+  TIMESTAMP_SOURCE="the commit date of HEAD"
 else
-  TIMESTAMP="$(TZ=UTC git -C ../.. log -1 --format=%cd --date=format-local:%Y-%m-%dT%H:%M:%SZ)"
+  echo "cannot read the commit date of HEAD (no git, or not a git checkout); set SOURCE_DATE_EPOCH to the release commit's date instead" >&2
+  exit 2
 fi
 
 rm -rf vendor
@@ -42,20 +54,20 @@ rm -rf vendor
 composer install --no-interaction --no-dev --prefer-dist --classmap-authoritative --no-plugins --no-scripts
 # A cached box.phar is checked on every run, not only right after the download: a stale one from
 # before a BOX_VERSION bump, or a replaced one, is removed and fetched again.
-if [ -f box.phar ] && ! echo "${BOX_SHA256}  box.phar" | shasum -a 256 -c --status -; then
+if [ -f box.phar ] && ! echo "${BOX_SHA256}  box.phar" | sha256 -c --status -; then
   rm -f box.phar
 fi
 if [ ! -f box.phar ]; then
   curl -fsSL -o box.phar "https://github.com/box-project/box/releases/download/${BOX_VERSION}/box.phar"
 fi
-echo "${BOX_SHA256}  box.phar" | shasum -a 256 -c -
+echo "${BOX_SHA256}  box.phar" | sha256 -c -
 # box.json plus the timestamp of this build; Box reads the timestamp from its configuration only.
-php -r '$c = json_decode(file_get_contents("box.json"), true); $c["timestamp"] = $argv[1]; file_put_contents("box.build.json", json_encode($c, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)."\n");' "$TIMESTAMP"
+php -r '$c = json_decode(file_get_contents("box.json"), true, 512, JSON_THROW_ON_ERROR); $c["timestamp"] = $argv[1]; file_put_contents("box.build.json", json_encode($c, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR)."\n");' "$TIMESTAMP"
 php box.phar compile --no-parallel --sort-compiled-files --config box.build.json
 php ../lockrot.phar --version
 # --offline keeps tagged releases from depending on Packagist/GitHub being reachable: with an empty
 # cache every verdict is "unknown", which is still a valid report and still exits 0.
 cd ../.. && php build/lockrot.phar -d tests/fixtures/skeletons/laravel --format=json --target-php=8.4 --offline >/dev/null && echo "phar smoke test ok"
-echo "source date ${TIMESTAMP}; built with $(php -r 'echo "PHP ".PHP_VERSION;'), $(composer -V 2>/dev/null | cut -d' ' -f1-3), Box ${BOX_VERSION}"
+echo "source date ${TIMESTAMP} (${TIMESTAMP_SOURCE}); built with $(php -r 'echo "PHP ".PHP_VERSION;'), $(composer -V 2>/dev/null | cut -d' ' -f1-3), Box ${BOX_VERSION}"
 ls -lh build/lockrot.phar
-shasum -a 256 build/lockrot.phar
+sha256 build/lockrot.phar

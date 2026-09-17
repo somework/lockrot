@@ -103,8 +103,9 @@ two PHP versions and compares the bytes.
 ```bash
 git clone https://github.com/somework/lockrot.git && cd lockrot
 git checkout v0.6.0
+grep 'tools: composer' .github/workflows/phar.yml   # the Composer version to build with
 build/build-phar.sh                     # downloads Box 4.7.0 and checks its sha256 on the way
-shasum -a 256 build/lockrot.phar        # compare with lockrot.phar.sha256 of the release
+sha256sum build/lockrot.phar            # compare with lockrot.phar.sha256 of the release
 ```
 
 What the script pins is written at its top: the dependencies of the archive come from the committed
