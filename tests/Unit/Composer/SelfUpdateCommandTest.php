@@ -304,12 +304,6 @@ final class SelfUpdateCommandTest extends TestCase
     }
 
     /**
-     * What `--help` puts on screen, in the order it reads in: what the command does, what it
-     * checks, what it needs, what it promises when that fails, and then the two ways to call it.
-     * The fragments are positional rather than exact, so the prose can be rewritten and the shape
-     * still has to hold.
-     */
-    /**
      * Pinned: the four facts a user needs (the source, the checksum, the writable directory, the
      * untouched archive on failure), in that order, followed by the two example lines. Rewording
      * around those phrases passes; dropping one of them, or moving an example above the

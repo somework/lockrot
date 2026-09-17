@@ -1,11 +1,25 @@
 # Mutants no test can observe
 
 The escapes the mutation gate (`infection.json5`, whole `src/` tree) tolerates, with the reason each
-one is equivalent to the original code. One entry per mutant, by area; the nine escapes of the
-original gate (src/Verdict, src/Signal, src/Output, src/Analyzer) are explained in `infection.json5`
-itself. Line numbers are as of 2026-09-17; a later edit may shift them without changing the
+one is equivalent to the original code. One entry per mutant, by area, the nine escapes of the
+original gate (src/Verdict, src/Signal, src/Output, src/Analyzer) first. Line numbers are as of 2026-09-17; a later edit may shift them without changing the
 argument. "Hard to test" is not "equivalent": every entry here claims that no test could tell the
 mutant from the original, and says why.
+
+## src/Verdict, src/Signal, src/Analyzer, src/Output (the original gate, 2026-09-16)
+
+- `src/Signal/ConstraintOpenness.php:46` CastInt, `:48` CastInt, IncrementInteger, DecrementInteger,
+  `:62` ConcatOperandRemoval — numeric strings compare numerically, every mutated integer stays
+  below any PHP major, and `normalize("8.4")` equals `normalize("8.4.0")`.
+- `src/Analyzer/Report.php:96` UnwrapArrayValues — `flagged()`: the findings are sorted and every
+  flagged one precedes every unflagged one, so the filtered keys are already `0..n`; the
+  `array_values()` is what makes the `list` type true by construction.
+- `src/Output/JsonFormatter.php:20` FalseValue — the `$showAll` default of the interface's
+  parameter, which the JSON document does not read (it always lists every finding).
+- `src/Output/TableFormatter.php:174` CastString — `label()`: `previousVerdictOf()` is never null
+  once the comparison says "worsened"; the cast is for the type, not for a case.
+- `src/Output/TerminalWidth.php:30` Coalesce — `detect()`: step 2 (symfony Terminal) refuses
+  whenever `COLUMNS` is set, so swapping it with step 1 (`COLUMNS`) is unobservable by design.
 
 ## src/SelfUpdate and src/Composer/SelfUpdateCommand.php
 

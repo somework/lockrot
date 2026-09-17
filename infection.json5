@@ -20,7 +20,8 @@
     // Scope widened to src/Output + src/Analyzer on 2026-09-16. Before: 1175 mutants, 76 escaped,
     // MSI 93.53%; 67 of those were closed, most by tests and the rest by removing the code they sat
     // in, and 4 more turned out to be equivalent (see the tests and refactors of that date). After: 1130 mutants, 9 escaped, 0 timed out -> MSI = Covered MSI 99.2%, ~1m35s on
-    // 8 threads. Each escape was checked by hand and is equivalent, the honest floor of this scope:
+    // 8 threads. Each escape was checked by hand and is equivalent, the honest floor of this scope
+    // (the reasoning, with every later escape, is in tests/infection-equivalents.md):
     //  - src/Signal/ConstraintOpenness.php (5: CastInt x2, IncrementInteger, DecrementInteger,
     //    ConcatOperandRemoval): numeric strings compare numerically, every mutated integer stays
     //    below any PHP major, and normalize("8.4") equals normalize("8.4.0").
@@ -41,10 +42,11 @@
     // 209 were closed by sharper tests, 9 by removing statements no test could observe (a redundant
     // array_unique, a sort over an already-sorted list, a root filter every walk guards against, a
     // trim its only reader repeats, an unused constructor parameter, Composer\Cache guards that
-    // Cache::read()/write() already apply), and 47 more turned out to be equivalent. After: 3201
-    // mutants, 56 escaped, 2 timed out (both genuine infinite loops in RepositoryMetadataLoader::
-    // loadChunked(), i.e. detections), MSI = Covered MSI 98.25%, ~6m20s on 8 threads locally. The 47,
-    // one line each; the full reasoning for every escape is in tests/infection-equivalents.md:
+    // Cache::read()/write() already apply), and 47 more turned out to be equivalent. After: 3202
+    // mutants (one added by the clock seam of that day), 56 escaped, 2 timed out (both genuine
+    // infinite loops in RepositoryMetadataLoader::loadChunked(), i.e. detections), MSI = Covered MSI
+    // 98.25%, ~6m20s on 8 threads locally. tests/infection-equivalents.md holds the reasoning for
+    // all 56; the 47 added that day, one line each, as an index:
     //  - Set membership written as `= true` and read only through isset(): ActivityClient.php:80,
     //    ActivityFetchPlanner.php:51 and :67, RepositoryMetadataLoader.php:274 (TrueValue).
     //  - array_values() that only makes a `list` type true, every consumer iterates: ActivityClient.php:120,
