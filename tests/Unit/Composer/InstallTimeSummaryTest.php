@@ -35,6 +35,7 @@ use Lockrot\Deadline;
 use Lockrot\Exception\InstallBlockedException;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
+use Lockrot\Tests\Support\RecordingIO;
 use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\TestCase;
 
@@ -68,6 +69,21 @@ final class InstallTimeSummaryTest extends TestCase
         'type' => 'library',
         'notification-url' => 'https://packagist.org/downloads/',
         'time' => '2015-08-13T06:14:41+00:00',
+    ];
+
+    /**
+     * {@see self::PHPZIP} with its `source` removed, so {@see \Lockrot\Data\Forge\RepoLocator} finds
+     * no repository to ask about and no activity round is planned. Everything the verdict needs
+     * still comes from the fixture server's metadata, which makes this the one package a test can
+     * hand to the real {@see \Lockrot\Composer\ServiceFactory} without reaching GitHub.
+     */
+    private const PHPZIP_WITHOUT_SOURCE = [
+        'name' => 'phpzip/phpzip',
+        'version' => '2.0.8',
+        'require' => ['php' => '>=5.3.0'],
+        'type' => 'library',
+        'notification-url' => 'https://packagist.org/downloads/',
+        'time' => '2015-11-16T16:30:51+00:00',
     ];
 
     /** psr/log 1.1.4 — matched by the built-in allowlist (`psr/*`), so it can never be flagged. */
@@ -525,21 +541,76 @@ final class InstallTimeSummaryTest extends TestCase
         self::assertStringContainsString('lockrot: install-time check skipped: boom', $io->getOutput());
     }
 
-    /** A multi-line exception message (a wrapped exception's chain, a library's own multi-line error) must not split the one promised warning line into several. */
+    /**
+     * A multi-line exception message (a wrapped exception's chain, a library's own multi-line error)
+     * must not split the one promised warning line into several, and the collapsing must not leave
+     * the indentation of the lines it folded in behind either — the message starts where the label
+     * ends.
+     */
     public function testAMultilineExceptionMessageStaysOnOneWarningLine(): void
     {
         $this->project();
         $io = new BufferIO();
         $event = $this->event($io, new Transaction([], [$this->loadPackage(self::PHPZIP)]));
         $factory = static function (): Analyzer {
-            throw new \RuntimeException("boom\nsecond line\n  third line  ");
+            throw new \RuntimeException("\n  boom\nsecond line\n  third line  ");
         };
 
         (new InstallTimeSummary($factory))->onPreOperationsExec($event);
 
         $output = $io->getOutput();
-        self::assertStringContainsString('lockrot: install-time check skipped: boom second line third line', $output);
+        // The `</warning>` pins the far end: collapsed whitespace must not survive as a trailing
+        // space, and `skipped: boom` pins the near end against a leading one.
+        self::assertStringContainsString('lockrot: install-time check skipped: boom second line third line</warning>', $output);
         self::assertCount(1, array_filter(explode("\n", trim($output))), $output);
+    }
+
+    /**
+     * The skipped-check line is a `<warning>` from end to end: Composer colours what the tags wrap,
+     * so a message that fell outside them would print as plain text in the middle of an install.
+     *
+     * Read before Composer's formatter sees it, because an undecorated formatter strips the tags and
+     * renders `<warning>text`, `text</warning>` and `<warning>text</warning>` identically.
+     */
+    public function testTheSkippedCheckLineIsWrappedInAWarningTag(): void
+    {
+        $this->project();
+        $io = new RecordingIO();
+        $event = $this->event($io, new Transaction([], [$this->loadPackage(self::PHPZIP)]));
+        $factory = static function (): Analyzer {
+            throw new \RuntimeException('boom');
+        };
+
+        (new InstallTimeSummary($factory))->onPreOperationsExec($event);
+
+        $message = $io->onlyError();
+        self::assertStringStartsWith('<warning>lockrot: install-time check skipped: ', $message);
+        self::assertStringContainsString('boom', $message);
+        self::assertStringEndsWith('</warning>', $message);
+    }
+
+    /**
+     * The plugin's own default wiring: constructed the way {@see \Lockrot\Composer\LockrotPlugin}
+     * constructs it, with no analyzer factory, the summary has to build one through
+     * {@see \Lockrot\Composer\ServiceFactory::createAnalyzer()} and print a real block — not fall
+     * into the "check skipped" line because the default is not callable.
+     *
+     * {@see self::PHPZIP_WITHOUT_SOURCE} keeps this off the network: its metadata comes from the
+     * class-level fixture server, and with no `source` URL no repository activity round is planned,
+     * so nothing reaches GitHub.
+     */
+    public function testTheDefaultAnalyzerFactoryBuildsAWorkingAnalyzer(): void
+    {
+        $this->project([], [self::PHPZIP_WITHOUT_SOURCE]);
+        $io = new BufferIO();
+        $event = $this->event($io, new Transaction([], [$this->loadPackage(self::PHPZIP_WITHOUT_SOURCE)]));
+
+        (new InstallTimeSummary())->onPreOperationsExec($event);
+
+        $output = $io->getOutput();
+        self::assertStringNotContainsString('install-time check skipped', $output);
+        self::assertStringContainsString('lockrot: dependency rot in 1 of 1 changed package', $output);
+        self::assertStringContainsString('phpzip/phpzip 2.0.8', $output);
     }
 
     public function testAnUninstallOnlyTransactionNeverBuildsAnAnalyzer(): void

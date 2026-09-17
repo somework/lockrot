@@ -62,6 +62,18 @@ final class TransactionPackagesTest extends TestCase
         self::assertSame([], TransactionPackages::fromTransaction($transaction));
     }
 
+    /**
+     * Transaction::calculateOperations() emits the removals before the installs, so an operation
+     * this class skips is never the end of the list: a package being uninstalled must not hide the
+     * packages installed behind it.
+     */
+    public function testAnUninstallDoesNotHideThePackagesInstalledAfterIt(): void
+    {
+        $transaction = new Transaction([$this->package('vendor/gone', '1.0.0')], [$this->package('vendor/new', '2.0.0')]);
+
+        self::assertSame(['vendor/new'], $this->names(TransactionPackages::fromTransaction($transaction)));
+    }
+
     public function testAnAliasedPackageIsReportedOnceAtItsLockedVersion(): void
     {
         $aliased = $this->package('vendor/a', 'dev-main', ['extra' => ['branch-alias' => ['dev-main' => '2.x-dev']]]);

@@ -114,6 +114,34 @@ final class ActivityClientTest extends TestCase
 
         $client = new ActivityClient($this->http([self::GH_URL => HttpResult::failure(self::GH_URL, 'timed out', new \DateTimeImmutable(self::FETCHED))], new \ArrayObject()), ForgeAuth::anonymous());
         self::assertSame(['github.com/Grandt/PHPZip' => 'timed out'], $client->fetch([self::github()])->failed());
+
+        // GitHub answers an exhausted quota with 403 and a secondary limit with 429; no other
+        // status is the forge asking to be left alone.
+        $client = new ActivityClient($this->http([self::GH_URL => [429, '']], new \ArrayObject()), ForgeAuth::anonymous());
+        $batch = $client->fetch([self::github()]);
+        self::assertTrue($batch->rateLimited(RepoRef::GITHUB));
+        self::assertSame(['github.com/Grandt/PHPZip' => 'HTTP 429'], $batch->failed());
+
+        $client = new ActivityClient($this->http([self::GH_URL => [404, '']], new \ArrayObject()), ForgeAuth::anonymous());
+        self::assertFalse($client->fetch([self::github()])->rateLimited(RepoRef::GITHUB));
+    }
+
+    /** One repository failing must not take the rest of its host's batch down with it. */
+    public function testAFailingRepositoryLeavesTheOthersOnTheSameHostAnswered(): void
+    {
+        $other = new RepoRef(RepoRef::GITHUB, 'github.com', 'other/repo');
+        $otherUrl = 'https://api.github.com/repos/other/repo';
+
+        $client = new ActivityClient($this->http([
+            self::GH_URL => [403, '{"message":"API rate limit exceeded"}'],
+            $otherUrl => [200, '{"archived":false,"pushed_at":"2020-01-01T00:00:00Z"}'],
+        ], new \ArrayObject()), ForgeAuth::anonymous());
+
+        $batch = $client->fetch([self::github(), $other]);
+
+        self::assertSame(['github.com/Grandt/PHPZip' => 'HTTP 403'], $batch->failed());
+        self::assertArrayHasKey('github.com/other/repo', $batch->activity());
+        self::assertSame('2020-01-01', self::day($batch->activity()['github.com/other/repo']->pushedAt()));
     }
 
     public function testAnAnswerFromTheCacheMarksTheActivity(): void
@@ -158,6 +186,11 @@ final class ActivityClientTest extends TestCase
     {
         $client = new ActivityClient($this->http([self::GH_URL => [200, '{"archived":true,"pushed_at":"2020-01-01T00:00:00Z"}']], new \ArrayObject()), ForgeAuth::anonymous());
         self::assertTrue($client->fetch([self::github()])->activity()['github.com/Grandt/PHPZip']->isArchived());
+
+        // A document that does not carry the flag at all is not an archived repository: only an
+        // explicit `true` is, so a shape lockrot did not expect never invents the strongest signal.
+        $client = new ActivityClient($this->http([self::GH_URL => [200, '{"pushed_at":"2020-01-01T00:00:00Z"}']], new \ArrayObject()), ForgeAuth::anonymous());
+        self::assertFalse($client->fetch([self::github()])->activity()['github.com/Grandt/PHPZip']->isArchived());
     }
 
     /** Anonymously only the commits call is made: the project document would not carry `archived` anyway. */
@@ -271,6 +304,16 @@ final class ActivityClientTest extends TestCase
         $batch = $client->fetch([self::github()]);
         self::assertSame(['github.com/Grandt/PHPZip' => 'invalid JSON from '.self::GH_URL], $batch->failed());
         self::assertSame([], $batch->activity());
+
+        // And, like any other failure, it stops at the repository it happened to.
+        $otherUrl = 'https://api.github.com/repos/other/repo';
+        $client = new ActivityClient($this->http([
+            self::GH_URL => [200, '<html>'],
+            $otherUrl => [200, '{"archived":false,"pushed_at":"2020-01-01T00:00:00Z"}'],
+        ], new \ArrayObject()), ForgeAuth::anonymous());
+        $batch = $client->fetch([self::github(), new RepoRef(RepoRef::GITHUB, 'github.com', 'other/repo')]);
+        self::assertSame(['github.com/Grandt/PHPZip' => 'invalid JSON from '.self::GH_URL], $batch->failed());
+        self::assertArrayHasKey('github.com/other/repo', $batch->activity());
     }
 
     /** One batch per host, each with its own headers, and every repository back under its own key. */

@@ -10,6 +10,7 @@ use Composer\IO\IOInterface;
 use Composer\IO\NullIO;
 use Composer\Util\Http\Response;
 use Composer\Util\HttpDownloader;
+use Composer\Util\Platform;
 use Lockrot\Analyzer\Analyzer;
 use Lockrot\Clock;
 use Lockrot\Composer\ComposerCacheAdapter;
@@ -19,10 +20,14 @@ use Lockrot\Config\LockrotConfig;
 use Lockrot\Data\Cache\ArrayCache;
 use Lockrot\Data\Forge\Tokens;
 use Lockrot\Data\Http\CachingHttpClient;
+use Lockrot\Data\Http\HttpResult;
 use Lockrot\Deadline;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
+use Lockrot\Tests\Support\RecordingIO;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Output\OutputInterface;
 
 final class ServiceFactoryTest extends TestCase
 {
@@ -211,7 +216,7 @@ final class ServiceFactoryTest extends TestCase
     }
 
     /** A downloader that answers the token URL from a script and records the request it saw in its public `$seen`, so the exchange runs without the network. */
-    private static function tokenDownloader(NullIO $io, Config $config, ?int $status, string $body): RecordingTokenDownloader
+    private static function tokenDownloader(IOInterface $io, Config $config, ?int $status, string $body): RecordingTokenDownloader
     {
         return new RecordingTokenDownloader($io, $config, $status, $body);
     }
@@ -273,12 +278,131 @@ final class ServiceFactoryTest extends TestCase
         }
     }
 
+    /**
+     * A refused exchange says so at -v and nowhere else: one `<warning>`-wrapped line, ending in a
+     * newline of its own, carrying the transport's message — the only clue a user has for why the
+     * Bitbucket rows came back capped.
+     *
+     * The message is read before Composer's formatter sees it, because an undecorated formatter
+     * strips the tags and would render `<warning>text` and `text</warning>` the same way as the
+     * correct `<warning>text</warning>`.
+     */
+    public function testARefusedBitbucketExchangeIsOneWarningLineAtVerbose(): void
+    {
+        $config = self::bitbucketConfig();
+        $io = new RecordingIO(OutputInterface::VERBOSITY_VERBOSE);
+        $io->setAuthentication('bitbucket.org', 'key', 'secret');
+        $downloader = self::tokenDownloader($io, $config, 401, '{"error":"unauthorized_client"}');
+
+        self::assertFalse(ServiceFactory::bitbucketAuthorizer($io, $config, Deadline::never(), static fn (): RecordingTokenDownloader => $downloader)());
+
+        $message = $io->onlyError();
+        self::assertStringStartsWith('<warning>lockrot: Bitbucket OAuth token request failed, continuing without credentials: ', $message);
+        self::assertStringContainsString('HTTP 401', $message);
+        self::assertStringEndsWith('</warning>', $message);
+        self::assertStringEndsWith("\n", $io->getOutput(), 'the warning is a line of its own, not glued onto whatever Composer prints next');
+    }
+
+    /** At the default verbosity the failure is silent: an install prints the compact block, not Composer plumbing. */
+    public function testARefusedBitbucketExchangeStaysQuietBelowVerbose(): void
+    {
+        $config = self::bitbucketConfig();
+        $io = new RecordingIO();
+        $io->setAuthentication('bitbucket.org', 'key', 'secret');
+        $downloader = self::tokenDownloader($io, $config, 401, '{"error":"unauthorized_client"}');
+
+        self::assertFalse(ServiceFactory::bitbucketAuthorizer($io, $config, Deadline::never(), static fn (): RecordingTokenDownloader => $downloader)());
+
+        self::assertSame('', $io->getOutput());
+    }
+
+    /**
+     * An offline run must not exchange a Bitbucket consumer for a bearer token: the exchange is a
+     * request, and --offline promises that no request is made. Online the same lock does attempt it.
+     *
+     * COMPOSER_DISABLE_NETWORK stands in for a machine with no route out, so the attempt fails in
+     * HttpDownloader's constructor instead of opening a socket — which is exactly how the failure
+     * becomes visible as the one warning line at -v.
+     *
+     * @dataProvider offlineAndOnline
+     */
+    #[DataProvider('offlineAndOnline')]
+    public function testOnlyAnOnlineRunExchangesABitbucketConsumer(bool $offline, bool $expectAttempt): void
+    {
+        $config = self::bitbucketConfig();
+        $config->merge(['config' => ['cache-dir' => $this->tempCacheDir(), 'home' => sys_get_temp_dir()]]);
+        $io = new RecordingIO(OutputInterface::VERBOSITY_VERY_VERBOSE);
+        $io->setAuthentication('bitbucket.org', 'key', 'secret');
+        $lockrot = LockrotConfig::fromSources([], [], ['offline' => $offline], '8.4.0', null);
+
+        $previous = Platform::getEnv('COMPOSER_DISABLE_NETWORK');
+        Platform::putEnv('COMPOSER_DISABLE_NETWORK', '1');
+        try {
+            ServiceFactory::createAnalyzer($io, $config, [], $lockrot, Tokens::none(), Clock::fixed(self::NOW))
+                ->analyze(self::bitbucketLock(), ProjectConfig::empty(), false);
+        } finally {
+            if ($previous === false) {
+                Platform::clearEnv('COMPOSER_DISABLE_NETWORK');
+            } else {
+                Platform::putEnv('COMPOSER_DISABLE_NETWORK', $previous);
+            }
+        }
+
+        $attempted = array_filter($io->errors, static fn (string $line): bool => strpos($line, 'Bitbucket OAuth token request failed') !== false);
+        self::assertSame($expectAttempt, $attempted !== [], implode("\n", $io->errors));
+    }
+
+    /** @return iterable<string, array{0: bool, 1: bool}> */
+    public static function offlineAndOnline(): iterable
+    {
+        yield 'offline' => [true, false];
+        yield 'online' => [false, true];
+    }
+
+    private static function bitbucketLock(): LockFile
+    {
+        return LockFile::fromArray(['packages' => [[
+            'name' => 'vendor/pkg',
+            'version' => '1.0.0',
+            'notification-url' => 'https://packagist.org/downloads/',
+            'source' => ['type' => 'git', 'url' => 'https://bitbucket.org/vendor/pkg.git', 'reference' => 'abc123'],
+        ]]]);
+    }
+
+    /**
+     * lockrot's envelopes live in their own `lockrot/` subdirectory of Composer's cache, whatever the
+     * configured path looks like — writing them next to Composer's own `repo/` and `files/` trees
+     * would put them in reach of Composer's cache housekeeping.
+     */
+    public function testTheCacheLivesInItsOwnSubdirectoryOfComposersCacheDir(): void
+    {
+        $dir = $this->tempCacheDir();
+        $config = new Config(false, sys_get_temp_dir());
+        // A trailing slash is what Composer's own cache-dir often carries; it must not produce `//`.
+        $config->merge(['config' => ['cache-dir' => $dir.'/', 'home' => sys_get_temp_dir()]]);
+
+        $cache = ServiceFactory::createCache(new NullIO(), $config);
+        $cache->set('https://api.github.com/repos/vendor/name', new HttpResult('https://api.github.com/repos/vendor/name', 200, '{}', new \DateTimeImmutable(self::NOW)));
+
+        self::assertNotSame([], glob($dir.'/lockrot/*') ?: [], 'the envelope must land under '.$dir.'/lockrot/');
+        self::assertSame([], glob($dir.'/*.json') ?: [], 'and not directly in the configured cache directory');
+    }
+
     public function testGithubTokenFromComposerConfig(): void
     {
         $config = new Config(false, sys_get_temp_dir());
         $config->merge(['config' => ['github-oauth' => ['github.com' => 'ghp_from_composer']]]);
         self::assertSame('ghp_from_composer', ServiceFactory::githubTokenFromComposer($config));
         self::assertNull(ServiceFactory::githubTokenFromComposer(new Config(false, sys_get_temp_dir())));
+    }
+
+    /** An empty `github-oauth` entry is no token: sending `Authorization: token ` would fail the request rather than run it anonymously. */
+    public function testAnEmptyGithubOauthEntryIsNoToken(): void
+    {
+        $config = new Config(false, sys_get_temp_dir());
+        $config->merge(['config' => ['github-oauth' => ['github.com' => '']]]);
+
+        self::assertNull(ServiceFactory::githubTokenFromComposer($config));
     }
 }
 

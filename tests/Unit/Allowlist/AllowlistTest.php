@@ -50,6 +50,7 @@ final class AllowlistTest extends TestCase
         $metapackageEntry = $list->match(F::package(['type' => 'metapackage']), null, $this->now);
         self::assertNotNull($metapackageEntry);
         self::assertSame('type:metapackage', $metapackageEntry->pattern());
+        self::assertSame('package type "metapackage" only lists dependencies', $metapackageEntry->reason(), 'the reason names the type that matched');
         self::assertNotNull($list->match(F::package(['name' => 'symfony/twig-pack']), F::metadata([['v1.0.1', '2020-10-19']], false, null, 'symfony-pack'), $this->now));
         self::assertNull($list->match(F::package(), F::metadata([['1.0.0', '2020-01-01']]), $this->now));
     }
@@ -79,5 +80,33 @@ final class AllowlistTest extends TestCase
         $aEntry = $merged->match(F::package(['name' => 'a/x']), null, $this->now);
         self::assertNotNull($aEntry);
         self::assertSame('builtin', $aEntry->source());
+    }
+
+    /**
+     * The built-in list carries the finished types and a project ignore list carries none, so the
+     * merge has to keep them whichever of the two it is called on.
+     */
+    public function testMergeKeepsTheFinishedTypesOfBothSides(): void
+    {
+        $withTypes = new Allowlist([], ['metapackage']);
+        $withoutTypes = new Allowlist([], []);
+        $metapackage = F::package(['type' => 'metapackage']);
+
+        self::assertNotNull($withTypes->merge($withoutTypes)->match($metapackage, null, $this->now));
+        self::assertNotNull($withoutTypes->merge($withTypes)->match($metapackage, null, $this->now));
+        self::assertNull($withoutTypes->merge($withoutTypes)->match($metapackage, null, $this->now));
+    }
+
+    /**
+     * `expires: 2026-06-01` covers the whole of that day: the entry still holds at 23:59:59 and is
+     * spent one second later.
+     */
+    public function testAnEntryIsNotYetExpiredAtItsExpiryInstant(): void
+    {
+        $at = new \DateTimeImmutable('2026-06-01T23:59:59+00:00');
+        $entry = new AllowlistEntry('a/b', null, 'temporary', $at, 'project');
+
+        self::assertFalse($entry->isExpired($at));
+        self::assertTrue($entry->isExpired($at->modify('+1 second')));
     }
 }

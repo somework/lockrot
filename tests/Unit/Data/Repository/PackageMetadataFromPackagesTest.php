@@ -43,6 +43,33 @@ final class PackageMetadataFromPackagesTest extends TestCase
         self::assertSame('c/d', $meta->replacement());
     }
 
+    /**
+     * Packagist repeats `abandoned` on every version entry of a package, and a rename can change
+     * which package it points at. The first entry seen names the replacement, so the report says
+     * one thing rather than whichever one the repository happened to list last.
+     */
+    public function testTheFirstAbandonedVersionSeenNamesTheReplacement(): void
+    {
+        $newest = $this->load(['name' => 'a/b', 'version' => '2.0.0', 'abandoned' => 'c/current']);
+        $older = $this->load(['name' => 'a/b', 'version' => '1.0.0', 'abandoned' => 'c/superseded']);
+
+        $meta = PackageMetadata::fromPackages('a/b', [$newest, $older], new \DateTimeImmutable(self::FIXED));
+
+        self::assertTrue($meta->isAbandoned());
+        self::assertSame('c/current', $meta->replacement());
+    }
+
+    /** Two releases stamped with the same time: the first one seen stands, so the answer is stable. */
+    public function testTwoReleasesWithTheSameTimeKeepTheFirstOneSeen(): void
+    {
+        $at = '2020-01-01T00:00:00+00:00';
+        $first = $this->load(['name' => 'a/b', 'version' => '1.0.0', 'time' => $at]);
+        $second = $this->load(['name' => 'a/b', 'version' => '1.0.1', 'time' => $at]);
+
+        self::assertSame('1.0.0', PackageMetadata::fromPackages('a/b', [$first, $second], new \DateTimeImmutable(self::FIXED))->lastStableVersion());
+        self::assertSame('1.0.1', PackageMetadata::fromPackages('a/b', [$second, $first], new \DateTimeImmutable(self::FIXED))->lastStableVersion());
+    }
+
     public function testDevOnlyHasNoStableRelease(): void
     {
         $version = $this->load(['name' => 'a/b', 'version' => 'dev-master']);

@@ -7,6 +7,7 @@ namespace Lockrot\Tests\Unit\Data\Repository;
 use Composer\Factory;
 use Composer\IO\NullIO;
 use Composer\Package\BasePackage;
+use Composer\Repository\ArrayRepository;
 use Composer\Repository\ComposerRepository;
 use Lockrot\Clock;
 use Lockrot\Data\Http\RecordedHttpClient;
@@ -152,10 +153,61 @@ final class RepositoryMetadataLoaderTest extends TestCase
 
     public function testNonexistentPackageIsNotFoundAndNotFailed(): void
     {
-        $batch = $this->loader()->load(['nonexistent/zzz']);
+        // The absent name is listed twice and sits ahead of a name that does resolve: duplicates
+        // are collapsed before anything is queried, and one unresolved name in a chunk must not
+        // stop the rest of that chunk.
+        $batch = $this->loader()->load(['nonexistent/zzz', 'nonexistent/zzz', 'phpzip/phpzip']);
 
         self::assertSame(['nonexistent/zzz'], $batch->notFound());
         self::assertSame([], $batch->failed());
+        self::assertArrayHasKey('phpzip/phpzip', $batch->metadata());
+    }
+
+    /**
+     * Only a ComposerRepository can be queried by name, so a path or vcs repository in the list has
+     * to be stepped over rather than end the walk. The second repository here was never started,
+     * so every name comes back failed — which can only happen if the walk reached it at all.
+     */
+    public function testARepositoryThatIsNotAComposerRepositoryIsSteppedOver(): void
+    {
+        $unreachable = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK]);
+        $loader = new RepositoryMetadataLoader(
+            array_merge([new ArrayRepository()], $unreachable->repositories()),
+            Clock::fixed(self::FIXED)
+        );
+
+        $batch = $loader->load(['phpzip/phpzip']);
+
+        self::assertSame([], $batch->notFound());
+        self::assertSame([], $batch->metadata());
+        self::assertArrayHasKey('phpzip/phpzip', $batch->failed());
+
+        $unreachable->stop();
+    }
+
+    /** Every repository adds to what the earlier ones resolved; none of them replaces it. */
+    public function testEachRepositoryAddsToWhatTheEarlierOnesResolved(): void
+    {
+        $first = $this->syntheticServer(['one/pkg' => [$this->p2Version('one/pkg', '1.0.0')]]);
+        $second = $this->syntheticServer(['two/pkg' => [$this->p2Version('two/pkg', '2.0.0')]]);
+        $first->start();
+        $second->start();
+        try {
+            $loader = new RepositoryMetadataLoader(
+                array_merge($first->repositories(), $second->repositories()),
+                Clock::fixed(self::FIXED)
+            );
+
+            $batch = $loader->load(['one/pkg', 'two/pkg']);
+
+            self::assertSame([], $batch->failed());
+            self::assertSame([], $batch->notFound());
+            self::assertArrayHasKey('one/pkg', $batch->metadata(), 'resolved by the first repository');
+            self::assertArrayHasKey('two/pkg', $batch->metadata(), 'resolved by the second');
+        } finally {
+            $first->stop();
+            $second->stop();
+        }
     }
 
     public function testTwentyFiveNamesAllResolveAcrossChunkedCalls(): void

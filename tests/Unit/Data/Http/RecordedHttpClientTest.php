@@ -20,9 +20,24 @@ final class RecordedHttpClientTest extends TestCase
         $results = $client->fetchAll(['https://x/a.json', 'https://x/missing.json']);
         self::assertSame(['ok' => true], $results['https://x/a.json']->json());
         self::assertTrue($results['https://x/missing.json']->isFailure());
-        self::assertStringContainsString('not recorded', (string) $results['https://x/missing.json']->error());
+        self::assertSame(
+            'not recorded: https://x/missing.json',
+            $results['https://x/missing.json']->error(),
+            'the message names the URL that has no recording'
+        );
         array_map('unlink', glob($dir.'/*') ?: []);
         rmdir($dir);
+    }
+
+    /** The recording directory is named by content hash, and a trailing separator on it is not doubled. */
+    public function testPathForHashesTheUrlAndTrimsTheDirectory(): void
+    {
+        $url = 'https://x/a.json';
+        $expected = '/tmp/recordings/'.sha1($url).'.json';
+
+        self::assertSame($expected, RecordedHttpClient::pathFor('/tmp/recordings', $url));
+        self::assertSame($expected, RecordedHttpClient::pathFor('/tmp/recordings/', $url));
+        self::assertSame($expected, RecordedHttpClient::pathFor('/tmp/recordings\\', $url));
     }
 
     public function testEmptyObjectEnvelopeIsTreatedAsNotRecorded(): void

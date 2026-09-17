@@ -17,6 +17,11 @@ final class LockrotConfigTest extends TestCase
         self::assertSame('none', $cfg->failOn());
         self::assertSame('8.5', $cfg->targetPhp());
         self::assertFalse($cfg->includeDev());
+        // A source that names neither flag leaves both off: install time passes an empty $cli, so a
+        // default of "offline" would silence every install-time repository lookup, and a default of
+        // "strict-network" would fail an install on the first unreachable repository.
+        self::assertFalse($cfg->offline());
+        self::assertFalse($cfg->strictNetwork());
         self::assertSame('table', $cfg->format());
         self::assertFalse($cfg->isDisabled());
         self::assertSame(3, $cfg->thresholds()->releaseWarnYears());
@@ -53,6 +58,13 @@ final class LockrotConfigTest extends TestCase
     public function testInstallTimeBudgetFromExtra(): void
     {
         self::assertSame(30, LockrotConfig::fromSources(['install-time-budget' => 30], [], [], '8.5.10', null)->installTimeBudgetSeconds());
+    }
+
+    /** Both ends of the documented range are accepted; {@see invalidInstallTimeBudgets} covers the values just outside it. */
+    public function testTheInstallTimeBudgetRangeIsInclusiveAtBothEnds(): void
+    {
+        self::assertSame(1, LockrotConfig::fromSources(['install-time-budget' => 1], [], [], '8.5.10', null)->installTimeBudgetSeconds());
+        self::assertSame(120, LockrotConfig::fromSources(['install-time-budget' => 120], [], [], '8.5.10', null)->installTimeBudgetSeconds());
     }
 
     /**
@@ -175,10 +187,23 @@ final class LockrotConfigTest extends TestCase
         self::assertSame(['table', 'json', 'github', 'sarif', 'gitlab', 'markdown'], LockrotConfig::FORMATS);
     }
 
+    /**
+     * The rejection has to carry both halves a user acts on: the value that was refused, and the
+     * list of the ones that would have worked.
+     */
     public function testInvalidFormat(): void
     {
-        $this->expectException(ConfigException::class);
-        LockrotConfig::fromSources([], [], ['format' => 'xml'], '8.5.10', null);
+        $thrown = null;
+        try {
+            LockrotConfig::fromSources([], [], ['format' => 'xml'], '8.5.10', null);
+        } catch (ConfigException $e) {
+            $thrown = $e;
+        }
+
+        self::assertInstanceOf(ConfigException::class, $thrown);
+        self::assertStringStartsWith('format must be one of ', $thrown->getMessage());
+        self::assertStringContainsString(implode(', ', LockrotConfig::FORMATS), $thrown->getMessage());
+        self::assertStringEndsWith('; got "xml"', $thrown->getMessage());
     }
 
     public function testIncludeDevFromExtraAndCli(): void

@@ -70,9 +70,29 @@ final class ActivityFetchPlannerTest extends TestCase
 
     public function testDeduplicatesRepositoriesAndCountsEveryPackageThatSharesOne(): void
     {
-        $plan = (new ActivityFetchPlanner(ForgeAuth::withTokens(new Tokens('t', null))))->select(['a/a' => self::gh('o/mono'), 'a/b' => self::gh('o/mono')], []);
-        self::assertSame(['github.com/o/mono'], self::keys($plan->repos()));
-        self::assertSame(2, $plan->checkedPackages(RepoRef::GITHUB), 'both packages receive the shared repository\'s activity data');
+        // z/z comes last and lives elsewhere: the package that shares an already-selected
+        // repository must be stepped over, not end the walk.
+        $plan = (new ActivityFetchPlanner(ForgeAuth::withTokens(new Tokens('t', null))))->select(
+            ['a/a' => self::gh('o/mono'), 'a/b' => self::gh('o/mono'), 'z/z' => self::gh('o/other')],
+            []
+        );
+        self::assertSame(['github.com/o/mono', 'github.com/o/other'], self::keys($plan->repos()));
+        self::assertSame(3, $plan->checkedPackages(RepoRef::GITHUB), 'both packages receive the shared repository\'s activity data');
+    }
+
+    /** A budget of zero asks about nothing, and every candidate it turns away is counted. */
+    public function testAZeroBudgetSkipsEveryCappedCandidate(): void
+    {
+        $plan = (new ActivityFetchPlanner(ForgeAuth::anonymous(), 0))->select(
+            ['a/a' => self::gh('o/a'), 'b/b' => self::gh('o/b')],
+            ['a/a' => true, 'b/b' => true]
+        );
+
+        self::assertSame([], $plan->repos());
+        self::assertSame(2, $plan->skippedBudget(RepoRef::GITHUB));
+        self::assertSame(0, $plan->skippedNoToken(RepoRef::GITHUB));
+        self::assertSame(0, $plan->checkedPackages(RepoRef::GITHUB));
+        self::assertSame([RepoRef::GITHUB], $plan->cappedForges());
     }
 
     /** GitLab's anonymous limit (500 a minute) needs no cap: everything is fetched, candidate or not. */

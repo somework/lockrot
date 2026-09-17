@@ -105,15 +105,20 @@ final class SelfUpdateCommandTest extends TestCase
         };
     }
 
-    private function command(FakeHttpClient $http, string $runningPhar): SelfUpdateCommand
+    private function command(FakeHttpClient $http, string $runningPhar, ?string $releaseUrl = null): SelfUpdateCommand
     {
-        $command = new SelfUpdateCommand(
+        return $this->registered(new SelfUpdateCommand(
             static function () use ($http): array {
                 return [$http, null];
             },
             $this->validator(),
-            $runningPhar
-        );
+            $runningPhar,
+            $releaseUrl
+        ));
+    }
+
+    private function registered(SelfUpdateCommand $command): SelfUpdateCommand
+    {
         $app = new Application();
         $app->setAutoExit(false);
         $app->add($command);
@@ -124,15 +129,27 @@ final class SelfUpdateCommandTest extends TestCase
 
     /**
      * @param array<string, mixed> $args
+     * @param bool                 $decorated render stderr as a terminal would, with the styles applied
      *
      * @return array{0: int, 1: string, 2: string} exit code, stdout, stderr
      */
-    private function runCommand(SelfUpdateCommand $command, array $args): array
+    private function runCommand(SelfUpdateCommand $command, array $args, bool $decorated = false): array
     {
         $output = new SplitStreamOutput();
+        $output->getErrorOutput()->setDecorated($decorated);
         $code = $command->run(new ArrayInput($args, $command->getDefinition()), $output);
 
         return [$code, $output->fetch(), $output->fetchErrors()];
+    }
+
+    /**
+     * The pattern for "$message is styled, all of it": one escape sequence in front of the whole
+     * line and one behind it, and none in between. A style that closed after the `lockrot:` prefix
+     * would print the reason itself unhighlighted.
+     */
+    private static function styledWhole(string $message): string
+    {
+        return '~\e\[[0-9;]+m'.preg_quote($message, '~').'\e\[[0-9;]+m~';
     }
 
     public function testCheckOnAnUpToDateInstallExitsZero(): void
@@ -267,5 +284,87 @@ final class SelfUpdateCommandTest extends TestCase
 
         self::assertSame('self-update', $command->getName());
         self::assertContains('selfupdate', $command->getAliases());
+    }
+
+    /**
+     * The release document is read from wherever the command was pointed, not from the constant.
+     * bin/lockrot passes LOCKROT_RELEASE_URL through here, which is how the end-to-end test serves
+     * its own releases without reaching api.github.com.
+     */
+    public function testTheReleaseDocumentIsReadFromTheConfiguredUrl(): void
+    {
+        $url = 'https://releases.example.test/lockrot/latest.json';
+        $http = new FakeHttpClient([$url => FakeHttpClient::ok($url, self::releaseBody('v'.Version::STRING))]);
+        $tester = new CommandTester($this->command($http, $this->installedPhar(), $url));
+
+        $code = $tester->execute(['--check' => true]);
+
+        self::assertSame(0, $code, $tester->getDisplay());
+        self::assertSame([$url], $http->requested());
+    }
+
+    /**
+     * What `--help` puts on screen, in the order it reads in: what the command does, what it
+     * checks, what it needs, what it promises when that fails, and then the two ways to call it.
+     * The fragments are positional rather than exact, so the prose can be rewritten and the shape
+     * still has to hold.
+     */
+    public function testTheHelpExplainsTheUpdateBeforeGivingTheTwoExamples(): void
+    {
+        $help = $this->command($this->httpFor('v'.Version::STRING), $this->installedPhar())->getHelp();
+
+        $offset = 0;
+        foreach ([
+            'from GitHub',
+            'sha256 published beside it',
+            'has to be writable',
+            'leaves the running archive exactly as it was',
+            "  php lockrot.phar self-update\n",
+            '  php lockrot.phar self-update --check',
+        ] as $fragment) {
+            $at = strpos($help, $fragment, $offset);
+            self::assertNotFalse($at, 'the help is missing "'.$fragment.'" after offset '.$offset.': '.$help);
+            $offset = $at + \strlen($fragment);
+        }
+    }
+
+    /**
+     * Anything that is not a ConfigException is still exit 2, and still one line on stderr — the
+     * command is the outermost frame of the PHAR, so an unhandled failure here would otherwise
+     * reach the user as a stack trace.
+     */
+    public function testAFailureThatIsNotAConfigErrorIsStillOneLineAndExitTwo(): void
+    {
+        $command = $this->registered(new SelfUpdateCommand(
+            static function (): array {
+                throw new \RuntimeException('the downloader could not be built');
+            },
+            $this->validator(),
+            $this->installedPhar()
+        ));
+
+        [$code, $stdout, $stderr] = $this->runCommand($command, [], true);
+
+        self::assertSame(2, $code);
+        self::assertSame('', $stdout);
+        self::assertMatchesRegularExpression(
+            self::styledWhole('lockrot self-update failed: the downloader could not be built'),
+            $stderr
+        );
+    }
+
+    /** The same for the errors lockrot raises itself, which is every failure a user normally sees. */
+    public function testOnATerminalTheWholeErrorIsStyledAndNotJustItsPrefix(): void
+    {
+        $body = file_get_contents(self::FIXTURES.'/not-found.json');
+        self::assertIsString($body);
+        $http = new FakeHttpClient([
+            ReleaseLocator::DEFAULT_URL => FakeHttpClient::status(ReleaseLocator::DEFAULT_URL, 404, $body),
+        ]);
+
+        [$code, , $stderr] = $this->runCommand($this->command($http, $this->installedPhar()), ['--check' => true], true);
+
+        self::assertSame(2, $code);
+        self::assertMatchesRegularExpression(self::styledWhole('lockrot: no published release found'), $stderr);
     }
 }

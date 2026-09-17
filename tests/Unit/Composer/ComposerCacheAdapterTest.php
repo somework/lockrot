@@ -22,8 +22,20 @@ final class ComposerCacheAdapterTest extends TestCase
         self::assertNotNull($hit);
         self::assertSame('{}', $hit->body());
         self::assertSame('2026-09-14', $hit->fetchedAt()->format('Y-m-d'));
+        // One `<sha1>.json` per URL: the hash keeps a query string or a path from colliding with
+        // Composer's own cache file names, and the suffix says what the file holds.
+        self::assertSame([sha1('https://repo.packagist.org/p2/a/b.json').'.json'], self::fileNamesIn($dir));
         array_map('unlink', glob($dir.'*') ?: []);
         rmdir($dir);
+    }
+
+    /** @return list<string> */
+    private static function fileNamesIn(string $dir): array
+    {
+        $names = array_map('basename', glob($dir.'*') ?: []);
+        sort($names);
+
+        return $names;
     }
 
     /** A stored envelope whose fetch time cannot be read is a miss, never an answer of unknowable age. */

@@ -35,6 +35,18 @@ final class ProjectConfigTest extends TestCase
         self::assertSame(['a/b'], $cfg->directRequires());
     }
 
+    /**
+     * json_decode(..., true) turns an object key that looks like an integer into an int key, and
+     * `require` is a nested object, so such a key reaches this far. The reported names stay
+     * strings whatever the key was.
+     */
+    public function testANumericRequireKeyIsReportedAsAStringName(): void
+    {
+        $cfg = ProjectConfig::fromArray(['require' => [123 => '^1.0', 'a/b' => '^1.0']]);
+
+        self::assertSame(['123', 'a/b'], $cfg->directRequires());
+    }
+
     public function testEmptyConfig(): void
     {
         $cfg = ProjectConfig::empty();

@@ -23,7 +23,8 @@ final class DependencyGraph
 
     /**
      * @param array<string, list<string>> $edges
-     * @param list<string> $roots
+     * @param list<string> $roots may name a package the lock does not carry; every walk below
+     *                            only ever follows an edge that exists, so such a root leads nowhere
      */
     private function __construct(array $edges, array $roots)
     {
@@ -41,7 +42,6 @@ final class DependencyGraph
         if ($includeDev) {
             $roots = array_merge($roots, $project->directDevRequires());
         }
-        $roots = array_values(array_filter($roots, static fn (string $name): bool => isset($edges[$name])));
 
         return new self($edges, $roots);
     }

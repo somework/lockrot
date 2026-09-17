@@ -5,9 +5,18 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Composer;
 
 use Composer\Config;
+use Composer\Downloader\TransportException;
 use Composer\IO\BufferIO;
+use Composer\IO\IOInterface;
+use Composer\IO\NullIO;
+use Composer\Util\Http\Response;
+use Composer\Util\HttpDownloader;
+use Lockrot\Clock;
 use Lockrot\Composer\ComposerHttpClient;
+use Lockrot\Data\Http\HttpResult;
+use Lockrot\Deadline;
 use PHPUnit\Framework\TestCase;
+use React\Promise\Deferred;
 
 final class ComposerHttpClientTest extends TestCase
 {
@@ -18,6 +27,7 @@ final class ComposerHttpClientTest extends TestCase
     private const WITHOUT_AUTHORIZATION = ['Accept: application/vnd.github+json', 'User-Agent: lockrot'];
     private const GITLAB_HEADERS = ['Accept: application/json', 'User-Agent: lockrot', 'PRIVATE-TOKEN: env-token'];
     private const GITLAB_WITHOUT_TOKEN = ['Accept: application/json', 'User-Agent: lockrot'];
+    private const NOW = '2026-09-14T00:00:00+00:00';
 
     /** @param list<string> $gitlabDomains */
     private static function config(array $gitlabDomains = ['gitlab.com']): Config
@@ -99,6 +109,66 @@ final class ComposerHttpClientTest extends TestCase
         }
     }
 
+    /**
+     * Url::getOrigin() resolves an empty URL to an empty origin, which an auth.json entry with an
+     * empty host would match — and Composer would then add credentials to a request it cannot even
+     * send. There is nothing to authenticate, so the headers are handed back before the origin is
+     * ever looked up.
+     */
+    public function testAnEmptyUrlKeepsItsHeadersEvenWhenSomethingIsStoredUnderTheEmptyOrigin(): void
+    {
+        $io = new BufferIO();
+        $io->setAuthentication('', 'user', 'secret');
+
+        self::assertSame(self::HEADERS, self::strip($io, '', self::HEADERS));
+    }
+
+    /**
+     * A GitHub Enterprise host is a `github-domains` entry with its own `github-oauth` token, which
+     * Composer stores exactly as it stores a github.com one — username the token, password
+     * `x-oauth-basic`. AuthHelper sends it as Basic on every request to that host, api path or not,
+     * so lockrot's own Authorization header has to go: the `api.github.com`-only exception belongs
+     * to github.com alone.
+     */
+    public function testAGithubEnterpriseTokenReplacesLockrotsHeaderOnEveryPath(): void
+    {
+        $io = new BufferIO();
+        $io->setAuthentication('github.example.com', 'ghe-token', 'x-oauth-basic');
+
+        self::assertSame(self::WITHOUT_AUTHORIZATION, self::strip($io, 'https://github.example.com/api/v3/repos/vendor/name', self::HEADERS));
+        self::assertSame(self::WITHOUT_AUTHORIZATION, self::strip($io, 'https://github.example.com/vendor/name/releases/download/v1/x.phar', self::HEADERS));
+    }
+
+    /**
+     * Bitbucket credentials are stored under the site host and read for the API host, so which
+     * origin the four characters of `api.` are stripped down to decides whose credentials are
+     * inspected. A `client-certificate` entry under bitbucket.org adds no credential header of its
+     * own, so lockrot's token must stay — read under any other origin, the entry is not found and
+     * the token would be dropped from a request nothing then authenticates.
+     */
+    public function testTheApiHostFallsBackToTheExactSiteHostWhoseCredentialsDecide(): void
+    {
+        $io = new BufferIO();
+        $io->setAuthentication('bitbucket.org', 'client-certificate', '{"local_cert":"/tmp/c.pem"}');
+
+        self::assertSame(
+            ['User-Agent: lockrot', 'Authorization: Bearer mine'],
+            self::strip($io, self::BITBUCKET, ['User-Agent: lockrot', 'Authorization: Bearer mine'])
+        );
+    }
+
+    /** What is left is a list, whichever position the credential header sat in — Composer indexes the `header` option by position. */
+    public function testTheRemainingHeadersComeBackAsAList(): void
+    {
+        $io = new BufferIO();
+        $io->setAuthentication('github.com', 'composer-token', 'x-oauth-basic');
+
+        self::assertSame(
+            ['Accept: application/vnd.github+json', 'User-Agent: lockrot'],
+            self::strip($io, self::GITHUB, ['Authorization: token env-token', 'Accept: application/vnd.github+json', 'User-Agent: lockrot'])
+        );
+    }
+
     public function testCredentialsForAnotherHostDoNotTouchGithubRequests(): void
     {
         $io = new BufferIO();
@@ -173,5 +243,225 @@ final class ComposerHttpClientTest extends TestCase
 
         self::assertSame(['User-Agent: lockrot'], self::strip($io, self::BITBUCKET, ['User-Agent: lockrot', 'Authorization: Bearer mine']));
         self::assertSame(['User-Agent: lockrot', 'Authorization: Bearer mine'], self::strip(new BufferIO(), self::BITBUCKET, ['User-Agent: lockrot', 'Authorization: Bearer mine']));
+    }
+
+    /**
+     * A client over a downloader that answers from $script, plus that downloader so a test can read
+     * the requests it saw.
+     *
+     * @param array<string, array{0: int, 1: string}|\Throwable> $script url => [status, body], or an exception to reject with; a URL the script does not mention is never answered at all
+     *
+     * @return array{0: ComposerHttpClient, 1: ScriptedDownloader}
+     */
+    private static function clientWith(array $script, ?Deadline $deadline = null): array
+    {
+        $io = new NullIO();
+        $config = new Config(false, sys_get_temp_dir());
+        $downloader = new ScriptedDownloader($io, $config, $script);
+
+        return [new ComposerHttpClient($downloader, $io, $config, Clock::fixed(self::NOW), $deadline), $downloader];
+    }
+
+    /**
+     * @param array<string, HttpResult> $results
+     *
+     * @return array<string, array{0: int, 1: ?string, 2: ?string}> url => status, body, error
+     */
+    private static function summarize(array $results): array
+    {
+        $summary = [];
+        foreach ($results as $url => $result) {
+            $summary[$url] = [$result->status(), $result->body(), $result->error()];
+        }
+
+        return $summary;
+    }
+
+    /** Every answer is turned into an HttpResult keyed by its own URL, carrying the clock's fetch time. */
+    public function testEveryAnsweredRequestBecomesItsOwnResult(): void
+    {
+        [$client] = self::clientWith([
+            'https://a.example.com/1' => [200, '{"a":1}'],
+            'https://a.example.com/2' => [404, ''],
+        ]);
+
+        $results = $client->fetchAll(['https://a.example.com/1', 'https://a.example.com/2']);
+
+        self::assertSame([
+            'https://a.example.com/1' => [200, '{"a":1}', null],
+            'https://a.example.com/2' => [404, '', null],
+        ], self::summarize($results));
+        self::assertSame('2026-09-14', $results['https://a.example.com/1']->fetchedAt()->format('Y-m-d'));
+    }
+
+    /**
+     * A refused request keeps the transport's own status and message, so the caller can tell a 403
+     * from "connection refused". Status 0 means "no HTTP answer to read a status from", which covers
+     * both a transport error that never got one and a failure that is not a transport error at all —
+     * a plugin listening on PRE_FILE_DOWNLOAD throwing, say. Anything other than 0 there would read
+     * as a status the server never sent.
+     */
+    public function testAFailedRequestKeepsItsStatusAndMessage(): void
+    {
+        $rateLimited = new TransportException('HTTP 403 rate limit exceeded');
+        $rateLimited->setStatusCode(403);
+        [$client] = self::clientWith([
+            'https://a.example.com/rate-limited' => $rateLimited,
+            'https://a.example.com/refused' => new TransportException('connection refused'),
+            'https://a.example.com/not-a-transport-error' => new \RuntimeException('a download listener blew up'),
+        ]);
+
+        $results = $client->fetchAll([
+            'https://a.example.com/rate-limited',
+            'https://a.example.com/refused',
+            'https://a.example.com/not-a-transport-error',
+        ]);
+
+        self::assertSame([
+            'https://a.example.com/rate-limited' => [403, null, 'HTTP 403 rate limit exceeded'],
+            'https://a.example.com/refused' => [0, null, 'connection refused'],
+            'https://a.example.com/not-a-transport-error' => [0, null, 'a download listener blew up'],
+        ], self::summarize($results));
+    }
+
+    /**
+     * A URL the downloader never answers still gets a result: the caller reads the map by URL, and a
+     * missing key would be indistinguishable from a URL it never asked for.
+     */
+    public function testAUrlWithNoAnswerAtAllBecomesAFailureResult(): void
+    {
+        [$client] = self::clientWith(['https://a.example.com/answered' => [200, 'body']]);
+
+        $results = $client->fetchAll(['https://a.example.com/answered', 'https://a.example.com/silent']);
+
+        self::assertSame([
+            'https://a.example.com/answered' => [200, 'body', null],
+            'https://a.example.com/silent' => [0, null, 'no response'],
+        ], self::summarize($results));
+    }
+
+    /** The results only exist once the downloader has been waited on; returning before that would report every URL as unanswered. */
+    public function testTheRequestsAreWaitedOnBeforeTheResultsAreRead(): void
+    {
+        [$client, $downloader] = self::clientWith(['https://a.example.com/1' => [200, 'body']]);
+
+        $results = $client->fetchAll(['https://a.example.com/1']);
+
+        self::assertSame(1, $downloader->waits, 'fetchAll() must wait for the promises it added');
+        self::assertSame('body', $results['https://a.example.com/1']->body());
+    }
+
+    /** The same URL asked for twice is one request, and one entry in the answer. */
+    public function testARepeatedUrlIsRequestedOnce(): void
+    {
+        [$client, $downloader] = self::clientWith(['https://a.example.com/1' => [200, 'body']]);
+
+        $results = $client->fetchAll(['https://a.example.com/1', 'https://a.example.com/1']);
+
+        self::assertSame(['https://a.example.com/1'], array_column($downloader->requests, 'url'));
+        self::assertCount(1, $results);
+    }
+
+    /**
+     * Each request carries the headers this URL is allowed to send, the timeout the deadline leaves
+     * it, and `retry-auth-failure` off — a retry would let Composer's AuthHelper exchange a
+     * bitbucket-oauth consumer on a 401 and rewrite composer.json/auth.json on the way, which a
+     * report must never do ({@see \Lockrot\Composer\ServiceFactory::bitbucketAuthorizer()} does the
+     * exchange itself instead).
+     */
+    public function testEachRequestCarriesItsHeadersTimeoutAndNoAuthRetry(): void
+    {
+        [$client, $downloader] = self::clientWith(['https://api.github.com/repos/vendor/name' => [200, '{}']]);
+
+        $client->fetchAll(['https://api.github.com/repos/vendor/name'], self::HEADERS);
+
+        self::assertSame([[
+            'url' => 'https://api.github.com/repos/vendor/name',
+            'options' => [
+                'http' => ['timeout' => ComposerHttpClient::DEFAULT_TIMEOUT, 'header' => self::HEADERS],
+                'retry-auth-failure' => false,
+            ],
+        ]], $downloader->requests);
+    }
+
+    /** The timeout is what the install-time budget has left at the moment the requests go out, never the default. */
+    public function testAPartlySpentDeadlineShortensEachRequestsTimeout(): void
+    {
+        $readings = [0.0, 2.6];
+        $now = static function () use (&$readings): float {
+            return \count($readings) > 1 ? (float) array_shift($readings) : $readings[0];
+        };
+        [$client, $downloader] = self::clientWith(['https://a.example.com/1' => [200, 'body']], Deadline::inSeconds(5.0, $now));
+
+        $client->fetchAll(['https://a.example.com/1']);
+
+        $options = $downloader->requests[0]['options'];
+        self::assertIsArray($options['http']);
+        self::assertSame(3, $options['http']['timeout'], '5s budget, 2.6s gone -> 2.4s left, rounded up');
+    }
+}
+
+/** See {@see ComposerHttpClientTest::clientWith()}. */
+final class ScriptedDownloader extends HttpDownloader
+{
+    /** @var list<array{url: string, options: array<string, mixed>}> the requests add() saw, in order */
+    public array $requests = [];
+    /** @var int how often wait() was called */
+    public int $waits = 0;
+
+    /** @var array<string, array{0: int, 1: string}|\Throwable> */
+    private array $script;
+    /** @var list<array{0: non-empty-string, 1: Deferred<Response>}> */
+    private array $pending = [];
+
+    /** @param array<string, array{0: int, 1: string}|\Throwable> $script */
+    public function __construct(IOInterface $io, Config $config, array $script)
+    {
+        parent::__construct($io, $config);
+        $this->script = $script;
+    }
+
+    /**
+     * @param string               $url
+     * @param array<string, mixed> $options
+     *
+     * @return \React\Promise\PromiseInterface<Response>
+     */
+    public function add($url, $options = [])
+    {
+        $url = (string) $url;
+        if ($url === '') {
+            // What the real downloader does, so a test cannot pass one by accident.
+            throw new \InvalidArgumentException('$url must not be an empty string');
+        }
+        $this->requests[] = ['url' => $url, 'options' => \is_array($options) ? $options : []];
+        /** @var Deferred<Response> $deferred */
+        $deferred = new Deferred();
+        $this->pending[] = [$url, $deferred];
+
+        return $deferred->promise();
+    }
+
+    /**
+     * Settles every promise added since the last call, from the script. A URL the script does not
+     * mention is left pending for good — the real downloader's "no answer ever arrived" case.
+     *
+     * @param ?int $index
+     *
+     * @return void
+     */
+    public function wait($index = null)
+    {
+        ++$this->waits;
+        $pending = $this->pending;
+        $this->pending = [];
+        foreach ($pending as [$url, $deferred]) {
+            $answer = $this->script[$url] ?? null;
+            if ($answer instanceof \Throwable) {
+                $deferred->reject($answer);
+            } elseif (\is_array($answer)) {
+                $deferred->resolve(new Response(['url' => $url], $answer[0], [], $answer[1]));
+            }
+        }
     }
 }

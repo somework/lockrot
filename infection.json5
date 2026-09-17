@@ -1,6 +1,6 @@
 {
     "source": {
-        "directories": ["src/Verdict", "src/Signal", "src/Output", "src/Analyzer"]
+        "directories": ["src"]
     },
     // The full suite takes ~30s on a developer machine, well past Infection's 10s default. With that
     // default, every mutant whose covering tests reach the integration suite came back as "required
@@ -35,8 +35,49 @@
     // Re-measured 2026-09-16 with FailOn, the per-forge analyzer notes and the activity cache age
     // in scope: 1175 mutants, the same 9 escapes, MSI = Covered MSI 99.23%, ~1m40s on 8 threads.
     //
-    // Threshold 97 = floor of the honest MSI minus 2, so 25 new escapes fit before the gate
-    // fails and the number does not move every time a test is added.
-    "minMsi": 97,
-    "minCoveredMsi": 97
+    // Widened to the whole src tree on 2026-09-17. Before: 3160 mutants, 269 escaped, MSI 91%.
+    // 209 were closed by sharper tests, 9 by removing statements no test could observe (a redundant
+    // array_unique, a sort over an already-sorted list, a root filter every walk guards against, a
+    // trim its only reader repeats, an unused constructor parameter, Composer\Cache guards that
+    // Cache::read()/write() already apply), and 47 more turned out to be equivalent. After: 3201
+    // mutants, 56 escaped, 2 timed out (both genuine infinite loops in RepositoryMetadataLoader::
+    // loadChunked(), i.e. detections), MSI = Covered MSI 98.25%, ~6m20s on 8 threads. The 47, one
+    // line each; the full reasoning is in the ledger of that day:
+    //  - Set membership written as `= true` and read only through isset(): ActivityClient.php:80,
+    //    ActivityFetchPlanner.php:51 and :67, RepositoryMetadataLoader.php:274 (TrueValue).
+    //  - array_values() that only makes a `list` type true, every consumer iterates: ActivityClient.php:120,
+    //    RepositoryMetadataLoader.php:72, InstallTimeSummary.php:116, LockrotCommand.php:364.
+    //  - Casts the type system already guarantees: RepoLocator.php:139 and SupportSource.php:28
+    //    (preg_replace with a literal pattern), PhpReleaseDates.php:29 (a `\d+.\d+` key is never an int),
+    //    ComposerHttpClient.php:117 (substr of a host longer than 4) and :173 (`?? 0` on a ?int),
+    //    LockrotCommand.php:104 and :161 (getcwd() false only in a removed working directory).
+    //  - Memoisation of a pure function: AllowlistEntry.php:36 (VersionParser is stateless),
+    //    BaselineSchema.php:70, ConfigSchema.php:54, DependencyGraph.php:115 (recomputed, equal answer).
+    //  - Branches the shipped inputs cannot enter: BaselineSchema.php:41 x2 and ConfigSchema.php:42 x2
+    //    (the PHPStan narrowing over json-schema errors, which are always arrays of strings),
+    //    BaselineSchema.php:74 and ConfigSchema.php:58 (a schema shipped in the package is never
+    //    unreadable), BaselineFile.php:112 (error_clear_last before a write that records its own
+    //    warning) and :154 (error_get_last() is never null on that path), ProjectIgnoreList.php:71
+    //    ((int) of the whole YYYY-MM-DD match is the year), HttpResult.php:84 (getLastErrors() is false
+    //    on PHP >= 8.2 when clean; killed on the 7.4 leg), LockrotCommand.php:375 x2 (the Composer 2.2
+    //    arm of the tryComposer() guard, never entered on the vendored Composer; covered by the Docker
+    //    7.4/2.2 run outside Infection), SelfUpdateCommand.php:122 (Phar::running(false) differs only
+    //    inside a running PHAR; covered by the e2e PharTest Infection does not run).
+    //  - Same result by another route: ActivityClient.php:68 (`<` to `<=` assigns an equal value),
+    //    ProjectIgnoreList.php:75 and PhpReleaseDates.php:29 Concat (PHP's date parser accepts the
+    //    reversed `T..` concatenation as the same instant), JsonReader.php:84 (array_keys([]) never
+    //    equals range(0, -1)), RepositoryMetadataLoader.php:158 and :200 (pass 2 after an exhausted
+    //    deadline starts no chunk and marks the same names), ActivityFetchPlanner.php:60 x2 (the `?? 0`
+    //    default inside the already-seen branch is unreachable), LockrotCommand.php:158 (the next
+    //    statement raises the identical ConfigException), :370 (tryComposer() on a missing manifest
+    //    returns null anyway), Policy.php:23 (FailOn::reaches() is false for `none`, the loop rejects
+    //    everything and falls through to EXIT_OK), InstallTimeSummary.php:186 x2 (the stale list the
+    //    names feed is never rendered on the install-time path; kept for a truthful comparison),
+    //    SelfUpdateCommand.php:154 and :158 (an unclosed `</error>` renders byte-identically, the line
+    //    is the command's last write).
+    //
+    // Threshold 96 = floor of the honest MSI minus 2, so ~70 new escapes fit before the gate fails and
+    // the number does not move every time a test is added.
+    "minMsi": 96,
+    "minCoveredMsi": 96
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Data\Http;
 
 use Lockrot\Data\Http\HttpResult;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class HttpResultTest extends TestCase
@@ -24,6 +25,36 @@ final class HttpResultTest extends TestCase
         self::assertSame('timeout', HttpResult::failure('u', 'timeout', $at)->error());
     }
 
+    /**
+     * A failure is a transport error, a server error, or the three answers that mean "not this
+     * time": rate limited (429), forbidden (403) and unauthorized (401). Every other 4xx is the
+     * forge answering, so a cached copy must not be preferred over it.
+     *
+     * @dataProvider statuses
+     */
+    #[DataProvider('statuses')]
+    public function testWhichStatusesCountAsAFailure(int $status, bool $isFailure): void
+    {
+        $result = new HttpResult('u', $status, '', new \DateTimeImmutable('2026-09-14T00:00:00+00:00'));
+
+        self::assertSame($isFailure, $result->isFailure());
+    }
+
+    /** @return iterable<string, array{int, bool}> */
+    public static function statuses(): iterable
+    {
+        yield 'no answer at all' => [0, true];
+        yield 'bad request' => [400, false];
+        yield 'unauthorized' => [401, true];
+        yield 'payment required' => [402, false];
+        yield 'forbidden' => [403, true];
+        yield 'not found' => [404, false];
+        yield 'precondition required' => [428, false];
+        yield 'too many requests' => [429, true];
+        yield 'the status after too many requests' => [430, false];
+        yield 'internal server error' => [500, true];
+    }
+
     public function testJsonAndEnvelopeRoundTrip(): void
     {
         $at = new \DateTimeImmutable('2026-09-14T12:34:56+00:00');
@@ -37,6 +68,10 @@ final class HttpResultTest extends TestCase
         self::assertSame('{"a":1}', $copy->body());
         self::assertSame('2026-09-14T12:34:56+00:00', $copy->fetchedAt()->format(\DATE_ATOM));
         self::assertNull((new HttpResult('u', 200, 'not json', $at))->json());
+        // Valid JSON that is not an object or an array is not a body a forge api can read either.
+        self::assertNull((new HttpResult('u', 200, '42', $at))->json());
+        self::assertNull((new HttpResult('u', 200, '"a string"', $at))->json());
+        self::assertNull((new HttpResult('u', 200, 'null', $at))->json());
     }
 
     /** An envelope without a readable fetch time has no age, so it is not an answer. */

@@ -9,6 +9,7 @@ use Lockrot\Baseline\BaselineEntry;
 use Lockrot\Baseline\BaselineFile;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Verdict\Verdict;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class BaselineFileTest extends TestCase
@@ -94,6 +95,33 @@ final class BaselineFileTest extends TestCase
         self::assertSame('/elsewhere/rot.json', $file->displayPath());
     }
 
+    public function testATrailingSeparatorOnTheProjectDirectoryIsNotDoubled(): void
+    {
+        self::assertSame('/projects/app/lockrot-baseline.json', BaselineFile::resolve('/projects/app/', null)->path());
+        self::assertSame('/projects/app/ci/rot.json', BaselineFile::resolve('/projects/app\\', 'ci/rot.json')->path());
+    }
+
+    /**
+     * A Windows absolute path is recognised on any platform, so a baseline configured on Windows
+     * and read back by a tool run elsewhere resolves to the same file rather than being glued onto
+     * the project directory. A drive letter is its own case: it starts with neither separator.
+     *
+     * @dataProvider windowsAbsolutePaths
+     */
+    #[DataProvider('windowsAbsolutePaths')]
+    public function testAWindowsAbsolutePathIsUsedAsIs(string $configured): void
+    {
+        self::assertSame($configured, BaselineFile::resolve('/projects/app', $configured)->path());
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function windowsAbsolutePaths(): iterable
+    {
+        yield 'a drive letter with a backslash' => ['C:\\ci\\rot.json'];
+        yield 'a drive letter with a slash' => ['c:/ci/rot.json'];
+        yield 'a UNC share' => ['\\\\server\\share\\rot.json'];
+    }
+
     public function testWriteThenReadRoundTrip(): void
     {
         $file = BaselineFile::resolve($this->tempDir(), null);
@@ -173,7 +201,11 @@ final class BaselineFileTest extends TestCase
         }
 
         self::assertInstanceOf(ConfigException::class, $thrown);
-        self::assertStringContainsString('Cannot write ', $thrown->getMessage());
+        self::assertMatchesRegularExpression(
+            '/^Cannot write lockrot-baseline\.json: \S/',
+            $thrown->getMessage(),
+            'the path a reader can act on comes first, then the reason'
+        );
         self::assertStringContainsString('file_put_contents', $thrown->getMessage());
         self::assertStringNotContainsString('unlink', $thrown->getMessage());
     }
@@ -214,7 +246,11 @@ final class BaselineFileTest extends TestCase
         }
 
         self::assertInstanceOf(ConfigException::class, $thrown);
-        self::assertStringContainsString('Cannot write lockrot-baseline.json', $thrown->getMessage());
+        self::assertMatchesRegularExpression(
+            '/^Cannot write lockrot-baseline\.json: \S/',
+            $thrown->getMessage(),
+            'a failed rename is reported the same way as a failed write'
+        );
         self::assertStringNotContainsString('unlink', $thrown->getMessage());
         self::assertSame(
             ['lockrot-baseline.json'],

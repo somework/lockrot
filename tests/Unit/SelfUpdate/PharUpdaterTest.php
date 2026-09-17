@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\SelfUpdate;
 
 use Composer\Semver\Comparator;
+use Composer\Util\Platform;
 use Lockrot\Exception\ConfigException;
 use Lockrot\SelfUpdate\PharUpdater;
 use Lockrot\SelfUpdate\PharValidatorInterface;
 use Lockrot\SelfUpdate\Release;
 use Lockrot\Tests\Support\FakeHttpClient;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
@@ -115,6 +117,42 @@ final class PharUpdaterTest extends TestCase
         return $found;
     }
 
+    /**
+     * Asserts that $message carries each of $fragments, in this order and without overlapping.
+     *
+     * The messages below are built by concatenation, and a reader needs every part of them in the
+     * right place: the path before what is wrong with it, the URL before what to do with it. This
+     * says that much without pinning the wording in between.
+     *
+     * @param list<string> $fragments
+     */
+    private static function assertFragmentsInOrder(array $fragments, string $message): void
+    {
+        $offset = 0;
+        foreach ($fragments as $fragment) {
+            $at = strpos($message, $fragment, $offset);
+            self::assertNotFalse($at, 'expected "'.$fragment.'" after offset '.$offset.' in: '.$message);
+            $offset = $at + \strlen($fragment);
+        }
+    }
+
+    /**
+     * The current second, entered after waiting for it to begin.
+     *
+     * `filemtime()` resolves to whole seconds, so a test that puts a file exactly on the sweep's
+     * cutoff has to know that the sweep's own `time()` lands in the same second the mtime was
+     * computed from. Starting at the top of a second leaves a full second of room for the run.
+     */
+    private static function atTheStartOfASecond(): int
+    {
+        $before = time();
+        while (($now = time()) === $before) {
+            usleep(1000);
+        }
+
+        return $now;
+    }
+
     public function testANewerReleaseIsAnAvailableUpdate(): void
     {
         $dir = $this->tempDir();
@@ -139,10 +177,18 @@ final class PharUpdaterTest extends TestCase
         self::assertSame(['lockrot.phar'], self::filesIn($dir));
     }
 
-    public function testANewerReleaseReplacesTheRunningPharAndKeepsItsPermissions(): void
+    /**
+     * Every one of the nine permission bits is carried over, 0755 included: an install whose
+     * `lockrot.phar` came back without the bits its group and everyone else had would still run for
+     * the user who updated it and for nobody else.
+     *
+     * @dataProvider carriedPermissions
+     */
+    #[DataProvider('carriedPermissions')]
+    public function testANewerReleaseReplacesTheRunningPharAndKeepsItsPermissions(int $mode): void
     {
         $dir = $this->tempDir();
-        $phar = $this->installedPhar($dir, 0700);
+        $phar = $this->installedPhar($dir, $mode);
         $http = $this->http(self::checksumFileFor(self::NEW_PHAR));
 
         $message = $this->updater($http, $phar)->update($this->release('0.2.0'), false);
@@ -151,8 +197,17 @@ final class PharUpdaterTest extends TestCase
         self::assertSame(self::NEW_PHAR, file_get_contents($phar));
         self::assertSame(['lockrot.phar'], self::filesIn($dir), 'the temporary file must be gone');
         clearstatcache(true, $phar);
-        self::assertSame(0700, fileperms($phar) & 0777);
+        self::assertSame($mode, fileperms($phar) & 0777);
         self::assertSame([self::CHECKSUM_URL, self::PHAR_URL], $http->requested());
+    }
+
+    /** @return array<string, array{0: int}> */
+    public static function carriedPermissions(): array
+    {
+        return [
+            'private to its owner' => [0700],
+            'executable for everyone' => [0755],
+        ];
     }
 
     public function testTheChecksumFileIsAcceptedWhateverNameFollowsTheHash(): void
@@ -160,6 +215,20 @@ final class PharUpdaterTest extends TestCase
         $dir = $this->tempDir();
         $phar = $this->installedPhar($dir);
         $http = $this->http(self::checksumFileFor(self::NEW_PHAR, 'build/lockrot.phar'));
+
+        self::assertSame('lockrot updated from 0.1.0 to 0.2.0', $this->updater($http, $phar)->update($this->release('0.2.0'), false));
+        self::assertSame(self::NEW_PHAR, file_get_contents($phar));
+    }
+
+    /**
+     * `sha256sum` writes lower case, but the hash is hex either way and some release pipelines
+     * upper-case it. It is read whatever case it is published in, and compared in one case.
+     */
+    public function testAnUpperCaseChecksumIsReadAndComparedAllTheSame(): void
+    {
+        $dir = $this->tempDir();
+        $phar = $this->installedPhar($dir);
+        $http = $this->http(strtoupper(hash('sha256', self::NEW_PHAR)).'  lockrot.phar'."\n");
 
         self::assertSame('lockrot updated from 0.1.0 to 0.2.0', $this->updater($http, $phar)->update($this->release('0.2.0'), false));
         self::assertSame(self::NEW_PHAR, file_get_contents($phar));
@@ -190,7 +259,7 @@ final class PharUpdaterTest extends TestCase
         $http = $this->http("404: Not Found\n");
 
         $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage('holds no sha256 hash');
+        $this->expectExceptionMessage(self::CHECKSUM_URL.' holds no sha256 hash');
         $this->updater($http, $phar)->update($this->release('0.2.0'), false);
     }
 
@@ -204,7 +273,10 @@ final class PharUpdaterTest extends TestCase
             $this->updater($http, $phar, 'internal corruption of phar')->update($this->release('0.2.0'), false);
             self::fail('an unreadable archive must not be installed');
         } catch (ConfigException $e) {
-            self::assertStringContainsString('internal corruption of phar', $e->getMessage());
+            self::assertFragmentsInOrder(
+                ['is not a readable archive (', 'internal corruption of phar', '); nothing was replaced'],
+                $e->getMessage()
+            );
         }
 
         self::assertSame(self::INSTALLED, file_get_contents($phar));
@@ -225,7 +297,10 @@ final class PharUpdaterTest extends TestCase
             $this->updater($http, $phar)->update($this->release('0.2.0'), false);
             self::fail('an unwritable directory must not be silently skipped');
         } catch (ConfigException $e) {
-            self::assertStringContainsString($dir, $e->getMessage());
+            self::assertFragmentsInOrder(
+                [$dir, ' is not writable', self::PHAR_URL, ' by hand instead'],
+                $e->getMessage()
+            );
         } finally {
             chmod($dir, 0755);
         }
@@ -247,8 +322,34 @@ final class PharUpdaterTest extends TestCase
             $this->updater($http, $phar)->update($this->release('0.2.0'), false);
             self::fail('a failed download must not be swallowed');
         } catch (ConfigException $e) {
-            self::assertStringContainsString(self::PHAR_URL, $e->getMessage());
-            self::assertStringContainsString('HTTP 404', $e->getMessage());
+            self::assertSame('could not download '.self::PHAR_URL.': HTTP 404', $e->getMessage());
+        }
+
+        self::assertSame(self::INSTALLED, file_get_contents($phar));
+        self::assertSame(['lockrot.phar'], self::filesIn($dir));
+    }
+
+    /**
+     * A request that never reached a server has no status to report, so the transport's own reason
+     * is what the message carries instead — `HTTP 0` would tell a reader nothing.
+     */
+    public function testADownloadThatNeverConnectedReportsTheTransportReasonRatherThanAStatus(): void
+    {
+        $dir = $this->tempDir();
+        $phar = $this->installedPhar($dir);
+        $http = new FakeHttpClient([
+            self::CHECKSUM_URL => FakeHttpClient::ok(self::CHECKSUM_URL, self::checksumFileFor(self::NEW_PHAR)),
+            self::PHAR_URL => FakeHttpClient::transportFailure(self::PHAR_URL, 'Could not resolve host: github.com'),
+        ]);
+
+        try {
+            $this->updater($http, $phar)->update($this->release('0.2.0'), false);
+            self::fail('a transport failure must not be swallowed');
+        } catch (ConfigException $e) {
+            self::assertSame(
+                'could not download '.self::PHAR_URL.': Could not resolve host: github.com',
+                $e->getMessage()
+            );
         }
 
         self::assertSame(self::INSTALLED, file_get_contents($phar));
@@ -259,6 +360,11 @@ final class PharUpdaterTest extends TestCase
      * The last step can still fail after a verified download — a target that cannot be written over
      * although its directory can. That must be reported, and must not leave the temporary archive
      * lying next to the PHAR.
+     *
+     * The message is matched whole because both paths in it are what a reader needs — what could
+     * not be written, and what it would have been written from — and because that also pins the
+     * name the staged archive is given: beside the PHAR, under its own name, ending in `.phar` so
+     * the runtime will open it at all.
      */
     public function testAReplaceThatCannotCompleteIsReportedAndLeavesNoTemporaryFile(): void
     {
@@ -273,7 +379,12 @@ final class PharUpdaterTest extends TestCase
             $this->updater($http, $target)->update($this->release('0.2.0'), false);
             self::fail('a failed replace must not be swallowed');
         } catch (ConfigException $e) {
-            self::assertStringContainsString($target, $e->getMessage());
+            // rename() everywhere but on Windows, where the replace is a copy() instead.
+            $verb = Platform::isWindows() ? 'could not copy ' : 'could not move ';
+            self::assertMatchesRegularExpression(
+                '~^'.preg_quote($verb.$target, '~').'\.\d+-\w+\.tmp\.phar onto '.preg_quote($target, '~').'$~',
+                $e->getMessage()
+            );
         } finally {
             @unlink($target.'/occupied');
             @rmdir($target);
@@ -327,6 +438,37 @@ final class PharUpdaterTest extends TestCase
         $this->updater($http, $phar)->update($this->release('0.2.0'), false);
 
         self::assertSame(['lockrot.phar', basename($inFlight), 'notes.txt'], self::filesIn($dir));
+    }
+
+    /**
+     * The cutoff itself is not stale. A self-update that started exactly
+     * {@see PharUpdater::STALE_TEMPORARY_SECONDS} ago may still be downloading into its temporary
+     * archive, and deleting that would turn a working update into a failure — so the sweep takes
+     * what is older than the cutoff, not what has reached it.
+     *
+     * `filemtime()` resolves to whole seconds, so this only says anything while the sweep's own
+     * `time()` falls in the second the mtime was computed from. The run starts at the top of a
+     * second for room, and is repeated if a tick got in anyway.
+     */
+    public function testAnArchiveExactlyAsOldAsTheCutoffIsNotSweptYet(): void
+    {
+        for ($attempt = 0; $attempt < 5; ++$attempt) {
+            $dir = $this->tempDir();
+            $phar = $this->installedPhar($dir);
+            $atCutoff = $dir.'/lockrot.phar.406-one-hour-old.tmp.phar';
+            file_put_contents($atCutoff, 'x');
+            $now = self::atTheStartOfASecond();
+            touch($atCutoff, $now - PharUpdater::STALE_TEMPORARY_SECONDS);
+
+            $this->updater($this->http(self::checksumFileFor(self::NEW_PHAR)), $phar)->update($this->release('0.2.0'), false);
+
+            if (time() === $now) {
+                self::assertFileExists($atCutoff, 'an archive exactly as old as the cutoff is not stale yet');
+
+                return;
+            }
+        }
+        self::markTestSkipped('the clock turned over during every attempt');
     }
 
     /**

@@ -57,6 +57,15 @@ final class BaselineTest extends TestCase
         self::assertIsArray($findings);
         self::assertSame(['acme/first', 'mid/middle', 'zzz/last'], $baseline->packages());
         self::assertSame(['acme/first', 'mid/middle', 'zzz/last'], array_keys($findings));
+
+        // Report order already happens to be alphabetical above; of() takes entries in any order,
+        // so the sort is what makes a regenerated baseline's diff reviewable.
+        $unordered = Baseline::of([
+            new BaselineEntry('zzz/last', '1.0.0', Verdict::STALE, '2026-01-01'),
+            new BaselineEntry('acme/first', '1.0.0', Verdict::ABANDONED, '2026-01-01'),
+            new BaselineEntry('mid/middle', '1.0.0', Verdict::SILENT, '2026-01-01'),
+        ], self::AT);
+        self::assertSame(['acme/first', 'mid/middle', 'zzz/last'], $unordered->packages());
     }
 
     public function testFirstSeenIsTheReportDateWhenThereIsNoPreviousEntry(): void
@@ -142,9 +151,34 @@ final class BaselineTest extends TestCase
         /** @var array<string, mixed> $data */
         $data = json_decode((string) file_get_contents(self::FIXTURES.'/'.$fixture), true);
 
+        $thrown = null;
+        try {
+            Baseline::fromArray($data);
+        } catch (ConfigException $e) {
+            $thrown = $e;
+        }
+
+        self::assertInstanceOf(ConfigException::class, $thrown);
+        self::assertStringStartsWith(
+            "baseline file is invalid:\n  - ",
+            $thrown->getMessage(),
+            'the reader says what file it is talking about before listing the validator findings'
+        );
+        self::assertStringContainsString($expectedMessage, $thrown->getMessage());
+    }
+
+    /**
+     * json_decode(..., true) turns an object key that looks like an integer into an int key, which
+     * the schema cannot see. A package name is never numeric, so such a document is not a baseline.
+     */
+    public function testANumericPackageKeyIsRejected(): void
+    {
         $this->expectException(ConfigException::class);
-        $this->expectExceptionMessageMatches('/'.preg_quote($expectedMessage, '/').'/');
-        Baseline::fromArray($data);
+        $this->expectExceptionMessage('findings must map package names to objects');
+        Baseline::fromArray([
+            'lockrot' => ['version' => '0.1.0', 'schema' => Baseline::SCHEMA],
+            'findings' => [123 => ['version' => '1.0.0', 'verdict' => Verdict::STALE, 'first_seen' => '2026-01-15']],
+        ]);
     }
 
     /** @return iterable<string, array{string, string}> */

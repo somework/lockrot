@@ -120,6 +120,27 @@ final class DependencyGraphTest extends TestCase
         );
     }
 
+    /**
+     * composer.json requires it and composer.lock does not carry it — a lock that is out of date
+     * against the manifest. It is a root of the graph with no edges of its own, so no chain leads
+     * to it and it is not a chain of length one either.
+     */
+    public function testAPackageRequiredButAbsentFromTheLockHasNoChain(): void
+    {
+        $lock = LockFile::fromArray(['packages' => [
+            ['name' => 'vendor/present', 'version' => '1.0.0'],
+        ]]);
+        $graph = DependencyGraph::fromLock(
+            $lock,
+            ProjectConfig::fromArray(['require' => ['vendor/present' => '^1', 'vendor/ghost' => '^1']]),
+            false
+        );
+
+        self::assertSame([], $graph->shortestChain('vendor/ghost'));
+        self::assertSame([], $graph->chainsTo('vendor/ghost'));
+        self::assertSame(['vendor/present'], $graph->shortestChain('vendor/present'), 'the root that is in the lock still works');
+    }
+
     public function testChainsToTerminatesOnCyclesAndIgnoresASelfRequire(): void
     {
         $lock = LockFile::fromArray(['packages' => [

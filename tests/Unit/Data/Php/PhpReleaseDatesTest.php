@@ -38,12 +38,37 @@ final class PhpReleaseDatesTest extends TestCase
     {
         $path = sys_get_temp_dir().'/lockrot-php-ga-dates-'.uniqid().'.json';
         file_put_contents($path, '{"8.0": "not a date"}');
+
+        $thrown = null;
         try {
-            $this->expectException(ConfigException::class);
-            $this->expectExceptionMessageMatches('{"8\.0"}');
             PhpReleaseDates::load($path);
+        } catch (ConfigException $e) {
+            $thrown = $e;
         } finally {
             unlink($path);
+        }
+
+        self::assertInstanceOf(ConfigException::class, $thrown);
+        self::assertSame('Invalid PHP GA date for "8.0" in '.$path, $thrown->getMessage(), 'the minor and the file are both named');
+        self::assertInstanceOf(\Exception::class, $thrown->getPrevious(), 'the parse failure is kept as the cause');
+        self::assertSame(0, $thrown->getCode(), 'lockrot carries no exception codes; a run exits on its verdict, not on these');
+    }
+
+    /**
+     * A GA date is a calendar day read as midnight UTC. Reading it in the machine's own timezone
+     * instead would move every PHP-version age by up to a day depending on where the run happens.
+     */
+    public function testGaDatesAreReadAsUtcWhateverTheMachineTimezone(): void
+    {
+        $previous = date_default_timezone_get();
+        date_default_timezone_set('Asia/Tokyo');
+
+        try {
+            $ga80 = PhpReleaseDates::load()->gaDate('8.0');
+            self::assertNotNull($ga80);
+            self::assertSame('2020-11-26T00:00:00+00:00', $ga80->format(\DATE_ATOM));
+        } finally {
+            date_default_timezone_set($previous);
         }
     }
 }

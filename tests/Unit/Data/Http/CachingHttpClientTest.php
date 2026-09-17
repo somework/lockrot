@@ -72,6 +72,28 @@ final class CachingHttpClientTest extends TestCase
         self::assertSame('new', $cached->body());
     }
 
+    /** The TTL is the age at which an entry stops being fresh, so an entry exactly that old is refetched. */
+    public function testAnEntryExactlyTheTtlOldIsAlreadyStale(): void
+    {
+        $calls = 0;
+        $clock = Clock::fixed('2026-09-14T00:00:00+00:00');
+        $cache = new ArrayCache();
+        $cache->set('https://a', new HttpResult('https://a', 200, 'old', $clock->now()->modify('-'.self::TTL.' seconds')));
+        $fresh = new HttpResult('https://a', 200, 'new', $clock->now());
+        $client = new CachingHttpClient($this->inner(['https://a' => $fresh], $calls), $cache, self::TTL, $clock);
+
+        self::assertSame('new', $client->fetchAll(['https://a'])['https://a']->body());
+        self::assertSame(1, $calls);
+
+        // One second younger and it is still fresh.
+        $calls = 0;
+        $cache->set('https://a', new HttpResult('https://a', 200, 'old', $clock->now()->modify('-'.(self::TTL - 1).' seconds')));
+        $client = new CachingHttpClient($this->inner(['https://a' => $fresh], $calls), $cache, self::TTL, $clock);
+
+        self::assertSame('old', $client->fetchAll(['https://a'])['https://a']->body());
+        self::assertSame(0, $calls);
+    }
+
     public function testNotFoundIsCachedButFailuresAreNot(): void
     {
         $calls = 0;
@@ -93,10 +115,13 @@ final class CachingHttpClientTest extends TestCase
         $cache = new ArrayCache();
         $cache->set('https://a', new HttpResult('https://a', 200, 'old', $clock->now()->modify('-30 days')));
         $client = new CachingHttpClient($this->inner([], $calls), $cache, self::TTL, $clock, true);
-        $results = $client->fetchAll(['https://a', 'https://b']);
+        // Two misses, so a miss must not stop the batch at the first one.
+        $results = $client->fetchAll(['https://a', 'https://b', 'https://c']);
         self::assertSame('old', $results['https://a']->body());
         self::assertTrue($results['https://b']->isFailure());
-        self::assertStringContainsString('offline', (string) $results['https://b']->error());
+        self::assertSame('offline and not cached: https://b', $results['https://b']->error(), 'the message names the URL that was not cached');
+        self::assertTrue($results['https://c']->isFailure());
+        self::assertSame('offline and not cached: https://c', $results['https://c']->error());
         self::assertSame(0, $calls);
     }
 

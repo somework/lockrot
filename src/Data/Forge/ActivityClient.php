@@ -26,12 +26,11 @@ final class ActivityClient
     /** @var array<string, ForgeApi> */
     private array $apis;
 
-    /** @param array<string, ForgeApi>|null $apis forge => api; the real three when null */
-    public function __construct(HttpClientInterface $http, ForgeAuth $auth, ?array $apis = null)
+    public function __construct(HttpClientInterface $http, ForgeAuth $auth)
     {
         $this->http = $http;
         $this->auth = $auth;
-        $this->apis = $apis ?? [RepoRef::GITHUB => new GitHubApi(), RepoRef::GITLAB => new GitLabApi(), RepoRef::BITBUCKET => new BitbucketApi()];
+        $this->apis = [RepoRef::GITHUB => new GitHubApi(), RepoRef::GITLAB => new GitLabApi(), RepoRef::BITBUCKET => new BitbucketApi()];
     }
 
     public function auth(): ForgeAuth

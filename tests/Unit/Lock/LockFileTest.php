@@ -167,9 +167,25 @@ final class LockFileTest extends TestCase
 
     public function testInvalidLockEntryThrowsConfigExceptionWithIndex(): void
     {
+        $thrown = null;
+        try {
+            LockFile::fromArray(['packages' => [['name' => 'a/b']]]);
+        } catch (ConfigException $e) {
+            $thrown = $e;
+        }
+
+        self::assertInstanceOf(ConfigException::class, $thrown);
+        self::assertSame('composer.lock entry #0 in packages cannot be loaded: Package a/b has no version defined.', $thrown->getMessage());
+        self::assertInstanceOf(\UnexpectedValueException::class, $thrown->getPrevious(), 'the loader failure is kept as the cause');
+        self::assertSame(0, $thrown->getCode(), 'lockrot carries no exception codes; a run exits on its verdict, not on these');
+    }
+
+    /** The reported index is the entry's position, not whatever key the JSON object carried. */
+    public function testTheReportedEntryIndexIsPositional(): void
+    {
         $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage('composer.lock entry #0 in packages cannot be loaded: Package a/b has no version defined.');
-        LockFile::fromArray(['packages' => [['name' => 'a/b']]]);
+        $this->expectExceptionMessage('composer.lock entry #1 in packages cannot be loaded: entry must be a JSON object');
+        LockFile::fromArray(['packages' => [7 => ['name' => 'a/b', 'version' => '1.0.0'], 9 => 'not-an-object']]);
     }
 
     public function testNonArrayLockEntryThrowsConfigExceptionWithIndex(): void

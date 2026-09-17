@@ -72,13 +72,14 @@ final class BaselineComparison
         }
 
         $present = array_fill_keys($presentPackages, true);
+        // Already sorted: Baseline keys its entries by package name and sorts them there, so
+        // packages() hands them over in name order and filtering keeps that order.
         $stale = [];
         foreach ($baseline->packages() as $package) {
             if (!isset($present[$package])) {
                 $stale[] = $package;
             }
         }
-        sort($stale, \SORT_STRING);
 
         return new self($displayPath, $statuses, $previousVerdicts, $stale);
     }

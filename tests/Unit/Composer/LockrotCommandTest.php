@@ -30,6 +30,8 @@ use Lockrot\Json\JsonReader;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\JsonPath;
+use Lockrot\Tests\Support\RecordingOutput;
+use Lockrot\Tests\Support\SplitStreamOutput;
 use Lockrot\Verdict\VerdictEngine;
 use Lockrot\Version;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -120,30 +122,46 @@ final class LockrotCommandTest extends TestCase
     {
         $loader ??= $this->emptyLoader();
         $factory = static function (IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, Tokens $tokens, Clock $clock) use ($loader): Analyzer {
-            $auth = ForgeAuth::withTokens(new Tokens('recorded', null));
-
-            return new Analyzer(
-                $loader,
-                new ActivityClient(new RecordedHttpClient(__DIR__.'/../../fixtures/http/github'), $auth),
-                new ActivityFetchPlanner($auth),
-                new RepoLocator(),
-                BuiltinAllowlist::load(),
-                SignalSet::default($clock, $lockrot->thresholds(), $lockrot->targetPhp(), PhpReleaseDates::load()),
-                new VerdictEngine(),
-                $clock,
-                $lockrot->offline()
-            );
+            return self::testAnalyzer($loader, $lockrot, $clock);
         };
 
         return $this->buildCommand($factory);
     }
 
+    /** The analyzer every test factory in this class builds: fixture metadata and recorded GitHub envelopes, never the network. */
+    private static function testAnalyzer(MetadataLoaderInterface $loader, LockrotConfig $lockrot, Clock $clock): Analyzer
+    {
+        $auth = ForgeAuth::withTokens(new Tokens('recorded', null));
+
+        return new Analyzer(
+            $loader,
+            new ActivityClient(new RecordedHttpClient(__DIR__.'/../../fixtures/http/github'), $auth),
+            new ActivityFetchPlanner($auth),
+            new RepoLocator(),
+            BuiltinAllowlist::load(),
+            SignalSet::default($clock, $lockrot->thresholds(), $lockrot->targetPhp(), PhpReleaseDates::load()),
+            new VerdictEngine(),
+            $clock,
+            $lockrot->offline()
+        );
+    }
+
     /** @param callable(IOInterface, Config, list<\Composer\Repository\RepositoryInterface>, LockrotConfig, Tokens, Clock): Analyzer $factory */
     private function buildCommand(callable $factory): LockrotCommand
     {
+        return $this->register(new LockrotCommand($factory));
+    }
+
+    /** The command the plugin registers: no analyzer factory, so its own default wiring is used. */
+    private function buildDefaultCommand(): LockrotCommand
+    {
+        return $this->register(new LockrotCommand());
+    }
+
+    private function register(LockrotCommand $command): LockrotCommand
+    {
         $app = new Application();
         $app->setAutoExit(false);
-        $command = new LockrotCommand($factory);
         $app->add($command);
         $command->setApplication($app);
 
@@ -230,6 +248,59 @@ final class LockrotCommandTest extends TestCase
         $code = $command->run($input, $output);
 
         return [$code, $output->fetch(), $errorOutput->fetch()];
+    }
+
+    /**
+     * Runs the command with a factory that records the process environment and the resolved
+     * configuration as the analysis saw them.
+     *
+     * None of this is visible from outside the run: --offline's network guard is in place only while
+     * the command is running, and the COMPOSER_ROOT_VERSION default only while Composer might still
+     * guess one. Both are put back before execute() returns.
+     *
+     * @param array<string, mixed> $args
+     *
+     * @return array{rootVersion: string|false, disableNetwork: string|false, offline: bool}
+     */
+    private function observeDuringRun(array $args, ?MetadataLoaderInterface $loader = null): array
+    {
+        $loader ??= $this->emptyLoader();
+        $observed = null;
+        $factory = static function (IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, Tokens $tokens, Clock $clock) use ($loader, &$observed): Analyzer {
+            $observed = [
+                'rootVersion' => Platform::getEnv('COMPOSER_ROOT_VERSION'),
+                'disableNetwork' => Platform::getEnv('COMPOSER_DISABLE_NETWORK'),
+                'offline' => $lockrot->offline(),
+            ];
+
+            return self::testAnalyzer($loader, $lockrot, $clock);
+        };
+        $tester = new CommandTester($this->buildCommand($factory));
+        $tester->execute($args);
+
+        return $observed ?? self::fail('the analyzer factory was never called: '.$tester->getDisplay());
+    }
+
+    /**
+     * Runs the command and returns what it wrote to stderr *before* Composer's output formatter saw
+     * it, so a test can assert on the console tags the formatter would otherwise strip.
+     *
+     * @param array<string, mixed>                                                                                        $args
+     * @param null|callable(IOInterface, Config, list<\Composer\Repository\RepositoryInterface>, LockrotConfig, Tokens, Clock): Analyzer $factory the default test factory when null
+     *
+     * @return array{0: int, 1: string, 2: list<string>} exit code, stdout, the unformatted stderr messages
+     */
+    private function runRecordingErrorMessages(array $args, ?callable $factory = null): array
+    {
+        $command = $factory === null ? $this->command($this->loader()) : $this->buildCommand($factory);
+        $input = new ArrayInput($args, $command->getDefinition());
+        $errors = new RecordingOutput();
+        $output = new SplitStreamOutput();
+        $output->setErrorOutput($errors);
+
+        $code = $command->run($input, $output);
+
+        return [$code, $output->fetch(), $errors->raw];
     }
 
     public function testTableOutputAndExitCodeOnWallabag(): void
@@ -446,15 +517,72 @@ final class LockrotCommandTest extends TestCase
         self::assertSame(0, $tester->execute(['--fail-on' => 'silent', '--target-php' => '8.4']));
     }
 
+    /**
+     * `composer lockrot` never walks up to a parent project the way `composer` does, so the message
+     * has to name the directory it did look in and say that it looked nowhere else — otherwise the
+     * only reading left is "this project has no lock".
+     */
     public function testMissingLockIsExit2(): void
     {
-        $dir = sys_get_temp_dir().'/lockrot-nolock-'.uniqid();
-        mkdir($dir);
+        $dir = $this->tempDir('lockrot-nolock-');
         chdir($dir);
+        // The real path, because sys_get_temp_dir() is a symlink on macOS and getcwd() resolves it.
+        $cwd = (string) getcwd();
         $tester = $this->tester();
         self::assertSame(2, $tester->execute([]));
-        self::assertStringContainsString('composer.lock not found', $tester->getDisplay());
-        rmdir($dir);
+        $display = $tester->getDisplay();
+        self::assertStringStartsWith('lockrot: composer.lock not found in ', $display);
+        self::assertStringContainsString('not found in '.$cwd.';', $display);
+        self::assertStringContainsString('lockrot does not look in parent directories', $display);
+    }
+
+    /** `composer rot` is the documented short form, so the alias is part of the command's contract. */
+    public function testTheCommandIsAlsoReachableAsRot(): void
+    {
+        self::assertSame(['rot'], $this->command()->getAliases());
+    }
+
+    /**
+     * The command the plugin registers, with no analyzer factory of its own, has to build a working
+     * one through {@see ServiceFactory::createAnalyzer()}.
+     *
+     * Kept off the network the same way {@see InstallTimeSummaryTest} keeps its equivalent test off
+     * it: the project points at the class-level fixture repository, and the locked package carries no
+     * `source`, so no repository activity round is planned.
+     */
+    public function testTheDefaultAnalyzerFactoryBuildsAWorkingAnalyzer(): void
+    {
+        $server = self::$server;
+        self::assertNotNull($server);
+
+        $project = $this->tempDir('lockrot-default-factory-project-');
+        file_put_contents($project.'/composer.json', (string) json_encode([
+            'name' => 'lockrot/default-factory-test',
+            'require' => ['phpzip/phpzip' => '2.0.8'],
+            'config' => ['secure-http' => false],
+            'repositories' => ['packagist.org' => false, 'fixture' => ['type' => 'composer', 'url' => $server->url()]],
+        ]));
+        file_put_contents($project.'/composer.lock', (string) json_encode([
+            'packages' => [[
+                'name' => 'phpzip/phpzip',
+                'version' => '2.0.8',
+                'require' => ['php' => '>=5.3.0'],
+                'notification-url' => 'https://packagist.org/downloads/',
+            ]],
+        ]));
+
+        chdir($project);
+        $this->withComposerEnv($this->tempDir('lockrot-default-factory-cache-'), $this->tempDir('lockrot-default-factory-home-'), function (): void {
+            $tester = new CommandTester($this->buildDefaultCommand());
+            $code = $tester->execute(['--format' => 'json', '--target-php' => '8.4']);
+
+            self::assertSame(0, $code, $tester->getDisplay());
+            $json = json_decode($tester->getDisplay(), true);
+            self::assertIsArray($json);
+            self::assertSame(1, $json['packages_checked'], 'the default factory has to produce an analyzer that actually analysed the lock');
+            self::assertIsArray($json['findings']);
+            self::assertSame('phpzip/phpzip', JsonPath::stringAt($json, ['findings', 0, 'package']));
+        });
     }
 
     public function testMalformedComposerJsonIsExit2(): void
@@ -803,18 +931,63 @@ final class LockrotCommandTest extends TestCase
         }
     }
 
-    public function testAPreExistingComposerRootVersionSurvivesExecute(): void
+    /**
+     * @return iterable<string, array{0: string|false, 1: string}> the value COMPOSER_ROOT_VERSION carries before the run, and the one the analysis must see
+     */
+    public static function rootVersionPreStates(): iterable
+    {
+        // Nothing set and an empty value are the two states in which RootPackageLoader would fall
+        // back to VersionGuesser — shelling out to git/hg/fossil/svn and then warning about the
+        // 1.0.0 default it lands on anyway. Setting that default up front skips both.
+        yield 'unset' => [false, '1.0.0'];
+        yield 'empty' => ['', '1.0.0'];
+        // Anything the caller chose is theirs: lockrot never reads the root package's own version,
+        // so it has no reason to overwrite one.
+        yield 'already set' => ['9.9.9', '9.9.9'];
+    }
+
+    /**
+     * @param string|false $before
+     *
+     * @dataProvider rootVersionPreStates
+     */
+    #[DataProvider('rootVersionPreStates')]
+    public function testTheRootVersionDefaultIsSetForTheRunAndThenPutBack($before, string $duringRun): void
     {
         chdir(__DIR__.'/../../fixtures/skeletons/laravel');
         $previous = Platform::getEnv('COMPOSER_ROOT_VERSION');
-        Platform::putEnv('COMPOSER_ROOT_VERSION', '9.9.9');
+        $this->restoreGlobalEnv('COMPOSER_ROOT_VERSION', $before);
         try {
-            $tester = $this->tester($this->loader());
-            $tester->execute(['--fail-on' => 'silent', '--target-php' => '8.4']);
+            $observed = $this->observeDuringRun(['--target-php' => '8.4'], $this->loader());
 
-            self::assertSame('9.9.9', Platform::getEnv('COMPOSER_ROOT_VERSION'), 'a value the caller already set must be restored, not cleared');
+            self::assertSame($duringRun, $observed['rootVersion']);
+            self::assertSame($before, Platform::getEnv('COMPOSER_ROOT_VERSION'), 'the environment is left exactly as initialize() found it');
         } finally {
             $this->restoreGlobalEnv('COMPOSER_ROOT_VERSION', $previous);
+        }
+    }
+
+    /**
+     * --offline's guard is COMPOSER_DISABLE_NETWORK, set for the duration of the run and then put
+     * back — including when the caller had already set it to something of their own, which clearing
+     * it would silently discard.
+     */
+    public function testOfflineSetsTheNetworkGuardForTheRunAndPutsBackWhatWasThere(): void
+    {
+        chdir(__DIR__.'/../../fixtures/skeletons/laravel');
+        $previousNetwork = Platform::getEnv('COMPOSER_DISABLE_NETWORK');
+        $previousRootVersion = Platform::getEnv('COMPOSER_ROOT_VERSION');
+        Platform::putEnv('COMPOSER_DISABLE_NETWORK', '0');
+        Platform::clearEnv('COMPOSER_ROOT_VERSION');
+        try {
+            $observed = $this->observeDuringRun(['--offline' => true, '--target-php' => '8.4'], $this->loader());
+
+            self::assertSame('1', $observed['disableNetwork']);
+            self::assertTrue($observed['offline'], '--offline has to reach the analyzer, not only the environment');
+            self::assertSame('0', Platform::getEnv('COMPOSER_DISABLE_NETWORK'), 'a value the caller already set is put back, not cleared');
+        } finally {
+            $this->restoreGlobalEnv('COMPOSER_DISABLE_NETWORK', $previousNetwork);
+            $this->restoreGlobalEnv('COMPOSER_ROOT_VERSION', $previousRootVersion);
         }
     }
 
@@ -1008,7 +1181,8 @@ final class LockrotCommandTest extends TestCase
 
         self::assertSame(2, $code);
         self::assertSame('', $stdout);
-        self::assertStringContainsString('ci/missing.json', $stderr);
+        // The path the caller asked for, and what is wrong with it, in that order.
+        self::assertStringContainsString('ci/missing.json not found', $stderr);
     }
 
     public function testAnEmptyBaselineOptionIsExit2(): void
@@ -1053,34 +1227,92 @@ final class LockrotCommandTest extends TestCase
         self::assertStringContainsString('baseline written to ci/rot.json', $stderr);
     }
 
+    /** Without --offline nothing is guarded and nothing is offline: a normal run may use the network. */
     public function testWithoutOfflineOptionComposerDisableNetworkEnvStaysUnset(): void
     {
         chdir(__DIR__.'/../../fixtures/skeletons/laravel');
-        putenv('COMPOSER_DISABLE_NETWORK');
-        $observed = 'factory not called';
-        $loader = $this->emptyLoader();
-        $factory = function (IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, Tokens $tokens, Clock $clock) use ($loader, &$observed): Analyzer {
-            $observed = getenv('COMPOSER_DISABLE_NETWORK');
-            $auth = ForgeAuth::withTokens(new Tokens('recorded', null));
-
-            return new Analyzer(
-                $loader,
-                new ActivityClient(new RecordedHttpClient(__DIR__.'/../../fixtures/http/github'), $auth),
-                new ActivityFetchPlanner($auth),
-                new RepoLocator(),
-                BuiltinAllowlist::load(),
-                SignalSet::default($clock, $lockrot->thresholds(), $lockrot->targetPhp(), PhpReleaseDates::load()),
-                new VerdictEngine(),
-                $clock,
-                $lockrot->offline()
-            );
-        };
+        $previous = Platform::getEnv('COMPOSER_DISABLE_NETWORK');
+        Platform::clearEnv('COMPOSER_DISABLE_NETWORK');
         try {
-            $tester = new CommandTester($this->buildCommand($factory));
-            $tester->execute(['--fail-on' => 'silent', '--target-php' => '8.4']);
-            self::assertFalse($observed);
+            $observed = $this->observeDuringRun(['--fail-on' => 'silent', '--target-php' => '8.4'], $this->loader());
+
+            self::assertFalse($observed['disableNetwork']);
+            self::assertFalse($observed['offline']);
         } finally {
-            putenv('COMPOSER_DISABLE_NETWORK');
+            $this->restoreGlobalEnv('COMPOSER_DISABLE_NETWORK', $previous);
         }
+    }
+
+    /**
+     * A configuration error is `lockrot: <what is wrong>`. Both failures exit 2, so the prefix is
+     * the only thing telling a user whether to fix their own config or report a bug — and the
+     * `<error>` tags have to wrap the whole line, or Composer colours only part of it.
+     */
+    public function testAConfigErrorIsOneLockrotErrorLineOnStderr(): void
+    {
+        chdir(__DIR__.'/../../fixtures/skeletons/laravel');
+
+        [$code, $stdout, $errors] = $this->runRecordingErrorMessages(['--fail-on' => 'dead']);
+
+        self::assertSame(2, $code);
+        self::assertSame('', $stdout);
+        self::assertCount(1, $errors);
+        self::assertStringStartsWith('<error>lockrot: ', $errors[0]);
+        self::assertStringContainsString('fail-on must be one of', $errors[0]);
+        self::assertStringEndsWith('</error>', $errors[0]);
+    }
+
+    /**
+     * Anything the command did not anticipate is still exit 2 and a line a user can read. Symfony's
+     * Command::run() has no try/catch of its own, so an exception left to reach it would surface as
+     * a Composer crash instead.
+     */
+    public function testAnUnexpectedFailureIsExit2AndSaysWhichKindOfFailureItWas(): void
+    {
+        chdir(__DIR__.'/../../fixtures/skeletons/laravel');
+        $factory = static function (): Analyzer {
+            throw new \RuntimeException('the analyzer blew up');
+        };
+
+        [$code, $stdout, $errors] = $this->runRecordingErrorMessages(['--target-php' => '8.4'], $factory);
+
+        self::assertSame(2, $code);
+        self::assertSame('', $stdout);
+        self::assertCount(1, $errors);
+        self::assertStringStartsWith('<error>lockrot failed: ', $errors[0]);
+        self::assertStringContainsString('the analyzer blew up', $errors[0]);
+        self::assertStringEndsWith('</error>', $errors[0]);
+    }
+
+    /**
+     * Without `--all` the table lists what was flagged; with it, every package the run checked gets
+     * a row. The laravel skeleton has one finding among 76 packages, so the two are far apart.
+     */
+    public function testAllListsEveryCheckedPackageAndTheDefaultOnlyTheFlaggedOnes(): void
+    {
+        chdir(__DIR__.'/../../fixtures/skeletons/laravel');
+
+        $flaggedOnly = $this->tester($this->loader());
+        $flaggedOnly->execute(['--target-php' => '8.4']);
+        $everything = $this->tester($this->loader());
+        $everything->execute(['--all' => true, '--target-php' => '8.4']);
+
+        self::assertStringNotContainsString('brick/math', $flaggedOnly->getDisplay(), 'brick/math has nothing to flag');
+        self::assertStringContainsString('brick/math', $everything->getDisplay());
+    }
+
+    /**
+     * The report goes out exactly as the formatter produced it. Every format already ends in its own
+     * newline, so a second one would leave a blank line under the table and a stray line in a JSON
+     * document on its way into a parser.
+     */
+    public function testTheReportIsWrittenWithoutAnAddedNewline(): void
+    {
+        chdir(__DIR__.'/../../fixtures/skeletons/laravel');
+
+        [, $stdout] = $this->runWithSplitStreams(['--format' => 'json', '--target-php' => '8.4'], $this->loader());
+
+        self::assertStringEndsWith("}\n", $stdout);
+        self::assertStringEndsNotWith("\n\n", $stdout);
     }
 }

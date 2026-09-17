@@ -74,6 +74,32 @@ final class ReleaseLocatorTest extends TestCase
         self::assertSame('0.3.1', $release->tag());
     }
 
+    /**
+     * Only a `v` at the very front is a version prefix. A tag that merely happens to contain one is
+     * left alone and fails the version check, rather than being quietly rewritten into whatever
+     * part of it the parser would accept.
+     */
+    public function testATagThatOnlyContainsAVersionIsNotRewrittenIntoOne(): void
+    {
+        $body = str_replace('"tag_name": "v0.2.0"', '"tag_name": "lockrot-v0.2.0"', self::fixture('latest.json'));
+        $http = new FakeHttpClient([self::URL => FakeHttpClient::ok(self::URL, $body)]);
+
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('release tag "lockrot-v0.2.0" is not a version lockrot can compare');
+        $this->locator($http)->locate();
+    }
+
+    /** The same on the other side: a tag is a version or it is not, never its first line. */
+    public function testATagIsNotTruncatedToItsFirstLine(): void
+    {
+        $body = str_replace('"tag_name": "v0.2.0"', '"tag_name": "v0.2.0\nand whatever follows"', self::fixture('latest.json'));
+        $http = new FakeHttpClient([self::URL => FakeHttpClient::ok(self::URL, $body)]);
+
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('is not a version lockrot can compare');
+        $this->locator($http)->locate();
+    }
+
     public function testAMissingReleaseIsReportedAsNoPublishedRelease(): void
     {
         $http = new FakeHttpClient([self::URL => FakeHttpClient::status(self::URL, 404, self::fixture('not-found.json'))]);
@@ -102,12 +128,27 @@ final class ReleaseLocatorTest extends TestCase
         $this->locator($http)->locate();
     }
 
+    /** An asset listed under the right name but with nothing to download from is no asset at all. */
+    public function testAnAssetWithoutADownloadUrlCountsAsMissing(): void
+    {
+        $body = str_replace(
+            '"browser_download_url": "https://github.com/somework/lockrot/releases/download/v0.2.0/lockrot.phar"',
+            '"browser_download_url": ""',
+            self::fixture('latest.json')
+        );
+        $http = new FakeHttpClient([self::URL => FakeHttpClient::ok(self::URL, $body)]);
+
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('release v0.2.0 has no lockrot.phar asset');
+        $this->locator($http)->locate();
+    }
+
     public function testANonJsonBodyIsAnError(): void
     {
         $http = new FakeHttpClient([self::URL => FakeHttpClient::ok(self::URL, '<html>502 Bad Gateway</html>')]);
 
         $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage('is not JSON');
+        $this->expectExceptionMessage('the response from '.self::URL.' is not JSON');
         $this->locator($http)->locate();
     }
 
@@ -117,7 +158,7 @@ final class ReleaseLocatorTest extends TestCase
         $http = new FakeHttpClient([self::URL => FakeHttpClient::ok(self::URL, $body)]);
 
         $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage('has no tag_name');
+        $this->expectExceptionMessage(self::URL.' has no tag_name');
         $this->locator($http)->locate();
     }
 
@@ -136,7 +177,7 @@ final class ReleaseLocatorTest extends TestCase
         $http = new FakeHttpClient([self::URL => FakeHttpClient::transportFailure(self::URL, 'Could not resolve host: api.github.com')]);
 
         $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage('Could not resolve host: api.github.com');
+        $this->expectExceptionMessage('could not read '.self::URL.': Could not resolve host: api.github.com');
         $this->locator($http)->locate();
     }
 
@@ -145,7 +186,7 @@ final class ReleaseLocatorTest extends TestCase
         $http = new FakeHttpClient([self::URL => FakeHttpClient::status(self::URL, 403, '{"message":"API rate limit exceeded"}')]);
 
         $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage('HTTP 403');
+        $this->expectExceptionMessage('could not read '.self::URL.': HTTP 403');
         $this->locator($http)->locate();
     }
 

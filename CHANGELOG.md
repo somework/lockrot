@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- The mutation-testing gate now covers the whole source tree — self-update, the Composer
+  integration, configuration, the baseline, the allowlist, the graph and the data layer — instead
+  of the verdict engine, the signals, the analyzer and the output formats alone. No behaviour
+  changes: the escapes it surfaced were closed with sharper tests, and a handful of statements
+  that no test could ever observe were removed as redundant.
+
 ## [0.5.0] - 2026-09-17
 
 ### Added
