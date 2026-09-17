@@ -77,7 +77,7 @@ final class ActivityFetchPlannerTest extends TestCase
             []
         );
         self::assertSame(['github.com/o/mono', 'github.com/o/other'], self::keys($plan->repos()));
-        self::assertSame(3, $plan->checkedPackages(RepoRef::GITHUB), 'both packages receive the shared repository\'s activity data');
+        self::assertSame(3, $plan->checkedPackages(RepoRef::GITHUB), 'three packages checked over two repositories: the shared one counts once per package');
     }
 
     /** A budget of zero asks about nothing, and every candidate it turns away is counted. */

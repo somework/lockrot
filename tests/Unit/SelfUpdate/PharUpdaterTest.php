@@ -6,6 +6,7 @@ namespace Lockrot\Tests\Unit\SelfUpdate;
 
 use Composer\Semver\Comparator;
 use Composer\Util\Platform;
+use Lockrot\Clock;
 use Lockrot\Exception\ConfigException;
 use Lockrot\SelfUpdate\PharUpdater;
 use Lockrot\SelfUpdate\PharValidatorInterface;
@@ -97,9 +98,9 @@ final class PharUpdaterTest extends TestCase
         };
     }
 
-    private function updater(FakeHttpClient $http, string $phar, ?string $validationError = null, string $installedVersion = '0.1.0'): PharUpdater
+    private function updater(FakeHttpClient $http, string $phar, ?string $validationError = null, string $installedVersion = '0.1.0', ?Clock $clock = null): PharUpdater
     {
-        return new PharUpdater($http, $this->validator($validationError), $phar, $installedVersion);
+        return new PharUpdater($http, $this->validator($validationError), $phar, $installedVersion, $clock);
     }
 
     /** @return list<string> every file in $dir, sorted */
@@ -134,23 +135,6 @@ final class PharUpdaterTest extends TestCase
             self::assertNotFalse($at, 'expected "'.$fragment.'" after offset '.$offset.' in: '.$message);
             $offset = $at + \strlen($fragment);
         }
-    }
-
-    /**
-     * The current second, entered after waiting for it to begin.
-     *
-     * `filemtime()` resolves to whole seconds, so a test that puts a file exactly on the sweep's
-     * cutoff has to know that the sweep's own `time()` lands in the same second the mtime was
-     * computed from. Starting at the top of a second leaves a full second of room for the run.
-     */
-    private static function atTheStartOfASecond(): int
-    {
-        $before = time();
-        while (($now = time()) === $before) {
-            usleep(1000);
-        }
-
-        return $now;
     }
 
     public function testANewerReleaseIsAnAvailableUpdate(): void
@@ -444,31 +428,25 @@ final class PharUpdaterTest extends TestCase
      * The cutoff itself is not stale. A self-update that started exactly
      * {@see PharUpdater::STALE_TEMPORARY_SECONDS} ago may still be downloading into its temporary
      * archive, and deleting that would turn a working update into a failure — so the sweep takes
-     * what is older than the cutoff, not what has reached it.
-     *
-     * `filemtime()` resolves to whole seconds, so this only says anything while the sweep's own
-     * `time()` falls in the second the mtime was computed from. The run starts at the top of a
-     * second for room, and is repeated if a tick got in anyway.
+     * what is older than the cutoff, not what has reached it. The updater's clock is pinned, so the
+     * boundary is exact rather than a race against the wall clock's whole seconds.
      */
     public function testAnArchiveExactlyAsOldAsTheCutoffIsNotSweptYet(): void
     {
-        for ($attempt = 0; $attempt < 5; ++$attempt) {
-            $dir = $this->tempDir();
-            $phar = $this->installedPhar($dir);
-            $atCutoff = $dir.'/lockrot.phar.406-one-hour-old.tmp.phar';
-            file_put_contents($atCutoff, 'x');
-            $now = self::atTheStartOfASecond();
-            touch($atCutoff, $now - PharUpdater::STALE_TEMPORARY_SECONDS);
+        $dir = $this->tempDir();
+        $phar = $this->installedPhar($dir);
+        $now = 1789600000;
+        $atCutoff = $dir.'/lockrot.phar.406-one-hour-old.tmp.phar';
+        $justPast = $dir.'/lockrot.phar.407-one-hour-and-a-second-old.tmp.phar';
+        file_put_contents($atCutoff, 'x');
+        file_put_contents($justPast, 'x');
+        touch($atCutoff, $now - PharUpdater::STALE_TEMPORARY_SECONDS);
+        touch($justPast, $now - PharUpdater::STALE_TEMPORARY_SECONDS - 1);
+        $clock = new Clock((new \DateTimeImmutable('@'.$now))->setTimezone(new \DateTimeZone('UTC')));
 
-            $this->updater($this->http(self::checksumFileFor(self::NEW_PHAR)), $phar)->update($this->release('0.2.0'), false);
+        $this->updater($this->http(self::checksumFileFor(self::NEW_PHAR)), $phar, null, '0.1.0', $clock)->update($this->release('0.2.0'), false);
 
-            if (time() === $now) {
-                self::assertFileExists($atCutoff, 'an archive exactly as old as the cutoff is not stale yet');
-
-                return;
-            }
-        }
-        self::markTestSkipped('the clock turned over during every attempt');
+        self::assertSame(['lockrot.phar', basename($atCutoff)], self::filesIn($dir), 'exactly at the cutoff stays, one second past it goes');
     }
 
     /**

@@ -6,6 +6,7 @@ namespace Lockrot\SelfUpdate;
 
 use Composer\Semver\Comparator;
 use Composer\Util\Platform;
+use Lockrot\Clock;
 use Lockrot\Data\Http\HttpClientInterface;
 use Lockrot\Data\Http\HttpResult;
 use Lockrot\Exception\ConfigException;
@@ -60,17 +61,21 @@ final class PharUpdater
     private PharValidatorInterface $validator;
     private string $runningPhar;
     private string $currentVersion;
+    private Clock $clock;
 
+    /** @param Clock|null $clock the instant the stale-temporary sweep measures age from; now by default */
     public function __construct(
         HttpClientInterface $http,
         PharValidatorInterface $validator,
         string $runningPhar,
-        string $currentVersion = Version::STRING
+        string $currentVersion = Version::STRING,
+        ?Clock $clock = null
     ) {
         $this->http = $http;
         $this->validator = $validator;
         $this->runningPhar = $runningPhar;
         $this->currentVersion = $currentVersion;
+        $this->clock = $clock ?? new Clock();
     }
 
     /**
@@ -211,7 +216,7 @@ final class PharUpdater
     private function sweepStaleTemporaries(): void
     {
         $pattern = \dirname($this->runningPhar).'/'.basename($this->runningPhar).'.*.tmp.phar';
-        $cutoff = time() - self::STALE_TEMPORARY_SECONDS;
+        $cutoff = $this->clock->now()->getTimestamp() - self::STALE_TEMPORARY_SECONDS;
         foreach (glob($pattern) ?: [] as $leftover) {
             $modified = @filemtime($leftover);
             if ($modified !== false && $modified < $cutoff) {

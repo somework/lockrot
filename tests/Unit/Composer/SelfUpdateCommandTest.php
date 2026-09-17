@@ -309,6 +309,12 @@ final class SelfUpdateCommandTest extends TestCase
      * The fragments are positional rather than exact, so the prose can be rewritten and the shape
      * still has to hold.
      */
+    /**
+     * Pinned: the four facts a user needs (the source, the checksum, the writable directory, the
+     * untouched archive on failure), in that order, followed by the two example lines. Rewording
+     * around those phrases passes; dropping one of them, or moving an example above the
+     * explanation, fails.
+     */
     public function testTheHelpExplainsTheUpdateBeforeGivingTheTwoExamples(): void
     {
         $help = $this->command($this->httpFor('v'.Version::STRING), $this->installedPhar())->getHelp();

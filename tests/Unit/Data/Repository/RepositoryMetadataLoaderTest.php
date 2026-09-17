@@ -181,8 +181,6 @@ final class RepositoryMetadataLoaderTest extends TestCase
         self::assertSame([], $batch->notFound());
         self::assertSame([], $batch->metadata());
         self::assertArrayHasKey('phpzip/phpzip', $batch->failed());
-
-        $unreachable->stop();
     }
 
     /** Every repository adds to what the earlier ones resolved; none of them replaces it. */
@@ -190,9 +188,9 @@ final class RepositoryMetadataLoaderTest extends TestCase
     {
         $first = $this->syntheticServer(['one/pkg' => [$this->p2Version('one/pkg', '1.0.0')]]);
         $second = $this->syntheticServer(['two/pkg' => [$this->p2Version('two/pkg', '2.0.0')]]);
-        $first->start();
-        $second->start();
         try {
+            $first->start();
+            $second->start();
             $loader = new RepositoryMetadataLoader(
                 array_merge($first->repositories(), $second->repositories()),
                 Clock::fixed(self::FIXED)
@@ -477,9 +475,9 @@ final class RepositoryMetadataLoaderTest extends TestCase
             $this->p2Version('dup/pkg', '1.0.0'),
             $this->p2Version('dup/pkg', '2.0.0'),
         ]]);
-        $first->start();
-        $second->start();
         try {
+            $first->start();
+            $second->start();
             $loader = new RepositoryMetadataLoader(
                 array_merge($first->repositories(), $second->repositories()),
                 Clock::fixed(self::FIXED)
