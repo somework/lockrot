@@ -25,7 +25,7 @@ host as the release itself:
     sha256sum -c lockrot.phar.sha256
 
 `php lockrot.phar self-update` performs the same check automatically, and from 0.6.0 on a second
-one: every release also publishes `lockrot.phar.sig`, an RSA signature (PKCS#1 v1.5 over SHA-384,
+one: every release also publishes `lockrot.phar.sig.json`, an RSA signature (PKCS#1 v1.5 over SHA-384,
 in Composer's `{"sha384": "<base64>"}` file format) by the lockrot self-update key, and the
 archive verifies it with `openssl_verify()` against the public key built into itself
 (`Lockrot\SelfUpdate\ReleaseKey`, published as `lockrot-selfupdate-key.pub` in this repository).

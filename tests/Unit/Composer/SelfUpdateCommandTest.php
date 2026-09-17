@@ -83,7 +83,7 @@ final class SelfUpdateCommandTest extends TestCase
     {
         $phar = self::downloadUrl($tag, 'lockrot.phar');
         $checksum = self::downloadUrl($tag, 'lockrot.phar.sha256');
-        $signature = self::downloadUrl($tag, 'lockrot.phar.sig');
+        $signature = self::downloadUrl($tag, 'lockrot.phar.sig.json');
 
         return $this->httpFor($tag, array_merge([
             $phar => FakeHttpClient::ok($phar, self::NEW_PHAR),

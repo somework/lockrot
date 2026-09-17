@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.1] - 2026-09-18
+
+### Fixed
+
+- `phive install somework/lockrot` works again. PHIVE takes any release asset ending in `.asc` or
+  `.sig` for the GPG signature of the PHAR, last one wins, and 0.6.0's self-update signature was
+  published as `lockrot.phar.sig` — so PHIVE tried to verify the archive with a JSON document and
+  failed. The asset is `lockrot.phar.sig.json` from this release on, and was renamed on the 0.6.0
+  release as well. The 0.6.0 archive looks for the old name, so it cannot `self-update` to this or
+  any later release: it reports `release v0.6.1 has no lockrot.phar.sig asset` and leaves itself in
+  place — download 0.6.1 by hand or `phive update`. Every other build, 0.5.0 included, updates as
+  before.
+
 ## [0.6.0] - 2026-09-18
 
 ### Added
@@ -322,7 +335,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The "GitHub token not set" note counts packages whose repository activity was checked, not
   distinct repositories, so packages sharing one repository are no longer under-reported.
 
-[Unreleased]: https://github.com/somework/lockrot/compare/v0.6.0...HEAD
+[Unreleased]: https://github.com/somework/lockrot/compare/v0.6.1...HEAD
+[0.6.1]: https://github.com/somework/lockrot/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/somework/lockrot/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/somework/lockrot/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/somework/lockrot/compare/v0.3.0...v0.4.0

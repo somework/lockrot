@@ -23,7 +23,7 @@ final class PharUpdaterTest extends TestCase
 {
     private const PHAR_URL = 'https://github.com/somework/lockrot/releases/download/v0.2.0/lockrot.phar';
     private const CHECKSUM_URL = 'https://github.com/somework/lockrot/releases/download/v0.2.0/lockrot.phar.sha256';
-    private const SIGNATURE_URL = 'https://github.com/somework/lockrot/releases/download/v0.2.0/lockrot.phar.sig';
+    private const SIGNATURE_URL = 'https://github.com/somework/lockrot/releases/download/v0.2.0/lockrot.phar.sig.json';
     private const NEW_PHAR = 'the bytes of a newer lockrot.phar';
     private const INSTALLED = 'the bytes of the running lockrot.phar';
 

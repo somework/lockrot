@@ -51,7 +51,7 @@ final class Release
         return $this->checksumUrl;
     }
 
-    /** The `lockrot.phar.sig` of the release, see {@see ReleaseSignatureVerifier}. */
+    /** The `lockrot.phar.sig.json` of the release, see {@see ReleaseSignatureVerifier}. */
     public function signatureUrl(): string
     {
         return $this->signatureUrl;

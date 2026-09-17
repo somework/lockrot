@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
 
 final class ReleaseSignatureVerifierTest extends TestCase
 {
-    private const URL = 'https://github.com/somework/lockrot/releases/download/v0.6.0/lockrot.phar.sig';
+    private const URL = 'https://github.com/somework/lockrot/releases/download/v0.6.0/lockrot.phar.sig.json';
     private const ARCHIVE = 'the bytes of a lockrot.phar';
 
     private function verifier(?string $pem = null): ReleaseSignatureVerifier

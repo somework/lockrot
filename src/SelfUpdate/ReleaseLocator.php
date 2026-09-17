@@ -31,7 +31,13 @@ final class ReleaseLocator
     public const DEFAULT_URL = 'https://api.github.com/repos/somework/lockrot/releases/latest';
     public const PHAR_ASSET = 'lockrot.phar';
     public const CHECKSUM_ASSET = 'lockrot.phar.sha256';
-    public const SIGNATURE_ASSET = 'lockrot.phar.sig';
+    /**
+     * Not `lockrot.phar.sig`: PHIVE takes any release asset ending in `.asc` or `.sig` for the GPG
+     * signature (phar-io/phive, GithubRepository::getReleasesByRequestedPhar(), last match wins),
+     * and `phive install somework/lockrot` failed on 0.6.0 until its asset was renamed. The
+     * suffix says what the file is — Composer's `{"sha384": …}` document — and PHIVE ignores it.
+     */
+    public const SIGNATURE_ASSET = 'lockrot.phar.sig.json';
 
     private HttpClientInterface $http;
     private ?string $token;

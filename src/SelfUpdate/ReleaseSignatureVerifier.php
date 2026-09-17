@@ -64,7 +64,7 @@ final class ReleaseSignatureVerifier implements SignatureVerifierInterface
     }
 
     /**
-     * The raw signature bytes out of the `.sig` file. Only the one shape is accepted — a JSON
+     * The raw signature bytes out of the `.sig.json` file. Only the one shape is accepted — a JSON
      * object whose `sha384` member is base64 in the strict alphabet — so a truncated download, an
      * HTML error page or a file signed under another scheme is a readable message, never bytes
      * handed to the verifier.

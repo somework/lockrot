@@ -257,7 +257,7 @@ final class PharTest extends TestCase
     }
 
     /**
-     * The built archive enforcing its own signature check end to end: a release whose `.sig` is by
+     * The built archive enforcing its own signature check end to end: a release whose `.sig.json` is by
      * a key the archive does not trust is reported on one line, exits 2, and leaves the running
      * archive — bytes and permissions — and its directory exactly as they were.
      */
@@ -272,7 +272,7 @@ final class PharTest extends TestCase
         self::assertSame('', $process->getOutput());
         self::assertSame(2, $process->getExitCode(), $process->getErrorOutput());
         $reported = self::reported($process);
-        self::assertStringContainsString('lockrot: the signature in '.self::server()->url().'/forged/lockrot.phar.sig does not match', $reported);
+        self::assertStringContainsString('lockrot: the signature in '.self::server()->url().'/forged/lockrot.phar.sig.json does not match', $reported);
         self::assertStringEndsWith("nothing was written\n", $reported);
         self::assertSame(1, substr_count($reported, "\n"), 'one line and nothing else');
         self::assertSame($before, hash_file('sha256', $target), 'the running archive must be untouched');
@@ -408,7 +408,7 @@ final class PharTest extends TestCase
         file_put_contents($directory.'/lockrot.phar.sha256', $hash.'  lockrot.phar'."\n");
         $bytes = (string) file_get_contents($archive);
         file_put_contents(
-            $directory.'/lockrot.phar.sig',
+            $directory.'/lockrot.phar.sig.json',
             $signedByReleaseKey ? SigningKeys::releaseSignatureFile($bytes) : SigningKeys::otherSignatureFile($bytes)
         );
 
@@ -418,7 +418,7 @@ final class PharTest extends TestCase
             'assets' => [
                 ['name' => 'lockrot.phar', 'browser_download_url' => $base.'lockrot.phar'],
                 ['name' => 'lockrot.phar.sha256', 'browser_download_url' => $base.'lockrot.phar.sha256'],
-                ['name' => 'lockrot.phar.sig', 'browser_download_url' => $base.'lockrot.phar.sig'],
+                ['name' => 'lockrot.phar.sig.json', 'browser_download_url' => $base.'lockrot.phar.sig.json'],
             ],
         ]);
         if ($latest === false) {

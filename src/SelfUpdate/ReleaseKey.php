@@ -10,7 +10,7 @@ namespace Lockrot\SelfUpdate;
  * `lockrot-selfupdate-key.pub` in the repository root; a test keeps the two identical.
  *
  * This is not the GPG release key: that one signs `lockrot.phar.asc` for people and PHIVE, this
- * one signs `lockrot.phar.sig` for the archive's own self-update, the way Composer keeps its
+ * one signs `lockrot.phar.sig.json` for the archive's own self-update, the way Composer keeps its
  * self-update keys apart from its maintainers' GPG keys. RSA 4096, held by the release workflow
  * as the SELFUPDATE_PRIVATE_KEY secret; SECURITY.md says how it is rotated.
  */

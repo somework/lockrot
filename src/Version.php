@@ -7,5 +7,5 @@ namespace Lockrot;
 /** The single place lockrot's own release number is written down. */
 final class Version
 {
-    public const STRING = '0.6.0';
+    public const STRING = '0.6.1';
 }

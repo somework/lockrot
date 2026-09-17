@@ -9,7 +9,7 @@ use Lockrot\Exception\ConfigException;
 interface SignatureVerifierInterface
 {
     /**
-     * Checks that $signatureFile — the body of the release's `lockrot.phar.sig` — is the release
+     * Checks that $signatureFile — the body of the release's `lockrot.phar.sig.json` — is the release
      * key's signature over exactly $archive.
      *
      * @param string $archive       the downloaded archive, byte for byte

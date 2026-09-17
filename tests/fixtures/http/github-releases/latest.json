@@ -25,12 +25,12 @@
             "browser_download_url": "https://github.com/somework/lockrot/releases/download/v0.2.0/lockrot.phar.sha256"
         },
         {
-            "name": "lockrot.phar.sig",
+            "name": "lockrot.phar.sig.json",
             "label": null,
             "content_type": "application/json",
             "state": "uploaded",
             "size": 716,
-            "browser_download_url": "https://github.com/somework/lockrot/releases/download/v0.2.0/lockrot.phar.sig"
+            "browser_download_url": "https://github.com/somework/lockrot/releases/download/v0.2.0/lockrot.phar.sig.json"
         }
     ]
 }

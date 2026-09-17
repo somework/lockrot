@@ -78,7 +78,9 @@ repository and the keys in CI cannot silently drift apart.
 
 ### Self-update signature
 
-Every release from 0.6.0 on also publishes `lockrot.phar.sig`: an RSA signature (PKCS#1 v1.5 over
+Every release from 0.6.0 on also publishes `lockrot.phar.sig.json` (named `lockrot.phar.sig` on
+0.6.0 for its first hour; PHIVE reads any `.sig` asset as a GPG signature, so it was renamed): an
+RSA signature (PKCS#1 v1.5 over
 SHA-384) by the lockrot self-update key, in the `{"sha384": "<base64>"}` file format Composer uses
 for `composer.phar`. It exists so that the archive can verify a release by itself — with
 `openssl_verify()` and the public key built into it, nothing installed on the machine — which an
@@ -87,9 +89,9 @@ release key; its public half is `lockrot-selfupdate-key.pub` in the repository r
 by hand:
 
 ```bash
-curl -fsSL -O https://github.com/somework/lockrot/releases/latest/download/lockrot.phar.sig
+curl -fsSL -O https://github.com/somework/lockrot/releases/latest/download/lockrot.phar.sig.json
 curl -fsSL -O https://raw.githubusercontent.com/somework/lockrot/main/lockrot-selfupdate-key.pub
-php -r 'echo base64_decode(json_decode(file_get_contents("lockrot.phar.sig"), true)["sha384"]);' > lockrot.phar.sig.bin
+php -r 'echo base64_decode(json_decode(file_get_contents("lockrot.phar.sig.json"), true)["sha384"]);' > lockrot.phar.sig.bin
 openssl dgst -sha384 -verify lockrot-selfupdate-key.pub -signature lockrot.phar.sig.bin lockrot.phar
 ```
 
@@ -181,12 +183,14 @@ php lockrot.phar self-update --force  # reinstall the latest release even when i
 refuse to run rather than fail half-way: an update cannot happen without the network.
 
 `self-update` reads `releases/latest` from the GitHub API directly, not through `lockrot.dev`. It
-downloads the release's `lockrot.phar.sha256` and `lockrot.phar.sig` alongside the archive, refuses
+downloads the release's `lockrot.phar.sha256` and `lockrot.phar.sig.json` alongside the archive, refuses
 to install anything whose hash does not match or whose signature does not verify against the key
 built into the running archive ([above](#self-update-signature)), and checks that the PHP runtime
 can open the download before it replaces the running file. The archive running 0.5.0 checks the
-checksum only when it updates to 0.6.0 — the verifier arrives with 0.6.0 — and releases before
-0.6.0 carry no signature, so a 0.6.0 archive cannot `--force` its way back to one.
+checksum only when it updates — the verifier arrives with 0.6.0 — and releases before 0.6.0 carry
+no signature, so a signed build cannot `--force` its way back to one. The 0.6.0 archive looks for
+the signature under its first name, `lockrot.phar.sig`, which no later release carries: it reports
+the missing asset and leaves itself in place, so replace it by hand once (or `phive update`).
 
 It needs write access to the directory the PHAR sits in — a PHAR in `/usr/local/bin` wants `sudo`, or
 a manual download — and it writes nothing else. If the update fails at any step, the running

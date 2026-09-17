@@ -10,9 +10,9 @@ declare(strict_types=1);
 // user's self-update will run, so a signing key that is not the one in ReleaseKey::PEM fails the
 // release build, not the user.
 //
-//   build/selfupdate-signature.php wrap   build/lockrot.phar.sig.bin > build/lockrot.phar.sig
-//   build/selfupdate-signature.php unwrap build/lockrot.phar.sig     > build/lockrot.phar.sig.bin
-//   build/selfupdate-signature.php verify build/lockrot.phar build/lockrot.phar.sig
+//   build/selfupdate-signature.php wrap   build/lockrot.phar.sig.bin > build/lockrot.phar.sig.json
+//   build/selfupdate-signature.php unwrap build/lockrot.phar.sig.json     > build/lockrot.phar.sig.bin
+//   build/selfupdate-signature.php verify build/lockrot.phar build/lockrot.phar.sig.json
 
 require __DIR__.'/../vendor/autoload.php';
 

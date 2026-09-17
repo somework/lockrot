@@ -7,7 +7,7 @@ namespace Lockrot\Tests\Support;
 /**
  * The test-only RSA key pairs under tests/fixtures/signing, and the release signature file format
  * built from them — the same `{"sha384": "<base64>"}` the release workflow publishes as
- * `lockrot.phar.sig` and {@see \Lockrot\SelfUpdate\ReleaseSignatureVerifier} reads.
+ * `lockrot.phar.sig.json` and {@see \Lockrot\SelfUpdate\ReleaseSignatureVerifier} reads.
  *
  * `release` stands in for the lockrot release key; `other` is a key of the same shape that is not
  * it. Both are checked in on purpose: generating keys in a test is slow on some runners and needs
@@ -28,13 +28,13 @@ final class SigningKeys
         return self::read('other-key.pub');
     }
 
-    /** The `.sig` file the release key would publish for $archive. */
+    /** The `.sig.json` file the release key would publish for $archive. */
     public static function releaseSignatureFile(string $archive): string
     {
         return self::signatureFile($archive, 'release-key.pem');
     }
 
-    /** The `.sig` file a key that is not the release key would produce for $archive. */
+    /** The `.sig.json` file a key that is not the release key would produce for $archive. */
     public static function otherSignatureFile(string $archive): string
     {
         return self::signatureFile($archive, 'other-key.pem');

@@ -37,7 +37,7 @@ final class ReleaseLocatorTest extends TestCase
         self::assertSame('v0.2.0', $release->tag());
         self::assertSame('https://github.com/somework/lockrot/releases/download/v0.2.0/lockrot.phar', $release->pharUrl());
         self::assertSame('https://github.com/somework/lockrot/releases/download/v0.2.0/lockrot.phar.sha256', $release->checksumUrl());
-        self::assertSame('https://github.com/somework/lockrot/releases/download/v0.2.0/lockrot.phar.sig', $release->signatureUrl());
+        self::assertSame('https://github.com/somework/lockrot/releases/download/v0.2.0/lockrot.phar.sig.json', $release->signatureUrl());
         self::assertSame([self::URL], $http->requested());
     }
 
@@ -129,14 +129,28 @@ final class ReleaseLocatorTest extends TestCase
         $this->locator($http)->locate();
     }
 
+    /**
+     * PHIVE reads any release asset ending in `.asc` or `.sig` as the GPG signature of the PHAR —
+     * last one wins — so the self-update signature must never carry either suffix: 0.6.0 shipped
+     * `lockrot.phar.sig` and `phive install somework/lockrot` broke until the asset was renamed.
+     */
+    public function testTheSignatureAssetNameIsNotOnePhiveTakesForAGpgSignature(): void
+    {
+        foreach (['.asc', '.sig'] as $suffix) {
+            self::assertStringEndsNotWith($suffix, ReleaseLocator::SIGNATURE_ASSET);
+        }
+        self::assertStringEndsNotWith('.phar', ReleaseLocator::SIGNATURE_ASSET);
+        self::assertStringEndsWith('.asc', 'lockrot.phar.asc');
+    }
+
     /** A release from before signing (0.5.0 and earlier) is not one this build can install. */
     public function testAReleaseWithoutTheSignatureAssetNamesTheTag(): void
     {
-        $body = str_replace('lockrot.phar.sig', 'lockrot.phar.asc', self::fixture('latest.json'));
+        $body = str_replace('lockrot.phar.sig.json', 'lockrot.phar.asc', self::fixture('latest.json'));
         $http = new FakeHttpClient([self::URL => FakeHttpClient::ok(self::URL, $body)]);
 
         $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage('release v0.2.0 has no lockrot.phar.sig asset');
+        $this->expectExceptionMessage('release v0.2.0 has no lockrot.phar.sig.json asset');
         $this->locator($http)->locate();
     }
 
