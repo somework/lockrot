@@ -237,12 +237,3 @@ slow test. They are listed here only so nobody reads them as an unexplained "2 t
   is not past, and splicing an empty array yields an empty chunk, so nothing ever changes.
 - `src/Data/Repository/RepositoryMetadataLoader.php:203` IncrementInteger — splicing from offset 1
   never removes the first name, so the queue never empties.
-
-## Added 2026-09-18 with the self-update signature
-
-src/SelfUpdate/ReleaseSignatureVerifier.php:51 DecrementInteger (`$verified === -1` → `=== -2`) —
-`openssl_verify()` returns -1 only for an error inside openssl (an unusable key type, an algorithm
-the build lacks); a wrong key, other bytes or a signature of the wrong length all return 0, which
-the tests cover. No input from outside produces -1, so the branch cannot be reached by a test and
-the mutated comparison is never evaluated true either way.
-
