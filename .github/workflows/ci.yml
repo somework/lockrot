@@ -71,9 +71,10 @@ jobs:
   # Its own job, sharded three ways: over the whole src tree one Infection run took 30 minutes on
   # a 4-core runner, and a style or type error should not wait for it. Each shard runs the same
   # configuration filtered to a group of directories; the threshold applies per shard (every shard
-  # measures above 97 on its own, see infection.json5 for the whole-tree numbers).
+  # measures above 97.5 on its own, see infection.json5 for the whole-tree numbers).
   mutation:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
@@ -93,9 +94,15 @@ jobs:
           composer global require "infection/infection:^0.35"
       # Infection 0.35 dropped --only-covered (uncovered code is skipped by default; --with-uncovered opts in).
       # Whole tree, 2026-09-17: 3201 mutants, 56 equivalent escapes, 2 timed out (infinite-loop
-      # mutants, i.e. detections) -> MSI = Covered MSI 98.25%, ~6m20s on 8 threads locally. Threshold
-      # matches infection.json5, which records why the timeout is 180 and which escapes are equivalent.
-      - run: $(composer global config bin-dir --absolute)/infection --threads=max --min-msi=96 --logger-github --filter='${{ matrix.shard.filter }}'
+      # mutants, i.e. detections) -> MSI = Covered MSI 98.25%; ~6m20s on 8 threads locally, ~30 min
+      # unsharded on a 4-core runner. Threshold matches infection.json5, which records why the timeout
+      # is 180; tests/infection-equivalents.md records why each escape is equivalent. No GitHub
+      # annotations: 56 warnings about documented equivalents per run would only teach people to
+      # ignore them; the escape listing is uploaded instead.
+      - run: $(composer global config bin-dir --absolute)/infection --threads=max --min-msi=97 --filter='${{ matrix.shard.filter }}'
+      - if: always()
+        uses: actions/upload-artifact@v7
+        with: {name: 'infection (${{ matrix.shard.name }})', path: build/infection.log, if-no-files-found: ignore}
   # docs/ is rendered at lockrot.dev from the newest tag by the somework/lockrot.dev repository;
   # --strict here is the only place a broken link or a page outside the nav fails before a release.
   docs:

@@ -4,8 +4,6 @@
 /build/phar/box.phar
 /build/*.phar
 /build/infection.log
-/build/infection-*.log
-/build/infection-*-tmp/
 /build/clover*.xml
 /.phpunit.cache
 /.phpunit.result.cache

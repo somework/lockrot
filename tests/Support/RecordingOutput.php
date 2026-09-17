@@ -16,14 +16,20 @@ use Symfony\Component\Console\Output\BufferedOutput;
  */
 final class RecordingOutput extends BufferedOutput
 {
-    /** @var list<string> every message passed to write(), unformatted and in order */
+    /** @var list<string> every message write() let through at this verbosity, unformatted and in order */
     public array $raw = [];
 
     /** @param iterable<string>|string $messages */
     public function write($messages, bool $newline = false, int $options = self::OUTPUT_NORMAL): void
     {
-        foreach (is_iterable($messages) ? $messages : [$messages] as $message) {
-            $this->raw[] = $message;
+        // The same test Output::write() applies before printing, so a line the verbosity drops is
+        // not recorded either.
+        $verbosities = self::VERBOSITY_QUIET | self::VERBOSITY_NORMAL | self::VERBOSITY_VERBOSE | self::VERBOSITY_VERY_VERBOSE | self::VERBOSITY_DEBUG;
+        $verbosity = ($verbosities & $options) ?: self::VERBOSITY_NORMAL;
+        if ($verbosity <= $this->getVerbosity()) {
+            foreach (is_iterable($messages) ? $messages : [$messages] as $message) {
+                $this->raw[] = $message;
+            }
         }
 
         parent::write($messages, $newline, $options);

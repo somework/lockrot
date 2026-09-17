@@ -6,8 +6,10 @@
     // default, every mutant whose covering tests reach the integration suite came back as "required
     // more time than configured", which Infection counts as *detected*: 253 of 269 mutants timed out,
     // 16 were actually killed, and the gate still reported MSI 100% and exited 0, i.e. it could not
-    // fail. A timeout has to exceed the slowest covering test run, not the fastest. With 180 no
-    // mutant times out.
+    // fail. A timeout has to exceed the slowest covering test run, not the fastest. With 180 the
+    // only mutants that time out are the two genuine infinite loops in
+    // RepositoryMetadataLoader::loadChunked() (the `!== []` loop guard and the splice offset), which
+    // Infection counts as detected — correctly, since a test that never returns is a failing test.
     "timeout": 180,
     "logs": {
         "text": "build/infection.log"
@@ -41,8 +43,8 @@
     // trim its only reader repeats, an unused constructor parameter, Composer\Cache guards that
     // Cache::read()/write() already apply), and 47 more turned out to be equivalent. After: 3201
     // mutants, 56 escaped, 2 timed out (both genuine infinite loops in RepositoryMetadataLoader::
-    // loadChunked(), i.e. detections), MSI = Covered MSI 98.25%, ~6m20s on 8 threads. The 47, one
-    // line each; the full reasoning is in the ledger of that day:
+    // loadChunked(), i.e. detections), MSI = Covered MSI 98.25%, ~6m20s on 8 threads locally. The 47,
+    // one line each; the full reasoning for every escape is in tests/infection-equivalents.md:
     //  - Set membership written as `= true` and read only through isset(): ActivityClient.php:80,
     //    ActivityFetchPlanner.php:51 and :67, RepositoryMetadataLoader.php:274 (TrueValue).
     //  - array_values() that only makes a `list` type true, every consumer iterates: ActivityClient.php:120,
@@ -76,8 +78,9 @@
     //    SelfUpdateCommand.php:154 and :158 (an unclosed `</error>` renders byte-identically, the line
     //    is the command's last write).
     //
-    // Threshold 96 = floor of the honest MSI minus 2, so ~70 new escapes fit before the gate fails and
-    // the number does not move every time a test is added.
-    "minMsi": 96,
-    "minCoveredMsi": 96
+    // Threshold 97 = floor of the honest MSI minus 1: at 3201 mutants that leaves room for ~40 new
+    // escapes before the gate fails — close to the ~25 the narrower scope allowed — without the
+    // number moving every time a test is added.
+    "minMsi": 97,
+    "minCoveredMsi": 97
 }
