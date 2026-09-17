@@ -1,3 +1,8 @@
+---
+title: lockrot.phar — verified download, GPG, PHIVE, self-update
+description: "Run lockrot with nothing added to your project: download the PHAR, verify its sha256, GPG signature and build provenance, install with PHIVE, self-update."
+---
+
 # The standalone PHAR
 
 No install, no dependency added to your project. Requires PHP 7.4+ to run the PHAR itself — the same

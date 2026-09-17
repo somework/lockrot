@@ -1,3 +1,8 @@
+---
+title: lockrot configuration — extra.lockrot keys and CLI options
+description: Every extra.lockrot key in composer.json with its default, the environment overrides, the command-line options, caching, and the allowlist of finished packages.
+---
+
 # Configuration reference
 
 Put project settings under `extra.lockrot` in `composer.json`:

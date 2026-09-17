@@ -1,3 +1,8 @@
+---
+title: lockrot verdicts and priority — abandoned, silent, pinned
+description: The eight verdicts lockrot gives a package in composer.lock, the signals behind each one, and how direct, transitive and dev dependencies set the priority.
+---
+
 # Verdicts and priority
 
 Every package in `composer.lock` gets exactly one verdict and one priority. The verdict says what

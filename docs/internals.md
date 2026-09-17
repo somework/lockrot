@@ -1,3 +1,8 @@
+---
+title: How lockrot fetches metadata — Composer repositories, APIs
+description: lockrot reads the Composer repositories you configured, Private Packagist and Satis included, plus the GitHub, GitLab and Bitbucket APIs, cached for 24 h.
+---
+
 # How lockrot fetches metadata
 
 You do not have to configure anything for this. lockrot reads the repositories already configured in

@@ -1,3 +1,8 @@
+---
+title: lockrot install-time summary — checks on composer require
+description: "What the plugin prints during composer require, update and install: at most 10 lines, a time budget, and it never fails the install unless you ask it to."
+---
+
 # Install-time summary
 
 With the plugin installed, nothing has to be enabled: `composer require`, `composer update` and

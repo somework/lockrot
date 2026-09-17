@@ -1,3 +1,8 @@
+---
+title: lockrot baseline — fail CI only on new dependency rot
+description: Record today's findings in lockrot-baseline.json with --generate-baseline, commit it, and CI fails only on findings that are new or have got worse since.
+---
+
 # Baseline
 
 Record the findings you have already seen and decided to live with, so CI fails only on what is

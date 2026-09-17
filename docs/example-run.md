@@ -1,3 +1,8 @@
+---
+title: lockrot example run — a 200-package composer.lock report
+description: "One complete lockrot run against wallabag's public 200-package composer.lock: the table output, the same run as JSON, and what a clean run looks like."
+---
+
 # Example run
 
 This is what one run prints, start to finish. To produce your own:

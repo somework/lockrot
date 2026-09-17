@@ -1,3 +1,8 @@
+---
+title: lockrot in CI — GitHub Actions, GitLab CI, SARIF, exit codes
+description: "Run lockrot in a pipeline: the --fail-on threshold, exit codes 0, 1 and 2, the GitHub Action, and the github, sarif, gitlab, markdown and json output formats."
+---
+
 # Running lockrot in CI
 
 Add one step to the pipeline and pick the threshold that should fail it:
