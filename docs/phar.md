@@ -93,9 +93,10 @@ it the check to prefer in an environment that already has `gh`.
 ### Rebuilding it yourself
 
 From 0.6.0 on the PHAR is [reproducible](https://reproducible-builds.org/): the tagged commit,
-Box 4.7.0 and a PHP of the series the release workflow uses (8.4) give the same bytes, so the
-archive on the release page can be checked against its own source rather than against the machine
-that built it:
+Box 4.7.0 and the Composer minor the release was built with give the same bytes, so the archive on
+the release page can be checked against its own source rather than against the machine that built
+it. The script prints the PHP, Composer and Box versions it ran with; the release workflow's log
+shows the same line for the published archive.
 
 ```bash
 git clone https://github.com/somework/lockrot.git && cd lockrot
@@ -105,8 +106,9 @@ shasum -a 256 build/lockrot.phar        # compare with lockrot.phar.sha256 of th
 ```
 
 What the script pins is written at its top: the dependencies of the archive come from the committed
-`build/phar/composer.lock`, the autoloader suffix and the PHAR alias are fixed, every file inside
-the archive carries the commit date of the checkout (`SOURCE_DATE_EPOCH` overrides it), and Box
+`build/phar/composer.lock`, the autoloader suffix, the PHAR alias and the package versions
+Composer records are fixed, every file inside the archive carries the commit date of the checkout
+(`SOURCE_DATE_EPOCH` overrides it), only an allowlist of lockrot's own files goes in, and Box
 compiles the files in sorted order. Every commit is also rebuilt on a second CI machine and compared
 byte for byte, so a change that ties the archive to the build machine fails before it is released.
 

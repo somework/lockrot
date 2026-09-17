@@ -29,19 +29,25 @@
                 "composer.lock"
             ],
             "notPath": [
-                "somework/lockrot/vendor",
-                "somework/lockrot/tests",
-                "somework/lockrot/build",
-                "somework/lockrot/docs",
-                "somework/lockrot/.superpowers",
-                "somework/lockrot/.git"
+                "somework/lockrot/"
             ]
+        },
+        {
+            "in": [
+                "vendor/somework/lockrot/src",
+                "vendor/somework/lockrot/resources"
+            ]
+        },
+        {
+            "in": "vendor/somework/lockrot/bin",
+            "name": "lockrot"
         }
     ],
     "exclude-dev-files": true,
     "exclude-composer-files": false,
     "files": [
-        "composer.json"
+        "composer.json",
+        "vendor/somework/lockrot/composer.json"
     ],
     "compression": "GZ",
     "compactors": [

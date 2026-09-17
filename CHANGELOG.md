@@ -10,12 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - The PHAR is built reproducibly. `build/build-phar.sh` on the tagged commit — with Box 4.7.0,
-  which the script downloads and checks, and a PHP of the release workflow's series — produces the
-  archive byte for byte, so a release can be verified against its own source without trusting the
-  builder: dependencies come from the committed `build/phar/composer.lock`, the autoloader suffix
-  and the PHAR alias are fixed, every file inside the archive carries the commit date of the build
-  (or `SOURCE_DATE_EPOCH`), and Box compiles the files in sorted order. CI rebuilds every commit on
-  a second machine and compares the bytes.
+  which the script downloads and checks, and the Composer minor the release was built with —
+  produces the archive byte for byte, so a release can be verified against its own source without
+  trusting the builder: dependencies come from the committed `build/phar/composer.lock`, the
+  autoloader suffix, the PHAR alias and the recorded package versions are fixed, every file inside
+  the archive carries the commit date of the build (or `SOURCE_DATE_EPOCH`), only an allowlist of
+  lockrot's own files goes in, and Box compiles the files in sorted order. CI rebuilds every commit
+  on a second machine and compares the bytes.
 
 ### Changed
 
