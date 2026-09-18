@@ -104,6 +104,16 @@ final class PackageMetadataFromPackagesTest extends TestCase
         }
     }
 
+    /** As for the package's last release: two releases on one branch with the same time keep the first one seen. */
+    public function testTwoReleasesOnABranchWithTheSameTimeKeepTheFirstOneSeen(): void
+    {
+        $first = $this->load(['name' => 'a/b', 'version' => '1.0.0', 'time' => '2021-01-01T00:00:00+00:00']);
+        $second = $this->load(['name' => 'a/b', 'version' => '1.0.1', 'time' => '2021-01-01T00:00:00+00:00']);
+
+        self::assertSame('1.0.0', PackageMetadata::fromPackages('a/b', [$first, $second], new \DateTimeImmutable(self::FIXED))->latestStableByBranch()['1']['version']);
+        self::assertSame('1.0.1', PackageMetadata::fromPackages('a/b', [$second, $first], new \DateTimeImmutable(self::FIXED))->latestStableByBranch()['1']['version']);
+    }
+
     public function testAnUndatedHigherTagNeverHidesADatedReleaseOnTheBranch(): void
     {
         $undatedHigher = $this->load(['name' => 'a/b', 'version' => '1.5.0']);
