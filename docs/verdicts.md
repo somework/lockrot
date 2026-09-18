@@ -63,11 +63,12 @@ above.
 ## Left behind
 
 `composer outdated --major-only` says a newer major exists. S2 says nothing, because the package's
-newest release is exactly the one that is fresh. Neither says that the major you are on gets no
+newest release is exactly the one that is fresh. Neither says that the branch you are on gets no
 fixes any more.
 
-A version's *release branch* is what a caret constraint on it would stay inside: `1.x` for anything
-`>= 1.0`, `0.3.x` for `0.3.*` — as `^0.3` has it. S8 takes the newest stable release on the
+A version's *release branch* is what a caret constraint on it would stay inside: the major for
+anything `>= 1.0` (`1.x`, so `1.2` and `1.9` share it and `2.0` does not), the major and minor
+below that (`0.3.x` for `0.3.*`, as `^0.3` has it). S8 takes the newest stable release on the
 installed branch — a backport on a lower minor counts, a pre-release does not — and measures its
 age against `release-warn-years` / `release-high-years`, the S2 thresholds. It fires only when some
 higher branch has released *after* that date and within `release-warn-years` of today: a `2.0` that
@@ -88,7 +89,9 @@ read as a constraint problem. The branch installed here has been quiet for 5.1 y
 kept going.
 
 A branch snapshot (`dev-master`, `2.x-dev`) belongs to no branch and is `pinned`. A package whose
-installed version is not on any branch the repository lists — a private fork, say — carries no S8.
+installed version the repository does not list — a private fork, or a lock written against a tag
+since deleted, sitting above everything the repository has on that branch — carries no S8: the
+branch's dates say nothing about it.
 
 ## Security advisories
 
@@ -99,8 +102,9 @@ S9 lists every advisory whose affected range matches the installed version, fetc
 configured Composer repositories exactly as audit fetches them — one request to Packagist for the
 whole lock, the package files themselves on a repository that carries advisories inline. It never
 decides a verdict: a vulnerability on a healthy package is audit's finding and stays out of the
-priority. On an `abandoned`, `silent` or `left-behind` package the evidence ends with
-`no fix expected` and the priority goes up one step, `critical` at most:
+priority. On an `abandoned`, `silent` or `left-behind` package the evidence closes what was
+observed about the package itself with `no fix expected` — ahead of what it pulls in, when it is a
+direct requirement that does — and the priority goes up one step, `critical` at most:
 
 ```text
   abandoned    zendframework/zend-http 2.8.0  direct
@@ -111,19 +115,23 @@ priority. On an `abandoned`, `silent` or `left-behind` package the evidence ends
 ```
 
 Each advisory is named by its CVE, or by its Packagist id when it has none; three are named, the
-rest counted. Advisories the project told Composer to ignore — `config.policy.advisories` on
-Composer 2.10 and later, `config.audit.ignore` before — are dropped here as `composer audit`
-drops them.
+rest counted. An advisory the project has accepted is silenced where `composer audit` silences it,
+not in lockrot's own configuration: `config.policy.advisories` (`ignore-id`, `ignore`,
+`ignore-severity`) on Composer 2.10 and later, `config.audit.ignore` and `audit.ignore-severity`
+before. What audit drops, lockrot drops. A policy section Composer itself rejects — a key reserved
+for a later version, say — leaves lockrot with no ignore list at all; the report then carries a note
+saying so, and every advisory counts until the section parses.
 
-`pinned` and `old-promise` are not raised: a branch snapshot or an open php constraint says nothing
-about whether a fix is coming. The [baseline](baseline.md) stays keyed on the verdict, so a baselined
-finding is `known` whatever S9 adds to its priority.
+`stale`, `pinned` and `old-promise` are not raised: an old release, a branch snapshot or an open php
+constraint says nothing about whether a fix is coming. The [baseline](baseline.md) stays keyed on
+the verdict, so a baselined finding is `known` whatever S9 adds to its priority.
 
 The check needs Composer 2.4 or newer — on the 2.2 LTS the report carries one note and nothing else
-changes — and cannot run under `--offline`, which is noted the same way. A repository that could not
-be reached for advisories is a note and, under `--strict-network`, exit `1`, like any other
-unreachable source. `--format=json` carries each advisory's id, CVE, title, link, severity and date
-under the signal's `data.advisories`.
+changes — and cannot run under `--offline`, which is noted the same way; at install time it is
+skipped, with a note, once the [budget](install-time.md) is spent. A repository that could not be
+reached for advisories is a note and, under `--strict-network`, exit `1`, like any other unreachable
+source. `--format=json` carries each advisory under the signal's `data.advisories` as `id`, `cve`,
+`title`, `link`, `severity` and `reported_at`, null where the repository gave none.
 
 ## Priority
 

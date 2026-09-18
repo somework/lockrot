@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `left-behind`: a verdict for the major you are on, not the package. Signal S8 takes the newest
+- `left-behind`: a verdict for the branch you are on, not the package. Signal S8 takes the newest
   stable release on the installed version's release branch (`1.x`, or `0.3.x` below 1.0 — what a
   caret constraint stays inside; pre-releases do not count), measures its age against
   `release-warn-years` / `release-high-years`, and fires only when a higher branch has released
@@ -21,12 +21,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   2019-03-02 (7.5 years ago); upstream moved on to 3.4.1 (2026-06-01)`.
 - Security advisories on the finding. Signal S9 carries the advisories that affect the installed
   version — the same ones `composer audit` reports, fetched through Composer's own advisory API from
-  the configured repositories — with id, CVE, title, link, severity and date under `data.advisories`
-  in `--format=json`. S9 never decides a verdict. On an `abandoned`, `silent` or `left-behind`
-  package the evidence ends with `no fix expected` and the priority goes up one step, `critical` at
-  most: the wait for a patched release is over before it started. On Composer 2.2, under `--offline`
-  and once the install-time budget is spent the report carries one note instead; a repository that
-  could not be reached for advisories is a note and, under `--strict-network`, exit `1`.
+  the configured repositories — with `id`, `cve`, `title`, `link`, `severity` and `reported_at`
+  under `data.advisories` in `--format=json`. Advisories the project ignores in Composer's own
+  configuration (`config.policy.advisories` on 2.10+, `config.audit.ignore` before) are dropped as
+  `composer audit` drops them. S9 never decides a verdict. On an `abandoned`, `silent` or
+  `left-behind` package the evidence gains `no fix expected` and the priority goes up one step,
+  `critical` at most: the wait for a patched release is over before it started. On Composer 2.2,
+  under `--offline` and once the install-time budget is spent the report carries one note instead;
+  a repository that could not be reached for advisories is a note and, under `--strict-network`,
+  exit `1`.
 
 ### Changed
 

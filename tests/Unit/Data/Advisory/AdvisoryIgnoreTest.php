@@ -108,6 +108,17 @@ final class AdvisoryIgnoreTest extends TestCase
         $ignore = AdvisoryIgnore::fromConfig($config);
 
         self::assertTrue($ignore->isEmpty());
+        self::assertNotNull($ignore->note());
+        self::assertStringStartsWith("Composer's advisory ignore list not read (", $ignore->note());
+        self::assertStringEndsWith('); every advisory counts', $ignore->note());
+        self::assertStringNotContainsString("\n", $ignore->note());
+    }
+
+    public function testAReadableConfigCarriesNoNote(): void
+    {
+        self::assertNull(AdvisoryIgnore::fromConfig(new Config(false))->note());
+        self::assertNull(AdvisoryIgnore::none()->note());
+        self::assertNull(AdvisoryIgnore::fromRaw(['PKSA-1'], [])->note());
     }
 
     public function testAnEmptyConfigIgnoresNothing(): void

@@ -69,7 +69,7 @@ final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
 
         /** @var array<string, array<string, Advisory>> $byName name => advisory id => advisory, so two repositories serving the same advisory count it once */
         $byName = [];
-        $notes = [];
+        $notes = $this->ignore->note() === null ? [] : [$this->ignore->note()];
         $failed = false;
         foreach ($this->repositories as $repository) {
             if (!$repository instanceof AdvisoryProviderInterface) {
