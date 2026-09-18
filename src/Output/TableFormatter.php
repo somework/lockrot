@@ -273,9 +273,35 @@ final class TableFormatter implements FormatterInterface
         $wrap = max(self::MIN_WRAP_WIDTH, $this->context->terminalWidth());
         $lines = [];
         foreach ($texts as $text) {
-            foreach (strpos($text, ' · ') !== false ? self::wrapBetweenItems($text, $wrap) : self::wrap($text, $wrap, false) as $line) {
+            foreach (strpos($text, ' · ') !== false ? self::wrapBetweenItems($text, $wrap) : self::wrapKeepingCommands($text, $wrap) as $line) {
                 $lines[] = $line;
             }
+        }
+
+        return $lines;
+    }
+
+    /**
+     * The commands the footer tells the reader to run. Folded at a space like any other words,
+     * `see composer` / `audit` is what an 80-column CI log shows; a command is one thing to copy,
+     * so each is held together as one token and, like a long path, may overflow rather than split.
+     */
+    private const COMMANDS = ['composer lockrot --format=json', 'composer audit'];
+
+    /**
+     * {@see wrap()} without cutting, with every command in {@see self::COMMANDS} kept on one line.
+     *
+     * @return list<string>
+     */
+    private static function wrapKeepingCommands(string $text, int $wrap): array
+    {
+        $glued = [];
+        foreach (self::COMMANDS as $command) {
+            $glued[] = str_replace(' ', "\x1F", $command);
+        }
+        $lines = [];
+        foreach (self::wrap(str_replace(self::COMMANDS, $glued, $text), $wrap, false) as $line) {
+            $lines[] = str_replace("\x1F", ' ', $line);
         }
 
         return $lines;

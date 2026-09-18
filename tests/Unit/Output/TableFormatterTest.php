@@ -42,6 +42,28 @@ final class TableFormatterTest extends TestCase
     }
 
     /**
+     * At 74 columns `see composer` fits and `audit` does not; at 80, `Run composer` fits and
+     * `lockrot --format=json` does not. A command is one thing to copy, so it moves down whole.
+     */
+    public function testACommandTheFooterNamesIsNeverSplitAcrossLines(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $advisories = array_fill(0, 3, ['id' => 'x']);
+        $report = new Report([
+            new Finding('vendor/ok', '1.0.0', Verdict::OK, [new Signal('S9', 'warn', '3 security advisories affect 1.0.0 (a, b, c)', ['advisories' => $advisories])], ['vendor/ok'], null, $at),
+        ], [], $at, 1, 0, false);
+
+        $at74 = $this->plainLines($this->formatter(74)->format($report));
+        self::assertContains('3 security advisories on 1 package the report does not flag; see', $at74);
+        self::assertContains('composer audit', $at74);
+
+        $at80 = $this->plainLines($this->formatter(80)->format($report));
+        self::assertContains('Data as of 2026-09-14 (package repositories, repository hosts). Run', $at80);
+        self::assertContains('composer lockrot --format=json for details.', $at80);
+        self::assertSame([], preg_grep('/\x1F/', $at80), 'the glue never reaches the terminal');
+    }
+
+    /**
      * One row per priority level plus two unflagged ones, so every group header and every label
      * style has a row to sit on.
      */
