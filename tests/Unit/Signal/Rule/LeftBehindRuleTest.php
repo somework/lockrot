@@ -92,6 +92,24 @@ final class LeftBehindRuleTest extends TestCase
         self::assertNull($this->rule()->evaluate(F::facts(F::package(['version' => '1.9.2']), $meta)));
     }
 
+    public function testAHigherBranchReleasedTheSameDayAsOursHasNotMovedOn(): void
+    {
+        $meta = F::metadata([['2.0.0', '2019-03-02'], ['1.9.2', '2019-03-02']]);
+
+        self::assertNull($this->rule()->evaluate(F::facts(F::package(['version' => '1.9.2']), $meta)));
+    }
+
+    public function testTwoHigherBranchesReleasedTheSameDayKeepTheFirstListed(): void
+    {
+        // Packagist lists the highest version first, so a tie names the highest branch.
+        $meta = F::metadata([['3.0.0', '2026-01-01'], ['2.5.0', '2026-01-01'], ['1.9.2', '2019-03-02']]);
+
+        $signal = $this->rule()->evaluate(F::facts(F::package(['version' => '1.9.2']), $meta));
+
+        self::assertNotNull($signal);
+        self::assertStringEndsWith('upstream moved on to 3.0.0 (2026-01-01)', $signal->summary());
+    }
+
     public function testAHigherBranchWithoutADateIsNotEvidence(): void
     {
         $meta = F::metadata([['2.0.0', null], ['1.9.2', '2019-03-02']]);

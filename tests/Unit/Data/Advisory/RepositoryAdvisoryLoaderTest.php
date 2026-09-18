@@ -150,6 +150,13 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
             self::assertCount(1, $batch->notes());
             self::assertStringContainsString('could not be loaded as a full advisory', $batch->notes()[0]);
             self::assertFalse($batch->hadNetworkFailure());
+
+            $behind = new RepositoryAdvisoryLoader(array_merge($partial->repositories(), $this->server()->repositories()));
+
+            $batch = $behind->load(['doctrine/cache' => '2.2.0']);
+
+            self::assertCount(1, $batch->notes());
+            self::assertCount(2, $batch->for('doctrine/cache'), 'the repository behind the partial one still answers');
         } finally {
             $partial->stop();
         }
