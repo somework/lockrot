@@ -22,6 +22,10 @@ use Lockrot\Deadline;
  * whose inline records are partial is a note. Advisories the project ignores in Composer's own
  * configuration ({@see AdvisoryIgnore}) are dropped, as audit drops them.
  *
+ * The POST goes through the repository's own HttpDownloader with the ten-second timeout Composer
+ * hard-codes for it, which lockrot cannot shorten: under the install-time budget the deadline is
+ * checked before each repository, not inside the call — the same bound the metadata pass has.
+ *
  * Composer 2.2 has no advisory API at all: the run says so in a note and checks nothing else
  * differently. Offline, nothing is asked — the POST cannot be served from a cache — and the note
  * says so too.
