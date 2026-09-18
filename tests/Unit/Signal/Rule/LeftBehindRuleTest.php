@@ -149,6 +149,16 @@ final class LeftBehindRuleTest extends TestCase
         self::assertNull($this->rule()->evaluate(F::facts(F::package(['version' => '0.9.0']), $meta)));
     }
 
+    /** A lock written against a tag the repository no longer lists: the branch's last date says nothing about it. */
+    public function testAnInstalledVersionAboveEverythingListedOnItsBranchIsNull(): void
+    {
+        $meta = F::metadata([['2.0.0', '2026-01-01'], ['1.9.2', '2019-03-02']]);
+
+        self::assertNull($this->rule()->evaluate(F::facts(F::package(['version' => 'v1.9.5']), $meta)));
+        self::assertNotNull($this->rule()->evaluate(F::facts(F::package(['version' => 'v1.9.2']), $meta)), 'the listed version itself is measured');
+        self::assertNotNull($this->rule()->evaluate(F::facts(F::package(['version' => '1.0.0']), $meta)), 'an older install on the branch is measured by the branch');
+    }
+
     public function testNoMetadataIsNull(): void
     {
         self::assertNull($this->rule()->evaluate(F::facts(F::package(['version' => '1.0.0']))));
