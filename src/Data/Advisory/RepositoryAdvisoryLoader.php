@@ -111,7 +111,7 @@ final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
      */
     private static function unavailableNote(string $repository, \Throwable $e): string
     {
-        $message = trim((string) strtok($e->getMessage(), "\r\n"));
+        $message = (string) strtok($e->getMessage(), "\r\n");
 
         return \sprintf('security advisories unavailable from %s: %s', $repository, $message === '' ? \get_class($e) : $message);
     }
