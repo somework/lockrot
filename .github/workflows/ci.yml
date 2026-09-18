@@ -1,5 +1,16 @@
 name: CI
-on: [push, pull_request]
+# A pull request runs once, on its pull_request event: a push to a branch other than main runs
+# nothing on its own, so a branch with an open PR is not checked twice per push. main runs on push
+# (every merge is a PR, so that is the post-merge record); tags are phar.yml's. A new push to a PR
+# cancels the run still going for the old head — the checks the ruleset waits for are the new
+# head's — while on main every push keeps its own run.
+on:
+  push:
+    branches: [main]
+  pull_request:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   tests:
     runs-on: ubuntu-latest
