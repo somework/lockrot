@@ -283,6 +283,24 @@ final class TableFormatterTest extends TestCase
      * The summary block is part of a width-aware report too: its lines fold at the full width with
      * no indent, since each is a fact of its own rather than a continuation hanging under a label.
      */
+    /**
+     * The counts line folds between items, by byte length as {@see TableFormatter::wrap()} counts:
+     * `6 packages checked · abandoned 2 · silent 0 · pinned 0` is 57 bytes (four two-byte dots),
+     * so `left-behind 0` fits exactly at 73 and starts the next line at 72.
+     */
+    public function testTheCountsLineFoldsBetweenItemsAtTheExactByteWidth(): void
+    {
+        $fits = $this->plainLines($this->formatter(73)->format($this->report()));
+        $wraps = $this->plainLines($this->formatter(72)->format($this->report()));
+
+        self::assertContains('6 packages checked · abandoned 2 · silent 0 · pinned 0 · left-behind 0 ·', $fits);
+        self::assertContains('6 packages checked · abandoned 2 · silent 0 · pinned 0 ·', $wraps);
+        self::assertNotEmpty(array_filter($wraps, static fn (string $line): bool => strpos($line, 'left-behind 0 · old-promise 0 ·') === 0), 'the item that did not fit opens the next line');
+        foreach ($wraps as $line) {
+            self::assertLessThanOrEqual(72, \strlen($line));
+        }
+    }
+
     public function testTheSummaryBlockIsWrappedToTheTerminalWidth(): void
     {
         $lines = $this->plainLines($this->formatter(60)->format($this->report()));
