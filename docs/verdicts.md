@@ -77,14 +77,15 @@ At the high threshold the verdict is `left-behind`; below it, `stale`, as an old
 push would be.
 
 ```text
-  left-behind  hashids/hashids 4.1.0  direct
-               last release 2023-02-23 (3.6 years ago); released 2020-11-26, before PHP 8.4 GA
-               (2024-11-21); php constraint ">=7.3" has no upper bound; branch 4.x last released
-               2020-11-26 (5.8 years ago); upstream moved on to 5.0.2 (2023-02-23)
+  left-behind  smalot/pdfparser v1.1.0  via j0k3r/graby
+               released 2021-08-03, before PHP 8.4 GA (2024-11-21); php constraint ">=7.1" has no
+               upper bound; branch 1.x last released 2021-08-03 (5.1 years ago); upstream moved on
+               to v2.12.5 (2026-04-17)
 ```
 
-S2 saw the package's last release at 3.6 years and said `stale`; the branch installed here has
-been quiet for 5.8, and 5.0 shipped in between.
+S2 has nothing to say — the package released five months ago — and `old-promise` alone would have
+read as a constraint problem. The branch installed here has been quiet for 5.1 years while 2.x
+kept going.
 
 A branch snapshot (`dev-master`, `2.x-dev`) belongs to no branch and is `pinned`. A package whose
 installed version is not on any branch the repository lists — a private fork, say — carries no S8.
