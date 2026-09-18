@@ -67,14 +67,17 @@ high (58)
   abandoned    hoa/consistency 1.17.05.02  via wallabag/rulerz, also via wallabag/rulerz-bundle
                marked abandoned by its repository; last release 2017-08-29 (9.0 years ago); repository archived on
                GitHub; last push 2021-04-28 (5.4 years ago); released 2017-05-02, before PHP 8.4 GA (2024-11-21); php
-               constraint ">=5.5.0" has no upper bound
+               constraint ">=5.5.0" has no upper bound; branch 1.x last released 2017-05-02 (9.4 years ago); upstream
+               moved on to 2.17.08.29 (2017-08-29)
   abandoned    hoa/event 1.17.01.13  via wallabag/rulerz › hoa/consistency › hoa/exception, also via
                wallabag/rulerz-bundle
                marked abandoned by its repository; last release 2017-08-30 (9.0 years ago); repository archived on
-               GitHub; last push 2021-04-29 (5.4 years ago)
+               GitHub; last push 2021-04-29 (5.4 years ago); branch 1.x last released 2017-01-13 (9.7 years ago);
+               upstream moved on to 2.17.08.30 (2017-08-30)
   abandoned    hoa/exception 1.17.01.16  via wallabag/rulerz › hoa/consistency, also via wallabag/rulerz-bundle
                marked abandoned by its repository; last release 2017-08-30 (9.0 years ago); repository archived on
-               GitHub; last push 2021-04-29 (5.4 years ago)
+               GitHub; last push 2021-04-29 (5.4 years ago); branch 1.x last released 2017-01-16 (9.7 years ago);
+               upstream moved on to 2.17.08.30 (2017-08-30)
   abandoned    hoa/file 1.17.07.11  via wallabag/rulerz › hoa/ruler, also via wallabag/rulerz-bundle
                marked abandoned by its repository; last release 2017-07-11 (9.2 years ago); repository archived on
                GitHub; last push 2018-01-23 (8.6 years ago)
@@ -153,8 +156,9 @@ high (58)
                last release 2021-08-15 (5.1 years ago); released 2021-08-15, before PHP 8.4 GA (2024-11-21); php
                constraint ">=7.0" has no upper bound; pulls in 1 flagged package: pragmarx/random (silent)
   old-promise  scheb/2fa-bundle v5.13.2  direct
-               released 2022-04-16, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound; pulls
-               in 1 flagged package: symfony/security-guard (abandoned)
+               released 2022-04-16, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound; branch
+               5.x last released 2022-04-16 (4.4 years ago); upstream moved on to v8.6.1 (2026-07-10); pulls in 1
+               flagged package: symfony/security-guard (abandoned)
   old-promise  spiriitlabs/form-filter-bundle v10.0.2  direct
                released 2024-08-23, before PHP 8.4 GA (2024-11-21); php constraint ">=7.4" has no upper bound; pulls in
                1 flagged package: doctrine/cache (abandoned)
@@ -214,7 +218,7 @@ high (58)
                grandt/phpresizegif (silent), grandt/phpzipmerge (silent), grandt/relativepath (silent), phpzip/phpzip
                (silent)
 
-medium (12)
+medium (18)
   pinned       wallabag/rulerz-bridge dev-master  via wallabag/rulerz-bundle
                released 2023-12-24, before PHP 8.4 GA (2024-11-21); php constraint ">=7.4" has no upper bound; pinned to
                branch snapshot dev-master
@@ -223,12 +227,14 @@ medium (12)
   old-promise  friendsofphp/proxy-manager-lts v1.0.18  via symfony/proxy-manager-bridge
                released 2024-03-20, before PHP 8.4 GA (2024-11-21); php constraint ">=7.1" has no upper bound
   old-promise  smalot/pdfparser v1.1.0  via j0k3r/graby
-               released 2021-08-03, before PHP 8.4 GA (2024-11-21); php constraint ">=7.1" has no upper bound
+               released 2021-08-03, before PHP 8.4 GA (2024-11-21); php constraint ">=7.1" has no upper bound; branch
+               1.x last released 2021-10-18 (4.9 years ago); upstream moved on to v2.12.5 (2026-04-17)
   old-promise  symfony/property-access v5.4.45  via babdev/pagerfanta-bundle, also via craue/config-bundle,
                friendsofsymfony/oauth-server-bundle, friendsofsymfony/user-bundle and 12 more
                released 2024-09-25, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound
   old-promise  symfony/psr-http-message-bridge v2.3.1  via sentry/sentry-symfony
-               released 2023-07-26, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound
+               released 2023-07-26, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound; branch
+               2.x last released 2023-07-26 (3.1 years ago); upstream moved on to v8.1.0 (2026-05-29)
   old-promise  symfony/serializer v5.4.45  via friendsofsymfony/jsrouting-bundle
                released 2024-09-25, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound
   old-promise  symfony/service-contracts v2.5.4  via doctrine/doctrine-bundle, also via babdev/pagerfanta-bundle,
@@ -246,18 +252,39 @@ medium (12)
                before PHP 8.4 GA (2024-11-21); php constraint ">=7.1.0" has no upper bound
   stale        craue/config-bundle 2.7.0  direct
                last release 2023-08-06 (3.1 years ago); pulls in 1 flagged package: doctrine/cache (abandoned)
+  stale        doctrine/event-manager 1.2.0  direct
+               branch 1.x last released 2022-10-12 (3.9 years ago); upstream moved on to 2.1.1 (2026-01-29)
+  stale        lcobucci/jwt 4.3.0  direct
+               branch 4.x last released 2023-01-02 (3.7 years ago); upstream moved on to 5.6.0 (2025-10-17)
+  stale        scheb/2fa-backup-code v5.13.2  direct
+               branch 5.x last released 2022-01-03 (4.7 years ago); upstream moved on to v7.14.0 (2026-01-24); pulls in
+               1 flagged package: symfony/security-guard (abandoned)
+  stale        scheb/2fa-email v5.13.2  direct
+               branch 5.x last released 2022-01-03 (4.7 years ago); upstream moved on to v7.14.0 (2026-06-08); pulls in
+               1 flagged package: symfony/security-guard (abandoned)
+  stale        scheb/2fa-google-authenticator v5.13.2  direct
+               branch 5.x last released 2022-01-03 (4.7 years ago); upstream moved on to v7.14.0 (2026-01-24); pulls in
+               3 flagged packages: symfony/security-guard (abandoned), spomky-labs/otphp (stale), thecodingmachine/safe
+               (stale)
+  stale        scheb/2fa-trusted-device v5.13.2  direct
+               branch 5.x last released 2022-01-03 (4.7 years ago); upstream moved on to v7.14.0 (2026-01-24); pulls in
+               1 flagged package: symfony/security-guard (abandoned)
 
-low (2)
+low (4)
   stale        friendsofsymfony/oauth2-php 1.3.1  via friendsofsymfony/oauth-server-bundle
                last release 2021-04-06 (5.4 years ago)
   stale        phpdocumentor/reflection-common 2.2.0  via nelmio/api-doc-bundle › phpdocumentor/reflection-docblock
                last release 2020-06-27 (6.2 years ago)
+  stale        spomky-labs/otphp v10.0.3  via scheb/2fa-google-authenticator
+               branch 10.x last released 2022-03-17 (4.5 years ago); upstream moved on to 11.5.0 (2026-06-06)
+  stale        thecodingmachine/safe v2.5.0  via scheb/2fa-google-authenticator › spomky-labs/otphp
+               branch 2.x last released 2023-04-05 (3.4 years ago); upstream moved on to v3.4.0 (2026-02-04)
 
-200 packages checked · abandoned 19 · silent 8 · pinned 4 · old-promise 41 · stale 3 · unknown 0 · finished 18 ·
-ok 107
-priority: critical 3 · high 58 · medium 12 · low 2
-pulled in by: wallabag/rulerz-bundle 15 · wallabag/rulerz 14 · wallabag/phpepub 5 · friendsofsymfony/jsrouting-bundle
-2 · friendsofsymfony/oauth-server-bundle 2 · … and 21 more
+200 packages checked · abandoned 19 · silent 8 · pinned 4 · left-behind 0 · old-promise 41 · stale 11 · unknown 0
+· finished 18 · ok 99
+priority: critical 3 · high 58 · medium 18 · low 4
+pulled in by: wallabag/rulerz-bundle 15 · wallabag/rulerz 14 · wallabag/phpepub 5 · scheb/2fa-google-authenticator 3
+· friendsofsymfony/jsrouting-bundle 2 · … and 21 more
 Data as of 2026-09-15 (package repositories, repository hosts). Run composer lockrot --format=json for details.
 ```
 
@@ -282,18 +309,19 @@ list, which `…` stands in for:
         "abandoned": 19,
         "silent": 8,
         "pinned": 4,
+        "left-behind": 0,
         "old-promise": 41,
-        "stale": 3,
+        "stale": 11,
         "unknown": 0,
         "finished": 18,
-        "ok": 107
+        "ok": 99
     },
     "priorities": {
         "critical": 3,
         "high": 58,
-        "medium": 12,
-        "low": 2,
-        "none": 125
+        "medium": 18,
+        "low": 4,
+        "none": 117
     },
     "exposure": [
         {
@@ -371,8 +399,8 @@ with nothing to report, the same command prints:
 ```text
 No dependency rot found in 20 packages.
 
-20 packages checked · abandoned 0 · silent 0 · pinned 0 · old-promise 0 · stale 0 · unknown 0
-· finished 11 · ok 9
+20 packages checked · abandoned 0 · silent 0 · pinned 0 · left-behind 0 · old-promise 0 ·
+stale 0 · unknown 0 · finished 11 · ok 9
 Data as of 2026-09-15 (package repositories, repository hosts). Run composer lockrot --format=json for
 details.
 ```
