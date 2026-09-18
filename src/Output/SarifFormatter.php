@@ -60,6 +60,10 @@ final class SarifFormatter implements FormatterInterface
             'Installed version is a branch snapshot, or the package has no stable release',
             'The installed version is a branch snapshot (dev-* or #hash), or the package has no stable release at all.',
         ],
+        Verdict::LEFT_BEHIND => [
+            'The installed release branch stopped while a newer branch kept releasing',
+            "No stable release on the installed version's branch for at least release-high-years (default 5 years), while a higher branch has released since: the package is alive, the branch installed here gets no fixes.",
+        ],
         Verdict::OLD_PROMISE => [
             "Released before the target PHP's GA date with an open-ended php constraint",
             "The installed version was released before the target PHP's GA date, and its require.php constraint is open-ended (>=N, *) for that target.",

@@ -128,7 +128,7 @@ final class ReportTest extends TestCase
         );
     }
 
-    public function testByVerdictHasAllEightKeysWithZeros(): void
+    public function testByVerdictHasAllNineKeysWithZeros(): void
     {
         $report = new Report([], [], new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), 0, 0, false);
         self::assertSame(
@@ -136,6 +136,7 @@ final class ReportTest extends TestCase
                 Verdict::ABANDONED => 0,
                 Verdict::SILENT => 0,
                 Verdict::PINNED => 0,
+                Verdict::LEFT_BEHIND => 0,
                 Verdict::OLD_PROMISE => 0,
                 Verdict::STALE => 0,
                 Verdict::UNKNOWN => 0,

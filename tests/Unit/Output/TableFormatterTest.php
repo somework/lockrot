@@ -265,7 +265,7 @@ final class TableFormatterTest extends TestCase
         $lines = $this->plainLines($this->formatter(200)->format($this->report()));
         $tail = \array_slice($lines, -4);
 
-        self::assertSame('6 packages checked · abandoned 2 · silent 0 · pinned 0 · old-promise 0 · stale 2 · unknown 0 · finished 1 · ok 1', $tail[0]);
+        self::assertSame('6 packages checked · abandoned 2 · silent 0 · pinned 0 · left-behind 0 · old-promise 0 · stale 2 · unknown 0 · finished 1 · ok 1', $tail[0]);
         self::assertSame('priority: critical 1 · high 1 · medium 1 · low 1', $tail[1]);
         self::assertSame('Data as of 2026-09-14 (package repositories, repository hosts). Run composer lockrot --format=json for details.', $tail[2]);
         self::assertSame('note: GitHub token not set: repository activity checked only for 2 candidate packages (0 skipped); set GITHUB_TOKEN to check all', $tail[3]);
@@ -292,7 +292,7 @@ final class TableFormatterTest extends TestCase
         }
         // the counts line and the note folded, and each continuation starts in column 1
         $plain = implode("\n", $lines);
-        self::assertStringContainsString("6 packages checked · abandoned 2 · silent 0 · pinned 0 ·\nold-promise 0 ·", $plain);
+        self::assertStringContainsString("6 packages checked · abandoned 2 · silent 0 · pinned 0 ·\nleft-behind 0 · old-promise 0 ·", $plain);
         self::assertStringContainsString("note: GitHub token not set: repository activity checked only\nfor 2 candidate packages", $plain);
     }
 
@@ -335,7 +335,8 @@ final class TableFormatterTest extends TestCase
     {
         $at = new \DateTimeImmutable(self::AT);
         $report = new Report([new Finding('vendor/ok', '1.0.0', Verdict::OK, [], ['vendor/ok'], null, $at)], [], $at, 1, 0, false);
-        $lines = $this->plainLines($this->formatter()->format($report));
+        // wide enough that the nine-verdict counts line does not fold
+        $lines = $this->plainLines($this->formatter(200)->format($report));
 
         self::assertSame('No dependency rot found in 1 packages.', $lines[0]);
         // the same blank line a grouped report puts before its summary block

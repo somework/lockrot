@@ -9,6 +9,7 @@ final class Verdict
     public const ABANDONED = 'abandoned';
     public const SILENT = 'silent';
     public const PINNED = 'pinned';
+    public const LEFT_BEHIND = 'left-behind';
     public const OLD_PROMISE = 'old-promise';
     public const STALE = 'stale';
     public const UNKNOWN = 'unknown';
@@ -16,7 +17,7 @@ final class Verdict
     public const OK = 'ok';
 
     private const SEVERITY = [
-        self::ABANDONED => 60, self::SILENT => 50, self::PINNED => 40, self::OLD_PROMISE => 30,
+        self::ABANDONED => 60, self::SILENT => 50, self::PINNED => 40, self::LEFT_BEHIND => 35, self::OLD_PROMISE => 30,
         self::STALE => 20, self::UNKNOWN => 10, self::FINISHED => 0, self::OK => 0,
     ];
 

@@ -34,6 +34,7 @@ final class Priority
         Verdict::ABANDONED => self::CRITICAL,
         Verdict::SILENT => self::CRITICAL,
         Verdict::PINNED => self::HIGH,
+        Verdict::LEFT_BEHIND => self::HIGH,
         Verdict::OLD_PROMISE => self::HIGH,
         Verdict::STALE => self::MEDIUM,
     ];

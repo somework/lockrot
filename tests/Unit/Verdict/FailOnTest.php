@@ -24,7 +24,7 @@ final class FailOnTest extends TestCase
 
     public function testTheAllowedValuesAreNoneTheFlaggedVerdictsAndThePriorities(): void
     {
-        self::assertSame(['none', 'abandoned', 'silent', 'pinned', 'old-promise', 'stale', 'critical', 'high', 'medium', 'low'], FailOn::allowed());
+        self::assertSame(['none', 'abandoned', 'silent', 'pinned', 'left-behind', 'old-promise', 'stale', 'critical', 'high', 'medium', 'low'], FailOn::allowed());
         foreach (FailOn::allowed() as $value) {
             self::assertSame($value, FailOn::fromString($value)->value());
         }
@@ -35,7 +35,7 @@ final class FailOnTest extends TestCase
     public function testAnythingElseIsRejectedWithTheFullList(string $value): void
     {
         $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage('fail-on must be one of none, abandoned, silent, pinned, old-promise, stale, critical, high, medium, low; got "'.$value.'"');
+        $this->expectExceptionMessage('fail-on must be one of none, abandoned, silent, pinned, left-behind, old-promise, stale, critical, high, medium, low; got "'.$value.'"');
         FailOn::fromString($value);
     }
 

@@ -14,6 +14,10 @@ final class Signal
     public const S6 = 'S6';
     /** Transitive exposure: attached to a direct requirement whose subtree holds flagged packages. Never decides a verdict. */
     public const S7 = 'S7';
+    /** The installed release branch has gone quiet while a higher branch kept releasing. */
+    public const S8 = 'S8';
+    /** Security advisories affecting the installed version. Never decides a verdict; raises the priority where no fix is coming. */
+    public const S9 = 'S9';
     public const LEVEL_INFO = 'info';
     public const LEVEL_WARN = 'warn';
     public const LEVEL_HIGH = 'high';

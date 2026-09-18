@@ -26,7 +26,16 @@ final class PackageMetadata
     private ?string $repositoryUrl;
     private string $type;
     private \DateTimeImmutable $dataDate;
+    /**
+     * The highest stable release on each release branch ({@see ReleaseBranch}) and its date, by
+     * branch key — an integer key where PHP makes one of `"1"`. What
+     * {@see \Lockrot\Signal\Rule\LeftBehindRule} compares the installed branch against.
+     *
+     * @var array<array-key, array{version: string, at: ?\DateTimeImmutable}>
+     */
+    private array $latestStableByBranch;
 
+    /** @param array<array-key, array{version: string, at: ?\DateTimeImmutable}> $latestStableByBranch */
     public function __construct(
         string $name,
         bool $abandoned,
@@ -37,7 +46,8 @@ final class PackageMetadata
         int $releaseCount,
         ?string $repositoryUrl,
         string $type,
-        \DateTimeImmutable $dataDate
+        \DateTimeImmutable $dataDate,
+        array $latestStableByBranch = []
     ) {
         $this->name = $name;
         $this->abandoned = $abandoned;
@@ -49,6 +59,7 @@ final class PackageMetadata
         $this->repositoryUrl = $repositoryUrl;
         $this->type = $type;
         $this->dataDate = $dataDate;
+        $this->latestStableByBranch = $latestStableByBranch;
     }
 
     /**
@@ -78,6 +89,8 @@ final class PackageMetadata
         $lastStableVersion = null;
         $highestStable = null;
         $type = null;
+        $byBranch = [];
+        $highestByBranch = [];
 
         foreach ($versions as $version) {
             if (!$abandoned && $version instanceof CompletePackage && $version->isAbandoned()) {
@@ -96,6 +109,11 @@ final class PackageMetadata
                         $lastStableReleaseAt = $releaseDate;
                         $lastStableVersion = $version->getPrettyVersion();
                     }
+                }
+                $branch = ReleaseBranch::of($version->getVersion());
+                if ($branch !== null && (!isset($highestByBranch[$branch]) || Comparator::greaterThan($version->getVersion(), $highestByBranch[$branch]))) {
+                    $highestByBranch[$branch] = $version->getVersion();
+                    $byBranch[$branch] = ['version' => $version->getPrettyVersion(), 'at' => $releaseDate];
                 }
             }
             if ($type === null) {
@@ -116,7 +134,8 @@ final class PackageMetadata
             \count($versions),
             $anchor !== null ? self::repositoryOf($anchor) : null,
             $type ?? 'library',
-            $dataDate
+            $dataDate,
+            $byBranch
         );
     }
 
@@ -190,5 +209,17 @@ final class PackageMetadata
     public function lastStableVersion(): ?string
     {
         return $this->lastStableVersion;
+    }
+
+    /**
+     * The highest stable release on every release branch and its date, keyed by
+     * {@see ReleaseBranch} key (an integer where PHP makes one of `"1"`); the date is null when that
+     * release carries no `time`.
+     *
+     * @return array<array-key, array{version: string, at: ?\DateTimeImmutable}>
+     */
+    public function latestStableByBranch(): array
+    {
+        return $this->latestStableByBranch;
     }
 }

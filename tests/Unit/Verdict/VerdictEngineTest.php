@@ -38,6 +38,13 @@ final class VerdictEngineTest extends TestCase
         yield 'silent' => [[$s('S2', $h), $s('S4', $h)], false, true, Verdict::SILENT];
         yield 'S2 high + S4 warn is stale' => [[$s('S2', $h), $s('S4', $w)], false, true, Verdict::STALE];
         yield 'S2 warn + S4 high is stale' => [[$s('S2', $w), $s('S4', $h)], false, true, Verdict::STALE];
+        yield 'S8 high is left-behind' => [[$s('S8', $h)], false, true, Verdict::LEFT_BEHIND];
+        yield 'S8 warn alone is stale' => [[$s('S8', $w)], false, true, Verdict::STALE];
+        yield 'S8 high beats S5' => [[$s('S5', $w), $s('S8', $h)], false, true, Verdict::LEFT_BEHIND];
+        yield 'S5 beats S8 warn' => [[$s('S5', $w), $s('S8', $w)], false, true, Verdict::OLD_PROMISE];
+        yield 'S6 beats S8 high' => [[$s('S6', $w), $s('S8', $h)], false, true, Verdict::PINNED];
+        yield 'silent beats S8 high' => [[$s('S2', $h), $s('S4', $h), $s('S8', $h)], false, true, Verdict::SILENT];
+        yield 'S2 warn + S8 high is left-behind' => [[$s('S2', $w), $s('S8', $h)], false, true, Verdict::LEFT_BEHIND];
         yield 'S2 high alone is stale' => [[$s('S2', $h)], false, true, Verdict::STALE];
         yield 'S4 alone is stale' => [[$s('S4', $w)], false, true, Verdict::STALE];
         yield 'pinned beats old-promise and stale' => [[$s('S6', $w), $s('S5', $w), $s('S2', $h)], false, true, Verdict::PINNED];
@@ -68,7 +75,7 @@ final class VerdictEngineTest extends TestCase
         self::assertFalse(Verdict::isValid('dead'));
         self::assertSame(0, Verdict::severity('not-a-real-verdict'));
         self::assertSame(
-            [Verdict::ABANDONED, Verdict::SILENT, Verdict::PINNED, Verdict::OLD_PROMISE, Verdict::STALE, Verdict::UNKNOWN, Verdict::FINISHED, Verdict::OK],
+            [Verdict::ABANDONED, Verdict::SILENT, Verdict::PINNED, Verdict::LEFT_BEHIND, Verdict::OLD_PROMISE, Verdict::STALE, Verdict::UNKNOWN, Verdict::FINISHED, Verdict::OK],
             Verdict::all()
         );
     }

@@ -25,6 +25,7 @@ final class PriorityTest extends TestCase
             Verdict::ABANDONED => [Priority::CRITICAL, Priority::HIGH, Priority::HIGH, Priority::MEDIUM],
             Verdict::SILENT => [Priority::CRITICAL, Priority::HIGH, Priority::HIGH, Priority::MEDIUM],
             Verdict::PINNED => [Priority::HIGH, Priority::MEDIUM, Priority::MEDIUM, Priority::LOW],
+            Verdict::LEFT_BEHIND => [Priority::HIGH, Priority::MEDIUM, Priority::MEDIUM, Priority::LOW],
             Verdict::OLD_PROMISE => [Priority::HIGH, Priority::MEDIUM, Priority::MEDIUM, Priority::LOW],
             Verdict::STALE => [Priority::MEDIUM, Priority::LOW, Priority::LOW, Priority::LOW],
             Verdict::UNKNOWN => [Priority::NONE, Priority::NONE, Priority::NONE, Priority::NONE],
@@ -46,7 +47,7 @@ final class PriorityTest extends TestCase
 
     public function testEveryVerdictIsCovered(): void
     {
-        self::assertCount(8, Verdict::all(), 'the case table above enumerates every verdict');
+        self::assertCount(9, Verdict::all(), 'the case table above enumerates every verdict');
     }
 
     public function testRank(): void
