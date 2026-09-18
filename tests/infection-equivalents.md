@@ -229,8 +229,8 @@ The memo changes how often the work is done, not what it answers.
 
 ## src/Data/Repository/ReleaseBranch.php and src/Signal/Rule/LeftBehindRule.php (left-behind, 2026-09-18)
 
-- `src/Data/Repository/ReleaseBranch.php:32` PregMatchRemoveCaret — `of()` matches
-  `^(\d+)\.(\d+)\.` against a string `VersionParser::normalize()` returned for a non-dev version,
+- `src/Data/Repository/ReleaseBranch.php:33` PregMatchRemoveCaret — `of()` matches
+  `^(\d+)\.(\d+)\.(\d+)\.` against a string `VersionParser::normalize()` returned for a non-dev version,
   which always starts with the major digits: the anchor cannot move the match.
 - `src/Signal/Rule/LeftBehindRule.php:66` LessThanOrEqualTo — `$release['at'] <= $own['at']`
   becoming `<` admits a higher branch released the very same instant as the installed one's last

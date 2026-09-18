@@ -314,16 +314,22 @@ final class TableFormatter implements FormatterInterface
      * separator stays at the end of the line it closes. An item wider than the terminal is left
      * whole, as {@see wrap()} leaves a long token.
      *
+     * Counted in bytes as {@see wrap()} counts: the four of the ` · ` an item is joined with, and
+     * for any item but the last the three of the ` ·` that closes the line should the next item
+     * not fit — so a line is never wider than $wrap, closing separator included.
+     *
      * @return list<string>
      */
     private static function wrapBetweenItems(string $text, int $wrap): array
     {
         $lines = [];
         $line = '';
-        foreach (explode(' · ', $text) as $item) {
+        $items = explode(' · ', $text);
+        $last = \count($items) - 1;
+        foreach ($items as $i => $item) {
             if ($line === '') {
                 $line = $item;
-            } elseif (\strlen($line) + 3 + \strlen($item) <= $wrap) {
+            } elseif (\strlen($line) + 4 + \strlen($item) + ($i === $last ? 0 : 3) <= $wrap) {
                 $line .= ' · '.$item;
             } else {
                 $lines[] = self::escape($line.' ·');

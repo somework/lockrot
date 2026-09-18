@@ -150,6 +150,41 @@ final class AdvisoryRuleTest extends TestCase
         }
     }
 
+    /**
+     * The repository lists nothing above what is installed — a tag since deleted, a pre-release
+     * ahead of every stable tag, a pretty version no parser reads. A tag the range spares is not a
+     * fix when reaching it means going back, so none is named.
+     */
+    public function testATagBelowTheInstalledVersionIsNoFixEvenWhenTheRangeSparesIt(): void
+    {
+        $listedBelow = F::metadata([['1.9.0', '2026-01-01T00:00:00+00:00'], ['1.0.0', '2020-01-01T00:00:00+00:00']]);
+
+        foreach ([
+            'installed above every tag on its branch' => F::facts(F::package(['version' => '1.9.5']), $listedBelow, null, [$this->ranged('CVE-1', '>=1.9.1')]),
+            'a pre-release of a major with no stable tag yet' => F::facts(F::package(['version' => '2.0.0-beta1']), $listedBelow, null, [$this->ranged('CVE-1', '>=2.0.0-alpha1')]),
+            'an unparsable installed version' => F::facts(F::package(['version' => 'not-a-version']), $listedBelow, null, [$this->ranged('CVE-1', '>=1.9.1')]),
+        ] as $case => $facts) {
+            $signal = (new AdvisoryRule())->evaluate($facts);
+            self::assertNotNull($signal, $case);
+            self::assertSame('1 security advisory affects '.$facts->package()->version().' (CVE-1)', $signal->summary(), $case);
+            self::assertNull(self::row($signal, 0)['fixed_by'], $case);
+            self::assertFalse(self::row($signal, 0)['fixed_on_branch'], $case);
+        }
+    }
+
+    /** The branch's tag is below the installed version, the package's above it: only the second is a candidate. */
+    public function testWithTheBranchsTagBelowTheInstalledVersionOnlyThePackagesTagCounts(): void
+    {
+        $meta = F::metadata([['2.0.0', '2026-01-01T00:00:00+00:00'], ['1.9.0', '2020-01-01T00:00:00+00:00']]);
+        $facts = F::facts(F::package(['version' => '1.9.5']), $meta, null, [$this->ranged('CVE-1', '>=1.9.1,<2.0.0')]);
+
+        $signal = (new AdvisoryRule())->evaluate($facts);
+
+        self::assertNotNull($signal);
+        self::assertSame('1 security advisory affects 1.9.5 (CVE-1); fixed by 2.0.0', $signal->summary());
+        self::assertFalse(self::row($signal, 0)['fixed_on_branch'], '1.9.0 spares the range but is below 1.9.5: not the branch\'s fix');
+    }
+
     /** A branch snapshot has no branch, but the package's highest tag can still carry the fix. */
     public function testABranchSnapshotIsCheckedAgainstThePackagesHighestTagOnly(): void
     {
