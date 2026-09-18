@@ -16,8 +16,9 @@ use Lockrot\Signal\Thresholds;
 
 /**
  * S8: the package is alive, the installed branch is not. The highest stable release on the
- * installed version's branch ({@see ReleaseBranch}) is older than the release thresholds, while
- * some higher branch has released since. S2 cannot see this — it reads the package's newest
+ * installed version's branch ({@see ReleaseBranch}) is older than `release-warn-years`, while
+ * some higher branch has released since. The verdict is `left-behind` at either level; the level
+ * only records whether the branch has also passed `release-high-years`. S2 cannot see this — it reads the package's newest
  * release, which is exactly the one that is fresh here — and `composer outdated` says a newer
  * major exists without saying that the one installed gets no fixes.
  *

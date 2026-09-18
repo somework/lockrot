@@ -87,11 +87,11 @@ final class FindingTest extends TestCase
 
         $pinned = new Finding('vendor/pkg', 'dev-master', Verdict::PINNED, [$s5, $s6, $s7], ['vendor/pkg'], null, null);
         $leftBehind = new Finding('vendor/pkg', '3.1.1', Verdict::LEFT_BEHIND, [$s5, $s8], ['root/app', 'vendor/pkg'], null, null);
-        $oldPromise = new Finding('vendor/pkg', '3.1.1', Verdict::OLD_PROMISE, [$s5, new Signal('S8', 'warn', 'branch 3.x …')], ['vendor/pkg'], null, null);
+        $oldPromise = new Finding('vendor/pkg', '3.1.1', Verdict::OLD_PROMISE, [$s5, new Signal('S2', 'warn', 'last release 2022-01-01 …')], ['vendor/pkg'], null, null);
 
         self::assertSame($s6->summary().'; '.$s5->summary().'; '.$s7->summary(), $pinned->evidence(), 'S7 still closes the line');
         self::assertSame($s8->summary().'; '.$s5->summary(), $leftBehind->ownEvidence());
-        self::assertSame($s5->summary().'; branch 3.x …', $oldPromise->ownEvidence(), 'signal order when the deciding one is already first');
+        self::assertSame($s5->summary().'; last release 2022-01-01 …', $oldPromise->ownEvidence(), 'signal order when the deciding one is already first');
         $signals = $pinned->toArray()['signals'];
         self::assertIsArray($signals);
         self::assertSame(['S5', 'S6', 'S7'], array_column($signals, 'id'), 'the JSON keeps signal order');
@@ -100,21 +100,22 @@ final class FindingTest extends TestCase
         self::assertSame($s6->summary().'; '.$s5->summary(), $s7First->ownEvidence(), 'S7 anywhere in the list is skipped, not a stop');
     }
 
-    public function testAnAdvisoryOnABranchS8NamesIsUnfixableWhateverTheVerdict(): void
+    /** S8 at either level makes the verdict `left-behind` ({@see VerdictEngine}); the raise follows the verdict, not the signal. */
+    public function testAnAdvisoryOnALeftBehindBranchIsUnfixableAtEitherLevel(): void
     {
         $s9 = new Signal('S9', 'warn', '14 security advisories affect 6.5.5 (CVE-a, CVE-b, CVE-c and 11 more)', ['advisories' => []]);
         $s8warn = new Signal('S8', 'warn', 'branch 6.x last released 2022-06-20 (4.2 years ago); 8.x released 8.2.0 (2026-09-06)');
         $s5 = new Signal('S5', 'warn', 'released 2020-06-16, before PHP 8.4 GA (2024-11-21); php constraint ">=5.5" has no upper bound');
 
-        $oldPromise = new Finding('guzzlehttp/guzzle', '6.5.5', Verdict::OLD_PROMISE, [$s5, $s8warn, $s9], ['guzzlehttp/guzzle'], null, null, null, false, ['guzzlehttp/guzzle']);
-        $stale = new Finding('guzzlehttp/guzzle', '6.5.5', Verdict::STALE, [$s8warn, $s9], ['guzzlehttp/guzzle'], null, null, null, false, ['guzzlehttp/guzzle']);
+        $leftBehind = new Finding('guzzlehttp/guzzle', '6.5.5', Verdict::LEFT_BEHIND, [$s5, $s8warn, $s9], ['guzzlehttp/guzzle'], null, null, null, false, ['guzzlehttp/guzzle']);
+        $oldPromise = new Finding('guzzlehttp/guzzle', '6.5.5', Verdict::OLD_PROMISE, [$s5, $s9], ['guzzlehttp/guzzle'], null, null, null, false, ['guzzlehttp/guzzle']);
         $finished = new Finding('guzzlehttp/guzzle', '6.5.5', Verdict::FINISHED, [$s8warn, $s9], ['guzzlehttp/guzzle'], 'frozen', null, null, false, ['guzzlehttp/guzzle']);
 
-        self::assertTrue($oldPromise->hasUnfixableAdvisory());
-        self::assertSame(Priority::CRITICAL, $oldPromise->priority(), 'high raised to critical');
-        self::assertStringEndsWith('; no fix expected', $oldPromise->ownEvidence());
-        self::assertTrue($stale->hasUnfixableAdvisory());
-        self::assertSame(Priority::HIGH, $stale->priority(), 'medium raised to high');
+        self::assertTrue($leftBehind->hasUnfixableAdvisory());
+        self::assertSame(Priority::CRITICAL, $leftBehind->priority(), 'high raised to critical');
+        self::assertSame($s8warn->summary().'; '.$s5->summary().'; '.$s9->summary().'; no fix expected', $leftBehind->ownEvidence());
+        self::assertFalse($oldPromise->hasUnfixableAdvisory(), 'an open php constraint says nothing about whether a fix is coming');
+        self::assertSame(Priority::HIGH, $oldPromise->priority());
         self::assertFalse($finished->hasUnfixableAdvisory(), 'an allowlisted package is never raised: the allowlist decided');
     }
 

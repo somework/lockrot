@@ -79,7 +79,7 @@ high (58)
   abandoned    hoa/ruler 2.17.05.16  via wallabag/rulerz, also via wallabag/rulerz-bundle
                marked abandoned by its repository; last release 2017-05-16 (9.3 years ago); …
   …
-200 packages checked · abandoned 19 · silent 8 · pinned 4 · left-behind 1 · old-promise 40 · stale 11 · …
+200 packages checked · abandoned 19 · silent 8 · pinned 4 · left-behind 11 · old-promise 38 · stale 3 · …
 priority: critical 3 · high 58 · medium 18 · low 4
 pulled in by: wallabag/rulerz-bundle 15 · wallabag/rulerz 14 · wallabag/phpepub 5 · …
 …
@@ -100,9 +100,9 @@ Abridged — `…` marks where lines were cut. [The full run →](https://lockro
 | `abandoned` | The package's Composer repository marks it abandoned (Packagist by default), or its repository is archived on GitHub or GitLab |
 | `silent` | No stable release for at least 5 years **and** no repository push for at least 5 years; an archived repository is reported as `abandoned` instead |
 | `pinned` | Installed version is a branch snapshot (`dev-*` or `#hash`), or the package has no stable release at all |
-| `left-behind` | No stable release on the installed version's release branch for at least 5 years while a higher branch has released since, and within the last 3 — the package is alive, the branch you are on is not |
+| `left-behind` | No stable release on the installed version's release branch for at least 3 years while a higher branch has released since, and within the last 3 — the package is alive, the branch you are on is not |
 | `old-promise` | The installed version was released before the target PHP's GA date, and its `require.php` constraint is open-ended (`>=N`, `*`) for that target |
-| `stale` | Old release, old push or a quiet branch, but not old enough (or not on both fronts) for `silent` or `left-behind` |
+| `stale` | Old release or old push, but not old enough (or not on both fronts) for `silent` |
 | `unknown` | No data could be obtained |
 | `finished` | Matched the built-in or project allowlist — the package is complete by design, not neglected |
 | `ok` | None of the above |
@@ -110,8 +110,7 @@ Abridged — `…` marks where lines were cut. [The full run →](https://lockro
 Each finding also carries a priority — `critical`, `high`, `medium`, `low`, or `none` for a package
 the report does not flag. The verdict sets a base level, which drops one step for a transitive
 package and one more for a development-only one, never below `low`. A security advisory on a
-package nobody will fix — `abandoned`, `silent`, `left-behind`, or on a branch the upstream left —
-is the vulnerability `composer audit` reports; here it raises the priority one step and marks the
+package nobody will fix — `abandoned`, `silent`, `left-behind` — is the vulnerability `composer audit` reports; here it raises the priority one step and marks the
 evidence `no fix expected`. The priority orders the report and is carried in every format. **`--fail-on` takes either a verdict or a priority**: `--fail-on=silent`
 fails on what was observed, wherever the package sits; `--fail-on=high` fails on how much it applies
 to this project. The baseline stays on the verdict.

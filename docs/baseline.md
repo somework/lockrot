@@ -55,9 +55,9 @@ regenerate — the file keeps saying how long each finding has been tolerated.
 Once the file exists, every normal run compares against it and says so:
 
 ```text
-200 packages checked · abandoned 19 · silent 8 · pinned 4 · left-behind 1 · old-promise 40 ·
-stale 11 · unknown 0 · finished 18 · ok 99
-priority: critical 3 · high 58 · medium 18 · low 4
+200 packages checked · abandoned 19 · silent 8 · pinned 4 · left-behind 11 ·
+old-promise 38 · stale 3 · unknown 0 · finished 18 · ok 99
+priority: critical 3 · high 64 · medium 14 · low 2
 baseline: 81 known · 1 new · 1 worsened · 0 stale (lockrot-baseline.json)
 ```
 
