@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Signal\Rule;
 
 use Composer\Semver\Comparator;
+use Composer\Semver\VersionParser;
 use Lockrot\Data\Advisory\Advisory;
 use Lockrot\Data\Repository\ReleaseBranch;
 use Lockrot\Signal\PackageFacts;
@@ -103,6 +104,12 @@ final class AdvisoryRule implements SignalRule
      * package's highest stable tag across branches. When the two are one release the second is
      * checked to no effect: what the first did not fix, the same tag does not fix either.
      *
+     * Either counts only above the installed version. The repository can list nothing newer than
+     * what is installed — a lock written against a tag since deleted, a pre-release ahead of every
+     * stable tag — and an advisory whose range spares an older tag is not fixed by going back to
+     * it. A branch snapshot is above no tag and below none; the package's highest tag stands for it
+     * as it is.
+     *
      * @return array{?array{normalized: string, pretty: string}, ?array{normalized: string, pretty: string}}
      */
     private function fixCandidates(PackageFacts $facts): array
@@ -111,8 +118,17 @@ final class AdvisoryRule implements SignalRule
         if ($metadata === null) {
             return [null, null];
         }
+        $version = $facts->package()->version();
+        $installed = null;
+        if (VersionParser::parseStability($version) !== 'dev') {
+            try {
+                $installed = (new VersionParser())->normalize($version);
+            } catch (\UnexpectedValueException $e) {
+                return [null, null];
+            }
+        }
         $byBranch = $metadata->latestStableByBranch();
-        $branch = ReleaseBranch::of($facts->package()->version());
+        $branch = ReleaseBranch::of($version);
         $onBranch = $branch !== null && isset($byBranch[$branch]) ? $byBranch[$branch]['highest'] : null;
         $inPackage = null;
         foreach ($byBranch as $release) {
@@ -121,10 +137,24 @@ final class AdvisoryRule implements SignalRule
             }
         }
 
-        return [
-            $onBranch === null ? null : ['normalized' => $onBranch['normalized'], 'pretty' => $onBranch['pretty']],
-            $inPackage === null ? null : ['normalized' => $inPackage['normalized'], 'pretty' => $inPackage['pretty']],
-        ];
+        return [self::above($onBranch, $installed), self::above($inPackage, $installed)];
+    }
+
+    /**
+     * The tag as a fix candidate, null when there is none or it is not above the installed version.
+     *
+     * @param ?array{normalized: string, pretty: string, at: ?\DateTimeImmutable} $tag
+     * @param ?string                                                             $installed normalized; null for a branch snapshot, which no tag is compared with
+     *
+     * @return ?array{normalized: string, pretty: string}
+     */
+    private static function above(?array $tag, ?string $installed): ?array
+    {
+        if ($tag === null || ($installed !== null && !Comparator::greaterThan($tag['normalized'], $installed))) {
+            return null;
+        }
+
+        return ['normalized' => $tag['normalized'], 'pretty' => $tag['pretty']];
     }
 
     /**

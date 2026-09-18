@@ -15,7 +15,7 @@ was observed about the package. The priority says how much that applies to *your
 | `abandoned` | The package's Composer repository marks it abandoned (Packagist by default), or its repository is archived on GitHub or GitLab | S1 or S3 |
 | `silent` | No stable release for at least `release-high-years` (default 5y) **and** no repository push for at least `push-high-years` (default 5y); an archived repository is reported as `abandoned` instead | S2 high AND S4 high, NOT S1, NOT S3 |
 | `pinned` | Installed version is a branch snapshot — `dev-master`, `dev-main`, any other `dev-*` branch, a `2.x-dev` alias or a `#hash` reference — or the package has no stable release at all | S6 |
-| `left-behind` | No stable release on the installed version's release branch for at least `release-warn-years` (default 3y), while a higher branch has released since — the package is alive, the branch you are on is not | S8 |
+| `left-behind` | No stable release on the installed version's release branch for at least `release-warn-years` (default 3y), while a higher branch has released since and within `release-warn-years` — the package is alive, the branch you are on is not | S8 |
 | `old-promise` | The installed version was released before the target PHP's GA date, and its `require.php` constraint is open-ended (`>=N`, `*`) for that target | S5 |
 | `stale` | Old release or old push, but not old enough (or not on both fronts) for `silent` | one of S2/S4 |
 | `unknown` | No data could be obtained (not found in any configured Composer repository, or all lookups failed) | — |
@@ -68,7 +68,8 @@ fixes any more.
 
 A version's *release branch* is what a caret constraint on it would stay inside: the major for
 anything `>= 1.0` (`1.x`, so `1.2` and `1.9` share it and `2.0` does not), the major and minor
-below that (`0.3.x` for `0.3.*`, as `^0.3` has it). S8 takes the newest stable release on the
+below that (`0.3.x` for `0.3.*`, as `^0.3` has it), and below `0.1` the patch alone (`^0.0.3` is
+`>=0.0.3 <0.0.4`, so `0.0.3` is a branch of its own). S8 takes the newest stable release on the
 installed branch — a backport on a lower minor counts, a pre-release does not — and measures its
 age against `release-warn-years` / `release-high-years`, the S2 thresholds. It fires only when some
 higher branch has released *after* that date and within `release-warn-years` of today: a `2.0` that
@@ -113,7 +114,9 @@ decides a verdict: a vulnerability on a healthy package is audit's finding and s
 priority.
 
 Each advisory is then held against two releases the repository already lists: the highest stable
-tag on the installed version's branch, and the package's highest stable tag. One that neither range
+tag on the installed version's branch, and the package's highest stable tag — each only when it is
+above the installed version, since a tag the range spares is no fix when reaching it means going
+back, and a repository that lists nothing above what is installed names none. One that neither range
 covers is already fixed, and the line says by what — `fixed by v3.4.47` when the branch's tag is
 enough, since a `composer update` inside the constraint gets it; `fixed by v8.1.7` when only the
 package's is. On an `abandoned`, `silent` or `left-behind` package, the advisories nothing listed

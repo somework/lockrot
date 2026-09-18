@@ -10,8 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - `left-behind`: a verdict for the branch you are on, not the package. Signal S8 takes the newest
-  stable release on the installed version's release branch (`1.x`, or `0.3.x` below 1.0 — what a
-  caret constraint stays inside; pre-releases do not count), measures its age against
+  stable release on the installed version's release branch (`1.x`; `0.3.x` below 1.0; the patch
+  alone below 0.1 — what a caret constraint stays inside; pre-releases do not count), measures its age against
   `release-warn-years` / `release-high-years`, and fires only when a higher branch has released
   since and within `release-warn-years` of today — a package dead on every branch stays S2's.
   `composer outdated --major-only` says a newer major exists; S2 sees the package's newest release
@@ -29,8 +29,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   under `data.advisories` in `--format=json`. Advisories the project ignores in Composer's own
   configuration (`config.policy.advisories` on 2.10+, `config.audit.ignore` before) are dropped as
   `composer audit` drops them. S9 never decides a verdict. Each advisory is held against the
-  highest stable tag on the installed version's branch and the package's highest stable tag; one
-  out of both ranges is already fixed, and the line says by what (`fixed by 6.3.0`; `1 fixed by
+  highest stable tag on the installed version's branch and the package's highest stable tag, each
+  only when above the installed version; one out of both ranges is already fixed, and the line says by what (`fixed by 6.3.0`; `1 fixed by
   v3.4.47, 3 fixed by v8.1.7` when they differ), with `affected_versions`, `fixed_by` and
   `fixed_on_branch` on each advisory in the JSON. On an `abandoned`, `silent` or `left-behind`
   package the advisories nothing listed fixes — on a left-behind branch, nothing listed *on the

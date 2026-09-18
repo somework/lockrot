@@ -160,6 +160,19 @@ final class PackageMetadataFromPackagesTest extends TestCase
         self::assertNull($branch['at']);
     }
 
+    /** `^0.0.3` is `>=0.0.3 <0.0.4`: a recent 0.0.4 is another branch and must not stand in for the installed 0.0.3's. */
+    public function testBelowZeroPointOneEveryPatchIsItsOwnBranch(): void
+    {
+        $three = $this->load(['name' => 'a/b', 'version' => '0.0.3', 'time' => '2021-01-01T00:00:00+00:00']);
+        $four = $this->load(['name' => 'a/b', 'version' => '0.0.4', 'time' => '2026-01-01T00:00:00+00:00']);
+
+        $byBranch = PackageMetadata::fromPackages('a/b', [$four, $three], new \DateTimeImmutable(self::FIXED))->latestStableByBranch();
+
+        self::assertSame(['0.0.4', '0.0.3'], array_keys($byBranch));
+        self::assertSame('0.0.3', $byBranch['0.0.3']['version']);
+        self::assertSame('0.0.4.0', $byBranch['0.0.4']['highest']['normalized']);
+    }
+
     public function testAnUndatedHigherTagNeverHidesADatedReleaseOnTheBranch(): void
     {
         $undatedHigher = $this->load(['name' => 'a/b', 'version' => '1.5.0']);

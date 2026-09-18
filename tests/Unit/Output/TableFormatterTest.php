@@ -307,20 +307,40 @@ final class TableFormatterTest extends TestCase
      */
     /**
      * The counts line folds between items, by byte length as {@see TableFormatter::wrap()} counts:
-     * `6 packages checked · abandoned 2 · silent 0 · pinned 0` is 57 bytes (four two-byte dots),
-     * so `left-behind 0` fits exactly at 73 and starts the next line at 72.
+     * `6 packages checked · abandoned 2 · silent 0 · pinned 0` is 57 bytes (three two-byte dots),
+     * ` · left-behind 0` adds 17 and the ` ·` that closes the line 3 more, so the 77-byte line
+     * `… · left-behind 0 ·` is emitted at 77 and `left-behind 0` starts the next line at 76. A line
+     * that closes with its separator is never wider than the terminal.
      */
     public function testTheCountsLineFoldsBetweenItemsAtTheExactByteWidth(): void
     {
-        $fits = $this->plainLines($this->formatter(73)->format($this->report()));
-        $wraps = $this->plainLines($this->formatter(72)->format($this->report()));
+        $fits = $this->plainLines($this->formatter(77)->format($this->report()));
+        $wraps = $this->plainLines($this->formatter(76)->format($this->report()));
 
         self::assertContains('6 packages checked · abandoned 2 · silent 0 · pinned 0 · left-behind 0 ·', $fits);
+        foreach ($fits as $line) {
+            self::assertLessThanOrEqual(77, \strlen($line), $line);
+        }
         self::assertContains('6 packages checked · abandoned 2 · silent 0 · pinned 0 ·', $wraps);
         self::assertNotEmpty(array_filter($wraps, static fn (string $line): bool => strpos($line, 'left-behind 0 · old-promise 0 ·') === 0), 'the item that did not fit opens the next line');
         foreach ($wraps as $line) {
-            self::assertLessThanOrEqual(72, \strlen($line));
+            self::assertLessThanOrEqual(76, \strlen($line), $line);
         }
+    }
+
+    /**
+     * The last item closes no line, so nothing is reserved after it: the 137-byte counts line is
+     * one line at 137, where a closing separator would not have fit, and `ok 1` folds at 136.
+     */
+    public function testTheLastItemNeedsNoRoomForAClosingSeparator(): void
+    {
+        $counts = '6 packages checked · abandoned 2 · silent 0 · pinned 0 · left-behind 0 · old-promise 0 · stale 2 · unknown 0 · finished 1 · ok 1';
+        self::assertSame(137, \strlen($counts));
+
+        self::assertContains($counts, $this->plainLines($this->formatter(137)->format($this->report())));
+        $folded = $this->plainLines($this->formatter(136)->format($this->report()));
+        self::assertContains('6 packages checked · abandoned 2 · silent 0 · pinned 0 · left-behind 0 · old-promise 0 · stale 2 · unknown 0 · finished 1 ·', $folded);
+        self::assertContains('ok 1', $folded);
     }
 
     public function testTheSummaryBlockIsWrappedToTheTerminalWidth(): void

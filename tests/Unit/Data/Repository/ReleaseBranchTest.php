@@ -25,7 +25,9 @@ final class ReleaseBranchTest extends TestCase
         yield 'two-digit major' => ['10.0.1', '10'];
         yield 'release candidate' => ['2.0.0-RC1', '2'];
         yield '0.x is a branch per minor' => ['0.3.1', '0.3'];
-        yield '0.0.x' => ['0.0.4', '0.0'];
+        yield '0.0.x is a branch per patch, as ^0.0.3 is >=0.0.3 <0.0.4' => ['0.0.4', '0.0.4'];
+        yield '0.0.3 is not the 0.0.4 branch' => ['0.0.3', '0.0.3'];
+        yield 'a fourth component stays on its patch' => ['0.0.3.1', '0.0.3'];
         yield 'dev branch' => ['dev-master', null];
         yield 'branch alias' => ['2.x-dev', null];
         yield 'unparsable' => ['not-a-version', null];
@@ -35,6 +37,7 @@ final class ReleaseBranchTest extends TestCase
     {
         self::assertSame('1.x', ReleaseBranch::label('1'));
         self::assertSame('0.3.x', ReleaseBranch::label('0.3'));
+        self::assertSame('0.0.3', ReleaseBranch::label('0.0.3'), 'a one-release branch is named by the release, not 0.0.3.x');
     }
 
     public function testIsAbove(): void
@@ -43,6 +46,8 @@ final class ReleaseBranchTest extends TestCase
         self::assertTrue(ReleaseBranch::isAbove('10', '9'));
         self::assertTrue(ReleaseBranch::isAbove('1', '0.9'));
         self::assertTrue(ReleaseBranch::isAbove('0.10', '0.9'));
+        self::assertTrue(ReleaseBranch::isAbove('0.0.4', '0.0.3'));
+        self::assertTrue(ReleaseBranch::isAbove('0.1', '0.0.9'));
         self::assertFalse(ReleaseBranch::isAbove('1', '1'));
         self::assertFalse(ReleaseBranch::isAbove('0.3', '1'));
     }
