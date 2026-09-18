@@ -118,7 +118,7 @@ final class InstallSummaryFormatterTest extends TestCase
         for ($i = 1; $i <= 12; ++$i) {
             $findings[] = $this->finding(\sprintf('vendor/p%02d', $i), '1.0.0', Verdict::SILENT, 'no stable release');
         }
-        $report = $this->report($findings, ['first note', 'second note', 'third note'], 12);
+        $report = $this->report($findings, ['first note', 'second note', 'third note', 'a fourth note the block has no room for'], 12);
 
         $lines = (new InstallSummaryFormatter())->format($report);
 

@@ -11,7 +11,7 @@ mutant from the original, and says why.
 - `src/Signal/ConstraintOpenness.php:46` CastInt, `:48` CastInt, IncrementInteger, DecrementInteger,
   `:62` ConcatOperandRemoval — numeric strings compare numerically, every mutated integer stays
   below any PHP major, and `normalize("8.4")` equals `normalize("8.4.0")`.
-- `src/Analyzer/Report.php:96` UnwrapArrayValues — `flagged()`: the findings are sorted and every
+- `src/Analyzer/Report.php:97` UnwrapArrayValues — `flagged()`: the findings are sorted and every
   flagged one precedes every unflagged one, so the filtered keys are already `0..n`; the
   `array_values()` is what makes the `list` type true by construction.
 - `src/Output/JsonFormatter.php:20` FalseValue — the `$showAll` default of the interface's
