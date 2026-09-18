@@ -67,17 +67,14 @@ high (58)
   abandoned    hoa/consistency 1.17.05.02  via wallabag/rulerz, also via wallabag/rulerz-bundle
                marked abandoned by its repository; last release 2017-08-29 (9.0 years ago); repository archived on
                GitHub; last push 2021-04-28 (5.4 years ago); released 2017-05-02, before PHP 8.4 GA (2024-11-21); php
-               constraint ">=5.5.0" has no upper bound; branch 1.x last released 2017-05-02 (9.4 years ago); upstream
-               moved on to 2.17.08.29 (2017-08-29)
+               constraint ">=5.5.0" has no upper bound
   abandoned    hoa/event 1.17.01.13  via wallabag/rulerz › hoa/consistency › hoa/exception, also via
                wallabag/rulerz-bundle
                marked abandoned by its repository; last release 2017-08-30 (9.0 years ago); repository archived on
-               GitHub; last push 2021-04-29 (5.4 years ago); branch 1.x last released 2017-01-13 (9.7 years ago);
-               upstream moved on to 2.17.08.30 (2017-08-30)
+               GitHub; last push 2021-04-29 (5.4 years ago)
   abandoned    hoa/exception 1.17.01.16  via wallabag/rulerz › hoa/consistency, also via wallabag/rulerz-bundle
                marked abandoned by its repository; last release 2017-08-30 (9.0 years ago); repository archived on
-               GitHub; last push 2021-04-29 (5.4 years ago); branch 1.x last released 2017-01-16 (9.7 years ago);
-               upstream moved on to 2.17.08.30 (2017-08-30)
+               GitHub; last push 2021-04-29 (5.4 years ago)
   abandoned    hoa/file 1.17.07.11  via wallabag/rulerz › hoa/ruler, also via wallabag/rulerz-bundle
                marked abandoned by its repository; last release 2017-07-11 (9.2 years ago); repository archived on
                GitHub; last push 2018-01-23 (8.6 years ago)
@@ -222,13 +219,13 @@ medium (18)
   pinned       wallabag/rulerz-bridge dev-master  via wallabag/rulerz-bundle
                released 2023-12-24, before PHP 8.4 GA (2024-11-21); php constraint ">=7.4" has no upper bound; pinned to
                branch snapshot dev-master
+  left-behind  smalot/pdfparser v1.1.0  via j0k3r/graby
+               released 2021-08-03, before PHP 8.4 GA (2024-11-21); php constraint ">=7.1" has no upper bound; branch
+               1.x last released 2021-08-03 (5.1 years ago); upstream moved on to v2.12.5 (2026-04-17)
   old-promise  clue/stream-filter v1.7.0  via j0k3r/graby › php-http/message
                released 2023-12-20, before PHP 8.4 GA (2024-11-21); php constraint ">=5.3" has no upper bound
   old-promise  friendsofphp/proxy-manager-lts v1.0.18  via symfony/proxy-manager-bridge
                released 2024-03-20, before PHP 8.4 GA (2024-11-21); php constraint ">=7.1" has no upper bound
-  old-promise  smalot/pdfparser v1.1.0  via j0k3r/graby
-               released 2021-08-03, before PHP 8.4 GA (2024-11-21); php constraint ">=7.1" has no upper bound; branch
-               1.x last released 2021-10-18 (4.9 years ago); upstream moved on to v2.12.5 (2026-04-17)
   old-promise  symfony/property-access v5.4.45  via babdev/pagerfanta-bundle, also via craue/config-bundle,
                friendsofsymfony/oauth-server-bundle, friendsofsymfony/user-bundle and 12 more
                released 2024-09-25, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2.5" has no upper bound
@@ -280,7 +277,7 @@ low (4)
   stale        thecodingmachine/safe v2.5.0  via scheb/2fa-google-authenticator › spomky-labs/otphp
                branch 2.x last released 2023-04-05 (3.4 years ago); upstream moved on to v3.4.0 (2026-02-04)
 
-200 packages checked · abandoned 19 · silent 8 · pinned 4 · left-behind 0 · old-promise 41 · stale 11 · unknown 0
+200 packages checked · abandoned 19 · silent 8 · pinned 4 · left-behind 1 · old-promise 40 · stale 11 · unknown 0
 · finished 18 · ok 99
 priority: critical 3 · high 58 · medium 18 · low 4
 pulled in by: wallabag/rulerz-bundle 15 · wallabag/rulerz 14 · wallabag/phpepub 5 · scheb/2fa-google-authenticator 3
@@ -309,8 +306,8 @@ list, which `…` stands in for:
         "abandoned": 19,
         "silent": 8,
         "pinned": 4,
-        "left-behind": 0,
-        "old-promise": 41,
+        "left-behind": 1,
+        "old-promise": 40,
         "stale": 11,
         "unknown": 0,
         "finished": 18,

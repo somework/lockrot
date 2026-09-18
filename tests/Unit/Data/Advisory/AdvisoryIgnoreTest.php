@@ -96,6 +96,20 @@ final class AdvisoryIgnoreTest extends TestCase
         self::assertTrue((new AdvisoryIgnore([], []))->isEmpty());
     }
 
+    /** A policy Composer rejects — a section reserved for a later version — costs the ignore list, never the report. */
+    public function testAPolicyComposerRejectsIgnoresNothingInsteadOfThrowing(): void
+    {
+        if (!class_exists(PolicyConfig::class)) {
+            self::markTestSkipped('Composer without the policy object');
+        }
+        $config = new Config(false);
+        $config->merge(['config' => ['policy' => ['licenses' => ['allow' => ['MIT']], 'advisories' => ['ignore-id' => ['PKSA-policy']]]]]);
+
+        $ignore = AdvisoryIgnore::fromConfig($config);
+
+        self::assertTrue($ignore->isEmpty());
+    }
+
     public function testAnEmptyConfigIgnoresNothing(): void
     {
         self::assertTrue(AdvisoryIgnore::fromConfig(new Config(false))->isEmpty());

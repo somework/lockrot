@@ -90,17 +90,56 @@ final class PackageMetadataFromPackagesTest extends TestCase
         self::assertNull($byBranch['0.9']['at']);
     }
 
-    public function testTheHighestVersionOnABranchWinsEvenWithAnOlderDate(): void
+    /** php-http/promise: 1.3.1 (2024-03) is the highest 1.x tag, 1.2.2 (2025-11) its last release. */
+    public function testTheNewestDatedReleaseOnABranchWinsOverAHigherOlderOne(): void
     {
         $higherButOlderDate = $this->load(['name' => 'a/b', 'version' => '1.5.0', 'time' => '2020-01-01T00:00:00+00:00']);
         $lowerButNewerDate = $this->load(['name' => 'a/b', 'version' => '1.4.9', 'time' => '2021-01-01T00:00:00+00:00']);
 
-        $meta = PackageMetadata::fromPackages('a/b', [$lowerButNewerDate, $higherButOlderDate], new \DateTimeImmutable(self::FIXED));
+        foreach ([[$lowerButNewerDate, $higherButOlderDate], [$higherButOlderDate, $lowerButNewerDate]] as $order) {
+            $branch = PackageMetadata::fromPackages('a/b', $order, new \DateTimeImmutable(self::FIXED))->latestStableByBranch()['1'];
+            self::assertSame('1.4.9', $branch['version']);
+            self::assertNotNull($branch['at']);
+            self::assertSame('2021-01-01T00:00:00+00:00', $branch['at']->format(\DATE_ATOM));
+        }
+    }
 
-        $branch = $meta->latestStableByBranch()['1'];
-        self::assertSame('1.5.0', $branch['version']);
-        self::assertNotNull($branch['at']);
-        self::assertSame('2020-01-01T00:00:00+00:00', $branch['at']->format(\DATE_ATOM));
+    public function testAnUndatedHigherTagNeverHidesADatedReleaseOnTheBranch(): void
+    {
+        $undatedHigher = $this->load(['name' => 'a/b', 'version' => '1.5.0']);
+        $dated = $this->load(['name' => 'a/b', 'version' => '1.4.9', 'time' => '2021-01-01T00:00:00+00:00']);
+
+        foreach ([[$undatedHigher, $dated], [$dated, $undatedHigher]] as $order) {
+            $branch = PackageMetadata::fromPackages('a/b', $order, new \DateTimeImmutable(self::FIXED))->latestStableByBranch()['1'];
+            self::assertSame('1.4.9', $branch['version']);
+            self::assertNotNull($branch['at']);
+        }
+    }
+
+    public function testABranchWithNoDatesKeepsItsHighestTagUndated(): void
+    {
+        $lower = $this->load(['name' => 'a/b', 'version' => '1.4.9']);
+        $higher = $this->load(['name' => 'a/b', 'version' => '1.5.0']);
+
+        foreach ([[$lower, $higher], [$higher, $lower]] as $order) {
+            $branch = PackageMetadata::fromPackages('a/b', $order, new \DateTimeImmutable(self::FIXED))->latestStableByBranch()['1'];
+            self::assertSame('1.5.0', $branch['version']);
+            self::assertNull($branch['at']);
+        }
+    }
+
+    /** sabre/dav: a 3.3.0-alpha1 must not become branch 3's newest release, nor open a branch of its own. */
+    public function testPreReleasesDoNotShapeABranch(): void
+    {
+        $stable = $this->load(['name' => 'a/b', 'version' => '3.2.3', 'time' => '2021-06-01T00:00:00+00:00']);
+        $alpha = $this->load(['name' => 'a/b', 'version' => '3.3.0-alpha1', 'time' => '2021-02-01T00:00:00+00:00']);
+        $nextMajorBeta = $this->load(['name' => 'a/b', 'version' => '4.0.0-beta1', 'time' => '2024-01-01T00:00:00+00:00']);
+
+        $meta = PackageMetadata::fromPackages('a/b', [$nextMajorBeta, $alpha, $stable], new \DateTimeImmutable(self::FIXED));
+
+        self::assertSame(['3'], array_map('strval', array_keys($meta->latestStableByBranch())));
+        self::assertSame('3.2.3', $meta->latestStableByBranch()['3']['version']);
+        self::assertSame('4.0.0-beta1', $meta->lastStableVersion(), 'S2 keeps counting every tag');
     }
 
     public function testDevOnlyHasNoStableRelease(): void

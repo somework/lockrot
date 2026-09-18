@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Signal;
 
+use Composer\Semver\VersionParser;
 use Lockrot\Data\Forge\RepoRef;
 use Lockrot\Data\Forge\RepositoryActivity;
 use Lockrot\Data\Repository\PackageMetadata;
@@ -64,11 +65,16 @@ final class FactsBuilder
                 $lastStableReleaseAt = $at;
                 $lastStableVersion = $version;
             }
-            // Releases are listed highest first in the callers, as Packagist lists them: the first
-            // one seen on a branch is its highest.
+            // As PackageMetadata::fromPackages() has it: the newest dated stable release per branch,
+            // pre-releases left out, an undated branch keeping its first (highest) tag.
             $branch = ReleaseBranch::of($version);
-            if ($branch !== null && !isset($byBranch[$branch])) {
-                $byBranch[$branch] = ['version' => $version, 'at' => $at];
+            if ($branch !== null && VersionParser::parseStability($version) === 'stable') {
+                $seen = $byBranch[$branch] ?? null;
+                if ($at !== null && ($seen === null || $seen['at'] === null || $at > $seen['at'])) {
+                    $byBranch[$branch] = ['version' => $version, 'at' => $at];
+                } elseif ($seen === null) {
+                    $byBranch[$branch] = ['version' => $version, 'at' => null];
+                }
             }
         }
 

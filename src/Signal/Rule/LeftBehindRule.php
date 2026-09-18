@@ -20,9 +20,10 @@ use Lockrot\Signal\Thresholds;
  * release, which is exactly the one that is fresh here — and `composer outdated` says a newer
  * major exists without saying that the one installed gets no fixes.
  *
- * A higher branch that stopped releasing *before* the installed one did says nothing (a
- * pre-release major that was abandoned, say), so it does not count as moving on. When every
- * branch is old, S2 already speaks. An installed version the repository does not list — above
+ * "Moved on" means a higher branch released after the installed one's last release *and* within
+ * `release-warn-years` of today: a package whose every branch went quiet years ago is not alive,
+ * it is S2's case (`stale`, or `silent` with S4), and a 2.0 that was itself abandoned before 1.x
+ * stopped says nothing about 1.x. An installed version the repository does not list — above
  * everything it has on that branch, as a lock written against a since-removed tag would be —
  * cannot be measured by that branch's last date, so it carries no S8 either.
  */
@@ -64,7 +65,7 @@ final class LeftBehindRule implements SignalRule
                 $newest = $release;
             }
         }
-        if ($newest === null) {
+        if ($newest === null || $this->clock->yearsSince($newest['at']) >= $this->thresholds->releaseWarnYears()) {
             return null;
         }
 
