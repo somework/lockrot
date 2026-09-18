@@ -13,9 +13,25 @@ use PHPUnit\Framework\TestCase;
 
 final class AdvisoryRuleTest extends TestCase
 {
-    private function advisory(string $id, ?string $cve = null): Advisory
+    private function advisory(string $id, ?string $cve = null, ?string $severity = 'high'): Advisory
     {
-        return new Advisory($id, $cve, 'Title of '.$id, 'https://example.test/'.$id, 'high', new \DateTimeImmutable('2024-03-01T12:00:00+00:00'));
+        return new Advisory($id, $cve, 'Title of '.$id, 'https://example.test/'.$id, $severity, new \DateTimeImmutable('2024-03-01T12:00:00+00:00'));
+    }
+
+    /** guzzle 6.5.5 carries 14: the three names on the line must be the worst, not the newest. */
+    public function testTheWorstSeverityIsNamedFirstAndTiesKeepTheRepositorysOrder(): void
+    {
+        $facts = new PackageFacts(F::package(), null, null, [
+            $this->advisory('M-1', null, 'medium'), $this->advisory('L-1', null, 'low'), $this->advisory('H-1', null, 'high'),
+            $this->advisory('N-1', null, null), $this->advisory('C-1', null, 'critical'), $this->advisory('H-2', null, 'high'),
+        ]);
+
+        $signal = (new AdvisoryRule())->evaluate($facts);
+
+        self::assertNotNull($signal);
+        self::assertSame('6 security advisories affect 1.0.0 (C-1, H-1, H-2 and 3 more)', $signal->summary());
+        self::assertIsArray($signal->data()['advisories']);
+        self::assertSame(['C-1', 'H-1', 'H-2', 'M-1', 'L-1', 'N-1'], array_column($signal->data()['advisories'], 'id'), 'the JSON list is ordered the same way');
     }
 
     public function testNoAdvisoriesIsNull(): void

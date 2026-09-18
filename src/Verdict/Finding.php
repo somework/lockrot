@@ -16,6 +16,19 @@ final class Finding
      */
     public const NO_FIX_VERDICTS = [Verdict::ABANDONED, Verdict::SILENT, Verdict::LEFT_BEHIND];
 
+    /**
+     * The signals that can decide each verdict ({@see VerdictEngine}); the evidence line opens with
+     * them, so the reason for the label is read before the rest of what was observed.
+     */
+    private const DECIDING = [
+        Verdict::ABANDONED => [Signal::S1, Signal::S3],
+        Verdict::SILENT => [Signal::S2, Signal::S4],
+        Verdict::PINNED => [Signal::S6],
+        Verdict::LEFT_BEHIND => [Signal::S8],
+        Verdict::OLD_PROMISE => [Signal::S5],
+        Verdict::STALE => [Signal::S2, Signal::S4, Signal::S8],
+    ];
+
     private string $package;
     private string $version;
     private string $verdict;
@@ -170,16 +183,15 @@ final class Finding
     }
 
     /**
-     * What was observed about the package itself — every signal but S7 — and, when nothing was, the
+     * What was observed about the package itself — every signal but S7, the ones that decided the
+     * verdict first ({@see self::DECIDING}), the rest in signal order — and, when nothing was, the
      * note that says why (not from a Composer repository, metadata unavailable, …).
      */
     public function ownEvidence(): string
     {
         $parts = [];
-        foreach ($this->signals as $signal) {
-            if ($signal->id() !== Signal::S7) {
-                $parts[] = $signal->summary();
-            }
+        foreach ($this->ownSignalsDecidingFirst() as $signal) {
+            $parts[] = $signal->summary();
             if ($signal->id() === Signal::S9 && $this->hasUnfixableAdvisory()) {
                 $parts[] = 'no fix expected';
             }
@@ -189,6 +201,26 @@ final class Finding
         }
 
         return implode('; ', $parts);
+    }
+
+    /** @return list<Signal> */
+    private function ownSignalsDecidingFirst(): array
+    {
+        $deciding = self::DECIDING[$this->verdict] ?? [];
+        $first = [];
+        $rest = [];
+        foreach ($this->signals as $signal) {
+            if ($signal->id() === Signal::S7) {
+                continue;
+            }
+            if (\in_array($signal->id(), $deciding, true)) {
+                $first[] = $signal;
+            } else {
+                $rest[] = $signal;
+            }
+        }
+
+        return array_merge($first, $rest);
     }
 
     /**

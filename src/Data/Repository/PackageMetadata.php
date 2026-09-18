@@ -28,15 +28,16 @@ final class PackageMetadata
     private string $type;
     private \DateTimeImmutable $dataDate;
     /**
-     * The newest stable release on each release branch ({@see ReleaseBranch}) and its date, by
-     * branch key — an integer key where PHP makes one of `"1"`. What
-     * {@see \Lockrot\Signal\Rule\LeftBehindRule} compares the installed branch against.
+     * Per release branch ({@see ReleaseBranch}), by branch key — an integer key where PHP makes one
+     * of `"1"`: the newest dated stable release (`version`, `at`) and the branch's highest stable
+     * tag as Composer normalizes it (`highest`). What {@see \Lockrot\Signal\Rule\LeftBehindRule}
+     * compares the installed branch against.
      *
-     * @var array<array-key, array{version: string, at: ?\DateTimeImmutable}>
+     * @var array<array-key, array{version: string, at: ?\DateTimeImmutable, highest: string}>
      */
     private array $latestStableByBranch;
 
-    /** @param array<array-key, array{version: string, at: ?\DateTimeImmutable}> $latestStableByBranch */
+    /** @param array<array-key, array{version: string, at: ?\DateTimeImmutable, highest: string}> $latestStableByBranch */
     public function __construct(
         string $name,
         bool $abandoned,
@@ -114,14 +115,22 @@ final class PackageMetadata
                 // lower minor released later is the branch's last word, and an alpha on a new major
                 // is not a branch the upstream moved on to. (S2 above counts every tag, pre-releases
                 // included: there a tag can only make the package look younger, here it would make
-                // findings.) A branch with no dated stable release keeps its highest tag, undated.
-                $branch = ReleaseBranch::of($version->getVersion());
-                if ($branch !== null && VersionParser::parseStability($version->getVersion()) === 'stable') {
+                // findings.) The branch's highest tag travels next to it, for the "installed version
+                // above everything listed" check; a branch with no dated release shows that tag,
+                // undated. Only normalized strings are compared — a repository that sends both
+                // `version` and `version_normalized` is trusted on the latter and may put anything in
+                // the former, which the loader never parses.
+                $normalized = $version->getVersion();
+                $branch = ReleaseBranch::of($normalized);
+                if ($branch !== null && VersionParser::parseStability($normalized) === 'stable') {
                     $seen = $byBranch[$branch] ?? null;
+                    $highest = $seen === null || Comparator::greaterThan($normalized, $seen['highest']) ? $normalized : $seen['highest'];
                     if ($releaseDate !== null && ($seen === null || $seen['at'] === null || $releaseDate > $seen['at'])) {
-                        $byBranch[$branch] = ['version' => $version->getPrettyVersion(), 'at' => $releaseDate];
-                    } elseif ($seen === null || ($seen['at'] === null && Comparator::greaterThan($version->getVersion(), (new VersionParser())->normalize($seen['version'])))) {
-                        $byBranch[$branch] = ['version' => $version->getPrettyVersion(), 'at' => null];
+                        $byBranch[$branch] = ['version' => $version->getPrettyVersion(), 'at' => $releaseDate, 'highest' => $highest];
+                    } elseif ($seen === null || ($seen['at'] === null && $highest === $normalized)) {
+                        $byBranch[$branch] = ['version' => $version->getPrettyVersion(), 'at' => null, 'highest' => $highest];
+                    } else {
+                        $byBranch[$branch]['highest'] = $highest;
                     }
                 }
             }
@@ -221,11 +230,12 @@ final class PackageMetadata
     }
 
     /**
-     * The newest dated stable release on every release branch, keyed by {@see ReleaseBranch} key (an
-     * integer where PHP makes one of `"1"`); pre-releases do not count. A branch whose releases carry
-     * no `time` at all holds its highest one with a null date.
+     * The newest dated stable release on every release branch (`version`, `at`) and the branch's
+     * highest stable tag, normalized (`highest`), keyed by {@see ReleaseBranch} key (an integer where
+     * PHP makes one of `"1"`); pre-releases do not count. A branch whose releases carry no `time` at
+     * all shows its highest tag with a null date.
      *
-     * @return array<array-key, array{version: string, at: ?\DateTimeImmutable}>
+     * @return array<array-key, array{version: string, at: ?\DateTimeImmutable, highest: string}>
      */
     public function latestStableByBranch(): array
     {

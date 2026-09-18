@@ -74,9 +74,8 @@ final class Priority
      *
      * After those steps, a security advisory on a package whose verdict says no fix is coming
      * ($unfixableAdvisory) raises the result one step: `composer audit` already reports the
-     * vulnerability, and this is the part it cannot know — the wait for a patched release is over
-     * before it started. An unflagged verdict is never raised: the advisory alone is audit's
-     * finding, not lockrot's.
+     * vulnerability; that no release will close it is what the verdict adds. An unflagged verdict
+     * is never raised: the advisory alone is audit's finding, not lockrot's.
      */
     public static function of(string $verdict, bool $direct, bool $dev, bool $unfixableAdvisory = false): string
     {

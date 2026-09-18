@@ -77,6 +77,26 @@ final class FindingTest extends TestCase
         }
     }
 
+    /** The label's reason is read first: S6 before S5 on a pinned finding, S8 before S5 on a left-behind one. */
+    public function testTheSignalThatDecidedTheVerdictOpensTheEvidence(): void
+    {
+        $s5 = new Signal('S5', 'warn', 'released 2020-09-28, before PHP 8.4 GA (2024-11-21); php constraint ">=7.3" has no upper bound');
+        $s6 = new Signal('S6', 'warn', 'pinned to branch snapshot dev-master');
+        $s8 = new Signal('S8', 'high', 'branch 3.x last released 2020-09-28 (6.0 years ago); 7.x released 7.0.0 (2026-02-06)');
+        $s7 = new Signal('S7', 'info', 'pulls in 1 flagged package: a/b (stale)');
+
+        $pinned = new Finding('vendor/pkg', 'dev-master', Verdict::PINNED, [$s5, $s6, $s7], ['vendor/pkg'], null, null);
+        $leftBehind = new Finding('vendor/pkg', '3.1.1', Verdict::LEFT_BEHIND, [$s5, $s8], ['root/app', 'vendor/pkg'], null, null);
+        $oldPromise = new Finding('vendor/pkg', '3.1.1', Verdict::OLD_PROMISE, [$s5, new Signal('S8', 'warn', 'branch 3.x …')], ['vendor/pkg'], null, null);
+
+        self::assertSame($s6->summary().'; '.$s5->summary().'; '.$s7->summary(), $pinned->evidence(), 'S7 still closes the line');
+        self::assertSame($s8->summary().'; '.$s5->summary(), $leftBehind->ownEvidence());
+        self::assertSame($s5->summary().'; branch 3.x …', $oldPromise->ownEvidence(), 'signal order when the deciding one is already first');
+        $signals = $pinned->toArray()['signals'];
+        self::assertIsArray($signals);
+        self::assertSame(['S5', 'S6', 'S7'], array_column($signals, 'id'), 'the JSON keeps signal order');
+    }
+
     public function testNoteWhenNoSignals(): void
     {
         $finding = new Finding('private/thing', '3.0.0', Verdict::UNKNOWN, [], [], null, null, 'not from a Composer repository, not checked');

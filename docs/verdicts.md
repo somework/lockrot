@@ -42,7 +42,7 @@ always wins, so an allowlisted package reports `finished` whatever its signals s
 | S5 | The installed release predates the target PHP's GA date and the `require.php` constraint has no upper bound |
 | S6 | The installed version is a branch snapshot (`dev-master`, `dev-main`, `2.x-dev`, `#hash`), or the package has no stable release |
 | S7 | A direct requirement pulls in flagged transitive packages — informational, never a verdict; see [Transitive exposure](#transitive-exposure) |
-| S8 | Time since the last stable release on the installed version's release branch, against `release-warn-years` / `release-high-years`, counted only when a higher branch has released since; see [Left behind](#left-behind) |
+| S8 | Time since the last stable release on the installed version's release branch, against `release-warn-years` / `release-high-years`, counted only when a higher branch has released since and within `release-warn-years`; see [Left behind](#left-behind) |
 | S9 | Security advisories affecting the installed version — never a verdict; raises the priority where no fix is coming; see [Security advisories](#security-advisories) |
 
 S3 and S4 come from the repository host — GitHub, GitLab or Bitbucket — and need network access;
@@ -79,14 +79,15 @@ push would be.
 
 ```text
   left-behind  smalot/pdfparser v1.1.0  via j0k3r/graby
-               released 2021-08-03, before PHP 8.4 GA (2024-11-21); php constraint ">=7.1" has no
-               upper bound; branch 1.x last released 2021-08-03 (5.1 years ago); upstream moved on
-               to v2.12.5 (2026-04-17)
+               branch 1.x last released 2021-08-03 (5.1 years ago); 2.x released v2.12.5
+               (2026-04-17); released 2021-08-03, before PHP 8.4 GA (2024-11-21); php constraint
+               ">=7.1" has no upper bound
 ```
 
 S2 has nothing to say — the package released five months ago — and `old-promise` alone would have
 read as a constraint problem. The branch installed here has been quiet for 5.1 years while 2.x
-kept going.
+kept going. The second clause names the higher branch whose release is newest, with that release:
+it is where fixes land now, which with a living LTS below the current major can be the LTS.
 
 A branch snapshot (`dev-master`, `2.x-dev`) belongs to no branch and is `pinned`. A package whose
 installed version the repository does not list — a private fork, or a lock written against a tag
@@ -96,7 +97,7 @@ branch's dates say nothing about it.
 ## Security advisories
 
 `composer audit` reports the vulnerability. lockrot carries the same advisories on the finding, as
-S9, and adds the one thing audit cannot know: whether a fix is coming.
+S9, and says whether a fix is coming.
 
 S9 lists every advisory whose affected range matches the installed version, fetched from the
 configured Composer repositories exactly as audit fetches them — one request to Packagist for the
@@ -107,15 +108,18 @@ observed about the package itself with `no fix expected` — ahead of what it pu
 direct requirement that does — and the priority goes up one step, `critical` at most:
 
 ```text
-  abandoned    zendframework/zend-http 2.8.0  direct
-               marked abandoned by its repository, replacement: laminas/laminas-http; last release
-               2019-12-30 (6.7 years ago); repository archived on GitHub; last push 2020-01-30 (6.6
-               years ago); 2 security advisories affect 2.8.0 (PKSA-g1mt-kjh9-jdwc,
-               PKSA-hw5g-51r3-f7q2); no fix expected
+  left-behind  phpunit/phpunit 5.6.2  direct
+               branch 5.x last released 2018-02-01 (8.6 years ago); 13.x released 13.3.4
+               (2026-09-15); 2 security advisories affect 5.6.2 (CVE-2017-9841, CVE-2026-24765); no
+               fix expected
 ```
 
-Each advisory is named by its CVE, or by its Packagist id when it has none; three are named, the
-rest counted. An advisory the project has accepted is silenced where `composer audit` silences it,
+A development requirement, so `left-behind` alone would sit at `medium`; the two advisories nobody
+will fix on the 5.x branch put it at `high`. Each advisory is named by its CVE, or by its Packagist
+id when it has none; the worst severity first, three named, the rest counted. Advisories on
+packages the report does not flag stay off the rows (they are audit's findings), but the footer
+counts them — `53 security advisories on 17 packages the report does not flag; see composer audit`
+— so a clean-looking report does not read as a clean audit. An advisory the project has accepted is silenced where `composer audit` silences it,
 not in lockrot's own configuration: `config.policy.advisories` (`ignore-id`, `ignore`,
 `ignore-severity`) on Composer 2.10 and later, `config.audit.ignore` and `audit.ignore-severity`
 before. What audit drops, lockrot drops. A policy section Composer itself rejects — a key reserved

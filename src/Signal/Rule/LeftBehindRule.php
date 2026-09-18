@@ -7,6 +7,7 @@ namespace Lockrot\Signal\Rule;
 use Composer\Semver\Comparator;
 use Composer\Semver\VersionParser;
 use Lockrot\Clock;
+use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Data\Repository\ReleaseBranch;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\Signal;
@@ -52,20 +53,22 @@ final class LeftBehindRule implements SignalRule
         }
         $byBranch = $metadata->latestStableByBranch();
         $own = $byBranch[$branch] ?? null;
-        if ($own === null || $own['at'] === null || $this->isAhead($facts->package()->version(), $own['version'])) {
+        if ($own === null || $own['at'] === null || $this->isAhead($facts->package()->version(), $own['highest'])) {
             return null;
         }
 
         $newest = null;
+        $newestBranch = null;
         foreach ($byBranch as $key => $release) {
             if ($release['at'] === null || !ReleaseBranch::isAbove((string) $key, $branch) || $release['at'] <= $own['at']) {
                 continue;
             }
             if ($newest === null || $release['at'] > $newest['at']) {
                 $newest = $release;
+                $newestBranch = (string) $key;
             }
         }
-        if ($newest === null || $this->clock->yearsSince($newest['at']) >= $this->thresholds->releaseWarnYears()) {
+        if ($newest === null || $newestBranch === null || $this->clock->yearsSince($newest['at']) >= $this->thresholds->releaseWarnYears()) {
             return null;
         }
 
@@ -75,11 +78,15 @@ final class LeftBehindRule implements SignalRule
             return null;
         }
 
+        // The branch is named, not only the release: the branch is what a maintainer moves to, and
+        // it is the newest *releasing* higher branch — with a living LTS below the current major
+        // that can be the LTS, which is a fact about where fixes land, not a claim about the latest.
         $summary = \sprintf(
-            'branch %s last released %s (%.1f years ago); upstream moved on to %s (%s)',
+            'branch %s last released %s (%.1f years ago); %s released %s (%s)',
             ReleaseBranch::label($branch),
             $own['at']->format('Y-m-d'),
             $years,
+            ReleaseBranch::label($newestBranch),
             $newest['version'],
             $newest['at']->format('Y-m-d')
         );
@@ -89,16 +96,22 @@ final class LeftBehindRule implements SignalRule
             'branch_last_release' => $own['at']->format(\DATE_ATOM),
             'branch_last_version' => $own['version'],
             'years' => round($years, 1),
+            'newest_branch' => ReleaseBranch::label($newestBranch),
             'newest_version' => $newest['version'],
             'newest_release' => $newest['at']->format(\DATE_ATOM),
         ]);
     }
 
-    /** Whether the installed version is above the highest release the repository lists on its branch. */
+    /**
+     * Whether the installed version is above the highest stable tag the repository lists on its
+     * branch — not above its newest release, which a backport on a lower minor can be.
+     *
+     * @param string $branchHighest already normalized ({@see PackageMetadata::latestStableByBranch()})
+     */
     private function isAhead(string $installed, string $branchHighest): bool
     {
         try {
-            return Comparator::greaterThan($this->parser->normalize($installed), $this->parser->normalize($branchHighest));
+            return Comparator::greaterThan($this->parser->normalize($installed), $branchHighest);
         } catch (\UnexpectedValueException $e) {
             return true;
         }

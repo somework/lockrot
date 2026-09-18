@@ -32,9 +32,13 @@ use Lockrot\Deadline;
  */
 final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
 {
-    public const NOTE_COMPOSER_TOO_OLD = 'security advisories not checked: needs Composer 2.4 or newer';
-    public const NOTE_OFFLINE = 'offline: security advisories not checked';
-    public const NOTE_BUDGET = 'security advisories not checked: install-time budget exhausted';
+    /**
+     * Each note says what the missing check costs: without S9 a finding no fix would come for sits
+     * one priority step lower than an online run would put it, and `--fail-on` decides on that.
+     */
+    public const NOTE_COMPOSER_TOO_OLD = 'security advisories not checked (needs Composer 2.4 or newer); a priority they would raise stays one step lower';
+    public const NOTE_OFFLINE = 'offline: security advisories not checked; a priority they would raise stays one step lower';
+    public const NOTE_BUDGET = 'security advisories not checked: install-time budget exhausted; a priority they would raise stays one step lower';
 
     /** @var list<RepositoryInterface> */
     private array $repositories;
@@ -88,7 +92,12 @@ final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
                 $notes[] = self::unavailableNote($repository->getRepoName(), $e);
                 $failed = true;
                 continue;
-            } catch (\RuntimeException $e) {
+            } catch (\Exception $e) {
+                // ComposerRepository::fetchFile() lets a JSON ParsingException, a
+                // RepositorySecurityException and a LogicException past its own retry loop, none of
+                // them a RuntimeException. The metadata pass never reaches a repository once every
+                // name is resolved; this pass asks every advisory-capable one, so what it throws is
+                // the report's note, not the report's end.
                 $notes[] = self::unavailableNote($repository->getRepoName(), $e);
                 continue;
             }

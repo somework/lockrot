@@ -27,12 +27,13 @@ final class LeftBehindRuleTest extends TestCase
         self::assertNotNull($signal);
         self::assertSame(Signal::S8, $signal->id());
         self::assertSame(Signal::LEVEL_HIGH, $signal->level());
-        self::assertSame('branch 1.x last released 2019-03-02 (7.5 years ago); upstream moved on to 3.4.1 (2026-06-01)', $signal->summary());
+        self::assertSame('branch 1.x last released 2019-03-02 (7.5 years ago); 3.x released 3.4.1 (2026-06-01)', $signal->summary());
         self::assertSame([
             'branch' => '1.x',
             'branch_last_release' => '2019-03-02T00:00:00+00:00',
             'branch_last_version' => '1.9.2',
             'years' => 7.5,
+            'newest_branch' => '3.x',
             'newest_version' => '3.4.1',
             'newest_release' => '2026-06-01T00:00:00+00:00',
         ], $signal->data());
@@ -134,7 +135,7 @@ final class LeftBehindRuleTest extends TestCase
         $signal = $this->rule()->evaluate(F::facts(F::package(['version' => '1.9.2']), $meta));
 
         self::assertNotNull($signal);
-        self::assertStringEndsWith('upstream moved on to 3.0.0 (2026-01-01)', $signal->summary());
+        self::assertStringEndsWith('; 3.x released 3.0.0 (2026-01-01)', $signal->summary());
     }
 
     public function testAHigherBranchWithoutADateIsNotEvidence(): void
@@ -166,7 +167,7 @@ final class LeftBehindRuleTest extends TestCase
         $signal = $this->rule()->evaluate(F::facts(F::package(['version' => '1.9.2']), $meta));
 
         self::assertNotNull($signal);
-        self::assertStringEndsWith('upstream moved on to 2.5.0 (2026-02-02)', $signal->summary());
+        self::assertStringEndsWith('; 2.x released 2.5.0 (2026-02-02)', $signal->summary());
     }
 
     /** A branch listed first that is not above ours must not end the search for one that is. */
@@ -177,7 +178,7 @@ final class LeftBehindRuleTest extends TestCase
         $signal = $this->rule()->evaluate(F::facts(F::package(['version' => '1.9.2']), $meta));
 
         self::assertNotNull($signal);
-        self::assertStringEndsWith('upstream moved on to 2.0.0 (2026-01-01)', $signal->summary());
+        self::assertStringEndsWith('; 2.x released 2.0.0 (2026-01-01)', $signal->summary());
     }
 
     public function testZeroDotBranchesArePerMinor(): void
@@ -187,7 +188,7 @@ final class LeftBehindRuleTest extends TestCase
         $signal = $this->rule()->evaluate(F::facts(F::package(['version' => '0.3.1']), $meta));
 
         self::assertNotNull($signal);
-        self::assertSame('branch 0.3.x last released 2019-03-02 (7.5 years ago); upstream moved on to 0.5.0 (2026-01-01)', $signal->summary());
+        self::assertSame('branch 0.3.x last released 2019-03-02 (7.5 years ago); 0.5.x released 0.5.0 (2026-01-01)', $signal->summary());
     }
 
     public function testADevInstalledVersionIsNull(): void
@@ -213,6 +214,21 @@ final class LeftBehindRuleTest extends TestCase
         self::assertNull($this->rule()->evaluate(F::facts(F::package(['version' => 'v1.9.5']), $meta)));
         self::assertNotNull($this->rule()->evaluate(F::facts(F::package(['version' => 'v1.9.2']), $meta)), 'the listed version itself is measured');
         self::assertNotNull($this->rule()->evaluate(F::facts(F::package(['version' => '1.0.0']), $meta)), 'an older install on the branch is measured by the branch');
+    }
+
+    /** php-http/promise: the highest 1.x tag is older than a later backport on a lower minor. */
+    public function testTheTopOfADeadBranchIsMeasuredEvenWhenABackportBelowItIsNewer(): void
+    {
+        $meta = F::metadata([['2.3.0', '2025-06-01'], ['1.5.0', '2018-01-01'], ['1.4.9', '2019-06-01']]);
+
+        $onTheTop = $this->rule()->evaluate(F::facts(F::package(['version' => '1.5.0']), $meta));
+        $onTheBackport = $this->rule()->evaluate(F::facts(F::package(['version' => '1.4.9']), $meta));
+
+        self::assertNotNull($onTheTop, 'the installed version is listed, so it is not ahead of the branch');
+        self::assertSame('branch 1.x last released 2019-06-01 (7.3 years ago); 2.x released 2.3.0 (2025-06-01)', $onTheTop->summary());
+        self::assertNotNull($onTheBackport);
+        self::assertSame($onTheTop->summary(), $onTheBackport->summary());
+        self::assertNull($this->rule()->evaluate(F::facts(F::package(['version' => '1.6.0']), $meta)), 'above the highest tag: not listed');
     }
 
     public function testNoMetadataIsNull(): void

@@ -121,6 +121,12 @@ final class FixtureRepositoryServer
         }
     }
 
+    /** Serve a `packages.json` that is not JSON — what a misconfigured private repository answers with. Call before {@see start()}. */
+    public function withCorruptPackagesJson(): void
+    {
+        file_put_contents($this->docroot.'/packages.json', '{not json');
+    }
+
     public function start(): void
     {
         $logFile = tempnam(sys_get_temp_dir(), 'lockrot-fixture-log-');

@@ -62,6 +62,10 @@ final class GithubFormatter implements FormatterInterface
         if ($exposure !== '') {
             $lines[] = str_replace(["\r\n", "\r", "\n"], ' ', $exposure);
         }
+        $unflagged = $report->unflaggedAdvisoriesLine();
+        if ($unflagged !== '') {
+            $lines[] = $unflagged;
+        }
         $lines[] = $report->summaryLine();
 
         return implode("\n", $lines)."\n";
