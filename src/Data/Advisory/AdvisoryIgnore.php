@@ -16,9 +16,9 @@ use Composer\Policy\PolicyConfig;
  * (2.4+) does not need lockrot to raise it again.
  *
  * On a Composer with {@see PolicyConfig} the lists come from it — the same object the audit command
- * reads, so every spelling the policy format allows (per-package constraints, per-operation flags,
- * reasons) is honoured without a second parser here. Older versions had one flat list under
- * `config.audit.ignore`, read directly.
+ * reads, flattened as audit flattens them: per-operation flags and reasons are resolved there, and
+ * a per-package version constraint is dropped there too, so an entry ignores the package whole on
+ * both sides. Older versions had one flat list under `config.audit.ignore`, read directly.
  */
 final class AdvisoryIgnore
 {

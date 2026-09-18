@@ -25,7 +25,7 @@ Or the PHAR, with nothing added to the project: `curl -fsSL -o lockrot.phar http
 
 | Page | What is on it |
 |---|---|
-| [What it reports](verdicts.md) | The eight verdicts, the signals behind them, and how priority is assigned |
+| [What it reports](verdicts.md) | The nine verdicts, the signals behind them, and how priority is assigned |
 | [Configuration](configuration.md) | `extra.lockrot`, every option, and the command-line flags |
 | [In CI](ci.md) | GitHub Actions, GitLab CI, SARIF, PR comments |
 | [Baseline](baseline.md) | Accept today's findings, fail on new and worsened ones |

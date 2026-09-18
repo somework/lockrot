@@ -203,7 +203,7 @@ cache. Repository activity comes from GitHub, GitLab and Bitbucket Cloud and is 
 
 Everything is at [lockrot.dev](https://lockrot.dev).
 
-- [Verdicts](https://lockrot.dev/verdicts/) — the eight verdicts, the seven signals, and how priority is derived
+- [Verdicts](https://lockrot.dev/verdicts/) — the nine verdicts, the nine signals, and how priority is derived
 - [Configuration](https://lockrot.dev/configuration/) — every `extra.lockrot` key, environment variable and CLI option
 - [CI](https://lockrot.dev/ci/) — exit codes and all six output formats, with GitHub and GitLab snippets
 - [Baseline](https://lockrot.dev/baseline/) — generating one, the four buckets, and how matching works

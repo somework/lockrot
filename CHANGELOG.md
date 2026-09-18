@@ -32,7 +32,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - A package on a quiet branch of a living upstream can now be `stale` (S8 warn) or `left-behind` (S8
   high) where it was `ok`; `--fail-on=stale` and `--fail-on=left-behind` see it. A baseline holding
-  such a package at `stale` reports it `worsened` once it crosses into `left-behind`.
+  such a package at `stale` or `old-promise` — both below `left-behind` in severity — reports it
+  `worsened` once it crosses into `left-behind`.
 - The counts line gained `left-behind`; the `verdict` enums in the config and baseline schemas, the
   SARIF rule list and `--fail-on` accept it. The JSON `schema` number stays `1`: an added enum value
   and two new signal ids, nothing removed or renamed.
