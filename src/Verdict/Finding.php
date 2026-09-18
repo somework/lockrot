@@ -164,22 +164,25 @@ final class Finding
     }
 
     /**
-     * A security advisory affects the installed version (S9) and the verdict is one under which no
-     * fix will come ({@see self::NO_FIX_VERDICTS}): what raises the priority one step and adds
-     * `no fix expected` to the evidence.
+     * A security advisory affects the installed version (S9) and no fix will come: the verdict is
+     * one under which nobody publishes fixes ({@see self::NO_FIX_VERDICTS}), or S8 says the
+     * installed branch is one the upstream left — at either level, since a branch quiet for three
+     * years while a higher one releases is not where the fix lands whatever the verdict ended up
+     * as. What raises the priority one step and adds `no fix expected` to the evidence.
      */
     public function hasUnfixableAdvisory(): bool
     {
-        if (!\in_array($this->verdict, self::NO_FIX_VERDICTS, true)) {
-            return false;
-        }
+        $hasAdvisory = false;
+        $noFix = \in_array($this->verdict, self::NO_FIX_VERDICTS, true);
         foreach ($this->signals as $signal) {
             if ($signal->id() === Signal::S9) {
-                return true;
+                $hasAdvisory = true;
+            } elseif ($signal->id() === Signal::S8) {
+                $noFix = true;
             }
         }
 
-        return false;
+        return $hasAdvisory && $noFix && Verdict::flagged($this->verdict);
     }
 
     /**

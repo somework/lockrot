@@ -27,7 +27,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   configuration (`config.policy.advisories` on 2.10+, `config.audit.ignore` before) are dropped as
   `composer audit` drops them. S9 never decides a verdict. On an `abandoned`, `silent` or
   `left-behind` package the evidence gains `no fix expected` and the priority goes up one step,
-  `critical` at most. The three advisories named on the line are the worst by severity. Advisories
+  `critical` at most — and so does an advisory on a `stale` or `old-promise` package whose S8 names
+  a branch the upstream left. The three advisories named on the line are the worst by severity. Advisories
   on packages the report does not flag stay off the rows and are totalled in the footer:
   `53 security advisories on 17 packages the report does not flag; see composer audit`. On
   Composer 2.2, under `--offline` and once the install-time budget is spent the report carries one
@@ -43,7 +44,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `worsened` once it crosses into `left-behind`.
 - A priority threshold can trip on a verdict that did not move: an advisory on an `abandoned`,
   `silent` or `left-behind` package lifts `high` to `critical`, so `--fail-on=critical` now fails
-  on it. The baseline, keyed on the verdict, still calls the finding `known`.
+  on it, and one on a branch the upstream left lifts `medium` to `high`. `left-behind` itself
+  starts at `high`, so a run that passed `--fail-on=high` can fail on a package that was `ok`
+  before. The baseline, keyed on the verdict, still calls the finding `known`.
+- `--strict-network` now covers the advisory request too: every repository that publishes
+  advisories is asked, as `composer audit` asks them, including one the metadata pass never
+  reached because Packagist had already answered for every name. A private repository that is
+  down fails a strict run where it used to pass unnoticed.
+- The counts, priority and `pulled in by:` lines fold between their `·`-separated items, never
+  between a label and its number. The install-time block shows up to three notes, one per source
+  that could not answer.
 - The evidence line opens with the signal that decided the verdict — `pinned to branch snapshot
   dev-master` before the php-constraint clause on a `pinned` row, `repository archived on GitHub`
   right after `marked abandoned` — then the rest in signal order, then what the package pulls in.

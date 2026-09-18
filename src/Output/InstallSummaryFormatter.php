@@ -26,7 +26,8 @@ use Lockrot\Verdict\Verdict;
 final class InstallSummaryFormatter
 {
     public const MAX_LINES = 10;
-    public const MAX_NOTES = 2;
+    /** Metadata, repository activity and advisories can each leave one note; the block shows them all. */
+    public const MAX_NOTES = 3;
 
     /** Header and footer always take one line each; the rest is shared by findings and notes. */
     private const FIXED_LINES = 2;
@@ -78,12 +79,13 @@ final class InstallSummaryFormatter
     private function uncheckedLines(Report $report): array
     {
         $checked = $report->packagesChecked();
-        $lines = [\sprintf(
-            '<warning>lockrot: %d of %d changed %s could not be checked</warning>',
-            $report->byVerdict()[Verdict::UNKNOWN],
-            $checked,
-            $checked === 1 ? 'package' : 'packages'
-        )];
+        $unknown = $report->byVerdict()[Verdict::UNKNOWN];
+        // Metadata arrived for every package but a later lookup failed — the advisory request, a
+        // repository host: nothing is `unknown`, and "0 of 3 could not be checked" would say the
+        // opposite of what the notes below say.
+        $lines = [$unknown === 0
+            ? \sprintf('<warning>lockrot: %d changed %s checked, one check incomplete</warning>', $checked, $checked === 1 ? 'package' : 'packages')
+            : \sprintf('<warning>lockrot: %d of %d changed %s could not be checked</warning>', $unknown, $checked, $checked === 1 ? 'package' : 'packages')];
         foreach (\array_slice($report->notes(), 0, self::MAX_NOTES) as $note) {
             $lines[] = '  note: '.$note;
         }

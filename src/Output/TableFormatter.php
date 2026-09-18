@@ -273,10 +273,38 @@ final class TableFormatter implements FormatterInterface
         $wrap = max(self::MIN_WRAP_WIDTH, $this->context->terminalWidth());
         $lines = [];
         foreach ($texts as $text) {
-            foreach (self::wrap($text, $wrap, false) as $line) {
+            foreach (strpos($text, ' · ') !== false ? self::wrapBetweenItems($text, $wrap) : self::wrap($text, $wrap, false) as $line) {
                 $lines[] = $line;
             }
         }
+
+        return $lines;
+    }
+
+    /**
+     * The counts, priority and `pulled in by:` lines are lists of `label N` items joined by ` · `;
+     * folding them at any space can part a label from its number (`… · stale` / `0 · unknown 0`).
+     * They fold between items instead: an item that does not fit starts the next line, and the
+     * separator stays at the end of the line it closes. An item wider than the terminal is left
+     * whole, as {@see wrap()} leaves a long token.
+     *
+     * @return list<string>
+     */
+    private static function wrapBetweenItems(string $text, int $wrap): array
+    {
+        $lines = [];
+        $line = '';
+        foreach (explode(' · ', $text) as $item) {
+            if ($line === '') {
+                $line = $item;
+            } elseif (\strlen($line) + 3 + \strlen($item) <= $wrap) {
+                $line .= ' · '.$item;
+            } else {
+                $lines[] = self::escape($line.' ·');
+                $line = $item;
+            }
+        }
+        $lines[] = self::escape($line);
 
         return $lines;
     }

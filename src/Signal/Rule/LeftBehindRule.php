@@ -57,18 +57,17 @@ final class LeftBehindRule implements SignalRule
             return null;
         }
 
+        /** @var array{branch: string, version: string, at: \DateTimeImmutable}|null $newest */
         $newest = null;
-        $newestBranch = null;
         foreach ($byBranch as $key => $release) {
             if ($release['at'] === null || !ReleaseBranch::isAbove((string) $key, $branch) || $release['at'] <= $own['at']) {
                 continue;
             }
             if ($newest === null || $release['at'] > $newest['at']) {
-                $newest = $release;
-                $newestBranch = (string) $key;
+                $newest = ['branch' => (string) $key, 'version' => $release['version'], 'at' => $release['at']];
             }
         }
-        if ($newest === null || $newestBranch === null || $this->clock->yearsSince($newest['at']) >= $this->thresholds->releaseWarnYears()) {
+        if ($newest === null || $this->clock->yearsSince($newest['at']) >= $this->thresholds->releaseWarnYears()) {
             return null;
         }
 
@@ -86,7 +85,7 @@ final class LeftBehindRule implements SignalRule
             ReleaseBranch::label($branch),
             $own['at']->format('Y-m-d'),
             $years,
-            ReleaseBranch::label($newestBranch),
+            ReleaseBranch::label($newest['branch']),
             $newest['version'],
             $newest['at']->format('Y-m-d')
         );
@@ -96,7 +95,7 @@ final class LeftBehindRule implements SignalRule
             'branch_last_release' => $own['at']->format(\DATE_ATOM),
             'branch_last_version' => $own['version'],
             'years' => round($years, 1),
-            'newest_branch' => ReleaseBranch::label($newestBranch),
+            'newest_branch' => ReleaseBranch::label($newest['branch']),
             'newest_version' => $newest['version'],
             'newest_release' => $newest['at']->format(\DATE_ATOM),
         ]);

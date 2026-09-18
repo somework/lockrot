@@ -92,12 +92,12 @@ final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
                 $notes[] = self::unavailableNote($repository->getRepoName(), $e);
                 $failed = true;
                 continue;
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 // ComposerRepository::fetchFile() lets a JSON ParsingException, a
                 // RepositorySecurityException and a LogicException past its own retry loop, none of
                 // them a RuntimeException. The metadata pass never reaches a repository once every
-                // name is resolved; this pass asks every advisory-capable one, so what it throws is
-                // the report's note, not the report's end.
+                // name is resolved; this pass asks every advisory-capable one, as `composer audit`
+                // does, so what a repository throws is the report's note, not the report's end.
                 $notes[] = self::unavailableNote($repository->getRepoName(), $e);
                 continue;
             }

@@ -277,11 +277,11 @@ low (4)
   stale        thecodingmachine/safe v2.5.0  via scheb/2fa-google-authenticator › spomky-labs/otphp
                branch 2.x last released 2023-04-05 (3.4 years ago); 3.x released v3.4.0 (2026-02-04)
 
-200 packages checked · abandoned 19 · silent 8 · pinned 4 · left-behind 1 · old-promise 40 · stale 11 · unknown 0
-· finished 18 · ok 99
+200 packages checked · abandoned 19 · silent 8 · pinned 4 · left-behind 1 · old-promise 40 · stale 11 · unknown 0 ·
+finished 18 · ok 99
 priority: critical 3 · high 58 · medium 18 · low 4
-pulled in by: wallabag/rulerz-bundle 15 · wallabag/rulerz 14 · wallabag/phpepub 5 · scheb/2fa-google-authenticator 3
-· friendsofsymfony/jsrouting-bundle 2 · … and 21 more
+pulled in by: wallabag/rulerz-bundle 15 · wallabag/rulerz 14 · wallabag/phpepub 5 · scheb/2fa-google-authenticator 3 ·
+friendsofsymfony/jsrouting-bundle 2 · … and 21 more
 Data as of 2026-09-15 (package repositories, repository hosts). Run composer lockrot --format=json for details.
 ```
 

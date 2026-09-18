@@ -69,7 +69,7 @@ final class InstallSummaryFormatterTest extends TestCase
             $this->finding('vendor/a', '1.0.0', Verdict::UNKNOWN, 'not checked: install-time budget exhausted'),
             $this->finding('vendor/b', '2.0.0', Verdict::UNKNOWN, 'not checked: install-time budget exhausted'),
             $this->finding('vendor/c', '3.0.0', Verdict::OK, ''),
-        ], ['first note', 'second note', 'third note'], 3, true);
+        ], ['first note', 'second note', 'third note', 'fourth note'], 3, true);
 
         $lines = (new InstallSummaryFormatter())->format($report);
 
@@ -77,8 +77,24 @@ final class InstallSummaryFormatterTest extends TestCase
             '<warning>lockrot: 2 of 3 changed packages could not be checked</warning>',
             '  note: first note',
             '  note: second note',
+            '  note: third note',
             'Run composer lockrot for details.',
         ], $lines);
+    }
+
+    /** Metadata arrived for every package, only the advisory request failed: nothing is unknown, and "0 of 3" would say the opposite of the note. */
+    public function testALookupThatFailedWithNothingUnknownSaysSoInsteadOfCountingZero(): void
+    {
+        $report = $this->report([
+            $this->finding('vendor/a', '1.0.0', Verdict::OK, ''),
+            $this->finding('vendor/b', '2.0.0', Verdict::OK, ''),
+        ], ['security advisories unavailable from packagist.org: timeout'], 2, true);
+
+        self::assertSame([
+            '<warning>lockrot: 2 changed packages checked, one check incomplete</warning>',
+            '  note: security advisories unavailable from packagist.org: timeout',
+            'Run composer lockrot for details.',
+        ], (new InstallSummaryFormatter())->format($report));
     }
 
     public function testTwoFlaggedPackagesRenderHeaderFindingsAndFooter(): void
@@ -109,10 +125,11 @@ final class InstallSummaryFormatterTest extends TestCase
         self::assertCount(InstallSummaryFormatter::MAX_LINES, $lines);
         self::assertSame('<warning>lockrot: dependency rot in 12 of 12 changed packages</warning>', $lines[0]);
         self::assertStringContainsString('vendor/p01 1.0.0', $lines[1]);
-        self::assertStringContainsString('vendor/p05 1.0.0', $lines[5]);
-        self::assertSame('  … and 7 more', $lines[6]);
-        self::assertSame('  note: first note', $lines[7]);
-        self::assertSame('  note: second note', $lines[8]);
+        self::assertStringContainsString('vendor/p04 1.0.0', $lines[4]);
+        self::assertSame('  … and 8 more', $lines[5]);
+        self::assertSame('  note: first note', $lines[6]);
+        self::assertSame('  note: second note', $lines[7]);
+        self::assertSame('  note: third note', $lines[8]);
         self::assertSame('Run composer lockrot for details.', $lines[9]);
     }
 

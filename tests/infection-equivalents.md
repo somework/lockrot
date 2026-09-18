@@ -232,11 +232,11 @@ The memo changes how often the work is done, not what it answers.
 - `src/Data/Repository/ReleaseBranch.php:32` PregMatchRemoveCaret — `of()` matches
   `^(\d+)\.(\d+)\.` against a string `VersionParser::normalize()` returned for a non-dev version,
   which always starts with the major digits: the anchor cannot move the match.
-- `src/Signal/Rule/LeftBehindRule.php:51` ReturnRemoval — without the `return null` on a null
+- `src/Signal/Rule/LeftBehindRule.php:52` ReturnRemoval — without the `return null` on a null
   branch, `$byBranch[null]` reads the key `''`, which no branch key ever is (they are `\d+` or
   `0.\d+`), so the next guard returns the same null. The early return is what makes the array
   read well-typed, not a case of its own.
-- `src/Signal/Rule/LeftBehindRule.php:61` LessThanOrEqualTo — `$release['at'] <= $own['at']`
+- `src/Signal/Rule/LeftBehindRule.php:63` LessThanOrEqualTo — `$release['at'] <= $own['at']`
   becoming `<` admits a higher branch released the very same instant as the installed one's last
   release. That release then has to pass the liveness check (younger than `release-warn-years`)
   while the installed branch's last release, the same instant, has to be at least
