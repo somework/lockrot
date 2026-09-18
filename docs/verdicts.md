@@ -75,9 +75,14 @@ branch is old is S2's case, not S8's. At the high threshold the verdict is `left
 `stale`, as an old release or an old push would be.
 
 ```text
-  left-behind  guzzlehttp/guzzle 6.5.8  direct
-               branch 6.x last released 2022-06-20 (4.2 years ago); upstream moved on to 7.9.3 (2025-03-27)
+  left-behind  hashids/hashids 4.1.0  direct
+               last release 2023-02-23 (3.6 years ago); released 2020-11-26, before PHP 8.4 GA
+               (2024-11-21); php constraint ">=7.3" has no upper bound; branch 4.x last released
+               2020-11-26 (5.8 years ago); upstream moved on to 5.0.2 (2023-02-23)
 ```
+
+S2 saw the package's last release at 3.6 years and said `stale`; the branch installed here has
+been quiet for 5.8, and 5.0 shipped in between.
 
 A branch snapshot (`dev-master`, `2.x-dev`) belongs to no branch and is `pinned`. A package whose
 installed version is not on any branch the repository lists — a private fork, say — carries no S8.
@@ -95,10 +100,17 @@ priority. On an `abandoned`, `silent` or `left-behind` package the evidence ends
 `no fix expected` and the priority goes up one step, `critical` at most:
 
 ```text
-  abandoned    league/flysystem 1.1.10  direct
-               marked abandoned by its repository; last release 2022-10-04 (3.9 years ago); 1 security
-               advisory affects 1.1.10 (CVE-2021-32708); no fix expected
+  abandoned    zendframework/zend-http 2.8.0  direct
+               marked abandoned by its repository, replacement: laminas/laminas-http; last release
+               2019-12-30 (6.7 years ago); repository archived on GitHub; last push 2020-01-30 (6.6
+               years ago); 2 security advisories affect 2.8.0 (PKSA-g1mt-kjh9-jdwc,
+               PKSA-hw5g-51r3-f7q2); no fix expected
 ```
+
+Each advisory is named by its CVE, or by its Packagist id when it has none; three are named, the
+rest counted. Advisories the project told Composer to ignore — `config.policy.advisories` on
+Composer 2.10 and later, `config.audit.ignore` before — are dropped here as `composer audit`
+drops them.
 
 `pinned` and `old-promise` are not raised: a branch snapshot or an open php constraint says nothing
 about whether a fix is coming. The [baseline](baseline.md) stays keyed on the verdict, so a baselined
