@@ -30,6 +30,7 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
             ],
             'doctrine/annotations' => [
                 self::record('PKSA-annotations-1', '<1.0', ['title' => 'Not the installed range']),
+                self::record('PKSA-annotations-2', '>=2.0,<2.1', ['title' => 'The installed range']),
             ],
         ]);
         self::$server->start();
@@ -80,7 +81,7 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
 
         self::assertSame([], $batch->notes());
         self::assertFalse($batch->hadNetworkFailure());
-        self::assertSame(['doctrine/cache'], array_keys($batch->byName()));
+        self::assertSame(['doctrine/cache', 'doctrine/annotations'], array_keys($batch->byName()));
         $advisories = $batch->for('doctrine/cache');
         self::assertSame(['PKSA-cache-1', 'PKSA-cache-3'], array_map(static fn (Advisory $a): string => $a->id(), $advisories));
         self::assertSame('CVE-2024-0001', $advisories[0]->cve());
@@ -90,7 +91,7 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
         self::assertNotNull($advisories[0]->reportedAt());
         self::assertSame('2024-03-01T12:00:00+00:00', $advisories[0]->reportedAt()->format(\DATE_ATOM));
         self::assertSame('PKSA-cache-3', $advisories[1]->label(), 'no CVE: named by its id');
-        self::assertSame([], $batch->for('doctrine/annotations'));
+        self::assertSame(['PKSA-annotations-2'], array_map(static fn (Advisory $a): string => $a->id(), $batch->for('doctrine/annotations')));
         self::assertSame([], $batch->for('symfony/console'));
     }
 
@@ -121,6 +122,37 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
 
         self::assertSame([], $batch->byName());
         self::assertSame([], $batch->notes());
+
+        $batch = $loader->load(['doctrine/annotations' => 'not a version', 'doctrine/cache' => '2.2.0']);
+
+        self::assertSame(['doctrine/cache'], array_keys($batch->byName()), 'the names after the unparsable one are still asked');
+    }
+
+    /**
+     * A repository whose inline advisory records carry only an id and a range: Composer refuses
+     * them as full advisories, and the answer is a note, not a network failure and not a finding
+     * built on a record that may have been withdrawn since it was cached.
+     */
+    public function testARepositoryServingPartialRecordsIsANoteNotAFailure(): void
+    {
+        if (!interface_exists(AdvisoryProviderInterface::class)) {
+            self::markTestSkipped('Composer without the advisory API');
+        }
+        $partial = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK]);
+        $partial->withSecurityAdvisories(['doctrine/cache' => [['advisoryId' => 'GHSA-partial-only', 'affectedVersions' => '>=2.0,<3.0']]]);
+        try {
+            $partial->start();
+            $loader = new RepositoryAdvisoryLoader($partial->repositories());
+
+            $batch = $loader->load(['doctrine/cache' => '2.2.0']);
+
+            self::assertSame([], $batch->byName());
+            self::assertCount(1, $batch->notes());
+            self::assertStringContainsString('could not be loaded as a full advisory', $batch->notes()[0]);
+            self::assertFalse($batch->hadNetworkFailure());
+        } finally {
+            $partial->stop();
+        }
     }
 
     public function testARepositoryWithoutAdvisoriesAndANonComposerRepositoryAreSteppedOver(): void
@@ -179,6 +211,29 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
         self::assertSame([RepositoryAdvisoryLoader::NOTE_OFFLINE], $batch->notes());
         self::assertFalse($batch->hadNetworkFailure());
         self::assertSame([], $batch->byName());
+    }
+
+    /** The budget runs out between two repositories: the first one's note is kept next to the budget note. */
+    public function testABudgetSpentAfterTheFirstRepositoryKeepsItsNote(): void
+    {
+        if (!interface_exists(AdvisoryProviderInterface::class)) {
+            self::markTestSkipped('Composer without the advisory API');
+        }
+        $unreachable = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK]);
+        $calls = 0;
+        // 0.0 while the first repository is queried, then past the 1-second budget
+        $now = static function () use (&$calls): float {
+            return ++$calls <= 2 ? 0.0 : 10.0;
+        };
+        $loader = new RepositoryAdvisoryLoader(array_merge($unreachable->repositories(), $this->server()->repositories()), false, Deadline::inSeconds(1.0, $now));
+
+        $batch = $loader->load(['doctrine/cache' => '2.2.0']);
+
+        self::assertCount(2, $batch->notes());
+        self::assertStringStartsWith('security advisories unavailable from ', $batch->notes()[0]);
+        self::assertSame(RepositoryAdvisoryLoader::NOTE_BUDGET, $batch->notes()[1]);
+        self::assertTrue($batch->hadNetworkFailure());
+        self::assertSame([], $batch->byName(), 'the second repository was never asked');
     }
 
     public function testAnExhaustedBudgetAsksNothing(): void

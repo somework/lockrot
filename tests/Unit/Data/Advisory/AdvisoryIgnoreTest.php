@@ -89,6 +89,13 @@ final class AdvisoryIgnoreTest extends TestCase
         self::assertFalse($ignore->ignores('vendor/pkg', $this->full('PKSA-9', 'CVE-2024-0002', null)));
     }
 
+    public function testIsEmptyNeedsBothListsEmpty(): void
+    {
+        self::assertFalse((new AdvisoryIgnore([], ['low']))->isEmpty());
+        self::assertFalse((new AdvisoryIgnore(['PKSA-1'], []))->isEmpty());
+        self::assertTrue((new AdvisoryIgnore([], []))->isEmpty());
+    }
+
     public function testAnEmptyConfigIgnoresNothing(): void
     {
         self::assertTrue(AdvisoryIgnore::fromConfig(new Config(false))->isEmpty());

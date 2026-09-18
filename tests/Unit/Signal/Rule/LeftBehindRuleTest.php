@@ -124,6 +124,17 @@ final class LeftBehindRuleTest extends TestCase
         self::assertStringEndsWith('upstream moved on to 2.5.0 (2026-02-02)', $signal->summary());
     }
 
+    /** A branch listed first that is not above ours must not end the search for one that is. */
+    public function testALowerBranchListedFirstDoesNotHideAHigherOne(): void
+    {
+        $meta = F::metadata([['0.9.0', '2015-01-01'], ['2.0.0', '2026-01-01'], ['1.9.2', '2019-03-02']]);
+
+        $signal = $this->rule()->evaluate(F::facts(F::package(['version' => '1.9.2']), $meta));
+
+        self::assertNotNull($signal);
+        self::assertStringEndsWith('upstream moved on to 2.0.0 (2026-01-01)', $signal->summary());
+    }
+
     public function testZeroDotBranchesArePerMinor(): void
     {
         $meta = F::metadata([['0.5.0', '2026-01-01'], ['0.3.9', '2019-03-02']]);
