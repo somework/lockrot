@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-09-19
+
 ### Added
 
 - `left-behind`: a verdict for the branch you are on, not the package. Signal S8 takes the newest
@@ -402,7 +404,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The "GitHub token not set" note counts packages whose repository activity was checked, not
   distinct repositories, so packages sharing one repository are no longer under-reported.
 
-[Unreleased]: https://github.com/somework/lockrot/compare/v0.6.1...HEAD
+[Unreleased]: https://github.com/somework/lockrot/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/somework/lockrot/compare/v0.6.1...v0.7.0
 [0.6.1]: https://github.com/somework/lockrot/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/somework/lockrot/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/somework/lockrot/compare/v0.4.0...v0.5.0
