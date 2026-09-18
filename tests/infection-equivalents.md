@@ -227,11 +227,15 @@ The memo changes how often the work is done, not what it answers.
   branch. Reaching that branch means some earlier package selected this repository, which set
   `$checkedPackages[$forge]` on the same forge, so the default is unreachable there.
 
-## src/Data/Repository/ReleaseBranch.php (left-behind, 2026-09-18)
+## src/Data/Repository/ReleaseBranch.php and src/Signal/Rule/LeftBehindRule.php (left-behind, 2026-09-18)
 
 - `src/Data/Repository/ReleaseBranch.php:32` PregMatchRemoveCaret — `of()` matches
   `^(\d+)\.(\d+)\.` against a string `VersionParser::normalize()` returned for a non-dev version,
   which always starts with the major digits: the anchor cannot move the match.
+- `src/Signal/Rule/LeftBehindRule.php:50` ReturnRemoval — without the `return null` on a null
+  branch, `$byBranch[null]` reads the key `''`, which no branch key ever is (they are `\d+` or
+  `0.\d+`), so the next guard returns the same null. The early return is what makes the array
+  read well-typed, not a case of its own.
 
 ### Not equivalent: the two mutants this run reports as timed out
 
