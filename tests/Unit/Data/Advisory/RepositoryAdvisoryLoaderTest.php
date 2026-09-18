@@ -111,6 +111,20 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
         self::assertSame(['PKSA-cache-1', 'PKSA-cache-3'], $ids(AdvisoryIgnore::fromRaw(['PKSA-cache-2'], ['low'])), 'nothing matching');
     }
 
+    public function testAnUnreadableIgnoreListIsANoteOnTheBatch(): void
+    {
+        if (!interface_exists(AdvisoryProviderInterface::class)) {
+            self::markTestSkipped('Composer without the advisory API');
+        }
+        $loader = new RepositoryAdvisoryLoader($this->server()->repositories(), false, null, new AdvisoryIgnore([], [], 'ignore list not read'));
+
+        $batch = $loader->load(['doctrine/cache' => '2.2.0']);
+
+        self::assertSame(['ignore list not read'], $batch->notes());
+        self::assertCount(2, $batch->for('doctrine/cache'), 'nothing is ignored');
+        self::assertFalse($batch->hadNetworkFailure());
+    }
+
     public function testAnUnparsableInstalledVersionIsSkippedNotFatal(): void
     {
         if (!interface_exists(AdvisoryProviderInterface::class)) {

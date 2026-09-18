@@ -26,15 +26,18 @@ final class AdvisoryIgnore
     private array $ids;
     /** @var array<string, true> */
     private array $severities;
+    /** Why the list is empty when the project meant it not to be; a report note. */
+    private ?string $note;
 
     /**
      * @param list<string> $ids
      * @param list<string> $severities
      */
-    public function __construct(array $ids, array $severities = [])
+    public function __construct(array $ids, array $severities = [], ?string $note = null)
     {
         $this->ids = array_fill_keys($ids, true);
         $this->severities = array_fill_keys($severities, true);
+        $this->note = $note;
     }
 
     public static function none(): self
@@ -50,11 +53,11 @@ final class AdvisoryIgnore
             // Composer, an unknown `ignore-*` key, a constraint it cannot parse — by throwing. A
             // report is not the place to enforce Composer's config schema: the PHAR carries one
             // Composer version and reads projects written for another, so a rejected policy means
-            // no ignore list, never no report.
+            // no ignore list, never no report — and a note, since accepted advisories reappear.
             try {
                 $policy = PolicyConfig::fromConfig($config);
             } catch (\Throwable $e) {
-                return self::none();
+                return new self([], [], \sprintf("Composer's advisory ignore list not read (%s); every advisory counts", (string) strtok($e->getMessage(), "\r\n")));
             }
 
             return new self(
@@ -108,6 +111,12 @@ final class AdvisoryIgnore
     public function isEmpty(): bool
     {
         return $this->ids === [] && $this->severities === [];
+    }
+
+    /** The report note explaining an ignore list that could not be read, null when it was. */
+    public function note(): ?string
+    {
+        return $this->note;
     }
 
     /**

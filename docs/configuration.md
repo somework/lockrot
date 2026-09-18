@@ -110,6 +110,12 @@ verdict:
 }
 ```
 
+An allowlist entry silences the whole finding. To accept one security advisory (signal S9) and
+keep the rest of the package's report, use Composer's own ignore configuration instead —
+`config.policy.advisories.ignore-id` on Composer 2.10 and later, `config.audit.ignore` before:
+lockrot drops exactly what `composer audit` drops. See
+[verdicts.md](verdicts.md#security-advisories).
+
 To propose an addition to the built-in list — a genuinely finished package used widely enough to
 belong there — open a pull request against `resources/finished-packages.json` with the package
 pattern and a one-line reason, the same shape as the existing entries.
