@@ -114,6 +114,34 @@ final class PackageMetadataFromPackagesTest extends TestCase
         self::assertSame('1.0.1', PackageMetadata::fromPackages('a/b', [$second, $first], new \DateTimeImmutable(self::FIXED))->latestStableByBranch()['1']['version']);
     }
 
+    public function testTheBranchsHighestTagTravelsNextToItsNewestRelease(): void
+    {
+        $higherButOlderDate = $this->load(['name' => 'a/b', 'version' => 'v1.5.0', 'time' => '2020-01-01T00:00:00+00:00']);
+        $lowerButNewerDate = $this->load(['name' => 'a/b', 'version' => '1.4.9', 'time' => '2021-01-01T00:00:00+00:00']);
+
+        foreach ([[$lowerButNewerDate, $higherButOlderDate], [$higherButOlderDate, $lowerButNewerDate]] as $order) {
+            $branch = PackageMetadata::fromPackages('a/b', $order, new \DateTimeImmutable(self::FIXED))->latestStableByBranch()['1'];
+            self::assertSame('1.4.9', $branch['version']);
+            self::assertSame('1.5.0.0', $branch['highest'], 'normalized, as Composer compares it');
+        }
+    }
+
+    /**
+     * A repository that sends `version_normalized` is trusted on it, and ArrayLoader never parses
+     * `version`: whatever it says must not reach a parser here.
+     */
+    public function testAPrettyVersionTheParserRejectsIsNeverParsed(): void
+    {
+        $one = $this->load(['name' => 'a/b', 'version' => 'release-one', 'version_normalized' => '1.0.0.0']);
+        $two = $this->load(['name' => 'a/b', 'version' => 'release-two', 'version_normalized' => '1.0.1.0']);
+
+        $branch = PackageMetadata::fromPackages('a/b', [$one, $two], new \DateTimeImmutable(self::FIXED))->latestStableByBranch()['1'];
+
+        self::assertSame('release-two', $branch['version']);
+        self::assertSame('1.0.1.0', $branch['highest']);
+        self::assertNull($branch['at']);
+    }
+
     public function testAnUndatedHigherTagNeverHidesADatedReleaseOnTheBranch(): void
     {
         $undatedHigher = $this->load(['name' => 'a/b', 'version' => '1.5.0']);

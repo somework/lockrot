@@ -224,6 +224,30 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
         self::assertSame([], $batch->byName());
     }
 
+    /** ComposerRepository lets a JSON ParsingException past its retry loop; it is not a RuntimeException. */
+    public function testARepositoryWhosePackagesJsonIsNotJsonIsANoteAndTheNextOneStillAnswers(): void
+    {
+        if (!interface_exists(AdvisoryProviderInterface::class)) {
+            self::markTestSkipped('Composer without the advisory API');
+        }
+        $corrupt = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK]);
+        $corrupt->withCorruptPackagesJson();
+        try {
+            $corrupt->start();
+            $loader = new RepositoryAdvisoryLoader(array_merge($corrupt->repositories(), $this->server()->repositories()));
+
+            $batch = $loader->load(['doctrine/cache' => '2.2.0']);
+
+            self::assertCount(1, $batch->notes());
+            self::assertStringContainsString('does not contain valid JSON', $batch->notes()[0]);
+            self::assertStringNotContainsString("\n", $batch->notes()[0]);
+            self::assertFalse($batch->hadNetworkFailure(), 'the server answered; what it said was the problem');
+            self::assertCount(2, $batch->for('doctrine/cache'));
+        } finally {
+            $corrupt->stop();
+        }
+    }
+
     public function testOfflineAsksNothing(): void
     {
         $unreachable = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK]);

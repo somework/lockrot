@@ -75,6 +75,11 @@ final class MarkdownFormatter implements FormatterInterface
             $lines[] = '';
             $lines[] = self::text($exposure);
         }
+        $unflagged = $report->unflaggedAdvisoriesLine();
+        if ($unflagged !== '') {
+            $lines[] = '';
+            $lines[] = $unflagged;
+        }
 
         $notes = $this->notes($report, $baseline);
         if ($notes !== []) {

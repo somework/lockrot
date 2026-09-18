@@ -25,7 +25,7 @@ use Symfony\Component\Console\Formatter\OutputFormatter;
  */
 final class TableFormatter implements FormatterInterface
 {
-    /** `old-promise`, the longest bare verdict: the label column never gets narrower than this. */
+    /** `old-promise` and `left-behind`, the longest bare verdicts: the label column never gets narrower than this. */
     private const MIN_LABEL_WIDTH = 11;
 
     /** However narrow the terminal claims to be, text is never wrapped tighter than this. */
@@ -250,6 +250,10 @@ final class TableFormatter implements FormatterInterface
         $exposure = $report->exposureSummaryLine();
         if ($exposure !== '') {
             $texts[] = $exposure;
+        }
+        $unflagged = $report->unflaggedAdvisoriesLine();
+        if ($unflagged !== '') {
+            $texts[] = $unflagged;
         }
         if ($baseline !== null) {
             $texts[] = $baseline->summaryLine();

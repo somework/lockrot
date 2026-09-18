@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Analyzer;
 
 use Lockrot\Baseline\BaselineComparison;
+use Lockrot\Signal\Signal;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Priority;
 use Lockrot\Verdict\Verdict;
@@ -170,6 +171,40 @@ final class Report
         }
 
         return 'pulled in by: '.implode(' · ', $parts);
+    }
+
+    /**
+     * `53 security advisories on 17 packages the report does not flag; see composer audit` — the
+     * advisories S9 fetched for `ok` and `finished` packages, which no row prints without `--all`.
+     * They are audit's findings, not lockrot's, but a footer that totals every verdict and says
+     * nothing about them reads as "nothing to report"; the empty string when there are none.
+     */
+    public function unflaggedAdvisoriesLine(): string
+    {
+        $packages = 0;
+        $advisories = 0;
+        foreach ($this->findings as $finding) {
+            if (Verdict::flagged($finding->verdict())) {
+                continue;
+            }
+            foreach ($finding->signals() as $signal) {
+                if ($signal->id() === Signal::S9) {
+                    ++$packages;
+                    $advisories += \count((array) ($signal->data()['advisories'] ?? []));
+                }
+            }
+        }
+        if ($packages === 0) {
+            return '';
+        }
+
+        return \sprintf(
+            '%d security %s on %d %s the report does not flag; see composer audit',
+            $advisories,
+            $advisories === 1 ? 'advisory' : 'advisories',
+            $packages,
+            $packages === 1 ? 'package' : 'packages'
+        );
     }
 
     /** @return list<string> */
