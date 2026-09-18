@@ -227,6 +227,12 @@ The memo changes how often the work is done, not what it answers.
   branch. Reaching that branch means some earlier package selected this repository, which set
   `$checkedPackages[$forge]` on the same forge, so the default is unreachable there.
 
+## src/Data/Repository/ReleaseBranch.php (left-behind, 2026-09-18)
+
+- `src/Data/Repository/ReleaseBranch.php:32` PregMatchRemoveCaret — `of()` matches
+  `^(\d+)\.(\d+)\.` against a string `VersionParser::normalize()` returned for a non-dev version,
+  which always starts with the major digits: the anchor cannot move the match.
+
 ### Not equivalent: the two mutants this run reports as timed out
 
 Both are genuine infinite loops in `loadChunked()`, so the timeout is a real detection and not a
