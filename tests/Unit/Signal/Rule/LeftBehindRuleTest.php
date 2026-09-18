@@ -102,10 +102,12 @@ final class LeftBehindRuleTest extends TestCase
 
     public function testTheHigherBranchMustHaveReleasedWithinTheWarnYears(): void
     {
-        // 2.x last released 2023-09-13: 3.0 years and a day before NOW — no longer alive by the warn threshold.
+        // 3 × 365.25 days before NOW is 2023-09-14T06:00: exactly the warn threshold, no longer alive.
+        $exactlyAtThreshold = F::metadata([['2.0.0', '2023-09-14T06:00:00+00:00'], ['1.9.2', '2019-03-02']]);
         $justTooOld = F::metadata([['2.0.0', '2023-09-13T00:00:00+00:00'], ['1.9.2', '2019-03-02']]);
         $alive = F::metadata([['2.0.0', '2023-09-15T00:00:00+00:00'], ['1.9.2', '2019-03-02']]);
 
+        self::assertNull($this->rule()->evaluate(F::facts(F::package(['version' => '1.9.2']), $exactlyAtThreshold)));
         self::assertNull($this->rule()->evaluate(F::facts(F::package(['version' => '1.9.2']), $justTooOld)));
         self::assertNotNull($this->rule()->evaluate(F::facts(F::package(['version' => '1.9.2']), $alive)));
     }
