@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Verdict;
 
+use Lockrot\Data\Repository\ReleaseBranch;
 use Lockrot\Signal\Signal;
 
 final class Finding
@@ -164,22 +165,79 @@ final class Finding
     }
 
     /**
-     * A security advisory affects the installed version (S9) and no fix will come: the verdict is
-     * one under which nobody publishes fixes ({@see self::NO_FIX_VERDICTS}). What raises the
-     * priority one step and adds `no fix expected` to the evidence.
+     * A security advisory affects the installed version (S9), the verdict is one under which nobody
+     * publishes fixes ({@see self::NO_FIX_VERDICTS}), and the fix is not already out: on a
+     * left-behind branch, the branch's highest release does not carry it (a fix in a higher branch
+     * is exactly what the branch will not get); on an abandoned or silent package, no release does.
+     * What raises the priority one step and adds `no fix expected` to the evidence.
      */
     public function hasUnfixableAdvisory(): bool
     {
+        return $this->unfixableAdvisories() > 0;
+    }
+
+    /**
+     * How many of the advisories on the finding no listed release fixes, in the sense
+     * {@see hasUnfixableAdvisory()} gives it; 0 when the verdict is not one of the no-fix ones.
+     */
+    private function unfixableAdvisories(): int
+    {
         if (!\in_array($this->verdict, self::NO_FIX_VERDICTS, true) || !Verdict::flagged($this->verdict)) {
-            return false;
+            return 0;
         }
-        foreach ($this->signals as $signal) {
-            if ($signal->id() === Signal::S9) {
-                return true;
+        $count = 0;
+        foreach ($this->advisoryRows() as $row) {
+            $fixed = $this->verdict === Verdict::LEFT_BEHIND ? ($row['fixed_on_branch'] ?? false) === true : ($row['fixed_by'] ?? null) !== null;
+            if (!$fixed) {
+                ++$count;
             }
         }
 
-        return false;
+        return $count;
+    }
+
+    /**
+     * `no fix expected`, qualified with the branch when the fix exists but lands elsewhere —
+     * `no fix expected on 3.x` reads next to `3 fixed by v8.1.7` — and null when every advisory is
+     * fixed by a release the finding's verdict lets the project reach.
+     */
+    private function noFixClause(): ?string
+    {
+        if ($this->unfixableAdvisories() === 0) {
+            return null;
+        }
+        if ($this->verdict === Verdict::LEFT_BEHIND) {
+            foreach ($this->advisoryRows() as $row) {
+                if (($row['fixed_by'] ?? null) !== null && ($row['fixed_on_branch'] ?? false) !== true) {
+                    $branch = ReleaseBranch::of($this->version);
+
+                    return $branch === null ? 'no fix expected' : 'no fix expected on '.ReleaseBranch::label($branch);
+                }
+            }
+        }
+
+        return 'no fix expected';
+    }
+
+    /** @return list<array<mixed, mixed>> */
+    private function advisoryRows(): array
+    {
+        foreach ($this->signals as $signal) {
+            if ($signal->id() !== Signal::S9) {
+                continue;
+            }
+            $rows = [];
+            $list = $signal->data()['advisories'] ?? [];
+            foreach (\is_array($list) ? $list : [] as $row) {
+                if (\is_array($row)) {
+                    $rows[] = $row;
+                }
+            }
+
+            return $rows;
+        }
+
+        return [];
     }
 
     /**
@@ -192,8 +250,8 @@ final class Finding
         $parts = [];
         foreach ($this->ownSignalsDecidingFirst() as $signal) {
             $parts[] = $signal->summary();
-            if ($signal->id() === Signal::S9 && $this->hasUnfixableAdvisory()) {
-                $parts[] = 'no fix expected';
+            if ($signal->id() === Signal::S9 && ($clause = $this->noFixClause()) !== null) {
+                $parts[] = $clause;
             }
         }
         if ($parts === []) {

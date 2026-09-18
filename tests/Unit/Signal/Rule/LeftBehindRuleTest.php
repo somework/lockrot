@@ -216,6 +216,25 @@ final class LeftBehindRuleTest extends TestCase
         self::assertNotNull($this->rule()->evaluate(F::facts(F::package(['version' => '1.0.0']), $meta)), 'an older install on the branch is measured by the branch');
     }
 
+    /**
+     * illuminate/macroable 10.x: the newest dated tag says 2023, the undated ones above it are 2025.
+     * A branch whose highest tag carries no date has an age nobody can read, so it carries no S8.
+     */
+    public function testAnUndatedHighestTagOnTheInstalledBranchMeansNoSignal(): void
+    {
+        $meta = F::metadata([['13.32.0', '2026-09-13T00:00:00+00:00'], ['10.49.0', null], ['10.13.1', '2023-03-17T00:00:00+00:00']]);
+
+        self::assertNull($this->rule()->evaluate(F::facts(F::package(['version' => '10.48.28']), $meta)));
+    }
+
+    /** Two branches released the same second: neither came after the other, and the upstream did not move on. */
+    public function testAHigherBranchReleasedAtTheSameInstantIsNotAMoveOn(): void
+    {
+        $meta = F::metadata([['2.0.0', '2022-09-14T00:00:00+00:00'], ['1.0.0', '2022-09-14T00:00:00+00:00']]);
+
+        self::assertNull($this->rule()->evaluate(F::facts(F::package(['version' => '1.0.0']), $meta)));
+    }
+
     /** php-http/promise: the highest 1.x tag is older than a later backport on a lower minor. */
     public function testTheTopOfADeadBranchIsMeasuredEvenWhenABackportBelowItIsNewer(): void
     {

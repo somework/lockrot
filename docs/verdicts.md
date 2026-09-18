@@ -94,7 +94,12 @@ it is where fixes land now, which with a living LTS below the current major can 
 A branch snapshot (`dev-master`, `2.x-dev`) belongs to no branch and is `pinned`. A package whose
 installed version the repository does not list — a private fork, or a lock written against a tag
 since deleted, sitting above everything the repository has on that branch — carries no S8: the
-branch's dates say nothing about it.
+branch's dates say nothing about it. Nor does a branch whose highest tag the repository leaves
+undated: the dates are the repository's, and Packagist dates a tag by the commit it points at, so
+a package split out of a monorepo (`illuminate/*`, `symfony/*`) has tags with no date and tags
+dated by the last change to that directory, years before the release that carried them. With the
+branch's newest tag undated, how much younger it is than the newest dated one cannot be read, and
+the branch is not measured; a dated highest tag is read as it stands.
 
 ## Security advisories
 
@@ -105,26 +110,57 @@ S9 lists every advisory whose affected range matches the installed version, fetc
 configured Composer repositories exactly as audit fetches them — one request to Packagist for the
 whole lock, the package files themselves on a repository that carries advisories inline. It never
 decides a verdict: a vulnerability on a healthy package is audit's finding and stays out of the
-priority. On an `abandoned`, `silent` or `left-behind` package the evidence closes what was
-observed about the package itself with `no fix expected` — ahead of what it pulls in, when it is a
-direct requirement that does — and the priority goes up one step, `critical` at most:
+priority.
+
+Each advisory is then held against two releases the repository already lists: the highest stable
+tag on the installed version's branch, and the package's highest stable tag. One that neither range
+covers is already fixed, and the line says by what — `fixed by v3.4.47` when the branch's tag is
+enough, since a `composer update` inside the constraint gets it; `fixed by v8.1.7` when only the
+package's is. On an `abandoned`, `silent` or `left-behind` package, the advisories nothing listed
+fixes are the ones no fix will come for: the evidence closes what was observed about the package
+itself with `no fix expected` — ahead of what it pulls in, when it is a direct requirement that
+does — and the priority goes up one step, `critical` at most. On a left-behind branch only a fix
+*on the branch* counts as one the project can reach, so `3 fixed by v8.1.7; no fix expected on
+3.x` is one line: the fix exists, and it will not land where this lock is. A package whose every
+advisory is fixed by a listed release is not raised, whatever its verdict — the fix is out, and
+the finding says which release carries it.
 
 ```text
-  left-behind  phpunit/phpunit 5.6.2  direct
-               branch 5.x last released 2018-02-01 (8.6 years ago); 13.x released 13.3.4
-               (2026-09-15); 2 security advisories affect 5.6.2 (CVE-2017-9841, CVE-2026-24765); no
-               fix expected
+  left-behind  symfony/http-foundation v3.4.18  via laravel/framework, also via webklex/php-imap
+               branch 3.x last released 2020-10-24 (5.9 years ago); 8.x released v8.1.7
+               (2026-09-14); released 2018-10-31, before PHP 8.5 GA (2025-11-20); php constraint
+               "^5.5.9|>=7.0.8" has no upper bound; 4 security advisories affect v3.4.18
+               (CVE-2019-10913, CVE-2025-64500, CVE-2019-18888 and 1 more); 2 fixed by v3.4.47, 2
+               fixed by v8.1.7; no fix expected on 3.x
 ```
 
-A development requirement, so `left-behind` alone would sit at `medium`; the two advisories nobody
-will fix on the 5.x branch put it at `high`. An allowlisted package is
+Two of the four were fixed within 3.x — v3.4.47 is out of their range — and a `composer update`
+gets them; the other two are fixed only in 8.x, which is what the branch will not get, so they earn
+the raise: `high` for a transitive requirement becomes `critical`. The same package `abandoned`
+rather than left behind would count fixes anywhere in it, since no branch of it will release again:
+
+```text
+  abandoned    swiftmailer/swiftmailer v6.1.3  via laravel/framework
+               marked abandoned by its repository, replacement: symfony/mailer; repository archived
+               on GitHub; last release 2021-10-18 (4.9 years ago); last push 2021-10-25 (4.9 years
+               ago); released 2018-09-11, before PHP 8.5 GA (2025-11-20); php constraint ">=7.0.0"
+               has no upper bound; 1 security advisory affects v6.1.3 (CVE-2024-28859); fixed by
+               v6.3.0
+```
+
+The one advisory is fixed by the package's last release; the priority stays at the verdict's own
+`high`, and the line says where the fix is instead of claiming there is none.
+
+An allowlisted package is
 never raised — `finished` says the project vouches for it — but its advisories are counted in the
 footer line. Each advisory is named by its CVE, or by its Packagist
 id when it has none; the worst severity first, three named, the rest counted. Advisories on
 packages the report does not flag stay off the rows (they are audit's findings), but the footer
 counts them — `53 security advisories on 17 packages the report does not flag; see composer audit`
-— so a clean-looking report does not read as a clean audit. An advisory the project has accepted is silenced where `composer audit` silences it,
-not in lockrot's own configuration: `config.policy.advisories` (`ignore-id`, `ignore`,
+— so a clean-looking report does not read as a clean audit. The count covers the packages the
+run checked: without `--dev` that is the production set, which `composer audit --no-dev` also
+reports on, where plain `composer audit` counts development packages too. An advisory the project
+has accepted is silenced where `composer audit` silences it, not in lockrot's own configuration: `config.policy.advisories` (`ignore-id`, `ignore`,
 `ignore-severity`) on Composer 2.10 and later, `config.audit.ignore` and `audit.ignore-severity`
 before. What audit drops, lockrot drops. A policy section Composer itself rejects — a key reserved
 for a later version, say — leaves lockrot with no ignore list at all; the report then carries a note
@@ -139,7 +175,10 @@ changes — and cannot run under `--offline`, which is noted the same way; at in
 skipped, with a note, once the [budget](install-time.md) is spent. A repository that could not be
 reached for advisories is a note and, under `--strict-network`, exit `1`, like any other unreachable
 source. `--format=json` carries each advisory under the signal's `data.advisories` as `id`, `cve`,
-`title`, `link`, `severity` and `reported_at`, null where the repository gave none.
+`title`, `link`, `severity`, `reported_at` and `affected_versions` (the range, as Composer prints
+it), null where the repository gave none, with `fixed_by` — the listed release out of the range,
+null when there is none — and `fixed_on_branch`, true when that release is on the installed
+version's branch.
 
 ## Priority
 
