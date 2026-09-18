@@ -28,10 +28,13 @@ final class VerdictEngine
         if (isset($byId[Signal::S6])) {
             return Verdict::PINNED;
         }
+        if (isset($byId[Signal::S8]) && $byId[Signal::S8]->isHigh()) {
+            return Verdict::LEFT_BEHIND;
+        }
         if (isset($byId[Signal::S5])) {
             return Verdict::OLD_PROMISE;
         }
-        if (isset($byId[Signal::S2]) || isset($byId[Signal::S4])) {
+        if (isset($byId[Signal::S2]) || isset($byId[Signal::S4]) || isset($byId[Signal::S8])) {
             return Verdict::STALE;
         }
         if (!$hasData) {

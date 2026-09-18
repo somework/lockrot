@@ -33,7 +33,7 @@
                     },
                     "verdict": {
                         "type": "string",
-                        "enum": ["abandoned", "silent", "pinned", "old-promise", "stale"]
+                        "enum": ["abandoned", "silent", "pinned", "left-behind", "old-promise", "stale"]
                     },
                     "first_seen": {
                         "type": "string",

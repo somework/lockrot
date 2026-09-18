@@ -142,7 +142,7 @@ final class GithubFormatterTest extends TestCase
 
         self::assertSame('::notice title=lockrot::GitHub token not set: repository activity checked only for 2 candidate packages', $lines[\count($lines) - 2]);
         self::assertSame(
-            '4 packages checked · abandoned 1 · silent 1 · pinned 0 · old-promise 0 · stale 1 · unknown 0 · finished 0 · ok 1',
+            '4 packages checked · abandoned 1 · silent 1 · pinned 0 · left-behind 0 · old-promise 0 · stale 1 · unknown 0 · finished 0 · ok 1',
             $lines[\count($lines) - 1]
         );
     }
@@ -151,7 +151,8 @@ final class GithubFormatterTest extends TestCase
     public function testSummaryLineMatchesTheTableFormatter(): void
     {
         $github = explode("\n", trim($this->formatter(LockrotConfig::FAIL_ON_NONE, null)->format($this->report())));
-        $table = explode("\n", trim((new TableFormatter(FormatContext::unknown()))->format($this->report())));
+        // wide enough that the nine-verdict counts line does not fold
+        $table = explode("\n", trim((new TableFormatter(FormatContext::create(null, LockrotConfig::FAIL_ON_NONE, '0.1.0', 200)))->format($this->report())));
         $summary = array_values(array_filter($table, static fn (string $line): bool => strpos($line, ' packages checked') !== false));
 
         self::assertSame($summary[0], $github[\count($github) - 1]);
@@ -164,7 +165,7 @@ final class GithubFormatterTest extends TestCase
         $out = $this->formatter(Verdict::SILENT, $this->lockPath())->format($report);
 
         self::assertSame(
-            "0 packages checked · abandoned 0 · silent 0 · pinned 0 · old-promise 0 · stale 0 · unknown 0 · finished 0 · ok 0\n",
+            "0 packages checked · abandoned 0 · silent 0 · pinned 0 · left-behind 0 · old-promise 0 · stale 0 · unknown 0 · finished 0 · ok 0\n",
             $out
         );
     }

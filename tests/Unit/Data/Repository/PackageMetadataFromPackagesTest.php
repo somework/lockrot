@@ -70,6 +70,39 @@ final class PackageMetadataFromPackagesTest extends TestCase
         self::assertSame('1.0.1', PackageMetadata::fromPackages('a/b', [$second, $first], new \DateTimeImmutable(self::FIXED))->lastStableVersion());
     }
 
+    public function testTheHighestReleasePerBranchAndItsDateAreKept(): void
+    {
+        $v1a = $this->load(['name' => 'a/b', 'version' => '1.8.0', 'time' => '2019-01-01T00:00:00+00:00']);
+        $v1b = $this->load(['name' => 'a/b', 'version' => '1.9.2', 'time' => '2019-06-01T00:00:00+00:00']);
+        $v2 = $this->load(['name' => 'a/b', 'version' => 'v2.3.0', 'time' => '2024-01-01T00:00:00+00:00']);
+        $v0 = $this->load(['name' => 'a/b', 'version' => '0.9.1']);
+        $dev = $this->load(['name' => 'a/b', 'version' => 'dev-main']);
+
+        $meta = PackageMetadata::fromPackages('a/b', [$v1b, $v2, $v1a, $v0, $dev], new \DateTimeImmutable(self::FIXED));
+
+        $byBranch = $meta->latestStableByBranch();
+        self::assertSame(['1', '2', '0.9'], array_map('strval', array_keys($byBranch)));
+        self::assertSame('1.9.2', $byBranch['1']['version']);
+        self::assertNotNull($byBranch['1']['at']);
+        self::assertSame('2019-06-01T00:00:00+00:00', $byBranch['1']['at']->format(\DATE_ATOM));
+        self::assertSame('v2.3.0', $byBranch['2']['version']);
+        self::assertSame('0.9.1', $byBranch['0.9']['version']);
+        self::assertNull($byBranch['0.9']['at']);
+    }
+
+    public function testTheHighestVersionOnABranchWinsEvenWithAnOlderDate(): void
+    {
+        $higherButOlderDate = $this->load(['name' => 'a/b', 'version' => '1.5.0', 'time' => '2020-01-01T00:00:00+00:00']);
+        $lowerButNewerDate = $this->load(['name' => 'a/b', 'version' => '1.4.9', 'time' => '2021-01-01T00:00:00+00:00']);
+
+        $meta = PackageMetadata::fromPackages('a/b', [$lowerButNewerDate, $higherButOlderDate], new \DateTimeImmutable(self::FIXED));
+
+        $branch = $meta->latestStableByBranch()['1'];
+        self::assertSame('1.5.0', $branch['version']);
+        self::assertNotNull($branch['at']);
+        self::assertSame('2020-01-01T00:00:00+00:00', $branch['at']->format(\DATE_ATOM));
+    }
+
     public function testDevOnlyHasNoStableRelease(): void
     {
         $version = $this->load(['name' => 'a/b', 'version' => 'dev-master']);

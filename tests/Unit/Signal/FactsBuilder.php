@@ -7,6 +7,7 @@ namespace Lockrot\Tests\Unit\Signal;
 use Lockrot\Data\Forge\RepoRef;
 use Lockrot\Data\Forge\RepositoryActivity;
 use Lockrot\Data\Repository\PackageMetadata;
+use Lockrot\Data\Repository\ReleaseBranch;
 use Lockrot\Lock\LockedPackage;
 use Lockrot\Signal\PackageFacts;
 
@@ -52,6 +53,7 @@ final class FactsBuilder
         $hasStableRelease = false;
         $lastStableReleaseAt = null;
         $lastStableVersion = null;
+        $byBranch = [];
         foreach ($releases as [$version, $time]) {
             if (strpos($version, 'dev-') === 0) {
                 continue;
@@ -61,6 +63,12 @@ final class FactsBuilder
             if ($at !== null && ($lastStableReleaseAt === null || $at > $lastStableReleaseAt)) {
                 $lastStableReleaseAt = $at;
                 $lastStableVersion = $version;
+            }
+            // Releases are listed highest first in the callers, as Packagist lists them: the first
+            // one seen on a branch is its highest.
+            $branch = ReleaseBranch::of($version);
+            if ($branch !== null && !isset($byBranch[$branch])) {
+                $byBranch[$branch] = ['version' => $version, 'at' => $at];
             }
         }
 
@@ -74,7 +82,8 @@ final class FactsBuilder
             \count($releases),
             'https://github.com/vendor/pkg.git',
             $type,
-            new \DateTimeImmutable(self::NOW)
+            new \DateTimeImmutable(self::NOW),
+            $byBranch
         );
     }
 

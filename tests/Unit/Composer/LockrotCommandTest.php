@@ -488,7 +488,7 @@ final class LockrotCommandTest extends TestCase
         $display = $tester->getDisplay();
 
         self::assertSame(1, $code, $display);
-        self::assertStringStartsWith('### lockrot: dependency rot in 75 of 200 packages', $display);
+        self::assertStringStartsWith('### lockrot: dependency rot in 83 of 200 packages', $display);
         self::assertStringContainsString('| Package | Version | Verdict | Evidence | Via |', $display);
     }
 
