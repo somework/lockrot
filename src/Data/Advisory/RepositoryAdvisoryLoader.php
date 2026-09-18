@@ -81,11 +81,11 @@ final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
                 }
                 $answer = $repository->getSecurityAdvisories($map, false)['advisories'];
             } catch (TransportException $e) {
-                $notes[] = \sprintf('security advisories unavailable from %s: %s', $repository->getRepoName(), $e->getMessage());
+                $notes[] = self::unavailableNote($repository->getRepoName(), $e);
                 $failed = true;
                 continue;
             } catch (\RuntimeException $e) {
-                $notes[] = \sprintf('security advisories unavailable from %s: %s', $repository->getRepoName(), $e->getMessage());
+                $notes[] = self::unavailableNote($repository->getRepoName(), $e);
                 continue;
             }
             foreach ($answer as $name => $advisories) {
@@ -99,6 +99,17 @@ final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
         }
 
         return new AdvisoryBatch(self::lists($byName), $notes, $failed);
+    }
+
+    /**
+     * One line: Composer's message for a partial record runs to a `var_export()` dump of it, and
+     * every format prints a note on one line.
+     */
+    private static function unavailableNote(string $repository, \Throwable $e): string
+    {
+        $message = trim((string) strtok($e->getMessage(), "\r\n"));
+
+        return \sprintf('security advisories unavailable from %s: %s', $repository, $message === '' ? \get_class($e) : $message);
     }
 
     /**

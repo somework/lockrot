@@ -7,6 +7,7 @@ namespace Lockrot\Data\Repository;
 use Composer\Package\BasePackage;
 use Composer\Package\CompletePackage;
 use Composer\Semver\Comparator;
+use Composer\Semver\VersionParser;
 use Lockrot\Data\Forge\SupportSource;
 
 /**
@@ -27,7 +28,7 @@ final class PackageMetadata
     private string $type;
     private \DateTimeImmutable $dataDate;
     /**
-     * The highest stable release on each release branch ({@see ReleaseBranch}) and its date, by
+     * The newest stable release on each release branch ({@see ReleaseBranch}) and its date, by
      * branch key — an integer key where PHP makes one of `"1"`. What
      * {@see \Lockrot\Signal\Rule\LeftBehindRule} compares the installed branch against.
      *
@@ -90,7 +91,6 @@ final class PackageMetadata
         $highestStable = null;
         $type = null;
         $byBranch = [];
-        $highestByBranch = [];
 
         foreach ($versions as $version) {
             if (!$abandoned && $version instanceof CompletePackage && $version->isAbandoned()) {
@@ -110,10 +110,19 @@ final class PackageMetadata
                         $lastStableVersion = $version->getPrettyVersion();
                     }
                 }
+                // The branch view keeps the newest *dated stable* release per branch: a backport on a
+                // lower minor released later is the branch's last word, and an alpha on a new major
+                // is not a branch the upstream moved on to. (S2 above counts every tag, pre-releases
+                // included: there a tag can only make the package look younger, here it would make
+                // findings.) A branch with no dated stable release keeps its highest tag, undated.
                 $branch = ReleaseBranch::of($version->getVersion());
-                if ($branch !== null && (!isset($highestByBranch[$branch]) || Comparator::greaterThan($version->getVersion(), $highestByBranch[$branch]))) {
-                    $highestByBranch[$branch] = $version->getVersion();
-                    $byBranch[$branch] = ['version' => $version->getPrettyVersion(), 'at' => $releaseDate];
+                if ($branch !== null && VersionParser::parseStability($version->getVersion()) === 'stable') {
+                    $seen = $byBranch[$branch] ?? null;
+                    if ($releaseDate !== null && ($seen === null || $seen['at'] === null || $releaseDate > $seen['at'])) {
+                        $byBranch[$branch] = ['version' => $version->getPrettyVersion(), 'at' => $releaseDate];
+                    } elseif ($seen === null || ($seen['at'] === null && Comparator::greaterThan($version->getVersion(), (new VersionParser())->normalize($seen['version'])))) {
+                        $byBranch[$branch] = ['version' => $version->getPrettyVersion(), 'at' => null];
+                    }
                 }
             }
             if ($type === null) {
@@ -212,9 +221,9 @@ final class PackageMetadata
     }
 
     /**
-     * The highest stable release on every release branch and its date, keyed by
-     * {@see ReleaseBranch} key (an integer where PHP makes one of `"1"`); the date is null when that
-     * release carries no `time`.
+     * The newest dated stable release on every release branch, keyed by {@see ReleaseBranch} key (an
+     * integer where PHP makes one of `"1"`); pre-releases do not count. A branch whose releases carry
+     * no `time` at all holds its highest one with a null date.
      *
      * @return array<array-key, array{version: string, at: ?\DateTimeImmutable}>
      */

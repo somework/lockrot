@@ -9,10 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `left-behind`: a verdict for the major you are on, not the package. Signal S8 takes the highest
+- `left-behind`: a verdict for the major you are on, not the package. Signal S8 takes the newest
   stable release on the installed version's release branch (`1.x`, or `0.3.x` below 1.0 — what a
-  caret constraint stays inside), measures its age against `release-warn-years` /
-  `release-high-years`, and fires only when a higher branch has released since. `composer outdated
+  caret constraint stays inside; pre-releases do not count), measures its age against
+  `release-warn-years` / `release-high-years`, and fires only when a higher branch has released
+  since and within `release-warn-years` of today — a package dead on every branch stays S2's. `composer outdated
   --major-only` says a newer major exists; S2 sees the package's newest release and stays quiet; this
   says the branch installed here gets no fixes. At the high threshold the verdict is `left-behind`,
   between `pinned` and `old-promise` in severity with base priority `high`; below it the package is

@@ -92,6 +92,31 @@ final class LeftBehindRuleTest extends TestCase
         self::assertNull($this->rule()->evaluate(F::facts(F::package(['version' => '1.9.2']), $meta)));
     }
 
+    /** hoa/consistency: 1.x stopped in 2017-05, 2.x in 2017-08 — nobody moved on, the package died. S2's case. */
+    public function testAHigherBranchThatIsItselfOldIsNull(): void
+    {
+        $meta = F::metadata([['2.17.08.29', '2017-08-29'], ['1.17.05.02', '2017-05-02']]);
+
+        self::assertNull($this->rule()->evaluate(F::facts(F::package(['version' => '1.17.05.02']), $meta)));
+    }
+
+    public function testTheHigherBranchMustHaveReleasedWithinTheWarnYears(): void
+    {
+        // 2.x last released 2023-09-13: 3.0 years and a day before NOW — no longer alive by the warn threshold.
+        $justTooOld = F::metadata([['2.0.0', '2023-09-13T00:00:00+00:00'], ['1.9.2', '2019-03-02']]);
+        $alive = F::metadata([['2.0.0', '2023-09-15T00:00:00+00:00'], ['1.9.2', '2019-03-02']]);
+
+        self::assertNull($this->rule()->evaluate(F::facts(F::package(['version' => '1.9.2']), $justTooOld)));
+        self::assertNotNull($this->rule()->evaluate(F::facts(F::package(['version' => '1.9.2']), $alive)));
+    }
+
+    public function testAPreReleaseOnAHigherBranchIsNotTheUpstreamMovingOn(): void
+    {
+        $meta = F::metadata([['2.0.0-alpha1', '2026-01-01'], ['1.9.2', '2019-03-02']]);
+
+        self::assertNull($this->rule()->evaluate(F::facts(F::package(['version' => '1.9.2']), $meta)));
+    }
+
     public function testAHigherBranchReleasedTheSameDayAsOursHasNotMovedOn(): void
     {
         $meta = F::metadata([['2.0.0', '2019-03-02'], ['1.9.2', '2019-03-02']]);

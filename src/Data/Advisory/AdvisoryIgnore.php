@@ -46,7 +46,16 @@ final class AdvisoryIgnore
     {
         // Composer 2.10 introduced the policy object; the guard is load-bearing on every older version.
         if (class_exists(PolicyConfig::class)) {
-            $policy = PolicyConfig::fromConfig($config);
+            // It rejects what it does not know — a `licenses` section reserved for a later
+            // Composer, an unknown `ignore-*` key, a constraint it cannot parse — by throwing. A
+            // report is not the place to enforce Composer's config schema: the PHAR carries one
+            // Composer version and reads projects written for another, so a rejected policy means
+            // no ignore list, never no report.
+            try {
+                $policy = PolicyConfig::fromConfig($config);
+            } catch (\Throwable $e) {
+                return self::none();
+            }
 
             return new self(
                 array_keys($policy->advisories->getIgnoreListForOperation('audit')),

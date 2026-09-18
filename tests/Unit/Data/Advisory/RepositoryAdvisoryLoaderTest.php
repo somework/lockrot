@@ -149,6 +149,8 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
             self::assertSame([], $batch->byName());
             self::assertCount(1, $batch->notes());
             self::assertStringContainsString('could not be loaded as a full advisory', $batch->notes()[0]);
+            self::assertStringNotContainsString("\n", $batch->notes()[0], 'one line: the var_export dump Composer appends is cut');
+            self::assertStringNotContainsString('advisoryId', $batch->notes()[0]);
             self::assertFalse($batch->hadNetworkFailure());
 
             $behind = new RepositoryAdvisoryLoader(array_merge($partial->repositories(), $this->server()->repositories()));

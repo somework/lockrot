@@ -67,12 +67,14 @@ newest release is exactly the one that is fresh. Neither says that the major you
 fixes any more.
 
 A version's *release branch* is what a caret constraint on it would stay inside: `1.x` for anything
-`>= 1.0`, `0.3.x` for `0.3.*` — as `^0.3` has it. S8 takes the highest stable release on the
-installed branch and measures its age against `release-warn-years` / `release-high-years`, the S2
-thresholds. It fires only when some higher branch has released *after* that date: a `2.0` that was
-abandoned before `1.x` got its last release is not the upstream moving on, and a package whose every
-branch is old is S2's case, not S8's. At the high threshold the verdict is `left-behind`; below it,
-`stale`, as an old release or an old push would be.
+`>= 1.0`, `0.3.x` for `0.3.*` — as `^0.3` has it. S8 takes the newest stable release on the
+installed branch — a backport on a lower minor counts, a pre-release does not — and measures its
+age against `release-warn-years` / `release-high-years`, the S2 thresholds. It fires only when some
+higher branch has released *after* that date and within `release-warn-years` of today: a `2.0` that
+was abandoned before `1.x` got its last release is not the upstream moving on, and a package whose
+every branch went quiet years ago is not alive — that is S2's case, `stale` or `silent`, not S8's.
+At the high threshold the verdict is `left-behind`; below it, `stale`, as an old release or an old
+push would be.
 
 ```text
   left-behind  hashids/hashids 4.1.0  direct
