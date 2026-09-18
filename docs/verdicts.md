@@ -14,7 +14,7 @@ was observed about the package. The priority says how much that applies to *your
 |---|---|---|
 | `abandoned` | The package's Composer repository marks it abandoned (Packagist by default), or its repository is archived on GitHub or GitLab | S1 or S3 |
 | `silent` | No stable release for at least `release-high-years` (default 5y) **and** no repository push for at least `push-high-years` (default 5y); an archived repository is reported as `abandoned` instead | S2 high AND S4 high, NOT S1, NOT S3 |
-| `pinned` | Installed version is a branch snapshot (`dev-*` or `#hash`), or the package has no stable release at all | S6 |
+| `pinned` | Installed version is a branch snapshot — `dev-master`, `dev-main`, any other `dev-*` branch, a `2.x-dev` alias or a `#hash` reference — or the package has no stable release at all | S6 |
 | `old-promise` | The installed version was released before the target PHP's GA date, and its `require.php` constraint is open-ended (`>=N`, `*`) for that target | S5 |
 | `stale` | Old release or old push, but not old enough (or not on both fronts) for `silent` | one of S2/S4 |
 | `unknown` | No data could be obtained (not found in any configured Composer repository, or all lookups failed) | — |
@@ -39,12 +39,16 @@ always wins, so an allowlisted package reports `finished` whatever its signals s
 | S3 | The repository is archived — on GitHub, or on GitLab when the run has credentials there (the anonymous API hides the flag); Bitbucket Cloud has no archived state |
 | S4 | Time since the last push to any branch (GitHub) or the newest commit on any branch (GitLab, Bitbucket), against `push-warn-years` / `push-high-years` |
 | S5 | The installed release predates the target PHP's GA date and the `require.php` constraint has no upper bound |
-| S6 | The installed version is a branch snapshot (`dev-*`, `#hash`), or the package has no stable release |
+| S6 | The installed version is a branch snapshot (`dev-master`, `dev-main`, `2.x-dev`, `#hash`), or the package has no stable release |
 | S7 | A direct requirement pulls in flagged transitive packages — informational, never a verdict; see [Transitive exposure](#transitive-exposure) |
 
 S3 and S4 come from the repository host — GitHub, GitLab or Bitbucket — and need network access;
 see [internals.md](internals.md) for how that data is fetched and cached, which host reads what, and
 [configuration.md](configuration.md) for the thresholds.
+
+S5 is not what `composer check-platform-reqs` checks. That command tests the platform against each
+constraint — PHP 8.4 satisfies `>=7.2`, so it passes — while S5 tests the constraint against the
+release history: a `>=7.2` written before PHP 8.4 existed says nothing about PHP 8.4.
 
 Every finding's evidence line states the concrete fact — release date, push date, constraint string
 — and the report footer states the data date. There are no severity words beyond the verdict names
