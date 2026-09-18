@@ -44,7 +44,9 @@ subdirectory. The same repository publishes `ghcr.io/somework/lockrot`, a signed
 | `2` | Tool or configuration error (unparsable `composer.json`/`composer.lock`, invalid config value, unreadable or unwritable [baseline](baseline.md)) |
 
 `composer audit` follows the same convention: exit `1` when it finds a security advisory or, with Composer's default
-`audit.abandoned=fail`, an abandoned package; exit `0` when it finds nothing.
+`audit.abandoned=fail`, an abandoned package; exit `0` when it finds nothing. lockrot reads the same advisories
+([signal S9](verdicts.md#security-advisories)) but never exits `1` for one alone: it raises the priority of a finding
+nobody will fix, and the exit code follows `--fail-on` as usual.
 
 A network failure — a configured Composer repository or a repository host (GitHub, GitLab, Bitbucket) unreachable — never turns into a non-zero exit code on
 its own. It is reported as a note, and the checks that could not run are treated as absent evidence.

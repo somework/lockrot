@@ -32,7 +32,7 @@ be JSON integers (`3`, not `"3"`).
 
 | Key | Default | Meaning |
 |---|---|---|
-| `fail-on` | `none` | Exit 1 threshold: a verdict (`stale`, `old-promise`, `pinned`, `silent`, `abandoned`) or a [priority](verdicts.md#priority) (`low`, `medium`, `high`, `critical`); `none` fails on nothing |
+| `fail-on` | `none` | Exit 1 threshold: a verdict (`stale`, `old-promise`, `left-behind`, `pinned`, `silent`, `abandoned`) or a [priority](verdicts.md#priority) (`low`, `medium`, `high`, `critical`); `none` fails on nothing |
 | `target-php` | `config.platform.php`, else the running PHP | PHP version used for the S5 "old promise" check, e.g. `"8.4"` |
 | `format` | `table` | `table`, `json`, `github`, `sarif`, `gitlab` or `markdown`; see [ci.md](ci.md) |
 | `include-dev` | `false` | Also check `packages-dev` (CLI: `--dev`) |
@@ -40,7 +40,7 @@ be JSON integers (`3`, not `"3"`).
 | `install-time-strict` | `false` | Apply `fail-on` at install time too, stopping the transaction instead of only reporting |
 | `install-time-budget` | `5` | Integer seconds (1–120): the install-time pass's hard time budget |
 | `baseline` | `lockrot-baseline.json` | Path to the [baseline](baseline.md) file, relative to `composer.json` or absolute |
-| `release-warn-years` / `release-high-years` | `3` / `5` | Integer thresholds for "no stable release" (S2) |
+| `release-warn-years` / `release-high-years` | `3` / `5` | Integer thresholds for "no stable release" (S2) and "no stable release on the installed branch" (S8) |
 | `push-warn-years` / `push-high-years` | `3` / `5` | Integer thresholds for "no repository push or commit" (S4) |
 | `ignore` | `[]` | Project allowlist, see below |
 
@@ -59,7 +59,7 @@ be JSON integers (`3`, not `"3"`).
 | Option | Meaning |
 |---|---|
 | `--format=table\|json\|github\|sarif\|gitlab\|markdown` | Output format. `table` (the default) is a width-aware list grouped by priority, not a box table. The format changes the output only; the exit code is the same for all six. See [ci.md](ci.md) |
-| `--fail-on=<verdict or priority>` | Exit-1 threshold for this run: `none`, a verdict (`abandoned`, `silent`, `pinned`, `old-promise`, `stale`) or a [priority](verdicts.md#priority) (`critical`, `high`, `medium`, `low`) |
+| `--fail-on=<verdict or priority>` | Exit-1 threshold for this run: `none`, a verdict (`abandoned`, `silent`, `pinned`, `left-behind`, `old-promise`, `stale`) or a [priority](verdicts.md#priority) (`critical`, `high`, `medium`, `low`) |
 | `--target-php=8.4` | PHP version for the S5 check |
 | `--dev` | Include `packages-dev`. A development package is reported the same way a production one is, but it gets one [priority](verdicts.md) step lower |
 | `--all` | Show every checked package, not only flagged ones. Adds a final `not flagged` group |

@@ -15,8 +15,12 @@ use Lockrot\Deadline;
  * Security advisories through Composer's own repository layer — the same call `composer audit`
  * makes ({@see \Composer\Repository\RepositorySet::getMatchingSecurityAdvisories()}): every
  * repository that publishes advisories is asked for every name, with the installed version as the
- * constraint, and the answers are merged. Packagist answers one POST for the whole list; a
- * repository that carries advisories in its package files answers from Composer's cache.
+ * constraint, and the answers are merged. Full records only, as audit's own report asks for them:
+ * Packagist then answers one POST for the whole list, while the partial records Composer keeps in
+ * its package-file cache — an id and a range, possibly withdrawn since — are never the answer. A
+ * repository that carries advisories in its package files answers from Composer's cache, and one
+ * whose inline records are partial is a note. Advisories the project ignores in Composer's own
+ * configuration ({@see AdvisoryIgnore}) are dropped, as audit drops them.
  *
  * Composer 2.2 has no advisory API at all: the run says so in a note and checks nothing else
  * differently. Offline, nothing is asked — the POST cannot be served from a cache — and the note
@@ -32,29 +36,31 @@ final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
     private array $repositories;
     private bool $offline;
     private Deadline $deadline;
+    private AdvisoryIgnore $ignore;
     private VersionParser $parser;
 
     /** @param list<RepositoryInterface> $repositories the project's Composer repositories, in configured order */
-    public function __construct(array $repositories, bool $offline = false, ?Deadline $deadline = null)
+    public function __construct(array $repositories, bool $offline = false, ?Deadline $deadline = null, ?AdvisoryIgnore $ignore = null)
     {
         $this->repositories = $repositories;
         $this->offline = $offline;
         $this->deadline = $deadline ?? Deadline::never();
+        $this->ignore = $ignore ?? AdvisoryIgnore::none();
         $this->parser = new VersionParser();
     }
 
     public function load(array $versionByName): AdvisoryBatch
     {
-        // The interface arrived in Composer 2.4; the guard is load-bearing on the 2.2 LTS.
-        if (!interface_exists(AdvisoryProviderInterface::class)) {
-            return AdvisoryBatch::unavailable(self::NOTE_COMPOSER_TOO_OLD);
+        $map = $this->constraints($versionByName);
+        if ($map === []) {
+            return AdvisoryBatch::empty();
         }
         if ($this->offline) {
             return AdvisoryBatch::unavailable(self::NOTE_OFFLINE);
         }
-        $map = $this->constraints($versionByName);
-        if ($map === []) {
-            return AdvisoryBatch::empty();
+        // The interface arrived in Composer 2.4; the guard is load-bearing on the 2.2 LTS.
+        if (!interface_exists(AdvisoryProviderInterface::class)) {
+            return AdvisoryBatch::unavailable(self::NOTE_COMPOSER_TOO_OLD);
         }
 
         /** @var array<string, array<string, Advisory>> $byName name => advisory id => advisory, so two repositories serving the same advisory count it once */
@@ -73,7 +79,7 @@ final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
                 if (!$repository->hasSecurityAdvisories()) {
                     continue;
                 }
-                $answer = $repository->getSecurityAdvisories($map, true)['advisories'];
+                $answer = $repository->getSecurityAdvisories($map, false)['advisories'];
             } catch (TransportException $e) {
                 $notes[] = \sprintf('security advisories unavailable from %s: %s', $repository->getRepoName(), $e->getMessage());
                 $failed = true;
@@ -84,6 +90,9 @@ final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
             }
             foreach ($answer as $name => $advisories) {
                 foreach ($advisories as $advisory) {
+                    if ($this->ignore->ignores($name, $advisory)) {
+                        continue;
+                    }
                     $byName[$name][$advisory->advisoryId] = Advisory::fromComposer($advisory);
                 }
             }
