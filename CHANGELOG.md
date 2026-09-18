@@ -15,9 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `release-warn-years` / `release-high-years`, and fires only when a higher branch has released
   since and within `release-warn-years` of today — a package dead on every branch stays S2's.
   `composer outdated --major-only` says a newer major exists; S2 sees the package's newest release
-  and stays quiet; this says the branch installed here gets no fixes. At the high threshold the
-  verdict is `left-behind`, between `pinned` and `old-promise` in severity with base priority
-  `high`; below it the package is `stale`, as an old release or push would make it. The evidence
+  and stays quiet; this says the branch installed here gets no fixes. The verdict is `left-behind`
+  at either threshold — between `pinned` and `old-promise` in severity, base priority `high`; the
+  signal's level records whether the branch has also passed `release-high-years`. The evidence
   reads `branch 1.x last released 2021-08-03 (5.1 years ago); 2.x released v2.12.5 (2026-04-17)`
   — the higher branch whose release is newest, named as the branch fixes land on.
 - Security advisories on the finding. Signal S9 carries the advisories that affect the installed
@@ -27,8 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   configuration (`config.policy.advisories` on 2.10+, `config.audit.ignore` before) are dropped as
   `composer audit` drops them. S9 never decides a verdict. On an `abandoned`, `silent` or
   `left-behind` package the evidence gains `no fix expected` and the priority goes up one step,
-  `critical` at most — and so does an advisory on a `stale` or `old-promise` package whose S8 names
-  a branch the upstream left. The three advisories named on the line are the worst by severity. Advisories
+  `critical` at most. The three advisories named on the line are the worst by severity. Advisories
   on packages the report does not flag stay off the rows and are totalled in the footer:
   `53 security advisories on 17 packages the report does not flag; see composer audit`. On
   Composer 2.2, under `--offline` and once the install-time budget is spent the report carries one
@@ -38,13 +37,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- A package on a quiet branch of a living upstream can now be `stale` (S8 warn) or `left-behind` (S8
-  high) where it was `ok`; `--fail-on=stale` and `--fail-on=left-behind` see it. A baseline holding
-  such a package at `stale` or `old-promise` — both below `left-behind` in severity — reports it
-  `worsened` once it crosses into `left-behind`.
+- A package on a quiet branch of a living upstream is now `left-behind` where it was `ok`, `stale`
+  or `old-promise`; `--fail-on=left-behind` sees it. A baseline holding such a package at `stale` or
+  `old-promise` — both below `left-behind` in severity — reports it `worsened`.
 - A priority threshold can trip on a verdict that did not move: an advisory on an `abandoned`,
   `silent` or `left-behind` package lifts `high` to `critical`, so `--fail-on=critical` now fails
-  on it, and one on a branch the upstream left lifts `medium` to `high`. `left-behind` itself
+  on it. `left-behind` itself
   starts at `high`, so a run that passed `--fail-on=high` can fail on a package that was `ok`
   before. The baseline, keyed on the verdict, still calls the finding `known`.
 - `--strict-network` now covers the advisory request too: every repository that publishes

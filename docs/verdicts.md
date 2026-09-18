@@ -15,9 +15,9 @@ was observed about the package. The priority says how much that applies to *your
 | `abandoned` | The package's Composer repository marks it abandoned (Packagist by default), or its repository is archived on GitHub or GitLab | S1 or S3 |
 | `silent` | No stable release for at least `release-high-years` (default 5y) **and** no repository push for at least `push-high-years` (default 5y); an archived repository is reported as `abandoned` instead | S2 high AND S4 high, NOT S1, NOT S3 |
 | `pinned` | Installed version is a branch snapshot — `dev-master`, `dev-main`, any other `dev-*` branch, a `2.x-dev` alias or a `#hash` reference — or the package has no stable release at all | S6 |
-| `left-behind` | No stable release on the installed version's release branch for at least `release-high-years` (default 5y), while a higher branch has released since — the package is alive, the branch you are on is not | S8 high |
+| `left-behind` | No stable release on the installed version's release branch for at least `release-warn-years` (default 3y), while a higher branch has released since — the package is alive, the branch you are on is not | S8 |
 | `old-promise` | The installed version was released before the target PHP's GA date, and its `require.php` constraint is open-ended (`>=N`, `*`) for that target | S5 |
-| `stale` | Old release, old push or a quiet branch, but not old enough (or not on both fronts) for `silent` or `left-behind` | one of S2/S4/S8 |
+| `stale` | Old release or old push, but not old enough (or not on both fronts) for `silent` | one of S2/S4 |
 | `unknown` | No data could be obtained (not found in any configured Composer repository, or all lookups failed) | — |
 | `finished` | Matched the built-in or project allowlist — the package is complete by design, not neglected | allowlist match |
 | `ok` | None of the above | — |
@@ -74,8 +74,10 @@ age against `release-warn-years` / `release-high-years`, the S2 thresholds. It f
 higher branch has released *after* that date and within `release-warn-years` of today: a `2.0` that
 was abandoned before `1.x` got its last release is not the upstream moving on, and a package whose
 every branch went quiet years ago is not alive — that is S2's case, `stale` or `silent`, not S8's.
-At the high threshold the verdict is `left-behind`; below it, `stale`, as an old release or an old
-push would be.
+The verdict is `left-behind` at either threshold. Three years without a release is `stale` for a
+package, because a package can simply be done; for a branch below one that keeps shipping it is
+the branch left, and the higher branch's releases are the proof. The level (`warn` past three
+years, `high` past five) stays on the signal, in `--format=json` and in the evidence's years.
 
 ```text
   left-behind  smalot/pdfparser v1.1.0  via j0k3r/graby
@@ -115,9 +117,7 @@ direct requirement that does — and the priority goes up one step, `critical` a
 ```
 
 A development requirement, so `left-behind` alone would sit at `medium`; the two advisories nobody
-will fix on the 5.x branch put it at `high`. The same applies when S8 fires below its threshold: a
-`stale` or `old-promise` package whose evidence names a branch the upstream left is not where a fix
-lands either, so its advisories read `no fix expected` and raise it too. An allowlisted package is
+will fix on the 5.x branch put it at `high`. An allowlisted package is
 never raised — `finished` says the project vouches for it — but its advisories are counted in the
 footer line. Each advisory is named by its CVE, or by its Packagist
 id when it has none; the worst severity first, three named, the rest counted. Advisories on
@@ -130,8 +130,8 @@ before. What audit drops, lockrot drops. A policy section Composer itself reject
 for a later version, say — leaves lockrot with no ignore list at all; the report then carries a note
 saying so, and every advisory counts until the section parses.
 
-Without S8, `stale`, `pinned` and `old-promise` are not raised: an old release, a branch snapshot
-or an open php constraint says nothing about whether a fix is coming. The [baseline](baseline.md) stays keyed on
+`stale`, `pinned` and `old-promise` are not raised: an old release, a branch snapshot or an open
+php constraint says nothing about whether a fix is coming. The [baseline](baseline.md) stays keyed on
 the verdict, so a baselined finding is `known` whatever S9 adds to its priority.
 
 The check needs Composer 2.4 or newer — on the 2.2 LTS the report carries one note and nothing else
@@ -153,9 +153,8 @@ Four rules, in order:
    `pinned`, `left-behind` and `old-promise` at **high**, `stale` at **medium**.
 3. The base drops one step when the package is transitive (nothing you require names it) and one
    more step when it is a development dependency. It never drops below **low**.
-4. A security advisory on an `abandoned`, `silent` or `left-behind` package — or on any flagged
-   package whose evidence carries S8, the branch the upstream left — raises the result one step,
-   never above **critical**; see [Security advisories](#security-advisories).
+4. A security advisory on an `abandoned`, `silent` or `left-behind` package raises the result one
+   step, never above **critical**; see [Security advisories](#security-advisories).
 
 | Verdict | direct, prod | transitive, prod | direct, dev | transitive, dev |
 |---|---|---|---|---|
