@@ -71,7 +71,7 @@ final class FactsBuilder
             $branch = ReleaseBranch::of($version);
             if ($branch !== null && VersionParser::parseStability($version) === 'stable') {
                 $seen = $byBranch[$branch] ?? null;
-                $highest = $seen === null ? (new VersionParser())->normalize($version) : $seen['highest'];
+                $highest = $seen === null ? ['normalized' => (new VersionParser())->normalize($version), 'pretty' => $version, 'at' => $at] : $seen['highest'];
                 if ($at !== null && ($seen === null || $seen['at'] === null || $at > $seen['at'])) {
                     $byBranch[$branch] = ['version' => $version, 'at' => $at, 'highest' => $highest];
                 } elseif ($seen === null) {
@@ -102,8 +102,9 @@ final class FactsBuilder
         return new RepositoryActivity(new RepoRef($forge, $host, 'vendor/pkg'), $archived, $pushedAt === null ? null : new \DateTimeImmutable($pushedAt), new \DateTimeImmutable(self::NOW));
     }
 
-    public static function facts(LockedPackage $p, ?PackageMetadata $m = null, ?RepositoryActivity $a = null): PackageFacts
+    /** @param list<\Lockrot\Data\Advisory\Advisory> $advisories */
+    public static function facts(LockedPackage $p, ?PackageMetadata $m = null, ?RepositoryActivity $a = null, array $advisories = []): PackageFacts
     {
-        return new PackageFacts($p, $m, $a);
+        return new PackageFacts($p, $m, $a, $advisories);
     }
 }

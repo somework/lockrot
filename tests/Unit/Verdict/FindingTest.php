@@ -12,6 +12,15 @@ use PHPUnit\Framework\TestCase;
 
 final class FindingTest extends TestCase
 {
+    /** An S9 advisory row no listed release fixes, as {@see \Lockrot\Signal\Rule\AdvisoryRule} writes it. */
+    private const OPEN = ['id' => 'PKSA-open', 'fixed_by' => null, 'fixed_on_branch' => false];
+
+    /** @return array{id: string, fixed_by: string, fixed_on_branch: bool} */
+    private static function fixed(string $by, bool $onBranch): array
+    {
+        return ['id' => 'PKSA-fixed-'.$by, 'fixed_by' => $by, 'fixed_on_branch' => $onBranch];
+    }
+
     public function testEvidenceAndArray(): void
     {
         $signals = [
@@ -41,7 +50,7 @@ final class FindingTest extends TestCase
     {
         $signals = [
             new Signal('S1', 'high', 'marked abandoned by its repository'),
-            new Signal('S9', 'warn', '1 security advisory affects 1.0.0 (CVE-2024-0001)', ['advisories' => []]),
+            new Signal('S9', 'warn', '1 security advisory affects 1.0.0 (CVE-2024-0001)', ['advisories' => [self::OPEN]]),
         ];
         $direct = new Finding('vendor/pkg', '1.0.0', Verdict::ABANDONED, $signals, ['vendor/pkg'], null, null, null, false, ['vendor/pkg']);
         $transitiveDev = new Finding('vendor/pkg', '1.0.0', Verdict::ABANDONED, $signals, ['root/app', 'vendor/pkg'], null, null, null, true, ['root/app']);
@@ -55,7 +64,7 @@ final class FindingTest extends TestCase
 
     public function testAnAdvisoryAloneChangesNeitherThePriorityNorTheWording(): void
     {
-        $s9 = new Signal('S9', 'warn', '1 security advisory affects 1.0.0 (CVE-2024-0001)', ['advisories' => []]);
+        $s9 = new Signal('S9', 'warn', '1 security advisory affects 1.0.0 (CVE-2024-0001)', ['advisories' => [self::OPEN]]);
         $pinned = new Finding('vendor/pkg', 'dev-main', Verdict::PINNED, [new Signal('S6', 'warn', 'pinned to branch snapshot dev-main'), $s9], ['vendor/pkg'], null, null, null, false, ['vendor/pkg']);
         $ok = new Finding('vendor/pkg', '1.0.0', Verdict::OK, [$s9], ['vendor/pkg'], null, null, null, false, ['vendor/pkg']);
 
@@ -70,11 +79,28 @@ final class FindingTest extends TestCase
     public function testTheNoFixVerdictsAreExactlyTheThreeWithNoUpstreamToWaitFor(): void
     {
         self::assertSame([Verdict::ABANDONED, Verdict::SILENT, Verdict::LEFT_BEHIND], Finding::NO_FIX_VERDICTS);
-        $s9 = new Signal('S9', 'warn', 'advisory', []);
+        $s9 = new Signal('S9', 'warn', 'advisory', ['advisories' => [self::OPEN]]);
         foreach (Verdict::all() as $verdict) {
             $finding = new Finding('vendor/pkg', '1.0.0', $verdict, [$s9], ['vendor/pkg'], null, null);
             self::assertSame(\in_array($verdict, Finding::NO_FIX_VERDICTS, true), $finding->hasUnfixableAdvisory(), $verdict);
         }
+    }
+
+    /** A row without the fix keys (an older JSON, a hand-built signal) is an advisory nothing fixes; a list that is not one is no advisory. */
+    public function testAnAdvisoryRowWithoutFixKeysCountsAsUnfixedAndAMalformedListAsNone(): void
+    {
+        $bare = new Finding('vendor/pkg', '1.0.0', Verdict::LEFT_BEHIND, [new Signal('S9', 'warn', 'x', ['advisories' => [['id' => 'PKSA-1']]])], ['vendor/pkg'], null, null);
+        self::assertTrue($bare->hasUnfixableAdvisory());
+        self::assertSame('x; no fix expected', $bare->ownEvidence());
+
+        $fixedSomewhere = new Finding('vendor/pkg', '1.0.0', Verdict::LEFT_BEHIND, [new Signal('S9', 'warn', 'x', ['advisories' => [['id' => 'PKSA-1', 'fixed_by' => '2.0.0']]])], ['vendor/pkg'], null, null);
+        self::assertSame('x; no fix expected on 1.x', $fixedSomewhere->ownEvidence(), 'no fixed_on_branch key reads as off the branch');
+
+        $onBranchAndOpen = new Finding('vendor/pkg', '1.0.0', Verdict::LEFT_BEHIND, [new Signal('S9', 'warn', 'x', ['advisories' => [self::fixed('1.9.0', true), self::OPEN]])], ['vendor/pkg'], null, null);
+        self::assertSame('x; no fix expected', $onBranchAndOpen->ownEvidence(), 'a fix on the branch is not the kind that qualifies the clause');
+
+        $malformed = new Finding('vendor/pkg', '1.0.0', Verdict::ABANDONED, [new Signal('S9', 'warn', 'x', ['advisories' => 'not a list'])], ['vendor/pkg'], null, null);
+        self::assertFalse($malformed->hasUnfixableAdvisory());
     }
 
     /** The label's reason is read first: S6 before S5 on a pinned finding, S8 before S5 on a left-behind one. */
@@ -103,7 +129,7 @@ final class FindingTest extends TestCase
     /** S8 at either level makes the verdict `left-behind` ({@see VerdictEngine}); the raise follows the verdict, not the signal. */
     public function testAnAdvisoryOnALeftBehindBranchIsUnfixableAtEitherLevel(): void
     {
-        $s9 = new Signal('S9', 'warn', '14 security advisories affect 6.5.5 (CVE-a, CVE-b, CVE-c and 11 more)', ['advisories' => []]);
+        $s9 = new Signal('S9', 'warn', '14 security advisories affect 6.5.5 (CVE-a, CVE-b, CVE-c and 11 more)', ['advisories' => [self::OPEN]]);
         $s8warn = new Signal('S8', 'warn', 'branch 6.x last released 2022-06-20 (4.2 years ago); 8.x released 8.2.0 (2026-09-06)');
         $s5 = new Signal('S5', 'warn', 'released 2020-06-16, before PHP 8.4 GA (2024-11-21); php constraint ">=5.5" has no upper bound');
 
@@ -117,6 +143,49 @@ final class FindingTest extends TestCase
         self::assertFalse($oldPromise->hasUnfixableAdvisory(), 'an open php constraint says nothing about whether a fix is coming');
         self::assertSame(Priority::HIGH, $oldPromise->priority());
         self::assertFalse($finished->hasUnfixableAdvisory(), 'an allowlisted package is never raised: the allowlist decided');
+    }
+
+    /**
+     * swiftmailer 6.1.3, abandoned: CVE-2024-28859 is fixed by 6.3.0, the package's last release.
+     * The fix is out, the raise is not earned, and the line must not say "no fix expected".
+     */
+    public function testAnAdvisoryAlreadyFixedByAListedReleaseNeitherRaisesNorSaysNoFixExpected(): void
+    {
+        $s9 = new Signal('S9', 'warn', '1 security advisory affects v6.1.3 (CVE-2024-28859); fixed by 6.3.0', ['advisories' => [self::fixed('6.3.0', false)]]);
+        $abandoned = new Finding('swiftmailer/swiftmailer', 'v6.1.3', Verdict::ABANDONED, [new Signal('S1', 'high', 'marked abandoned by its repository'), $s9], ['swiftmailer/swiftmailer'], null, null, null, false, ['swiftmailer/swiftmailer']);
+
+        self::assertFalse($abandoned->hasUnfixableAdvisory());
+        self::assertSame(Priority::CRITICAL, $abandoned->priority(), 'the base, not a raise');
+        self::assertSame('marked abandoned by its repository; 1 security advisory affects v6.1.3 (CVE-2024-28859); fixed by 6.3.0', $abandoned->ownEvidence());
+    }
+
+    /**
+     * symfony/http-foundation v3.4.18 on the 3.x branch the upstream left: one CVE fixed by
+     * v3.4.47 (on the branch — reachable), three by v8.1.7 (the fix the branch will not get). The
+     * three earn the raise, and the clause names the branch, since "no fix expected" alone would
+     * contradict "fixed by v8.1.7" on the same line.
+     */
+    public function testOnALeftBehindBranchOnlyAFixOnTheBranchCounts(): void
+    {
+        $s8 = new Signal('S8', 'high', 'branch 3.x last released 2020-10-24 (5.9 years ago); 8.x released v8.1.7 (2026-09-14)');
+        $s9 = new Signal('S9', 'warn', '4 security advisories affect v3.4.18 (a, b, c and 1 more); 3 fixed by v8.1.7, 1 fixed by v3.4.47', ['advisories' => [self::fixed('v8.1.7', false), self::fixed('v8.1.7', false), self::fixed('v8.1.7', false), self::fixed('v3.4.47', true)]]);
+        $finding = new Finding('symfony/http-foundation', 'v3.4.18', Verdict::LEFT_BEHIND, [$s8, $s9], ['symfony/http-foundation'], null, null, null, false, ['symfony/http-foundation']);
+
+        self::assertTrue($finding->hasUnfixableAdvisory());
+        self::assertSame(Priority::CRITICAL, $finding->priority());
+        self::assertStringEndsWith('; 3 fixed by v8.1.7, 1 fixed by v3.4.47; no fix expected on 3.x', $finding->ownEvidence());
+
+        $allOnBranch = new Finding('symfony/http-foundation', 'v3.4.18', Verdict::LEFT_BEHIND, [$s8, new Signal('S9', 'warn', '1 security advisory affects v3.4.18 (a); fixed by v3.4.47', ['advisories' => [self::fixed('v3.4.47', true)]])], ['symfony/http-foundation'], null, null, null, false, ['symfony/http-foundation']);
+        self::assertFalse($allOnBranch->hasUnfixableAdvisory(), 'a composer update inside the constraint gets the fix');
+        self::assertSame(Priority::HIGH, $allOnBranch->priority());
+        self::assertStringEndsWith('; fixed by v3.4.47', $allOnBranch->ownEvidence());
+
+        $openEverywhere = new Finding('symfony/http-foundation', 'v3.4.18', Verdict::LEFT_BEHIND, [$s8, new Signal('S9', 'warn', '1 security advisory affects v3.4.18 (a)', ['advisories' => [self::OPEN]])], ['symfony/http-foundation'], null, null, null, false, ['symfony/http-foundation']);
+        self::assertStringEndsWith('(a); no fix expected', $openEverywhere->ownEvidence(), 'nothing fixes it anywhere: no branch to point away from');
+
+        $abandonedWithAFixElsewhere = new Finding('vendor/pkg', '1.0.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'marked abandoned by its repository'), new Signal('S9', 'warn', '2 security advisories affect 1.0.0 (a, b); 1 fixed by 2.0.0', ['advisories' => [self::fixed('2.0.0', false), self::OPEN]])], ['vendor/pkg'], null, null, null, false, ['vendor/pkg']);
+        self::assertTrue($abandonedWithAFixElsewhere->hasUnfixableAdvisory(), 'one of the two has no fix at all');
+        self::assertStringEndsWith('; 1 fixed by 2.0.0; no fix expected', $abandonedWithAFixElsewhere->ownEvidence(), 'an abandoned package has no branch to qualify with');
     }
 
     public function testNoteWhenNoSignals(): void

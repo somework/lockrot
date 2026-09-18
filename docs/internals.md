@@ -16,7 +16,7 @@ This page explains what that means for freshness, memory and the "Data as of" li
 
 | Source | What it provides | Freshness |
 |---|---|---|
-| The configured Composer repositories | The abandoned flag (S1), release dates and versions (S2, S5, S6, S8) | Revalidated on every run |
+| The configured Composer repositories | The abandoned flag (S1), release dates and versions (S2, S5, S6, S8, and the releases S9 looks for a fix in). A release date is what the repository says it is — Packagist dates a tag by its commit, and a tag it has no date for is read as "age unknown", so a branch or package whose highest tag is undated gets no S8 or S2 | Revalidated on every run |
 | The same repositories, through Composer's advisory API | Security advisories on the installed version (S9); Packagist answers one request for the whole lock | Packagist's answer is fetched on every run; a repository carrying advisories in its package files answers from Composer's metadata cache; Composer 2.4+ only |
 | GitHub, GitLab, Bitbucket | The last push or commit (S4); the archived state (S3) on GitHub, and on GitLab with credentials | 24-hour cache |
 

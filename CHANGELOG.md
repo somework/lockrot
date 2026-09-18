@@ -15,7 +15,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `release-warn-years` / `release-high-years`, and fires only when a higher branch has released
   since and within `release-warn-years` of today — a package dead on every branch stays S2's.
   `composer outdated --major-only` says a newer major exists; S2 sees the package's newest release
-  and stays quiet; this says the branch installed here gets no fixes. The verdict is `left-behind`
+  and stays quiet; this says the branch installed here gets no fixes. A branch whose highest tag
+  the repository leaves undated is not measured: Packagist dates a tag by its commit, and a
+  subtree split (`illuminate/*`, `symfony/*`) has undated tags and tags dated by the last change
+  to the directory, years before the release. The verdict is `left-behind`
   at either threshold — between `pinned` and `old-promise` in severity, base priority `high`; the
   signal's level records whether the branch has also passed `release-high-years`. The evidence
   reads `branch 1.x last released 2021-08-03 (5.1 years ago); 2.x released v2.12.5 (2026-04-17)`
@@ -25,9 +28,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the configured repositories — with `id`, `cve`, `title`, `link`, `severity` and `reported_at`
   under `data.advisories` in `--format=json`. Advisories the project ignores in Composer's own
   configuration (`config.policy.advisories` on 2.10+, `config.audit.ignore` before) are dropped as
-  `composer audit` drops them. S9 never decides a verdict. On an `abandoned`, `silent` or
-  `left-behind` package the evidence gains `no fix expected` and the priority goes up one step,
-  `critical` at most. The three advisories named on the line are the worst by severity. Advisories
+  `composer audit` drops them. S9 never decides a verdict. Each advisory is held against the
+  highest stable tag on the installed version's branch and the package's highest stable tag; one
+  out of both ranges is already fixed, and the line says by what (`fixed by 6.3.0`; `1 fixed by
+  v3.4.47, 3 fixed by v8.1.7` when they differ), with `affected_versions`, `fixed_by` and
+  `fixed_on_branch` on each advisory in the JSON. On an `abandoned`, `silent` or `left-behind`
+  package the advisories nothing listed fixes — on a left-behind branch, nothing listed *on the
+  branch* — earn `no fix expected` (`no fix expected on 3.x` next to a fix in a higher branch) and
+  the priority goes up one step, `critical` at most; a package whose every advisory is fixed by a
+  listed release is not raised. The three advisories named on the line are the worst by severity. Advisories
   on packages the report does not flag stay off the rows and are totalled in the footer:
   `53 security advisories on 17 packages the report does not flag; see composer audit`. On
   Composer 2.2, under `--offline` and once the install-time budget is spent the report carries one
@@ -45,6 +54,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   on it. `left-behind` itself
   starts at `high`, so a run that passed `--fail-on=high` can fail on a package that was `ok`
   before. The baseline, keyed on the verdict, still calls the finding `known`.
+- S2 (no stable release for years) stays quiet when the package's highest non-dev tag carries no
+  release date: "last release" would otherwise date the newest tag the repository dated, and say
+  nothing about the undated ones above it. Before, such a package could read `stale` or `silent`
+  from a date that was not its last release's.
 - `--strict-network` now covers the advisory request too: every repository that publishes
   advisories is asked, as `composer audit` asks them, including one the metadata pass never
   reached because Packagist had already answered for every name. A private repository that is

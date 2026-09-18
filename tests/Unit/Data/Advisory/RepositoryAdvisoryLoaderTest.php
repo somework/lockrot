@@ -91,6 +91,8 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
         self::assertNotNull($advisories[0]->reportedAt());
         self::assertSame('2024-03-01T12:00:00+00:00', $advisories[0]->reportedAt()->format(\DATE_ATOM));
         self::assertSame('PKSA-cache-3', $advisories[1]->label(), 'no CVE: named by its id');
+        self::assertTrue($advisories[0]->affects('2.2.0.0'), 'the affected range travels with the advisory');
+        self::assertFalse($advisories[0]->affects('99.0.0.0'));
         self::assertSame(['PKSA-annotations-2'], array_map(static fn (Advisory $a): string => $a->id(), $batch->for('doctrine/annotations')));
         self::assertSame([], $batch->for('symfony/console'));
     }

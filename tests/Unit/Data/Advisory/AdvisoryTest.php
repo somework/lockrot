@@ -7,6 +7,7 @@ namespace Lockrot\Tests\Unit\Data\Advisory;
 use Composer\Advisory\PartialSecurityAdvisory;
 use Composer\Advisory\SecurityAdvisory;
 use Composer\Semver\Constraint\MatchAllConstraint;
+use Composer\Semver\VersionParser;
 use Lockrot\Data\Advisory\Advisory;
 use PHPUnit\Framework\TestCase;
 
@@ -38,7 +39,20 @@ final class AdvisoryTest extends TestCase
             'link' => 'https://example.test/advisory',
             'severity' => 'high',
             'reported_at' => '2024-03-01T12:00:00+00:00',
+            'affected_versions' => '*',
         ], $advisory->toArray());
+    }
+
+    /** swiftmailer 6.1.3 under CVE-2024-28859 (`<6.2.5`): 6.3.0 is out of the range, so the fix is out. */
+    public function testTheAffectedRangeSaysWhetherALaterReleaseCarriesTheFix(): void
+    {
+        $range = (new VersionParser())->parseConstraints('>=4.0.0,<6.0.0|>=6.0.0,<6.2.5');
+        $advisory = new Advisory('PKSA-1', 'CVE-2024-28859', null, null, null, null, $range);
+
+        self::assertTrue($advisory->affects('6.1.3.0'));
+        self::assertFalse($advisory->affects('6.3.0.0'));
+        self::assertSame('>=4.0.0,<6.0.0|>=6.0.0,<6.2.5', $advisory->toArray()['affected_versions']);
+        self::assertNull((new Advisory('PKSA-2', null, null, null, null, null))->affects('6.3.0.0'), 'no range, no answer');
     }
 
     public function testAPartialAdvisoryIsNamedByItsIdAndCarriesNothingElse(): void
@@ -49,7 +63,8 @@ final class AdvisoryTest extends TestCase
         self::assertNull($advisory->cve());
         self::assertNull($advisory->title());
         self::assertNull($advisory->reportedAt());
-        self::assertSame(['id' => 'GHSA-xxxx-yyyy-zzzz', 'cve' => null, 'title' => null, 'link' => null, 'severity' => null, 'reported_at' => null], $advisory->toArray());
+        self::assertSame(['id' => 'GHSA-xxxx-yyyy-zzzz', 'cve' => null, 'title' => null, 'link' => null, 'severity' => null, 'reported_at' => null, 'affected_versions' => '*'], $advisory->toArray());
+        self::assertTrue($advisory->affects('9.9.9.0'), 'the partial form still carries the range');
     }
 
     public function testAFullAdvisoryWithoutACveIsNamedByItsId(): void

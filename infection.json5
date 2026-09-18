@@ -80,8 +80,7 @@
     //    SelfUpdateCommand.php:168 and :172 (an unclosed `</error>` renders byte-identically, the line
     //    is the command's last write).
     //  - 2026-09-18 (left-behind, advisories): ReleaseBranch.php:32 PregMatchRemoveCaret (a normalized
-    //    non-dev version always starts with its major digits), LeftBehindRule.php:52 ReturnRemoval (a
-    //    null branch reads key '' and the next guard returns the same null), LeftBehindRule.php:63
+    //    non-dev version always starts with its major digits), LeftBehindRule.php:66
     //    LessThanOrEqualTo (a same-instant higher release cannot be both alive and older than the
     //    warn threshold), RepositoryAdvisoryLoader.php:67 ReturnRemoval (the Composer 2.2 arm, covered
     //    by the Docker 7.4/2.2 run).

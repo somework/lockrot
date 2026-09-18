@@ -6,11 +6,14 @@ namespace Lockrot\Data\Advisory;
 
 use Composer\Advisory\PartialSecurityAdvisory;
 use Composer\Advisory\SecurityAdvisory;
+use Composer\Semver\Constraint\Constraint;
+use Composer\Semver\Constraint\ConstraintInterface;
 
 /**
  * One security advisory that affects an installed version, reduced to what the report prints and
  * the JSON document carries. Built from Composer's own advisory objects; a repository that serves
- * only the partial form (id and affected range) leaves title, link, severity and date null.
+ * only the partial form (id and affected range) leaves title, link, severity and date null. The
+ * affected range is what says whether a later release already carries the fix.
  */
 final class Advisory
 {
@@ -20,8 +23,9 @@ final class Advisory
     private ?string $link;
     private ?string $severity;
     private ?\DateTimeImmutable $reportedAt;
+    private ?ConstraintInterface $affectedVersions;
 
-    public function __construct(string $id, ?string $cve, ?string $title, ?string $link, ?string $severity, ?\DateTimeImmutable $reportedAt)
+    public function __construct(string $id, ?string $cve, ?string $title, ?string $link, ?string $severity, ?\DateTimeImmutable $reportedAt, ?ConstraintInterface $affectedVersions = null)
     {
         $this->id = $id;
         $this->cve = $cve;
@@ -29,15 +33,16 @@ final class Advisory
         $this->link = $link;
         $this->severity = $severity;
         $this->reportedAt = $reportedAt;
+        $this->affectedVersions = $affectedVersions;
     }
 
     public static function fromComposer(PartialSecurityAdvisory $advisory): self
     {
         if (!$advisory instanceof SecurityAdvisory) {
-            return new self($advisory->advisoryId, null, null, null, null, null);
+            return new self($advisory->advisoryId, null, null, null, null, null, $advisory->affectedVersions);
         }
 
-        return new self($advisory->advisoryId, $advisory->cve, $advisory->title, $advisory->link, $advisory->severity, $advisory->reportedAt);
+        return new self($advisory->advisoryId, $advisory->cve, $advisory->title, $advisory->link, $advisory->severity, $advisory->reportedAt, $advisory->affectedVersions);
     }
 
     /** The advisory's Packagist or GitHub id (`PKSA-…`, `GHSA-…`). */
@@ -77,7 +82,20 @@ final class Advisory
         return $this->reportedAt;
     }
 
-    /** @return array{id: string, cve: ?string, title: ?string, link: ?string, severity: ?string, reported_at: ?string} */
+    /**
+     * Whether the advisory's affected range covers a version, given normalized (`3.4.47.0`); null
+     * when the range is not known, which no fix can then be read from.
+     */
+    public function affects(string $normalized): ?bool
+    {
+        if ($this->affectedVersions === null) {
+            return null;
+        }
+
+        return $this->affectedVersions->matches(new Constraint('==', $normalized));
+    }
+
+    /** @return array{id: string, cve: ?string, title: ?string, link: ?string, severity: ?string, reported_at: ?string, affected_versions: ?string} */
     public function toArray(): array
     {
         return [
@@ -87,6 +105,7 @@ final class Advisory
             'link' => $this->link,
             'severity' => $this->severity,
             'reported_at' => $this->reportedAt === null ? null : $this->reportedAt->format(\DATE_ATOM),
+            'affected_versions' => $this->affectedVersions === null ? null : $this->affectedVersions->getPrettyString(),
         ];
     }
 }

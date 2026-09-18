@@ -122,7 +122,24 @@ final class PackageMetadataFromPackagesTest extends TestCase
         foreach ([[$lowerButNewerDate, $higherButOlderDate], [$higherButOlderDate, $lowerButNewerDate]] as $order) {
             $branch = PackageMetadata::fromPackages('a/b', $order, new \DateTimeImmutable(self::FIXED))->latestStableByBranch()['1'];
             self::assertSame('1.4.9', $branch['version']);
-            self::assertSame('1.5.0.0', $branch['highest'], 'normalized, as Composer compares it');
+            self::assertSame('1.5.0.0', $branch['highest']['normalized'], 'normalized, as Composer compares it');
+            self::assertSame('v1.5.0', $branch['highest']['pretty'], 'as the repository prints it, for the evidence');
+            self::assertNotNull($branch['highest']['at']);
+            self::assertSame('2020-01-01T00:00:00+00:00', $branch['highest']['at']->format(\DATE_ATOM));
+        }
+    }
+
+    /** illuminate/macroable 10.x on Packagist: 112 of 115 tags carry no time. The branch keeps its newest dated release, but the highest tag says it is undated. */
+    public function testAnUndatedHighestTagIsReportedAsSuchNextToTheNewestDatedRelease(): void
+    {
+        $undatedHighest = $this->load(['name' => 'a/b', 'version' => 'v10.49.0']);
+        $dated = $this->load(['name' => 'a/b', 'version' => 'v10.13.1', 'time' => '2023-03-17T13:33:11+00:00']);
+
+        foreach ([[$undatedHighest, $dated], [$dated, $undatedHighest]] as $order) {
+            $branch = PackageMetadata::fromPackages('a/b', $order, new \DateTimeImmutable(self::FIXED))->latestStableByBranch()['10'];
+            self::assertSame('v10.13.1', $branch['version']);
+            self::assertSame('10.49.0.0', $branch['highest']['normalized']);
+            self::assertNull($branch['highest']['at']);
         }
     }
 
@@ -138,7 +155,8 @@ final class PackageMetadataFromPackagesTest extends TestCase
         $branch = PackageMetadata::fromPackages('a/b', [$one, $two], new \DateTimeImmutable(self::FIXED))->latestStableByBranch()['1'];
 
         self::assertSame('release-two', $branch['version']);
-        self::assertSame('1.0.1.0', $branch['highest']);
+        self::assertSame('1.0.1.0', $branch['highest']['normalized']);
+        self::assertSame('release-two', $branch['highest']['pretty']);
         self::assertNull($branch['at']);
     }
 
@@ -304,7 +322,26 @@ final class PackageMetadataFromPackagesTest extends TestCase
         $lts = $this->load(['name' => 'a/b', 'version' => '1.0.1', 'time' => '2026-01-01T00:00:00+00:00', 'source' => ['type' => 'git', 'url' => 'https://github.com/a/old-archived.git', 'reference' => 'a']]);
 
         self::assertSame('https://github.com/a/new.git', PackageMetadata::fromPackages('a/b', [$dated, $lts, $undated], new \DateTimeImmutable(self::FIXED))->repositoryUrl(), 'a later LTS patch does not move the anchor');
-        self::assertSame('1.0.1', PackageMetadata::fromPackages('a/b', [$dated, $lts, $undated], new \DateTimeImmutable(self::FIXED))->lastStableVersion(), 'the age signal still reads the latest date');
+    }
+
+    /**
+     * The package's age is its highest tag's. With that tag undated, "last release 2026-01-01" would
+     * date the 1.x LTS patch and say nothing about 2.0.0, which may be a day or five years old: the
+     * age is unknown and S2 stays quiet. A dated highest tag reads as before, whatever is undated below it.
+     */
+    public function testAnUndatedHighestTagLeavesThePackagesLastReleaseUnknown(): void
+    {
+        $undated = $this->load(['name' => 'a/b', 'version' => '2.0.0']);
+        $lts = $this->load(['name' => 'a/b', 'version' => '1.0.1', 'time' => '2026-01-01T00:00:00+00:00']);
+        $datedHighest = $this->load(['name' => 'a/b', 'version' => '2.0.1', 'time' => '2026-02-01T00:00:00+00:00']);
+
+        $unknown = PackageMetadata::fromPackages('a/b', [$lts, $undated], new \DateTimeImmutable(self::FIXED));
+        self::assertTrue($unknown->hasStableRelease());
+        self::assertNull($unknown->lastStableReleaseAt());
+        self::assertNull($unknown->lastStableVersion());
+
+        $known = PackageMetadata::fromPackages('a/b', [$lts, $undated, $datedHighest], new \DateTimeImmutable(self::FIXED));
+        self::assertSame('2.0.1', $known->lastStableVersion());
     }
 
     /** An empty `source` URL is no repository; the release's `support.source` is read instead, and a mistyped one is nothing. */

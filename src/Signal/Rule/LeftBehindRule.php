@@ -27,7 +27,8 @@ use Lockrot\Signal\Thresholds;
  * it is S2's case (`stale`, or `silent` with S4), and a 2.0 that was itself abandoned before 1.x
  * stopped says nothing about 1.x. An installed version the repository does not list — above
  * everything it has on that branch, as a lock written against a since-removed tag would be —
- * cannot be measured by that branch's last date, so it carries no S8 either.
+ * cannot be measured by that branch's last date, so it carries no S8 either; nor does a branch
+ * whose highest tag the repository leaves undated.
  */
 final class LeftBehindRule implements SignalRule
 {
@@ -49,12 +50,13 @@ final class LeftBehindRule implements SignalRule
             return null;
         }
         $branch = ReleaseBranch::of($facts->package()->version());
-        if ($branch === null) {
-            return null;
-        }
         $byBranch = $metadata->latestStableByBranch();
-        $own = $byBranch[$branch] ?? null;
-        if ($own === null || $own['at'] === null || $this->isAhead($facts->package()->version(), $own['highest'])) {
+        // An undated highest tag means the branch's newest release is one the repository does not
+        // date; how much younger than the newest dated release it is cannot be known, so the branch
+        // is not measured (a subtree split — illuminate/*, symfony/* — dates tags by the commit they
+        // point at, and leaves many with no date at all).
+        $own = $branch === null ? null : ($byBranch[$branch] ?? null);
+        if ($branch === null || $own === null || $own['at'] === null || $own['highest']['at'] === null || $this->isAhead($facts->package()->version(), $own['highest']['normalized'])) {
             return null;
         }
 
