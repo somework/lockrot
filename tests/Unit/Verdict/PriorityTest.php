@@ -50,6 +50,25 @@ final class PriorityTest extends TestCase
         self::assertCount(9, Verdict::all(), 'the case table above enumerates every verdict');
     }
 
+    /** @dataProvider raised */
+    #[DataProvider('raised')]
+    public function testAnUnfixableAdvisoryRaisesOneStepUpToCritical(string $verdict, bool $direct, bool $dev, string $expected): void
+    {
+        self::assertSame($expected, Priority::of($verdict, $direct, $dev, true));
+    }
+
+    /** @return iterable<string, array{string, bool, bool, string}> */
+    public static function raised(): iterable
+    {
+        yield 'critical stays critical' => [Verdict::ABANDONED, true, false, Priority::CRITICAL];
+        yield 'high becomes critical' => [Verdict::ABANDONED, false, false, Priority::CRITICAL];
+        yield 'medium becomes high' => [Verdict::ABANDONED, false, true, Priority::HIGH];
+        yield 'left-behind transitive dev: low becomes medium' => [Verdict::LEFT_BEHIND, false, true, Priority::MEDIUM];
+        yield 'stale direct prod: medium becomes high' => [Verdict::STALE, true, false, Priority::HIGH];
+        yield 'an unflagged verdict is never raised' => [Verdict::OK, true, false, Priority::NONE];
+        yield 'unknown is never raised' => [Verdict::UNKNOWN, true, false, Priority::NONE];
+    }
+
     public function testRank(): void
     {
         self::assertSame(4, Priority::rank(Priority::CRITICAL));

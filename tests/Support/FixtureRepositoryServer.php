@@ -57,14 +57,18 @@ final class FixtureRepositoryServer
     private string $docroot;
     private string $cacheDir;
     private int $port;
+    /** @var list<string> every package name the docroot may serve, whatever the recorded envelopes hold */
+    private array $names;
     private ?Process $process = null;
     private ?string $logFile = null;
 
-    private function __construct(string $docroot, string $cacheDir, int $port)
+    /** @param list<string> $names */
+    private function __construct(string $docroot, string $cacheDir, int $port, array $names)
     {
         $this->docroot = $docroot;
         $this->cacheDir = $cacheDir;
         $this->port = $port;
+        $this->names = $names;
     }
 
     /** @param list<string> $lockFiles absolute paths of composer.lock files whose package names to serve */
@@ -75,13 +79,46 @@ final class FixtureRepositoryServer
         self::writePackagesJson($docroot);
         file_put_contents($docroot.'/'.self::ROUTER_FILENAME, self::ROUTER_SCRIPT);
 
-        foreach (self::namesFromLockFiles($lockFiles) as $name) {
+        $names = self::namesFromLockFiles($lockFiles);
+        foreach ($names as $name) {
             foreach (self::SUFFIXES as $suffix) {
                 self::writeEnvelopeIfOk($docroot, $envelopeDir, $name, $suffix);
             }
         }
 
-        return new self($docroot, $cacheDir, self::freePort());
+        return new self($docroot, $cacheDir, self::freePort(), $names);
+    }
+
+    /**
+     * Turns the fixture into a repository that publishes security advisories the way a Composer
+     * repository without an API does: `security-advisories.metadata: true` in `packages.json`, and
+     * each advisory list under the `security-advisories` key of the package's own p2 file — which
+     * must already be served here. Composer insists on an `available-packages` list for such a
+     * repository, so the served names are declared too. Call before {@see start()}.
+     *
+     * @param array<string, list<array<string, mixed>>> $advisoriesByName p2 advisory records per package name
+     */
+    public function withSecurityAdvisories(array $advisoriesByName): void
+    {
+        $body = json_encode(['metadata-url' => '/p2/%package%.json', 'available-packages' => $this->names, 'security-advisories' => ['metadata' => true]]);
+        if ($body === false) {
+            throw new \RuntimeException('cannot encode packages.json for the fixture repository server');
+        }
+        file_put_contents($this->docroot.'/packages.json', $body);
+
+        foreach ($advisoriesByName as $name => $advisories) {
+            $file = $this->docroot.'/p2/'.$name.'.json';
+            $raw = is_file($file) ? file_get_contents($file) : false;
+            if ($raw === false) {
+                throw new \RuntimeException('no p2 file served for '.$name.'; advisories need one to live in');
+            }
+            $decoded = json_decode($raw, true);
+            if (!\is_array($decoded)) {
+                throw new \RuntimeException('unreadable p2 file for '.$name);
+            }
+            $decoded['security-advisories'] = $advisories;
+            file_put_contents($file, (string) json_encode($decoded));
+        }
     }
 
     public function start(): void

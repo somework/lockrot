@@ -10,6 +10,9 @@ use Lockrot\Analyzer\Analyzer;
 use Lockrot\Analyzer\Report;
 use Lockrot\Clock;
 use Lockrot\Config\LockrotConfig;
+use Lockrot\Data\Advisory\Advisory;
+use Lockrot\Data\Advisory\AdvisoryBatch;
+use Lockrot\Data\Advisory\AdvisoryLoaderInterface;
 use Lockrot\Data\Cache\ArrayCache;
 use Lockrot\Data\Forge\ActivityClient;
 use Lockrot\Data\Forge\ActivityFetchPlanner;
@@ -102,7 +105,7 @@ final class AnalyzerTest extends TestCase
         };
     }
 
-    private function analyzer(MetadataLoaderInterface $metadata, HttpClientInterface $http, bool $token, Allowlist $allowlist, bool $offline = false, int $noTokenBudget = ActivityFetchPlanner::DEFAULT_ANONYMOUS_BUDGET, ?ForgeAuth $auth = null): Analyzer
+    private function analyzer(MetadataLoaderInterface $metadata, HttpClientInterface $http, bool $token, Allowlist $allowlist, bool $offline = false, int $noTokenBudget = ActivityFetchPlanner::DEFAULT_ANONYMOUS_BUDGET, ?ForgeAuth $auth = null, ?AdvisoryLoaderInterface $advisories = null): Analyzer
     {
         $clock = Clock::fixed(F::NOW);
         $auth ??= ForgeAuth::withTokens(new Tokens($token ? 't' : null, null));
@@ -115,8 +118,90 @@ final class AnalyzerTest extends TestCase
             SignalSet::default($clock, new Thresholds(), '8.4', PhpReleaseDates::load()),
             new VerdictEngine(),
             $clock,
-            $offline
+            $offline,
+            $advisories
         );
+    }
+
+    /**
+     * An advisory source answering one fixed batch, recording what it was asked for.
+     *
+     * @param \ArrayObject<string, string>|null $asked
+     */
+    private function advisories(AdvisoryBatch $batch, ?\ArrayObject $asked = null): AdvisoryLoaderInterface
+    {
+        return new class ($batch, $asked) implements AdvisoryLoaderInterface {
+            private AdvisoryBatch $batch;
+            /** @var \ArrayObject<string, string>|null */
+            private ?\ArrayObject $asked;
+
+            /** @param \ArrayObject<string, string>|null $asked */
+            public function __construct(AdvisoryBatch $batch, ?\ArrayObject $asked)
+            {
+                $this->batch = $batch;
+                $this->asked = $asked;
+            }
+
+            public function load(array $versionByName): AdvisoryBatch
+            {
+                if ($this->asked !== null) {
+                    $this->asked->exchangeArray($versionByName);
+                }
+
+                return $this->batch;
+            }
+        };
+    }
+
+    public function testAdvisoriesReachTheFindingAsS9AndRaiseAnAbandonedPackage(): void
+    {
+        $lock = LockFile::fromArray(['packages' => [
+            ['name' => 'vendor/direct', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/'],
+            ['name' => 'vendor/local', 'version' => '1.0.0', 'dist' => ['type' => 'path', 'url' => '../local']],
+        ]]);
+        $project = ProjectConfig::fromArray(['require' => ['vendor/direct' => '^1.0', 'vendor/local' => '*']]);
+        $metadata = ['vendor/direct' => new PackageMetadata('vendor/direct', true, null, true, new \DateTimeImmutable('2024-01-10T10:00:00+00:00'), '1.0.0', 1, null, 'library', new \DateTimeImmutable(F::NOW))];
+        /** @var \ArrayObject<string, string> $asked */
+        $asked = new \ArrayObject();
+        $advisory = new Advisory('PKSA-1', 'CVE-2024-0001', 'Title', null, 'high', null);
+        $analyzer = $this->analyzer($this->loader($metadata), $this->http([]), true, new Allowlist([]), false, ActivityFetchPlanner::DEFAULT_ANONYMOUS_BUDGET, null, $this->advisories(new AdvisoryBatch(['vendor/direct' => [$advisory]]), $asked));
+
+        $report = $analyzer->analyze($lock, $project, false);
+
+        self::assertSame(['vendor/direct' => '1.0.0'], $asked->getArrayCopy(), 'only Composer-repository packages are asked for');
+        $finding = $report->findings()[0];
+        self::assertSame('vendor/direct', $finding->package());
+        self::assertSame(Verdict::ABANDONED, $finding->verdict());
+        self::assertSame(Priority::CRITICAL, $finding->priority());
+        self::assertSame('marked abandoned by its repository; 1 security advisory affects 1.0.0 (CVE-2024-0001); no fix expected', $finding->evidence());
+        self::assertSame(['1 package is not from a Composer repository and was not checked'], $report->notes(), 'no advisory note on a complete answer');
+        self::assertFalse($report->hadNetworkFailures());
+    }
+
+    public function testAdvisoryNotesAndNetworkFailuresReachTheReport(): void
+    {
+        $lock = LockFile::fromArray(['packages' => [['name' => 'vendor/direct', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/']]]);
+        $batch = new AdvisoryBatch([], ['security advisories unavailable from packagist.org: HTTP 503'], true);
+        $analyzer = $this->analyzer($this->loader(['vendor/direct' => $this->ancient()]), $this->http([]), true, new Allowlist([]), false, ActivityFetchPlanner::DEFAULT_ANONYMOUS_BUDGET, null, $this->advisories($batch));
+
+        $report = $analyzer->analyze($lock, ProjectConfig::empty(), false);
+
+        self::assertContains('security advisories unavailable from packagist.org: HTTP 503', $report->notes());
+        self::assertTrue($report->hadNetworkFailures());
+    }
+
+    public function testWithoutAnAdvisorySourceNothingIsAskedAndNothingIsNoted(): void
+    {
+        $lock = LockFile::fromArray(['packages' => [['name' => 'vendor/direct', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/']]]);
+
+        $report = $this->analyzer($this->loader(['vendor/direct' => $this->ancient()]), $this->http([]), true, new Allowlist([]))->analyze($lock, ProjectConfig::empty(), false);
+
+        foreach ($report->notes() as $note) {
+            self::assertStringNotContainsString('advisor', $note);
+        }
+        foreach ($report->findings()[0]->signals() as $signal) {
+            self::assertNotSame('S9', $signal->id());
+        }
     }
 
     public function testOfflineNoteAppearsOnlyWhenOfflineFlagIsSet(): void

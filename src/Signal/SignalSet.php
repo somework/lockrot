@@ -7,6 +7,7 @@ namespace Lockrot\Signal;
 use Lockrot\Clock;
 use Lockrot\Data\Php\PhpReleaseDates;
 use Lockrot\Signal\Rule\AbandonedRule;
+use Lockrot\Signal\Rule\AdvisoryRule;
 use Lockrot\Signal\Rule\ArchivedRule;
 use Lockrot\Signal\Rule\LeftBehindRule;
 use Lockrot\Signal\Rule\NoPushRule;
@@ -35,6 +36,7 @@ final class SignalSet
             new OldPromiseRule(new ConstraintOpenness(), $dates, $targetPhp),
             new PinnedRule(),
             new LeftBehindRule($clock, $thresholds),
+            new AdvisoryRule(),
         ]);
     }
 

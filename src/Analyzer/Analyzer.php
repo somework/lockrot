@@ -7,6 +7,8 @@ namespace Lockrot\Analyzer;
 use Lockrot\Allowlist\Allowlist;
 use Lockrot\Allowlist\AllowlistEntry;
 use Lockrot\Clock;
+use Lockrot\Data\Advisory\AdvisoryBatch;
+use Lockrot\Data\Advisory\AdvisoryLoaderInterface;
 use Lockrot\Data\Forge\ActivityBatch;
 use Lockrot\Data\Forge\ActivityClient;
 use Lockrot\Data\Forge\ActivityFetchPlan;
@@ -52,8 +54,10 @@ final class Analyzer
     private Clock $clock;
     private bool $offline;
     private Deadline $deadline;
+    /** Null when the run has no advisory source at all; then nothing is asked and nothing is noted. */
+    private ?AdvisoryLoaderInterface $advisories;
 
-    public function __construct(MetadataLoaderInterface $metadata, ActivityClient $activity, ActivityFetchPlanner $planner, RepoLocator $locator, Allowlist $allowlist, SignalSet $signals, VerdictEngine $engine, Clock $clock, bool $offline)
+    public function __construct(MetadataLoaderInterface $metadata, ActivityClient $activity, ActivityFetchPlanner $planner, RepoLocator $locator, Allowlist $allowlist, SignalSet $signals, VerdictEngine $engine, Clock $clock, bool $offline, ?AdvisoryLoaderInterface $advisories = null)
     {
         $this->metadata = $metadata;
         $this->activity = $activity;
@@ -64,6 +68,7 @@ final class Analyzer
         $this->engine = $engine;
         $this->clock = $clock;
         $this->offline = $offline;
+        $this->advisories = $advisories;
         // Only the install-time path sets a budget; `composer lockrot` runs unbounded.
         $this->deadline = Deadline::never();
     }
@@ -123,6 +128,9 @@ final class Analyzer
             $notes[] = $this->metadataUnavailableNote($metadataFailed);
         }
 
+        $advisories = $this->fetchAdvisories($packages);
+        $notes = array_merge($notes, $advisories->notes());
+
         [$allowlisted, $repoByPackage, $candidateByPackage] = $this->classify($packages, $metadata, $now);
 
         if ($this->deadline->isPast()) {
@@ -145,7 +153,7 @@ final class Analyzer
             $repo = $repoByPackage[$package->name()] ?? null;
             $act = $repo !== null ? ($activity[$repo->key()] ?? null) : null;
             $entry = $allowlisted[$package->name()];
-            $findings[] = $this->buildFinding($package, $meta, $act, $entry, $graph, $batch);
+            $findings[] = $this->buildFinding($package, $meta, $act, $entry, $graph, $batch, $advisories);
             if (!$package->isFromComposerRepository()) {
                 ++$notInRepository;
             }
@@ -153,7 +161,7 @@ final class Analyzer
         $notes = array_merge($notes, $this->notInRepositoryNotes($notInRepository));
         $findings = TransitiveExposure::attach($findings, $graph);
 
-        $hadNetworkFailures = $batch->failed() !== [] || $activityBatch->failed() !== [];
+        $hadNetworkFailures = $batch->failed() !== [] || $activityBatch->failed() !== [] || $advisories->hadNetworkFailure();
 
         return new Report($findings, $notes, $now, \count($packages), $notInRepository, $hadNetworkFailures, null, self::oldestCachedActivity($activity));
     }
@@ -187,6 +195,27 @@ final class Analyzer
         }
 
         return $this->metadata->load($names);
+    }
+
+    /**
+     * The same names the metadata pass asks for, each with its locked version: a package outside
+     * every Composer repository has no advisory feed either.
+     *
+     * @param list<LockedPackage> $packages
+     */
+    private function fetchAdvisories(array $packages): AdvisoryBatch
+    {
+        if ($this->advisories === null) {
+            return AdvisoryBatch::empty();
+        }
+        $versionByName = [];
+        foreach ($packages as $package) {
+            if ($package->isFromComposerRepository()) {
+                $versionByName[$package->name()] = $package->version();
+            }
+        }
+
+        return $this->advisories->load($versionByName);
     }
 
     /**
@@ -243,9 +272,9 @@ final class Analyzer
         return [$batch, $notes];
     }
 
-    private function buildFinding(LockedPackage $package, ?PackageMetadata $meta, ?RepositoryActivity $activity, ?AllowlistEntry $entry, DependencyGraph $graph, MetadataBatch $batch): Finding
+    private function buildFinding(LockedPackage $package, ?PackageMetadata $meta, ?RepositoryActivity $activity, ?AllowlistEntry $entry, DependencyGraph $graph, MetadataBatch $batch, AdvisoryBatch $advisories): Finding
     {
-        $facts = new PackageFacts($package, $meta, $activity);
+        $facts = new PackageFacts($package, $meta, $activity, $advisories->for($package->name()));
         $signals = $this->signals->evaluate($facts);
         $verdict = $this->engine->decide($signals, $entry !== null, $meta !== null);
 
