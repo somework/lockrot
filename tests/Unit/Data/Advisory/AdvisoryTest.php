@@ -12,6 +12,13 @@ use PHPUnit\Framework\TestCase;
 
 final class AdvisoryTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        if (!class_exists(SecurityAdvisory::class)) {
+            self::markTestSkipped('Composer without the advisory API');
+        }
+    }
+
     public function testAFullAdvisoryKeepsWhatTheReportPrints(): void
     {
         $composer = new SecurityAdvisory('vendor/pkg', 'PKSA-abcd-1234', new MatchAllConstraint(), 'Remote code execution', [['name' => 'GitHub', 'remoteId' => 'GHSA-xxxx-yyyy-zzzz']], new \DateTimeImmutable('2024-03-01T12:00:00+00:00'), 'CVE-2024-0001', 'https://example.test/advisory', 'high');

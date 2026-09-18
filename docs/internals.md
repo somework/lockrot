@@ -16,7 +16,8 @@ This page explains what that means for freshness, memory and the "Data as of" li
 
 | Source | What it provides | Freshness |
 |---|---|---|
-| The configured Composer repositories | The abandoned flag (S1), release dates and versions (S2, S5, S6) | Revalidated on every run |
+| The configured Composer repositories | The abandoned flag (S1), release dates and versions (S2, S5, S6, S8) | Revalidated on every run |
+| The same repositories, through Composer's advisory API | Security advisories on the installed version (S9); Packagist answers one request for the whole lock | Fetched on every run, never cached; Composer 2.4+ only |
 | GitHub, GitLab, Bitbucket | The last push or commit (S4); the archived state (S3) on GitHub, and on GitLab with credentials | 24-hour cache |
 
 Composer's metadata cache is reused and revalidated (`If-Modified-Since`) on every run, which is why

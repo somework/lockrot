@@ -6,6 +6,8 @@ namespace Lockrot\Tests\Unit\Data\Advisory;
 
 use Composer\Repository\AdvisoryProviderInterface;
 use Composer\Repository\ArrayRepository;
+use Lockrot\Data\Advisory\Advisory;
+use Lockrot\Data\Advisory\AdvisoryIgnore;
 use Lockrot\Data\Advisory\RepositoryAdvisoryLoader;
 use Lockrot\Deadline;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
@@ -24,7 +26,7 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
             'doctrine/cache' => [
                 self::record('PKSA-cache-1', '>=2.0,<2.3', ['cve' => 'CVE-2024-0001', 'title' => 'Cache poisoning']),
                 self::record('PKSA-cache-2', '<2.0', ['cve' => 'CVE-2019-0002', 'title' => 'Older branch only']),
-                ['advisoryId' => 'GHSA-partial-only', 'affectedVersions' => '>=2.2,<2.2.1'],
+                self::record('PKSA-cache-3', '>=2.2,<2.2.1', ['title' => 'No CVE assigned', 'sources' => [['name' => 'GitHub', 'remoteId' => 'GHSA-cache-3']]]),
             ],
             'doctrine/annotations' => [
                 self::record('PKSA-annotations-1', '<1.0', ['title' => 'Not the installed range']),
@@ -67,7 +69,7 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
         return self::$server;
     }
 
-    public function testOnlyAdvisoriesMatchingTheInstalledVersionComeBackFullOrPartial(): void
+    public function testOnlyAdvisoriesMatchingTheInstalledVersionComeBack(): void
     {
         if (!interface_exists(AdvisoryProviderInterface::class)) {
             self::markTestSkipped('Composer without the advisory API');
@@ -80,16 +82,32 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
         self::assertFalse($batch->hadNetworkFailure());
         self::assertSame(['doctrine/cache'], array_keys($batch->byName()));
         $advisories = $batch->for('doctrine/cache');
-        self::assertSame(['PKSA-cache-1', 'GHSA-partial-only'], array_map(static fn ($a) => $a->id(), $advisories));
+        self::assertSame(['PKSA-cache-1', 'PKSA-cache-3'], array_map(static fn (Advisory $a): string => $a->id(), $advisories));
         self::assertSame('CVE-2024-0001', $advisories[0]->cve());
         self::assertSame('Cache poisoning', $advisories[0]->title());
         self::assertSame('https://example.test/PKSA-cache-1', $advisories[0]->link());
         self::assertSame('high', $advisories[0]->severity());
         self::assertNotNull($advisories[0]->reportedAt());
         self::assertSame('2024-03-01T12:00:00+00:00', $advisories[0]->reportedAt()->format(\DATE_ATOM));
-        self::assertNull($advisories[1]->title(), 'a partial record is kept, named by its id');
+        self::assertSame('PKSA-cache-3', $advisories[1]->label(), 'no CVE: named by its id');
         self::assertSame([], $batch->for('doctrine/annotations'));
         self::assertSame([], $batch->for('symfony/console'));
+    }
+
+    public function testIgnoredAdvisoriesAreDroppedByIdCveSourceIdPackageOrSeverity(): void
+    {
+        if (!interface_exists(AdvisoryProviderInterface::class)) {
+            self::markTestSkipped('Composer without the advisory API');
+        }
+        $repositories = $this->server()->repositories();
+        $ids = static fn (AdvisoryIgnore $ignore): array => array_map(static fn (Advisory $a): string => $a->id(), (new RepositoryAdvisoryLoader($repositories, false, null, $ignore))->load(['doctrine/cache' => '2.2.0'])->for('doctrine/cache'));
+
+        self::assertSame(['PKSA-cache-3'], $ids(AdvisoryIgnore::fromRaw(['PKSA-cache-1'], [])), 'by advisory id');
+        self::assertSame(['PKSA-cache-3'], $ids(AdvisoryIgnore::fromRaw(['CVE-2024-0001' => 'accepted risk'], [])), 'by CVE, map form');
+        self::assertSame(['PKSA-cache-1'], $ids(AdvisoryIgnore::fromRaw(['GHSA-cache-3'], [])), 'by source id');
+        self::assertSame([], $ids(AdvisoryIgnore::fromRaw(['doctrine/cache'], [])), 'by package');
+        self::assertSame([], $ids(AdvisoryIgnore::fromRaw([], ['high'])), 'by severity');
+        self::assertSame(['PKSA-cache-1', 'PKSA-cache-3'], $ids(AdvisoryIgnore::fromRaw(['PKSA-cache-2'], ['low'])), 'nothing matching');
     }
 
     public function testAnUnparsableInstalledVersionIsSkippedNotFatal(): void
@@ -140,6 +158,17 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
         self::assertCount(2, $batch->for('doctrine/cache'));
     }
 
+    /** Nothing to check means nothing to say, on every Composer. */
+    public function testNoNamesIsSilentEvenOffline(): void
+    {
+        $unreachable = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK]);
+
+        $batch = (new RepositoryAdvisoryLoader($unreachable->repositories(), true))->load([]);
+
+        self::assertSame([], $batch->notes());
+        self::assertSame([], $batch->byName());
+    }
+
     public function testOfflineAsksNothing(): void
     {
         $unreachable = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK]);
@@ -164,16 +193,6 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
 
         self::assertSame([RepositoryAdvisoryLoader::NOTE_BUDGET], $batch->notes());
         self::assertFalse($batch->hadNetworkFailure());
-    }
-
-    public function testNoNamesAsksNothing(): void
-    {
-        $unreachable = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK]);
-
-        $batch = (new RepositoryAdvisoryLoader($unreachable->repositories()))->load([]);
-
-        self::assertSame([], $batch->notes());
-        self::assertSame([], $batch->byName());
     }
 
     /** On the Composer 2.2 LTS the whole check is one note; on 2.4+ that note never appears. */

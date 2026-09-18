@@ -26,6 +26,7 @@
         "Composer\\Plugin\\Capability\\CommandProvider",
         "Composer\\Plugin\\Capable",
         "Composer\\Plugin\\PluginInterface",
+        "Composer\\Policy\\PolicyConfig",
         "Composer\\Repository\\AdvisoryProviderInterface",
         "Composer\\Repository\\ComposerRepository",
         "Composer\\Repository\\PlatformRepository",

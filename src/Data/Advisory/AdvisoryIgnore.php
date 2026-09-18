@@ -1,0 +1,122 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Lockrot\Data\Advisory;
+
+use Composer\Advisory\PartialSecurityAdvisory;
+use Composer\Advisory\SecurityAdvisory;
+use Composer\Config;
+use Composer\Policy\PolicyConfig;
+
+/**
+ * The advisories the project told Composer to ignore, applied the way `composer audit` applies
+ * them: by package name, advisory id, CVE, source id (`GHSA-…`) or severity. A project that
+ * accepted a vulnerability in `config.policy.advisories` (Composer 2.10+) or `config.audit.ignore`
+ * (2.4+) does not need lockrot to raise it again.
+ *
+ * On a Composer with {@see PolicyConfig} the lists come from it — the same object the audit command
+ * reads, so every spelling the policy format allows (per-package constraints, per-operation flags,
+ * reasons) is honoured without a second parser here. Older versions had one flat list under
+ * `config.audit.ignore`, read directly.
+ */
+final class AdvisoryIgnore
+{
+    /** @var array<string, true> package names, advisory ids, CVEs and source ids */
+    private array $ids;
+    /** @var array<string, true> */
+    private array $severities;
+
+    /**
+     * @param list<string> $ids
+     * @param list<string> $severities
+     */
+    public function __construct(array $ids, array $severities = [])
+    {
+        $this->ids = array_fill_keys($ids, true);
+        $this->severities = array_fill_keys($severities, true);
+    }
+
+    public static function none(): self
+    {
+        return new self([]);
+    }
+
+    public static function fromConfig(Config $config): self
+    {
+        // Composer 2.10 introduced the policy object; the guard is load-bearing on every older version.
+        if (class_exists(PolicyConfig::class)) {
+            $policy = PolicyConfig::fromConfig($config);
+
+            return new self(
+                array_keys($policy->advisories->getIgnoreListForOperation('audit')),
+                array_keys($policy->advisories->getIgnoreSeverityForOperation('audit'))
+            );
+        }
+
+        $audit = $config->get('audit');
+        if (!\is_array($audit)) {
+            return self::none();
+        }
+
+        return self::fromRaw(\is_array($audit['ignore'] ?? null) ? $audit['ignore'] : [], \is_array($audit['ignore-severity'] ?? null) ? $audit['ignore-severity'] : []);
+    }
+
+    /**
+     * The 2.4–2.9 shape: each list is either a plain list of strings or a map of string to reason.
+     *
+     * @param array<mixed> $ignore
+     * @param array<mixed> $ignoreSeverity
+     */
+    public static function fromRaw(array $ignore, array $ignoreSeverity): self
+    {
+        return new self(self::keysOrValues($ignore), self::keysOrValues($ignoreSeverity));
+    }
+
+    public function ignores(string $package, PartialSecurityAdvisory $advisory): bool
+    {
+        if (isset($this->ids[$package]) || isset($this->ids[$advisory->advisoryId])) {
+            return true;
+        }
+        if (!$advisory instanceof SecurityAdvisory) {
+            return false;
+        }
+        if ($advisory->cve !== null && isset($this->ids[$advisory->cve])) {
+            return true;
+        }
+        if ($advisory->severity !== null && isset($this->severities[$advisory->severity])) {
+            return true;
+        }
+        foreach ($advisory->sources as $source) {
+            if (isset($this->ids[$source['remoteId']])) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function isEmpty(): bool
+    {
+        return $this->ids === [] && $this->severities === [];
+    }
+
+    /**
+     * @param array<mixed> $list
+     *
+     * @return list<string>
+     */
+    private static function keysOrValues(array $list): array
+    {
+        $out = [];
+        foreach ($list as $key => $value) {
+            if (\is_int($key) && \is_string($value)) {
+                $out[] = $value;
+            } elseif (\is_string($key)) {
+                $out[] = $key;
+            }
+        }
+
+        return $out;
+    }
+}

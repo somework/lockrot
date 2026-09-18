@@ -8,21 +8,22 @@ description: The eight verdicts lockrot gives a package in composer.lock, the si
 Every package in `composer.lock` gets exactly one verdict and one priority. The verdict says what
 was observed about the package. The priority says how much that applies to *your* project.
 
-## The eight verdicts
+## The nine verdicts
 
 | Verdict | Meaning | Signals |
 |---|---|---|
 | `abandoned` | The package's Composer repository marks it abandoned (Packagist by default), or its repository is archived on GitHub or GitLab | S1 or S3 |
 | `silent` | No stable release for at least `release-high-years` (default 5y) **and** no repository push for at least `push-high-years` (default 5y); an archived repository is reported as `abandoned` instead | S2 high AND S4 high, NOT S1, NOT S3 |
 | `pinned` | Installed version is a branch snapshot — `dev-master`, `dev-main`, any other `dev-*` branch, a `2.x-dev` alias or a `#hash` reference — or the package has no stable release at all | S6 |
+| `left-behind` | No stable release on the installed version's release branch for at least `release-high-years` (default 5y), while a higher branch has released since — the package is alive, the branch you are on is not | S8 high |
 | `old-promise` | The installed version was released before the target PHP's GA date, and its `require.php` constraint is open-ended (`>=N`, `*`) for that target | S5 |
-| `stale` | Old release or old push, but not old enough (or not on both fronts) for `silent` | one of S2/S4 |
+| `stale` | Old release, old push or a quiet branch, but not old enough (or not on both fronts) for `silent` or `left-behind` | one of S2/S4/S8 |
 | `unknown` | No data could be obtained (not found in any configured Composer repository, or all lookups failed) | — |
 | `finished` | Matched the built-in or project allowlist — the package is complete by design, not neglected | allowlist match |
 | `ok` | None of the above | — |
 
 Severity order among the signal-derived verdicts, used by `--fail-on` and the baseline:
-`abandoned > silent > pinned > old-promise > stale > unknown > ok`.
+`abandoned > silent > pinned > left-behind > old-promise > stale > unknown > ok`.
 
 `finished` and `ok` sit equal and lowest in that ordering, and neither is ever a finding.
 
@@ -41,10 +42,15 @@ always wins, so an allowlisted package reports `finished` whatever its signals s
 | S5 | The installed release predates the target PHP's GA date and the `require.php` constraint has no upper bound |
 | S6 | The installed version is a branch snapshot (`dev-master`, `dev-main`, `2.x-dev`, `#hash`), or the package has no stable release |
 | S7 | A direct requirement pulls in flagged transitive packages — informational, never a verdict; see [Transitive exposure](#transitive-exposure) |
+| S8 | Time since the last stable release on the installed version's release branch, against `release-warn-years` / `release-high-years`, counted only when a higher branch has released since; see [Left behind](#left-behind) |
+| S9 | Security advisories affecting the installed version — never a verdict; raises the priority where no fix is coming; see [Security advisories](#security-advisories) |
 
 S3 and S4 come from the repository host — GitHub, GitLab or Bitbucket — and need network access;
 see [internals.md](internals.md) for how that data is fetched and cached, which host reads what, and
 [configuration.md](configuration.md) for the thresholds.
+
+S8 reads the same release dates S2 does, one branch at a time — see [Left behind](#left-behind).
+S9 comes from the same Composer repositories, through the advisory API `composer audit` uses.
 
 S5 is not what `composer check-platform-reqs` checks. That command tests the platform against each
 constraint — PHP 8.4 satisfies `>=7.2`, so it passes — while S5 tests the constraint against the
@@ -54,23 +60,75 @@ Every finding's evidence line states the concrete fact — release date, push da
 — and the report footer states the data date. There are no severity words beyond the verdict names
 above.
 
+## Left behind
+
+`composer outdated --major-only` says a newer major exists. S2 says nothing, because the package's
+newest release is exactly the one that is fresh. Neither says that the major you are on gets no
+fixes any more.
+
+A version's *release branch* is what a caret constraint on it would stay inside: `1.x` for anything
+`>= 1.0`, `0.3.x` for `0.3.*` — as `^0.3` has it. S8 takes the highest stable release on the
+installed branch and measures its age against `release-warn-years` / `release-high-years`, the S2
+thresholds. It fires only when some higher branch has released *after* that date: a `2.0` that was
+abandoned before `1.x` got its last release is not the upstream moving on, and a package whose every
+branch is old is S2's case, not S8's. At the high threshold the verdict is `left-behind`; below it,
+`stale`, as an old release or an old push would be.
+
+```text
+  left-behind  guzzlehttp/guzzle 6.5.8  direct
+               branch 6.x last released 2022-06-20 (4.2 years ago); upstream moved on to 7.9.3 (2025-03-27)
+```
+
+A branch snapshot (`dev-master`, `2.x-dev`) belongs to no branch and is `pinned`. A package whose
+installed version is not on any branch the repository lists — a private fork, say — carries no S8.
+
+## Security advisories
+
+`composer audit` reports the vulnerability. lockrot carries the same advisories on the finding, as
+S9, and adds the one thing audit cannot know: whether a fix is coming.
+
+S9 lists every advisory whose affected range matches the installed version, fetched from the
+configured Composer repositories exactly as audit fetches them — one request to Packagist for the
+whole lock, the package files themselves on a repository that carries advisories inline. It never
+decides a verdict: a vulnerability on a healthy package is audit's finding and stays out of the
+priority. On an `abandoned`, `silent` or `left-behind` package the evidence ends with
+`no fix expected` and the priority goes up one step, `critical` at most:
+
+```text
+  abandoned    league/flysystem 1.1.10  direct
+               marked abandoned by its repository; last release 2022-10-04 (3.9 years ago); 1 security
+               advisory affects 1.1.10 (CVE-2021-32708); no fix expected
+```
+
+`pinned` and `old-promise` are not raised: a branch snapshot or an open php constraint says nothing
+about whether a fix is coming. The [baseline](baseline.md) stays keyed on the verdict, so a baselined
+finding is `known` whatever S9 adds to its priority.
+
+The check needs Composer 2.4 or newer — on the 2.2 LTS the report carries one note and nothing else
+changes — and cannot run under `--offline`, which is noted the same way. A repository that could not
+be reached for advisories is a note and, under `--strict-network`, exit `1`, like any other
+unreachable source. `--format=json` carries each advisory's id, CVE, title, link, severity and date
+under the signal's `data.advisories`.
+
 ## Priority
 
 A package reported the same way matters less when nothing in the project requires it directly, and
 less again when it is only ever installed for development.
 
-Three rules, in order:
+Four rules, in order:
 
 1. A package the report does not flag (`unknown`, `finished`, `ok`) has priority `none`.
 2. Otherwise the verdict sets the base level: `abandoned` and `silent` start at **critical**,
-   `pinned` and `old-promise` at **high**, `stale` at **medium**.
+   `pinned`, `left-behind` and `old-promise` at **high**, `stale` at **medium**.
 3. The base drops one step when the package is transitive (nothing you require names it) and one
    more step when it is a development dependency. It never drops below **low**.
+4. A security advisory on an `abandoned`, `silent` or `left-behind` package raises the result one
+   step, never above **critical** — see [Security advisories](#security-advisories).
 
 | Verdict | direct, prod | transitive, prod | direct, dev | transitive, dev |
 |---|---|---|---|---|
 | `abandoned`, `silent` | `critical` | `high` | `high` | `medium` |
-| `pinned`, `old-promise` | `high` | `medium` | `medium` | `low` |
+| `pinned`, `left-behind`, `old-promise` | `high` | `medium` | `medium` | `low` |
 | `stale` | `medium` | `low` | `low` | `low` |
 | `unknown`, `finished`, `ok` | `none` | `none` | `none` | `none` |
 
