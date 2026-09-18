@@ -47,6 +47,14 @@ final class Priority
         self::LOW => self::LOW,
     ];
 
+    /** One step up, for a vulnerability nobody will fix ({@see Finding::hasUnfixableAdvisory()}). `critical` is the ceiling. */
+    private const RAISE = [
+        self::CRITICAL => self::CRITICAL,
+        self::HIGH => self::CRITICAL,
+        self::MEDIUM => self::HIGH,
+        self::LOW => self::MEDIUM,
+    ];
+
     public static function rank(string $priority): int
     {
         return self::RANK[$priority] ?? 0;
@@ -63,8 +71,14 @@ final class Priority
      * for being transitive and one more for being a development dependency, never below `low`.
      *
      * A package with an empty chain — nothing in the project reaches it — counts as transitive.
+     *
+     * After those steps, a security advisory on a package whose verdict says no fix is coming
+     * ($unfixableAdvisory) raises the result one step: `composer audit` already reports the
+     * vulnerability, and this is the part it cannot know — the wait for a patched release is over
+     * before it started. An unflagged verdict is never raised: the advisory alone is audit's
+     * finding, not lockrot's.
      */
-    public static function of(string $verdict, bool $direct, bool $dev): string
+    public static function of(string $verdict, bool $direct, bool $dev, bool $unfixableAdvisory = false): string
     {
         if (!isset(self::BASE[$verdict])) {
             return self::NONE;
@@ -75,6 +89,9 @@ final class Priority
         }
         if ($dev) {
             $priority = self::LOWER[$priority];
+        }
+        if ($unfixableAdvisory) {
+            $priority = self::RAISE[$priority];
         }
 
         return $priority;

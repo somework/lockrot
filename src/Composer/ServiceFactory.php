@@ -16,6 +16,7 @@ use Lockrot\Allowlist\BuiltinAllowlist;
 use Lockrot\Analyzer\Analyzer;
 use Lockrot\Clock;
 use Lockrot\Config\LockrotConfig;
+use Lockrot\Data\Advisory\RepositoryAdvisoryLoader;
 use Lockrot\Data\Cache\ArrayCache;
 use Lockrot\Data\Cache\CacheInterface;
 use Lockrot\Data\Forge\ActivityClient;
@@ -56,7 +57,8 @@ final class ServiceFactory
             SignalSet::default($clock, $lockrot->thresholds(), $lockrot->targetPhp(), PhpReleaseDates::load()),
             new VerdictEngine(),
             $clock,
-            $lockrot->offline()
+            $lockrot->offline(),
+            new RepositoryAdvisoryLoader($repositories, $lockrot->offline(), $deadline)
         );
 
         return $analyzer->withDeadline($deadline);

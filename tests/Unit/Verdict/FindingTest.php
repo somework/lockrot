@@ -37,6 +37,46 @@ final class FindingTest extends TestCase
         self::assertSame(['wallabag/wallabag', 'phpzip/phpzip'], $array['chain']);
     }
 
+    public function testAnAdvisoryOnAnAbandonedPackageRaisesThePriorityAndSaysNoFixIsExpected(): void
+    {
+        $signals = [
+            new Signal('S1', 'high', 'marked abandoned by its repository'),
+            new Signal('S9', 'warn', '1 security advisory affects 1.0.0 (CVE-2024-0001)', ['advisories' => []]),
+        ];
+        $direct = new Finding('vendor/pkg', '1.0.0', Verdict::ABANDONED, $signals, ['vendor/pkg'], null, null, null, false, ['vendor/pkg']);
+        $transitiveDev = new Finding('vendor/pkg', '1.0.0', Verdict::ABANDONED, $signals, ['root/app', 'vendor/pkg'], null, null, null, true, ['root/app']);
+
+        self::assertTrue($direct->hasUnfixableAdvisory());
+        self::assertSame(Priority::CRITICAL, $direct->priority());
+        self::assertSame(Priority::HIGH, $transitiveDev->priority(), 'medium raised one step');
+        self::assertSame('marked abandoned by its repository; 1 security advisory affects 1.0.0 (CVE-2024-0001); no fix expected', $direct->ownEvidence());
+        self::assertSame($direct->ownEvidence(), $direct->evidence());
+    }
+
+    public function testAnAdvisoryAloneChangesNeitherThePriorityNorTheWording(): void
+    {
+        $s9 = new Signal('S9', 'warn', '1 security advisory affects 1.0.0 (CVE-2024-0001)', ['advisories' => []]);
+        $pinned = new Finding('vendor/pkg', 'dev-main', Verdict::PINNED, [new Signal('S6', 'warn', 'pinned to branch snapshot dev-main'), $s9], ['vendor/pkg'], null, null, null, false, ['vendor/pkg']);
+        $ok = new Finding('vendor/pkg', '1.0.0', Verdict::OK, [$s9], ['vendor/pkg'], null, null, null, false, ['vendor/pkg']);
+
+        self::assertFalse($pinned->hasUnfixableAdvisory());
+        self::assertSame(Priority::HIGH, $pinned->priority());
+        self::assertSame('pinned to branch snapshot dev-main; 1 security advisory affects 1.0.0 (CVE-2024-0001)', $pinned->ownEvidence());
+        self::assertFalse($ok->hasUnfixableAdvisory());
+        self::assertSame(Priority::NONE, $ok->priority());
+        self::assertSame('1 security advisory affects 1.0.0 (CVE-2024-0001)', $ok->ownEvidence());
+    }
+
+    public function testTheNoFixVerdictsAreExactlyTheThreeWithNoUpstreamToWaitFor(): void
+    {
+        self::assertSame([Verdict::ABANDONED, Verdict::SILENT, Verdict::LEFT_BEHIND], Finding::NO_FIX_VERDICTS);
+        $s9 = new Signal('S9', 'warn', 'advisory', []);
+        foreach (Verdict::all() as $verdict) {
+            $finding = new Finding('vendor/pkg', '1.0.0', $verdict, [$s9], ['vendor/pkg'], null, null);
+            self::assertSame(\in_array($verdict, Finding::NO_FIX_VERDICTS, true), $finding->hasUnfixableAdvisory(), $verdict);
+        }
+    }
+
     public function testNoteWhenNoSignals(): void
     {
         $finding = new Finding('private/thing', '3.0.0', Verdict::UNKNOWN, [], [], null, null, 'not from a Composer repository, not checked');

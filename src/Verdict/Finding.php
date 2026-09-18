@@ -8,6 +8,14 @@ use Lockrot\Signal\Signal;
 
 final class Finding
 {
+    /**
+     * The verdicts under which a security advisory will not be fixed upstream: the package is
+     * abandoned, nobody has touched it for years, or the installed branch is the one the upstream
+     * moved on from. `pinned` and `old-promise` are not here — a branch snapshot or an open php
+     * constraint says nothing about whether a fix is coming.
+     */
+    public const NO_FIX_VERDICTS = [Verdict::ABANDONED, Verdict::SILENT, Verdict::LEFT_BEHIND];
+
     private string $package;
     private string $version;
     private string $verdict;
@@ -136,10 +144,29 @@ final class Finding
         return array_values(array_filter($this->directDependents, static fn (string $name): bool => $name !== $root));
     }
 
-    /** Derived, never stored: the priority is a view of the verdict, the chain and the dev flag. */
+    /** Derived, never stored: the priority is a view of the verdict, the chain, the dev flag and S9. */
     public function priority(): string
     {
-        return Priority::of($this->verdict, $this->isDirect(), $this->dev);
+        return Priority::of($this->verdict, $this->isDirect(), $this->dev, $this->hasUnfixableAdvisory());
+    }
+
+    /**
+     * A security advisory affects the installed version (S9) and the verdict is one under which no
+     * fix will come ({@see self::NO_FIX_VERDICTS}): what raises the priority one step and adds
+     * `no fix expected` to the evidence.
+     */
+    public function hasUnfixableAdvisory(): bool
+    {
+        if (!\in_array($this->verdict, self::NO_FIX_VERDICTS, true)) {
+            return false;
+        }
+        foreach ($this->signals as $signal) {
+            if ($signal->id() === Signal::S9) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -152,6 +179,9 @@ final class Finding
         foreach ($this->signals as $signal) {
             if ($signal->id() !== Signal::S7) {
                 $parts[] = $signal->summary();
+            }
+            if ($signal->id() === Signal::S9 && $this->hasUnfixableAdvisory()) {
+                $parts[] = 'no fix expected';
             }
         }
         if ($parts === []) {
