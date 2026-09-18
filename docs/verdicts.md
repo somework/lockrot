@@ -115,7 +115,11 @@ direct requirement that does — and the priority goes up one step, `critical` a
 ```
 
 A development requirement, so `left-behind` alone would sit at `medium`; the two advisories nobody
-will fix on the 5.x branch put it at `high`. Each advisory is named by its CVE, or by its Packagist
+will fix on the 5.x branch put it at `high`. The same applies when S8 fires below its threshold: a
+`stale` or `old-promise` package whose evidence names a branch the upstream left is not where a fix
+lands either, so its advisories read `no fix expected` and raise it too. An allowlisted package is
+never raised — `finished` says the project vouches for it — but its advisories are counted in the
+footer line. Each advisory is named by its CVE, or by its Packagist
 id when it has none; the worst severity first, three named, the rest counted. Advisories on
 packages the report does not flag stay off the rows (they are audit's findings), but the footer
 counts them — `53 security advisories on 17 packages the report does not flag; see composer audit`
@@ -126,8 +130,8 @@ before. What audit drops, lockrot drops. A policy section Composer itself reject
 for a later version, say — leaves lockrot with no ignore list at all; the report then carries a note
 saying so, and every advisory counts until the section parses.
 
-`stale`, `pinned` and `old-promise` are not raised: an old release, a branch snapshot or an open php
-constraint says nothing about whether a fix is coming. The [baseline](baseline.md) stays keyed on
+Without S8, `stale`, `pinned` and `old-promise` are not raised: an old release, a branch snapshot
+or an open php constraint says nothing about whether a fix is coming. The [baseline](baseline.md) stays keyed on
 the verdict, so a baselined finding is `known` whatever S9 adds to its priority.
 
 The check needs Composer 2.4 or newer — on the 2.2 LTS the report carries one note and nothing else
@@ -149,8 +153,9 @@ Four rules, in order:
    `pinned`, `left-behind` and `old-promise` at **high**, `stale` at **medium**.
 3. The base drops one step when the package is transitive (nothing you require names it) and one
    more step when it is a development dependency. It never drops below **low**.
-4. A security advisory on an `abandoned`, `silent` or `left-behind` package raises the result one
-   step, never above **critical** — see [Security advisories](#security-advisories).
+4. A security advisory on an `abandoned`, `silent` or `left-behind` package — or on any flagged
+   package whose evidence carries S8, the branch the upstream left — raises the result one step,
+   never above **critical**; see [Security advisories](#security-advisories).
 
 | Verdict | direct, prod | transitive, prod | direct, dev | transitive, dev |
 |---|---|---|---|---|

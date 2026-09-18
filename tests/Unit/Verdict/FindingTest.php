@@ -95,6 +95,27 @@ final class FindingTest extends TestCase
         $signals = $pinned->toArray()['signals'];
         self::assertIsArray($signals);
         self::assertSame(['S5', 'S6', 'S7'], array_column($signals, 'id'), 'the JSON keeps signal order');
+
+        $s7First = new Finding('vendor/pkg', 'dev-master', Verdict::PINNED, [$s7, $s6, $s5], ['vendor/pkg'], null, null);
+        self::assertSame($s6->summary().'; '.$s5->summary(), $s7First->ownEvidence(), 'S7 anywhere in the list is skipped, not a stop');
+    }
+
+    public function testAnAdvisoryOnABranchS8NamesIsUnfixableWhateverTheVerdict(): void
+    {
+        $s9 = new Signal('S9', 'warn', '14 security advisories affect 6.5.5 (CVE-a, CVE-b, CVE-c and 11 more)', ['advisories' => []]);
+        $s8warn = new Signal('S8', 'warn', 'branch 6.x last released 2022-06-20 (4.2 years ago); 8.x released 8.2.0 (2026-09-06)');
+        $s5 = new Signal('S5', 'warn', 'released 2020-06-16, before PHP 8.4 GA (2024-11-21); php constraint ">=5.5" has no upper bound');
+
+        $oldPromise = new Finding('guzzlehttp/guzzle', '6.5.5', Verdict::OLD_PROMISE, [$s5, $s8warn, $s9], ['guzzlehttp/guzzle'], null, null, null, false, ['guzzlehttp/guzzle']);
+        $stale = new Finding('guzzlehttp/guzzle', '6.5.5', Verdict::STALE, [$s8warn, $s9], ['guzzlehttp/guzzle'], null, null, null, false, ['guzzlehttp/guzzle']);
+        $finished = new Finding('guzzlehttp/guzzle', '6.5.5', Verdict::FINISHED, [$s8warn, $s9], ['guzzlehttp/guzzle'], 'frozen', null, null, false, ['guzzlehttp/guzzle']);
+
+        self::assertTrue($oldPromise->hasUnfixableAdvisory());
+        self::assertSame(Priority::CRITICAL, $oldPromise->priority(), 'high raised to critical');
+        self::assertStringEndsWith('; no fix expected', $oldPromise->ownEvidence());
+        self::assertTrue($stale->hasUnfixableAdvisory());
+        self::assertSame(Priority::HIGH, $stale->priority(), 'medium raised to high');
+        self::assertFalse($finished->hasUnfixableAdvisory(), 'an allowlisted package is never raised: the allowlist decided');
     }
 
     public function testNoteWhenNoSignals(): void

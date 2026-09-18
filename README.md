@@ -109,10 +109,10 @@ Abridged — `…` marks where lines were cut. [The full run →](https://lockro
 
 Each finding also carries a priority — `critical`, `high`, `medium`, `low`, or `none` for a package
 the report does not flag. The verdict sets a base level, which drops one step for a transitive
-package and one more for a development-only one, never below `low`. A security advisory on an
-`abandoned`, `silent` or `left-behind` package — the vulnerability `composer audit` reports, on a
-package nobody will fix — raises it one step and marks the evidence `no fix expected`. The priority
-orders the report and is carried in every format. **`--fail-on` takes either a verdict or a priority**: `--fail-on=silent`
+package and one more for a development-only one, never below `low`. A security advisory on a
+package nobody will fix — `abandoned`, `silent`, `left-behind`, or on a branch the upstream left —
+is the vulnerability `composer audit` reports; here it raises the priority one step and marks the
+evidence `no fix expected`. The priority orders the report and is carried in every format. **`--fail-on` takes either a verdict or a priority**: `--fail-on=silent`
 fails on what was observed, wherever the package sits; `--fail-on=high` fails on how much it applies
 to this project. The baseline stays on the verdict.
 

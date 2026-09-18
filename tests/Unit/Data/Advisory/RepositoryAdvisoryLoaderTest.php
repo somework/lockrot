@@ -248,6 +248,48 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
         }
     }
 
+    /** What a repository throws is a note, whatever its class — and an empty message names the class. */
+    public function testAnyThrowableFromARepositoryIsANote(): void
+    {
+        if (!interface_exists(AdvisoryProviderInterface::class)) {
+            self::markTestSkipped('Composer without the advisory API');
+        }
+        $throwing = static function (\Throwable $e): ArrayRepository {
+            return new class ($e) extends ArrayRepository implements AdvisoryProviderInterface {
+                private \Throwable $e;
+
+                public function __construct(\Throwable $e)
+                {
+                    parent::__construct();
+                    $this->e = $e;
+                }
+
+                public function getRepoName(): string
+                {
+                    return 'throwing repo';
+                }
+
+                public function hasSecurityAdvisories(): bool
+                {
+                    throw $this->e;
+                }
+
+                public function getSecurityAdvisories(array $packageConstraintMap, bool $allowPartialAdvisories = false): array
+                {
+                    return ['namesFound' => [], 'advisories' => []];
+                }
+            };
+        };
+
+        $batch = (new RepositoryAdvisoryLoader(array_merge([$throwing(new \LogicException("first line\nsecond line"))], $this->server()->repositories())))->load(['doctrine/cache' => '2.2.0']);
+        self::assertSame(['security advisories unavailable from throwing repo: first line'], $batch->notes());
+        self::assertFalse($batch->hadNetworkFailure());
+        self::assertCount(2, $batch->for('doctrine/cache'));
+
+        $batch = (new RepositoryAdvisoryLoader([$throwing(new \RuntimeException(''))]))->load(['doctrine/cache' => '2.2.0']);
+        self::assertSame(['security advisories unavailable from throwing repo: RuntimeException'], $batch->notes());
+    }
+
     public function testOfflineAsksNothing(): void
     {
         $unreachable = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK]);

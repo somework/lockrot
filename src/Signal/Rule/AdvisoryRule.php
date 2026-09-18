@@ -59,15 +59,14 @@ final class AdvisoryRule implements SignalRule
      */
     private static function worstFirst(array $advisories): array
     {
-        $indexed = array_values($advisories);
-        $order = array_keys($indexed);
-        usort($order, static function (int $a, int $b) use ($indexed): int {
-            $rankA = self::SEVERITY_RANK[$indexed[$a]->severity() ?? ''] ?? \count(self::SEVERITY_RANK);
-            $rankB = self::SEVERITY_RANK[$indexed[$b]->severity() ?? ''] ?? \count(self::SEVERITY_RANK);
+        $order = array_keys($advisories);
+        usort($order, static function (int $a, int $b) use ($advisories): int {
+            $rankA = self::SEVERITY_RANK[$advisories[$a]->severity() ?? ''] ?? \count(self::SEVERITY_RANK);
+            $rankB = self::SEVERITY_RANK[$advisories[$b]->severity() ?? ''] ?? \count(self::SEVERITY_RANK);
 
             return $rankA <=> $rankB ?: $a <=> $b;
         });
 
-        return array_map(static fn (int $i): Advisory => $indexed[$i], $order);
+        return array_map(static fn (int $i): Advisory => $advisories[$i], $order);
     }
 }
