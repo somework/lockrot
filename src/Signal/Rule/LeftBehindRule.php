@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Lockrot\Signal\Rule;
 
+use Composer\Semver\Comparator;
+use Composer\Semver\VersionParser;
 use Lockrot\Clock;
 use Lockrot\Data\Repository\ReleaseBranch;
 use Lockrot\Signal\PackageFacts;
@@ -20,17 +22,21 @@ use Lockrot\Signal\Thresholds;
  *
  * A higher branch that stopped releasing *before* the installed one did says nothing (a
  * pre-release major that was abandoned, say), so it does not count as moving on. When every
- * branch is old, S2 already speaks.
+ * branch is old, S2 already speaks. An installed version the repository does not list — above
+ * everything it has on that branch, as a lock written against a since-removed tag would be —
+ * cannot be measured by that branch's last date, so it carries no S8 either.
  */
 final class LeftBehindRule implements SignalRule
 {
     private Clock $clock;
     private Thresholds $thresholds;
+    private VersionParser $parser;
 
     public function __construct(Clock $clock, Thresholds $thresholds)
     {
         $this->clock = $clock;
         $this->thresholds = $thresholds;
+        $this->parser = new VersionParser();
     }
 
     public function evaluate(PackageFacts $facts): ?Signal
@@ -45,7 +51,7 @@ final class LeftBehindRule implements SignalRule
         }
         $byBranch = $metadata->latestStableByBranch();
         $own = $byBranch[$branch] ?? null;
-        if ($own === null || $own['at'] === null) {
+        if ($own === null || $own['at'] === null || $this->isAhead($facts->package()->version(), $own['version'])) {
             return null;
         }
 
@@ -85,5 +91,15 @@ final class LeftBehindRule implements SignalRule
             'newest_version' => $newest['version'],
             'newest_release' => $newest['at']->format(\DATE_ATOM),
         ]);
+    }
+
+    /** Whether the installed version is above the highest release the repository lists on its branch. */
+    private function isAhead(string $installed, string $branchHighest): bool
+    {
+        try {
+            return Comparator::greaterThan($this->parser->normalize($installed), $this->parser->normalize($branchHighest));
+        } catch (\UnexpectedValueException $e) {
+            return true;
+        }
     }
 }
