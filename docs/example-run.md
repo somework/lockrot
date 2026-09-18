@@ -20,7 +20,8 @@ reproducible.
 ## The table format
 
 Findings are grouped by [priority](verdicts.md), highest first, and every line — rows and the closing
-summary alike — wraps to the width of the terminal, so nothing has to be read sideways. The width
+summary alike — wraps to the width of the terminal, so nothing has to be read sideways; a command the
+footer names (`composer audit`, `composer lockrot --format=json`) is never split across two lines. The width
 comes from `COLUMNS` when it is set, otherwise from the console itself, falling back to 120 columns
 and never going below 40. `--all` adds a final `not flagged` group with everything else in the lock.
 
