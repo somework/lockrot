@@ -188,6 +188,7 @@ which win over `composer.json`.
 | `ignore` | — | `[]` | Project allowlist |
 | — | `--all` | | Show every checked package, not only flagged ones |
 | — | `--generate-baseline` | | Write this run's findings to the baseline file and exit 0 |
+| — | `--explain=vendor/package` | | One package: its verdict, every signal with its raw data, and the repository facts behind them; exit 0 |
 
 `extra.lockrot` is validated against
 [`resources/lockrot-config.schema.json`](resources/lockrot-config.schema.json). Package metadata comes
