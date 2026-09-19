@@ -70,11 +70,15 @@ final class Explanation
 
     /**
      * The repository's release branches, highest first, each with its highest stable tag and that
-     * tag's date (null when the repository leaves it undated or dates it by a commit other tags
-     * share — see {@see \Lockrot\Data\Repository\PackageMetadata::fromPackages()}), and the branch's
-     * newest dated release; `installed` marks the branch the locked version is on.
+     * tag's release date (null when the repository leaves it undated or dates it by a commit other
+     * tags share — see {@see \Lockrot\Data\Repository\PackageMetadata::fromPackages()}), and the
+     * branch's newest dated release; `installed` marks the branch the locked version is on.
+     * `highest_commit_date` is the date such a shared-commit tag carried before it was set aside —
+     * the branch's newest dated release *is* that tag, so the date it shows is the commit's — and
+     * null for a tag that is dated as a release or not at all; what lets a reader tell "no date"
+     * from "a date that is not the release's".
      *
-     * @return list<array{branch: string, installed: bool, highest: string, highest_released: ?\DateTimeImmutable, newest_dated: string, newest_dated_released: ?\DateTimeImmutable}>
+     * @return list<array{branch: string, installed: bool, highest: string, highest_released: ?\DateTimeImmutable, highest_commit_date: ?\DateTimeImmutable, newest_dated: string, newest_dated_released: ?\DateTimeImmutable}>
      */
     public function branches(): array
     {
@@ -93,11 +97,13 @@ final class Explanation
         $rows = [];
         foreach ($keys as $key) {
             $release = $byBranch[$key];
+            $sharedCommit = $release['highest']['at'] === null && $release['version'] === $release['highest']['pretty'];
             $rows[] = [
                 'branch' => ReleaseBranch::label($key),
                 'installed' => $key === $installed,
                 'highest' => $release['highest']['pretty'],
                 'highest_released' => $release['highest']['at'],
+                'highest_commit_date' => $sharedCommit ? $release['at'] : null,
                 'newest_dated' => $release['version'],
                 'newest_dated_released' => $release['at'],
             ];
@@ -131,6 +137,7 @@ final class Explanation
                 'installed' => $row['installed'],
                 'highest' => $row['highest'],
                 'highest_released' => self::date($row['highest_released']),
+                'highest_commit_date' => self::date($row['highest_commit_date']),
                 'newest_dated' => $row['newest_dated'],
                 'newest_dated_released' => self::date($row['newest_dated_released']),
             ];

@@ -238,7 +238,7 @@ final class ExplainFormatter
             break;
         }
 
-        return \sprintf('last stable release unknown: the highest tag%s is undated, so S2 does not measure the package', $highest === '' ? '' : ' '.$highest);
+        return \sprintf('last stable release unknown: the highest tag%s has no release date, so S2 does not measure the package', $highest === '' ? '' : ' '.$highest);
     }
 
     /** @return list<string> */
@@ -248,17 +248,23 @@ final class ExplainFormatter
         if ($rows === []) {
             return [];
         }
-        $lines = ['  branch     highest tag        released     newest dated release'];
+        $lines = ['  branch     highest tag        released           newest dated release'];
         foreach (\array_slice($rows, 0, Explanation::BRANCH_ROWS) as $row) {
-            $released = $row['highest_released'] === null ? 'undated' : $row['highest_released']->format('Y-m-d');
+            if ($row['highest_released'] !== null) {
+                $released = $row['highest_released']->format('Y-m-d');
+            } elseif ($row['highest_commit_date'] !== null) {
+                $released = 'commit '.$row['highest_commit_date']->format('Y-m-d');
+            } else {
+                $released = 'undated';
+            }
             $newest = $row['newest_dated_released'] === null ? '—' : $row['newest_dated'].' ('.$row['newest_dated_released']->format('Y-m-d').')';
-            $lines[] = \sprintf('%s%-10s %-18s %-12s %s', $row['installed'] ? '* ' : '  ', $row['branch'], $row['highest'], $released, $newest);
+            $lines[] = \sprintf('%s%-10s %-18s %-18s %s', $row['installed'] ? '* ' : '  ', $row['branch'], $row['highest'], $released, $newest);
         }
         if (\count($rows) > Explanation::BRANCH_ROWS) {
             $lines[] = \sprintf('  … and %d more', \count($rows) - Explanation::BRANCH_ROWS);
         }
         if ($explanation->installedBranchIsUndated()) {
-            $lines[] = '* the installed branch\'s highest tag is undated — the repository gives it no date, or dates it by a commit other tags share (a subtree split) — so S8 does not measure the branch';
+            $lines[] = '* the installed branch\'s highest tag has no release date — the repository leaves it undated, or dates it only by a commit other tags share (`commit …`: a subtree split, the day the directory last changed) — so S8 does not measure the branch';
         }
 
         return $lines;

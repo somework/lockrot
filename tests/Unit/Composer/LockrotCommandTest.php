@@ -440,7 +440,7 @@ final class LockrotCommandTest extends TestCase
         self::assertStringContainsString('— abandoned, priority', $display);
         self::assertStringContainsString("\n  S1 high marked abandoned by its repository", $display);
         self::assertStringContainsString("\nrepository metadata (as of ", $display);
-        self::assertStringContainsString("\n    branch     highest tag        released     newest dated release\n", $display);
+        self::assertStringContainsString("\n    branch     highest tag        released           newest dated release\n", $display);
         self::assertStringContainsString("\nthresholds: release-warn-years 3", $display);
         self::assertStringNotContainsString('packages checked', $display, 'the report itself is not printed');
     }
@@ -490,6 +490,18 @@ final class LockrotCommandTest extends TestCase
         self::assertSame(2, $code);
         self::assertSame('', $stdout);
         self::assertStringContainsString('lockrot: '.$message, implode("\n", $errors));
+    }
+
+    /** An explanation does not consult the baseline, so a baseline that would fail the report run does not fail it. */
+    public function testExplainDoesNotNeedTheBaseline(): void
+    {
+        chdir(__DIR__.'/../../fixtures/apps/wallabag_wallabag');
+        $tester = $this->tester($this->loader());
+
+        $code = $tester->execute(['--explain' => 'doctrine/annotations', '--baseline' => 'no-such-baseline.json', '--target-php' => '8.4']);
+
+        self::assertSame(0, $code, $tester->getDisplay());
+        self::assertStringStartsWith('doctrine/annotations ', $tester->getDisplay());
     }
 
     public function testExplainReachesADevPackageWithDev(): void

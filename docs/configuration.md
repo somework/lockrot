@@ -85,15 +85,17 @@ finding with everything it was decided on:
 - the `composer.lock` entry: version, `php` constraint, release date, source;
 - the repository metadata: how many versions are listed, whether the package is abandoned and what
   replaces it, its last stable release, and the table S8 reads — every release branch with its
-  highest tag, that tag's date and the branch's newest dated release, the installed branch marked
-  `*`. A branch whose highest tag is `undated` is one S8 does not measure; the table says so when
-  it is the installed one (see [verdicts.md](verdicts.md#left-behind));
+  highest tag, that tag's release date and the branch's newest dated release, the installed branch
+  marked `*`. A highest tag the repository gives no date reads `undated`; one it dates only by a
+  commit other tags share (a subtree split) reads `commit 2023-06-05` — the day the directory last
+  changed, not a release. S8 measures neither kind of branch, and the table says so when it is the
+  installed one (see [verdicts.md](verdicts.md#left-behind));
 - the repository activity S3 and S4 read, or that it was not fetched;
 - the thresholds and target PHP the signals were measured against, and the run's notes.
 
-`--format=json` prints the same as JSON (`package`, `finding` — the finding as `--format=json`
-carries it — `lock`, `metadata`, `activity`, `thresholds`, `target_php`, `notes`); no other format
-has an explanation form. The exit code is `0`: the run answers a question, it does not gate. A
+`--format=json` prints the same as JSON (`package`, `version`, `finding` — the finding as
+`--format=json` carries it — `lock`, `metadata`, `activity`, `thresholds`, `target_php`,
+`generated_at`, `notes`); no other format has an explanation form. The exit code is `0`: the run answers a question, it does not gate. A
 package that is not in the lock, or is in `packages-dev` on a run without `--dev`, is a configuration
 error (exit `2`). The baseline is not consulted.
 
