@@ -25,6 +25,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   evidence ends `…; 8.x released 8.2.0 (2026-09-06); require ^8.2 to follow`. A transitive
   package's parent owns that line, so there the clause stays off the row and the constraint stays
   on the signal's data.
+- `no fix expected` says where to go when there is somewhere: on an `abandoned` package whose
+  repository names a replacement, an advisory nothing fixes reads `no fix expected; migrate to
+  symfony/mailer` — the fix is not coming here, and the package that took over is where it lands.
 
 ### Fixed
 
