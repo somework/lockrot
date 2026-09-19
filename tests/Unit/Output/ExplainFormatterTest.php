@@ -110,9 +110,11 @@ final class ExplainFormatterTest extends TestCase
         $on = static fn (string $version, ?string $commit, ?string $time): array => array_filter(['name' => 'vendor/pkg', 'version' => $version, 'time' => $time, 'source' => $commit === null ? null : ['type' => 'git', 'url' => 'https://github.com/vendor/pkg.git', 'reference' => $commit]]);
         $metadata = PackageMetadata::fromPackages('vendor/pkg', [
             $loader->load($on('13.1.0', 'split-13', '2026-04-29T09:35:06+00:00')),
+            $loader->load($on('13.0.1', 'split-13', '2026-04-29T09:35:06+00:00')),
             $loader->load($on('13.0.0', 'split-13', '2026-04-29T09:35:06+00:00')),
             $loader->load($on('12.0.0', null, null)),
             $loader->load($on('10.49.0', 'split-10', '2023-06-05T12:46:42+00:00')),
+            $loader->load($on('10.20.0', 'split-10', '2023-06-05T12:46:42+00:00')),
             $loader->load($on('10.13.1', 'split-10', '2023-06-05T12:46:42+00:00')),
         ], new \DateTimeImmutable(F::NOW));
         $explanation = new Explanation($finding, F::facts(F::package(['version' => '10.48.28']), $metadata), new Thresholds(), '8.4', $this->report());
@@ -128,7 +130,7 @@ final class ExplainFormatterTest extends TestCase
               source https://github.com/vendor/pkg.git
 
             repository metadata (as of 2026-09-14)
-              5 versions listed · library · not abandoned
+              7 versions listed · library · not abandoned
               source https://github.com/vendor/pkg.git
               last stable release unknown: the highest tag 13.1.0 has no release date, so S2 does not measure the package
                 branch     highest tag        released           newest dated release

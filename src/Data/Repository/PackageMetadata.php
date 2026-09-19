@@ -17,6 +17,18 @@ use Lockrot\Data\Forge\SupportSource;
  */
 final class PackageMetadata
 {
+    /**
+     * How many stable tags have to sit on one source commit before their date is read as the
+     * commit's rather than a release's. A subtree split piles them up by the dozen — 83 on the
+     * commit behind illuminate/macroable v10.49.0, dated a year and a half before the release.
+     * Two on one commit is what an ordinary repository does now and then: a re-tag, or the last
+     * two releases of a branch cut with nothing changed in between (symfony/* 3.4.46 and 3.4.47);
+     * there the date is at most one release interval off, and reading it keeps a dead branch
+     * measurable. The understatement grows with the count, which is the only handle there is —
+     * every tag on the commit carries the same date, so the span between them cannot be read.
+     */
+    public const SHARED_COMMIT_TAGS = 3;
+
     private string $name;
     private bool $abandoned;
     private ?string $replacement;
@@ -167,15 +179,15 @@ final class PackageMetadata
         // whether or not this directory changed, so tags pile up on one commit — illuminate/macroable
         // has 83 stable tags on the commit behind v10.49.0 — and Packagist dates each by that
         // commit: `time` says when the directory last changed, years before the release it names.
-        // A tag whose commit another stable tag shares is therefore dated by no release, and is
-        // treated as the undated tag it effectively is: the branch's age is not known. (Two stable
-        // tags on one commit in a repository released by hand — a re-tag — are the one shape this
-        // also catches; there the date is right, and a branch measured a release late is the cost.)
+        // A tag sharing its commit with SHARED_COMMIT_TAGS - 1 other stable tags or more is therefore
+        // dated by no release, and is treated as the undated tag it effectively is: the branch's age
+        // is not known. Fewer than that is a re-tag or a branch's last releases cut with nothing
+        // changed, where the date is one release interval off at most and stays readable.
         // Dev branches and pre-releases do not count: `dev-main` sits on the newest tag's commit by
         // construction, and a final cut on its release candidate's commit is dated days late, not years.
         foreach ($byBranch as $branch => $entry) {
             $commit = $highestCommitByBranch[$branch] ?? null;
-            if ($commit !== null && $tagsOnCommit[$commit] > 1) {
+            if ($commit !== null && $tagsOnCommit[$commit] >= self::SHARED_COMMIT_TAGS) {
                 $byBranch[$branch] = ['version' => $entry['version'], 'at' => $entry['at'], 'highest' => ['normalized' => $entry['highest']['normalized'], 'pretty' => $entry['highest']['pretty'], 'at' => null]];
             }
         }
@@ -183,7 +195,7 @@ final class PackageMetadata
         // a date that is the commit's rather than the release's — the newest dated one below it is
         // not "the last release": it is the last release the repository dated, and how much
         // younger the tags above it are cannot be known; S2 then has nothing to measure and stays quiet.
-        if ($highestStable !== null && ($highestStable->getReleaseDate() === null || ($highestCommit !== null && isset($tagsOnCommit[$highestCommit]) && $tagsOnCommit[$highestCommit] > 1))) {
+        if ($highestStable !== null && ($highestStable->getReleaseDate() === null || ($highestCommit !== null && isset($tagsOnCommit[$highestCommit]) && $tagsOnCommit[$highestCommit] >= self::SHARED_COMMIT_TAGS))) {
             $lastStableReleaseAt = null;
             $lastStableVersion = null;
         }

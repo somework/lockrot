@@ -38,11 +38,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   one commit and Packagist dates each of them by that commit: `illuminate/macroable` has 83 stable
   tags on the commit behind `v10.49.0`, all dated 2023-06-05, and a lock on 10.x read as `branch
   10.x last released 2023-06-05 (3.3 years ago)` while Laravel 10 kept releasing. A tag that shares
-  its commit with another stable tag is now read as undated — the date is the directory's, not the
-  release's — so S8 does not measure the branch and S2 does not measure the package. The cost is
-  the other way: a split branch that really did stop (`illuminate/contracts` 8.x) is no longer
-  reported `left-behind` either, since its last tag is dated the same way. Dev branches and
-  pre-releases on a tag's commit do not count.
+  its commit with two or more other stable tags is now read as undated — the date is the
+  directory's, not the release's — so S8 does not measure the branch and S2 does not measure the
+  package. Two tags on one commit keep their date: a re-tag, or a branch's last two releases cut
+  with nothing changed between them (`symfony/*` 3.4.46 and 3.4.47), where the date is one release
+  interval off at most — so a Symfony 3.4 lock still reads `left-behind` on every component. The
+  cost is the other way: a split branch that really did stop and piled up more tags
+  (`illuminate/contracts` 8.x, 31 on one commit) is no longer reported `left-behind`, since its last
+  tag is dated the same way. Dev branches and pre-releases on a tag's commit do not count.
 
 ### Changed
 
