@@ -93,6 +93,12 @@ final class PackageMetadata
         $highestStable = null;
         $type = null;
         $byBranch = [];
+        // Stable tags per source commit, and the commit each branch's highest tag points at: a tag
+        // that shares its commit with another stable tag was cut without a change in this repository,
+        // so its `time` — the commit's — is not the release's. See the pass over $byBranch below.
+        $tagsOnCommit = [];
+        $highestCommitByBranch = [];
+        $highestCommit = null;
 
         foreach ($versions as $version) {
             if (!$abandoned && $version instanceof CompletePackage && $version->isAbandoned()) {
@@ -103,6 +109,7 @@ final class PackageMetadata
                 $hasStableRelease = true;
                 if ($highestStable === null || Comparator::greaterThan($version->getVersion(), $highestStable->getVersion())) {
                     $highestStable = $version;
+                    $highestCommit = self::commitOf($version);
                 }
                 $releaseDate = $version->getReleaseDate();
                 if ($releaseDate !== null) {
@@ -127,14 +134,20 @@ final class PackageMetadata
                 $normalized = $version->getVersion();
                 $branch = ReleaseBranch::of($normalized);
                 if ($branch !== null && VersionParser::parseStability($normalized) === 'stable') {
+                    $commit = self::commitOf($version);
+                    if ($commit !== null) {
+                        $tagsOnCommit[$commit] = ($tagsOnCommit[$commit] ?? 0) + 1;
+                    }
                     $pretty = $version->getPrettyVersion();
                     $tag = ['normalized' => $normalized, 'pretty' => $pretty, 'at' => $releaseDate];
                     $entry = $byBranch[$branch] ?? null;
                     if ($entry === null) {
                         $byBranch[$branch] = ['version' => $pretty, 'at' => $releaseDate, 'highest' => $tag];
+                        $highestCommitByBranch[$branch] = $commit;
                     } else {
                         if (Comparator::greaterThan($normalized, $entry['highest']['normalized'])) {
                             $entry['highest'] = $tag;
+                            $highestCommitByBranch[$branch] = $commit;
                         }
                         if ($releaseDate !== null && ($entry['at'] === null || $releaseDate > $entry['at'])) {
                             $entry['version'] = $pretty;
@@ -150,11 +163,27 @@ final class PackageMetadata
                 $type = $version->getType();
             }
         }
-        // The package's age is its highest tag's age. When that tag carries no date, the newest
-        // dated one below it is not "the last release" — it is the last release the repository
-        // dated, and how much younger the undated tags above it are cannot be known; S2 then has
-        // nothing to measure and stays quiet.
-        if ($highestStable !== null && $highestStable->getReleaseDate() === null) {
+        // A subtree split (illuminate/*, symfony/*) cuts a tag on every release of the monorepo
+        // whether or not this directory changed, so tags pile up on one commit — illuminate/macroable
+        // has 83 stable tags on the commit behind v10.49.0 — and Packagist dates each by that
+        // commit: `time` says when the directory last changed, years before the release it names.
+        // A tag whose commit another stable tag shares is therefore dated by no release, and is
+        // treated as the undated tag it effectively is: the branch's age is not known. (Two stable
+        // tags on one commit in a repository released by hand — a re-tag — are the one shape this
+        // also catches; there the date is right, and a branch measured a release late is the cost.)
+        // Dev branches and pre-releases do not count: `dev-main` sits on the newest tag's commit by
+        // construction, and a final cut on its release candidate's commit is dated days late, not years.
+        foreach ($byBranch as $branch => $entry) {
+            $commit = $highestCommitByBranch[$branch] ?? null;
+            if ($commit !== null && $tagsOnCommit[$commit] > 1) {
+                $byBranch[$branch] = ['version' => $entry['version'], 'at' => $entry['at'], 'highest' => ['normalized' => $entry['highest']['normalized'], 'pretty' => $entry['highest']['pretty'], 'at' => null]];
+            }
+        }
+        // The package's age is its highest tag's age. When that tag carries no date — or, as above,
+        // a date that is the commit's rather than the release's — the newest dated one below it is
+        // not "the last release": it is the last release the repository dated, and how much
+        // younger the tags above it are cannot be known; S2 then has nothing to measure and stays quiet.
+        if ($highestStable !== null && ($highestStable->getReleaseDate() === null || ($highestCommit !== null && ($tagsOnCommit[$highestCommit] ?? 0) > 1))) {
             $lastStableReleaseAt = null;
             $lastStableVersion = null;
         }
@@ -175,6 +204,14 @@ final class PackageMetadata
             $dataDate,
             $byBranch
         );
+    }
+
+    /** The commit the release's `source` points at, null when the repository names none. */
+    private static function commitOf(BasePackage $version): ?string
+    {
+        $reference = $version->getSourceReference();
+
+        return $reference === null || $reference === '' ? null : $reference;
     }
 
     /** The release's `source` URL, else its `support.source` reduced to the repository, else null. */
