@@ -256,7 +256,12 @@ slow test. They are listed here only so nobody reads them as an unexplained "2 t
 
 ## pre-post-fixes (2026-09-19)
 
-- `src/Composer/LockrotCommand.php` `explain()` LogicalOr on `$finding === null || $facts === null` —
+- `src/Signal/Rule/LeftBehindRule.php:70` LessThanOrEqualTo — a higher branch released at the very
+  instant the installed branch's last release was is skipped by `<=` and kept by `<`; kept, it is the
+  newest candidate at the installed branch's own date, and the signal then needs that date to be
+  both at least `release-warn-years` old (the branch) and younger than `release-warn-years` (the
+  move-on) — impossible, so the rule returns null either way.
+- `src/Composer/LockrotCommand.php:268` `explain()` LogicalOr on `$finding === null || $facts === null` —
   `Analysis::finding()` and `Analysis::facts()` are filled by the same loop over the same packages
   in `Analyzer::analyzeWithFacts()`, so one is null exactly when the other is; and the lock lookup
   two lines up already rejects every name the run does not analyse, so the branch never runs. The
