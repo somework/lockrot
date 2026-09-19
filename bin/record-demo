@@ -2,7 +2,7 @@
 # Records the README demo from a real run and renders it: asciinema captures the terminal session,
 # agg turns the recording into docs/assets/lockrot-demo.gif. No browser involved.
 #
-#   LOCKROT_DEMO_DIR=<scratch copy of tests/fixtures/apps/matomo-org_matomo, holding lockrot.phar> \
+#   LOCKROT_DEMO_DIR=<scratch copy of tests/fixtures/apps/koel_koel, holding lockrot.phar> \
 #   GITHUB_TOKEN=<token> COMPOSER_CACHE_DIR=<scratch dir> bin/record-demo
 #
 # Warm Composer's metadata cache with one plain run first, then delete <cache>/lockrot so the
@@ -30,6 +30,7 @@ session() {
 export -f session
 
 # The exported function only exists for bash, whatever the recorder's login shell is.
-SHELL=/bin/bash asciinema rec --overwrite --quiet --window-size 100x33 --command 'session "php lockrot.phar --target-php=8.4"' "$cast"
+# 48 rows: koel's report is 46 lines at 100 columns with the plain footer and its note, plus the prompt; the last frame holds it whole.
+SHELL=/bin/bash asciinema rec --overwrite --quiet --window-size 100x48 --command 'session "php lockrot.phar --target-php=8.4"' "$cast"
 agg --font-size 20 --line-height 1.3 --theme monokai --speed 1 --last-frame-duration 5 --fps-cap 20 "$cast" "$gif"
 ls -la "$gif"
