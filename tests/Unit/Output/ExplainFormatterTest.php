@@ -163,11 +163,12 @@ final class ExplainFormatterTest extends TestCase
             $releases[] = ['0.0.'.$i, '2020-01-01T00:00:00+00:00'];
         }
         $finding = new Finding('vendor/pkg', '0.0.3', Verdict::FINISHED, [], ['vendor/pkg'], 'interfaces only', new \DateTimeImmutable(F::NOW));
-        $explanation = new Explanation($finding, F::facts(F::package(['version' => '0.0.3']), F::metadata($releases)), new Thresholds(), '8.4', $this->report());
+        $explanation = new Explanation($finding, F::facts(F::package(['version' => '0.0.3']), F::metadata($releases), F::activity(false, '2026-02-01T00:00:00+00:00')), new Thresholds(), '8.4', $this->report());
 
         $text = $this->plain($explanation);
 
         self::assertStringContainsString("  allowlisted: interfaces only\n", $text);
+        self::assertStringContainsString("repository activity\n  GitHub vendor/pkg · not archived · last push 2026-02-01 · fetched 2026-09-14\n", $text, 'a dated push, fetched in this run');
         self::assertSame(Explanation::BRANCH_ROWS, preg_match_all('/^    0\.0\.\d+ /m', $text));
         self::assertStringContainsString('  … and 5 more', $text);
 

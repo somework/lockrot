@@ -27,6 +27,9 @@ final class ExplainFormatter
 
     private const INDENT = '  ';
 
+    /** Under a signal's `S8 warn ` line: the data hangs beneath the summary's first character. */
+    private const DATA_INDENT = '           ';
+
     /** The signal data keys printed as a list of advisories rather than as scalars. */
     private const ADVISORY_LIST = 'advisories';
 
@@ -98,7 +101,7 @@ final class ExplainFormatter
         foreach ($finding->signals() as $signal) {
             $lines[] = \sprintf('%s%s %-4s %s', self::INDENT, $signal->id(), $signal->level(), self::escape($signal->summary()));
             foreach ($this->signalData($signal) as $line) {
-                $lines[] = self::INDENT.self::INDENT.'       '.self::escape($line);
+                $lines[] = self::DATA_INDENT.self::escape($line);
             }
         }
 
