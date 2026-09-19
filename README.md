@@ -93,6 +93,11 @@ Abridged — `…` marks where lines were cut. [The full run →](https://lockro
 > packages, and lockrot reports how many were affected. Development dependencies are not checked
 > unless you pass `--dev`.
 
+Why is a row there — or why is a package you expected not? `composer lockrot --explain=vendor/package`
+prints that one package with everything it was decided on: every signal's raw data and dates, the
+release branches the repository lists with their dates, the repository activity, the thresholds.
+[Explaining one package →](https://lockrot.dev/configuration/#explaining-one-package)
+
 ## What it reports
 
 | Verdict | Meaning |
