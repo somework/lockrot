@@ -187,6 +187,16 @@ final class PackageMetadataFromPackagesTest extends TestCase
         self::assertEquals(new \DateTimeImmutable('2026-01-01T00:00:00+00:00'), $metadata->lastStableReleaseAt());
     }
 
+    /** A highest tag that is a pre-release sits on a commit no stable tag counts; its date stands as before. */
+    public function testAPreReleaseHighestTagOnItsOwnCommitKeepsItsDate(): void
+    {
+        $on = static fn (string $version, string $commit): array => ['name' => 'a/b', 'version' => $version, 'time' => '2026-02-01T00:00:00+00:00', 'source' => ['type' => 'git', 'url' => 'https://github.com/a/b.git', 'reference' => $commit]];
+        $metadata = PackageMetadata::fromPackages('a/b', [$this->load($on('2.0.0-RC1', 'rc')), $this->load($on('1.0.0', 'one'))], new \DateTimeImmutable(self::FIXED));
+
+        self::assertEquals(new \DateTimeImmutable('2026-02-01T00:00:00+00:00'), $metadata->lastStableReleaseAt());
+        self::assertSame('2.0.0-RC1', $metadata->lastStableVersion());
+    }
+
     /** illuminate/support 10.x: tags share commits below the top, but v10.49.0 has its own — that one is dated. */
     public function testTagsSharingACommitBelowAHighestOnItsOwnLeaveTheHighestDated(): void
     {

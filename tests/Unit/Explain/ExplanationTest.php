@@ -28,14 +28,15 @@ final class ExplanationTest extends TestCase
 
     public function testBranchesAreListedHighestFirstWithTheInstalledOneMarked(): void
     {
-        $metadata = F::metadata([['2.1.0', '2026-01-01T00:00:00+00:00'], ['1.5.0', '2021-06-01T00:00:00+00:00'], ['1.4.0', '2020-01-01T00:00:00+00:00'], ['0.3.1', '2018-01-01T00:00:00+00:00']]);
+        // Listed out of order and with a two-digit major: the rows come out as versions order them, not as strings do.
+        $metadata = F::metadata([['1.5.0', '2021-06-01T00:00:00+00:00'], ['0.3.1', '2018-01-01T00:00:00+00:00'], ['10.0.0', '2026-01-01T00:00:00+00:00'], ['2.1.0', '2026-01-01T00:00:00+00:00'], ['1.4.0', '2020-01-01T00:00:00+00:00']]);
         $explanation = new Explanation($this->finding('1.4.0', Verdict::LEFT_BEHIND), F::facts(F::package(['version' => '1.4.0']), $metadata), new Thresholds(), '8.4', $this->report());
 
         $branches = $explanation->branches();
 
-        self::assertSame(['2.x', '1.x', '0.3.x'], array_column($branches, 'branch'));
-        self::assertSame([false, true, false], array_column($branches, 'installed'));
-        self::assertSame('1.5.0', $branches[1]['highest']);
+        self::assertSame(['10.x', '2.x', '1.x', '0.3.x'], array_column($branches, 'branch'));
+        self::assertSame([false, false, true, false], array_column($branches, 'installed'));
+        self::assertSame('1.5.0', $branches[2]['highest']);
         self::assertSame('1', $explanation->installedBranch());
         self::assertFalse($explanation->installedBranchIsUndated());
     }
@@ -76,16 +77,21 @@ final class ExplanationTest extends TestCase
         self::assertSame($finding = $explanation->finding()->toArray(), $array['finding'], 'the finding as --format=json carries it');
         self::assertSame(Verdict::LEFT_BEHIND, $finding['verdict']);
         self::assertSame(['php' => '>=7.1', 'released' => '2021-06-01T00:00:00+00:00', 'repository' => 'https://github.com/vendor/pkg.git', 'from_composer_repository' => true, 'dev' => false, 'branch_snapshot' => false, 'type' => 'library'], $array['lock']);
-        $meta = $array['metadata'];
-        self::assertIsArray($meta);
-        self::assertSame(2, $meta['releases_listed']);
-        self::assertSame('2026-01-01T00:00:00+00:00', $meta['last_stable_release']);
-        self::assertIsArray($meta['branches']);
-        self::assertSame(['2.x', '1.x'], array_column($meta['branches'], 'branch'));
-        self::assertSame(
-            ['branch' => '1.x', 'installed' => true, 'highest' => '1.5.0', 'highest_released' => '2021-06-01T00:00:00+00:00', 'newest_dated' => '1.5.0', 'newest_dated_released' => '2021-06-01T00:00:00+00:00'],
-            $meta['branches'][1]
-        );
+        self::assertSame([
+            'abandoned' => false,
+            'replacement' => null,
+            'releases_listed' => 2,
+            'has_stable_release' => true,
+            'last_stable_release' => '2026-01-01T00:00:00+00:00',
+            'last_stable_version' => '2.1.0',
+            'repository' => 'https://github.com/vendor/pkg.git',
+            'type' => 'library',
+            'data_date' => F::NOW,
+            'branches' => [
+                ['branch' => '2.x', 'installed' => false, 'highest' => '2.1.0', 'highest_released' => '2026-01-01T00:00:00+00:00', 'newest_dated' => '2.1.0', 'newest_dated_released' => '2026-01-01T00:00:00+00:00'],
+                ['branch' => '1.x', 'installed' => true, 'highest' => '1.5.0', 'highest_released' => '2021-06-01T00:00:00+00:00', 'newest_dated' => '1.5.0', 'newest_dated_released' => '2021-06-01T00:00:00+00:00'],
+            ],
+        ], $array['metadata']);
         self::assertSame(['forge' => 'GitHub', 'repository' => 'vendor/pkg', 'archived' => false, 'pushed_at' => '2026-02-01T00:00:00+00:00', 'fetched_at' => F::NOW, 'from_cache' => false], $array['activity']);
         self::assertSame(['release-warn-years' => 2, 'release-high-years' => 4, 'push-warn-years' => 3, 'push-high-years' => 5], $array['thresholds']);
         self::assertSame('8.3', $array['target_php']);

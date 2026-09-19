@@ -261,14 +261,10 @@ final class LockrotCommand extends BaseCommand
             throw new ConfigException($name.' is in packages-dev; pass --dev to explain it');
         }
         $analysis = $analyzer->analyzeWithFacts($lock->packages($lockrot->includeDev()), $lock, $project, $lockrot->includeDev());
-        $finding = null;
-        foreach ($analysis->report()->findings() as $candidate) {
-            if ($candidate->package() === $name) {
-                $finding = $candidate;
-                break;
-            }
-        }
+        $finding = $analysis->finding($name);
         $facts = $analysis->facts($name);
+        // Both come from the same pass over the same packages, so one is null exactly when the
+        // other is; the check is for the types, the lock lookup above already ruled the case out.
         if ($finding === null || $facts === null) {
             throw new ConfigException($name.' was not analysed');
         }
