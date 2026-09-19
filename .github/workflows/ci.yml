@@ -87,7 +87,11 @@ jobs:
   # minus one; infection.json5 keeps the whole-tree number for a local run.
   mutation:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    # 50, not 30: the composer/self-update shard measured 20m02s on 2026-09-19 and was cancelled at
+    # the 30-minute cap on the very next run of the same commit range, with its summary already
+    # printed (97% covered MSI against a threshold of 96) — a runner minute slower and a green shard
+    # reads as a failure. The cap is there to stop a runaway run, not to pace this one.
+    timeout-minutes: 50
     strategy:
       fail-fast: false
       matrix:
