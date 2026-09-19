@@ -134,7 +134,10 @@ fixes are the ones no fix will come for: the evidence closes what was observed a
 itself with `no fix expected` — ahead of what it pulls in, when it is a direct requirement that
 does — and the priority goes up one step, `critical` at most. On a left-behind branch only a fix
 *on the branch* counts as one the project can reach, so `3 fixed by v8.1.7; no fix expected on
-3.x` is one line: the fix exists, and it will not land where this lock is. A package whose every
+3.x` is one line: the fix exists, and it will not land where this lock is. On an abandoned package
+whose repository names a replacement the clause says where to go — `no fix expected; migrate to
+symfony/mailer` — since the advisory will not be fixed here and the package that took over is
+where fixes land. A package whose every
 advisory is fixed by a listed release is not raised, whatever its verdict — the fix is out, and
 the finding says which release carries it.
 

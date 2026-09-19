@@ -197,9 +197,11 @@ final class Finding
     }
 
     /**
-     * `no fix expected`, qualified with the branch when the fix exists but lands elsewhere —
-     * `no fix expected on 3.x` reads next to `3 fixed by v8.1.7` — and null when every advisory is
-     * fixed by a release the finding's verdict lets the project reach.
+     * `no fix expected`, qualified with where the fix is when that is known: `no fix expected on
+     * 3.x` reads next to `3 fixed by v8.1.7` on a left-behind branch, and `no fix expected; migrate
+     * to symfony/mailer` on an abandoned package whose repository names a replacement — the
+     * advisory is not going to be fixed here, and the package that took over is where to go. Null
+     * when every advisory is fixed by a release the finding's verdict lets the project reach.
      */
     private function noFixClause(): ?string
     {
@@ -215,8 +217,25 @@ final class Finding
                 }
             }
         }
+        if ($this->verdict === Verdict::ABANDONED && ($replacement = $this->replacement()) !== null) {
+            return 'no fix expected; migrate to '.$replacement;
+        }
 
         return 'no fix expected';
+    }
+
+    /** The replacement S1 carries — the repository's, or the lock's — null when none is named. */
+    private function replacement(): ?string
+    {
+        foreach ($this->signals as $signal) {
+            if ($signal->id() === Signal::S1) {
+                $replacement = $signal->data()['replacement'] ?? null;
+
+                return \is_string($replacement) && $replacement !== '' ? $replacement : null;
+            }
+        }
+
+        return null;
     }
 
     /**

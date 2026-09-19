@@ -170,6 +170,29 @@ final class FindingTest extends TestCase
     }
 
     /**
+     * swiftmailer 5.4.12, abandoned with symfony/mailer named as its replacement, an advisory no
+     * release fixes: the fix is not coming here, and the line says where to go instead of only
+     * that. Without a replacement, or under another no-fix verdict, the bare clause stays.
+     */
+    public function testAnAbandonedPackageWithAReplacementSaysWhereToMigrate(): void
+    {
+        $s9 = new Signal('S9', 'warn', '1 security advisory affects v5.4.12 (CVE-2016-10074)', ['advisories' => [self::OPEN]]);
+        $replaced = new Signal('S1', 'high', 'marked abandoned by its repository, replacement: symfony/mailer', ['replacement' => 'symfony/mailer']);
+        $bare = new Signal('S1', 'high', 'marked abandoned by its repository', ['replacement' => null]);
+
+        $withReplacement = new Finding('swiftmailer/swiftmailer', 'v5.4.12', Verdict::ABANDONED, [$replaced, $s9], ['root/app', 'swiftmailer/swiftmailer'], null, null);
+        $withoutReplacement = new Finding('swiftmailer/swiftmailer', 'v5.4.12', Verdict::ABANDONED, [$bare, $s9], ['swiftmailer/swiftmailer'], null, null);
+        $silent = new Finding('swiftmailer/swiftmailer', 'v5.4.12', Verdict::SILENT, [$replaced, $s9], ['swiftmailer/swiftmailer'], null, null);
+        $fixed = new Finding('swiftmailer/swiftmailer', 'v5.4.12', Verdict::ABANDONED, [$replaced, new Signal('S9', 'warn', 'x; fixed by 6.3.0', ['advisories' => [self::fixed('6.3.0', false)]])], ['swiftmailer/swiftmailer'], null, null);
+
+        self::assertSame($replaced->summary().'; '.$s9->summary().'; no fix expected; migrate to symfony/mailer', $withReplacement->ownEvidence(), 'transitive or not: the replacement is where the fix is');
+        self::assertTrue($withReplacement->hasUnfixableAdvisory());
+        self::assertSame($bare->summary().'; '.$s9->summary().'; no fix expected', $withoutReplacement->ownEvidence());
+        self::assertSame($replaced->summary().'; '.$s9->summary().'; no fix expected', $silent->ownEvidence(), 'only abandoned points at the replacement; under silent the clause stays bare');
+        self::assertSame($replaced->summary().'; x; fixed by 6.3.0', $fixed->ownEvidence(), 'the fix is out: nothing to migrate for');
+    }
+
+    /**
      * swiftmailer 6.1.3, abandoned: CVE-2024-28859 is fixed by 6.3.0, the package's last release.
      * The fix is out, the raise is not earned, and the line must not say "no fix expected".
      */
