@@ -92,9 +92,9 @@ jobs:
       fail-fast: false
       matrix:
         shard:
-          - {name: verdicts and output, filter: 'src/Verdict,src/Signal,src/Analyzer,src/Output', min_msi: 98}
-          - {name: composer and self-update, filter: 'src/Composer,src/Config,src/SelfUpdate', min_msi: 96}
-          - {name: data and the rest, filter: 'src/Data,src/Baseline,src/Allowlist,src/Graph,src/Lock,src/Json,src/Exception,src/Version.php,src/Clock.php,src/Deadline.php', min_msi: 96}
+          - {name: verdicts and output, filter: 'src/Verdict src/Signal src/Analyzer src/Output', min_msi: 98}
+          - {name: composer and self-update, filter: 'src/Composer src/Config src/SelfUpdate', min_msi: 96}
+          - {name: data and the rest, filter: 'src/Data src/Baseline src/Allowlist src/Graph src/Lock src/Json src/Exception src/Version.php src/Clock.php src/Deadline.php', min_msi: 96}
     name: mutation (${{ matrix.shard.name }})
     steps:
       - uses: actions/checkout@v7
@@ -112,7 +112,7 @@ jobs:
       # tests/infection-equivalents.md records why every one of the 56 escapes is equivalent. No
       # GitHub annotations: 56 warnings about documented equivalents per run would only teach people
       # to ignore them; the escape listing is uploaded instead.
-      - run: $(composer global config bin-dir --absolute)/infection --threads=max --min-msi=${{ matrix.shard.min_msi }} --min-covered-msi=${{ matrix.shard.min_msi }} --filter='${{ matrix.shard.filter }}'
+      - run: $(composer global config bin-dir --absolute)/infection --threads=max --min-msi=${{ matrix.shard.min_msi }} --min-covered-msi=${{ matrix.shard.min_msi }} ${{ matrix.shard.filter }}
       - if: always()
         uses: actions/upload-artifact@v7
         with: {name: 'infection (${{ matrix.shard.name }})', path: build/infection.log, if-no-files-found: ignore}

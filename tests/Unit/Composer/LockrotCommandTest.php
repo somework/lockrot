@@ -476,7 +476,11 @@ final class LockrotCommandTest extends TestCase
         yield 'an empty name' => [['--explain' => ' '], '--explain needs a package name'];
     }
 
-    /** @param array<string, mixed> $args */
+    /**
+     * @param array<string, mixed> $args
+     *
+     * @dataProvider explainConfigurationErrors
+     */
     #[DataProvider('explainConfigurationErrors')]
     public function testExplainRefusesWhatItCannotExplainAsAConfigurationError(array $args, string $message): void
     {
