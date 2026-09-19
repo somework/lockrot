@@ -31,6 +31,7 @@ that never arrived would accept findings lockrot was not actually able to check.
 
 ```json
 {
+    "$schema": "https://lockrot.dev/schema/baseline-1.json",
     "lockrot": {
         "version": "0.8.0",
         "schema": 1
@@ -45,6 +46,9 @@ that never arrived would accept findings lockrot was not actually able to check.
     }
 }
 ```
+
+`$schema` names the file's published [JSON schema](schema.md), which an editor uses to complete and
+check the file; lockrot itself validates every baseline it reads against the same schema.
 
 Only flagged verdicts are recorded (`ok`, `finished` and `unknown` are not findings), entries are
 sorted by package name so the diff stays reviewable, and `first_seen` is carried over when you

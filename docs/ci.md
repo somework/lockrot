@@ -189,7 +189,11 @@ bold only when the baseline has not already accepted it.
 ## `--format=json`
 
 The complete report, and the only format that carries every field: per-finding `signals`, `chain`,
-`direct_dependents`, `evidence` and `data_date`, plus the document's `exposure` and `notes`.
+`direct_dependents`, `evidence` and `data_date`, plus the document's `exposure` and `notes`. The
+document opens with `$schema`, naming its published JSON schema at
+[`https://lockrot.dev/schema/report-1.json`](https://lockrot.dev/schema/report-1.json); see
+[schema.md](schema.md) for what it types, the compatibility rule behind the number, and a CI
+validation step.
 [example-run.md](example-run.md) has a worked excerpt. Signal `S7` on a direct requirement carries every package it
 pulls in, each with its chain, under `data.packages` — uncapped, so on a lock with many direct requirements and much
 transitive rot that part of the document is the large one.

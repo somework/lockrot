@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Published JSON schemas for every document lockrot writes for a machine, and the one it reads:
+  the `--format=json` report (`https://lockrot.dev/schema/report-1.json`), the `--explain`
+  document (`explain-1.json`), the baseline file (`baseline-1.json`) and `extra.lockrot`
+  (`config-1.json`). The report, the explanation and the baseline file now open with a `$schema`
+  key naming theirs, so an editor completes a baseline file and a CI step can validate a report
+  with any draft-04 validator. The files ship under `resources/` in the repository and the PHAR.
+  Objects are open: under one number a document only gains fields, and the number moves only when
+  a field is removed or renamed — `lockrot.schema` stays `1`. The test suite validates what the
+  formatters write, and the JSON samples in the docs, against the files, with a strict copy that
+  rejects undeclared fields. See [schema.md](docs/schema.md).
+
 ## [0.8.0] - 2026-09-20
 
 ### Added

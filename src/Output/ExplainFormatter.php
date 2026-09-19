@@ -6,6 +6,7 @@ namespace Lockrot\Output;
 
 use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Explain\Explanation;
+use Lockrot\Json\Schemas;
 use Lockrot\Signal\Signal;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
@@ -55,7 +56,7 @@ final class ExplainFormatter
 
     public function json(Explanation $explanation): string
     {
-        $data = ['lockrot' => ['version' => JsonFormatter::VERSION, 'schema' => self::SCHEMA]] + $explanation->toArray();
+        $data = ['$schema' => Schemas::url(Schemas::EXPLAIN, self::SCHEMA), 'lockrot' => ['version' => JsonFormatter::VERSION, 'schema' => self::SCHEMA]] + $explanation->toArray();
         $json = json_encode($data, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES);
         if ($json === false) {
             throw new \RuntimeException('Cannot encode explanation as JSON: '.json_last_error_msg());

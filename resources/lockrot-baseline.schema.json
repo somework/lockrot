@@ -1,5 +1,8 @@
 {
     "$schema": "http://json-schema.org/draft-04/schema#",
+    "id": "https://lockrot.dev/schema/baseline-1.json",
+    "title": "lockrot baseline",
+    "description": "The file `composer lockrot --generate-baseline` writes and later runs compare against. Objects are open: a field added later validates against this file unchanged; the number in the id changes only when a field is removed or renamed.",
     "type": "object",
     "required": ["lockrot", "findings"],
     "properties": {
