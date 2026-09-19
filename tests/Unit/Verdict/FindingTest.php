@@ -126,6 +126,30 @@ final class FindingTest extends TestCase
         self::assertSame($s6->summary().'; '.$s5->summary(), $s7First->ownEvidence(), 'S7 anywhere in the list is skipped, not a stop');
     }
 
+    /**
+     * The constraint S8 suggests is printed for a direct requirement — the project's own line in
+     * composer.json — and not for a transitive one, whose parent owns the requirement; the data
+     * keeps it either way.
+     */
+    public function testALeftBehindDirectRequirementSaysWhatToRequire(): void
+    {
+        $s8 = new Signal('S8', 'warn', 'branch 6.x last released 2022-06-20 (4.2 years ago); 8.x released 8.2.0 (2026-09-06)', ['suggested_constraint' => '^8.2']);
+        $s5 = new Signal('S5', 'warn', 'released 2022-06-20, before PHP 8.4 GA (2024-11-21); php constraint ">=5.5" has no upper bound');
+
+        $direct = new Finding('guzzlehttp/guzzle', '6.5.8', Verdict::LEFT_BEHIND, [$s5, $s8], ['guzzlehttp/guzzle'], null, null);
+        $transitive = new Finding('guzzlehttp/guzzle', '6.5.8', Verdict::LEFT_BEHIND, [$s5, $s8], ['root/app', 'guzzlehttp/guzzle'], null, null);
+        $finished = new Finding('guzzlehttp/guzzle', '6.5.8', Verdict::FINISHED, [$s8], ['guzzlehttp/guzzle'], 'frozen', null);
+        $noConstraint = new Finding('guzzlehttp/guzzle', '6.5.8', Verdict::LEFT_BEHIND, [new Signal('S8', 'warn', $s8->summary())], ['guzzlehttp/guzzle'], null, null);
+
+        self::assertSame($s8->summary().'; require ^8.2 to follow; '.$s5->summary(), $direct->ownEvidence());
+        self::assertSame($s8->summary().'; '.$s5->summary(), $transitive->ownEvidence(), 'not the project\'s line to change');
+        self::assertSame($s8->summary(), $finished->ownEvidence(), 'the allowlist decided; nothing to follow');
+        self::assertSame($s8->summary(), $noConstraint->ownEvidence(), 'no constraint on the signal, no clause');
+        $signals = $direct->toArray()['signals'];
+        self::assertIsArray($signals);
+        self::assertSame(['id' => 'S8', 'level' => 'warn', 'summary' => $s8->summary(), 'data' => ['suggested_constraint' => '^8.2']], $signals[1] ?? null, 'the data travels into --format=json');
+    }
+
     /** S8 at either level makes the verdict `left-behind` ({@see VerdictEngine}); the raise follows the verdict, not the signal. */
     public function testAnAdvisoryOnALeftBehindBranchIsUnfixableAtEitherLevel(): void
     {

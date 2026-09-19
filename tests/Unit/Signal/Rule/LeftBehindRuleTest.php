@@ -36,6 +36,7 @@ final class LeftBehindRuleTest extends TestCase
             'newest_branch' => '3.x',
             'newest_version' => '3.4.1',
             'newest_release' => '2026-06-01T00:00:00+00:00',
+            'suggested_constraint' => '^3.4',
         ], $signal->data());
     }
 
@@ -253,5 +254,21 @@ final class LeftBehindRuleTest extends TestCase
     public function testNoMetadataIsNull(): void
     {
         self::assertNull($this->rule()->evaluate(F::facts(F::package(['version' => '1.0.0']))));
+    }
+
+    /**
+     * The signal carries the constraint that follows the upstream, written as `composer require`
+     * writes it: `^8.2` from 8.2.0, `^0.4.3` below 1.0 (a caret there stays inside the minor).
+     */
+    public function testTheSignalSuggestsTheConstraintThatFollowsTheNewestBranch(): void
+    {
+        $major = $this->rule()->evaluate(F::facts(F::package(['version' => '6.5.8']), F::metadata([['v8.2.0', '2026-09-06'], ['7.15.5', '2026-08-24'], ['6.5.8', '2022-06-20']])));
+        $minor = $this->rule()->evaluate(F::facts(F::package(['version' => '0.2.1']), F::metadata([['0.4.3', '2026-01-01'], ['0.2.1', '2020-01-01']])));
+
+        self::assertNotNull($major);
+        self::assertSame('^8.2', $major->data()['suggested_constraint']);
+        self::assertSame('8.x', $major->data()['newest_branch']);
+        self::assertNotNull($minor);
+        self::assertSame('^0.4.3', $minor->data()['suggested_constraint']);
     }
 }

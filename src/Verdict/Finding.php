@@ -219,6 +219,23 @@ final class Finding
         return 'no fix expected';
     }
 
+    /**
+     * `require ^8.2 to follow` after S8, for a `left-behind` package the project requires itself:
+     * the constraint S8 suggests ({@see \Lockrot\Signal\Rule\LeftBehindRule}) is the one line in
+     * composer.json that moves the project onto the branch fixes land on. A transitive package is
+     * not the project's to require — its parent is — so the clause stays off; the constraint is
+     * still on the signal's data for whoever does own the requirement.
+     */
+    private function followClause(Signal $s8): ?string
+    {
+        if ($this->verdict !== Verdict::LEFT_BEHIND || !$this->isDirect()) {
+            return null;
+        }
+        $constraint = $s8->data()['suggested_constraint'] ?? null;
+
+        return \is_string($constraint) && $constraint !== '' ? 'require '.$constraint.' to follow' : null;
+    }
+
     /** @return list<array<mixed, mixed>> */
     private function advisoryRows(): array
     {
@@ -250,6 +267,9 @@ final class Finding
         $parts = [];
         foreach ($this->ownSignalsDecidingFirst() as $signal) {
             $parts[] = $signal->summary();
+            if ($signal->id() === Signal::S8 && ($clause = $this->followClause($signal)) !== null) {
+                $parts[] = $clause;
+            }
             if ($signal->id() === Signal::S9 && ($clause = $this->noFixClause()) !== null) {
                 $parts[] = $clause;
             }

@@ -19,6 +19,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Exit 0 — it answers a question, it does not gate; a package not in the lock, or in `packages-dev`
   without `--dev`, is a configuration error (exit 2). See
   [configuration.md](docs/configuration.md#explaining-one-package).
+- `left-behind` says what to require. S8 carries `suggested_constraint` — the constraint that
+  follows the upstream onto the branch fixes land on, written as `composer require` writes it
+  (`^8.2` from 8.2.0, `^0.4.3` below 1.0) — and for a package the project requires itself the
+  evidence ends `…; 8.x released 8.2.0 (2026-09-06); require ^8.2 to follow`. A transitive
+  package's parent owns that line, so there the clause stays off the row and the constraint stays
+  on the signal's data.
 
 ### Fixed
 
