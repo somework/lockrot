@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Lockrot\Signal\Rule;
 
+use Composer\Package\Package;
+use Composer\Package\Version\VersionSelector;
+use Composer\Repository\RepositorySet;
 use Composer\Semver\Comparator;
 use Composer\Semver\VersionParser;
 use Lockrot\Clock;
@@ -102,7 +105,25 @@ final class LeftBehindRule implements SignalRule
             'newest_branch' => ReleaseBranch::label($newest['branch']),
             'newest_version' => $newest['version'],
             'newest_release' => $newest['at']->format(\DATE_ATOM),
+            'suggested_constraint' => $this->suggestedConstraint($facts->package()->name(), $newest['version']),
         ]);
+    }
+
+    /**
+     * The constraint that follows the upstream onto the newest releasing branch — `^8.2` for
+     * 8.2.0, `^0.4.3` below 1.0 — written the way `composer require` would write it
+     * ({@see VersionSelector::findRecommendedRequireVersion()}), so it can be pasted into
+     * composer.json or handed to a bot; null when the repository's version string cannot be parsed.
+     */
+    private function suggestedConstraint(string $package, string $newestVersion): ?string
+    {
+        try {
+            $normalized = $this->parser->normalize($newestVersion);
+        } catch (\UnexpectedValueException $e) {
+            return null;
+        }
+
+        return (new VersionSelector(new RepositorySet()))->findRecommendedRequireVersion(new Package($package, $normalized, $newestVersion));
     }
 
     /**

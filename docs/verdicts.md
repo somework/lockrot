@@ -89,7 +89,12 @@ years, `high` past five) stays on the signal, in `--format=json` and in the evid
 
 S2 has nothing to say — the package released five months ago — and `old-promise` alone would have
 read as a constraint problem. The branch installed here has been quiet for 5.1 years while 2.x
-kept going. The second clause names the higher branch whose release is newest, with that release:
+kept going. For a package the project requires itself the evidence adds what to change —
+`require ^2.12 to follow` — the constraint written as `composer require` would write it (`^2.12`
+from v2.12.5; `^0.4.3` below 1.0), so it can be pasted into `composer.json` or handed to a bot; a
+transitive package's parent owns that line, so there the clause stays off. The constraint is on
+the signal's data as `suggested_constraint` in every case. The second clause names the higher
+branch whose release is newest, with that release:
 it is where fixes land now, which with a living LTS below the current major can be the LTS.
 
 A branch snapshot (`dev-master`, `2.x-dev`) belongs to no branch and is `pinned`. A package whose
