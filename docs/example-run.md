@@ -295,7 +295,7 @@ list, which `…` stands in for:
 ```json
 {
     "lockrot": {
-        "version": "0.7.0",
+        "version": "0.8.0",
         "schema": 1
     },
     "generated_at": "2026-09-15T17:31:32+00:00",
