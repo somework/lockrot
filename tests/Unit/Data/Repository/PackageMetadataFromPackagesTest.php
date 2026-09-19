@@ -153,10 +153,11 @@ final class PackageMetadataFromPackagesTest extends TestCase
     {
         $split = static fn (string $version, string $commit, string $time): array => ['name' => 'a/b', 'version' => $version, 'time' => $time, 'source' => ['type' => 'git', 'url' => 'https://github.com/a/b.git', 'reference' => $commit]];
         $top = $this->load($split('v10.49.0', 'dir-last-changed', '2023-06-05T12:46:42+00:00'));
+        $middle = $this->load($split('v10.20.0', 'dir-last-changed', '2023-06-05T12:46:42+00:00'));
         $lower = $this->load($split('v10.13.1', 'dir-last-changed', '2023-06-05T12:46:42+00:00'));
         $unique = $this->load($split('v11.51.0', 'its-own-commit', '2024-06-28T20:10:30+00:00'));
 
-        foreach ([[$top, $lower, $unique], [$unique, $lower, $top]] as $order) {
+        foreach ([[$top, $middle, $lower, $unique], [$unique, $lower, $middle, $top]] as $order) {
             $metadata = PackageMetadata::fromPackages('a/b', $order, new \DateTimeImmutable(self::FIXED));
             $byBranch = $metadata->latestStableByBranch();
             self::assertSame('10.49.0.0', $byBranch['10']['highest']['normalized']);
@@ -166,7 +167,7 @@ final class PackageMetadataFromPackagesTest extends TestCase
             self::assertSame('v11.51.0', $metadata->lastStableVersion(), 'the package\'s highest tag is the unique one');
         }
 
-        $sharedHighest = PackageMetadata::fromPackages('a/b', [$top, $lower], new \DateTimeImmutable(self::FIXED));
+        $sharedHighest = PackageMetadata::fromPackages('a/b', [$top, $middle, $lower], new \DateTimeImmutable(self::FIXED));
         self::assertTrue($sharedHighest->hasStableRelease());
         self::assertNull($sharedHighest->lastStableReleaseAt(), 'the package\'s age is its highest tag\'s, and that one is dated by no release');
         self::assertNull($sharedHighest->lastStableVersion());
@@ -185,6 +186,22 @@ final class PackageMetadataFromPackagesTest extends TestCase
 
         self::assertEquals(new \DateTimeImmutable('2026-01-01T00:00:00+00:00'), $metadata->latestStableByBranch()['1']['highest']['at']);
         self::assertEquals(new \DateTimeImmutable('2026-01-01T00:00:00+00:00'), $metadata->lastStableReleaseAt());
+    }
+
+    /**
+     * symfony/console v3.4.46 and v3.4.47 sit on one commit: the branch's last two releases, cut
+     * with nothing changed in between. Two tags on a commit are a re-tag or exactly that, and the
+     * date is one release interval off at most — below {@see PackageMetadata::SHARED_COMMIT_TAGS}
+     * the tag keeps it, so a branch that really stopped stays measurable.
+     */
+    public function testTwoTagsOnOneCommitKeepTheirDate(): void
+    {
+        $on = static fn (string $version): array => ['name' => 'a/b', 'version' => $version, 'time' => '2020-10-24T10:57:07+00:00', 'source' => ['type' => 'git', 'url' => 'https://github.com/a/b.git', 'reference' => 'last-two']];
+        $metadata = PackageMetadata::fromPackages('a/b', [$this->load($on('v3.4.47')), $this->load($on('v3.4.46'))], new \DateTimeImmutable(self::FIXED));
+
+        self::assertEquals(new \DateTimeImmutable('2020-10-24T10:57:07+00:00'), $metadata->latestStableByBranch()['3']['highest']['at']);
+        self::assertEquals(new \DateTimeImmutable('2020-10-24T10:57:07+00:00'), $metadata->lastStableReleaseAt());
+        self::assertSame(3, PackageMetadata::SHARED_COMMIT_TAGS, 'the threshold the tests above cross with a third tag');
     }
 
     /** A highest tag that is a pre-release sits on a commit no stable tag counts; its date stands as before. */

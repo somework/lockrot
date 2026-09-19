@@ -267,6 +267,7 @@ final class LeftBehindRuleTest extends TestCase
         $meta = PackageMetadata::fromPackages('vendor/pkg', [
             $loader->load($on('2.3.0', 'split', '2025-06-01T00:00:00+00:00')),
             $loader->load($on('2.2.0', 'split', '2025-06-01T00:00:00+00:00')),
+            $loader->load($on('2.1.0', 'split', '2025-06-01T00:00:00+00:00')),
             $loader->load($on('1.5.0', 'own', '2019-06-01T00:00:00+00:00')),
         ], new \DateTimeImmutable(F::NOW));
 

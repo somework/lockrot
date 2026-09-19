@@ -68,6 +68,7 @@ final class ExplanationTest extends TestCase
         $on = static fn (string $version, ?string $commit, ?string $time): array => array_filter(['name' => 'vendor/pkg', 'version' => $version, 'time' => $time, 'source' => $commit === null ? null : ['type' => 'git', 'url' => 'https://github.com/vendor/pkg.git', 'reference' => $commit]]);
         $metadata = PackageMetadata::fromPackages('vendor/pkg', [
             $loader->load($on('10.49.0', 'split', '2023-06-05T12:46:42+00:00')),
+            $loader->load($on('10.20.0', 'split', '2023-06-05T12:46:42+00:00')),
             $loader->load($on('10.13.1', 'split', '2023-06-05T12:46:42+00:00')),
             $loader->load($on('9.0.0', null, null)),
         ], new \DateTimeImmutable(F::NOW));
