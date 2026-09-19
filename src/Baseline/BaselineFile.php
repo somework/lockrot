@@ -7,6 +7,7 @@ namespace Lockrot\Baseline;
 use Composer\Json\JsonFile;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Json\JsonReader;
+use Lockrot\Json\Schemas;
 
 /**
  * Where the baseline lives and how it is read and written.
@@ -142,7 +143,7 @@ final class BaselineFile
             $document['findings'] = new \stdClass();
         }
 
-        return $document;
+        return ['$schema' => Schemas::url(Schemas::BASELINE, Baseline::SCHEMA)] + $document;
     }
 
     /** The last filesystem failure PHP recorded, or a generic reason when it recorded none. */

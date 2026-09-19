@@ -23,8 +23,9 @@ Put project settings under `extra.lockrot` in `composer.json`:
 
 CLI options win over environment variables, which win over `composer.json`.
 
-The shape of `extra.lockrot` is validated against
-[`resources/lockrot-config.schema.json`](https://github.com/somework/lockrot/blob/main/resources/lockrot-config.schema.json). Unknown keys are
+The shape of `extra.lockrot` is validated against its published JSON schema,
+[`https://lockrot.dev/schema/config-1.json`](https://lockrot.dev/schema/config-1.json)
+(`resources/lockrot-config.schema.json` in the repository; see [schema.md](schema.md)). Unknown keys are
 allowed, but the keys below must have the listed type — in particular, the four threshold keys must
 be JSON integers (`3`, not `"3"`).
 

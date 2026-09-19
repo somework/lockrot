@@ -139,7 +139,7 @@ final class BaselineFileTest extends TestCase
         $file->write($this->baseline());
         $contents = (string) file_get_contents($file->path());
 
-        self::assertStringStartsWith("{\n    \"lockrot\": {\n", $contents);
+        self::assertStringStartsWith("{\n    \"\$schema\": \"https://lockrot.dev/schema/baseline-1.json\",\n    \"lockrot\": {\n", $contents);
         self::assertStringEndsWith("}\n", $contents);
         self::assertStringNotContainsString('\\/', $contents, 'slashes stay unescaped, as in composer.json');
     }

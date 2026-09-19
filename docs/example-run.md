@@ -294,6 +294,7 @@ list, which `…` stands in for:
 
 ```json
 {
+    "$schema": "https://lockrot.dev/schema/report-1.json",
     "lockrot": {
         "version": "0.8.0",
         "schema": 1

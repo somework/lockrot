@@ -1,0 +1,388 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Lockrot\Tests\Integration;
+
+use JsonSchema\Constraints\Constraint;
+use JsonSchema\Validator;
+use Lockrot\Allowlist\BuiltinAllowlist;
+use Lockrot\Analyzer\Analysis;
+use Lockrot\Analyzer\Analyzer;
+use Lockrot\Baseline\Baseline;
+use Lockrot\Baseline\BaselineFile;
+use Lockrot\Clock;
+use Lockrot\Data\Advisory\RepositoryAdvisoryLoader;
+use Lockrot\Data\Forge\ActivityClient;
+use Lockrot\Data\Forge\ActivityFetchPlanner;
+use Lockrot\Data\Forge\ForgeAuth;
+use Lockrot\Data\Forge\RepoLocator;
+use Lockrot\Data\Forge\Tokens;
+use Lockrot\Data\Http\RecordedHttpClient;
+use Lockrot\Data\Php\PhpReleaseDates;
+use Lockrot\Data\Repository\RepositoryMetadataLoader;
+use Lockrot\Explain\Explanation;
+use Lockrot\Json\Schemas;
+use Lockrot\Lock\LockFile;
+use Lockrot\Lock\ProjectConfig;
+use Lockrot\Output\ExplainFormatter;
+use Lockrot\Output\JsonFormatter;
+use Lockrot\Signal\Signal;
+use Lockrot\Signal\SignalSet;
+use Lockrot\Signal\Thresholds;
+use Lockrot\Tests\Support\FixtureRepositoryServer;
+use Lockrot\Tests\Support\JsonPath;
+use Lockrot\Verdict\VerdictEngine;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
+
+/**
+ * The published schemas under resources/ describe what the formatters really write. Every document
+ * lockrot emits for a machine — the `--format=json` report, the `--explain` document, the baseline
+ * file — is produced here from recorded fixtures and validated against its schema twice: as
+ * published (objects open, so a consumer's older copy keeps validating), and against a strict
+ * twin with `additionalProperties: false` on every declared object, so a field a formatter gains
+ * without the schema learning it fails this test rather than reaching a user undocumented. The
+ * JSON samples in docs/ are validated the same way, so the docs cannot drift either.
+ */
+final class JsonSchemaConformanceTest extends TestCase
+{
+    private const FIXTURES = __DIR__.'/../fixtures/';
+    private const DOCS = __DIR__.'/../../docs/';
+    private const NOW = '2026-09-14T00:00:00+00:00';
+    /** wallabag carries S1–S8 (left-behind rows included), matomo S3/S4 on live forges, laravel a clean lock. */
+    private const DIRS = ['apps/wallabag_wallabag', 'apps/matomo-org_matomo', 'skeletons/laravel'];
+
+    private static ?FixtureRepositoryServer $server = null;
+    /** @var array<string, Analysis> by fixture dir */
+    private static array $analyses = [];
+
+    public static function setUpBeforeClass(): void
+    {
+        $lockFiles = array_map(static fn (string $dir): string => self::FIXTURES.$dir.'/composer.lock', self::DIRS);
+        self::$server = FixtureRepositoryServer::fromLockFiles($lockFiles);
+        // S9 needs an advisory on an installed version: doctrine/cache 2.2.0 is in wallabag's lock.
+        self::$server->withSecurityAdvisories([
+            'doctrine/cache' => [[
+                'advisoryId' => 'PKSA-cache-1',
+                'packageName' => 'doctrine/cache',
+                'remoteId' => 'PKSA-cache-1',
+                'cve' => 'CVE-2024-0001',
+                'title' => 'Cache poisoning',
+                'link' => 'https://example.test/PKSA-cache-1',
+                'affectedVersions' => '>=2.0,<2.3',
+                'sources' => [['name' => 'FriendsOfPHP/security-advisories', 'remoteId' => 'PKSA-cache-1']],
+                'reportedAt' => '2024-03-01 12:00:00',
+                'severity' => 'high',
+            ]],
+        ]);
+        self::$server->start();
+    }
+
+    public static function tearDownAfterClass(): void
+    {
+        if (self::$server !== null) {
+            self::$server->stop();
+            self::$server = null;
+        }
+        self::$analyses = [];
+    }
+
+    private static function analysis(string $dir): Analysis
+    {
+        if (isset(self::$analyses[$dir])) {
+            return self::$analyses[$dir];
+        }
+        $server = self::$server;
+        self::assertNotNull($server);
+        $clock = Clock::fixed(self::NOW);
+        $auth = ForgeAuth::withTokens(new Tokens('recorded', null));
+        $analyzer = new Analyzer(
+            new RepositoryMetadataLoader($server->repositories(), $clock),
+            new ActivityClient(new RecordedHttpClient(self::FIXTURES.'http/github'), $auth),
+            new ActivityFetchPlanner($auth),
+            new RepoLocator(),
+            BuiltinAllowlist::load(),
+            SignalSet::default($clock, new Thresholds(), '8.4', PhpReleaseDates::load()),
+            new VerdictEngine(),
+            $clock,
+            false,
+            new RepositoryAdvisoryLoader($server->repositories())
+        );
+        $lock = LockFile::fromFile(self::FIXTURES.$dir.'/composer.lock');
+        $project = ProjectConfig::fromFile(self::FIXTURES.$dir.'/composer.json');
+
+        return self::$analyses[$dir] = $analyzer->analyzeWithFacts($lock->packages(false), $lock, $project, false);
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function fixtureDirs(): iterable
+    {
+        foreach (self::DIRS as $dir) {
+            yield $dir => [$dir];
+        }
+    }
+
+    /**
+     * @dataProvider fixtureDirs
+     */
+    #[DataProvider('fixtureDirs')]
+    public function testTheReportValidatesAgainstItsSchemaAndItsStrictTwin(string $dir): void
+    {
+        $json = (new JsonFormatter())->format(self::analysis($dir)->report());
+
+        self::assertStringStartsWith("{\n    \"\$schema\": \"https://lockrot.dev/schema/report-1.json\",\n", $json);
+        $this->assertValid(Schemas::REPORT, $json, $dir);
+        $this->assertValid(Schemas::REPORT, $json, $dir, true);
+    }
+
+    /** The per-signal `data` branches are only tested if every signal really occurs in the fixtures. */
+    public function testTheFixturesExerciseEverySignal(): void
+    {
+        $seen = [];
+        foreach (self::DIRS as $dir) {
+            foreach (self::analysis($dir)->report()->findings() as $finding) {
+                foreach ($finding->signals() as $signal) {
+                    $seen[$signal->id()] = true;
+                }
+            }
+        }
+        ksort($seen);
+
+        self::assertSame([Signal::S1, Signal::S2, Signal::S3, Signal::S4, Signal::S5, Signal::S6, Signal::S7, Signal::S8, Signal::S9], array_keys($seen));
+    }
+
+    /** A signal's `data` must match its own branch, not just any branch: a wrong id/data pair fails. */
+    public function testASignalWhoseDataBelongsToAnotherSignalIsRejected(): void
+    {
+        $json = (new JsonFormatter())->format(self::analysis('apps/wallabag_wallabag')->report());
+        $document = json_decode($json);
+        self::assertInstanceOf(\stdClass::class, $document);
+        self::assertIsArray($document->findings);
+        $relabelled = false;
+        foreach ($document->findings as $finding) {
+            self::assertInstanceOf(\stdClass::class, $finding);
+            self::assertIsArray($finding->signals);
+            foreach ($finding->signals as $signal) {
+                self::assertInstanceOf(\stdClass::class, $signal);
+                if ($signal->id === Signal::S2) {
+                    $signal->id = Signal::S3;
+                    $relabelled = true;
+                    break 2;
+                }
+            }
+        }
+        self::assertTrue($relabelled, 'an S2 signal to relabel');
+
+        self::assertNotSame([], $this->errors(Schemas::REPORT, (string) json_encode($document), false));
+    }
+
+    public function testTheExplanationValidatesAgainstItsSchemaAndItsStrictTwin(): void
+    {
+        $analysis = self::analysis('apps/wallabag_wallabag');
+        // One package per data shape: a left-behind one with advisories on it, an abandoned direct
+        // one with an archived repository, and one the repository does not list at all.
+        foreach (['doctrine/cache', 'sensio/framework-extra-bundle', 'wallabag/rulerz'] as $package) {
+            $finding = $analysis->finding($package);
+            $facts = $analysis->facts($package);
+            self::assertNotNull($finding, $package);
+            self::assertNotNull($facts, $package);
+            $json = (new ExplainFormatter())->json(new Explanation($finding, $facts, new Thresholds(), '8.4', $analysis->report()));
+
+            self::assertStringStartsWith("{\n    \"\$schema\": \"https://lockrot.dev/schema/explain-1.json\",\n", $json);
+            $this->assertValid(Schemas::EXPLAIN, $json, $package);
+            $this->assertValid(Schemas::EXPLAIN, $json, $package, true);
+        }
+    }
+
+    public function testTheBaselineFileValidatesAgainstItsSchemaAndItsStrictTwin(): void
+    {
+        $dir = sys_get_temp_dir().'/lockrot-schema-'.uniqid('', true);
+        mkdir($dir);
+        try {
+            foreach (['apps/wallabag_wallabag', 'skeletons/laravel'] as $fixture) {
+                $file = BaselineFile::resolve($dir, null);
+                $file->write(Baseline::fromReport(self::analysis($fixture)->report()));
+                $json = (string) file_get_contents($file->path());
+
+                self::assertStringStartsWith("{\n    \"\$schema\": \"https://lockrot.dev/schema/baseline-1.json\",\n", $json);
+                $this->assertValid(Schemas::BASELINE, $json, $fixture);
+                $this->assertValid(Schemas::BASELINE, $json, $fixture, true);
+                // And what lockrot wrote, lockrot reads back through the same schema.
+                self::assertSame(\count(self::analysis($fixture)->report()->flagged()), $file->read()->count(), $fixture);
+            }
+        } finally {
+            array_map('unlink', glob($dir.'/*') ?: []);
+            rmdir($dir);
+        }
+    }
+
+    /** @return iterable<string, array{string, string}> every ```json block in docs/, with the schema it must match */
+    public static function docSamples(): iterable
+    {
+        foreach (glob(self::DOCS.'*.md') ?: [] as $path) {
+            $text = (string) file_get_contents($path);
+            preg_match_all('/```json\n(.*?)\n```/s', $text, $matches);
+            foreach ($matches[1] as $i => $block) {
+                $document = self::documentOf($block);
+                $schema = self::schemaFor($document);
+                if ($schema === null) {
+                    continue;
+                }
+                yield basename($path).' #'.($i + 1) => [$schema, $block];
+            }
+        }
+    }
+
+    /**
+     * @dataProvider docSamples
+     */
+    #[DataProvider('docSamples')]
+    public function testTheDocsSamplesValidate(string $schema, string $block): void
+    {
+        $document = self::documentOf($block);
+        if ($schema === Schemas::CONFIG) {
+            // composer.json samples: the schema describes extra.lockrot, not the file around it.
+            $document = JsonPath::arrayAt($document, ['extra', 'lockrot']);
+        }
+        $json = (string) json_encode($document);
+
+        $this->assertValid($schema, $json, 'docs sample');
+        $this->assertValid($schema, $json, 'docs sample', true);
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function schemaDocuments(): iterable
+    {
+        foreach ([Schemas::REPORT, Schemas::EXPLAIN, Schemas::BASELINE, Schemas::CONFIG] as $document) {
+            yield $document => [$document];
+        }
+    }
+
+    /**
+     * @dataProvider schemaDocuments
+     */
+    #[DataProvider('schemaDocuments')]
+    public function testEachSchemaIsValidDraft04AndNamesItsPublishedUrl(string $document): void
+    {
+        $schema = self::schema($document);
+
+        // validate() takes its subject by reference; a copy keeps $schema typed for the reads below.
+        $subject = self::schema($document);
+        $validator = new Validator();
+        $validator->validate($subject, (object) ['$ref' => 'http://json-schema.org/draft-04/schema#'], Constraint::CHECK_MODE_VALIDATE_SCHEMA);
+        self::assertTrue($validator->isValid(), $document.': '.json_encode($validator->getErrors()));
+
+        $number = $document === Schemas::BASELINE ? Baseline::SCHEMA : JsonFormatter::SCHEMA;
+        $header = get_object_vars($schema);
+        self::assertSame('http://json-schema.org/draft-04/schema#', $header['$schema'] ?? null);
+        self::assertSame(Schemas::url($document, $number), $header['id'] ?? null);
+        self::assertSame('https://lockrot.dev/schema/'.$document.'-'.$number.'.json', $header['id'] ?? null);
+    }
+
+    private function assertValid(string $document, string $json, string $what, bool $strict = false): void
+    {
+        $errors = $this->errors($document, $json, $strict);
+
+        self::assertSame([], $errors, $what.($strict ? ' (strict twin)' : '').': '.json_encode($errors, \JSON_PRETTY_PRINT));
+    }
+
+    /** @return list<string> */
+    private function errors(string $document, string $json, bool $strict): array
+    {
+        $data = json_decode($json);
+        self::assertNotNull($data, 'valid JSON');
+        $schema = self::schema($document);
+        if ($strict) {
+            self::assertInstanceOf(\stdClass::class, $schema);
+            $schema = self::strictTwin($schema);
+        }
+
+        $validator = new Validator();
+        $validator->validate($data, $schema);
+        $errors = [];
+        foreach ($validator->getErrors() as $error) {
+            self::assertIsArray($error);
+            $property = $error['property'] ?? null;
+            $message = $error['message'] ?? null;
+            $errors[] = (\is_string($property) ? $property : '?').': '.(\is_string($message) ? $message : '?');
+        }
+
+        return $errors;
+    }
+
+    private static function schema(string $document): object
+    {
+        $decoded = json_decode((string) file_get_contents(Schemas::path($document)));
+        self::assertIsObject($decoded, $document);
+
+        return $decoded;
+    }
+
+    /**
+     * The same schema with `additionalProperties: false` on every node that declares `properties`
+     * and leaves the question open. Nodes that only say `type: object` (a signal's generic `data`)
+     * and maps that already say what their members are (a baseline's `findings`) are left alone;
+     * so are the `anyOf` branches, which have no `type` of their own.
+     */
+    private static function strictTwin(\stdClass $node): \stdClass
+    {
+        $copy = clone $node;
+        foreach (get_object_vars($copy) as $key => $value) {
+            if ($value instanceof \stdClass) {
+                $copy->{$key} = self::strictTwin($value);
+            } elseif (\is_array($value)) {
+                $copy->{$key} = array_map(static fn ($item) => $item instanceof \stdClass ? self::strictTwin($item) : $item, $value);
+            }
+        }
+        $vars = get_object_vars($copy);
+        if (($vars['type'] ?? null) === 'object' && isset($vars['properties']) && !\array_key_exists('additionalProperties', $vars)) {
+            $copy->additionalProperties = false;
+        }
+
+        return $copy;
+    }
+
+    /**
+     * A docs sample as a decoded document. The samples in docs/ elide with `…` lines, which leave a
+     * trailing comma behind; both are removed before decoding.
+     *
+     * @return array<string, mixed>
+     */
+    private static function documentOf(string $block): array
+    {
+        $json = (string) preg_replace('/^\s*…\s*\n/m', '', $block);
+        $json = (string) preg_replace('/,(\s*[\]}])/', '$1', $json);
+        $document = json_decode($json, true);
+        self::assertIsArray($document, 'a docs sample decodes: '.$block);
+        $typed = [];
+        foreach ($document as $key => $value) {
+            $typed[(string) $key] = $value;
+        }
+
+        return $typed;
+    }
+
+    /** @param array<string, mixed> $document */
+    private static function schemaFor(array $document): ?string
+    {
+        $extra = $document['extra'] ?? null;
+        if (\is_array($extra) && isset($extra['lockrot'])) {
+            return Schemas::CONFIG;
+        }
+        if (!isset($document['lockrot'])) {
+            return null;
+        }
+        if (isset($document['finding'], $document['lock'])) {
+            return Schemas::EXPLAIN;
+        }
+        if (!isset($document['findings'])) {
+            // An envelope-only fragment, as schema.md shows one: nothing to validate.
+            return null;
+        }
+
+        $findings = $document['findings'] ?? null;
+
+        return \is_array($findings) && $findings !== [] && array_keys($findings) === range(0, \count($findings) - 1) ? Schemas::REPORT : Schemas::BASELINE;
+    }
+}

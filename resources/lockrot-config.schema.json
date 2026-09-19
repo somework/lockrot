@@ -1,5 +1,8 @@
 {
     "$schema": "http://json-schema.org/draft-04/schema#",
+    "id": "https://lockrot.dev/schema/config-1.json",
+    "title": "lockrot configuration",
+    "description": "The `extra.lockrot` object in composer.json. Unknown keys are allowed; the listed ones must have the listed type.",
     "type": "object",
     "properties": {
         "fail-on": {

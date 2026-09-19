@@ -195,7 +195,7 @@ final class ExplainFormatterTest extends TestCase
         $encoded = (new ExplainFormatter())->json($explanation);
         $json = json_decode($encoded, true);
 
-        self::assertStringStartsWith("{\n    \"lockrot\": {\n", $encoded, 'pretty-printed');
+        self::assertStringStartsWith("{\n    \"\$schema\": \"https://lockrot.dev/schema/explain-1.json\",\n    \"lockrot\": {\n", $encoded, 'pretty-printed');
         self::assertStringEndsWith("}\n", $encoded);
         self::assertStringContainsString('"https://github.com/vendor/pkg.git"', $encoded, 'slashes unescaped');
         self::assertIsArray($json);
