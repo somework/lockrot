@@ -427,6 +427,77 @@ final class LockrotCommandTest extends TestCase
         self::assertSame(19, $json['counts']['abandoned']);
     }
 
+    public function testExplainPrintsOnePackageWithItsSignalsAndFactsAndExitsZero(): void
+    {
+        chdir(__DIR__.'/../../fixtures/apps/wallabag_wallabag');
+        $tester = $this->tester($this->loader());
+
+        $code = $tester->execute(['--explain' => 'doctrine/annotations', '--target-php' => '8.4', '--fail-on' => 'stale']);
+
+        $display = $tester->getDisplay();
+        self::assertSame(0, $code, $display);
+        self::assertStringStartsWith('doctrine/annotations ', $display);
+        self::assertStringContainsString('— abandoned, priority', $display);
+        self::assertStringContainsString("\n  S1 high marked abandoned by its repository", $display);
+        self::assertStringContainsString("\nrepository metadata (as of ", $display);
+        self::assertStringContainsString("\n    branch     highest tag        released     newest dated release\n", $display);
+        self::assertStringContainsString("\nthresholds: release-warn-years 3", $display);
+        self::assertStringNotContainsString('packages checked', $display, 'the report itself is not printed');
+    }
+
+    public function testExplainAsJsonCarriesTheFindingAndTheFacts(): void
+    {
+        chdir(__DIR__.'/../../fixtures/apps/wallabag_wallabag');
+        [$code, $stdout, $options] = $this->runRecordingWriteOptions(['--explain' => 'doctrine/annotations', '--format' => 'json', '--target-php' => '8.4'], $this->loader());
+
+        self::assertSame(0, $code, $stdout);
+        self::assertSame([OutputInterface::OUTPUT_RAW], $options, 'written raw, like every machine-readable format');
+        $json = json_decode($stdout, true);
+        self::assertIsArray($json);
+        self::assertIsArray($json['lockrot']);
+        self::assertSame(1, $json['lockrot']['schema']);
+        self::assertSame('doctrine/annotations', $json['package']);
+        self::assertIsArray($json['finding']);
+        self::assertSame('abandoned', $json['finding']['verdict']);
+        self::assertIsArray($json['metadata']);
+        self::assertTrue($json['metadata']['abandoned']);
+        self::assertIsArray($json['metadata']['branches']);
+        self::assertSame('8.4', $json['target_php']);
+    }
+
+    /** @return iterable<string, array{array<string, mixed>, string}> */
+    public static function explainConfigurationErrors(): iterable
+    {
+        yield 'not in the lock' => [['--explain' => 'nobody/nothing'], 'nobody/nothing is not in composer.lock'];
+        yield 'a dev package without --dev' => [['--explain' => 'clue/ndjson-react'], 'clue/ndjson-react is in packages-dev; pass --dev to explain it'];
+        yield 'a format with no explanation form' => [['--explain' => 'doctrine/annotations', '--format' => 'github'], '--explain prints text or, with --format=json, JSON; --format=github has no explanation form'];
+        yield 'an empty name' => [['--explain' => ' '], '--explain needs a package name'];
+    }
+
+    /** @param array<string, mixed> $args */
+    #[DataProvider('explainConfigurationErrors')]
+    public function testExplainRefusesWhatItCannotExplainAsAConfigurationError(array $args, string $message): void
+    {
+        chdir(__DIR__.'/../../fixtures/apps/wallabag_wallabag');
+        [$code, $stdout, $errors] = $this->runRecordingErrorMessages($args + ['--target-php' => '8.4']);
+
+        self::assertSame(2, $code);
+        self::assertSame('', $stdout);
+        self::assertStringContainsString('lockrot: '.$message, implode("\n", $errors));
+    }
+
+    public function testExplainReachesADevPackageWithDev(): void
+    {
+        chdir(__DIR__.'/../../fixtures/apps/wallabag_wallabag');
+        $tester = $this->tester($this->loader());
+
+        $code = $tester->execute(['--explain' => 'clue/ndjson-react', '--dev' => true, '--target-php' => '8.4']);
+
+        self::assertSame(0, $code, $tester->getDisplay());
+        self::assertStringStartsWith('clue/ndjson-react ', $tester->getDisplay());
+        self::assertStringContainsString(' · packages-dev', $tester->getDisplay());
+    }
+
     public function testGithubAnnotationsOnWallabag(): void
     {
         chdir(__DIR__.'/../../fixtures/apps/wallabag_wallabag');

@@ -153,6 +153,33 @@ final class AnalyzerTest extends TestCase
         };
     }
 
+    /** `--explain` reads the facts the rules read: the same run, the same report, plus what each finding was decided on. */
+    public function testAnalyzeWithFactsKeepsWhatEachFindingWasDecidedOn(): void
+    {
+        $lock = LockFile::fromArray(['packages' => [
+            ['name' => 'vendor/direct', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/'],
+            ['name' => 'vendor/local', 'version' => '1.0.0', 'dist' => ['type' => 'path', 'url' => '../local']],
+        ]]);
+        $project = ProjectConfig::fromArray(['require' => ['vendor/direct' => '^1.0', 'vendor/local' => '*']]);
+        $meta = new PackageMetadata('vendor/direct', true, null, true, new \DateTimeImmutable('2024-01-10T10:00:00+00:00'), '1.0.0', 1, null, 'library', new \DateTimeImmutable(F::NOW));
+        $advisory = new Advisory('PKSA-1', 'CVE-2024-0001', 'Title', null, 'high', null);
+        $analyzer = $this->analyzer($this->loader(['vendor/direct' => $meta]), $this->http([]), true, new Allowlist([]), false, ActivityFetchPlanner::DEFAULT_ANONYMOUS_BUDGET, null, $this->advisories(new AdvisoryBatch(['vendor/direct' => [$advisory]])));
+
+        $analysis = $analyzer->analyzeWithFacts($lock->packages(false), $lock, $project, false);
+
+        self::assertSame(['vendor/direct', 'vendor/local'], array_map(static fn ($f) => $f->package(), $analysis->report()->findings()));
+        self::assertEquals($analyzer->analyze($lock, $project, false)->toArray(), $analysis->report()->toArray(), 'the same run as analyze()');
+        $direct = $analysis->facts('vendor/direct');
+        self::assertNotNull($direct);
+        self::assertSame($meta, $direct->metadata());
+        self::assertSame([$advisory], $direct->advisories());
+        self::assertSame('1.0.0', $direct->package()->version());
+        $local = $analysis->facts('vendor/local');
+        self::assertNotNull($local);
+        self::assertNull($local->metadata(), 'a path package has no repository metadata');
+        self::assertNull($analysis->facts('vendor/absent'));
+    }
+
     public function testAdvisoriesReachTheFindingAsS9AndRaiseAnAbandonedPackage(): void
     {
         $lock = LockFile::fromArray(['packages' => [

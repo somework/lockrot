@@ -23,8 +23,10 @@ use Lockrot\Config\Policy;
 use Lockrot\Data\Forge\Tokens;
 use Lockrot\Deadline;
 use Lockrot\Exception\ConfigException;
+use Lockrot\Explain\Explanation;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
+use Lockrot\Output\ExplainFormatter;
 use Lockrot\Output\FormatContext;
 use Lockrot\Output\Formatters;
 use Lockrot\Output\TerminalWidth;
@@ -73,7 +75,8 @@ final class LockrotCommand extends BaseCommand
             ->addOption('offline', null, InputOption::VALUE_NONE, 'Use cached data only, never go to the network')
             ->addOption('strict-network', null, InputOption::VALUE_NONE, 'Exit 1 when a repository or a repository host (GitHub, GitLab, Bitbucket) could not be reached')
             ->addOption('baseline', null, InputOption::VALUE_REQUIRED, 'Baseline file to read or write (default: lockrot-baseline.json next to composer.json)')
-            ->addOption('generate-baseline', null, InputOption::VALUE_NONE, 'Write the current findings to the baseline file and exit 0');
+            ->addOption('generate-baseline', null, InputOption::VALUE_NONE, 'Write the current findings to the baseline file and exit 0')
+            ->addOption('explain', null, InputOption::VALUE_REQUIRED, 'Explain one package: its verdict, every signal with its raw data, and the repository facts they were read from (text, or JSON with --format=json); exit 0');
     }
 
     /**
@@ -183,6 +186,10 @@ final class LockrotCommand extends BaseCommand
             // `composer lockrot` is the deliberate, full run: no time budget, unlike the
             // install-time summary.
             $analyzer = AnalyzerBootstrap::create($this->analyzerFactory, $io, $config, $repositories, $project, $lockrot, $env, Deadline::never());
+            $explain = $input->getOption('explain');
+            if (\is_string($explain)) {
+                return $this->explain($output, $explain, $analyzer, $lock, $project, $lockrot);
+            }
             $report = $analyzer->analyze($lock, $project, $lockrot->includeDev());
 
             if ($generate) {
@@ -226,6 +233,54 @@ final class LockrotCommand extends BaseCommand
         } finally {
             $this->restoreEnv();
         }
+    }
+
+    /**
+     * `--explain <package>`: the same run every other invocation makes — the whole lock, so the
+     * chain, the transitive exposure and the priority are the report's — then one package's
+     * finding printed with the facts it was decided on ({@see Explanation}), and exit 0: the run
+     * answers a question, it does not gate anything. A package the run did not analyse is a
+     * configuration error (exit 2) with the reason: not in the lock, or in `packages-dev` without
+     * `--dev`. The baseline is not consulted — what the project has accepted is not what is asked.
+     */
+    private function explain(OutputInterface $output, string $name, Analyzer $analyzer, LockFile $lock, ProjectConfig $project, LockrotConfig $lockrot): int
+    {
+        $format = $lockrot->format();
+        if ($format !== 'table' && $format !== 'json') {
+            throw new ConfigException('--explain prints text or, with --format=json, JSON; --format='.$format.' has no explanation form');
+        }
+        $name = strtolower(trim($name));
+        if ($name === '') {
+            throw new ConfigException('--explain needs a package name, e.g. --explain=vendor/package');
+        }
+        $locked = $lock->find($name);
+        if ($locked === null) {
+            throw new ConfigException($name.' is not in composer.lock');
+        }
+        if ($locked->isDev() && !$lockrot->includeDev()) {
+            throw new ConfigException($name.' is in packages-dev; pass --dev to explain it');
+        }
+        $analysis = $analyzer->analyzeWithFacts($lock->packages($lockrot->includeDev()), $lock, $project, $lockrot->includeDev());
+        $finding = null;
+        foreach ($analysis->report()->findings() as $candidate) {
+            if ($candidate->package() === $name) {
+                $finding = $candidate;
+                break;
+            }
+        }
+        $facts = $analysis->facts($name);
+        if ($finding === null || $facts === null) {
+            throw new ConfigException($name.' was not analysed');
+        }
+        $explanation = new Explanation($finding, $facts, $lockrot->thresholds(), $lockrot->targetPhp(), $analysis->report());
+        $formatter = new ExplainFormatter();
+        if ($format === 'json') {
+            $output->write($formatter->json($explanation), false, OutputInterface::OUTPUT_RAW);
+        } else {
+            $output->write($formatter->text($explanation));
+        }
+
+        return Policy::EXIT_OK;
     }
 
     /**

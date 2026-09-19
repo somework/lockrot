@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `--explain=vendor/package`: one package, everything it was decided on, one call. The verdict and
+  priority with how the package is reached; every signal with its summary and raw data (the dates
+  the years were computed from, one line per advisory with what fixes it and where); the
+  `composer.lock` entry; the repository metadata with the table S8 reads — every release branch,
+  its highest tag and that tag's date, the installed branch marked, and a line saying so when that
+  branch's highest tag is undated and S8 therefore does not measure it; the repository activity;
+  the thresholds and target PHP; the run's notes. Text, or the same as JSON with `--format=json`.
+  Exit 0 — it answers a question, it does not gate; a package not in the lock, or in `packages-dev`
+  without `--dev`, is a configuration error (exit 2). See
+  [configuration.md](docs/configuration.md#explaining-one-package).
+
 ### Fixed
 
 - A false `left-behind` on packages split out of a monorepo. A subtree split (`illuminate/*`,

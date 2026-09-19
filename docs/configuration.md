@@ -67,8 +67,35 @@ be JSON integers (`3`, not `"3"`).
 | `--strict-network` | Exit 1 (see [ci.md](ci.md)) when a configured repository or a repository host (GitHub, GitLab, Bitbucket) could not be reached |
 | `--generate-baseline` | Write this run's findings to the [baseline](baseline.md) file and exit 0, whatever `--fail-on` says — `--strict-network` is the one exception |
 | `--baseline=<path>` | Baseline file to read (or, with `--generate-baseline`, to write); relative to `composer.json` or absolute. Wins over `extra.lockrot.baseline`. An empty `--baseline=` is a configuration error (exit `2`), never a silent fall-back to the default file — as is an empty `--fail-on=` |
+| `--explain=vendor/package` | Explain one package and exit 0 — see [Explaining one package](#explaining-one-package) |
 
 `-d <dir>` points the standalone PHAR at a project; see [phar.md](phar.md).
+
+## Explaining one package
+
+`composer lockrot --explain=vendor/package` answers "why is this flagged?" — and "why is it not?" —
+for one package, in one call. The run is the ordinary one over the whole lock (the chain, the
+transitive exposure and the priority are the report's), and what is printed is that package's
+finding with everything it was decided on:
+
+- the verdict and priority, how the package is reached (`direct requirement`, or the shortest
+  `via` chain and the other direct requirements it is reached from), the allowlist reason or note;
+- every signal, its summary and its raw data — the dates the summary's years were computed from,
+  and for S9 one line per advisory with what fixes it and where;
+- the `composer.lock` entry: version, `php` constraint, release date, source;
+- the repository metadata: how many versions are listed, whether the package is abandoned and what
+  replaces it, its last stable release, and the table S8 reads — every release branch with its
+  highest tag, that tag's date and the branch's newest dated release, the installed branch marked
+  `*`. A branch whose highest tag is `undated` is one S8 does not measure; the table says so when
+  it is the installed one (see [verdicts.md](verdicts.md#left-behind));
+- the repository activity S3 and S4 read, or that it was not fetched;
+- the thresholds and target PHP the signals were measured against, and the run's notes.
+
+`--format=json` prints the same as JSON (`package`, `finding` — the finding as `--format=json`
+carries it — `lock`, `metadata`, `activity`, `thresholds`, `target_php`, `notes`); no other format
+has an explanation form. The exit code is `0`: the run answers a question, it does not gate. A
+package that is not in the lock, or is in `packages-dev` on a run without `--dev`, is a configuration
+error (exit `2`). The baseline is not consulted.
 
 ## Caching
 

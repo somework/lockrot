@@ -114,6 +114,17 @@ final class Analyzer
      */
     public function analyzePackages(array $packages, LockFile $lock, ProjectConfig $project, bool $includeDev): Report
     {
+        return $this->analyzeWithFacts($packages, $lock, $project, $includeDev)->report();
+    }
+
+    /**
+     * {@see analyzePackages()}, keeping the facts each finding was decided on ({@see Analysis}).
+     * The same run, the same report: `--explain` prints exactly what the report would.
+     *
+     * @param list<LockedPackage> $packages
+     */
+    public function analyzeWithFacts(array $packages, LockFile $lock, ProjectConfig $project, bool $includeDev): Analysis
+    {
         $graph = DependencyGraph::fromLock($lock, $project, $includeDev);
         $now = $this->clock->now();
         $notes = [];
@@ -147,13 +158,16 @@ final class Analyzer
         $activity = $activityBatch->activity();
 
         $findings = [];
+        $factsByPackage = [];
         $notInRepository = 0;
         foreach ($packages as $package) {
             $meta = $metadata[$package->name()] ?? null;
             $repo = $repoByPackage[$package->name()] ?? null;
             $act = $repo !== null ? ($activity[$repo->key()] ?? null) : null;
             $entry = $allowlisted[$package->name()];
-            $findings[] = $this->buildFinding($package, $meta, $act, $entry, $graph, $batch, $advisories);
+            $facts = new PackageFacts($package, $meta, $act, $advisories->for($package->name()));
+            $factsByPackage[$package->name()] = $facts;
+            $findings[] = $this->buildFinding($facts, $entry, $graph, $batch);
             if (!$package->isFromComposerRepository()) {
                 ++$notInRepository;
             }
@@ -163,7 +177,10 @@ final class Analyzer
 
         $hadNetworkFailures = $batch->failed() !== [] || $activityBatch->failed() !== [] || $advisories->hadNetworkFailure();
 
-        return new Report($findings, $notes, $now, \count($packages), $notInRepository, $hadNetworkFailures, null, self::oldestCachedActivity($activity), $includeDev);
+        return new Analysis(
+            new Report($findings, $notes, $now, \count($packages), $notInRepository, $hadNetworkFailures, null, self::oldestCachedActivity($activity), $includeDev),
+            $factsByPackage
+        );
     }
 
     /**
@@ -272,9 +289,11 @@ final class Analyzer
         return [$batch, $notes];
     }
 
-    private function buildFinding(LockedPackage $package, ?PackageMetadata $meta, ?RepositoryActivity $activity, ?AllowlistEntry $entry, DependencyGraph $graph, MetadataBatch $batch, AdvisoryBatch $advisories): Finding
+    private function buildFinding(PackageFacts $facts, ?AllowlistEntry $entry, DependencyGraph $graph, MetadataBatch $batch): Finding
     {
-        $facts = new PackageFacts($package, $meta, $activity, $advisories->for($package->name()));
+        $package = $facts->package();
+        $meta = $facts->metadata();
+        $activity = $facts->activity();
         $signals = $this->signals->evaluate($facts);
         $verdict = $this->engine->decide($signals, $entry !== null, $meta !== null);
 
