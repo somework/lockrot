@@ -87,11 +87,15 @@ final class LeftBehindRule implements SignalRule
         // The branch is named, not only the release: the branch is what a maintainer moves to, and
         // it is the newest *releasing* higher branch — with a living LTS below the current major
         // that can be the LTS, which is a fact about where fixes land, not a claim about the latest.
+        // A branch dated by the monorepo says so: the date is laravel/framework's release, read
+        // through `replace`, not one this package's own tags carry ({@see PackageMetadata::datedBy()}).
+        $datedBy = $own['dated_by'] ?? null;
         $summary = \sprintf(
-            'branch %s last released %s (%.1f years ago); %s released %s (%s)',
+            'branch %s last released %s (%.1f years ago%s); %s released %s (%s)',
             ReleaseBranch::label($branch),
             $own['at']->format('Y-m-d'),
             $years,
+            $datedBy === null ? '' : ', dated by '.$datedBy,
             ReleaseBranch::label($newest['branch']),
             $newest['version'],
             $newest['at']->format('Y-m-d')
@@ -106,6 +110,7 @@ final class LeftBehindRule implements SignalRule
             'newest_version' => $newest['version'],
             'newest_release' => $newest['at']->format(\DATE_ATOM),
             'suggested_constraint' => $this->suggestedConstraint($facts->package()->name(), $newest['version']),
+            'dated_by' => $datedBy,
         ]);
     }
 

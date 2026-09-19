@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Signal\Rule;
 
 use Lockrot\Clock;
+use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Signal\Rule\NoReleaseRule;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\Thresholds;
@@ -29,6 +30,7 @@ final class NoReleaseRuleTest extends TestCase
             'last_release' => '2015-11-16T16:30:51+00:00',
             'last_version' => '2.0.8',
             'years' => 10.8,
+            'dated_by' => null,
         ], $signal->data());
     }
 
@@ -56,5 +58,17 @@ final class NoReleaseRuleTest extends TestCase
         self::assertNull($this->rule()->evaluate(F::facts(F::package())));
         self::assertNull($this->rule()->evaluate(F::facts(F::package(), F::metadata([['dev-master', '2015-01-01']]))));
         self::assertNull($this->rule()->evaluate(F::facts(F::package(), F::metadata([['1.0.0', null]]))));
+    }
+
+    /** A last release read from the monorepo parent ({@see PackageMetadata::datedBy()}) says so. */
+    public function testALastReleaseDatedByTheMonorepoNamesIt(): void
+    {
+        $meta = new PackageMetadata('illuminate/contracts', false, null, true, new \DateTimeImmutable('2021-11-20T15:55:41+00:00'), 'v8.83.29', 1, null, 'library', new \DateTimeImmutable(F::NOW), [], [], 'laravel/framework');
+
+        $signal = (new NoReleaseRule(Clock::fixed(F::NOW), new Thresholds()))->evaluate(F::facts(F::package(), $meta));
+
+        self::assertNotNull($signal);
+        self::assertSame('last release 2021-11-20 (4.8 years ago, dated by laravel/framework)', $signal->summary());
+        self::assertSame(['last_release' => '2021-11-20T15:55:41+00:00', 'last_version' => 'v8.83.29', 'years' => 4.8, 'dated_by' => 'laravel/framework'], $signal->data());
     }
 }

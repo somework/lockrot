@@ -71,15 +71,19 @@ final class FixtureRepositoryServer
         $this->names = $names;
     }
 
-    /** @param list<string> $lockFiles absolute paths of composer.lock files whose package names to serve */
-    public static function fromLockFiles(array $lockFiles, string $envelopeDir = __DIR__.'/../fixtures/http/p2'): self
+    /**
+     * @param list<string> $lockFiles  absolute paths of composer.lock files whose package names to serve
+     * @param list<string> $extraNames package names to serve on top of the locks' — the monorepo parents the
+     *                                 analyzer loads to date a split package, which no lock lists
+     */
+    public static function fromLockFiles(array $lockFiles, string $envelopeDir = __DIR__.'/../fixtures/http/p2', array $extraNames = []): self
     {
         $docroot = self::freshTempDir('lockrot-fixture-repo-');
         $cacheDir = self::freshTempDir('lockrot-fixture-cache-');
         self::writePackagesJson($docroot);
         file_put_contents($docroot.'/'.self::ROUTER_FILENAME, self::ROUTER_SCRIPT);
 
-        $names = self::namesFromLockFiles($lockFiles);
+        $names = array_values(array_unique(array_merge(self::namesFromLockFiles($lockFiles), $extraNames)));
         foreach ($names as $name) {
             foreach (self::SUFFIXES as $suffix) {
                 self::writeEnvelopeIfOk($docroot, $envelopeDir, $name, $suffix);

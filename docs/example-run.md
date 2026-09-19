@@ -364,7 +364,8 @@ list, which `…` stands in for:
                     "data": {
                         "last_release": "2023-02-24T14:57:12+00:00",
                         "last_version": "v6.2.10",
-                        "years": 3.6
+                        "years": 3.6,
+                        "dated_by": null
                     }
                 },
                 …

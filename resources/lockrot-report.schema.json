@@ -84,6 +84,7 @@
         "priority": { "type": "string", "enum": ["critical", "high", "medium", "low", "none"] },
         "level": { "type": "string", "enum": ["info", "warn", "high"] },
         "years": { "description": "Years elapsed, one decimal.", "type": "number", "minimum": 0 },
+        "datedBy": { "description": "The monorepo the dates were read from through its `replace` list (a package split out of laravel/framework or symfony/symfony), null when they are the package's own.", "oneOf": [{ "$ref": "#/definitions/packageName" }, { "type": "null" }] },
         "baselineComparison": {
             "type": "object",
             "required": ["path", "known", "new", "worsened", "stale"],
@@ -144,11 +145,12 @@
         "s2": {
             "description": "No release for years.",
             "type": "object",
-            "required": ["last_release", "last_version", "years"],
+            "required": ["last_release", "last_version", "years", "dated_by"],
             "properties": {
                 "last_release": { "$ref": "#/definitions/dateTime" },
                 "last_version": { "type": ["string", "null"] },
-                "years": { "$ref": "#/definitions/years" }
+                "years": { "$ref": "#/definitions/years" },
+                "dated_by": { "$ref": "#/definitions/datedBy" }
             }
         },
         "s3": {
@@ -208,7 +210,7 @@
         "s8": {
             "description": "The installed release branch stopped while a higher one kept releasing.",
             "type": "object",
-            "required": ["branch", "branch_last_release", "branch_last_version", "years", "newest_branch", "newest_version", "newest_release", "suggested_constraint"],
+            "required": ["branch", "branch_last_release", "branch_last_version", "years", "newest_branch", "newest_version", "newest_release", "suggested_constraint", "dated_by"],
             "properties": {
                 "branch": { "type": "string" },
                 "branch_last_release": { "$ref": "#/definitions/dateTime" },
@@ -217,7 +219,8 @@
                 "newest_branch": { "type": "string" },
                 "newest_version": { "type": "string" },
                 "newest_release": { "$ref": "#/definitions/dateTime" },
-                "suggested_constraint": { "description": "A caret constraint that follows the newest releasing branch, null when Composer cannot suggest one.", "type": ["string", "null"] }
+                "suggested_constraint": { "description": "A caret constraint that follows the newest releasing branch, null when Composer cannot suggest one.", "type": ["string", "null"] },
+                "dated_by": { "$ref": "#/definitions/datedBy" }
             }
         },
         "s9": {
