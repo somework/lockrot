@@ -78,7 +78,7 @@ final class Explanation
      * null for a tag that is dated as a release or not at all; what lets a reader tell "no date"
      * from "a date that is not the release's".
      *
-     * @return list<array{branch: string, installed: bool, highest: string, highest_released: ?\DateTimeImmutable, highest_commit_date: ?\DateTimeImmutable, newest_dated: string, newest_dated_released: ?\DateTimeImmutable}>
+     * @return list<array{branch: string, installed: bool, highest: string, highest_released: ?\DateTimeImmutable, highest_commit_date: ?\DateTimeImmutable, newest_dated: string, newest_dated_released: ?\DateTimeImmutable, dated_by: ?string}>
      */
     public function branches(): array
     {
@@ -106,10 +106,31 @@ final class Explanation
                 'highest_commit_date' => $sharedCommit ? $release['at'] : null,
                 'newest_dated' => $release['version'],
                 'newest_dated_released' => $release['at'],
+                'dated_by' => $release['dated_by'] ?? null,
             ];
         }
 
         return $rows;
+    }
+
+    /**
+     * The monorepo parent whose dates some branch rows carry, null when every row is this
+     * package's own ({@see PackageMetadata::datedBy()}); with the branch labels it dated.
+     *
+     * @return array{0: string, 1: list<string>}|null
+     */
+    public function branchesDatedBy(): ?array
+    {
+        $parent = null;
+        $branches = [];
+        foreach ($this->branches() as $row) {
+            if ($row['dated_by'] !== null) {
+                $parent = $row['dated_by'];
+                $branches[] = $row['branch'];
+            }
+        }
+
+        return $parent === null ? null : [$parent, $branches];
     }
 
     /** Whether the installed branch's highest tag carries no usable date — the reason S8 does not measure it. */
@@ -140,6 +161,7 @@ final class Explanation
                 'highest_commit_date' => self::date($row['highest_commit_date']),
                 'newest_dated' => $row['newest_dated'],
                 'newest_dated_released' => self::date($row['newest_dated_released']),
+                'dated_by' => $row['dated_by'],
             ];
         }
 
@@ -163,6 +185,7 @@ final class Explanation
                 'has_stable_release' => $metadata->hasStableRelease(),
                 'last_stable_release' => self::date($metadata->lastStableReleaseAt()),
                 'last_stable_version' => $metadata->lastStableVersion(),
+                'last_stable_dated_by' => $metadata->lastStableDatedBy(),
                 'repository' => $metadata->repositoryUrl(),
                 'type' => $metadata->type(),
                 'data_date' => self::date($metadata->dataDate()),

@@ -21,9 +21,10 @@ use Lockrot\Data\Forge\RepoLocator;
 use Lockrot\Data\Forge\RepoRef;
 use Lockrot\Data\Http\HttpResult;
 use Lockrot\Data\Http\RecordedHttpClient;
+use Lockrot\Data\Repository\MonorepoParents;
 use Lockrot\Lock\LockFile;
 
-const KEEP = ['name', 'version', 'version_normalized', 'time', 'abandoned', 'source', 'require', 'type', 'extra'];
+const KEEP = ['name', 'version', 'version_normalized', 'time', 'abandoned', 'source', 'require', 'replace', 'type', 'extra'];
 const REPOSITORY_BASE_URL = 'https://repo.packagist.org/p2/';
 
 $root = \dirname(__DIR__);
@@ -80,6 +81,23 @@ $repositoryHttp = new ComposerHttpClient(Factory::createHttpDownloader($io, $com
 $github = new GitHubApi();
 $githubHeaders = GitHubApi::headersFor(getenv('GITHUB_TOKEN') ?: null);
 $locator = new RepoLocator();
+$recordP2 = static function (string $name) use ($p2Dir, $repositoryHttp, $trim, $isRecorded): void {
+    foreach ([false, true] as $dev) {
+        $url = REPOSITORY_BASE_URL.$name.($dev ? '~dev' : '').'.json';
+        $path = RecordedHttpClient::pathFor($p2Dir, $url);
+        if ($isRecorded($path)) {
+            continue;
+        }
+        $result = $repositoryHttp->fetchAll([$url])[$url];
+        $body = $result->body() === null ? null : $trim($result->body(), $name);
+        file_put_contents($path, json_encode((new HttpResult($url, $result->status(), $body, $result->fetchedAt()))->toEnvelope(), \JSON_UNESCAPED_SLASHES));
+        fwrite(STDERR, \sprintf("p2 %s%s %d\n", $name, $dev ? '~dev' : '', $result->status()));
+    }
+};
+// The monorepos the analyzer may load to date a split package's branches (resources/monorepo-parents.json).
+foreach (MonorepoParents::load()->candidates() as $parent) {
+    $recordP2($parent);
+}
 $repos = [];
 foreach ($fixtures as $fixture) {
     $lock = LockFile::fromFile($root.'/'.$fixture.'/composer.lock');
@@ -87,18 +105,8 @@ foreach ($fixtures as $fixture) {
         if (!$package->isFromComposerRepository()) {
             continue;
         }
-        foreach ([false, true] as $dev) {
-            $url = REPOSITORY_BASE_URL.$package->name().($dev ? '~dev' : '').'.json';
-            $path = RecordedHttpClient::pathFor($p2Dir, $url);
-            if ($isRecorded($path)) {
-                continue;
-            }
-            $result = $repositoryHttp->fetchAll([$url])[$url];
-            $body = $result->body() === null ? null : $trim($result->body(), $package->name());
-            file_put_contents($path, json_encode((new HttpResult($url, $result->status(), $body, $result->fetchedAt()))->toEnvelope(), \JSON_UNESCAPED_SLASHES));
-            fwrite(STDERR, \sprintf("p2 %s%s %d\n", $package->name(), $dev ? '~dev' : '', $result->status()));
-        }
-        $repo = $locator->locate($package->sourceUrl());
+        $recordP2($package->name());
+        $repo = $locator->locate($package->repositoryUrl());
         if ($repo !== null && $repo->forge() === RepoRef::GITHUB) {
             $repos[$repo->path()] = $repo;
         }

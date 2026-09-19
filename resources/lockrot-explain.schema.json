@@ -93,7 +93,7 @@
         },
         "metadata": {
             "type": "object",
-            "required": ["abandoned", "replacement", "releases_listed", "has_stable_release", "last_stable_release", "last_stable_version", "repository", "type", "data_date", "branches"],
+            "required": ["abandoned", "replacement", "releases_listed", "has_stable_release", "last_stable_release", "last_stable_version", "last_stable_dated_by", "repository", "type", "data_date", "branches"],
             "properties": {
                 "abandoned": { "type": "boolean" },
                 "replacement": { "type": ["string", "null"] },
@@ -101,6 +101,7 @@
                 "has_stable_release": { "type": "boolean" },
                 "last_stable_release": { "oneOf": [{ "$ref": "#/definitions/dateTime" }, { "type": "null" }] },
                 "last_stable_version": { "type": ["string", "null"] },
+                "last_stable_dated_by": { "description": "The monorepo last_stable_release was read from through its `replace` list, null when it is the package's own.", "oneOf": [{ "$ref": "#/definitions/packageName" }, { "type": "null" }] },
                 "repository": { "type": ["string", "null"] },
                 "type": { "type": "string" },
                 "data_date": { "$ref": "#/definitions/dateTime" },
@@ -109,7 +110,7 @@
                     "type": "array",
                     "items": {
                         "type": "object",
-                        "required": ["branch", "installed", "highest", "highest_released", "highest_commit_date", "newest_dated", "newest_dated_released"],
+                        "required": ["branch", "installed", "highest", "highest_released", "highest_commit_date", "newest_dated", "newest_dated_released", "dated_by"],
                         "properties": {
                             "branch": { "description": "The branch label, `10.x` or `0.3.x`.", "type": "string" },
                             "installed": { "type": "boolean" },
@@ -117,7 +118,8 @@
                             "highest_released": { "description": "That tag's release date; null when the repository leaves it undated or dates it only by a commit other tags share.", "oneOf": [{ "$ref": "#/definitions/dateTime" }, { "type": "null" }] },
                             "highest_commit_date": { "description": "The shared commit's date when highest_released is null for that reason.", "oneOf": [{ "$ref": "#/definitions/dateTime" }, { "type": "null" }] },
                             "newest_dated": { "description": "The branch's newest dated stable release.", "type": "string" },
-                            "newest_dated_released": { "oneOf": [{ "$ref": "#/definitions/dateTime" }, { "type": "null" }] }
+                            "newest_dated_released": { "oneOf": [{ "$ref": "#/definitions/dateTime" }, { "type": "null" }] },
+                            "dated_by": { "description": "The monorepo this row's dates were read from, null when they are the package's own.", "oneOf": [{ "$ref": "#/definitions/packageName" }, { "type": "null" }] }
                         }
                     }
                 }

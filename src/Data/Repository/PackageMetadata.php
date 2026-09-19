@@ -29,6 +29,13 @@ final class PackageMetadata
      */
     public const SHARED_COMMIT_TAGS = 3;
 
+    /**
+     * The `replace` constraint a subtree split carries: the component's `vX.Y.Z` is the monorepo's
+     * own `vX.Y.Z`. Composer resolves it to an exact-version constraint and keeps the written form
+     * on the link, which is the form that can be told apart from a range.
+     */
+    private const SELF_VERSION = 'self.version';
+
     private string $name;
     private bool $abandoned;
     private ?string $replacement;
@@ -44,13 +51,27 @@ final class PackageMetadata
      * of `"1"`: the newest dated stable release (`version`, `at`) and the branch's highest stable
      * tag (`highest`: as Composer normalizes it, as the repository prints it, and when it was
      * released, null when the repository does not say). What {@see \Lockrot\Signal\Rule\LeftBehindRule}
-     * compares the installed branch against.
+     * compares the installed branch against. A branch this package could not date itself and its
+     * monorepo parent did ({@see datedBy()}) names the parent under `dated_by`.
      *
-     * @var array<array-key, array{version: string, at: ?\DateTimeImmutable, highest: array{normalized: string, pretty: string, at: ?\DateTimeImmutable}}>
+     * @var array<array-key, array{version: string, at: ?\DateTimeImmutable, highest: array{normalized: string, pretty: string, at: ?\DateTimeImmutable}, dated_by?: string}>
      */
     private array $latestStableByBranch;
+    /**
+     * Every package name a version of this one `replace`s at `self.version` — the split packages of
+     * a monorepo (`laravel/framework` names `illuminate/*`), empty for an ordinary package. The union
+     * over the versions seen: a component that left the monorepo is still one it once carried.
+     *
+     * @var list<string>
+     */
+    private array $replaces;
+    /** The monorepo parent whose dates `lastStableReleaseAt`/`lastStableVersion` come from, null when they are this package's own. */
+    private ?string $lastStableDatedBy;
 
-    /** @param array<array-key, array{version: string, at: ?\DateTimeImmutable, highest: array{normalized: string, pretty: string, at: ?\DateTimeImmutable}}> $latestStableByBranch */
+    /**
+     * @param array<array-key, array{version: string, at: ?\DateTimeImmutable, highest: array{normalized: string, pretty: string, at: ?\DateTimeImmutable}, dated_by?: string}> $latestStableByBranch
+     * @param list<string>                                                                                                                                                   $replaces
+     */
     public function __construct(
         string $name,
         bool $abandoned,
@@ -62,7 +83,9 @@ final class PackageMetadata
         ?string $repositoryUrl,
         string $type,
         \DateTimeImmutable $dataDate,
-        array $latestStableByBranch = []
+        array $latestStableByBranch = [],
+        array $replaces = [],
+        ?string $lastStableDatedBy = null
     ) {
         $this->name = $name;
         $this->abandoned = $abandoned;
@@ -75,6 +98,8 @@ final class PackageMetadata
         $this->type = $type;
         $this->dataDate = $dataDate;
         $this->latestStableByBranch = $latestStableByBranch;
+        $this->replaces = $replaces;
+        $this->lastStableDatedBy = $lastStableDatedBy;
     }
 
     /**
@@ -111,8 +136,18 @@ final class PackageMetadata
         $tagsOnCommit = [];
         $highestCommitByBranch = [];
         $highestCommit = null;
+        $replaces = [];
 
         foreach ($versions as $version) {
+            foreach ($version->getReplaces() as $link) {
+                // Only `self.version`: that is the subtree split's claim that the two tags are one
+                // release, which is what makes the parent's dates this package's. A replace with a
+                // range (`symplify/easy-coding-standard` replaces `symfony/polyfill-ctype` at `*`)
+                // says "do not install that one too" and says nothing about when either released.
+                if (self::SELF_VERSION === $link->getPrettyConstraint()) {
+                    $replaces[$link->getTarget()] = true;
+                }
+            }
             if (!$abandoned && $version instanceof CompletePackage && $version->isAbandoned()) {
                 $abandoned = true;
                 $replacement = $version->getReplacementPackage();
@@ -214,8 +249,114 @@ final class PackageMetadata
             $anchor !== null ? self::repositoryOf($anchor) : null,
             $type ?? 'library',
             $dataDate,
-            $byBranch
+            $byBranch,
+            array_keys($replaces)
         );
+    }
+
+    /**
+     * Whether the dates this package's findings read are missing in a way a monorepo parent could
+     * fill: the installed branch's highest tag is undated, or the package's own last release is
+     * ({@see fromPackages()} hands both over undated when the tag shares its commit with other
+     * stable tags, as a subtree split's do). Branches other than the installed one do not count —
+     * every split package has old branches with undated tags, and they decide nothing.
+     *
+     * @param ?string $installedBranch {@see ReleaseBranch::of()} of the installed version, null for a snapshot
+     */
+    public function needsParentDates(?string $installedBranch): bool
+    {
+        if ($this->hasStableRelease && $this->lastStableReleaseAt === null) {
+            return true;
+        }
+        if ($installedBranch === null) {
+            return false;
+        }
+        $own = $this->latestStableByBranch[$installedBranch] ?? null;
+
+        return $own !== null && $own['highest']['at'] === null;
+    }
+
+    /**
+     * This package's branches dated by its monorepo parent's. A split package's `vX.Y.Z` is the
+     * parent's `vX.Y.Z` (`replace: {child: self.version}`), and the parent's tag is dated by its own
+     * release where the split's is dated by a commit other tags share, or not at all. So every branch
+     * whose highest tag carries no date takes the parent's entry for the same branch — newest dated
+     * release, highest tag, dates — and is marked `dated_by`; the package's own last release follows
+     * when it was undated for the same reason and the parent dates the branch it is on. A branch the
+     * parent does not have, or leaves undated too, is left as it was; a package the parent does not
+     * replace is returned unchanged. Immutable: a new object, this one untouched.
+     */
+    public function datedBy(self $parent): self
+    {
+        if (!\in_array($this->name, $parent->replaces, true)) {
+            return $this;
+        }
+        $byBranch = $this->latestStableByBranch;
+        $parentBranches = $parent->latestStableByBranch();
+        $datedBranches = [];
+        foreach ($byBranch as $key => $entry) {
+            if ($entry['highest']['at'] !== null) {
+                continue;
+            }
+            $theirs = $parentBranches[$key] ?? null;
+            if ($theirs === null || $theirs['at'] === null || $theirs['highest']['at'] === null) {
+                continue;
+            }
+            $byBranch[$key] = ['version' => $theirs['version'], 'at' => $theirs['at'], 'highest' => $theirs['highest'], 'dated_by' => $parent->name];
+            $datedBranches[] = (string) $key;
+        }
+        if ($datedBranches === []) {
+            return $this;
+        }
+
+        // The package's own age is its highest branch's. That branch is in $datedBranches exactly
+        // when this package could not date its own highest tag — which is when fromPackages() left
+        // lastStableReleaseAt null — so asking whether the parent dated it is the whole question.
+        $lastStableReleaseAt = $this->lastStableReleaseAt;
+        $lastStableVersion = $this->lastStableVersion;
+        $lastStableDatedBy = $this->lastStableDatedBy;
+        $highestBranch = self::highestBranch($byBranch);
+        if (\in_array($highestBranch, $datedBranches, true)) {
+            $lastStableReleaseAt = $byBranch[$highestBranch]['at'];
+            $lastStableVersion = $byBranch[$highestBranch]['version'];
+            $lastStableDatedBy = $parent->name;
+        }
+
+        return new self(
+            $this->name,
+            $this->abandoned,
+            $this->replacement,
+            $this->hasStableRelease,
+            $lastStableReleaseAt,
+            $lastStableVersion,
+            $this->releaseCount,
+            $this->repositoryUrl,
+            $this->type,
+            $this->dataDate,
+            $byBranch,
+            $this->replaces,
+            $lastStableDatedBy
+        );
+    }
+
+    /**
+     * The branch the package's highest stable tag is on: the greatest key as versions go
+     * (`10` above `9`, `0.3` above `0.0.3`). A package with no branches answers `''`, which is no
+     * branch key — every key is a version — and so matches nothing the caller compares it against.
+     *
+     * @param array<array-key, mixed> $byBranch
+     */
+    private static function highestBranch(array $byBranch): string
+    {
+        $highest = '';
+        foreach (array_keys($byBranch) as $key) {
+            $key = (string) $key;
+            if (version_compare($key, $highest, '>')) {
+                $highest = $key;
+            }
+        }
+
+        return $highest;
     }
 
     /** The commit the release's `source` points at, null when the repository names none. */
@@ -299,13 +440,25 @@ final class PackageMetadata
         return $this->lastStableVersion;
     }
 
+    /** The monorepo parent `lastStableReleaseAt()` was read from ({@see datedBy()}), null when it is this package's own date. */
+    public function lastStableDatedBy(): ?string
+    {
+        return $this->lastStableDatedBy;
+    }
+
+    /** @return list<string> every package name a version of this one replaces; {@see $replaces} */
+    public function replaces(): array
+    {
+        return $this->replaces;
+    }
+
     /**
      * The newest dated stable release on every release branch (`version`, `at`) and the branch's
      * highest stable tag (`highest`: `normalized`, `pretty`, `at`), keyed by {@see ReleaseBranch} key
      * (an integer where PHP makes one of `"1"`); pre-releases do not count. A branch whose releases
      * carry no `time` at all shows its highest tag as its newest, with a null date.
      *
-     * @return array<array-key, array{version: string, at: ?\DateTimeImmutable, highest: array{normalized: string, pretty: string, at: ?\DateTimeImmutable}}>
+     * @return array<array-key, array{version: string, at: ?\DateTimeImmutable, highest: array{normalized: string, pretty: string, at: ?\DateTimeImmutable}, dated_by?: string}>
      */
     public function latestStableByBranch(): array
     {

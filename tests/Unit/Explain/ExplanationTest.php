@@ -85,7 +85,7 @@ final class ExplanationTest extends TestCase
         self::assertIsArray($meta);
         self::assertIsArray($meta['branches']);
         self::assertSame(
-            ['branch' => '10.x', 'installed' => true, 'highest' => '10.49.0', 'highest_released' => null, 'highest_commit_date' => '2023-06-05T12:46:42+00:00', 'newest_dated' => '10.49.0', 'newest_dated_released' => '2023-06-05T12:46:42+00:00'],
+            ['branch' => '10.x', 'installed' => true, 'highest' => '10.49.0', 'highest_released' => null, 'highest_commit_date' => '2023-06-05T12:46:42+00:00', 'newest_dated' => '10.49.0', 'newest_dated_released' => '2023-06-05T12:46:42+00:00', 'dated_by' => null],
             $meta['branches'][0]
         );
     }
@@ -120,12 +120,13 @@ final class ExplanationTest extends TestCase
             'has_stable_release' => true,
             'last_stable_release' => '2026-01-01T00:00:00+00:00',
             'last_stable_version' => '2.1.0',
+            'last_stable_dated_by' => null,
             'repository' => 'https://github.com/vendor/pkg.git',
             'type' => 'library',
             'data_date' => F::NOW,
             'branches' => [
-                ['branch' => '2.x', 'installed' => false, 'highest' => '2.1.0', 'highest_released' => '2026-01-01T00:00:00+00:00', 'highest_commit_date' => null, 'newest_dated' => '2.1.0', 'newest_dated_released' => '2026-01-01T00:00:00+00:00'],
-                ['branch' => '1.x', 'installed' => true, 'highest' => '1.5.0', 'highest_released' => '2021-06-01T00:00:00+00:00', 'highest_commit_date' => null, 'newest_dated' => '1.5.0', 'newest_dated_released' => '2021-06-01T00:00:00+00:00'],
+                ['branch' => '2.x', 'installed' => false, 'highest' => '2.1.0', 'highest_released' => '2026-01-01T00:00:00+00:00', 'highest_commit_date' => null, 'newest_dated' => '2.1.0', 'newest_dated_released' => '2026-01-01T00:00:00+00:00', 'dated_by' => null],
+                ['branch' => '1.x', 'installed' => true, 'highest' => '1.5.0', 'highest_released' => '2021-06-01T00:00:00+00:00', 'highest_commit_date' => null, 'newest_dated' => '1.5.0', 'newest_dated_released' => '2021-06-01T00:00:00+00:00', 'dated_by' => null],
             ],
         ], $array['metadata']);
         self::assertSame(['forge' => 'GitHub', 'repository' => 'vendor/pkg', 'archived' => false, 'pushed_at' => '2026-02-01T00:00:00+00:00', 'fetched_at' => F::NOW, 'from_cache' => false], $array['activity']);
@@ -146,5 +147,48 @@ final class ExplanationTest extends TestCase
         self::assertSame([], $explanation->branches());
         self::assertIsArray($array['lock']);
         self::assertFalse($array['lock']['from_composer_repository']);
+    }
+
+    /** A branch the monorepo parent dated ({@see PackageMetadata::datedBy()}) carries the parent on its row. */
+    public function testABranchDatedByTheMonorepoIsMarkedAndNamed(): void
+    {
+        $loader = new ArrayLoader();
+        $on = static fn (string $name, string $version, string $commit, string $time, array $replace = []): array => array_filter(['name' => $name, 'version' => $version, 'time' => $time, 'source' => ['type' => 'git', 'url' => 'https://github.com/'.$name.'.git', 'reference' => $commit], 'replace' => $replace]);
+        $child = PackageMetadata::fromPackages('illuminate/contracts', [
+            $loader->load($on('illuminate/contracts', 'v10.49.0', 'split', '2023-06-05T12:46:42+00:00')),
+            $loader->load($on('illuminate/contracts', 'v10.20.0', 'split', '2023-06-05T12:46:42+00:00')),
+            $loader->load($on('illuminate/contracts', 'v10.13.1', 'split', '2023-06-05T12:46:42+00:00')),
+            $loader->load($on('illuminate/contracts', 'v9.52.0', 'own', '2023-01-01T00:00:00+00:00')),
+        ], new \DateTimeImmutable(F::NOW));
+        $parent = PackageMetadata::fromPackages('laravel/framework', [
+            $loader->load($on('laravel/framework', 'v10.50.3', 'f10', '2026-08-12T03:46:26+00:00', ['illuminate/contracts' => 'self.version'])),
+            $loader->load($on('laravel/framework', 'v9.52.22', 'f9', '2026-08-12T03:46:05+00:00')),
+        ], new \DateTimeImmutable(F::NOW));
+        $explanation = new Explanation($this->finding('v10.48.28', Verdict::OK), F::facts(F::package(['name' => 'illuminate/contracts', 'version' => 'v10.48.28']), $child->datedBy($parent)), new Thresholds(), '8.4', $this->report());
+
+        [$ten, $nine] = $explanation->branches();
+
+        self::assertSame('laravel/framework', $ten['dated_by']);
+        self::assertEquals(new \DateTimeImmutable('2026-08-12T03:46:26+00:00'), $ten['highest_released']);
+        self::assertNull($ten['highest_commit_date']);
+        self::assertSame('v10.50.3', $ten['highest']);
+        self::assertNull($nine['dated_by'], 'a branch the package dated itself');
+        self::assertFalse($explanation->installedBranchIsUndated());
+        self::assertSame(['laravel/framework', ['10.x']], $explanation->branchesDatedBy());
+        $meta = $explanation->toArray()['metadata'];
+        self::assertIsArray($meta);
+        self::assertSame('laravel/framework', $meta['last_stable_dated_by']);
+        self::assertIsArray($meta['branches']);
+        self::assertSame(
+            ['branch' => '10.x', 'installed' => true, 'highest' => 'v10.50.3', 'highest_released' => '2026-08-12T03:46:26+00:00', 'highest_commit_date' => null, 'newest_dated' => 'v10.50.3', 'newest_dated_released' => '2026-08-12T03:46:26+00:00', 'dated_by' => 'laravel/framework'],
+            $meta['branches'][0]
+        );
+    }
+
+    public function testNoBranchDatedByAParentIsNull(): void
+    {
+        $explanation = new Explanation($this->finding('1.0.0', Verdict::OK), F::facts(F::package(), F::metadata([['1.0.0', '2026-01-01T00:00:00+00:00']])), new Thresholds(), '8.4', $this->report());
+
+        self::assertNull($explanation->branchesDatedBy());
     }
 }

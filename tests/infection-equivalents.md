@@ -266,3 +266,21 @@ slow test. They are listed here only so nobody reads them as an unexplained "2 t
   in `Analyzer::analyzeWithFacts()`, so one is null exactly when the other is; and the lock lookup
   two lines up already rejects every name the run does not analyse, so the branch never runs. The
   check is for the types.
+
+## JSON schemas and monorepo-dated branches (2026-09-20)
+
+- `src/Analyzer/Analyzer.php:228` ReturnRemoval — `dateSplitPackages()` returns early when no
+  package needs dates. Without the return the method runs on: `missingCandidates()` intersects
+  every parent's list with an empty children list and returns nothing, no request is made, and
+  `date([])` hands the batch back untouched. The guard states the common case, it does not decide it.
+- `src/Data/Repository/MonorepoParents.php:114` ReturnRemoval — the same guard one level down, with
+  the same argument: `array_intersect($replaces, [])` is empty for every parent, so the loop below
+  selects nothing and the method returns `[]` either way.
+- `src/Data/Repository/PackageMetadata.php:148` TrueValue — `$replaces[$link->getTarget()] = true`
+  is set membership read only through `array_keys()`; the value is never looked at, so `false`
+  builds the same list. The same shape as `ActivityClient.php:80` above.
+- `src/Data/Repository/PackageMetadata.php:272` ReturnRemoval — `needsParentDates()` returns false
+  for a branch snapshot, which has no branch. Without the return the lookup runs with a null key,
+  PHP reads it as `''`, no branch is keyed by the empty string, and the method returns false on the
+  next line. The early return is the statement of intent.
+

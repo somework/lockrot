@@ -1,0 +1,42 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "0000000000000000000000000000000000000000",
+    "packages": [
+        {
+            "name": "illuminate/contracts",
+            "version": "v8.83.27",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/illuminate/contracts.git",
+                "reference": "5e0fd287a1b22a6b346a9f7cd484d8f6b0e4b3e9"
+            },
+            "require": {
+                "php": "^7.3|^8.0",
+                "psr/container": "^1.0",
+                "psr/simple-cache": "^1.0"
+            },
+            "type": "library",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "The Illuminate Contracts package.",
+            "time": "2022-01-13T14:47:47+00:00"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": [],
+    "prefer-stable": true,
+    "prefer-lowest": false,
+    "platform": {
+        "php": "^7.4 || ^8.0"
+    },
+    "platform-dev": [],
+    "plugin-api-version": "2.6.0"
+}

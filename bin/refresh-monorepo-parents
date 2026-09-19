@@ -1,0 +1,63 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+// Refreshes resources/monorepo-parents.json from the listed monorepos' own `replace: self.version`
+// entries. Usage: bin/refresh-monorepo-parents [parent ...] — with no arguments the parents already
+// in the file are refreshed; a parent named on the command line is added.
+//
+// The lists only decide whether a lock is worth one request for that parent; what a parent dates is
+// its live `replace` list, read at analysis time. See Lockrot\Data\Repository\MonorepoParents.
+require __DIR__.'/../vendor/autoload.php';
+
+use Composer\Factory;
+use Composer\IO\NullIO;
+use Composer\Package\BasePackage;
+use Composer\Repository\ComposerRepository;
+use Lockrot\Json\JsonReader;
+
+$path = __DIR__.'/../resources/monorepo-parents.json';
+$document = JsonReader::readObject($path);
+$existing = \is_array($document['parents'] ?? null) ? $document['parents'] : [];
+$parents = array_values(array_unique(array_merge(array_keys($existing), \array_slice($argv, 1))));
+sort($parents);
+
+$io = new NullIO();
+$composer = Factory::create($io, [], true);
+$repositories = $composer->getRepositoryManager()->getRepositories();
+
+$replaces = [];
+foreach ($parents as $parent) {
+    $names = [];
+    foreach ($repositories as $repository) {
+        if (!$repository instanceof ComposerRepository) {
+            continue;
+        }
+        $result = $repository->loadPackages([$parent => null], ['stable' => BasePackage::STABILITY_STABLE], []);
+        foreach ($result['packages'] as $version) {
+            if ($version->getName() !== $parent) {
+                continue;
+            }
+            foreach ($version->getReplaces() as $link) {
+                if ($link->getPrettyConstraint() === 'self.version') {
+                    $names[$link->getTarget()] = true;
+                }
+            }
+        }
+        if ($names !== []) {
+            break;
+        }
+    }
+    if ($names === []) {
+        fwrite(STDERR, "no replace: self.version entries for {$parent}\n");
+        exit(1);
+    }
+    $names = array_keys($names);
+    sort($names);
+    $replaces[$parent] = $names;
+    fwrite(STDERR, \sprintf("%s replaces %d packages\n", $parent, \count($names)));
+}
+
+$document['parents'] = $replaces;
+file_put_contents($path, json_encode($document, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE)."\n");
+fwrite(STDERR, "written to resources/monorepo-parents.json\n");

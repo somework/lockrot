@@ -205,6 +205,56 @@ final class ExplainFormatterTest extends TestCase
         self::assertSame('ok', $json['finding']['verdict']);
         self::assertIsArray($json['metadata']);
         self::assertIsArray($json['metadata']['branches']);
-        self::assertSame([['branch' => '1.x', 'installed' => true, 'highest' => '1.0.0', 'highest_released' => '2026-01-01T00:00:00+00:00', 'highest_commit_date' => null, 'newest_dated' => '1.0.0', 'newest_dated_released' => '2026-01-01T00:00:00+00:00']], $json['metadata']['branches']);
+        self::assertSame([['branch' => '1.x', 'installed' => true, 'highest' => '1.0.0', 'highest_released' => '2026-01-01T00:00:00+00:00', 'highest_commit_date' => null, 'newest_dated' => '1.0.0', 'newest_dated_released' => '2026-01-01T00:00:00+00:00', 'dated_by' => null]], $json['metadata']['branches']);
+    }
+
+    /** A split package dated by its monorepo: the rows read the parent's dates, and a footnote says whose they are. */
+    public function testASplitPackageDatedByItsMonorepoSaysSo(): void
+    {
+        $finding = new Finding('illuminate/contracts', 'v10.48.28', Verdict::OK, [], ['illuminate/contracts'], null, new \DateTimeImmutable(F::NOW));
+        $loader = new ArrayLoader();
+        $on = static fn (string $name, string $version, string $commit, string $time, array $replace = []): array => array_filter(['name' => $name, 'version' => $version, 'time' => $time, 'source' => ['type' => 'git', 'url' => 'https://github.com/'.$name.'.git', 'reference' => $commit], 'replace' => $replace]);
+        $child = PackageMetadata::fromPackages('illuminate/contracts', [
+            $loader->load($on('illuminate/contracts', 'v10.49.0', 'split-10', '2023-06-05T12:46:42+00:00')),
+            $loader->load($on('illuminate/contracts', 'v10.20.0', 'split-10', '2023-06-05T12:46:42+00:00')),
+            $loader->load($on('illuminate/contracts', 'v10.13.1', 'split-10', '2023-06-05T12:46:42+00:00')),
+            $loader->load($on('illuminate/contracts', 'v9.52.0', 'split-9', '2023-01-01T00:00:00+00:00')),
+            $loader->load($on('illuminate/contracts', 'v9.51.0', 'split-9', '2023-01-01T00:00:00+00:00')),
+            $loader->load($on('illuminate/contracts', 'v9.50.0', 'split-9', '2023-01-01T00:00:00+00:00')),
+            $loader->load($on('illuminate/contracts', 'v8.83.27', 'own-8', '2022-01-13T14:47:47+00:00')),
+        ], new \DateTimeImmutable(F::NOW));
+        $parent = PackageMetadata::fromPackages('laravel/framework', [
+            $loader->load($on('laravel/framework', 'v10.50.3', 'f10', '2026-08-12T03:46:26+00:00', ['illuminate/contracts' => 'self.version'])),
+            $loader->load($on('laravel/framework', 'v9.52.22', 'f9', '2026-08-12T03:46:05+00:00')),
+        ], new \DateTimeImmutable(F::NOW));
+        $explanation = new Explanation($finding, F::facts(F::package(['name' => 'illuminate/contracts', 'version' => 'v10.48.28', 'source' => 'https://github.com/illuminate/contracts.git']), $child->datedBy($parent)), new Thresholds(), '8.4', $this->report());
+
+        $expected = <<<'TEXT'
+            illuminate/contracts v10.48.28 — ok, priority none
+              direct requirement
+
+            signals: none
+
+            composer.lock
+              version v10.48.28 · no php constraint · undated · from a Composer repository
+              source https://github.com/illuminate/contracts.git
+
+            repository metadata (as of 2026-09-14)
+              7 versions listed · library · not abandoned
+              source https://github.com/illuminate/contracts.git
+              last stable release v10.50.3 (2026-08-12, dated by laravel/framework)
+                branch     highest tag        released           newest dated release
+              * 10.x       v10.50.3           2026-08-12         v10.50.3 (2026-08-12)
+                9.x        v9.52.22           2026-08-12         v9.52.22 (2026-08-12)
+                8.x        v8.83.27           2022-01-13         v8.83.27 (2022-01-13)
+              branches 10.x, 9.x dated by laravel/framework, the monorepo this package is split out of: its own tags there are dated by a commit other tags share, the monorepo's by their release
+
+            repository activity
+              not fetched — S3 and S4 have nothing to read; the run's notes below say why when a cap or a failure is the cause
+
+            thresholds: release-warn-years 3 · release-high-years 5 · push-warn-years 3 · push-high-years 5 · target PHP 8.4
+
+            TEXT;
+        self::assertSame($expected, $this->plain($explanation));
     }
 }

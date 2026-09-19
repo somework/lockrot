@@ -20,6 +20,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   formatters write, and the JSON samples in the docs, against the files, with a strict copy that
   rejects undeclared fields. See [schema.md](docs/schema.md).
 
+- A split package's release branches are dated by the monorepo they are cut from. Since 0.8.0 a tag
+  sharing its commit with two others is read as undated, which stopped the false `left-behind` on
+  `illuminate/macroable` but also stopped measuring a branch that really did end. The monorepo's own
+  tag for the same version carries the release date, and `replace: {illuminate/contracts:
+  self.version}` says the two are one release, so where a branch of the split package has no date
+  the branch of the same name in its parent supplies one. A lock on `illuminate/contracts v5.8.36`
+  reported nothing in 0.8.0 and now reads `branch 5.x last released 2020-08-18 (6.1 years ago,
+  dated by laravel/framework); 12.x released v12.69.2`, and every other Laravel component on a
+  branch of its own is measured again rather than skipped. Laravel's late security tags on 6.x, 7.x
+  and 8.x are recent enough that those branches read as current under the default thresholds; being
+  measured is the difference, not the verdict. The parent is taken from the lock
+  when it is there; otherwise it is loaded from the configured repositories, one request, and only
+  when `resources/monorepo-parents.json` lists that monorepo as carrying a package this lock needs
+  dates for — `laravel/framework`, `symfony/symfony` and `cakephp/cakephp` with the components each
+  replaces, refreshed by `bin/refresh-monorepo-parents`. A lock without such a package fetches
+  nothing, and neither does one whose undated packages belong to no listed monorepo, which is the
+  common case: `symfony/polyfill-*` is cut by a repository no Packagist package replaces. An
+  install-time run that has used up its budget skips the request and the branch stays as it was.
+  What a parent dates is its live `replace` list, never the snapshot. `--format=json` carries the
+  parent as `dated_by` on S8 and S2, and `--explain` marks the branch rows it supplied.
+
 ## [0.8.0] - 2026-09-20
 
 ### Added

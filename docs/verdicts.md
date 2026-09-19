@@ -115,6 +115,34 @@ most and a branch that really stopped stays measurable. The same reading
 applies to the package's own age (S2): with its highest tag undated or shared, the age is unknown
 and S2 stays quiet. A highest tag with a date and a commit of its own is read as it stands.
 
+### Dates from the monorepo
+
+A split package's dates are missing for one reason: its tags are cut by a monorepo, and the
+monorepo's own tag for the same version is dated by the release that carried it. `laravel/framework`
+declares `replace: {illuminate/contracts: self.version}` — the two `v8.83.27` are one release — so
+where a branch of `illuminate/contracts` carries no date of its own, the branch of the same name in
+`laravel/framework` supplies it, and the finding says whose date it is:
+
+```text
+  left-behind  illuminate/contracts v5.8.36  direct
+               branch 5.x last released 2020-08-18 (6.1 years ago, dated by laravel/framework);
+               12.x released v12.69.2 (2026-09-08); require ^12.69 to follow
+```
+
+The parent is found in the lock first — a Laravel application already has `laravel/framework`, and
+nothing extra is fetched. Otherwise lockrot asks the configured repositories for it, one request,
+and only for a monorepo that
+[`resources/monorepo-parents.json`](https://github.com/somework/lockrot/blob/main/resources/monorepo-parents.json)
+lists as carrying a package this lock needs dates for. That file holds `laravel/framework`,
+`symfony/symfony` and `cakephp/cakephp` with the components each was last seen to replace, and it
+decides only what is worth fetching: what a parent dates is its live `replace` list. So
+`symfony/polyfill-ctype`, whose own tags are cut the same way by a repository no Packagist package
+replaces, costs nothing — it is in almost every lock, and nothing can date it.
+
+A branch the parent does not have, or does not date either, stays unmeasured as before; so does
+every branch during an install-time run that has used up its budget. The signal carries the parent
+as `dated_by` in `--format=json`, and `--explain` marks the rows it supplied.
+
 ## Security advisories
 
 `composer audit` reports the vulnerability. lockrot carries the same advisories on the finding, as

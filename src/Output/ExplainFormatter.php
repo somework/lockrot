@@ -231,7 +231,9 @@ final class ExplainFormatter
         }
         $at = $metadata->lastStableReleaseAt();
         if ($at !== null) {
-            return \sprintf('last stable release %s (%s)', (string) $metadata->lastStableVersion(), $at->format('Y-m-d'));
+            $datedBy = $metadata->lastStableDatedBy();
+
+            return \sprintf('last stable release %s (%s%s)', (string) $metadata->lastStableVersion(), $at->format('Y-m-d'), $datedBy === null ? '' : ', dated by '.$datedBy);
         }
         $highest = '';
         foreach ($explanation->branches() as $row) {
@@ -266,6 +268,11 @@ final class ExplainFormatter
         }
         if ($explanation->installedBranchIsUndated()) {
             $lines[] = '* the installed branch\'s highest tag has no release date — the repository leaves it undated, or dates it only by a commit other tags share (`commit …`: a subtree split, the day the directory last changed) — so S8 does not measure the branch';
+        }
+        $datedBy = $explanation->branchesDatedBy();
+        if ($datedBy !== null) {
+            [$parent, $branches] = $datedBy;
+            $lines[] = \sprintf('%s %s dated by %s, the monorepo this package is split out of: its own tags there are dated by a commit other tags share, the monorepo\'s by their release', \count($branches) === 1 ? 'branch' : 'branches', implode(', ', $branches), $parent);
         }
 
         return $lines;

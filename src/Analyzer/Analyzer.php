@@ -18,6 +18,7 @@ use Lockrot\Data\Forge\RepoRef;
 use Lockrot\Data\Forge\RepositoryActivity;
 use Lockrot\Data\Repository\MetadataBatch;
 use Lockrot\Data\Repository\MetadataLoaderInterface;
+use Lockrot\Data\Repository\MonorepoParents;
 use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Deadline;
 use Lockrot\Graph\DependencyGraph;
@@ -56,8 +57,9 @@ final class Analyzer
     private Deadline $deadline;
     /** Null when the run has no advisory source at all; then nothing is asked and nothing is noted. */
     private ?AdvisoryLoaderInterface $advisories;
+    private MonorepoParents $parents;
 
-    public function __construct(MetadataLoaderInterface $metadata, ActivityClient $activity, ActivityFetchPlanner $planner, RepoLocator $locator, Allowlist $allowlist, SignalSet $signals, VerdictEngine $engine, Clock $clock, bool $offline, ?AdvisoryLoaderInterface $advisories = null)
+    public function __construct(MetadataLoaderInterface $metadata, ActivityClient $activity, ActivityFetchPlanner $planner, RepoLocator $locator, Allowlist $allowlist, SignalSet $signals, VerdictEngine $engine, Clock $clock, bool $offline, ?AdvisoryLoaderInterface $advisories = null, ?MonorepoParents $parents = null)
     {
         $this->metadata = $metadata;
         $this->activity = $activity;
@@ -69,6 +71,7 @@ final class Analyzer
         $this->clock = $clock;
         $this->offline = $offline;
         $this->advisories = $advisories;
+        $this->parents = $parents ?? MonorepoParents::load();
         // Only the install-time path sets a budget; `composer lockrot` runs unbounded.
         $this->deadline = Deadline::never();
     }
@@ -133,10 +136,13 @@ final class Analyzer
         }
 
         $batch = $this->fetchMetadata($packages);
-        $metadata = $batch->metadata();
         $metadataFailed = $batch->failed();
         if ($metadataFailed !== []) {
             $notes[] = $this->metadataUnavailableNote($metadataFailed);
+        }
+        [$metadata, $parentsFailed] = $this->dateSplitPackages($packages, $batch->metadata());
+        foreach ($parentsFailed as $parent => $reason) {
+            $notes[] = \sprintf('Repository metadata unavailable for %s, which dates the packages split out of it: %s', $parent, $reason);
         }
 
         $advisories = $this->fetchAdvisories($packages);
@@ -175,7 +181,7 @@ final class Analyzer
         $notes = array_merge($notes, $this->notInRepositoryNotes($notInRepository));
         $findings = TransitiveExposure::attach($findings, $graph);
 
-        $hadNetworkFailures = $batch->failed() !== [] || $activityBatch->failed() !== [] || $advisories->hadNetworkFailure();
+        $hadNetworkFailures = $metadataFailed !== [] || $parentsFailed !== [] || $activityBatch->failed() !== [] || $advisories->hadNetworkFailure();
 
         return new Analysis(
             new Report($findings, $notes, $now, \count($packages), $notInRepository, $hadNetworkFailures, null, self::oldestCachedActivity($activity), $includeDev),
@@ -199,6 +205,41 @@ final class Analyzer
         }
 
         return $cachedAt === [] ? null : min($cachedAt);
+    }
+
+    /**
+     * The batch with every split package's branches dated by its monorepo parent
+     * ({@see MonorepoParents}). A parent not in the batch is loaded from the same repositories —
+     * one request, skipped under an exhausted install-time budget like the forge round-trips are,
+     * and dropped silently when the budget runs out mid-way: the branch stays undated, as it was.
+     * A parent the repositories do not list is no failure (a mirror without laravel/framework is
+     * a mirror); one they could not deliver is returned as a note and a network failure, since the
+     * report would otherwise read as measured where it is not.
+     *
+     * @param list<LockedPackage>            $packages
+     * @param array<string, PackageMetadata> $metadata
+     *
+     * @return array{0: array<string, PackageMetadata>, 1: array<string, string>} the metadata, and the parents that failed to load with the reason
+     */
+    private function dateSplitPackages(array $packages, array $metadata): array
+    {
+        $children = $this->parents->children($packages, $metadata);
+        if ($children === []) {
+            return [$metadata, []];
+        }
+        $failed = [];
+        $missing = $this->parents->missingCandidates($children, $metadata);
+        if ($missing !== [] && !$this->deadline->isPast()) {
+            $batch = $this->metadata->load($missing);
+            $metadata += $batch->metadata();
+            foreach ($batch->failed() as $name => $reason) {
+                if ($reason !== MetadataLoaderInterface::BUDGET_REASON) {
+                    $failed[$name] = $reason;
+                }
+            }
+        }
+
+        return [$this->parents->date($children, $metadata), $failed];
     }
 
     /** @param list<LockedPackage> $packages */

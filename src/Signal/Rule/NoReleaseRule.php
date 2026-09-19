@@ -37,8 +37,10 @@ final class NoReleaseRule implements SignalRule
             return null;
         }
 
-        return new Signal(Signal::S2, $level, \sprintf('last release %s (%.1f years ago)', $last->format('Y-m-d'), $years), [
-            'last_release' => $last->format(\DATE_ATOM), 'last_version' => $metadata->lastStableVersion(), 'years' => round($years, 1),
+        $datedBy = $metadata->lastStableDatedBy();
+
+        return new Signal(Signal::S2, $level, \sprintf('last release %s (%.1f years ago%s)', $last->format('Y-m-d'), $years, $datedBy === null ? '' : ', dated by '.$datedBy), [
+            'last_release' => $last->format(\DATE_ATOM), 'last_version' => $metadata->lastStableVersion(), 'years' => round($years, 1), 'dated_by' => $datedBy,
         ]);
     }
 }

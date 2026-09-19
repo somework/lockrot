@@ -39,6 +39,7 @@ final class LeftBehindRuleTest extends TestCase
             'newest_version' => '3.4.1',
             'newest_release' => '2026-06-01T00:00:00+00:00',
             'suggested_constraint' => '^3.4',
+            'dated_by' => null,
         ], $signal->data());
     }
 
@@ -297,5 +298,28 @@ final class LeftBehindRuleTest extends TestCase
         self::assertSame('8.x', $major->data()['newest_branch']);
         self::assertNotNull($minor);
         self::assertSame('^0.4.3', $minor->data()['suggested_constraint']);
+    }
+
+    /** A branch the monorepo parent dated ({@see PackageMetadata::datedBy()}) says so in the summary and the data. */
+    public function testABranchDatedByTheMonorepoNamesIt(): void
+    {
+        /** @return array{version: string, at: \DateTimeImmutable, highest: array{normalized: string, pretty: string, at: \DateTimeImmutable}, dated_by?: string} */
+        $branch = static function (string $version, string $at, ?string $datedBy): array {
+            $row = ['version' => $version, 'at' => new \DateTimeImmutable($at), 'highest' => ['normalized' => $version.'.0', 'pretty' => 'v'.$version, 'at' => new \DateTimeImmutable($at)]];
+
+            return $datedBy === null ? $row : $row + ['dated_by' => $datedBy];
+        };
+        $meta = new PackageMetadata('illuminate/contracts', false, null, true, new \DateTimeImmutable('2026-09-01'), 'v13.24.0', 2, null, 'library', new \DateTimeImmutable(F::NOW), [
+            '13' => $branch('13.24.0', '2026-09-01T00:00:00+00:00', 'laravel/framework'),
+            '8' => $branch('8.83.29', '2021-11-20T15:55:41+00:00', 'laravel/framework'),
+        ], [], 'laravel/framework');
+
+        $signal = $this->rule()->evaluate(F::facts(F::package(['name' => 'illuminate/contracts', 'version' => 'v8.83.27']), $meta));
+
+        self::assertNotNull($signal);
+        self::assertSame(Signal::LEVEL_WARN, $signal->level());
+        self::assertSame('branch 8.x last released 2021-11-20 (4.8 years ago, dated by laravel/framework); 13.x released 13.24.0 (2026-09-01)', $signal->summary());
+        self::assertSame('laravel/framework', $signal->data()['dated_by']);
+        self::assertSame('^13.24', $signal->data()['suggested_constraint']);
     }
 }
