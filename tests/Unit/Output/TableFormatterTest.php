@@ -51,7 +51,7 @@ final class TableFormatterTest extends TestCase
         $advisories = array_fill(0, 3, ['id' => 'x']);
         $report = new Report([
             new Finding('vendor/ok', '1.0.0', Verdict::OK, [new Signal('S9', 'warn', '3 security advisories affect 1.0.0 (a, b, c)', ['advisories' => $advisories])], ['vendor/ok'], null, $at),
-        ], [], $at, 1, 0, false);
+        ], [], $at, 1, 0, false, null, null, true);
 
         $at74 = $this->plainLines($this->formatter(74)->format($report));
         self::assertContains('3 security advisories on 1 package the report does not flag; see', $at74);

@@ -163,7 +163,7 @@ final class Analyzer
 
         $hadNetworkFailures = $batch->failed() !== [] || $activityBatch->failed() !== [] || $advisories->hadNetworkFailure();
 
-        return new Report($findings, $notes, $now, \count($packages), $notInRepository, $hadNetworkFailures, null, self::oldestCachedActivity($activity));
+        return new Report($findings, $notes, $now, \count($packages), $notInRepository, $hadNetworkFailures, null, self::oldestCachedActivity($activity), $includeDev);
     }
 
     /**

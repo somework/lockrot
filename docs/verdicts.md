@@ -162,7 +162,9 @@ packages the report does not flag stay off the rows (they are audit's findings),
 counts them — `53 security advisories on 17 packages the report does not flag; see composer audit`
 — so a clean-looking report does not read as a clean audit. The count covers the packages the
 run checked: without `--dev` that is the production set, which `composer audit --no-dev` also
-reports on, where plain `composer audit` counts development packages too. An advisory the project
+reports on, where plain `composer audit` counts development packages too — so the line then adds
+`(it counts packages-dev too, which this run skipped; pass --dev to include them)`, and
+`--format=json` records the scope as `include_dev`. An advisory the project
 has accepted is silenced where `composer audit` silences it, not in lockrot's own configuration: `config.policy.advisories` (`ignore-id`, `ignore`,
 `ignore-severity`) on Composer 2.10 and later, `config.audit.ignore` and `audit.ignore-severity`
 before. What audit drops, lockrot drops. A policy section Composer itself rejects — a key reserved

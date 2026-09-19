@@ -32,12 +32,18 @@ final class Report
      * revalidated on every run, so this is the one source whose age the report has to state.
      */
     private ?\DateTimeImmutable $activityCacheOldestAt;
+    /**
+     * Whether `packages-dev` was part of the run (`--dev`, `include-dev`). The footer says so where
+     * it points at `composer audit`, which counts development packages by default: the two totals
+     * differ on most projects, and a reader comparing them should be told why by the report itself.
+     */
+    private bool $includesDev;
 
     /**
      * @param list<Finding> $findings
      * @param list<string> $notes
      */
-    public function __construct(array $findings, array $notes, \DateTimeImmutable $generatedAt, int $packagesChecked, int $notFromComposerRepository, bool $hadNetworkFailures, ?BaselineComparison $baseline = null, ?\DateTimeImmutable $activityCacheOldestAt = null)
+    public function __construct(array $findings, array $notes, \DateTimeImmutable $generatedAt, int $packagesChecked, int $notFromComposerRepository, bool $hadNetworkFailures, ?BaselineComparison $baseline = null, ?\DateTimeImmutable $activityCacheOldestAt = null, bool $includesDev = false)
     {
         usort($findings, [self::class, 'compare']);
         $this->findings = $findings;
@@ -48,6 +54,7 @@ final class Report
         $this->hadNetworkFailures = $hadNetworkFailures;
         $this->baseline = $baseline;
         $this->activityCacheOldestAt = $activityCacheOldestAt;
+        $this->includesDev = $includesDev;
     }
 
     /**
@@ -76,7 +83,8 @@ final class Report
             $this->notFromComposerRepository,
             $this->hadNetworkFailures,
             $baseline,
-            $this->activityCacheOldestAt
+            $this->activityCacheOldestAt,
+            $this->includesDev
         );
     }
 
@@ -178,6 +186,10 @@ final class Report
      * advisories S9 fetched for `ok` and `finished` packages, which no row prints without `--all`.
      * They are audit's findings, not lockrot's, but a footer that totals every verdict and says
      * nothing about them reads as "nothing to report"; the empty string when there are none.
+     *
+     * Without `--dev` the line adds that `composer audit` counts `packages-dev` too and this run did
+     * not: plain `composer audit` on the same project usually prints a bigger number, and the
+     * difference should read as the scope it is, not as one of the two tools missing something.
      */
     public function unflaggedAdvisoriesLine(): string
     {
@@ -199,12 +211,19 @@ final class Report
         }
 
         return \sprintf(
-            '%d security %s on %d %s the report does not flag; see composer audit',
+            '%d security %s on %d %s the report does not flag; see composer audit%s',
             $advisories,
             $advisories === 1 ? 'advisory' : 'advisories',
             $packages,
-            $packages === 1 ? 'package' : 'packages'
+            $packages === 1 ? 'package' : 'packages',
+            $this->includesDev ? '' : ' (it counts packages-dev too, which this run skipped; pass --dev to include them)'
         );
+    }
+
+    /** Whether `packages-dev` was analysed alongside the production set. */
+    public function includesDev(): bool
+    {
+        return $this->includesDev;
     }
 
     /** @return list<string> */
@@ -301,6 +320,7 @@ final class Report
             'generated_at' => $this->generatedAt->format(\DATE_ATOM),
             'activity_cache_oldest_at' => $this->activityCacheOldestAt === null ? null : $this->activityCacheOldestAt->format(\DATE_ATOM),
             'packages_checked' => $this->packagesChecked,
+            'include_dev' => $this->includesDev,
             'not_from_composer_repository' => $this->notFromComposerRepository,
             'network_failures' => $this->hadNetworkFailures,
             'counts' => $this->byVerdict(),

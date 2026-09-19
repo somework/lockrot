@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- The footer's advisory line says why `composer audit` counts more. Without `--dev` it now reads
+  `… the report does not flag; see composer audit (it counts packages-dev too, which this run
+  skipped; pass --dev to include them)`: plain `composer audit` totals `packages-dev` and a plain
+  lockrot run does not, and the difference should read as the scope it is. `--format=json` records
+  the scope as `include_dev`.
+
 ## [0.7.0] - 2026-09-19
 
 ### Added

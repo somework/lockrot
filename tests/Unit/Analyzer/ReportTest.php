@@ -223,7 +223,7 @@ final class ReportTest extends TestCase
         );
         $array = $report->toArray();
         self::assertSame(
-            ['generated_at', 'activity_cache_oldest_at', 'packages_checked', 'not_from_composer_repository', 'network_failures', 'counts', 'priorities', 'exposure', 'baseline', 'notes', 'findings'],
+            ['generated_at', 'activity_cache_oldest_at', 'packages_checked', 'include_dev', 'not_from_composer_repository', 'network_failures', 'counts', 'priorities', 'exposure', 'baseline', 'notes', 'findings'],
             array_keys($array)
         );
         self::assertIsArray($array['priorities']);
@@ -309,15 +309,38 @@ final class ReportTest extends TestCase
             new Finding('vendor/done', '1.0.0', Verdict::FINISHED, [$s9(4)], ['vendor/done'], 'interfaces', $at),
             new Finding('vendor/gone', '1.0.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'abandoned'), $s9(2)], ['vendor/gone'], null, $at),
             new Finding('vendor/clean', '1.0.0', Verdict::OK, [], ['vendor/clean'], null, $at),
-        ], [], $at, 4, 0, false);
+        ], [], $at, 4, 0, false, null, null, true);
 
         self::assertSame('16 security advisories on 2 packages the report does not flag; see composer audit', $report->unflaggedAdvisoriesLine());
+    }
+
+    /**
+     * `composer audit` counts `packages-dev` by default and a run without `--dev` does not, so the
+     * two totals differ on most projects; the line says why before a reader has to ask.
+     */
+    public function testWithoutDevTheFooterSaysWhyAuditCountsMore(): void
+    {
+        $at = new \DateTimeImmutable('2026-09-14T00:00:00+00:00');
+        $finding = new Finding('vendor/ok', '1.0.0', Verdict::OK, [new Signal('S9', 'warn', '2 security advisories affect x', ['advisories' => [['id' => 'x'], ['id' => 'y']]])], ['vendor/ok'], null, $at);
+        $withoutDev = new Report([$finding], [], $at, 1, 0, false);
+        $withDev = new Report([$finding], [], $at, 1, 0, false, null, null, true);
+
+        self::assertFalse($withoutDev->includesDev());
+        self::assertSame(
+            '2 security advisories on 1 package the report does not flag; see composer audit (it counts packages-dev too, which this run skipped; pass --dev to include them)',
+            $withoutDev->unflaggedAdvisoriesLine()
+        );
+        self::assertFalse($withoutDev->toArray()['include_dev']);
+        self::assertTrue($withDev->includesDev());
+        self::assertTrue($withDev->toArray()['include_dev']);
+        $comparison = BaselineComparison::compare(Baseline::of([], '2026-09-14T00:00:00+00:00'), $withDev, 'lockrot-baseline.json', ['vendor/ok']);
+        self::assertTrue($withDev->withBaseline($comparison)->includesDev(), 'the baseline view keeps the scope');
     }
 
     public function testUnflaggedAdvisoriesLineIsSingularAndEmptyWhenNoneAreThere(): void
     {
         $at = new \DateTimeImmutable('2026-09-14T00:00:00+00:00');
-        $one = new Report([new Finding('vendor/ok', '1.0.0', Verdict::OK, [new Signal('S9', 'warn', '1 security advisory affects x', ['advisories' => [['id' => 'x']]])], ['vendor/ok'], null, $at)], [], $at, 1, 0, false);
+        $one = new Report([new Finding('vendor/ok', '1.0.0', Verdict::OK, [new Signal('S9', 'warn', '1 security advisory affects x', ['advisories' => [['id' => 'x']]])], ['vendor/ok'], null, $at)], [], $at, 1, 0, false, null, null, true);
         $none = new Report([new Finding('vendor/gone', '1.0.0', Verdict::ABANDONED, [new Signal('S9', 'warn', 'x', ['advisories' => [['id' => 'x']]])], ['vendor/gone'], null, $at)], [], $at, 1, 0, false);
 
         self::assertSame('1 security advisory on 1 package the report does not flag; see composer audit', $one->unflaggedAdvisoriesLine());
