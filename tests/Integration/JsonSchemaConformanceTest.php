@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Integration;
 
+use Composer\Repository\AdvisoryProviderInterface;
 use JsonSchema\Constraints\Constraint;
 use JsonSchema\Validator;
 use Lockrot\Allowlist\BuiltinAllowlist;
@@ -136,7 +137,11 @@ final class JsonSchemaConformanceTest extends TestCase
         $this->assertValid(Schemas::REPORT, $json, $dir, true);
     }
 
-    /** The per-signal `data` branches are only tested if every signal really occurs in the fixtures. */
+    /**
+     * The per-signal `data` branches are only tested if every signal really occurs in the fixtures.
+     * S9 needs Composer's advisory API, which the 2.2 LTS does not have; there the run carries no
+     * advisory and the S9 branch of the schema goes untested, as it does for a user on that LTS.
+     */
     public function testTheFixturesExerciseEverySignal(): void
     {
         $seen = [];
@@ -149,7 +154,12 @@ final class JsonSchemaConformanceTest extends TestCase
         }
         ksort($seen);
 
-        self::assertSame([Signal::S1, Signal::S2, Signal::S3, Signal::S4, Signal::S5, Signal::S6, Signal::S7, Signal::S8, Signal::S9], array_keys($seen));
+        $expected = [Signal::S1, Signal::S2, Signal::S3, Signal::S4, Signal::S5, Signal::S6, Signal::S7, Signal::S8];
+        if (interface_exists(AdvisoryProviderInterface::class)) {
+            $expected[] = Signal::S9;
+        }
+
+        self::assertSame($expected, array_keys($seen));
     }
 
     /** A signal's `data` must match its own branch, not just any branch: a wrong id/data pair fails. */
