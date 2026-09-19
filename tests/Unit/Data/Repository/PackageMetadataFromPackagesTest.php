@@ -144,6 +144,67 @@ final class PackageMetadataFromPackagesTest extends TestCase
     }
 
     /**
+     * illuminate/macroable 10.x: 83 stable tags point at one commit, and Packagist dates every one of
+     * them 2023-06-05 — the day the directory last changed, not the day v10.49.0 was cut. A highest
+     * tag that shares its commit with another stable tag is dated by no release, so the branch reads
+     * as undated, and the package's own age is unknown when its highest tag is such a one.
+     */
+    public function testAHighestTagSharingItsCommitWithAnotherStableTagIsDatedByNoRelease(): void
+    {
+        $split = static fn (string $version, string $commit, string $time): array => ['name' => 'a/b', 'version' => $version, 'time' => $time, 'source' => ['type' => 'git', 'url' => 'https://github.com/a/b.git', 'reference' => $commit]];
+        $top = $this->load($split('v10.49.0', 'dir-last-changed', '2023-06-05T12:46:42+00:00'));
+        $lower = $this->load($split('v10.13.1', 'dir-last-changed', '2023-06-05T12:46:42+00:00'));
+        $unique = $this->load($split('v11.51.0', 'its-own-commit', '2024-06-28T20:10:30+00:00'));
+
+        foreach ([[$top, $lower, $unique], [$unique, $lower, $top]] as $order) {
+            $metadata = PackageMetadata::fromPackages('a/b', $order, new \DateTimeImmutable(self::FIXED));
+            $byBranch = $metadata->latestStableByBranch();
+            self::assertSame('10.49.0.0', $byBranch['10']['highest']['normalized']);
+            self::assertNull($byBranch['10']['highest']['at'], 'shared commit: the date is the directory\'s, not the release\'s');
+            self::assertEquals(new \DateTimeImmutable('2023-06-05T12:46:42+00:00'), $byBranch['10']['at'], 'the newest dated release is still recorded');
+            self::assertEquals(new \DateTimeImmutable('2024-06-28T20:10:30+00:00'), $byBranch['11']['highest']['at'], 'a tag on its own commit is dated as before');
+            self::assertSame('v11.51.0', $metadata->lastStableVersion(), 'the package\'s highest tag is the unique one');
+        }
+
+        $sharedHighest = PackageMetadata::fromPackages('a/b', [$top, $lower], new \DateTimeImmutable(self::FIXED));
+        self::assertTrue($sharedHighest->hasStableRelease());
+        self::assertNull($sharedHighest->lastStableReleaseAt(), 'the package\'s age is its highest tag\'s, and that one is dated by no release');
+        self::assertNull($sharedHighest->lastStableVersion());
+    }
+
+    /**
+     * `dev-main` sits on the newest tag's commit after every release, and a final is now and then
+     * cut on its release candidate's commit; neither says the tag's date is not the release's.
+     */
+    public function testADevBranchOrAPreReleaseOnTheTagsCommitDoesNotMakeItShared(): void
+    {
+        $on = static fn (string $version, string $commit): array => ['name' => 'a/b', 'version' => $version, 'time' => '2026-01-01T00:00:00+00:00', 'source' => ['type' => 'git', 'url' => 'https://github.com/a/b.git', 'reference' => $commit]];
+        $versions = [$this->load($on('1.1.0', 'rc-commit')), $this->load($on('1.1.0-RC1', 'rc-commit')), $this->load($on('dev-main', 'rc-commit'))];
+
+        $metadata = PackageMetadata::fromPackages('a/b', $versions, new \DateTimeImmutable(self::FIXED));
+
+        self::assertEquals(new \DateTimeImmutable('2026-01-01T00:00:00+00:00'), $metadata->latestStableByBranch()['1']['highest']['at']);
+        self::assertEquals(new \DateTimeImmutable('2026-01-01T00:00:00+00:00'), $metadata->lastStableReleaseAt());
+    }
+
+    /** illuminate/support 10.x: tags share commits below the top, but v10.49.0 has its own — that one is dated. */
+    public function testTagsSharingACommitBelowAHighestOnItsOwnLeaveTheHighestDated(): void
+    {
+        $on = static fn (string $version, string $commit, string $time): array => ['name' => 'a/b', 'version' => $version, 'time' => $time, 'source' => ['type' => 'git', 'url' => 'https://github.com/a/b.git', 'reference' => $commit]];
+        $versions = [
+            $this->load($on('v10.49.0', 'own', '2025-09-08T19:05:53+00:00')),
+            $this->load($on('v10.48.0', 'shared', '2024-01-01T00:00:00+00:00')),
+            $this->load($on('v10.47.0', 'shared', '2024-01-01T00:00:00+00:00')),
+            $this->load(['name' => 'a/b', 'version' => 'v10.46.0', 'time' => '2023-01-01T00:00:00+00:00']),
+        ];
+
+        $metadata = PackageMetadata::fromPackages('a/b', $versions, new \DateTimeImmutable(self::FIXED));
+
+        self::assertEquals(new \DateTimeImmutable('2025-09-08T19:05:53+00:00'), $metadata->latestStableByBranch()['10']['highest']['at']);
+        self::assertSame('v10.49.0', $metadata->lastStableVersion());
+    }
+
+    /**
      * A repository that sends `version_normalized` is trusted on it, and ArrayLoader never parses
      * `version`: whatever it says must not reach a parser here.
      */

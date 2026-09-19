@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- A false `left-behind` on packages split out of a monorepo. A subtree split (`illuminate/*`,
+  `symfony/*`) cuts a tag on every release whether or not the directory changed, so tags pile up on
+  one commit and Packagist dates each of them by that commit: `illuminate/macroable` has 83 stable
+  tags on the commit behind `v10.49.0`, all dated 2023-06-05, and a lock on 10.x read as `branch
+  10.x last released 2023-06-05 (3.3 years ago)` while Laravel 10 kept releasing. A tag that shares
+  its commit with another stable tag is now read as undated — the date is the directory's, not the
+  release's — so S8 does not measure the branch and S2 does not measure the package. The cost is
+  the other way: a split branch that really did stop (`illuminate/contracts` 8.x) is no longer
+  reported `left-behind` either, since its last tag is dated the same way. Dev branches and
+  pre-releases on a tag's commit do not count.
+
 ### Changed
 
 - The footer's advisory line says why `composer audit` counts more. Without `--dev` it now reads

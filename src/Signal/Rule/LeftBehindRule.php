@@ -54,7 +54,8 @@ final class LeftBehindRule implements SignalRule
         // An undated highest tag means the branch's newest release is one the repository does not
         // date; how much younger than the newest dated release it is cannot be known, so the branch
         // is not measured (a subtree split — illuminate/*, symfony/* — dates tags by the commit they
-        // point at, and leaves many with no date at all).
+        // point at, and leaves many with no date at all; a tag sharing its commit with another is
+        // handed over undated for the same reason, see PackageMetadata::fromPackages()).
         $own = $branch === null ? null : ($byBranch[$branch] ?? null);
         if ($branch === null || $own === null || $own['at'] === null || $own['highest']['at'] === null || $this->isAhead($facts->package()->version(), $own['highest']['normalized'])) {
             return null;

@@ -100,7 +100,12 @@ undated: the dates are the repository's, and Packagist dates a tag by the commit
 a package split out of a monorepo (`illuminate/*`, `symfony/*`) has tags with no date and tags
 dated by the last change to that directory, years before the release that carried them. With the
 branch's newest tag undated, how much younger it is than the newest dated one cannot be read, and
-the branch is not measured; a dated highest tag is read as it stands.
+the branch is not measured. A tag that shares its commit with another stable tag counts as undated
+too: a split cuts a tag on every release whether or not the directory changed, so its tags pile up
+on one commit — `illuminate/macroable` has 83 stable tags on the commit behind `v10.49.0`, all
+dated 2023 — and the date on such a tag is the commit's, not the release's. The same reading
+applies to the package's own age (S2): with its highest tag undated or shared, the age is unknown
+and S2 stays quiet. A highest tag with a date and a commit of its own is read as it stands.
 
 ## Security advisories
 
