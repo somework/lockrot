@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Lockrot\Explain;
 
-use Composer\Semver\Comparator;
 use Lockrot\Analyzer\Report;
 use Lockrot\Data\Repository\ReleaseBranch;
 use Lockrot\Signal\PackageFacts;
@@ -89,8 +88,8 @@ final class Explanation
         foreach (array_keys($byBranch) as $key) {
             $keys[] = (string) $key;
         }
-        // Highest branch first: Comparator orders the keys as the versions they are (`10` above `9`, `0.3` above `0.0.3`).
-        usort($keys, static fn (string $a, string $b): int => Comparator::greaterThan($a, $b) ? -1 : (Comparator::greaterThan($b, $a) ? 1 : 0));
+        // Highest branch first, the keys ordered as the versions they are (`10` above `9`, `0.3` above `0.0.3`).
+        usort($keys, static fn (string $a, string $b): int => version_compare($b, $a));
         $rows = [];
         foreach ($keys as $key) {
             $release = $byBranch[$key];

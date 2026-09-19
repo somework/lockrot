@@ -253,3 +253,11 @@ slow test. They are listed here only so nobody reads them as an unexplained "2 t
   is not past, and splicing an empty array yields an empty chunk, so nothing ever changes.
 - `src/Data/Repository/RepositoryMetadataLoader.php:203` IncrementInteger — splicing from offset 1
   never removes the first name, so the queue never empties.
+
+## pre-post-fixes (2026-09-19)
+
+- `src/Composer/LockrotCommand.php` `explain()` LogicalOr on `$finding === null || $facts === null` —
+  `Analysis::finding()` and `Analysis::facts()` are filled by the same loop over the same packages
+  in `Analyzer::analyzeWithFacts()`, so one is null exactly when the other is; and the lock lookup
+  two lines up already rejects every name the run does not analyse, so the branch never runs. The
+  check is for the types.

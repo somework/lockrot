@@ -183,7 +183,7 @@ final class PackageMetadata
         // a date that is the commit's rather than the release's — the newest dated one below it is
         // not "the last release": it is the last release the repository dated, and how much
         // younger the tags above it are cannot be known; S2 then has nothing to measure and stays quiet.
-        if ($highestStable !== null && ($highestStable->getReleaseDate() === null || ($highestCommit !== null && ($tagsOnCommit[$highestCommit] ?? 0) > 1))) {
+        if ($highestStable !== null && ($highestStable->getReleaseDate() === null || ($highestCommit !== null && isset($tagsOnCommit[$highestCommit]) && $tagsOnCommit[$highestCommit] > 1))) {
             $lastStableReleaseAt = null;
             $lastStableVersion = null;
         }

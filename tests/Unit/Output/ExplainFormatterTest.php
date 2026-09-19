@@ -6,8 +6,11 @@ namespace Lockrot\Tests\Unit\Output;
 
 use Composer\Package\Loader\ArrayLoader;
 use Lockrot\Analyzer\Report;
+use Lockrot\Data\Forge\RepoRef;
+use Lockrot\Data\Forge\RepositoryActivity;
 use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Explain\Explanation;
+use Lockrot\Lock\LockedPackage;
 use Lockrot\Output\ExplainFormatter;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\Thresholds;
@@ -35,31 +38,63 @@ final class ExplainFormatterTest extends TestCase
         return new Report([], $notes, new \DateTimeImmutable(F::NOW), 3, 0, false);
     }
 
+    /**
+     * The whole text of a flagged, transitive, abandoned-with-replacement package with an archived
+     * repository read from the cache: every block, every separator, the raw data in every shape a
+     * signal can carry (scalars, null, a nested array, the advisory list with a row that is not one).
+     */
     public function testAFlaggedPackageReadsVerdictSignalsDataAndBranches(): void
     {
-        $s8 = new Signal(Signal::S8, Signal::LEVEL_WARN, 'branch 1.x last released 2021-06-01 (5.3 years ago); 2.x released 2.1.0 (2026-01-01)', ['branch' => '1.x', 'years' => 5.3, 'newest_release' => '2026-01-01T00:00:00+00:00']);
+        $s8 = new Signal(Signal::S8, Signal::LEVEL_WARN, 'branch 1.x last released 2021-06-01 (5.3 years ago); 2.x released 2.1.0 (2026-01-01)', ['branch' => '1.x', 'years' => 5.3, 'suggested_constraint' => null, 'flags' => ['a' => true]]);
         $s9 = new Signal(Signal::S9, Signal::LEVEL_WARN, '2 security advisories affect 1.5.0 (CVE-2026-1, PKSA-2)', ['advisories' => [
             ['id' => 'PKSA-1', 'cve' => 'CVE-2026-1', 'severity' => 'high', 'fixed_by' => '2.1.0', 'fixed_on_branch' => false, 'reported_at' => '2026-03-01T00:00:00+00:00', 'link' => 'https://example.test/a'],
-            ['id' => 'PKSA-2', 'cve' => null, 'severity' => null, 'fixed_by' => null, 'fixed_on_branch' => false],
-        ]]);
+            ['id' => 'PKSA-2', 'cve' => '', 'severity' => null, 'fixed_by' => null, 'fixed_on_branch' => false],
+            'not-a-row',
+        ], 'count' => 2]);
         $finding = new Finding('vendor/pkg', '1.5.0', Verdict::LEFT_BEHIND, [$s8, $s9], ['root/app', 'vendor/mid', 'vendor/pkg'], null, new \DateTimeImmutable(F::NOW), null, false, ['root/app', 'root/other']);
-        $metadata = F::metadata([['2.1.0', '2026-01-01T00:00:00+00:00'], ['1.5.0', '2021-06-01T00:00:00+00:00'], ['1.4.9', '2021-01-01T00:00:00+00:00']]);
+        // Branches listed out of order: the table sorts them.
+        $metadata = F::metadata([['1.5.0', '2021-06-01T00:00:00+00:00'], ['1.4.9', '2021-01-01T00:00:00+00:00'], ['2.1.0', '2026-01-01T00:00:00+00:00']], true, 'vendor/next');
         $package = F::package(['version' => '1.5.0', 'php' => '>=7.1 <8.0', 'time' => '2021-06-01T00:00:00+00:00']);
-        $explanation = new Explanation($finding, F::facts($package, $metadata, F::activity(false, '2026-02-01T00:00:00+00:00')), new Thresholds(), '8.4', $this->report(['GitHub token not set']));
+        $activity = new RepositoryActivity(new RepoRef(RepoRef::GITHUB, 'github.com', 'vendor/pkg'), true, null, new \DateTimeImmutable(F::NOW), new \DateTimeImmutable('2026-09-13T00:00:00+00:00'));
+        $explanation = new Explanation($finding, F::facts($package, $metadata, $activity), new Thresholds(), '8.4', $this->report(['GitHub token not set']));
 
-        $text = $this->plain($explanation);
+        $expected = <<<'TEXT'
+            vendor/pkg 1.5.0 — left-behind, priority high
+              via root/app > vendor/mid > vendor/pkg; also reached from root/other
 
-        self::assertStringContainsString("vendor/pkg 1.5.0 — left-behind, priority high\n  via root/app > vendor/mid > vendor/pkg; also reached from root/other\n", $text, 'transitive: one step below the verdict\'s critical');
-        self::assertStringContainsString("  S8 warn branch 1.x last released 2021-06-01 (5.3 years ago); 2.x released 2.1.0 (2026-01-01)\n           branch 1.x · years 5.3 · newest_release 2026-01-01T00:00:00+00:00\n", $text);
-        self::assertStringContainsString("           CVE-2026-1 (PKSA-1) high · fixed by 2.1.0, not on the installed branch · reported 2026-03-01 · https://example.test/a\n", $text);
-        self::assertStringContainsString("           PKSA-2 · no listed release fixes it\n", $text);
-        self::assertStringContainsString("composer.lock\n  version 1.5.0 · php >=7.1 <8.0 · released 2021-06-01 · from a Composer repository\n  source https://github.com/vendor/pkg.git\n", $text, 'a `<` in the constraint survives the console formatter');
-        self::assertStringContainsString("repository metadata (as of 2026-09-14)\n  3 versions listed · library · not abandoned\n", $text);
-        self::assertStringContainsString("  last stable release 2.1.0 (2026-01-01)\n", $text);
-        self::assertStringContainsString("    2.x        2.1.0              2026-01-01   2.1.0 (2026-01-01)\n  * 1.x        1.5.0              2021-06-01   1.5.0 (2021-06-01)\n", $text);
-        self::assertStringNotContainsString('highest tag is undated', $text);
-        self::assertStringContainsString("repository activity\n  GitHub vendor/pkg · not archived · last push 2026-02-01 · fetched 2026-09-14\n", $text);
-        self::assertStringContainsString("thresholds: release-warn-years 3 · release-high-years 5 · push-warn-years 3 · push-high-years 5 · target PHP 8.4\nnote: GitHub token not set\n", $text);
+            signals
+              S8 warn branch 1.x last released 2021-06-01 (5.3 years ago); 2.x released 2.1.0 (2026-01-01)
+                       branch 1.x · years 5.3 · suggested_constraint null
+                       flags {"a":true}
+              S9 warn 2 security advisories affect 1.5.0 (CVE-2026-1, PKSA-2)
+                       count 2
+                       CVE-2026-1 (PKSA-1) high · fixed by 2.1.0, not on the installed branch · reported 2026-03-01 · https://example.test/a
+                       PKSA-2 · no listed release fixes it
+                       "not-a-row"
+
+            composer.lock
+              version 1.5.0 · php >=7.1 <8.0 · released 2021-06-01 · from a Composer repository
+              source https://github.com/vendor/pkg.git
+
+            repository metadata (as of 2026-09-14)
+              3 versions listed · library · abandoned, replacement vendor/next
+              source https://github.com/vendor/pkg.git
+              last stable release 2.1.0 (2026-01-01)
+                branch     highest tag        released     newest dated release
+                2.x        2.1.0              2026-01-01   2.1.0 (2026-01-01)
+              * 1.x        1.5.0              2021-06-01   1.5.0 (2021-06-01)
+
+            repository activity
+              GitHub vendor/pkg · archived · last push unknown · fetched 2026-09-14 (from lockrot's cache)
+
+            thresholds: release-warn-years 3 · release-high-years 5 · push-warn-years 3 · push-high-years 5 · target PHP 8.4
+            note: GitHub token not set
+
+            TEXT;
+        self::assertSame($expected, $this->plain($explanation));
+        $raw = (new ExplainFormatter())->text($explanation);
+        self::assertStringStartsWith("<options=bold>vendor/pkg 1.5.0</> — <fg=yellow>left-behind</fg=yellow>, priority high\n", $raw, 'a flagged verdict is coloured');
+        self::assertStringContainsString('php \>=7.1 \<8.0', $raw, 'escaped for the console formatter, which the plain rendering resolves');
     }
 
     /** The question `--explain` exists for: a package the report does not flag, and the row that says why S8 stayed quiet. */
@@ -75,19 +110,39 @@ final class ExplainFormatterTest extends TestCase
         ], new \DateTimeImmutable(F::NOW));
         $explanation = new Explanation($finding, F::facts(F::package(['version' => '10.48.28']), $metadata), new Thresholds(), '8.4', $this->report());
 
-        $text = $this->plain($explanation);
+        $expected = <<<'TEXT'
+            vendor/pkg 10.48.28 — ok, priority none
+              direct requirement
 
-        self::assertStringContainsString("vendor/pkg 10.48.28 — ok, priority none\n  direct requirement\n\nsignals: none\n", $text);
-        self::assertStringContainsString("  last stable release unknown: the highest tag 13.0.0 is undated, so S2 does not measure the package\n", $text);
-        self::assertStringContainsString("  * 10.x       10.49.0            undated      10.13.1 (2023-03-17)\n", $text);
-        self::assertStringContainsString("  * the installed branch's highest tag is undated", $text);
-        self::assertStringContainsString("repository activity\n  not fetched — S3 and S4 have nothing to read", $text);
+            signals: none
+
+            composer.lock
+              version 10.48.28 · no php constraint · undated · from a Composer repository
+              source https://github.com/vendor/pkg.git
+
+            repository metadata (as of 2026-09-14)
+              3 versions listed · library · not abandoned
+              last stable release unknown: the highest tag 13.0.0 is undated, so S2 does not measure the package
+                branch     highest tag        released     newest dated release
+                13.x       13.0.0             undated      —
+              * 10.x       10.49.0            undated      10.13.1 (2023-03-17)
+              * the installed branch's highest tag is undated — the repository gives it no date, or dates it by a commit other tags share (a subtree split) — so S8 does not measure the branch
+
+            repository activity
+              not fetched — S3 and S4 have nothing to read; the run's notes below say why when a cap or a failure is the cause
+
+            thresholds: release-warn-years 3 · release-high-years 5 · push-warn-years 3 · push-high-years 5 · target PHP 8.4
+
+            TEXT;
+        self::assertSame($expected, $this->plain($explanation));
+        self::assertStringNotContainsString('<fg=', (new ExplainFormatter())->text($explanation), 'an unflagged verdict is not coloured');
     }
 
     public function testAPackageWithoutMetadataShowsTheNoteInsteadOfATable(): void
     {
         $finding = new Finding('vendor/pkg', '1.0.0', Verdict::UNKNOWN, [], ['vendor/pkg'], null, null, 'not from a Composer repository, not checked', true);
-        $explanation = new Explanation($finding, F::facts(F::package(['fromComposerRepository' => false, 'dev' => true, 'source' => null])), new Thresholds(), '8.4', $this->report());
+        $sourceless = new LockedPackage('vendor/pkg', '1.0.0', null, null, [], null, 'library', false, true, false);
+        $explanation = new Explanation($finding, F::facts($sourceless), new Thresholds(), '8.4', $this->report());
 
         $text = $this->plain($explanation);
 
@@ -95,6 +150,10 @@ final class ExplainFormatterTest extends TestCase
         self::assertStringContainsString("  version 1.0.0 · no php constraint · undated · not from a Composer repository\n", $text);
         self::assertStringContainsString("repository metadata\n  none — not from a Composer repository, not checked\n", $text);
         self::assertStringNotContainsString('branch     highest tag', $text);
+        self::assertStringNotContainsString('  source ', $text, 'no source in the lock, no source line');
+
+        $noNote = new Explanation(new Finding('vendor/pkg', '1.0.0', Verdict::UNKNOWN, [], ['vendor/pkg'], null, null), F::facts(F::package()), new Thresholds(), '8.4', $this->report());
+        self::assertStringContainsString("repository metadata\n  none — not available\n", $this->plain($noNote));
     }
 
     public function testTheBranchTableIsCappedAndAnAllowlistedPackageSaysSo(): void
@@ -111,6 +170,9 @@ final class ExplainFormatterTest extends TestCase
         self::assertStringContainsString("  allowlisted: interfaces only\n", $text);
         self::assertSame(Explanation::BRANCH_ROWS, preg_match_all('/^    0\.0\.\d+ /m', $text));
         self::assertStringContainsString('  … and 5 more', $text);
+
+        $exactly = new Explanation($finding, F::facts(F::package(['version' => '0.0.3']), F::metadata(\array_slice($releases, 0, Explanation::BRANCH_ROWS))), new Thresholds(), '8.4', $this->report());
+        self::assertStringNotContainsString('more', $this->plain($exactly), 'a table that fits is not counted');
     }
 
     public function testJsonCarriesTheEnvelopeAndTheExplanation(): void
@@ -118,8 +180,12 @@ final class ExplainFormatterTest extends TestCase
         $finding = new Finding('vendor/pkg', '1.0.0', Verdict::OK, [], ['vendor/pkg'], null, new \DateTimeImmutable(F::NOW));
         $explanation = new Explanation($finding, F::facts(F::package(), F::metadata([['1.0.0', '2026-01-01T00:00:00+00:00']])), new Thresholds(), '8.4', $this->report());
 
-        $json = json_decode((new ExplainFormatter())->json($explanation), true);
+        $encoded = (new ExplainFormatter())->json($explanation);
+        $json = json_decode($encoded, true);
 
+        self::assertStringStartsWith("{\n    \"lockrot\": {\n", $encoded, 'pretty-printed');
+        self::assertStringEndsWith("}\n", $encoded);
+        self::assertStringContainsString('"https://github.com/vendor/pkg.git"', $encoded, 'slashes unescaped');
         self::assertIsArray($json);
         self::assertSame(['version' => Version::STRING, 'schema' => 1], $json['lockrot']);
         self::assertSame('vendor/pkg', $json['package']);

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Analyzer;
 
 use Lockrot\Signal\PackageFacts;
+use Lockrot\Verdict\Finding;
 
 /**
  * A run's report together with what each finding was decided on: the locked package, its
@@ -35,5 +36,18 @@ final class Analysis
     public function facts(string $package): ?PackageFacts
     {
         return $this->facts[$package] ?? null;
+    }
+
+    /** The report's finding for one package, null for a package the run did not analyse. */
+    public function finding(string $package): ?Finding
+    {
+        $found = null;
+        foreach ($this->report->findings() as $finding) {
+            if ($finding->package() === $package) {
+                $found = $finding;
+            }
+        }
+
+        return $found;
     }
 }

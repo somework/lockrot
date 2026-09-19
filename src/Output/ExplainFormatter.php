@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Output;
 
+use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Explain\Explanation;
 use Lockrot\Signal\Signal;
 use Lockrot\Verdict\Finding;
@@ -211,7 +212,7 @@ final class ExplainFormatter
         if ($metadata->repositoryUrl() !== null) {
             $lines[] = self::INDENT.self::escape('source '.$metadata->repositoryUrl());
         }
-        $lines[] = self::INDENT.self::escape($this->lastRelease($explanation));
+        $lines[] = self::INDENT.self::escape($this->lastRelease($metadata, $explanation));
         foreach ($this->branchTable($explanation) as $line) {
             $lines[] = self::INDENT.self::escape($line);
         }
@@ -219,10 +220,9 @@ final class ExplainFormatter
         return $lines;
     }
 
-    private function lastRelease(Explanation $explanation): string
+    private function lastRelease(PackageMetadata $metadata, Explanation $explanation): string
     {
-        $metadata = $explanation->facts()->metadata();
-        if ($metadata === null || !$metadata->hasStableRelease()) {
+        if (!$metadata->hasStableRelease()) {
             return 'no stable release';
         }
         $at = $metadata->lastStableReleaseAt();

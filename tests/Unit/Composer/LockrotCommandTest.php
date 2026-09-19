@@ -432,11 +432,11 @@ final class LockrotCommandTest extends TestCase
         chdir(__DIR__.'/../../fixtures/apps/wallabag_wallabag');
         $tester = $this->tester($this->loader());
 
-        $code = $tester->execute(['--explain' => 'doctrine/annotations', '--target-php' => '8.4', '--fail-on' => 'stale']);
+        $code = $tester->execute(['--explain' => ' Doctrine/Annotations ', '--target-php' => '8.4', '--fail-on' => 'stale']);
 
         $display = $tester->getDisplay();
         self::assertSame(0, $code, $display);
-        self::assertStringStartsWith('doctrine/annotations ', $display);
+        self::assertStringStartsWith('doctrine/annotations ', $display, 'the name is trimmed and lower-cased, as Composer names packages');
         self::assertStringContainsString('— abandoned, priority', $display);
         self::assertStringContainsString("\n  S1 high marked abandoned by its repository", $display);
         self::assertStringContainsString("\nrepository metadata (as of ", $display);
@@ -452,6 +452,8 @@ final class LockrotCommandTest extends TestCase
 
         self::assertSame(0, $code, $stdout);
         self::assertSame([OutputInterface::OUTPUT_RAW], $options, 'written raw, like every machine-readable format');
+        self::assertStringEndsWith("}\n", $stdout);
+        self::assertStringEndsNotWith("\n\n", $stdout, 'the formatter ends the document; the writer adds no second newline');
         $json = json_decode($stdout, true);
         self::assertIsArray($json);
         self::assertIsArray($json['lockrot']);
