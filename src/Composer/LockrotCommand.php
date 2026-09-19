@@ -177,19 +177,21 @@ final class LockrotCommand extends BaseCommand
                 throw new ConfigException('composer.lock not found in '.$cwd.'; lockrot does not look in parent directories: run it from the project root or pass -d <dir>');
             }
             $lock = LockFile::fromFile($lockPath);
+            // `composer lockrot` is the deliberate, full run: no time budget, unlike the
+            // install-time summary.
+            $analyzer = AnalyzerBootstrap::create($this->analyzerFactory, $io, $config, $repositories, $project, $lockrot, $env, Deadline::never());
+            // Before the baseline is even resolved: an explanation does not consult it, so a
+            // baseline that is missing or unreadable must not stand between the question and the answer.
+            $explain = $input->getOption('explain');
+            if (\is_string($explain)) {
+                return $this->explain($output, $explain, $analyzer, $lock, $project, $lockrot);
+            }
             // Resolved and read before the analysis so a missing explicit path or an unreadable
             // file fails immediately, rather than after a full repository round. A generate run is the
             // one case where the target is allowed not to exist yet: it is about to be created.
             $generate = $input->getOption('generate-baseline') === true;
             $baselineFile = BaselineFile::resolve($cwd, $lockrot->baseline());
             $existingBaseline = $this->readBaseline($baselineFile, $lockrot->baseline() !== null && !$generate);
-            // `composer lockrot` is the deliberate, full run: no time budget, unlike the
-            // install-time summary.
-            $analyzer = AnalyzerBootstrap::create($this->analyzerFactory, $io, $config, $repositories, $project, $lockrot, $env, Deadline::never());
-            $explain = $input->getOption('explain');
-            if (\is_string($explain)) {
-                return $this->explain($output, $explain, $analyzer, $lock, $project, $lockrot);
-            }
             $report = $analyzer->analyze($lock, $project, $lockrot->includeDev());
 
             if ($generate) {

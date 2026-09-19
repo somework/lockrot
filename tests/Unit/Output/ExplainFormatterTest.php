@@ -80,9 +80,9 @@ final class ExplainFormatterTest extends TestCase
               3 versions listed · library · abandoned, replacement vendor/next
               source https://github.com/vendor/pkg.git
               last stable release 2.1.0 (2026-01-01)
-                branch     highest tag        released     newest dated release
-                2.x        2.1.0              2026-01-01   2.1.0 (2026-01-01)
-              * 1.x        1.5.0              2021-06-01   1.5.0 (2021-06-01)
+                branch     highest tag        released           newest dated release
+                2.x        2.1.0              2026-01-01         2.1.0 (2026-01-01)
+              * 1.x        1.5.0              2021-06-01         1.5.0 (2021-06-01)
 
             repository activity
               GitHub vendor/pkg · archived · last push unknown · fetched 2026-09-14 (from lockrot's cache)
@@ -97,16 +97,23 @@ final class ExplainFormatterTest extends TestCase
         self::assertStringContainsString('php \>=7.1 \<8.0', $raw, 'escaped for the console formatter, which the plain rendering resolves');
     }
 
-    /** The question `--explain` exists for: a package the report does not flag, and the row that says why S8 stayed quiet. */
+    /**
+     * The question `--explain` exists for: a package the report does not flag, and the rows that
+     * say why S8 stayed quiet. Two of the three branches are dated only by a commit their tags share
+     * (a subtree split, as {@see PackageMetadata::fromPackages()} reads it) and read `commit <date>`;
+     * the third carries no date at all and reads `undated`.
+     */
     public function testAnUnflaggedSplitPackageSaysWhyItsBranchIsNotMeasured(): void
     {
         $finding = new Finding('vendor/pkg', '10.48.28', Verdict::OK, [], ['vendor/pkg'], null, new \DateTimeImmutable(F::NOW));
-        // Through fromPackages(), as the loader builds it: an undated highest tag leaves the package's last release unknown.
         $loader = new ArrayLoader();
+        $on = static fn (string $version, ?string $commit, ?string $time): array => array_filter(['name' => 'vendor/pkg', 'version' => $version, 'time' => $time, 'source' => $commit === null ? null : ['type' => 'git', 'url' => 'https://github.com/vendor/pkg.git', 'reference' => $commit]]);
         $metadata = PackageMetadata::fromPackages('vendor/pkg', [
-            $loader->load(['name' => 'vendor/pkg', 'version' => '13.0.0']),
-            $loader->load(['name' => 'vendor/pkg', 'version' => '10.49.0']),
-            $loader->load(['name' => 'vendor/pkg', 'version' => '10.13.1', 'time' => '2023-03-17T00:00:00+00:00']),
+            $loader->load($on('13.1.0', 'split-13', '2026-04-29T09:35:06+00:00')),
+            $loader->load($on('13.0.0', 'split-13', '2026-04-29T09:35:06+00:00')),
+            $loader->load($on('12.0.0', null, null)),
+            $loader->load($on('10.49.0', 'split-10', '2023-06-05T12:46:42+00:00')),
+            $loader->load($on('10.13.1', 'split-10', '2023-06-05T12:46:42+00:00')),
         ], new \DateTimeImmutable(F::NOW));
         $explanation = new Explanation($finding, F::facts(F::package(['version' => '10.48.28']), $metadata), new Thresholds(), '8.4', $this->report());
 
@@ -121,12 +128,14 @@ final class ExplainFormatterTest extends TestCase
               source https://github.com/vendor/pkg.git
 
             repository metadata (as of 2026-09-14)
-              3 versions listed · library · not abandoned
-              last stable release unknown: the highest tag 13.0.0 is undated, so S2 does not measure the package
-                branch     highest tag        released     newest dated release
-                13.x       13.0.0             undated      —
-              * 10.x       10.49.0            undated      10.13.1 (2023-03-17)
-              * the installed branch's highest tag is undated — the repository gives it no date, or dates it by a commit other tags share (a subtree split) — so S8 does not measure the branch
+              5 versions listed · library · not abandoned
+              source https://github.com/vendor/pkg.git
+              last stable release unknown: the highest tag 13.1.0 has no release date, so S2 does not measure the package
+                branch     highest tag        released           newest dated release
+                13.x       13.1.0             commit 2026-04-29  13.1.0 (2026-04-29)
+                12.x       12.0.0             undated            —
+              * 10.x       10.49.0            commit 2023-06-05  10.49.0 (2023-06-05)
+              * the installed branch's highest tag has no release date — the repository leaves it undated, or dates it only by a commit other tags share (`commit …`: a subtree split, the day the directory last changed) — so S8 does not measure the branch
 
             repository activity
               not fetched — S3 and S4 have nothing to read; the run's notes below say why when a cap or a failure is the cause
@@ -194,6 +203,6 @@ final class ExplainFormatterTest extends TestCase
         self::assertSame('ok', $json['finding']['verdict']);
         self::assertIsArray($json['metadata']);
         self::assertIsArray($json['metadata']['branches']);
-        self::assertSame([['branch' => '1.x', 'installed' => true, 'highest' => '1.0.0', 'highest_released' => '2026-01-01T00:00:00+00:00', 'newest_dated' => '1.0.0', 'newest_dated_released' => '2026-01-01T00:00:00+00:00']], $json['metadata']['branches']);
+        self::assertSame([['branch' => '1.x', 'installed' => true, 'highest' => '1.0.0', 'highest_released' => '2026-01-01T00:00:00+00:00', 'highest_commit_date' => null, 'newest_dated' => '1.0.0', 'newest_dated_released' => '2026-01-01T00:00:00+00:00']], $json['metadata']['branches']);
     }
 }

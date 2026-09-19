@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Signal\Rule;
 
+use Composer\Package\Loader\ArrayLoader;
 use Lockrot\Clock;
+use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Signal\Rule\LeftBehindRule;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\Thresholds;
@@ -249,6 +251,30 @@ final class LeftBehindRuleTest extends TestCase
         self::assertNotNull($onTheBackport);
         self::assertSame($onTheTop->summary(), $onTheBackport->summary());
         self::assertNull($this->rule()->evaluate(F::facts(F::package(['version' => '1.6.0']), $meta)), 'above the highest tag: not listed');
+    }
+
+    /**
+     * A higher branch dated only by a commit its tags share still counts as the upstream moving
+     * on: the commit's date is when the directory last changed, which is at or before the release
+     * that carried it — a lower bound. If that lower bound is recent, the release is more recent
+     * still, so the S8 it supports is real; an understated date can only make a move-on less
+     * likely, never invent one. The installed branch is measured by its own, release-dated tag.
+     */
+    public function testAHigherBranchDatedByASharedCommitStillCountsAsAMoveOn(): void
+    {
+        $loader = new ArrayLoader();
+        $on = static fn (string $version, string $commit, string $time): array => ['name' => 'vendor/pkg', 'version' => $version, 'time' => $time, 'source' => ['type' => 'git', 'url' => 'https://github.com/vendor/pkg.git', 'reference' => $commit]];
+        $meta = PackageMetadata::fromPackages('vendor/pkg', [
+            $loader->load($on('2.3.0', 'split', '2025-06-01T00:00:00+00:00')),
+            $loader->load($on('2.2.0', 'split', '2025-06-01T00:00:00+00:00')),
+            $loader->load($on('1.5.0', 'own', '2019-06-01T00:00:00+00:00')),
+        ], new \DateTimeImmutable(F::NOW));
+
+        $signal = $this->rule()->evaluate(F::facts(F::package(['version' => '1.5.0']), $meta));
+
+        self::assertNotNull($signal);
+        self::assertSame('branch 1.x last released 2019-06-01 (7.3 years ago); 2.x released 2.3.0 (2025-06-01)', $signal->summary());
+        self::assertNull($this->rule()->evaluate(F::facts(F::package(['version' => '2.2.0']), $meta)), 'the shared-commit branch itself is not measured');
     }
 
     public function testNoMetadataIsNull(): void

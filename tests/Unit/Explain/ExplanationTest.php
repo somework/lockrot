@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Explain;
 
+use Composer\Package\Loader\ArrayLoader;
 use Lockrot\Analyzer\Report;
+use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Explain\Explanation;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\Thresholds;
@@ -54,6 +56,39 @@ final class ExplanationTest extends TestCase
         self::assertSame('10.13.1', $installed['newest_dated']);
     }
 
+    /**
+     * A highest tag dated only by a commit other tags share is handed over undated by
+     * {@see PackageMetadata::fromPackages()}, but the date it carried is still the branch's newest
+     * dated release; the row keeps it as `highest_commit_date` so the reader can tell "no date"
+     * from "the commit's date". A tag with no date at all has neither.
+     */
+    public function testASharedCommitTagKeepsItsCommitDateNextToTheMissingReleaseDate(): void
+    {
+        $loader = new ArrayLoader();
+        $on = static fn (string $version, ?string $commit, ?string $time): array => array_filter(['name' => 'vendor/pkg', 'version' => $version, 'time' => $time, 'source' => $commit === null ? null : ['type' => 'git', 'url' => 'https://github.com/vendor/pkg.git', 'reference' => $commit]]);
+        $metadata = PackageMetadata::fromPackages('vendor/pkg', [
+            $loader->load($on('10.49.0', 'split', '2023-06-05T12:46:42+00:00')),
+            $loader->load($on('10.13.1', 'split', '2023-06-05T12:46:42+00:00')),
+            $loader->load($on('9.0.0', null, null)),
+        ], new \DateTimeImmutable(F::NOW));
+        $explanation = new Explanation($this->finding('10.48.28', Verdict::OK), F::facts(F::package(['version' => '10.48.28']), $metadata), new Thresholds(), '8.4', $this->report());
+
+        [$shared, $undated] = $explanation->branches();
+
+        self::assertNull($shared['highest_released']);
+        self::assertEquals(new \DateTimeImmutable('2023-06-05T12:46:42+00:00'), $shared['highest_commit_date']);
+        self::assertNull($undated['highest_released']);
+        self::assertNull($undated['highest_commit_date']);
+        self::assertTrue($explanation->installedBranchIsUndated());
+        $meta = $explanation->toArray()['metadata'];
+        self::assertIsArray($meta);
+        self::assertIsArray($meta['branches']);
+        self::assertSame(
+            ['branch' => '10.x', 'installed' => true, 'highest' => '10.49.0', 'highest_released' => null, 'highest_commit_date' => '2023-06-05T12:46:42+00:00', 'newest_dated' => '10.49.0', 'newest_dated_released' => '2023-06-05T12:46:42+00:00'],
+            $meta['branches'][0]
+        );
+    }
+
     public function testABranchSnapshotBelongsToNoBranch(): void
     {
         $explanation = new Explanation($this->finding('dev-main', Verdict::PINNED), F::facts(F::package(['version' => 'dev-main']), F::metadata([['1.0.0', '2026-01-01T00:00:00+00:00']])), new Thresholds(), '8.4', $this->report());
@@ -88,8 +123,8 @@ final class ExplanationTest extends TestCase
             'type' => 'library',
             'data_date' => F::NOW,
             'branches' => [
-                ['branch' => '2.x', 'installed' => false, 'highest' => '2.1.0', 'highest_released' => '2026-01-01T00:00:00+00:00', 'newest_dated' => '2.1.0', 'newest_dated_released' => '2026-01-01T00:00:00+00:00'],
-                ['branch' => '1.x', 'installed' => true, 'highest' => '1.5.0', 'highest_released' => '2021-06-01T00:00:00+00:00', 'newest_dated' => '1.5.0', 'newest_dated_released' => '2021-06-01T00:00:00+00:00'],
+                ['branch' => '2.x', 'installed' => false, 'highest' => '2.1.0', 'highest_released' => '2026-01-01T00:00:00+00:00', 'highest_commit_date' => null, 'newest_dated' => '2.1.0', 'newest_dated_released' => '2026-01-01T00:00:00+00:00'],
+                ['branch' => '1.x', 'installed' => true, 'highest' => '1.5.0', 'highest_released' => '2021-06-01T00:00:00+00:00', 'highest_commit_date' => null, 'newest_dated' => '1.5.0', 'newest_dated_released' => '2021-06-01T00:00:00+00:00'],
             ],
         ], $array['metadata']);
         self::assertSame(['forge' => 'GitHub', 'repository' => 'vendor/pkg', 'archived' => false, 'pushed_at' => '2026-02-01T00:00:00+00:00', 'fetched_at' => F::NOW, 'from_cache' => false], $array['activity']);
