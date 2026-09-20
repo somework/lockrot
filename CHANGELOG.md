@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `--format=html`: the whole run as one self-contained page. It carries the report, the release
+  branches behind every finding and the baseline comparison inside a single file, so it opens from
+  `file://`, uploads as one CI artifact and attaches to a ticket — no server, no network, no fonts
+  or scripts fetched from anywhere. What a stream cannot show: one line per signal instead of one
+  sentence with four semicolons in it, every release branch on a time axis with the installed one
+  marked, advisories grouped by whether the fix is a patch on your own branch or a move to another,
+  and what is new or worsened since the baseline. Filters and the open package live in the URL hash,
+  the query understands `verdict:`, `priority:`, `signal:`, `severity:`, `cve:`, `direct:` and
+  `dev:`, and `?` opens a glossary of every verdict and signal. The payload's `report` key is byte
+  for byte what `--format=json` writes, envelope included, so it validates against the published
+  [report schema](docs/schema.md). `--all` puts every package in the page, at roughly 4 KB each;
+  without it a 100-package lock lands around 250 KB. See [ci.md](docs/ci.md).
+
 ## [0.9.0] - 2026-09-20
 
 ### Added
