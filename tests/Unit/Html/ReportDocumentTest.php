@@ -70,6 +70,14 @@ final class ReportDocumentTest extends TestCase
             'target_php' => '8.4',
             'lock_file' => null,
             'fail_on' => FailOn::NONE,
+            'flagged_verdicts' => [
+                Verdict::ABANDONED,
+                Verdict::SILENT,
+                Verdict::PINNED,
+                Verdict::LEFT_BEHIND,
+                Verdict::OLD_PROMISE,
+                Verdict::STALE,
+            ],
             'thresholds' => [
                 'release-warn-years' => 3,
                 'release-high-years' => 5,
@@ -77,6 +85,27 @@ final class ReportDocumentTest extends TestCase
                 'push-high-years' => 5,
             ],
         ], J::arrayAt($document, ['context']));
+    }
+
+    /**
+     * The page counts findings for itself, so it has to be told which verdicts are findings. If it
+     * decided on its own that anything other than `ok` and `finished` counts, `unknown` — a package
+     * lockrot could not check — would be listed as a finding, and the page would show one more than
+     * its own title, the text table and `--fail-on` all say.
+     */
+    public function testThePageIsToldWhichVerdictsAreFindings(): void
+    {
+        $document = $this->document($this->report([]))->toArray();
+
+        $flagged = J::arrayAt($document, ['context', 'flagged_verdicts']);
+
+        self::assertNotContains(Verdict::UNKNOWN, $flagged);
+        self::assertNotContains(Verdict::FINISHED, $flagged);
+        self::assertNotContains(Verdict::OK, $flagged);
+        foreach (array_keys($flagged) as $at) {
+            $verdict = J::stringAt($flagged, [$at]);
+            self::assertTrue(Verdict::flagged($verdict), $verdict.' is not a flagged verdict');
+        }
     }
 
     public function testOnlyTheFlaggedPackagesAreExplainedUnlessEverythingIsAsked(): void

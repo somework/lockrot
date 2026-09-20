@@ -79,6 +79,10 @@ final class ReportDocument
             // page is about one lock and already says which.
             'lock_file' => $lockPath === null ? null : basename($lockPath),
             'fail_on' => $this->context->failOn(),
+            // Which verdicts count as flagged, so the page's own idea of "flagged" cannot drift from
+            // the one the text table, the counters and `--fail-on` all share. `unknown` is the case
+            // this settles: a package lockrot could not check is not a finding, it is a note.
+            'flagged_verdicts' => array_values(array_filter(Verdict::all(), [Verdict::class, 'flagged'])),
             'thresholds' => $thresholds === null ? null : [
                 'release-warn-years' => $thresholds->releaseWarnYears(),
                 'release-high-years' => $thresholds->releaseHighYears(),

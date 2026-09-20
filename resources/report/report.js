@@ -78,21 +78,35 @@
   function outLink(url, text) {
     return '<a class="out" href="' + esc(url) + '" target="_blank" rel="noopener noreferrer">' + esc(text) + "</a>";
   }
-  var FLAGGED = FINDINGS.filter(function (f) { return f.verdict !== "ok" && f.verdict !== "finished"; });
+  /**
+   * The verdicts that count as findings, as the tool itself defines them — `context.flagged_verdicts`
+   * is written from Verdict::flagged(), so this page and lockrot's own table always agree on the
+   * number. The fallback is for a document that carries no context, a bare `--format=json` one:
+   * `unknown` is left out there too, because a package lockrot could not check is a note, not a
+   * finding, and counting it would put the page one ahead of its own headline.
+   */
+  var FLAGGED_VERDICTS = CONTEXT.flagged_verdicts ||
+    ["abandoned", "silent", "pinned", "left-behind", "old-promise", "stale"];
+  var FLAGGED = FINDINGS.filter(function (f) { return FLAGGED_VERDICTS.indexOf(f.verdict) !== -1; });
 
   /**
    * new / worsened / known, against the baseline file the run read. The report's own JSON carries
    * only the totals, so the state per finding is worked out here from the same file lockrot read.
    */
   var BASELINE = BUNDLE.baseline || {};
+  /**
+   * Whether the per-finding baseline states are actually here. The report's own JSON carries the
+   * `baseline` totals, so `REPORT.baseline` alone is not enough: a document that came from
+   * `--format=json` has the totals and no states, and gating on it would draw a filter whose three
+   * counts are all wrong.
+   */
+  var HAS_BASELINE = !!REPORT.baseline && Object.keys(BASELINE).length > 0;
   var SEVERITY_ORDER = ["abandoned", "silent", "pinned", "left-behind", "old-promise", "stale", "unknown"];
   /** new / known / worsened, as BaselineComparison decided it; null when the run had no baseline. */
   function baselineState(f) {
     var state = BASELINE[f.package];
     return state ? state.status : null;
   }
-  var BASE_NEW = FLAGGED.filter(function (f) { return baselineState(f) === "new"; });
-  var BASE_WORSE = FLAGGED.filter(function (f) { return baselineState(f) === "worsened"; });
   var SEV_ORDER = ["critical", "high", "medium", "low", null];
   function sevTone(sev) {
     return sev === "critical" ? "crit" : sev === "high" ? "high" : sev === "medium" ? "med" : "low";
@@ -310,7 +324,7 @@
 
     // The baseline lives in the rail, not in the Findings list: matches() applies it on every tab,
     // so the control has to be reachable from every tab that it silently narrows.
-    if (REPORT.baseline) {
+    if (HAS_BASELINE) {
       var since = [
         ["new", "New", here.filter(function (f) { return baselineState(f) === "new"; }).length],
         ["worsened", "Worsened", here.filter(function (f) { return baselineState(f) === "worsened"; }).length],
