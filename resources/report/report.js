@@ -270,38 +270,83 @@
   }
 
   /* ---------- rail ---------- */
+  /**
+   * The population the current tab draws from. The rail counts against it, so "Direct 214" never
+   * sits over a list of 47 rows again, and a filter that cannot apply to this tab is not offered.
+   */
+  function population() {
+    if (state.view === "findings" || state.view === "radius") return FLAGGED;
+    if (state.view === "advisories") return ADV_PACKAGES;
+    if (state.view === "packages") return FINDINGS;
+    return [];
+  }
+
   function renderRail() {
+    var rail = el("rail");
+    var here = population();
+    // Run data describes the run, not its packages: nothing on it can be filtered.
+    if (!here.length) {
+      rail.hidden = true;
+      rail.innerHTML = "";
+      return;
+    }
+    rail.hidden = false;
+
     var sigCount = {};
-    FINDINGS.forEach(function (f) {
-      (f.signals || []).forEach(function (s) { sigCount[s.id] = (sigCount[s.id] || 0) + 1; });
+    here.forEach(function (f) {
+      (f.signals || []).forEach(function (sig) { sigCount[sig.id] = (sigCount[sig.id] || 0) + 1; });
     });
     var scope = [
-      ["direct", "Direct", FINDINGS.filter(function (f) { return f.direct; }).length],
-      ["transitive", "Transitive", FINDINGS.filter(function (f) { return !f.direct; }).length],
-      ["prod", "require", FINDINGS.filter(function (f) { return !f.dev; }).length],
-      ["dev", "require-dev", FINDINGS.filter(function (f) { return f.dev; }).length]
+      ["direct", "Direct", here.filter(function (f) { return f.direct; }).length],
+      ["transitive", "Transitive", here.filter(function (f) { return !f.direct; }).length],
+      ["prod", "require", here.filter(function (f) { return !f.dev; }).length],
+      ["dev", "require-dev", here.filter(function (f) { return f.dev; }).length]
     ];
-    var html = '<div class="rail-group"><span class="eyebrow">Scope</span><div class="opts">';
-    scope.forEach(function (s) {
-      html += '<button class="opt" type="button" data-filter="scope" data-key="' + s[0] + '" aria-pressed="' +
-        (state.scope[s[0]] ? "true" : "false") + '">' + s[1] + '<span class="c">' + s[2] + "</span></button>";
+    var html = "";
+
+    // The baseline lives in the rail, not in the Findings list: matches() applies it on every tab,
+    // so the control has to be reachable from every tab that it silently narrows.
+    if (REPORT.baseline) {
+      var since = [
+        ["new", "New", here.filter(function (f) { return baselineState(f) === "new"; }).length],
+        ["worsened", "Worsened", here.filter(function (f) { return baselineState(f) === "worsened"; }).length],
+        ["known", "Already accepted", here.filter(function (f) { return baselineState(f) !== "new" && baselineState(f) !== "worsened"; }).length]
+      ];
+      html += '<div class="rail-group"><span class="eyebrow">Since ' + esc(REPORT.baseline.path) + '</span><div class="opts">';
+      since.forEach(function (row) {
+        html += '<button class="opt" type="button" data-filter="since" data-key="' + row[0] + '" aria-pressed="' +
+          (state.since[row[0]] ? "true" : "false") + '">' + row[1] + '<span class="c">' + row[2] + "</span></button>";
+      });
+      html += "</div></div>";
+    }
+
+    html += '<div class="rail-group"><span class="eyebrow">Scope</span><div class="opts">';
+    scope.forEach(function (row) {
+      html += '<button class="opt" type="button" data-filter="scope" data-key="' + row[0] + '" aria-pressed="' +
+        (state.scope[row[0]] ? "true" : "false") + '">' + row[1] + '<span class="c">' + row[2] + "</span></button>";
     });
     html += "</div></div>";
 
-    html += '<div class="rail-group"><span class="eyebrow">Signal</span><div class="opts">';
-    Object.keys(sigCount).sort().forEach(function (id) {
-      html += '<button class="opt" type="button" data-filter="signal" data-key="' + id + '" aria-pressed="' +
-        (state.signal[id] ? "true" : "false") + '" title="' + esc(SIGNAL_NAMES[id] || "") + '">' +
-        '<span class="mono">' + id + "</span> " + esc(SIGNAL_NAMES[id] || "") +
-        '<span class="c">' + sigCount[id] + "</span></button>";
-    });
-    html += "</div></div>";
+    if (Object.keys(sigCount).length) {
+      html += '<div class="rail-group"><span class="eyebrow">Signal</span><div class="opts">';
+      Object.keys(sigCount).sort().forEach(function (id) {
+        html += '<button class="opt" type="button" data-filter="signal" data-key="' + id + '" aria-pressed="' +
+          (state.signal[id] ? "true" : "false") + '" title="' + esc(SIGNAL_DEFS[id] || "") + '">' +
+          '<span class="mono">' + id + "</span> " + esc(SIGNAL_NAMES[id] || "") +
+          '<span class="c">' + sigCount[id] + "</span></button>";
+      });
+      html += "</div></div>";
+    }
 
     var shapes = { branch: 0, move: 0, none: 0 };
-    ALL_ADVISORIES.forEach(function (a) {
-      shapes[!a.fixed_by ? "none" : (a.fixed_on_branch ? "branch" : "move")]++;
+    var advisories = 0;
+    here.forEach(function (f) {
+      advisoriesOf(f).forEach(function (a) {
+        advisories++;
+        shapes[!a.fixed_by ? "none" : (a.fixed_on_branch ? "branch" : "move")]++;
+      });
     });
-    if (ALL_ADVISORIES.length) {
+    if (advisories) {
       html += '<div class="rail-group"><span class="eyebrow">What the fix costs</span><div class="opts">';
       [["branch", "A release on this branch"], ["move", "Moving to another branch"], ["none", "No fix listed"]].forEach(function (pair) {
         if (!shapes[pair[0]]) return;
@@ -310,7 +355,7 @@
       });
       html += "</div></div>";
     }
-    el("rail").innerHTML = html;
+    rail.innerHTML = html;
   }
 
   /* ---------- views ---------- */
@@ -367,19 +412,6 @@
   function viewFindings(terms) {
     visible = FLAGGED.filter(function (f) { return matches(f, terms); });
     var head = "";
-    var b = REPORT.baseline;
-    if (b) {
-      head += '<div class="since"><span class="eyebrow">Since ' + esc(b.path) + "</span>" +
-        '<button class="opt" type="button" data-filter="since" data-key="new" aria-pressed="' +
-          (state.since["new"] ? "true" : "false") + '"><b style="color:var(--crit)">' + b["new"] + "</b> new</button>" +
-        '<button class="opt" type="button" data-filter="since" data-key="worsened" aria-pressed="' +
-          (state.since.worsened ? "true" : "false") + '"><b style="color:var(--high)">' + b.worsened + "</b> worsened</button>" +
-        '<button class="opt" type="button" data-filter="since" data-key="known" aria-pressed="' +
-          (state.since.known ? "true" : "false") + '"><b>' + b.known + "</b> already accepted</button>" +
-        (b.stale && b.stale.length ? '<span style="color:var(--muted);font-size:12px">' + b.stale.length +
-          " baselined package" + (b.stale.length > 1 ? "s are" : " is") + " no longer in the lock</span>" : "") +
-        "</div>";
-    }
     var quiet = FINDINGS.filter(function (f) {
       return advisoriesOf(f).length && (f.verdict === "ok" || f.verdict === "finished");
     });
@@ -428,11 +460,30 @@
       "</span></div>";
   }
 
+  /**
+   * Whether one advisory passes the filters that are about advisories. Filtering the package and
+   * then drawing all of its advisories showed four low ones next to the critical that was asked
+   * for, and put rows in fix-shape groups nobody had selected.
+   */
+  function advisoryMatches(a, terms) {
+    var severity = a.severity || "unrated";
+    if (terms.severity.length && terms.severity.indexOf(String(a.severity)) === -1) return false;
+    if (anySelected(state.sev) && !state.sev[severity]) return false;
+    var shape = !a.fixed_by ? "none" : (a.fixed_on_branch ? "branch" : "move");
+    if (anySelected(state.fix) && !state.fix[shape]) return false;
+    if (terms.cve.length) {
+      var id = (a.cve || a.id || "").toUpperCase();
+      var hit = terms.cve.some(function (c) { return id.indexOf(c) !== -1; });
+      if (!hit) return false;
+    }
+    return true;
+  }
+
   function viewAdvisories(terms) {
     visible = FINDINGS.filter(function (f) { return advisoriesOf(f).length && matches(f, terms); });
     var keep = {};
     visible.forEach(function (f) { keep[f.package] = true; });
-    var rows = ALL_ADVISORIES.filter(function (a) { return keep[a._pkg]; });
+    var rows = ALL_ADVISORIES.filter(function (a) { return keep[a._pkg] && advisoryMatches(a, terms); });
     if (!rows.length) return emptyState();
 
     rows.sort(function (x, y) {
@@ -498,15 +549,24 @@
     return '<div class="tablewrap"><table><thead><tr>' + head + "</tr></thead><tbody>" + rows + "</tbody></table></div>";
   }
 
-  function viewRadius() {
-    visible = [];
-    var exposure = (REPORT.exposure || []).slice().sort(function (a, b) { return b.flagged - a.flagged; });
+  function viewRadius(terms) {
+    var kept = FLAGGED.filter(function (f) { return matches(f, terms); });
+    var keptNames = {};
+    kept.forEach(function (f) { keptNames[f.package] = true; });
+    visible = kept;
+    var exposure = (REPORT.exposure || []).slice()
+      .map(function (e) {
+        var pulled = kept.filter(function (f) {
+          return (f.chain || []).indexOf(e.package) !== -1 && f.package !== e.package;
+        });
+        return { package: e.package, flagged: pulled.length + (keptNames[e.package] ? 1 : 0), pulled: pulled };
+      })
+      .filter(function (e) { return e.flagged > 0; })
+      .sort(function (a, b) { return b.flagged - a.flagged; });
     if (!exposure.length) return '<div class="empty">No direct requirement drags a flagged package in.</div>';
     var max = exposure[0].flagged || 1;
     var cards = exposure.map(function (e) {
-      var pulled = FLAGGED.filter(function (f) {
-        return (f.chain || []).indexOf(e.package) !== -1 && f.package !== e.package;
-      });
+      var pulled = e.pulled;
       var names = pulled.map(function (f) {
         return '<div style="display:flex;gap:7px;align-items:baseline"><span class="mono" style="font-size:11px;color:var(--muted)">→</span>' +
           '<button class="opt" type="button" data-open="' + esc(f.package) + '" style="padding:1px 4px">' +
@@ -734,7 +794,7 @@
     if (state.view === "findings") root.innerHTML = viewFindings(terms);
     else if (state.view === "advisories") root.innerHTML = viewAdvisories(terms);
     else if (state.view === "packages") root.innerHTML = viewPackages(terms);
-    else if (state.view === "radius") root.innerHTML = viewRadius();
+    else if (state.view === "radius") root.innerHTML = viewRadius(terms);
     else root.innerHTML = viewRun();
 
     Array.prototype.forEach.call(document.querySelectorAll(".tab"), function (t) {
@@ -756,13 +816,21 @@
     }, 0) + (state.q ? 1 : 0);
     var line = "";
     if (state.view === "findings") line = visible.length + " of " + FLAGGED.length + " flagged packages";
-    else if (state.view === "advisories") line = (root.querySelectorAll(".adv").length) + " of " + ALL_ADVISORIES.length + " advisories";
+    else if (state.view === "advisories") line = root.querySelectorAll(".advgroup .adv").length + " of " + ALL_ADVISORIES.length + " advisories";
     else if (state.view === "packages") line = visible.length + " of " + FINDINGS.length + " packages";
+    else if (state.view === "radius") line = root.querySelectorAll(".card").length + " of " + (REPORT.exposure || []).length + " direct requirements";
+    el("countLine").hidden = !line;
     el("countLine").innerHTML = esc(line) +
-      (active ? ' <span style="color:var(--accent-ink)">' + active + " filter" + (active > 1 ? "s" : "") + " on</span>" : "");
+      (line && active ? ' <span style="color:var(--accent-ink)">' + active + " filter" + (active > 1 ? "s" : "") + " on</span>" : "");
     el("clearBtn").disabled = !active;
     el("clearBtn").style.opacity = active ? "1" : ".5";
 
+    var filterable = population().length > 0;
+    document.querySelector(".searchbar").hidden = !filterable;
+    document.querySelector(".hint").hidden = !filterable;
+    document.querySelector(".ledger").hidden = state.view === "run";
+
+    renderRail();
     renderDetail();
     document.body.classList.toggle("detail-open", !!state.pkg && !WIDE);
     writeHash();
@@ -931,6 +999,8 @@
   el("themeBtn").textContent = document.documentElement.getAttribute("data-theme") === "dark" ? "Light" : "Dark";
 
   el("mVersion").textContent = TOOL.version || "\u2014";
+  el("fVersion").textContent = TOOL.version || "\u2014";
+  el("fDate").textContent = day(REPORT.generated_at);
   el("mData").textContent = day(REPORT.generated_at);
   el("mTarget").textContent = CONTEXT.target_php || "\u2014";
   el("projectName").textContent = CONTEXT.lock_file || "composer.lock";
@@ -940,6 +1010,5 @@
   if (!state.pkg && WIDE && FLAGGED.length) state.pkg = FLAGGED[0].package;
   fillLegend();
   renderLedger();
-  renderRail();
   render();
 })();
