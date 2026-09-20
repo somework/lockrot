@@ -77,7 +77,7 @@ too — so the published schema, the code and the docs cannot drift apart.
 
 ## What the report schema types
 
-Beyond the field list [ci.md](ci.md#--formatjson) gives, the report schema pins down the parts a
+Beyond the field list [ci.md](ci.md#-formatjson) gives, the report schema pins down the parts a
 consumer usually keys on:
 
 - `verdict`, `priority` and a signal's `level` are enums — the nine verdicts, five priorities and
