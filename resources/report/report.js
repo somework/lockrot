@@ -163,6 +163,9 @@
     if (y < 1) return Math.max(1, Math.round(y * 12)) + " mo ago";
     return y.toFixed(1) + " y ago";
   }
+  function plural(n, one, many) {
+    return n + " " + (n === 1 ? one : many);
+  }
   function anySelected(obj) {
     for (var k in obj) { if (obj[k]) return true; }
     return false;
@@ -254,8 +257,9 @@
       var k = a.severity || "unrated";
       sc[k] = (sc[k] || 0) + 1;
     });
-    el("advCount").textContent = ALL_ADVISORIES.length;
-    el("advPkgs").textContent = ADV_PACKAGES.length;
+    el("advLabel").textContent = ALL_ADVISORIES.length === 0
+      ? "No advisory affects this lock"
+      : plural(ALL_ADVISORIES.length, "advisory", "advisories") + " on " + plural(ADV_PACKAGES.length, "package", "packages");
     var aBar = [], aLeg = [];
     ["critical", "high", "medium", "low", "unrated"].forEach(function (k) {
       var n = sc[k] || 0;
