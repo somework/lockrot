@@ -7,6 +7,7 @@ namespace Lockrot\Output;
 use Lockrot\Analyzer\Report;
 use Lockrot\Html\PageData;
 use Lockrot\Html\ReportDocument;
+use Lockrot\Verdict\Verdict;
 
 /**
  * The report as one page: `--format=html`.
@@ -40,10 +41,41 @@ final class HtmlFormatter implements FormatterInterface
 
         return strtr(self::read(self::TEMPLATE), [
             '{{TITLE}}' => self::text(self::title($report)),
+            '{{DESCRIPTION}}' => self::text(self::description($report)),
             '{{CSS}}' => self::read(self::STYLES),
             '{{JS}}' => self::read(self::SCRIPT),
             '{{DATA}}' => self::payload($document->toArray($showAll)),
         ]);
+    }
+
+    /**
+     * The sentence under the title wherever the page is linked — a search result, a Slack unfurl, a
+     * post. It says what was found, because that is what the reader is deciding whether to open,
+     * and it names the three verdicts that carried the most packages rather than all nine.
+     */
+    private static function description(Report $report): string
+    {
+        $flagged = \count($report->flagged());
+        $checked = $report->packagesChecked();
+        if ($flagged === 0) {
+            return 'lockrot checked '.$checked.' packages in composer.lock and flagged none. Every verdict carries the release dates it was decided on.';
+        }
+
+        $counts = [];
+        foreach ($report->byVerdict() as $verdict => $count) {
+            if ($count > 0 && Verdict::flagged($verdict)) {
+                $counts[$verdict] = $count;
+            }
+        }
+        arsort($counts);
+        $named = [];
+        foreach (\array_slice($counts, 0, 3, true) as $verdict => $count) {
+            $named[] = $count.' '.$verdict;
+        }
+
+        return 'lockrot flagged '.$flagged.' of '.$checked.' packages in composer.lock'
+            .($named === [] ? '' : ': '.implode(', ', $named))
+            .'. Each finding carries its evidence, the release branches behind it and any security advisory.';
     }
 
     /** What the tab says, which is the first thing anyone sees of a downloaded artifact. */

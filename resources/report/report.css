@@ -82,6 +82,9 @@
 }
 
 * { box-sizing: border-box; }
+/* Every display rule below is a class selector, which ties with [hidden] on specificity and wins on
+   order. Without this, hiding the rail leaves an empty element holding its grid column. */
+[hidden] { display: none !important; }
 body {
   margin: 0;
   background: var(--bg);
@@ -223,8 +226,14 @@ button { font: inherit; color: inherit; }
   gap: 20px;
   align-items: start;
 }
-@media (max-width: 1180px) { .shell { grid-template-columns: 200px minmax(0, 1fr); } }
-@media (max-width: 860px) { .shell { grid-template-columns: 1fr; } }
+/* Run data has nothing to filter, so the rail goes -- and its column with it, or the main
+   column inherits the rail's 210px and every value wraps one character at a time. */
+.shell.no-rail { grid-template-columns: minmax(0, 1fr) minmax(0, 420px); }
+@media (max-width: 1180px) {
+  .shell { grid-template-columns: 200px minmax(0, 1fr); }
+  .shell.no-rail { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 860px) { .shell, .shell.no-rail { grid-template-columns: 1fr; } }
 
 .rail { display: flex; flex-direction: column; gap: 18px; position: sticky; top: 196px; }
 @media (max-width: 860px) { .rail { position: static; } }

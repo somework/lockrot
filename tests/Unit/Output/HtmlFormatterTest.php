@@ -88,7 +88,9 @@ final class HtmlFormatterTest extends TestCase
         $page = $this->page($this->report([$this->finding($nasty)]));
 
         self::assertStringNotContainsString('</script><script>alert(1)', $page);
-        self::assertStringNotContainsString('<!--', $page);
+        $matched = preg_match('{<script id="lockrot-data" type="application/json">(.*?)</script>}s', $page, $m);
+        self::assertSame(1, $matched);
+        self::assertStringNotContainsString('<!--', $m[1], 'a comment opener inside the payload would end parsing too');
         $payload = self::payloadOf($page);
         self::assertSame($nasty, J::stringAt($payload, ['report', 'findings', 0, 'package']), 'and it still reads back unchanged');
     }
@@ -148,6 +150,32 @@ final class HtmlFormatterTest extends TestCase
 
         self::assertStringContainsString('"https://lockrot.dev/schema/report-1.json"', $page);
         self::assertStringNotContainsString('https:\/\/lockrot.dev', $page);
+    }
+
+    /**
+     * Whether a published report may be indexed is the publisher's call, made in their robots.txt
+     * and their headers. What the page owes a link is a sentence and a card.
+     */
+    public function testThePageCarriesWhatALinkNeedsAndNoIndexingPolicy(): void
+    {
+        $report = $this->report([
+            $this->finding('vendor/gone', Verdict::ABANDONED),
+            $this->finding('vendor/quiet', Verdict::SILENT),
+            $this->finding('vendor/fine', Verdict::OK),
+        ], 40);
+        $page = $this->page($report);
+
+        self::assertStringNotContainsString('name="robots"', $page);
+        self::assertStringContainsString('lockrot flagged 2 of 40 packages in composer.lock: 1 abandoned, 1 silent.', $page);
+        self::assertStringContainsString('<meta property="og:image" content="https://lockrot.dev/assets/og.png">', $page);
+        self::assertStringContainsString('<meta name="twitter:card" content="summary_large_image">', $page);
+    }
+
+    public function testACleanRunSaysSoInItsDescription(): void
+    {
+        $page = $this->page($this->report([$this->finding('vendor/fine', Verdict::OK)], 40));
+
+        self::assertStringContainsString('lockrot checked 40 packages in composer.lock and flagged none.', $page);
     }
 
     public function testTheFormatIsReachableByName(): void

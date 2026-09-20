@@ -3,8 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="robots" content="noindex">
 <title>{{TITLE}}</title>
+<meta name="description" content="{{DESCRIPTION}}">
+<!--
+  Indexing is the publisher's call, not this file's: a report lives on someone else's domain, and
+  robots.txt and a response header are where that decision belongs. What is here instead is what a
+  link needs when the page is shared: a title, a sentence and a card image. The image is fetched by
+  a social scraper, never by the page, which still loads nothing at render.
+-->
+<meta property="og:type" content="article">
+<meta property="og:title" content="{{TITLE}}">
+<meta property="og:description" content="{{DESCRIPTION}}">
+<meta property="og:image" content="https://lockrot.dev/assets/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{TITLE}}">
+<meta name="twitter:description" content="{{DESCRIPTION}}">
 <style>
 {{CSS}}
 </style>

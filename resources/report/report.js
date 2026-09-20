@@ -830,6 +830,7 @@
     el("clearBtn").style.opacity = active ? "1" : ".5";
 
     var filterable = population().length > 0;
+    document.querySelector(".shell").classList.toggle("no-rail", !filterable);
     document.querySelector(".searchbar").hidden = !filterable;
     document.querySelector(".hint").hidden = !filterable;
     document.querySelector(".ledger").hidden = state.view === "run";

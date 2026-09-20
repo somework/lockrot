@@ -31,7 +31,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `dev:`, and `?` opens a glossary of every verdict and signal. The payload's `report` key is byte
   for byte what `--format=json` writes, envelope included, so it validates against the published
   [report schema](docs/schema.md). `--all` puts every package in the page, at roughly 4 KB each;
-  without it a 100-package lock lands around 250 KB. See [ci.md](docs/ci.md).
+  without it a 100-package lock lands around 250 KB. The page carries a description and an Open
+  Graph card so a shared link says what was found, and no `robots` directive: whether a published
+  report may be indexed is the publisher's call, made in their robots.txt, not this file's.
+  See [ci.md](docs/ci.md).
 
 ## [0.9.0] - 2026-09-20
 
