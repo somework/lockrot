@@ -6,6 +6,7 @@ namespace Lockrot\Html;
 
 use Lockrot\Analyzer\Report;
 use Lockrot\Explain\Explanation;
+use Lockrot\Json\Schemas;
 use Lockrot\Output\FormatContext;
 use Lockrot\Output\JsonFormatter;
 use Lockrot\Signal\Signal;
@@ -50,9 +51,10 @@ final class ReportDocument
     public function toArray(bool $showAll = false): array
     {
         return [
-            'lockrot' => ['version' => Version::STRING, 'schema' => JsonFormatter::SCHEMA],
             'context' => $this->context(),
-            'report' => $this->report->toArray(),
+            // Byte for byte what `--format=json` writes, envelope included, so `jq .report` out of
+            // the page gives a document the published schema describes.
+            'report' => ['$schema' => Schemas::url(Schemas::REPORT, JsonFormatter::SCHEMA), 'lockrot' => ['version' => Version::STRING, 'schema' => JsonFormatter::SCHEMA]] + $this->report->toArray(),
             'details' => $this->details($showAll),
             'baseline' => $this->baselineStates(),
         ];

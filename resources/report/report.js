@@ -5,7 +5,7 @@
   var REPORT = BUNDLE.report;
   var DETAILS = BUNDLE.details || {};
   var CONTEXT = BUNDLE.context || {};
-  var TOOL = BUNDLE.lockrot || {};
+  var TOOL = REPORT.lockrot || {};
   var FINDINGS = REPORT.findings || [];
   var NOW = new Date(REPORT.generated_at);
 
@@ -23,9 +23,8 @@
     S8: "the installed branch stopped", S9: "security advisories"
   };
   var DOCS = "https://lockrot.dev/verdicts/";
-  // The `report` key below is the document --format=json writes, so it is described by the
-  // published schema of the same number.
-  var SCHEMA_URL = "https://lockrot.dev/schema/report-" + ((BUNDLE.lockrot || {}).schema || 1) + ".json";
+  // The report carries its own $schema, being the document --format=json writes.
+  var SCHEMA_URL = REPORT["$schema"] || "https://lockrot.dev/schema/report-1.json";
   var SIGNAL_DOC = { S7: DOCS + "#transitive-exposure", S8: DOCS + "#left-behind", S9: DOCS + "#security-advisories" };
   var VERDICT_DEFS = {
     abandoned: "The package's Composer repository marks it abandoned, or its repository is archived on GitHub or GitLab.",

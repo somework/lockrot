@@ -8,6 +8,7 @@ use Lockrot\Analyzer\Analysis;
 use Lockrot\Analyzer\Report;
 use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineComparison;
+use Lockrot\Html\PageData;
 use Lockrot\Html\ReportDocument;
 use Lockrot\Output\FormatContext;
 use Lockrot\Signal\PackageFacts;
@@ -17,6 +18,7 @@ use Lockrot\Tests\Support\JsonPath as J;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
+use Lockrot\Version;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -37,14 +39,12 @@ final class ReportDocumentTest extends TestCase
     /** @param array<string, PackageFacts> $facts */
     private function document(Report $report, array $facts = [], ?BaselineComparison $baseline = null): ReportDocument
     {
-        return new ReportDocument(
-            $report,
-            FormatContext::unknown(),
+        return new ReportDocument($report, FormatContext::unknown(), new PageData(
             $facts === [] ? null : new Analysis($report, $facts),
             $baseline,
             new Thresholds(),
             '8.4'
-        );
+        ));
     }
 
     public function testTheReportKeyIsWhatFormatJsonWrites(): void
@@ -53,8 +53,11 @@ final class ReportDocumentTest extends TestCase
 
         $document = $this->document($report)->toArray();
 
-        self::assertSame($report->toArray(), J::arrayAt($document, ['report']), 'a consumer pulling the payload out of the page gets the published document');
-        self::assertSame(['version', 'schema'], array_keys(J::arrayAt($document, ['lockrot'])));
+        self::assertSame(
+            ['$schema' => 'https://lockrot.dev/schema/report-1.json', 'lockrot' => ['version' => Version::STRING, 'schema' => 1]] + $report->toArray(),
+            J::arrayAt($document, ['report']),
+            'a consumer pulling the payload out of the page gets the published document'
+        );
     }
 
     public function testTheContextCarriesWhatTheRunWasToldToDo(): void
