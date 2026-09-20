@@ -284,3 +284,25 @@ slow test. They are listed here only so nobody reads them as an unexplained "2 t
   PHP reads it as `''`, no branch is keyed by the empty string, and the method returns false on the
   next line. The early return is the statement of intent.
 
+## The html report (2026-09-21)
+
+Measured over `src/Html/ReportDocument.php`, `src/Html/PageData.php` and
+`src/Output/HtmlFormatter.php`: 116 mutants, 114 killed, MSI = Covered MSI 98%, ~1m45s on 8 threads.
+The first pass escaped 18; sixteen of them were real gaps in the tests and are killed now — the
+whole `context` array is asserted rather than two of its keys, `repository_link` is asserted across
+five sources including one that is not a URL, `trim()` is exercised by a padded URL, the default
+value of `$showAll` is exercised against a run that has facts, and the payload is asserted to keep
+its slashes unescaped. Two are equivalent:
+
+- `src/Html/ReportDocument.php:103` Continue_ — `continue` becomes `break` in the skip for a package
+  that is not worth explaining. `Report::compare()` orders findings by priority rank first, and an
+  unflagged package has no priority at all, so the packages this branch skips are always a suffix of
+  the list. Breaking out of the loop at the first of them selects exactly what stepping over each of
+  them selects. It is `continue` because the loop's condition is about one package, not about where
+  the list stops.
+- `src/Output/HtmlFormatter.php:83` BitwiseOr — `ENT_QUOTES | ENT_SUBSTITUTE` becomes `&`, which is
+  `0`, so quotes stay unescaped and invalid UTF-8 is not substituted. `text()` has one caller and it
+  is `title()`, which builds its string from two integers and literal words: no quote and no invalid
+  byte can reach it today. The flags are there so that stays true if the title ever grows a value
+  from the lock, and a test cannot tell the difference until it does.
+

@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Output;
 
+use Lockrot\Analyzer\Analysis;
 use Lockrot\Analyzer\Report;
+use Lockrot\Html\PageData;
 use Lockrot\Output\FormatContext;
 use Lockrot\Output\Formatters;
 use Lockrot\Output\HtmlFormatter;
 use Lockrot\Signal\Signal;
+use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\JsonPath as J;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
 use Lockrot\Verdict\Finding;
@@ -115,6 +118,36 @@ final class HtmlFormatterTest extends TestCase
         self::assertSame('https://lockrot.dev/schema/report-1.json', J::stringAt($payload, ['report', '$schema']));
         self::assertSame([], J::arrayAt($payload, ['details']), 'no facts were passed, so there is nothing to explain');
         self::assertSame([], J::arrayAt($payload, ['baseline']));
+    }
+
+    /**
+     * Without `--all` the page explains the flagged packages and leaves the rest as rows, which is
+     * what keeps a 100-package report near 250 KB rather than a megabyte.
+     */
+    public function testTheDefaultIsTheFlaggedPackagesOnly(): void
+    {
+        $report = $this->report([$this->finding('vendor/rotten'), $this->finding('vendor/fine', Verdict::OK)], 2);
+        $facts = [
+            'vendor/rotten' => F::facts(F::package(['name' => 'vendor/rotten']), F::metadata([['1.0.0', '2020-01-01T00:00:00+00:00']])),
+            'vendor/fine' => F::facts(F::package(['name' => 'vendor/fine']), F::metadata([['1.0.0', '2026-01-01T00:00:00+00:00']])),
+        ];
+        $formatter = new HtmlFormatter(FormatContext::unknown(), new PageData(new Analysis($report, $facts), null, new Thresholds(), '8.4'));
+
+        self::assertSame(['vendor/rotten'], array_keys(J::arrayAt(self::payloadOf($formatter->format($report)), ['details'])));
+        self::assertSame(['vendor/rotten', 'vendor/fine'], array_keys(J::arrayAt(self::payloadOf($formatter->format($report, true)), ['details'])));
+    }
+
+    /**
+     * Escaping every slash would inflate a page full of URLs for nothing: the payload sits in a
+     * script element, where a slash is only dangerous next to `</`, and that pair is escaped on its
+     * own.
+     */
+    public function testTheUrlsInThePayloadAreNotEscapedSlashBySlash(): void
+    {
+        $page = $this->page($this->report([$this->finding('vendor/pkg')]));
+
+        self::assertStringContainsString('"https://lockrot.dev/schema/report-1.json"', $page);
+        self::assertStringNotContainsString('https:\/\/lockrot.dev', $page);
     }
 
     public function testTheFormatIsReachableByName(): void
