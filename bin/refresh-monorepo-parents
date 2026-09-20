@@ -19,8 +19,10 @@ use Lockrot\Json\JsonReader;
 $path = __DIR__.'/../resources/monorepo-parents.json';
 $document = JsonReader::readObject($path);
 $existing = \is_array($document['parents'] ?? null) ? $document['parents'] : [];
+// The file's own order is kept and a new parent is appended, so a refresh that adds nothing
+// rewrites nothing: the diff of a routine run is the replace lists, not a reshuffle. Each list is
+// sorted below, where the order really is arbitrary.
 $parents = array_values(array_unique(array_merge(array_keys($existing), \array_slice($argv, 1))));
-sort($parents);
 
 $io = new NullIO();
 $composer = Factory::create($io, [], true);
