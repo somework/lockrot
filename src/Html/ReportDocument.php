@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Html;
 
 use Lockrot\Analyzer\Report;
+use Lockrot\Data\Repository\RepositoryUrl;
 use Lockrot\Explain\Explanation;
 use Lockrot\Json\Schemas;
 use Lockrot\Output\FormatContext;
@@ -69,9 +70,14 @@ final class ReportDocument
     {
         $thresholds = $this->page->thresholds();
 
+        $lockPath = $this->context->lockPath();
+
         return [
             'target_php' => $this->page->targetPhp(),
-            'lock_path' => $this->context->lockPath(),
+            // The name, never the path. A report is something people publish, and an absolute path
+            // carries the account name it was run under and often the client's directory name; the
+            // page is about one lock and already says which.
+            'lock_file' => $lockPath === null ? null : basename($lockPath),
             'fail_on' => $this->context->failOn(),
             'thresholds' => $thresholds === null ? null : [
                 'release-warn-years' => $thresholds->releaseWarnYears(),
@@ -184,23 +190,12 @@ final class ReportDocument
     }
 
     /**
-     * A repository URL only becomes an `href` when it is one. The value comes from the package's own
-     * `source.url` or `support.source`, which is whatever its author wrote there, and the page it
-     * lands in is opened in a browser — so a `javascript:` or `data:` URL is dropped rather than
-     * rendered, and an `scp`-style `git@host:vendor/name.git` is rewritten to the https form it
-     * means. The page checks the scheme again before it writes the attribute.
+     * A repository URL only becomes an `href` when it is one, and never carries the credentials a
+     * private source routinely has in it ({@see RepositoryUrl}). The page checks the scheme again
+     * before it writes the attribute.
      */
     public static function linkable(?string $url): ?string
     {
-        if ($url === null) {
-            return null;
-        }
-        $url = preg_replace('{^git\+}', '', trim($url)) ?? '';
-        $url = preg_replace('{\.git$}', '', $url) ?? '';
-        if (preg_match('{^[A-Za-z0-9._~-]+@([A-Za-z0-9.-]+):(?!//)(.+)$}', $url, $m) === 1) {
-            $url = 'https://'.$m[1].'/'.$m[2];
-        }
-
-        return preg_match('{^https?://[^\s<>"\']+$}i', $url) === 1 ? $url : null;
+        return RepositoryUrl::linkable($url);
     }
 }

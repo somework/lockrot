@@ -6,6 +6,7 @@ namespace Lockrot\Explain;
 
 use Lockrot\Analyzer\Report;
 use Lockrot\Data\Repository\ReleaseBranch;
+use Lockrot\Data\Repository\RepositoryUrl;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Verdict\Finding;
@@ -172,7 +173,7 @@ final class Explanation
             'lock' => [
                 'php' => $package->requirePhp(),
                 'released' => self::date($package->time()),
-                'repository' => $package->repositoryUrl(),
+                'repository' => RepositoryUrl::withoutCredentials($package->repositoryUrl()),
                 'from_composer_repository' => $package->isFromComposerRepository(),
                 'dev' => $package->isDev(),
                 'branch_snapshot' => $package->isBranchSnapshot(),
@@ -186,7 +187,7 @@ final class Explanation
                 'last_stable_release' => self::date($metadata->lastStableReleaseAt()),
                 'last_stable_version' => $metadata->lastStableVersion(),
                 'last_stable_dated_by' => $metadata->lastStableDatedBy(),
-                'repository' => $metadata->repositoryUrl(),
+                'repository' => RepositoryUrl::withoutCredentials($metadata->repositoryUrl()),
                 'type' => $metadata->type(),
                 'data_date' => self::date($metadata->dataDate()),
                 'branches' => $branches,

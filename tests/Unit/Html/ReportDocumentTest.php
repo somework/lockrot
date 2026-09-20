@@ -68,7 +68,7 @@ final class ReportDocumentTest extends TestCase
 
         self::assertSame([
             'target_php' => '8.4',
-            'lock_path' => null,
+            'lock_file' => null,
             'fail_on' => FailOn::NONE,
             'thresholds' => [
                 'release-warn-years' => 3,

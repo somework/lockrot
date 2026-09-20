@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **A repository URL no longer carries its credentials into a report.** A private Composer source is
+  routinely configured with a token in the URL — `https://gitlab-ci-token:$CI_JOB_TOKEN@…` is how
+  GitLab CI hands a job access to one, and Bitbucket app passwords take the same shape — and
+  Composer keeps it in the lock because it has to fetch with it. `--explain` printed that value
+  verbatim, in the text output as the `source` line and in `--format=json` as `lock.repository`, so
+  a pasted terminal buffer or an uploaded artifact carried a working token. Every repository URL
+  lockrot prints now has its userinfo removed, the host kept (`Lockrot\Data\Repository\RepositoryUrl`).
+  Affects 0.8.0 and 0.9.0, where `--explain` was the only path to it.
+
 ### Added
 
 - `--format=html`: the whole run as one self-contained page. It carries the report, the release

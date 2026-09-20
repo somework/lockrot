@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Output;
 
 use Lockrot\Data\Repository\PackageMetadata;
+use Lockrot\Data\Repository\RepositoryUrl;
 use Lockrot\Explain\Explanation;
 use Lockrot\Json\Schemas;
 use Lockrot\Signal\Signal;
@@ -187,7 +188,7 @@ final class ExplainFormatter
         }
         $lines = ['composer.lock', self::INDENT.self::escape(implode(' · ', $parts))];
         if ($package->repositoryUrl() !== null) {
-            $lines[] = self::INDENT.self::escape('source '.$package->repositoryUrl());
+            $lines[] = self::INDENT.self::escape('source '.RepositoryUrl::withoutCredentials($package->repositoryUrl()));
         }
 
         return $lines;

@@ -933,12 +933,7 @@
   el("mVersion").textContent = TOOL.version || "\u2014";
   el("mData").textContent = day(REPORT.generated_at);
   el("mTarget").textContent = CONTEXT.target_php || "\u2014";
-  // The name, not the path: the page is an artifact people pass around, and an absolute path
-  // from a build machine has no business travelling with it. The payload still carries the value
-  // the run was given, for anyone who needs it.
-  var lockName = String(CONTEXT.lock_path || "composer.lock").split(/[\\/]/).pop();
-  el("projectName").textContent = lockName || "composer.lock";
-  el("projectName").title = String(CONTEXT.lock_path || "");
+  el("projectName").textContent = CONTEXT.lock_file || "composer.lock";
 
   readHash();
   var WIDE = !window.matchMedia || window.matchMedia("(min-width: 1181px)").matches;
