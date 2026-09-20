@@ -1,0 +1,951 @@
+(function () {
+  "use strict";
+
+  var BUNDLE = JSON.parse(document.getElementById("lockrot-data").textContent);
+  var REPORT = BUNDLE.report;
+  var DETAILS = BUNDLE.details || {};
+  var CONTEXT = BUNDLE.context || {};
+  var TOOL = BUNDLE.lockrot || {};
+  var FINDINGS = REPORT.findings || [];
+  var NOW = new Date(REPORT.generated_at);
+
+  var PRIORITIES = ["critical", "high", "medium", "low", "none"];
+  var VERDICTS = ["abandoned", "silent", "pinned", "left-behind", "old-promise", "stale", "unknown", "finished", "ok"];
+  var TONE = {
+    critical: "crit", high: "high", medium: "med", low: "low", none: "none",
+    abandoned: "crit", silent: "crit", pinned: "high", "left-behind": "high",
+    "old-promise": "med", stale: "med", unknown: "low", finished: "none", ok: "none"
+  };
+  var SIGNAL_NAMES = {
+    S1: "marked abandoned", S2: "no stable release", S3: "repository archived",
+    S4: "no push to the repository", S5: "release predates the target PHP",
+    S6: "branch snapshot, not a release", S7: "pulls in flagged packages",
+    S8: "the installed branch stopped", S9: "security advisories"
+  };
+  var DOCS = "https://lockrot.dev/verdicts/";
+  // The `report` key below is the document --format=json writes, so it is described by the
+  // published schema of the same number.
+  var SCHEMA_URL = "https://lockrot.dev/schema/report-" + ((BUNDLE.lockrot || {}).schema || 1) + ".json";
+  var SIGNAL_DOC = { S7: DOCS + "#transitive-exposure", S8: DOCS + "#left-behind", S9: DOCS + "#security-advisories" };
+  var VERDICT_DEFS = {
+    abandoned: "The package's Composer repository marks it abandoned, or its repository is archived on GitHub or GitLab.",
+    silent: "No stable release for at least release-high-years and no repository push for at least push-high-years.",
+    pinned: "The installed version is a branch snapshot \u2014 dev-master, a 2.x-dev alias, a #hash \u2014 or the package has no stable release at all.",
+    "left-behind": "No stable release on the installed branch for release-warn-years, while a higher branch kept releasing. The package is alive; the branch you are on is not.",
+    "old-promise": "The installed version was released before the target PHP's GA date, and its require.php constraint is open-ended for that target.",
+    stale: "Old release or old push, but not old enough on both fronts for silent.",
+    unknown: "No data could be obtained \u2014 not found in any configured Composer repository, or every lookup failed.",
+    finished: "Matched the built-in or project allowlist. The package is complete by design, not neglected.",
+    ok: "None of the above."
+  };
+  var SIGNAL_DEFS = {
+    S1: "The Composer repository marks the package abandoned, sometimes naming a replacement.",
+    S2: "Time since the last stable release, against release-warn-years / release-high-years.",
+    S3: "The repository is archived \u2014 on GitHub, or on GitLab when the run has credentials there.",
+    S4: "Time since the last push to any branch, against push-warn-years / push-high-years.",
+    S5: "The installed release predates the target PHP's GA date and require.php has no upper bound.",
+    S6: "The installed version is a branch snapshot, or the package has no stable release.",
+    S7: "A direct requirement pulls in flagged transitive packages. Informational, never a verdict.",
+    S8: "Time since the last stable release on the installed branch, counted only when a higher branch has released since.",
+    S9: "Security advisories affecting the installed version. Never a verdict; raises the priority where no fix is coming."
+  };
+  var PRIORITY_BASE = {
+    abandoned: "critical", silent: "critical",
+    pinned: "high", "left-behind": "high", "old-promise": "high", stale: "medium"
+  };
+
+  /** Packagist page for a package, when the lock says it came from a Composer repository. */
+  function packagistUrl(f) {
+    var ex = DETAILS[f.package] || {};
+    var fromRepo = ex.lock ? ex.lock.from_composer_repository !== false : true;
+    return fromRepo ? "https://packagist.org/packages/" + f.package : null;
+  }
+  /** The repository the metadata points at, as a browsable URL. */
+  /**
+   * The link ReportDocument already scheme-checked. Checked again here because this is the value
+   * that becomes an href, and a page should not trust its own payload to have been sanitised.
+   */
+  function repoUrl(f) {
+    var link = (DETAILS[f.package] || {}).repository_link;
+    return typeof link === "string" && /^https?:\/\//.test(link) ? link : null;
+  }
+  function repoHost(url) {
+    var m = /^https?:\/\/([^/]+)/.exec(url || "");
+    return m ? m[1].replace(/^www\./, "") : "repository";
+  }
+  function cveUrl(a) {
+    return a.cve && /^CVE-/.test(a.cve) ? "https://nvd.nist.gov/vuln/detail/" + a.cve : null;
+  }
+  function outLink(url, text) {
+    return '<a class="out" href="' + esc(url) + '" target="_blank" rel="noopener noreferrer">' + esc(text) + "</a>";
+  }
+  var FLAGGED = FINDINGS.filter(function (f) { return f.verdict !== "ok" && f.verdict !== "finished"; });
+
+  /**
+   * new / worsened / known, against the baseline file the run read. The report's own JSON carries
+   * only the totals, so the state per finding is worked out here from the same file lockrot read.
+   */
+  var BASELINE = BUNDLE.baseline || {};
+  var SEVERITY_ORDER = ["abandoned", "silent", "pinned", "left-behind", "old-promise", "stale", "unknown"];
+  /** new / known / worsened, as BaselineComparison decided it; null when the run had no baseline. */
+  function baselineState(f) {
+    var state = BASELINE[f.package];
+    return state ? state.status : null;
+  }
+  var BASE_NEW = FLAGGED.filter(function (f) { return baselineState(f) === "new"; });
+  var BASE_WORSE = FLAGGED.filter(function (f) { return baselineState(f) === "worsened"; });
+  var SEV_ORDER = ["critical", "high", "medium", "low", null];
+  function sevTone(sev) {
+    return sev === "critical" ? "crit" : sev === "high" ? "high" : sev === "medium" ? "med" : "low";
+  }
+  function advisoriesOf(f) {
+    var s9 = (f.signals || []).filter(function (s) { return s.id === "S9"; })[0];
+    return (s9 && s9.data && s9.data.advisories) || [];
+  }
+  var ALL_ADVISORIES = [];
+  FINDINGS.forEach(function (f) {
+    advisoriesOf(f).forEach(function (a) {
+      var row = {};
+      for (var k in a) row[k] = a[k];
+      row._pkg = f.package;
+      row._version = f.version;
+      row._verdict = f.verdict;
+      ALL_ADVISORIES.push(row);
+    });
+  });
+  var ADV_PACKAGES = FINDINGS.filter(function (f) { return advisoriesOf(f).length; });
+  /** Distinct releases that clear advisories, cheapest move first. */
+  function fixLadder(f) {
+    var by = {};
+    advisoriesOf(f).forEach(function (a) {
+      var key = a.fixed_by || "\u0000none";
+      by[key] = by[key] || { version: a.fixed_by, onBranch: a.fixed_on_branch, n: 0 };
+      by[key].n++;
+    });
+    return Object.keys(by).map(function (k) { return by[k]; }).sort(function (x, y) {
+      if (x.onBranch !== y.onBranch) return x.onBranch ? -1 : 1;
+      return y.n - x.n;
+    });
+  }
+
+  function evidenceOf(f) {
+    var e = f.evidence;
+    if (!e) return "";
+    return Array.isArray(e) ? e.join(" \u00b7 ") : String(e);
+  }
+
+  var state = { view: "findings", q: "", pkg: null, sort: "verdict", sortDesc: false, prio: {}, verdict: {}, scope: {}, signal: {}, sev: {}, fix: {}, since: {} };
+  var visible = [];
+  var cursor = -1;
+
+  /* ---------- helpers ---------- */
+  function el(id) { return document.getElementById(id); }
+  function esc(s) {
+    return String(s === null || s === undefined ? "" : s)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+  function tone(key) { return TONE[key] || "low"; }
+  function pill(key, link) {
+    var t = tone(key);
+    var style = "color:var(--" + t + ");background:var(--" + t + "-soft);border-color:var(--" + t + ")";
+    var title = VERDICT_DEFS[key] ? ' title="' + esc(VERDICT_DEFS[key]) + '"' : "";
+    if (!link) return '<span class="pill" style="' + style + '"' + title + ">" + esc(key) + "</span>";
+    return '<a class="pill" style="' + style + ';text-decoration:none" href="' + DOCS + '#the-nine-verdicts"' +
+      ' target="_blank" rel="noopener noreferrer"' + title + ">" + esc(key) + "</a>";
+  }
+  function day(iso) { return iso ? String(iso).slice(0, 10) : "—"; }
+  function years(iso) {
+    if (!iso) return null;
+    return (NOW - new Date(iso)) / (365.25 * 24 * 3600 * 1000);
+  }
+  function ageText(iso) {
+    var y = years(iso);
+    if (y === null) return "undated";
+    if (y < 1) return Math.max(1, Math.round(y * 12)) + " mo ago";
+    return y.toFixed(1) + " y ago";
+  }
+  function anySelected(obj) {
+    for (var k in obj) { if (obj[k]) return true; }
+    return false;
+  }
+
+  /* ---------- query ---------- */
+  function parseQuery(raw) {
+    var terms = { text: [], verdict: [], priority: [], signal: [], severity: [], cve: [], direct: null, dev: null };
+    raw.trim().split(/\s+/).forEach(function (part) {
+      if (!part) return;
+      var m = part.match(/^(verdict|priority|signal|severity|cve|direct|dev):(.+)$/i);
+      if (!m) { terms.text.push(part.toLowerCase()); return; }
+      var key = m[1].toLowerCase(), val = m[2].toLowerCase();
+      if (key === "direct" || key === "dev") { terms[key] = (val === "yes" || val === "true" || val === "1"); return; }
+      terms[key].push(key === "signal" || key === "cve" ? val.toUpperCase() : val);
+    });
+    return terms;
+  }
+  function matches(f, terms) {
+    if (terms.text.length) {
+      var hay = (f.package + " " + f.version + " " + f.verdict + " " + evidenceOf(f)).toLowerCase();
+      for (var i = 0; i < terms.text.length; i++) { if (hay.indexOf(terms.text[i]) === -1) return false; }
+    }
+    if (terms.verdict.length && terms.verdict.indexOf(f.verdict) === -1) return false;
+    if (terms.priority.length && terms.priority.indexOf(f.priority) === -1) return false;
+    if (terms.direct !== null && !!f.direct !== terms.direct) return false;
+    if (terms.dev !== null && !!f.dev !== terms.dev) return false;
+    if (terms.signal.length) {
+      var ids = (f.signals || []).map(function (s) { return s.id; });
+      for (var j = 0; j < terms.signal.length; j++) { if (ids.indexOf(terms.signal[j]) === -1) return false; }
+    }
+    var adv = advisoriesOf(f);
+    if (terms.severity.length && !adv.some(function (a) { return terms.severity.indexOf(String(a.severity)) !== -1; })) return false;
+    if (terms.cve.length && !adv.some(function (a) {
+      return terms.cve.some(function (c) { return (a.cve || a.id || "").toUpperCase().indexOf(c) !== -1; });
+    })) return false;
+    if (anySelected(state.sev) && !adv.some(function (a) { return state.sev[a.severity || "unrated"]; })) return false;
+    if (anySelected(state.fix)) {
+      var shape = function (a) { return !a.fixed_by ? "none" : (a.fixed_on_branch ? "branch" : "move"); };
+      if (!adv.some(function (a) { return state.fix[shape(a)]; })) return false;
+    }
+    if (anySelected(state.prio) && !state.prio[f.priority]) return false;
+    if (anySelected(state.verdict) && !state.verdict[f.verdict]) return false;
+    if (anySelected(state.signal)) {
+      var has = (f.signals || []).some(function (s) { return state.signal[s.id]; });
+      if (!has) return false;
+    }
+    if (anySelected(state.since) && !state.since[baselineState(f) || "known"]) return false;
+    if (state.scope.direct && !f.direct) return false;
+    if (state.scope.transitive && f.direct) return false;
+    if (state.scope.prod && f.dev) return false;
+    if (state.scope.dev && !f.dev) return false;
+    return true;
+  }
+
+  /* ---------- ledger ---------- */
+  function renderLedger() {
+    var counts = REPORT.priorities || {};
+    var flaggedTotal = FLAGGED.length;
+    el("flaggedCount").textContent = flaggedTotal;
+    el("totalCount").textContent = FINDINGS.length;
+
+    var pBar = [], pLeg = [];
+    PRIORITIES.forEach(function (p) {
+      if (p === "none") return;
+      var n = counts[p] || 0;
+      if (n) pBar.push('<span style="flex:' + n + ';background:var(--' + tone(p) + ')" title="' + p + ": " + n + '"></span>');
+      pLeg.push('<button type="button" data-filter="prio" data-key="' + p + '" data-on="false">' +
+        '<i class="swatch" style="background:var(--' + tone(p) + ')"></i>' + p + ' <i class="c">' + n + "</i></button>");
+    });
+    el("prioBar").innerHTML = pBar.join("") || '<span style="flex:1;background:var(--none)"></span>';
+    el("prioLegend").innerHTML = pLeg.join("");
+
+    var vc = REPORT.counts || {}, vBar = [], vLeg = [];
+    VERDICTS.forEach(function (v) {
+      var n = vc[v] || 0;
+      if (!n) return;
+      vBar.push('<span style="flex:' + n + ';background:var(--' + tone(v) + ');opacity:' +
+        (v === "ok" ? ".35" : "1") + '" title="' + v + ": " + n + '"></span>');
+      vLeg.push('<button type="button" data-filter="verdict" data-key="' + v + '" data-on="false">' +
+        '<i class="swatch" style="background:var(--' + tone(v) + ');opacity:' + (v === "ok" ? ".35" : "1") + '"></i>' +
+        v + ' <i class="c">' + n + "</i></button>");
+    });
+    el("verdictBar").innerHTML = vBar.join("");
+    el("verdictLegend").innerHTML = vLeg.join("");
+
+    var sc = {};
+    ALL_ADVISORIES.forEach(function (a) {
+      var k = a.severity || "unrated";
+      sc[k] = (sc[k] || 0) + 1;
+    });
+    el("advCount").textContent = ALL_ADVISORIES.length;
+    el("advPkgs").textContent = ADV_PACKAGES.length;
+    var aBar = [], aLeg = [];
+    ["critical", "high", "medium", "low", "unrated"].forEach(function (k) {
+      var n = sc[k] || 0;
+      if (!n) return;
+      var t = sevTone(k === "unrated" ? null : k);
+      aBar.push('<span style="flex:' + n + ';background:var(--' + t + ')" title="' + k + ": " + n + '"></span>');
+      aLeg.push('<button type="button" data-filter="sev" data-key="' + k + '" data-on="false">' +
+        '<i class="swatch" style="background:var(--' + t + ')"></i>' + k + ' <i class="c">' + n + "</i></button>");
+    });
+    el("advBar").innerHTML = aBar.join("") || '<span style="flex:1;background:var(--none)"></span>';
+    el("advLegend").innerHTML = aLeg.join("") || '<span style="color:var(--muted)">no advisory affects this lock</span>';
+  }
+
+  /* ---------- rail ---------- */
+  function renderRail() {
+    var sigCount = {};
+    FINDINGS.forEach(function (f) {
+      (f.signals || []).forEach(function (s) { sigCount[s.id] = (sigCount[s.id] || 0) + 1; });
+    });
+    var scope = [
+      ["direct", "Direct", FINDINGS.filter(function (f) { return f.direct; }).length],
+      ["transitive", "Transitive", FINDINGS.filter(function (f) { return !f.direct; }).length],
+      ["prod", "require", FINDINGS.filter(function (f) { return !f.dev; }).length],
+      ["dev", "require-dev", FINDINGS.filter(function (f) { return f.dev; }).length]
+    ];
+    var html = '<div class="rail-group"><span class="eyebrow">Scope</span><div class="opts">';
+    scope.forEach(function (s) {
+      html += '<button class="opt" type="button" data-filter="scope" data-key="' + s[0] + '" aria-pressed="' +
+        (state.scope[s[0]] ? "true" : "false") + '">' + s[1] + '<span class="c">' + s[2] + "</span></button>";
+    });
+    html += "</div></div>";
+
+    html += '<div class="rail-group"><span class="eyebrow">Signal</span><div class="opts">';
+    Object.keys(sigCount).sort().forEach(function (id) {
+      html += '<button class="opt" type="button" data-filter="signal" data-key="' + id + '" aria-pressed="' +
+        (state.signal[id] ? "true" : "false") + '" title="' + esc(SIGNAL_NAMES[id] || "") + '">' +
+        '<span class="mono">' + id + "</span> " + esc(SIGNAL_NAMES[id] || "") +
+        '<span class="c">' + sigCount[id] + "</span></button>";
+    });
+    html += "</div></div>";
+
+    var shapes = { branch: 0, move: 0, none: 0 };
+    ALL_ADVISORIES.forEach(function (a) {
+      shapes[!a.fixed_by ? "none" : (a.fixed_on_branch ? "branch" : "move")]++;
+    });
+    if (ALL_ADVISORIES.length) {
+      html += '<div class="rail-group"><span class="eyebrow">What the fix costs</span><div class="opts">';
+      [["branch", "A release on this branch"], ["move", "Moving to another branch"], ["none", "No fix listed"]].forEach(function (pair) {
+        if (!shapes[pair[0]]) return;
+        html += '<button class="opt" type="button" data-filter="fix" data-key="' + pair[0] + '" aria-pressed="' +
+          (state.fix[pair[0]] ? "true" : "false") + '">' + pair[1] + '<span class="c">' + shapes[pair[0]] + "</span></button>";
+      });
+      html += "</div></div>";
+    }
+    el("rail").innerHTML = html;
+  }
+
+  /* ---------- views ---------- */
+  function signalLine(sig) {
+    var cls = sig.level === "high" ? " is-high" : (sig.level === "warn" ? " is-warn" : "");
+    var doc = SIGNAL_DOC[sig.id] || (DOCS + "#the-signals");
+    return '<span class="sig-line' + cls + '">' +
+      '<a class="sid" href="' + doc + '" target="_blank" rel="noopener noreferrer" title="' +
+        esc(SIGNAL_DEFS[sig.id] || "") + '">' + esc(sig.id) + "</a>" +
+      "<span>" + esc(sig.summary) + "</span></span>";
+  }
+
+  function rowHtml(f, idx) {
+    var t = tone(f.priority === "none" ? f.verdict : f.priority);
+    var tags = [];
+    tags.push('<span class="tag" title="' + (f.direct ? "required by this project's composer.json" : "installed because something else requires it") + '">' +
+      (f.direct ? "direct" : "transitive") + "</span>");
+    if (f.dev) tags.push('<span class="tag" title="installed only for development">require-dev</span>');
+    var adv = advisoriesOf(f);
+    if (adv.length) {
+      var worst = SEV_ORDER.filter(function (sv) {
+        return adv.some(function (a) { return a.severity === sv; });
+      })[0] || null;
+      tags.unshift('<span class="cve-tag" style="color:var(--' + sevTone(worst) + ');border-color:var(--' + sevTone(worst) +
+        ');background:var(--' + sevTone(worst) + '-soft)">' + adv.length + " advisor" + (adv.length > 1 ? "ies" : "y") + "</span>");
+    }
+    var bstate = baselineState(f);
+    if (bstate === "new" || bstate === "worsened") {
+      var bt = bstate === "new" ? "crit" : "high";
+      tags.unshift('<span class="state" style="color:var(--' + bt + ');border-color:var(--' + bt + ');background:var(--' + bt +
+        '-soft)" title="' + (bstate === "new" ? "not in the baseline file" : "the baseline recorded a milder verdict") + '">' +
+        bstate + "</span>");
+    }
+
+    var sigs = (f.signals || []);
+    var shown = sigs.slice(0, 3).map(signalLine).join("");
+    var rest = sigs.length - 3;
+    var body = sigs.length
+      ? '<span class="sig-lines">' + shown + (rest > 0 ? '<span class="more-sig">+ ' + rest + " more signal" + (rest > 1 ? "s" : "") + ", open the package</span>" : "") + "</span>"
+      : '<span class="ev">' + esc(evidenceOf(f)) + "</span>";
+
+    return '<div class="row" data-idx="' + idx + '" data-pkg="' + esc(f.package) + '" role="button" tabindex="0"' +
+      (state.pkg === f.package ? ' aria-current="true"' : "") + ">" +
+      '<span class="stripe" style="background:var(--' + t + ')"></span>' +
+      '<span class="body">' +
+        '<span class="line1">' + pill(f.verdict) +
+          '<span class="pkg">' + esc(f.package) + "</span>" +
+          '<span class="ver mono">' + esc(f.version) + "</span>" +
+          '<span class="tags">' + tags.join("") + "</span></span>" +
+        body +
+      "</span></div>";
+  }
+
+  function viewFindings(terms) {
+    visible = FLAGGED.filter(function (f) { return matches(f, terms); });
+    var head = "";
+    var b = REPORT.baseline;
+    if (b) {
+      head += '<div class="since"><span class="eyebrow">Since ' + esc(b.path) + "</span>" +
+        '<button class="opt" type="button" data-filter="since" data-key="new" aria-pressed="' +
+          (state.since["new"] ? "true" : "false") + '"><b style="color:var(--crit)">' + b["new"] + "</b> new</button>" +
+        '<button class="opt" type="button" data-filter="since" data-key="worsened" aria-pressed="' +
+          (state.since.worsened ? "true" : "false") + '"><b style="color:var(--high)">' + b.worsened + "</b> worsened</button>" +
+        '<button class="opt" type="button" data-filter="since" data-key="known" aria-pressed="' +
+          (state.since.known ? "true" : "false") + '"><b>' + b.known + "</b> already accepted</button>" +
+        (b.stale && b.stale.length ? '<span style="color:var(--muted);font-size:12px">' + b.stale.length +
+          " baselined package" + (b.stale.length > 1 ? "s are" : " is") + " no longer in the lock</span>" : "") +
+        "</div>";
+    }
+    var quiet = FINDINGS.filter(function (f) {
+      return advisoriesOf(f).length && (f.verdict === "ok" || f.verdict === "finished");
+    });
+    if (quiet.length) {
+      head += '<div class="note">' + quiet.length + " package" + (quiet.length > 1 ? "s carry" : " carries") +
+        " a security advisory but no rot verdict, so " + (quiet.length > 1 ? "they are" : "it is") +
+        " not in this list: " +
+        quiet.map(function (f) {
+          return '<button class="opt" type="button" data-open="' + esc(f.package) + '" style="padding:0 3px">' +
+            esc(f.package) + "</button>";
+        }).join(" ") +
+        ' <button class="icon-btn" type="button" data-goto="advisories">See the advisories</button></div>';
+    }
+    if (!visible.length) return head + emptyState();
+    var byPrio = {};
+    visible.forEach(function (f) { (byPrio[f.priority] = byPrio[f.priority] || []).push(f); });
+    var out = "", idx = 0;
+    PRIORITIES.forEach(function (p) {
+      var list = byPrio[p];
+      if (!list) return;
+      out += '<section class="group"><div class="group-head"><h2 style="color:var(--' + tone(p) + ')">' + p +
+        '</h2><span class="mono" style="color:var(--muted);font-size:12px">' + list.length + " package" +
+        (list.length > 1 ? "s" : "") + "</span></div><div class=\"rows\">";
+      list.forEach(function (f) { out += rowHtml(f, idx++); });
+      out += "</div></section>";
+    });
+    return head + out;
+  }
+
+  function advRow(a) {
+    var t = sevTone(a.severity);
+    var fix = a.fixed_by
+      ? (a.fixed_on_branch ? "fixed by " + a.fixed_by + " on this branch" : "fixed only by " + a.fixed_by)
+      : "no fix listed";
+    return '<div class="adv"><span class="sev" style="color:var(--' + t + ');border-color:var(--' + t +
+      ');background:var(--' + t + '-soft)">' + esc(a.severity || "unrated") + "</span>" +
+      '<span class="t">' + esc(a.title || a.id) + "</span>" +
+      '<span class="m">' +
+        '<button class="opt" type="button" data-open="' + esc(a._pkg) + '" style="padding:0;font-size:11.5px">' +
+          esc(a._pkg) + " " + esc(a._version) + "</button>" +
+        (cveUrl(a) ? outLink(cveUrl(a), a.cve) : '<span class="mono">' + esc(a.cve || a.id) + "</span>") +
+        "<span>" + esc(fix) + "</span>" +
+        "<span>affects " + esc(a.affected_versions || "?") + "</span>" +
+        "<span>reported " + day(a.reported_at) + (a.reported_at ? ", open " + ageText(a.reported_at).replace(" ago", "") : "") + "</span>" +
+        (a.link ? outLink(a.link, "advisory") : "") +
+      "</span></div>";
+  }
+
+  function viewAdvisories(terms) {
+    visible = FINDINGS.filter(function (f) { return advisoriesOf(f).length && matches(f, terms); });
+    var keep = {};
+    visible.forEach(function (f) { keep[f.package] = true; });
+    var rows = ALL_ADVISORIES.filter(function (a) { return keep[a._pkg]; });
+    if (!rows.length) return emptyState();
+
+    rows.sort(function (x, y) {
+      var d = SEV_ORDER.indexOf(x.severity) - SEV_ORDER.indexOf(y.severity);
+      if (d) return d;
+      return String(y.reported_at || "").localeCompare(String(x.reported_at || ""));
+    });
+    var groups = [
+      ["branch", "A release on the branch you are on", "The cheapest move: a patch or minor bump, no migration."],
+      ["move", "Only a move to another branch", "The fix never landed on your branch. This is an upgrade, not a bump."],
+      ["none", "No fix listed", "Nothing published clears it. Replacement or mitigation."]
+    ];
+    var out = "";
+    groups.forEach(function (g) {
+      var list = rows.filter(function (a) {
+        return (!a.fixed_by ? "none" : (a.fixed_on_branch ? "branch" : "move")) === g[0];
+      });
+      if (!list.length) return;
+      out += '<section class="advgroup"><header><h2>' + g[1] + "</h2>" +
+        '<span class="mono" style="font-size:12px;color:var(--muted)">' + list.length + "</span>" +
+        "<p>" + g[2] + "</p></header>" + list.map(advRow).join("") + "</section>";
+    });
+    return out;
+  }
+
+  var SORTS = {
+    package: function (f) { return f.package; },
+    version: function (f) { return f.version; },
+    verdict: function (f) { return SEVERITY_ORDER.indexOf(f.verdict) === -1 ? 99 : SEVERITY_ORDER.indexOf(f.verdict); },
+    priority: function (f) { return PRIORITIES.indexOf(f.priority); },
+    reached: function (f) { return (f.direct ? "0" : "1") + (f.dev ? "1" : "0"); },
+    signals: function (f) { return -(f.signals || []).length; },
+    data: function (f) { return f.data_date || ""; }
+  };
+  function viewPackages(terms) {
+    visible = FINDINGS.filter(function (f) { return matches(f, terms); });
+    if (!visible.length) return emptyState();
+    var key = SORTS[state.sort] ? state.sort : "verdict";
+    visible = visible.slice().sort(function (a, b) {
+      var x = SORTS[key](a), y = SORTS[key](b);
+      var d = x < y ? -1 : (x > y ? 1 : 0);
+      return state.sortDesc ? -d : d;
+    });
+    var rows = visible.map(function (f, i) {
+      var last = f.data_date;
+      return '<tr data-idx="' + i + '" data-pkg="' + esc(f.package) + '">' +
+        "<td>" + (packagistUrl(f) ? '<a class="lnk" href="' + esc(packagistUrl(f)) + '" target="_blank" rel="noopener noreferrer">' + esc(f.package) + "</a>" : esc(f.package)) + "</td>" +
+        '<td class="num">' + esc(f.version) + "</td>" +
+        "<td>" + pill(f.verdict) + "</td>" +
+        "<td>" + (f.priority === "none" ? '<span style="color:var(--muted)">—</span>' : pill(f.priority)) + "</td>" +
+        "<td>" + (f.direct ? "direct" : "transitive") + (f.dev ? " \u00b7 dev" : "") + "</td>" +
+        '<td class="num">' + ((f.signals || []).map(function (s) { return s.id; }).join(" ") || "—") + "</td>" +
+        '<td class="num">' + day(last) + "</td></tr>";
+    }).join("");
+    var head = [["package", "Package"], ["version", "Version"], ["verdict", "Verdict"], ["priority", "Priority"],
+      ["reached", "Reached"], ["signals", "Signals"], ["data", "Data as of"]].map(function (c) {
+      var on = (SORTS[state.sort] ? state.sort : "verdict") === c[0];
+      return '<th aria-sort="' + (on ? (state.sortDesc ? "descending" : "ascending") : "none") +
+        '"><button type="button" data-sort="' + c[0] +
+        '" style="background:none;border:0;padding:0;cursor:pointer;font:inherit;letter-spacing:inherit;text-transform:inherit;color:' +
+        (on ? "var(--ink)" : "inherit") + '">' + c[1] + (on ? (state.sortDesc ? " \u2193" : " \u2191") : "") + "</button></th>";
+    }).join("");
+    return '<div class="tablewrap"><table><thead><tr>' + head + "</tr></thead><tbody>" + rows + "</tbody></table></div>";
+  }
+
+  function viewRadius() {
+    visible = [];
+    var exposure = (REPORT.exposure || []).slice().sort(function (a, b) { return b.flagged - a.flagged; });
+    if (!exposure.length) return '<div class="empty">No direct requirement drags a flagged package in.</div>';
+    var max = exposure[0].flagged || 1;
+    var cards = exposure.map(function (e) {
+      var pulled = FLAGGED.filter(function (f) {
+        return (f.chain || []).indexOf(e.package) !== -1 && f.package !== e.package;
+      });
+      var names = pulled.map(function (f) {
+        return '<div style="display:flex;gap:7px;align-items:baseline"><span class="mono" style="font-size:11px;color:var(--muted)">→</span>' +
+          '<button class="opt" type="button" data-open="' + esc(f.package) + '" style="padding:1px 4px">' +
+          esc(f.package) + "</button>" + pill(f.verdict) + "</div>";
+      }).join("");
+      return '<article class="card"><h3>' + esc(e.package) + "</h3>" +
+        '<div class="meter"><i style="width:' + Math.round(100 * e.flagged / max) + '%"></i></div>' +
+        '<span class="eyebrow">' + e.flagged + " flagged package" + (e.flagged > 1 ? "s" : "") + " underneath</span>" +
+        (names || '<span style="color:var(--muted);font-size:12px">flagged itself</span>') + "</article>";
+    }).join("");
+    return '<p class="hint" style="margin-top:0">Direct requirements ranked by how much rot each one brings with it. ' +
+      "Fixing the parent is often cheaper than chasing the child.</p>" + '<div class="cards">' + cards + "</div>";
+  }
+
+  function viewRun() {
+    visible = [];
+    var t = CONTEXT.thresholds || {};
+    var notes = (REPORT.notes || []).map(function (n) {
+      var doc = /token|activity|repository/.test(n) ? "https://lockrot.dev/internals/" : "https://lockrot.dev/configuration/";
+      return '<div class="note">' + esc(n) + ' <span style="white-space:nowrap">' + outLink(doc, "what this means") + "</span></div>";
+    }).join("");
+    var kv = [
+      ["lockrot", (TOOL.version || "?") + " (report schema " + (TOOL.schema || "?") + ")"],
+      ["generated", REPORT.generated_at],
+      ["packages checked", REPORT.packages_checked],
+      ["include dev", String(REPORT.include_dev)],
+      ["fail-on", String(CONTEXT.fail_on || "none")],
+      ["oldest activity cache", REPORT.activity_cache_oldest_at || "—"],
+      ["network failures", String(REPORT.network_failures)],
+      ["not from a Composer repository", String(REPORT.not_from_composer_repository)],
+      ["baseline", REPORT.baseline ? JSON.stringify(REPORT.baseline) : "none"]
+    ].map(function (p) { return "<dt>" + esc(p[0]) + "</dt><dd>" + esc(p[1]) + "</dd>"; }).join("");
+    var th = Object.keys(t).map(function (k) { return "<dt>" + esc(k) + "</dt><dd>" + esc(t[k]) + " years</dd>"; }).join("");
+    return '<div style="display:flex;flex-direction:column;gap:18px">' +
+      (notes ? '<section class="sect"><h3>What this run could not see</h3>' + notes + "</section>" : "") +
+      '<section class="sect"><h3>Thresholds in force</h3><div class="tablewrap" style="padding:12px 14px"><dl class="kv">' + th + "</dl></div></section>" +
+      '<section class="sect"><h3>Run</h3><div class="tablewrap" style="padding:12px 14px"><dl class="kv">' + kv + "</dl></div>" +
+      '<p style="margin:6px 0 0;font-size:12px;color:var(--muted)">This document validates against ' +
+        outLink(SCHEMA_URL, SCHEMA_URL) +
+        ". " + outLink("https://lockrot.dev/internals/", "How lockrot fetches and caches metadata") + "</p></section>" +
+      "</div>";
+  }
+
+  function emptyState() {
+    return '<div class="empty">Nothing matches this filter. <button class="icon-btn" id="emptyClear" type="button">Clear filters</button></div>';
+  }
+
+  /* ---------- branch timeline ---------- */
+  function timeline(meta, installedVersion) {
+    var branches = (meta && meta.branches) || [];
+    var dated = branches.filter(function (b) { return b.highest_released || b.newest_dated_released; });
+    if (dated.length < 2) return "";
+    var times = dated.map(function (b) { return new Date(b.highest_released || b.newest_dated_released).getTime(); });
+    var min = Math.min.apply(null, times);
+    var max = NOW.getTime();
+    var span = Math.max(max - min, 1);
+    function pct(t) { return 4 + 88 * (t - min) / span; }
+
+    var lanes = dated.slice().sort(function (a, b) {
+      return new Date(b.highest_released || b.newest_dated_released) - new Date(a.highest_released || a.newest_dated_released);
+    });
+    var newest = lanes[0];
+
+    var rows = lanes.map(function (b) {
+      var iso = b.highest_released || b.newest_dated_released;
+      var x = pct(new Date(iso).getTime());
+      var cls = "lane" + (b.installed ? " is-installed" : "") + (b === newest && !b.installed ? " is-newest" : "");
+      var labLeft = x > 62;
+      var lab = '<span class="lab" style="' + (labLeft ? "right:" + (100 - x + 2) + "%" : "left:" + (x + 2) + "%") + '">' +
+        esc(b.highest) + " \u00b7 " + day(iso) + "</span>";
+      return '<div class="' + cls + '"><span class="bl">' + esc(b.branch) + "</span>" +
+        '<span class="track"><span class="mark" style="left:' + x + '%"></span>' + lab + "</span></div>";
+    }).join("");
+
+    var startYear = new Date(min).getUTCFullYear();
+    var endYear = NOW.getUTCFullYear();
+    var ticks = "";
+    var step = (endYear - startYear) > 8 ? 3 : ((endYear - startYear) > 4 ? 2 : 1);
+    for (var y = startYear; y <= endYear; y += step) {
+      var t = Date.UTC(y, 0, 1);
+      if (t < min) continue;
+      ticks += '<span style="left:' + pct(t) + '%">' + y + "</span>";
+    }
+    return '<div class="tl"><div class="tl-axis">' + ticks + "</div>" + rows + "</div>" +
+      '<div class="tl-note">' +
+      '<i><span class="swatch" style="background:var(--crit)"></span>you are on ' + esc(installedVersion) + "</i>" +
+      '<i><span class="swatch" style="background:var(--none)"></span>branch still releasing</i>' +
+      "<i>one dot = that branch's newest dated release</i></div>";
+  }
+
+  /* ---------- detail ---------- */
+  function signalHtml(s) {
+    var data = s.data || {};
+    var rows = Object.keys(data).map(function (k) {
+      var v = data[k];
+      if (v && typeof v === "object") v = JSON.stringify(v);
+      return "<dt>" + esc(k) + "</dt><dd>" + esc(v === null ? "null" : v) + "</dd>";
+    }).join("");
+    var t = s.level === "high" ? "crit" : (s.level === "warn" ? "high" : "low");
+    var doc = SIGNAL_DOC[s.id] || (DOCS + "#the-signals");
+    return '<details class="signal"><summary><a class="sid" style="color:var(--' + t + ');text-decoration:none" href="' +
+      doc + '" target="_blank" rel="noopener noreferrer" title="' + esc(SIGNAL_DEFS[s.id] || "") + '">' + esc(s.id) +
+      '</a><span class="ssum">' + esc(s.summary) + "</span></summary>" +
+      '<div class="sdata"><dl class="kv">' + (rows || "<dt>—</dt><dd>no data</dd>") + "</dl></div></details>";
+  }
+
+  /** Rebuilds the ladder Priority::of() walks, so the number is not a black box. */
+  function priorityWhy(f) {
+    if (f.priority === "none" || !PRIORITY_BASE[f.verdict]) return "";
+    var steps = ['<span class="step">' + esc(f.verdict) + " starts at " + PRIORITY_BASE[f.verdict] + "</span>"];
+    if (!f.direct) steps.push('<span class="step">nothing requires it directly, one step down</span>');
+    if (f.dev) steps.push('<span class="step">development only, one step down</span>');
+    if (/no fix expected/.test(evidenceOf(f))) steps.push('<span class="step">an advisory no release will fix, one step up</span>');
+    return steps.join('<span aria-hidden="true">&rarr;</span>') + "<b>" + esc(f.priority) + "</b>";
+  }
+
+  function renderDetail() {
+    var box = el("detail");
+    if (!state.pkg) { box.hidden = true; box.innerHTML = ""; return; }
+    var f = FINDINGS.filter(function (x) { return x.package === state.pkg; })[0];
+    if (!f) { box.hidden = true; return; }
+    var ex = DETAILS[f.package] || {};
+    var meta = ex.metadata || {};
+    var lock = ex.lock || {};
+
+    var s8 = (f.signals || []).filter(function (s) { return s.id === "S8"; })[0];
+    var suggestion = s8 && s8.data && s8.data.suggested_constraint;
+    var pk = packagistUrl(f);
+    var rp = repoUrl(f);
+    var replacement = meta.replacement || null;
+    var why = priorityWhy(f);
+    var bstate = baselineState(f);
+
+    var chain = (f.chain || []);
+    var chainHtml = f.direct
+      ? '<span class="mono">composer.json</span> → <span class="mono">' + esc(f.package) + "</span>"
+      : chain.concat([f.package]).map(function (p) { return '<span class="mono">' + esc(p) + "</span>"; }).join(" → ");
+
+    var lockRows = [
+      ["installed", f.version],
+      ["php constraint", lock.php || "—"],
+      ["released", day(lock.released) + (lock.released ? " \u00b7 " + ageText(lock.released) : "")],
+      ["repository", rp ? '<a class="lnk" href="' + esc(rp) + '" target="_blank" rel="noopener noreferrer">' + esc(rp) + "</a>" : (lock.repository || meta.repository || "—")],
+      ["type", lock.type || meta.type || "—"]
+    ].map(function (p) {
+      var v = p[0] === "repository" ? p[1] : esc(p[1]);
+      return "<dt>" + esc(p[0]) + "</dt><dd>" + v + "</dd>";
+    }).join("");
+
+    var tl = timeline(meta, f.version);
+
+    box.hidden = false;
+    box.innerHTML =
+      '<div class="detail-head"><div class="top">' +
+        "<div style=\"flex:1;min-width:0\"><h2>" + esc(f.package) + "</h2>" +
+        '<div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:6px">' + pill(f.verdict, true) +
+          (f.priority === "none" ? "" : pill(f.priority)) +
+          '<span class="tag">' + (f.direct ? "direct" : "transitive") + "</span>" +
+          (f.dev ? '<span class="tag">require-dev</span>' : "") + "</div>" +
+        '<div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:7px">' +
+          (pk ? outLink(pk, "packagist") : "") +
+          (rp ? outLink(rp, repoHost(rp)) : "") +
+          (replacement ? outLink("https://packagist.org/packages/" + replacement, "replacement: " + replacement) : "") +
+        "</div></div>" +
+        '<button class="icon-btn" type="button" id="closeDetail">Close</button>' +
+      "</div></div>" +
+      '<div class="detail-body">' +
+        (bstate ? '<section class="sect"><h3>Against the baseline</h3><p style="margin:0;font-size:13px;color:var(--ink-2)">' +
+          (bstate === "new" ? "Not in " + esc(REPORT.baseline ? REPORT.baseline.path : "the baseline") + ". This one is new since it was written."
+            : bstate === "worsened" ? "The baseline recorded <span class=\"mono\">" + esc((BASELINE[f.package] || {}).previous_verdict || "a milder verdict") +
+              "</span>. It has got worse since."
+            : "Already accepted in " + esc(REPORT.baseline ? REPORT.baseline.path : "the baseline") + ". It does not fail the build.") +
+          "</p></section>" : "") +
+        (why ? '<section class="sect"><h3>Why this is ' + esc(f.priority) + '</h3><div class="why">' + why + "</div></section>" : "") +
+        (advisoriesOf(f).length ? (function () {
+          var adv = advisoriesOf(f);
+          var ladder = fixLadder(f).map(function (r) {
+            return '<div class="rung' + (r.onBranch ? " here" : "") + '">' +
+              '<span class="v">' + esc(r.version || "no release") + "</span>" +
+              '<span class="bar2"><i style="width:' + Math.round(100 * r.n / adv.length) + '%"></i></span>' +
+              '<span class="n">clears ' + r.n + " of " + adv.length + (r.onBranch ? " \u00b7 this branch" : "") + "</span></div>";
+          }).join("");
+          var list = adv.slice().sort(function (x, y) {
+            return SEV_ORDER.indexOf(x.severity) - SEV_ORDER.indexOf(y.severity);
+          }).map(function (a) {
+            var t = sevTone(a.severity);
+            return '<div class="adv" style="padding:8px 0"><span class="sev" style="color:var(--' + t +
+              ');border-color:var(--' + t + ');background:var(--' + t + '-soft)">' + esc(a.severity || "unrated") + "</span>" +
+              '<span class="t" style="font-size:12.5px">' + esc(a.title || a.id) + "</span>" +
+              '<span class="m">' +
+              (cveUrl(a) ? outLink(cveUrl(a), a.cve) : '<span class="mono">' + esc(a.cve || a.id) + "</span>") +
+              "<span>" + (a.fixed_by ? "fixed by " + esc(a.fixed_by) : "no fix listed") + "</span>" +
+              "<span>reported " + day(a.reported_at) + "</span>" +
+              (a.link ? outLink(a.link, "advisory") : "") +
+              "</span></div>";
+          }).join("");
+          return '<section class="sect"><h3>' + adv.length + " security advisor" + (adv.length > 1 ? "ies" : "y") +
+            '</h3><div class="ladder">' + ladder + "</div>" +
+            '<details class="signal" style="background:transparent"><summary><span class="ssum">Every advisory</span></summary>' +
+            '<div class="sdata" style="padding-left:11px">' + list + "</div></details></section>";
+        })() : "") +
+        (suggestion ?
+          '<div class="action"><span class="eyebrow" style="color:var(--accent-ink)">Follow the upstream</span>' +
+          '<div class="cmd"><span>composer require ' + esc(f.package) + " " + esc(suggestion) + "</span>" +
+          '<button class="copy" type="button" data-copy="composer require ' + esc(f.package) + " " + esc(suggestion) + '">Copy</button></div>' +
+          "</div>" : "") +
+        (tl ? '<section class="sect"><h3>Release branches</h3>' + tl + "</section>" : "") +
+        '<section class="sect"><h3>Signals &mdash; what was observed</h3>' + (f.signals || []).map(signalHtml).join("") +
+          (!(f.signals || []).length ? '<p style="margin:0;color:var(--muted)">No signal fired. The verdict comes from what lockrot could not learn.</p>' : "") +
+        "</section>" +
+        '<section class="sect"><h3>How it is reached</h3><p style="margin:0;font-size:12.5px;word-break:break-word">' + chainHtml + "</p></section>" +
+        '<section class="sect"><h3>The lock entry</h3><dl class="kv">' + lockRows + "</dl></section>" +
+        '<section class="sect"><h3>Provenance</h3><dl class="kv">' +
+          "<dt>metadata</dt><dd>" + esc(day(meta.data_date || f.data_date)) + "</dd>" +
+          "<dt>releases listed</dt><dd>" + esc(meta.releases_listed === undefined ? "—" : meta.releases_listed) + "</dd>" +
+          "<dt>last stable</dt><dd>" + esc(meta.last_stable_version || "—") + " \u00b7 " + day(meta.last_stable_release) + "</dd>" +
+        "</dl></section>" +
+      "</div>";
+  }
+
+  /* ---------- render ---------- */
+  function render() {
+    var terms = parseQuery(state.q);
+    var root = el("viewRoot");
+    if (state.view === "findings") root.innerHTML = viewFindings(terms);
+    else if (state.view === "advisories") root.innerHTML = viewAdvisories(terms);
+    else if (state.view === "packages") root.innerHTML = viewPackages(terms);
+    else if (state.view === "radius") root.innerHTML = viewRadius();
+    else root.innerHTML = viewRun();
+
+    Array.prototype.forEach.call(document.querySelectorAll(".tab"), function (t) {
+      t.setAttribute("aria-selected", t.dataset.view === state.view ? "true" : "false");
+    });
+    el("tabFindings").textContent = FLAGGED.length;
+    el("tabAdvisories").textContent = ALL_ADVISORIES.length;
+    el("tabPackages").textContent = FINDINGS.length;
+    el("tabRadius").textContent = (REPORT.exposure || []).length;
+    el("tabRun").textContent = (REPORT.notes || []).length ? String(REPORT.notes.length) : "";
+
+    Array.prototype.forEach.call(document.querySelectorAll("[data-filter]"), function (b) {
+      var on = state[b.dataset.filter][b.dataset.key];
+      if (b.classList.contains("opt")) b.setAttribute("aria-pressed", on ? "true" : "false");
+      else b.dataset.on = on ? "true" : "false";
+    });
+    var active = FILTER_GROUPS.reduce(function (n, g) {
+      return n + Object.keys(state[g]).filter(function (k) { return state[g][k]; }).length;
+    }, 0) + (state.q ? 1 : 0);
+    var line = "";
+    if (state.view === "findings") line = visible.length + " of " + FLAGGED.length + " flagged packages";
+    else if (state.view === "advisories") line = (root.querySelectorAll(".adv").length) + " of " + ALL_ADVISORIES.length + " advisories";
+    else if (state.view === "packages") line = visible.length + " of " + FINDINGS.length + " packages";
+    el("countLine").innerHTML = esc(line) +
+      (active ? ' <span style="color:var(--accent-ink)">' + active + " filter" + (active > 1 ? "s" : "") + " on</span>" : "");
+    el("clearBtn").disabled = !active;
+    el("clearBtn").style.opacity = active ? "1" : ".5";
+
+    renderDetail();
+    document.body.classList.toggle("detail-open", !!state.pkg && !WIDE);
+    writeHash();
+  }
+
+  var FILTER_GROUPS = ["prio", "verdict", "scope", "signal", "sev", "fix", "since"];
+  function writeHash() {
+    var parts = [];
+    if (state.view !== "findings") parts.push("view=" + state.view);
+    if (state.q) parts.push("q=" + encodeURIComponent(state.q));
+    FILTER_GROUPS.forEach(function (g) {
+      var on = Object.keys(state[g]).filter(function (k) { return state[g][k]; });
+      if (on.length) parts.push(g + "=" + encodeURIComponent(on.join(",")));
+    });
+    if (state.pkg) parts.push("pkg=" + encodeURIComponent(state.pkg));
+    var h = parts.join("&");
+    if (h !== location.hash.replace(/^#/, "")) history.replaceState(null, "", h ? "#" + h : location.pathname);
+  }
+  function readHash() {
+    var h = location.hash.replace(/^#/, "");
+    if (!h) return;
+    h.split("&").forEach(function (p) {
+      var i = p.indexOf("=");
+      if (i < 0) return;
+      var k = p.slice(0, i), v = decodeURIComponent(p.slice(i + 1));
+      if (k === "view") state.view = v;
+      if (k === "q") { state.q = v; el("q").value = v; }
+      if (k === "pkg") state.pkg = v;
+      if (FILTER_GROUPS.indexOf(k) !== -1) {
+        v.split(",").forEach(function (key) { if (key) state[k][key] = true; });
+      }
+    });
+  }
+
+  /* ---------- events ---------- */
+  document.addEventListener("click", function (e) {
+    var tab = e.target.closest(".tab");
+    if (tab) { state.view = tab.dataset.view; state.pkg = null; cursor = -1; render(); return; }
+
+    var filter = e.target.closest("[data-filter]");
+    if (filter) {
+      var group = filter.dataset.filter;
+      state[group][filter.dataset.key] = !state[group][filter.dataset.key];
+      render();
+      return;
+    }
+    var sorter = e.target.closest("[data-sort]");
+    if (sorter) {
+      if (state.sort === sorter.dataset.sort) state.sortDesc = !state.sortDesc;
+      else { state.sort = sorter.dataset.sort; state.sortDesc = false; }
+      render();
+      return;
+    }
+    var goto = e.target.closest("[data-goto]");
+    if (goto) { state.view = goto.dataset.goto; cursor = -1; render(); return; }
+    var open = e.target.closest("[data-open]");
+    if (open) { state.pkg = open.dataset.open; render(); return; }
+
+    var copy = e.target.closest("[data-copy]");
+    if (copy) {
+      var text = copy.dataset.copy;
+      var done = function (ok) {
+        copy.textContent = ok ? "Copied" : "Select it and copy";
+        setTimeout(function () { copy.textContent = "Copy"; }, ok ? 1400 : 2600);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () { done(true); }, function () { done(false); });
+      } else {
+        done(false);
+      }
+      return;
+    }
+    if (e.target.closest("#legendBtn")) { openLegend(); return; }
+    if (e.target.closest("#legendClose")) { closeLegend(); return; }
+    if (e.target.closest("#closeDetail")) { state.pkg = null; render(); lastRow(); return; }
+    if (e.target.closest("#clearBtn") || e.target.closest("#emptyClear")) {
+      state.q = ""; state.prio = {}; state.verdict = {}; state.scope = {}; state.signal = {}; state.sev = {}; state.fix = {}; state.since = {};
+      el("q").value = "";
+      render();
+      return;
+    }
+    var row = e.target.closest(".row, tbody tr");
+    if (row && e.target.closest("a")) return;
+    if (row && row.dataset.pkg) {
+      state.pkg = state.pkg === row.dataset.pkg ? null : row.dataset.pkg;
+      cursor = parseInt(row.dataset.idx, 10);
+      render();
+    }
+  });
+
+  el("q").addEventListener("input", function () { state.q = this.value; cursor = -1; render(); });
+
+  el("themeBtn").addEventListener("click", function () {
+    var dark = document.documentElement.getAttribute("data-theme") === "dark";
+    var next = dark ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+    this.textContent = next === "dark" ? "Light" : "Dark";
+    try { localStorage.setItem("lockrot-theme", next); } catch (err) { /* private mode */ }
+  });
+
+  /** Puts focus back on the row the detail was opened from. */
+  function lastRow() {
+    if (cursor < 0 || !visible[cursor]) return;
+    var node = document.querySelector('[data-pkg="' + visible[cursor].package.replace(/"/g, '\\"') + '"]');
+    if (node && node.focus) node.focus();
+  }
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Enter" || e.key === " ") {
+      var row = e.target.closest && e.target.closest(".row, tbody tr");
+      if (row && row.dataset.pkg) {
+        e.preventDefault();
+        state.pkg = state.pkg === row.dataset.pkg ? null : row.dataset.pkg;
+        cursor = parseInt(row.dataset.idx, 10);
+        render();
+        return;
+      }
+    }
+    if (e.key === "?" && document.activeElement !== el("q")) { e.preventDefault(); openLegend(); return; }
+    if (e.key === "/" && document.activeElement !== el("q")) { e.preventDefault(); el("q").focus(); return; }
+    if (e.key === "Escape") {
+      if (el("legend").open) { closeLegend(); return; }
+      if (state.pkg) { state.pkg = null; render(); lastRow(); } else el("q").blur();
+      return;
+    }
+    if (document.activeElement === el("q")) return;
+    if (e.key === "j" || e.key === "k") {
+      if (!visible.length) return;
+      e.preventDefault();
+      cursor = Math.max(0, Math.min(visible.length - 1, cursor + (e.key === "j" ? 1 : -1)));
+      state.pkg = visible[cursor].package;
+      render();
+      var node = document.querySelector('[data-pkg="' + visible[cursor].package.replace(/"/g, '\\"') + '"]');
+      if (node) node.scrollIntoView({ block: "nearest" });
+    }
+  });
+
+  /* ---------- glossary ---------- */
+  function fillLegend() {
+    var vc = REPORT.counts || {};
+    el("verdictDefs").innerHTML = VERDICTS.map(function (v) {
+      var n = vc[v] || 0;
+      return '<dt style="color:var(--' + tone(v) + ')">' + esc(v) +
+        (n ? ' <span style="color:var(--muted)">' + n + "</span>" : "") + "</dt><dd>" + esc(VERDICT_DEFS[v]) + "</dd>";
+    }).join("");
+    el("signalDefs").innerHTML = Object.keys(SIGNAL_DEFS).map(function (id) {
+      var doc = SIGNAL_DOC[id];
+      return "<dt>" + esc(id) + " " + (doc ? outLink(doc, SIGNAL_NAMES[id]) : '<span style="color:var(--muted);font-family:var(--sans);font-size:12px">' +
+        esc(SIGNAL_NAMES[id]) + "</span>") + "</dt><dd>" + esc(SIGNAL_DEFS[id]) + "</dd>";
+    }).join("");
+  }
+  function openLegend() {
+    var d = el("legend");
+    if (d.showModal) d.showModal(); else d.setAttribute("open", "open");
+  }
+  function closeLegend() {
+    var d = el("legend");
+    if (d.close) d.close(); else d.removeAttribute("open");
+  }
+
+  /* ---------- boot ---------- */
+  try {
+    var saved = localStorage.getItem("lockrot-theme");
+    if (saved) document.documentElement.setAttribute("data-theme", saved);
+  } catch (err) { /* private mode */ }
+  el("themeBtn").textContent = document.documentElement.getAttribute("data-theme") === "dark" ? "Light" : "Dark";
+
+  el("mVersion").textContent = TOOL.version || "\u2014";
+  el("mData").textContent = day(REPORT.generated_at);
+  el("mTarget").textContent = CONTEXT.target_php || "\u2014";
+  // The name, not the path: the page is an artifact people pass around, and an absolute path
+  // from a build machine has no business travelling with it. The payload still carries the value
+  // the run was given, for anyone who needs it.
+  var lockName = String(CONTEXT.lock_path || "composer.lock").split(/[\\/]/).pop();
+  el("projectName").textContent = lockName || "composer.lock";
+  el("projectName").title = String(CONTEXT.lock_path || "");
+
+  readHash();
+  var WIDE = !window.matchMedia || window.matchMedia("(min-width: 1181px)").matches;
+  if (!state.pkg && WIDE && FLAGGED.length) state.pkg = FLAGGED[0].package;
+  fillLegend();
+  renderLedger();
+  renderRail();
+  render();
+})();

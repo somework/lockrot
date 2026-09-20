@@ -4,14 +4,11 @@ declare(strict_types=1);
 
 namespace Lockrot\Html;
 
-use Lockrot\Analyzer\Analysis;
 use Lockrot\Analyzer\Report;
-use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Explain\Explanation;
 use Lockrot\Output\FormatContext;
 use Lockrot\Output\JsonFormatter;
 use Lockrot\Signal\Signal;
-use Lockrot\Signal\Thresholds;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
 use Lockrot\Version;
@@ -34,32 +31,13 @@ final class ReportDocument
 {
     private Report $report;
     private FormatContext $context;
-    private ?Analysis $analysis;
-    private ?BaselineComparison $baseline;
-    private ?Thresholds $thresholds;
-    private ?string $targetPhp;
+    private PageData $page;
 
-    /**
-     * @param ?Analysis           $analysis   the facts each finding was decided on, when the caller
-     *                                        asked for them ({@see \Lockrot\Analyzer\Analyzer::analyzeWithFacts()});
-     *                                        without them the page renders with no release branches
-     * @param ?BaselineComparison $baseline   null when the project has no baseline file
-     * @param ?Thresholds         $thresholds needed to explain a package; null drops `details` too
-     */
-    public function __construct(
-        Report $report,
-        FormatContext $context,
-        ?Analysis $analysis = null,
-        ?BaselineComparison $baseline = null,
-        ?Thresholds $thresholds = null,
-        ?string $targetPhp = null
-    ) {
+    public function __construct(Report $report, FormatContext $context, ?PageData $page = null)
+    {
         $this->report = $report;
         $this->context = $context;
-        $this->analysis = $analysis;
-        $this->baseline = $baseline;
-        $this->thresholds = $thresholds;
-        $this->targetPhp = $targetPhp;
+        $this->page = $page ?? PageData::none();
     }
 
     /**
@@ -87,15 +65,17 @@ final class ReportDocument
      */
     private function context(): array
     {
+        $thresholds = $this->page->thresholds();
+
         return [
-            'target_php' => $this->targetPhp,
+            'target_php' => $this->page->targetPhp(),
             'lock_path' => $this->context->lockPath(),
             'fail_on' => $this->context->failOn(),
-            'thresholds' => $this->thresholds === null ? null : [
-                'release-warn-years' => $this->thresholds->releaseWarnYears(),
-                'release-high-years' => $this->thresholds->releaseHighYears(),
-                'push-warn-years' => $this->thresholds->pushWarnYears(),
-                'push-high-years' => $this->thresholds->pushHighYears(),
+            'thresholds' => $thresholds === null ? null : [
+                'release-warn-years' => $thresholds->releaseWarnYears(),
+                'release-high-years' => $thresholds->releaseHighYears(),
+                'push-warn-years' => $thresholds->pushWarnYears(),
+                'push-high-years' => $thresholds->pushHighYears(),
             ],
         ];
     }
@@ -108,7 +88,10 @@ final class ReportDocument
      */
     private function details(bool $showAll): array
     {
-        if ($this->analysis === null || $this->thresholds === null || $this->targetPhp === null) {
+        $analysis = $this->page->analysis();
+        $thresholds = $this->page->thresholds();
+        $targetPhp = $this->page->targetPhp();
+        if ($analysis === null || $thresholds === null || $targetPhp === null) {
             return [];
         }
 
@@ -117,11 +100,11 @@ final class ReportDocument
             if (!$showAll && !self::worthExplaining($finding)) {
                 continue;
             }
-            $facts = $this->analysis->facts($finding->package());
+            $facts = $analysis->facts($finding->package());
             if ($facts === null) {
                 continue;
             }
-            $explained = (new Explanation($finding, $facts, $this->thresholds, $this->targetPhp, $this->report))->toArray();
+            $explained = (new Explanation($finding, $facts, $thresholds, $targetPhp, $this->report))->toArray();
             $metadata = $explained['metadata'] ?? null;
             $details[$finding->package()] = [
                 'metadata' => \is_array($metadata) ? $metadata : null,
@@ -163,19 +146,20 @@ final class ReportDocument
      */
     private function baselineStates(): array
     {
-        if ($this->baseline === null) {
+        $baseline = $this->page->baseline();
+        if ($baseline === null) {
             return [];
         }
 
         $states = [];
         foreach ($this->report->findings() as $finding) {
-            $status = $this->baseline->statusOf($finding->package());
+            $status = $baseline->statusOf($finding->package());
             if ($status === null) {
                 continue;
             }
             $states[$finding->package()] = [
                 'status' => $status,
-                'previous_verdict' => $this->baseline->previousVerdictOf($finding->package()),
+                'previous_verdict' => $baseline->previousVerdictOf($finding->package()),
             ];
         }
 
