@@ -855,6 +855,16 @@
     writeHash();
   }
 
+  /**
+   * Open a package's detail, or close it with null. Every route a reader can take goes through
+   * here, which is what clears `pkgAuto`: from this point the selection is theirs, and the address
+   * bar and a copied link both start naming it.
+   */
+  function select(pkg) {
+    state.pkg = pkg;
+    state.pkgAuto = false;
+  }
+
   var FILTER_GROUPS = ["prio", "verdict", "scope", "signal", "sev", "fix", "since"];
   function writeHash() {
     var parts = [];
@@ -864,7 +874,7 @@
       var on = Object.keys(state[g]).filter(function (k) { return state[g][k]; });
       if (on.length) parts.push(g + "=" + encodeURIComponent(on.join(",")));
     });
-    if (state.pkg) parts.push("pkg=" + encodeURIComponent(state.pkg));
+    if (state.pkg && !state.pkgAuto) parts.push("pkg=" + encodeURIComponent(state.pkg));
     var h = parts.join("&");
     if (h !== location.hash.replace(/^#/, "")) history.replaceState(null, "", h ? "#" + h : location.pathname);
   }
@@ -877,7 +887,7 @@
       var k = p.slice(0, i), v = decodeURIComponent(p.slice(i + 1));
       if (k === "view") state.view = v;
       if (k === "q") { state.q = v; el("q").value = v; }
-      if (k === "pkg") state.pkg = v;
+      if (k === "pkg") select(v);
       if (FILTER_GROUPS.indexOf(k) !== -1) {
         v.split(",").forEach(function (key) { if (key) state[k][key] = true; });
       }
@@ -887,7 +897,7 @@
   /* ---------- events ---------- */
   document.addEventListener("click", function (e) {
     var tab = e.target.closest(".tab");
-    if (tab) { state.view = tab.dataset.view; state.pkg = null; cursor = -1; render(); return; }
+    if (tab) { state.view = tab.dataset.view; select(null); cursor = -1; render(); return; }
 
     var filter = e.target.closest("[data-filter]");
     if (filter) {
@@ -906,7 +916,7 @@
     var goto = e.target.closest("[data-goto]");
     if (goto) { state.view = goto.dataset.goto; cursor = -1; render(); return; }
     var open = e.target.closest("[data-open]");
-    if (open) { state.pkg = open.dataset.open; render(); return; }
+    if (open) { select(open.dataset.open); render(); return; }
 
     var copy = e.target.closest("[data-copy]");
     if (copy) {
@@ -924,7 +934,7 @@
     }
     if (e.target.closest("#legendBtn")) { openLegend(); return; }
     if (e.target.closest("#legendClose")) { closeLegend(); return; }
-    if (e.target.closest("#closeDetail")) { state.pkg = null; render(); lastRow(); return; }
+    if (e.target.closest("#closeDetail")) { select(null); render(); lastRow(); return; }
     if (e.target.closest("#clearBtn") || e.target.closest("#emptyClear")) {
       state.q = ""; state.prio = {}; state.verdict = {}; state.scope = {}; state.signal = {}; state.sev = {}; state.fix = {}; state.since = {};
       el("q").value = "";
@@ -934,13 +944,15 @@
     var row = e.target.closest(".row, tbody tr");
     if (row && e.target.closest("a")) return;
     if (row && row.dataset.pkg) {
-      state.pkg = state.pkg === row.dataset.pkg ? null : row.dataset.pkg;
+      select(state.pkg === row.dataset.pkg ? null : row.dataset.pkg);
       cursor = parseInt(row.dataset.idx, 10);
       render();
     }
   });
 
   el("q").addEventListener("input", function () { state.q = this.value; cursor = -1; render(); });
+
+  el("copyBtn").addEventListener("click", copyLink);
 
   el("themeBtn").addEventListener("click", function () {
     var dark = document.documentElement.getAttribute("data-theme") === "dark";
@@ -962,7 +974,7 @@
       var row = e.target.closest && e.target.closest(".row, tbody tr");
       if (row && row.dataset.pkg) {
         e.preventDefault();
-        state.pkg = state.pkg === row.dataset.pkg ? null : row.dataset.pkg;
+        select(state.pkg === row.dataset.pkg ? null : row.dataset.pkg);
         cursor = parseInt(row.dataset.idx, 10);
         render();
         return;
@@ -972,20 +984,107 @@
     if (e.key === "/" && document.activeElement !== el("q")) { e.preventDefault(); el("q").focus(); return; }
     if (e.key === "Escape") {
       if (el("legend").open) { closeLegend(); return; }
-      if (state.pkg) { state.pkg = null; render(); lastRow(); } else el("q").blur();
+      if (state.pkg) { select(null); render(); lastRow(); } else el("q").blur();
       return;
     }
     if (document.activeElement === el("q")) return;
+    // Bare c only: cmd+c and ctrl+c are how the reader copies the text they have selected.
+    if (e.key === "c" && !e.metaKey && !e.ctrlKey && !e.altKey) { e.preventDefault(); copyLink(); return; }
     if (e.key === "j" || e.key === "k") {
       if (!visible.length) return;
       e.preventDefault();
       cursor = Math.max(0, Math.min(visible.length - 1, cursor + (e.key === "j" ? 1 : -1)));
-      state.pkg = visible[cursor].package;
+      select(visible[cursor].package);
       render();
       var node = document.querySelector('[data-pkg="' + visible[cursor].package.replace(/"/g, '\\"') + '"]');
       if (node) node.scrollIntoView({ block: "nearest" });
     }
   });
+
+  /* ---------- copy a link to the current view ---------- */
+
+  /**
+   * What to put on the clipboard for the view on screen.
+   *
+   * Served over http(s) the whole address travels, and the person who opens it lands on the same
+   * tab, the same filters and the same package. Opened from a local file it is the fragment alone:
+   * a `file://` address is useless to anyone else, and it names a directory — a client's name, an
+   * employer's, a person's — that has no business on someone's clipboard on its way into a chat.
+   * Two people reading the same file both have it; the fragment is the part that means anything
+   * to both of them.
+   */
+  function shareTarget() {
+    if (location.protocol === "http:" || location.protocol === "https:") {
+      return { text: location.href, label: "Copied", status: "Link copied." };
+    }
+    // writeHash() drops the fragment entirely for the view the report opens on, and a lone "#"
+    // would be a link to nothing.
+    if (!location.hash || location.hash === "#") {
+      return {
+        text: null,
+        label: "Nothing to copy",
+        status: "This is the report as it opens. Filter it or open a package first."
+      };
+    }
+
+    return {
+      text: location.hash,
+      label: "Copied",
+      status: "View copied. Paste it after the address of this report."
+    };
+  }
+
+  /**
+   * navigator.clipboard is the way, and it is also the way that is missing: the page is built to be
+   * opened from a file, and a file is not a secure context in every browser that will open it. The
+   * old selection-based copy is the fallback; when that is refused as well the button says so and
+   * points at the address bar, which has the same link.
+   */
+  function copyToClipboard(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      // Present and refusing is the case that matters: from a file the API is there and the
+      // context is not secure, so it rejects rather than being missing.
+      return navigator.clipboard.writeText(text).catch(function () { return copyBySelection(text); });
+    }
+
+    return copyBySelection(text);
+  }
+  function copyBySelection(text) {
+    return new Promise(function (resolve, reject) {
+      var field = document.createElement("textarea");
+      field.value = text;
+      field.setAttribute("readonly", "readonly");
+      field.style.position = "fixed";
+      field.style.top = "-1000px";
+      document.body.appendChild(field);
+      field.select();
+      var ok = false;
+      try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+      document.body.removeChild(field);
+      if (ok) resolve(); else reject(new Error("the browser refused to copy"));
+    });
+  }
+
+  var copyTimer = null;
+  function copyLink() {
+    var target = shareTarget();
+    var button = el("copyBtn");
+    if (target.text === null) {
+      say(button, target.label, target.status);
+      return;
+    }
+    copyToClipboard(target.text).then(function () {
+      say(button, target.label, target.status);
+    }, function () {
+      say(button, "Copy failed", "The browser would not copy. The address bar has the same link.");
+    });
+  }
+  function say(button, label, status) {
+    el("copyStatus").textContent = status;
+    button.textContent = label;
+    if (copyTimer) clearTimeout(copyTimer);
+    copyTimer = setTimeout(function () { button.textContent = "Copy link"; }, 2600);
+  }
 
   /* ---------- glossary ---------- */
   function fillLegend() {
@@ -1026,7 +1125,10 @@
 
   readHash();
   var WIDE = !window.matchMedia || window.matchMedia("(min-width: 1181px)").matches;
-  if (!state.pkg && WIDE && FLAGGED.length) state.pkg = FLAGGED[0].package;
+  // On a wide screen the detail pane would otherwise open empty, so the first finding is shown.
+  // Nobody asked for it, so it stays out of the address bar and out of a copied link: a link that
+  // says pkg= reads as "look at this one", and this one was picked by the page.
+  if (!state.pkg && WIDE && FLAGGED.length) { state.pkg = FLAGGED[0].package; state.pkgAuto = true; }
   fillLegend();
   renderLedger();
   render();

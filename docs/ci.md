@@ -225,9 +225,13 @@ What the page has that a stream cannot:
 - **What the run could not see.** The notes, the thresholds it used and the schema it validates
   against, on their own tab.
 
-Filters, the open package and the search live in the URL hash, so a filtered view is a link. The
-query understands `verdict:`, `priority:`, `signal:`, `severity:`, `cve:`, `direct:` and `dev:`;
-`/` searches, `j`/`k` move, `?` opens a glossary of every verdict and signal.
+Filters, the open package and the search live in the URL hash, so a filtered view is a link. **Copy
+link** — `c` — puts that link on the clipboard, which is how you send someone three packages rather
+than a report with eighty findings in it. Served over http(s) it copies the whole address; opened
+from a local file it copies the fragment alone, because a `file://` path is no use to anyone else
+and names a directory that is nobody else's business. The query understands `verdict:`, `priority:`,
+`signal:`, `severity:`, `cve:`, `direct:` and `dev:`; `/` searches, `j`/`k` move, `?` opens a
+glossary of every verdict and signal.
 
 The page carries the run as JSON, and that payload's `report` key is byte for byte what
 `--format=json` writes, [schema](schema.md) and all:
