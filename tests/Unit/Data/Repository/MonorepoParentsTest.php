@@ -37,7 +37,10 @@ final class MonorepoParentsTest extends TestCase
         $metadata = ['illuminate/contracts' => self::metadata('illuminate/contracts', ['8' => self::branch('8.83.27', null)])];
         $children = $parents->children([F::package(['name' => 'illuminate/contracts', 'version' => 'v8.83.27'])], $metadata);
 
-        self::assertSame(['laravel/framework', 'symfony/symfony', 'cakephp/cakephp'], $parents->candidates());
+        // Sorted: which monorepos are listed is the claim, the order they sit in the file is not.
+        $candidates = $parents->candidates();
+        sort($candidates);
+        self::assertSame(['cakephp/cakephp', 'laravel/framework', 'symfony/symfony'], $candidates);
         self::assertSame(['illuminate/contracts'], $children);
         self::assertSame(['laravel/framework'], $parents->missingCandidates($children, $metadata), 'symfony and cakephp carry no illuminate/*');
     }
