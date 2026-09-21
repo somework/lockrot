@@ -27,7 +27,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   thresholds left none at all; two people comparing two reports could not tell whether they differ
   because the locks do or because the settings do. The report now carries a `run` block with the
   project's own name from composer.json — until now nothing in a report said which project it was
-  about, every lock being called composer.lock — the target PHP, the thresholds, the `fail-on`, the
+  about, every lock being called composer.lock, and `extra.lockrot.project` overrides it where the
+  manifest has no name or where its name is not the one to publish — the target PHP, the thresholds, the `fail-on`, the
   name of the lock (never its path) and `flagged_verdicts`, the verdicts the run counted as
   findings. Each finding also carries
   `baseline`, where it stands against the baseline file — `known`, `new` or `worsened`, with the

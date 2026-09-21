@@ -21,6 +21,7 @@ final class LockrotConfig
     public const INSTALL_TIME_VALUES = ['on', 'off'];
     public const INSTALL_TIME_ON = 'on';
 
+    private ?string $project;
     private string $failOn;
     private string $targetPhp;
     private bool $includeDev;
@@ -34,8 +35,9 @@ final class LockrotConfig
     private int $installTimeBudgetSeconds;
     private Thresholds $thresholds;
 
-    private function __construct(string $failOn, string $targetPhp, bool $includeDev, bool $offline, bool $strictNetwork, string $format, ?string $baseline, bool $disabled, bool $installTime, bool $installTimeStrict, int $installTimeBudgetSeconds, Thresholds $thresholds)
+    private function __construct(string $failOn, string $targetPhp, bool $includeDev, bool $offline, bool $strictNetwork, string $format, ?string $baseline, bool $disabled, bool $installTime, bool $installTimeStrict, int $installTimeBudgetSeconds, Thresholds $thresholds, ?string $project = null)
     {
+        $this->project = $project;
         $this->failOn = $failOn;
         $this->targetPhp = $targetPhp;
         $this->includeDev = $includeDev;
@@ -58,6 +60,7 @@ final class LockrotConfig
     public static function fromSources(array $extra, array $env, array $cli, string $runtimePhp, ?string $platformPhp): self
     {
         $failOn = self::resolveFailOn($extra, $env, $cli);
+        $project = self::resolveProject($extra);
         $targetPhp = self::resolveTargetPhp($extra, $env, $cli, $runtimePhp, $platformPhp);
         $format = self::resolveFormat($extra, $cli);
         $includeDev = ($cli['dev'] ?? null) === true || ($extra['include-dev'] ?? false) === true;
@@ -74,7 +77,8 @@ final class LockrotConfig
             self::resolveInstallTime($extra),
             ($extra['install-time-strict'] ?? false) === true,
             self::resolveInstallTimeBudget($extra),
-            Thresholds::fromArray($extra)
+            Thresholds::fromArray($extra),
+            $project
         );
     }
 
@@ -182,6 +186,23 @@ final class LockrotConfig
     }
 
     /**
+     * The name the report should call this project, when the manifest's own `name` is not it.
+     *
+     * A composer.json is not required to carry a name, and where it carries one it is not always
+     * the name to publish: a package inside a monorepo names itself after the package, and a
+     * private project names itself after the client. This is read from the manifest rather than
+     * from a flag because it describes the project, not the run.
+     *
+     * @param array<string, mixed> $extra
+     */
+    private static function resolveProject(array $extra): ?string
+    {
+        $project = $extra['project'] ?? null;
+
+        return \is_string($project) && $project !== '' ? $project : null;
+    }
+
+    /**
      * The baseline file's path, or null for the default `lockrot-baseline.json` next to
      * composer.json. No environment override: which findings a project has accepted is a property
      * of the project, not of the machine the run happens on.
@@ -246,6 +267,12 @@ final class LockrotConfig
         return $this->format;
     }
     /** The configured baseline path, or null when the default file name applies. */
+    /** What `extra.lockrot.project` calls this project, or null where it says nothing. */
+    public function project(): ?string
+    {
+        return $this->project;
+    }
+
     public function baseline(): ?string
     {
         return $this->baseline;

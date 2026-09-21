@@ -205,7 +205,8 @@ final class LockrotCommand extends BaseCommand
             // Before the baseline and before any formatter: every document the run writes should say
             // what the run was told to do, because that is what its verdicts were decided against.
             $report = $report->withRun(new RunSettings(
-                $project->name(),
+                // What the project calls itself, unless the manifest's lockrot config says otherwise.
+                $lockrot->project() ?? $project->name(),
                 $lockrot->targetPhp(),
                 $lockPath,
                 $lockrot->failOn(),
