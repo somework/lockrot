@@ -207,6 +207,22 @@ final class HtmlFormatterTest extends TestCase
         self::assertStringNotContainsString('1 silent', $page);
     }
 
+    /**
+     * The markup carries placeholders for the three values in the header bar, and the script
+     * replaces all three. A placeholder that names a PHP version is a claim about the run, made by
+     * a file that has not read the run yet: it is what a reader sees before the script goes, what
+     * a reader sees if it never goes, and what anyone reading the file itself sees. The other two
+     * placeholders are em dashes; this one was `8.4`.
+     */
+    public function testThePageNamesNoTargetPhpUntilItKnowsOne(): void
+    {
+        $page = $this->page($this->report([$this->finding('vendor/pkg')]));
+
+        $matched = preg_match('{<b class="mono" id="mTarget">(.*?)</b>}', $page, $m);
+        self::assertSame(1, $matched, 'the header carries the target PHP slot');
+        self::assertSame("\u{2014}", $m[1], 'and it holds nothing until the script fills it');
+    }
+
     public function testACleanRunSaysSoInItsDescription(): void
     {
         $page = $this->page($this->report([$this->finding('vendor/fine', Verdict::OK)], 40));
