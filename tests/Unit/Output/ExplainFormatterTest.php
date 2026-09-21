@@ -167,6 +167,42 @@ final class ExplainFormatterTest extends TestCase
         self::assertStringContainsString("repository metadata\n  none — not available\n", $this->plain($noNote));
     }
 
+    /**
+     * Two lines say `source`: the lock's URL and the repository metadata's. Both come from a place
+     * that routinely carries a token — `https://gitlab-ci-token:$CI_JOB_TOKEN@…` is how GitLab CI
+     * hands a job access to a private Composer source — and `--explain` is printed into tickets and
+     * CI logs. The lock line was redacted and the metadata line was not, which this pins.
+     */
+    public function testNeitherSourceLineCarriesACredential(): void
+    {
+        $credentialed = 'https://gitlab-ci-token:glpat-abcdef123456@gitlab.internal.acme.com/team/service.git';
+        $package = new LockedPackage('vendor/pkg', '1.0.0', new \DateTimeImmutable('2020-01-01T00:00:00+00:00'), '>=7.4', [], $credentialed, 'library', true, false, false);
+        $metadata = new PackageMetadata(
+            'vendor/pkg',
+            false,
+            null,
+            true,
+            new \DateTimeImmutable('2020-01-01T00:00:00+00:00'),
+            '1.0.0',
+            1,
+            $credentialed,
+            'library',
+            new \DateTimeImmutable(F::NOW)
+        );
+        $finding = new Finding('vendor/pkg', '1.0.0', Verdict::STALE, [], ['vendor/pkg'], null, null);
+        $explanation = new Explanation($finding, F::facts($package, $metadata), new Thresholds(), '8.4', $this->report());
+
+        $text = $this->plain($explanation);
+
+        self::assertStringNotContainsString('glpat-', $text, 'no token reaches the output');
+        self::assertStringNotContainsString('gitlab-ci-token', $text);
+        self::assertSame(
+            2,
+            substr_count($text, '  source https://gitlab.internal.acme.com/team/service.git'),
+            'both source lines keep the host and lose the userinfo'
+        );
+    }
+
     public function testTheBranchTableIsCappedAndAnAllowlistedPackageSaysSo(): void
     {
         $releases = [];

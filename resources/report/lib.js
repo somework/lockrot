@@ -48,13 +48,19 @@ var LockrotLib = (function () {
    * run. lockrot's own constraints are always well formed; a document from somewhere else is not
    * lockrot's own. A package name is a vendor and a name, a constraint is the small grammar
    * Composer accepts, and anything else means no command is offered.
+   *
+   * The constraint is quoted because the grammar Composer accepts is full of characters a shell
+   * reads first: `composer require laravel/framework >=10.0 <12.0` writes a file called `=10.0`,
+   * reads its input from `12.0` and passes Composer no constraint at all, and `~2.0|^3.0` pipes
+   * into a command named `^3.0`. Single quotes are the right ones: the grammar above has no `'`
+   * in it, so nothing can close the quote it is wrapped in.
    */
   function installCommand(name, constraint) {
     if (!/^[A-Za-z0-9]([A-Za-z0-9._-]*)\/[A-Za-z0-9]([A-Za-z0-9._-]*)$/.test(String(name))) return null;
     var value = String(constraint);
     if (value.length > 100 || !/^[A-Za-z0-9.,^~><=!|*\/ @_-]+$/.test(value)) return null;
 
-    return "composer require " + name + " " + value;
+    return "composer require " + name + " '" + value + "'";
   }
 
   /** The date out of an ISO timestamp, or an em dash when there is none. */

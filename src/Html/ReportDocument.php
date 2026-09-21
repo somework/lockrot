@@ -53,7 +53,8 @@ final class ReportDocument
     {
         return [
             'context' => $this->context(),
-            // Byte for byte what `--format=json` writes, envelope included, so `jq .report` out of
+            // The document `--format=json` writes, envelope included — compact here where the
+            // formatter pretty-prints, and identical once parsed — so `jq .report` out of
             // the page gives a document the published schema describes.
             'report' => ['$schema' => Schemas::url(Schemas::REPORT, JsonFormatter::SCHEMA), 'lockrot' => ['version' => Version::STRING, 'schema' => JsonFormatter::SCHEMA]] + $this->report->toArray(),
             'details' => $this->details($showAll),

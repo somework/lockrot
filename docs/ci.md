@@ -231,8 +231,9 @@ address, and whoever opens it lands on the same three packages rather than on ei
 query understands `verdict:`, `priority:`, `signal:`, `severity:`, `cve:`, `direct:` and `dev:`;
 `/` searches, `j`/`k` move, `?` opens a glossary of every verdict and signal.
 
-The page carries the run as JSON, and that payload's `report` key is byte for byte what
-`--format=json` writes, [schema](schema.md) and all:
+The page carries the run as JSON, and that payload's `report` key is the document `--format=json`
+writes, [schema](schema.md), envelope and every field — the page's copy is compact where the
+formatter pretty-prints, and identical once parsed:
 
 ```bash
 composer lockrot --format=html > lockrot-report.html
@@ -240,8 +241,11 @@ sed -n 's/.*<script id="lockrot-data" type="application\/json">\(.*\)<\/script>.
   | jq .report > lockrot.json
 ```
 
-Nothing in the page is fetched — no fonts, no CDN, no analytics — so it renders the same offline,
-under a strict Content-Security-Policy, and from a downloaded artifact. `--all` puts every package
+Nothing in the page is fetched — no fonts, no CDN, no analytics — so it renders the same offline and
+from a downloaded artifact. Its styles and script are inlined, so a host that serves it under a
+Content-Security-Policy has to allow those (`script-src 'self' 'unsafe-inline'`, and the same for
+`style-src`, since the page uses `style` attributes); every other directive can stay shut, including
+`connect-src` and `img-src`, because the page never asks for anything. `--all` puts every package
 in it, at roughly 4 KB a package; without it a 100-package lock lands around 250 KB.
 
 ## `--format=json`

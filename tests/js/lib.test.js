@@ -73,10 +73,21 @@ test("safeHref takes nothing but a string", () => {
 });
 
 test("installCommand builds the line a real finding suggests", () => {
-    assert.strictEqual(lib.installCommand("predis/predis", "^3.6"), "composer require predis/predis ^3.6");
-    assert.strictEqual(lib.installCommand("laravel/framework", ">=10.0 <12.0"), "composer require laravel/framework >=10.0 <12.0");
-    assert.strictEqual(lib.installCommand("vendor/pkg", "~2.0|^3.0"), "composer require vendor/pkg ~2.0|^3.0");
-    assert.strictEqual(lib.installCommand("vendor/pkg", "1.2.*@dev"), "composer require vendor/pkg 1.2.*@dev");
+    assert.strictEqual(lib.installCommand("predis/predis", "^3.6"), "composer require predis/predis '^3.6'");
+    assert.strictEqual(lib.installCommand("laravel/framework", ">=10.0 <12.0"), "composer require laravel/framework '>=10.0 <12.0'");
+    assert.strictEqual(lib.installCommand("vendor/pkg", "~2.0|^3.0"), "composer require vendor/pkg '~2.0|^3.0'");
+    assert.strictEqual(lib.installCommand("vendor/pkg", "1.2.*@dev"), "composer require vendor/pkg '1.2.*@dev'");
+});
+
+test("installCommand quotes the constraint, because Composer's grammar is shell metacharacters", () => {
+    // Unquoted, `composer require laravel/framework >=10.0 <12.0` writes a file named `=10.0`,
+    // reads stdin from `12.0` and hands Composer no constraint. These are ordinary constraints,
+    // not hostile ones: the quoting is for correctness first and only then for safety.
+    for (const constraint of [">=10.0 <12.0", "~2.0|^3.0", "1.2.*", "^3.6", ">=1.0", "!=2.0"]) {
+        const line = lib.installCommand("vendor/pkg", constraint);
+        assert.strictEqual(line, "composer require vendor/pkg '" + constraint + "'", constraint);
+        assert.ok(!/[<>|*](?=[^']*$)/.test(line), "no metacharacter is left outside the quotes: " + line);
+    }
 });
 
 test("installCommand offers nothing when a second command is hiding in the constraint", () => {
@@ -112,7 +123,7 @@ test("installCommand refuses a package name that is not a vendor and a name", ()
 });
 
 test("installCommand caps how long a constraint may be", () => {
-    assert.strictEqual(lib.installCommand("vendor/pkg", "^" + "1".repeat(98)), "composer require vendor/pkg ^" + "1".repeat(98));
+    assert.strictEqual(lib.installCommand("vendor/pkg", "^" + "1".repeat(98)), "composer require vendor/pkg '^" + "1".repeat(98) + "'");
     assert.strictEqual(lib.installCommand("vendor/pkg", "^" + "1".repeat(100)), null);
 });
 
