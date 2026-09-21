@@ -843,10 +843,11 @@
       ],
       "properties": {
         "project": {
-          "description": "The name the project gives itself in composer.json, the one thing that says which project the report is about. Null where an application does not name itself.",
+          "description": "What the report calls this project: composer.json's own `name`, or whatever `extra.lockrot.project` says instead. A display name, not an identifier — a package inside a monorepo or a private project is routinely called something that is not a vendor/name. Null where the manifest has no name and the config says nothing.",
           "oneOf": [
             {
-              "$ref": "#/definitions/packageName"
+              "type": "string",
+              "minLength": 1
             },
             {
               "type": "null"

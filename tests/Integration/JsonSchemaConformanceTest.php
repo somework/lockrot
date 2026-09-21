@@ -180,7 +180,7 @@ final class JsonSchemaConformanceTest extends TestCase
         $report = self::analysis('apps/wallabag_wallabag')->report();
         $previous = Baseline::fromReport($report);
         $report = $report
-            ->withRun(new RunSettings('wallabag/wallabag', '8.4', '/home/someone/clients/acme/composer.lock', 'silent', new Thresholds(2, 4, 2, 4)))
+            ->withRun(new RunSettings('Acme internal API', '8.4', '/home/someone/clients/acme/composer.lock', 'silent', new Thresholds(2, 4, 2, 4)))
             ->withBaseline(BaselineComparison::compare($previous, $report, 'lockrot-baseline.json', []));
 
         $json = (new JsonFormatter())->format($report);
@@ -192,6 +192,10 @@ final class JsonSchemaConformanceTest extends TestCase
         self::assertIsArray($decoded);
         $run = JsonPath::arrayAt($decoded, ['run']);
         self::assertSame('8.4', $run['target_php']);
+        // A display name, not a vendor/name: `extra.lockrot.project` exists precisely so a project
+        // can be called something that is not its package name, and typing the field as one made
+        // the published schema reject the value the documentation recommends.
+        self::assertSame('Acme internal API', $run['project']);
         self::assertSame('composer.lock', $run['lock_file'], 'the lock is named, never located');
         self::assertStringNotContainsString('/home/someone', $json, 'and no path reaches the document');
         self::assertSame(2, JsonPath::arrayAt($decoded, ['run', 'thresholds'])['release-warn-years']);
