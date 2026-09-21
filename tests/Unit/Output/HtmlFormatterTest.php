@@ -56,6 +56,13 @@ final class HtmlFormatterTest extends TestCase
         self::assertStringContainsString('<style>', $page);
         self::assertStringContainsString('.row {', $page, 'the stylesheet is spliced in, not linked');
         self::assertStringContainsString('function baselineState', $page, 'and so is the script');
+        // Order, not just presence: report.js reads LockrotLib while it is still evaluating, so a
+        // page that carries both halves the wrong way round throws before it renders anything.
+        $library = strpos($page, 'var LockrotLib');
+        $application = strpos($page, 'function baselineState');
+        self::assertIsInt($library, 'the DOM-free half is in the page');
+        self::assertIsInt($application);
+        self::assertLessThan($application, $library, 'and it comes first');
         self::assertStringNotContainsString('{{CSS}}', $page);
         self::assertStringNotContainsString('{{DATA}}', $page);
     }

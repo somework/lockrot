@@ -79,6 +79,23 @@ jobs:
           vendor/bin/phpunit -c phpunit.core-coverage.xml.dist --coverage-clover build/clover-core.xml
           composer global require --no-interaction "rregeer/phpunit-coverage-check:^0.3"
           $(composer global config bin-dir --absolute)/coverage-check build/clover-core.xml 94
+  # The report page's DOM-free half, which is the only JavaScript in the project that can be loaded
+  # outside a browser. node is a development tool here and nowhere else: the page has no build step,
+  # the PHAR is built without node, and what ships is the source under resources/report/. The runner
+  # is node's own, so there is no package.json, no lockfile and nothing to install — which is also
+  # why this job takes seconds and why it cannot drift into the release path.
+  report-script:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: The page's scripts parse
+        run: |
+          node --check resources/report/lib.js
+          node --check resources/report/report.js
+      # The shell expands the pattern, so this does not depend on node's own glob support.
+      - run: node --test tests/js/*.test.js
   # Its own job, sharded three ways: over the whole src tree one Infection run took 30 minutes on
   # a 4-core runner, and a style or type error should not wait for it. Each shard runs the same
   # configuration filtered to a group of directories, against its own threshold: the shards are

@@ -312,7 +312,7 @@ its slashes unescaped. Two are equivalent:
   unflagged one, the filter leaves a gap in the keys and `json_encode` writes an object where the
   page expects a list. The defence is for a future ordering, and a test cannot reach it without
   rewriting `SEVERITY`.
-- `src/Output/HtmlFormatter.php:83` BitwiseOr — `ENT_QUOTES | ENT_SUBSTITUTE` becomes `&`, which is
+- `src/Output/HtmlFormatter.php:124` BitwiseOr — `ENT_QUOTES | ENT_SUBSTITUTE` becomes `&`, which is
   `0`, so quotes stay unescaped and invalid UTF-8 is not substituted. `text()` has one caller and it
   is `title()`, which builds its string from two integers and literal words: no quote and no invalid
   byte can reach it today. The flags are there so that stays true if the title ever grows a value

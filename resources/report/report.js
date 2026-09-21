@@ -1,6 +1,13 @@
 (function () {
   "use strict";
 
+  // The DOM-free half of the page, spliced in ahead of this file. Named here rather than reached
+  // through LockrotLib at every call site, so the several hundred uses of esc() read as they did.
+  var esc = LockrotLib.esc;
+  var safeHref = LockrotLib.safeHref;
+  var installCommand = LockrotLib.installCommand;
+  var kvRows = LockrotLib.kvRows;
+
   var BUNDLE = JSON.parse(document.getElementById("lockrot-data").textContent);
   var REPORT = BUNDLE.report;
   var DETAILS = BUNDLE.details || {};
@@ -68,18 +75,6 @@
     var link = (DETAILS[f.package] || {}).repository_link;
     return safeHref(link);
   }
-  /**
-   * Definition rows, minus the ones with nothing to say. A row whose value is null is dropped
-   * rather than printed as a dash: the lock entry and the provenance are built from `--explain`
-   * data, and a document that carries only the report has none of it — five dashes under a heading
-   * reads as a broken page, where three real rows and no heading reads as what is known.
-   *
-   * Values arrive escaped, because some of them are links.
-   */
-  function kvRows(pairs) {
-    return pairs.filter(function (p) { return p[1] !== null && p[1] !== undefined && p[1] !== ""; })
-      .map(function (p) { return "<dt>" + esc(p[0]) + "</dt><dd>" + p[1] + "</dd>"; }).join("");
-  }
   function kvSection(heading, rows) {
     return rows ? '<section class="sect"><h3>' + esc(heading) + '</h3><dl class="kv">' + rows + "</dl></section>" : "";
   }
@@ -96,45 +91,12 @@
 
     return null;
   }
-  /**
-   * The `composer require` line for a finding, or null when either half is not the shape it has to
-   * be.
-   *
-   * This one is offered with a button that puts it on the clipboard, and what the button copies is
-   * the raw value — the HTML escaping is undone by the parser on the way back out of the
-   * attribute. Somewhere between that clipboard and a shell prompt there is no escaping left at
-   * all, so a `suggested_constraint` carrying a newline and a second command would be pasted and
-   * run. lockrot's own constraints are always well formed; a document from somewhere else is not
-   * lockrot's own. A package name is a vendor and a name, a constraint is the small grammar
-   * Composer accepts, and anything else means no command is offered.
-   */
-  function installCommand(name, constraint) {
-    if (!/^[A-Za-z0-9]([A-Za-z0-9._-]*)\/[A-Za-z0-9]([A-Za-z0-9._-]*)$/.test(String(name))) return null;
-    var value = String(constraint);
-    if (value.length > 100 || !/^[A-Za-z0-9.,^~><=!|*\/ @_-]+$/.test(value)) return null;
-
-    return "composer require " + name + " " + value;
-  }
   function repoHost(url) {
     var m = /^https?:\/\/([^/]+)/.exec(url || "");
     return m ? m[1].replace(/^www\./, "") : "repository";
   }
   function cveUrl(a) {
     return a.cve && /^CVE-/.test(a.cve) ? "https://nvd.nist.gov/vuln/detail/" + a.cve : null;
-  }
-  /**
-   * A URL the page may put in an href, or null.
-   *
-   * The page renders data it did not produce. A package's own metadata reaches it — the name, the
-   * description, the repository, and through the advisory feed a `link` and a title — and so does
-   * the document's `$schema`. Any of those arriving as `javascript:` would be a link that runs
-   * script in whatever origin the page is open in. `target="_blank"` happens to stop Chrome
-   * following such a link today, which is luck, not a defence: it is the scheme that has to be
-   * checked, once, where the href is written.
-   */
-  function safeHref(url) {
-    var value = typeof url === "string" ? url.trim() : "";
-    return /^https?:\/\/[^\s<>"']+$/i.test(value) ? value : null;
   }
   function outLink(url, text) {
     var href = safeHref(url);
@@ -217,10 +179,6 @@
 
   /* ---------- helpers ---------- */
   function el(id) { return document.getElementById(id); }
-  function esc(s) {
-    return String(s === null || s === undefined ? "" : s)
-      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-  }
   function tone(key) { return TONE[key] || "low"; }
   function pill(key, link) {
     var t = tone(key);
@@ -230,38 +188,17 @@
     return '<a class="pill" style="' + style + ';text-decoration:none" href="' + DOCS + '#the-nine-verdicts"' +
       ' target="_blank" rel="noopener noreferrer"' + title + ">" + esc(key) + "</a>";
   }
-  function day(iso) { return iso ? String(iso).slice(0, 10) : "—"; }
-  function years(iso) {
-    if (!iso) return null;
-    return (NOW - new Date(iso)) / (365.25 * 24 * 3600 * 1000);
-  }
-  function ageText(iso) {
-    var y = years(iso);
-    if (y === null) return "undated";
-    if (y < 1) return Math.max(1, Math.round(y * 12)) + " mo ago";
-    return y.toFixed(1) + " y ago";
-  }
-  function plural(n, one, many) {
-    return n + " " + (n === 1 ? one : many);
-  }
+  function day(iso) { return LockrotLib.day(iso); }
+  function years(iso) { return LockrotLib.years(iso, NOW); }
+  function ageText(iso) { return LockrotLib.ageText(iso, NOW); }
+  function plural(n, one, many) { return LockrotLib.plural(n, one, many); }
   function anySelected(obj) {
     for (var k in obj) { if (obj[k]) return true; }
     return false;
   }
 
   /* ---------- query ---------- */
-  function parseQuery(raw) {
-    var terms = { text: [], verdict: [], priority: [], signal: [], severity: [], cve: [], direct: null, dev: null };
-    raw.trim().split(/\s+/).forEach(function (part) {
-      if (!part) return;
-      var m = part.match(/^(verdict|priority|signal|severity|cve|direct|dev):(.+)$/i);
-      if (!m) { terms.text.push(part.toLowerCase()); return; }
-      var key = m[1].toLowerCase(), val = m[2].toLowerCase();
-      if (key === "direct" || key === "dev") { terms[key] = (val === "yes" || val === "true" || val === "1"); return; }
-      terms[key].push(key === "signal" || key === "cve" ? val.toUpperCase() : val);
-    });
-    return terms;
-  }
+  function parseQuery(raw) { return LockrotLib.parseQuery(raw); }
   function matches(f, terms) {
     if (terms.text.length) {
       var hay = (f.package + " " + f.version + " " + f.verdict + " " + evidenceOf(f)).toLowerCase();

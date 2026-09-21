@@ -15,8 +15,9 @@ use Lockrot\Verdict\Verdict;
  * Self-contained on purpose. Playwright's HTML reporter ships a folder and a server because it has
  * traces and videos to serve; lockrot has nothing that cannot live inside the document, so the whole
  * run goes into one file that opens from `file://`, downloads from CI as a single artifact and
- * attaches to a ticket. No server, no network, no bundler: the three files under resources/report/
- * are hand-written and spliced together here.
+ * attaches to a ticket. No server, no network, no bundler: the files under resources/report/ are
+ * hand-written and spliced together here, which is also why the page carries no generated code —
+ * what is in the PHAR is what is in the repository, and the release is attested on that basis.
  *
  * What the page renders from is {@see ReportDocument}; this class only assembles.
  */
@@ -24,7 +25,15 @@ final class HtmlFormatter implements FormatterInterface
 {
     private const TEMPLATE = __DIR__.'/../../resources/report/report.html';
     private const STYLES = __DIR__.'/../../resources/report/report.css';
-    private const SCRIPT = __DIR__.'/../../resources/report/report.js';
+    /**
+     * In order: the DOM-free half, then the page. report.js reads `LockrotLib` at the top, so it
+     * cannot come first. Splicing here rather than bundling keeps both halves readable source in
+     * the archive, and lets node test the first one without a browser.
+     */
+    private const SCRIPTS = [
+        __DIR__.'/../../resources/report/lib.js',
+        __DIR__.'/../../resources/report/report.js',
+    ];
 
     private FormatContext $context;
     private PageData $page;
@@ -43,7 +52,7 @@ final class HtmlFormatter implements FormatterInterface
             '{{TITLE}}' => self::text(self::title($report)),
             '{{DESCRIPTION}}' => self::text(self::description($report)),
             '{{CSS}}' => self::read(self::STYLES),
-            '{{JS}}' => self::read(self::SCRIPT),
+            '{{JS}}' => self::script(),
             '{{DATA}}' => self::payload($document->toArray($showAll)),
         ]);
     }
@@ -115,10 +124,16 @@ final class HtmlFormatter implements FormatterInterface
         return htmlspecialchars($value, \ENT_QUOTES | \ENT_SUBSTITUTE, 'UTF-8');
     }
 
+    /** Every script the page runs, in the order it has to run them. */
+    private static function script(): string
+    {
+        return implode("\n", array_map([self::class, 'read'], self::SCRIPTS));
+    }
+
     private static function read(string $path): string
     {
         $contents = file_get_contents($path);
-        // The three assets ship inside the package and the PHAR, so a failure here means a broken
+        // The assets ship inside the package and the PHAR, so a failure here means a broken
         // install rather than anything a run can recover from.
         if ($contents === false) {
             throw new \RuntimeException('Cannot read the report asset '.basename($path));
