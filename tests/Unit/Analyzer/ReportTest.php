@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Analyzer;
 
 use Lockrot\Analyzer\Report;
+use Lockrot\Analyzer\RunSettings;
 use Lockrot\Analyzer\TransitiveExposure;
 use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Baseline\BaselineEntry;
 use Lockrot\Signal\Signal;
+use Lockrot\Signal\Thresholds;
+use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Priority;
 use Lockrot\Verdict\Verdict;
@@ -211,6 +214,133 @@ final class ReportTest extends TestCase
         self::assertSame('priority: critical 0 · high 0 · medium 0 · low 0', $report->prioritySummaryLine());
     }
 
+    /**
+     * The verdicts in a report were decided against settings the report did not record. Until the
+     * `run` block, `--format=json` named the target PHP in exactly one place — inside the data of
+     * an S5 signal — so a run where S5 never fired left no trace of what it aimed at, and the
+     * thresholds left none at all. Two people comparing two reports could not tell whether they
+     * differ because the locks do or because the settings do.
+     */
+    public function testTheReportRecordsWhatTheRunWasToldToDo(): void
+    {
+        $report = $this->report($this->finding('vendor/a', Verdict::SILENT))
+            ->withRun(new RunSettings('8.4', '/home/someone/clients/acme/composer.lock', 'silent', new Thresholds(2, 4, 6, 8)));
+
+        $run = JsonPath::arrayAt($report->toArray(), ['run']);
+
+        self::assertSame([
+            'target_php' => '8.4',
+            'lock_file' => 'composer.lock',
+            'fail_on' => 'silent',
+            'thresholds' => [
+                'release-warn-years' => 2,
+                'release-high-years' => 4,
+                'push-warn-years' => 6,
+                'push-high-years' => 8,
+            ],
+            'flagged_verdicts' => [
+                Verdict::ABANDONED,
+                Verdict::SILENT,
+                Verdict::PINNED,
+                Verdict::LEFT_BEHIND,
+                Verdict::OLD_PROMISE,
+                Verdict::STALE,
+            ],
+        ], $run);
+    }
+
+    /**
+     * A report is something people publish, and an absolute path carries the account it ran under
+     * and often the client's directory name. The same rule as the repository URLs.
+     */
+    public function testTheRunNamesTheLockAndNeverLocatesIt(): void
+    {
+        $report = $this->report()->withRun(new RunSettings(null, '/srv/deploy/acme-bank/composer.lock', 'none', null));
+
+        $json = json_encode($report->toArray());
+
+        self::assertIsString($json);
+        self::assertStringNotContainsString('acme-bank', $json);
+        self::assertStringNotContainsString('/srv', $json);
+        self::assertSame('composer.lock', JsonPath::stringAt($report->toArray(), ['run', 'lock_file']));
+    }
+
+    /**
+     * `flagged_verdicts` is the vocabulary, not a setting: a consumer deciding what counts as a
+     * finding should not have to know the severity ladder by heart. `unknown` is the case it
+     * settles — a package lockrot could not check is a note, not a finding.
+     */
+    public function testTheRunNamesWhichVerdictsAreFindings(): void
+    {
+        $flagged = JsonPath::arrayAt($this->report()->withRun(new RunSettings(null, null, null, null))->toArray(), ['run', 'flagged_verdicts']);
+
+        self::assertNotContains(Verdict::UNKNOWN, $flagged);
+        self::assertNotContains(Verdict::FINISHED, $flagged);
+        self::assertNotContains(Verdict::OK, $flagged);
+        foreach (array_keys($flagged) as $at) {
+            $verdict = JsonPath::stringAt($flagged, [$at]);
+            self::assertTrue(Verdict::flagged($verdict), $verdict.' is not a flagged verdict');
+        }
+    }
+
+    /**
+     * The `baseline` block gives the totals. A reader filtering for what is new needs the same
+     * judgement per finding, which the totals cannot give.
+     */
+    public function testEachFindingCarriesItsStandingAgainstTheBaseline(): void
+    {
+        $report = $this->report(
+            $this->finding('vendor/known', Verdict::STALE),
+            $this->finding('vendor/worse', Verdict::ABANDONED),
+            $this->finding('vendor/fresh', Verdict::LEFT_BEHIND)
+        );
+        // The baseline a run wrote a month ago, when the second package was merely stale.
+        $before = $this->report($this->finding('vendor/known', Verdict::STALE), $this->finding('vendor/worse', Verdict::STALE));
+        $compared = $report->withBaseline(BaselineComparison::compare(
+            Baseline::fromReport($before),
+            $report,
+            'lockrot-baseline.json',
+            ['vendor/known', 'vendor/worse', 'vendor/fresh']
+        ));
+
+        $standings = [];
+        foreach (array_keys(JsonPath::arrayAt($compared->toArray(), ['findings'])) as $at) {
+            $standings[JsonPath::stringAt($compared->toArray(), ['findings', $at, 'package'])]
+                = JsonPath::arrayAt($compared->toArray(), ['findings', $at, 'baseline']);
+        }
+
+        self::assertSame(['status' => 'known', 'previous_verdict' => Verdict::STALE], $standings['vendor/known']);
+        self::assertSame(['status' => 'worsened', 'previous_verdict' => Verdict::STALE], $standings['vendor/worse']);
+        self::assertSame(['status' => 'new', 'previous_verdict' => null], $standings['vendor/fresh']);
+    }
+
+    /** Without a baseline there is nothing to stand against, and the key says so rather than lying. */
+    public function testAFindingWithoutABaselineStandsNowhere(): void
+    {
+        $findings = JsonPath::arrayAt($this->report($this->finding('vendor/a', Verdict::SILENT))->toArray(), ['findings']);
+
+        self::assertArrayHasKey(0, $findings);
+        self::assertIsArray($findings[0]);
+        self::assertArrayHasKey('baseline', $findings[0]);
+        self::assertNull($findings[0]['baseline']);
+    }
+
+    /** The run survives being compared with a baseline, which rebuilds the report. */
+    public function testTheRunOutlivesWithBaseline(): void
+    {
+        $report = $this->report($this->finding('vendor/a', Verdict::SILENT))
+            ->withRun(new RunSettings('8.3', null, 'none', null));
+
+        $compared = $report->withBaseline(BaselineComparison::compare(
+            Baseline::fromReport($report),
+            $report,
+            'lockrot-baseline.json',
+            ['vendor/a']
+        ));
+
+        self::assertSame('8.3', JsonPath::stringAt($compared->toArray(), ['run', 'target_php']));
+    }
+
     public function testToArrayKeys(): void
     {
         $report = new Report(
@@ -223,7 +353,7 @@ final class ReportTest extends TestCase
         );
         $array = $report->toArray();
         self::assertSame(
-            ['generated_at', 'activity_cache_oldest_at', 'packages_checked', 'include_dev', 'not_from_composer_repository', 'network_failures', 'counts', 'priorities', 'exposure', 'baseline', 'notes', 'findings'],
+            ['generated_at', 'run', 'activity_cache_oldest_at', 'packages_checked', 'include_dev', 'not_from_composer_repository', 'network_failures', 'counts', 'priorities', 'exposure', 'baseline', 'notes', 'findings'],
             array_keys($array)
         );
         self::assertIsArray($array['priorities']);
@@ -238,6 +368,7 @@ final class ReportTest extends TestCase
         self::assertSame(1, $array['not_from_composer_repository']);
         self::assertTrue($array['network_failures']);
         self::assertNull($array['baseline']);
+        self::assertNull($array['run'], 'a report nothing told about the run says so rather than guessing');
         self::assertSame(['a note'], $array['notes']);
         self::assertIsArray($array['findings']);
         self::assertCount(1, $array['findings']);

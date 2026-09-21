@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Lockrot\Html;
 
 use Lockrot\Analyzer\Analysis;
-use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Signal\Thresholds;
 
 /**
@@ -21,18 +20,15 @@ use Lockrot\Signal\Thresholds;
 final class PageData
 {
     private ?Analysis $analysis;
-    private ?BaselineComparison $baseline;
     private ?Thresholds $thresholds;
     private ?string $targetPhp;
 
     public function __construct(
         ?Analysis $analysis = null,
-        ?BaselineComparison $baseline = null,
         ?Thresholds $thresholds = null,
         ?string $targetPhp = null
     ) {
         $this->analysis = $analysis;
-        $this->baseline = $baseline;
         $this->thresholds = $thresholds;
         $this->targetPhp = $targetPhp;
     }
@@ -48,10 +44,6 @@ final class PageData
         return $this->analysis;
     }
 
-    public function baseline(): ?BaselineComparison
-    {
-        return $this->baseline;
-    }
 
     public function thresholds(): ?Thresholds
     {

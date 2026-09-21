@@ -6,12 +6,12 @@ namespace Lockrot\Tests\Unit\Html;
 
 use Lockrot\Analyzer\Analysis;
 use Lockrot\Analyzer\Report;
+use Lockrot\Analyzer\RunSettings;
 use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Html\PageData;
 use Lockrot\Html\ReportDocument;
-use Lockrot\Output\FormatContext;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\Thresholds;
@@ -41,12 +41,12 @@ final class ReportDocumentTest extends TestCase
     /** @param array<string, PackageFacts> $facts */
     private function document(Report $report, array $facts = [], ?BaselineComparison $baseline = null): ReportDocument
     {
-        return new ReportDocument($report, FormatContext::unknown(), new PageData(
-            $facts === [] ? null : new Analysis($report, $facts),
-            $baseline,
-            new Thresholds(),
-            '8.4'
-        ));
+        // The baseline lives in the report now, not beside it: the page reads a finding's standing
+        // out of the same document `--format=json` writes.
+        return new ReportDocument(
+            $baseline === null ? $report : $report->withBaseline($baseline),
+            new PageData($facts === [] ? null : new Analysis($report, $facts), new Thresholds(), '8.4')
+        );
     }
 
     public function testTheReportKeyIsWhatFormatJsonWrites(): void
@@ -62,51 +62,22 @@ final class ReportDocumentTest extends TestCase
         );
     }
 
-    public function testTheContextCarriesWhatTheRunWasToldToDo(): void
-    {
-        $document = $this->document($this->report([]))->toArray();
-
-        self::assertSame([
-            'target_php' => '8.4',
-            'lock_file' => null,
-            'fail_on' => FailOn::NONE,
-            'flagged_verdicts' => [
-                Verdict::ABANDONED,
-                Verdict::SILENT,
-                Verdict::PINNED,
-                Verdict::LEFT_BEHIND,
-                Verdict::OLD_PROMISE,
-                Verdict::STALE,
-            ],
-            'thresholds' => [
-                'release-warn-years' => 3,
-                'release-high-years' => 5,
-                'push-warn-years' => 3,
-                'push-high-years' => 5,
-            ],
-        ], J::arrayAt($document, ['context']));
-    }
-
     /**
-     * The page counts findings for itself, so it has to be told which verdicts are findings. If it
-     * decided on its own that anything other than `ok` and `finished` counts, `unknown` — a package
-     * lockrot could not check — would be listed as a finding, and the page would show one more than
-     * its own title, the text table and `--fail-on` all say.
+     * What the run was told to do used to be a key of its own beside the report. It is in the
+     * report now — the page reads it from there, and so does anyone with `jq` — so what this asserts
+     * is that the page did not keep a second copy of it.
      */
-    public function testThePageIsToldWhichVerdictsAreFindings(): void
+    public function testThePayloadKeepsNoSecondCopyOfTheRun(): void
     {
-        $document = $this->document($this->report([]))->toArray();
+        $report = $this->report([])->withRun(new RunSettings('8.4', '/home/someone/acme/composer.lock', FailOn::NONE, new Thresholds()));
 
-        $flagged = J::arrayAt($document, ['context', 'flagged_verdicts']);
+        $document = (new ReportDocument($report))->toArray();
 
-        self::assertNotContains(Verdict::UNKNOWN, $flagged);
-        self::assertNotContains(Verdict::FINISHED, $flagged);
-        self::assertNotContains(Verdict::OK, $flagged);
-        foreach (array_keys($flagged) as $at) {
-            $verdict = J::stringAt($flagged, [$at]);
-            self::assertTrue(Verdict::flagged($verdict), $verdict.' is not a flagged verdict');
-        }
+        self::assertSame(['report', 'details'], array_keys($document));
+        self::assertSame('8.4', J::stringAt($document, ['report', 'run', 'target_php']));
+        self::assertSame('composer.lock', J::stringAt($document, ['report', 'run', 'lock_file']));
     }
+
 
     public function testOnlyTheFlaggedPackagesAreExplainedUnlessEverythingIsAsked(): void
     {
@@ -158,8 +129,8 @@ final class ReportDocumentTest extends TestCase
         $report = $this->report([$this->finding('vendor/pkg', Verdict::LEFT_BEHIND)]);
         $analysis = new Analysis($report, ['vendor/pkg' => F::facts(F::package(), F::metadata([['1.0.0', '2020-01-01T00:00:00+00:00']]))]);
 
-        $noThresholds = new ReportDocument($report, FormatContext::unknown(), new PageData($analysis, null, null, '8.4'));
-        $noTarget = new ReportDocument($report, FormatContext::unknown(), new PageData($analysis, null, new Thresholds(), null));
+        $noThresholds = new ReportDocument($report, new PageData($analysis, null, '8.4'));
+        $noTarget = new ReportDocument($report, new PageData($analysis, new Thresholds(), null));
 
         self::assertSame([], J::arrayAt($noThresholds->toArray(), ['details']));
         self::assertSame([], J::arrayAt($noTarget->toArray(), ['details']));
@@ -224,36 +195,12 @@ final class ReportDocumentTest extends TestCase
     {
         $report = $this->report([$this->finding('vendor/pkg', Verdict::STALE)]);
 
-        $document = (new ReportDocument($report, FormatContext::unknown()))->toArray();
+        $document = (new ReportDocument($report))->toArray();
 
         self::assertSame([], J::arrayAt($document, ['details']), 'the install-time path keeps no facts');
-        self::assertSame([], J::arrayAt($document, ['baseline']));
         self::assertNotSame([], J::arrayAt($document, ['report', 'findings']));
     }
 
-    public function testTheBaselineStateIsGivenPerPackage(): void
-    {
-        $report = $this->report([
-            $this->finding('vendor/known', Verdict::STALE),
-            $this->finding('vendor/worse', Verdict::ABANDONED),
-            $this->finding('vendor/fresh', Verdict::LEFT_BEHIND),
-        ]);
-        // The baseline a run wrote a month ago, when both packages were merely stale.
-        $before = $this->report([
-            $this->finding('vendor/known', Verdict::STALE),
-            $this->finding('vendor/worse', Verdict::STALE),
-        ]);
-        $baseline = Baseline::fromReport($before);
-
-        $comparison = BaselineComparison::compare($baseline, $report, 'lockrot-baseline.json', ['vendor/known', 'vendor/worse', 'vendor/fresh']);
-
-        $states = J::arrayAt($this->document($report, [], $comparison)->toArray(), ['baseline']);
-
-        self::assertSame('known', J::stringAt($states, ['vendor/known', 'status']));
-        self::assertSame('worsened', J::stringAt($states, ['vendor/worse', 'status']));
-        self::assertSame(Verdict::STALE, J::stringAt($states, ['vendor/worse', 'previous_verdict']));
-        self::assertSame('new', J::stringAt($states, ['vendor/fresh', 'status']));
-    }
 
     /**
      * The URL comes out of the package's own `source.url` or `support.source`, and lands in a page

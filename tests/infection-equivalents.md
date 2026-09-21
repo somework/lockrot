@@ -11,7 +11,7 @@ mutant from the original, and says why.
 - `src/Signal/ConstraintOpenness.php:46` CastInt, `:48` CastInt, IncrementInteger, DecrementInteger,
   `:62` ConcatOperandRemoval — numeric strings compare numerically, every mutated integer stays
   below any PHP major, and `normalize("8.4")` equals `normalize("8.4.0")`.
-- `src/Analyzer/Report.php:97` UnwrapArrayValues — `flagged()`: the findings are sorted and every
+- `src/Analyzer/Report.php:132` UnwrapArrayValues — `flagged()`: the findings are sorted and every
   flagged one precedes every unflagged one, so the filtered keys are already `0..n`; the
   `array_values()` is what makes the `list` type true by construction.
 - `src/Output/JsonFormatter.php:20` FalseValue — the `$showAll` default of the interface's
@@ -299,20 +299,20 @@ five sources including one that is not a URL, `trim()` is exercised by a padded 
 value of `$showAll` is exercised against a run that has facts, and the payload is asserted to keep
 its slashes unescaped. Two are equivalent:
 
-- `src/Html/ReportDocument.php:103` Continue_ — `continue` becomes `break` in the skip for a package
+- `src/Html/ReportDocument.php:81` Continue_ — `continue` becomes `break` in the skip for a package
   that is not worth explaining. `Report::compare()` orders findings by priority rank first, and an
   unflagged package has no priority at all, so the packages this branch skips are always a suffix of
   the list. Breaking out of the loop at the first of them selects exactly what stepping over each of
   them selects. It is `continue` because the loop's condition is about one package, not about where
   the list stops.
-- `src/Html/ReportDocument.php:85` UnwrapArrayValues — `array_values()` falls away from
+- `src/Analyzer/RunSettings.php:55` UnwrapArrayValues — `array_values()` falls away from
   `flagged_verdicts`. `Verdict::all()` returns the keys of `SEVERITY` in declaration order and the
   flagged ones are the first six of them, so `array_filter()` leaves 0..5 and the reindex changes
   nothing that a test can see. It stays because the day a flagged verdict is declared below an
   unflagged one, the filter leaves a gap in the keys and `json_encode` writes an object where the
   page expects a list. The defence is for a future ordering, and a test cannot reach it without
   rewriting `SEVERITY`.
-- `src/Output/HtmlFormatter.php:124` BitwiseOr — `ENT_QUOTES | ENT_SUBSTITUTE` becomes `&`, which is
+- `src/Output/HtmlFormatter.php:127` BitwiseOr — `ENT_QUOTES | ENT_SUBSTITUTE` becomes `&`, which is
   `0`, so quotes stay unescaped and invalid UTF-8 is not substituted. `text()` has one caller and it
   is `title()`, which builds its string from two integers and literal words: no quote and no invalid
   byte can reach it today. The flags are there so that stays true if the title ever grows a value

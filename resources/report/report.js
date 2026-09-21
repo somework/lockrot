@@ -11,7 +11,9 @@
   var BUNDLE = JSON.parse(document.getElementById("lockrot-data").textContent);
   var REPORT = BUNDLE.report;
   var DETAILS = BUNDLE.details || {};
-  var CONTEXT = BUNDLE.context || {};
+  // What the run was told to do, and the vocabulary it used. It rides inside the report, so a
+  // document straight from `--format=json` carries it too and this page needs nothing beside it.
+  var RUN = REPORT.run || {};
   var TOOL = REPORT.lockrot || {};
   var FINDINGS = REPORT.findings || [];
   var NOW = new Date(REPORT.generated_at);
@@ -111,7 +113,7 @@
    * `unknown` is left out there too, because a package lockrot could not check is a note, not a
    * finding, and counting it would put the page one ahead of its own headline.
    */
-  var FLAGGED_VERDICTS = CONTEXT.flagged_verdicts ||
+  var FLAGGED_VERDICTS = RUN.flagged_verdicts ||
     ["abandoned", "silent", "pinned", "left-behind", "old-promise", "stale"];
   var FLAGGED = FINDINGS.filter(function (f) { return FLAGGED_VERDICTS.indexOf(f.verdict) !== -1; });
 
@@ -119,12 +121,13 @@
    * new / worsened / known, against the baseline file the run read. The report's own JSON carries
    * only the totals, so the state per finding is worked out here from the same file lockrot read.
    */
-  var BASELINE = BUNDLE.baseline || {};
+  /** Where each finding stands against the baseline, keyed by package, out of the findings. */
+  var BASELINE = {};
+  FINDINGS.forEach(function (f) { if (f.baseline) BASELINE[f.package] = f.baseline; });
   /**
-   * Whether the per-finding baseline states are actually here. The report's own JSON carries the
-   * `baseline` totals, so `REPORT.baseline` alone is not enough: a document that came from
-   * `--format=json` has the totals and no states, and gating on it would draw a filter whose three
-   * counts are all wrong.
+   * Whether the standings are actually here. The `baseline` block gives the totals, and a report
+   * written before 0.10.0 gives nothing but the totals — gating the filter on that block alone
+   * would draw three counts that are all wrong.
    */
   var HAS_BASELINE = !!REPORT.baseline && Object.keys(BASELINE).length > 0;
   var SEVERITY_ORDER = ["abandoned", "silent", "pinned", "left-behind", "old-promise", "stale", "unknown"];
@@ -602,7 +605,7 @@
 
   function viewRun() {
     visible = [];
-    var t = CONTEXT.thresholds || {};
+    var t = RUN.thresholds || {};
     var notes = (REPORT.notes || []).map(function (n) {
       var doc = /token|activity|repository/.test(n) ? "https://lockrot.dev/internals/" : "https://lockrot.dev/configuration/";
       return '<div class="note">' + esc(n) + ' <span style="white-space:nowrap">' + outLink(doc, "what this means") + "</span></div>";
@@ -612,7 +615,7 @@
       ["generated", REPORT.generated_at],
       ["packages checked", REPORT.packages_checked],
       ["include dev", String(REPORT.include_dev)],
-      ["fail-on", String(CONTEXT.fail_on || "none")],
+      ["fail-on", String(RUN.fail_on || "none")],
       ["oldest activity cache", REPORT.activity_cache_oldest_at || "—"],
       ["network failures", String(REPORT.network_failures)],
       ["not from a Composer repository", String(REPORT.not_from_composer_repository)],
@@ -1052,8 +1055,8 @@
   el("fVersion").textContent = TOOL.version || "\u2014";
   el("fDate").textContent = day(REPORT.generated_at);
   el("mData").textContent = day(REPORT.generated_at);
-  el("mTarget").textContent = CONTEXT.target_php || "\u2014";
-  el("projectName").textContent = CONTEXT.lock_file || "composer.lock";
+  el("mTarget").textContent = RUN.target_php || "\u2014";
+  el("projectName").textContent = RUN.lock_file || "composer.lock";
 
   readHash();
   var WIDE = !window.matchMedia || window.matchMedia("(min-width: 1181px)").matches;

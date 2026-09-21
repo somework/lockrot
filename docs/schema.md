@@ -83,6 +83,14 @@ consumer usually keys on:
 - `verdict`, `priority` and a signal's `level` are enums — the nine verdicts, five priorities and
   three levels from [verdicts.md](verdicts.md).
 - `counts` and `priorities` always carry every key, zero included.
+- `run` says what the report was decided against — the target PHP, the thresholds, the `fail-on`,
+  the name of the lock — plus `flagged_verdicts`, the verdicts this run counted as findings. It is
+  optional in the schema so that documents written before 0.10.0 still validate, and null only
+  where nothing filled it in.
+- Each finding carries `baseline`, where it stands against the baseline file (`known`, `new` or
+  `worsened`, with the verdict the baseline accepted), or null when the run read none. The report's
+  own `baseline` block still carries the totals; this is the same judgement per finding, which is
+  what a reader filtering for what is new actually needs.
 - Each signal's `data` is typed per signal id (`S1` … `S9`): a signal claiming `S2` with `S4`'s
   fields does not validate.
 - Dates are RFC 3339 strings (`format: date-time`); `ga_date` in S5 and `first_seen` in the

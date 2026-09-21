@@ -10,7 +10,9 @@ use JsonSchema\Validator;
 use Lockrot\Allowlist\BuiltinAllowlist;
 use Lockrot\Analyzer\Analysis;
 use Lockrot\Analyzer\Analyzer;
+use Lockrot\Analyzer\RunSettings;
 use Lockrot\Baseline\Baseline;
+use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Baseline\BaselineFile;
 use Lockrot\Clock;
 use Lockrot\Data\Advisory\RepositoryAdvisoryLoader;
@@ -28,7 +30,6 @@ use Lockrot\Json\Schemas;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Output\ExplainFormatter;
-use Lockrot\Output\FormatContext;
 use Lockrot\Output\HtmlFormatter;
 use Lockrot\Output\JsonFormatter;
 use Lockrot\Signal\Signal;
@@ -151,7 +152,7 @@ final class JsonSchemaConformanceTest extends TestCase
     public function testTheHtmlPageEmbedsADocumentThatValidates(string $dir): void
     {
         $analysis = self::analysis($dir);
-        $page = (new HtmlFormatter(FormatContext::unknown(), new PageData($analysis, null, new Thresholds(), '8.4')))->format($analysis->report());
+        $page = (new HtmlFormatter(new PageData($analysis, new Thresholds(), '8.4')))->format($analysis->report());
 
         $matched = preg_match('{<script id="lockrot-data" type="application/json">(.*?)</script>}s', $page, $m);
         self::assertSame(1, $matched, $dir.' carries exactly one payload');
@@ -165,6 +166,46 @@ final class JsonSchemaConformanceTest extends TestCase
         self::assertNotSame([], (array) $payload->details, $dir.' explains the packages it flagged');
         self::assertDoesNotMatchRegularExpression('{<script[^>]+src=}i', $page, $dir.' fetches no script');
         self::assertDoesNotMatchRegularExpression('{<link[^>]+rel="stylesheet"}i', $page, $dir.' fetches no stylesheet');
+    }
+
+    /**
+     * The two blocks a report only carries once something has filled them in.
+     *
+     * The conformance run above builds its reports straight from the analyzer, so `run` is null and
+     * no finding has a baseline standing — valid, and proving nothing about the shape of either.
+     * This fills both and validates against the strict twin, where an undeclared key fails.
+     */
+    public function testAReportThatKnowsItsRunAndItsBaselineValidatesToo(): void
+    {
+        $report = self::analysis('apps/wallabag_wallabag')->report();
+        $previous = Baseline::fromReport($report);
+        $report = $report
+            ->withRun(new RunSettings('8.4', '/home/someone/clients/acme/composer.lock', 'silent', new Thresholds(2, 4, 2, 4)))
+            ->withBaseline(BaselineComparison::compare($previous, $report, 'lockrot-baseline.json', []));
+
+        $json = (new JsonFormatter())->format($report);
+
+        $this->assertValid(Schemas::REPORT, $json, 'a report that knows its run');
+        $this->assertValid(Schemas::REPORT, $json, 'a report that knows its run', true);
+
+        $decoded = json_decode($json, true);
+        self::assertIsArray($decoded);
+        $run = JsonPath::arrayAt($decoded, ['run']);
+        self::assertSame('8.4', $run['target_php']);
+        self::assertSame('composer.lock', $run['lock_file'], 'the lock is named, never located');
+        self::assertStringNotContainsString('/home/someone', $json, 'and no path reaches the document');
+        self::assertSame(2, JsonPath::arrayAt($decoded, ['run', 'thresholds'])['release-warn-years']);
+        self::assertNotContains('unknown', JsonPath::arrayAt($decoded, ['run', 'flagged_verdicts']));
+
+        $standings = [];
+        foreach (array_keys(JsonPath::arrayAt($decoded, ['findings'])) as $at) {
+            $finding = JsonPath::arrayAt($decoded, ['findings', $at]);
+            if (\is_array($finding['baseline'] ?? null)) {
+                $standings[JsonPath::stringAt($decoded, ['findings', $at, 'baseline', 'status'])] = true;
+            }
+        }
+        self::assertNotSame([], $standings, 'the findings carry their standing, not just the totals');
+        self::assertSame(['known'], array_keys($standings), 'a baseline written from this very report knows all of them');
     }
 
     /**
