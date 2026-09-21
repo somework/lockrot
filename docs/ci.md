@@ -1,6 +1,6 @@
 ---
 title: lockrot in CI — GitHub Actions, GitLab CI, SARIF, exit codes
-description: "Run lockrot in a pipeline: the --fail-on threshold, exit codes 0, 1 and 2, the GitHub Action, and the github, sarif, gitlab, markdown and json output formats."
+description: "Run lockrot in a pipeline: the --fail-on threshold, exit codes 0, 1 and 2, the GitHub Action, and the github, sarif, gitlab, markdown, json and html output formats."
 ---
 
 # Running lockrot in CI
@@ -185,6 +185,68 @@ report's order, so a reviewer reads down the first column and stops where the ro
 `### lockrot: no dependency rot found in N packages` and no table. With a [baseline](baseline.md) in place, a second
 line under the heading carries the same `known`/`new`/`worsened`/`stale` counts as the table format, and a verdict is
 bold only when the baseline has not already accepted it.
+
+## `--format=html`
+
+The whole run as one page, for the person who has to act on it rather than the machine that gates it.
+No server and no network: the report, the release branches behind every finding and the baseline
+comparison all sit inside a single file, so it opens from `file://`, uploads as one CI artifact and
+attaches to a ticket.
+
+```bash
+composer lockrot --format=html --target-php=8.4 > lockrot-report.html
+```
+
+```yaml
+- run: composer lockrot --format=html --target-php=8.4 > lockrot-report.html
+  if: always()
+- uses: actions/upload-artifact@v4
+  if: always()
+  with:
+    name: lockrot-report
+    path: lockrot-report.html
+```
+
+`if: always()` keeps the upload running when `--fail-on` already failed the step, which is exactly
+when somebody wants to read the page.
+
+What the page has that a stream cannot:
+
+- **One line per signal, not one line per finding.** A terminal row has one line, so a package with
+  four signals gets one sentence with four semicolons in it. Here each signal keeps its own line and
+  its own id, which links to what that signal observes.
+- **The release branches on a time axis.** Every branch the repository lists, its newest dated
+  release, the branch you are installed on and the one still shipping — the shape of being left
+  behind, rather than two dates to subtract.
+- **Advisories grouped by what the fix costs.** `fixed_by` and `fixed_on_branch` split them into
+  the ones a patch on your own branch clears and the ones that need a move to another branch. A
+  package with fourteen advisories is usually two tickets, not one.
+- **What changed since the [baseline](baseline.md).** New, worsened and already-accepted, filterable.
+- **What the run could not see.** The notes, the thresholds it used and the schema it validates
+  against, on their own tab.
+
+Filters, the open package and the search live in the URL hash, so the address bar is always a link
+to what is on screen: filter a report published on Pages or served from a CI artifact, copy the
+address, and whoever opens it lands on the same three packages rather than on eighty findings. The
+query understands `verdict:`, `priority:`, `signal:`, `severity:`, `cve:`, `direct:` and `dev:`;
+`/` searches, `j`/`k` move, `?` opens a glossary of every verdict and signal.
+
+The page carries the run as JSON, and that payload's `report` key is the document `--format=json`
+writes, [schema](schema.md), envelope and every field — the page's copy is compact where the
+formatter pretty-prints, and identical once parsed:
+
+```bash
+composer lockrot --format=html > lockrot-report.html
+sed -n 's/.*<script id="lockrot-data" type="application\/json">\(.*\)<\/script>.*/\1/p' lockrot-report.html \
+  | jq .report > lockrot.json
+```
+
+Nothing in the page is fetched — no fonts, no CDN, no analytics — so it renders the same offline and
+from a downloaded artifact. Its styles and script are inlined, so a host that serves it under a
+Content-Security-Policy has to allow those (`script-src 'self' 'unsafe-inline'`, and the same for
+`style-src`, since the page uses `style` attributes); every other directive can stay shut, including
+`connect-src` and `img-src`, because the page never asks for anything. `--all` puts every package
+in it, at roughly 4 KB a package; without it a 100-package lock lands around 250 KB.
 
 ## `--format=json`
 

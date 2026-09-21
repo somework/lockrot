@@ -15,6 +15,17 @@ Four commands make up the local check suite. CI runs them on every PHP/Composer 
 | `composer cs` | php-cs-fixer in `--dry-run --diff` mode. |
 | `composer cs-fix` | The same fixer, applying the changes. |
 
+The report page has one more, and it needs node — a development tool here and nowhere else. The page
+has no build step, the PHAR is built without node, and what ships is the source under
+`resources/report/`. `resources/report/lib.js` is the half of the page with no DOM in it, which is
+also the half where a mistake stops being a rendering bug: it holds the escaping, the check that
+keeps a `javascript:` URL out of an `href`, and the one that keeps a second shell command off the
+clipboard. node's own runner covers it, with no `package.json` and nothing installed:
+
+    node --test tests/js/*.test.js
+
+The rest of `report.js` needs a browser and is not covered. Change it and open the page.
+
 ## What the code has to run on
 
 Three floors are not negotiable, and CI enforces all three across a 7.4–8.5 × Composer 2.2/latest

@@ -138,7 +138,7 @@ exposure](https://lockrot.dev/verdicts/#transitive-exposure).
 A network failure is reported as a note and never fails the run on its own, unless you pass
 `--strict-network`. `--format=github` turns findings into pull-request annotations, `--format=sarif`
 uploads them to the Security tab, `--format=gitlab` into a Code Quality report and
-`--format=markdown` into a PR comment.
+`--format=markdown` into a PR comment, and `--format=html` into a single-file page you can upload as a CI artifact and open.
 
 On GitHub Actions, [somework/lockrot-action](https://github.com/somework/lockrot-action) runs the
 verified release with annotations, a job summary and a metadata cache in one step:
@@ -187,7 +187,7 @@ which win over `composer.json`.
 |---|---|---|---|
 | `fail-on` | `--fail-on=<verdict or priority>` | `none` | Exit 1 threshold: a verdict (`stale`, `old-promise`, `left-behind`, `pinned`, `silent`, `abandoned`) or a priority (`low`, `medium`, `high`, `critical`) |
 | `target-php` | `--target-php=8.4` | `config.platform.php`, else the running PHP | PHP version used for the `old-promise` check |
-| `format` | `--format=<name>` | `table` | `table`, `json`, `github`, `sarif`, `gitlab` or `markdown` |
+| `format` | `--format=<name>` | `table` | `table`, `json`, `github`, `sarif`, `gitlab`, `markdown` or `html` |
 | `include-dev` | `--dev` | `false` | Also check `packages-dev`, one priority step lower |
 | `install-time` | — | `on` | Print a compact block during `composer require`/`update`/`install` |
 | `ignore` | — | `[]` | Project allowlist |

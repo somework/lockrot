@@ -23,10 +23,13 @@ use Lockrot\Data\Http\RecordedHttpClient;
 use Lockrot\Data\Php\PhpReleaseDates;
 use Lockrot\Data\Repository\RepositoryMetadataLoader;
 use Lockrot\Explain\Explanation;
+use Lockrot\Html\PageData;
 use Lockrot\Json\Schemas;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Output\ExplainFormatter;
+use Lockrot\Output\FormatContext;
+use Lockrot\Output\HtmlFormatter;
 use Lockrot\Output\JsonFormatter;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\SignalSet;
@@ -135,6 +138,33 @@ final class JsonSchemaConformanceTest extends TestCase
         self::assertStringStartsWith("{\n    \"\$schema\": \"https://lockrot.dev/schema/report-1.json\",\n", $json);
         $this->assertValid(Schemas::REPORT, $json, $dir);
         $this->assertValid(Schemas::REPORT, $json, $dir, true);
+    }
+
+    /**
+     * `--format=html` embeds the same document the JSON format writes, so a consumer who pulls the
+     * payload out of the page gets something the published schema describes. The page also has to
+     * survive being a page: nothing fetched, and no string able to close the script it sits in.
+     *
+     * @dataProvider fixtureDirs
+     */
+    #[DataProvider('fixtureDirs')]
+    public function testTheHtmlPageEmbedsADocumentThatValidates(string $dir): void
+    {
+        $analysis = self::analysis($dir);
+        $page = (new HtmlFormatter(FormatContext::unknown(), new PageData($analysis, null, new Thresholds(), '8.4')))->format($analysis->report());
+
+        $matched = preg_match('{<script id="lockrot-data" type="application/json">(.*?)</script>}s', $page, $m);
+        self::assertSame(1, $matched, $dir.' carries exactly one payload');
+        $payload = json_decode($m[1]);
+        self::assertInstanceOf(\stdClass::class, $payload, $dir.': '.json_last_error_msg());
+
+        $report = json_encode($payload->report, \JSON_THROW_ON_ERROR);
+        $this->assertValid(Schemas::REPORT, $report, $dir.' (html payload)');
+        $this->assertValid(Schemas::REPORT, $report, $dir.' (html payload)', true);
+
+        self::assertNotSame([], (array) $payload->details, $dir.' explains the packages it flagged');
+        self::assertDoesNotMatchRegularExpression('{<script[^>]+src=}i', $page, $dir.' fetches no script');
+        self::assertDoesNotMatchRegularExpression('{<link[^>]+rel="stylesheet"}i', $page, $dir.' fetches no stylesheet');
     }
 
     /**

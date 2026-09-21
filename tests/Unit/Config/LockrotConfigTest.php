@@ -184,7 +184,7 @@ final class LockrotConfigTest extends TestCase
 
     public function testFormatsCoverTheNewOutputs(): void
     {
-        self::assertSame(['table', 'json', 'github', 'sarif', 'gitlab', 'markdown'], LockrotConfig::FORMATS);
+        self::assertSame(['table', 'json', 'github', 'sarif', 'gitlab', 'markdown', 'html'], LockrotConfig::FORMATS);
     }
 
     /**
