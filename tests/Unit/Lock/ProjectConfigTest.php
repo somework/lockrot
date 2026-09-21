@@ -47,6 +47,20 @@ final class ProjectConfigTest extends TestCase
         self::assertSame(['123', 'a/b'], $cfg->directRequires());
     }
 
+    /**
+     * The one thing that says which project a report is about: every lock in the world is called
+     * composer.lock, so the name has to come from the manifest. An application is not required to
+     * name itself, and a name that is there but empty is not a name.
+     */
+    public function testTheProjectNamesItselfOrDoesNot(): void
+    {
+        self::assertSame('acme/shop', ProjectConfig::fromArray(['name' => 'acme/shop'])->name());
+        self::assertNull(ProjectConfig::fromArray([])->name(), 'an application need not name itself');
+        self::assertNull(ProjectConfig::fromArray(['name' => ''])->name());
+        self::assertNull(ProjectConfig::fromArray(['name' => ['acme/shop']])->name(), 'a name is a string or it is nothing');
+        self::assertNull(ProjectConfig::empty()->name());
+    }
+
     public function testEmptyConfig(): void
     {
         $cfg = ProjectConfig::empty();

@@ -35,18 +35,21 @@ final class HtmlFormatter implements FormatterInterface
         __DIR__.'/../../resources/report/report.js',
     ];
 
-    private FormatContext $context;
     private PageData $page;
 
-    public function __construct(FormatContext $context, ?PageData $page = null)
+    /**
+     * Alone among the formatters, this one takes no FormatContext: what the page needs from the
+     * run — the target PHP, the thresholds, the lock's name, the fail-on — is in the report
+     * itself, and a second copy beside it could only disagree with it.
+     */
+    public function __construct(?PageData $page = null)
     {
-        $this->context = $context;
         $this->page = $page ?? PageData::none();
     }
 
     public function format(Report $report, bool $showAll = false): string
     {
-        $document = new ReportDocument($report, $this->context, $this->page);
+        $document = new ReportDocument($report, $this->page);
 
         return strtr(self::read(self::TEMPLATE), [
             '{{TITLE}}' => self::text(self::title($report)),

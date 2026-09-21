@@ -11,6 +11,19 @@ use PHPUnit\Framework\TestCase;
 
 final class LockrotConfigTest extends TestCase
 {
+    /**
+     * A composer.json need not name itself, and where it does the name is not always the one to
+     * publish: a package inside a monorepo names itself after the package, a private project after
+     * the client. Read from the manifest rather than a flag, because it describes the project.
+     */
+    public function testTheProjectCanBeCalledSomethingOtherThanItsManifestName(): void
+    {
+        self::assertSame('Acme internal API', LockrotConfig::fromSources(['project' => 'Acme internal API'], [], [], '8.5.10', null)->project());
+        self::assertNull(LockrotConfig::fromSources([], [], [], '8.5.10', null)->project(), 'saying nothing leaves the manifest to answer');
+        self::assertNull(LockrotConfig::fromSources(['project' => ''], [], [], '8.5.10', null)->project());
+        self::assertNull(LockrotConfig::fromSources(['project' => ['a']], [], [], '8.5.10', null)->project(), 'a name is a string or it is nothing');
+    }
+
     public function testDefaults(): void
     {
         $cfg = LockrotConfig::fromSources([], [], [], '8.5.10', null);

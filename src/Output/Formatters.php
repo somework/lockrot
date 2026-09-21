@@ -36,7 +36,7 @@ final class Formatters
             case 'markdown':
                 return new MarkdownFormatter($context);
             case 'html':
-                return new HtmlFormatter($context, $page);
+                return new HtmlFormatter($page);
             default:
                 throw new ConfigException('Unknown output format "'.$format.'"');
         }

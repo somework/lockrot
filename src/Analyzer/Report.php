@@ -25,6 +25,8 @@ final class Report
     private bool $hadNetworkFailures;
     /** Null when the project has no baseline file, which is every run until one is generated. */
     private ?BaselineComparison $baseline;
+    /** Null when the report was not told what the run was asked to do, which is only ever a test. */
+    private ?RunSettings $run = null;
     /**
      * When the oldest repository-activity answer served from lockrot's cache was fetched — usually
      * within the last day, older after a failed refetch fell back to a stale entry or under
@@ -75,7 +77,7 @@ final class Report
      */
     public function withBaseline(BaselineComparison $baseline): self
     {
-        return new self(
+        $copy = new self(
             $this->findings,
             $this->notes,
             $this->generatedAt,
@@ -86,11 +88,36 @@ final class Report
             $this->activityCacheOldestAt,
             $this->includesDev
         );
+        $copy->run = $this->run;
+
+        return $copy;
     }
 
     public function baseline(): ?BaselineComparison
     {
         return $this->baseline;
+    }
+
+    /**
+     * The same report, carrying what the run was told to do. A new instance rather than a mutation,
+     * for the reason {@see self::withBaseline()} gives.
+     */
+    public function withRun(RunSettings $run): self
+    {
+        $copy = new self(
+            $this->findings,
+            $this->notes,
+            $this->generatedAt,
+            $this->packagesChecked,
+            $this->notFromComposerRepository,
+            $this->hadNetworkFailures,
+            $this->baseline,
+            $this->activityCacheOldestAt,
+            $this->includesDev
+        );
+        $copy->run = $run;
+
+        return $copy;
     }
 
     /** @return list<Finding> */
@@ -313,11 +340,36 @@ final class Report
         return $list;
     }
 
+    /**
+     * Where a finding stands against the baseline, or null when the run read none or the baseline
+     * has nothing to say about this package.
+     *
+     * The totals are in the `baseline` block above; this is the same judgement per finding, which
+     * is what a reader filtering for what is new actually needs and what the block cannot give.
+     *
+     * @return array{status: string, previous_verdict: ?string}|null
+     */
+    private function baselineStateOf(Finding $finding): ?array
+    {
+        if ($this->baseline === null) {
+            return null;
+        }
+        $status = $this->baseline->statusOf($finding->package());
+
+        return $status === null ? null : [
+            'status' => $status,
+            'previous_verdict' => $this->baseline->previousVerdictOf($finding->package()),
+        ];
+    }
+
     /** @return array<string, mixed> */
     public function toArray(): array
     {
         return [
             'generated_at' => $this->generatedAt->format(\DATE_ATOM),
+            // What the verdicts below were decided against. Null only where nothing told the report,
+            // which outside a test is nowhere.
+            'run' => $this->run === null ? null : $this->run->toArray(),
             'activity_cache_oldest_at' => $this->activityCacheOldestAt === null ? null : $this->activityCacheOldestAt->format(\DATE_ATOM),
             'packages_checked' => $this->packagesChecked,
             'include_dev' => $this->includesDev,
@@ -328,7 +380,7 @@ final class Report
             'exposure' => $this->exposureList(),
             'baseline' => $this->baseline === null ? null : $this->baseline->toArray(),
             'notes' => $this->notes,
-            'findings' => array_map(static fn (Finding $f): array => $f->toArray(), $this->findings),
+            'findings' => array_map(fn (Finding $f): array => $f->toArray() + ['baseline' => $this->baselineStateOf($f)], $this->findings),
         ];
     }
 }

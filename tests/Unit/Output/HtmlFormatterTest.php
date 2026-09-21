@@ -7,7 +7,6 @@ namespace Lockrot\Tests\Unit\Output;
 use Lockrot\Analyzer\Analysis;
 use Lockrot\Analyzer\Report;
 use Lockrot\Html\PageData;
-use Lockrot\Output\FormatContext;
 use Lockrot\Output\Formatters;
 use Lockrot\Output\HtmlFormatter;
 use Lockrot\Signal\Signal;
@@ -34,7 +33,7 @@ final class HtmlFormatterTest extends TestCase
 
     private function page(Report $report, bool $showAll = false): string
     {
-        return (new HtmlFormatter(FormatContext::unknown()))->format($report, $showAll);
+        return (new HtmlFormatter())->format($report, $showAll);
     }
 
     /** @return array<mixed, mixed> */
@@ -113,7 +112,7 @@ final class HtmlFormatterTest extends TestCase
 
     public function testTheTitleIsEscapedLikeEverythingElse(): void
     {
-        $page = (new HtmlFormatter(FormatContext::unknown()))->format($this->report([], 0));
+        $page = (new HtmlFormatter())->format($this->report([], 0));
 
         self::assertStringNotContainsString('<title></title>', $page);
         self::assertStringContainsString('lockrot: nothing flagged in 0 packages', $page);
@@ -123,10 +122,11 @@ final class HtmlFormatterTest extends TestCase
     {
         $payload = self::payloadOf($this->page($this->report([$this->finding('vendor/pkg')])));
 
-        self::assertSame(['context', 'report', 'details', 'baseline'], array_keys($payload));
+        // Two keys, not four: what the run was told to do and where each finding stands against
+        // the baseline live in the report itself now, so the page reads them from there.
+        self::assertSame(['report', 'details'], array_keys($payload));
         self::assertSame('https://lockrot.dev/schema/report-1.json', J::stringAt($payload, ['report', '$schema']));
         self::assertSame([], J::arrayAt($payload, ['details']), 'no facts were passed, so there is nothing to explain');
-        self::assertSame([], J::arrayAt($payload, ['baseline']));
     }
 
     /**
@@ -140,7 +140,7 @@ final class HtmlFormatterTest extends TestCase
             'vendor/rotten' => F::facts(F::package(['name' => 'vendor/rotten']), F::metadata([['1.0.0', '2020-01-01T00:00:00+00:00']])),
             'vendor/fine' => F::facts(F::package(['name' => 'vendor/fine']), F::metadata([['1.0.0', '2026-01-01T00:00:00+00:00']])),
         ];
-        $formatter = new HtmlFormatter(FormatContext::unknown(), new PageData(new Analysis($report, $facts), null, new Thresholds(), '8.4'));
+        $formatter = new HtmlFormatter(new PageData(new Analysis($report, $facts), new Thresholds(), '8.4'));
 
         self::assertSame(['vendor/rotten'], array_keys(J::arrayAt(self::payloadOf($formatter->format($report)), ['details'])));
         self::assertSame(['vendor/rotten', 'vendor/fine'], array_keys(J::arrayAt(self::payloadOf($formatter->format($report, true)), ['details'])));
