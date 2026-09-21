@@ -47,10 +47,19 @@ final class Libyears
     private int $measured;
     /** @var array<string, int> every key of {@see REASONS}, zero included */
     private array $unmeasured;
-    private ?Finding $worst;
+    /**
+     * The finding furthest behind and its value, kept as the pair they were set as; null when
+     * nothing was measured.
+     *
+     * @var array{Finding, float}|null
+     */
+    private ?array $worst;
 
-    /** @param array<string, int> $unmeasured */
-    private function __construct(float $total, float $direct, int $measured, array $unmeasured, ?Finding $worst)
+    /**
+     * @param array<string, int>        $unmeasured
+     * @param array{Finding, float}|null $worst
+     */
+    private function __construct(float $total, float $direct, int $measured, array $unmeasured, ?array $worst)
     {
         $this->total = $total;
         $this->direct = $direct;
@@ -95,6 +104,7 @@ final class Libyears
         $direct = 0.0;
         $measured = 0;
         $unmeasured = array_fill_keys(self::REASONS, 0);
+        /** @var array{Finding, float}|null $worst the finding and its value, set together */
         $worst = null;
         foreach ($findings as $finding) {
             $behind = $finding->libyears();
@@ -107,8 +117,10 @@ final class Libyears
             if ($finding->isDirect()) {
                 $direct += $behind;
             }
-            if ($worst === null || self::worseThan($finding, $behind, $worst)) {
-                $worst = $finding;
+            // Two findings never share a package name — the lock is keyed by it — so on a tie the
+            // comparison decides between two different names, never between a name and itself.
+            if ($worst === null || $behind > $worst[1] || ($behind === $worst[1] && strcmp($finding->package(), $worst[0]->package()) < 0)) {
+                $worst = [$finding, $behind];
             }
         }
 
@@ -137,13 +149,6 @@ final class Libyears
         return self::NO_STABLE_RELEASE_DATE;
     }
 
-    private static function worseThan(Finding $candidate, float $behind, Finding $worst): bool
-    {
-        $current = (float) $worst->libyears();
-
-        return $behind > $current || ($behind === $current && strcmp($candidate->package(), $worst->package()) < 0);
-    }
-
     /** The sum over every measured package, unrounded. */
     public function total(): float
     {
@@ -169,7 +174,7 @@ final class Libyears
 
     public function worst(): ?Finding
     {
-        return $this->worst;
+        return $this->worst === null ? null : $this->worst[0];
     }
 
     private function unmeasuredCount(): int
@@ -189,10 +194,11 @@ final class Libyears
         if ($this->worst === null) {
             return 'libyears: nothing measured'.($skipped === 0 ? '' : \sprintf(' (%d not measured)', $skipped));
         }
+        [$worst, $behind] = $this->worst;
         $parts = [
             \sprintf('libyears: %.1f across %d measured %s', $this->total, $this->measured, $this->measured === 1 ? 'package' : 'packages'),
             \sprintf('direct %.1f', $this->direct),
-            \sprintf('worst %s %s (%.1f)', $this->worst->package(), $this->worst->version(), (float) $this->worst->libyears()),
+            \sprintf('worst %s %s (%.1f)', $worst->package(), $worst->version(), $behind),
         ];
         if ($skipped > 0) {
             $parts[] = \sprintf('%d not measured', $skipped);
@@ -210,9 +216,9 @@ final class Libyears
             'measured' => $this->measured,
             'unmeasured' => $this->unmeasured,
             'worst' => $this->worst === null ? null : [
-                'package' => $this->worst->package(),
-                'version' => $this->worst->version(),
-                'libyears' => round((float) $this->worst->libyears(), self::DECIMALS),
+                'package' => $this->worst[0]->package(),
+                'version' => $this->worst[0]->version(),
+                'libyears' => round($this->worst[1], self::DECIMALS),
             ],
         ];
     }

@@ -142,6 +142,10 @@ final class LibyearsTest extends TestCase
 
         self::assertNotNull($worst);
         self::assertSame('alpha/pkg', $worst->package());
+        // and the same answer when the first-named one comes first: a tie never goes to whoever came later
+        $reversed = Libyears::fromFindings([self::finding('alpha/pkg', 3.0), self::finding('zeta/pkg', 3.0)])->worst();
+        self::assertNotNull($reversed);
+        self::assertSame('alpha/pkg', $reversed->package());
     }
 
     public function testAnEmptyRunMeasuresNothing(): void

@@ -361,7 +361,10 @@ final class ReportTest extends TestCase
         $sum = 0.0;
         foreach (JsonPath::arrayAt($report->toArray(), ['findings']) as $finding) {
             self::assertIsArray($finding);
-            $sum += (float) ($finding['libyears'] ?? 0.0);
+            if ($finding['libyears'] !== null) {
+                self::assertIsFloat($finding['libyears']);
+                $sum += $finding['libyears'];
+            }
         }
         self::assertEqualsWithDelta(JsonPath::arrayAt($report->toArray(), ['libyears'])['total'], $sum, 0.01);
     }

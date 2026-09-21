@@ -21,6 +21,13 @@ mutant from the original, and says why.
 - `src/Output/TerminalWidth.php:30` Coalesce — `detect()`: step 2 (symfony Terminal) refuses
   whenever `COLUMNS` is set, so swapping it with step 1 (`COLUMNS`) is unobservable by design.
 
+## src/Analyzer/Libyears.php (0.11.0)
+
+- `src/Analyzer/Libyears.php:122` LessThan (`strcmp(...) < 0` → `<= 0`) — `fromFindings()`: the
+  tie-break between two findings with the same value compares their package names, and two findings
+  in one report never share a name (the lock is keyed by it), so `strcmp` never returns 0 there and
+  `<` and `<=` decide identically.
+
 ## src/SelfUpdate and src/Composer/SelfUpdateCommand.php
 
 src/Composer/SelfUpdateCommand.php:130 FalseValue (`\Phar::running(false)` → `\Phar::running(true)`) — the

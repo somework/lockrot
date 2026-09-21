@@ -23,6 +23,7 @@ use Lockrot\Signal\Signal;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
+use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\MemoisingMetadataLoader;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Priority;
@@ -272,11 +273,12 @@ final class AcceptanceTest extends TestCase
         // rounding of each printed value.
         $sum = 0.0;
         $measured = 0;
-        foreach ($wallabag->toArray()['findings'] as $finding) {
+        foreach (JsonPath::arrayAt($wallabag->toArray(), ['findings']) as $finding) {
             self::assertIsArray($finding);
             if ($finding['libyears'] !== null) {
+                self::assertIsFloat($finding['libyears']);
                 ++$measured;
-                $sum += (float) $finding['libyears'];
+                $sum += $finding['libyears'];
             }
         }
         self::assertSame($block->measured(), $measured);
