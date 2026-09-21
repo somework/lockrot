@@ -33,8 +33,10 @@ and the install-time path measures the transaction. A package is **not measured*
 
 Also unmeasured, folded into `no_stable_release_date` because the lock has no date to compare:
 a lock entry without `time` (a `path` repository entry, which is also not from a Composer
-repository and is counted there first). The order of the checks is the order of the table: a
-snapshot not from a Composer repository counts under `not_from_composer_repository`.
+repository and is counted there first). The checks run in this order, and the first that applies
+names the reason: `not_from_composer_repository`, `metadata_unavailable`, `branch_snapshots`,
+`no_stable_release_date`. So a snapshot not from a Composer repository counts under the first, and
+a `dev-master` pin on a package with no stable release at all (lox/xhprof) counts as a snapshot.
 
 A negative difference (the lock is on a version the repository no longer lists, or on a
 pre-release above the last stable) is clamped to zero, not dropped: the package is measured and
@@ -55,8 +57,8 @@ requirements only; lockrot sums the whole lock. On wallabag that is 94.5 against
     "direct": 94.48,
     "measured": 191,
     "unmeasured": {
-      "branch_snapshots": 1,
-      "no_stable_release_date": 8,
+      "branch_snapshots": 4,
+      "no_stable_release_date": 5,
       "not_from_composer_repository": 0,
       "metadata_unavailable": 0
     },
