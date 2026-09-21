@@ -96,6 +96,25 @@
 
     return null;
   }
+  /**
+   * The `composer require` line for a finding, or null when either half is not the shape it has to
+   * be.
+   *
+   * This one is offered with a button that puts it on the clipboard, and what the button copies is
+   * the raw value — the HTML escaping is undone by the parser on the way back out of the
+   * attribute. Somewhere between that clipboard and a shell prompt there is no escaping left at
+   * all, so a `suggested_constraint` carrying a newline and a second command would be pasted and
+   * run. lockrot's own constraints are always well formed; a document from somewhere else is not
+   * lockrot's own. A package name is a vendor and a name, a constraint is the small grammar
+   * Composer accepts, and anything else means no command is offered.
+   */
+  function installCommand(name, constraint) {
+    if (!/^[A-Za-z0-9]([A-Za-z0-9._-]*)\/[A-Za-z0-9]([A-Za-z0-9._-]*)$/.test(String(name))) return null;
+    var value = String(constraint);
+    if (value.length > 100 || !/^[A-Za-z0-9.,^~><=!|*\/ @_-]+$/.test(value)) return null;
+
+    return "composer require " + name + " " + value;
+  }
   function repoHost(url) {
     var m = /^https?:\/\/([^/]+)/.exec(url || "");
     return m ? m[1].replace(/^www\./, "") : "repository";
@@ -757,6 +776,7 @@
 
     var s8 = (f.signals || []).filter(function (s) { return s.id === "S8"; })[0];
     var suggestion = s8 && s8.data && s8.data.suggested_constraint;
+    var command = suggestion ? installCommand(f.package, suggestion) : null;
     var pk = packagistUrl(f);
     var rp = repoUrl(f);
     var replacement = meta.replacement || null;
@@ -836,10 +856,10 @@
             '<details class="signal" style="background:transparent"><summary><span class="ssum">Every advisory</span></summary>' +
             '<div class="sdata" style="padding-left:11px">' + list + "</div></details></section>";
         })() : "") +
-        (suggestion ?
+        (command ?
           '<div class="action"><span class="eyebrow" style="color:var(--accent-ink)">Follow the upstream</span>' +
-          '<div class="cmd"><span>composer require ' + esc(f.package) + " " + esc(suggestion) + "</span>" +
-          '<button class="copy" type="button" data-copy="composer require ' + esc(f.package) + " " + esc(suggestion) + '">Copy</button></div>' +
+          '<div class="cmd"><span>' + esc(command) + "</span>" +
+          '<button class="copy" type="button" data-copy="' + esc(command) + '">Copy</button></div>' +
           "</div>" : "") +
         (tl ? '<section class="sect"><h3>Release branches</h3>' + tl + "</section>" : "") +
         '<section class="sect"><h3>Signals &mdash; what was observed</h3>' + (f.signals || []).map(signalHtml).join("") +
