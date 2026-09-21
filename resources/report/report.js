@@ -68,6 +68,21 @@
     var link = (DETAILS[f.package] || {}).repository_link;
     return typeof link === "string" && /^https?:\/\//.test(link) ? link : null;
   }
+  /**
+   * Definition rows, minus the ones with nothing to say. A row whose value is null is dropped
+   * rather than printed as a dash: the lock entry and the provenance are built from `--explain`
+   * data, and a document that carries only the report has none of it — five dashes under a heading
+   * reads as a broken page, where three real rows and no heading reads as what is known.
+   *
+   * Values arrive escaped, because some of them are links.
+   */
+  function kvRows(pairs) {
+    return pairs.filter(function (p) { return p[1] !== null && p[1] !== undefined && p[1] !== ""; })
+      .map(function (p) { return "<dt>" + esc(p[0]) + "</dt><dd>" + p[1] + "</dd>"; }).join("");
+  }
+  function kvSection(heading, rows) {
+    return rows ? '<section class="sect"><h3>' + esc(heading) + '</h3><dl class="kv">' + rows + "</dl></section>" : "";
+  }
   function repoHost(url) {
     var m = /^https?:\/\/([^/]+)/.exec(url || "");
     return m ? m[1].replace(/^www\./, "") : "repository";
@@ -723,16 +738,21 @@
       ? '<span class="mono">composer.json</span> → <span class="mono">' + esc(f.package) + "</span>"
       : chain.concat([f.package]).map(function (p) { return '<span class="mono">' + esc(p) + "</span>"; }).join(" → ");
 
-    var lockRows = [
-      ["installed", f.version],
-      ["php constraint", lock.php || "—"],
-      ["released", day(lock.released) + (lock.released ? " \u00b7 " + ageText(lock.released) : "")],
-      ["repository", rp ? '<a class="lnk" href="' + esc(rp) + '" target="_blank" rel="noopener noreferrer">' + esc(rp) + "</a>" : (lock.repository || meta.repository || "—")],
-      ["type", lock.type || meta.type || "—"]
-    ].map(function (p) {
-      var v = p[0] === "repository" ? p[1] : esc(p[1]);
-      return "<dt>" + esc(p[0]) + "</dt><dd>" + v + "</dd>";
-    }).join("");
+    var lockRows = kvRows([
+      ["installed", esc(f.version)],
+      ["php constraint", lock.php ? esc(lock.php) : null],
+      ["released", lock.released ? esc(day(lock.released) + " \u00b7 " + ageText(lock.released)) : null],
+      ["repository", rp
+        ? '<a class="lnk" href="' + esc(rp) + '" target="_blank" rel="noopener noreferrer">' + esc(rp) + "</a>"
+        : (lock.repository || meta.repository ? esc(lock.repository || meta.repository) : null)],
+      ["type", lock.type || meta.type ? esc(lock.type || meta.type) : null]
+    ]);
+    var provenanceRows = kvRows([
+      ["metadata", esc(day(meta.data_date || f.data_date))],
+      ["releases listed", meta.releases_listed === undefined ? null : esc(meta.releases_listed)],
+      ["last stable", meta.last_stable_version
+        ? esc(meta.last_stable_version) + " \u00b7 " + esc(day(meta.last_stable_release)) : null]
+    ]);
 
     var tl = timeline(meta, f.version);
 
@@ -796,12 +816,8 @@
           (!(f.signals || []).length ? '<p style="margin:0;color:var(--muted)">No signal fired. The verdict comes from what lockrot could not learn.</p>' : "") +
         "</section>" +
         '<section class="sect"><h3>How it is reached</h3><p style="margin:0;font-size:12.5px;word-break:break-word">' + chainHtml + "</p></section>" +
-        '<section class="sect"><h3>The lock entry</h3><dl class="kv">' + lockRows + "</dl></section>" +
-        '<section class="sect"><h3>Provenance</h3><dl class="kv">' +
-          "<dt>metadata</dt><dd>" + esc(day(meta.data_date || f.data_date)) + "</dd>" +
-          "<dt>releases listed</dt><dd>" + esc(meta.releases_listed === undefined ? "—" : meta.releases_listed) + "</dd>" +
-          "<dt>last stable</dt><dd>" + esc(meta.last_stable_version || "—") + " \u00b7 " + day(meta.last_stable_release) + "</dd>" +
-        "</dl></section>" +
+        kvSection("The lock entry", lockRows) +
+        kvSection("Provenance", provenanceRows) +
       "</div>";
   }
 
