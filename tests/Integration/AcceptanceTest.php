@@ -22,6 +22,7 @@ use Lockrot\Signal\Signal;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
+use Lockrot\Tests\Support\MemoisingMetadataLoader;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Priority;
 use Lockrot\Verdict\Verdict;
@@ -36,7 +37,7 @@ final class AcceptanceTest extends TestCase
     private const DIRS = ['apps/wallabag_wallabag', 'apps/nextcloud_3rdparty', 'skeletons/laravel', 'apps/matomo-org_matomo'];
 
     private static ?FixtureRepositoryServer $server = null;
-    private static ?RepositoryMetadataLoader $loader = null;
+    private static ?MemoisingMetadataLoader $loader = null;
 
     public static function setUpBeforeClass(): void
     {
@@ -44,8 +45,12 @@ final class AcceptanceTest extends TestCase
         self::$server = FixtureRepositoryServer::fromLockFiles($lockFiles);
         self::$server->start();
         // One loader shared across every test in this class, matching how a real analyzer run uses
-        // it: one instance queried repeatedly rather than rebuilt per call.
-        self::$loader = new RepositoryMetadataLoader(self::$server->repositories(), Clock::fixed(self::NOW));
+        // it: one instance queried repeatedly rather than rebuilt per call. It remembers what it
+        // has already been asked for: three of the tests here analyse the same wallabag lock, and
+        // without the memory each of them fetched all two hundred of its packages again.
+        self::$loader = new MemoisingMetadataLoader(
+            new RepositoryMetadataLoader(self::$server->repositories(), Clock::fixed(self::NOW))
+        );
     }
 
     public static function tearDownAfterClass(): void
@@ -57,7 +62,7 @@ final class AcceptanceTest extends TestCase
         self::$loader = null;
     }
 
-    private function loader(): RepositoryMetadataLoader
+    private function loader(): MemoisingMetadataLoader
     {
         $loader = self::$loader;
         self::assertNotNull($loader);
