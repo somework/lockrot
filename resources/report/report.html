@@ -34,7 +34,6 @@
       <span>target PHP <b class="mono" id="mTarget">8.4</b></span>
       <span>data as of <b class="mono" id="mData">—</b></span>
       <span>lockrot <b class="mono" id="mVersion">—</b></span>
-      <button class="icon-btn" id="copyBtn" type="button" title="Copy a link that opens this report on the tab, filters and package now on screen">Copy link</button>
       <button class="icon-btn" id="legendBtn" type="button">What these words mean</button>
       <button class="icon-btn" id="themeBtn" type="button">Dark</button>
     </div>
@@ -46,7 +45,6 @@
     <button class="tab" role="tab" data-view="radius" aria-selected="false" type="button">Blast radius<span class="n" id="tabRadius"></span></button>
     <button class="tab" role="tab" data-view="run" aria-selected="false" type="button">Run data<span class="n" id="tabRun"></span></button>
   </nav>
-  <p class="sr-only" id="copyStatus" role="status" aria-live="polite"></p>
   <div class="ledger">
     <div class="ledger-block">
       <span class="eyebrow" title="Every verdict except ok and finished">Priority of the <span id="flaggedCount">0</span> flagged packages</span>
@@ -75,8 +73,8 @@
       <button class="icon-btn" id="clearBtn" type="button">Clear</button>
     </div>
     <p class="hint">
-      <code>/</code> to search &middot; <code>j</code> <code>k</code> to move &middot; <code>Enter</code> to open &middot; <code>Esc</code> to close &middot;
-      <code>c</code> to copy a link to this view &middot; <code>?</code> for the glossary.
+      <code>/</code> to search &middot; <code>j</code> <code>k</code> to move &middot; <code>Enter</code> to open &middot; <code>Esc</code> to close &middot; <code>?</code> for the glossary.
+      The tab, the filters and the open package are in the address, so the address bar is a link to what you are looking at.
       Keys: <code>verdict:</code> <code>priority:</code> <code>signal:</code> <code>severity:</code> <code>cve:</code> <code>direct:</code> <code>dev:</code>
     </p>
     <p class="count-line" id="countLine" role="status" aria-live="polite"></p>

@@ -851,9 +851,6 @@
     document.querySelector(".searchbar").hidden = !filterable;
     document.querySelector(".hint").hidden = !filterable;
     document.querySelector(".ledger").hidden = state.view === "run";
-    // The button promises a link to what is on screen. Where the view cannot reach the address
-    // bar it cannot keep that promise, so it does not offer.
-    el("copyBtn").hidden = !URL_STATE;
 
     renderRail();
     renderDetail();
@@ -970,8 +967,6 @@
 
   el("q").addEventListener("input", function () { state.q = this.value; cursor = -1; render(); });
 
-  el("copyBtn").addEventListener("click", copyLink);
-
   el("themeBtn").addEventListener("click", function () {
     var dark = document.documentElement.getAttribute("data-theme") === "dark";
     var next = dark ? "light" : "dark";
@@ -1006,8 +1001,6 @@
       return;
     }
     if (document.activeElement === el("q")) return;
-    // Bare c only: cmd+c and ctrl+c are how the reader copies the text they have selected.
-    if (e.key === "c" && !e.metaKey && !e.ctrlKey && !e.altKey) { e.preventDefault(); copyLink(); return; }
     if (e.key === "j" || e.key === "k") {
       if (!visible.length) return;
       e.preventDefault();
@@ -1018,92 +1011,6 @@
       if (node) node.scrollIntoView({ block: "nearest" });
     }
   });
-
-  /* ---------- copy a link to the current view ---------- */
-
-  /**
-   * What to put on the clipboard for the view on screen.
-   *
-   * Served over http(s) the whole address travels, and the person who opens it lands on the same
-   * tab, the same filters and the same package. Opened from a local file it is the fragment alone:
-   * a `file://` address is useless to anyone else, and it names a directory — a client's name, an
-   * employer's, a person's — that has no business on someone's clipboard on its way into a chat.
-   * Two people reading the same file both have it; the fragment is the part that means anything
-   * to both of them.
-   */
-  function shareTarget() {
-    if (location.protocol === "http:" || location.protocol === "https:") {
-      return { text: location.href, label: "Copied", status: "Link copied." };
-    }
-    // writeHash() drops the fragment entirely for the view the report opens on, and a lone "#"
-    // would be a link to nothing.
-    if (!location.hash || location.hash === "#") {
-      return {
-        text: null,
-        label: "Nothing to copy",
-        status: "This is the report as it opens. Filter it or open a package first."
-      };
-    }
-
-    return {
-      text: location.hash,
-      label: "Copied",
-      status: "View copied. Paste it after the address of this report."
-    };
-  }
-
-  /**
-   * navigator.clipboard is the way, and it is also the way that is missing: the page is built to be
-   * opened from a file, and a file is not a secure context in every browser that will open it. The
-   * old selection-based copy is the fallback; when that is refused as well the button says so and
-   * points at the address bar, which has the same link.
-   */
-  function copyToClipboard(text) {
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      // Present and refusing is the case that matters: from a file the API is there and the
-      // context is not secure, so it rejects rather than being missing.
-      return navigator.clipboard.writeText(text).catch(function () { return copyBySelection(text); });
-    }
-
-    return copyBySelection(text);
-  }
-  function copyBySelection(text) {
-    return new Promise(function (resolve, reject) {
-      var field = document.createElement("textarea");
-      field.value = text;
-      field.setAttribute("readonly", "readonly");
-      field.style.position = "fixed";
-      field.style.top = "-1000px";
-      document.body.appendChild(field);
-      field.select();
-      var ok = false;
-      try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
-      document.body.removeChild(field);
-      if (ok) resolve(); else reject(new Error("the browser refused to copy"));
-    });
-  }
-
-  var copyTimer = null;
-  function copyLink() {
-    if (!URL_STATE) return;
-    var target = shareTarget();
-    var button = el("copyBtn");
-    if (target.text === null) {
-      say(button, target.label, target.status);
-      return;
-    }
-    copyToClipboard(target.text).then(function () {
-      say(button, target.label, target.status);
-    }, function () {
-      say(button, "Copy failed", "The browser would not copy. The address bar has the same link.");
-    });
-  }
-  function say(button, label, status) {
-    el("copyStatus").textContent = status;
-    button.textContent = label;
-    if (copyTimer) clearTimeout(copyTimer);
-    copyTimer = setTimeout(function () { button.textContent = "Copy link"; }, 2600);
-  }
 
   /* ---------- glossary ---------- */
   function fillLegend() {
@@ -1149,13 +1056,6 @@
   el("projectName").textContent = CONTEXT.lock_file || "composer.lock";
 
   readHash();
-  // Settled before the first render rather than on the first failure, so the copy button is never
-  // offered for one paint in a place where it cannot work.
-  try {
-    history.replaceState(null, "", location.hash || location.pathname);
-  } catch (err) {
-    URL_STATE = false;
-  }
   var WIDE = !window.matchMedia || window.matchMedia("(min-width: 1181px)").matches;
   // On a wide screen the detail pane would otherwise open empty, so the first finding is shown.
   // Nobody asked for it, so it stays out of the address bar and out of a copied link: a link that

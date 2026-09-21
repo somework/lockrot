@@ -28,12 +28,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   marked, advisories grouped by whether the fix is a patch on your own branch or a move to another,
   and what is new or worsened since the baseline. Filters and the open package live in the URL hash,
   the query understands `verdict:`, `priority:`, `signal:`, `severity:`, `cve:`, `direct:` and
-  `dev:`, and `?` opens a glossary of every verdict and signal. **Copy link** — `c` — puts a link to
-  what is on screen on the clipboard, so a colleague gets three packages rather than a report with
-  eighty findings in it; opened from a local file it copies the fragment alone, because a `file://`
-  path is no use to anyone else and names a directory that is nobody else's business. A report is
-  usually read by someone who did not run it, so the page closes with the two commands that produce
-  the same page for their own lock. The payload's `report` key is byte
+  `dev:`, and `?` opens a glossary of every verdict and signal. A report is usually read by someone
+  who did not run it, so the page closes with the two commands that produce the same page for their
+  own lock. The payload's `report` key is byte
   for byte what `--format=json` writes, envelope included, so it validates against the published
   [report schema](docs/schema.md). `--all` puts every package in the page, at roughly 4 KB each;
   without it a 100-package lock lands around 250 KB. The page carries a description and an Open
