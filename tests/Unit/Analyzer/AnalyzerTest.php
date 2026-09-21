@@ -420,6 +420,33 @@ final class AnalyzerTest extends TestCase
         return $this->analyzer($this->loader(['vendor/pkg' => $meta]), $this->http($map), $token, new Allowlist([]))->analyze($lock, ProjectConfig::empty(), false);
     }
 
+    /**
+     * The libyears on a finding come from the lock's `time` and the repository's newest stable
+     * release, through {@see \Lockrot\Analyzer\Libyears::behind()}: two years apart here, so a
+     * swapped argument or a dropped one would read as zero or null.
+     */
+    public function testAFindingCarriesTheLibyearsBetweenItsLockTimeAndTheNewestStableRelease(): void
+    {
+        $lock = LockFile::fromArray(['packages' => [
+            ['name' => 'vendor/pkg', 'version' => '1.0.0', 'time' => '2024-01-10T10:00:00+00:00', 'notification-url' => 'https://packagist.org/downloads/'],
+            ['name' => 'vendor/pin', 'version' => 'dev-main', 'time' => '2024-01-10T10:00:00+00:00', 'notification-url' => 'https://packagist.org/downloads/'],
+        ]]);
+        $metadata = [
+            'vendor/pkg' => $this->metadataFor('2026-01-10T10:00:00+00:00'),
+            'vendor/pin' => new PackageMetadata('vendor/pin', false, null, true, new \DateTimeImmutable('2026-01-10T10:00:00+00:00'), '1.0.0', 1, null, 'library', new \DateTimeImmutable(F::NOW)),
+        ];
+        $report = $this->analyzer($this->loader($metadata), $this->http([]), true, new Allowlist([]))->analyze($lock, ProjectConfig::empty(), false);
+        $byName = [];
+        foreach ($report->findings() as $finding) {
+            $byName[$finding->package()] = $finding;
+        }
+
+        self::assertEqualsWithDelta(2.0, (float) $byName['vendor/pkg']->libyears(), 0.01);
+        self::assertNull($byName['vendor/pin']->libyears(), 'a branch snapshot is not measured');
+        self::assertEqualsWithDelta(2.0, $report->libyears()->total(), 0.01);
+        self::assertSame(1, $report->libyears()->unmeasured()['branch_snapshot']);
+    }
+
     private function metadataFor(?string $releasedAt): PackageMetadata
     {
         $releaseAt = $releasedAt === null ? null : new \DateTimeImmutable($releasedAt);

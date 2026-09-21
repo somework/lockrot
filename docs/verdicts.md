@@ -370,20 +370,23 @@ holds, so it does not move between two runs on the same lock unless a package re
 Every finding carries its own value as `libyears` in `--format=json`, `null` when the package is not
 measured, and the report's `libyears` block is the arithmetic over them: `total` and `direct` (the
 same sum over the direct requirements), `measured`, `unmeasured` by reason, `worst`. A consumer can
-recompute every number in the block from the findings, to within the rounding of each printed
-value. The HTML page shows the total in its ledger and the value in a sortable column.
+recompute every number in the block from the findings: `total` is summed before rounding, so the
+sum of the printed values agrees with it to within 0.005 per measured finding. The HTML page shows the total in its ledger and the value in a sortable column.
 
 A package is **not measured**, and counted under one of four reasons, when:
 
 | `unmeasured` key | when |
 |---|---|
 | `branch_snapshots` | The installed version is a branch (`dev-main`, `2.x-dev`): it has a commit date, not a release date. Measured by push date a fresh `dev-main` reads as zero and an old one as years of nothing (lox/xhprof on Matomo would add ten). The `pinned` verdict already says what there is to say. |
-| `no_stable_release_date` | The repository dates no stable release: none exists, or the highest tag carries no date lockrot trusts — a subtree split whose tags share a commit (symfony/polyfill-\*, scheb/2fa-\*) — or the lock entry itself has no `time`. Adding an unknown to a sum is not measuring. |
+| `no_stable_release_date` | No date lockrot trusts for one of the two ends: no stable release exists, or the highest tag carries no date lockrot trusts — a subtree split whose tags share a commit (symfony/polyfill-\*, scheb/2fa-\*) — or the installed version is dated only by such a shared commit (a split whose newest release is [dated by its monorepo parent](#dates-from-the-monorepo): the lock's `time` for illuminate/macroable v10.48.28 is a year and a half before the release), or the lock entry has no `time`. Adding an unknown to a sum is not measuring. |
 | `not_from_composer_repository` | A `path`, `vcs` or `package` repository entry: no metadata was asked for. |
 | `metadata_unavailable` | Metadata was asked for and did not come: not listed, offline, budget, transport. |
 
-The first reason that applies is the one counted. A lock ahead of the last stable release — a
-pre-release above it, a tag the repository no longer lists — is measured as zero, not dropped.
+The reasons are checked in this order, and the first that applies is the one counted: not from a
+Composer repository, then metadata unavailable, then a branch snapshot, then no dated stable
+release — so a `dev-main` pin on a package that never released counts as a snapshot. A lock ahead
+of the last stable release — a pre-release above it, a tag the repository no longer lists — is
+measured as zero, not dropped; a lock with nothing behind names no worst package.
 
 Three things the number is not:
 

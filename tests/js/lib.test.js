@@ -219,3 +219,9 @@ test("libyearsLine says so when nothing was measured, and stays quiet for a docu
     assert.strictEqual(lib.libyearsLine(undefined), "", "a report from before the block existed");
     assert.strictEqual(lib.libyearsLine({}), "", "or a block that is not one");
 });
+
+test("libyearsSortKey puts an unmeasured package below every measured one, zero included", () => {
+    const rows = [{ libyears: 1.2 }, { libyears: null }, { libyears: 0 }, {}];
+    assert.deepStrictEqual(rows.map(lib.libyearsSortKey).sort((a, b) => a - b), [-1, -1, 0, 1.2]);
+    assert.strictEqual(lib.libyearsSortKey(undefined), -1, "no finding at all sorts with the unmeasured");
+});

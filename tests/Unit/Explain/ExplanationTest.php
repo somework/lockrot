@@ -10,6 +10,7 @@ use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Explain\Explanation;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\Thresholds;
+use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
@@ -26,6 +27,15 @@ final class ExplanationTest extends TestCase
     private function finding(string $version, string $verdict, array $signals = []): Finding
     {
         return new Finding('vendor/pkg', $version, $verdict, $signals, ['root/app', 'vendor/pkg'], null, new \DateTimeImmutable(F::NOW));
+    }
+
+    public function testTheExplanationCarriesTheFindingsLibyears(): void
+    {
+        $finding = new Finding('vendor/pkg', '1.4.0', Verdict::LEFT_BEHIND, [], ['root/app', 'vendor/pkg'], null, new \DateTimeImmutable(F::NOW), null, false, [], 2.345);
+        $metadata = F::metadata([['1.5.0', '2021-06-01T00:00:00+00:00'], ['1.4.0', '2020-01-01T00:00:00+00:00']]);
+        $explanation = new Explanation($finding, F::facts(F::package(['version' => '1.4.0']), $metadata), new Thresholds(), '8.4', $this->report());
+
+        self::assertSame(2.35, JsonPath::arrayAt($explanation->toArray(), ['finding'])['libyears']);
     }
 
     public function testBranchesAreListedHighestFirstWithTheInstalledOneMarked(): void

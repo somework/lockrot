@@ -355,7 +355,7 @@ final class ReportTest extends TestCase
         self::assertSame(6.5, $block->total());
         self::assertSame(4.0, $block->direct());
         self::assertSame(2, $block->measured());
-        self::assertSame(1, $block->unmeasured()[Libyears::BRANCH_SNAPSHOTS]);
+        self::assertSame(1, $block->unmeasured()[Libyears::BRANCH_SNAPSHOT]);
         self::assertSame($block->toArray(), $report->toArray()['libyears']);
         // and the block a consumer reads is recomputable from the findings it reads
         $sum = 0.0;

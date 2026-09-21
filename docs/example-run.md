@@ -281,6 +281,8 @@ low (2)
 200 packages checked · abandoned 19 · silent 8 · pinned 4 · left-behind 11 · old-promise 38 · stale 3 ·
 unknown 0 · finished 18 · ok 99
 priority: critical 3 · high 64 · medium 14 · low 2
+libyears: 151.5 behind across 191 of 200 packages · 94.5 from direct requirements ·
+furthest behind smalot/pdfparser v1.1.0 at 4.7
 pulled in by: wallabag/rulerz-bundle 15 · wallabag/rulerz 14 · wallabag/phpepub 5 ·
 scheb/2fa-google-authenticator 3 · friendsofsymfony/jsrouting-bundle 2 · … and 21 more
 Data as of 2026-09-15 (package repositories, repository hosts). Run composer lockrot --format=json for details.
@@ -340,15 +342,15 @@ list, which `…` stands in for:
     ],
     "libyears": {
         "total": 151.52,
-        "direct": 94.48,
+        "direct_requirements": 94.53,
         "measured": 191,
         "unmeasured": {
-            "branch_snapshots": 4,
+            "branch_snapshot": 4,
             "no_stable_release_date": 5,
             "not_from_composer_repository": 0,
             "metadata_unavailable": 0
         },
-        "worst": {
+        "furthest_behind": {
             "package": "smalot/pdfparser",
             "version": "v1.1.0",
             "libyears": 4.7
@@ -396,7 +398,7 @@ list, which `…` stands in for:
             "allowlist_reason": null,
             "note": null,
             "data_date": "2026-09-15T17:31:32+00:00",
-            "libyears": 0.0
+            "libyears": 0
         },
         …
     ]
@@ -421,6 +423,7 @@ No dependency rot found in 20 packages.
 
 20 packages checked · abandoned 0 · silent 0 · pinned 0 · left-behind 0 · old-promise 0 · stale 0 · unknown 0 ·
 finished 11 · ok 9
+libyears: 0.9 behind across all 20 packages · 0.0 from direct requirements · furthest behind laminas/laminas-httphandlerrunner 2.13.0 at 0.9
 Data as of 2026-09-15 (package repositories, repository hosts). Run composer lockrot --format=json for details.
 ```
 

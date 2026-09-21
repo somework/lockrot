@@ -222,6 +222,8 @@ What the page has that a stream cannot:
   the ones a patch on your own branch clears and the ones that need a move to another branch. A
   package with fourteen advisories is usually two tickets, not one.
 - **What changed since the [baseline](baseline.md).** New, worsened and already-accepted, filterable.
+- **How far behind the lock is.** The [libyears](verdicts.md#libyears) total in the ledger, and every
+  package's own value as a sortable column.
 - **What the run could not see.** The notes, the thresholds it used and the schema it validates
   against, on their own tab.
 

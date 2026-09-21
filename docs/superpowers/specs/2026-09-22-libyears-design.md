@@ -17,7 +17,8 @@ For one package: `lastStableReleaseAt() - LockedPackage::time()`, in years of 36
 (`Clock::SECONDS_PER_YEAR`), clamped at zero. `lastStableReleaseAt()` is the highest stable tag's
 release date as `PackageMetadata` already computes it — dated by the monorepo parent where the
 package's own tags share a commit, null where the repository dates none. The lock's `time` is
-Composer's own record of the installed version's release. Nothing about "now" enters: the number
+Composer's own record of the installed version's release — the repository's date for that tag,
+which for a subtree split is the shared commit's, and that case is excluded below. Nothing about "now" enters: the number
 depends on two dates that are both in the data lockrot already has, so it is stable on recorded
 fixtures and needs no clock.
 
@@ -27,7 +28,7 @@ and the install-time path measures the transaction. A package is **not measured*
 | reason (`unmeasured` key)      | why                                                                                   |
 |--------------------------------|---------------------------------------------------------------------------------------|
 | `branch_snapshots`             | `isBranchSnapshot()`: a dev pin has a commit date, not a release date. Measured by push date it reads as zero on a fresh `dev-main` and as an artefact on an old one (lox/xhprof: 10.5 years of nothing). The `pinned` verdict already covers it. |
-| `no_stable_release_date`       | `lastStableReleaseAt()` is null: no stable release at all, or the highest tag is undated (symfony/polyfill-*, scheb/2fa-* splits). Adding "unknown" to a sum is not measuring. |
+| `no_stable_release_date`       | `lastStableReleaseAt()` is null: no stable release at all, or the highest tag is undated (symfony/polyfill-*, scheb/2fa-* splits); or `lastStableDatedBy()` is set: the newest date was repaired from the monorepo parent but the lock's `time` for the installed version is the same stale shared-commit date (illuminate/macroable v10.48.28 in Mautic's lock: 2023-06-05 for a 2024-11-21 release), so measuring would add the artefact. Adding "unknown" to a sum is not measuring. |
 | `not_from_composer_repository` | no metadata was asked for                                                             |
 | `metadata_unavailable`         | metadata was asked for and did not come                                               |
 
@@ -54,7 +55,7 @@ requirements only; lockrot sums the whole lock. On wallabag that is 94.5 against
   ```json
   "libyears": {
     "total": 151.52,
-    "direct": 94.48,
+    "direct": 94.53,
     "measured": 191,
     "unmeasured": {
       "branch_snapshots": 4,
@@ -67,16 +68,18 @@ requirements only; lockrot sums the whole lock. On wallabag that is 94.5 against
   ```
 
   `total` and `direct` are sums of the unrounded per-package values, rounded to two decimals
-  once; `measured` is the count of non-null findings; `worst` is the maximum (ties by package
-  name, ascending; `null` when nothing was measured). The block is checkable by arithmetic over
+  once; `measured` is the count of non-null findings; `worst` is the maximum above zero (ties by
+  package name, ascending; `null` when nothing was measured or nothing measured is behind). The block is checkable by arithmetic over
   `findings`, to within the rounding of the per-package values. Both are required in the schema;
   the schema number does not change (a field is added, none removed or renamed).
 - **Table footer**, one line after the priority totals, before `pulled in by:`:
-  `151.5 libyears behind across 191 packages (direct 94.5); worst smalot/pdfparser v1.1.0, 4.7 · 9 not measured`.
-  On a run where nothing was measured: `libyears: nothing measured (N not measured)`. Not added
-  to `summaryLine()`, which the `github` format pins itself against.
-- **HTML**: the headline shows the total next to the package count; the packages table gets a
-  sortable `libyears` column; the Run block lists the block's counts.
+  `libyears: 151.5 across 191 measured packages · direct 94.5 · worst smalot/pdfparser v1.1.0 (4.7) · 9 not measured`,
+  joined with ` · ` so the table folds it between items. `nothing behind` in place of the worst
+  when every measured package is on its newest release; `libyears: nothing measured (N not
+  measured)` when nothing was measured. Not added to `summaryLine()`, which the `github` format
+  pins itself against.
+- **HTML**: a fourth ledger block beside priority, verdicts and advisories shows the total and the
+  line; the packages table gets a sortable `libyears` column; the Run block repeats the line.
 - **Explain** (`--explain`): the finding is printed as it is, so the number rides along in
   `--format=json`; the text output is unchanged.
 - **Markdown**: the same footer line as the table.
@@ -86,10 +89,10 @@ install-time summary, `--fail-on`, priorities, the baseline.
 
 ## Code
 
-- `Lockrot\Analyzer\Libyears` — immutable value object. `Libyears::of(PackageFacts $facts, bool $metadataFailed): ?float`
+- `Lockrot\Analyzer\Libyears` — immutable value object. `Libyears::behind(LockedPackage, ?PackageMetadata): ?float`
   is the per-package rule, the one place the arithmetic and the exclusion order live;
-  `Libyears::summarise(list<Finding>): self` folds findings into the block. `toArray()`,
-  `total()`, `direct()`, `measured()`, `unmeasuredBy()`, `worst()`, `line()` (the footer text).
+  `Libyears::fromFindings(list<Finding>): self` folds findings into the block. `toArray()`,
+  `total()`, `direct()`, `measured()`, `unmeasured()`, `worst()`, `line()` (the footer text).
 - `Finding` gains `?float $libyears` (constructor, last, default null) and `libyears()`; it is set
   in `Analyzer::buildFinding()` and appears in `Finding::toArray()` as `libyears`.
 - `Report::libyears()` computes the block from its findings — nothing to thread through

@@ -290,9 +290,17 @@ final class TableFormatterTest extends TestCase
         self::assertSame('6 packages checked · abandoned 2 · silent 0 · pinned 0 · left-behind 0 · old-promise 0 · stale 2 · unknown 0 · finished 1 · ok 1', $tail[0]);
         self::assertSame('priority: critical 1 · high 1 · medium 1 · low 1', $tail[1]);
         // the fixture findings carry no libyears value, so the line says so rather than inventing a zero
-        self::assertSame('libyears: nothing measured (6 not measured)', $tail[2]);
+        self::assertSame('libyears: none of the 6 packages could be measured', $tail[2]);
         self::assertSame('Data as of 2026-09-14 (package repositories, repository hosts). Run composer lockrot --format=json for details.', $tail[3]);
         self::assertSame('note: GitHub token not set: repository activity checked only for 2 candidate packages (0 skipped); set GITHUB_TOKEN to check all', $tail[4]);
+    }
+
+    public function testAnEmptyRunStillEndsWithTheLibyearsLine(): void
+    {
+        $lines = $this->plainLines($this->formatter(200)->format(new Report([], [], new \DateTimeImmutable(self::AT), 0, 0, false)));
+
+        self::assertSame('No dependency rot found in 0 packages.', $lines[0]);
+        self::assertContains('libyears: nothing to measure', $lines);
     }
 
     /** The libyears line sits between the priority totals and the exposure line, and folds between its items like the counts line. */
@@ -308,14 +316,15 @@ final class TableFormatterTest extends TestCase
         $priority = array_search('priority: critical 0 · high 2 · medium 0 · low 0', $lines, true);
 
         self::assertNotFalse($priority);
-        self::assertSame('libyears: 8.1 across 2 measured packages · direct 4.7 · worst smalot/pdfparser v1.1.0 (4.7) · 1 not measured', $lines[$priority + 1]);
+        self::assertSame('libyears: 8.1 behind across 2 of 3 packages · 4.7 from direct requirements · furthest behind smalot/pdfparser v1.1.0 at 4.7', $lines[$priority + 1]);
         self::assertStringStartsWith('Data as of ', $lines[$priority + 2]);
 
         // narrow: the line folds between items, and every fold ends on the separator
         $narrow = $this->plainLines($this->formatter(60)->format($report));
-        $first = array_search('libyears: 8.1 across 2 measured packages · direct 4.7 ·', $narrow, true);
+        $first = array_search('libyears: 8.1 behind across 2 of 3 packages ·', $narrow, true);
         self::assertNotFalse($first, implode("\n", $narrow));
-        self::assertSame('worst smalot/pdfparser v1.1.0 (4.7) · 1 not measured', $narrow[$first + 1]);
+        self::assertSame('4.7 from direct requirements ·', $narrow[$first + 1]);
+        self::assertSame('furthest behind smalot/pdfparser v1.1.0 at 4.7', $narrow[$first + 2]);
     }
 
     public function testTheFooterStatesTheAgeOfCachedActivity(): void
@@ -429,7 +438,7 @@ final class TableFormatterTest extends TestCase
         self::assertStringContainsString(' packages checked', $lines[2]);
         // and no `priority: critical 0 · high 0 · medium 0 · low 0` under it — the libyears line, yes:
         // a clean lock can still be years behind
-        self::assertSame('libyears: nothing measured (1 not measured)', $lines[3]);
+        self::assertSame('libyears: the one package could not be measured', $lines[3]);
         self::assertStringStartsWith('Data as of ', $lines[4]);
     }
 

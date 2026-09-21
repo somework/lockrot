@@ -540,7 +540,7 @@
   var SORTS = {
     package: function (f) { return f.package; },
     version: function (f) { return f.version; },
-    libyears: function (f) { return f.libyears == null ? -1 : f.libyears; },
+    libyears: LockrotLib.libyearsSortKey,
     verdict: function (f) { return SEVERITY_ORDER.indexOf(f.verdict) === -1 ? 99 : SEVERITY_ORDER.indexOf(f.verdict); },
     priority: function (f) { return PRIORITIES.indexOf(f.priority); },
     reached: function (f) { return (f.direct ? "0" : "1") + (f.dev ? "1" : "0"); },

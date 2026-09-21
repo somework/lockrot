@@ -434,6 +434,29 @@ final class LockrotCommandTest extends TestCase
         self::assertStringContainsString('php constraint', $stdout);
     }
 
+    /** The block sums what the run analysed: `--dev` adds the development packages to it, and nothing else moves. */
+    public function testDevPackagesEnterTheLibyearsBlockOnlyWithDev(): void
+    {
+        chdir(__DIR__.'/../../fixtures/skeletons/laravel');
+        $prod = $this->tester($this->loader());
+        $prod->execute(['--format' => 'json', '--target-php' => '8.4']);
+        $withDev = $this->tester($this->loader());
+        $withDev->execute(['--format' => 'json', '--dev' => true, '--target-php' => '8.4']);
+        $prodJson = (array) json_decode($prod->getDisplay(), true);
+        $devJson = (array) json_decode($withDev->getDisplay(), true);
+        $prodBlock = JsonPath::arrayAt($prodJson, ['libyears']);
+        $devBlock = JsonPath::arrayAt($devJson, ['libyears']);
+
+        self::assertGreaterThan($prodJson['packages_checked'], $devJson['packages_checked']);
+        // every analysed package is either measured or filed under a reason, in both runs
+        foreach ([[$prodJson, $prodBlock], [$devJson, $devBlock]] as [$json, $block]) {
+            self::assertIsInt($block['measured']);
+            self::assertIsArray($block['unmeasured']);
+            self::assertSame($json['packages_checked'], $block['measured'] + array_sum($block['unmeasured']));
+        }
+        self::assertGreaterThanOrEqual($prodBlock['total'], $devBlock['total']);
+    }
+
     public function testJsonOutputAndDefaultExitZero(): void
     {
         chdir(__DIR__.'/../../fixtures/apps/wallabag_wallabag');
@@ -1413,7 +1436,7 @@ final class LockrotCommandTest extends TestCase
         $summaryAt = strpos($display, ' packages checked');
         self::assertNotFalse($summaryAt);
         self::assertStringNotContainsString('brick/math', substr($display, 0, $summaryAt), 'brick/math has nothing to flag');
-        self::assertStringContainsString('worst brick/math 0.18.0', $display, 'but it is the one furthest behind');
+        self::assertStringContainsString('furthest behind brick/math 0.18.0', $display, 'but it is the one furthest behind');
         self::assertStringContainsString('brick/math', $everything->getDisplay());
     }
 

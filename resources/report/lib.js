@@ -86,6 +86,15 @@ var LockrotLib = (function () {
   }
 
   /**
+   * What the packages table sorts on for the libyears column: the value, with an unmeasured
+   * package (null, or a document from before the field) below every measured one, zero included.
+   */
+  function libyearsSortKey(finding) {
+    var value = finding ? finding.libyears : null;
+    return value === null || value === undefined ? -1 : Number(value);
+  }
+
+  /**
    * The libyears block as one line — `151.5 libyears across 191 measured packages · direct 94.5 ·
    * worst smalot/pdfparser v1.1.0 (4.7) · 9 not measured` — the same words the table footer
    * prints. An empty string for a document without the block (a report from before 0.11.0), so the
@@ -149,6 +158,7 @@ var LockrotLib = (function () {
     ageText: ageText,
     plural: plural,
     libyearsLine: libyearsLine,
+    libyearsSortKey: libyearsSortKey,
     kvRows: kvRows,
     parseQuery: parseQuery
   };

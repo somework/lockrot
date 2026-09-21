@@ -13,8 +13,8 @@ use Lockrot\Verdict\Finding;
  * How far behind the lock is, in libyears: for each package, the years between the release of the
  * version installed and the package's newest stable release, summed over the analysed set.
  *
- * The verdicts are precise and are not quoted; "wallabag is 152 libyears behind" is. This is a
- * showcase number laid over the verdicts, not one of them: it does not enter a priority, a
+ * A verdict is a judgement about one package; this is one sentence about the whole lock —
+ * "wallabag is 151.5 libyears behind". It is laid over the verdicts, not one of them: it does not enter a priority, a
  * `--fail-on` or the baseline, and it is not a measure of rot or of security — a package three
  * healthy patches behind adds as much as an abandoned one, and a `finished` psr/log 1.1.4 adds
  * three years for a 3.x it will never need. Nothing about "now" enters either: two dates the run
@@ -28,8 +28,12 @@ use Lockrot\Verdict\Finding;
 final class Libyears
 {
     /** A dev pin (`dev-main`, `2.x-dev`) has a commit date, not a release date; the `pinned` verdict covers it. */
-    public const BRANCH_SNAPSHOTS = 'branch_snapshots';
-    /** No stable release at all, or the newest one undated (a subtree split's tags share a commit); the lock's own `time` missing too. */
+    public const BRANCH_SNAPSHOT = 'branch_snapshot';
+    /**
+     * No date lockrot trusts for one of the two ends: no stable release at all, the newest one
+     * undated (a subtree split's tags share a commit), the installed version dated only by that
+     * shared commit (a split dated by its monorepo parent), or the lock entry without a `time`.
+     */
     public const NO_STABLE_RELEASE_DATE = 'no_stable_release_date';
     /** No metadata was asked for: a `path`, `vcs` or `package` repository entry. */
     public const NOT_FROM_COMPOSER_REPOSITORY = 'not_from_composer_repository';
@@ -37,7 +41,7 @@ final class Libyears
     public const METADATA_UNAVAILABLE = 'metadata_unavailable';
 
     /** The reasons a package goes unmeasured, in the order the block lists them. */
-    public const REASONS = [self::BRANCH_SNAPSHOTS, self::NO_STABLE_RELEASE_DATE, self::NOT_FROM_COMPOSER_REPOSITORY, self::METADATA_UNAVAILABLE];
+    public const REASONS = [self::BRANCH_SNAPSHOT, self::NO_STABLE_RELEASE_DATE, self::NOT_FROM_COMPOSER_REPOSITORY, self::METADATA_UNAVAILABLE];
 
     /** Decimals the block and each finding print; the sums are taken before rounding. */
     private const DECIMALS = 2;
@@ -49,7 +53,7 @@ final class Libyears
     private array $unmeasured;
     /**
      * The finding furthest behind and its value, kept as the pair they were set as; null when
-     * nothing was measured.
+     * nothing was measured, or nothing measured is behind.
      *
      * @var array{Finding, float}|null
      */
@@ -73,18 +77,23 @@ final class Libyears
      * years of 365.25 days, never below zero — a lock on a pre-release above the last stable, or on
      * a tag the repository no longer lists, is measured and is not behind. Null when the package
      * is not measured, in the order {@see reasonFor()} files it: outside every Composer repository,
-     * without metadata, a branch snapshot, or without one of the two dates. The date is the
-     * repository's for the newest release ({@see PackageMetadata::lastStableReleaseAt()}, dated by
-     * the monorepo parent where the package's own tags cannot be) and the lock's for the installed one.
+     * without metadata, a branch snapshot, or without a date to trust for one of the two ends. The
+     * date is the repository's for the newest release ({@see PackageMetadata::lastStableReleaseAt()})
+     * and the lock's for the installed one.
      */
     public static function behind(LockedPackage $package, ?PackageMetadata $metadata): ?float
     {
         if (!$package->isFromComposerRepository() || $metadata === null || $package->isBranchSnapshot()) {
             return null;
         }
+        // A split package dated by its monorepo parent is one whose own tags Packagist dates by the
+        // commit they share — the newest release's date was repaired from the parent, the installed
+        // version's in the lock was not, and it is the same stale commit date (illuminate/macroable
+        // v10.48.28: locked 2023-06-05 for a release of 2024-11-21). Measuring the two against each
+        // other adds the whole artefact to the sum, so the package is left unmeasured instead.
         $latest = $metadata->lastStableReleaseAt();
         $installed = $package->time();
-        if ($latest === null || $installed === null) {
+        if ($latest === null || $installed === null || $metadata->lastStableDatedBy() !== null) {
             return null;
         }
 
@@ -93,8 +102,8 @@ final class Libyears
 
     /**
      * The block for a set of findings: the sums of the unrounded values, how many were measured and
-     * how many were not and why, and the worst one — the greatest value, ties going to the package
-     * that sorts first by name, so two runs over the same lock name the same package.
+     * how many were not and why, and the worst one — the greatest value above zero, ties going to
+     * the package that sorts first by name, so two runs over the same lock name the same package.
      *
      * @param list<Finding> $findings
      */
@@ -117,9 +126,11 @@ final class Libyears
             if ($finding->isDirect()) {
                 $direct += $behind;
             }
-            // Two findings never share a package name — the lock is keyed by it — so on a tie the
-            // comparison decides between two different names, never between a name and itself.
-            if ($worst === null || $behind > $worst[1] || ($behind === $worst[1] && strcmp($finding->package(), $worst[0]->package()) < 0)) {
+            // Only a package that is behind can be the worst: a lock with every package on its
+            // newest release names nobody. Two findings never share a package name — the lock is
+            // keyed by it — so on a tie the comparison decides between two different names, never
+            // between a name and itself.
+            if ($behind > 0.0 && ($worst === null || $behind > $worst[1] || ($behind === $worst[1] && strcmp($finding->package(), $worst[0]->package()) < 0))) {
                 $worst = [$finding, $behind];
             }
         }
@@ -143,7 +154,7 @@ final class Libyears
             return self::METADATA_UNAVAILABLE;
         }
         if (LockedPackage::isSnapshotVersion($finding->version())) {
-            return self::BRANCH_SNAPSHOTS;
+            return self::BRANCH_SNAPSHOT;
         }
 
         return self::NO_STABLE_RELEASE_DATE;
@@ -183,28 +194,49 @@ final class Libyears
     }
 
     /**
-     * The footer line: `libyears: 151.5 across 191 measured packages · direct 94.5 · worst
-     * smalot/pdfparser v1.1.0 (4.7) · 9 not measured`, the last item only when something was not
-     * measured; `libyears: nothing measured (9 not measured)` when nothing was. Joined with ` · `
-     * like the counts line, so the table folds it between items rather than inside one.
+     * The footer line: `libyears: 151.5 behind across 191 of 200 packages · 94.5 from direct
+     * requirements · furthest behind smalot/pdfparser v1.1.0 at 4.7`. Every number carries its
+     * noun: the scope says how many packages the sum covers and how many the run analysed, the
+     * direct share says whose number it is (php-libyear's, near enough), and the package furthest
+     * behind is named as that, not as "worst" — it may well be an `ok` package, and the table above
+     * the line lists flagged rows. When every measured package is on its newest release the line
+     * stops at the scope; when nothing could be measured it says so and how many packages there
+     * were; on an empty run there is nothing to measure. Joined with ` · ` like the counts line, so
+     * the table folds it between items rather than inside one. `%F`, not `%f`: the decimal point
+     * does not follow the process locale, which another plugin in the same Composer process may
+     * have set.
      */
     public function line(): string
     {
-        $skipped = $this->unmeasuredCount();
+        $packages = $this->measured + $this->unmeasuredCount();
+        if ($this->measured === 0) {
+            if ($packages === 0) {
+                return 'libyears: nothing to measure';
+            }
+
+            return $packages === 1 ? 'libyears: the one package could not be measured' : \sprintf('libyears: none of the %d packages could be measured', $packages);
+        }
+        $head = \sprintf('libyears: %.1F behind across %s', $this->total, $this->scope($packages));
         if ($this->worst === null) {
-            return 'libyears: nothing measured'.($skipped === 0 ? '' : \sprintf(' (%d not measured)', $skipped));
+            return $head;
         }
         [$worst, $behind] = $this->worst;
-        $parts = [
-            \sprintf('libyears: %.1f across %d measured %s', $this->total, $this->measured, $this->measured === 1 ? 'package' : 'packages'),
-            \sprintf('direct %.1f', $this->direct),
-            \sprintf('worst %s %s (%.1f)', $worst->package(), $worst->version(), $behind),
-        ];
-        if ($skipped > 0) {
-            $parts[] = \sprintf('%d not measured', $skipped);
+
+        return implode(' · ', [
+            $head,
+            \sprintf('%.1F from direct requirements', $this->direct),
+            \sprintf('furthest behind %s %s at %.1F', $worst->package(), $worst->version(), $behind),
+        ]);
+    }
+
+    /** `191 of 200 packages`, or `all 200 packages` when every analysed package was measured. */
+    private function scope(int $packages): string
+    {
+        if ($this->measured === $packages) {
+            return $packages === 1 ? 'the one package' : \sprintf('all %d packages', $packages);
         }
 
-        return implode(' · ', $parts);
+        return \sprintf('%d of %d packages', $this->measured, $packages);
     }
 
     /** @return array<string, mixed> the block `--format=json` writes, each number rounded once */
@@ -212,10 +244,10 @@ final class Libyears
     {
         return [
             'total' => round($this->total, self::DECIMALS),
-            'direct' => round($this->direct, self::DECIMALS),
+            'direct_requirements' => round($this->direct, self::DECIMALS),
             'measured' => $this->measured,
             'unmeasured' => $this->unmeasured,
-            'worst' => $this->worst === null ? null : [
+            'furthest_behind' => $this->worst === null ? null : [
                 'package' => $this->worst[0]->package(),
                 'version' => $this->worst[0]->version(),
                 'libyears' => round($this->worst[1], self::DECIMALS),

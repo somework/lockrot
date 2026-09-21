@@ -83,6 +83,16 @@ final class LibyearsTest extends TestCase
         self::assertNull(Libyears::behind($this->package('v5.13.2', null), $this->metadata('2026-01-24T13:26:10+00:00')));
     }
 
+    public function testASplitPackageDatedByItsMonorepoParentIsNotMeasured(): void
+    {
+        // The newest release's date came from laravel/framework; the installed version's date in
+        // the lock is the shared commit's, a year and a half early, and would inflate the sum.
+        $datedByParent = new PackageMetadata('illuminate/macroable', false, null, true, new \DateTimeImmutable('2026-01-24T13:26:10+00:00'), 'v13.31.0', 120, null, 'library', new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), [], [], 'laravel/framework');
+
+        self::assertNull(Libyears::behind($this->package(), $datedByParent));
+        self::assertSame('laravel/framework', $datedByParent->lastStableDatedBy());
+    }
+
     public function testADevelopmentPackageIsMeasuredLikeAnyOther(): void
     {
         $behind = Libyears::behind($this->package('v5.13.2', self::LOCKED_AT, true, true), $this->metadata('2026-01-24T13:26:10+00:00'));
@@ -98,7 +108,7 @@ final class LibyearsTest extends TestCase
         $block = Libyears::fromFindings([self::finding('a/a', 1.005), self::finding('b/b', 1.005)]);
 
         self::assertSame(2.01, $block->total());
-        self::assertSame([2.01, 2.01], [$block->toArray()['total'], $block->toArray()['direct']]);
+        self::assertSame([2.01, 2.01], [$block->toArray()['total'], $block->toArray()['direct_requirements']]);
     }
 
     public function testDirectCountsOnlyTheDirectRequirements(): void
@@ -123,7 +133,7 @@ final class LibyearsTest extends TestCase
         ]);
 
         self::assertSame([
-            Libyears::BRANCH_SNAPSHOTS => 2,
+            Libyears::BRANCH_SNAPSHOT => 2,
             Libyears::NO_STABLE_RELEASE_DATE => 1,
             Libyears::NOT_FROM_COMPOSER_REPOSITORY => 1,
             Libyears::METADATA_UNAVAILABLE => 2,
@@ -148,6 +158,20 @@ final class LibyearsTest extends TestCase
         self::assertSame('alpha/pkg', $reversed->package());
     }
 
+    public function testALockWithNothingBehindNamesNoWorstPackage(): void
+    {
+        $block = Libyears::fromFindings([self::finding('a/a', 0.0), self::finding('b/b', 0.0, false)]);
+
+        self::assertNull($block->worst());
+        self::assertSame(2, $block->measured());
+        self::assertNull($block->toArray()['furthest_behind']);
+        self::assertSame('libyears: 0.0 behind across all 2 packages', $block->line());
+        // and a package at zero never outranks one that is behind, whatever the order
+        $worst = Libyears::fromFindings([self::finding('a/a', 0.0), self::finding('b/b', 0.4)])->worst();
+        self::assertNotNull($worst);
+        self::assertSame('b/b', $worst->package());
+    }
+
     public function testAnEmptyRunMeasuresNothing(): void
     {
         $block = Libyears::fromFindings([]);
@@ -155,11 +179,11 @@ final class LibyearsTest extends TestCase
         self::assertSame(0.0, $block->total());
         self::assertSame(0, $block->measured());
         self::assertNull($block->worst());
-        self::assertSame('libyears: nothing measured', $block->line());
-        self::assertNull($block->toArray()['worst']);
+        self::assertSame('libyears: nothing to measure', $block->line());
+        self::assertNull($block->toArray()['furthest_behind']);
     }
 
-    public function testTheLineNamesTheTotalTheDirectShareTheWorstAndWhatWasNotMeasured(): void
+    public function testTheLineNamesTheTotalItsScopeTheDirectShareAndThePackageFurthestBehind(): void
     {
         $block = Libyears::fromFindings([
             self::finding('smalot/pdfparser', 4.7123, true, 'v1.1.0'),
@@ -167,21 +191,23 @@ final class LibyearsTest extends TestCase
             self::finding('wallabag/rulerz', null, true, 'dev-master'),
         ]);
 
-        self::assertSame('libyears: 8.1 across 2 measured packages · direct 4.7 · worst smalot/pdfparser v1.1.0 (4.7) · 1 not measured', $block->line());
+        self::assertSame('libyears: 8.1 behind across 2 of 3 packages · 4.7 from direct requirements · furthest behind smalot/pdfparser v1.1.0 at 4.7', $block->line());
     }
 
-    public function testTheLineDropsTheUnmeasuredItemWhenEverythingWasMeasured(): void
+    public function testTheLineSaysAllWhenEveryPackageWasMeasured(): void
     {
         $block = Libyears::fromFindings([self::finding('a/a', 1.0)]);
 
-        self::assertSame('libyears: 1.0 across 1 measured package · direct 1.0 · worst a/a 1.0.0 (1.0)', $block->line());
+        self::assertSame('libyears: 1.0 behind across the one package · 1.0 from direct requirements · furthest behind a/a 1.0.0 at 1.0', $block->line());
+        self::assertSame('libyears: 2.0 behind across all 2 packages · 2.0 from direct requirements · furthest behind a/a 1.0.0 at 1.0', Libyears::fromFindings([self::finding('a/a', 1.0), self::finding('b/b', 1.0)])->line());
     }
 
     public function testTheLineSaysSoWhenNothingCouldBeMeasured(): void
     {
         $block = Libyears::fromFindings([self::finding('a/a', null, true, 'dev-main'), self::finding('b/b', null, true, 'dev-main')]);
 
-        self::assertSame('libyears: nothing measured (2 not measured)', $block->line());
+        self::assertSame('libyears: none of the 2 packages could be measured', $block->line());
+        self::assertSame('libyears: the one package could not be measured', Libyears::fromFindings([self::finding('a/a', null, true, 'dev-main')])->line());
     }
 
     public function testTheArrayIsTheBlockTheSchemaDescribes(): void
@@ -194,15 +220,15 @@ final class LibyearsTest extends TestCase
 
         self::assertSame([
             'total' => 8.07,
-            'direct' => 4.71,
+            'direct_requirements' => 4.71,
             'measured' => 2,
             'unmeasured' => [
-                Libyears::BRANCH_SNAPSHOTS => 1,
+                Libyears::BRANCH_SNAPSHOT => 1,
                 Libyears::NO_STABLE_RELEASE_DATE => 0,
                 Libyears::NOT_FROM_COMPOSER_REPOSITORY => 0,
                 Libyears::METADATA_UNAVAILABLE => 0,
             ],
-            'worst' => ['package' => 'smalot/pdfparser', 'version' => 'v1.1.0', 'libyears' => 4.71],
+            'furthest_behind' => ['package' => 'smalot/pdfparser', 'version' => 'v1.1.0', 'libyears' => 4.71],
         ], $block->toArray());
     }
 }
