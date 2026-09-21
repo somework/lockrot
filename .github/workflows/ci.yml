@@ -108,6 +108,12 @@ jobs:
     # the 30-minute cap on the very next run of the same commit range, with its summary already
     # printed (97% covered MSI against a threshold of 96) — a runner minute slower and a green shard
     # reads as a failure. The cap is there to stop a runaway run, not to pace this one.
+    #
+    # It reached 40m23s on 2026-09-21 before the command tests stopped fetching the same two hundred
+    # packages once per test (tests/Support/MemoisingMetadataLoader.php). On the same runners, at the
+    # same three threads, the three shards then measured 7m05s, 9m31s and 2m47s against 40m23s,
+    # 18m09s and 9m05s, with every mutant verdict unchanged. The cap stays at 50 because its job is
+    # to catch a run that has gone wrong, and there is no cost to the headroom.
     timeout-minutes: 50
     strategy:
       fail-fast: false
