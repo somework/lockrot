@@ -7,7 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Fixed
+## [0.10.0] - 2026-09-22
+
+### Security
 
 - **A repository URL no longer carries its credentials into a report.** A private Composer source is
   routinely configured with a token in the URL — `https://gitlab-ci-token:$CI_JOB_TOKEN@…` is how
@@ -533,7 +535,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The "GitHub token not set" note counts packages whose repository activity was checked, not
   distinct repositories, so packages sharing one repository are no longer under-reported.
 
-[Unreleased]: https://github.com/somework/lockrot/compare/v0.9.0...HEAD
+[Unreleased]: https://github.com/somework/lockrot/compare/v0.10.0...HEAD
+[0.10.0]: https://github.com/somework/lockrot/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/somework/lockrot/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/somework/lockrot/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/somework/lockrot/compare/v0.6.1...v0.7.0
