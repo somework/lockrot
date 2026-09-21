@@ -12,7 +12,7 @@ use Lockrot\Verdict\FailOn;
 final class LockrotConfig
 {
     public const FAIL_ON_NONE = FailOn::NONE;
-    public const FORMATS = ['table', 'json', 'github', 'sarif', 'gitlab', 'markdown'];
+    public const FORMATS = ['table', 'json', 'github', 'sarif', 'gitlab', 'markdown', 'html'];
     public const DEFAULT_INSTALL_TIME_BUDGET = 5;
     private const INSTALL_TIME_BUDGET_MIN = 1;
     private const INSTALL_TIME_BUDGET_MAX = 120;

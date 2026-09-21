@@ -24,6 +24,7 @@ use Lockrot\Data\Forge\Tokens;
 use Lockrot\Deadline;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Explain\Explanation;
+use Lockrot\Html\PageData;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Output\ExplainFormatter;
@@ -67,7 +68,7 @@ final class LockrotCommand extends BaseCommand
         $this
             ->setAliases(['rot'])
             ->setDescription('Shows dependency rot in composer.lock: abandoned, silent, pinned, left-behind and old-promise packages, with the security advisories no fix is coming for')
-            ->addOption('format', null, InputOption::VALUE_REQUIRED, 'Output format: table, json, github (workflow annotations), sarif (SARIF 2.1.0), gitlab (Code Quality JSON) or markdown (PR comment)')
+            ->addOption('format', null, InputOption::VALUE_REQUIRED, 'Output format: table, json, github (workflow annotations), sarif (SARIF 2.1.0), gitlab (Code Quality JSON), markdown (PR comment) or html (one self-contained page)')
             ->addOption('fail-on', null, InputOption::VALUE_REQUIRED, 'Exit 1 when a finding reaches this verdict (none, abandoned, silent, pinned, left-behind, old-promise, stale) or priority (critical, high, medium, low)')
             ->addOption('target-php', null, InputOption::VALUE_REQUIRED, 'PHP version the project targets, e.g. 8.4 (default: config.platform.php or the running PHP)')
             ->addOption('dev', null, InputOption::VALUE_NONE, 'Include packages-dev')
@@ -192,7 +193,13 @@ final class LockrotCommand extends BaseCommand
             $generate = $input->getOption('generate-baseline') === true;
             $baselineFile = BaselineFile::resolve($cwd, $lockrot->baseline());
             $existingBaseline = $this->readBaseline($baselineFile, $lockrot->baseline() !== null && !$generate);
-            $report = $analyzer->analyze($lock, $project, $lockrot->includeDev());
+            $format = $lockrot->format();
+            // `html` draws a release-branch timeline per package, which is the one thing only the
+            // facts carry; every other format is happy with the report and lets them go.
+            $analysis = $format === 'html'
+                ? $analyzer->analyzeWithFacts($lock->packages($lockrot->includeDev()), $lock, $project, $lockrot->includeDev())
+                : null;
+            $report = $analysis === null ? $analyzer->analyze($lock, $project, $lockrot->includeDev()) : $analysis->report();
 
             if ($generate) {
                 return $this->generateBaseline($output, $baselineFile, $report, $existingBaseline, $lockrot);
@@ -210,12 +217,14 @@ final class LockrotCommand extends BaseCommand
             // one throws ConfigException from here, which the catch below turns into exit 2 the
             // same way an unreadable lock does a few lines up.
             $context = FormatContext::create($lockPath, $lockrot->failOn(), Version::STRING, TerminalWidth::detect($env, $this->getApplication()));
-            $format = $lockrot->format();
+            $page = $analysis === null
+                ? null
+                : new PageData($analysis, $report->baseline(), $lockrot->thresholds(), $lockrot->targetPhp());
             // Only `table` is meant to go through the tag formatter; every machine-readable format
             // is written raw, so a `<` in a constraint or a package name reaches the parser on the
             // other end untouched.
             $output->write(
-                Formatters::for($format, $context)->format($report, $input->getOption('all') === true),
+                Formatters::for($format, $context, $page)->format($report, $input->getOption('all') === true),
                 false,
                 $format === 'table' ? OutputInterface::OUTPUT_NORMAL : OutputInterface::OUTPUT_RAW
             );

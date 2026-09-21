@@ -303,6 +303,20 @@ final class LockrotCommandTest extends TestCase
         return [$code, $output->fetch(), $errors->raw];
     }
 
+    /**
+     * `--help` is where a person looks for the list, and it was written out by hand, so adding a
+     * format left it behind — `html` was accepted and unlisted. The option's description now has to
+     * name every format the config will take.
+     */
+    public function testTheHelpTextNamesEveryFormatTheToolAccepts(): void
+    {
+        $description = $this->command()->getDefinition()->getOption('format')->getDescription();
+
+        foreach (LockrotConfig::FORMATS as $format) {
+            self::assertStringContainsString($format, $description, $format.' is accepted but not listed in --help');
+        }
+    }
+
     public function testTableOutputAndExitCodeOnWallabag(): void
     {
         chdir(__DIR__.'/../../fixtures/apps/wallabag_wallabag');

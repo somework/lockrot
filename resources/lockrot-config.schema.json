@@ -15,7 +15,7 @@
         },
         "format": {
             "type": "string",
-            "enum": ["table", "json", "github", "sarif", "gitlab", "markdown"]
+            "enum": ["table", "json", "github", "sarif", "gitlab", "markdown", "html"]
         },
         "include-dev": {
             "type": "boolean"

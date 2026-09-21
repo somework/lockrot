@@ -35,7 +35,7 @@ be JSON integers (`3`, not `"3"`).
 |---|---|---|
 | `fail-on` | `none` | Exit 1 threshold: a verdict (`stale`, `old-promise`, `left-behind`, `pinned`, `silent`, `abandoned`) or a [priority](verdicts.md#priority) (`low`, `medium`, `high`, `critical`); `none` fails on nothing |
 | `target-php` | `config.platform.php`, else the running PHP | PHP version used for the S5 "old promise" check, e.g. `"8.4"` |
-| `format` | `table` | `table`, `json`, `github`, `sarif`, `gitlab` or `markdown`; see [ci.md](ci.md) |
+| `format` | `table` | `table`, `json`, `github`, `sarif`, `gitlab`, `markdown` or `html`; see [ci.md](ci.md) |
 | `include-dev` | `false` | Also check `packages-dev` (CLI: `--dev`) |
 | `install-time` | `on` | `on` or `off`: print the [install-time summary](install-time.md) during `composer require`/`update`/`install` |
 | `install-time-strict` | `false` | Apply `fail-on` at install time too, stopping the transaction instead of only reporting |
@@ -59,7 +59,7 @@ be JSON integers (`3`, not `"3"`).
 
 | Option | Meaning |
 |---|---|
-| `--format=table\|json\|github\|sarif\|gitlab\|markdown` | Output format. `table` (the default) is a width-aware list grouped by priority, not a box table. The format changes the output only; the exit code is the same for all six. See [ci.md](ci.md) |
+| `--format=table\|json\|github\|sarif\|gitlab\|markdown\|html` | Output format. `table` (the default) is a width-aware list grouped by priority, not a box table; `html` is the whole run as one self-contained page. The format changes the output only; the exit code is the same for all seven. See [ci.md](ci.md) |
 | `--fail-on=<verdict or priority>` | Exit-1 threshold for this run: `none`, a verdict (`abandoned`, `silent`, `pinned`, `left-behind`, `old-promise`, `stale`) or a [priority](verdicts.md#priority) (`critical`, `high`, `medium`, `low`) |
 | `--target-php=8.4` | PHP version for the S5 check |
 | `--dev` | Include `packages-dev`. A development package is reported the same way a production one is, but it gets one [priority](verdicts.md) step lower |

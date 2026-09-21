@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **A repository URL no longer carries its credentials into a report.** A private Composer source is
+  routinely configured with a token in the URL — `https://gitlab-ci-token:$CI_JOB_TOKEN@…` is how
+  GitLab CI hands a job access to one, and Bitbucket app passwords take the same shape — and
+  Composer keeps it in the lock because it has to fetch with it. `--explain` printed that value
+  verbatim, in the text output as the `source` line and in `--format=json` as `lock.repository`, so
+  a pasted terminal buffer or an uploaded artifact carried a working token. Every repository URL
+  lockrot prints now has its userinfo removed, the host kept (`Lockrot\Data\Repository\RepositoryUrl`).
+  Affects 0.8.0 and 0.9.0, where `--explain` was the only path to it.
+
+### Added
+
+- `--format=html`: the whole run as one self-contained page. It carries the report, the release
+  branches behind every finding and the baseline comparison inside a single file, so it opens from
+  `file://`, uploads as one CI artifact and attaches to a ticket — no server, no network, no fonts
+  or scripts fetched from anywhere. What a stream cannot show: one line per signal instead of one
+  sentence with four semicolons in it, every release branch on a time axis with the installed one
+  marked, advisories grouped by whether the fix is a patch on your own branch or a move to another,
+  and what is new or worsened since the baseline. Filters and the open package live in the URL hash,
+  the query understands `verdict:`, `priority:`, `signal:`, `severity:`, `cve:`, `direct:` and
+  `dev:`, and `?` opens a glossary of every verdict and signal. A report is usually read by someone
+  who did not run it, so the page closes with the two commands that produce the same page for their
+  own lock. The payload's `report` key is byte
+  for byte what `--format=json` writes, envelope included, so it validates against the published
+  [report schema](docs/schema.md). `--all` puts every package in the page, at roughly 4 KB each;
+  without it a 100-package lock lands around 250 KB. The page carries a description and an Open
+  Graph card so a shared link says what was found, and no `robots` directive: whether a published
+  report may be indexed is the publisher's call, made in their robots.txt, not this file's.
+  See [ci.md](docs/ci.md).
+
 ## [0.9.0] - 2026-09-20
 
 ### Added
