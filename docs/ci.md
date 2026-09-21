@@ -251,8 +251,8 @@ in it, at roughly 4 KB a package; without it a 100-package lock lands around 250
 ## `--format=json`
 
 The complete report, and the only format that carries every field: per-finding `signals`, `chain`,
-`direct_dependents`, `evidence`, `data_date` and `baseline` — where that finding stands against the
-baseline file — plus the document's `run`, `exposure` and `notes`. `run` is what the report is about and what
+`direct_dependents`, `evidence`, `data_date`, `libyears` and `baseline` — where that finding stands against the
+baseline file — plus the document's `run`, `exposure`, `libyears` and `notes`. `run` is what the report is about and what
 its verdicts were decided against: the project's own name from composer.json, the target PHP, the
 thresholds, the `fail-on` and the name of the lock, with the list of verdicts the run counted as
 findings. Without it a report could not be read twice the same

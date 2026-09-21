@@ -352,9 +352,56 @@ At install time only the packages the transaction touches are analysed, so a dir
 gets S7 only when it is itself part of the transaction, and the compact block does not print S7 or
 the other parents at all; `composer lockrot` on the full lock always has the whole picture.
 
+## Libyears
+
+One number for how far behind the whole lock is, laid over the verdicts rather than added to them:
+
+```text
+libyears: 151.5 across 191 measured packages · direct 94.5 · worst smalot/pdfparser v1.1.0 (4.7) · 9 not measured
+```
+
+For each package, the years between the release of the version installed and the package's newest
+stable release — the lock's own `time` against the repository's date for its highest stable tag,
+in years of 365.25 days, never below zero — summed over the packages the run analysed (with
+`--dev`, `packages-dev` included). A *libyear* is the unit [Cox et al.](https://libyear.com/)
+proposed for dependency freshness. Nothing about today enters the number: two dates the run already
+holds, so it does not move between two runs on the same lock unless a package releases.
+
+Every finding carries its own value as `libyears` in `--format=json`, `null` when the package is not
+measured, and the report's `libyears` block is the arithmetic over them: `total` and `direct` (the
+same sum over the direct requirements), `measured`, `unmeasured` by reason, `worst`. A consumer can
+recompute every number in the block from the findings, to within the rounding of each printed
+value. The HTML page shows the total in its ledger and the value in a sortable column.
+
+A package is **not measured**, and counted under one of four reasons, when:
+
+| `unmeasured` key | when |
+|---|---|
+| `branch_snapshots` | The installed version is a branch (`dev-main`, `2.x-dev`): it has a commit date, not a release date. Measured by push date a fresh `dev-main` reads as zero and an old one as years of nothing (lox/xhprof on Matomo would add ten). The `pinned` verdict already says what there is to say. |
+| `no_stable_release_date` | The repository dates no stable release: none exists, or the highest tag carries no date lockrot trusts — a subtree split whose tags share a commit (symfony/polyfill-\*, scheb/2fa-\*) — or the lock entry itself has no `time`. Adding an unknown to a sum is not measuring. |
+| `not_from_composer_repository` | A `path`, `vcs` or `package` repository entry: no metadata was asked for. |
+| `metadata_unavailable` | Metadata was asked for and did not come: not listed, offline, budget, transport. |
+
+The first reason that applies is the one counted. A lock ahead of the last stable release — a
+pre-release above it, a tag the repository no longer lists — is measured as zero, not dropped.
+
+Three things the number is not:
+
+- **A measure of rot.** It counts every drift, healthy patches included: `psr/log 1.1.4` is
+  `finished` and adds 3.4 years for a 3.x it will never need; `sensio/framework-extra-bundle` is
+  `abandoned` and adds zero, because the release installed is the last one there is. The two axes
+  are independent — on the same set of applications the order by libyears and the order by
+  `left-behind` differ — which is why the number does not enter a priority, `--fail-on` or the
+  baseline.
+- **A security number.** An advisory is S9 and the priority ladder; this is distance.
+- **php-libyear's number.** [ecoAPM/php-libyear](https://github.com/ecoAPM/php-libyear) reads
+  `composer.json` and sums the direct requirements only; lockrot sums the whole lock, which on
+  wallabag is 151.5 against 94.5. `direct` is the same sum restricted to `direct: true` — the
+  number to compare with that tool's.
+
 ## Related
 
-- [example-run.md](example-run.md) — a full run with every verdict in it
+- [example-run.md](example-run.md) — a full run with every verdict in it, and the libyears block
 - [configuration.md](configuration.md) — the thresholds behind S2 and S4, and the allowlist
 - [baseline.md](baseline.md) — accepting findings you have already decided to live with
 - [ci.md](ci.md) — exit codes and the six output formats, and where each carries the exposure

@@ -1407,7 +1407,13 @@ final class LockrotCommandTest extends TestCase
         $everything = $this->tester($this->loader());
         $everything->execute(['--all' => true, '--target-php' => '8.4']);
 
-        self::assertStringNotContainsString('brick/math', $flaggedOnly->getDisplay(), 'brick/math has nothing to flag');
+        // The rows, not the whole display: the footer's libyears line names the package furthest
+        // behind whether or not it is flagged — brick/math, here — and that is the point of the line.
+        $display = $flaggedOnly->getDisplay();
+        $summaryAt = strpos($display, ' packages checked');
+        self::assertNotFalse($summaryAt);
+        self::assertStringNotContainsString('brick/math', substr($display, 0, $summaryAt), 'brick/math has nothing to flag');
+        self::assertStringContainsString('worst brick/math 0.18.0', $display, 'but it is the one furthest behind');
         self::assertStringContainsString('brick/math', $everything->getDisplay());
     }
 

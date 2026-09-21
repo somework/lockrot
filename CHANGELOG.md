@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **One number for how far behind the lock is: libyears.** The verdicts are precise and are not
+  quoted; "wallabag is 152 libyears behind" is. For each package the years between the release
+  installed and the package's newest stable release, summed over the analysed lock. Every finding
+  carries its `libyears` in `--format=json` (`null` when not measured: a branch snapshot, no dated
+  stable release, not from a Composer repository, metadata unavailable), and the document a
+  `libyears` block that is the arithmetic over them — `total`, `direct` (the same sum over the
+  direct requirements, the number to compare with php-libyear's, which reads `composer.json`
+  only), `measured`, `unmeasured` by reason and `worst`. The table and markdown footers print one
+  line (`libyears: 151.5 across 191 measured packages · direct 94.5 · worst smalot/pdfparser v1.1.0
+  (4.7) · 9 not measured`); the HTML page shows the total in its ledger and a sortable column.
+  It is laid over the verdicts, not one of them: it counts every drift, healthy patches included,
+  and enters no priority, `--fail-on` or baseline. The schemas gain the fields under the same
+  number. No new request is made: both dates were already in the data.
+
 ## [0.10.0] - 2026-09-22
 
 ### Security

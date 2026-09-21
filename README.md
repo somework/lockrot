@@ -81,6 +81,7 @@ high (58)
   …
 200 packages checked · abandoned 19 · silent 8 · pinned 4 · left-behind 11 · old-promise 38 · stale 3 · …
 priority: critical 3 · high 58 · medium 18 · low 4
+libyears: 151.5 across 191 measured packages · direct 94.5 · worst smalot/pdfparser v1.1.0 (4.7) · 9 not measured
 pulled in by: wallabag/rulerz-bundle 15 · wallabag/rulerz 14 · wallabag/phpepub 5 · …
 …
 ```
@@ -124,6 +125,13 @@ A transitive finding names every direct requirement it is reachable from (`via a
 not only the one its shortest chain starts from, and each direct requirement's evidence says what
 flagged packages it pulls in. The `pulled in by:` summary line sums that up — [transitive
 exposure](https://lockrot.dev/verdicts/#transitive-exposure).
+
+The footer's `libyears:` line is one number for the whole lock: for each package, the years between
+the release installed and the package's newest stable release, summed — 151.5 for wallabag, with the
+package furthest behind named. It is laid over the verdicts, not one of them: every drift counts,
+healthy patches included, so it says how far behind the lock is and nothing about why. Each finding
+carries its own value in `--format=json`, and the report's block is the sum of them —
+[libyears](https://lockrot.dev/verdicts/#libyears).
 
 [Every verdict, signal and priority rule →](https://lockrot.dev/verdicts/)
 
