@@ -1,80 +1,111 @@
 {
-    "$schema": "http://json-schema.org/draft-04/schema#",
-    "id": "https://lockrot.dev/schema/config-1.json",
-    "title": "lockrot configuration",
-    "description": "The `extra.lockrot` object in composer.json. Unknown keys are allowed; the listed ones must have the listed type.",
-    "type": "object",
-    "properties": {
-        "fail-on": {
-            "type": "string",
-            "enum": ["none", "abandoned", "silent", "pinned", "left-behind", "old-promise", "stale", "critical", "high", "medium", "low"]
-        },
-        "target-php": {
-            "type": "string",
-            "pattern": "^\\d+(\\.\\d+)?$"
-        },
-        "format": {
-            "type": "string",
-            "enum": ["table", "json", "github", "sarif", "gitlab", "markdown", "html"]
-        },
-        "include-dev": {
-            "type": "boolean"
-        },
-        "install-time": {
-            "type": "string",
-            "enum": ["on", "off"]
-        },
-        "install-time-strict": {
-            "type": "boolean"
-        },
-        "install-time-budget": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 120
-        },
-        "baseline": {
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "https://lockrot.dev/schema/config-1.json",
+  "title": "lockrot configuration",
+  "description": "The `extra.lockrot` object in composer.json. Unknown keys are allowed; the listed ones must have the listed type.",
+  "type": "object",
+  "properties": {
+    "project": {
+      "description": "What a report should call this project, when the manifest's own name is not it — a package inside a monorepo, or a private project whose name is the client's. Defaults to composer.json's own name.",
+      "type": "string",
+      "minLength": 1
+    },
+    "fail-on": {
+      "type": "string",
+      "enum": [
+        "none",
+        "abandoned",
+        "silent",
+        "pinned",
+        "left-behind",
+        "old-promise",
+        "stale",
+        "critical",
+        "high",
+        "medium",
+        "low"
+      ]
+    },
+    "target-php": {
+      "type": "string",
+      "pattern": "^\\d+(\\.\\d+)?$"
+    },
+    "format": {
+      "type": "string",
+      "enum": [
+        "table",
+        "json",
+        "github",
+        "sarif",
+        "gitlab",
+        "markdown",
+        "html"
+      ]
+    },
+    "include-dev": {
+      "type": "boolean"
+    },
+    "install-time": {
+      "type": "string",
+      "enum": [
+        "on",
+        "off"
+      ]
+    },
+    "install-time-strict": {
+      "type": "boolean"
+    },
+    "install-time-budget": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 120
+    },
+    "baseline": {
+      "type": "string",
+      "minLength": 1
+    },
+    "release-warn-years": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "release-high-years": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "push-warn-years": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "push-high-years": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "ignore": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "package": {
             "type": "string",
             "minLength": 1
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version": {
+            "type": "string"
+          },
+          "expires": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          }
         },
-        "release-warn-years": {
-            "type": "integer",
-            "minimum": 1
-        },
-        "release-high-years": {
-            "type": "integer",
-            "minimum": 1
-        },
-        "push-warn-years": {
-            "type": "integer",
-            "minimum": 1
-        },
-        "push-high-years": {
-            "type": "integer",
-            "minimum": 1
-        },
-        "ignore": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "package": {
-                        "type": "string",
-                        "minLength": 1
-                    },
-                    "reason": {
-                        "type": "string",
-                        "minLength": 1
-                    },
-                    "version": {
-                        "type": "string"
-                    },
-                    "expires": {
-                        "type": "string",
-                        "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
-                    }
-                },
-                "required": ["package", "reason"]
-            }
-        }
+        "required": [
+          "package",
+          "reason"
+        ]
+      }
     }
+  }
 }

@@ -11,6 +11,7 @@ use Lockrot\Json\JsonReader;
 
 final class ProjectConfig
 {
+    private ?string $name;
     /** @var list<string> */
     private array $requires;
     /** @var list<string> */
@@ -24,8 +25,9 @@ final class ProjectConfig
      * @param list<string> $devRequires
      * @param array<string, mixed> $lockrotExtra
      */
-    private function __construct(array $requires, array $devRequires, array $lockrotExtra, ?string $platformPhp)
+    private function __construct(array $requires, array $devRequires, array $lockrotExtra, ?string $platformPhp, ?string $name = null)
     {
+        $this->name = $name;
         $this->requires = $requires;
         $this->devRequires = $devRequires;
         $this->lockrotExtra = $lockrotExtra;
@@ -59,11 +61,14 @@ final class ProjectConfig
         $platformRoot = \is_array($config) ? ($config['platform'] ?? null) : null;
         $platform = \is_array($platformRoot) ? ($platformRoot['php'] ?? null) : null;
 
+        $name = $json['name'] ?? null;
+
         return new self(
             self::packageNames($json['require'] ?? null),
             self::packageNames($json['require-dev'] ?? null),
             self::lockrotExtraFrom($extraRoot),
-            \is_string($platform) ? $platform : null
+            \is_string($platform) ? $platform : null,
+            \is_string($name) && $name !== '' ? $name : null
         );
     }
 
@@ -121,6 +126,16 @@ final class ProjectConfig
     public function lockrotExtra(): array
     {
         return $this->lockrotExtra;
+    }
+
+    /**
+     * The project's own `name` from composer.json, or null where it has none — an application is
+     * not required to name itself. It is the one thing that says which project a report is about:
+     * the lock is called composer.lock in every project there is.
+     */
+    public function name(): ?string
+    {
+        return $this->name;
     }
 
     public function platformPhp(): ?string

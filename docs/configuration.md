@@ -33,6 +33,7 @@ be JSON integers (`3`, not `"3"`).
 
 | Key | Default | Meaning |
 |---|---|---|
+| `project` | composer.json's own `name` | What a report calls this project. Worth setting where the manifest has no name, or where its name is not the one to publish — a package inside a monorepo names itself after the package, a private project after the client |
 | `fail-on` | `none` | Exit 1 threshold: a verdict (`stale`, `old-promise`, `left-behind`, `pinned`, `silent`, `abandoned`) or a [priority](verdicts.md#priority) (`low`, `medium`, `high`, `critical`); `none` fails on nothing |
 | `target-php` | `config.platform.php`, else the running PHP | PHP version used for the S5 "old promise" check, e.g. `"8.4"` |
 | `format` | `table` | `table`, `json`, `github`, `sarif`, `gitlab`, `markdown` or `html`; see [ci.md](ci.md) |

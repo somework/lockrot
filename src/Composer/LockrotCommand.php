@@ -14,6 +14,7 @@ use Composer\Repository\RepositoryInterface;
 use Composer\Util\Platform;
 use Lockrot\Analyzer\Analyzer;
 use Lockrot\Analyzer\Report;
+use Lockrot\Analyzer\RunSettings;
 use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Baseline\BaselineFile;
@@ -201,6 +202,17 @@ final class LockrotCommand extends BaseCommand
                 : null;
             $report = $analysis === null ? $analyzer->analyze($lock, $project, $lockrot->includeDev()) : $analysis->report();
 
+            // Before the baseline and before any formatter: every document the run writes should say
+            // what the run was told to do, because that is what its verdicts were decided against.
+            $report = $report->withRun(new RunSettings(
+                // What the project calls itself, unless the manifest's lockrot config says otherwise.
+                $lockrot->project() ?? $project->name(),
+                $lockrot->targetPhp(),
+                $lockPath,
+                $lockrot->failOn(),
+                $lockrot->thresholds()
+            ));
+
             if ($generate) {
                 return $this->generateBaseline($output, $baselineFile, $report, $existingBaseline, $lockrot);
             }
@@ -219,7 +231,7 @@ final class LockrotCommand extends BaseCommand
             $context = FormatContext::create($lockPath, $lockrot->failOn(), Version::STRING, TerminalWidth::detect($env, $this->getApplication()));
             $page = $analysis === null
                 ? null
-                : new PageData($analysis, $report->baseline(), $lockrot->thresholds(), $lockrot->targetPhp());
+                : new PageData($analysis, $lockrot->thresholds(), $lockrot->targetPhp());
             // Only `table` is meant to go through the tag formatter; every machine-readable format
             // is written raw, so a `<` in a constraint or a package name reaches the parser on the
             // other end untouched.
