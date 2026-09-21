@@ -62,7 +62,7 @@ requirements only; lockrot sums the whole lock. On wallabag that is 94.5 against
       "not_from_composer_repository": 0,
       "metadata_unavailable": 0
     },
-    "worst": {"package": "smalot/pdfparser", "version": "v1.1.0", "libyears": 4.71}
+    "worst": {"package": "smalot/pdfparser", "version": "v1.1.0", "libyears": 4.7}
   }
   ```
 

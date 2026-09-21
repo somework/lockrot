@@ -86,6 +86,29 @@ var LockrotLib = (function () {
   }
 
   /**
+   * The libyears block as one line — `151.5 libyears across 191 measured packages · direct 94.5 ·
+   * worst smalot/pdfparser v1.1.0 (4.7) · 9 not measured` — the same words the table footer
+   * prints. An empty string for a document without the block (a report from before 0.11.0), so the
+   * caller decides what an absent number looks like. Plain text: the caller escapes or uses
+   * textContent, since the worst package's name comes from the document.
+   */
+  function libyearsLine(block) {
+    if (!block || typeof block.measured !== "number") return "";
+    var skipped = 0;
+    Object.keys(block.unmeasured || {}).forEach(function (k) { skipped += Number(block.unmeasured[k]) || 0; });
+    var tail = skipped ? skipped + " not measured" : "";
+    if (!block.measured || !block.worst) return "nothing measured" + (tail ? " (" + tail + ")" : "");
+    var parts = [
+      Number(block.total).toFixed(1) + " libyears across " + plural(block.measured, "measured package", "measured packages"),
+      "direct " + Number(block.direct).toFixed(1),
+      "worst " + block.worst.package + " " + block.worst.version + " (" + Number(block.worst.libyears).toFixed(1) + ")"
+    ];
+    if (tail) parts.push(tail);
+
+    return parts.join(" \u00b7 ");
+  }
+
+  /**
    * Definition rows, minus the ones with nothing to say. A row whose value is null is dropped
    * rather than printed as a dash: the lock entry and the provenance are built from `--explain`
    * data, and a document that carries only the report has none of it — five dashes under a heading
@@ -125,6 +148,7 @@ var LockrotLib = (function () {
     years: years,
     ageText: ageText,
     plural: plural,
+    libyearsLine: libyearsLine,
     kvRows: kvRows,
     parseQuery: parseQuery
   };

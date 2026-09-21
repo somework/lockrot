@@ -289,6 +289,12 @@
     });
     el("advBar").innerHTML = aBar.join("") || '<span style="flex:1;background:var(--none)"></span>';
     el("advLegend").innerHTML = aLeg.join("") || '<span style="color:var(--muted)">no advisory affects this lock</span>';
+
+    // textContent, not innerHTML: the worst package's name is the document's, and this block is
+    // prose, not a filter. A document from before 0.11.0 carries no block and says so.
+    var ly = REPORT.libyears;
+    el("libyearsTotal").textContent = ly && ly.measured ? Number(ly.total).toFixed(1) : "\u2014";
+    el("libyearsLine").textContent = LockrotLib.libyearsLine(ly) || "not in this document";
   }
 
   /* ---------- rail ---------- */
@@ -534,6 +540,7 @@
   var SORTS = {
     package: function (f) { return f.package; },
     version: function (f) { return f.version; },
+    libyears: function (f) { return f.libyears == null ? -1 : f.libyears; },
     verdict: function (f) { return SEVERITY_ORDER.indexOf(f.verdict) === -1 ? 99 : SEVERITY_ORDER.indexOf(f.verdict); },
     priority: function (f) { return PRIORITIES.indexOf(f.priority); },
     reached: function (f) { return (f.direct ? "0" : "1") + (f.dev ? "1" : "0"); },
@@ -554,13 +561,14 @@
       return '<tr data-idx="' + i + '" data-pkg="' + esc(f.package) + '">' +
         "<td>" + (packagistUrl(f) ? '<a class="lnk" href="' + esc(packagistUrl(f)) + '" target="_blank" rel="noopener noreferrer">' + esc(f.package) + "</a>" : esc(f.package)) + "</td>" +
         '<td class="num">' + esc(f.version) + "</td>" +
+        '<td class="num">' + (f.libyears == null ? '<span style="color:var(--muted)">\u2014</span>' : Number(f.libyears).toFixed(1)) + "</td>" +
         "<td>" + pill(f.verdict) + "</td>" +
         "<td>" + (f.priority === "none" ? '<span style="color:var(--muted)">—</span>' : pill(f.priority)) + "</td>" +
         "<td>" + (f.direct ? "direct" : "transitive") + (f.dev ? " \u00b7 dev" : "") + "</td>" +
         '<td class="num">' + ((f.signals || []).map(function (s) { return s.id; }).join(" ") || "—") + "</td>" +
         '<td class="num">' + day(last) + "</td></tr>";
     }).join("");
-    var head = [["package", "Package"], ["version", "Version"], ["verdict", "Verdict"], ["priority", "Priority"],
+    var head = [["package", "Package"], ["version", "Version"], ["libyears", "Libyears"], ["verdict", "Verdict"], ["priority", "Priority"],
       ["reached", "Reached"], ["signals", "Signals"], ["data", "Data as of"]].map(function (c) {
       var on = (SORTS[state.sort] ? state.sort : "verdict") === c[0];
       return '<th aria-sort="' + (on ? (state.sortDesc ? "descending" : "ascending") : "none") +
@@ -619,6 +627,7 @@
       ["oldest activity cache", REPORT.activity_cache_oldest_at || "—"],
       ["network failures", String(REPORT.network_failures)],
       ["not from a Composer repository", String(REPORT.not_from_composer_repository)],
+      ["libyears", LockrotLib.libyearsLine(REPORT.libyears) || "not in this document"],
       ["baseline", REPORT.baseline ? JSON.stringify(REPORT.baseline) : "none"]
     ].map(function (p) { return "<dt>" + esc(p[0]) + "</dt><dd>" + esc(p[1]) + "</dd>"; }).join("");
     var th = Object.keys(t).map(function (k) { return "<dt>" + esc(k) + "</dt><dd>" + esc(t[k]) + " years</dd>"; }).join("");

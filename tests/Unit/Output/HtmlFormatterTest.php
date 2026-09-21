@@ -110,6 +110,20 @@ final class HtmlFormatterTest extends TestCase
         self::assertStringContainsString('<title>lockrot: nothing flagged in 12 packages</title>', $clean);
     }
 
+    public function testThePageCarriesTheLibyearsBlockAndAPlaceToShowIt(): void
+    {
+        $measured = new Finding('smalot/pdfparser', 'v1.1.0', Verdict::LEFT_BEHIND, [], ['smalot/pdfparser'], null, new \DateTimeImmutable(F::NOW), null, false, ['smalot/pdfparser'], 4.7123);
+        $page = $this->page($this->report([$measured, $this->finding('vendor/pinned', Verdict::PINNED)], 2));
+        $payload = self::payloadOf($page);
+
+        self::assertStringContainsString('id="libyearsTotal"', $page, 'the ledger has a place for the total');
+        self::assertStringContainsString('id="libyearsLine"', $page, 'and for the line under it');
+        self::assertStringContainsString('function libyearsLine', $page, 'the library that writes the line is inline');
+        self::assertSame(4.71, J::arrayAt($payload, ['report', 'libyears'])['total']);
+        self::assertSame(4.71, J::arrayAt($payload, ['report', 'findings', 0])['libyears']);
+        self::assertNull(J::arrayAt($payload, ['report', 'findings', 1])['libyears']);
+    }
+
     public function testTheTitleIsEscapedLikeEverythingElse(): void
     {
         $page = (new HtmlFormatter())->format($this->report([], 0));

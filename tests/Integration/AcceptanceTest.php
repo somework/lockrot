@@ -6,6 +6,7 @@ namespace Lockrot\Tests\Integration;
 
 use Lockrot\Allowlist\BuiltinAllowlist;
 use Lockrot\Analyzer\Analyzer;
+use Lockrot\Analyzer\Libyears;
 use Lockrot\Analyzer\Report;
 use Lockrot\Clock;
 use Lockrot\Data\Forge\ActivityClient;
@@ -231,6 +232,62 @@ final class AcceptanceTest extends TestCase
         // phpzip/phpzip 2.0.8: released 2015, require php >=5.3.0 -> S5 fires but silent has precedence
         $ids = array_map(static fn ($s) => $s->id(), $f['phpzip/phpzip']->signals());
         self::assertContains('S5', $ids);
+    }
+
+    /**
+     * The libyears of the recorded fixtures, pinned like the verdict counts are.
+     *
+     * The research table these numbers were first written against (wallabag 171.6, nextcloud 47.1,
+     * matomo 11.8) was computed from ecosyste.ms's `latest_release_published_at`, which dates a
+     * package with no release at all by its branch's last push. That is where the whole gap is:
+     * lox/xhprof on `dev-master` (10.5 of matomo's 11.8), the three wallabag/rulerz-* on
+     * `dev-master` (8.1) and the three scheb/2fa-* whose tags share a commit and carry no usable
+     * date (12.2). lockrot leaves every one of them unmeasured and says so in the block, so the
+     * totals here are lower and the worst packages are the same.
+     */
+    public function testLibyearsOnTheRecordedFixtures(): void
+    {
+        $wallabag = $this->analyze('apps/wallabag_wallabag');
+        $block = $wallabag->libyears();
+        self::assertEqualsWithDelta(151.52, $block->total(), 0.005);
+        self::assertEqualsWithDelta(94.53, $block->direct(), 0.005);
+        self::assertSame(191, $block->measured());
+        self::assertSame([
+            Libyears::BRANCH_SNAPSHOTS => 4,
+            Libyears::NO_STABLE_RELEASE_DATE => 5,
+            Libyears::NOT_FROM_COMPOSER_REPOSITORY => 0,
+            Libyears::METADATA_UNAVAILABLE => 0,
+        ], $block->unmeasured());
+        $worst = $block->worst();
+        self::assertNotNull($worst);
+        self::assertSame('smalot/pdfparser', $worst->package());
+        self::assertEqualsWithDelta(4.70, (float) $worst->libyears(), 0.005);
+        $f = $this->byName($wallabag);
+        self::assertNull($f['wallabag/rulerz']->libyears(), 'a dev-master pin is not measured');
+        self::assertNull($f['scheb/2fa-backup-code']->libyears(), 'a split package whose newest tag the repository leaves undated');
+        self::assertEqualsWithDelta(4.23, (float) $f['scheb/2fa-bundle']->libyears(), 0.005, 'while the monorepo itself, dated, is measured');
+        self::assertNull($f['symfony/polyfill-ctype']->libyears(), 'a split whose tags share a commit has no usable date');
+        self::assertSame(0.0, $f['sensio/framework-extra-bundle']->libyears(), 'abandoned, and zero libyears behind: the installed release is the last one');
+        // The block is the arithmetic over the findings the document prints, to within the
+        // rounding of each printed value.
+        $sum = 0.0;
+        $measured = 0;
+        foreach ($wallabag->toArray()['findings'] as $finding) {
+            self::assertIsArray($finding);
+            if ($finding['libyears'] !== null) {
+                ++$measured;
+                $sum += (float) $finding['libyears'];
+            }
+        }
+        self::assertSame($block->measured(), $measured);
+        self::assertEqualsWithDelta($block->toArray()['total'], $sum, 0.005 * $measured);
+
+        self::assertEqualsWithDelta(45.3, $this->analyze('apps/nextcloud_3rdparty')->libyears()->total(), 0.05);
+        $matomo = $this->analyze('apps/matomo-org_matomo')->libyears();
+        self::assertEqualsWithDelta(0.9, $matomo->total(), 0.05);
+        self::assertSame(3, $matomo->unmeasured()[Libyears::BRANCH_SNAPSHOTS], 'lox/xhprof and the two matomo/* lists, all on dev-master');
+        self::assertSame(2, $matomo->unmeasured()[Libyears::NO_STABLE_RELEASE_DATE], 'two symfony/polyfill-* splits');
+        self::assertEqualsWithDelta(0.5, $this->analyze('skeletons/laravel')->libyears()->total(), 0.05);
     }
 
     public function testOutputWordingIsNeutral(): void

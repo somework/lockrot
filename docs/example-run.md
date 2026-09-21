@@ -351,7 +351,7 @@ list, which `…` stands in for:
         "worst": {
             "package": "smalot/pdfparser",
             "version": "v1.1.0",
-            "libyears": 4.71
+            "libyears": 4.7
         }
     },
     "baseline": null,
