@@ -894,6 +894,9 @@
     document.querySelector(".searchbar").hidden = !filterable;
     document.querySelector(".hint").hidden = !filterable;
     document.querySelector(".ledger").hidden = state.view === "run";
+    // The button promises a link to what is on screen. Where the view cannot reach the address
+    // bar it cannot keep that promise, so it does not offer.
+    el("copyBtn").hidden = !URL_STATE;
 
     renderRail();
     renderDetail();
@@ -912,7 +915,10 @@
   }
 
   var FILTER_GROUPS = ["prio", "verdict", "scope", "signal", "sev", "fix", "since"];
+  /** Whether this document is allowed to write its own address. False inside a sandboxed frame. */
+  var URL_STATE = true;
   function writeHash() {
+    if (!URL_STATE) return;
     var parts = [];
     if (state.view !== "findings") parts.push("view=" + state.view);
     if (state.q) parts.push("q=" + encodeURIComponent(state.q));
@@ -922,7 +928,16 @@
     });
     if (state.pkg && !state.pkgAuto) parts.push("pkg=" + encodeURIComponent(state.pkg));
     var h = parts.join("&");
-    if (h !== location.hash.replace(/^#/, "")) history.replaceState(null, "", h ? "#" + h : location.pathname);
+    if (h === location.hash.replace(/^#/, "")) return;
+    // A document with an opaque origin — a sandboxed frame, which is where a page rendering
+    // somebody else's report belongs — refuses replaceState with a SecurityError. It is the last
+    // thing render() does, so an unguarded throw leaves the page blank. There the view simply does
+    // not live in the URL, and whatever embeds the frame owns the address instead.
+    try {
+      history.replaceState(null, "", h ? "#" + h : location.pathname);
+    } catch (err) {
+      URL_STATE = false;
+    }
   }
   function readHash() {
     var h = location.hash.replace(/^#/, "");
@@ -1113,6 +1128,7 @@
 
   var copyTimer = null;
   function copyLink() {
+    if (!URL_STATE) return;
     var target = shareTarget();
     var button = el("copyBtn");
     if (target.text === null) {
@@ -1148,7 +1164,13 @@
   }
   function openLegend() {
     var d = el("legend");
-    if (d.showModal) d.showModal(); else d.setAttribute("open", "open");
+    // showModal() exists and still throws where modals are not allowed — inside a sandboxed frame,
+    // which is where a page rendering someone else's document belongs. Feature detection alone
+    // would leave the glossary unreachable there, so the failure falls through to the attribute.
+    try {
+      if (d.showModal) { d.showModal(); return; }
+    } catch (err) { /* modals are not allowed here */ }
+    d.setAttribute("open", "open");
   }
   function closeLegend() {
     var d = el("legend");
@@ -1170,6 +1192,13 @@
   el("projectName").textContent = CONTEXT.lock_file || "composer.lock";
 
   readHash();
+  // Settled before the first render rather than on the first failure, so the copy button is never
+  // offered for one paint in a place where it cannot work.
+  try {
+    history.replaceState(null, "", location.hash || location.pathname);
+  } catch (err) {
+    URL_STATE = false;
+  }
   var WIDE = !window.matchMedia || window.matchMedia("(min-width: 1181px)").matches;
   // On a wide screen the detail pane would otherwise open empty, so the first finding is shown.
   // Nobody asked for it, so it stays out of the address bar and out of a copied link: a link that
