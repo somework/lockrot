@@ -171,6 +171,35 @@ final class HtmlFormatterTest extends TestCase
         self::assertStringContainsString('<meta name="twitter:card" content="summary_large_image">', $page);
     }
 
+    /**
+     * The sentence under the title is what a search result and a Slack unfurl show, and it has room
+     * for three verdicts. Which three is the whole point: the biggest counts, biggest first. A run
+     * with five flagged verdicts names left-behind, old-promise and stale, and says nothing about
+     * the two singletons below them.
+     */
+    public function testTheDescriptionNamesTheThreeBiggestVerdictsInOrder(): void
+    {
+        $findings = [$this->finding('vendor/gone', Verdict::ABANDONED), $this->finding('vendor/quiet', Verdict::SILENT)];
+        foreach (range(1, 3) as $i) {
+            $findings[] = $this->finding('vendor/left'.$i, Verdict::LEFT_BEHIND);
+        }
+        foreach (range(1, 5) as $i) {
+            $findings[] = $this->finding('vendor/old'.$i, Verdict::OLD_PROMISE);
+        }
+        foreach (range(1, 4) as $i) {
+            $findings[] = $this->finding('vendor/stale'.$i, Verdict::STALE);
+        }
+
+        $page = $this->page($this->report($findings, 60));
+
+        self::assertStringContainsString(
+            'lockrot flagged 14 of 60 packages in composer.lock: 5 old-promise, 4 stale, 3 left-behind.',
+            $page
+        );
+        self::assertStringNotContainsString('1 abandoned', $page, 'the fourth and fifth verdicts do not fit');
+        self::assertStringNotContainsString('1 silent', $page);
+    }
+
     public function testACleanRunSaysSoInItsDescription(): void
     {
         $page = $this->page($this->report([$this->finding('vendor/fine', Verdict::OK)], 40));
