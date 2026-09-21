@@ -9,19 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **One number for how far behind the lock is: libyears.** The verdicts are precise and are not
-  quoted; "wallabag is 152 libyears behind" is. For each package the years between the release
-  installed and the package's newest stable release, summed over the analysed lock. Every finding
-  carries its `libyears` in `--format=json` (`null` when not measured: a branch snapshot, no dated
-  stable release, not from a Composer repository, metadata unavailable), and the document a
-  `libyears` block that is the arithmetic over them — `total`, `direct` (the same sum over the
-  direct requirements, the number to compare with php-libyear's, which reads `composer.json`
-  only), `measured`, `unmeasured` by reason and `worst`. The table and markdown footers print one
-  line (`libyears: 151.5 across 191 measured packages · direct 94.5 · worst smalot/pdfparser v1.1.0
-  (4.7) · 9 not measured`); the HTML page shows the total in its ledger and a sortable column.
-  It is laid over the verdicts, not one of them: it counts every drift, healthy patches included,
-  and enters no priority, `--fail-on` or baseline. The schemas gain the fields under the same
-  number. No new request is made: both dates were already in the data.
+- **One number for how far behind the lock is: libyears.** For each package, the years between
+  the release installed and the package's newest stable release, summed over the analysed lock —
+  151.5 on the wallabag fixture. Every finding carries its `libyears` in `--format=json` (`null`
+  when not measured: a branch snapshot, no dated stable release, not from a Composer repository,
+  metadata unavailable), and the document a `libyears` block that is the arithmetic over them —
+  `total`, `direct_requirements` (the same sum over the direct requirements, the nearest number
+  to php-libyear's, which reads `composer.json`), `measured`, `unmeasured` by reason and
+  `furthest_behind`. The table and markdown footers print one line (`libyears: 151.5 behind
+  across 191 of 200 packages · 94.5 from direct requirements · furthest behind smalot/pdfparser
+  v1.1.0 at 4.7`); the HTML page shows the total in its ledger, a sortable column, and the counts
+  by reason on the Run tab. It is laid over the verdicts, not one of them: it counts every drift,
+  healthy patches included, and enters no priority, `--fail-on` or baseline. The schemas gain the
+  fields under the same number, optional so that older documents still validate. No new request
+  is made: both dates were already in the data.
 
 ## [0.10.0] - 2026-09-22
 

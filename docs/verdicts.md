@@ -357,27 +357,34 @@ the other parents at all; `composer lockrot` on the full lock always has the who
 One number for how far behind the whole lock is, laid over the verdicts rather than added to them:
 
 ```text
-libyears: 151.5 across 191 measured packages · direct 94.5 · worst smalot/pdfparser v1.1.0 (4.7) · 9 not measured
+libyears: 151.5 behind across 191 of 200 packages · 94.5 from direct requirements ·
+furthest behind smalot/pdfparser v1.1.0 at 4.7
 ```
 
 For each package, the years between the release of the version installed and the package's newest
 stable release — the lock's own `time` against the repository's date for its highest stable tag,
 in years of 365.25 days, never below zero — summed over the packages the run analysed (with
-`--dev`, `packages-dev` included). A *libyear* is the unit [Cox et al.](https://libyear.com/)
-proposed for dependency freshness. Nothing about today enters the number: two dates the run already
-holds, so it does not move between two runs on the same lock unless a package releases.
+`--dev`, `packages-dev` included). The *libyear* is the unit [libyear.com](https://libyear.com/)
+gives this measure — "Rails 5.0.0 (June 2016) is 1 libyear behind 5.1.2 (June 2017)"; the metric
+underneath is the version release date of [Cox, Bouwers, van Eekelen and Visser, *Measuring
+Dependency Freshness in Software Systems*, ICSE 2015](https://ericbouwers.github.io/papers/icse15.pdf),
+which that site cites. Nothing about today enters the number: two dates the run already holds, so
+it does not move between two runs on the same lock unless a package releases.
 
 Every finding carries its own value as `libyears` in `--format=json`, `null` when the package is not
-measured, and the report's `libyears` block is the arithmetic over them: `total` and `direct` (the
-same sum over the direct requirements), `measured`, `unmeasured` by reason, `worst`. A consumer can
-recompute every number in the block from the findings: `total` is summed before rounding, so the
-sum of the printed values agrees with it to within 0.005 per measured finding. The HTML page shows the total in its ledger and the value in a sortable column.
+measured, and the report's `libyears` block is the arithmetic over them: `total`,
+`direct_requirements` (the same sum over the findings with `direct: true`), `measured`, `unmeasured`
+by reason, `furthest_behind`. A consumer can recompute every number in the block from the findings:
+`total` is summed before rounding, so the sum of the printed values agrees with it to within 0.005
+per measured finding, and `measured` plus every count in `unmeasured` is the number of findings.
+The HTML page shows the total in its ledger, the value in a sortable column, and the counts by
+reason on the Run tab.
 
 A package is **not measured**, and counted under one of four reasons, when:
 
 | `unmeasured` key | when |
 |---|---|
-| `branch_snapshots` | The installed version is a branch (`dev-main`, `2.x-dev`): it has a commit date, not a release date. Measured by push date a fresh `dev-main` reads as zero and an old one as years of nothing (lox/xhprof on Matomo would add ten). The `pinned` verdict already says what there is to say. |
+| `branch_snapshot` | The installed version is a branch (`dev-main`, `2.x-dev`): it has a commit date, not a release date. Measured by push date a fresh `dev-main` reads as zero and an old one as years of nothing (lox/xhprof on Matomo would add ten). The `pinned` verdict already says what there is to say. |
 | `no_stable_release_date` | No date lockrot trusts for one of the two ends: no stable release exists, or the highest tag carries no date lockrot trusts — a subtree split whose tags share a commit (symfony/polyfill-\*, scheb/2fa-\*) — or the installed version is dated only by such a shared commit (a split whose newest release is [dated by its monorepo parent](#dates-from-the-monorepo): the lock's `time` for illuminate/macroable v10.48.28 is a year and a half before the release), or the lock entry has no `time`. Adding an unknown to a sum is not measuring. |
 | `not_from_composer_repository` | A `path`, `vcs` or `package` repository entry: no metadata was asked for. |
 | `metadata_unavailable` | Metadata was asked for and did not come: not listed, offline, budget, transport. |
@@ -386,21 +393,24 @@ The reasons are checked in this order, and the first that applies is the one cou
 Composer repository, then metadata unavailable, then a branch snapshot, then no dated stable
 release — so a `dev-main` pin on a package that never released counts as a snapshot. A lock ahead
 of the last stable release — a pre-release above it, a tag the repository no longer lists — is
-measured as zero, not dropped; a lock with nothing behind names no worst package.
+measured as zero, not dropped; a lock with nothing behind names no package as furthest behind.
 
 Three things the number is not:
 
-- **A measure of rot.** It counts every drift, healthy patches included: `psr/log 1.1.4` is
-  `finished` and adds 3.4 years for a 3.x it will never need; `sensio/framework-extra-bundle` is
-  `abandoned` and adds zero, because the release installed is the last one there is. The two axes
-  are independent — on the same set of applications the order by libyears and the order by
-  `left-behind` differ — which is why the number does not enter a priority, `--fail-on` or the
-  baseline.
+- **A measure of rot.** It counts every drift, healthy patches included: on the wallabag lock
+  `psr/log 1.1.4` is `finished` and adds 3.4 years for a 3.x it will never need, while
+  `sensio/framework-extra-bundle` is `abandoned` and adds zero, because the release installed is
+  the last one there is; the package furthest behind, `smalot/pdfparser`, is `left-behind`. The
+  two axes do not track each other, which is why the number does not enter a priority, `--fail-on`
+  or the baseline.
 - **A security number.** An advisory is S9 and the priority ladder; this is distance.
 - **php-libyear's number.** [ecoAPM/php-libyear](https://github.com/ecoAPM/php-libyear) reads
   `composer.json` and sums the direct requirements only; lockrot sums the whole lock, which on
-  wallabag is 151.5 against 94.5. `direct` is the same sum restricted to `direct: true` — the
-  number to compare with that tool's.
+  wallabag is 151.5 against 94.5. `direct_requirements` is the same sum restricted to
+  `direct: true` — the nearest number to that tool's, not the same one: run with `--dev` to
+  compare, since php-libyear counts `require` and `require-dev` together; it picks the newest
+  version by the project's `minimum-stability` where lockrot always takes the newest stable; and it
+  scores an undated package as zero where lockrot leaves it unmeasured.
 
 ## Related
 

@@ -202,22 +202,25 @@ test("parseQuery treats an unknown key as text, not as a filter nobody applies",
     assert.deepStrictEqual(lib.parseQuery("license:mit").text, ["license:mit"]);
 });
 
-test("libyearsLine says the total, the direct share, the worst package and what was not measured", () => {
+test("libyearsSummary says the scope, the direct share and the package furthest behind, without the total", () => {
     const block = {
-        total: 151.52, direct: 94.48, measured: 191,
-        unmeasured: { branch_snapshots: 4, no_stable_release_date: 5, not_from_composer_repository: 0, metadata_unavailable: 0 },
-        worst: { package: "smalot/pdfparser", version: "v1.1.0", libyears: 4.71 }
+        total: 151.52, direct_requirements: 94.53, measured: 191,
+        unmeasured: { branch_snapshot: 4, no_stable_release_date: 5, not_from_composer_repository: 0, metadata_unavailable: 0 },
+        furthest_behind: { package: "smalot/pdfparser", version: "v1.1.0", libyears: 4.70 }
     };
-    assert.strictEqual(lib.libyearsLine(block), "151.5 libyears across 191 measured packages · direct 94.5 · worst smalot/pdfparser v1.1.0 (4.7) · 9 not measured");
-    assert.strictEqual(lib.libyearsLine({ ...block, unmeasured: {} }), "151.5 libyears across 191 measured packages · direct 94.5 · worst smalot/pdfparser v1.1.0 (4.7)", "nothing unmeasured, no trailing item");
-    assert.strictEqual(lib.libyearsLine({ total: 1, direct: 1, measured: 1, unmeasured: {}, worst: { package: "a/a", version: "1.0.0", libyears: 1 } }), "1.0 libyears across 1 measured package · direct 1.0 · worst a/a 1.0.0 (1.0)", "one package, singular");
+    assert.strictEqual(lib.libyearsSummary(block), "across 191 of 200 packages · 94.5 from direct requirements · furthest behind smalot/pdfparser v1.1.0 at 4.7");
+    assert.strictEqual(lib.libyearsSummary({ ...block, unmeasured: {} }), "across all 191 packages · 94.5 from direct requirements · furthest behind smalot/pdfparser v1.1.0 at 4.7", "every package measured");
+    assert.strictEqual(lib.libyearsSummary({ total: 1, direct_requirements: 1, measured: 1, unmeasured: {}, furthest_behind: { package: "a/a", version: "1.0.0", libyears: 1 } }), "across the one package · 1.0 from direct requirements · furthest behind a/a 1.0.0 at 1.0");
+    assert.strictEqual(lib.libyearsSummary({ total: 0, direct_requirements: 0, measured: 20, unmeasured: {}, furthest_behind: null }), "across all 20 packages", "nothing behind: the scope alone");
 });
 
-test("libyearsLine says so when nothing was measured, and stays quiet for a document without the block", () => {
-    assert.strictEqual(lib.libyearsLine({ total: 0, direct: 0, measured: 0, unmeasured: { branch_snapshots: 2 }, worst: null }), "nothing measured (2 not measured)");
-    assert.strictEqual(lib.libyearsLine({ total: 0, direct: 0, measured: 0, unmeasured: {}, worst: null }), "nothing measured");
-    assert.strictEqual(lib.libyearsLine(undefined), "", "a report from before the block existed");
-    assert.strictEqual(lib.libyearsLine({}), "", "or a block that is not one");
+test("libyearsSummary says so when nothing was measured, and stays quiet for a block that is not one", () => {
+    assert.strictEqual(lib.libyearsSummary({ total: 0, direct_requirements: 0, measured: 0, unmeasured: { branch_snapshot: 2 }, furthest_behind: null }), "none of the 2 packages could be measured");
+    assert.strictEqual(lib.libyearsSummary({ total: 0, direct_requirements: 0, measured: 0, unmeasured: { branch_snapshot: 1 }, furthest_behind: null }), "the one package could not be measured");
+    assert.strictEqual(lib.libyearsSummary({ total: 0, direct_requirements: 0, measured: 0, unmeasured: {}, furthest_behind: null }), "nothing to measure");
+    assert.strictEqual(lib.libyearsSummary(undefined), "");
+    assert.strictEqual(lib.libyearsSummary({}), "");
+    assert.strictEqual(lib.libyearsSummary({ measured: 3, unmeasured: "nine", furthest_behind: "worst" }), "across all 3 packages", "hostile shapes degrade, never throw");
 });
 
 test("libyearsSortKey puts an unmeasured package below every measured one, zero included", () => {

@@ -59,13 +59,14 @@
       <div class="legend" id="verdictLegend"></div>
     </div>
     <div class="ledger-block">
-      <span class="eyebrow" title="For each measured package, the years between the installed version's release and the package's newest stable release, summed. Counts every drift, healthy patches included: not a measure of rot or of security."><span id="libyearsTotal">—</span> libyears behind</span>
-      <div class="legend" id="libyearsLine" aria-label="Libyears summary"></div>
-    </div>
-    <div class="ledger-block">
       <span class="eyebrow" id="advLabel">Security advisories</span>
       <div class="bar" id="advBar" role="img" aria-label="Advisory severity distribution"></div>
       <div class="legend" id="advLegend"></div>
+    </div>
+    <div class="ledger-block">
+      <span class="eyebrow" title="Years between the installed release and the newest stable release, summed over the measured packages. Counts every drift, healthy patches included.">Libyears behind</span>
+      <p class="figure"><span id="libyearsTotal">—</span></p>
+      <div class="legend" id="libyearsLine"></div>
     </div>
   </div>
 </header>

@@ -290,11 +290,12 @@
     el("advBar").innerHTML = aBar.join("") || '<span style="flex:1;background:var(--none)"></span>';
     el("advLegend").innerHTML = aLeg.join("") || '<span style="color:var(--muted)">no advisory affects this lock</span>';
 
-    // textContent, not innerHTML: the worst package's name is the document's, and this block is
-    // prose, not a filter. A document from before 0.11.0 carries no block and says so.
+    // textContent, not innerHTML: the package furthest behind is named by the document, and this
+    // block is prose, not a filter. The figure stays a dash when the block is missing or nothing
+    // could be measured.
     var ly = REPORT.libyears;
     el("libyearsTotal").textContent = ly && ly.measured ? Number(ly.total).toFixed(1) : "\u2014";
-    el("libyearsLine").textContent = LockrotLib.libyearsLine(ly) || "not in this document";
+    el("libyearsLine").textContent = LockrotLib.libyearsSummary(ly);
   }
 
   /* ---------- rail ---------- */
@@ -614,6 +615,7 @@
   function viewRun() {
     visible = [];
     var t = RUN.thresholds || {};
+    var ly = REPORT.libyears;
     var notes = (REPORT.notes || []).map(function (n) {
       var doc = /token|activity|repository/.test(n) ? "https://lockrot.dev/internals/" : "https://lockrot.dev/configuration/";
       return '<div class="note">' + esc(n) + ' <span style="white-space:nowrap">' + outLink(doc, "what this means") + "</span></div>";
@@ -627,7 +629,12 @@
       ["oldest activity cache", REPORT.activity_cache_oldest_at || "—"],
       ["network failures", String(REPORT.network_failures)],
       ["not from a Composer repository", String(REPORT.not_from_composer_repository)],
-      ["libyears", LockrotLib.libyearsLine(REPORT.libyears) || "not in this document"],
+      ["libyears behind", ly && ly.measured ? Number(ly.total).toFixed(2) : "\u2014"],
+      ["libyears, direct requirements", ly && ly.measured ? Number(ly.direct_requirements).toFixed(2) : "\u2014"],
+      ["libyears measured", ly ? String(ly.measured) : "\u2014"],
+      ["libyears not measured", ly && ly.unmeasured && typeof ly.unmeasured === "object"
+        ? Object.keys(ly.unmeasured).map(function (k) { return k.replace(/_/g, " ") + " " + ly.unmeasured[k]; }).join(" \u00b7 ")
+        : "\u2014"],
       ["baseline", REPORT.baseline ? JSON.stringify(REPORT.baseline) : "none"]
     ].map(function (p) { return "<dt>" + esc(p[0]) + "</dt><dd>" + esc(p[1]) + "</dd>"; }).join("");
     var th = Object.keys(t).map(function (k) { return "<dt>" + esc(k) + "</dt><dd>" + esc(t[k]) + " years</dd>"; }).join("");

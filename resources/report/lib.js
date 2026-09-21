@@ -95,24 +95,32 @@ var LockrotLib = (function () {
   }
 
   /**
-   * The libyears block as one line — `151.5 libyears across 191 measured packages · direct 94.5 ·
-   * worst smalot/pdfparser v1.1.0 (4.7) · 9 not measured` — the same words the table footer
-   * prints. An empty string for a document without the block (a report from before 0.11.0), so the
-   * caller decides what an absent number looks like. Plain text: the caller escapes or uses
-   * textContent, since the worst package's name comes from the document.
+   * The libyears block, minus the total, as the words under the ledger's figure and in the Run
+   * tab: `across 191 of 200 packages · 94.5 from direct requirements · furthest behind
+   * smalot/pdfparser v1.1.0 at 4.7` — the table footer's items after the number, in its words.
+   * `none of the 200 packages could be measured` when nothing was, `nothing to measure` on an
+   * empty run, and an empty string for a block that is not one. Plain text: the caller uses
+   * textContent or escapes, since the package name comes from the document.
    */
-  function libyearsLine(block) {
+  function libyearsSummary(block) {
     if (!block || typeof block.measured !== "number") return "";
-    var skipped = 0;
-    Object.keys(block.unmeasured || {}).forEach(function (k) { skipped += Number(block.unmeasured[k]) || 0; });
-    var tail = skipped ? skipped + " not measured" : "";
-    if (!block.measured || !block.worst) return "nothing measured" + (tail ? " (" + tail + ")" : "");
-    var parts = [
-      Number(block.total).toFixed(1) + " libyears across " + plural(block.measured, "measured package", "measured packages"),
-      "direct " + Number(block.direct).toFixed(1),
-      "worst " + block.worst.package + " " + block.worst.version + " (" + Number(block.worst.libyears).toFixed(1) + ")"
-    ];
-    if (tail) parts.push(tail);
+    var unmeasured = 0;
+    var reasons = block.unmeasured && typeof block.unmeasured === "object" ? block.unmeasured : {};
+    Object.keys(reasons).forEach(function (k) { unmeasured += Number(reasons[k]) || 0; });
+    var packages = block.measured + unmeasured;
+    if (!block.measured) {
+      if (!packages) return "nothing to measure";
+      return packages === 1 ? "the one package could not be measured" : "none of the " + packages + " packages could be measured";
+    }
+    var scope = block.measured === packages
+      ? (packages === 1 ? "the one package" : "all " + packages + " packages")
+      : block.measured + " of " + packages + " packages";
+    var parts = ["across " + scope];
+    var worst = block.furthest_behind;
+    if (worst && typeof worst === "object") {
+      parts.push(Number(block.direct_requirements).toFixed(1) + " from direct requirements");
+      parts.push("furthest behind " + worst.package + " " + worst.version + " at " + Number(worst.libyears).toFixed(1));
+    }
 
     return parts.join(" \u00b7 ");
   }
@@ -157,7 +165,7 @@ var LockrotLib = (function () {
     years: years,
     ageText: ageText,
     plural: plural,
-    libyearsLine: libyearsLine,
+    libyearsSummary: libyearsSummary,
     libyearsSortKey: libyearsSortKey,
     kvRows: kvRows,
     parseQuery: parseQuery
