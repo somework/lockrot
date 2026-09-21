@@ -225,8 +225,8 @@ final class TableFormatter implements FormatterInterface
     }
 
     /**
-     * The block every run ends with: the counts, the priority totals, which direct requirements the
-     * transitive findings are pulled in by, what the baseline made of the run, the data date, and
+     * The block every run ends with: the counts, the priority totals, the libyears line, which
+     * direct requirements the transitive findings are pulled in by, what the baseline made of the run, the data date, and
      * the notes.
      *
      * Wrapped like the rows, but to the full width, with no indent, and without cutting a long
@@ -247,6 +247,9 @@ final class TableFormatter implements FormatterInterface
         if ($hasFlagged) {
             $texts[] = $report->prioritySummaryLine();
         }
+        // Always, clean report included: a lock with nothing to flag can still be years behind, and
+        // that is the one number this report has that a reader can quote.
+        $texts[] = $report->libyears()->line();
         $exposure = $report->exposureSummaryLine();
         if ($exposure !== '') {
             $texts[] = $exposure;

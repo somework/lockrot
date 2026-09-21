@@ -124,6 +124,22 @@ final class MarkdownFormatterTest extends TestCase
         self::assertSame('- note: a note', $lines[$exposure + 2]);
     }
 
+    public function testTheLibyearsLineIsItsOwnParagraphBetweenTheTableAndTheExposureLine(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $report = new Report([
+            new Finding('acme/leaf', '1.0.0', Verdict::STALE, [new Signal('S2', 'warn', 'old')], ['a/parent', 'acme/leaf'], null, $at, null, false, ['a/parent'], 2.3),
+            new Finding('acme/<b>', '1.0.0', Verdict::STALE, [new Signal('S2', 'warn', 'old')], ['acme/<b>'], null, $at, null, false, ['acme/<b>'], 1.0),
+        ], [], $at, 2, 0, false);
+        $lines = explode("\n", $this->formatter()->format($report));
+        $libyears = array_search('libyears: 3.3 across 2 measured packages · direct 1.0 · worst acme/leaf 1.0.0 (2.3)', $lines, true);
+
+        self::assertNotFalse($libyears, implode("\n", $lines));
+        self::assertSame('', $lines[$libyears - 1], 'a blank line separates it from the table');
+        self::assertSame('', $lines[$libyears + 1]);
+        self::assertSame('pulled in by: a/parent 1', $lines[$libyears + 2]);
+    }
+
     public function testNoExposureLineWhenNothingIsPulledInThroughAnotherPackage(): void
     {
         self::assertStringNotContainsString('pulled in by:', $this->formatter()->format($this->report()));

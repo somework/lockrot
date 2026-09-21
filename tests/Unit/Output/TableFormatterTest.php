@@ -285,12 +285,37 @@ final class TableFormatterTest extends TestCase
     public function testTheSummaryBlockKeepsItsOrderWithThePriorityLineAfterTheCounts(): void
     {
         $lines = $this->plainLines($this->formatter(200)->format($this->report()));
-        $tail = \array_slice($lines, -4);
+        $tail = \array_slice($lines, -5);
 
         self::assertSame('6 packages checked · abandoned 2 · silent 0 · pinned 0 · left-behind 0 · old-promise 0 · stale 2 · unknown 0 · finished 1 · ok 1', $tail[0]);
         self::assertSame('priority: critical 1 · high 1 · medium 1 · low 1', $tail[1]);
-        self::assertSame('Data as of 2026-09-14 (package repositories, repository hosts). Run composer lockrot --format=json for details.', $tail[2]);
-        self::assertSame('note: GitHub token not set: repository activity checked only for 2 candidate packages (0 skipped); set GITHUB_TOKEN to check all', $tail[3]);
+        // the fixture findings carry no libyears value, so the line says so rather than inventing a zero
+        self::assertSame('libyears: nothing measured (6 not measured)', $tail[2]);
+        self::assertSame('Data as of 2026-09-14 (package repositories, repository hosts). Run composer lockrot --format=json for details.', $tail[3]);
+        self::assertSame('note: GitHub token not set: repository activity checked only for 2 candidate packages (0 skipped); set GITHUB_TOKEN to check all', $tail[4]);
+    }
+
+    /** The libyears line sits between the priority totals and the exposure line, and folds between its items like the counts line. */
+    public function testTheLibyearsLineFollowsThePriorityTotals(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $report = new Report([
+            new Finding('smalot/pdfparser', 'v1.1.0', Verdict::LEFT_BEHIND, [new Signal('S8', 'warn', 'branch 1.x last released 2022-01-03')], ['smalot/pdfparser'], null, $at, null, false, ['smalot/pdfparser'], 4.7123),
+            new Finding('psr/log', '1.1.4', Verdict::FINISHED, [], ['smalot/pdfparser', 'psr/log'], 'interfaces', $at, null, false, ['smalot/pdfparser'], 3.36),
+            new Finding('wallabag/rulerz', 'dev-master', Verdict::PINNED, [new Signal('S6', 'warn', 'pinned')], ['wallabag/rulerz'], null, $at, null, false, ['wallabag/rulerz']),
+        ], [], $at, 3, 0, false);
+        $lines = $this->plainLines($this->formatter(200)->format($report));
+        $priority = array_search('priority: critical 0 · high 2 · medium 0 · low 0', $lines, true);
+
+        self::assertNotFalse($priority);
+        self::assertSame('libyears: 8.1 across 2 measured packages · direct 4.7 · worst smalot/pdfparser v1.1.0 (4.7) · 1 not measured', $lines[$priority + 1]);
+        self::assertStringStartsWith('Data as of ', $lines[$priority + 2]);
+
+        // narrow: the line folds between items, and every fold ends on the separator
+        $narrow = $this->plainLines($this->formatter(60)->format($report));
+        $first = array_search('libyears: 8.1 across 2 measured packages · direct 4.7 ·', $narrow, true);
+        self::assertNotFalse($first, implode("\n", $narrow));
+        self::assertSame('worst smalot/pdfparser v1.1.0 (4.7) · 1 not measured', $narrow[$first + 1]);
     }
 
     public function testTheFooterStatesTheAgeOfCachedActivity(): void
@@ -402,8 +427,10 @@ final class TableFormatterTest extends TestCase
         // the same blank line a grouped report puts before its summary block
         self::assertSame('', $lines[1]);
         self::assertStringContainsString(' packages checked', $lines[2]);
-        // and no `priority: critical 0 · high 0 · medium 0 · low 0` under it
-        self::assertStringStartsWith('Data as of ', $lines[3]);
+        // and no `priority: critical 0 · high 0 · medium 0 · low 0` under it — the libyears line, yes:
+        // a clean lock can still be years behind
+        self::assertSame('libyears: nothing measured (1 not measured)', $lines[3]);
+        self::assertStringStartsWith('Data as of ', $lines[4]);
     }
 
     /**
@@ -489,9 +516,11 @@ final class TableFormatterTest extends TestCase
         }
 
         self::assertNotNull($index);
+        // the libyears line sits between the two
+        self::assertStringStartsWith('libyears: ', $lines[$index + 1]);
         self::assertSame(
             'baseline: 1 known · 2 new · 1 worsened · 1 stale (lockrot-baseline.json)',
-            $lines[$index + 1]
+            $lines[$index + 2]
         );
     }
 
@@ -563,7 +592,8 @@ final class TableFormatterTest extends TestCase
         self::assertContains('pulled in by: r/a 1 · r/b 1 · r/c 1 · r/d 1 · r/e 1 · … and 2 more', $lines);
         $priority = array_search('priority: critical 0 · high 1 · medium 1 · low 1', $lines, true);
         self::assertNotFalse($priority);
-        self::assertStringStartsWith('pulled in by: ', $lines[$priority + 1]);
+        self::assertStringStartsWith('libyears: ', $lines[$priority + 1]);
+        self::assertStringStartsWith('pulled in by: ', $lines[$priority + 2]);
     }
 
     public function testNoPulledInByLineWhenNothingIsReachedThroughAnotherPackage(): void
