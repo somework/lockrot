@@ -26,8 +26,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   data of an S5 signal — so a run where S5 never fired left no trace of what it aimed at, and the
   thresholds left none at all; two people comparing two reports could not tell whether they differ
   because the locks do or because the settings do. The report now carries a `run` block with the
-  target PHP, the thresholds, the `fail-on`, the name of the lock (never its path) and
-  `flagged_verdicts`, the verdicts the run counted as findings. Each finding also carries
+  project's own name from composer.json — until now nothing in a report said which project it was
+  about, every lock being called composer.lock — the target PHP, the thresholds, the `fail-on`, the
+  name of the lock (never its path) and `flagged_verdicts`, the verdicts the run counted as
+  findings. Each finding also carries
   `baseline`, where it stands against the baseline file — `known`, `new` or `worsened`, with the
   verdict the baseline accepted — beside the totals the `baseline` block already gave. Both are
   optional in the [published schema](docs/schema.md), so documents written by 0.9.0 still validate.

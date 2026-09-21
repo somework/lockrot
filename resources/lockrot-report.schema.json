@@ -834,6 +834,7 @@
       "description": "What the run was told to do. Every verdict depends on it: the thresholds decide stale from silent, the target PHP decides whether a release predates it. Optional, because reports written before 0.10.0 do not carry it.",
       "type": "object",
       "required": [
+        "project",
         "target_php",
         "lock_file",
         "fail_on",
@@ -841,6 +842,17 @@
         "flagged_verdicts"
       ],
       "properties": {
+        "project": {
+          "description": "The name the project gives itself in composer.json, the one thing that says which project the report is about. Null where an application does not name itself.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/packageName"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
         "target_php": {
           "description": "The PHP version the project targets, as --target-php, config.platform.php or the running PHP gave it.",
           "oneOf": [

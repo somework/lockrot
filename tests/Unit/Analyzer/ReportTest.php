@@ -224,11 +224,12 @@ final class ReportTest extends TestCase
     public function testTheReportRecordsWhatTheRunWasToldToDo(): void
     {
         $report = $this->report($this->finding('vendor/a', Verdict::SILENT))
-            ->withRun(new RunSettings('8.4', '/home/someone/clients/acme/composer.lock', 'silent', new Thresholds(2, 4, 6, 8)));
+            ->withRun(new RunSettings('acme/shop', '8.4', '/home/someone/clients/acme/composer.lock', 'silent', new Thresholds(2, 4, 6, 8)));
 
         $run = JsonPath::arrayAt($report->toArray(), ['run']);
 
         self::assertSame([
+            'project' => 'acme/shop',
             'target_php' => '8.4',
             'lock_file' => 'composer.lock',
             'fail_on' => 'silent',
@@ -255,7 +256,7 @@ final class ReportTest extends TestCase
      */
     public function testTheRunNamesTheLockAndNeverLocatesIt(): void
     {
-        $report = $this->report()->withRun(new RunSettings(null, '/srv/deploy/acme-bank/composer.lock', 'none', null));
+        $report = $this->report()->withRun(new RunSettings(null, null, '/srv/deploy/acme-bank/composer.lock', 'none', null));
 
         $json = json_encode($report->toArray());
 
@@ -272,7 +273,7 @@ final class ReportTest extends TestCase
      */
     public function testTheRunNamesWhichVerdictsAreFindings(): void
     {
-        $flagged = JsonPath::arrayAt($this->report()->withRun(new RunSettings(null, null, null, null))->toArray(), ['run', 'flagged_verdicts']);
+        $flagged = JsonPath::arrayAt($this->report()->withRun(new RunSettings(null, null, null, null, null))->toArray(), ['run', 'flagged_verdicts']);
 
         self::assertNotContains(Verdict::UNKNOWN, $flagged);
         self::assertNotContains(Verdict::FINISHED, $flagged);
@@ -329,7 +330,7 @@ final class ReportTest extends TestCase
     public function testTheRunOutlivesWithBaseline(): void
     {
         $report = $this->report($this->finding('vendor/a', Verdict::SILENT))
-            ->withRun(new RunSettings('8.3', null, 'none', null));
+            ->withRun(new RunSettings(null, '8.3', null, 'none', null));
 
         $compared = $report->withBaseline(BaselineComparison::compare(
             Baseline::fromReport($report),

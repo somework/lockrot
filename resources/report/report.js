@@ -1056,7 +1056,8 @@
   el("fDate").textContent = day(REPORT.generated_at);
   el("mData").textContent = day(REPORT.generated_at);
   el("mTarget").textContent = RUN.target_php || "\u2014";
-  el("projectName").textContent = RUN.lock_file || "composer.lock";
+  // The project names itself; the lock is called composer.lock everywhere, so it is the fallback.
+  el("projectName").textContent = RUN.project || RUN.lock_file || "composer.lock";
 
   readHash();
   var WIDE = !window.matchMedia || window.matchMedia("(min-width: 1181px)").matches;

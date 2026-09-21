@@ -21,18 +21,26 @@ use Lockrot\Verdict\Verdict;
  * reason: a reader deciding what counts as a finding should not have to know the severity ladder by
  * heart or guess it from the counts.
  *
+ * `project` is the name the project gives itself in composer.json, which is the only thing in a
+ * report that says which project it is about — every lock in the world is called composer.lock.
+ * Null where an application does not name itself, which composer.json does not require it to.
+ *
  * The lock is named, never located: a report is something people publish, and an absolute path
- * carries the account it ran under and often the client's directory name.
+ * carries the account it ran under and often the client's directory name. The project's own name is
+ * a different thing — chosen metadata about the project the report already describes in full,
+ * rather than a fact about the machine it happened to run on.
  */
 final class RunSettings
 {
+    private ?string $project;
     private ?string $targetPhp;
     private ?string $lockFile;
     private ?string $failOn;
     private ?Thresholds $thresholds;
 
-    public function __construct(?string $targetPhp, ?string $lockPath, ?string $failOn, ?Thresholds $thresholds)
+    public function __construct(?string $project, ?string $targetPhp, ?string $lockPath, ?string $failOn, ?Thresholds $thresholds)
     {
+        $this->project = $project;
         $this->targetPhp = $targetPhp;
         $this->lockFile = $lockPath === null ? null : basename($lockPath);
         $this->failOn = $failOn;
@@ -43,6 +51,7 @@ final class RunSettings
     public function toArray(): array
     {
         return [
+            'project' => $this->project,
             'target_php' => $this->targetPhp,
             'lock_file' => $this->lockFile,
             'fail_on' => $this->failOn,

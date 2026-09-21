@@ -83,8 +83,9 @@ consumer usually keys on:
 - `verdict`, `priority` and a signal's `level` are enums — the nine verdicts, five priorities and
   three levels from [verdicts.md](verdicts.md).
 - `counts` and `priorities` always carry every key, zero included.
-- `run` says what the report was decided against — the target PHP, the thresholds, the `fail-on`,
-  the name of the lock — plus `flagged_verdicts`, the verdicts this run counted as findings. It is
+- `run` says what the report is about and what it was decided against — the project's own name
+  from composer.json, the target PHP, the thresholds, the `fail-on`, the name of the lock — plus
+  `flagged_verdicts`, the verdicts this run counted as findings. It is
   optional in the schema so that documents written before 0.10.0 still validate, and null only
   where nothing filled it in.
 - Each finding carries `baseline`, where it stands against the baseline file (`known`, `new` or

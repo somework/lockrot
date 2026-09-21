@@ -305,7 +305,7 @@ its slashes unescaped. Two are equivalent:
   the list. Breaking out of the loop at the first of them selects exactly what stepping over each of
   them selects. It is `continue` because the loop's condition is about one package, not about where
   the list stops.
-- `src/Analyzer/RunSettings.php:55` UnwrapArrayValues — `array_values()` falls away from
+- `src/Analyzer/RunSettings.php:64` UnwrapArrayValues — `array_values()` falls away from
   `flagged_verdicts`. `Verdict::all()` returns the keys of `SEVERITY` in declaration order and the
   flagged ones are the first six of them, so `array_filter()` leaves 0..5 and the reindex changes
   nothing that a test can see. It stays because the day a flagged verdict is declared below an
