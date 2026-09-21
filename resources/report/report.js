@@ -66,7 +66,7 @@
    */
   function repoUrl(f) {
     var link = (DETAILS[f.package] || {}).repository_link;
-    return typeof link === "string" && /^https?:\/\//.test(link) ? link : null;
+    return safeHref(link);
   }
   /**
    * Definition rows, minus the ones with nothing to say. A row whose value is null is dropped
@@ -83,6 +83,19 @@
   function kvSection(heading, rows) {
     return rows ? '<section class="sect"><h3>' + esc(heading) + '</h3><dl class="kv">' + rows + "</dl></section>" : "";
   }
+  /**
+   * The row for a package, found without building a selector out of its name. A name is data, and
+   * CSS has metacharacters of its own: one backslash or bracket in it and querySelector throws,
+   * which would take the keyboard with it.
+   */
+  function rowFor(name) {
+    var rows = document.querySelectorAll("[data-pkg]");
+    for (var i = 0; i < rows.length; i++) {
+      if (rows[i].getAttribute("data-pkg") === name) return rows[i];
+    }
+
+    return null;
+  }
   function repoHost(url) {
     var m = /^https?:\/\/([^/]+)/.exec(url || "");
     return m ? m[1].replace(/^www\./, "") : "repository";
@@ -90,8 +103,25 @@
   function cveUrl(a) {
     return a.cve && /^CVE-/.test(a.cve) ? "https://nvd.nist.gov/vuln/detail/" + a.cve : null;
   }
+  /**
+   * A URL the page may put in an href, or null.
+   *
+   * The page renders data it did not produce. A package's own metadata reaches it — the name, the
+   * description, the repository, and through the advisory feed a `link` and a title — and so does
+   * the document's `$schema`. Any of those arriving as `javascript:` would be a link that runs
+   * script in whatever origin the page is open in. `target="_blank"` happens to stop Chrome
+   * following such a link today, which is luck, not a defence: it is the scheme that has to be
+   * checked, once, where the href is written.
+   */
+  function safeHref(url) {
+    var value = typeof url === "string" ? url.trim() : "";
+    return /^https?:\/\/[^\s<>"']+$/i.test(value) ? value : null;
+  }
   function outLink(url, text) {
-    return '<a class="out" href="' + esc(url) + '" target="_blank" rel="noopener noreferrer">' + esc(text) + "</a>";
+    var href = safeHref(url);
+    if (href === null) return '<span class="out">' + esc(text) + "</span>";
+
+    return '<a class="out" href="' + esc(href) + '" target="_blank" rel="noopener noreferrer">' + esc(text) + "</a>";
   }
   /**
    * The verdicts that count as findings, as the tool itself defines them — `context.flagged_verdicts`
@@ -981,7 +1011,7 @@
   /** Puts focus back on the row the detail was opened from. */
   function lastRow() {
     if (cursor < 0 || !visible[cursor]) return;
-    var node = document.querySelector('[data-pkg="' + visible[cursor].package.replace(/"/g, '\\"') + '"]');
+    var node = rowFor(visible[cursor].package);
     if (node && node.focus) node.focus();
   }
 
@@ -1012,7 +1042,7 @@
       cursor = Math.max(0, Math.min(visible.length - 1, cursor + (e.key === "j" ? 1 : -1)));
       select(visible[cursor].package);
       render();
-      var node = document.querySelector('[data-pkg="' + visible[cursor].package.replace(/"/g, '\\"') + '"]');
+      var node = rowFor(visible[cursor].package);
       if (node) node.scrollIntoView({ block: "nearest" });
     }
   });
