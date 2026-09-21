@@ -30,6 +30,7 @@ use Lockrot\Json\JsonReader;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\JsonPath;
+use Lockrot\Tests\Support\MemoisingMetadataLoader;
 use Lockrot\Tests\Support\RecordingOutput;
 use Lockrot\Tests\Support\SplitStreamOutput;
 use Lockrot\Verdict\VerdictEngine;
@@ -50,7 +51,7 @@ final class LockrotCommandTest extends TestCase
     private const FIXED_NOW = '2026-09-14T00:00:00+00:00';
 
     private static ?FixtureRepositoryServer $server = null;
-    private static ?RepositoryMetadataLoader $loader = null;
+    private static ?MemoisingMetadataLoader $loader = null;
 
     private string $cwd;
     /** @var list<string> */
@@ -61,8 +62,14 @@ final class LockrotCommandTest extends TestCase
         self::$server = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK, self::LARAVEL_LOCK]);
         self::$server->start();
         // One loader shared across every test in this class, matching how a real analyzer run uses
-        // it: one instance queried repeatedly rather than rebuilt per call.
-        self::$loader = new RepositoryMetadataLoader(self::$server->repositories(), Clock::fixed(self::FIXED_NOW));
+        // it: one instance queried repeatedly rather than rebuilt per call. It remembers what it
+        // has already been asked for, because every test here runs the command over the same
+        // 200-package lock and fetching all two hundred again for each of them was 30 of this
+        // class's 40 seconds — and the class is most of the unit suite, and mutation testing pays
+        // it again per mutant. What loading really does is tested in RepositoryMetadataLoaderTest.
+        self::$loader = new MemoisingMetadataLoader(
+            new RepositoryMetadataLoader(self::$server->repositories(), Clock::fixed(self::FIXED_NOW))
+        );
     }
 
     public static function tearDownAfterClass(): void
@@ -96,7 +103,7 @@ final class LockrotCommandTest extends TestCase
         $this->tempDirs = [];
     }
 
-    private function loader(): RepositoryMetadataLoader
+    private function loader(): MemoisingMetadataLoader
     {
         $loader = self::$loader;
         self::assertNotNull($loader);
