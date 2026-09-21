@@ -15,6 +15,7 @@
     "counts",
     "priorities",
     "exposure",
+    "libyears",
     "baseline",
     "notes",
     "findings"
@@ -167,6 +168,90 @@
             "type": "integer",
             "minimum": 1
           }
+        }
+      }
+    },
+    "libyears": {
+      "description": "How far behind the lock is, in libyears: for each measured finding, the years (365.25 days) between the installed version's release and the package's newest stable release, never below zero, summed. Derived from `findings`: `total` is the sum of the unrounded per-finding values, `direct` the same over `direct: true`, `measured` the number of findings whose `libyears` is not null, `unmeasured` the null ones by reason, `worst` the greatest (ties to the first package name; null when nothing was measured). Every drift counts, healthy patches included: this is not a measure of rot or of security, and not php-libyear's number, which sums composer.json's direct requirements only.",
+      "type": "object",
+      "required": [
+        "total",
+        "direct",
+        "measured",
+        "unmeasured",
+        "worst"
+      ],
+      "properties": {
+        "total": {
+          "description": "Sum over every measured finding, two decimals.",
+          "type": "number",
+          "minimum": 0
+        },
+        "direct": {
+          "description": "Sum over the measured direct requirements, two decimals.",
+          "type": "number",
+          "minimum": 0
+        },
+        "measured": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unmeasured": {
+          "description": "Findings with `libyears: null`, by the first reason that applies.",
+          "type": "object",
+          "required": [
+            "branch_snapshots",
+            "no_stable_release_date",
+            "not_from_composer_repository",
+            "metadata_unavailable"
+          ],
+          "properties": {
+            "branch_snapshots": {
+              "description": "A dev pin (`dev-main`, `2.x-dev`): a commit date, not a release date.",
+              "type": "integer",
+              "minimum": 0
+            },
+            "no_stable_release_date": {
+              "description": "No stable release, or its newest one undated, or the lock entry without a `time`.",
+              "type": "integer",
+              "minimum": 0
+            },
+            "not_from_composer_repository": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "metadata_unavailable": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "worst": {
+          "oneOf": [
+            {
+              "type": "object",
+              "required": [
+                "package",
+                "version",
+                "libyears"
+              ],
+              "properties": {
+                "package": {
+                  "$ref": "#/definitions/packageName"
+                },
+                "version": {
+                  "type": "string"
+                },
+                "libyears": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       }
     },
@@ -327,7 +412,8 @@
         "evidence",
         "allowlist_reason",
         "note",
-        "data_date"
+        "data_date",
+        "libyears"
       ],
       "properties": {
         "package": {
@@ -393,6 +479,14 @@
               "type": "null"
             }
           ]
+        },
+        "libyears": {
+          "description": "Years (365.25 days) between the installed version's release and the package's newest stable release, at least 0, two decimals; null when not measured: a branch snapshot, no dated stable release, not from a Composer repository, or metadata unavailable.",
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
         },
         "baseline": {
           "$ref": "#/definitions/baselineStanding"

@@ -338,6 +338,22 @@ list, which `…` stands in for:
         },
         …
     ],
+    "libyears": {
+        "total": 151.52,
+        "direct": 94.48,
+        "measured": 191,
+        "unmeasured": {
+            "branch_snapshots": 4,
+            "no_stable_release_date": 5,
+            "not_from_composer_repository": 0,
+            "metadata_unavailable": 0
+        },
+        "worst": {
+            "package": "smalot/pdfparser",
+            "version": "v1.1.0",
+            "libyears": 4.71
+        }
+    },
     "baseline": null,
     "notes": [],
     "findings": [
@@ -379,7 +395,8 @@ list, which `…` stands in for:
             "evidence": "marked abandoned by its repository, replacement: Symfony; repository archived on GitHub; last release 2023-02-24 (3.6 years ago); last push 2023-02-24 (3.6 years ago); released 2023-02-24, before PHP 8.4 GA (2024-11-21); php constraint \">=7.2.5\" has no upper bound; pulls in 1 flagged package: doctrine/annotations (abandoned)",
             "allowlist_reason": null,
             "note": null,
-            "data_date": "2026-09-15T17:31:32+00:00"
+            "data_date": "2026-09-15T17:31:32+00:00",
+            "libyears": 0.0
         },
         …
     ]
@@ -388,9 +405,11 @@ list, which `…` stands in for:
 
 The cut signals have the same shape as S1 and S2; S7 carries the packages it names under `data`. So
 do the other 199 findings, each with its own `priority`, `direct`, `dev`, `signals`, `chain`,
-`direct_dependents`, `evidence`, `allowlist_reason`, `note` and `data_date`. `exposure` is the
+`direct_dependents`, `evidence`, `allowlist_reason`, `note`, `data_date` and `libyears`. `exposure` is the
 `pulled in by:` line in full — every direct requirement that pulls in a flagged transitive package,
-with how many, most first.
+with how many, most first. `libyears` is the [libyears block](verdicts.md#libyears), summed from the
+findings: sensio/framework-extra-bundle is abandoned and *zero* libyears behind — its last release is
+the one installed — which is the point of keeping the two numbers apart.
 
 ## A clean run
 

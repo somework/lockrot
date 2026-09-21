@@ -62,7 +62,7 @@
         "finding": {
             "description": "The same object the report's `findings[]` carries; see report-1.json for the per-signal `data` shapes.",
             "type": "object",
-            "required": ["package", "version", "verdict", "priority", "direct", "dev", "signals", "chain", "direct_dependents", "evidence", "allowlist_reason", "note", "data_date"],
+            "required": ["package", "version", "verdict", "priority", "direct", "dev", "signals", "chain", "direct_dependents", "evidence", "allowlist_reason", "note", "data_date", "libyears"],
             "properties": {
                 "package": { "$ref": "#/definitions/packageName" },
                 "version": { "type": "string" },
@@ -88,7 +88,8 @@
                 "evidence": { "type": "string" },
                 "allowlist_reason": { "type": ["string", "null"] },
                 "note": { "type": ["string", "null"] },
-                "data_date": { "oneOf": [{ "$ref": "#/definitions/dateTime" }, { "type": "null" }] }
+                "data_date": { "oneOf": [{ "$ref": "#/definitions/dateTime" }, { "type": "null" }] },
+                "libyears": { "description": "Years behind the newest stable release, at least 0; null when not measured. See report-1.json.", "type": ["number", "null"], "minimum": 0 }
             }
         },
         "metadata": {
