@@ -81,7 +81,7 @@ high (58)
   …
 200 packages checked · abandoned 19 · silent 8 · pinned 4 · left-behind 11 · old-promise 38 · stale 3 · …
 priority: critical 3 · high 58 · medium 18 · low 4
-libyears: 151.5 behind across 191 of 200 packages · 94.5 from direct requirements · furthest behind smalot/pdfparser v1.1.0 at 4.7
+libyears: 163.7 behind across 195 of 200 packages · 106.7 from direct requirements · furthest behind smalot/pdfparser v1.1.0 at 4.7
 pulled in by: wallabag/rulerz-bundle 15 · wallabag/rulerz 14 · wallabag/phpepub 5 · …
 …
 ```
@@ -127,7 +127,7 @@ flagged packages it pulls in. The `pulled in by:` summary line sums that up — 
 exposure](https://lockrot.dev/verdicts/#transitive-exposure).
 
 The footer's `libyears:` line is one number for the whole lock: for each package, the years between
-the release installed and the package's newest stable release, summed — 151.5 for wallabag, with the
+the release installed and the package's newest stable release, summed — 163.7 for wallabag, with the
 package furthest behind named. It is laid over the verdicts, not one of them: every drift counts,
 healthy patches included, so it says how far behind the lock is and nothing about why. Each finding
 carries its own value in `--format=json`, and the report's block is the arithmetic over them —

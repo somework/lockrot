@@ -281,7 +281,7 @@ low (2)
 200 packages checked · abandoned 19 · silent 8 · pinned 4 · left-behind 11 · old-promise 38 · stale 3 ·
 unknown 0 · finished 18 · ok 99
 priority: critical 3 · high 64 · medium 14 · low 2
-libyears: 151.5 behind across 191 of 200 packages · 94.5 from direct requirements ·
+libyears: 163.7 behind across 195 of 200 packages · 106.7 from direct requirements ·
 furthest behind smalot/pdfparser v1.1.0 at 4.7
 pulled in by: wallabag/rulerz-bundle 15 · wallabag/rulerz 14 · wallabag/phpepub 5 ·
 scheb/2fa-google-authenticator 3 · friendsofsymfony/jsrouting-bundle 2 · … and 21 more
@@ -341,12 +341,12 @@ list, which `…` stands in for:
         …
     ],
     "libyears": {
-        "total": 151.52,
-        "direct_requirements": 94.53,
-        "measured": 191,
+        "total": 163.69,
+        "direct_requirements": 106.7,
+        "measured": 195,
         "unmeasured": {
             "branch_snapshot": 4,
-            "no_stable_release_date": 5,
+            "no_stable_release_date": 1,
             "not_from_composer_repository": 0,
             "metadata_unavailable": 0
         },

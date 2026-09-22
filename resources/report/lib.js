@@ -120,7 +120,7 @@ var LockrotLib = (function () {
     var version = String(finding.version || "").replace(/#.*$/, "");
     if (/^dev-/.test(version) || /-dev$/.test(version)) return "branch snapshot";
 
-    return "no dated stable release";
+    return "no release date lockrot trusts";
   }
 
   /**

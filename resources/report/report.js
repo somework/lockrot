@@ -1056,7 +1056,10 @@
     }
     var newest = meta && meta.last_stable_version ? String(meta.last_stable_version) : null;
     var why;
-    if (value === "0.0") {
+    if (meta && meta.has_stable_release && !meta.last_stable_release) {
+      // measured to the newest dated release above the installed one: the newest tag is undated
+      why = "at least: the newest release is undated, measured to the newest dated one above";
+    } else if (value === "0.0") {
       why = newest && newest !== f.version ? "ahead of the newest stable, " + newest : "the installed release is the newest";
     } else {
       why = newest ? "newest " + newest + (meta.last_stable_release ? " released " + day(meta.last_stable_release) : "") : null;

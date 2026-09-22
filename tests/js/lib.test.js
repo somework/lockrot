@@ -243,8 +243,8 @@ test("libyearsReason names why a finding was not measured, in the block's own wo
     assert.strictEqual(lib.libyearsReason({ libyears: null, version: "1.0.0", note: "Repository metadata unavailable: timeout" }), "metadata unavailable");
     assert.strictEqual(lib.libyearsReason({ libyears: null, version: "dev-main", note: null }), "branch snapshot");
     assert.strictEqual(lib.libyearsReason({ libyears: null, version: "2.x-dev#abc123" }), "branch snapshot", "the reference is stripped first");
-    assert.strictEqual(lib.libyearsReason({ libyears: null, version: "v1.37.0" }), "no dated stable release");
-    assert.strictEqual(lib.libyearsReason({ version: "v1.37.0" }), "no dated stable release", "a document from before the field reads as unmeasured");
+    assert.strictEqual(lib.libyearsReason({ libyears: null, version: "v1.37.0" }), "no release date lockrot trusts");
+    assert.strictEqual(lib.libyearsReason({ version: "v1.37.0" }), "no release date lockrot trusts", "a document from before the field reads as unmeasured");
     assert.strictEqual(lib.libyearsReason(undefined), "");
 });
 

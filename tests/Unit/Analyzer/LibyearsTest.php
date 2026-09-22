@@ -22,9 +22,16 @@ final class LibyearsTest extends TestCase
         return new LockedPackage('scheb/2fa-bundle', $version, $time === null ? null : new \DateTimeImmutable($time), null, [], null, 'library', $fromComposerRepository, $dev, false);
     }
 
-    private function metadata(?string $lastStableReleaseAt): PackageMetadata
+    /** @param array<array-key, array{string, ?string}> $branches branch key (an int where PHP makes one) => [newest dated version, its date] */
+    private function metadata(?string $lastStableReleaseAt, array $branches = []): PackageMetadata
     {
-        return new PackageMetadata('scheb/2fa-bundle', false, null, true, $lastStableReleaseAt === null ? null : new \DateTimeImmutable($lastStableReleaseAt), 'v8.6.1', 12, null, 'library', new \DateTimeImmutable('2026-09-14T00:00:00+00:00'));
+        $byBranch = [];
+        foreach ($branches as $key => [$version, $at]) {
+            $date = $at === null ? null : new \DateTimeImmutable($at);
+            $byBranch[$key] = ['version' => $version, 'at' => $date, 'highest' => ['normalized' => ltrim($version, 'v').'.0', 'pretty' => $version, 'at' => $date]];
+        }
+
+        return new PackageMetadata('scheb/2fa-bundle', false, null, true, $lastStableReleaseAt === null ? null : new \DateTimeImmutable($lastStableReleaseAt), 'v8.6.1', 12, null, 'library', new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), $byBranch);
     }
 
     private static function finding(string $package, ?float $libyears, bool $direct = true, string $version = '1.0.0', ?string $note = null): Finding
@@ -73,9 +80,79 @@ final class LibyearsTest extends TestCase
         self::assertNull(Libyears::behind($this->package(), null));
     }
 
-    public function testAnUndatedLastStableReleaseIsNotMeasured(): void
+    public function testAnUndatedLastStableReleaseIsNotMeasuredWhenNothingAboveIsDatedEither(): void
     {
         self::assertNull(Libyears::behind($this->package(), $this->metadata(null)));
+        self::assertNull(Libyears::behind($this->package(), $this->metadata(null, ['8' => ['v8.6.1', null], '5' => ['v5.13.2', self::LOCKED_AT]])), 'the installed branch alone, and its newest is the installed version');
+    }
+
+    /**
+     * scheb/2fa-backup-code: v8.3.0 to v8.6.1 sit on one commit, all "2026-01-24", so the newest
+     * release is undated — but a tag's commit is never younger than the release it names, so the
+     * newest trusted date above the installed version bounds the answer from below.
+     */
+    public function testWhenTheNewestReleaseIsUndatedTheNewestTrustedDateAboveTheInstalledVersionCounts(): void
+    {
+        $metadata = $this->metadata(null, [
+            '8' => ['v8.6.1', '2026-01-24T13:26:10+00:00'],
+            '7' => ['v7.14.0', '2026-01-24T12:00:00+00:00'],
+            '6' => ['v6.13.1', '2024-11-29T00:00:00+00:00'],
+            '5' => ['v5.13.2', self::LOCKED_AT],
+        ]);
+        $behind = Libyears::behind($this->package(), $metadata);
+
+        self::assertNotNull($behind);
+        self::assertEqualsWithDelta(4.06, $behind, 0.005);
+    }
+
+    /**
+     * The branch view is a map in whatever order the repository listed the branches; an undated
+     * branch, a backport below, or a lower version on the installed branch listed *first* must be
+     * stepped over, not stop the scan, and the newest date wins whatever position it sits in.
+     */
+    public function testTheScanStepsOverWhatDoesNotCountAndKeepsTheNewestDateWhereverItIsListed(): void
+    {
+        $listedOldestFirst = $this->metadata(null, [
+            '8' => ['v8.6.1', null],
+            '4' => ['v4.9.9', '2026-03-01T00:00:00+00:00'],
+            '5' => ['v5.13.1', '2026-02-01T00:00:00+00:00'],
+            '6' => ['v6.13.1', '2024-11-29T00:00:00+00:00'],
+            '7' => ['v7.14.0', '2026-01-24T13:26:10+00:00'],
+        ]);
+        $behind = Libyears::behind($this->package(), $listedOldestFirst);
+
+        self::assertNotNull($behind);
+        self::assertEqualsWithDelta(4.06, $behind, 0.005, 'the 7.x date, not the 6.x one listed before it, and none of the three that do not count');
+    }
+
+    public function testABackportOnALowerBranchReleasedLaterIsNotAheadOfTheInstalledVersion(): void
+    {
+        $metadata = $this->metadata(null, [
+            '5' => ['v5.13.2', self::LOCKED_AT],
+            '4' => ['v4.9.9', '2026-03-01T00:00:00+00:00'],
+        ]);
+
+        self::assertNull(Libyears::behind($this->package(), $metadata));
+    }
+
+    public function testOnTheInstalledBranchOnlyAHigherVersionCounts(): void
+    {
+        $newerPatch = $this->metadata(null, ['5' => ['v5.14.0', '2023-06-01T00:00:00+00:00']]);
+        $behind = Libyears::behind($this->package(), $newerPatch);
+        self::assertNotNull($behind);
+        self::assertEqualsWithDelta(1.41, $behind, 0.005);
+
+        // the branch's newest dated release below the installed version — a re-tag dated later — is not movement forward
+        $lowerDatedLater = $this->metadata(null, ['5' => ['v5.13.1', '2023-06-01T00:00:00+00:00']]);
+        self::assertNull(Libyears::behind($this->package(), $lowerDatedLater));
+    }
+
+    public function testATrustedNewestReleaseDateOutranksTheBranchView(): void
+    {
+        // when the repository dates the newest release, that date is the one used, whatever the branches say
+        $behind = Libyears::behind($this->package(), $this->metadata('2026-01-24T13:26:10+00:00', ['8' => ['v8.6.1', '2030-01-01T00:00:00+00:00']]));
+        self::assertNotNull($behind);
+        self::assertEqualsWithDelta(4.06, $behind, 0.005);
     }
 
     public function testALockEntryWithoutATimeIsNotMeasured(): void

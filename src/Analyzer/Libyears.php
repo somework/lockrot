@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace Lockrot\Analyzer;
 
+use Composer\Semver\Comparator;
+use Composer\Semver\VersionParser;
 use Lockrot\Clock;
 use Lockrot\Data\Repository\PackageMetadata;
+use Lockrot\Data\Repository\ReleaseBranch;
 use Lockrot\Lock\LockedPackage;
 use Lockrot\Verdict\Finding;
 
@@ -14,7 +17,7 @@ use Lockrot\Verdict\Finding;
  * version installed and the package's newest stable release, summed over the analysed set.
  *
  * A verdict is a judgement about one package; this is one sentence about the whole lock —
- * "wallabag is 151.5 libyears behind". It is laid over the verdicts, not one of them: it does not enter a priority, a
+ * "wallabag is 163.7 libyears behind". It is laid over the verdicts, not one of them: it does not enter a priority, a
  * `--fail-on` or the baseline, and it is not a measure of rot or of security — a package three
  * healthy patches behind adds as much as an abandoned one, and a `finished` psr/log 1.1.4 adds
  * three years for a 3.x it will never need. Nothing about "now" enters either: two dates the run
@@ -30,9 +33,10 @@ final class Libyears
     /** A dev pin (`dev-main`, `2.x-dev`) has a commit date, not a release date; the `pinned` verdict covers it. */
     public const BRANCH_SNAPSHOT = 'branch_snapshot';
     /**
-     * No date lockrot trusts for one of the two ends: no stable release at all, the newest one
-     * undated (a subtree split's tags share a commit), the installed version dated only by that
-     * shared commit (a split dated by its monorepo parent), or the lock entry without a `time`.
+     * No date lockrot trusts for one of the two ends: no stable release at all, no dated release
+     * above the installed version (the newest tags share a commit, as a subtree split's do, and
+     * nothing dated sits between), the installed version dated only by such a shared commit (a
+     * split dated by its monorepo parent), or the lock entry without a `time`.
      */
     public const NO_STABLE_RELEASE_DATE = 'no_stable_release_date';
     /** No metadata was asked for: a `path`, `vcs` or `package` repository entry. */
@@ -91,13 +95,58 @@ final class Libyears
         // version's in the lock was not, and it is the same stale commit date (illuminate/macroable
         // v10.48.28: locked 2023-06-05 for a release of 2024-11-21). Measuring the two against each
         // other adds the whole artefact to the sum, so the package is left unmeasured instead.
-        $latest = $metadata->lastStableReleaseAt();
         $installed = $package->time();
-        if ($latest === null || $installed === null || $metadata->lastStableDatedBy() !== null) {
+        if ($installed === null || $metadata->lastStableDatedBy() !== null) {
+            return null;
+        }
+        $latest = $metadata->lastStableReleaseAt() ?? self::newestTrustedDateAbove($metadata, $package->version());
+        if ($latest === null) {
             return null;
         }
 
         return max(0.0, ($latest->getTimestamp() - $installed->getTimestamp()) / Clock::SECONDS_PER_YEAR);
+    }
+
+    /**
+     * When the repository dates no newest release lockrot trusts — the highest tag shares its
+     * commit with other tags, as a subtree split's do (scheb/2fa-backup-code: v8.3.0 to v8.6.1 all
+     * on one commit, all "2026-01-24") — the newest *trusted* date of a release above the installed
+     * version still bounds the answer from below: a tag's commit is never younger than the release
+     * it names, so whatever released above the installed version, it released no earlier than this.
+     * Read off the branch view S8 already keeps: every branch above the installed one, and the
+     * installed branch itself when its newest dated release is a higher version. A branch below
+     * (a backport released later) is not "ahead" and does not count. Null when nothing above is dated.
+     */
+    private static function newestTrustedDateAbove(PackageMetadata $metadata, string $installedVersion): ?\DateTimeImmutable
+    {
+        $branch = ReleaseBranch::of($installedVersion);
+        if ($branch === null) {
+            return null;
+        }
+        $parser = new VersionParser();
+        $newest = null;
+        foreach ($metadata->latestStableByBranch() as $key => $release) {
+            if ($release['at'] === null) {
+                continue;
+            }
+            $key = (string) $key;
+            if ($key === $branch) {
+                try {
+                    if (!Comparator::greaterThan($parser->normalize($release['version']), $parser->normalize($installedVersion))) {
+                        continue;
+                    }
+                } catch (\UnexpectedValueException $e) {
+                    continue;
+                }
+            } elseif (!ReleaseBranch::isAbove($key, $branch)) {
+                continue;
+            }
+            if ($newest === null || $release['at'] > $newest) {
+                $newest = $release['at'];
+            }
+        }
+
+        return $newest;
     }
 
     /**
@@ -194,7 +243,7 @@ final class Libyears
     }
 
     /**
-     * The footer line: `libyears: 151.5 behind across 191 of 200 packages · 94.5 from direct
+     * The footer line: `libyears: 163.7 behind across 195 of 200 packages · 106.7 from direct
      * requirements · furthest behind smalot/pdfparser v1.1.0 at 4.7`. Every number carries its
      * noun: the scope says how many packages the sum covers and how many the run analysed, the
      * direct share says whose number it is (php-libyear's, near enough), and the package furthest
