@@ -807,13 +807,6 @@
         "newest_branch",
         "newest_version",
         "newest_release",
-        "newest_php",
-        "newest_within_reach",
-        "floor_php",
-        "floor_source",
-        "reachable_branch",
-        "reachable_version",
-        "reachable_release",
         "suggested_constraint",
         "dated_by"
       ],
@@ -840,25 +833,25 @@
           "$ref": "#/definitions/dateTime"
         },
         "newest_php": {
-          "description": "The php requirement of the newest branch's release as the repository lists it, null when it requires no PHP.",
+          "description": "The php requirement of the newest branch's release as the repository lists it, null when it requires no PHP. Optional: documents written before 0.11.0 do not carry it.",
           "type": [
             "string",
             "null"
           ]
         },
         "newest_within_reach": {
-          "description": "Whether the project can move onto the newest branch: its php requirement admits the project's own require.php and the target PHP.",
+          "description": "Whether the project can move onto the newest branch: its php requirement admits the project's own require.php and the target PHP. Optional: documents written before 0.11.0 do not carry it.",
           "type": "boolean"
         },
         "floor_php": {
-          "description": "What holds the newest branch back when it is out of reach: the project's require.php as written, or the target PHP minor; null when within reach.",
+          "description": "What holds the newest branch back when it is out of reach: the project's require.php as written, or the target PHP minor; null when within reach. Optional: documents written before 0.11.0 do not carry it.",
           "type": [
             "string",
             "null"
           ]
         },
         "floor_source": {
-          "description": "Which floor floor_php is; null when the newest branch is within reach.",
+          "description": "Which floor floor_php is; null when the newest branch is within reach. Optional: documents written before 0.11.0 do not carry it.",
           "enum": [
             "project",
             "target",
@@ -866,19 +859,21 @@
           ]
         },
         "reachable_branch": {
-          "description": "The newest releasing higher branch within reach, the one suggested_constraint follows; the newest branch itself when that is within reach, null when none is.",
+          "description": "The newest releasing higher branch within reach, the one suggested_constraint follows; the newest branch itself when that is within reach, null when none is. Optional: documents written before 0.11.0 do not carry it.",
           "type": [
             "string",
             "null"
           ]
         },
         "reachable_version": {
+          "description": "Optional: documents written before 0.11.0 do not carry it.",
           "type": [
             "string",
             "null"
           ]
         },
         "reachable_release": {
+          "description": "Optional: documents written before 0.11.0 do not carry it.",
           "oneOf": [
             {
               "$ref": "#/definitions/dateTime"
