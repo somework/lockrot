@@ -39,6 +39,7 @@
         "Composer\\Semver\\Comparator",
         "Composer\\Semver\\Constraint\\Constraint",
         "Composer\\Semver\\Constraint\\ConstraintInterface",
+        "Composer\\Semver\\Intervals",
         "Composer\\Semver\\VersionParser",
         "Composer\\Util\\Bitbucket",
         "Composer\\Util\\Http\\Response",

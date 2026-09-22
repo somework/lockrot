@@ -38,8 +38,9 @@ final class ServiceFactory
     /**
      * @param list<RepositoryInterface> $repositories the project's configured Composer repositories, in lookup order
      * @param ?Deadline                 $deadline     install-time budget; null (and `composer lockrot`) means unlimited
+     * @param ?string                   $projectPhp   the project's own `require.php`, one of the two floors S8 keeps the branch it names within ({@see \Lockrot\Signal\PhpFloor}); null when the manifest has none
      */
-    public static function createAnalyzer(IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, Tokens $tokens, Clock $clock, ?Deadline $deadline = null): Analyzer
+    public static function createAnalyzer(IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, Tokens $tokens, Clock $clock, ?Deadline $deadline = null, ?string $projectPhp = null): Analyzer
     {
         $deadline ??= Deadline::never();
         $http = self::createHttp($io, $config, $lockrot, $clock, $deadline);
@@ -55,7 +56,7 @@ final class ServiceFactory
             new ActivityFetchPlanner($auth),
             RepoLocator::fromConfig($config),
             BuiltinAllowlist::load(),
-            SignalSet::default($clock, $lockrot->thresholds(), $lockrot->targetPhp(), PhpReleaseDates::load()),
+            SignalSet::default($clock, $lockrot->thresholds(), $lockrot->targetPhp(), PhpReleaseDates::load(), $projectPhp),
             new VerdictEngine(),
             $clock,
             $lockrot->offline(),

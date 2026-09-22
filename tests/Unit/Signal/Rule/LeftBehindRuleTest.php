@@ -7,6 +7,7 @@ namespace Lockrot\Tests\Unit\Signal\Rule;
 use Composer\Package\Loader\ArrayLoader;
 use Lockrot\Clock;
 use Lockrot\Data\Repository\PackageMetadata;
+use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\Rule\LeftBehindRule;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\Thresholds;
@@ -15,9 +16,9 @@ use PHPUnit\Framework\TestCase;
 
 final class LeftBehindRuleTest extends TestCase
 {
-    private function rule(): LeftBehindRule
+    private function rule(?PhpFloor $floor = null): LeftBehindRule
     {
-        return new LeftBehindRule(Clock::fixed(F::NOW), new Thresholds());
+        return new LeftBehindRule(Clock::fixed(F::NOW), new Thresholds(), $floor);
     }
 
     public function testHighWhenTheInstalledMajorStoppedFiveYearsAgoAndANewerMajorReleased(): void
@@ -38,6 +39,13 @@ final class LeftBehindRuleTest extends TestCase
             'newest_branch' => '3.x',
             'newest_version' => '3.4.1',
             'newest_release' => '2026-06-01T00:00:00+00:00',
+            'newest_php' => null,
+            'newest_within_reach' => true,
+            'floor_php' => null,
+            'floor_source' => null,
+            'reachable_branch' => '3.x',
+            'reachable_version' => '3.4.1',
+            'reachable_release' => '2026-06-01T00:00:00+00:00',
             'suggested_constraint' => '^3.4',
             'dated_by' => null,
         ], $signal->data());
@@ -140,6 +148,8 @@ final class LeftBehindRuleTest extends TestCase
 
         self::assertNotNull($signal);
         self::assertStringEndsWith('; 3.x released 3.0.0 (2026-01-01)', $signal->summary());
+        self::assertSame('3.x', $signal->data()['reachable_branch'], 'the branch within reach ties the same way');
+        self::assertSame('^3.0', $signal->data()['suggested_constraint']);
     }
 
     public function testAHigherBranchWithoutADateIsNotEvidence(): void
@@ -303,9 +313,9 @@ final class LeftBehindRuleTest extends TestCase
     /** A branch the monorepo parent dated ({@see PackageMetadata::datedBy()}) says so in the summary and the data. */
     public function testABranchDatedByTheMonorepoNamesIt(): void
     {
-        /** @return array{version: string, at: \DateTimeImmutable, highest: array{normalized: string, pretty: string, at: \DateTimeImmutable}, dated_by?: string} */
+        /** @return array{version: string, at: \DateTimeImmutable, highest: array{normalized: string, pretty: string, at: \DateTimeImmutable}, dated_by?: string, php: ?string} */
         $branch = static function (string $version, string $at, ?string $datedBy): array {
-            $row = ['version' => $version, 'at' => new \DateTimeImmutable($at), 'highest' => ['normalized' => $version.'.0', 'pretty' => 'v'.$version, 'at' => new \DateTimeImmutable($at)]];
+            $row = ['version' => $version, 'at' => new \DateTimeImmutable($at), 'highest' => ['normalized' => $version.'.0', 'pretty' => 'v'.$version, 'at' => new \DateTimeImmutable($at)], 'php' => null];
 
             return $datedBy === null ? $row : $row + ['dated_by' => $datedBy];
         };
@@ -321,5 +331,102 @@ final class LeftBehindRuleTest extends TestCase
         self::assertSame('branch 8.x last released 2021-11-20 (4.8 years ago, dated by laravel/framework); 13.x released 13.24.0 (2026-09-01)', $signal->summary());
         self::assertSame('laravel/framework', $signal->data()['dated_by']);
         self::assertSame('^13.24', $signal->data()['suggested_constraint']);
+    }
+
+    /**
+     * Matomo 5.13.0 requires php >=7.2.5 and locks monolog 1.27.1. monolog 3.x needs php >=8.1 — the
+     * project cannot require it without dropping PHP 7 — and 2.x, alive and within reach, is what the
+     * signal points at: the newest branch is still the proof the upstream moved on, the reachable one
+     * is where the project can follow.
+     */
+    public function testTheBranchNamedToFollowIsTheNewestOneWithinTheProjectsReach(): void
+    {
+        $meta = F::metadata([['3.12.0', '2026-09-09', '>=8.1'], ['2.11.1', '2026-09-02', '>=7.2'], ['1.27.1', '2022-06-09', '>=5.3.0']]);
+
+        $signal = $this->rule(new PhpFloor('8.4', '>=7.2.5'))->evaluate(F::facts(F::package(['version' => '1.27.1']), $meta));
+
+        self::assertNotNull($signal);
+        self::assertSame(Signal::LEVEL_WARN, $signal->level());
+        self::assertSame('branch 1.x last released 2022-06-09 (4.3 years ago); 3.x released 3.12.0 (2026-09-09), needs php >=8.1 above the project\'s php >=7.2.5; 2.x released 2.11.1 (2026-09-02)', $signal->summary());
+        $data = $signal->data();
+        self::assertSame('3.x', $data['newest_branch']);
+        self::assertSame('>=8.1', $data['newest_php']);
+        self::assertFalse($data['newest_within_reach']);
+        self::assertSame('>=7.2.5', $data['floor_php']);
+        self::assertSame('project', $data['floor_source']);
+        self::assertSame('2.x', $data['reachable_branch']);
+        self::assertSame('2.11.1', $data['reachable_version']);
+        self::assertSame('2026-09-02T00:00:00+00:00', $data['reachable_release']);
+        self::assertSame('^2.11', $data['suggested_constraint']);
+    }
+
+    /** phpBB 3.3 on symfony 3.4: 8.x needs php >=8.4.1, 4.x stopped in 2022 — nothing within `^7.2 || ^8.0.0` is releasing. */
+    public function testNoBranchWithinReachIsSaidAndNothingIsSuggested(): void
+    {
+        $meta = F::metadata([['v8.1.7', '2026-09-10', '>=8.4.1'], ['v4.4.49', '2022-11-04', '>=7.1.3'], ['v3.4.47', '2020-10-24', '^5.5.9|>=7.0.8']]);
+
+        $signal = $this->rule(new PhpFloor('8.4', '^7.2 || ^8.0.0'))->evaluate(F::facts(F::package(['version' => 'v3.4.47']), $meta));
+
+        self::assertNotNull($signal);
+        self::assertSame(Signal::LEVEL_HIGH, $signal->level());
+        self::assertSame('branch 3.x last released 2020-10-24 (5.9 years ago); 8.x released v8.1.7 (2026-09-10), needs php >=8.4.1 above the project\'s php ^7.2 || ^8.0.0; no releasing branch within reach', $signal->summary());
+        $data = $signal->data();
+        self::assertFalse($data['newest_within_reach']);
+        self::assertNull($data['reachable_branch']);
+        self::assertNull($data['reachable_version']);
+        self::assertNull($data['reachable_release']);
+        self::assertNull($data['suggested_constraint']);
+    }
+
+    /** A project that declares no php: the target PHP — `config.platform.php` or the running one — is the floor, and is named as such. */
+    public function testTheTargetPhpIsTheFloorWhenTheProjectDeclaresNone(): void
+    {
+        $meta = F::metadata([['3.12.0', '2026-09-09', '>=8.1'], ['2.11.1', '2026-09-02', '>=7.2'], ['1.27.1', '2022-06-09', '>=5.3.0']]);
+
+        $signal = $this->rule(new PhpFloor('7.2'))->evaluate(F::facts(F::package(['version' => '1.27.1']), $meta));
+
+        self::assertNotNull($signal);
+        self::assertStringEndsWith('; 3.x released 3.12.0 (2026-09-09), needs php >=8.1 above the target PHP 7.2; 2.x released 2.11.1 (2026-09-02)', $signal->summary());
+        self::assertSame('7.2', $signal->data()['floor_php']);
+        self::assertSame('target', $signal->data()['floor_source']);
+        self::assertSame('^2.11', $signal->data()['suggested_constraint']);
+    }
+
+    /** A branch within reach that stopped releasing is no branch to follow: the one named has to be alive, as the newest one has to be. */
+    public function testABranchWithinReachThatWentQuietIsNotNamed(): void
+    {
+        $meta = F::metadata([['3.0.0', '2026-01-01', '>=8.1'], ['2.5.0', '2022-06-01', '>=7.2'], ['1.9.2', '2019-03-02', '>=5.6']]);
+
+        $signal = $this->rule(new PhpFloor('7.4'))->evaluate(F::facts(F::package(['version' => '1.9.2']), $meta));
+
+        self::assertNotNull($signal);
+        self::assertStringEndsWith('needs php >=8.1 above the target PHP 7.4; no releasing branch within reach', $signal->summary());
+        self::assertNull($signal->data()['suggested_constraint']);
+    }
+
+    /** The newest branch within reach is the one named, whatever is between: 2.x here, not the higher 3.x that also fits but released earlier. */
+    public function testTheNewestReleasingBranchWithinReachIsNamed(): void
+    {
+        $meta = F::metadata([['4.0.0', '2026-06-01', '>=8.2'], ['3.4.0', '2025-01-01', '>=7.4'], ['2.9.0', '2026-03-01', '>=7.4'], ['1.9.2', '2019-03-02', '>=5.6']]);
+
+        $signal = $this->rule(new PhpFloor('7.4'))->evaluate(F::facts(F::package(['version' => '1.9.2']), $meta));
+
+        self::assertNotNull($signal);
+        self::assertStringEndsWith('; 4.x released 4.0.0 (2026-06-01), needs php >=8.2 above the target PHP 7.4; 2.x released 2.9.0 (2026-03-01)', $signal->summary());
+        self::assertSame('^2.9', $signal->data()['suggested_constraint']);
+    }
+
+    /** With the newest branch within reach the summary reads as before: the floor changes nothing it does not have to. */
+    public function testANewestBranchWithinReachIsNamedAsBefore(): void
+    {
+        $meta = F::metadata([['2.0.0', '2024-01-10', '>=7.2'], ['1.9.2', '2022-08-01', '>=5.6']]);
+
+        $signal = $this->rule(new PhpFloor('8.4', '>=7.2.5'))->evaluate(F::facts(F::package(['version' => '1.9.2']), $meta));
+
+        self::assertNotNull($signal);
+        self::assertSame('branch 1.x last released 2022-08-01 (4.1 years ago); 2.x released 2.0.0 (2024-01-10)', $signal->summary());
+        self::assertTrue($signal->data()['newest_within_reach']);
+        self::assertSame('>=7.2', $signal->data()['newest_php']);
+        self::assertSame('^2.0', $signal->data()['suggested_constraint']);
     }
 }

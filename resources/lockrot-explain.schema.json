@@ -123,7 +123,8 @@
                             "highest_commit_date": { "description": "The shared commit's date when highest_released is null for that reason.", "oneOf": [{ "$ref": "#/definitions/dateTime" }, { "type": "null" }] },
                             "newest_dated": { "description": "The branch's newest dated stable release.", "type": "string" },
                             "newest_dated_released": { "oneOf": [{ "$ref": "#/definitions/dateTime" }, { "type": "null" }] },
-                            "dated_by": { "description": "The monorepo this row's dates were read from, null when they are the package's own.", "oneOf": [{ "$ref": "#/definitions/packageName" }, { "type": "null" }] }
+                            "dated_by": { "description": "The monorepo this row's dates were read from, null when they are the package's own.", "oneOf": [{ "$ref": "#/definitions/packageName" }, { "type": "null" }] },
+                            "php": { "description": "The php requirement of the branch's newest dated release, as the repository lists it; null when it requires no PHP. Optional: documents written before 0.11.0 do not carry it.", "type": ["string", "null"] }
                         }
                     }
                 }
