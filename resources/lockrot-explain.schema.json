@@ -84,7 +84,7 @@
                         }
                     }
                 },
-                "chain": { "type": "array", "minItems": 1, "items": { "$ref": "#/definitions/packageName" } },
+                "chain": { "description": "From the direct requirement down to this package; empty when none reaches it. See report-1.json.", "type": "array", "items": { "$ref": "#/definitions/packageName" } },
                 "direct_dependents": { "type": "array", "items": { "$ref": "#/definitions/packageName" } },
                 "evidence": { "type": "string" },
                 "allowlist_reason": { "type": ["string", "null"] },

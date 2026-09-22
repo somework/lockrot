@@ -80,6 +80,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **The report schema accepts the empty chain a run can really produce.** `chain` was declared with
+  `minItems: 1`, and two ordinary runs break that: a `composer.lock` with no `composer.json` beside
+  it has no direct requirements at all, so nothing reaches any package, and a lock can hold a
+  package only the skipped `require-dev` asks for. Every finding of such a run was valid JSON that
+  its own published schema rejected. Documents themselves are unchanged.
 - **A repository that names the abandoned package as its own replacement names nowhere to go.**
   `migrate to vendor/pkg` pointed back at the package the reader was being told to leave, and the
   new `abandoned.with_replacement` counted it. Such a marker is now read as no replacement at all:
