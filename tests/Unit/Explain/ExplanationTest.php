@@ -131,6 +131,8 @@ final class ExplanationTest extends TestCase
             'last_stable_release' => '2026-01-01T00:00:00+00:00',
             'last_stable_version' => '2.1.0',
             'last_stable_dated_by' => null,
+            'installed_release' => '2021-06-01T00:00:00+00:00',
+            'installed_release_dated_by' => null,
             'repository' => 'https://github.com/vendor/pkg.git',
             'type' => 'library',
             'data_date' => F::NOW,
@@ -172,9 +174,10 @@ final class ExplanationTest extends TestCase
         ], new \DateTimeImmutable(F::NOW));
         $parent = PackageMetadata::fromPackages('laravel/framework', [
             $loader->load($on('laravel/framework', 'v10.50.3', 'f10', '2026-08-12T03:46:26+00:00', ['illuminate/contracts' => 'self.version'])),
+            $loader->load($on('laravel/framework', 'v10.48.28', 'f10-48', '2024-11-21T14:44:37+00:00')),
             $loader->load($on('laravel/framework', 'v9.52.22', 'f9', '2026-08-12T03:46:05+00:00')),
         ], new \DateTimeImmutable(F::NOW));
-        $explanation = new Explanation($this->finding('v10.48.28', Verdict::OK), F::facts(F::package(['name' => 'illuminate/contracts', 'version' => 'v10.48.28']), $child->datedBy($parent)), new Thresholds(), '8.4', $this->report());
+        $explanation = new Explanation($this->finding('v10.48.28', Verdict::OK), F::facts(F::package(['name' => 'illuminate/contracts', 'version' => 'v10.48.28', 'time' => '2023-06-05T12:46:42+00:00']), $child->datedBy($parent)), new Thresholds(), '8.4', $this->report());
 
         [$ten, $nine] = $explanation->branches();
 
@@ -185,9 +188,14 @@ final class ExplanationTest extends TestCase
         self::assertNull($nine['dated_by'], 'a branch the package dated itself');
         self::assertFalse($explanation->installedBranchIsUndated());
         self::assertSame(['laravel/framework', ['10.x']], $explanation->branchesDatedBy());
-        $meta = $explanation->toArray()['metadata'];
+        $array = $explanation->toArray();
+        $meta = $array['metadata'];
         self::assertIsArray($meta);
         self::assertSame('laravel/framework', $meta['last_stable_dated_by']);
+        self::assertIsArray($array['lock']);
+        self::assertSame('2023-06-05T12:46:42+00:00', $array['lock']['released'], 'the lock\'s date is the shared commit\'s');
+        self::assertSame('2024-11-21T14:44:37+00:00', $meta['installed_release'], 'the parent\'s v10.48.28 dates the installed version');
+        self::assertSame('laravel/framework', $meta['installed_release_dated_by']);
         self::assertIsArray($meta['branches']);
         self::assertSame(
             ['branch' => '10.x', 'installed' => true, 'highest' => 'v10.50.3', 'highest_released' => '2026-08-12T03:46:26+00:00', 'highest_commit_date' => null, 'newest_dated' => 'v10.50.3', 'newest_dated_released' => '2026-08-12T03:46:26+00:00', 'dated_by' => 'laravel/framework'],

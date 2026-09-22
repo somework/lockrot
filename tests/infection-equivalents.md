@@ -23,12 +23,12 @@ mutant from the original, and says why.
 
 ## src/Analyzer/Libyears.php (0.11.0)
 
-- `src/Analyzer/Libyears.php:182` LessThan (`strcmp(...) < 0` → `<= 0`) — `fromFindings()`: the
+- `src/Analyzer/Libyears.php:221` LessThan (`strcmp(...) < 0` → `<= 0`) — `fromFindings()`: the
   tie-break between two findings with the same value compares their package names, and two findings
   in one report never share a name (the lock is keyed by it), so `strcmp` never returns 0 there and
   `<` and `<=` decide identically.
 
-- `src/Analyzer/Libyears.php:144` GreaterThan (`$release['at'] > $newest` → `>=`) —
+- `src/Analyzer/Libyears.php:183` GreaterThan (`$release['at'] > $newest` → `>=`) —
   `newestTrustedDateAbove()`: on a tie the two dates are equal, so keeping the first or taking the
   second yields the same instant; nothing downstream reads which branch it came from.
 
@@ -287,10 +287,10 @@ slow test. They are listed here only so nobody reads them as an unexplained "2 t
 - `src/Data/Repository/MonorepoParents.php:114` ReturnRemoval — the same guard one level down, with
   the same argument: `array_intersect($replaces, [])` is empty for every parent, so the loop below
   selects nothing and the method returns `[]` either way.
-- `src/Data/Repository/PackageMetadata.php:148` TrueValue — `$replaces[$link->getTarget()] = true`
+- `src/Data/Repository/PackageMetadata.php:172` TrueValue — `$replaces[$link->getTarget()] = true`
   is set membership read only through `array_keys()`; the value is never looked at, so `false`
   builds the same list. The same shape as `ActivityClient.php:80` above.
-- `src/Data/Repository/PackageMetadata.php:272` ReturnRemoval — `needsParentDates()` returns false
+- `src/Data/Repository/PackageMetadata.php:315` ReturnRemoval — `needsParentDates()` returns false
   for a branch snapshot, which has no branch. Without the return the lookup runs with a null key,
   PHP reads it as `''`, no branch is keyed by the empty string, and the method returns false on the
   next line. The early return is the statement of intent.
