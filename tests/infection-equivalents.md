@@ -303,13 +303,17 @@ slow test. They are listed here only so nobody reads them as an unexplained "2 t
 - `src/Data/Repository/MonorepoParents.php:114` ReturnRemoval — the same guard one level down, with
   the same argument: `array_intersect($replaces, [])` is empty for every parent, so the loop below
   selects nothing and the method returns `[]` either way.
-- `src/Data/Repository/PackageMetadata.php:172` TrueValue — `$replaces[$link->getTarget()] = true`
+- `src/Data/Repository/PackageMetadata.php:189` TrueValue — `$replaces[$link->getTarget()] = true`
   is set membership read only through `array_keys()`; the value is never looked at, so `false`
   builds the same list. The same shape as `ActivityClient.php:80` above.
-- `src/Data/Repository/PackageMetadata.php:320` ReturnRemoval — `needsParentDates()` returns false
+- `src/Data/Repository/PackageMetadata.php:306` TrueValue — `$sharedCommitVersions[$normalized] = true`
+  is set membership read only through `isset()`, which is true for a `false` value as well; the
+  value is never looked at.
+- `src/Data/Repository/PackageMetadata.php:351` ReturnRemoval — `needsParentDates()` returns false
   for a branch snapshot, which has no branch. Without the return the lookup runs with a null key,
-  PHP reads it as `''`, no branch is keyed by the empty string, and the method returns false on the
-  next line. The early return is the statement of intent.
+  PHP reads it as `''`, no branch is keyed by the empty string, and the version check after it
+  finds a branch name (`dev-main`, `2.x-dev`) among no stable tags, so the method returns false all
+  the same. The early return is the statement of intent.
 
 ## The html report (2026-09-21)
 

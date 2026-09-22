@@ -124,6 +124,17 @@ final class MonorepoParentsTest extends TestCase
         self::assertSame([], $parents->missingCandidates([], $metadata), 'no children, nothing to fetch');
     }
 
+    /** A dated branch still leaves the installed version to its parent when its own tag shares its commit. */
+    public function testChildrenAskAboutTheInstalledVersionNotOnlyItsBranch(): void
+    {
+        $parents = MonorepoParents::none();
+        $shared = new PackageMetadata('illuminate/macroable', false, null, true, new \DateTimeImmutable('2024-11-21'), 'v10.49.0', 1, null, 'library', new \DateTimeImmutable(self::NOW), ['10' => self::branch('10.49.0', '2024-11-21')], [], null, [], null, ['10.48.28.0' => true]);
+        $metadata = ['illuminate/macroable' => $shared];
+
+        self::assertSame(['illuminate/macroable'], $parents->children([F::package(['name' => 'illuminate/macroable', 'version' => 'v10.48.28'])], $metadata));
+        self::assertSame([], $parents->children([F::package(['name' => 'illuminate/macroable', 'version' => 'v10.49.0'])], $metadata), 'the branch\'s own newest tag is dated');
+    }
+
     public function testAParentAlreadyInTheBatchDatesItsChildAndNothingIsMissing(): void
     {
         $parents = new MonorepoParents(['laravel/framework' => ['illuminate/contracts']]);

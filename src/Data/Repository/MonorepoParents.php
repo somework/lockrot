@@ -77,7 +77,7 @@ final class MonorepoParents
 
     /**
      * The packages whose findings would read dates a parent could supply: metadata is loaded and
-     * {@see PackageMetadata::needsParentDates()} says so for the installed branch.
+     * {@see PackageMetadata::needsParentDates()} says so for the installed branch and version.
      *
      * @param list<LockedPackage>            $packages
      * @param array<string, PackageMetadata> $metadata by package name
@@ -89,7 +89,7 @@ final class MonorepoParents
         $children = [];
         foreach ($packages as $package) {
             $meta = $metadata[$package->name()] ?? null;
-            if ($meta !== null && $meta->needsParentDates(ReleaseBranch::of($package->version()))) {
+            if ($meta !== null && $meta->needsParentDates(ReleaseBranch::of($package->version()), $package->version())) {
                 $children[] = $package->name();
             }
         }

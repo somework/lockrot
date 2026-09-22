@@ -326,6 +326,43 @@ final class PackageMetadataDatedByTest extends TestCase
     }
 
     /**
+     * The installed version on a shared commit under a branch whose highest tag has one of its
+     * own — the directory changed after a run of releases cut without a change, so only the newest
+     * tags are dated. The branch and the package's age read fine, and the lock's date for the
+     * installed version is still the shared commit's: the parent is what dates it.
+     */
+    public function testAnInstalledVersionOnASharedCommitNeedsTheParentWhenItsBranchIsDated(): void
+    {
+        $child = PackageMetadata::fromPackages('illuminate/macroable', [
+            $this->load(self::tag('illuminate/macroable', 'v10.49.0', 'c10-own', '2024-11-21T00:00:00+00:00')),
+            $this->load(self::tag('illuminate/macroable', 'v10.48.28', 'c10-shared', '2023-06-05T00:00:00+00:00')),
+            $this->load(self::tag('illuminate/macroable', 'v10.48.27', 'c10-shared', '2023-06-05T00:00:00+00:00')),
+            $this->load(self::tag('illuminate/macroable', 'v10.48.26', 'c10-shared', '2023-06-05T00:00:00+00:00')),
+            $this->load(self::tag('illuminate/macroable', 'v10.48.25', 'c10-two', '2023-05-01T00:00:00+00:00')),
+            $this->load(self::tag('illuminate/macroable', 'v10.48.24', 'c10-two', '2023-05-01T00:00:00+00:00')),
+        ], new \DateTimeImmutable(self::NOW));
+
+        self::assertNotNull($child->latestStableByBranch()['10']['highest']['at'], 'the branch\'s highest tag is dated by its own commit');
+        self::assertNotNull($child->lastStableReleaseAt());
+        self::assertTrue($child->needsParentDates('10', 'v10.48.28'), 'the installed tag shares its commit with two others');
+        self::assertTrue($child->needsParentDates('10', '10.48.26'), 'read in either form the lock prints');
+        self::assertFalse($child->needsParentDates('10', 'v10.49.0'), 'a tag on its own commit is dated by it');
+        self::assertFalse($child->needsParentDates('10', 'v10.48.24'), 'two on one commit keep their date, as the branch view does');
+        self::assertFalse($child->needsParentDates('10', 'v9.0.0'), 'a version the repository does not list');
+        self::assertFalse($child->needsParentDates('10', 'not a version'));
+        self::assertFalse($child->needsParentDates('10'), 'without the installed version only the branch decides');
+
+        $parent = PackageMetadata::fromPackages('laravel/framework', [
+            $this->load(self::tag('laravel/framework', 'v10.49.0', 'f10-49', '2024-11-21T00:00:00+00:00', ['illuminate/macroable' => 'self.version'])),
+            $this->load(self::tag('laravel/framework', 'v10.48.28', 'f10-28', '2025-01-20T00:00:00+00:00')),
+        ], new \DateTimeImmutable(self::NOW));
+        $dated = $child->datedBy($parent);
+
+        self::assertEquals(new \DateTimeImmutable('2025-01-20T00:00:00+00:00'), $dated->releaseDateOf('10.48.28.0'));
+        self::assertFalse($dated->needsParentDates('10', 'v10.48.28'), 'once dated by the parent it needs nothing more');
+    }
+
+    /**
      * Built by hand rather than from packages, so the branch order and each branch's dates are
      * exactly what the case under test needs.
      *
