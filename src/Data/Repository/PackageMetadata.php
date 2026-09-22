@@ -14,8 +14,10 @@ use Lockrot\Data\Forge\SupportSource;
  * Memory: fromPackages() folds the given package objects into scalars in a single pass and
  * retains nothing beyond them. Nothing here retains a per-release object, so a 200-package lock
  * costs kilobytes rather than the tens of megabytes the full release history would. The one
- * per-release value kept is a date per stable tag, and only for a monorepo parent
- * ({@see $releaseDates}): a thousand dates for laravel/framework, nothing for anyone else.
+ * per-release values kept are a date per stable tag, and only for a monorepo parent
+ * ({@see $releaseDates}): a thousand dates for laravel/framework, nothing for anyone else; and
+ * the stable tags that share their commit ({@see $sharedCommitVersions}), which is a set only a
+ * subtree split fills.
  */
 final class PackageMetadata
 {
@@ -82,11 +84,22 @@ final class PackageMetadata
     private array $releaseDates;
     /** The monorepo parent {@see $releaseDates} came from, null when they are this package's own. */
     private ?string $releaseDatesBy;
+    /**
+     * Every stable tag, by normalized version, that sits on a commit SHARED_COMMIT_TAGS or more
+     * stable tags share: the tags whose date is the commit's, not a release's. The lock copies that
+     * date as the installed version's `time`, so an installed version in here needs its parent's
+     * date even when its branch's highest tag is dated by a commit of its own
+     * ({@see needsParentDates()}). Empty for an ordinary package, whose tags do not pile up.
+     *
+     * @var array<string, true>
+     */
+    private array $sharedCommitVersions;
 
     /**
      * @param array<array-key, array{version: string, at: ?\DateTimeImmutable, highest: array{normalized: string, pretty: string, at: ?\DateTimeImmutable}, dated_by?: string, php: ?string}> $latestStableByBranch
      * @param list<string>                                                                                                                                                   $replaces
      * @param array<string, \DateTimeImmutable>                                                                                                                              $releaseDates
+     * @param array<string, true>                                                                                                                                            $sharedCommitVersions
      */
     public function __construct(
         string $name,
@@ -103,7 +116,8 @@ final class PackageMetadata
         array $replaces = [],
         ?string $lastStableDatedBy = null,
         array $releaseDates = [],
-        ?string $releaseDatesBy = null
+        ?string $releaseDatesBy = null,
+        array $sharedCommitVersions = []
     ) {
         $this->name = $name;
         $this->abandoned = $abandoned;
@@ -120,6 +134,7 @@ final class PackageMetadata
         $this->lastStableDatedBy = $lastStableDatedBy;
         $this->releaseDates = $releaseDates;
         $this->releaseDatesBy = $releaseDatesBy;
+        $this->sharedCommitVersions = $sharedCommitVersions;
     }
 
     /**
@@ -161,6 +176,8 @@ final class PackageMetadata
         // only where the commit is a release's ({@see $releaseDates}).
         $releaseDates = [];
         $commitByVersion = [];
+        // Every stable tag's commit, dated or not: what the set of shared-commit tags is read from.
+        $commitOfTag = [];
 
         foreach ($versions as $version) {
             foreach ($version->getReplaces() as $link) {
@@ -208,6 +225,7 @@ final class PackageMetadata
                     $commit = self::commitOf($version);
                     if ($commit !== null) {
                         $tagsOnCommit[$commit] = ($tagsOnCommit[$commit] ?? 0) + 1;
+                        $commitOfTag[$normalized] = $commit;
                     }
                     if ($releaseDate !== null) {
                         $releaseDates[$normalized] = $releaseDate;
@@ -280,6 +298,14 @@ final class PackageMetadata
                 }
             }
         }
+        // The same rule, per tag: the installed version may be one of these under a branch whose
+        // highest tag has a commit of its own, and then the lock's date for it is the shared commit's.
+        $sharedCommitVersions = [];
+        foreach ($commitOfTag as $normalized => $commit) {
+            if ($tagsOnCommit[$commit] >= self::SHARED_COMMIT_TAGS) {
+                $sharedCommitVersions[$normalized] = true;
+            }
+        }
         // A package with dev branches only has no version order worth the name; its first branch
         // (Packagist lists the default branch first) is read.
         $anchor = $highestStable ?? ($versions[0] ?? null);
@@ -298,7 +324,9 @@ final class PackageMetadata
             $byBranch,
             array_keys($replaces),
             null,
-            $releaseDates
+            $releaseDates,
+            null,
+            $sharedCommitVersions
         );
     }
 
@@ -306,12 +334,15 @@ final class PackageMetadata
      * Whether the dates this package's findings read are missing in a way a monorepo parent could
      * fill: the installed branch's highest tag is undated, or the package's own last release is
      * ({@see fromPackages()} hands both over undated when the tag shares its commit with other
-     * stable tags, as a subtree split's do). Branches other than the installed one do not count —
+     * stable tags, as a subtree split's do), or the installed version's own tag shares its commit
+     * that way and no parent has dated it yet — the lock's `time` for it is then the commit's,
+     * whatever the branch above it says. Branches other than the installed one do not count —
      * every split package has old branches with undated tags, and they decide nothing.
      *
-     * @param ?string $installedBranch {@see ReleaseBranch::of()} of the installed version, null for a snapshot
+     * @param ?string $installedBranch  {@see ReleaseBranch::of()} of the installed version, null for a snapshot
+     * @param ?string $installedVersion the installed version as the lock prints it; null leaves the branch to decide
      */
-    public function needsParentDates(?string $installedBranch): bool
+    public function needsParentDates(?string $installedBranch, ?string $installedVersion = null): bool
     {
         if ($this->hasStableRelease && $this->lastStableReleaseAt === null) {
             return true;
@@ -320,8 +351,21 @@ final class PackageMetadata
             return false;
         }
         $own = $this->latestStableByBranch[$installedBranch] ?? null;
+        if ($own !== null && $own['highest']['at'] === null) {
+            return true;
+        }
 
-        return $own !== null && $own['highest']['at'] === null;
+        return $installedVersion !== null && $this->releaseDatesBy === null && $this->sharesItsCommit($installedVersion);
+    }
+
+    /** Whether the version, in any form the parser takes, is one of {@see $sharedCommitVersions}. */
+    private function sharesItsCommit(string $version): bool
+    {
+        try {
+            return isset($this->sharedCommitVersions[(new VersionParser())->normalize($version)]);
+        } catch (\UnexpectedValueException $e) {
+            return false;
+        }
     }
 
     /**
@@ -394,7 +438,8 @@ final class PackageMetadata
             $this->replaces,
             $lastStableDatedBy,
             $parent->releaseDates,
-            $parent->name
+            $parent->name,
+            $this->sharedCommitVersions
         );
     }
 
@@ -418,7 +463,6 @@ final class PackageMetadata
         return $highest;
     }
 
-    /** The commit the release's `source` points at, null when the repository names none. */
     /** The release's `require.php` as the repository lists it, null when it requires no PHP. */
     private static function phpOf(BasePackage $version): ?string
     {
@@ -427,6 +471,7 @@ final class PackageMetadata
         return $link === null ? null : $link->getPrettyConstraint();
     }
 
+    /** The commit the release's `source` points at, null when the repository names none. */
     private static function commitOf(BasePackage $version): ?string
     {
         $reference = $version->getSourceReference();

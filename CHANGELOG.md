@@ -27,7 +27,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   is made: both dates were already in the data. A split package's installed version is dated by
   its monorepo parent's tag of the same version, not by the lock: the lock copies the date
   Packagist gave the split's tag, the commit its tags share, and illuminate/contracts v8.83.27
-  would read as 4.65 libyears behind for 3.75. `--explain` says whose date it is under
+  would read as 4.65 libyears behind for 3.75. That holds for an installed tag on a shared commit
+  under a branch whose newest tag has a commit of its own, as after a change to the split's
+  directory: the parent is asked for the installed version, not only for the branch. `--explain`
+  says whose date it is under
   `installed_release` and `installed_release_dated_by`, and so does the package card.
 - **`left-behind` suggests a branch the project can actually move to.** S8 named the newest
   releasing branch and wrote the constraint that follows it, whatever PHP that branch requires:
