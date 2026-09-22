@@ -759,9 +759,7 @@
       ["installed", esc(f.version)],
       ["php constraint", lock.php ? esc(lock.php) : null],
       ["released", lock.released ? esc(day(lock.released) + " \u00b7 " + ageText(lock.released)) : null],
-      ["libyears behind", LockrotLib.fixed(f.libyears, 1) === null
-        ? '<span style="color:var(--muted)">not measured \u00b7 ' + esc(LockrotLib.libyearsReason(f)) + "</span>"
-        : esc(LockrotLib.fixed(f.libyears, 1))],
+      ["libyears behind", libyearsRow(f, meta)],
       ["repository", rp
         ? '<a class="lnk" href="' + esc(rp) + '" target="_blank" rel="noopener noreferrer">' + esc(rp) + "</a>"
         : (lock.repository || meta.repository ? esc(lock.repository || meta.repository) : null)],
@@ -1044,6 +1042,29 @@
       if (node) node.scrollIntoView({ block: "nearest" });
     }
   });
+
+  /**
+   * The package card's libyears row: the number, and where it came from — the newest stable
+   * release it is measured against, or, at zero, that the installed release is that newest one
+   * (or sits above it: a pre-release the lock got ahead on). An unmeasured package says why in
+   * the words the Run tab counts it under. Values arrive escaped, as kvRows expects.
+   */
+  function libyearsRow(f, meta) {
+    var value = LockrotLib.fixed(f.libyears, 1);
+    if (value === null) {
+      return '<span style="color:var(--muted)">not measured \u00b7 ' + esc(LockrotLib.libyearsReason(f)) + "</span>";
+    }
+    var newest = meta && meta.last_stable_version ? String(meta.last_stable_version) : null;
+    var why;
+    if (value === "0.0") {
+      why = newest && newest !== f.version ? "ahead of the newest stable, " + newest : "the installed release is the newest";
+    } else {
+      why = newest ? "newest " + newest + (meta.last_stable_release ? " released " + day(meta.last_stable_release) : "") : null;
+    }
+
+    // nowrap: the phrase moves to the next line whole rather than splitting its date at a hyphen.
+    return esc(value) + (why ? ' <span style="color:var(--muted);white-space:nowrap">\u00b7 ' + esc(why) + "</span>" : "");
+  }
 
   /* ---------- glossary ---------- */
   function fillLegend() {
