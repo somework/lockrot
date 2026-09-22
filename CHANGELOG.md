@@ -18,7 +18,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   metadata unavailable), and the document a `libyears` block that is the arithmetic over them —
   `total`, `direct_requirements` (the same sum over the direct requirements, the nearest number
   to php-libyear's, which reads `composer.json`), `measured`, `unmeasured` by reason and
-  `furthest_behind`. The table and markdown footers print one line (`libyears: 171.3 behind
+  `furthest_behind`. `total` and `direct_requirements` are null where nothing could be measured, so
+  that a reader adding the field up over several projects never counts an unmeasurable lock as a
+  lock with nothing to fix; a measured lock with nothing behind reports `0`. The table and markdown footers print one line (`libyears: 171.3 behind
   across 195 of 200 packages · 111.7 from direct requirements · furthest behind smalot/pdfparser
   v1.1.0 at 4.7`); the HTML page shows the total in its ledger, a sortable column, and the counts
   by reason on the Run tab; `--explain` prints the package's own value under its verdict, or the

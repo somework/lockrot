@@ -98,8 +98,8 @@ consumer usually keys on:
   what a reader filtering for what is new actually needs.
 - Each finding carries `libyears` — years behind the package's newest stable release, at least 0,
   or null when not measured — and the document a `libyears` block derived from them: `total`,
-  `direct_requirements`, `measured`, `unmeasured` (four reasons, every key present) and
-  `furthest_behind`. Added in 0.11.0 under the same schema number, and optional in the schema like
+  `direct_requirements` (both null when `measured` is 0, since nothing could be measured), `measured`,
+  `unmeasured` (four reasons, every key present) and `furthest_behind`. Added in 0.11.0 under the same schema number, and optional in the schema like
   `run`, so reports written before 0.11.0 still validate; a document from 0.11.0 on always carries
   both. See [verdicts.md](verdicts.md#libyears) for the definition and what the number is not.
 - Each signal's `data` is typed per signal id (`S1` … `S9`): a signal claiming `S2` with `S4`'s
