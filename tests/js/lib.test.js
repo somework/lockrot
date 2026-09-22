@@ -263,3 +263,14 @@ test("libyearsItems and libyearsReason never turn a missing number into a zero",
     assert.strictEqual(lib.libyearsReason({ libyears: "4.7", version: "1.0.0" }), "not a number in this document");
     assert.strictEqual(lib.libyearsReason({ libyears: 0, version: "1.0.0" }), "", "zero stays measured");
 });
+
+test("libyearsAtZero reads the value, not the 0.0 it rounds to", () => {
+    const meta = { last_stable_version: "v1.2.4" };
+    assert.strictEqual(lib.libyearsAtZero({ libyears: 0, version: "v1.2.4" }, meta), "the installed release is the newest");
+    assert.strictEqual(lib.libyearsAtZero({ libyears: 0, version: "v1.3.0-beta1" }, meta), "ahead of the newest stable, v1.2.4", "a pre-release above the newest");
+    assert.strictEqual(lib.libyearsAtZero({ libyears: 0, version: "v1.2.4" }, null), "the installed release is the newest", "no newest to name");
+    assert.strictEqual(lib.libyearsAtZero({ libyears: 0.025, version: "v1.2.3" }, meta), null, "ten days behind prints 0.0 and is behind");
+    assert.strictEqual(lib.libyearsAtZero({ libyears: null, version: "v1.2.3" }, meta), null, "unmeasured");
+    assert.strictEqual(lib.libyearsAtZero({ libyears: "0", version: "v1.2.3" }, meta), null, "not a number");
+    assert.strictEqual(lib.libyearsAtZero(undefined, meta), null);
+});

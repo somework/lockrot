@@ -105,6 +105,19 @@ var LockrotLib = (function () {
   }
 
   /**
+   * What a libyears value of zero says about the installed release, as plain text: it is the
+   * newest stable, or it sits above it (a pre-release the lock got ahead on) and the newest is
+   * named. Null for anything but an exact zero — read off the value, never off its rounded form:
+   * a release ten days behind prints `0.0` and is behind all the same.
+   */
+  function libyearsAtZero(finding, meta) {
+    if (!finding || finding.libyears !== 0) return null;
+    var newest = meta && meta.last_stable_version ? String(meta.last_stable_version) : null;
+
+    return newest && newest !== finding.version ? "ahead of the newest stable, " + newest : "the installed release is the newest";
+  }
+
+  /**
    * Why a finding carries no libyears value, in the words the report's `unmeasured` block counts
    * it under, read off the finding the way the block itself does: the note names a package no
    * repository was asked about or one whose metadata did not come, a dev version is a branch
@@ -206,6 +219,7 @@ var LockrotLib = (function () {
     libyearsItems: libyearsItems,
     libyearsSummary: libyearsSummary,
     libyearsReason: libyearsReason,
+    libyearsAtZero: libyearsAtZero,
     libyearsSortKey: libyearsSortKey,
     kvRows: kvRows,
     parseQuery: parseQuery
