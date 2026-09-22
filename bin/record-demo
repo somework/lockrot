@@ -30,9 +30,9 @@ session() {
 export -f session
 
 # The exported function only exists for bash, whatever the recorder's login shell is.
-# 110x41: koel's report is 39 lines at 110 columns with the plain footer and its note, plus the prompt and
-# the cursor row, so the last frame holds it whole. The idle cap turns the repository round-trips —
-# ten seconds of nothing on screen — into two.
-SHELL=/bin/bash asciinema rec --overwrite --quiet --idle-time-limit 2 --window-size 110x41 --command 'session "php lockrot.phar --target-php=8.4"' "$cast"
+# 110x37: koel's report is 34 lines at 110 columns with the plain footer, its note and the libyears
+# line, plus the prompt and the cursor row, so the last frame holds it whole. The idle cap turns the
+# repository round-trips — ten seconds of nothing on screen — into two.
+SHELL=/bin/bash asciinema rec --overwrite --quiet --idle-time-limit 2 --window-size 110x37 --command 'session "php lockrot.phar --target-php=8.4"' "$cast"
 agg --font-size 18 --line-height 1.3 --theme monokai --speed 1 --last-frame-duration 5 --fps-cap 20 "$cast" "$gif"
 ls -la "$gif"
