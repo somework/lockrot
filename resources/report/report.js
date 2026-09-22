@@ -1051,7 +1051,7 @@
   /**
    * The package card's libyears row: the number, and where it came from — the newest stable
    * release it is measured against, or, at zero, that the installed release is that newest one
-   * (or sits above it: a pre-release the lock got ahead on). An unmeasured package says why in
+   * or is not behind it ({@link LockrotLib.libyearsAtZero}). An unmeasured package says why in
    * the words the Run tab counts it under. Values arrive escaped, as kvRows expects.
    */
   function libyearsRow(f, meta) {

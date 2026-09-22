@@ -106,15 +106,18 @@ var LockrotLib = (function () {
 
   /**
    * What a libyears value of zero says about the installed release, as plain text: it is the
-   * newest stable, or it sits above it (a pre-release the lock got ahead on) and the newest is
-   * named. Null for anything but an exact zero — read off the value, never off its rounded form:
-   * a release ten days behind prints `0.0` and is behind all the same.
+   * newest stable, or it is another release that is not behind it, and the newest is named. Not
+   * "ahead": the value is a difference of release dates clamped at zero, so a pre-release above
+   * the newest, a tag released the same day, and a backport on an older branch released after the
+   * newest all read zero, and the document carries no version order to tell them apart. Null for
+   * anything but an exact zero — read off the value, never off its rounded form: a release ten
+   * days behind prints `0.0` and is behind all the same.
    */
   function libyearsAtZero(finding, meta) {
     if (!finding || finding.libyears !== 0) return null;
     var newest = meta && meta.last_stable_version ? String(meta.last_stable_version) : null;
 
-    return newest && newest !== finding.version ? "ahead of the newest stable, " + newest : "the installed release is the newest";
+    return newest && newest !== finding.version ? "not behind the newest stable, " + newest : "the installed release is the newest";
   }
 
   /**
