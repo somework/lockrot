@@ -110,7 +110,7 @@ final class Explanation
                 'newest_dated' => $release['version'],
                 'newest_dated_released' => $release['at'],
                 'dated_by' => $release['dated_by'] ?? null,
-                'php' => $release['php'],
+                'php' => $release['php'] ?? null,
             ];
         }
 
