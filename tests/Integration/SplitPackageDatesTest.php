@@ -143,4 +143,23 @@ final class SplitPackageDatesTest extends TestCase
         self::assertNull(self::signal($finding, Signal::S2));
         self::assertSame(Verdict::OK, $finding->verdict(), 'measured, and the answer is that the branch still gets releases');
     }
+
+    /**
+     * The lock dates v8.83.27 at 2022-01-13 — the commit its 31 tags share; laravel/framework
+     * v8.83.27 released 2022-12-08. The package dates its own newest release (v13.32.0,
+     * 2026-09-06, a commit two tags share) so nothing else in the finding needs the parent, and
+     * without one the lock's date would be read as the release's: 4.65 libyears for 3.75.
+     */
+    public function testTheMonorepoDatesTheInstalledVersionForLibyears(): void
+    {
+        $withParent = self::contracts($this->report(MonorepoParents::load(), new Thresholds()));
+        $withoutParent = self::contracts($this->report(MonorepoParents::none(), new Thresholds()));
+
+        $expected = ((new \DateTimeImmutable('2026-09-06T21:12:06+00:00'))->getTimestamp() - (new \DateTimeImmutable('2022-12-08T15:28:55+00:00'))->getTimestamp()) / Clock::SECONDS_PER_YEAR;
+        self::assertNotNull($withParent->libyears());
+        self::assertEqualsWithDelta($expected, $withParent->libyears(), 0.0001);
+        self::assertEqualsWithDelta(3.75, $withParent->libyears(), 0.005);
+        self::assertNotNull($withoutParent->libyears());
+        self::assertEqualsWithDelta(4.65, $withoutParent->libyears(), 0.005, 'without a parent the lock\'s date is all there is, and it is the shared commit\'s');
+    }
 }

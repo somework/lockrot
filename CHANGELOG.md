@@ -22,7 +22,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   by reason on the Run tab. It is laid over the verdicts, not one of them: it counts every drift,
   healthy patches included, and enters no priority, `--fail-on` or baseline. The schemas gain the
   fields under the same number, optional so that older documents still validate. No new request
-  is made: both dates were already in the data.
+  is made: both dates were already in the data. A split package's installed version is dated by
+  its monorepo parent's tag of the same version, not by the lock: the lock copies the date
+  Packagist gave the split's tag, the commit its tags share, and illuminate/contracts v8.83.27
+  would read as 4.65 libyears behind for 3.75. `--explain` says whose date it is under
+  `installed_release` and `installed_release_dated_by`, and so does the package card.
 
 ## [0.10.0] - 2026-09-22
 

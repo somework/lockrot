@@ -36,7 +36,8 @@ final class Libyears
      * No date lockrot trusts for one of the two ends: no stable release at all, no dated release
      * above the installed version (the newest tags share a commit, as a subtree split's do, and
      * nothing dated sits between), the installed version dated only by such a shared commit (a
-     * split dated by its monorepo parent), or the lock entry without a `time`.
+     * split whose newest release the monorepo parent dated and whose installed version it does
+     * not), or the lock entry without a `time`.
      */
     public const NO_STABLE_RELEASE_DATE = 'no_stable_release_date';
     /** No metadata was asked for: a `path`, `vcs` or `package` repository entry. */
@@ -87,16 +88,11 @@ final class Libyears
      */
     public static function behind(LockedPackage $package, ?PackageMetadata $metadata): ?float
     {
-        if (!$package->isFromComposerRepository() || $metadata === null || $package->isBranchSnapshot()) {
+        if (!$package->isFromComposerRepository() || $metadata === null) {
             return null;
         }
-        // A split package dated by its monorepo parent is one whose own tags Packagist dates by the
-        // commit they share — the newest release's date was repaired from the parent, the installed
-        // version's in the lock was not, and it is the same stale commit date (illuminate/macroable
-        // v10.48.28: locked 2023-06-05 for a release of 2024-11-21). Measuring the two against each
-        // other adds the whole artefact to the sum, so the package is left unmeasured instead.
-        $installed = $package->time();
-        if ($installed === null || $metadata->lastStableDatedBy() !== null) {
+        $installed = self::installedReleaseAt($package, $metadata);
+        if ($installed === null) {
             return null;
         }
         $latest = $metadata->lastStableReleaseAt() ?? self::newestTrustedDateAbove($metadata, $package->version());
@@ -105,6 +101,49 @@ final class Libyears
         }
 
         return max(0.0, ($latest->getTimestamp() - $installed->getTimestamp()) / Clock::SECONDS_PER_YEAR);
+    }
+
+    /**
+     * When the installed version released, as far as lockrot trusts a date for it: the monorepo
+     * parent's tag of the same version where the package was dated by one
+     * ({@see PackageMetadata::releaseDateOf()}), else the lock's own `time`. A split package's tags
+     * are dated by the commit they share, and the lock copies that date — illuminate/macroable
+     * v10.48.28 is locked at 2023-06-05 for a release of 2024-11-21, illuminate/contracts v8.83.27
+     * at 2022-01-13 for one of 2022-12-08 — while `replace: {child: self.version}` says the parent's
+     * tag is the same release, dated by it. So the parent's date wins whenever there is one, even
+     * for a package that dated its own newest release: the artefact is in the installed version's
+     * date, not the newest one's. Null when nothing is trusted: a branch snapshot (a commit date,
+     * not a release's), a lock entry without a `time`, or a package whose newest release had to be
+     * dated by the parent and whose installed version the parent does not date — its lock date is
+     * the shared commit's, and measuring from it would add the whole artefact to the sum.
+     */
+    public static function installedReleaseAt(LockedPackage $package, PackageMetadata $metadata): ?\DateTimeImmutable
+    {
+        if ($package->isBranchSnapshot()) {
+            return null;
+        }
+
+        return self::parentDateOf($package, $metadata) ?? ($metadata->lastStableDatedBy() === null ? $package->time() : null);
+    }
+
+    /**
+     * The monorepo parent whose tag {@see installedReleaseAt()} reads, null when the date is the
+     * lock's own or there is none. A snapshot needs no check of its own here: the parent's map
+     * holds stable releases only, and a branch is not one.
+     */
+    public static function installedReleaseDatedBy(LockedPackage $package, PackageMetadata $metadata): ?string
+    {
+        return self::parentDateOf($package, $metadata) !== null ? $metadata->releaseDatesBy() : null;
+    }
+
+    /** The parent's date for the installed version, null when it has none or the version does not parse. */
+    private static function parentDateOf(LockedPackage $package, PackageMetadata $metadata): ?\DateTimeImmutable
+    {
+        try {
+            return $metadata->releaseDateOf((new VersionParser())->normalize($package->version()));
+        } catch (\UnexpectedValueException $e) {
+            return null;
+        }
     }
 
     /**

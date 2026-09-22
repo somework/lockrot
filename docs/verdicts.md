@@ -143,6 +143,13 @@ A branch the parent does not have, or does not date either, stays unmeasured as 
 every branch during an install-time run that has used up its budget. The signal carries the parent
 as `dated_by` in `--format=json`, and `--explain` marks the rows it supplied.
 
+The parent dates the installed version too. The lock's `time` for a split package is the date
+Packagist gave its tag — the shared commit's — so `illuminate/contracts` v8.83.27 is locked at
+2022-01-13 for a release of 2022-12-08. Where the parent lists the same version, its date is the
+installed version's for [libyears](#libyears), and `--explain` names it under
+`installed_release_dated_by`; where it does not, the lock's date is not trusted and the package
+goes unmeasured rather than eleven months too far behind.
+
 ## Security advisories
 
 `composer audit` reports the vulnerability. lockrot carries the same advisories on the finding, as
@@ -385,7 +392,7 @@ A package is **not measured**, and counted under one of four reasons, when:
 | `unmeasured` key | when |
 |---|---|
 | `branch_snapshot` | The installed version is a branch (`dev-main`, `2.x-dev`): it has a commit date, not a release date. Measured by push date a fresh `dev-main` reads as zero and an old one as years of nothing (lox/xhprof on Matomo would add ten). The `pinned` verdict already says what there is to say. |
-| `no_stable_release_date` | No date lockrot trusts for one of the two ends: no stable release exists; or the newest tag carries no date lockrot trusts — a subtree split whose tags share a commit — and nothing dated sits above the installed version either (symfony/polyfill-ctype v1.37.0: the newest tag, undated); or the installed version is dated only by such a shared commit (a split whose newest release is [dated by its monorepo parent](#dates-from-the-monorepo): the lock's `time` for illuminate/macroable v10.48.28 is a year and a half before the release); or the lock entry has no `time`. Adding an unknown to a sum is not measuring. |
+| `no_stable_release_date` | No date lockrot trusts for one of the two ends: no stable release exists; or the newest tag carries no date lockrot trusts — a subtree split whose tags share a commit — and nothing dated sits above the installed version either (symfony/polyfill-ctype v1.37.0: the newest tag, undated); or the installed version is dated only by such a shared commit and its [monorepo parent](#dates-from-the-monorepo) does not date it either (the lock's `time` for illuminate/macroable v10.48.28 is a year and a half before the release; where the parent lists the version, its date is used instead); or the lock entry has no `time`. Adding an unknown to a sum is not measuring. |
 | `not_from_composer_repository` | A `path`, `vcs` or `package` repository entry: no metadata was asked for. |
 | `metadata_unavailable` | Metadata was asked for and did not come: not listed, offline, budget, transport. |
 

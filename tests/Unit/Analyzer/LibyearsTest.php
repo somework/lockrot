@@ -160,14 +160,87 @@ final class LibyearsTest extends TestCase
         self::assertNull(Libyears::behind($this->package('v5.13.2', null), $this->metadata('2026-01-24T13:26:10+00:00')));
     }
 
-    public function testASplitPackageDatedByItsMonorepoParentIsNotMeasured(): void
-    {
-        // The newest release's date came from laravel/framework; the installed version's date in
-        // the lock is the shared commit's, a year and a half early, and would inflate the sum.
-        $datedByParent = new PackageMetadata('illuminate/macroable', false, null, true, new \DateTimeImmutable('2026-01-24T13:26:10+00:00'), 'v13.31.0', 120, null, 'library', new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), [], [], 'laravel/framework');
+    // ---- a split package: the installed version is dated by its monorepo parent -------------
 
-        self::assertNull(Libyears::behind($this->package(), $datedByParent));
-        self::assertSame('laravel/framework', $datedByParent->lastStableDatedBy());
+    private const LATEST = '2026-01-24T13:26:10+00:00';
+
+    /**
+     * A split package dated by laravel/framework: the newest release's date came from the parent,
+     * and the parent's tag for the installed v5.13.2 is dated too — two years before the newest.
+     *
+     * @param array<string, string> $parentDates by normalized version
+     */
+    private function splitPackage(array $parentDates, ?string $lastStableDatedBy = 'laravel/framework'): PackageMetadata
+    {
+        $dates = [];
+        foreach ($parentDates as $version => $at) {
+            $dates[$version] = new \DateTimeImmutable($at);
+        }
+
+        return new PackageMetadata('illuminate/macroable', false, null, true, new \DateTimeImmutable(self::LATEST), 'v13.31.0', 120, null, 'library', new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), [], [], $lastStableDatedBy, $dates, $dates === [] ? null : 'laravel/framework');
+    }
+
+    private static function twoYearsBefore(string $date): string
+    {
+        return (new \DateTimeImmutable($date))->modify('-'.(2 * Clock::SECONDS_PER_YEAR).' seconds')->format(\DATE_ATOM);
+    }
+
+    public function testASplitPackageIsMeasuredFromItsParentsDateForTheInstalledVersion(): void
+    {
+        // The lock says 2022-01-03 for v5.13.2 — the commit its tags share, not the release; the
+        // parent's v5.13.2 says two years before the newest, and that is the installed end.
+        $metadata = $this->splitPackage(['5.13.2.0' => self::twoYearsBefore(self::LATEST)]);
+
+        self::assertSame(2.0, Libyears::behind($this->package(), $metadata));
+        self::assertEquals(new \DateTimeImmutable(self::twoYearsBefore(self::LATEST)), Libyears::installedReleaseAt($this->package(), $metadata));
+        self::assertSame('laravel/framework', Libyears::installedReleaseDatedBy($this->package(), $metadata));
+    }
+
+    public function testASplitPackageWhoseParentDoesNotDateTheInstalledVersionIsNotMeasured(): void
+    {
+        // The newest release's date came from the parent, so the lock's date for the installed
+        // version is the shared commit's, a year and a half early, and would inflate the sum.
+        $neighbour = $this->splitPackage(['5.13.3.0' => self::twoYearsBefore(self::LATEST)]);
+
+        self::assertNull(Libyears::behind($this->package(), $this->splitPackage([])));
+        self::assertNull(Libyears::behind($this->package(), $neighbour), 'a neighbouring version is not this one');
+        self::assertNull(Libyears::installedReleaseAt($this->package(), $this->splitPackage([])));
+        self::assertSame('laravel/framework', $neighbour->releaseDatesBy());
+        self::assertNull(Libyears::installedReleaseDatedBy($this->package(), $neighbour), 'the parent has dates, none of them for this version');
+    }
+
+    public function testTheParentsDateOutranksTheLocksEvenWhenThePackageDatedItsNewestReleaseItself(): void
+    {
+        // illuminate/contracts: the newest tag sits on a commit of its own and is dated by the
+        // package itself, but the installed v8.83.27 sits on one 31 tags share — the lock's date
+        // is eleven months early. The parent dates the installed version whenever it can.
+        $metadata = $this->splitPackage(['5.13.2.0' => self::twoYearsBefore(self::LATEST)], null);
+
+        self::assertNull($metadata->lastStableDatedBy());
+        self::assertSame(2.0, Libyears::behind($this->package(), $metadata));
+    }
+
+    public function testWithoutAParentAPackageIsMeasuredFromTheLocksDate(): void
+    {
+        $metadata = $this->splitPackage([], null);
+
+        self::assertEquals(new \DateTimeImmutable(self::LOCKED_AT), Libyears::installedReleaseAt($this->package(), $metadata));
+        self::assertEqualsWithDelta(4.06, Libyears::behind($this->package(), $metadata) ?? 0.0, 0.005);
+    }
+
+    public function testAVersionComposerCannotNormalizeIsMeasuredFromTheLocksDate(): void
+    {
+        $metadata = $this->splitPackage(['5.13.2.0' => self::twoYearsBefore(self::LATEST)], null);
+
+        self::assertEquals(new \DateTimeImmutable(self::LOCKED_AT), Libyears::installedReleaseAt($this->package('not a version'), $metadata));
+    }
+
+    public function testASnapshotHasNoReleaseDateToMeasureFrom(): void
+    {
+        $metadata = $this->splitPackage(['5.13.2.0' => self::twoYearsBefore(self::LATEST)], null);
+
+        self::assertNull(Libyears::installedReleaseAt($this->package('dev-main'), $metadata));
+        self::assertNull(Libyears::installedReleaseDatedBy($this->package('dev-main'), $metadata), 'the parent dates releases, and a branch is not one');
     }
 
     public function testADevelopmentPackageIsMeasuredLikeAnyOther(): void

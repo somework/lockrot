@@ -212,7 +212,7 @@
               "minimum": 0
             },
             "no_stable_release_date": {
-              "description": "No date to trust for one end: no stable release; the newest one undated with nothing dated above the installed version (when something dated is, its date is used and the value is a lower bound); the installed version dated only by a commit its tags share (a split dated by its monorepo parent); or the lock entry without a `time`.",
+              "description": "No date to trust for one end: no stable release; the newest one undated with nothing dated above the installed version (when something dated is, its date is used and the value is a lower bound); the installed version dated only by a commit its tags share and not by its monorepo parent either (where the parent lists the version, its date is the installed version's); or the lock entry without a `time`.",
               "type": "integer",
               "minimum": 0
             },
