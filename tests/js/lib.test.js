@@ -228,3 +228,15 @@ test("libyearsSortKey puts an unmeasured package below every measured one, zero 
     assert.deepStrictEqual(rows.map(lib.libyearsSortKey).sort((a, b) => a - b), [-1, -1, 0, 1.2]);
     assert.strictEqual(lib.libyearsSortKey(undefined), -1, "no finding at all sorts with the unmeasured");
 });
+
+test("libyearsReason names why a finding was not measured, in the block's own words", () => {
+    assert.strictEqual(lib.libyearsReason({ libyears: 4.7, version: "dev-main" }), "", "measured: nothing to explain");
+    assert.strictEqual(lib.libyearsReason({ libyears: 0, version: "1.0.0" }), "", "zero is measured");
+    assert.strictEqual(lib.libyearsReason({ libyears: null, version: "dev-main", note: "not from a Composer repository, not checked" }), "not from a Composer repository", "the note outranks the version");
+    assert.strictEqual(lib.libyearsReason({ libyears: null, version: "1.0.0", note: "Repository metadata unavailable: timeout" }), "metadata unavailable");
+    assert.strictEqual(lib.libyearsReason({ libyears: null, version: "dev-main", note: null }), "branch snapshot");
+    assert.strictEqual(lib.libyearsReason({ libyears: null, version: "2.x-dev#abc123" }), "branch snapshot", "the reference is stripped first");
+    assert.strictEqual(lib.libyearsReason({ libyears: null, version: "v1.37.0" }), "no dated stable release");
+    assert.strictEqual(lib.libyearsReason({ version: "v1.37.0" }), "no dated stable release", "a document from before the field reads as unmeasured");
+    assert.strictEqual(lib.libyearsReason(undefined), "");
+});

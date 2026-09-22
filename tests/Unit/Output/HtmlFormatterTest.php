@@ -119,6 +119,7 @@ final class HtmlFormatterTest extends TestCase
         self::assertStringContainsString('id="libyearsTotal"', $page, 'the ledger has a place for the total');
         self::assertStringContainsString('id="libyearsLine"', $page, 'and for the line under it');
         self::assertStringContainsString('function libyearsSummary', $page, 'the library that writes the words under the figure is inline');
+        self::assertStringContainsString('id="libyearsDef"', $page, 'and the glossary says what the number is');
         self::assertSame(4.71, J::arrayAt($payload, ['report', 'libyears'])['total']);
         self::assertSame(4.71, J::arrayAt($payload, ['report', 'findings', 0])['libyears']);
         self::assertNull(J::arrayAt($payload, ['report', 'findings', 1])['libyears']);

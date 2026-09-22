@@ -562,18 +562,23 @@
       return '<tr data-idx="' + i + '" data-pkg="' + esc(f.package) + '">' +
         "<td>" + (packagistUrl(f) ? '<a class="lnk" href="' + esc(packagistUrl(f)) + '" target="_blank" rel="noopener noreferrer">' + esc(f.package) + "</a>" : esc(f.package)) + "</td>" +
         '<td class="num">' + esc(f.version) + "</td>" +
-        '<td class="num">' + (f.libyears == null ? '<span style="color:var(--muted)">\u2014</span>' : Number(f.libyears).toFixed(1)) + "</td>" +
+        '<td class="num">' + (f.libyears == null
+          ? '<span style="color:var(--muted)" title="not measured: ' + esc(LockrotLib.libyearsReason(f)) + '">\u2014</span>'
+          : Number(f.libyears).toFixed(1)) + "</td>" +
         "<td>" + pill(f.verdict) + "</td>" +
         "<td>" + (f.priority === "none" ? '<span style="color:var(--muted)">—</span>' : pill(f.priority)) + "</td>" +
         "<td>" + (f.direct ? "direct" : "transitive") + (f.dev ? " \u00b7 dev" : "") + "</td>" +
         '<td class="num">' + ((f.signals || []).map(function (s) { return s.id; }).join(" ") || "—") + "</td>" +
         '<td class="num">' + day(last) + "</td></tr>";
     }).join("");
-    var head = [["package", "Package"], ["version", "Version"], ["libyears", "Libyears"], ["verdict", "Verdict"], ["priority", "Priority"],
+    var head = [["package", "Package"], ["version", "Version"],
+      ["libyears", "Libyears", "Years between the installed release and the package's newest stable release; a dash is a package that could not be measured, and says why on hover"],
+      ["verdict", "Verdict"], ["priority", "Priority"],
       ["reached", "Reached"], ["signals", "Signals"], ["data", "Data as of"]].map(function (c) {
       var on = (SORTS[state.sort] ? state.sort : "verdict") === c[0];
-      return '<th aria-sort="' + (on ? (state.sortDesc ? "descending" : "ascending") : "none") +
-        '"><button type="button" data-sort="' + c[0] +
+      return '<th aria-sort="' + (on ? (state.sortDesc ? "descending" : "ascending") : "none") + '"' +
+        (c[2] ? ' title="' + esc(c[2]) + '"' : "") +
+        '><button type="button" data-sort="' + c[0] +
         '" style="background:none;border:0;padding:0;cursor:pointer;font:inherit;letter-spacing:inherit;text-transform:inherit;color:' +
         (on ? "var(--ink)" : "inherit") + '">' + c[1] + (on ? (state.sortDesc ? " \u2193" : " \u2191") : "") + "</button></th>";
     }).join("");
@@ -748,6 +753,9 @@
       ["installed", esc(f.version)],
       ["php constraint", lock.php ? esc(lock.php) : null],
       ["released", lock.released ? esc(day(lock.released) + " \u00b7 " + ageText(lock.released)) : null],
+      ["libyears behind", f.libyears == null
+        ? '<span style="color:var(--muted)">not measured \u00b7 ' + esc(LockrotLib.libyearsReason(f)) + "</span>"
+        : esc(Number(f.libyears).toFixed(1))],
       ["repository", rp
         ? '<a class="lnk" href="' + esc(rp) + '" target="_blank" rel="noopener noreferrer">' + esc(rp) + "</a>"
         : (lock.repository || meta.repository ? esc(lock.repository || meta.repository) : null)],

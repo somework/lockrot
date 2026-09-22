@@ -95,6 +95,24 @@ var LockrotLib = (function () {
   }
 
   /**
+   * Why a finding carries no libyears value, in the words the report's `unmeasured` block counts
+   * it under, read off the finding the way the block itself does: the note names a package no
+   * repository was asked about or one whose metadata did not come, a dev version is a branch
+   * snapshot, and what is left had metadata and no pair of dates to compare. An empty string
+   * for a measured finding.
+   */
+  function libyearsReason(finding) {
+    if (!finding || (finding.libyears !== null && finding.libyears !== undefined)) return "";
+    var note = finding.note;
+    if (note === "not from a Composer repository, not checked") return "not from a Composer repository";
+    if (note) return "metadata unavailable";
+    var version = String(finding.version || "").replace(/#.*$/, "");
+    if (/^dev-/.test(version) || /-dev$/.test(version)) return "branch snapshot";
+
+    return "no dated stable release";
+  }
+
+  /**
    * The libyears block, minus the total, as the words under the ledger's figure and in the Run
    * tab: `across 191 of 200 packages · 94.5 from direct requirements · furthest behind
    * smalot/pdfparser v1.1.0 at 4.7` — the table footer's items after the number, in its words.
@@ -166,6 +184,7 @@ var LockrotLib = (function () {
     ageText: ageText,
     plural: plural,
     libyearsSummary: libyearsSummary,
+    libyearsReason: libyearsReason,
     libyearsSortKey: libyearsSortKey,
     kvRows: kvRows,
     parseQuery: parseQuery
