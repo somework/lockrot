@@ -53,7 +53,7 @@ final class ExplainFormatterTest extends TestCase
         ], 'count' => 2]);
         $finding = new Finding('vendor/pkg', '1.5.0', Verdict::LEFT_BEHIND, [$s8, $s9], ['root/app', 'vendor/mid', 'vendor/pkg'], null, new \DateTimeImmutable(F::NOW), null, false, ['root/app', 'root/other']);
         // Branches listed out of order: the table sorts them.
-        $metadata = F::metadata([['1.5.0', '2021-06-01T00:00:00+00:00'], ['1.4.9', '2021-01-01T00:00:00+00:00'], ['2.1.0', '2026-01-01T00:00:00+00:00']], true, 'vendor/next');
+        $metadata = F::metadata([['1.5.0', '2021-06-01T00:00:00+00:00', '>=7.1 <8.0'], ['1.4.9', '2021-01-01T00:00:00+00:00'], ['2.1.0', '2026-01-01T00:00:00+00:00', '>=8.1']], true, 'vendor/next');
         $package = F::package(['version' => '1.5.0', 'php' => '>=7.1 <8.0', 'time' => '2021-06-01T00:00:00+00:00']);
         $activity = new RepositoryActivity(new RepoRef(RepoRef::GITHUB, 'github.com', 'vendor/pkg'), true, null, new \DateTimeImmutable(F::NOW), new \DateTimeImmutable('2026-09-13T00:00:00+00:00'));
         $explanation = new Explanation($finding, F::facts($package, $metadata, $activity), new Thresholds(), '8.4', $this->report(['GitHub token not set']));
@@ -80,9 +80,9 @@ final class ExplainFormatterTest extends TestCase
               3 versions listed · library · abandoned, replacement vendor/next
               source https://github.com/vendor/pkg.git
               last stable release 2.1.0 (2026-01-01)
-                branch     highest tag        released           newest dated release
-                2.x        2.1.0              2026-01-01         2.1.0 (2026-01-01)
-              * 1.x        1.5.0              2021-06-01         1.5.0 (2021-06-01)
+                branch     highest tag        released           newest dated release     php
+                2.x        2.1.0              2026-01-01         2.1.0 (2026-01-01)       >=8.1
+              * 1.x        1.5.0              2021-06-01         1.5.0 (2021-06-01)       >=7.1 <8.0
 
             repository activity
               GitHub vendor/pkg · archived · last push unknown · fetched 2026-09-14 (from lockrot's cache)
@@ -133,10 +133,10 @@ final class ExplainFormatterTest extends TestCase
               7 versions listed · library · not abandoned
               source https://github.com/vendor/pkg.git
               last stable release unknown: the highest tag 13.1.0 has no release date, so S2 does not measure the package
-                branch     highest tag        released           newest dated release
-                13.x       13.1.0             commit 2026-04-29  13.1.0 (2026-04-29)
-                12.x       12.0.0             undated            —
-              * 10.x       10.49.0            commit 2023-06-05  10.49.0 (2023-06-05)
+                branch     highest tag        released           newest dated release     php
+                13.x       13.1.0             commit 2026-04-29  13.1.0 (2026-04-29)      —
+                12.x       12.0.0             undated            —                        —
+              * 10.x       10.49.0            commit 2023-06-05  10.49.0 (2023-06-05)     —
               * the installed branch's highest tag has no release date — the repository leaves it undated, or dates it only by a commit other tags share (`commit …`: a subtree split, the day the directory last changed) — so S8 does not measure the branch
 
             repository activity
@@ -162,6 +162,10 @@ final class ExplainFormatterTest extends TestCase
         self::assertStringContainsString("repository metadata\n  none — not from a Composer repository, not checked\n", $text);
         self::assertStringNotContainsString('branch     highest tag', $text);
         self::assertStringNotContainsString('  source ', $text, 'no source in the lock, no source line');
+
+        $devOnly = new Explanation($finding, F::facts(F::package(['version' => 'dev-main']), F::metadata([['dev-main', null]])), new Thresholds(), '8.4', $this->report());
+        self::assertStringNotContainsString('branch     highest tag', $this->plain($devOnly), 'a package with no release branch has no table, not an empty one');
+        self::assertStringContainsString("\n  no stable release\n", $this->plain($devOnly), 'and its last release is said to be none, not unknown');
 
         $noNote = new Explanation(new Finding('vendor/pkg', '1.0.0', Verdict::UNKNOWN, [], ['vendor/pkg'], null, null), F::facts(F::package()), new Thresholds(), '8.4', $this->report());
         self::assertStringContainsString("repository metadata\n  none — not available\n", $this->plain($noNote));
@@ -241,7 +245,7 @@ final class ExplainFormatterTest extends TestCase
         self::assertSame('ok', $json['finding']['verdict']);
         self::assertIsArray($json['metadata']);
         self::assertIsArray($json['metadata']['branches']);
-        self::assertSame([['branch' => '1.x', 'installed' => true, 'highest' => '1.0.0', 'highest_released' => '2026-01-01T00:00:00+00:00', 'highest_commit_date' => null, 'newest_dated' => '1.0.0', 'newest_dated_released' => '2026-01-01T00:00:00+00:00', 'dated_by' => null]], $json['metadata']['branches']);
+        self::assertSame([['branch' => '1.x', 'installed' => true, 'highest' => '1.0.0', 'highest_released' => '2026-01-01T00:00:00+00:00', 'highest_commit_date' => null, 'newest_dated' => '1.0.0', 'newest_dated_released' => '2026-01-01T00:00:00+00:00', 'dated_by' => null, 'php' => null]], $json['metadata']['branches']);
     }
 
     /** A split package dated by its monorepo: the rows read the parent's dates, and a footnote says whose they are. */
@@ -279,10 +283,10 @@ final class ExplainFormatterTest extends TestCase
               7 versions listed · library · not abandoned
               source https://github.com/illuminate/contracts.git
               last stable release v10.50.3 (2026-08-12, dated by laravel/framework)
-                branch     highest tag        released           newest dated release
-              * 10.x       v10.50.3           2026-08-12         v10.50.3 (2026-08-12)
-                9.x        v9.52.22           2026-08-12         v9.52.22 (2026-08-12)
-                8.x        v8.83.27           2022-01-13         v8.83.27 (2022-01-13)
+                branch     highest tag        released           newest dated release     php
+              * 10.x       v10.50.3           2026-08-12         v10.50.3 (2026-08-12)    —
+                9.x        v9.52.22           2026-08-12         v9.52.22 (2026-08-12)    —
+                8.x        v8.83.27           2022-01-13         v8.83.27 (2022-01-13)    —
               branches 10.x, 9.x dated by laravel/framework, the monorepo this package is split out of: its own tags there are dated by a commit other tags share, the monorepo's by their release
 
             repository activity

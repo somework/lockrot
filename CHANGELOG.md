@@ -27,6 +27,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Packagist gave the split's tag, the commit its tags share, and illuminate/contracts v8.83.27
   would read as 4.65 libyears behind for 3.75. `--explain` says whose date it is under
   `installed_release` and `installed_release_dated_by`, and so does the package card.
+- **`left-behind` suggests a branch the project can actually move to.** S8 named the newest
+  releasing branch and wrote the constraint that follows it, whatever PHP that branch requires:
+  Matomo supports `php >=7.2.5`, locks monolog 1.27.1, and was told `require ^3.12` — monolog
+  3.x needs PHP 8.1. On the weekly watch, 99 of the 138 constraints suggested to projects that
+  declare a `require.php` contradicted it. Every release branch now carries the php requirement of
+  the release it names (read from the same repository data, no new request), and S8 holds the
+  higher branches to two floors — the project's own `require.php` and the target PHP, the version
+  Composer resolves against. The newest branch still proves the upstream moved on; the branch the
+  evidence tells the project to follow is the newest releasing one within both floors, and when
+  that is not the newest the line says what holds the newest back: `3.x released 3.12.0
+  (2026-09-09), needs php >=8.1 above the project's php >=7.2.5; 2.x released 2.11.1 (2026-09-02);
+  require ^2.11 to follow`. With no releasing branch within reach it says so and suggests nothing:
+  the way forward is a PHP upgrade, not a `composer.json` line. `--format=json` gains `newest_php`,
+  `newest_within_reach`, `floor_php`, `floor_source` and `reachable_branch`/`_version`/`_release`
+  on the signal; `--explain` shows each branch's php requirement in the branch table and in the
+  JSON `branches` rows. See [Within reach](docs/verdicts.md#within-reach).
 
 ### Changed
 

@@ -252,7 +252,7 @@ final class ExplainFormatter
         if ($rows === []) {
             return [];
         }
-        $lines = ['  branch     highest tag        released           newest dated release'];
+        $lines = ['  branch     highest tag        released           newest dated release     php'];
         foreach (\array_slice($rows, 0, Explanation::BRANCH_ROWS) as $row) {
             if ($row['highest_released'] !== null) {
                 $released = $row['highest_released']->format('Y-m-d');
@@ -262,7 +262,9 @@ final class ExplainFormatter
                 $released = 'undated';
             }
             $newest = $row['newest_dated_released'] === null ? '—' : $row['newest_dated'].' ('.$row['newest_dated_released']->format('Y-m-d').')';
-            $lines[] = \sprintf('%s%-10s %-18s %-18s %s', $row['installed'] ? '* ' : '  ', $row['branch'], $row['highest'], $released, $newest);
+            // The em dash is three bytes and one column; sprintf and str_pad count bytes, so that cell
+            // is padded to 24 columns by adding the bytes the multibyte characters cost.
+            $lines[] = \sprintf('%s%-10s %-18s %-18s %s %s', $row['installed'] ? '* ' : '  ', $row['branch'], $row['highest'], $released, str_pad($newest, 24 + \strlen($newest) - self::columns($newest)), $row['php'] ?? '—');
         }
         if (\count($rows) > Explanation::BRANCH_ROWS) {
             $lines[] = \sprintf('  … and %d more', \count($rows) - Explanation::BRANCH_ROWS);
@@ -277,6 +279,12 @@ final class ExplainFormatter
         }
 
         return $lines;
+    }
+
+    /** Characters in a UTF-8 string, without ext-mbstring: every byte that does not continue a multibyte sequence starts a character. */
+    private static function columns(string $text): int
+    {
+        return \strlen((string) preg_replace('/[\x80-\xBF]/', '', $text));
     }
 
     /** @return list<string> */

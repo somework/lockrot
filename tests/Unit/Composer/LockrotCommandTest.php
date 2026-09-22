@@ -485,7 +485,7 @@ final class LockrotCommandTest extends TestCase
         self::assertStringContainsString('— abandoned, priority', $display);
         self::assertStringContainsString("\n  S1 high marked abandoned by its repository", $display);
         self::assertStringContainsString("\nrepository metadata (as of ", $display);
-        self::assertStringContainsString("\n    branch     highest tag        released           newest dated release\n", $display);
+        self::assertStringContainsString("\n    branch     highest tag        released           newest dated release     php\n", $display);
         self::assertStringContainsString("\nthresholds: release-warn-years 3", $display);
         self::assertStringNotContainsString('packages checked', $display, 'the report itself is not printed');
     }

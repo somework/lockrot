@@ -48,14 +48,16 @@ final class FactsBuilder
         );
     }
 
-    /** @param list<array{string, ?string}> $releases [version, time] */
+    /** @param list<array{0: string, 1: ?string, 2?: ?string}> $releases [version, time, php requirement] */
     public static function metadata(array $releases, bool $abandoned = false, ?string $replacement = null, string $type = 'library'): PackageMetadata
     {
         $hasStableRelease = false;
         $lastStableReleaseAt = null;
         $lastStableVersion = null;
         $byBranch = [];
-        foreach ($releases as [$version, $time]) {
+        foreach ($releases as $release) {
+            [$version, $time] = $release;
+            $php = $release[2] ?? null;
             if (strpos($version, 'dev-') === 0) {
                 continue;
             }
@@ -73,9 +75,9 @@ final class FactsBuilder
                 $seen = $byBranch[$branch] ?? null;
                 $highest = $seen === null ? ['normalized' => (new VersionParser())->normalize($version), 'pretty' => $version, 'at' => $at] : $seen['highest'];
                 if ($at !== null && ($seen === null || $seen['at'] === null || $at > $seen['at'])) {
-                    $byBranch[$branch] = ['version' => $version, 'at' => $at, 'highest' => $highest];
+                    $byBranch[$branch] = ['version' => $version, 'at' => $at, 'highest' => $highest, 'php' => $php];
                 } elseif ($seen === null) {
-                    $byBranch[$branch] = ['version' => $version, 'at' => null, 'highest' => $highest];
+                    $byBranch[$branch] = ['version' => $version, 'at' => null, 'highest' => $highest, 'php' => $php];
                 }
             }
         }

@@ -106,12 +106,12 @@ final class AnalyzerSplitPackagesTest extends TestCase
         return LockFile::fromArray(['packages' => $packages]);
     }
 
-    /** @return array{version: string, at: ?\DateTimeImmutable, highest: array{normalized: string, pretty: string, at: ?\DateTimeImmutable}} */
+    /** @return array{version: string, at: ?\DateTimeImmutable, highest: array{normalized: string, pretty: string, at: ?\DateTimeImmutable}, php: ?string} */
     private static function branch(string $version, ?string $at): array
     {
         $date = $at === null ? null : new \DateTimeImmutable($at);
 
-        return ['version' => 'v'.$version, 'at' => $date, 'highest' => ['normalized' => $version.'.0', 'pretty' => 'v'.$version, 'at' => $date]];
+        return ['version' => 'v'.$version, 'at' => $date, 'highest' => ['normalized' => $version.'.0', 'pretty' => 'v'.$version, 'at' => $date], 'php' => null];
     }
 
     /** contracts as Packagist has it: 8.x and 13.x on shared commits (undated), 7.x on its own. */
