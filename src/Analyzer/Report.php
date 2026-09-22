@@ -143,6 +143,24 @@ final class Report
         return $counts;
     }
 
+    /**
+     * How many `abandoned` findings name a package to move to ({@see Finding::successor()}). The
+     * marker alone does not say whether a package died or moved: on the weekly watch 19 of 72
+     * abandoned packages carried a replacement, 17 of them a package name. A reader comparing two
+     * reports, or two projects, wants the two apart.
+     */
+    public function abandonedWithReplacement(): int
+    {
+        $count = 0;
+        foreach ($this->findings as $finding) {
+            if ($finding->successor() !== null) {
+                ++$count;
+            }
+        }
+
+        return $count;
+    }
+
     /** @return array<string, int> */
     public function byPriority(): array
     {
@@ -308,12 +326,16 @@ final class Report
         return \sprintf('package repositories; repository activity from lockrot\'s cache, up to %d h old', max(1, (int) ceil($seconds / 3600)));
     }
 
-    /** One-line totals, e.g. `200 packages checked · abandoned 19 · silent 1 · …`, shared by the table and GitHub formats. */
+    /**
+     * One-line totals, e.g. `200 packages checked · abandoned 19 (6 with a replacement) · silent 1 · …`,
+     * shared by the table and GitHub formats. The replacement count is there only when it is not zero.
+     */
     public function summaryLine(): string
     {
         $parts = [\sprintf('%d packages checked', $this->packagesChecked)];
+        $withReplacement = $this->abandonedWithReplacement();
         foreach ($this->byVerdict() as $verdict => $count) {
-            $parts[] = $verdict.' '.$count;
+            $parts[] = $verdict.' '.$count.($verdict === Verdict::ABANDONED && $withReplacement > 0 ? \sprintf(' (%d with a replacement)', $withReplacement) : '');
         }
 
         return implode(' · ', $parts);
@@ -386,6 +408,9 @@ final class Report
             'not_from_composer_repository' => $this->notFromComposerRepository,
             'network_failures' => $this->hadNetworkFailures,
             'counts' => $this->byVerdict(),
+            // The abandoned count split by what the reader can do about it: `with_replacement` names a
+            // package to move to, the rest is dead. `total` repeats counts.abandoned so the block reads alone.
+            'abandoned' => ['total' => $this->byVerdict()[Verdict::ABANDONED], 'with_replacement' => $this->abandonedWithReplacement()],
             'priorities' => $this->byPriority(),
             'exposure' => $this->exposureList(),
             'libyears' => $this->libyears()->toArray(),

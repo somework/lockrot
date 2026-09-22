@@ -117,6 +117,24 @@
         }
       }
     },
+    "abandoned": {
+      "description": "The abandoned count split by what the reader can do about it: `with_replacement` is how many of the `abandoned` findings carry a `replacement` that names a package, the rest name none (or free text). `total` equals counts.abandoned. Absent from documents written before 0.11.0.",
+      "type": "object",
+      "required": [
+        "total",
+        "with_replacement"
+      ],
+      "properties": {
+        "total": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "with_replacement": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
     "priorities": {
       "description": "Findings per priority, every priority present.",
       "type": "object",
@@ -436,6 +454,17 @@
         "dev": {
           "description": "Listed under packages-dev in the lock.",
           "type": "boolean"
+        },
+        "replacement": {
+          "description": "On an abandoned finding, the package its repository names as the replacement, when that is a Composer package name (Packagist's field is free text; `Symfony` or a sentence stays in the evidence and is null here). Null on every other finding. Absent from documents written before 0.11.0.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/packageName"
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "signals": {
           "type": "array",
