@@ -16,7 +16,7 @@ was observed about the package. The priority says how much that applies to *your
 | `silent` | No stable release for at least `release-high-years` (default 5y) **and** no repository push for at least `push-high-years` (default 5y); an archived repository is reported as `abandoned` instead | S2 high AND S4 high, NOT S1, NOT S3 |
 | `pinned` | Installed version is a branch snapshot — `dev-master`, `dev-main`, any other `dev-*` branch, a `2.x-dev` alias or a `#hash` reference — or the package has no stable release at all | S6 |
 | `left-behind` | No stable release on the installed version's release branch for at least `release-warn-years` (default 3y), while a higher branch has released since and within `release-warn-years` — the package is alive, the branch you are on is not | S8 |
-| `old-promise` | The installed version was written for an older PHP major (`>=7.2`, `*`) and released before the target's major existed, and its `require.php` admits the target only because it has no upper bound | S5 |
+| `old-promise` | The installed version was written for an older PHP major, or for none at all (`>=7.2`, `*`), and released before the target's major existed, and its `require.php` admits the target only because it has no upper bound | S5 |
 | `stale` | Old release or old push, but not old enough (or not on both fronts) for `silent` | one of S2/S4 |
 | `unknown` | No data could be obtained (not found in any configured Composer repository, or all lookups failed) | — |
 | `finished` | Matched the built-in or project allowlist — the package is complete by design, not neglected | allowlist match |
@@ -421,7 +421,7 @@ the other parents at all; `composer lockrot` on the full lock always has the who
 One number for how far behind the whole lock is, laid over the verdicts rather than added to them:
 
 ```text
-libyears: 163.7 behind across 195 of 200 packages · 106.7 from direct requirements ·
+libyears: 171.3 behind across 195 of 200 packages · 111.7 from direct requirements ·
 furthest behind smalot/pdfparser v1.1.0 at 4.7
 ```
 
@@ -479,7 +479,7 @@ Three things the number is not:
 - **A security number.** An advisory is S9 and the priority ladder; this is distance.
 - **php-libyear's number.** [ecoAPM/php-libyear](https://github.com/ecoAPM/php-libyear) reads
   `composer.json` and sums the direct requirements only; lockrot sums the whole lock, which on
-  wallabag is 163.7 against 106.7. `direct_requirements` is the same sum restricted to
+  wallabag is 171.3 against 111.7. `direct_requirements` is the same sum restricted to
   `direct: true` — the nearest number to that tool's, not the same one: run with `--dev` to
   compare, since php-libyear counts `require` and `require-dev` together; it picks the newest
   version by the project's `minimum-stability` where lockrot always takes the newest stable; and it
