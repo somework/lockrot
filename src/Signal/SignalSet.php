@@ -26,7 +26,11 @@ final class SignalSet
         $this->rules = $rules;
     }
 
-    public static function default(Clock $clock, Thresholds $thresholds, string $targetPhp, PhpReleaseDates $dates): self
+    /**
+     * @param string  $targetPhp  the PHP the run targets: S5 measures the installed release against it, S8 names no branch outside it
+     * @param ?string $projectPhp the project's own `require.php`, the other floor S8 keeps to ({@see PhpFloor}); null when the manifest has none
+     */
+    public static function default(Clock $clock, Thresholds $thresholds, string $targetPhp, PhpReleaseDates $dates, ?string $projectPhp = null): self
     {
         return new self([
             new AbandonedRule(),
@@ -35,7 +39,7 @@ final class SignalSet
             new NoPushRule($clock, $thresholds),
             new OldPromiseRule(new ConstraintOpenness(), $dates, $targetPhp),
             new PinnedRule(),
-            new LeftBehindRule($clock, $thresholds),
+            new LeftBehindRule($clock, $thresholds, new PhpFloor($targetPhp, $projectPhp)),
             new AdvisoryRule(),
         ]);
     }

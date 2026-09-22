@@ -20,6 +20,19 @@ final class ProjectConfigTest extends TestCase
         self::assertSame(['vendor/devtool'], $cfg->directDevRequires());
         self::assertSame('silent', $cfg->lockrotExtra()['fail-on']);
         self::assertSame('8.1.0', $cfg->platformPhp());
+        self::assertSame('^7.4 || ^8.0', $cfg->requirePhp());
+    }
+
+    /** `require.php` is read as written; a project that promises no PHP, or an unreadable promise, has none. */
+    public function testThePhpRequirementIsReadAsWrittenOrIsNothing(): void
+    {
+        self::assertSame('>=7.2.5', ProjectConfig::fromArray(['require' => ['php' => '>=7.2.5']])->requirePhp());
+        self::assertNull(ProjectConfig::fromArray(['require' => ['a/b' => '^1.0']])->requirePhp());
+        self::assertNull(ProjectConfig::fromArray(['require' => ['php' => '']])->requirePhp());
+        self::assertNull(ProjectConfig::fromArray(['require' => ['php' => ['^8.2']]])->requirePhp());
+        self::assertNull(ProjectConfig::fromArray(['require' => 'nonsense'])->requirePhp());
+        self::assertNull(ProjectConfig::fromArray([])->requirePhp());
+        self::assertNull(ProjectConfig::empty()->requirePhp());
     }
 
     public function testPlatformPackagesAreExcludedFromRequires(): void

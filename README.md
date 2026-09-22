@@ -194,7 +194,7 @@ which win over `composer.json`.
 | `extra.lockrot` key | CLI option | Default | Meaning |
 |---|---|---|---|
 | `fail-on` | `--fail-on=<verdict or priority>` | `none` | Exit 1 threshold: a verdict (`stale`, `old-promise`, `left-behind`, `pinned`, `silent`, `abandoned`) or a priority (`low`, `medium`, `high`, `critical`) |
-| `target-php` | `--target-php=8.4` | `config.platform.php`, else the running PHP | PHP version used for the `old-promise` check |
+| `target-php` | `--target-php=8.4` | `config.platform.php`, else the running PHP | PHP version the project runs on: decides `old-promise`, and which branch `left-behind` suggests |
 | `format` | `--format=<name>` | `table` | `table`, `json`, `github`, `sarif`, `gitlab`, `markdown` or `html` |
 | `include-dev` | `--dev` | `false` | Also check `packages-dev`, one priority step lower |
 | `install-time` | — | `on` | Print a compact block during `composer require`/`update`/`install` |

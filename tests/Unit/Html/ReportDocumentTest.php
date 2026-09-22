@@ -171,7 +171,7 @@ final class ReportDocumentTest extends TestCase
             $metadataUrl,
             'library',
             new \DateTimeImmutable(F::NOW),
-            ['1' => ['version' => '1.0.0', 'at' => $at, 'highest' => ['normalized' => '1.0.0.0', 'pretty' => '1.0.0', 'at' => $at]]]
+            ['1' => ['version' => '1.0.0', 'at' => $at, 'highest' => ['normalized' => '1.0.0.0', 'pretty' => '1.0.0', 'at' => $at], 'php' => null]]
         );
         $facts = ['vendor/pkg' => F::facts(F::package(['source' => $lockSource]), $metadata)];
 

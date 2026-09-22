@@ -19,19 +19,21 @@ final class ProjectConfig
     /** @var array<string, mixed> */
     private array $lockrotExtra;
     private ?string $platformPhp;
+    private ?string $requirePhp;
 
     /**
      * @param list<string> $requires
      * @param list<string> $devRequires
      * @param array<string, mixed> $lockrotExtra
      */
-    private function __construct(array $requires, array $devRequires, array $lockrotExtra, ?string $platformPhp, ?string $name = null)
+    private function __construct(array $requires, array $devRequires, array $lockrotExtra, ?string $platformPhp, ?string $name = null, ?string $requirePhp = null)
     {
         $this->name = $name;
         $this->requires = $requires;
         $this->devRequires = $devRequires;
         $this->lockrotExtra = $lockrotExtra;
         $this->platformPhp = $platformPhp;
+        $this->requirePhp = $requirePhp;
     }
 
     public static function empty(): self
@@ -62,13 +64,16 @@ final class ProjectConfig
         $platform = \is_array($platformRoot) ? ($platformRoot['php'] ?? null) : null;
 
         $name = $json['name'] ?? null;
+        $require = $json['require'] ?? null;
+        $requirePhp = \is_array($require) ? ($require['php'] ?? null) : null;
 
         return new self(
-            self::packageNames($json['require'] ?? null),
+            self::packageNames($require),
             self::packageNames($json['require-dev'] ?? null),
             self::lockrotExtraFrom($extraRoot),
             \is_string($platform) ? $platform : null,
-            \is_string($name) && $name !== '' ? $name : null
+            \is_string($name) && $name !== '' ? $name : null,
+            \is_string($requirePhp) && $requirePhp !== '' ? $requirePhp : null
         );
     }
 
@@ -141,5 +146,17 @@ final class ProjectConfig
     public function platformPhp(): ?string
     {
         return $this->platformPhp;
+    }
+
+    /**
+     * The project's own `require.php` as written — `>=7.2.5`, `^8.2` — or null where the manifest
+     * makes no promise. It is the lowest PHP the project says it runs on, which is what a branch
+     * S8 tells the project to follow has to admit ({@see \Lockrot\Signal\PhpFloor}). Composer
+     * itself never resolves against it (only against the platform), so a project can lock what
+     * its own requirement forbids; the report's job is to not suggest doing so.
+     */
+    public function requirePhp(): ?string
+    {
+        return $this->requirePhp;
     }
 }

@@ -78,9 +78,10 @@ final class Explanation
      * `highest_commit_date` is the date such a shared-commit tag carried before it was set aside —
      * the branch's newest dated release *is* that tag, so the date it shows is the commit's — and
      * null for a tag that is dated as a release or not at all; what lets a reader tell "no date"
-     * from "a date that is not the release's".
+     * from "a date that is not the release's". `php` is what the branch's newest dated release
+     * requires, the requirement S8 holds against the project's own and the target PHP.
      *
-     * @return list<array{branch: string, installed: bool, highest: string, highest_released: ?\DateTimeImmutable, highest_commit_date: ?\DateTimeImmutable, newest_dated: string, newest_dated_released: ?\DateTimeImmutable, dated_by: ?string}>
+     * @return list<array{branch: string, installed: bool, highest: string, highest_released: ?\DateTimeImmutable, highest_commit_date: ?\DateTimeImmutable, newest_dated: string, newest_dated_released: ?\DateTimeImmutable, dated_by: ?string, php: ?string}>
      */
     public function branches(): array
     {
@@ -109,6 +110,7 @@ final class Explanation
                 'newest_dated' => $release['version'],
                 'newest_dated_released' => $release['at'],
                 'dated_by' => $release['dated_by'] ?? null,
+                'php' => $release['php'],
             ];
         }
 
@@ -164,6 +166,7 @@ final class Explanation
                 'newest_dated' => $row['newest_dated'],
                 'newest_dated_released' => self::date($row['newest_dated_released']),
                 'dated_by' => $row['dated_by'],
+                'php' => $row['php'],
             ];
         }
 

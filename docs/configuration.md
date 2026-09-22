@@ -35,7 +35,7 @@ be JSON integers (`3`, not `"3"`).
 |---|---|---|
 | `project` | composer.json's own `name` | What a report calls this project. Worth setting where the manifest has no name, or where its name is not the one to publish — a package inside a monorepo names itself after the package, a private project after the client |
 | `fail-on` | `none` | Exit 1 threshold: a verdict (`stale`, `old-promise`, `left-behind`, `pinned`, `silent`, `abandoned`) or a [priority](verdicts.md#priority) (`low`, `medium`, `high`, `critical`); `none` fails on nothing |
-| `target-php` | `config.platform.php`, else the running PHP | PHP version used for the S5 "old promise" check, e.g. `"8.4"` |
+| `target-php` | `config.platform.php`, else the running PHP | PHP version the project runs on, e.g. `"8.4"`: S5 measures the installed release against its GA date, and S8 names no branch it cannot install ([within reach](verdicts.md#within-reach)) |
 | `format` | `table` | `table`, `json`, `github`, `sarif`, `gitlab`, `markdown` or `html`; see [ci.md](ci.md) |
 | `include-dev` | `false` | Also check `packages-dev` (CLI: `--dev`) |
 | `install-time` | `on` | `on` or `off`: print the [install-time summary](install-time.md) during `composer require`/`update`/`install` |
@@ -62,7 +62,7 @@ be JSON integers (`3`, not `"3"`).
 |---|---|
 | `--format=table\|json\|github\|sarif\|gitlab\|markdown\|html` | Output format. `table` (the default) is a width-aware list grouped by priority, not a box table; `html` is the whole run as one self-contained page. The format changes the output only; the exit code is the same for all seven. See [ci.md](ci.md) |
 | `--fail-on=<verdict or priority>` | Exit-1 threshold for this run: `none`, a verdict (`abandoned`, `silent`, `pinned`, `left-behind`, `old-promise`, `stale`) or a [priority](verdicts.md#priority) (`critical`, `high`, `medium`, `low`) |
-| `--target-php=8.4` | PHP version for the S5 check |
+| `--target-php=8.4` | PHP version the project runs on, for S5 and for the branch S8 suggests |
 | `--dev` | Include `packages-dev`. A development package is reported the same way a production one is, but it gets one [priority](verdicts.md) step lower |
 | `--all` | Show every checked package, not only flagged ones. Adds a final `not flagged` group |
 | `--offline` | Never reach the network: lockrot sets `COMPOSER_DISABLE_NETWORK=1` and rebuilds the configured repositories behind it (in plugin mode Composer has already built its own, network-enabled ones before any command runs), so repository metadata is served from Composer's own cache and repository activity from lockrot's cache. A package missing from the cache is reported as unavailable, not as absent from the repository |

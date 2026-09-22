@@ -25,7 +25,7 @@ use Lockrot\Lock\ProjectConfig;
 final class AnalyzerBootstrap
 {
     /**
-     * @param callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, Tokens, Clock, Deadline): Analyzer $analyzerFactory
+     * @param callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, Tokens, Clock, Deadline, ?string): Analyzer $analyzerFactory
      * @param list<RepositoryInterface>                                                                                 $repositories
      * @param array<string, mixed>                                                                                      $env
      */
@@ -41,7 +41,7 @@ final class AnalyzerBootstrap
     ): Analyzer {
         $clock = Clock::fromEnvironment($env);
         $tokens = Tokens::fromEnvironment($env, ServiceFactory::githubTokenFromComposer($config));
-        $analyzer = $analyzerFactory($io, $config, $repositories, $lockrot, $tokens, $clock, $deadline);
+        $analyzer = $analyzerFactory($io, $config, $repositories, $lockrot, $tokens, $clock, $deadline, $project->requirePhp());
 
         return $analyzer->withAllowlist($analyzer->allowlist()->merge(ProjectIgnoreList::fromExtra($project->lockrotExtra())));
     }

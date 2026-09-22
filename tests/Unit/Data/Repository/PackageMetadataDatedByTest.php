@@ -42,6 +42,18 @@ final class PackageMetadataDatedByTest extends TestCase
         return $config;
     }
 
+    /**
+     * @param array<string, mixed> $config
+     *
+     * @return array<string, mixed>
+     */
+    private static function withPhp(array $config, string $php): array
+    {
+        $config['require'] = ['php' => $php];
+
+        return $config;
+    }
+
     /** contracts: 8.x highest on a commit shared by three tags (undated), 7.x on its own commit, 13.x highest of all, also shared. */
     private function child(): PackageMetadata
     {
@@ -110,6 +122,29 @@ final class PackageMetadataDatedByTest extends TestCase
         self::assertSame('v7.30.6', $byBranch['7']['version'], 'a branch the child dates itself is left alone, even where the parent has it');
         self::assertEquals(new \DateTimeImmutable('2021-11-17T15:00:14+00:00'), $byBranch['7']['at']);
         self::assertArrayNotHasKey('dated_by', $byBranch['7']);
+    }
+
+    /**
+     * The parent dates the branch; what the branch requires stays the child's own. illuminate/contracts
+     * 8.x asks for `^7.3|^8.0` and laravel/framework 8.x for the same plus a dozen extensions, but a
+     * split is not obliged to mirror its parent, and the requirement S8 reads is the split's — the
+     * package the lock installs.
+     */
+    public function testADatedBranchKeepsTheChildsOwnPhpRequirement(): void
+    {
+        $child = PackageMetadata::fromPackages('illuminate/contracts', [
+            $this->load(self::withPhp(self::tag('illuminate/contracts', 'v8.83.27', 'c8-shared', '2022-01-13T14:47:47+00:00'), '^7.3|^8.0')),
+            $this->load(self::withPhp(self::tag('illuminate/contracts', 'v8.83.26', 'c8-shared', '2022-01-13T14:47:47+00:00'), '^7.3|^8.0')),
+            $this->load(self::withPhp(self::tag('illuminate/contracts', 'v8.80.0', 'c8-shared', '2022-01-13T14:47:47+00:00'), '^7.3|^8.0')),
+        ], new \DateTimeImmutable(self::NOW));
+        $parent = PackageMetadata::fromPackages('laravel/framework', [
+            $this->load(self::withPhp(self::tag('laravel/framework', 'v8.83.29', 'f8-29', '2024-11-20T15:55:41+00:00', ['illuminate/contracts' => 'self.version']), '^7.3|^8.0.2')),
+        ], new \DateTimeImmutable(self::NOW));
+
+        $branch = $child->datedBy($parent)->latestStableByBranch()['8'];
+
+        self::assertSame('laravel/framework', $branch['dated_by'] ?? null);
+        self::assertSame('^7.3|^8.0', $branch['php']);
     }
 
     public function testThePackagesOwnLastReleaseFollowsWhenTheParentDatesItsHighestBranch(): void
@@ -294,7 +329,7 @@ final class PackageMetadataDatedByTest extends TestCase
      * Built by hand rather than from packages, so the branch order and each branch's dates are
      * exactly what the case under test needs.
      *
-     * @param array<array-key, array{version: string, at: ?\DateTimeImmutable, highest: array{normalized: string, pretty: string, at: ?\DateTimeImmutable}, dated_by?: string}> $byBranch
+     * @param array<array-key, array{version: string, at: ?\DateTimeImmutable, highest: array{normalized: string, pretty: string, at: ?\DateTimeImmutable}, dated_by?: string, php: ?string}> $byBranch
      * @param list<string>                                                                                                                                                      $replaces
      */
     private static function metadata(string $name, array $byBranch, array $replaces = [], ?string $lastStable = null): PackageMetadata
@@ -302,13 +337,14 @@ final class PackageMetadataDatedByTest extends TestCase
         return new PackageMetadata($name, false, null, true, $lastStable === null ? null : new \DateTimeImmutable($lastStable), $lastStable === null ? null : 'x', \count($byBranch), null, 'library', new \DateTimeImmutable(self::NOW), $byBranch, $replaces);
     }
 
-    /** @return array{version: string, at: ?\DateTimeImmutable, highest: array{normalized: string, pretty: string, at: ?\DateTimeImmutable}} */
+    /** @return array{version: string, at: ?\DateTimeImmutable, highest: array{normalized: string, pretty: string, at: ?\DateTimeImmutable}, php: ?string} */
     private static function branch(string $version, ?string $newestDated, ?string $highestAt): array
     {
         return [
             'version' => 'v'.$version,
             'at' => $newestDated === null ? null : new \DateTimeImmutable($newestDated),
             'highest' => ['normalized' => $version.'.0', 'pretty' => 'v'.$version, 'at' => $highestAt === null ? null : new \DateTimeImmutable($highestAt)],
+            'php' => null,
         ];
     }
 
