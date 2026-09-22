@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Verdict;
 
+use Composer\Package\Loader\ValidatingArrayLoader;
 use Lockrot\Data\Repository\ReleaseBranch;
 use Lockrot\Signal\Signal;
 
@@ -237,6 +238,27 @@ final class Finding
         return 'no fix expected';
     }
 
+    /**
+     * The package the repository names as this one's replacement, when it names a package: the
+     * `replacement` of an abandoned finding on Packagist is free text — `symfony/mailer` for
+     * swiftmailer, but also `Symfony` for sensio/framework-extra-bundle and `EnglishInflector from
+     * the String component` for doctrine/inflector — and only a Composer package name is something a
+     * reader can migrate to, count, or link. Free text stays in the evidence, where it is read as
+     * text. Null on every finding but an abandoned one with such a name.
+     */
+    public function successor(): ?string
+    {
+        if ($this->verdict !== Verdict::ABANDONED) {
+            return null;
+        }
+        $replacement = $this->replacement();
+        if ($replacement === null || strpos($replacement, '/') === false || ValidatingArrayLoader::hasPackageNamingError($replacement) !== null) {
+            return null;
+        }
+
+        return $replacement;
+    }
+
     /** The replacement S1 carries — the repository's, or the lock's — null when none is named. */
     private function replacement(): ?string
     {
@@ -379,6 +401,7 @@ final class Finding
         return [
             'package' => $this->package, 'version' => $this->version, 'verdict' => $this->verdict,
             'priority' => $this->priority(), 'direct' => $this->isDirect(), 'dev' => $this->dev,
+            'replacement' => $this->successor(),
             'signals' => $signals, 'chain' => $this->chain, 'direct_dependents' => $this->directDependents,
             'evidence' => $this->evidence(),
             'allowlist_reason' => $this->allowlistReason, 'note' => $this->note,

@@ -168,6 +168,30 @@ final class ReportTest extends TestCase
         self::assertSame(0, $counts[Verdict::ABANDONED]);
     }
 
+    /**
+     * `abandoned` alone does not say whether a package died or moved. The report counts the findings
+     * that name a package to move to, next to the total, and the summary line says so where it is not zero.
+     */
+    public function testTheAbandonedCountIsSplitByWhetherAReplacementIsNamed(): void
+    {
+        $s1 = static fn (?string $replacement): Signal => new Signal('S1', 'high', 'marked abandoned by its repository', ['replacement' => $replacement]);
+        $report = $this->report(
+            new Finding('vendor/moved', '1.0.0', Verdict::ABANDONED, [$s1('vendor/successor')], ['vendor/moved'], null, null),
+            new Finding('vendor/dead', '1.0.0', Verdict::ABANDONED, [$s1(null)], ['vendor/dead'], null, null),
+            new Finding('vendor/text', '1.0.0', Verdict::ABANDONED, [$s1('Symfony')], ['vendor/text'], null, null),
+            $this->finding('vendor/quiet', Verdict::SILENT)
+        );
+
+        self::assertSame(1, $report->abandonedWithReplacement());
+        self::assertSame(['total' => 3, 'with_replacement' => 1], $report->toArray()['abandoned']);
+        self::assertSame(['counts', 'abandoned', 'priorities'], \array_slice(array_keys($report->toArray()), 7, 3), 'the split sits right after the counts');
+        self::assertStringStartsWith('4 packages checked · abandoned 3 (1 with a replacement) · silent 1 · ', $report->summaryLine());
+
+        $none = $this->report($this->finding('vendor/dead', Verdict::ABANDONED));
+        self::assertSame(['total' => 1, 'with_replacement' => 0], $none->toArray()['abandoned']);
+        self::assertStringStartsWith('1 packages checked · abandoned 1 · silent 0', $none->summaryLine(), 'a zero is not said');
+    }
+
     public function testByPriorityHasAllFiveKeysWithZeros(): void
     {
         $report = new Report([], [], new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), 0, 0, false);
@@ -381,7 +405,7 @@ final class ReportTest extends TestCase
         );
         $array = $report->toArray();
         self::assertSame(
-            ['generated_at', 'run', 'activity_cache_oldest_at', 'packages_checked', 'include_dev', 'not_from_composer_repository', 'network_failures', 'counts', 'priorities', 'exposure', 'libyears', 'baseline', 'notes', 'findings'],
+            ['generated_at', 'run', 'activity_cache_oldest_at', 'packages_checked', 'include_dev', 'not_from_composer_repository', 'network_failures', 'counts', 'abandoned', 'priorities', 'exposure', 'libyears', 'baseline', 'notes', 'findings'],
             array_keys($array)
         );
         self::assertIsArray($array['priorities']);

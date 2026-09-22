@@ -437,6 +437,7 @@
       '<span class="stripe" style="background:var(--' + t + ')"></span>' +
       '<span class="body">' +
         '<span class="line1">' + pill(f.verdict) +
+          (f.replacement ? '<span class="tag mono" title="the repository names this package as the replacement">\u2192 ' + esc(f.replacement) + "</span>" : "") +
           '<span class="pkg">' + esc(f.package) + "</span>" +
           '<span class="ver mono">' + esc(f.version) + "</span>" +
           '<span class="tags">' + tags.join("") + "</span></span>" +
@@ -640,6 +641,7 @@
       ["oldest activity cache", REPORT.activity_cache_oldest_at || "—"],
       ["network failures", String(REPORT.network_failures)],
       ["not from a Composer repository", String(REPORT.not_from_composer_repository)],
+      ["abandoned with a replacement", REPORT.abandoned ? REPORT.abandoned.with_replacement + " of " + REPORT.abandoned.total : "\u2014"],
       ["libyears behind", (ly && ly.measured ? LockrotLib.fixed(ly.total, 2) : null) || "\u2014"],
       ["libyears, direct requirements", (ly && ly.measured ? LockrotLib.fixed(ly.direct_requirements, 2) : null) || "\u2014"],
       ["libyears measured", ly ? String(ly.measured) : "\u2014"],
@@ -746,7 +748,8 @@
     var command = suggestion ? installCommand(f.package, suggestion) : null;
     var pk = packagistUrl(f);
     var rp = repoUrl(f);
-    var replacement = meta.replacement || null;
+    // f.replacement is a package name (linkable); meta.replacement is Packagist's free text.
+    var replacement = f.replacement || meta.replacement || null;
     var why = priorityWhy(f);
     var bstate = baselineState(f);
 
@@ -785,7 +788,9 @@
         '<div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:7px">' +
           (pk ? outLink(pk, "packagist") : "") +
           (rp ? outLink(rp, repoHost(rp)) : "") +
-          (replacement ? outLink("https://packagist.org/packages/" + replacement, "replacement: " + replacement) : "") +
+          (replacement ? (f.replacement
+            ? outLink("https://packagist.org/packages/" + replacement, "replacement: " + replacement)
+            : '<span style="color:var(--muted)">replacement: ' + esc(String(replacement)) + "</span>") : "") +
         "</div></div>" +
         '<button class="icon-btn" type="button" id="closeDetail">Close</button>' +
       "</div></div>" +
