@@ -42,6 +42,8 @@ final class ActivityFetchPlanner
         $checkedPackages = [];
         $skippedNoToken = [];
         $skippedBudget = [];
+        /** @var array<string, string> $skippedPackages */
+        $skippedPackages = [];
         /** @var array<string, true> $capped */
         $capped = [];
         foreach ($repoByPackage as $package => $repo) {
@@ -52,6 +54,7 @@ final class ActivityFetchPlanner
             }
             if ($isCapped && ($candidateByPackage[$package] ?? false) !== true) {
                 $skippedNoToken[$forge] = ($skippedNoToken[$forge] ?? 0) + 1;
+                $skippedPackages[$package] = ActivityFetchPlan::NO_TOKEN;
                 continue;
             }
             if (isset($seen[$repo->key()])) {
@@ -62,6 +65,7 @@ final class ActivityFetchPlanner
             }
             if ($isCapped && ($selected[$forge] ?? 0) >= $this->budget) {
                 $skippedBudget[$forge] = ($skippedBudget[$forge] ?? 0) + 1;
+                $skippedPackages[$package] = ActivityFetchPlan::BUDGET;
                 continue;
             }
             $seen[$repo->key()] = true;
@@ -75,7 +79,8 @@ final class ActivityFetchPlanner
             $checkedPackages,
             $skippedNoToken,
             $skippedBudget,
-            array_values(array_filter(RepoRef::FORGES, static fn (string $forge): bool => isset($capped[$forge])))
+            array_values(array_filter(RepoRef::FORGES, static fn (string $forge): bool => isset($capped[$forge]))),
+            $skippedPackages
         );
     }
 }

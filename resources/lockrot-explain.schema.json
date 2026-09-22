@@ -77,7 +77,7 @@
                         "type": "object",
                         "required": ["id", "level", "summary", "data"],
                         "properties": {
-                            "id": { "type": "string", "enum": ["S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9"] },
+                            "id": { "type": "string", "enum": ["S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9", "S10"] },
                             "level": { "type": "string", "enum": ["info", "warn", "high"] },
                             "summary": { "type": "string" },
                             "data": { "type": "object" }

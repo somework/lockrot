@@ -23,7 +23,8 @@
         "critical",
         "high",
         "medium",
-        "low"
+        "low",
+        "unchecked"
       ]
     },
     "target-php": {

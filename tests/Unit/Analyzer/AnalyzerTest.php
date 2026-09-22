@@ -297,8 +297,13 @@ final class AnalyzerTest extends TestCase
         self::assertSame(['vendor/direct'], $byName['vendor/transitive']->directDependents());
         self::assertSame(['vendor/direct'], $byName['vendor/direct']->directDependents());
         self::assertSame([], $byName['vendor/snapshot']->directDependents());
-        self::assertSame(['S7'], array_map(static fn ($s) => $s->id(), $byName['vendor/direct']->signals()));
-        self::assertSame('pulls in 1 flagged package: vendor/transitive (silent)', $byName['vendor/direct']->evidence(), 'nothing observed about the package itself, only what it pulls in');
+        // S10 too: the run has no token, so this package's repository was never asked about, and
+        // the finding says so rather than reading as "checked, nothing found".
+        self::assertSame(['S7', 'S10'], array_map(static fn ($s) => $s->id(), $byName['vendor/direct']->signals()));
+        $notChecked = $byName['vendor/direct']->signals()[1];
+        self::assertSame(['S3', 'S4'], $notChecked->data()['blocks']);
+        self::assertStringContainsString('repository activity not checked', $notChecked->summary());
+        self::assertSame('repository activity not checked (no token for the repository host), so S3 and S4 could not be read; pulls in 1 flagged package: vendor/transitive (silent)', $byName['vendor/direct']->evidence(), 'nothing observed about the package itself: what it pulls in, and what was not checked');
         self::assertSame(['vendor/direct' => 1], $report->exposure());
     }
 

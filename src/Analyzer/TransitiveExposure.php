@@ -70,7 +70,15 @@ final class TransitiveExposure
         $result = [];
         foreach ($findings as $finding) {
             $descendants = $exposed[$finding->package()] ?? [];
-            $result[] = $descendants === [] ? $finding : $finding->withSignals(array_merge($finding->signals(), [self::signal($descendants)]));
+            if ($descendants === []) {
+                $result[] = $finding;
+                continue;
+            }
+            // Sorted by number, as SignalSet leaves them: S7 belongs between S6 and S8, not after
+            // whatever the finding already carried.
+            $signals = array_merge($finding->signals(), [self::signal($descendants)]);
+            usort($signals, static fn (Signal $a, Signal $b): int => strnatcmp($a->id(), $b->id()));
+            $result[] = $finding->withSignals($signals);
         }
 
         return $result;

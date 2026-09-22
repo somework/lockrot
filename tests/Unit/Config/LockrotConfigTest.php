@@ -175,7 +175,7 @@ final class LockrotConfigTest extends TestCase
     public function testInvalidFailOn(): void
     {
         $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage('fail-on must be one of none, abandoned, silent, pinned, left-behind, old-promise, stale, critical, high, medium, low; got "dead"');
+        $this->expectExceptionMessage('fail-on must be one of none, abandoned, silent, pinned, left-behind, old-promise, stale, critical, high, medium, low, unchecked; got "dead"');
         LockrotConfig::fromSources([], [], ['fail-on' => 'dead'], '8.5.10', null);
     }
 

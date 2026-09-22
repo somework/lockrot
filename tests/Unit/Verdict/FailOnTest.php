@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Verdict;
 
 use Lockrot\Exception\ConfigException;
+use Lockrot\Signal\Signal;
 use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Priority;
@@ -22,9 +23,27 @@ final class FailOnTest extends TestCase
         return new Finding('a/pkg', '1.0.0', $verdict, [], $chain, null, new \DateTimeImmutable(self::AT), null, $dev);
     }
 
+    /**
+     * `unchecked` is neither a verdict nor a priority: it fails on a finding whose check did not
+     * run, whatever that finding otherwise says, which is how a pipeline demands a complete run.
+     */
+    public function testUncheckedFailsOnTheFindingsThatCarryS10(): void
+    {
+        $threshold = FailOn::fromString(FailOn::UNCHECKED);
+        $notChecked = new Signal(Signal::S10, Signal::LEVEL_INFO, 'repository activity not checked', ['unchecked' => [], 'blocks' => ['S3', 'S4']]);
+        $ok = new Finding('vendor/ok', '1.0.0', Verdict::OK, [], ['vendor/ok'], null, null);
+        $okUnchecked = new Finding('vendor/ok', '1.0.0', Verdict::OK, [$notChecked], ['vendor/ok'], null, null);
+        $abandoned = new Finding('vendor/gone', '1.0.0', Verdict::ABANDONED, [new Signal(Signal::S1, Signal::LEVEL_HIGH, 'marked abandoned', [])], ['vendor/gone'], null, null);
+
+        self::assertTrue($threshold->reaches($okUnchecked), 'the check behind this ok did not run');
+        self::assertFalse($threshold->reaches($ok), 'checked, and nothing was found');
+        self::assertFalse($threshold->reaches($abandoned), 'every check that mattered ran; the verdict thresholds are for this');
+        self::assertFalse(FailOn::fromString(Verdict::STALE)->reaches($okUnchecked), 'a verdict threshold still reads the verdict');
+    }
+
     public function testTheAllowedValuesAreNoneTheFlaggedVerdictsAndThePriorities(): void
     {
-        self::assertSame(['none', 'abandoned', 'silent', 'pinned', 'left-behind', 'old-promise', 'stale', 'critical', 'high', 'medium', 'low'], FailOn::allowed());
+        self::assertSame(['none', 'abandoned', 'silent', 'pinned', 'left-behind', 'old-promise', 'stale', 'critical', 'high', 'medium', 'low', 'unchecked'], FailOn::allowed());
         foreach (FailOn::allowed() as $value) {
             self::assertSame($value, FailOn::fromString($value)->value());
         }
@@ -35,7 +54,7 @@ final class FailOnTest extends TestCase
     public function testAnythingElseIsRejectedWithTheFullList(string $value): void
     {
         $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage('fail-on must be one of none, abandoned, silent, pinned, left-behind, old-promise, stale, critical, high, medium, low; got "'.$value.'"');
+        $this->expectExceptionMessage('fail-on must be one of none, abandoned, silent, pinned, left-behind, old-promise, stale, critical, high, medium, low, unchecked; got "'.$value.'"');
         FailOn::fromString($value);
     }
 
