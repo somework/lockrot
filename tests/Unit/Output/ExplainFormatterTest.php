@@ -328,4 +328,25 @@ final class ExplainFormatterTest extends TestCase
         self::assertStringContainsString('  libyears not measured: no release date lockrot trusts', $text);
         self::assertStringContainsString('  installed release v10.48.28 undated: the lock dates it 2023-06-05, a commit its tags share, not a release', $text);
     }
+
+    /**
+     * A branch snapshot is undated for a reason of its own: the lock's `time` is the commit's,
+     * which the `composer.lock` block already says next to `branch snapshot`. The shared-commit
+     * sentence is about a tag, and claiming it of `dev-main` would be a fact the data does not
+     * carry.
+     */
+    public function testABranchSnapshotIsNotToldItsTagsShareACommit(): void
+    {
+        $finding = new Finding('vendor/pkg', 'dev-main', Verdict::PINNED, [], ['vendor/pkg'], null, new \DateTimeImmutable(F::NOW));
+        $loader = new ArrayLoader();
+        $metadata = PackageMetadata::fromPackages('vendor/pkg', [
+            $loader->load(['name' => 'vendor/pkg', 'version' => '1.2.0', 'time' => '2026-01-01T00:00:00+00:00', 'source' => ['type' => 'git', 'url' => 'https://github.com/vendor/pkg.git', 'reference' => 'tag-12']]),
+        ], new \DateTimeImmutable(F::NOW));
+        $explanation = new Explanation($finding, F::facts(F::package(['version' => 'dev-main', 'time' => '2026-09-13T00:00:00+00:00']), $metadata), new Thresholds(), '8.4', $this->report());
+
+        $text = $this->plain($explanation);
+        self::assertStringContainsString('  libyears not measured: branch snapshot', $text);
+        self::assertStringNotContainsString('installed release', $text);
+        self::assertStringContainsString('branch snapshot', $text);
+    }
 }

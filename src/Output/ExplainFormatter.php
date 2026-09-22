@@ -271,7 +271,9 @@ final class ExplainFormatter
         if ($datedBy !== null && $at !== null) {
             return \sprintf('installed release %s (%s, dated by %s)', $package->version(), $at->format('Y-m-d'), $datedBy);
         }
-        if ($at !== null || $package->time() === null) {
+        // A branch snapshot is undated for a reason of its own — the lock's date is the commit's,
+        // which the block above says next to `branch snapshot` — and no tag of it is involved.
+        if ($at !== null || $package->time() === null || $package->isBranchSnapshot()) {
             return null;
         }
 

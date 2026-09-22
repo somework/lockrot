@@ -85,10 +85,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   it has no direct requirements at all, so nothing reaches any package, and a lock can hold a
   package only the skipped `require-dev` asks for. Every finding of such a run was valid JSON that
   its own published schema rejected. Documents themselves are unchanged.
-- **A repository that names the abandoned package as its own replacement names nowhere to go.**
-  `migrate to vendor/pkg` pointed back at the package the reader was being told to leave, and the
-  new `abandoned.with_replacement` counted it. Such a marker is now read as no replacement at all:
-  the clause stays bare, `replacement` in `--format=json` is null, and the count leaves it out.
+- **`migrate to` names a package, or says nothing.** The clause read the abandoned marker as the
+  repository wrote it, so free text became an instruction — `no fix expected; migrate to Symfony`,
+  `migrate to EnglishInflector from the String component` — and a repository that names the package
+  itself sent the reader back to what they were leaving, while the new
+  `abandoned.with_replacement` counted it. The clause, the JSON `replacement` and that count now
+  all read the same validated successor: a Composer package name that is not this package's own.
   The repository's text is still shown in the evidence, as all free text is.
 
 ## [0.10.0] - 2026-09-22

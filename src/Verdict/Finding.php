@@ -231,7 +231,9 @@ final class Finding
                 }
             }
         }
-        if ($this->verdict === Verdict::ABANDONED && ($replacement = $this->replacementElsewhere()) !== null) {
+        // The successor, not the raw marker: only a package name is somewhere to migrate to, and
+        // the repository's free text is already in the evidence above this clause.
+        if (($replacement = $this->successor()) !== null) {
             return 'no fix expected; migrate to '.$replacement;
         }
 
@@ -246,31 +248,24 @@ final class Finding
      * reader can migrate to, count, or link. Free text stays in the evidence, where it is read as
      * text. A name that is this package's own is not a successor either — a repository that names
      * itself says there is nowhere to go, and `migrate to` would point back at the abandoned
-     * package. Null on every finding but an abandoned one with such a name.
+     * package. Null on every finding but an abandoned one with such a name. What the `migrate to`
+     * clause ({@see noFixClause()}), the JSON `replacement` and the report's `with_replacement`
+     * count all read, so the three cannot disagree.
      */
     public function successor(): ?string
     {
         if ($this->verdict !== Verdict::ABANDONED) {
             return null;
         }
-        $replacement = $this->replacementElsewhere();
+        $replacement = $this->replacement();
         if ($replacement === null || strpos($replacement, '/') === false || ValidatingArrayLoader::hasPackageNamingError($replacement) !== null) {
             return null;
         }
+        // Composer reads a package name without case, and so do the repositories that write them.
+        if (strcasecmp($replacement, $this->package) === 0) {
+            return null;
+        }
         return $replacement;
-    }
-
-    /**
-     * The replacement S1 carries, unless it is this package's own name: a repository that names
-     * itself says there is nowhere to go, and both the `migrate to` clause and {@see successor()}
-     * would otherwise point back at the abandoned package. Composer reads a package name without
-     * case, and so does this. Null when none is named.
-     */
-    private function replacementElsewhere(): ?string
-    {
-        $replacement = $this->replacement();
-
-        return $replacement === null || strcasecmp($replacement, $this->package) === 0 ? null : $replacement;
     }
 
     /** The replacement S1 carries — the repository's, or the lock's — null when none is named. */

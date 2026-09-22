@@ -32,6 +32,15 @@ mutant from the original, and says why.
   `newestTrustedDateAbove()`: on a tie the two dates are equal, so keeping the first or taking the
   second yields the same instant; nothing downstream reads which branch it came from.
 
+## src/Verdict/Finding.php (0.11.0, the successor)
+
+- `src/Verdict/Finding.php:278` LogicalAnd (`is_string($replacement) && $replacement !== ''` → `||`)
+  — `replacement()`: the one caller is `successor()`, which then requires a `/` and a name Composer
+  accepts. Under `||` a null stays null (the ternary returns the value itself) and an empty string
+  is returned instead of null, and an empty string has no `/`, so `successor()` answers null either
+  way. Every surface — the `migrate to` clause, the JSON `replacement`, the `with_replacement`
+  count — reads `successor()`, so nothing else can tell the two apart.
+
 ## src/Signal/PhpFloor.php and src/Signal/Rule/LeftBehindRule.php (0.11.0, the branch within reach)
 
 - `src/Signal/PhpFloor.php:55` ReturnRemoval (`blocking()`, `if ($constraint === null) return null`)
