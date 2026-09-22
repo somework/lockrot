@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Analyzer;
 
+use Lockrot\Analyzer\Libyears;
 use Lockrot\Analyzer\Report;
 use Lockrot\Analyzer\RunSettings;
 use Lockrot\Analyzer\TransitiveExposure;
@@ -342,6 +343,32 @@ final class ReportTest extends TestCase
         self::assertSame('8.3', JsonPath::stringAt($compared->toArray(), ['run', 'target_php']));
     }
 
+    public function testTheLibyearsBlockIsTheArithmeticOverTheFindings(): void
+    {
+        $report = $this->report(
+            new Finding('vendor/direct', '1.0.0', Verdict::LEFT_BEHIND, [], ['vendor/direct'], null, null, null, false, [], 4.0),
+            new Finding('vendor/deep', '1.0.0', Verdict::OK, [], ['vendor/direct', 'vendor/deep'], null, null, null, false, [], 2.5),
+            new Finding('vendor/pinned', 'dev-main', Verdict::PINNED, [], ['vendor/pinned'], null, null)
+        );
+        $block = $report->libyears();
+
+        self::assertSame(6.5, $block->total());
+        self::assertSame(4.0, $block->direct());
+        self::assertSame(2, $block->measured());
+        self::assertSame(1, $block->unmeasured()[Libyears::BRANCH_SNAPSHOT]);
+        self::assertSame($block->toArray(), $report->toArray()['libyears']);
+        // and the block a consumer reads is recomputable from the findings it reads
+        $sum = 0.0;
+        foreach (JsonPath::arrayAt($report->toArray(), ['findings']) as $finding) {
+            self::assertIsArray($finding);
+            if ($finding['libyears'] !== null) {
+                self::assertIsFloat($finding['libyears']);
+                $sum += $finding['libyears'];
+            }
+        }
+        self::assertEqualsWithDelta(JsonPath::arrayAt($report->toArray(), ['libyears'])['total'], $sum, 0.01);
+    }
+
     public function testToArrayKeys(): void
     {
         $report = new Report(
@@ -354,7 +381,7 @@ final class ReportTest extends TestCase
         );
         $array = $report->toArray();
         self::assertSame(
-            ['generated_at', 'run', 'activity_cache_oldest_at', 'packages_checked', 'include_dev', 'not_from_composer_repository', 'network_failures', 'counts', 'priorities', 'exposure', 'baseline', 'notes', 'findings'],
+            ['generated_at', 'run', 'activity_cache_oldest_at', 'packages_checked', 'include_dev', 'not_from_composer_repository', 'network_failures', 'counts', 'priorities', 'exposure', 'libyears', 'baseline', 'notes', 'findings'],
             array_keys($array)
         );
         self::assertIsArray($array['priorities']);

@@ -222,6 +222,8 @@ What the page has that a stream cannot:
   the ones a patch on your own branch clears and the ones that need a move to another branch. A
   package with fourteen advisories is usually two tickets, not one.
 - **What changed since the [baseline](baseline.md).** New, worsened and already-accepted, filterable.
+- **How far behind the lock is.** The [libyears](verdicts.md#libyears) total in the ledger, and every
+  package's own value as a sortable column.
 - **What the run could not see.** The notes, the thresholds it used and the schema it validates
   against, on their own tab.
 
@@ -251,8 +253,8 @@ in it, at roughly 4 KB a package; without it a 100-package lock lands around 250
 ## `--format=json`
 
 The complete report, and the only format that carries every field: per-finding `signals`, `chain`,
-`direct_dependents`, `evidence`, `data_date` and `baseline` — where that finding stands against the
-baseline file — plus the document's `run`, `exposure` and `notes`. `run` is what the report is about and what
+`direct_dependents`, `evidence`, `data_date`, `libyears` and `baseline` — where that finding stands against the
+baseline file — plus the document's `run`, `exposure`, `libyears` and `notes`. `run` is what the report is about and what
 its verdicts were decided against: the project's own name from composer.json, the target PHP, the
 thresholds, the `fail-on` and the name of the lock, with the list of verdicts the run counted as
 findings. Without it a report could not be read twice the same

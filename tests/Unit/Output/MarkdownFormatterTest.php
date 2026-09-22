@@ -124,6 +124,30 @@ final class MarkdownFormatterTest extends TestCase
         self::assertSame('- note: a note', $lines[$exposure + 2]);
     }
 
+    public function testTheLibyearsLineIsItsOwnParagraphBetweenTheTableAndTheExposureLine(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $report = new Report([
+            new Finding('acme/leaf', '1.0.0', Verdict::STALE, [new Signal('S2', 'warn', 'old')], ['a/parent', 'acme/leaf'], null, $at, null, false, ['a/parent'], 2.3),
+            new Finding('acme/<b>', '1.0.0', Verdict::STALE, [new Signal('S2', 'warn', 'old')], ['acme/<b>'], null, $at, null, false, ['acme/<b>'], 1.0),
+        ], [], $at, 2, 0, false);
+        $lines = explode("\n", $this->formatter()->format($report));
+        $libyears = array_search('libyears: 3.3 behind across all 2 packages · 1.0 from direct requirements · furthest behind acme/leaf 1.0.0 at 2.3', $lines, true);
+
+        self::assertNotFalse($libyears, implode("\n", $lines));
+        self::assertSame('', $lines[$libyears - 1], 'a blank line separates it from the table');
+        self::assertSame('', $lines[$libyears + 1]);
+        self::assertSame('pulled in by: a/parent 1', $lines[$libyears + 2]);
+    }
+
+    public function testTheLibyearsLineSaysSoWhenNothingWasMeasuredAndOnAnEmptyRun(): void
+    {
+        // the fixture findings carry no value
+        self::assertStringContainsString("\nlibyears: none of the 3 packages could be measured\n", $this->formatter()->format($this->report()));
+        $empty = new Report([], [], new \DateTimeImmutable(self::AT), 0, 0, false);
+        self::assertContains('libyears: nothing to measure', explode("\n", $this->formatter()->format($empty)));
+    }
+
     public function testNoExposureLineWhenNothingIsPulledInThroughAnotherPackage(): void
     {
         self::assertStringNotContainsString('pulled in by:', $this->formatter()->format($this->report()));

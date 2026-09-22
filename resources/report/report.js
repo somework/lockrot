@@ -289,6 +289,19 @@
     });
     el("advBar").innerHTML = aBar.join("") || '<span style="flex:1;background:var(--none)"></span>';
     el("advLegend").innerHTML = aLeg.join("") || '<span style="color:var(--muted)">no advisory affects this lock</span>';
+
+    // textContent, not innerHTML: the package furthest behind is named by the document, and this
+    // block is prose, not a filter. The figure stays a dash when the block is missing or nothing
+    // could be measured.
+    var ly = REPORT.libyears;
+    el("libyearsTotal").textContent = (ly && ly.measured ? LockrotLib.fixed(ly.total, 1) : null) || "\u2014";
+    var line = el("libyearsLine");
+    line.textContent = "";
+    LockrotLib.libyearsItems(ly).forEach(function (item) {
+      var span = document.createElement("span");
+      span.textContent = item;
+      line.appendChild(span);
+    });
   }
 
   /* ---------- rail ---------- */
@@ -534,6 +547,7 @@
   var SORTS = {
     package: function (f) { return f.package; },
     version: function (f) { return f.version; },
+    libyears: LockrotLib.libyearsSortKey,
     verdict: function (f) { return SEVERITY_ORDER.indexOf(f.verdict) === -1 ? 99 : SEVERITY_ORDER.indexOf(f.verdict); },
     priority: function (f) { return PRIORITIES.indexOf(f.priority); },
     reached: function (f) { return (f.direct ? "0" : "1") + (f.dev ? "1" : "0"); },
@@ -554,17 +568,23 @@
       return '<tr data-idx="' + i + '" data-pkg="' + esc(f.package) + '">' +
         "<td>" + (packagistUrl(f) ? '<a class="lnk" href="' + esc(packagistUrl(f)) + '" target="_blank" rel="noopener noreferrer">' + esc(f.package) + "</a>" : esc(f.package)) + "</td>" +
         '<td class="num">' + esc(f.version) + "</td>" +
+        '<td class="num">' + (LockrotLib.fixed(f.libyears, 1) === null
+          ? '<span style="color:var(--muted)" title="not measured: ' + esc(LockrotLib.libyearsReason(f)) + '">\u2014</span>'
+          : LockrotLib.fixed(f.libyears, 1)) + "</td>" +
         "<td>" + pill(f.verdict) + "</td>" +
         "<td>" + (f.priority === "none" ? '<span style="color:var(--muted)">—</span>' : pill(f.priority)) + "</td>" +
         "<td>" + (f.direct ? "direct" : "transitive") + (f.dev ? " \u00b7 dev" : "") + "</td>" +
         '<td class="num">' + ((f.signals || []).map(function (s) { return s.id; }).join(" ") || "—") + "</td>" +
         '<td class="num">' + day(last) + "</td></tr>";
     }).join("");
-    var head = [["package", "Package"], ["version", "Version"], ["verdict", "Verdict"], ["priority", "Priority"],
+    var head = [["package", "Package"], ["version", "Version"],
+      ["libyears", "Libyears", "Years between the installed release and the package's newest stable release; a dash is a package that could not be measured, and says why on hover"],
+      ["verdict", "Verdict"], ["priority", "Priority"],
       ["reached", "Reached"], ["signals", "Signals"], ["data", "Data as of"]].map(function (c) {
       var on = (SORTS[state.sort] ? state.sort : "verdict") === c[0];
-      return '<th aria-sort="' + (on ? (state.sortDesc ? "descending" : "ascending") : "none") +
-        '"><button type="button" data-sort="' + c[0] +
+      return '<th aria-sort="' + (on ? (state.sortDesc ? "descending" : "ascending") : "none") + '"' +
+        (c[2] ? ' title="' + esc(c[2]) + '"' : "") +
+        '><button type="button" data-sort="' + c[0] +
         '" style="background:none;border:0;padding:0;cursor:pointer;font:inherit;letter-spacing:inherit;text-transform:inherit;color:' +
         (on ? "var(--ink)" : "inherit") + '">' + c[1] + (on ? (state.sortDesc ? " \u2193" : " \u2191") : "") + "</button></th>";
     }).join("");
@@ -606,6 +626,7 @@
   function viewRun() {
     visible = [];
     var t = RUN.thresholds || {};
+    var ly = REPORT.libyears;
     var notes = (REPORT.notes || []).map(function (n) {
       var doc = /token|activity|repository/.test(n) ? "https://lockrot.dev/internals/" : "https://lockrot.dev/configuration/";
       return '<div class="note">' + esc(n) + ' <span style="white-space:nowrap">' + outLink(doc, "what this means") + "</span></div>";
@@ -619,6 +640,12 @@
       ["oldest activity cache", REPORT.activity_cache_oldest_at || "—"],
       ["network failures", String(REPORT.network_failures)],
       ["not from a Composer repository", String(REPORT.not_from_composer_repository)],
+      ["libyears behind", (ly && ly.measured ? LockrotLib.fixed(ly.total, 2) : null) || "\u2014"],
+      ["libyears, direct requirements", (ly && ly.measured ? LockrotLib.fixed(ly.direct_requirements, 2) : null) || "\u2014"],
+      ["libyears measured", ly ? String(ly.measured) : "\u2014"],
+      ["libyears not measured", ly && ly.unmeasured && typeof ly.unmeasured === "object"
+        ? Object.keys(ly.unmeasured).map(function (k) { return k.replace(/_/g, " ") + " " + ly.unmeasured[k]; }).join(" \u00b7 ")
+        : "\u2014"],
       ["baseline", REPORT.baseline ? JSON.stringify(REPORT.baseline) : "none"]
     ].map(function (p) { return "<dt>" + esc(p[0]) + "</dt><dd>" + esc(p[1]) + "</dd>"; }).join("");
     var th = Object.keys(t).map(function (k) { return "<dt>" + esc(k) + "</dt><dd>" + esc(t[k]) + " years</dd>"; }).join("");
@@ -732,6 +759,7 @@
       ["installed", esc(f.version)],
       ["php constraint", lock.php ? esc(lock.php) : null],
       ["released", lock.released ? esc(day(lock.released) + " \u00b7 " + ageText(lock.released)) : null],
+      ["libyears behind", libyearsRow(f, meta)],
       ["repository", rp
         ? '<a class="lnk" href="' + esc(rp) + '" target="_blank" rel="noopener noreferrer">' + esc(rp) + "</a>"
         : (lock.repository || meta.repository ? esc(lock.repository || meta.repository) : null)],
@@ -1014,6 +1042,32 @@
       if (node) node.scrollIntoView({ block: "nearest" });
     }
   });
+
+  /**
+   * The package card's libyears row: the number, and where it came from — the newest stable
+   * release it is measured against, or, at zero, that the installed release is that newest one
+   * (or sits above it: a pre-release the lock got ahead on). An unmeasured package says why in
+   * the words the Run tab counts it under. Values arrive escaped, as kvRows expects.
+   */
+  function libyearsRow(f, meta) {
+    var value = LockrotLib.fixed(f.libyears, 1);
+    if (value === null) {
+      return '<span style="color:var(--muted)">not measured \u00b7 ' + esc(LockrotLib.libyearsReason(f)) + "</span>";
+    }
+    var newest = meta && meta.last_stable_version ? String(meta.last_stable_version) : null;
+    var why;
+    if (meta && meta.has_stable_release && !meta.last_stable_release) {
+      // measured to the newest dated release above the installed one: the newest tag is undated
+      why = "at least: the newest release is undated, measured to the newest dated one above";
+    } else if (value === "0.0") {
+      why = newest && newest !== f.version ? "ahead of the newest stable, " + newest : "the installed release is the newest";
+    } else {
+      why = newest ? "newest " + newest + (meta.last_stable_release ? " released " + day(meta.last_stable_release) : "") : null;
+    }
+
+    // nowrap: the phrase moves to the next line whole rather than splitting its date at a hyphen.
+    return esc(value) + (why ? ' <span style="color:var(--muted);white-space:nowrap">\u00b7 ' + esc(why) + "</span>" : "");
+  }
 
   /* ---------- glossary ---------- */
   function fillLegend() {

@@ -357,7 +357,8 @@ final class Analyzer
             $this->dataDate($meta, $activity),
             $note,
             $package->isDev(),
-            array_keys($graph->chainsTo($package->name()))
+            array_keys($graph->chainsTo($package->name())),
+            Libyears::behind($package, $meta)
         );
     }
 

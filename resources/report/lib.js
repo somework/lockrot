@@ -86,6 +86,83 @@ var LockrotLib = (function () {
   }
 
   /**
+   * What the packages table sorts on for the libyears column: the value, with an unmeasured
+   * package (null, or a document from before the field) below every measured one, zero included.
+   */
+  function libyearsSortKey(finding) {
+    var value = finding ? finding.libyears : null;
+    return value === null || value === undefined ? -1 : Number(value);
+  }
+
+  /**
+   * A number from the document formatted to `digits` decimals, or null when the value is not a
+   * finite number — `null`, a string, `Infinity`. Checked before `Number()`, not after: `Number(null)`
+   * is a finite zero, and a page that printed `0.0` for a missing value would be asserting something
+   * the document does not say.
+   */
+  function fixed(value, digits) {
+    return typeof value === "number" && isFinite(value) ? value.toFixed(digits) : null;
+  }
+
+  /**
+   * Why a finding carries no libyears value, in the words the report's `unmeasured` block counts
+   * it under, read off the finding the way the block itself does: the note names a package no
+   * repository was asked about or one whose metadata did not come, a dev version is a branch
+   * snapshot, and what is left had metadata and no pair of dates to compare. An empty string
+   * for a measured finding.
+   */
+  function libyearsReason(finding) {
+    if (!finding || fixed(finding.libyears, 1) !== null) return "";
+    if (finding.libyears !== null && finding.libyears !== undefined) return "not a number in this document";
+    var note = finding.note;
+    if (note === "not from a Composer repository, not checked") return "not from a Composer repository";
+    if (note) return "metadata unavailable";
+    var version = String(finding.version || "").replace(/#.*$/, "");
+    if (/^dev-/.test(version) || /-dev$/.test(version)) return "branch snapshot";
+
+    return "no release date lockrot trusts";
+  }
+
+  /**
+   * The libyears block, minus the total, as the items under the ledger's figure: `across 191 of
+   * 200 packages`, `94.5 from direct requirements`, `furthest behind smalot/pdfparser v1.1.0 at
+   * 4.7` — the table footer's items after the number, in its words, one string each so the page
+   * can wrap between them and never inside one. `none of the 200 packages could be measured`
+   * when nothing was, `nothing to measure` on an empty run, and no items for a block that is not
+   * one. Plain text: the caller uses textContent or escapes, since the package name comes from
+   * the document.
+   */
+  function libyearsItems(block) {
+    if (!block || typeof block.measured !== "number") return [];
+    var unmeasured = 0;
+    var reasons = block.unmeasured && typeof block.unmeasured === "object" ? block.unmeasured : {};
+    Object.keys(reasons).forEach(function (k) { unmeasured += Number(reasons[k]) || 0; });
+    var packages = block.measured + unmeasured;
+    if (!block.measured) {
+      if (!packages) return ["nothing to measure"];
+      return [packages === 1 ? "the one package could not be measured" : "none of the " + packages + " packages could be measured"];
+    }
+    var scope = block.measured === packages
+      ? (packages === 1 ? "the one package" : "all " + packages + " packages")
+      : block.measured + " of " + packages + " packages";
+    var items = ["across " + scope];
+    var worst = block.furthest_behind;
+    if (worst && typeof worst === "object") {
+      var direct = fixed(block.direct_requirements, 1);
+      if (direct !== null) items.push(direct + " from direct requirements");
+      var behind = fixed(worst.libyears, 1);
+      items.push("furthest behind " + worst.package + " " + worst.version + (behind === null ? "" : " at " + behind));
+    }
+
+    return items;
+  }
+
+  /** {@see libyearsItems} as the one line the Run tab prints, joined like the table footer. */
+  function libyearsSummary(block) {
+    return libyearsItems(block).join(" \u00b7 ");
+  }
+
+  /**
    * Definition rows, minus the ones with nothing to say. A row whose value is null is dropped
    * rather than printed as a dash: the lock entry and the provenance are built from `--explain`
    * data, and a document that carries only the report has none of it — five dashes under a heading
@@ -125,6 +202,11 @@ var LockrotLib = (function () {
     years: years,
     ageText: ageText,
     plural: plural,
+    fixed: fixed,
+    libyearsItems: libyearsItems,
+    libyearsSummary: libyearsSummary,
+    libyearsReason: libyearsReason,
+    libyearsSortKey: libyearsSortKey,
     kvRows: kvRows,
     parseQuery: parseQuery
   };

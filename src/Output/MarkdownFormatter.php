@@ -70,6 +70,9 @@ final class MarkdownFormatter implements FormatterInterface
             }
         }
 
+        $lines[] = '';
+        $lines[] = self::text($report->libyears()->line());
+
         $exposure = $report->exposureSummaryLine();
         if ($exposure !== '') {
             $lines[] = '';

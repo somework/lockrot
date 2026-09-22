@@ -6,7 +6,8 @@ namespace Lockrot;
 
 final class Clock
 {
-    private const SECONDS_PER_YEAR = 31557600; // 365.25 days
+    /** The year every "years ago" and every libyear is counted in: 365.25 days. */
+    public const SECONDS_PER_YEAR = 31557600;
     private \DateTimeImmutable $now;
 
     public function __construct(?\DateTimeImmutable $now = null)

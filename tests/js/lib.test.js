@@ -201,3 +201,65 @@ test("parseQuery reads the two boolean keys, and only those", () => {
 test("parseQuery treats an unknown key as text, not as a filter nobody applies", () => {
     assert.deepStrictEqual(lib.parseQuery("license:mit").text, ["license:mit"]);
 });
+
+test("libyearsItems are the footer's items after the number, one string each, so the page wraps between them", () => {
+    const block = { total: 8.07, direct_requirements: 4.71, measured: 2, unmeasured: { branch_snapshot: 1 }, furthest_behind: { package: "smalot/pdfparser", version: "v1.1.0", libyears: 4.7 } };
+    assert.deepStrictEqual(lib.libyearsItems(block), ["across 2 of 3 packages", "4.7 from direct requirements", "furthest behind smalot/pdfparser v1.1.0 at 4.7"]);
+    assert.deepStrictEqual(lib.libyearsItems({ measured: 0, unmeasured: {} }), ["nothing to measure"]);
+    assert.deepStrictEqual(lib.libyearsItems(undefined), [], "no block, no items: the ledger stays empty rather than saying something");
+});
+
+test("libyearsSummary says the scope, the direct share and the package furthest behind, without the total", () => {
+    const block = {
+        total: 151.52, direct_requirements: 94.53, measured: 191,
+        unmeasured: { branch_snapshot: 4, no_stable_release_date: 5, not_from_composer_repository: 0, metadata_unavailable: 0 },
+        furthest_behind: { package: "smalot/pdfparser", version: "v1.1.0", libyears: 4.70 }
+    };
+    assert.strictEqual(lib.libyearsSummary(block), "across 191 of 200 packages · 94.5 from direct requirements · furthest behind smalot/pdfparser v1.1.0 at 4.7");
+    assert.strictEqual(lib.libyearsSummary({ ...block, unmeasured: {} }), "across all 191 packages · 94.5 from direct requirements · furthest behind smalot/pdfparser v1.1.0 at 4.7", "every package measured");
+    assert.strictEqual(lib.libyearsSummary({ total: 1, direct_requirements: 1, measured: 1, unmeasured: {}, furthest_behind: { package: "a/a", version: "1.0.0", libyears: 1 } }), "across the one package · 1.0 from direct requirements · furthest behind a/a 1.0.0 at 1.0");
+    assert.strictEqual(lib.libyearsSummary({ total: 0, direct_requirements: 0, measured: 20, unmeasured: {}, furthest_behind: null }), "across all 20 packages", "nothing behind: the scope alone");
+});
+
+test("libyearsSummary says so when nothing was measured, and stays quiet for a block that is not one", () => {
+    assert.strictEqual(lib.libyearsSummary({ total: 0, direct_requirements: 0, measured: 0, unmeasured: { branch_snapshot: 2 }, furthest_behind: null }), "none of the 2 packages could be measured");
+    assert.strictEqual(lib.libyearsSummary({ total: 0, direct_requirements: 0, measured: 0, unmeasured: { branch_snapshot: 1 }, furthest_behind: null }), "the one package could not be measured");
+    assert.strictEqual(lib.libyearsSummary({ total: 0, direct_requirements: 0, measured: 0, unmeasured: {}, furthest_behind: null }), "nothing to measure");
+    assert.strictEqual(lib.libyearsSummary(undefined), "");
+    assert.strictEqual(lib.libyearsSummary({}), "");
+    assert.strictEqual(lib.libyearsSummary({ measured: 3, unmeasured: "nine", furthest_behind: "worst" }), "across all 3 packages", "hostile shapes degrade, never throw");
+});
+
+test("libyearsSortKey puts an unmeasured package below every measured one, zero included", () => {
+    const rows = [{ libyears: 1.2 }, { libyears: null }, { libyears: 0 }, {}];
+    assert.deepStrictEqual(rows.map(lib.libyearsSortKey).sort((a, b) => a - b), [-1, -1, 0, 1.2]);
+    assert.strictEqual(lib.libyearsSortKey(undefined), -1, "no finding at all sorts with the unmeasured");
+});
+
+test("libyearsReason names why a finding was not measured, in the block's own words", () => {
+    assert.strictEqual(lib.libyearsReason({ libyears: 4.7, version: "dev-main" }), "", "measured: nothing to explain");
+    assert.strictEqual(lib.libyearsReason({ libyears: 0, version: "1.0.0" }), "", "zero is measured");
+    assert.strictEqual(lib.libyearsReason({ libyears: null, version: "dev-main", note: "not from a Composer repository, not checked" }), "not from a Composer repository", "the note outranks the version");
+    assert.strictEqual(lib.libyearsReason({ libyears: null, version: "1.0.0", note: "Repository metadata unavailable: timeout" }), "metadata unavailable");
+    assert.strictEqual(lib.libyearsReason({ libyears: null, version: "dev-main", note: null }), "branch snapshot");
+    assert.strictEqual(lib.libyearsReason({ libyears: null, version: "2.x-dev#abc123" }), "branch snapshot", "the reference is stripped first");
+    assert.strictEqual(lib.libyearsReason({ libyears: null, version: "v1.37.0" }), "no release date lockrot trusts");
+    assert.strictEqual(lib.libyearsReason({ version: "v1.37.0" }), "no release date lockrot trusts", "a document from before the field reads as unmeasured");
+    assert.strictEqual(lib.libyearsReason(undefined), "");
+});
+
+test("fixed formats a finite number and refuses everything else, null included", () => {
+    assert.strictEqual(lib.fixed(4.7123, 1), "4.7");
+    assert.strictEqual(lib.fixed(0, 2), "0.00", "zero is a number");
+    assert.strictEqual(lib.fixed(null, 1), null, "Number(null) would have been 0.0");
+    assert.strictEqual(lib.fixed("4.7", 1), null);
+    assert.strictEqual(lib.fixed(Infinity, 1), null);
+    assert.strictEqual(lib.fixed(undefined, 1), null);
+});
+
+test("libyearsItems and libyearsReason never turn a missing number into a zero", () => {
+    const block = { total: null, direct_requirements: null, measured: 2, unmeasured: {}, furthest_behind: { package: "a/a", version: "1.0.0", libyears: null } };
+    assert.deepStrictEqual(lib.libyearsItems(block), ["across all 2 packages", "furthest behind a/a 1.0.0"], "the direct share is dropped, the package keeps its name and loses the number");
+    assert.strictEqual(lib.libyearsReason({ libyears: "4.7", version: "1.0.0" }), "not a number in this document");
+    assert.strictEqual(lib.libyearsReason({ libyears: 0, version: "1.0.0" }), "", "zero stays measured");
+});

@@ -151,6 +151,12 @@ final class LockedPackage
 
     public function isBranchSnapshot(): bool
     {
-        return VersionParser::parseStability($this->version) === 'dev';
+        return self::isSnapshotVersion($this->version);
+    }
+
+    /** Whether a version string names a branch (`dev-main`, `2.x-dev`) rather than a release. */
+    public static function isSnapshotVersion(string $version): bool
+    {
+        return VersionParser::parseStability($version) === 'dev';
     }
 }

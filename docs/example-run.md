@@ -281,6 +281,8 @@ low (2)
 200 packages checked · abandoned 19 · silent 8 · pinned 4 · left-behind 11 · old-promise 38 · stale 3 ·
 unknown 0 · finished 18 · ok 99
 priority: critical 3 · high 64 · medium 14 · low 2
+libyears: 163.7 behind across 195 of 200 packages · 106.7 from direct requirements ·
+furthest behind smalot/pdfparser v1.1.0 at 4.7
 pulled in by: wallabag/rulerz-bundle 15 · wallabag/rulerz 14 · wallabag/phpepub 5 ·
 scheb/2fa-google-authenticator 3 · friendsofsymfony/jsrouting-bundle 2 · … and 21 more
 Data as of 2026-09-15 (package repositories, repository hosts). Run composer lockrot --format=json for details.
@@ -338,6 +340,22 @@ list, which `…` stands in for:
         },
         …
     ],
+    "libyears": {
+        "total": 163.69,
+        "direct_requirements": 106.7,
+        "measured": 195,
+        "unmeasured": {
+            "branch_snapshot": 4,
+            "no_stable_release_date": 1,
+            "not_from_composer_repository": 0,
+            "metadata_unavailable": 0
+        },
+        "furthest_behind": {
+            "package": "smalot/pdfparser",
+            "version": "v1.1.0",
+            "libyears": 4.7
+        }
+    },
     "baseline": null,
     "notes": [],
     "findings": [
@@ -379,7 +397,8 @@ list, which `…` stands in for:
             "evidence": "marked abandoned by its repository, replacement: Symfony; repository archived on GitHub; last release 2023-02-24 (3.6 years ago); last push 2023-02-24 (3.6 years ago); released 2023-02-24, before PHP 8.4 GA (2024-11-21); php constraint \">=7.2.5\" has no upper bound; pulls in 1 flagged package: doctrine/annotations (abandoned)",
             "allowlist_reason": null,
             "note": null,
-            "data_date": "2026-09-15T17:31:32+00:00"
+            "data_date": "2026-09-15T17:31:32+00:00",
+            "libyears": 0
         },
         …
     ]
@@ -388,9 +407,11 @@ list, which `…` stands in for:
 
 The cut signals have the same shape as S1 and S2; S7 carries the packages it names under `data`. So
 do the other 199 findings, each with its own `priority`, `direct`, `dev`, `signals`, `chain`,
-`direct_dependents`, `evidence`, `allowlist_reason`, `note` and `data_date`. `exposure` is the
+`direct_dependents`, `evidence`, `allowlist_reason`, `note`, `data_date` and `libyears`. `exposure` is the
 `pulled in by:` line in full — every direct requirement that pulls in a flagged transitive package,
-with how many, most first.
+with how many, most first. `libyears` is the [libyears block](verdicts.md#libyears), summed from the
+findings: sensio/framework-extra-bundle is abandoned and *zero* libyears behind — its last release is
+the one installed — which is the point of keeping the two numbers apart.
 
 ## A clean run
 
@@ -402,6 +423,7 @@ No dependency rot found in 20 packages.
 
 20 packages checked · abandoned 0 · silent 0 · pinned 0 · left-behind 0 · old-promise 0 · stale 0 · unknown 0 ·
 finished 11 · ok 9
+libyears: 0.9 behind across all 20 packages · 0.0 from direct requirements · furthest behind laminas/laminas-httphandlerrunner 2.13.0 at 0.9
 Data as of 2026-09-15 (package repositories, repository hosts). Run composer lockrot --format=json for details.
 ```
 

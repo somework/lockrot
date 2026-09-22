@@ -63,6 +63,11 @@
       <div class="bar" id="advBar" role="img" aria-label="Advisory severity distribution"></div>
       <div class="legend" id="advLegend"></div>
     </div>
+    <div class="ledger-block">
+      <span class="eyebrow" title="Years between the installed release and the newest stable release, summed over the measured packages. Counts every drift, healthy patches included.">Libyears behind</span>
+      <p class="figure"><span id="libyearsTotal">—</span></p>
+      <div class="legend" id="libyearsLine"></div>
+    </div>
   </div>
 </header>
 
@@ -134,6 +139,17 @@
     <section class="sect">
       <h3>The signals</h3>
       <dl class="deflist" id="signalDefs"></dl>
+    </section>
+    <section class="sect" id="libyearsDef">
+      <h3>One number for the lock: libyears</h3>
+      <p style="margin:0;font-size:13px;color:var(--ink-2)">
+        For each package, the years between the release installed and the package's newest stable release,
+        summed. It counts every drift, healthy patches included, so it says how far behind the lock is and
+        nothing about why &mdash; it is not a verdict, and no priority reads it. A package is not measured when
+        it is a branch snapshot, when no dated stable release is known for it, when it is not from a Composer
+        repository, or when its metadata did not come; the Run tab counts each case.
+        <a class="out" href="https://lockrot.dev/verdicts/#libyears" target="_blank" rel="noopener noreferrer">what libyears measure</a>
+      </p>
     </section>
     <section class="sect">
       <h3>How a priority is reached</h3>

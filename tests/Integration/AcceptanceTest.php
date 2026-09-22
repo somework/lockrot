@@ -6,6 +6,7 @@ namespace Lockrot\Tests\Integration;
 
 use Lockrot\Allowlist\BuiltinAllowlist;
 use Lockrot\Analyzer\Analyzer;
+use Lockrot\Analyzer\Libyears;
 use Lockrot\Analyzer\Report;
 use Lockrot\Clock;
 use Lockrot\Data\Forge\ActivityClient;
@@ -22,6 +23,7 @@ use Lockrot\Signal\Signal;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
+use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\MemoisingMetadataLoader;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Priority;
@@ -231,6 +233,88 @@ final class AcceptanceTest extends TestCase
         // phpzip/phpzip 2.0.8: released 2015, require php >=5.3.0 -> S5 fires but silent has precedence
         $ids = array_map(static fn ($s) => $s->id(), $f['phpzip/phpzip']->signals());
         self::assertContains('S5', $ids);
+    }
+
+    /**
+     * The libyears of the recorded fixtures, pinned like the verdict counts are.
+     *
+     * The research table these numbers were first written against (wallabag 171.6, nextcloud 47.1,
+     * matomo 11.8) was computed from ecosyste.ms's `latest_release_published_at`, which dates a
+     * package with no release at all by its branch's last push. That is where the gap is:
+     * lox/xhprof on `dev-master` (10.5 of matomo's 11.8) and the three wallabag/rulerz-* on
+     * `dev-master` (8.1 of wallabag's). lockrot leaves them unmeasured and says so in the block.
+     * The three scheb/2fa-* splits, whose newest tags share one commit and carry no date lockrot
+     * trusts, are measured to the newest dated release above the installed one — a lower bound,
+     * 4.06 each — which is what the table had for them too. The packages furthest behind are the
+     * same on every fixture.
+     */
+    public function testLibyearsOnTheRecordedFixtures(): void
+    {
+        $wallabag = $this->analyze('apps/wallabag_wallabag');
+        $block = $wallabag->libyears();
+        self::assertEqualsWithDelta(163.69, $block->total(), 0.005);
+        self::assertEqualsWithDelta(106.7, $block->direct(), 0.005);
+        self::assertSame(195, $block->measured());
+        self::assertSame([
+            Libyears::BRANCH_SNAPSHOT => 4,
+            Libyears::NO_STABLE_RELEASE_DATE => 1,
+            Libyears::NOT_FROM_COMPOSER_REPOSITORY => 0,
+            Libyears::METADATA_UNAVAILABLE => 0,
+        ], $block->unmeasured());
+        $worst = $block->worst();
+        self::assertNotNull($worst);
+        self::assertSame('smalot/pdfparser', $worst->package());
+        self::assertEqualsWithDelta(4.70, (float) $worst->libyears(), 0.005);
+        $f = $this->byName($wallabag);
+        self::assertNull($f['wallabag/rulerz']->libyears(), 'a dev-master pin is not measured');
+        self::assertEqualsWithDelta(4.06, (float) $f['scheb/2fa-backup-code']->libyears(), 0.005, 'a split whose newest tags share a commit: measured to the newest dated release above, a lower bound');
+        self::assertEqualsWithDelta(4.23, (float) $f['scheb/2fa-bundle']->libyears(), 0.005, 'while the monorepo itself is dated exactly');
+        self::assertNull($f['symfony/polyfill-ctype']->libyears(), 'the newest tag is undated and nothing dated sits above the installed version');
+        self::assertSame(0.0, $f['sensio/framework-extra-bundle']->libyears(), 'abandoned, and zero libyears behind: the installed release is the last one');
+        self::assertEqualsWithDelta(3.36, (float) $f['psr/log']->libyears(), 0.005, 'finished, and three years behind a 3.x it will never need — the docs quote this');
+        // The block is the arithmetic over the findings the document prints, to within the
+        // rounding of each printed value.
+        $sum = 0.0;
+        $measured = 0;
+        foreach (JsonPath::arrayAt($wallabag->toArray(), ['findings']) as $finding) {
+            self::assertIsArray($finding);
+            if ($finding['libyears'] !== null) {
+                self::assertIsFloat($finding['libyears']);
+                ++$measured;
+                $sum += $finding['libyears'];
+            }
+        }
+        self::assertSame($block->measured(), $measured);
+        self::assertEqualsWithDelta($block->toArray()['total'], $sum, 0.005 * $measured);
+
+        // The other fixtures, each block pinned and each checked against its own findings.
+        $expected = [
+            'apps/nextcloud_3rdparty' => ['total' => 47.47, 'direct' => 13.3, 'measured' => 94, 'unmeasured' => [0, 0, 0, 0], 'worst' => ['punic/punic', 3.45]],
+            // lox/xhprof and the two matomo/* lists on dev-master; two symfony/polyfill-* splits undated
+            'apps/matomo-org_matomo' => ['total' => 0.87, 'direct' => 0.07, 'measured' => 47, 'unmeasured' => [3, 2, 0, 0], 'worst' => ['maxmind-db/reader', 0.8]],
+            'skeletons/laravel' => ['total' => 0.46, 'direct' => 0.02, 'measured' => 73, 'unmeasured' => [0, 3, 0, 0], 'worst' => ['brick/math', 0.25]],
+        ];
+        foreach ($expected as $dir => $want) {
+            $report = $this->analyze($dir);
+            $block = $report->libyears();
+            self::assertEqualsWithDelta($want['total'], $block->total(), 0.005, $dir);
+            self::assertEqualsWithDelta($want['direct'], $block->direct(), 0.005, $dir);
+            self::assertSame($want['measured'], $block->measured(), $dir);
+            self::assertSame(array_combine(Libyears::REASONS, $want['unmeasured']), $block->unmeasured(), $dir);
+            $worst = $block->worst();
+            self::assertNotNull($worst, $dir);
+            self::assertSame($want['worst'][0], $worst->package(), $dir);
+            self::assertEqualsWithDelta($want['worst'][1], (float) $worst->libyears(), 0.005, $dir);
+            $sum = 0.0;
+            foreach (JsonPath::arrayAt($report->toArray(), ['findings']) as $finding) {
+                self::assertIsArray($finding);
+                if ($finding['libyears'] !== null) {
+                    self::assertIsFloat($finding['libyears']);
+                    $sum += $finding['libyears'];
+                }
+            }
+            self::assertEqualsWithDelta($block->toArray()['total'], $sum, 0.005 * $block->measured(), $dir.': the block is the arithmetic over the findings');
+        }
     }
 
     public function testOutputWordingIsNeutral(): void
