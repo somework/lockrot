@@ -50,13 +50,19 @@ final class Finding
      * @var list<string>
      */
     private array $directDependents;
+    /**
+     * How many years the installed version is behind the package's newest stable release
+     * ({@see \Lockrot\Analyzer\Libyears::behind()}), unrounded; null when the package is not
+     * measured. Kept unrounded so the report's totals sum what was measured, not what was printed.
+     */
+    private ?float $libyears;
 
     /**
      * @param list<Signal> $signals
      * @param list<string> $chain
      * @param list<string> $directDependents
      */
-    public function __construct(string $package, string $version, string $verdict, array $signals, array $chain, ?string $allowlistReason, ?\DateTimeImmutable $dataDate, ?string $note = null, bool $dev = false, array $directDependents = [])
+    public function __construct(string $package, string $version, string $verdict, array $signals, array $chain, ?string $allowlistReason, ?\DateTimeImmutable $dataDate, ?string $note = null, bool $dev = false, array $directDependents = [], ?float $libyears = null)
     {
         $this->package = $package;
         $this->version = $version;
@@ -68,6 +74,7 @@ final class Finding
         $this->note = $note;
         $this->dev = $dev;
         $this->directDependents = $directDependents;
+        $this->libyears = $libyears;
     }
 
     /**
@@ -141,6 +148,12 @@ final class Finding
     public function directDependents(): array
     {
         return $this->directDependents;
+    }
+
+    /** Years behind the newest stable release, unrounded; null when not measured ({@see \Lockrot\Analyzer\Libyears}). */
+    public function libyears(): ?float
+    {
+        return $this->libyears;
     }
 
     /**
@@ -370,6 +383,7 @@ final class Finding
             'evidence' => $this->evidence(),
             'allowlist_reason' => $this->allowlistReason, 'note' => $this->note,
             'data_date' => $this->dataDate === null ? null : $this->dataDate->format(\DATE_ATOM),
+            'libyears' => $this->libyears === null ? null : round($this->libyears, 2),
         ];
     }
 }

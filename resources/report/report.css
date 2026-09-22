@@ -189,14 +189,16 @@ button { font: inherit; color: inherit; }
 .ledger {
   max-width: 1500px;
   margin: 0 auto;
-  padding: 18px 20px 0;
+  padding: 18px 20px 14px;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 18px 28px;
 }
-@media (max-width: 1180px) { .ledger { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 1400px) { .ledger { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 860px) { .ledger { grid-template-columns: 1fr; } }
 .ledger-block { display: flex; flex-direction: column; gap: 8px; }
+/* The one ledger block whose weight is a number rather than a bar: the same height as a bar row, as a figure. */
+.figure { margin: 0; font-family: var(--mono); font-size: 22px; line-height: 1; font-variant-numeric: tabular-nums; }
 .bar {
   display: flex;
   height: 10px;

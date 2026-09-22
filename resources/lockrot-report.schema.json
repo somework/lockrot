@@ -170,6 +170,94 @@
         }
       }
     },
+    "libyears": {
+      "description": "How far behind the lock is, in libyears: for each measured finding, the years (365.25 days) between the installed version's release and the package's newest stable release, never below zero, summed. Derived from `findings`: `total` is the sum of the unrounded per-finding values (so the sum of the printed two-decimal values agrees with it to within 0.005 per measured finding), `direct_requirements` the same over `direct: true`, `measured` the number of findings whose `libyears` is not null, `unmeasured` the null ones by reason, `furthest_behind` the greatest above zero (ties to the first package name; null when nothing was measured or nothing is behind). Every drift counts, healthy patches included: this is not a measure of rot or of security, and not php-libyear's number, which sums composer.json's direct requirements (require and require-dev) and scores an undated package as zero. Absent from documents written before 0.11.0.",
+      "type": "object",
+      "required": [
+        "total",
+        "direct_requirements",
+        "measured",
+        "unmeasured",
+        "furthest_behind"
+      ],
+      "properties": {
+        "total": {
+          "description": "Sum over every measured finding, two decimals.",
+          "type": "number",
+          "minimum": 0
+        },
+        "direct_requirements": {
+          "description": "Sum over the measured findings with `direct: true`, two decimals: the nearest number to php-libyear's.",
+          "type": "number",
+          "minimum": 0
+        },
+        "measured": {
+          "description": "Findings whose `libyears` is not null. `measured` plus every value in `unmeasured` is the number of findings.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "unmeasured": {
+          "description": "Findings with `libyears: null`, by the first reason that applies.",
+          "type": "object",
+          "required": [
+            "branch_snapshot",
+            "no_stable_release_date",
+            "not_from_composer_repository",
+            "metadata_unavailable"
+          ],
+          "properties": {
+            "branch_snapshot": {
+              "description": "A dev pin (`dev-main`, `2.x-dev`): a commit date, not a release date.",
+              "type": "integer",
+              "minimum": 0
+            },
+            "no_stable_release_date": {
+              "description": "No date to trust for one end: no stable release; the newest one undated with nothing dated above the installed version (when something dated is, its date is used and the value is a lower bound); the installed version dated only by a commit its tags share (a split dated by its monorepo parent); or the lock entry without a `time`.",
+              "type": "integer",
+              "minimum": 0
+            },
+            "not_from_composer_repository": {
+              "description": "No metadata was asked for: a path, vcs or package repository entry.",
+              "type": "integer",
+              "minimum": 0
+            },
+            "metadata_unavailable": {
+              "description": "Metadata was asked for and did not come: not listed, offline, budget, transport.",
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "furthest_behind": {
+          "description": "The measured finding furthest behind, ties to the first package name; null when nothing was measured or nothing measured is behind.",
+          "oneOf": [
+            {
+              "type": "object",
+              "required": [
+                "package",
+                "version",
+                "libyears"
+              ],
+              "properties": {
+                "package": {
+                  "$ref": "#/definitions/packageName"
+                },
+                "version": {
+                  "type": "string"
+                },
+                "libyears": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
     "baseline": {
       "description": "How the run compared with the baseline file, null when none was used.",
       "oneOf": [
@@ -393,6 +481,14 @@
               "type": "null"
             }
           ]
+        },
+        "libyears": {
+          "description": "Years (365.25 days) between the installed version's release and the package's newest stable release — or, when that release carries no date lockrot trusts, the newest trusted date of a release above the installed version, a lower bound — at least 0, two decimals; null when not measured: a branch snapshot, no dated stable release, not from a Composer repository, or metadata unavailable. Absent from documents written before 0.11.0.",
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
         },
         "baseline": {
           "$ref": "#/definitions/baselineStanding"

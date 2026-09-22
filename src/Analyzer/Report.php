@@ -247,6 +247,16 @@ final class Report
         );
     }
 
+    /**
+     * How far behind the lock is, in libyears ({@see Libyears}): derived from the findings every
+     * time it is asked for, so the block the report prints is exactly the arithmetic over the
+     * findings it prints — nothing to thread through the constructor, nothing that can disagree.
+     */
+    public function libyears(): Libyears
+    {
+        return Libyears::fromFindings($this->findings);
+    }
+
     /** Whether `packages-dev` was analysed alongside the production set. */
     public function includesDev(): bool
     {
@@ -378,6 +388,7 @@ final class Report
             'counts' => $this->byVerdict(),
             'priorities' => $this->byPriority(),
             'exposure' => $this->exposureList(),
+            'libyears' => $this->libyears()->toArray(),
             'baseline' => $this->baseline === null ? null : $this->baseline->toArray(),
             'notes' => $this->notes,
             'findings' => array_map(fn (Finding $f): array => $f->toArray() + ['baseline' => $this->baselineStateOf($f)], $this->findings),

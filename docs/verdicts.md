@@ -352,9 +352,78 @@ At install time only the packages the transaction touches are analysed, so a dir
 gets S7 only when it is itself part of the transaction, and the compact block does not print S7 or
 the other parents at all; `composer lockrot` on the full lock always has the whole picture.
 
+## Libyears
+
+One number for how far behind the whole lock is, laid over the verdicts rather than added to them:
+
+```text
+libyears: 163.7 behind across 195 of 200 packages · 106.7 from direct requirements ·
+furthest behind smalot/pdfparser v1.1.0 at 4.7
+```
+
+For each package, the years between the release of the version installed and the package's newest
+stable release — the lock's own `time` against the repository's date for its highest stable tag,
+in years of 365.25 days, never below zero — summed over the packages the run analysed (with
+`--dev`, `packages-dev` included). The *libyear* is the unit [libyear.com](https://libyear.com/)
+gives this measure — "Rails 5.0.0 (June 2016) is 1 libyear behind 5.1.2 (June 2017)"; the metric
+underneath is the version release date of [Cox, Bouwers, van Eekelen and Visser, *Measuring
+Dependency Freshness in Software Systems*, ICSE 2015](https://ericbouwers.github.io/papers/icse15.pdf),
+which that site cites. Nothing about today enters the number: two dates the run already holds, so
+it does not move between two runs on the same lock unless a package releases.
+
+Every finding carries its own value as `libyears` in `--format=json`, `null` when the package is not
+measured, and the report's `libyears` block is the arithmetic over them: `total`,
+`direct_requirements` (the same sum over the findings with `direct: true`), `measured`, `unmeasured`
+by reason, `furthest_behind`. A consumer can recompute every number in the block from the findings:
+`total` is summed before rounding, so the sum of the printed values agrees with it to within 0.005
+per measured finding, and `measured` plus every count in `unmeasured` is the number of findings.
+The HTML page shows the total in its ledger, the value in a sortable column, and the counts by
+reason on the Run tab.
+
+A package is **not measured**, and counted under one of four reasons, when:
+
+| `unmeasured` key | when |
+|---|---|
+| `branch_snapshot` | The installed version is a branch (`dev-main`, `2.x-dev`): it has a commit date, not a release date. Measured by push date a fresh `dev-main` reads as zero and an old one as years of nothing (lox/xhprof on Matomo would add ten). The `pinned` verdict already says what there is to say. |
+| `no_stable_release_date` | No date lockrot trusts for one of the two ends: no stable release exists; or the newest tag carries no date lockrot trusts — a subtree split whose tags share a commit — and nothing dated sits above the installed version either (symfony/polyfill-ctype v1.37.0: the newest tag, undated); or the installed version is dated only by such a shared commit (a split whose newest release is [dated by its monorepo parent](#dates-from-the-monorepo): the lock's `time` for illuminate/macroable v10.48.28 is a year and a half before the release); or the lock entry has no `time`. Adding an unknown to a sum is not measuring. |
+| `not_from_composer_repository` | A `path`, `vcs` or `package` repository entry: no metadata was asked for. |
+| `metadata_unavailable` | Metadata was asked for and did not come: not listed, offline, budget, transport. |
+
+The reasons are checked in this order, and the first that applies is the one counted: not from a
+Composer repository, then metadata unavailable, then a branch snapshot, then no dated stable
+release — so a `dev-main` pin on a package that never released counts as a snapshot. A lock ahead
+of the last stable release — a pre-release above it, a tag the repository no longer lists — is
+measured as zero, not dropped; a lock with nothing behind names no package as furthest behind.
+
+**When the newest release is undated, the number is a lower bound.** A subtree split's tags pile
+up on one commit — scheb/2fa-backup-code has v8.3.0 through v8.6.1 on one, all "2026-01-24" —
+and Packagist dates each by that commit, so the newest tag's date is not the release's and lockrot
+does not read it (that is also why S2 stays quiet there). But a tag's commit is never younger than
+the release it names, so the newest *trusted* date of a release above the installed version, read
+off the same branch view [left-behind](#left-behind) uses, is a date the package had certainly
+moved past. That is what such a package is measured to: at least 4.1 years for
+scheb/2fa-backup-code v5.13.2, possibly more. The HTML package card says "at least" on these.
+
+Three things the number is not:
+
+- **A measure of rot.** It counts every drift, healthy patches included: on the wallabag lock
+  `psr/log 1.1.4` is `finished` and adds 3.4 years for a 3.x it will never need, while
+  `sensio/framework-extra-bundle` is `abandoned` and adds zero, because the release installed is
+  the last one there is; the package furthest behind, `smalot/pdfparser`, is `left-behind`. The
+  two axes do not track each other, which is why the number does not enter a priority, `--fail-on`
+  or the baseline.
+- **A security number.** An advisory is S9 and the priority ladder; this is distance.
+- **php-libyear's number.** [ecoAPM/php-libyear](https://github.com/ecoAPM/php-libyear) reads
+  `composer.json` and sums the direct requirements only; lockrot sums the whole lock, which on
+  wallabag is 163.7 against 106.7. `direct_requirements` is the same sum restricted to
+  `direct: true` — the nearest number to that tool's, not the same one: run with `--dev` to
+  compare, since php-libyear counts `require` and `require-dev` together; it picks the newest
+  version by the project's `minimum-stability` where lockrot always takes the newest stable; and it
+  scores an undated package as zero where lockrot leaves it unmeasured.
+
 ## Related
 
-- [example-run.md](example-run.md) — a full run with every verdict in it
+- [example-run.md](example-run.md) — a full run with every verdict in it, and the libyears block
 - [configuration.md](configuration.md) — the thresholds behind S2 and S4, and the allowlist
 - [baseline.md](baseline.md) — accepting findings you have already decided to live with
 - [ci.md](ci.md) — exit codes and the six output formats, and where each carries the exposure

@@ -88,7 +88,8 @@
                 "evidence": { "type": "string" },
                 "allowlist_reason": { "type": ["string", "null"] },
                 "note": { "type": ["string", "null"] },
-                "data_date": { "oneOf": [{ "$ref": "#/definitions/dateTime" }, { "type": "null" }] }
+                "data_date": { "oneOf": [{ "$ref": "#/definitions/dateTime" }, { "type": "null" }] },
+                "libyears": { "description": "Years behind the newest stable release (a lower bound when that release is undated), at least 0; null when not measured; absent before 0.11.0. See report-1.json.", "type": ["number", "null"], "minimum": 0 }
             }
         },
         "metadata": {

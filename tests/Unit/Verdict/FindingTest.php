@@ -301,12 +301,23 @@ final class FindingTest extends TestCase
         $finding = new Finding('vendor/pkg', '1.2.3', Verdict::STALE, [], ['vendor/root', 'vendor/pkg'], null, null, null, true);
         $array = $finding->toArray();
         self::assertSame(
-            ['package', 'version', 'verdict', 'priority', 'direct', 'dev', 'signals', 'chain', 'direct_dependents', 'evidence', 'allowlist_reason', 'note', 'data_date'],
+            ['package', 'version', 'verdict', 'priority', 'direct', 'dev', 'signals', 'chain', 'direct_dependents', 'evidence', 'allowlist_reason', 'note', 'data_date', 'libyears'],
             array_keys($array)
         );
         self::assertSame(Priority::LOW, $array['priority']);
         self::assertFalse($array['direct']);
         self::assertTrue($array['dev']);
+    }
+
+    public function testAFindingCarriesItsLibyearsUnroundedAndPrintsThemToTwoDecimals(): void
+    {
+        $measured = new Finding('smalot/pdfparser', 'v1.1.0', Verdict::LEFT_BEHIND, [], ['smalot/pdfparser'], null, null, null, false, [], 4.7123);
+        $unmeasured = new Finding('wallabag/rulerz', 'dev-master', Verdict::PINNED, [], ['wallabag/rulerz'], null, null);
+
+        self::assertSame(4.7123, $measured->libyears());
+        self::assertSame(4.71, $measured->toArray()['libyears']);
+        self::assertNull($unmeasured->libyears());
+        self::assertNull($unmeasured->toArray()['libyears']);
     }
 
     public function testDirectDependentsDefaultToNoneAndAreCarriedInTheArray(): void
