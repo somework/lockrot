@@ -14,6 +14,9 @@ composer lockrot --fail-on=silent --target-php=8.4
 `--fail-on` takes a verdict (`silent`: fail on what was observed, wherever the package sits) or a
 [priority](verdicts.md#priority) (`high`: fail on how much it applies to this project — an abandoned
 direct production requirement fails, the same verdict on a transitive development package does not).
+`--fail-on=unchecked` is neither: it fails on a finding whose check did not run — the workflow that
+forgot to pass `GITHUB_TOKEN` through, an exhausted rate limit — so an incomplete run is not read as
+a clean one ([What was not checked](verdicts.md#what-was-not-checked)).
 
 With a committed [baseline](baseline.md) the same command fails only on new or worsened findings; no extra flag is
 needed, the file is picked up automatically. To run without installing the plugin, use the PHAR — [phar.md](phar.md)
@@ -40,7 +43,7 @@ subdirectory. The same repository publishes `ghcr.io/somework/lockrot`, a signed
 | Code | Meaning |
 |---|---|
 | `0` | No finding reached the `fail-on` threshold (or `fail-on=none`) |
-| `1` | A finding reached or exceeded the `fail-on` threshold |
+| `1` | A finding reached or exceeded the `fail-on` threshold, or carried an unrun check under `--fail-on=unchecked` |
 | `2` | Tool or configuration error (unparsable `composer.json`/`composer.lock`, invalid config value, unreadable or unwritable [baseline](baseline.md)) |
 
 `composer audit` follows the same convention: exit `1` when it finds a security advisory or, with Composer's default
