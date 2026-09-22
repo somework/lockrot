@@ -87,7 +87,10 @@ finding with everything it was decided on:
   `unmeasured` block counts it under;
 - every signal, its summary and its raw data — the dates the summary's years were computed from,
   and for S9 one line per advisory with what fixes it and where;
-- the `composer.lock` entry: version, `php` constraint, release date, source;
+- the `composer.lock` entry: version, `php` constraint, source, and the entry's own date — `released
+  2021-06-01` where the repository dated the version by a release, `dated 2026-09-13 by its commit`
+  for a branch snapshot, `dated 2023-06-05 by a commit its tags share` for a subtree split, which is
+  the date `installed release` below it replaces;
 - the repository metadata: how many versions are listed, whether the package is abandoned and what
   replaces it, its last stable release, and the table S8 reads — every release branch with its
   highest tag, that tag's release date and the branch's newest dated release, the installed branch

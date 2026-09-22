@@ -24,7 +24,7 @@
             "required": ["php", "released", "repository", "from_composer_repository", "dev", "branch_snapshot", "type"],
             "properties": {
                 "php": { "description": "The entry's php requirement, null when it has none.", "type": ["string", "null"] },
-                "released": { "oneOf": [{ "$ref": "#/definitions/dateTime" }, { "type": "null" }] },
+                "released": { "description": "The lock's `time` for the installed version, as Composer wrote it. A release's date only where the repository dated the version by one: for a branch snapshot it is the commit's (`branch_snapshot` is then true), and for a subtree split's tag it can be the date of a commit the tag shares with others. `metadata.installed_release` is the date lockrot reads as the release's.", "oneOf": [{ "$ref": "#/definitions/dateTime" }, { "type": "null" }] },
                 "repository": { "type": ["string", "null"] },
                 "from_composer_repository": { "type": "boolean" },
                 "dev": { "type": "boolean" },

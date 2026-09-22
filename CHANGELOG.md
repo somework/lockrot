@@ -80,6 +80,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **`--explain` says what the lock's date is a date of.** The `composer.lock` block called that
+  date a release whenever the entry carried one, so a branch snapshot read `released 2026-09-21 ·
+  branch snapshot` and a subtree split read `released 2023-06-05` four lines above the block saying
+  that same date is a commit its tags share, not a release. It now reads `dated … by its commit`
+  for a snapshot and `dated … by a commit its tags share` for a split, and `released …` only where
+  the repository dated the version by a release. The JSON keeps its `lock.released` field, whose
+  schema description now says which of the three it is carrying.
 - **The report schema accepts the empty chain a run can really produce.** `chain` was declared with
   `minItems: 1`, and two ordinary runs break that: a `composer.lock` with no `composer.json` beside
   it has no direct requirements at all, so nothing reaches any package, and a lock can hold a
