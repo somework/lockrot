@@ -84,8 +84,8 @@ baseline, the SARIF rule and every count key on). Each finding carries `replacem
 `Symfony` (sensio/framework-extra-bundle) and `EnglishInflector from the String component`
 (doctrine/inflector) are what Packagist has on record, and they stay in the evidence as text, not
 in the field. The document carries the split next to the counts —
-`"abandoned": {"total": 19, "with_replacement": 6}` — and the summary line says
-`abandoned 19 (6 with a replacement)` where the number is not zero. The HTML page tags the row with
+`"abandoned": {"total": 7, "with_replacement": 6}` — and the summary line says
+`abandoned 7 (6 with a replacement)` where the number is not zero. The HTML page tags the row with
 the replacement and links it on the package card.
 
 A named replacement is where to go, not a string to swap: `psr/http-factory` for
