@@ -103,6 +103,8 @@
                 "last_stable_release": { "oneOf": [{ "$ref": "#/definitions/dateTime" }, { "type": "null" }] },
                 "last_stable_version": { "type": ["string", "null"] },
                 "last_stable_dated_by": { "description": "The monorepo last_stable_release was read from through its `replace` list, null when it is the package's own.", "oneOf": [{ "$ref": "#/definitions/packageName" }, { "type": "null" }] },
+                "installed_release": { "description": "When the installed version released, as far as lockrot trusts a date for it: the lock's own `time`, or the monorepo parent's tag of the same version for a split package it dated (the split's own tag is dated by a commit other tags share, and the lock copies that date). The installed end of the finding's `libyears`. Null where neither is trusted: a branch snapshot, a lock entry without a `time`, or a split package whose installed version the parent does not date. Optional: documents written before 0.11.0 do not carry it.", "oneOf": [{ "$ref": "#/definitions/dateTime" }, { "type": "null" }] },
+                "installed_release_dated_by": { "description": "The monorepo parent whose tag `installed_release` is, null when it is the lock's own date or there is none. Optional, as `installed_release` is.", "oneOf": [{ "$ref": "#/definitions/packageName" }, { "type": "null" }] },
                 "repository": { "type": ["string", "null"] },
                 "type": { "type": "string" },
                 "data_date": { "$ref": "#/definitions/dateTime" },

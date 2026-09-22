@@ -1055,18 +1055,24 @@
       return '<span style="color:var(--muted)">not measured \u00b7 ' + esc(LockrotLib.libyearsReason(f)) + "</span>";
     }
     var newest = meta && meta.last_stable_version ? String(meta.last_stable_version) : null;
+    // a date never splits at its hyphens; the words around it wrap as the panel's width asks
+    var whole = function (text) { return '<span style="white-space:nowrap">' + esc(text) + "</span>"; };
     var why;
     if (meta && meta.has_stable_release && !meta.last_stable_release) {
       // measured to the newest dated release above the installed one: the newest tag is undated
-      why = "at least: the newest release is undated, measured to the newest dated one above";
+      why = esc("at least: the newest release is undated, measured to the newest dated one above");
     } else if (value === "0.0") {
-      why = newest && newest !== f.version ? "ahead of the newest stable, " + newest : "the installed release is the newest";
+      why = esc(newest && newest !== f.version ? "ahead of the newest stable, " + newest : "the installed release is the newest");
     } else {
-      why = newest ? "newest " + newest + (meta.last_stable_release ? " released " + day(meta.last_stable_release) : "") : null;
+      why = newest ? esc("newest " + newest) + (meta.last_stable_release ? " released " + whole(day(meta.last_stable_release)) : "") : null;
+    }
+    var phrases = why ? [why] : [];
+    if (meta && meta.installed_release_dated_by) {
+      // a split package: the lock dates the installed version by a commit its tags share, the monorepo's tag by its release
+      phrases.push(esc("installed release dated by " + String(meta.installed_release_dated_by)) + (meta.installed_release ? ", " + whole(day(meta.installed_release)) : ""));
     }
 
-    // nowrap: the phrase moves to the next line whole rather than splitting its date at a hyphen.
-    return esc(value) + (why ? ' <span style="color:var(--muted);white-space:nowrap">\u00b7 ' + esc(why) + "</span>" : "");
+    return esc(value) + phrases.map(function (p) { return ' <span style="color:var(--muted)">\u00b7 ' + p + "</span>"; }).join("");
   }
 
   /* ---------- glossary ---------- */

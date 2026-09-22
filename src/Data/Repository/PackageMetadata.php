@@ -13,7 +13,9 @@ use Lockrot\Data\Forge\SupportSource;
 /**
  * Memory: fromPackages() folds the given package objects into scalars in a single pass and
  * retains nothing beyond them. Nothing here retains a per-release object, so a 200-package lock
- * costs kilobytes rather than the tens of megabytes the full release history would.
+ * costs kilobytes rather than the tens of megabytes the full release history would. The one
+ * per-release value kept is a date per stable tag, and only for a monorepo parent
+ * ({@see $releaseDates}): a thousand dates for laravel/framework, nothing for anyone else.
  */
 final class PackageMetadata
 {
@@ -67,10 +69,24 @@ final class PackageMetadata
     private array $replaces;
     /** The monorepo parent whose dates `lastStableReleaseAt`/`lastStableVersion` come from, null when they are this package's own. */
     private ?string $lastStableDatedBy;
+    /**
+     * The release date of every stable tag the repository dates by a release, by normalized
+     * version — kept for a monorepo parent (a package that `replace`s others), whose tag for a
+     * version is the release date of every split package's tag of the same version, and handed to
+     * each child {@see datedBy()} dates. A split package's own tag is dated by a commit other tags
+     * share, and the lock copies that date as the installed version's `time`; this map is where
+     * the installed version's real release date is read from. Empty for an ordinary package.
+     *
+     * @var array<string, \DateTimeImmutable>
+     */
+    private array $releaseDates;
+    /** The monorepo parent {@see $releaseDates} came from, null when they are this package's own. */
+    private ?string $releaseDatesBy;
 
     /**
      * @param array<array-key, array{version: string, at: ?\DateTimeImmutable, highest: array{normalized: string, pretty: string, at: ?\DateTimeImmutable}, dated_by?: string}> $latestStableByBranch
      * @param list<string>                                                                                                                                                   $replaces
+     * @param array<string, \DateTimeImmutable>                                                                                                                              $releaseDates
      */
     public function __construct(
         string $name,
@@ -85,7 +101,9 @@ final class PackageMetadata
         \DateTimeImmutable $dataDate,
         array $latestStableByBranch = [],
         array $replaces = [],
-        ?string $lastStableDatedBy = null
+        ?string $lastStableDatedBy = null,
+        array $releaseDates = [],
+        ?string $releaseDatesBy = null
     ) {
         $this->name = $name;
         $this->abandoned = $abandoned;
@@ -100,6 +118,8 @@ final class PackageMetadata
         $this->latestStableByBranch = $latestStableByBranch;
         $this->replaces = $replaces;
         $this->lastStableDatedBy = $lastStableDatedBy;
+        $this->releaseDates = $releaseDates;
+        $this->releaseDatesBy = $releaseDatesBy;
     }
 
     /**
@@ -137,6 +157,10 @@ final class PackageMetadata
         $highestCommitByBranch = [];
         $highestCommit = null;
         $replaces = [];
+        // Every dated stable tag and its commit; kept past this method only for a parent, and
+        // only where the commit is a release's ({@see $releaseDates}).
+        $releaseDates = [];
+        $commitByVersion = [];
 
         foreach ($versions as $version) {
             foreach ($version->getReplaces() as $link) {
@@ -184,6 +208,10 @@ final class PackageMetadata
                     $commit = self::commitOf($version);
                     if ($commit !== null) {
                         $tagsOnCommit[$commit] = ($tagsOnCommit[$commit] ?? 0) + 1;
+                    }
+                    if ($releaseDate !== null) {
+                        $releaseDates[$normalized] = $releaseDate;
+                        $commitByVersion[$normalized] = $commit;
                     }
                     $pretty = $version->getPrettyVersion();
                     $tag = ['normalized' => $normalized, 'pretty' => $pretty, 'at' => $releaseDate];
@@ -234,6 +262,19 @@ final class PackageMetadata
             $lastStableReleaseAt = null;
             $lastStableVersion = null;
         }
+        // A monorepo parent keeps a date per release for its children to read; the same rule as
+        // above decides which dates are a release's: a tag on a commit SHARED_COMMIT_TAGS or more
+        // stable tags sit on is dated by none. Anyone else keeps nothing — the map is a thousand
+        // entries for laravel/framework, and no ordinary package has children to hand it to.
+        if ($replaces === []) {
+            $releaseDates = [];
+        } else {
+            foreach ($commitByVersion as $normalized => $commit) {
+                if ($commit !== null && $tagsOnCommit[$commit] >= self::SHARED_COMMIT_TAGS) {
+                    unset($releaseDates[$normalized]);
+                }
+            }
+        }
         // A package with dev branches only has no version order worth the name; its first branch
         // (Packagist lists the default branch first) is read.
         $anchor = $highestStable ?? ($versions[0] ?? null);
@@ -250,7 +291,9 @@ final class PackageMetadata
             $type ?? 'library',
             $dataDate,
             $byBranch,
-            array_keys($replaces)
+            array_keys($replaces),
+            null,
+            $releaseDates
         );
     }
 
@@ -284,7 +327,10 @@ final class PackageMetadata
      * release, highest tag, dates — and is marked `dated_by`; the package's own last release follows
      * when it was undated for the same reason and the parent dates the branch it is on. A branch the
      * parent does not have, or leaves undated too, is left as it was; a package the parent does not
-     * replace is returned unchanged. Immutable: a new object, this one untouched.
+     * replace is returned unchanged. The dated child also takes the parent's date per release
+     * ({@see releaseDateOf()}): the installed version's own date in the lock is the shared commit's,
+     * and the parent's tag of the same version is what dates it. Immutable: a new object, this one
+     * untouched.
      */
     public function datedBy(self $parent): self
     {
@@ -335,7 +381,9 @@ final class PackageMetadata
             $this->dataDate,
             $byBranch,
             $this->replaces,
-            $lastStableDatedBy
+            $lastStableDatedBy,
+            $parent->releaseDates,
+            $parent->name
         );
     }
 
@@ -450,6 +498,26 @@ final class PackageMetadata
     public function replaces(): array
     {
         return $this->replaces;
+    }
+
+    /**
+     * When the given version released, as a monorepo parent's tag of that version dates it —
+     * this package's own tags for a parent, the parent's for a split package it dated
+     * ({@see datedBy()}; {@see releaseDatesBy()} names it). Null for a version the parent does
+     * not list or dates by a shared commit, and for every version of an ordinary package, whose
+     * release dates are the lock's business.
+     *
+     * @param string $normalizedVersion as Composer normalizes it (`8.83.27.0`)
+     */
+    public function releaseDateOf(string $normalizedVersion): ?\DateTimeImmutable
+    {
+        return $this->releaseDates[$normalizedVersion] ?? null;
+    }
+
+    /** The monorepo parent {@see releaseDateOf()} reads, null when the dates are this package's own or it has none. */
+    public function releaseDatesBy(): ?string
+    {
+        return $this->releaseDatesBy;
     }
 
     /**

@@ -216,6 +216,60 @@ final class PackageMetadataDatedByTest extends TestCase
         self::assertSame($polyfill, $polyfill->datedBy($tool));
     }
 
+    // ---- the parent's date per release, for the installed version of a child -------------------
+
+    public function testAParentKeepsADatePerStableReleaseAndAnOrdinaryPackageKeepsNone(): void
+    {
+        $parent = PackageMetadata::fromPackages('laravel/framework', [
+            $this->load(self::tag('laravel/framework', 'v13.24.0', 'f13-24', '2026-09-01T00:00:00+00:00', ['illuminate/contracts' => 'self.version'])),
+            $this->load(self::tag('laravel/framework', 'v14.0.0-beta.1', 'f14-b1', '2026-09-10T00:00:00+00:00')),
+            $this->load(self::tag('laravel/framework', 'v8.83.29', 'f8-29', '2024-11-20T15:55:41+00:00')),
+            $this->load(['name' => 'laravel/framework', 'version' => 'v8.83.28', 'source' => ['type' => 'git', 'url' => 'https://github.com/laravel/framework.git', 'reference' => 'f8-28']]),
+            $this->load(['name' => 'laravel/framework', 'version' => '13.x-dev', 'time' => '2026-09-13T00:00:00+00:00', 'source' => ['type' => 'git', 'url' => 'https://github.com/laravel/framework.git', 'reference' => 'f13-dev']]),
+        ], new \DateTimeImmutable(self::NOW));
+
+        self::assertEquals(new \DateTimeImmutable('2024-11-20T15:55:41+00:00'), $parent->releaseDateOf('8.83.29.0'));
+        self::assertEquals(new \DateTimeImmutable('2026-09-01T00:00:00+00:00'), $parent->releaseDateOf('13.24.0.0'));
+        self::assertNull($parent->releaseDateOf('8.83.28.0'), 'a tag the repository does not date');
+        self::assertNull($parent->releaseDateOf('14.0.0.0-beta1'), 'a pre-release is not a release');
+        self::assertNull($parent->releaseDateOf('13.9999999.9999999.9999999-dev'), 'nor is a branch');
+        self::assertNull($parent->releaseDateOf('9.9.9.0'), 'a version the parent never had');
+        self::assertNull($parent->releaseDatesBy(), 'its own dates');
+
+        self::assertNull($this->child()->releaseDateOf('7.30.6.0'), 'an ordinary package keeps no dates: its releases are the lock\'s business, and it has no children');
+        self::assertNull($this->child()->releaseDatesBy());
+    }
+
+    public function testAParentLeavesOutTheReleasesItDatesByASharedCommit(): void
+    {
+        $parent = PackageMetadata::fromPackages('laravel/framework', [
+            $this->load(self::tag('laravel/framework', 'v13.24.0', 'f13-24', '2026-09-01T00:00:00+00:00', ['illuminate/contracts' => 'self.version'])),
+            $this->load(self::tag('laravel/framework', 'v8.83.29', 'f8-shared', '2024-11-20T15:55:41+00:00')),
+            $this->load(self::tag('laravel/framework', 'v8.83.28', 'f8-shared', '2024-11-20T15:55:41+00:00')),
+            $this->load(self::tag('laravel/framework', 'v8.83.27', 'f8-shared', '2024-11-20T15:55:41+00:00')),
+            $this->load(self::tag('laravel/framework', 'v7.30.7', 'f7-two', '2024-11-12T15:42:13+00:00')),
+            $this->load(self::tag('laravel/framework', 'v7.30.6', 'f7-two', '2024-11-12T15:42:13+00:00')),
+        ], new \DateTimeImmutable(self::NOW));
+
+        self::assertNull($parent->releaseDateOf('8.83.29.0'), 'three tags on one commit: the date is the commit\'s, not a release\'s');
+        self::assertNull($parent->releaseDateOf('8.83.27.0'));
+        self::assertEquals(new \DateTimeImmutable('2024-11-12T15:42:13+00:00'), $parent->releaseDateOf('7.30.6.0'), 'two on one commit keep their date, as the branch view does');
+        self::assertEquals(new \DateTimeImmutable('2026-09-01T00:00:00+00:00'), $parent->releaseDateOf('13.24.0.0'));
+    }
+
+    public function testTheDatedChildReadsTheParentsDatePerReleaseAndSaysWhose(): void
+    {
+        $child = $this->child();
+        $dated = $child->datedBy($this->parent());
+
+        self::assertEquals(new \DateTimeImmutable('2022-01-13T14:47:47+00:00'), $dated->releaseDateOf('8.83.27.0'), 'the parent\'s v8.83.27 dates the child\'s');
+        self::assertEquals(new \DateTimeImmutable('2024-11-12T15:42:13+00:00'), $dated->releaseDateOf('7.30.7.0'));
+        self::assertNull($dated->releaseDateOf('8.83.26.0'), 'a version the parent does not list');
+        self::assertSame('laravel/framework', $dated->releaseDatesBy());
+        self::assertNull($child->releaseDateOf('8.83.27.0'), 'the original is untouched');
+        self::assertNull($child->releaseDatesBy());
+    }
+
     /**
      * Built by hand rather than from packages, so the branch order and each branch's dates are
      * exactly what the case under test needs.

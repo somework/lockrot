@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Explain;
 
+use Lockrot\Analyzer\Libyears;
 use Lockrot\Analyzer\Report;
 use Lockrot\Data\Repository\ReleaseBranch;
 use Lockrot\Data\Repository\RepositoryUrl;
@@ -187,6 +188,11 @@ final class Explanation
                 'last_stable_release' => self::date($metadata->lastStableReleaseAt()),
                 'last_stable_version' => $metadata->lastStableVersion(),
                 'last_stable_dated_by' => $metadata->lastStableDatedBy(),
+                // The installed end of the package's libyears, and whose date it is: the lock's own
+                // `time` for an ordinary package, the monorepo parent's tag for a split package it
+                // dated, null where lockrot trusts neither ({@see Libyears::installedReleaseAt()}).
+                'installed_release' => self::date(Libyears::installedReleaseAt($package, $metadata)),
+                'installed_release_dated_by' => Libyears::installedReleaseDatedBy($package, $metadata),
                 'repository' => RepositoryUrl::withoutCredentials($metadata->repositoryUrl()),
                 'type' => $metadata->type(),
                 'data_date' => self::date($metadata->dataDate()),
