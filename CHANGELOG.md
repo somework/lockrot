@@ -76,6 +76,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `target_major`, and `written_for_php` names the constraint's lower major. The verdict, its
   priority and `--fail-on` are unchanged; a project's count of `old-promise` will drop.
 
+### Fixed
+
+- **A repository that names the abandoned package as its own replacement names nowhere to go.**
+  `migrate to vendor/pkg` pointed back at the package the reader was being told to leave, and the
+  new `abandoned.with_replacement` counted it. Such a marker is now read as no replacement at all:
+  the clause stays bare, `replacement` in `--format=json` is null, and the count leaves it out.
+  The repository's text is still shown in the evidence, as all free text is.
+
 ## [0.10.0] - 2026-09-22
 
 ### Security

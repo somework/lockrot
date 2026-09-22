@@ -183,6 +183,7 @@ final class FindingTest extends TestCase
         $withReplacement = new Finding('swiftmailer/swiftmailer', 'v5.4.12', Verdict::ABANDONED, [$replaced, $s9], ['root/app', 'swiftmailer/swiftmailer'], null, null);
         $withoutReplacement = new Finding('swiftmailer/swiftmailer', 'v5.4.12', Verdict::ABANDONED, [$bare, $s9], ['swiftmailer/swiftmailer'], null, null);
         $silent = new Finding('swiftmailer/swiftmailer', 'v5.4.12', Verdict::SILENT, [$replaced, $s9], ['swiftmailer/swiftmailer'], null, null);
+        $itself = new Finding('swiftmailer/swiftmailer', 'v5.4.12', Verdict::ABANDONED, [new Signal('S1', 'high', 'marked abandoned by its repository, replacement: swiftmailer/swiftmailer', ['replacement' => 'swiftmailer/swiftmailer']), $s9], ['swiftmailer/swiftmailer'], null, null);
         $fixed = new Finding('swiftmailer/swiftmailer', 'v5.4.12', Verdict::ABANDONED, [$replaced, new Signal('S9', 'warn', 'x; fixed by 6.3.0', ['advisories' => [self::fixed('6.3.0', false)]])], ['swiftmailer/swiftmailer'], null, null);
 
         self::assertSame($replaced->summary().'; '.$s9->summary().'; no fix expected; migrate to symfony/mailer', $withReplacement->ownEvidence(), 'transitive or not: the replacement is where the fix is');
@@ -190,6 +191,7 @@ final class FindingTest extends TestCase
         self::assertSame($bare->summary().'; '.$s9->summary().'; no fix expected', $withoutReplacement->ownEvidence(), 'an empty replacement is none');
         self::assertSame($replaced->summary().'; '.$s9->summary().'; no fix expected', $silent->ownEvidence(), 'only abandoned points at the replacement; under silent the clause stays bare');
         self::assertSame($replaced->summary().'; x; fixed by 6.3.0', $fixed->ownEvidence(), 'the fix is out: nothing to migrate for');
+        self::assertSame('marked abandoned by its repository, replacement: swiftmailer/swiftmailer; '.$s9->summary().'; no fix expected', $itself->ownEvidence(), 'a repository naming the package itself names nowhere to migrate');
     }
 
     /**
@@ -210,6 +212,10 @@ final class FindingTest extends TestCase
         self::assertNull($abandoned($s1('vendor/Bad Name'))->successor(), 'a name Composer rejects is not one either');
         self::assertNull($abandoned(new Signal('S1', 'high', 'marked abandoned by its repository', ['replacement' => null]))->successor(), 'none named');
         self::assertSame('marked abandoned by its repository, replacement: Symfony', $abandoned($s1('Symfony'))->evidence(), 'the free text is still read as text');
+
+        self::assertNull($abandoned($s1('vendor/old'))->successor(), 'a package is not its own successor');
+        self::assertNull($abandoned($s1('Vendor/Old'))->successor(), 'Composer reads a package name without case, and so does this');
+        self::assertSame('marked abandoned by its repository, replacement: vendor/old', $abandoned($s1('vendor/old'))->evidence(), 'the free text is still read as text');
 
         $archivedOnly = new Finding('vendor/old', '1.0.0', Verdict::ABANDONED, [new Signal('S3', 'high', 'repository archived', [])], ['vendor/old'], null, null);
         self::assertNull($archivedOnly->successor(), 'an archived repository names nothing');

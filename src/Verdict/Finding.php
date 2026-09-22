@@ -231,7 +231,7 @@ final class Finding
                 }
             }
         }
-        if ($this->verdict === Verdict::ABANDONED && ($replacement = $this->replacement()) !== null) {
+        if ($this->verdict === Verdict::ABANDONED && ($replacement = $this->replacementElsewhere()) !== null) {
             return 'no fix expected; migrate to '.$replacement;
         }
 
@@ -244,19 +244,33 @@ final class Finding
      * swiftmailer, but also `Symfony` for sensio/framework-extra-bundle and `EnglishInflector from
      * the String component` for doctrine/inflector — and only a Composer package name is something a
      * reader can migrate to, count, or link. Free text stays in the evidence, where it is read as
-     * text. Null on every finding but an abandoned one with such a name.
+     * text. A name that is this package's own is not a successor either — a repository that names
+     * itself says there is nowhere to go, and `migrate to` would point back at the abandoned
+     * package. Null on every finding but an abandoned one with such a name.
      */
     public function successor(): ?string
     {
         if ($this->verdict !== Verdict::ABANDONED) {
             return null;
         }
-        $replacement = $this->replacement();
+        $replacement = $this->replacementElsewhere();
         if ($replacement === null || strpos($replacement, '/') === false || ValidatingArrayLoader::hasPackageNamingError($replacement) !== null) {
             return null;
         }
-
         return $replacement;
+    }
+
+    /**
+     * The replacement S1 carries, unless it is this package's own name: a repository that names
+     * itself says there is nowhere to go, and both the `migrate to` clause and {@see successor()}
+     * would otherwise point back at the abandoned package. Composer reads a package name without
+     * case, and so does this. Null when none is named.
+     */
+    private function replacementElsewhere(): ?string
+    {
+        $replacement = $this->replacement();
+
+        return $replacement === null || strcasecmp($replacement, $this->package) === 0 ? null : $replacement;
     }
 
     /** The replacement S1 carries — the repository's, or the lock's — null when none is named. */
