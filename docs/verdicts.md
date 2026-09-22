@@ -204,9 +204,9 @@ as `dated_by` in `--format=json`, and `--explain` marks the rows it supplied.
 The parent dates the installed version too. The lock's `time` for a split package is the date
 Packagist gave its tag — the shared commit's — so `illuminate/contracts` v8.83.27 is locked at
 2022-01-13 for a release of 2022-12-08. Where the parent lists the same version, its date is the
-installed version's for [libyears](#libyears), and `--explain` names it under
-`installed_release_dated_by`; where it does not, the lock's date is not trusted and the package
-goes unmeasured rather than eleven months too far behind.
+installed version's for [libyears](#libyears), and `--explain` prints it as `installed release`
+(`installed_release_dated_by` in JSON); where it does not, the lock's date is not trusted and the
+package goes unmeasured rather than eleven months too far behind.
 
 ## Security advisories
 

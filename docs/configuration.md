@@ -81,7 +81,10 @@ transitive exposure and the priority are the report's), and what is printed is t
 finding with everything it was decided on:
 
 - the verdict and priority, how the package is reached (`direct requirement`, or the shortest
-  `via` chain and the other direct requirements it is reached from), the allowlist reason or note;
+  `via` chain and the other direct requirements it is reached from), the allowlist reason or note,
+  and the package's [libyears](verdicts.md#libyears) — `libyears 4.7 behind the newest stable
+  release`, or `libyears not measured: no release date lockrot trusts` in the words the report's
+  `unmeasured` block counts it under;
 - every signal, its summary and its raw data — the dates the summary's years were computed from,
   and for S9 one line per advisory with what fixes it and where;
 - the `composer.lock` entry: version, `php` constraint, release date, source;
@@ -91,7 +94,9 @@ finding with everything it was decided on:
   marked `*`. A highest tag the repository gives no date reads `undated`; one it dates only by a
   commit other tags share (a subtree split) reads `commit 2023-06-05` — the day the directory last
   changed, not a release. S8 measures neither kind of branch, and the table says so when it is the
-  installed one (see [verdicts.md](verdicts.md#left-behind));
+  installed one (see [verdicts.md](verdicts.md#left-behind)). A split package the monorepo dates
+  also reads `installed release v10.48.28 (2023-11-14, dated by laravel/framework)`, and one whose
+  lock date is a shared commit's with no parent to replace it says the date is not a release's;
 - the repository activity S3 and S4 read, or that it was not fetched;
 - the thresholds and target PHP the signals were measured against, and the run's notes.
 

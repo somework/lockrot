@@ -51,7 +51,7 @@ final class ExplainFormatterTest extends TestCase
             ['id' => 'PKSA-2', 'cve' => '', 'severity' => null, 'fixed_by' => null, 'fixed_on_branch' => false],
             'not-a-row',
         ], 'count' => 2]);
-        $finding = new Finding('vendor/pkg', '1.5.0', Verdict::LEFT_BEHIND, [$s8, $s9], ['root/app', 'vendor/mid', 'vendor/pkg'], null, new \DateTimeImmutable(F::NOW), null, false, ['root/app', 'root/other']);
+        $finding = new Finding('vendor/pkg', '1.5.0', Verdict::LEFT_BEHIND, [$s8, $s9], ['root/app', 'vendor/mid', 'vendor/pkg'], null, new \DateTimeImmutable(F::NOW), null, false, ['root/app', 'root/other'], 4.58);
         // Branches listed out of order: the table sorts them.
         $metadata = F::metadata([['1.5.0', '2021-06-01T00:00:00+00:00', '>=7.1 <8.0'], ['1.4.9', '2021-01-01T00:00:00+00:00'], ['2.1.0', '2026-01-01T00:00:00+00:00', '>=8.1']], true, 'vendor/next');
         $package = F::package(['version' => '1.5.0', 'php' => '>=7.1 <8.0', 'time' => '2021-06-01T00:00:00+00:00']);
@@ -61,6 +61,7 @@ final class ExplainFormatterTest extends TestCase
         $expected = <<<'TEXT'
             vendor/pkg 1.5.0 — left-behind, priority high
               via root/app > vendor/mid > vendor/pkg; also reached from root/other
+              libyears 4.6 behind the newest stable release
 
             signals
               S8 warn branch 1.x last released 2021-06-01 (5.3 years ago); 2.x released 2.1.0 (2026-01-01)
@@ -122,6 +123,7 @@ final class ExplainFormatterTest extends TestCase
         $expected = <<<'TEXT'
             vendor/pkg 10.48.28 — ok, priority none
               direct requirement
+              libyears not measured: no release date lockrot trusts
 
             signals: none
 
@@ -251,7 +253,7 @@ final class ExplainFormatterTest extends TestCase
     /** A split package dated by its monorepo: the rows read the parent's dates, and a footnote says whose they are. */
     public function testASplitPackageDatedByItsMonorepoSaysSo(): void
     {
-        $finding = new Finding('illuminate/contracts', 'v10.48.28', Verdict::OK, [], ['illuminate/contracts'], null, new \DateTimeImmutable(F::NOW));
+        $finding = new Finding('illuminate/contracts', 'v10.48.28', Verdict::OK, [], ['illuminate/contracts'], null, new \DateTimeImmutable(F::NOW), null, false, [], 2.74);
         $loader = new ArrayLoader();
         $on = static fn (string $name, string $version, string $commit, string $time, array $replace = []): array => array_filter(['name' => $name, 'version' => $version, 'time' => $time, 'source' => ['type' => 'git', 'url' => 'https://github.com/'.$name.'.git', 'reference' => $commit], 'replace' => $replace]);
         $child = PackageMetadata::fromPackages('illuminate/contracts', [
@@ -265,6 +267,7 @@ final class ExplainFormatterTest extends TestCase
         ], new \DateTimeImmutable(F::NOW));
         $parent = PackageMetadata::fromPackages('laravel/framework', [
             $loader->load($on('laravel/framework', 'v10.50.3', 'f10', '2026-08-12T03:46:26+00:00', ['illuminate/contracts' => 'self.version'])),
+            $loader->load($on('laravel/framework', 'v10.48.28', 'f10-48', '2023-11-14T15:31:23+00:00')),
             $loader->load($on('laravel/framework', 'v9.52.22', 'f9', '2026-08-12T03:46:05+00:00')),
         ], new \DateTimeImmutable(F::NOW));
         $explanation = new Explanation($finding, F::facts(F::package(['name' => 'illuminate/contracts', 'version' => 'v10.48.28', 'source' => 'https://github.com/illuminate/contracts.git']), $child->datedBy($parent)), new Thresholds(), '8.4', $this->report());
@@ -272,6 +275,7 @@ final class ExplainFormatterTest extends TestCase
         $expected = <<<'TEXT'
             illuminate/contracts v10.48.28 — ok, priority none
               direct requirement
+              libyears 2.7 behind the newest stable release
 
             signals: none
 
@@ -283,6 +287,7 @@ final class ExplainFormatterTest extends TestCase
               7 versions listed · library · not abandoned
               source https://github.com/illuminate/contracts.git
               last stable release v10.50.3 (2026-08-12, dated by laravel/framework)
+              installed release v10.48.28 (2023-11-14, dated by laravel/framework)
                 branch     highest tag        released           newest dated release     php
               * 10.x       v10.50.3           2026-08-12         v10.50.3 (2026-08-12)    —
                 9.x        v9.52.22           2026-08-12         v9.52.22 (2026-08-12)    —
@@ -296,5 +301,31 @@ final class ExplainFormatterTest extends TestCase
 
             TEXT;
         self::assertSame($expected, $this->plain($explanation));
+    }
+
+    /**
+     * A split package with no parent to date it: the lock carries a `time`, but it is the date of
+     * the commit the package's tags share, so nothing dates the installed version and the libyears
+     * go unmeasured. The block says which date it is refusing to read.
+     */
+    public function testALockDateThatIsASharedCommitsSaysItIsNotAReleases(): void
+    {
+        $finding = new Finding('illuminate/contracts', 'v10.48.28', Verdict::OK, [], ['illuminate/contracts'], null, new \DateTimeImmutable(F::NOW));
+        $loader = new ArrayLoader();
+        $on = static fn (string $name, string $version, string $commit, string $time, array $replace = []): array => array_filter(['name' => $name, 'version' => $version, 'time' => $time, 'source' => ['type' => 'git', 'url' => 'https://github.com/'.$name.'.git', 'reference' => $commit], 'replace' => $replace]);
+        $child = PackageMetadata::fromPackages('illuminate/contracts', [
+            $loader->load($on('illuminate/contracts', 'v10.49.0', 'split-10', '2023-06-05T12:46:42+00:00')),
+            $loader->load($on('illuminate/contracts', 'v10.20.0', 'split-10', '2023-06-05T12:46:42+00:00')),
+            $loader->load($on('illuminate/contracts', 'v10.13.1', 'split-10', '2023-06-05T12:46:42+00:00')),
+        ], new \DateTimeImmutable(F::NOW));
+        // The parent dates the branch, but never listed the installed version: nothing dates it.
+        $parent = PackageMetadata::fromPackages('laravel/framework', [
+            $loader->load($on('laravel/framework', 'v10.50.3', 'f10', '2026-08-12T03:46:26+00:00', ['illuminate/contracts' => 'self.version'])),
+        ], new \DateTimeImmutable(F::NOW));
+        $explanation = new Explanation($finding, F::facts(F::package(['name' => 'illuminate/contracts', 'version' => 'v10.48.28', 'time' => '2023-06-05T12:46:42+00:00']), $child->datedBy($parent)), new Thresholds(), '8.4', $this->report());
+
+        $text = $this->plain($explanation);
+        self::assertStringContainsString('  libyears not measured: no release date lockrot trusts', $text);
+        self::assertStringContainsString('  installed release v10.48.28 undated: the lock dates it 2023-06-05, a commit its tags share, not a release', $text);
     }
 }

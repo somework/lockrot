@@ -291,6 +291,15 @@ final class LibyearsTest extends TestCase
         self::assertSame(1, $block->measured());
     }
 
+    /** The same four reasons in the words `--explain` prints, one per key the block counts under. */
+    public function testEveryReasonHasWordsOfItsOwn(): void
+    {
+        self::assertSame('branch snapshot', Libyears::reasonWords(self::finding('pinned/main', null, true, 'dev-main')));
+        self::assertSame('no release date lockrot trusts', Libyears::reasonWords(self::finding('undated/split', null, true, 'v1.37.0')));
+        self::assertSame('not from a Composer repository', Libyears::reasonWords(self::finding('path/local', null, true, 'dev-main', Analyzer::NOTE_NOT_IN_REPOSITORY)));
+        self::assertSame('metadata unavailable', Libyears::reasonWords(self::finding('gone/failed', null, true, '1.0.0', 'Repository metadata unavailable: timeout')));
+    }
+
     public function testTheWorstIsTheMaximumWithTiesGoingToTheFirstName(): void
     {
         $block = Libyears::fromFindings([
