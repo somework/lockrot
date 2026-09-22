@@ -397,6 +397,8 @@ final class Report
     /** @return array<string, mixed> */
     public function toArray(): array
     {
+        $counts = $this->byVerdict();
+
         return [
             'generated_at' => $this->generatedAt->format(\DATE_ATOM),
             // What the verdicts below were decided against. Null only where nothing told the report,
@@ -407,10 +409,10 @@ final class Report
             'include_dev' => $this->includesDev,
             'not_from_composer_repository' => $this->notFromComposerRepository,
             'network_failures' => $this->hadNetworkFailures,
-            'counts' => $this->byVerdict(),
+            'counts' => $counts,
             // The abandoned count split by what the reader can do about it: `with_replacement` names a
             // package to move to, the rest is dead. `total` repeats counts.abandoned so the block reads alone.
-            'abandoned' => ['total' => $this->byVerdict()[Verdict::ABANDONED], 'with_replacement' => $this->abandonedWithReplacement()],
+            'abandoned' => ['total' => $counts[Verdict::ABANDONED], 'with_replacement' => $this->abandonedWithReplacement()],
             'priorities' => $this->byPriority(),
             'exposure' => $this->exposureList(),
             'libyears' => $this->libyears()->toArray(),
