@@ -79,7 +79,7 @@ high (58)
   abandoned    hoa/ruler 2.17.05.16  via wallabag/rulerz, also via wallabag/rulerz-bundle
                marked abandoned by its repository; last release 2017-05-16 (9.3 years ago); …
   …
-200 packages checked · abandoned 19 · silent 8 · pinned 4 · left-behind 11 · old-promise 38 · stale 3 · …
+200 packages checked · abandoned 19 · silent 8 · pinned 4 · left-behind 11 · old-promise 6 · stale 3 · …
 priority: critical 3 · high 58 · medium 18 · low 4
 libyears: 163.7 behind across 195 of 200 packages · 106.7 from direct requirements · furthest behind smalot/pdfparser v1.1.0 at 4.7
 pulled in by: wallabag/rulerz-bundle 15 · wallabag/rulerz 14 · wallabag/phpepub 5 · …
@@ -107,7 +107,7 @@ release branches the repository lists with their dates, the repository activity,
 | `silent` | No stable release for at least 5 years **and** no repository push for at least 5 years; an archived repository is reported as `abandoned` instead |
 | `pinned` | Installed version is a branch snapshot (`dev-*` or `#hash`), or the package has no stable release at all |
 | `left-behind` | No stable release on the installed version's release branch for at least 3 years while a higher branch has released since, and within the last 3 — the package is alive, the branch you are on is not |
-| `old-promise` | The installed version was released before the target PHP's GA date, and its `require.php` constraint is open-ended (`>=N`, `*`) for that target |
+| `old-promise` | The installed version was written for an older PHP major and released before the target's major existed; its `require.php` admits the target only because it has no upper bound |
 | `stale` | Old release or old push, but not old enough (or not on both fronts) for `silent` |
 | `unknown` | No data could be obtained |
 | `finished` | Matched the built-in or project allowlist — the package is complete by design, not neglected |

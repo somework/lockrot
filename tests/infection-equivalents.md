@@ -9,7 +9,7 @@ mutant from the original, and says why.
 ## src/Verdict, src/Signal, src/Analyzer, src/Output (the original gate, 2026-09-16)
 
 - `src/Signal/ConstraintOpenness.php:46` CastInt, `:48` CastInt, IncrementInteger, DecrementInteger,
-  `:62` ConcatOperandRemoval — numeric strings compare numerically, every mutated integer stays
+  `:77` ConcatOperandRemoval — numeric strings compare numerically, every mutated integer stays
   below any PHP major, and `normalize("8.4")` equals `normalize("8.4.0")`.
 - `src/Analyzer/Report.php:132` UnwrapArrayValues — `flagged()`: the findings are sorted and every
   flagged one precedes every unflagged one, so the filtered keys are already `0..n`; the

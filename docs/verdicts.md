@@ -16,7 +16,7 @@ was observed about the package. The priority says how much that applies to *your
 | `silent` | No stable release for at least `release-high-years` (default 5y) **and** no repository push for at least `push-high-years` (default 5y); an archived repository is reported as `abandoned` instead | S2 high AND S4 high, NOT S1, NOT S3 |
 | `pinned` | Installed version is a branch snapshot — `dev-master`, `dev-main`, any other `dev-*` branch, a `2.x-dev` alias or a `#hash` reference — or the package has no stable release at all | S6 |
 | `left-behind` | No stable release on the installed version's release branch for at least `release-warn-years` (default 3y), while a higher branch has released since and within `release-warn-years` — the package is alive, the branch you are on is not | S8 |
-| `old-promise` | The installed version was released before the target PHP's GA date, and its `require.php` constraint is open-ended (`>=N`, `*`) for that target | S5 |
+| `old-promise` | The installed version was written for an older PHP major (`>=7.2`, `*`) and released before the target's major existed, and its `require.php` admits the target only because it has no upper bound | S5 |
 | `stale` | Old release or old push, but not old enough (or not on both fronts) for `silent` | one of S2/S4 |
 | `unknown` | No data could be obtained (not found in any configured Composer repository, or all lookups failed) | — |
 | `finished` | Matched the built-in or project allowlist — the package is complete by design, not neglected | allowlist match |
@@ -39,7 +39,7 @@ always wins, so an allowlisted package reports `finished` whatever its signals s
 | S2 | Time since the last stable release, against `release-warn-years` / `release-high-years` |
 | S3 | The repository is archived — on GitHub, or on GitLab when the run has credentials there (the anonymous API hides the flag); Bitbucket Cloud has no archived state |
 | S4 | Time since the last push to any branch (GitHub) or the newest commit on any branch (GitLab, Bitbucket), against `push-warn-years` / `push-high-years` |
-| S5 | The installed release predates the target PHP's GA date and the `require.php` constraint has no upper bound |
+| S5 | The installed release predates the GA of the target PHP's major, and its `require.php` was written for an older major with no upper bound — it admits the target on a promise made before the major existed |
 | S6 | The installed version is a branch snapshot (`dev-master`, `dev-main`, `2.x-dev`, `#hash`), or the package has no stable release |
 | S7 | A direct requirement pulls in flagged transitive packages — informational, never a verdict; see [Transitive exposure](#transitive-exposure) |
 | S8 | Time since the last stable release on the installed version's release branch, against `release-warn-years` / `release-high-years`, counted only when a higher branch has released since and within `release-warn-years`; see [Left behind](#left-behind) |
@@ -54,7 +54,19 @@ S9 comes from the same Composer repositories, through the advisory API `composer
 
 S5 is not what `composer check-platform-reqs` checks. That command tests the platform against each
 constraint — PHP 8.4 satisfies `>=7.2`, so it passes — while S5 tests the constraint against the
-release history: a `>=7.2` written before PHP 8.4 existed says nothing about PHP 8.4.
+release history: a `>=7.2` written in 2019 says nothing about PHP 8, which did not exist. The line
+is the GA of the target's *major* (8.0, 2020-11-26, for any 8.x target), not of the target minor:
+nothing older than PHP 8.4 was tested on 8.4, `^8.0` included, and a `>=7.2` cut in 2022 with PHP
+8.1 on every CI matrix differs from a `^7.2 || ^8.0` of the same day in spelling alone. A
+constraint that names the target's major (`^7.2 || ^8.0`) is a promise its author made on purpose
+and is never S5. Composer's own convention is silent on the upper bound — Symfony writes `>=8.2`,
+Laravel `^8.2` — and S5 does not fault the style; it reads the date.
+
+```text
+  old-promise  matomo/decompress 2.1.0  direct
+               released 2020-01-11 for PHP 5 (php ">=5.3.2"), before PHP 8 existed (8.0 GA
+               2020-11-26); admits 8.4 untested
+```
 
 Every finding's evidence line states the concrete fact — release date, push date, constraint string
 — and the report footer states the data date. There are no severity words beyond the verdict names
@@ -83,13 +95,12 @@ years, `high` past five) stays on the signal, in `--format=json` and in the evid
 ```text
   left-behind  smalot/pdfparser v1.1.0  via j0k3r/graby
                branch 1.x last released 2021-08-03 (5.1 years ago); 2.x released v2.12.5
-               (2026-04-17); released 2021-08-03, before PHP 8.4 GA (2024-11-21); php constraint
-               ">=7.1" has no upper bound
+               (2026-04-17)
 ```
 
-S2 has nothing to say — the package released five months ago — and `old-promise` alone would have
-read as a constraint problem. The branch installed here has been quiet for 5.1 years while 2.x
-kept going. For a package the project requires itself the evidence adds what to change —
+S2 has nothing to say — the package released five months ago — and S5 has nothing either: v1.1.0
+was cut in 2021, with PHP 8 on the table. The branch installed here has been quiet for 5.1 years
+while 2.x kept going. For a package the project requires itself the evidence adds what to change —
 `require ^2.12 to follow` — the constraint written as `composer require` would write it (`^2.12`
 from v2.12.5; `^0.4.3` below 1.0), so it can be pasted into `composer.json` or handed to a bot; a
 transitive package's parent owns that line, so there the clause stays off. The constraint is on
@@ -182,8 +193,8 @@ the finding says which release carries it.
 ```text
   left-behind  symfony/http-foundation v3.4.18  via laravel/framework, also via webklex/php-imap
                branch 3.x last released 2020-10-24 (5.9 years ago); 8.x released v8.1.7
-               (2026-09-14); released 2018-10-31, before PHP 8.5 GA (2025-11-20); php constraint
-               "^5.5.9|>=7.0.8" has no upper bound; 4 security advisories affect v3.4.18
+               (2026-09-14); released 2018-10-31 for PHP 5 (php "^5.5.9|>=7.0.8"), before PHP 8
+               existed (8.0 GA 2020-11-26); admits 8.5 untested; 4 security advisories affect v3.4.18
                (CVE-2019-10913, CVE-2025-64500, CVE-2019-18888 and 1 more); 2 fixed by v3.4.47, 2
                fixed by v8.1.7; no fix expected on 3.x
 ```
@@ -197,9 +208,9 @@ rather than left behind would count fixes anywhere in it, since no branch of it 
   abandoned    swiftmailer/swiftmailer v6.1.3  via laravel/framework
                marked abandoned by its repository, replacement: symfony/mailer; repository archived
                on GitHub; last release 2021-10-18 (4.9 years ago); last push 2021-10-25 (4.9 years
-               ago); released 2018-09-11, before PHP 8.5 GA (2025-11-20); php constraint ">=7.0.0"
-               has no upper bound; 1 security advisory affects v6.1.3 (CVE-2024-28859); fixed by
-               v6.3.0
+               ago); released 2018-09-11 for PHP 7 (php ">=7.0.0"), before PHP 8 existed (8.0 GA
+               2020-11-26); admits 8.5 untested; 1 security advisory affects v6.1.3 (CVE-2024-28859);
+               fixed by v6.3.0
 ```
 
 The one advisory is fixed by the package's last release; the priority stays at the verdict's own
@@ -317,8 +328,7 @@ report order, with the shortest chain from that requirement to each:
 
 ```text
   pinned       wallabag/rulerz-bundle dev-master  direct
-               released 2023-12-24, before PHP 8.4 GA (2024-11-21); php constraint ">=7.4" has no
-               upper bound; pinned to branch snapshot dev-master; pulls in 15 flagged packages:
+               pinned to branch snapshot dev-master; pulls in 15 flagged packages:
                hoa/compiler (abandoned), hoa/consistency (abandoned), hoa/event (abandoned),
                hoa/exception (abandoned), hoa/file (abandoned) and 10 more
 ```
