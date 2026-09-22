@@ -72,6 +72,27 @@ Every finding's evidence line states the concrete fact — release date, push da
 — and the report footer states the data date. There are no severity words beyond the verdict names
 above.
 
+## Abandoned, and where to
+
+`abandoned` is one verdict for two situations. Packagist's marker comes with a free-text
+`replacement` field, and a good share of abandoned packages carry one: on the weekly watch over
+twenty applications, 19 of 72 did, 17 of them naming a package. For the reader those are different
+findings — `swiftmailer/swiftmailer` says to go to `symfony/mailer`, `hoa/ruler` says nothing — and
+the report keeps them apart without splitting the verdict (the verdict is what `--fail-on`, the
+baseline, the SARIF rule and every count key on). Each finding carries `replacement` in
+`--format=json`: the package the repository names, when what it names is a Composer package name.
+`Symfony` (sensio/framework-extra-bundle) and `EnglishInflector from the String component`
+(doctrine/inflector) are what Packagist has on record, and they stay in the evidence as text, not
+in the field. The document carries the split next to the counts —
+`"abandoned": {"total": 19, "with_replacement": 6}` — and the summary line says
+`abandoned 19 (6 with a replacement)` where the number is not zero. The HTML page tags the row with
+the replacement and links it on the package card.
+
+A named replacement is where to go, not a string to swap: `psr/http-factory` for
+`php-http/message-factory`, `symfony/error-handler` for `symfony/debug` and `web-token/jwt-library`
+for four `web-token/jwt-*` packages are migrations, not renames. Where the replacement is already in
+the lock, the work left is removing the old package.
+
 ## Left behind
 
 `composer outdated --major-only` says a newer major exists. S2 says nothing, because the package's

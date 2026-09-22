@@ -82,7 +82,9 @@ consumer usually keys on:
 
 - `verdict`, `priority` and a signal's `level` are enums — the nine verdicts, five priorities and
   three levels from [verdicts.md](verdicts.md).
-- `counts` and `priorities` always carry every key, zero included.
+- `counts` and `priorities` always carry every key, zero included; `abandoned` splits that count
+  into `total` and `with_replacement`, and an abandoned finding's `replacement` is a package name or
+  null (see [verdicts.md](verdicts.md#abandoned-and-where-to)).
 - `run` says what the report is about and what it was decided against — what the project is called
   (composer.json's own `name`, or `extra.lockrot.project` instead; a display name, not an
   identifier, because a monorepo package or a private project is routinely called something that is
