@@ -28,6 +28,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   would read as 4.65 libyears behind for 3.75. `--explain` says whose date it is under
   `installed_release` and `installed_release_dated_by`, and so does the package card.
 
+- **`abandoned` says whether there is somewhere to go.** Packagist's marker comes with a free-text
+  `replacement`, and on the weekly watch 19 of 72 abandoned packages carried one — 17 naming a
+  package, two naming `Symfony` and a sentence. The verdict stays one (it is what `--fail-on`, the
+  baseline, the SARIF rule and every count key on); what changes is the reading. Each finding
+  carries `replacement` in `--format=json` — the named package when it is a Composer package name,
+  null otherwise, the free text staying in the evidence as text — the document carries
+  `"abandoned": {"total", "with_replacement"}` next to `counts`, the summary line reads
+  `abandoned 19 (6 with a replacement)` where that is not zero, and the HTML page tags the row with
+  the replacement and links it on the card. Both fields are optional in the schemas. See
+  [Abandoned, and where to](docs/verdicts.md#abandoned-and-where-to).
+
 ## [0.10.0] - 2026-09-22
 
 ### Security

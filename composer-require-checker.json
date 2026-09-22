@@ -22,6 +22,7 @@
         "Composer\\Package\\BasePackage",
         "Composer\\Package\\CompletePackage",
         "Composer\\Package\\Loader\\ArrayLoader",
+        "Composer\\Package\\Loader\\ValidatingArrayLoader",
         "Composer\\Package\\Package",
         "Composer\\Package\\PackageInterface",
         "Composer\\Package\\Version\\VersionSelector",

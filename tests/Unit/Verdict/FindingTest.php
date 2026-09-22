@@ -193,6 +193,31 @@ final class FindingTest extends TestCase
     }
 
     /**
+     * Packagist's `replacement` is free text. swiftmailer names `symfony/mailer`;
+     * sensio/framework-extra-bundle names `Symfony`, doctrine/inflector `EnglishInflector from the
+     * String component`. Only a package name is a successor: something to migrate to, count and
+     * link. The free text stays in the evidence; the JSON field holds the name or null.
+     */
+    public function testTheSuccessorIsTheReplacementWhenItNamesAPackage(): void
+    {
+        $s1 = static fn (string $replacement): Signal => new Signal('S1', 'high', 'marked abandoned by its repository, replacement: '.$replacement, ['replacement' => $replacement]);
+        $abandoned = static fn (Signal $signal): Finding => new Finding('vendor/old', '1.0.0', Verdict::ABANDONED, [$signal], ['vendor/old'], null, null);
+
+        self::assertSame('symfony/mailer', $abandoned($s1('symfony/mailer'))->successor());
+        self::assertSame('symfony/mailer', $abandoned($s1('symfony/mailer'))->toArray()['replacement']);
+        self::assertNull($abandoned($s1('Symfony'))->successor(), 'a vendor is not a package');
+        self::assertNull($abandoned($s1('EnglishInflector from the String component'))->successor(), 'a sentence is not a package');
+        self::assertNull($abandoned($s1('vendor/Bad Name'))->successor(), 'a name Composer rejects is not one either');
+        self::assertNull($abandoned(new Signal('S1', 'high', 'marked abandoned by its repository', ['replacement' => null]))->successor(), 'none named');
+        self::assertSame('marked abandoned by its repository, replacement: Symfony', $abandoned($s1('Symfony'))->evidence(), 'the free text is still read as text');
+
+        $archivedOnly = new Finding('vendor/old', '1.0.0', Verdict::ABANDONED, [new Signal('S3', 'high', 'repository archived', [])], ['vendor/old'], null, null);
+        self::assertNull($archivedOnly->successor(), 'an archived repository names nothing');
+        $silent = new Finding('vendor/old', '1.0.0', Verdict::SILENT, [$s1('symfony/mailer')], ['vendor/old'], null, null);
+        self::assertNull($silent->successor(), 'only an abandoned finding has a successor, whatever S1 says underneath');
+    }
+
+    /**
      * swiftmailer 6.1.3, abandoned: CVE-2024-28859 is fixed by 6.3.0, the package's last release.
      * The fix is out, the raise is not earned, and the line must not say "no fix expected".
      */
@@ -301,7 +326,7 @@ final class FindingTest extends TestCase
         $finding = new Finding('vendor/pkg', '1.2.3', Verdict::STALE, [], ['vendor/root', 'vendor/pkg'], null, null, null, true);
         $array = $finding->toArray();
         self::assertSame(
-            ['package', 'version', 'verdict', 'priority', 'direct', 'dev', 'signals', 'chain', 'direct_dependents', 'evidence', 'allowlist_reason', 'note', 'data_date', 'libyears'],
+            ['package', 'version', 'verdict', 'priority', 'direct', 'dev', 'replacement', 'signals', 'chain', 'direct_dependents', 'evidence', 'allowlist_reason', 'note', 'data_date', 'libyears'],
             array_keys($array)
         );
         self::assertSame(Priority::LOW, $array['priority']);
