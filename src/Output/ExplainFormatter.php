@@ -9,6 +9,7 @@ use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Data\Repository\RepositoryUrl;
 use Lockrot\Explain\Explanation;
 use Lockrot\Json\Schemas;
+use Lockrot\Lock\LockedPackage;
 use Lockrot\Signal\Signal;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
@@ -187,7 +188,7 @@ final class ExplainFormatter
         $package = $explanation->facts()->package();
         $parts = ['version '.$package->version()];
         $parts[] = $package->requirePhp() === null ? 'no php constraint' : 'php '.$package->requirePhp();
-        $parts[] = $package->time() === null ? 'undated' : 'released '.$package->time()->format('Y-m-d');
+        $parts[] = $this->lockDate($package, $explanation->facts()->metadata());
         $parts[] = $package->isFromComposerRepository() ? 'from a Composer repository' : 'not from a Composer repository';
         if ($package->isBranchSnapshot()) {
             $parts[] = 'branch snapshot';
@@ -253,6 +254,31 @@ final class ExplainFormatter
         }
 
         return \sprintf('last stable release unknown: the highest tag%s has no release date, so S2 does not measure the package', $highest === '' ? '' : ' '.$highest);
+    }
+
+    /**
+     * The lock's `time` for the installed version, and what it is a date of. Composer writes the
+     * date the repository gave the version, which is a release's only where the repository dated it
+     * by one: a branch snapshot's is its commit's, and a subtree split's tag is dated by a commit
+     * its other tags share ({@see PackageMetadata::SHARED_COMMIT_TAGS}). Calling either a release
+     * would contradict {@see installedRelease()} four lines below. Without metadata there is
+     * nothing to tell the two apart, and the lock is read as it reads itself.
+     */
+    private function lockDate(LockedPackage $package, ?PackageMetadata $metadata): string
+    {
+        $time = $package->time();
+        if ($time === null) {
+            return 'undated';
+        }
+        $day = $time->format('Y-m-d');
+        if ($package->isBranchSnapshot()) {
+            return 'dated '.$day.' by its commit';
+        }
+        if ($metadata !== null && (Libyears::installedReleaseDatedBy($package, $metadata) !== null || Libyears::installedReleaseAt($package, $metadata) === null)) {
+            return 'dated '.$day.' by a commit its tags share';
+        }
+
+        return 'released '.$day;
     }
 
     /**

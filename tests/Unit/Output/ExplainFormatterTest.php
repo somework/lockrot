@@ -327,6 +327,8 @@ final class ExplainFormatterTest extends TestCase
         $text = $this->plain($explanation);
         self::assertStringContainsString('  libyears not measured: no release date lockrot trusts', $text);
         self::assertStringContainsString('  installed release v10.48.28 undated: the lock dates it 2023-06-05, a commit its tags share, not a release', $text);
+        self::assertStringContainsString('version v10.48.28 · no php constraint · dated 2023-06-05 by a commit its tags share · from a Composer repository', $text, 'the block cannot call that date a release four lines above saying it is not one');
+        self::assertStringNotContainsString('released 2023-06-05', $text);
     }
 
     /**
@@ -347,6 +349,7 @@ final class ExplainFormatterTest extends TestCase
         $text = $this->plain($explanation);
         self::assertStringContainsString('  libyears not measured: branch snapshot', $text);
         self::assertStringNotContainsString('installed release', $text);
-        self::assertStringContainsString('branch snapshot', $text);
+        self::assertStringContainsString('version dev-main · no php constraint · dated 2026-09-13 by its commit · from a Composer repository · branch snapshot', $text, 'a snapshot is dated by the commit it points at, and no release of it exists');
+        self::assertStringNotContainsString('released 2026-09-13', $text);
     }
 }
