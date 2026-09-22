@@ -11,6 +11,7 @@
 /.php-cs-fixer.cache
 /composer.lock
 /.superpowers/
+/docs/superpowers/
 /.private/
 /site/
 /.venv/
