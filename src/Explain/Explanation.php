@@ -6,6 +6,7 @@ namespace Lockrot\Explain;
 
 use Lockrot\Analyzer\Libyears;
 use Lockrot\Analyzer\Report;
+use Lockrot\Data\Repository\InstalledRelease;
 use Lockrot\Data\Repository\ReleaseBranch;
 use Lockrot\Data\Repository\RepositoryUrl;
 use Lockrot\Signal\PackageFacts;
@@ -155,6 +156,7 @@ final class Explanation
         $package = $this->facts->package();
         $metadata = $this->facts->metadata();
         $activity = $this->facts->activity();
+        $installed = InstalledRelease::of($package, $metadata);
         $branches = [];
         foreach ($this->branches() as $row) {
             $branches[] = [
@@ -194,8 +196,8 @@ final class Explanation
                 // The installed end of the package's libyears, and whose date it is: the lock's own
                 // `time` for an ordinary package, the monorepo parent's tag for a split package it
                 // dated, null where lockrot trusts neither ({@see Libyears::installedReleaseAt()}).
-                'installed_release' => self::date(Libyears::installedReleaseAt($package, $metadata)),
-                'installed_release_dated_by' => Libyears::installedReleaseDatedBy($package, $metadata),
+                'installed_release' => self::date($installed->at()),
+                'installed_release_dated_by' => $installed->datedBy(),
                 'repository' => RepositoryUrl::withoutCredentials($metadata->repositoryUrl()),
                 'type' => $metadata->type(),
                 'data_date' => self::date($metadata->dataDate()),

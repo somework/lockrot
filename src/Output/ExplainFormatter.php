@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Lockrot\Output;
 
 use Lockrot\Analyzer\Libyears;
+use Lockrot\Data\Repository\InstalledRelease;
 use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Data\Repository\RepositoryUrl;
 use Lockrot\Explain\Explanation;
 use Lockrot\Json\Schemas;
-use Lockrot\Lock\LockedPackage;
 use Lockrot\Signal\Signal;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
@@ -188,7 +188,7 @@ final class ExplainFormatter
         $package = $explanation->facts()->package();
         $parts = ['version '.$package->version()];
         $parts[] = $package->requirePhp() === null ? 'no php constraint' : 'php '.$package->requirePhp();
-        $parts[] = $this->lockDate($package, $explanation->facts()->metadata());
+        $parts[] = $this->lockDate(InstalledRelease::of($package, $explanation->facts()->metadata()));
         $parts[] = $package->isFromComposerRepository() ? 'from a Composer repository' : 'not from a Composer repository';
         if ($package->isBranchSnapshot()) {
             $parts[] = 'branch snapshot';
@@ -264,46 +264,48 @@ final class ExplainFormatter
      * would contradict {@see installedRelease()} four lines below. Without metadata there is
      * nothing to tell the two apart, and the lock is read as it reads itself.
      */
-    private function lockDate(LockedPackage $package, ?PackageMetadata $metadata): string
+    private function lockDate(InstalledRelease $installed): string
     {
-        $time = $package->time();
+        $time = $installed->lockTime();
         if ($time === null) {
             return 'undated';
         }
         $day = $time->format('Y-m-d');
-        if ($package->isBranchSnapshot()) {
-            return 'dated '.$day.' by its commit';
+        switch ($installed->kind()) {
+            case InstalledRelease::BRANCH_SNAPSHOT:
+                return 'dated '.$day.' by its commit';
+            case InstalledRelease::SHARED_COMMIT:
+            case InstalledRelease::DATED_BY_PARENT:
+                return 'dated '.$day.' by a commit its tags share';
+            default:
+                return 'released '.$day;
         }
-        if ($metadata !== null && (Libyears::installedReleaseDatedBy($package, $metadata) !== null || Libyears::installedReleaseAt($package, $metadata) === null)) {
-            return 'dated '.$day.' by a commit its tags share';
-        }
-
-        return 'released '.$day;
     }
 
     /**
      * When the installed version released, where the lock's own `time` is not the answer: the
-     * monorepo parent's tag of the same version dates it ({@see Libyears::installedReleaseAt()}),
-     * or nothing does although the lock carries a date — a split package's `time` is the date of
-     * the commit its tags share, and measuring from it would add that artefact to the libyears.
-     * Null when the lock's date is the one read, which the block above already prints.
+     * monorepo parent's tag of the same version dates it, or nothing does although the lock
+     * carries a date — a split package's `time` is the date of the commit its tags share, and
+     * measuring from it would add that artefact to the libyears. Null when the lock's date is the
+     * one read, which the block above already prints, and for a branch snapshot, which is undated
+     * for a reason of its own that the block above gives ({@see InstalledRelease}).
      */
     private function installedRelease(Explanation $explanation, PackageMetadata $metadata): ?string
     {
         $package = $explanation->facts()->package();
-        $datedBy = Libyears::installedReleaseDatedBy($package, $metadata);
-        $at = Libyears::installedReleaseAt($package, $metadata);
+        $installed = InstalledRelease::of($package, $metadata);
+        $at = $installed->at();
+        $datedBy = $installed->datedBy();
         // $datedBy names the parent only where its date is the one read, so $at is that date.
         if ($datedBy !== null && $at !== null) {
             return \sprintf('installed release %s (%s, dated by %s)', $package->version(), $at->format('Y-m-d'), $datedBy);
         }
-        // A branch snapshot is undated for a reason of its own — the lock's date is the commit's,
-        // which the block above says next to `branch snapshot` — and no tag of it is involved.
-        if ($at !== null || $package->time() === null || $package->isBranchSnapshot()) {
+        $time = $installed->lockTime();
+        if ($installed->kind() !== InstalledRelease::SHARED_COMMIT || $time === null) {
             return null;
         }
 
-        return \sprintf('installed release %s undated: the lock dates it %s, a commit its tags share, not a release', $package->version(), $package->time()->format('Y-m-d'));
+        return \sprintf('installed release %s undated: the lock dates it %s, a commit its tags share, not a release', $package->version(), $time->format('Y-m-d'));
     }
 
     /** @return list<string> */

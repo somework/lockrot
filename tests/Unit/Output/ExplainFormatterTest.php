@@ -332,6 +332,33 @@ final class ExplainFormatterTest extends TestCase
     }
 
     /**
+     * The lock's date for a version the monorepo parent dates is the split's own tag's — the commit
+     * its tags share — so the block says so there too, and `installed release` below it gives the
+     * date that is a release's.
+     */
+    public function testTheLockBlockCallsTheSplitsOwnDateWhatItIs(): void
+    {
+        $finding = new Finding('illuminate/contracts', 'v10.48.28', Verdict::OK, [], ['illuminate/contracts'], null, new \DateTimeImmutable(F::NOW), null, false, [], 2.74);
+        $loader = new ArrayLoader();
+        $on = static fn (string $name, string $version, string $commit, string $time, array $replace = []): array => array_filter(['name' => $name, 'version' => $version, 'time' => $time, 'source' => ['type' => 'git', 'url' => 'https://github.com/'.$name.'.git', 'reference' => $commit], 'replace' => $replace]);
+        $child = PackageMetadata::fromPackages('illuminate/contracts', [
+            $loader->load($on('illuminate/contracts', 'v10.49.0', 'split-10', '2023-06-05T12:46:42+00:00')),
+            $loader->load($on('illuminate/contracts', 'v10.20.0', 'split-10', '2023-06-05T12:46:42+00:00')),
+            $loader->load($on('illuminate/contracts', 'v10.13.1', 'split-10', '2023-06-05T12:46:42+00:00')),
+        ], new \DateTimeImmutable(F::NOW));
+        $parent = PackageMetadata::fromPackages('laravel/framework', [
+            $loader->load($on('laravel/framework', 'v10.50.3', 'f10', '2026-08-12T03:46:26+00:00', ['illuminate/contracts' => 'self.version'])),
+            $loader->load($on('laravel/framework', 'v10.48.28', 'f10-48', '2023-11-14T15:31:23+00:00')),
+        ], new \DateTimeImmutable(F::NOW));
+        $explanation = new Explanation($finding, F::facts(F::package(['name' => 'illuminate/contracts', 'version' => 'v10.48.28', 'time' => '2023-06-05T12:46:42+00:00']), $child->datedBy($parent)), new Thresholds(), '8.4', $this->report());
+
+        $text = $this->plain($explanation);
+        self::assertStringContainsString('version v10.48.28 · no php constraint · dated 2023-06-05 by a commit its tags share · from a Composer repository', $text);
+        self::assertStringNotContainsString('released 2023-06-05', $text, 'the release is the parent\'s date, four lines below');
+        self::assertStringContainsString('installed release v10.48.28 (2023-11-14, dated by laravel/framework)', $text);
+    }
+
+    /**
      * A branch snapshot is undated for a reason of its own: the lock's `time` is the commit's,
      * which the `composer.lock` block already says next to `branch snapshot`. The shared-commit
      * sentence is about a tag, and claiming it of `dev-main` would be a fact the data does not
