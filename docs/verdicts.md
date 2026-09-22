@@ -44,6 +44,7 @@ always wins, so an allowlisted package reports `finished` whatever its signals s
 | S7 | A direct requirement pulls in flagged transitive packages — informational, never a verdict; see [Transitive exposure](#transitive-exposure) |
 | S8 | Time since the last stable release on the installed version's release branch, against `release-warn-years` / `release-high-years`, counted only when a higher branch has released since and within `release-warn-years`; see [Left behind](#left-behind) |
 | S9 | Security advisories affecting the installed version — never a verdict; raises the priority where no fix is coming; see [Security advisories](#security-advisories) |
+| S10 | A check the verdict rests on did not run, and the signals it blocked — informational, never a verdict; see [What was not checked](#what-was-not-checked) |
 
 S3 and S4 come from the repository host — GitHub, GitLab or Bitbucket — and need network access;
 see [internals.md](internals.md) for how that data is fetched and cached, which host reads what, and
@@ -321,7 +322,9 @@ A package nothing in your `require`/`require-dev` can reach counts as transitive
 The priority orders the report — highest first, then by verdict severity, then direct dependencies
 ahead of transitive ones, then by package name — and it is carried in every format.
 
-> **`--fail-on` takes a verdict or a priority.** `--fail-on=silent` fails on what was observed,
+> **`--fail-on` takes a verdict, a priority, or `unchecked`.** The last one is not a severity at
+> all: it fails on a finding whose check did not run ([What was not checked](#what-was-not-checked)).
+> `--fail-on=silent` fails on what was observed,
 > wherever the package sits; `--fail-on=high` fails on a `critical` or `high` finding and lets the
 > same verdict pass on a transitive development package. Both are inclusive. The
 > [baseline](baseline.md) stays on the verdict: a finding it already carries never fails a run,
@@ -415,6 +418,33 @@ no edge, so the provider can have fewer parents listed than actually pull it in.
 At install time only the packages the transaction touches are analysed, so a direct requirement
 gets S7 only when it is itself part of the transaction, and the compact block does not print S7 or
 the other parents at all; `composer lockrot` on the full lock always has the whole picture.
+
+## What was not checked
+
+`ok` is the absence of a finding, and without S10 it would mean two different things: every check
+ran and found nothing, or a check never ran. The difference matters most where it is least visible.
+Anonymously, GitHub allows 60 requests an hour, so the activity round asks only about packages that
+already look stale on release age ([internals.md](internals.md)) — a maintainer who tags a last
+release and archives the repository a week later has a *recent* release, and S3, the signal that
+would call that `abandoned`, never gets to run. The run says `89 packages skipped` in its notes and
+names none of them.
+
+S10 carries that fact on the finding itself. Two checks can be missing:
+
+| Check | Why it can be missing | What it blocks |
+|---|---|---|
+| `repository_activity` | `no_token` (the anonymous cap asks only about candidates), `anonymous_budget`, `install_time_budget`, `rate_limit`, `fetch_failed`, `offline` | S3, S4 |
+| `release_dates` | `undated_releases`: the repository dates the package's newest releases only by a commit their tags share, and no [monorepo parent](#dates-from-the-monorepo) dates them either | S2, S8 |
+
+It is informational, like S7 and S9: it never decides a verdict. It is raised only where the
+missing check could have changed one — a package the repository already marks `abandoned` has
+nothing left for the activity round to add, and an allowlisted package reports `finished` whatever
+its signals say, so neither carries it. With credentials for every host in the lock a complete run
+carries no S10 at all.
+
+`--fail-on=unchecked` fails on any finding that carries it: the one threshold that is neither a
+verdict nor a priority, for a pipeline that wants to hear about the workflow that never passed
+`GITHUB_TOKEN` through rather than a green run over unasked questions.
 
 ## Libyears
 

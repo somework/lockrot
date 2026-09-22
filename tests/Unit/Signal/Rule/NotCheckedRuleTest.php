@@ -101,9 +101,7 @@ final class NotCheckedRuleTest extends TestCase
         self::assertStringContainsString('the age of the package was not read', $signal->summary());
         $unchecked = $signal->data()['unchecked'];
         self::assertIsArray($unchecked);
-        $first = $unchecked[0];
-        self::assertIsArray($first);
-        self::assertSame('release_dates', $first['check']);
+        self::assertSame([['check' => 'release_dates', 'reason' => 'undated_releases', 'blocks' => [Signal::S2, Signal::S8]]], $unchecked);
     }
 
     public function testBothChecksCanBeMissingAtOnce(): void

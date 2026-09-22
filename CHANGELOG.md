@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [Unreleased]
+
+### Added
+
+- **S10: what the run could not check.** `ok` meant two things — every check ran and found nothing,
+  or a check never ran — and the difference was invisible on the finding. Anonymously the activity
+  round asks only about packages already stale on release age, so a repository archived a week
+  after its last release cannot be seen, and the only trace was a note counting how many packages
+  were skipped without naming one. A package whose newest releases are dated by a commit their tags
+  share has the same shape: S2 has nothing to measure, and the finding read as `ok`. S10 carries
+  the missing check on the finding, with the reason and the signals it blocked (`repository_activity`
+  → S3, S4; `release_dates` → S2, S8). It is informational, like S7 and S9: it never decides a
+  verdict, and it is raised only where the missing check could have changed one — never on a package
+  the repository already marks abandoned, nor on an allowlisted one. A run with credentials for
+  every host carries none at all. `--fail-on=unchecked` fails a run that could not check everything,
+  which is how a pipeline catches the workflow that never passed `GITHUB_TOKEN` through. See
+  [What was not checked](docs/verdicts.md#what-was-not-checked).
+
+### Changed
+
+- **One reading of the installed version's date.** The lock's `time` is a release date only
+  sometimes — a branch snapshot carries its commit's, a subtree split's tag the date of a commit
+  its tags share, a monorepo parent can date the version instead — and each surface re-derived
+  that for itself, which is how one explanation came to call a date a release four lines above
+  saying it was not one. `InstalledRelease` answers it once. No output changes.
+
 ## [0.11.0] - 2026-09-22
 
 ### Added
