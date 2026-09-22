@@ -438,7 +438,10 @@ it does not move between two runs on the same lock unless a package releases.
 Every finding carries its own value as `libyears` in `--format=json`, `null` when the package is not
 measured, and the report's `libyears` block is the arithmetic over them: `total`,
 `direct_requirements` (the same sum over the findings with `direct: true`), `measured`, `unmeasured`
-by reason, `furthest_behind`. A consumer can recompute every number in the block from the findings:
+by reason, `furthest_behind`. `total` and `direct_requirements` are null when `measured` is 0 —
+nothing could be measured, so there is no sum; a run that measured packages and found none behind
+reports `0`, which is a different answer and says so. A consumer can recompute every number in the
+block from the findings:
 `total` is summed before rounding, so the sum of the printed values agrees with it to within 0.005
 per measured finding, and `measured` plus every count in `unmeasured` is the number of findings.
 The HTML page shows the total in its ledger, the value in a sortable column, and the counts by

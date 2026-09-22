@@ -264,16 +264,24 @@ final class Libyears
         return $words[self::reasonFor($finding)];
     }
 
-    /** The sum over every measured package, unrounded. */
-    public function total(): float
+    /**
+     * The sum over every measured package, unrounded; null when no package could be measured.
+     * Zero is an answer — every package measured and none behind — and null is the absence of one,
+     * so a reader adding the field up over several projects does not count a lock nothing could be
+     * read from as a lock with nothing to fix.
+     */
+    public function total(): ?float
     {
-        return $this->total;
+        return $this->measured === 0 ? null : $this->total;
     }
 
-    /** The sum over the measured direct requirements, unrounded — what php-libyear would count. */
-    public function direct(): float
+    /**
+     * The sum over the measured direct requirements, unrounded — what php-libyear would count.
+     * Null on the same terms as {@see total()}.
+     */
+    public function direct(): ?float
     {
-        return $this->direct;
+        return $this->measured === 0 ? null : $this->direct;
     }
 
     public function measured(): int
@@ -347,8 +355,8 @@ final class Libyears
     public function toArray(): array
     {
         return [
-            'total' => round($this->total, self::DECIMALS),
-            'direct_requirements' => round($this->direct, self::DECIMALS),
+            'total' => $this->measured === 0 ? null : round($this->total, self::DECIMALS),
+            'direct_requirements' => $this->measured === 0 ? null : round($this->direct, self::DECIMALS),
             'measured' => $this->measured,
             'unmeasured' => $this->unmeasured,
             'furthest_behind' => $this->worst === null ? null : [

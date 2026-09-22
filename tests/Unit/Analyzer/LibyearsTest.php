@@ -335,11 +335,40 @@ final class LibyearsTest extends TestCase
     {
         $block = Libyears::fromFindings([]);
 
-        self::assertSame(0.0, $block->total());
+        self::assertNull($block->total(), 'no package was measured, so there is no sum — zero would read as "nothing is behind"');
+        self::assertNull($block->direct());
         self::assertSame(0, $block->measured());
         self::assertNull($block->worst());
         self::assertSame('libyears: nothing to measure', $block->line());
         self::assertNull($block->toArray()['furthest_behind']);
+        self::assertNull($block->toArray()['total'], 'and the document says so too');
+        self::assertNull($block->toArray()['direct_requirements']);
+    }
+
+    /**
+     * Zero and null are different answers: a run that measured packages and found none behind is
+     * `0.0`, a run that could measure nothing at all has no number. A reader summing the field over
+     * several projects would otherwise count an unmeasurable lock as a lock with nothing to fix.
+     */
+    public function testNothingMeasuredHasNoTotalWhileNothingBehindIsZero(): void
+    {
+        $unmeasurable = Libyears::fromFindings([
+            self::finding('pinned/main', null, true, 'dev-main'),
+            self::finding('gone/missing', null, true, '1.0.0', 'not found in the repository'),
+        ]);
+        $measuredAndCurrent = Libyears::fromFindings([
+            self::finding('a/a', 0.0),
+            self::finding('b/b', 0.0, false),
+        ]);
+
+        self::assertNull($unmeasurable->total());
+        self::assertNull($unmeasurable->toArray()['total']);
+        self::assertNull($unmeasurable->toArray()['direct_requirements']);
+        self::assertSame(0, $unmeasurable->measured());
+        self::assertSame(0.0, $measuredAndCurrent->total(), 'measured, and nothing is behind');
+        self::assertSame(0.0, $measuredAndCurrent->toArray()['total']);
+        self::assertSame(0.0, $measuredAndCurrent->toArray()['direct_requirements']);
+        self::assertSame(2, $measuredAndCurrent->measured());
     }
 
     public function testTheLineNamesTheTotalItsScopeTheDirectShareAndThePackageFurthestBehind(): void

@@ -200,13 +200,13 @@
       ],
       "properties": {
         "total": {
-          "description": "Sum over every measured finding, two decimals.",
-          "type": "number",
+          "description": "Sum over every measured finding, two decimals; null when `measured` is 0, since a run that could measure nothing has no sum — 0 is the answer of a run that measured packages and found none behind.",
+          "type": ["number", "null"],
           "minimum": 0
         },
         "direct_requirements": {
-          "description": "Sum over the measured findings with `direct: true`, two decimals: the nearest number to php-libyear's.",
-          "type": "number",
+          "description": "Sum over the measured findings with `direct: true`, two decimals: the nearest number to php-libyear's. Null on the same terms as `total`.",
+          "type": ["number", "null"],
           "minimum": 0
         },
         "measured": {
