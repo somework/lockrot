@@ -189,7 +189,7 @@ button { font: inherit; color: inherit; }
 .ledger {
   max-width: 1500px;
   margin: 0 auto;
-  padding: 18px 20px 0;
+  padding: 18px 20px 14px;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 18px 28px;

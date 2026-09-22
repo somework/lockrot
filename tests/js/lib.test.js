@@ -202,6 +202,13 @@ test("parseQuery treats an unknown key as text, not as a filter nobody applies",
     assert.deepStrictEqual(lib.parseQuery("license:mit").text, ["license:mit"]);
 });
 
+test("libyearsItems are the footer's items after the number, one string each, so the page wraps between them", () => {
+    const block = { total: 8.07, direct_requirements: 4.71, measured: 2, unmeasured: { branch_snapshot: 1 }, furthest_behind: { package: "smalot/pdfparser", version: "v1.1.0", libyears: 4.7 } };
+    assert.deepStrictEqual(lib.libyearsItems(block), ["across 2 of 3 packages", "4.7 from direct requirements", "furthest behind smalot/pdfparser v1.1.0 at 4.7"]);
+    assert.deepStrictEqual(lib.libyearsItems({ measured: 0, unmeasured: {} }), ["nothing to measure"]);
+    assert.deepStrictEqual(lib.libyearsItems(undefined), [], "no block, no items: the ledger stays empty rather than saying something");
+});
+
 test("libyearsSummary says the scope, the direct share and the package furthest behind, without the total", () => {
     const block = {
         total: 151.52, direct_requirements: 94.53, measured: 191,

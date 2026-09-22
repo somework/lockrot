@@ -295,7 +295,13 @@
     // could be measured.
     var ly = REPORT.libyears;
     el("libyearsTotal").textContent = ly && ly.measured ? Number(ly.total).toFixed(1) : "\u2014";
-    el("libyearsLine").textContent = LockrotLib.libyearsSummary(ly);
+    var line = el("libyearsLine");
+    line.textContent = "";
+    LockrotLib.libyearsItems(ly).forEach(function (item) {
+      var span = document.createElement("span");
+      span.textContent = item;
+      line.appendChild(span);
+    });
   }
 
   /* ---------- rail ---------- */
