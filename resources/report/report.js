@@ -1063,11 +1063,12 @@
     // a date never splits at its hyphens; the words around it wrap as the panel's width asks
     var whole = function (text) { return '<span style="white-space:nowrap">' + esc(text) + "</span>"; };
     var why;
+    var atZero = LockrotLib.libyearsAtZero(f, meta);
     if (meta && meta.has_stable_release && !meta.last_stable_release) {
       // measured to the newest dated release above the installed one: the newest tag is undated
       why = esc("at least: the newest release is undated, measured to the newest dated one above");
-    } else if (value === "0.0") {
-      why = esc(newest && newest !== f.version ? "ahead of the newest stable, " + newest : "the installed release is the newest");
+    } else if (atZero !== null) {
+      why = esc(atZero);
     } else {
       why = newest ? esc("newest " + newest) + (meta.last_stable_release ? " released " + whole(day(meta.last_stable_release)) : "") : null;
     }
