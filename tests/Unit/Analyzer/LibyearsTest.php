@@ -7,6 +7,7 @@ namespace Lockrot\Tests\Unit\Analyzer;
 use Lockrot\Analyzer\Analyzer;
 use Lockrot\Analyzer\Libyears;
 use Lockrot\Clock;
+use Lockrot\Data\Repository\InstalledRelease;
 use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Lock\LockedPackage;
 use Lockrot\Verdict\Finding;
@@ -192,8 +193,8 @@ final class LibyearsTest extends TestCase
         $metadata = $this->splitPackage(['5.13.2.0' => self::twoYearsBefore(self::LATEST)]);
 
         self::assertSame(2.0, Libyears::behind($this->package(), $metadata));
-        self::assertEquals(new \DateTimeImmutable(self::twoYearsBefore(self::LATEST)), Libyears::installedReleaseAt($this->package(), $metadata));
-        self::assertSame('laravel/framework', Libyears::installedReleaseDatedBy($this->package(), $metadata));
+        self::assertEquals(new \DateTimeImmutable(self::twoYearsBefore(self::LATEST)), InstalledRelease::of($this->package(), $metadata)->at());
+        self::assertSame('laravel/framework', InstalledRelease::of($this->package(), $metadata)->datedBy());
     }
 
     public function testASplitPackageWhoseParentDoesNotDateTheInstalledVersionIsNotMeasured(): void
@@ -204,9 +205,9 @@ final class LibyearsTest extends TestCase
 
         self::assertNull(Libyears::behind($this->package(), $this->splitPackage([])));
         self::assertNull(Libyears::behind($this->package(), $neighbour), 'a neighbouring version is not this one');
-        self::assertNull(Libyears::installedReleaseAt($this->package(), $this->splitPackage([])));
+        self::assertNull(InstalledRelease::of($this->package(), $this->splitPackage([]))->at());
         self::assertSame('laravel/framework', $neighbour->releaseDatesBy());
-        self::assertNull(Libyears::installedReleaseDatedBy($this->package(), $neighbour), 'the parent has dates, none of them for this version');
+        self::assertNull(InstalledRelease::of($this->package(), $neighbour)->datedBy(), 'the parent has dates, none of them for this version');
     }
 
     public function testTheParentsDateOutranksTheLocksEvenWhenThePackageDatedItsNewestReleaseItself(): void
@@ -224,7 +225,7 @@ final class LibyearsTest extends TestCase
     {
         $metadata = $this->splitPackage([], null);
 
-        self::assertEquals(new \DateTimeImmutable(self::LOCKED_AT), Libyears::installedReleaseAt($this->package(), $metadata));
+        self::assertEquals(new \DateTimeImmutable(self::LOCKED_AT), InstalledRelease::of($this->package(), $metadata)->at());
         self::assertEqualsWithDelta(4.06, Libyears::behind($this->package(), $metadata) ?? 0.0, 0.005);
     }
 
@@ -232,15 +233,15 @@ final class LibyearsTest extends TestCase
     {
         $metadata = $this->splitPackage(['5.13.2.0' => self::twoYearsBefore(self::LATEST)], null);
 
-        self::assertEquals(new \DateTimeImmutable(self::LOCKED_AT), Libyears::installedReleaseAt($this->package('not a version'), $metadata));
+        self::assertEquals(new \DateTimeImmutable(self::LOCKED_AT), InstalledRelease::of($this->package('not a version'), $metadata)->at());
     }
 
     public function testASnapshotHasNoReleaseDateToMeasureFrom(): void
     {
         $metadata = $this->splitPackage(['5.13.2.0' => self::twoYearsBefore(self::LATEST)], null);
 
-        self::assertNull(Libyears::installedReleaseAt($this->package('dev-main'), $metadata));
-        self::assertNull(Libyears::installedReleaseDatedBy($this->package('dev-main'), $metadata), 'the parent dates releases, and a branch is not one');
+        self::assertNull(InstalledRelease::of($this->package('dev-main'), $metadata)->at());
+        self::assertNull(InstalledRelease::of($this->package('dev-main'), $metadata)->datedBy(), 'the parent dates releases, and a branch is not one');
     }
 
     public function testADevelopmentPackageIsMeasuredLikeAnyOther(): void
