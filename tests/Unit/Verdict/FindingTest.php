@@ -192,6 +192,9 @@ final class FindingTest extends TestCase
         self::assertSame($replaced->summary().'; '.$s9->summary().'; no fix expected', $silent->ownEvidence(), 'only abandoned points at the replacement; under silent the clause stays bare');
         self::assertSame($replaced->summary().'; x; fixed by 6.3.0', $fixed->ownEvidence(), 'the fix is out: nothing to migrate for');
         self::assertSame('marked abandoned by its repository, replacement: swiftmailer/swiftmailer; '.$s9->summary().'; no fix expected', $itself->ownEvidence(), 'a repository naming the package itself names nowhere to migrate');
+
+        $freeText = new Finding('sensiolabs/framework-extra-bundle', 'v6.2.10', Verdict::ABANDONED, [new Signal('S1', 'high', 'marked abandoned by its repository, replacement: Symfony', ['replacement' => 'Symfony']), $s9], ['sensiolabs/framework-extra-bundle'], null, null);
+        self::assertSame('marked abandoned by its repository, replacement: Symfony; '.$s9->summary().'; no fix expected', $freeText->ownEvidence(), 'free text is not a package to migrate to; the clause stays bare and the text is still read as text above it');
     }
 
     /**
