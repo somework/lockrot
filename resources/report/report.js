@@ -294,7 +294,7 @@
     // block is prose, not a filter. The figure stays a dash when the block is missing or nothing
     // could be measured.
     var ly = REPORT.libyears;
-    el("libyearsTotal").textContent = ly && ly.measured ? Number(ly.total).toFixed(1) : "\u2014";
+    el("libyearsTotal").textContent = (ly && ly.measured ? LockrotLib.fixed(ly.total, 1) : null) || "\u2014";
     var line = el("libyearsLine");
     line.textContent = "";
     LockrotLib.libyearsItems(ly).forEach(function (item) {
@@ -568,9 +568,9 @@
       return '<tr data-idx="' + i + '" data-pkg="' + esc(f.package) + '">' +
         "<td>" + (packagistUrl(f) ? '<a class="lnk" href="' + esc(packagistUrl(f)) + '" target="_blank" rel="noopener noreferrer">' + esc(f.package) + "</a>" : esc(f.package)) + "</td>" +
         '<td class="num">' + esc(f.version) + "</td>" +
-        '<td class="num">' + (f.libyears == null
+        '<td class="num">' + (LockrotLib.fixed(f.libyears, 1) === null
           ? '<span style="color:var(--muted)" title="not measured: ' + esc(LockrotLib.libyearsReason(f)) + '">\u2014</span>'
-          : Number(f.libyears).toFixed(1)) + "</td>" +
+          : LockrotLib.fixed(f.libyears, 1)) + "</td>" +
         "<td>" + pill(f.verdict) + "</td>" +
         "<td>" + (f.priority === "none" ? '<span style="color:var(--muted)">—</span>' : pill(f.priority)) + "</td>" +
         "<td>" + (f.direct ? "direct" : "transitive") + (f.dev ? " \u00b7 dev" : "") + "</td>" +
@@ -640,8 +640,8 @@
       ["oldest activity cache", REPORT.activity_cache_oldest_at || "—"],
       ["network failures", String(REPORT.network_failures)],
       ["not from a Composer repository", String(REPORT.not_from_composer_repository)],
-      ["libyears behind", ly && ly.measured ? Number(ly.total).toFixed(2) : "\u2014"],
-      ["libyears, direct requirements", ly && ly.measured ? Number(ly.direct_requirements).toFixed(2) : "\u2014"],
+      ["libyears behind", (ly && ly.measured ? LockrotLib.fixed(ly.total, 2) : null) || "\u2014"],
+      ["libyears, direct requirements", (ly && ly.measured ? LockrotLib.fixed(ly.direct_requirements, 2) : null) || "\u2014"],
       ["libyears measured", ly ? String(ly.measured) : "\u2014"],
       ["libyears not measured", ly && ly.unmeasured && typeof ly.unmeasured === "object"
         ? Object.keys(ly.unmeasured).map(function (k) { return k.replace(/_/g, " ") + " " + ly.unmeasured[k]; }).join(" \u00b7 ")
@@ -759,9 +759,9 @@
       ["installed", esc(f.version)],
       ["php constraint", lock.php ? esc(lock.php) : null],
       ["released", lock.released ? esc(day(lock.released) + " \u00b7 " + ageText(lock.released)) : null],
-      ["libyears behind", f.libyears == null
+      ["libyears behind", LockrotLib.fixed(f.libyears, 1) === null
         ? '<span style="color:var(--muted)">not measured \u00b7 ' + esc(LockrotLib.libyearsReason(f)) + "</span>"
-        : esc(Number(f.libyears).toFixed(1))],
+        : esc(LockrotLib.fixed(f.libyears, 1))],
       ["repository", rp
         ? '<a class="lnk" href="' + esc(rp) + '" target="_blank" rel="noopener noreferrer">' + esc(rp) + "</a>"
         : (lock.repository || meta.repository ? esc(lock.repository || meta.repository) : null)],

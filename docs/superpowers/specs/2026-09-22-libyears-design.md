@@ -112,8 +112,10 @@ install-time summary, `--fail-on`, priorities, the baseline.
   `exposure`.
 - `TableFormatter::summaryLines()` and `MarkdownFormatter` add the line; `report.js` adds the
   column and the headline.
-- `resources/lockrot-report.schema.json`: `finding.libyears`, root `libyears`, both required, with
-  descriptions that state the definition and the exclusions.
+- `resources/lockrot-report.schema.json` and `lockrot-explain.schema.json`: `finding.libyears` and
+  the root `libyears` block, both **optional** (documents from before 0.11.0 stay valid under
+  schema 1), the block's own fields required once the block is present, with descriptions that
+  state the definition and the exclusions.
 
 ## Tests
 

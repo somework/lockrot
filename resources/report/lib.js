@@ -95,6 +95,16 @@ var LockrotLib = (function () {
   }
 
   /**
+   * A number from the document formatted to `digits` decimals, or null when the value is not a
+   * finite number — `null`, a string, `Infinity`. Checked before `Number()`, not after: `Number(null)`
+   * is a finite zero, and a page that printed `0.0` for a missing value would be asserting something
+   * the document does not say.
+   */
+  function fixed(value, digits) {
+    return typeof value === "number" && isFinite(value) ? value.toFixed(digits) : null;
+  }
+
+  /**
    * Why a finding carries no libyears value, in the words the report's `unmeasured` block counts
    * it under, read off the finding the way the block itself does: the note names a package no
    * repository was asked about or one whose metadata did not come, a dev version is a branch
@@ -102,7 +112,8 @@ var LockrotLib = (function () {
    * for a measured finding.
    */
   function libyearsReason(finding) {
-    if (!finding || (finding.libyears !== null && finding.libyears !== undefined)) return "";
+    if (!finding || fixed(finding.libyears, 1) !== null) return "";
+    if (finding.libyears !== null && finding.libyears !== undefined) return "not a number in this document";
     var note = finding.note;
     if (note === "not from a Composer repository, not checked") return "not from a Composer repository";
     if (note) return "metadata unavailable";
@@ -137,8 +148,10 @@ var LockrotLib = (function () {
     var items = ["across " + scope];
     var worst = block.furthest_behind;
     if (worst && typeof worst === "object") {
-      items.push(Number(block.direct_requirements).toFixed(1) + " from direct requirements");
-      items.push("furthest behind " + worst.package + " " + worst.version + " at " + Number(worst.libyears).toFixed(1));
+      var direct = fixed(block.direct_requirements, 1);
+      if (direct !== null) items.push(direct + " from direct requirements");
+      var behind = fixed(worst.libyears, 1);
+      items.push("furthest behind " + worst.package + " " + worst.version + (behind === null ? "" : " at " + behind));
     }
 
     return items;
@@ -189,6 +202,7 @@ var LockrotLib = (function () {
     years: years,
     ageText: ageText,
     plural: plural,
+    fixed: fixed,
     libyearsItems: libyearsItems,
     libyearsSummary: libyearsSummary,
     libyearsReason: libyearsReason,

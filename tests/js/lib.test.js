@@ -247,3 +247,19 @@ test("libyearsReason names why a finding was not measured, in the block's own wo
     assert.strictEqual(lib.libyearsReason({ version: "v1.37.0" }), "no dated stable release", "a document from before the field reads as unmeasured");
     assert.strictEqual(lib.libyearsReason(undefined), "");
 });
+
+test("fixed formats a finite number and refuses everything else, null included", () => {
+    assert.strictEqual(lib.fixed(4.7123, 1), "4.7");
+    assert.strictEqual(lib.fixed(0, 2), "0.00", "zero is a number");
+    assert.strictEqual(lib.fixed(null, 1), null, "Number(null) would have been 0.0");
+    assert.strictEqual(lib.fixed("4.7", 1), null);
+    assert.strictEqual(lib.fixed(Infinity, 1), null);
+    assert.strictEqual(lib.fixed(undefined, 1), null);
+});
+
+test("libyearsItems and libyearsReason never turn a missing number into a zero", () => {
+    const block = { total: null, direct_requirements: null, measured: 2, unmeasured: {}, furthest_behind: { package: "a/a", version: "1.0.0", libyears: null } };
+    assert.deepStrictEqual(lib.libyearsItems(block), ["across all 2 packages", "furthest behind a/a 1.0.0"], "the direct share is dropped, the package keeps its name and loses the number");
+    assert.strictEqual(lib.libyearsReason({ libyears: "4.7", version: "1.0.0" }), "not a number in this document");
+    assert.strictEqual(lib.libyearsReason({ libyears: 0, version: "1.0.0" }), "", "zero stays measured");
+});
