@@ -160,14 +160,34 @@ final class PackageMetadataDatedByTest extends TestCase
         self::assertSame('laravel/framework', $dated->lastStableDatedBy());
     }
 
-    public function testAParentThatDatesNothingReturnsTheSameObject(): void
+    public function testAParentThatDatesNoBranchStillHandsOverItsReleaseDates(): void
     {
+        // No branch in common, so the branch view and the package's own age stay as they were —
+        // but the installed version may be one of the parent's releases all the same (a tag on a
+        // shared commit under a branch whose highest tag is not), and its date travels.
         $child = $this->child();
         $parent = PackageMetadata::fromPackages('laravel/framework', [
             $this->load(self::tag('laravel/framework', 'v5.8.0', 'f5', '2019-01-01T00:00:00+00:00', ['illuminate/contracts' => 'self.version'])),
         ], new \DateTimeImmutable(self::NOW));
 
-        self::assertSame($child, $child->datedBy($parent), 'no branch in common: nothing to date');
+        $dated = $child->datedBy($parent);
+
+        self::assertNotSame($child, $dated);
+        self::assertSame($child->latestStableByBranch(), $dated->latestStableByBranch(), 'no branch dated');
+        self::assertNull($dated->lastStableDatedBy());
+        self::assertNull($dated->lastStableReleaseAt());
+        self::assertEquals(new \DateTimeImmutable('2019-01-01T00:00:00+00:00'), $dated->releaseDateOf('5.8.0.0'));
+        self::assertSame('laravel/framework', $dated->releaseDatesBy());
+    }
+
+    public function testAParentWithNoDatedReleaseReturnsTheSameObject(): void
+    {
+        $child = $this->child();
+        $parent = PackageMetadata::fromPackages('laravel/framework', [
+            $this->load(['name' => 'laravel/framework', 'version' => 'v5.8.0', 'replace' => ['illuminate/contracts' => 'self.version'], 'source' => ['type' => 'git', 'url' => 'https://github.com/laravel/framework.git', 'reference' => 'f5']]),
+        ], new \DateTimeImmutable(self::NOW));
+
+        self::assertSame($child, $child->datedBy($parent), 'no branch in common and no date to hand over: nothing to do');
     }
 
     public function testAnOwnDatedPackageNeedsNoParent(): void

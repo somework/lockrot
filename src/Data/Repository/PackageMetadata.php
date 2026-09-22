@@ -351,7 +351,11 @@ final class PackageMetadata
             $byBranch[$key] = ['version' => $theirs['version'], 'at' => $theirs['at'], 'highest' => $theirs['highest'], 'dated_by' => $parent->name];
             $datedBranches[] = (string) $key;
         }
-        if ($datedBranches === []) {
+        // A parent that dates no branch of this package still dates its releases: the installed
+        // version may sit on a shared commit while its branch's highest tag does not, and the
+        // parent's tag for it is the date to read. Only a parent with nothing to give leaves this
+        // object as it is.
+        if ($datedBranches === [] && $parent->releaseDates === []) {
             return $this;
         }
 
