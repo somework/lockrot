@@ -32,6 +32,22 @@ mutant from the original, and says why.
   `newestTrustedDateAbove()`: on a tie the two dates are equal, so keeping the first or taking the
   second yields the same instant; nothing downstream reads which branch it came from.
 
+## src/Signal/PhpFloor.php and src/Signal/Rule/LeftBehindRule.php (0.11.0, the branch within reach)
+
+- `src/Signal/PhpFloor.php:55` ReturnRemoval (`blocking()`, `if ($constraint === null) return null`)
+  and `:102` ReturnRemoval (`project()`, `if ($projectPhp === null) return [null, null]`) — without
+  the return, composer/semver's untyped `parseConstraints()` receives null, reads it as `""`, throws
+  `UnexpectedValueException` ("Invalid version string"), and the `catch` below returns the same
+  value. The early return says what a missing requirement means; the parser would say it too.
+- `src/Signal/PhpFloor.php:75` CastString — `describe()`: `php($kind)` is null only for a floor that
+  is not there, and `blocking()` never names a floor that is not there, so the cast is for the type,
+  not for a case.
+- `src/Signal/Rule/LeftBehindRule.php:82` LessThanOrEqualTo (`$release['at'] <= $own['at']` →
+  `<`) — a higher branch released at the very instant of the installed branch's last release would
+  become a candidate. For S8 to fire it would then have to be alive (released within
+  `release-warn-years`) while the installed branch, released at the same instant, is at least
+  `release-warn-years` old: the two cannot both hold, so the mutant never changes a verdict.
+
 ## src/SelfUpdate and src/Composer/SelfUpdateCommand.php
 
 src/Composer/SelfUpdateCommand.php:130 FalseValue (`\Phar::running(false)` → `\Phar::running(true)`) — the
@@ -290,7 +306,7 @@ slow test. They are listed here only so nobody reads them as an unexplained "2 t
 - `src/Data/Repository/PackageMetadata.php:172` TrueValue — `$replaces[$link->getTarget()] = true`
   is set membership read only through `array_keys()`; the value is never looked at, so `false`
   builds the same list. The same shape as `ActivityClient.php:80` above.
-- `src/Data/Repository/PackageMetadata.php:315` ReturnRemoval — `needsParentDates()` returns false
+- `src/Data/Repository/PackageMetadata.php:320` ReturnRemoval — `needsParentDates()` returns false
   for a branch snapshot, which has no branch. Without the return the lookup runs with a null key,
   PHP reads it as `''`, no branch is keyed by the empty string, and the method returns false on the
   next line. The early return is the statement of intent.

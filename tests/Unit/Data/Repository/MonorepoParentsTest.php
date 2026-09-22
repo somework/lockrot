@@ -15,7 +15,7 @@ final class MonorepoParentsTest extends TestCase
     private const NOW = '2026-09-14T00:00:00+00:00';
 
     /**
-     * @param array<array-key, array{version: string, at: ?\DateTimeImmutable, highest: array{normalized: string, pretty: string, at: ?\DateTimeImmutable}}> $byBranch
+     * @param array<array-key, array{version: string, at: ?\DateTimeImmutable, highest: array{normalized: string, pretty: string, at: ?\DateTimeImmutable}, php: ?string}> $byBranch
      * @param list<string>                                                                                                                                  $replaces
      */
     private static function metadata(string $name, array $byBranch, array $replaces = [], ?string $lastStable = null): PackageMetadata
@@ -23,12 +23,12 @@ final class MonorepoParentsTest extends TestCase
         return new PackageMetadata($name, false, null, true, $lastStable === null ? null : new \DateTimeImmutable($lastStable), $lastStable === null ? null : 'x', \count($byBranch), null, 'library', new \DateTimeImmutable(self::NOW), $byBranch, $replaces);
     }
 
-    /** @return array{version: string, at: ?\DateTimeImmutable, highest: array{normalized: string, pretty: string, at: ?\DateTimeImmutable}} */
+    /** @return array{version: string, at: ?\DateTimeImmutable, highest: array{normalized: string, pretty: string, at: ?\DateTimeImmutable}, php: ?string} */
     private static function branch(string $version, ?string $at): array
     {
         $date = $at === null ? null : new \DateTimeImmutable($at);
 
-        return ['version' => $version, 'at' => $date, 'highest' => ['normalized' => $version.'.0', 'pretty' => 'v'.$version, 'at' => $date]];
+        return ['version' => $version, 'at' => $date, 'highest' => ['normalized' => $version.'.0', 'pretty' => 'v'.$version, 'at' => $date], 'php' => null];
     }
 
     public function testTheBundledFileLoadsAndOnlyTheMonorepoThatCarriesTheChildIsWorthARequest(): void
