@@ -201,12 +201,18 @@
       "properties": {
         "total": {
           "description": "Sum over every measured finding, two decimals; null when `measured` is 0, since a run that could measure nothing has no sum — 0 is the answer of a run that measured packages and found none behind.",
-          "type": ["number", "null"],
+          "type": [
+            "number",
+            "null"
+          ],
           "minimum": 0
         },
         "direct_requirements": {
           "description": "Sum over the measured findings with `direct: true`, two decimals: the nearest number to php-libyear's. Null on the same terms as `total`.",
-          "type": ["number", "null"],
+          "type": [
+            "number",
+            "null"
+          ],
           "minimum": 0
         },
         "measured": {
@@ -358,6 +364,22 @@
         "medium",
         "low",
         "none"
+      ]
+    },
+    "signalId": {
+      "description": "A signal identifier, as `docs/verdicts.md` lists them.",
+      "type": "string",
+      "enum": [
+        "S1",
+        "S2",
+        "S3",
+        "S4",
+        "S5",
+        "S6",
+        "S7",
+        "S8",
+        "S9",
+        "S10"
       ]
     },
     "level": {
@@ -543,7 +565,8 @@
             "S6",
             "S7",
             "S8",
-            "S9"
+            "S9",
+            "S10"
           ]
         },
         "level": {
@@ -662,6 +685,18 @@
             },
             "data": {
               "$ref": "#/definitions/s9"
+            }
+          }
+        },
+        {
+          "properties": {
+            "id": {
+              "enum": [
+                "S10"
+              ]
+            },
+            "data": {
+              "$ref": "#/definitions/s10"
             }
           }
         }
@@ -932,6 +967,68 @@
         },
         "dated_by": {
           "$ref": "#/definitions/datedBy"
+        }
+      }
+    },
+    "s10": {
+      "description": "A check the verdict rests on did not run. Informational: it never decides a verdict, and it is carried only where the missing check could have changed one — not on a package the repository already marks abandoned, nor on an allowlisted one.",
+      "type": "object",
+      "required": [
+        "unchecked",
+        "blocks"
+      ],
+      "properties": {
+        "unchecked": {
+          "description": "One entry per check that did not run.",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "check",
+              "reason",
+              "blocks"
+            ],
+            "properties": {
+              "check": {
+                "description": "`repository_activity` is the forge round behind S3 and S4; `release_dates` is the package's own age, which the repository dates only by a commit its tags share.",
+                "type": "string",
+                "enum": [
+                  "repository_activity",
+                  "release_dates"
+                ]
+              },
+              "reason": {
+                "description": "Why it did not run.",
+                "type": "string",
+                "enum": [
+                  "no_token",
+                  "anonymous_budget",
+                  "install_time_budget",
+                  "rate_limit",
+                  "fetch_failed",
+                  "offline",
+                  "undated_releases"
+                ]
+              },
+              "blocks": {
+                "description": "The signals that could not be read without it.",
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "$ref": "#/definitions/signalId"
+                }
+              }
+            }
+          }
+        },
+        "blocks": {
+          "description": "Every signal the missing checks blocked, flattened.",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/signalId"
+          }
         }
       }
     },

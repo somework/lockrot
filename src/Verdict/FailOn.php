@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Verdict;
 
 use Lockrot\Exception\ConfigException;
+use Lockrot\Signal\Signal;
 
 /**
  * The `fail-on` threshold: the verdict or the priority at or above which a finding fails the run.
@@ -22,6 +23,12 @@ use Lockrot\Exception\ConfigException;
 final class FailOn
 {
     public const NONE = 'none';
+    /**
+     * Not a verdict and not a priority: a run where a check did not happen. It fails on any finding
+     * carrying S10 ({@see \Lockrot\Signal\Rule\NotCheckedRule}), which is how a pipeline asks for
+     * a complete run — the usual cause is a workflow that never passed `GITHUB_TOKEN` through.
+     */
+    public const UNCHECKED = 'unchecked';
 
     private string $value;
 
@@ -60,7 +67,7 @@ final class FailOn
             }
         }
 
-        return array_merge([self::NONE], $verdicts, self::priorities());
+        return array_merge([self::NONE], $verdicts, self::priorities(), [self::UNCHECKED]);
     }
 
     /** @return list<string> the priorities a threshold can name — every level but `none`, which is no threshold */
@@ -90,6 +97,15 @@ final class FailOn
     public function reaches(Finding $finding): bool
     {
         if ($this->isNone()) {
+            return false;
+        }
+        if ($this->value === self::UNCHECKED) {
+            foreach ($finding->signals() as $signal) {
+                if ($signal->id() === Signal::S10) {
+                    return true;
+                }
+            }
+
             return false;
         }
         if (\in_array($this->value, self::priorities(), true)) {

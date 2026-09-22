@@ -18,6 +18,8 @@ final class Signal
     public const S8 = 'S8';
     /** Security advisories affecting the installed version. Never decides a verdict; raises the priority where no fix is coming. */
     public const S9 = 'S9';
+    /** A check the verdict rests on did not run, and what it could not decide. Never decides a verdict. */
+    public const S10 = 'S10';
     public const LEVEL_INFO = 'info';
     public const LEVEL_WARN = 'warn';
     public const LEVEL_HIGH = 'high';

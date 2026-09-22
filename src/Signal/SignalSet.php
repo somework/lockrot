@@ -12,6 +12,7 @@ use Lockrot\Signal\Rule\ArchivedRule;
 use Lockrot\Signal\Rule\LeftBehindRule;
 use Lockrot\Signal\Rule\NoPushRule;
 use Lockrot\Signal\Rule\NoReleaseRule;
+use Lockrot\Signal\Rule\NotCheckedRule;
 use Lockrot\Signal\Rule\OldPromiseRule;
 use Lockrot\Signal\Rule\PinnedRule;
 
@@ -41,6 +42,7 @@ final class SignalSet
             new PinnedRule(),
             new LeftBehindRule($clock, $thresholds, new PhpFloor($targetPhp, $projectPhp)),
             new AdvisoryRule(),
+            new NotCheckedRule(),
         ]);
     }
 
@@ -54,7 +56,8 @@ final class SignalSet
                 $signals[] = $signal;
             }
         }
-        usort($signals, static fn (Signal $a, Signal $b): int => strcmp($a->id(), $b->id()));
+        // by number, not by string: S10 follows S9 rather than sitting between S1 and S2
+        usort($signals, static fn (Signal $a, Signal $b): int => strnatcmp($a->id(), $b->id()));
 
         return $signals;
     }

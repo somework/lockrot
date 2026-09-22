@@ -232,12 +232,15 @@ final class JsonSchemaConformanceTest extends TestCase
                 }
             }
         }
-        ksort($seen);
+        uksort($seen, 'strnatcmp');
 
         $expected = [Signal::S1, Signal::S2, Signal::S3, Signal::S4, Signal::S5, Signal::S6, Signal::S7, Signal::S8];
         if (interface_exists(AdvisoryProviderInterface::class)) {
             $expected[] = Signal::S9;
         }
+        // S10 rides on the fixtures that carry an undated newest release — symfony/polyfill-* in
+        // wallabag's lock, whose tags are cut by a monorepo and share their commit.
+        $expected[] = Signal::S10;
 
         self::assertSame($expected, array_keys($seen));
     }

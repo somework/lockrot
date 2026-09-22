@@ -26,6 +26,7 @@ use Lockrot\Lock\LockedPackage;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Signal\PackageFacts;
+use Lockrot\Signal\Rule\NotCheckedRule;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Verdict\Finding;
@@ -150,16 +151,19 @@ final class Analyzer
 
         [$allowlisted, $repoByPackage, $candidateByPackage] = $this->classify($packages, $metadata, $now);
 
+        $activityBatch = ActivityBatch::empty();
         if ($this->deadline->isPast()) {
             // The metadata pass already used the whole budget. Starting the forge round-trips now
             // would push the install past it, so the activity signals are dropped and the report
             // says so rather than reading as "checked, nothing found". Planning waits too: it may
             // exchange Bitbucket credentials over the network ({@see ForgeAuth}).
-            $activityBatch = ActivityBatch::empty();
             $activityNotes = ['repository activity not checked: install-time budget exhausted'];
+            $plan = null;
         } else {
-            [$activityBatch, $activityNotes] = $this->fetchActivity($this->planner->select($repoByPackage, $candidateByPackage));
+            $plan = $this->planner->select($repoByPackage, $candidateByPackage);
+            [$activityBatch, $activityNotes] = $this->fetchActivity($plan);
         }
+        $notChecked = $this->activityNotCheckedReasons($repoByPackage, $activityBatch, $plan);
         $notes = array_merge($notes, $activityNotes);
         $activity = $activityBatch->activity();
 
@@ -171,7 +175,7 @@ final class Analyzer
             $repo = $repoByPackage[$package->name()] ?? null;
             $act = $repo !== null ? ($activity[$repo->key()] ?? null) : null;
             $entry = $allowlisted[$package->name()];
-            $facts = new PackageFacts($package, $meta, $act, $advisories->for($package->name()));
+            $facts = new PackageFacts($package, $meta, $act, $advisories->for($package->name()), $notChecked[$package->name()] ?? null);
             $factsByPackage[$package->name()] = $facts;
             $findings[] = $this->buildFinding($facts, $entry, $graph, $batch);
             if (!$package->isFromComposerRepository()) {
@@ -303,6 +307,51 @@ final class Analyzer
     }
 
     /** @return array{0: ActivityBatch, 1: list<string>} */
+    /**
+     * Why each package's repository was never asked about, by package name. A check that ran and
+     * came back empty — a 404, a repository the forge hides — is not in here: it was answered for,
+     * and the report's notes say how many. Only a check that never happened is, so a finding can
+     * carry that fact instead of reading as "checked, nothing found"
+     * ({@see \Lockrot\Signal\Rule\NotCheckedRule}).
+     *
+     * @param array<string, RepoRef> $repoByPackage
+     *
+     * @return array<string, string>
+     */
+    private function activityNotCheckedReasons(array $repoByPackage, ActivityBatch $batch, ?ActivityFetchPlan $plan): array
+    {
+        $activity = $batch->activity();
+        $reasons = [];
+        $skipped = $plan === null ? [] : $plan->skippedPackages();
+        foreach ($repoByPackage as $name => $repo) {
+            if (isset($activity[$repo->key()])) {
+                continue;
+            }
+            if ($this->offline) {
+                $reasons[$name] = NotCheckedRule::OFFLINE;
+                continue;
+            }
+            if ($plan === null) {
+                $reasons[$name] = NotCheckedRule::BUDGET;
+                continue;
+            }
+            if (isset($skipped[$name])) {
+                $reasons[$name] = $skipped[$name] === ActivityFetchPlan::BUDGET ? NotCheckedRule::RATE_BUDGET : NotCheckedRule::NO_TOKEN;
+                continue;
+            }
+            if ($batch->rateLimited($repo->forge())) {
+                $reasons[$name] = NotCheckedRule::RATE_LIMIT;
+                continue;
+            }
+            if (isset($batch->failedOn($repo->forge())[$repo->key()])) {
+                $reasons[$name] = NotCheckedRule::FETCH_FAILED;
+            }
+        }
+
+        return $reasons;
+    }
+
+    /** @return array{ActivityBatch, list<string>} the batch, and the notes the round produced */
     private function fetchActivity(ActivityFetchPlan $plan): array
     {
         $batch = $this->activity->fetch($plan->repos());
@@ -336,6 +385,12 @@ final class Analyzer
         $meta = $facts->metadata();
         $activity = $facts->activity();
         $signals = $this->signals->evaluate($facts);
+        // S10 says a missing check could have changed the verdict. It could not have changed an
+        // allowlisted one, which is `finished` whatever the signals say, nor one the repository
+        // already marks abandoned, which is the most serious verdict there is.
+        if ($entry !== null || ($meta !== null && $meta->isAbandoned())) {
+            $signals = array_values(array_filter($signals, static fn (Signal $signal): bool => $signal->id() !== Signal::S10));
+        }
         $verdict = $this->engine->decide($signals, $entry !== null, $meta !== null);
 
         $note = null;

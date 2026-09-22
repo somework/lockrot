@@ -14,6 +14,11 @@ namespace Lockrot\Data\Forge;
  */
 final class ActivityFetchPlan
 {
+    /** The run is anonymous on a capped forge and the package is not a candidate for an activity verdict. */
+    public const NO_TOKEN = 'no_token';
+    /** A candidate the anonymous request budget could not fit. */
+    public const BUDGET = 'budget';
+
     /** @var list<RepoRef> */
     private array $repos;
     /** @var array<string, int> */
@@ -24,6 +29,8 @@ final class ActivityFetchPlan
     private array $skippedBudget;
     /** @var list<string> */
     private array $cappedForges;
+    /** @var array<string, string> */
+    private array $skippedPackages;
 
     /**
      * @param list<RepoRef>      $repos           unique repositories, ordered by package name
@@ -31,14 +38,28 @@ final class ActivityFetchPlan
      * @param array<string, int> $skippedNoToken  forge => packages skipped as non-candidates under the anonymous cap
      * @param array<string, int> $skippedBudget   forge => candidates the anonymous budget could not fit
      * @param list<string>       $cappedForges    forges that were planned anonymously under a cap and had at least one repository
+     * @param array<string, string> $skippedPackages package name => why its repository was not asked about ({@see self::NO_TOKEN}, {@see self::BUDGET})
      */
-    public function __construct(array $repos, array $checkedPackages, array $skippedNoToken, array $skippedBudget, array $cappedForges)
+    public function __construct(array $repos, array $checkedPackages, array $skippedNoToken, array $skippedBudget, array $cappedForges, array $skippedPackages = [])
     {
         $this->repos = $repos;
         $this->checkedPackages = $checkedPackages;
         $this->skippedNoToken = $skippedNoToken;
         $this->skippedBudget = $skippedBudget;
         $this->cappedForges = $cappedForges;
+        $this->skippedPackages = $skippedPackages;
+    }
+
+    /**
+     * Why each package's repository was not asked about, by package name — the counts above say how
+     * many, this says which, so a finding can record that the check behind it never ran
+     * ({@see \Lockrot\Signal\Rule\NotCheckedRule}).
+     *
+     * @return array<string, string>
+     */
+    public function skippedPackages(): array
+    {
+        return $this->skippedPackages;
     }
 
     /** @return list<RepoRef> */
