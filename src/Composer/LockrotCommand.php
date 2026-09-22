@@ -41,7 +41,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /** `composer lockrot` — analyses composer.lock and prints a report in the configured format. */
 final class LockrotCommand extends BaseCommand
 {
-    /** @var callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, Tokens, Clock, Deadline): Analyzer */
+    /** @var callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, Tokens, Clock, Deadline, ?string): Analyzer */
     private $analyzerFactory;
 
     /** Set by initialize() when the project manifest is unusable; rethrown inside execute(). */
@@ -57,7 +57,7 @@ final class LockrotCommand extends BaseCommand
      */
     private ?array $envSnapshot = null;
 
-    /** @param null|callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, Tokens, Clock, Deadline): Analyzer $analyzerFactory */
+    /** @param null|callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, Tokens, Clock, Deadline, ?string): Analyzer $analyzerFactory */
     public function __construct(?callable $analyzerFactory = null)
     {
         $this->analyzerFactory = $analyzerFactory ?? [ServiceFactory::class, 'createAnalyzer'];

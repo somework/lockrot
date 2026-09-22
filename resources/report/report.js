@@ -685,7 +685,7 @@
       var cls = "lane" + (b.installed ? " is-installed" : "") + (b === newest && !b.installed ? " is-newest" : "");
       var labLeft = x > 62;
       var lab = '<span class="lab" style="' + (labLeft ? "right:" + (100 - x + 2) + "%" : "left:" + (x + 2) + "%") + '">' +
-        esc(b.highest) + " \u00b7 " + day(iso) + "</span>";
+        esc(b.highest) + " \u00b7 " + day(iso) + (b.php ? " \u00b7 php " + esc(String(b.php)) : "") + "</span>";
       return '<div class="' + cls + '"><span class="bl">' + esc(b.branch) + "</span>" +
         '<span class="track"><span class="mark" style="left:' + x + '%"></span>' + lab + "</span></div>";
     }).join("");

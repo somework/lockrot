@@ -28,7 +28,7 @@ final class LibyearsTest extends TestCase
         $byBranch = [];
         foreach ($branches as $key => [$version, $at]) {
             $date = $at === null ? null : new \DateTimeImmutable($at);
-            $byBranch[$key] = ['version' => $version, 'at' => $date, 'highest' => ['normalized' => ltrim($version, 'v').'.0', 'pretty' => $version, 'at' => $date]];
+            $byBranch[$key] = ['version' => $version, 'at' => $date, 'highest' => ['normalized' => ltrim($version, 'v').'.0', 'pretty' => $version, 'at' => $date], 'php' => null];
         }
 
         return new PackageMetadata('scheb/2fa-bundle', false, null, true, $lastStableReleaseAt === null ? null : new \DateTimeImmutable($lastStableReleaseAt), 'v8.6.1', 12, null, 'library', new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), $byBranch);

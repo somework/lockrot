@@ -97,6 +97,32 @@ the signal's data as `suggested_constraint` in every case. The second clause nam
 branch whose release is newest, with that release:
 it is where fixes land now, which with a living LTS below the current major can be the LTS.
 
+### Within reach
+
+The newest branch proves the upstream moved on; it is not always one the project can follow.
+Matomo 5.13 supports `php >=7.2.5` and locks monolog 1.27.1; monolog 3.x requires `php >=8.1`, so
+`require ^3.12` is a line Matomo cannot write without dropping PHP 7 — and 2.x, which requires
+`>=7.2` and released last month, is the branch it can move to. S8 holds every higher branch to two
+floors: the project's own `require.php` as written in `composer.json`, and the target PHP
+(`config.platform.php` or the running PHP, the version Composer resolves against — a branch outside
+it will not install at all). The branch it tells the project to follow is the newest releasing one
+within both, and when that is not the newest branch the evidence says what holds the newest back:
+
+```text
+  left-behind  monolog/monolog 1.27.1  direct
+               branch 1.x last released 2022-06-09 (4.3 years ago); 3.x released 3.12.0
+               (2026-09-09), needs php >=8.1 above the project's php >=7.2.5; 2.x released 2.11.1
+               (2026-09-02); require ^2.11 to follow
+```
+
+When no releasing branch is within reach the evidence ends with `no releasing branch within reach`
+and suggests nothing: the way forward is a PHP upgrade, which is not a `composer.json` line. The
+verdict is `left-behind` either way — the branch installed is the one the upstream left. In
+`--format=json` the signal carries `newest_php`, `newest_within_reach`, `floor_php` and
+`floor_source` (`project` or `target`), and `reachable_branch`, `reachable_version` and
+`reachable_release` for the branch `suggested_constraint` follows; `--explain` lists each branch's
+php requirement in its branch table. A branch that requires no PHP is within reach of anything.
+
 A branch snapshot (`dev-master`, `2.x-dev`) belongs to no branch and is `pinned`. A package whose
 installed version the repository does not list — a private fork, or a lock written against a tag
 since deleted, sitting above everything the repository has on that branch — carries no S8: the

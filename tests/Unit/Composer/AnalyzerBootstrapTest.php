@@ -72,6 +72,23 @@ final class AnalyzerBootstrapTest extends TestCase
         self::assertContains('vendor/project', $patterns, 'the project ignore list must be merged in');
     }
 
+    /** The project's own php requirement reaches the factory: it is one of the two floors S8 keeps the branch it names within. */
+    public function testCreatePassesTheProjectsPhpRequirementThroughToTheFactory(): void
+    {
+        $lockrot = LockrotConfig::fromSources([], [], [], '8.4.0', null);
+        $seen = [];
+        $factory = function (IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, Tokens $tokens, Clock $clock, Deadline $deadline, ?string $projectPhp = null) use (&$seen): Analyzer {
+            $seen[] = $projectPhp;
+
+            return $this->baseAnalyzer($clock, $lockrot);
+        };
+
+        AnalyzerBootstrap::create($factory, new NullIO(), new Config(false, sys_get_temp_dir()), [], ProjectConfig::fromArray(['require' => ['php' => '>=7.2.5']]), $lockrot, [], Deadline::never());
+        AnalyzerBootstrap::create($factory, new NullIO(), new Config(false, sys_get_temp_dir()), [], ProjectConfig::empty(), $lockrot, [], Deadline::never());
+
+        self::assertSame(['>=7.2.5', null], $seen, 'as written, and null for a project without a manifest');
+    }
+
     public function testCreatePassesTheDeadlineThroughToTheFactory(): void
     {
         $lockrot = LockrotConfig::fromSources([], [], [], '8.4.0', null);

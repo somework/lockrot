@@ -90,6 +90,41 @@ final class PackageMetadataFromPackagesTest extends TestCase
         self::assertNull($byBranch['0.9']['at']);
     }
 
+    /**
+     * monolog: 1.x requires `>=5.3.0`, 2.x `>=7.2`, 3.x `>=8.1`. Each branch carries the php requirement
+     * of the release it names — its newest dated one — so S8 can tell which higher branch a project
+     * can move onto ({@see \Lockrot\Signal\PhpFloor}). A branch with no dated release carries its
+     * highest tag's; a release that requires no PHP carries null.
+     */
+    public function testEachBranchCarriesThePhpRequirementOfTheReleaseItNames(): void
+    {
+        $v3 = $this->load(['name' => 'a/b', 'version' => '3.12.0', 'time' => '2026-09-09T00:00:00+00:00', 'require' => ['php' => '>=8.1']]);
+        $v2new = $this->load(['name' => 'a/b', 'version' => '2.11.1', 'time' => '2026-09-02T00:00:00+00:00', 'require' => ['php' => '>=7.2']]);
+        $v2old = $this->load(['name' => 'a/b', 'version' => '2.0.0', 'time' => '2020-07-05T00:00:00+00:00', 'require' => ['php' => '>=7.2.0']]);
+        $v1 = $this->load(['name' => 'a/b', 'version' => '1.27.1', 'time' => '2022-06-09T00:00:00+00:00', 'require' => ['php' => '>=5.3.0']]);
+        $undated = $this->load(['name' => 'a/b', 'version' => '0.9.0', 'require' => ['php' => '>=5.2']]);
+        $noPhp = $this->load(['name' => 'a/b', 'version' => '0.8.0', 'time' => '2012-01-01T00:00:00+00:00']);
+
+        $byBranch = PackageMetadata::fromPackages('a/b', [$v3, $v2old, $v2new, $v1, $undated, $noPhp], new \DateTimeImmutable(self::FIXED))->latestStableByBranch();
+
+        self::assertSame('>=8.1', $byBranch['3']['php']);
+        self::assertSame('>=7.2', $byBranch['2']['php'], 'the newest dated release\'s, not the oldest\'s');
+        self::assertSame('>=5.3.0', $byBranch['1']['php']);
+        self::assertSame('>=5.2', $byBranch['0.9']['php'], 'an undated branch carries its highest tag\'s');
+        self::assertNull($byBranch['0.8']['php']);
+    }
+
+    /** A backport on a lower minor that is the branch's newest release names the branch's requirement, as it names its version. */
+    public function testTheBranchsPhpFollowsItsNewestDatedReleaseNotItsHighestTag(): void
+    {
+        $higherButOlder = $this->load(['name' => 'a/b', 'version' => '1.5.0', 'time' => '2020-01-01T00:00:00+00:00', 'require' => ['php' => '>=7.4']]);
+        $lowerButNewer = $this->load(['name' => 'a/b', 'version' => '1.4.9', 'time' => '2021-01-01T00:00:00+00:00', 'require' => ['php' => '>=7.1']]);
+
+        foreach ([[$lowerButNewer, $higherButOlder], [$higherButOlder, $lowerButNewer]] as $order) {
+            self::assertSame('>=7.1', PackageMetadata::fromPackages('a/b', $order, new \DateTimeImmutable(self::FIXED))->latestStableByBranch()['1']['php']);
+        }
+    }
+
     /** php-http/promise: 1.3.1 (2024-03) is the highest 1.x tag, 1.2.2 (2025-11) its last release. */
     public function testTheNewestDatedReleaseOnABranchWinsOverAHigherOlderOne(): void
     {
@@ -171,6 +206,16 @@ final class PackageMetadataFromPackagesTest extends TestCase
         self::assertTrue($sharedHighest->hasStableRelease());
         self::assertNull($sharedHighest->lastStableReleaseAt(), 'the package\'s age is its highest tag\'s, and that one is dated by no release');
         self::assertNull($sharedHighest->lastStableVersion());
+    }
+
+    /** Setting a shared-commit tag aside as undated changes its date, not what the branch requires. */
+    public function testASharedCommitBranchKeepsItsPhpRequirement(): void
+    {
+        $split = static fn (string $version): array => ['name' => 'a/b', 'version' => $version, 'time' => '2023-06-05T12:46:42+00:00', 'require' => ['php' => '^8.1'], 'source' => ['type' => 'git', 'url' => 'https://github.com/a/b.git', 'reference' => 'shared']];
+        $metadata = PackageMetadata::fromPackages('a/b', [$this->load($split('v10.49.0')), $this->load($split('v10.20.0')), $this->load($split('v10.13.1'))], new \DateTimeImmutable(self::FIXED));
+
+        self::assertNull($metadata->latestStableByBranch()['10']['highest']['at']);
+        self::assertSame('^8.1', $metadata->latestStableByBranch()['10']['php']);
     }
 
     /**

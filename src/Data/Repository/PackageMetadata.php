@@ -56,7 +56,7 @@ final class PackageMetadata
      * compares the installed branch against. A branch this package could not date itself and its
      * monorepo parent did ({@see datedBy()}) names the parent under `dated_by`.
      *
-     * @var array<array-key, array{version: string, at: ?\DateTimeImmutable, highest: array{normalized: string, pretty: string, at: ?\DateTimeImmutable}, dated_by?: string}>
+     * @var array<array-key, array{version: string, at: ?\DateTimeImmutable, highest: array{normalized: string, pretty: string, at: ?\DateTimeImmutable}, dated_by?: string, php: ?string}>
      */
     private array $latestStableByBranch;
     /**
@@ -84,7 +84,7 @@ final class PackageMetadata
     private ?string $releaseDatesBy;
 
     /**
-     * @param array<array-key, array{version: string, at: ?\DateTimeImmutable, highest: array{normalized: string, pretty: string, at: ?\DateTimeImmutable}, dated_by?: string}> $latestStableByBranch
+     * @param array<array-key, array{version: string, at: ?\DateTimeImmutable, highest: array{normalized: string, pretty: string, at: ?\DateTimeImmutable}, dated_by?: string, php: ?string}> $latestStableByBranch
      * @param list<string>                                                                                                                                                   $replaces
      * @param array<string, \DateTimeImmutable>                                                                                                                              $releaseDates
      */
@@ -215,9 +215,12 @@ final class PackageMetadata
                     }
                     $pretty = $version->getPrettyVersion();
                     $tag = ['normalized' => $normalized, 'pretty' => $pretty, 'at' => $releaseDate];
+                    // The php requirement travels with the release the branch names: it is what a
+                    // project moving onto the branch has to satisfy ({@see \Lockrot\Signal\PhpFloor}).
+                    $php = self::phpOf($version);
                     $entry = $byBranch[$branch] ?? null;
                     if ($entry === null) {
-                        $byBranch[$branch] = ['version' => $pretty, 'at' => $releaseDate, 'highest' => $tag];
+                        $byBranch[$branch] = ['version' => $pretty, 'at' => $releaseDate, 'highest' => $tag, 'php' => $php];
                         $highestCommitByBranch[$branch] = $commit;
                     } else {
                         if (Comparator::greaterThan($normalized, $entry['highest']['normalized'])) {
@@ -227,8 +230,10 @@ final class PackageMetadata
                         if ($releaseDate !== null && ($entry['at'] === null || $releaseDate > $entry['at'])) {
                             $entry['version'] = $pretty;
                             $entry['at'] = $releaseDate;
+                            $entry['php'] = $php;
                         } elseif ($entry['at'] === null && $entry['highest']['normalized'] === $normalized) {
                             $entry['version'] = $pretty;
+                            $entry['php'] = $php;
                         }
                         $byBranch[$branch] = $entry;
                     }
@@ -251,7 +256,7 @@ final class PackageMetadata
         foreach ($byBranch as $branch => $entry) {
             $commit = $highestCommitByBranch[$branch] ?? null;
             if ($commit !== null && $tagsOnCommit[$commit] >= self::SHARED_COMMIT_TAGS) {
-                $byBranch[$branch] = ['version' => $entry['version'], 'at' => $entry['at'], 'highest' => ['normalized' => $entry['highest']['normalized'], 'pretty' => $entry['highest']['pretty'], 'at' => null]];
+                $byBranch[$branch] = ['version' => $entry['version'], 'at' => $entry['at'], 'highest' => ['normalized' => $entry['highest']['normalized'], 'pretty' => $entry['highest']['pretty'], 'at' => null], 'php' => $entry['php'] ?? null];
             }
         }
         // The package's age is its highest tag's age. When that tag carries no date — or, as above,
@@ -348,7 +353,9 @@ final class PackageMetadata
             if ($theirs === null || $theirs['at'] === null || $theirs['highest']['at'] === null) {
                 continue;
             }
-            $byBranch[$key] = ['version' => $theirs['version'], 'at' => $theirs['at'], 'highest' => $theirs['highest'], 'dated_by' => $parent->name];
+            // The date is the parent's; the php requirement stays this package's own — the split is
+            // what the lock installs, and it is not obliged to require what its parent does.
+            $byBranch[$key] = ['version' => $theirs['version'], 'at' => $theirs['at'], 'highest' => $theirs['highest'], 'dated_by' => $parent->name, 'php' => $entry['php'] ?? null];
             $datedBranches[] = (string) $key;
         }
         // A parent that dates no branch of this package still dates its releases: the installed
@@ -412,6 +419,14 @@ final class PackageMetadata
     }
 
     /** The commit the release's `source` points at, null when the repository names none. */
+    /** The release's `require.php` as the repository lists it, null when it requires no PHP. */
+    private static function phpOf(BasePackage $version): ?string
+    {
+        $link = $version->getRequires()['php'] ?? null;
+
+        return $link === null ? null : $link->getPrettyConstraint();
+    }
+
     private static function commitOf(BasePackage $version): ?string
     {
         $reference = $version->getSourceReference();
@@ -530,7 +545,7 @@ final class PackageMetadata
      * (an integer where PHP makes one of `"1"`); pre-releases do not count. A branch whose releases
      * carry no `time` at all shows its highest tag as its newest, with a null date.
      *
-     * @return array<array-key, array{version: string, at: ?\DateTimeImmutable, highest: array{normalized: string, pretty: string, at: ?\DateTimeImmutable}, dated_by?: string}>
+     * @return array<array-key, array{version: string, at: ?\DateTimeImmutable, highest: array{normalized: string, pretty: string, at: ?\DateTimeImmutable}, dated_by?: string, php: ?string}>
      */
     public function latestStableByBranch(): array
     {
