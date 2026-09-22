@@ -726,10 +726,8 @@
       "type": "object",
       "required": [
         "target_php",
-        "target_major",
         "ga_date",
         "php_constraint",
-        "written_for_php",
         "released"
       ],
       "properties": {
@@ -737,7 +735,7 @@
           "type": "string"
         },
         "target_major": {
-          "description": "The first release of the target's major, `8.0` for a target of `8.4`; its GA is the date the release is held against.",
+          "description": "The first release of the target's major, `8.0` for a target of `8.4`; its GA is the date the release is held against. Optional: documents written before 0.11.0 do not carry it.",
           "type": "string"
         },
         "ga_date": {
@@ -748,7 +746,7 @@
           "type": "string"
         },
         "written_for_php": {
-          "description": "The PHP major of the constraint's lower bound, null when it has none (`*`).",
+          "description": "The PHP major of the constraint's lower bound, null when it has none (`*`). Optional: documents written before 0.11.0 do not carry it.",
           "type": [
             "integer",
             "null"
