@@ -98,11 +98,20 @@ final class JsonSchemaConformanceTest extends TestCase
         if (isset(self::$analyses[$dir])) {
             return self::$analyses[$dir];
         }
+        $lock = LockFile::fromFile(self::FIXTURES.$dir.'/composer.lock');
+        $project = ProjectConfig::fromFile(self::FIXTURES.$dir.'/composer.json');
+
+        return self::$analyses[$dir] = self::analyzer()->analyzeWithFacts($lock->packages(false), $lock, $project, false);
+    }
+
+    private static function analyzer(): Analyzer
+    {
         $server = self::$server;
         self::assertNotNull($server);
         $clock = Clock::fixed(self::NOW);
         $auth = ForgeAuth::withTokens(new Tokens('recorded', null));
-        $analyzer = new Analyzer(
+
+        return new Analyzer(
             new RepositoryMetadataLoader($server->repositories(), $clock),
             new ActivityClient(new RecordedHttpClient(self::FIXTURES.'http/github'), $auth),
             new ActivityFetchPlanner($auth),
@@ -114,10 +123,6 @@ final class JsonSchemaConformanceTest extends TestCase
             false,
             new RepositoryAdvisoryLoader($server->repositories())
         );
-        $lock = LockFile::fromFile(self::FIXTURES.$dir.'/composer.lock');
-        $project = ProjectConfig::fromFile(self::FIXTURES.$dir.'/composer.json');
-
-        return self::$analyses[$dir] = $analyzer->analyzeWithFacts($lock->packages(false), $lock, $project, false);
     }
 
     /** @return iterable<string, array{string}> */
@@ -342,6 +347,40 @@ final class JsonSchemaConformanceTest extends TestCase
         foreach ([Schemas::REPORT, Schemas::EXPLAIN, Schemas::BASELINE, Schemas::CONFIG] as $document) {
             yield $document => [$document];
         }
+    }
+
+    /**
+     * A lock-only run: lockrot needs no composer.json ({@see ProjectConfig::fromFile()}), and
+     * without one there are no direct requirements, so nothing reaches any package and every
+     * finding carries an empty chain. wallabag's lock has 200 of them, and the document has to
+     * validate all the same — the published schema cannot demand a chain the run cannot have.
+     */
+    public function testALockWithoutItsComposerJsonValidates(): void
+    {
+        $server = self::$server;
+        self::assertNotNull($server);
+        $lock = LockFile::fromFile(self::FIXTURES.'apps/wallabag_wallabag/composer.lock');
+        $analysis = self::analyzer()->analyzeWithFacts($lock->packages(false), $lock, ProjectConfig::empty(), false);
+
+        $json = (new JsonFormatter())->format($analysis->report());
+
+        $decoded = json_decode($json, true);
+        self::assertIsArray($decoded);
+        $findings = JsonPath::arrayAt($decoded, ['findings']);
+        self::assertNotSame([], $findings);
+        foreach ($findings as $finding) {
+            self::assertIsArray($finding);
+            self::assertSame([], $finding['chain'], 'no root, so no chain reaches the package');
+            self::assertFalse($finding['direct']);
+        }
+        $this->assertValid(Schemas::REPORT, $json, 'a lock without its composer.json');
+        $this->assertValid(Schemas::REPORT, $json, 'a lock without its composer.json', true);
+
+        $first = $analysis->report()->findings()[0];
+        $facts = $analysis->facts($first->package());
+        self::assertNotNull($facts);
+        $explanation = new Explanation($first, $facts, new Thresholds(), '8.4', $analysis->report());
+        $this->assertValid(Schemas::EXPLAIN, (new ExplainFormatter())->json($explanation), 'an explanation without a chain');
     }
 
     /**

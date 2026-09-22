@@ -473,9 +473,8 @@
           }
         },
         "chain": {
-          "description": "From the direct requirement down to this package; one element when it is direct.",
+          "description": "From the direct requirement down to this package; one element when it is direct. Empty when no direct requirement reaches the package: a run over a composer.lock with no composer.json beside it has no direct requirements at all, and a lock can hold a package only the skipped require-dev asks for.",
           "type": "array",
-          "minItems": 1,
           "items": {
             "$ref": "#/definitions/packageName"
           }
