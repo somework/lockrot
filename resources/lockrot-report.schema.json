@@ -751,7 +751,7 @@
       }
     },
     "s5": {
-      "description": "Released before the target PHP's GA with an open-ended php constraint.",
+      "description": "Written for an older PHP major and released before the target's major existed, with a php constraint that admits the target only because it has no upper bound.",
       "type": "object",
       "required": [
         "target_php",
@@ -763,11 +763,23 @@
         "target_php": {
           "type": "string"
         },
+        "target_major": {
+          "description": "The first release of the target's major, `8.0` for a target of `8.4`; its GA is the date the release is held against. Optional: documents written before 0.11.0 do not carry it.",
+          "type": "string"
+        },
         "ga_date": {
+          "description": "GA of target_major. Documents written before 0.11.0 carry the target minor's GA here instead, and no target_major.",
           "$ref": "#/definitions/date"
         },
         "php_constraint": {
           "type": "string"
+        },
+        "written_for_php": {
+          "description": "The PHP major of the constraint's lower bound, null when it has none (`*`). Optional: documents written before 0.11.0 do not carry it.",
+          "type": [
+            "integer",
+            "null"
+          ]
         },
         "released": {
           "$ref": "#/definitions/dateTime"

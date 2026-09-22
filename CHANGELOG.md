@@ -55,6 +55,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the replacement and links it on the card. Both fields are optional in the schemas. See
   [Abandoned, and where to](docs/verdicts.md#abandoned-and-where-to).
 
+### Changed
+
+- **`old-promise` reads the date against the target's major, not its minor.** S5 held a release
+  against the GA of the target PHP minor: anything older than 2024-11-21 with a `>=7.x` constraint
+  was an old promise about PHP 8.4. That caught the wrong thing. A `>=7.2` cut in 2022 was written
+  with PHP 8.1 on every CI matrix and differs from a `^7.2 || ^8.0` of the same day in spelling
+  alone, yet only the first was flagged — and the evidence blamed the style (`has no upper bound`),
+  which is Symfony's own convention. The line is now the GA of the target's major (8.0,
+  2020-11-26, for any 8.x target): the release predates the major it admits, and its constraint was
+  written for an older one. On the weekly watch that is 22 of the 178 `old-promise` verdicts the
+  minor line produced; the other 156 were releases of the PHP 8 era. The evidence reads `released
+  2020-01-11 for PHP 5 (php ">=5.3.2"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4
+  untested`. In `--format=json` the signal's `ga_date` is now the major's, next to a new
+  `target_major`, and `written_for_php` names the constraint's lower major. The verdict, its
+  priority and `--fail-on` are unchanged; a project's count of `old-promise` will drop.
+
 ## [0.10.0] - 2026-09-22
 
 ### Security

@@ -263,12 +263,14 @@ final class AnalyzerTest extends TestCase
         foreach ($report->findings() as $finding) {
             $byName[$finding->package()] = $finding;
         }
-        // vendor/direct is released 2024-01-10 with an open-ended "php": ">=7.4" constraint, which
-        // predates the PHP 8.4 GA (2024-11-21) used as targetPhp below, so S5 fires and the verdict
-        // is OLD_PROMISE rather than OK. The mini fixture is shared with
-        // LockFileTest/DependencyGraphTest/ProjectConfigTest, so the interaction is documented here
-        // instead of edited into the fixture.
-        self::assertSame(Verdict::OLD_PROMISE, $byName['vendor/direct']->verdict());
+        // vendor/direct is released 2024-01-10 with an open-ended "php": ">=7.4" constraint. That is
+        // after PHP 8.0's GA (2020-11-26), the line S5 reads for a target of 8.4: a release of the
+        // PHP 8 era is no old promise about PHP 8, so S5 stays quiet and the verdict is OK. (Until
+        // 0.11.0 the line was the target minor's own GA, 2024-11-21, and this was OLD_PROMISE.)
+        // vendor/transitive, released 2015 with ">=5.3.0", is the old promise here — under `silent`,
+        // which outranks it. The mini fixture is shared with LockFileTest/DependencyGraphTest/
+        // ProjectConfigTest, so the interaction is documented here instead of edited into the fixture.
+        self::assertSame(Verdict::OK, $byName['vendor/direct']->verdict());
         self::assertSame(Verdict::SILENT, $byName['vendor/transitive']->verdict());
         self::assertSame(['vendor/direct', 'vendor/transitive'], $byName['vendor/transitive']->chain());
         self::assertNotNull($byName['vendor/transitive']->dataDate());
@@ -279,24 +281,24 @@ final class AnalyzerTest extends TestCase
         self::assertSame(4, $report->packagesChecked());
         self::assertSame(1, $report->notFromComposerRepository());
         self::assertFalse($report->hadNetworkFailures());
-        // Sort order is priority desc, then severity desc, then direct first, then name asc. Priority
-        // outranks the verdict here: vendor/snapshot is PINNED(40) but nothing in the lock reaches it,
-        // so its chain is empty, it counts as transitive and its `high` base drops to `medium` — below
-        // vendor/direct, which is only OLD_PROMISE(30) but is a root require and stays `high`.
+        // Sort order is priority desc, then severity desc, then direct first, then name asc.
+        // vendor/snapshot is PINNED(40) but nothing in the lock reaches it, so its chain is empty, it
+        // counts as transitive and its `high` base drops to `medium`; the two unflagged rows follow,
+        // UNKNOWN(10) ahead of OK(0).
         self::assertSame(Priority::HIGH, $byName['vendor/transitive']->priority());
-        self::assertSame(Priority::HIGH, $byName['vendor/direct']->priority());
+        self::assertSame(Priority::NONE, $byName['vendor/direct']->priority());
         self::assertSame([], $byName['vendor/snapshot']->chain());
         self::assertSame(Priority::MEDIUM, $byName['vendor/snapshot']->priority());
         self::assertSame(Priority::NONE, $byName['private/thing']->priority());
-        self::assertSame(['vendor/transitive', 'vendor/direct', 'vendor/snapshot', 'private/thing'], array_map(static fn ($f) => $f->package(), $report->findings()));
+        self::assertSame(['vendor/transitive', 'vendor/snapshot', 'private/thing', 'vendor/direct'], array_map(static fn ($f) => $f->package(), $report->findings()));
         self::assertNotEmpty(array_filter($report->notes(), static fn (string $n): bool => strpos($n, 'GitHub token not set') !== false));
         // Transitive exposure: vendor/direct is the one root and pulls in the silent package, so it
-        // carries S7 next to its own S5 — with the verdict and priority it had without it.
+        // carries S7 — with the verdict and priority it had without it.
         self::assertSame(['vendor/direct'], $byName['vendor/transitive']->directDependents());
         self::assertSame(['vendor/direct'], $byName['vendor/direct']->directDependents());
         self::assertSame([], $byName['vendor/snapshot']->directDependents());
-        self::assertSame(['S5', 'S7'], array_map(static fn ($s) => $s->id(), $byName['vendor/direct']->signals()));
-        self::assertStringEndsWith('; pulls in 1 flagged package: vendor/transitive (silent)', $byName['vendor/direct']->evidence());
+        self::assertSame(['S7'], array_map(static fn ($s) => $s->id(), $byName['vendor/direct']->signals()));
+        self::assertSame('pulls in 1 flagged package: vendor/transitive (silent)', $byName['vendor/direct']->evidence(), 'nothing observed about the package itself, only what it pulls in');
         self::assertSame(['vendor/direct' => 1], $report->exposure());
     }
 

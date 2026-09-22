@@ -430,8 +430,9 @@ final class LockrotCommandTest extends TestCase
         [, $stdout] = $this->runRecordingWriteOptions(['--format' => 'json', '--target-php' => '8.4'], $this->loader());
 
         self::assertIsArray(json_decode($stdout, true), $stdout);
-        // the wallabag lock is full of open-ended php constraints, which is where a `<` shows up
-        self::assertStringContainsString('php constraint', $stdout);
+        // the wallabag lock is full of open-ended php constraints, quoted in S5's evidence, which is where a `<` or a `>` shows up
+        self::assertStringContainsString('admits 8.4 untested', $stdout);
+        self::assertStringContainsString('(php \\">=', $stdout);
     }
 
     /** The block sums what the run analysed: `--dev` adds the development packages to it, and nothing else moves. */
@@ -621,7 +622,8 @@ final class LockrotCommandTest extends TestCase
         $display = $tester->getDisplay();
 
         self::assertSame(1, $code, $display);
-        self::assertStringStartsWith('### lockrot: dependency rot in 83 of 200 packages', $display);
+        // 51 flagged: 0.11.0 moved S5's line to PHP 8.0's GA, and 32 of wallabag's old-promise rows were PHP 8-era releases.
+        self::assertStringStartsWith('### lockrot: dependency rot in 51 of 200 packages', $display);
         self::assertStringContainsString('| Package | Version | Verdict | Evidence | Via |', $display);
     }
 
