@@ -21,13 +21,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `furthest_behind`. The table and markdown footers print one line (`libyears: 171.3 behind
   across 195 of 200 packages · 111.7 from direct requirements · furthest behind smalot/pdfparser
   v1.1.0 at 4.7`); the HTML page shows the total in its ledger, a sortable column, and the counts
-  by reason on the Run tab. It is laid over the verdicts, not one of them: it counts every drift,
+  by reason on the Run tab; `--explain` prints the package's own value under its verdict, or the
+  reason it was not measured. It is laid over the verdicts, not one of them: it counts every drift,
   healthy patches included, and enters no priority, `--fail-on` or baseline. The schemas gain the
   fields under the same number, optional so that older documents still validate. No new request
   is made: both dates were already in the data. A split package's installed version is dated by
   its monorepo parent's tag of the same version, not by the lock: the lock copies the date
   Packagist gave the split's tag, the commit its tags share, and illuminate/contracts v8.83.27
-  would read as 4.65 libyears behind for 3.75. That holds for an installed tag on a shared commit
+  would read as 4.65 libyears behind for 3.75. `--explain` prints that date as `installed release`
+  and names the monorepo it came from. That holds for an installed tag on a shared commit
   under a branch whose newest tag has a commit of its own, as after a change to the split's
   directory: the parent is asked for the installed version, not only for the branch. `--explain`
   says whose date it is under

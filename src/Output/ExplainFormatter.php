@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Output;
 
+use Lockrot\Analyzer\Libyears;
 use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Data\Repository\RepositoryUrl;
 use Lockrot\Explain\Explanation;
@@ -84,6 +85,11 @@ final class ExplainFormatter
         if ($finding->note() !== null) {
             $lines[] = self::INDENT.self::escape('note: '.$finding->note());
         }
+        // Last in the block: where the package is unmeasured, the note above is usually the reason.
+        $libyears = $finding->libyears();
+        $lines[] = self::INDENT.self::escape($libyears === null
+            ? 'libyears not measured: '.Libyears::reasonWords($finding)
+            : \sprintf('libyears %.1F behind the newest stable release', $libyears));
 
         return $lines;
     }
@@ -218,6 +224,10 @@ final class ExplainFormatter
             $lines[] = self::INDENT.self::escape('source '.RepositoryUrl::withoutCredentials($metadata->repositoryUrl()));
         }
         $lines[] = self::INDENT.self::escape($this->lastRelease($metadata, $explanation));
+        $installed = $this->installedRelease($explanation, $metadata);
+        if ($installed !== null) {
+            $lines[] = self::INDENT.self::escape($installed);
+        }
         foreach ($this->branchTable($explanation) as $line) {
             $lines[] = self::INDENT.self::escape($line);
         }
@@ -243,6 +253,29 @@ final class ExplainFormatter
         }
 
         return \sprintf('last stable release unknown: the highest tag%s has no release date, so S2 does not measure the package', $highest === '' ? '' : ' '.$highest);
+    }
+
+    /**
+     * When the installed version released, where the lock's own `time` is not the answer: the
+     * monorepo parent's tag of the same version dates it ({@see Libyears::installedReleaseAt()}),
+     * or nothing does although the lock carries a date — a split package's `time` is the date of
+     * the commit its tags share, and measuring from it would add that artefact to the libyears.
+     * Null when the lock's date is the one read, which the block above already prints.
+     */
+    private function installedRelease(Explanation $explanation, PackageMetadata $metadata): ?string
+    {
+        $package = $explanation->facts()->package();
+        $datedBy = Libyears::installedReleaseDatedBy($package, $metadata);
+        $at = Libyears::installedReleaseAt($package, $metadata);
+        // $datedBy names the parent only where its date is the one read, so $at is that date.
+        if ($datedBy !== null && $at !== null) {
+            return \sprintf('installed release %s (%s, dated by %s)', $package->version(), $at->format('Y-m-d'), $datedBy);
+        }
+        if ($at !== null || $package->time() === null) {
+            return null;
+        }
+
+        return \sprintf('installed release %s undated: the lock dates it %s, a commit its tags share, not a release', $package->version(), $package->time()->format('Y-m-d'));
     }
 
     /** @return list<string> */

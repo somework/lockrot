@@ -248,6 +248,22 @@ final class Libyears
         return self::NO_STABLE_RELEASE_DATE;
     }
 
+    /**
+     * {@see reasonFor()} in the words a reader gets, rather than the key the report counts under.
+     * Every key has one: the map is over {@see REASONS}.
+     */
+    public static function reasonWords(Finding $finding): string
+    {
+        $words = [
+            self::BRANCH_SNAPSHOT => 'branch snapshot',
+            self::NO_STABLE_RELEASE_DATE => 'no release date lockrot trusts',
+            self::NOT_FROM_COMPOSER_REPOSITORY => 'not from a Composer repository',
+            self::METADATA_UNAVAILABLE => 'metadata unavailable',
+        ];
+
+        return $words[self::reasonFor($finding)];
+    }
+
     /** The sum over every measured package, unrounded. */
     public function total(): float
     {
