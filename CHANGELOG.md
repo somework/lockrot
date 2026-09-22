@@ -51,7 +51,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   carries `replacement` in `--format=json` — the named package when it is a Composer package name,
   null otherwise, the free text staying in the evidence as text — the document carries
   `"abandoned": {"total", "with_replacement"}` next to `counts`, the summary line reads
-  `abandoned 19 (6 with a replacement)` where that is not zero, and the HTML page tags the row with
+  `abandoned 7 (6 with a replacement)` where that is not zero, and the HTML page tags the row with
   the replacement and links it on the card. Both fields are optional in the schemas. See
   [Abandoned, and where to](docs/verdicts.md#abandoned-and-where-to).
 
