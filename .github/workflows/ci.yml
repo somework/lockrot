@@ -153,6 +153,23 @@ jobs:
         with: {python-version-file: .python-version, cache: pip, cache-dependency-path: docs/requirements.txt}
       - run: pip install -r docs/requirements.txt
       - run: mkdocs build --strict
+  # The corpus checks read lockrot's output against the data lockrot read, and the thing that can
+  # go wrong with them is that they quietly stop reading it: a renamed field, a skip path that
+  # swallows the population, a branch somebody deleted. This job is what proves they still check
+  # something — every problem key a check can emit has a recorded document mutated to make exactly
+  # that key come out, or a dated reason why no mutation can reach it. It does not watch lockrot:
+  # the recorded pages are frozen at their recording date, and a sentence reworded in src/Output/
+  # surfaces at the next re-record or on the next corpus run, as `unparsable`. Deliberately the
+  # opposite of a corpus run: no network, no token, no clock, nothing installed (the tool is
+  # stdlib-only Python, as CONTRIBUTING says the node checks are stdlib-only node).
+  corpus-selftest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with: {python-version-file: .python-version}
+      - run: python -m compileall -q tools/corpus
+      - run: python -m unittest discover -s tools/corpus/tests -t tools/corpus/tests
   e2e:
     runs-on: ubuntu-latest
     steps:
