@@ -1,0 +1,99 @@
+{
+  "$schema": "https://lockrot.dev/schema/explain-1.json",
+  "lockrot": {
+    "version": "0.11.0",
+    "schema": 1
+  },
+  "package": "drupal/core",
+  "version": "dev-main",
+  "finding": {
+    "package": "drupal/core",
+    "version": "dev-main",
+    "verdict": "pinned",
+    "priority": "high",
+    "direct": true,
+    "dev": false,
+    "replacement": null,
+    "signals": [
+      {
+        "id": "S6",
+        "level": "warn",
+        "summary": "pinned to branch snapshot dev-main",
+        "data": {
+          "version": "dev-main"
+        }
+      },
+      {
+        "id": "S7",
+        "level": "info",
+        "summary": "pulls in 3 flagged packages: pear/console_getopt (silent), drupal/core-composer-scaffold (pinned), pear/pear_exception (stale)",
+        "data": {
+          "flagged": 3,
+          "packages": [
+            {
+              "package": "pear/console_getopt",
+              "verdict": "silent",
+              "chain": [
+                "drupal/core",
+                "pear/archive_tar",
+                "pear/pear-core-minimal",
+                "pear/console_getopt"
+              ]
+            },
+            {
+              "package": "drupal/core-composer-scaffold",
+              "verdict": "pinned",
+              "chain": [
+                "drupal/core",
+                "drupal/core-composer-scaffold"
+              ]
+            },
+            {
+              "package": "pear/pear_exception",
+              "verdict": "stale",
+              "chain": [
+                "drupal/core",
+                "pear/archive_tar",
+                "pear/pear-core-minimal",
+                "pear/pear_exception"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "chain": [
+      "drupal/core"
+    ],
+    "direct_dependents": [
+      "drupal/core"
+    ],
+    "evidence": "pinned to branch snapshot dev-main; pulls in 3 flagged packages: pear/console_getopt (silent), drupal/core-composer-scaffold (pinned), pear/pear_exception (stale)",
+    "allowlist_reason": null,
+    "note": "not from a Composer repository, not checked",
+    "data_date": null,
+    "libyears": null
+  },
+  "lock": {
+    "php": ">=8.5.0",
+    "released": null,
+    "repository": null,
+    "from_composer_repository": false,
+    "dev": false,
+    "branch_snapshot": true,
+    "type": "drupal-core"
+  },
+  "metadata": null,
+  "activity": null,
+  "thresholds": {
+    "release-warn-years": 3,
+    "release-high-years": 5,
+    "push-warn-years": 3,
+    "push-high-years": 5
+  },
+  "target_php": "8.4",
+  "generated_at": "2026-09-23T08:38:15+00:00",
+  "notes": [
+    "5 packages are not from a Composer repository and were not checked"
+  ]
+}

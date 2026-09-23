@@ -1,0 +1,229 @@
+{
+  "_comment": "Recorded findings, one per shape the claims checks must reach. Written by tools/corpus/record; never edited by hand.",
+  "cases": [
+    {
+      "covers": "a tag on a commit its siblings share, left unmeasured",
+      "project": "BookStackApp_BookStack",
+      "package": "symfony/polyfill-ctype",
+      "finding": {
+        "package": "symfony/polyfill-ctype",
+        "version": "v1.37.0",
+        "verdict": "finished",
+        "priority": "none",
+        "direct": false,
+        "dev": false,
+        "replacement": null,
+        "signals": [],
+        "chain": [
+          "laravel/framework",
+          "symfony/http-kernel",
+          "symfony/polyfill-ctype"
+        ],
+        "direct_dependents": [
+          "laravel/framework",
+          "laravel/tinker",
+          "league/flysystem-aws-s3-v3"
+        ],
+        "evidence": "",
+        "allowlist_reason": "polyfills for older PHP versions; intentionally frozen once the target PHP is covered",
+        "note": null,
+        "data_date": "2026-09-23T08:10:26+00:00",
+        "libyears": null,
+        "baseline": null
+      }
+    },
+    {
+      "covers": "a clean measured package, both ends dated",
+      "project": "BookStackApp_BookStack",
+      "package": "socialiteproviders/discord",
+      "finding": {
+        "package": "socialiteproviders/discord",
+        "version": "4.2.0",
+        "verdict": "stale",
+        "priority": "medium",
+        "direct": true,
+        "dev": false,
+        "replacement": null,
+        "signals": [
+          {
+            "id": "S2",
+            "level": "warn",
+            "summary": "last release 2023-07-24 (3.2 years ago)",
+            "data": {
+              "last_release": "2023-07-24T23:28:47+00:00",
+              "last_version": "4.2.0",
+              "years": 3.2,
+              "dated_by": null
+            }
+          }
+        ],
+        "chain": [
+          "socialiteproviders/discord"
+        ],
+        "direct_dependents": [
+          "socialiteproviders/discord"
+        ],
+        "evidence": "last release 2023-07-24 (3.2 years ago)",
+        "allowlist_reason": null,
+        "note": null,
+        "data_date": "2026-09-23T08:10:26+00:00",
+        "libyears": 0,
+        "baseline": null
+      }
+    },
+    {
+      "covers": "a version a monorepo parent dates",
+      "project": "gh_espocrm_espocrm",
+      "package": "illuminate/collections",
+      "finding": {
+        "package": "illuminate/collections",
+        "version": "v12.51.0",
+        "verdict": "ok",
+        "priority": "none",
+        "direct": false,
+        "dev": false,
+        "replacement": null,
+        "signals": [],
+        "chain": [
+          "directorytree/imapengine",
+          "illuminate/collections"
+        ],
+        "direct_dependents": [
+          "directorytree/imapengine"
+        ],
+        "evidence": "",
+        "allowlist_reason": null,
+        "note": null,
+        "data_date": "2026-09-23T08:11:41+00:00",
+        "libyears": 0.61,
+        "baseline": null
+      }
+    },
+    {
+      "covers": "an S2 signal that credits no parent",
+      "project": "BookStackApp_BookStack",
+      "package": "socialiteproviders/gitlab",
+      "finding": {
+        "package": "socialiteproviders/gitlab",
+        "version": "4.1.0",
+        "verdict": "stale",
+        "priority": "medium",
+        "direct": true,
+        "dev": false,
+        "replacement": null,
+        "signals": [
+          {
+            "id": "S2",
+            "level": "high",
+            "summary": "last release 2020-12-01 (5.8 years ago)",
+            "data": {
+              "last_release": "2020-12-01T23:10:59+00:00",
+              "last_version": "4.1.0",
+              "years": 5.8,
+              "dated_by": null
+            }
+          }
+        ],
+        "chain": [
+          "socialiteproviders/gitlab"
+        ],
+        "direct_dependents": [
+          "socialiteproviders/gitlab"
+        ],
+        "evidence": "last release 2020-12-01 (5.8 years ago)",
+        "allowlist_reason": null,
+        "note": null,
+        "data_date": "2026-09-23T08:10:26+00:00",
+        "libyears": 0,
+        "baseline": null
+      }
+    },
+    {
+      "covers": "an S10 entry about undated releases",
+      "project": "gh_SuiteCRM_SuiteCRM",
+      "package": "phootwork/collection",
+      "finding": {
+        "package": "phootwork/collection",
+        "version": "v3.2.3",
+        "verdict": "ok",
+        "priority": "none",
+        "direct": false,
+        "dev": false,
+        "replacement": null,
+        "signals": [
+          {
+            "id": "S10",
+            "level": "info",
+            "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 and S8 could not measure it",
+            "data": {
+              "unchecked": [
+                {
+                  "check": "release_dates",
+                  "reason": "undated_releases",
+                  "blocks": [
+                    "S2",
+                    "S8"
+                  ]
+                }
+              ],
+              "blocks": [
+                "S2",
+                "S8"
+              ]
+            }
+          }
+        ],
+        "chain": [
+          "consolidation/robo",
+          "phpowermove/docblock",
+          "phootwork/collection"
+        ],
+        "direct_dependents": [
+          "consolidation/robo"
+        ],
+        "evidence": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 and S8 could not measure it",
+        "allowlist_reason": null,
+        "note": null,
+        "data_date": "2026-09-23T08:10:59+00:00",
+        "libyears": null,
+        "baseline": null
+      }
+    },
+    {
+      "covers": "a package whose p2 document carries an __unset sentinel",
+      "project": "BookStackApp_BookStack",
+      "package": "guzzlehttp/guzzle",
+      "finding": {
+        "package": "guzzlehttp/guzzle",
+        "version": "7.15.5",
+        "verdict": "ok",
+        "priority": "none",
+        "direct": true,
+        "dev": false,
+        "replacement": null,
+        "signals": [],
+        "chain": [
+          "guzzlehttp/guzzle"
+        ],
+        "direct_dependents": [
+          "guzzlehttp/guzzle",
+          "laravel/framework",
+          "laravel/socialite",
+          "league/flysystem-aws-s3-v3",
+          "league/oauth2-client",
+          "socialiteproviders/discord",
+          "socialiteproviders/gitlab",
+          "socialiteproviders/microsoft-azure",
+          "socialiteproviders/okta",
+          "socialiteproviders/twitch"
+        ],
+        "evidence": "",
+        "allowlist_reason": null,
+        "note": null,
+        "data_date": "2026-09-23T08:10:26+00:00",
+        "libyears": 0.04,
+        "baseline": null
+      }
+    }
+  ]
+}

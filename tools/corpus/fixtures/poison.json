@@ -1,0 +1,446 @@
+{
+  "_comment": "Positive controls. Each entry names a recorded fixture, a mutation applied to its JSON at test time, and the exact problem key that must come out. Mutations touch the JSON half only — the recorded page stays byte-for-byte what lockrot printed, so a check that has stopped producing its own key, or collapsed into `unparsable`, goes red here. Every key a check can emit must appear either here or in `unreachable_by_mutation`, and the test reads those keys out of the check modules' source rather than from a list kept by hand — so a branch nobody poisoned cannot be deleted with the suite still green, which is the hole this tool exists to close, reopened one branch at a time.",
+  "poisons": [
+    {
+      "check": "A1",
+      "kind": "claim",
+      "from": "symfony/polyfill-ctype",
+      "mutate": [
+        {
+          "path": "libyears",
+          "set": 1.5
+        }
+      ],
+      "outcome": "problem",
+      "expect": "libyears measured from a commit three tags share"
+    },
+    {
+      "check": "A2",
+      "kind": "claim",
+      "from": "socialiteproviders/discord",
+      "mutate": [
+        {
+          "path": "libyears",
+          "set": null
+        }
+      ],
+      "outcome": "problem",
+      "expect": "libyears left unmeasured with both ends dated"
+    },
+    {
+      "check": "A3",
+      "kind": "claim",
+      "from": "socialiteproviders/discord",
+      "mutate": [
+        {
+          "path": "libyears",
+          "set": 9.99
+        }
+      ],
+      "outcome": "problem",
+      "expect": "the libyears reported is not the difference between the two dates"
+    },
+    {
+      "check": "A4",
+      "kind": "claim",
+      "from": "socialiteproviders/gitlab",
+      "mutate": [
+        {
+          "path": "signals.0.data.last_release",
+          "set": "2011-03-04T00:00:00+00:00"
+        }
+      ],
+      "outcome": "problem",
+      "expect": "the last_release S2 names is not the newest release this tool finds"
+    },
+    {
+      "check": "A5",
+      "kind": "claim",
+      "from": "socialiteproviders/discord",
+      "mutate": [
+        {
+          "path": "signals",
+          "set": [
+            {
+              "id": "S10",
+              "data": {
+                "unchecked": [
+                  {
+                    "check": "release_dates",
+                    "reason": "undated_releases"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "outcome": "problem",
+      "expect": "S10 says the releases carry no date, and this tool dates the newest one"
+    },
+    {
+      "check": "C1",
+      "kind": "pair",
+      "from": "BookStackApp_BookStack@aws_aws-crt-php",
+      "mutate": [
+        {
+          "path": "finding.libyears",
+          "set": null
+        }
+      ],
+      "outcome": "problem",
+      "expect": "the text measures libyears the JSON leaves null"
+    },
+    {
+      "check": "C2",
+      "kind": "pair",
+      "from": "BookStackApp_BookStack@symfony_polyfill-uuid",
+      "mutate": [
+        {
+          "path": "metadata.installed_release",
+          "set": "2026-04-10T00:00:00+00:00"
+        }
+      ],
+      "outcome": "problem",
+      "expect": "a commit date is also read as the release",
+      "note": "The shipped guzzlehttp/guzzle bug, reproduced: the page calls the day a commit three tags share while the document reads that same day as the installed release with nobody credited for it."
+    },
+    {
+      "check": "C2",
+      "kind": "pair",
+      "from": "BookStackApp_BookStack@aws_aws-crt-php",
+      "mutate": [
+        {
+          "path": "metadata.installed_release",
+          "set": null
+        }
+      ],
+      "outcome": "problem",
+      "expect": "the text calls the lock date a release, the JSON dates no release"
+    },
+    {
+      "check": "C3a",
+      "kind": "pair",
+      "from": "gh_espocrm_espocrm@illuminate_macroable",
+      "mutate": [
+        {
+          "path": "metadata.installed_release_dated_by",
+          "set": "acme/not-the-parent"
+        }
+      ],
+      "outcome": "problem",
+      "expect": "the sentence credits another parent"
+    },
+    {
+      "check": "C3a",
+      "kind": "pair",
+      "from": "BookStackApp_BookStack@aws_aws-crt-php",
+      "mutate": [
+        {
+          "path": "metadata.installed_release_dated_by",
+          "set": "laravel/framework"
+        }
+      ],
+      "outcome": "unparsable",
+      "expect": "the JSON names a parent but the text has no sentence saying so",
+      "note": "The loudness mechanism itself: the document now says a parent dated this release, the page never said so, and the check reports that rather than passing over it."
+    },
+    {
+      "check": "C3b",
+      "kind": "pair",
+      "from": "BookStackApp_BookStack@symfony_polyfill-ctype",
+      "mutate": [
+        {
+          "path": "lock.released",
+          "set": "2019-01-02T03:04:05+00:00"
+        }
+      ],
+      "outcome": "problem",
+      "expect": "the undated sentence prints a day the lock does not carry"
+    },
+    {
+      "check": "C4",
+      "kind": "pair",
+      "from": "BookStackApp_BookStack@bacon_bacon-qr-code",
+      "mutate": [
+        {
+          "path": "metadata.branches.0.installed",
+          "set": true
+        },
+        {
+          "path": "metadata.branches.1.installed",
+          "set": true
+        },
+        {
+          "path": "metadata.branches.2.installed",
+          "set": true
+        }
+      ],
+      "outcome": "problem",
+      "expect": "more than one branch marked installed in the JSON"
+    },
+    {
+      "check": "C4",
+      "kind": "pair",
+      "from": "BookStackApp_BookStack@bacon_bacon-qr-code",
+      "mutate": [
+        {
+          "path": "metadata.branches.0.installed",
+          "set": false
+        },
+        {
+          "path": "metadata.branches.1.installed",
+          "set": false
+        },
+        {
+          "path": "metadata.branches.2.installed",
+          "set": false
+        }
+      ],
+      "outcome": "problem",
+      "expect": "the table marks a different number of rows than the JSON does",
+      "note": "A count comparison rather than a presence test: this is the direction that makes a broken branch-row pattern report instead of pass."
+    },
+    {
+      "check": "C5",
+      "kind": "pair",
+      "from": "BookStackApp_BookStack@aws_aws-crt-php",
+      "mutate": [
+        {
+          "path": "finding.replacement",
+          "set": "aws/aws-crt-php"
+        }
+      ],
+      "outcome": "problem",
+      "expect": "the JSON says the package replaces itself"
+    },
+    {
+      "check": "C6",
+      "kind": "pair",
+      "from": "gh_SuiteCRM_SuiteCRM@phootwork_collection",
+      "mutate": [
+        {
+          "path": "finding.signals",
+          "set": []
+        }
+      ],
+      "outcome": "problem",
+      "expect": "S10 is in one of the two renderings only"
+    },
+    {
+      "check": "A4",
+      "kind": "claim",
+      "from": "socialiteproviders/gitlab",
+      "mutate": [
+        {
+          "path": "signals.0.data.last_release",
+          "set": "the day before yesterday"
+        }
+      ],
+      "outcome": "problem",
+      "expect": "S2 names a last_release that is not a timestamp"
+    },
+    {
+      "check": "A4",
+      "kind": "claim",
+      "from": "phootwork/collection",
+      "mutate": [
+        {
+          "path": "signals",
+          "set": [
+            {
+              "id": "S10",
+              "data": {
+                "unchecked": [
+                  {
+                    "check": "release_dates",
+                    "reason": "undated_releases"
+                  }
+                ]
+              }
+            },
+            {
+              "id": "S2",
+              "data": {
+                "dated_by": null,
+                "last_release": "2020-01-01T00:00:00+00:00"
+              }
+            }
+          ]
+        }
+      ],
+      "outcome": "problem",
+      "expect": "S2 on a package whose newest release this tool does not trust",
+      "note": "A package lockrot could not date the newest release of cannot also have an S2 that names one."
+    },
+    {
+      "check": "C1",
+      "kind": "pair",
+      "from": "BookStackApp_BookStack@aws_aws-crt-php",
+      "mutate": [
+        {
+          "path": "finding.libyears",
+          "set": 5.0
+        }
+      ],
+      "outcome": "problem",
+      "expect": "the libyears in the text is not the one in the JSON"
+    },
+    {
+      "check": "C1",
+      "kind": "pair",
+      "from": "BookStackApp_BookStack@symfony_polyfill-php80",
+      "mutate": [
+        {
+          "path": "finding.libyears",
+          "set": 1.0
+        }
+      ],
+      "outcome": "problem",
+      "expect": "the text says libyears was not measured, the JSON carries a number"
+    },
+    {
+      "check": "C2",
+      "kind": "pair",
+      "from": "BookStackApp_BookStack@aws_aws-crt-php",
+      "mutate": [
+        {
+          "path": "metadata.installed_release",
+          "set": "2019-01-02T03:04:05+00:00"
+        },
+        {
+          "path": "lock.released",
+          "set": "2019-01-02T03:04:05+00:00"
+        }
+      ],
+      "outcome": "problem",
+      "expect": "the text calls the lock date a release, the JSON reads another day"
+    },
+    {
+      "check": "C2",
+      "kind": "pair",
+      "from": "BookStackApp_BookStack@bacon_bacon-qr-code",
+      "mutate": [
+        {
+          "path": "lock.released",
+          "set": "2019-01-02T03:04:05+00:00"
+        }
+      ],
+      "outcome": "problem",
+      "expect": "the day printed is not the lock entry date"
+    },
+    {
+      "check": "C2",
+      "kind": "pair",
+      "from": "gh_librenms_librenms@librenms_laravel-vue-i18n-generator",
+      "mutate": [
+        {
+          "path": "lock.branch_snapshot",
+          "set": false
+        }
+      ],
+      "outcome": "problem",
+      "expect": "a commit date on something that is not a branch snapshot"
+    },
+    {
+      "check": "C2",
+      "kind": "pair",
+      "from": "gh_librenms_librenms@librenms_laravel-vue-i18n-generator",
+      "mutate": [
+        {
+          "path": "metadata.installed_release",
+          "set": "2026-09-10T00:00:00+00:00"
+        }
+      ],
+      "outcome": "problem",
+      "expect": "a branch snapshot with a release date"
+    },
+    {
+      "check": "C3a",
+      "kind": "pair",
+      "from": "gh_espocrm_espocrm@illuminate_macroable",
+      "mutate": [
+        {
+          "path": "version",
+          "set": "v9.9.9"
+        }
+      ],
+      "outcome": "problem",
+      "expect": "the sentence names another version"
+    },
+    {
+      "check": "C3a",
+      "kind": "pair",
+      "from": "gh_espocrm_espocrm@illuminate_macroable",
+      "mutate": [
+        {
+          "path": "metadata.installed_release",
+          "set": "2019-01-02T03:04:05+00:00"
+        }
+      ],
+      "outcome": "problem",
+      "expect": "the sentence prints a date that is not installed_release"
+    },
+    {
+      "check": "C3b",
+      "kind": "pair",
+      "from": "BookStackApp_BookStack@aws_aws-crt-php",
+      "mutate": [
+        {
+          "path": "metadata.installed_release",
+          "set": null
+        }
+      ],
+      "outcome": "unparsable",
+      "expect": "the JSON dates no release but the text does not say the version is undated"
+    },
+    {
+      "check": "C4",
+      "kind": "pair",
+      "from": "gh_librenms_librenms@librenms_laravel-vue-i18n-generator",
+      "mutate": [
+        {
+          "path": "metadata.branches",
+          "set": [
+            {
+              "key": "1",
+              "installed": true
+            }
+          ]
+        }
+      ],
+      "outcome": "problem",
+      "expect": "a branch snapshot marked as sitting on a release branch"
+    }
+  ],
+  "unreachable_by_mutation": {
+    "_comment": "Problem keys that no mutation of a document can produce, because they are the checks noticing that the PAGE no longer says what it said. A poison only ever changes the JSON — changing the recorded text would make the fixture stop being lockrot's output and would defeat the whole arrangement — so these are reachable only by a real rewording, which is what the corpus run reports as `unparsable`. Declared here with a date so the gap is a line somebody reads rather than a silence.",
+    "recorded_on": "2026-09-23",
+    "keys": [
+      {
+        "key": "no libyears line in the text at all",
+        "why": "fires when the header this check reads is gone from the page"
+      },
+      {
+        "key": "the composer.lock line is not in a shape this check knows",
+        "why": "fires when none of the four registered forms of that line matches the page"
+      },
+      {
+        "key": "the header both measures libyears and says it did not",
+        "why": "needs a page carrying both header lines at once, which no renderer produces"
+      },
+      {
+        "key": "the text says to migrate to the package itself",
+        "why": "needs a page carrying the `migrate to` clause; see catalog.MIGRATE_TO, which no target in the 283-pair corpus renders"
+      },
+      {
+        "key": "the replacement named in the text is not the one in the JSON",
+        "why": "the same clause, for the same reason"
+      },
+      {
+        "key": "the text calls the lock entry undated, the JSON dates it",
+        "why": "C2 declines a document with no metadata block, and every one of the 6 pairs whose page reads `· undated` is metadata-less — a lock entry with no date is one the repository never answered for. The branch is kept because nothing guarantees that pairing"
+      }
+    ]
+  }
+}

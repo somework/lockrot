@@ -1,0 +1,103 @@
+{
+  "$schema": "https://lockrot.dev/schema/explain-1.json",
+  "lockrot": {
+    "version": "0.11.0",
+    "schema": 1
+  },
+  "package": "librenms/laravel-vue-i18n-generator",
+  "version": "dev-master",
+  "finding": {
+    "package": "librenms/laravel-vue-i18n-generator",
+    "version": "dev-master",
+    "verdict": "pinned",
+    "priority": "high",
+    "direct": true,
+    "dev": false,
+    "replacement": null,
+    "signals": [
+      {
+        "id": "S2",
+        "level": "warn",
+        "summary": "last release 2022-10-11 (4.0 years ago)",
+        "data": {
+          "last_release": "2022-10-11T14:28:22+00:00",
+          "last_version": "0.1.48",
+          "years": 4,
+          "dated_by": null
+        }
+      },
+      {
+        "id": "S6",
+        "level": "warn",
+        "summary": "pinned to branch snapshot dev-master",
+        "data": {
+          "version": "dev-master"
+        }
+      }
+    ],
+    "chain": [
+      "librenms/laravel-vue-i18n-generator"
+    ],
+    "direct_dependents": [
+      "librenms/laravel-vue-i18n-generator"
+    ],
+    "evidence": "pinned to branch snapshot dev-master; last release 2022-10-11 (4.0 years ago)",
+    "allowlist_reason": null,
+    "note": null,
+    "data_date": "2026-09-23T09:10:59+00:00",
+    "libyears": null
+  },
+  "lock": {
+    "php": ">=5.5.0",
+    "released": "2025-04-24T09:00:15+00:00",
+    "repository": "https://github.com/librenms/laravel-vue-i18n-generator.git",
+    "from_composer_repository": true,
+    "dev": false,
+    "branch_snapshot": true,
+    "type": "library"
+  },
+  "metadata": {
+    "abandoned": false,
+    "replacement": null,
+    "releases_listed": 49,
+    "has_stable_release": true,
+    "last_stable_release": "2022-10-11T14:28:22+00:00",
+    "last_stable_version": "0.1.48",
+    "last_stable_dated_by": null,
+    "installed_release": null,
+    "installed_release_dated_by": null,
+    "repository": "https://github.com/librenms/laravel-vue-i18n-generator.git",
+    "type": "library",
+    "data_date": "2026-09-23T09:10:59+00:00",
+    "branches": [
+      {
+        "branch": "0.1.x",
+        "installed": false,
+        "highest": "0.1.48",
+        "highest_released": "2022-10-11T14:28:22+00:00",
+        "highest_commit_date": null,
+        "newest_dated": "0.1.48",
+        "newest_dated_released": "2022-10-11T14:28:22+00:00",
+        "dated_by": null,
+        "php": ">=5.5.0"
+      }
+    ]
+  },
+  "activity": {
+    "forge": "GitHub",
+    "repository": "librenms/laravel-vue-i18n-generator",
+    "archived": false,
+    "pushed_at": "2026-09-22T15:43:26+00:00",
+    "fetched_at": "2026-09-22T18:53:17+00:00",
+    "from_cache": true
+  },
+  "thresholds": {
+    "release-warn-years": 3,
+    "release-high-years": 5,
+    "push-warn-years": 3,
+    "push-high-years": 5
+  },
+  "target_php": "8.4",
+  "generated_at": "2026-09-23T09:10:59+00:00",
+  "notes": []
+}

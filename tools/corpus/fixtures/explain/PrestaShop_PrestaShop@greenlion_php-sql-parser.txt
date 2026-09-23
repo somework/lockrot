@@ -1,0 +1,19 @@
+greenlion/php-sql-parser v4.7.0 — unknown, priority none
+  direct requirement
+  note: not from a Composer repository, not checked
+  libyears not measured: not from a Composer repository
+
+signals: none
+
+composer.lock
+  version v4.7.0 · php >=5.3.2 · released 2024-11-29 · not from a Composer repository
+  source https://github.com/PrestaShop/PHP-SQL-Parser.git
+
+repository metadata
+  none — not from a Composer repository, not checked
+
+repository activity
+  not fetched — S3 and S4 have nothing to read; the run's notes below say why when a cap or a failure is the cause
+
+thresholds: release-warn-years 3 · release-high-years 5 · push-warn-years 3 · push-high-years 5 · target PHP 8.4
+note: 2 packages are not from a Composer repository and were not checked

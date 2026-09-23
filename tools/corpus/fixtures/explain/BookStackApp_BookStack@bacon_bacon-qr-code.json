@@ -1,0 +1,105 @@
+{
+  "$schema": "https://lockrot.dev/schema/explain-1.json",
+  "lockrot": {
+    "version": "0.11.0",
+    "schema": 1
+  },
+  "package": "bacon/bacon-qr-code",
+  "version": "v3.1.1",
+  "finding": {
+    "package": "bacon/bacon-qr-code",
+    "version": "v3.1.1",
+    "verdict": "ok",
+    "priority": "none",
+    "direct": true,
+    "dev": false,
+    "replacement": null,
+    "signals": [],
+    "chain": [
+      "bacon/bacon-qr-code"
+    ],
+    "direct_dependents": [
+      "bacon/bacon-qr-code"
+    ],
+    "evidence": "",
+    "allowlist_reason": null,
+    "note": null,
+    "data_date": "2026-09-23T08:30:00+00:00",
+    "libyears": 0
+  },
+  "lock": {
+    "php": "^8.1",
+    "released": "2026-04-05T21:06:35+00:00",
+    "repository": "https://github.com/Bacon/BaconQrCode.git",
+    "from_composer_repository": true,
+    "dev": false,
+    "branch_snapshot": false,
+    "type": "library"
+  },
+  "metadata": {
+    "abandoned": false,
+    "replacement": null,
+    "releases_listed": 20,
+    "has_stable_release": true,
+    "last_stable_release": "2026-04-05T21:06:35+00:00",
+    "last_stable_version": "v3.1.1",
+    "last_stable_dated_by": null,
+    "installed_release": "2026-04-05T21:06:35+00:00",
+    "installed_release_dated_by": null,
+    "repository": "https://github.com/Bacon/BaconQrCode.git",
+    "type": "library",
+    "data_date": "2026-09-23T08:30:00+00:00",
+    "branches": [
+      {
+        "branch": "3.x",
+        "installed": true,
+        "highest": "v3.1.1",
+        "highest_released": "2026-04-05T21:06:35+00:00",
+        "highest_commit_date": null,
+        "newest_dated": "v3.1.1",
+        "newest_dated_released": "2026-04-05T21:06:35+00:00",
+        "dated_by": null,
+        "php": "^8.1"
+      },
+      {
+        "branch": "2.x",
+        "installed": false,
+        "highest": "2.0.8",
+        "highest_released": "2022-12-07T17:46:57+00:00",
+        "highest_commit_date": null,
+        "newest_dated": "2.0.8",
+        "newest_dated_released": "2022-12-07T17:46:57+00:00",
+        "dated_by": null,
+        "php": "^7.1 || ^8.0"
+      },
+      {
+        "branch": "1.x",
+        "installed": false,
+        "highest": "1.0.3",
+        "highest_released": "2017-10-17T09:59:25+00:00",
+        "highest_commit_date": null,
+        "newest_dated": "1.0.3",
+        "newest_dated_released": "2017-10-17T09:59:25+00:00",
+        "dated_by": null,
+        "php": "^5.4|^7.0"
+      }
+    ]
+  },
+  "activity": {
+    "forge": "GitHub",
+    "repository": "Bacon/BaconQrCode",
+    "archived": false,
+    "pushed_at": "2026-09-16T01:33:33+00:00",
+    "fetched_at": "2026-09-22T18:50:48+00:00",
+    "from_cache": true
+  },
+  "thresholds": {
+    "release-warn-years": 3,
+    "release-high-years": 5,
+    "push-warn-years": 3,
+    "push-high-years": 5
+  },
+  "target_php": "8.4",
+  "generated_at": "2026-09-23T08:30:00+00:00",
+  "notes": []
+}

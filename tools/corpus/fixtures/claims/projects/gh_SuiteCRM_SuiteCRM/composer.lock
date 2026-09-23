@@ -1,0 +1,60 @@
+{
+  "packages": [
+    {
+      "name": "phootwork/collection",
+      "version": "v3.2.3",
+      "source": {
+        "type": "git",
+        "url": "https://github.com/phootwork/collection.git",
+        "reference": "46dde20420fba17766c89200bc3ff91d3e58eafa"
+      },
+      "dist": {
+        "type": "zip",
+        "url": "https://api.github.com/repos/phootwork/collection/zipball/46dde20420fba17766c89200bc3ff91d3e58eafa",
+        "reference": "46dde20420fba17766c89200bc3ff91d3e58eafa",
+        "shasum": ""
+      },
+      "require": {
+        "phootwork/lang": "^3.0",
+        "php": ">=8.0"
+      },
+      "type": "library",
+      "autoload": {
+        "psr-4": {
+          "phootwork\\collection\\": ""
+        }
+      },
+      "notification-url": "https://packagist.org/downloads/",
+      "license": [
+        "MIT"
+      ],
+      "authors": [
+        {
+          "name": "Thomas Gossmann",
+          "homepage": "http://gos.si"
+        }
+      ],
+      "description": "The phootwork library fills gaps in the php language and provides better solutions than the existing ones php offers.",
+      "homepage": "https://phootwork.github.io/collection/",
+      "keywords": [
+        "Array object",
+        "Text object",
+        "collection",
+        "collections",
+        "json",
+        "list",
+        "map",
+        "queue",
+        "set",
+        "stack",
+        "xml"
+      ],
+      "support": {
+        "issues": "https://github.com/phootwork/phootwork/issues",
+        "source": "https://github.com/phootwork/collection/tree/v3.2.3"
+      },
+      "time": "2022-08-27T12:51:24+00:00"
+    }
+  ],
+  "packages-dev": []
+}

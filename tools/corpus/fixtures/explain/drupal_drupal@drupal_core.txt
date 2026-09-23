@@ -1,0 +1,23 @@
+drupal/core dev-main — pinned, priority high
+  direct requirement
+  note: not from a Composer repository, not checked
+  libyears not measured: not from a Composer repository
+
+signals
+  S6 warn pinned to branch snapshot dev-main
+           version dev-main
+  S7 info pulls in 3 flagged packages: pear/console_getopt (silent), drupal/core-composer-scaffold (pinned), pear/pear_exception (stale)
+           flagged 3
+           packages [{"package":"pear/console_getopt","verdict":"silent","chain":["drupal/core","pear/archive_tar","pear/pear-core-minimal","pear/console_getopt"]},{"package":"drupal/core-composer-scaffold","verdict":"pinned","chain":["drupal/core","drupal/core-composer-scaffold"]},{"package":"pear/pear_exception","verdict":"stale","chain":["drupal/core","pear/archive_tar","pear/pear-core-minimal","pear/pear_exception"]}]
+
+composer.lock
+  version dev-main · php >=8.5.0 · undated · not from a Composer repository · branch snapshot
+
+repository metadata
+  none — not from a Composer repository, not checked
+
+repository activity
+  not fetched — S3 and S4 have nothing to read; the run's notes below say why when a cap or a failure is the cause
+
+thresholds: release-warn-years 3 · release-high-years 5 · push-warn-years 3 · push-high-years 5 · target PHP 8.4
+note: 5 packages are not from a Composer repository and were not checked

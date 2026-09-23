@@ -1,0 +1,27 @@
+{
+  "findings": [
+    {
+      "package": "illuminate/collections",
+      "version": "v12.51.0",
+      "verdict": "ok",
+      "priority": "none",
+      "direct": false,
+      "dev": false,
+      "replacement": null,
+      "signals": [],
+      "chain": [
+        "directorytree/imapengine",
+        "illuminate/collections"
+      ],
+      "direct_dependents": [
+        "directorytree/imapengine"
+      ],
+      "evidence": "",
+      "allowlist_reason": null,
+      "note": null,
+      "data_date": "2026-09-23T08:11:41+00:00",
+      "libyears": 0.61,
+      "baseline": null
+    }
+  ]
+}

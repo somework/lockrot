@@ -1,0 +1,50 @@
+{
+  "findings": [
+    {
+      "package": "phootwork/collection",
+      "version": "v3.2.3",
+      "verdict": "ok",
+      "priority": "none",
+      "direct": false,
+      "dev": false,
+      "replacement": null,
+      "signals": [
+        {
+          "id": "S10",
+          "level": "info",
+          "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 and S8 could not measure it",
+          "data": {
+            "unchecked": [
+              {
+                "check": "release_dates",
+                "reason": "undated_releases",
+                "blocks": [
+                  "S2",
+                  "S8"
+                ]
+              }
+            ],
+            "blocks": [
+              "S2",
+              "S8"
+            ]
+          }
+        }
+      ],
+      "chain": [
+        "consolidation/robo",
+        "phpowermove/docblock",
+        "phootwork/collection"
+      ],
+      "direct_dependents": [
+        "consolidation/robo"
+      ],
+      "evidence": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 and S8 could not measure it",
+      "allowlist_reason": null,
+      "note": null,
+      "data_date": "2026-09-23T08:10:59+00:00",
+      "libyears": null,
+      "baseline": null
+    }
+  ]
+}

@@ -1,0 +1,129 @@
+{
+  "findings": [
+    {
+      "package": "symfony/polyfill-ctype",
+      "version": "v1.37.0",
+      "verdict": "finished",
+      "priority": "none",
+      "direct": false,
+      "dev": false,
+      "replacement": null,
+      "signals": [],
+      "chain": [
+        "laravel/framework",
+        "symfony/http-kernel",
+        "symfony/polyfill-ctype"
+      ],
+      "direct_dependents": [
+        "laravel/framework",
+        "laravel/tinker",
+        "league/flysystem-aws-s3-v3"
+      ],
+      "evidence": "",
+      "allowlist_reason": "polyfills for older PHP versions; intentionally frozen once the target PHP is covered",
+      "note": null,
+      "data_date": "2026-09-23T08:10:26+00:00",
+      "libyears": null,
+      "baseline": null
+    },
+    {
+      "package": "socialiteproviders/discord",
+      "version": "4.2.0",
+      "verdict": "stale",
+      "priority": "medium",
+      "direct": true,
+      "dev": false,
+      "replacement": null,
+      "signals": [
+        {
+          "id": "S2",
+          "level": "warn",
+          "summary": "last release 2023-07-24 (3.2 years ago)",
+          "data": {
+            "last_release": "2023-07-24T23:28:47+00:00",
+            "last_version": "4.2.0",
+            "years": 3.2,
+            "dated_by": null
+          }
+        }
+      ],
+      "chain": [
+        "socialiteproviders/discord"
+      ],
+      "direct_dependents": [
+        "socialiteproviders/discord"
+      ],
+      "evidence": "last release 2023-07-24 (3.2 years ago)",
+      "allowlist_reason": null,
+      "note": null,
+      "data_date": "2026-09-23T08:10:26+00:00",
+      "libyears": 0,
+      "baseline": null
+    },
+    {
+      "package": "socialiteproviders/gitlab",
+      "version": "4.1.0",
+      "verdict": "stale",
+      "priority": "medium",
+      "direct": true,
+      "dev": false,
+      "replacement": null,
+      "signals": [
+        {
+          "id": "S2",
+          "level": "high",
+          "summary": "last release 2020-12-01 (5.8 years ago)",
+          "data": {
+            "last_release": "2020-12-01T23:10:59+00:00",
+            "last_version": "4.1.0",
+            "years": 5.8,
+            "dated_by": null
+          }
+        }
+      ],
+      "chain": [
+        "socialiteproviders/gitlab"
+      ],
+      "direct_dependents": [
+        "socialiteproviders/gitlab"
+      ],
+      "evidence": "last release 2020-12-01 (5.8 years ago)",
+      "allowlist_reason": null,
+      "note": null,
+      "data_date": "2026-09-23T08:10:26+00:00",
+      "libyears": 0,
+      "baseline": null
+    },
+    {
+      "package": "guzzlehttp/guzzle",
+      "version": "7.15.5",
+      "verdict": "ok",
+      "priority": "none",
+      "direct": true,
+      "dev": false,
+      "replacement": null,
+      "signals": [],
+      "chain": [
+        "guzzlehttp/guzzle"
+      ],
+      "direct_dependents": [
+        "guzzlehttp/guzzle",
+        "laravel/framework",
+        "laravel/socialite",
+        "league/flysystem-aws-s3-v3",
+        "league/oauth2-client",
+        "socialiteproviders/discord",
+        "socialiteproviders/gitlab",
+        "socialiteproviders/microsoft-azure",
+        "socialiteproviders/okta",
+        "socialiteproviders/twitch"
+      ],
+      "evidence": "",
+      "allowlist_reason": null,
+      "note": null,
+      "data_date": "2026-09-23T08:10:26+00:00",
+      "libyears": 0.04,
+      "baseline": null
+    }
+  ]
+}
