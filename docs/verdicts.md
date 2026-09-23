@@ -452,7 +452,7 @@ verdict nor a priority, for a pipeline that wants to hear about the workflow tha
 One number for how far behind the whole lock is, laid over the verdicts rather than added to them:
 
 ```text
-libyears: 171.3 behind across 195 of 200 packages · 111.7 from direct requirements ·
+libyears: 171.3 behind across 194 of 200 packages · 111.7 from direct requirements ·
 furthest behind smalot/pdfparser v1.1.0 at 4.7
 ```
 
