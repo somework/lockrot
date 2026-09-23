@@ -1,6 +1,6 @@
 ---
 title: lockrot example run — a 200-package composer.lock report
-description: "One complete lockrot run against wallabag's public 200-package composer.lock: the table output, the same run as JSON, and what a clean run looks like."
+description: "One complete lockrot run against wallabag's public 200-package composer.lock: the table output, the same lock as JSON, and what a clean run looks like."
 ---
 
 # Example run
@@ -124,7 +124,7 @@ high (37)
                last release 2015-05-14 (11.4 years ago); last push 2020-04-01 (6.5 years ago); released 2015-05-14 for
                PHP 5 (php ">=5.0"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
   silent       phpzip/phpzip 2.0.8  via wallabag/phpepub
-               last release 2015-11-16 (10.8 years ago); last push 2015-11-16 (10.8 years ago); released 2015-11-16 for
+               last release 2015-11-16 (10.9 years ago); last push 2015-11-16 (10.9 years ago); released 2015-11-16 for
                PHP 5 (php ">=5.3.0"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
   silent       pragmarx/random v0.2.2  via pragmarx/recovery
                last release 2017-11-21 (8.8 years ago); last push 2017-12-18 (8.8 years ago); released 2017-11-21 for
@@ -151,7 +151,8 @@ high (37)
                follow
   left-behind  scheb/2fa-backup-code v5.13.2  direct
                branch 5.x last released 2022-01-03 (4.7 years ago); 7.x released v7.14.0 (2026-01-24); require ^7.14 to
-               follow; pulls in 1 flagged package: symfony/security-guard (abandoned)
+               follow; the age of the package was not read (its newest releases are dated by a commit their tags share),
+               so S2 and S8 could not measure it; pulls in 1 flagged package: symfony/security-guard (abandoned)
   left-behind  scheb/2fa-bundle v5.13.2  direct
                branch 5.x last released 2022-04-16 (4.4 years ago); 8.x released v8.6.1 (2026-07-10), needs php ~8.4.0
                || ~8.5.0 above the project's php >=8.2; 7.x released v7.14.0 (2026-06-12); require ^7.14 to follow;
@@ -161,11 +162,13 @@ high (37)
                follow; pulls in 1 flagged package: symfony/security-guard (abandoned)
   left-behind  scheb/2fa-google-authenticator v5.13.2  direct
                branch 5.x last released 2022-01-03 (4.7 years ago); 7.x released v7.14.0 (2026-01-24); require ^7.14 to
-               follow; pulls in 3 flagged packages: symfony/security-guard (abandoned), spomky-labs/otphp (left-behind),
-               thecodingmachine/safe (left-behind)
+               follow; the age of the package was not read (its newest releases are dated by a commit their tags share),
+               so S2 and S8 could not measure it; pulls in 3 flagged packages: symfony/security-guard (abandoned),
+               spomky-labs/otphp (left-behind), thecodingmachine/safe (left-behind)
   left-behind  scheb/2fa-trusted-device v5.13.2  direct
                branch 5.x last released 2022-01-03 (4.7 years ago); 7.x released v7.14.0 (2026-01-24); require ^7.14 to
-               follow; pulls in 1 flagged package: symfony/security-guard (abandoned)
+               follow; the age of the package was not read (its newest releases are dated by a commit their tags share),
+               so S2 and S8 could not measure it; pulls in 1 flagged package: symfony/security-guard (abandoned)
   left-behind  spomky-labs/otphp v10.0.3  via scheb/2fa-google-authenticator
                branch 10.x last released 2022-03-17 (4.5 years ago); 11.x released 11.5.0 (2026-06-06); 2 security
                advisories affect v10.0.3 (PKSA-kbc7-dq62-pt7d, PKSA-qv5y-crcz-9nxw); fixed by 11.5.0; no fix expected on
@@ -207,14 +210,14 @@ low (4)
 200 packages checked · abandoned 19 · silent 8 · pinned 4 · left-behind 12 · old-promise 1 · stale 7 ·
 unknown 0 · finished 18 · ok 131
 priority: critical 3 · high 37 · medium 7 · low 4
-libyears: 171.3 behind across 195 of 200 packages · 111.7 from direct requirements ·
+libyears: 171.3 behind across 194 of 200 packages · 111.7 from direct requirements ·
 furthest behind smalot/pdfparser v1.1.0 at 4.7
 pulled in by: wallabag/rulerz-bundle 15 · wallabag/rulerz 14 · wallabag/phpepub 5 ·
 scheb/2fa-google-authenticator 3 · friendsofsymfony/oauth-server-bundle 2 · … and 20 more
-Data as of 2026-09-22 (package repositories, repository hosts). Run composer lockrot --format=json for details.
+Data as of 2026-09-23 (package repositories, repository hosts). Run composer lockrot --format=json for details.
 ```
 
-## The same run as JSON
+## The same lock as JSON
 
 `--format=json` is the only format that carries every field. Below is the document header and the
 first finding, complete except for signals S3, S4 and S7, and for the rest of the `exposure`
@@ -227,7 +230,7 @@ list, which `…` stands in for:
         "version": "0.11.0",
         "schema": 1
     },
-    "generated_at": "2026-09-22T10:53:03+00:00",
+    "generated_at": "2026-09-23T08:32:48+00:00",
     "run": {
         "project": "wallabag/wallabag",
         "target_php": "8.4",
@@ -291,12 +294,12 @@ list, which `…` stands in for:
         …
     ],
     "libyears": {
-        "total": 171.32,
-        "direct_requirements": 111.69,
-        "measured": 195,
+        "total": 171.34,
+        "direct_requirements": 111.72,
+        "measured": 194,
         "unmeasured": {
             "branch_snapshot": 4,
-            "no_stable_release_date": 1,
+            "no_stable_release_date": 2,
             "not_from_composer_repository": 0,
             "metadata_unavailable": 0
         },
@@ -348,7 +351,7 @@ list, which `…` stands in for:
             "evidence": "marked abandoned by its repository, replacement: Symfony; repository archived on GitHub; last release 2023-02-24 (3.6 years ago); last push 2023-02-24 (3.6 years ago); pulls in 1 flagged package: doctrine/annotations (abandoned)",
             "allowlist_reason": null,
             "note": null,
-            "data_date": "2026-09-22T10:53:03+00:00",
+            "data_date": "2026-09-23T08:32:48+00:00",
             "libyears": 0,
             "baseline": null
         },
@@ -378,7 +381,7 @@ No dependency rot found in 20 packages.
 finished 11 · ok 9
 libyears: 0.9 behind across all 20 packages · 0.0 from direct requirements ·
 furthest behind laminas/laminas-httphandlerrunner 2.13.0 at 0.9
-Data as of 2026-09-22 (package repositories, repository hosts). Run composer lockrot --format=json for details.
+Data as of 2026-09-23 (package repositories, repository hosts). Run composer lockrot --format=json for details.
 ```
 
 The `priority:` line is printed only when the run flagged something, so a clean run does not carry
