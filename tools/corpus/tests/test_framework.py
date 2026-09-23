@@ -132,10 +132,6 @@ class TheOutputCarriesItsPopulation(unittest.TestCase):
         self.assertEqual(PROBLEMS, exit_code(census))
 
 
-if __name__ == '__main__':
-    unittest.main()
-
-
 class TheLibyearsPopulation(unittest.TestCase):
     """The aggregate that exists because no single row reports it — and had no test of its own."""
 
@@ -183,3 +179,7 @@ class TheLibyearsPopulation(unittest.TestCase):
         floored = [(-value, value) for value in [0.004, 0.003, 0.002, 0.001] * 200]
         keys = [key for key, _ in self._errors(floored)]
         self.assertNotIn('libyears errs in one direction far more often than rounding would', keys)
+
+
+if __name__ == '__main__':
+    unittest.main()

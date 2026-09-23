@@ -96,6 +96,37 @@ class Resume(unittest.TestCase):
         self.assertNotIn('not-a-real-token', str(manifest),
                          'the token itself must never reach a recorded file')
 
+    def test_the_run_records_what_it_set_out_to_cover_before_it_covers_any_of_it(self):
+        """A target reaches the manifest when the run reaches it; the intent has to be there first.
+
+        Otherwise a run killed at the 35th of 39 projects holds 35 records and nothing anywhere
+        names the other four — not the status list, not a file, not the directory.
+        """
+        os.makedirs(os.path.join(self.projects, 'b-project'))
+        write_text_atomic(os.path.join(self.projects, 'b-project', 'composer.lock'), '{}')
+        manifest = self._run()
+        self.assertEqual(['a-project', 'b-project'], manifest['intended'])
+
+    def test_a_resumed_run_stops_claiming_the_first_run_s_finish(self):
+        """`finished` used to survive a resume, so a second interruption kept the first completion."""
+        first = self._run()
+        self.assertIsNotNone(first['finished'])
+        write_text_atomic(os.path.join(self.out, 'a-project.json'), '{"findings": [ ')
+        recorded = []
+
+        def die(*args, **kwargs):
+            recorded.append(read_json(os.path.join(self.out, 'run.json')))
+            raise KeyboardInterrupt
+
+        saved, runner.subprocess.run = runner.subprocess.run, die
+        try:
+            with self.assertRaises(KeyboardInterrupt):
+                self._run()
+        finally:
+            runner.subprocess.run = saved
+        self.assertIsNone(recorded[0]['finished'],
+                          'the resumed run still carried the earlier run as finished')
+
     def test_resuming_a_directory_written_by_another_run_is_refused(self):
         self._run()
         with self.assertRaises(runner.RunError) as raised:

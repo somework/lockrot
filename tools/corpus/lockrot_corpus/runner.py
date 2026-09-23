@@ -124,6 +124,10 @@ def new_manifest(kind: str, phar: str, today: str, cache_root: str, anon: bool,
         # Two runs only read the same upstream while they are inside one activity cache lifetime.
         'started': _now(),
         'finished': None,
+        # What this invocation set out to cover, written before it covers any of it. A target only
+        # reaches `targets` once the run reaches it, so without this a run killed partway through
+        # is indistinguishable from a smaller corpus that finished.
+        'intended': [],
         'targets': {},
     }
 
@@ -138,6 +142,17 @@ def _is_complete(manifest: dict, key: str, path: str) -> bool:
         return False
 
     return recorded.get('sha256') is not None and recorded['sha256'] == sha256_file(path)
+
+
+def _begin(manifest: dict, intended: 'Sequence[str]') -> None:
+    """Open this invocation: record what it means to cover and unsay any earlier completion.
+
+    `finished` is cleared on every pass, resume included. It used to survive a resume, so a run that
+    completed, had one output edited, and was then killed on the way back through still carried the
+    first run's timestamp and read as whole.
+    """
+    manifest['finished'] = None
+    manifest['intended'] = list(intended)
 
 
 def _record(manifest: dict, key: str, status: str, path: 'str | None' = None,
@@ -170,6 +185,8 @@ def run_reports(phar: str, projects_dir: str, out_dir: str, cache_root: str, tod
                       if os.path.isfile(os.path.join(projects_dir, name, 'composer.lock')))
     if not projects:
         raise RunError('%s holds no project with a composer.lock' % projects_dir)
+    _begin(manifest, projects)
+    write_json_atomic(os.path.join(out_dir, 'run.json'), manifest)
 
     for project in projects:
         output = os.path.join(out_dir, project + '.json')
@@ -222,6 +239,10 @@ def run_reports(phar: str, projects_dir: str, out_dir: str, cache_root: str, tod
     return manifest
 
 
+def _slug(project: str, package: str) -> str:
+    return '%s@%s' % (project, package.replace('/', '_'))
+
+
 def run_explains(phar: str, projects_dir: str, targets: 'Sequence[tuple[str, str]]', out_dir: str,
                  cache_root: str, today: str, anon: bool = False,
                  timeout: int = EXPLAIN_TIMEOUT, target_php: str = '8.4',
@@ -240,9 +261,11 @@ def run_explains(phar: str, projects_dir: str, targets: 'Sequence[tuple[str, str
     _assert_same_run(manifest, phar, today, cache_root, anon, corpus_digest)
     environment = run_environment(token, cache_root, today)
     environment['COLUMNS'] = EXPLAIN_COLUMNS
+    _begin(manifest, [_slug(project, package) for project, package in targets])
+    write_json_atomic(os.path.join(out_dir, 'run.json'), manifest)
 
     for project, package in targets:
-        slug = '%s@%s' % (project, package.replace('/', '_'))
+        slug = _slug(project, package)
         text_path = os.path.join(out_dir, slug + '.txt')
         json_path = os.path.join(out_dir, slug + '.json')
         recorded = manifest['targets'].get(slug)
