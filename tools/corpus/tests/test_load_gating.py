@@ -98,6 +98,31 @@ class Reports(unittest.TestCase):
         self.assertEqual([], missing)
 
 
+class Pairs(unittest.TestCase):
+    """The same rule on the explain half, where a document is only half of a target."""
+
+    def setUp(self):
+        self.explains = tempfile.mkdtemp(prefix='corpus-pairs-')
+
+    def tearDown(self):
+        shutil.rmtree(self.explains, ignore_errors=True)
+
+    def _pair(self, slug, document, text='a page'):
+        path = os.path.join(self.explains, slug + '.json')
+        if isinstance(document, str):
+            write_text_atomic(path, document)
+        else:
+            write_json_atomic(path, document)
+        write_text_atomic(os.path.join(self.explains, slug + '.txt'), text)
+
+    def test_one_document_that_will_not_parse_does_not_take_the_other_pairs_with_it(self):
+        self._pair('good', {'finding': {'package': 'x/y'}})
+        self._pair('bad', '{"finding": ')
+        pairs, incomplete = load.load_pairs(self.explains)
+        self.assertEqual(['good'], [pair.name for pair in pairs])
+        self.assertEqual(['bad (the document does not parse as one)'], incomplete)
+
+
 class MultiHostPackages(unittest.TestCase):
     """A package cached under two hosts, and the lock entry that says which one served it."""
 
