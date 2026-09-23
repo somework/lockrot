@@ -13,6 +13,7 @@
 /.gitattributes export-ignore
 /bin/record-fixtures export-ignore
 /bin/record-demo export-ignore
+/tools export-ignore
 /docs export-ignore
 /mkdocs.yml export-ignore
 /.python-version export-ignore

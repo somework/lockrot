@@ -18,3 +18,5 @@
 /.playwright-mcp/
 .wrangler/
 /build/*.txt
+/build/corpus/
+__pycache__/
