@@ -105,7 +105,7 @@ consumer usually keys on:
   `unmeasured` (four reasons, every key present) and `furthest_behind`. Added in 0.11.0 under the same schema number, and optional in the schema like
   `run`, so reports written before 0.11.0 still validate; a document from 0.11.0 on always carries
   both. See [verdicts.md](verdicts.md#libyears) for the definition and what the number is not.
-- Each signal's `data` is typed per signal id (`S1` … `S9`): a signal claiming `S2` with `S4`'s
+- Each signal's `data` is typed per signal id (`S1` … `S10`): a signal claiming `S2` with `S4`'s
   fields does not validate.
 - Dates are RFC 3339 strings (`format: date-time`); `ga_date` in S5 and `first_seen` in the
   baseline are plain `YYYY-MM-DD`.

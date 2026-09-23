@@ -170,15 +170,16 @@ final class LibyearsTest extends TestCase
      * and the parent's tag for the installed v5.13.2 is dated too — two years before the newest.
      *
      * @param array<string, string> $parentDates by normalized version
+     * @param array<string, true>   $shared      the normalized versions whose tags share a commit
      */
-    private function splitPackage(array $parentDates, ?string $lastStableDatedBy = 'laravel/framework'): PackageMetadata
+    private function splitPackage(array $parentDates, ?string $lastStableDatedBy = 'laravel/framework', array $shared = ['5.13.2.0' => true]): PackageMetadata
     {
         $dates = [];
         foreach ($parentDates as $version => $at) {
             $dates[$version] = new \DateTimeImmutable($at);
         }
 
-        return new PackageMetadata('illuminate/macroable', false, null, true, new \DateTimeImmutable(self::LATEST), 'v13.31.0', 120, null, 'library', new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), [], [], $lastStableDatedBy, $dates, $dates === [] ? null : 'laravel/framework');
+        return new PackageMetadata('illuminate/macroable', false, null, true, new \DateTimeImmutable(self::LATEST), 'v13.31.0', 120, null, 'library', new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), [], [], $lastStableDatedBy, $dates, $dates === [] ? null : 'laravel/framework', $shared);
     }
 
     private static function twoYearsBefore(string $date): string
@@ -221,9 +222,20 @@ final class LibyearsTest extends TestCase
         self::assertSame(2.0, Libyears::behind($this->package(), $metadata));
     }
 
+    /**
+     * And where no parent dates it either, the lock's date is a commit's and nothing to measure
+     * from. Reading the newest release's own answer instead measured pagerfanta/twig from a date
+     * that was never its release's.
+     */
+    public function testATagOnASharedCommitIsNotMeasuredFromTheLocksDate(): void
+    {
+        self::assertNull(Libyears::behind($this->package(), $this->splitPackage([], null)));
+    }
+
     public function testWithoutAParentAPackageIsMeasuredFromTheLocksDate(): void
     {
-        $metadata = $this->splitPackage([], null);
+        // a tag with a commit to itself: the lock's date is its release's, parent or no parent
+        $metadata = $this->splitPackage([], null, []);
 
         self::assertEquals(new \DateTimeImmutable(self::LOCKED_AT), InstalledRelease::of($this->package(), $metadata)->at());
         self::assertEqualsWithDelta(4.06, Libyears::behind($this->package(), $metadata) ?? 0.0, 0.005);
@@ -231,14 +243,14 @@ final class LibyearsTest extends TestCase
 
     public function testAVersionComposerCannotNormalizeIsMeasuredFromTheLocksDate(): void
     {
-        $metadata = $this->splitPackage(['5.13.2.0' => self::twoYearsBefore(self::LATEST)], null);
+        $metadata = $this->splitPackage(['5.13.2.0' => self::twoYearsBefore(self::LATEST)], null, []);
 
         self::assertEquals(new \DateTimeImmutable(self::LOCKED_AT), InstalledRelease::of($this->package('not a version'), $metadata)->at());
     }
 
     public function testASnapshotHasNoReleaseDateToMeasureFrom(): void
     {
-        $metadata = $this->splitPackage(['5.13.2.0' => self::twoYearsBefore(self::LATEST)], null);
+        $metadata = $this->splitPackage(['5.13.2.0' => self::twoYearsBefore(self::LATEST)], null, []);
 
         self::assertNull(InstalledRelease::of($this->package('dev-main'), $metadata)->at());
         self::assertNull(InstalledRelease::of($this->package('dev-main'), $metadata)->datedBy(), 'the parent dates releases, and a branch is not one');

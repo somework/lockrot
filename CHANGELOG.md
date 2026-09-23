@@ -20,8 +20,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the missing check on the finding, with the reason and the signals it blocked (`repository_activity`
   → S3, S4; `release_dates` → S2, S8). It is informational, like S7 and S9: it never decides a
   verdict, and it is raised only where the missing check could have changed one — never on a package
-  the repository already marks abandoned, nor on an allowlisted one. A run with credentials for
-  every host carries none at all. `--fail-on=unchecked` fails a run that could not check everything,
+  the repository already marks abandoned, nor on an allowlisted one. Credentials for every host take
+  away the `repository_activity` reasons and only those — `release_dates` asks no forge — and a
+  branch snapshot, which is on no release branch, is told about S2 alone.
+  `--fail-on=unchecked` fails a run that could not check everything,
   which is how a pipeline catches the workflow that never passed `GITHUB_TOKEN` through. See
   [What was not checked](docs/verdicts.md#what-was-not-checked).
 
@@ -49,7 +51,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   under a branch whose newest tag has a commit of its own, as after a change to the split's
   directory: the parent is asked for the installed version, not only for the branch. `--explain`
   says whose date it is under
-  `installed_release` and `installed_release_dated_by`, and so does the package card.
+  `installed_release` and `installed_release_dated_by`, and so does the package card. Where no
+  parent dates it, such a tag is not measured at all rather than measured from the commit's date:
+  the installed tag's own entry in the repository decides that, not what dated the package's
+  newest release.
 - **`left-behind` suggests a branch the project can actually move to.** S8 named the newest
   releasing branch and wrote the constraint that follows it, whatever PHP that branch requires:
   Matomo supports `php >=7.2.5`, locks monolog 1.27.1, and was told `require ^3.12` — monolog

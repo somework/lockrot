@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Signal\Rule;
 
+use Lockrot\Data\Repository\ReleaseBranch;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\SignalRule;
@@ -71,10 +72,16 @@ final class NotCheckedRule implements SignalRule
         // fromPackages() hands the newest tag over undated exactly where its date is a commit's,
         // which is the case S2 cannot measure and the branch table marks with `commit …`.
         if ($metadata !== null && $metadata->hasStableRelease() && $metadata->lastStableReleaseAt() === null) {
-            $unchecked[] = ['check' => 'release_dates', 'reason' => 'undated_releases', 'blocks' => [Signal::S2, Signal::S8]];
-            $blocks[] = Signal::S2;
-            $blocks[] = Signal::S8;
-            $summaries[] = 'the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 and S8 could not measure it';
+            // S8 measures the installed version's release branch, and a branch snapshot is on
+            // none, so nothing it could have read is missing there. S2 reads the package's own
+            // newest release whatever the lock installs, and with S4 it is what would have made
+            // the snapshot `silent` rather than `pinned`.
+            $ageBlocks = ReleaseBranch::of($facts->package()->version()) === null ? [Signal::S2] : [Signal::S2, Signal::S8];
+            $unchecked[] = ['check' => 'release_dates', 'reason' => 'undated_releases', 'blocks' => $ageBlocks];
+            foreach ($ageBlocks as $id) {
+                $blocks[] = $id;
+            }
+            $summaries[] = 'the age of the package was not read (its newest releases are dated by a commit their tags share), so '.implode(' and ', $ageBlocks).' could not measure it';
         }
 
         if ($unchecked === []) {

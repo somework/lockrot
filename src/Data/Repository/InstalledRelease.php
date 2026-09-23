@@ -69,9 +69,15 @@ final class InstalledRelease
         if ($time === null) {
             return new self(self::UNDATED, null, null, null);
         }
-        // The package could not date its own newest release either, which is how fromPackages()
-        // reports a tag on a commit its neighbours share: the installed tag is one of those.
-        if ($metadata->lastStableDatedBy() !== null) {
+        // Two readings of the same fact, and either is enough to set the lock's date aside. The
+        // first is the installed tag itself: fromPackages() marks every tag it dates by a commit
+        // the tag's neighbours share. The second is the package — one that could not date its own
+        // newest release and took a parent's is a split, and a split's tags are all dated that
+        // way, including a tag the repository no longer lists for the first reading to mark.
+        // Asking only the second read a commit's date as a release's wherever no parent was
+        // involved: illuminate/contracts v8.83.27 without one, and wallabag's pagerfanta/twig
+        // v4.8.0, whose newest release nothing dates either.
+        if ($metadata->sharesItsCommit($package->version()) || $metadata->lastStableDatedBy() !== null) {
             return new self(self::SHARED_COMMIT, null, $time, null);
         }
 

@@ -358,8 +358,13 @@ final class PackageMetadata
         return $installedVersion !== null && $this->releaseDatesBy === null && $this->sharesItsCommit($installedVersion);
     }
 
-    /** Whether the version, in any form the parser takes, is one of {@see $sharedCommitVersions}. */
-    private function sharesItsCommit(string $version): bool
+    /**
+     * Whether the version, in any form the parser takes, is one of {@see $sharedCommitVersions} —
+     * a tag the repository dates by a commit its neighbours share, so its date is not a release's.
+     * Asked per version: the package's newest release sharing a commit says nothing about an older
+     * installed tag, nor the other way round.
+     */
+    public function sharesItsCommit(string $version): bool
     {
         try {
             return isset($this->sharedCommitVersions[(new VersionParser())->normalize($version)]);

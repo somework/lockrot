@@ -6,6 +6,7 @@ namespace Lockrot\Tests\Integration;
 
 use Lockrot\Allowlist\BuiltinAllowlist;
 use Lockrot\Analyzer\Analyzer;
+use Lockrot\Analyzer\Libyears;
 use Lockrot\Analyzer\Report;
 use Lockrot\Clock;
 use Lockrot\Data\Forge\ActivityClient;
@@ -147,8 +148,10 @@ final class SplitPackageDatesTest extends TestCase
     /**
      * The lock dates v8.83.27 at 2022-01-13 — the commit its 31 tags share; laravel/framework
      * v8.83.27 released 2022-12-08. The package dates its own newest release (v13.32.0,
-     * 2026-09-06, a commit two tags share) so nothing else in the finding needs the parent, and
-     * without one the lock's date would be read as the release's: 4.65 libyears for 3.75.
+     * 2026-09-06, a commit two tags share) so nothing else in the finding needs the parent —
+     * which is exactly the case where reading what dated *that* release says nothing about the
+     * installed tag. Without a parent the 31 tags on one commit are all lockrot has, and a commit
+     * is not a release: the package goes unmeasured rather than 4.65 libyears behind for 3.75.
      */
     public function testTheMonorepoDatesTheInstalledVersionForLibyears(): void
     {
@@ -159,7 +162,7 @@ final class SplitPackageDatesTest extends TestCase
         self::assertNotNull($withParent->libyears());
         self::assertEqualsWithDelta($expected, $withParent->libyears(), 0.0001);
         self::assertEqualsWithDelta(3.75, $withParent->libyears(), 0.005);
-        self::assertNotNull($withoutParent->libyears());
-        self::assertEqualsWithDelta(4.65, $withoutParent->libyears(), 0.005, 'without a parent the lock\'s date is all there is, and it is the shared commit\'s');
+        self::assertNull($withoutParent->libyears(), 'without a parent the lock\'s date is all there is, and it is the shared commit\'s');
+        self::assertSame('no release date lockrot trusts', Libyears::reasonWords($withoutParent));
     }
 }

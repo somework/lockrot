@@ -116,6 +116,31 @@ final class NotCheckedRuleTest extends TestCase
         self::assertStringContainsString('; ', $signal->summary(), 'one sentence per missing check');
     }
 
+    /**
+     * S8 reads the installed version's release branch, and a branch snapshot is on none
+     * ({@see \Lockrot\Data\Repository\ReleaseBranch::of()}), so the missing dates block S2 alone.
+     * S2 is still worth naming: with S4 it is what turns `pinned` into `silent`.
+     */
+    public function testASnapshotsMissingDatesBlockTheAgeSignalOnly(): void
+    {
+        $signal = $this->rule()->evaluate(new PackageFacts(F::package(['version' => 'dev-main']), self::undated(), F::activity(false, '2026-09-01T00:00:00+00:00'), []));
+
+        self::assertNotNull($signal);
+        self::assertSame([Signal::S2], $signal->data()['blocks']);
+        self::assertSame([['check' => 'release_dates', 'reason' => 'undated_releases', 'blocks' => [Signal::S2]]], $signal->data()['unchecked']);
+        self::assertStringContainsString('so S2 could not measure it', $signal->summary());
+        self::assertStringNotContainsString('S8', $signal->summary());
+    }
+
+    public function testAVersionOnAReleaseBranchBlocksBothAgeSignals(): void
+    {
+        $signal = $this->rule()->evaluate(new PackageFacts(F::package(['version' => 'v1.2.0']), self::undated(), F::activity(false, '2026-09-01T00:00:00+00:00'), []));
+
+        self::assertNotNull($signal);
+        self::assertSame([Signal::S2, Signal::S8], $signal->data()['blocks']);
+        self::assertStringContainsString('so S2 and S8 could not measure it', $signal->summary());
+    }
+
     public function testAPackageWithoutMetadataIsNotToldItsAgeWasNotRead(): void
     {
         // Nothing is known about it at all, which is what `unknown` says; the run's notes carry why.
