@@ -84,22 +84,31 @@ def refresh(repo_root: str, today: str, only: 'Sequence[str] | None' = None) -> 
                 note('%s: no longer resolves; marked unavailable and kept' % owner_repo)
                 changed += 1
             continue
-        if project.get('unavailable'):
-            project.pop('unavailable')
-            changed += 1
+        # The marker is dropped only once both files are in hand. Dropping it here and setting it
+        # again below counted two changes and rewrote the date on every single refresh, for a
+        # project whose files are simply still missing — and a file rewritten by a refresh that
+        # found nothing new is the one thing this function promises never to do.
         digests = {}
+        absent = None
         for name in FILES:
             body = _fetch_raw(owner_repo, commit, name)
             if body is None:
                 digests = None
+                absent = name
                 break
             digests[name] = {'sha256': sha256_bytes(body), 'bytes': len(body)}
         if digests is None:
             # The commit resolved, so the repository is reachable; this file is genuinely not in it.
-            project['unavailable'] = today
-            note('%s: %s missing at %s; marked unavailable' % (owner_repo, ', '.join(FILES), commit[:12]))
-            changed += 1
+            # The date kept is the day it first went missing, which is the only one worth having.
+            if not project.get('unavailable'):
+                project['unavailable'] = today
+                note('%s: %s missing at %s; marked unavailable' % (owner_repo, absent, commit[:12]))
+                changed += 1
             continue
+        if project.get('unavailable'):
+            note('%s: back, and both files are there again' % owner_repo)
+            project.pop('unavailable')
+            changed += 1
         if project.get('commit') != commit:
             note('%s: %s -> %s' % (owner_repo, (project.get('commit') or 'unpinned')[:12], commit[:12]))
             changed += 1

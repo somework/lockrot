@@ -24,8 +24,21 @@ REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__fi
 DEFAULT_WORK = os.path.join(REPO_ROOT, 'build', 'corpus')
 
 
+class _Parser(argparse.ArgumentParser):
+    """argparse, but a usage error exits 3 rather than 2.
+
+    argparse's own default is 2, which is this tool's "I cannot tell you whether it is clean" — so
+    `corpus run` with no --phar used to report the same code as a corrupt cached document. The
+    subparsers inherit this class: add_subparsers defaults parser_class to type(self).
+    """
+
+    def error(self, message: str) -> 'NoReturn':
+        self.print_usage(sys.stderr)
+        self.exit(report.USAGE, '%s: error: %s\n' % (self.prog, message))
+
+
 def main(argv: 'list[str]') -> int:
-    parser = argparse.ArgumentParser(prog='corpus', add_help=True)
+    parser = _Parser(prog='corpus', add_help=True)
     parser.add_argument('--work', default=DEFAULT_WORK,
                         help='where the corpus, the cache and the runs live (default build/corpus)')
     sub = parser.add_subparsers(dest='command')
@@ -80,6 +93,12 @@ def main(argv: 'list[str]') -> int:
     except (CorpusDataError, load.LoadError, runner.RunError, manifest.ManifestError,
             fetch.FetchError, diff.NotComparable) as error:
         report.note('cannot continue: %s' % error)
+
+        return report.CANNOT_TELL
+    except checks.FrameworkError as error:
+        # A bug in this tool, not a finding about lockrot. Left to escape it exits 1, which is the
+        # code that says the audited output has problems — the one answer it has no right to give.
+        report.note('this tool is broken, not the output it read: %s' % error)
 
         return report.CANNOT_TELL
 
@@ -179,6 +198,9 @@ def _audit(options: argparse.Namespace) -> 'tuple[checks.Census, str | None]':
         if run_manifest is None:
             missing.append('%s has no run manifest, so nothing records which projects were attempted'
                            % reports_dir)
+        elif run_manifest.get('finished') is None:
+            missing.append('%s was never recorded as finished, so it was interrupted and this is '
+                           'whatever it got through' % reports_dir)
         for project in absent:
             report.note('no report to audit: %s' % project)
         if absent:
@@ -191,7 +213,11 @@ def _audit(options: argparse.Namespace) -> 'tuple[checks.Census, str | None]':
         scopes.append('%d findings from %s' % (len(found), reports_dir))
     if options.explain_out:
         explain_dir = os.path.join(options.work, 'explains', options.explain_out)
-        pairs, incomplete = load.load_pairs(explain_dir, runner.load_manifest(explain_dir))
+        explain_manifest = runner.load_manifest(explain_dir)
+        pairs, incomplete = load.load_pairs(explain_dir, explain_manifest)
+        if explain_manifest is not None and explain_manifest.get('finished') is None:
+            missing.append('%s was never recorded as finished, so it was interrupted and this is '
+                           'whatever it got through' % explain_dir)
         for slug in incomplete:
             report.note('not a complete pair, not judged: %s' % slug)
         if incomplete:

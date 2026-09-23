@@ -47,6 +47,53 @@ class Manifest(unittest.TestCase):
         self.assertEqual(one, manifest.digest_of({'projects': [other]}))
 
 
+class RefreshChurn(unittest.TestCase):
+    """A refresh that finds nothing new must leave no diff, unavailable projects included.
+
+    The marker used to be dropped the moment the commit resolved and set again the moment the files
+    did not, so a project whose composer.lock is simply still missing counted two changes and had
+    its date rewritten on every single run — losing the one thing the date is for, which is the day
+    it first went missing.
+    """
+
+    def setUp(self):
+        self.root = tempfile.mkdtemp(prefix='corpus-refresh-')
+        self.saved = (manifest._resolve_head, manifest._fetch_raw, manifest.load,
+                      manifest.write_json_atomic)
+        self.written = []
+        manifest._resolve_head = lambda owner_repo: 'e' * 40
+        manifest.write_json_atomic = lambda path, document: self.written.append(document)
+
+    def tearDown(self):
+        (manifest._resolve_head, manifest._fetch_raw, manifest.load,
+         manifest.write_json_atomic) = self.saved
+        shutil.rmtree(self.root, ignore_errors=True)
+
+    def _refresh(self, document, present, today='2026-10-01'):
+        manifest.load = lambda repo_root: document
+        manifest._fetch_raw = lambda owner_repo, commit, name: (b'{}' if present else None)
+
+        return manifest.refresh(self.root, today)
+
+    def test_a_project_whose_files_are_still_missing_is_not_rewritten(self):
+        document = {'projects': [_project('one', unavailable='2026-09-23')]}
+        self.assertEqual(0, self._refresh(document, present=False))
+        self.assertEqual([], self.written, 'a refresh that found nothing new rewrote the file')
+        self.assertEqual('2026-09-23', document['projects'][0]['unavailable'],
+                         'the day it first went missing was overwritten with today')
+
+    def test_a_project_whose_files_have_come_back_drops_the_marker_once(self):
+        # Pinned to the commit _resolve_head answers with, so the marker is the only thing moving.
+        document = {'projects': [_project('one', commit='e' * 40, unavailable='2026-09-23')]}
+        self.assertEqual(1, self._refresh(document, present=True))
+        self.assertNotIn('unavailable', document['projects'][0])
+
+    def test_a_project_that_has_just_gone_missing_is_dated_today(self):
+        document = {'projects': [_project('one')]}
+        self.assertEqual(1, self._refresh(document, present=False))
+        self.assertEqual('2026-10-01', document['projects'][0]['unavailable'])
+
+
 class FetchRefusals(unittest.TestCase):
     def setUp(self):
         self.root = tempfile.mkdtemp(prefix='corpus-fetch-')

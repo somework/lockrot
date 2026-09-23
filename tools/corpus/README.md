@@ -85,7 +85,17 @@ day apart the two halves were not reading the same upstream.
 
 Exit codes: **0** every check ran and found nothing · **1** problems found · **2** *I cannot tell
 you whether it is clean* — a check below its floor, a decline over the share it declared, a corrupt
-cached document, an empty input tree, two runs that cannot be compared · **3** usage.
+cached document, an empty input tree, two runs that cannot be compared, a run that was interrupted,
+a bug in this tool · **3** usage.
+
+`check` reads a report only when the run recorded that target `ok` and the file still hashes to what
+was recorded, and it takes the list of targets from the run rather than from the directory. Every
+other shape is named and counted, never passed over: a project lockrot died on leaves no file at
+all, a project the run never reached leaves not even a record, `unreadable output` deliberately
+leaves its bytes on disk beside its stderr, and a file rewritten after the run is not evidence about
+that run. A single one of those is exit 2 — a partial audit is not a clean one — but the other
+thirty-eight projects are still audited and still reported, because "one file will not parse" and
+"nothing was checked" are different facts.
 
 ## The corpus
 
@@ -151,6 +161,7 @@ install, which follows the precedent CONTRIBUTING already sets for the node chec
 | `lockrot_corpus/metadata.py` | the date-trust layer, re-derived |
 | `lockrot_corpus/p2.py` | the Composer cache, minified entries reconstructed |
 | `lockrot_corpus/runner.py` | running an archive over the corpus, resumably |
+| `lockrot_corpus/load.py` | turning a finished run into documents, and refusing what is not one |
 | `lockrot_corpus/diff.py` | comparing two runs, and refusing incomparable ones |
 
 ## When to run it
