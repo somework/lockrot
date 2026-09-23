@@ -21,8 +21,11 @@ final class InstalledReleaseTest extends TestCase
     private const NOW = '2026-09-14T00:00:00+00:00';
     private const LOCKED_AT = '2023-06-05T12:46:42+00:00';
 
-    /** @param array<string, string> $parentDates by normalized version */
-    private static function metadata(?string $lastStableDatedBy, array $parentDates = []): PackageMetadata
+    /**
+     * @param array<string, string> $parentDates by normalized version
+     * @param array<string, true>   $shared      the normalized versions whose tags share a commit
+     */
+    private static function metadata(?string $lastStableDatedBy, array $parentDates = [], array $shared = []): PackageMetadata
     {
         $dates = [];
         foreach ($parentDates as $version => $at) {
@@ -44,7 +47,8 @@ final class InstalledReleaseTest extends TestCase
             [],
             $lastStableDatedBy,
             $dates,
-            $dates === [] ? null : 'laravel/framework'
+            $dates === [] ? null : 'laravel/framework',
+            $shared
         );
     }
 
@@ -88,7 +92,7 @@ final class InstalledReleaseTest extends TestCase
         // would add that artefact to every number read off it
         $installed = InstalledRelease::of(
             F::package(['version' => 'v5.13.2', 'time' => self::LOCKED_AT]),
-            self::metadata('laravel/framework', ['5.13.3.0' => '2024-11-21T00:00:00+00:00'])
+            self::metadata('laravel/framework', ['5.13.3.0' => '2024-11-21T00:00:00+00:00'], ['5.13.2.0' => true])
         );
 
         self::assertSame(InstalledRelease::SHARED_COMMIT, $installed->kind());
@@ -96,6 +100,24 @@ final class InstalledReleaseTest extends TestCase
         self::assertEquals(new \DateTimeImmutable(self::LOCKED_AT), $installed->lockTime(), 'the lock still says what it says');
         self::assertNull($installed->datedBy());
         self::assertFalse($installed->isDated());
+    }
+
+    /**
+     * The other reading of the same fact, and the one that was missing: the repository marks the
+     * installed tag itself as dated by a commit its neighbours share, while dating its own newest
+     * release perfectly well. Asking only what dated the newest release measured pagerfanta/twig
+     * from a commit's date.
+     */
+    public function testATagOnASharedCommitIsUndatedThoughTheNewestReleaseDatesItself(): void
+    {
+        $installed = InstalledRelease::of(
+            F::package(['version' => 'v5.13.2', 'time' => self::LOCKED_AT]),
+            self::metadata(null, [], ['5.13.2.0' => true])
+        );
+
+        self::assertSame(InstalledRelease::SHARED_COMMIT, $installed->kind());
+        self::assertNull($installed->at());
+        self::assertEquals(new \DateTimeImmutable(self::LOCKED_AT), $installed->lockTime());
     }
 
     public function testABranchSnapshotIsDatedByItsCommit(): void

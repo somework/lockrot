@@ -434,13 +434,14 @@ S10 carries that fact on the finding itself. Two checks can be missing:
 | Check | Why it can be missing | What it blocks |
 |---|---|---|
 | `repository_activity` | `no_token` (the anonymous cap asks only about candidates), `anonymous_budget`, `install_time_budget`, `rate_limit`, `fetch_failed`, `offline` | S3, S4 |
-| `release_dates` | `undated_releases`: the repository dates the package's newest releases only by a commit their tags share, and no [monorepo parent](#dates-from-the-monorepo) dates them either | S2, S8 |
+| `release_dates` | `undated_releases`: the repository dates the package's newest releases only by a commit their tags share, and no [monorepo parent](#dates-from-the-monorepo) dates them either | S2, S8 — S2 alone where the installed version is a branch snapshot, which is on no release branch for S8 to measure |
 
 It is informational, like S7 and S9: it never decides a verdict. It is raised only where the
 missing check could have changed one — a package the repository already marks `abandoned` has
 nothing left for the activity round to add, and an allowlisted package reports `finished` whatever
-its signals say, so neither carries it. With credentials for every host in the lock a complete run
-carries no S10 at all.
+its signals say, so neither carries it. Credentials for every host in the lock take away the
+`repository_activity` reasons, and only those: `release_dates` asks no forge, so a fully
+credentialed run can still carry S10 — and still fail `--fail-on=unchecked` on it.
 
 `--fail-on=unchecked` fails on any finding that carries it: the one threshold that is neither a
 verdict nor a priority, for a pipeline that wants to hear about the workflow that never passed

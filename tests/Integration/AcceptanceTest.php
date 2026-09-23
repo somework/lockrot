@@ -245,8 +245,10 @@ final class AcceptanceTest extends TestCase
      * `dev-master` (8.1 of wallabag's). lockrot leaves them unmeasured and says so in the block.
      * The three scheb/2fa-* splits, whose newest tags share one commit and carry no date lockrot
      * trusts, are measured to the newest dated release above the installed one — a lower bound,
-     * 4.06 each — which is what the table had for them too. The packages furthest behind are the
-     * same on every fixture.
+     * 4.06 each — which is what the table had for them too. pagerfanta/twig is the other way
+     * round: its own v4.8.0 is one of the tags on a shared commit, so the lock dates it by that
+     * commit and there is no installed end to measure from at all. The packages furthest behind
+     * are the same on every fixture.
      */
     public function testLibyearsOnTheRecordedFixtures(): void
     {
@@ -254,10 +256,10 @@ final class AcceptanceTest extends TestCase
         $block = $wallabag->libyears();
         self::assertEqualsWithDelta(163.69, $block->total(), 0.005);
         self::assertEqualsWithDelta(106.7, $block->direct(), 0.005);
-        self::assertSame(195, $block->measured());
+        self::assertSame(194, $block->measured());
         self::assertSame([
             Libyears::BRANCH_SNAPSHOT => 4,
-            Libyears::NO_STABLE_RELEASE_DATE => 1,
+            Libyears::NO_STABLE_RELEASE_DATE => 2,
             Libyears::NOT_FROM_COMPOSER_REPOSITORY => 0,
             Libyears::METADATA_UNAVAILABLE => 0,
         ], $block->unmeasured());
@@ -270,6 +272,7 @@ final class AcceptanceTest extends TestCase
         self::assertEqualsWithDelta(4.06, (float) $f['scheb/2fa-backup-code']->libyears(), 0.005, 'a split whose newest tags share a commit: measured to the newest dated release above, a lower bound');
         self::assertEqualsWithDelta(4.23, (float) $f['scheb/2fa-bundle']->libyears(), 0.005, 'while the monorepo itself is dated exactly');
         self::assertNull($f['symfony/polyfill-ctype']->libyears(), 'the newest tag is undated and nothing dated sits above the installed version');
+        self::assertNull($f['pagerfanta/twig']->libyears(), 'the installed tag itself shares a commit: the lock dates it by that, not by its release');
         self::assertSame(0.0, $f['sensio/framework-extra-bundle']->libyears(), 'abandoned, and zero libyears behind: the installed release is the last one');
         self::assertEqualsWithDelta(3.36, (float) $f['psr/log']->libyears(), 0.005, 'finished, and three years behind a 3.x it will never need — the docs quote this');
         // The block is the arithmetic over the findings the document prints, to within the
