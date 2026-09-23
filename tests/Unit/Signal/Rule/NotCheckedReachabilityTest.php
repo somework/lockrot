@@ -41,6 +41,8 @@ final class NotCheckedReachabilityTest extends TestCase
     private const RECENT = '2026-09-01T00:00:00+00:00';
 
     /**
+     * @dataProvider shapes
+     *
      * @param PackageFacts $facts a shape {@see NotCheckedRule} raises S10 on
      */
     #[DataProvider('shapes')]
