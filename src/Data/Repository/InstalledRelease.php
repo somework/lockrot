@@ -61,10 +61,15 @@ final class InstalledRelease
         if ($metadata === null) {
             return new self($time === null ? self::UNDATED : self::RELEASE, $time, $time, null);
         }
-        // The parent dates the version whether or not the lock carries a date of its own.
-        $parent = self::parentDateOf($package, $metadata);
+        // The parent dates the version whether or not the lock carries a date of its own. Only a
+        // parent's, though: fromPackages() keeps a date per release for any package that declares
+        // `replace: <other> self.version`, so that its children can read them, and guzzlehttp/guzzle
+        // — which replaces the old `guzzle/*` packages — would otherwise be dated by itself and
+        // told its own release was a commit two tags share.
+        $datedBy = $metadata->releaseDatesBy();
+        $parent = $datedBy === null ? null : self::parentDateOf($package, $metadata);
         if ($parent !== null) {
-            return new self(self::DATED_BY_PARENT, $parent, $time, $metadata->releaseDatesBy());
+            return new self(self::DATED_BY_PARENT, $parent, $time, $datedBy);
         }
         if ($time === null) {
             return new self(self::UNDATED, null, null, null);

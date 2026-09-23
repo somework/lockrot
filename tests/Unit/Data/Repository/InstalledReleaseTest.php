@@ -103,6 +103,39 @@ final class InstalledReleaseTest extends TestCase
     }
 
     /**
+     * A package that has ever declared `replace: <other> self.version` keeps a date per release of
+     * its own — guzzlehttp/guzzle replaces the old `guzzle/*` packages, and so does every monorepo
+     * that is nobody's child. Those dates are not a parent's, and reading them as one made the
+     * explanation call an ordinary release "dated by a commit its tags share".
+     */
+    public function testAPackagesOwnReleaseDatesAreNotAParents(): void
+    {
+        $metadata = new PackageMetadata(
+            'guzzlehttp/guzzle',
+            false,
+            null,
+            true,
+            new \DateTimeImmutable('2026-09-06T13:55:09+00:00'),
+            '8.2.0',
+            120,
+            null,
+            'library',
+            new \DateTimeImmutable(self::NOW),
+            [],
+            ['guzzle/common'],
+            null,
+            ['5.13.2.0' => new \DateTimeImmutable('2024-11-21T00:00:00+00:00')],
+            null
+        );
+
+        $installed = InstalledRelease::of(F::package(['version' => 'v5.13.2', 'time' => self::LOCKED_AT]), $metadata);
+
+        self::assertSame(InstalledRelease::RELEASE, $installed->kind(), 'no parent dated it: the date is the lock\'s own');
+        self::assertEquals(new \DateTimeImmutable(self::LOCKED_AT), $installed->at());
+        self::assertNull($installed->datedBy());
+    }
+
+    /**
      * The other reading of the same fact, and the one that was missing: the repository marks the
      * installed tag itself as dated by a commit its neighbours share, while dating its own newest
      * release perfectly well. Asking only what dated the newest release measured pagerfanta/twig
