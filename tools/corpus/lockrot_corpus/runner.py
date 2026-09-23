@@ -296,6 +296,19 @@ def run_explains(phar: str, projects_dir: str, targets: 'Sequence[tuple[str, str
             continue
         write_text_atomic(text_path, page.stdout.decode('utf-8', 'replace'))
         write_text_atomic(json_path, document.stdout.decode('utf-8', 'replace'))
+        # Parsed before it is called `ok`, the way a report is. A rendering recorded `ok` unread is
+        # one the loader has to open to discover is not one, and a target recorded `ok` is never
+        # retried on a resume — so an unreadable one would have stayed unreadable for good.
+        try:
+            parsed = read_json(json_path)
+        except CorpusDataError as error:
+            parsed = None
+            note('%s: %s' % (slug, error))
+        if not isinstance(parsed, dict) or 'finding' not in parsed:
+            manifest['targets'][slug] = {'status': 'unreadable rendering',
+                                         'exit': document.returncode}
+            write_json_atomic(os.path.join(out_dir, 'run.json'), manifest)
+            continue
         manifest['targets'][slug] = {
             'status': 'ok',
             'exit': document.returncode,

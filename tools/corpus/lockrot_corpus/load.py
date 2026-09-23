@@ -261,8 +261,14 @@ def load_pairs(explain_dir: str, manifest: 'dict | None' = None) -> 'tuple[list[
             # that run, and the digests are recorded precisely so this is not a judgement call.
             incomplete.append('%s (replaced since the run wrote it)' % slug)
             continue
-        document = read_json(json_path)
-        text = read_text(text_path)
+        try:
+            document = read_json(json_path)
+            text = read_text(text_path)
+        except CorpusDataError:
+            # The same rule load_claims holds a report to. Reachable two ways: a globbed directory,
+            # where there is no recorded status to gate on at all, and a target the run recorded
+            # `ok` without reading — which is what `run_explains` used to do.
+            document, text = None, None
         if not isinstance(document, dict) or 'finding' not in document or text is None:
             incomplete.append('%s (the document does not parse as one)' % slug)
             continue

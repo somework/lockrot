@@ -136,6 +136,42 @@ class Resume(unittest.TestCase):
         self.assertIn('today', str(raised.exception))
 
 
+class ExplainRenderings(unittest.TestCase):
+    """A rendering is called `ok` only once it has been read, the way a report is.
+
+    A target recorded `ok` is never retried on a resume, so one recorded unread would have stayed
+    unreadable for the life of the run directory — and the loader would have been the first thing
+    to find out, by opening it.
+    """
+
+    PAGE = '''#!/bin/sh
+case "$*" in
+  *--format=json*) printf '%s' '{"finding": ' ;;
+  *) printf '%s' 'a rendered page' ;;
+esac
+'''
+
+    def setUp(self):
+        self.root = tempfile.mkdtemp(prefix='corpus-explain-')
+        self.projects = os.path.join(self.root, 'projects')
+        os.makedirs(os.path.join(self.projects, 'a-project'))
+        write_text_atomic(os.path.join(self.projects, 'a-project', 'composer.lock'), '{}')
+        self.phar = os.path.join(self.root, 'stub.sh')
+        write_text_atomic(self.phar, self.PAGE)
+        os.chmod(self.phar, os.stat(self.phar).st_mode | stat.S_IEXEC)
+        os.environ['GITHUB_TOKEN'] = 'not-a-real-token'
+
+    def tearDown(self):
+        shutil.rmtree(self.root, ignore_errors=True)
+
+    def test_a_rendering_that_will_not_parse_is_not_recorded_as_a_finished_target(self):
+        out = os.path.join(self.root, 'out')
+        manifest = runner.run_explains(self.phar, self.projects, [('a-project', 'x/y')], out,
+                                       os.path.join(self.root, 'cache'), '2026-09-23',
+                                       interpreter='/bin/sh')
+        self.assertEqual('unreadable rendering', manifest['targets']['a-project@x_y']['status'])
+
+
 class TokenMode(unittest.TestCase):
     def test_a_tokenless_run_has_to_be_asked_for(self):
         saved = os.environ.pop('GITHUB_TOKEN', None)
