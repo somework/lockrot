@@ -128,6 +128,15 @@ reviews:
         timeout-minutes is set from a dated measurement of a real run, not guessed. ci.yml is
         triggered by pull_request and by push to main only, which its header comment explains.
 
+  pre_merge_checks:
+    # Docstring coverage is measured per function, and this repository does not write per-function
+    # docstrings. The reasoning lives in module headers and in comments at the line that needs
+    # them — tools/corpus is 2,000 lines of Python whose header comments are the documentation, and
+    # src/ is PHP documented in class docblocks. Measured against this rule the corpus PR scored
+    # 24% and the remedy would have been 170 restatements of the function name.
+    docstrings:
+      mode: 'off'
+
   auto_review:
     enabled: true
     drafts: false
