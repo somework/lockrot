@@ -58,7 +58,27 @@ final class SigningKeys
             throw new \RuntimeException('cannot load '.$keyFile);
         }
         $signature = '';
-        if (!openssl_sign($archive, $signature, $key, \OPENSSL_ALGO_SHA384) || !\is_string($signature)) {
+        if (!openssl_sign($archive, $signature, $key, \OPENSSL_ALGO_SHA384)) {
+            throw new \RuntimeException('cannot sign with '.$keyFile);
+        }
+
+        return self::signatureBytes($signature, $keyFile);
+    }
+
+    /**
+     * What openssl_sign() wrote by reference, checked rather than assumed.
+     *
+     * The check lives behind a `mixed` parameter because PHPStan cannot decide what that variable
+     * is at the call site: its openssl_sign() stub declares the by-reference parameter `string`, so
+     * 2.2.15 reports an is_string() there as always true, while the same stub carries no
+     * `@param-out` and the inferred type after the call is `mixed`. Neither keeping the check nor
+     * dropping it passes. Here the parameter is mixed by declaration, so the check is a check.
+     *
+     * @param mixed $signature
+     */
+    public static function signatureBytes($signature, string $keyFile): string
+    {
+        if (!\is_string($signature)) {
             throw new \RuntimeException('cannot sign with '.$keyFile);
         }
 
