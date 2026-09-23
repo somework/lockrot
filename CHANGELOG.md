@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `tools/corpus/`, the corpus checks, which read lockrot's output against the data lockrot read
+  rather than against lockrot. Two of them had been ad-hoc scripts living in a scratchpad: one
+  audits every finding's libyears and signal claims against the raw Packagist documents in the run's
+  own cache, re-deriving Composer's version semantics and lockrot's date-trust rules independently;
+  the other reads every `--explain` page against the JSON it was rendered from. On the 0.11.0 branch
+  they found 31 and 6 real problems respectively, over 4,124 findings and 283 pages, and nothing
+  after the fixes. Nothing in the tool may import or shell out to lockrot's PHP: a checker that asks
+  the subject what it is about agrees with it by construction.
+- The corpus is now pinned. `tools/corpus/corpus.lock.json` names 39 projects — 21 already pinned by
+  git as recorded fixtures, 18 by commit with a digest per file — so a run is reproducible instead
+  of being whatever those projects' default branches held that day, and `--today` pins the clock so
+  the calendar cannot be filed as a code change.
+- An offline `corpus-selftest` job on every pull request and every push to main, which is the part
+  that proves the checks have not quietly stopped checking: every rendered sentence they read is
+  registered with a declared minimum or a dated note that it is unexercised, every problem key a
+  check can emit has a recorded document mutated to make exactly that key come out, and a sentence
+  that no longer parses is reported rather than skipped. It does not watch lockrot's wording — a
+  frozen page cannot — which a re-record or a corpus run does. Recording the Composer version
+  oracle found three faults in the checker itself, affecting 3,346 of 96,599 recorded versions.
+
 ## [0.11.0] - 2026-09-22
 
 ### Added
