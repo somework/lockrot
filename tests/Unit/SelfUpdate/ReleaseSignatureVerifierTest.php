@@ -65,12 +65,15 @@ final class ReleaseSignatureVerifierTest extends TestCase
     /** Padding matters: the same key and bytes under another digest or padding are not a match. */
     public function testASignatureUnderAnotherDigestIsRefused(): void
     {
-        $key = openssl_pkey_get_private((string) file_get_contents(__DIR__.'/../../fixtures/signing/release-key.pem'));
+        $pem = __DIR__.'/../../fixtures/signing/release-key.pem';
+        $key = openssl_pkey_get_private((string) file_get_contents($pem));
         self::assertNotFalse($key);
         $signature = '';
         self::assertTrue(openssl_sign(self::ARCHIVE, $signature, $key, \OPENSSL_ALGO_SHA256));
-        self::assertIsString($signature);
-        $file = json_encode(['sha384' => base64_encode($signature)], \JSON_THROW_ON_ERROR);
+        // Through the same helper SigningKeys signs with, and for the same reason: PHPStan reads an
+        // assertIsString() on this variable as always true and its own inference reads it as mixed.
+        $bytes = SigningKeys::signatureBytes($signature, $pem);
+        $file = json_encode(['sha384' => base64_encode($bytes)], \JSON_THROW_ON_ERROR);
 
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage('does not match the downloaded archive');
