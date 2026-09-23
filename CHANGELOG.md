@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [Unreleased]
+## [0.11.0] - 2026-09-22
 
 ### Added
 
@@ -24,18 +24,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   every host carries none at all. `--fail-on=unchecked` fails a run that could not check everything,
   which is how a pipeline catches the workflow that never passed `GITHUB_TOKEN` through. See
   [What was not checked](docs/verdicts.md#what-was-not-checked).
-
-### Changed
-
-- **One reading of the installed version's date.** The lock's `time` is a release date only
-  sometimes — a branch snapshot carries its commit's, a subtree split's tag the date of a commit
-  its tags share, a monorepo parent can date the version instead — and each surface re-derived
-  that for itself, which is how one explanation came to call a date a release four lines above
-  saying it was not one. `InstalledRelease` answers it once. No output changes.
-
-## [0.11.0] - 2026-09-22
-
-### Added
 
 - **One number for how far behind the lock is: libyears.** For each package, the years between
   the release installed and the package's newest stable release, summed over the analysed lock —
@@ -91,6 +79,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   [Abandoned, and where to](docs/verdicts.md#abandoned-and-where-to).
 
 ### Changed
+
+- **One reading of the installed version's date.** The lock's `time` is a release date only
+  sometimes — a branch snapshot carries its commit's, a subtree split's tag the date of a commit
+  its tags share, a monorepo parent can date the version instead — and each surface re-derived
+  that for itself, which is how one explanation came to call a date a release four lines above
+  saying it was not one. `InstalledRelease` answers it once. No output changes.
 
 - **`old-promise` reads the date against the target's major, not its minor.** S5 held a release
   against the GA of the target PHP minor: anything older than 2024-11-21 with a `>=7.x` constraint

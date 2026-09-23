@@ -97,7 +97,7 @@ consumer usually keys on:
   own `baseline` block still carries the totals; this is the same judgement per finding, which is
   what a reader filtering for what is new actually needs.
 - A finding can carry `S10`, the signal that says a check did not run: its `data` names each
-  missing check, why, and the signals it blocked. Added in 0.12.0; documents written before it
+  missing check, why, and the signals it blocked. Added in 0.11.0; documents written before it
   simply have no such signal, and the id is part of the same schema number.
 - Each finding carries `libyears` — years behind the package's newest stable release, at least 0,
   or null when not measured — and the document a `libyears` block derived from them: `total`,
