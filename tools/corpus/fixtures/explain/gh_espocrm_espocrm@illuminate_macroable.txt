@@ -1,0 +1,29 @@
+illuminate/macroable v12.51.0 — ok, priority none
+  via directorytree/imapengine > illuminate/collections > illuminate/macroable
+  libyears 0.6 behind the newest stable release
+
+signals: none
+
+composer.lock
+  version v12.51.0 · php ^8.2 · dated 2024-07-23 by a commit its tags share · from a Composer repository
+  source https://github.com/illuminate/macroable.git
+
+repository metadata (as of 2026-09-23)
+  626 versions listed · library · not abandoned
+  source https://github.com/illuminate/macroable.git
+  last stable release v13.33.0 (2026-09-22, dated by laravel/framework)
+  installed release v12.51.0 (2026-02-10, dated by laravel/framework)
+    branch     highest tag        released           newest dated release     php
+    13.x       v13.33.0           2026-09-22         v13.33.0 (2026-09-22)    ^8.2
+  * 12.x       v12.69.2           2026-09-08         v12.69.2 (2026-09-08)    ^8.2
+    11.x       v11.56.1           2026-08-25         v11.56.1 (2026-08-25)    ^8.2
+    10.x       v10.50.3           2026-08-12         v10.50.3 (2026-08-12)    ^8.1
+    9.x        v9.52.22           2026-08-12         v9.52.22 (2026-08-12)    ^8.0.2
+    8.x        v8.83.29           2024-11-20         v8.83.29 (2024-11-20)    ^7.3|^8.0
+  branches 13.x, 12.x, 11.x, 10.x, 9.x, 8.x dated by laravel/framework, the monorepo this package is split out of: its own tags there are dated by a commit other tags share, the monorepo's by their release
+
+repository activity
+  GitHub illuminate/macroable · not archived · last push 2026-09-22 · fetched 2026-09-22 (from lockrot's cache)
+
+thresholds: release-warn-years 3 · release-high-years 5 · push-warn-years 3 · push-high-years 5 · target PHP 8.4
+note: 2 packages are not from a Composer repository and were not checked

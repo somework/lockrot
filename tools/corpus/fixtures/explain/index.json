@@ -1,0 +1,45 @@
+{
+  "_comment": "Recorded explain pairs, one per rendered shape. Written by tools/corpus/record; the text half is byte-for-byte lockrot output and must never be edited, or a rewording stops being visible.",
+  "pairs": [
+    {
+      "slug": "gh_espocrm_espocrm@illuminate_macroable",
+      "covers": "a parent dates the installed release"
+    },
+    {
+      "slug": "BookStackApp_BookStack@symfony_polyfill-ctype",
+      "covers": "the installed release is undated"
+    },
+    {
+      "slug": "gh_librenms_librenms@librenms_laravel-vue-i18n-generator",
+      "covers": "a branch snapshot"
+    },
+    {
+      "slug": "PrestaShop_PrestaShop@greenlion_php-sql-parser",
+      "covers": "no metadata block at all"
+    },
+    {
+      "slug": "gh_SuiteCRM_SuiteCRM@phootwork_collection",
+      "covers": "S10 says the age was not read"
+    },
+    {
+      "slug": "BookStackApp_BookStack@aws_aws-crt-php",
+      "covers": "libyears measured"
+    },
+    {
+      "slug": "BookStackApp_BookStack@symfony_polyfill-php80",
+      "covers": "libyears not measured"
+    },
+    {
+      "slug": "BookStackApp_BookStack@bacon_bacon-qr-code",
+      "covers": "a branch table with several rows"
+    },
+    {
+      "slug": "BookStackApp_BookStack@symfony_polyfill-uuid",
+      "covers": "the lock date is a commit its tags share"
+    },
+    {
+      "slug": "drupal_drupal@drupal_core",
+      "covers": "a lock entry with no date at all"
+    }
+  ]
+}

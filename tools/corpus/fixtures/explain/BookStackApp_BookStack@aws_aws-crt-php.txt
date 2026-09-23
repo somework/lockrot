@@ -1,0 +1,21 @@
+aws/aws-crt-php v1.2.7 — ok, priority none
+  via league/flysystem-aws-s3-v3 > aws/aws-sdk-php > aws/aws-crt-php
+  libyears 0.0 behind the newest stable release
+
+signals: none
+
+composer.lock
+  version v1.2.7 · php >=5.5 · released 2024-10-18 · from a Composer repository
+  source https://github.com/awslabs/aws-crt-php.git
+
+repository metadata (as of 2026-09-23)
+  14 versions listed · library · not abandoned
+  source https://github.com/awslabs/aws-crt-php.git
+  last stable release v1.2.7 (2024-10-18)
+    branch     highest tag        released           newest dated release     php
+  * 1.x        v1.2.7             2024-10-18         v1.2.7 (2024-10-18)      >=5.5
+
+repository activity
+  GitHub awslabs/aws-crt-php · not archived · last push 2026-07-30 · fetched 2026-09-22 (from lockrot's cache)
+
+thresholds: release-warn-years 3 · release-high-years 5 · push-warn-years 3 · push-high-years 5 · target PHP 8.4

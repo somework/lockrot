@@ -1,0 +1,24 @@
+symfony/polyfill-uuid v1.37.0 — finished, priority none
+  via laravel/framework > symfony/uid > symfony/polyfill-uuid
+  allowlisted: polyfills for older PHP versions; intentionally frozen once the target PHP is covered
+  libyears not measured: no release date lockrot trusts
+
+signals: none
+
+composer.lock
+  version v1.37.0 · php >=7.2 · dated 2026-04-10 by a commit its tags share · from a Composer repository
+  source https://github.com/symfony/polyfill-uuid.git
+
+repository metadata (as of 2026-09-23)
+  29 versions listed · library · not abandoned
+  source https://github.com/symfony/polyfill-uuid.git
+  last stable release unknown: the highest tag v1.37.0 has no release date, so S2 does not measure the package
+  installed release v1.37.0 undated: the lock dates it 2026-04-10, a commit its tags share, not a release
+    branch     highest tag        released           newest dated release     php
+  * 1.x        v1.37.0            commit 2026-04-10  v1.37.0 (2026-04-10)     >=7.2
+  * the installed branch's highest tag has no release date — the repository leaves it undated, or dates it only by a commit other tags share (`commit …`: a subtree split, the day the directory last changed) — so S8 does not measure the branch
+
+repository activity
+  not fetched — S3 and S4 have nothing to read; the run's notes below say why when a cap or a failure is the cause
+
+thresholds: release-warn-years 3 · release-high-years 5 · push-warn-years 3 · push-high-years 5 · target PHP 8.4

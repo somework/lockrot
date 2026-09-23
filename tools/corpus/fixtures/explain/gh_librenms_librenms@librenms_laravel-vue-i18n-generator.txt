@@ -1,0 +1,25 @@
+librenms/laravel-vue-i18n-generator dev-master — pinned, priority high
+  direct requirement
+  libyears not measured: branch snapshot
+
+signals
+  S2 warn last release 2022-10-11 (4.0 years ago)
+           last_release 2022-10-11T14:28:22+00:00 · last_version 0.1.48 · years 4 · dated_by null
+  S6 warn pinned to branch snapshot dev-master
+           version dev-master
+
+composer.lock
+  version dev-master · php >=5.5.0 · dated 2025-04-24 by its commit · from a Composer repository · branch snapshot
+  source https://github.com/librenms/laravel-vue-i18n-generator.git
+
+repository metadata (as of 2026-09-23)
+  49 versions listed · library · not abandoned
+  source https://github.com/librenms/laravel-vue-i18n-generator.git
+  last stable release 0.1.48 (2022-10-11)
+    branch     highest tag        released           newest dated release     php
+    0.1.x      0.1.48             2022-10-11         0.1.48 (2022-10-11)      >=5.5.0
+
+repository activity
+  GitHub librenms/laravel-vue-i18n-generator · not archived · last push 2026-09-22 · fetched 2026-09-22 (from lockrot's cache)
+
+thresholds: release-warn-years 3 · release-high-years 5 · push-warn-years 3 · push-high-years 5 · target PHP 8.4

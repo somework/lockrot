@@ -1,0 +1,399 @@
+{
+  "_comment": "The pinned membership of the corpus. Fixture projects are pinned by git already — they are this repository's recorded locks. GitHub projects are pinned by commit, and both of their files are fetched from that one ref and checked against the digests recorded here. `tools/corpus/corpus refresh --today <date>` is the only thing that moves a pin, and a project that stops resolving is marked unavailable and kept, so a shrinking corpus is a line in a diff rather than silence.",
+  "refreshed": "2026-09-23",
+  "projects": [
+    {
+      "name": "BookStackApp_BookStack",
+      "kind": "fixture",
+      "path": "tests/fixtures/apps/BookStackApp_BookStack"
+    },
+    {
+      "name": "PrestaShop_PrestaShop",
+      "kind": "fixture",
+      "path": "tests/fixtures/apps/PrestaShop_PrestaShop"
+    },
+    {
+      "name": "drupal_drupal",
+      "kind": "fixture",
+      "path": "tests/fixtures/apps/drupal_drupal"
+    },
+    {
+      "name": "firefly-iii_firefly-iii",
+      "kind": "fixture",
+      "path": "tests/fixtures/apps/firefly-iii_firefly-iii"
+    },
+    {
+      "name": "grokability_snipe-it",
+      "kind": "fixture",
+      "path": "tests/fixtures/apps/grokability_snipe-it"
+    },
+    {
+      "name": "koel_koel",
+      "kind": "fixture",
+      "path": "tests/fixtures/apps/koel_koel"
+    },
+    {
+      "name": "magento_magento2",
+      "kind": "fixture",
+      "path": "tests/fixtures/apps/magento_magento2"
+    },
+    {
+      "name": "matomo-org_matomo",
+      "kind": "fixture",
+      "path": "tests/fixtures/apps/matomo-org_matomo"
+    },
+    {
+      "name": "mautic_mautic",
+      "kind": "fixture",
+      "path": "tests/fixtures/apps/mautic_mautic"
+    },
+    {
+      "name": "monicahq_monica",
+      "kind": "fixture",
+      "path": "tests/fixtures/apps/monicahq_monica"
+    },
+    {
+      "name": "nextcloud_3rdparty",
+      "kind": "fixture",
+      "path": "tests/fixtures/apps/nextcloud_3rdparty"
+    },
+    {
+      "name": "wallabag_wallabag",
+      "kind": "fixture",
+      "path": "tests/fixtures/apps/wallabag_wallabag"
+    },
+    {
+      "name": "bedrock",
+      "kind": "fixture",
+      "path": "tests/fixtures/skeletons/bedrock"
+    },
+    {
+      "name": "cakephp",
+      "kind": "fixture",
+      "path": "tests/fixtures/skeletons/cakephp"
+    },
+    {
+      "name": "drupal",
+      "kind": "fixture",
+      "path": "tests/fixtures/skeletons/drupal"
+    },
+    {
+      "name": "laminas",
+      "kind": "fixture",
+      "path": "tests/fixtures/skeletons/laminas"
+    },
+    {
+      "name": "laravel",
+      "kind": "fixture",
+      "path": "tests/fixtures/skeletons/laravel"
+    },
+    {
+      "name": "shopware",
+      "kind": "fixture",
+      "path": "tests/fixtures/skeletons/shopware"
+    },
+    {
+      "name": "sylius",
+      "kind": "fixture",
+      "path": "tests/fixtures/skeletons/sylius"
+    },
+    {
+      "name": "symfony-webapp",
+      "kind": "fixture",
+      "path": "tests/fixtures/skeletons/symfony-webapp"
+    },
+    {
+      "name": "yii2",
+      "kind": "fixture",
+      "path": "tests/fixtures/skeletons/yii2"
+    },
+    {
+      "name": "gh_akaunting_akaunting",
+      "kind": "github",
+      "repo": "akaunting/akaunting",
+      "commit": "15e031c67938ba3ce7bc502b5ad426eb0569258d",
+      "files": {
+        "composer.lock": {
+          "sha256": "582e7733a2e3e2b63d6281047b199474295f9c88db80a05b948d66c9a1363eac",
+          "bytes": 586727
+        },
+        "composer.json": {
+          "sha256": "0ef5bb514c5990fe828357e36065f2c2d628ba95cfd2305cdd2a21505859c0e0",
+          "bytes": 8265
+        }
+      }
+    },
+    {
+      "name": "gh_pixelfed_pixelfed",
+      "kind": "github",
+      "repo": "pixelfed/pixelfed",
+      "commit": "e1df7d657c33bb3b814c31d48d1dd990d71fda57",
+      "files": {
+        "composer.lock": {
+          "sha256": "2ede1d55b08cbb8c867d8b60d88bb9e8bc6ecce35d291c44f2c74b3a6dc38123",
+          "bytes": 547785
+        },
+        "composer.json": {
+          "sha256": "9e66653e8b3735633abdf7d4ab40a66442bf374c23f8f6554737d2861df87252",
+          "bytes": 4469
+        }
+      }
+    },
+    {
+      "name": "gh_invoiceninja_invoiceninja",
+      "kind": "github",
+      "repo": "invoiceninja/invoiceninja",
+      "commit": "f1ffa5f9989afbed4e7dc80b5c0cc18944335ffc",
+      "files": {
+        "composer.lock": {
+          "sha256": "110ce61ba2cc89d1e8734ff0d25d56083e6ca2f8a778a9c4fa563e9055a3a0bd",
+          "bytes": 828939
+        },
+        "composer.json": {
+          "sha256": "94df6653a921bc214fb474cb6c18489aaf94d9b53b7e3b321fe0e33c2d6ce00d",
+          "bytes": 7625
+        }
+      }
+    },
+    {
+      "name": "gh_librenms_librenms",
+      "kind": "github",
+      "repo": "librenms/librenms",
+      "commit": "ecd7b4dc704b41e0eae9fdd3117c523b7f39611c",
+      "files": {
+        "composer.lock": {
+          "sha256": "991f2c8ef0622c81974f230cc2f9a24870b59f8df6ef6ff87e9213da57209ec8",
+          "bytes": 546725
+        },
+        "composer.json": {
+          "sha256": "59fc73bb7c02e6fffb56d4afa9679c7a8d4a2285979696daa53b92a98b168175",
+          "bytes": 6332
+        }
+      }
+    },
+    {
+      "name": "gh_kanboard_kanboard",
+      "kind": "github",
+      "repo": "kanboard/kanboard",
+      "commit": "cf53b54597b67b60140586c09c2fe6132ead013c",
+      "files": {
+        "composer.lock": {
+          "sha256": "be22d1d4427e19cb6f907fd9a7d6e4d577a9cb1b98c04839656c15c0ab2384a4",
+          "bytes": 112510
+        },
+        "composer.json": {
+          "sha256": "48da225091408b7ccb372ff6699050af937784fca05a6d6015e659c329413295",
+          "bytes": 2106
+        }
+      }
+    },
+    {
+      "name": "gh_bagisto_bagisto",
+      "kind": "github",
+      "repo": "bagisto/bagisto",
+      "commit": "805b67013134ebc53f1da1285f0aa6632f5dde62",
+      "files": {
+        "composer.lock": {
+          "sha256": "e33dbb2586b01c983a0a54d8eb42e361f4c6cc95b8e84f74341f69f9167dff33",
+          "bytes": 593335
+        },
+        "composer.json": {
+          "sha256": "960f9d9a4ebb66c09783c86546e7bf002ded6ac528161c74a28e6b8642dd840e",
+          "bytes": 7374
+        }
+      }
+    },
+    {
+      "name": "gh_espocrm_espocrm",
+      "kind": "github",
+      "repo": "espocrm/espocrm",
+      "commit": "e47868c18a058f80da4df3557a48d75b452f560e",
+      "files": {
+        "composer.lock": {
+          "sha256": "33bff230ababc8f662c613a6062c87af3953ee0e4b278552009729ef317ba1e0",
+          "bytes": 390543
+        },
+        "composer.json": {
+          "sha256": "7bdb10e1f27dcde2282a40d7343523f5eee406277aa9bb69da63f928bd6a4ff0",
+          "bytes": 4156
+        }
+      }
+    },
+    {
+      "name": "gh_phpmyadmin_phpmyadmin",
+      "kind": "github",
+      "repo": "phpmyadmin/phpmyadmin",
+      "commit": "8b98b05aae49c62fc1cee69d0014e5dce8d3fa05",
+      "files": {
+        "composer.lock": {
+          "sha256": "89fceb683a63ba7707d1ee78b5f79dc1f90235b8d3ea091ca28090cad7b84cd9",
+          "bytes": 347420
+        },
+        "composer.json": {
+          "sha256": "1dd94afe8a5c01f9d572ec2ad9e2f844f020eb0e2f6519813b20d37c0eee4d7b",
+          "bytes": 5779
+        }
+      }
+    },
+    {
+      "name": "gh_getgrav_grav",
+      "kind": "github",
+      "repo": "getgrav/grav",
+      "commit": "6adc16120cf7e044aa5adf44e42d0c6a88b124a6",
+      "files": {
+        "composer.lock": {
+          "sha256": "5ea1afa59579281c81658968e59b722ba75f9632fe573b8e14f18d43502e77fb",
+          "bytes": 274207
+        },
+        "composer.json": {
+          "sha256": "64d8ebaa5ce8870f14e2a765aa9e7c51c5f3d5e66c9c5c74f87aa6c98e1accdf",
+          "bytes": 6387
+        }
+      }
+    },
+    {
+      "name": "gh_FOSSBilling_FOSSBilling",
+      "kind": "github",
+      "repo": "FOSSBilling/FOSSBilling",
+      "commit": "acf28ed3bd20850de43f45401e7798addb666d44",
+      "files": {
+        "composer.lock": {
+          "sha256": "163d09e09290fe88136d76040f910ff36add99069972072b5c02073667d532fe",
+          "bytes": 408940
+        },
+        "composer.json": {
+          "sha256": "de7e070e55af02f5a3d3cdb92c50077b118b33d99d3ce77cd3fee7937bfb6dba",
+          "bytes": 4662
+        }
+      }
+    },
+    {
+      "name": "gh_SuiteCRM_SuiteCRM",
+      "kind": "github",
+      "repo": "SuiteCRM/SuiteCRM",
+      "commit": "62effd0ceb767ed3b634ade585b19a6633eb4fcb",
+      "files": {
+        "composer.lock": {
+          "sha256": "ea957420fcdd8026fdee78bd046f85792e769c8124fa762b2c79b2968ffbc6b4",
+          "bytes": 448200
+        },
+        "composer.json": {
+          "sha256": "4298fb7c40199364e963551630bf4dacab99ccdbe2474333154922e593d8e697",
+          "bytes": 3815
+        }
+      }
+    },
+    {
+      "name": "gh_crater-invoice_crater",
+      "kind": "github",
+      "repo": "crater-invoice/crater",
+      "commit": "05d5ce26fdd8d9466009163444e944259bc0cc2a",
+      "files": {
+        "composer.lock": {
+          "sha256": "4c68160268b7ec9e5f9cf188c1ad7c47ac6149a0d7b9d128b8e5ce6347515f8d",
+          "bytes": 433753
+        },
+        "composer.json": {
+          "sha256": "48c7dfaac40fccefd0339f48e334f4a4422fcedcfc94b0c0eb39938437fea6e0",
+          "bytes": 2613
+        }
+      }
+    },
+    {
+      "name": "gh_composer_composer",
+      "kind": "github",
+      "repo": "composer/composer",
+      "commit": "56a26ff6ad41a8972aae691e82d5a36a31d4684b",
+      "files": {
+        "composer.lock": {
+          "sha256": "ab0785e46e5ddc97a6b4aaad2b71662fac3ff3397de3338aedcbb9630d5e3e88",
+          "bytes": 90676
+        },
+        "composer.json": {
+          "sha256": "6bf7d3fb762798f1c6da25263fc68bf7760ae6e80d22da1bd1a1e6b076e71fdf",
+          "bytes": 3885
+        }
+      }
+    },
+    {
+      "name": "gh_sebastianbergmann_phpunit",
+      "kind": "github",
+      "repo": "sebastianbergmann/phpunit",
+      "commit": "cf4ca72d2154ff3386f745b8eb1cea2be042c348",
+      "files": {
+        "composer.lock": {
+          "sha256": "d153882d7b20634d3718bed5cef0f509fb23cd8b5e5c7950a87efab36761096a",
+          "bytes": 68137
+        },
+        "composer.json": {
+          "sha256": "7c9c232e9fec771df23b6fccd69cd9771e5b0f025af3430adde988f4b8734dee",
+          "bytes": 5333
+        }
+      }
+    },
+    {
+      "name": "gh_phpstan_phpstan-src",
+      "kind": "github",
+      "repo": "phpstan/phpstan-src",
+      "commit": "d807830cea5ad0971b7fec081b674ea6a9ffed7e",
+      "files": {
+        "composer.lock": {
+          "sha256": "210e89e27c487c86f6180ab91d70774cccb9152554882fefa2c27f09e0b884df",
+          "bytes": 202165
+        },
+        "composer.json": {
+          "sha256": "7439e31ba1c3875d1e91637c5e400b60bf93952dacd327bad514f141fa82d041",
+          "bytes": 4531
+        }
+      }
+    },
+    {
+      "name": "gh_symfony_demo",
+      "kind": "github",
+      "repo": "symfony/demo",
+      "commit": "8d2e2ef75c3e18df173d8bf2379a14abb58c4c31",
+      "files": {
+        "composer.lock": {
+          "sha256": "bfc1c816cbb22ffe92ec294847037ef2fb618dfd77d429264fbc57d7befea7cd",
+          "bytes": 435991
+        },
+        "composer.json": {
+          "sha256": "2ab32224beea0167d4620ad7373eb17b0b31204d305ac241a253ccaa633f7246",
+          "bytes": 3614
+        }
+      }
+    },
+    {
+      "name": "gh_laravel_pint",
+      "kind": "github",
+      "repo": "laravel/pint",
+      "commit": "006bd7825eb01daf92959d060b89cd9514fe4253",
+      "files": {
+        "composer.lock": {
+          "sha256": "5ccea2e9e06f079801d176304f755b829315a250a9dba492f432ea4abf0dc27c",
+          "bytes": 389589
+        },
+        "composer.json": {
+          "sha256": "26c30e8d30e23a50a44955168df52710fbde9d41938f60309d45617dab47c7e1",
+          "bytes": 1774
+        }
+      }
+    },
+    {
+      "name": "gh_filamentphp_filament",
+      "kind": "github",
+      "repo": "filamentphp/filament",
+      "commit": "63d75f893b6b2ea44f0b79ccc643ed5e048951ec",
+      "files": {
+        "composer.lock": {
+          "sha256": "5c202355214ffa6cdff3b2fd98fa2840650f69fba06c78d3bc9e2d660c2f60a0",
+          "bytes": 552112
+        },
+        "composer.json": {
+          "sha256": "1f7bfbb84dad8734bcb6e900dd5fa01afb478a079cffb0def1f6415e4703cf3f",
+          "bytes": 4611
+        }
+      }
+    }
+  ]
+}

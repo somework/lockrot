@@ -1,0 +1,129 @@
+{
+  "$schema": "https://lockrot.dev/schema/explain-1.json",
+  "lockrot": {
+    "version": "0.11.0",
+    "schema": 1
+  },
+  "package": "phootwork/collection",
+  "version": "v3.2.3",
+  "finding": {
+    "package": "phootwork/collection",
+    "version": "v3.2.3",
+    "verdict": "ok",
+    "priority": "none",
+    "direct": false,
+    "dev": false,
+    "replacement": null,
+    "signals": [
+      {
+        "id": "S10",
+        "level": "info",
+        "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 and S8 could not measure it",
+        "data": {
+          "unchecked": [
+            {
+              "check": "release_dates",
+              "reason": "undated_releases",
+              "blocks": [
+                "S2",
+                "S8"
+              ]
+            }
+          ],
+          "blocks": [
+            "S2",
+            "S8"
+          ]
+        }
+      }
+    ],
+    "chain": [
+      "consolidation/robo",
+      "phpowermove/docblock",
+      "phootwork/collection"
+    ],
+    "direct_dependents": [
+      "consolidation/robo"
+    ],
+    "evidence": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 and S8 could not measure it",
+    "allowlist_reason": null,
+    "note": null,
+    "data_date": "2026-09-23T09:01:28+00:00",
+    "libyears": null
+  },
+  "lock": {
+    "php": ">=8.0",
+    "released": "2022-08-27T12:51:24+00:00",
+    "repository": "https://github.com/phootwork/collection.git",
+    "from_composer_repository": true,
+    "dev": false,
+    "branch_snapshot": false,
+    "type": "library"
+  },
+  "metadata": {
+    "abandoned": false,
+    "replacement": null,
+    "releases_listed": 27,
+    "has_stable_release": true,
+    "last_stable_release": null,
+    "last_stable_version": null,
+    "last_stable_dated_by": null,
+    "installed_release": null,
+    "installed_release_dated_by": null,
+    "repository": "https://github.com/phootwork/collection.git",
+    "type": "library",
+    "data_date": "2026-09-23T09:01:28+00:00",
+    "branches": [
+      {
+        "branch": "3.x",
+        "installed": true,
+        "highest": "v3.2.3",
+        "highest_released": null,
+        "highest_commit_date": "2022-08-27T12:51:24+00:00",
+        "newest_dated": "v3.2.3",
+        "newest_dated_released": "2022-08-27T12:51:24+00:00",
+        "dated_by": null,
+        "php": ">=8.0"
+      },
+      {
+        "branch": "2.x",
+        "installed": false,
+        "highest": "v2.1.3",
+        "highest_released": "2020-09-17T16:04:53+00:00",
+        "highest_commit_date": null,
+        "newest_dated": "v2.1.3",
+        "newest_dated_released": "2020-09-17T16:04:53+00:00",
+        "dated_by": null,
+        "php": ">=7.2"
+      },
+      {
+        "branch": "1.x",
+        "installed": false,
+        "highest": "v1.6.1",
+        "highest_released": "2018-09-15T11:41:17+00:00",
+        "highest_commit_date": null,
+        "newest_dated": "v1.6.1",
+        "newest_dated_released": "2018-09-15T11:41:17+00:00",
+        "dated_by": null,
+        "php": ">=5.6"
+      }
+    ]
+  },
+  "activity": {
+    "forge": "GitHub",
+    "repository": "phootwork/collection",
+    "archived": false,
+    "pushed_at": "2024-10-03T15:44:53+00:00",
+    "fetched_at": "2026-09-22T18:52:04+00:00",
+    "from_cache": true
+  },
+  "thresholds": {
+    "release-warn-years": 3,
+    "release-high-years": 5,
+    "push-warn-years": 3,
+    "push-high-years": 5
+  },
+  "target_php": "8.4",
+  "generated_at": "2026-09-23T09:01:28+00:00",
+  "notes": []
+}

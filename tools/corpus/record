@@ -1,0 +1,324 @@
+#!/usr/bin/env python3
+# Records the offline fixture set from a finished corpus run, so the checks can be exercised with no
+# corpus, no token and no network.
+# Usage: tools/corpus/record --work <dir> --out <report run> --explain-out <explain run>
+#
+# Run deliberately and rarely: when lockrot changes a sentence these checks read, or when a check is
+# added and its poison needs a document to mutate. Everything written here is lockrot's own output
+# and Composer's own metadata, trimmed but never edited — a fixture that no longer matches the
+# source it was taken from is worth less than no fixture.
+#
+# The p2 documents keep their minified shape, `__unset` sentinels and all. Expanding them before
+# committing would remove the one thing the reader under test has to get right.
+
+import argparse
+import os
+import shutil
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+from lockrot_corpus import load, runner  # noqa: E402
+from lockrot_corpus.jsonio import read_json, write_json_atomic, write_text_atomic  # noqa: E402
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+FIXTURES = os.path.join(HERE, 'fixtures')
+
+# What a recorded p2 entry keeps, mirroring bin/record-fixtures' KEEP list: everything the checks
+# read and nothing else. `source` is cut to its reference, which is all the shared-commit rule uses.
+KEEP = ('name', 'version', 'version_normalized', 'time', 'abandoned', 'replace', 'source')
+
+PACKAGIST_HOST = 'https---repo.packagist.org'
+
+
+def main(argv: 'list[str]') -> int:
+    parser = argparse.ArgumentParser(prog='record')
+    parser.add_argument('--work', required=True)
+    parser.add_argument('--out', required=True)
+    parser.add_argument('--explain-out', required=True)
+    parser.add_argument('--semver-oracle', action='store_true',
+                        help='also re-record the Composer version oracle from the cache')
+    options = parser.parse_args(argv)
+
+    projects = os.path.join(options.work, 'projects')
+    cache = os.path.join(options.work, 'cache')
+    reports = os.path.join(options.work, 'reports', options.out)
+    explains = os.path.join(options.work, 'explains', options.explain_out)
+    repo_root = os.path.dirname(os.path.dirname(HERE))
+
+    _clear()
+    claims, _ = load.load_claims(reports, projects, cache, repo_root,
+                                 runner.load_manifest(reports))
+    chosen = _choose_claims(claims, cache)
+    _write_claims(chosen, cache)
+
+    pairs, _ = load.load_pairs(explains, runner.load_manifest(explains))
+    _write_pairs(_choose_pairs(pairs), explains)
+
+    if options.semver_oracle:
+        _write_semver_oracle(cache)
+
+    return 0
+
+
+# --- the Composer version oracle -------------------------------------------------------------------
+#
+# p2 documents carry Composer's own `version_normalized` beside the pretty `version`, and list their
+# versions newest first. That is Composer's answer to both questions this tool re-implements, free
+# and offline — so the re-implementation is checked against Composer without Composer being on the
+# path. Recorded here and never computed by the test, which would make the test a tautology.
+
+def _write_semver_oracle(cache: str) -> None:
+    import glob
+    import re as _re
+
+    from lockrot_corpus.semver import normalize, stability
+
+    by_shape = {}
+    order_rows = []
+    divergences = []
+    for path in sorted(glob.glob(os.path.join(cache, 'repo', PACKAGIST_HOST, 'provider-*.json'))):
+        document = read_json(path)
+        for name, entries in (document.get('packages') or {}).items():
+            if not isinstance(entries, list):
+                continue
+            for entry in entries:
+                normalized = entry.get('version_normalized')
+                pretty = entry.get('version')
+                if normalized is None or pretty is None:
+                    continue
+                if stability(normalized) == 'dev':
+                    continue
+                shape = _re.sub(r'\d+', '#', str(pretty))
+                got = normalize(pretty)
+                if got != normalized:
+                    divergences.append({'pretty': pretty, 'composer': normalized, 'this_tool': got,
+                                        'package': name})
+                    continue
+                bucket = by_shape.setdefault(shape, [])
+                if len(bucket) < 2:
+                    bucket.append({'pretty': pretty, 'normalized': normalized})
+            # Recorded by what the list CONTAINS, never by whether this tool already agrees with
+            # it. Keeping only the packages that sort correctly is how an oracle comes to confirm
+            # the code it validates: the recorder drops every counter-example and the test then
+            # passes over the twelve survivors. Selection is by stability coverage instead, so the
+            # suffixes the corpus is thin on — RC and patch — are the ones most likely to be kept.
+            versions = [entry.get('version_normalized') for entry in entries
+                        if entry.get('version_normalized')]
+            if len(versions) >= 8:
+                kinds = {stability(version) for version in versions}
+                wanted = len(kinds & {'RC', 'alpha', 'beta'})
+                order_rows.append({'package': name, 'covers': sorted(kinds),
+                                   'rank': (wanted, len(versions)), 'newest_first': versions})
+
+    recorded = [row for bucket in by_shape.values() for row in bucket]
+    recorded.sort(key=lambda row: row['pretty'])
+    # The richest lists first, then a stable name order, and only then the cap — so the twelve kept
+    # are the twelve that exercise the most of the ordering, not the first twelve alphabetically.
+    order_rows.sort(key=lambda row: (-row['rank'][0], -row['rank'][1], row['package']))
+    order_rows = [{'package': row['package'], 'covers': row['covers'],
+                   'newest_first': row['newest_first']} for row in order_rows[:12]]
+    write_json_atomic(os.path.join(FIXTURES, 'semver-oracle.json'), {
+        '_comment': 'Composer\'s own answers, recorded from the p2 documents of the corpus cache by '
+                    'tools/corpus/record --semver-oracle. `normalization` holds up to two examples '
+                    'of every distinct pretty-version shape seen; `order` holds whole version lists '
+                    'in the order p2 serves them, which is newest first. Never computed by the test.',
+        'recorded_on': '2026-09-23',
+        'normalization': recorded,
+        'order': order_rows,
+        'known_divergences': divergences,
+    })
+    covered = sorted({kind for row in order_rows for kind in row['covers']})
+    print('%d normalization row(s), %d order row(s) covering %s, %d known divergence(s)'
+          % (len(recorded), len(order_rows), '/'.join(covered), len(divergences)))
+
+
+def _clear() -> None:
+    """The recorded set is exactly what this run chose, and nothing left over from the last one.
+
+    A stale report beside a rewritten lock is not a fixture — it is a project whose findings name
+    packages the lock no longer carries, which every check then declines for the wrong reason.
+    """
+    for relative in ('claims/reports', 'claims/projects', 'claims/cache'):
+        shutil.rmtree(os.path.join(FIXTURES, relative), ignore_errors=True)
+    explain = os.path.join(FIXTURES, 'explain')
+    for name in os.listdir(explain) if os.path.isdir(explain) else []:
+        if name.endswith(('.txt', '.json')):
+            os.remove(os.path.join(explain, name))
+
+
+def _choose_claims(claims: 'list', cache: str) -> dict:
+    """One finding per shape the checks have to reach, picked by what the data is rather than by name."""
+    wanted = {
+        'a tag on a commit its siblings share, left unmeasured':
+            lambda c: c.metadata and c.shares_commit and c.libyears is None and c.parent_date is None,
+        'a clean measured package, both ends dated':
+            lambda c: (c.metadata and not c.shares_commit and c.libyears is not None
+                       and c.parent_date is None and c.entry and c.entry.get('time')
+                       and c.metadata.last_stable_release_at is not None),
+        'a version a monorepo parent dates':
+            lambda c: c.parent_date is not None,
+        'an S2 signal that credits no parent':
+            lambda c: c.metadata and [s for s in c.signals('S2') if (s.get('data') or {}).get('dated_by') is None],
+        'an S10 entry about undated releases':
+            lambda c: c.metadata and [s for s in c.signals('S10')
+                                      if any((e or {}).get('reason') == 'undated_releases'
+                                             for e in (s.get('data') or {}).get('unchecked', []))],
+        'a package whose p2 document carries an __unset sentinel':
+            lambda c: c.metadata and _has_unset(c.finding['package'], cache),
+    }
+    chosen = {}
+    for label, predicate in wanted.items():
+        for claim in claims:
+            if claim.finding.get('package') in {item.finding.get('package') for item in chosen.values()}:
+                continue
+            try:
+                if predicate(claim):
+                    chosen[label] = claim
+                    break
+            except Exception:  # noqa: BLE001 - a predicate over real data, not an assertion
+                continue
+        if label not in chosen:
+            print('!! nothing in this run has: %s' % label, file=sys.stderr)
+    for label, claim in chosen.items():
+        print('%-58s %s %s' % (label, claim.finding['package'], claim.finding.get('version')))
+
+    return chosen
+
+
+def _has_unset(package: str, cache: str) -> bool:
+    """Whether the cached document really uses the deletion sentinel, read from the cache itself.
+
+    Asked before anything is written, because a fixture chosen for a property it does not have
+    leaves the reader under test with nothing to read.
+    """
+    document = read_json(os.path.join(cache, 'repo', PACKAGIST_HOST,
+                                      'provider-%s.json' % package.replace('/', '~')))
+    if document is None:
+        return False
+
+    # The sentinel has to sit on a key the recording keeps. In the repository's own p2 corpus it
+    # lands on `extra` 478 times and on `replace` once — so a package chosen for a sentinel on
+    # `extra` loses it to the trim, and the committed fixture then proves nothing about the one
+    # line of p2.py that exists to honour it.
+    return any(value == '__unset' and key in KEEP
+               for entry in document.get('packages', {}).get(package, [])
+               if isinstance(entry, dict)
+               for key, value in entry.items())
+
+
+def _write_claims(chosen: dict, cache: str) -> None:
+    cases = []
+    project_locks = {}
+    for label, claim in chosen.items():
+        package = claim.finding['package']
+        cases.append({
+            'covers': label,
+            'project': claim.project,
+            'package': package,
+            'finding': claim.finding,
+        })
+        project_locks.setdefault(claim.project, {})[package] = claim.entry
+        _copy_provider(package, cache)
+        if claim.parent:
+            # The parent the run actually resolved, not a guess from the candidate table: a fixture
+            # whose parent is not the one that dated it proves nothing about the parent path.
+            _copy_provider(claim.parent, cache)
+
+    write_json_atomic(os.path.join(FIXTURES, 'claims', 'cases.json'),
+                      {'_comment': 'Recorded findings, one per shape the claims checks must reach. '
+                                   'Written by tools/corpus/record; never edited by hand.',
+                       'cases': cases})
+    for project, entries in project_locks.items():
+        write_json_atomic(
+            os.path.join(FIXTURES, 'claims', 'projects', project, 'composer.lock'),
+            {'packages': [entry for entry in entries.values() if entry], 'packages-dev': []})
+    reports = {}
+    for case in cases:
+        reports.setdefault(case['project'], []).append(case['finding'])
+    for project, findings in reports.items():
+        write_json_atomic(os.path.join(FIXTURES, 'claims', 'reports', project + '.json'),
+                          {'findings': findings})
+    print('%d claim case(s) recorded' % len(cases))
+
+
+def _copy_provider(package: str, cache: str) -> None:
+    """The package's p2 document, trimmed to KEEP, with its minified shape left alone."""
+    source = os.path.join(cache, 'repo', PACKAGIST_HOST,
+                          'provider-%s.json' % package.replace('/', '~'))
+    document = read_json(source)
+    if document is None:
+        print('!! no cached p2 for %s' % package, file=sys.stderr)
+
+        return
+    entries = document.get('packages', {}).get(package)
+    if not isinstance(entries, list):
+        return
+    trimmed = []
+    for entry in entries:
+        kept = {key: value for key, value in entry.items() if key in KEEP}
+        if isinstance(kept.get('source'), dict):
+            kept['source'] = {'reference': kept['source'].get('reference')}
+        trimmed.append(kept)
+    write_json_atomic(
+        os.path.join(FIXTURES, 'claims', 'cache', 'repo', PACKAGIST_HOST,
+                     'provider-%s.json' % package.replace('/', '~')),
+        {'packages': {package: trimmed}}, pretty=False)
+
+
+def _choose_pairs(pairs: 'list') -> dict:
+    """One explain pair per rendered shape, so every catalog phrase with a minimum has a document."""
+    wanted = {
+        'a parent dates the installed release': lambda p: p.dated_by is not None,
+        'the installed release is undated': lambda p: (p.metadata and p.installed_at is None
+                                                       and p.lock_day and not p.is_snapshot),
+        # With a metadata block: a snapshot the repository never answered for cannot exercise any
+        # check that reads one, and most of what is interesting about a snapshot is in that block.
+        'a branch snapshot': lambda p: p.is_snapshot and p.metadata is not None,
+        'no metadata block at all': lambda p: p.metadata is None,
+        'S10 says the age was not read': lambda p: 'the age of the package was not read (' in p.text,
+        'libyears measured': lambda p: p.finding.get('libyears') is not None,
+        'libyears not measured': lambda p: (p.finding.get('libyears') is None and p.metadata
+                                            and not p.is_snapshot),
+        'a branch table with several rows':
+            lambda p: p.metadata and len(p.metadata.get('branches') or []) >= 3,
+        'the lock date is a commit its tags share':
+            lambda p: 'by a commit its tags share' in p.text,
+        'a lock entry with no date at all': lambda p: '· undated' in p.text,
+    }
+    chosen = {}
+    taken = set()
+    for label, predicate in wanted.items():
+        for pair in pairs:
+            if pair.name in taken:
+                continue
+            try:
+                if predicate(pair):
+                    chosen[label] = pair
+                    taken.add(pair.name)
+                    break
+            except Exception:  # noqa: BLE001
+                continue
+        if label not in chosen:
+            print('!! nothing in this run has: %s' % label, file=sys.stderr)
+
+    return chosen
+
+
+def _write_pairs(chosen: dict, explains: str) -> None:
+    index = []
+    for label, pair in chosen.items():
+        write_text_atomic(os.path.join(FIXTURES, 'explain', pair.name + '.txt'), pair.text)
+        write_json_atomic(os.path.join(FIXTURES, 'explain', pair.name + '.json'), pair.document)
+        index.append({'slug': pair.name, 'covers': label})
+        print('%-44s %s' % (label, pair.name))
+    write_json_atomic(os.path.join(FIXTURES, 'explain', 'index.json'),
+                      {'_comment': 'Recorded explain pairs, one per rendered shape. Written by '
+                                   'tools/corpus/record; the text half is byte-for-byte lockrot '
+                                   'output and must never be edited, or a rewording stops being '
+                                   'visible.',
+                       'pairs': index})
+
+
+if __name__ == '__main__':
+    sys.exit(main(sys.argv[1:]))

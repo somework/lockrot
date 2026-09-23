@@ -1,0 +1,142 @@
+{
+  "$schema": "https://lockrot.dev/schema/explain-1.json",
+  "lockrot": {
+    "version": "0.11.0",
+    "schema": 1
+  },
+  "package": "illuminate/macroable",
+  "version": "v12.51.0",
+  "finding": {
+    "package": "illuminate/macroable",
+    "version": "v12.51.0",
+    "verdict": "ok",
+    "priority": "none",
+    "direct": false,
+    "dev": false,
+    "replacement": null,
+    "signals": [],
+    "chain": [
+      "directorytree/imapengine",
+      "illuminate/collections",
+      "illuminate/macroable"
+    ],
+    "direct_dependents": [
+      "directorytree/imapengine"
+    ],
+    "evidence": "",
+    "allowlist_reason": null,
+    "note": null,
+    "data_date": "2026-09-23T08:35:09+00:00",
+    "libyears": 0.61
+  },
+  "lock": {
+    "php": "^8.2",
+    "released": "2024-07-23T16:31:01+00:00",
+    "repository": "https://github.com/illuminate/macroable.git",
+    "from_composer_repository": true,
+    "dev": false,
+    "branch_snapshot": false,
+    "type": "library"
+  },
+  "metadata": {
+    "abandoned": false,
+    "replacement": null,
+    "releases_listed": 626,
+    "has_stable_release": true,
+    "last_stable_release": "2026-09-22T14:12:33+00:00",
+    "last_stable_version": "v13.33.0",
+    "last_stable_dated_by": "laravel/framework",
+    "installed_release": "2026-02-10T18:20:19+00:00",
+    "installed_release_dated_by": "laravel/framework",
+    "repository": "https://github.com/illuminate/macroable.git",
+    "type": "library",
+    "data_date": "2026-09-23T08:35:09+00:00",
+    "branches": [
+      {
+        "branch": "13.x",
+        "installed": false,
+        "highest": "v13.33.0",
+        "highest_released": "2026-09-22T14:12:33+00:00",
+        "highest_commit_date": null,
+        "newest_dated": "v13.33.0",
+        "newest_dated_released": "2026-09-22T14:12:33+00:00",
+        "dated_by": "laravel/framework",
+        "php": "^8.2"
+      },
+      {
+        "branch": "12.x",
+        "installed": true,
+        "highest": "v12.69.2",
+        "highest_released": "2026-09-08T14:29:09+00:00",
+        "highest_commit_date": null,
+        "newest_dated": "v12.69.2",
+        "newest_dated_released": "2026-09-08T14:29:09+00:00",
+        "dated_by": "laravel/framework",
+        "php": "^8.2"
+      },
+      {
+        "branch": "11.x",
+        "installed": false,
+        "highest": "v11.56.1",
+        "highest_released": "2026-08-25T14:29:04+00:00",
+        "highest_commit_date": null,
+        "newest_dated": "v11.56.1",
+        "newest_dated_released": "2026-08-25T14:29:04+00:00",
+        "dated_by": "laravel/framework",
+        "php": "^8.2"
+      },
+      {
+        "branch": "10.x",
+        "installed": false,
+        "highest": "v10.50.3",
+        "highest_released": "2026-08-12T03:46:26+00:00",
+        "highest_commit_date": null,
+        "newest_dated": "v10.50.3",
+        "newest_dated_released": "2026-08-12T03:46:26+00:00",
+        "dated_by": "laravel/framework",
+        "php": "^8.1"
+      },
+      {
+        "branch": "9.x",
+        "installed": false,
+        "highest": "v9.52.22",
+        "highest_released": "2026-08-12T03:46:05+00:00",
+        "highest_commit_date": null,
+        "newest_dated": "v9.52.22",
+        "newest_dated_released": "2026-08-12T03:46:05+00:00",
+        "dated_by": "laravel/framework",
+        "php": "^8.0.2"
+      },
+      {
+        "branch": "8.x",
+        "installed": false,
+        "highest": "v8.83.29",
+        "highest_released": "2024-11-20T15:55:41+00:00",
+        "highest_commit_date": null,
+        "newest_dated": "v8.83.29",
+        "newest_dated_released": "2024-11-20T15:55:41+00:00",
+        "dated_by": "laravel/framework",
+        "php": "^7.3|^8.0"
+      }
+    ]
+  },
+  "activity": {
+    "forge": "GitHub",
+    "repository": "illuminate/macroable",
+    "archived": false,
+    "pushed_at": "2026-09-22T14:13:28+00:00",
+    "fetched_at": "2026-09-22T18:52:53+00:00",
+    "from_cache": true
+  },
+  "thresholds": {
+    "release-warn-years": 3,
+    "release-high-years": 5,
+    "push-warn-years": 3,
+    "push-high-years": 5
+  },
+  "target_php": "8.4",
+  "generated_at": "2026-09-23T08:35:09+00:00",
+  "notes": [
+    "2 packages are not from a Composer repository and were not checked"
+  ]
+}

@@ -1,0 +1,85 @@
+{
+  "$schema": "https://lockrot.dev/schema/explain-1.json",
+  "lockrot": {
+    "version": "0.11.0",
+    "schema": 1
+  },
+  "package": "aws/aws-crt-php",
+  "version": "v1.2.7",
+  "finding": {
+    "package": "aws/aws-crt-php",
+    "version": "v1.2.7",
+    "verdict": "ok",
+    "priority": "none",
+    "direct": false,
+    "dev": false,
+    "replacement": null,
+    "signals": [],
+    "chain": [
+      "league/flysystem-aws-s3-v3",
+      "aws/aws-sdk-php",
+      "aws/aws-crt-php"
+    ],
+    "direct_dependents": [
+      "league/flysystem-aws-s3-v3"
+    ],
+    "evidence": "",
+    "allowlist_reason": null,
+    "note": null,
+    "data_date": "2026-09-23T08:32:58+00:00",
+    "libyears": 0
+  },
+  "lock": {
+    "php": ">=5.5",
+    "released": "2024-10-18T22:15:13+00:00",
+    "repository": "https://github.com/awslabs/aws-crt-php.git",
+    "from_composer_repository": true,
+    "dev": false,
+    "branch_snapshot": false,
+    "type": "library"
+  },
+  "metadata": {
+    "abandoned": false,
+    "replacement": null,
+    "releases_listed": 14,
+    "has_stable_release": true,
+    "last_stable_release": "2024-10-18T22:15:13+00:00",
+    "last_stable_version": "v1.2.7",
+    "last_stable_dated_by": null,
+    "installed_release": "2024-10-18T22:15:13+00:00",
+    "installed_release_dated_by": null,
+    "repository": "https://github.com/awslabs/aws-crt-php.git",
+    "type": "library",
+    "data_date": "2026-09-23T08:32:58+00:00",
+    "branches": [
+      {
+        "branch": "1.x",
+        "installed": true,
+        "highest": "v1.2.7",
+        "highest_released": "2024-10-18T22:15:13+00:00",
+        "highest_commit_date": null,
+        "newest_dated": "v1.2.7",
+        "newest_dated_released": "2024-10-18T22:15:13+00:00",
+        "dated_by": null,
+        "php": ">=5.5"
+      }
+    ]
+  },
+  "activity": {
+    "forge": "GitHub",
+    "repository": "awslabs/aws-crt-php",
+    "archived": false,
+    "pushed_at": "2026-07-30T21:17:21+00:00",
+    "fetched_at": "2026-09-22T18:50:48+00:00",
+    "from_cache": true
+  },
+  "thresholds": {
+    "release-warn-years": 3,
+    "release-high-years": 5,
+    "push-warn-years": 3,
+    "push-high-years": 5
+  },
+  "target_php": "8.4",
+  "generated_at": "2026-09-23T08:32:58+00:00",
+  "notes": []
+}

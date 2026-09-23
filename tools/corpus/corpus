@@ -1,0 +1,246 @@
+#!/usr/bin/env python3
+# Audits a lockrot run against the repository data it read, rather than against lockrot.
+# Usage: tools/corpus/corpus {fetch,run,explain,check,diff,refresh,selftest} [options]
+#
+# A full run needs GITHUB_TOKEN and the network and takes hours; `selftest` needs neither and takes
+# seconds. The day is pinned with --today so two runs can be compared at all. Exit 0 means every
+# check ran and found nothing, 1 means it found something, 2 means it cannot tell you either way —
+# a check that selected almost nothing, a corrupt cached document, an empty input tree.
+#
+# Nothing here may import or shell out to lockrot's PHP to work out what the answer should be. The
+# independence is the entire product: a checker that asks the subject what it is about agrees with
+# it by construction, and no test in this repository could tell.
+
+import argparse
+import os
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+from lockrot_corpus import catalog, checks, claims, diff, explain, fetch, load, manifest, report, runner  # noqa: E402
+from lockrot_corpus.jsonio import CorpusDataError, write_json_atomic, write_text_atomic  # noqa: E402
+
+REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+DEFAULT_WORK = os.path.join(REPO_ROOT, 'build', 'corpus')
+
+
+def main(argv: 'list[str]') -> int:
+    parser = argparse.ArgumentParser(prog='corpus', add_help=True)
+    parser.add_argument('--work', default=DEFAULT_WORK,
+                        help='where the corpus, the cache and the runs live (default build/corpus)')
+    sub = parser.add_subparsers(dest='command')
+
+    sub.add_parser('fetch', help='materialise the pinned corpus')
+
+    refresh = sub.add_parser('refresh', help='re-pin the fetched projects to their current HEAD')
+    refresh.add_argument('--today', required=True, help='the date recorded on what moves, YYYY-MM-DD')
+    refresh.add_argument('--only', nargs='*', help='project names, default all')
+
+    run = sub.add_parser('run', help='run one archive over every project')
+    run.add_argument('--phar', required=True)
+    run.add_argument('--out', required=True, help='a name for this run')
+    run.add_argument('--today', required=True, help='pins every "years ago", YYYY-MM-DD')
+    run.add_argument('--anon', action='store_true', help='run without a token, on purpose')
+
+    explain_run = sub.add_parser('explain', help='render every explain target twice')
+    explain_run.add_argument('--phar', required=True)
+    explain_run.add_argument('--out', required=True)
+    explain_run.add_argument('--today', required=True)
+    explain_run.add_argument('--anon', action='store_true')
+    explain_run.add_argument('--targets', default=os.path.join(
+        REPO_ROOT, 'tools', 'corpus', 'targets', 'explain-targets.tsv'))
+
+    check = sub.add_parser('check', help='audit a finished run')
+    check.add_argument('--out', help='the report run to audit')
+    check.add_argument('--explain-out', help='the explain run to audit')
+    check.add_argument('--cache', help='the Composer cache the run read (default <work>/cache)')
+    check.add_argument('--projects', help='the corpus directory (default <work>/projects)')
+    check.add_argument('--format', choices=('text', 'json'), default='text')
+    check.add_argument('--partial', action='store_true',
+                       help='accept a population below the measured floors')
+
+    compare = sub.add_parser('diff', help='compare two runs')
+    compare.add_argument('a')
+    compare.add_argument('b')
+
+    sub.add_parser('selftest', help='run the offline unit tests')
+
+    options = parser.parse_args(argv)
+    if options.command is None:
+        parser.print_usage(sys.stderr)
+
+        return report.USAGE
+
+    handler = {
+        'fetch': _fetch, 'refresh': _refresh, 'run': _run, 'explain': _explain,
+        'check': _check, 'diff': _diff, 'selftest': _selftest,
+    }[options.command]
+    try:
+        return handler(options)
+    except (CorpusDataError, load.LoadError, runner.RunError, manifest.ManifestError,
+            fetch.FetchError, diff.NotComparable) as error:
+        report.note('cannot continue: %s' % error)
+
+        return report.CANNOT_TELL
+
+
+def _projects_dir(options: argparse.Namespace) -> str:
+    return getattr(options, 'projects', None) or os.path.join(options.work, 'projects')
+
+
+def _cache_root(options: argparse.Namespace) -> str:
+    return getattr(options, 'cache', None) or os.path.join(options.work, 'cache')
+
+
+def _fetch(options: argparse.Namespace) -> int:
+    document = manifest.load(REPO_ROOT)
+    _, _, failures = fetch.materialise(document, REPO_ROOT, _projects_dir(options))
+    for failure in failures:
+        report.note(failure)
+    print('%d project(s) pinned, %d unavailable'
+          % (len(manifest.available(document)), len(document['projects']) - len(manifest.available(document))))
+
+    return report.CANNOT_TELL if failures else report.OK
+
+
+def _refresh(options: argparse.Namespace) -> int:
+    manifest.refresh(REPO_ROOT, options.today, options.only)
+
+    return report.OK
+
+
+def _run(options: argparse.Namespace) -> int:
+    out_dir = os.path.join(options.work, 'reports', options.out)
+    result = runner.run_reports(options.phar, _projects_dir(options), out_dir, _cache_root(options),
+                                options.today, anon=options.anon,
+                                corpus_digest=manifest.digest_of(manifest.load(REPO_ROOT)))
+
+    return _closing_line(out_dir, result)
+
+
+def _closing_line(out_dir: str, manifest_document: dict) -> int:
+    """What a run came to, and a non-zero code when part of it did not.
+
+    A run that finished 30 of 39 projects is not a run of the corpus, and saying so here is what
+    stops the next command from auditing three quarters of the evidence and calling it clean.
+    """
+    failed = sorted(name for name, recorded in manifest_document['targets'].items()
+                    if (recorded or {}).get('status') != 'ok')
+    print('%s: %d of %d target(s) complete'
+          % (out_dir, len(manifest_document['targets']) - len(failed), len(manifest_document['targets'])))
+    if failed:
+        report.note('%d target(s) did not finish: %s' % (len(failed), ', '.join(failed)))
+
+        return report.CANNOT_TELL
+
+    return report.OK
+
+
+def _explain(options: argparse.Namespace) -> int:
+    out_dir = os.path.join(options.work, 'explains', options.out)
+    targets = runner.read_targets(options.targets)
+    result = runner.run_explains(options.phar, _projects_dir(options), targets, out_dir,
+                                 _cache_root(options), options.today, anon=options.anon,
+                                 corpus_digest=manifest.digest_of(manifest.load(REPO_ROOT)))
+
+    return _closing_line(out_dir, result)
+
+
+def _check(options: argparse.Namespace) -> int:
+    if not options.out and not options.explain_out:
+        report.note('nothing to audit: pass --out, --explain-out, or both')
+
+        return report.USAGE
+
+    census, listing = _audit(options)
+    if options.partial:
+        # Deliberately narrow, and narrower than it looks: only the measured floors are waived. A
+        # check that judged nothing at all, a decline over the share it declared, and a project the
+        # run never finished all still fail, because none of those is a smaller population — they
+        # are the tool not having an answer.
+        census.failures = [failure for failure in census.failures if 'below its floor' not in failure]
+    if options.format == 'json':
+        print(_json(report.render_json(census)))
+    else:
+        print(report.render_text(census, listing), end='')
+
+    return report.exit_code(census)
+
+
+def _audit(options: argparse.Namespace) -> 'tuple[checks.Census, str | None]':
+    scopes, all_checks, documents, phrases = [], [], [], {}
+    aggregate = []
+    missing = []
+    if options.out:
+        reports_dir = os.path.join(options.work, 'reports', options.out)
+        run_manifest = runner.load_manifest(reports_dir)
+        found, absent = load.load_claims(reports_dir, _projects_dir(options), _cache_root(options),
+                                         REPO_ROOT, run_manifest)
+        if run_manifest is None:
+            missing.append('%s has no run manifest, so nothing records which projects were attempted'
+                           % reports_dir)
+        for project in absent:
+            report.note('no report to audit: %s' % project)
+        if absent:
+            missing.append('%d project(s) of the report run produced nothing to audit: %s'
+                           % (len(absent), ', '.join(absent)))
+        claim_checks = claims.ClaimChecks()
+        all_checks += claim_checks.checks()
+        documents += found
+        aggregate.append(claim_checks)
+        scopes.append('%d findings from %s' % (len(found), reports_dir))
+    if options.explain_out:
+        explain_dir = os.path.join(options.work, 'explains', options.explain_out)
+        pairs, incomplete = load.load_pairs(explain_dir, runner.load_manifest(explain_dir))
+        for slug in incomplete:
+            report.note('not a complete pair, not judged: %s' % slug)
+        if incomplete:
+            missing.append('%d explain target(s) were not judged: %s'
+                           % (len(incomplete), ', '.join(incomplete[:8])
+                              + (', …' if len(incomplete) > 8 else '')))
+        all_checks += explain.checks()
+        documents += pairs
+        phrases = catalog.census([pair.text for pair in pairs])
+        scopes.append('%d explain pairs from %s' % (len(pairs), explain_dir))
+
+    census = checks.run(all_checks, documents, ' and '.join(scopes), phrase_counts=phrases)
+    census.failures.extend(missing)
+    for holder in aggregate:
+        for key, row in holder.aggregate_problems():
+            census.checks['A3'].problems.setdefault(key, []).append(row)
+
+    listing = None
+    if census.problem_count:
+        listing = os.path.join(options.work, 'problems-%s.txt' % (options.out or options.explain_out))
+        write_text_atomic(listing, report.full_listing(census))
+
+    return census, listing
+
+
+def _json(document: object) -> str:
+    import json
+
+    return json.dumps(document, indent=2, ensure_ascii=False)
+
+
+def _diff(options: argparse.Namespace) -> int:
+    root_a = os.path.join(options.work, 'reports', options.a)
+    root_b = os.path.join(options.work, 'reports', options.b)
+    result = diff.compare(root_a, root_b, manifest.digest_of(manifest.load(REPO_ROOT)))
+    print(diff.render(result, root_a, root_b), end='')
+
+    return report.PROBLEMS if result['missing'] else report.OK
+
+
+def _selftest(options: argparse.Namespace) -> int:
+    import unittest
+
+    tests = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'tests')
+    suite = unittest.defaultTestLoader.discover(tests, top_level_dir=tests)
+    result = unittest.TextTestRunner(verbosity=2).run(suite)
+
+    return report.OK if result.wasSuccessful() else report.PROBLEMS
+
+
+if __name__ == '__main__':
+    sys.exit(main(sys.argv[1:]))
