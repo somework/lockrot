@@ -56,6 +56,26 @@ final class RendererManifestTest extends TestCase
         }
     }
 
+    /**
+     * The hashes in the policy are what the browser checks the inline script and stylesheet
+     * against, so they are checked here the same way: sha256 over the exact text between the tags.
+     * A policy that does not match the code it guards renders a blank page, and a manifest written
+     * by the same build would agree with it.
+     */
+    public function testThePolicyHashesAreTheHashesOfTheInlineCode(): void
+    {
+        $page = file_get_contents(self::DIR.'/report.html');
+        self::assertIsString($page);
+        $matched = preg_match('{<meta http-equiv="Content-Security-Policy" content="([^"]+)">}', $page, $policy);
+        self::assertSame(1, $matched, 'the page carries one policy');
+
+        foreach (['script', 'style'] as $kind) {
+            self::assertSame(1, preg_match_all('{<'.$kind.'>(.*?)</'.$kind.'>}s', $page, $inline), 'one inline '.$kind);
+            $hash = "'sha256-".base64_encode(hash('sha256', $inline[1][0], true))."'";
+            self::assertStringContainsString($kind.'-src '.$hash, $policy[1]);
+        }
+    }
+
     public function testTheManifestReadsTheReportSchemaLockrotWrites(): void
     {
         $schema = self::manifest()['schema'] ?? null;

@@ -45,6 +45,13 @@ actual=$(php -r 'echo hash_file("sha256", $argv[1]);' "$work/report.html")
   exit 1
 }
 
+# A release names its version in its manifest; it must be the version that was asked for, or the
+# pin and the CHANGELOG would name one renderer while the page is another.
+if [ "${tag:-}" != "" ]; then
+  named=$(php -r 'echo json_decode(file_get_contents($argv[1]), true)["version"] ?? "";' "$work/manifest.json")
+  [ "v$named" = "$tag" ] || { echo "update-renderer: $tag carries a manifest for version ${named:-nothing}" >&2; exit 1; }
+fi
+
 mkdir -p "$DEST"
 for file in "${FILES[@]}"; do cp "$work/$file" "$DEST/$file"; done
 version=$(php -r 'echo json_decode(file_get_contents($argv[1]), true)["version"] ?? "?";' "$DEST/manifest.json")
