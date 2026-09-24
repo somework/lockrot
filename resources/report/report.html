@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-RHj2FEiGXSKlf8nzwd5i8nt6uN3lO1GIN1nIt00XtJ4='; style-src 'sha256-VUvRlJdFmrCzf03WaJAFic4rHYeD+9VrbHFOoFnQDVo='; img-src data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-DHx7LMeV6En9CBRow2GFxsfVgm9b0UGfHx/j0Ku0Lwg='; style-src 'sha256-ymvElEqyZ94Y+Dx4f9IEVRgI9VSzr71OUHS43WMGF1Y='; img-src data:; base-uri 'none'; form-action 'none'">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="color-scheme" content="light dark">
     <title>{{TITLE}}</title>
@@ -29,20 +29,7 @@
       this file's source, or open it in your browser's developer tools, to read it directly.
     </noscript>
     <script id="lockrot-data" type="application/json">{{DATA}}</script>
-    <style>/*
- * The report's design tokens, ported verbatim from legacy/report.css:1-82. Names and values are a
- * contract with every component stylesheet and with the report's look across releases, so a change
- * here is a visual change to every published report. Two light-theme values are a shade darker
- * than legacy's: --muted (#5f726f) and --high (#a95a07) fell just short of 4.5:1 on the tinted
- * surfaces they sit on (--surface-2, --high-soft), which axe reports as a contrast failure.
- *
- * Theming, as the legacy page does it: light lives on bare :root; the OS dark preference applies
- * unless the reader pinned light (data-theme="light"); an explicit data-theme="dark" applies
- * whatever the OS says. The dark block is written twice because CSS has no way to share one
- * declaration block between a media-query branch and an attribute branch without a preprocessor or
- * light-dark(), and this file is shipped as written (DESIGN.md §1: nothing is minified or compiled).
- */
-:root {
+    <style>:root {
   --bg: #f2f5f4;
   --surface: #ffffff;
   --surface-2: #e9eeec;
@@ -67,14 +54,9 @@
   --none-soft: #dcebe1;
   --shadow: 0 1px 2px rgba(15, 26, 25, 0.06), 0 8px 24px -12px rgba(15, 26, 25, 0.18);
   --backdrop: rgba(4, 12, 11, 0.55);
-  /* Nothing is fetched: a report about dependency risk does not phone home, and it has to
-     render from file:// and under a strict CSP. These are the stacks every target already has. */
   --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --cond: var(--sans);
   --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
-
-  /* The spacing and radius steps the legacy stylesheet used as scattered literals (css-html.md
-     §10.2), named so new rules pick from a scale instead of inventing a thirteenth padding. */
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -86,9 +68,6 @@
   --radius-l: 10px;
   --gutter: 20px;
   --page-max: 1500px;
-
-  /* Height of the sticky header, measured by Header at runtime; this is only the first-paint
-     guess, close to the brand row plus the tab row. */
   --topbar-h: 104px;
 
   color-scheme: light;
@@ -154,20 +133,11 @@
   --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 28px -14px rgba(0, 0, 0, 0.8);
   color-scheme: dark;
 }
-/*
- * Reset, typography and the small shared pieces every surface uses (the classes common.tsx emits).
- * Component stylesheets sit next to their components; only what more than one surface needs lives
- * here.
- */
-
 *,
 *::before,
 *::after {
   box-sizing: border-box;
 }
-
-/* Every display rule below is a class selector, which ties with [hidden] on specificity and wins on
-   order. Without this, hiding an element leaves it holding its grid column (legacy report.css:85-87). */
 [hidden] {
   display: none !important;
 }
@@ -219,14 +189,10 @@ code {
   background: var(--accent-soft);
   color: var(--ink);
 }
-
-/* One focus ring for the whole page: visible on keyboard focus only, never on a mouse click. */
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
-
-/* ---------- typography helpers ---------- */
 .mono {
   font-family: var(--mono);
   font-variant-numeric: tabular-nums;
@@ -245,12 +211,6 @@ code {
   text-transform: uppercase;
   color: var(--muted);
 }
-
-/* ---------- tones ----------
-   A tone is a pair of custom properties, set by one class and read by whatever draws it: a pill's
-   text and border, a bar segment's fill, a stripe. Colour never travels as an inline style, which
-   the page's CSP would refuse (DESIGN.md §1.3). The root default matches TONE()'s own fallback,
-   "low", so an element that reads --tone outside any tone class still gets a real colour. */
 :root {
   --tone: var(--low);
   --tone-soft: var(--low-soft);
@@ -275,8 +235,6 @@ code {
   --tone: var(--none);
   --tone-soft: var(--none-soft);
 }
-
-/* ---------- pills and tags ---------- */
 .pill {
   display: inline-block;
   font-family: var(--cond);
@@ -314,8 +272,6 @@ a.pill:hover {
   border-color: var(--tone);
   background: var(--tone-soft);
 }
-
-/* ---------- links ---------- */
 .lnk {
   color: inherit;
   text-decoration: none;
@@ -341,8 +297,6 @@ a.out:hover {
   color: var(--accent-ink);
   border-bottom-style: solid;
 }
-
-/* ---------- buttons ---------- */
 .icon-btn {
   background: var(--surface-2);
   border: 1px solid var(--border);
@@ -367,8 +321,6 @@ a.out:hover {
 .icon-btn:disabled:hover {
   border-color: var(--border);
 }
-
-/* Motion is decoration here, never information: with reduced motion asked for, all of it goes. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -378,14 +330,6 @@ a.out:hover {
     scroll-behavior: auto !important;
   }
 }
-
-/*
- * A publisher's line above the report: a site that republishes someone else's run says where the
- * document came from (lockrot.dev's published reports do). The page's Content-Security-Policy
- * refuses style attributes, so a publisher cannot style its own markup inline; it puts a
- * div with class lockrot-provenance first thing in the body, and the page styles it in both themes.
- * This class is part of the renderer's public interface (README, "Publishing a report").
- */
 .lockrot-provenance {
   font: 13px/1.5 var(--sans);
   background: var(--surface);
@@ -403,13 +347,6 @@ a.out:hover {
     background: none;
   }
 }
-/*
- * The package detail panel. Class names are prefixed `detail-` throughout, even where legacy used a
- * short generic name (`.sect`, `.kv`, `.action`) that another surface of this rewrite (the Run view,
- * the Advisories tab) also has reason to want for its own, differently-tuned rule — this file only
- * ever selects its own component's markup.
- */
-
 .detail {
   position: sticky;
   top: 196px;
@@ -440,8 +377,6 @@ a.out:hover {
   margin: 20px 16px 0;
   color: var(--muted);
 }
-
-/* ---------- header ---------- */
 .detail-head {
   position: sticky;
   top: 0;
@@ -495,8 +430,6 @@ a.out:hover {
 .detail-close:hover {
   border-color: var(--border-strong);
 }
-
-/* ---------- body / sections ---------- */
 .detail-body {
   padding: 4px 16px 24px;
   display: flex;
@@ -547,8 +480,6 @@ a.out:hover {
   font-size: 12px;
   word-break: break-word;
 }
-
-/* ---------- why this priority ---------- */
 .detail-why {
   display: flex;
   flex-wrap: wrap;
@@ -573,8 +504,6 @@ a.out:hover {
   margin: 0 6px;
   color: var(--muted);
 }
-
-/* ---------- signals ---------- */
 .detail-signal {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
@@ -589,8 +518,6 @@ a.out:hover {
 .detail-signal + .detail-signal {
   margin-top: 6px;
 }
-/* "Every advisory" under the fix ladder: the same disclosure line as a signal, with no id beside it
-   and no panel behind it. */
 .detail-disclosure {
   padding-left: 11px;
   border: 1px solid var(--border);
@@ -610,7 +537,6 @@ a.out:hover {
 .detail-signal-summary::-webkit-details-marker {
   display: none;
 }
-/* The disclosure chevron closes the line, since the signal's id link now opens it. */
 .detail-signal-summary::after {
   content: "▸";
   margin-left: auto;
@@ -644,8 +570,6 @@ a.out:hover {
     transition: none;
   }
 }
-
-/* ---------- release timeline ---------- */
 .detail-timeline {
   display: flex;
   flex-direction: column;
@@ -670,7 +594,7 @@ a.out:hover {
   grid-template-columns: 62px minmax(0, 1fr);
   gap: 4px;
   align-items: center;
-  height: 22px;
+  min-height: 22px;
 }
 .detail-timeline-branch {
   font-family: var(--mono);
@@ -686,7 +610,11 @@ a.out:hover {
 }
 .detail-timeline-track {
   position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 22px;
   height: 100%;
+  padding: 3px 0;
   border-bottom: 1px dotted var(--border);
 }
 .detail-timeline-dot {
@@ -706,18 +634,14 @@ a.out:hover {
   background: var(--none);
   box-shadow: 0 0 0 3px var(--none-soft);
 }
-/* Bounded on both sides by the track, so a label never runs over the branch names or out of the
-   panel on a narrow sheet: it ends in an ellipsis instead (the full text stays in the DOM). */
 .detail-timeline-label {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
+  flex: 1 1 auto;
+  min-width: 0;
   font-family: var(--mono);
   font-size: 10px;
+  line-height: 1.35;
   color: var(--muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow-wrap: anywhere;
 }
 .detail-timeline-label.is-flipped {
   text-align: right;
@@ -746,8 +670,6 @@ a.out:hover {
 .detail-timeline-swatch-newest {
   background: var(--none);
 }
-
-/* ---------- follow the upstream ---------- */
 .detail-action {
   background: var(--accent-soft);
   border: 1px solid var(--accent);
@@ -776,8 +698,6 @@ a.out:hover {
   font-family: var(--mono);
   font-size: 12px;
 }
-/* The command wraps rather than scrolls: in a narrow sheet a scrolling box carried the Copy button
-   out of view with it. The button is what copies, so a wrapped line costs nothing. */
 .detail-cmd-text {
   flex: 1;
   min-width: 0;
@@ -799,8 +719,6 @@ a.out:hover {
 .detail-copy:hover {
   border-color: var(--border-strong);
 }
-
-/* ---------- advisories ---------- */
 .detail-ladder {
   display: flex;
   flex-direction: column;
@@ -884,8 +802,6 @@ a.out:hover {
 .detail-advisory-meta .mono {
   color: var(--ink-2);
 }
-/* The ledger strip: four equal-width blocks on a wide screen, collapsing to two and then one
-   column as the report narrows. Ported from legacy report.css's `.ledger`/`.ledger-block` rules. */
 .ledger {
   max-width: 1500px;
   margin: 0 auto;
@@ -916,8 +832,6 @@ a.out:hover {
 .ledger-figure {
   color: var(--ink);
 }
-
-/* The one ledger block whose weight is a number rather than a bar (libyears). */
 .figure {
   margin: 0;
   font-family: var(--mono);
@@ -934,9 +848,6 @@ a.out:hover {
   background: var(--surface-2);
   border: 1px solid var(--border);
 }
-
-/* Tone-* classes (toneClass()) define --tone/--tone-soft on the element itself (styles/base.css);
-   the dynamic width is the one part CSP forces through the CSSOM instead (style={{flexGrow}}). */
 .bar-seg {
   display: block;
   background: var(--tone);
@@ -977,9 +888,6 @@ a.out:hover {
 .legend-btn[aria-pressed="true"] {
   border-bottom-color: currentColor;
 }
-
-/* A bucket with nothing flagged in it reads quieter, but its text keeps full contrast: the legacy
-   page faded the whole button to 35% opacity, which left the label unreadable. Only the swatch fades. */
 .legend-btn-dim {
   color: var(--muted);
 }
@@ -1003,8 +911,6 @@ a.out:hover {
   font-family: var(--mono);
   color: var(--muted);
 }
-/* The filter rail: a sticky column of toggle groups beside the list. Ported from legacy
-   report.css's `.rail`/`.rail-group`/`.opt` rules. */
 .rail {
   display: flex;
   flex-direction: column;
@@ -1069,7 +975,6 @@ a.out:hover {
   font-size: 11px;
   color: var(--muted);
 }
-/* Ported from legacy report.css's `.searchbar`/`.hint`/`.count-line` rules. */
 .searchbar {
   display: flex;
   gap: 8px;
@@ -1097,9 +1002,6 @@ a.out:hover {
   color: var(--muted);
   margin: -4px 0 14px;
 }
-
-/* <kbd> for the keyboard shortcuts ("a key you press") and <code> for the search keys (text you
-   type), one look for both, as legacy's <code> had. */
 .hint kbd,
 .hint code {
   font-family: var(--mono);
@@ -1108,9 +1010,6 @@ a.out:hover {
   border-radius: 4px;
   font-size: 11px;
 }
-
-/* A phone has no keyboard to press them on: under 760px the shortcut half of the hint goes, which
-   also brings the list up (DESIGN.md §8). */
 @media (max-width: 759px) {
   .hint-keys {
     display: none;
@@ -1130,17 +1029,6 @@ a.out:hover {
 .active-filters {
   color: var(--accent-ink);
 }
-/*
- * The tab bodies: Findings, Advisories, Packages, Radius, Run. Pills, tags, links and buttons reuse
- * the shared classes from styles/base.css (`.pill`, `.tag`, `.out`, `.icon-btn`, `.mono`, `.muted`,
- * `.eyebrow`, the `.tone-*` classes); everything here is specific to this surface's own layout.
- * Ported from legacy/report.css's findings/tables/other-views section (~lines 290-767), with every
- * inline `style="…"` legacy used there turned into a class — the page's CSP refuses a `style`
- * attribute, and DESIGN.md reserves the `style` prop itself for values that are actually numeric and
- * change per row (a meter's width), never for a fixed layout rule.
- */
-
-/* ---------- findings: priority groups ---------- */
 .group {
   margin-bottom: var(--space-5);
 }
@@ -1164,9 +1052,6 @@ a.out:hover {
 .group-count {
   font-size: 12px;
 }
-
-/* ---------- rows (Findings, Packages, Radius, Advisories all build on this shape) ---------- */
-/* The row lists are real lists (`<ul>`) for assistive tech; none of them wants bullets or indents. */
 .rows,
 .adv-list,
 .pulled-list {
@@ -1235,8 +1120,6 @@ a.out:hover {
     margin-left: 0;
   }
 }
-
-/* ---------- signal lines inside a Findings row ---------- */
 .sig-lines {
   display: flex;
   flex-direction: column;
@@ -1279,10 +1162,6 @@ a.out:hover {
   color: var(--muted);
   padding-left: 34px;
 }
-
-/* A small inline "open this package" action used by the quiet-advisory note, an Advisories row's
-   package mention and a Radius card's pulled list — a link-styled button, never a real `<a>`, since
-   it only ever opens the detail pane and never navigates. */
 .pkg-link-btn {
   background: none;
   border: 0;
@@ -1316,8 +1195,6 @@ a.out:hover {
   text-align: center;
   color: var(--muted);
 }
-
-/* ---------- Packages table ---------- */
 .tablewrap {
   overflow-x: auto;
   background: var(--surface);
@@ -1357,7 +1234,6 @@ a.out:hover {
 .tablewrap tbody tr:hover td {
   background: var(--surface-2);
 }
-/* The open package's row (M6): the accent rule on its first cell mirrors a Findings row's border. */
 .tablewrap tbody tr[aria-selected="true"] td {
   background: var(--surface-2);
 }
@@ -1388,8 +1264,6 @@ a.out:hover {
 .kv-wrap {
   padding: 12px 14px;
 }
-
-/* ---------- Blast radius ---------- */
 .radius-note {
   font-size: 12px;
   color: var(--muted);
@@ -1433,8 +1307,6 @@ a.out:hover {
 }
 .pulled-row {
   display: flex;
-  /* A long package name next to its verdict pill must wrap, not push the card past a phone's
-     edge: at 320px on Linux fonts the pill used to end 2px outside the viewport. */
   flex-wrap: wrap;
   min-width: 0;
   gap: 7px;
@@ -1460,8 +1332,6 @@ a.out:hover {
   color: var(--muted);
   font-size: 12px;
 }
-
-/* ---------- Advisories ---------- */
 .advgroup {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -1508,7 +1378,6 @@ a.out:hover {
 .adv[aria-current="true"] {
   background: var(--surface-2);
 }
-/* The severity tag keeps its own width instead of stretching across the 68px column. */
 .adv > .tag {
   justify-self: start;
 }
@@ -1527,8 +1396,6 @@ a.out:hover {
 .adv .m .mono {
   color: var(--ink-2);
 }
-
-/* ---------- Run ---------- */
 .sect {
   display: flex;
   flex-direction: column;
@@ -1568,14 +1435,6 @@ a.out:hover {
   font-size: 12px;
   color: var(--muted);
 }
-/*
- * The page shell: header band, tabs, the ledger slot, the three-column layout, the detail sheet,
- * the glossary dialog and the colophon. Visual language ported from legacy/report.css; layout
- * decisions in DESIGN.md §8. Breakpoints: 1181px and up is three columns (rail, list, detail);
- * 760-1180px is rail and list with the detail as a sheet; under 760px is one column, list first.
- */
-
-/* ---------- header ---------- */
 .topbar {
   background: var(--surface);
   border-bottom: 1px solid var(--border);
@@ -1657,11 +1516,6 @@ a.out:hover {
     padding-top: 4px;
   }
 }
-
-/* ---------- tabs ----------
-   The tab row scrolls sideways when it does not fit. The two "local" gradients are painted with
-   the content and cover the two "scroll" shadows at each end until there is something to scroll
-   to on that side: a cue drawn by CSS alone, which the legacy row lacked (css-html.md §10.3). */
 .tabs {
   max-width: var(--page-max);
   margin: 0 auto;
@@ -1710,18 +1564,10 @@ a.out:hover {
 .tab .n:empty {
   display: none;
 }
-
-/* ---------- ledger band ----------
-   The summary sits on the header's surface, as on the legacy page, so the page reads as a band of
-   totals above the list; only the header part above it sticks. */
 .ledger-band {
   background: var(--surface);
   border-bottom: 1px solid var(--border);
 }
-
-/* ---------- ledger fold (phone widths) ----------
-   The ledger keeps its own padding on wider screens; folded, the fold carries the page gutter and
-   the ledger inside it drops its own. */
 .ledger-fold {
   max-width: var(--page-max);
   margin: 0 auto;
@@ -1763,8 +1609,6 @@ a.out:hover {
 .ledger-fold[open] > summary {
   margin-bottom: 14px;
 }
-
-/* ---------- layout ---------- */
 .shell {
   max-width: var(--page-max);
   margin: 0 auto;
@@ -1774,8 +1618,6 @@ a.out:hover {
   gap: 20px;
   align-items: start;
 }
-/* Run data has nothing to filter, so the rail goes, and its column with it, or the list would
-   inherit the rail's 210px and every value would wrap one character at a time. */
 .shell.no-rail {
   grid-template-columns: minmax(0, 1fr) minmax(0, 420px);
 }
@@ -1806,16 +1648,12 @@ a.out:hover {
   overscroll-behavior: contain;
   scrollbar-width: thin;
 }
-/* The column scrolls and sticks; the rail inside it must not stick a second time against a guessed
-   offset of its own. */
 .shell-rail > .rail {
   position: static;
 }
 .rail-fold[open] > summary {
   margin-bottom: 12px;
 }
-
-/* ---------- detail: a column beside the list, or a sheet over the page ---------- */
 .shell-detail:empty {
   display: none;
 }
@@ -1851,12 +1689,9 @@ a.out:hover {
     opacity: 1;
   }
 }
-/* Only while a sheet with something in it covers the page (DESIGN.md §5 M13). */
 body.detail-open:has(.shell-detail.is-sheet > *) {
   overflow: hidden;
 }
-
-/* ---------- newer schema ---------- */
 .schema-banner {
   background: var(--high-soft);
   border-bottom: 1px solid var(--high);
@@ -1868,10 +1703,6 @@ body.detail-open:has(.shell-detail.is-sheet > *) {
   margin: 0 auto;
   padding: 10px var(--gutter);
 }
-
-/* ---------- glossary ----------
-   Fixed in both modes: the UA already fixes a modal dialog, and the fallback for a frame that
-   forbids modals (DESIGN.md §5 M28) is pinned the same way, with a spread shadow for a backdrop. */
 .glossary {
   position: fixed;
   inset: 0;
@@ -1978,9 +1809,6 @@ body.detail-open:has(.shell-detail.is-sheet > *) {
     margin-bottom: 8px;
   }
 }
-
-/* ---------- colophon ----------
-   Who made the instrument, not who was audited. Below everything, never sticky. */
 .colophon {
   max-width: var(--page-max);
   margin: 0 auto;
@@ -1992,8 +1820,6 @@ body.detail-open:has(.shell-detail.is-sheet > *) {
   font-size: 12px;
   color: var(--muted);
 }
-/* The one line in the colophon a reader is meant to act on, so it carries ink rather than the
-   muted grey the rest of the footer is set in. */
 .colophon .cta {
   margin-top: 4px;
   padding: 9px 12px;
@@ -2018,19 +1844,6 @@ body.detail-open:has(.shell-detail.is-sheet > *) {
     overflow-wrap: anywhere;
   }
 }
-/*
- * Print is pure CSS, as it was in the legacy page (legacy/report.css:629-636, 813, 816): there is no
- * print button and no beforeprint handler. A printed report keeps what it says and drops what only
- * works on a screen: the tabs, the filters, the search box, the two header buttons, and the detail
- * pane (a sheet or a side column that would print as a clipped box).
- *
- * `.searchbar` and `.hint` are SearchBar's own classes (search/SearchBar.tsx); the count line it
- * renders beneath them stays, as it did on the legacy page.
- *
- * The rules that keep a row or a card from splitting across pages select by role, the same roles
- * the accessibility contract (e2e/support/new.ts) asks every list entry to carry, so they hold
- * whatever class names the list components use.
- */
 @media print {
   :root {
     color-scheme: light;
@@ -2077,7 +1890,7 @@ body.detail-open:has(.shell-detail.is-sheet > *) {
     border-left-color: #999;
   }
 }
-/*$vite$:1*/</style>
+</style>
     <script>var LockrotReport = (function(exports) {
 	Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
 	//#region node_modules/preact/dist/preact.module.js
@@ -4065,6 +3878,9 @@ body.detail-open:has(.shell-detail.is-sheet > *) {
 		if (lane.newest && !lane.installed) classes.push("detail-timeline-lane-newest");
 		return classes.join(" ");
 	}
+	function labelGrowsLeft(x) {
+		return x > 50;
+	}
 	function Timeline({ metadata, installedVersion }) {
 		const { now } = useReport();
 		const layout = timelineLayout(metadata?.branches ?? [], now);
@@ -4083,14 +3899,8 @@ body.detail-open:has(.shell-detail.is-sheet > *) {
 							children: tick.year
 						}, tick.year))
 					}), layout.lanes.map((lane) => {
-						const labelPastMidpoint = lane.x > 62;
-						const labelStyle = labelPastMidpoint ? {
-							left: "0%",
-							right: `${100 - lane.x + 2}%`
-						} : {
-							left: `${lane.x + 2}%`,
-							right: "0%"
-						};
+						const labelPastMidpoint = labelGrowsLeft(lane.x);
+						const labelStyle = labelPastMidpoint ? { marginRight: `${100 - lane.x + 2}%` } : { marginLeft: `${lane.x + 2}%` };
 						return u("div", {
 							className: laneClassName(lane),
 							children: [u("span", {
@@ -4108,7 +3918,7 @@ body.detail-open:has(.shell-detail.is-sheet > *) {
 										lane.label,
 										" · ",
 										day(lane.date),
-										lane.php !== null && ` · php ${lane.php}`
+										lane.php !== null && ` · php\u00a0${lane.php}`
 									]
 								})]
 							})]
@@ -6431,7 +6241,7 @@ body.detail-open:has(.shell-detail.is-sheet > *) {
 	function parse(text) {
 		return parseBundle(text);
 	}
-	var version = "0.11.0";
+	var version = "0.12.0";
 	function autoboot() {
 		const dataEl = document.getElementById("lockrot-data");
 		const appEl = document.getElementById("lockrot-app");
