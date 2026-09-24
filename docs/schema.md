@@ -29,7 +29,7 @@ The report, the explanation and the baseline file open with a `$schema` key nami
 {
     "$schema": "https://lockrot.dev/schema/report-1.json",
     "lockrot": {
-        "version": "0.11.0",
+        "version": "0.12.0",
         "schema": 1
     },
     …
