@@ -15,16 +15,17 @@ Four commands make up the local check suite. CI runs them on every PHP/Composer 
 | `composer cs` | php-cs-fixer in `--dry-run --diff` mode. |
 | `composer cs-fix` | The same fixer, applying the changes. |
 
-The report page has one more, and it needs node — a development tool here and nowhere else. The page
-has no build step, the PHAR is built without node, and what ships is the source under
-`resources/report/`. `resources/report/lib.js` is the half of the page with no DOM in it, which is
-also the half where a mistake stops being a rendering bug: it holds the escaping, the check that
-keeps a `javascript:` URL out of an `href`, and the one that keeps a second shell command off the
-clipboard. node's own runner covers it, with no `package.json` and nothing installed:
+The report page is not built here. It lives in its own repository,
+[somework/lockrot-report](https://github.com/somework/lockrot-report), with its own tests in real
+browsers; lockrot vendors a release of it as `resources/report/report.html` and `manifest.json`, so
+the PHAR is still built without node. To move to a new release:
 
-    node --test tests/js/*.test.js
+    tools/report/update-renderer v1.2.3
 
-The rest of `report.js` needs a browser and is not covered. Change it and open the page.
+The script verifies the release's build provenance with `gh attestation verify`, then the page
+against the sha256 its manifest states, and `RendererManifestTest` checks the second part on every
+run. Do not edit the vendored page by hand: change the renderer, release it, update the pin. What
+goes into the page — which packages, which facts — is decided here, in `src/Html/ReportDocument.php`.
 
 ## What the code has to run on
 

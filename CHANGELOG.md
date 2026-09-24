@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- The `--format=html` page is built in its own repository now,
+  [somework/lockrot-report](https://github.com/somework/lockrot-report) (0.11.0), in TypeScript with tests
+  in real browsers, and vendored here as one file with the manifest of its release. The report and
+  its address format are the same; the page carries its own Content-Security-Policy, which pins its
+  one script and one stylesheet by hash and allows no connection, so a host serving it no longer
+  needs `'unsafe-inline'` for styles. On a phone the findings come first. The fixes that came with
+  the rewrite — a bad escape in the address no longer blanks the page, the theme button is right the
+  first time under a dark OS setting, `j`/`k` walk the rows on screen, and a dozen more — are in the
+  renderer's changelog. `tools/report/update-renderer` moves the pin after checking the release's
+  build provenance.
+
 ### Added
 
 - `tools/corpus/`, the corpus checks, which read lockrot's output against the data lockrot read

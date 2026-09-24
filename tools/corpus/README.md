@@ -143,8 +143,7 @@ and a dash before a pre-release number — together affecting 3,346 of 96,599 re
 
 **This tool is stdlib-only Python on the 3.12 in `.python-version`, and it does not inherit
 lockrot's PHP 7.4 floor.** There is no `requirements.txt`, no ruff, no pytest and nothing to
-install, which follows the precedent CONTRIBUTING already sets for the node checks over
-`resources/report/lib.js`: the language's own runner, nothing installed. `python -m compileall` and
+install: the language's own runner, nothing installed. `python -m compileall` and
 `python -m unittest` are the whole toolchain.
 
 ## Files

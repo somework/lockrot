@@ -114,15 +114,15 @@ reviews:
           selector reopens the hole the tool exists to close.
         Stdlib only, on the version in .python-version, run with unittest and compileall: there is
         no requirements.txt, no ruff, no pytest and nothing to install, following the same
-        arrangement CONTRIBUTING describes for the node checks. It does not inherit the PHP 7.4
+        nothing-installed arrangement lockrot keeps for its own checks. It does not inherit the PHP 7.4
         floor.
-    - path: 'resources/report/*.js'
+    - path: 'resources/report/**'
       instructions: |
-        Ships as source: the page has no build step and the PHAR is built without node. lib.js is
-        the half with no DOM in it and holds the escaping, the check that keeps a javascript: URL
-        out of an href, and the one that keeps a second shell command off the clipboard; it is
-        covered by node's own runner in tests/js. The rest of report.js needs a browser and is not
-        covered.
+        Vendored build output of somework/lockrot-report, brought in by tools/report/update-renderer
+        after verifying its build provenance; RendererManifestTest pins report.html to the sha256
+        in manifest.json. Do not review or suggest edits to these files — a change belongs in the
+        renderer repository and arrives here as a new release. Review only whether a diff here came
+        with a matching manifest and a CHANGELOG entry naming the renderer version.
     - path: '.github/workflows/**'
       instructions: |
         timeout-minutes is set from a dated measurement of a real run, not guessed. ci.yml is
