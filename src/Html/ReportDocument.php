@@ -17,11 +17,11 @@ use Lockrot\Version;
 /**
  * Everything `--format=html` puts inside the page, as one array.
  *
- * The page itself renders; this decides what it has to render from. Keeping the two apart is what
- * makes the format testable at all: the JavaScript in resources/report/ is exercised by hand in a
- * browser, while the decisions — which packages get their release branches, what the baseline says
- * about each finding, which repository URL is safe to turn into a link — are made here and asserted
- * in {@see \Lockrot\Tests\Unit\Html\ReportDocumentTest}.
+ * The page itself renders; this decides what it has to render from. The two live in different
+ * repositories: the renderer (somework/lockrot-report) is tested in browsers against real payloads,
+ * while the decisions — which packages get their release branches, what the baseline says about
+ * each finding, which repository URL is safe to turn into a link — are made here and asserted in
+ * {@see \Lockrot\Tests\Unit\Html\ReportDocumentTest}. This array is the contract between them.
  *
  * The `report` key is exactly what `--format=json` writes under its envelope, so a consumer who
  * pulls the payload out of the page gets a document that validates against the published report
@@ -41,7 +41,7 @@ final class ReportDocument
 
     /**
      * @param bool $showAll explain every package, not only the flagged ones. Costs roughly 4 KB a
-     *                      package, so the default keeps a 100-package report around 250 KB rather
+     *                      package, so the default keeps a 100-package report around 300 KB rather
      *                      than a megabyte
      *
      * @return array<string, mixed>

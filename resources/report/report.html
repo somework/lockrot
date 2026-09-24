@@ -1,170 +1,6457 @@
 <!doctype html>
 <html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>{{TITLE}}</title>
-<meta name="description" content="{{DESCRIPTION}}">
-<!--
+  <head>
+    <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-RHj2FEiGXSKlf8nzwd5i8nt6uN3lO1GIN1nIt00XtJ4='; style-src 'sha256-VUvRlJdFmrCzf03WaJAFic4rHYeD+9VrbHFOoFnQDVo='; img-src data:; base-uri 'none'; form-action 'none'">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="color-scheme" content="light dark">
+    <title>{{TITLE}}</title>
+    <meta name="description" content="{{DESCRIPTION}}">
+    <!--
   Indexing is the publisher's call, not this file's: a report lives on someone else's domain, and
   robots.txt and a response header are where that decision belongs. What is here instead is what a
   link needs when the page is shared: a title, a sentence and a card image. The image is fetched by
   a social scraper, never by the page, which still loads nothing at render.
 -->
-<meta property="og:type" content="article">
-<meta property="og:title" content="{{TITLE}}">
-<meta property="og:description" content="{{DESCRIPTION}}">
-<meta property="og:image" content="https://lockrot.dev/assets/og.png">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="{{TITLE}}">
-<meta name="twitter:description" content="{{DESCRIPTION}}">
-<style>
-{{CSS}}
-</style>
-</head>
-<body>
-<header class="topbar">
-  <div class="topbar-in">
-    <div class="brand">
-      <span class="dot" aria-hidden="true"></span>
-      <h1><a href="https://lockrot.dev/" target="_blank" rel="noopener noreferrer">lockrot</a></h1>
-      <span class="eyebrow" id="projectName"></span>
-    </div>
-    <div class="run-meta">
-      <!-- An em dash, like its neighbours: the script fills all three in, and until it does the
-           page must not name a version this run may not have targeted. -->
-      <span>target PHP <b class="mono" id="mTarget">—</b></span>
-      <span>data as of <b class="mono" id="mData">—</b></span>
-      <span>lockrot <b class="mono" id="mVersion">—</b></span>
-      <button class="icon-btn" id="legendBtn" type="button">What these words mean</button>
-      <button class="icon-btn" id="themeBtn" type="button">Dark</button>
-    </div>
-  </div>
-  <nav class="tabs" id="tabs" role="tablist" aria-label="Report views">
-    <button class="tab" role="tab" data-view="findings" aria-selected="true" type="button">Findings<span class="n" id="tabFindings"></span></button>
-    <button class="tab" role="tab" data-view="advisories" aria-selected="false" type="button">Advisories<span class="n" id="tabAdvisories"></span></button>
-    <button class="tab" role="tab" data-view="packages" aria-selected="false" type="button">All packages<span class="n" id="tabPackages"></span></button>
-    <button class="tab" role="tab" data-view="radius" aria-selected="false" type="button">Blast radius<span class="n" id="tabRadius"></span></button>
-    <button class="tab" role="tab" data-view="run" aria-selected="false" type="button">Run data<span class="n" id="tabRun"></span></button>
-  </nav>
-  <div class="ledger">
-    <div class="ledger-block">
-      <span class="eyebrow" title="Every verdict except ok and finished">Priority of the <span id="flaggedCount">0</span> flagged packages</span>
-      <div class="bar" id="prioBar" role="img" aria-label="Priority distribution"></div>
-      <div class="legend" id="prioLegend"></div>
-    </div>
-    <div class="ledger-block">
-      <span class="eyebrow">Verdicts across <span id="totalCount">0</span> packages</span>
-      <div class="bar" id="verdictBar" role="img" aria-label="Verdict distribution"></div>
-      <div class="legend" id="verdictLegend"></div>
-    </div>
-    <div class="ledger-block">
-      <span class="eyebrow" id="advLabel">Security advisories</span>
-      <div class="bar" id="advBar" role="img" aria-label="Advisory severity distribution"></div>
-      <div class="legend" id="advLegend"></div>
-    </div>
-    <div class="ledger-block">
-      <span class="eyebrow" title="Years between the installed release and the newest stable release, summed over the measured packages. Counts every drift, healthy patches included.">Libyears behind</span>
-      <p class="figure"><span id="libyearsTotal">—</span></p>
-      <div class="legend" id="libyearsLine"></div>
-    </div>
-  </div>
-</header>
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="{{TITLE}}">
+    <meta property="og:description" content="{{DESCRIPTION}}">
+    <meta property="og:image" content="https://lockrot.dev/assets/og.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{TITLE}}">
+    <meta name="twitter:description" content="{{DESCRIPTION}}">
+  </head>
+  <body>
+    <div id="lockrot-app"></div>
+    <noscript>
+      This report needs JavaScript to render. Nothing on this page loads from the network either way: the data
+      it would have shown is sitting, unread, in the <code>lockrot-data</code> script element below — view
+      this file's source, or open it in your browser's developer tools, to read it directly.
+    </noscript>
+    <script id="lockrot-data" type="application/json">{{DATA}}</script>
+    <style>/*
+ * The report's design tokens, ported verbatim from legacy/report.css:1-82. Names and values are a
+ * contract with every component stylesheet and with the report's look across releases, so a change
+ * here is a visual change to every published report. Two light-theme values are a shade darker
+ * than legacy's: --muted (#5f726f) and --high (#a95a07) fell just short of 4.5:1 on the tinted
+ * surfaces they sit on (--surface-2, --high-soft), which axe reports as a contrast failure.
+ *
+ * Theming, as the legacy page does it: light lives on bare :root; the OS dark preference applies
+ * unless the reader pinned light (data-theme="light"); an explicit data-theme="dark" applies
+ * whatever the OS says. The dark block is written twice because CSS has no way to share one
+ * declaration block between a media-query branch and an attribute branch without a preprocessor or
+ * light-dark(), and this file is shipped as written (DESIGN.md §1: nothing is minified or compiled).
+ */
+:root {
+  --bg: #f2f5f4;
+  --surface: #ffffff;
+  --surface-2: #e9eeec;
+  --surface-3: #dfe7e4;
+  --border: #d3ddda;
+  --border-strong: #b4c3bf;
+  --ink: #0f1a19;
+  --ink-2: #3a4b49;
+  --muted: #536562;
+  --accent: #0f766e;
+  --accent-soft: #d7ece8;
+  --accent-ink: #0a574f;
+  --crit: #a92b1f;
+  --crit-soft: #f6dfdc;
+  --high: #955005;
+  --high-soft: #f7e7d3;
+  --med: #7c6300;
+  --med-soft: #f4edd2;
+  --low: #456472;
+  --low-soft: #dfe9ee;
+  --none: #366b4b;
+  --none-soft: #dcebe1;
+  --shadow: 0 1px 2px rgba(15, 26, 25, 0.06), 0 8px 24px -12px rgba(15, 26, 25, 0.18);
+  --backdrop: rgba(4, 12, 11, 0.55);
+  /* Nothing is fetched: a report about dependency risk does not phone home, and it has to
+     render from file:// and under a strict CSP. These are the stacks every target already has. */
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --cond: var(--sans);
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
 
-<main class="shell">
-  <aside class="rail" id="rail" aria-label="Filters"></aside>
+  /* The spacing and radius steps the legacy stylesheet used as scattered literals (css-html.md
+     §10.2), named so new rules pick from a scale instead of inventing a thirteenth padding. */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 28px;
+  --radius-s: 4px;
+  --radius-m: 7px;
+  --radius-l: 10px;
+  --gutter: 20px;
+  --page-max: 1500px;
 
-  <section id="main">
-    <div class="searchbar">
-      <input id="q" type="search" placeholder="Filter: guzzle, verdict:left-behind, severity:critical, cve:CVE-2022-31090" aria-label="Filter packages">
-      <button class="icon-btn" id="clearBtn" type="button">Clear</button>
-    </div>
-    <p class="hint">
-      <code>/</code> to search &middot; <code>j</code> <code>k</code> to move &middot; <code>Enter</code> to open &middot; <code>Esc</code> to close &middot; <code>?</code> for the glossary.
-      The tab, the filters and the open package are in the address, so the address bar is a link to what you are looking at.
-      Keys: <code>verdict:</code> <code>priority:</code> <code>signal:</code> <code>severity:</code> <code>cve:</code> <code>direct:</code> <code>dev:</code>
-    </p>
-    <p class="count-line" id="countLine" role="status" aria-live="polite"></p>
-    <div id="viewRoot"></div>
-  </section>
+  /* Height of the sticky header, measured by Header at runtime; this is only the first-paint
+     guess, close to the brand row plus the tab row. */
+  --topbar-h: 104px;
 
-  <aside class="detail" id="detail" hidden aria-label="Package detail"></aside>
-</main>
+  color-scheme: light;
+}
 
-<footer class="colophon">
-  <p>
-    Generated by lockrot <span class="mono" id="fVersion">&mdash;</span> on <span class="mono" id="fDate">&mdash;</span>.
-    Everything it shows is inside this file; nothing in it loads from the network.
-  </p>
-  <!--
-    A report is usually read by someone who did not run it: it was sent to them. The page is the
-    only thing they have, so it says how to get the same page for their own lock rather than
-    leaving them to work it out from a link to the documentation.
-  -->
-  <p class="cta">
-    Run it on your own <span class="mono">composer.lock</span>:
-    <code>composer require --dev somework/lockrot</code>, then <code>composer lockrot --format=html &gt; report.html</code>.
-    No Composer plugin wanted? The <a class="lnk" href="https://lockrot.dev/lockrot.phar" target="_blank" rel="noopener noreferrer">PHAR</a> needs nothing installed.
-  </p>
-  <p>
-    <a class="lnk" href="https://github.com/somework/lockrot" target="_blank" rel="noopener noreferrer">Source</a> &middot;
-    <a class="lnk" href="https://packagist.org/packages/somework/lockrot" target="_blank" rel="noopener noreferrer">somework/lockrot</a> &middot;
-    <a class="lnk" href="https://lockrot.dev/" target="_blank" rel="noopener noreferrer">Documentation</a> &middot;
-    <a class="lnk" href="https://github.com/somework/lockrot/issues" target="_blank" rel="noopener noreferrer">Report a wrong verdict</a>
-  </p>
-  <p>
-    Written by <a class="lnk" href="https://github.com/somework" target="_blank" rel="noopener noreferrer">Igor Pinchuk</a>
-    (<a class="lnk" href="https://www.linkedin.com/in/kolgarn/" target="_blank" rel="noopener noreferrer">LinkedIn</a>).
-    MIT licence.
-  </p>
-</footer>
+@media (max-width: 759px) {
+  :root {
+    --gutter: 16px;
+  }
+}
 
-<dialog id="legend">
-  <div class="legend-head">
-    <h2>What these words mean</h2>
-    <span style="margin-left:auto"><a class="out" href="https://lockrot.dev/verdicts/" target="_blank" rel="noopener noreferrer">full reference</a></span>
-    <button class="icon-btn" id="legendClose" type="button">Close</button>
-  </div>
-  <div class="legend-body">
-    <section class="sect">
-      <h3>The nine verdicts</h3>
-      <dl class="deflist" id="verdictDefs"></dl>
-      <p style="margin:0;font-size:12px;color:var(--muted)">
-        Order used by <span class="mono">--fail-on</span> and the baseline:
-        abandoned &gt; silent &gt; pinned &gt; left-behind &gt; old-promise &gt; stale &gt; unknown &gt; ok.
-        <span class="mono">unknown</span> &mdash; a package lockrot could not check &mdash;
-        <span class="mono">finished</span> and <span class="mono">ok</span> are never findings, and none of them fail a build.
-      </p>
-    </section>
-    <section class="sect">
-      <h3>The signals</h3>
-      <dl class="deflist" id="signalDefs"></dl>
-    </section>
-    <section class="sect" id="libyearsDef">
-      <h3>One number for the lock: libyears</h3>
-      <p style="margin:0;font-size:13px;color:var(--ink-2)">
-        For each package, the years between the release installed and the package's newest stable release,
-        summed. It counts every drift, healthy patches included, so it says how far behind the lock is and
-        nothing about why &mdash; it is not a verdict, and no priority reads it. A package is not measured when
-        it is a branch snapshot, when no dated stable release is known for it, when it is not from a Composer
-        repository, or when its metadata did not come; the Run tab counts each case.
-        <a class="out" href="https://lockrot.dev/verdicts/#libyears" target="_blank" rel="noopener noreferrer">what libyears measure</a>
-      </p>
-    </section>
-    <section class="sect">
-      <h3>How a priority is reached</h3>
-      <p style="margin:0;font-size:13px;color:var(--ink-2)">
-        The verdict sets a base &mdash; <span class="mono">abandoned</span> and <span class="mono">silent</span> start at critical,
-        <span class="mono">pinned</span>, <span class="mono">left-behind</span> and <span class="mono">old-promise</span> at high,
-        <span class="mono">stale</span> at medium. A package nothing requires directly drops one step, one that is only installed
-        for development drops another, and an advisory no release will fix raises it one. Low is the floor, critical the ceiling.
-      </p>
-    </section>
-  </div>
-</dialog>
-<script id="lockrot-data" type="application/json">{{DATA}}</script>
-<script>
-{{JS}}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0c1413;
+    --surface: #121c1b;
+    --surface-2: #182422;
+    --surface-3: #1e2c2a;
+    --border: #253331;
+    --border-strong: #374846;
+    --ink: #e4edea;
+    --ink-2: #c3d2ce;
+    --muted: #8fa39f;
+    --accent: #35b7a7;
+    --accent-soft: #10312e;
+    --accent-ink: #6fd8ca;
+    --crit: #ef8074;
+    --crit-soft: #351916;
+    --high: #e0a055;
+    --high-soft: #332412;
+    --med: #cdb250;
+    --med-soft: #2e2814;
+    --low: #93aebb;
+    --low-soft: #1b2830;
+    --none: #71b98a;
+    --none-soft: #16291d;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 28px -14px rgba(0, 0, 0, 0.8);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0c1413;
+  --surface: #121c1b;
+  --surface-2: #182422;
+  --surface-3: #1e2c2a;
+  --border: #253331;
+  --border-strong: #374846;
+  --ink: #e4edea;
+  --ink-2: #c3d2ce;
+  --muted: #8fa39f;
+  --accent: #35b7a7;
+  --accent-soft: #10312e;
+  --accent-ink: #6fd8ca;
+  --crit: #ef8074;
+  --crit-soft: #351916;
+  --high: #e0a055;
+  --high-soft: #332412;
+  --med: #cdb250;
+  --med-soft: #2e2814;
+  --low: #93aebb;
+  --low-soft: #1b2830;
+  --none: #71b98a;
+  --none-soft: #16291d;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 28px -14px rgba(0, 0, 0, 0.8);
+  color-scheme: dark;
+}
+/*
+ * Reset, typography and the small shared pieces every surface uses (the classes common.tsx emits).
+ * Component stylesheets sit next to their components; only what more than one surface needs lives
+ * here.
+ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Every display rule below is a class selector, which ties with [hidden] on specificity and wins on
+   order. Without this, hiding an element leaves it holding its grid column (legacy report.css:85-87). */
+[hidden] {
+  display: none !important;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4,
+p,
+dl,
+dd {
+  margin: 0;
+}
+a {
+  color: var(--accent-ink);
+}
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+button {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: default;
+}
+code {
+  font-family: var(--mono);
+}
+::selection {
+  background: var(--accent-soft);
+  color: var(--ink);
+}
+
+/* One focus ring for the whole page: visible on keyboard focus only, never on a mouse click. */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ---------- typography helpers ---------- */
+.mono {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+}
+.muted {
+  color: var(--muted);
+}
+.nowrap {
+  white-space: nowrap;
+}
+.eyebrow {
+  font-family: var(--cond);
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ---------- tones ----------
+   A tone is a pair of custom properties, set by one class and read by whatever draws it: a pill's
+   text and border, a bar segment's fill, a stripe. Colour never travels as an inline style, which
+   the page's CSP would refuse (DESIGN.md §1.3). The root default matches TONE()'s own fallback,
+   "low", so an element that reads --tone outside any tone class still gets a real colour. */
+:root {
+  --tone: var(--low);
+  --tone-soft: var(--low-soft);
+}
+.tone-crit {
+  --tone: var(--crit);
+  --tone-soft: var(--crit-soft);
+}
+.tone-high {
+  --tone: var(--high);
+  --tone-soft: var(--high-soft);
+}
+.tone-med {
+  --tone: var(--med);
+  --tone-soft: var(--med-soft);
+}
+.tone-low {
+  --tone: var(--low);
+  --tone-soft: var(--low-soft);
+}
+.tone-none {
+  --tone: var(--none);
+  --tone-soft: var(--none-soft);
+}
+
+/* ---------- pills and tags ---------- */
+.pill {
+  display: inline-block;
+  font-family: var(--cond);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.45;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: var(--radius-s);
+  border: 1px solid var(--tone);
+  color: var(--tone);
+  background: var(--tone-soft);
+  white-space: nowrap;
+  text-decoration: none;
+}
+a.pill:hover {
+  box-shadow: 0 0 0 2px var(--tone-soft);
+}
+
+.tag {
+  display: inline-block;
+  font-size: 11px;
+  font-family: var(--mono);
+  line-height: 1.5;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  padding: 1px 6px;
+  background: var(--surface-2);
+  white-space: nowrap;
+}
+.tag:where(.tone-crit, .tone-high, .tone-med, .tone-low, .tone-none) {
+  color: var(--tone);
+  border-color: var(--tone);
+  background: var(--tone-soft);
+}
+
+/* ---------- links ---------- */
+.lnk {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid var(--border-strong);
+  transition:
+    color 0.12s ease,
+    border-color 0.12s ease;
+}
+.lnk:hover {
+  border-bottom-color: currentColor;
+  color: var(--accent-ink);
+}
+
+.out {
+  font-size: 11px;
+  color: var(--muted);
+  text-decoration: none;
+  border-bottom: 1px dotted var(--border-strong);
+  white-space: nowrap;
+  transition: color 0.12s ease;
+}
+a.out:hover {
+  color: var(--accent-ink);
+  border-bottom-style: solid;
+}
+
+/* ---------- buttons ---------- */
+.icon-btn {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 12px;
+  line-height: 1.4;
+  white-space: nowrap;
+  transition:
+    border-color 0.12s ease,
+    background-color 0.12s ease;
+}
+.icon-btn:hover {
+  border-color: var(--border-strong);
+}
+.icon-btn:active {
+  background: var(--surface-3);
+}
+.icon-btn:disabled {
+  opacity: 0.5;
+}
+.icon-btn:disabled:hover {
+  border-color: var(--border);
+}
+
+/* Motion is decoration here, never information: with reduced motion asked for, all of it goes. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/*
+ * A publisher's line above the report: a site that republishes someone else's run says where the
+ * document came from (lockrot.dev's published reports do). The page's Content-Security-Policy
+ * refuses style attributes, so a publisher cannot style its own markup inline; it puts a
+ * div with class lockrot-provenance first thing in the body, and the page styles it in both themes.
+ * This class is part of the renderer's public interface (README, "Publishing a report").
+ */
+.lockrot-provenance {
+  font: 13px/1.5 var(--sans);
+  background: var(--surface);
+  color: var(--muted);
+  border-bottom: 1px solid var(--border);
+  padding: 8px 16px;
+}
+
+.lockrot-provenance a {
+  color: var(--accent);
+}
+
+@media print {
+  .lockrot-provenance {
+    background: none;
+  }
+}
+/*
+ * The package detail panel. Class names are prefixed `detail-` throughout, even where legacy used a
+ * short generic name (`.sect`, `.kv`, `.action`) that another surface of this rewrite (the Run view,
+ * the Advisories tab) also has reason to want for its own, differently-tuned rule — this file only
+ * ever selects its own component's markup.
+ */
+
+.detail {
+  position: sticky;
+  top: 196px;
+  max-height: calc(100vh - 220px);
+  overflow-y: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+}
+@media (max-width: 1180px) {
+  .detail {
+    position: fixed;
+    inset: 0;
+    max-height: none;
+    border-radius: 0;
+    border-width: 0;
+    z-index: 40;
+    overflow-y: auto;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}
+
+.detail-missing {
+  margin: 20px 16px 0;
+  color: var(--muted);
+}
+
+/* ---------- header ---------- */
+.detail-head {
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 16px 12px;
+  z-index: 2;
+}
+.detail-head-top {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+.detail-head-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.detail-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  word-break: break-word;
+}
+.detail-pills {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+.detail-links {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.detail-replacement-text {
+  font-size: 11px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.detail-close {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.detail-close:hover {
+  border-color: var(--border-strong);
+}
+
+/* ---------- body / sections ---------- */
+.detail-body {
+  padding: 4px 16px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.detail-section {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.detail-section > h3 {
+  margin: 0;
+  font-family: var(--cond);
+  font-size: 11px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 600;
+}
+.detail-baseline {
+  margin: 0;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+.detail-chain {
+  margin: 0;
+  font-size: 12.5px;
+  word-break: break-word;
+}
+.detail-signal-empty {
+  margin: 0;
+  color: var(--muted);
+}
+
+.detail-kv {
+  display: grid;
+  grid-template-columns: minmax(84px, auto) minmax(0, 1fr);
+  gap: 4px 12px;
+  font-size: 13px;
+}
+.detail-kv dt {
+  color: var(--muted);
+}
+.detail-kv dd {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 12px;
+  word-break: break-word;
+}
+
+/* ---------- why this priority ---------- */
+.detail-why {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  font-size: 12px;
+  color: var(--muted);
+}
+.detail-why-result {
+  font-weight: 500;
+  color: var(--ink-2);
+}
+.detail-why-step {
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+}
+.detail-why-arrow {
+  margin: 0 6px;
+  color: var(--muted);
+}
+
+/* ---------- signals ---------- */
+.detail-signal {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 9px;
+  align-items: baseline;
+  padding-left: 11px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  overflow: hidden;
+  background: var(--surface-2);
+}
+.detail-signal + .detail-signal {
+  margin-top: 6px;
+}
+/* "Every advisory" under the fix ladder: the same disclosure line as a signal, with no id beside it
+   and no panel behind it. */
+.detail-disclosure {
+  padding-left: 11px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+}
+.detail-disclosure > .detail-advisory-list {
+  padding: 0 11px 11px 0;
+}
+.detail-signal-summary {
+  cursor: pointer;
+  padding: 8px 11px 8px 0;
+  display: flex;
+  gap: 9px;
+  align-items: baseline;
+  list-style: none;
+}
+.detail-signal-summary::-webkit-details-marker {
+  display: none;
+}
+/* The disclosure chevron closes the line, since the signal's id link now opens it. */
+.detail-signal-summary::after {
+  content: "▸";
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 10px;
+  transition: transform 0.15s ease;
+}
+.detail-signal-more[open] > .detail-signal-summary::after {
+  transform: rotate(90deg);
+}
+.detail-signal-id {
+  padding: 8px 0;
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: 12px;
+  text-decoration: none;
+  color: var(--tone);
+}
+.detail-signal-id:hover {
+  text-decoration: underline;
+}
+.detail-signal-summary-text {
+  font-size: 12.5px;
+  color: var(--ink-2);
+}
+.detail-signal-data {
+  padding: 0 11px 11px 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .detail-signal-summary::after {
+    transition: none;
+  }
+}
+
+/* ---------- release timeline ---------- */
+.detail-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.detail-timeline-axis {
+  position: relative;
+  height: 16px;
+  margin-left: 66px;
+  border-bottom: 1px solid var(--border);
+}
+.detail-timeline-tick {
+  position: absolute;
+  bottom: 2px;
+  transform: translateX(-50%);
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+}
+.detail-timeline-lane {
+  display: grid;
+  grid-template-columns: 62px minmax(0, 1fr);
+  gap: 4px;
+  align-items: center;
+  height: 22px;
+}
+.detail-timeline-branch {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.detail-timeline-lane-installed .detail-timeline-branch {
+  color: var(--ink);
+  font-weight: 600;
+}
+.detail-timeline-track {
+  position: relative;
+  height: 100%;
+  border-bottom: 1px dotted var(--border);
+}
+.detail-timeline-dot {
+  position: absolute;
+  top: 50%;
+  width: 9px;
+  height: 9px;
+  margin: -5px 0 0 -4.5px;
+  border-radius: 50%;
+  background: var(--border-strong);
+}
+.detail-timeline-lane-installed .detail-timeline-dot {
+  background: var(--crit);
+  box-shadow: 0 0 0 3px var(--crit-soft);
+}
+.detail-timeline-lane-newest .detail-timeline-dot {
+  background: var(--none);
+  box-shadow: 0 0 0 3px var(--none-soft);
+}
+/* Bounded on both sides by the track, so a label never runs over the branch names or out of the
+   panel on a narrow sheet: it ends in an ellipsis instead (the full text stays in the DOM). */
+.detail-timeline-label {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.detail-timeline-label.is-flipped {
+  text-align: right;
+}
+.detail-timeline-legend {
+  font-size: 11.5px;
+  color: var(--muted);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+}
+.detail-timeline-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.detail-timeline-swatch {
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+  display: inline-block;
+}
+.detail-timeline-swatch-installed {
+  background: var(--crit);
+}
+.detail-timeline-swatch-newest {
+  background: var(--none);
+}
+
+/* ---------- follow the upstream ---------- */
+.detail-action {
+  background: var(--accent-soft);
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  padding: 11px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.detail-action-eyebrow {
+  font-family: var(--cond);
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--accent-ink);
+}
+.detail-cmd {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 7px 9px;
+  font-family: var(--mono);
+  font-size: 12px;
+}
+/* The command wraps rather than scrolls: in a narrow sheet a scrolling box carried the Copy button
+   out of view with it. The button is what copies, so a wrapped line costs nothing. */
+.detail-cmd-text {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  user-select: text;
+}
+.detail-copy {
+  flex: none;
+  margin-left: auto;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 3px 9px;
+  cursor: pointer;
+  font-size: 11px;
+  font-family: var(--sans);
+  white-space: nowrap;
+}
+.detail-copy:hover {
+  border-color: var(--border-strong);
+}
+
+/* ---------- advisories ---------- */
+.detail-ladder {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.detail-rung {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--surface-2);
+  font-size: 12.5px;
+}
+.detail-rung-here {
+  border-color: var(--none);
+  background: var(--none-soft);
+}
+.detail-rung-version {
+  font-family: var(--mono);
+  font-weight: 600;
+}
+.detail-rung-bar {
+  height: 5px;
+  border-radius: 3px;
+  background: var(--surface-3);
+  overflow: hidden;
+}
+.detail-rung-bar i {
+  display: block;
+  height: 100%;
+  background: var(--crit);
+}
+.detail-rung-count {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.detail-advisory-list {
+  padding-left: 11px;
+}
+.detail-advisory {
+  display: grid;
+  grid-template-columns: 68px minmax(0, 1fr);
+  gap: 2px 12px;
+  padding: 8px 0;
+  align-items: start;
+}
+.detail-advisory + .detail-advisory {
+  border-top: 1px solid var(--border);
+}
+.detail-advisory-sev {
+  font-family: var(--cond);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 2px 0;
+  text-align: center;
+  border-radius: 3px;
+  border: 1px solid var(--tone);
+  color: var(--tone);
+  background: var(--tone-soft);
+}
+.detail-advisory-title {
+  font-size: 12.5px;
+  color: var(--ink);
+}
+.detail-advisory-meta {
+  grid-column: 2;
+  font-size: 11.5px;
+  color: var(--muted);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 14px;
+}
+.detail-advisory-meta .mono {
+  color: var(--ink-2);
+}
+/* The ledger strip: four equal-width blocks on a wide screen, collapsing to two and then one
+   column as the report narrows. Ported from legacy report.css's `.ledger`/`.ledger-block` rules. */
+.ledger {
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 18px 20px 14px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px 28px;
+}
+
+@media (max-width: 1400px) {
+  .ledger {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 759px) {
+  .ledger {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ledger-block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ledger-figure {
+  color: var(--ink);
+}
+
+/* The one ledger block whose weight is a number rather than a bar (libyears). */
+.figure {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 22px;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.bar {
+  display: flex;
+  height: 10px;
+  border-radius: 3px;
+  overflow: hidden;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+}
+
+/* Tone-* classes (toneClass()) define --tone/--tone-soft on the element itself (styles/base.css);
+   the dynamic width is the one part CSP forces through the CSSOM instead (style={{flexGrow}}). */
+.bar-seg {
+  display: block;
+  background: var(--tone);
+}
+
+.bar-seg-dim {
+  opacity: 0.35;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  font-size: 12px;
+}
+
+.legend-empty {
+  color: var(--muted);
+}
+
+.legend-btn {
+  background: none;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  padding: 2px 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: inherit;
+  font: inherit;
+}
+
+.legend-btn:hover {
+  color: var(--ink);
+}
+
+.legend-btn[aria-pressed="true"] {
+  border-bottom-color: currentColor;
+}
+
+/* A bucket with nothing flagged in it reads quieter, but its text keeps full contrast: the legacy
+   page faded the whole button to 35% opacity, which left the label unreadable. Only the swatch fades. */
+.legend-btn-dim {
+  color: var(--muted);
+}
+.legend-btn-dim .swatch {
+  opacity: 0.35;
+}
+
+.legend-btn .swatch {
+  background: var(--tone);
+}
+
+.swatch {
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+  display: inline-block;
+}
+
+.legend-btn .count,
+.legend > .count {
+  font-family: var(--mono);
+  color: var(--muted);
+}
+/* The filter rail: a sticky column of toggle groups beside the list. Ported from legacy
+   report.css's `.rail`/`.rail-group`/`.opt` rules. */
+.rail {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  position: sticky;
+  top: 196px;
+}
+
+@media (max-width: 860px) {
+  .rail {
+    position: static;
+  }
+}
+
+.rail-group {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.opts {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+@media (max-width: 860px) {
+  .opts {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}
+
+.opt {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 7px;
+  border-radius: 5px;
+  border: 1px solid transparent;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.opt:hover {
+  background: var(--surface-2);
+}
+
+.opt[aria-pressed="true"] {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.opt .c {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+}
+/* Ported from legacy report.css's `.searchbar`/`.hint`/`.count-line` rules. */
+.searchbar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.search-input {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--mono);
+  font-size: 13px;
+  padding: 9px 12px;
+  border-radius: 7px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.search-input::placeholder {
+  color: var(--muted);
+}
+
+.hint {
+  font-size: 12px;
+  color: var(--muted);
+  margin: -4px 0 14px;
+}
+
+/* <kbd> for the keyboard shortcuts ("a key you press") and <code> for the search keys (text you
+   type), one look for both, as legacy's <code> had. */
+.hint kbd,
+.hint code {
+  font-family: var(--mono);
+  background: var(--surface-2);
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 11px;
+}
+
+/* A phone has no keyboard to press them on: under 760px the shortcut half of the hint goes, which
+   also brings the list up (DESIGN.md §8). */
+@media (max-width: 759px) {
+  .hint-keys {
+    display: none;
+  }
+}
+
+.count-line {
+  font-size: 12px;
+  color: var(--muted);
+  margin: -4px 0 12px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: baseline;
+}
+
+.active-filters {
+  color: var(--accent-ink);
+}
+/*
+ * The tab bodies: Findings, Advisories, Packages, Radius, Run. Pills, tags, links and buttons reuse
+ * the shared classes from styles/base.css (`.pill`, `.tag`, `.out`, `.icon-btn`, `.mono`, `.muted`,
+ * `.eyebrow`, the `.tone-*` classes); everything here is specific to this surface's own layout.
+ * Ported from legacy/report.css's findings/tables/other-views section (~lines 290-767), with every
+ * inline `style="…"` legacy used there turned into a class — the page's CSP refuses a `style`
+ * attribute, and DESIGN.md reserves the `style` prop itself for values that are actually numeric and
+ * change per row (a meter's width), never for a fixed layout rule.
+ */
+
+/* ---------- findings: priority groups ---------- */
+.group {
+  margin-bottom: var(--space-5);
+}
+.group-head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  padding-bottom: 7px;
+  margin-bottom: var(--space-2);
+  border-bottom: 1px solid var(--border);
+}
+.group-head h2 {
+  margin: 0;
+  font-size: 13px;
+  font-family: var(--cond);
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--tone);
+}
+.group-count {
+  font-size: 12px;
+}
+
+/* ---------- rows (Findings, Packages, Radius, Advisories all build on this shape) ---------- */
+/* The row lists are real lists (`<ul>`) for assistive tech; none of them wants bullets or indents. */
+.rows,
+.adv-list,
+.pulled-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.row {
+  display: grid;
+  grid-template-columns: 4px minmax(0, 1fr);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-l);
+  overflow: hidden;
+  cursor: pointer;
+}
+.row:hover {
+  border-color: var(--border-strong);
+}
+.row[aria-current="true"] {
+  border-color: var(--accent);
+  box-shadow: var(--shadow);
+}
+.row .stripe {
+  background: var(--tone);
+}
+.row .body {
+  padding: 10px 13px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+.row .line1 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: baseline;
+}
+.row .pkg {
+  font-weight: 600;
+  font-size: 14px;
+}
+.row .ver {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--muted);
+}
+.row .ev {
+  color: var(--ink-2);
+  font-size: 13px;
+}
+.row .tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-left: auto;
+}
+@media (max-width: 620px) {
+  .row .tags {
+    margin-left: 0;
+  }
+}
+
+/* ---------- signal lines inside a Findings row ---------- */
+.sig-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.sig-line {
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr);
+  gap: var(--space-2);
+  align-items: baseline;
+}
+.sig-line > .sid {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  text-align: center;
+  border-radius: 3px;
+  padding: 1px 0;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--muted);
+  text-decoration: none;
+}
+.sig-line.is-high > .sid {
+  color: var(--crit);
+  border-color: var(--crit);
+  background: var(--crit-soft);
+}
+.sig-line.is-warn > .sid {
+  color: var(--high);
+  border-color: var(--high);
+  background: var(--high-soft);
+}
+.sig-line > span {
+  font-size: 12.5px;
+  color: var(--ink-2);
+}
+.more-sig {
+  font-size: 12px;
+  color: var(--muted);
+  padding-left: 34px;
+}
+
+/* A small inline "open this package" action used by the quiet-advisory note, an Advisories row's
+   package mention and a Radius card's pulled list — a link-styled button, never a real `<a>`, since
+   it only ever opens the detail pane and never navigates. */
+.pkg-link-btn {
+  background: none;
+  border: 0;
+  padding: 0 2px;
+  margin: 0;
+  font: inherit;
+  font-size: inherit;
+  color: var(--accent-ink);
+  text-decoration: underline dotted;
+  text-decoration-color: var(--border-strong);
+}
+.pkg-link-btn:hover {
+  text-decoration-style: solid;
+}
+
+.note {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--high);
+  border-radius: 0 var(--radius-m) var(--radius-m) 0;
+  padding: 10px 13px;
+  font-size: 13px;
+  margin-bottom: var(--space-3);
+}
+
+.empty {
+  background: var(--surface);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-m);
+  padding: 28px 20px;
+  text-align: center;
+  color: var(--muted);
+}
+
+/* ---------- Packages table ---------- */
+.tablewrap {
+  overflow-x: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-m);
+}
+.tablewrap table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 13px;
+}
+.tablewrap th,
+.tablewrap td {
+  text-align: left;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.tablewrap th {
+  font-family: var(--cond);
+  font-size: 11px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+  z-index: 1;
+}
+.tablewrap tbody tr:last-child td {
+  border-bottom: 0;
+}
+.tablewrap tbody tr {
+  cursor: pointer;
+}
+.tablewrap tbody tr:hover td {
+  background: var(--surface-2);
+}
+/* The open package's row (M6): the accent rule on its first cell mirrors a Findings row's border. */
+.tablewrap tbody tr[aria-selected="true"] td {
+  background: var(--surface-2);
+}
+.tablewrap tbody tr[aria-selected="true"] td:first-child {
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+.tablewrap tbody tr:focus-visible {
+  outline-offset: -2px;
+}
+.tablewrap td.num {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+}
+.sort-btn {
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  color: inherit;
+}
+.sort-btn.active {
+  color: var(--ink);
+}
+.kv-wrap {
+  padding: 12px 14px;
+}
+
+/* ---------- Blast radius ---------- */
+.radius-note {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 0 0 var(--space-3);
+}
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--space-3);
+}
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-m);
+  padding: 13px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.card h3 {
+  margin: 0;
+  font-size: 13.5px;
+  font-weight: 600;
+  word-break: break-word;
+}
+.meter {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+.meter i {
+  display: block;
+  height: 100%;
+  background: var(--high);
+}
+.pulled-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.pulled-row {
+  display: flex;
+  /* A long package name next to its verdict pill must wrap, not push the card past a phone's
+     edge: at 320px on Linux fonts the pill used to end 2px outside the viewport. */
+  flex-wrap: wrap;
+  min-width: 0;
+  gap: 7px;
+  align-items: baseline;
+  background: none;
+  border: 0;
+  padding: 1px 0;
+  margin: 0;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.pulled-row .pkg-link-btn {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.pulled-row .arrow {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+}
+.pulled-empty {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+/* ---------- Advisories ---------- */
+.advgroup {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-m);
+  overflow: hidden;
+  margin-bottom: var(--space-2);
+}
+.advgroup > header {
+  padding: 9px 13px;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  gap: var(--space-2);
+  align-items: baseline;
+}
+.advgroup > header h2 {
+  margin: 0;
+  font-family: var(--cond);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+.advgroup > header p {
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+.adv {
+  display: grid;
+  grid-template-columns: 68px minmax(0, 1fr);
+  gap: 2px 12px;
+  padding: 10px 13px;
+  border-bottom: 1px solid var(--border);
+  align-items: start;
+  cursor: pointer;
+}
+.adv:focus-visible {
+  outline-offset: -2px;
+}
+.adv:last-child {
+  border-bottom: 0;
+}
+.adv[aria-current="true"] {
+  background: var(--surface-2);
+}
+/* The severity tag keeps its own width instead of stretching across the 68px column. */
+.adv > .tag {
+  justify-self: start;
+}
+.adv .t {
+  font-size: 13px;
+  color: var(--ink);
+}
+.adv .m {
+  grid-column: 2;
+  font-size: 11.5px;
+  color: var(--muted);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 14px;
+}
+.adv .m .mono {
+  color: var(--ink-2);
+}
+
+/* ---------- Run ---------- */
+.sect {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.sect > h3 {
+  margin: 0;
+  font-size: 13px;
+  font-family: var(--cond);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.kv {
+  display: grid;
+  grid-template-columns: minmax(84px, auto) minmax(0, 1fr);
+  gap: 4px 12px;
+  font-size: 13px;
+}
+.kv dt {
+  color: var(--muted);
+}
+.kv dd {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 12px;
+  word-break: break-word;
+}
+.run-sections {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.run-footer {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+/*
+ * The page shell: header band, tabs, the ledger slot, the three-column layout, the detail sheet,
+ * the glossary dialog and the colophon. Visual language ported from legacy/report.css; layout
+ * decisions in DESIGN.md §8. Breakpoints: 1181px and up is three columns (rail, list, detail);
+ * 760-1180px is rail and list with the detail as a sheet; under 760px is one column, list first.
+ */
+
+/* ---------- header ---------- */
+.topbar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+@media (min-width: 760px) {
+  .topbar {
+    position: sticky;
+    top: env(safe-area-inset-top, 0px);
+    z-index: 20;
+  }
+}
+.topbar-in {
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: 14px var(--gutter) 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 24px;
+  align-items: flex-start;
+}
+.brand {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+  min-width: 0;
+}
+.brand h1 {
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+}
+.brand h1 a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.12s ease;
+}
+.brand h1 a:hover {
+  color: var(--accent-ink);
+}
+.brand .dot {
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--crit);
+  align-self: center;
+  box-shadow: 0 0 0 3px var(--crit-soft);
+}
+.brand .project {
+  overflow-wrap: anywhere;
+}
+.run-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 18px;
+  align-items: center;
+  font-size: 12px;
+  color: var(--muted);
+  margin-left: auto;
+  justify-content: flex-end;
+}
+.run-meta b {
+  color: var(--ink-2);
+  font-weight: 500;
+}
+.run-actions {
+  display: inline-flex;
+  gap: 8px;
+}
+@media (max-width: 759px) {
+  .run-meta {
+    margin-left: 0;
+    justify-content: flex-start;
+    gap: 4px 14px;
+  }
+  .run-actions {
+    width: 100%;
+    padding-top: 4px;
+  }
+}
+
+/* ---------- tabs ----------
+   The tab row scrolls sideways when it does not fit. The two "local" gradients are painted with
+   the content and cover the two "scroll" shadows at each end until there is something to scroll
+   to on that side: a cue drawn by CSS alone, which the legacy row lacked (css-html.md §10.3). */
+.tabs {
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: 10px var(--gutter) 0;
+  display: flex;
+  gap: 2px;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  overscroll-behavior-x: contain;
+  background:
+    linear-gradient(to right, var(--surface) 40%, transparent) left center / 36px 100% no-repeat local,
+    linear-gradient(to left, var(--surface) 40%, transparent) right center / 36px 100% no-repeat local,
+    linear-gradient(to right, var(--border-strong), transparent) left center / 8px 100% no-repeat scroll,
+    linear-gradient(to left, var(--border-strong), transparent) right center / 8px 100% no-repeat scroll;
+}
+.tab {
+  flex: none;
+  background: none;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  padding: 8px 12px 10px;
+  color: var(--muted);
+  font-weight: 500;
+  white-space: nowrap;
+  transition:
+    color 0.12s ease,
+    border-color 0.12s ease;
+}
+.tab:hover {
+  color: var(--ink-2);
+  border-bottom-color: var(--border-strong);
+}
+.tab[aria-selected="true"] {
+  color: var(--ink);
+  border-bottom-color: var(--accent);
+}
+.tab:focus-visible {
+  outline-offset: -2px;
+}
+.tab .n {
+  font-family: var(--mono);
+  font-size: 11px;
+  margin-left: 6px;
+  color: var(--muted);
+}
+.tab .n:empty {
+  display: none;
+}
+
+/* ---------- ledger band ----------
+   The summary sits on the header's surface, as on the legacy page, so the page reads as a band of
+   totals above the list; only the header part above it sticks. */
+.ledger-band {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+/* ---------- ledger fold (phone widths) ----------
+   The ledger keeps its own padding on wider screens; folded, the fold carries the page gutter and
+   the ledger inside it drops its own. */
+.ledger-fold {
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: 12px var(--gutter) 0;
+}
+.ledger-fold > .ledger {
+  padding: 0 0 4px;
+}
+.ledger-fold > summary,
+.rail-fold > summary {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 9px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-m);
+  cursor: pointer;
+  list-style: none;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+.ledger-fold > summary::-webkit-details-marker,
+.rail-fold > summary::-webkit-details-marker {
+  display: none;
+}
+.ledger-fold > summary::after,
+.rail-fold > summary::after {
+  content: "▸";
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 11px;
+  transition: transform 0.15s ease;
+}
+.ledger-fold[open] > summary::after,
+.rail-fold[open] > summary::after {
+  transform: rotate(90deg);
+}
+.ledger-fold[open] > summary {
+  margin-bottom: 14px;
+}
+
+/* ---------- layout ---------- */
+.shell {
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: var(--gutter);
+  display: grid;
+  grid-template-columns: 210px minmax(0, 1fr) minmax(0, 420px);
+  gap: 20px;
+  align-items: start;
+}
+/* Run data has nothing to filter, so the rail goes, and its column with it, or the list would
+   inherit the rail's 210px and every value would wrap one character at a time. */
+.shell.no-rail {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 420px);
+}
+@media (max-width: 1180px) {
+  .shell {
+    grid-template-columns: 200px minmax(0, 1fr);
+  }
+  .shell.no-rail {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 759px) {
+  .shell,
+  .shell.no-rail {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+}
+.shell-main {
+  min-width: 0;
+}
+
+.shell-rail {
+  position: sticky;
+  top: calc(var(--topbar-h) + 16px);
+  max-height: calc(100vh - var(--topbar-h) - 32px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+/* The column scrolls and sticks; the rail inside it must not stick a second time against a guessed
+   offset of its own. */
+.shell-rail > .rail {
+  position: static;
+}
+.rail-fold[open] > summary {
+  margin-bottom: 12px;
+}
+
+/* ---------- detail: a column beside the list, or a sheet over the page ---------- */
+.shell-detail:empty {
+  display: none;
+}
+.shell-detail.is-side {
+  position: sticky;
+  top: calc(var(--topbar-h) + 16px);
+  max-height: calc(100vh - var(--topbar-h) - 32px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-l);
+  box-shadow: var(--shadow);
+}
+.shell-detail.is-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--surface);
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  animation: sheet-in 0.18s ease-out;
+}
+@keyframes sheet-in {
+  from {
+    transform: translateY(12px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+/* Only while a sheet with something in it covers the page (DESIGN.md §5 M13). */
+body.detail-open:has(.shell-detail.is-sheet > *) {
+  overflow: hidden;
+}
+
+/* ---------- newer schema ---------- */
+.schema-banner {
+  background: var(--high-soft);
+  border-bottom: 1px solid var(--high);
+  color: var(--ink);
+  font-size: 13px;
+}
+.schema-banner p {
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: 10px var(--gutter);
+}
+
+/* ---------- glossary ----------
+   Fixed in both modes: the UA already fixes a modal dialog, and the fallback for a frame that
+   forbids modals (DESIGN.md §5 M28) is pinned the same way, with a spread shadow for a backdrop. */
+.glossary {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  height: fit-content;
+  width: min(760px, calc(100% - 32px));
+  max-width: none;
+  max-height: 84vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--shadow);
+}
+.glossary::backdrop {
+  background: var(--backdrop);
+}
+.glossary.is-fallback {
+  z-index: 60;
+  box-shadow:
+    var(--shadow),
+    0 0 0 100vmax var(--backdrop);
+}
+@media (max-width: 759px) {
+  .glossary {
+    width: calc(100% - 24px);
+    max-height: calc(100vh - 24px);
+  }
+}
+.glossary-head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 18px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: baseline;
+}
+.glossary-head h2 {
+  font-size: 16px;
+  margin-right: auto;
+}
+.glossary-body {
+  padding: 16px 18px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+.glossary-sect {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.glossary-sect > h3 {
+  font-family: var(--cond);
+  font-size: 11px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 600;
+}
+.glossary .deflist {
+  display: grid;
+  grid-template-columns: minmax(96px, auto) minmax(0, 1fr);
+  gap: 7px 14px;
+  font-size: 13px;
+}
+.glossary .deflist dt {
+  font-family: var(--mono);
+  font-size: 12px;
+}
+.glossary .deflist dt .out,
+.glossary .deflist dt .term-name {
+  font-family: var(--sans);
+  font-size: 12px;
+  color: var(--muted);
+}
+.glossary .deflist dd {
+  color: var(--ink-2);
+}
+.glossary .term-toned {
+  color: var(--tone);
+}
+.glossary .small-note {
+  font-size: 12px;
+  color: var(--muted);
+}
+.glossary .prose {
+  font-size: 13px;
+  color: var(--ink-2);
+}
+@media (max-width: 480px) {
+  .glossary .deflist {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+  }
+  .glossary .deflist dd {
+    margin-bottom: 8px;
+  }
+}
+
+/* ---------- colophon ----------
+   Who made the instrument, not who was audited. Below everything, never sticky. */
+.colophon {
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: 26px var(--gutter) calc(26px + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--muted);
+}
+/* The one line in the colophon a reader is meant to act on, so it carries ink rather than the
+   muted grey the rest of the footer is set in. */
+.colophon .cta {
+  margin-top: 4px;
+  padding: 9px 12px;
+  border-left: 2px solid var(--accent);
+  background: var(--surface-2);
+  border-radius: 0 6px 6px 0;
+  color: var(--ink-2);
+  line-height: 1.7;
+}
+.colophon .cta code {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 1px 6px;
+  border-radius: var(--radius-s);
+  font-size: 11px;
+  color: var(--ink);
+  white-space: nowrap;
+}
+@media (max-width: 480px) {
+  .colophon .cta code {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+}
+/*
+ * Print is pure CSS, as it was in the legacy page (legacy/report.css:629-636, 813, 816): there is no
+ * print button and no beforeprint handler. A printed report keeps what it says and drops what only
+ * works on a screen: the tabs, the filters, the search box, the two header buttons, and the detail
+ * pane (a sheet or a side column that would print as a clipped box).
+ *
+ * `.searchbar` and `.hint` are SearchBar's own classes (search/SearchBar.tsx); the count line it
+ * renders beneath them stays, as it did on the legacy page.
+ *
+ * The rules that keep a row or a card from splitting across pages select by role, the same roles
+ * the accessibility contract (e2e/support/new.ts) asks every list entry to carry, so they hold
+ * whatever class names the list components use.
+ */
+@media print {
+  :root {
+    color-scheme: light;
+  }
+  body {
+    background: #fff;
+    color: #000;
+  }
+
+  .topbar {
+    position: static;
+    box-shadow: none;
+  }
+  .tabs,
+  .shell-rail,
+  .rail-fold,
+  .searchbar,
+  .hint,
+  .shell-detail,
+  .glossary-open,
+  .theme-toggle {
+    display: none !important;
+  }
+
+  .shell {
+    display: block;
+    max-width: none;
+    padding: 0;
+  }
+
+  [role="option"],
+  [role="row"],
+  [role="listitem"],
+  article {
+    break-inside: avoid;
+    border-color: #999;
+  }
+
+  .colophon {
+    border-top-color: #999;
+  }
+  .colophon .cta {
+    background: none;
+    border-left-color: #999;
+  }
+}
+/*$vite$:1*/</style>
+    <script>var LockrotReport = (function(exports) {
+	Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+	//#region node_modules/preact/dist/preact.module.js
+	var n;
+	var l$1;
+	var u$2;
+	var i$2;
+	var r$1;
+	var o$1;
+	var e$1;
+	var f$2;
+	var c$1;
+	var a$1;
+	var s$1;
+	var h$1;
+	var p$1;
+	var v$1;
+	var y$1;
+	var d$1 = {};
+	var w$1 = [];
+	var _$1 = /acit|ex(?:s|g|n|p|$)|rph|grid|ows|mnc|ntw|ine[ch]|zoo|^ord|itera/i;
+	var g$1 = Array.isArray;
+	function m$1(n, l) {
+		for (var u in l) n[u] = l[u];
+		return n;
+	}
+	function b(n) {
+		n && n.parentNode && n.parentNode.removeChild(n);
+	}
+	function k$1(l, u, t) {
+		var i, r, o, e = {};
+		for (o in u) "key" == o ? i = u[o] : "ref" == o ? r = u[o] : e[o] = u[o];
+		if (arguments.length > 2 && (e.children = arguments.length > 3 ? n.call(arguments, 2) : t), "function" == typeof l && null != l.defaultProps) for (o in l.defaultProps) void 0 === e[o] && (e[o] = l.defaultProps[o]);
+		return x$1(l, e, i, r, null);
+	}
+	function x$1(n, t, i, r, o) {
+		var e = {
+			type: n,
+			props: t,
+			key: i,
+			ref: r,
+			__k: null,
+			__: null,
+			__b: 0,
+			__e: null,
+			__c: null,
+			constructor: void 0,
+			__v: null == o ? ++u$2 : o,
+			__i: -1,
+			__u: 0
+		};
+		return null == o && null != l$1.vnode && l$1.vnode(e), e;
+	}
+	function S(n) {
+		return n.children;
+	}
+	function C$1(n, l) {
+		this.props = n, this.context = l;
+	}
+	function $(n, l) {
+		if (null == l) return n.__ ? $(n.__, n.__i + 1) : null;
+		for (var u; l < n.__k.length; l++) if (null != (u = n.__k[l]) && null != u.__e) return u.__e;
+		return "function" == typeof n.type ? $(n) : null;
+	}
+	function I(n) {
+		if (n.__P && n.__d) {
+			var u = n.__v, t = u.__e, i = [], r = [], o = m$1({}, u);
+			o.__v = u.__v + 1, l$1.vnode && l$1.vnode(o), q$1(n.__P, o, u, n.__n, n.__P.namespaceURI, 32 & u.__u ? [t] : null, i, null == t ? $(u) : t, !!(32 & u.__u), r), o.__v = u.__v, o.__.__k[o.__i] = o, D$1(i, o, r), u.__e = u.__ = null, o.__e != t && P(o);
+		}
+	}
+	function P(n) {
+		if (null != (n = n.__) && null != n.__c) return n.__e = n.__c.base = null, n.__k.some(function(l) {
+			if (null != l && null != l.__e) return n.__e = n.__c.base = l.__e;
+		}), P(n);
+	}
+	function A$1(n) {
+		(!n.__d && (n.__d = !0) && i$2.push(n) && !H.__r++ || r$1 != l$1.debounceRendering) && ((r$1 = l$1.debounceRendering) || o$1)(H);
+	}
+	function H() {
+		try {
+			for (var n, l = 1; i$2.length;) i$2.length > l && i$2.sort(e$1), n = i$2.shift(), l = i$2.length, I(n);
+		} finally {
+			i$2.length = H.__r = 0;
+		}
+	}
+	function L(n, l, u, t, i, r, o, e, f, c, a) {
+		var s, h, p, v, y, _, g = t && t.__k || w$1, m = l.length;
+		for (f = T$1(u, l, g, f, m), s = 0; s < m; s++) null != (p = u.__k[s]) && (h = -1 != p.__i && g[p.__i] || d$1, p.__i = s, _ = q$1(n, p, h, i, r, o, e, f, c, a), v = p.__e, p.ref && h.ref != p.ref && (h.ref && J(h.ref, null, p), a.push(p.ref, p.__c || v, p)), null == y && null != v && (y = v), 4 & p.__u ? (f = j$1(p, f, n), h.__e && (h.__e = null)) : "function" == typeof p.type && void 0 !== _ ? f = _ : v && (f = v.nextSibling), p.__u &= -7);
+		return u.__e = y, f;
+	}
+	function T$1(n, l, u, t, i) {
+		var r, o, e, f, c, a = u.length, s = a, h = 0;
+		for (n.__k = new Array(i), r = 0; r < i; r++) null != (o = l[r]) && "boolean" != typeof o && "function" != typeof o ? ("string" == typeof o || "number" == typeof o || "bigint" == typeof o || o.constructor == String ? o = n.__k[r] = x$1(null, o, null, null, null) : g$1(o) ? o = n.__k[r] = x$1(S, { children: o }, null, null, null) : void 0 === o.constructor && o.__b > 0 ? o = n.__k[r] = x$1(o.type, o.props, o.key, o.ref ? o.ref : null, o.__v) : n.__k[r] = o, f = r + h, o.__ = n, o.__b = n.__b + 1, e = null, -1 != (c = o.__i = O(o, u, f, s)) && (s--, (e = u[c]) && (e.__u |= 2)), null == e || null == e.__v ? (-1 == c && (i > a ? h-- : i < a && h++), "function" != typeof o.type && (o.__u |= 4)) : c != f && (c == f - 1 ? h-- : c == f + 1 ? h++ : (c > f ? h-- : h++, o.__u |= 4))) : n.__k[r] = null;
+		if (s) for (r = 0; r < a; r++) null != (e = u[r]) && 0 == (2 & e.__u) && (e.__e == t && (t = $(e)), K(e, e));
+		return t;
+	}
+	function j$1(n, l, u) {
+		var t, i;
+		if ("function" == typeof n.type) {
+			for (t = n.__k, i = 0; t && i < t.length; i++) t[i] && (t[i].__ = n, l = j$1(t[i], l, u));
+			return l;
+		}
+		n.__e != l && (l && n.type && !l.parentNode && (l = $(n)), l = u.insertBefore(n.__e, l || null));
+		do
+			l = l && l.nextSibling;
+		while (null != l && 8 == l.nodeType);
+		return l;
+	}
+	function O(n, l, u, t) {
+		var i, r, o, e = n.key, f = n.type, c = l[u], a = null != c && 0 == (2 & c.__u);
+		if (null === c && null == e || a && e == c.key && f == c.type) return u;
+		if (t > (a ? 1 : 0)) {
+			for (i = u - 1, r = u + 1; i >= 0 || r < l.length;) if (null != (c = l[o = i >= 0 ? i-- : r++]) && 0 == (2 & c.__u) && e == c.key && f == c.type) return o;
+		}
+		return -1;
+	}
+	function z$1(n, l, u) {
+		"-" == l[0] ? n.setProperty(l, null == u ? "" : u) : n[l] = null == u ? "" : "number" != typeof u || _$1.test(l) ? u : u + "px";
+	}
+	function N(n, l, u, t, i) {
+		var r, o;
+		n: if ("style" == l) if ("string" == typeof u) n.style.cssText = u;
+		else {
+			if ("string" == typeof t && (n.style.cssText = t = ""), t) for (l in t) u && l in u || z$1(n.style, l, "");
+			if (u) for (l in u) t && u[l] == t[l] || z$1(n.style, l, u[l]);
+		}
+		else if ("o" == l[0] && "n" == l[1]) r = l != (l = l.replace(s$1, "$1")), o = l.toLowerCase(), l = o in n || "onFocusOut" == l || "onFocusIn" == l ? o.slice(2) : l.slice(2), n.l || (n.l = {}), n.l[l + r] = u, u ? t ? u[a$1] = t[a$1] : (u[a$1] = h$1, n.addEventListener(l, r ? v$1 : p$1, r)) : n.removeEventListener(l, r ? v$1 : p$1, r);
+		else {
+			if ("http://www.w3.org/2000/svg" == i) l = l.replace(/xlink(H|:h)/, "h").replace(/sName$/, "s");
+			else if ("width" != l && "height" != l && "href" != l && "list" != l && "form" != l && "tabIndex" != l && "download" != l && "rowSpan" != l && "colSpan" != l && "role" != l && "popover" != l && l in n) try {
+				n[l] = null == u ? "" : u;
+				break n;
+			} catch (n) {}
+			"function" == typeof u || (null == u || !1 === u && "-" != l[4] ? n.removeAttribute(l) : n.setAttribute(l, "popover" == l && 1 == u ? "" : u));
+		}
+	}
+	function V(n) {
+		return function(u) {
+			if (this.l) {
+				var t = this.l[u.type + n];
+				if (null == u[c$1]) u[c$1] = h$1++;
+				else if (u[c$1] < t[a$1]) return;
+				return t(l$1.event ? l$1.event(u) : u);
+			}
+		};
+	}
+	function q$1(n, u, t, i, r, o, e, f, c, a) {
+		var s, h, p, v, y, d, _, k, x, M, I, P, A, H, T, j, F = u.type;
+		if (void 0 !== u.constructor) return null;
+		128 & t.__u && (c = !!(32 & t.__u), o = [f = u.__e = t.__e]), (s = l$1.__b) && s(u);
+		n: if ("function" == typeof F) {
+			h = e.length;
+			try {
+				if (x = u.props, M = F.prototype && F.prototype.render, I = (s = F.contextType) && i[s.__c], P = s ? I ? I.props.value : s.__ : i, t.__c ? k = (p = u.__c = t.__c).__ = p.__E : (M ? u.__c = p = new F(x, P) : (u.__c = p = new C$1(x, P), p.constructor = F, p.render = Q), I && I.sub(p), p.state || (p.state = {}), p.__n = i, v = p.__d = !0, p.__h = [], p._sb = []), M && null == p.__s && (p.__s = p.state), M && null != F.getDerivedStateFromProps && (p.__s == p.state && (p.__s = m$1({}, p.__s)), m$1(p.__s, F.getDerivedStateFromProps(x, p.__s))), y = p.props, d = p.state, p.__v = u, v) M && null == F.getDerivedStateFromProps && null != p.componentWillMount && p.componentWillMount(), M && null != p.componentDidMount && p.__h.push(p.componentDidMount);
+				else {
+					if (M && null == F.getDerivedStateFromProps && x !== y && null != p.componentWillReceiveProps && p.componentWillReceiveProps(x, P), u.__v == t.__v || !p.__e && null != p.shouldComponentUpdate && !1 === p.shouldComponentUpdate(x, p.__s, P)) {
+						u.__v != t.__v && (p.props = x, p.state = p.__s, p.__d = !1), u.__e = t.__e, u.__k = t.__k, u.__k.some(function(n) {
+							n && (n.__ = u);
+						}), w$1.push.apply(p.__h, p._sb), p._sb = [], p.__h.length && e.push(p), f = $(t);
+						break n;
+					}
+					null != p.componentWillUpdate && p.componentWillUpdate(x, p.__s, P), M && null != p.componentDidUpdate && p.__h.push(function() {
+						p.componentDidUpdate(y, d, _);
+					});
+				}
+				if (p.context = P, p.props = x, p.__P = n, p.__e = !1, A = l$1.__r, H = 0, M) p.state = p.__s, p.__d = !1, A && A(u), s = p.render(p.props, p.state, p.context), w$1.push.apply(p.__h, p._sb), p._sb = [];
+				else do
+					p.__d = !1, A && A(u), s = p.render(p.props, p.state, p.context), p.state = p.__s;
+				while (p.__d && ++H < 25);
+				p.state = p.__s, null != p.getChildContext && (i = m$1(m$1({}, i), p.getChildContext())), M && !v && null != p.getSnapshotBeforeUpdate && (_ = p.getSnapshotBeforeUpdate(y, d)), T = null != s && s.type === S && null == s.key ? E(s.props.children) : s, f = L(n, g$1(T) ? T : [T], u, t, i, r, o, e, f, c, a), p.base = u.__e, u.__u &= -161, p.__h.length && e.push(p), k && (p.__E = p.__ = null);
+			} catch (n) {
+				if (e.length = h, u.__v = null, c || null != o) {
+					if (n.then) {
+						for (u.__u |= c ? 160 : 128; f && 8 == f.nodeType && f.nextSibling;) f = f.nextSibling;
+						null != o && (o[o.indexOf(f)] = null), u.__e = f;
+					} else if (null != o) for (j = o.length; j--;) b(o[j]);
+				} else u.__e = t.__e;
+				u.__k ??= t.__k || [], n.then || B$1(u), l$1.__e(n, u, t);
+			}
+		} else null == o && u.__v == t.__v ? (u.__k = t.__k, u.__e = t.__e) : f = u.__e = G(t.__e, u, t, i, r, o, e, c, a);
+		return (s = l$1.diffed) && s(u), 128 & u.__u ? void 0 : f;
+	}
+	function B$1(n) {
+		n && (n.__c && (n.__c.__e = !0), n.__k && n.__k.some(B$1));
+	}
+	function D$1(n, u, t) {
+		for (var i = 0; i < t.length; i++) J(t[i], t[++i], t[++i]);
+		l$1.__c && l$1.__c(u, n), n.some(function(u) {
+			try {
+				n = u.__h, u.__h = [], n.some(function(n) {
+					n.call(u);
+				});
+			} catch (n) {
+				l$1.__e(n, u.__v);
+			}
+		});
+	}
+	function E(n) {
+		return "object" != typeof n || null == n || n.__b > 0 ? n : g$1(n) ? n.map(E) : void 0 !== n.constructor ? null : m$1({}, n);
+	}
+	function G(u, t, i, r, o, e, f, c, a) {
+		var s, h, p, v, y, w, _, m = i.props || d$1, k = t.props, x = t.type;
+		if ("svg" == x ? o = "http://www.w3.org/2000/svg" : "math" == x ? o = "http://www.w3.org/1998/Math/MathML" : o || (o = "http://www.w3.org/1999/xhtml"), null != e) {
+			for (s = 0; s < e.length; s++) if ((y = e[s]) && "setAttribute" in y == !!x && (x ? y.localName == x : 3 == y.nodeType)) {
+				u = y, e[s] = null;
+				break;
+			}
+		}
+		if (null == u) {
+			if (null == x) return document.createTextNode(k);
+			u = document.createElementNS(o, x, k.is && k), c && (l$1.__m && l$1.__m(t, e), c = !1), e = null;
+		}
+		if (null == x) m === k || c && u.data == k || (u.data = k);
+		else {
+			if (e = "textarea" == x && null != k.defaultValue ? null : e && n.call(u.childNodes), !c && null != e) for (m = {}, s = 0; s < u.attributes.length; s++) m[(y = u.attributes[s]).name] = y.value;
+			for (s in m) y = m[s], "dangerouslySetInnerHTML" == s ? p = y : "children" == s || s in k || "value" == s && "defaultValue" in k || "checked" == s && "defaultChecked" in k || N(u, s, null, y, o);
+			for (s in k) y = k[s], "children" == s ? v = y : "dangerouslySetInnerHTML" == s ? h = y : "value" == s ? w = y : "checked" == s ? _ = y : c && "function" != typeof y || m[s] === y || N(u, s, y, m[s], o);
+			if (h) c || p && (h.__html == p.__html || h.__html == u.innerHTML) || (u.innerHTML = h.__html), t.__k = [];
+			else if (p && (u.innerHTML = ""), L("template" == t.type ? u.content : u, g$1(v) ? v : [v], t, i, r, "foreignObject" == x ? "http://www.w3.org/1999/xhtml" : o, e, f, e ? e[0] : i.__k && $(i, 0), c, a), null != e) for (s = e.length; s--;) b(e[s]);
+			c && "textarea" != x || (s = "value", "progress" == x && null == w ? u.removeAttribute("value") : null != w && (w !== u[s] || "progress" == x && !w || "option" == x && w != m[s]) && N(u, s, w, m[s], o), s = "checked", null != _ && _ != u[s] && N(u, s, _, m[s], o));
+		}
+		return u;
+	}
+	function J(n, u, t) {
+		try {
+			if ("function" == typeof n) {
+				var i = "function" == typeof n.__u;
+				i && n.__u(), i && null == u || (n.__u = n(u));
+			} else n.current = u;
+		} catch (n) {
+			l$1.__e(n, t);
+		}
+	}
+	function K(n, u, t) {
+		var i, r;
+		if (l$1.unmount && l$1.unmount(n), (i = n.ref) && (i.current && i.current != n.__e || J(i, null, u)), null != (i = n.__c)) {
+			if (i.componentWillUnmount) try {
+				i.componentWillUnmount();
+			} catch (n) {
+				l$1.__e(n, u);
+			}
+			i.base = i.__P = i.__n = null;
+		}
+		if (i = n.__k) for (r = 0; r < i.length; r++) i[r] && K(i[r], u, t || "function" != typeof n.type);
+		t || b(n.__e), n.__c = n.__ = n.__e = void 0;
+	}
+	function Q(n, l, u) {
+		return this.constructor(n, u);
+	}
+	function R(u, t, i) {
+		var r, o, e, f;
+		t == document && (t = document.documentElement), l$1.__ && l$1.__(u, t), o = (r = "function" == typeof i) ? null : i && i.__k || t.__k, e = [], f = [], q$1(t, u = (!r && i || t).__k = k$1(S, null, [u]), o || d$1, d$1, t.namespaceURI, !r && i ? [i] : o ? null : t.firstChild ? n.call(t.childNodes) : null, e, !r && i ? i : o ? o.__e : t.firstChild, r, f), D$1(e, u, f), u.props.children = null;
+	}
+	function X(n) {
+		function l(n) {
+			var u, t;
+			return this.getChildContext || (u = new Set(), (t = {})[l.__c] = this, this.getChildContext = function() {
+				return t;
+			}, this.componentWillUnmount = function() {
+				u = null;
+			}, this.shouldComponentUpdate = function(n) {
+				this.props.value != n.value && u.forEach(function(n) {
+					n.__e = !0, A$1(n);
+				});
+			}, this.sub = function(n) {
+				u.add(n);
+				var l = n.componentWillUnmount;
+				n.componentWillUnmount = function() {
+					u && u.delete(n), l && l.call(n);
+				};
+			}), n.children;
+		}
+		return l.__c = "__cC" + y$1++, l.__ = n, l.Provider = l.__l = (l.Consumer = function(n, l) {
+			return n.children(l);
+		}).contextType = l, l;
+	}
+	n = w$1.slice, l$1 = { __e: function(n, l, u, t) {
+		for (var i, r, o; l = l.__;) if ((i = l.__c) && !i.__) try {
+			if ((r = i.constructor) && null != r.getDerivedStateFromError && (i.setState(r.getDerivedStateFromError(n)), o = i.__d), null != i.componentDidCatch && (i.componentDidCatch(n, t || {}), o = i.__d), o) return i.__E = i;
+		} catch (l) {
+			n = l;
+		}
+		throw n;
+	} }, u$2 = 0, C$1.prototype.setState = function(n, l) {
+		var u = null != this.__s && this.__s != this.state ? this.__s : this.__s = m$1({}, this.state);
+		"function" == typeof n && (n = n(m$1({}, u), this.props)), n && m$1(u, n), null != n && this.__v && (l && this._sb.push(l), A$1(this));
+	}, C$1.prototype.forceUpdate = function(n) {
+		this.__v && (this.__e = !0, n && this.__h.push(n), A$1(this));
+	}, C$1.prototype.render = S, i$2 = [], o$1 = "function" == typeof Promise ? Promise.prototype.then.bind(Promise.resolve()) : setTimeout, e$1 = function(n, l) {
+		return n.__v.__b - l.__v.__b;
+	}, H.__r = 0, f$2 = Math.random().toString(8), c$1 = "__d" + f$2, a$1 = "__a" + f$2, s$1 = /(PointerCapture)$|Capture$/i, h$1 = 0, p$1 = V(!1), v$1 = V(!0), y$1 = 0;
+	//#endregion
+	//#region src/model/types.ts
+	var VERDICTS = [
+		"abandoned",
+		"silent",
+		"pinned",
+		"left-behind",
+		"old-promise",
+		"stale",
+		"unknown",
+		"finished",
+		"ok"
+	];
+	var PRIORITIES = [
+		"critical",
+		"high",
+		"medium",
+		"low",
+		"none"
+	];
+	var SIGNAL_IDS = [
+		"S1",
+		"S2",
+		"S3",
+		"S4",
+		"S5",
+		"S6",
+		"S7",
+		"S8",
+		"S9",
+		"S10"
+	];
+	var SEVERITIES = [
+		"critical",
+		"high",
+		"medium",
+		"low",
+		"unrated"
+	];
+	var VIEWS = [
+		"findings",
+		"advisories",
+		"packages",
+		"radius",
+		"run"
+	];
+	//#endregion
+	//#region src/domain/severity.ts
+	var SEVERITY_ORDER = SEVERITIES;
+	function normalizeSeverity(raw) {
+		if (raw === null) return "unrated";
+		switch (raw.toLowerCase()) {
+			case "critical": return "critical";
+			case "high": return "high";
+			case "medium": return "medium";
+			case "moderate": return "medium";
+			case "low": return "low";
+			default: return "unrated";
+		}
+	}
+	function severityRank(severity) {
+		const index = SEVERITY_ORDER.indexOf(severity);
+		return index === -1 ? SEVERITY_ORDER.length : index;
+	}
+	//#endregion
+	//#region src/domain/vocab.ts
+	function vocabTable(entries) {
+		return Object.assign(Object.create(null), entries);
+	}
+	var DEFAULT_FLAGGED = [
+		"abandoned",
+		"silent",
+		"pinned",
+		"left-behind",
+		"old-promise",
+		"stale"
+	];
+	var VERDICT_ORDER = [
+		"abandoned",
+		"silent",
+		"pinned",
+		"left-behind",
+		"old-promise",
+		"stale",
+		"unknown"
+	];
+	var TONE_TABLE = vocabTable({
+		critical: "crit",
+		high: "high",
+		medium: "med",
+		low: "low",
+		none: "none",
+		abandoned: "crit",
+		silent: "crit",
+		pinned: "high",
+		"left-behind": "high",
+		"old-promise": "med",
+		stale: "med",
+		unknown: "low",
+		finished: "none",
+		ok: "none"
+	});
+	function TONE(key) {
+		return TONE_TABLE[key] ?? "low";
+	}
+	var SIGNAL_NAMES = vocabTable({
+		S1: "marked abandoned",
+		S2: "no stable release",
+		S3: "repository archived",
+		S4: "no push to the repository",
+		S5: "release predates the target PHP",
+		S6: "branch snapshot, not a release",
+		S7: "pulls in flagged packages",
+		S8: "the installed branch stopped",
+		S9: "security advisories",
+		S10: "a check could not run"
+	});
+	var SIGNAL_DEFS = vocabTable({
+		S1: "The Composer repository marks the package abandoned, sometimes naming a replacement.",
+		S2: "Time since the last stable release, against release-warn-years / release-high-years.",
+		S3: "The repository is archived — on GitHub, or on GitLab when the run has credentials there.",
+		S4: "Time since the last push to any branch, against push-warn-years / push-high-years.",
+		S5: "The installed release predates the target PHP's GA date and require.php has no upper bound.",
+		S6: "The installed version is a branch snapshot, or the package has no stable release.",
+		S7: "A direct requirement pulls in flagged transitive packages. Informational, never a verdict.",
+		S8: "Time since the last stable release on the installed branch, counted only when a higher branch has released since.",
+		S9: "Security advisories affecting the installed version. Never a verdict; raises the priority where no fix is coming.",
+		S10: "A check lockrot relies on could not run for this package, so a verdict may be missing a signal; the data says which and why."
+	});
+	var VERDICT_DEFS = vocabTable({
+		abandoned: "The package's Composer repository marks it abandoned, or its repository is archived on GitHub or GitLab.",
+		silent: "No stable release for at least release-high-years and no repository push for at least push-high-years.",
+		pinned: "The installed version is a branch snapshot — dev-master, a 2.x-dev alias, a #hash — or the package has no stable release at all.",
+		"left-behind": "No stable release on the installed branch for release-warn-years, while a higher branch kept releasing. The package is alive; the branch you are on is not.",
+		"old-promise": "The installed version was released before the target PHP's GA date, and its require.php constraint is open-ended for that target.",
+		stale: "Old release or old push, but not old enough on both fronts for silent.",
+		unknown: "No data could be obtained — not found in any configured Composer repository, or every lookup failed.",
+		finished: "Matched the built-in or project allowlist. The package is complete by design, not neglected.",
+		ok: "None of the above."
+	});
+	var DOCS_URL = "https://lockrot.dev/verdicts/";
+	var SIGNAL_DOC = vocabTable({
+		S7: `${DOCS_URL}#transitive-exposure`,
+		S8: `${DOCS_URL}#left-behind`,
+		S9: `${DOCS_URL}#security-advisories`
+	});
+	function isFlagged(verdict, flaggedVerdicts) {
+		return flaggedVerdicts.includes(verdict);
+	}
+	//#endregion
+	//#region src/model/normalize.ts
+	var DEFAULT_SCHEMA_URL = "https://lockrot.dev/schema/report-1.json";
+	var LIBYEARS_UNMEASURED_REASONS = [
+		"branch_snapshot",
+		"no_stable_release_date",
+		"not_from_composer_repository",
+		"metadata_unavailable"
+	];
+	var NOT_A_REPORT_MESSAGE = "This does not look like a lockrot report. Expected either the html bundle ({report, details}) or a --format=json document (with 'lockrot' and 'findings').";
+	var NO_GENERATED_AT_MESSAGE = "This report has no readable 'generated_at' date, so ages and the timeline cannot be shown.";
+	function normalize(input) {
+		if (!isRecord(input)) return notAReport(NOT_A_REPORT_MESSAGE);
+		const shape = pickReportShape(input);
+		if (shape === null) return notAReport(NOT_A_REPORT_MESSAGE);
+		const generatedAt = asNullableString(shape.reportSource.generated_at);
+		if (generatedAt === null || Number.isNaN(Date.parse(generatedAt))) return notAReport(NO_GENERATED_AT_MESSAGE);
+		const lockrot = shape.reportSource.lockrot;
+		const schema = asFiniteNumber(isRecord(lockrot) ? lockrot.schema : void 0) ?? 1;
+		return {
+			ok: true,
+			model: {
+				report: buildReportModel(shape.reportSource, generatedAt),
+				details: buildDetailsMap(shape.detailsSource),
+				schema,
+				newerSchema: schema > 1
+			}
+		};
+	}
+	function parseBundle(text) {
+		let parsed;
+		try {
+			parsed = JSON.parse(text);
+		} catch {
+			return {
+				ok: false,
+				error: {
+					kind: "not-json",
+					message: "This file is not valid JSON."
+				}
+			};
+		}
+		return normalize(parsed);
+	}
+	function notAReport(message) {
+		return {
+			ok: false,
+			error: {
+				kind: "not-a-report",
+				message
+			}
+		};
+	}
+	function pickReportShape(input) {
+		if ("report" in input) return isRecord(input.report) ? {
+			reportSource: input.report,
+			detailsSource: input.details
+		} : null;
+		if (isRecord(input.lockrot) && "findings" in input) return {
+			reportSource: input,
+			detailsSource: void 0
+		};
+		return null;
+	}
+	function buildReportModel(source, generatedAt) {
+		const lockrot = isRecord(source.lockrot) ? source.lockrot : {};
+		return {
+			schemaUrl: asString(source["$schema"], DEFAULT_SCHEMA_URL),
+			tool: {
+				version: asNullableString(lockrot.version),
+				schema: asFiniteNumber(lockrot.schema)
+			},
+			generatedAt,
+			run: buildRunSettings(source.run),
+			activityCacheOldestAt: asNullableString(source.activity_cache_oldest_at),
+			packagesChecked: asFiniteNumber(source.packages_checked),
+			includeDev: asNullableBoolean(source.include_dev),
+			notFromComposerRepository: asFiniteNumber(source.not_from_composer_repository),
+			networkFailures: asNullableBoolean(source.network_failures),
+			counts: zeroFillCounts(source.counts, VERDICTS),
+			abandoned: buildAbandoned(source.abandoned),
+			priorities: zeroFillCounts(source.priorities, PRIORITIES),
+			exposure: buildExposure(source.exposure),
+			libyears: buildLibyears(source.libyears),
+			baseline: buildBaseline(source.baseline),
+			notes: asStringArray(source.notes),
+			findings: asArray(source.findings).map(buildFinding)
+		};
+	}
+	function buildRunSettings(raw) {
+		const rec = isRecord(raw) ? raw : {};
+		return {
+			project: asNullableString(rec.project),
+			targetPhp: asNullableString(rec.target_php),
+			lockFile: asNullableString(rec.lock_file),
+			failOn: asNullableString(rec.fail_on),
+			thresholds: buildThresholds(rec.thresholds),
+			flaggedVerdicts: buildFlaggedVerdicts(rec.flagged_verdicts)
+		};
+	}
+	function buildThresholds(raw) {
+		if (!isRecord(raw)) return [];
+		const thresholds = [];
+		for (const [name, value] of Object.entries(raw)) {
+			const years = asFiniteNumber(value);
+			if (years !== null) thresholds.push([name, years]);
+		}
+		return thresholds;
+	}
+	function buildFlaggedVerdicts(raw) {
+		if (!isArray(raw)) return DEFAULT_FLAGGED;
+		return raw.map((value) => asCoercedString(value));
+	}
+	function zeroFillCounts(raw, knownKeys) {
+		const rec = isRecord(raw) ? raw : {};
+		const result = {};
+		for (const key of knownKeys) result[key] = asFiniteNumber(rec[key]) ?? 0;
+		for (const [key, value] of Object.entries(rec)) if (!(key in result)) result[key] = asFiniteNumber(value) ?? 0;
+		return result;
+	}
+	function buildAbandoned(raw) {
+		if (!isRecord(raw)) return null;
+		return {
+			total: asFiniteNumber(raw.total) ?? 0,
+			withReplacement: asFiniteNumber(raw.with_replacement) ?? 0
+		};
+	}
+	function buildExposure(raw) {
+		return asArray(raw).map((item) => {
+			const rec = isRecord(item) ? item : {};
+			return {
+				package: asCoercedString(rec.package),
+				flagged: asFiniteNumber(rec.flagged) ?? 0
+			};
+		});
+	}
+	function buildLibyears(raw) {
+		if (!isRecord(raw)) return null;
+		return {
+			total: asFiniteNumber(raw.total),
+			directRequirements: asFiniteNumber(raw.direct_requirements),
+			measured: asFiniteNumber(raw.measured) ?? 0,
+			unmeasured: buildUnmeasured(raw.unmeasured),
+			furthestBehind: buildFurthestBehind(raw.furthest_behind)
+		};
+	}
+	function buildUnmeasured(raw) {
+		const rec = isRecord(raw) ? raw : {};
+		const seen = new Set();
+		const rows = [];
+		for (const reason of LIBYEARS_UNMEASURED_REASONS) {
+			rows.push([reason, asFiniteNumber(rec[reason]) ?? 0]);
+			seen.add(reason);
+		}
+		for (const [reason, value] of Object.entries(rec)) if (!seen.has(reason)) rows.push([reason, asFiniteNumber(value) ?? 0]);
+		return rows;
+	}
+	function buildFurthestBehind(raw) {
+		if (!isRecord(raw)) return null;
+		return {
+			package: asCoercedString(raw.package),
+			version: asCoercedString(raw.version),
+			libyears: asFiniteNumber(raw.libyears) ?? 0
+		};
+	}
+	function buildBaseline(raw) {
+		if (!isRecord(raw)) return null;
+		return {
+			path: asString(raw.path, ""),
+			known: asFiniteNumber(raw.known) ?? 0,
+			new: asFiniteNumber(raw.new) ?? 0,
+			worsened: asFiniteNumber(raw.worsened) ?? 0,
+			stale: asStringArray(raw.stale)
+		};
+	}
+	function buildFinding(raw) {
+		const rec = isRecord(raw) ? raw : {};
+		const signals = asArray(rec.signals).map(buildSignal);
+		return {
+			package: asCoercedString(rec.package),
+			version: asCoercedString(rec.version),
+			verdict: asCoercedString(rec.verdict),
+			priority: asCoercedString(rec.priority),
+			direct: asBoolean(rec.direct, false),
+			dev: asBoolean(rec.dev, false),
+			replacement: asNullableString(rec.replacement),
+			signals,
+			chain: asStringArray(rec.chain),
+			directDependents: asStringArray(rec.direct_dependents),
+			evidence: buildEvidence(rec.evidence),
+			allowlistReason: asNullableString(rec.allowlist_reason),
+			note: asNullableString(rec.note),
+			dataDate: asNullableString(rec.data_date),
+			libyears: asFiniteNumber(rec.libyears),
+			baseline: buildFindingBaseline(rec.baseline),
+			advisories: flattenAdvisories(signals)
+		};
+	}
+	function buildEvidence(raw) {
+		if (typeof raw === "string") return raw;
+		if (isArray(raw)) return raw.map((line) => asCoercedString(line)).join(" · ");
+		return "";
+	}
+	function buildFindingBaseline(raw) {
+		if (!isRecord(raw)) return null;
+		return {
+			status: asCoercedString(raw.status),
+			previousVerdict: asNullableString(raw.previous_verdict)
+		};
+	}
+	function buildSignal(raw) {
+		const rec = isRecord(raw) ? raw : {};
+		return {
+			id: asCoercedString(rec.id),
+			level: asString(rec.level, "info"),
+			summary: asCoercedString(rec.summary),
+			data: isRecord(rec.data) ? rec.data : {}
+		};
+	}
+	function flattenAdvisories(signals) {
+		const advisories = [];
+		for (const signal of signals) {
+			if (signal.id !== "S9") continue;
+			for (const raw of asArray(signal.data.advisories)) advisories.push(buildAdvisory(raw));
+		}
+		return advisories;
+	}
+	function buildAdvisory(raw) {
+		const rec = isRecord(raw) ? raw : {};
+		const severityRaw = asNullableString(rec.severity);
+		return {
+			id: asCoercedString(rec.id),
+			cve: asNullableString(rec.cve),
+			title: asNullableString(rec.title),
+			link: asNullableString(rec.link),
+			severityRaw,
+			severity: normalizeSeverity(severityRaw),
+			reportedAt: asNullableString(rec.reported_at),
+			affectedVersions: asNullableString(rec.affected_versions),
+			fixedBy: asNullableString(rec.fixed_by),
+			fixedOnBranch: asBoolean(rec.fixed_on_branch, false)
+		};
+	}
+	function buildDetailsMap(raw) {
+		if (!isRecord(raw)) return new Map();
+		const details = new Map();
+		for (const [pkg, value] of Object.entries(raw)) details.set(pkg, buildPackageDetails(value));
+		return details;
+	}
+	function buildPackageDetails(raw) {
+		const rec = isRecord(raw) ? raw : {};
+		return {
+			metadata: buildMetadata(rec.metadata),
+			lock: buildLock(rec.lock),
+			activity: buildActivity(rec.activity),
+			repositoryLink: asNullableString(rec.repository_link)
+		};
+	}
+	function buildLock(raw) {
+		if (!isRecord(raw)) return null;
+		return {
+			php: asNullableString(raw.php),
+			released: asNullableString(raw.released),
+			repository: asNullableString(raw.repository),
+			fromComposerRepository: asBoolean(raw.from_composer_repository, true),
+			dev: asBoolean(raw.dev, false),
+			branchSnapshot: asBoolean(raw.branch_snapshot, false),
+			type: asNullableString(raw.type)
+		};
+	}
+	function buildMetadata(raw) {
+		if (!isRecord(raw)) return null;
+		return {
+			abandoned: asBoolean(raw.abandoned, false),
+			replacement: asNullableString(raw.replacement),
+			releasesListed: asFiniteNumber(raw.releases_listed),
+			hasStableRelease: asBoolean(raw.has_stable_release, false),
+			lastStableRelease: asNullableString(raw.last_stable_release),
+			lastStableVersion: asNullableString(raw.last_stable_version),
+			lastStableDatedBy: asNullableString(raw.last_stable_dated_by),
+			installedRelease: asNullableString(raw.installed_release),
+			installedReleaseDatedBy: asNullableString(raw.installed_release_dated_by),
+			repository: asNullableString(raw.repository),
+			type: asNullableString(raw.type),
+			dataDate: asNullableString(raw.data_date),
+			branches: asArray(raw.branches).map(buildBranchRow)
+		};
+	}
+	function buildBranchRow(raw) {
+		const rec = isRecord(raw) ? raw : {};
+		return {
+			branch: asCoercedString(rec.branch),
+			installed: asBoolean(rec.installed, false),
+			highest: asCoercedString(rec.highest),
+			highestReleased: asNullableString(rec.highest_released),
+			highestCommitDate: asNullableString(rec.highest_commit_date),
+			newestDated: asNullableString(rec.newest_dated),
+			newestDatedReleased: asNullableString(rec.newest_dated_released),
+			datedBy: asNullableString(rec.dated_by),
+			php: asNullableString(rec.php)
+		};
+	}
+	function buildActivity(raw) {
+		if (!isRecord(raw)) return null;
+		return {
+			forge: asNullableString(raw.forge),
+			repository: asNullableString(raw.repository),
+			archived: asBoolean(raw.archived, false),
+			pushedAt: asNullableString(raw.pushed_at),
+			fetchedAt: asNullableString(raw.fetched_at),
+			fromCache: asBoolean(raw.from_cache, false)
+		};
+	}
+	function isRecord(value) {
+		return typeof value === "object" && value !== null && !Array.isArray(value);
+	}
+	function isArray(value) {
+		return Array.isArray(value);
+	}
+	function asArray(value) {
+		return isArray(value) ? value : [];
+	}
+	function asString(value, fallback) {
+		return typeof value === "string" ? value : fallback;
+	}
+	function asNullableString(value) {
+		return typeof value === "string" ? value : null;
+	}
+	function asFiniteNumber(value) {
+		return typeof value === "number" && Number.isFinite(value) ? value : null;
+	}
+	function asBoolean(value, fallback) {
+		return typeof value === "boolean" ? value : fallback;
+	}
+	function asNullableBoolean(value) {
+		return typeof value === "boolean" ? value : null;
+	}
+	function asStringArray(value) {
+		return asArray(value).map((item) => asCoercedString(item));
+	}
+	function asCoercedString(value) {
+		if (typeof value === "string") return value;
+		if (value === void 0 || value === null) return "";
+		if (typeof value === "number" || typeof value === "boolean") return String(value);
+		try {
+			return JSON.stringify(value) ?? "";
+		} catch {
+			return "";
+		}
+	}
+	//#endregion
+	//#region node_modules/preact/hooks/dist/hooks.module.js
+	var t;
+	var r;
+	var u$1;
+	var i$1;
+	var o = 0;
+	var f$1 = [];
+	var c = l$1;
+	var e = c.__b;
+	var a = c.__r;
+	var v = c.diffed;
+	var l = c.__c;
+	var m = c.unmount;
+	var p = c.__;
+	function s(n, t) {
+		c.__h && c.__h(r, n, o || t), o = 0;
+		var u = r.__H || (r.__H = {
+			__: [],
+			__h: []
+		});
+		return n >= u.__.length && u.__.push({}), u.__[n];
+	}
+	function d(n) {
+		return o = 1, y(D, n);
+	}
+	function y(n, u, i) {
+		var o = s(t++, 2);
+		if (o.t = n, !o.__c && (o.__ = [i ? i(u) : D(void 0, u), function(n) {
+			var t = o.__N ? o.__N[0] : o.__[0], r = o.t(t, n);
+			t !== r && (o.__N = [r, o.__[1]], o.__c.setState({}));
+		}], o.__c = r, !r.__f)) {
+			var f = function(n, t, r) {
+				if (!o.__c.__H) return !0;
+				var u = !1, i = o.__c.props !== n;
+				if (o.__c.__H.__.some(function(n) {
+					if (n.__N) {
+						u = !0;
+						var t = n.__[0];
+						n.__ = n.__N, n.__N = void 0, t !== n.__[0] && (i = !0);
+					}
+				}), c) {
+					var f = c.call(this, n, t, r);
+					return u ? f || i : f;
+				}
+				return !u || i;
+			};
+			r.__f = !0;
+			var c = r.shouldComponentUpdate, e = r.componentWillUpdate;
+			r.componentWillUpdate = function(n, t, r) {
+				if (this.__e) {
+					var u = c;
+					c = void 0, f(n, t, r), c = u;
+				}
+				e && e.call(this, n, t, r);
+			}, r.shouldComponentUpdate = f;
+		}
+		return o.__N || o.__;
+	}
+	function h(n, u) {
+		var i = s(t++, 3);
+		!c.__s && C(i.__H, u) && (i.__ = n, i.u = u, r.__H.__h.push(i));
+	}
+	function _(n, u) {
+		var i = s(t++, 4);
+		!c.__s && C(i.__H, u) && (i.__ = n, i.u = u, r.__h.push(i));
+	}
+	function A(n) {
+		return o = 5, T(function() {
+			return { current: n };
+		}, []);
+	}
+	function T(n, r) {
+		var u = s(t++, 7);
+		return C(u.__H, r) && (u.__ = n(), u.__H = r, u.__h = n), u.__;
+	}
+	function q(n, t) {
+		return o = 8, T(function() {
+			return n;
+		}, t);
+	}
+	function x(n) {
+		var u = r.context[n.__c], i = s(t++, 9);
+		return i.c = n, u ? (i.__ ?? (i.__ = !0, u.sub(r)), u.props.value) : n.__;
+	}
+	function g() {
+		var n = s(t++, 11);
+		if (!n.__) {
+			for (var u = r.__v; null !== u && !u.__m && null !== u.__;) u = u.__;
+			var i = u.__m || (u.__m = [0, 0]);
+			n.__ = "P" + i[0] + "-" + i[1]++;
+		}
+		return n.__;
+	}
+	function j() {
+		for (var n; n = f$1.shift();) {
+			var t = n.__H;
+			if (n.__P && t) try {
+				t.__h.some(z), t.__h.some(B), t.__h = [];
+			} catch (r) {
+				t.__h = [], c.__e(r, n.__v);
+			}
+		}
+	}
+	c.__b = function(n) {
+		r = null, e && e(n);
+	}, c.__ = function(n, t) {
+		n && t.__k && t.__k.__m && (n.__m = t.__k.__m), p && p(n, t);
+	}, c.__r = function(n) {
+		a && a(n), t = 0;
+		var i = (r = n.__c).__H;
+		i && (u$1 === r ? (i.__h = [], r.__h = [], i.__.some(function(n) {
+			n.__N && (n.__ = n.__N), n.u = n.__N = void 0;
+		})) : (i.__h.some(z), i.__h.some(B), i.__h = [], t = 0)), u$1 = r;
+	}, c.diffed = function(n) {
+		v && v(n);
+		var t = n.__c;
+		t && t.__H && (t.__H.__h.length && (1 !== f$1.push(t) && i$1 === c.requestAnimationFrame || ((i$1 = c.requestAnimationFrame) || w)(j)), t.__H.__.some(function(n) {
+			n.u && (n.__H = n.u, n.u = void 0);
+		})), u$1 = r = null;
+	}, c.__c = function(n, t) {
+		t.some(function(n) {
+			try {
+				n.__h.some(z), n.__h = n.__h.filter(function(n) {
+					return !n.__ || B(n);
+				});
+			} catch (r) {
+				t.some(function(n) {
+					n.__h && (n.__h = []);
+				}), t = [], c.__e(r, n.__v);
+			}
+		}), l && l(n, t);
+	}, c.unmount = function(n) {
+		m && m(n);
+		var t, r = n.__c;
+		r && r.__H && (r.__H.__.some(function(n) {
+			try {
+				z(n);
+			} catch (n) {
+				t = n;
+			}
+		}), r.__H = void 0, t && c.__e(t, r.__v));
+	};
+	var k = "function" == typeof requestAnimationFrame;
+	function w(n) {
+		var t, r = function() {
+			clearTimeout(u), k && cancelAnimationFrame(t), setTimeout(n);
+		}, u = setTimeout(r, 35);
+		k && (t = requestAnimationFrame(r));
+	}
+	function z(n) {
+		var t = r, u = n.__c;
+		"function" == typeof u && (n.__c = void 0, u()), r = t;
+	}
+	function B(n) {
+		var t = r;
+		n.__c = n.__(), r = t;
+	}
+	function C(n, t) {
+		return !n || n.length !== t.length || t.some(function(t, r) {
+			return t !== n[r];
+		});
+	}
+	function D(n, t) {
+		return "function" == typeof t ? t(n) : t;
+	}
+	//#endregion
+	//#region src/domain/query.ts
+	var FIELD_PATTERN = /^(verdict|priority|signal|severity|cve|direct|dev):(.+)$/i;
+	var TRUTHY_VALUES = new Set([
+		"yes",
+		"true",
+		"1"
+	]);
+	var UPPERCASE_FIELDS = new Set(["signal", "cve"]);
+	function parseQuery(raw) {
+		const trimmed = raw.trim();
+		if (trimmed === "") return [];
+		const terms = [];
+		for (const part of trimmed.split(/\s+/)) {
+			if (part === "") continue;
+			const match = FIELD_PATTERN.exec(part);
+			if (match === null) {
+				terms.push({
+					field: null,
+					value: part.toLowerCase()
+				});
+				continue;
+			}
+			const key = match[1];
+			const rawValue = match[2];
+			if (key === void 0 || rawValue === void 0) {
+				terms.push({
+					field: null,
+					value: part.toLowerCase()
+				});
+				continue;
+			}
+			const field = key.toLowerCase();
+			const value = rawValue.toLowerCase();
+			if (field === "direct" || field === "dev") {
+				terms.push({
+					field,
+					value: TRUTHY_VALUES.has(value) ? "true" : "false"
+				});
+				continue;
+			}
+			terms.push({
+				field,
+				value: UPPERCASE_FIELDS.has(field) ? value.toUpperCase() : value
+			});
+		}
+		return terms;
+	}
+	function valuesOf(terms, field) {
+		return terms.filter((term) => term.field === field).map((term) => term.value);
+	}
+	function lastBooleanTerm(terms, field) {
+		let result = null;
+		for (const term of terms) if (term.field === field) result = term.value === "true";
+		return result;
+	}
+	function matchesSeverityTerm(advisory, terms) {
+		const raw = (advisory.severityRaw ?? "").toLowerCase();
+		return terms.some((term) => term === advisory.severity || term === raw);
+	}
+	function matchesCveTerm(advisory, terms) {
+		const id = (advisory.cve ?? advisory.id).toUpperCase();
+		return terms.some((term) => id.includes(term));
+	}
+	function matchesFinding(f, terms) {
+		const text = valuesOf(terms, null);
+		if (text.length > 0) {
+			const haystack = `${f.package} ${f.version} ${f.verdict} ${f.evidence}`.toLowerCase();
+			if (!text.every((term) => haystack.includes(term))) return false;
+		}
+		const verdicts = valuesOf(terms, "verdict");
+		if (verdicts.length > 0 && !verdicts.includes(f.verdict)) return false;
+		const priorities = valuesOf(terms, "priority");
+		if (priorities.length > 0 && !priorities.includes(f.priority)) return false;
+		const direct = lastBooleanTerm(terms, "direct");
+		if (direct !== null && f.direct !== direct) return false;
+		const dev = lastBooleanTerm(terms, "dev");
+		if (dev !== null && f.dev !== dev) return false;
+		const signals = valuesOf(terms, "signal");
+		if (signals.length > 0) {
+			const ids = f.signals.map((signal) => signal.id);
+			if (!signals.every((id) => ids.includes(id))) return false;
+		}
+		const severities = valuesOf(terms, "severity");
+		if (severities.length > 0 && !f.advisories.some((advisory) => matchesSeverityTerm(advisory, severities))) return false;
+		const cves = valuesOf(terms, "cve");
+		if (cves.length > 0 && !f.advisories.some((advisory) => matchesCveTerm(advisory, cves))) return false;
+		return true;
+	}
+	function matchesAdvisory(a, _finding, terms) {
+		const severities = valuesOf(terms, "severity");
+		if (severities.length > 0 && !matchesSeverityTerm(a, severities)) return false;
+		const cves = valuesOf(terms, "cve");
+		if (cves.length > 0 && !matchesCveTerm(a, cves)) return false;
+		return true;
+	}
+	//#endregion
+	//#region src/domain/advisories.ts
+	function advisoriesOf(finding) {
+		return finding.advisories;
+	}
+	function fixLadder(finding) {
+		const buckets = new Map();
+		for (const advisory of advisoriesOf(finding)) {
+			const key = advisory.fixedBy ?? "\0none";
+			const existing = buckets.get(key);
+			if (existing) buckets.set(key, {
+				version: existing.version,
+				onBranch: existing.onBranch,
+				n: existing.n + 1
+			});
+			else buckets.set(key, {
+				version: advisory.fixedBy,
+				onBranch: advisory.fixedOnBranch,
+				n: 1
+			});
+		}
+		return Array.from(buckets.values()).sort((x, y) => {
+			if (x.onBranch !== y.onBranch) return x.onBranch ? -1 : 1;
+			return y.n - x.n;
+		});
+	}
+	function sevTone(severity) {
+		switch (severity) {
+			case "critical": return "crit";
+			case "high": return "high";
+			case "medium": return "med";
+			default: return "low";
+		}
+	}
+	function sortAdvisories(items, severityOf) {
+		return [...items].sort((a, b) => severityRank(severityOf(a)) - severityRank(severityOf(b)));
+	}
+	function allAdvisories(model) {
+		const pairs = [];
+		for (const finding of model.report.findings) for (const advisory of advisoriesOf(finding)) pairs.push({
+			advisory,
+			finding
+		});
+		return sortAdvisories(pairs, (pair) => pair.advisory.severity);
+	}
+	function fixShapeOf(advisory) {
+		if (!advisory.fixedBy) return "none";
+		return advisory.fixedOnBranch ? "branch" : "move";
+	}
+	function passesAdvisoryRail(filters, advisory) {
+		if (filters.sev.length > 0 && !filters.sev.includes(advisory.severity)) return false;
+		if (filters.fix.length > 0 && !filters.fix.includes(fixShapeOf(advisory))) return false;
+		return true;
+	}
+	var GROUP_TEXT = [
+		{
+			shape: "branch",
+			heading: "A release on the branch you are on",
+			hint: "The cheapest move: a patch or minor bump, no migration."
+		},
+		{
+			shape: "move",
+			heading: "Only a move to another branch",
+			hint: "The fix never landed on your branch. This is an upgrade, not a bump."
+		},
+		{
+			shape: "none",
+			heading: "No fix listed",
+			hint: "Nothing published clears it. Replacement or mitigation."
+		}
+	];
+	function groupAdvisories(pairs) {
+		return GROUP_TEXT.map((group) => ({
+			...group,
+			advisories: pairs.filter((pair) => fixShapeOf(pair.advisory) === group.shape)
+		})).filter((group) => group.advisories.length > 0);
+	}
+	//#endregion
+	//#region src/domain/filters.ts
+	function flaggedFindings(model) {
+		return model.report.findings.filter((f) => isFlagged(f.verdict, model.report.run.flaggedVerdicts));
+	}
+	function population(model, view) {
+		switch (view) {
+			case "findings":
+			case "radius": return flaggedFindings(model);
+			case "advisories": return model.report.findings.filter((f) => f.advisories.length > 0);
+			case "packages": return model.report.findings;
+			case "run": return [];
+		}
+	}
+	function sinceBucket(f) {
+		if (f.baseline === null) return null;
+		const status = f.baseline.status;
+		if (status === "new") return "new";
+		if (status === "worsened") return "worsened";
+		if (status === "known") return "known";
+		return null;
+	}
+	function passesRail(filters, f) {
+		if (filters.sev.length > 0 && !f.advisories.some((advisory) => filters.sev.includes(advisory.severity))) return false;
+		if (filters.fix.length > 0 && !f.advisories.some((advisory) => filters.fix.includes(fixShapeOf(advisory)))) return false;
+		if (filters.prio.length > 0 && !filters.prio.includes(f.priority)) return false;
+		if (filters.verdict.length > 0 && !filters.verdict.includes(f.verdict)) return false;
+		if (filters.signal.length > 0) {
+			const ids = f.signals.map((signal) => signal.id);
+			if (!filters.signal.some((id) => ids.includes(id))) return false;
+		}
+		const since = sinceBucket(f);
+		if (filters.since.length > 0 && (since === null || !filters.since.includes(since))) return false;
+		if (filters.scope.includes("direct") && !f.direct) return false;
+		if (filters.scope.includes("transitive") && f.direct) return false;
+		if (filters.scope.includes("prod") && f.dev) return false;
+		if (filters.scope.includes("dev") && !f.dev) return false;
+		return true;
+	}
+	function orderByPriorityGroup(findings) {
+		const buckets = new Map();
+		for (const f of findings) {
+			const bucket = buckets.get(f.priority);
+			if (bucket) bucket.push(f);
+			else buckets.set(f.priority, [f]);
+		}
+		const known = PRIORITIES.flatMap((p) => buckets.get(p) ?? []);
+		const knownSet = PRIORITIES;
+		const unknown = [...buckets.keys()].filter((p) => !knownSet.includes(p)).flatMap((p) => buckets.get(p) ?? []);
+		return [...known, ...unknown];
+	}
+	function sortKeyValue(f, key) {
+		switch (key) {
+			case "package": return f.package;
+			case "version": return f.version;
+			case "libyears": return f.libyears === null ? -1 : f.libyears;
+			case "verdict": {
+				const index = VERDICT_ORDER.indexOf(f.verdict);
+				return index === -1 ? 99 : index;
+			}
+			case "priority": return PRIORITIES.indexOf(f.priority);
+			case "reached": return (f.direct ? "0" : "1") + (f.dev ? "1" : "0");
+			case "signals": return -f.signals.length;
+			case "data": return f.dataDate ?? "";
+		}
+	}
+	function comparePackages(a, b, key) {
+		if (key === "package") return a.package.localeCompare(b.package, void 0, { numeric: true });
+		if (key === "version") return a.version.localeCompare(b.version, void 0, { numeric: true });
+		const x = sortKeyValue(a, key);
+		const y = sortKeyValue(b, key);
+		if (x < y) return -1;
+		if (x > y) return 1;
+		return 0;
+	}
+	function sortPackages(findings, sort, desc) {
+		const sign = desc ? -1 : 1;
+		return [...findings].sort((a, b) => sign * comparePackages(a, b, sort));
+	}
+	function applyFilters(model, state, view) {
+		const terms = parseQuery(state.q);
+		const filtered = population(model, view).filter((f) => matchesFinding(f, terms) && passesRail(state.filters, f));
+		if (view === "findings") return orderByPriorityGroup(filtered);
+		if (view === "packages") return sortPackages(filtered, state.sort, state.sortDesc);
+		return filtered;
+	}
+	function hasBaseline(model) {
+		return model.report.baseline !== null && model.report.findings.some((f) => f.baseline !== null);
+	}
+	function buildSinceGroup(model, state, here) {
+		if (model.report.baseline === null || !hasBaseline(model)) return null;
+		return {
+			group: "since",
+			title: `Since ${model.report.baseline.path}`,
+			rows: [
+				["new", "New"],
+				["worsened", "Worsened"],
+				["known", "Already accepted"]
+			].map(([key, label]) => ({
+				key,
+				label,
+				count: here.filter((f) => sinceBucket(f) === key).length,
+				on: state.filters.since.includes(key)
+			}))
+		};
+	}
+	function buildScopeGroup(state, here) {
+		return {
+			group: "scope",
+			title: "Scope",
+			rows: [
+				[
+					"direct",
+					"Direct",
+					(f) => f.direct
+				],
+				[
+					"transitive",
+					"Transitive",
+					(f) => !f.direct
+				],
+				[
+					"prod",
+					"require",
+					(f) => !f.dev
+				],
+				[
+					"dev",
+					"require-dev",
+					(f) => f.dev
+				]
+			].map(([key, label, predicate]) => ({
+				key,
+				label,
+				count: here.filter(predicate).length,
+				on: state.filters.scope.includes(key)
+			}))
+		};
+	}
+	function signalSortKey(id) {
+		const digits = /^S(\d+)$/.exec(id)?.[1];
+		return digits !== void 0 ? [Number(digits), ""] : [Number.MAX_SAFE_INTEGER, id];
+	}
+	function buildSignalGroup(state, here) {
+		const counts = new Map();
+		for (const f of here) for (const signal of f.signals) counts.set(signal.id, (counts.get(signal.id) ?? 0) + 1);
+		if (counts.size === 0) return null;
+		return {
+			group: "signal",
+			title: "Signal",
+			rows: [...counts.keys()].sort((a, b) => {
+				const [an, as] = signalSortKey(a);
+				const [bn, bs] = signalSortKey(b);
+				return an !== bn ? an - bn : as.localeCompare(bs);
+			}).map((id) => ({
+				key: id,
+				label: SIGNAL_NAMES[id] ?? "",
+				count: counts.get(id) ?? 0,
+				on: state.filters.signal.includes(id)
+			}))
+		};
+	}
+	var FIX_GROUP_TEXT = [
+		["branch", "A release on this branch"],
+		["move", "Moving to another branch"],
+		["none", "No fix listed"]
+	];
+	function buildFixGroup(state, here) {
+		const counts = {
+			branch: 0,
+			move: 0,
+			none: 0
+		};
+		let total = 0;
+		for (const f of here) for (const advisory of f.advisories) {
+			counts[fixShapeOf(advisory)] += 1;
+			total += 1;
+		}
+		if (total === 0) return null;
+		return {
+			group: "fix",
+			title: "What the fix costs",
+			rows: FIX_GROUP_TEXT.filter(([shape]) => counts[shape] > 0).map(([shape, label]) => ({
+				key: shape,
+				label,
+				count: counts[shape],
+				on: state.filters.fix.includes(shape)
+			}))
+		};
+	}
+	function railGroups(model, state) {
+		const here = population(model, state.view);
+		const groups = [];
+		const since = buildSinceGroup(model, state, here);
+		if (since) groups.push(since);
+		groups.push(buildScopeGroup(state, here));
+		const signal = buildSignalGroup(state, here);
+		if (signal) groups.push(signal);
+		const fix = buildFixGroup(state, here);
+		if (fix) groups.push(fix);
+		return groups;
+	}
+	//#endregion
+	//#region src/domain/format.ts
+	var MS_PER_JULIAN_YEAR = 315576e5;
+	function day(iso) {
+		return iso ? iso.slice(0, 10) : "—";
+	}
+	function years(iso, now) {
+		if (!iso) return null;
+		return (now.getTime() - new Date(iso).getTime()) / MS_PER_JULIAN_YEAR;
+	}
+	function ageText(iso, now) {
+		const y = years(iso, now);
+		if (y === null) return "undated";
+		if (y < 1) return `${Math.max(1, Math.round(y * 12))} mo ago`;
+		return `${y.toFixed(1)} y ago`;
+	}
+	function plural(n, one, many) {
+		return `${n} ${n === 1 ? one : many}`;
+	}
+	function fixed(value, digits) {
+		return typeof value === "number" && Number.isFinite(value) ? value.toFixed(digits) : null;
+	}
+	function countPhrase(n, of, noun1, nounN) {
+		return `${n} of ${of} ${n === 1 ? noun1 : nounN}`;
+	}
+	//#endregion
+	//#region src/ui/context.ts
+	var ReportContext = X(null);
+	function useReport() {
+		const value = x(ReportContext);
+		if (value === null) throw new Error("useReport() outside <ReportContext.Provider>: mount the page through App");
+		return value;
+	}
+	//#endregion
+	//#region src/domain/links.ts
+	function safeHref(url) {
+		const value = typeof url === "string" ? url.trim() : "";
+		return /^https?:\/\/[^\s<>"']+$/i.test(value) ? value : null;
+	}
+	function packagistUrl(finding, details) {
+		const entry = details.get(finding.package);
+		return (entry?.lock ? entry.lock.fromComposerRepository : true) ? `https://packagist.org/packages/${finding.package}` : null;
+	}
+	function cveUrl(advisory) {
+		return advisory.cve && /^CVE-/.test(advisory.cve) ? `https://nvd.nist.gov/vuln/detail/${advisory.cve}` : null;
+	}
+	function repoHost(url) {
+		const host = /^https?:\/\/([^/]+)/.exec(url ?? "")?.[1];
+		return host ? host.replace(/^www\./, "") : "repository";
+	}
+	//#endregion
+	//#region node_modules/preact/jsx-runtime/dist/jsxRuntime.module.js
+	var f = 0;
+	Array.isArray;
+	function u(e, t, n, o, i, u) {
+		t || (t = {});
+		var a, c, p = t;
+		if ("ref" in p) for (c in p = {}, t) "ref" == c ? a = t[c] : p[c] = t[c];
+		var l = {
+			type: e,
+			props: p,
+			key: n,
+			ref: a,
+			__k: null,
+			__: null,
+			__b: 0,
+			__e: null,
+			__c: null,
+			constructor: void 0,
+			__v: --f,
+			__i: -1,
+			__u: 0,
+			__source: i,
+			__self: u
+		};
+		if ("function" == typeof e && (a = e.defaultProps)) for (c in a) void 0 === p[c] && (p[c] = a[c]);
+		return l$1.vnode && l$1.vnode(l), l;
+	}
+	//#endregion
+	//#region src/ui/common/common.tsx
+	function toneClass(tone) {
+		return `tone-${tone}`;
+	}
+	function Pill({ word, docs = false }) {
+		const className = `pill ${toneClass(TONE(word))}`;
+		const title = VERDICT_DEFS[word];
+		if (!docs) return u("span", {
+			className,
+			title,
+			children: word
+		});
+		return u("a", {
+			className,
+			title,
+			href: `${DOCS_URL}#the-nine-verdicts`,
+			target: "_blank",
+			rel: "noopener noreferrer",
+			children: word
+		});
+	}
+	function Tag({ children, tone, title }) {
+		return u("span", {
+			className: tone ? `tag ${toneClass(tone)}` : "tag",
+			title,
+			children
+		});
+	}
+	function OutLink({ href, children }) {
+		const safe = safeHref(href);
+		if (safe === null) return u("span", {
+			className: "out",
+			children
+		});
+		return u("a", {
+			className: "out",
+			href: safe,
+			target: "_blank",
+			rel: "noopener noreferrer",
+			children
+		});
+	}
+	function NoWrap({ children }) {
+		return u("span", {
+			className: "nowrap",
+			children
+		});
+	}
+	function Muted({ children, title }) {
+		return u("span", {
+			className: "muted",
+			title,
+			children
+		});
+	}
+	//#endregion
+	//#region src/ui/detail/AdvisoryList.tsx
+	function AdvisoryList({ finding }) {
+		const advisories = advisoriesOf(finding);
+		if (advisories.length === 0) return null;
+		const ladder = fixLadder(finding);
+		const sorted = sortAdvisories(advisories, (advisory) => advisory.severity);
+		return u("section", {
+			className: "detail-section",
+			children: [
+				u("h3", { children: plural(advisories.length, "security advisory", "security advisories") }),
+				u("div", {
+					className: "detail-ladder",
+					children: ladder.map((rung) => u("div", {
+						className: rung.onBranch ? "detail-rung detail-rung-here" : "detail-rung",
+						children: [
+							u("span", {
+								className: "detail-rung-version",
+								children: rung.version ?? "no release"
+							}),
+							u("span", {
+								className: "detail-rung-bar",
+								children: u("i", { style: { width: `${Math.round(100 * rung.n / advisories.length)}%` } })
+							}),
+							u("span", {
+								className: "detail-rung-count",
+								children: [
+									"clears ",
+									rung.n,
+									" of ",
+									advisories.length,
+									rung.onBranch && " · this branch"
+								]
+							})
+						]
+					}, rung.version ?? "\0none"))
+				}),
+				u("details", {
+					className: "detail-signal-more detail-disclosure",
+					children: [u("summary", {
+						className: "detail-signal-summary",
+						children: u("span", {
+							className: "detail-signal-summary-text",
+							children: "Every advisory"
+						})
+					}), u("div", {
+						className: "detail-advisory-list",
+						children: sorted.map((advisory) => {
+							const cve = cveUrl(advisory);
+							return u("div", {
+								className: "detail-advisory",
+								children: [
+									u("span", {
+										className: `detail-advisory-sev ${toneClass(sevTone(advisory.severity))}`,
+										children: advisory.severityRaw ?? "unrated"
+									}),
+									u("span", {
+										className: "detail-advisory-title",
+										children: advisory.title ?? advisory.id
+									}),
+									u("span", {
+										className: "detail-advisory-meta",
+										children: [
+											cve !== null ? u(OutLink, {
+												href: cve,
+												children: advisory.cve
+											}) : u("span", {
+												className: "mono",
+												children: advisory.cve ?? advisory.id
+											}),
+											u("span", { children: advisory.fixedBy ? `fixed by ${advisory.fixedBy}` : "no fix listed" }),
+											u("span", { children: ["reported ", day(advisory.reportedAt)] }),
+											advisory.link !== null && u(OutLink, {
+												href: advisory.link,
+												children: "advisory"
+											})
+										]
+									})
+								]
+							}, advisory.id);
+						})
+					})]
+				})
+			]
+		});
+	}
+	//#endregion
+	//#region src/ui/detail/DetailHeader.tsx
+	function DetailHeader({ finding, onClose }) {
+		const { model } = useReport();
+		const details = model.details.get(finding.package) ?? null;
+		const packagist = packagistUrl(finding, model.details);
+		const repositoryLink = safeHref(details?.repositoryLink ?? null);
+		const replacement = finding.replacement ?? details?.metadata?.replacement ?? null;
+		return u("div", {
+			className: "detail-head",
+			children: u("div", {
+				className: "detail-head-top",
+				children: [u("div", {
+					className: "detail-head-main",
+					children: [
+						u("h2", {
+							className: "detail-title",
+							children: finding.package
+						}),
+						u("div", {
+							className: "detail-pills",
+							children: [
+								u(Pill, {
+									word: finding.verdict,
+									docs: true
+								}),
+								finding.priority !== "none" && u(Pill, { word: finding.priority }),
+								u(Tag, { children: finding.direct ? "direct" : "transitive" }),
+								finding.dev && u(Tag, { children: "require-dev" })
+							]
+						}),
+						u("div", {
+							className: "detail-links",
+							children: [
+								packagist !== null && u(OutLink, {
+									href: packagist,
+									children: "packagist"
+								}),
+								repositoryLink !== null && u(OutLink, {
+									href: repositoryLink,
+									children: repoHost(repositoryLink)
+								}),
+								replacement !== null && (finding.replacement !== null ? u(OutLink, {
+									href: `https://packagist.org/packages/${replacement}`,
+									children: `replacement: ${replacement}`
+								}) : u("span", {
+									className: "detail-replacement-text",
+									children: `replacement: ${replacement}`
+								}))
+							]
+						})
+					]
+				}), u("button", {
+					type: "button",
+					className: "detail-close",
+					onClick: onClose,
+					children: "Close"
+				})]
+			})
+		});
+	}
+	//#endregion
+	//#region src/domain/install.ts
+	function installCommand(name, constraint) {
+		const vendorName = String(name);
+		if (!/^[A-Za-z0-9]([A-Za-z0-9._-]*)\/[A-Za-z0-9]([A-Za-z0-9._-]*)$/.test(vendorName)) return null;
+		const value = String(constraint);
+		if (value.length > 100 || value.startsWith("-") || !/^[A-Za-z0-9.,^~><=!|*/ @_-]+$/.test(value)) return null;
+		return `composer require ${vendorName} '${value}'`;
+	}
+	//#endregion
+	//#region src/ui/detail/FollowUpstream.tsx
+	var COPIED_MS = 1400;
+	var FAILED_MS = 2600;
+	function CopyButton({ text }) {
+		const [label, setLabel] = d("Copy");
+		const timer = A(null);
+		h(() => () => {
+			if (timer.current !== null) clearTimeout(timer.current);
+		}, []);
+		function revertAfter(ms) {
+			if (timer.current !== null) clearTimeout(timer.current);
+			timer.current = setTimeout(() => {
+				setLabel("Copy");
+			}, ms);
+		}
+		function handleClick() {
+			const clipboard = navigator.clipboard;
+			if (!clipboard) {
+				setLabel("Select it and copy");
+				revertAfter(FAILED_MS);
+				return;
+			}
+			clipboard.writeText(text).then(() => {
+				setLabel("Copied");
+				revertAfter(COPIED_MS);
+			}, () => {
+				setLabel("Select it and copy");
+				revertAfter(FAILED_MS);
+			});
+		}
+		return u("button", {
+			type: "button",
+			className: "detail-copy",
+			onClick: handleClick,
+			children: label
+		});
+	}
+	function FollowUpstream({ finding }) {
+		const suggestion = finding.signals.find((signal) => signal.id === "S8")?.data.suggested_constraint;
+		const command = suggestion ? installCommand(finding.package, suggestion) : null;
+		if (command === null) return null;
+		return u("div", {
+			className: "detail-action",
+			children: [u("span", {
+				className: "detail-action-eyebrow",
+				children: "Follow the upstream"
+			}), u("div", {
+				className: "detail-cmd",
+				children: [u("span", {
+					className: "detail-cmd-text",
+					children: command
+				}), u(CopyButton, { text: command })]
+			})]
+		});
+	}
+	//#endregion
+	//#region src/ui/detail/KeyValue.tsx
+	function KeyValue({ rows }) {
+		if (rows.length === 0) return null;
+		return u("dl", {
+			className: "detail-kv",
+			children: rows.map((row) => u(S, { children: [u("dt", { children: row.label }), u("dd", { children: row.value })] }, row.label))
+		});
+	}
+	function presentRows(rows) {
+		return rows.filter((row) => row.value !== null && row.value !== void 0 && row.value !== "");
+	}
+	//#endregion
+	//#region src/domain/libyears.ts
+	function libyearsReason(finding) {
+		if (!finding || fixed(finding.libyears, 1) !== null) return "";
+		if (finding.libyears !== null) return "not a number in this document";
+		if (finding.note === "not from a Composer repository, not checked") return "not from a Composer repository";
+		if (finding.note) return "metadata unavailable";
+		const hashIndex = finding.version.indexOf("#");
+		const version = hashIndex < 0 ? finding.version : finding.version.slice(0, hashIndex);
+		return /^dev-/.test(version) || /-dev$/.test(version) ? "branch snapshot" : "no release date lockrot trusts";
+	}
+	function libyearsAtZero(finding, meta) {
+		if (!finding || finding.libyears !== 0) return null;
+		const newest = meta?.lastStableVersion ?? null;
+		return newest && newest !== finding.version ? `not behind the newest stable, ${newest}` : "the installed release is the newest";
+	}
+	function libyearsItems(block) {
+		if (!block) return [];
+		const unmeasured = block.unmeasured.reduce((sum, [, count]) => sum + count, 0);
+		const packages = block.measured + unmeasured;
+		if (!block.measured) {
+			if (!packages) return ["nothing to measure"];
+			return [packages === 1 ? "the one package could not be measured" : `none of the ${packages} packages could be measured`];
+		}
+		const items = [`across ${block.measured === packages ? packages === 1 ? "the one package" : `all ${packages} packages` : `${block.measured} of ${packages} packages`}`];
+		const worst = block.furthestBehind;
+		if (worst) {
+			const direct = fixed(block.directRequirements, 1);
+			if (direct !== null) items.push(`${direct} from direct requirements`);
+			const behind = fixed(worst.libyears, 1);
+			items.push(`furthest behind ${worst.package} ${worst.version}${behind === null ? "" : ` at ${behind}`}`);
+		}
+		return items;
+	}
+	function libyearsRowPhrases(finding, metadata) {
+		if (!finding || fixed(finding.libyears, 1) === null) return [];
+		const newest = metadata?.lastStableVersion ?? null;
+		const atZero = libyearsAtZero(finding, metadata);
+		let why = null;
+		if (metadata?.hasStableRelease && !metadata.lastStableRelease) why = { text: "at least: the newest release is undated, measured to the newest dated one above" };
+		else if (atZero !== null) why = { text: atZero };
+		else if (newest) why = metadata?.lastStableRelease ? {
+			text: `newest ${newest} released `,
+			date: metadata.lastStableRelease
+		} : { text: `newest ${newest}` };
+		const phrases = why ? [why] : [];
+		if (metadata?.installedReleaseDatedBy) {
+			const name = metadata.installedReleaseDatedBy;
+			phrases.push(metadata.installedRelease ? {
+				text: `installed release dated by ${name}, `,
+				date: metadata.installedRelease
+			} : { text: `installed release dated by ${name}` });
+		}
+		return phrases;
+	}
+	//#endregion
+	//#region src/ui/detail/LibyearsRow.tsx
+	function LibyearsRow({ finding, metadata }) {
+		const value = fixed(finding.libyears, 1);
+		if (value === null) return u(Muted, { children: ["not measured · ", libyearsReason(finding)] });
+		return u(S, { children: [value, libyearsRowPhrases(finding, metadata).map((phrase, index) => u(Muted, { children: [
+			" ",
+			"· ",
+			phrase.text,
+			phrase.date !== void 0 && u(NoWrap, { children: day(phrase.date) })
+		] }, index))] });
+	}
+	//#endregion
+	//#region src/domain/sniff.ts
+	function hasNoFixExpected(finding) {
+		return /no fix expected/.test(ownEvidence(finding));
+	}
+	function ownEvidence(finding) {
+		const s7 = finding.signals.find((signal) => signal.id === "S7");
+		if (!s7 || !s7.summary) return finding.evidence;
+		const suffix = "; " + s7.summary;
+		if (finding.evidence.endsWith(suffix)) return finding.evidence.slice(0, -suffix.length);
+		if (finding.evidence === s7.summary) return "";
+		return finding.evidence;
+	}
+	function noteDocLink(note) {
+		return /token|activity|repository/.test(note) ? "https://lockrot.dev/internals/" : "https://lockrot.dev/configuration/";
+	}
+	//#endregion
+	//#region src/domain/priority.ts
+	var PRIORITY_BASE = vocabTable({
+		abandoned: "critical",
+		silent: "critical",
+		pinned: "high",
+		"left-behind": "high",
+		"old-promise": "high",
+		stale: "medium"
+	});
+	var LADDER = [
+		"critical",
+		"high",
+		"medium",
+		"low"
+	];
+	function stepDown(p) {
+		const index = LADDER.indexOf(p);
+		if (index === -1) return p;
+		return LADDER[Math.min(index + 1, LADDER.length - 1)] ?? p;
+	}
+	function stepUp(p) {
+		const index = LADDER.indexOf(p);
+		if (index === -1) return p;
+		return LADDER[Math.max(index - 1, 0)] ?? p;
+	}
+	function priorityWhy(finding) {
+		const base = PRIORITY_BASE[finding.verdict];
+		if (finding.priority === "none" || !base) return [];
+		const steps = [];
+		let current = base;
+		steps.push({
+			text: `${finding.verdict} starts at ${base}`,
+			to: current
+		});
+		if (!finding.direct) {
+			current = stepDown(current);
+			steps.push({
+				text: "nothing requires it directly, one step down",
+				to: current
+			});
+		}
+		if (finding.dev) {
+			current = stepDown(current);
+			steps.push({
+				text: "development only, one step down",
+				to: current
+			});
+		}
+		if (hasNoFixExpected(finding)) {
+			current = stepUp(current);
+			steps.push({
+				text: "an advisory no release will fix, one step up",
+				to: current
+			});
+		}
+		return steps;
+	}
+	//#endregion
+	//#region src/ui/detail/PriorityWhy.tsx
+	function PriorityWhy({ finding }) {
+		const steps = priorityWhy(finding);
+		if (steps.length === 0) return null;
+		return u("section", {
+			className: "detail-section",
+			children: [u("h3", { children: ["Why this is ", finding.priority] }), u("div", {
+				className: "detail-why",
+				children: [steps.map((step, index) => u("span", {
+					className: "detail-why-step",
+					children: [index > 0 && u("span", {
+						className: "detail-why-arrow",
+						"aria-hidden": "true",
+						children: "→"
+					}), step.text]
+				}, step.text)), u("b", {
+					className: "detail-why-result",
+					children: finding.priority
+				})]
+			})]
+		});
+	}
+	//#endregion
+	//#region src/ui/detail/SignalList.tsx
+	function signalTone(level) {
+		if (level === "high") return "crit";
+		if (level === "warn") return "high";
+		return "low";
+	}
+	function formatDataValue(value) {
+		if (value === null) return "null";
+		if (typeof value === "object") return JSON.stringify(value);
+		if (typeof value === "string") return value;
+		return JSON.stringify(value);
+	}
+	function signalRows(data) {
+		const entries = Object.entries(data);
+		if (entries.length === 0) return [{
+			label: "—",
+			value: "no data"
+		}];
+		return entries.map(([key, value]) => ({
+			label: key,
+			value: formatDataValue(value)
+		}));
+	}
+	function SignalRow({ signal }) {
+		const doc = SIGNAL_DOC[signal.id] ?? `https://lockrot.dev/verdicts/#the-signals`;
+		return u("div", {
+			className: "detail-signal",
+			children: [u("a", {
+				className: `detail-signal-id tone-${signalTone(signal.level)}`,
+				href: doc,
+				target: "_blank",
+				rel: "noopener noreferrer",
+				title: SIGNAL_DEFS[signal.id] ?? "",
+				children: signal.id
+			}), u("details", {
+				className: "detail-signal-more",
+				children: [u("summary", {
+					className: "detail-signal-summary",
+					children: u("span", {
+						className: "detail-signal-summary-text",
+						children: signal.summary
+					})
+				}), u("div", {
+					className: "detail-signal-data",
+					children: u(KeyValue, { rows: signalRows(signal.data) })
+				})]
+			})]
+		});
+	}
+	function SignalList({ finding }) {
+		return u("section", {
+			className: "detail-section",
+			children: [u("h3", { children: "Signals — what was observed" }), finding.signals.length === 0 ? u("p", {
+				className: "detail-signal-empty",
+				children: "No signal fired. The verdict comes from what lockrot could not learn."
+			}) : finding.signals.map((signal) => u(SignalRow, { signal }, signal.id))]
+		});
+	}
+	//#endregion
+	//#region src/domain/timeline.ts
+	var LEFT_MARGIN = 4;
+	var EMPTY_LAYOUT = {
+		lanes: [],
+		ticks: []
+	};
+	function datedTag(branch) {
+		if (branch.highestReleased !== null) return {
+			iso: branch.highestReleased,
+			label: branch.highest
+		};
+		if (branch.highestCommitDate !== null) return {
+			iso: branch.highestCommitDate,
+			label: branch.highest
+		};
+		if (branch.newestDatedReleased !== null && branch.newestDated !== null) return {
+			iso: branch.newestDatedReleased,
+			label: branch.newestDated
+		};
+		return null;
+	}
+	function timelineLayout(branches, now) {
+		const dated = [];
+		for (const branch of branches) {
+			const tag = datedTag(branch);
+			if (tag === null) continue;
+			const time = new Date(tag.iso).getTime();
+			if (Number.isNaN(time)) continue;
+			dated.push({
+				branch,
+				iso: tag.iso,
+				label: tag.label,
+				time
+			});
+		}
+		if (dated.length < 2) return EMPTY_LAYOUT;
+		const min = Math.min(...dated.map((d) => d.time));
+		const max = now.getTime();
+		const span = Math.max(max - min, 1);
+		const pct = (t) => LEFT_MARGIN + 88 * ((t - min) / span);
+		const lanes = [...dated].sort((a, b) => b.time - a.time);
+		const newestLane = lanes[0];
+		if (newestLane === void 0) return EMPTY_LAYOUT;
+		const lanesOut = lanes.map((d) => ({
+			branch: d.branch.branch,
+			x: pct(d.time),
+			label: d.label,
+			date: d.iso,
+			installed: d.branch.installed,
+			newest: d === newestLane,
+			php: d.branch.php
+		}));
+		const startYear = new Date(min).getUTCFullYear();
+		const endYear = now.getUTCFullYear();
+		const yearSpan = endYear - startYear;
+		const step = yearSpan > 8 ? 3 : yearSpan > 4 ? 2 : 1;
+		const ticks = [];
+		for (let year = startYear; year <= endYear; year += step) ticks.push({
+			x: pct(Date.UTC(year, 0, 1)),
+			year
+		});
+		return {
+			lanes: lanesOut,
+			ticks
+		};
+	}
+	//#endregion
+	//#region src/ui/detail/Timeline.tsx
+	function laneClassName(lane) {
+		const classes = ["detail-timeline-lane"];
+		if (lane.installed) classes.push("detail-timeline-lane-installed");
+		if (lane.newest && !lane.installed) classes.push("detail-timeline-lane-newest");
+		return classes.join(" ");
+	}
+	function Timeline({ metadata, installedVersion }) {
+		const { now } = useReport();
+		const layout = timelineLayout(metadata?.branches ?? [], now);
+		if (layout.lanes.length === 0) return null;
+		return u("section", {
+			className: "detail-section",
+			children: [
+				u("h3", { children: "Release branches" }),
+				u("div", {
+					className: "detail-timeline",
+					children: [u("div", {
+						className: "detail-timeline-axis",
+						children: layout.ticks.map((tick) => u("span", {
+							className: "detail-timeline-tick",
+							style: { left: `${tick.x}%` },
+							children: tick.year
+						}, tick.year))
+					}), layout.lanes.map((lane) => {
+						const labelPastMidpoint = lane.x > 62;
+						const labelStyle = labelPastMidpoint ? {
+							left: "0%",
+							right: `${100 - lane.x + 2}%`
+						} : {
+							left: `${lane.x + 2}%`,
+							right: "0%"
+						};
+						return u("div", {
+							className: laneClassName(lane),
+							children: [u("span", {
+								className: "detail-timeline-branch",
+								children: lane.branch
+							}), u("span", {
+								className: "detail-timeline-track",
+								children: [u("span", {
+									className: "detail-timeline-dot",
+									style: { left: `${lane.x}%` }
+								}), u("span", {
+									className: labelPastMidpoint ? "detail-timeline-label is-flipped" : "detail-timeline-label",
+									style: labelStyle,
+									children: [
+										lane.label,
+										" · ",
+										day(lane.date),
+										lane.php !== null && ` · php ${lane.php}`
+									]
+								})]
+							})]
+						}, lane.branch);
+					})]
+				}),
+				u("div", {
+					className: "detail-timeline-legend",
+					children: [
+						u("span", {
+							className: "detail-timeline-legend-item",
+							children: [
+								u("span", { className: "detail-timeline-swatch detail-timeline-swatch-installed" }),
+								"you are on ",
+								installedVersion
+							]
+						}),
+						u("span", {
+							className: "detail-timeline-legend-item",
+							children: [u("span", { className: "detail-timeline-swatch detail-timeline-swatch-newest" }), "branch still releasing"]
+						}),
+						u("span", {
+							className: "detail-timeline-legend-item",
+							children: "one dot = that branch's newest dated release"
+						})
+					]
+				})
+			]
+		});
+	}
+	//#endregion
+	//#region src/ui/detail/Detail.tsx
+	function Detail({ onClose }) {
+		const { model, state, now } = useReport();
+		if (state.pkg === null) return null;
+		const finding = model.report.findings.find((f) => f.package === state.pkg) ?? null;
+		if (finding === null) return u("aside", {
+			className: "detail",
+			role: "complementary",
+			"aria-label": state.pkg,
+			children: [u("p", {
+				className: "detail-missing",
+				children: [state.pkg, " is not in this report."]
+			}), u("button", {
+				type: "button",
+				className: "detail-close",
+				onClick: onClose,
+				children: "Close"
+			})]
+		});
+		const details = model.details.get(finding.package) ?? null;
+		const baselineText = baselineParagraph(finding, model.report.baseline?.path ?? "the baseline");
+		const chain = finding.direct ? ["composer.json", finding.package] : finding.chain;
+		return u("aside", {
+			className: "detail",
+			role: "complementary",
+			"aria-label": finding.package,
+			children: [u(DetailHeader, {
+				finding,
+				onClose
+			}), u("div", {
+				className: "detail-body",
+				children: [
+					baselineText !== null && u("section", {
+						className: "detail-section",
+						children: [u("h3", { children: "Against the baseline" }), u("p", {
+							className: "detail-baseline",
+							children: baselineText
+						})]
+					}),
+					u(PriorityWhy, { finding }),
+					u(AdvisoryList, { finding }),
+					u(FollowUpstream, { finding }),
+					u(Timeline, {
+						metadata: details?.metadata ?? null,
+						installedVersion: finding.version
+					}),
+					u(SignalList, { finding }),
+					u("section", {
+						className: "detail-section",
+						children: [u("h3", { children: "How it is reached" }), u("p", {
+							className: "detail-chain",
+							children: chain.map((pkg, index) => u(S, { children: [index > 0 && " → ", u("span", {
+								className: "mono",
+								children: pkg
+							})] }, pkg))
+						})]
+					}),
+					u("section", {
+						className: "detail-section",
+						children: [u("h3", { children: "The lock entry" }), u(KeyValue, { rows: lockRows(finding, details, now) })]
+					}),
+					u("section", {
+						className: "detail-section",
+						children: [u("h3", { children: "Provenance" }), u(KeyValue, { rows: provenanceRows(finding, details?.metadata ?? null) })]
+					})
+				]
+			})]
+		});
+	}
+	function lockRows(finding, details, now) {
+		const metadata = details?.metadata ?? null;
+		const lock = details?.lock ?? null;
+		const safeRepository = safeHref(details?.repositoryLink ?? null);
+		const repository = safeRepository !== null ? u(OutLink, {
+			href: safeRepository,
+			children: safeRepository
+		}) : lock?.repository || metadata?.repository || null;
+		return presentRows([
+			{
+				label: "installed",
+				value: finding.version
+			},
+			{
+				label: "php constraint",
+				value: lock?.php || null
+			},
+			{
+				label: "released",
+				value: lock?.released ? `${day(lock.released)} · ${ageText(lock.released, now)}` : null
+			},
+			{
+				label: "libyears behind",
+				value: u(LibyearsRow, {
+					finding,
+					metadata
+				})
+			},
+			{
+				label: "repository",
+				value: repository
+			},
+			{
+				label: "type",
+				value: lock?.type || metadata?.type || null
+			}
+		]);
+	}
+	function provenanceRows(finding, metadata) {
+		return presentRows([
+			{
+				label: "metadata",
+				value: day(metadata?.dataDate ?? finding.dataDate)
+			},
+			{
+				label: "releases listed",
+				value: metadata && metadata.releasesListed !== null ? String(metadata.releasesListed) : null
+			},
+			{
+				label: "last stable",
+				value: metadata?.lastStableVersion ? `${metadata.lastStableVersion} · ${day(metadata.lastStableRelease)}` : null
+			}
+		]);
+	}
+	function baselineParagraph(finding, baselinePath) {
+		const baseline = finding.baseline;
+		if (baseline === null) return null;
+		if (baseline.status === "new") return `Not in ${baselinePath}. This one is new since it was written.`;
+		if (baseline.status === "worsened") return u(S, { children: [
+			"The baseline recorded ",
+			u("span", {
+				className: "mono",
+				children: baseline.previousVerdict ?? "a milder verdict"
+			}),
+			". It has got worse since."
+		] });
+		return `Already accepted in ${baselinePath}. It does not fail the build.`;
+	}
+	//#endregion
+	//#region src/ui/Footer.tsx
+	function Lnk({ href, children }) {
+		return u("a", {
+			className: "lnk",
+			href,
+			target: "_blank",
+			rel: "noopener noreferrer",
+			children
+		});
+	}
+	function Footer() {
+		const { model } = useReport();
+		return u("footer", {
+			className: "colophon",
+			children: [
+				u("p", { children: [
+					"Generated by lockrot ",
+					u("span", {
+						className: "mono",
+						children: model.report.tool.version ?? "—"
+					}),
+					" on",
+					" ",
+					u("span", {
+						className: "mono",
+						children: day(model.report.generatedAt)
+					}),
+					". Everything it shows is inside this file; nothing in it loads from the network."
+				] }),
+				u("p", {
+					className: "cta",
+					children: [
+						"Run it on your own ",
+						u("span", {
+							className: "mono",
+							children: "composer.lock"
+						}),
+						":",
+						" ",
+						u("code", { children: "composer require --dev somework/lockrot" }),
+						", then",
+						" ",
+						u("code", { children: "composer lockrot --format=html > report.html" }),
+						". No Composer plugin wanted? The",
+						" ",
+						u(Lnk, {
+							href: "https://lockrot.dev/lockrot.phar",
+							children: "PHAR"
+						}),
+						" needs nothing installed."
+					]
+				}),
+				u("p", { children: [
+					u(Lnk, {
+						href: "https://github.com/somework/lockrot",
+						children: "Source"
+					}),
+					" ·",
+					" ",
+					u(Lnk, {
+						href: "https://packagist.org/packages/somework/lockrot",
+						children: "somework/lockrot"
+					}),
+					" ·",
+					" ",
+					u(Lnk, {
+						href: "https://lockrot.dev/",
+						children: "Documentation"
+					}),
+					" ·",
+					" ",
+					u(Lnk, {
+						href: "https://github.com/somework/lockrot/issues",
+						children: "Report a wrong verdict"
+					})
+				] }),
+				u("p", { children: [
+					"Written by ",
+					u(Lnk, {
+						href: "https://github.com/somework",
+						children: "Igor Pinchuk"
+					}),
+					" (",
+					u(Lnk, {
+						href: "https://www.linkedin.com/in/kolgarn/",
+						children: "LinkedIn"
+					}),
+					"). MIT licence."
+				] })
+			]
+		});
+	}
+	//#endregion
+	//#region src/ui/Glossary.tsx
+	function VerdictDefs() {
+		const { model } = useReport();
+		return u("dl", {
+			className: "deflist",
+			children: VERDICTS.map((verdict) => {
+				const count = model.report.counts[verdict] ?? 0;
+				return [u("dt", {
+					className: `term-toned ${toneClass(TONE(verdict))}`,
+					children: [verdict, count > 0 && u("span", {
+						className: "muted",
+						children: [" ", count]
+					})]
+				}, `t-${verdict}`), u("dd", { children: VERDICT_DEFS[verdict] }, `d-${verdict}`)];
+			})
+		});
+	}
+	function SignalDefs() {
+		return u("dl", {
+			className: "deflist",
+			children: SIGNAL_IDS.map((id) => {
+				const doc = SIGNAL_DOC[id];
+				const name = SIGNAL_NAMES[id] ?? "";
+				return [u("dt", { children: [
+					id,
+					" ",
+					doc === void 0 ? u("span", {
+						className: "term-name",
+						children: name
+					}) : u(OutLink, {
+						href: doc,
+						children: name
+					})
+				] }, `t-${id}`), u("dd", { children: SIGNAL_DEFS[id] }, `d-${id}`)];
+			})
+		});
+	}
+	function OrderNote() {
+		return u("p", {
+			className: "small-note",
+			children: [
+				"Order used by ",
+				u("span", {
+					className: "mono",
+					children: "--fail-on"
+				}),
+				" and the baseline: abandoned > silent > pinned > left-behind > old-promise > stale > unknown > ok.",
+				" ",
+				u("span", {
+					className: "mono",
+					children: "unknown"
+				}),
+				" — a package lockrot could not check —",
+				" ",
+				u("span", {
+					className: "mono",
+					children: "finished"
+				}),
+				" and ",
+				u("span", {
+					className: "mono",
+					children: "ok"
+				}),
+				" are never findings, and none of them fail a build."
+			]
+		});
+	}
+	function LibyearsSection() {
+		return u("section", {
+			className: "glossary-sect",
+			children: [u("h3", { children: "One number for the lock: libyears" }), u("p", {
+				className: "prose",
+				children: [
+					"For each package, the years between the release installed and the package's newest stable release, summed. It counts every drift, healthy patches included, so it says how far behind the lock is and nothing about why — it is not a verdict, and no priority reads it. A package is not measured when it is a branch snapshot, when no dated stable release is known for it, when it is not from a Composer repository, or when its metadata did not come; the Run tab counts each case.",
+					" ",
+					u(OutLink, {
+						href: `${DOCS_URL}#libyears`,
+						children: "what libyears measure"
+					})
+				]
+			})]
+		});
+	}
+	function PrioritySection() {
+		return u("section", {
+			className: "glossary-sect",
+			children: [u("h3", { children: "How a priority is reached" }), u("p", {
+				className: "prose",
+				children: [
+					"The verdict sets a base — ",
+					u("span", {
+						className: "mono",
+						children: "abandoned"
+					}),
+					" and",
+					" ",
+					u("span", {
+						className: "mono",
+						children: "silent"
+					}),
+					" start at critical, ",
+					u("span", {
+						className: "mono",
+						children: "pinned"
+					}),
+					",",
+					" ",
+					u("span", {
+						className: "mono",
+						children: "left-behind"
+					}),
+					" and ",
+					u("span", {
+						className: "mono",
+						children: "old-promise"
+					}),
+					" at high,",
+					" ",
+					u("span", {
+						className: "mono",
+						children: "stale"
+					}),
+					" at medium. A package nothing requires directly drops one step, one that is only installed for development drops another, and an advisory no release will fix raises it one. Low is the floor, critical the ceiling."
+				]
+			})]
+		});
+	}
+	function useDialog(open) {
+		const ref = A(null);
+		const closeRef = A(null);
+		const opener = A(null);
+		const [fallback, setFallback] = d(false);
+		_(() => {
+			const dialog = ref.current;
+			if (dialog === null || open === dialog.open) return;
+			if (!open) {
+				dialog.close();
+				if (fallback && opener.current instanceof HTMLElement && opener.current.isConnected) opener.current.focus();
+				return;
+			}
+			opener.current = document.activeElement;
+			try {
+				dialog.showModal();
+				setFallback(false);
+			} catch {
+				dialog.setAttribute("open", "");
+				setFallback(true);
+			}
+			closeRef.current?.focus();
+		}, [open, fallback]);
+		return {
+			ref,
+			closeRef,
+			fallback
+		};
+	}
+	function Glossary({ open, onClose }) {
+		const titleId = g();
+		const { ref, closeRef, fallback } = useDialog(open);
+		return u("dialog", {
+			ref,
+			className: fallback ? "glossary is-fallback" : "glossary",
+			"aria-labelledby": titleId,
+			onClose,
+			children: [u("div", {
+				className: "glossary-head",
+				children: [
+					u("h2", {
+						id: titleId,
+						children: "What these words mean"
+					}),
+					u(OutLink, {
+						href: DOCS_URL,
+						children: "full reference"
+					}),
+					u("button", {
+						ref: closeRef,
+						className: "icon-btn",
+						type: "button",
+						onClick: onClose,
+						children: "Close"
+					})
+				]
+			}), u("div", {
+				className: "glossary-body",
+				children: [
+					u("section", {
+						className: "glossary-sect",
+						children: [
+							u("h3", { children: "The nine verdicts" }),
+							u(VerdictDefs, {}),
+							u(OrderNote, {})
+						]
+					}),
+					u("section", {
+						className: "glossary-sect",
+						children: [u("h3", { children: "The signals" }), u(SignalDefs, {})]
+					}),
+					u(LibyearsSection, {}),
+					u(PrioritySection, {})
+				]
+			})]
+		});
+	}
+	//#endregion
+	//#region src/ui/useWide.ts
+	var WIDE_QUERY = "(min-width: 1181px)";
+	var NARROW_QUERY = "(max-width: 759px)";
+	function currentMatch(query, fallback) {
+		if (typeof window === "undefined" || typeof window.matchMedia !== "function") return fallback;
+		return window.matchMedia(query).matches;
+	}
+	function useMediaQuery(query, fallback) {
+		const [matches, setMatches] = d(() => currentMatch(query, fallback));
+		h(() => {
+			if (typeof window.matchMedia !== "function") return void 0;
+			const list = window.matchMedia(query);
+			const sync = () => {
+				setMatches(list.matches);
+			};
+			sync();
+			list.addEventListener("change", sync);
+			return () => {
+				list.removeEventListener("change", sync);
+			};
+		}, [query]);
+		return matches;
+	}
+	function useWide() {
+		return useMediaQuery(WIDE_QUERY, true);
+	}
+	function useNarrow() {
+		return useMediaQuery(NARROW_QUERY, false);
+	}
+	//#endregion
+	//#region src/ui/useTheme.ts
+	var THEME_KEY = "lockrot-theme";
+	var DARK_QUERY = "(prefers-color-scheme: dark)";
+	function asTheme(value) {
+		return value === "dark" || value === "light" ? value : null;
+	}
+	function readSaved() {
+		try {
+			return asTheme(window.localStorage.getItem(THEME_KEY));
+		} catch {
+			return null;
+		}
+	}
+	function save(theme) {
+		try {
+			window.localStorage.setItem(THEME_KEY, theme);
+		} catch {}
+	}
+	function nextTheme(effective) {
+		return effective === "dark" ? "light" : "dark";
+	}
+	function themeButtonLabel(effective) {
+		return effective === "dark" ? "Light" : "Dark";
+	}
+	function useTheme() {
+		const [pinned, setPinned] = d(() => readSaved() ?? asTheme(document.documentElement.getAttribute("data-theme")));
+		const osDark = useMediaQuery(DARK_QUERY, false);
+		_(() => {
+			if (pinned !== null) document.documentElement.setAttribute("data-theme", pinned);
+		}, [pinned]);
+		const effective = pinned ?? (osDark ? "dark" : "light");
+		return {
+			effective,
+			toggle: () => {
+				const next = nextTheme(effective);
+				setPinned(next);
+				save(next);
+			}
+		};
+	}
+	//#endregion
+	//#region src/ui/Header.tsx
+	function useHeaderHeight() {
+		const ref = A(null);
+		_(() => {
+			const node = ref.current;
+			if (node === null || typeof ResizeObserver === "undefined") return void 0;
+			const root = document.documentElement;
+			const observer = new ResizeObserver(() => {
+				root.style.setProperty("--topbar-h", `${Math.ceil(node.getBoundingClientRect().height)}px`);
+			});
+			observer.observe(node);
+			return () => {
+				observer.disconnect();
+				root.style.removeProperty("--topbar-h");
+			};
+		}, []);
+		return ref;
+	}
+	function Header({ theme, onToggleTheme, onOpenGlossary, children }) {
+		const { model } = useReport();
+		const { run, tool, generatedAt } = model.report;
+		const ref = useHeaderHeight();
+		const project = run.project ?? run.lockFile ?? "composer.lock";
+		const label = themeButtonLabel(theme);
+		return u("header", {
+			className: "topbar",
+			ref,
+			children: [u("div", {
+				className: "topbar-in",
+				children: [u("div", {
+					className: "brand",
+					children: [
+						u("span", {
+							className: "dot",
+							"aria-hidden": "true"
+						}),
+						u("h1", { children: u("a", {
+							href: "https://lockrot.dev/",
+							target: "_blank",
+							rel: "noopener noreferrer",
+							children: "lockrot"
+						}) }),
+						u("span", {
+							className: "eyebrow project",
+							children: project
+						})
+					]
+				}), u("div", {
+					className: "run-meta",
+					children: [
+						u("span", { children: ["target PHP ", u("b", {
+							className: "mono",
+							children: run.targetPhp ?? "—"
+						})] }),
+						u("span", { children: ["data as of ", u("b", {
+							className: "mono",
+							children: day(generatedAt)
+						})] }),
+						u("span", { children: ["lockrot ", u("b", {
+							className: "mono",
+							children: tool.version ?? "—"
+						})] }),
+						u("span", {
+							className: "run-actions",
+							children: [u("button", {
+								className: "icon-btn glossary-open",
+								type: "button",
+								onClick: onOpenGlossary,
+								children: "What these words mean"
+							}), u("button", {
+								className: "icon-btn theme-toggle",
+								type: "button",
+								title: `Switch to the ${label.toLowerCase()} theme`,
+								onClick: onToggleTheme,
+								children: label
+							})]
+						})
+					]
+				})]
+			}), children]
+		});
+	}
+	//#endregion
+	//#region src/ui/keyboard.ts
+	var IGNORE = { type: "ignore" };
+	function decideKey(input) {
+		if (input.modified) return IGNORE;
+		if (input.key === "Escape") return decideEscape(input);
+		if (input.dialogOpen) return IGNORE;
+		if (input.key === "Enter" || input.key === " ") {
+			if (input.rowPkg === null || input.onControl || input.typing) return IGNORE;
+			return {
+				type: "toggleRow",
+				pkg: input.selected === input.rowPkg ? null : input.rowPkg
+			};
+		}
+		if (input.typing) return IGNORE;
+		if (input.key === "?") return { type: "openGlossary" };
+		if (input.key === "/") return { type: "focusSearch" };
+		if (input.key === "j" || input.key === "k") return decideMove(input, input.key === "j" ? 1 : -1);
+		return IGNORE;
+	}
+	function decideEscape(input) {
+		if (input.dialogOpen) return { type: "closeGlossary" };
+		if (input.selected !== null) return {
+			type: "closeDetail",
+			restore: input.selected
+		};
+		if (input.searchFocused) return { type: "blurSearch" };
+		return IGNORE;
+	}
+	function decideMove(input, step) {
+		const count = input.rendered.length;
+		if (count === 0) return IGNORE;
+		const at = input.selected === null ? -1 : input.rendered.indexOf(input.selected);
+		const next = at < 0 ? 0 : Math.min(count - 1, Math.max(0, at + step));
+		const pkg = input.rendered[next];
+		return pkg === void 0 ? IGNORE : {
+			type: "move",
+			pkg
+		};
+	}
+	function prevents(decision) {
+		return decision.type !== "ignore" && decision.type !== "blurSearch";
+	}
+	var CONTROLS = "a[href], button, input, select, textarea, summary, [contenteditable]";
+	var TEXT_FIELDS = "input, select, textarea, [contenteditable]";
+	function keyInputFrom(event, context) {
+		const target = event.target instanceof Element ? event.target : null;
+		const row = target?.closest("[data-pkg]") ?? null;
+		const control = target?.closest(CONTROLS) ?? null;
+		const active = document.activeElement;
+		return {
+			key: event.key,
+			modified: event.ctrlKey || event.metaKey || event.altKey,
+			typing: target?.closest(TEXT_FIELDS) != null,
+			searchFocused: context.search !== null && active === context.search,
+			dialogOpen: context.dialogOpen,
+			rowPkg: row?.getAttribute("data-pkg") ?? null,
+			onControl: control !== null && (row === null || row.contains(control)),
+			selected: context.selected,
+			rendered: event.key === "j" || event.key === "k" ? context.rendered() : []
+		};
+	}
+	function findRow(root, pkg) {
+		for (const node of root.querySelectorAll("[data-pkg]")) if (node.getAttribute("data-pkg") === pkg) return node;
+		return null;
+	}
+	//#endregion
+	//#region src/ui/ledger/PriorityLedger.tsx
+	var SHOWN_PRIORITIES = [
+		"critical",
+		"high",
+		"medium",
+		"low"
+	];
+	function PriorityLedger() {
+		const { model, state, dispatch } = useReport();
+		const counts = model.report.priorities;
+		const flaggedCount = population(model, "findings").length;
+		const known = new Set(SHOWN_PRIORITIES);
+		const unknown = Object.keys(counts).filter((p) => !known.has(p) && p !== "none" && (counts[p] ?? 0) > 0);
+		const shown = [...SHOWN_PRIORITIES, ...unknown];
+		const bars = shown.filter((p) => (counts[p] ?? 0) > 0);
+		return u("div", {
+			className: "ledger-block",
+			children: [
+				u("span", {
+					className: "eyebrow",
+					title: "Every verdict except ok, finished and unknown",
+					children: [
+						"Priority of the ",
+						u("span", {
+							className: "ledger-figure",
+							children: flaggedCount
+						}),
+						" flagged packages"
+					]
+				}),
+				u("div", {
+					className: "bar",
+					role: "img",
+					"aria-label": "Priority distribution",
+					children: bars.length === 0 ? u("span", {
+						className: `bar-seg ${toneClass("none")}`,
+						style: { flexGrow: 1 }
+					}) : bars.map((p) => u("span", {
+						className: `bar-seg ${toneClass(TONE(p))}`,
+						style: { flexGrow: counts[p] ?? 0 },
+						title: `${p}: ${counts[p] ?? 0}`
+					}, p))
+				}),
+				u("div", {
+					className: "legend",
+					children: shown.map((p) => {
+						const n = counts[p] ?? 0;
+						const on = state.filters.prio.includes(p);
+						return u("button", {
+							type: "button",
+							className: `legend-btn ${toneClass(TONE(p))}`,
+							"aria-pressed": on,
+							onClick: () => {
+								dispatch({
+									type: "toggle",
+									group: "prio",
+									key: p
+								});
+							},
+							children: [
+								u("i", {
+									className: "swatch",
+									"aria-hidden": "true"
+								}),
+								p,
+								" ",
+								u("i", {
+									className: "count",
+									children: n
+								})
+							]
+						}, p);
+					})
+				})
+			]
+		});
+	}
+	//#endregion
+	//#region src/ui/ledger/VerdictLedger.tsx
+	function VerdictLedger() {
+		const { model, state, dispatch } = useReport();
+		const counts = model.report.counts;
+		const known = new Set(VERDICTS);
+		const unknown = Object.keys(counts).filter((v) => !known.has(v) && (counts[v] ?? 0) > 0);
+		const shown = [...VERDICTS.filter((v) => (counts[v] ?? 0) > 0), ...unknown];
+		return u("div", {
+			className: "ledger-block",
+			children: [
+				u("span", {
+					className: "eyebrow",
+					children: [
+						"Verdicts across ",
+						u("span", {
+							className: "ledger-figure",
+							children: model.report.findings.length
+						}),
+						" packages"
+					]
+				}),
+				u("div", {
+					className: "bar",
+					role: "img",
+					"aria-label": "Verdict distribution",
+					children: shown.map((v) => u("span", {
+						className: `bar-seg ${toneClass(TONE(v))}${v === "ok" ? " bar-seg-dim" : ""}`,
+						style: { flexGrow: counts[v] ?? 0 },
+						title: `${v}: ${counts[v] ?? 0}`
+					}, v))
+				}),
+				u("div", {
+					className: "legend",
+					children: shown.map((v) => {
+						const on = state.filters.verdict.includes(v);
+						return u("button", {
+							type: "button",
+							className: `legend-btn ${toneClass(TONE(v))}${v === "ok" ? " legend-btn-dim" : ""}`,
+							"aria-pressed": on,
+							onClick: () => {
+								dispatch({
+									type: "toggle",
+									group: "verdict",
+									key: v
+								});
+							},
+							children: [
+								u("i", {
+									className: "swatch",
+									"aria-hidden": "true"
+								}),
+								v,
+								" ",
+								u("i", {
+									className: "count",
+									children: counts[v] ?? 0
+								})
+							]
+						}, v);
+					})
+				})
+			]
+		});
+	}
+	//#endregion
+	//#region src/ui/ledger/AdvisoryLedger.tsx
+	function AdvisoryLedger() {
+		const { model, state, dispatch } = useReport();
+		const advisories = allAdvisories(model);
+		const packagesWithAdvisories = population(model, "advisories").length;
+		const counts = {};
+		for (const { advisory } of advisories) counts[advisory.severity] = (counts[advisory.severity] ?? 0) + 1;
+		const shown = SEVERITIES.filter((sev) => (counts[sev] ?? 0) > 0);
+		return u("div", {
+			className: "ledger-block",
+			children: [
+				u("span", {
+					className: "eyebrow",
+					children: advisories.length === 0 ? "No advisory affects this lock" : `${plural(advisories.length, "advisory", "advisories")} on ${plural(packagesWithAdvisories, "package", "packages")}`
+				}),
+				u("div", {
+					className: "bar",
+					role: "img",
+					"aria-label": "Advisory severity distribution",
+					children: shown.length === 0 ? u("span", {
+						className: `bar-seg ${toneClass("none")}`,
+						style: { flexGrow: 1 }
+					}) : shown.map((sev) => u("span", {
+						className: `bar-seg ${toneClass(sevTone(sev))}`,
+						style: { flexGrow: counts[sev] ?? 0 },
+						title: `${sev}: ${counts[sev] ?? 0}`
+					}, sev))
+				}),
+				u("div", {
+					className: "legend",
+					children: shown.length === 0 ? u("span", {
+						className: "legend-empty",
+						children: "no advisory affects this lock"
+					}) : shown.map((sev) => {
+						const on = state.filters.sev.includes(sev);
+						return u("button", {
+							type: "button",
+							className: `legend-btn ${toneClass(sevTone(sev))}`,
+							"aria-pressed": on,
+							onClick: () => {
+								dispatch({
+									type: "toggle",
+									group: "sev",
+									key: sev
+								});
+							},
+							children: [
+								u("i", {
+									className: "swatch",
+									"aria-hidden": "true"
+								}),
+								sev,
+								" ",
+								u("i", {
+									className: "count",
+									children: counts[sev] ?? 0
+								})
+							]
+						}, sev);
+					})
+				})
+			]
+		});
+	}
+	//#endregion
+	//#region src/ui/ledger/LibyearsLedger.tsx
+	var TOOLTIP = "Years between the installed release and the newest stable release, summed over the measured packages. Counts every drift, healthy patches included.";
+	function LibyearsLedger() {
+		const { model } = useReport();
+		const block = model.report.libyears;
+		const figure = block && block.measured ? fixed(block.total, 1) ?? "—" : "—";
+		const items = libyearsItems(block);
+		return u("div", {
+			className: "ledger-block",
+			children: [
+				u("span", {
+					className: "eyebrow",
+					title: TOOLTIP,
+					children: "Libyears behind"
+				}),
+				u("p", {
+					className: "figure",
+					children: figure
+				}),
+				u("div", {
+					className: "legend libyears-line",
+					children: items.map((item) => u("span", { children: item }, item))
+				})
+			]
+		});
+	}
+	//#endregion
+	//#region src/ui/ledger/Ledger.tsx
+	function Ledger() {
+		const { state } = useReport();
+		if (state.view === "run") return null;
+		return u("div", {
+			className: "ledger",
+			children: [
+				u(PriorityLedger, {}),
+				u(VerdictLedger, {}),
+				u(AdvisoryLedger, {}),
+				u(LibyearsLedger, {})
+			]
+		});
+	}
+	//#endregion
+	//#region src/ui/NewerSchemaBanner.tsx
+	var READS_SCHEMA = 1;
+	function NewerSchemaBanner() {
+		const { model } = useReport();
+		if (!model.newerSchema) return null;
+		return u("div", {
+			className: "schema-banner",
+			children: u("p", { children: [
+				u("b", { children: "This report is newer than this page." }),
+				" It was written with report schema",
+				" ",
+				u("span", {
+					className: "mono",
+					children: model.schema
+				}),
+				", and this page reads schema",
+				" ",
+				u("span", {
+					className: "mono",
+					children: READS_SCHEMA
+				}),
+				". What it recognises is shown below; anything the newer lockrot added is left out."
+			] })
+		});
+	}
+	//#endregion
+	//#region src/ui/rail/Rail.tsx
+	function Rail() {
+		const { model, state, dispatch } = useReport();
+		if (population(model, state.view).length === 0) return null;
+		return u("div", {
+			className: "rail",
+			role: "group",
+			"aria-label": "Filters",
+			children: railGroups(model, state).map((group) => u("div", {
+				className: "rail-group",
+				children: [u("span", {
+					className: "eyebrow",
+					children: group.title
+				}), u("div", {
+					className: "opts",
+					children: group.rows.map((row) => u("button", {
+						type: "button",
+						className: "opt",
+						"aria-pressed": row.on,
+						title: group.group === "signal" ? SIGNAL_DEFS[row.key] : void 0,
+						onClick: () => {
+							dispatch({
+								type: "toggle",
+								group: group.group,
+								key: row.key
+							});
+						},
+						children: [
+							group.group === "signal" ? u("span", {
+								className: "mono",
+								children: row.key
+							}) : null,
+							" " + row.label,
+							" ",
+							u("span", {
+								className: "c",
+								children: row.count
+							})
+						]
+					}, row.key))
+				})]
+			}, group.group))
+		});
+	}
+	//#endregion
+	//#region src/domain/radius.ts
+	function radiusCards(model, visibleFlagged) {
+		const keptNames = new Set(visibleFlagged.map((f) => f.package));
+		const sorted = [...model.report.exposure.map((exposure) => {
+			const pulled = visibleFlagged.filter((f) => f.package !== exposure.package && f.chain.includes(exposure.package));
+			return {
+				package: exposure.package,
+				pulled,
+				parentFlagged: keptNames.has(exposure.package)
+			};
+		}).filter((c) => c.pulled.length > 0 || c.parentFlagged)].sort((a, b) => b.pulled.length - a.pulled.length);
+		const maxCount = Math.max(1, ...sorted.map((c) => c.pulled.length));
+		return sorted.map((c) => ({
+			package: c.package,
+			count: c.pulled.length,
+			parentFlagged: c.parentFlagged,
+			meterPercent: Math.round(100 * c.pulled.length / maxCount),
+			pulled: c.pulled.map((f) => ({
+				package: f.package,
+				verdict: f.verdict
+			}))
+		}));
+	}
+	//#endregion
+	//#region src/ui/search/SearchBar.tsx
+	var PLACEHOLDER = "Filter: guzzle, verdict:left-behind, severity:critical, cve:CVE-2022-31090";
+	function countLine(model, state) {
+		if (state.view === "findings") return countPhrase(applyFilters(model, state, "findings").length, population(model, "findings").length, "flagged package", "flagged packages");
+		if (state.view === "packages") return countPhrase(applyFilters(model, state, "packages").length, population(model, "packages").length, "package", "packages");
+		if (state.view === "advisories") {
+			const terms = parseQuery(state.q);
+			const kept = new Set(applyFilters(model, state, "advisories").map((f) => f.package));
+			return countPhrase(allAdvisories(model).filter(({ advisory, finding }) => kept.has(finding.package) && passesAdvisoryRail(state.filters, advisory) && matchesAdvisory(advisory, finding, terms)).length, allAdvisories(model).length, "advisory", "advisories");
+		}
+		if (state.view === "radius") return countPhrase(radiusCards(model, applyFilters(model, state, "radius")).length, model.report.exposure.length, "direct requirement", "direct requirements");
+		return null;
+	}
+	function activeFilterCount(state) {
+		return Object.values(state.filters).reduce((n, keys) => n + keys.length, 0) + (state.q.trim() === "" ? 0 : 1);
+	}
+	function SearchBar({ inputRef }) {
+		const { model, state, dispatch } = useReport();
+		const filterable = population(model, state.view).length > 0;
+		const line = countLine(model, state);
+		const active = activeFilterCount(state);
+		return u(S, { children: [
+			filterable && u("div", {
+				className: "searchbar",
+				children: [u("input", {
+					ref: inputRef,
+					type: "search",
+					className: "search-input",
+					"aria-label": "Filter packages",
+					placeholder: PLACEHOLDER,
+					value: state.q,
+					onInput: (event) => {
+						dispatch({
+							type: "query",
+							q: event.currentTarget.value
+						});
+					}
+				}), u("button", {
+					type: "button",
+					className: "icon-btn",
+					disabled: active === 0,
+					onClick: () => {
+						dispatch({ type: "clear" });
+					},
+					children: "Clear"
+				})]
+			}),
+			filterable && u("p", {
+				className: "hint",
+				children: [
+					u("span", {
+						className: "hint-keys",
+						children: [
+							u("kbd", { children: "/" }),
+							" to search · ",
+							u("kbd", { children: "j" }),
+							" ",
+							u("kbd", { children: "k" }),
+							" to move · ",
+							u("kbd", { children: "Enter" }),
+							" to open ·",
+							" ",
+							u("kbd", { children: "Esc" }),
+							" to close · ",
+							u("kbd", { children: "?" }),
+							" for the glossary.",
+							" "
+						]
+					}),
+					"The tab, the filters and the open package are in the address, so the address bar is a link to what you are looking at. Keys: ",
+					u("code", { children: "verdict:" }),
+					" ",
+					u("code", { children: "priority:" }),
+					" ",
+					u("code", { children: "signal:" }),
+					" ",
+					u("code", { children: "severity:" }),
+					" ",
+					u("code", { children: "cve:" }),
+					" ",
+					u("code", { children: "direct:" }),
+					" ",
+					u("code", { children: "dev:" })
+				]
+			}),
+			line !== null && u("p", {
+				className: "count-line",
+				role: "status",
+				"aria-live": "polite",
+				children: [line, active > 0 && u("span", {
+					className: "active-filters",
+					children: [
+						" ",
+						plural(active, "filter", "filters"),
+						" on"
+					]
+				})]
+			})
+		] });
+	}
+	//#endregion
+	//#region src/ui/Tabs.tsx
+	var TABS = [
+		{
+			view: "findings",
+			label: "Findings"
+		},
+		{
+			view: "advisories",
+			label: "Advisories"
+		},
+		{
+			view: "packages",
+			label: "All packages"
+		},
+		{
+			view: "radius",
+			label: "Blast radius"
+		},
+		{
+			view: "run",
+			label: "Run data"
+		}
+	];
+	function tabCounts(model) {
+		const notes = model.report.notes.length;
+		return {
+			findings: String(population(model, "findings").length),
+			advisories: String(allAdvisories(model).length),
+			packages: String(model.report.findings.length),
+			radius: String(model.report.exposure.length),
+			run: notes > 0 ? String(notes) : ""
+		};
+	}
+	function tabId(idBase, view) {
+		return `${idBase}-tab-${view}`;
+	}
+	function stepTab(key, index) {
+		const last = TABS.length - 1;
+		if (key === "ArrowRight") return index === last ? 0 : index + 1;
+		if (key === "ArrowLeft") return index === 0 ? last : index - 1;
+		if (key === "Home") return 0;
+		if (key === "End") return last;
+		return null;
+	}
+	function Tabs({ idBase, panelId }) {
+		const { model, state, dispatch } = useReport();
+		const counts = T(() => tabCounts(model), [model]);
+		const buttons = A([]);
+		const onKeyDown = (event, index) => {
+			const next = stepTab(event.key, index);
+			const tab = next === null ? void 0 : TABS[next];
+			if (next === null || tab === void 0) return;
+			event.preventDefault();
+			buttons.current[next]?.focus();
+			dispatch({
+				type: "view",
+				view: tab.view
+			});
+		};
+		return u("nav", {
+			className: "tabs",
+			role: "tablist",
+			"aria-label": "Report views",
+			children: TABS.map(({ view, label }, index) => {
+				const selected = state.view === view;
+				return u("button", {
+					ref: (node) => {
+						buttons.current[index] = node;
+					},
+					id: tabId(idBase, view),
+					className: "tab",
+					type: "button",
+					role: "tab",
+					"aria-selected": selected ? "true" : "false",
+					"aria-controls": panelId,
+					tabIndex: selected ? 0 : -1,
+					onClick: () => {
+						dispatch({
+							type: "view",
+							view
+						});
+					},
+					onKeyDown: (event) => {
+						onKeyDown(event, index);
+					},
+					children: [label, u("span", {
+						className: "n",
+						children: counts[view]
+					})]
+				}, view);
+			})
+		});
+	}
+	//#endregion
+	//#region src/state/types.ts
+	var FILTER_GROUPS = [
+		"prio",
+		"verdict",
+		"scope",
+		"signal",
+		"sev",
+		"fix",
+		"since"
+	];
+	var EMPTY_FILTERS = {
+		prio: [],
+		verdict: [],
+		scope: [],
+		signal: [],
+		sev: [],
+		fix: [],
+		since: []
+	};
+	var INITIAL_STATE = {
+		view: "findings",
+		q: "",
+		pkg: null,
+		pkgAuto: false,
+		sort: "verdict",
+		sortDesc: false,
+		filters: EMPTY_FILTERS
+	};
+	//#endregion
+	//#region src/state/hash.ts
+	var FILTER_GROUP_SET = new Set(FILTER_GROUPS);
+	var VIEW_SET = new Set(VIEWS);
+	function isFilterGroup(key) {
+		return FILTER_GROUP_SET.has(key);
+	}
+	function serializeHash(state) {
+		const parts = [];
+		if (state.view !== "findings") parts.push("view=" + state.view);
+		if (state.q.trim() !== "") parts.push("q=" + encodeURIComponent(state.q));
+		for (const group of FILTER_GROUPS) {
+			const on = state.filters[group];
+			if (on.length > 0) parts.push(group + "=" + encodeURIComponent(on.join(",")));
+		}
+		if (state.pkg && !state.pkgAuto) parts.push("pkg=" + encodeURIComponent(state.pkg));
+		return parts.join("&");
+	}
+	function addFilterKey(filters, group, key) {
+		const current = filters[group];
+		return current.includes(key) ? filters : {
+			...filters,
+			[group]: [...current, key]
+		};
+	}
+	function parseHash(fragment, base) {
+		const h = fragment.startsWith("#") ? fragment.slice(1) : fragment;
+		if (h === "") return base;
+		let view = base.view;
+		let q = base.q;
+		let pkg = base.pkg;
+		let pkgAuto = base.pkgAuto;
+		let filters = base.filters;
+		for (const piece of h.split("&")) {
+			const i = piece.indexOf("=");
+			if (i < 0) continue;
+			const key = piece.slice(0, i);
+			let value;
+			try {
+				value = decodeURIComponent(piece.slice(i + 1));
+			} catch {
+				continue;
+			}
+			if (key === "view") {
+				if (VIEW_SET.has(value)) view = value;
+				continue;
+			}
+			if (key === "q") {
+				q = value;
+				continue;
+			}
+			if (key === "pkg") {
+				pkg = value;
+				pkgAuto = false;
+				continue;
+			}
+			if (isFilterGroup(key)) {
+				for (const part of value.split(",")) if (part !== "") filters = addFilterKey(filters, key, part);
+			}
+		}
+		return {
+			...base,
+			view,
+			q,
+			pkg,
+			pkgAuto,
+			filters
+		};
+	}
+	var HashSync = class {
+		disabled = false;
+		writeHash(state, win) {
+			if (this.disabled) return;
+			const h = serializeHash(state);
+			if (h === (win.location.hash.startsWith("#") ? win.location.hash.slice(1) : win.location.hash)) return;
+			try {
+				const url = h ? "#" + h : win.location.pathname + win.location.search;
+				win.history.replaceState(null, "", url);
+			} catch {
+				this.disabled = true;
+			}
+		}
+	};
+	//#endregion
+	//#region src/state/reducer.ts
+	function toggleFilterKey(filters, group, key) {
+		const current = filters[group];
+		const next = current.includes(key) ? current.filter((k) => k !== key) : [...current, key];
+		return {
+			...filters,
+			[group]: next
+		};
+	}
+	function reducer(state, action) {
+		switch (action.type) {
+			case "view": {
+				const keepDetail = action.keepDetail ?? false;
+				return {
+					...state,
+					view: action.view,
+					pkg: keepDetail ? state.pkg : null,
+					pkgAuto: keepDetail ? state.pkgAuto : false
+				};
+			}
+			case "query": return {
+				...state,
+				q: action.q
+			};
+			case "toggle": return {
+				...state,
+				filters: toggleFilterKey(state.filters, action.group, action.key)
+			};
+			case "clear": return {
+				...state,
+				q: "",
+				filters: EMPTY_FILTERS
+			};
+			case "sort": {
+				const sameKey = state.sort === action.key;
+				return {
+					...state,
+					sort: action.key,
+					sortDesc: sameKey ? !state.sortDesc : false
+				};
+			}
+			case "select": return {
+				...state,
+				pkg: action.pkg,
+				pkgAuto: false
+			};
+			case "autoSelect": return {
+				...state,
+				pkg: action.pkg,
+				pkgAuto: true
+			};
+			case "restore": return action.state;
+		}
+	}
+	//#endregion
+	//#region src/ui/views/order.ts
+	function advisoryGroupsFor(model, state) {
+		const terms = parseQuery(state.q);
+		const keep = new Set(applyFilters(model, state, "advisories").map((f) => f.package));
+		return groupAdvisories(allAdvisories(model).filter((pair) => {
+			if (!keep.has(pair.finding.package)) return false;
+			if (!matchesAdvisory(pair.advisory, pair.finding, terms)) return false;
+			return passesAdvisoryRail(state.filters, pair.advisory);
+		}));
+	}
+	function findingsOrder(model, state, view) {
+		return applyFilters(model, state, view).map((f) => f.package);
+	}
+	function advisoriesOrder(model, state) {
+		return advisoryGroupsFor(model, state).flatMap((group) => group.advisories.map((pair) => pair.finding.package));
+	}
+	function radiusOrder(model, state) {
+		return radiusCards(model, applyFilters(model, state, "radius")).flatMap((card) => card.pulled.map((pulled) => pulled.package));
+	}
+	function renderedPackages(model, state, view) {
+		switch (view) {
+			case "findings":
+			case "packages": return findingsOrder(model, state, view);
+			case "advisories": return advisoriesOrder(model, state);
+			case "radius": return radiusOrder(model, state);
+			case "run": return [];
+		}
+	}
+	//#endregion
+	//#region src/ui/useHashState.ts
+	function bootPick(model, state) {
+		return renderedPackages(model, state, "findings")[0] ?? population(model, "findings")[0]?.package ?? null;
+	}
+	function bootState(model, hash, wide) {
+		const restored = parseHash(hash, INITIAL_STATE);
+		if (restored.pkg !== null || !wide) return restored;
+		const pick = bootPick(model, restored);
+		return pick === null ? restored : reducer(restored, {
+			type: "autoSelect",
+			pkg: pick
+		});
+	}
+	function stateFromHashChange(hash, current) {
+		return parseHash(hash, {
+			...INITIAL_STATE,
+			sort: current.sort,
+			sortDesc: current.sortDesc
+		});
+	}
+	function useHashState(model, wide) {
+		const [state, dispatch] = y(reducer, window.location.hash, (hash) => bootState(model, hash, wide));
+		const sync = A(null);
+		const latest = A(state);
+		latest.current = state;
+		h(() => {
+			sync.current ??= new HashSync();
+			sync.current.writeHash(state, window);
+		}, [state]);
+		h(() => {
+			const onHashChange = () => {
+				dispatch({
+					type: "restore",
+					state: stateFromHashChange(window.location.hash, latest.current)
+				});
+			};
+			window.addEventListener("hashchange", onHashChange);
+			return () => {
+				window.removeEventListener("hashchange", onHashChange);
+			};
+		}, []);
+		return [state, dispatch];
+	}
+	//#endregion
+	//#region src/ui/views/FindingRow.tsx
+	function rowInteractions(pkg, isOpen, dispatch) {
+		return { onClick: (event) => {
+			if (event.target.closest("a")) return;
+			dispatch({
+				type: "select",
+				pkg: isOpen ? null : pkg
+			});
+		} };
+	}
+	function openInteractions(pkg, dispatch) {
+		return { onClick: (event) => {
+			if (event.target.closest("a")) return;
+			dispatch({
+				type: "select",
+				pkg
+			});
+		} };
+	}
+	function SignalLine({ signal }) {
+		const levelClass = signal.level === "high" ? " is-high" : signal.level === "warn" ? " is-warn" : "";
+		const doc = SIGNAL_DOC[signal.id] ?? `https://lockrot.dev/verdicts/#the-signals`;
+		return u("span", {
+			className: `sig-line${levelClass}`,
+			children: [u("a", {
+				className: "sid",
+				href: doc,
+				target: "_blank",
+				rel: "noopener noreferrer",
+				title: SIGNAL_DEFS[signal.id] ?? "",
+				children: signal.id
+			}), u("span", { children: signal.summary })]
+		});
+	}
+	function RowTags({ finding }) {
+		const bstate = finding.baseline?.status;
+		const worst = finding.advisories.length > 0 ? [...finding.advisories].sort((a, b) => severityRank(a.severity) - severityRank(b.severity))[0] : void 0;
+		return u("span", {
+			className: "tags",
+			children: [
+				(bstate === "new" || bstate === "worsened") && u(Tag, {
+					tone: bstate === "new" ? "crit" : "high",
+					title: bstate === "new" ? "not in the baseline file" : "the baseline recorded a milder verdict",
+					children: bstate
+				}),
+				worst && u(Tag, {
+					tone: sevTone(worst.severity),
+					children: plural(finding.advisories.length, "advisory", "advisories")
+				}),
+				u(Tag, {
+					title: finding.direct ? "required by this project's composer.json" : "installed because something else requires it",
+					children: finding.direct ? "direct" : "transitive"
+				}),
+				finding.dev && u(Tag, {
+					title: "installed only for development",
+					children: "require-dev"
+				})
+			]
+		});
+	}
+	function FindingRow({ finding }) {
+		const { state, dispatch } = useReport();
+		const isOpen = state.pkg === finding.package;
+		const stripeTone = TONE(finding.priority === "none" ? finding.verdict : finding.priority);
+		const shown = finding.signals.slice(0, 3);
+		const rest = finding.signals.length - shown.length;
+		return u("li", {
+			tabIndex: 0,
+			"aria-current": isOpen ? "true" : void 0,
+			"aria-label": finding.package,
+			"data-pkg": finding.package,
+			className: `row ${toneClass(stripeTone)}`,
+			...rowInteractions(finding.package, isOpen, dispatch),
+			children: [u("span", { className: "stripe" }), u("span", {
+				className: "body",
+				children: [u("span", {
+					className: "line1",
+					children: [
+						u(Pill, { word: finding.verdict }),
+						finding.replacement && u(Tag, {
+							title: "the repository names this package as the replacement",
+							children: ["→ ", finding.replacement]
+						}),
+						u("span", {
+							className: "pkg",
+							children: finding.package
+						}),
+						u("span", {
+							className: "ver mono",
+							children: finding.version
+						}),
+						u(RowTags, { finding })
+					]
+				}), shown.length > 0 ? u("span", {
+					className: "sig-lines",
+					children: [shown.map((signal) => u(SignalLine, { signal }, signal.id)), rest > 0 && u("span", {
+						className: "more-sig",
+						children: [
+							"+ ",
+							plural(rest, "more signal", "more signals"),
+							", open the package"
+						]
+					})]
+				}) : u("span", {
+					className: "ev",
+					children: finding.evidence
+				})]
+			})]
+		});
+	}
+	//#endregion
+	//#region src/ui/views/EmptyState.tsx
+	function EmptyState({ reason }) {
+		const { dispatch } = useReport();
+		if (reason === "clean") return u("p", {
+			className: "empty",
+			children: "Nothing was flagged."
+		});
+		return u("p", {
+			className: "empty",
+			children: [
+				"Nothing matches this filter.",
+				" ",
+				u("button", {
+					type: "button",
+					className: "icon-btn",
+					onClick: () => {
+						dispatch({ type: "clear" });
+					},
+					children: "Clear filters"
+				})
+			]
+		});
+	}
+	//#endregion
+	//#region src/ui/views/FindingsView.tsx
+	function QuietNote({ quiet }) {
+		const { dispatch } = useReport();
+		const many = quiet.length > 1;
+		return u("div", {
+			className: "note",
+			children: [
+				plural(quiet.length, "package", "packages"),
+				" ",
+				many ? "carry" : "carries",
+				" a security advisory but no rot verdict, so ",
+				many ? "they are" : "it is",
+				" not in this list:",
+				" ",
+				quiet.map((finding) => u("button", {
+					type: "button",
+					className: "pkg-link-btn",
+					onClick: () => {
+						dispatch({
+							type: "select",
+							pkg: finding.package
+						});
+					},
+					children: finding.package
+				}, finding.package)),
+				" ",
+				u("button", {
+					type: "button",
+					className: "icon-btn",
+					onClick: () => {
+						dispatch({
+							type: "view",
+							view: "advisories",
+							keepDetail: true
+						});
+					},
+					children: "See the advisories"
+				})
+			]
+		});
+	}
+	function groupByPriority(findings) {
+		const groups = [];
+		for (const finding of findings) {
+			const current = groups.at(-1);
+			if (current && current.priority === finding.priority) current.findings.push(finding);
+			else groups.push({
+				priority: finding.priority,
+				findings: [finding]
+			});
+		}
+		return groups;
+	}
+	function FindingsView() {
+		const { model, state } = useReport();
+		const quiet = model.report.findings.filter((finding) => finding.advisories.length > 0 && (finding.verdict === "ok" || finding.verdict === "finished"));
+		const visible = applyFilters(model, state, "findings");
+		return u("div", { children: [quiet.length > 0 && u(QuietNote, { quiet }), visible.length === 0 ? u(EmptyState, { reason: population(model, "findings").length === 0 ? "clean" : "filtered" }) : groupByPriority(visible).map((group) => u("section", {
+			className: "group",
+			children: [u("div", {
+				className: "group-head",
+				children: [u("h2", {
+					className: toneClass(TONE(group.priority)),
+					children: group.priority
+				}), u("span", {
+					className: "mono muted group-count",
+					children: plural(group.findings.length, "package", "packages")
+				})]
+			}), u("ul", {
+				className: "rows",
+				"aria-label": `${group.priority} priority`,
+				children: group.findings.map((finding) => u(FindingRow, { finding }, finding.package))
+			})]
+		}, group.priority))] });
+	}
+	//#endregion
+	//#region src/ui/views/AdvisoriesView.tsx
+	function fixText(advisory) {
+		if (!advisory.fixedBy) return "no fix listed";
+		return advisory.fixedOnBranch ? `fixed by ${advisory.fixedBy} on this branch` : `fixed only by ${advisory.fixedBy}`;
+	}
+	function AdvisoryRow({ finding, advisory }) {
+		const { state, dispatch, now } = useReport();
+		const isOpen = state.pkg === finding.package;
+		const cve = cveUrl(advisory);
+		const openedAgo = advisory.reportedAt ? ageText(advisory.reportedAt, now).replace(" ago", "") : null;
+		return u("li", {
+			tabIndex: 0,
+			"aria-current": isOpen ? "true" : void 0,
+			"aria-label": finding.package,
+			"data-pkg": finding.package,
+			className: "adv",
+			...openInteractions(finding.package, dispatch),
+			children: [
+				u(Tag, {
+					tone: sevTone(advisory.severity),
+					children: advisory.severityRaw ?? "unrated"
+				}),
+				u("span", {
+					className: "t",
+					children: advisory.title ?? advisory.id
+				}),
+				u("span", {
+					className: "m",
+					children: [
+						u("span", {
+							className: "mono",
+							children: [
+								finding.package,
+								" ",
+								finding.version
+							]
+						}),
+						cve !== null ? u(OutLink, {
+							href: cve,
+							children: advisory.cve
+						}) : u("span", {
+							className: "mono",
+							children: advisory.cve ?? advisory.id
+						}),
+						u("span", { children: fixText(advisory) }),
+						u("span", { children: ["affects ", advisory.affectedVersions ?? "?"] }),
+						u("span", { children: [
+							"reported ",
+							u(NoWrap, { children: day(advisory.reportedAt) }),
+							openedAgo !== null ? `, open ${openedAgo}` : ""
+						] }),
+						advisory.link && u(OutLink, {
+							href: advisory.link,
+							children: "advisory"
+						})
+					]
+				})
+			]
+		});
+	}
+	function advisoryKey(pair) {
+		return `${pair.finding.package}:${pair.advisory.id}`;
+	}
+	function AdvisoriesView() {
+		const { model, state } = useReport();
+		const groups = advisoryGroupsFor(model, state);
+		if (groups.length === 0) return u(EmptyState, { reason: population(model, "advisories").length === 0 ? "clean" : "filtered" });
+		return u("div", { children: groups.map((group) => u("section", {
+			className: "advgroup",
+			children: [u("header", { children: [
+				u("h2", { children: group.heading }),
+				u("span", {
+					className: "mono muted",
+					children: group.advisories.length
+				}),
+				u("p", { children: group.hint })
+			] }), u("ul", {
+				className: "adv-list",
+				"aria-label": group.heading,
+				children: group.advisories.map((pair) => u(AdvisoryRow, {
+					finding: pair.finding,
+					advisory: pair.advisory
+				}, advisoryKey(pair)))
+			})]
+		}, group.shape)) });
+	}
+	//#endregion
+	//#region src/ui/views/PackagesView.tsx
+	var COLUMNS = [
+		{
+			key: "package",
+			label: "Package"
+		},
+		{
+			key: "version",
+			label: "Version"
+		},
+		{
+			key: "libyears",
+			label: "Libyears",
+			title: "Years between the installed release and the package's newest stable release; a dash is a package that could not be measured, and says why on hover"
+		},
+		{
+			key: "verdict",
+			label: "Verdict"
+		},
+		{
+			key: "priority",
+			label: "Priority"
+		},
+		{
+			key: "reached",
+			label: "Reached"
+		},
+		{
+			key: "signals",
+			label: "Signals"
+		},
+		{
+			key: "data",
+			label: "Data as of"
+		}
+	];
+	function LibyearsCell({ finding }) {
+		const value = fixed(finding.libyears, 1);
+		if (value === null) return u(Muted, {
+			title: `not measured: ${libyearsReason(finding)}`,
+			children: "—"
+		});
+		return u(S, { children: value });
+	}
+	function PackageCell({ finding }) {
+		const { model } = useReport();
+		const url = packagistUrl(finding, model.details);
+		if (url === null) return u(S, { children: finding.package });
+		return u("a", {
+			className: "lnk",
+			href: url,
+			target: "_blank",
+			rel: "noopener noreferrer",
+			children: finding.package
+		});
+	}
+	function PackageRow({ finding }) {
+		const { state, dispatch } = useReport();
+		const isOpen = state.pkg === finding.package;
+		return u("tr", {
+			tabIndex: 0,
+			"aria-selected": isOpen,
+			"aria-label": finding.package,
+			"data-pkg": finding.package,
+			...rowInteractions(finding.package, isOpen, dispatch),
+			children: [
+				u("td", { children: u(PackageCell, { finding }) }),
+				u("td", {
+					className: "num",
+					children: finding.version
+				}),
+				u("td", {
+					className: "num",
+					children: u(LibyearsCell, { finding })
+				}),
+				u("td", { children: u(Pill, { word: finding.verdict }) }),
+				u("td", { children: finding.priority === "none" ? u(Muted, { children: "—" }) : u(Pill, { word: finding.priority }) }),
+				u("td", { children: [finding.direct ? "direct" : "transitive", finding.dev ? " · dev" : ""] }),
+				u("td", {
+					className: "num",
+					children: finding.signals.map((signal) => signal.id).join(" ") || "—"
+				}),
+				u("td", {
+					className: "num",
+					children: day(finding.dataDate)
+				})
+			]
+		});
+	}
+	function PackagesView() {
+		const { model, state, dispatch } = useReport();
+		const visible = applyFilters(model, state, "packages");
+		const activeSort = state.sort;
+		if (visible.length === 0) return u(EmptyState, { reason: population(model, "packages").length === 0 ? "clean" : "filtered" });
+		return u("div", {
+			className: "tablewrap",
+			children: u("table", { children: [u("thead", { children: u("tr", { children: COLUMNS.map((column) => {
+				const active = column.key === activeSort;
+				return u("th", {
+					"aria-sort": active ? state.sortDesc ? "descending" : "ascending" : "none",
+					title: column.title,
+					children: u("button", {
+						type: "button",
+						className: `sort-btn${active ? " active" : ""}`,
+						onClick: () => {
+							dispatch({
+								type: "sort",
+								key: column.key
+							});
+						},
+						children: [column.label, active ? state.sortDesc ? " ↓" : " ↑" : ""]
+					})
+				}, column.key);
+			}) }) }), u("tbody", { children: visible.map((finding) => u(PackageRow, { finding }, finding.package)) })] })
+		});
+	}
+	//#endregion
+	//#region src/ui/views/RadiusView.tsx
+	function PulledRow({ pulled }) {
+		const { state, dispatch } = useReport();
+		return u("li", {
+			tabIndex: 0,
+			"aria-current": state.pkg === pulled.package ? "true" : void 0,
+			"aria-label": pulled.package,
+			"data-pkg": pulled.package,
+			className: "pulled-row",
+			...openInteractions(pulled.package, dispatch),
+			children: [
+				u("span", {
+					className: "arrow",
+					children: "→"
+				}),
+				u("span", {
+					className: "pkg-link-btn",
+					children: pulled.package
+				}),
+				u(Pill, { word: pulled.verdict })
+			]
+		});
+	}
+	function RadiusCardView({ card }) {
+		return u("article", {
+			className: "card",
+			children: [
+				u("h3", { children: card.package }),
+				card.parentFlagged && card.pulled.length > 0 && u(Tag, {
+					title: "this direct requirement is itself one of the run's flagged findings",
+					children: "flagged itself"
+				}),
+				u("div", {
+					className: "meter",
+					children: u("i", { style: { width: `${card.meterPercent}%` } })
+				}),
+				card.pulled.length > 0 ? u(S, { children: [u("span", {
+					className: "eyebrow",
+					children: [plural(card.count, "flagged package", "flagged packages"), " underneath"]
+				}), u("ul", {
+					className: "pulled-list",
+					"aria-label": `Pulled in by ${card.package}`,
+					children: card.pulled.map((pulled) => u(PulledRow, { pulled }, pulled.package))
+				})] }) : u("span", {
+					className: "pulled-empty",
+					children: "flagged itself"
+				})
+			]
+		});
+	}
+	function RadiusView() {
+		const { model, state } = useReport();
+		const cards = radiusCards(model, applyFilters(model, state, "radius"));
+		if (cards.length === 0) return u("p", {
+			className: "empty",
+			children: "No direct requirement drags a flagged package in."
+		});
+		return u("div", { children: [u("p", {
+			className: "radius-note",
+			children: "Direct requirements ranked by how much rot each one brings with it. Fixing the parent is often cheaper than chasing the child."
+		}), u("div", {
+			className: "cards",
+			children: cards.map((card) => u(RadiusCardView, { card }, card.package))
+		})] });
+	}
+	//#endregion
+	//#region src/ui/views/RunView.tsx
+	function orDash(value) {
+		return value ?? "—";
+	}
+	function baselineText(baseline) {
+		if (!baseline) return "none";
+		const counts = `${baseline.known} known, ${baseline.new} new, ${baseline.worsened} worsened, ${baseline.stale.length} stale`;
+		const summary = `${baseline.path} — ${counts}`;
+		return baseline.stale.length > 0 ? `${summary} (${baseline.stale.join(", ")})` : summary;
+	}
+	function unmeasuredText(block) {
+		if (!block) return "—";
+		const parts = block.unmeasured.filter(([, count]) => count > 0).map(([reason, count]) => `${reason.replace(/_/g, " ")} ${count}`);
+		return parts.length > 0 ? parts.join(" · ") : "—";
+	}
+	function RunView() {
+		const { model } = useReport();
+		const { report } = model;
+		const ly = report.libyears;
+		const thresholds = report.run.thresholds;
+		const kv = [
+			["lockrot", `${report.tool.version ?? "?"} (report schema ${report.tool.schema ?? "?"})`],
+			["generated", report.generatedAt],
+			["packages checked", orDash(report.packagesChecked === null ? null : String(report.packagesChecked))],
+			["include dev", orDash(report.includeDev === null ? null : String(report.includeDev))],
+			["fail-on", report.run.failOn ?? "none"],
+			["oldest activity cache", orDash(report.activityCacheOldestAt)],
+			["network failures", orDash(report.networkFailures === null ? null : String(report.networkFailures))],
+			["not from a Composer repository", orDash(report.notFromComposerRepository === null ? null : String(report.notFromComposerRepository))],
+			["abandoned with a replacement", report.abandoned ? `${report.abandoned.withReplacement} of ${report.abandoned.total}` : "—"],
+			["libyears behind", orDash(ly && ly.measured ? fixed(ly.total, 2) : null)],
+			["libyears, direct requirements", orDash(ly && ly.measured ? fixed(ly.directRequirements, 2) : null)],
+			["libyears measured", ly ? String(ly.measured) : "—"],
+			["libyears not measured", unmeasuredText(ly)],
+			["baseline", baselineText(report.baseline)]
+		];
+		return u("div", {
+			className: "run-sections",
+			children: [
+				report.notes.length > 0 && u("section", {
+					className: "sect",
+					children: [u("h3", { children: "What this run could not see" }), report.notes.map((note) => u("div", {
+						className: "note",
+						children: [
+							note,
+							" ",
+							u(NoWrap, { children: u(OutLink, {
+								href: noteDocLink(note),
+								children: "what this means"
+							}) })
+						]
+					}, note))]
+				}),
+				u("section", {
+					className: "sect",
+					children: [u("h3", { children: "Thresholds in force" }), u("div", {
+						className: "tablewrap kv-wrap",
+						children: u("dl", {
+							className: "kv",
+							children: thresholds.map(([name, years]) => u(S, { children: [u("dt", { children: name }), u("dd", { children: [years, " years"] })] }, name))
+						})
+					})]
+				}),
+				u("section", {
+					className: "sect",
+					children: [
+						u("h3", { children: "Run" }),
+						u("div", {
+							className: "tablewrap kv-wrap",
+							children: u("dl", {
+								className: "kv",
+								children: kv.map(([label, value]) => u(S, { children: [u("dt", { children: label }), u("dd", { children: value })] }, label))
+							})
+						}),
+						u("p", {
+							className: "run-footer",
+							children: [
+								"This document validates against ",
+								u(OutLink, {
+									href: report.schemaUrl,
+									children: report.schemaUrl
+								}),
+								".",
+								" ",
+								u(OutLink, {
+									href: "https://lockrot.dev/internals/",
+									children: "How lockrot fetches and caches metadata"
+								})
+							]
+						})
+					]
+				})
+			]
+		});
+	}
+	//#endregion
+	//#region src/ui/views/Views.tsx
+	function CurrentView() {
+		const { state } = useReport();
+		switch (state.view) {
+			case "findings": return u(FindingsView, {});
+			case "advisories": return u(AdvisoriesView, {});
+			case "packages": return u(PackagesView, {});
+			case "radius": return u(RadiusView, {});
+			case "run": return u(RunView, {});
+		}
+	}
+	//#endregion
+	//#region src/ui/App.tsx
+	function applyKey(decision, deps) {
+		const { dispatch, search, setGlossaryOpen, rowRequest } = deps;
+		switch (decision.type) {
+			case "toggleRow":
+				dispatch({
+					type: "select",
+					pkg: decision.pkg
+				});
+				break;
+			case "move":
+				rowRequest.current = {
+					pkg: decision.pkg,
+					focus: false
+				};
+				dispatch({
+					type: "select",
+					pkg: decision.pkg
+				});
+				break;
+			case "closeDetail":
+				rowRequest.current = {
+					pkg: decision.restore,
+					focus: true
+				};
+				dispatch({
+					type: "select",
+					pkg: null
+				});
+				break;
+			case "focusSearch":
+				search.current?.focus();
+				break;
+			case "blurSearch":
+				search.current?.blur();
+				break;
+			case "openGlossary":
+				setGlossaryOpen(true);
+				break;
+			case "closeGlossary": setGlossaryOpen(false);
+		}
+	}
+	function useShortcuts(deps) {
+		const latest = A(deps);
+		latest.current = deps;
+		h(() => {
+			const onKeyDown = (event) => {
+				const current = latest.current;
+				const { model, state } = current;
+				const decision = decideKey(keyInputFrom(event, {
+					search: current.search.current,
+					dialogOpen: current.glossaryOpen,
+					selected: state.pkg,
+					rendered: () => renderedPackages(model, state, state.view)
+				}));
+				if (prevents(decision)) event.preventDefault();
+				applyKey(decision, current);
+			};
+			document.addEventListener("keydown", onKeyDown);
+			return () => {
+				document.removeEventListener("keydown", onKeyDown);
+			};
+		}, []);
+	}
+	function LedgerSlot({ narrow }) {
+		const { model } = useReport();
+		if (!narrow) return u("div", {
+			className: "ledger-band",
+			children: u(Ledger, {})
+		});
+		const flagged = population(model, "findings").length;
+		return u("details", {
+			className: "ledger-fold",
+			children: [u("summary", { children: [
+				u("span", {
+					className: "eyebrow",
+					children: "Summary"
+				}),
+				" ",
+				flagged,
+				" flagged of",
+				" ",
+				plural(model.report.findings.length, "package", "packages")
+			] }), u(Ledger, {})]
+		});
+	}
+	function RailSlot({ narrow }) {
+		const { state } = useReport();
+		if (!narrow) return u("div", {
+			className: "shell-rail",
+			children: u(Rail, {})
+		});
+		const { scope, signal, fix, since } = state.filters;
+		const on = scope.length + signal.length + fix.length + since.length;
+		return u("details", {
+			className: "rail-fold",
+			children: [u("summary", { children: ["Filters", on > 0 && u("span", {
+				className: "muted",
+				children: [
+					" · ",
+					on,
+					" on"
+				]
+			})] }), u(Rail, {})]
+		});
+	}
+	function App({ model }) {
+		const wide = useWide();
+		const narrow = useNarrow();
+		const [state, dispatch] = useHashState(model, wide);
+		const theme = useTheme();
+		const [glossaryOpen, setGlossaryOpen] = d(false);
+		const search = A(null);
+		const rowRequest = A(null);
+		const idBase = g();
+		useShortcuts({
+			model,
+			state,
+			dispatch,
+			search,
+			glossaryOpen,
+			setGlossaryOpen,
+			rowRequest
+		});
+		_(() => {
+			const request = rowRequest.current;
+			rowRequest.current = null;
+			const row = request === null ? null : findRow(document, request.pkg);
+			if (request?.focus) row?.focus();
+			else if (typeof row?.scrollIntoView === "function") row.scrollIntoView({ block: "nearest" });
+		}, [state]);
+		const sheet = state.pkg !== null && !wide;
+		h(() => {
+			document.body.classList.toggle("detail-open", sheet);
+			return () => {
+				document.body.classList.remove("detail-open");
+			};
+		}, [sheet]);
+		const closeDetail = q(() => {
+			if (state.pkg !== null) rowRequest.current = {
+				pkg: state.pkg,
+				focus: true
+			};
+			dispatch({
+				type: "select",
+				pkg: null
+			});
+		}, [state.pkg, dispatch]);
+		const now = T(() => new Date(model.report.generatedAt), [model]);
+		const value = T(() => ({
+			model,
+			state,
+			dispatch,
+			now,
+			wide
+		}), [
+			model,
+			state,
+			dispatch,
+			now,
+			wide
+		]);
+		const filterable = population(model, state.view).length > 0;
+		const panelId = `${idBase}-panel`;
+		return u(ReportContext.Provider, {
+			value,
+			children: [
+				u(NewerSchemaBanner, {}),
+				u(Header, {
+					theme: theme.effective,
+					onToggleTheme: theme.toggle,
+					onOpenGlossary: () => {
+						setGlossaryOpen(true);
+					},
+					children: u(Tabs, {
+						idBase,
+						panelId
+					})
+				}),
+				state.view !== "run" && u(LedgerSlot, { narrow }),
+				u("main", {
+					className: filterable ? "shell" : "shell no-rail",
+					children: [
+						filterable && u(RailSlot, { narrow }),
+						u("div", {
+							className: "shell-main",
+							id: panelId,
+							role: "tabpanel",
+							"aria-labelledby": tabId(idBase, state.view),
+							children: [u(SearchBar, { inputRef: search }), u(CurrentView, {})]
+						}),
+						state.pkg !== null && u("div", {
+							className: wide ? "shell-detail is-side" : "shell-detail is-sheet",
+							children: u(Detail, { onClose: closeDetail })
+						})
+					]
+				}),
+				u(Footer, {}),
+				u(Glossary, {
+					open: glossaryOpen,
+					onClose: () => {
+						setGlossaryOpen(false);
+					}
+				})
+			]
+		});
+	}
+	//#endregion
+	//#region src/ui/ErrorScreen.tsx
+	var EXPLANATIONS = {
+		"not-json": "The data this page was given is not valid JSON, so nothing in it could be parsed.",
+		"not-a-report": "The data parsed, but it is not shaped like a lockrot report: it has none of the fields (a \"report\" object with its findings) this page expects."
+	};
+	function ErrorScreen({ error }) {
+		return u("main", {
+			className: "error-screen",
+			"aria-labelledby": "error-heading",
+			children: [
+				u("h1", {
+					id: "error-heading",
+					children: "This report could not be rendered"
+				}),
+				u("p", { children: EXPLANATIONS[error.kind] }),
+				u("p", {
+					className: "error-screen-detail",
+					children: [
+						u("span", {
+							className: "error-screen-label",
+							children: "Reported reason:"
+						}),
+						" ",
+						error.message
+					]
+				}),
+				u("p", {
+					className: "error-screen-hint",
+					children: [
+						"Nothing was sent anywhere over this: the page loads no network resource, and the data it was given is still sitting, untouched, in the ",
+						u("code", { children: "#lockrot-data" }),
+						" element it was read from. If this page was produced by ",
+						u("code", { children: "composer lockrot --format=html" }),
+						", check that the file was not truncated or hand-edited before it reached this browser."
+					]
+				})
+			]
+		});
+	}
+	//#endregion
+	//#region src/main.ts
+	function renderResult(target, result) {
+		R(result.ok ? k$1(App, { model: result.model }) : k$1(ErrorScreen, { error: result.error }), target);
+	}
+	function mount(target, bundle) {
+		renderResult(target, normalize(bundle));
+		return {
+			update(next) {
+				renderResult(target, normalize(next));
+			},
+			unmount() {
+				R(null, target);
+			}
+		};
+	}
+	function parse(text) {
+		return parseBundle(text);
+	}
+	var version = "0.11.0";
+	function autoboot() {
+		const dataEl = document.getElementById("lockrot-data");
+		const appEl = document.getElementById("lockrot-app");
+		if (!dataEl || !appEl) return;
+		const text = dataEl.textContent;
+		if (text.trim() === "") return;
+		renderResult(appEl, parseBundle(text));
+	}
+	window.LockrotReport = {
+		version,
+		mount,
+		parse
+	};
+	autoboot();
+	//#endregion
+	exports.mount = mount;
+	exports.parse = parse;
+	exports.version = version;
+	return exports;
+})({});
 </script>
-</body>
+  </body>
 </html>

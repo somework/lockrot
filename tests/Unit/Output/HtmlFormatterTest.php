@@ -52,18 +52,29 @@ final class HtmlFormatterTest extends TestCase
         $page = $this->page($this->report([$this->finding('vendor/pkg')]));
 
         self::assertStringStartsWith('<!doctype html>', $page);
-        self::assertStringContainsString('<style>', $page);
-        self::assertStringContainsString('.row {', $page, 'the stylesheet is spliced in, not linked');
-        self::assertStringContainsString('function baselineState', $page, 'and so is the script');
-        // Order, not just presence: report.js reads LockrotLib while it is still evaluating, so a
-        // page that carries both halves the wrong way round throws before it renders anything.
-        $library = strpos($page, 'var LockrotLib');
-        $application = strpos($page, 'function baselineState');
-        self::assertIsInt($library, 'the DOM-free half is in the page');
-        self::assertIsInt($application);
-        self::assertLessThan($application, $library, 'and it comes first');
-        self::assertStringNotContainsString('{{CSS}}', $page);
+        self::assertSame(1, substr_count($page, '<style>'), 'the stylesheet is inline, not linked');
+        self::assertStringContainsString('LockrotReport', $page, 'and so is the renderer');
         self::assertStringNotContainsString('{{DATA}}', $page);
+        self::assertStringNotContainsString('{{TITLE}}', $page);
+        self::assertStringNotContainsString('{{DESCRIPTION}}', $page);
+    }
+
+    /**
+     * The page pins its one script and one stylesheet by hash and allows no connection: whatever a
+     * package's name or an advisory's title manages to put in the markup cannot run, and nothing
+     * the page renders can be sent anywhere. The policy is written by the renderer's build; what
+     * lockrot owes it is not to add anything to the page that the policy would have to allow.
+     */
+    public function testThePageCarriesAPolicyThatAllowsOnlyItsOwnCode(): void
+    {
+        $page = $this->page($this->report([$this->finding('vendor/pkg')]));
+
+        $matched = preg_match('{<meta http-equiv="Content-Security-Policy" content="([^"]+)">}', $page, $m);
+        self::assertSame(1, $matched, 'the page carries a policy');
+        self::assertStringContainsString("default-src 'none'", $m[1]);
+        self::assertMatchesRegularExpression("{script-src 'sha256-[A-Za-z0-9+/=]+'}", $m[1]);
+        self::assertStringNotContainsString('unsafe-inline', $m[1]);
+        self::assertSame(1, substr_count($page, '<script>'), 'one inline script, the one the policy pins');
     }
 
     /**
@@ -110,16 +121,11 @@ final class HtmlFormatterTest extends TestCase
         self::assertStringContainsString('<title>lockrot: nothing flagged in 12 packages</title>', $clean);
     }
 
-    public function testThePageCarriesTheLibyearsBlockAndAPlaceToShowIt(): void
+    public function testThePayloadCarriesTheLibyearsBlock(): void
     {
         $measured = new Finding('smalot/pdfparser', 'v1.1.0', Verdict::LEFT_BEHIND, [], ['smalot/pdfparser'], null, new \DateTimeImmutable(F::NOW), null, false, ['smalot/pdfparser'], 4.7123);
-        $page = $this->page($this->report([$measured, $this->finding('vendor/pinned', Verdict::PINNED)], 2));
-        $payload = self::payloadOf($page);
+        $payload = self::payloadOf($this->page($this->report([$measured, $this->finding('vendor/pinned', Verdict::PINNED)], 2)));
 
-        self::assertStringContainsString('id="libyearsTotal"', $page, 'the ledger has a place for the total');
-        self::assertStringContainsString('id="libyearsLine"', $page, 'and for the line under it');
-        self::assertStringContainsString('function libyearsSummary', $page, 'the library that writes the words under the figure is inline');
-        self::assertStringContainsString('id="libyearsDef"', $page, 'and the glossary says what the number is');
         self::assertSame(4.71, J::arrayAt($payload, ['report', 'libyears'])['total']);
         self::assertSame(4.71, J::arrayAt($payload, ['report', 'findings', 0])['libyears']);
         self::assertNull(J::arrayAt($payload, ['report', 'findings', 1])['libyears']);
@@ -223,19 +229,20 @@ final class HtmlFormatterTest extends TestCase
     }
 
     /**
-     * The markup carries placeholders for the three values in the header bar, and the script
-     * replaces all three. A placeholder that names a PHP version is a claim about the run, made by
-     * a file that has not read the run yet: it is what a reader sees before the script goes, what
-     * a reader sees if it never goes, and what anyone reading the file itself sees. The other two
-     * placeholders are em dashes; this one was `8.4`.
+     * The page states nothing about the run outside its payload. The header used to carry a slot
+     * for the target PHP that read `8.4` before the script filled it — a claim made by a file that
+     * had not read the run. The renderer now draws every value from the payload, so the only place
+     * a PHP version, a lock file or a verdict may appear is the payload itself and the two lines
+     * lockrot writes about it, the title and the description.
      */
-    public function testThePageNamesNoTargetPhpUntilItKnowsOne(): void
+    public function testThePageSaysNothingAboutTheRunOutsideItsPayload(): void
     {
         $page = $this->page($this->report([$this->finding('vendor/pkg')]));
 
-        $matched = preg_match('{<b class="mono" id="mTarget">(.*?)</b>}', $page, $m);
-        self::assertSame(1, $matched, 'the header carries the target PHP slot');
-        self::assertSame("\u{2014}", $m[1], 'and it holds nothing until the script fills it');
+        $withoutPayload = preg_replace('{<script id="lockrot-data" type="application/json">.*?</script>}s', '', $page);
+        self::assertIsString($withoutPayload);
+        self::assertStringNotContainsString('vendor/pkg', $withoutPayload, 'package names come from the payload');
+        self::assertDoesNotMatchRegularExpression('{target PHP \d}', $withoutPayload);
     }
 
     public function testACleanRunSaysSoInItsDescription(): void

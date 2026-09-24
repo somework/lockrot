@@ -247,11 +247,13 @@ sed -n 's/.*<script id="lockrot-data" type="application\/json">\(.*\)<\/script>.
 ```
 
 Nothing in the page is fetched — no fonts, no CDN, no analytics — so it renders the same offline and
-from a downloaded artifact. Its styles and script are inlined, so a host that serves it under a
-Content-Security-Policy has to allow those (`script-src 'self' 'unsafe-inline'`, and the same for
-`style-src`, since the page uses `style` attributes); every other directive can stay shut, including
-`connect-src` and `img-src`, because the page never asks for anything. `--all` puts every package
-in it, at roughly 4 KB a package; without it a 100-package lock lands around 250 KB.
+from a downloaded artifact. The page carries its own Content-Security-Policy: its one inline script
+and one stylesheet are pinned by sha256, and every other source, `connect-src` included, is `'none'`,
+so nothing the page renders can run or be sent anywhere. A host that adds a policy of its own in a
+response header gets the intersection of the two; `script-src 'unsafe-inline'` and
+`style-src 'unsafe-inline'` in the header are enough, because the page's own policy narrows them to
+its hashes. Every other directive can stay shut. `--all` puts every package
+in it, at roughly 4 KB a package; without it a 100-package lock lands around 300 KB.
 
 ## `--format=json`
 

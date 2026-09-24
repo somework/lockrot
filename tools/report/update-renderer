@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+# Vendor a release of the report renderer into resources/report/.
+#
+#   tools/report/update-renderer v1.2.3           a release of somework/lockrot-report
+#   tools/report/update-renderer --from-dir DIR   a local dist/ (development only; CI refuses it)
+#
+# The page lockrot writes with --format=html is built in its own repository
+# (https://github.com/somework/lockrot-report). lockrot does not build it: it vendors the built
+# report.html and the manifest that describes it, so the PHAR is still built without node and still
+# carries exactly the bytes that are in this repository. What makes those bytes trustworthy is
+# checked here, once, when they come in: the release's build provenance attestation, then every
+# file against the sha256 the manifest states. tests/Unit/Output/RendererManifestTest.php checks the
+# second half again on every run.
+set -euo pipefail
+cd "$(dirname "$0")/../.."
+
+REPO=somework/lockrot-report
+DEST=resources/report
+FILES=(report.html manifest.json)
+
+usage() { sed -n '2,5p' "$0" | sed 's/^# \{0,1\}//' >&2; exit 2; }
+[ $# -ge 1 ] || usage
+
+work=$(mktemp -d)
+trap 'rm -rf "$work"' EXIT
+
+if [ "$1" = "--from-dir" ]; then
+  [ $# -eq 2 ] || usage
+  for file in "${FILES[@]}"; do cp "$2/$file" "$work/$file"; done
+  echo "update-renderer: vendoring a LOCAL build from $2 — not attested; do not release with it" >&2
+else
+  tag=$1
+  [[ $tag =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "update-renderer: expected a tag like v1.2.3, got $tag" >&2; exit 2; }
+  gh release download "$tag" --repo "$REPO" --dir "$work" "${FILES[@]/#/--pattern=}"
+  for file in "${FILES[@]}"; do
+    gh attestation verify "$work/$file" --repo "$REPO" >/dev/null
+  done
+fi
+
+# The manifest names every file's sha256; the page must be the one it describes.
+expected=$(php -r '$m = json_decode(file_get_contents($argv[1]), true); echo $m["files"]["report.html"] ?? "";' "$work/manifest.json")
+actual=$(php -r 'echo hash_file("sha256", $argv[1]);' "$work/report.html")
+[ -n "$expected" ] && [ "$expected" = "$actual" ] || {
+  echo "update-renderer: report.html does not match its manifest (expected ${expected:-nothing}, got $actual)" >&2
+  exit 1
+}
+
+mkdir -p "$DEST"
+for file in "${FILES[@]}"; do cp "$work/$file" "$DEST/$file"; done
+version=$(php -r 'echo json_decode(file_get_contents($argv[1]), true)["version"] ?? "?";' "$DEST/manifest.json")
+echo "update-renderer: resources/report/ now holds lockrot-report $version"
