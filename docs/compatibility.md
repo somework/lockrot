@@ -48,7 +48,8 @@ The document number `lockrot.schema` is `1` for all of 1.x.
 The first six verdicts are the flagged ones. They are what the report lists in
 `run.flagged_verdicts`, the only verdicts a baseline entry holds, and the only verdicts `--fail-on`
 accepts. `finished` and `ok` share the lowest severity: no threshold and no comparison tells them
-apart. Where lockrot lists verdicts — `counts`, the SARIF rules, this page — `finished` comes first.
+apart. Where lockrot lists verdicts — `counts`, `run.flagged_verdicts`, the schema enums, this page —
+`finished` comes first; the SARIF rules appear in the order the results first use them.
 
 The order decides four things:
 
@@ -133,9 +134,9 @@ requests are blocked.
 - `extra.lockrot` keys are never removed within 1.x.
 - Precedence: CLI options, then environment variables, then `extra.lockrot`, then an `extends`d file
   (*planned*), then the defaults. The first one that sets a value wins.
-- From 0.13, an `extra.lockrot` key lockrot does not know prints one warning on stderr, naming the
-  closest key it does know, and the run goes on. The reserved `extensions` key and keys that start
-  with `x-` never warn.
+- From 0.13, each `extra.lockrot` key lockrot does not know prints one warning on stderr,
+  suggesting the closest known key when one is near, and the run goes on. Nested keys are checked
+  too. The reserved `extensions` key and keys that start with `x-`, at either level, never warn.
 - The default thresholds are not frozen. They are chosen at the RC, and a later change to them is a
   [Verdict change](#verdict-changes). If you need fixed numbers, set them in `extra.lockrot`.
 
@@ -263,7 +264,7 @@ These names are reserved so that an extension mechanism can arrive later without
 - In your project, lockrot writes only the files you name: reports with `--output` and the baseline
   with `--generate-baseline`. It never writes `composer.json` or `composer.lock`. Outside the project
   it writes only its activity cache, under Composer's cache directory, and `self-update` replaces the
-  PHAR.
+  PHAR; Composer writes its own metadata cache there too, as it would for any install.
 - It opens no pull request or merge request, and it changes no code.
 - It has no hosted service, no account, no telemetry and no usage metering. It talks to:
   - the Composer repositories your project configures, through Composer;

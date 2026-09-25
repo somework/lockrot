@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Integration;
 
+use Lockrot\Baseline\BaselineComparison;
+use Lockrot\Signal\Signal;
 use Lockrot\Verdict\Priority;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\TestCase;
@@ -28,6 +30,24 @@ final class CompatibilityPageTest extends TestCase
 
         self::assertStringContainsString('Verdicts, most severe first: `'.implode('`, `', Verdict::all()).'`.', $page);
         self::assertStringContainsString('Priorities, highest first: `'.implode('`, `', Priority::all()).'`.', $page);
+        self::assertStringContainsString('Signal levels, lowest first: `'.implode('`, `', [Signal::LEVEL_INFO, Signal::LEVEL_WARN, Signal::LEVEL_HIGH]).'`.', $page);
+        self::assertStringContainsString(
+            "A finding's standing against the baseline: `".implode('`, `', [BaselineComparison::KNOWN, BaselineComparison::NEW_FINDING, BaselineComparison::WORSENED]).'`.',
+            $page
+        );
+    }
+
+    /**
+     * The SARIF rules follow the order the results first use them (SarifFormatterTest pins that),
+     * so neither page may name them among the lists kept in Verdict::all() order.
+     */
+    public function testThePagesDoNotClaimVerdictOrderForTheSarifRules(): void
+    {
+        $compatibility = self::read(self::DOCS.'compatibility.md');
+
+        self::assertStringContainsString('the SARIF rules appear in the order the results first use them', $compatibility);
+        self::assertStringNotContainsString('`counts`, the SARIF rules', $compatibility);
+        self::assertStringContainsString('`counts`, `run.flagged_verdicts`, the schema enums, this page', self::read(self::DOCS.'verdicts.md'));
     }
 
     public function testThePageSaysItIsADraft(): void

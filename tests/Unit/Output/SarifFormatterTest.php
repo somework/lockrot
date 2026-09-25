@@ -184,6 +184,24 @@ final class SarifFormatterTest extends TestCase
         self::assertSame(['lockrot/abandoned', 'lockrot/abandoned', 'lockrot/silent'], JsonPath::column($run, ['results'], 'ruleId'));
     }
 
+    /**
+     * Rules follow the order the results first use them, which is the report's order, not
+     * Verdict::all(): `finished` and `ok` tie, so a direct `ok` package comes before a `finished`
+     * one. docs/compatibility.md says so; changing it would change machine-readable output.
+     */
+    public function testRulesFollowTheOrderTheResultsFirstUseThem(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $report = new Report([
+            new Finding('z/z', '1.0.0', Verdict::FINISHED, [], ['a/parent', 'z/z'], null, $at),
+            new Finding('a/a', '1.0.0', Verdict::OK, [], ['a/a'], null, $at),
+        ], [], $at, 2, 0, false);
+
+        $run = $this->singleRun($this->formatter(LockrotConfig::FAIL_ON_NONE, null)->format($report, true));
+
+        self::assertSame(['lockrot/ok', 'lockrot/finished'], JsonPath::column($run, ['tool', 'driver', 'rules'], 'id'));
+    }
+
     public function testLevelMappingAtTheFailOnBoundary(): void
     {
         $lockPath = $this->lockPath();

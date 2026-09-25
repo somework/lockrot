@@ -57,7 +57,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   change in any release. The promise is narrowed now because it can only be narrowed before 1.0.
 
 - A release that changes the verdict or the priority lockrot gives a package says so under a
-  heading of its own, **Verdict changes**, from 0.13 on, and ships only in a minor release. Until
+  heading of its own, **Verdict changes**, from 0.13 on, and ships only in a minor release; a
+  curated-data fix that only removes a false verdict may ship in a patch. Until
   now such a change sat under `Changed` or `Fixed` with everything else, and a team deciding whether
   an upgrade can turn its pipeline red had to read every entry to find out.
 
@@ -171,7 +172,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   marked *planned*.
 
 - A test that holds the code, the published report, explain and baseline schemas, and the
-  compatibility and verdicts pages to the same verdicts and priorities in the same order, and that
+  compatibility and verdicts pages to the same verdicts, priorities, signal levels and baseline
+  standings in the same order, and that
   keeps every name lockrot ships out of the namespaces reserved for extensions. The existing tests
   compared the lists through the class constants, so they would have followed a changed value
   rather than caught it. `docs/verdicts.md` now lists all nine verdicts in its severity line

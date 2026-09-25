@@ -26,8 +26,9 @@ Severity order, used by `--fail-on` and the baseline:
 `abandoned > silent > pinned > left-behind > old-promise > stale > unknown > finished = ok`.
 
 `finished` and `ok` sit equal and lowest in that ordering, and neither is ever a finding. Where
-lockrot lists verdicts, `finished` comes before `ok`. The order, and the six flagged verdicts above
-`unknown`, are frozen for 1.x — see [compatibility.md](compatibility.md#closed-sets-and-their-order).
+lockrot lists verdicts — `counts`, `run.flagged_verdicts`, the schema enums, this page —
+`finished` comes before `ok`. The order, and the six flagged verdicts above `unknown`, are frozen for
+1.x — see [compatibility.md](compatibility.md#closed-sets-and-their-order).
 
 An allowlist match never competes in the order at all. It is checked before any signal is read and
 always wins, so an allowlisted package reports `finished` whatever its signals say — see
