@@ -94,6 +94,94 @@ final class PathTest extends TestCase
         self::assertNotSame(Path::canonical($dir.'/nope/base.json'), Path::canonical($dir.'/other/base.json'));
     }
 
+    /**
+     * Windows folds `..` by spelling alone, before it asks the disk anything, so
+     * `missing\..\lockrot-baseline.json` is the baseline there even though `missing` does not exist.
+     * The key folds dot segments the same way, with either separator, so that spelling is caught on
+     * every system — a directory that cannot be resolved no longer hides what the path names.
+     *
+     * @return iterable<string, array{string, string}>
+     */
+    public static function dotSegmentSpellings(): iterable
+    {
+        yield 'through a missing directory' => ['/nope/../base.json', '/base.json'];
+        yield 'through a missing directory, backslashes' => ['\\nope\\..\\base.json', '/base.json'];
+        yield 'mixed separators' => ['/nope\\..//./base.json', '/base.json'];
+        yield 'two levels up' => ['/a/b/../../base.json', '/base.json'];
+        yield 'a dot segment' => ['/./base.json', '/base.json'];
+    }
+
+    /**
+     * @dataProvider dotSegmentSpellings
+     */
+    #[DataProvider('dotSegmentSpellings')]
+    public function testCanonicalFoldsDotSegmentsBySpellingWhateverTheSeparator(string $spelled, string $meant): void
+    {
+        $dir = $this->tempDir();
+
+        self::assertSame(Path::canonical($dir.$meant), Path::canonical($dir.$spelled));
+    }
+
+    /** A file in the root directory keeps one separator: realpath('/') ends in the one it has. */
+    public function testCanonicalOfAFileInTheRootHasOneSeparator(): void
+    {
+        if (\DIRECTORY_SEPARATOR === '\\') {
+            self::markTestSkipped('the root is a drive on Windows');
+        }
+
+        self::assertSame('/r.json', Path::canonical('/r.json'));
+    }
+
+    /** @return iterable<string, array{string, string}> */
+    public static function normalized(): iterable
+    {
+        yield 'a plain path' => ['/app/r.json', '/app/r.json'];
+        yield 'a dot segment' => ['/app/./r.json', '/app/r.json'];
+        yield 'a parent segment' => ['/app/sub/../r.json', '/app/r.json'];
+        yield 'backslashes' => ['C:\\app\\sub\\..\\r.json', 'C:/app/r.json'];
+        yield 'repeated separators' => ['/app//sub///r.json', '/app/sub/r.json'];
+        yield 'no climbing above the root' => ['/../../r.json', '/r.json'];
+        yield 'no climbing above a drive' => ['C:\\..\\r.json', 'C:/r.json'];
+        yield 'a UNC share keeps its two leading separators' => ['\\\\server\\share\\..\\r.json', '//server/r.json'];
+        yield 'a relative path keeps the parents it cannot fold' => ['../a/../../r.json', '../../r.json'];
+        yield 'a name with dots is not a dot segment' => ['/app/..r/.x/r..json', '/app/..r/.x/r..json'];
+    }
+
+    /**
+     * @dataProvider normalized
+     */
+    #[DataProvider('normalized')]
+    public function testNormalizeFoldsDotSegmentsBySpellingAlone(string $path, string $expected): void
+    {
+        self::assertSame($expected, Path::normalize($path));
+    }
+
+    /**
+     * Two names for one file on disk: a hard link here, and on a case-insensitive filesystem any
+     * spelling it folds to the same entry. Nothing that does not exist is the same file as anything.
+     */
+    public function testSameFileComparesWhatIsOnDisk(): void
+    {
+        $dir = $this->tempDir();
+        file_put_contents($dir.'/a.json', 'a');
+        file_put_contents($dir.'/b.json', 'b');
+        link($dir.'/a.json', $dir.'/hard.json');
+        symlink($dir.'/a.json', $dir.'/soft.json');
+        try {
+            self::assertTrue(Path::sameFile($dir.'/a.json', $dir.'/a.json'));
+            self::assertTrue(Path::sameFile($dir.'/a.json', $dir.'/hard.json'));
+            self::assertTrue(Path::sameFile($dir.'/soft.json', $dir.'/a.json'), 'a symlink resolves to its target');
+            self::assertFalse(Path::sameFile($dir.'/a.json', $dir.'/b.json'));
+            self::assertFalse(Path::sameFile($dir.'/a.json', $dir.'/missing.json'));
+            self::assertFalse(Path::sameFile($dir.'/missing.json', $dir.'/a.json'));
+            self::assertFalse(Path::sameFile($dir.'/missing.json', $dir.'/missing.json'));
+        } finally {
+            foreach (['a', 'b', 'hard', 'soft'] as $name) {
+                unlink($dir.'/'.$name.'.json');
+            }
+        }
+    }
+
     /** @return iterable<string, array{string, bool}> */
     public static function windowsAliases(): iterable
     {

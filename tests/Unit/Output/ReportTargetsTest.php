@@ -99,19 +99,23 @@ final class ReportTargetsTest extends TestCase
         ], ['a note with <info>tags</info> in it'], $at, 1, 0, false);
     }
 
-    public function testNoSpecsIsEmptyAndWantsNothing(): void
+    public function testNoSpecsWantsNothingAndWritesNothing(): void
     {
         $targets = $this->resolve([]);
+        $called = false;
 
-        self::assertTrue($targets->isEmpty());
         self::assertFalse($targets->wants('table'));
+        $targets->write(self::report(), FormatContext::create(null, LockrotConfig::FAIL_ON_NONE), null, false, static function () use (&$called): void {
+            $called = true;
+        });
+        self::assertFalse($called);
+        self::assertSame([], array_values(array_diff((array) scandir($this->cwd), ['.', '..'])));
     }
 
     public function testWantsIsTrueOnlyForAFormatAsked(): void
     {
         $targets = $this->resolve(['json:r.json', 'sarif:r.sarif']);
 
-        self::assertFalse($targets->isEmpty());
         self::assertTrue($targets->wants('json'));
         self::assertTrue($targets->wants('sarif'));
         self::assertFalse($targets->wants('html'));
@@ -124,6 +128,7 @@ final class ReportTargetsTest extends TestCase
         yield 'composer.lock' => ['json:composer.lock'];
         yield 'dot-relative' => ['json:./composer.lock'];
         yield 'through a directory that does not exist' => ['json:sub/../composer.lock'];
+        yield 'through a directory that does not exist, Windows separators' => ['json:sub\\..\\composer.lock'];
         yield 'in a directory that does not exist' => ['json:nope/composer.lock'];
         yield 'another case' => ['json:Composer.LOCK'];
         yield 'another package of a monorepo' => ['json:vendor/x/composer.json'];
@@ -157,6 +162,10 @@ final class ReportTargetsTest extends TestCase
         yield 'the default name, in another case' => ['lockrot-baseline.json', 'html:LOCKROT-BASELINE.json'];
         yield 'in a directory that does not exist yet' => ['later/base.json', 'json:later/base.json'];
         yield 'in a directory that does not exist yet, in another case' => ['later/base.json', 'json:LATER/base.json'];
+        // Windows folds `..` by spelling before it asks whether `missing` exists
+        yield 'through a directory that does not exist' => ['lockrot-baseline.json', 'json:missing/../lockrot-baseline.json'];
+        yield 'through a directory that does not exist, Windows separators' => ['lockrot-baseline.json', 'json:missing\\..\\lockrot-baseline.json'];
+        yield 'up and back down through a directory that does not exist' => ['ci/base.json', 'json:missing/../ci/base.json'];
     }
 
     /**
@@ -251,6 +260,69 @@ final class ReportTargetsTest extends TestCase
         );
     }
 
+    /**
+     * A second name for the file itself — a hard link here; on macOS's case-insensitive APFS any
+     * spelling Unicode case folding sends to the same entry, such as `composer.locK` with a Kelvin
+     * sign, which lower-casing ASCII never matches — is that file.
+     */
+    public function testAnotherNameForAProtectedFileOnDiskIsRefused(): void
+    {
+        file_put_contents($this->cwd.'/lockrot-baseline.json', '{}');
+        mkdir($this->cwd.'/out');
+        link($this->cwd.'/lockrot-baseline.json', $this->cwd.'/out/r.json');
+
+        self::assertSame(
+            '--output=json:out/r.json: '.self::BASELINE_REASON,
+            $this->refusal(fn () => $this->resolve(['json:out/r.json'], [[$this->cwd.'/lockrot-baseline.json', self::BASELINE_REASON]]))
+        );
+    }
+
+    /** Beside the target, whatever the caller protects: a composer.json or composer.lock is never written. */
+    public function testAnotherNameForAComposerFileBesideTheTargetIsRefused(): void
+    {
+        mkdir($this->cwd.'/pkg');
+        file_put_contents($this->cwd.'/pkg/composer.json', '{}');
+        file_put_contents($this->cwd.'/pkg/composer.lock', '{}');
+        link($this->cwd.'/pkg/composer.json', $this->cwd.'/pkg/manifest.json');
+        link($this->cwd.'/pkg/composer.lock', $this->cwd.'/pkg/lock.json');
+
+        foreach (['json:pkg/manifest.json', 'json:pkg/lock.json'] as $spec) {
+            self::assertSame(
+                '--output='.$spec.': lockrot never writes composer.json or composer.lock',
+                $this->refusal(fn () => $this->resolve([$spec]))
+            );
+        }
+    }
+
+    /** @return iterable<string, array{string, string, string}> */
+    public static function foldedSpellings(): iterable
+    {
+        yield 'the lock, with a Kelvin sign' => ['composer.lock', "json:composer.loc\u{212A}", 'lockrot never writes composer.json or composer.lock'];
+        yield 'the manifest, with a long s' => ['composer.json', "markdown:compo\u{17F}er.json", 'lockrot never writes composer.json or composer.lock'];
+        yield 'the baseline, with a Kelvin sign' => ['lockrot-baseline.json', "json:loc\u{212A}rot-baseline.json", self::BASELINE_REASON];
+    }
+
+    /**
+     * On a filesystem that folds case by Unicode rules (APFS and HFS+ by default, NTFS) these names
+     * open the protected file. Skipped where the filesystem does not fold them — there they are
+     * other files, and writing one harms nothing.
+     *
+     * @dataProvider foldedSpellings
+     */
+    #[DataProvider('foldedSpellings')]
+    public function testASpellingTheFilesystemFoldsToAProtectedFileIsRefused(string $file, string $spec, string $reason): void
+    {
+        file_put_contents($this->cwd.'/'.$file, '{}');
+        if (!file_exists($this->cwd.'/'.substr($spec, (int) strpos($spec, ':') + 1))) {
+            self::markTestSkipped('this filesystem does not fold the spelling to '.$file);
+        }
+
+        self::assertSame(
+            '--output='.$spec.': '.$reason,
+            $this->refusal(fn () => $this->resolve([$spec], [[$this->cwd.'/lockrot-baseline.json', self::BASELINE_REASON]]))
+        );
+    }
+
     /** @return iterable<string, array{list<string>, string}> */
     public static function duplicates(): iterable
     {
@@ -268,6 +340,62 @@ final class ReportTargetsTest extends TestCase
     public function testTheSameFileTwiceIsAConfigError(array $specs, string $message): void
     {
         self::assertSame($message, $this->refusal(fn () => $this->resolve($specs)));
+    }
+
+    /** Two names that exist and are one file on disk — a hard link here — are the same file named twice. */
+    public function testTwoNamesForOneFileOnDiskAreTheSameFileTwice(): void
+    {
+        file_put_contents($this->cwd.'/a.json', 'the last run');
+        link($this->cwd.'/a.json', $this->cwd.'/b.json');
+
+        self::assertSame(
+            '--output=html:b.json: the same file as --output=json:a.json',
+            $this->refusal(fn () => $this->resolve(['json:a.json', 'html:b.json']))
+        );
+    }
+
+    /**
+     * A name that does not exist yet can still turn out to be a file this run has just written — on
+     * APFS `café.json` spelled precomposed and decomposed is one file. Checked again before each
+     * write, it stops the run with exit 2 naming both, instead of losing the first report silently;
+     * the first file is kept as written.
+     */
+    public function testAFileThatTurnsOutToBeOneAlreadyWrittenStopsTheRun(): void
+    {
+        $targets = $this->resolve(['json:a.json', 'markdown:b.md', 'json:c.json']);
+        $context = FormatContext::create(null, LockrotConfig::FAIL_ON_NONE);
+        $written = [];
+
+        $message = $this->refusal(function () use ($targets, $context, &$written): void {
+            $targets->write(self::report(), $context, null, false, function (ReportTarget $target) use (&$written): void {
+                $written[] = $target->displayPath();
+                if ($target->displayPath() === 'b.md') {
+                    link($this->cwd.'/a.json', $this->cwd.'/c.json');
+                }
+            });
+        });
+
+        self::assertSame('--output=json:c.json: the same file as --output=json:a.json', $message);
+        self::assertSame(['a.json', 'b.md'], $written);
+        self::assertSame(Formatters::for('json', $context)->format(self::report()), file_get_contents($this->cwd.'/a.json'));
+    }
+
+    public function testNormalizationEquivalentNamesAreOneFileWhereTheFilesystemSaysSo(): void
+    {
+        $composed = "caf\u{E9}.json";
+        $decomposed = "cafe\u{301}.json";
+        file_put_contents($this->cwd.'/probe-'.$composed, '');
+        $folds = file_exists($this->cwd.'/probe-'.$decomposed);
+        unlink($this->cwd.'/probe-'.$composed);
+        if (!$folds) {
+            self::markTestSkipped('this filesystem keeps both spellings apart');
+        }
+        $targets = $this->resolve(['json:'.$composed, 'markdown:'.$decomposed]);
+
+        $message = $this->refusal(fn () => $targets->write(self::report(), FormatContext::create(null, LockrotConfig::FAIL_ON_NONE), null, false, static function (): void {
+        }));
+
+        self::assertSame('--output=markdown:'.$decomposed.': the same file as --output=json:'.$composed, $message);
     }
 
     public function testOneFormatMayGoToTwoFiles(): void

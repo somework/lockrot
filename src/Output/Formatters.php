@@ -23,6 +23,17 @@ final class Formatters
      * baseline comparison, the thresholds — and {@see PageData} carries them. Left out, the page
      * still renders, minus the release branches and the baseline column.
      */
+    /**
+     * Whether $format's text carries console markup — style tags, and `\<` escapes the console
+     * undoes — and so must go through Symfony's tag formatter before anyone reads it: only `table`.
+     * Every other format is written raw, so a `<` in a constraint or a package name reaches the
+     * parser on the other end untouched.
+     */
+    public static function carriesConsoleMarkup(string $format): bool
+    {
+        return $format === 'table';
+    }
+
     public static function for(string $format, ?FormatContext $context = null, ?PageData $page = null): FormatterInterface
     {
         $context ??= FormatContext::unknown();
