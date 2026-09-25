@@ -138,7 +138,7 @@ MIGRATE_TO = _phrase(
     'migrate-to',
     r'^.*\bmigrate to (\S+)',
     'the evidence clause telling the reader which package to move to',
-    unexercised=('Finding::fix() (src/Verdict/Finding.php:237) writes this clause only for a '
+    unexercised=('Finding::fix() (src/Verdict/Finding.php:238) writes this clause only for a '
                  'package that has an advisory with no fixed release AND names a successor, so it '
                  'is not a property of the fixtures: no target in the 283-pair corpus is of that '
                  'shape either, in the page or in the document', '2026-09-23'),

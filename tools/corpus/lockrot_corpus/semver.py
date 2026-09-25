@@ -21,11 +21,11 @@ finding lands in a skip counter and the run prints a clean census over nothing.
 
 import re
 
-# Read from src/Data/Repository/PackageMetadata.php:34 on 2026-09-23. Three or more stable tags on
+# Read from src/Data/Repository/PackageMetadata.php:36 on 2026-09-23. Three or more stable tags on
 # one source commit means none of them is dated by a release of its own.
 SHARED_COMMIT_TAGS = 3
 
-# Read from src/Clock.php:10 on 2026-09-23: 365.25 days, the year every libyear is counted in.
+# Read from src/Clock.php:11 on 2026-09-23: 365.25 days, the year every libyear is counted in.
 SECONDS_PER_YEAR = 31557600
 
 # Composer's stability ordering within one version number. The empty suffix is a plain release and
@@ -124,7 +124,7 @@ def order_key(normalized: object) -> 'tuple[int, ...] | None':
 def release_branch(normalized: object) -> 'str | None':
     """The branch key a version belongs to, or None for a dev or unparsable one.
 
-    Mirrors ReleaseBranch::of() (src/Data/Repository/ReleaseBranch.php:22-41): the key of the caret
+    Mirrors ReleaseBranch::of() (src/Data/Repository/ReleaseBranch.php:24-43): the key of the caret
     range that version satisfies, which for a 0.x version is narrower than the major.
     """
     if stability(normalized) == 'dev':

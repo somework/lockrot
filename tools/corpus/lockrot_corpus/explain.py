@@ -20,8 +20,8 @@ from .checks import (Check, Decline, Selection, Verdict, decline, ok, problem, s
 # every measured package; a wider one stops seeing real drift.
 LIBYEARS_TOLERANCE = 0.051
 
-# Read from src/Explain/Explanation.php:26 on 2026-09-23: how many branch rows the page prints
-# before it stops and says how many it left out (src/Output/ExplainFormatter.php:319-333).
+# Read from src/Explain/Explanation.php:28 on 2026-09-23: how many branch rows the page prints
+# before it stops and says how many it left out (src/Output/ExplainFormatter.php:321-335).
 BRANCH_ROWS = 15
 
 
