@@ -31,8 +31,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   line then says `self-update --allow-major`, since a plain run would hold it back). A release whose
   lowest PHP is above the running one is passed over with a line saying so, and so is one signed with
   a self-update key the archive does not carry, which makes the transition release of a rotation the
-  step in between. `--force` reinstalls the newest release at or below the running one and never
-  looks further down. The choice is made by the archive doing the update, so this starts with
+  step in between. `--force` reinstalls the newest release at or below the running one, only in the
+  running major version, and never looks further down: a build ahead of every release of its line
+  (a 1.0.0 rehearsed before its tag) is exit 2 rather than a step back to 0.x. The choice is made by the archive doing the update, so this starts with
   archives from 0.13.0 on; 0.12 and older still follow `releases/latest` (see
   [the PHAR page](https://lockrot.dev/phar/#keeping-it-updated)). `LOCKROT_RELEASE_URL`, the test
   hook, now names a release list.

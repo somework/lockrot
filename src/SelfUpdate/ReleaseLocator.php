@@ -109,8 +109,9 @@ final class ReleaseLocator
      * Without $force the walk ends at the running version: nothing at or below it is an update, so
      * an up-to-date check reads the list and nothing else. With $force the newest release at or
      * below the running version is also a candidate — the one it reinstalls, or the one a dev build
-     * ahead of every release goes back to — and nothing older: the description is unsigned, and a
-     * lying one must not walk a reinstall down to an older release.
+     * ahead of every release goes back to — as long as it is in the running major version, and
+     * nothing older: the description is unsigned, and a lying one must not walk a reinstall down to
+     * an older release.
      *
      * @param bool $allowMajor also take a release of the next major version
      * @param bool $force      also take the newest release at or below the running version
@@ -122,7 +123,10 @@ final class ReleaseLocator
         $notes = [];
         foreach ($this->candidates() as $candidate) {
             $newer = Comparator::greaterThan($candidate['version'], $this->currentVersion);
-            if (!$newer && !$force) {
+            // --force stays in the running line: a build ahead of every release of its major (one
+            // rehearsed before its tag, or one whose release was pulled) does not fall back to the
+            // newest release of the line below.
+            if (!$newer && (!$force || self::majorOf($candidate['version']) < self::majorOf($this->currentVersion))) {
                 return new ReleaseChoice(null, array_values($notes));
             }
             $heldBack = $this->heldBack($candidate, $allowMajor);

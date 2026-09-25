@@ -217,7 +217,10 @@ their key, so the signature alone decides. A 0.13.0 or later release without the
 (exit `2`) naming the tag, as a missing archive is. The file is not signed: it decides only which
 release is tried. The checksum and the signature still decide whether one is installed, so a
 doctored description can hold an update back, and `--force` looks no further down than the newest
-release at or below the running one, so it cannot walk a reinstall into a downgrade.
+release at or below the running one, so it cannot walk a reinstall into a downgrade. `--force` also
+stays in the running major version: an archive ahead of every release of its line — a 1.0.0 built
+before its tag, or one whose release was withdrawn — has nothing to reinstall and exits `2` rather
+than going back to the newest 0.x.
 
 `self-update` downloads the chosen release's `lockrot.phar.sha256` and `lockrot.phar.sig.json`
 alongside the archive, refuses to install anything whose hash does not match or whose signature does

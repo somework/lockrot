@@ -560,6 +560,22 @@ final class ReleaseLocatorTest extends TestCase
     }
 
     /**
+     * --force stays in the running major line. A build ahead of every release of its line — a 1.0.0
+     * archive rehearsed before its tag, or one whose release was pulled — must not reinstall the
+     * newest release of the line below.
+     */
+    public function testForceNeverCrossesDownToAnOlderMajor(): void
+    {
+        $http = self::described(['v0.14.0']);
+
+        $choice = $this->locator($http, '1.0.0')->locate(false, true);
+
+        self::assertNull($choice->release());
+        self::assertSame([], $choice->notes());
+        self::assertSame([self::URL], $http->requested(), 'an older major is decided from the tag alone');
+    }
+
+    /**
      * @param int<1, max> $count
      *
      * @return list<array<string, mixed>> releases 0.1.($first + $count - 1) down to 0.1.$first, newest
