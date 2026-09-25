@@ -144,18 +144,18 @@ are not listed here even though the area-B Infection config covers `src/Composer
 
 ### src/Config/ConfigSchema.php
 
-- `src/Config/ConfigSchema.php:44` LogicalOr (both mutants) — the PHPStan narrowing the source comment
+- `src/Config/ConfigSchema.php:41` LogicalOr (both mutants) — the PHPStan narrowing the source comment
   describes. Every error justinrainbow/json-schema produces is an array carrying string `property` and
   `message`, so no `extra.lockrot` can make the three operands disagree and no input reaches the
   `continue`.
-- `src/Config/ConfigSchema.php:56` ReturnRemoval — dropping the memo makes `schema()` re-read and
+- `src/Config/ConfigSchema.php:53` ReturnRemoval — dropping the memo makes `schema()` re-read and
   re-decode `resources/lockrot-config.schema.json` and return an equal object; nothing compares the
   schema by identity, so validation behaves identically and only the number of reads differs. Making
   that observable means removing or unreading a tracked resource file *while Infection runs the suite
   in parallel processes against it*, which would make other mutants fail for the wrong reason. This is
   the weakest equivalence claim in this list: the memo saves one 2 KB read per process, and removing
   it instead of documenting it is a defensible alternative.
-- `src/Config/ConfigSchema.php:60` LogicalOr — `!is_file($path) && !is_readable($path)`: the two
+- `src/Config/ConfigSchema.php:57` LogicalOr — `!is_file($path) && !is_readable($path)`: the two
   operands disagree only for a file that exists and cannot be read, which a file shipped inside the
   package never is. Even then the next guard raises a `ConfigException` when `file_get_contents()`
   returns false, so the method still refuses to run on an unreadable schema.
@@ -212,7 +212,7 @@ The memo changes how often the work is done, not what it answers.
 
 - `src/Allowlist/AllowlistEntry.php:37` AssignCoalesce — `self::$parser ??= new VersionParser()`;
   VersionParser is stateless, so a fresh one normalises identically.
-- `src/Baseline/BaselineSchema.php:72` ReturnRemoval — dropping the early `return self::$schema`
+- `src/Baseline/BaselineSchema.php:76` ReturnRemoval — dropping the early `return self::$schema`
   re-reads and re-decodes the same bundled schema file and reassigns it.
 - `src/Graph/DependencyGraph.php:116` ReturnRemoval — dropping the early
   `return $this->trees[$root]` recomputes the BFS tree of immutable edges and gets the same map.
@@ -223,7 +223,7 @@ The memo changes how often the work is done, not what it answers.
   `$validator->getErrors()`. Every error justinrainbow/json-schema produces is an array with string
   `property` and `message`, so all three operands are false and `&&` agrees with `||` whichever
   pair is joined. The guard exists for PHPStan, as its own comment says.
-- `src/Baseline/BaselineSchema.php:76` LogicalOr — `!is_file($path) || !is_readable($path)` on
+- `src/Baseline/BaselineSchema.php:80` LogicalOr — `!is_file($path) || !is_readable($path)` on
   `resources/lockrot-baseline.schema.json`, a file shipped inside the package. No test can make it
   missing or unreadable, and both operands are false for the file that is there.
 - `src/Filesystem/AtomicWriter.php:43` FunctionCallRemoval — `error_clear_last()` before the write

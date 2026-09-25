@@ -57,10 +57,10 @@
     //    ComposerHttpClient.php:119 (substr of a host longer than 4) and :175 (`?? 0` on a ?int),
     //    LockrotCommand.php:612 and :205 (getcwd() false only in a removed working directory).
     //  - Memoisation of a pure function: AllowlistEntry.php:37 (VersionParser is stateless),
-    //    BaselineSchema.php:72, ConfigSchema.php:56, DependencyGraph.php:116 (recomputed, equal answer).
-    //  - Branches the shipped inputs cannot enter: BaselineSchema.php:43 x2 and ConfigSchema.php:44 x2
+    //    BaselineSchema.php:76, ConfigSchema.php:53, DependencyGraph.php:116 (recomputed, equal answer).
+    //  - Branches the shipped inputs cannot enter: BaselineSchema.php:43 x2 and ConfigSchema.php:41 x2
     //    (the PHPStan narrowing over json-schema errors, which are always arrays of strings),
-    //    BaselineSchema.php:76 and ConfigSchema.php:60 (a schema shipped in the package is never
+    //    BaselineSchema.php:80 and ConfigSchema.php:57 (a schema shipped in the package is never
     //    unreadable), AtomicWriter.php:43 (was BaselineFile.php:112; error_clear_last before a write
     //    that records its own warning), ProjectIgnoreList.php:72
     //    ((int) of the whole YYYY-MM-DD match is the year), HttpResult.php:85 (getLastErrors() is false
