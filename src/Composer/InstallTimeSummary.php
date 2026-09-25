@@ -24,6 +24,7 @@ use Lockrot\Exception\InstallBlockedException;
 use Lockrot\Lock\LockedPackage;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
+use Lockrot\Output\ConsoleMarkup;
 use Lockrot\Output\InstallSummaryFormatter;
 use Lockrot\Output\TerminalText;
 
@@ -151,7 +152,10 @@ final class InstallTimeSummary
         $report = $this->withBaseline($report, \dirname($composerFile), $lockrot, $lock);
         $lines = (new InstallSummaryFormatter())->format($report);
         if ($lines !== []) {
-            $event->getIO()->writeError($lines);
+            // Raw, rendered by lockrot: the block quotes the lock, which is not console markup
+            // (see ConsoleMarkup).
+            $decorated = $event->getIO()->isDecorated();
+            $event->getIO()->writeErrorRaw(array_map(static fn (string $line): string => ConsoleMarkup::render($line, $decorated), $lines));
         }
 
         // isExecutingOperations() is false for a dry run, where nothing is about to land on disk and

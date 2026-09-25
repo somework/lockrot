@@ -401,18 +401,19 @@ final class LockrotCommandTest extends TestCase
     }
 
     /**
-     * Only `table` is written through the tag formatter; every machine-readable format goes out
-     * with OUTPUT_RAW, so a `<` in a constraint or a package name can never be eaten as a console
-     * tag on its way to a parser (OutputInterface::OUTPUT_RAW is 2 in both symfony/console 5.4 and
-     * 2.8).
+     * `table` is not written through Symfony's tag formatter either: lockrot renders its markup
+     * (ConsoleMarkup) and writes the result with OUTPUT_RAW, as every machine-readable format goes
+     * out, so a `<` in a constraint or a package name can never be read as a console tag
+     * (OutputInterface::OUTPUT_RAW is 2 in both symfony/console 5.4 and 2.8).
      */
-    public function testTheTableFormatIsWrittenThroughTheFormatter(): void
+    public function testTheTableFormatIsRenderedByLockrotAndWrittenRaw(): void
     {
         chdir(__DIR__.'/../../fixtures/apps/wallabag_wallabag');
         [$code, $stdout, $options] = $this->runRecordingWriteOptions(['--target-php' => '8.4'], $this->loader());
 
         self::assertSame(0, $code, $stdout);
-        self::assertSame([OutputInterface::OUTPUT_NORMAL], $options);
+        self::assertSame([OutputInterface::OUTPUT_RAW], $options);
+        self::assertStringNotContainsString('<options=bold>', $stdout);
     }
 
     /** @return iterable<string, array{0: string}> */
@@ -1013,6 +1014,48 @@ final class LockrotCommandTest extends TestCase
             self::assertStringEndsWith("\033[39;49m", $line);
         }
         self::assertStringStartsWith("\033[37;41mlockrot: extra.lockrot is invalid:", $lines[0]);
+    }
+
+    /**
+     * A package name is the lock's text. The table and `--explain` are written past Symfony's tag
+     * formatter, rendered by lockrot, so a name that looks like markup prints as written, on a
+     * decorated stdout too, and the formatter — which on symfony/console 5.4 threw on `<<fg=red>>`,
+     * turning the report into exit 2 — is not even asked.
+     *
+     * @dataProvider namesThatLookLikeMarkup
+     */
+    #[DataProvider('namesThatLookLikeMarkup')]
+    public function testAPackageNameThatLooksLikeMarkupPrintsAsWrittenInTheTableAndTheExplanation(string $name): void
+    {
+        $project = $this->tempDir('lockrot-markup-name-');
+        file_put_contents($project.'/composer.json', (string) json_encode([
+            'name' => 'lockrot/markup-name-test',
+            'require' => [$name => '1.0.0'],
+            'extra' => ['lockrot' => ['target-php' => '8.4']],
+        ]));
+        file_put_contents($project.'/composer.lock', (string) json_encode(['packages' => [['name' => $name, 'version' => '1.0.0']], 'packages-dev' => []]));
+        chdir($project);
+
+        foreach ([false, true] as $decorated) {
+            $formatter = new MarkupRefusingFormatter('1.0.0', $decorated);
+            [$code, $stdout] = $this->runWithErrorOutput(['--all' => true], new BufferedOutput(), $formatter);
+            self::assertSame(0, $code, $stdout);
+            self::assertStringContainsString('  unknown      '.$name.' 1.0.0  direct', $stdout);
+            self::assertStringStartsWith($decorated ? "\033[1mnot flagged (1)\033[22m\n" : "not flagged (1)\n", $stdout);
+
+            [$code, $stdout] = $this->runWithErrorOutput(['--explain' => $name], new BufferedOutput(), $formatter);
+            self::assertSame(0, $code, $stdout);
+            self::assertStringStartsWith($decorated ? "\033[1m".$name." 1.0.0\033[22m — unknown" : $name.' 1.0.0 — unknown', $stdout);
+        }
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function namesThatLookLikeMarkup(): iterable
+    {
+        yield 'a style tag' => ['acme/<<fg=red>>'];
+        yield 'a link tag' => ['acme/<<href=x>>'];
+        yield 'an escaped tag' => ['acme/a\\<b'];
+        yield 'a trailing backslash' => ['acme/a\\'];
     }
 
     /**

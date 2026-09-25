@@ -29,9 +29,9 @@ use Lockrot\Data\Http\CachingHttpClient;
 use Lockrot\Data\Php\PhpReleaseDates;
 use Lockrot\Data\Repository\RepositoryMetadataLoader;
 use Lockrot\Deadline;
+use Lockrot\Output\TerminalText;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Verdict\VerdictEngine;
-use Symfony\Component\Console\Formatter\OutputFormatter;
 
 /**
  * Builds the analyzer and its HTTP stack from Composer's own IO, Config and repositories.
@@ -128,7 +128,10 @@ final class ServiceFactory
 
                 return true;
             } catch (\Throwable $e) {
-                $io->writeError('<warning>lockrot: Bitbucket OAuth token request failed, continuing without credentials: '.OutputFormatter::escape($e->getMessage()).'</warning>', true, IOInterface::VERBOSE);
+                // Raw, past Composer's formatter: the transport's message is not console markup
+                // (see TerminalText), and what a terminal would obey in it is shown instead.
+                $line = 'lockrot: Bitbucket OAuth token request failed, continuing without credentials: '.TerminalText::neutralise($e->getMessage());
+                $io->writeErrorRaw(TerminalText::warning($line, $io->isDecorated()), true, IOInterface::VERBOSE);
 
                 return false;
             }

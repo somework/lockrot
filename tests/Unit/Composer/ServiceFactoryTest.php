@@ -25,6 +25,7 @@ use Lockrot\Data\Http\HttpResult;
 use Lockrot\Deadline;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
+use Lockrot\Tests\Support\MarkupRefusingFormatter;
 use Lockrot\Tests\Support\RecordingIO;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -294,13 +295,12 @@ final class ServiceFactoryTest extends TestCase
     }
 
     /**
-     * A refused exchange says so at -v and nowhere else: one `<warning>`-wrapped line, ending in a
-     * newline of its own, carrying the transport's message — the only clue a user has for why the
-     * Bitbucket rows came back capped.
+     * A refused exchange says so at -v and nowhere else: one line, ending in a newline of its own,
+     * carrying the transport's message — the only clue a user has for why the Bitbucket rows came
+     * back capped.
      *
-     * The message is read before Composer's formatter sees it, because an undecorated formatter
-     * strips the tags and would render `<warning>text` and `text</warning>` the same way as the
-     * correct `<warning>text</warning>`.
+     * The line is written raw, past Composer's formatter, so the message is recorded as it reaches
+     * the terminal: an undecorated output carries no tag and no colour at all.
      */
     public function testARefusedBitbucketExchangeIsOneWarningLineAtVerbose(): void
     {
@@ -312,10 +312,32 @@ final class ServiceFactoryTest extends TestCase
         self::assertFalse(ServiceFactory::bitbucketAuthorizer($io, $config, Deadline::never(), static fn (): RecordingTokenDownloader => $downloader)());
 
         $message = $io->onlyError();
-        self::assertStringStartsWith('<warning>lockrot: Bitbucket OAuth token request failed, continuing without credentials: ', $message);
+        self::assertStringStartsWith('lockrot: Bitbucket OAuth token request failed, continuing without credentials: ', $message);
         self::assertStringContainsString('HTTP 401', $message);
-        self::assertStringEndsWith('</warning>', $message);
+        self::assertStringNotContainsString('<', $message);
         self::assertStringEndsWith("\n", $io->getOutput(), 'the warning is a line of its own, not glued onto whatever Composer prints next');
+    }
+
+    /**
+     * The transport's message is not console markup: the line never reaches Composer's formatter,
+     * which on symfony/console 5.4 threw on a `<<fg=red>>` that OutputFormatter::escape() left
+     * half-live. It is coloured by lockrot, whole, in the `warning` style, with nothing in the
+     * message a terminal would obey.
+     */
+    public function testARefusalMessageThatLooksLikeMarkupNeverReachesTheFormatter(): void
+    {
+        $config = self::bitbucketConfig();
+        $io = new BufferIO('', OutputInterface::VERBOSITY_VERBOSE, new MarkupRefusingFormatter('refused', true));
+        $io->setAuthentication('bitbucket.org', 'key', 'secret');
+
+        self::assertFalse(ServiceFactory::bitbucketAuthorizer($io, $config, Deadline::never(), static function (): HttpDownloader {
+            throw new \RuntimeException("refused by <<fg=red>> <<href=x>> a\\<b\e[2J");
+        })());
+
+        self::assertSame(
+            "\033[30;43mlockrot: Bitbucket OAuth token request failed, continuing without credentials: refused by <<fg=red>> <<href=x>> a\\<b\\x1B[2J\033[39;49m\n",
+            $io->getOutput()
+        );
     }
 
     /** At the default verbosity the failure is silent: an install prints the compact block, not Composer plumbing. */

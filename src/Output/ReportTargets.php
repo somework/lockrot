@@ -9,7 +9,6 @@ use Lockrot\Exception\ConfigException;
 use Lockrot\Filesystem\AtomicWriter;
 use Lockrot\Filesystem\Path;
 use Lockrot\Html\PageData;
-use Symfony\Component\Console\Formatter\OutputFormatter;
 
 /**
  * The files one run writes its report to: every `--output=<format>:<path>`, checked before the
@@ -156,8 +155,8 @@ final class ReportTargets
      * Renders and writes every file, in the order given, calling $onWritten after each one.
      *
      * Each file is what `--format=<its format>` prints for the same report and context. The format
-     * that carries console markup ({@see Formatters::carriesConsoleMarkup()}) is passed through the
-     * same non-decorating formatter a redirected stdout gets: no colours, no tags, the brackets back
+     * that carries console markup ({@see Formatters::carriesConsoleMarkup()}) is rendered the way a
+     * redirected stdout renders it ({@see ConsoleMarkup::render()}): no colours, no tags, the brackets back
      * as the evidence wrote them.
      *
      * @param callable(ReportTarget): void $onWritten
@@ -171,7 +170,7 @@ final class ReportTargets
             self::refuseSameFileAs($target, \array_slice($this->targets, 0, $index));
             $contents = Formatters::for($target->format(), $context, $page)->format($report, $showAll);
             if (Formatters::carriesConsoleMarkup($target->format())) {
-                $contents = (string) (new OutputFormatter(false))->format($contents);
+                $contents = ConsoleMarkup::render($contents, false);
             }
             AtomicWriter::write($target->path(), $contents, $target->displayPath());
             $onWritten($target);

@@ -676,6 +676,39 @@ final class InstallTimeSummaryTest extends TestCase
         self::assertStringNotContainsString('check skipped', $output);
     }
 
+    /**
+     * The block quotes the lock — names, versions, evidence, chains — and is written past Composer's
+     * formatter, rendered by lockrot: a formatter that refuses the block is not even asked, and the
+     * block is printed rather than turned into "check skipped".
+     */
+    public function testTheBlockNeverReachesTheFormatter(): void
+    {
+        $this->project();
+        $io = new BufferIO('', StreamOutput::VERBOSITY_NORMAL, new MarkupRefusingFormatter('phpzip/phpzip'));
+        $event = $this->event($io, new Transaction([], [$this->loadPackage(self::PHPZIP)]));
+
+        (new InstallTimeSummary($this->analyzerFactory()))->onPreOperationsExec($event);
+
+        $output = $io->getOutput();
+        self::assertStringStartsWith("lockrot: dependency rot in 1 of 1 changed package\n", $output);
+        self::assertStringContainsString("\n  silent      phpzip/phpzip 2.0.8: ", $output);
+        self::assertStringNotContainsString('check skipped', $output);
+    }
+
+    /** Decorated, the block has the colours Composer's formatter gave it: the header in `warning`, the verdict in `comment`. */
+    public function testTheBlockIsColouredWhenTheOutputIsDecorated(): void
+    {
+        $this->project();
+        $io = new BufferIO('', StreamOutput::VERBOSITY_NORMAL, new OutputFormatter(true));
+        $event = $this->event($io, new Transaction([], [$this->loadPackage(self::PHPZIP)]));
+
+        (new InstallTimeSummary($this->analyzerFactory()))->onPreOperationsExec($event);
+
+        $output = $io->getOutput();
+        self::assertStringStartsWith("\033[30;43mlockrot: dependency rot in 1 of 1 changed package\033[39;49m\n  \033[33msilent      \033[39mphpzip/phpzip 2.0.8: ", $output);
+        self::assertStringEndsWith("\nRun composer lockrot for details.\n", $output);
+    }
+
     /** Written raw, the line is coloured by lockrot itself, in Composer's `warning` style, when the output is decorated. */
     public function testTheWarningIsColouredWhenTheOutputIsDecorated(): void
     {

@@ -407,7 +407,8 @@ and so is the one the Windows-alias refusal added (259 mutants, 5 escapes, after
   `mixed`, and a `foreach` over `mixed` is not something PHPStan lets through.
 - `src/Output/ReportTargets.php:174` CastString — `(string)` around `OutputFormatter::format()`,
   which symfony/console types `?string` and returns null only for a null message; the table
-  formatter always hands it a string. The cast is for the type.
+  formatter always hands it a string. The cast is for the type. (Gone since the table is rendered by
+  `ConsoleMarkup`, which returns a string: the cast and its mutant went with the formatter call.)
 - `src/Filesystem/Path.php:41` CastString — `(string) preg_replace(...)` in `isWindowsAlias()`, the
   shape of the `RepoLocator` cast above: preg_replace returns null only when the pattern fails to
   compile, and this one is a literal. The cast is for the type.

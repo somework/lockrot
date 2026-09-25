@@ -30,6 +30,7 @@ use Lockrot\Filesystem\Path;
 use Lockrot\Html\PageData;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
+use Lockrot\Output\ConsoleMarkup;
 use Lockrot\Output\ExplainFormatter;
 use Lockrot\Output\FormatContext;
 use Lockrot\Output\Formatters;
@@ -292,13 +293,15 @@ final class LockrotCommand extends BaseCommand
             // one throws ConfigException from here, which the catch below turns into exit 2 the
             // same way an unreadable lock does a few lines up.
             $context = FormatContext::create($lockPath, $lockrot->failOn(), Version::STRING, TerminalWidth::detect($env, $this->getApplication()), $cwd);
-            // Only the format that carries console markup goes through the tag formatter; every
-            // machine-readable one is written raw, so a `<` in a constraint or a package name reaches
-            // the parser on the other end untouched.
+            // Every format is written raw: the one that carries console markup is rendered by
+            // lockrot rather than Symfony's tag formatter (see ConsoleMarkup), every
+            // machine-readable one as it is, so a `<` in a constraint or a package name reaches
+            // the terminal or the parser on the other end untouched.
+            $rendered = Formatters::for($format, $context, $page)->format($report, $showAll);
             $output->write(
-                Formatters::for($format, $context, $page)->format($report, $showAll),
+                Formatters::carriesConsoleMarkup($format) ? ConsoleMarkup::render($rendered, $output->isDecorated()) : $rendered,
                 false,
-                Formatters::carriesConsoleMarkup($format) ? OutputInterface::OUTPUT_NORMAL : OutputInterface::OUTPUT_RAW
+                OutputInterface::OUTPUT_RAW
             );
             // After stdout, so the report is in the log even when a file cannot be written.
             $this->writeReports($output, $targets, $report, $fileContext, $page, $showAll);
@@ -357,11 +360,11 @@ final class LockrotCommand extends BaseCommand
         }
         $explanation = new Explanation($finding, $facts, $lockrot->thresholds(), $lockrot->targetPhp(), $analysis->report());
         $formatter = new ExplainFormatter();
-        if ($format === 'json') {
-            $output->write($formatter->json($explanation), false, OutputInterface::OUTPUT_RAW);
-        } else {
-            $output->write($formatter->text($explanation));
-        }
+        $output->write(
+            $format === 'json' ? $formatter->json($explanation) : ConsoleMarkup::render($formatter->text($explanation), $output->isDecorated()),
+            false,
+            OutputInterface::OUTPUT_RAW
+        );
 
         return Policy::EXIT_OK;
     }

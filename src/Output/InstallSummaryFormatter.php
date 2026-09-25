@@ -17,11 +17,15 @@ use Lockrot\Verdict\Verdict;
  * succeeded prints nothing at all, so silence always means "checked, and clean".
  *
  * {@see MAX_LINES} counts logical lines — one array entry in the returned list, one line as
- * IOInterface::writeError() writes it — not rendered terminal rows; a long evidence line can still
+ * IOInterface::writeErrorRaw() writes it — not rendered terminal rows; a long evidence line can still
  * wrap past one row in a narrow terminal.
  *
- * Unlike {@see TableFormatter} this returns lines rather than a rendered string, because
- * IOInterface::writeError() takes string|string[] and applies Composer's own styling to each.
+ * Unlike {@see TableFormatter} this returns lines rather than one string, because
+ * IOInterface::writeErrorRaw() takes string|string[] and writes each as a line of its own. Each line
+ * is {@see ConsoleMarkup} for {@see ConsoleMarkup::render()}, written raw: never Composer's
+ * formatter, which cannot be trusted with the lock's text ({@see ConsoleMarkup} says why) and whose
+ * sanitising a raw write skips. What the lock and the repository wrote is therefore neutralised
+ * ({@see TerminalText::neutralise()}) as well as escaped.
  *
  * @internal
  */
@@ -65,7 +69,7 @@ final class InstallSummaryFormatter
             $lines[] = \sprintf('  … and %d more', $omitted);
         }
         foreach ($notes as $note) {
-            $lines[] = '  note: '.$note;
+            $lines[] = '  note: '.self::text($note);
         }
         $lines[] = self::FOOTER;
 
@@ -89,7 +93,7 @@ final class InstallSummaryFormatter
             ? \sprintf('<warning>lockrot: %d changed %s checked, one check incomplete</warning>', $checked, $checked === 1 ? 'package' : 'packages')
             : \sprintf('<warning>lockrot: %d of %d changed %s could not be checked</warning>', $unknown, $checked, $checked === 1 ? 'package' : 'packages')];
         foreach (\array_slice($report->notes(), 0, self::MAX_NOTES) as $note) {
-            $lines[] = '  note: '.$note;
+            $lines[] = '  note: '.self::text($note);
         }
         $lines[] = self::FOOTER;
 
@@ -114,12 +118,15 @@ final class InstallSummaryFormatter
     private function findingLine(Finding $finding): string
     {
         return \sprintf(
-            '  <comment>%-12s</comment>%s %s: %s%s',
+            '  <comment>%-12s</comment>%s',
             $finding->verdict(),
-            $finding->package(),
-            $finding->version(),
-            $finding->ownEvidence(),
-            Via::suffix($finding, ' > ', false)
+            self::text($finding->package().' '.$finding->version().': '.$finding->ownEvidence().Via::suffix($finding, ' > ', false))
         );
+    }
+
+    /** Text lockrot did not write, as markup that prints it as written and obeys nothing in it. */
+    private static function text(string $text): string
+    {
+        return ConsoleMarkup::escape(TerminalText::neutralise($text));
     }
 }

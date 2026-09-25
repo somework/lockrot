@@ -13,7 +13,6 @@ use Lockrot\Json\Schemas;
 use Lockrot\Signal\Signal;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
-use Symfony\Component\Console\Formatter\OutputFormatter;
 
 /**
  * `--explain <package>`: one package, every signal with its raw data, and the facts the signals
@@ -24,6 +23,9 @@ use Symfony\Component\Console\Formatter\OutputFormatter;
  * The text is meant to be read top to bottom: the verdict and how the package is reached, then
  * what fired, then the data — a reader who disagrees with a signal finds the number it was
  * computed from two blocks down, in the same units the signal used.
+ *
+ * The text is {@see ConsoleMarkup}, with every piece of the lock's and the repository's text
+ * escaped, for {@see ConsoleMarkup::render()} rather than Symfony's tag formatter.
  *
  * @internal
  */
@@ -415,6 +417,6 @@ final class ExplainFormatter
 
     private static function escape(string $text): string
     {
-        return OutputFormatter::escape($text);
+        return ConsoleMarkup::escape($text);
     }
 }

@@ -196,6 +196,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- A package name, a version, a constraint or a note that looked like console markup could break the
+  report or restyle it. The table, `--explain` and a `table` file escaped that text with Symfony's
+  `OutputFormatter::escape()`, which on the symfony/console 5.4 inside Composer's PHARs and
+  lockrot's own leaves the second `<` of `<<` live: a lock entry with `<<fg=red>>` in it could throw
+  (`Invalid "red>" color`, exit `2` and no report), `<<href=…>>` opened a terminal link, a long run
+  of `<b` let a style run on past its row, and `a\<b` lost its backslash. The install-time block
+  and the `-v` Bitbucket token warning did not escape the text at all. lockrot now renders these
+  itself instead of handing them to Symfony's or Composer's formatter, on every console version
+  alike (2.8 in Composer 2.2 LTS, 5.4 and later): the lock's text prints as written, with the same
+  colours and layout as before and nothing running on into the next line. As they are now written
+  past Composer's own sanitising, the install-time block and the Bitbucket warning show a control
+  character in that text as an escape (`\x1B`, `\n`) rather than passing it to the terminal.
+
 - A configuration error from `composer lockrot`, and the install-time `check skipped` line, print
   their message as written instead of handing it to Symfony's tag formatter: a message quoting text
   from outside lockrot, such as an `--explain` argument like `<fg=red>x`, restyled the line instead
@@ -206,8 +219,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   with `<info>` in it, an exception's message, the `-v` stack trace — lost that part, because it went
   through the console's tag formatter unescaped. Every line `composer lockrot` prints on stderr now
   goes past the formatter, as the configuration errors above do, and every line `lockrot.phar
-  self-update` prints is escaped for it, as is the Bitbucket token warning; each is printed as it
-  was.
+  self-update` prints is escaped for it; each is printed as it was.
 
 - The baseline is now written through a temporary file created exclusively, so a file or symlink
   already at that name fails the write instead of being followed, and a baseline that is replaced

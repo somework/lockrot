@@ -273,6 +273,36 @@ final class PharTest extends TestCase
     }
 
     /**
+     * The same console, handed a package name like `<<fg=red>>` in the table or `--explain`: escaped
+     * by OutputFormatter::escape(), the second `<` stayed live. lockrot renders both itself, so
+     * the name prints as written, and a `table` file carries it the same way.
+     */
+    public function testAPackageNameThatLooksLikeMarkupPrintsAsWrittenFromThePhar(): void
+    {
+        $dir = $this->freshDir();
+        $names = ['acme/<<fg=red>>', 'acme/<<href=https://example.com>>', 'acme/a\\<b'];
+        $packages = [];
+        foreach ($names as $name) {
+            $packages[] = ['name' => $name, 'version' => '1.0.0'];
+        }
+        file_put_contents($dir.'/composer.json', (string) json_encode(['name' => 'acme/markup-name', 'require' => array_fill_keys($names, '1.0.0')]));
+        file_put_contents($dir.'/composer.lock', (string) json_encode(['packages' => $packages, 'packages-dev' => []]));
+
+        $process = $this->runPhar(['--offline', '--all', '--output=table:r.txt'], $dir);
+
+        self::assertSame(0, $process->getExitCode(), $process->getErrorOutput());
+        foreach ($names as $name) {
+            self::assertStringContainsString('  unknown      '.$name.' 1.0.0  direct', $process->getOutput());
+            self::assertStringContainsString('  unknown      '.$name.' 1.0.0  direct', (string) file_get_contents($dir.'/r.txt'));
+        }
+
+        $explained = $this->runPhar(['--offline', '--explain=acme/<<fg=red>>'], $dir);
+
+        self::assertSame(0, $explained->getExitCode(), $explained->getErrorOutput());
+        self::assertStringStartsWith('acme/<<fg=red>> 1.0.0 — unknown', $explained->getOutput());
+    }
+
+    /**
      * `-d` makes the project directory the working directory before lockrot runs, so a relative
      * `--output` path lands in the project, not in the directory the PHAR was started from — the
      * same base a relative `--baseline` has. The table file carries no console markup.
