@@ -14,8 +14,9 @@ use PHPUnit\Framework\TestCase;
  * `@internal` tag, which PHPStan and IDEs report when another package uses it, except the one class
  * Composer loads by name.
  *
- * The scan reads tokens rather than reflecting classes, so it loads nothing from src/ and runs the
- * same on PHP 7.4 and 8.x, whose tokenizers spell a namespace differently.
+ * The declaration scan reads tokens rather than reflecting classes, so it loads nothing from src/ and
+ * runs the same on PHP 7.4 and 8.x, whose tokenizers spell a namespace differently. Only the
+ * plugin-method check reflects LockrotPlugin.
  */
 final class PublicApiTest extends TestCase
 {
