@@ -36,6 +36,11 @@ Header, one line per flagged package (most severe first), at most two notes, foo
 list is cut with `… and N more`. The budget counts lines as written, not rendered terminal rows — a
 long evidence line may still wrap past one row in a narrow terminal.
 
+An `extra.lockrot` key lockrot does not know adds one `lockrot: unknown key …` line above the block,
+outside its ten ([Unknown keys](configuration.md#unknown-keys)). It follows the block's own rules:
+nothing with `install-time` off, under `LOCKROT_DISABLE`, or for a transaction that installs or
+updates nothing, and it never stops the install.
+
 The order is the report's own: [priority](verdicts.md) first, so the ten lines go to the packages
 that apply most directly to the project.
 

@@ -369,3 +369,23 @@ its slashes unescaped. Two are equivalent:
   byte can reach it today. The flags are there so that stays true if the title ever grows a value
   from the lock, and a test cannot tell the difference until it does.
 
+
+## Unknown `extra.lockrot` keys (0.13.0)
+
+Measured over the branch's changed lines (`--git-diff-lines` against `origin/main`, which takes in
+the two new classes whole and the two call sites): 94 mutants, 92 killed, MSI = Covered MSI 97%. The
+first pass escaped one more, a real gap — nothing had two unknown keys in `ignore` entries, so
+returning only the first went unseen; a test with three across two entries kills it. Two are
+equivalent, both on the guard in front of `levenshtein()`:
+
+- `src/Config/UnknownKeys.php:130` GreaterThan (`strlen($key) > 255` → `>=`) — `nearest()` gives up
+  on a key of exactly 255 bytes instead of measuring it. Measured, it would come back empty anyway:
+  it is at least 236 edits from the longest known key (19 bytes), far past the third of 255 the
+  threshold allows, and no known key is long enough to contain it. Every length the mutant moves to
+  the early return gets the same `null` the loop would give.
+- `src/Config/UnknownKeys.php:131` ReturnRemoval — without the early return a key longer than 255
+  bytes reaches `levenshtein()`. On PHP 8, where Infection runs, that function measures strings of
+  any length, finds no known key within reach (by the same arithmetic) and returns no suggestion, so
+  the result is the same. The guard is for PHP 7.4, whose `levenshtein()` emits a warning and returns
+  `-1` past 255 bytes, and `-1` is within any threshold: `UnknownKeysTest::testAVeryLongKeyGetsNoSuggestion()`
+  fails without it on the 7.4 leg of the test matrix, which Infection does not run.

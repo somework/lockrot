@@ -21,6 +21,7 @@ use Lockrot\Baseline\BaselineFile;
 use Lockrot\Clock;
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Config\Policy;
+use Lockrot\Config\UnknownKeyWarnings;
 use Lockrot\Data\Forge\Tokens;
 use Lockrot\Deadline;
 use Lockrot\Exception\ConfigException;
@@ -61,10 +62,14 @@ final class LockrotCommand extends BaseCommand
      */
     private ?array $envSnapshot = null;
 
+    /** Prints each unknown `extra.lockrot` key once; the process-wide guard unless a test hands in its own. */
+    private UnknownKeyWarnings $unknownKeys;
+
     /** @param null|callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, Tokens, Clock, Deadline, ?string): Analyzer $analyzerFactory */
-    public function __construct(?callable $analyzerFactory = null)
+    public function __construct(?callable $analyzerFactory = null, ?UnknownKeyWarnings $unknownKeys = null)
     {
         $this->analyzerFactory = $analyzerFactory ?? [ServiceFactory::class, 'createAnalyzer'];
+        $this->unknownKeys = $unknownKeys ?? UnknownKeyWarnings::process();
         parent::__construct('lockrot');
     }
 
@@ -175,6 +180,11 @@ final class LockrotCommand extends BaseCommand
                 $this->writeError($output, 'lockrot disabled via LOCKROT_DISABLE');
 
                 return Policy::EXIT_OK;
+            }
+            // Here and not in initialize(), which reads the same manifest: once per run, on stderr
+            // only, after LOCKROT_DISABLE and after a config error has had its say. Never a failure.
+            foreach ($this->unknownKeys->lines($project->lockrotExtra()) as $line) {
+                $this->writeError($output, $line);
             }
             $lockPath = $cwd.'/composer.lock';
             if (!is_file($lockPath)) {

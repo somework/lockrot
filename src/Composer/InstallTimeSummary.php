@@ -16,6 +16,7 @@ use Lockrot\Baseline\BaselineFile;
 use Lockrot\Clock;
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Config\Policy;
+use Lockrot\Config\UnknownKeyWarnings;
 use Lockrot\Data\Forge\Tokens;
 use Lockrot\Deadline;
 use Lockrot\Exception\ConfigException;
@@ -48,10 +49,14 @@ final class InstallTimeSummary
     /** @var callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, Tokens, Clock, Deadline, ?string): Analyzer */
     private $analyzerFactory;
 
+    /** Prints each unknown `extra.lockrot` key once; the process-wide guard unless a test hands in its own. */
+    private UnknownKeyWarnings $unknownKeys;
+
     /** @param null|callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, Tokens, Clock, Deadline, ?string): Analyzer $analyzerFactory */
-    public function __construct(?callable $analyzerFactory = null)
+    public function __construct(?callable $analyzerFactory = null, ?UnknownKeyWarnings $unknownKeys = null)
     {
         $this->analyzerFactory = $analyzerFactory ?? [ServiceFactory::class, 'createAnalyzer'];
+        $this->unknownKeys = $unknownKeys ?? UnknownKeyWarnings::process();
     }
 
     public function onPreOperationsExec(InstallerEvent $event): void
@@ -99,6 +104,11 @@ final class InstallTimeSummary
         $packages = TransactionPackages::fromTransaction($transaction);
         if ($packages === []) {
             return;
+        }
+        // Gated like the block itself: not under LOCKROT_DISABLE, not with install-time off, not for
+        // a transaction that installs nothing. Above the block, and never a reason to stop.
+        foreach ($this->unknownKeys->lines($project->lockrotExtra()) as $line) {
+            $event->getIO()->writeError($line);
         }
 
         // By the time this event fires, `composer require`/`update` has already written the new lock

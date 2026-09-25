@@ -16,6 +16,7 @@ use Lockrot\Clock;
 use Lockrot\Composer\LockrotCommand;
 use Lockrot\Composer\ServiceFactory;
 use Lockrot\Config\LockrotConfig;
+use Lockrot\Config\UnknownKeyWarnings;
 use Lockrot\Data\Forge\ActivityClient;
 use Lockrot\Data\Forge\ActivityFetchPlanner;
 use Lockrot\Data\Forge\ForgeAuth;
@@ -125,14 +126,14 @@ final class LockrotCommandTest extends TestCase
         };
     }
 
-    private function command(?MetadataLoaderInterface $loader = null): LockrotCommand
+    private function command(?MetadataLoaderInterface $loader = null, ?UnknownKeyWarnings $warnings = null): LockrotCommand
     {
         $loader ??= $this->emptyLoader();
         $factory = static function (IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, Tokens $tokens, Clock $clock) use ($loader): Analyzer {
             return self::testAnalyzer($loader, $lockrot, $clock);
         };
 
-        return $this->buildCommand($factory);
+        return $this->buildCommand($factory, $warnings);
     }
 
     /** The analyzer every test factory in this class builds: fixture metadata and recorded GitHub envelopes, never the network. */
@@ -154,9 +155,9 @@ final class LockrotCommandTest extends TestCase
     }
 
     /** @param callable(IOInterface, Config, list<\Composer\Repository\RepositoryInterface>, LockrotConfig, Tokens, Clock): Analyzer $factory */
-    private function buildCommand(callable $factory): LockrotCommand
+    private function buildCommand(callable $factory, ?UnknownKeyWarnings $warnings = null): LockrotCommand
     {
-        return $this->register(new LockrotCommand($factory));
+        return $this->register(new LockrotCommand($factory, $warnings));
     }
 
     /** The command the plugin registers: no analyzer factory, so its own default wiring is used. */
@@ -221,11 +222,12 @@ final class LockrotCommandTest extends TestCase
      *
      * @return array{0: int, 1: string, 2: string} exit code, stdout, stderr
      *
-     * @param null|MetadataLoaderInterface $loader the in-memory default when null, as in tester()
+     * @param null|MetadataLoaderInterface $loader   the in-memory default when null, as in tester()
+     * @param null|UnknownKeyWarnings      $warnings the process-wide guard when null, as in the plugin
      */
-    private function runWithSplitStreams(array $args, ?MetadataLoaderInterface $loader = null): array
+    private function runWithSplitStreams(array $args, ?MetadataLoaderInterface $loader = null, ?UnknownKeyWarnings $warnings = null): array
     {
-        $command = $this->command($loader);
+        $command = $this->command($loader, $warnings);
         $input = new ArrayInput($args, $command->getDefinition());
         $errorOutput = new BufferedOutput();
         $output = new class ($errorOutput) extends BufferedOutput implements ConsoleOutputInterface {
@@ -795,6 +797,147 @@ final class LockrotCommandTest extends TestCase
         self::assertSame(2, $code);
         self::assertSame('', $stdout);
         self::assertStringContainsString('fail-on', $stderr);
+    }
+
+    /**
+     * A writable copy of a fixture project whose composer.json carries $extraLockrot as its
+     * `extra.lockrot`, with the working directory moved into it.
+     *
+     * @param array<string, mixed> $extraLockrot
+     */
+    private function fixtureCopyWithConfig(string $lockPath, array $extraLockrot): string
+    {
+        $dir = $this->tempDir('lockrot-unknown-keys-');
+        $source = \dirname($lockPath);
+        copy($source.'/composer.lock', $dir.'/composer.lock');
+        $this->writeLockrotConfig($dir, $source, $extraLockrot);
+        chdir($dir);
+
+        return $dir;
+    }
+
+    /** @param array<string, mixed> $extraLockrot */
+    private function writeLockrotConfig(string $dir, string $source, array $extraLockrot): void
+    {
+        $manifest = $this->readJsonFile($source.'/composer.json');
+        $extra = $manifest['extra'] ?? [];
+        self::assertIsArray($extra);
+        $extra['lockrot'] = $extraLockrot;
+        $manifest['extra'] = $extra;
+        file_put_contents($dir.'/composer.json', (string) json_encode($manifest, \JSON_UNESCAPED_SLASHES));
+    }
+
+    /**
+     * An unknown key is one line on stderr naming the key it was probably meant to be, and nothing
+     * else: the same report byte for byte, the same exit code. The manifest is read twice per run
+     * (initialize() and execute()), so the count also pins that the line is not printed twice.
+     */
+    public function testAnUnknownKeyWarnsOnceOnStderrAndChangesNothingElse(): void
+    {
+        $dir = $this->fixtureCopyWithConfig(self::LARAVEL_LOCK, ['target-php' => '8.4']);
+        [$cleanCode, $cleanStdout, $cleanStderr] = $this->runWithSplitStreams(['--format' => 'json'], $this->loader(), new UnknownKeyWarnings());
+        $this->writeLockrotConfig($dir, \dirname(self::LARAVEL_LOCK), ['target-php' => '8.4', 'install-tme' => 'off', 'x-ci' => 1, 'extensions' => ['acme/x' => ['k' => 1]]]);
+
+        [$code, $stdout, $stderr] = $this->runWithSplitStreams(['--format' => 'json'], $this->loader(), new UnknownKeyWarnings());
+
+        self::assertSame(0, $cleanCode, $cleanStderr);
+        self::assertStringNotContainsString('unknown key', $cleanStderr);
+        self::assertSame($cleanCode, $code, $stderr);
+        self::assertSame($cleanStdout, $stdout);
+        self::assertIsArray(json_decode($stdout, true));
+        self::assertSame(1, substr_count($stderr, 'extra.lockrot.'), $stderr);
+        self::assertStringContainsString('lockrot: unknown key extra.lockrot.install-tme ignored (did you mean install-time?)', $stderr);
+    }
+
+    public function testAnUnknownKeyNeverChangesTheExitCode(): void
+    {
+        $this->fixtureCopyWithConfig(self::WALLABAG_LOCK, ['fail-on' => 'silent', 'target-php' => '8.4', 'slack-webhook' => 'https://example.com']);
+
+        [$code, $stdout, $stderr] = $this->runWithSplitStreams(['--format' => 'json'], $this->loader(), new UnknownKeyWarnings());
+
+        self::assertSame(1, $code, $stderr);
+        self::assertIsArray(json_decode($stdout, true), $stdout);
+        self::assertStringContainsString('lockrot: unknown key extra.lockrot.slack-webhook ignored', $stderr);
+    }
+
+    public function testLockrotDisableSilencesTheUnknownKeyWarning(): void
+    {
+        $this->fixtureCopyWithConfig(self::LARAVEL_LOCK, ['install-tme' => 'off']);
+        putenv('LOCKROT_DISABLE=1');
+        try {
+            [$code, $stdout, $stderr] = $this->runWithSplitStreams(['--format' => 'json'], null, new UnknownKeyWarnings());
+        } finally {
+            putenv('LOCKROT_DISABLE');
+        }
+
+        self::assertSame(0, $code);
+        self::assertSame('', $stdout);
+        self::assertStringContainsString('disabled', $stderr);
+        self::assertStringNotContainsString('unknown key', $stderr);
+    }
+
+    /** A config the schema rejects is exit 2 with the schema's message; the unknown key is not reached. */
+    public function testASchemaErrorIsReportedWithoutTheUnknownKeyWarning(): void
+    {
+        $this->fixtureCopyWithConfig(self::LARAVEL_LOCK, ['install-tme' => 'off', 'fail-on' => 'dead']);
+
+        [$code, $stdout, $stderr] = $this->runWithSplitStreams([], null, new UnknownKeyWarnings());
+
+        self::assertSame(2, $code);
+        self::assertSame('', $stdout);
+        self::assertStringContainsString('extra.lockrot is invalid:', $stderr);
+        self::assertStringNotContainsString('unknown key', $stderr);
+    }
+
+    public function testExplainStillPrintsCleanJsonWithAnUnknownKey(): void
+    {
+        $this->fixtureCopyWithConfig(self::LARAVEL_LOCK, ['target-php' => '8.4', 'install-tme' => 'off']);
+
+        [$code, $stdout, $stderr] = $this->runWithSplitStreams(['--explain' => 'brick/math', '--format' => 'json'], $this->loader(), new UnknownKeyWarnings());
+
+        self::assertSame(0, $code, $stderr);
+        self::assertIsArray(json_decode($stdout, true), $stdout);
+        self::assertStringContainsString('lockrot: unknown key extra.lockrot.install-tme ignored', $stderr);
+    }
+
+    public function testASecondRunInTheSameProcessDoesNotRepeatTheWarning(): void
+    {
+        $this->fixtureCopyWithConfig(self::LARAVEL_LOCK, ['target-php' => '8.4', 'install-tme' => 'off']);
+        $warnings = new UnknownKeyWarnings();
+
+        [, , $first] = $this->runWithSplitStreams(['--format' => 'json'], $this->loader(), $warnings);
+        [$code, $stdout, $second] = $this->runWithSplitStreams(['--format' => 'json'], $this->loader(), $warnings);
+
+        self::assertStringContainsString('unknown key extra.lockrot.install-tme', $first);
+        self::assertStringNotContainsString('unknown key', $second);
+        self::assertSame(0, $code, $second);
+        self::assertIsArray(json_decode($stdout, true), $stdout);
+    }
+
+    /**
+     * The command the plugin registers shares the process-wide guard with the install-time summary,
+     * so a line that summary already printed is not printed again.
+     */
+    public function testTheDefaultWiringUsesTheProcessWideGuard(): void
+    {
+        $this->fixtureCopyWithConfig(self::LARAVEL_LOCK, ['target-php' => '8.4', 'lockrot-command-default-guard' => 1]);
+        UnknownKeyWarnings::process()->lines(['lockrot-command-default-guard' => 1]);
+
+        [$code, , $stderr] = $this->runWithSplitStreams(['--format' => 'json'], $this->loader());
+
+        self::assertSame(0, $code, $stderr);
+        self::assertStringNotContainsString('unknown key', $stderr);
+    }
+
+    /** A guard handed in is the one used: what the process-wide one printed is not its business. */
+    public function testAGuardHandedInIsTheOneUsed(): void
+    {
+        $this->fixtureCopyWithConfig(self::LARAVEL_LOCK, ['target-php' => '8.4', 'lockrot-command-own-guard' => 1]);
+        UnknownKeyWarnings::process()->lines(['lockrot-command-own-guard' => 1]);
+
+        [, , $stderr] = $this->runWithSplitStreams(['--format' => 'json'], $this->loader(), new UnknownKeyWarnings());
+
+        self::assertStringContainsString('unknown key extra.lockrot.lockrot-command-own-guard ignored', $stderr);
     }
 
     /**

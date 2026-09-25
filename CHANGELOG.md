@@ -84,11 +84,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   on without it is an error naming the tag, and SECURITY.md now describes the key rotation it makes
   possible, with today's fingerprint, and why a compromised key is not rotated that way: every
   archive carrying it is replaced by hand.
+
 - The release workflow checks each release's self-update signature, and the key its
   `lockrot.phar.meta.json` names, against the key the previous release carries — the one every
   archive in the field verifies it with — instead of the key in the source tree. A rotation that
   skips its transition release now fails the build, and the transition release itself passes
   without any check switched off.
+
+- A warning for an `extra.lockrot` key lockrot does not know. The config accepted any key and
+  ignored the ones it does not read, so a typo changed nothing and said nothing: `install-tme: off`
+  left the install-time block printing, `failOn` left the build ungated, and an `ignore` entry's
+  `expire` made a temporary ignore permanent. Each unknown key now gets one line on stderr, with the
+  known key it was probably meant to be when one is close —
+  `lockrot: unknown key extra.lockrot.install-tme ignored (did you mean install-time?)` — the
+  closeness rule being Symfony Console's own "Did you mean" for a mistyped command. `composer lockrot`
+  and the PHAR print it on every run, and the install-time summary above its block, gated like the
+  block (not with `install-time` off, not for a transaction that installs nothing); one process
+  prints a line once, and `LOCKROT_DISABLE` silences it. Nothing else about the run changes — the
+  same report, the same exit code, nothing on stdout — and the config schema is untouched, so no
+  `composer.json` that worked before stops working. `extensions` and keys starting with `x-` are
+  reserved, for the configuration of extensions and for your own tooling, and are never warned about;
+  a project that keeps its own data under `extra.lockrot` can move it under `x-` to stay quiet.
 
 ## [0.12.0] - 2026-09-24
 

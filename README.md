@@ -206,7 +206,10 @@ which win over `composer.json`.
 | — | `--explain=vendor/package` | | One package: its verdict, every signal with its raw data, and the repository facts behind them; exit 0 |
 
 `extra.lockrot` is validated against
-[`resources/lockrot-config.schema.json`](resources/lockrot-config.schema.json). Package metadata comes
+[`resources/lockrot-config.schema.json`](resources/lockrot-config.schema.json). A key lockrot does not
+know is not an error: it gets one line on stderr, with the known key it was probably meant to be, and
+the run carries on unchanged; `extensions` and keys starting with `x-` are reserved and stay quiet.
+Package metadata comes
 from the repositories configured in your `composer.json`, through Composer's own repository layer —
 Private Packagist, Satis and mirrors included, with its authentication, proxy settings and metadata
 cache. Repository activity comes from GitHub, GitLab and Bitbucket Cloud and is cached for 24 hours.

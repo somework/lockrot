@@ -25,9 +25,10 @@ CLI options win over environment variables, which win over `composer.json`.
 
 The shape of `extra.lockrot` is validated against its published JSON schema,
 [`https://lockrot.dev/schema/config-1.json`](https://lockrot.dev/schema/config-1.json)
-(`resources/lockrot-config.schema.json` in the repository; see [schema.md](schema.md)). Unknown keys are
-allowed, but the keys below must have the listed type — in particular, the four threshold keys must
-be JSON integers (`3`, not `"3"`).
+(`resources/lockrot-config.schema.json` in the repository; see [schema.md](schema.md)). The keys below
+must have the listed type — in particular, the four threshold keys must be JSON integers (`3`, not
+`"3"`). A key lockrot does not know is still accepted, but no longer silently: see
+[Unknown keys](#unknown-keys).
 
 ## `extra.lockrot` keys
 
@@ -45,6 +46,44 @@ be JSON integers (`3`, not `"3"`).
 | `release-warn-years` / `release-high-years` | `3` / `5` | Integer thresholds for "no stable release" (S2) and "no stable release on the installed branch" (S8) |
 | `push-warn-years` / `push-high-years` | `3` / `5` | Integer thresholds for "no repository push or commit" (S4) |
 | `ignore` | `[]` | Project allowlist, see below |
+
+### Unknown keys
+
+A key lockrot does not read changes nothing, so a typo used to go unnoticed: `install-tme: off` left
+the install-time summary printing, `failOn` left the build ungated, and an ignore entry's `expire`
+made a temporary ignore permanent. lockrot now names each such key with one line on stderr, and the
+known key it was probably meant to be when one is close:
+
+```text
+lockrot: unknown key extra.lockrot.install-tme ignored (did you mean install-time?)
+lockrot: unknown key extra.lockrot.slack-webhook ignored
+lockrot: unknown key extra.lockrot.ignore[1].expire ignored (did you mean expires?)
+```
+
+- A key is close when it is at most a third of its own length in edits away from a known key, or
+  when a known key contains it (three characters or more: `dev` suggests `include-dev`), compared in
+  lower case. The fewest edits wins, and a tie goes to the alphabetically first key. Nothing close
+  means no suggestion rather than a far-fetched one. This is the rule Symfony Console, and so
+  Composer, uses for a mistyped command.
+- The keys of each `ignore` entry are checked against `package`, `reason`, `version` and `expires`.
+- It is a warning and nothing more: the run goes on, the report and the exit code are exactly what
+  they would be without the key, and stdout carries nothing of it, whatever the format. The key is
+  still valid as far as the [schema](schema.md) is concerned, so a `composer.json` that worked keeps
+  working.
+- Two namespaces are reserved and never warned about. `extensions` (top level) is for the
+  configuration of extensions; lockrot does not read, walk or validate what it holds. Any key
+  starting with `x-` (`x-ci`, `x-owner`, or `x-ticket` inside an `ignore` entry), in lower case, is
+  for your own tooling and notes; lockrot will never give such a key a meaning. The `LOCKROT_X_*`
+  environment variables are reserved the same way.
+- `composer lockrot` and the PHAR print the lines on every run, `--explain` and
+  `--generate-baseline` included. The [install-time summary](install-time.md) prints them above its
+  block, under the same conditions as the block itself: not with `install-time` off, and not for a
+  transaction that installs or updates nothing. `LOCKROT_DISABLE` silences them everywhere, and so
+  does `-q`. One process prints a line once, however often it reads `composer.json`.
+- A key the schema rejects is a configuration error (exit `2`) before this check runs, so an `ignore`
+  entry that misspells a required key (`reasn`) shows the schema's message, not the suggestion. A
+  top-level key PHP reads as an integer (`"5"`) is dropped before the check and is not named.
+- The environment is not checked: lockrot reads only the variables documented below.
 
 ## Environment overrides
 

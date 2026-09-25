@@ -189,6 +189,26 @@ final class PluginTest extends TestCase
         self::assertDirectoryDoesNotExist($this->dir.'/vendor/phpzip');
     }
 
+    /**
+     * Through the real plugin: one rendered warning line on stderr (Composer's `<warning>` style, no
+     * literal tag), the report on stdout, and the run otherwise unchanged. `x-ci` is reserved and stays
+     * quiet.
+     */
+    public function testAnUnknownKeyIsWarnedAboutThroughThePlugin(): void
+    {
+        $this->createProject(['install-tme' => 'off', 'x-ci' => true]);
+        $this->install();
+
+        $run = $this->composer(['lockrot', '--format=json', '--offline'], [], 120);
+
+        $stderr = $run->getErrorOutput();
+        self::assertSame(0, $run->getExitCode(), $stderr);
+        self::assertIsArray(json_decode($run->getOutput(), true), $stderr.$run->getOutput());
+        self::assertSame(1, substr_count($stderr, 'lockrot: unknown key extra.lockrot.install-tme ignored (did you mean install-time?)'), $stderr);
+        self::assertStringNotContainsString('x-ci', $stderr);
+        self::assertStringNotContainsString('<warning>', $stderr);
+    }
+
     public function testLockrotDisableSkipsTheInstallTimeSummary(): void
     {
         $this->createProject(['target-php' => '8.4']);

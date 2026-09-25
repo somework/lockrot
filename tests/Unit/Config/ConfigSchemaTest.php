@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Config;
 
 use Lockrot\Config\ConfigSchema;
+use Lockrot\Config\UnknownKeys;
 use Lockrot\Exception\ConfigException;
+use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Verdict\FailOn;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -80,6 +82,62 @@ final class ConfigSchemaTest extends TestCase
     {
         ConfigSchema::validate(['totally-unknown-key' => 'value']);
         $this->addToAssertionCount(1);
+    }
+
+    /** The reserved names are unknown keys like any other to the schema: accepted, whatever they hold. */
+    public function testReservedKeysStillValidate(): void
+    {
+        ConfigSchema::validate(['extensions' => ['acme/x' => ['k' => 1]], 'x-ci' => 'y']);
+        ConfigSchema::validate(['extensions' => 'anything', 'ignore' => [['package' => 'a/b', 'reason' => 'r', 'x-ticket' => 'ACME-1']]]);
+        $this->addToAssertionCount(2);
+    }
+
+    /**
+     * The unknown-key warning knows the settings from a hand-written list; the schema is the
+     * contract. Sorted on both sides because the list is kept in alphabetical order, which is what
+     * breaks a tie between two equally near keys.
+     */
+    public function testTheKnownKeysAreExactlyTheSchemaProperties(): void
+    {
+        $keys = array_keys(self::schemaProperties());
+        sort($keys);
+
+        self::assertSame($keys, UnknownKeys::KNOWN);
+    }
+
+    public function testTheKnownIgnoreKeysAreExactlyTheIgnoreItemProperties(): void
+    {
+        $ignore = self::schemaProperties()['ignore'] ?? null;
+        self::assertIsArray($ignore);
+        $keys = array_keys(JsonPath::arrayAt($ignore, ['items', 'properties']));
+        sort($keys);
+
+        self::assertSame($keys, UnknownKeys::KNOWN_IN_IGNORE);
+    }
+
+    /** The warning walks one level down, into `ignore` entries: a second nested object would go unchecked. */
+    public function testIgnoreIsTheOnlyNestedObjectInTheSchema(): void
+    {
+        $nested = [];
+        foreach (self::schemaProperties() as $name => $property) {
+            self::assertIsArray($property);
+            $items = $property['items'] ?? [];
+            self::assertIsArray($items);
+            if (isset($property['properties']) || isset($items['properties'])) {
+                $nested[] = $name;
+            }
+        }
+
+        self::assertSame(['ignore'], $nested);
+    }
+
+    /** @return array<array-key, mixed> */
+    private static function schemaProperties(): array
+    {
+        $schema = json_decode((string) file_get_contents(__DIR__.'/../../../resources/lockrot-config.schema.json'), true);
+        self::assertIsArray($schema);
+
+        return JsonPath::arrayAt($schema, ['properties']);
     }
 
     /**

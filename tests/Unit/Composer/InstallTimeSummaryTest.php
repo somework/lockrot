@@ -21,6 +21,7 @@ use Lockrot\Analyzer\Analyzer;
 use Lockrot\Clock;
 use Lockrot\Composer\InstallTimeSummary;
 use Lockrot\Config\LockrotConfig;
+use Lockrot\Config\UnknownKeyWarnings;
 use Lockrot\Data\Forge\ActivityClient;
 use Lockrot\Data\Forge\ActivityFetchPlanner;
 use Lockrot\Data\Forge\ForgeAuth;
@@ -611,6 +612,109 @@ final class InstallTimeSummaryTest extends TestCase
         self::assertStringNotContainsString('install-time check skipped', $output);
         self::assertStringContainsString('lockrot: dependency rot in 1 of 1 changed package', $output);
         self::assertStringContainsString('phpzip/phpzip 2.0.8', $output);
+    }
+
+    /** `install-tme: off` is the typo nobody would understand from the install: the block keeps printing. */
+    public function testAnUnknownKeyIsWarnedAboutAboveTheBlock(): void
+    {
+        $this->project(['install-tme' => 'off']);
+        $io = new RecordingIO();
+        $event = $this->event($io, new Transaction([], [$this->loadPackage(self::PHPZIP)]));
+
+        (new InstallTimeSummary($this->analyzerFactory(), new UnknownKeyWarnings()))->onPreOperationsExec($event);
+
+        self::assertGreaterThan(1, \count($io->errors), implode("\n", $io->errors));
+        self::assertSame('<warning>lockrot: unknown key extra.lockrot.install-tme ignored (did you mean install-time?)</warning>', $io->errors[0]);
+        self::assertStringContainsString('lockrot: dependency rot in 1 of 1 changed package', $io->errors[1]);
+    }
+
+    /** The warning is about the config, not about what the transaction found: a clean one still says it. */
+    public function testAnUnknownKeyIsWarnedAboutWhenNothingIsFlagged(): void
+    {
+        $this->project(['slack-webhook' => 'https://example.com'], [self::PSR_LOG]);
+        $io = new RecordingIO();
+        $event = $this->event($io, new Transaction([], [$this->loadPackage(self::PSR_LOG)]));
+
+        (new InstallTimeSummary($this->analyzerFactory(), new UnknownKeyWarnings()))->onPreOperationsExec($event);
+
+        self::assertSame('<warning>lockrot: unknown key extra.lockrot.slack-webhook ignored</warning>', $io->onlyError());
+    }
+
+    /** With install-time correctly off, the project asked for silence and gets it, unknown key or not. */
+    public function testInstallTimeOffStaysSilentDespiteAnUnknownKey(): void
+    {
+        $this->project(['install-time' => 'off', 'slack-webhook' => 'https://example.com']);
+        $io = new BufferIO();
+        $event = $this->event($io, new Transaction([], [$this->loadPackage(self::PHPZIP)]));
+
+        (new InstallTimeSummary($this->analyzerFactory(), new UnknownKeyWarnings()))->onPreOperationsExec($event);
+
+        self::assertSame('', $io->getOutput());
+    }
+
+    public function testLockrotDisableSilencesTheUnknownKeyWarning(): void
+    {
+        $this->project(['install-tme' => 'off']);
+        $io = new BufferIO();
+        $event = $this->event($io, new Transaction([], [$this->loadPackage(self::PHPZIP)]));
+
+        putenv('LOCKROT_DISABLE=1');
+        try {
+            (new InstallTimeSummary($this->analyzerFactory(), new UnknownKeyWarnings()))->onPreOperationsExec($event);
+        } finally {
+            putenv('LOCKROT_DISABLE');
+        }
+
+        self::assertSame('', $io->getOutput());
+    }
+
+    /** `composer remove` and a no-op install print no block, and no warning either. */
+    public function testAnUninstallOnlyTransactionPrintsNoUnknownKeyWarning(): void
+    {
+        $this->project(['install-tme' => 'off']);
+        $io = new BufferIO();
+        $event = $this->event($io, new Transaction([$this->loadPackage(self::PHPZIP)], []));
+
+        (new InstallTimeSummary($this->analyzerFactory(), new UnknownKeyWarnings()))->onPreOperationsExec($event);
+
+        self::assertSame('', $io->getOutput());
+    }
+
+    public function testASecondTransactionInTheSameProcessDoesNotRepeatTheWarning(): void
+    {
+        $this->project(['install-tme' => 'off'], [self::PSR_LOG]);
+        $warnings = new UnknownKeyWarnings();
+        $first = new RecordingIO();
+        $second = new RecordingIO();
+
+        (new InstallTimeSummary($this->analyzerFactory(), $warnings))->onPreOperationsExec($this->event($first, new Transaction([], [$this->loadPackage(self::PSR_LOG)])));
+        (new InstallTimeSummary($this->analyzerFactory(), $warnings))->onPreOperationsExec($this->event($second, new Transaction([], [$this->loadPackage(self::PSR_LOG)])));
+
+        self::assertCount(1, $first->errors);
+        self::assertSame([], $second->errors);
+    }
+
+    /** Constructed the way the plugin constructs it, the summary shares the process-wide guard. */
+    public function testTheDefaultWiringUsesTheProcessWideGuard(): void
+    {
+        $this->project(['install-time-default-guard' => 1], [self::PSR_LOG]);
+        UnknownKeyWarnings::process()->lines(['install-time-default-guard' => 1]);
+        $io = new RecordingIO();
+
+        (new InstallTimeSummary($this->analyzerFactory()))->onPreOperationsExec($this->event($io, new Transaction([], [$this->loadPackage(self::PSR_LOG)])));
+
+        self::assertSame([], $io->errors);
+    }
+
+    public function testAGuardHandedInIsTheOneUsed(): void
+    {
+        $this->project(['install-time-own-guard' => 1], [self::PSR_LOG]);
+        UnknownKeyWarnings::process()->lines(['install-time-own-guard' => 1]);
+        $io = new RecordingIO();
+
+        (new InstallTimeSummary($this->analyzerFactory(), new UnknownKeyWarnings()))->onPreOperationsExec($this->event($io, new Transaction([], [$this->loadPackage(self::PSR_LOG)])));
+
+        self::assertSame(['<warning>lockrot: unknown key extra.lockrot.install-time-own-guard ignored</warning>'], $io->errors);
     }
 
     public function testAnUninstallOnlyTransactionNeverBuildsAnAnalyzer(): void

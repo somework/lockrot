@@ -216,6 +216,30 @@ final class PharTest extends TestCase
     }
 
     /**
+     * The PHAR runs the same command on Composer's application, so the warning renders there too:
+     * one line on stderr in Composer's `<warning>` style rather than a literal tag, and stdout still
+     * the report alone.
+     */
+    public function testThePharWarnsAboutAnUnknownKeyOnStderr(): void
+    {
+        $dir = $this->freshDir();
+        file_put_contents($dir.'/composer.json', (string) json_encode([
+            'name' => 'acme/unknown-key',
+            'extra' => ['lockrot' => ['install-tme' => 'off', 'x-ci' => true, 'extensions' => ['acme/x' => ['k' => 1]]]],
+        ]));
+        file_put_contents($dir.'/composer.lock', (string) json_encode(['packages' => [], 'packages-dev' => []]));
+
+        $process = $this->runPhar(['--format=json', '--offline'], $dir);
+
+        $stderr = $process->getErrorOutput();
+        self::assertSame(0, $process->getExitCode(), $stderr);
+        self::assertIsArray(json_decode($process->getOutput(), true), $stderr);
+        self::assertSame(1, substr_count($stderr, 'lockrot: unknown key extra.lockrot.install-tme ignored (did you mean install-time?)'), $stderr);
+        self::assertSame(1, substr_count($stderr, 'extra.lockrot.'), $stderr);
+        self::assertStringNotContainsString('<warning>', $stderr);
+    }
+
+    /**
      * A real self-update, end to end: a real PHAR replaces itself with a different, valid archive
      * and then has to finish. Everything up to the swap is covered by unit tests; what only a
      * separate process can show is what happens afterwards, when the code the running archive still
