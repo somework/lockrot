@@ -10,7 +10,7 @@
 # printed one character at a time behind a bare prompt); the run itself is real.
 set -euo pipefail
 gif=$(cd "$(dirname "$0")/.." && pwd)/docs/assets/lockrot-demo.gif
-work=$(mktemp -d -t lockrot-demo)
+work=$(mktemp -d "${TMPDIR:-/tmp}/lockrot-demo.XXXXXX")
 trap 'rm -rf "$work"' EXIT
 cast="$work/demo.cast"
 : "${LOCKROT_DEMO_DIR:?export LOCKROT_DEMO_DIR}"

@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Records the documents an earlier lockrot release wrote, for tests/Integration/SchemaEvolutionTest:
-# its `--format=json` report and a few `--explain … --format=json` documents over wallabag's lock.
+# the baseline file its `--generate-baseline` writes, its `--format=json` report compared against
+# that baseline, and a few `--explain … --format=json` documents, over wallabag's lock.
 #
 #   GITHUB_TOKEN=$(gh auth token) bin/record-schema-evolution <version> <today>
 #
@@ -9,15 +10,22 @@
 #
 # The PHAR comes from the GitHub release and is checked three ways before it runs: its sha256
 # against lockrot.phar.sha256, its GPG signature against lockrot-release-key.asc (with gpgv and a
-# throwaway keyring, never yours), and its build attestation with `gh attestation verify`. It runs
-# with network and GITHUB_TOKEN, over a copy of tests/fixtures/apps/wallabag_wallabag in a scratch
-# directory (nothing is written into tests/fixtures but the result), with an empty Composer cache of
-# its own, so what it writes is what that release writes for a user on a fresh machine.
+# throwaway keyring, never yours; a revoked signing key fails, an expired one does not, since an
+# older release was signed by a subkey that has expired since), and its build attestation with
+# `gh attestation verify`. It runs with network and GITHUB_TOKEN, over a copy of
+# tests/fixtures/apps/wallabag_wallabag in a scratch directory (nothing is written into
+# tests/fixtures but the result).
+#
+# Caches: the baseline run fills a Composer cache of its own, and the report run starts from another,
+# empty one, so the report is what that release writes on a fresh machine — every answer fetched in
+# the run, `activity_cache_oldest_at: null`. The explanations run after it on the cache it filled,
+# as a second run on that machine would, so they carry `from_cache: true`.
 #
 # A recorded version is frozen: the script refuses a version whose directory exists. A document
 # there that stops validating is a compatibility break to raise, not a fixture to refresh.
 # `provenance.json` next to the documents names the release, the PHAR's sha256, the PHP that ran it,
-# the arguments of every run and the sha256 of every file written.
+# the arguments of every run and the sha256 of every file written; SchemaEvolutionTest pins the
+# sha256 of provenance.json itself and the release asset's digest.
 set -euo pipefail
 
 usage='usage: GITHUB_TOKEN=$(gh auth token) bin/record-schema-evolution <version> <today>'
@@ -34,13 +42,14 @@ lock=tests/fixtures/apps/wallabag_wallabag
 fingerprint=39ECC3F64AE8D06A9A63FD99AB6F7F52AE513141
 target_php=8.4
 # Relative on purpose: the report prints the baseline path as given, so an absolute one would
-# carry the scratch directory into the document.
+# carry the scratch directory into the document. The file is kept under this same name.
 baseline=lockrot-schema-evolution-baseline.json
-# Packages whose explanations, between them, carry every signal and every verdict wallabag's lock
-# has (measured 2026-09-25): abandoned (doctrine/cache), abandoned with an archived repository
+# Packages whose explanations, between them, carry every signal wallabag's lock has (measured
+# 2026-09-25): abandoned (doctrine/cache), abandoned with an archived repository
 # (sensio/framework-extra-bundle), a pinned branch snapshot (wallabag/rulerz), silent with S5
 # (javibravo/simpleue), left-behind with S8, and S10 from 0.11.0 on (scheb/2fa-backup-code),
-# left-behind with a security advisory (spomky-labs/otphp).
+# left-behind with a security advisory (spomky-labs/otphp). Not every verdict or priority: the
+# report carries those, and the schema widening check covers what no recording does.
 packages=(doctrine/cache sensio/framework-extra-bundle wallabag/rulerz javibravo/simpleue scheb/2fa-backup-code spomky-labs/otphp)
 
 if [[ -e $out ]]; then
@@ -48,9 +57,10 @@ if [[ -e $out ]]; then
     exit 1
 fi
 
-work=$(mktemp -d -t lockrot-schema-evolution)
+# GNU and busybox mktemp want the X's in the template; BSD mktemp takes them too.
+work=$(mktemp -d "${TMPDIR:-/tmp}/lockrot-schema-evolution.XXXXXX")
 trap 'rm -rf "$work"' EXIT
-mkdir -p "$work/release" "$work/project" "$work/cache" "$work/home" "$work/out/explain" "$work/log"
+mkdir -p "$work/release" "$work/project" "$work/cache-baseline" "$work/cache" "$work/home" "$work/out/explain" "$work/log"
 mkdir -m 700 "$work/gnupg"
 
 echo "downloading v$version" >&2
@@ -58,9 +68,18 @@ gh release download "v$version" --repo somework/lockrot --dir "$work/release" \
     -p lockrot.phar -p lockrot.phar.sha256 -p lockrot.phar.asc
 (cd "$work/release" && shasum -a 256 -c lockrot.phar.sha256 >&2)
 # gpgv against a keyring holding the release key alone: no agent, and nothing touches your keyring.
+# gpgv does not look at revocations, but it reports them: REVKEYSIG in place of GOODSIG. VALIDSIG
+# ends with the primary key's fingerprint, anchored so the signature is this key's, not a key's
+# whose fingerprint merely contains it. EXPKEYSIG passes on purpose: the subkey that signed an
+# older release may have expired since, which does not make that signature any less its.
 GNUPGHOME=$work/gnupg gpg --batch --dearmor < "$root/lockrot-release-key.asc" > "$work/release-key.gpg"
-if ! gpgv --keyring "$work/release-key.gpg" --status-fd 1 "$work/release/lockrot.phar.asc" "$work/release/lockrot.phar" 2>/dev/null \
-    | grep "^\[GNUPG:\] VALIDSIG .*$fingerprint" >/dev/null; then
+gpgv --keyring "$work/release-key.gpg" --status-fd 1 "$work/release/lockrot.phar.asc" "$work/release/lockrot.phar" \
+    > "$work/log/gpg-status" 2>/dev/null || true
+if grep -q '^\[GNUPG:\] REVKEYSIG ' "$work/log/gpg-status"; then
+    echo "lockrot.phar of v$version is signed by a revoked key" >&2
+    exit 1
+fi
+if ! grep -Eq "^\[GNUPG:\] VALIDSIG [0-9A-F]{40} .* $fingerprint\$" "$work/log/gpg-status"; then
     echo "lockrot.phar of v$version is not signed by $fingerprint" >&2
     exit 1
 fi
@@ -71,11 +90,12 @@ cp "$root/$lock/composer.json" "$root/$lock/composer.lock" "$work/project/"
 # The runs: "<file>\t<exit>\t<arg>\t<arg>…" per line, with the scratch copy named rather than located.
 runs=$work/log/runs.tsv
 : > "$runs"
+cache=$work/cache
 lockrot() {
     local file=$1 allowed=$2
     shift 2
     local status=0
-    env -i PATH="$PATH" HOME="$work/home" COMPOSER_HOME="$work/home" COMPOSER_CACHE_DIR="$work/cache" \
+    env -i PATH="$PATH" HOME="$work/home" COMPOSER_HOME="$work/home" COMPOSER_CACHE_DIR="$cache" \
         COMPOSER_NO_INTERACTION=1 LOCKROT_TODAY="${today}T00:00:00+00:00" GITHUB_TOKEN="$GITHUB_TOKEN" \
         "$php" -d display_errors=stderr "$work/release/lockrot.phar" -d "$work/project" --target-php="$target_php" --no-ansi "$@" \
         > "$work/log/stdout" 2> "$work/log/stderr" || status=$?
@@ -84,10 +104,7 @@ lockrot() {
         cat "$work/log/stderr" >&2
         exit 1
     fi
-    if [[ -n $file ]]; then
-        mv "$work/log/stdout" "$work/out/$file"
-    fi
-    local line="${file:-(baseline)}"$'\t'"$status" arg
+    local line="$file"$'\t'"$status" arg
     for arg in -d "<copy of $lock>" --target-php="$target_php" --no-ansi "$@"; do
         line+=$'\t'"$arg"
     done
@@ -95,50 +112,68 @@ lockrot() {
 }
 
 echo "recording with lockrot $version" >&2
-lockrot '' 0 --generate-baseline --baseline="$baseline"
+cache=$work/cache-baseline
+lockrot "$baseline" 0 --generate-baseline --baseline="$baseline"
+mv "$work/project/$baseline" "$work/out/$baseline"
+cp "$work/out/$baseline" "$work/project/$baseline"
+cache=$work/cache
 lockrot report.json '0 1' --format=json --baseline="$baseline"
+mv "$work/log/stdout" "$work/out/report.json"
+# A quoted `~`: bash 4.3 and later tilde-expand an unquoted one in the replacement to $HOME.
+tilde='~'
 for package in "${packages[@]}"; do
-    lockrot "explain/${package/\//~}.json" 0 --explain="$package" --format=json
+    file="explain/${package/\//$tilde}.json"
+    lockrot "$file" 0 --explain="$package" --format=json
+    mv "$work/log/stdout" "$work/out/$file"
 done
 
-# Each document is JSON, names its schema first, says it was written by $version, and carries no
-# path of this machine and no token.
-for path in "$work"/out/report.json "$work"/out/explain/*.json; do
+# Each document is JSON, names its schema first, says it was written by $version under the schema
+# number its `$schema` names, and carries no path of this machine and no token. A path counts only
+# as a whole path: `/lockrot` is in every document's `https://lockrot.dev/…`, and HOME=/ is in all
+# of them.
+for path in "$work/out/$baseline" "$work"/out/report.json "$work"/out/explain/*.json; do
     case $path in
-        */report.json) schema=report ;;
-        *) schema=explain ;;
+        */report.json) kind=report ;;
+        */"$baseline") kind=baseline ;;
+        *) kind=explain ;;
     esac
     "$php" -r '
-        [, $path, $schema, $version] = $argv;
-        $json = file_get_contents($path);
-        $head = "{\n    \"\$schema\": \"https://lockrot.dev/schema/$schema-1.json\",\n";
+        [, $path, $kind, $version, $token] = $argv;
+        $paths = array_slice($argv, 5);
+        $json = (string) file_get_contents($path);
         $doc = json_decode($json, true);
-        if (strpos($json, $head) !== 0 || !is_array($doc) || ($doc["lockrot"]["version"] ?? null) !== $version) {
-            fwrite(STDERR, "$path is not a $schema-1 document written by $version\n");
+        $head = "{\n    \"\$schema\": \"https://lockrot.dev/schema/$kind-";
+        $number = is_array($doc) && preg_match("{^https://lockrot\\.dev/schema/$kind-([1-9][0-9]*)\\.json\$}", (string) ($doc["\$schema"] ?? ""), $m) === 1 ? (int) $m[1] : null;
+        if (strpos($json, $head) !== 0 || $number === null || ($doc["lockrot"]["version"] ?? null) !== $version || ($doc["lockrot"]["schema"] ?? null) !== $number) {
+            fwrite(STDERR, "$path is not a $kind document written by $version\n");
             exit(1);
         }
-    ' "$path" "$schema" "$version"
-    for secret in "$work" "$(cd "$work" && pwd -P)" "$root" "$HOME" "$GITHUB_TOKEN"; do
-        if grep -qF -- "$secret" "$path"; then
-            echo "$path carries a path of this machine or the token" >&2
-            exit 1
-        fi
-    done
+        if (strpos($json, $token) !== false) {
+            fwrite(STDERR, "$path carries the token\n");
+            exit(1);
+        }
+        foreach ($paths as $machine) {
+            $machine = rtrim($machine, "/");
+            if ($machine === "") {
+                continue;
+            }
+            foreach ([$machine, str_replace("/", "\\/", $machine)] as $form) {
+                if (preg_match("{(?<![\\w./\\\\-])".preg_quote($form, "{")."(?![\\w.-])}", $json) === 1) {
+                    fwrite(STDERR, "$path carries $machine, a path of this machine\n");
+                    exit(1);
+                }
+            }
+        }
+    ' "$path" "$kind" "$version" "$GITHUB_TOKEN" "$work" "$(cd "$work" && pwd -P)" "$root" "$HOME"
 done
 
 "$php" -r '
     [, $runs, $out, $version, $sha256, $today, $recorded, $lock, $targetPhp, $fingerprint] = $argv;
     $files = [];
-    $baseline = null;
     foreach (file($runs, FILE_IGNORE_NEW_LINES) as $line) {
         $fields = explode("\t", $line);
-        $run = ["args" => array_slice($fields, 2), "exit" => (int) $fields[1]];
         $file = $fields[0];
-        if ($file === "(baseline)") {
-            $baseline = $run;
-            continue;
-        }
-        $files[$file] = $run + ["sha256" => hash_file("sha256", $out."/".$file)];
+        $files[$file] = ["args" => array_slice($fields, 2), "exit" => (int) $fields[1], "sha256" => hash_file("sha256", $out."/".$file)];
     }
     $provenance = [
         "lockrot" => $version,
@@ -156,8 +191,7 @@ done
         "lock" => $lock,
         "network" => true,
         "github_token" => true,
-        "cache" => "empty at the start, shared with no other version",
-        "baseline" => $baseline,
+        "cache" => "the baseline run on a cache of its own; the report on an empty one, shared with no other version; the explanations on the cache the report filled",
         "files" => $files,
     ];
     file_put_contents($out."/provenance.json", json_encode($provenance, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)."\n");
