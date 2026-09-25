@@ -28,7 +28,9 @@ interface SignatureVerifierInterface
      * `lockrot.phar.meta.json` names for the key that signed it. {@see ReleaseLocator} passes over a
      * release whose key is not this one.
      *
-     * @throws ConfigException when the key is not one a fingerprint can be taken of
+     * @throws ConfigException when the key is not one a fingerprint can be taken of, or not one
+     *                         {@see verify()} could load: a fingerprint no release names would pass
+     *                         every release over instead of reporting the broken key
      */
     public function keyFingerprint(): string;
 }

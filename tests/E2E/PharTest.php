@@ -362,6 +362,28 @@ final class PharTest extends TestCase
         self::assertSame(hash_file('sha256', self::minimalPhar()), hash_file('sha256', $target));
     }
 
+    /**
+     * The same rotation with its transition release missing: the archive names the release it
+     * cannot verify, then says it is stranded and has to be reinstalled by hand — exit 2, for
+     * `--check` too, and the running archive untouched.
+     */
+    public function testTheBuiltArchiveSaysWhenARotationStrandsIt(): void
+    {
+        $directory = $this->freshDir();
+        $target = $this->installedCopy($directory);
+        $expected = 'lockrot '.self::offeredVersion().' is signed with a self-update key this lockrot.phar does not carry ('
+            .GitHubReleases::fingerprint(SigningKeys::otherPublicPem()).'); only a release that carries that key can update to it'."\n"
+            .'lockrot: the newer releases are signed with a self-update key this lockrot.phar does not carry, and no release it can install carries that key; download lockrot.phar again by hand and verify it (see https://lockrot.dev/phar/#reinstalling-by-hand)'."\n";
+
+        foreach ([[], ['--check']] as $options) {
+            $process = $this->runSelfUpdate($target, 'stranded', $options);
+
+            self::assertSame(2, $process->getExitCode(), $process->getErrorOutput());
+            self::assertSame($expected, self::reported($process));
+        }
+        self::assertSame(hash_file('sha256', $this->phar()), hash_file('sha256', $target));
+    }
+
     /** The transition release of the `rotated` channel: in the line, just below the offered one. */
     private static function transitionVersion(): string
     {
@@ -470,6 +492,7 @@ final class PharTest extends TestCase
                 [$minimal, self::offeredVersion(), self::SIGNED_BY_OTHER_KEY, $otherKey],
                 [$minimal, self::transitionVersion(), self::SIGNED_BY_RELEASE_KEY, $releaseKey],
             ],
+            'stranded' => [[$minimal, self::offeredVersion(), self::SIGNED_BY_OTHER_KEY, $otherKey]],
         ];
         foreach ($channels as $channel => $releases) {
             self::publishChannel($docroot, $server->url(), $channel, $releases);

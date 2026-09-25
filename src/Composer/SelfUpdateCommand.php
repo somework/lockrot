@@ -22,6 +22,7 @@ use Lockrot\SelfUpdate\ReleaseLocator;
 use Lockrot\SelfUpdate\ReleaseSignatureVerifier;
 use Lockrot\SelfUpdate\SignatureVerifierInterface;
 use Lockrot\Version;
+use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
@@ -35,10 +36,12 @@ use Symfony\Component\Console\Output\OutputInterface;
  * the project's vendor directory, where the way to update lockrot is `composer update`.
  *
  * Exit codes follow the rest of lockrot: 0 for a successful update or an already-current build, 2
- * for every error. `--check` adds one case of its own — exit 1 when an update is available — so a
- * scheduled CI job can notice a new release without this command ever writing to disk. A newer
- * major version alone is not an update without `--allow-major`: `--check` names it on a line of
- * its own and still exits 0.
+ * for every error. `--check` decides exactly as a plain run would and adds one case of its own —
+ * exit 1 when that run would install something — so a scheduled CI job can notice a new release
+ * without this command ever writing to disk; `--force` does not change what it reports. A newer
+ * release held back for its major version (without `--allow-major`) or its PHP floor is named on a
+ * line of its own and is still exit 0. An archive stranded by a key rotation is exit 2 under
+ * `--check` too, since no later run would change it ({@see ReleaseLocator::locate()}).
  *
  * Every message goes to stderr; stdout stays empty, as it does for every lockrot run that produces
  * no report.
@@ -146,42 +149,29 @@ final class SelfUpdateCommand extends BaseCommand
             }
 
             [$http, $token] = $this->httpAndToken();
-            $force = $input->getOption('force') === true;
+            $check = $input->getOption('check') === true;
+            // --check only ever reports: with --force as well it says what a plain run would do.
+            $force = !$check && $input->getOption('force') === true;
             $signatures = $this->signatures ?? new ReleaseSignatureVerifier(ReleaseKey::PEM);
-            $choice = (new ReleaseLocator($http, $signatures->keyFingerprint(), $token, $this->releaseUrl))
-                ->locate($input->getOption('allow-major') === true, $force);
-            // Every line is written before anything is installed; see PharUpdater on why nothing
-            // new may be loaded once the archive has been swapped.
-            foreach ($choice->notes() as $note) {
-                $this->writeError($output, $note);
+            $locator = new ReleaseLocator($http, $signatures->keyFingerprint(), $token, $this->releaseUrl);
+            try {
+                $release = $locator->locate($input->getOption('allow-major') === true, $force);
+            } finally {
+                // Every line is written before anything is installed — see PharUpdater on why
+                // nothing new may be loaded once the archive has been swapped — and also when the
+                // walk failed further down the list, so the error follows the reason a newer
+                // release was passed over.
+                foreach ($locator->notes() as $note) {
+                    $this->writeError($output, self::plain($note));
+                }
             }
             $upToDate = 'lockrot '.Version::STRING.' is up to date';
-            $release = $choice->release();
             if ($release === null) {
-                if ($force) {
-                    throw new ConfigException(\sprintf(
-                        'no release in the %d.x line can be installed by this lockrot.phar',
-                        ReleaseLocator::majorOf(Version::STRING)
-                    ));
-                }
                 $this->writeError($output, $upToDate);
 
                 return $exitOk;
             }
-            $updater = new PharUpdater(
-                $http,
-                $this->validator ?? new PharValidator(),
-                $signatures,
-                $phar,
-                Version::STRING
-            );
-
-            if ($input->getOption('check') === true) {
-                if (!$updater->isUpdateAvailable($release)) {
-                    $this->writeError($output, $upToDate);
-
-                    return $exitOk;
-                }
+            if ($check) {
                 // A release of the next major is one a plain self-update holds back, so the advice
                 // names the flag that reaches it.
                 $this->writeError($output, \sprintf(
@@ -193,17 +183,24 @@ final class SelfUpdateCommand extends BaseCommand
 
                 return $exitFindings;
             }
+            $updater = new PharUpdater(
+                $http,
+                $this->validator ?? new PharValidator(),
+                $signatures,
+                $phar,
+                Version::STRING
+            );
 
             $message = $updater->update($release, $force);
             $this->writeError($output, $message ?? $upToDate);
 
             return $exitOk;
         } catch (ConfigException $e) {
-            $this->writeError($output, '<error>lockrot: '.$e->getMessage().'</error>');
+            $this->writeError($output, '<error>lockrot: '.self::plain($e->getMessage()).'</error>');
 
             return $exitError;
         } catch (\Throwable $e) {
-            $this->writeError($output, '<error>lockrot self-update failed: '.$e->getMessage().'</error>');
+            $this->writeError($output, '<error>lockrot self-update failed: '.self::plain($e->getMessage()).'</error>');
 
             return $exitError;
         }
@@ -246,6 +243,17 @@ final class SelfUpdateCommand extends BaseCommand
         );
 
         return [$client, Tokens::fromEnvironment($env, ServiceFactory::githubTokenFromComposer($config))->github()];
+    }
+
+    /**
+     * $text as text and nothing else: the notes and the errors carry tags, versions and URLs from
+     * the release list and its assets, which must neither open a console style (`<href=…>`) nor
+     * reach the terminal as a control sequence. C0 controls, DEL and the C1 controls (in their UTF-8
+     * form) become `?`; the rest is escaped for Symfony's formatter.
+     */
+    private static function plain(string $text): string
+    {
+        return OutputFormatter::escape((string) preg_replace('/[\x00-\x1F\x7F]|\xC2[\x80-\x9F]/', '?', $text));
     }
 
     private function writeError(OutputInterface $output, string $message): void

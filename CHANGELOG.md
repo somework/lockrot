@@ -24,16 +24,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   2.0 on its next self-update, a release needing a newer PHP would have installed and then refused
   to start, and after a rotation of the self-update key the archive would have refused the new
   release with a signature error and no way forward. It now reads the release list (drafts,
-  pre-releases and tags that are not a stable version skipped) and takes the newest release in its
-  own major version — before 1.0 that is the whole 0.x line, so 0.x updates keep arriving as
-  before. `--allow-major` moves to the next major version, one at a time, and `--check` names a
-  newer major on a line of its own without exiting 1 (`--check --allow-major` does, and its advice
-  line then says `self-update --allow-major`, since a plain run would hold it back). A release whose
-  lowest PHP is above the running one is passed over with a line saying so, and so is one signed with
-  a self-update key the archive does not carry, which makes the transition release of a rotation the
-  step in between. `--force` reinstalls the newest release at or below the running one, only in the
-  running major version, and never looks further down: a build ahead of every release of its line
-  (a 1.0.0 rehearsed before its tag) is exit 2 rather than a step back to 0.x. The choice is made by the archive doing the update, so this starts with
+  pre-releases and tags that are not a stable version skipped; a published release whose tag is not
+  a version at all is named on a line of its own) and takes the newest release in its own major
+  version — before 1.0 that is the whole 0.x line, so 0.x updates keep arriving as before. Versions
+  are compared the way Composer compares them (`v1.0`, `V1.0.0` and `1.0.0` are one version).
+  `--allow-major` moves to the next major version that has a stable release, one at a time; a newer
+  major is named on a line of its own, and the line suggesting `--allow-major` names the release it
+  would install, or says why none of that major can be installed here. A release whose lowest PHP is
+  above the running one (or is not spelled `major.minor.patch`) is passed over with a line saying
+  so, and so is one signed with a self-update key the archive does not carry, which makes the
+  transition release of a rotation the step in between. When newer releases exist only under a key
+  the archive does not carry and no release it can install carries it, the archive is stranded:
+  `self-update` and `--check` exit 2 and say it has to be reinstalled by hand. Otherwise `--check`
+  exits 1 exactly when `self-update` would install something (`--check --allow-major` for a next
+  major, whose advice line then says `self-update --allow-major`), exits 0 when every newer release
+  is held back for its major, PHP or floor, and ignores `--force`. `--check` also reads the chosen
+  release's `lockrot.phar.meta.json` from GitHub's release downloads, not only the API. `--force`
+  reinstalls the newest release at or below the running one in its major version, which can be
+  older than the running build (a 0.13.1 whose release was withdrawn gets 0.13.0), never looks
+  below that release, and never leaves the line: with nothing in the line to install it exits 2
+  rather than stepping back to 0.x. Notes and errors are printed as plain text, whatever the release
+  list puts in a tag or URL. The choice is made by the archive doing the update, so this starts with
   archives from 0.13.0 on; 0.12 and older still follow `releases/latest` (see
   [the PHAR page](https://lockrot.dev/phar/#keeping-it-updated)). `LOCKROT_RELEASE_URL`, the test
   hook, now names a release list.
@@ -67,11 +78,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `lockrot.phar.meta.json` on every release: the lowest PHP the archive runs on and the SHA-256
   fingerprint of the key that signed `lockrot.phar.sig.json` — what `self-update` chooses by
   without downloading the archive. The release workflow writes it from `build/phar/composer.json`
-  (and fails when its platform PHP is not the floor both manifests declare) and from the key it
-  actually signed with, then checks it against the committed key. It decides only which release is
+  (and fails when its platform PHP is not spelled `major.minor.patch` or is not the floor both
+  manifests declare) and from the key it actually signed with. It decides only which release is
   tried; the checksum and the signature still decide whether it is installed. A release from 0.13.0
   on without it is an error naming the tag, and SECURITY.md now describes the key rotation it makes
-  possible, with today's fingerprint.
+  possible, with today's fingerprint, and why a compromised key is not rotated that way: every
+  archive carrying it is replaced by hand.
+- The release workflow checks each release's self-update signature, and the key its
+  `lockrot.phar.meta.json` names, against the key the previous release carries — the one every
+  archive in the field verifies it with — instead of the key in the source tree. A rotation that
+  skips its transition release now fails the build, and the transition release itself passes
+  without any check switched off.
 
 ## [0.12.0] - 2026-09-24
 

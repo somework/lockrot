@@ -7,7 +7,7 @@ namespace Lockrot\Tests\Unit\SelfUpdate;
 use Lockrot\Data\Http\HttpResult;
 use Lockrot\Exception\ConfigException;
 use Lockrot\SelfUpdate\PharUpdater;
-use Lockrot\SelfUpdate\ReleaseChoice;
+use Lockrot\SelfUpdate\Release;
 use Lockrot\SelfUpdate\ReleaseLocator;
 use Lockrot\Tests\Support\FakeHttpClient;
 use Lockrot\Tests\Support\GitHubReleases;
@@ -89,10 +89,34 @@ final class ReleaseLocatorTest extends TestCase
         return new ReleaseLocator($http, $trustedKey ?? self::releaseKey(), $token, $url, $current, $php);
     }
 
-    private static function assertChose(string $version, ReleaseChoice $choice): void
+    /**
+     * locate() throws $message; the notes it decided on the way stay readable afterwards.
+     */
+    private static function assertLocateFails(string $message, ReleaseLocator $locator, bool $allowMajor = false, bool $force = false): void
     {
-        $release = $choice->release();
-        self::assertNotNull($release, 'expected '.$version.' to be chosen; notes: '.implode(' | ', $choice->notes()));
+        try {
+            $locator->locate($allowMajor, $force);
+        } catch (ConfigException $e) {
+            self::assertSame($message, $e->getMessage());
+
+            return;
+        }
+        self::fail('expected locate() to fail with: '.$message);
+    }
+
+    private static function stranded(): string
+    {
+        return 'the newer releases are signed with a self-update key this lockrot.phar does not carry, and no release it can install carries that key; download lockrot.phar again by hand and verify it (see https://lockrot.dev/phar/#reinstalling-by-hand)';
+    }
+
+    private static function keyNote(string $version): string
+    {
+        return 'lockrot '.$version.' is signed with a self-update key this lockrot.phar does not carry ('.self::otherKey().'); only a release that carries that key can update to it';
+    }
+
+    private static function assertChose(string $version, ?Release $release): void
+    {
+        self::assertNotNull($release, 'expected '.$version.' to be chosen');
         self::assertSame($version, $release->version());
     }
 
@@ -126,16 +150,16 @@ final class ReleaseLocatorTest extends TestCase
             $metaUrl => FakeHttpClient::ok($metaUrl, self::fixture('lockrot.phar.meta.json')),
         ]);
 
-        $choice = $this->locator($http, '0.12.0', self::PHP, 'sha256:ec3ca71b1a3ced86f871b89cff7973b58454e5694136683680b72b18070a8f87')->locate();
+        $locator = $this->locator($http, '0.12.0', self::PHP, 'sha256:ec3ca71b1a3ced86f871b89cff7973b58454e5694136683680b72b18070a8f87');
+        $release = $locator->locate();
 
-        $release = $choice->release();
         self::assertNotNull($release);
         self::assertSame('0.13.0', $release->version());
         self::assertSame('v0.13.0', $release->tag());
         self::assertSame('https://github.com/somework/lockrot/releases/download/v0.13.0/lockrot.phar', $release->pharUrl());
         self::assertSame('https://github.com/somework/lockrot/releases/download/v0.13.0/lockrot.phar.sha256', $release->checksumUrl());
         self::assertSame('https://github.com/somework/lockrot/releases/download/v0.13.0/lockrot.phar.sig.json', $release->signatureUrl());
-        self::assertSame([], $choice->notes());
+        self::assertSame([], $locator->notes());
         self::assertSame([self::URL, $metaUrl], $http->requested());
     }
 
@@ -143,10 +167,11 @@ final class ReleaseLocatorTest extends TestCase
     {
         $http = self::described(['v0.14.0', 'v0.13.1']);
 
-        $choice = $this->locator($http, '0.13.0')->locate();
+        $locator = $this->locator($http, '0.13.0');
+        $release = $locator->locate();
 
-        self::assertChose('0.14.0', $choice);
-        self::assertSame([], $choice->notes());
+        self::assertChose('0.14.0', $release);
+        self::assertSame([], $locator->notes());
         self::assertSame([self::URL, self::metaUrl('v0.14.0')], $http->requested());
     }
 
@@ -192,7 +217,7 @@ final class ReleaseLocatorTest extends TestCase
     {
         $http = self::http([GitHubReleases::entry('0.3.1')]);
 
-        $release = $this->locator($http, '0.3.0')->locate()->release();
+        $release = $this->locator($http, '0.3.0')->locate();
 
         self::assertNotNull($release);
         self::assertSame('0.3.1', $release->version());
@@ -263,24 +288,27 @@ final class ReleaseLocatorTest extends TestCase
     {
         $http = self::described(['v2.1.0', 'v2.0.0', 'v1.3.0']);
 
-        $choice = $this->locator($http, '1.2.0')->locate();
+        $locator = $this->locator($http, '1.2.0');
+        $release = $locator->locate();
 
-        self::assertChose('1.3.0', $choice);
+        self::assertChose('1.3.0', $release);
         self::assertSame(
             ['lockrot 2.1.0 is in the next major version; run lockrot.phar self-update --allow-major to move to it'],
-            $choice->notes()
+            $locator->notes()
         );
-        self::assertSame([self::URL, self::metaUrl('v1.3.0')], $http->requested(), 'a held-back major is not described');
+        // The next major is described once, for the advice; the rest of its line is not.
+        self::assertSame([self::URL, self::metaUrl('v2.1.0'), self::metaUrl('v1.3.0')], $http->requested());
     }
 
     public function testAllowMajorMovesToTheNextMajor(): void
     {
         $http = self::described(['v2.1.0', 'v2.0.0', 'v1.3.0']);
 
-        $choice = $this->locator($http, '1.2.0')->locate(true);
+        $locator = $this->locator($http, '1.2.0');
+        $release = $locator->locate(true);
 
-        self::assertChose('2.1.0', $choice);
-        self::assertSame([], $choice->notes());
+        self::assertChose('2.1.0', $release);
+        self::assertSame([], $locator->notes());
     }
 
     /**
@@ -292,12 +320,13 @@ final class ReleaseLocatorTest extends TestCase
     {
         $http = self::described(['v3.1.0', 'v3.0.0', 'v2.1.0', 'v1.3.0']);
 
-        $choice = $this->locator($http, '1.2.0')->locate(true);
+        $locator = $this->locator($http, '1.2.0');
+        $release = $locator->locate(true);
 
-        self::assertChose('2.1.0', $choice);
+        self::assertChose('2.1.0', $release);
         self::assertSame(
             ['lockrot 3.1.0 is more than one major version ahead; --allow-major moves one major version at a time'],
-            $choice->notes()
+            $locator->notes()
         );
     }
 
@@ -305,13 +334,14 @@ final class ReleaseLocatorTest extends TestCase
     {
         $http = self::described(['v3.1.0', 'v3.0.0', 'v2.1.0', 'v2.0.0', 'v1.3.0']);
 
-        $choice = $this->locator($http, '1.2.0')->locate();
+        $locator = $this->locator($http, '1.2.0');
+        $release = $locator->locate();
 
-        self::assertChose('1.3.0', $choice);
+        self::assertChose('1.3.0', $release);
         self::assertSame([
             'lockrot 3.1.0 is more than one major version ahead; --allow-major moves one major version at a time',
             'lockrot 2.1.0 is in the next major version; run lockrot.phar self-update --allow-major to move to it',
-        ], $choice->notes());
+        ], $locator->notes());
     }
 
     /** Taken literally: the major is the first number, so all of 0.x is one line and 1.0 is the next. */
@@ -319,12 +349,13 @@ final class ReleaseLocatorTest extends TestCase
     {
         $http = self::described(['v1.0.0', 'v0.14.0']);
 
-        $choice = $this->locator($http, '0.13.0')->locate();
+        $locator = $this->locator($http, '0.13.0');
+        $release = $locator->locate();
 
-        self::assertChose('0.14.0', $choice);
+        self::assertChose('0.14.0', $release);
         self::assertSame(
             ['lockrot 1.0.0 is in the next major version; run lockrot.phar self-update --allow-major to move to it'],
-            $choice->notes()
+            $locator->notes()
         );
     }
 
@@ -332,14 +363,15 @@ final class ReleaseLocatorTest extends TestCase
     {
         $http = self::described(['v1.0.0', 'v0.13.0']);
 
-        $choice = $this->locator($http, '0.13.0')->locate();
+        $locator = $this->locator($http, '0.13.0');
+        $release = $locator->locate();
 
-        self::assertNull($choice->release());
+        self::assertNull($release);
         self::assertSame(
             ['lockrot 1.0.0 is in the next major version; run lockrot.phar self-update --allow-major to move to it'],
-            $choice->notes()
+            $locator->notes()
         );
-        self::assertSame([self::URL], $http->requested());
+        self::assertSame([self::URL, self::metaUrl('v1.0.0')], $http->requested());
     }
 
     public function testAReleaseNeedingANewerPhpIsSkipped(): void
@@ -353,10 +385,11 @@ final class ReleaseLocatorTest extends TestCase
             ]
         );
 
-        $choice = $this->locator($http, '0.13.0', '7.4.33')->locate();
+        $locator = $this->locator($http, '0.13.0', '7.4.33');
+        $release = $locator->locate();
 
-        self::assertChose('0.14.0', $choice);
-        self::assertSame(['lockrot 0.16.0 needs PHP 8.2.0 or newer, and this is PHP 7.4.33'], $choice->notes());
+        self::assertChose('0.14.0', $release);
+        self::assertSame(['lockrot 0.16.0 needs PHP 8.2.0 or newer, and this is PHP 7.4.33'], $locator->notes());
     }
 
     public function testAFloorEqualToThisPhpIsInstallable(): void
@@ -378,10 +411,11 @@ final class ReleaseLocatorTest extends TestCase
             ]
         );
 
-        $choice = $this->locator($http, '0.13.0', null)->locate();
+        $locator = $this->locator($http, '0.13.0', null);
+        $release = $locator->locate();
 
-        self::assertChose('0.14.0', $choice);
-        self::assertSame(['lockrot 0.15.0 needs PHP '.$next.' or newer, and this is PHP '.$running], $choice->notes());
+        self::assertChose('0.14.0', $release);
+        self::assertSame(['lockrot 0.15.0 needs PHP '.$next.' or newer, and this is PHP '.$running], $locator->notes());
     }
 
     /**
@@ -400,12 +434,13 @@ final class ReleaseLocatorTest extends TestCase
             ]
         );
 
-        $choice = $this->locator($http, '1.0.0')->locate();
+        $locator = $this->locator($http, '1.0.0');
+        $release = $locator->locate();
 
-        self::assertChose('1.0.1', $choice);
+        self::assertChose('1.0.1', $release);
         self::assertSame(
             ['lockrot 1.2.0 is signed with a self-update key this lockrot.phar does not carry ('.self::otherKey().'); only a release that carries that key can update to it'],
-            $choice->notes()
+            $locator->notes()
         );
     }
 
@@ -419,10 +454,11 @@ final class ReleaseLocatorTest extends TestCase
             ]
         );
 
-        $choice = $this->locator($http, '1.0.1', self::PHP, self::otherKey())->locate();
+        $locator = $this->locator($http, '1.0.1', self::PHP, self::otherKey());
+        $release = $locator->locate();
 
-        self::assertChose('1.2.0', $choice);
-        self::assertSame([], $choice->notes());
+        self::assertChose('1.2.0', $release);
+        self::assertSame([], $locator->notes());
     }
 
     /**
@@ -435,9 +471,10 @@ final class ReleaseLocatorTest extends TestCase
         $assets = [ReleaseLocator::PHAR_ASSET, ReleaseLocator::CHECKSUM_ASSET, ReleaseLocator::SIGNATURE_ASSET];
         $http = self::http([GitHubReleases::entry('v0.12.0', $assets)]);
 
-        $choice = $this->locator($http, '0.11.0', '7.4.0', self::otherKey())->locate();
+        $locator = $this->locator($http, '0.11.0', '7.4.0', self::otherKey());
+        $release = $locator->locate();
 
-        self::assertChose('0.12.0', $choice);
+        self::assertChose('0.12.0', $release);
         self::assertSame([self::URL], $http->requested(), 'a release before 0.13.0 has no description to fetch');
     }
 
@@ -446,10 +483,11 @@ final class ReleaseLocatorTest extends TestCase
         $assets = [ReleaseLocator::PHAR_ASSET, ReleaseLocator::CHECKSUM_ASSET, ReleaseLocator::SIGNATURE_ASSET];
         $http = self::http([GitHubReleases::entry('v0.12.0', $assets)]);
 
-        $choice = $this->locator($http, '0.11.0', '7.3.33')->locate();
+        $locator = $this->locator($http, '0.11.0', '7.3.33');
+        $release = $locator->locate();
 
-        self::assertNull($choice->release());
-        self::assertSame(['lockrot 0.12.0 needs PHP 7.4.0 or newer, and this is PHP 7.3.33'], $choice->notes());
+        self::assertNull($release);
+        self::assertSame(['lockrot 0.12.0 needs PHP 7.4.0 or newer, and this is PHP 7.3.33'], $locator->notes());
     }
 
     public function testTheFirstDescribedVersionWithoutItsDescriptionIsAnError(): void
@@ -470,7 +508,7 @@ final class ReleaseLocatorTest extends TestCase
         yield 'not found' => [FakeHttpClient::status($url, 404, 'Not Found'), 'could not download '.$url.': HTTP 404'];
         yield 'unreachable' => [FakeHttpClient::transportFailure($url, 'Connection reset'), 'could not download '.$url.': Connection reset'];
         yield 'not json' => ['<html>502</html>', $url.' is not a lockrot release description'];
-        yield 'a floor that is not a version' => ['{"php": "soon", "selfupdate-key": "'.str_repeat('a', 64).'"}', $url.' is not a lockrot release description'];
+        yield 'a floor that is not a string' => ['{"php": 8.1, "selfupdate-key": "sha256:'.str_repeat('a', 64).'"}', $url.' is not a lockrot release description'];
         yield 'a key that is not a sha256' => ['{"php": "7.4.0", "selfupdate-key": "md5:'.str_repeat('a', 32).'"}', $url.' is not a lockrot release description'];
     }
 
@@ -504,10 +542,11 @@ final class ReleaseLocatorTest extends TestCase
     {
         $http = self::described(['v0.14.0', 'v0.13.0']);
 
-        $choice = $this->locator($http, '0.14.0')->locate();
+        $locator = $this->locator($http, '0.14.0');
+        $release = $locator->locate();
 
-        self::assertNull($choice->release());
-        self::assertSame([], $choice->notes());
+        self::assertNull($release);
+        self::assertSame([], $locator->notes());
         self::assertSame([self::URL], $http->requested());
     }
 
@@ -529,12 +568,13 @@ final class ReleaseLocatorTest extends TestCase
     {
         $http = self::described(['v1.0.0', 'v0.14.0', 'v0.13.0']);
 
-        $choice = $this->locator($http, '0.15.0')->locate(false, true);
+        $locator = $this->locator($http, '0.15.0');
+        $release = $locator->locate(false, true);
 
-        self::assertChose('0.14.0', $choice);
+        self::assertChose('0.14.0', $release);
         self::assertSame(
             ['lockrot 1.0.0 is in the next major version; run lockrot.phar self-update --allow-major to move to it'],
-            $choice->notes()
+            $locator->notes()
         );
     }
 
@@ -553,10 +593,11 @@ final class ReleaseLocatorTest extends TestCase
             ]
         );
 
-        $choice = $this->locator($http, '0.14.0')->locate(false, true);
+        $locator = $this->locator($http, '0.14.0');
 
-        self::assertNull($choice->release());
-        self::assertSame(['lockrot 0.14.0 needs PHP 99.0.0 or newer, and this is PHP '.self::PHP], $choice->notes());
+        self::assertLocateFails('no release in the 0.x line can be installed by this lockrot.phar', $locator, false, true);
+        self::assertSame(['lockrot 0.14.0 needs PHP 99.0.0 or newer, and this is PHP '.self::PHP], $locator->notes());
+        self::assertNotContains(self::metaUrl('v0.13.0'), $http->requested());
     }
 
     /**
@@ -568,10 +609,10 @@ final class ReleaseLocatorTest extends TestCase
     {
         $http = self::described(['v0.14.0']);
 
-        $choice = $this->locator($http, '1.0.0')->locate(false, true);
+        $locator = $this->locator($http, '1.0.0');
 
-        self::assertNull($choice->release());
-        self::assertSame([], $choice->notes());
+        self::assertLocateFails('no release in the 1.x line can be installed by this lockrot.phar', $locator, false, true);
+        self::assertSame([], $locator->notes());
         self::assertSame([self::URL], $http->requested(), 'an older major is decided from the tag alone');
     }
 
@@ -600,9 +641,10 @@ final class ReleaseLocatorTest extends TestCase
             $second => FakeHttpClient::ok($second, GitHubReleases::listJson(self::page(1, 3))),
         ]);
 
-        $choice = $this->locator($http, '0.0.1')->locate();
+        $locator = $this->locator($http, '0.0.1');
+        $release = $locator->locate();
 
-        self::assertChose('0.1.200', $choice);
+        self::assertChose('0.1.200', $release);
         self::assertSame([self::URL, $second], $http->requested());
     }
 
@@ -637,9 +679,10 @@ final class ReleaseLocatorTest extends TestCase
         }
         $http = new FakeHttpClient($responses);
 
-        $choice = $this->locator($http, '0.0.1')->locate();
+        $locator = $this->locator($http, '0.0.1');
+        $release = $locator->locate();
 
-        self::assertChose('0.1.'.((ReleaseLocator::MAX_PAGES + 1) * ReleaseLocator::PER_PAGE), $choice);
+        self::assertChose('0.1.'.((ReleaseLocator::MAX_PAGES + 1) * ReleaseLocator::PER_PAGE), $release);
         self::assertCount(ReleaseLocator::MAX_PAGES, $http->requested());
         self::assertSame(self::URL.'&page='.ReleaseLocator::MAX_PAGES, $http->requested()[ReleaseLocator::MAX_PAGES - 1]);
     }
@@ -784,6 +827,317 @@ final class ReleaseLocatorTest extends TestCase
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage('could not read '.self::URL.': HTTP 403');
         $this->locator($http, '0.1.0')->locate();
+    }
+
+    /**
+     * A rotation whose transition release is missing (never shipped, or pulled): every newer
+     * release names a key this archive does not carry, and nothing it could install carries it. No
+     * later run changes that, so it is an error on every run — not "up to date" forever.
+     */
+    public function testNewerReleasesOnlyUnderAnotherKeyStrandTheArchive(): void
+    {
+        $http = self::http(
+            [GitHubReleases::entry('v0.15.0'), GitHubReleases::entry('v0.14.0'), GitHubReleases::entry('v0.13.0')],
+            ['v0.15.0' => GitHubReleases::meta('7.4.0', self::otherKey()), 'v0.14.0' => GitHubReleases::meta('7.4.0', self::otherKey())]
+        );
+        $locator = $this->locator($http, '0.13.0');
+
+        self::assertLocateFails(self::stranded(), $locator);
+        self::assertSame([self::keyNote('0.15.0')], $locator->notes());
+        self::assertSame([self::URL, self::metaUrl('v0.15.0'), self::metaUrl('v0.14.0')], $http->requested());
+    }
+
+    /** A transition release this PHP cannot run leaves the archive just as stranded. */
+    public function testATransitionReleaseThisPhpCannotRunStillStrandsTheArchive(): void
+    {
+        $http = self::http(
+            [GitHubReleases::entry('v0.15.0'), GitHubReleases::entry('v0.14.0')],
+            ['v0.15.0' => GitHubReleases::meta('7.4.0', self::otherKey()), 'v0.14.0' => GitHubReleases::meta('99.0.0', self::releaseKey())]
+        );
+        $locator = $this->locator($http, '0.13.0');
+
+        self::assertLocateFails(self::stranded(), $locator);
+        self::assertSame([self::keyNote('0.15.0'), 'lockrot 0.14.0 needs PHP 99.0.0 or newer, and this is PHP '.self::PHP], $locator->notes());
+    }
+
+    /** Held back by the PHP floor alone: nothing this PHP can install, which is not an error. */
+    public function testNewerReleasesHeldBackOnlyByThePhpFloorAreNotAnError(): void
+    {
+        $http = self::http(
+            [GitHubReleases::entry('v0.15.0'), GitHubReleases::entry('v0.14.0')],
+            ['v0.15.0' => GitHubReleases::meta('8.2.0', self::releaseKey()), 'v0.14.0' => GitHubReleases::meta('8.1.0', self::releaseKey())]
+        );
+        $locator = $this->locator($http, '0.13.0', '7.4.33');
+
+        self::assertNull($locator->locate());
+        self::assertSame(['lockrot 0.15.0 needs PHP 8.2.0 or newer, and this is PHP 7.4.33'], $locator->notes());
+    }
+
+    /** --allow-major into a line signed only with another key is stranded too. */
+    public function testAllowMajorIntoALineOnlyUnderAnotherKeyIsStranded(): void
+    {
+        $http = self::http([GitHubReleases::entry('v1.0.0'), GitHubReleases::entry('v0.13.0')], ['v1.0.0' => GitHubReleases::meta('7.4.0', self::otherKey())]);
+        $locator = $this->locator($http, '0.13.0');
+
+        self::assertLocateFails(self::stranded(), $locator, true);
+        self::assertSame([self::keyNote('1.0.0')], $locator->notes());
+    }
+
+    /**
+     * Without --allow-major the next major is advice, not the target: one signed with another key
+     * says so instead of advising a flag that would install nothing, and strands nothing.
+     */
+    public function testANextMajorUnderAnotherKeyIsNamedForItsKeyNotAdvised(): void
+    {
+        $http = self::http([GitHubReleases::entry('v1.0.0'), GitHubReleases::entry('v0.13.0')], ['v1.0.0' => GitHubReleases::meta('7.4.0', self::otherKey())]);
+        $locator = $this->locator($http, '0.13.0');
+
+        self::assertNull($locator->locate());
+        self::assertSame([self::keyNote('1.0.0')], $locator->notes());
+    }
+
+    /**
+     * The advice names the release --allow-major would install: a newer 1.x this PHP cannot run is
+     * named for its floor, and the newest one it can run is the one advised.
+     */
+    public function testTheAdviceNamesTheNextMajorReleaseAllowMajorWouldInstall(): void
+    {
+        $http = self::http(
+            [GitHubReleases::entry('v1.1.0'), GitHubReleases::entry('v1.0.0'), GitHubReleases::entry('v0.13.0')],
+            ['v1.1.0' => GitHubReleases::meta('8.1.0', self::releaseKey()), 'v1.0.0' => GitHubReleases::meta('7.4.0', self::releaseKey())]
+        );
+        $locator = $this->locator($http, '0.13.0', '7.4.33');
+
+        self::assertNull($locator->locate());
+        self::assertSame([
+            'lockrot 1.1.0 needs PHP 8.1.0 or newer, and this is PHP 7.4.33',
+            'lockrot 1.0.0 is in the next major version; run lockrot.phar self-update --allow-major to move to it',
+        ], $locator->notes());
+        self::assertChose('1.0.0', $this->locator($http, '0.13.0', '7.4.33')->locate(true));
+    }
+
+    /** A next major this PHP cannot run at all gets the floor, never the advice. */
+    public function testANextMajorThisPhpCannotRunIsNotAdvised(): void
+    {
+        $http = self::http([GitHubReleases::entry('v1.0.0'), GitHubReleases::entry('v0.13.0')], ['v1.0.0' => GitHubReleases::meta('8.1.0', self::releaseKey())]);
+        $locator = $this->locator($http, '0.13.0', '7.4.33');
+
+        self::assertNull($locator->locate());
+        self::assertSame(['lockrot 1.0.0 needs PHP 8.1.0 or newer, and this is PHP 7.4.33'], $locator->notes());
+    }
+
+    /** @return iterable<string, array{0: list<array<string, mixed>>}> */
+    public static function majorsWithoutAStableRelease(): iterable
+    {
+        yield 'a major number that was skipped' => [[GitHubReleases::entry('v2.0.0'), GitHubReleases::entry('v0.13.0')]];
+        yield 'a major withdrawn to a draft' => [[GitHubReleases::entry('v2.0.0'), GitHubReleases::entry('v1.0.0', GitHubReleases::ASSETS, true), GitHubReleases::entry('v0.13.0')]];
+        yield 'a major with only a pre-release' => [[GitHubReleases::entry('v2.0.0'), GitHubReleases::entry('v1.0.0', GitHubReleases::ASSETS, false, true), GitHubReleases::entry('v0.13.0')]];
+    }
+
+    /**
+     * The next major is the next one that has a stable release: a major with none is no dead end
+     * that no flag gets past.
+     *
+     * @dataProvider majorsWithoutAStableRelease
+     *
+     * @param list<array<string, mixed>> $entries
+     */
+    #[DataProvider('majorsWithoutAStableRelease')]
+    public function testTheNextMajorIsTheNextOneWithAStableRelease(array $entries): void
+    {
+        $http = self::http($entries, ['v2.0.0' => GitHubReleases::meta('7.4.0', self::releaseKey())]);
+        $locator = $this->locator($http, '0.13.0');
+
+        self::assertNull($locator->locate());
+        self::assertSame(['lockrot 2.0.0 is in the next major version; run lockrot.phar self-update --allow-major to move to it'], $locator->notes());
+        self::assertChose('2.0.0', $this->locator($http, '0.13.0')->locate(true));
+    }
+
+    public function testBeyondTheNextStableMajorIsStillOneStepAtATime(): void
+    {
+        $http = self::described(['v3.0.0', 'v2.0.0', 'v0.13.0']);
+        $locator = $this->locator($http, '0.13.0');
+
+        self::assertChose('2.0.0', $locator->locate(true));
+        self::assertSame(['lockrot 3.0.0 is more than one major version ahead; --allow-major moves one major version at a time'], $locator->notes());
+    }
+
+    /**
+     * A floor spelled other than `major.minor.patch` is compared with nothing: `v8.1.0` would sort
+     * below every PHP and install an archive that refuses to start. The release is passed over
+     * with a note that does not repeat the value.
+     */
+    public function testAReleaseWhoseFloorIsNotMajorMinorPatchIsNotInstalled(): void
+    {
+        $http = self::http(
+            [GitHubReleases::entry('v0.15.0'), GitHubReleases::entry('v0.14.0')],
+            ['v0.15.0' => GitHubReleases::meta('v8.1.0', self::releaseKey()), 'v0.14.0' => GitHubReleases::meta('7.4.0', self::releaseKey())]
+        );
+        $locator = $this->locator($http, '0.13.0', '7.4.33');
+
+        self::assertChose('0.14.0', $locator->locate());
+        self::assertSame(['lockrot 0.15.0 does not give its lowest PHP as major.minor.patch in its lockrot.phar.meta.json, so it is not installed'], $locator->notes());
+    }
+
+    /**
+     * Every decision is on the normalised version: a tag with a capital `V` is the version it
+     * names, in its major line, and described like any other.
+     */
+    public function testACapitalVTagIsTheVersionItNames(): void
+    {
+        $http = self::http([GitHubReleases::entry('V1.0.0'), GitHubReleases::entry('v0.13.0')], [
+            'V1.0.0' => GitHubReleases::meta('99.0.0', self::releaseKey()),
+            'v0.13.0' => GitHubReleases::meta('7.4.0', self::releaseKey()),
+        ]);
+        $locator = $this->locator($http, '0.12.0');
+
+        self::assertChose('0.13.0', $locator->locate());
+        self::assertSame(['lockrot 1.0.0 needs PHP 99.0.0 or newer, and this is PHP '.self::PHP], $locator->notes());
+    }
+
+    /** --force from 0.12.0 does not leave its line for a `V1.0.0`. */
+    public function testForceWithACapitalVTagStaysInTheLine(): void
+    {
+        $http = self::http([GitHubReleases::entry('V1.0.0'), GitHubReleases::entry('v0.12.0', [ReleaseLocator::PHAR_ASSET, ReleaseLocator::CHECKSUM_ASSET, ReleaseLocator::SIGNATURE_ASSET])], [
+            'V1.0.0' => GitHubReleases::meta('7.4.0', self::releaseKey()),
+        ]);
+
+        self::assertChose('0.12.0', $this->locator($http, '0.12.0')->locate(false, true));
+    }
+
+    /** @return iterable<string, array{0: string}> */
+    public static function otherSpellingsOfADescribedRelease(): iterable
+    {
+        yield 'two numbers' => ['v0.13'];
+        yield 'build metadata' => ['v0.13.0+build.1'];
+        yield 'a stability flag' => ['v0.13.0-stable'];
+    }
+
+    /**
+     * 0.13.0 in any spelling is a described release: its description is read and its floor holds
+     * it back, and it is shown as `major.minor.patch`.
+     *
+     * @dataProvider otherSpellingsOfADescribedRelease
+     */
+    #[DataProvider('otherSpellingsOfADescribedRelease')]
+    public function testEverySpellingOfADescribedReleaseIsDescribed(string $tag): void
+    {
+        $http = self::http([GitHubReleases::entry($tag)], [$tag => GitHubReleases::meta('99.0.0', self::releaseKey())]);
+        $locator = $this->locator($http, '0.12.0');
+
+        self::assertNull($locator->locate());
+        self::assertSame(['lockrot 0.13.0 needs PHP 99.0.0 or newer, and this is PHP '.self::PHP], $locator->notes());
+    }
+
+    public function testAFourNumberTagOfTheRunningVersionIsNotAnUpdate(): void
+    {
+        $http = self::described(['v0.13.0.0']);
+
+        self::assertNull($this->locator($http, '0.13.0')->locate());
+        self::assertSame([self::URL], $http->requested());
+    }
+
+    /**
+     * Two releases of one version — `v0.13.0` with every asset, a stray `0.13.0` with none — pick
+     * the same one in either list order, on every PHP (usort() is not stable on 7.4).
+     */
+    public function testTwoTagsOfOneVersionAlwaysResolveToTheSameRelease(): void
+    {
+        $full = GitHubReleases::entry('v0.13.0');
+        $bare = GitHubReleases::entry('0.13.0', []);
+        foreach ([[$full, $bare], [$bare, $full]] as $entries) {
+            $http = self::http($entries, ['v0.13.0' => GitHubReleases::meta('7.4.0', self::releaseKey())]);
+
+            $release = $this->locator($http, '0.12.0')->locate();
+
+            self::assertNotNull($release);
+            self::assertSame('v0.13.0', $release->tag());
+        }
+    }
+
+    /**
+     * A published release whose tag is not a version is skipped — but not in silence, when it is
+     * newer than the running version by list order: a signed release nobody can install would
+     * otherwise look like "up to date" forever.
+     */
+    public function testAPublishedReleaseWithATagThatIsNotAVersionIsNamed(): void
+    {
+        $http = self::http([GitHubReleases::entry('v0.13.1-hotfix'), GitHubReleases::entry('v0.13.0')]);
+        $locator = $this->locator($http, '0.13.0');
+
+        self::assertNull($locator->locate());
+        self::assertSame(['release tag "v0.13.1-hotfix" is not a version lockrot can compare, so that release was skipped'], $locator->notes());
+    }
+
+    /** Each such tag is named, and none of them hides a note given for a reason. */
+    public function testEveryTagThatIsNotAVersionIsNamedOnItsOwnLine(): void
+    {
+        $http = self::http(
+            [GitHubReleases::entry('php'), GitHubReleases::entry('v0.13.2-hotfix'), GitHubReleases::entry('v0.14.0'), GitHubReleases::entry('v0.13.0')],
+            ['v0.14.0' => GitHubReleases::meta('99.0.0', self::releaseKey())]
+        );
+        $locator = $this->locator($http, '0.13.0');
+
+        self::assertNull($locator->locate());
+        self::assertSame([
+            'release tag "php" is not a version lockrot can compare, so that release was skipped',
+            'release tag "v0.13.2-hotfix" is not a version lockrot can compare, so that release was skipped',
+            'lockrot 0.14.0 needs PHP 99.0.0 or newer, and this is PHP '.self::PHP,
+        ], $locator->notes());
+    }
+
+    /** Listed after a release at or below the running one, it is history, not news. */
+    public function testATagThatIsNotAVersionBelowTheRunningVersionIsNotNamed(): void
+    {
+        $http = self::http([GitHubReleases::entry('v0.13.0'), GitHubReleases::entry('v0.12.1-hotfix'), GitHubReleases::entry('v0.12.0')]);
+        $locator = $this->locator($http, '0.13.0');
+
+        self::assertNull($locator->locate());
+        self::assertSame([], $locator->notes());
+    }
+
+    /** A draft or a pre-release under such a tag is not published, so it is not named either. */
+    public function testAnUnpublishedTagThatIsNotAVersionIsNotNamed(): void
+    {
+        $http = self::http([
+            GitHubReleases::entry('nightly', GitHubReleases::ASSETS, false, true),
+            GitHubReleases::entry('wip', GitHubReleases::ASSETS, true),
+            GitHubReleases::entry('v0.13.0'),
+        ]);
+        $locator = $this->locator($http, '0.13.0');
+
+        self::assertNull($locator->locate());
+        self::assertSame([], $locator->notes());
+    }
+
+    /**
+     * A failure further down the list keeps the notes decided before it: the reason the newer
+     * release was passed over — here the flag that would route around the broken one — is still
+     * there to print ahead of the error.
+     */
+    public function testNotesSurviveAFailureFurtherDownTheList(): void
+    {
+        $assets = array_values(array_diff(GitHubReleases::ASSETS, [ReleaseLocator::PHAR_ASSET]));
+        $http = self::http(
+            [GitHubReleases::entry('v1.0.0'), GitHubReleases::entry('v0.14.0', $assets)],
+            ['v1.0.0' => GitHubReleases::meta('7.4.0', self::releaseKey()), 'v0.14.0' => GitHubReleases::meta('7.4.0', self::releaseKey())]
+        );
+        $locator = $this->locator($http, '0.12.0');
+
+        self::assertLocateFails('release v0.14.0 has no lockrot.phar asset', $locator);
+        self::assertSame(['lockrot 1.0.0 is in the next major version; run lockrot.phar self-update --allow-major to move to it'], $locator->notes());
+    }
+
+    /** Each locate() starts from no notes. */
+    public function testNotesAreThoseOfTheLastLocate(): void
+    {
+        $http = self::described(['v1.0.0', 'v0.13.0']);
+        $locator = $this->locator($http, '0.13.0');
+
+        $locator->locate();
+        self::assertCount(1, $locator->notes());
+        $locator->locate(true);
+        self::assertSame([], $locator->notes());
     }
 
     public function testTheRunningMajorIsTheFirstNumberOfTheVersion(): void

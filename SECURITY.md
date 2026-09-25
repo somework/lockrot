@@ -39,27 +39,40 @@ The self-update key is RSA 4096 and separate from the GPG release key, the way C
 self-update keys apart from its maintainers' keys: the archive cannot verify OpenPGP without `gpg`
 on the machine, and `openssl_verify()` is in every PHP that can download over https. The private
 half is held by the release workflow (`SELFUPDATE_PRIVATE_KEY`, `SELFUPDATE_PASSPHRASE`); the
-workflow verifies every signature it makes against the committed public key and through the
-archive's own verifier before it publishes. Its fingerprint — the SHA-256 of the DER public key,
+workflow verifies every signature it makes before it publishes, with openssl and through the
+archive's own verifier, against the key the previous release carries (see below). Its fingerprint — the SHA-256 of the DER public key,
 `openssl pkey -pubin -in lockrot-selfupdate-key.pub -outform DER | sha256sum` — is
 `sha256:ec3ca71b1a3ced86f871b89cff7973b58454e5694136683680b72b18070a8f87`.
 
 Every release from 0.13.0 on also publishes `lockrot.phar.meta.json`, which names the fingerprint
 of the key that actually signed it, derived by the workflow from the private key it signed with.
 An archive from 0.13.0 on passes over a release signed with a key it does not carry, and that is
-how a rotation reaches it. The new key ships in a transition release signed with the old key: an
-archive in the field skips the releases after it, whose description names the new key, installs
-the transition release, and from there verifies with the new key. The changelog of the transition
-release names the new key's fingerprint. A key suspected compromised is rotated the same way, and
-the releases it signed are pulled.
+how a planned rotation reaches it. The new key ships in a transition release signed with the old
+key: an archive in the field skips the releases after it, whose description names the new key,
+installs the transition release, and from there verifies with the new key. The changelog of the
+transition release names the new key's fingerprint.
 
-The first rotation still has one manual step: the workflow checks every signature and description
-against the committed public key, and a transition release is the one release whose signer (the
-old key) is not the committed key (already the new one). That check is relaxed for that one
-release, which is built with the old key as `SELFUPDATE_PRIVATE_KEY`; every release after it is
-signed with the new key and checked as usual. Archives up to 0.12 read only the newest release, so
-after a rotation their `self-update` refuses the new release as a signature mismatch and leaves
-itself in place — replace such an archive by hand once.
+The release workflow verifies every self-update signature against the key the previous release
+carries (`lockrot-selfupdate-key.pub` at the previous `v*` tag) — the key every archive in the field
+will verify it with — and the description must name that key. A rotation that skips its transition
+release, replacing the key in the source tree and the secret at once, therefore fails the build. The
+transition release needs no exception: it is built with the old key still as
+`SELFUPDATE_PRIVATE_KEY`, while the source tree already carries the new one, so it passes, and the
+workflow says it is a transition release. The secret is replaced with the new key right after it,
+and the same check then holds the next release to the new key.
+
+An archive that finds newer releases only under a key it does not carry, and no release it can
+install that carries that key — the transition release missing, pulled, or needing a newer PHP — is
+stranded: `self-update` and `self-update --check` exit 2 and say so, and the archive has to be
+replaced by hand ([Reinstalling by hand](https://lockrot.dev/phar/#reinstalling-by-hand)).
+
+A transition release is for a planned rotation only. After a compromise the old key cannot vouch
+for anything, a transition release it would sign included: every release signed with it is pulled,
+and every archive that carries it — 0.13 and later just as much as 0.12 and older — has to be
+replaced by hand with a download verified with the GPG signature or the attestation below. The
+advisory and the changelog name the new key's fingerprint. Archives up to 0.12 read only the newest
+release, so after any rotation their `self-update` refuses the new release as a signature mismatch
+and leaves itself in place — replace such an archive by hand once.
 
 Every release from 0.5.0 on is also signed with the lockrot release key — `lockrot.phar.asc` next
 to the PHAR — and attested by GitHub:
@@ -86,8 +99,10 @@ the recipe.
 
 lockrot reads `composer.json` and `composer.lock` and never writes to either. The PHAR always runs
 the inspected project with `--no-plugins`, so it never executes that project's Composer plugins.
-Network access is limited to the configured Composer repositories and the GitHub API (repository
-activity checks, and release lookups for `self-update`); `GITHUB_TOKEN` and
-`LOCKROT_GITHUB_TOKEN` are read from the environment and are never written anywhere.
+Network access is limited to the configured Composer repositories, the GitHub API (repository
+activity checks, and release lookups for `self-update`) and, for `self-update` only, the release
+downloads on `github.com` (the archive, its checksum, signature and `lockrot.phar.meta.json`, which
+`--check` reads too); `GITHUB_TOKEN` and `LOCKROT_GITHUB_TOKEN` are read from the environment and
+are never written anywhere.
 
 lockrot does not check for known CVEs in your dependencies. For that, use `composer audit`.

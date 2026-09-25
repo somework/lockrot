@@ -40,6 +40,47 @@ final class ReleaseDescriptionTest extends TestCase
     }
 
     /** @return iterable<string, array{0: string}> */
+    public static function floorsInAnotherSpelling(): iterable
+    {
+        yield 'not a version' => ['soon'];
+        // Each of these is a version Composer's parser accepts, and each compares wrongly as a
+        // string: `v8.1.0` sorts below every PHP, `8.1.0.0` above 8.1.0 itself.
+        yield 'a leading v' => ['v8.1.0'];
+        yield 'a leading capital V' => ['V8.1.0'];
+        yield 'two numbers' => ['8.1'];
+        yield 'four numbers' => ['8.1.0.0'];
+        yield 'a space in front' => [' 8.1.0'];
+        yield 'a newline behind' => ["8.1.0\n"];
+        yield 'build metadata' => ['8.1.0+build'];
+        // What would otherwise reach the terminal verbatim in the note naming the floor.
+        yield 'an escape sequence' => ["99.0.0+\u{1b}[2K"];
+        yield 'a console tag' => ['99.0.0 as <href=https://evil.test>click</>'];
+        yield 'empty' => [''];
+    }
+
+    /**
+     * A floor in any other spelling than the workflow's is no floor at all: the release is known
+     * not to be fit to try, but not why, and the value is never compared or printed.
+     *
+     * @dataProvider floorsInAnotherSpelling
+     */
+    #[DataProvider('floorsInAnotherSpelling')]
+    public function testAFloorInAnotherSpellingIsNoFloor(string $floor): void
+    {
+        $body = json_encode(['php' => $floor, 'selfupdate-key' => self::KEY], \JSON_THROW_ON_ERROR);
+
+        $description = ReleaseDescription::fromJson($body, self::URL);
+
+        self::assertNull($description->phpFloor());
+        self::assertSame(self::KEY, $description->signingKey());
+    }
+
+    public function testTheFloorPatternIsPinned(): void
+    {
+        self::assertSame('/^\\d+\\.\\d+\\.\\d+$/D', ReleaseDescription::PHP_FLOOR_PATTERN);
+    }
+
+    /** @return iterable<string, array{0: string}> */
     public static function notADescription(): iterable
     {
         $key = '"selfupdate-key": "'.self::KEY.'"';
@@ -48,7 +89,6 @@ final class ReleaseDescriptionTest extends TestCase
         yield 'json but not an object' => ['"7.4.0"'];
         yield 'no floor' => ['{'.$key.'}'];
         yield 'a floor that is not a string' => ['{"php": 7.4, '.$key.'}'];
-        yield 'a floor that is not a version' => ['{"php": "soon", '.$key.'}'];
         yield 'no key' => ['{"php": "7.4.0"}'];
         yield 'a key that is not a string' => ['{"php": "7.4.0", "selfupdate-key": 42}'];
         yield 'a key without its algorithm' => ['{"php": "7.4.0", "selfupdate-key": "'.substr(self::KEY, 7).'"}'];

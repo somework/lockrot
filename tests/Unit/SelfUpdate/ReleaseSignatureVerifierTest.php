@@ -181,6 +181,23 @@ final class ReleaseSignatureVerifierTest extends TestCase
         $this->verifier($pem)->keyFingerprint();
     }
 
+    /**
+     * A block that is well-formed base64 but not a key openssl can load has no fingerprint either:
+     * one that hashed would match no release's description, and every release would be passed over
+     * as signed with another key instead of this being the error verify() reports for the same key.
+     */
+    public function testAKeyOpensslCannotLoadHasNoFingerprint(): void
+    {
+        $lines = explode("\n", SigningKeys::releasePublicPem());
+        unset($lines[3]);
+        $damaged = implode("\n", $lines);
+        self::assertFalse(openssl_pkey_get_public($damaged), 'the fixture must be a key openssl refuses');
+
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('the public key self-update verifies releases with cannot be loaded; download the new release by hand and verify it');
+        $this->verifier($damaged)->keyFingerprint();
+    }
+
     /** The signature file is read before the key: garbage in is reported as garbage, not as a key fault. */
     public function testTheFileIsReadBeforeTheKeyIsLoaded(): void
     {

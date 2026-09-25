@@ -31,7 +31,10 @@ final class Release
         $this->signatureUrl = $signatureUrl;
     }
 
-    /** The tag without its leading `v`, normalised by Composer's own version parser. */
+    /**
+     * The version the tag names, `major.minor.patch`: Composer's normalised form without its fourth
+     * number when that is 0, whatever spelling the tag used (`v0.13`, `V0.13.0` are both 0.13.0).
+     */
     public function version(): string
     {
         return $this->version;

@@ -61,7 +61,7 @@ mutant from the original, and says why.
 
 ## src/SelfUpdate and src/Composer/SelfUpdateCommand.php
 
-src/Composer/SelfUpdateCommand.php:140 FalseValue (`\Phar::running(false)` → `\Phar::running(true)`) — the
+src/Composer/SelfUpdateCommand.php:143 FalseValue (`\Phar::running(false)` → `\Phar::running(true)`) — the
 two differ only inside a running PHAR, where `false` gives `/path/lockrot.phar` and `true` gives
 `phar:///path/lockrot.phar`; the unit suite is not running from a PHAR, so both return `''` and take the same
 branch. The difference is exercised by `tests/E2E/PharTest.php::testSelfUpdateFinishesCleanlyAfterReplacingTheRunningArchive`,
@@ -80,6 +80,15 @@ src/Composer/SelfUpdateCommand.php:203 ConcatOperandRemoval (drops the closing `
 `\Throwable` branch; killed counterpart is `testAFailureThatIsNotAConfigErrorIsStillOneLineAndExitTwo`. Both
 mutants on this line are new: the branch had no coverage at the time escaped-A.txt was taken, so its mutants
 were counted as uncovered rather than escaped.
+
+Both lines now pass the message through `SelfUpdateCommand::plain()` first; the mutant still only drops the
+closing tag, and the reasoning above is unchanged (line numbers checked 2026-09-26).
+
+src/SelfUpdate/ReleaseLocator.php:435 CastString (`(string) preg_replace(...)` → `preg_replace(...)`) — the
+display version of a candidate. preg_replace() returns null only when the pattern fails to compile or the
+backtrack limit is hit; the pattern is a literal that compiles, and the subject is a normalised stable version
+(`\d+.\d+.\d+.\d+` with at most a short suffix), far below any limit. The cast states the `string` type the
+candidate array promises; it never changes a value.
 
 ## src/Composer (the rest) and src/Config
 

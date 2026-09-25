@@ -109,6 +109,11 @@ final class SelfUpdateCommandTest extends TestCase
         return GitHubReleases::assetUrl('v'.$version, ReleaseLocator::PHAR_ASSET);
     }
 
+    private static function metaUrl(string $version): string
+    {
+        return GitHubReleases::assetUrl('v'.$version, ReleaseLocator::METADATA_ASSET);
+    }
+
     private function validator(?string $error = null): PharValidatorInterface
     {
         return new class ($error) implements PharValidatorInterface {
@@ -200,7 +205,9 @@ final class SelfUpdateCommandTest extends TestCase
             'lockrot '.self::newer().' is available (installed: '.Version::STRING.'); run lockrot.phar self-update',
             $tester->getDisplay()
         );
-        self::assertNotContains(self::pharUrl(self::newer()), $http->requested(), '--check never downloads the phar');
+        // The list and the chosen release's description, from GitHub's release download host —
+        // never the archive, its checksum or its signature.
+        self::assertSame([self::URL, self::metaUrl(self::newer())], $http->requested());
     }
 
     public function testAnUpdateReplacesThePharAndReportsBothVersions(): void
@@ -254,6 +261,120 @@ final class SelfUpdateCommandTest extends TestCase
         self::assertNotContains(self::pharUrl(Version::STRING), $http->requested());
     }
 
+    /**
+     * Where --force alone would fail (nothing in the running line to reinstall), --check --force
+     * reports exactly what --check does: --check never installs, so --force changes nothing.
+     */
+    public function testCheckWithForceReportsWhatCheckReports(): void
+    {
+        $http = self::http([self::nextMajor()]);
+
+        [$code, , $stderr] = $this->runCommand($this->command($http, $this->installedPhar()), ['--check' => true, '--force' => true]);
+
+        self::assertSame(0, $code, $stderr);
+        self::assertSame(self::heldBackNote()."\n".'lockrot '.Version::STRING." is up to date\n", $stderr);
+        self::assertSame([self::URL, self::metaUrl(self::nextMajor())], $http->requested());
+    }
+
+    /**
+     * A rotation this archive cannot follow — newer releases only under another key, no transition
+     * release it can install — is exit 2 for a plain run and for --check alike, after the note that
+     * names the release, so a scheduled check notices instead of reading "up to date" forever.
+     */
+    public function testAnArchiveStrandedByARotationIsExitTwoAlsoForCheck(): void
+    {
+        $other = GitHubReleases::fingerprint(SigningKeys::otherPublicPem());
+        $extra = [self::metaUrl(self::newer()) => FakeHttpClient::ok(self::metaUrl(self::newer()), GitHubReleases::meta('7.4.0', $other))];
+        $expected = 'lockrot '.self::newer().' is signed with a self-update key this lockrot.phar does not carry ('.$other.'); only a release that carries that key can update to it'."\n"
+            .'lockrot: the newer releases are signed with a self-update key this lockrot.phar does not carry, and no release it can install carries that key; download lockrot.phar again by hand and verify it (see https://lockrot.dev/phar/#reinstalling-by-hand)'."\n";
+        foreach ([[], ['--check' => true]] as $options) {
+            $phar = $this->installedPhar();
+            $before = (string) file_get_contents($phar);
+
+            [$code, $stdout, $stderr] = $this->runCommand($this->command(self::http([self::newer(), Version::STRING], $extra), $phar), $options);
+
+            self::assertSame(2, $code, $stderr);
+            self::assertSame('', $stdout);
+            self::assertSame($expected, $stderr);
+            self::assertSame($before, file_get_contents($phar));
+        }
+    }
+
+    /** Held back by the PHP floor alone, nothing is wrong: the note, "up to date", exit 0. */
+    public function testNewerReleasesHeldBackByThePhpFloorAloneAreExitZero(): void
+    {
+        $extra = [self::metaUrl(self::newer()) => FakeHttpClient::ok(self::metaUrl(self::newer()), GitHubReleases::meta('99.0.0', GitHubReleases::fingerprint(SigningKeys::releasePublicPem())))];
+        $running = \sprintf('%d.%d.%d', \PHP_MAJOR_VERSION, \PHP_MINOR_VERSION, \PHP_RELEASE_VERSION);
+
+        [$code, , $stderr] = $this->runCommand($this->command(self::http([self::newer(), Version::STRING], $extra), $this->installedPhar()), ['--check' => true]);
+
+        self::assertSame(0, $code, $stderr);
+        self::assertSame(
+            'lockrot '.self::newer().' needs PHP 99.0.0 or newer, and this is PHP '.$running."\n".'lockrot '.Version::STRING." is up to date\n",
+            $stderr
+        );
+    }
+
+    /**
+     * The walk failing further down the list still prints what it decided first: here the
+     * --allow-major advice, ahead of the error about the broken release below it.
+     */
+    public function testNotesArePrintedBeforeAnErrorFurtherDownTheList(): void
+    {
+        $missing = FakeHttpClient::ok(self::URL, GitHubReleases::listJson([
+            GitHubReleases::entry('v'.self::nextMajor()),
+            GitHubReleases::entry('v'.self::newer(), array_values(array_diff(GitHubReleases::ASSETS, [ReleaseLocator::PHAR_ASSET]))),
+        ]));
+
+        [$code, , $stderr] = $this->runCommand($this->command(self::http([self::nextMajor(), self::newer()], [self::URL => $missing]), $this->installedPhar()), []);
+
+        self::assertSame(2, $code, $stderr);
+        self::assertSame(self::heldBackNote()."\n".'lockrot: release v'.self::newer()." has no lockrot.phar asset\n", $stderr);
+    }
+
+    /**
+     * Notes carry text from the release list. A tag with a control sequence and a console tag in
+     * it reaches the terminal as text: the escape byte replaced, the tag printed literally, no
+     * hyperlink opened.
+     */
+    public function testANoteIsPrintedAsTextWhateverTheTagHoldsInIt(): void
+    {
+        $tag = "bad\e[2K<href=https://evil.test>click</>";
+        $list = FakeHttpClient::ok(self::URL, GitHubReleases::listJson([GitHubReleases::entry($tag), GitHubReleases::entry('v'.Version::STRING)]));
+        $http = self::http([Version::STRING], [self::URL => $list]);
+
+        [$code, , $plain] = $this->runCommand($this->command($http, $this->installedPhar()), []);
+        [, , $decorated] = $this->runCommand($this->command($http, $this->installedPhar()), [], true);
+
+        self::assertSame(0, $code, $plain);
+        self::assertSame(
+            'release tag "bad?[2K<href=https://evil.test>click</>" is not a version lockrot can compare, so that release was skipped'."\n"
+            .'lockrot '.Version::STRING." is up to date\n",
+            $plain
+        );
+        self::assertStringNotContainsString("\e]8", $decorated, 'no hyperlink may be opened');
+        self::assertStringNotContainsString("\e[2K", $decorated);
+        self::assertStringContainsString('<href=https://evil.test>click</>', $decorated);
+    }
+
+    /** The same for an error, which names URLs the release list chose. */
+    public function testAnErrorIsPrintedAsTextWhateverTheUrlHoldsInIt(): void
+    {
+        $metaUrl = "https://example.test/\e[2K<href=https://evil.test>m</>";
+        $entry = GitHubReleases::entry('v'.self::newer());
+        $entry['assets'] = [['name' => ReleaseLocator::METADATA_ASSET, 'browser_download_url' => $metaUrl]];
+        $http = new FakeHttpClient([
+            self::URL => FakeHttpClient::ok(self::URL, GitHubReleases::listJson([$entry])),
+            $metaUrl => FakeHttpClient::status($metaUrl, 404, 'Not Found'),
+        ]);
+
+        [$code, , $stderr] = $this->runCommand($this->command($http, $this->installedPhar()), [], true);
+
+        self::assertSame(2, $code, $stderr);
+        self::assertStringContainsString('could not download https://example.test/?[2K<href=https://evil.test>m</>: HTTP 404', $stderr);
+        self::assertStringNotContainsString("\e]8", $stderr);
+    }
+
     public function testANewerMajorIsNotInstalledWithoutAllowMajor(): void
     {
         $phar = $this->installedPhar();
@@ -266,7 +387,8 @@ final class SelfUpdateCommandTest extends TestCase
         self::assertSame('', $stdout);
         self::assertSame(self::heldBackNote()."\n".'lockrot '.Version::STRING." is up to date\n", $stderr);
         self::assertSame($before, file_get_contents($phar));
-        self::assertSame([self::URL], $http->requested());
+        // The next major's description is read before --allow-major is advised; nothing else is.
+        self::assertSame([self::URL, self::metaUrl(self::nextMajor())], $http->requested());
     }
 
     public function testAllowMajorInstallsTheNextMajor(): void
