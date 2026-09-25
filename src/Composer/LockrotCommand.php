@@ -38,7 +38,6 @@ use Lockrot\Output\ReportTargets;
 use Lockrot\Output\TerminalText;
 use Lockrot\Output\TerminalWidth;
 use Lockrot\Version;
-use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
@@ -205,7 +204,7 @@ final class LockrotCommand extends BaseCommand
             $baselineFile = BaselineFile::resolve($cwd, $lockrot->baseline());
             // Checked before the analysis, like the baseline below: a typo in a path fails now,
             // not after a full repository round.
-            $targets = ReportTargets::resolve($specs, $cwd, self::protectedFiles($cwd, $baselineFile, $env));
+            $targets = ReportTargets::resolve($specs, $cwd, $specs === [] ? [] : self::protectedFiles($cwd, $baselineFile, $project));
             // `composer lockrot` is the deliberate, full run: no time budget, unlike the
             // install-time summary.
             $analyzer = AnalyzerBootstrap::create($this->analyzerFactory, $io, $config, $repositories, $project, $lockrot, $env, Deadline::never());
@@ -262,26 +261,26 @@ final class LockrotCommand extends BaseCommand
             // one throws ConfigException from here, which the catch below turns into exit 2 the
             // same way an unreadable lock does a few lines up.
             $context = FormatContext::create($lockPath, $lockrot->failOn(), Version::STRING, TerminalWidth::detect($env, $this->getApplication()));
-            // Only `table` is meant to go through the tag formatter; every machine-readable format
-            // is written raw, so a `<` in a constraint or a package name reaches the parser on the
-            // other end untouched.
+            // Only the format that carries console markup goes through the tag formatter; every
+            // machine-readable one is written raw, so a `<` in a constraint or a package name reaches
+            // the parser on the other end untouched.
             $output->write(
                 Formatters::for($format, $context, $page)->format($report, $showAll),
                 false,
-                $format === 'table' ? OutputInterface::OUTPUT_NORMAL : OutputInterface::OUTPUT_RAW
+                Formatters::carriesConsoleMarkup($format) ? OutputInterface::OUTPUT_NORMAL : OutputInterface::OUTPUT_RAW
             );
             // After stdout, so the report is in the log even when a file cannot be written.
             $this->writeReports($output, $targets, $report, $lockPath, $lockrot, $page, $showAll);
 
             return Policy::exitCode($report, $lockrot);
         } catch (ConfigException $e) {
-            // Raw: a config error can quote the project's own keys (see ProjectConfig), which are
-            // text, not console markup.
-            $this->writeConfigError($output, 'lockrot: '.$e->getMessage());
+            // Raw: a config error can quote the project's own keys (see ProjectConfig) or a path,
+            // which are text, not console markup.
+            $this->writeFailure($output, 'lockrot: '.$e->getMessage());
 
             return Policy::EXIT_ERROR;
         } catch (\Throwable $e) {
-            $this->writeError($output, '<error>lockrot failed: '.OutputFormatter::escape($e->getMessage()).'</error>');
+            $this->writeFailure($output, 'lockrot failed: '.$e->getMessage());
             if ($io->isVerbose()) {
                 $this->writeError($output, $e->getTraceAsString());
             }
@@ -391,33 +390,41 @@ final class LockrotCommand extends BaseCommand
             $page,
             $showAll,
             function (ReportTarget $target) use ($output): void {
-                $this->writeError($output, 'lockrot: '.$target->format().' report written to '.OutputFormatter::escape($target->displayPath()));
+                $this->writeError($output, 'lockrot: '.$target->format().' report written to '.$target->displayPath());
             }
         );
     }
 
     /**
-     * The files an `--output` may not name besides every composer.json and composer.lock, which
-     * {@see ReportTargets} refuses on its own: the baseline, whether or not it exists yet, and — when
-     * `COMPOSER` points Composer at another manifest — that manifest and the lock beside it, named
-     * the way Composer names it (`composer-8.json` -> `composer-8.lock`).
+     * The files an `--output` may not name, besides every composer.json and composer.lock by name,
+     * which {@see ReportTargets} refuses on its own:
      *
-     * @param array<string, string> $env
+     * - every baseline the project names: this run's (`--baseline`, else `extra.lockrot.baseline`,
+     *   else `lockrot-baseline.json`) and the project's own (`extra.lockrot.baseline`, else
+     *   `lockrot-baseline.json`), which `--baseline` does not stop being the committed one — each
+     *   whether or not it exists yet;
+     * - the composer.json and composer.lock this run reads, so a second name for either on disk is
+     *   caught wherever the report would go;
+     * - the manifest Composer reads, as {@see Factory::getComposerFile()} names it (`COMPOSER`), and
+     *   the lock {@see Factory::getLockFile()} pairs with it (`composer-8.json` -> `composer-8.lock`).
+     *   Without `COMPOSER` these are the two above, which come first and keep their reason.
      *
      * @return list<array{0: string, 1: string}>
      */
-    private static function protectedFiles(string $cwd, BaselineFile $baseline, array $env): array
+    private static function protectedFiles(string $cwd, BaselineFile $baseline, ProjectConfig $project): array
     {
-        $files = [[$baseline->path(), 'that is the baseline file, which lockrot writes only with --generate-baseline']];
-        $manifest = trim($env['COMPOSER'] ?? '');
-        if ($manifest !== '') {
-            $manifest = Path::resolve($cwd, $manifest);
-            $lock = pathinfo($manifest, \PATHINFO_EXTENSION) === 'json' ? substr($manifest, 0, -4).'lock' : $manifest.'.lock';
-            $files[] = [$manifest, 'that is the manifest COMPOSER names, which lockrot never writes'];
-            $files[] = [$lock, 'that is the lock COMPOSER names, which lockrot never writes'];
-        }
+        $configured = $project->lockrotExtra()['baseline'] ?? null;
+        $baselineReason = 'that is the baseline file, which lockrot writes only with --generate-baseline';
+        $manifest = Path::resolve($cwd, Factory::getComposerFile());
 
-        return $files;
+        return [
+            [$baseline->path(), $baselineReason],
+            [BaselineFile::resolve($cwd, \is_string($configured) ? $configured : null)->path(), $baselineReason],
+            [$cwd.'/composer.json', ReportTargets::COMPOSER_REASON],
+            [$cwd.'/composer.lock', ReportTargets::COMPOSER_REASON],
+            [$manifest, 'that is the manifest COMPOSER names, which lockrot never writes'],
+            [Factory::getLockFile($manifest), 'that is the lock COMPOSER names, which lockrot never writes'],
+        ];
     }
 
     /**
@@ -479,9 +486,15 @@ final class LockrotCommand extends BaseCommand
         $this->envSnapshot = null;
     }
 
+    /**
+     * One line on stderr, written past Symfony's tag formatter: $message is lockrot's words around
+     * text it did not write — a path, a package name, an exception's message, a stack trace — and
+     * none of that is console markup (see {@see TerminalText}), so a `<` in it prints as given and
+     * nothing needs escaping.
+     */
     private function writeError(OutputInterface $output, string $message): void
     {
-        self::errorOutput($output)->writeln($message);
+        self::errorOutput($output)->writeln($message, OutputInterface::OUTPUT_RAW);
     }
 
     /**
@@ -495,7 +508,7 @@ final class LockrotCommand extends BaseCommand
     }
 
     /** $text on stderr in the `error` colours, past the formatter for the same reason. */
-    private function writeConfigError(OutputInterface $output, string $text): void
+    private function writeFailure(OutputInterface $output, string $text): void
     {
         $target = self::errorOutput($output);
         $target->writeln(TerminalText::error($text, $target->isDecorated()), OutputInterface::OUTPUT_RAW);

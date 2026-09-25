@@ -134,7 +134,8 @@ final class SelfUpdateCommand extends BaseCommand
         // `Policy::EXIT_OK` in a return statement below would be exactly that — the first use of
         // Policy in a self-update run, resolved too late to succeed. Everything else on the way out
         // is already in memory: writeError() only calls `instanceof`, which never triggers the
-        // autoloader, and `writeln()` on an output object built before the command ran.
+        // autoloader, OutputFormatter::escape() on a class the output's own formatter loaded, and
+        // `writeln()` on an output object built before the command ran.
         $exitOk = Policy::EXIT_OK;
         $exitError = Policy::EXIT_ERROR;
         $exitFindings = Policy::EXIT_FINDINGS;
@@ -196,11 +197,11 @@ final class SelfUpdateCommand extends BaseCommand
 
             return $exitOk;
         } catch (ConfigException $e) {
-            $this->writeError($output, '<error>lockrot: '.self::plain($e->getMessage()).'</error>');
+            $this->writeError($output, 'lockrot: '.self::plain($e->getMessage()), 'error');
 
             return $exitError;
         } catch (\Throwable $e) {
-            $this->writeError($output, '<error>lockrot self-update failed: '.self::plain($e->getMessage()).'</error>');
+            $this->writeError($output, 'lockrot self-update failed: '.self::plain($e->getMessage()), 'error');
 
             return $exitError;
         }
@@ -246,19 +247,26 @@ final class SelfUpdateCommand extends BaseCommand
     }
 
     /**
-     * $text as text and nothing else: the notes and the errors carry tags, versions and URLs from
-     * the release list and its assets, which must neither open a console style (`<href=…>`) nor
-     * reach the terminal as a control sequence. C0 controls, DEL and the C1 controls (in their UTF-8
-     * form) become `?`; the rest is escaped for Symfony's formatter.
+     * $text with nothing a terminal would obey: the notes and the errors carry tags, versions and
+     * URLs from the release list and its assets, which must not reach the terminal as a control
+     * sequence. C0 controls, DEL and the C1 controls (in their UTF-8 form) become `?`; writeError()
+     * escapes the rest, so a `<href=…>` in it never opens a console style.
      */
     private static function plain(string $text): string
     {
-        return OutputFormatter::escape((string) preg_replace('/[\x00-\x1F\x7F]|\xC2[\x80-\x9F]/', '?', $text));
+        return (string) preg_replace('/[\x00-\x1F\x7F]|\xC2[\x80-\x9F]/', '?', $text);
     }
 
-    private function writeError(OutputInterface $output, string $message): void
+    /**
+     * One line on stderr, $message escaped so that nothing in it — a version from the release
+     * document, an exception's message — is read as a console tag and lost; $style, when given,
+     * wraps it in that one tag of lockrot's own. OutputFormatter is loaded long before the archive
+     * can be replaced: the output this writes to was built with one.
+     */
+    private function writeError(OutputInterface $output, string $message, ?string $style = null): void
     {
         $target = $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output;
-        $target->writeln($message);
+        $escaped = OutputFormatter::escape($message);
+        $target->writeln($style === null ? $escaped : '<'.$style.'>'.$escaped.'</'.$style.'>');
     }
 }

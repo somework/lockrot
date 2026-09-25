@@ -31,6 +31,7 @@ use Lockrot\Data\Repository\RepositoryMetadataLoader;
 use Lockrot\Deadline;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Verdict\VerdictEngine;
+use Symfony\Component\Console\Formatter\OutputFormatter;
 
 /**
  * Builds the analyzer and its HTTP stack from Composer's own IO, Config and repositories.
@@ -127,7 +128,7 @@ final class ServiceFactory
 
                 return true;
             } catch (\Throwable $e) {
-                $io->writeError('<warning>lockrot: Bitbucket OAuth token request failed, continuing without credentials: '.$e->getMessage().'</warning>', true, IOInterface::VERBOSE);
+                $io->writeError('<warning>lockrot: Bitbucket OAuth token request failed, continuing without credentials: '.OutputFormatter::escape($e->getMessage()).'</warning>', true, IOInterface::VERBOSE);
 
                 return false;
             }

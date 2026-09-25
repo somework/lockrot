@@ -544,6 +544,20 @@ final class InstallTimeSummaryTest extends TestCase
         self::assertStringContainsString('lockrot: install-time check skipped: boom', $io->getOutput());
     }
 
+    public function testAFailureMessageThatLooksLikeAConsoleTagIsPrintedAsGiven(): void
+    {
+        $this->project();
+        $io = new BufferIO();
+        $event = $this->event($io, new Transaction([], [$this->loadPackage(self::PHPZIP)]));
+        $factory = static function (): Analyzer {
+            throw new \RuntimeException('cannot open <info>here</info>');
+        };
+
+        (new InstallTimeSummary($factory))->onPreOperationsExec($event);
+
+        self::assertStringContainsString('lockrot: install-time check skipped: cannot open <info>here</info>', $io->getOutput());
+    }
+
     /**
      * A multi-line exception message (a wrapped exception's chain, a library's own multi-line error)
      * must not split the one promised warning line into several, and the collapsing must not leave

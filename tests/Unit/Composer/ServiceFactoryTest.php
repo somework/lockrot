@@ -6,6 +6,7 @@ namespace Lockrot\Tests\Unit\Composer;
 
 use Composer\Config;
 use Composer\Downloader\TransportException;
+use Composer\IO\BufferIO;
 use Composer\IO\IOInterface;
 use Composer\IO\NullIO;
 use Composer\Util\Http\Response;
@@ -276,6 +277,20 @@ final class ServiceFactoryTest extends TestCase
             self::assertFalse(ServiceFactory::bitbucketAuthorizer($io, $config, Deadline::never(), static fn (): RecordingTokenDownloader => $downloader)(), (string) $status);
             self::assertSame(['username' => 'key', 'password' => 'secret'], $io->getAuthentication('bitbucket.org'), 'nothing changed');
         }
+    }
+
+    /** The transport's message reaches the user as it was, even when it looks like a console tag. */
+    public function testARefusalMessageThatLooksLikeAConsoleTagIsPrintedAsGiven(): void
+    {
+        $config = self::bitbucketConfig();
+        $io = new BufferIO('', OutputInterface::VERBOSITY_VERBOSE);
+        $io->setAuthentication('bitbucket.org', 'key', 'secret');
+
+        self::assertFalse(ServiceFactory::bitbucketAuthorizer($io, $config, Deadline::never(), static function (): HttpDownloader {
+            throw new \RuntimeException('refused by <info>proxy</info>');
+        })());
+
+        self::assertStringContainsString('continuing without credentials: refused by <info>proxy</info>', $io->getOutput());
     }
 
     /**

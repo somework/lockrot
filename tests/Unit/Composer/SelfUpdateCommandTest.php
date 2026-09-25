@@ -8,6 +8,7 @@ use Composer\Console\Application;
 use Composer\Util\Platform;
 use Lockrot\Composer\SelfUpdateCommand;
 use Lockrot\Data\Http\HttpResult;
+use Lockrot\Exception\ConfigException;
 use Lockrot\SelfUpdate\PharValidatorInterface;
 use Lockrot\SelfUpdate\ReleaseLocator;
 use Lockrot\SelfUpdate\ReleaseSignatureVerifier;
@@ -637,6 +638,39 @@ final class SelfUpdateCommandTest extends TestCase
             self::styledWhole('lockrot self-update failed: the downloader could not be built'),
             $stderr
         );
+    }
+
+    /** A message that looks like a console tag reaches stderr as it was, not with the tag swallowed. */
+    public function testAFailureMessageIsPrintedAsGiven(): void
+    {
+        $command = $this->registered(new SelfUpdateCommand(
+            static function (): array {
+                throw new \RuntimeException('cannot reach <info>the host</info>');
+            },
+            $this->validator(),
+            $this->installedPhar()
+        ));
+
+        [$code, , $stderr] = $this->runCommand($command, []);
+
+        self::assertSame(2, $code);
+        self::assertSame("lockrot self-update failed: cannot reach <info>the host</info>\n", $stderr);
+    }
+
+    public function testAConfigErrorMessageIsPrintedAsGiven(): void
+    {
+        $command = $this->registered(new SelfUpdateCommand(
+            static function (): array {
+                throw new ConfigException('no release at <comment>here');
+            },
+            $this->validator(),
+            $this->installedPhar()
+        ));
+
+        [$code, , $stderr] = $this->runCommand($command, []);
+
+        self::assertSame(2, $code);
+        self::assertSame("lockrot: no release at <comment>here\n", $stderr);
     }
 
     /** The same for the errors lockrot raises itself, which is every failure a user normally sees. */

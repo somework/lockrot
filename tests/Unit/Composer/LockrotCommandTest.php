@@ -1939,6 +1939,9 @@ final class LockrotCommandTest extends TestCase
         yield 'the default baseline, which does not exist yet' => [[], 'json:lockrot-baseline.json', 'that is the baseline file, which lockrot writes only with --generate-baseline', null];
         yield 'the baseline --baseline names' => [['--baseline' => 'custom.json'], 'json:custom.json', 'that is the baseline file, which lockrot writes only with --generate-baseline', null];
         yield 'the baseline extra.lockrot names' => [[], 'json:ci-baseline.json', 'that is the baseline file, which lockrot writes only with --generate-baseline', ['baseline' => 'ci-baseline.json']];
+        // --baseline points this run elsewhere; the project's committed baseline is still its baseline
+        yield 'the baseline extra.lockrot names, when --baseline names another' => [['--baseline' => 'other.json'], 'json:ci-baseline.json', 'that is the baseline file, which lockrot writes only with --generate-baseline', ['baseline' => 'ci-baseline.json']];
+        yield 'the default baseline, when --baseline names another' => [['--baseline' => 'other.json'], 'json:lockrot-baseline.json', 'that is the baseline file, which lockrot writes only with --generate-baseline', null];
     }
 
     /**
@@ -1999,6 +2002,46 @@ final class LockrotCommandTest extends TestCase
                 self::assertSame('lockrot: --output='.$spec.': that is '.$what.' COMPOSER names, which lockrot never writes'."\n", $stderr);
             }
         });
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function projectFiles(): iterable
+    {
+        yield 'the lock' => ['composer.lock'];
+        yield 'the manifest' => ['composer.json'];
+    }
+
+    /**
+     * A second name on disk for the project's manifest or lock — a hard link here, in another
+     * directory — is that file.
+     *
+     * @dataProvider projectFiles
+     */
+    #[DataProvider('projectFiles')]
+    public function testAnOutputThatIsAProjectFileOnDiskIsExit2(string $file): void
+    {
+        $dir = $this->wallabagCopy();
+        mkdir($dir.'/out');
+        link($dir.'/'.$file, $dir.'/out/r.json');
+        $called = false;
+
+        [$code, , $stderr] = $this->runCommandWithSplitStreams($this->recordingCommand($called), ['--output' => ['json:out/r.json'], '--target-php' => '8.4']);
+
+        self::assertSame(2, $code);
+        self::assertSame("lockrot: --output=json:out/r.json: lockrot never writes composer.json or composer.lock\n", $stderr);
+        self::assertFalse($called);
+    }
+
+    /** Every line lockrot prints on stderr shows a path as it was given, `<` and all. */
+    public function testTheBaselineLineShowsAPathThatLooksLikeAConsoleTagAsGiven(): void
+    {
+        $dir = $this->wallabagCopy();
+
+        [$code, , $stderr] = $this->runWithSplitStreams(['--generate-baseline' => true, '--baseline' => '<info>b.json', '--target-php' => '8.4'], $this->loader());
+
+        self::assertSame(0, $code, $stderr);
+        self::assertMatchesRegularExpression('/\Alockrot: baseline written to <info>b\.json \(\d+ findings\)\n\z/', $stderr);
+        self::assertFileExists($dir.'/<info>b.json');
     }
 
     /** @return iterable<string, array{list<string>, string}> */
