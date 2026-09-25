@@ -37,7 +37,7 @@ that never arrived would accept findings lockrot was not actually able to check.
 {
     "$schema": "https://lockrot.dev/schema/baseline-1.json",
     "lockrot": {
-        "version": "0.12.0",
+        "version": "0.13.0",
         "schema": 1
     },
     "generated_at": "2026-09-14T00:00:00+00:00",

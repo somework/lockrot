@@ -11,5 +11,5 @@ namespace Lockrot;
  */
 final class Version
 {
-    public const STRING = '0.12.0';
+    public const STRING = '0.13.0';
 }

@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.13.0] - 2026-09-26
+
 ### Changed
 
 - Every class, interface and trait under `src/` is now marked `@internal`, the Composer plugin class
@@ -995,7 +997,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The "GitHub token not set" note counts packages whose repository activity was checked, not
   distinct repositories, so packages sharing one repository are no longer under-reported.
 
-[Unreleased]: https://github.com/somework/lockrot/compare/v0.12.0...HEAD
+[Unreleased]: https://github.com/somework/lockrot/compare/v0.13.0...HEAD
+[0.13.0]: https://github.com/somework/lockrot/compare/v0.12.0...v0.13.0
 [0.12.0]: https://github.com/somework/lockrot/compare/v0.11.0...v0.12.0
 [0.11.0]: https://github.com/somework/lockrot/compare/v0.10.0...v0.11.0
 [0.10.0]: https://github.com/somework/lockrot/compare/v0.9.0...v0.10.0
