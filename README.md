@@ -143,7 +143,7 @@ carries its own value in `--format=json`, and the report's block is the arithmet
 |---|---|
 | `0` | No finding reached the `fail-on` threshold (or `fail-on=none`) |
 | `1` | A finding reached or exceeded the `fail-on` threshold |
-| `2` | Tool or configuration error |
+| `2` | Tool, configuration or usage error (an unknown option, a bad value) |
 
 A network failure is reported as a note and never fails the run on its own, unless you pass
 `--strict-network`. `--format=github` turns findings into pull-request annotations, `--format=sarif`
