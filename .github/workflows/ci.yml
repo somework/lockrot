@@ -127,7 +127,9 @@ jobs:
         uses: actions/upload-artifact@v7
         with: {name: 'infection (${{ matrix.shard.name }})', path: build/infection.log, if-no-files-found: ignore}
   # docs/ is rendered at lockrot.dev from the newest tag by the somework/lockrot.dev repository;
-  # --strict here is the only place a broken link or a page outside the nav fails before a release.
+  # --strict here is the only place a broken link, a link to a missing anchor or a page outside the
+  # nav fails before a release. The last two are warnings only because mkdocs.yml's `validation`
+  # block makes them so; mkdocs's defaults print them as info lines, which --strict lets through.
   docs:
     runs-on: ubuntu-latest
     steps:
