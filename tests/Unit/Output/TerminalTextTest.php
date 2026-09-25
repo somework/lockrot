@@ -93,6 +93,7 @@ final class TerminalTextTest extends TestCase
     {
         self::assertSame('abcd…', TerminalText::escape('abcdefgh', 4));
         self::assertSame('ab\\t…', TerminalText::escape("ab\tcd", 4));
+        self::assertSame('a\\tbc…', TerminalText::escape("a\tbcdef", 5));
     }
 
     /** neutralise() is for text people read rather than compare: a Windows path keeps its backslashes. */

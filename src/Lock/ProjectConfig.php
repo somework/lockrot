@@ -118,7 +118,7 @@ final class ProjectConfig
             return $schemaError;
         }
 
-        return new ConfigException($schemaError->getMessage()."\n  - ".implode("\n  - ", $warnings), 0, $schemaError);
+        return new ConfigException($schemaError->getMessage()."\n  - ".implode("\n  - ", $warnings), $schemaError->getCode(), $schemaError);
     }
 
     /**

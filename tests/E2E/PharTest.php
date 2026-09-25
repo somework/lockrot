@@ -240,6 +240,38 @@ final class PharTest extends TestCase
     }
 
     /**
+     * The symfony/console inside the PHAR is where a key like `<<fg=red>>` broke the run: escaped by
+     * OutputFormatter::escape() and handed to the formatter, it threw `Invalid "red>" color`, exit 2
+     * with nothing on stdout. Written raw, the key prints as written — in the warning, and in the
+     * config error that quotes it when the schema rejects the config.
+     */
+    public function testAKeyThatLooksLikeMarkupPrintsAsWrittenFromThePhar(): void
+    {
+        $dir = $this->freshDir();
+        file_put_contents($dir.'/composer.lock', (string) json_encode(['packages' => [], 'packages-dev' => []]));
+        file_put_contents($dir.'/composer.json', (string) json_encode(['name' => 'acme/markup-key', 'extra' => ['lockrot' => ['<<fg=red>>' => 1, '<<href=https://example.com>>' => 1]]]));
+
+        $process = $this->runPhar(['--format=json', '--offline'], $dir);
+
+        $stderr = $process->getErrorOutput();
+        self::assertSame(0, $process->getExitCode(), $stderr);
+        self::assertIsArray(json_decode($process->getOutput(), true), $stderr);
+        self::assertSame(
+            "lockrot: unknown key extra.lockrot.<<fg=red>> ignored\nlockrot: unknown key extra.lockrot.<<href=https://example.com>> ignored\n",
+            $stderr
+        );
+
+        file_put_contents($dir.'/composer.json', (string) json_encode(['name' => 'acme/markup-key', 'extra' => ['lockrot' => ['<<fg=red>>' => 1, 'fail-on' => 'dead']]]));
+
+        $failed = $this->runPhar(['--offline'], $dir);
+
+        self::assertSame(2, $failed->getExitCode(), $failed->getErrorOutput());
+        self::assertSame('', $failed->getOutput());
+        self::assertStringStartsWith('lockrot: extra.lockrot is invalid:', $failed->getErrorOutput());
+        self::assertStringEndsWith("\n  - unknown key extra.lockrot.<<fg=red>> ignored\n", $failed->getErrorOutput());
+    }
+
+    /**
      * A real self-update, end to end: a real PHAR replaces itself with a different, valid archive
      * and then has to finish. Everything up to the swap is covered by unit tests; what only a
      * separate process can show is what happens afterwards, when the code the running archive still

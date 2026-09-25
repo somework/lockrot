@@ -373,19 +373,25 @@ its slashes unescaped. Two are equivalent:
 ## Unknown `extra.lockrot` keys (0.13.0)
 
 Measured over the branch's changed lines (`--git-diff-lines` against `origin/main`, which takes in
-the two new classes whole and the two call sites): 94 mutants, 92 killed, MSI = Covered MSI 97%. The
-first pass escaped one more, a real gap — nothing had two unknown keys in `ignore` entries, so
-returning only the first went unseen; a test with three across two entries kills it. Two are
-equivalent, both on the guard in front of `levenshtein()`:
+`UnknownKeys` and `TerminalText` whole, the schema-error hint in `ProjectConfig` and the call sites
+in the command and the install-time summary): 169 mutants, 167 killed, Covered MSI 98%. Earlier
+passes escaped more, all real gaps or removable: nothing had two unknown keys in `ignore` entries,
+so returning only the first went unseen (a test with three across two entries kills it); a cut that
+kept part of a printable run after an escape was untested (`a\tbc…` kills the swapped
+concatenation); and `TerminalText` once had a length guard, anchors and a bit mask that no input
+could tell apart from their mutants, so it now reads one unit at a time with named groups and
+subtracts the UTF-8 length marker instead. Two are equivalent, both on the guard in front of
+`levenshtein()`:
 
-- `src/Config/UnknownKeys.php:130` GreaterThan (`strlen($key) > 255` → `>=`) — `nearest()` gives up
+- `src/Config/UnknownKeys.php:143` GreaterThan (`strlen($key) > 255` → `>=`) — `nearest()` gives up
   on a key of exactly 255 bytes instead of measuring it. Measured, it would come back empty anyway:
   it is at least 236 edits from the longest known key (19 bytes), far past the third of 255 the
   threshold allows, and no known key is long enough to contain it. Every length the mutant moves to
   the early return gets the same `null` the loop would give.
-- `src/Config/UnknownKeys.php:131` ReturnRemoval — without the early return a key longer than 255
+- `src/Config/UnknownKeys.php:144` ReturnRemoval — without the early return a key longer than 255
   bytes reaches `levenshtein()`. On PHP 8, where Infection runs, that function measures strings of
   any length, finds no known key within reach (by the same arithmetic) and returns no suggestion, so
   the result is the same. The guard is for PHP 7.4, whose `levenshtein()` emits a warning and returns
-  `-1` past 255 bytes, and `-1` is within any threshold: `UnknownKeysTest::testAVeryLongKeyGetsNoSuggestion()`
-  fails without it on the 7.4 leg of the test matrix, which Infection does not run.
+  `-1` past 255 bytes, and `-1` is within any threshold:
+  `UnknownKeysTest::testAVeryLongKeyIsCutAndGetsNoSuggestion()` fails without it on the 7.4 leg of
+  the test matrix, which Infection does not run.
