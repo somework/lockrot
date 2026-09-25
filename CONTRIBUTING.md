@@ -85,11 +85,17 @@ still holds.
 
 ## Backward compatibility
 
-The CLI (`composer lockrot` options), the `extra.lockrot` configuration keys, the output formats,
-the baseline file and the exit codes are the public interface and follow semantic versioning. The
-PHP classes under `src/` are not a public API and may change in any release: every class, interface,
-trait and enum there is marked `@internal`, and `tests/Unit/PublicApiTest.php` fails on one that is
-not. PHPStan reports a use of an `@internal` class from code outside its root namespace, `Lockrot\`;
+The public interface follows semantic versioning. It is:
+
+- the CLI (`composer lockrot` options) and its exit codes;
+- the `extra.lockrot` configuration keys;
+- the machine-readable output formats (`json`, `sarif`, `gitlab`, `github`);
+- the baseline file.
+
+`table`, `markdown` and `html` are for people and may change in any release. The PHP classes under
+`src/` are not a public API and may change in any release too: every class, interface, trait and
+enum there is marked `@internal`, and `tests/Unit/PublicApiTest.php` fails on one that is not.
+PHPStan reports a use of an `@internal` class from code outside its root namespace, `Lockrot\`;
 code declared under `Lockrot\` itself, `Lockrot\Extension\` included, gets no warning. IDEs flag
 such uses too, by rules of their own.
 
@@ -97,6 +103,15 @@ The namespace `Lockrot\Extension\` is reserved. Nothing is declared in it, and t
 on a class that is, or on a `src/Extension/` directory, in any letter case: PHP matches namespaces
 without regard to case. The reservation keeps the name free; it is not a promise that anything will
 be published there, or in what form.
+
+What 1.0 will freeze, and what it will not, is drafted in
+[`docs/compatibility.md`](docs/compatibility.md): the closed sets of verdicts and priorities and
+their order, finding identity, the severity mapping, the names reserved for extensions, and the
+deprecation policy.
+
+From 0.13 on, a change to the verdict or the priority lockrot gives a package goes into a minor
+release, never a patch, and gets a line under `### Verdict changes` in `CHANGELOG.md`. The one
+exception is a curated-data fix that only removes a false verdict, which may ship in a patch.
 
 ## What lockrot writes
 

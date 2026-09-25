@@ -49,6 +49,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   [the PHAR page](https://lockrot.dev/phar/#keeping-it-updated)). `LOCKROT_RELEASE_URL`, the test
   hook, now names a release list.
 
+- The semantic-versioning promise is narrower. `CONTRIBUTING.md` and the README used to say that
+  "the output formats" follow semantic versioning, which covered the wording of a `table` row and
+  the look of the HTML page as much as a SARIF `ruleId`. The public interface is now named as the
+  CLI and its exit codes, the configuration keys, the machine-readable formats (`json`, `sarif`,
+  `gitlab`, `github`) and the baseline file; `table`, `markdown` and `html` are for people and may
+  change in any release. The promise is narrowed now because it can only be narrowed before 1.0.
+
+- A release that changes the verdict or the priority lockrot gives a package says so under a
+  heading of its own, **Verdict changes**, from 0.13 on, and ships only in a minor release. Until
+  now such a change sat under `Changed` or `Fixed` with everything else, and a team deciding whether
+  an upgrade can turn its pipeline red had to read every entry to find out.
+
 ### Added
 
 - A schema evolution test. Under one schema number a document may only gain fields, so whatever an
@@ -146,6 +158,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   interrupted run can leave a `*.tmp` there), its activity cache under Composer's cache directory,
   and with `self-update` the PHAR; never `composer.json` or `composer.lock` — where they used to call
   the baseline the only file lockrot writes.
+
+- `docs/compatibility.md`, a draft of the promise lockrot 1.0 will make, marked as a draft until
+  1.0.0-RC1. Until now the promise was one sentence in `CONTRIBUTING.md`, which said neither which
+  parts of a format are fixed nor whether a minor release may change the verdict a package gets. The
+  page names what 1.0 freezes (the machine-readable documents; the identity and severity fields of
+  SARIF, GitLab Code Quality and GitHub annotations; the CLI and the exit codes; the closed sets of
+  verdicts, priorities, levels and baseline standings, in their order), what it does not
+  (human-readable output, which verdict and priority a package gets), how verdicts may change
+  between releases and what a baseline does and does not absorb, the names reserved for
+  extensions, the deprecation policy, and what lockrot never does. Items not in lockrot yet are
+  marked *planned*.
+
+- A test that holds the code, the published report, explain and baseline schemas, and the
+  compatibility and verdicts pages to the same verdicts and priorities in the same order, and that
+  keeps every name lockrot ships out of the namespaces reserved for extensions. The existing tests
+  compared the lists through the class constants, so they would have followed a changed value
+  rather than caught it. `docs/verdicts.md` now lists all nine verdicts in its severity line
+  (`finished = ok` at the bottom); it used to leave out `finished`.
 
 ### Fixed
 

@@ -48,7 +48,8 @@ a document only ever **gains** fields: every object in every schema is open (no
 `additionalProperties: false`), so a report from a newer lockrot validates against the copy of the
 schema you fetched or vendored earlier, and a field your CI step does not know about is not an
 error. The number moves only when a field is removed or renamed, and then the old file stays
-published at its old URL.
+published at its old URL. What else 1.0 will freeze — the closed sets and their order, the identity
+fields of the other formats, the command line — is drafted in [compatibility.md](compatibility.md).
 
 The schema files themselves are edited in place when a field is added, so the copy at the URL always
 describes the newest release under that number. The version that added a field is in the
@@ -124,3 +125,4 @@ consumer usually keys on:
 - [ci.md](ci.md) — the six output formats
 - [baseline.md](baseline.md) — the baseline file
 - [configuration.md](configuration.md) — `extra.lockrot`
+- [compatibility.md](compatibility.md) — what 1.0 freezes beyond the schemas (draft)

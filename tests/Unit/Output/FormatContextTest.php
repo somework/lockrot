@@ -11,6 +11,8 @@ use Lockrot\Baseline\BaselineEntry;
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Output\FormatContext;
+use Lockrot\Signal\Signal;
+use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
 use Lockrot\Version;
@@ -116,6 +118,21 @@ final class FormatContextTest extends TestCase
             FormatContext::LEVEL_ERROR,
             $context->levelOf($finding, $this->comparison([['a/b', Verdict::STALE]], $report))
         );
+    }
+
+    /**
+     * `unchecked` reads S10, not the verdict, so a row only `--all` shows becomes an error when its
+     * check did not run — docs/compatibility.md states the mapping in this order: known first, then
+     * the threshold, then flagged.
+     */
+    public function testUnderUncheckedAnUnflaggedFindingWhoseCheckDidNotRunIsAnError(): void
+    {
+        $context = FormatContext::create(null, FailOn::UNCHECKED, Version::STRING);
+        $unchecked = new Finding('a/b', '1.0.0', Verdict::OK, [new Signal(Signal::S10, Signal::LEVEL_INFO, 'not checked')], ['a/b'], null, new \DateTimeImmutable(self::AT));
+
+        self::assertSame(FormatContext::LEVEL_ERROR, $context->levelOf($unchecked));
+        self::assertSame(FormatContext::LEVEL_WARNING, $context->levelOf($this->finding('a/c', Verdict::ABANDONED)), 'flagged without S10');
+        self::assertSame(FormatContext::LEVEL_NOTE, $context->levelOf($this->finding('a/d', Verdict::OK)));
     }
 
     public function testUnknownContextCarriesNothing(): void

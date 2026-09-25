@@ -22,10 +22,12 @@ was observed about the package. The priority says how much that applies to *your
 | `finished` | Matched the built-in or project allowlist — the package is complete by design, not neglected | allowlist match |
 | `ok` | None of the above | — |
 
-Severity order among the signal-derived verdicts, used by `--fail-on` and the baseline:
-`abandoned > silent > pinned > left-behind > old-promise > stale > unknown > ok`.
+Severity order, used by `--fail-on` and the baseline:
+`abandoned > silent > pinned > left-behind > old-promise > stale > unknown > finished = ok`.
 
-`finished` and `ok` sit equal and lowest in that ordering, and neither is ever a finding.
+`finished` and `ok` sit equal and lowest in that ordering, and neither is ever a finding. Where
+lockrot lists verdicts, `finished` comes before `ok`. The order, and the six flagged verdicts above
+`unknown`, are frozen for 1.x — see [compatibility.md](compatibility.md#closed-sets-and-their-order).
 
 An allowlist match never competes in the order at all. It is checked before any signal is read and
 always wins, so an allowlisted package reports `finished` whatever its signals say — see
@@ -525,3 +527,4 @@ Three things the number is not:
 - [configuration.md](configuration.md) — the thresholds behind S2 and S4, and the allowlist
 - [baseline.md](baseline.md) — accepting findings you have already decided to live with
 - [ci.md](ci.md) — exit codes and the six output formats, and where each carries the exposure
+- [compatibility.md](compatibility.md) — which of these names and orders 1.0 freezes, and how a verdict may change between releases

@@ -239,6 +239,7 @@ Everything is at [lockrot.dev](https://lockrot.dev).
 - [Configuration](https://lockrot.dev/configuration/) — every `extra.lockrot` key, environment variable and CLI option
 - [CI](https://lockrot.dev/ci/) — exit codes and all six output formats, with GitHub and GitLab snippets
 - [Baseline](https://lockrot.dev/baseline/) — generating one, the four buckets, and how matching works
+- [Compatibility](https://lockrot.dev/compatibility/) — what 1.0 will freeze and what it will not, and how verdicts may change (draft)
 - [Install-time summary](https://lockrot.dev/install-time/) — the block Composer prints, its budgets, and the strict gate
 - [PHAR](https://lockrot.dev/phar/) — verified and signed downloads, PHIVE, `self-update`, and the global plugin install
 - [Internals](https://lockrot.dev/internals/) — the repository layer, two-pass fetching, caching and `--offline`
@@ -275,9 +276,10 @@ the lock files bundled inside PHAR tools is being evaluated.
 ## Contributing
 
 Bug reports, fixes and additions to the built-in allowlist are welcome — see
-[`CONTRIBUTING.md`](CONTRIBUTING.md). The CLI, configuration keys, output formats, baseline file and
-exit codes are the public interface; the PHP classes are not, and every one of them is marked
-`@internal`.
+[`CONTRIBUTING.md`](CONTRIBUTING.md). The public interface is the CLI (its options and exit codes),
+the configuration keys, the machine-readable formats (`json`, `sarif`, `gitlab`, `github`) and the
+baseline file. `table`, `markdown` and `html` are for people and may change; the PHP classes are not
+an API, and every one of them is marked `@internal`. [What 1.0 will freeze →](https://lockrot.dev/compatibility/)
 
 ## Security
 
