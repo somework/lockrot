@@ -21,7 +21,7 @@ use Lockrot\Baseline\BaselineFile;
 use Lockrot\Clock;
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Config\Policy;
-use Lockrot\Config\UnknownKeyWarnings;
+use Lockrot\Config\UnknownKeys;
 use Lockrot\Data\Forge\Tokens;
 use Lockrot\Deadline;
 use Lockrot\Exception\ConfigException;
@@ -32,6 +32,7 @@ use Lockrot\Lock\ProjectConfig;
 use Lockrot\Output\ExplainFormatter;
 use Lockrot\Output\FormatContext;
 use Lockrot\Output\Formatters;
+use Lockrot\Output\TerminalText;
 use Lockrot\Output\TerminalWidth;
 use Lockrot\Version;
 use Symfony\Component\Console\Input\InputInterface;
@@ -62,14 +63,10 @@ final class LockrotCommand extends BaseCommand
      */
     private ?array $envSnapshot = null;
 
-    /** Prints each unknown `extra.lockrot` key once; the process-wide guard unless a test hands in its own. */
-    private UnknownKeyWarnings $unknownKeys;
-
     /** @param null|callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, Tokens, Clock, Deadline, ?string): Analyzer $analyzerFactory */
-    public function __construct(?callable $analyzerFactory = null, ?UnknownKeyWarnings $unknownKeys = null)
+    public function __construct(?callable $analyzerFactory = null)
     {
         $this->analyzerFactory = $analyzerFactory ?? [ServiceFactory::class, 'createAnalyzer'];
-        $this->unknownKeys = $unknownKeys ?? UnknownKeyWarnings::process();
         parent::__construct('lockrot');
     }
 
@@ -181,10 +178,11 @@ final class LockrotCommand extends BaseCommand
 
                 return Policy::EXIT_OK;
             }
-            // Here and not in initialize(), which reads the same manifest: once per run, on stderr
-            // only, after LOCKROT_DISABLE and after a config error has had its say. Never a failure.
-            foreach ($this->unknownKeys->lines($project->lockrotExtra()) as $line) {
-                $this->writeError($output, $line);
+            // Here and not in initialize(), which reads the same manifest without printing: once per
+            // run, on stderr only, after LOCKROT_DISABLE and after a config error has had its say.
+            // Never a failure.
+            foreach (UnknownKeys::warnings($project->lockrotExtra()) as $warning) {
+                $this->writeWarning($output, 'lockrot: '.$warning);
             }
             $lockPath = $cwd.'/composer.lock';
             if (!is_file($lockPath)) {
@@ -257,7 +255,9 @@ final class LockrotCommand extends BaseCommand
 
             return Policy::exitCode($report, $lockrot);
         } catch (ConfigException $e) {
-            $this->writeError($output, '<error>lockrot: '.$e->getMessage().'</error>');
+            // Raw: a config error can quote the project's own keys (see ProjectConfig), which are
+            // text, not console markup.
+            $this->writeConfigError($output, 'lockrot: '.$e->getMessage());
 
             return Policy::EXIT_ERROR;
         } catch (\Throwable $e) {
@@ -400,8 +400,29 @@ final class LockrotCommand extends BaseCommand
 
     private function writeError(OutputInterface $output, string $message): void
     {
-        $target = $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output;
-        $target->writeln($message);
+        self::errorOutput($output)->writeln($message);
+    }
+
+    /**
+     * $line on stderr in the `warning` colours, past Symfony's tag formatter: it quotes the
+     * project's text, which is not console markup (see {@see TerminalText}).
+     */
+    private function writeWarning(OutputInterface $output, string $line): void
+    {
+        $target = self::errorOutput($output);
+        $target->writeln(TerminalText::warning($line, $target->isDecorated()), OutputInterface::OUTPUT_RAW);
+    }
+
+    /** $text on stderr in the `error` colours, past the formatter for the same reason. */
+    private function writeConfigError(OutputInterface $output, string $text): void
+    {
+        $target = self::errorOutput($output);
+        $target->writeln(TerminalText::error($text, $target->isDecorated()), OutputInterface::OUTPUT_RAW);
+    }
+
+    private static function errorOutput(OutputInterface $output): OutputInterface
+    {
+        return $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output;
     }
 
     /** @return array<string, mixed> */

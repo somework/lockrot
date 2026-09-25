@@ -16,7 +16,6 @@ use Lockrot\Clock;
 use Lockrot\Composer\LockrotCommand;
 use Lockrot\Composer\ServiceFactory;
 use Lockrot\Config\LockrotConfig;
-use Lockrot\Config\UnknownKeyWarnings;
 use Lockrot\Data\Forge\ActivityClient;
 use Lockrot\Data\Forge\ActivityFetchPlanner;
 use Lockrot\Data\Forge\ForgeAuth;
@@ -31,6 +30,7 @@ use Lockrot\Json\JsonReader;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\JsonPath;
+use Lockrot\Tests\Support\MarkupRefusingFormatter;
 use Lockrot\Tests\Support\MemoisingMetadataLoader;
 use Lockrot\Tests\Support\RecordingOutput;
 use Lockrot\Tests\Support\SplitStreamOutput;
@@ -38,6 +38,7 @@ use Lockrot\Verdict\VerdictEngine;
 use Lockrot\Version;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
@@ -90,7 +91,7 @@ final class LockrotCommandTest extends TestCase
     protected function tearDown(): void
     {
         chdir($this->cwd);
-        // The baseline tests write next to composer.json of the *copy* wallabagCopy() makes; if one
+        // The baseline tests write next to composer.json of the *copy* fixtureCopy() makes; if one
         // ever runs in the tracked fixture instead (a lost chdir), the file is removed and the test
         // fails here rather than the fixture directory quietly growing an untracked baseline.
         $stray = \dirname(self::WALLABAG_LOCK).'/lockrot-baseline.json';
@@ -126,14 +127,14 @@ final class LockrotCommandTest extends TestCase
         };
     }
 
-    private function command(?MetadataLoaderInterface $loader = null, ?UnknownKeyWarnings $warnings = null): LockrotCommand
+    private function command(?MetadataLoaderInterface $loader = null): LockrotCommand
     {
         $loader ??= $this->emptyLoader();
         $factory = static function (IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, Tokens $tokens, Clock $clock) use ($loader): Analyzer {
             return self::testAnalyzer($loader, $lockrot, $clock);
         };
 
-        return $this->buildCommand($factory, $warnings);
+        return $this->buildCommand($factory);
     }
 
     /** The analyzer every test factory in this class builds: fixture metadata and recorded GitHub envelopes, never the network. */
@@ -155,9 +156,9 @@ final class LockrotCommandTest extends TestCase
     }
 
     /** @param callable(IOInterface, Config, list<\Composer\Repository\RepositoryInterface>, LockrotConfig, Tokens, Clock): Analyzer $factory */
-    private function buildCommand(callable $factory, ?UnknownKeyWarnings $warnings = null): LockrotCommand
+    private function buildCommand(callable $factory): LockrotCommand
     {
-        return $this->register(new LockrotCommand($factory, $warnings));
+        return $this->register(new LockrotCommand($factory));
     }
 
     /** The command the plugin registers: no analyzer factory, so its own default wiring is used. */
@@ -222,12 +223,11 @@ final class LockrotCommandTest extends TestCase
      *
      * @return array{0: int, 1: string, 2: string} exit code, stdout, stderr
      *
-     * @param null|MetadataLoaderInterface $loader   the in-memory default when null, as in tester()
-     * @param null|UnknownKeyWarnings      $warnings the process-wide guard when null, as in the plugin
+     * @param null|MetadataLoaderInterface $loader the in-memory default when null, as in tester()
      */
-    private function runWithSplitStreams(array $args, ?MetadataLoaderInterface $loader = null, ?UnknownKeyWarnings $warnings = null): array
+    private function runWithSplitStreams(array $args, ?MetadataLoaderInterface $loader = null): array
     {
-        $command = $this->command($loader, $warnings);
+        $command = $this->command($loader);
         $input = new ArrayInput($args, $command->getDefinition());
         $errorOutput = new BufferedOutput();
         $output = new class ($errorOutput) extends BufferedOutput implements ConsoleOutputInterface {
@@ -799,23 +799,6 @@ final class LockrotCommandTest extends TestCase
         self::assertStringContainsString('fail-on', $stderr);
     }
 
-    /**
-     * A writable copy of a fixture project whose composer.json carries $extraLockrot as its
-     * `extra.lockrot`, with the working directory moved into it.
-     *
-     * @param array<string, mixed> $extraLockrot
-     */
-    private function fixtureCopyWithConfig(string $lockPath, array $extraLockrot): string
-    {
-        $dir = $this->tempDir('lockrot-unknown-keys-');
-        $source = \dirname($lockPath);
-        copy($source.'/composer.lock', $dir.'/composer.lock');
-        $this->writeLockrotConfig($dir, $source, $extraLockrot);
-        chdir($dir);
-
-        return $dir;
-    }
-
     /** @param array<string, mixed> $extraLockrot */
     private function writeLockrotConfig(string $dir, string $source, array $extraLockrot): void
     {
@@ -834,11 +817,11 @@ final class LockrotCommandTest extends TestCase
      */
     public function testAnUnknownKeyWarnsOnceOnStderrAndChangesNothingElse(): void
     {
-        $dir = $this->fixtureCopyWithConfig(self::LARAVEL_LOCK, ['target-php' => '8.4']);
-        [$cleanCode, $cleanStdout, $cleanStderr] = $this->runWithSplitStreams(['--format' => 'json'], $this->loader(), new UnknownKeyWarnings());
+        $dir = $this->fixtureCopy(self::LARAVEL_LOCK, ['target-php' => '8.4']);
+        [$cleanCode, $cleanStdout, $cleanStderr] = $this->runWithSplitStreams(['--format' => 'json'], $this->loader());
         $this->writeLockrotConfig($dir, \dirname(self::LARAVEL_LOCK), ['target-php' => '8.4', 'install-tme' => 'off', 'x-ci' => 1, 'extensions' => ['acme/x' => ['k' => 1]]]);
 
-        [$code, $stdout, $stderr] = $this->runWithSplitStreams(['--format' => 'json'], $this->loader(), new UnknownKeyWarnings());
+        [$code, $stdout, $stderr] = $this->runWithSplitStreams(['--format' => 'json'], $this->loader());
 
         self::assertSame(0, $cleanCode, $cleanStderr);
         self::assertStringNotContainsString('unknown key', $cleanStderr);
@@ -851,9 +834,9 @@ final class LockrotCommandTest extends TestCase
 
     public function testAnUnknownKeyNeverChangesTheExitCode(): void
     {
-        $this->fixtureCopyWithConfig(self::WALLABAG_LOCK, ['fail-on' => 'silent', 'target-php' => '8.4', 'slack-webhook' => 'https://example.com']);
+        $this->fixtureCopy(self::WALLABAG_LOCK, ['fail-on' => 'silent', 'target-php' => '8.4', 'slack-webhook' => 'https://example.com']);
 
-        [$code, $stdout, $stderr] = $this->runWithSplitStreams(['--format' => 'json'], $this->loader(), new UnknownKeyWarnings());
+        [$code, $stdout, $stderr] = $this->runWithSplitStreams(['--format' => 'json'], $this->loader());
 
         self::assertSame(1, $code, $stderr);
         self::assertIsArray(json_decode($stdout, true), $stdout);
@@ -862,10 +845,10 @@ final class LockrotCommandTest extends TestCase
 
     public function testLockrotDisableSilencesTheUnknownKeyWarning(): void
     {
-        $this->fixtureCopyWithConfig(self::LARAVEL_LOCK, ['install-tme' => 'off']);
+        $this->fixtureCopy(self::LARAVEL_LOCK, ['install-tme' => 'off']);
         putenv('LOCKROT_DISABLE=1');
         try {
-            [$code, $stdout, $stderr] = $this->runWithSplitStreams(['--format' => 'json'], null, new UnknownKeyWarnings());
+            [$code, $stdout, $stderr] = $this->runWithSplitStreams(['--format' => 'json'], null);
         } finally {
             putenv('LOCKROT_DISABLE');
         }
@@ -876,68 +859,168 @@ final class LockrotCommandTest extends TestCase
         self::assertStringNotContainsString('unknown key', $stderr);
     }
 
-    /** A config the schema rejects is exit 2 with the schema's message; the unknown key is not reached. */
-    public function testASchemaErrorIsReportedWithoutTheUnknownKeyWarning(): void
+    /**
+     * A config the schema rejects is exit 2 with the schema's message, and the unknown key that may
+     * have caused it is named in the same error, with its suggestion. A misspelt required key is
+     * reported by the schema as the right one missing, so the suggestion is what says why.
+     */
+    public function testASchemaErrorAlsoNamesTheUnknownKeys(): void
     {
-        $this->fixtureCopyWithConfig(self::LARAVEL_LOCK, ['install-tme' => 'off', 'fail-on' => 'dead']);
+        $this->fixtureCopy(self::LARAVEL_LOCK, ['install-tme' => 'off', 'fail-on' => 'dead']);
 
-        [$code, $stdout, $stderr] = $this->runWithSplitStreams([], null, new UnknownKeyWarnings());
+        [$code, $stdout, $stderr] = $this->runWithSplitStreams([]);
 
         self::assertSame(2, $code);
         self::assertSame('', $stdout);
-        self::assertStringContainsString('extra.lockrot is invalid:', $stderr);
-        self::assertStringNotContainsString('unknown key', $stderr);
+        self::assertStringStartsWith("lockrot: extra.lockrot is invalid:\n  - fail-on: ", $stderr);
+        self::assertStringEndsWith("\n  - unknown key extra.lockrot.install-tme ignored (did you mean install-time?)\n", $stderr);
+        self::assertSame(1, substr_count($stderr, 'unknown key'), $stderr);
+    }
+
+    public function testAMisspeltRequiredIgnoreKeyGetsItsSuggestionInTheError(): void
+    {
+        $this->fixtureCopy(self::LARAVEL_LOCK, ['ignore' => [['package' => 'a/b', 'reasn' => 'legacy']]]);
+
+        [$code, , $stderr] = $this->runWithSplitStreams([]);
+
+        self::assertSame(2, $code);
+        self::assertStringContainsString('  - ignore[0].reason: The property reason is required', $stderr);
+        self::assertStringContainsString('  - unknown key extra.lockrot.ignore[0].reasn ignored (did you mean reason?)', $stderr);
     }
 
     public function testExplainStillPrintsCleanJsonWithAnUnknownKey(): void
     {
-        $this->fixtureCopyWithConfig(self::LARAVEL_LOCK, ['target-php' => '8.4', 'install-tme' => 'off']);
+        $this->fixtureCopy(self::LARAVEL_LOCK, ['target-php' => '8.4', 'install-tme' => 'off']);
 
-        [$code, $stdout, $stderr] = $this->runWithSplitStreams(['--explain' => 'brick/math', '--format' => 'json'], $this->loader(), new UnknownKeyWarnings());
+        [$code, $stdout, $stderr] = $this->runWithSplitStreams(['--explain' => 'brick/math', '--format' => 'json'], $this->loader());
 
         self::assertSame(0, $code, $stderr);
         self::assertIsArray(json_decode($stdout, true), $stdout);
         self::assertStringContainsString('lockrot: unknown key extra.lockrot.install-tme ignored', $stderr);
     }
 
-    public function testASecondRunInTheSameProcessDoesNotRepeatTheWarning(): void
+    /**
+     * Each run warns about the config it read, however many ran before it in the same process: there
+     * is no process-wide memory of what was printed.
+     */
+    public function testEveryRunInAProcessWarnsAboutItsOwnConfig(): void
     {
-        $this->fixtureCopyWithConfig(self::LARAVEL_LOCK, ['target-php' => '8.4', 'install-tme' => 'off']);
-        $warnings = new UnknownKeyWarnings();
+        $this->fixtureCopy(self::LARAVEL_LOCK, ['target-php' => '8.4', 'install-tme' => 'off']);
 
-        [, , $first] = $this->runWithSplitStreams(['--format' => 'json'], $this->loader(), $warnings);
-        [$code, $stdout, $second] = $this->runWithSplitStreams(['--format' => 'json'], $this->loader(), $warnings);
+        [, , $first] = $this->runWithSplitStreams(['--format' => 'json'], $this->loader());
+        [$code, $stdout, $second] = $this->runWithSplitStreams(['--format' => 'json'], $this->loader());
 
-        self::assertStringContainsString('unknown key extra.lockrot.install-tme', $first);
-        self::assertStringNotContainsString('unknown key', $second);
+        $line = "lockrot: unknown key extra.lockrot.install-tme ignored (did you mean install-time?)\n";
+        self::assertSame($line, $first);
+        self::assertSame($line, $second);
         self::assertSame(0, $code, $second);
         self::assertIsArray(json_decode($stdout, true), $stdout);
     }
 
     /**
-     * The command the plugin registers shares the process-wide guard with the install-time summary,
-     * so a line that summary already printed is not printed again.
+     * A key is the project's text, never console markup, and the line never reaches Symfony's tag
+     * formatter: some symfony/console 5.4 releases in Composer's PHARs throw on `<<fg=red>>`, which
+     * turned a warning into exit 2 with nothing on stdout. A formatter that refuses the text proves
+     * it is not even asked; `a\<b` keeps its backslash, escaped like any other.
+     *
+     * @dataProvider keysThatLookLikeMarkup
      */
-    public function testTheDefaultWiringUsesTheProcessWideGuard(): void
+    #[DataProvider('keysThatLookLikeMarkup')]
+    public function testAKeyThatLooksLikeMarkupIsPrintedAsWrittenAndChangesNothing(string $key, string $shown): void
     {
-        $this->fixtureCopyWithConfig(self::LARAVEL_LOCK, ['target-php' => '8.4', 'lockrot-command-default-guard' => 1]);
-        UnknownKeyWarnings::process()->lines(['lockrot-command-default-guard' => 1]);
+        $this->fixtureCopy(self::LARAVEL_LOCK, ['target-php' => '8.4', $key => 1]);
+        $errors = new BufferedOutput(OutputInterface::VERBOSITY_NORMAL, false, new MarkupRefusingFormatter($key));
 
-        [$code, , $stderr] = $this->runWithSplitStreams(['--format' => 'json'], $this->loader());
+        [$code, $stdout] = $this->runWithErrorOutput(['--format' => 'json'], $errors);
 
+        $stderr = $errors->fetch();
         self::assertSame(0, $code, $stderr);
-        self::assertStringNotContainsString('unknown key', $stderr);
+        self::assertIsArray(json_decode($stdout, true), $stdout);
+        self::assertSame('lockrot: unknown key extra.lockrot.'.$shown." ignored\n", $stderr);
     }
 
-    /** A guard handed in is the one used: what the process-wide one printed is not its business. */
-    public function testAGuardHandedInIsTheOneUsed(): void
+    /** @return iterable<string, array{string, string}> */
+    public static function keysThatLookLikeMarkup(): iterable
     {
-        $this->fixtureCopyWithConfig(self::LARAVEL_LOCK, ['target-php' => '8.4', 'lockrot-command-own-guard' => 1]);
-        UnknownKeyWarnings::process()->lines(['lockrot-command-own-guard' => 1]);
+        yield 'a style tag' => ['<<fg=red>>', '<<fg=red>>'];
+        yield 'a link tag' => ['<<href=https://example.com>>', '<<href=https://example.com>>'];
+        yield 'an escaped tag' => ['a\\<b', 'a\\\\<b'];
+    }
 
-        [, , $stderr] = $this->runWithSplitStreams(['--format' => 'json'], $this->loader(), new UnknownKeyWarnings());
+    /**
+     * A config error quotes the keys too, so it is written past the formatter as well: the schema
+     * error and the key it names both reach stderr, and the exit code is the config error's.
+     */
+    public function testAConfigErrorQuotingAKeyThatLooksLikeMarkupIsPrintedAsWritten(): void
+    {
+        $this->fixtureCopy(self::LARAVEL_LOCK, ['<<fg=red>>' => 1, 'fail-on' => 'dead']);
+        $errors = new BufferedOutput(OutputInterface::VERBOSITY_NORMAL, false, new MarkupRefusingFormatter('<<'));
 
-        self::assertStringContainsString('unknown key extra.lockrot.lockrot-command-own-guard ignored', $stderr);
+        [$code, $stdout] = $this->runWithErrorOutput([], $errors);
+
+        $stderr = $errors->fetch();
+        self::assertSame(2, $code, $stderr);
+        self::assertSame('', $stdout);
+        self::assertStringStartsWith('lockrot: extra.lockrot is invalid:', $stderr);
+        self::assertStringEndsWith("\n  - unknown key extra.lockrot.<<fg=red>> ignored\n", $stderr);
+    }
+
+    /**
+     * Decorated, the warning is coloured by lockrot itself, whole and on stderr alone. The key is
+     * thousands of `<b` — the text that once exhausted PCRE's JIT in the formatter, so the closing
+     * tag printed literally and the style ran on into the report, which shares the formatter.
+     */
+    public function testADecoratedWarningIsColouredWholeAndNothingLeaksOntoTheReport(): void
+    {
+        $this->fixtureCopy(self::LARAVEL_LOCK, ['target-php' => '8.4', str_repeat('<b', 4000) => 1]);
+        $formatter = new OutputFormatter(true);
+        $errors = new BufferedOutput(OutputInterface::VERBOSITY_NORMAL, true, $formatter);
+
+        [$code, $stdout] = $this->runWithErrorOutput([], $errors, $formatter);
+
+        $stderr = $errors->fetch();
+        self::assertSame(0, $code, $stderr);
+        self::assertSame("\033[30;43mlockrot: unknown key extra.lockrot.".substr(str_repeat('<b', 128), 0, 255)."… ignored\033[39;49m\n", $stderr);
+        self::assertStringNotContainsString("\033[30;43m", $stdout);
+        self::assertStringNotContainsString('<b', $stdout);
+    }
+
+    /** A config error is coloured line by line, the error style, on a decorated stderr. */
+    public function testADecoratedConfigErrorIsColouredLineByLine(): void
+    {
+        $this->fixtureCopy(self::LARAVEL_LOCK, ['install-tme' => 'off', 'fail-on' => 'dead']);
+        $errors = new BufferedOutput(OutputInterface::VERBOSITY_NORMAL, true);
+
+        [$code] = $this->runWithErrorOutput([], $errors);
+
+        $lines = explode("\n", rtrim($errors->fetch(), "\n"));
+        self::assertSame(2, $code);
+        self::assertCount(3, $lines);
+        foreach ($lines as $line) {
+            self::assertStringStartsWith("\033[37;41m", $line);
+            self::assertStringEndsWith("\033[39;49m", $line);
+        }
+        self::assertStringStartsWith("\033[37;41mlockrot: extra.lockrot is invalid:", $lines[0]);
+    }
+
+    /**
+     * Runs the command with $errors as its stderr and returns the exit code and stdout. $formatter,
+     * when given, is stdout's too, the way ConsoleOutput shares one formatter between its streams.
+     *
+     * @param array<string, mixed> $args
+     *
+     * @return array{0: int, 1: string}
+     */
+    private function runWithErrorOutput(array $args, OutputInterface $errors, ?OutputFormatter $formatter = null): array
+    {
+        $command = $this->command($this->loader());
+        $input = new ArrayInput($args, $command->getDefinition());
+        $output = new SplitStreamOutput($formatter);
+        $output->setErrorOutput($errors);
+
+        $code = $command->run($input, $output);
+
+        return [$code, $output->fetch()];
     }
 
     /**
@@ -1270,15 +1353,23 @@ final class LockrotCommandTest extends TestCase
     }
 
     /**
-     * A writable copy of the wallabag fixture: the baseline file is written next to composer.json,
-     * and the fixture directory itself is checked in, so every baseline test runs on a copy.
+     * A writable copy of the fixture project $lockPath belongs to, with the working directory moved
+     * into it: the baseline file is written next to composer.json, and the fixture directories are
+     * checked in, so every test that writes runs on a copy. With $extraLockrot, the copy's
+     * composer.json carries that as its `extra.lockrot` instead of the fixture's own.
+     *
+     * @param null|array<string, mixed> $extraLockrot
      */
-    private function wallabagCopy(): string
+    private function fixtureCopy(string $lockPath, ?array $extraLockrot = null): string
     {
-        $dir = $this->tempDir('lockrot-baseline-project-');
-        $source = \dirname(self::WALLABAG_LOCK);
-        copy($source.'/composer.json', $dir.'/composer.json');
+        $dir = $this->tempDir('lockrot-fixture-copy-');
+        $source = \dirname($lockPath);
         copy($source.'/composer.lock', $dir.'/composer.lock');
+        if ($extraLockrot === null) {
+            copy($source.'/composer.json', $dir.'/composer.json');
+        } else {
+            $this->writeLockrotConfig($dir, $source, $extraLockrot);
+        }
         chdir($dir);
 
         return $dir;
@@ -1330,7 +1421,7 @@ final class LockrotCommandTest extends TestCase
 
     public function testGenerateBaselineWritesTheFileAndExitsZeroDespiteFailOn(): void
     {
-        $dir = $this->wallabagCopy();
+        $dir = $this->fixtureCopy(self::WALLABAG_LOCK);
 
         [$code, $stdout, $stderr] = $this->runWithSplitStreams(
             ['--generate-baseline' => true, '--fail-on' => 'stale', '--target-php' => '8.4'],
@@ -1353,7 +1444,7 @@ final class LockrotCommandTest extends TestCase
 
     public function testASecondRunWithTheGeneratedBaselinePresentExitsZero(): void
     {
-        $this->wallabagCopy();
+        $this->fixtureCopy(self::WALLABAG_LOCK);
         self::assertSame(0, $this->tester($this->loader())->execute(['--generate-baseline' => true, '--target-php' => '8.4']));
 
         $tester = $this->tester($this->loader());
@@ -1366,7 +1457,7 @@ final class LockrotCommandTest extends TestCase
 
     public function testAWorsenedFindingExitsOneEvenWithABaseline(): void
     {
-        $dir = $this->wallabagCopy();
+        $dir = $this->fixtureCopy(self::WALLABAG_LOCK);
         self::assertSame(0, $this->tester($this->loader())->execute(['--generate-baseline' => true, '--target-php' => '8.4']));
 
         $findings = $this->baselineFindings($dir.'/lockrot-baseline.json');
@@ -1384,7 +1475,7 @@ final class LockrotCommandTest extends TestCase
 
     public function testRegeneratingCarriesFirstSeenOver(): void
     {
-        $dir = $this->wallabagCopy();
+        $dir = $this->fixtureCopy(self::WALLABAG_LOCK);
         self::assertSame(0, $this->tester($this->loader())->execute(['--generate-baseline' => true, '--target-php' => '8.4']));
 
         $findings = $this->baselineFindings($dir.'/lockrot-baseline.json');
@@ -1400,7 +1491,7 @@ final class LockrotCommandTest extends TestCase
 
     public function testJsonOutputCarriesTheBaselineBlock(): void
     {
-        $this->wallabagCopy();
+        $this->fixtureCopy(self::WALLABAG_LOCK);
         self::assertSame(0, $this->tester($this->loader())->execute(['--generate-baseline' => true, '--target-php' => '8.4']));
 
         $tester = $this->tester($this->loader());
@@ -1418,7 +1509,7 @@ final class LockrotCommandTest extends TestCase
 
     public function testWithoutABaselineFileTheJsonBaselineBlockIsNull(): void
     {
-        $this->wallabagCopy();
+        $this->fixtureCopy(self::WALLABAG_LOCK);
         $tester = $this->tester($this->loader());
         $tester->execute(['--format' => 'json', '--target-php' => '8.4']);
         $json = json_decode($tester->getDisplay(), true);
@@ -1435,7 +1526,7 @@ final class LockrotCommandTest extends TestCase
      */
     public function testABaselineGeneratedWithDevReportsNoStaleEntriesOnARunWithoutDev(): void
     {
-        $this->wallabagCopy();
+        $this->fixtureCopy(self::WALLABAG_LOCK);
         self::assertSame(0, $this->tester($this->loader())->execute(['--generate-baseline' => true, '--dev' => true, '--target-php' => '8.4']));
 
         $tester = $this->tester($this->loader());
@@ -1450,7 +1541,7 @@ final class LockrotCommandTest extends TestCase
 
     public function testAnExplicitBaselinePathThatDoesNotExistIsExit2(): void
     {
-        $this->wallabagCopy();
+        $this->fixtureCopy(self::WALLABAG_LOCK);
 
         [$code, $stdout, $stderr] = $this->runWithSplitStreams(
             ['--baseline' => 'ci/missing.json', '--target-php' => '8.4'],
@@ -1465,7 +1556,7 @@ final class LockrotCommandTest extends TestCase
 
     public function testAnEmptyBaselineOptionIsExit2(): void
     {
-        $this->wallabagCopy();
+        $this->fixtureCopy(self::WALLABAG_LOCK);
 
         [$code, $stdout, $stderr] = $this->runWithSplitStreams(
             ['--baseline' => '', '--target-php' => '8.4'],
@@ -1479,7 +1570,7 @@ final class LockrotCommandTest extends TestCase
 
     public function testAMalformedBaselineFileIsExit2(): void
     {
-        $dir = $this->wallabagCopy();
+        $dir = $this->fixtureCopy(self::WALLABAG_LOCK);
         file_put_contents($dir.'/lockrot-baseline.json', '{"findings": ');
 
         [$code, $stdout, $stderr] = $this->runWithSplitStreams(['--target-php' => '8.4'], $this->loader());
@@ -1491,7 +1582,7 @@ final class LockrotCommandTest extends TestCase
 
     public function testAnExplicitBaselinePathIsHonouredAndReportedRelative(): void
     {
-        $dir = $this->wallabagCopy();
+        $dir = $this->fixtureCopy(self::WALLABAG_LOCK);
         mkdir($dir.'/ci');
 
         [$code, , $stderr] = $this->runWithSplitStreams(
@@ -1523,8 +1614,10 @@ final class LockrotCommandTest extends TestCase
 
     /**
      * A configuration error is `lockrot: <what is wrong>`. Both failures exit 2, so the prefix is
-     * the only thing telling a user whether to fix their own config or report a bug — and the
-     * `<error>` tags have to wrap the whole line, or Composer colours only part of it.
+     * the only thing telling a user whether to fix their own config or report a bug. The message is
+     * written as it is, with no console tags for the formatter to act on — it can quote the
+     * project's own keys — and coloured whole by lockrot itself
+     * ({@see self::testADecoratedConfigErrorIsColouredLineByLine()}).
      */
     public function testAConfigErrorIsOneLockrotErrorLineOnStderr(): void
     {
@@ -1535,9 +1628,8 @@ final class LockrotCommandTest extends TestCase
         self::assertSame(2, $code);
         self::assertSame('', $stdout);
         self::assertCount(1, $errors);
-        self::assertStringStartsWith('<error>lockrot: ', $errors[0]);
-        self::assertStringContainsString('fail-on must be one of', $errors[0]);
-        self::assertStringEndsWith('</error>', $errors[0]);
+        self::assertStringStartsWith('lockrot: fail-on must be one of', $errors[0]);
+        self::assertStringEndsWith('got "dead"', $errors[0]);
     }
 
     /**

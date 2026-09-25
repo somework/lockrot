@@ -16,7 +16,7 @@ use Lockrot\Baseline\BaselineFile;
 use Lockrot\Clock;
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Config\Policy;
-use Lockrot\Config\UnknownKeyWarnings;
+use Lockrot\Config\UnknownKeys;
 use Lockrot\Data\Forge\Tokens;
 use Lockrot\Deadline;
 use Lockrot\Exception\ConfigException;
@@ -25,6 +25,7 @@ use Lockrot\Lock\LockedPackage;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Output\InstallSummaryFormatter;
+use Lockrot\Output\TerminalText;
 
 /**
  * The `composer require`/`update`/`install` half of lockrot: on InstallerEvents::PRE_OPERATIONS_EXEC
@@ -49,14 +50,10 @@ final class InstallTimeSummary
     /** @var callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, Tokens, Clock, Deadline, ?string): Analyzer */
     private $analyzerFactory;
 
-    /** Prints each unknown `extra.lockrot` key once; the process-wide guard unless a test hands in its own. */
-    private UnknownKeyWarnings $unknownKeys;
-
     /** @param null|callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, Tokens, Clock, Deadline, ?string): Analyzer $analyzerFactory */
-    public function __construct(?callable $analyzerFactory = null, ?UnknownKeyWarnings $unknownKeys = null)
+    public function __construct(?callable $analyzerFactory = null)
     {
         $this->analyzerFactory = $analyzerFactory ?? [ServiceFactory::class, 'createAnalyzer'];
-        $this->unknownKeys = $unknownKeys ?? UnknownKeyWarnings::process();
     }
 
     public function onPreOperationsExec(InstallerEvent $event): void
@@ -73,13 +70,29 @@ final class InstallTimeSummary
             // install continues. Collapsed to one line: some exception messages (a wrapped
             // exception's chain, a multi-line library error) embed newlines of their own, which
             // would otherwise split this into more than the one line promised.
-            $io->writeError('<warning>lockrot: install-time check skipped: '.$this->oneLine($e->getMessage()).'</warning>');
+            self::writeWarning($io, 'lockrot: install-time check skipped: '.$this->oneLine($e->getMessage()));
         }
     }
 
+    /**
+     * The message on one line, with nothing left in it that a terminal would obey. Written raw (see
+     * {@see self::writeWarning()}), it no longer passes through Composer's own sanitising, so
+     * {@see TerminalText::neutralise()} does that job.
+     */
     private function oneLine(string $message): string
     {
-        return trim((string) preg_replace('/\s+/', ' ', $message));
+        return TerminalText::neutralise(trim((string) preg_replace('/\s+/', ' ', $message)));
+    }
+
+    /**
+     * One `warning`-coloured line on stderr, past Symfony's tag formatter: these lines quote the
+     * project's own text — an `extra.lockrot` key, a config error that names one — which is not
+     * console markup (see {@see TerminalText}). writeErrorRaw() is on IOInterface from Composer 2.2 on.
+     * IOInterface only says whether stdout is decorated; stderr is taken to be the same.
+     */
+    private static function writeWarning(IOInterface $io, string $line): void
+    {
+        $io->writeErrorRaw(TerminalText::warning($line, $io->isDecorated()));
     }
 
     private function run(InstallerEvent $event): void
@@ -105,10 +118,12 @@ final class InstallTimeSummary
         if ($packages === []) {
             return;
         }
-        // Gated like the block itself: not under LOCKROT_DISABLE, not with install-time off, not for
-        // a transaction that installs nothing. Above the block, and never a reason to stop.
-        foreach ($this->unknownKeys->lines($project->lockrotExtra()) as $line) {
-            $event->getIO()->writeError($line);
+        // The warning's own gates, checked above: not under LOCKROT_DISABLE, not with install-time
+        // off, not without a transaction, not for one that installs or updates nothing. Unlike the
+        // block it does not wait for a finding: it is printed before the analysis, above the block,
+        // and is never a reason to stop.
+        foreach (UnknownKeys::warnings($project->lockrotExtra()) as $warning) {
+            self::writeWarning($event->getIO(), 'lockrot: '.$warning);
         }
 
         // By the time this event fires, `composer require`/`update` has already written the new lock

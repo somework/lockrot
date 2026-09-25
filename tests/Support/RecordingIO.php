@@ -10,7 +10,7 @@ use Symfony\Component\Console\Output\StreamOutput;
 
 /**
  * A BufferIO that also keeps every stderr message as it was handed over, before Composer's output
- * formatter saw it.
+ * formatter saw it — through writeError() or, bypassing the formatter, writeErrorRaw().
  *
  * `getOutput()` alone cannot tell `<warning>text</warning>` from `<warning>text` or from
  * `text<warning>`: an undecorated formatter removes the tags, so all three render as `text`. The
@@ -19,7 +19,7 @@ use Symfony\Component\Console\Output\StreamOutput;
  */
 final class RecordingIO extends BufferIO
 {
-    /** @var list<string> every message writeError() let through at this verbosity, unformatted and in order */
+    /** @var list<string> every message writeError() or writeErrorRaw() let through at this verbosity, unformatted and in order */
     public array $errors = [];
 
     /** Composer's verbosity levels against Symfony's, the way ConsoleIO::doWrite() maps them. */
@@ -45,16 +45,37 @@ final class RecordingIO extends BufferIO
      */
     public function writeError($messages, $newline = true, $verbosity = self::NORMAL)
     {
+        $this->record($messages, (int) $verbosity);
+        parent::writeError($messages, (bool) $newline, (int) $verbosity);
+    }
+
+    /**
+     * ConsoleIO::writeErrorRaw() goes straight to the output, not through writeError(), so a message
+     * is recorded once whichever way it came.
+     *
+     * @param string|string[] $messages
+     * @param bool            $newline
+     * @param int             $verbosity
+     *
+     * @return void
+     */
+    public function writeErrorRaw($messages, $newline = true, $verbosity = self::NORMAL)
+    {
+        $this->record($messages, (int) $verbosity);
+        parent::writeErrorRaw($messages, (bool) $newline, (int) $verbosity);
+    }
+
+    /** @param string|string[] $messages */
+    private function record($messages, int $verbosity): void
+    {
         // Only what ConsoleIO would print: a debug-level line Composer writes on its own way through
         // must not count against a test that expects exactly one message.
-        $wanted = self::SYMFONY_VERBOSITY[(int) $verbosity] ?? OutputInterface::VERBOSITY_NORMAL;
+        $wanted = self::SYMFONY_VERBOSITY[$verbosity] ?? OutputInterface::VERBOSITY_NORMAL;
         if ($wanted <= $this->output->getVerbosity()) {
             foreach (\is_array($messages) ? $messages : [$messages] as $message) {
                 $this->errors[] = $message;
             }
         }
-
-        parent::writeError($messages, (bool) $newline, (int) $verbosity);
     }
 
     /** The one message written to stderr, failing the test when there was not exactly one. */

@@ -131,6 +131,66 @@ final class ProjectConfigTest extends TestCase
         ProjectConfig::fromArray(['extra' => ['lockrot' => ['fail-on' => 'dead']]]);
     }
 
+    /**
+     * A misspelt required key is where the suggestion helps most, and the schema error alone only
+     * says the right key is missing: the error names the misspelling and what it was meant to be.
+     */
+    public function testASchemaErrorAlsoNamesTheUnknownKeyThatCausedIt(): void
+    {
+        $message = $this->configErrorFor(['ignore' => [['package' => 'a/b', 'reasn' => 'legacy']]]);
+
+        self::assertSame(
+            "extra.lockrot is invalid:\n"
+            ."  - ignore[0].reason: The property reason is required\n"
+            .'  - unknown key extra.lockrot.ignore[0].reasn ignored (did you mean reason?)',
+            $message
+        );
+    }
+
+    /** An unknown key beside an unrelated schema error is still named, after the schema's own lines. */
+    public function testASchemaErrorIsFollowedByEveryUnknownKey(): void
+    {
+        $message = $this->configErrorFor(['install-tme' => 'off', 'fail-on' => 'dead', 'x-ci' => 1]);
+
+        self::assertStringStartsWith("extra.lockrot is invalid:\n  - fail-on: ", $message);
+        self::assertStringEndsWith("\n  - unknown key extra.lockrot.install-tme ignored (did you mean install-time?)", $message);
+        self::assertStringNotContainsString('x-ci', $message);
+    }
+
+    public function testASchemaErrorWithNoUnknownKeyIsTheSchemasAlone(): void
+    {
+        $message = $this->configErrorFor(['fail-on' => 'dead']);
+
+        self::assertStringStartsWith("extra.lockrot is invalid:\n  - fail-on: ", $message);
+        self::assertStringNotContainsString('unknown key', $message);
+        self::assertSame(1, substr_count($message, "\n"), $message);
+    }
+
+    /** The schema's error is kept as the cause, whatever is added to the message. */
+    public function testTheSchemaErrorIsKeptAsThePrevious(): void
+    {
+        try {
+            ProjectConfig::fromArray(['extra' => ['lockrot' => ['install-tme' => 'off', 'fail-on' => 'dead']]]);
+            self::fail('a schema error was expected');
+        } catch (ConfigException $e) {
+            $previous = $e->getPrevious();
+            self::assertInstanceOf(ConfigException::class, $previous);
+            self::assertStringNotContainsString('unknown key', $previous->getMessage());
+        }
+    }
+
+    /** @param array<string, mixed> $lockrot */
+    private function configErrorFor(array $lockrot): string
+    {
+        try {
+            ProjectConfig::fromArray(['extra' => ['lockrot' => $lockrot]]);
+        } catch (ConfigException $e) {
+            return $e->getMessage();
+        }
+
+        return self::fail('a schema error was expected');
+    }
+
     private function tempComposerJson(string $contents): string
     {
         $dir = sys_get_temp_dir().'/lockrot-projectconfig-'.uniqid();

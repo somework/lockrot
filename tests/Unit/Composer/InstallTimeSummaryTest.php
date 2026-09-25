@@ -21,7 +21,6 @@ use Lockrot\Analyzer\Analyzer;
 use Lockrot\Clock;
 use Lockrot\Composer\InstallTimeSummary;
 use Lockrot\Config\LockrotConfig;
-use Lockrot\Config\UnknownKeyWarnings;
 use Lockrot\Data\Forge\ActivityClient;
 use Lockrot\Data\Forge\ActivityFetchPlanner;
 use Lockrot\Data\Forge\ForgeAuth;
@@ -36,9 +35,12 @@ use Lockrot\Deadline;
 use Lockrot\Exception\InstallBlockedException;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
+use Lockrot\Tests\Support\MarkupRefusingFormatter;
 use Lockrot\Tests\Support\RecordingIO;
 use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Formatter\OutputFormatter;
+use Symfony\Component\Console\Output\StreamOutput;
 
 final class InstallTimeSummaryTest extends TestCase
 {
@@ -560,34 +562,30 @@ final class InstallTimeSummaryTest extends TestCase
         (new InstallTimeSummary($factory))->onPreOperationsExec($event);
 
         $output = $io->getOutput();
-        // The `</warning>` pins the far end: collapsed whitespace must not survive as a trailing
-        // space, and `skipped: boom` pins the near end against a leading one.
-        self::assertStringContainsString('lockrot: install-time check skipped: boom second line third line</warning>', $output);
+        // The newline pins the far end: collapsed whitespace must not survive as a trailing space,
+        // and `skipped: boom` pins the near end against a leading one.
+        self::assertStringContainsString("lockrot: install-time check skipped: boom second line third line\n", $output);
         self::assertCount(1, array_filter(explode("\n", trim($output))), $output);
     }
 
     /**
-     * The skipped-check line is a `<warning>` from end to end: Composer colours what the tags wrap,
-     * so a message that fell outside them would print as plain text in the middle of an install.
-     *
-     * Read before Composer's formatter sees it, because an undecorated formatter strips the tags and
-     * renders `<warning>text`, `text</warning>` and `<warning>text</warning>` identically.
+     * The skipped-check line is in the `warning` colours from end to end: a message that fell outside
+     * them would print as plain text in the middle of an install. It is written raw — it can quote
+     * the project's own keys — so the colour is lockrot's, and so is the job Composer's sanitising
+     * did: nothing in the message is left for the terminal to obey.
      */
-    public function testTheSkippedCheckLineIsWrappedInAWarningTag(): void
+    public function testTheSkippedCheckLineIsColouredWholeAndCarriesNoControlCharacters(): void
     {
         $this->project();
-        $io = new RecordingIO();
+        $io = new BufferIO('', StreamOutput::VERBOSITY_NORMAL, new OutputFormatter(true));
         $event = $this->event($io, new Transaction([], [$this->loadPackage(self::PHPZIP)]));
         $factory = static function (): Analyzer {
-            throw new \RuntimeException('boom');
+            throw new \RuntimeException("boom \033[31mred\u{202E} C:\\path");
         };
 
         (new InstallTimeSummary($factory))->onPreOperationsExec($event);
 
-        $message = $io->onlyError();
-        self::assertStringStartsWith('<warning>lockrot: install-time check skipped: ', $message);
-        self::assertStringContainsString('boom', $message);
-        self::assertStringEndsWith('</warning>', $message);
+        self::assertSame("\033[30;43mlockrot: install-time check skipped: boom \\x1B[31mred\\u{202E} C:\\path\033[39;49m\n", $io->getOutput());
     }
 
     /**
@@ -621,10 +619,10 @@ final class InstallTimeSummaryTest extends TestCase
         $io = new RecordingIO();
         $event = $this->event($io, new Transaction([], [$this->loadPackage(self::PHPZIP)]));
 
-        (new InstallTimeSummary($this->analyzerFactory(), new UnknownKeyWarnings()))->onPreOperationsExec($event);
+        (new InstallTimeSummary($this->analyzerFactory()))->onPreOperationsExec($event);
 
         self::assertGreaterThan(1, \count($io->errors), implode("\n", $io->errors));
-        self::assertSame('<warning>lockrot: unknown key extra.lockrot.install-tme ignored (did you mean install-time?)</warning>', $io->errors[0]);
+        self::assertSame('lockrot: unknown key extra.lockrot.install-tme ignored (did you mean install-time?)', $io->errors[0]);
         self::assertStringContainsString('lockrot: dependency rot in 1 of 1 changed package', $io->errors[1]);
     }
 
@@ -635,9 +633,45 @@ final class InstallTimeSummaryTest extends TestCase
         $io = new RecordingIO();
         $event = $this->event($io, new Transaction([], [$this->loadPackage(self::PSR_LOG)]));
 
-        (new InstallTimeSummary($this->analyzerFactory(), new UnknownKeyWarnings()))->onPreOperationsExec($event);
+        (new InstallTimeSummary($this->analyzerFactory()))->onPreOperationsExec($event);
 
-        self::assertSame('<warning>lockrot: unknown key extra.lockrot.slack-webhook ignored</warning>', $io->onlyError());
+        self::assertSame('lockrot: unknown key extra.lockrot.slack-webhook ignored', $io->onlyError());
+    }
+
+    /**
+     * The key is the project's text, and the line never reaches a console formatter: one that would
+     * choke on it is not even asked. Before, the formatter's exception became "check skipped" — and
+     * with it the install-time-strict block the project asked for was skipped too.
+     */
+    public function testAKeyThatLooksLikeMarkupNeverReachesTheFormatter(): void
+    {
+        $this->project(['<<fg=red>>' => 1, 'install-time-strict' => true, 'fail-on' => 'silent']);
+        $io = new BufferIO('', StreamOutput::VERBOSITY_NORMAL, new MarkupRefusingFormatter('<<'));
+        $event = $this->event($io, new Transaction([], [$this->loadPackage(self::PHPZIP)]));
+
+        $thrown = null;
+        try {
+            (new InstallTimeSummary($this->analyzerFactory()))->onPreOperationsExec($event);
+        } catch (InstallBlockedException $e) {
+            $thrown = $e;
+        }
+
+        $output = $io->getOutput();
+        self::assertInstanceOf(InstallBlockedException::class, $thrown, $output);
+        self::assertStringStartsWith("lockrot: unknown key extra.lockrot.<<fg=red>> ignored\n", $output);
+        self::assertStringNotContainsString('check skipped', $output);
+    }
+
+    /** Written raw, the line is coloured by lockrot itself, in Composer's `warning` style, when the output is decorated. */
+    public function testTheWarningIsColouredWhenTheOutputIsDecorated(): void
+    {
+        $this->project(['<b>' => 1], [self::PSR_LOG]);
+        $io = new BufferIO('', StreamOutput::VERBOSITY_NORMAL, new OutputFormatter(true));
+        $event = $this->event($io, new Transaction([], [$this->loadPackage(self::PSR_LOG)]));
+
+        (new InstallTimeSummary($this->analyzerFactory()))->onPreOperationsExec($event);
+
+        self::assertSame("\033[30;43mlockrot: unknown key extra.lockrot.<b> ignored\033[39;49m\n", $io->getOutput());
     }
 
     /** With install-time correctly off, the project asked for silence and gets it, unknown key or not. */
@@ -647,7 +681,7 @@ final class InstallTimeSummaryTest extends TestCase
         $io = new BufferIO();
         $event = $this->event($io, new Transaction([], [$this->loadPackage(self::PHPZIP)]));
 
-        (new InstallTimeSummary($this->analyzerFactory(), new UnknownKeyWarnings()))->onPreOperationsExec($event);
+        (new InstallTimeSummary($this->analyzerFactory()))->onPreOperationsExec($event);
 
         self::assertSame('', $io->getOutput());
     }
@@ -660,7 +694,7 @@ final class InstallTimeSummaryTest extends TestCase
 
         putenv('LOCKROT_DISABLE=1');
         try {
-            (new InstallTimeSummary($this->analyzerFactory(), new UnknownKeyWarnings()))->onPreOperationsExec($event);
+            (new InstallTimeSummary($this->analyzerFactory()))->onPreOperationsExec($event);
         } finally {
             putenv('LOCKROT_DISABLE');
         }
@@ -675,46 +709,47 @@ final class InstallTimeSummaryTest extends TestCase
         $io = new BufferIO();
         $event = $this->event($io, new Transaction([$this->loadPackage(self::PHPZIP)], []));
 
-        (new InstallTimeSummary($this->analyzerFactory(), new UnknownKeyWarnings()))->onPreOperationsExec($event);
+        (new InstallTimeSummary($this->analyzerFactory()))->onPreOperationsExec($event);
 
         self::assertSame('', $io->getOutput());
     }
 
-    public function testASecondTransactionInTheSameProcessDoesNotRepeatTheWarning(): void
+    /**
+     * Every transaction warns about the config it read. A process can run several — bamarni's
+     * composer-bin-plugin runs an install per manifest — and a line printed for one is no reason to
+     * keep quiet about the next.
+     */
+    public function testEveryTransactionInAProcessWarnsAboutItsOwnConfig(): void
     {
         $this->project(['install-tme' => 'off'], [self::PSR_LOG]);
-        $warnings = new UnknownKeyWarnings();
         $first = new RecordingIO();
         $second = new RecordingIO();
+        $summary = new InstallTimeSummary($this->analyzerFactory());
 
-        (new InstallTimeSummary($this->analyzerFactory(), $warnings))->onPreOperationsExec($this->event($first, new Transaction([], [$this->loadPackage(self::PSR_LOG)])));
-        (new InstallTimeSummary($this->analyzerFactory(), $warnings))->onPreOperationsExec($this->event($second, new Transaction([], [$this->loadPackage(self::PSR_LOG)])));
+        $summary->onPreOperationsExec($this->event($first, new Transaction([], [$this->loadPackage(self::PSR_LOG)])));
+        $summary->onPreOperationsExec($this->event($second, new Transaction([], [$this->loadPackage(self::PSR_LOG)])));
 
-        self::assertCount(1, $first->errors);
-        self::assertSame([], $second->errors);
+        $line = 'lockrot: unknown key extra.lockrot.install-tme ignored (did you mean install-time?)';
+        self::assertSame([$line], $first->errors);
+        self::assertSame([$line], $second->errors);
     }
 
-    /** Constructed the way the plugin constructs it, the summary shares the process-wide guard. */
-    public function testTheDefaultWiringUsesTheProcessWideGuard(): void
+    /**
+     * A config the schema rejects still gets its suggestion, inside the one skipped-check line, and
+     * that line is raw too: the suggestion quotes the key.
+     */
+    public function testASchemaErrorNamesTheUnknownKeyInTheSkippedCheckLine(): void
     {
-        $this->project(['install-time-default-guard' => 1], [self::PSR_LOG]);
-        UnknownKeyWarnings::process()->lines(['install-time-default-guard' => 1]);
-        $io = new RecordingIO();
+        $this->project(['<<fg=red>>' => 1, 'ignore' => [['package' => 'a/b', 'reasn' => 'legacy']]]);
+        $io = new BufferIO('', StreamOutput::VERBOSITY_NORMAL, new MarkupRefusingFormatter('<<'));
+        $event = $this->event($io, new Transaction([], [$this->loadPackage(self::PHPZIP)]));
 
-        (new InstallTimeSummary($this->analyzerFactory()))->onPreOperationsExec($this->event($io, new Transaction([], [$this->loadPackage(self::PSR_LOG)])));
+        (new InstallTimeSummary($this->analyzerFactory()))->onPreOperationsExec($event);
 
-        self::assertSame([], $io->errors);
-    }
-
-    public function testAGuardHandedInIsTheOneUsed(): void
-    {
-        $this->project(['install-time-own-guard' => 1], [self::PSR_LOG]);
-        UnknownKeyWarnings::process()->lines(['install-time-own-guard' => 1]);
-        $io = new RecordingIO();
-
-        (new InstallTimeSummary($this->analyzerFactory(), new UnknownKeyWarnings()))->onPreOperationsExec($this->event($io, new Transaction([], [$this->loadPackage(self::PSR_LOG)])));
-
-        self::assertSame(['<warning>lockrot: unknown key extra.lockrot.install-time-own-guard ignored</warning>'], $io->errors);
+        $output = $io->getOutput();
+        self::assertStringStartsWith('lockrot: install-time check skipped: extra.lockrot is invalid: - ignore[0].reason: ', $output);
+        self::assertStringContainsString(' - unknown key extra.lockrot.<<fg=red>> ignored - unknown key extra.lockrot.ignore[0].reasn ignored (did you mean reason?)', $output);
+        self::assertCount(1, array_filter(explode("\n", $output)), $output);
     }
 
     public function testAnUninstallOnlyTransactionNeverBuildsAnAnalyzer(): void

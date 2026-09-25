@@ -6,6 +6,7 @@ namespace Lockrot\Lock;
 
 use Composer\Repository\PlatformRepository;
 use Lockrot\Config\ConfigSchema;
+use Lockrot\Config\UnknownKeys;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Json\JsonReader;
 
@@ -94,9 +95,30 @@ final class ProjectConfig
         }
 
         $lockrotExtra = JsonReader::stringKeyed($lockrotRaw);
-        ConfigSchema::validate($lockrotExtra);
+        try {
+            ConfigSchema::validate($lockrotExtra);
+        } catch (ConfigException $e) {
+            throw self::withUnknownKeys($e, $lockrotExtra);
+        }
 
         return $lockrotExtra;
+    }
+
+    /**
+     * The schema's error followed by the unknown-key lines a valid config would have printed as
+     * warnings. A misspelt required key (`reasn`) fails the schema as a missing `reason`; the line
+     * naming `reasn` and suggesting `reason` is what says why.
+     *
+     * @param array<string, mixed> $lockrotExtra
+     */
+    private static function withUnknownKeys(ConfigException $schemaError, array $lockrotExtra): ConfigException
+    {
+        $warnings = UnknownKeys::warnings($lockrotExtra);
+        if ($warnings === []) {
+            return $schemaError;
+        }
+
+        return new ConfigException($schemaError->getMessage()."\n  - ".implode("\n  - ", $warnings), 0, $schemaError);
     }
 
     /**
