@@ -38,6 +38,17 @@ comment rather than editing the recorded fixture files by hand.
 - `sarif/` — the pinned SARIF 2.1.0 schema the SARIF output is validated against.
 - `phar/` — a minimal PHP archive for the self-update tests; see its own README.
 - `http/github-releases/` — three recorded `releases/latest` bodies for the self-update tests.
+- `schema-evolution/` — what earlier releases wrote, for `SchemaEvolutionTest`: the
+  `--format=json` report (with a baseline, so its `baseline` block is filled) and six
+  `--explain … --format=json` documents per version, recorded on 2026-09-25 from the signed release
+  PHARs of 0.10.0 and 0.11.0 over a copy of `apps/wallabag_wallabag`, with network and a GitHub
+  token, `--target-php=8.4` and `LOCKROT_TODAY=2026-09-25T00:00:00+00:00`, by
+  `GITHUB_TOKEN=$(gh auth token) bin/record-schema-evolution <version> 2026-09-25`. Each version's
+  `provenance.json` names the release, the PHAR's sha256, the PHP that ran it (8.5.10), the
+  arguments of every run and each file's sha256; the test checks those hashes. The reports carry
+  S1–S9 (0.10.0) and S1–S10 (0.11.0), and the explanations between them the same; about 730 KB in
+  all. A version is added, never re-recorded or edited: a document here that stops validating
+  against the current schemas is a compatibility break to raise, not a fixture to refresh.
 - `big-summary.json`, `phar-summary.json`, `skeletons-summary.json`, `summary.json`,
   `top500.json`, `liveness.py`, `pre8.py` — research artefacts kept for provenance. No test reads
   them.

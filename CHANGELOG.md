@@ -19,6 +19,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `Lockrot\Extension\` is reserved: nothing is declared in it, in any letter case, and reserving it
   promises nothing about what, if anything, will be.
 
+### Added
+
+- A schema evolution test. Under one schema number a document may only gain fields, so a report or
+  an explanation an older lockrot wrote has to keep validating against the newest `report-1.json`
+  and `explain-1.json`. Every document the schema tests checked was written by the current code,
+  which cannot notice a schema change that rejects an older one — a field made required, a type or
+  an enum narrowed, a listed field dropped. The `--format=json` report and six `--explain` documents
+  that the signed 0.10.0 and 0.11.0 release archives wrote over wallabag's lock are now kept under
+  `tests/fixtures/schema-evolution/`, recorded once by `bin/record-schema-evolution` and never
+  edited, and validated on every run against the current schemas, as published and with the strict
+  copy that rejects a field the schema does not list. This checks the backward direction only, old
+  documents under the current schemas; a document a newer lockrot writes, validated against a
+  schema an older release published, is not what it tests. The report, its schemas and the HTML
+  page are unchanged.
+
 ## [0.12.0] - 2026-09-24
 
 ### Changed

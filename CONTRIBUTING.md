@@ -53,6 +53,14 @@ The README demo (`docs/assets/lockrot-demo.gif`) is recorded the same way, from 
 `bin/record-demo` captures it with asciinema and renders it with agg — its header says what to
 export first. Re-record it when the table output changes shape, not for every release.
 
+`tests/fixtures/schema-evolution/` holds the JSON reports and `--explain` documents earlier releases
+wrote, and `SchemaEvolutionTest` validates them against the current schemas: a schema change that
+would reject a document an older lockrot wrote, or stop listing a field one carries, fails there.
+`GITHUB_TOKEN=$(gh auth token) bin/record-schema-evolution <version> <today>` records a release from
+its signed PHAR, which it verifies first. A recorded version is frozen — the script refuses to
+record it again, and the test checks every file against the hash the recording took — so a failure
+there is a compatibility break to fix in the schema change, not in the fixture.
+
 ## Contributing a finished package
 
 `resources/finished-packages.json` is the built-in allowlist of packages that are complete rather
