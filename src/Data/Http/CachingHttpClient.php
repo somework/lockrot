@@ -7,6 +7,7 @@ namespace Lockrot\Data\Http;
 use Lockrot\Clock;
 use Lockrot\Data\Cache\CacheInterface;
 
+/** @internal */
 final class CachingHttpClient implements HttpClientInterface
 {
     private HttpClientInterface $inner;

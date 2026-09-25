@@ -13,6 +13,8 @@ namespace Lockrot\Data\Repository;
  * take the same shape. Composer keeps them because it has to fetch with them. lockrot only ever
  * shows them, and a report — a terminal buffer pasted into a ticket, a JSON file uploaded as a CI
  * artifact, an HTML page published in a blog post — is exactly where a token should never appear.
+ *
+ * @internal
  */
 final class RepositoryUrl
 {

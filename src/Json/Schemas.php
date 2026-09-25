@@ -14,6 +14,8 @@ namespace Lockrot\Json;
  * {@see \Lockrot\Baseline\Baseline::SCHEMA}): a file under one number only ever gains fields, so a
  * consumer validating against a copy it fetched earlier keeps validating; the number moves only
  * when a field is removed or renamed. The `id` inside each resources/*.schema.json is this same URL.
+ *
+ * @internal
  */
 final class Schemas
 {

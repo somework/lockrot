@@ -19,6 +19,8 @@ use Lockrot\Verdict\Finding;
  * metadata with the release date of every branch, the repository activity, the thresholds the
  * signals were measured against, and the run's notes. Nothing here is computed anew: the finding
  * is the report's, the facts are the ones the rules read ({@see \Lockrot\Analyzer\Analysis}).
+ *
+ * @internal
  */
 final class Explanation
 {

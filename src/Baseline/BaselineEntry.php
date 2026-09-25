@@ -11,6 +11,8 @@ namespace Lockrot\Baseline;
  * `version` is informational — matching is by package name only, so a version bump that keeps the
  * same verdict stays accepted. `firstSeen` is carried over across regenerations so the file says
  * how long a finding has been tolerated.
+ *
+ * @internal
  */
 final class BaselineEntry
 {

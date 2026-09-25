@@ -24,6 +24,8 @@ use Symfony\Component\Console\Formatter\OutputFormatter;
  * The text is meant to be read top to bottom: the verdict and how the package is reached, then
  * what fired, then the data — a reader who disagrees with a signal finds the number it was
  * computed from two blocks down, in the same units the signal used.
+ *
+ * @internal
  */
 final class ExplainFormatter
 {

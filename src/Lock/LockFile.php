@@ -10,6 +10,7 @@ use Composer\Package\Loader\ArrayLoader;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Json\JsonReader;
 
+/** @internal */
 final class LockFile
 {
     /** @var array<string, LockedPackage> */

@@ -17,6 +17,8 @@ use Lockrot\Data\Http\HttpResult;
  * no-op either way. {@see ServiceFactory::createCache()} does not hand such a cache over in the first
  * place — it falls back to an in-memory cache — so this only covers a cache that turns disabled
  * mid-run.
+ *
+ * @internal
  */
 final class ComposerCacheAdapter implements CacheInterface
 {

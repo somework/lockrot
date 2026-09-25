@@ -10,6 +10,7 @@ use Lockrot\Signal\Signal;
 use Lockrot\Signal\SignalRule;
 use Lockrot\Signal\Thresholds;
 
+/** @internal */
 final class NoReleaseRule implements SignalRule
 {
     private Clock $clock;

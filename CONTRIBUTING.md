@@ -69,7 +69,17 @@ still holds.
 
 The CLI (`composer lockrot` options), the `extra.lockrot` configuration keys, the output formats,
 the baseline file and the exit codes are the public interface and follow semantic versioning. The
-PHP classes under `src/` are not a public API and may change in any release.
+PHP classes under `src/` are not a public API and may change in any release: every class, interface
+and trait there is marked `@internal`, which PHPStan and IDEs report when another package uses it,
+and `tests/Unit/PublicApiTest.php` fails on one that is not. The one exception is
+`Lockrot\Composer\LockrotPlugin`, which `composer.json` names in `extra.class`: Composer loads the
+plugin by that name, so the name stays. What the plugin can be asked is Composer's plugin
+interfaces; the one public method they do not declare, the install-time event handler, is marked
+`@internal` on its own, and the same test fails on another.
+
+The namespace `Lockrot\Extension\` is reserved. Nothing is declared in it, and the same test fails
+on a class that is. The reservation keeps the name free; it is not a promise that anything will be
+published there, or in what form.
 
 ## Commits and pull requests
 

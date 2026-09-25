@@ -18,6 +18,8 @@ use Lockrot\Data\Http\HttpResult;
  * an anonymous request gets GitLab's basic projection, which leaves the flag out. So that call is
  * made only when the request carries credentials, and without them a GitLab repository can be
  * `silent` but never `abandoned` for being archived.
+ *
+ * @internal
  */
 final class GitLabApi implements ForgeApi
 {

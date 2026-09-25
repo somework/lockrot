@@ -22,6 +22,8 @@ use Lockrot\Verdict\Verdict;
  *
  * Unlike {@see TableFormatter} this returns lines rather than a rendered string, because
  * IOInterface::writeError() takes string|string[] and applies Composer's own styling to each.
+ *
+ * @internal
  */
 final class InstallSummaryFormatter
 {

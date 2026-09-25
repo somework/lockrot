@@ -12,6 +12,8 @@ use Lockrot\Exception\ConfigException;
  * Validates the shape of composer.json's extra.lockrot against
  * resources/lockrot-config.schema.json, using Composer's own bundled justinrainbow/json-schema
  * validator.
+ *
+ * @internal
  */
 final class ConfigSchema
 {

@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace Lockrot\Data\Forge;
 
-/** The outcome of one {@see ActivityClient::fetch()}: activity per repository, and what went wrong, per forge. */
+/**
+ * The outcome of one {@see ActivityClient::fetch()}: activity per repository, and what went wrong, per forge.
+ *
+ * @internal
+ */
 final class ActivityBatch
 {
     /** @var array<string, RepositoryActivity> */

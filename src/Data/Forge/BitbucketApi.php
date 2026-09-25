@@ -15,6 +15,8 @@ use Lockrot\Data\Http\HttpResult;
  * lockrot sends no credentials of its own to Bitbucket; Composer's (`http-basic` with an API
  * token, or a `bitbucket-oauth` consumer once exchanged, see {@see ForgeAuth}) are added by
  * Composer's HTTP layer.
+ *
+ * @internal
  */
 final class BitbucketApi implements ForgeApi
 {

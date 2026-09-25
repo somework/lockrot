@@ -29,6 +29,8 @@ use Lockrot\Deadline;
  * Composer 2.2 has no advisory API at all: the run says so in a note and checks nothing else
  * differently. Offline, nothing is asked — the POST cannot be served from a cache — and the note
  * says so too.
+ *
+ * @internal
  */
 final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
 {

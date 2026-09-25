@@ -18,6 +18,8 @@ use Lockrot\Version;
  * `json` ignores it; `github` and `sarif` need it to point their annotations at composer.lock and
  * to decide which findings are reported as errors rather than warnings; `table` needs the width of
  * the terminal it is about to be printed on.
+ *
+ * @internal
  */
 final class FormatContext
 {

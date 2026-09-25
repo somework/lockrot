@@ -37,6 +37,8 @@ use Lockrot\Version;
  * process has not already loaded is gone. So the swap is the last thing that touches the runtime:
  * the temporary archive is written, permissioned and validated first, the message to report is
  * built while the old bytes are still there, and only then is the file replaced.
+ *
+ * @internal
  */
 final class PharUpdater
 {

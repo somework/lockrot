@@ -15,6 +15,8 @@ use Lockrot\Exception\ConfigException;
  *
  * A baseline lockrot cannot read is never treated as "no baseline": it is a configuration error, so
  * CI cannot silently start failing — or silently stop failing — on a file nobody noticed was damaged.
+ *
+ * @internal
  */
 final class BaselineSchema
 {

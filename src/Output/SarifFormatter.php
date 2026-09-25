@@ -25,6 +25,8 @@ use Lockrot\Verdict\Verdict;
  * field SARIF defines for exactly this, and as `properties.priority` next to `properties.direct`
  * and `properties.dev`, the two facts it is derived from. `ruleId` stays on the verdict; `level`
  * follows the run's fail-on threshold ({@see FormatContext::levelOf()}), whichever kind it names.
+ *
+ * @internal
  */
 final class SarifFormatter implements FormatterInterface
 {

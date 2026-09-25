@@ -26,6 +26,8 @@ use Lockrot\Lock\LockedPackage;
  * snapshot has lost is dated anyway when the parent is in the lock, one it has gained is skipped
  * when the repository no longer agrees, and symfony/polyfill-* — which symfony/symfony does not
  * replace, though its own monorepo dates its tags the same way — costs no request at all.
+ *
+ * @internal
  */
 final class MonorepoParents
 {

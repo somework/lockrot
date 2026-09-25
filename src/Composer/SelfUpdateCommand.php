@@ -39,6 +39,8 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * Every message goes to stderr; stdout stays empty, as it does for every lockrot run that produces
  * no report.
+ *
+ * @internal
  */
 final class SelfUpdateCommand extends BaseCommand
 {

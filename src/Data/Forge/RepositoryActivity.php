@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace Lockrot\Data\Forge;
 
-/** What a forge said about one repository: archived or not, and when it last saw a push or commit. */
+/**
+ * What a forge said about one repository: archived or not, and when it last saw a push or commit.
+ *
+ * @internal
+ */
 final class RepositoryActivity
 {
     private RepoRef $ref;

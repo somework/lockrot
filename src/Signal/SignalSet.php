@@ -16,6 +16,7 @@ use Lockrot\Signal\Rule\NotCheckedRule;
 use Lockrot\Signal\Rule\OldPromiseRule;
 use Lockrot\Signal\Rule\PinnedRule;
 
+/** @internal */
 final class SignalSet
 {
     /** @var list<SignalRule> */

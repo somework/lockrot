@@ -29,6 +29,8 @@ use Lockrot\Verdict\Verdict;
  * carries the account it ran under and often the client's directory name. The project's own name is
  * a different thing — chosen metadata about the project the report already describes in full,
  * rather than a fact about the machine it happened to run on.
+ *
+ * @internal
  */
 final class RunSettings
 {

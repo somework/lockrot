@@ -8,6 +8,8 @@ namespace Lockrot\Data\Forge;
  * The access tokens lockrot itself resolved for one run — as opposed to the credentials Composer
  * holds in `auth.json`/`COMPOSER_AUTH`, which Composer's own HTTP layer applies without lockrot's
  * help ({@see ForgeAuth}).
+ *
+ * @internal
  */
 final class Tokens
 {

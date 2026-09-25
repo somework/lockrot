@@ -38,7 +38,11 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-/** `composer lockrot` — analyses composer.lock and prints a report in the configured format. */
+/**
+ * `composer lockrot` — analyses composer.lock and prints a report in the configured format.
+ *
+ * @internal
+ */
 final class LockrotCommand extends BaseCommand
 {
     /** @var callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, Tokens, Clock, Deadline, ?string): Analyzer */

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Signal;
 
+/** @internal */
 final class Signal
 {
     public const S1 = 'S1';

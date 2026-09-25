@@ -7,6 +7,7 @@ namespace Lockrot\Data\Php;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Json\JsonReader;
 
+/** @internal */
 final class PhpReleaseDates
 {
     /** @var array<string, \DateTimeImmutable> */

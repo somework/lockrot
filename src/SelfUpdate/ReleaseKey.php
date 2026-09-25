@@ -13,6 +13,8 @@ namespace Lockrot\SelfUpdate;
  * one signs `lockrot.phar.sig.json` for the archive's own self-update, the way Composer keeps its
  * self-update keys apart from its maintainers' GPG keys. RSA 4096, held by the release workflow
  * as the SELFUPDATE_PRIVATE_KEY secret; SECURITY.md says how it is rotated.
+ *
+ * @internal
  */
 final class ReleaseKey
 {

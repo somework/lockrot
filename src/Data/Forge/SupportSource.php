@@ -14,6 +14,8 @@ namespace Lockrot\Data\Forge;
  * Bitbucket's `<repository>/src/<ref>`. Those tails are cut here, once, so the locator only ever
  * sees the repository. A maintainer-set value
  * such as phpstan's `https://github.com/phpstan/phpstan-src` passes through unchanged.
+ *
+ * @internal
  */
 final class SupportSource
 {

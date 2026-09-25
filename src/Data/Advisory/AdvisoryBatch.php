@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace Lockrot\Data\Advisory;
 
-/** What one {@see AdvisoryLoaderInterface::load()} call found, and what it could not do. */
+/**
+ * What one {@see AdvisoryLoaderInterface::load()} call found, and what it could not do.
+ *
+ * @internal
+ */
 final class AdvisoryBatch
 {
     /** @var array<string, list<Advisory>> */

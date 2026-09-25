@@ -20,6 +20,8 @@ use Lockrot\Verdict\Verdict;
  *
  * "Flagged" is the same line every other part of the report draws ({@see Verdict::flagged()}), so
  * the packages a parent is said to pull in are exactly the rows the default report prints.
+ *
+ * @internal
  */
 final class TransitiveExposure
 {

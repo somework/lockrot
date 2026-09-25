@@ -16,6 +16,8 @@ use Lockrot\Verdict\Finding;
  * reader that dropping the chain's root would not remove the package. Formats differ only in the
  * separator between chain links and in whether the phrase is inline, a table cell or a
  * parenthesised suffix.
+ *
+ * @internal
  */
 final class Via
 {

@@ -11,6 +11,8 @@ namespace Lockrot\Data\Forge;
  * Bitbucket 60, so on those forges an anonymous run asks only about candidate packages — the ones
  * that already look stale on release age, where activity data can still change the verdict — and
  * no more than the budget. GitLab's anonymous limit is 500 a minute, so it is never capped.
+ *
+ * @internal
  */
 final class ActivityFetchPlanner
 {

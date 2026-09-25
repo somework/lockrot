@@ -23,6 +23,8 @@ use Lockrot\Json\Schemas;
  * property, since the table line and the JSON `baseline.path` then carry the absolute path it asked
  * for. Printing it as given is the deliberate choice: a path the reader recognises beats a
  * relativised one they have to reconstruct.
+ *
+ * @internal
  */
 final class BaselineFile
 {

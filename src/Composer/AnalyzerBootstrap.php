@@ -21,6 +21,8 @@ use Lockrot\Lock\ProjectConfig;
  * lockrot's own tokens, build a {@see Clock} from the environment, hand both (plus the deadline) to the
  * analyzer factory, and merge the project's own `extra.lockrot.ignore` allowlist onto whatever
  * allowlist the factory built the analyzer with.
+ *
+ * @internal
  */
 final class AnalyzerBootstrap
 {

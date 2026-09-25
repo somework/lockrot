@@ -14,6 +14,8 @@ use Composer\Semver\Constraint\ConstraintInterface;
  * the JSON document carries. Built from Composer's own advisory objects; a repository that serves
  * only the partial form (id and affected range) leaves title, link, severity and date null. The
  * affected range is what says whether a later release already carries the fix.
+ *
+ * @internal
  */
 final class Advisory
 {

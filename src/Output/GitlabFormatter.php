@@ -35,6 +35,8 @@ use Lockrot\Verdict\Finding;
  * issue identity instead of appearing as a new one. The priority is deliberately not part of it:
  * a package that moves from a `require` to a `require-dev` would otherwise open a second issue for
  * a finding GitLab already tracks.
+ *
+ * @internal
  */
 final class GitlabFormatter implements FormatterInterface
 {

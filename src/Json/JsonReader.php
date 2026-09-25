@@ -11,6 +11,8 @@ use Seld\JsonLint\ParsingException;
 /**
  * Reads a JSON file through Composer's own JsonFile, translating its exceptions into the
  * single ConfigException contract every lockrot caller relies on.
+ *
+ * @internal
  */
 final class JsonReader
 {

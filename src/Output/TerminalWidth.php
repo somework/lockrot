@@ -16,6 +16,8 @@ use Symfony\Component\Console\Terminal;
  * through Application::getTerminalDimensions(), a method 5.4 does not have. Neither call can be
  * made unconditionally, so each source is guarded and each is a method of its own: under 5.4 the
  * Terminal step always answers, which makes the two later steps unreachable from this side.
+ *
+ * @internal
  */
 final class TerminalWidth
 {

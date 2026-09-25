@@ -15,6 +15,8 @@ use Lockrot\Data\Http\HttpClientInterface;
  * found", any other failure fails the repository. A later request is enrichment (GitLab's project
  * document, for the archived flag) and is read when it answered; when it did not, the repository
  * keeps what the first request said.
+ *
+ * @internal
  */
 final class ActivityClient
 {

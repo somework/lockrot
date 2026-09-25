@@ -7,6 +7,7 @@ namespace Lockrot\Config;
 use Lockrot\Analyzer\Report;
 use Lockrot\Verdict\FailOn;
 
+/** @internal */
 final class Policy
 {
     public const EXIT_OK = 0;
