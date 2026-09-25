@@ -28,14 +28,17 @@ use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * `lockrot.phar self-update` — replaces the running PHAR with the latest GitHub release.
+ * `lockrot.phar self-update` — replaces the running PHAR with the newest GitHub release of its
+ * major version that this PHP can run and this archive can verify ({@see ReleaseLocator}).
  *
  * Registered in bin/lockrot only. The Composer plugin must never expose it: there the code lives in
  * the project's vendor directory, where the way to update lockrot is `composer update`.
  *
  * Exit codes follow the rest of lockrot: 0 for a successful update or an already-current build, 2
  * for every error. `--check` adds one case of its own — exit 1 when an update is available — so a
- * scheduled CI job can notice a new release without this command ever writing to disk.
+ * scheduled CI job can notice a new release without this command ever writing to disk. A newer
+ * major version alone is not an update without `--allow-major`: `--check` names it on a line of
+ * its own and still exits 0.
  *
  * Every message goes to stderr; stdout stays empty, as it does for every lockrot run that produces
  * no report.
@@ -91,18 +94,23 @@ final class SelfUpdateCommand extends BaseCommand
             // PHAR replaces both entries so neither spelling can reach Composer's updater, which
             // would go looking for a composer.phar that is not there.
             ->setAliases(['selfupdate'])
-            ->setDescription('Replaces this lockrot.phar with the latest release from GitHub')
+            ->setDescription('Replaces this lockrot.phar with the newest release of its major version from GitHub')
             ->addOption('check', null, InputOption::VALUE_NONE, 'Only report whether an update exists; exits 1 when one does')
-            ->addOption('force', null, InputOption::VALUE_NONE, 'Reinstall even when the latest release is the version already running')
+            ->addOption('force', null, InputOption::VALUE_NONE, 'Reinstall even when the newest release is the version already running')
+            ->addOption('allow-major', null, InputOption::VALUE_NONE, 'Also move to the next major version (for example 0.x to 1.0, or 1.x to 2.x)')
             ->addOption('offline', null, InputOption::VALUE_NONE, 'Refuse to use the network (self-update cannot run without it)')
             ->setHelp(
-                "Downloads the newest release of lockrot.phar from GitHub, checks it against the\n"
-                ."sha256 published beside it and against its signature (verified with the release\n"
-                ."key built into this archive), and replaces the running archive in place.\n\n"
+                "Downloads the newest release of lockrot.phar from GitHub in the same major version as\n"
+                ."this one (all of 0.x counts as one), checks it against the sha256 published beside it\n"
+                ."and against its signature (verified with the release key built into this archive),\n"
+                ."and replaces the running archive in place. A release that needs a newer PHP than this\n"
+                ."one is passed over with a line saying so; --allow-major moves on to the next major\n"
+                ."version, one at a time.\n\n"
                 ."The PHAR's own directory has to be writable. Nothing else on disk is touched, and\n"
                 ."a failure at any step leaves the running archive exactly as it was.\n\n"
                 ."  php lockrot.phar self-update\n"
                 ."  php lockrot.phar self-update --check\n"
+                ."  php lockrot.phar self-update --allow-major\n"
             );
     }
 
@@ -138,18 +146,39 @@ final class SelfUpdateCommand extends BaseCommand
             }
 
             [$http, $token] = $this->httpAndToken();
-            $release = (new ReleaseLocator($http, $token, $this->releaseUrl))->locate();
+            $force = $input->getOption('force') === true;
+            $signatures = $this->signatures ?? new ReleaseSignatureVerifier(ReleaseKey::PEM);
+            $choice = (new ReleaseLocator($http, $signatures->keyFingerprint(), $token, $this->releaseUrl))
+                ->locate($input->getOption('allow-major') === true, $force);
+            // Every line is written before anything is installed; see PharUpdater on why nothing
+            // new may be loaded once the archive has been swapped.
+            foreach ($choice->notes() as $note) {
+                $this->writeError($output, $note);
+            }
+            $upToDate = 'lockrot '.Version::STRING.' is up to date';
+            $release = $choice->release();
+            if ($release === null) {
+                if ($force) {
+                    throw new ConfigException(\sprintf(
+                        'no release in the %d.x line can be installed by this lockrot.phar',
+                        ReleaseLocator::majorOf(Version::STRING)
+                    ));
+                }
+                $this->writeError($output, $upToDate);
+
+                return $exitOk;
+            }
             $updater = new PharUpdater(
                 $http,
                 $this->validator ?? new PharValidator(),
-                $this->signatures ?? new ReleaseSignatureVerifier(ReleaseKey::PEM),
+                $signatures,
                 $phar,
                 Version::STRING
             );
 
             if ($input->getOption('check') === true) {
                 if (!$updater->isUpdateAvailable($release)) {
-                    $this->writeError($output, 'lockrot '.Version::STRING.' is up to date');
+                    $this->writeError($output, $upToDate);
 
                     return $exitOk;
                 }
@@ -162,8 +191,8 @@ final class SelfUpdateCommand extends BaseCommand
                 return $exitFindings;
             }
 
-            $message = $updater->update($release, $input->getOption('force') === true);
-            $this->writeError($output, $message ?? 'lockrot '.Version::STRING.' is up to date');
+            $message = $updater->update($release, $force);
+            $this->writeError($output, $message ?? $upToDate);
 
             return $exitOk;
         } catch (ConfigException $e) {

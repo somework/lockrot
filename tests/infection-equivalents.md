@@ -61,14 +61,14 @@ mutant from the original, and says why.
 
 ## src/SelfUpdate and src/Composer/SelfUpdateCommand.php
 
-src/Composer/SelfUpdateCommand.php:132 FalseValue (`\Phar::running(false)` → `\Phar::running(true)`) — the
+src/Composer/SelfUpdateCommand.php:140 FalseValue (`\Phar::running(false)` → `\Phar::running(true)`) — the
 two differ only inside a running PHAR, where `false` gives `/path/lockrot.phar` and `true` gives
 `phar:///path/lockrot.phar`; the unit suite is not running from a PHAR, so both return `''` and take the same
 branch. The difference is exercised by `tests/E2E/PharTest.php::testSelfUpdateFinishesCleanlyAfterReplacingTheRunningArchive`,
 which replaces a real archive in place and would fail on a `phar://` path, but Infection runs the `unit` and
 `integration` suites only (`@group e2e` is excluded in phpunit.xml.dist), so no test it runs can see it.
 
-src/Composer/SelfUpdateCommand.php:170 ConcatOperandRemoval (drops the closing `'</error>'`) — Symfony's
+src/Composer/SelfUpdateCommand.php:199 ConcatOperandRemoval (drops the closing `'</error>'`) — Symfony's
 OutputFormatter wraps each text chunk in the current style's opening *and* closing sequences, so an unclosed
 `<error>` tag renders byte-for-byte like a closed one (verified: `<error>lockrot: boom` and
 `<error>lockrot: boom</error>` both come out as `ESC[37;41mlockrot: boom ESC[39;49m`). The only way a leaked
@@ -76,7 +76,7 @@ style could be observed is a later write on the same output, and this line is th
 writes before returning. The *reordering* mutant on the same line is observable and is killed by
 `testOnATerminalTheWholeErrorIsStyledAndNotJustItsPrefix`.
 
-src/Composer/SelfUpdateCommand.php:174 ConcatOperandRemoval (drops the closing `'</error>'`) — the same, on the
+src/Composer/SelfUpdateCommand.php:203 ConcatOperandRemoval (drops the closing `'</error>'`) — the same, on the
 `\Throwable` branch; killed counterpart is `testAFailureThatIsNotAConfigErrorIsStillOneLineAndExitTwo`. Both
 mutants on this line are new: the branch had no coverage at the time escaped-A.txt was taken, so its mutants
 were counted as uncovered rather than escaped.

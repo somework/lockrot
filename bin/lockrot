@@ -139,9 +139,9 @@ $application = new class () extends \Composer\Console\Application {
     }
 
     /**
-     * Where `self-update` looks for the release document, so lockrot's own end-to-end test can point
-     * a real PHAR at a local server and watch it replace itself. Empty or unset means GitHub, which
-     * is the only value any install ever uses.
+     * Where `self-update` reads the release list, so lockrot's own end-to-end test can point a real
+     * PHAR at a local server and watch it replace itself. Empty or unset means GitHub, which is the
+     * only value any install ever uses.
      */
     private static function releaseUrlOverride(): ?string
     {
@@ -156,7 +156,8 @@ $application = new class () extends \Composer\Console\Application {
      * key built into this archive ({@see \Lockrot\SelfUpdate\ReleaseKey}), which is the only key any
      * install ever uses. Composer's self-update has the same seam in COMPOSER_HOME/keys.tags.pub.
      *
-     * The file is read when a signature is checked, not here: every command goes through this
+     * The file is read when self-update needs the key — its fingerprint to choose a release, then
+     * the key itself to check a signature — not here: every command goes through this
      * factory, and an unreadable path must fail `self-update` through its own error channel, not
      * `lockrot -d project` before it has read a lock.
      */
@@ -177,11 +178,22 @@ $application = new class () extends \Composer\Console\Application {
 
             public function verify(string $archive, string $signatureFile, string $signatureUrl): void
             {
+                $this->verifier()->verify($archive, $signatureFile, $signatureUrl);
+            }
+
+            public function keyFingerprint(): string
+            {
+                return $this->verifier()->keyFingerprint();
+            }
+
+            private function verifier(): \Lockrot\SelfUpdate\ReleaseSignatureVerifier
+            {
                 $pem = @file_get_contents($this->path);
                 if ($pem === false) {
                     throw new \Lockrot\Exception\ConfigException('LOCKROT_RELEASE_KEY names an unreadable file: '.$this->path);
                 }
-                (new \Lockrot\SelfUpdate\ReleaseSignatureVerifier($pem))->verify($archive, $signatureFile, $signatureUrl);
+
+                return new \Lockrot\SelfUpdate\ReleaseSignatureVerifier($pem);
             }
         };
     }

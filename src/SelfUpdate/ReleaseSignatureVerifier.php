@@ -20,7 +20,10 @@ use Lockrot\Exception\ConfigException;
  * The key is the one the archive was built with, so trust starts with the first download: verify
  * that one by hand (`lockrot.phar.asc` with the GPG key, or the attestation), and every self-update
  * after it is checked against the key that download carried. A rotated key reaches an old archive
- * the same way — by updating to a release signed with both.
+ * the same way, through the transition release: signed with the old key, carrying the new one. An
+ * archive on the old key passes over the releases after it, whose description names a key it does
+ * not carry ({@see keyFingerprint()}, {@see ReleaseLocator}), installs the transition release, and
+ * from there verifies with the new key.
  *
  * @internal
  */
@@ -63,6 +66,26 @@ final class ReleaseSignatureVerifier implements SignatureVerifierInterface
                 $signatureUrl
             ));
         }
+    }
+
+    /**
+     * Pure PHP, no openssl: the DER is the base64 between the armour lines, so this is the same
+     * value on a machine without ext-openssl, in the release workflow's `describe` step and in a
+     * user's archive. Only a `PUBLIC KEY` block (SubjectPublicKeyInfo) is read; an
+     * `RSA PUBLIC KEY` block holds the same key in PKCS#1, whose hash is another value, and would
+     * otherwise mismatch every description in silence. The line breaks inside the block need no
+     * stripping: base64_decode() skips whitespace even in strict mode, which rejects anything else
+     * outside the alphabet.
+     */
+    public function keyFingerprint(): string
+    {
+        $pattern = '/^\s*-----BEGIN PUBLIC KEY-----([^-]*)-----END PUBLIC KEY-----\s*$/';
+        $der = preg_match($pattern, $this->publicKeyPem, $matches) === 1 ? base64_decode($matches[1], true) : false;
+        if ($der === false || $der === '') {
+            throw new ConfigException('the public key self-update verifies releases with is not a PEM "PUBLIC KEY" block, so it has no fingerprint; download the new release by hand and verify it');
+        }
+
+        return 'sha256:'.hash('sha256', $der);
     }
 
     /**

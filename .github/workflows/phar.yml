@@ -71,6 +71,15 @@ jobs:
       # private key lives in a throw-away directory for the length of the step — removed on every
       # exit, a failed openssl included — and the passphrase is read from the environment by
       # openssl itself, never from an argument.
+      #
+      # The same step writes lockrot.phar.meta.json, which self-update chooses a release by without
+      # downloading it: the lowest PHP the archive runs on (config.platform.php of
+      # build/phar/composer.json) and the SHA-256 fingerprint of the key that signed it. The
+      # fingerprint is taken from the public half of the private key just used, not from the
+      # committed key file, so the description names the actual signer — which is what makes a
+      # rotation's transition release (signed with the old key, carrying the new one) describe
+      # itself correctly. build/selfupdate-signer.pub is not a release asset: the upload glob is
+      # build/lockrot.phar*.
       - name: Sign the PHAR for self-update
         if: env.SIGN == 'true'
         env:
@@ -83,16 +92,23 @@ jobs:
           openssl dgst -sha384 -sign "$KEYDIR/key.pem" -passin env:SELFUPDATE_PASSPHRASE -out build/lockrot.phar.sig.bin build/lockrot.phar
           build/selfupdate-signature.php wrap build/lockrot.phar.sig.bin > build/lockrot.phar.sig.json
           rm build/lockrot.phar.sig.bin
-      # Two checks: openssl against the published key file, and the archive's own verifier class
-      # against the key it carries — the second is what a user's self-update will run, so a key
-      # the workflow signs with that is not the one in ReleaseKey::PEM fails here, not on a user.
+          openssl pkey -in "$KEYDIR/key.pem" -passin env:SELFUPDATE_PASSPHRASE -pubout -out build/selfupdate-signer.pub
+          build/selfupdate-signature.php describe build/phar/composer.json build/selfupdate-signer.pub > build/lockrot.phar.meta.json
+      # Three checks: openssl against the published key file, the archive's own verifier class
+      # against the key it carries — what a user's self-update will run, so a key the workflow signs
+      # with that is not the one in ReleaseKey::PEM fails here, not on a user — and the description
+      # against the same committed key. The last one is also what a rotation's transition release
+      # has to relax: its signer is the old key while the committed file is already the new one (see
+      # SECURITY.md).
       - name: Verify the self-update signature with the built-in key
         if: env.SIGN == 'true'
         run: |
           build/selfupdate-signature.php unwrap build/lockrot.phar.sig.json > build/lockrot.phar.sig.bin
           openssl dgst -sha384 -verify lockrot-selfupdate-key.pub -signature build/lockrot.phar.sig.bin build/lockrot.phar
+          openssl dgst -sha384 -verify build/selfupdate-signer.pub -signature build/lockrot.phar.sig.bin build/lockrot.phar
           rm build/lockrot.phar.sig.bin
           build/selfupdate-signature.php verify build/lockrot.phar build/lockrot.phar.sig.json
+          build/selfupdate-signature.php describe build/phar/composer.json lockrot-selfupdate-key.pub | cmp - build/lockrot.phar.meta.json
       - run: LOCKROT_E2E=1 vendor/bin/phpunit --group e2e --filter PharTest
       - if: env.SIGN == 'true'
         uses: actions/attest-build-provenance@v4

@@ -12,6 +12,7 @@ use Lockrot\SelfUpdate\PharValidatorInterface;
 use Lockrot\SelfUpdate\ReleaseLocator;
 use Lockrot\SelfUpdate\ReleaseSignatureVerifier;
 use Lockrot\Tests\Support\FakeHttpClient;
+use Lockrot\Tests\Support\GitHubReleases;
 use Lockrot\Tests\Support\SigningKeys;
 use Lockrot\Tests\Support\SplitStreamOutput;
 use Lockrot\Version;
@@ -22,7 +23,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 final class SelfUpdateCommandTest extends TestCase
 {
     private const FIXTURES = __DIR__.'/../../fixtures/http/github-releases';
-    private const NEWER = '99.0.0';
+    private const URL = ReleaseLocator::DEFAULT_URL;
     private const NEW_PHAR = 'the bytes of a newer lockrot.phar';
 
     /** @var list<string> */
@@ -42,6 +43,22 @@ final class SelfUpdateCommandTest extends TestCase
         $this->tempDirs = [];
     }
 
+    /** A release newer than the running build and in its major version, whatever that build is. */
+    private static function newer(): string
+    {
+        return GitHubReleases::newerInLine(Version::STRING);
+    }
+
+    private static function nextMajor(): string
+    {
+        return GitHubReleases::nextMajor(Version::STRING);
+    }
+
+    private static function heldBackNote(): string
+    {
+        return 'lockrot '.self::nextMajor().' is in the next major version; run lockrot.phar self-update --allow-major to move to it';
+    }
+
     private function installedPhar(): string
     {
         $dir = sys_get_temp_dir().'/lockrot-selfupdate-cmd-'.uniqid('', true);
@@ -55,41 +72,41 @@ final class SelfUpdateCommandTest extends TestCase
         return $path;
     }
 
-    /** The recorded releases/latest body, retagged so the test controls whether it is newer. */
-    private static function releaseBody(string $tag): string
+    /**
+     * The release list for $versions, newest first, each described as the release workflow would
+     * describe it — PHP 7.4.0 and the test key the command verifies with — with its archive,
+     * checksum and signature ready to download.
+     *
+     * @param list<string>              $versions
+     * @param array<string, HttpResult> $extra
+     */
+    private static function http(array $versions, array $extra = [], string $url = self::URL): FakeHttpClient
     {
-        $fixture = file_get_contents(self::FIXTURES.'/latest.json');
-        self::assertIsString($fixture);
+        $key = GitHubReleases::fingerprint(SigningKeys::releasePublicPem());
+        $entries = [];
+        $responses = [];
+        foreach ($versions as $version) {
+            $tag = 'v'.$version;
+            $entries[] = GitHubReleases::entry($tag);
+            $assets = [
+                ReleaseLocator::METADATA_ASSET => GitHubReleases::meta('7.4.0', $key),
+                ReleaseLocator::PHAR_ASSET => self::NEW_PHAR,
+                ReleaseLocator::CHECKSUM_ASSET => hash('sha256', self::NEW_PHAR).'  lockrot.phar'."\n",
+                ReleaseLocator::SIGNATURE_ASSET => SigningKeys::releaseSignatureFile(self::NEW_PHAR),
+            ];
+            foreach ($assets as $name => $body) {
+                $assetUrl = GitHubReleases::assetUrl($tag, $name);
+                $responses[$assetUrl] = FakeHttpClient::ok($assetUrl, $body);
+            }
+        }
+        $responses[$url] = FakeHttpClient::ok($url, GitHubReleases::listJson($entries));
 
-        return str_replace('v0.2.0', $tag, $fixture);
+        return new FakeHttpClient(array_merge($responses, $extra));
     }
 
-    private static function downloadUrl(string $tag, string $asset): string
+    private static function pharUrl(string $version): string
     {
-        return 'https://github.com/somework/lockrot/releases/download/'.$tag.'/'.$asset;
-    }
-
-    /** @param array<string, HttpResult> $extra */
-    private function httpFor(string $tag, array $extra = []): FakeHttpClient
-    {
-        return new FakeHttpClient(array_merge(
-            [ReleaseLocator::DEFAULT_URL => FakeHttpClient::ok(ReleaseLocator::DEFAULT_URL, self::releaseBody($tag))],
-            $extra
-        ));
-    }
-
-    /** @param array<string, HttpResult> $extra */
-    private function httpWithAssets(string $tag, array $extra = []): FakeHttpClient
-    {
-        $phar = self::downloadUrl($tag, 'lockrot.phar');
-        $checksum = self::downloadUrl($tag, 'lockrot.phar.sha256');
-        $signature = self::downloadUrl($tag, 'lockrot.phar.sig.json');
-
-        return $this->httpFor($tag, array_merge([
-            $phar => FakeHttpClient::ok($phar, self::NEW_PHAR),
-            $checksum => FakeHttpClient::ok($checksum, hash('sha256', self::NEW_PHAR).'  lockrot.phar'."\n"),
-            $signature => FakeHttpClient::ok($signature, SigningKeys::releaseSignatureFile(self::NEW_PHAR)),
-        ], $extra));
+        return GitHubReleases::assetUrl('v'.$version, ReleaseLocator::PHAR_ASSET);
     }
 
     private function validator(?string $error = null): PharValidatorInterface
@@ -161,41 +178,41 @@ final class SelfUpdateCommandTest extends TestCase
 
     public function testCheckOnAnUpToDateInstallExitsZero(): void
     {
-        $http = $this->httpFor('v'.Version::STRING);
+        $http = self::http([Version::STRING]);
         $tester = new CommandTester($this->command($http, $this->installedPhar()));
 
         $code = $tester->execute(['--check' => true]);
 
         self::assertSame(0, $code, $tester->getDisplay());
         self::assertStringContainsString('lockrot '.Version::STRING.' is up to date', $tester->getDisplay());
-        self::assertSame([ReleaseLocator::DEFAULT_URL], $http->requested(), '--check never downloads the phar');
+        self::assertSame([self::URL], $http->requested(), 'an up-to-date check reads the list and nothing else');
     }
 
     public function testCheckWithAnAvailableUpdateExitsOneAndNamesBothVersions(): void
     {
-        $http = $this->httpFor('v'.self::NEWER);
+        $http = self::http([self::newer(), Version::STRING]);
         $tester = new CommandTester($this->command($http, $this->installedPhar()));
 
         $code = $tester->execute(['--check' => true]);
 
         self::assertSame(1, $code, $tester->getDisplay());
         self::assertStringContainsString(
-            'lockrot '.self::NEWER.' is available (installed: '.Version::STRING.'); run lockrot.phar self-update',
+            'lockrot '.self::newer().' is available (installed: '.Version::STRING.'); run lockrot.phar self-update',
             $tester->getDisplay()
         );
-        self::assertSame([ReleaseLocator::DEFAULT_URL], $http->requested(), '--check never downloads the phar');
+        self::assertNotContains(self::pharUrl(self::newer()), $http->requested(), '--check never downloads the phar');
     }
 
     public function testAnUpdateReplacesThePharAndReportsBothVersions(): void
     {
         $phar = $this->installedPhar();
-        $http = $this->httpWithAssets('v'.self::NEWER);
+        $http = self::http([self::newer(), Version::STRING]);
 
         [$code, $stdout, $stderr] = $this->runCommand($this->command($http, $phar), []);
 
         self::assertSame(0, $code, $stderr);
         self::assertSame('', $stdout, 'self-update writes nothing to stdout');
-        self::assertStringContainsString('lockrot updated from '.Version::STRING.' to '.self::NEWER, $stderr);
+        self::assertSame('lockrot updated from '.Version::STRING.' to '.self::newer()."\n", $stderr);
         self::assertSame(self::NEW_PHAR, file_get_contents($phar));
     }
 
@@ -203,31 +220,148 @@ final class SelfUpdateCommandTest extends TestCase
     {
         $phar = $this->installedPhar();
         $before = (string) file_get_contents($phar);
-        $http = $this->httpWithAssets('v'.Version::STRING);
+        $http = self::http([Version::STRING]);
 
         [$code, $stdout, $stderr] = $this->runCommand($this->command($http, $phar), []);
 
         self::assertSame(0, $code, $stderr);
         self::assertSame('', $stdout);
-        self::assertStringContainsString('lockrot '.Version::STRING.' is up to date', $stderr);
+        self::assertSame('lockrot '.Version::STRING." is up to date\n", $stderr);
         self::assertSame($before, file_get_contents($phar));
     }
 
     public function testForceReinstallsTheSameVersion(): void
     {
         $phar = $this->installedPhar();
-        $http = $this->httpWithAssets('v'.Version::STRING);
+        $http = self::http([Version::STRING]);
 
         [$code, , $stderr] = $this->runCommand($this->command($http, $phar), ['--force' => true]);
 
         self::assertSame(0, $code, $stderr);
-        self::assertStringContainsString('lockrot reinstalled '.Version::STRING, $stderr);
+        self::assertSame('lockrot reinstalled '.Version::STRING."\n", $stderr);
         self::assertSame(self::NEW_PHAR, file_get_contents($phar));
+    }
+
+    /** --check only ever reports; with --force it still says whether anything newer exists. */
+    public function testCheckWithForceOnTheRunningVersionIsUpToDate(): void
+    {
+        $http = self::http([Version::STRING]);
+
+        [$code, , $stderr] = $this->runCommand($this->command($http, $this->installedPhar()), ['--check' => true, '--force' => true]);
+
+        self::assertSame(0, $code, $stderr);
+        self::assertSame('lockrot '.Version::STRING." is up to date\n", $stderr);
+        self::assertNotContains(self::pharUrl(Version::STRING), $http->requested());
+    }
+
+    public function testANewerMajorIsNotInstalledWithoutAllowMajor(): void
+    {
+        $phar = $this->installedPhar();
+        $before = (string) file_get_contents($phar);
+        $http = self::http([self::nextMajor(), Version::STRING]);
+
+        [$code, $stdout, $stderr] = $this->runCommand($this->command($http, $phar), []);
+
+        self::assertSame(0, $code, $stderr);
+        self::assertSame('', $stdout);
+        self::assertSame(self::heldBackNote()."\n".'lockrot '.Version::STRING." is up to date\n", $stderr);
+        self::assertSame($before, file_get_contents($phar));
+        self::assertSame([self::URL], $http->requested());
+    }
+
+    public function testAllowMajorInstallsTheNextMajor(): void
+    {
+        $phar = $this->installedPhar();
+        $http = self::http([self::nextMajor(), Version::STRING]);
+
+        [$code, , $stderr] = $this->runCommand($this->command($http, $phar), ['--allow-major' => true]);
+
+        self::assertSame(0, $code, $stderr);
+        self::assertSame('lockrot updated from '.Version::STRING.' to '.self::nextMajor()."\n", $stderr);
+        self::assertSame(self::NEW_PHAR, file_get_contents($phar));
+    }
+
+    /**
+     * Exit 1 means "self-update would install something", and without the flag it would not. A
+     * scheduled job keeps its meaning and still reads the new major on the line above.
+     */
+    public function testCheckNamesANewerMajorButExitsZero(): void
+    {
+        $http = self::http([self::nextMajor(), Version::STRING]);
+
+        [$code, , $stderr] = $this->runCommand($this->command($http, $this->installedPhar()), ['--check' => true]);
+
+        self::assertSame(0, $code, $stderr);
+        self::assertSame(self::heldBackNote()."\n".'lockrot '.Version::STRING." is up to date\n", $stderr);
+    }
+
+    public function testCheckWithAllowMajorExitsOneForANewMajor(): void
+    {
+        $http = self::http([self::nextMajor(), Version::STRING]);
+
+        [$code, , $stderr] = $this->runCommand($this->command($http, $this->installedPhar()), ['--check' => true, '--allow-major' => true]);
+
+        self::assertSame(1, $code, $stderr);
+        self::assertStringContainsString('lockrot '.self::nextMajor().' is available (installed: '.Version::STRING.')', $stderr);
+    }
+
+    /** The notes say why; the error says that nothing in the line was left to install. */
+    public function testForceWithNoInstallableReleaseInTheLineIsExitTwo(): void
+    {
+        $http = self::http([self::nextMajor()]);
+
+        [$code, $stdout, $stderr] = $this->runCommand($this->command($http, $this->installedPhar()), ['--force' => true]);
+
+        self::assertSame(2, $code, $stderr);
+        self::assertSame('', $stdout);
+        self::assertSame(
+            self::heldBackNote()."\n".'lockrot: no release in the '.((int) Version::STRING).".x line can be installed by this lockrot.phar\n",
+            $stderr
+        );
+    }
+
+    /** Everything is said before the archive is swapped: afterwards the old classes are gone. */
+    public function testNotesComeBeforeTheOutcomeLine(): void
+    {
+        $phar = $this->installedPhar();
+        $http = self::http([self::nextMajor(), self::newer(), Version::STRING]);
+
+        [$code, , $stderr] = $this->runCommand($this->command($http, $phar), []);
+
+        self::assertSame(0, $code, $stderr);
+        self::assertSame(
+            self::heldBackNote()."\n".'lockrot updated from '.Version::STRING.' to '.self::newer()."\n",
+            $stderr
+        );
+    }
+
+    /**
+     * The fingerprint the release list is filtered by is the key's own: a key without one is an
+     * error before anything is asked of the network, not a quiet "nothing to install".
+     */
+    public function testAKeyWithoutAFingerprintIsExitTwoBeforeTheListIsRead(): void
+    {
+        $http = self::http([self::newer()]);
+        $command = $this->registered(new SelfUpdateCommand(
+            static function () use ($http): array {
+                return [$http, null];
+            },
+            $this->validator(),
+            $this->installedPhar(),
+            null,
+            new ReleaseSignatureVerifier('not a key')
+        ));
+
+        [$code, , $stderr] = $this->runCommand($command, []);
+
+        self::assertSame(2, $code);
+        self::assertStringContainsString('lockrot: the public key self-update verifies releases with is not a PEM "PUBLIC KEY" block', $stderr);
+        self::assertSame([], $http->requested());
     }
 
     public function testOutsideAPharTheCommandRefusesBeforeTouchingTheNetwork(): void
     {
-        $http = $this->httpWithAssets('v'.self::NEWER);
+        $http = self::http([self::newer()]);
 
         [$code, $stdout, $stderr] = $this->runCommand($this->command($http, ''), []);
 
@@ -239,7 +373,7 @@ final class SelfUpdateCommandTest extends TestCase
 
     public function testTheOfflineOptionIsRefusedWithAReason(): void
     {
-        $http = $this->httpWithAssets('v'.self::NEWER);
+        $http = self::http([self::newer()]);
 
         [$code, $stdout, $stderr] = $this->runCommand($this->command($http, $this->installedPhar()), ['--offline' => true]);
 
@@ -254,7 +388,7 @@ final class SelfUpdateCommandTest extends TestCase
         $previous = Platform::getEnv('COMPOSER_DISABLE_NETWORK');
         Platform::putEnv('COMPOSER_DISABLE_NETWORK', '1');
         try {
-            $http = $this->httpWithAssets('v'.self::NEWER);
+            $http = self::http([self::newer()]);
 
             [$code, , $stderr] = $this->runCommand($this->command($http, $this->installedPhar()), []);
 
@@ -274,9 +408,7 @@ final class SelfUpdateCommandTest extends TestCase
     {
         $body = file_get_contents(self::FIXTURES.'/not-found.json');
         self::assertIsString($body);
-        $http = new FakeHttpClient([
-            ReleaseLocator::DEFAULT_URL => FakeHttpClient::status(ReleaseLocator::DEFAULT_URL, 404, $body),
-        ]);
+        $http = new FakeHttpClient([self::URL => FakeHttpClient::status(self::URL, 404, $body)]);
 
         [$code, $stdout, $stderr] = $this->runCommand($this->command($http, $this->installedPhar()), ['--check' => true]);
 
@@ -287,21 +419,21 @@ final class SelfUpdateCommandTest extends TestCase
 
     public function testTheCommandIsNamedSelfUpdateAndAliasesComposersOwnSpelling(): void
     {
-        $command = $this->command($this->httpFor('v'.Version::STRING), $this->installedPhar());
+        $command = $this->command(self::http([Version::STRING]), $this->installedPhar());
 
         self::assertSame('self-update', $command->getName());
         self::assertContains('selfupdate', $command->getAliases());
     }
 
     /**
-     * The release document is read from wherever the command was pointed, not from the constant.
+     * The release list is read from wherever the command was pointed, not from the constant.
      * bin/lockrot passes LOCKROT_RELEASE_URL through here, which is how the end-to-end test serves
      * its own releases without reaching api.github.com.
      */
-    public function testTheReleaseDocumentIsReadFromTheConfiguredUrl(): void
+    public function testTheReleaseListIsReadFromTheConfiguredUrl(): void
     {
-        $url = 'https://releases.example.test/lockrot/latest.json';
-        $http = new FakeHttpClient([$url => FakeHttpClient::ok($url, self::releaseBody('v'.Version::STRING))]);
+        $url = 'https://releases.example.test/lockrot/releases.json';
+        $http = self::http([Version::STRING], [], $url);
         $tester = new CommandTester($this->command($http, $this->installedPhar(), $url));
 
         $code = $tester->execute(['--check' => true]);
@@ -311,25 +443,30 @@ final class SelfUpdateCommandTest extends TestCase
     }
 
     /**
-     * Pinned: the four facts a user needs (the source, the checksum, the writable directory, the
-     * untouched archive on failure), in that order, followed by the two example lines. Rewording
-     * around those phrases passes; dropping one of them, or moving an example above the
-     * explanation, fails.
+     * Pinned: the facts a user needs (the source, the major line, the checksum, the signature, the
+     * PHP floor, the flag, the writable directory, the untouched archive on failure), in that order,
+     * followed by the three example lines. Rewording around those phrases passes; dropping one of
+     * them, or moving an example above the explanation, fails.
      */
-    public function testTheHelpExplainsTheUpdateBeforeGivingTheTwoExamples(): void
+    public function testTheHelpExplainsTheUpdateBeforeGivingTheExamples(): void
     {
-        $help = $this->command($this->httpFor('v'.Version::STRING), $this->installedPhar())->getHelp();
+        $help = $this->command(self::http([Version::STRING]), $this->installedPhar())->getHelp();
 
         $offset = 0;
         foreach ([
             'from GitHub',
+            'same major version',
             'sha256 published beside it',
             'against its signature',
             'key built into this archive',
+            'newer PHP',
+            '--allow-major',
+            'one at a time',
             'has to be writable',
             'leaves the running archive exactly as it was',
             "  php lockrot.phar self-update\n",
-            '  php lockrot.phar self-update --check',
+            "  php lockrot.phar self-update --check\n",
+            '  php lockrot.phar self-update --allow-major',
         ] as $fragment) {
             $at = strpos($help, $fragment, $offset);
             self::assertNotFalse($at, 'the help is missing "'.$fragment.'" after offset '.$offset.': '.$help);
@@ -367,9 +504,7 @@ final class SelfUpdateCommandTest extends TestCase
     {
         $body = file_get_contents(self::FIXTURES.'/not-found.json');
         self::assertIsString($body);
-        $http = new FakeHttpClient([
-            ReleaseLocator::DEFAULT_URL => FakeHttpClient::status(ReleaseLocator::DEFAULT_URL, 404, $body),
-        ]);
+        $http = new FakeHttpClient([self::URL => FakeHttpClient::status(self::URL, 404, $body)]);
 
         [$code, , $stderr] = $this->runCommand($this->command($http, $this->installedPhar()), ['--check' => true], true);
 
