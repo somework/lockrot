@@ -1,0 +1,425 @@
+{
+    "$schema": "https://lockrot.dev/schema/baseline-1.json",
+    "lockrot": {
+        "version": "0.9.0",
+        "schema": 1
+    },
+    "generated_at": "2026-09-25T00:00:00+00:00",
+    "findings": {
+        "behat/transliterator": {
+            "version": "v1.5.0",
+            "verdict": "abandoned",
+            "first_seen": "2026-09-25"
+        },
+        "clue/stream-filter": {
+            "version": "v1.7.0",
+            "verdict": "old-promise",
+            "first_seen": "2026-09-25"
+        },
+        "craue/config-bundle": {
+            "version": "2.7.0",
+            "verdict": "left-behind",
+            "first_seen": "2026-09-25"
+        },
+        "defuse/php-encryption": {
+            "version": "v2.4.0",
+            "verdict": "old-promise",
+            "first_seen": "2026-09-25"
+        },
+        "doctrine/annotations": {
+            "version": "2.0.2",
+            "verdict": "abandoned",
+            "first_seen": "2026-09-25"
+        },
+        "doctrine/cache": {
+            "version": "2.2.0",
+            "verdict": "abandoned",
+            "first_seen": "2026-09-25"
+        },
+        "doctrine/event-manager": {
+            "version": "1.2.0",
+            "verdict": "left-behind",
+            "first_seen": "2026-09-25"
+        },
+        "friendsofphp/proxy-manager-lts": {
+            "version": "v1.0.18",
+            "verdict": "old-promise",
+            "first_seen": "2026-09-25"
+        },
+        "friendsofsymfony/oauth-server-bundle": {
+            "version": "dev-master",
+            "verdict": "pinned",
+            "first_seen": "2026-09-25"
+        },
+        "friendsofsymfony/oauth2-php": {
+            "version": "1.3.1",
+            "verdict": "stale",
+            "first_seen": "2026-09-25"
+        },
+        "grandt/binstring": {
+            "version": "1.0.0",
+            "verdict": "silent",
+            "first_seen": "2026-09-25"
+        },
+        "grandt/phpresizegif": {
+            "version": "1.0.3",
+            "verdict": "silent",
+            "first_seen": "2026-09-25"
+        },
+        "grandt/phpzipmerge": {
+            "version": "1.0.4",
+            "verdict": "silent",
+            "first_seen": "2026-09-25"
+        },
+        "grandt/relativepath": {
+            "version": "1.0.2",
+            "verdict": "silent",
+            "first_seen": "2026-09-25"
+        },
+        "gregwar/captcha-bundle": {
+            "version": "v2.2.0",
+            "verdict": "old-promise",
+            "first_seen": "2026-09-25"
+        },
+        "hoa/compiler": {
+            "version": "3.17.08.08",
+            "verdict": "abandoned",
+            "first_seen": "2026-09-25"
+        },
+        "hoa/consistency": {
+            "version": "1.17.05.02",
+            "verdict": "abandoned",
+            "first_seen": "2026-09-25"
+        },
+        "hoa/event": {
+            "version": "1.17.01.13",
+            "verdict": "abandoned",
+            "first_seen": "2026-09-25"
+        },
+        "hoa/exception": {
+            "version": "1.17.01.16",
+            "verdict": "abandoned",
+            "first_seen": "2026-09-25"
+        },
+        "hoa/file": {
+            "version": "1.17.07.11",
+            "verdict": "abandoned",
+            "first_seen": "2026-09-25"
+        },
+        "hoa/iterator": {
+            "version": "2.17.01.10",
+            "verdict": "abandoned",
+            "first_seen": "2026-09-25"
+        },
+        "hoa/math": {
+            "version": "1.17.05.16",
+            "verdict": "abandoned",
+            "first_seen": "2026-09-25"
+        },
+        "hoa/protocol": {
+            "version": "1.17.01.14",
+            "verdict": "abandoned",
+            "first_seen": "2026-09-25"
+        },
+        "hoa/regex": {
+            "version": "1.17.01.13",
+            "verdict": "abandoned",
+            "first_seen": "2026-09-25"
+        },
+        "hoa/ruler": {
+            "version": "2.17.05.16",
+            "verdict": "abandoned",
+            "first_seen": "2026-09-25"
+        },
+        "hoa/stream": {
+            "version": "1.17.02.21",
+            "verdict": "abandoned",
+            "first_seen": "2026-09-25"
+        },
+        "hoa/ustring": {
+            "version": "4.17.01.16",
+            "verdict": "abandoned",
+            "first_seen": "2026-09-25"
+        },
+        "hoa/visitor": {
+            "version": "2.17.01.16",
+            "verdict": "abandoned",
+            "first_seen": "2026-09-25"
+        },
+        "hoa/zformat": {
+            "version": "1.17.01.10",
+            "verdict": "abandoned",
+            "first_seen": "2026-09-25"
+        },
+        "javibravo/simpleue": {
+            "version": "2.1.0",
+            "verdict": "silent",
+            "first_seen": "2026-09-25"
+        },
+        "lcobucci/jwt": {
+            "version": "4.3.0",
+            "verdict": "left-behind",
+            "first_seen": "2026-09-25"
+        },
+        "mgargano/simplehtmldom": {
+            "version": "1.5",
+            "verdict": "old-promise",
+            "first_seen": "2026-09-25"
+        },
+        "mnapoli/piwik-twig-extension": {
+            "version": "3.0.0",
+            "verdict": "silent",
+            "first_seen": "2026-09-25"
+        },
+        "phpdocumentor/reflection-common": {
+            "version": "2.2.0",
+            "verdict": "stale",
+            "first_seen": "2026-09-25"
+        },
+        "phpzip/phpzip": {
+            "version": "2.0.8",
+            "verdict": "silent",
+            "first_seen": "2026-09-25"
+        },
+        "pragmarx/random": {
+            "version": "v0.2.2",
+            "verdict": "silent",
+            "first_seen": "2026-09-25"
+        },
+        "pragmarx/recovery": {
+            "version": "v0.2.1",
+            "verdict": "old-promise",
+            "first_seen": "2026-09-25"
+        },
+        "scheb/2fa-backup-code": {
+            "version": "v5.13.2",
+            "verdict": "left-behind",
+            "first_seen": "2026-09-25"
+        },
+        "scheb/2fa-bundle": {
+            "version": "v5.13.2",
+            "verdict": "left-behind",
+            "first_seen": "2026-09-25"
+        },
+        "scheb/2fa-email": {
+            "version": "v5.13.2",
+            "verdict": "left-behind",
+            "first_seen": "2026-09-25"
+        },
+        "scheb/2fa-google-authenticator": {
+            "version": "v5.13.2",
+            "verdict": "left-behind",
+            "first_seen": "2026-09-25"
+        },
+        "scheb/2fa-trusted-device": {
+            "version": "v5.13.2",
+            "verdict": "left-behind",
+            "first_seen": "2026-09-25"
+        },
+        "sensio/framework-extra-bundle": {
+            "version": "v6.2.10",
+            "verdict": "abandoned",
+            "first_seen": "2026-09-25"
+        },
+        "smalot/pdfparser": {
+            "version": "v1.1.0",
+            "verdict": "left-behind",
+            "first_seen": "2026-09-25"
+        },
+        "spiriitlabs/form-filter-bundle": {
+            "version": "v10.0.2",
+            "verdict": "old-promise",
+            "first_seen": "2026-09-25"
+        },
+        "spomky-labs/otphp": {
+            "version": "v10.0.3",
+            "verdict": "left-behind",
+            "first_seen": "2026-09-25"
+        },
+        "symfony/asset": {
+            "version": "v5.4.45",
+            "verdict": "old-promise",
+            "first_seen": "2026-09-25"
+        },
+        "symfony/browser-kit": {
+            "version": "v5.4.45",
+            "verdict": "old-promise",
+            "first_seen": "2026-09-25"
+        },
+        "symfony/config": {
+            "version": "v5.4.46",
+            "verdict": "old-promise",
+            "first_seen": "2026-09-25"
+        },
+        "symfony/console": {
+            "version": "v5.4.47",
+            "verdict": "old-promise",
+            "first_seen": "2026-09-25"
+        },
+        "symfony/dependency-injection": {
+            "version": "v5.4.48",
+            "verdict": "old-promise",
+            "first_seen": "2026-09-25"
+        },
+        "symfony/doctrine-bridge": {
+            "version": "v5.4.48",
+            "verdict": "old-promise",
+            "first_seen": "2026-09-25"
+        },
+        "symfony/error-handler": {
+            "version": "v5.4.46",
+            "verdict": "old-promise",
+            "first_seen": "2026-09-25"
+        },
+        "symfony/event-dispatcher": {
+            "version": "v5.4.45",
+            "verdict": "old-promise",
+            "first_seen": "2026-09-25"
+        },
+        "symfony/event-dispatcher-contracts": {
+            "version": "v2.5.4",
+            "verdict": "old-promise",
+            "first_seen": "2026-09-25"
+        },
+        "symfony/expression-language": {
+            "version": "v5.4.45",
+            "verdict": "old-promise",
+            "first_seen": "2026-09-25"
+        },
+        "symfony/filesystem": {
+            "version": "v5.4.45",
+            "verdict": "old-promise",
+            "first_seen": "2026-09-25"
+        },
+        "symfony/finder": {
+            "version": "v5.4.45",
+            "verdict": "old-promise",
+            "first_seen": "2026-09-25"
+        },
+        "symfony/form": {
+            "version": "v5.4.45",
+            "verdict": "old-promise",
+            "first_seen": "2026-09-25"
+        },
+        "symfony/framework-bundle": {
+            "version": "v5.4.45",
+            "verdict": "old-promise",
+            "first_seen": "2026-09-25"
+        },
+        "symfony/google-mailer": {
+            "version": "v5.4.45",
+            "verdict": "old-promise",
+            "first_seen": "2026-09-25"
+        },
+        "symfony/intl": {
+            "version": "v5.4.47",
+            "verdict": "old-promise",
+            "first_seen": "2026-09-25"
+        },
+        "symfony/monolog-bundle": {
+            "version": "v3.10.0",
+            "verdict": "old-promise",
+            "first_seen": "2026-09-25"
+        },
+        "symfony/options-resolver": {
+            "version": "v5.4.45",
+            "verdict": "old-promise",
+            "first_seen": "2026-09-25"
+        },
+        "symfony/property-access": {
+            "version": "v5.4.45",
+            "verdict": "old-promise",
+            "first_seen": "2026-09-25"
+        },
+        "symfony/proxy-manager-bridge": {
+            "version": "v5.4.45",
+            "verdict": "old-promise",
+            "first_seen": "2026-09-25"
+        },
+        "symfony/psr-http-message-bridge": {
+            "version": "v2.3.1",
+            "verdict": "left-behind",
+            "first_seen": "2026-09-25"
+        },
+        "symfony/security-bundle": {
+            "version": "v5.4.45",
+            "verdict": "old-promise",
+            "first_seen": "2026-09-25"
+        },
+        "symfony/security-guard": {
+            "version": "v5.4.45",
+            "verdict": "abandoned",
+            "first_seen": "2026-09-25"
+        },
+        "symfony/serializer": {
+            "version": "v5.4.45",
+            "verdict": "old-promise",
+            "first_seen": "2026-09-25"
+        },
+        "symfony/service-contracts": {
+            "version": "v2.5.4",
+            "verdict": "old-promise",
+            "first_seen": "2026-09-25"
+        },
+        "symfony/templating": {
+            "version": "v5.4.45",
+            "verdict": "old-promise",
+            "first_seen": "2026-09-25"
+        },
+        "symfony/translation-contracts": {
+            "version": "v2.5.4",
+            "verdict": "old-promise",
+            "first_seen": "2026-09-25"
+        },
+        "symfony/twig-bundle": {
+            "version": "v5.4.45",
+            "verdict": "old-promise",
+            "first_seen": "2026-09-25"
+        },
+        "symfony/var-dumper": {
+            "version": "v5.4.48",
+            "verdict": "old-promise",
+            "first_seen": "2026-09-25"
+        },
+        "symfony/webpack-encore-bundle": {
+            "version": "v1.17.2",
+            "verdict": "old-promise",
+            "first_seen": "2026-09-25"
+        },
+        "thecodingmachine/safe": {
+            "version": "v2.5.0",
+            "verdict": "left-behind",
+            "first_seen": "2026-09-25"
+        },
+        "wallabag/phpepub": {
+            "version": "4.0.10",
+            "verdict": "old-promise",
+            "first_seen": "2026-09-25"
+        },
+        "wallabag/rulerz": {
+            "version": "dev-master",
+            "verdict": "pinned",
+            "first_seen": "2026-09-25"
+        },
+        "wallabag/rulerz-bridge": {
+            "version": "dev-master",
+            "verdict": "pinned",
+            "first_seen": "2026-09-25"
+        },
+        "wallabag/rulerz-bundle": {
+            "version": "dev-master",
+            "verdict": "pinned",
+            "first_seen": "2026-09-25"
+        },
+        "willdurand/jsonp-callback-validator": {
+            "version": "v2.0.0",
+            "verdict": "old-promise",
+            "first_seen": "2026-09-25"
+        },
+        "willdurand/negotiation": {
+            "version": "3.1.0",
+            "verdict": "old-promise",
+            "first_seen": "2026-09-25"
+        }
+    }
+}

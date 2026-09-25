@@ -23,7 +23,13 @@ trait ValidatesJsonSchemas
 {
     private function assertValid(string $document, string $json, string $what, bool $strict = false): void
     {
-        $errors = $this->errors($document, $json, $strict);
+        $this->assertValidAgainst(self::schema($document), $json, $what, $strict);
+    }
+
+    /** As {@see assertValid()}, against a schema already loaded: an older release's copy, or a part of one. */
+    private function assertValidAgainst(object $schema, string $json, string $what, bool $strict = false): void
+    {
+        $errors = $this->errorsAgainst($schema, $json, $strict);
 
         self::assertSame([], $errors, $what.($strict ? ' (strict twin)' : '').': '.json_encode($errors, \JSON_PRETTY_PRINT));
     }
@@ -31,9 +37,14 @@ trait ValidatesJsonSchemas
     /** @return list<string> */
     private function errors(string $document, string $json, bool $strict): array
     {
+        return $this->errorsAgainst(self::schema($document), $json, $strict);
+    }
+
+    /** @return list<string> */
+    private function errorsAgainst(object $schema, string $json, bool $strict): array
+    {
         $data = json_decode($json);
         self::assertNotNull($data, 'valid JSON');
-        $schema = self::schema($document);
         if ($strict) {
             self::assertInstanceOf(\stdClass::class, $schema);
             $schema = self::strictTwin($schema);
@@ -54,8 +65,14 @@ trait ValidatesJsonSchemas
 
     private static function schema(string $document): object
     {
-        $decoded = json_decode((string) file_get_contents(Schemas::path($document)));
-        self::assertIsObject($decoded, $document);
+        return self::schemaAt(Schemas::path($document));
+    }
+
+    /** A schema file, decoded afresh on every call: the validator is free to annotate what it is given. */
+    private static function schemaAt(string $path): object
+    {
+        $decoded = json_decode((string) file_get_contents($path));
+        self::assertIsObject($decoded, $path);
 
         return $decoded;
     }

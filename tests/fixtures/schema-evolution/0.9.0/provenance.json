@@ -1,7 +1,7 @@
 {
-    "lockrot": "0.11.0",
-    "tag": "v0.11.0",
-    "phar_sha256": "d8196dbe5b5dbe4aa8cb626f5b135e3cb0ccd8d6989b587b8fe05eee8ceb301a",
+    "lockrot": "0.9.0",
+    "tag": "v0.9.0",
+    "phar_sha256": "9c334523667627810a04d5903aec683124d2df98421d5b7ab100d40749cb8c1c",
     "verified": {
         "sha256": "lockrot.phar.sha256 of the release",
         "gpg": "39ECC3F64AE8D06A9A63FD99AB6F7F52AE513141",
@@ -26,7 +26,7 @@
                 "--baseline=lockrot-schema-evolution-baseline.json"
             ],
             "exit": 0,
-            "sha256": "1b85e3f6711a7d04fa8de789539eb302b982c8a89881cd07dd3faaece118c335"
+            "sha256": "fa8eeb666f25faa75388966a719cee06f9f5bd37446b64a00cbfd2016866ce82"
         },
         "report.json": {
             "args": [
@@ -38,7 +38,7 @@
                 "--baseline=lockrot-schema-evolution-baseline.json"
             ],
             "exit": 0,
-            "sha256": "6dabda21bf1636869040078114d53fa834c958ab6cb5ee0531b042bb437cff59"
+            "sha256": "9a90e07465cc3a0f2f78e26cd16dfdbc54cda2ccf5469c53d407a6db00c9e23c"
         },
         "explain/doctrine~cache.json": {
             "args": [
@@ -50,7 +50,7 @@
                 "--format=json"
             ],
             "exit": 0,
-            "sha256": "c065e560ea440fd1f7900d737a37b12a8e981fd1b8ffe959318f48304e2f8c9d"
+            "sha256": "b22207ca6eb122eae73fcb6aae526471b992acefa4c2d21dce38a44e54771064"
         },
         "explain/sensio~framework-extra-bundle.json": {
             "args": [
@@ -62,7 +62,7 @@
                 "--format=json"
             ],
             "exit": 0,
-            "sha256": "8a30856759169658ed01f0c3eeed7fcaccb147a625bf80e21b0e5daaae6adb52"
+            "sha256": "ac4c86078f1dad347a5f84addbe8a881efada0a0fb76d646791f3bb2a3b34da3"
         },
         "explain/wallabag~rulerz.json": {
             "args": [
@@ -74,7 +74,7 @@
                 "--format=json"
             ],
             "exit": 0,
-            "sha256": "30554865d7a00406725d8bb71bf59417728c08895f5c4b6cbf0ec2fc76565412"
+            "sha256": "88e6d5c9b5c6446442f035048284164a6a56e1b7901376831a4cca8044bc1aaf"
         },
         "explain/javibravo~simpleue.json": {
             "args": [
@@ -86,7 +86,7 @@
                 "--format=json"
             ],
             "exit": 0,
-            "sha256": "7941c478c9117d407b42ca5a34c90f7d9b4f5facb2363ad68672369f16bcd4d7"
+            "sha256": "cc945a7adfe34a13e5cc786e09ab39214ed73ee506c76513125d2f88d4b2e984"
         },
         "explain/scheb~2fa-backup-code.json": {
             "args": [
@@ -98,7 +98,7 @@
                 "--format=json"
             ],
             "exit": 0,
-            "sha256": "59a3c271a196d0cfda2d3c28a9d2130e5a1b8fff40fd1ce64de2720ecd80c69f"
+            "sha256": "c2f1c97ad0a76cde587e43a38e8587f8d67f5a7febd31d9d75c8a8a5aa3fa00e"
         },
         "explain/spomky-labs~otphp.json": {
             "args": [
@@ -110,7 +110,7 @@
                 "--format=json"
             ],
             "exit": 0,
-            "sha256": "80fdddd4533b31987695da7900994d98782c76a48eae7b6e8434ca07aa8bfd8a"
+            "sha256": "ce82130a5e591667a46a4f56bf8644f402e740ace7242151d8d43757c8cb0bec"
         }
     }
 }

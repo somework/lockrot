@@ -14,19 +14,20 @@
     "lock": "tests/fixtures/apps/wallabag_wallabag",
     "network": true,
     "github_token": true,
-    "cache": "empty at the start, shared with no other version",
-    "baseline": {
-        "args": [
-            "-d",
-            "<copy of tests/fixtures/apps/wallabag_wallabag>",
-            "--target-php=8.4",
-            "--no-ansi",
-            "--generate-baseline",
-            "--baseline=lockrot-schema-evolution-baseline.json"
-        ],
-        "exit": 0
-    },
+    "cache": "the baseline run on a cache of its own; the report on an empty one, shared with no other version; the explanations on the cache the report filled",
     "files": {
+        "lockrot-schema-evolution-baseline.json": {
+            "args": [
+                "-d",
+                "<copy of tests/fixtures/apps/wallabag_wallabag>",
+                "--target-php=8.4",
+                "--no-ansi",
+                "--generate-baseline",
+                "--baseline=lockrot-schema-evolution-baseline.json"
+            ],
+            "exit": 0,
+            "sha256": "343624c4e32bd4e8ba0ade4ad05f7a6c3fdd82132b48f816c3e17d3ddbe6efb5"
+        },
         "report.json": {
             "args": [
                 "-d",
@@ -37,7 +38,7 @@
                 "--baseline=lockrot-schema-evolution-baseline.json"
             ],
             "exit": 0,
-            "sha256": "091a0fef3ce881617b90d2f279b35104e83a2f2e90938395da95aca66957c4ed"
+            "sha256": "0ee14ca6826fbb4ee4a75e4941dbcc11f5351701631cc676cc1dba97b676f069"
         },
         "explain/doctrine~cache.json": {
             "args": [

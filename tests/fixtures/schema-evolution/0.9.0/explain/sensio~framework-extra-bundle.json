@@ -1,0 +1,187 @@
+{
+    "$schema": "https://lockrot.dev/schema/explain-1.json",
+    "lockrot": {
+        "version": "0.9.0",
+        "schema": 1
+    },
+    "package": "sensio/framework-extra-bundle",
+    "version": "v6.2.10",
+    "finding": {
+        "package": "sensio/framework-extra-bundle",
+        "version": "v6.2.10",
+        "verdict": "abandoned",
+        "priority": "critical",
+        "direct": true,
+        "dev": false,
+        "signals": [
+            {
+                "id": "S1",
+                "level": "high",
+                "summary": "marked abandoned by its repository, replacement: Symfony",
+                "data": {
+                    "replacement": "Symfony"
+                }
+            },
+            {
+                "id": "S2",
+                "level": "warn",
+                "summary": "last release 2023-02-24 (3.6 years ago)",
+                "data": {
+                    "last_release": "2023-02-24T14:57:12+00:00",
+                    "last_version": "v6.2.10",
+                    "years": 3.6,
+                    "dated_by": null
+                }
+            },
+            {
+                "id": "S3",
+                "level": "high",
+                "summary": "repository archived on GitHub",
+                "data": {
+                    "repo": "sensiolabs/SensioFrameworkExtraBundle",
+                    "host": "github.com"
+                }
+            },
+            {
+                "id": "S4",
+                "level": "warn",
+                "summary": "last push 2023-02-24 (3.6 years ago)",
+                "data": {
+                    "last_push": "2023-02-24T14:58:10+00:00",
+                    "repo": "sensiolabs/SensioFrameworkExtraBundle",
+                    "host": "github.com",
+                    "years": 3.6
+                }
+            },
+            {
+                "id": "S5",
+                "level": "warn",
+                "summary": "released 2023-02-24, before PHP 8.4 GA (2024-11-21); php constraint \">=7.2.5\" has no upper bound",
+                "data": {
+                    "target_php": "8.4",
+                    "ga_date": "2024-11-21",
+                    "php_constraint": ">=7.2.5",
+                    "released": "2023-02-24T14:57:12+00:00"
+                }
+            },
+            {
+                "id": "S7",
+                "level": "info",
+                "summary": "pulls in 1 flagged package: doctrine/annotations (abandoned)",
+                "data": {
+                    "flagged": 1,
+                    "packages": [
+                        {
+                            "package": "doctrine/annotations",
+                            "verdict": "abandoned",
+                            "chain": [
+                                "sensio/framework-extra-bundle",
+                                "doctrine/annotations"
+                            ]
+                        }
+                    ]
+                }
+            }
+        ],
+        "chain": [
+            "sensio/framework-extra-bundle"
+        ],
+        "direct_dependents": [
+            "sensio/framework-extra-bundle"
+        ],
+        "evidence": "marked abandoned by its repository, replacement: Symfony; repository archived on GitHub; last release 2023-02-24 (3.6 years ago); last push 2023-02-24 (3.6 years ago); released 2023-02-24, before PHP 8.4 GA (2024-11-21); php constraint \">=7.2.5\" has no upper bound; pulls in 1 flagged package: doctrine/annotations (abandoned)",
+        "allowlist_reason": null,
+        "note": null,
+        "data_date": "2026-09-25T00:00:00+00:00"
+    },
+    "lock": {
+        "php": ">=7.2.5",
+        "released": "2023-02-24T14:57:12+00:00",
+        "repository": "https://github.com/sensiolabs/SensioFrameworkExtraBundle.git",
+        "from_composer_repository": true,
+        "dev": false,
+        "branch_snapshot": false,
+        "type": "symfony-bundle"
+    },
+    "metadata": {
+        "abandoned": true,
+        "replacement": "Symfony",
+        "releases_listed": 113,
+        "has_stable_release": true,
+        "last_stable_release": "2023-02-24T14:57:12+00:00",
+        "last_stable_version": "v6.2.10",
+        "last_stable_dated_by": null,
+        "repository": "https://github.com/sensiolabs/SensioFrameworkExtraBundle.git",
+        "type": "symfony-bundle",
+        "data_date": "2026-09-25T00:00:00+00:00",
+        "branches": [
+            {
+                "branch": "6.x",
+                "installed": true,
+                "highest": "v6.2.10",
+                "highest_released": "2023-02-24T14:57:12+00:00",
+                "highest_commit_date": null,
+                "newest_dated": "v6.2.10",
+                "newest_dated_released": "2023-02-24T14:57:12+00:00",
+                "dated_by": null
+            },
+            {
+                "branch": "5.x",
+                "installed": false,
+                "highest": "v5.6.1",
+                "highest_released": "2020-08-25T19:10:18+00:00",
+                "highest_commit_date": null,
+                "newest_dated": "v5.5.7",
+                "newest_dated_released": "2020-09-05T14:06:05+00:00",
+                "dated_by": null
+            },
+            {
+                "branch": "4.x",
+                "installed": false,
+                "highest": "v4.0.0",
+                "highest_released": "2017-09-29T16:05:12+00:00",
+                "highest_commit_date": null,
+                "newest_dated": "v4.0.0",
+                "newest_dated_released": "2017-09-29T16:05:12+00:00",
+                "dated_by": null
+            },
+            {
+                "branch": "3.x",
+                "installed": false,
+                "highest": "v3.0.29",
+                "highest_released": "2017-12-14T19:03:23+00:00",
+                "highest_commit_date": null,
+                "newest_dated": "v3.0.29",
+                "newest_dated_released": "2017-12-14T19:03:23+00:00",
+                "dated_by": null
+            },
+            {
+                "branch": "2.x",
+                "installed": false,
+                "highest": "v2.3.4",
+                "highest_released": "2013-07-24T08:49:53+00:00",
+                "highest_commit_date": null,
+                "newest_dated": "v2.3.4",
+                "newest_dated_released": "2013-07-24T08:49:53+00:00",
+                "dated_by": null
+            }
+        ]
+    },
+    "activity": {
+        "forge": "GitHub",
+        "repository": "sensiolabs/SensioFrameworkExtraBundle",
+        "archived": true,
+        "pushed_at": "2023-02-24T14:58:10+00:00",
+        "fetched_at": "2026-09-25T00:00:00+00:00",
+        "from_cache": true
+    },
+    "thresholds": {
+        "release-warn-years": 3,
+        "release-high-years": 5,
+        "push-warn-years": 3,
+        "push-high-years": 5
+    },
+    "target_php": "8.4",
+    "generated_at": "2026-09-25T00:00:00+00:00",
+    "notes": []
+}
