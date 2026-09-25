@@ -149,6 +149,13 @@ A network failure is reported as a note and never fails the run on its own, unle
 `--strict-network`. `--format=github` turns findings into pull-request annotations, `--format=sarif`
 uploads them to the Security tab, `--format=gitlab` into a Code Quality report and
 `--format=markdown` into a PR comment, and `--format=html` into a single-file page you can upload as a CI artifact and open.
+One run can write several of them: `--format` decides stdout, and each `--output=<format>:<path>` adds a file
+rendered from the same report:
+
+```bash
+composer lockrot --format=github --fail-on=silent --target-php=8.4 \
+  --output=sarif:lockrot.sarif --output=html:lockrot-report.html --output=json:lockrot.json
+```
 
 On GitHub Actions, [somework/lockrot-action](https://github.com/somework/lockrot-action) runs the
 verified release with annotations, a job summary and a metadata cache in one step:
@@ -169,7 +176,11 @@ Everywhere else, the PHAR or the Docker image `ghcr.io/somework/lockrot` does th
 A large project rarely starts clean. The **baseline** records the findings you have already seen and
 decided to live with, so CI fails only on what is new or has got worse, without turning `--fail-on`
 off and losing the check entirely. Commit the file: it is a statement about the project, worth
-reviewing like any other change, and the only file lockrot ever writes — on this flag alone.
+reviewing like any other change, and lockrot writes it on this flag alone.
+
+In your project, lockrot writes only the files you name: reports with `--output` and the baseline
+with `--generate-baseline`. It never writes `composer.json` or `composer.lock`. Outside the project it
+writes only its activity cache, under Composer's cache directory, and `self-update` replaces the PHAR.
 
 ```bash
 composer rot --target-php=8.4 --generate-baseline
@@ -204,6 +215,7 @@ which win over `composer.json`.
 | — | `--all` | | Show every checked package, not only flagged ones |
 | — | `--generate-baseline` | | Write this run's findings to the baseline file and exit 0 |
 | — | `--explain=vendor/package` | | One package: its verdict, every signal with its raw data, and the repository facts behind them; exit 0 |
+| — | `--output=<format>:<path>` | | Also write the report to a file, in any `--format` format; repeatable. Relative to the project directory; the directory must exist |
 
 `extra.lockrot` is validated against
 [`resources/lockrot-config.schema.json`](resources/lockrot-config.schema.json). A key lockrot does not

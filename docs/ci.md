@@ -44,7 +44,7 @@ subdirectory. The same repository publishes `ghcr.io/somework/lockrot`, a signed
 |---|---|
 | `0` | No finding reached the `fail-on` threshold (or `fail-on=none`) |
 | `1` | A finding reached or exceeded the `fail-on` threshold, or carried an unrun check under `--fail-on=unchecked` |
-| `2` | Tool or configuration error (unparsable `composer.json`/`composer.lock`, invalid config value, unreadable or unwritable [baseline](baseline.md)) |
+| `2` | Tool or configuration error (unparsable `composer.json`/`composer.lock`, invalid config value, unreadable or unwritable [baseline](baseline.md), an `--output` that names `composer.json`, `composer.lock` or the baseline, an unknown format, an empty or repeated path, a directory that does not exist, or a file that cannot be written) |
 
 `composer audit` follows the same convention: exit `1` when it finds a security advisory or, with Composer's default
 `audit.abandoned=fail`, an abandoned package; exit `0` when it finds nothing. lockrot reads the same advisories
@@ -66,6 +66,50 @@ codes with its own meanings; see [phar.md](phar.md).
 
 The [install-time summary](install-time.md) never sets an exit code unless `install-time-strict` is on. The exit code
 is identical for every output format below; only the output changes.
+
+## Several reports from one run
+
+`--format` decides what goes to stdout; `--output=<format>:<path>`, repeatable, writes more formats to files from the
+same run. The analysis runs once, so every file carries the same report — the same clock, the same findings, the same
+notes — where two runs could disagree on all three: a second run is a second round of requests, and offline it has its
+own notes and its own reasons for what it could not check. Annotations on stdout, and SARIF, a page and the JSON
+document as files:
+
+```yaml
+permissions:
+  contents: read
+  security-events: write
+
+steps:
+  - uses: actions/checkout@v7
+  - name: lockrot
+    run: >-
+      composer lockrot --format=github --fail-on=silent --target-php=8.4
+      --output=sarif:lockrot.sarif --output=html:lockrot-report.html --output=json:lockrot.json
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  - name: Upload SARIF
+    if: always()
+    uses: github/codeql-action/upload-sarif@v4
+    with:
+      sarif_file: lockrot.sarif
+  - name: Upload the page and the JSON
+    if: always()
+    uses: actions/upload-artifact@v4
+    with:
+      name: lockrot-report
+      path: |
+        lockrot-report.html
+        lockrot.json
+```
+
+Each file is byte for byte what its `--format` prints; a `table` file has no colours and is wrapped at 120 columns.
+Each one is written atomically after stdout, and named on stderr (`lockrot: sarif report written to lockrot.sarif`).
+A relative path is relative to the project directory (`-d` sets it), and the directory must exist: lockrot creates
+none. A path naming `composer.json`, `composer.lock` or the [baseline](baseline.md) is refused before the analysis
+starts (exit `2`); otherwise the exit code is the one `--fail-on` decides, with or without `--output`. The
+`> lockrot.sarif` redirections below still work; `--output` is for when one run should feed several consumers. Every
+rule is in [configuration.md](configuration.md#writing-reports-to-files).
 
 ## `--format=github`
 

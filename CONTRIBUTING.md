@@ -98,6 +98,18 @@ on a class that is, or on a `src/Extension/` directory, in any letter case: PHP 
 without regard to case. The reservation keeps the name free; it is not a promise that anything will
 be published there, or in what form.
 
+## What lockrot writes
+
+In your project, lockrot writes only the files you name: reports with `--output` and the baseline
+with `--generate-baseline`. It never writes `composer.json` or `composer.lock`. Outside the project
+it writes only its activity cache, under Composer's cache directory, and `self-update` replaces the
+PHAR.
+
+That sentence is a promise the README, `SECURITY.md` and the docs make, so a change that writes
+anything else — a new file, a created directory, a cache in another place — is a change to the
+promise and needs the maintainer's decision first, not only a review. Every project file goes
+through `Lockrot\Filesystem\AtomicWriter`.
+
 ## Commits and pull requests
 
 Commit messages follow [Conventional Commits](https://www.conventionalcommits.org/): `feat:`,

@@ -176,6 +176,13 @@ The PHAR always runs the inspected project with `--no-plugins`: it reads `compos
 `composer.json` and never needs that project's Composer plugins. It also never writes to
 `composer.json` or `composer.lock`.
 
+In your project, lockrot writes only the files you name: reports with
+[`--output`](configuration.md#writing-reports-to-files) and the baseline with `--generate-baseline`.
+Outside the project it writes only its activity cache, under Composer's cache directory, and
+`self-update` replaces the PHAR. `-d` makes the project the working directory before lockrot starts,
+so relative `--output` paths, like `--baseline`, are relative to the `-d` directory:
+`php lockrot.phar -d app --output=json:lockrot.json` writes `app/lockrot.json`.
+
 The only project-inspection commands are `lockrot` (the default, so the name can be left out) and
 `self-update`. Symfony's own `help`, `list` and `completion` remain, so `php lockrot.phar list` shows
 five entries — and nothing in the inspected project can be installed, updated or run through the

@@ -128,8 +128,58 @@ lockrot: unknown key extra.lockrot.ignore[1].expire ignored (did you mean expire
 | `--generate-baseline` | Write this run's findings to the [baseline](baseline.md) file and exit 0, whatever `--fail-on` says — `--strict-network` is the one exception |
 | `--baseline=<path>` | Baseline file to read (or, with `--generate-baseline`, to write); relative to `composer.json` or absolute. Wins over `extra.lockrot.baseline`. An empty `--baseline=` is a configuration error (exit `2`), never a silent fall-back to the default file — as is an empty `--fail-on=` |
 | `--explain=vendor/package` | Explain one package and exit 0 — see [Explaining one package](#explaining-one-package) |
+| `--output=<format>:<path>` | Also write the report to a file, in any format `--format` takes; repeatable. `--format` still decides stdout. See [Writing reports to files](#writing-reports-to-files) |
 
 `-d <dir>` points the standalone PHAR at a project; see [phar.md](phar.md).
+
+`--output` exists on the command line only: which files a run writes is a property of the run, not
+of the project, so there is no `extra.lockrot` key and no environment variable for it.
+
+## Writing reports to files
+
+One run, several reports: the analysis runs once, and every file is rendered from the same report
+stdout gets — the same `generated_at`, the same findings, the same notes.
+
+```bash
+composer lockrot --format=github --fail-on=silent --target-php=8.4 \
+  --output=sarif:lockrot.sarif --output=html:lockrot-report.html --output=json:lockrot.json
+```
+
+- **Syntax.** `<format>:<path>`, split at the first colon, so `json:C:\reports\lockrot.json` works.
+  The format is one `--format` takes, spelled the same way. One format may go to two files.
+- **Contents.** Each file is byte for byte what `--format=<that format>` prints on stdout for the
+  same run, with one exception: `table` in a file has no colours and no console markup, and is
+  wrapped at 120 columns whatever the terminal is.
+- **Where.** A relative path is relative to the working directory lockrot runs in, which is the
+  project directory: `-d <dir>` changes it before lockrot starts (in plugin mode and in the PHAR
+  alike), so `composer -d app lockrot --output=json:r.json` writes `app/r.json`. In plugin mode,
+  Composer's [`use-parent-dir`](https://getcomposer.org/doc/06-config.md#use-parent-dir) can switch
+  to a parent project when the current directory has no `composer.json`, and the path is then
+  relative to that project; the PHAR never walks up. An absolute path is used as given.
+- **Directories.** The directory must already exist; lockrot creates none (`mkdir -p` first). An
+  existing file is replaced.
+- **How.** Each file is written atomically — a temporary file beside it, then a rename — after the
+  report is on stdout, and each one gets a line on stderr: `lockrot: sarif report written to
+  lockrot.sarif`.
+- **Refusals.** A path naming `composer.json` or `composer.lock` (in any directory, in any letter
+  case), the [baseline](baseline.md) file, or the manifest `COMPOSER` names and its lock; an unknown
+  format, an empty path or one ending in a separator; the same file twice (compared
+  case-insensitively, so `r.json` and `R.json` are one file even on Linux); a directory that does not
+  exist; a path that is a directory — each is a configuration error (exit `2`), found before the
+  analysis starts, so nothing is fetched and nothing is written.
+- **Failures.** A file that cannot be written when its turn comes is exit `2` with the reason. The
+  files written before it stay; the report is already on stdout.
+- **Exit code.** Otherwise untouched: `0` or `1` by `--fail-on`, as without `--output`.
+- `--explain` refuses `--output` (exit `2`): it prints one package, not a report. `--generate-baseline`
+  writes both: the reports first, then the baseline, and the reports carry no baseline comparison —
+  the baseline is what the run is writing. A report that cannot be written stops the run before the
+  baseline is replaced. `LOCKROT_DISABLE` writes nothing.
+
+In your project, lockrot writes only the files you name: reports with `--output` and the baseline
+with `--generate-baseline`. It never writes `composer.json` or `composer.lock`. Outside the project
+it writes only its activity cache, under Composer's cache directory ([Caching](#caching)) — where
+Composer also keeps the repository metadata it fetched, as it does for any command — and
+`self-update` replaces the PHAR.
 
 ## Explaining one package
 

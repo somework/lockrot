@@ -97,7 +97,11 @@ the recipe.
 
 ## What lockrot does and does not do
 
-lockrot reads `composer.json` and `composer.lock` and never writes to either. The PHAR always runs
+lockrot reads `composer.json` and `composer.lock` and never writes to either. In your project it
+writes only the files you name: reports with `--output` and the baseline with
+`--generate-baseline`; an `--output` naming `composer.json`, `composer.lock` or the baseline is
+refused before anything runs. Outside the project it writes only its repository-activity cache,
+under Composer's cache directory, and `self-update` replaces the PHAR. The PHAR always runs
 the inspected project with `--no-plugins`, so it never executes that project's Composer plugins.
 Network access is limited to the configured Composer repositories, the GitHub API (repository
 activity checks, and release lookups for `self-update`) and, for `self-update` only, the release
