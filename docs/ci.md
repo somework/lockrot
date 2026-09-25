@@ -64,19 +64,15 @@ than being skipped.
 
 Every usage or configuration error lockrot's own commands see — an unknown option, a missing or invalid value, an
 `extra.lockrot` the schema rejects — is exit `2`. Exit `1` can also come from Composer or Symfony, before lockrot runs:
-an unknown command (a typo in `composer lockrot`, or a PHAR option whose value is separated by a space ahead of the
-command name, which Symfony reads as a command), or an error Composer raises itself. As a Composer plugin, a
+an unknown command (a typo such as `composer lokrot` or `lockrot.phar nope`, or a PHAR option whose value is separated
+by a space ahead of the command name, which Symfony reads as a command), or an error Composer raises itself. As a Composer plugin, a
 `composer.json` that Composer itself cannot parse, or that fails Composer's own schema, never reaches lockrot at all:
 Composer parses the project's manifest while collecting plugin commands, before any plugin class is loaded, so it
 stops with its own exit `1` first. The standalone PHAR reads and validates `composer.json` itself, so the same failure
-there is exit `2`. To tell the two `1`s apart: a `1` from lockrot comes with a report, while one from before lockrot
-runs comes with none, and with Composer's or Symfony's message rather than a `lockrot:` line. `lockrot.phar
+there is exit `2`. To tell the two `1`s apart: a `1` from lockrot comes with a report (under `--generate-baseline`,
+with a `lockrot: baseline written` line), while one from before lockrot runs comes with neither, and with Composer's
+error box or Symfony's message rather than a `lockrot:` line. `lockrot.phar
 self-update` uses the same three codes with its own meanings; see [phar.md](phar.md#self-update-exit-codes).
-
-More generally, an exit `1` can come from Composer or Symfony before lockrot runs at all — an unknown command name
-(`lockrot.phar nope`, `composer lokrot`), or Composer stopping on its own while it starts up. That exit `1` puts
-Composer's error box on stderr instead of a `lockrot:` line and writes no report, which is how a gate tells it apart
-from findings.
 
 Like Composer, lockrot reads the manifest the `COMPOSER` environment variable names: `COMPOSER=alt.json composer
 lockrot` reads `alt.json` and `alt.lock`, and the default baseline sits next to `alt.json`.

@@ -29,8 +29,9 @@ changes in minor releases under a heading of its own — see [Verdict changes](#
   number.
 - Their URLs under `https://lockrot.dev/schema/` stay published for all of 1.x. The authoritative copy
   is the one in `resources/` of the release you run.
-- *Planned:* the schemas are tested against recorded documents from earlier releases, so a field
-  cannot quietly become required.
+- The schemas are tested against what earlier releases published and wrote — each release's
+  schemas from 0.9.0 on, and the report, baseline and explanations the 0.9.0, 0.10.0 and 0.11.0
+  archives wrote — so a field cannot quietly become required, narrowed or dropped.
 - *Planned:* lockrot 2.x keeps writing report-1 behind `--schema=1`.
 - Human-readable strings inside those documents — a signal's `summary`, a note, an evidence sentence —
   are text, not contract. Key on ids and data fields, never on wording.
@@ -131,9 +132,9 @@ requests are blocked.
       missing or invalid value, an `extra.lockrot` the schema rejects.
     - Exit `1` can also come from Composer or Symfony, before lockrot runs: an unknown command, or
       an error Composer raises itself — under the plugin, a `composer.json` Composer cannot parse or
-      that fails Composer's own schema. A `1` from lockrot comes with a report; one from before
-      lockrot runs comes with none, and with Composer's or Symfony's message rather than a
-      `lockrot:` line.
+      that fails Composer's own schema. A `1` from lockrot comes with a report, or under
+      `--generate-baseline` with a `lockrot: baseline written` line; one from before lockrot runs
+      comes with neither, and with Composer's or Symfony's message rather than a `lockrot:` line.
     - `self-update` gives the same three codes meanings of its own
       ([phar.md](phar.md#self-update-exit-codes)).
 - Messages about lockrot itself — a failure, a warning, a deprecation — go to stderr, never into the
