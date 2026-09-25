@@ -122,8 +122,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   lockrot creates none. Each file is written atomically after stdout and named on stderr
   (`lockrot: sarif report written to lockrot.sarif`). A path naming `composer.json`,
   `composer.lock`, the baseline or the manifest `COMPOSER` names, an unknown format, an empty path,
-  the same file twice or a missing directory is a configuration error (exit 2) found before the
-  analysis starts, and so is a file that cannot be written when its turn comes; otherwise the exit
+  the same file twice, a missing directory, or a path that exists and is not a regular file (a
+  directory, a device such as `/dev/stdout`, a pipe — the write is a rename over the path, and stdout
+  is what `--format` is for) is a configuration error (exit 2) found before the analysis starts. So
+  is a file name ending in a dot or a space or holding a colon, on every system: Windows reads
+  `composer.lock.` and `composer.lock::$DATA` as the lock itself; and so is an existing file that
+  resolves to a protected one, through a symlink or a Windows 8.3 short name. A file that cannot be
+  written when its turn comes is exit 2 as well; otherwise the exit
   code is untouched. `--explain` refuses `--output`; `--generate-baseline` writes the reports, then
   the baseline. In your project, lockrot writes only the files you name — reports with `--output`,
   the baseline with `--generate-baseline` — and never `composer.json` or `composer.lock`; the README,

@@ -165,8 +165,13 @@ composer lockrot --format=github --fail-on=silent --target-php=8.4 \
   case), the [baseline](baseline.md) file, or the manifest `COMPOSER` names and its lock; an unknown
   format, an empty path or one ending in a separator; the same file twice (compared
   case-insensitively, so `r.json` and `R.json` are one file even on Linux); a directory that does not
-  exist; a path that is a directory — each is a configuration error (exit `2`), found before the
-  analysis starts, so nothing is fetched and nothing is written.
+  exist; a path that exists and is not a regular file (a directory, a device such as `/dev/stdout`,
+  a pipe), since the write is a rename over the path and stdout is what `--format` is for; a file
+  name ending in a dot or a space or holding a colon, which Windows reads as another name
+  (`composer.lock.` and `composer.lock::$DATA` are the lock there), refused on every system; an
+  existing file that resolves to a protected one (a symlink, a Windows 8.3 short name) — each is a
+  configuration error (exit `2`), found before the analysis starts, so nothing is fetched and
+  nothing is written.
 - **Failures.** A file that cannot be written when its turn comes is exit `2` with the reason. The
   files written before it stay; the report is already on stdout.
 - **Exit code.** Otherwise untouched: `0` or `1` by `--fail-on`, as without `--output`.
