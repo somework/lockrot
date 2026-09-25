@@ -94,7 +94,8 @@ findings, so a `--dev` run reports every one of them as new and fails.
 
 A baseline lockrot cannot read is a configuration error, not an absent baseline: a malformed or
 schema-invalid file, or a `--baseline`/`extra.lockrot.baseline` path that does not exist, exits `2`
-rather than silently running ungated. The default path simply not existing is not an error — that is
+rather than silently running ungated. The message names what is wrong and where — a field of the
+wrong type, or a key starting with a NUL byte, which lockrot cannot read. The default path simply not existing is not an error — that is
 every project before its first `--generate-baseline`. To start over from a file that has been
 damaged, delete it and generate a new one.
 

@@ -228,6 +228,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   reaches the schema, which rejects it under a key that wants an integer. Nothing that fails while the command starts
   up escapes as exit `1` any more.
 
+- The baseline file went through the same round trip. A key starting with a NUL byte made lockrot validate an empty
+  object in its place, so the file was rejected for missing the `lockrot` and `findings` it had; a number too large
+  for a float (`1e400`) ended the run with `lockrot failed:` and the schema library's own encoding error. Both still
+  exit `2`, now with a `baseline file is invalid:` message naming the key or the field, through the conversion
+  `extra.lockrot` uses. A number too large for a float under a key lockrot does not read is left alone, as the file's
+  open objects promise.
+
 - lockrot reads the manifest and lock Composer reads: with `COMPOSER=alt.json` it takes `extra.lockrot` from
   `alt.json`, analyses `alt.lock` and puts the default baseline next to `alt.json`, where it read `composer.json` and
   `composer.lock` from the working directory whatever `COMPOSER` said. The install-time summary already did. A

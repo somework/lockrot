@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Lockrot\Baseline;
 
-use JsonSchema\Constraints\BaseConstraint;
 use JsonSchema\Validator;
 use Lockrot\Exception\ConfigException;
+use Lockrot\Json\SchemaPayload;
 
 /**
  * Validates the shape of a baseline file against resources/lockrot-baseline.schema.json using
@@ -55,6 +55,10 @@ final class BaselineSchema
      * information already gone. A bare stdClass restores it for that one case; every other value is
      * left exactly as read, so a `findings` that really was a JSON array is still rejected below.
      *
+     * The rest is turned into objects by {@see SchemaPayload}, not by the library's JSON round trip:
+     * that trip validated an empty object in place of a file with a key starting with a NUL byte, and
+     * threw its own exception on a number too large for a float.
+     *
      * @param array<string, mixed> $baseline
      */
     private static function payload(array $baseline): object
@@ -63,7 +67,7 @@ final class BaselineSchema
             $baseline['findings'] = new \stdClass();
         }
 
-        return BaseConstraint::arrayToObjectRecursive($baseline);
+        return SchemaPayload::of($baseline, 'baseline file');
     }
 
     private static function schema(): object

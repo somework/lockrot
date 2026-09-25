@@ -1592,6 +1592,40 @@ final class LockrotCommandTest extends TestCase
         self::assertStringContainsString('is not valid JSON', $stderr);
     }
 
+    /** @return iterable<string, array{0: string, 1: string}> */
+    public static function baselinesTheSchemaCouldNotSee(): iterable
+    {
+        // json_decode() into objects cannot keep a property whose name starts with a NUL byte: the
+        // validator was handed `(object) null`, and the file was called invalid for missing the
+        // `lockrot` and `findings` it had.
+        yield 'a key starting with a NUL byte' => [
+            '{"lockrot": {"version": "0.1.0", "schema": 1}, "findings": {"\u0000acme/a": {}}}',
+            'findings.\000acme/a: a key starting with a NUL byte cannot be read',
+        ];
+        // 1e400 reads as INF, which json_encode() refuses: the validator's own conversion threw a
+        // library exception, reported as `lockrot failed:`.
+        yield 'a number too large for a float' => [
+            '{"lockrot": {"version": "0.1.0", "schema": 1e400}, "findings": {}}',
+            '  - lockrot.schema: ',
+        ];
+    }
+
+    /** @dataProvider baselinesTheSchemaCouldNotSee */
+    #[DataProvider('baselinesTheSchemaCouldNotSee')]
+    public function testABaselineTheValidatorCouldNotReadIsExitTwo(string $baseline, string $reason): void
+    {
+        $dir = $this->fixtureCopy(self::WALLABAG_LOCK);
+        file_put_contents($dir.'/lockrot-baseline.json', $baseline);
+
+        [$code, $stdout, $stderr] = $this->runWithSplitStreams(['--target-php' => '8.4'], $this->loader());
+
+        self::assertSame(2, $code, $stderr);
+        self::assertSame('', $stdout);
+        self::assertStringStartsWith("lockrot: baseline file is invalid:\n", $stderr);
+        self::assertStringContainsString($reason, $stderr);
+        self::assertSame(1, preg_match_all('/^lockrot/m', $stderr), $stderr);
+    }
+
     public function testAnExplicitBaselinePathIsHonouredAndReportedRelative(): void
     {
         $dir = $this->fixtureCopy(self::WALLABAG_LOCK);
