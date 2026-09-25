@@ -97,7 +97,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `expire` made a temporary ignore permanent. Each unknown key now gets one line on stderr, with the
   known key it was probably meant to be when one is close —
   `lockrot: unknown key extra.lockrot.install-tme ignored (did you mean install-time?)` — the
-  closeness rule being Symfony Console's own "Did you mean" for a mistyped command. `composer lockrot`
+  closeness rule adapted from Symfony Console's own "Did you mean" for a mistyped command. `composer lockrot`
   and the PHAR print it on every run, and the install-time summary above its block, gated like the
   block (not with `install-time` off, not for a transaction that installs nothing); one process
   prints a line once, and `LOCKROT_DISABLE` silences it. Nothing else about the run changes — the

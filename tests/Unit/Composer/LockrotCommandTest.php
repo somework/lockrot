@@ -829,8 +829,8 @@ final class LockrotCommandTest extends TestCase
 
     /**
      * An unknown key is one line on stderr naming the key it was probably meant to be, and nothing
-     * else: the same report byte for byte, the same exit code. The manifest is read twice per run
-     * (initialize() and execute()), so the count also pins that the line is not printed twice.
+     * else: the same report byte for byte, the same exit code. The count pins one line per
+     * unknown key per run.
      */
     public function testAnUnknownKeyWarnsOnceOnStderrAndChangesNothingElse(): void
     {

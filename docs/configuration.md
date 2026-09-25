@@ -63,7 +63,7 @@ lockrot: unknown key extra.lockrot.ignore[1].expire ignored (did you mean expire
 - A key is close when it is at most a third of its own length in edits away from a known key, or
   when a known key contains it (three characters or more: `dev` suggests `include-dev`), compared in
   lower case. The fewest edits wins, and a tie goes to the alphabetically first key. Nothing close
-  means no suggestion rather than a far-fetched one. This is the rule Symfony Console, and so
+  means no suggestion rather than a far-fetched one. The rule is adapted from the one Symfony Console, and so
   Composer, uses for a mistyped command.
 - The keys of each `ignore` entry are checked against `package`, `reason`, `version` and `expires`.
 - It is a warning and nothing more: the run goes on, the report and the exit code are exactly what
