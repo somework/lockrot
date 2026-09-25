@@ -61,9 +61,8 @@
     //  - Branches the shipped inputs cannot enter: BaselineSchema.php:43 x2 and ConfigSchema.php:44 x2
     //    (the PHPStan narrowing over json-schema errors, which are always arrays of strings),
     //    BaselineSchema.php:76 and ConfigSchema.php:60 (a schema shipped in the package is never
-    //    unreadable), AtomicWriter.php:37 (was BaselineFile.php:112; error_clear_last before a write
-    //    that records its own warning) and :61 (was :154; error_get_last() is never null on that
-    //    path), ProjectIgnoreList.php:72
+    //    unreadable), AtomicWriter.php:43 (was BaselineFile.php:112; error_clear_last before a write
+    //    that records its own warning), ProjectIgnoreList.php:72
     //    ((int) of the whole YYYY-MM-DD match is the year), HttpResult.php:85 (getLastErrors() is false
     //    on PHP >= 8.2 when clean; killed on the 7.4 leg), LockrotCommand.php:578 x2 (the Composer 2.2
     //    arm of the tryComposer() guard, never entered on the vendored Composer; covered by the Docker
