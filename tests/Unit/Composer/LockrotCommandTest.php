@@ -1030,7 +1030,6 @@ final class LockrotCommandTest extends TestCase
         $project = $this->tempDir('lockrot-markup-name-');
         file_put_contents($project.'/composer.json', (string) json_encode([
             'name' => 'lockrot/markup-name-test',
-            'require' => [$name => '1.0.0'],
             'extra' => ['lockrot' => ['target-php' => '8.4']],
         ]));
         file_put_contents($project.'/composer.lock', (string) json_encode(['packages' => [['name' => $name, 'version' => '1.0.0']], 'packages-dev' => []]));
@@ -1040,7 +1039,8 @@ final class LockrotCommandTest extends TestCase
             $formatter = new MarkupRefusingFormatter('1.0.0', $decorated);
             [$code, $stdout] = $this->runWithErrorOutput(['--all' => true], new BufferedOutput(), $formatter);
             self::assertSame(0, $code, $stdout);
-            self::assertStringContainsString('  unknown      '.$name.' 1.0.0  direct', $stdout);
+            // Unrequired: composer.json cannot name it, Composer 2.2 rejects such a name in `require`.
+            self::assertStringContainsString('  unknown      '.$name.' 1.0.0  ?', $stdout);
             self::assertStringStartsWith($decorated ? "\033[1mnot flagged (1)\033[22m\n" : "not flagged (1)\n", $stdout);
 
             [$code, $stdout] = $this->runWithErrorOutput(['--explain' => $name], new BufferedOutput(), $formatter);
