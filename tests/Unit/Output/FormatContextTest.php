@@ -135,6 +135,19 @@ final class FormatContextTest extends TestCase
         self::assertSame(FormatContext::LEVEL_NOTE, $context->levelOf($this->finding('a/d', Verdict::OK)));
     }
 
+    /**
+     * The mapping's first rule wins: a finding the baseline already accepted is a note even when
+     * `--fail-on=unchecked` would otherwise make it an error for carrying S10.
+     */
+    public function testUnderUncheckedAFindingTheBaselineKnowsStaysANote(): void
+    {
+        $context = FormatContext::create(null, FailOn::UNCHECKED, Version::STRING);
+        $unchecked = new Finding('a/b', '1.0.0', Verdict::ABANDONED, [new Signal(Signal::S10, Signal::LEVEL_INFO, 'not checked')], ['a/b'], null, new \DateTimeImmutable(self::AT));
+
+        self::assertSame(FormatContext::LEVEL_ERROR, $context->levelOf($unchecked), 'without the baseline');
+        self::assertSame(FormatContext::LEVEL_NOTE, $context->levelOf($unchecked, $this->comparison([['a/b', Verdict::ABANDONED]], $this->report($unchecked))));
+    }
+
     public function testUnknownContextCarriesNothing(): void
     {
         $context = FormatContext::unknown();

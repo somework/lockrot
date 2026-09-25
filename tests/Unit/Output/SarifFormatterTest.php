@@ -200,6 +200,8 @@ final class SarifFormatterTest extends TestCase
         $run = $this->singleRun($this->formatter(LockrotConfig::FAIL_ON_NONE, null)->format($report, true));
 
         self::assertSame(['lockrot/ok', 'lockrot/finished'], JsonPath::column($run, ['tool', 'driver', 'rules'], 'id'));
+        self::assertSame('note', JsonPath::stringAt($run, ['tool', 'driver', 'rules', 0, 'defaultConfiguration', 'level']), 'a rule for a verdict that is never flagged defaults to note');
+        self::assertSame('note', JsonPath::stringAt($run, ['tool', 'driver', 'rules', 1, 'defaultConfiguration', 'level']));
     }
 
     public function testLevelMappingAtTheFailOnBoundary(): void
