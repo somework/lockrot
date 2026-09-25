@@ -11,8 +11,8 @@ use Lockrot\Verdict\Finding;
 
 /**
  * GitLab Code Quality JSON, one object per flagged finding (every finding with `--all`), for a job
- * that publishes `artifacts.reports.codequality` so findings show up as inline diff annotations on
- * a merge request.
+ * that publishes `artifacts.reports.codequality` so GitLab lists the findings in the merge request
+ * (and, on Ultimate only, marks their lines in its Changes view).
  *
  * Shape per https://docs.gitlab.com/ci/testing/code_quality/#implement-a-custom-tool ("Implement a
  * custom tool"): each issue needs `description`, `check_name`, `fingerprint`, `severity` (one of

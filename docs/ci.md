@@ -190,8 +190,7 @@ the directory that holds the lock file.
 ## `--format=gitlab`
 
 A [GitLab Code Quality](https://docs.gitlab.com/ci/testing/code_quality/#implement-a-custom-tool) report: a JSON array
-with one issue per flagged finding (every finding with `--all`), so a merge request shows them inline in the diff of
-`composer.lock`. Publish it as a `codequality` artifact:
+with one issue per flagged finding (every finding with `--all`). Publish it as a `codequality` artifact:
 
 ```yaml
 lockrot:
@@ -201,6 +200,13 @@ lockrot:
     reports:
       codequality: lockrot-codequality.json
 ```
+
+Where the findings appear depends on your GitLab tier ([features per
+tier](https://docs.gitlab.com/ci/testing/code_quality/#features-per-tier)):
+
+- Every tier lists them in the merge request's reports.
+- Premium adds the pipeline's **Code Quality** tab.
+- Only Ultimate also marks the lines of `composer.lock` in the merge request's **Changes** view.
 
 Code Quality has no title field of its own, so each issue's description opens with the package, the version and the
 same `<verdict> (<priority>)` phrase the GitHub annotation title uses:

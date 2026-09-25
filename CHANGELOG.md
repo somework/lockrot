@@ -225,6 +225,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `--target-php` was silently ignored, while an invalid `extra.lockrot` value under the same option was exit `2`; both
   are exit `2` now, and the message names the variable.
 
+- `docs/ci.md` said a merge request shows `--format=gitlab` findings inline in the diff of
+  `composer.lock`. Only GitLab Ultimate marks them in the merge request's Changes view; every tier
+  lists them in the merge request's reports, and Premium adds the pipeline's Code Quality tab. The
+  page now says which tier shows what. The format itself is unchanged.
+
 ## [0.12.0] - 2026-09-24
 
 ### Changed
