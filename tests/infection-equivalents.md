@@ -302,7 +302,7 @@ slow test. They are listed here only so nobody reads them as an unexplained "2 t
   newest candidate at the installed branch's own date, and the signal then needs that date to be
   both at least `release-warn-years` old (the branch) and younger than `release-warn-years` (the
   move-on) — impossible, so the rule returns null either way.
-- `src/Composer/LockrotCommand.php:350` `explain()` LogicalOr on `$finding === null || $facts === null` —
+- `src/Composer/LockrotCommand.php:355` `explain()` LogicalOr on `$finding === null || $facts === null` —
   `Analysis::finding()` and `Analysis::facts()` are filled by the same loop over the same packages
   in `Analyzer::analyzeWithFacts()`, so one is null exactly when the other is; and the lock lookup
   two lines up already rejects every name the run does not analyse, so the branch never runs. The
