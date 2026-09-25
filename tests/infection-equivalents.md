@@ -439,3 +439,11 @@ equivalent (403 mutants, 9 escapes, Covered MSI 97.8%):
 - `src/Output/ReportTarget.php:49` GreaterThan (`>` to `>=`) — two different format names of the
   same length cannot both be followed by a colon at the start of one spec, so an equal length never
   meets a second match: the longest-match rule and its `>=` twin pick the same name.
+
+## Annotations name the lock `COMPOSER` names (0.13.0)
+
+- `src/Output/FormatContext.php:172` CastString — `(string) substr($lock, \strlen($root))` in
+  `relativePath()`: the branch is taken only when `$lock` starts with `$root`, which ends in `/`,
+  and `Path::normalize()` never leaves a trailing `/` on `$lock`, so `$lock` is strictly longer and
+  `substr()` can never return the `false` PHP 7.4 documents for an out-of-range start. The cast
+  states the type; it does not cover a case.

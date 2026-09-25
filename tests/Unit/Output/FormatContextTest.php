@@ -171,7 +171,8 @@ final class FormatContextTest extends TestCase
         yield 'COMPOSER=alt.json' => ['/p/alt.lock', '/p', 'alt.lock', '/p'];
         yield 'COMPOSER=app/alt.json: the directory stays in the name' => ['/p/app/alt.lock', '/p', 'app/alt.lock', '/p'];
         yield 'a project directory spelled with a trailing separator' => ['/p/app/alt.lock', '/p/', 'app/alt.lock', '/p/'];
-        yield 'the filesystem root as the project directory' => ['/alt.lock', '/', 'alt.lock', '/'];
+        yield 'the filesystem root as the project directory' => ['/app/alt.lock', '/', 'app/alt.lock', '/'];
+        yield 'a drive root as the project directory' => ['C:\\app\\alt.lock', 'C:\\', 'app/alt.lock', 'C:\\'];
         yield 'dot segments fold before the comparison' => ['/p/app/../alt.lock', '/p', 'alt.lock', '/p'];
         yield 'Windows separators' => ['C:\\p\\app\\alt.lock', 'C:\\p', 'app/alt.lock', 'C:\\p'];
         yield 'a lock outside the project directory: its file name, beside it' => ['/elsewhere/alt.lock', '/p', 'alt.lock', '/elsewhere'];
