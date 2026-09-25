@@ -1993,7 +1993,10 @@ final class LockrotCommandTest extends TestCase
     #[DataProvider('composerManifests')]
     public function testTheManifestComposerNamesAndItsLockAreProtected(string $composer, string $manifest, string $lock): void
     {
-        $this->fixtureCopy(self::WALLABAG_LOCK);
+        // Composer reads the manifest COMPOSER names and the lock beside it, so they have to exist.
+        $dir = $this->fixtureCopy(self::WALLABAG_LOCK);
+        copy($dir.'/composer.json', $dir.'/'.$manifest);
+        copy($dir.'/composer.lock', $dir.'/'.$lock);
         $this->withEnv('COMPOSER', $composer, function () use ($manifest, $lock): void {
             foreach (['json:'.$manifest => 'the manifest', 'json:'.$lock => 'the lock'] as $spec => $what) {
                 [$code, , $stderr] = $this->runWithSplitStreams(['--output' => [$spec], '--target-php' => '8.4'], $this->loader());

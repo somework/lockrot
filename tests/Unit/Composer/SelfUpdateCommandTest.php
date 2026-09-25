@@ -706,7 +706,7 @@ final class SelfUpdateCommandTest extends TestCase
     #[DataProvider('unreadableCommandLines')]
     public function testACommandLineSelfUpdateCannotReadIsExitTwoWithOneLockrotLine(string $commandLine, string $reason): void
     {
-        $http = $this->httpWithAssets('v'.self::NEWER);
+        $http = self::http([self::newer()]);
         $command = $this->command($http, $this->installedPhar());
         $output = new SplitStreamOutput();
         $output->getErrorOutput()->setDecorated(true);
