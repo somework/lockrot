@@ -2213,6 +2213,8 @@ final class LockrotCommandTest extends TestCase
         yield 'an option missing its value' => ['lockrot --format', '"--format" option requires a value'];
         yield 'a value given to a flag' => ['lockrot --dev=yes', '"--dev" option does not accept a value'];
         yield 'an argument too many' => ['lockrot surplus', 'got "surplus"'];
+        // Printed as typed: the line goes past the tag formatter, which would read this as a style.
+        yield 'an option that looks like a console tag' => ['lockrot --<fg=red>', '"--<fg" option does not exist'];
     }
 
     /**
@@ -2233,9 +2235,8 @@ final class LockrotCommandTest extends TestCase
         self::assertSame(2, $code);
         self::assertSame('', $stdout);
         self::assertCount(1, $errors);
-        self::assertStringStartsWith('<error>lockrot: ', $errors[0]);
+        self::assertStringStartsWith('lockrot: ', $errors[0]);
         self::assertStringContainsString($reason, $errors[0]);
-        self::assertStringEndsWith('</error>', $errors[0]);
     }
 
     /** The options Composer's own application adds to every command are part of what the command reads. */

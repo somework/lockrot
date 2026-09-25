@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Composer;
 
 use Lockrot\Config\Policy;
+use Lockrot\Output\TerminalText;
 use Symfony\Component\Console\Exception\ExceptionInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
@@ -38,8 +39,10 @@ trait RejectsUnreadableInput
             $this->mergeApplicationDefinition();
             $input->bind($this->getDefinition());
         } catch (ExceptionInterface $e) {
+            // Past the tag formatter: the message quotes the command line as typed (`--<fg=red>`),
+            // which is not console markup ({@see TerminalText}).
             $target = $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output;
-            $target->writeln('<error>lockrot: '.$e->getMessage().'</error>');
+            $target->writeln(TerminalText::error('lockrot: '.$e->getMessage(), $target->isDecorated()), OutputInterface::OUTPUT_RAW);
 
             return Policy::EXIT_ERROR;
         }
