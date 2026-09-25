@@ -272,6 +272,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `--format=html` in the same run. The README, `docs/schema.md` and `docs/verdicts.md` said there
   are six output formats; there are seven.
 
+- The test suite no longer leaves `php -S` fixture servers running after an interrupted run. A test
+  process killed before its cleanup ran — Infection stopping a timed-out mutant, a `timeout`
+  wrapper, a fatal error — left each server it had started orphaned, holding its port until someone
+  killed it by hand. A watchdog beside each server now stops it within about a second of the test
+  process going away, however it went, and a normal stop returns only once the port is free; a
+  test kills the process that started a server and checks the port closes. No change to lockrot
+  itself.
+
 ## [0.12.0] - 2026-09-24
 
 ### Changed

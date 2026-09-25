@@ -226,8 +226,9 @@ final class RepositoryMetadataLoaderTest extends TestCase
      * (which the startup poll loop does, but nothing does afterward). A single ~200-package load is
      * already ~1000 requests; three of them back-to-back through the one shared loader/server this
      * class builds in setUpBeforeClass() is ~3000 requests, which filled the pipe and wedged the
-     * server well before completing. FixtureRepositoryServer::start() redirects the child's
-     * stdout/stderr to a file instead of a pipe, which removes the pipe to fill in the first place.
+     * server well before completing. PhpBuiltinServer::start(), which FixtureRepositoryServer runs
+     * on, redirects the child's stdout/stderr to a file instead of a pipe, which removes the pipe to
+     * fill in the first place.
      */
     public function testThreeConsecutiveFullWallabagLoadsThroughSharedServerAllResolve(): void
     {
