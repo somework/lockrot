@@ -85,10 +85,11 @@ final class PharTest extends TestCase
     /**
      * @param list<string> $arguments
      * @param ?string      $cwd       run the PHAR from here instead of the repository root
+     * @param ?array<string, string> $env merged over the inherited environment
      */
-    private function runPhar(array $arguments, ?string $cwd = null): Process
+    private function runPhar(array $arguments, ?string $cwd = null, ?array $env = null): Process
     {
-        $process = new Process(array_merge(['php', $this->phar()], $arguments), $cwd);
+        $process = new Process(array_merge(['php', $this->phar()], $arguments), $cwd, $env);
         $process->setTimeout(300)->run();
 
         return $process;
@@ -297,6 +298,44 @@ final class PharTest extends TestCase
         self::assertStringNotContainsString('<options=', $table);
         self::assertStringNotContainsString("\e[", $table);
         self::assertSame([], array_values(array_diff((array) scandir($elsewhere), ['.', '..'])), 'nothing lands where the PHAR was started');
+    }
+
+    /**
+     * A command line the PHAR's own commands cannot read is exit 2 and one `lockrot:` line, whether
+     * the command is named or left to the default. An unknown command name is not lockrot's to
+     * answer: that stays Symfony's exit 1 ({@see testAProjectScriptIsNotAReachableCommand()}).
+     */
+    public function testAnUnreadableCommandLineIsExitTwoWithOneLockrotLine(): void
+    {
+        $laravel = \dirname(__DIR__).'/fixtures/skeletons/laravel';
+        foreach ([['--nope'], ['lockrot', '--format'], ['self-update', '--check=yes']] as $arguments) {
+            $process = $this->runPhar(array_merge(['-d', $laravel], $arguments));
+            $label = implode(' ', $arguments);
+
+            self::assertSame(2, $process->getExitCode(), $label."\n".$process->getErrorOutput());
+            self::assertSame('', $process->getOutput(), $label);
+            self::assertMatchesRegularExpression('/^lockrot: The "--[a-z]+" option [^\n]+$/m', $process->getErrorOutput(), $label);
+        }
+    }
+
+    /**
+     * The PHAR points COMPOSER at the null device while Composer's preamble runs (see bin/lockrot)
+     * and puts the caller's value back before the command: `COMPOSER=alt.json` has to reach the
+     * command, which then reads alt.json and alt.lock as Composer would.
+     */
+    public function testComposerTheEnvironmentVariableReachesTheCommand(): void
+    {
+        $dir = $this->freshDir();
+        file_put_contents($dir.'/alt.json', '{}');
+        copy(\dirname(__DIR__).'/fixtures/skeletons/laravel/composer.lock', $dir.'/alt.lock');
+
+        $process = $this->runPhar(['--format=json', '--offline', '--target-php=8.4'], $dir, ['COMPOSER' => 'alt.json']);
+
+        self::assertSame(0, $process->getExitCode(), $process->getErrorOutput());
+        $json = json_decode($process->getOutput(), true);
+        self::assertIsArray($json, $process->getErrorOutput());
+        self::assertIsArray($json['run']);
+        self::assertSame('alt.lock', $json['run']['lock_file']);
     }
 
     /**

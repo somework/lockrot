@@ -57,6 +57,7 @@
         "Seld\\JsonLint\\ParsingException",
         "Symfony\\Component\\Console\\Application",
         "Symfony\\Component\\Console\\Command\\Command",
+        "Symfony\\Component\\Console\\Exception\\ExceptionInterface",
         "Symfony\\Component\\Console\\Formatter\\OutputFormatter",
         "Symfony\\Component\\Console\\Formatter\\OutputFormatterStyle",
         "Symfony\\Component\\Console\\Input\\InputInterface",

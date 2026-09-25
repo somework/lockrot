@@ -199,6 +199,9 @@ PHAR.
 > Composer's `use-parent-dir` setting is not honoured. Run it from the project root or point it there
 > with `-d`.
 
+The `COMPOSER` environment variable is honoured as Composer honours it: `COMPOSER=alt.json php
+lockrot.phar` reads `alt.json` and `alt.lock`.
+
 ## Keeping it updated
 
 ```bash
@@ -316,9 +319,14 @@ not from `api.github.com`. A CI job whose network allows only the API needs that
 |---|---|
 | `0` | An update was installed, or nothing would be: the build is current in its major version, or every newer release is held back by a newer major version, a PHP floor above this one, or an unreadable floor (each named on a line of its own) |
 | `1` | `--check` only: `self-update` would install a newer release — in the running major version, or in the next one with `--allow-major` |
-| `2` | Every failure: no published release, GitHub unreachable, a chosen release missing an asset or with a `lockrot.phar.meta.json` that cannot be read, newer releases signed only with a key this archive does not carry and no release it can install that carries it (the archive is stranded; also under `--check`), a checksum mismatch, a signature that does not verify, an archive the runtime cannot open, an unwritable directory, `--force` with no release in the running major version this archive can install, or running outside the PHAR |
+| `2` | Every failure: no published release, GitHub unreachable, a chosen release missing an asset or with a `lockrot.phar.meta.json` that cannot be read, newer releases signed only with a key this archive does not carry and no release it can install that carries it (the archive is stranded; also under `--check`), a checksum mismatch, a signature that does not verify, an archive the runtime cannot open, an unwritable directory, `--force` with no release in the running major version this archive can install, running outside the PHAR, or a command line it cannot read (`self-update --nope`, `--check=yes`) |
 
 On `2` the running `lockrot.phar` is untouched.
+
+An exit `1` without a `lockrot` line on stderr is not lockrot's: a command name the PHAR does not have
+(`php lockrot.phar self-updte`) is refused by Symfony's console before any lockrot command runs, with its own error
+box and exit `1`, and nothing is checked or written. The same holds for the analysis — see
+[ci.md](ci.md#exit-codes).
 
 ### Reinstalling by hand
 

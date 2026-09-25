@@ -40,6 +40,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\ConsoleSectionOutput;
@@ -2182,5 +2183,268 @@ final class LockrotCommandTest extends TestCase
 
         self::assertSame(2, $code);
         self::assertSame("lockrot failed: cannot open <info>here\n", $stderr);
+    }
+
+    /**
+     * Runs a command line the way the console application hands one over — unparsed, so it is the
+     * command's own binding that reads it — with a factory that fails the test if the analysis is
+     * ever reached.
+     *
+     * @return array{0: int, 1: string, 2: list<string>} exit code, stdout, the unformatted stderr messages
+     */
+    private function runCommandLine(string $commandLine): array
+    {
+        $command = $this->buildCommand(static function (): Analyzer {
+            throw new \LogicException('a command line that cannot be read must stop before the analysis');
+        });
+        $errors = new RecordingOutput();
+        $output = new SplitStreamOutput();
+        $output->setErrorOutput($errors);
+
+        $code = $command->run(new StringInput($commandLine), $output);
+
+        return [$code, $output->fetch(), $errors->raw];
+    }
+
+    /** @return iterable<string, array{0: string, 1: string}> */
+    public static function unreadableCommandLines(): iterable
+    {
+        yield 'an option the command does not have' => ['lockrot --nope', '"--nope" option does not exist'];
+        yield 'an option missing its value' => ['lockrot --format', '"--format" option requires a value'];
+        yield 'a value given to a flag' => ['lockrot --dev=yes', '"--dev" option does not accept a value'];
+        yield 'an argument too many' => ['lockrot surplus', 'got "surplus"'];
+    }
+
+    /**
+     * A command line the command cannot read is a usage error like any other configuration error:
+     * exit 2 and one `lockrot:` line. Symfony binds the command line before initialize() and
+     * execute() and lets the failure escape, which Composer rendered in its own box with exit 1 —
+     * the code a CI gate reads as "findings".
+     *
+     * @dataProvider unreadableCommandLines
+     */
+    #[DataProvider('unreadableCommandLines')]
+    public function testACommandLineTheCommandCannotReadIsExitTwoWithOneLockrotLine(string $commandLine, string $reason): void
+    {
+        chdir(__DIR__.'/../../fixtures/skeletons/laravel');
+
+        [$code, $stdout, $errors] = $this->runCommandLine($commandLine);
+
+        self::assertSame(2, $code);
+        self::assertSame('', $stdout);
+        self::assertCount(1, $errors);
+        self::assertStringStartsWith('<error>lockrot: ', $errors[0]);
+        self::assertStringContainsString($reason, $errors[0]);
+        self::assertStringEndsWith('</error>', $errors[0]);
+    }
+
+    /** The options Composer's own application adds to every command are part of what the command reads. */
+    public function testTheApplicationsOwnOptionsAreNotUsageErrors(): void
+    {
+        chdir(__DIR__.'/../../fixtures/skeletons/laravel');
+        $command = $this->command($this->loader());
+        $output = new SplitStreamOutput();
+
+        $code = $command->run(new StringInput('lockrot --no-interaction --no-ansi --target-php=8.4 --format=json'), $output);
+
+        self::assertSame(0, $code, $output->fetchErrors());
+        self::assertIsArray(json_decode($output->fetch(), true));
+    }
+
+    /** @return iterable<string, array{0: string, 1: array<string, mixed>}> */
+    public static function brokenInputsUnderLockrotDisable(): iterable
+    {
+        yield 'an invalid extra.lockrot' => ['{"extra": {"lockrot": {"fail-on": "dead"}}}', []];
+        yield 'an unparsable composer.json' => ['{broken', []];
+        yield 'an invalid option value' => ['{}', ['--fail-on' => 'dead']];
+        yield 'an empty --baseline' => ['{}', ['--baseline' => '']];
+    }
+
+    /**
+     * LOCKROT_DISABLE is the off switch, and it is documented as skipping lockrot entirely: nothing
+     * the run would read — composer.json, extra.lockrot, the option values, the lock — may turn it
+     * into an exit 2. It used to be checked only after the configuration was read and resolved.
+     *
+     * @param array<string, mixed> $args
+     *
+     * @dataProvider brokenInputsUnderLockrotDisable
+     */
+    #[DataProvider('brokenInputsUnderLockrotDisable')]
+    public function testLockrotDisableSkipsEverythingTheRunWouldRead(string $manifest, array $args): void
+    {
+        $dir = $this->tempDir('lockrot-disabled-');
+        file_put_contents($dir.'/composer.json', $manifest);
+        chdir($dir);
+        putenv('LOCKROT_DISABLE=1');
+        try {
+            [$code, $stdout, $stderr] = $this->runWithSplitStreams($args);
+        } finally {
+            putenv('LOCKROT_DISABLE');
+        }
+
+        self::assertSame(0, $code, $stderr);
+        self::assertSame('', $stdout);
+        self::assertSame("lockrot disabled via LOCKROT_DISABLE\n", $stderr);
+    }
+
+    /** Even a command line the command cannot read: the switch is checked before anything is. */
+    public function testLockrotDisableSkipsAnUnreadableCommandLineToo(): void
+    {
+        chdir(__DIR__.'/../../fixtures/skeletons/laravel');
+        putenv('LOCKROT_DISABLE=1');
+        try {
+            [$code, $stdout, $errors] = $this->runCommandLine('lockrot --nope');
+        } finally {
+            putenv('LOCKROT_DISABLE');
+        }
+
+        self::assertSame(0, $code);
+        self::assertSame('', $stdout);
+        self::assertSame(['lockrot disabled via LOCKROT_DISABLE'], $errors);
+    }
+
+    /**
+     * Sets COMPOSER for the length of $body and puts back whatever was there.
+     *
+     * @param callable(): void $body
+     */
+    private function withComposerFile(string $value, callable $body): void
+    {
+        $previous = Platform::getEnv('COMPOSER');
+        Platform::putEnv('COMPOSER', $value);
+        try {
+            $body();
+        } finally {
+            $this->restoreGlobalEnv('COMPOSER', $previous);
+        }
+    }
+
+    /**
+     * `COMPOSER=alt.json composer install` reads alt.json and alt.lock, and so must `composer
+     * lockrot`: it inspects the lock Composer uses, not whatever composer.lock sits beside it. Here
+     * composer.json is not even JSON and there is no composer.lock — neither may be touched.
+     */
+    public function testComposerTheEnvironmentVariableNamesTheManifestAndTheLock(): void
+    {
+        $dir = $this->tempDir('lockrot-composer-env-');
+        $source = \dirname(self::WALLABAG_LOCK);
+        copy($source.'/composer.json', $dir.'/alt.json');
+        copy($source.'/composer.lock', $dir.'/alt.lock');
+        file_put_contents($dir.'/composer.json', '{broken');
+        chdir($dir);
+
+        $this->withComposerFile('alt.json', function (): void {
+            [$code, $stdout, $stderr] = $this->runWithSplitStreams(['--format' => 'json', '--fail-on' => 'silent', '--target-php' => '8.4'], $this->loader());
+
+            self::assertSame(1, $code, $stderr);
+            $json = json_decode($stdout, true);
+            self::assertIsArray($json);
+            self::assertSame(200, $json['packages_checked']);
+            self::assertSame('alt.lock', JsonPath::stringAt($json, ['run', 'lock_file']));
+        });
+    }
+
+    /** The baseline sits next to the manifest Composer reads, wherever COMPOSER puts that. */
+    public function testTheBaselineLivesNextToTheManifestComposerNames(): void
+    {
+        $dir = $this->tempDir('lockrot-composer-env-baseline-');
+        mkdir($dir.'/app');
+        $source = \dirname(self::WALLABAG_LOCK);
+        copy($source.'/composer.json', $dir.'/app/alt.json');
+        copy($source.'/composer.lock', $dir.'/app/alt.lock');
+        chdir($dir);
+
+        $this->withComposerFile('app/alt.json', function () use ($dir): void {
+            [$code, , $stderr] = $this->runWithSplitStreams(['--generate-baseline' => true, '--target-php' => '8.4'], $this->loader());
+
+            self::assertSame(0, $code, $stderr);
+            self::assertFileExists($dir.'/app/lockrot-baseline.json');
+            self::assertFileDoesNotExist($dir.'/lockrot-baseline.json');
+        });
+    }
+
+    /** A missing lock is named as the lock Composer would read, in the directory it would read it from. */
+    public function testAMissingLockIsTheLockComposerWouldRead(): void
+    {
+        $dir = $this->tempDir('lockrot-composer-env-nolock-');
+        file_put_contents($dir.'/alt.json', '{}');
+        copy(self::LARAVEL_LOCK, $dir.'/composer.lock');
+        chdir($dir);
+        $cwd = (string) getcwd();
+
+        $this->withComposerFile('alt.json', function () use ($cwd): void {
+            [$code, $stdout, $stderr] = $this->runWithSplitStreams([]);
+
+            self::assertSame(2, $code);
+            self::assertSame('', $stdout);
+            self::assertStringContainsString('lockrot: alt.lock not found in '.$cwd.';', $stderr);
+        });
+    }
+
+    /** Whatever the manifest's own configuration says is read from the manifest COMPOSER names. */
+    public function testTheConfigurationIsReadFromTheManifestComposerNames(): void
+    {
+        $dir = $this->tempDir('lockrot-composer-env-config-');
+        file_put_contents($dir.'/alt.json', '{"extra": {"lockrot": {"fail-on": "dead"}}}');
+        file_put_contents($dir.'/composer.json', '{}');
+        copy(self::LARAVEL_LOCK, $dir.'/alt.lock');
+        chdir($dir);
+
+        $this->withComposerFile('alt.json', function (): void {
+            [$code, $stdout, $stderr] = $this->runWithSplitStreams([]);
+
+            self::assertSame(2, $code);
+            self::assertSame('', $stdout);
+            self::assertStringContainsString('extra.lockrot is invalid:', $stderr);
+        });
+    }
+
+    /**
+     * Composer 2.3 and later refuse a COMPOSER that names a directory, with an exception of their
+     * own; that happens while the command is starting up, where only a ConfigException used to be
+     * caught — so it escaped as a Composer crash, exit 1.
+     */
+    public function testNothingThatFailsWhileTheCommandStartsEscapesAsExitOne(): void
+    {
+        $dir = $this->tempDir('lockrot-composer-env-dir-');
+        mkdir($dir.'/not-a-file');
+        chdir($dir);
+
+        $this->withComposerFile('not-a-file', function (): void {
+            [$code, $stdout, $stderr] = $this->runWithSplitStreams([]);
+
+            self::assertSame(2, $code, $stderr);
+            self::assertSame('', $stdout);
+            self::assertStringStartsWith('lockrot', $stderr);
+        });
+    }
+
+    /** @return iterable<string, array{0: string, 1: string}> */
+    public static function manifestsTheSchemaCouldNotSee(): iterable
+    {
+        // json_decode() into objects cannot keep a property whose name starts with a NUL byte, and
+        // the validator used to be handed `(object) null` — an empty object, which is valid — so a
+        // gate configured next to such a key ran with fail-on none and exited 0.
+        yield 'a key starting with a NUL byte' => ['{"extra": {"lockrot": {"fail-on": "abandoned", "\u0000k": 1}}}', 'NUL byte'];
+        // 1e400 reads as INF, which json_encode() refuses: the validator's own conversion threw a
+        // library exception, and the command exited 1.
+        yield 'a number too large for a float' => ['{"extra": {"lockrot": {"release-warn-years": 1e400}}}', 'release-warn-years'];
+    }
+
+    /** @dataProvider manifestsTheSchemaCouldNotSee */
+    #[DataProvider('manifestsTheSchemaCouldNotSee')]
+    public function testAConfigurationTheValidatorCouldNotReadIsExitTwo(string $manifest, string $reason): void
+    {
+        $dir = $this->tempDir('lockrot-unreadable-config-');
+        file_put_contents($dir.'/composer.json', $manifest);
+        copy(self::LARAVEL_LOCK, $dir.'/composer.lock');
+        chdir($dir);
+
+        [$code, $stdout, $stderr] = $this->runWithSplitStreams(['--target-php' => '8.4'], $this->loader());
+
+        self::assertSame(2, $code, $stderr);
+        self::assertSame('', $stdout);
+        self::assertStringStartsWith('lockrot: extra.lockrot is invalid:', $stderr);
+        self::assertStringContainsString($reason, $stderr);
     }
 }

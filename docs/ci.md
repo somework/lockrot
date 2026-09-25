@@ -44,7 +44,11 @@ subdirectory. The same repository publishes `ghcr.io/somework/lockrot`, a signed
 |---|---|
 | `0` | No finding reached the `fail-on` threshold (or `fail-on=none`) |
 | `1` | A finding reached or exceeded the `fail-on` threshold, or carried an unrun check under `--fail-on=unchecked` |
-| `2` | Tool or configuration error (unparsable `composer.json`/`composer.lock`, invalid config value, unreadable or unwritable [baseline](baseline.md), an `--output` that names `composer.json`, `composer.lock` or the baseline, an unknown format, an empty or repeated path, a directory that does not exist, or a file that cannot be written) |
+| `2` | Tool, configuration or usage error: unparsable `composer.json`/`composer.lock`, invalid config value, unreadable or unwritable [baseline](baseline.md); an `--output` that names `composer.json`, `composer.lock` or the baseline, an unknown format, an empty or repeated path, a directory that does not exist, or a file that cannot be written; a command line lockrot cannot read — an unknown option, an option missing its value, a value given to a flag, an argument too many |
+
+A `2` writes nothing to stdout, except an `--output` file that cannot be written: that one is found after stdout has
+the report. stderr says what went wrong, starting `lockrot:` for a configuration or usage error and `lockrot failed:`
+for anything else.
 
 `composer audit` follows the same convention: exit `1` when it finds a security advisory or, with Composer's default
 `audit.abandoned=fail`, an abandoned package; exit `0` when it finds nothing. lockrot reads the same advisories
@@ -63,6 +67,18 @@ the project's manifest while collecting plugin commands, before any plugin class
 exit `1` first. `composer lockrot` on an unparsable `composer.json` exits `1`, not `2`. The standalone PHAR reads and
 validates `composer.json` itself, so the same failure there is exit `2`. `lockrot.phar self-update` uses the same three
 codes with its own meanings; see [phar.md](phar.md).
+
+More generally, an exit `1` can come from Composer or Symfony before lockrot runs at all — an unknown command name
+(`lockrot.phar nope`, `composer lokrot`), or Composer stopping on its own while it starts up. That exit `1` puts
+Composer's error box on stderr instead of a `lockrot:` line and writes no report, which is how a gate tells it apart
+from findings.
+
+Like Composer, lockrot reads the manifest the `COMPOSER` environment variable names: `COMPOSER=alt.json composer
+lockrot` reads `alt.json` and `alt.lock`, and the default baseline sits next to `alt.json`.
+
+With `LOCKROT_DISABLE=1` the analysis skips all of this: it reads nothing — not the command line, `composer.json`,
+`extra.lockrot` or the lock — prints `lockrot disabled via LOCKROT_DISABLE` on stderr and exits `0`. It does not
+disable `lockrot.phar self-update`.
 
 The [install-time summary](install-time.md) never sets an exit code unless `install-time-strict` is on. The exit code
 is identical for every output format below; only the output changes.

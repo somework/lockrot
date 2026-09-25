@@ -50,6 +50,8 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class SelfUpdateCommand extends BaseCommand
 {
+    use RejectsUnreadableInput;
+
     /**
      * How long the whole self-update round may take. {@see ComposerHttpClient} turns this into the
      * per-request timeout, which Composer maps to curl's CURLOPT_TIMEOUT — the *total* transfer
@@ -115,6 +117,12 @@ final class SelfUpdateCommand extends BaseCommand
                 ."  php lockrot.phar self-update --check\n"
                 ."  php lockrot.phar self-update --allow-major\n"
             );
+    }
+
+    /** A command line this command cannot read is exit 2 and a `lockrot:` line ({@see RejectsUnreadableInput}). */
+    public function run(InputInterface $input, OutputInterface $output): int
+    {
+        return $this->unreadableInput($input, $output) ?? parent::run($input, $output);
     }
 
     /**

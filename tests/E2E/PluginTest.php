@@ -245,6 +245,46 @@ final class PluginTest extends TestCase
         self::assertStringNotContainsString('<warning>', $stderr);
     }
 
+    /**
+     * A command line `composer lockrot` cannot read is lockrot's usage error — exit 2 and one
+     * `lockrot:` line — not Composer's error box and exit 1. This runs through the real binary, so on
+     * the Composer 2.2 leg of CI it is the check that the binding works on symfony/console 2.8 too.
+     * No network is needed: nothing is analysed.
+     */
+    public function testAnUnreadableCommandLineIsExitTwoWithOneLockrotLine(): void
+    {
+        $this->createProject(['target-php' => '8.4']);
+        $this->install();
+
+        foreach (['--nope' => '"--nope" option does not exist', '--format' => '"--format" option requires a value', '--dev=yes' => '"--dev" option does not accept a value'] as $option => $reason) {
+            $run = $this->composer(['lockrot', $option], [], 120);
+
+            self::assertSame(2, $run->getExitCode(), $option."\n".$run->getErrorOutput());
+            self::assertSame('', $run->getOutput(), $option);
+            self::assertMatchesRegularExpression('/^lockrot: [^\n]*'.preg_quote($reason, '/').'[^\n]*$/m', $run->getErrorOutput(), $option);
+        }
+    }
+
+    /**
+     * `COMPOSER=alt.json composer lockrot` reads alt.json and alt.lock, as every other Composer
+     * command does. The copies are byte-identical, so only the lock's name tells them apart.
+     */
+    public function testComposerTheEnvironmentVariableChoosesTheLockLockrotReads(): void
+    {
+        $this->createProject(['target-php' => '8.4']);
+        $this->install();
+        copy($this->dir.'/composer.json', $this->dir.'/alt.json');
+        copy($this->dir.'/composer.lock', $this->dir.'/alt.lock');
+
+        $run = $this->composer(['lockrot', '--format=json'], ['COMPOSER' => 'alt.json'], 120);
+
+        self::assertSame(0, $run->getExitCode(), $run->getErrorOutput());
+        $json = json_decode($run->getOutput(), true);
+        self::assertIsArray($json, $run->getErrorOutput());
+        self::assertIsArray($json['run']);
+        self::assertSame('alt.lock', $json['run']['lock_file']);
+    }
+
     public function testLockrotDisableSkipsTheInstallTimeSummary(): void
     {
         $this->createProject(['target-php' => '8.4']);

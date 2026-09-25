@@ -17,8 +17,10 @@ use Lockrot\Tests\Support\GitHubReleases;
 use Lockrot\Tests\Support\SigningKeys;
 use Lockrot\Tests\Support\SplitStreamOutput;
 use Lockrot\Version;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Tester\CommandTester;
 
 final class SelfUpdateCommandTest extends TestCase
@@ -684,5 +686,38 @@ final class SelfUpdateCommandTest extends TestCase
 
         self::assertSame(2, $code);
         self::assertMatchesRegularExpression(self::styledWhole('lockrot: no published release found'), $stderr);
+    }
+
+    /** @return iterable<string, array{0: string, 1: string}> */
+    public static function unreadableCommandLines(): iterable
+    {
+        yield 'an option the command does not have' => ['self-update --nope', 'The "--nope" option does not exist.'];
+        yield 'a value given to a flag' => ['self-update --check=yes', 'The "--check" option does not accept a value.'];
+        yield 'an argument too many' => ['self-update surplus', 'got "surplus"'];
+    }
+
+    /**
+     * A command line self-update cannot read exits 2 like every other self-update failure, with one
+     * styled `lockrot:` line — not Composer's own error box and exit 1, which `--check` uses to say
+     * an update is available. Nothing is requested.
+     *
+     * @dataProvider unreadableCommandLines
+     */
+    #[DataProvider('unreadableCommandLines')]
+    public function testACommandLineSelfUpdateCannotReadIsExitTwoWithOneLockrotLine(string $commandLine, string $reason): void
+    {
+        $http = $this->httpWithAssets('v'.self::NEWER);
+        $command = $this->command($http, $this->installedPhar());
+        $output = new SplitStreamOutput();
+        $output->getErrorOutput()->setDecorated(true);
+
+        $code = $command->run(new StringInput($commandLine), $output);
+
+        $stderr = $output->fetchErrors();
+        self::assertSame(2, $code, $stderr);
+        self::assertSame('', $output->fetch());
+        self::assertSame(1, substr_count($stderr, "\n"), $stderr);
+        self::assertMatchesRegularExpression('~\e\[[0-9;]+mlockrot: [^\e]*'.preg_quote($reason, '~').'[^\e]*\e\[[0-9;]+m~', $stderr);
+        self::assertSame([], $http->requested());
     }
 }

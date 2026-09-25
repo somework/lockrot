@@ -166,6 +166,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   already at that name fails the write instead of being followed, and a baseline that is replaced
   keeps its permission bits instead of taking the umask's default.
 
+- A command line lockrot cannot read — an unknown option, an option missing its value, a value given to a flag, an
+  argument too many — exits `2` with one `lockrot:` line, from `composer lockrot` and `lockrot.phar self-update`
+  alike. It was Composer's error box and exit `1`, the code a CI gate reads as "findings": Symfony binds the command
+  line before any lockrot code runs, so the commands now bind it first. What never reaches a lockrot command — an
+  unknown command name, Composer stopping before it has chosen one — is still Composer's exit `1`, and
+  [ci.md](docs/ci.md#exit-codes) now says so.
+
+- A key starting with a NUL byte anywhere in `extra.lockrot` switched validation off: the schema library turned the
+  config into an object with a `json_encode`/`json_decode` round trip, the decode failed, and the empty object left
+  behind was valid — so `{"fail-on": "abandoned", "\u0000k": 1}` ran with `fail-on` `none` and exited `0`. lockrot
+  converts the config itself now, and such a key is a configuration error naming where it is. A number too large for
+  a float (`1e400`) made the same round trip throw, which the command did not catch as a configuration error; it now
+  reaches the schema, which rejects it under a key that wants an integer. Nothing that fails while the command starts
+  up escapes as exit `1` any more.
+
+- lockrot reads the manifest and lock Composer reads: with `COMPOSER=alt.json` it takes `extra.lockrot` from
+  `alt.json`, analyses `alt.lock` and puts the default baseline next to `alt.json`, where it read `composer.json` and
+  `composer.lock` from the working directory whatever `COMPOSER` said. The install-time summary already did. A
+  missing lock is reported under its own name.
+
+- `LOCKROT_DISABLE=1` skips `composer lockrot` entirely, as documented: it is checked before the command line,
+  `composer.json`, `extra.lockrot` or an option value is read, where a broken configuration or a bad option used to
+  exit `2` under it.
+
+- One validation rule for every configuration source: `extra.lockrot` is validated in full on every run, and
+  `LOCKROT_FAIL_ON`/`LOCKROT_TARGET_PHP` whenever they are set. An invalid variable under `--fail-on` or
+  `--target-php` was silently ignored, while an invalid `extra.lockrot` value under the same option was exit `2`; both
+  are exit `2` now, and the message names the variable.
+
 ## [0.12.0] - 2026-09-24
 
 ### Changed

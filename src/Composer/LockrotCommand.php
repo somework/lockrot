@@ -50,11 +50,17 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class LockrotCommand extends BaseCommand
 {
+    use RejectsUnreadableInput;
+
     /** @var callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, Tokens, Clock, Deadline, ?string): Analyzer */
     private $analyzerFactory;
 
-    /** Set by initialize() when the project manifest is unusable; rethrown inside execute(). */
-    private ?ConfigException $bootstrapError = null;
+    /**
+     * Set by initialize() when the project manifest is unusable, or anything else fails before
+     * Composer has been bootstrapped; rethrown inside execute(), whose catch blocks decide the line
+     * and the exit code.
+     */
+    private ?\Throwable $bootstrapError = null;
 
     /**
      * Snapshot of COMPOSER_DISABLE_NETWORK/COMPOSER_ROOT_VERSION taken at the top of initialize(),
@@ -92,11 +98,32 @@ final class LockrotCommand extends BaseCommand
     }
 
     /**
+     * LOCKROT_DISABLE is the off switch, documented as skipping lockrot entirely, so it is checked
+     * before anything the run would read: the command line, composer.json and its extra.lockrot, the
+     * option values, the lock. None of them can turn a disabled run into an exit 2.
+     *
+     * Then the command line is bound here, before Symfony's run() does it, so one this command
+     * cannot read is exit 2 and a `lockrot:` line ({@see RejectsUnreadableInput}).
+     */
+    public function run(InputInterface $input, OutputInterface $output): int
+    {
+        if (LockrotConfig::isDisabledByEnvironment(getenv())) {
+            $this->writeError($output, 'lockrot disabled via LOCKROT_DISABLE');
+
+            return Policy::EXIT_OK;
+        }
+
+        return $this->unreadableInput($input, $output) ?? parent::run($input, $output);
+    }
+
+    /**
      * Composer's BaseCommand::initialize() bootstraps a Composer instance from the project's
      * composer.json and lets a JSON parse error escape as a Composer crash — exit 1, before
      * execute() is ever reached. lockrot documents a malformed manifest as a configuration error
      * (exit 2, README "Exit codes"), so the file is checked here first and the failure is carried
-     * into execute()'s error handling instead.
+     * into execute()'s error handling instead. So is any other failure on the way there — Composer
+     * refusing a COMPOSER that names a directory, say: Symfony calls initialize() outside any
+     * try/catch, and nothing this command does may leave it as a Composer crash.
      *
      * --offline sets COMPOSER_DISABLE_NETWORK as early as this command can, but that alone is not
      * the mechanism, and cannot be: HttpDownloader reads the variable once, in its own constructor,
@@ -116,8 +143,8 @@ final class LockrotCommand extends BaseCommand
             'COMPOSER_ROOT_VERSION' => Platform::getEnv('COMPOSER_ROOT_VERSION'),
         ];
         try {
-            ProjectConfig::fromFile((string) getcwd().'/composer.json');
-        } catch (ConfigException $e) {
+            ProjectConfig::fromFile(self::composerFile());
+        } catch (\Throwable $e) {
             $this->bootstrapError = $e;
 
             return;
@@ -173,26 +200,25 @@ final class LockrotCommand extends BaseCommand
                 throw $this->bootstrapError;
             }
             $env = getenv();
+            // --output paths are relative to the directory lockrot runs in; the manifest, its lock
+            // and the baseline are where Composer reads them.
             $cwd = (string) getcwd();
-            $project = ProjectConfig::fromFile($cwd.'/composer.json');
-            [$config, $repositories] = $this->composerBootstrap($io, is_file($cwd.'/composer.json'));
+            $composerFile = self::composerFile();
+            $project = ProjectConfig::fromFile($composerFile);
+            [$config, $repositories] = $this->composerBootstrap($io, is_file($composerFile));
+            // LOCKROT_DISABLE needs no check here: run() answered it before any of this was read.
             $lockrot = LockrotConfig::fromSources($project->lockrotExtra(), $env, $this->cliOptions($input), \PHP_VERSION, $project->platformPhp());
-            if ($lockrot->isDisabled()) {
-                $this->writeError($output, 'lockrot disabled via LOCKROT_DISABLE');
-
-                return Policy::EXIT_OK;
-            }
             // Here and not in initialize(), which reads the same manifest without printing: once per
-            // run, on stderr only, after LOCKROT_DISABLE and after a config error has had its say.
-            // Never a failure.
+            // run, on stderr only, after a config error has had its say. Never a failure.
             foreach (UnknownKeys::warnings($project->lockrotExtra()) as $warning) {
                 $this->writeWarning($output, 'lockrot: '.$warning);
             }
-            $lockPath = $cwd.'/composer.lock';
+            // The lock Composer itself would read: alt.lock beside COMPOSER=alt.json.
+            $lockPath = Factory::getLockFile($composerFile);
             if (!is_file($lockPath)) {
                 // Unlike `composer`, lockrot never walks up to a parent project (the PHAR hides the
                 // manifest from Composer's preamble, see bin/lockrot), so say where it looked.
-                throw new ConfigException('composer.lock not found in '.$cwd.'; lockrot does not look in parent directories: run it from the project root or pass -d <dir>');
+                throw new ConfigException(basename($lockPath).' not found in '.\dirname($lockPath).'; lockrot does not look in parent directories: run it from the project root or pass -d <dir>');
             }
             $lock = LockFile::fromFile($lockPath);
             $explain = $input->getOption('explain');
@@ -201,10 +227,10 @@ final class LockrotCommand extends BaseCommand
                 throw new ConfigException('--explain prints one package on stdout and --output writes whole-run reports; run them separately');
             }
             // Resolving the path touches nothing, and the files --output may not name include it.
-            $baselineFile = BaselineFile::resolve($cwd, $lockrot->baseline());
+            $baselineFile = BaselineFile::resolve(\dirname($composerFile), $lockrot->baseline());
             // Checked before the analysis, like the baseline below: a typo in a path fails now,
             // not after a full repository round.
-            $targets = ReportTargets::resolve($specs, $cwd, $specs === [] ? [] : self::protectedFiles($cwd, $baselineFile, $project));
+            $targets = ReportTargets::resolve($specs, $cwd, $specs === [] ? [] : self::protectedFiles($cwd, $composerFile, $lockPath, $baselineFile, $project));
             // `composer lockrot` is the deliberate, full run: no time budget, unlike the
             // install-time summary.
             $analyzer = AnalyzerBootstrap::create($this->analyzerFactory, $io, $config, $repositories, $project, $lockrot, $env, Deadline::never());
@@ -405,25 +431,25 @@ final class LockrotCommand extends BaseCommand
      *   whether or not it exists yet;
      * - the composer.json and composer.lock this run reads, so a second name for either on disk is
      *   caught wherever the report would go;
-     * - the manifest Composer reads, as {@see Factory::getComposerFile()} names it (`COMPOSER`), and
-     *   the lock {@see Factory::getLockFile()} pairs with it (`composer-8.json` -> `composer-8.lock`).
-     *   Without `COMPOSER` these are the two above, which come first and keep their reason.
+     * - the manifest Composer reads, as {@see self::composerFile()} names it (`COMPOSER`), and the
+     *   lock {@see Factory::getLockFile()} pairs with it (`composer-8.json` -> `composer-8.lock`),
+     *   the two this run reads. Without `COMPOSER` these are the two above, which come first and
+     *   keep their reason.
      *
      * @return list<array{0: string, 1: string}>
      */
-    private static function protectedFiles(string $cwd, BaselineFile $baseline, ProjectConfig $project): array
+    private static function protectedFiles(string $cwd, string $composerFile, string $lockPath, BaselineFile $baseline, ProjectConfig $project): array
     {
         $configured = $project->lockrotExtra()['baseline'] ?? null;
         $baselineReason = 'that is the baseline file, which lockrot writes only with --generate-baseline';
-        $manifest = Path::resolve($cwd, Factory::getComposerFile());
 
         return [
             [$baseline->path(), $baselineReason],
-            [BaselineFile::resolve($cwd, \is_string($configured) ? $configured : null)->path(), $baselineReason],
+            [BaselineFile::resolve(\dirname($composerFile), \is_string($configured) ? $configured : null)->path(), $baselineReason],
             [$cwd.'/composer.json', ReportTargets::COMPOSER_REASON],
             [$cwd.'/composer.lock', ReportTargets::COMPOSER_REASON],
-            [$manifest, 'that is the manifest COMPOSER names, which lockrot never writes'],
-            [Factory::getLockFile($manifest), 'that is the lock COMPOSER names, which lockrot never writes'],
+            [$composerFile, 'that is the manifest COMPOSER names, which lockrot never writes'],
+            [$lockPath, 'that is the lock COMPOSER names, which lockrot never writes'],
         ];
     }
 
@@ -565,6 +591,25 @@ final class LockrotCommand extends BaseCommand
         $manager = RepositoryFactory::manager($io, $config, Factory::createHttpDownloader($io, $config), $eventDispatcher);
 
         return [$config, array_values(RepositoryFactory::defaultRepos($io, $config, $manager))];
+    }
+
+    /**
+     * The manifest Composer itself reads — the one the COMPOSER environment variable names, else
+     * composer.json — as an absolute path, so the lock beside it, the baseline next to it and every
+     * message naming it point at the file Composer would use (`COMPOSER=alt.json` means alt.json and
+     * alt.lock, exactly as `composer install` reads them). {@see InstallTimeSummary} resolves it the
+     * same way, and the files `--output` may not name are derived from it ({@see self::protectedFiles()}).
+     */
+    private static function composerFile(): string
+    {
+        $file = Factory::getComposerFile();
+        // Composer's default is `./composer.json`; without the `./` every path built from it reads
+        // the way the working directory does.
+        if (strpos($file, './') === 0) {
+            $file = substr($file, 2);
+        }
+
+        return Path::resolve((string) getcwd(), $file);
     }
 
     private function resolveComposer(bool $hasComposerJson): ?Composer

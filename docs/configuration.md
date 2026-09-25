@@ -21,7 +21,14 @@ Put project settings under `extra.lockrot` in `composer.json`:
 }
 ```
 
-CLI options win over environment variables, which win over `composer.json`.
+CLI options win over environment variables, which win over `composer.json`. Losing does not skip the check:
+`extra.lockrot` is validated in full on every run, even a key an option overrides — it is a file in the project, and an
+error in it is an error on every run — and an environment variable (`LOCKROT_FAIL_ON`, `LOCKROT_TARGET_PHP`) is
+validated whenever it is set, even under the option that outranks it. An invalid value in either is exit `2`, as is an
+invalid option. A variable set to the empty string counts as unset.
+
+As with every Composer command, `COMPOSER` chooses the manifest: `COMPOSER=alt.json composer lockrot` reads
+`extra.lockrot` from `alt.json`, analyses `alt.lock`, and resolves the baseline next to `alt.json`.
 
 The shape of `extra.lockrot` is validated against its published JSON schema,
 [`https://lockrot.dev/schema/config-1.json`](https://lockrot.dev/schema/config-1.json)
@@ -108,7 +115,7 @@ lockrot: unknown key extra.lockrot.ignore[1].expire ignored (did you mean expire
 
 | Variable | Overrides |
 |---|---|
-| `LOCKROT_DISABLE=1` (or `true`) | Skips lockrot entirely, exits 0 |
+| `LOCKROT_DISABLE=1` (or `true`) | Skips lockrot entirely, exits 0: nothing is read or validated first — not the command line, `composer.json`, `extra.lockrot` or the lock. The install-time summary is skipped too; `lockrot.phar self-update` is not affected |
 | `LOCKROT_FAIL_ON` | `fail-on` |
 | `LOCKROT_TARGET_PHP` | `target-php` |
 | `LOCKROT_GITHUB_TOKEN` / `GITHUB_TOKEN` | GitHub token for the repository-activity signals (S3/S4) on github.com; Composer's `github-oauth.github.com` auth is the fallback. When Composer has that auth, its token is the one sent — see [internals.md](internals.md) |
