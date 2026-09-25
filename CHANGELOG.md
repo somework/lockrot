@@ -110,6 +110,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   tooling, and are never warned about; a project that keeps its own data under `extra.lockrot` can
   move it under `x-` to stay quiet.
 
+- `--output=<format>:<path>`, repeatable: one run writes several reports. Until now a run had one
+  report, on stdout, in its one `--format`, and a second format meant a second run. lockrot-action
+  does exactly that for its job summary — `src/run.sh` runs lockrot again with `--format=markdown
+  --offline` — so the summary came from another run, with another clock and, offline, its own notes
+  and its own S10 reasons for what it could not check. Now the analysis runs once and every file is
+  rendered from the same report: the same `generated_at`, findings and notes, and each file is byte
+  for byte what its `--format` prints, except that a table in a file has no colours and is wrapped at
+  120 columns whatever the terminal is. `--format` still decides stdout. A relative path is relative
+  to the project directory lockrot runs in (`-d` sets it); the directory must already exist, since
+  lockrot creates none. Each file is written atomically after stdout and named on stderr
+  (`lockrot: sarif report written to lockrot.sarif`). A path naming `composer.json`,
+  `composer.lock`, the baseline or the manifest `COMPOSER` names, an unknown format, an empty path,
+  the same file twice or a missing directory is a configuration error (exit 2) found before the
+  analysis starts, and so is a file that cannot be written when its turn comes; otherwise the exit
+  code is untouched. `--explain` refuses `--output`; `--generate-baseline` writes the reports, then
+  the baseline. In your project, lockrot writes only the files you name — reports with `--output`,
+  the baseline with `--generate-baseline` — and never `composer.json` or `composer.lock`; the README,
+  `SECURITY.md` and `CONTRIBUTING.md` now say so, where they used to call the baseline the only file
+  lockrot writes.
+
 ### Fixed
 
 - A configuration error from `composer lockrot`, and the install-time `check skipped` line, print
@@ -117,6 +137,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   from outside lockrot, such as an `--explain` argument like `<fg=red>x`, restyled the line instead
   of printing it. Both keep their colours, and the `check skipped` line still escapes any control
   character in the message.
+
+- A configuration error or an unexpected failure whose message quoted something that looks like a
+  console tag — a path or a package name with `<info>` in it — lost that part on stderr, because the
+  message went through the console's tag formatter unescaped. It is escaped now and printed as it
+  was.
 
 ## [0.12.0] - 2026-09-24
 

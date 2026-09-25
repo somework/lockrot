@@ -1,0 +1,139 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Lockrot\Output;
+
+use Lockrot\Analyzer\Report;
+use Lockrot\Exception\ConfigException;
+use Lockrot\Filesystem\AtomicWriter;
+use Lockrot\Filesystem\Path;
+use Lockrot\Html\PageData;
+use Symfony\Component\Console\Formatter\OutputFormatter;
+
+/**
+ * The files one run writes its report to: every `--output=<format>:<path>`, checked before the
+ * analysis starts and written after it, from the same report stdout gets.
+ *
+ * The checks are the whole promise of `--output` — lockrot writes the files it is told to and
+ * nothing else — so a spec that would write anything else is refused up front, with exit 2, before
+ * a single repository is asked anything:
+ *
+ * - a file named `composer.json` or `composer.lock`, in any directory and any letter case;
+ * - a file the caller protects — the baseline, the manifest `COMPOSER` names and its lock;
+ * - the same file named twice;
+ * - a file whose directory does not exist, or is not a directory: lockrot creates none;
+ * - a path that already exists and is not a regular file (a directory, a device).
+ *
+ * Writability is not checked in advance: is_writable() is unreliable under ACLs and root, so an
+ * unwritable target fails at the write instead, with PHP's reason, as exit 2 all the same.
+ *
+ * @internal
+ */
+final class ReportTargets
+{
+    /** @var list<ReportTarget> */
+    private array $targets;
+
+    /** @param list<ReportTarget> $targets */
+    private function __construct(array $targets)
+    {
+        $this->targets = $targets;
+    }
+
+    /**
+     * @param list<string>                      $specs     every `--output` value, in the order given
+     * @param string                            $cwd       the directory relative paths are relative to
+     * @param list<array{0: string, 1: string}> $protected absolute paths no report may be written to,
+     *                                                     each with the reason given when one is named
+     *
+     * @throws ConfigException for the first spec that breaks a rule, after every spec has parsed
+     */
+    public static function resolve(array $specs, string $cwd, array $protected): self
+    {
+        $targets = [];
+        foreach ($specs as $spec) {
+            $targets[] = ReportTarget::parse($spec, $cwd);
+        }
+        $seen = [];
+        foreach ($targets as $target) {
+            $canonical = Path::canonical($target->path());
+            self::refuseProtected($target, $canonical, $protected);
+            if (isset($seen[$canonical])) {
+                throw new ConfigException($target->option().': the same file as '.$seen[$canonical]);
+            }
+            $seen[$canonical] = $target->option();
+            self::refuseUnwritablePlace($target);
+        }
+
+        return new self($targets);
+    }
+
+    /** @param list<array{0: string, 1: string}> $protected */
+    private static function refuseProtected(ReportTarget $target, string $canonical, array $protected): void
+    {
+        if (\in_array(strtolower(basename($target->path())), ['composer.json', 'composer.lock'], true)) {
+            throw new ConfigException($target->option().': lockrot never writes composer.json or composer.lock');
+        }
+        foreach ($protected as [$path, $reason]) {
+            if (Path::canonical($path) === $canonical) {
+                throw new ConfigException($target->option().': '.$reason);
+            }
+        }
+    }
+
+    private static function refuseUnwritablePlace(ReportTarget $target): void
+    {
+        $directory = \dirname($target->path());
+        if (!is_dir($directory)) {
+            $shown = \dirname($target->displayPath());
+            throw new ConfigException(file_exists($directory)
+                ? $target->option().': '.$shown.' is not a directory'
+                : $target->option().': directory '.$shown.' does not exist; lockrot does not create directories');
+        }
+        if (file_exists($target->path()) && !is_file($target->path())) {
+            throw new ConfigException($target->option().': '.$target->displayPath().' exists and is not a regular file');
+        }
+    }
+
+    public function isEmpty(): bool
+    {
+        return $this->targets === [];
+    }
+
+    /** Whether a file asks for $format — `html` needs facts the other formats do without. */
+    public function wants(string $format): bool
+    {
+        foreach ($this->targets as $target) {
+            if ($target->format() === $format) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Renders and writes every file, in the order given, calling $onWritten after each one.
+     *
+     * Each file is what `--format=<its format>` prints for the same report and context. `table` is
+     * the one that carries console markup — style tags, and `\<` escapes the console undoes — so a
+     * table file is passed through the same non-decorating formatter a redirected stdout gets: no
+     * colours, no tags, the brackets back as the evidence wrote them.
+     *
+     * @param callable(ReportTarget): void $onWritten
+     *
+     * @throws ConfigException at the first file that cannot be written; the files before it stay
+     */
+    public function write(Report $report, FormatContext $context, ?PageData $page, bool $showAll, callable $onWritten): void
+    {
+        foreach ($this->targets as $target) {
+            $contents = Formatters::for($target->format(), $context, $page)->format($report, $showAll);
+            if ($target->format() === 'table') {
+                $contents = (string) (new OutputFormatter(false))->format($contents);
+            }
+            AtomicWriter::write($target->path(), $contents, $target->displayPath());
+            $onWritten($target);
+        }
+    }
+}

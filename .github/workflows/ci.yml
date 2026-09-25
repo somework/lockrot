@@ -104,7 +104,7 @@ jobs:
         shard:
           - {name: verdicts and output, filter: 'src/Verdict src/Signal src/Analyzer src/Output', min_msi: 98}
           - {name: composer and self-update, filter: 'src/Composer src/Config src/SelfUpdate', min_msi: 96}
-          - {name: data and the rest, filter: 'src/Data src/Baseline src/Allowlist src/Graph src/Lock src/Json src/Exception src/Version.php src/Clock.php src/Deadline.php', min_msi: 96}
+          - {name: data and the rest, filter: 'src/Data src/Baseline src/Filesystem src/Allowlist src/Graph src/Lock src/Json src/Exception src/Version.php src/Clock.php src/Deadline.php', min_msi: 96}
     name: mutation (${{ matrix.shard.name }})
     steps:
       - uses: actions/checkout@v7

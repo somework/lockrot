@@ -139,6 +139,42 @@ final class PluginTest extends TestCase
         self::assertStringNotContainsString('<options=', $stdout);
     }
 
+    /**
+     * `composer -d <dir>` changes into the project before any command runs, so relative `--output`
+     * paths land there, not in the shell's directory. The table file is the one place the plugin's
+     * own symfony/console strips the markup — 2.8 under Composer 2.2 LTS, 5.4 under 2.10 — so this is
+     * the test that covers both. Offline, so no verdict depends on GitHub: the assertions are about
+     * where the files go and what is in them, not what they report.
+     */
+    public function testOutputFilesAreRelativeToTheDirectoryComposerRunsIn(): void
+    {
+        $this->createProject(['target-php' => '8.4'], ['somework/lockrot' => '*', 'phpzip/phpzip' => '2.0.8']);
+        $this->install();
+        $elsewhere = sys_get_temp_dir().'/lockrot-e2e-elsewhere-'.uniqid();
+        mkdir($elsewhere);
+        try {
+            $run = new Process(
+                ['composer', '-d', $this->dir, 'lockrot', '--offline', '--output=table:r.txt', '--output=json:r.json'],
+                $elsewhere,
+                ['COMPOSER_HOME' => $this->dir.'/.composer']
+            );
+            $run->setTimeout(120)->run();
+
+            self::assertSame(0, $run->getExitCode(), $run->getErrorOutput().$run->getOutput());
+            self::assertStringContainsString("lockrot: table report written to r.txt\nlockrot: json report written to r.json\n", $run->getErrorOutput());
+            $table = (string) file_get_contents($this->dir.'/r.txt');
+            self::assertMatchesRegularExpression('/\d+ packages checked/', $table);
+            self::assertStringNotContainsString('<fg=', $table);
+            self::assertStringNotContainsString('<options=', $table);
+            self::assertStringNotContainsString('\\<', $table);
+            self::assertStringNotContainsString("\e[", $table);
+            self::assertIsArray(json_decode((string) file_get_contents($this->dir.'/r.json'), true));
+            self::assertSame(['.', '..'], scandir($elsewhere), 'nothing lands in the shell\'s directory');
+        } finally {
+            (new Process(['rm', '-rf', $elsewhere]))->run();
+        }
+    }
+
     public function testComposerRequirePrintsTheInstallTimeSummary(): void
     {
         $this->createProject(['target-php' => '8.4']);

@@ -26,15 +26,19 @@ use Lockrot\Data\Forge\Tokens;
 use Lockrot\Deadline;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Explain\Explanation;
+use Lockrot\Filesystem\Path;
 use Lockrot\Html\PageData;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Output\ExplainFormatter;
 use Lockrot\Output\FormatContext;
 use Lockrot\Output\Formatters;
+use Lockrot\Output\ReportTarget;
+use Lockrot\Output\ReportTargets;
 use Lockrot\Output\TerminalText;
 use Lockrot\Output\TerminalWidth;
 use Lockrot\Version;
+use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
@@ -84,7 +88,8 @@ final class LockrotCommand extends BaseCommand
             ->addOption('strict-network', null, InputOption::VALUE_NONE, 'Exit 1 when a repository or a repository host (GitHub, GitLab, Bitbucket) could not be reached')
             ->addOption('baseline', null, InputOption::VALUE_REQUIRED, 'Baseline file to read or write (default: lockrot-baseline.json next to composer.json)')
             ->addOption('generate-baseline', null, InputOption::VALUE_NONE, 'Write the current findings to the baseline file and exit 0')
-            ->addOption('explain', null, InputOption::VALUE_REQUIRED, 'Explain one package: its verdict, every signal with its raw data, and the repository facts they were read from (text, or JSON with --format=json); exit 0');
+            ->addOption('explain', null, InputOption::VALUE_REQUIRED, 'Explain one package: its verdict, every signal with its raw data, and the repository facts they were read from (text, or JSON with --format=json); exit 0')
+            ->addOption('output', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Also write the report to a file, as <format>:<path> (e.g. sarif:lockrot.sarif), in any format --format takes; repeatable. A relative path is relative to the project directory lockrot runs in; the directory must exist. --format still decides stdout');
     }
 
     /**
@@ -191,25 +196,33 @@ final class LockrotCommand extends BaseCommand
                 throw new ConfigException('composer.lock not found in '.$cwd.'; lockrot does not look in parent directories: run it from the project root or pass -d <dir>');
             }
             $lock = LockFile::fromFile($lockPath);
+            $explain = $input->getOption('explain');
+            $specs = self::outputSpecs($input);
+            if (\is_string($explain) && $specs !== []) {
+                throw new ConfigException('--explain prints one package on stdout and --output writes whole-run reports; run them separately');
+            }
+            // Resolving the path touches nothing, and the files --output may not name include it.
+            $baselineFile = BaselineFile::resolve($cwd, $lockrot->baseline());
+            // Checked before the analysis, like the baseline below: a typo in a path fails now,
+            // not after a full repository round.
+            $targets = ReportTargets::resolve($specs, $cwd, self::protectedFiles($cwd, $baselineFile, $env));
             // `composer lockrot` is the deliberate, full run: no time budget, unlike the
             // install-time summary.
             $analyzer = AnalyzerBootstrap::create($this->analyzerFactory, $io, $config, $repositories, $project, $lockrot, $env, Deadline::never());
-            // Before the baseline is even resolved: an explanation does not consult it, so a
+            // Before the baseline is even read: an explanation does not consult it, so a
             // baseline that is missing or unreadable must not stand between the question and the answer.
-            $explain = $input->getOption('explain');
             if (\is_string($explain)) {
                 return $this->explain($output, $explain, $analyzer, $lock, $project, $lockrot);
             }
-            // Resolved and read before the analysis so a missing explicit path or an unreadable
-            // file fails immediately, rather than after a full repository round. A generate run is the
-            // one case where the target is allowed not to exist yet: it is about to be created.
+            // Read before the analysis so a missing explicit path or an unreadable file fails
+            // immediately, rather than after a full repository round. A generate run is the one case
+            // where the target is allowed not to exist yet: it is about to be created.
             $generate = $input->getOption('generate-baseline') === true;
-            $baselineFile = BaselineFile::resolve($cwd, $lockrot->baseline());
             $existingBaseline = $this->readBaseline($baselineFile, $lockrot->baseline() !== null && !$generate);
             $format = $lockrot->format();
             // `html` draws a release-branch timeline per package, which is the one thing only the
             // facts carry; every other format is happy with the report and lets them go.
-            $analysis = $format === 'html'
+            $analysis = $format === 'html' || $targets->wants('html')
                 ? $analyzer->analyzeWithFacts($lock->packages($lockrot->includeDev()), $lock, $project, $lockrot->includeDev())
                 : null;
             $report = $analysis === null ? $analyzer->analyze($lock, $project, $lockrot->includeDev()) : $analysis->report();
@@ -225,7 +238,15 @@ final class LockrotCommand extends BaseCommand
                 $lockrot->thresholds()
             ));
 
+            $page = $analysis === null
+                ? null
+                : new PageData($analysis, $lockrot->thresholds(), $lockrot->targetPhp());
+            $showAll = $input->getOption('all') === true;
+
             if ($generate) {
+                // Before the baseline, so an exit 2 from a report never follows a replaced baseline.
+                $this->writeReports($output, $targets, $report, $lockPath, $lockrot, $page, $showAll);
+
                 return $this->generateBaseline($output, $baselineFile, $report, $existingBaseline, $lockrot);
             }
             if ($existingBaseline !== null) {
@@ -241,17 +262,16 @@ final class LockrotCommand extends BaseCommand
             // one throws ConfigException from here, which the catch below turns into exit 2 the
             // same way an unreadable lock does a few lines up.
             $context = FormatContext::create($lockPath, $lockrot->failOn(), Version::STRING, TerminalWidth::detect($env, $this->getApplication()));
-            $page = $analysis === null
-                ? null
-                : new PageData($analysis, $lockrot->thresholds(), $lockrot->targetPhp());
             // Only `table` is meant to go through the tag formatter; every machine-readable format
             // is written raw, so a `<` in a constraint or a package name reaches the parser on the
             // other end untouched.
             $output->write(
-                Formatters::for($format, $context, $page)->format($report, $input->getOption('all') === true),
+                Formatters::for($format, $context, $page)->format($report, $showAll),
                 false,
                 $format === 'table' ? OutputInterface::OUTPUT_NORMAL : OutputInterface::OUTPUT_RAW
             );
+            // After stdout, so the report is in the log even when a file cannot be written.
+            $this->writeReports($output, $targets, $report, $lockPath, $lockrot, $page, $showAll);
 
             return Policy::exitCode($report, $lockrot);
         } catch (ConfigException $e) {
@@ -261,7 +281,7 @@ final class LockrotCommand extends BaseCommand
 
             return Policy::EXIT_ERROR;
         } catch (\Throwable $e) {
-            $this->writeError($output, '<error>lockrot failed: '.$e->getMessage().'</error>');
+            $this->writeError($output, '<error>lockrot failed: '.OutputFormatter::escape($e->getMessage()).'</error>');
             if ($io->isVerbose()) {
                 $this->writeError($output, $e->getTraceAsString());
             }
@@ -355,6 +375,67 @@ final class LockrotCommand extends BaseCommand
         ));
 
         return Policy::strictNetworkTripped($report, $lockrot) ? Policy::EXIT_FINDINGS : Policy::EXIT_OK;
+    }
+
+    /**
+     * The `--output` files, each followed by one line on stderr naming it, as the baseline's is.
+     *
+     * A file has no terminal, so a table in one is rendered at the default width whatever this
+     * run's terminal is: the same file on a laptop and on a CI runner.
+     */
+    private function writeReports(OutputInterface $output, ReportTargets $targets, Report $report, string $lockPath, LockrotConfig $lockrot, ?PageData $page, bool $showAll): void
+    {
+        $targets->write(
+            $report,
+            FormatContext::create($lockPath, $lockrot->failOn()),
+            $page,
+            $showAll,
+            function (ReportTarget $target) use ($output): void {
+                $this->writeError($output, 'lockrot: '.$target->format().' report written to '.OutputFormatter::escape($target->displayPath()));
+            }
+        );
+    }
+
+    /**
+     * The files an `--output` may not name besides every composer.json and composer.lock, which
+     * {@see ReportTargets} refuses on its own: the baseline, whether or not it exists yet, and — when
+     * `COMPOSER` points Composer at another manifest — that manifest and the lock beside it, named
+     * the way Composer names it (`composer-8.json` -> `composer-8.lock`).
+     *
+     * @param array<string, string> $env
+     *
+     * @return list<array{0: string, 1: string}>
+     */
+    private static function protectedFiles(string $cwd, BaselineFile $baseline, array $env): array
+    {
+        $files = [[$baseline->path(), 'that is the baseline file, which lockrot writes only with --generate-baseline']];
+        $manifest = trim($env['COMPOSER'] ?? '');
+        if ($manifest !== '') {
+            $manifest = Path::resolve($cwd, $manifest);
+            $lock = pathinfo($manifest, \PATHINFO_EXTENSION) === 'json' ? substr($manifest, 0, -4).'lock' : $manifest.'.lock';
+            $files[] = [$manifest, 'that is the manifest COMPOSER names, which lockrot never writes'];
+            $files[] = [$lock, 'that is the lock COMPOSER names, which lockrot never writes'];
+        }
+
+        return $files;
+    }
+
+    /**
+     * Every `--output` value. The option is declared as an array of values, so anything else is
+     * a console library's doing, not the user's, and is dropped.
+     *
+     * @return list<string>
+     */
+    private static function outputSpecs(InputInterface $input): array
+    {
+        $specs = [];
+        foreach ((array) $input->getOption('output') as $spec) {
+            if (\is_string($spec)) {
+                $specs[] = $spec;
+            }
+        }
+
+        return $specs;
     }
 
     /**

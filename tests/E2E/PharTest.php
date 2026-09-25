@@ -272,6 +272,34 @@ final class PharTest extends TestCase
     }
 
     /**
+     * `-d` makes the project directory the working directory before lockrot runs, so a relative
+     * `--output` path lands in the project, not in the directory the PHAR was started from — the
+     * same base a relative `--baseline` has. The table file carries no console markup.
+     */
+    public function testOutputPathsAreRelativeToTheDirectoryDashDNames(): void
+    {
+        $this->phar();
+        $project = $this->freshDir();
+        $fixture = \dirname(__DIR__).'/fixtures/skeletons/laravel';
+        copy($fixture.'/composer.json', $project.'/composer.json');
+        copy($fixture.'/composer.lock', $project.'/composer.lock');
+        $elsewhere = $this->freshDir();
+
+        $process = $this->runPhar(['-d', $project, '--format=json', '--target-php=8.4', '--offline', '--output=markdown:summary.md', '--output=table:report.txt'], $elsewhere);
+
+        self::assertSame(0, $process->getExitCode(), $process->getErrorOutput());
+        self::assertIsArray(json_decode($process->getOutput(), true), 'stdout is still the --format document');
+        self::assertStringContainsString("lockrot: markdown report written to summary.md\nlockrot: table report written to report.txt\n", $process->getErrorOutput());
+        self::assertStringStartsWith('### lockrot: ', (string) file_get_contents($project.'/summary.md'));
+        $table = (string) file_get_contents($project.'/report.txt');
+        self::assertMatchesRegularExpression('/\d+ packages checked/', $table);
+        self::assertStringNotContainsString('<fg=', $table);
+        self::assertStringNotContainsString('<options=', $table);
+        self::assertStringNotContainsString("\e[", $table);
+        self::assertSame([], array_values(array_diff((array) scandir($elsewhere), ['.', '..'])), 'nothing lands where the PHAR was started');
+    }
+
+    /**
      * A real self-update, end to end: a real PHAR replaces itself with a different, valid archive
      * and then has to finish. Everything up to the swap is covered by unit tests; what only a
      * separate process can show is what happens afterwards, when the code the running archive still
