@@ -1660,9 +1660,8 @@ final class LockrotCommandTest extends TestCase
         self::assertSame(2, $code);
         self::assertSame('', $stdout);
         self::assertCount(1, $errors);
-        self::assertStringStartsWith('<error>lockrot failed: ', $errors[0]);
-        self::assertStringContainsString('the analyzer blew up', $errors[0]);
-        self::assertStringEndsWith('</error>', $errors[0]);
+        // Written raw, like a config error: the message is not console markup.
+        self::assertSame('lockrot failed: the analyzer blew up', $errors[0]);
     }
 
     /**
@@ -1769,7 +1768,7 @@ final class LockrotCommandTest extends TestCase
 
     public function testOutputWritesTheFileWhileStdoutKeepsItsFormat(): void
     {
-        $dir = $this->wallabagCopy();
+        $dir = $this->fixtureCopy(self::WALLABAG_LOCK);
 
         [$code, $stdout, $stderr] = $this->runWithSplitStreams(['--output' => ['json:r.json'], '--target-php' => '8.4'], $this->loader());
 
@@ -1784,7 +1783,7 @@ final class LockrotCommandTest extends TestCase
     /** Without --output nothing new reaches stderr: a report run says nothing there. */
     public function testWithoutOutputStderrStaysEmpty(): void
     {
-        $this->wallabagCopy();
+        $this->fixtureCopy(self::WALLABAG_LOCK);
 
         [$code, , $stderr] = $this->runWithSplitStreams(['--target-php' => '8.4'], $this->loader());
 
@@ -1798,7 +1797,7 @@ final class LockrotCommandTest extends TestCase
     #[DataProvider('machineReadableFormatProvider')]
     public function testAFileIsByteIdenticalToWhatThatFormatPrintsOnStdout(string $format): void
     {
-        $dir = $this->wallabagCopy();
+        $dir = $this->fixtureCopy(self::WALLABAG_LOCK);
 
         [$code, $stdout, $stderr] = $this->runWithSplitStreams(['--format' => $format, '--output' => [$format.':r.out'], '--fail-on' => 'silent', '--target-php' => '8.4'], $this->loader());
 
@@ -1813,7 +1812,7 @@ final class LockrotCommandTest extends TestCase
      */
     public function testTheHtmlFileIsThePageAnHtmlRunWouldPrint(): void
     {
-        $dir = $this->wallabagCopy();
+        $dir = $this->fixtureCopy(self::WALLABAG_LOCK);
         [, $page] = $this->runWithSplitStreams(['--format' => 'html', '--target-php' => '8.4'], $this->loader());
 
         [$code, , $stderr] = $this->runWithSplitStreams(['--output' => ['html:r.html'], '--target-php' => '8.4'], $this->loader());
@@ -1825,7 +1824,7 @@ final class LockrotCommandTest extends TestCase
 
     public function testAnHtmlRunWritingAnHtmlFileGivesBothTheFacts(): void
     {
-        $dir = $this->wallabagCopy();
+        $dir = $this->fixtureCopy(self::WALLABAG_LOCK);
 
         [$code, $stdout, $stderr] = $this->runWithSplitStreams(['--format' => 'html', '--output' => ['html:r.html'], '--target-php' => '8.4'], $this->loader());
 
@@ -1836,7 +1835,7 @@ final class LockrotCommandTest extends TestCase
 
     public function testEveryFileOfOneRunCarriesTheSameReport(): void
     {
-        $dir = $this->wallabagCopy();
+        $dir = $this->fixtureCopy(self::WALLABAG_LOCK);
 
         [$code, $stdout, $stderr] = $this->runWithSplitStreams(['--format' => 'json', '--output' => ['json:r.json', 'html:r.html'], '--target-php' => '8.4'], $this->loader());
 
@@ -1852,7 +1851,7 @@ final class LockrotCommandTest extends TestCase
      */
     public function testATableFileIsTheDefaultWidthTableWhateverTheTerminal(): void
     {
-        $dir = $this->wallabagCopy();
+        $dir = $this->fixtureCopy(self::WALLABAG_LOCK);
         $narrow = $wide = '';
         $this->withEnv('COLUMNS', '60', function () use (&$narrow): void {
             [$code, $narrow, $stderr] = $this->runWithSplitStreams(['--output' => ['table:r.txt'], '--target-php' => '8.4'], $this->loader());
@@ -1868,7 +1867,7 @@ final class LockrotCommandTest extends TestCase
 
     public function testATableFileHasNoAnsiEvenWhenStdoutIsDecorated(): void
     {
-        $dir = $this->wallabagCopy();
+        $dir = $this->fixtureCopy(self::WALLABAG_LOCK);
         $tester = $this->tester($this->loader());
 
         $code = $tester->execute(['--output' => ['table:r.txt'], '--target-php' => '8.4'], ['decorated' => true]);
@@ -1885,7 +1884,7 @@ final class LockrotCommandTest extends TestCase
 
     public function testEachWrittenFileIsNamedOnStderrInTheOrderGiven(): void
     {
-        $dir = $this->wallabagCopy();
+        $dir = $this->fixtureCopy(self::WALLABAG_LOCK);
         mkdir($dir.'/out');
 
         [$code, , $stderr] = $this->runWithSplitStreams(['--output' => ['sarif:out/r.sarif', 'json:r.json'], '--target-php' => '8.4'], $this->loader());
@@ -1898,7 +1897,7 @@ final class LockrotCommandTest extends TestCase
     /** A path is printed as given, even one a console would read as a style tag. */
     public function testAPathThatLooksLikeAConsoleTagIsPrintedAsGiven(): void
     {
-        $dir = $this->wallabagCopy();
+        $dir = $this->fixtureCopy(self::WALLABAG_LOCK);
 
         [$code, , $stderr] = $this->runWithSplitStreams(['--output' => ['json:<info>r.json'], '--target-php' => '8.4'], $this->loader());
 
@@ -1909,7 +1908,7 @@ final class LockrotCommandTest extends TestCase
 
     public function testARefusalNamingAConsoleTagIsPrintedAsGiven(): void
     {
-        $this->wallabagCopy();
+        $this->fixtureCopy(self::WALLABAG_LOCK);
 
         [$code, , $stderr] = $this->runWithSplitStreams(['--output' => ['json:<info>/r.json'], '--target-php' => '8.4'], $this->loader());
 
@@ -1919,7 +1918,7 @@ final class LockrotCommandTest extends TestCase
 
     public function testTheExitCodeDoesNotDependOnOutput(): void
     {
-        $dir = $this->wallabagCopy();
+        $dir = $this->fixtureCopy(self::WALLABAG_LOCK);
 
         [$without] = $this->runWithSplitStreams(['--fail-on' => 'silent', '--target-php' => '8.4'], $this->loader());
         [$with] = $this->runWithSplitStreams(['--fail-on' => 'silent', '--output' => ['json:r.json'], '--target-php' => '8.4'], $this->loader());
@@ -1955,7 +1954,7 @@ final class LockrotCommandTest extends TestCase
     #[DataProvider('protectedTargets')]
     public function testAnOutputThatNamesAProtectedFileIsExit2AndTouchesNothing(array $args, string $spec, string $reason, ?array $extra): void
     {
-        $dir = $this->wallabagCopy();
+        $dir = $this->fixtureCopy(self::WALLABAG_LOCK);
         if ($extra !== null) {
             $manifest = $this->readJsonFile($dir.'/composer.json');
             $manifest['extra'] = ['lockrot' => $extra];
@@ -1993,7 +1992,7 @@ final class LockrotCommandTest extends TestCase
     #[DataProvider('composerManifests')]
     public function testTheManifestComposerNamesAndItsLockAreProtected(string $composer, string $manifest, string $lock): void
     {
-        $this->wallabagCopy();
+        $this->fixtureCopy(self::WALLABAG_LOCK);
         $this->withEnv('COMPOSER', $composer, function () use ($manifest, $lock): void {
             foreach (['json:'.$manifest => 'the manifest', 'json:'.$lock => 'the lock'] as $spec => $what) {
                 [$code, , $stderr] = $this->runWithSplitStreams(['--output' => [$spec], '--target-php' => '8.4'], $this->loader());
@@ -2020,7 +2019,7 @@ final class LockrotCommandTest extends TestCase
     #[DataProvider('projectFiles')]
     public function testAnOutputThatIsAProjectFileOnDiskIsExit2(string $file): void
     {
-        $dir = $this->wallabagCopy();
+        $dir = $this->fixtureCopy(self::WALLABAG_LOCK);
         mkdir($dir.'/out');
         link($dir.'/'.$file, $dir.'/out/r.json');
         $called = false;
@@ -2035,7 +2034,7 @@ final class LockrotCommandTest extends TestCase
     /** Every line lockrot prints on stderr shows a path as it was given, `<` and all. */
     public function testTheBaselineLineShowsAPathThatLooksLikeAConsoleTagAsGiven(): void
     {
-        $dir = $this->wallabagCopy();
+        $dir = $this->fixtureCopy(self::WALLABAG_LOCK);
 
         [$code, , $stderr] = $this->runWithSplitStreams(['--generate-baseline' => true, '--baseline' => '<info>b.json', '--target-php' => '8.4'], $this->loader());
 
@@ -2062,7 +2061,7 @@ final class LockrotCommandTest extends TestCase
     #[DataProvider('invalidOutputs')]
     public function testAnInvalidOutputIsExit2BeforeTheAnalysis(array $specs, string $message): void
     {
-        $dir = $this->wallabagCopy();
+        $dir = $this->fixtureCopy(self::WALLABAG_LOCK);
         $called = false;
 
         [$code, $stdout, $stderr] = $this->runCommandWithSplitStreams($this->recordingCommand($called), ['--output' => $specs, '--target-php' => '8.4']);
@@ -2088,7 +2087,7 @@ final class LockrotCommandTest extends TestCase
 
     public function testExplainWithOutputIsExit2AndWritesNothing(): void
     {
-        $dir = $this->wallabagCopy();
+        $dir = $this->fixtureCopy(self::WALLABAG_LOCK);
         $called = false;
 
         [$code, $stdout, $stderr] = $this->runCommandWithSplitStreams($this->recordingCommand($called), ['--explain' => 'phpzip/phpzip', '--output' => ['json:r.json'], '--target-php' => '8.4']);
@@ -2106,7 +2105,7 @@ final class LockrotCommandTest extends TestCase
      */
     public function testGenerateBaselineWithOutputWritesBothAndExitsZero(): void
     {
-        $dir = $this->wallabagCopy();
+        $dir = $this->fixtureCopy(self::WALLABAG_LOCK);
 
         [$code, $stdout, $stderr] = $this->runWithSplitStreams(['--generate-baseline' => true, '--fail-on' => 'stale', '--output' => ['json:r.json'], '--target-php' => '8.4'], $this->loader());
 
@@ -2122,7 +2121,7 @@ final class LockrotCommandTest extends TestCase
 
     public function testAReportThatCannotBeWrittenUnderGenerateBaselineLeavesTheBaselineAlone(): void
     {
-        $dir = $this->wallabagCopy();
+        $dir = $this->fixtureCopy(self::WALLABAG_LOCK);
         $called = false;
         $command = $this->recordingCommand($called, static function () use ($dir): void {
             mkdir($dir.'/r.json');
@@ -2143,7 +2142,7 @@ final class LockrotCommandTest extends TestCase
      */
     public function testAFileThatCannotBeWrittenIsExit2WithTheReason(): void
     {
-        $dir = $this->wallabagCopy();
+        $dir = $this->fixtureCopy(self::WALLABAG_LOCK);
         $called = false;
         $command = $this->recordingCommand($called, static function () use ($dir): void {
             mkdir($dir.'/r.json');
@@ -2160,7 +2159,7 @@ final class LockrotCommandTest extends TestCase
 
     public function testLockrotDisableWritesNoFile(): void
     {
-        $dir = $this->wallabagCopy();
+        $dir = $this->fixtureCopy(self::WALLABAG_LOCK);
         $this->withEnv('LOCKROT_DISABLE', '1', function (): void {
             [$code, $stdout] = $this->runWithSplitStreams(['--output' => ['json:r.json']]);
 

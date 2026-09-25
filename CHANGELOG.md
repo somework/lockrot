@@ -157,9 +157,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - A message on stderr that quoted something looking like a console tag — a path or a package name
   with `<info>` in it, an exception's message, the `-v` stack trace — lost that part, because it went
-  through the console's tag formatter unescaped. Every line `composer lockrot` and `lockrot.phar
-  self-update` print on stderr is escaped now, as are the install-time "check skipped" warning and
-  the Bitbucket token warning, and each is printed as it was.
+  through the console's tag formatter unescaped. Every line `composer lockrot` prints on stderr now
+  goes past the formatter, as the configuration errors above do, and every line `lockrot.phar
+  self-update` prints is escaped for it, as is the Bitbucket token warning; each is printed as it
+  was.
 
 - The baseline is now written through a temporary file created exclusively, so a file or symlink
   already at that name fails the write instead of being followed, and a baseline that is replaced

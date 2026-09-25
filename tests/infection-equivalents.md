@@ -61,28 +61,17 @@ mutant from the original, and says why.
 
 ## src/SelfUpdate and src/Composer/SelfUpdateCommand.php
 
-src/Composer/SelfUpdateCommand.php:143 FalseValue (`\Phar::running(false)` → `\Phar::running(true)`) — the
+src/Composer/SelfUpdateCommand.php:144 FalseValue (`\Phar::running(false)` → `\Phar::running(true)`) — the
 two differ only inside a running PHAR, where `false` gives `/path/lockrot.phar` and `true` gives
 `phar:///path/lockrot.phar`; the unit suite is not running from a PHAR, so both return `''` and take the same
 branch. The difference is exercised by `tests/E2E/PharTest.php::testSelfUpdateFinishesCleanlyAfterReplacingTheRunningArchive`,
 which replaces a real archive in place and would fail on a `phar://` path, but Infection runs the `unit` and
 `integration` suites only (`@group e2e` is excluded in phpunit.xml.dist), so no test it runs can see it.
 
-src/Composer/SelfUpdateCommand.php:199 ConcatOperandRemoval (drops the closing `'</error>'`) — Symfony's
-OutputFormatter wraps each text chunk in the current style's opening *and* closing sequences, so an unclosed
-`<error>` tag renders byte-for-byte like a closed one (verified: `<error>lockrot: boom` and
-`<error>lockrot: boom</error>` both come out as `ESC[37;41mlockrot: boom ESC[39;49m`). The only way a leaked
-style could be observed is a later write on the same output, and this line is the last thing the command
-writes before returning. The *reordering* mutant on the same line is observable and is killed by
-`testOnATerminalTheWholeErrorIsStyledAndNotJustItsPrefix`.
-
-src/Composer/SelfUpdateCommand.php:203 ConcatOperandRemoval (drops the closing `'</error>'`) — the same, on the
-`\Throwable` branch; killed counterpart is `testAFailureThatIsNotAConfigErrorIsStillOneLineAndExitTwo`. Both
-mutants on this line are new: the branch had no coverage at the time escaped-A.txt was taken, so its mutants
-were counted as uncovered rather than escaped.
-
-Both lines now pass the message through `SelfUpdateCommand::plain()` first; the mutant still only drops the
-closing tag, and the reasoning above is unchanged (line numbers checked 2026-09-26).
+Two escapes listed here before 0.13.0, a ConcatOperandRemoval dropping the closing `'</error>'` on each of
+the two `catch` lines of `execute()`, went with the tag itself: both lines now hand their message to
+`writeError()` with the `error` style, and the one mutant left in that helper is listed with the `--output`
+entries below (`SelfUpdateCommand.php:270`).
 
 src/SelfUpdate/ReleaseLocator.php:435 CastString (`(string) preg_replace(...)` → `preg_replace(...)`) — the
 display version of a candidate. preg_replace() returns null only when the pattern fails to compile or the
@@ -435,9 +424,9 @@ equivalent (403 mutants, 9 escapes, Covered MSI 97.8%):
 
 - `src/Composer/SelfUpdateCommand.php:270` ConcatOperandRemoval — `'</'.$style.'>'` becomes `'</>'`.
   Symfony's formatter reads `</>` as "close the style opened last", and the line opens exactly one,
-  `$style`, so both spellings render the same bytes. (`LockrotCommand`'s copy of the helper is
-  killed by its own tests; the two stay separate because self-update must not load a class after it
-  has replaced the archive it runs from.)
+  `$style`, so both spellings render the same bytes. (`LockrotCommand` has no copy of the helper:
+  it writes its stderr lines past the formatter through `TerminalText`, a class self-update could not
+  load after it has replaced the archive it runs from.)
 - `src/Filesystem/Path.php:119` LogicalOr and DecrementInteger x2 — `$a['ino'] === 0 ||
   $b['ino'] === 0`, the fallback to comparing resolved paths where a filesystem reports no inode.
   Every filesystem CI and a developer machine run on (ext4, APFS, tmpfs) reports one, so the

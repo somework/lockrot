@@ -67,7 +67,7 @@
     //    ((int) of the whole YYYY-MM-DD match is the year), HttpResult.php:85 (getLastErrors() is false
     //    on PHP >= 8.2 when clean; killed on the 7.4 leg), LockrotCommand.php:578 x2 (the Composer 2.2
     //    arm of the tryComposer() guard, never entered on the vendored Composer; covered by the Docker
-    //    7.4/2.2 run outside Infection), SelfUpdateCommand.php:143 (Phar::running(false) differs only
+    //    7.4/2.2 run outside Infection), SelfUpdateCommand.php:144 (Phar::running(false) differs only
     //    inside a running PHAR; covered by the e2e PharTest Infection does not run).
     //  - Same result by another route: ActivityClient.php:70 (`<` to `<=` assigns an equal value),
     //    ProjectIgnoreList.php:76 and PhpReleaseDates.php:30 Concat (PHP's date parser accepts the
@@ -79,9 +79,8 @@
     //    returns null anyway), Policy.php:24 (FailOn::reaches() is false for `none`, the loop rejects
     //    everything and falls through to EXIT_OK), InstallTimeSummary.php:188 x2 (the stale list the
     //    names feed is never rendered on the install-time path; kept for a truthful comparison),
-    //    SelfUpdateCommand.php:199 and :203 (an unclosed `</error>` renders byte-identically, the line
-    //    is the command's last write), ReleaseLocator.php:435 CastString (preg_replace() on a literal
-    //    pattern and a normalised version is never null).
+    //    ReleaseLocator.php:435 CastString (preg_replace() on a literal pattern and a normalised
+    //    version is never null).
     //  - 2026-09-18 (left-behind, advisories): ReleaseBranch.php:35 PregMatchRemoveCaret (a normalized
     //    non-dev version always starts with its major digits), LeftBehindRule.php:68
     //    LessThanOrEqualTo (a same-instant higher release cannot be both alive and older than the
