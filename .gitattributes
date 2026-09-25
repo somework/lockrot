@@ -1,5 +1,7 @@
 # Test fixtures include a small PHP archive; never let it through line-ending normalisation.
 *.phar binary
+# The documents older releases wrote are checked against the sha256 their recording took.
+/tests/fixtures/schema-evolution/** -text
 
 /tests export-ignore
 /build export-ignore
@@ -13,6 +15,7 @@
 /.gitattributes export-ignore
 /bin/record-fixtures export-ignore
 /bin/record-demo export-ignore
+/bin/record-schema-evolution export-ignore
 /tools export-ignore
 /docs export-ignore
 /mkdocs.yml export-ignore

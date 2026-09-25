@@ -1,0 +1,181 @@
+{
+    "$schema": "https://lockrot.dev/schema/explain-1.json",
+    "lockrot": {
+        "version": "0.11.0",
+        "schema": 1
+    },
+    "package": "scheb/2fa-backup-code",
+    "version": "v5.13.2",
+    "finding": {
+        "package": "scheb/2fa-backup-code",
+        "version": "v5.13.2",
+        "verdict": "left-behind",
+        "priority": "high",
+        "direct": true,
+        "dev": false,
+        "replacement": null,
+        "signals": [
+            {
+                "id": "S7",
+                "level": "info",
+                "summary": "pulls in 1 flagged package: symfony/security-guard (abandoned)",
+                "data": {
+                    "flagged": 1,
+                    "packages": [
+                        {
+                            "package": "symfony/security-guard",
+                            "verdict": "abandoned",
+                            "chain": [
+                                "scheb/2fa-backup-code",
+                                "scheb/2fa-bundle",
+                                "symfony/security-bundle",
+                                "symfony/security-guard"
+                            ]
+                        }
+                    ]
+                }
+            },
+            {
+                "id": "S8",
+                "level": "warn",
+                "summary": "branch 5.x last released 2022-01-03 (4.7 years ago); 7.x released v7.14.0 (2026-01-24)",
+                "data": {
+                    "branch": "5.x",
+                    "branch_last_release": "2022-01-03T10:21:24+00:00",
+                    "branch_last_version": "v5.13.2",
+                    "years": 4.7,
+                    "newest_branch": "7.x",
+                    "newest_version": "v7.14.0",
+                    "newest_release": "2026-01-24T13:47:32+00:00",
+                    "newest_php": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
+                    "newest_within_reach": true,
+                    "floor_php": null,
+                    "floor_source": null,
+                    "reachable_branch": "7.x",
+                    "reachable_version": "v7.14.0",
+                    "reachable_release": "2026-01-24T13:47:32+00:00",
+                    "suggested_constraint": "^7.14",
+                    "dated_by": null
+                }
+            },
+            {
+                "id": "S10",
+                "level": "info",
+                "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 and S8 could not measure it",
+                "data": {
+                    "unchecked": [
+                        {
+                            "check": "release_dates",
+                            "reason": "undated_releases",
+                            "blocks": [
+                                "S2",
+                                "S8"
+                            ]
+                        }
+                    ],
+                    "blocks": [
+                        "S2",
+                        "S8"
+                    ]
+                }
+            }
+        ],
+        "chain": [
+            "scheb/2fa-backup-code"
+        ],
+        "direct_dependents": [
+            "scheb/2fa-backup-code"
+        ],
+        "evidence": "branch 5.x last released 2022-01-03 (4.7 years ago); 7.x released v7.14.0 (2026-01-24); require ^7.14 to follow; the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 and S8 could not measure it; pulls in 1 flagged package: symfony/security-guard (abandoned)",
+        "allowlist_reason": null,
+        "note": null,
+        "data_date": "2026-09-25T00:00:00+00:00",
+        "libyears": 4.06
+    },
+    "lock": {
+        "php": null,
+        "released": "2022-01-03T10:21:24+00:00",
+        "repository": "https://github.com/scheb/2fa-backup-code.git",
+        "from_composer_repository": true,
+        "dev": false,
+        "branch_snapshot": false,
+        "type": "library"
+    },
+    "metadata": {
+        "abandoned": false,
+        "replacement": null,
+        "releases_listed": 76,
+        "has_stable_release": true,
+        "last_stable_release": null,
+        "last_stable_version": null,
+        "last_stable_dated_by": null,
+        "installed_release": "2022-01-03T10:21:24+00:00",
+        "installed_release_dated_by": null,
+        "repository": "https://github.com/scheb/2fa-backup-code.git",
+        "type": "library",
+        "data_date": "2026-09-25T00:00:00+00:00",
+        "branches": [
+            {
+                "branch": "8.x",
+                "installed": false,
+                "highest": "v8.6.1",
+                "highest_released": null,
+                "highest_commit_date": "2026-01-24T13:26:10+00:00",
+                "newest_dated": "v8.6.1",
+                "newest_dated_released": "2026-01-24T13:26:10+00:00",
+                "dated_by": null,
+                "php": "~8.4.0 || ~8.5.0"
+            },
+            {
+                "branch": "7.x",
+                "installed": false,
+                "highest": "v7.14.0",
+                "highest_released": "2026-01-24T13:47:32+00:00",
+                "highest_commit_date": null,
+                "newest_dated": "v7.14.0",
+                "newest_dated_released": "2026-01-24T13:47:32+00:00",
+                "dated_by": null,
+                "php": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0"
+            },
+            {
+                "branch": "6.x",
+                "installed": false,
+                "highest": "v6.13.1",
+                "highest_released": "2024-11-29T19:22:48+00:00",
+                "highest_commit_date": null,
+                "newest_dated": "v6.13.1",
+                "newest_dated_released": "2024-11-29T19:22:48+00:00",
+                "dated_by": null,
+                "php": "~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0"
+            },
+            {
+                "branch": "5.x",
+                "installed": true,
+                "highest": "v5.13.2",
+                "highest_released": "2022-01-03T10:21:24+00:00",
+                "highest_commit_date": null,
+                "newest_dated": "v5.13.2",
+                "newest_dated_released": "2022-01-03T10:21:24+00:00",
+                "dated_by": null,
+                "php": null
+            }
+        ]
+    },
+    "activity": {
+        "forge": "GitHub",
+        "repository": "scheb/2fa-backup-code",
+        "archived": false,
+        "pushed_at": "2026-07-10T18:36:01+00:00",
+        "fetched_at": "2026-09-25T00:00:00+00:00",
+        "from_cache": true
+    },
+    "thresholds": {
+        "release-warn-years": 3,
+        "release-high-years": 5,
+        "push-warn-years": 3,
+        "push-high-years": 5
+    },
+    "target_php": "8.4",
+    "generated_at": "2026-09-25T00:00:00+00:00",
+    "notes": []
+}

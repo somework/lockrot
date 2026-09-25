@@ -1,0 +1,115 @@
+{
+    "lockrot": "0.11.0",
+    "tag": "v0.11.0",
+    "phar_sha256": "d8196dbe5b5dbe4aa8cb626f5b135e3cb0ccd8d6989b587b8fe05eee8ceb301a",
+    "verified": {
+        "sha256": "lockrot.phar.sha256 of the release",
+        "gpg": "39ECC3F64AE8D06A9A63FD99AB6F7F52AE513141",
+        "attestation": "gh attestation verify lockrot.phar --repo somework/lockrot"
+    },
+    "recorded": "2026-09-25",
+    "today": "2026-09-25T00:00:00+00:00",
+    "php": "8.5.10",
+    "target_php": "8.4",
+    "lock": "tests/fixtures/apps/wallabag_wallabag",
+    "network": true,
+    "github_token": true,
+    "cache": "empty at the start, shared with no other version",
+    "baseline": {
+        "args": [
+            "-d",
+            "<copy of tests/fixtures/apps/wallabag_wallabag>",
+            "--target-php=8.4",
+            "--no-ansi",
+            "--generate-baseline",
+            "--baseline=lockrot-schema-evolution-baseline.json"
+        ],
+        "exit": 0
+    },
+    "files": {
+        "report.json": {
+            "args": [
+                "-d",
+                "<copy of tests/fixtures/apps/wallabag_wallabag>",
+                "--target-php=8.4",
+                "--no-ansi",
+                "--format=json",
+                "--baseline=lockrot-schema-evolution-baseline.json"
+            ],
+            "exit": 0,
+            "sha256": "d2d8e295617b4765e4bc6f5f914b11cc3667b8a34df9560bc8ac91c581bf8365"
+        },
+        "explain/doctrine~cache.json": {
+            "args": [
+                "-d",
+                "<copy of tests/fixtures/apps/wallabag_wallabag>",
+                "--target-php=8.4",
+                "--no-ansi",
+                "--explain=doctrine/cache",
+                "--format=json"
+            ],
+            "exit": 0,
+            "sha256": "c065e560ea440fd1f7900d737a37b12a8e981fd1b8ffe959318f48304e2f8c9d"
+        },
+        "explain/sensio~framework-extra-bundle.json": {
+            "args": [
+                "-d",
+                "<copy of tests/fixtures/apps/wallabag_wallabag>",
+                "--target-php=8.4",
+                "--no-ansi",
+                "--explain=sensio/framework-extra-bundle",
+                "--format=json"
+            ],
+            "exit": 0,
+            "sha256": "8a30856759169658ed01f0c3eeed7fcaccb147a625bf80e21b0e5daaae6adb52"
+        },
+        "explain/wallabag~rulerz.json": {
+            "args": [
+                "-d",
+                "<copy of tests/fixtures/apps/wallabag_wallabag>",
+                "--target-php=8.4",
+                "--no-ansi",
+                "--explain=wallabag/rulerz",
+                "--format=json"
+            ],
+            "exit": 0,
+            "sha256": "30554865d7a00406725d8bb71bf59417728c08895f5c4b6cbf0ec2fc76565412"
+        },
+        "explain/javibravo~simpleue.json": {
+            "args": [
+                "-d",
+                "<copy of tests/fixtures/apps/wallabag_wallabag>",
+                "--target-php=8.4",
+                "--no-ansi",
+                "--explain=javibravo/simpleue",
+                "--format=json"
+            ],
+            "exit": 0,
+            "sha256": "7941c478c9117d407b42ca5a34c90f7d9b4f5facb2363ad68672369f16bcd4d7"
+        },
+        "explain/scheb~2fa-backup-code.json": {
+            "args": [
+                "-d",
+                "<copy of tests/fixtures/apps/wallabag_wallabag>",
+                "--target-php=8.4",
+                "--no-ansi",
+                "--explain=scheb/2fa-backup-code",
+                "--format=json"
+            ],
+            "exit": 0,
+            "sha256": "59a3c271a196d0cfda2d3c28a9d2130e5a1b8fff40fd1ce64de2720ecd80c69f"
+        },
+        "explain/spomky-labs~otphp.json": {
+            "args": [
+                "-d",
+                "<copy of tests/fixtures/apps/wallabag_wallabag>",
+                "--target-php=8.4",
+                "--no-ansi",
+                "--explain=spomky-labs/otphp",
+                "--format=json"
+            ],
+            "exit": 0,
+            "sha256": "80fdddd4533b31987695da7900994d98782c76a48eae7b6e8434ca07aa8bfd8a"
+        }
+    }
+}

@@ -1,0 +1,224 @@
+{
+    "$schema": "https://lockrot.dev/schema/explain-1.json",
+    "lockrot": {
+        "version": "0.11.0",
+        "schema": 1
+    },
+    "package": "wallabag/rulerz",
+    "version": "dev-master",
+    "finding": {
+        "package": "wallabag/rulerz",
+        "version": "dev-master",
+        "verdict": "pinned",
+        "priority": "high",
+        "direct": true,
+        "dev": false,
+        "replacement": null,
+        "signals": [
+            {
+                "id": "S6",
+                "level": "warn",
+                "summary": "pinned to branch snapshot dev-master",
+                "data": {
+                    "version": "dev-master"
+                }
+            },
+            {
+                "id": "S7",
+                "level": "info",
+                "summary": "pulls in 14 flagged packages: hoa/compiler (abandoned), hoa/consistency (abandoned), hoa/event (abandoned), hoa/exception (abandoned), hoa/file (abandoned) and 9 more",
+                "data": {
+                    "flagged": 14,
+                    "packages": [
+                        {
+                            "package": "hoa/compiler",
+                            "verdict": "abandoned",
+                            "chain": [
+                                "wallabag/rulerz",
+                                "hoa/ruler",
+                                "hoa/compiler"
+                            ]
+                        },
+                        {
+                            "package": "hoa/consistency",
+                            "verdict": "abandoned",
+                            "chain": [
+                                "wallabag/rulerz",
+                                "hoa/consistency"
+                            ]
+                        },
+                        {
+                            "package": "hoa/event",
+                            "verdict": "abandoned",
+                            "chain": [
+                                "wallabag/rulerz",
+                                "hoa/consistency",
+                                "hoa/exception",
+                                "hoa/event"
+                            ]
+                        },
+                        {
+                            "package": "hoa/exception",
+                            "verdict": "abandoned",
+                            "chain": [
+                                "wallabag/rulerz",
+                                "hoa/consistency",
+                                "hoa/exception"
+                            ]
+                        },
+                        {
+                            "package": "hoa/file",
+                            "verdict": "abandoned",
+                            "chain": [
+                                "wallabag/rulerz",
+                                "hoa/ruler",
+                                "hoa/file"
+                            ]
+                        },
+                        {
+                            "package": "hoa/iterator",
+                            "verdict": "abandoned",
+                            "chain": [
+                                "wallabag/rulerz",
+                                "hoa/ruler",
+                                "hoa/compiler",
+                                "hoa/iterator"
+                            ]
+                        },
+                        {
+                            "package": "hoa/math",
+                            "verdict": "abandoned",
+                            "chain": [
+                                "wallabag/rulerz",
+                                "hoa/ruler",
+                                "hoa/compiler",
+                                "hoa/math"
+                            ]
+                        },
+                        {
+                            "package": "hoa/protocol",
+                            "verdict": "abandoned",
+                            "chain": [
+                                "wallabag/rulerz",
+                                "hoa/ruler",
+                                "hoa/protocol"
+                            ]
+                        },
+                        {
+                            "package": "hoa/regex",
+                            "verdict": "abandoned",
+                            "chain": [
+                                "wallabag/rulerz",
+                                "hoa/ruler",
+                                "hoa/compiler",
+                                "hoa/regex"
+                            ]
+                        },
+                        {
+                            "package": "hoa/ruler",
+                            "verdict": "abandoned",
+                            "chain": [
+                                "wallabag/rulerz",
+                                "hoa/ruler"
+                            ]
+                        },
+                        {
+                            "package": "hoa/stream",
+                            "verdict": "abandoned",
+                            "chain": [
+                                "wallabag/rulerz",
+                                "hoa/ruler",
+                                "hoa/file",
+                                "hoa/stream"
+                            ]
+                        },
+                        {
+                            "package": "hoa/ustring",
+                            "verdict": "abandoned",
+                            "chain": [
+                                "wallabag/rulerz",
+                                "hoa/ruler",
+                                "hoa/compiler",
+                                "hoa/regex",
+                                "hoa/ustring"
+                            ]
+                        },
+                        {
+                            "package": "hoa/visitor",
+                            "verdict": "abandoned",
+                            "chain": [
+                                "wallabag/rulerz",
+                                "hoa/ruler",
+                                "hoa/visitor"
+                            ]
+                        },
+                        {
+                            "package": "hoa/zformat",
+                            "verdict": "abandoned",
+                            "chain": [
+                                "wallabag/rulerz",
+                                "hoa/ruler",
+                                "hoa/compiler",
+                                "hoa/math",
+                                "hoa/zformat"
+                            ]
+                        }
+                    ]
+                }
+            }
+        ],
+        "chain": [
+            "wallabag/rulerz"
+        ],
+        "direct_dependents": [
+            "wallabag/rulerz",
+            "wallabag/rulerz-bundle"
+        ],
+        "evidence": "pinned to branch snapshot dev-master; pulls in 14 flagged packages: hoa/compiler (abandoned), hoa/consistency (abandoned), hoa/event (abandoned), hoa/exception (abandoned), hoa/file (abandoned) and 9 more",
+        "allowlist_reason": null,
+        "note": null,
+        "data_date": "2026-09-25T00:00:00+00:00",
+        "libyears": null
+    },
+    "lock": {
+        "php": ">=7.4",
+        "released": "2023-12-24T00:53:44+00:00",
+        "repository": "https://github.com/wallabag/rulerz.git",
+        "from_composer_repository": true,
+        "dev": false,
+        "branch_snapshot": true,
+        "type": "library"
+    },
+    "metadata": {
+        "abandoned": false,
+        "replacement": null,
+        "releases_listed": 2,
+        "has_stable_release": false,
+        "last_stable_release": null,
+        "last_stable_version": null,
+        "last_stable_dated_by": null,
+        "installed_release": null,
+        "installed_release_dated_by": null,
+        "repository": "https://github.com/wallabag/rulerz.git",
+        "type": "library",
+        "data_date": "2026-09-25T00:00:00+00:00",
+        "branches": []
+    },
+    "activity": {
+        "forge": "GitHub",
+        "repository": "wallabag/rulerz",
+        "archived": false,
+        "pushed_at": "2023-12-24T00:58:48+00:00",
+        "fetched_at": "2026-09-25T00:00:00+00:00",
+        "from_cache": true
+    },
+    "thresholds": {
+        "release-warn-years": 3,
+        "release-high-years": 5,
+        "push-warn-years": 3,
+        "push-high-years": 5
+    },
+    "target_php": "8.4",
+    "generated_at": "2026-09-25T00:00:00+00:00",
+    "notes": []
+}
