@@ -61,7 +61,7 @@ mutant from the original, and says why.
 
 ## src/SelfUpdate and src/Composer/SelfUpdateCommand.php
 
-src/Composer/SelfUpdateCommand.php:144 FalseValue (`\Phar::running(false)` → `\Phar::running(true)`) — the
+src/Composer/SelfUpdateCommand.php:152 FalseValue (`\Phar::running(false)` → `\Phar::running(true)`) — the
 two differ only inside a running PHAR, where `false` gives `/path/lockrot.phar` and `true` gives
 `phar:///path/lockrot.phar`; the unit suite is not running from a PHAR, so both return `''` and take the same
 branch. The difference is exercised by `tests/E2E/PharTest.php::testSelfUpdateFinishesCleanlyAfterReplacingTheRunningArchive`,
@@ -71,7 +71,7 @@ which replaces a real archive in place and would fail on a `phar://` path, but I
 Two escapes listed here before 0.13.0, a ConcatOperandRemoval dropping the closing `'</error>'` on each of
 the two `catch` lines of `execute()`, went with the tag itself: both lines now hand their message to
 `writeError()` with the `error` style, and the one mutant left in that helper is listed with the `--output`
-entries below (`SelfUpdateCommand.php:270`).
+entries below (`SelfUpdateCommand.php:278`).
 
 src/SelfUpdate/ReleaseLocator.php:435 CastString (`(string) preg_replace(...)` → `preg_replace(...)`) — the
 display version of a candidate. preg_replace() returns null only when the pattern fails to compile or the
@@ -426,7 +426,7 @@ equivalent until then: a short write records no warning, so the generic reason i
 its entry is gone. Four escapes are the entries above, at their new lines. The other five are
 equivalent (403 mutants, 9 escapes, Covered MSI 97.8%):
 
-- `src/Composer/SelfUpdateCommand.php:270` ConcatOperandRemoval — `'</'.$style.'>'` becomes `'</>'`.
+- `src/Composer/SelfUpdateCommand.php:278` ConcatOperandRemoval — `'</'.$style.'>'` becomes `'</>'`.
   Symfony's formatter reads `</>` as "close the style opened last", and the line opens exactly one,
   `$style`, so both spellings render the same bytes. (`LockrotCommand` has no copy of the helper:
   it writes its stderr lines past the formatter through `TerminalText`, a class self-update could not

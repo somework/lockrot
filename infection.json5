@@ -66,7 +66,7 @@
     //    ((int) of the whole YYYY-MM-DD match is the year), HttpResult.php:85 (getLastErrors() is false
     //    on PHP >= 8.2 when clean; killed on the 7.4 leg), LockrotCommand.php:623 x2 (the Composer 2.2
     //    arm of the tryComposer() guard, never entered on the vendored Composer; covered by the Docker
-    //    7.4/2.2 run outside Infection), SelfUpdateCommand.php:144 (Phar::running(false) differs only
+    //    7.4/2.2 run outside Infection), SelfUpdateCommand.php:152 (Phar::running(false) differs only
     //    inside a running PHAR; covered by the e2e PharTest Infection does not run).
     //  - Same result by another route: ActivityClient.php:70 (`<` to `<=` assigns an equal value),
     //    ProjectIgnoreList.php:76 and PhpReleaseDates.php:30 Concat (PHP's date parser accepts the
