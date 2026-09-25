@@ -302,7 +302,25 @@ final class SelfUpdateCommandTest extends TestCase
         [$code, , $stderr] = $this->runCommand($this->command($http, $this->installedPhar()), ['--check' => true, '--allow-major' => true]);
 
         self::assertSame(1, $code, $stderr);
-        self::assertStringContainsString('lockrot '.self::nextMajor().' is available (installed: '.Version::STRING.')', $stderr);
+        // A plain self-update would hold this release back, so the advice carries the flag.
+        self::assertSame(
+            'lockrot '.self::nextMajor().' is available (installed: '.Version::STRING.'); run lockrot.phar self-update --allow-major'."\n",
+            $stderr
+        );
+    }
+
+    /** --allow-major that finds nothing beyond the running line advises the plain command. */
+    public function testCheckWithAllowMajorInTheSameLineAdvisesThePlainCommand(): void
+    {
+        $http = self::http([self::newer(), Version::STRING]);
+
+        [$code, , $stderr] = $this->runCommand($this->command($http, $this->installedPhar()), ['--check' => true, '--allow-major' => true]);
+
+        self::assertSame(1, $code, $stderr);
+        self::assertSame(
+            'lockrot '.self::newer().' is available (installed: '.Version::STRING.'); run lockrot.phar self-update'."\n",
+            $stderr
+        );
     }
 
     /** The notes say why; the error says that nothing in the line was left to install. */

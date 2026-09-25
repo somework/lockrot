@@ -251,7 +251,8 @@ deletes any such file older than an hour, so there is nothing to clean up by han
 `--check` is the CI-friendly half: it never downloads the archive, and exits `1` when a newer release
 in the running major version exists so a scheduled job notices. A newer major version alone is not
 an update: `--check` names it on a line of its own and exits `0`, and `--check --allow-major` exits
-`1` for it.
+`1` for it and says to run `self-update --allow-major`, since a plain `self-update` would hold it
+back.
 
 ### `self-update` exit codes
 

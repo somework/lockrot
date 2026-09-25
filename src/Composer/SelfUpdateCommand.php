@@ -182,10 +182,13 @@ final class SelfUpdateCommand extends BaseCommand
 
                     return $exitOk;
                 }
+                // A release of the next major is one a plain self-update holds back, so the advice
+                // names the flag that reaches it.
                 $this->writeError($output, \sprintf(
-                    'lockrot %s is available (installed: %s); run lockrot.phar self-update',
+                    'lockrot %s is available (installed: %s); run lockrot.phar self-update%s',
                     $release->version(),
-                    Version::STRING
+                    Version::STRING,
+                    ReleaseLocator::majorOf($release->version()) === ReleaseLocator::majorOf(Version::STRING) ? '' : ' --allow-major'
                 ));
 
                 return $exitFindings;

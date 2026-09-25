@@ -27,7 +27,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   pre-releases and tags that are not a stable version skipped) and takes the newest release in its
   own major version — before 1.0 that is the whole 0.x line, so 0.x updates keep arriving as
   before. `--allow-major` moves to the next major version, one at a time, and `--check` names a
-  newer major on a line of its own without exiting 1 (`--check --allow-major` does). A release whose
+  newer major on a line of its own without exiting 1 (`--check --allow-major` does, and its advice
+  line then says `self-update --allow-major`, since a plain run would hold it back). A release whose
   lowest PHP is above the running one is passed over with a line saying so, and so is one signed with
   a self-update key the archive does not carry, which makes the transition release of a rotation the
   step in between. `--force` reinstalls the newest release at or below the running one and never
