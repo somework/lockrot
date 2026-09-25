@@ -8,10 +8,10 @@ The trap, and the reason three sets live here instead of one: lockrot applies SH
 through three different filters at three different scopes, and they are not interchangeable.
 
   * `shared_commit_versions` marks every stable on-branch tag sitting on a commit that carries
-    three or more of them — dated or not (PackageMetadata.php:303-308).
+    three or more of them — dated or not (PackageMetadata.php:305-310).
   * `last_stable_release_at` is the newest date among *non-dev* tags, pre-releases included, and is
     discarded entirely when the *highest* non-dev tag is undated or sits on a shared commit
-    (PackageMetadata.php:284). It is not "the newest dated tag": it is nothing, when the top of the
+    (PackageMetadata.php:286). It is not "the newest dated tag": it is nothing, when the top of the
     list cannot be trusted.
   * `times`, and `parent_dates` which is `times` minus the shared set, count stable on-branch tags
     only — a parent hands a child only the dates that are a release's.
@@ -33,7 +33,7 @@ from .semver import SHARED_COMMIT_TAGS, order_key, release_branch, stability
 # `replace` links only hand dates over when they are pinned to the replacer's own version. A range
 # replace — symplify/easy-coding-standard replacing symfony/polyfill-ctype at `*` — says "do not
 # install that one as well", and reading it as a monorepo link starts unrelated packages dating
-# each other (PackageMetadata.php:41).
+# each other (PackageMetadata.php:43).
 SELF_VERSION = 'self.version'
 
 
@@ -76,7 +76,7 @@ class Metadata:
             if reference and stability(normalized) != 'dev':
                 # Every non-dev tag's commit, counted nowhere. The count is over stable on-branch
                 # tags only, but the *lookup* at the veto below is for the highest non-dev tag,
-                # pre-release included — that is the pairing PackageMetadata.php:284 uses, and
+                # pre-release included — that is the pairing PackageMetadata.php:286 uses, and
                 # looking the highest tag up in a stable-only map silently answers "not shared"
                 # for every package whose newest tag is a beta or an RC.
                 commit_of_any[normalized] = reference
@@ -148,8 +148,8 @@ class Parents:
 
     The file is not the map. resources/monorepo-parents.json decides only which extra repository
     request is worth making for a lock that does not already contain the parent
-    (MonorepoParents::missingCandidates(), :111); what makes a package a child is that *some package
-    in the batch* declares `replace: <child> self.version`, and MonorepoParents::parentOf() (:150)
+    (MonorepoParents::missingCandidates(), :113); what makes a package a child is that *some package
+    in the batch* declares `replace: <child> self.version`, and MonorepoParents::parentOf() (:152)
     scans the whole batch for one. Gating on the file inverts that, and the inversion is not
     theoretical: sylius/sylius has 44 children in a real lock and is not in the file, so every one
     of them would be read as unparented and audited against dates lockrot never used.
