@@ -8,10 +8,11 @@ on:
 # keyserver.ubuntu.com); CI holds only its signing subkey (GPG_PRIVATE_KEY, GPG_PASSPHRASE). The
 # RSA signature (lockrot.phar.sig.json) is for the archive's own self-update, checked against the key
 # built into it (ReleaseKey::PEM, published as lockrot-selfupdate-key.pub); CI holds the private
-# half as SELFUPDATE_PRIVATE_KEY with SELFUPDATE_PASSPHRASE. Both signatures are checked here
-# against the committed public keys, so a key rotation that forgets to update a file — or a secret
-# that no longer matches it — fails the build instead of shipping an archive nobody can verify with
-# the documented key.
+# half as SELFUPDATE_PRIVATE_KEY with SELFUPDATE_PASSPHRASE. The GPG signature is checked against the
+# committed public key, and the self-update signature against the key the previous release's
+# archive carries — what every archive in the field will check — so a key rotation that skips its
+# transition release, or a secret that no longer matches the key in the field, fails the build
+# instead of shipping an archive nobody can follow.
 #
 # Signing and attestation run for a tag (pushed or dispatched) and for a dispatch from the default
 # branch (a key rotation is rehearsed there), never for a dispatch from another branch: a
@@ -27,7 +28,10 @@ jobs:
       id-token: write # build provenance attestation
       attestations: write
     steps:
+      # Full history and tags: the self-update check below reads the key the previous release
+      # carries from its tag.
       - uses: actions/checkout@v7
+        with: {fetch-depth: 0}
       # Composer is part of the reproducible-build recipe (it writes vendor/composer/*.php from its
       # own source); the version here is what docs/phar.md tells a rebuilder to use, at the tag.
       - uses: shivammathur/setup-php@v2
@@ -78,8 +82,8 @@ jobs:
       # fingerprint is taken from the public half of the private key just used, not from the
       # committed key file, so the description names the actual signer — which is what makes a
       # rotation's transition release (signed with the old key, carrying the new one) describe
-      # itself correctly. build/selfupdate-signer.pub is not a release asset: the upload glob is
-      # build/lockrot.phar*.
+      # itself correctly. build/selfupdate-signer.pub and build/previous-selfupdate-key.pub are not
+      # release assets: the upload glob is build/lockrot.phar*.
       - name: Sign the PHAR for self-update
         if: env.SIGN == 'true'
         env:
@@ -94,21 +98,33 @@ jobs:
           rm build/lockrot.phar.sig.bin
           openssl pkey -in "$KEYDIR/key.pem" -passin env:SELFUPDATE_PASSPHRASE -pubout -out build/selfupdate-signer.pub
           build/selfupdate-signature.php describe build/phar/composer.json build/selfupdate-signer.pub > build/lockrot.phar.meta.json
-      # Three checks: openssl against the published key file, the archive's own verifier class
-      # against the key it carries — what a user's self-update will run, so a key the workflow signs
-      # with that is not the one in ReleaseKey::PEM fails here, not on a user — and the description
-      # against the same committed key. The last one is also what a rotation's transition release
-      # has to relax: its signer is the old key while the committed file is already the new one (see
-      # SECURITY.md).
-      - name: Verify the self-update signature with the built-in key
+      # Every check is against the key the previous release carries — lockrot-selfupdate-key.pub at
+      # the newest v* tag before this commit — because that is the key every archive in the field
+      # verifies this release with. openssl checks the signature against it and against the signer's
+      # own public half; the archive's own verifier class checks it again (the code a user's
+      # self-update runs); and the description must name it. A rotation done in one step — the new
+      # key in ReleaseKey::PEM, the .pub and the secret at once — fails all of these, as it must: no
+      # archive in the field could follow it.
+      #
+      # There is nothing to relax for the transition release of a rotation (signed with the old key,
+      # carrying the new one in ReleaseKey::PEM and the .pub): it is signed with the previous
+      # release's key, so it passes, and `verify` says it is a transition release because the key
+      # this build carries is another one. What a transition release is exempt from is only the
+      # check this build's own key would make — that it signed the release — which the next release
+      # makes instead: its previous release is the transition release, so it must be signed with
+      # the new key (see SECURITY.md).
+      - name: Verify the self-update signature with the key the previous release carries
         if: env.SIGN == 'true'
         run: |
+          PREVIOUS="$(git describe --tags --abbrev=0 --match 'v*' HEAD^)"
+          git show "$PREVIOUS:lockrot-selfupdate-key.pub" > build/previous-selfupdate-key.pub
+          echo "previous release: $PREVIOUS"
           build/selfupdate-signature.php unwrap build/lockrot.phar.sig.json > build/lockrot.phar.sig.bin
-          openssl dgst -sha384 -verify lockrot-selfupdate-key.pub -signature build/lockrot.phar.sig.bin build/lockrot.phar
+          openssl dgst -sha384 -verify build/previous-selfupdate-key.pub -signature build/lockrot.phar.sig.bin build/lockrot.phar
           openssl dgst -sha384 -verify build/selfupdate-signer.pub -signature build/lockrot.phar.sig.bin build/lockrot.phar
           rm build/lockrot.phar.sig.bin
-          build/selfupdate-signature.php verify build/lockrot.phar build/lockrot.phar.sig.json
-          build/selfupdate-signature.php describe build/phar/composer.json lockrot-selfupdate-key.pub | cmp - build/lockrot.phar.meta.json
+          build/selfupdate-signature.php verify build/lockrot.phar build/lockrot.phar.sig.json build/previous-selfupdate-key.pub
+          build/selfupdate-signature.php describe build/phar/composer.json build/previous-selfupdate-key.pub | cmp - build/lockrot.phar.meta.json
       - run: LOCKROT_E2E=1 vendor/bin/phpunit --group e2e --filter PharTest
       - if: env.SIGN == 'true'
         uses: actions/attest-build-provenance@v4
