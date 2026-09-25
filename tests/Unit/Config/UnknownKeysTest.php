@@ -229,15 +229,105 @@ final class UnknownKeysTest extends TestCase
 
     public function testAControlCharacterInAKeyStaysOnOneLine(): void
     {
-        self::assertSame(['unknown key extra.lockrot.bad\nkey\033[31m ignored'], UnknownKeys::warnings(["bad\nkey\033[31m" => 1]));
+        self::assertSame(['unknown key extra.lockrot.bad\nkey\x1B[31m ignored'], UnknownKeys::warnings(["bad\nkey\033[31m" => 1]));
     }
 
-    /** PHP 7.4's levenshtein() gives up on strings longer than 255 bytes and returns -1, which is not a distance. */
-    public function testAVeryLongKeyGetsNoSuggestion(): void
+    /**
+     * A key is the project's text: shown as written, console tags and all, in both places a key can
+     * be. How it reaches the terminal without Symfony's formatter is the printers' business.
+     *
+     * @dataProvider keysShownAsWritten
+     */
+    #[DataProvider('keysShownAsWritten')]
+    public function testAKeyIsShownAsWritten(string $key, string $shown): void
     {
-        $key = str_repeat('f', 300);
+        self::assertSame(
+            ['unknown key extra.lockrot.'.$shown.' ignored', 'unknown key extra.lockrot.ignore[0].'.$shown.' ignored'],
+            UnknownKeys::warnings([$key => 1, 'ignore' => [['package' => 'a/b', 'reason' => 'r', $key => 1]]])
+        );
+    }
+
+    /** @return iterable<string, array{string, string}> */
+    public static function keysShownAsWritten(): iterable
+    {
+        yield 'a style tag' => ['<<fg=red>>', '<<fg=red>>'];
+        yield 'a link tag' => ['<<href=x>>', '<<href=x>>'];
+        yield 'an escaped tag, its backslash escaped in turn' => ['a\\<b', 'a\\\\<b'];
+    }
+
+    /**
+     * Every escape starts with a backslash, and a backslash in the key is escaped too, so no two keys
+     * print alike.
+     *
+     * @dataProvider keysThatLookAlike
+     */
+    #[DataProvider('keysThatLookAlike')]
+    public function testDistinctKeysAreShownDistinctly(string $one, string $other): void
+    {
+        $warnings = UnknownKeys::warnings([$one => 1, $other => 2]);
+
+        self::assertCount(2, $warnings);
+        self::assertNotSame($warnings[0], $warnings[1]);
+    }
+
+    /** @return iterable<string, array{string, string}> */
+    public static function keysThatLookAlike(): iterable
+    {
+        yield 'a newline and a backslash-n' => ["a\nb", 'a\\nb'];
+        yield 'a tag and an escaped tag' => ['<c', '\\<c'];
+    }
+
+    /**
+     * PHP 7.4's levenshtein() gives up on strings longer than 255 bytes and returns -1, which is not
+     * a distance; and a key that long is never a near-miss. It is shown cut at 255 bytes.
+     */
+    public function testAVeryLongKeyIsCutAndGetsNoSuggestion(): void
+    {
+        self::assertSame(
+            ['unknown key extra.lockrot.'.str_repeat('f', 255).'… ignored'],
+            UnknownKeys::warnings([str_repeat('f', 300) => 1])
+        );
+    }
+
+    public function testAKeyOfTheLimitIsShownWhole(): void
+    {
+        $key = str_repeat('f', 255);
 
         self::assertSame(['unknown key extra.lockrot.'.$key.' ignored'], UnknownKeys::warnings([$key => 1]));
+    }
+
+    /** Cut to the same 255 bytes, two long keys would print the same line twice: it is printed once. */
+    public function testTwoLongKeysThatLookTheSameOnceCutAreOneLine(): void
+    {
+        $prefix = str_repeat('f', 300);
+
+        self::assertSame(
+            ['unknown key extra.lockrot.'.str_repeat('f', 255).'… ignored', 'unknown key extra.lockrot.short ignored'],
+            UnknownKeys::warnings([$prefix.'a' => 1, $prefix.'b' => 2, 'short' => 3])
+        );
+    }
+
+    /** PHP turns a JSON key like "5" into the integer 5; at the top level too, it is named, never a TypeError. */
+    public function testANumericTopLevelKeyIsNamed(): void
+    {
+        self::assertSame(['unknown key extra.lockrot.5 ignored'], UnknownKeys::warnings([5 => 'five']));
+    }
+
+    /**
+     * Compared in ASCII lower case whatever the locale: PHP 7.4's strtolower() follows LC_CTYPE, and
+     * under a Turkish locale it lowers `I` to a byte that is not `i`.
+     */
+    public function testUpperCaseIsFoldedWithoutTheLocale(): void
+    {
+        $previous = setlocale(\LC_CTYPE, '0');
+        setlocale(\LC_CTYPE, 'tr_TR.ISO8859-9', 'tr_TR.ISO-8859-9', 'tr_TR', 'tr_TR.UTF-8');
+        try {
+            $warnings = UnknownKeys::warnings(['INSTALL' => 'off']);
+        } finally {
+            setlocale(\LC_CTYPE, (string) $previous);
+        }
+
+        self::assertSame(['unknown key extra.lockrot.INSTALL ignored (did you mean install-time?)'], $warnings);
     }
 
     /**

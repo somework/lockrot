@@ -58,6 +58,7 @@
         "Symfony\\Component\\Console\\Application",
         "Symfony\\Component\\Console\\Command\\Command",
         "Symfony\\Component\\Console\\Formatter\\OutputFormatter",
+        "Symfony\\Component\\Console\\Formatter\\OutputFormatterStyle",
         "Symfony\\Component\\Console\\Input\\InputInterface",
         "Symfony\\Component\\Console\\Input\\InputOption",
         "Symfony\\Component\\Console\\Output\\ConsoleOutputInterface",
