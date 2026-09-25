@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Every class and interface under `src/` is now marked `@internal`, except
+  `Lockrot\Composer\LockrotPlugin`, the class `composer.json` names in `extra.class` for Composer to
+  load; its one public method outside Composer's plugin interfaces, the install-time event handler,
+  is marked on its own. The PHP classes were never a public API — CONTRIBUTING and the README said so
+  in a sentence — but nothing in the code said it, so a project that built on them got no warning
+  from its IDE, or from PHPStan, which reports an `@internal` class used from another package, until
+  a release moved one. After 1.0 that line could not be drawn without breaking someone, so it is
+  drawn now, and a test fails on a class, interface or trait that arrives without the mark. The
+  namespace `Lockrot\Extension\` is reserved: nothing is declared in it, and reserving it promises
+  nothing about what, if anything, will be.
+
 ## [0.12.0] - 2026-09-24
 
 ### Changed

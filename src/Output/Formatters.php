@@ -7,7 +7,11 @@ namespace Lockrot\Output;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Html\PageData;
 
-/** Resolves a format name to its formatter. */
+/**
+ * Resolves a format name to its formatter.
+ *
+ * @internal
+ */
 final class Formatters
 {
     /**

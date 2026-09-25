@@ -20,6 +20,8 @@ use Lockrot\Lock\LockedPackage;
  * and UpdateOperation's target. Uninstall and the two alias-marker operations are skipped — a
  * package being removed, or an alias marker being flipped, cannot bring new dependency rot into the
  * project.
+ *
+ * @internal
  */
 final class TransactionPackages
 {

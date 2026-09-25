@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Data\Advisory;
 
+/** @internal */
 interface AdvisoryLoaderInterface
 {
     /**

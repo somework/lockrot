@@ -21,6 +21,8 @@ use Lockrot\Exception\ConfigException;
  * that one by hand (`lockrot.phar.asc` with the GPG key, or the attestation), and every self-update
  * after it is checked against the key that download carried. A rotated key reaches an old archive
  * the same way — by updating to a release signed with both.
+ *
+ * @internal
  */
 final class ReleaseSignatureVerifier implements SignatureVerifierInterface
 {

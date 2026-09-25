@@ -27,6 +27,8 @@ use Lockrot\Version;
  * pulls the payload out of the page gets a document that validates against the published report
  * schema. `details` is the `--explain` document for the packages worth explaining, minus the parts
  * the report already carries; the page draws the branch timeline out of it.
+ *
+ * @internal
  */
 final class ReportDocument
 {

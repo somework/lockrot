@@ -19,6 +19,8 @@ namespace Lockrot\Data\Forge;
  * once it has been exchanged for one, which Composer does on a 401 challenge lockrot never lets
  * through. The exchange is handed in as a callable and run at most once, the first time a
  * Bitbucket repository is asked about.
+ *
+ * @internal
  */
 final class ForgeAuth
 {

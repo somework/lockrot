@@ -10,6 +10,8 @@ namespace Lockrot\Exception;
  * lets escape: Composer prints its message and exits non-zero, so the operations never run.
  *
  * The message is built by the caller, because Composer shows it verbatim to the user.
+ *
+ * @internal
  */
 final class InstallBlockedException extends \RuntimeException
 {

@@ -13,6 +13,8 @@ use Lockrot\Verdict\Finding;
  * what every format prints; the facts are what `--explain` prints for one package, and they are
  * kept only when a caller asks for them ({@see Analyzer::analyzeWithFacts()}) — a report on its own
  * ({@see Analyzer::analyze()}) lets them go with the run.
+ *
+ * @internal
  */
 final class Analysis
 {

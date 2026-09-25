@@ -18,6 +18,8 @@ use Lockrot\Data\Php\PhpReleaseDates;
  * not install at all). Composer enforces only the second; the first is the maintainers' to keep,
  * and they are the ones reading the report. S8 holds the branch it names to both
  * ({@see \Lockrot\Signal\Rule\LeftBehindRule}).
+ *
+ * @internal
  */
 final class PhpFloor
 {

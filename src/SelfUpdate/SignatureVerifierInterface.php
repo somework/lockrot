@@ -6,6 +6,7 @@ namespace Lockrot\SelfUpdate;
 
 use Lockrot\Exception\ConfigException;
 
+/** @internal */
 interface SignatureVerifierInterface
 {
     /**

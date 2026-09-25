@@ -25,6 +25,8 @@ use Lockrot\Exception\ConfigException;
  * command reports on stderr and turns into exit 2. Releases before 0.6.0 carry no signature, so
  * `--force` cannot install one from a build that checks signatures; that is the one direction the
  * check closes on purpose.
+ *
+ * @internal
  */
 final class ReleaseLocator
 {

@@ -30,6 +30,8 @@ use Lockrot\Verdict\Finding;
  * where it names a verdict next to a finding. The command (`error`/`warning`/`notice`) is unchanged
  * by the priority: it comes from FormatContext::levelOf(), so the colour of an annotation keeps
  * matching the exit code.
+ *
+ * @internal
  */
 final class GithubFormatter implements FormatterInterface
 {

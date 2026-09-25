@@ -9,6 +9,7 @@ use Composer\Repository\PlatformRepository;
 use Composer\Semver\VersionParser;
 use Lockrot\Data\Forge\SupportSource;
 
+/** @internal */
 final class LockedPackage
 {
     private string $name;

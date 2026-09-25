@@ -11,6 +11,8 @@ namespace Lockrot\SelfUpdate;
  *
  * Built only by {@see ReleaseLocator}, which is where the validation lives; this is an immutable
  * carrier, not a parser.
+ *
+ * @internal
  */
 final class Release
 {

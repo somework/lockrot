@@ -7,6 +7,7 @@ namespace Lockrot\Graph;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 
+/** @internal */
 final class DependencyGraph
 {
     /** @var array<string, list<string>> package => list of packages it requires */

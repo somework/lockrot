@@ -25,6 +25,8 @@ use Lockrot\Verdict\Verdict;
  * nothing to the page that could run.
  *
  * What the page renders from is {@see ReportDocument}; this class only assembles.
+ *
+ * @internal
  */
 final class HtmlFormatter implements FormatterInterface
 {

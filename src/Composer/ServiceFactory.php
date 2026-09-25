@@ -32,7 +32,11 @@ use Lockrot\Deadline;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Verdict\VerdictEngine;
 
-/** Builds the analyzer and its HTTP stack from Composer's own IO, Config and repositories. */
+/**
+ * Builds the analyzer and its HTTP stack from Composer's own IO, Config and repositories.
+ *
+ * @internal
+ */
 final class ServiceFactory
 {
     /**

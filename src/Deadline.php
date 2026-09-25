@@ -10,6 +10,8 @@ namespace Lockrot;
  * Built on a monotonic clock rather than {@see Clock}/wall-clock time: a budget must not be
  * shortened or extended by a system-clock adjustment (NTP sync, DST) happening mid-run. `$now` is
  * injectable so a caller can drive it from a counter of its own.
+ *
+ * @internal
  */
 final class Deadline
 {

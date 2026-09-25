@@ -6,6 +6,7 @@ namespace Lockrot\Signal;
 
 use Lockrot\Exception\ConfigException;
 
+/** @internal */
 final class Thresholds
 {
     private int $releaseWarnYears;

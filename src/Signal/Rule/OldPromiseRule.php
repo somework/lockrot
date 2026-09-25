@@ -21,6 +21,8 @@ use Lockrot\Signal\SignalRule;
  * line — nothing older than PHP 8.4 was tested on 8.4, `^8.0` included, and that is not a promise
  * about a major the author never saw. On the weekly watch, 156 of the 178 `old-promise` verdicts
  * the minor line produced were releases of the PHP 8 era.
+ *
+ * @internal
  */
 final class OldPromiseRule implements SignalRule
 {

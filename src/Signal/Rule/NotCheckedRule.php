@@ -28,6 +28,8 @@ use Lockrot\Signal\SignalRule;
  * where the missing check could have changed one. A package the repository already marks abandoned
  * has nothing left for the activity round to add, and an allowlisted package answers `finished`
  * whatever its signals say, so {@see \Lockrot\Analyzer\Analyzer} leaves it off those.
+ *
+ * @internal
  */
 final class NotCheckedRule implements SignalRule
 {

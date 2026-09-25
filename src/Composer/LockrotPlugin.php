@@ -13,7 +13,13 @@ use Composer\Plugin\Capability\CommandProvider as CommandProviderCapability;
 use Composer\Plugin\Capable;
 use Composer\Plugin\PluginInterface;
 
-/** The Composer plugin entry point: registers the install-time listener and the `composer lockrot` command. */
+/**
+ * The Composer plugin entry point: registers the install-time listener and the `composer lockrot` command.
+ *
+ * The one class under src/ not marked `@internal`: composer.json names it in `extra.class` and
+ * Composer loads it by that name, so the name is public. What it can be asked is Composer's plugin
+ * interfaces; the one public method they do not declare is marked on its own.
+ */
 final class LockrotPlugin implements PluginInterface, Capable, EventSubscriberInterface
 {
     public function activate(Composer $composer, IOInterface $io): void
@@ -42,6 +48,11 @@ final class LockrotPlugin implements PluginInterface, Capable, EventSubscriberIn
         return [InstallerEvents::PRE_OPERATIONS_EXEC => 'onPreOperationsExec'];
     }
 
+    /**
+     * Composer calls this by the name getSubscribedEvents() gives it; no interface declares it.
+     *
+     * @internal
+     */
     public function onPreOperationsExec(InstallerEvent $event): void
     {
         (new InstallTimeSummary())->onPreOperationsExec($event);

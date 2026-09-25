@@ -6,7 +6,11 @@ namespace Lockrot\Data\Forge;
 
 use Lockrot\Data\Http\HttpResult;
 
-/** `GET /repos/{owner}/{repo}`: `archived` and `pushed_at` (the last push to any branch). */
+/**
+ * `GET /repos/{owner}/{repo}`: `archived` and `pushed_at` (the last push to any branch).
+ *
+ * @internal
+ */
 final class GitHubApi implements ForgeApi
 {
     public const DEFAULT_API_BASE = 'https://api.github.com/repos/';

@@ -40,6 +40,8 @@ use Lockrot\Output\InstallSummaryFormatter;
  * from an existing lock, which starts cold, is bounded by
  * {@see LockrotConfig::installTimeBudgetSeconds()} ({@see LockrotConfig::DEFAULT_INSTALL_TIME_BUDGET}
  * seconds unless the project sets `extra.lockrot.install-time-budget`).
+ *
+ * @internal
  */
 final class InstallTimeSummary
 {

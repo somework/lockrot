@@ -22,6 +22,8 @@ namespace Lockrot\SelfUpdate;
  * The file being checked is a copy of an archive whose alias may already be mapped by the running
  * PHAR. That is not a conflict: PHP only rejects a duplicate alias when it is being registered, not
  * when an archive is opened for reading.
+ *
+ * @internal
  */
 final class PharValidator implements PharValidatorInterface
 {

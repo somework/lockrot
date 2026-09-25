@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace Lockrot;
 
-/** The single place lockrot's own release number is written down. */
+/**
+ * The single place lockrot's own release number is written down.
+ *
+ * @internal
+ */
 final class Version
 {
     public const STRING = '0.12.0';

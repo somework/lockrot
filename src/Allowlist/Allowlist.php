@@ -7,6 +7,7 @@ namespace Lockrot\Allowlist;
 use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Lock\LockedPackage;
 
+/** @internal */
 final class Allowlist
 {
     public const DEFAULT_FINISHED_TYPES = ['metapackage', 'symfony-pack'];

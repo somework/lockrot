@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Verdict;
 
+/** @internal */
 final class Verdict
 {
     public const ABANDONED = 'abandoned';

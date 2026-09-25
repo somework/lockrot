@@ -22,6 +22,8 @@ use Symfony\Component\Console\Formatter\OutputFormatter;
  * {@see OutputFormatter::escape()} before it is written, so a `<` in a constraint, a package name
  * or a note can never be read as a console tag. Styles use explicit closing tags rather than `</>`
  * because the colour table, not the shorthand, is what symfony/console 2.8 and 5.4 agree on.
+ *
+ * @internal
  */
 final class TableFormatter implements FormatterInterface
 {

@@ -38,6 +38,8 @@ use Lockrot\Verdict\Finding;
  * the plain ">" the annotation formats use, and names the other direct requirements the package is
  * reachable from (`, also via …`). The `pulled in by:` line under the table sums that up per direct
  * requirement — see Report::exposureSummaryLine().
+ *
+ * @internal
  */
 final class MarkdownFormatter implements FormatterInterface
 {

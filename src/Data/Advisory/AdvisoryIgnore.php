@@ -19,6 +19,8 @@ use Composer\Policy\PolicyConfig;
  * reads, flattened as audit flattens them: per-operation flags and reasons are resolved there, and
  * a per-package version constraint is dropped there too, so an entry ignores the package whole on
  * both sides. Older versions had one flat list under `config.audit.ignore`, read directly.
+ *
+ * @internal
  */
 final class AdvisoryIgnore
 {

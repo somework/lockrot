@@ -6,7 +6,11 @@ namespace Lockrot\Data\Forge;
 
 use Lockrot\Data\Http\HttpResult;
 
-/** One forge's REST API: which URLs answer for a repository, and how to read the answers. */
+/**
+ * One forge's REST API: which URLs answer for a repository, and how to read the answers.
+ *
+ * @internal
+ */
 interface ForgeApi
 {
     /**

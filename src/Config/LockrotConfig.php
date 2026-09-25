@@ -9,6 +9,7 @@ use Lockrot\Exception\ConfigException;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Verdict\FailOn;
 
+/** @internal */
 final class LockrotConfig
 {
     public const FAIL_ON_NONE = FailOn::NONE;

@@ -8,6 +8,7 @@ use Composer\Package\Loader\ValidatingArrayLoader;
 use Lockrot\Data\Repository\ReleaseBranch;
 use Lockrot\Signal\Signal;
 
+/** @internal */
 final class Finding
 {
     /**
