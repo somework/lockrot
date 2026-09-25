@@ -6,6 +6,7 @@ namespace Lockrot\Output;
 
 use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Config\LockrotConfig;
+use Lockrot\Filesystem\Path;
 use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
@@ -15,9 +16,9 @@ use Lockrot\Version;
  * Everything a formatter needs about the run itself rather than about the report: which file was
  * analysed, which verdict the run would fail on, and which lockrot produced it.
  *
- * `json` ignores it; `github` and `sarif` need it to point their annotations at composer.lock and
- * to decide which findings are reported as errors rather than warnings; `table` needs the width of
- * the terminal it is about to be printed on.
+ * `json` ignores it; `github`, `gitlab` and `sarif` need it to point their annotations at the lock
+ * the run analysed ({@see lockName()}) and to decide which findings are reported as errors rather
+ * than warnings; `table` needs the width of the terminal it is about to be printed on.
  *
  * @internal
  */
@@ -37,38 +38,76 @@ final class FormatContext
      */
     public const MIN_WIDTH = 40;
 
+    /** The name every lock has unless `COMPOSER` names another manifest. */
+    public const DEFAULT_LOCK_NAME = 'composer.lock';
+
     private ?string $lockPath;
+    private string $lockName;
+    private ?string $lockDirectory;
     private FailOn $failOn;
     private string $toolVersion;
     private int $terminalWidth;
 
-    private function __construct(?string $lockPath, string $failOn, string $toolVersion, int $terminalWidth)
+    private function __construct(?string $lockPath, string $failOn, string $toolVersion, int $terminalWidth, ?string $projectDirectory)
     {
         $this->lockPath = $lockPath;
+        $this->lockName = self::DEFAULT_LOCK_NAME;
+        $this->lockDirectory = null;
+        if ($lockPath !== null) {
+            $relative = $projectDirectory === null ? null : self::relativePath($lockPath, $projectDirectory);
+            $this->lockName = $relative ?? basename($lockPath);
+            $this->lockDirectory = $relative === null ? \dirname($lockPath) : $projectDirectory;
+        }
         $this->failOn = FailOn::fromString($failOn);
         $this->toolVersion = $toolVersion;
         $this->terminalWidth = max(self::MIN_WIDTH, $terminalWidth);
     }
 
     /**
-     * @param null|string $lockPath      absolute path of the analysed composer.lock, null when unknown
-     * @param string      $failOn        the resolved fail-on — a verdict, a priority or LockrotConfig::FAIL_ON_NONE
-     * @param int         $terminalWidth columns available for `table`, clamped to MIN_WIDTH
+     * @param null|string $lockPath         absolute path of the analysed lock, null when unknown
+     * @param string      $failOn           the resolved fail-on — a verdict, a priority or LockrotConfig::FAIL_ON_NONE
+     * @param int         $terminalWidth    columns available for `table`, clamped to MIN_WIDTH
+     * @param null|string $projectDirectory absolute path of the directory lockrot runs in, which the
+     *                                      annotation formats name the lock relative to; null when unknown
      */
-    public static function create(?string $lockPath, string $failOn, string $toolVersion = Version::STRING, int $terminalWidth = self::DEFAULT_WIDTH): self
+    public static function create(?string $lockPath, string $failOn, string $toolVersion = Version::STRING, int $terminalWidth = self::DEFAULT_WIDTH, ?string $projectDirectory = null): self
     {
-        return new self($lockPath, $failOn, $toolVersion, $terminalWidth);
+        return new self($lockPath, $failOn, $toolVersion, $terminalWidth, $projectDirectory);
     }
 
     /** The context for a run with nothing to say: no lock path, no fail-on threshold, default width. */
     public static function unknown(): self
     {
-        return new self(null, LockrotConfig::FAIL_ON_NONE, Version::STRING, self::DEFAULT_WIDTH);
+        return new self(null, LockrotConfig::FAIL_ON_NONE, Version::STRING, self::DEFAULT_WIDTH, null);
     }
 
     public function lockPath(): ?string
     {
         return $this->lockPath;
+    }
+
+    /**
+     * The analysed lock as an annotation names it: its path relative to the project directory, with
+     * `/` between segments — `composer.lock` by default, `alt.lock` under `COMPOSER=alt.json`,
+     * `app/alt.lock` under `COMPOSER=app/alt.json`. GitHub and GitLab resolve that against the
+     * checkout, and an absolute path from the runner's filesystem would match no file in the diff.
+     *
+     * A lock outside the project directory (an absolute `COMPOSER` elsewhere), or a context that
+     * knows no project directory, gives the lock's file name alone, relative to its own directory;
+     * no lock at all gives `composer.lock`.
+     */
+    public function lockName(): string
+    {
+        return $this->lockName;
+    }
+
+    /**
+     * The directory {@see lockName()} is relative to, spelled as it was given: the project directory,
+     * or the lock's own when it lies outside that. Null when no lock is known.
+     */
+    public function lockDirectory(): ?string
+    {
+        return $this->lockDirectory;
     }
 
     public function failOn(): string
@@ -118,5 +157,18 @@ final class FormatContext
         }
 
         return Verdict::flagged($finding->verdict()) ? self::LEVEL_WARNING : self::LEVEL_NOTE;
+    }
+
+    /**
+     * $lockPath below $directory, both folded by spelling ({@see Path::normalize()}), or null when it
+     * is not below it. Only the spelling is compared: two spellings of one directory through a
+     * symlink read as unrelated, which gives the file name alone rather than a wrong path.
+     */
+    private static function relativePath(string $lockPath, string $directory): ?string
+    {
+        $root = rtrim(Path::normalize($directory), '/').'/';
+        $lock = Path::normalize($lockPath);
+
+        return strpos($lock, $root) === 0 ? (string) substr($lock, \strlen($root)) : null;
     }
 }

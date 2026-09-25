@@ -16,6 +16,7 @@ use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
 use Lockrot\Version;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class FormatContextTest extends TestCase
@@ -156,6 +157,49 @@ final class FormatContextTest extends TestCase
         self::assertSame(LockrotConfig::FAIL_ON_NONE, $context->failOn());
         self::assertSame(Version::STRING, $context->toolVersion());
         self::assertSame(FormatContext::DEFAULT_WIDTH, $context->terminalWidth());
+    }
+
+    /**
+     * Lock path, project directory, the name, the directory the name is relative to.
+     *
+     * @return iterable<string, array{0: null|string, 1: null|string, 2: string, 3: null|string}>
+     */
+    public static function lockNames(): iterable
+    {
+        yield 'no lock at all: the name every lock has by default' => [null, '/p', 'composer.lock', null];
+        yield 'the default lock in the project directory' => ['/p/composer.lock', '/p', 'composer.lock', '/p'];
+        yield 'COMPOSER=alt.json' => ['/p/alt.lock', '/p', 'alt.lock', '/p'];
+        yield 'COMPOSER=app/alt.json: the directory stays in the name' => ['/p/app/alt.lock', '/p', 'app/alt.lock', '/p'];
+        yield 'a project directory spelled with a trailing separator' => ['/p/app/alt.lock', '/p/', 'app/alt.lock', '/p/'];
+        yield 'the filesystem root as the project directory' => ['/alt.lock', '/', 'alt.lock', '/'];
+        yield 'dot segments fold before the comparison' => ['/p/app/../alt.lock', '/p', 'alt.lock', '/p'];
+        yield 'Windows separators' => ['C:\\p\\app\\alt.lock', 'C:\\p', 'app/alt.lock', 'C:\\p'];
+        yield 'a lock outside the project directory: its file name, beside it' => ['/elsewhere/alt.lock', '/p', 'alt.lock', '/elsewhere'];
+        yield 'a sibling directory sharing the prefix is outside' => ['/project-b/alt.lock', '/project', 'alt.lock', '/project-b'];
+        yield 'no project directory: the file name, beside it' => ['/p/app/alt.lock', null, 'alt.lock', '/p/app'];
+    }
+
+    /**
+     * The annotation formats name the analysed lock the way the checkout does — relative to the
+     * project directory — so `COMPOSER=alt.json` annotates alt.lock and the default stays
+     * `composer.lock`.
+     *
+     * @dataProvider lockNames
+     */
+    #[DataProvider('lockNames')]
+    public function testTheLockIsNamedRelativeToTheProjectDirectory(?string $lockPath, ?string $projectDirectory, string $name, ?string $directory): void
+    {
+        $context = FormatContext::create($lockPath, LockrotConfig::FAIL_ON_NONE, Version::STRING, FormatContext::DEFAULT_WIDTH, $projectDirectory);
+
+        self::assertSame($name, $context->lockName());
+        self::assertSame($directory, $context->lockDirectory());
+        self::assertSame($lockPath, $context->lockPath(), 'the path the line index reads is untouched');
+    }
+
+    public function testTheUnknownContextNamesTheDefaultLock(): void
+    {
+        self::assertSame('composer.lock', FormatContext::unknown()->lockName());
+        self::assertNull(FormatContext::unknown()->lockDirectory());
     }
 
     public function testTheTerminalWidthDefaultsToOneHundredAndTwenty(): void

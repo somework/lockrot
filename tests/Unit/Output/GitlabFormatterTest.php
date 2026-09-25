@@ -17,6 +17,7 @@ use Lockrot\Signal\Signal;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
+use Lockrot\Version;
 use PHPUnit\Framework\TestCase;
 
 final class GitlabFormatterTest extends TestCase
@@ -29,8 +30,9 @@ final class GitlabFormatterTest extends TestCase
     protected function tearDown(): void
     {
         foreach ($this->tempDirs as $dir) {
-            if (is_file($dir.'/composer.lock')) {
-                unlink($dir.'/composer.lock');
+            // scandir(), not glob(): a directory name here may hold a backslash, which glob() reads as an escape.
+            foreach (is_dir($dir) ? array_diff((array) scandir($dir), ['.', '..']) : [] as $file) {
+                unlink($dir.'/'.$file);
             }
             if (is_dir($dir)) {
                 rmdir($dir);
@@ -40,14 +42,14 @@ final class GitlabFormatterTest extends TestCase
     }
 
     /** acme/abandoned is on line 4 of the lock written here, acme/silent on line 8. */
-    private function lockPath(): string
+    private function lockPath(string $name = 'composer.lock'): string
     {
         $dir = sys_get_temp_dir().'/lockrot-gitlab-'.uniqid('', true);
         if (!mkdir($dir, 0777, true) && !is_dir($dir)) {
             throw new \RuntimeException('cannot create temp dir: '.$dir);
         }
         $this->tempDirs[] = $dir;
-        file_put_contents($dir.'/composer.lock', <<<'JSON'
+        file_put_contents($dir.'/'.$name, <<<'JSON'
             {
                 "packages": [
                     {
@@ -63,7 +65,7 @@ final class GitlabFormatterTest extends TestCase
             }
             JSON);
 
-        return $dir.'/composer.lock';
+        return $dir.'/'.$name;
     }
 
     private function report(): Report
@@ -205,6 +207,43 @@ final class GitlabFormatterTest extends TestCase
         self::assertSame(8, JsonPath::intAt($second[0], ['location', 'lines', 'begin']));
         self::assertNotSame($first[0]['description'], $second[0]['description'], 'the version really did change');
         self::assertSame($first[0]['fingerprint'], $second[0]['fingerprint']);
+    }
+
+    private function inProject(string $failOn, string $lockPath, string $projectDirectory): GitlabFormatter
+    {
+        return new GitlabFormatter(FormatContext::create($lockPath, $failOn, Version::STRING, FormatContext::DEFAULT_WIDTH, $projectDirectory));
+    }
+
+    /**
+     * Under `COMPOSER=alt.json` the analysed lock is alt.lock: `location.path` is the lock's path
+     * relative to the project directory, so GitLab marks the file the merge request changes. The
+     * fingerprint does not move with it — a changed identity would make every finding look new.
+     */
+    public function testTheLocationNamesTheAnalysedLockAndTheFingerprintStays(): void
+    {
+        $lockPath = $this->lockPath('alt.lock');
+
+        $issues = $this->decode($this->inProject(Verdict::SILENT, $lockPath, \dirname($lockPath, 2))->format($this->report()));
+        $default = $this->decode($this->formatter(Verdict::SILENT, $this->lockPath())->format($this->report()));
+
+        self::assertSame(
+            array_fill(0, 3, basename(\dirname($lockPath)).'/alt.lock'),
+            array_map(static fn (array $issue): string => JsonPath::stringAt($issue, ['location', 'path']), $issues)
+        );
+        self::assertSame(4, JsonPath::intAt($issues[0], ['location', 'lines', 'begin']));
+        self::assertSame(array_column($default, 'fingerprint'), array_column($issues, 'fingerprint'));
+        self::assertSame(hash('sha256', 'lockrot|acme/abandoned|abandoned'), $issues[0]['fingerprint']);
+    }
+
+    /** The default lock in the project directory produces exactly the report it always did. */
+    public function testTheDefaultLockKeepsTheReportByteForByte(): void
+    {
+        $lockPath = $this->lockPath();
+
+        $out = $this->inProject(Verdict::SILENT, $lockPath, \dirname($lockPath))->format($this->report(), true);
+
+        self::assertSame($this->formatter(Verdict::SILENT, $lockPath)->format($this->report(), true), $out);
+        self::assertStringContainsString('"path": "composer.lock"', $out);
     }
 
     public function testTheBaselineStaleNoteIsNotRepresentableAndIsDropped(): void

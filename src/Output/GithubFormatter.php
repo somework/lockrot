@@ -11,7 +11,7 @@ use Lockrot\Verdict\Finding;
 
 /**
  * GitHub Actions workflow commands, one annotation per finding, so a `composer lockrot` step
- * annotates composer.lock on the pull request instead of only writing to the job log.
+ * annotates the lock on the pull request instead of only writing to the job log.
  *
  * Command syntax — `::error file={name},line={line},title={title}::{message}`, and the same shape
  * for `::warning` and `::notice` — is documented at
@@ -23,8 +23,10 @@ use Lockrot\Verdict\Finding;
  * (`%` → `%25`, CR → `%0D`, LF → `%0A`) and property values through `escapeProperty()`, which adds
  * `:` → `%3A` and `,` → `%2C` because both are command-syntax separators.
  *
- * `file=` is always the literal `composer.lock`: annotations are resolved against the checkout
- * root, so an absolute path from the runner's filesystem would not match a file in the diff.
+ * `file=` is the analysed lock's path relative to the project directory
+ * ({@see FormatContext::lockName()}) — `composer.lock`, or `alt.lock` under `COMPOSER=alt.json`:
+ * annotations are resolved against the checkout root, so an absolute path from the runner's
+ * filesystem would not match a file in the diff.
  *
  * The title carries `lockrot: <verdict> (<priority>)` — the same phrase every other format uses
  * where it names a verdict next to a finding. The command (`error`/`warning`/`notice`) is unchanged
@@ -88,7 +90,7 @@ final class GithubFormatter implements FormatterInterface
 
     private function annotation(Finding $finding, ?int $line, ?BaselineComparison $baseline): string
     {
-        $properties = ['file=composer.lock'];
+        $properties = ['file='.self::escapeProperty($this->context->lockName())];
         if ($line !== null) {
             $properties[] = 'line='.$line;
         }

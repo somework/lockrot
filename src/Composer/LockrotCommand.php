@@ -267,10 +267,15 @@ final class LockrotCommand extends BaseCommand
                 ? null
                 : new PageData($analysis, $lockrot->thresholds(), $lockrot->targetPhp());
             $showAll = $input->getOption('all') === true;
+            // The annotation formats name the lock relative to the directory lockrot runs in, as the
+            // checkout does: alt.lock under COMPOSER=alt.json, and composer.lock as ever without it.
+            // A file has no terminal, so a table in one is rendered at the default width whatever
+            // this run's terminal is: the same file on a laptop and on a CI runner.
+            $fileContext = FormatContext::create($lockPath, $lockrot->failOn(), Version::STRING, FormatContext::DEFAULT_WIDTH, $cwd);
 
             if ($generate) {
                 // Before the baseline, so an exit 2 from a report never follows a replaced baseline.
-                $this->writeReports($output, $targets, $report, $lockPath, $lockrot, $page, $showAll);
+                $this->writeReports($output, $targets, $report, $fileContext, $page, $showAll);
 
                 return $this->generateBaseline($output, $baselineFile, $report, $existingBaseline, $lockrot);
             }
@@ -286,7 +291,7 @@ final class LockrotCommand extends BaseCommand
             // The annotation formats point back at the lock they were computed from; an unreadable
             // one throws ConfigException from here, which the catch below turns into exit 2 the
             // same way an unreadable lock does a few lines up.
-            $context = FormatContext::create($lockPath, $lockrot->failOn(), Version::STRING, TerminalWidth::detect($env, $this->getApplication()));
+            $context = FormatContext::create($lockPath, $lockrot->failOn(), Version::STRING, TerminalWidth::detect($env, $this->getApplication()), $cwd);
             // Only the format that carries console markup goes through the tag formatter; every
             // machine-readable one is written raw, so a `<` in a constraint or a package name reaches
             // the parser on the other end untouched.
@@ -296,7 +301,7 @@ final class LockrotCommand extends BaseCommand
                 Formatters::carriesConsoleMarkup($format) ? OutputInterface::OUTPUT_NORMAL : OutputInterface::OUTPUT_RAW
             );
             // After stdout, so the report is in the log even when a file cannot be written.
-            $this->writeReports($output, $targets, $report, $lockPath, $lockrot, $page, $showAll);
+            $this->writeReports($output, $targets, $report, $fileContext, $page, $showAll);
 
             return Policy::exitCode($report, $lockrot);
         } catch (ConfigException $e) {
@@ -402,17 +407,12 @@ final class LockrotCommand extends BaseCommand
         return Policy::strictNetworkTripped($report, $lockrot) ? Policy::EXIT_FINDINGS : Policy::EXIT_OK;
     }
 
-    /**
-     * The `--output` files, each followed by one line on stderr naming it, as the baseline's is.
-     *
-     * A file has no terminal, so a table in one is rendered at the default width whatever this
-     * run's terminal is: the same file on a laptop and on a CI runner.
-     */
-    private function writeReports(OutputInterface $output, ReportTargets $targets, Report $report, string $lockPath, LockrotConfig $lockrot, ?PageData $page, bool $showAll): void
+    /** The `--output` files, each followed by one line on stderr naming it, as the baseline's is. */
+    private function writeReports(OutputInterface $output, ReportTargets $targets, Report $report, FormatContext $context, ?PageData $page, bool $showAll): void
     {
         $targets->write(
             $report,
-            FormatContext::create($lockPath, $lockrot->failOn()),
+            $context,
             $page,
             $showAll,
             function (ReportTarget $target) use ($output): void {

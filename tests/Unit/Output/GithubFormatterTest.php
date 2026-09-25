@@ -17,6 +17,7 @@ use Lockrot\Output\TableFormatter;
 use Lockrot\Signal\Signal;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
+use Lockrot\Version;
 use PHPUnit\Framework\TestCase;
 
 final class GithubFormatterTest extends TestCase
@@ -29,8 +30,9 @@ final class GithubFormatterTest extends TestCase
     protected function tearDown(): void
     {
         foreach ($this->tempDirs as $dir) {
-            if (is_file($dir.'/composer.lock')) {
-                unlink($dir.'/composer.lock');
+            // scandir(), not glob(): a directory name here may hold a backslash, which glob() reads as an escape.
+            foreach (is_dir($dir) ? array_diff((array) scandir($dir), ['.', '..']) : [] as $file) {
+                unlink($dir.'/'.$file);
             }
             if (is_dir($dir)) {
                 rmdir($dir);
@@ -43,14 +45,14 @@ final class GithubFormatterTest extends TestCase
      * A two-package lock whose line numbers are fixed by the literal below: acme/abandoned is on
      * line 4, acme/silent on line 8.
      */
-    private function lockPath(): string
+    private function lockPath(string $name = 'composer.lock'): string
     {
         $dir = sys_get_temp_dir().'/lockrot-github-'.uniqid('', true);
         if (!mkdir($dir, 0777, true) && !is_dir($dir)) {
             throw new \RuntimeException('cannot create temp dir: '.$dir);
         }
         $this->tempDirs[] = $dir;
-        file_put_contents($dir.'/composer.lock', <<<'JSON'
+        file_put_contents($dir.'/'.$name, <<<'JSON'
             {
                 "packages": [
                     {
@@ -66,7 +68,7 @@ final class GithubFormatterTest extends TestCase
             }
             JSON);
 
-        return $dir.'/composer.lock';
+        return $dir.'/'.$name;
     }
 
     private function report(): Report
@@ -209,6 +211,49 @@ final class GithubFormatterTest extends TestCase
         $out = $this->formatter(Verdict::SILENT, null)->format($this->report());
         self::assertStringNotContainsString('line=', $out);
         self::assertStringContainsString('file=composer.lock,title=lockrot%3A abandoned (critical)::', $out);
+    }
+
+    private function inProject(string $failOn, string $lockPath, string $projectDirectory): GithubFormatter
+    {
+        return new GithubFormatter(FormatContext::create($lockPath, $failOn, Version::STRING, FormatContext::DEFAULT_WIDTH, $projectDirectory));
+    }
+
+    /**
+     * Under `COMPOSER=alt.json` the analysed lock is alt.lock, and an annotation on composer.lock
+     * pointed at a file the run never read. `file=` is the lock's path relative to the project
+     * directory, the subdirectory `COMPOSER=app/alt.json` puts it in included.
+     */
+    public function testTheAnnotationNamesTheAnalysedLockRelativeToTheProjectDirectory(): void
+    {
+        $lockPath = $this->lockPath('alt.lock');
+        $name = basename(\dirname($lockPath)).'/alt.lock';
+
+        $lines = explode("\n", trim($this->inProject(Verdict::SILENT, $lockPath, \dirname($lockPath, 2))->format($this->report(), true)));
+
+        self::assertSame('::error file='.$name.',line=4,title=lockrot%3A abandoned (critical)::acme/abandoned 1.0.0: marked abandoned by its repository', $lines[0]);
+        self::assertSame('::error file='.$name.',line=8,title=lockrot%3A silent (high)::acme/silent 2.0.8: last release 2015-11-16 (10.8 years ago) (via a/parent)', $lines[1]);
+        self::assertSame('::warning file='.$name.',title=lockrot%3A stale (medium)::acme/absent 3.0.0: last release 2022-05-20 (4.3 years ago)', $lines[2]);
+    }
+
+    /** The default lock in the project directory annotates exactly what it always did. */
+    public function testTheDefaultLockKeepsEveryAnnotationByteForByte(): void
+    {
+        $lockPath = $this->lockPath();
+
+        $out = $this->inProject(Verdict::SILENT, $lockPath, \dirname($lockPath))->format($this->report(), true);
+
+        self::assertSame($this->formatter(Verdict::SILENT, $lockPath)->format($this->report(), true), $out);
+        self::assertStringStartsWith('::error file=composer.lock,line=4,title=', $out);
+    }
+
+    /** A lock name is a property value: a `,` or `:` in it would end the property or the command. */
+    public function testTheLockNameIsEscapedAsAProperty(): void
+    {
+        $lockPath = $this->lockPath('a,b%c.lock');
+
+        $out = $this->inProject(Verdict::SILENT, $lockPath, \dirname($lockPath))->format($this->report());
+
+        self::assertStringStartsWith('::error file=a%2Cb%25c.lock,line=4,title=', $out);
     }
 
     public function testWordingAvoidsBannedTerms(): void

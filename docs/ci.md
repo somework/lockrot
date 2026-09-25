@@ -75,7 +75,8 @@ error box or Symfony's message rather than a `lockrot:` line. `lockrot.phar
 self-update` uses the same three codes with its own meanings; see [phar.md](phar.md#self-update-exit-codes).
 
 Like Composer, lockrot reads the manifest the `COMPOSER` environment variable names: `COMPOSER=alt.json composer
-lockrot` reads `alt.json` and `alt.lock`, and the default baseline sits next to `alt.json`.
+lockrot` reads `alt.json` and `alt.lock`, the default baseline sits next to `alt.json`, and the `github`, `sarif` and
+`gitlab` formats below point at `alt.lock`.
 
 With `LOCKROT_DISABLE=1` the analysis skips all of this: it reads nothing — not the command line, `composer.json`,
 `extra.lockrot` or the lock — prints `lockrot disabled via LOCKROT_DISABLE` on stderr and exits `0`. It does not
@@ -185,8 +186,12 @@ steps:
 [priority](verdicts.md) as `rank`, the field SARIF 2.1.0 defines for it, and the same result's `properties` carry,
 among others, `priority`, `direct`, `dev`, `chain` and `direct_dependents` — every direct requirement the package is
 reachable from, see [transitive exposure](verdicts.md#transitive-exposure). The rule a result points at follows the
-verdict; its `level` follows `--fail-on`, whichever kind of threshold it names. Both `github` and `sarif` point at `composer.lock` in the checkout root, so run them from
-the directory that holds the lock file.
+verdict; its `level` follows `--fail-on`, whichever kind of threshold it names.
+
+`github`, `sarif` and `gitlab` name the lock the run analysed by its path relative to the project directory:
+`composer.lock`, `alt.lock` under `COMPOSER=alt.json`, `app/alt.lock` under `COMPOSER=app/alt.json`. GitHub and
+GitLab resolve that path against the checkout root, so run them from the checkout root (or pass `-d` to it). A lock
+outside the project directory is named by its file name alone.
 
 ## `--format=gitlab`
 

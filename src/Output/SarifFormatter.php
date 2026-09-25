@@ -17,7 +17,7 @@ use Lockrot\Verdict\Verdict;
  * Security tab and on the pull request.
  *
  * One run, one rule per verdict actually present in the report, one result per finding, each
- * located on the `"name"` line of the package's composer.lock entry. `results` keeps the report's
+ * located on the `"name"` line of the package's entry in the analysed lock. `results` keeps the report's
  * own priority-then-severity-then-name order so two runs over the same lock produce byte-identical
  * output.
  *
@@ -26,6 +26,10 @@ use Lockrot\Verdict\Verdict;
  * and `properties.dev`, the two facts it is derived from. `ruleId` stays on the verdict; `level`
  * follows the run's fail-on threshold ({@see FormatContext::levelOf()}), whichever kind it names.
  *
+ * The location's `uri` is the lock's path relative to the project directory
+ * ({@see FormatContext::lockName()}) — `composer.lock`, or `alt.lock` under `COMPOSER=alt.json` — and
+ * `%SRCROOT%` is that directory, so the two resolve to the file the run read.
+ *
  * @internal
  */
 final class SarifFormatter implements FormatterInterface
@@ -33,7 +37,6 @@ final class SarifFormatter implements FormatterInterface
     private const SCHEMA_URI = 'https://json.schemastore.org/sarif-2.1.0.json';
     private const INFORMATION_URI = 'https://github.com/somework/lockrot';
     private const HELP_URI = 'https://lockrot.dev/verdicts/';
-    private const ARTIFACT_URI = 'composer.lock';
     private const URI_BASE_ID = '%SRCROOT%';
 
     /**
@@ -122,8 +125,9 @@ final class SarifFormatter implements FormatterInterface
             ]],
             'columnKind' => 'utf16CodeUnits',
         ];
-        if ($lockPath !== null) {
-            $run['originalUriBaseIds'] = [self::URI_BASE_ID => ['uri' => self::directoryUri($lockPath)]];
+        $lockDirectory = $this->context->lockDirectory();
+        if ($lockDirectory !== null) {
+            $run['originalUriBaseIds'] = [self::URI_BASE_ID => ['uri' => self::directoryUri($lockDirectory)]];
         }
         $run['results'] = $results;
         $run['invocations'] = [$this->invocation($report)];
@@ -151,8 +155,8 @@ final class SarifFormatter implements FormatterInterface
     /** @return array<string, mixed> */
     private function result(Finding $finding, int $ruleIndex, ?int $line, ?BaselineComparison $baseline): array
     {
-        $artifactLocation = ['uri' => self::ARTIFACT_URI];
-        if ($this->context->lockPath() !== null) {
+        $artifactLocation = ['uri' => self::relativeUri($this->context->lockName())];
+        if ($this->context->lockDirectory() !== null) {
             $artifactLocation['uriBaseId'] = self::URI_BASE_ID;
         }
         $physicalLocation = ['artifactLocation' => $artifactLocation];
@@ -234,22 +238,32 @@ final class SarifFormatter implements FormatterInterface
     }
 
     /**
-     * The `originalUriBaseIds` entry for %SRCROOT%: an absolute file URI for the directory the lock
-     * was read from, with the trailing slash SARIF 2.1.0 §3.4.4 requires of a directory URI.
+     * The `originalUriBaseIds` entry for %SRCROOT%: an absolute file URI for the directory the lock's
+     * name is relative to, with the trailing slash SARIF 2.1.0 §3.4.4 requires of a directory URI.
      *
      * Each path segment is percent-encoded on its own so the separators survive: a checkout
      * directory may legally hold a space, `#`, `?` or non-ASCII, none of which a URI can carry raw.
      */
-    private static function directoryUri(string $lockPath): string
+    private static function directoryUri(string $directory): string
     {
         $segments = [];
-        foreach (explode('/', trim(str_replace('\\', '/', \dirname($lockPath)), '/')) as $segment) {
+        foreach (explode('/', trim(str_replace('\\', '/', $directory), '/')) as $segment) {
             // rawurlencode() also escapes ":", which RFC 3986 allows unescaped inside a path segment
             // and which a Windows drive letter needs — file:///C:/project/, not file:///C%3A/project/.
             $segments[] = str_replace('%3A', ':', rawurlencode($segment));
         }
 
         return 'file:///'.implode('/', $segments).'/';
+    }
+
+    /**
+     * The lock's `/`-separated relative name as a relative URI reference, each segment
+     * percent-encoded on its own. Unlike in {@see directoryUri()}, `:` is escaped too: in the first
+     * segment of a relative reference it would read as the end of a URI scheme (RFC 3986 §4.2).
+     */
+    private static function relativeUri(string $name): string
+    {
+        return implode('/', array_map('rawurlencode', explode('/', $name)));
     }
 
     /** @param array<string, mixed> $document */

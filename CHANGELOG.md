@@ -240,6 +240,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `composer.lock` from the working directory whatever `COMPOSER` said. The install-time summary already did. A
   missing lock is reported under its own name.
 
+- With `COMPOSER=alt.json`, `--format=github` (`file=`), `--format=gitlab` (`location.path`) and
+  `--format=sarif` (each result's `artifactLocation.uri`) still named the literal `composer.lock`,
+  so every annotation pointed at a file the run had not analysed — or at none — while its line
+  number came from `alt.lock`. They now name the analysed lock by its path relative to the project
+  directory, which is how GitHub and GitLab resolve it against the checkout: `alt.lock`, or
+  `app/alt.lock` under `COMPOSER=app/alt.json`, with SARIF's `%SRCROOT%` set to that directory. The
+  same goes for `--output` files. Without `COMPOSER` the output is byte for byte what it was,
+  `composer.lock` included. The GitLab fingerprint and the SARIF partial fingerprint never involved
+  the path and are unchanged, so no finding a merge request already tracks reappears as new. The
+  JSON report's `run.lock_file` already named the analysed lock and is unchanged.
+
 - `LOCKROT_DISABLE=1` skips `composer lockrot` entirely, as documented: it is checked before the command line,
   `composer.json`, `extra.lockrot` or an option value is read, where a broken configuration or a bad option used to
   exit `2` under it.

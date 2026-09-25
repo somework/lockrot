@@ -2382,6 +2382,79 @@ final class LockrotCommandTest extends TestCase
         });
     }
 
+    /**
+     * The path each annotation format points at, read from the document it printed.
+     *
+     * @return list<string>
+     */
+    private static function annotatedPaths(string $format, string $out): array
+    {
+        if ($format === 'github') {
+            preg_match_all('{^::(?:error|warning|notice) file=([^,]*),}m', $out, $matches);
+
+            return $matches[1];
+        }
+        $document = json_decode($out, true);
+        self::assertIsArray($document);
+        if ($format === 'gitlab') {
+            return array_map(static fn (int $i): string => JsonPath::stringAt($document, [$i, 'location', 'path']), array_keys($document));
+        }
+
+        return array_map(
+            static fn (int $i): string => JsonPath::stringAt($document, ['runs', 0, 'results', $i, 'locations', 0, 'physicalLocation', 'artifactLocation', 'uri']),
+            array_keys(JsonPath::arrayAt($document, ['runs', 0, 'results']))
+        );
+    }
+
+    /** @return iterable<string, array{0: string, 1: string, 2: string}> COMPOSER, format, the path the annotations name */
+    public static function annotationsUnderComposer(): iterable
+    {
+        foreach (['github', 'gitlab', 'sarif'] as $format) {
+            yield $format.' under COMPOSER=alt.json' => ['alt.json', $format, 'alt.lock'];
+            yield $format.' under COMPOSER=app/alt.json' => ['app/alt.json', $format, 'app/alt.lock'];
+        }
+    }
+
+    /**
+     * The annotation formats point at the lock the run analysed. They used to name composer.lock
+     * whatever COMPOSER said — here a file that does not even exist — while the line numbers came
+     * from alt.lock.
+     *
+     * @dataProvider annotationsUnderComposer
+     */
+    #[DataProvider('annotationsUnderComposer')]
+    public function testTheAnnotationFormatsPointAtTheLockComposerNames(string $composer, string $format, string $path): void
+    {
+        $dir = $this->tempDir('lockrot-composer-env-annotations-');
+        $source = \dirname(self::WALLABAG_LOCK);
+        if (!is_dir(\dirname($dir.'/'.$composer))) {
+            mkdir(\dirname($dir.'/'.$composer));
+        }
+        copy($source.'/composer.json', $dir.'/'.$composer);
+        copy($source.'/composer.lock', $dir.'/'.$path);
+        chdir($dir);
+        $cwd = (string) getcwd();
+
+        $this->withComposerFile($composer, function () use ($format, $path, $cwd): void {
+            [$code, $stdout, $stderr] = $this->runWithSplitStreams(['--format' => $format, '--output' => [$format.':report.out'], '--target-php' => '8.4'], $this->loader());
+
+            self::assertSame(0, $code, $stderr);
+            $paths = self::annotatedPaths($format, $stdout);
+            self::assertNotSame([], $paths);
+            self::assertSame([$path], array_values(array_unique($paths)));
+            self::assertSame($stdout, (string) file_get_contents($cwd.'/report.out'), 'the file written with --output points at the same lock');
+            if ($format === 'sarif') {
+                $sarif = json_decode($stdout, true);
+                self::assertIsArray($sarif);
+                self::assertStringEndsWith(
+                    '/'.basename($cwd).'/',
+                    JsonPath::stringAt($sarif, ['runs', 0, 'originalUriBaseIds', '%SRCROOT%', 'uri']),
+                    'the project directory, which the uri is relative to'
+                );
+            }
+        });
+    }
+
     /** The baseline sits next to the manifest Composer reads, wherever COMPOSER puts that. */
     public function testTheBaselineLivesNextToTheManifestComposerNames(): void
     {
