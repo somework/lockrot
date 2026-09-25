@@ -12,8 +12,12 @@ use PHPUnit\Framework\TestCase;
 
 final class ReportTargetTest extends TestCase
 {
-    /** No format name has a colon in it, so the first one ends the format and the rest is the path, colons included. */
-    public function testTheFormatEndsAtTheFirstColon(): void
+    /**
+     * The spec starts with a format name lockrot knows and a colon; the rest is the path, colons
+     * included. A name is matched whole, not cut at the first colon, so a format whose name holds a
+     * colon (the `<vendor>:<name>` form docs/compatibility.md reserves) stays parseable.
+     */
+    public function testTheFormatIsAKnownNameFollowedByAColon(): void
     {
         $windows = ReportTarget::parse('json:C:\\out\\r.json', '/projects/app');
         self::assertSame('json', $windows->format());
@@ -72,6 +76,9 @@ final class ReportTargetTest extends TestCase
         yield 'no colon' => ['r.json', '--output=r.json: expected <format>:<path>, e.g. --output=sarif:lockrot.sarif'];
         yield 'an unknown format' => ['xml:r.xml', '--output=xml:r.xml: unknown format "xml"; the formats are table, json, github, sarif, gitlab, markdown, html'];
         yield 'no format' => [':r.json', '--output=:r.json: unknown format ""'];
+        yield 'a known name that runs on' => ['jsonx:r.json', '--output=jsonx:r.json: unknown format "jsonx"'];
+        yield 'a known name without its colon' => ['json', '--output=json: expected <format>:<path>'];
+        yield 'an unknown vendor format is named up to its first colon' => ['acme:lint:r.txt', '--output=acme:lint:r.txt: unknown format "acme"'];
         yield 'formats are case-sensitive, as --format is' => ['JSON:r.json', '--output=JSON:r.json: unknown format "JSON"'];
         yield 'an empty path' => ['json:', '--output=json:: the path is empty'];
         yield 'a path ending in a slash' => ['json:out/', '--output=json:out/: the path names a directory, not a file'];

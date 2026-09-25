@@ -29,9 +29,11 @@ final class ReportTarget
     }
 
     /**
-     * No format name has a colon in it, so the first colon ends the format and everything after it
-     * is the path, verbatim — `json:C:\out\r.json` included, and a name with spaces at either end.
-     * The format is one `--format` takes, spelled the same way.
+     * The spec starts with a format `--format` takes, spelled the same way, and a colon; everything
+     * after that colon is the path, verbatim — `json:C:\out\r.json` included, and a name with spaces
+     * at either end. The format is found by matching the known names, the longest first, rather than
+     * by cutting at the first colon, so a format whose own name holds a colon — an extension's
+     * `<vendor>:<name>` — would still parse.
      *
      * @param string $spec what follows `--output=`
      * @param string $cwd  the directory a relative path is relative to
@@ -42,15 +44,19 @@ final class ReportTarget
     public static function parse(string $spec, string $cwd): self
     {
         $option = '--output='.$spec;
-        $colon = strpos($spec, ':');
-        if ($colon === false) {
-            throw new ConfigException($option.': expected <format>:<path>, e.g. --output=sarif:lockrot.sarif');
+        $format = '';
+        foreach (LockrotConfig::FORMATS as $known) {
+            if (strpos($spec, $known.':') === 0 && \strlen($known) > \strlen($format)) {
+                $format = $known;
+            }
         }
-        $format = substr($spec, 0, $colon);
-        if (!\in_array($format, LockrotConfig::FORMATS, true)) {
-            throw new ConfigException($option.': unknown format "'.$format.'"; the formats are '.implode(', ', LockrotConfig::FORMATS));
+        if ($format === '') {
+            $colon = strpos($spec, ':');
+            throw new ConfigException($colon === false
+                ? $option.': expected <format>:<path>, e.g. --output=sarif:lockrot.sarif'
+                : $option.': unknown format "'.substr($spec, 0, $colon).'"; the formats are '.implode(', ', LockrotConfig::FORMATS));
         }
-        $path = substr($spec, $colon + 1);
+        $path = substr($spec, \strlen($format) + 1);
         if ($path === '') {
             throw new ConfigException($option.': the path is empty');
         }
