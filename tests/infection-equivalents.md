@@ -123,29 +123,29 @@ are not listed here even though the area-B Infection config covers `src/Composer
 
 ### src/Composer/LockrotCommand.php
 
-- `src/Composer/LockrotCommand.php:120` CastString — and
-- `src/Composer/LockrotCommand.php:177` CastString — `(string) getcwd()`: `getcwd()` returns false
+- `src/Composer/LockrotCommand.php:119` CastString — and
+- `src/Composer/LockrotCommand.php:176` CastString — `(string) getcwd()`: `getcwd()` returns false
   only when the working directory has been removed or become unreadable under the running process,
   which would already have broken PHPUnit's own bootstrap. The cast is for the type.
-- `src/Composer/LockrotCommand.php:174` Throw_ — not rethrowing `$this->bootstrapError` changes
+- `src/Composer/LockrotCommand.php:173` Throw_ — not rethrowing `$this->bootstrapError` changes
   nothing a test can see: the next statement re-reads the same manifest through the same
   `ProjectConfig::fromFile()` call and raises the identical `ConfigException`, so the exit code and
   the message are the same. The load-bearing half of the mechanism is the early `return` in
   `initialize()`, which stops `parent::initialize()` from crashing on the manifest first; that half is
   covered by `testMalformedComposerJsonIsExit2()`.
-- `src/Composer/LockrotCommand.php:554` UnwrapArrayValues — `RepositoryFactory::defaultRepos()` hands
+- `src/Composer/LockrotCommand.php:567` UnwrapArrayValues — `RepositoryFactory::defaultRepos()` hands
   the repositories back keyed by their configuration name, and nothing downstream reads those keys:
   `RepositoryMetadataLoader` iterates the list and never indexes it. `array_values()` is the `list<>`
   type guarantee.
-- `src/Composer/LockrotCommand.php:560` ReturnRemoval — without the early return, a directory with no
+- `src/Composer/LockrotCommand.php:573` ReturnRemoval — without the early return, a directory with no
   composer.json reaches `tryComposer()`, i.e. `Application::getComposer(false)`, where
   `Factory::create()` throws `InvalidArgumentException` for the missing manifest and is swallowed
   because the call is not `$required`. Null comes back either way; the return only skips a call that
   cannot succeed.
-- `src/Composer/LockrotCommand.php:565` FalseValue — `$this->getComposer(false)` is the Composer 2.2
+- `src/Composer/LockrotCommand.php:578` FalseValue — `$this->getComposer(false)` is the Composer 2.2
   LTS arm of the `method_exists($this, 'tryComposer')` guard. The vendored Composer has
   `tryComposer()`, so that arm is never entered by any test on this runtime.
-- `src/Composer/LockrotCommand.php:565` Ternary — swapping the arms puts `getComposer(false)` on the
+- `src/Composer/LockrotCommand.php:578` Ternary — swapping the arms puts `getComposer(false)` on the
   taken branch, and in Composer 2.3+ `BaseCommand::getComposer(false)` is literally
   `return $this->tryComposer($disablePlugins, $disableScripts);`. The two arms are the same call.
 
@@ -233,15 +233,13 @@ The memo changes how often the work is done, not what it answers.
 - `src/Baseline/BaselineSchema.php:76` LogicalOr — `!is_file($path) || !is_readable($path)` on
   `resources/lockrot-baseline.schema.json`, a file shipped inside the package. No test can make it
   missing or unreadable, and both operands are false for the file that is there.
-- `src/Filesystem/AtomicWriter.php:37` FunctionCallRemoval — `error_clear_last()` before the write
+- `src/Filesystem/AtomicWriter.php:43` FunctionCallRemoval — `error_clear_last()` before the write
   (moved out of `BaselineFile::write()` on 2026-09-25, when the reports of `--output` started going
   through the same writer; it was `src/Baseline/BaselineFile.php:112`).
   It only changes the reported reason if the failing call records no warning of its own, and every
-  file_put_contents/rename failure records one, which replaces whatever was there regardless.
-- `src/Filesystem/AtomicWriter.php:61` LogicalAnd (was `src/Baseline/BaselineFile.php:154`) —
-  `is_string($message) && $message !== ''` in
-  `reason()`. `$message` is null only when `error_get_last()` is null, which (per the entry above)
-  cannot happen on a path that reaches `reason()`; and a recorded warning message is never `''`.
+  fopen/chmod/rename failure on a real file records one, which replaces whatever was there
+  regardless. (A short write records none — a full disk — and then the reason may be an older
+  warning; the message still says which file could not be written.)
 - `src/Allowlist/ProjectIgnoreList.php:72` DecrementInteger (`$matches[1]` → `$matches[0]`) — the
   year argument of `checkdate()`. `$matches[0]` is the whole `YYYY-MM-DD` match and `(int)` of it
   is `YYYY`, which is exactly `(int) $matches[1]`, for every input the regex accepts.
@@ -311,7 +309,7 @@ slow test. They are listed here only so nobody reads them as an unexplained "2 t
   newest candidate at the installed branch's own date, and the signal then needs that date to be
   both at least `release-warn-years` old (the branch) and younger than `release-warn-years` (the
   move-on) — impossible, so the rule returns null either way.
-- `src/Composer/LockrotCommand.php:325` `explain()` LogicalOr on `$finding === null || $facts === null` —
+- `src/Composer/LockrotCommand.php:324` `explain()` LogicalOr on `$finding === null || $facts === null` —
   `Analysis::finding()` and `Analysis::facts()` are filled by the same loop over the same packages
   in `Analyzer::analyzeWithFacts()`, so one is null exactly when the other is; and the lock lookup
   two lines up already rejects every name the run does not analyse, so the branch never runs. The
@@ -406,16 +404,45 @@ changed lines. The first pass escaped 11; seven were real gaps and are killed no
 that the page an `--output=html:` file carries has its facts (`details`) when stdout is html too,
 which left the facts gate and the `PageData` ternary free, and the `COMPOSER` manifest was only
 tested with a trimmed `.json` name, which left `trim()` and the `.lock`-appending arm free. Two
-escapes are the `AtomicWriter` pair above, moved from `BaselineFile`. The other two are equivalent,
+escapes are the `AtomicWriter` pair above, moved from `BaselineFile` (the `reason()` LogicalAnd of
+that pair has since been killed, see below). The other two are equivalent,
 and so is the one the Windows-alias refusal added (259 mutants, 5 escapes, after it):
 
-- `src/Composer/LockrotCommand.php:432` CastArray — `(array) $input->getOption('output')`. The option
+- `src/Composer/LockrotCommand.php:439` CastArray — `(array) $input->getOption('output')`. The option
   is declared `VALUE_IS_ARRAY`, and symfony/console returns an array for it in every case — `[]` when
   it is not given — so the cast never changes the value. It is there because `getOption()` is typed
   `mixed`, and a `foreach` over `mixed` is not something PHPStan lets through.
-- `src/Output/ReportTargets.php:144` CastString — `(string)` around `OutputFormatter::format()`,
+- `src/Output/ReportTargets.php:174` CastString — `(string)` around `OutputFormatter::format()`,
   which symfony/console types `?string` and returns null only for a null message; the table
   formatter always hands it a string. The cast is for the type.
 - `src/Filesystem/Path.php:41` CastString — `(string) preg_replace(...)` in `isWindowsAlias()`, the
   shape of the `RepoLocator` cast above: preg_replace returns null only when the pattern fails to
   compile, and this one is a literal. The cast is for the type.
+
+### The review fixes to `--output` (2026-09-26)
+
+Same measurement after the fixes from the code review (files named on disk by device and inode,
+dot segments folded by spelling, exclusive temporary files, kept permissions, every stderr line
+escaped, known-name format parsing): 403 mutants on the changed lines, 16 escaped at first. Six
+were real gaps and are killed now (three of them on one line) — the project's own composer.json was only tested through the
+name rule, never as a second name on disk; no test replaced a file with execute bits; a short
+write was never simulated (a stream wrapper stands in for the full disk now); and nothing pinned a
+file in the root directory, which left the `rtrim()` in `Path::canonical()` free. The short-write
+test also killed `reason()`'s LogicalAnd (`src/Filesystem/AtomicWriter.php:75`), listed as
+equivalent until then: a short write records no warning, so the generic reason is reachable, and
+its entry is gone. Four escapes are the entries above, at their new lines. The other five are
+equivalent (403 mutants, 9 escapes, Covered MSI 97.8%):
+
+- `src/Composer/SelfUpdateCommand.php:270` ConcatOperandRemoval — `'</'.$style.'>'` becomes `'</>'`.
+  Symfony's formatter reads `</>` as "close the style opened last", and the line opens exactly one,
+  `$style`, so both spellings render the same bytes. (`LockrotCommand`'s copy of the helper is
+  killed by its own tests; the two stay separate because self-update must not load a class after it
+  has replaced the archive it runs from.)
+- `src/Filesystem/Path.php:119` LogicalOr and DecrementInteger x2 — `$a['ino'] === 0 ||
+  $b['ino'] === 0`, the fallback to comparing resolved paths where a filesystem reports no inode.
+  Every filesystem CI and a developer machine run on (ext4, APFS, tmpfs) reports one, so the
+  condition is false on both sides and every mutant of it is false too; only a Windows filesystem
+  without a file index reaches the fallback.
+- `src/Output/ReportTarget.php:49` GreaterThan (`>` to `>=`) — two different format names of the
+  same length cannot both be followed by a colon at the start of one spec, so an equal length never
+  meets a second match: the longest-match rule and its `>=` twin pick the same name.

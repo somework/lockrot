@@ -178,9 +178,11 @@ decided to live with, so CI fails only on what is new or has got worse, without 
 off and losing the check entirely. Commit the file: it is a statement about the project, worth
 reviewing like any other change, and lockrot writes it on this flag alone.
 
-In your project, lockrot writes only the files you name: reports with `--output` and the baseline
-with `--generate-baseline`. It never writes `composer.json` or `composer.lock`. Outside the project it
-writes only its activity cache, under Composer's cache directory, and `self-update` replaces the PHAR.
+lockrot writes the files you name — reports with `--output`, the baseline with `--generate-baseline`
+— each through a temporary file beside it that is renamed over it, so it needs write access to that
+directory; its activity cache, under Composer's cache directory; and, with `self-update`, the PHAR.
+It never writes `composer.json` or `composer.lock`. An absolute path is written where it points, in
+the project or not, and a run interrupted mid-write can leave a `*.tmp` file beside the target.
 
 ```bash
 composer rot --target-php=8.4 --generate-baseline

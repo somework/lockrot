@@ -100,12 +100,13 @@ be published there, or in what form.
 
 ## What lockrot writes
 
-In your project, lockrot writes only the files you name: reports with `--output` and the baseline
-with `--generate-baseline`. It never writes `composer.json` or `composer.lock`. Outside the project
-it writes only its activity cache, under Composer's cache directory, and `self-update` replaces the
-PHAR.
+lockrot writes the files you name — reports with `--output`, the baseline with `--generate-baseline`
+— each through a temporary file beside it that is renamed over it, so it needs write access to that
+directory; its activity cache, under Composer's cache directory; and, with `self-update`, the PHAR.
+It never writes `composer.json` or `composer.lock`. An absolute path is written where it points, in
+the project or not, and a run interrupted mid-write can leave a `*.tmp` file beside the target.
 
-That sentence is a promise the README, `SECURITY.md` and the docs make, so a change that writes
+That paragraph is a promise the README, `SECURITY.md` and the docs make, so a change that writes
 anything else — a new file, a created directory, a cache in another place — is a change to the
 promise and needs the maintainer's decision first, not only a review. Every project file goes
 through `Lockrot\Filesystem\AtomicWriter`.

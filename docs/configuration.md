@@ -145,8 +145,10 @@ composer lockrot --format=github --fail-on=silent --target-php=8.4 \
   --output=sarif:lockrot.sarif --output=html:lockrot-report.html --output=json:lockrot.json
 ```
 
-- **Syntax.** `<format>:<path>`, split at the first colon, so `json:C:\reports\lockrot.json` works.
-  The format is one `--format` takes, spelled the same way. One format may go to two files.
+- **Syntax.** `<format>:<path>`: a format `--format` takes, spelled the same way, then a colon, then
+  the path, verbatim, colons and all, so `json:C:\reports\lockrot.json` works. One format may go to
+  two files. Give the option its value with `=`: in the PHAR, `--output json:r.json` before the
+  command name is read as a command ([PHAR](phar.md#what-the-phar-does-and-does-not-do)).
 - **Contents.** Each file is byte for byte what `--format=<that format>` prints on stdout for the
   same run, with one exception: `table` in a file has no colours and no console markup, and is
   wrapped at 120 columns whatever the terminal is.
@@ -160,33 +162,44 @@ composer lockrot --format=github --fail-on=silent --target-php=8.4 \
   relative to that project; the PHAR never walks up. An absolute path is used as given.
 - **Directories.** The directory must already exist; lockrot creates none (`mkdir -p` first). An
   existing file is replaced.
-- **How.** Each file is written atomically — a temporary file beside it, then a rename — after the
-  report is on stdout, and each one gets a line on stderr: `lockrot: sarif report written to
-  lockrot.sarif`.
+- **How.** Each file is written atomically — a temporary file beside it, created exclusively so
+  nothing already at that name is followed, then a rename — after the report is on stdout, and each
+  one gets a line on stderr: `lockrot: sarif report written to lockrot.sarif`. A file that is
+  replaced keeps its permission bits (a report kept at `0600` stays `0600`); its owner and ACLs are
+  not carried over, and a new file gets the umask's default.
 - **Refusals.** A path naming `composer.json` or `composer.lock` (in any directory, in any letter
-  case), the [baseline](baseline.md) file, or the manifest `COMPOSER` names and its lock; an unknown
-  format, an empty path or one ending in a separator; the same file twice (compared
-  case-insensitively, so `r.json` and `R.json` are one file even on Linux); a directory that does not
-  exist; a path that exists and is not a regular file (a directory, a device such as `/dev/stdout`,
-  a pipe), since the write is a rename over the path and stdout is what `--format` is for; a file
-  name ending in a dot or a space or holding a colon, which Windows reads as another name
-  (`composer.lock.` and `composer.lock::$DATA` are the lock there), refused on every system; an
-  existing file that resolves to a protected one (a symlink, a Windows 8.3 short name) — each is a
+  case), a [baseline](baseline.md) file — this run's, and the project's own (`extra.lockrot.baseline`,
+  else `lockrot-baseline.json`) when `--baseline` points the run elsewhere — or the manifest
+  `COMPOSER` names and its lock; dot segments count as Windows folds them, by spelling, so
+  `missing\..\composer.lock` is the lock even where `missing` does not exist; an unknown format, an
+  empty path or one ending in a separator; the same file twice (compared case-insensitively, so
+  `r.json` and `R.json` are one file even on Linux, and on disk for files that exist); a directory
+  that does not exist; a path that exists and is not a regular file (a directory, a device such as
+  `/dev/stdout`, a pipe), since the write is a rename over the path and stdout is what `--format` is
+  for; a file name ending in a dot or a space or holding a colon, which Windows reads as another
+  name (`composer.lock.` and `composer.lock::$DATA` are the lock there), refused on every system; an
+  existing file that is on disk a protected one, or the `composer.json` or `composer.lock` beside it
+  (a symlink, a hard link, a Windows 8.3 short name, a spelling the filesystem folds by Unicode rules
+  such as `composer.locK` with a Kelvin sign on macOS), compared by device and inode — each is a
   configuration error (exit `2`), found before the analysis starts, so nothing is fetched and
   nothing is written.
-- **Failures.** A file that cannot be written when its turn comes is exit `2` with the reason. The
-  files written before it stay; the report is already on stdout.
+- **Failures.** A file that cannot be written when its turn comes is exit `2` with the reason. So is
+  a file that turns out, once the ones before it are written, to be one of them (on macOS `café.json`
+  spelled precomposed and decomposed is one file): the run stops rather than write one report over
+  another. The files written before it stay; the report is already on stdout.
 - **Exit code.** Otherwise untouched: `0` or `1` by `--fail-on`, as without `--output`.
 - `--explain` refuses `--output` (exit `2`): it prints one package, not a report. `--generate-baseline`
   writes both: the reports first, then the baseline, and the reports carry no baseline comparison —
   the baseline is what the run is writing. A report that cannot be written stops the run before the
   baseline is replaced. `LOCKROT_DISABLE` writes nothing.
 
-In your project, lockrot writes only the files you name: reports with `--output` and the baseline
-with `--generate-baseline`. It never writes `composer.json` or `composer.lock`. Outside the project
-it writes only its activity cache, under Composer's cache directory ([Caching](#caching)) — where
-Composer also keeps the repository metadata it fetched, as it does for any command — and
-`self-update` replaces the PHAR.
+lockrot writes the files you name — reports with `--output`, the baseline with `--generate-baseline`
+— each through a temporary file beside it that is renamed over it, so it needs write access to that
+directory; its activity cache, under Composer's cache directory ([Caching](#caching)), where Composer
+also keeps the repository metadata it fetched, as it does for any command; and, with `self-update`,
+the PHAR. It never writes `composer.json` or `composer.lock`. An absolute path is written where it
+points, in the project or not, and a run interrupted mid-write can leave a `*.tmp` file beside the
+target.
 
 ## Explaining one package
 

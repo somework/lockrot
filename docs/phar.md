@@ -176,12 +176,19 @@ The PHAR always runs the inspected project with `--no-plugins`: it reads `compos
 `composer.json` and never needs that project's Composer plugins. It also never writes to
 `composer.json` or `composer.lock`.
 
-In your project, lockrot writes only the files you name: reports with
-[`--output`](configuration.md#writing-reports-to-files) and the baseline with `--generate-baseline`.
-Outside the project it writes only its activity cache, under Composer's cache directory, and
-`self-update` replaces the PHAR. `-d` makes the project the working directory before lockrot starts,
-so relative `--output` paths, like `--baseline`, are relative to the `-d` directory:
+lockrot writes the files you name — reports with
+[`--output`](configuration.md#writing-reports-to-files), the baseline with `--generate-baseline` —
+each through a temporary file beside it that is renamed over it, so it needs write access to that
+directory; its activity cache, under Composer's cache directory; and, with `self-update`, the PHAR.
+An absolute path is written where it points, in the project or not, and a run interrupted mid-write
+can leave a `*.tmp` file beside the target. `-d` makes the project the working directory before
+lockrot starts, so relative `--output` paths, like `--baseline`, are relative to the `-d` directory:
 `php lockrot.phar -d app --output=json:lockrot.json` writes `app/lockrot.json`.
+
+Give `--output` its value with `=`, as above. Written with a space before the command name —
+`php lockrot.phar --output json:r.json` — the console reads `json:r.json` as the command to run, a
+command `r.json` in a `json` namespace, and exits `1` with "There are no commands defined in the
+"json" namespace". `--output=json:r.json` means the same thing everywhere.
 
 The only project-inspection commands are `lockrot` (the default, so the name can be left out) and
 `self-update`. Symfony's own `help`, `list` and `completion` remain, so `php lockrot.phar list` shows

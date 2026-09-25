@@ -14,8 +14,10 @@ use Lockrot\Json\Schemas;
 /**
  * Where the baseline lives and how it is read and written.
  *
- * lockrot writes it only on an explicit `--generate-baseline`, as it writes reports only where
- * `--output` names them; composer.json and composer.lock never.
+ * lockrot writes the files the caller names — reports with `--output`, this file with
+ * `--generate-baseline` — each through a temporary file beside it that is renamed over it
+ * ({@see AtomicWriter}); its activity cache under Composer's cache directory; and, with
+ * `self-update`, the PHAR. It never writes composer.json or composer.lock.
  *
  * Two paths are kept apart on purpose. {@see path()} is what the filesystem needs — absolute, so
  * the file lands next to the project's composer.json whatever the process's working directory is.

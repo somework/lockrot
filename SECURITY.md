@@ -97,11 +97,16 @@ the recipe.
 
 ## What lockrot does and does not do
 
-lockrot reads `composer.json` and `composer.lock` and never writes to either. In your project it
-writes only the files you name: reports with `--output` and the baseline with
-`--generate-baseline`; an `--output` naming `composer.json`, `composer.lock` or the baseline is
-refused before anything runs. Outside the project it writes only its repository-activity cache,
-under Composer's cache directory, and `self-update` replaces the PHAR. The PHAR always runs
+lockrot reads `composer.json` and `composer.lock` and never writes to either. It writes the files
+you name — reports with `--output`, the baseline with `--generate-baseline` — each through a
+temporary file beside it, created exclusively so a file or symlink already at that name is never
+followed, and renamed over the target, so it needs write access to that directory; its
+repository-activity cache, under Composer's cache directory; and, with `self-update`, the PHAR. An
+absolute path is written where it points, in the project or not, and a run interrupted mid-write can
+leave a `*.tmp` file beside the target. An `--output` naming `composer.json`, `composer.lock` or a
+baseline — by any spelling that reaches the same file, a link included — is refused before anything
+runs. A report that replaces a file keeps that file's permission bits; its owner and ACLs are not
+carried over. The PHAR always runs
 the inspected project with `--no-plugins`, so it never executes that project's Composer plugins.
 Network access is limited to the configured Composer repositories, the GitHub API (repository
 activity checks, and release lookups for `self-update`) and, for `self-update` only, the release

@@ -117,23 +117,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and its own S10 reasons for what it could not check. Now the analysis runs once and every file is
   rendered from the same report: the same `generated_at`, findings and notes, and each file is byte
   for byte what its `--format` prints, except that a table in a file has no colours and is wrapped at
-  120 columns whatever the terminal is. `--format` still decides stdout. A relative path is relative
-  to the project directory lockrot runs in (`-d` sets it); the directory must already exist, since
-  lockrot creates none. Each file is written atomically after stdout and named on stderr
-  (`lockrot: sarif report written to lockrot.sarif`). A path naming `composer.json`,
-  `composer.lock`, the baseline or the manifest `COMPOSER` names, an unknown format, an empty path,
-  the same file twice, a missing directory, or a path that exists and is not a regular file (a
-  directory, a device such as `/dev/stdout`, a pipe — the write is a rename over the path, and stdout
-  is what `--format` is for) is a configuration error (exit 2) found before the analysis starts. So
-  is a file name ending in a dot or a space or holding a colon, on every system: Windows reads
-  `composer.lock.` and `composer.lock::$DATA` as the lock itself; and so is an existing file that
-  resolves to a protected one, through a symlink or a Windows 8.3 short name. A file that cannot be
-  written when its turn comes is exit 2 as well; otherwise the exit
-  code is untouched. `--explain` refuses `--output`; `--generate-baseline` writes the reports, then
-  the baseline. In your project, lockrot writes only the files you name — reports with `--output`,
-  the baseline with `--generate-baseline` — and never `composer.json` or `composer.lock`; the README,
-  `SECURITY.md` and `CONTRIBUTING.md` now say so, where they used to call the baseline the only file
-  lockrot writes.
+  120 columns whatever the terminal is. `--format` still decides stdout. The spec is a format
+  `--format` takes, a colon, then the path verbatim, so `json:C:\reports\r.json` works; in the PHAR
+  give it with `=`, since `--output json:r.json` before the command name is read as a command. A
+  relative path is relative to the project directory lockrot runs in (`-d` sets it); an absolute
+  one is written where it points; the directory must already exist, since lockrot creates none.
+  Each file is written after stdout, through a temporary file beside it that is created exclusively
+  (nothing already at that name is followed) and renamed over the target, keeping a replaced file's
+  permission bits, and is named on stderr (`lockrot: sarif report written to lockrot.sarif`). A
+  configuration error (exit 2), found before the analysis starts: a path naming `composer.json` or
+  `composer.lock`, a baseline — this run's, and the project's own (`extra.lockrot.baseline`, else
+  `lockrot-baseline.json`) when `--baseline` points the run elsewhere — or the manifest `COMPOSER`
+  names and its lock, with dot segments folded by spelling as Windows folds them
+  (`missing\..\composer.lock` is the lock); an existing file that is on disk one of those or the
+  `composer.json`/`composer.lock` beside it — a symlink, a hard link, a Windows 8.3 short name, a
+  spelling the filesystem folds by Unicode rules such as `composer.locK` with a Kelvin sign on macOS
+  — compared by device and inode; an unknown format, an empty path, the same file twice (by spelling,
+  or on disk for files that exist), a missing directory, or a path that exists and is not a regular
+  file (a directory, a device such as `/dev/stdout`, a pipe — the write is a rename over the path,
+  and stdout is what `--format` is for); and a file name ending in a dot or a space or holding a
+  colon, on every system, since Windows reads `composer.lock.` and `composer.lock::$DATA` as the lock
+  itself. A file that cannot be written when its turn comes is exit 2, and so is one that turns out
+  to be a file this run already wrote (on macOS `café.json` precomposed and decomposed are one file),
+  instead of one report silently replacing another; otherwise the exit code is untouched.
+  `--explain` refuses `--output`; `--generate-baseline` writes the reports, then the baseline. The
+  README, `SECURITY.md`, `CONTRIBUTING.md` and the docs now say what lockrot writes — the files you
+  name, each through a temporary file beside it (so it needs write access to that directory, and an
+  interrupted run can leave a `*.tmp` there), its activity cache under Composer's cache directory,
+  and with `self-update` the PHAR; never `composer.json` or `composer.lock` — where they used to call
+  the baseline the only file lockrot writes.
 
 ### Fixed
 
@@ -143,10 +155,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   of printing it. Both keep their colours, and the `check skipped` line still escapes any control
   character in the message.
 
-- A configuration error or an unexpected failure whose message quoted something that looks like a
-  console tag — a path or a package name with `<info>` in it — lost that part on stderr, because the
-  message went through the console's tag formatter unescaped. It is escaped now and printed as it
-  was.
+- A message on stderr that quoted something looking like a console tag — a path or a package name
+  with `<info>` in it, an exception's message, the `-v` stack trace — lost that part, because it went
+  through the console's tag formatter unescaped. Every line `composer lockrot` and `lockrot.phar
+  self-update` print on stderr is escaped now, as are the install-time "check skipped" warning and
+  the Bitbucket token warning, and each is printed as it was.
+
+- The baseline is now written through a temporary file created exclusively, so a file or symlink
+  already at that name fails the write instead of being followed, and a baseline that is replaced
+  keeps its permission bits instead of taking the umask's default.
 
 ## [0.12.0] - 2026-09-24
 
