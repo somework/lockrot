@@ -154,7 +154,7 @@ final class PluginTest extends TestCase
         mkdir($elsewhere);
         try {
             $run = new Process(
-                ['composer', '-d', $this->dir, 'lockrot', '--offline', '--output=table:r.txt', '--output=json:r.json'],
+                ['composer', '--working-dir='.$this->dir, 'lockrot', '--offline', '--output=table:r.txt', '--output=json:r.json'],
                 $elsewhere,
                 ['COMPOSER_HOME' => $this->dir.'/.composer']
             );

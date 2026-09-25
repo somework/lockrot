@@ -152,7 +152,9 @@ composer lockrot --format=github --fail-on=silent --target-php=8.4 \
   wrapped at 120 columns whatever the terminal is.
 - **Where.** A relative path is relative to the working directory lockrot runs in, which is the
   project directory: `-d <dir>` changes it before lockrot starts (in plugin mode and in the PHAR
-  alike), so `composer -d app lockrot --output=json:r.json` writes `app/r.json`. In plugin mode,
+  alike), so `composer --working-dir=app lockrot --output=json:r.json` writes `app/r.json`
+  (Composer 2.2 reads the directory only when it is joined to the option, as `--working-dir=app` or
+  `-dapp`; later versions also take `-d app`). In plugin mode,
   Composer's [`use-parent-dir`](https://getcomposer.org/doc/06-config.md#use-parent-dir) can switch
   to a parent project when the current directory has no `composer.json`, and the path is then
   relative to that project; the PHAR never walks up. An absolute path is used as given.
