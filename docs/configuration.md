@@ -166,5 +166,5 @@ Neither of these is part of the configuration contract.
 | Variable | Effect |
 |---|---|
 | `LOCKROT_TODAY` (e.g. `2026-09-14`) | Fixes the reference date used for every "years ago" calculation |
-| `LOCKROT_RELEASE_URL` | Sends `lockrot.phar self-update` to this release document instead of GitHub's; for lockrot's own tests |
+| `LOCKROT_RELEASE_URL` | Sends `lockrot.phar self-update` to this release list (the shape of GitHub's `GET /repos/{owner}/{repo}/releases`) instead of GitHub's; for lockrot's own tests |
 | `LOCKROT_RELEASE_KEY` | A PEM file whose public key `lockrot.phar self-update` verifies release signatures with, instead of the key built into the archive; for lockrot's own tests |

@@ -19,6 +19,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `Lockrot\Extension\` is reserved: nothing is declared in it, in any letter case, and reserving it
   promises nothing about what, if anything, will be.
 
+- `self-update` stays within the major version it is running. It read GitHub's `releases/latest`
+  and installed whatever that named: on the day 2.0 is released every 1.x archive would have become
+  2.0 on its next self-update, a release needing a newer PHP would have installed and then refused
+  to start, and after a rotation of the self-update key the archive would have refused the new
+  release with a signature error and no way forward. It now reads the release list (drafts,
+  pre-releases and tags that are not a stable version skipped) and takes the newest release in its
+  own major version — before 1.0 that is the whole 0.x line, so 0.x updates keep arriving as
+  before. `--allow-major` moves to the next major version, one at a time, and `--check` names a
+  newer major on a line of its own without exiting 1 (`--check --allow-major` does). A release whose
+  lowest PHP is above the running one is passed over with a line saying so, and so is one signed with
+  a self-update key the archive does not carry, which makes the transition release of a rotation the
+  step in between. `--force` reinstalls the newest release at or below the running one and never
+  looks further down. The choice is made by the archive doing the update, so this starts with
+  archives from 0.13.0 on; 0.12 and older still follow `releases/latest` (see
+  [the PHAR page](https://lockrot.dev/phar/#keeping-it-updated)). `LOCKROT_RELEASE_URL`, the test
+  hook, now names a release list.
+
 ### Added
 
 - A schema evolution test. Under one schema number a document may only gain fields, so whatever an
@@ -44,6 +61,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   This checks the backward direction only, old documents under the current schemas; a document a
   newer lockrot writes, validated against a schema an older release published, is not what it
   tests. The report, its schemas and the HTML page are unchanged.
+
+- `lockrot.phar.meta.json` on every release: the lowest PHP the archive runs on and the SHA-256
+  fingerprint of the key that signed `lockrot.phar.sig.json` — what `self-update` chooses by
+  without downloading the archive. The release workflow writes it from `build/phar/composer.json`
+  (and fails when its platform PHP is not the floor both manifests declare) and from the key it
+  actually signed with, then checks it against the committed key. It decides only which release is
+  tried; the checksum and the signature still decide whether it is installed. A release from 0.13.0
+  on without it is an error naming the tag, and SECURITY.md now describes the key rotation it makes
+  possible, with today's fingerprint.
 
 ## [0.12.0] - 2026-09-24
 

@@ -40,10 +40,26 @@ self-update keys apart from its maintainers' keys: the archive cannot verify Ope
 on the machine, and `openssl_verify()` is in every PHP that can download over https. The private
 half is held by the release workflow (`SELFUPDATE_PRIVATE_KEY`, `SELFUPDATE_PASSPHRASE`); the
 workflow verifies every signature it makes against the committed public key and through the
-archive's own verifier before it publishes. A rotation ships the new key inside a release signed
-with the old one — so an archive in the field updates to it — and the changelog names the new
-key's SHA-256 fingerprint; a key suspected compromised is rotated the same way, and the release it
-signed is pulled.
+archive's own verifier before it publishes. Its fingerprint — the SHA-256 of the DER public key,
+`openssl pkey -pubin -in lockrot-selfupdate-key.pub -outform DER | sha256sum` — is
+`sha256:ec3ca71b1a3ced86f871b89cff7973b58454e5694136683680b72b18070a8f87`.
+
+Every release from 0.13.0 on also publishes `lockrot.phar.meta.json`, which names the fingerprint
+of the key that actually signed it, derived by the workflow from the private key it signed with.
+An archive from 0.13.0 on passes over a release signed with a key it does not carry, and that is
+how a rotation reaches it. The new key ships in a transition release signed with the old key: an
+archive in the field skips the releases after it, whose description names the new key, installs
+the transition release, and from there verifies with the new key. The changelog of the transition
+release names the new key's fingerprint. A key suspected compromised is rotated the same way, and
+the releases it signed are pulled.
+
+The first rotation still has one manual step: the workflow checks every signature and description
+against the committed public key, and a transition release is the one release whose signer (the
+old key) is not the committed key (already the new one). That check is relaxed for that one
+release, which is built with the old key as `SELFUPDATE_PRIVATE_KEY`; every release after it is
+signed with the new key and checked as usual. Archives up to 0.12 read only the newest release, so
+after a rotation their `self-update` refuses the new release as a signature mismatch and leaves
+itself in place — replace such an archive by hand once.
 
 Every release from 0.5.0 on is also signed with the lockrot release key — `lockrot.phar.asc` next
 to the PHAR — and attested by GitHub:

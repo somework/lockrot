@@ -9,8 +9,8 @@ namespace Lockrot\SelfUpdate;
  * compare against {@see \Lockrot\Version::STRING}, the tag it came from (for messages), and the
  * three asset URLs to download — the archive, its sha256 and its signature.
  *
- * Built only by {@see ReleaseLocator}, which is where the validation lives; this is an immutable
- * carrier, not a parser.
+ * Built only by {@see ReleaseLocator}, which chooses it from the release list and is where the
+ * validation lives; this is an immutable carrier, not a parser.
  *
  * @internal
  */
