@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Lockrot\Config;
 
-use JsonSchema\Constraints\BaseConstraint;
 use JsonSchema\Validator;
 use Lockrot\Exception\ConfigException;
+use Lockrot\Json\JsonReader;
 
 /**
  * Validates the shape of composer.json's extra.lockrot against
@@ -22,11 +22,7 @@ final class ConfigSchema
     /** @param array<string, mixed> $lockrotExtra contents of composer.json extra.lockrot */
     public static function validate(array $lockrotExtra): void
     {
-        // json_decode(..., true) turns both an empty JSON object ({}) and an empty JSON array ([]) into
-        // [], so by the time an empty extra.lockrot reaches here the "this was an object" information is
-        // gone and arrayToObjectRecursive() cannot restore it. A bare stdClass hands the validator an
-        // explicit object for this one case where the type would otherwise be ambiguous.
-        $data = $lockrotExtra === [] ? new \stdClass() : BaseConstraint::arrayToObjectRecursive($lockrotExtra);
+        $data = self::toObject($lockrotExtra, '');
 
         $validator = new Validator();
         $validator->validate($data, self::schema());
@@ -48,6 +44,64 @@ final class ConfigSchema
         }
 
         throw new ConfigException(implode("\n", $lines));
+    }
+
+    /**
+     * The validator reads JSON objects as PHP objects, and composer.json arrives as arrays, so the
+     * array form is turned back into the object form here, one value at a time.
+     *
+     * The library's own BaseConstraint::arrayToObjectRecursive() does it with a json_encode() and
+     * json_decode() round trip, and checks only the encode. A key starting with a NUL byte is valid
+     * JSON that no PHP object can hold, so the decode returned null — and `(object) null`, an empty
+     * object, passed the schema: the whole of extra.lockrot went unvalidated, and a gate configured
+     * beside such a key ran with fail-on `none`. A number too large for a float (1e400, read as INF)
+     * failed the encode instead, with a library exception the command did not report as a
+     * configuration error. Here the first is a ConfigException naming the key, and INF simply
+     * reaches the schema, which rejects it wherever a known key wants an integer.
+     *
+     * The top level is always an object: `{}` and `[]` both decode to [] with json_decode(..., true),
+     * and extra.lockrot has already been checked to be an object. Below it, [] stays an array —
+     * the round trip read it that way too, and `ignore: []` has to stay valid.
+     *
+     * @param array<array-key, mixed> $array
+     */
+    private static function toObject(array $array, string $path): object
+    {
+        $object = new \stdClass();
+        foreach ($array as $key => $value) {
+            $key = (string) $key;
+            $keyPath = $path === '' ? $key : $path.'.'.$key;
+            if (strpos($key, "\0") === 0) {
+                throw new ConfigException(\sprintf(
+                    "extra.lockrot is invalid:\n  - %s: a key starting with a NUL byte cannot be read",
+                    addcslashes($keyPath, "\0..\37")
+                ));
+            }
+            $object->{$key} = self::toJsonValue($value, $keyPath);
+        }
+
+        return $object;
+    }
+
+    /**
+     * @param mixed $value
+     *
+     * @return mixed
+     */
+    private static function toJsonValue($value, string $path)
+    {
+        if (!\is_array($value)) {
+            return $value;
+        }
+        if ($value !== [] && !JsonReader::isList($value)) {
+            return self::toObject($value, $path);
+        }
+        $list = [];
+        foreach ($value as $index => $item) {
+            $list[] = self::toJsonValue($item, $path.'['.$index.']');
+        }
+
+        return $list;
     }
 
     private static function schema(): object

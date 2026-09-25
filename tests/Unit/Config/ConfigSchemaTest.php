@@ -141,6 +141,75 @@ final class ConfigSchemaTest extends TestCase
     }
 
     /**
+     * A key starting with a NUL byte is valid JSON no PHP object can hold. The library's own
+     * array-to-object conversion decoded it to null and validated `(object) null` — an empty object,
+     * so every other key went unchecked — and this `fail-on` passed.
+     *
+     * @param array<string, mixed> $extra
+     *
+     * @dataProvider keysNoObjectCanHold
+     */
+    #[DataProvider('keysNoObjectCanHold')]
+    public function testAKeyStartingWithANulByteIsAnErrorNamingWhereItIs(array $extra, string $where): void
+    {
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage("extra.lockrot is invalid:\n  - ".$where.': a key starting with a NUL byte cannot be read');
+        ConfigSchema::validate($extra);
+    }
+
+    /** @return iterable<string, array{0: array<string, mixed>, 1: string}> */
+    public static function keysNoObjectCanHold(): iterable
+    {
+        yield 'at the top' => [['fail-on' => 'dead', "\0k" => 1], '\000k'];
+        yield 'inside an ignore entry' => [['ignore' => [['package' => 'a/b', 'reason' => 'x', "\0" => 1]]], 'ignore[0].\000'];
+        yield 'inside an unknown key' => [['custom' => ['deep' => ["\0k" => true]]], 'custom.deep.\000k'];
+    }
+
+    /** A NUL byte anywhere else in a key is an ordinary character. */
+    public function testANulByteInsideAKeyIsAnOrdinaryCharacter(): void
+    {
+        ConfigSchema::validate(["k\0" => 1, 'ignore' => [['package' => 'a/b', 'reason' => 'x', "x\0y" => 1]]]);
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * 1e400 reads as INF, which json_encode() refuses: the library's conversion threw its own
+     * exception rather than a configuration error. INF now reaches the schema, which says what is
+     * wrong with it wherever an integer is wanted, and leaves it alone under a key it does not know.
+     */
+    public function testANumberTooLargeForAFloatIsJudgedByTheSchema(): void
+    {
+        ConfigSchema::validate(['custom' => \INF, 'nested' => ['value' => -\INF]]);
+
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('  - release-warn-years: ');
+        ConfigSchema::validate(['release-warn-years' => \INF]);
+    }
+
+    /**
+     * Below the top level an empty array stays an array — `ignore: []` is valid — and a map whose keys
+     * are not 0..n-1 is an object, not a list, exactly as json_encode() would have written it.
+     */
+    public function testNestedValuesKeepTheirJsonShape(): void
+    {
+        ConfigSchema::validate(['ignore' => []]);
+        ConfigSchema::validate(['ignore' => [['package' => 'a/b', 'reason' => 'x', 'extra' => []]]]);
+        $this->addToAssertionCount(2);
+
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('  - ignore: ');
+        ConfigSchema::validate(['ignore' => [1 => ['package' => 'a/b', 'reason' => 'x']]]);
+    }
+
+    /** The top level is an object even when it is empty, and an empty key is an ordinary unknown key. */
+    public function testAnEmptyObjectAtTheTopIsStillAnObject(): void
+    {
+        ConfigSchema::validate([]);
+        ConfigSchema::validate(['' => 1]);
+        $this->addToAssertionCount(2);
+    }
+
+    /**
      * @param array<string, mixed> $extra
      *
      * @dataProvider invalidConfigs
