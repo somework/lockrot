@@ -21,18 +21,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- A schema evolution test. Under one schema number a document may only gain fields, so a report or
-  an explanation an older lockrot wrote has to keep validating against the newest `report-1.json`
-  and `explain-1.json`. Every document the schema tests checked was written by the current code,
+- A schema evolution test. Under one schema number a document may only gain fields, so whatever an
+  older lockrot wrote has to keep validating against the newest `report-1.json`, `explain-1.json`
+  and `baseline-1.json`. Every document the schema tests checked was written by the current code,
   which cannot notice a schema change that rejects an older one — a field made required, a type or
-  an enum narrowed, a listed field dropped. The `--format=json` report and six `--explain` documents
-  that the signed 0.10.0 and 0.11.0 release archives wrote over wallabag's lock are now kept under
-  `tests/fixtures/schema-evolution/`, recorded once by `bin/record-schema-evolution` and never
-  edited, and validated on every run against the current schemas, as published and with the strict
-  copy that rejects a field the schema does not list. This checks the backward direction only, old
-  documents under the current schemas; a document a newer lockrot writes, validated against a
-  schema an older release published, is not what it tests. The report, its schemas and the HTML
-  page are unchanged.
+  an enum value lost, a listed field dropped. Two checks now hold the schemas to it, both under
+  `tests/fixtures/schema-evolution/`:
+  - The report, explain, baseline and config schemas every release from 0.9.0 to 0.12.0 published
+    are kept, and each one under the current number must be accepted by the current file: a member
+    made required, a type or an enum value lost, a bound tightened, a listed property dropped or an
+    object closed fails the build, whether or not any recorded document carries it. A release that
+    does not add its schemas there fails it too.
+  - What the signed 0.9.0, 0.10.0 and 0.11.0 release archives wrote over wallabag's lock — the
+    baseline file, the `--format=json` report compared against it and six `--explain` documents —
+    recorded once by `bin/record-schema-evolution`, is validated against the schema each document
+    names, as published and with the strict copy that rejects a field the schema does not list.
+    The baseline is also read back as the current lockrot reads a committed one, and the signals
+    in each explanation are held to the report schema's signal definitions, since the explain
+    schema types no signal data. The recordings' provenance and the release archives' digests are
+    pinned in the test, so a document edited to validate fails whatever its recorded hash says.
+
+  This checks the backward direction only, old documents under the current schemas; a document a
+  newer lockrot writes, validated against a schema an older release published, is not what it
+  tests. The report, its schemas and the HTML page are unchanged.
 
 ## [0.12.0] - 2026-09-24
 

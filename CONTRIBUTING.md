@@ -53,13 +53,23 @@ The README demo (`docs/assets/lockrot-demo.gif`) is recorded the same way, from 
 `bin/record-demo` captures it with asciinema and renders it with agg — its header says what to
 export first. Re-record it when the table output changes shape, not for every release.
 
-`tests/fixtures/schema-evolution/` holds the JSON reports and `--explain` documents earlier releases
-wrote, and `SchemaEvolutionTest` validates them against the current schemas: a schema change that
-would reject a document an older lockrot wrote, or stop listing a field one carries, fails there.
-`GITHUB_TOKEN=$(gh auth token) bin/record-schema-evolution <version> <today>` records a release from
-its signed PHAR, which it verifies first. A recorded version is frozen — the script refuses to
-record it again, and the test checks every file against the hash the recording took — so a failure
-there is a compatibility break to fix in the schema change, not in the fixture.
+`tests/fixtures/schema-evolution/` holds what earlier releases published and wrote, and
+`SchemaEvolutionTest` holds the current schemas to it: a schema change that would reject a document
+an older lockrot wrote, or stop listing a field one carries, fails there. Two kinds of fixture:
+
+- `schemas/<version>/` — the four `resources/lockrot-*.schema.json` files as that release's tag holds
+  them. A release adds its own: copy them in (`git show v<version>:resources/lockrot-report.schema.json`
+  and so on, or from `resources/` in the release PR itself) and pin their sha256 in
+  `RELEASED_SCHEMAS`. The test compares every release's changelog heading with this list, so a
+  release without its schemas fails.
+- `<version>/` — what a release's signed PHAR wrote, recorded by
+  `GITHUB_TOKEN=$(gh auth token) bin/record-schema-evolution <version> <today>`, which verifies the
+  PHAR first. Pin the new `provenance.json` sha256 and the release asset's digest
+  (`gh release view v<version> --json assets`) in the test, with the signals the recording carries.
+
+Both are frozen — the script refuses to record a version again, and the test checks every file
+against a pinned hash — so a failure there is a compatibility break to fix in the schema change, not
+in the fixture.
 
 ## Contributing a finished package
 

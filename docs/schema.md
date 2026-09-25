@@ -75,13 +75,14 @@ lockrot's own test suite validates every document its formatters write against t
 strict copy that rejects any field the schema does not list, and the JSON samples in these docs
 too — so the published schema, the code and the docs cannot drift apart.
 
-It also keeps the reports and explanations earlier releases wrote — 0.10.0 and 0.11.0, recorded
-from their signed PHARs and never edited — and validates them against the current files in the same
-two ways. That checks one direction of the rule above, the backward one: a document an older
-lockrot wrote keeps validating against the newest schema, so a change that would make a field
-required, narrow a type or stop listing a field an older document carries fails the build. The
-other direction — a document a newer lockrot writes, against a copy of the schema an older release
-published — is not what these recordings test.
+It also holds the current files to the older ones, in the backward direction: whatever an older
+lockrot wrote keeps validating against the newest schema of the same number. Every schema a release
+from 0.9.0 on published is kept, and a change that would make a field required, lose a type or an
+enum value, tighten a bound, stop listing a field or close an object fails the build against each of
+them. The baseline files, reports and explanations 0.9.0, 0.10.0 and 0.11.0 wrote, recorded from
+their signed PHARs and never edited, are validated against the current files in the same two ways.
+A document a newer lockrot writes, checked against a copy of the schema an older release published,
+is not what these checks test.
 
 ## What the report schema types
 
