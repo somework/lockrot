@@ -406,12 +406,16 @@ changed lines. The first pass escaped 11; seven were real gaps and are killed no
 that the page an `--output=html:` file carries has its facts (`details`) when stdout is html too,
 which left the facts gate and the `PageData` ternary free, and the `COMPOSER` manifest was only
 tested with a trimmed `.json` name, which left `trim()` and the `.lock`-appending arm free. Two
-escapes are the `AtomicWriter` pair above, moved from `BaselineFile`. The other two are equivalent:
+escapes are the `AtomicWriter` pair above, moved from `BaselineFile`. The other two are equivalent,
+and so is the one the Windows-alias refusal added (259 mutants, 5 escapes, after it):
 
 - `src/Composer/LockrotCommand.php:432` CastArray — `(array) $input->getOption('output')`. The option
   is declared `VALUE_IS_ARRAY`, and symfony/console returns an array for it in every case — `[]` when
   it is not given — so the cast never changes the value. It is there because `getOption()` is typed
   `mixed`, and a `foreach` over `mixed` is not something PHPStan lets through.
-- `src/Output/ReportTargets.php:133` CastString — `(string)` around `OutputFormatter::format()`,
+- `src/Output/ReportTargets.php:144` CastString — `(string)` around `OutputFormatter::format()`,
   which symfony/console types `?string` and returns null only for a null message; the table
   formatter always hands it a string. The cast is for the type.
+- `src/Filesystem/Path.php:41` CastString — `(string) preg_replace(...)` in `isWindowsAlias()`, the
+  shape of the `RepoLocator` cast above: preg_replace returns null only when the pattern fails to
+  compile, and this one is a literal. The cast is for the type.

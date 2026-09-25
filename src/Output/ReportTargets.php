@@ -19,11 +19,15 @@ use Symfony\Component\Console\Formatter\OutputFormatter;
  * nothing else — so a spec that would write anything else is refused up front, with exit 2, before
  * a single repository is asked anything:
  *
+ * - a file name Windows reads as another — one ending in a dot or a space, or holding a colon
+ *   (`composer.lock.` and `composer.lock::$DATA` are the lock) — on every system, so the rule is one;
  * - a file named `composer.json` or `composer.lock`, in any directory and any letter case;
  * - a file the caller protects — the baseline, the manifest `COMPOSER` names and its lock;
+ * - an existing file that resolves on disk to one of those — a symlink, a Windows 8.3 short name;
  * - the same file named twice;
  * - a file whose directory does not exist, or is not a directory: lockrot creates none;
- * - a path that already exists and is not a regular file (a directory, a device).
+ * - a path that already exists and is not a regular file (a directory, a device such as
+ *   /dev/stdout, a pipe): the write is a rename over the path, and stdout is what --format is for.
  *
  * Writability is not checked in advance: is_writable() is unreliable under ACLs and root, so an
  * unwritable target fails at the write instead, with PHP's reason, as exit 2 all the same.
@@ -72,11 +76,18 @@ final class ReportTargets
     /** @param list<array{0: string, 1: string}> $protected */
     private static function refuseProtected(ReportTarget $target, string $canonical, array $protected): void
     {
-        if (\in_array(strtolower(basename($target->path())), ['composer.json', 'composer.lock'], true)) {
-            throw new ConfigException($target->option().': lockrot never writes composer.json or composer.lock');
+        if (Path::isWindowsAlias($target->path())) {
+            throw new ConfigException($target->option().': a file name that ends in a dot or a space, or holds a colon, is another name on Windows');
+        }
+        // The file itself, when it exists: a symlink, or a Windows 8.3 short name, to a protected file.
+        $real = realpath($target->path());
+        foreach ([$target->path(), (string) $real] as $name) {
+            if (\in_array(strtolower(basename($name)), ['composer.json', 'composer.lock'], true)) {
+                throw new ConfigException($target->option().': lockrot never writes composer.json or composer.lock');
+            }
         }
         foreach ($protected as [$path, $reason]) {
-            if (Path::canonical($path) === $canonical) {
+            if (Path::canonical($path) === $canonical || ($real !== false && realpath($path) === $real)) {
                 throw new ConfigException($target->option().': '.$reason);
             }
         }

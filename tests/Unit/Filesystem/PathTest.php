@@ -93,4 +93,37 @@ final class PathTest extends TestCase
         self::assertSame(Path::canonical($dir.'/nope/base.json'), Path::canonical($dir.'/NOPE/base.json'));
         self::assertNotSame(Path::canonical($dir.'/nope/base.json'), Path::canonical($dir.'/other/base.json'));
     }
+
+    /** @return iterable<string, array{string, bool}> */
+    public static function windowsAliases(): iterable
+    {
+        yield 'a trailing dot' => ['/app/composer.lock.', true];
+        yield 'trailing dots' => ['/app/composer.lock..', true];
+        yield 'a trailing space' => ['/app/composer.lock ', true];
+        yield 'a dot then a space' => ['/app/composer.lock. ', true];
+        yield 'the default data stream' => ['/app/composer.lock::$DATA', true];
+        yield 'a named stream' => ['/app/r.json:stream', true];
+        yield 'a backslash-separated Windows path' => ['C:\\app\\composer.lock.', true];
+        yield 'a drive-relative name' => ['C:r.json', true];
+        yield 'a plain name' => ['/app/r.json', false];
+        yield 'a drive letter in an earlier component' => ['C:\\app\\r.json', false];
+        yield 'a colon in an earlier component' => ['/a:b/r.json', false];
+        yield 'a dot inside the name' => ['/app/r.v1.json', false];
+        yield 'a space inside the name' => ['/app/my report.json', false];
+        yield 'a leading dot' => ['/app/.lockrot.json', false];
+        yield 'a trailing dot in the directory only' => ['/app./r.json', false];
+    }
+
+    /**
+     * Win32 drops trailing dots and spaces from a name and reads `name::$DATA` as the file itself,
+     * so such a last component is another spelling of a different name. The rule is on the string,
+     * so it holds on every system.
+     *
+     * @dataProvider windowsAliases
+     */
+    #[DataProvider('windowsAliases')]
+    public function testIsWindowsAliasLooksAtTheLastComponentOnly(string $path, bool $alias): void
+    {
+        self::assertSame($alias, Path::isWindowsAlias($path));
+    }
 }

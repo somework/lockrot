@@ -192,6 +192,65 @@ final class ReportTargetsTest extends TestCase
         self::assertTrue($this->resolve(['json:three.json'], $protected)->wants('json'));
     }
 
+    /** @return iterable<string, array{string}> */
+    public static function windowsAliases(): iterable
+    {
+        yield 'the lock with a trailing dot' => ['json:composer.lock.'];
+        yield 'the lock with a trailing space' => ['json:composer.lock '];
+        yield 'the lock\'s default data stream' => ['json:composer.lock::$DATA'];
+        yield 'the manifest with a trailing dot' => ['json:composer.json.'];
+        yield 'the baseline with a trailing dot' => ['json:lockrot-baseline.json.'];
+        yield 'the baseline\'s default data stream' => ['json:lockrot-baseline.json::$DATA'];
+        yield 'a named stream of any file' => ['json:r.json:stream'];
+        yield 'any name with a trailing dot' => ['json:r.json.'];
+    }
+
+    /**
+     * Win32 drops trailing dots and spaces from a name and reads `name::$DATA` as the file itself,
+     * so each of these passes a name comparison and then lands on the file it spells. Such a name is
+     * refused outright, on every system, before any other rule.
+     *
+     * @dataProvider windowsAliases
+     */
+    #[DataProvider('windowsAliases')]
+    public function testANameWindowsReadsAsAnotherIsNeverATarget(string $spec): void
+    {
+        file_put_contents($this->cwd.'/lockrot-baseline.json', '{}');
+
+        self::assertSame(
+            '--output='.$spec.': a file name that ends in a dot or a space, or holds a colon, is another name on Windows',
+            $this->refusal(fn () => $this->resolve([$spec], [[$this->cwd.'/lockrot-baseline.json', self::BASELINE_REASON]]))
+        );
+    }
+
+    /**
+     * A name that resolves on disk to a protected file — a symlink here; an 8.3 short name such as
+     * `LOCKRO~1.JSO` on Windows — is that file.
+     */
+    public function testALinkToAProtectedFileIsRefused(): void
+    {
+        file_put_contents($this->cwd.'/lockrot-baseline.json', '{}');
+        mkdir($this->cwd.'/out');
+        symlink($this->cwd.'/lockrot-baseline.json', $this->cwd.'/out/r.json');
+
+        self::assertSame(
+            '--output=json:out/r.json: '.self::BASELINE_REASON,
+            $this->refusal(fn () => $this->resolve(['json:out/r.json'], [[$this->cwd.'/lockrot-baseline.json', self::BASELINE_REASON]]))
+        );
+        self::assertTrue($this->resolve(['json:out/r.json'], [[$this->cwd.'/other.json', self::BASELINE_REASON]])->wants('json'));
+    }
+
+    public function testALinkToAComposerLockIsRefused(): void
+    {
+        file_put_contents($this->cwd.'/composer.lock', '{}');
+        symlink($this->cwd.'/composer.lock', $this->cwd.'/r.json');
+
+        self::assertSame(
+            '--output=json:r.json: lockrot never writes composer.json or composer.lock',
+            $this->refusal(fn () => $this->resolve(['json:r.json']))
+        );
+    }
+
     /** @return iterable<string, array{list<string>, string}> */
     public static function duplicates(): iterable
     {

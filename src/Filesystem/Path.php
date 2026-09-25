@@ -30,6 +30,20 @@ final class Path
     }
 
     /**
+     * Whether the last component is a name Windows reads as another: Win32 drops trailing dots and
+     * spaces (`composer.lock.` is `composer.lock`), and a colon names an NTFS stream of the file
+     * before it (`composer.lock::$DATA` is the file itself). Only the last component is looked at,
+     * split on either separator, so a drive letter (`C:\`) never counts, and the answer is the same
+     * on every system.
+     */
+    public static function isWindowsAlias(string $path): bool
+    {
+        $name = (string) preg_replace('{^.*[\\\\/]}s', '', $path);
+
+        return strpos($name, ':') !== false || preg_match('{[. ]$}', $name) === 1;
+    }
+
+    /**
      * A key under which two spellings of one file compare equal: the directory resolved through the
      * filesystem (dot segments, symlinked directories such as macOS's temp directory) and lower
      * case — so `Composer.lock` on a case-insensitive filesystem, which is the lock, is caught. On a
