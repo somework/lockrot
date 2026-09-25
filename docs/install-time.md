@@ -37,9 +37,9 @@ list is cut with `… and N more`. The budget counts lines as written, not rende
 long evidence line may still wrap past one row in a narrow terminal.
 
 An `extra.lockrot` key lockrot does not know adds one `lockrot: unknown key …` line above the block,
-outside its ten ([Unknown keys](configuration.md#unknown-keys)). It follows the block's own rules:
-nothing with `install-time` off, under `LOCKROT_DISABLE`, or for a transaction that installs or
-updates nothing, and it never stops the install.
+outside its ten ([Unknown keys](configuration.md#unknown-keys)). It is printed when lockrot is not
+disabled, `install-time` is not `off` and the transaction installs or updates something — whether or
+not anything is flagged — and it never stops the install.
 
 The order is the report's own: [priority](verdicts.md) first, so the ten lines go to the packages
 that apply most directly to the project.
@@ -49,7 +49,7 @@ stops there: neither the other direct requirements that reach the package nor wh
 (signal S7, see [verdicts.md](verdicts.md#transitive-exposure)) is printed here — both answer questions asked over
 the full report, and `composer lockrot` has them.
 
-## Silent only when the transaction was both checked and clean
+## Never silent about a package it could not check
 
 A package whose metadata never arrived is reported as `unknown`, which is not a finding. So if
 nothing is flagged *but* a lookup failed, a shorter block is printed instead of nothing, and silence
@@ -60,6 +60,10 @@ lockrot: 4 of 4 changed packages could not be checked
   note: Repository metadata unavailable for 4 packages: not checked: install-time budget exhausted
 Run composer lockrot for details.
 ```
+
+The block itself is left out only when every changed package was checked and none was flagged.
+Even then the install is not necessarily silent: an unknown `extra.lockrot` key still gets its line
+(see above), because it is about the configuration, not about the packages.
 
 ## Time budget
 

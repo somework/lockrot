@@ -97,14 +97,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `expire` made a temporary ignore permanent. Each unknown key now gets one line on stderr, with the
   known key it was probably meant to be when one is close —
   `lockrot: unknown key extra.lockrot.install-tme ignored (did you mean install-time?)` — the
-  closeness rule adapted from Symfony Console's own "Did you mean" for a mistyped command. `composer lockrot`
-  and the PHAR print it on every run, and the install-time summary above its block, gated like the
-  block (not with `install-time` off, not for a transaction that installs nothing); one process
-  prints a line once, and `LOCKROT_DISABLE` silences it. Nothing else about the run changes — the
-  same report, the same exit code, nothing on stdout — and the config schema is untouched, so no
-  `composer.json` that worked before stops working. `extensions` and keys starting with `x-` are
-  reserved, for the configuration of extensions and for your own tooling, and are never warned about;
-  a project that keeps its own data under `extra.lockrot` can move it under `x-` to stay quiet.
+  closeness rule adapted from Symfony Console's own "Did you mean" for a mistyped command.
+  `composer lockrot` and the PHAR print it on every run, and the install-time summary above its
+  block (not with `install-time` off, not for a transaction that installs or updates nothing, but
+  whether or not anything is flagged); `LOCKROT_DISABLE` silences it. The key is printed as written,
+  never read as console markup, with control, bidirectional and invalid UTF-8 characters escaped and
+  anything past 255 bytes cut. Nothing else about the run changes — the same report, the same exit
+  code, nothing on stdout — and the config schema is untouched, so no `composer.json` that worked
+  before stops working. When the schema does reject the config, the error now ends with the same
+  lines, so an `ignore` entry with `reasn` for `reason` says why `reason` is missing. `extensions`
+  and keys starting with `x-` are reserved, for the configuration of extensions and for your own
+  tooling, and are never warned about; a project that keeps its own data under `extra.lockrot` can
+  move it under `x-` to stay quiet.
+
+### Fixed
+
+- A configuration error from `composer lockrot`, and the install-time `check skipped` line, print
+  their message as written instead of handing it to Symfony's tag formatter: a message quoting text
+  from outside lockrot, such as an `--explain` argument like `<fg=red>x`, restyled the line instead
+  of printing it. Both keep their colours, and the `check skipped` line still escapes any control
+  character in the message.
 
 ## [0.12.0] - 2026-09-24
 

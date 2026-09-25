@@ -62,27 +62,46 @@ lockrot: unknown key extra.lockrot.ignore[1].expire ignored (did you mean expire
 
 - A key is close when it is at most a third of its own length in edits away from a known key, or
   when a known key contains it (three characters or more: `dev` suggests `include-dev`), compared in
-  lower case. The fewest edits wins, and a tie goes to the alphabetically first key. Nothing close
-  means no suggestion rather than a far-fetched one. The rule is adapted from the one Symfony Console, and so
-  Composer, uses for a mistyped command.
+  ASCII lower case. The fewest edits wins, and a tie goes to the alphabetically first key. Nothing
+  close means no suggestion rather than a far-fetched one. The rule is adapted from the one Symfony
+  Console, and so Composer, uses for a mistyped command.
 - The keys of each `ignore` entry are checked against `package`, `reason`, `version` and `expires`.
 - It is a warning and nothing more: the run goes on, the report and the exit code are exactly what
   they would be without the key, and stdout carries nothing of it, whatever the format. The key is
   still valid as far as the [schema](schema.md) is concerned, so a `composer.json` that worked keeps
   working.
 - Two namespaces are reserved and never warned about. `extensions` (top level) is for the
-  configuration of extensions; lockrot does not read, walk or validate what it holds. Any key
-  starting with `x-` (`x-ci`, `x-owner`, or `x-ticket` inside an `ignore` entry), in lower case, is
-  for your own tooling and notes; lockrot will never give such a key a meaning. The `LOCKROT_X_*`
-  environment variables are reserved the same way.
+  configuration of extensions; lockrot gives what it holds no meaning and does not warn about
+  anything inside it. Any key starting with `x-` (`x-ci`, `x-owner`, or `x-ticket` inside an `ignore`
+  entry), in lower case, is for your own tooling and notes; lockrot will never give such a key a
+  meaning. The `LOCKROT_X_*` environment variables are reserved the same way.
+- The key is printed as written, `<` and all — a key is text, never console markup. Anything a
+  terminal would act on instead of print is escaped: `\n`, `\r`, `\t`, `\xNN` for any other
+  control byte and for a byte that is not valid UTF-8, `\u{NNNN}` for a C1 control, the line and
+  paragraph separators, a bidirectional control or a byte order mark, and a backslash as `\\`, so
+  two different keys never print alike. A key longer than 255 bytes is cut there and ends in `…`;
+  nothing that long is a near-miss.
 - `composer lockrot` and the PHAR print the lines on every run, `--explain` and
-  `--generate-baseline` included. The [install-time summary](install-time.md) prints them above its
-  block, under the same conditions as the block itself: not with `install-time` off, and not for a
-  transaction that installs or updates nothing. `LOCKROT_DISABLE` silences them everywhere, and so
-  does `-q`. One process prints a line once, however often it reads `composer.json`.
-- A key the schema rejects is a configuration error (exit `2`) before this check runs, so an `ignore`
-  entry that misspells a required key (`reasn`) shows the schema's message, not the suggestion. A
-  top-level key PHP reads as an integer (`"5"`) is dropped before the check and is not named.
+  `--generate-baseline` included, once the configuration has loaded and `LOCKROT_DISABLE` is
+  checked, before the lock is read. The [install-time summary](install-time.md) prints them above
+  its block, when all of these hold: `LOCKROT_DISABLE` is not set, the configuration loads,
+  `install-time` is not `off`, and the transaction installs or updates at least one package. Unlike the block, they do not wait for a finding: a transaction with nothing
+  to report still gets them. `-q` silences them, and with them everything else lockrot prints,
+  the report on stdout included. Each run prints the lines for the `composer.json` it read; a second
+  run in the same process, such as another manifest's install under a plugin that runs one per
+  manifest, prints its own.
+- When the [schema](schema.md) rejects the config, the run is a configuration error (exit `2`) and
+  these lines are added to that error, after the schema's own, so an `ignore` entry that misspells a
+  required key says why the key is missing:
+
+  ```text
+  lockrot: extra.lockrot is invalid:
+    - ignore[0].reason: The property reason is required
+    - unknown key extra.lockrot.ignore[0].reasn ignored (did you mean reason?)
+  ```
+
+  At install time the same error is the one `install-time check skipped` line. A top-level key PHP
+  reads as an integer (`"5"`) is dropped before the config is read and is not named.
 - The environment is not checked: lockrot reads only the variables documented below.
 
 ## Environment overrides
