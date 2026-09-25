@@ -123,29 +123,29 @@ are not listed here even though the area-B Infection config covers `src/Composer
 
 ### src/Composer/LockrotCommand.php
 
-- `src/Composer/LockrotCommand.php:108` CastString — and
-- `src/Composer/LockrotCommand.php:165` CastString — `(string) getcwd()`: `getcwd()` returns false
+- `src/Composer/LockrotCommand.php:115` CastString — and
+- `src/Composer/LockrotCommand.php:172` CastString — `(string) getcwd()`: `getcwd()` returns false
   only when the working directory has been removed or become unreadable under the running process,
   which would already have broken PHPUnit's own bootstrap. The cast is for the type.
-- `src/Composer/LockrotCommand.php:162` Throw_ — not rethrowing `$this->bootstrapError` changes
+- `src/Composer/LockrotCommand.php:169` Throw_ — not rethrowing `$this->bootstrapError` changes
   nothing a test can see: the next statement re-reads the same manifest through the same
   `ProjectConfig::fromFile()` call and raises the identical `ConfigException`, so the exit code and
   the message are the same. The load-bearing half of the mechanism is the early `return` in
   `initialize()`, which stops `parent::initialize()` from crashing on the manifest first; that half is
   covered by `testMalformedComposerJsonIsExit2()`.
-- `src/Composer/LockrotCommand.php:368` UnwrapArrayValues — `RepositoryFactory::defaultRepos()` hands
+- `src/Composer/LockrotCommand.php:473` UnwrapArrayValues — `RepositoryFactory::defaultRepos()` hands
   the repositories back keyed by their configuration name, and nothing downstream reads those keys:
   `RepositoryMetadataLoader` iterates the list and never indexes it. `array_values()` is the `list<>`
   type guarantee.
-- `src/Composer/LockrotCommand.php:374` ReturnRemoval — without the early return, a directory with no
+- `src/Composer/LockrotCommand.php:479` ReturnRemoval — without the early return, a directory with no
   composer.json reaches `tryComposer()`, i.e. `Application::getComposer(false)`, where
   `Factory::create()` throws `InvalidArgumentException` for the missing manifest and is swallowed
   because the call is not `$required`. Null comes back either way; the return only skips a call that
   cannot succeed.
-- `src/Composer/LockrotCommand.php:379` FalseValue — `$this->getComposer(false)` is the Composer 2.2
+- `src/Composer/LockrotCommand.php:484` FalseValue — `$this->getComposer(false)` is the Composer 2.2
   LTS arm of the `method_exists($this, 'tryComposer')` guard. The vendored Composer has
   `tryComposer()`, so that arm is never entered by any test on this runtime.
-- `src/Composer/LockrotCommand.php:379` Ternary — swapping the arms puts `getComposer(false)` on the
+- `src/Composer/LockrotCommand.php:484` Ternary — swapping the arms puts `getComposer(false)` on the
   taken branch, and in Composer 2.3+ `BaseCommand::getComposer(false)` is literally
   `return $this->tryComposer($disablePlugins, $disableScripts);`. The two arms are the same call.
 
@@ -308,7 +308,7 @@ slow test. They are listed here only so nobody reads them as an unexplained "2 t
   newest candidate at the installed branch's own date, and the signal then needs that date to be
   both at least `release-warn-years` old (the branch) and younger than `release-warn-years` (the
   move-on) — impossible, so the rule returns null either way.
-- `src/Composer/LockrotCommand.php:272` `explain()` LogicalOr on `$finding === null || $facts === null` —
+- `src/Composer/LockrotCommand.php:305` `explain()` LogicalOr on `$finding === null || $facts === null` —
   `Analysis::finding()` and `Analysis::facts()` are filled by the same loop over the same packages
   in `Analyzer::analyzeWithFacts()`, so one is null exactly when the other is; and the lock lookup
   two lines up already rejects every name the run does not analyse, so the branch never runs. The
