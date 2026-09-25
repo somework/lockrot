@@ -101,14 +101,15 @@ lockrot: unknown key extra.lockrot.ignore[1].expire ignored (did you mean expire
   these lines are added to that error, after the schema's own, so an `ignore` entry that misspells a
   required key says why the key is missing:
 
-  ```text
-  lockrot: extra.lockrot is invalid:
-    - ignore[0].reason: The property reason is required
-    - unknown key extra.lockrot.ignore[0].reasn ignored (did you mean reason?)
-  ```
+    ```text
+    lockrot: extra.lockrot is invalid:
+      - ignore[0].reason: The property reason is required
+      - unknown key extra.lockrot.ignore[0].reasn ignored (did you mean reason?)
+    ```
 
-  At install time the same error is the one `install-time check skipped` line. A top-level key PHP
-  reads as an integer (`"5"`) is dropped before the config is read and is not named.
+    At install time the same error is the one `install-time check skipped` line. A top-level key PHP
+    reads as an integer (`"5"`) is dropped before the config is read and is not named.
+
 - The environment is not checked: lockrot reads only the variables documented below.
 
 ## Environment overrides
