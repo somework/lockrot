@@ -52,15 +52,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The semantic-versioning promise is narrower. `CONTRIBUTING.md` and the README used to say that
   "the output formats" follow semantic versioning, which covered the wording of a `table` row and
   the look of the HTML page as much as a SARIF `ruleId`. The public interface is now named as the
-  CLI and its exit codes, the configuration keys, the machine-readable formats (`json`, `sarif`,
-  `gitlab`, `github`) and the baseline file; `table`, `markdown` and `html` are for people and may
-  change in any release. The promise is narrowed now because it can only be narrowed before 1.0.
+  CLI and its exit codes, the PHAR's `self-update` with its options and exit codes, the environment
+  variables, the configuration keys, the machine-readable formats (`json`, `sarif`, `gitlab`,
+  `github`) and the baseline file; `table`, `markdown` and `html` are for people and may change in
+  any release. `CONTRIBUTING.md` holds the one list, and the README links to it instead of keeping
+  a second one. The promise is narrowed now because it can only be narrowed before 1.0.
 
-- A release that changes the verdict or the priority lockrot gives a package says so under a
-  heading of its own, **Verdict changes**, from 0.13 on, and ships only in a minor release; a
-  curated-data fix that only removes a false verdict may ship in a patch. Until
-  now such a change sat under `Changed` or `Fixed` with everything else, and a team deciding whether
-  an upgrade can turn its pipeline red had to read every entry to find out.
+- A change that can alter the verdict or the priority lockrot gives a package, or what
+  `--fail-on=unchecked` matches (a new S10 reason, a newly supported host), ships in a minor release,
+  never in a patch, and is listed under a heading of its own, **Verdict changes**. The only patch
+  exception is a curated-data fix that moves a package to `finished` or `ok`. This is project
+  practice from 0.13 on, ahead of the rest of `docs/compatibility.md`. Until now such a change sat
+  under `Changed` or `Fixed` with everything else, and a team deciding whether an upgrade can turn
+  its pipeline red had to read every entry to find out.
 
 ### Added
 
@@ -164,20 +168,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   1.0.0-RC1. Until now the promise was one sentence in `CONTRIBUTING.md`, which said neither which
   parts of a format are fixed nor whether a minor release may change the verdict a package gets. The
   page names what 1.0 freezes (the machine-readable documents; the identity and severity fields of
-  SARIF, GitLab Code Quality and GitHub annotations; the CLI and the exit codes; the closed sets of
-  verdicts, priorities, levels and baseline standings, in their order), what it does not
-  (human-readable output, which verdict and priority a package gets), how verdicts may change
-  between releases and what a baseline does and does not absorb, the names reserved for
-  extensions, the deprecation policy, and what lockrot never does. Items not in lockrot yet are
-  marked *planned*.
+  SARIF, GitLab Code Quality and GitHub annotations; the CLI, `self-update` and the exit codes, with
+  the `1` Composer or Symfony can return before lockrot runs; the closed sets of verdicts,
+  priorities, levels and baseline standings, in their order), what it does not (human-readable
+  output, which verdict and priority a package gets), which open sets the schemas still spell out as
+  enums, what the Composer underneath changes between the plugin and the PHAR, how verdicts may
+  change between releases and what a baseline does and does not absorb, the names reserved for
+  extensions, the deprecation policy, and what lockrot never does, down to the hosts it talks to.
+  Items not in lockrot yet are marked *planned*.
 
 - A test that holds the code, the published report, explain and baseline schemas, and the
   compatibility and verdicts pages to the same verdicts, priorities, signal levels and baseline
-  standings in the same order, and that
-  keeps every name lockrot ships out of the namespaces reserved for extensions. The existing tests
-  compared the lists through the class constants, so they would have followed a changed value
-  rather than caught it. `docs/verdicts.md` now lists all nine verdicts in its severity line
-  (`finished = ok` at the bottom); it used to leave out `finished`.
+  standings in the same order. The existing tests compared the lists through the class constants,
+  so they would have followed a changed value rather than caught it. It also holds the signal ids
+  in the code to every place the report schema spells them (the `signalId` enum, the enum on a
+  signal's `id`, and the `anyOf` branch that types each signal's `data`) and to the explain schema,
+  and keeps every name lockrot ships out of the names reserved for extensions: no verdict, priority,
+  `--fail-on` value, format, signal id or configuration key holds a colon; no configuration key,
+  top level or `ignore` entry, starts with `x-`; the configuration schema gives `extensions` no
+  meaning; nothing under `src/` or in `bin/lockrot` reads a `LOCKROT_X_` variable; and nothing is
+  declared under `Lockrot\Extension\`, in any letter case. `docs/verdicts.md` now lists all nine
+  verdicts in its severity line (`finished = ok` at the bottom); it used to leave out `finished`.
+
+- The docs build in CI now fails on a page left out of the site navigation and on a link to a
+  heading that does not exist. `mkdocs build --strict` let both through, because mkdocs reports them
+  as information rather than warnings; `mkdocs.yml` now makes them warnings.
 
 ### Fixed
 
@@ -228,9 +243,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   are exit `2` now, and the message names the variable.
 
 - `docs/ci.md` said a merge request shows `--format=gitlab` findings inline in the diff of
-  `composer.lock`. Only GitLab Ultimate marks them in the merge request's Changes view; every tier
-  lists them in the merge request's reports, and Premium adds the pipeline's Code Quality tab. The
-  page now says which tier shows what. The format itself is unchanged.
+  `composer.lock`. Every GitLab tier shows, in the merge request, the findings that are new or fixed
+  compared with the target branch's report, so a merge request that changes no verdict shows none;
+  Premium's pipeline Code Quality tab lists them all; Ultimate also marks new findings on
+  `composer.lock` lines in the Changes view when the merge request changes `composer.lock`. The page
+  now says so, and its link to GitLab's format description points at a heading that exists. The
+  format itself is unchanged.
+
+- `docs/verdicts.md` said `finished` and `ok` are never a finding. Neither is ever flagged, but
+  `--fail-on=unchecked` reads S10 rather than the verdict, so an `ok` package carrying S10 fails
+  the run; the page now says so.
+
+- `docs/schema.md` said a report from a newer lockrot validates against a copy of the schema
+  fetched or vendored earlier. Its objects are open, but signal ids, S10's `check`, `reason` and
+  `blocks`, S8's `floor_source` and the configuration schema's `format` are still enums, so a new
+  value there fails against an older copy. The page, and the docblock of the class that names the
+  schema URLs, now say so, and the vendoring recipe says to refresh the copy on an upgrade. The
+  schemas are unchanged; describing those values as open strings is planned before 1.0.
+
+- `SECURITY.md` said lockrot talks only to the configured Composer repositories and the GitHub API,
+  and reads only the GitHub token variables. It also talks to GitLab and Bitbucket for repository
+  activity and to GitHub's release downloads for `self-update`, and reads the GitLab token
+  variables and the credentials Composer holds; it now lists them.
+
+- `docs/ci.md` cut the report out of an HTML page with a `sed` recipe that wrote an empty file when
+  the page did not match. The recipe now fails instead, says it relies on the page's data element
+  staying on one line, and comes after the simpler route: `--output=json:lockrot.json` beside
+  `--format=html` in the same run. The README, `docs/schema.md` and `docs/verdicts.md` said there
+  are six output formats; there are seven.
 
 ## [0.12.0] - 2026-09-24
 

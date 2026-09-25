@@ -12,8 +12,13 @@ namespace Lockrot\Json;
  *
  * The number in the URL is the document's schema number ({@see \Lockrot\Output\JsonFormatter::SCHEMA},
  * {@see \Lockrot\Baseline\Baseline::SCHEMA}): a file under one number only ever gains fields, so a
- * consumer validating against a copy it fetched earlier keeps validating; the number moves only
- * when a field is removed or renamed. The `id` inside each resources/*.schema.json is this same URL.
+ * field added later validates against a copy a consumer fetched earlier; the number moves only when
+ * a field is removed or renamed. The `id` inside each resources/*.schema.json is this same URL.
+ *
+ * Objects are open, but some values are still enums: signal ids, S10's `check`, `reason` and
+ * `blocks`, S8's `floor_source` and the config schema's `format`. A new value there needs a schema
+ * update, and a copy fetched or vendored before it rejects the value until it is refreshed;
+ * describing them as open strings is planned before 1.0 (docs/compatibility.md, "Open sets").
  *
  * @internal
  */

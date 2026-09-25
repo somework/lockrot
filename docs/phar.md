@@ -323,10 +323,10 @@ not from `api.github.com`. A CI job whose network allows only the API needs that
 
 On `2` the running `lockrot.phar` is untouched.
 
-An exit `1` without a `lockrot` line on stderr is not lockrot's: a command name the PHAR does not have
-(`php lockrot.phar self-updte`) is refused by Symfony's console before any lockrot command runs, with its own error
-box and exit `1`, and nothing is checked or written. The same holds for the analysis — see
-[ci.md](ci.md#exit-codes).
+An unknown option or a missing value is a usage error, and exit `2` like the rest. An unknown
+command (`php lockrot.phar self-updat`) never reaches `self-update`: Symfony stops it with its own
+exit `1` and its own message, and nothing is checked or downloaded. A `1` from `self-update` itself
+comes only from `--check`, with a line naming the release that is available.
 
 ### Reinstalling by hand
 

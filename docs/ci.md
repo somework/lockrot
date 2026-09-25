@@ -62,11 +62,16 @@ metadata: it is reported as a failure, not silently skipped. A `composer.lock` e
 load (missing `name`/`version`, an unnormalizable version, a malformed entry) stops the report with exit `2` rather
 than being skipped.
 
-As a Composer plugin, a `composer.json` that Composer itself cannot parse never reaches lockrot at all: Composer parses
-the project's manifest while collecting plugin commands, before any plugin class is loaded, so it stops with its own
-exit `1` first. `composer lockrot` on an unparsable `composer.json` exits `1`, not `2`. The standalone PHAR reads and
-validates `composer.json` itself, so the same failure there is exit `2`. `lockrot.phar self-update` uses the same three
-codes with its own meanings; see [phar.md](phar.md).
+Every usage or configuration error lockrot's own commands see — an unknown option, a missing or invalid value, an
+`extra.lockrot` the schema rejects — is exit `2`. Exit `1` can also come from Composer or Symfony, before lockrot runs:
+an unknown command (a typo in `composer lockrot`, or a PHAR option whose value is separated by a space ahead of the
+command name, which Symfony reads as a command), or an error Composer raises itself. As a Composer plugin, a
+`composer.json` that Composer itself cannot parse, or that fails Composer's own schema, never reaches lockrot at all:
+Composer parses the project's manifest while collecting plugin commands, before any plugin class is loaded, so it
+stops with its own exit `1` first. The standalone PHAR reads and validates `composer.json` itself, so the same failure
+there is exit `2`. To tell the two `1`s apart: a `1` from lockrot comes with a report, while one from before lockrot
+runs comes with none, and with Composer's or Symfony's message rather than a `lockrot:` line. `lockrot.phar
+self-update` uses the same three codes with its own meanings; see [phar.md](phar.md#self-update-exit-codes).
 
 More generally, an exit `1` can come from Composer or Symfony before lockrot runs at all — an unknown command name
 (`lockrot.phar nope`, `composer lokrot`), or Composer stopping on its own while it starts up. That exit `1` puts
@@ -189,7 +194,7 @@ the directory that holds the lock file.
 
 ## `--format=gitlab`
 
-A [GitLab Code Quality](https://docs.gitlab.com/ci/testing/code_quality/#implement-a-custom-tool) report: a JSON array
+A [GitLab Code Quality](https://docs.gitlab.com/ci/testing/code_quality/#code-quality-report-format) report: a JSON array
 with one issue per flagged finding (every finding with `--all`). Publish it as a `codequality` artifact:
 
 ```yaml
@@ -204,9 +209,11 @@ lockrot:
 Where the findings appear depends on your GitLab tier ([features per
 tier](https://docs.gitlab.com/ci/testing/code_quality/#features-per-tier)):
 
-- Every tier lists them in the merge request's reports.
-- Premium adds the pipeline's **Code Quality** tab.
-- Only Ultimate also marks the lines of `composer.lock` in the merge request's **Changes** view.
+- Every tier shows, in the merge request, the findings that are new or fixed compared with the target
+  branch's report, so a merge request that changes no verdict shows none.
+- Premium's pipeline **Code Quality** tab lists them all.
+- Ultimate also marks new findings on the lines of `composer.lock` in the merge request's **Changes**
+  view, when the merge request changes `composer.lock`.
 
 Code Quality has no title field of its own, so each issue's description opens with the package, the version and the
 same `<verdict> (<priority>)` phrase the GitHub annotation title uses:
@@ -304,12 +311,19 @@ query understands `verdict:`, `priority:`, `signal:`, `severity:`, `cve:`, `dire
 
 The page carries the run as JSON, and that payload's `report` key is the document `--format=json`
 writes, [schema](schema.md), envelope and every field — the page's copy is compact where the
-formatter pretty-prints, and identical once parsed:
+formatter pretty-prints, and identical once parsed. To have both from one run, ask for both:
 
 ```bash
-composer lockrot --format=html > lockrot-report.html
+composer lockrot --format=html --output=json:lockrot.json > lockrot-report.html
+```
+
+If all you have is the page, the document can be cut out of it. This relies on the page keeping its
+`<script id="lockrot-data">` element on one line, which is how lockrot writes it today but not a
+promise, so let the pipeline fail when nothing matched rather than write an empty file:
+
+```bash
 sed -n 's/.*<script id="lockrot-data" type="application\/json">\(.*\)<\/script>.*/\1/p' lockrot-report.html \
-  | jq .report > lockrot.json
+  | jq -e .report > lockrot.json
 ```
 
 Nothing in the page is fetched — no fonts, no CDN, no analytics — so it renders the same offline and

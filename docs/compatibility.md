@@ -8,8 +8,9 @@ description: Draft of the lockrot 1.0 compatibility promise — the machine-read
 !!! warning "Draft until 1.0.0-RC1"
     This page describes the promise lockrot will make at 1.0.0. Until then lockrot is 0.x and, as
     Semantic Versioning allows, a minor release may change anything; the [changelog](changelog.md)
-    says what did. The page becomes binding with the first release candidate. Items marked
-    *planned* are not in lockrot yet.
+    says what did. The page becomes binding with the first release candidate. One rule applies
+    already, as project practice from 0.13 on: how a release may change a verdict, in
+    [Verdict changes](#verdict-changes). Items marked *planned* are not in lockrot yet.
 
 1.0 promises what a machine reads or writes: the command line and its exit codes, the configuration
 keys, the machine-readable formats (`json`, `sarif`, `gitlab`, `github`) and the baseline file.
@@ -49,7 +50,8 @@ The first six verdicts are the flagged ones. They are what the report lists in
 `run.flagged_verdicts`, the only verdicts a baseline entry holds, and the only verdicts `--fail-on`
 accepts. `finished` and `ok` share the lowest severity: no threshold and no comparison tells them
 apart. Where lockrot lists verdicts — `counts`, `run.flagged_verdicts`, the schema enums, this page —
-`finished` comes first; the SARIF rules appear in the order the results first use them.
+`finished` comes before `ok` wherever both appear; the SARIF rules appear in the order the results
+first use them.
 
 The order decides four things:
 
@@ -75,9 +77,11 @@ These grow in minor releases:
 
 A consumer treats a value it does not know as "other".
 
-*Planned (before 1.0):* the schemas describe these as open strings. Until then a new value arrives
-with a schema update, and a vendored copy of the schema needs refreshing. The changelog says so when
-that happens.
+Today the schemas still spell some of them out as enums: signal ids, S10's checks, reasons and
+blocked signals, S8's `floor_source`, and `format` in the configuration schema. A new value there
+arrives with a schema update, and a copy of the schema you vendored rejects it until you refresh the
+copy; the changelog says so when that happens. *Planned (before 1.0):* the schemas describe these as
+open strings.
 
 ### Finding identity
 
@@ -113,30 +117,42 @@ requests are blocked.
 ### Command line
 
 - The commands: `composer lockrot` (alias `composer rot`), and the PHAR's `lockrot` and
-  `self-update`.
-- The options documented in [configuration.md](configuration.md#cli-options).
+  `self-update` (alias `selfupdate`).
+- The options documented in [configuration.md](configuration.md#cli-options), and `self-update`'s
+  `--check`, `--force`, `--offline` and `--allow-major`, documented with its exit codes in
+  [phar.md](phar.md#keeping-it-updated).
 - The format names `table`, `json`, `github`, `sarif`, `gitlab`, `markdown` and `html`. All seven
   names are fixed; only the contents of the machine-readable four are contract.
 - The `--fail-on` values.
 - The variables listed in [Environment overrides](configuration.md#environment-overrides). The
   [testing hooks](configuration.md#testing-hooks) are not included.
 - Exit codes are the closed set `0`, `1` and `2`, as [ci.md](ci.md#exit-codes) defines them.
-  - One failure differs by distribution: under the plugin, an unparsable `composer.json` exits `1`,
-    because Composer stops before lockrot runs.
-  - `self-update` gives the same three codes meanings of its own ([phar.md](phar.md#self-update-exit-codes)).
+    - lockrot's own commands exit `2` on every usage or configuration error: an unknown option, a
+      missing or invalid value, an `extra.lockrot` the schema rejects.
+    - Exit `1` can also come from Composer or Symfony, before lockrot runs: an unknown command, or
+      an error Composer raises itself — under the plugin, a `composer.json` Composer cannot parse or
+      that fails Composer's own schema. A `1` from lockrot comes with a report; one from before
+      lockrot runs comes with none, and with Composer's or Symfony's message rather than a
+      `lockrot:` line.
+    - `self-update` gives the same three codes meanings of its own
+      ([phar.md](phar.md#self-update-exit-codes)).
 - Messages about lockrot itself — a failure, a warning, a deprecation — go to stderr, never into the
   report on stdout. A report's own notes are part of the report.
 - `--fail-on=unchecked` can match more findings after a minor release. A new reason a check could not
-  run, or a newly supported host, is a [Verdict change](#verdict-changes).
+  run, or a newly supported host, is a [Verdict change](#verdict-changes), so it never arrives in a
+  patch.
 
 ### Configuration
 
 - `extra.lockrot` keys are never removed within 1.x.
 - Precedence: CLI options, then environment variables, then `extra.lockrot`, then an `extends`d file
-  (*planned*), then the defaults. The first one that sets a value wins.
+  (*planned*), then the defaults. The first one that sets a value wins. One exception: a credential
+  Composer already holds for a host (`auth.json`, `COMPOSER_AUTH`) is the one sent, whatever the
+  token variables say — see [configuration.md](configuration.md#environment-overrides).
 - From 0.13, each `extra.lockrot` key lockrot does not know prints one warning on stderr,
-  suggesting the closest known key when one is near, and the run goes on. Nested keys are checked
-  too. The reserved `extensions` key and keys that start with `x-`, at either level, never warn.
+  suggesting the closest known key when one is near, and the run goes on. The keys inside each
+  `ignore` entry are checked too. Reserved names never warn: `extensions` at the top level of
+  `extra.lockrot`, and any key that starts with `x-`, at the top level or inside an `ignore` entry.
 - The default thresholds are not frozen. They are chosen at the RC, and a later change to them is a
   [Verdict change](#verdict-changes). If you need fixed numbers, set them in `extra.lockrot`.
 
@@ -153,21 +169,30 @@ pending a spike. Nothing on this page promises any of the three.
 ### Distribution
 
 - The Composer plugin, the signed PHAR, the Docker image `ghcr.io/somework/lockrot` and
-  `somework/lockrot-action` run the same code and write the same documents.
+  `somework/lockrot-action` run the same lockrot code and write documents to the same schemas. The
+  Composer underneath differs: the PHAR, and the image and the Action that run it, bundle Composer
+  2.10.x, while the plugin runs on the project's own Composer. On an older one:
+    - below 2.4, S9 (security advisories) is not checked, so a priority can be one step lower than
+      the PHAR gives the same lock; the report carries a note saying so;
+    - below 2.10, only `config.audit.ignore` (and `audit.ignore-severity`) silences an advisory;
+      `config.policy.advisories` is not read.
 - The PHAR's asset names and the verification path in [phar.md](phar.md) are stable.
 - `lockrot-action@v1` follows lockrot 1.x, and its inputs follow semver. lockrot 2.0 means action v2.
 - The Docker tag scheme is decided at the RC.
-- *Planned:* `self-update` stays within the running major version, skips a release whose PHP floor is
-  above the running PHP, and updates through the transition release of a signing-key rotation.
-  - Today `self-update` installs the newest release, whatever it is.
-  - The rules will protect only archives from the release that introduces them on;
-    [phar.md](phar.md#keeping-it-updated) will say which.
+- `self-update` stays within the running major version (`--allow-major` moves to the next one),
+  passes over a release whose lowest PHP is above the running one, and passes over a release signed
+  with a key the archive does not carry, so it updates through the transition release of a
+  signing-key rotation. The rules belong to the archive doing the update, so they hold for archives
+  from 0.13.0 on; 0.12 and older take whatever GitHub's latest release is
+  ([phar.md](phar.md#keeping-it-updated)).
 
 ### PHP platform
 
 - lockrot runs on PHP 7.4+ with Composer 2.2+ today. The floor for 1.x is chosen at the RC.
-- *Planned:* within 1.x the floor rises only in a minor release, never in a patch. A warning on stderr
-  comes one minor release ahead, and `self-update` protects older runtimes.
+- *Planned:* within 1.x the floor rises only in a minor release, never in a patch, with a warning on
+  stderr one minor release ahead.
+- `self-update` already protects an older runtime: it passes over a release whose lowest PHP is above
+  the running one.
 
 ## What is not contract
 
@@ -188,15 +213,15 @@ pending a spike. Nothing on this page promises any of the three.
 Semantic Versioning covers the shape and the names. It cannot cover which verdict a package gets,
 because that is what improving lockrot changes. So:
 
-- A release changes the verdict or the priority a package gets only in a minor version, never in a
-  patch. It lists every such change in the changelog under **Verdict changes**. That heading is used
-  from 0.13 on.
-- A patch may correct curated data only when the correction removes a false verdict: a package moves
-  to `finished` or `ok`, never to a flagged verdict.
+- A change that can alter the verdict or the priority a package gets, or what `--fail-on=unchecked`
+  matches — a new S10 reason, a newly supported host — ships in a minor release, never in a patch,
+  and is listed in the changelog under **Verdict changes**.
+- The only patch exception is a curated-data fix that moves a package to `finished` or `ok`.
 - A new signal that decides verdicts ships for one minor release as evidence only. It appears in the
   report and decides nothing; it starts deciding in the next minor.
-- New reasons a check could not run, and newly supported hosts, widen `--fail-on=unchecked` and can
-  change verdicts. Both are Verdict changes.
+
+This section is project practice from 0.13 on, ahead of the rest of the page; it becomes binding with
+it at 1.0.0-RC1.
 
 A committed [baseline](baseline.md) does not make an upgrade silent:
 
@@ -217,8 +242,8 @@ one clock and one set of fetched data, so a pull request fails only on what it c
 
 1.0 ships no plugin API. There are three routes instead:
 
-- **JSON out.** report-1 and explain-1 are the same from the plugin, the PHAR, the Docker image and
-  the Action. Dashboards, fleet summaries, other formats and organisation policy (a `jq -e` gate)
+- **JSON out.** The plugin, the PHAR, the Docker image and the Action write report-1 and explain-1
+  from the same code; [Distribution](#distribution) says what the Composer underneath changes. Dashboards, fleet summaries, other formats and organisation policy (a `jq -e` gate)
   are programs over those documents.
 - **Composer configuration in.** lockrot finds repository hosts through Composer's own settings —
   today `gitlab-domains` — and has no host keys of its own.
@@ -233,9 +258,9 @@ These names are reserved so that an extension mechanism can arrive later without
 - Anything that does not come from lockrot — a signal, a format — is named `<vendor>:<name>`. No name
   lockrot ships contains a colon.
 - lockrot will never give a meaning of its own to:
-  - the `extra.lockrot.extensions` key;
-  - any `extra.lockrot` key that starts with `x-`;
-  - any environment variable that starts with `LOCKROT_X_`.
+    - `extensions` at the top level of `extra.lockrot`;
+    - any key that starts with `x-`, at the top level of `extra.lockrot` or inside an `ignore` entry;
+    - any environment variable that starts with `LOCKROT_X_`.
 - The PHP namespace `Lockrot\Extension\` is reserved. Nothing in it exists, and reserving it
   promises nothing about what will.
 
@@ -244,11 +269,11 @@ These names are reserved so that an extension mechanism can arrive later without
 - Nothing in the contract is removed within 1.x.
 - An option, environment variable, configuration key, format name or Action input can be deprecated
   in a minor release. From then on it:
-  - keeps working unchanged until the next major version;
-  - prints one line to stderr when used;
-  - is listed under `Deprecated` in the changelog and in the table below.
-
-  It is removed only in the next major version, and at least six months after it was deprecated.
+    - keeps working unchanged until the next major version;
+    - prints one line to stderr when used;
+    - is listed under `Deprecated` in the changelog and in the table below;
+    - is removed only in the next major version, and no sooner than six months after it was
+      deprecated.
 - Exit codes and format names never take on a new meaning.
 - A JSON field is never deprecated on its own. It keeps being written, the schema marks it
   `x-deprecated: true`, and it disappears only with report-2.
@@ -261,17 +286,26 @@ These names are reserved so that an extension mechanism can arrive later without
 
 ## What lockrot does not do
 
-- In your project, lockrot writes only the files you name: reports with `--output` and the baseline
-  with `--generate-baseline`. It never writes `composer.json` or `composer.lock`. Outside the project
-  it writes only its activity cache, under Composer's cache directory, and `self-update` replaces the
-  PHAR; Composer writes its own metadata cache there too, as it would for any install.
+- lockrot writes the files you name — reports with `--output`, the baseline with
+  `--generate-baseline` — each through a temporary file beside it that is renamed over it, so it
+  needs write access to that directory; its activity cache under Composer's cache directory; and,
+  with `self-update`, the PHAR. It never writes `composer.json` or `composer.lock`. Composer keeps
+  the repository metadata it fetched in its own cache, as it does for any command.
 - It opens no pull request or merge request, and it changes no code.
 - It has no hosted service, no account, no telemetry and no usage metering. It talks to:
-  - the Composer repositories your project configures, through Composer;
-  - GitHub, GitLab and Bitbucket, for repository activity;
-  - GitHub's release API, for `self-update` only.
+    - the Composer repositories your project configures, through Composer, for package metadata
+      and security advisories;
+    - the GitHub, GitLab and Bitbucket APIs, for repository activity: `api.github.com`, gitlab.com
+      and every host in Composer's `gitlab-domains`, and `api.bitbucket.org` (plus `bitbucket.org`,
+      to exchange a Composer `bitbucket-oauth` consumer for a token);
+    - for `self-update` only, GitHub's release API and the release's asset downloads, from
+      `github.com` and the download host it redirects them to.
 
-  `--offline` talks to none of them.
+    `--offline` talks to none of them. The tokens it reads from the environment are the
+    `LOCKROT_GITHUB_TOKEN`, `GITHUB_TOKEN`, `LOCKROT_GITLAB_TOKEN` and `GITLAB_TOKEN` variables
+    [configuration.md](configuration.md#environment-overrides) lists; beside them it uses the
+    credentials Composer already holds, and it sends each one only to its own host.
+
 - Anything lockrot may serve later, such as a Composer policy source, runs where you run it.
 
 ## Related

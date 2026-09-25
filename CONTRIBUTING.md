@@ -87,7 +87,11 @@ still holds.
 
 The public interface follows semantic versioning. It is:
 
-- the CLI (`composer lockrot` options) and its exit codes;
+- the CLI — `composer lockrot` and the PHAR's `lockrot` — its options and its exit codes;
+- the PHAR's `self-update`: its options and its exit codes;
+- the environment variables listed under
+  [Environment overrides](docs/configuration.md#environment-overrides) (the testing hooks are not
+  included);
 - the `extra.lockrot` configuration keys;
 - the machine-readable output formats (`json`, `sarif`, `gitlab`, `github`);
 - the baseline file.
@@ -104,14 +108,17 @@ on a class that is, or on a `src/Extension/` directory, in any letter case: PHP 
 without regard to case. The reservation keeps the name free; it is not a promise that anything will
 be published there, or in what form.
 
-What 1.0 will freeze, and what it will not, is drafted in
-[`docs/compatibility.md`](docs/compatibility.md): the closed sets of verdicts and priorities and
-their order, finding identity, the severity mapping, the names reserved for extensions, and the
+This is the one list; the README points here rather than repeating it. The detail is drafted in
+[`docs/compatibility.md`](docs/compatibility.md): what 1.0 will freeze and what it will not, the four
+closed sets (verdicts, priorities, signal levels, and a finding's standing against the baseline)
+and their order, finding identity, the severity mapping, the names reserved for extensions, and the
 deprecation policy.
 
-From 0.13 on, a change to the verdict or the priority lockrot gives a package goes into a minor
-release, never a patch, and gets a line under `### Verdict changes` in `CHANGELOG.md`. The one
-exception is a curated-data fix that only removes a false verdict, which may ship in a patch.
+A change that can alter the verdict or the priority a package gets, or what `--fail-on=unchecked`
+matches (a new S10 reason, a newly supported host), ships in a minor release, never in a patch, and
+gets a line under `### Verdict changes` in `CHANGELOG.md`. The only patch exception is a
+curated-data fix that moves a package to `finished` or `ok`. This is project practice from 0.13 on;
+the rest of `docs/compatibility.md` becomes binding at 1.0.0-RC1.
 
 ## What lockrot writes
 

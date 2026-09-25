@@ -11,11 +11,14 @@ use Lockrot\Verdict\Finding;
 
 /**
  * GitLab Code Quality JSON, one object per flagged finding (every finding with `--all`), for a job
- * that publishes `artifacts.reports.codequality` so GitLab lists the findings in the merge request
- * (and, on Ultimate only, marks their lines in its Changes view).
+ * that publishes `artifacts.reports.codequality`. Every tier shows, in the merge request, the
+ * findings that are new or fixed compared with the target branch's report, so a merge request that
+ * changes no verdict shows none; Premium's pipeline Code Quality tab lists them all; Ultimate also
+ * marks new findings on composer.lock lines in the Changes view when the merge request changes
+ * composer.lock.
  *
- * Shape per https://docs.gitlab.com/ci/testing/code_quality/#implement-a-custom-tool ("Implement a
- * custom tool"): each issue needs `description`, `check_name`, `fingerprint`, `severity` (one of
+ * Shape per https://docs.gitlab.com/ci/testing/code_quality/#code-quality-report-format ("Code
+ * Quality report format"): each issue needs `description`, `check_name`, `fingerprint`, `severity` (one of
  * `info`, `minor`, `major`, `critical`, `blocker`) and a location with either `lines.begin` or
  * `positions.begin.line`; `type` and `categories` are accepted but not required by GitLab's own
  * parser — kept here for compatibility with tools that still expect the CodeClimate shape GitLab's

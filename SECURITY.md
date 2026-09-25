@@ -106,12 +106,24 @@ absolute path is written where it points, in the project or not, and a run inter
 leave a `*.tmp` file beside the target. An `--output` naming `composer.json`, `composer.lock` or a
 baseline — by any spelling that reaches the same file, a link included — is refused before anything
 runs. A report that replaces a file keeps that file's permission bits; its owner and ACLs are not
-carried over. The PHAR always runs
-the inspected project with `--no-plugins`, so it never executes that project's Composer plugins.
-Network access is limited to the configured Composer repositories, the GitHub API (repository
-activity checks, and release lookups for `self-update`) and, for `self-update` only, the release
-downloads on `github.com` (the archive, its checksum, signature and `lockrot.phar.meta.json`, which
-`--check` reads too); `GITHUB_TOKEN` and `LOCKROT_GITHUB_TOKEN` are read from the environment and
-are never written anywhere.
+carried over. The PHAR always runs the inspected project with `--no-plugins`, so it never executes
+that project's Composer plugins.
+
+Network access is limited to:
+
+- the Composer repositories the project configures, through Composer, for package metadata and
+  security advisories;
+- the GitHub, GitLab and Bitbucket APIs, for repository activity: `api.github.com`, gitlab.com and
+  every host in Composer's `gitlab-domains`, and `api.bitbucket.org` (plus `bitbucket.org`, to
+  exchange a Composer `bitbucket-oauth` consumer for a token);
+- for `self-update` only, GitHub's release API and the release's asset downloads (the archive, its
+  checksum, signature and `lockrot.phar.meta.json`, which `--check` reads too), from `github.com`
+  and the download host it redirects them to.
+
+`--offline` reaches none of them. The tokens read from the environment are
+`LOCKROT_GITHUB_TOKEN`, `GITHUB_TOKEN`, `LOCKROT_GITLAB_TOKEN` and `GITLAB_TOKEN`, as the
+[configuration reference](https://lockrot.dev/configuration/#environment-overrides) lists them;
+beside them lockrot uses the credentials Composer already holds. Each is sent only to its own host
+and is never written anywhere.
 
 lockrot does not check for known CVEs in your dependencies. For that, use `composer audit`.
