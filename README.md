@@ -257,8 +257,8 @@ the lock files bundled inside PHAR tools is being evaluated.
 
 Bug reports, fixes and additions to the built-in allowlist are welcome — see
 [`CONTRIBUTING.md`](CONTRIBUTING.md). The CLI, configuration keys, output formats, baseline file and
-exit codes are the public interface; the PHP classes are not, and every one of them but the Composer
-plugin's entry point is marked `@internal`.
+exit codes are the public interface; the PHP classes are not, and every one of them is marked
+`@internal`.
 
 ## Security
 
