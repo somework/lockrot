@@ -206,7 +206,7 @@ final class BaselineFileTest extends TestCase
             $thrown->getMessage(),
             'the path a reader can act on comes first, then the reason'
         );
-        self::assertStringContainsString('file_put_contents', $thrown->getMessage());
+        self::assertStringContainsString('fopen', $thrown->getMessage());
         self::assertStringNotContainsString('unlink', $thrown->getMessage());
     }
 
