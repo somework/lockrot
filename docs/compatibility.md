@@ -73,6 +73,7 @@ These grow in minor releases:
 - signal ids;
 - the checks, reasons and blocked signals of S10;
 - S8's `floor_source`;
+- S6's `reason`;
 - repository hosts;
 - format names.
 

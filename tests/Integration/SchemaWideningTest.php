@@ -62,6 +62,7 @@ final class SchemaWideningTest extends TestCase
         yield 'baseline findings lose stale' => [Schemas::BASELINE, 'baseline-verdict', '#/properties/findings/additionalProperties/properties/verdict: no longer accepts "stale"'];
         yield 'baseline schema maximum lowered' => [Schemas::BASELINE, 'baseline-maximum', '#/properties/lockrot/properties/schema: maximum lowered to 0'];
         yield 'config budget maximum lowered' => [Schemas::CONFIG, 'budget-maximum', '#/properties/install-time-budget: maximum lowered to 60'];
+        yield 's6 reason closed to the values it knows' => [Schemas::REPORT, 's6-reason-enum', '/properties/data/properties/reason: enum ["branch_snapshot","no_stable_release"] where any value was accepted'];
     }
 
     /**
@@ -186,6 +187,9 @@ final class SchemaWideningTest extends TestCase
                 return self::with($s, ['properties', 'findings', 'additionalProperties', 'properties', 'verdict', 'enum'], ['abandoned', 'silent', 'pinned', 'left-behind', 'old-promise']);
             case 'baseline-maximum':
                 return self::with($s, ['properties', 'lockrot', 'properties', 'schema', 'maximum'], 0);
+            case 's6-reason-enum':
+                // An open set: a reason a later release adds has to keep validating.
+                return self::with($s, ['definitions', 's6', 'properties', 'reason', 'enum'], ['branch_snapshot', 'no_stable_release']);
             case 'budget-maximum':
                 return self::with($s, ['properties', 'install-time-budget', 'maximum'], 60);
             case 'field-added':
