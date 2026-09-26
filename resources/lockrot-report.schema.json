@@ -1138,6 +1138,18 @@
             }
           ]
         },
+        "root_package": {
+          "description": "What Composer calls this project: the `name` of the manifest Composer reads (composer.json, or the file `COMPOSER` names), exactly as written, whatever `extra.lockrot.project` says. `project` is what the report calls the project; this is the root package's own name. Not checked against the vendor/name form. Null where the manifest has no `name` (absent, empty or not a string), or where no composer.json was read (a lock-only run). The one key in `run` a document may omit: reports written before 0.13.0 do not carry it; from 0.13.0 on it is always written.",
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
         "target_php": {
           "description": "The PHP version the project targets, as --target-php, config.platform.php or the running PHP gave it.",
           "oneOf": [

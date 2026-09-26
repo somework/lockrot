@@ -21,9 +21,16 @@ use Lockrot\Verdict\Verdict;
  * reason: a reader deciding what counts as a finding should not have to know the severity ladder by
  * heart or guess it from the counts.
  *
- * `project` is the name the project gives itself in composer.json, which is the only thing in a
- * report that says which project it is about — every lock in the world is called composer.lock.
- * Null where an application does not name itself, which composer.json does not require it to.
+ * `project` is what the report calls the project: composer.json's own `name`, unless
+ * `extra.lockrot.project` names it something else — a display name, not an identifier. Null where
+ * neither says anything, which composer.json does not require it to.
+ *
+ * `root_package` is what Composer calls it: always the manifest's own `name` (the manifest Composer
+ * reads, so `COMPOSER=alt.json` reads alt.json), as written, whatever `extra.lockrot.project` says,
+ * and null where the manifest has none or the run read a lock without one. A consumer matching a
+ * report to its repository, or joining the reports of several projects, needs the name Composer
+ * uses, not the label the report was published under; a lock cannot say, since every lock in the
+ * world is called composer.lock and none stores its root package's name.
  *
  * The lock is named, never located: a report is something people publish, and an absolute path
  * carries the account it ran under and often the client's directory name. The project's own name is
@@ -35,14 +42,16 @@ use Lockrot\Verdict\Verdict;
 final class RunSettings
 {
     private ?string $project;
+    private ?string $rootPackage;
     private ?string $targetPhp;
     private ?string $lockFile;
     private ?string $failOn;
     private ?Thresholds $thresholds;
 
-    public function __construct(?string $project, ?string $targetPhp, ?string $lockPath, ?string $failOn, ?Thresholds $thresholds)
+    public function __construct(?string $project, ?string $rootPackage, ?string $targetPhp, ?string $lockPath, ?string $failOn, ?Thresholds $thresholds)
     {
         $this->project = $project;
+        $this->rootPackage = $rootPackage;
         $this->targetPhp = $targetPhp;
         $this->lockFile = $lockPath === null ? null : basename($lockPath);
         $this->failOn = $failOn;
@@ -54,6 +63,7 @@ final class RunSettings
     {
         return [
             'project' => $this->project,
+            'root_package' => $this->rootPackage,
             'target_php' => $this->targetPhp,
             'lock_file' => $this->lockFile,
             'fail_on' => $this->failOn,

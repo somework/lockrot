@@ -70,6 +70,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   under `Changed` or `Fixed` with everything else, and a team deciding whether an upgrade can turn
   its pipeline red had to read every entry to find out.
 
+- `extra.lockrot.project` no longer keeps composer.json's `name` out of a report. The configuration
+  page, the config schema and the code described it as the setting for a project whose manifest
+  name "is not the one to publish", a private project named after its client among them, and until
+  now a report did carry only that override as `run.project`. From 0.13.0 every `--format=json` and
+  `--format=html` report, `--output` files included, also carries the manifest's own `name` as
+  `run.root_package` (see Added), whatever `extra.lockrot.project` says. A project that set the
+  override so the client's name would stay out of its published reports should know this before
+  it publishes one from 0.13.0: the override renames the project and hides nothing. The table,
+  markdown, github, SARIF and GitLab outputs and `--explain` do not carry `run`, and are unchanged.
+  The configuration page, the config schema's `project` description and the docblocks no longer
+  promise otherwise.
+
 ### Added
 
 - A schema evolution test. Under one schema number a document may only gain fields, so whatever an
@@ -197,6 +209,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The docs build in CI now fails on a page left out of the site navigation and on a link to a
   heading that does not exist. `mkdocs build --strict` let both through, because mkdocs reports them
   as information rather than warnings; `mkdocs.yml` now makes them warnings.
+
+- `run.root_package`: what Composer calls the project, beside what the report calls it.
+  `run.project` is a display name — composer.json's own `name`, unless `extra.lockrot.project` says
+  otherwise — so a consumer that needed the root package itself, to match a report to its
+  repository or to join the reports of several projects, could not tell an override from the
+  manifest's name. `run.root_package` is always the `name` of the manifest Composer reads
+  (composer.json, or the file `COMPOSER` names), as written, whatever `extra.lockrot.project` says,
+  and null where the manifest has no name or the run read a lock without its composer.json; the key
+  is always written. `run.project` is unchanged. The field is listed but not required in the
+  [published schema](docs/schema.md), so documents written before 0.13.0 still validate; it is the
+  one key in `run` such a document omits. `--format=html` carries it in the page's payload, which
+  does not draw it; the other formats and `--explain` do not carry `run` at all.
 
 ### Fixed
 
