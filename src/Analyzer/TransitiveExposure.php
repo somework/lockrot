@@ -34,7 +34,9 @@ final class TransitiveExposure
      * bundle — and nobody's to remove, so it is attributed to no parent. On a 200-package Symfony
      * lock the fan-in of flagged transitive packages was 1 or 2 for 32 of 37, then 6, 8, 16, 33 and
      * 44: the cap sits in the gap. The package keeps its own row, with `also via … and N more`, and
-     * `direct_dependents` in the JSON document names every parent.
+     * `direct_dependents` in the JSON document names every parent. The JSON document states the cap
+     * as `exposure_rule.max_fan_in` and lists these packages under `unattributed`
+     * ({@see sharedAboveCap()}), so a reader never has to know the number.
      */
     public const MAX_FAN_IN = 8;
 
@@ -52,6 +54,19 @@ final class TransitiveExposure
             && !$finding->isDirect()
             && $parents > 0
             && $parents <= self::MAX_FAN_IN;
+    }
+
+    /**
+     * Whether a finding is what the cap gives to nobody: flagged, transitive, and reached from more
+     * than {@see MAX_FAN_IN} direct requirements — {@see attributable()}'s complement above the cap.
+     * A flagged transitive package no direct requirement reaches (an empty chain: a lock-only run, or
+     * a package reached only through a name it provides or replaces) is neither, having no fan-in.
+     */
+    public static function sharedAboveCap(Finding $finding): bool
+    {
+        return Verdict::flagged($finding->verdict())
+            && !$finding->isDirect()
+            && \count($finding->directDependents()) > self::MAX_FAN_IN;
     }
 
     /**

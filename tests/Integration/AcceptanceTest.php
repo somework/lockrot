@@ -8,6 +8,7 @@ use Lockrot\Allowlist\BuiltinAllowlist;
 use Lockrot\Analyzer\Analyzer;
 use Lockrot\Analyzer\Libyears;
 use Lockrot\Analyzer\Report;
+use Lockrot\Analyzer\TransitiveExposure;
 use Lockrot\Clock;
 use Lockrot\Data\Forge\ActivityClient;
 use Lockrot\Data\Forge\ActivityFetchPlanner;
@@ -181,6 +182,26 @@ final class AcceptanceTest extends TestCase
             for ($i = 1; $i < \count($counts); ++$i) {
                 self::assertGreaterThanOrEqual($counts[$i], $counts[$i - 1], 'exposure is ordered most first');
             }
+            // Pinned from the run before the report stated its exposure rule and listed what the
+            // rule gives to nobody: stating it moved neither the list nor the line.
+            self::assertCount(25, $exposure);
+            self::assertSame(
+                'pulled in by: wallabag/rulerz-bundle 15 · wallabag/rulerz 14 · wallabag/phpepub 5 · scheb/2fa-google-authenticator 3 · friendsofsymfony/oauth-server-bundle 2 · … and 20 more',
+                $report->exposureSummaryLine()
+            );
+            // Every flagged transitive package is attributed, shared above the cap, or reached by no
+            // direct requirement — exactly one of the three. wallabag's widest fan-in is 8, so the
+            // document lists nothing above the cap.
+            foreach ($report->findings() as $finding) {
+                if (!Verdict::flagged($finding->verdict()) || $finding->isDirect()) {
+                    continue;
+                }
+                $arms = (int) TransitiveExposure::attributable($finding) + (int) TransitiveExposure::sharedAboveCap($finding) + (int) ($finding->directDependents() === []);
+                self::assertSame(1, $arms, $finding->package());
+            }
+            $document = $report->toArray();
+            self::assertSame([], $document['unattributed']);
+            self::assertSame(['max_fan_in' => 8], $document['exposure_rule']);
             // The report leads with its critical rows. sensio/framework-extra-bundle is the fixture's
             // only root require whose GitHub repository is recorded as archived
             // (sensiolabs/SensioFrameworkExtraBundle in tests/fixtures/http/github), so it is the one

@@ -91,7 +91,10 @@ final class JsonFormatterTest extends TestCase
         self::assertSame([['package' => 'a/root', 'flagged' => 1], ['package' => 'b/root', 'flagged' => 1]], $json['exposure']);
 
         $empty = new Report([new Finding('a/root', '1.0.0', Verdict::OK, [], ['a/root'], null, $at, null, false, ['a/root'])], [], $at, 1, 0, false);
-        self::assertStringContainsString('"exposure": []', (new JsonFormatter())->format($empty));
+        $emptyJson = (new JsonFormatter())->format($empty);
+        self::assertStringContainsString('"exposure": []', $emptyJson);
+        // The rule is an object and the list a list, whether or not anything is above the cap.
+        self::assertStringContainsString("\"exposure_rule\": {\n        \"max_fan_in\": 8\n    },\n    \"unattributed\": [],\n", $emptyJson);
     }
 
     public function testTheEnvelopeNamesTheVersionAndTheDocumentIsOnePrettyObjectEndingInANewline(): void

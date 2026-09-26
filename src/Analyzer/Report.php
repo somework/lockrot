@@ -179,9 +179,10 @@ final class Report
      * {@see TransitiveExposure::attributable()} — the rule S7 uses, so the number here is the number
      * on the parent's signal. A flagged package the project requires directly is its own
      * responsibility and counts under nobody, and so is one reached from more direct requirements
-     * than anyone could remove. Derived from the findings' {@see Finding::directDependents()}, so it
-     * is as complete as the analysed set — the whole lock for `composer lockrot`, the transaction at
-     * install time.
+     * than anyone could remove — the JSON document lists those under `unattributed`
+     * ({@see TransitiveExposure::sharedAboveCap()}). Derived from the findings'
+     * {@see Finding::directDependents()}, so it is as complete as the analysed set — the whole lock
+     * for `composer lockrot`, the transaction at install time.
      *
      * @return array<string, int> parent => attributable packages reachable from it
      */
@@ -208,7 +209,9 @@ final class Report
      * `pulled in by: acme/a 16 · acme/b 3`, naming at most
      * {@see EXPOSURE_NAMES} parents before counting the rest — in a framework application a
      * transitive core package is reached from every bundle, and the long tail of equal counts that
-     * makes is what `--format=json` is for; the empty string when no flagged package is transitive.
+     * makes is what `--format=json` is for; the empty string when {@see exposure()} is empty — no
+     * flagged package is attributed to a direct requirement, which is also the case when every
+     * flagged transitive one is shared above the cap or reached by none.
      */
     public function exposureSummaryLine(): string
     {
@@ -374,6 +377,25 @@ final class Report
     }
 
     /**
+     * The flagged transitive packages {@see exposure()} counts under nobody because too many direct
+     * requirements reach them ({@see TransitiveExposure::sharedAboveCap()}), in report order, with
+     * how many reach each.
+     *
+     * @return list<array{package: string, verdict: string, fan_in: int}>
+     */
+    private function unattributedList(): array
+    {
+        $list = [];
+        foreach ($this->findings as $finding) {
+            if (TransitiveExposure::sharedAboveCap($finding)) {
+                $list[] = ['package' => $finding->package(), 'verdict' => $finding->verdict(), 'fan_in' => \count($finding->directDependents())];
+            }
+        }
+
+        return $list;
+    }
+
+    /**
      * Where a finding stands against the baseline, or null when the run read none or the baseline
      * has nothing to say about this package.
      *
@@ -416,6 +438,10 @@ final class Report
             'abandoned' => ['total' => $counts[Verdict::ABANDONED], 'with_replacement' => $this->abandonedWithReplacement()],
             'priorities' => $this->byPriority(),
             'exposure' => $this->exposureList(),
+            // The rule `exposure` and S7 attribute by, stated so a reader need not know the number,
+            // and what that rule gives to nobody.
+            'exposure_rule' => ['max_fan_in' => TransitiveExposure::MAX_FAN_IN],
+            'unattributed' => $this->unattributedList(),
             'libyears' => $this->libyears()->toArray(),
             'baseline' => $this->baseline === null ? null : $this->baseline->toArray(),
             'notes' => $this->notes,
