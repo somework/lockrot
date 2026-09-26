@@ -6,7 +6,7 @@
   "type": "object",
   "properties": {
     "project": {
-      "description": "What a report should call this project, when the manifest's own name is not it — a package inside a monorepo, or a private project whose name is the client's. Defaults to composer.json's own name.",
+      "description": "What a report should call this project, when the manifest's own name is not it — a package inside a monorepo, or a private project named after the client. Defaults to composer.json's own name. It renames the report's `run.project` only: it does not keep composer.json's name out of a report, whose `run.root_package` is always that name.",
       "type": "string",
       "minLength": 1
     },
