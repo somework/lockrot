@@ -378,6 +378,57 @@ final class SelfUpdateCommandTest extends TestCase
         self::assertStringNotContainsString("\e]8", $stderr);
     }
 
+    /**
+     * A doubled `<` is text too. OutputFormatter::escape() on symfony/console 5.4, the one inside
+     * the PHAR, leaves the second `<` of `<<` live, so a tag like `<<fg=red>>` would throw from the
+     * formatter and turn an up-to-date run into exit 2, and `<<href=…>>` would open a hyperlink.
+     */
+    public function testANoteWithADoubledAngleBracketIsPrintedAsText(): void
+    {
+        $red = 'x<<fg=red>>y';
+        $link = '<<href=https://evil.test>>click';
+        $list = FakeHttpClient::ok(self::URL, GitHubReleases::listJson([
+            GitHubReleases::entry($red),
+            GitHubReleases::entry($link),
+            GitHubReleases::entry('v'.Version::STRING),
+        ]));
+        $http = self::http([Version::STRING], [self::URL => $list]);
+        $expected = 'release tag "'.$red.'" is not a version lockrot can compare, so that release was skipped'."\n"
+            .'release tag "'.$link.'" is not a version lockrot can compare, so that release was skipped'."\n"
+            .'lockrot '.Version::STRING." is up to date\n";
+
+        [$code, , $plain] = $this->runCommand($this->command($http, $this->installedPhar()), []);
+        [$decoratedCode, , $decorated] = $this->runCommand($this->command($http, $this->installedPhar()), [], true);
+
+        self::assertSame(0, $code, $plain);
+        self::assertSame($expected, $plain);
+        self::assertSame(0, $decoratedCode, $decorated);
+        self::assertSame($expected, $decorated, 'a note is lockrot\'s plain text, uncoloured on a terminal too');
+        self::assertStringNotContainsString("\e]8", $decorated, 'no hyperlink may be opened');
+    }
+
+    /** The same for an error: the URL is printed as the release list gave it, and the run is exit 2. */
+    public function testAnErrorWithADoubledAngleBracketIsPrintedAsText(): void
+    {
+        $metaUrl = 'https://example.test/<<fg=red>>m';
+        $entry = GitHubReleases::entry('v'.self::newer());
+        $entry['assets'] = [['name' => ReleaseLocator::METADATA_ASSET, 'browser_download_url' => $metaUrl]];
+        $http = new FakeHttpClient([
+            self::URL => FakeHttpClient::ok(self::URL, GitHubReleases::listJson([$entry])),
+            $metaUrl => FakeHttpClient::status($metaUrl, 404, 'Not Found'),
+        ]);
+        $message = 'lockrot: could not download '.$metaUrl.': HTTP 404';
+
+        [$code, , $plain] = $this->runCommand($this->command($http, $this->installedPhar()), []);
+        [$decoratedCode, , $decorated] = $this->runCommand($this->command($http, $this->installedPhar()), [], true);
+
+        self::assertSame(2, $code, $plain);
+        self::assertSame($message."\n", $plain);
+        self::assertSame(2, $decoratedCode, $decorated);
+        self::assertMatchesRegularExpression(self::styledWhole($message), $decorated);
+        self::assertStringNotContainsString("\e]8", $decorated);
+    }
+
     public function testANewerMajorIsNotInstalledWithoutAllowMajor(): void
     {
         $phar = $this->installedPhar();
