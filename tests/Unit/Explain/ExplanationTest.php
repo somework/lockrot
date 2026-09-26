@@ -8,6 +8,7 @@ use Composer\Package\Loader\ArrayLoader;
 use Lockrot\Analyzer\Report;
 use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Explain\Explanation;
+use Lockrot\Signal\Rule\PinnedRule;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\JsonPath;
@@ -107,6 +108,32 @@ final class ExplanationTest extends TestCase
         self::assertNull($explanation->installedBranch());
         self::assertFalse($explanation->installedBranchIsUndated());
         self::assertSame([false], array_column($explanation->branches(), 'installed'));
+    }
+
+    /**
+     * S6 repeats on the finding what the explanation's metadata and lock already say, under the same
+     * names: one name means one fact on both surfaces. The signal comes from the rule itself, over
+     * the same facts the explanation reads.
+     */
+    public function testS6AndTheExplanationStateTheSameReleaseFacts(): void
+    {
+        $cases = [
+            'tagged' => F::metadata([['dev-main', '2025-03-04T05:06:07+00:00'], ['1.6.2', '2019-01-23T15:23:04+00:00']]),
+            'never tagged' => F::metadata([['dev-main', '2025-03-04T05:06:07+00:00']]),
+        ];
+        foreach ($cases as $what => $metadata) {
+            $facts = F::facts(F::package(['version' => 'dev-main', 'time' => '2025-03-04T05:06:07+00:00']), $metadata);
+            $s6 = (new PinnedRule())->evaluate($facts);
+            self::assertNotNull($s6, $what);
+            $array = (new Explanation($this->finding('dev-main', Verdict::PINNED, [$s6]), $facts, new Thresholds(), '8.4', $this->report()))->toArray();
+
+            $data = JsonPath::arrayAt($array, ['finding', 'signals', 0, 'data']);
+            $meta = JsonPath::arrayAt($array, ['metadata']);
+            foreach (['has_stable_release', 'last_stable_release', 'last_stable_version', 'last_stable_dated_by'] as $key) {
+                self::assertSame($meta[$key], $data[$key], $what.': '.$key);
+            }
+            self::assertSame(JsonPath::arrayAt($array, ['lock'])['released'], $data['snapshot_time'], $what.': the snapshot is dated by the lock');
+        }
     }
 
     public function testToArrayCarriesTheFindingTheFactsAndTheRun(): void

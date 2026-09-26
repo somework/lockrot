@@ -13,6 +13,7 @@ use Lockrot\Explain\Explanation;
 use Lockrot\Lock\LockedPackage;
 use Lockrot\Output\ConsoleMarkup;
 use Lockrot\Output\ExplainFormatter;
+use Lockrot\Signal\Rule\PinnedRule;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
@@ -416,5 +417,19 @@ final class ExplainFormatterTest extends TestCase
         self::assertStringNotContainsString('installed release', $text);
         self::assertStringContainsString('version dev-main · no php constraint · dated 2026-09-13 by its commit · from a Composer repository · branch snapshot', $text, 'a snapshot is dated by the commit it points at, and no release of it exists');
         self::assertStringNotContainsString('released 2026-09-13', $text);
+    }
+
+    /** The explain text lists S6's data as it lists every signal's: what the rule said, key by key. */
+    public function testTheSnapshotSignalSaysWhetherThePackageEverReleased(): void
+    {
+        $facts = F::facts(F::package(['version' => 'dev-main', 'time' => '2026-09-13T00:00:00+00:00']), F::metadata([['dev-main', '2026-09-13T00:00:00+00:00']]));
+        $s6 = (new PinnedRule())->evaluate($facts);
+        self::assertNotNull($s6);
+        $finding = new Finding('vendor/pkg', 'dev-main', Verdict::PINNED, [$s6], ['vendor/pkg'], null, new \DateTimeImmutable(F::NOW));
+
+        $text = $this->plain(new Explanation($finding, $facts, new Thresholds(), '8.4', $this->report()));
+
+        self::assertStringContainsString('pinned to branch snapshot dev-main', $text);
+        self::assertStringContainsString('version dev-main · reason branch_snapshot · has_stable_release false · last_stable_release null · last_stable_version null · last_stable_dated_by null · snapshot_time 2026-09-13T00:00:00+00:00', $text);
     }
 }
