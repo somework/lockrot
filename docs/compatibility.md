@@ -261,8 +261,10 @@ one clock and one set of fetched data, so a pull request fails only on what it c
 These names are reserved so that an extension mechanism can arrive later without breaking anyone:
 
 - `S<n>` belongs to lockrot. A retired signal keeps its number, and no number is reused.
-- Anything that does not come from lockrot — a signal, a format — is named `<vendor>:<name>`. No name
-  lockrot ships contains a colon.
+- Anything that does not come from lockrot — a signal, a format — is named `<vendor>:<name>`. The
+  vendor and the name are each lower-case letters, digits, `_`, `.` and `-`, and start with a letter
+  or a digit: `acme:licence` fits, while `Acme:Licence` and `acme:lint:licence` do not, and the
+  published schemas reject them. No name lockrot ships contains a colon.
 - lockrot will never give a meaning of its own to:
     - `extensions` at the top level of `extra.lockrot`;
     - any key that starts with `x-`, at the top level of `extra.lockrot` or inside an `ignore` entry;

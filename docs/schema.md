@@ -68,7 +68,9 @@ configuration schema's `format`. Each is a string with a `pattern`, plus an `x-k
 the values this release writes. A validator ignores a keyword draft-04 does not define, so a copy of
 the schema taken from 0.13.0 on accepts a signal, a reason, a floor or a format that a later release
 adds, and a signal or format named `<vendor>:<name>`, the form reserved for those that do not come
-from lockrot ([compatibility.md](compatibility.md#names-reserved-for-extensions)).
+from lockrot ([compatibility.md](compatibility.md#names-reserved-for-extensions)). The vendor and
+the name are each lower-case letters, digits, `_`, `.` and `-`, starting with a letter or a digit;
+`acme:licence` validates, `Acme:Licence` does not.
 
 - A signal whose id the schema does not list validates with any object as its `data`. A listed id
   still has its `data` typed: S2's id with S4's data fails, and so does S2's id with no data at all.

@@ -340,6 +340,44 @@ final class JsonSchemaConformanceTest extends TestCase
         self::assertNotSame([], array_filter($errors, static fn (string $error): bool => strpos($error, $property) !== false), implode("\n", $errors));
     }
 
+    /** @return iterable<string, array{string}> a name outside the rule docs/compatibility.md states for a signal id */
+    public static function namesThatAreNotSignalIds(): iterable
+    {
+        yield 'an upper-case vendor' => ['Acme:licence'];
+        yield 'an upper-case name' => ['acme:Licence'];
+        yield 'a vendor that starts with a dash' => ['-acme:licence'];
+        yield 'a name that starts with a dot' => ['acme:.licence'];
+        yield 'a character outside the set' => ['acme:lic ence'];
+        yield 'two colons' => ['acme:lint:licence'];
+        yield 'no vendor' => [':licence'];
+        yield 'no name' => ['acme:'];
+        yield 'a lower-case s' => ['s99'];
+        yield 'signal zero' => ['S0'];
+        yield 'a leading zero' => ['S01'];
+    }
+
+    /**
+     * The published schema is open to new ids but not to any string: a signal or a block named
+     * outside `S<n>` and the `<vendor>:<name>` rule docs/compatibility.md states — lower-case letters,
+     * digits, `_`, `.` and `-`, starting with a letter or a digit — is rejected, so the documented rule
+     * and the pattern cannot drift apart.
+     *
+     * @dataProvider namesThatAreNotSignalIds
+     */
+    #[DataProvider('namesThatAreNotSignalIds')]
+    public function testThePublishedSchemaRejectsASignalIdOutsideTheDocumentedRule(string $id): void
+    {
+        $asSignal = self::wallabagReport();
+        $finding = self::object(self::items($asSignal->findings)[0]);
+        $finding->signals = array_merge(self::items($finding->signals), [(object) ['id' => $id, 'level' => 'info', 'summary' => 'x', 'data' => new \stdClass()]]);
+        $asBlock = self::wallabagReport();
+        $entry = self::firstUnchecked(self::firstSignal($asBlock, Signal::S10));
+        $entry->blocks = array_merge(self::items($entry->blocks), [$id]);
+
+        self::assertNotSame([], $this->errors(Schemas::REPORT, (string) json_encode($asSignal), false), 'as a signal id');
+        self::assertNotSame([], $this->errors(Schemas::REPORT, (string) json_encode($asBlock), false), 'as a block');
+    }
+
     /**
      * The generic branch is for ids the schema does not list: a listed id cannot shed its typed data
      * by taking it, whether its data is empty or another signal's.
@@ -383,7 +421,7 @@ final class JsonSchemaConformanceTest extends TestCase
             self::assertSame([], $this->errors(Schemas::CONFIG, $json, false), $format);
             self::assertNotSame([], $this->errors(Schemas::CONFIG, $json, true), $format);
         }
-        foreach (['', 'CSV', 'a:b:c', ':csv'] as $format) {
+        foreach (['', 'CSV', 'a:b:c', ':csv', 'Acme:csv', 'acme:CSV', 'acme:', '-csv'] as $format) {
             self::assertNotSame([], $this->errors(Schemas::CONFIG, (string) json_encode(['format' => $format]), false), 'not a format name: '.$format);
         }
     }

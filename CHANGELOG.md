@@ -77,8 +77,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   until it was refreshed — a closed set in all but name, for values `docs/compatibility.md` already
   promised would grow. Each is now a string with a `pattern` and an `x-known-values` list of the
   values this release writes. The patterns also admit the `<vendor>:<name>` form reserved for a
-  signal or a format that does not come from lockrot (`acme:licence`, `acme:csv`); the others are
-  lower-case words. A signal whose id the schema does not list validates with any object as its
+  signal or a format that does not come from lockrot (`acme:licence`, `acme:csv`: lower-case letters,
+  digits, `_`, `.` and `-` on each side); the others are lower-case words. A signal whose id the schema does not list validates with any object as its
   `data`, while a listed id keeps its `data` typed: S2's id with S4's data, or with none, still
   fails. Verdicts, priorities, signal levels, baseline standings, a baseline entry's verdict and the
   schema number stay enums. `x-known-values` is a keyword draft-04 does not define, which
