@@ -10,6 +10,7 @@ use Lockrot\Data\Repository\InstalledRelease;
 use Lockrot\Data\Repository\ReleaseBranch;
 use Lockrot\Data\Repository\RepositoryUrl;
 use Lockrot\Signal\PackageFacts;
+use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Verdict\Finding;
 
@@ -32,14 +33,23 @@ final class Explanation
     private Thresholds $thresholds;
     private string $targetPhp;
     private Report $report;
+    private ?string $projectPhp;
+    /** The two floors S8 holds a branch to, built from the same target and project php S8's is ({@see \Lockrot\Signal\SignalSet::default()}). */
+    private PhpFloor $floor;
 
-    public function __construct(Finding $finding, PackageFacts $facts, Thresholds $thresholds, string $targetPhp, Report $report)
+    /**
+     * @param ?string $projectPhp the project's own `require.php` as composer.json writes it, the
+     *                            one S8 was given; null when the manifest has none
+     */
+    public function __construct(Finding $finding, PackageFacts $facts, Thresholds $thresholds, string $targetPhp, Report $report, ?string $projectPhp = null)
     {
         $this->finding = $finding;
         $this->facts = $facts;
         $this->thresholds = $thresholds;
         $this->targetPhp = $targetPhp;
         $this->report = $report;
+        $this->projectPhp = $projectPhp;
+        $this->floor = new PhpFloor($targetPhp, $projectPhp);
     }
 
     public function finding(): Finding
@@ -65,6 +75,12 @@ final class Explanation
     public function report(): Report
     {
         return $this->report;
+    }
+
+    /** The project's own `require.php` the branch rows were held against, null when it names none. */
+    public function projectPhp(): ?string
+    {
+        return $this->projectPhp;
     }
 
     /** The installed version's release branch key ({@see ReleaseBranch::of()}), null for a branch snapshot. */
@@ -152,7 +168,16 @@ final class Explanation
         return false;
     }
 
-    /** @return array<string, mixed> */
+    /**
+     * The `--explain --format=json` document. Each branch row also carries what S8's floors say
+     * about its `php` ({@see PhpFloor}): whether it admits the target PHP, whether it admits the
+     * lowest PHP the project's own `require.php` promises (null for no answer: no requirement, one
+     * that cannot be read, no project floor), and `php_blocked_by`, which of the two holds the
+     * branch back as S8 decides it. Only here, not in {@see self::branches()}: the text table does
+     * not print them, and it reads the rows more than once.
+     *
+     * @return array<string, mixed>
+     */
     public function toArray(): array
     {
         $package = $this->facts->package();
@@ -171,6 +196,9 @@ final class Explanation
                 'newest_dated_released' => self::date($row['newest_dated_released']),
                 'dated_by' => $row['dated_by'],
                 'php' => $row['php'],
+                'admits_target_php' => $this->floor->admitsTarget($row['php']),
+                'admits_project_php' => $this->floor->admitsProject($row['php']),
+                'php_blocked_by' => $this->floor->blocking($row['php']),
             ];
         }
 
@@ -220,6 +248,7 @@ final class Explanation
                 'push-high-years' => $this->thresholds->pushHighYears(),
             ],
             'target_php' => $this->targetPhp,
+            'project_php' => $this->projectPhp,
             'generated_at' => self::date($this->report->generatedAt()),
             'notes' => $this->report->notes(),
         ];

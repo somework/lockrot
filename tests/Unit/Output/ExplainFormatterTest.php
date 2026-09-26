@@ -285,7 +285,7 @@ final class ExplainFormatterTest extends TestCase
         self::assertSame('ok', $json['finding']['verdict']);
         self::assertIsArray($json['metadata']);
         self::assertIsArray($json['metadata']['branches']);
-        self::assertSame([['branch' => '1.x', 'installed' => true, 'highest' => '1.0.0', 'highest_released' => '2026-01-01T00:00:00+00:00', 'highest_commit_date' => null, 'newest_dated' => '1.0.0', 'newest_dated_released' => '2026-01-01T00:00:00+00:00', 'dated_by' => null, 'php' => null]], $json['metadata']['branches']);
+        self::assertSame([['branch' => '1.x', 'installed' => true, 'highest' => '1.0.0', 'highest_released' => '2026-01-01T00:00:00+00:00', 'highest_commit_date' => null, 'newest_dated' => '1.0.0', 'newest_dated_released' => '2026-01-01T00:00:00+00:00', 'dated_by' => null, 'php' => null, 'admits_target_php' => null, 'admits_project_php' => null, 'php_blocked_by' => null]], $json['metadata']['branches']);
     }
 
     /** A split package dated by its monorepo: the rows read the parent's dates, and a footnote says whose they are. */

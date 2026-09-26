@@ -51,6 +51,7 @@
             }
         },
         "target_php": { "type": "string" },
+        "project_php": { "description": "The project's own `require.php` as composer.json writes it, the second floor each branch row's admits_project_php is tested against (its lowest version); null when composer.json names none or there is no composer.json. Optional: documents written before 0.13.0 do not carry it.", "type": ["string", "null"] },
         "generated_at": { "$ref": "#/definitions/dateTime" },
         "notes": { "type": "array", "items": { "type": "string" } }
     },
@@ -124,7 +125,10 @@
                             "newest_dated": { "description": "The branch's newest dated stable release.", "type": "string" },
                             "newest_dated_released": { "oneOf": [{ "$ref": "#/definitions/dateTime" }, { "type": "null" }] },
                             "dated_by": { "description": "The monorepo this row's dates were read from, null when they are the package's own.", "oneOf": [{ "$ref": "#/definitions/packageName" }, { "type": "null" }] },
-                            "php": { "description": "The php requirement of the branch's newest dated release, as the repository lists it; null when it requires no PHP. Optional: documents written before 0.11.0 do not carry it.", "type": ["string", "null"] }
+                            "php": { "description": "The php requirement of the branch's newest dated release, as the repository lists it; of its highest tag when the branch has no dated release; and on a row the monorepo dated (`dated_by`), the package's own release's requirement, not the parent's. Null when it requires no PHP. The requirement S8 holds the branch against the project's own php and the target PHP. Optional: documents written before 0.11.0 do not carry it.", "type": ["string", "null"] },
+                            "admits_target_php": { "description": "Whether `php` admits the target PHP: true when some version of the target minor (`target_php`, 8.4 read as >=8.4.0 <8.5.0) satisfies it, false when none does and Composer resolving against the target would not install the branch. Null is no answer, never admitted: `php` is null or cannot be read. Optional: documents written before 0.13.0 do not carry it.", "type": ["boolean", "null"] },
+                            "admits_project_php": { "description": "Whether `php` admits the lowest PHP the project's own `require.php` (`project_php`) promises: `>=7.2.5` and `^7.2.5 || ^8.0` both read as 7.2.5. Only the lowest is tested, as S8 tests it. Null is no answer, never admitted: `php` is null or cannot be read, or the project names no lowest PHP (no `require.php`, `*`, or one that cannot be read). Optional: documents written before 0.13.0 do not carry it.", "type": ["boolean", "null"] },
+                            "php_blocked_by": { "description": "S8's admission test on this row's `php`: `project` when admits_project_php is false, else `target` when admits_target_php is false, else null. Null covers both admitted and untested (the admits_* fields tell them apart); S8 counts an untested branch as within reach, too. Every row carries it, whatever its place; S8 applies the test only to dated branches above the installed one, and the row of the newest branch it names carries its `floor_source`. On the installed row, `project` means the lock already needs more PHP than the project's own `require.php` promises. Values grow in minor releases; treat one you do not know as other. Optional: documents written before 0.13.0 do not carry it.", "oneOf": [{ "type": "string", "pattern": "^[a-z][a-z0-9_]*$", "x-known-values": ["project", "target"] }, { "type": "null" }] }
                         }
                     }
                 }

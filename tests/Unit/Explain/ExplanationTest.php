@@ -95,7 +95,7 @@ final class ExplanationTest extends TestCase
         self::assertIsArray($meta);
         self::assertIsArray($meta['branches']);
         self::assertSame(
-            ['branch' => '10.x', 'installed' => true, 'highest' => '10.49.0', 'highest_released' => null, 'highest_commit_date' => '2023-06-05T12:46:42+00:00', 'newest_dated' => '10.49.0', 'newest_dated_released' => '2023-06-05T12:46:42+00:00', 'dated_by' => null, 'php' => null],
+            ['branch' => '10.x', 'installed' => true, 'highest' => '10.49.0', 'highest_released' => null, 'highest_commit_date' => '2023-06-05T12:46:42+00:00', 'newest_dated' => '10.49.0', 'newest_dated_released' => '2023-06-05T12:46:42+00:00', 'dated_by' => null, 'php' => null, 'admits_target_php' => null, 'admits_project_php' => null, 'php_blocked_by' => null],
             $meta['branches'][0]
         );
     }
@@ -118,7 +118,7 @@ final class ExplanationTest extends TestCase
 
         $array = $explanation->toArray();
 
-        self::assertSame(['package', 'version', 'finding', 'lock', 'metadata', 'activity', 'thresholds', 'target_php', 'generated_at', 'notes'], array_keys($array));
+        self::assertSame(['package', 'version', 'finding', 'lock', 'metadata', 'activity', 'thresholds', 'target_php', 'project_php', 'generated_at', 'notes'], array_keys($array));
         self::assertSame('vendor/pkg', $array['package']);
         self::assertSame($finding = $explanation->finding()->toArray(), $array['finding'], 'the finding as --format=json carries it');
         self::assertSame(Verdict::LEFT_BEHIND, $finding['verdict']);
@@ -137,13 +137,14 @@ final class ExplanationTest extends TestCase
             'type' => 'library',
             'data_date' => F::NOW,
             'branches' => [
-                ['branch' => '2.x', 'installed' => false, 'highest' => '2.1.0', 'highest_released' => '2026-01-01T00:00:00+00:00', 'highest_commit_date' => null, 'newest_dated' => '2.1.0', 'newest_dated_released' => '2026-01-01T00:00:00+00:00', 'dated_by' => null, 'php' => null],
-                ['branch' => '1.x', 'installed' => true, 'highest' => '1.5.0', 'highest_released' => '2021-06-01T00:00:00+00:00', 'highest_commit_date' => null, 'newest_dated' => '1.5.0', 'newest_dated_released' => '2021-06-01T00:00:00+00:00', 'dated_by' => null, 'php' => null],
+                ['branch' => '2.x', 'installed' => false, 'highest' => '2.1.0', 'highest_released' => '2026-01-01T00:00:00+00:00', 'highest_commit_date' => null, 'newest_dated' => '2.1.0', 'newest_dated_released' => '2026-01-01T00:00:00+00:00', 'dated_by' => null, 'php' => null, 'admits_target_php' => null, 'admits_project_php' => null, 'php_blocked_by' => null],
+                ['branch' => '1.x', 'installed' => true, 'highest' => '1.5.0', 'highest_released' => '2021-06-01T00:00:00+00:00', 'highest_commit_date' => null, 'newest_dated' => '1.5.0', 'newest_dated_released' => '2021-06-01T00:00:00+00:00', 'dated_by' => null, 'php' => null, 'admits_target_php' => null, 'admits_project_php' => null, 'php_blocked_by' => null],
             ],
         ], $array['metadata']);
         self::assertSame(['forge' => 'GitHub', 'repository' => 'vendor/pkg', 'archived' => false, 'pushed_at' => '2026-02-01T00:00:00+00:00', 'fetched_at' => F::NOW, 'from_cache' => false], $array['activity']);
         self::assertSame(['release-warn-years' => 2, 'release-high-years' => 4, 'push-warn-years' => 3, 'push-high-years' => 5], $array['thresholds']);
         self::assertSame('8.3', $array['target_php']);
+        self::assertNull($array['project_php'], 'no project php was given');
         self::assertSame(F::NOW, $array['generated_at']);
         self::assertSame(['a note'], $array['notes']);
     }
@@ -198,7 +199,7 @@ final class ExplanationTest extends TestCase
         self::assertSame('laravel/framework', $meta['installed_release_dated_by']);
         self::assertIsArray($meta['branches']);
         self::assertSame(
-            ['branch' => '10.x', 'installed' => true, 'highest' => 'v10.50.3', 'highest_released' => '2026-08-12T03:46:26+00:00', 'highest_commit_date' => null, 'newest_dated' => 'v10.50.3', 'newest_dated_released' => '2026-08-12T03:46:26+00:00', 'dated_by' => 'laravel/framework', 'php' => null],
+            ['branch' => '10.x', 'installed' => true, 'highest' => 'v10.50.3', 'highest_released' => '2026-08-12T03:46:26+00:00', 'highest_commit_date' => null, 'newest_dated' => 'v10.50.3', 'newest_dated_released' => '2026-08-12T03:46:26+00:00', 'dated_by' => 'laravel/framework', 'php' => null, 'admits_target_php' => null, 'admits_project_php' => null, 'php_blocked_by' => null],
             $meta['branches'][0]
         );
     }
@@ -208,5 +209,81 @@ final class ExplanationTest extends TestCase
         $explanation = new Explanation($this->finding('1.0.0', Verdict::OK), F::facts(F::package(), F::metadata([['1.0.0', '2026-01-01T00:00:00+00:00']])), new Thresholds(), '8.4', $this->report());
 
         self::assertNull($explanation->branchesDatedBy());
+    }
+
+    /**
+     * Matomo (`require.php >=7.2.5`) on PHP 8.4 locking monolog 1.x: 3.x needs php >=8.1, which
+     * PHP 8.4 installs and Matomo's 7.2.5 does not; 2.x admits both; 1.x requires no PHP, so
+     * neither floor has anything to say about it.
+     */
+    public function testEachBranchRowSaysWhichFloorAdmitsIt(): void
+    {
+        $rows = $this->admission('8.4', '>=7.2.5', [['3.12.0', '2026-09-09T00:00:00+00:00', '>=8.1'], ['2.11.1', '2026-09-02T00:00:00+00:00', '>=7.2'], ['1.27.1', '2022-06-09T00:00:00+00:00', null]]);
+
+        self::assertSame(['3.x' => [true, false, 'project'], '2.x' => [true, true, null], '1.x' => [null, null, null]], $rows);
+    }
+
+    /** No composer.json php: the project column has no answer, and PHP 7.4 alone holds 3.x back. */
+    public function testWithoutAProjectPhpOnlyTheTargetAnswers(): void
+    {
+        $rows = $this->admission('7.4', null, [['3.12.0', '2026-09-09T00:00:00+00:00', '>=8.1'], ['2.11.1', '2026-09-02T00:00:00+00:00', '>=7.2']]);
+
+        self::assertSame(['3.x' => [false, null, 'target'], '2.x' => [true, null, null]], $rows);
+    }
+
+    /** A requirement lockrot cannot read is no answer from either floor: null, not true. */
+    public function testAnUnreadableBranchRequirementGivesNoAnswer(): void
+    {
+        $rows = $this->admission('8.4', '>=7.2.5', [['3.12.0', '2026-09-09T00:00:00+00:00', 'not a constraint']]);
+
+        self::assertSame(['3.x' => [null, null, null]], $rows);
+    }
+
+    /**
+     * The installed row gets the same test as any other: a project whose require.php promises
+     * 7.2.5 but whose lock already holds a branch needing 8.1 shows `project` on its own row.
+     */
+    public function testTheInstalledRowIsTestedLikeAnyOther(): void
+    {
+        $metadata = F::metadata([['3.12.0', '2026-09-09T00:00:00+00:00', '>=8.1']]);
+        $explanation = new Explanation($this->finding('3.12.0', Verdict::OK), F::facts(F::package(['version' => '3.12.0']), $metadata), new Thresholds(), '8.4', $this->report(), '>=7.2.5');
+
+        $meta = $explanation->toArray()['metadata'];
+        self::assertIsArray($meta);
+        self::assertIsArray($meta['branches']);
+        self::assertIsArray($meta['branches'][0]);
+        self::assertTrue($meta['branches'][0]['installed']);
+        self::assertSame('project', $meta['branches'][0]['php_blocked_by']);
+    }
+
+    /** The project php the rows were held against is in the document, as composer.json writes it. */
+    public function testTheProjectPhpIsCarriedAsWritten(): void
+    {
+        $explanation = new Explanation($this->finding('1.0.0', Verdict::OK), F::facts(F::package()), new Thresholds(), '8.4', $this->report(), '^7.2.5 || ^8.0');
+
+        self::assertSame('^7.2.5 || ^8.0', $explanation->projectPhp());
+        self::assertSame('^7.2.5 || ^8.0', $explanation->toArray()['project_php']);
+        self::assertNull((new Explanation($this->finding('1.0.0', Verdict::OK), F::facts(F::package()), new Thresholds(), '8.4', $this->report()))->projectPhp());
+    }
+
+    /**
+     * @param list<array{0: string, 1: ?string, 2?: ?string}> $releases
+     *
+     * @return array<string, array{0: mixed, 1: mixed, 2: mixed}>
+     */
+    private function admission(string $target, ?string $project, array $releases): array
+    {
+        $explanation = new Explanation($this->finding('1.0.0', Verdict::OK), F::facts(F::package(['version' => '1.0.0']), F::metadata($releases)), new Thresholds(), $target, $this->report(), $project);
+        $meta = $explanation->toArray()['metadata'];
+        self::assertIsArray($meta);
+        self::assertIsArray($meta['branches']);
+        $rows = [];
+        foreach ($meta['branches'] as $row) {
+            self::assertIsArray($row);
+            self::assertIsString($row['branch']);
+            $rows[$row['branch']] = [$row['admits_target_php'], $row['admits_project_php'], $row['php_blocked_by']];
+        }
+
+        return $rows;
     }
 }
