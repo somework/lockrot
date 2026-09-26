@@ -244,9 +244,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   a snapshot: the commit the branch pointed at, not a release). The names are the ones the
   explanation's `metadata` already uses. All are optional in `report-1.json`, so reports written
   before still validate, and the schema snapshot for 0.13.0 is the file with them. The verdict,
-  priority, exit code, evidence line, baseline, SARIF and GitLab output are unchanged; the
-  `--explain` text and the HTML page list the new keys with the signal, as they list every
-  signal's data. See [verdicts.md](docs/verdicts.md#the-signals).
+  priority, exit code, evidence line, baseline, SARIF and GitLab output are unchanged; the HTML
+  page lists the new keys with the signal, as it lists every signal's data. The `--explain` text
+  shows the S6 keys that have a value; nulls are left out (the JSON carries them all), and every
+  other signal's data line is printed as before. See [verdicts.md](docs/verdicts.md#the-signals).
 
 - Each release branch in the `--explain --format=json` document, and in the HTML page's package
   details, now says whether the project can move onto it: `admits_target_php` (the branch's `php`

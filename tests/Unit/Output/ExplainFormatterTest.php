@@ -13,6 +13,7 @@ use Lockrot\Explain\Explanation;
 use Lockrot\Lock\LockedPackage;
 use Lockrot\Output\ConsoleMarkup;
 use Lockrot\Output\ExplainFormatter;
+use Lockrot\Signal\Rule\AbandonedRule;
 use Lockrot\Signal\Rule\PinnedRule;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\Thresholds;
@@ -419,17 +420,70 @@ final class ExplainFormatterTest extends TestCase
         self::assertStringNotContainsString('released 2026-09-13', $text);
     }
 
-    /** The explain text lists S6's data as it lists every signal's: what the rule said, key by key. */
-    public function testTheSnapshotSignalSaysWhetherThePackageEverReleased(): void
+    /**
+     * The explain text prints S6's release facts that have a value and leaves out the ones that are
+     * null (not known, or not applicable to the reason): a null there reads as noise on a line a
+     * person scans, and the JSON carries every key, nulls included.
+     *
+     * @dataProvider snapshotSignals
+     */
+    #[DataProvider('snapshotSignals')]
+    public function testTheSnapshotSignalPrintsTheReleaseFactsThatHaveAValue(string $version, ?PackageMetadata $metadata, string $summary, string $dataLine): void
     {
-        $facts = F::facts(F::package(['version' => 'dev-main', 'time' => '2026-09-13T00:00:00+00:00']), F::metadata([['dev-main', '2026-09-13T00:00:00+00:00']]));
+        $facts = F::facts(F::package(['version' => $version, 'time' => '2026-09-13T00:00:00+00:00']), $metadata);
         $s6 = (new PinnedRule())->evaluate($facts);
         self::assertNotNull($s6);
-        $finding = new Finding('vendor/pkg', 'dev-main', Verdict::PINNED, [$s6], ['vendor/pkg'], null, new \DateTimeImmutable(F::NOW));
+        $finding = new Finding('vendor/pkg', $version, Verdict::PINNED, [$s6], ['vendor/pkg'], null, new \DateTimeImmutable(F::NOW));
 
         $text = $this->plain(new Explanation($finding, $facts, new Thresholds(), '8.4', $this->report()));
 
-        self::assertStringContainsString('pinned to branch snapshot dev-main', $text);
-        self::assertStringContainsString('version dev-main · reason branch_snapshot · has_stable_release false · last_stable_release null · last_stable_version null · last_stable_dated_by null · snapshot_time 2026-09-13T00:00:00+00:00', $text);
+        self::assertStringContainsString("signals\n  S6 warn ".$summary."\n           ".$dataLine."\n\ncomposer.lock\n", $text);
+    }
+
+    /** @return iterable<string, array{string, ?PackageMetadata, string, string}> */
+    public static function snapshotSignals(): iterable
+    {
+        yield 'a snapshot of a package that never released' => [
+            'dev-main',
+            F::metadata([['dev-main', '2026-09-13T00:00:00+00:00']]),
+            'pinned to branch snapshot dev-main',
+            'version dev-main · reason branch_snapshot · has_stable_release false · snapshot_time 2026-09-13T00:00:00+00:00',
+        ];
+        yield 'a snapshot of a package with a dated tag' => [
+            'dev-main',
+            F::metadata([['dev-main', '2026-09-13T00:00:00+00:00'], ['1.2.0', '2026-01-01T00:00:00+00:00']]),
+            'pinned to branch snapshot dev-main',
+            'version dev-main · reason branch_snapshot · has_stable_release true · last_stable_release 2026-01-01T00:00:00+00:00 · last_stable_version 1.2.0 · snapshot_time 2026-09-13T00:00:00+00:00',
+        ];
+        yield 'a snapshot without repository metadata' => [
+            'dev-main',
+            null,
+            'pinned to branch snapshot dev-main',
+            'version dev-main · reason branch_snapshot · snapshot_time 2026-09-13T00:00:00+00:00',
+        ];
+        yield 'a tagged version of a repository that lists no tag' => [
+            '1.0.0',
+            F::metadata([['dev-main', '2026-09-13T00:00:00+00:00']]),
+            'no tagged release in its repository',
+            'version 1.0.0 · reason no_stable_release · has_stable_release false',
+        ];
+    }
+
+    /**
+     * Only S6 leaves its nulls out. Every other signal's data line prints a null as `null`, as it
+     * did before S6 carried release facts, so those lines stay byte for byte what they were: S1
+     * without a replacement here, S8's `suggested_constraint` in the full text above.
+     */
+    public function testAnotherSignalStillPrintsItsNullData(): void
+    {
+        $facts = F::facts(F::package(['version' => '1.0.0']), F::metadata([['1.0.0', '2026-01-01T00:00:00+00:00']], true));
+        $s1 = (new AbandonedRule())->evaluate($facts);
+        self::assertNotNull($s1);
+        self::assertSame(['replacement' => null], $s1->data());
+        $finding = new Finding('vendor/pkg', '1.0.0', Verdict::ABANDONED, [$s1], ['vendor/pkg'], null, new \DateTimeImmutable(F::NOW));
+
+        $text = $this->plain(new Explanation($finding, $facts, new Thresholds(), '8.4', $this->report()));
+
+        self::assertStringContainsString("signals\n  S1 high marked abandoned by its repository\n           replacement null\n\ncomposer.lock\n", $text);
     }
 }
