@@ -196,8 +196,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   SARIF, GitLab Code Quality and GitHub annotations; the CLI, `self-update` and the exit codes, with
   the `1` Composer or Symfony can return before lockrot runs; the closed sets of verdicts,
   priorities, levels and baseline standings, in their order), what it does not (human-readable
-  output, which verdict and priority a package gets), which open sets the schemas still spell out as
-  enums, what the Composer underneath changes between the plugin and the PHAR, how verdicts may
+  output, which verdict and priority a package gets), which sets are open and how the schemas
+  describe them, what the Composer underneath changes between the plugin and the PHAR, how verdicts may
   change between releases and what a baseline does and does not absorb, the names reserved for
   extensions, the deprecation policy, and what lockrot never does, down to the hosts it talks to.
   Items not in lockrot yet are marked *planned*.
