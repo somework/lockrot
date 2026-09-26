@@ -92,9 +92,12 @@ reviews:
         The PHP scripts (bin/lockrot, bin/record-fixtures, bin/refresh-monorepo-parents) are
         extensionless PHP under the same PHP 7.4 floor as src/. Note that php-cs-fixer's Finder
         covers only the files named in .php-cs-fixer.dist.php and PHPStan does not scan bin/ at
-        all, so nothing here is checked automatically. In those PHP scripts, progress and errors go
-        to STDERR and the single closing result line to STDOUT, and a token is read as
-        getenv('GITHUB_TOKEN') ?: null, where unset means anonymous rather than an error.
+        all, so nothing here is checked automatically. bin/lockrot is the application entry point
+        (the PHAR's stub runs it), not a script with a closing line. bin/record-fixtures writes
+        progress and errors to STDERR and its single closing result line to STDOUT, and reads its
+        token as getenv('GITHUB_TOKEN') ?: null, where unset means anonymous rather than an error.
+        bin/refresh-monorepo-parents writes everything, its closing line included, to STDERR and
+        takes credentials through Composer's Factory::create(), so it reads no token itself.
         The bash recorders (bin/record-schema-evolution, bin/record-demo) are run by hand and record
         with a GitHub token on purpose: record-schema-evolution refuses to start without
         GITHUB_TOKEN, because its provenance.json states that the recording used one and an
