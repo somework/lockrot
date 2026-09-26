@@ -4,9 +4,14 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Config;
 
+use JsonSchema\Validator;
 use Lockrot\Config\ConfigSchema;
+use Lockrot\Config\LockrotConfig;
 use Lockrot\Config\UnknownKeys;
 use Lockrot\Exception\ConfigException;
+use Lockrot\Json\KnownValues;
+use Lockrot\Json\SchemaPayload;
+use Lockrot\Tests\Support\ColdConfigSchema;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Verdict\FailOn;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -73,8 +78,87 @@ final class ConfigSchemaTest extends TestCase
     /** @return iterable<string, array{string}> */
     public static function schemaFormats(): iterable
     {
-        foreach (['table', 'json', 'github', 'sarif'] as $format) {
+        foreach (LockrotConfig::FORMATS as $format) {
             yield $format => [$format];
+        }
+    }
+
+    /**
+     * The published schema lists the formats as `x-known-values` on an open string, so an editor's
+     * older copy accepts a format a later release adds; lockrot itself accepts exactly these.
+     */
+    public function testTheSchemaFormatsAreExactlyWhatLockrotAccepts(): void
+    {
+        $format = self::schemaProperties()['format'] ?? null;
+        self::assertIsArray($format);
+
+        self::assertSame(LockrotConfig::FORMATS, $format[KnownValues::KEYWORD] ?? null);
+        self::assertArrayNotHasKey('enum', $format, 'the published copy is open');
+    }
+
+    /**
+     * The runtime reads `x-known-values` as the enum, so what it says about a configuration is what
+     * it said while `format` was an enum in the published file: the same lines in the same order, a
+     * mistyped format included, and nothing about a pattern. 0.12.0's copy is the reference because
+     * it was released with the enum.
+     *
+     * @param array<string, mixed> $extra
+     *
+     * @dataProvider invalidConfigs
+     * @dataProvider invalidFormats
+     */
+    #[DataProvider('invalidConfigs')]
+    #[DataProvider('invalidFormats')]
+    public function testTheRuntimeErrorIsTheOneTheEnumGave(array $extra): void
+    {
+        $validator = new Validator();
+        $data = SchemaPayload::of($extra, 'extra.lockrot');
+        $validator->validate($data, self::decodedFile(self::RELEASED_WITH_THE_ENUM));
+        $lines = ['extra.lockrot is invalid:'];
+        foreach ($validator->getErrors() as $error) {
+            self::assertIsArray($error);
+            self::assertIsString($error['property'] ?? null);
+            self::assertIsString($error['message'] ?? null);
+            $lines[] = \sprintf('  - %s: %s', $error['property'], $error['message']);
+        }
+        self::assertGreaterThan(1, \count($lines), 'the released schema rejects it too');
+
+        try {
+            ConfigSchema::validate($extra);
+            self::fail('Expected a ConfigException');
+        } catch (ConfigException $e) {
+            self::assertSame(implode("\n", $lines), $e->getMessage());
+        }
+    }
+
+    /** @return iterable<string, array{array<string, mixed>}> */
+    public static function invalidFormats(): iterable
+    {
+        yield 'a format lockrot does not write' => [['format' => 'xml']];
+        yield 'a format in capitals' => [['format' => 'JSON']];
+        yield 'an empty format' => [['format' => '']];
+        yield 'a vendor-named format' => [['format' => 'acme:csv']];
+        yield 'a format that is not a string' => [['format' => 5]];
+        yield 'a bad format beside a bad fail-on' => [['format' => 'xml', 'fail-on' => 'dead']];
+    }
+
+    /**
+     * The first validation of a process is the one the install-time path makes, and the only one it
+     * makes: it has to hold `format` to the known values as every later one does.
+     */
+    public function testTheFirstValidationInAProcessHoldsTheFormatToTheKnownValues(): void
+    {
+        ColdConfigSchema::forget();
+
+        try {
+            ConfigSchema::validate(['format' => 'XML']);
+            self::fail('Expected a ConfigException');
+        } catch (ConfigException $e) {
+            // One line: the enum's, and no second one for a pattern.
+            self::assertSame(
+                "extra.lockrot is invalid:\n  - format: Does not have a value in the enumeration [\"table\",\"json\",\"github\",\"sarif\",\"gitlab\",\"markdown\",\"html\"]",
+                $e->getMessage()
+            );
         }
     }
 
@@ -129,6 +213,16 @@ final class ConfigSchemaTest extends TestCase
         }
 
         self::assertSame(['ignore'], $nested);
+    }
+
+    private const RELEASED_WITH_THE_ENUM = __DIR__.'/../../fixtures/schema-evolution/schemas/0.12.0/lockrot-config.schema.json';
+
+    private static function decodedFile(string $path): object
+    {
+        $decoded = json_decode((string) file_get_contents($path));
+        self::assertIsObject($decoded, $path);
+
+        return $decoded;
     }
 
     /** @return array<array-key, mixed> */

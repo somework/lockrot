@@ -70,6 +70,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   under `Changed` or `Fixed` with everything else, and a team deciding whether an upgrade can turn
   its pipeline red had to read every entry to find out.
 
+- The values that grow in minor releases are open strings in the published schemas. Signal ids (a
+  signal's `id`, and the `blocks` of S10), S10's `check` and `reason`, S8's `floor_source` and the
+  configuration schema's `format` were enums, so every new signal, S10 reason or output format made
+  each vendored copy of `report-1.json`, `explain-1.json` or `config-1.json` reject the next document
+  until it was refreshed — a closed set in all but name, for values `docs/compatibility.md` already
+  promised would grow. Each is now a string with a `pattern` and an `x-known-values` list of the
+  values this release writes. The patterns also admit the `<vendor>:<name>` form reserved for a
+  signal or a format that does not come from lockrot (`acme:licence`, `acme:csv`: lower-case letters,
+  digits, `_`, `.` and `-` on each side); the others are lower-case words. A signal whose id the schema does not list validates with any object as its
+  `data`, while a listed id keeps its `data` typed: S2's id with S4's data, or with none, still
+  fails. Verdicts, priorities, signal levels, baseline standings, a baseline entry's verdict and the
+  schema number stay enums. `x-known-values` is a keyword draft-04 does not define, which
+  check-jsonschema, python-jsonschema and Composer's validator ignore; Ajv's strict mode refuses it
+  until it is declared (`docs/schema.md` says how). lockrot still refuses an `extra.lockrot.format`
+  it does not write, with the same error and exit code 2, even when `--format` overrides it: it
+  reads `x-known-values` as the enum when it validates the configuration, and so do its tests when
+  they hold its own documents to the schemas, so a mistyped reason still fails the build. Nothing
+  lockrot writes changes, and every document and schema an earlier release produced still
+  validates. The gain starts with copies taken from this release: one vendored earlier still
+  carries the enums.
+
 ### Added
 
 - A schema evolution test. Under one schema number a document may only gain fields, so whatever an
@@ -78,7 +99,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   which cannot notice a schema change that rejects an older one — a field made required, a type or
   an enum value lost, a listed field dropped. Two checks now hold the schemas to it, both under
   `tests/fixtures/schema-evolution/`:
-  - The report, explain, baseline and config schemas every release from 0.9.0 to 0.12.0 published
+  - The report, explain, baseline and config schemas every release from 0.9.0 to 0.13.0 published
     are kept, and each one under the current number must be accepted by the current file: a member
     made required, a type or an enum value lost, a bound tightened, a listed property dropped or an
     object closed fails the build, whether or not any recorded document carries it. A release that
@@ -175,8 +196,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   SARIF, GitLab Code Quality and GitHub annotations; the CLI, `self-update` and the exit codes, with
   the `1` Composer or Symfony can return before lockrot runs; the closed sets of verdicts,
   priorities, levels and baseline standings, in their order), what it does not (human-readable
-  output, which verdict and priority a package gets), which open sets the schemas still spell out as
-  enums, what the Composer underneath changes between the plugin and the PHAR, how verdicts may
+  output, which verdict and priority a package gets), which sets are open and how the schemas
+  describe them, what the Composer underneath changes between the plugin and the PHAR, how verdicts may
   change between releases and what a baseline does and does not absorb, the names reserved for
   extensions, the deprecation policy, and what lockrot never does, down to the hosts it talks to.
   Items not in lockrot yet are marked *planned*.
@@ -293,7 +314,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `blocks`, S8's `floor_source` and the configuration schema's `format` are still enums, so a new
   value there fails against an older copy. The page, and the docblock of the class that names the
   schema URLs, now say so, and the vendoring recipe says to refresh the copy on an upgrade. The
-  schemas are unchanged; describing those values as open strings is planned before 1.0.
+  same release then opens those sets (see *Changed*), so the page and the docblock now describe
+  them as open strings with their known values listed.
 
 - `SECURITY.md` said lockrot talks only to the configured Composer repositories and the GitHub API,
   and reads only the GitHub token variables. It also talks to GitLab and Bitbucket for repository

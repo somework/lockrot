@@ -890,6 +890,27 @@ final class LockrotCommandTest extends TestCase
         self::assertSame(1, substr_count($stderr, 'unknown key'), $stderr);
     }
 
+    /**
+     * `--format` on the command line wins over `extra.lockrot.format`, but a format the configuration
+     * names and lockrot does not write is still a configuration error, exit 2: the published schema
+     * leaves `format` open for editors, and lockrot reads its `x-known-values` as the enum. This pins
+     * the command's message and exit code, byte for byte. It does not pin the first validation of a
+     * process: the command validates extra.lockrot twice, in initialize() and again in execute(), so
+     * a first call that let the format through would still end here. ConfigSchemaTest and
+     * InstallTimeSummaryTest pin the first call.
+     */
+    public function testAnUnknownConfiguredFormatIsExit2EvenWhenTheCommandLineNamesOne(): void
+    {
+        $this->fixtureCopy(self::LARAVEL_LOCK, ['format' => 'xml', 'install-tme' => 'off']);
+
+        [$code, $stdout, $stderr] = $this->runWithSplitStreams(['--format' => 'json']);
+
+        self::assertSame(2, $code);
+        self::assertSame('', $stdout);
+        self::assertStringStartsWith("lockrot: extra.lockrot is invalid:\n  - format: Does not have a value in the enumeration [\"table\",", $stderr);
+        self::assertStringEndsWith("\n  - unknown key extra.lockrot.install-tme ignored (did you mean install-time?)\n", $stderr);
+    }
+
     public function testAMisspeltRequiredIgnoreKeyGetsItsSuggestionInTheError(): void
     {
         $this->fixtureCopy(self::LARAVEL_LOCK, ['ignore' => [['package' => 'a/b', 'reasn' => 'legacy']]]);
