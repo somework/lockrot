@@ -28,6 +28,7 @@ use Lockrot\Data\Repository\MetadataLoaderInterface;
 use Lockrot\Data\Repository\RepositoryMetadataLoader;
 use Lockrot\Json\JsonReader;
 use Lockrot\Signal\SignalSet;
+use Lockrot\Tests\Support\ColdConfigSchema;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\MarkupRefusingFormatter;
@@ -888,6 +889,25 @@ final class LockrotCommandTest extends TestCase
         self::assertStringStartsWith("lockrot: extra.lockrot is invalid:\n  - fail-on: ", $stderr);
         self::assertStringEndsWith("\n  - unknown key extra.lockrot.install-tme ignored (did you mean install-time?)\n", $stderr);
         self::assertSame(1, substr_count($stderr, 'unknown key'), $stderr);
+    }
+
+    /**
+     * `--format` on the command line wins over `extra.lockrot.format`, but a format the configuration
+     * names and lockrot does not write is still a configuration error, exit 2: the published schema
+     * leaves `format` open for editors, and lockrot reads its `x-known-values` as the enum. The
+     * schema is read afresh, since the first validation of a process is the one that has to hold.
+     */
+    public function testAnUnknownConfiguredFormatIsExit2EvenWhenTheCommandLineNamesOne(): void
+    {
+        $this->fixtureCopy(self::LARAVEL_LOCK, ['format' => 'xml', 'install-tme' => 'off']);
+        ColdConfigSchema::forget();
+
+        [$code, $stdout, $stderr] = $this->runWithSplitStreams(['--format' => 'json']);
+
+        self::assertSame(2, $code);
+        self::assertSame('', $stdout);
+        self::assertStringStartsWith("lockrot: extra.lockrot is invalid:\n  - format: Does not have a value in the enumeration [\"table\",", $stderr);
+        self::assertStringEndsWith("\n  - unknown key extra.lockrot.install-tme ignored (did you mean install-time?)\n", $stderr);
     }
 
     public function testAMisspeltRequiredIgnoreKeyGetsItsSuggestionInTheError(): void

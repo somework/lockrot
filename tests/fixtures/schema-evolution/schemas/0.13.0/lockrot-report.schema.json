@@ -367,9 +367,10 @@
       ]
     },
     "signalId": {
-      "description": "A signal identifier, as `docs/verdicts.md` lists them.",
+      "description": "A signal identifier: `S` and a number for lockrot's own, as `docs/verdicts.md` lists them, or `<vendor>:<name>` for one that does not come from lockrot. An open set: a later release under this schema number can add an id, so read one you do not know as \"other\". `x-known-values` lists the ids this release writes; read it as the enum to hold a document to them.",
       "type": "string",
-      "enum": [
+      "pattern": "^(S[1-9][0-9]*|[a-z0-9][a-z0-9_.-]*:[a-z0-9][a-z0-9_.-]*)$",
+      "x-known-values": [
         "S1",
         "S2",
         "S3",
@@ -555,19 +556,7 @@
       ],
       "properties": {
         "id": {
-          "type": "string",
-          "enum": [
-            "S1",
-            "S2",
-            "S3",
-            "S4",
-            "S5",
-            "S6",
-            "S7",
-            "S8",
-            "S9",
-            "S10"
-          ]
+          "$ref": "#/definitions/signalId"
         },
         "level": {
           "$ref": "#/definitions/level"
@@ -697,6 +686,27 @@
             },
             "data": {
               "$ref": "#/definitions/s10"
+            }
+          }
+        },
+        {
+          "description": "A signal whose id this schema does not list, from a later release or not from lockrot: its data is any object. Every id the schema lists is typed by its own branch above and cannot take this one.",
+          "not": {
+            "properties": {
+              "id": {
+                "enum": [
+                  "S1",
+                  "S2",
+                  "S3",
+                  "S4",
+                  "S5",
+                  "S6",
+                  "S7",
+                  "S8",
+                  "S9",
+                  "S10"
+                ]
+              }
             }
           }
         }
@@ -926,11 +936,19 @@
           ]
         },
         "floor_source": {
-          "description": "Which floor floor_php is; null when the newest branch is within reach. Optional: documents written before 0.11.0 do not carry it.",
-          "enum": [
-            "project",
-            "target",
-            null
+          "description": "Which floor floor_php is; null when the newest branch is within reach. An open set: a later release can add a floor, so read a value you do not know as \"other\". Optional: documents written before 0.11.0 do not carry it.",
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]*$",
+              "x-known-values": [
+                "project",
+                "target"
+              ]
+            },
+            {
+              "type": "null"
+            }
           ]
         },
         "reachable_branch": {
@@ -991,17 +1009,19 @@
             ],
             "properties": {
               "check": {
-                "description": "`repository_activity` is the forge round behind S3 and S4; `release_dates` is the package's own age, which the repository dates only by a commit its tags share.",
+                "description": "`repository_activity` is the forge round behind S3 and S4; `release_dates` is the package's own age, which the repository dates only by a commit its tags share. An open set: a later release can add a check, so read one you do not know as \"other\".",
                 "type": "string",
-                "enum": [
+                "pattern": "^[a-z][a-z0-9_]*$",
+                "x-known-values": [
                   "repository_activity",
                   "release_dates"
                 ]
               },
               "reason": {
-                "description": "Why it did not run.",
+                "description": "Why it did not run. An open set: a later release can add a reason, so read one you do not know as \"other\".",
                 "type": "string",
-                "enum": [
+                "pattern": "^[a-z][a-z0-9_]*$",
+                "x-known-values": [
                   "no_token",
                   "anonymous_budget",
                   "install_time_budget",

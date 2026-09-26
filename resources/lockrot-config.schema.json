@@ -32,8 +32,10 @@
       "pattern": "^\\d+(\\.\\d+)?$"
     },
     "format": {
+      "description": "The output format. An open set in this published copy, so an editor holding it accepts a format a later release adds, or a `<vendor>:<name>` one; lockrot itself accepts exactly the formats in `x-known-values` of the copy it ships, and rejects any other as a configuration error.",
       "type": "string",
-      "enum": [
+      "pattern": "^([a-z][a-z0-9-]*|[a-z0-9][a-z0-9_.-]*:[a-z0-9][a-z0-9_.-]*)$",
+      "x-known-values": [
         "table",
         "json",
         "github",

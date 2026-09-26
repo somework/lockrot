@@ -271,6 +271,223 @@ final class JsonSchemaConformanceTest extends TestCase
         self::assertTrue($relabelled, 'an S2 signal to relabel');
 
         self::assertNotSame([], $this->errors(Schemas::REPORT, (string) json_encode($document), false));
+        self::assertNotSame([], $this->errors(Schemas::REPORT, (string) json_encode($document), true));
+    }
+
+    /**
+     * The sets that grow in minor releases are open strings in the published schema: a signal id, an
+     * S10 check or reason and an S8 floor source a later release adds validate against a copy taken
+     * now, and so do the `<vendor>:<name>` names reserved for signals that do not come from lockrot.
+     * A signal whose id the schema does not list carries any object as its data.
+     */
+    public function testValuesALaterReleaseOrAnExtensionAddsValidateAgainstThePublishedSchema(): void
+    {
+        $json = (string) json_encode(self::withNewValues(self::wallabagReport()));
+
+        self::assertSame([], $this->errors(Schemas::REPORT, $json, false));
+        self::assertNotSame([], $this->errors(Schemas::REPORT, $json, true), 'the strict twin holds them to the values it knows');
+    }
+
+    /** @return iterable<string, array{string, string}> a typo in a value the schema knows, and the property that names it */
+    public static function typosInKnownValues(): iterable
+    {
+        yield 'an S10 reason' => ['reason', 'reason'];
+        yield 'an S10 check' => ['check', 'check'];
+        yield 'an S10 block' => ['block', 'blocks'];
+        yield 'an S8 floor source' => ['floor_source', 'floor_source'];
+        yield 'a signal id' => ['id', 'id'];
+    }
+
+    /**
+     * A mistyped value that still fits the open pattern passes the published schema, which cannot
+     * tell it from a value a later release adds; the strict twin reads `x-known-values` as the enum
+     * and rejects it, which is how lockrot's own output is held to the values it documents.
+     *
+     * @dataProvider typosInKnownValues
+     */
+    #[DataProvider('typosInKnownValues')]
+    public function testTheStrictTwinRejectsATypoInAKnownValue(string $typo, string $property): void
+    {
+        $document = self::wallabagReport();
+        $s10 = self::firstSignal($document, Signal::S10);
+        $entry = self::firstUnchecked($s10);
+        switch ($typo) {
+            case 'reason':
+                $entry->reason = 'no_tokn';
+
+                break;
+            case 'check':
+                $entry->check = 'release_date';
+
+                break;
+            case 'block':
+                $entry->blocks = array_merge(self::items($entry->blocks), ['S11']);
+
+                break;
+            case 'floor_source':
+                self::dataOf(self::firstLeftBehind($document))->floor_source = 'projct';
+
+                break;
+            default:
+                $s10->id = 'S99';
+                $s10->data = new \stdClass();
+        }
+        $json = (string) json_encode($document);
+
+        self::assertSame([], $this->errors(Schemas::REPORT, $json, false), 'the published schema cannot tell a typo from a new value');
+        $errors = $this->errors(Schemas::REPORT, $json, true);
+        self::assertNotSame([], $errors);
+        self::assertNotSame([], array_filter($errors, static fn (string $error): bool => strpos($error, $property) !== false), implode("\n", $errors));
+    }
+
+    /**
+     * The generic branch is for ids the schema does not list: a listed id cannot shed its typed data
+     * by taking it, whether its data is empty or another signal's.
+     */
+    public function testAKnownIdCannotBorrowTheBranchForUnknownIds(): void
+    {
+        $document = self::wallabagReport();
+        self::firstSignal($document, Signal::S2)->data = new \stdClass();
+        $json = (string) json_encode($document);
+
+        self::assertNotSame([], $this->errors(Schemas::REPORT, $json, false));
+        self::assertNotSame([], $this->errors(Schemas::REPORT, $json, true));
+    }
+
+    public function testTheExplanationAcceptsASignalIdALaterReleaseOrAnExtensionAdds(): void
+    {
+        $analysis = self::analysis('apps/wallabag_wallabag');
+        $finding = $analysis->finding('doctrine/cache');
+        $facts = $analysis->facts('doctrine/cache');
+        self::assertNotNull($finding);
+        self::assertNotNull($facts);
+        $document = self::object(json_decode((new ExplainFormatter())->json(new Explanation($finding, $facts, new Thresholds(), '8.4', $analysis->report()))));
+        $explained = self::object($document->finding);
+        $explained->signals = array_merge(self::items($explained->signals), self::signalsNoLockrotWrote());
+        $json = (string) json_encode($document);
+
+        self::assertSame([], $this->errors(Schemas::EXPLAIN, $json, false));
+        self::assertNotSame([], $this->errors(Schemas::EXPLAIN, $json, true));
+    }
+
+    /**
+     * The published configuration schema accepts a format a later release adds, and a vendor's, so an
+     * editor holding an older copy does not flag it; the strict reading, which is what lockrot
+     * validates `extra.lockrot` with, does not.
+     */
+    public function testThePublishedConfigSchemaAcceptsAFormatALaterReleaseOrAnExtensionAdds(): void
+    {
+        foreach (['csv', 'acme:csv'] as $format) {
+            $json = (string) json_encode(['format' => $format]);
+
+            self::assertSame([], $this->errors(Schemas::CONFIG, $json, false), $format);
+            self::assertNotSame([], $this->errors(Schemas::CONFIG, $json, true), $format);
+        }
+        foreach (['', 'CSV', 'a:b:c', ':csv'] as $format) {
+            self::assertNotSame([], $this->errors(Schemas::CONFIG, (string) json_encode(['format' => $format]), false), 'not a format name: '.$format);
+        }
+    }
+
+    /** wallabag's report, decoded to objects. */
+    private static function wallabagReport(): \stdClass
+    {
+        return self::object(json_decode((new JsonFormatter())->format(self::analysis('apps/wallabag_wallabag')->report())));
+    }
+
+    /**
+     * The document with a value in every open set that no lockrot has written: a signal S99 and a
+     * signal acme:licence with data of their own, an S10 check and reason, both blocking those two,
+     * and an S8 floor source.
+     */
+    private static function withNewValues(\stdClass $document): \stdClass
+    {
+        $s10 = self::firstSignal($document, Signal::S10);
+        $entry = self::firstUnchecked($s10);
+        $entry->check = 'license_scan';
+        $entry->reason = 'quota_exhausted';
+        $entry->blocks = array_merge(self::items($entry->blocks), ['S99', 'acme:licence']);
+        $data = self::dataOf($s10);
+        $data->blocks = array_merge(self::items($data->blocks), ['S99', 'acme:licence']);
+        self::dataOf(self::firstLeftBehind($document))->floor_source = 'extension';
+        $finding = self::object(self::items($document->findings)[0]);
+        $finding->signals = array_merge(self::items($finding->signals), self::signalsNoLockrotWrote());
+
+        return $document;
+    }
+
+    /** @return list<\stdClass> a signal with an id no lockrot wrote, and one named as a vendor's */
+    private static function signalsNoLockrotWrote(): array
+    {
+        $signals = [];
+        foreach (['S99', 'acme:licence'] as $id) {
+            $signals[] = (object) ['id' => $id, 'level' => 'info', 'summary' => 'x', 'data' => (object) ['anything' => [1]]];
+        }
+
+        return $signals;
+    }
+
+    private static function firstUnchecked(\stdClass $s10): \stdClass
+    {
+        return self::object(self::items(self::dataOf($s10)->unchecked)[0]);
+    }
+
+    private static function dataOf(\stdClass $signal): \stdClass
+    {
+        return self::object($signal->data);
+    }
+
+    /** @param mixed $value */
+    private static function object($value): \stdClass
+    {
+        self::assertInstanceOf(\stdClass::class, $value);
+
+        return $value;
+    }
+
+    /**
+     * @param mixed $value
+     *
+     * @return list<mixed>
+     */
+    private static function items($value): array
+    {
+        self::assertIsArray($value);
+
+        return array_values($value);
+    }
+
+    private static function firstSignal(\stdClass $document, string $id): \stdClass
+    {
+        foreach (self::signals($document) as $signal) {
+            if ($signal->id === $id) {
+                return $signal;
+            }
+        }
+        self::fail('no '.$id.' in the document');
+    }
+
+    /** An S8 that carries floor_source, null here: every newest branch is within reach of PHP 8.4. */
+    private static function firstLeftBehind(\stdClass $document): \stdClass
+    {
+        foreach (self::signals($document) as $signal) {
+            if ($signal->id === Signal::S8 && property_exists(self::dataOf($signal), 'floor_source')) {
+                return $signal;
+            }
+        }
+        self::fail('no S8 with a floor source in the document');
+    }
+
+    /** @return list<\stdClass> */
+    private static function signals(\stdClass $document): array
+    {
+        $signals = [];
+        foreach (self::items($document->findings) as $finding) {
+            foreach (self::items(self::object($finding)->signals) as $signal) {
+                $signals[] = self::object($signal);
+            }
+        }
+
+        return $signals;
     }
 
     public function testTheExplanationValidatesAgainstItsSchemaAndItsStrictTwin(): void
