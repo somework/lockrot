@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Integration;
 
+use Lockrot\Json\KnownValues;
 use Lockrot\Json\Schemas;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\SchemaWidening;
@@ -45,7 +46,12 @@ final class SchemaWideningTest extends TestCase
         yield 'report verdict loses unknown' => [Schemas::REPORT, 'verdict-unknown', '/properties/verdict: no longer accepts "unknown"'];
         yield 'baseline standing only known' => [Schemas::REPORT, 'standing-known', '/properties/status: no longer accepts "new"'];
         yield 's10 check and reason lose values' => [Schemas::REPORT, 's10-enums', '/properties/check: no longer accepts "repository_activity"'];
-        yield 's8 floor_source loses target' => [Schemas::REPORT, 'floor-source', '/properties/floor_source: no longer accepts "target"'];
+        yield 's8 floor_source loses target' => [Schemas::REPORT, 'floor-source', '/properties/floor_source/oneOf/0: no longer accepts "target"'];
+        yield 'a known signal id dropped' => [Schemas::REPORT, 'signal-id-dropped', '/properties/id: no longer accepts "S10"'];
+        yield 'known values on a free string' => [Schemas::EXPLAIN, 'forge-known', '/properties/forge: enum ["github"] where any value was accepted'];
+        yield 'config format loses html' => [Schemas::CONFIG, 'format-dropped', '#/properties/format: no longer accepts "html"'];
+        yield 'an unknown signal id left untyped by the older schema' => [Schemas::REPORT, 'not-list-drifted', '/anyOf/10/properties/data: made required unchecked, blocks'];
+        yield 'a typed signal narrowed in three places' => [Schemas::REPORT, 's1-three-places', '/anyOf/0/properties/data/properties/replacement: no longer accepts type null'];
         yield 'run made required' => [Schemas::REPORT, 'run-required', '#: made required run'];
         yield 'baseline stale typed integer' => [Schemas::REPORT, 'stale-integer', '/properties/stale/items: no longer accepts type string'];
         yield 'finding note only null' => [Schemas::REPORT, 'note-null', '/properties/note: no longer accepts type string'];
@@ -70,7 +76,9 @@ final class SchemaWideningTest extends TestCase
     #[DataProvider('narrowings')]
     public function testEachNarrowingIsFound(string $document, string $narrowing, string $expected): void
     {
-        $problems = SchemaWidening::narrowings(self::current($document), self::narrowed($document, $narrowing));
+        $problems = $narrowing === 'not-list-drifted'
+            ? SchemaWidening::narrowings(self::narrowed($document, $narrowing), self::current($document))
+            : SchemaWidening::narrowings(self::current($document), self::narrowed($document, $narrowing));
 
         self::assertNotSame([], $problems);
         $found = array_filter($problems, static fn (string $problem): bool => strpos($problem, $expected) !== false);
@@ -86,6 +94,8 @@ final class SchemaWideningTest extends TestCase
         yield 'a field no longer required' => [Schemas::REPORT, 'note-optional'];
         yield 'a minimum lowered' => [Schemas::REPORT, 'flagged-minimum'];
         yield 'a signal added' => [Schemas::REPORT, 's11'];
+        yield 'a signal id added to the explanation' => [Schemas::EXPLAIN, 's11-explain'];
+        yield 'an S10 reason added' => [Schemas::REPORT, 'reason-added'];
         yield 'a minItems dropped' => [Schemas::REPORT, 's10-min-items'];
         yield 'a type list as oneOf' => [Schemas::REPORT, 'note-oneof'];
         yield 'a pattern dropped' => [Schemas::BASELINE, 'first-seen-any'];
@@ -119,6 +129,23 @@ final class SchemaWideningTest extends TestCase
         self::assertContains('#/properties/run: no longer listed', $report);
     }
 
+    /**
+     * The branch for unknown signal ids admits none of the ids its schema knows, so the check skips
+     * it on the older side and never compares an older signal with it on the newer side: adding S11
+     * reads as a widening above, and a narrowed typed branch is reported as that branch's problem.
+     * Read against the schemas released before the branch existed, the current one only widens.
+     */
+    public function testTheBranchForUnknownIdsIsNeitherANarrowingNorAHidingPlace(): void
+    {
+        foreach (['0.9.0', '0.12.0'] as $version) {
+            $released = self::decode(__DIR__.'/../fixtures/schema-evolution/schemas/'.$version.'/lockrot-report.schema.json');
+            self::assertSame([], SchemaWidening::narrowings($released, self::current(Schemas::REPORT)), $version);
+        }
+
+        $problems = SchemaWidening::narrowings(self::current(Schemas::REPORT), self::narrowed(Schemas::REPORT, 's1-three-places'));
+        self::assertSame([], array_values(array_filter($problems, static fn (string $problem): bool => strpos($problem, 'not is a keyword') !== false)), implode("\n", $problems));
+    }
+
     /** @return array<mixed, mixed> */
     private static function current(string $document): array
     {
@@ -150,11 +177,30 @@ final class SchemaWideningTest extends TestCase
             case 'standing-known':
                 return self::with($s, ['definitions', 'baselineStanding', 'oneOf', 0, 'properties', 'status', 'enum'], ['known']);
             case 's10-enums':
-                $s = self::with($s, array_merge($s10Entry, ['check', 'enum']), ['release_dates']);
+                $s = self::with($s, array_merge($s10Entry, ['check', KnownValues::KEYWORD]), ['release_dates']);
 
-                return self::with($s, array_merge($s10Entry, ['reason', 'enum']), ['undated_releases']);
+                return self::with($s, array_merge($s10Entry, ['reason', KnownValues::KEYWORD]), ['undated_releases']);
             case 'floor-source':
-                return self::with($s, ['definitions', 's8', 'properties', 'floor_source', 'enum'], ['project', null]);
+                return self::with($s, ['definitions', 's8', 'properties', 'floor_source', 'oneOf', 0, KnownValues::KEYWORD], ['project']);
+            case 'signal-id-dropped':
+                return self::with($s, ['definitions', 'signalId', KnownValues::KEYWORD], ['S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8', 'S9']);
+            case 'forge-known':
+                return self::with($s, ['definitions', 'activity', 'properties', 'forge', KnownValues::KEYWORD], ['github']);
+            case 'format-dropped':
+                return self::with($s, ['properties', 'format', KnownValues::KEYWORD], ['table', 'json', 'github', 'sarif', 'gitlab', 'markdown']);
+            case 'not-list-drifted':
+                // Read the other way round below: the older schema's last branch leaves S10 out of its
+                // not-list, so it takes an S10 with any data, which the current S10 branch refuses.
+                return self::with($s, ['definitions', 'signal', 'anyOf', 10, 'not', 'properties', 'id', 'enum'], ['S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8', 'S9']);
+            case 's1-three-places':
+                // Three places in S1's own branch: the signal, its data and the replacement in it.
+                // Compared with the branch for unknown ids an older S1 differs in two (the `not`, and
+                // the replacement that branch does not list), so the fewest-places rule alone would
+                // report that branch's problems instead of these.
+                $s = self::with($s, ['definitions', 's1', 'properties', 'replacement', 'type'], 'string');
+                $s = self::appended($s, ['definitions', 's1', 'required'], 'since');
+
+                return self::with($s, ['definitions', 'signal', 'anyOf', 0, 'required'], ['since']);
             case 'run-required':
                 return self::appended($s, ['required'], 'run');
             case 'stale-integer':
@@ -199,10 +245,18 @@ final class SchemaWideningTest extends TestCase
             case 'flagged-minimum':
                 return self::with($s, ['properties', 'exposure', 'items', 'properties', 'flagged', 'minimum'], 0);
             case 's11':
-                $s = self::appended($s, ['definitions', 'signalId', 'enum'], 'S11');
-                $s = self::appended($s, ['definitions', 'signal', 'properties', 'id', 'enum'], 'S11');
+                // Known to the schema, typed by a branch of its own before the one for unknown ids, and
+                // no longer unknown to that one.
+                $s = self::appended($s, ['definitions', 'signalId', KnownValues::KEYWORD], 'S11');
+                $anyOf = JsonPath::arrayAt($s, ['definitions', 'signal', 'anyOf']);
+                $unknown = array_pop($anyOf);
+                $anyOf[] = ['properties' => ['id' => ['enum' => ['S11']], 'data' => ['type' => 'object']]];
+                $anyOf[] = $unknown;
+                $s = self::with($s, ['definitions', 'signal', 'anyOf'], $anyOf);
 
-                return self::appended($s, ['definitions', 'signal', 'anyOf'], ['properties' => ['id' => ['enum' => ['S11']], 'data' => ['type' => 'object']]]);
+                return self::appended($s, ['definitions', 'signal', 'anyOf', \count($anyOf) - 1, 'not', 'properties', 'id', 'enum'], 'S11');
+            case 's11-explain':
+                return self::appended($s, ['definitions', 'signalId', KnownValues::KEYWORD], 'S11');
             case 's10-min-items':
                 return self::without($s, ['definitions', 's10', 'properties', 'unchecked', 'minItems']);
             case 'note-oneof':
@@ -210,7 +264,9 @@ final class SchemaWideningTest extends TestCase
             case 'first-seen-any':
                 return self::without($s, ['properties', 'findings', 'additionalProperties', 'properties', 'first_seen', 'pattern']);
             case 'format-added':
-                return self::appended($s, ['properties', 'format', 'enum'], 'csv');
+                return self::appended($s, ['properties', 'format', KnownValues::KEYWORD], 'csv');
+            case 'reason-added':
+                return self::appended($s, array_merge($s10Entry, ['reason', KnownValues::KEYWORD]), 'quota_exhausted');
         }
 
         self::fail('no change named '.$change);

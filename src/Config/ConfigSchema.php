@@ -6,12 +6,19 @@ namespace Lockrot\Config;
 
 use JsonSchema\Validator;
 use Lockrot\Exception\ConfigException;
+use Lockrot\Json\KnownValues;
 use Lockrot\Json\SchemaPayload;
 
 /**
  * Validates the shape of composer.json's extra.lockrot against
  * resources/lockrot-config.schema.json, using Composer's own bundled justinrainbow/json-schema
  * validator.
+ *
+ * The published file leaves `format` open — a pattern and the formats this release writes in
+ * `x-known-values` — so an editor holding an older copy does not flag a format a later release adds.
+ * lockrot itself accepts exactly the formats it writes: it reads the file strictly
+ * ({@see KnownValues::closed()}), on the first validation of a process as on every later one, so a
+ * mistyped `format` is the enum's error, exit 2, even when `--format` on the command line overrides it.
  *
  * @internal
  */
@@ -64,12 +71,10 @@ final class ConfigSchema
         }
 
         $decoded = json_decode($contents);
-        if (!\is_object($decoded)) {
+        if (!$decoded instanceof \stdClass) {
             throw new ConfigException($path.' must contain a JSON object');
         }
 
-        self::$schema = $decoded;
-
-        return $decoded;
+        return self::$schema = KnownValues::closed($decoded);
     }
 }

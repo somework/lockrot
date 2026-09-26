@@ -34,6 +34,7 @@ use Lockrot\Data\Repository\RepositoryMetadataLoader;
 use Lockrot\Deadline;
 use Lockrot\Exception\InstallBlockedException;
 use Lockrot\Signal\SignalSet;
+use Lockrot\Tests\Support\ColdConfigSchema;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\MarkupRefusingFormatter;
 use Lockrot\Tests\Support\RecordingIO;
@@ -796,6 +797,26 @@ final class InstallTimeSummaryTest extends TestCase
         $output = $io->getOutput();
         self::assertStringStartsWith('lockrot: install-time check skipped: extra.lockrot is invalid: - ignore[0].reason: ', $output);
         self::assertStringContainsString(' - unknown key extra.lockrot.<<fg=red>> ignored - unknown key extra.lockrot.ignore[0].reasn ignored (did you mean reason?)', $output);
+        self::assertCount(1, array_filter(explode("\n", $output)), $output);
+    }
+
+    /**
+     * The install-time path validates the configuration once per process, so that first validation
+     * holds `format` to the formats lockrot writes: the same skipped-check line as any other schema
+     * error, with the unknown keys in it, and not the resolver's shorter message.
+     */
+    public function testAnUnknownFormatOnAColdSchemaIsTheSchemaErrorInTheSkippedCheckLine(): void
+    {
+        $this->project(['format' => 'xml', 'install-tme' => 'off']);
+        $io = new BufferIO();
+        $event = $this->event($io, new Transaction([], [$this->loadPackage(self::PHPZIP)]));
+        ColdConfigSchema::forget();
+
+        (new InstallTimeSummary($this->analyzerFactory()))->onPreOperationsExec($event);
+
+        $output = $io->getOutput();
+        self::assertStringStartsWith('lockrot: install-time check skipped: extra.lockrot is invalid: - format: Does not have a value in the enumeration ["table",', $output);
+        self::assertStringContainsString(' - unknown key extra.lockrot.install-tme ignored (did you mean install-time?)', $output);
         self::assertCount(1, array_filter(explode("\n", $output)), $output);
     }
 

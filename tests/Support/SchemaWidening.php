@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Support;
 
+use Lockrot\Json\KnownValues;
+
 /**
  * Whether a newer JSON schema accepts every document an older one accepts: the rule docs/schema.md
  * states for one schema number, checked on the two schema files rather than on documents.
@@ -16,9 +18,21 @@ namespace Lockrot\Tests\Support;
  *
  * It covers the draft-04 keywords lockrot's schemas use — `$ref` into the same file, `type`, `enum`,
  * `oneOf`/`anyOf`, `properties`, `required`, `items`, `additionalProperties`, `minimum`/`maximum`,
- * `minItems`/`maxItems`, `minLength`/`maxLength`, `pattern`, `format` — and fails closed on any
- * other: a keyword it cannot compare, in the newer schema, is reported unless the older node
- * carries it with the same value. Where it cannot be exact it errs towards reporting:
+ * `minItems`/`maxItems`, `minLength`/`maxLength`, `pattern`, `format`, and `not` in the one shape
+ * described below — and fails closed on any other: a keyword it cannot compare, in the newer schema,
+ * is reported unless the older node carries it with the same value. Where it cannot be exact it errs
+ * towards reporting:
+ *
+ * - Both schemas are read strictly ({@see KnownValues::closed()}): an open set's `x-known-values`
+ *   is its enum and its `pattern` is dropped. No older lockrot wrote a value outside the list, since
+ *   the strict twin in ValidatesJsonSchemas holds its output to it, so a value dropped from the list
+ *   is a narrowing and a value added is not. A known value that stops matching a narrowed pattern is
+ *   not seen here; ClosedSetsTest spells each open set's pattern out instead.
+ * - A `not` of exactly `{properties: {K: {enum: L}}}` — the report's branch for signal ids it does
+ *   not list — admits no object whose K is in L. On the older side it takes L away from the values
+ *   K admits there, and a branch left with none admits nothing an older lockrot wrote and is skipped;
+ *   on the newer side a branch whose `not` excludes every value the older node's K admits is not a
+ *   candidate for it. Any other older `not` is dropped, which only widens the older node.
  *
  * - An older `oneOf`/`anyOf` is split into its branches, each joined with the rest of its node, and
  *   every branch has to fit the newer node; a newer one is split the same way, and each older
@@ -41,7 +55,7 @@ final class SchemaWidening
     ];
 
     /** Keywords that say nothing about which documents validate. */
-    private const ANNOTATIONS = ['$schema', 'id', '$id', 'title', 'description', 'default', 'examples', 'definitions'];
+    private const ANNOTATIONS = ['$schema', 'id', '$id', 'title', 'description', 'default', 'examples', 'definitions', KnownValues::KEYWORD];
 
     private const ALTERNATIVES = ['oneOf', 'anyOf'];
 
@@ -77,7 +91,29 @@ final class SchemaWidening
      */
     public static function narrowings(array $old, array $new): array
     {
+        $old = self::strictly($old);
+        $new = self::strictly($new);
+
         return array_values(array_unique((new self($old, $new))->compare($old, $new, '#', 0)));
+    }
+
+    /**
+     * @param array<mixed, mixed> $schema
+     *
+     * @return array<mixed, mixed>
+     */
+    private static function strictly(array $schema): array
+    {
+        $object = json_decode((string) json_encode($schema));
+        if (!$object instanceof \stdClass) {
+            throw new \UnexpectedValueException('a schema is an object: '.self::show($schema));
+        }
+        $read = json_decode((string) json_encode(KnownValues::closed($object)), true);
+        if (!\is_array($read)) {
+            throw new \UnexpectedValueException('the strict reading of a schema is an object');
+        }
+
+        return $read;
     }
 
     /**
@@ -92,10 +128,14 @@ final class SchemaWidening
             return [$path.': nested too deep to compare'];
         }
         try {
-            $old = $this->resolve($old, $this->oldRoot);
+            $old = $this->withoutNot($this->resolve($old, $this->oldRoot));
             $new = $this->resolve($new, $this->newRoot);
         } catch (\UnexpectedValueException $e) {
             return [$path.': '.$e->getMessage()];
+        }
+        if ($old === null) {
+            // A branch that admits nothing: no older document can have taken it.
+            return [];
         }
 
         $oldBranches = $this->branches($old, $this->oldRoot, false);
@@ -143,6 +183,9 @@ final class SchemaWidening
         $best = null;
         $fewest = \PHP_INT_MAX;
         foreach ($branches as $branch) {
+            if ($this->excludesAll($branch, $old)) {
+                continue;
+            }
             $problems = $this->compare($old, $branch, $path, $depth + 1);
             if ($problems === []) {
                 return [];
@@ -155,6 +198,100 @@ final class SchemaWidening
         }
 
         return $best ?? [$path.': no branch left to accept it'];
+    }
+
+    /**
+     * An older node with its `not` folded in: the values of the one property it names that are left
+     * once it has excluded its own, or null when none are — the node then admits nothing. A `not` of
+     * any other shape, or over a property the node does not type as finitely many values, is dropped.
+     *
+     * @param array<mixed, mixed> $old resolved
+     *
+     * @return null|array<mixed, mixed>
+     */
+    private function withoutNot(array $old): ?array
+    {
+        if (!\array_key_exists('not', $old)) {
+            return $old;
+        }
+        $excluded = self::excluded($old['not']);
+        unset($old['not']);
+        $values = $excluded === null ? null : $this->oldValuesOf($old, $excluded[0]);
+        if ($excluded === null || $values === null) {
+            return $old;
+        }
+        [$name, $list] = $excluded;
+        $left = array_values(array_filter($values, static fn ($value): bool => !\in_array($value, $list, true)));
+        if ($left === []) {
+            return null;
+        }
+        $properties = self::map($old['properties'] ?? [], 'properties');
+        $properties[$name] = ['enum' => $left] + $this->resolve(self::node($properties[$name], $name), $this->oldRoot);
+        $old['properties'] = $properties;
+
+        return $old;
+    }
+
+    /**
+     * Whether a newer branch's `not` excludes every value the older node's property can hold, so
+     * that the branch accepts none of the older node's documents.
+     *
+     * @param array<mixed, mixed> $branch
+     * @param array<mixed, mixed> $old
+     */
+    private function excludesAll(array $branch, array $old): bool
+    {
+        $excluded = self::excluded($branch['not'] ?? null);
+        if ($excluded === null) {
+            return false;
+        }
+        try {
+            $values = $this->oldValuesOf($old, $excluded[0]);
+        } catch (\UnexpectedValueException $e) {
+            return false;
+        }
+
+        return $values !== null && array_filter($values, static fn ($value): bool => !\in_array($value, $excluded[1], true)) === [];
+    }
+
+    /**
+     * The values an older node's property admits, when finitely many; null when there are more, or
+     * the node does not list the property.
+     *
+     * @param array<mixed, mixed> $old
+     *
+     * @return null|list<mixed>
+     */
+    private function oldValuesOf(array $old, string $name): ?array
+    {
+        $properties = self::map($old['properties'] ?? [], 'properties');
+        if (!\array_key_exists($name, $properties)) {
+            return null;
+        }
+
+        return self::finiteValues($this->resolve(self::node($properties[$name], $name), $this->oldRoot));
+    }
+
+    /**
+     * The property and the values a `not` of exactly `{properties: {K: {enum: L}}}` excludes; null
+     * for a `not` of any other shape.
+     *
+     * @param mixed $not
+     *
+     * @return null|array{string, list<mixed>}
+     */
+    private static function excluded($not): ?array
+    {
+        if (!\is_array($not) || array_keys($not) !== ['properties'] || !\is_array($not['properties']) || \count($not['properties']) !== 1) {
+            return null;
+        }
+        foreach ($not['properties'] as $name => $schema) {
+            if (\is_array($schema) && array_keys($schema) === ['enum'] && \is_array($schema['enum'])) {
+                return [(string) $name, array_values($schema['enum'])];
+            }
+        }
+
+        return null;
     }
 
     /**

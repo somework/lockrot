@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Support;
 
 use JsonSchema\Validator;
+use Lockrot\Json\KnownValues;
 use Lockrot\Json\Schemas;
 
 /**
@@ -12,9 +13,12 @@ use Lockrot\Json\Schemas;
  * against its strict twin.
  *
  * The published schemas keep every object open, so a field the schema does not list is not an
- * error. The strict twin closes every object that declares its `properties`, so a field the schema
- * does not list fails: a formatter that gains a field the schema never learned, or an older document
- * carrying a field the current schema stopped listing.
+ * error, and describe the sets that grow in minor releases as open strings. The strict twin closes
+ * every object that declares its `properties`, so a field the schema does not list fails: a formatter
+ * that gains a field the schema never learned, or an older document carrying a field the current
+ * schema stopped listing. It also reads every `x-known-values` as the enum it lists
+ * ({@see KnownValues::closed()}), so a value outside it fails too: a mistyped reason, or a signal id
+ * the schema was never taught.
  *
  * For a {@see \PHPUnit\Framework\TestCase}; shared by the tests that validate what the current
  * formatters write and what earlier releases wrote.
@@ -47,7 +51,7 @@ trait ValidatesJsonSchemas
         self::assertNotNull($data, 'valid JSON');
         if ($strict) {
             self::assertInstanceOf(\stdClass::class, $schema);
-            $schema = self::strictTwin($schema);
+            $schema = self::strictTwin(KnownValues::closed($schema));
         }
 
         $validator = new Validator();

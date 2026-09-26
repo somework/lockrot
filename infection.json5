@@ -57,10 +57,10 @@
     //    ComposerHttpClient.php:119 (substr of a host longer than 4) and :175 (`?? 0` on a ?int),
     //    LockrotCommand.php:615 and :206 (getcwd() false only in a removed working directory).
     //  - Memoisation of a pure function: AllowlistEntry.php:37 (VersionParser is stateless),
-    //    BaselineSchema.php:76, ConfigSchema.php:53, DependencyGraph.php:116 (recomputed, equal answer).
-    //  - Branches the shipped inputs cannot enter: BaselineSchema.php:43 x2 and ConfigSchema.php:41 x2
+    //    BaselineSchema.php:76, ConfigSchema.php:60, DependencyGraph.php:116 (recomputed, equal answer).
+    //  - Branches the shipped inputs cannot enter: BaselineSchema.php:43 x2 and ConfigSchema.php:48 x2
     //    (the PHPStan narrowing over json-schema errors, which are always arrays of strings),
-    //    BaselineSchema.php:80 and ConfigSchema.php:57 (a schema shipped in the package is never
+    //    BaselineSchema.php:80 and ConfigSchema.php:64 (a schema shipped in the package is never
     //    unreadable), AtomicWriter.php:43 (was BaselineFile.php:112; error_clear_last before a write
     //    that records its own warning), ProjectIgnoreList.php:72
     //    ((int) of the whole YYYY-MM-DD match is the year), HttpResult.php:85 (getLastErrors() is false
@@ -97,6 +97,11 @@
     // with the write they sit in, and two new equivalents — the `(array)` over the VALUE_IS_ARRAY
     // option in LockrotCommand::outputSpecs() and the `(string)` over OutputFormatter::format() in
     // ReportTargets::write(). src/Filesystem joins the "data and the rest" CI shard.
+    //
+    // 2026-09-26 (open vocabularies): src/Json/KnownValues.php, the strict reading of the published
+    // schemas, adds no escape (every mutant killed by tests/Unit/Json/KnownValuesTest.php and the
+    // first-call tests of ConfigSchema); the four ConfigSchema escapes moved to :48, :60 and :64
+    // with the docblock that says why the runtime reads `x-known-values` as the enum.
     //
     // Threshold 97 = floor of the honest MSI minus 1: at 3201 mutants that leaves room for ~40 new
     // escapes before the gate fails — close to the ~25 the narrower scope allowed — without the
