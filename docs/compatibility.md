@@ -72,7 +72,7 @@ These grow in minor releases:
 
 - signal ids;
 - the checks, reasons and blocked signals of S10;
-- S8's `floor_source`;
+- S8's `floor_source`, and the explanation's `php_blocked_by`, which holds the same values;
 - S6's `reason`;
 - repository hosts;
 - format names.
@@ -81,7 +81,7 @@ A consumer treats a value it does not know as "other": it shows the value as wri
 fail on it.
 
 The schemas describe signal ids, S10's checks, reasons and blocked signals, S6's `reason`, S8's
-`floor_source` and the configuration's `format` as open strings: a `pattern`, which also admits the `<vendor>:<name>`
+`floor_source`, the explanation's `php_blocked_by` and the configuration's `format` as open strings: a `pattern`, which also admits the `<vendor>:<name>`
 form for a signal id and a format, plus `x-known-values`, the values lockrot writes, which only grows
 within 1.x. A signal whose id is not listed validates with any object as its `data`; a listed id
 keeps its `data` typed. A consumer that validates strictly reads `x-known-values` as an enum and

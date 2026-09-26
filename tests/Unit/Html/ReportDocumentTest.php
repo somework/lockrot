@@ -121,6 +121,31 @@ final class ReportDocumentTest extends TestCase
     }
 
     /**
+     * The page's branch rows are held against the same two floors S8 is: the target PHP, and the
+     * project's own `require.php` when the caller hands it over. Without it the project column has
+     * no answer, which is not the same as admitted.
+     */
+    public function testABranchRowSaysWhichFloorHoldsItBack(): void
+    {
+        $report = $this->report([$this->finding('vendor/pkg', Verdict::LEFT_BEHIND, [], '1.27.1')]);
+        $metadata = F::metadata([['3.12.0', '2026-09-09T00:00:00+00:00', '>=8.1'], ['1.27.1', '2022-06-09T00:00:00+00:00', '>=5.3.0']]);
+        $analysis = new Analysis($report, ['vendor/pkg' => F::facts(F::package(['version' => '1.27.1']), $metadata)]);
+        $withProject = new PageData($analysis, new Thresholds(), '8.4', '>=7.2.5');
+        $withoutProject = new PageData($analysis, new Thresholds(), '8.4');
+
+        $held = J::arrayAt((new ReportDocument($report, $withProject))->toArray(), ['details', 'vendor/pkg']);
+        $free = J::arrayAt((new ReportDocument($report, $withoutProject))->toArray(), ['details', 'vendor/pkg']);
+
+        self::assertSame('>=7.2.5', $withProject->projectPhp());
+        self::assertNull($withoutProject->projectPhp());
+        self::assertSame(['project', null], J::column($held, ['metadata', 'branches'], 'php_blocked_by'));
+        self::assertSame([false, true], J::column($held, ['metadata', 'branches'], 'admits_project_php'));
+        self::assertSame([true, true], J::column($held, ['metadata', 'branches'], 'admits_target_php'));
+        self::assertSame([null, null], J::column($free, ['metadata', 'branches'], 'php_blocked_by'));
+        self::assertSame([null, null], J::column($free, ['metadata', 'branches'], 'admits_project_php'));
+    }
+
+    /**
      * Explaining a package needs the thresholds and the target PHP as much as it needs the facts:
      * the branch table is read against both. Any one missing and there is nothing to explain.
      */

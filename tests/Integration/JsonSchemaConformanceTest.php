@@ -32,6 +32,7 @@ use Lockrot\Lock\ProjectConfig;
 use Lockrot\Output\ExplainFormatter;
 use Lockrot\Output\HtmlFormatter;
 use Lockrot\Output\JsonFormatter;
+use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
@@ -408,6 +409,41 @@ final class JsonSchemaConformanceTest extends TestCase
 
         self::assertSame([], $this->errors(Schemas::EXPLAIN, $json, false));
         self::assertNotSame([], $this->errors(Schemas::EXPLAIN, $json, true));
+    }
+
+    /**
+     * A branch row's `php_blocked_by` is an open set: a value a later release adds validates against
+     * the explain schema this release publishes, and the strict twin, which reads `x-known-values` as
+     * the enum, rejects it. The values lockrot writes, and null, pass both.
+     */
+    public function testTheExplanationsPhpBlockedByIsOpenToALaterValue(): void
+    {
+        $analysis = self::analysis('apps/wallabag_wallabag');
+        $finding = $analysis->finding('doctrine/cache');
+        $facts = $analysis->facts('doctrine/cache');
+        self::assertNotNull($finding);
+        self::assertNotNull($facts);
+        $json = (new ExplainFormatter())->json(new Explanation($finding, $facts, new Thresholds(), '8.4', $analysis->report()));
+        $withBlockedBy = static function ($value) use ($json): string {
+            $document = self::object(json_decode($json));
+            $rows = self::items(self::object($document->metadata)->branches);
+            self::assertNotSame([], $rows, 'doctrine/cache lists its branches');
+            self::object($rows[0])->php_blocked_by = $value;
+
+            return (string) json_encode($document);
+        };
+
+        foreach ([PhpFloor::PROJECT, PhpFloor::TARGET, null] as $known) {
+            $this->assertValid(Schemas::EXPLAIN, $withBlockedBy($known), (string) $known);
+            $this->assertValid(Schemas::EXPLAIN, $withBlockedBy($known), (string) $known, true);
+        }
+        $unknown = $withBlockedBy('extension');
+        $this->assertValid(Schemas::EXPLAIN, $unknown, 'a value this release does not know');
+        $errors = $this->errors(Schemas::EXPLAIN, $unknown, true);
+        self::assertNotSame([], array_filter($errors, static fn (string $error): bool => strpos($error, 'php_blocked_by') !== false), 'the strict twin holds php_blocked_by to the values it knows: '.implode("\n", $errors));
+        foreach (['', 'Project', 1] as $wrong) {
+            self::assertNotSame([], $this->errors(Schemas::EXPLAIN, $withBlockedBy($wrong), false), 'not a php_blocked_by: '.json_encode($wrong));
+        }
     }
 
     /**

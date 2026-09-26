@@ -14,8 +14,10 @@ use Lockrot\Signal\Thresholds;
  * release branches come from the facts a run keeps only when asked
  * ({@see \Lockrot\Analyzer\Analyzer::analyzeWithFacts()}), the new/known/worsened column from the
  * baseline comparison, and both the thresholds and the target PHP are needed to explain a package
- * at all. Bundling them keeps {@see \Lockrot\Output\Formatters::for()} to one extra argument, and
- * every one of them is optional: the install-time path holds none of it and still renders a page.
+ * at all. The project's own `require.php` is the second floor a branch row is held against, as S8
+ * holds it ({@see \Lockrot\Signal\PhpFloor}); without it the rows' project column has no answer.
+ * Bundling them keeps {@see \Lockrot\Output\Formatters::for()} to one extra argument, and every one
+ * of them is optional: the install-time path holds none of it and still renders a page.
  *
  * @internal
  */
@@ -24,15 +26,18 @@ final class PageData
     private ?Analysis $analysis;
     private ?Thresholds $thresholds;
     private ?string $targetPhp;
+    private ?string $projectPhp;
 
     public function __construct(
         ?Analysis $analysis = null,
         ?Thresholds $thresholds = null,
-        ?string $targetPhp = null
+        ?string $targetPhp = null,
+        ?string $projectPhp = null
     ) {
         $this->analysis = $analysis;
         $this->thresholds = $thresholds;
         $this->targetPhp = $targetPhp;
+        $this->projectPhp = $projectPhp;
     }
 
     /** Nothing but the report: no release branches, no baseline column, no thresholds. */
@@ -55,5 +60,11 @@ final class PageData
     public function targetPhp(): ?string
     {
         return $this->targetPhp;
+    }
+
+    /** The project's own `require.php` as composer.json writes it, null when it names none. */
+    public function projectPhp(): ?string
+    {
+        return $this->projectPhp;
     }
 }

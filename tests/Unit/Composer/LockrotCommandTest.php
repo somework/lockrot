@@ -527,6 +527,59 @@ final class LockrotCommandTest extends TestCase
         self::assertSame('8.4', $json['target_php']);
     }
 
+    /**
+     * wallabag's composer.json requires php >=8.2 and it locks symfony/console 5.4. The fixture
+     * repository also serves 8.1.6, which needs php >=8.4.1: PHP 8.4 installs it, wallabag's own
+     * 8.2 does not. The `--explain` document is held against the project's php, not only the target.
+     */
+    public function testExplainHoldsEachBranchToTheProjectsOwnPhp(): void
+    {
+        chdir(__DIR__.'/../../fixtures/apps/wallabag_wallabag');
+        [$code, $stdout] = $this->runRecordingWriteOptions(['--explain' => 'symfony/console', '--format' => 'json', '--target-php' => '8.4'], $this->loader());
+
+        self::assertSame(0, $code, $stdout);
+        $json = json_decode($stdout, true);
+        self::assertIsArray($json);
+        self::assertSame('>=8.2', $json['project_php']);
+        $rows = self::admission($json);
+        self::assertSame(['>=8.4.1', true, false, 'project'], $rows['8.x'] ?? null);
+        self::assertSame(['>=7.2.5', true, true, null], $rows['5.x'] ?? null, 'the installed branch');
+    }
+
+    /** The page's branch rows are held against the same two floors as `--explain`'s. */
+    public function testThePageHoldsEachBranchToTheProjectsOwnPhp(): void
+    {
+        $this->fixtureCopy(self::WALLABAG_LOCK);
+        [$code, $page, $stderr] = $this->runWithSplitStreams(['--format' => 'html', '--all' => true, '--target-php' => '8.4'], $this->loader());
+
+        self::assertSame(0, $code, $stderr);
+        $details = self::pagePayload($page)['details'];
+        self::assertIsArray($details);
+        self::assertIsArray($details['symfony/console']);
+        $rows = self::admission($details['symfony/console']);
+        self::assertSame(['>=8.4.1', true, false, 'project'], $rows['8.x'] ?? null);
+        self::assertSame(['>=7.2.5', true, true, null], $rows['5.x'] ?? null, 'the installed branch');
+    }
+
+    /**
+     * @param array<mixed, mixed> $explained
+     *
+     * @return array<string, list<mixed>>
+     */
+    private static function admission(array $explained): array
+    {
+        self::assertIsArray($explained['metadata']);
+        self::assertIsArray($explained['metadata']['branches']);
+        $rows = [];
+        foreach ($explained['metadata']['branches'] as $row) {
+            self::assertIsArray($row);
+            self::assertIsString($row['branch']);
+            $rows[$row['branch']] = [$row['php'], $row['admits_target_php'], $row['admits_project_php'], $row['php_blocked_by']];
+        }
+
+        return $rows;
+    }
+
     /** @return iterable<string, array{array<string, mixed>, string}> */
     public static function explainConfigurationErrors(): iterable
     {
