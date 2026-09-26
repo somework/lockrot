@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Signal;
 
 use Lockrot\Signal\PhpFloor;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class PhpFloorTest extends TestCase
@@ -81,5 +82,77 @@ final class PhpFloorTest extends TestCase
     {
         self::assertSame(PhpFloor::TARGET, (new PhpFloor('8.4'))->blocking('>=7.1 <8.0'));
         self::assertNull((new PhpFloor('7.4'))->blocking('>=7.1 <8.0'));
+    }
+
+    /** Matomo again, one floor at a time: monolog 3.x admits PHP 8.4 but not the 7.2.5 Matomo promises. */
+    public function testEachFloorAnswersOnItsOwn(): void
+    {
+        $floor = new PhpFloor('8.4', '>=7.2.5');
+
+        self::assertFalse($floor->admitsProject('>=8.1'));
+        self::assertTrue($floor->admitsTarget('>=8.1'));
+        self::assertTrue($floor->admitsProject('>=7.2'));
+        self::assertTrue($floor->admitsTarget('>=7.2'));
+        self::assertFalse((new PhpFloor('8.4', '^8.2|^8.3|^8.4|^8.5'))->admitsProject('^8.3'), 'the lowest of the whole constraint, 8.2.0');
+    }
+
+    /** The target is read as its whole minor here too, and a branch capped below it does not admit it. */
+    public function testTheTargetAdmitsABranchWhenAnyVersionOfItsMinorDoes(): void
+    {
+        self::assertFalse((new PhpFloor('8.3'))->admitsTarget('>=8.4.1'));
+        self::assertTrue((new PhpFloor('8.4'))->admitsTarget('>=8.4.1'));
+        self::assertTrue((new PhpFloor('8.4.7'))->admitsTarget('~8.4.0'));
+        self::assertFalse((new PhpFloor('8.4'))->admitsTarget('>=7.1 <8.0'));
+    }
+
+    /** A branch with no requirement, or one that cannot be read, gets no answer from either floor: null, never true. */
+    public function testNoRequirementOrAnUnreadableOneGivesNoAnswer(): void
+    {
+        $floor = new PhpFloor('7.2', '>=7.2.5');
+
+        self::assertNull($floor->admitsProject(null));
+        self::assertNull($floor->admitsTarget(null));
+        self::assertNull($floor->admitsProject('not a constraint'));
+        self::assertNull($floor->admitsTarget('not a constraint'));
+    }
+
+    /** A floor that is not there (no require.php, `*`, one that cannot be read, no target) answers nothing either. */
+    public function testAFloorThatIsNotThereGivesNoAnswer(): void
+    {
+        self::assertNull((new PhpFloor('8.4', null))->admitsProject('>=8.1'));
+        self::assertNull((new PhpFloor('8.4', '*'))->admitsProject('>=8.1'));
+        self::assertNull((new PhpFloor('8.4', 'whatever'))->admitsProject('>=8.1'));
+        self::assertNull((new PhpFloor(null, '>=7.2.5'))->admitsTarget('>=8.1'));
+        self::assertNull((new PhpFloor('latest'))->admitsTarget('>=8.1'));
+        self::assertFalse((new PhpFloor(null, '>=7.2.5'))->admitsProject('>=8.1'), 'the project floor holds without a target');
+    }
+
+    /**
+     * blocking() is the two answers read in S8's order: the project first, then the target, and
+     * nothing when neither says no.
+     *
+     * @dataProvider floors
+     */
+    #[DataProvider('floors')]
+    public function testBlockingIsTheTwoAnswersInOrder(?string $target, ?string $project, ?string $constraint, ?string $expected): void
+    {
+        $floor = new PhpFloor($target, $project);
+        $composed = $floor->admitsProject($constraint) === false ? PhpFloor::PROJECT : ($floor->admitsTarget($constraint) === false ? PhpFloor::TARGET : null);
+
+        self::assertSame($expected, $floor->blocking($constraint));
+        self::assertSame($expected, $composed);
+    }
+
+    /** @return iterable<string, array{?string, ?string, ?string, ?string}> */
+    public static function floors(): iterable
+    {
+        yield 'both block, the project is named' => ['7.4', '>=7.2.5', '>=8.1', PhpFloor::PROJECT];
+        yield 'only the project blocks' => ['8.4', '>=7.2.5', '>=8.1', PhpFloor::PROJECT];
+        yield 'only the target blocks' => ['7.4', '>=7.2.5', '>=7.2 <7.4', PhpFloor::TARGET];
+        yield 'the target blocks with no project floor' => ['7.4', null, '>=8.1', PhpFloor::TARGET];
+        yield 'within both' => ['8.4', '>=7.2.5', '>=7.2', null];
+        yield 'no requirement' => ['7.4', '>=7.2.5', null, null];
+        yield 'an unreadable requirement' => ['7.4', '>=7.2.5', 'not a constraint', null];
+        yield 'no floor at all' => [null, null, '>=8.1', null];
     }
 }
