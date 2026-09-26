@@ -73,7 +73,7 @@ the two `catch` lines of `execute()`, went with the tag itself: both lines now h
 `writeError()` with the `error` style, and the one mutant left in that helper is listed with the `--output`
 entries below (`SelfUpdateCommand.php:278`).
 
-src/SelfUpdate/ReleaseLocator.php:435 CastString (`(string) preg_replace(...)` → `preg_replace(...)`) — the
+src/SelfUpdate/ReleaseLocator.php:447 CastString (`(string) preg_replace(...)` → `preg_replace(...)`) — the
 display version of a candidate. preg_replace() returns null only when the pattern fails to compile or the
 backtrack limit is hit; the pattern is a literal that compiles, and the subject is a normalised stable version
 (`\d+.\d+.\d+.\d+` with at most a short suffix), far below any limit. The cast states the `string` type the
@@ -377,12 +377,12 @@ could tell apart from their mutants, so it now reads one unit at a time with nam
 subtracts the UTF-8 length marker instead. Two are equivalent, both on the guard in front of
 `levenshtein()`:
 
-- `src/Config/UnknownKeys.php:143` GreaterThan (`strlen($key) > 255` → `>=`) — `nearest()` gives up
+- `src/Config/UnknownKeys.php:144` GreaterThan (`strlen($key) > 255` → `>=`) — `nearest()` gives up
   on a key of exactly 255 bytes instead of measuring it. Measured, it would come back empty anyway:
   it is at least 236 edits from the longest known key (19 bytes), far past the third of 255 the
   threshold allows, and no known key is long enough to contain it. Every length the mutant moves to
   the early return gets the same `null` the loop would give.
-- `src/Config/UnknownKeys.php:144` ReturnRemoval — without the early return a key longer than 255
+- `src/Config/UnknownKeys.php:145` ReturnRemoval — without the early return a key longer than 255
   bytes reaches `levenshtein()`. On PHP 8, where Infection runs, that function measures strings of
   any length, finds no known key within reach (by the same arithmetic) and returns no suggestion, so
   the result is the same. The guard is for PHP 7.4, whose `levenshtein()` emits a warning and returns

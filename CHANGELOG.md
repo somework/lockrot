@@ -41,7 +41,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   exits 1 exactly when `self-update` would install something (`--check --allow-major` for a next
   major, whose advice line then says `self-update --allow-major`), exits 0 when every newer release
   is held back for its major, PHP or floor, and ignores `--force`. `--check` also reads the chosen
-  release's `lockrot.phar.meta.json` from GitHub's release downloads, not only the API. `--force`
+  release's `lockrot.phar.meta.json` from GitHub's release downloads, not only the API; a release of
+  the next major that is only advised and whose description cannot be read gets a line saying so,
+  and does not stop an update in the running major. `--force`
   reinstalls the newest release at or below the running one in its major version, which can be
   older than the running build (a 0.13.1 whose release was withdrawn gets 0.13.0), never looks
   below that release, and never leaves the line: with nothing in the line to install it exits 2

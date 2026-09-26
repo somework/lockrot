@@ -916,6 +916,67 @@ final class ReleaseLocatorTest extends TestCase
         self::assertChose('1.0.0', $this->locator($http, '0.13.0', '7.4.33')->locate(true));
     }
 
+    /** @return iterable<string, array{0: list<string>, 1: array<string, HttpResult|string>, 2: string}> */
+    public static function unreadableNextMajors(): iterable
+    {
+        $url = self::metaUrl('v1.0.0');
+
+        yield 'no description asset' => [[ReleaseLocator::PHAR_ASSET, ReleaseLocator::CHECKSUM_ASSET, ReleaseLocator::SIGNATURE_ASSET], [], 'release v1.0.0 has no lockrot.phar.meta.json asset'];
+        yield 'a download that fails' => [GitHubReleases::ASSETS, ['v1.0.0' => FakeHttpClient::status($url, 503, 'Service Unavailable')], 'could not download '.$url.': HTTP 503'];
+        yield 'not a description' => [GitHubReleases::ASSETS, ['v1.0.0' => '<html>502</html>'], $url.' is not a lockrot release description ({"php": "<version>", "selfupdate-key": "sha256:<hex>"} expected)'];
+    }
+
+    /**
+     * The next major is only advice until --allow-major is given: one whose description cannot be
+     * read is named with the reason, and the update in the running major goes ahead.
+     *
+     * @dataProvider unreadableNextMajors
+     *
+     * @param list<string>                     $assets
+     * @param array<string, HttpResult|string> $metas
+     */
+    #[DataProvider('unreadableNextMajors')]
+    public function testANextMajorThatCannotBeDescribedDoesNotStopAnUpdateInTheRunningMajor(array $assets, array $metas, string $reason): void
+    {
+        $http = self::http(
+            [GitHubReleases::entry('v1.0.0', $assets), GitHubReleases::entry('v0.14.0'), GitHubReleases::entry('v0.13.0')],
+            $metas + ['v0.14.0' => GitHubReleases::meta('7.4.0', self::releaseKey())]
+        );
+        $locator = $this->locator($http, '0.13.0');
+
+        self::assertChose('0.14.0', $locator->locate());
+        self::assertSame(['lockrot 1.0.0 is in the next major version, and its description could not be read: '.$reason], $locator->notes());
+    }
+
+    /** An unreadable newest release of the next major does not hide the advice about an older one. */
+    public function testTheAdviceGoesOnPastANextMajorReleaseThatCannotBeDescribed(): void
+    {
+        $url = self::metaUrl('v1.1.0');
+        $http = self::http(
+            [GitHubReleases::entry('v1.1.0'), GitHubReleases::entry('v1.0.0'), GitHubReleases::entry('v0.13.0')],
+            ['v1.1.0' => FakeHttpClient::status($url, 404, 'Not Found'), 'v1.0.0' => GitHubReleases::meta('7.4.0', self::releaseKey())]
+        );
+        $locator = $this->locator($http, '0.13.0');
+
+        self::assertNull($locator->locate());
+        self::assertSame([
+            'lockrot 1.1.0 is in the next major version, and its description could not be read: could not download '.$url.': HTTP 404',
+            'lockrot 1.0.0 is in the next major version; run lockrot.phar self-update --allow-major to move to it',
+        ], $locator->notes());
+    }
+
+    /** With --allow-major the next major is the target, and a target that cannot be described still fails loudly. */
+    public function testWithAllowMajorANextMajorThatCannotBeDescribedIsAnError(): void
+    {
+        $url = self::metaUrl('v1.0.0');
+        $http = self::http(
+            [GitHubReleases::entry('v1.0.0'), GitHubReleases::entry('v0.14.0'), GitHubReleases::entry('v0.13.0')],
+            ['v1.0.0' => FakeHttpClient::status($url, 404, 'Not Found'), 'v0.14.0' => GitHubReleases::meta('7.4.0', self::releaseKey())]
+        );
+
+        self::assertLocateFails('could not download '.$url.': HTTP 404', $this->locator($http, '0.13.0'), true);
+    }
+
     /** A next major this PHP cannot run at all gets the floor, never the advice. */
     public function testANextMajorThisPhpCannotRunIsNotAdvised(): void
     {

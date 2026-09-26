@@ -249,7 +249,10 @@ the release workflow and fetched only for a release that would otherwise be inst
 newest releases of the next major version until one could be (so `--allow-major` is suggested only
 when it would install something). Releases before 0.13.0 have none and are read as what they are:
 built for PHP 7.4.0, with no claim about their key, so the signature alone decides. A 0.13.0 or
-later release without the file is an error (exit `2`) naming the tag, as a missing archive is. The
+later release that would be installed without the file, or with one that cannot be downloaded or
+read, is an error (exit `2`) naming the tag, as a missing archive is. A release of the next major
+that is only named for `--allow-major` is not installed, so there the same problem is a line saying
+its description could not be read, and the update in the running major goes ahead. The
 file is not signed: it decides only which release is tried. The checksum and the signature still
 decide whether one is installed, so a doctored description cannot get anything installed that the
 release key did not sign. It can hold an update back, and a description that understates the lowest
@@ -309,7 +312,7 @@ change what `--check` reports.
 before it suggests `--allow-major`). That file is a release download: it comes from
 `github.com/somework/lockrot/releases/download/…`, which redirects to GitHub's release-asset host,
 not from `api.github.com`. A CI job whose network allows only the API needs that host too, or
-`--check` exits `2` on a newer release it cannot describe.
+`--check` exits `2` on a newer release in its major that it cannot describe.
 
 ### `self-update` exit codes
 

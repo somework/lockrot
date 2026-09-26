@@ -35,8 +35,9 @@ use Lockrot\Version;
  *   and are read as what they are: built for PHP 7.4.0, with no claim about their key.
  * - Drafts (listed for a token with push access), pre-releases, and tags that are not a stable
  *   version are not candidates; a published release whose tag is not a version at all is named in a
- *   note. One odd entry does not stop an update; a chosen release that lacks an asset, or whose
- *   description cannot be read, still fails loudly rather than falling back.
+ *   note. One odd entry does not stop an update, and neither does a release of the next major that
+ *   is only advised and whose description cannot be read; a chosen release that lacks an asset, or
+ *   whose description cannot be read, still fails loudly rather than falling back.
  * - Versions are compared in Composer's normalised form (`v1.0`, `V1.0.0` and `1.0.0` are one
  *   version), and shown as `major.minor.patch`.
  *
@@ -213,11 +214,22 @@ final class ReleaseLocator
      * note saying why. True once the advice has been given, so the rest of that major is not
      * described.
      *
+     * A release that is only advised is not chosen, so a description that cannot be read is a note
+     * here, not a failure: a next major published without its description, or a download that fails
+     * once, must not stop an update in the running major. The walk goes on to that major's older
+     * releases for the advice.
+     *
      * @param array{version: string, normalized: string, tag: string, entry: array<mixed>} $candidate
      */
     private function advise(array $candidate): bool
     {
-        $heldBack = $this->heldBack($candidate);
+        try {
+            $heldBack = $this->heldBack($candidate);
+        } catch (ConfigException $e) {
+            $this->note('undescribed', \sprintf('lockrot %s is in the next major version, and its description could not be read: %s', $candidate['version'], $e->getMessage()));
+
+            return false;
+        }
         [$reason, $text] = $heldBack ?? ['major', \sprintf(
             'lockrot %s is in the next major version; run lockrot.phar self-update --allow-major to move to it',
             $candidate['version']
@@ -230,7 +242,7 @@ final class ReleaseLocator
     /**
      * One line for each reason a newer release was passed over during the last {@see locate()} —
      * a new major version, a PHP floor above this one or unreadable, a key this archive does not
-     * carry, a tag that is not a version — naming the newest release held back for it. Kept when
+     * carry, a next major whose description cannot be read, a tag that is not a version — naming the newest release held back for it. Kept when
      * locate() throws, so a failure further down the list still comes after the reason the newer
      * release was not taken.
      *
