@@ -314,7 +314,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `blocks`, S8's `floor_source` and the configuration schema's `format` are still enums, so a new
   value there fails against an older copy. The page, and the docblock of the class that names the
   schema URLs, now say so, and the vendoring recipe says to refresh the copy on an upgrade. The
-  schemas are unchanged; describing those values as open strings is planned before 1.0.
+  same release then opens those sets (see *Changed*), so the page and the docblock now describe
+  them as open strings with their known values listed.
 
 - `SECURITY.md` said lockrot talks only to the configured Composer repositories and the GitHub API,
   and reads only the GitHub token variables. It also talks to GitLab and Bitbucket for repository
