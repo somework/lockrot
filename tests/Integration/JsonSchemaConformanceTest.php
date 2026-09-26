@@ -188,7 +188,7 @@ final class JsonSchemaConformanceTest extends TestCase
         $report = self::analysis('apps/wallabag_wallabag')->report();
         $previous = Baseline::fromReport($report);
         $report = $report
-            ->withRun(new RunSettings('Acme internal API', '8.4', '/home/someone/clients/acme/composer.lock', 'silent', new Thresholds(2, 4, 2, 4)))
+            ->withRun(new RunSettings('Acme internal API', 'acme/internal-api', '8.4', '/home/someone/clients/acme/composer.lock', 'silent', new Thresholds(2, 4, 2, 4)))
             ->withBaseline(BaselineComparison::compare($previous, $report, 'lockrot-baseline.json', []));
 
         $json = (new JsonFormatter())->format($report);
@@ -204,6 +204,9 @@ final class JsonSchemaConformanceTest extends TestCase
         // can be called something that is not its package name, and typing the field as one made
         // the published schema reject the value the documentation recommends.
         self::assertSame('Acme internal API', $run['project']);
+        // What Composer calls the project, beside what the report calls it: the manifest's own
+        // name, whatever extra.lockrot.project says.
+        self::assertSame('acme/internal-api', $run['root_package']);
         self::assertSame('composer.lock', $run['lock_file'], 'the lock is named, never located');
         self::assertStringNotContainsString('/home/someone', $json, 'and no path reaches the document');
         self::assertSame(2, JsonPath::arrayAt($decoded, ['run', 'thresholds'])['release-warn-years']);
@@ -368,7 +371,9 @@ final class JsonSchemaConformanceTest extends TestCase
         $lock = LockFile::fromFile(self::FIXTURES.'apps/wallabag_wallabag/composer.lock');
         $analysis = self::analyzer()->analyzeWithFacts($lock->packages(false), $lock, ProjectConfig::empty(), false);
 
-        $json = (new JsonFormatter())->format($analysis->report());
+        // What the command records for a lock read without its manifest: no name to display and
+        // no root package, both written as null — the null branch of each has to validate too.
+        $json = (new JsonFormatter())->format($analysis->report()->withRun(new RunSettings(null, null, '8.4', null, 'none', null)));
 
         $decoded = json_decode($json, true);
         self::assertIsArray($decoded);
@@ -381,6 +386,10 @@ final class JsonSchemaConformanceTest extends TestCase
         }
         $this->assertValid(Schemas::REPORT, $json, 'a lock without its composer.json');
         $this->assertValid(Schemas::REPORT, $json, 'a lock without its composer.json', true);
+        $run = JsonPath::arrayAt($decoded, ['run']);
+        self::assertArrayHasKey('root_package', $run);
+        self::assertNull($run['root_package']);
+        self::assertNull($run['project']);
 
         $first = $analysis->report()->findings()[0];
         $facts = $analysis->facts($first->package());

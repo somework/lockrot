@@ -51,11 +51,11 @@
     //  - Set membership written as `= true` and read only through isset(): ActivityClient.php:82,
     //    ActivityFetchPlanner.php:53 and :69, RepositoryMetadataLoader.php:275 (TrueValue).
     //  - array_values() that only makes a `list` type true, every consumer iterates: ActivityClient.php:122,
-    //    RepositoryMetadataLoader.php:73, InstallTimeSummary.php:144, LockrotCommand.php:596.
+    //    RepositoryMetadataLoader.php:73, InstallTimeSummary.php:144, LockrotCommand.php:597.
     //  - Casts the type system already guarantees: RepoLocator.php:141 and SupportSource.php:30
     //    (preg_replace with a literal pattern), PhpReleaseDates.php:30 (a `\d+.\d+` key is never an int),
     //    ComposerHttpClient.php:119 (substr of a host longer than 4) and :175 (`?? 0` on a ?int),
-    //    LockrotCommand.php:615 and :206 (getcwd() false only in a removed working directory).
+    //    LockrotCommand.php:616 and :206 (getcwd() false only in a removed working directory).
     //  - Memoisation of a pure function: AllowlistEntry.php:37 (VersionParser is stateless),
     //    BaselineSchema.php:76, ConfigSchema.php:53, DependencyGraph.php:116 (recomputed, equal answer).
     //  - Branches the shipped inputs cannot enter: BaselineSchema.php:43 x2 and ConfigSchema.php:41 x2
@@ -64,7 +64,7 @@
     //    unreadable), AtomicWriter.php:43 (was BaselineFile.php:112; error_clear_last before a write
     //    that records its own warning), ProjectIgnoreList.php:72
     //    ((int) of the whole YYYY-MM-DD match is the year), HttpResult.php:85 (getLastErrors() is false
-    //    on PHP >= 8.2 when clean; killed on the 7.4 leg), LockrotCommand.php:626 x2 (the Composer 2.2
+    //    on PHP >= 8.2 when clean; killed on the 7.4 leg), LockrotCommand.php:627 x2 (the Composer 2.2
     //    arm of the tryComposer() guard, never entered on the vendored Composer; covered by the Docker
     //    7.4/2.2 run outside Infection), SelfUpdateCommand.php:152 (Phar::running(false) differs only
     //    inside a running PHAR; covered by the e2e PharTest Infection does not run).

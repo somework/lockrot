@@ -2400,6 +2400,51 @@ final class LockrotCommandTest extends TestCase
         }
     }
 
+    /** @return iterable<string, array{0: bool, 1: bool, 2: null|string, 3: null|string, 4: null|string}> */
+    public static function rootPackageProvider(): iterable
+    {
+        // manifest present, its name kept, extra.lockrot.project, then the expected project and root_package
+        yield 'a named manifest and no override' => [true, true, null, 'laravel/laravel', 'laravel/laravel'];
+        yield 'an override renames the project, never the root package' => [true, true, 'Acme internal API', 'Acme internal API', 'laravel/laravel'];
+        yield 'an unnamed manifest with an override' => [true, false, 'Acme internal API', 'Acme internal API', null];
+        yield 'a lock without its composer.json' => [false, false, null, null, null];
+    }
+
+    /**
+     * `run.project` is what the report calls the project; `run.root_package` is what Composer
+     * calls it — the manifest's own `name`, whatever `extra.lockrot.project` says, and null where
+     * there is no name to read. Both keys are written in every case, null included.
+     *
+     * @dataProvider rootPackageProvider
+     */
+    #[DataProvider('rootPackageProvider')]
+    public function testTheRunNamesTheRootPackageWhateverTheConfigCallsTheProject(bool $manifest, bool $named, ?string $override, ?string $project, ?string $rootPackage): void
+    {
+        $dir = $this->fixtureCopy(self::LARAVEL_LOCK, $override === null ? null : ['project' => $override]);
+        if (!$named) {
+            $written = $this->readJsonFile($dir.'/composer.json');
+            unset($written['name']);
+            file_put_contents($dir.'/composer.json', (string) json_encode($written, \JSON_UNESCAPED_SLASHES));
+        }
+        if (!$manifest) {
+            unlink($dir.'/composer.json');
+        }
+
+        // A lock-only run reads Composer's own config from COMPOSER_HOME: never the developer's.
+        $this->withComposerEnv($this->tempDir('lockrot-root-package-cache-'), $this->tempDir('lockrot-root-package-home-'), function () use ($project, $rootPackage): void {
+            [$code, $stdout, $stderr] = $this->runWithSplitStreams(['--format' => 'json', '--target-php' => '8.4'], $this->loader());
+
+            self::assertSame(0, $code, $stderr);
+            $json = json_decode($stdout, true);
+            self::assertIsArray($json);
+            $run = JsonPath::arrayAt($json, ['run']);
+            self::assertArrayHasKey('project', $run);
+            self::assertArrayHasKey('root_package', $run);
+            self::assertSame($project, $run['project']);
+            self::assertSame($rootPackage, $run['root_package']);
+        });
+    }
+
     /**
      * `COMPOSER=alt.json composer install` reads alt.json and alt.lock, and so must `composer
      * lockrot`: it inspects the lock Composer uses, not whatever composer.lock sits beside it. Here
@@ -2422,6 +2467,7 @@ final class LockrotCommandTest extends TestCase
             self::assertIsArray($json);
             self::assertSame(200, $json['packages_checked']);
             self::assertSame('alt.lock', JsonPath::stringAt($json, ['run', 'lock_file']));
+            self::assertSame('wallabag/wallabag', JsonPath::stringAt($json, ['run', 'root_package']), 'the name comes from the manifest Composer reads');
         });
     }
 

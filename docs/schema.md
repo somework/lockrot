@@ -111,6 +111,12 @@ consumer usually keys on:
   `flagged_verdicts`, the verdicts this run counted as findings. It is
   optional in the schema so that documents written before 0.10.0 still validate, and null only
   where nothing filled it in.
+- `run.root_package` is what Composer calls the project: the `name` of the manifest it reads,
+  exactly as written, whatever `extra.lockrot.project` says — the key to match a report to its
+  repository or to join several projects' reports on, where `project` is only a label. Null where
+  the manifest has no `name`, or where the run read a lock without its composer.json. It is the one
+  key in `run` a document may omit, because reports written before 0.13.0 do not carry it; from
+  0.13.0 on lockrot always writes it, as a string or as null.
 - Each finding carries `baseline`, where it stands against the baseline file (`known`, `new` or
   `worsened`, with the verdict the baseline accepted), or null when the run read none. The report's
   own `baseline` block still carries the totals; this is the same judgement per finding, which is

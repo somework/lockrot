@@ -116,10 +116,10 @@ final class SchemaEvolutionTest extends TestCase
             Schemas::CONFIG => 'c643d1740ea647848a7372a3e083ce766a12a536c01470368adba273caa6843b',
         ],
         '0.13.0' => [
-            Schemas::REPORT => 'b2295ceebef2c97bef526975fd43fc2d5768af0fa066192407c7e6f03873f4a6',
+            Schemas::REPORT => '81ca10b651343904a2c5a2ff4adcf4883aaecc88c98ffc134663fb2fa23a97bb',
             Schemas::EXPLAIN => '4802ed4b9e93322a266232170a52dd04bc65d15be0afc4368704f387b8c8b1db',
             Schemas::BASELINE => '4435c03d9d9927b5da58b48a4df85deaa9c8b25f88703f3c6081e63b7c2ed9f9',
-            Schemas::CONFIG => 'c643d1740ea647848a7372a3e083ce766a12a536c01470368adba273caa6843b',
+            Schemas::CONFIG => '7cf1cc468df811d8924caca2be806ea423f7a0ed3d0fa926b179c6c648f778cc',
         ],
     ];
 

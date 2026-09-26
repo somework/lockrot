@@ -12,9 +12,10 @@ use PHPUnit\Framework\TestCase;
 final class LockrotConfigTest extends TestCase
 {
     /**
-     * A composer.json need not name itself, and where it does the name is not always the one to
-     * publish: a package inside a monorepo names itself after the package, a private project after
-     * the client. Read from the manifest rather than a flag, because it describes the project.
+     * A composer.json need not name itself, and where it does the name is not always the one a
+     * reader knows the project by: a package inside a monorepo names itself after the package, a
+     * private project often after the client. Read from the manifest rather than a flag, because it
+     * describes the project.
      */
     public function testTheProjectCanBeCalledSomethingOtherThanItsManifestName(): void
     {

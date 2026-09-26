@@ -112,7 +112,7 @@ are not listed here even though the area-B Infection config covers `src/Composer
 
 ### src/Composer/LockrotCommand.php
 
-- `src/Composer/LockrotCommand.php:615` CastString — and
+- `src/Composer/LockrotCommand.php:616` CastString — and
 - `src/Composer/LockrotCommand.php:206` CastString — `(string) getcwd()`, in `composerFile()` and for
   the directory `--output` paths are relative to in `execute()`: `getcwd()` returns false only when the
   working directory has been removed or become unreadable under the running process, which would
@@ -126,19 +126,19 @@ are not listed here even though the area-B Infection config covers `src/Composer
   is the early `return` in `initialize()`, which stops `parent::initialize()` from crashing on the
   manifest first; that half is covered by `testMalformedComposerJsonIsExit2()` and
   `testNothingThatFailsWhileTheCommandStartsEscapesAsExitOne()`.
-- `src/Composer/LockrotCommand.php:596` UnwrapArrayValues — `RepositoryFactory::defaultRepos()` hands
+- `src/Composer/LockrotCommand.php:597` UnwrapArrayValues — `RepositoryFactory::defaultRepos()` hands
   the repositories back keyed by their configuration name, and nothing downstream reads those keys:
   `RepositoryMetadataLoader` iterates the list and never indexes it. `array_values()` is the `list<>`
   type guarantee.
-- `src/Composer/LockrotCommand.php:621` ReturnRemoval — without the early return, a directory with no
+- `src/Composer/LockrotCommand.php:622` ReturnRemoval — without the early return, a directory with no
   composer.json reaches `tryComposer()`, i.e. `Application::getComposer(false)`, where
   `Factory::create()` throws `InvalidArgumentException` for the missing manifest and is swallowed
   because the call is not `$required`. Null comes back either way; the return only skips a call that
   cannot succeed.
-- `src/Composer/LockrotCommand.php:626` FalseValue — `$this->getComposer(false)` is the Composer 2.2
+- `src/Composer/LockrotCommand.php:627` FalseValue — `$this->getComposer(false)` is the Composer 2.2
   LTS arm of the `method_exists($this, 'tryComposer')` guard. The vendored Composer has
   `tryComposer()`, so that arm is never entered by any test on this runtime.
-- `src/Composer/LockrotCommand.php:626` Ternary — swapping the arms puts `getComposer(false)` on the
+- `src/Composer/LockrotCommand.php:627` Ternary — swapping the arms puts `getComposer(false)` on the
   taken branch, and in Composer 2.3+ `BaseCommand::getComposer(false)` is literally
   `return $this->tryComposer($disablePlugins, $disableScripts);`. The two arms are the same call.
 
@@ -302,7 +302,7 @@ slow test. They are listed here only so nobody reads them as an unexplained "2 t
   newest candidate at the installed branch's own date, and the signal then needs that date to be
   both at least `release-warn-years` old (the branch) and younger than `release-warn-years` (the
   move-on) — impossible, so the rule returns null either way.
-- `src/Composer/LockrotCommand.php:358` `explain()` LogicalOr on `$finding === null || $facts === null` —
+- `src/Composer/LockrotCommand.php:359` `explain()` LogicalOr on `$finding === null || $facts === null` —
   `Analysis::finding()` and `Analysis::facts()` are filled by the same loop over the same packages
   in `Analyzer::analyzeWithFacts()`, so one is null exactly when the other is; and the lock lookup
   two lines up already rejects every name the run does not analyse, so the branch never runs. The
@@ -350,7 +350,7 @@ its slashes unescaped. Two are equivalent:
   the list. Breaking out of the loop at the first of them selects exactly what stepping over each of
   them selects. It is `continue` because the loop's condition is about one package, not about where
   the list stops.
-- `src/Analyzer/RunSettings.php:66` UnwrapArrayValues — `array_values()` falls away from
+- `src/Analyzer/RunSettings.php:76` UnwrapArrayValues — `array_values()` falls away from
   `flagged_verdicts`. `Verdict::all()` returns the keys of `SEVERITY` in declaration order and the
   flagged ones are the first six of them, so `array_filter()` leaves 0..5 and the reindex changes
   nothing that a test can see. It stays because the day a flagged verdict is declared below an
@@ -401,7 +401,7 @@ escapes are the `AtomicWriter` pair above, moved from `BaselineFile` (the `reaso
 that pair has since been killed, see below). The other two are equivalent,
 and so is the one the Windows-alias refusal added (259 mutants, 5 escapes, after it):
 
-- `src/Composer/LockrotCommand.php:468` CastArray — `(array) $input->getOption('output')`. The option
+- `src/Composer/LockrotCommand.php:469` CastArray — `(array) $input->getOption('output')`. The option
   is declared `VALUE_IS_ARRAY`, and symfony/console returns an array for it in every case — `[]` when
   it is not given — so the cast never changes the value. It is there because `getOption()` is typed
   `mixed`, and a `foreach` over `mixed` is not something PHPStan lets through.
