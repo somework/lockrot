@@ -249,12 +249,13 @@ final class ReportTest extends TestCase
     public function testTheReportRecordsWhatTheRunWasToldToDo(): void
     {
         $report = $this->report($this->finding('vendor/a', Verdict::SILENT))
-            ->withRun(new RunSettings('acme/shop', '8.4', '/home/someone/clients/acme/composer.lock', 'silent', new Thresholds(2, 4, 6, 8)));
+            ->withRun(new RunSettings('Acme shop', 'acme/shop', '8.4', '/home/someone/clients/acme/composer.lock', 'silent', new Thresholds(2, 4, 6, 8)));
 
         $run = JsonPath::arrayAt($report->toArray(), ['run']);
 
         self::assertSame([
-            'project' => 'acme/shop',
+            'project' => 'Acme shop',
+            'root_package' => 'acme/shop',
             'target_php' => '8.4',
             'lock_file' => 'composer.lock',
             'fail_on' => 'silent',
@@ -276,12 +277,26 @@ final class ReportTest extends TestCase
     }
 
     /**
+     * `root_package` is always written where `run` is, null included: a consumer reading a report
+     * lockrot 0.13.0 or later wrote finds the key, and null means the manifest names no package,
+     * not that the field went missing.
+     */
+    public function testARunWithoutAManifestNameWritesARootPackageOfNull(): void
+    {
+        $run = JsonPath::arrayAt($this->report()->withRun(new RunSettings('Acme shop', null, null, null, null, null))->toArray(), ['run']);
+
+        self::assertArrayHasKey('root_package', $run);
+        self::assertNull($run['root_package']);
+        self::assertSame('Acme shop', $run['project']);
+    }
+
+    /**
      * A report is something people publish, and an absolute path carries the account it ran under
      * and often the client's directory name. The same rule as the repository URLs.
      */
     public function testTheRunNamesTheLockAndNeverLocatesIt(): void
     {
-        $report = $this->report()->withRun(new RunSettings(null, null, '/srv/deploy/acme-bank/composer.lock', 'none', null));
+        $report = $this->report()->withRun(new RunSettings(null, null, null, '/srv/deploy/acme-bank/composer.lock', 'none', null));
 
         $json = json_encode($report->toArray());
 
@@ -298,7 +313,7 @@ final class ReportTest extends TestCase
      */
     public function testTheRunNamesWhichVerdictsAreFindings(): void
     {
-        $flagged = JsonPath::arrayAt($this->report()->withRun(new RunSettings(null, null, null, null, null))->toArray(), ['run', 'flagged_verdicts']);
+        $flagged = JsonPath::arrayAt($this->report()->withRun(new RunSettings(null, null, null, null, null, null))->toArray(), ['run', 'flagged_verdicts']);
 
         self::assertNotContains(Verdict::UNKNOWN, $flagged);
         self::assertNotContains(Verdict::FINISHED, $flagged);
@@ -355,7 +370,7 @@ final class ReportTest extends TestCase
     public function testTheRunOutlivesWithBaseline(): void
     {
         $report = $this->report($this->finding('vendor/a', Verdict::SILENT))
-            ->withRun(new RunSettings(null, '8.3', null, 'none', null));
+            ->withRun(new RunSettings(null, null, '8.3', null, 'none', null));
 
         $compared = $report->withBaseline(BaselineComparison::compare(
             Baseline::fromReport($report),

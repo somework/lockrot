@@ -158,8 +158,9 @@ final class ProjectConfig
 
     /**
      * The project's own `name` from composer.json, or null where it has none — an application is
-     * not required to name itself. It is the one thing that says which project a report is about:
-     * the lock is called composer.lock in every project there is.
+     * not required to name itself. It is what says which project a report is about, since the lock
+     * is called composer.lock in every project there is: always the report's `run.root_package`,
+     * and its `run.project` too unless `extra.lockrot.project` names the project something else.
      */
     public function name(): ?string
     {

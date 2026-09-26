@@ -207,9 +207,12 @@ final class LockrotConfig
      * The name the report should call this project, when the manifest's own `name` is not it.
      *
      * A composer.json is not required to carry a name, and where it carries one it is not always
-     * the name to publish: a package inside a monorepo names itself after the package, and a
-     * private project names itself after the client. This is read from the manifest rather than
-     * from a flag because it describes the project, not the run.
+     * the one a reader knows the project by: a package inside a monorepo names itself after the
+     * package, and a private project often after the client. This is read from the manifest rather
+     * than from a flag because it describes the project, not the run.
+     *
+     * It renames the report's `run.project` and nothing else. It does not keep the manifest's name
+     * out of a report: `run.root_package` is always that name, in every json and html report.
      *
      * @param array<string, mixed> $extra
      */
@@ -284,13 +287,13 @@ final class LockrotConfig
     {
         return $this->format;
     }
-    /** The configured baseline path, or null when the default file name applies. */
     /** What `extra.lockrot.project` calls this project, or null where it says nothing. */
     public function project(): ?string
     {
         return $this->project;
     }
 
+    /** The configured baseline path, or null when the default file name applies. */
     public function baseline(): ?string
     {
         return $this->baseline;
