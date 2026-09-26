@@ -76,13 +76,18 @@ These grow in minor releases:
 - repository hosts;
 - format names.
 
-A consumer treats a value it does not know as "other".
+A consumer treats a value it does not know as "other": it shows the value as written, and does not
+fail on it.
 
-Today the schemas still spell some of them out as enums: signal ids, S10's checks, reasons and
-blocked signals, S8's `floor_source`, and `format` in the configuration schema. A new value there
-arrives with a schema update, and a copy of the schema you vendored rejects it until you refresh the
-copy; the changelog says so when that happens. *Planned (before 1.0):* the schemas describe these as
-open strings.
+The schemas describe signal ids, S10's checks, reasons and blocked signals, S8's `floor_source` and
+the configuration's `format` as open strings: a `pattern`, which also admits the `<vendor>:<name>`
+form for a signal id and a format, plus `x-known-values`, the values lockrot writes, which only grows
+within 1.x. A signal whose id is not listed validates with any object as its `data`; a listed id
+keeps its `data` typed. A consumer that validates strictly reads `x-known-values` as an enum and
+refreshes its copy on upgrade. A copy of a schema taken before 0.13.0 still holds these as enums.
+Repository hosts are in no schema as a set: S3 and S4's `host` and the explanation's `forge` are plain
+strings. lockrot itself accepts only the format names it knows, in `--format`, `--output` and
+`extra.lockrot.format`.
 
 ### Finding identity
 
@@ -277,7 +282,9 @@ These names are reserved so that an extension mechanism can arrive later without
       deprecated.
 - Exit codes and format names never take on a new meaning.
 - A JSON field is never deprecated on its own. It keeps being written, the schema marks it
-  `x-deprecated: true`, and it disappears only with report-2.
+  `x-deprecated: true`, and it disappears only with report-2. `x-deprecated` and `x-known-values`
+  (the values an open set holds today, see [Open sets](#open-sets)) are the two annotations lockrot's
+  schemas carry; a draft-04 validator ignores both.
 - A signal is retired rather than removed.
 - An Experimental surface can change in any minor release, with a line in the changelog.
 
