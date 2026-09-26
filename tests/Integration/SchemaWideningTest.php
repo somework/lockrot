@@ -115,6 +115,33 @@ final class SchemaWideningTest extends TestCase
         self::assertSame([], SchemaWidening::narrowings(self::current($document), $widened));
     }
 
+    /** @return iterable<string, array{array<mixed, mixed>, array<mixed, mixed>, list<string>}> an older node, a newer one, and the narrowings between them */
+    public static function valuesFacingAPattern(): iterable
+    {
+        $date = ['type' => 'string', 'pattern' => '^\d{4}-\d{2}-\d{2}$'];
+        yield 'a value the quantified pattern takes' => [['type' => 'string', 'enum' => ['2024-01-02']], $date, []];
+        yield 'a value the quantified pattern refuses' => [['type' => 'string', 'enum' => ['2024-1-2']], $date, ['#: no longer accepts "2024-1-2"']];
+        yield 'a pattern with an unbalanced brace' => [['type' => 'string', 'enum' => ['abc']], ['type' => 'string', 'pattern' => '^[^}]+$'], []];
+        // The one pattern the check cannot delimit is one it cannot decide, which counts as refusing.
+        yield 'a pattern holding the delimiter byte' => [['type' => 'string', 'enum' => ['abc']], ['type' => 'string', 'pattern' => "^[a-c\x01]+$"], ['#: no longer accepts "abc"']];
+    }
+
+    /**
+     * An older value is checked against the newer pattern as the pattern is written, braces and all:
+     * a `{4}` quantifier or a lone `}` in a character class must not turn into a false narrowing.
+     *
+     * @param array<mixed, mixed> $older
+     * @param array<mixed, mixed> $newer
+     * @param list<string>        $expected
+     *
+     * @dataProvider valuesFacingAPattern
+     */
+    #[DataProvider('valuesFacingAPattern')]
+    public function testAnOlderValueIsReadAgainstTheNewerPatternAsWritten(array $older, array $newer, array $expected): void
+    {
+        self::assertSame($expected, SchemaWidening::narrowings($older, $newer));
+    }
+
     /**
      * The check is not blind to the difference between releases: read the other way round — the
      * current schema as the older one — it finds what 0.9.0's schemas cannot accept, which is why
