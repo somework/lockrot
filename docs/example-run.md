@@ -364,8 +364,8 @@ The cut signals have the same shape as S1 and S2; S7 carries the packages it nam
 do the other 199 findings, each with its own `priority`, `direct`, `dev`, `replacement`, `signals`,
 `chain`, `direct_dependents`, `evidence`, `allowlist_reason`, `note`, `data_date`, `libyears` and
 `baseline`. `exposure` is the
-`pulled in by:` line in full — every direct requirement that pulls in a flagged transitive package,
-with how many, most first. From 0.13.0 the document also carries `exposure_rule`, the cap that list
+`pulled in by:` line in full — every direct requirement that pulls in an attributable flagged transitive
+package, with how many, most first. From 0.13.0 the document also carries `exposure_rule`, the cap that list
 is drawn by (`{"max_fan_in": 8}`), and `unattributed`, the flagged packages reached from more direct
 requirements than that and so counted under none; see
 [transitive exposure](verdicts.md#transitive-exposure). `libyears` is the [libyears block](verdicts.md#libyears), summed from the
