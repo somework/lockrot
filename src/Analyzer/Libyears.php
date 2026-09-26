@@ -28,6 +28,8 @@ use Lockrot\Verdict\Finding;
  * derived from the findings so that every number in it can be checked against them by arithmetic.
  * Not php-libyear's number: that tool reads composer.json and sums the direct requirements only;
  * lockrot sums the whole lock, and {@see direct()} is the bridge between the two.
+ *
+ * @internal
  */
 final class Libyears
 {

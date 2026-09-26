@@ -11,11 +11,15 @@ use Lockrot\Verdict\Finding;
 
 /**
  * GitLab Code Quality JSON, one object per flagged finding (every finding with `--all`), for a job
- * that publishes `artifacts.reports.codequality` so findings show up as inline diff annotations on
- * a merge request.
+ * that publishes `artifacts.reports.codequality`. Every tier shows, in the merge request, the
+ * findings that are new or fixed compared with the target branch's report, so a merge request that
+ * changes no verdict shows none; Premium's pipeline Code Quality tab lists them all; Ultimate also
+ * marks new findings on the lock's lines in the Changes view when the merge request changes the
+ * lock. `location.path` is the analysed lock's path relative to the project directory
+ * ({@see FormatContext::lockName()}): `composer.lock`, or `alt.lock` under `COMPOSER=alt.json`.
  *
- * Shape per https://docs.gitlab.com/ci/testing/code_quality/#implement-a-custom-tool ("Implement a
- * custom tool"): each issue needs `description`, `check_name`, `fingerprint`, `severity` (one of
+ * Shape per https://docs.gitlab.com/ci/testing/code_quality/#code-quality-report-format ("Code
+ * Quality report format"): each issue needs `description`, `check_name`, `fingerprint`, `severity` (one of
  * `info`, `minor`, `major`, `critical`, `blocker`) and a location with either `lines.begin` or
  * `positions.begin.line`; `type` and `categories` are accepted but not required by GitLab's own
  * parser — kept here for compatibility with tools that still expect the CodeClimate shape GitLab's
@@ -32,9 +36,12 @@ use Lockrot\Verdict\Finding;
  * The fingerprint is `sha256("lockrot|<package>|<verdict>")`: stable across machines and runs, and
  * deliberately excludes the line number and version, so a version bump that keeps the same verdict
  * — or a reformatted composer.lock that moves the entry to a different line — keeps the same GitLab
- * issue identity instead of appearing as a new one. The priority is deliberately not part of it:
+ * issue identity instead of appearing as a new one. Nor is the lock's path, so pointing
+ * `COMPOSER` at another manifest does not reopen every issue. The priority is deliberately not part of it:
  * a package that moves from a `require` to a `require-dev` would otherwise open a second issue for
  * a finding GitLab already tracks.
+ *
+ * @internal
  */
 final class GitlabFormatter implements FormatterInterface
 {
@@ -75,7 +82,7 @@ final class GitlabFormatter implements FormatterInterface
             'severity' => $this->severity($finding, $baseline),
             'fingerprint' => hash('sha256', 'lockrot|'.$finding->package().'|'.$finding->verdict()),
             'location' => [
-                'path' => 'composer.lock',
+                'path' => $this->context->lockName(),
                 'lines' => ['begin' => $line ?? self::FALLBACK_LINE],
             ],
         ];

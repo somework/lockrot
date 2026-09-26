@@ -21,13 +21,21 @@ Put project settings under `extra.lockrot` in `composer.json`:
 }
 ```
 
-CLI options win over environment variables, which win over `composer.json`.
+CLI options win over environment variables, which win over `composer.json`. Losing does not skip the check:
+`extra.lockrot` is validated in full on every run, even a key an option overrides — it is a file in the project, and an
+error in it is an error on every run — and an environment variable (`LOCKROT_FAIL_ON`, `LOCKROT_TARGET_PHP`) is
+validated whenever it is set, even under the option that outranks it. An invalid value in either is exit `2`, as is an
+invalid option. A variable set to the empty string counts as unset.
+
+As with every Composer command, `COMPOSER` chooses the manifest: `COMPOSER=alt.json composer lockrot` reads
+`extra.lockrot` from `alt.json`, analyses `alt.lock`, and resolves the baseline next to `alt.json`.
 
 The shape of `extra.lockrot` is validated against its published JSON schema,
 [`https://lockrot.dev/schema/config-1.json`](https://lockrot.dev/schema/config-1.json)
-(`resources/lockrot-config.schema.json` in the repository; see [schema.md](schema.md)). Unknown keys are
-allowed, but the keys below must have the listed type — in particular, the four threshold keys must
-be JSON integers (`3`, not `"3"`).
+(`resources/lockrot-config.schema.json` in the repository; see [schema.md](schema.md)). The keys below
+must have the listed type — in particular, the four threshold keys must be JSON integers (`3`, not
+`"3"`). A key lockrot does not know is still accepted, but no longer silently: see
+[Unknown keys](#unknown-keys).
 
 ## `extra.lockrot` keys
 
@@ -46,11 +54,69 @@ be JSON integers (`3`, not `"3"`).
 | `push-warn-years` / `push-high-years` | `3` / `5` | Integer thresholds for "no repository push or commit" (S4) |
 | `ignore` | `[]` | Project allowlist, see below |
 
+### Unknown keys
+
+A key lockrot does not read changes nothing, so a typo used to go unnoticed: `install-tme: off` left
+the install-time summary printing, `failOn` left the build ungated, and an ignore entry's `expire`
+made a temporary ignore permanent. lockrot now names each such key with one line on stderr, and the
+known key it was probably meant to be when one is close:
+
+```text
+lockrot: unknown key extra.lockrot.install-tme ignored (did you mean install-time?)
+lockrot: unknown key extra.lockrot.slack-webhook ignored
+lockrot: unknown key extra.lockrot.ignore[1].expire ignored (did you mean expires?)
+```
+
+- A key is close when it is at most a third of its own length in edits away from a known key, or
+  when a known key contains it (three characters or more: `dev` suggests `include-dev`), compared in
+  ASCII lower case. The fewest edits wins, and a tie goes to the alphabetically first key. Nothing
+  close means no suggestion rather than a far-fetched one. The rule is adapted from the one Symfony
+  Console, and so Composer, uses for a mistyped command.
+- The keys of each `ignore` entry are checked against `package`, `reason`, `version` and `expires`.
+- It is a warning and nothing more: the run goes on, the report and the exit code are exactly what
+  they would be without the key, and stdout carries nothing of it, whatever the format. The key is
+  still valid as far as the [schema](schema.md) is concerned, so a `composer.json` that worked keeps
+  working.
+- Two namespaces are reserved and never warned about. `extensions` (top level) is for the
+  configuration of extensions; lockrot gives what it holds no meaning and does not warn about
+  anything inside it. Any key starting with `x-` (`x-ci`, `x-owner`, or `x-ticket` inside an `ignore`
+  entry), in lower case, is for your own tooling and notes; lockrot will never give such a key a
+  meaning. The `LOCKROT_X_*` environment variables are reserved the same way.
+- The key is printed as written, `<` and all — a key is text, never console markup. Anything a
+  terminal would act on instead of print is escaped: `\n`, `\r`, `\t`, `\xNN` for any other
+  control byte and for a byte that is not valid UTF-8, `\u{NNNN}` for a C1 control, the line and
+  paragraph separators, a bidirectional control or a byte order mark, and a backslash as `\\`, so
+  two different keys never print alike. A key longer than 255 bytes is cut there and ends in `…`;
+  nothing that long is a near-miss.
+- `composer lockrot` and the PHAR print the lines on every run, `--explain` and
+  `--generate-baseline` included, once the configuration has loaded and `LOCKROT_DISABLE` is
+  checked, before the lock is read. The [install-time summary](install-time.md) prints them above
+  its block, when all of these hold: `LOCKROT_DISABLE` is not set, the configuration loads,
+  `install-time` is not `off`, and the transaction installs or updates at least one package. Unlike the block, they do not wait for a finding: a transaction with nothing
+  to report still gets them. `-q` silences them, and with them everything else lockrot prints,
+  the report on stdout included. Each run prints the lines for the `composer.json` it read; a second
+  run in the same process, such as another manifest's install under a plugin that runs one per
+  manifest, prints its own.
+- When the [schema](schema.md) rejects the config, the run is a configuration error (exit `2`) and
+  these lines are added to that error, after the schema's own, so an `ignore` entry that misspells a
+  required key says why the key is missing:
+
+    ```text
+    lockrot: extra.lockrot is invalid:
+      - ignore[0].reason: The property reason is required
+      - unknown key extra.lockrot.ignore[0].reasn ignored (did you mean reason?)
+    ```
+
+    At install time the same error is the one `install-time check skipped` line. A top-level key PHP
+    reads as an integer (`"5"`) is dropped before the config is read and is not named.
+
+- The environment is not checked: lockrot reads only the variables documented below.
+
 ## Environment overrides
 
 | Variable | Overrides |
 |---|---|
-| `LOCKROT_DISABLE=1` (or `true`) | Skips lockrot entirely, exits 0 |
+| `LOCKROT_DISABLE=1` (or `true`) | Skips lockrot entirely, exits 0: nothing is read or validated first — not the command line, `composer.json`, `extra.lockrot` or the lock. The install-time summary is skipped too; `lockrot.phar self-update` is not affected |
 | `LOCKROT_FAIL_ON` | `fail-on` |
 | `LOCKROT_TARGET_PHP` | `target-php` |
 | `LOCKROT_GITHUB_TOKEN` / `GITHUB_TOKEN` | GitHub token for the repository-activity signals (S3/S4) on github.com; Composer's `github-oauth.github.com` auth is the fallback. When Composer has that auth, its token is the one sent — see [internals.md](internals.md) |
@@ -70,8 +136,78 @@ be JSON integers (`3`, not `"3"`).
 | `--generate-baseline` | Write this run's findings to the [baseline](baseline.md) file and exit 0, whatever `--fail-on` says — `--strict-network` is the one exception |
 | `--baseline=<path>` | Baseline file to read (or, with `--generate-baseline`, to write); relative to `composer.json` or absolute. Wins over `extra.lockrot.baseline`. An empty `--baseline=` is a configuration error (exit `2`), never a silent fall-back to the default file — as is an empty `--fail-on=` |
 | `--explain=vendor/package` | Explain one package and exit 0 — see [Explaining one package](#explaining-one-package) |
+| `--output=<format>:<path>` | Also write the report to a file, in any format `--format` takes; repeatable. `--format` still decides stdout. See [Writing reports to files](#writing-reports-to-files) |
 
 `-d <dir>` points the standalone PHAR at a project; see [phar.md](phar.md).
+
+`--output` exists on the command line only: which files a run writes is a property of the run, not
+of the project, so there is no `extra.lockrot` key and no environment variable for it.
+
+## Writing reports to files
+
+One run, several reports: the analysis runs once, and every file is rendered from the same report
+stdout gets — the same `generated_at`, the same findings, the same notes.
+
+```bash
+composer lockrot --format=github --fail-on=silent --target-php=8.4 \
+  --output=sarif:lockrot.sarif --output=html:lockrot-report.html --output=json:lockrot.json
+```
+
+- **Syntax.** `<format>:<path>`: a format `--format` takes, spelled the same way, then a colon, then
+  the path, verbatim, colons and all, so `json:C:\reports\lockrot.json` works. One format may go to
+  two files. Give the option its value with `=`: in the PHAR, `--output json:r.json` before the
+  command name is read as a command ([PHAR](phar.md#what-the-phar-does-and-does-not-do)).
+- **Contents.** Each file is byte for byte what `--format=<that format>` prints on stdout for the
+  same run, with one exception: `table` in a file has no colours and no console markup, and is
+  wrapped at 120 columns whatever the terminal is.
+- **Where.** A relative path is relative to the working directory lockrot runs in, which is the
+  project directory: `-d <dir>` changes it before lockrot starts (in plugin mode and in the PHAR
+  alike), so `composer --working-dir=app lockrot --output=json:r.json` writes `app/r.json`
+  (Composer 2.2 reads the directory only when it is joined to the option, as `--working-dir=app` or
+  `-dapp`; later versions also take `-d app`). In plugin mode,
+  Composer's [`use-parent-dir`](https://getcomposer.org/doc/06-config.md#use-parent-dir) can switch
+  to a parent project when the current directory has no `composer.json`, and the path is then
+  relative to that project; the PHAR never walks up. An absolute path is used as given.
+- **Directories.** The directory must already exist; lockrot creates none (`mkdir -p` first). An
+  existing file is replaced.
+- **How.** Each file is written atomically — a temporary file beside it, created exclusively so
+  nothing already at that name is followed, then a rename — after the report is on stdout, and each
+  one gets a line on stderr: `lockrot: sarif report written to lockrot.sarif`. A file that is
+  replaced keeps its permission bits (a report kept at `0600` stays `0600`); its owner and ACLs are
+  not carried over, and a new file gets the umask's default.
+- **Refusals.** A path naming `composer.json` or `composer.lock` (in any directory, in any letter
+  case), a [baseline](baseline.md) file — this run's, and the project's own (`extra.lockrot.baseline`,
+  else `lockrot-baseline.json`) when `--baseline` points the run elsewhere — or the manifest
+  `COMPOSER` names and its lock; dot segments count as Windows folds them, by spelling, so
+  `missing\..\composer.lock` is the lock even where `missing` does not exist; an unknown format, an
+  empty path or one ending in a separator; the same file twice (compared case-insensitively, so
+  `r.json` and `R.json` are one file even on Linux, and on disk for files that exist); a directory
+  that does not exist; a path that exists and is not a regular file (a directory, a device such as
+  `/dev/stdout`, a pipe), since the write is a rename over the path and stdout is what `--format` is
+  for; a file name ending in a dot or a space or holding a colon, which Windows reads as another
+  name (`composer.lock.` and `composer.lock::$DATA` are the lock there), refused on every system; an
+  existing file that is on disk a protected one, or the `composer.json` or `composer.lock` beside it
+  (a symlink, a hard link, a Windows 8.3 short name, a spelling the filesystem folds by Unicode rules
+  such as `composer.locK` with a Kelvin sign on macOS), compared by device and inode — each is a
+  configuration error (exit `2`), found before the analysis starts, so nothing is fetched and
+  nothing is written.
+- **Failures.** A file that cannot be written when its turn comes is exit `2` with the reason. So is
+  a file that turns out, once the ones before it are written, to be one of them (on macOS `café.json`
+  spelled precomposed and decomposed is one file): the run stops rather than write one report over
+  another. The files written before it stay; the report is already on stdout.
+- **Exit code.** Otherwise untouched: `0` or `1` by `--fail-on`, as without `--output`.
+- `--explain` refuses `--output` (exit `2`): it prints one package, not a report. `--generate-baseline`
+  writes both: the reports first, then the baseline, and the reports carry no baseline comparison —
+  the baseline is what the run is writing. A report that cannot be written stops the run before the
+  baseline is replaced. `LOCKROT_DISABLE` writes nothing.
+
+lockrot writes the files you name — reports with `--output`, the baseline with `--generate-baseline`
+— each through a temporary file beside it that is renamed over it, so it needs write access to that
+directory; its activity cache, under Composer's cache directory ([Caching](#caching)), where Composer
+also keeps the repository metadata it fetched, as it does for any command; and, with `self-update`,
+the PHAR. It never writes `composer.json` or `composer.lock`. An absolute path is written where it
+points, in the project or not, and a run interrupted mid-write can leave a `*.tmp` file beside the
+target.
 
 ## Explaining one package
 
@@ -166,5 +302,5 @@ Neither of these is part of the configuration contract.
 | Variable | Effect |
 |---|---|
 | `LOCKROT_TODAY` (e.g. `2026-09-14`) | Fixes the reference date used for every "years ago" calculation |
-| `LOCKROT_RELEASE_URL` | Sends `lockrot.phar self-update` to this release document instead of GitHub's; for lockrot's own tests |
+| `LOCKROT_RELEASE_URL` | Sends `lockrot.phar self-update` to this release list (the shape of GitHub's `GET /repos/{owner}/{repo}/releases`) instead of GitHub's; for lockrot's own tests |
 | `LOCKROT_RELEASE_KEY` | A PEM file whose public key `lockrot.phar self-update` verifies release signatures with, instead of the key built into the archive; for lockrot's own tests |

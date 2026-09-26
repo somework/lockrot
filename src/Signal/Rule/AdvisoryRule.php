@@ -24,6 +24,8 @@ use Lockrot\Signal\SignalRule;
  * inside the constraint gets it), else by the package's (a new major). "No fix expected" is then
  * said only of the advisories nothing listed fixes; the finding decides which of the two releases
  * counts, since a left-behind branch will not see the package's fix land on it.
+ *
+ * @internal
  */
 final class AdvisoryRule implements SignalRule
 {

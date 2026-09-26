@@ -30,6 +30,7 @@ Or the PHAR, with nothing added to the project: `curl -fsSL -o lockrot.phar http
 | [In CI](ci.md) | GitHub Actions, GitLab CI, SARIF, PR comments |
 | [Baseline](baseline.md) | Accept today's findings, fail on new and worsened ones |
 | [JSON schemas](schema.md) | The published schemas for the report, the explanation, the baseline and `extra.lockrot` |
+| [Compatibility](compatibility.md) | What 1.0 will freeze and what it will not, how verdicts may change, reserved names (draft) |
 | [Install-time summary](install-time.md) | What the plugin prints during `install`/`update`, and how to silence it |
 | [PHAR and self-update](phar.md) | Verified and signed download, PHIVE, `self-update`, the global-plugin alternative |
 | [Example run](example-run.md) | A full 200-package report, in three formats, plus a clean one |

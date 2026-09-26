@@ -29,7 +29,7 @@ The report, the explanation and the baseline file open with a `$schema` key nami
 {
     "$schema": "https://lockrot.dev/schema/report-1.json",
     "lockrot": {
-        "version": "0.12.0",
+        "version": "0.13.0",
         "schema": 1
     },
     …
@@ -45,10 +45,19 @@ carries no `$schema`; point your editor's JSON schema mapping at `config-1.json`
 
 The `1` in `report-1.json` is the `lockrot.schema` number the document carries. Under one number,
 a document only ever **gains** fields: every object in every schema is open (no
-`additionalProperties: false`), so a report from a newer lockrot validates against the copy of the
+`additionalProperties: false`), so a field a newer lockrot adds validates against the copy of the
 schema you fetched or vendored earlier, and a field your CI step does not know about is not an
 error. The number moves only when a field is removed or renamed, and then the old file stays
 published at its old URL.
+
+Objects are open; some values are not yet. Signal ids, S10's `check`, `reason` and `blocks`, S8's
+`floor_source` and the configuration schema's `format` are enums today, so a new signal, a new
+reason a check could not run or a new format arrives with a schema update, and a copy of the schema
+fetched or vendored before it rejects the new value until it is refreshed. The changelog says when
+that happens. Describing those values as open strings is planned before 1.0.
+
+What else 1.0 will freeze — the closed sets and their order, the identity fields of the other
+formats, the command line — is drafted in [compatibility.md](compatibility.md).
 
 The schema files themselves are edited in place when a field is added, so the copy at the URL always
 describes the newest release under that number. The version that added a field is in the
@@ -64,7 +73,8 @@ check-jsonschema --schemafile https://lockrot.dev/schema/report-1.json lockrot.j
 ```
 
 Or with the schema pinned next to the workflow, so the check does not depend on lockrot.dev being
-up:
+up — refresh the copy when you upgrade lockrot, since a new enum value (see
+[above](#the-number-and-what-may-change-under-it)) fails against an older one:
 
 ```bash
 curl -fsSL -o ci/lockrot-report.schema.json https://lockrot.dev/schema/report-1.json
@@ -74,6 +84,15 @@ check-jsonschema --schemafile ci/lockrot-report.schema.json lockrot.json
 lockrot's own test suite validates every document its formatters write against these files, with a
 strict copy that rejects any field the schema does not list, and the JSON samples in these docs
 too — so the published schema, the code and the docs cannot drift apart.
+
+It also holds the current files to the older ones, in the backward direction: whatever an older
+lockrot wrote keeps validating against the newest schema of the same number. Every schema a release
+from 0.9.0 on published is kept, and a change that would make a field required, lose a type or an
+enum value, tighten a bound, stop listing a field or close an object fails the build against each of
+them. The baseline files, reports and explanations 0.9.0, 0.10.0 and 0.11.0 wrote, recorded from
+their signed PHARs and never edited, are validated against the current files in the same two ways.
+A document a newer lockrot writes, checked against a copy of the schema an older release published,
+is not what these checks test.
 
 ## What the report schema types
 
@@ -112,6 +131,7 @@ consumer usually keys on:
 
 ## Related
 
-- [ci.md](ci.md) — the six output formats
+- [ci.md](ci.md) — the seven output formats
 - [baseline.md](baseline.md) — the baseline file
 - [configuration.md](configuration.md) — `extra.lockrot`
+- [compatibility.md](compatibility.md) — what 1.0 freezes beyond the schemas (draft)

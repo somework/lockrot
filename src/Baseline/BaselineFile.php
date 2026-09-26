@@ -6,14 +6,18 @@ namespace Lockrot\Baseline;
 
 use Composer\Json\JsonFile;
 use Lockrot\Exception\ConfigException;
+use Lockrot\Filesystem\AtomicWriter;
+use Lockrot\Filesystem\Path;
 use Lockrot\Json\JsonReader;
 use Lockrot\Json\Schemas;
 
 /**
  * Where the baseline lives and how it is read and written.
  *
- * This is the only file lockrot ever writes, and only on an explicit `--generate-baseline`; it
- * never modifies composer.json or composer.lock.
+ * lockrot writes the files the caller names — reports with `--output`, this file with
+ * `--generate-baseline` — each through a temporary file beside it that is renamed over it
+ * ({@see AtomicWriter}); its activity cache under Composer's cache directory; and, with
+ * `self-update`, the PHAR. It never writes composer.json or composer.lock.
  *
  * Two paths are kept apart on purpose. {@see path()} is what the filesystem needs — absolute, so
  * the file lands next to the project's composer.json whatever the process's working directory is.
@@ -23,6 +27,8 @@ use Lockrot\Json\Schemas;
  * property, since the table line and the JSON `baseline.path` then carry the absolute path it asked
  * for. Printing it as given is the deliberate choice: a path the reader recognises beats a
  * relativised one they have to reconstruct.
+ *
+ * @internal
  */
 final class BaselineFile
 {
@@ -44,20 +50,8 @@ final class BaselineFile
     public static function resolve(string $projectDir, ?string $configured): self
     {
         $name = ($configured === null || $configured === '') ? self::DEFAULT_NAME : $configured;
-        $path = self::isAbsolute($name) ? $name : rtrim($projectDir, '/\\').'/'.$name;
 
-        return new self($path, $name);
-    }
-
-    /**
-     * Unix absolute paths start with a separator; Windows ones with a drive letter (`C:\project`)
-     * or a UNC prefix (`\\server\share`), both of which the leading-separator test already covers.
-     */
-    private static function isAbsolute(string $path): bool
-    {
-        return strpos($path, '/') === 0
-            || strpos($path, '\\') === 0
-            || preg_match('{^[A-Za-z]:[\\\\/]}', $path) === 1;
+        return new self(Path::resolve($projectDir, $name), $name);
     }
 
     public function path(): string
@@ -85,12 +79,10 @@ final class BaselineFile
     }
 
     /**
-     * Writes the baseline atomically: the encoded document goes to a sibling `.tmp` file first and
-     * is then renamed over the target, so a run interrupted mid-write can never leave a truncated
-     * baseline behind — which would read as "these findings were never accepted" on the next CI run.
+     * Writes the baseline atomically ({@see AtomicWriter}), so a run interrupted mid-write can never
+     * leave a truncated baseline behind — which would read as "these findings were never accepted"
+     * on the next CI run.
      *
-     * Composer's own JsonFile::write() is not used for the write itself: it calls
-     * file_put_contents() without checking the result, so an unwritable target returns silently.
      * JsonFile::encode() is used for the encoding, so the file is laid out exactly like
      * composer.json — 4-space indent, unescaped slashes and unicode — and the trailing newline
      * JsonFile::write() appends for a pretty-printed document is added here too.
@@ -104,28 +96,7 @@ final class BaselineFile
             \JSON_UNESCAPED_SLASHES | \JSON_PRETTY_PRINT | \JSON_UNESCAPED_UNICODE
         )."\n";
 
-        // Unique per run, and in the target's own directory so the rename below stays within one
-        // filesystem and therefore atomic: two concurrent --generate-baseline runs in the same
-        // workspace must not be able to rename each other's half-written file.
-        $temporary = \sprintf('%s.%d-%s.tmp', $this->path, getmypid(), uniqid('', true));
-        // Cleared first so reason() below reports this write's own failure and never an unrelated
-        // warning some earlier part of the run left behind.
-        error_clear_last();
-        $written = @file_put_contents($temporary, $json);
-        if ($written !== \strlen($json)) {
-            // Read before the cleanup: unlink() on a temp file that was never created records a
-            // failure of its own, which would otherwise replace the reason the caller needs.
-            $reason = $this->reason();
-            @unlink($temporary);
-
-            throw new ConfigException('Cannot write '.$this->displayPath.': '.$reason);
-        }
-        if (!@rename($temporary, $this->path)) {
-            $reason = $this->reason();
-            @unlink($temporary);
-
-            throw new ConfigException('Cannot write '.$this->displayPath.': '.$reason);
-        }
+        AtomicWriter::write($this->path, $json, $this->displayPath);
     }
 
     /**
@@ -144,14 +115,5 @@ final class BaselineFile
         }
 
         return ['$schema' => Schemas::url(Schemas::BASELINE, Baseline::SCHEMA)] + $document;
-    }
-
-    /** The last filesystem failure PHP recorded, or a generic reason when it recorded none. */
-    private function reason(): string
-    {
-        $error = error_get_last();
-        $message = $error === null ? null : $error['message'];
-
-        return \is_string($message) && $message !== '' ? $message : 'the file could not be created';
     }
 }

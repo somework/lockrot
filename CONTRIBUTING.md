@@ -53,6 +53,24 @@ The README demo (`docs/assets/lockrot-demo.gif`) is recorded the same way, from 
 `bin/record-demo` captures it with asciinema and renders it with agg — its header says what to
 export first. Re-record it when the table output changes shape, not for every release.
 
+`tests/fixtures/schema-evolution/` holds what earlier releases published and wrote, and
+`SchemaEvolutionTest` holds the current schemas to it: a schema change that would reject a document
+an older lockrot wrote, or stop listing a field one carries, fails there. Two kinds of fixture:
+
+- `schemas/<version>/` — the four `resources/lockrot-*.schema.json` files as that release's tag holds
+  them. A release adds its own: copy them in (`git show v<version>:resources/lockrot-report.schema.json`
+  and so on, or from `resources/` in the release PR itself) and pin their sha256 in
+  `RELEASED_SCHEMAS`. The test compares every release's changelog heading with this list, so a
+  release without its schemas fails.
+- `<version>/` — what a release's signed PHAR wrote, recorded by
+  `GITHUB_TOKEN=$(gh auth token) bin/record-schema-evolution <version> <today>`, which verifies the
+  PHAR first. Pin the new `provenance.json` sha256 and the release asset's digest
+  (`gh release view v<version> --json assets`) in the test, with the signals the recording carries.
+
+Both are frozen — the script refuses to record a version again, and the test checks every file
+against a pinned hash — so a failure there is a compatibility break to fix in the schema change, not
+in the fixture.
+
 ## Contributing a finished package
 
 `resources/finished-packages.json` is the built-in allowlist of packages that are complete rather
@@ -67,9 +85,53 @@ still holds.
 
 ## Backward compatibility
 
-The CLI (`composer lockrot` options), the `extra.lockrot` configuration keys, the output formats,
-the baseline file and the exit codes are the public interface and follow semantic versioning. The
-PHP classes under `src/` are not a public API and may change in any release.
+The public interface follows semantic versioning. It is:
+
+- the CLI — `composer lockrot` and the PHAR's `lockrot` — its options and its exit codes;
+- the PHAR's `self-update`: its options and its exit codes;
+- the environment variables listed under
+  [Environment overrides](docs/configuration.md#environment-overrides) (the testing hooks are not
+  included);
+- the `extra.lockrot` configuration keys;
+- the machine-readable output formats (`json`, `sarif`, `gitlab`, `github`);
+- the baseline file.
+
+`table`, `markdown` and `html` are for people and may change in any release. The PHP classes under
+`src/` are not a public API and may change in any release too: every class, interface, trait and
+enum there is marked `@internal`, and `tests/Unit/PublicApiTest.php` fails on one that is not.
+PHPStan reports a use of an `@internal` class from code outside its root namespace, `Lockrot\`;
+code declared under `Lockrot\` itself, `Lockrot\Extension\` included, gets no warning. IDEs flag
+such uses too, by rules of their own.
+
+The namespace `Lockrot\Extension\` is reserved. Nothing is declared in it, and the same test fails
+on a class that is, or on a `src/Extension/` directory, in any letter case: PHP matches namespaces
+without regard to case. The reservation keeps the name free; it is not a promise that anything will
+be published there, or in what form.
+
+This is the one list; the README points here rather than repeating it. The detail is drafted in
+[`docs/compatibility.md`](docs/compatibility.md): what 1.0 will freeze and what it will not, the four
+closed sets (verdicts, priorities, signal levels, and a finding's standing against the baseline)
+and their order, finding identity, the severity mapping, the names reserved for extensions, and the
+deprecation policy.
+
+A change that can alter the verdict or the priority a package gets, or what `--fail-on=unchecked`
+matches (a new S10 reason, a newly supported host), ships in a minor release, never in a patch, and
+gets a line under `### Verdict changes` in `CHANGELOG.md`. The only patch exception is a
+curated-data fix that moves a package to `finished` or `ok`. This is project practice from 0.13 on;
+the rest of `docs/compatibility.md` becomes binding at 1.0.0-RC1.
+
+## What lockrot writes
+
+lockrot writes the files you name — reports with `--output`, the baseline with `--generate-baseline`
+— each through a temporary file beside it that is renamed over it, so it needs write access to that
+directory; its activity cache, under Composer's cache directory; and, with `self-update`, the PHAR.
+It never writes `composer.json` or `composer.lock`. An absolute path is written where it points, in
+the project or not, and a run interrupted mid-write can leave a `*.tmp` file beside the target.
+
+That paragraph is a promise the README, `SECURITY.md` and the docs make, so a change that writes
+anything else — a new file, a created directory, a cache in another place — is a change to the
+promise and needs the maintainer's decision first, not only a review. Every project file goes
+through `Lockrot\Filesystem\AtomicWriter`.
 
 ## Commits and pull requests
 

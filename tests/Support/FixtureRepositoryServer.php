@@ -12,7 +12,6 @@ use Composer\Repository\RepositoryInterface;
 use Lockrot\Data\Http\HttpResult;
 use Lockrot\Data\Http\RecordedHttpClient;
 use Lockrot\Lock\LockFile;
-use Symfony\Component\Process\Process;
 
 /**
  * Serves recorded p2 envelopes over a real `php -S` HTTP server so tests can exercise
@@ -25,8 +24,6 @@ use Symfony\Component\Process\Process;
 final class FixtureRepositoryServer
 {
     private const SUFFIXES = ['', '~dev'];
-    private const START_TIMEOUT_SECONDS = 5.0;
-    private const POLL_INTERVAL_MICROSECONDS = 20000;
     private const ROUTER_FILENAME = 'router.php';
 
     /**
@@ -56,18 +53,16 @@ final class FixtureRepositoryServer
 
     private string $docroot;
     private string $cacheDir;
-    private int $port;
+    private PhpBuiltinServer $server;
     /** @var list<string> every package name the docroot may serve, whatever the recorded envelopes hold */
     private array $names;
-    private ?Process $process = null;
-    private ?string $logFile = null;
 
     /** @param list<string> $names */
-    private function __construct(string $docroot, string $cacheDir, int $port, array $names)
+    private function __construct(string $docroot, string $cacheDir, array $names)
     {
         $this->docroot = $docroot;
         $this->cacheDir = $cacheDir;
-        $this->port = $port;
+        $this->server = new PhpBuiltinServer($docroot, $docroot.'/'.self::ROUTER_FILENAME, 'fixture repository server');
         $this->names = $names;
     }
 
@@ -90,7 +85,7 @@ final class FixtureRepositoryServer
             }
         }
 
-        return new self($docroot, $cacheDir, self::freePort(), $names);
+        return new self($docroot, $cacheDir, $names);
     }
 
     /**
@@ -133,83 +128,15 @@ final class FixtureRepositoryServer
 
     public function start(): void
     {
-        $logFile = tempnam(sys_get_temp_dir(), 'lockrot-fixture-log-');
-        if ($logFile === false) {
-            throw new \RuntimeException('cannot create a log file for the fixture repository server');
-        }
-        $this->logFile = $logFile;
-
-        // php -S writes one access-log line per request to stderr. Symfony\Process normally pipes
-        // a child process's stdout/stderr through the OS's pipe buffer (~64 KiB on macOS/Linux, a
-        // few hundred requests' worth of log lines) and only drains it when something calls back
-        // into the Process object (isRunning(), wait(), ...); once the startup poll loop below
-        // returns, nothing does that again until stop() runs at the end of the test. A real load
-        // (a 200-package analysis is ~1000 requests) fills that pipe and php -S then blocks in
-        // write(2) — a genuine, silent hang, not a slowdown, and nothing to do with keep-alive or
-        // connection reuse. Running through a shell with `> logfile 2>&1` redirects both streams
-        // straight to a file at the OS level, so there is no pipe for php -S to ever fill.
-        //
-        // The leading `exec` matters: without it, `/bin/sh -c '... > logfile 2>&1'` on this system
-        // forks php -S as a *child* of the shell rather than replacing the shell process, so the PID
-        // Symfony\Process tracks is the shell's — stop() then kills the shell and php -S is silently
-        // orphaned (reparented to init) and keeps running and holding the port forever. `exec`
-        // forces the shell to replace itself with php -S, so the tracked PID is the real one.
-        $command = \sprintf(
-            'exec %s -S 127.0.0.1:%d -t %s %s > %s 2>&1',
-            escapeshellarg(\PHP_BINARY),
-            $this->port,
-            escapeshellarg($this->docroot),
-            escapeshellarg($this->docroot.'/'.self::ROUTER_FILENAME),
-            escapeshellarg($logFile)
-        );
-        $this->process = Process::fromShellCommandline($command);
-        $this->process->setTimeout(null);
-        $this->process->start();
-
-        $context = stream_context_create(['http' => ['timeout' => 0.2, 'ignore_errors' => true]]);
-        $deadline = microtime(true) + self::START_TIMEOUT_SECONDS;
-        while (microtime(true) < $deadline) {
-            if (!$this->process->isRunning()) {
-                $error = $this->readLog();
-                $this->process = null;
-                throw new \RuntimeException('fixture repository server exited before it started answering: '.$error);
-            }
-            $body = @file_get_contents($this->url().'/packages.json', false, $context);
-            if ($body !== false) {
-                return;
-            }
-            usleep(self::POLL_INTERVAL_MICROSECONDS);
-        }
-
-        $error = $this->readLog();
-        $this->stop();
-        throw new \RuntimeException('fixture repository server did not answer packages.json within '.self::START_TIMEOUT_SECONDS.'s: '.$error);
+        $this->server->start('/packages.json');
     }
 
+    /** Stops php -S — returning once its port is free — and removes the docroot and the cache. */
     public function stop(): void
     {
-        if ($this->process !== null) {
-            $this->process->stop();
-            $this->process = null;
-        }
-        if ($this->logFile !== null) {
-            if (is_file($this->logFile)) {
-                unlink($this->logFile);
-            }
-            $this->logFile = null;
-        }
+        $this->server->stop();
         self::removeDir($this->docroot);
         self::removeDir($this->cacheDir);
-    }
-
-    private function readLog(): string
-    {
-        if ($this->logFile === null || !is_file($this->logFile)) {
-            return '';
-        }
-        $contents = file_get_contents($this->logFile);
-
-        return $contents === false ? '' : $contents;
     }
 
     /**
@@ -221,7 +148,7 @@ final class FixtureRepositoryServer
      */
     public function requestCount(): int
     {
-        $log = $this->readLog();
+        $log = $this->server->readLog();
         if ($log === '') {
             return 0;
         }
@@ -238,9 +165,7 @@ final class FixtureRepositoryServer
     /** Truncates the access log so a subsequent requestCount() reflects only requests made after this call. */
     public function resetRequestCount(): void
     {
-        if ($this->logFile !== null) {
-            file_put_contents($this->logFile, '');
-        }
+        $this->server->clearLog();
     }
 
     public function __destruct()
@@ -251,7 +176,7 @@ final class FixtureRepositoryServer
     /** @return non-empty-string */
     public function url(): string
     {
-        return 'http://127.0.0.1:'.$this->port;
+        return $this->server->url();
     }
 
     public function config(): Config
@@ -355,22 +280,5 @@ final class FixtureRepositoryServer
             }
         }
         rmdir($dir);
-    }
-
-    private static function freePort(): int
-    {
-        $socket = @stream_socket_server('tcp://127.0.0.1:0', $errno, $errstr);
-        if ($socket === false) {
-            throw new \RuntimeException(\sprintf('cannot bind a free port: %s (%d)', $errstr, $errno));
-        }
-        $name = stream_socket_get_name($socket, false);
-        fclose($socket);
-        $parts = explode(':', (string) $name);
-        $port = (int) end($parts);
-        if ($port <= 0) {
-            throw new \RuntimeException('cannot determine a free port from address: '.$name);
-        }
-
-        return $port;
     }
 }

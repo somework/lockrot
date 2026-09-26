@@ -73,8 +73,9 @@ from the same place. The signature proves the bytes were signed with the release
 release assets alone cannot fake: it still holds if the assets were replaced after the fact.
 `self-update` checks the checksum, and from 0.6.0 on a signature of its own — see
 [Self-update signature](#self-update-signature) below. The release workflow verifies its own
-signatures against the committed public keys before it uploads anything, so the keys in the
-repository and the keys in CI cannot silently drift apart.
+signatures before it uploads anything — the GPG one against the committed public key, the
+self-update one against the key the previous release carries — so the keys in the field and the
+keys in CI cannot silently drift apart.
 
 ### Self-update signature
 
@@ -99,8 +100,21 @@ For a person, the GPG signature or the attestation is the check to make: they do
 key fetched from the same place as the archive. The self-update signature is for the archive
 already on the machine, whose key arrived with a download that was verified once. Like every
 signature over an archive, it proves the bytes are a lockrot release, not that they are the newest
-one: the version comes from the release document, which `self-update` reads from GitHub's API over
+one: the version comes from the release list, which `self-update` reads from GitHub's API over
 TLS. Composer's self-update has the same shape.
+
+A release names the key it was signed with in `lockrot.phar.meta.json` (from 0.13.0 on), as
+`sha256:` and the SHA-256 of the DER public key. The fingerprint of the current key is
+`sha256:ec3ca71b1a3ced86f871b89cff7973b58454e5694136683680b72b18070a8f87`; to take it yourself:
+
+```bash
+openssl pkey -pubin -in lockrot-selfupdate-key.pub -outform DER | sha256sum
+```
+
+The release workflow checks each release's self-update signature against the key the previous
+release carries, which is the key every archive in the field verifies it with, so a rotation of the
+key cannot skip the transition release those archives need to follow it (see
+[SECURITY.md](https://github.com/somework/lockrot/blob/main/SECURITY.md)).
 
 ### Build provenance
 
@@ -162,6 +176,20 @@ The PHAR always runs the inspected project with `--no-plugins`: it reads `compos
 `composer.json` and never needs that project's Composer plugins. It also never writes to
 `composer.json` or `composer.lock`.
 
+lockrot writes the files you name — reports with
+[`--output`](configuration.md#writing-reports-to-files), the baseline with `--generate-baseline` —
+each through a temporary file beside it that is renamed over it, so it needs write access to that
+directory; its activity cache, under Composer's cache directory; and, with `self-update`, the PHAR.
+An absolute path is written where it points, in the project or not, and a run interrupted mid-write
+can leave a `*.tmp` file beside the target. `-d` makes the project the working directory before
+lockrot starts, so relative `--output` paths, like `--baseline`, are relative to the `-d` directory:
+`php lockrot.phar -d app --output=json:lockrot.json` writes `app/lockrot.json`.
+
+Give `--output` its value with `=`, as above. Written with a space before the command name —
+`php lockrot.phar --output json:r.json` — the console reads `json:r.json` as the command to run, a
+command `r.json` in a `json` namespace, and exits `1` with "There are no commands defined in the
+"json" namespace". `--output=json:r.json` means the same thing everywhere.
+
 The only project-inspection commands are `lockrot` (the default, so the name can be left out) and
 `self-update`. Symfony's own `help`, `list` and `completion` remain, so `php lockrot.phar list` shows
 five entries — and nothing in the inspected project can be installed, updated or run through the
@@ -171,26 +199,92 @@ PHAR.
 > Composer's `use-parent-dir` setting is not honoured. Run it from the project root or point it there
 > with `-d`.
 
+The `COMPOSER` environment variable is honoured as Composer honours it: `COMPOSER=alt.json php
+lockrot.phar` reads `alt.json` and `alt.lock`.
+
 ## Keeping it updated
 
 ```bash
-php lockrot.phar self-update          # download, verify the sha256 and the signature, replace this file
-php lockrot.phar self-update --check  # report only; exits 1 when an update is available
-php lockrot.phar self-update --force  # reinstall the latest release even when it is the one running
+php lockrot.phar self-update                # download, verify the sha256 and the signature, replace this file
+php lockrot.phar self-update --check        # report only; exits 1 when an update is available
+php lockrot.phar self-update --force        # reinstall the newest release even when it is the one running
+php lockrot.phar self-update --allow-major  # also move to the next major version
 ```
 
 `selfupdate` is accepted as an alias. `--offline` (or `COMPOSER_DISABLE_NETWORK=1`) makes the command
 refuse to run rather than fail half-way: an update cannot happen without the network.
 
-`self-update` reads `releases/latest` from the GitHub API directly, not through `lockrot.dev`. It
-downloads the release's `lockrot.phar.sha256` and `lockrot.phar.sig.json` alongside the archive, refuses
-to install anything whose hash does not match or whose signature does not verify against the key
-built into the running archive ([above](#self-update-signature)), and checks that the PHP runtime
-can open the download before it replaces the running file. The archive running 0.5.0 checks the
-checksum only when it updates — the verifier arrives with 0.6.0 — and releases before 0.6.0 carry
-no signature, so a signed build cannot `--force` its way back to one. The 0.6.0 archive looks for
-the signature under its first name, `lockrot.phar.sig`, which no later release carries: it reports
-the missing asset and leaves itself in place, so replace it by hand once (or `phive update`).
+`self-update` reads lockrot's release list from the GitHub API directly, not through `lockrot.dev`,
+and skips drafts, pre-releases and any tag that is not a stable version. From the rest it takes the
+newest release that passes three rules, and says on a line of its own which newer release it passed
+over and why:
+
+- **The same major version.** The major version is the first number, so all of 0.x is one line:
+  0.13 to 0.14 arrives as it always has, and 0.x to 1.0 is a new major like 1.x to 2.0. A newer
+  major is named and not installed. `--allow-major` moves to the next major version, and only to
+  that one: from 1.x it installs the newest 2.x even when 3.0 exists, and the next
+  `self-update --allow-major` goes on from there. A release that exists to warn about the step
+  after it is not skipped on the way. The next major is the next one that has a stable release,
+  so a major number that was skipped or withdrawn is stepped over rather than blocking the way. The
+  line that suggests `--allow-major` names the release it would install; when no release of the
+  next major can be installed here, the lines say why instead (its PHP, or its key).
+- **A PHP this machine has.** A release whose lowest PHP is above the running one is passed over,
+  rather than installed to refuse to start. So is a release whose `lockrot.phar.meta.json` spells
+  its lowest PHP any other way than `major.minor.patch`: its real floor is unknown.
+- **A key this archive carries.** A release signed with another self-update key is passed over. After
+  a planned key rotation this makes the transition release — signed with the old key, carrying the
+  new one — the step in between: the archive installs it, and the next `self-update` verifies with
+  the new key (see [SECURITY.md](https://github.com/somework/lockrot/blob/main/SECURITY.md)). An
+  archive that finds newer releases only under a key it does not carry, and no release it can install
+  that carries that key, is stranded: `self-update` and `self-update --check` exit `2` saying so, and
+  it has to be [reinstalled by hand](#reinstalling-by-hand).
+
+Versions are compared the way Composer compares them, so `v1.0`, `V1.0.0` and `1.0.0` are one
+version, and a release is shown as `major.minor.patch`. A published release whose tag is not a
+version at all (`v0.13.1-hotfix`) cannot be compared: it is skipped with a line naming the tag.
+
+The lowest PHP and the signing key come from `lockrot.phar.meta.json`, which every release from 0.13.0
+on publishes beside the archive, `{"php": "7.4.0", "selfupdate-key": "sha256:…"}`. It is written by
+the release workflow and fetched only for a release that would otherwise be installed, and for the
+newest releases of the next major version until one could be (so `--allow-major` is suggested only
+when it would install something). Releases before 0.13.0 have none and are read as what they are:
+built for PHP 7.4.0, with no claim about their key, so the signature alone decides. A 0.13.0 or
+later release that would be installed without the file, or with one that cannot be downloaded or
+read, is an error (exit `2`) naming the tag, as a missing archive is. A release of the next major
+that is only named for `--allow-major` is not installed, so there the same problem is a line saying
+its description could not be read, and the update in the running major goes ahead. The
+file is not signed: it decides only which release is tried. The checksum and the signature still
+decide whether one is installed, so a doctored description cannot get anything installed that the
+release key did not sign. It can hold an update back, and a description that understates the lowest
+PHP can pick a signed release this PHP cannot run, which then refuses to start and has to be
+[replaced by hand](#reinstalling-by-hand).
+
+`--force` reinstalls the newest release at or below the running version in the running major
+version, and looks no further down than that one release: a description claiming it cannot be
+installed here does not walk the reinstall down to an older one. That release may be older than the
+running build. A build ahead of every release of its line — a 0.13.1 whose release was withdrawn, or
+one rehearsed before its tag — is replaced by the newest release left in its line (`lockrot replaced
+0.13.1 with 0.13.0`), which from then on follows the published releases again. `--force` never leaves
+the running major version: with no release of the line it can install — a 1.0.0 built before any
+1.x is published, or the one release it would take held back — it exits `2` rather than going back
+to the newest 0.x.
+
+`self-update` downloads the chosen release's `lockrot.phar.sha256` and `lockrot.phar.sig.json`
+alongside the archive, refuses to install anything whose hash does not match or whose signature does
+not verify against the key built into the running archive ([above](#self-update-signature)), and
+checks that the PHP runtime can open the download before it replaces the running file. The archive
+running 0.5.0 checks the checksum only when it updates — the verifier arrives with 0.6.0 — and
+releases before 0.6.0 carry no signature, so a signed build cannot `--force` its way back to one.
+The 0.6.0 archive looks for the signature under its first name, `lockrot.phar.sig`, which no later
+release carries: it reports the missing asset and leaves itself in place, so replace it by hand once
+(or `phive update`).
+
+Archives up to 0.12 choose the other way: they read `releases/latest` and take whatever it names. On
+the day a new major version is released their `self-update` installs it; a release that needs a newer
+PHP installs and then fails to start; and a release signed after a key rotation is refused as a
+signature mismatch, leaving the archive in place — replace it by hand once. The rules above are part
+of the archive that does the update, so they start with 0.13: one plain `self-update` of a 0.12 or
+older archive to a 0.13 or later release, before a 1.0 exists, puts them in force.
 
 It needs write access to the directory the PHAR sits in — a PHAR in `/usr/local/bin` wants `sudo`, or
 a manual download — and it writes nothing else. If the update fails at any step, the running
@@ -204,8 +298,21 @@ An update killed part-way through — a `Ctrl-C` between the download and the re
 `lockrot.phar.<pid>-<id>.tmp.phar` file next to the PHAR. It is inert, and the next `self-update`
 deletes any such file older than an hour, so there is nothing to clean up by hand.
 
-`--check` is the CI-friendly half: it never downloads the archive, and exits `1` when a newer release
-exists so a scheduled job notices.
+`--check` is the CI-friendly half: it decides exactly as a plain `self-update` would and installs
+nothing. It exits `1` when `self-update` would install a release, so a scheduled job notices. It
+exits `0` when nothing would be installed: the build is current, or every newer release is held
+back for a reason this archive cannot act on — a newer major version without `--allow-major`
+(`--check --allow-major` exits `1` for it and says to run `self-update --allow-major`), a lowest
+PHP above this one, or an unreadable one — each named on a line of its own. It exits `2` where
+`self-update` would fail, which includes an archive stranded by a key rotation. `--force` does not
+change what `--check` reports.
+
+`--check` never downloads the archive, its checksum or its signature, but it does read
+`lockrot.phar.meta.json` of the release it would choose (and of the next major's newest releases
+before it suggests `--allow-major`). That file is a release download: it comes from
+`github.com/somework/lockrot/releases/download/…`, which redirects to GitHub's release-asset host,
+not from `api.github.com`. A CI job whose network allows only the API needs that host too, or
+`--check` exits `2` on a newer release in its major that it cannot describe.
 
 ### `self-update` exit codes
 
@@ -213,11 +320,27 @@ exists so a scheduled job notices.
 
 | Code | Meaning |
 |---|---|
-| `0` | An update was installed, or the build is already current |
-| `1` | `--check` only: a newer release exists |
-| `2` | Every failure: no published release, GitHub unreachable, a checksum mismatch, a signature that does not verify, an archive the runtime cannot open, an unwritable directory, or running outside the PHAR |
+| `0` | An update was installed, or nothing would be: the build is current in its major version, or every newer release is held back by a newer major version, a PHP floor above this one, or an unreadable floor (each named on a line of its own) |
+| `1` | `--check` only: `self-update` would install a newer release — in the running major version, or in the next one with `--allow-major` |
+| `2` | Every failure: no published release, GitHub unreachable, a chosen release missing an asset or with a `lockrot.phar.meta.json` that cannot be read, newer releases signed only with a key this archive does not carry and no release it can install that carries it (the archive is stranded; also under `--check`), a checksum mismatch, a signature that does not verify, an archive the runtime cannot open, an unwritable directory, `--force` with no release in the running major version this archive can install, running outside the PHAR, or a command line it cannot read (`self-update --nope`, `--check=yes`) |
 
 On `2` the running `lockrot.phar` is untouched.
+
+An unknown option or a missing value is a usage error, and exit `2` like the rest. An unknown
+command (`php lockrot.phar self-updat`) never reaches `self-update`: Symfony stops it with its own
+exit `1` and its own message, and nothing is checked or downloaded. A `1` from `self-update` itself
+comes only from `--check`, with a line naming the release that is available.
+
+### Reinstalling by hand
+
+`self-update` cannot move an archive on by itself when it is stranded by a key rotation (exit `2`,
+naming the key it does not carry), when the self-update key was compromised (see
+[SECURITY.md](https://github.com/somework/lockrot/blob/main/SECURITY.md): every archive on the old
+key is replaced this way, whatever its version), when it is 0.12 or older after any rotation, or
+when an installed release refuses to start. Download `lockrot.phar` again, verify it with the
+[GPG signature](#gpg-signature) or the [build provenance](#build-provenance) — not with a key the
+old archive carried — and put it in place of the old file. Every `self-update` after that verifies
+with the key the new download carries.
 
 ## In CI
 

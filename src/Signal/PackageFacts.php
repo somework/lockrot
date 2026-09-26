@@ -9,6 +9,7 @@ use Lockrot\Data\Forge\RepositoryActivity;
 use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Lock\LockedPackage;
 
+/** @internal */
 final class PackageFacts
 {
     private LockedPackage $package;

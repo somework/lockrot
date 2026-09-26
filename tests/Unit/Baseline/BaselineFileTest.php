@@ -206,7 +206,7 @@ final class BaselineFileTest extends TestCase
             $thrown->getMessage(),
             'the path a reader can act on comes first, then the reason'
         );
-        self::assertStringContainsString('file_put_contents', $thrown->getMessage());
+        self::assertStringContainsString('fopen', $thrown->getMessage());
         self::assertStringNotContainsString('unlink', $thrown->getMessage());
     }
 
@@ -287,6 +287,73 @@ final class BaselineFileTest extends TestCase
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessageMatches('/is not valid JSON/');
         $file->read();
+    }
+
+    /**
+     * The schema library turned the baseline into an object with a json_encode()/json_decode() round
+     * trip that checked only the encode. A key starting with a NUL byte is valid JSON no PHP object
+     * can hold, so the decode returned null, `(object) null` was validated, and the file was reported
+     * as missing `lockrot` and `findings` it plainly had. 1e400 reads as INF, which json_encode()
+     * refused with the library's own exception, not a configuration error.
+     *
+     * @dataProvider baselinesTheValidatorCouldNotRead
+     */
+    #[DataProvider('baselinesTheValidatorCouldNotRead')]
+    public function testABaselineTheValidatorCouldNotReadIsAConfigExceptionNamingTheProblem(string $json, string $message): void
+    {
+        $dir = $this->tempDir();
+        file_put_contents($dir.'/lockrot-baseline.json', $json);
+
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage($message);
+        BaselineFile::resolve($dir, null)->read();
+    }
+
+    /** @return iterable<string, array{0: string, 1: string}> */
+    public static function baselinesTheValidatorCouldNotRead(): iterable
+    {
+        $lockrot = '"lockrot": {"version": "0.1.0", "schema": 1}';
+        $entry = '{"version": "1.0.0", "verdict": "abandoned", "first_seen": "2026-01-15"}';
+
+        yield 'a NUL key at the top' => [
+            '{'.$lockrot.', "findings": {}, "\u0000k": 1}',
+            "baseline file is invalid:\n  - \\000k: a key starting with a NUL byte cannot be read",
+        ];
+        yield 'a NUL key naming a package' => [
+            '{'.$lockrot.', "findings": {"acme/a": '.$entry.', "\u0000acme/b": '.$entry.'}}',
+            "baseline file is invalid:\n  - findings.\\000acme/b: a key starting with a NUL byte cannot be read",
+        ];
+        yield 'a NUL key inside an entry' => [
+            '{'.$lockrot.', "findings": {"acme/a": {"version": "1.0.0", "verdict": "abandoned", "first_seen": "2026-01-15", "\u0000": 1}}}',
+            "baseline file is invalid:\n  - findings.acme/a.\\000: a key starting with a NUL byte cannot be read",
+        ];
+        yield 'a number too large for a float where an integer is wanted' => [
+            '{"lockrot": {"version": "0.1.0", "schema": 1e400}, "findings": {}}',
+            "baseline file is invalid:\n  - lockrot.schema: ",
+        ];
+        yield 'a number too large for a float where a string is wanted' => [
+            '{'.$lockrot.', "findings": {"acme/a": {"version": -1e400, "verdict": "abandoned", "first_seen": "2026-01-15"}}}',
+            "baseline file is invalid:\n  - findings.acme/a.version: ",
+        ];
+    }
+
+    /**
+     * Objects in the baseline are open, so a field lockrot does not know is left alone whatever it
+     * holds — INF included, which nothing reads — and a NUL byte past a key's first character is an
+     * ordinary character.
+     */
+    public function testWhatTheValidatorCanReadIsReadAsBefore(): void
+    {
+        $dir = $this->tempDir();
+        file_put_contents(
+            $dir.'/lockrot-baseline.json',
+            '{"lockrot": {"version": "0.1.0", "schema": 1}, "custom": 1e400, "k\u0000": {"deep": [-1e400]},'
+            .' "findings": {"acme/a": {"version": "1.0.0", "verdict": "abandoned", "first_seen": "2026-01-15", "note\u0000": []}}}'
+        );
+
+        $baseline = BaselineFile::resolve($dir, null)->read();
+
+        self::assertSame(['acme/a'], $baseline->packages());
     }
 
     public function testReadingAMissingFileIsAConfigException(): void

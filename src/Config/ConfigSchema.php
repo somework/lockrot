@@ -4,14 +4,16 @@ declare(strict_types=1);
 
 namespace Lockrot\Config;
 
-use JsonSchema\Constraints\BaseConstraint;
 use JsonSchema\Validator;
 use Lockrot\Exception\ConfigException;
+use Lockrot\Json\SchemaPayload;
 
 /**
  * Validates the shape of composer.json's extra.lockrot against
  * resources/lockrot-config.schema.json, using Composer's own bundled justinrainbow/json-schema
  * validator.
+ *
+ * @internal
  */
 final class ConfigSchema
 {
@@ -20,11 +22,8 @@ final class ConfigSchema
     /** @param array<string, mixed> $lockrotExtra contents of composer.json extra.lockrot */
     public static function validate(array $lockrotExtra): void
     {
-        // json_decode(..., true) turns both an empty JSON object ({}) and an empty JSON array ([]) into
-        // [], so by the time an empty extra.lockrot reaches here the "this was an object" information is
-        // gone and arrayToObjectRecursive() cannot restore it. A bare stdClass hands the validator an
-        // explicit object for this one case where the type would otherwise be ambiguous.
-        $data = $lockrotExtra === [] ? new \stdClass() : BaseConstraint::arrayToObjectRecursive($lockrotExtra);
+        // The validator reads JSON objects as PHP objects, and composer.json arrives as arrays.
+        $data = SchemaPayload::of($lockrotExtra, 'extra.lockrot');
 
         $validator = new Validator();
         $validator->validate($data, self::schema());

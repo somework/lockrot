@@ -139,6 +139,42 @@ final class PluginTest extends TestCase
         self::assertStringNotContainsString('<options=', $stdout);
     }
 
+    /**
+     * `composer -d <dir>` changes into the project before any command runs, so relative `--output`
+     * paths land there, not in the shell's directory. The table file is the one place the plugin's
+     * own symfony/console strips the markup — 2.8 under Composer 2.2 LTS, 5.4 under 2.10 — so this is
+     * the test that covers both. Offline, so no verdict depends on GitHub: the assertions are about
+     * where the files go and what is in them, not what they report.
+     */
+    public function testOutputFilesAreRelativeToTheDirectoryComposerRunsIn(): void
+    {
+        $this->createProject(['target-php' => '8.4'], ['somework/lockrot' => '*', 'phpzip/phpzip' => '2.0.8']);
+        $this->install();
+        $elsewhere = sys_get_temp_dir().'/lockrot-e2e-elsewhere-'.uniqid();
+        mkdir($elsewhere);
+        try {
+            $run = new Process(
+                ['composer', '--working-dir='.$this->dir, 'lockrot', '--offline', '--output=table:r.txt', '--output=json:r.json'],
+                $elsewhere,
+                ['COMPOSER_HOME' => $this->dir.'/.composer']
+            );
+            $run->setTimeout(120)->run();
+
+            self::assertSame(0, $run->getExitCode(), $run->getErrorOutput().$run->getOutput());
+            self::assertStringContainsString("lockrot: table report written to r.txt\nlockrot: json report written to r.json\n", $run->getErrorOutput());
+            $table = (string) file_get_contents($this->dir.'/r.txt');
+            self::assertMatchesRegularExpression('/\d+ packages checked/', $table);
+            self::assertStringNotContainsString('<fg=', $table);
+            self::assertStringNotContainsString('<options=', $table);
+            self::assertStringNotContainsString('\\<', $table);
+            self::assertStringNotContainsString("\e[", $table);
+            self::assertIsArray(json_decode((string) file_get_contents($this->dir.'/r.json'), true));
+            self::assertSame(['.', '..'], scandir($elsewhere), 'nothing lands in the shell\'s directory');
+        } finally {
+            (new Process(['rm', '-rf', $elsewhere]))->run();
+        }
+    }
+
     public function testComposerRequirePrintsTheInstallTimeSummary(): void
     {
         $this->createProject(['target-php' => '8.4']);
@@ -187,6 +223,66 @@ final class PluginTest extends TestCase
         self::assertStringContainsString('install-time-strict', $stderr);
         self::assertStringContainsString('fail-on=old-promise', $stderr);
         self::assertDirectoryDoesNotExist($this->dir.'/vendor/phpzip');
+    }
+
+    /**
+     * Through the real plugin: one rendered warning line on stderr (Composer's `<warning>` style, no
+     * literal tag), the report on stdout, and the run otherwise unchanged. `x-ci` is reserved and stays
+     * quiet.
+     */
+    public function testAnUnknownKeyIsWarnedAboutThroughThePlugin(): void
+    {
+        $this->createProject(['install-tme' => 'off', 'x-ci' => true]);
+        $this->install();
+
+        $run = $this->composer(['lockrot', '--format=json', '--offline'], [], 120);
+
+        $stderr = $run->getErrorOutput();
+        self::assertSame(0, $run->getExitCode(), $stderr);
+        self::assertIsArray(json_decode($run->getOutput(), true), $stderr.$run->getOutput());
+        self::assertSame(1, substr_count($stderr, 'lockrot: unknown key extra.lockrot.install-tme ignored (did you mean install-time?)'), $stderr);
+        self::assertStringNotContainsString('x-ci', $stderr);
+        self::assertStringNotContainsString('<warning>', $stderr);
+    }
+
+    /**
+     * A command line `composer lockrot` cannot read is lockrot's usage error — exit 2 and one
+     * `lockrot:` line — not Composer's error box and exit 1. This runs through the real binary, so on
+     * the Composer 2.2 leg of CI it is the check that the binding works on symfony/console 2.8 too.
+     * No network is needed: nothing is analysed.
+     */
+    public function testAnUnreadableCommandLineIsExitTwoWithOneLockrotLine(): void
+    {
+        $this->createProject(['target-php' => '8.4']);
+        $this->install();
+
+        foreach (['--nope' => '"--nope" option does not exist', '--format' => '"--format" option requires a value', '--dev=yes' => '"--dev" option does not accept a value'] as $option => $reason) {
+            $run = $this->composer(['lockrot', $option], [], 120);
+
+            self::assertSame(2, $run->getExitCode(), $option."\n".$run->getErrorOutput());
+            self::assertSame('', $run->getOutput(), $option);
+            self::assertMatchesRegularExpression('/^lockrot: [^\n]*'.preg_quote($reason, '/').'[^\n]*$/m', $run->getErrorOutput(), $option);
+        }
+    }
+
+    /**
+     * `COMPOSER=alt.json composer lockrot` reads alt.json and alt.lock, as every other Composer
+     * command does. The copies are byte-identical, so only the lock's name tells them apart.
+     */
+    public function testComposerTheEnvironmentVariableChoosesTheLockLockrotReads(): void
+    {
+        $this->createProject(['target-php' => '8.4']);
+        $this->install();
+        copy($this->dir.'/composer.json', $this->dir.'/alt.json');
+        copy($this->dir.'/composer.lock', $this->dir.'/alt.lock');
+
+        $run = $this->composer(['lockrot', '--format=json'], ['COMPOSER' => 'alt.json'], 120);
+
+        self::assertSame(0, $run->getExitCode(), $run->getErrorOutput());
+        $json = json_decode($run->getOutput(), true);
+        self::assertIsArray($json, $run->getErrorOutput());
+        self::assertIsArray($json['run']);
+        self::assertSame('alt.lock', $json['run']['lock_file']);
     }
 
     public function testLockrotDisableSkipsTheInstallTimeSummary(): void

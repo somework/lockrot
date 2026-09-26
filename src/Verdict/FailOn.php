@@ -19,6 +19,8 @@ use Lockrot\Signal\Signal;
  *
  * The baseline is not consulted here: {@see \Lockrot\Config\Policy::exitCode()} skips a finding the
  * project has already accepted before asking, whichever kind of threshold is set.
+ *
+ * @internal
  */
 final class FailOn
 {

@@ -36,8 +36,9 @@ final class SarifFormatterTest extends TestCase
     protected function tearDown(): void
     {
         foreach ($this->tempDirs as $dir) {
-            if (is_file($dir.'/composer.lock')) {
-                unlink($dir.'/composer.lock');
+            // scandir(), not glob(): a directory name here may hold a backslash, which glob() reads as an escape.
+            foreach (is_dir($dir) ? array_diff((array) scandir($dir), ['.', '..']) : [] as $file) {
+                unlink($dir.'/'.$file);
             }
             if (is_dir($dir)) {
                 rmdir($dir);
@@ -47,14 +48,14 @@ final class SarifFormatterTest extends TestCase
     }
 
     /** acme/abandoned is on line 4 of the lock written here, acme/silent on line 8. */
-    private function lockPath(): string
+    private function lockPath(string $name = 'composer.lock'): string
     {
         $dir = sys_get_temp_dir().'/lockrot-sarif-'.uniqid('', true);
         if (!mkdir($dir, 0777, true) && !is_dir($dir)) {
             throw new \RuntimeException('cannot create temp dir: '.$dir);
         }
         $this->tempDirs[] = $dir;
-        file_put_contents($dir.'/composer.lock', <<<'JSON'
+        file_put_contents($dir.'/'.$name, <<<'JSON'
             {
                 "packages": [
                     {
@@ -70,7 +71,7 @@ final class SarifFormatterTest extends TestCase
             }
             JSON);
 
-        return $dir.'/composer.lock';
+        return $dir.'/'.$name;
     }
 
     private function report(): Report
@@ -182,6 +183,26 @@ final class SarifFormatterTest extends TestCase
         self::assertCount(3, JsonPath::arrayAt($run, ['results']));
         self::assertSame([0, 0, 1], JsonPath::column($run, ['results'], 'ruleIndex'));
         self::assertSame(['lockrot/abandoned', 'lockrot/abandoned', 'lockrot/silent'], JsonPath::column($run, ['results'], 'ruleId'));
+    }
+
+    /**
+     * Rules follow the order the results first use them, which is the report's order, not
+     * Verdict::all(): `finished` and `ok` tie, so a direct `ok` package comes before a `finished`
+     * one. docs/compatibility.md says so; changing it would change machine-readable output.
+     */
+    public function testRulesFollowTheOrderTheResultsFirstUseThem(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $report = new Report([
+            new Finding('z/z', '1.0.0', Verdict::FINISHED, [], ['a/parent', 'z/z'], null, $at),
+            new Finding('a/a', '1.0.0', Verdict::OK, [], ['a/a'], null, $at),
+        ], [], $at, 2, 0, false);
+
+        $run = $this->singleRun($this->formatter(LockrotConfig::FAIL_ON_NONE, null)->format($report, true));
+
+        self::assertSame(['lockrot/ok', 'lockrot/finished'], JsonPath::column($run, ['tool', 'driver', 'rules'], 'id'));
+        self::assertSame('note', JsonPath::stringAt($run, ['tool', 'driver', 'rules', 0, 'defaultConfiguration', 'level']), 'a rule for a verdict that is never flagged defaults to note');
+        self::assertSame('note', JsonPath::stringAt($run, ['tool', 'driver', 'rules', 1, 'defaultConfiguration', 'level']));
     }
 
     public function testLevelMappingAtTheFailOnBoundary(): void
@@ -325,6 +346,69 @@ final class SarifFormatterTest extends TestCase
         self::assertStringNotContainsString('#', $uri);
         // ":" is a legal path character and a Windows drive letter needs it, so it stays raw.
         self::assertStringNotContainsString('%3A', $uri);
+    }
+
+    private function inProject(string $failOn, string $lockPath, string $projectDirectory): SarifFormatter
+    {
+        return new SarifFormatter(FormatContext::create($lockPath, $failOn, Version::STRING, FormatContext::DEFAULT_WIDTH, $projectDirectory));
+    }
+
+    /**
+     * Under `COMPOSER=alt.json` the analysed lock is alt.lock: every result's `uri` is the lock's
+     * path relative to the project directory, and %SRCROOT% is that directory, so the two resolve
+     * to the file the run read. The partial fingerprint stays the package name.
+     */
+    public function testTheArtifactLocationNamesTheAnalysedLockRelativeToTheProjectDirectory(): void
+    {
+        $lockPath = $this->lockPath('alt.lock');
+        $project = \dirname($lockPath, 2);
+
+        $sarif = $this->inProject(Verdict::SILENT, $lockPath, $project)->format($this->report());
+        $this->assertValidSarif($sarif);
+        $run = $this->singleRun($sarif);
+
+        self::assertSame(
+            array_fill(0, 3, basename(\dirname($lockPath)).'/alt.lock'),
+            array_map(
+                static fn (int $i): string => JsonPath::stringAt($run, ['results', $i, 'locations', 0, 'physicalLocation', 'artifactLocation', 'uri']),
+                [0, 1, 2]
+            )
+        );
+        self::assertSame('%SRCROOT%', JsonPath::stringAt($run, ['results', 0, 'locations', 0, 'physicalLocation', 'artifactLocation', 'uriBaseId']));
+        self::assertSame(4, JsonPath::intAt($run, ['results', 0, 'locations', 0, 'physicalLocation', 'region', 'startLine']));
+        self::assertSame(
+            'file://'.rtrim(str_replace('\\', '/', $project), '/').'/',
+            JsonPath::stringAt($run, ['originalUriBaseIds', '%SRCROOT%', 'uri'])
+        );
+        self::assertSame(['lockrot/package' => 'acme/abandoned'], JsonPath::arrayAt($run, ['results', 0, 'partialFingerprints']));
+    }
+
+    /** The default lock in the project directory produces exactly the document it always did. */
+    public function testTheDefaultLockKeepsTheDocumentByteForByte(): void
+    {
+        $lockPath = $this->lockPath();
+
+        $out = $this->inProject(Verdict::SILENT, $lockPath, \dirname($lockPath))->format($this->report(), true);
+
+        self::assertSame($this->formatter(Verdict::SILENT, $lockPath)->format($this->report(), true), $out);
+        self::assertStringContainsString('"uri": "composer.lock"', $out);
+    }
+
+    /**
+     * The lock's name is a relative URI reference, so it is percent-encoded per segment — a colon
+     * included, which in a first segment would otherwise read as a URI scheme.
+     */
+    public function testTheArtifactUriIsPercentEncoded(): void
+    {
+        $lockPath = $this->lockPath('a b#c:d.lock');
+
+        $sarif = $this->inProject(Verdict::SILENT, $lockPath, \dirname($lockPath, 2))->format($this->report());
+        $this->assertValidSarif($sarif);
+
+        self::assertSame(
+            rawurlencode(basename(\dirname($lockPath))).'/a%20b%23c%3Ad.lock',
+            JsonPath::stringAt($this->singleRun($sarif), ['results', 0, 'locations', 0, 'physicalLocation', 'artifactLocation', 'uri'])
+        );
     }
 
     public function testWithoutALockPathThereIsNoUriBaseId(): void

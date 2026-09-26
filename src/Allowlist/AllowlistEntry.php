@@ -6,6 +6,7 @@ namespace Lockrot\Allowlist;
 
 use Composer\Semver\VersionParser;
 
+/** @internal */
 final class AllowlistEntry
 {
     private static ?VersionParser $parser = null;

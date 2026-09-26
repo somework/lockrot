@@ -10,6 +10,7 @@ use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Priority;
 use Lockrot\Verdict\Verdict;
 
+/** @internal */
 final class Report
 {
     /** Parents named on the `pulled in by:` line before the rest is counted. */

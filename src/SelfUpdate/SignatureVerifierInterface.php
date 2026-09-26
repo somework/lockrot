@@ -6,6 +6,7 @@ namespace Lockrot\SelfUpdate;
 
 use Lockrot\Exception\ConfigException;
 
+/** @internal */
 interface SignatureVerifierInterface
 {
     /**
@@ -20,4 +21,16 @@ interface SignatureVerifierInterface
      *                         match — every one of which means the archive is not installed
      */
     public function verify(string $archive, string $signatureFile, string $signatureUrl): void;
+
+    /**
+     * `sha256:` followed by the hex SHA-256 of the DER public key this verifier trusts — the value
+     * `openssl pkey -pubin -outform DER | sha256sum` prints, and the one a release's
+     * `lockrot.phar.meta.json` names for the key that signed it. {@see ReleaseLocator} passes over a
+     * release whose key is not this one.
+     *
+     * @throws ConfigException when the key is not one a fingerprint can be taken of, or not one
+     *                         {@see verify()} could load: a fingerprint no release names would pass
+     *                         every release over instead of reporting the broken key
+     */
+    public function keyFingerprint(): string;
 }

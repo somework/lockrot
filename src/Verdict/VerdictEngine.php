@@ -6,7 +6,11 @@ namespace Lockrot\Verdict;
 
 use Lockrot\Signal\Signal;
 
-/** Turns a package's signals into its one verdict, highest severity first. */
+/**
+ * Turns a package's signals into its one verdict, highest severity first.
+ *
+ * @internal
+ */
 final class VerdictEngine
 {
     /** @param list<Signal> $signals */

@@ -25,6 +25,8 @@ use Lockrot\Deadline;
  * Composer\Util\Loop, whose constructor calls HttpDownloader::enableAsync(). Loop is used here for
  * that reason rather than calling enableAsync() directly, which Composer marks internal; the
  * process-executor half of Loop stays unused.
+ *
+ * @internal
  */
 final class ComposerHttpClient implements HttpClientInterface
 {

@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace Lockrot\Data\Forge;
 
-/** A date out of a JSON value: null unless it is a string PHP can parse. */
+/**
+ * A date out of a JSON value: null unless it is a string PHP can parse.
+ *
+ * @internal
+ */
 final class JsonDate
 {
     /** @param mixed $value */

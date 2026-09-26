@@ -14,6 +14,9 @@ namespace Lockrot\Tests\Support;
  */
 final class JsonPath
 {
+    /** @var array<string, array<mixed, mixed>> path => decoded contents */
+    private static array $files = [];
+
     /**
      * @param array<mixed, mixed> $data
      * @param list<int|string>    $path
@@ -70,6 +73,29 @@ final class JsonPath
         }
 
         return $value;
+    }
+
+    /**
+     * A JSON file decoded to arrays, read once per process: the schemas under resources/ are read
+     * by several tests, and a file that is missing or not a JSON object fails the test that asked.
+     *
+     * @return array<mixed, mixed>
+     */
+    public static function decodeFile(string $path): array
+    {
+        if (!isset(self::$files[$path])) {
+            $contents = @file_get_contents($path);
+            if ($contents === false) {
+                throw new \RuntimeException($path.' cannot be read');
+            }
+            $value = json_decode($contents, true);
+            if (!\is_array($value)) {
+                throw new \RuntimeException($path.' is not a JSON object or array');
+            }
+            self::$files[$path] = $value;
+        }
+
+        return self::$files[$path];
     }
 
     /**

@@ -104,7 +104,7 @@ jobs:
         shard:
           - {name: verdicts and output, filter: 'src/Verdict src/Signal src/Analyzer src/Output', min_msi: 98}
           - {name: composer and self-update, filter: 'src/Composer src/Config src/SelfUpdate', min_msi: 96}
-          - {name: data and the rest, filter: 'src/Data src/Baseline src/Allowlist src/Graph src/Lock src/Json src/Exception src/Version.php src/Clock.php src/Deadline.php', min_msi: 96}
+          - {name: data and the rest, filter: 'src/Data src/Baseline src/Filesystem src/Allowlist src/Graph src/Lock src/Json src/Exception src/Version.php src/Clock.php src/Deadline.php', min_msi: 96}
     name: mutation (${{ matrix.shard.name }})
     steps:
       - uses: actions/checkout@v7
@@ -127,7 +127,9 @@ jobs:
         uses: actions/upload-artifact@v7
         with: {name: 'infection (${{ matrix.shard.name }})', path: build/infection.log, if-no-files-found: ignore}
   # docs/ is rendered at lockrot.dev from the newest tag by the somework/lockrot.dev repository;
-  # --strict here is the only place a broken link or a page outside the nav fails before a release.
+  # --strict here is the only place a broken link, a link to a missing anchor or a page outside the
+  # nav fails before a release. The last two are warnings only because mkdocs.yml's `validation`
+  # block makes them so; mkdocs's defaults print them as info lines, which --strict lets through.
   docs:
     runs-on: ubuntu-latest
     steps:

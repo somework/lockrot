@@ -22,10 +22,16 @@ was observed about the package. The priority says how much that applies to *your
 | `finished` | Matched the built-in or project allowlist — the package is complete by design, not neglected | allowlist match |
 | `ok` | None of the above | — |
 
-Severity order among the signal-derived verdicts, used by `--fail-on` and the baseline:
-`abandoned > silent > pinned > left-behind > old-promise > stale > unknown > ok`.
+Severity order, used by `--fail-on` and the baseline:
+`abandoned > silent > pinned > left-behind > old-promise > stale > unknown > finished = ok`.
 
-`finished` and `ok` sit equal and lowest in that ordering, and neither is ever a finding.
+`finished` and `ok` sit equal and lowest in that ordering. Like `unknown`, neither is ever
+flagged: they have priority `none`, no verdict or priority threshold reaches them, and they are
+listed only with `--all`. `--fail-on=unchecked` is the exception, because it reads S10 rather than
+the verdict: a finding carrying S10 fails the run whatever its verdict, `ok` and `unknown` included
+(an allowlisted, `finished` package never carries S10). Where lockrot lists verdicts — `counts`, `run.flagged_verdicts`, the schema enums, this page —
+`finished` comes before `ok`. The order, and the six flagged verdicts above `unknown`, are frozen for
+1.x — see [compatibility.md](compatibility.md#closed-sets-and-their-order).
 
 An allowlist match never competes in the order at all. It is checked before any signal is read and
 always wins, so an allowlisted package reports `finished` whatever its signals say — see
@@ -524,4 +530,5 @@ Three things the number is not:
 - [example-run.md](example-run.md) — a full run with every verdict in it, and the libyears block
 - [configuration.md](configuration.md) — the thresholds behind S2 and S4, and the allowlist
 - [baseline.md](baseline.md) — accepting findings you have already decided to live with
-- [ci.md](ci.md) — exit codes and the six output formats, and where each carries the exposure
+- [ci.md](ci.md) — exit codes and the seven output formats, and where each carries the exposure
+- [compatibility.md](compatibility.md) — which of these names and orders 1.0 freezes, and how a verdict may change between releases

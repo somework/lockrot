@@ -16,6 +16,8 @@ use Lockrot\Signal\Thresholds;
  * baseline comparison, and both the thresholds and the target PHP are needed to explain a package
  * at all. Bundling them keeps {@see \Lockrot\Output\Formatters::for()} to one extra argument, and
  * every one of them is optional: the install-time path holds none of it and still renders a page.
+ *
+ * @internal
  */
 final class PageData
 {

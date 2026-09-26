@@ -12,6 +12,8 @@ namespace Lockrot\Verdict;
  * less again when it is only ever installed for development. The priority orders the report, is
  * carried in every output format, and decides the exit code only when `fail-on` names a priority
  * ({@see FailOn}); the baseline stays on the verdict.
+ *
+ * @internal
  */
 final class Priority
 {

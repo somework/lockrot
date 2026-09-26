@@ -1,0 +1,122 @@
+{
+    "$schema": "https://lockrot.dev/schema/explain-1.json",
+    "lockrot": {
+        "version": "0.10.0",
+        "schema": 1
+    },
+    "package": "javibravo/simpleue",
+    "version": "2.1.0",
+    "finding": {
+        "package": "javibravo/simpleue",
+        "version": "2.1.0",
+        "verdict": "silent",
+        "priority": "critical",
+        "direct": true,
+        "dev": false,
+        "signals": [
+            {
+                "id": "S2",
+                "level": "high",
+                "summary": "last release 2017-11-15 (8.9 years ago)",
+                "data": {
+                    "last_release": "2017-11-15T13:41:13+00:00",
+                    "last_version": "2.1.0",
+                    "years": 8.9,
+                    "dated_by": null
+                }
+            },
+            {
+                "id": "S4",
+                "level": "high",
+                "summary": "last push 2017-11-18 (8.8 years ago)",
+                "data": {
+                    "last_push": "2017-11-18T18:56:40+00:00",
+                    "repo": "javibravo/simpleue",
+                    "host": "github.com",
+                    "years": 8.8
+                }
+            },
+            {
+                "id": "S5",
+                "level": "warn",
+                "summary": "released 2017-11-15, before PHP 8.4 GA (2024-11-21); php constraint \">=5.5\" has no upper bound",
+                "data": {
+                    "target_php": "8.4",
+                    "ga_date": "2024-11-21",
+                    "php_constraint": ">=5.5",
+                    "released": "2017-11-15T13:41:13+00:00"
+                }
+            }
+        ],
+        "chain": [
+            "javibravo/simpleue"
+        ],
+        "direct_dependents": [
+            "javibravo/simpleue"
+        ],
+        "evidence": "last release 2017-11-15 (8.9 years ago); last push 2017-11-18 (8.8 years ago); released 2017-11-15, before PHP 8.4 GA (2024-11-21); php constraint \">=5.5\" has no upper bound",
+        "allowlist_reason": null,
+        "note": null,
+        "data_date": "2026-09-25T00:00:00+00:00"
+    },
+    "lock": {
+        "php": ">=5.5",
+        "released": "2017-11-15T13:41:13+00:00",
+        "repository": "https://github.com/javibravo/simpleue.git",
+        "from_composer_repository": true,
+        "dev": false,
+        "branch_snapshot": false,
+        "type": "library"
+    },
+    "metadata": {
+        "abandoned": false,
+        "replacement": null,
+        "releases_listed": 7,
+        "has_stable_release": true,
+        "last_stable_release": "2017-11-15T13:41:13+00:00",
+        "last_stable_version": "2.1.0",
+        "last_stable_dated_by": null,
+        "repository": "https://github.com/javibravo/simpleue.git",
+        "type": "library",
+        "data_date": "2026-09-25T00:00:00+00:00",
+        "branches": [
+            {
+                "branch": "2.x",
+                "installed": true,
+                "highest": "2.1.0",
+                "highest_released": "2017-11-15T13:41:13+00:00",
+                "highest_commit_date": null,
+                "newest_dated": "2.1.0",
+                "newest_dated_released": "2017-11-15T13:41:13+00:00",
+                "dated_by": null
+            },
+            {
+                "branch": "1.x",
+                "installed": false,
+                "highest": "1.2.0",
+                "highest_released": "2017-08-07T19:19:23+00:00",
+                "highest_commit_date": null,
+                "newest_dated": "1.2.0",
+                "newest_dated_released": "2017-08-07T19:19:23+00:00",
+                "dated_by": null
+            }
+        ]
+    },
+    "activity": {
+        "forge": "GitHub",
+        "repository": "javibravo/simpleue",
+        "archived": false,
+        "pushed_at": "2017-11-18T18:56:40+00:00",
+        "fetched_at": "2026-09-25T00:00:00+00:00",
+        "from_cache": true
+    },
+    "thresholds": {
+        "release-warn-years": 3,
+        "release-high-years": 5,
+        "push-warn-years": 3,
+        "push-high-years": 5
+    },
+    "target_php": "8.4",
+    "generated_at": "2026-09-25T00:00:00+00:00",
+    "notes": []
+}

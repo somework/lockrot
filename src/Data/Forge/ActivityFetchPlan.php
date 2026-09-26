@@ -11,6 +11,8 @@ namespace Lockrot\Data\Forge;
  * lack of credentials were never candidates for an activity-based verdict, while budget drops are
  * candidates that the anonymous request cap could not fit. The report adds them together, but the
  * split keeps the planner honest and testable.
+ *
+ * @internal
  */
 final class ActivityFetchPlan
 {

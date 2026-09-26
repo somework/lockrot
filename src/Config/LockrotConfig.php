@@ -9,6 +9,7 @@ use Lockrot\Exception\ConfigException;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Verdict\FailOn;
 
+/** @internal */
 final class LockrotConfig
 {
     public const FAIL_ON_NONE = FailOn::NONE;
@@ -152,6 +153,13 @@ final class LockrotConfig
         if (($cli['fail-on'] ?? null) === '') {
             throw new ConfigException('--fail-on must not be empty');
         }
+        // Checked whenever it is set, not only when it wins: extra.lockrot is validated in full even
+        // where an option overrides it, and a variable a CI system carries into every run is no less
+        // a mistake on the runs where a command line happens to override it.
+        $fromEnv = $env['LOCKROT_FAIL_ON'] ?? null;
+        if (\is_string($fromEnv) && $fromEnv !== '' && !\in_array($fromEnv, FailOn::allowed(), true)) {
+            throw new ConfigException(\sprintf('LOCKROT_FAIL_ON must be one of %s; got "%s"', implode(', ', FailOn::allowed()), $fromEnv));
+        }
 
         return FailOn::fromString(self::pick([$cli['fail-on'] ?? null, $env['LOCKROT_FAIL_ON'] ?? null, $extra['fail-on'] ?? null], self::FAIL_ON_NONE))->value();
     }
@@ -163,12 +171,22 @@ final class LockrotConfig
      */
     private static function resolveTargetPhp(array $extra, array $env, array $cli, string $runtimePhp, ?string $platformPhp): string
     {
+        // Whenever it is set, like LOCKROT_FAIL_ON in resolveFailOn().
+        $fromEnv = $env['LOCKROT_TARGET_PHP'] ?? null;
+        if (\is_string($fromEnv) && $fromEnv !== '' && !self::looksLikePhpVersion($fromEnv)) {
+            throw new ConfigException('LOCKROT_TARGET_PHP must look like "8.4"; got "'.$fromEnv.'"');
+        }
         $target = self::pick([$cli['target-php'] ?? null, $env['LOCKROT_TARGET_PHP'] ?? null, $extra['target-php'] ?? null, $platformPhp], $runtimePhp);
-        if (preg_match('{^\d+(\.\d+)?}', $target) !== 1) {
+        if (!self::looksLikePhpVersion($target)) {
             throw new ConfigException('target-php must look like "8.4"; got "'.$target.'"');
         }
 
         return PhpReleaseDates::minorOf($target);
+    }
+
+    private static function looksLikePhpVersion(string $value): bool
+    {
+        return preg_match('{^\d+(\.\d+)?}', $value) === 1;
     }
 
     /**

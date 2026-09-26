@@ -13,7 +13,11 @@ use Composer\Plugin\Capability\CommandProvider as CommandProviderCapability;
 use Composer\Plugin\Capable;
 use Composer\Plugin\PluginInterface;
 
-/** The Composer plugin entry point: registers the install-time listener and the `composer lockrot` command. */
+/**
+ * The Composer plugin entry point: registers the install-time listener and the `composer lockrot` command.
+ *
+ * @internal
+ */
 final class LockrotPlugin implements PluginInterface, Capable, EventSubscriberInterface
 {
     public function activate(Composer $composer, IOInterface $io): void

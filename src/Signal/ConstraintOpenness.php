@@ -12,6 +12,8 @@ use Lockrot\Data\Php\PhpReleaseDates;
 /**
  * Decides whether a php requirement is an "open promise": it accepts the target PHP version only because
  * it has no upper bound, and was written for an older major (e.g. ">=5.3.0" accepting PHP 8.4).
+ *
+ * @internal
  */
 final class ConstraintOpenness
 {

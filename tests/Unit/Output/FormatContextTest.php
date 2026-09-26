@@ -11,9 +11,12 @@ use Lockrot\Baseline\BaselineEntry;
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Output\FormatContext;
+use Lockrot\Signal\Signal;
+use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
 use Lockrot\Version;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class FormatContextTest extends TestCase
@@ -118,6 +121,34 @@ final class FormatContextTest extends TestCase
         );
     }
 
+    /**
+     * `unchecked` reads S10, not the verdict, so a row only `--all` shows becomes an error when its
+     * check did not run — docs/compatibility.md states the mapping in this order: known first, then
+     * the threshold, then flagged.
+     */
+    public function testUnderUncheckedAnUnflaggedFindingWhoseCheckDidNotRunIsAnError(): void
+    {
+        $context = FormatContext::create(null, FailOn::UNCHECKED, Version::STRING);
+        $unchecked = new Finding('a/b', '1.0.0', Verdict::OK, [new Signal(Signal::S10, Signal::LEVEL_INFO, 'not checked')], ['a/b'], null, new \DateTimeImmutable(self::AT));
+
+        self::assertSame(FormatContext::LEVEL_ERROR, $context->levelOf($unchecked));
+        self::assertSame(FormatContext::LEVEL_WARNING, $context->levelOf($this->finding('a/c', Verdict::ABANDONED)), 'flagged without S10');
+        self::assertSame(FormatContext::LEVEL_NOTE, $context->levelOf($this->finding('a/d', Verdict::OK)));
+    }
+
+    /**
+     * The mapping's first rule wins: a finding the baseline already accepted is a note even when
+     * `--fail-on=unchecked` would otherwise make it an error for carrying S10.
+     */
+    public function testUnderUncheckedAFindingTheBaselineKnowsStaysANote(): void
+    {
+        $context = FormatContext::create(null, FailOn::UNCHECKED, Version::STRING);
+        $unchecked = new Finding('a/b', '1.0.0', Verdict::ABANDONED, [new Signal(Signal::S10, Signal::LEVEL_INFO, 'not checked')], ['a/b'], null, new \DateTimeImmutable(self::AT));
+
+        self::assertSame(FormatContext::LEVEL_ERROR, $context->levelOf($unchecked), 'without the baseline');
+        self::assertSame(FormatContext::LEVEL_NOTE, $context->levelOf($unchecked, $this->comparison([['a/b', Verdict::ABANDONED]], $this->report($unchecked))));
+    }
+
     public function testUnknownContextCarriesNothing(): void
     {
         $context = FormatContext::unknown();
@@ -126,6 +157,50 @@ final class FormatContextTest extends TestCase
         self::assertSame(LockrotConfig::FAIL_ON_NONE, $context->failOn());
         self::assertSame(Version::STRING, $context->toolVersion());
         self::assertSame(FormatContext::DEFAULT_WIDTH, $context->terminalWidth());
+    }
+
+    /**
+     * Lock path, project directory, the name, the directory the name is relative to.
+     *
+     * @return iterable<string, array{0: null|string, 1: null|string, 2: string, 3: null|string}>
+     */
+    public static function lockNames(): iterable
+    {
+        yield 'no lock at all: the name every lock has by default' => [null, '/p', 'composer.lock', null];
+        yield 'the default lock in the project directory' => ['/p/composer.lock', '/p', 'composer.lock', '/p'];
+        yield 'COMPOSER=alt.json' => ['/p/alt.lock', '/p', 'alt.lock', '/p'];
+        yield 'COMPOSER=app/alt.json: the directory stays in the name' => ['/p/app/alt.lock', '/p', 'app/alt.lock', '/p'];
+        yield 'a project directory spelled with a trailing separator' => ['/p/app/alt.lock', '/p/', 'app/alt.lock', '/p/'];
+        yield 'the filesystem root as the project directory' => ['/app/alt.lock', '/', 'app/alt.lock', '/'];
+        yield 'a drive root as the project directory' => ['C:\\app\\alt.lock', 'C:\\', 'app/alt.lock', 'C:\\'];
+        yield 'dot segments fold before the comparison' => ['/p/app/../alt.lock', '/p', 'alt.lock', '/p'];
+        yield 'Windows separators' => ['C:\\p\\app\\alt.lock', 'C:\\p', 'app/alt.lock', 'C:\\p'];
+        yield 'a lock outside the project directory: its file name, beside it' => ['/elsewhere/alt.lock', '/p', 'alt.lock', '/elsewhere'];
+        yield 'a sibling directory sharing the prefix is outside' => ['/project-b/alt.lock', '/project', 'alt.lock', '/project-b'];
+        yield 'no project directory: the file name, beside it' => ['/p/app/alt.lock', null, 'alt.lock', '/p/app'];
+    }
+
+    /**
+     * The annotation formats name the analysed lock the way the checkout does — relative to the
+     * project directory — so `COMPOSER=alt.json` annotates alt.lock and the default stays
+     * `composer.lock`.
+     *
+     * @dataProvider lockNames
+     */
+    #[DataProvider('lockNames')]
+    public function testTheLockIsNamedRelativeToTheProjectDirectory(?string $lockPath, ?string $projectDirectory, string $name, ?string $directory): void
+    {
+        $context = FormatContext::create($lockPath, LockrotConfig::FAIL_ON_NONE, Version::STRING, FormatContext::DEFAULT_WIDTH, $projectDirectory);
+
+        self::assertSame($name, $context->lockName());
+        self::assertSame($directory, $context->lockDirectory());
+        self::assertSame($lockPath, $context->lockPath(), 'the path the line index reads is untouched');
+    }
+
+    public function testTheUnknownContextNamesTheDefaultLock(): void
+    {
+        self::assertSame('composer.lock', FormatContext::unknown()->lockName());
+        self::assertNull(FormatContext::unknown()->lockDirectory());
     }
 
     public function testTheTerminalWidthDefaultsToOneHundredAndTwenty(): void

@@ -53,7 +53,9 @@ Releases from 0.5.0 on are also GPG-signed (`lockrot.phar.asc`, key `39EC C3F6 4
 FD99 AB6F 7F52 AE51 3141`) and attested by GitHub (`gh attestation verify lockrot.phar --repo
 somework/lockrot`); `phive install somework/lockrot` does the download and the signature check in
 one step. From 0.6.0 on `php lockrot.phar self-update` verifies each release's `lockrot.phar.sig.json`
-against the key built into the archive, with nothing installed on the machine.
+against the key built into the archive, with nothing installed on the machine; from 0.13.0 on it
+stays within its major version (`--allow-major` moves to the next) and passes over a release that
+needs a newer PHP than the one running it.
 
 [The PHAR, signatures, `self-update` and the global plugin install →](https://lockrot.dev/phar/)
 
@@ -141,12 +143,19 @@ carries its own value in `--format=json`, and the report's block is the arithmet
 |---|---|
 | `0` | No finding reached the `fail-on` threshold (or `fail-on=none`) |
 | `1` | A finding reached or exceeded the `fail-on` threshold |
-| `2` | Tool or configuration error |
+| `2` | Tool, configuration or usage error (an unknown option, a bad value) |
 
 A network failure is reported as a note and never fails the run on its own, unless you pass
 `--strict-network`. `--format=github` turns findings into pull-request annotations, `--format=sarif`
 uploads them to the Security tab, `--format=gitlab` into a Code Quality report and
 `--format=markdown` into a PR comment, and `--format=html` into a single-file page you can upload as a CI artifact and open.
+One run can write several of them: `--format` decides stdout, and each `--output=<format>:<path>` adds a file
+rendered from the same report:
+
+```bash
+composer lockrot --format=github --fail-on=silent --target-php=8.4 \
+  --output=sarif:lockrot.sarif --output=html:lockrot-report.html --output=json:lockrot.json
+```
 
 On GitHub Actions, [somework/lockrot-action](https://github.com/somework/lockrot-action) runs the
 verified release with annotations, a job summary and a metadata cache in one step:
@@ -167,7 +176,13 @@ Everywhere else, the PHAR or the Docker image `ghcr.io/somework/lockrot` does th
 A large project rarely starts clean. The **baseline** records the findings you have already seen and
 decided to live with, so CI fails only on what is new or has got worse, without turning `--fail-on`
 off and losing the check entirely. Commit the file: it is a statement about the project, worth
-reviewing like any other change, and the only file lockrot ever writes — on this flag alone.
+reviewing like any other change, and lockrot writes it on this flag alone.
+
+lockrot writes the files you name — reports with `--output`, the baseline with `--generate-baseline`
+— each through a temporary file beside it that is renamed over it, so it needs write access to that
+directory; its activity cache, under Composer's cache directory; and, with `self-update`, the PHAR.
+It never writes `composer.json` or `composer.lock`. An absolute path is written where it points, in
+the project or not, and a run interrupted mid-write can leave a `*.tmp` file beside the target.
 
 ```bash
 composer rot --target-php=8.4 --generate-baseline
@@ -202,9 +217,13 @@ which win over `composer.json`.
 | — | `--all` | | Show every checked package, not only flagged ones |
 | — | `--generate-baseline` | | Write this run's findings to the baseline file and exit 0 |
 | — | `--explain=vendor/package` | | One package: its verdict, every signal with its raw data, and the repository facts behind them; exit 0 |
+| — | `--output=<format>:<path>` | | Also write the report to a file, in any `--format` format; repeatable. Relative to the project directory; the directory must exist |
 
 `extra.lockrot` is validated against
-[`resources/lockrot-config.schema.json`](resources/lockrot-config.schema.json). Package metadata comes
+[`resources/lockrot-config.schema.json`](resources/lockrot-config.schema.json). A key lockrot does not
+know is not an error: it gets one line on stderr, with the known key it was probably meant to be, and
+the run carries on unchanged; `extensions` and keys starting with `x-` are reserved and stay quiet.
+Package metadata comes
 from the repositories configured in your `composer.json`, through Composer's own repository layer —
 Private Packagist, Satis and mirrors included, with its authentication, proxy settings and metadata
 cache. Repository activity comes from GitHub, GitLab and Bitbucket Cloud and is cached for 24 hours.
@@ -218,8 +237,9 @@ Everything is at [lockrot.dev](https://lockrot.dev).
 
 - [Verdicts](https://lockrot.dev/verdicts/) — the nine verdicts, the nine signals, and how priority is derived
 - [Configuration](https://lockrot.dev/configuration/) — every `extra.lockrot` key, environment variable and CLI option
-- [CI](https://lockrot.dev/ci/) — exit codes and all six output formats, with GitHub and GitLab snippets
+- [CI](https://lockrot.dev/ci/) — exit codes and all seven output formats, with GitHub and GitLab snippets
 - [Baseline](https://lockrot.dev/baseline/) — generating one, the four buckets, and how matching works
+- [Compatibility](https://lockrot.dev/compatibility/) — what 1.0 will freeze and what it will not, and how verdicts may change (draft)
 - [Install-time summary](https://lockrot.dev/install-time/) — the block Composer prints, its budgets, and the strict gate
 - [PHAR](https://lockrot.dev/phar/) — verified and signed downloads, PHIVE, `self-update`, and the global plugin install
 - [Internals](https://lockrot.dev/internals/) — the repository layer, two-pass fetching, caching and `--offline`
@@ -256,8 +276,10 @@ the lock files bundled inside PHAR tools is being evaluated.
 ## Contributing
 
 Bug reports, fixes and additions to the built-in allowlist are welcome — see
-[`CONTRIBUTING.md`](CONTRIBUTING.md). The CLI, configuration keys, output formats, baseline file and
-exit codes are the public interface; the PHP classes are not.
+[`CONTRIBUTING.md`](CONTRIBUTING.md), which also lists what the public interface is
+([Backward compatibility](CONTRIBUTING.md#backward-compatibility)); what 1.0 will freeze is drafted
+in [Compatibility](https://lockrot.dev/compatibility/). The PHP classes are not part of it: every one
+of them is marked `@internal`.
 
 ## Security
 

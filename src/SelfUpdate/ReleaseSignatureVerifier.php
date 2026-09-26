@@ -20,7 +20,13 @@ use Lockrot\Exception\ConfigException;
  * The key is the one the archive was built with, so trust starts with the first download: verify
  * that one by hand (`lockrot.phar.asc` with the GPG key, or the attestation), and every self-update
  * after it is checked against the key that download carried. A rotated key reaches an old archive
- * the same way — by updating to a release signed with both.
+ * the same way, through the transition release: signed with the old key, carrying the new one. An
+ * archive on the old key passes over the releases after it, whose description names a key it does
+ * not carry ({@see keyFingerprint()}, {@see ReleaseLocator}), installs the transition release, and
+ * from there verifies with the new key. That is for a planned rotation only: a compromised key
+ * cannot vouch for a transition release, and every archive carrying it is replaced by hand.
+ *
+ * @internal
  */
 final class ReleaseSignatureVerifier implements SignatureVerifierInterface
 {
@@ -61,6 +67,34 @@ final class ReleaseSignatureVerifier implements SignatureVerifierInterface
                 $signatureUrl
             ));
         }
+    }
+
+    /**
+     * The DER is the base64 between the armour lines, so the value is the same in the release
+     * workflow's `describe` step and in a user's archive, and needs no openssl to compute. Only a
+     * `PUBLIC KEY` block (SubjectPublicKeyInfo) is read; an `RSA PUBLIC KEY` block holds the same
+     * key in PKCS#1, whose hash is another value, and would otherwise mismatch every description in
+     * silence. The line breaks inside the block need no stripping: base64_decode() skips whitespace
+     * even in strict mode, which rejects anything else outside the alphabet.
+     *
+     * Where openssl is available the key must also load, as {@see verify()} will need it to: a
+     * damaged key would otherwise have a fingerprint no release names, and every release would be
+     * passed over as signed with another key rather than reported as the error it is. Without
+     * openssl nothing can be installed anyway — verify() refuses first — so the fingerprint alone
+     * still serves `--check`.
+     */
+    public function keyFingerprint(): string
+    {
+        $pattern = '/^\s*-----BEGIN PUBLIC KEY-----([^-]*)-----END PUBLIC KEY-----\s*$/';
+        $der = preg_match($pattern, $this->publicKeyPem, $matches) === 1 ? base64_decode($matches[1], true) : false;
+        if ($der === false || $der === '') {
+            throw new ConfigException('the public key self-update verifies releases with is not a PEM "PUBLIC KEY" block, so it has no fingerprint; download the new release by hand and verify it');
+        }
+        if (\extension_loaded('openssl') && openssl_pkey_get_public($this->publicKeyPem) === false) {
+            throw new ConfigException('the public key self-update verifies releases with cannot be loaded; download the new release by hand and verify it');
+        }
+
+        return 'sha256:'.hash('sha256', $der);
     }
 
     /**

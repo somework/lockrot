@@ -39,11 +39,40 @@ The self-update key is RSA 4096 and separate from the GPG release key, the way C
 self-update keys apart from its maintainers' keys: the archive cannot verify OpenPGP without `gpg`
 on the machine, and `openssl_verify()` is in every PHP that can download over https. The private
 half is held by the release workflow (`SELFUPDATE_PRIVATE_KEY`, `SELFUPDATE_PASSPHRASE`); the
-workflow verifies every signature it makes against the committed public key and through the
-archive's own verifier before it publishes. A rotation ships the new key inside a release signed
-with the old one — so an archive in the field updates to it — and the changelog names the new
-key's SHA-256 fingerprint; a key suspected compromised is rotated the same way, and the release it
-signed is pulled.
+workflow verifies every signature it makes before it publishes, with openssl and through the
+archive's own verifier, against the key the previous release carries (see below). Its fingerprint — the SHA-256 of the DER public key,
+`openssl pkey -pubin -in lockrot-selfupdate-key.pub -outform DER | sha256sum` — is
+`sha256:ec3ca71b1a3ced86f871b89cff7973b58454e5694136683680b72b18070a8f87`.
+
+Every release from 0.13.0 on also publishes `lockrot.phar.meta.json`, which names the fingerprint
+of the key that actually signed it, derived by the workflow from the private key it signed with.
+An archive from 0.13.0 on passes over a release signed with a key it does not carry, and that is
+how a planned rotation reaches it. The new key ships in a transition release signed with the old
+key: an archive in the field skips the releases after it, whose description names the new key,
+installs the transition release, and from there verifies with the new key. The changelog of the
+transition release names the new key's fingerprint.
+
+The release workflow verifies every self-update signature against the key the previous release
+carries (`lockrot-selfupdate-key.pub` at the previous `v*` tag) — the key every archive in the field
+will verify it with — and the description must name that key. A rotation that skips its transition
+release, replacing the key in the source tree and the secret at once, therefore fails the build. The
+transition release needs no exception: it is built with the old key still as
+`SELFUPDATE_PRIVATE_KEY`, while the source tree already carries the new one, so it passes, and the
+workflow says it is a transition release. The secret is replaced with the new key right after it,
+and the same check then holds the next release to the new key.
+
+An archive that finds newer releases only under a key it does not carry, and no release it can
+install that carries that key — the transition release missing, pulled, or needing a newer PHP — is
+stranded: `self-update` and `self-update --check` exit 2 and say so, and the archive has to be
+replaced by hand ([Reinstalling by hand](https://lockrot.dev/phar/#reinstalling-by-hand)).
+
+A transition release is for a planned rotation only. After a compromise the old key cannot vouch
+for anything, a transition release it would sign included: every release signed with it is pulled,
+and every archive that carries it — 0.13 and later just as much as 0.12 and older — has to be
+replaced by hand with a download verified with the GPG signature or the attestation below. The
+advisory and the changelog name the new key's fingerprint. Archives up to 0.12 read only the newest
+release, so after any rotation their `self-update` refuses the new release as a signature mismatch
+and leaves itself in place — replace such an archive by hand once.
 
 Every release from 0.5.0 on is also signed with the lockrot release key — `lockrot.phar.asc` next
 to the PHAR — and attested by GitHub:
@@ -68,10 +97,33 @@ the recipe.
 
 ## What lockrot does and does not do
 
-lockrot reads `composer.json` and `composer.lock` and never writes to either. The PHAR always runs
-the inspected project with `--no-plugins`, so it never executes that project's Composer plugins.
-Network access is limited to the configured Composer repositories and the GitHub API (repository
-activity checks, and release lookups for `self-update`); `GITHUB_TOKEN` and
-`LOCKROT_GITHUB_TOKEN` are read from the environment and are never written anywhere.
+lockrot reads `composer.json` and `composer.lock` and never writes to either. It writes the files
+you name — reports with `--output`, the baseline with `--generate-baseline` — each through a
+temporary file beside it, created exclusively so a file or symlink already at that name is never
+followed, and renamed over the target, so it needs write access to that directory; its
+repository-activity cache, under Composer's cache directory; and, with `self-update`, the PHAR. An
+absolute path is written where it points, in the project or not, and a run interrupted mid-write can
+leave a `*.tmp` file beside the target. An `--output` naming `composer.json`, `composer.lock` or a
+baseline — by any spelling that reaches the same file, a link included — is refused before anything
+runs. A report that replaces a file keeps that file's permission bits; its owner and ACLs are not
+carried over. The PHAR always runs the inspected project with `--no-plugins`, so it never executes
+that project's Composer plugins.
+
+Network access is limited to:
+
+- the Composer repositories the project configures, through Composer, for package metadata and
+  security advisories;
+- the GitHub, GitLab and Bitbucket APIs, for repository activity: `api.github.com`, gitlab.com and
+  every host in Composer's `gitlab-domains`, and `api.bitbucket.org` (plus `bitbucket.org`, to
+  exchange a Composer `bitbucket-oauth` consumer for a token);
+- for `self-update` only, GitHub's release API and the release's asset downloads (the archive, its
+  checksum, signature and `lockrot.phar.meta.json`, which `--check` reads too), from `github.com`
+  and the download host it redirects them to.
+
+`--offline` reaches none of them. The tokens read from the environment are
+`LOCKROT_GITHUB_TOKEN`, `GITHUB_TOKEN`, `LOCKROT_GITLAB_TOKEN` and `GITLAB_TOKEN`, as the
+[configuration reference](https://lockrot.dev/configuration/#environment-overrides) lists them;
+beside them lockrot uses the credentials Composer already holds. Each is sent only to its own host
+and is never written anywhere.
 
 lockrot does not check for known CVEs in your dependencies. For that, use `composer audit`.

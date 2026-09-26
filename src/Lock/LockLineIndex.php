@@ -27,6 +27,8 @@ use Lockrot\Exception\ConfigException;
  * The index is best-effort by design: a lock with no line breaks (minified, or one entry per line)
  * yields no lines at all rather than wrong ones, and the formatters then emit their annotations
  * without a line number.
+ *
+ * @internal
  */
 final class LockLineIndex
 {

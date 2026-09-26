@@ -8,7 +8,6 @@ use Lockrot\Analyzer\Report;
 use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Priority;
-use Symfony\Component\Console\Formatter\OutputFormatter;
 
 /**
  * The default format: a grouped, width-aware list.
@@ -18,10 +17,13 @@ use Symfony\Component\Console\Formatter\OutputFormatter;
  * hold the widest evidence string, which is not a terminal anybody has. Nothing machine-readable
  * depends on this shape; `--format=json` exists for that.
  *
- * Every string that comes from the analysed project is passed through
- * {@see OutputFormatter::escape()} before it is written, so a `<` in a constraint, a package name
- * or a note can never be read as a console tag. Styles use explicit closing tags rather than `</>`
- * because the colour table, not the shorthand, is what symfony/console 2.8 and 5.4 agree on.
+ * The result is {@see ConsoleMarkup}, which only {@see ConsoleMarkup::render()} reads — never
+ * Symfony's tag formatter. Every string that comes from the analysed project is passed through
+ * {@see ConsoleMarkup::escape()} before it is written, so a `<` or a backslash in a constraint, a
+ * package name or a note prints as written and can never be read as a tag. Styles use explicit
+ * closing tags rather than `</>`, so the markup says which style each one ends.
+ *
+ * @internal
  */
 final class TableFormatter implements FormatterInterface
 {
@@ -346,6 +348,6 @@ final class TableFormatter implements FormatterInterface
 
     private static function escape(string $text): string
     {
-        return OutputFormatter::escape($text);
+        return ConsoleMarkup::escape($text);
     }
 }

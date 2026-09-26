@@ -12,6 +12,8 @@ use Lockrot\Version;
  * The machine-readable report: Report::toArray() under a `lockrot` envelope carrying the tool
  * version and the document schema number, which only changes when a field is removed or renamed.
  * The document opens with `$schema`, the published resources/lockrot-report.schema.json ({@see Schemas}).
+ *
+ * @internal
  */
 final class JsonFormatter implements FormatterInterface
 {

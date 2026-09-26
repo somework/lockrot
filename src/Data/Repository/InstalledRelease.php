@@ -20,6 +20,8 @@ use Lockrot\Lock\LockedPackage;
  *
  * Every surface that prints or measures the installed version's date reads this one object, so the
  * same date cannot be called a release in one line and a commit in the next.
+ *
+ * @internal
  */
 final class InstalledRelease
 {

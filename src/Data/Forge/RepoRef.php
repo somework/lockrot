@@ -8,6 +8,8 @@ namespace Lockrot\Data\Forge;
  * A source repository on one of the hosts lockrot can ask about activity: which forge, which host,
  * and the repository's path there (`owner/repo` on GitHub and Bitbucket, `group/sub/project` on
  * GitLab, where subgroups nest).
+ *
+ * @internal
  */
 final class RepoRef
 {

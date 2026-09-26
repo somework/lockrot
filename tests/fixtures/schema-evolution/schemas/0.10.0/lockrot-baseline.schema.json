@@ -1,0 +1,49 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "id": "https://lockrot.dev/schema/baseline-1.json",
+    "title": "lockrot baseline",
+    "description": "The file `composer lockrot --generate-baseline` writes and later runs compare against. Objects are open: a field added later validates against this file unchanged; the number in the id changes only when a field is removed or renamed.",
+    "type": "object",
+    "required": ["lockrot", "findings"],
+    "properties": {
+        "lockrot": {
+            "type": "object",
+            "required": ["version", "schema"],
+            "properties": {
+                "version": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "schema": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 1
+                }
+            }
+        },
+        "generated_at": {
+            "type": "string",
+            "minLength": 1
+        },
+        "findings": {
+            "type": "object",
+            "additionalProperties": {
+                "type": "object",
+                "required": ["version", "verdict", "first_seen"],
+                "properties": {
+                    "version": {
+                        "type": "string"
+                    },
+                    "verdict": {
+                        "type": "string",
+                        "enum": ["abandoned", "silent", "pinned", "left-behind", "old-promise", "stale"]
+                    },
+                    "first_seen": {
+                        "type": "string",
+                        "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                    }
+                }
+            }
+        }
+    }
+}

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\E2E;
 
+use Lockrot\SelfUpdate\ReleaseKey;
+use Lockrot\Tests\Support\GitHubReleases;
 use Lockrot\Tests\Support\SigningKeys;
 use Lockrot\Tests\Support\StaticFileServer;
 use Lockrot\Version;
@@ -15,12 +17,21 @@ use Symfony\Component\Process\Process;
 #[Group('e2e')]
 final class PharTest extends TestCase
 {
-    /** The tag the release server offers under `/release`, far enough ahead to always be an update. */
-    private const OFFERED_VERSION = '99.0.0';
+    private const SIGNED_BY_RELEASE_KEY = 'release';
+    private const SIGNED_BY_OTHER_KEY = 'other';
 
     private static ?StaticFileServer $server = null;
     private static ?string $docroot = null;
     private static ?string $composerHome = null;
+
+    /**
+     * The version the release server offers under `/release`: ahead of the build and in its major
+     * version, so it is always an update the archive takes without --allow-major.
+     */
+    private static function offeredVersion(): string
+    {
+        return GitHubReleases::newerInLine(Version::STRING);
+    }
 
     private function phar(): string
     {
@@ -74,10 +85,11 @@ final class PharTest extends TestCase
     /**
      * @param list<string> $arguments
      * @param ?string      $cwd       run the PHAR from here instead of the repository root
+     * @param ?array<string, string> $env merged over the inherited environment
      */
-    private function runPhar(array $arguments, ?string $cwd = null): Process
+    private function runPhar(array $arguments, ?string $cwd = null, ?array $env = null): Process
     {
-        $process = new Process(array_merge(['php', $this->phar()], $arguments), $cwd);
+        $process = new Process(array_merge(['php', $this->phar()], $arguments), $cwd, $env);
         $process->setTimeout(300)->run();
 
         return $process;
@@ -193,6 +205,7 @@ final class PharTest extends TestCase
         self::assertSame(0, $process->getExitCode(), $process->getErrorOutput());
         self::assertStringContainsString('--check', $process->getOutput());
         self::assertStringContainsString('--force', $process->getOutput());
+        self::assertStringContainsString('--allow-major', $process->getOutput());
     }
 
     public function testTheDefaultCommandStillRunsWithoutBeingNamed(): void
@@ -201,6 +214,158 @@ final class PharTest extends TestCase
 
         self::assertSame(0, $process->getExitCode(), $process->getErrorOutput());
         self::assertIsArray(json_decode($process->getOutput(), true), $process->getErrorOutput());
+    }
+
+    /**
+     * The PHAR runs the same command on Composer's application, so the warning renders there too:
+     * one line on stderr in Composer's `<warning>` style rather than a literal tag, and stdout still
+     * the report alone.
+     */
+    public function testThePharWarnsAboutAnUnknownKeyOnStderr(): void
+    {
+        $dir = $this->freshDir();
+        file_put_contents($dir.'/composer.json', (string) json_encode([
+            'name' => 'acme/unknown-key',
+            'extra' => ['lockrot' => ['install-tme' => 'off', 'x-ci' => true, 'extensions' => ['acme/x' => ['k' => 1]]]],
+        ]));
+        file_put_contents($dir.'/composer.lock', (string) json_encode(['packages' => [], 'packages-dev' => []]));
+
+        $process = $this->runPhar(['--format=json', '--offline'], $dir);
+
+        $stderr = $process->getErrorOutput();
+        self::assertSame(0, $process->getExitCode(), $stderr);
+        self::assertIsArray(json_decode($process->getOutput(), true), $stderr);
+        self::assertSame(1, substr_count($stderr, 'lockrot: unknown key extra.lockrot.install-tme ignored (did you mean install-time?)'), $stderr);
+        self::assertSame(1, substr_count($stderr, 'extra.lockrot.'), $stderr);
+        self::assertStringNotContainsString('<warning>', $stderr);
+    }
+
+    /**
+     * The symfony/console inside the PHAR is where a key like `<<fg=red>>` broke the run: escaped by
+     * OutputFormatter::escape() and handed to the formatter, it threw `Invalid "red>" color`, exit 2
+     * with nothing on stdout. Written raw, the key prints as written — in the warning, and in the
+     * config error that quotes it when the schema rejects the config.
+     */
+    public function testAKeyThatLooksLikeMarkupPrintsAsWrittenFromThePhar(): void
+    {
+        $dir = $this->freshDir();
+        file_put_contents($dir.'/composer.lock', (string) json_encode(['packages' => [], 'packages-dev' => []]));
+        file_put_contents($dir.'/composer.json', (string) json_encode(['name' => 'acme/markup-key', 'extra' => ['lockrot' => ['<<fg=red>>' => 1, '<<href=https://example.com>>' => 1]]]));
+
+        $process = $this->runPhar(['--format=json', '--offline'], $dir);
+
+        $stderr = $process->getErrorOutput();
+        self::assertSame(0, $process->getExitCode(), $stderr);
+        self::assertIsArray(json_decode($process->getOutput(), true), $stderr);
+        self::assertSame(
+            "lockrot: unknown key extra.lockrot.<<fg=red>> ignored\nlockrot: unknown key extra.lockrot.<<href=https://example.com>> ignored\n",
+            $stderr
+        );
+
+        file_put_contents($dir.'/composer.json', (string) json_encode(['name' => 'acme/markup-key', 'extra' => ['lockrot' => ['<<fg=red>>' => 1, 'fail-on' => 'dead']]]));
+
+        $failed = $this->runPhar(['--offline'], $dir);
+
+        self::assertSame(2, $failed->getExitCode(), $failed->getErrorOutput());
+        self::assertSame('', $failed->getOutput());
+        self::assertStringStartsWith('lockrot: extra.lockrot is invalid:', $failed->getErrorOutput());
+        self::assertStringEndsWith("\n  - unknown key extra.lockrot.<<fg=red>> ignored\n", $failed->getErrorOutput());
+    }
+
+    /**
+     * The same console, handed a package name like `<<fg=red>>` in the table or `--explain`: escaped
+     * by OutputFormatter::escape(), the second `<` stayed live. lockrot renders both itself, so
+     * the name prints as written, and a `table` file carries it the same way.
+     */
+    public function testAPackageNameThatLooksLikeMarkupPrintsAsWrittenFromThePhar(): void
+    {
+        $dir = $this->freshDir();
+        $names = ['acme/<<fg=red>>', 'acme/<<href=https://example.com>>', 'acme/a\\<b'];
+        $packages = [];
+        foreach ($names as $name) {
+            $packages[] = ['name' => $name, 'version' => '1.0.0'];
+        }
+        file_put_contents($dir.'/composer.json', (string) json_encode(['name' => 'acme/markup-name', 'require' => array_fill_keys($names, '1.0.0')]));
+        file_put_contents($dir.'/composer.lock', (string) json_encode(['packages' => $packages, 'packages-dev' => []]));
+
+        $process = $this->runPhar(['--offline', '--all', '--output=table:r.txt'], $dir);
+
+        self::assertSame(0, $process->getExitCode(), $process->getErrorOutput());
+        foreach ($names as $name) {
+            self::assertStringContainsString('  unknown      '.$name.' 1.0.0  direct', $process->getOutput());
+            self::assertStringContainsString('  unknown      '.$name.' 1.0.0  direct', (string) file_get_contents($dir.'/r.txt'));
+        }
+
+        $explained = $this->runPhar(['--offline', '--explain=acme/<<fg=red>>'], $dir);
+
+        self::assertSame(0, $explained->getExitCode(), $explained->getErrorOutput());
+        self::assertStringStartsWith('acme/<<fg=red>> 1.0.0 — unknown', $explained->getOutput());
+    }
+
+    /**
+     * `-d` makes the project directory the working directory before lockrot runs, so a relative
+     * `--output` path lands in the project, not in the directory the PHAR was started from — the
+     * same base a relative `--baseline` has. The table file carries no console markup.
+     */
+    public function testOutputPathsAreRelativeToTheDirectoryDashDNames(): void
+    {
+        $this->phar();
+        $project = $this->freshDir();
+        $fixture = \dirname(__DIR__).'/fixtures/skeletons/laravel';
+        copy($fixture.'/composer.json', $project.'/composer.json');
+        copy($fixture.'/composer.lock', $project.'/composer.lock');
+        $elsewhere = $this->freshDir();
+
+        $process = $this->runPhar(['-d', $project, '--format=json', '--target-php=8.4', '--offline', '--output=markdown:summary.md', '--output=table:report.txt'], $elsewhere);
+
+        self::assertSame(0, $process->getExitCode(), $process->getErrorOutput());
+        self::assertIsArray(json_decode($process->getOutput(), true), 'stdout is still the --format document');
+        self::assertStringContainsString("lockrot: markdown report written to summary.md\nlockrot: table report written to report.txt\n", $process->getErrorOutput());
+        self::assertStringStartsWith('### lockrot: ', (string) file_get_contents($project.'/summary.md'));
+        $table = (string) file_get_contents($project.'/report.txt');
+        self::assertMatchesRegularExpression('/\d+ packages checked/', $table);
+        self::assertStringNotContainsString('<fg=', $table);
+        self::assertStringNotContainsString('<options=', $table);
+        self::assertStringNotContainsString("\e[", $table);
+        self::assertSame([], array_values(array_diff((array) scandir($elsewhere), ['.', '..'])), 'nothing lands where the PHAR was started');
+    }
+
+    /**
+     * A command line the PHAR's own commands cannot read is exit 2 and one `lockrot:` line, whether
+     * the command is named or left to the default. An unknown command name is not lockrot's to
+     * answer: that stays Symfony's exit 1 ({@see testAProjectScriptIsNotAReachableCommand()}).
+     */
+    public function testAnUnreadableCommandLineIsExitTwoWithOneLockrotLine(): void
+    {
+        $laravel = \dirname(__DIR__).'/fixtures/skeletons/laravel';
+        foreach ([['--nope'], ['lockrot', '--format'], ['self-update', '--check=yes']] as $arguments) {
+            $process = $this->runPhar(array_merge(['-d', $laravel], $arguments));
+            $label = implode(' ', $arguments);
+
+            self::assertSame(2, $process->getExitCode(), $label."\n".$process->getErrorOutput());
+            self::assertSame('', $process->getOutput(), $label);
+            self::assertMatchesRegularExpression('/^lockrot: The "--[a-z]+" option [^\n]+$/m', $process->getErrorOutput(), $label);
+        }
+    }
+
+    /**
+     * The PHAR points COMPOSER at the null device while Composer's preamble runs (see bin/lockrot)
+     * and puts the caller's value back before the command: `COMPOSER=alt.json` has to reach the
+     * command, which then reads alt.json and alt.lock as Composer would.
+     */
+    public function testComposerTheEnvironmentVariableReachesTheCommand(): void
+    {
+        $dir = $this->freshDir();
+        file_put_contents($dir.'/alt.json', '{}');
+        copy(\dirname(__DIR__).'/fixtures/skeletons/laravel/composer.lock', $dir.'/alt.lock');
+
+        $process = $this->runPhar(['--format=json', '--offline', '--target-php=8.4'], $dir, ['COMPOSER' => 'alt.json']);
+
+        self::assertSame(0, $process->getExitCode(), $process->getErrorOutput());
+        $json = json_decode($process->getOutput(), true);
+        self::assertIsArray($json, $process->getErrorOutput());
+        self::assertIsArray($json['run']);
+        self::assertSame('alt.lock', $json['run']['lock_file']);
     }
 
     /**
@@ -222,7 +387,7 @@ final class PharTest extends TestCase
 
         self::assertSame('', $process->getOutput(), 'self-update writes nothing to stdout');
         self::assertSame(
-            'lockrot updated from '.Version::STRING.' to '.self::OFFERED_VERSION."\n",
+            'lockrot updated from '.Version::STRING.' to '.self::offeredVersion()."\n",
             self::reported($process),
             'the update must report one line and nothing else'
         );
@@ -260,6 +425,10 @@ final class PharTest extends TestCase
      * The built archive enforcing its own signature check end to end: a release whose `.sig.json` is by
      * a key the archive does not trust is reported on one line, exits 2, and leaves the running
      * archive — bytes and permissions — and its directory exactly as they were.
+     *
+     * The channel's description claims the key the archive trusts, which is what a doctored
+     * `lockrot.phar.meta.json` would do: the description only chooses what is tried, and the
+     * signature still decides.
      */
     public function testSelfUpdateRefusesAReleaseSignedWithAnotherKey(): void
     {
@@ -272,7 +441,10 @@ final class PharTest extends TestCase
         self::assertSame('', $process->getOutput());
         self::assertSame(2, $process->getExitCode(), $process->getErrorOutput());
         $reported = self::reported($process);
-        self::assertStringContainsString('lockrot: the signature in '.self::server()->url().'/forged/lockrot.phar.sig.json does not match', $reported);
+        self::assertStringContainsString(
+            'lockrot: the signature in '.self::server()->url().'/forged/v'.self::offeredVersion().'/lockrot.phar.sig.json does not match',
+            $reported
+        );
         self::assertStringEndsWith("nothing was written\n", $reported);
         self::assertSame(1, substr_count($reported, "\n"), 'one line and nothing else');
         self::assertSame($before, hash_file('sha256', $target), 'the running archive must be untouched');
@@ -281,21 +453,94 @@ final class PharTest extends TestCase
 
     /**
      * Without the seam, the archive verifies with the key built into it — which proves that key
-     * is packed and loads: a release signed with the test key is then "does not match", never "the
-     * key cannot be loaded". A box.json that stopped packing ReleaseKey.php would fail here.
+     * is packed and loads twice over. Its fingerprint matches the one the channel's description
+     * names, so the release is tried rather than passed over; and the release, signed with the test
+     * key, is then "does not match", never "the key cannot be loaded". A box.json that stopped
+     * packing ReleaseKey.php would fail here.
      */
     public function testWithoutTheSeamTheBuiltInKeyIsWhatTheArchiveVerifiesWith(): void
     {
         $directory = $this->freshDir();
         $target = $this->installedCopy($directory);
 
-        $process = $this->runSelfUpdate($target, 'release', [], false);
+        $process = $this->runSelfUpdate($target, 'builtin', [], false);
 
         self::assertSame(2, $process->getExitCode(), $process->getErrorOutput());
         $reported = self::reported($process);
         self::assertStringContainsString('does not match the downloaded archive', $reported);
         self::assertStringNotContainsString('cannot be loaded', $reported);
+        self::assertStringNotContainsString('does not carry', $reported, 'the built-in fingerprint must match the description');
         self::assertSame(hash_file('sha256', $this->phar()), hash_file('sha256', $target));
+    }
+
+    /**
+     * A new major version is not installed without --allow-major: the archive says so on one line,
+     * says it is up to date on the next, exits 0 and stays exactly as it was.
+     */
+    public function testTheBuiltArchiveHoldsBackANewMajor(): void
+    {
+        $directory = $this->freshDir();
+        $target = $this->installedCopy($directory);
+
+        $process = $this->runSelfUpdate($target, 'major');
+
+        self::assertSame(0, $process->getExitCode(), $process->getErrorOutput());
+        self::assertSame(
+            'lockrot '.GitHubReleases::nextMajor(Version::STRING).' is in the next major version; run lockrot.phar self-update --allow-major to move to it'."\n"
+            .'lockrot '.Version::STRING." is up to date\n",
+            self::reported($process)
+        );
+        self::assertSame(hash_file('sha256', $this->phar()), hash_file('sha256', $target));
+    }
+
+    /**
+     * A key rotation, with the test keys standing in: the newest release is signed with a key the
+     * archive does not carry, the one before it — the transition release — with the key it does. The
+     * archive passes over the first, names it, and installs the second.
+     */
+    public function testTheBuiltArchiveStepsThroughATransitionRelease(): void
+    {
+        $directory = $this->freshDir();
+        $target = $this->installedCopy($directory);
+
+        $process = $this->runSelfUpdate($target, 'rotated');
+
+        self::assertSame(0, $process->getExitCode(), $process->getErrorOutput());
+        self::assertSame(
+            'lockrot '.self::offeredVersion().' is signed with a self-update key this lockrot.phar does not carry ('
+            .GitHubReleases::fingerprint(SigningKeys::otherPublicPem()).'); only a release that carries that key can update to it'."\n"
+            .'lockrot updated from '.Version::STRING.' to '.self::transitionVersion()."\n",
+            self::reported($process)
+        );
+        self::assertSame(hash_file('sha256', self::minimalPhar()), hash_file('sha256', $target));
+    }
+
+    /**
+     * The same rotation with its transition release missing: the archive names the release it
+     * cannot verify, then says it is stranded and has to be reinstalled by hand — exit 2, for
+     * `--check` too, and the running archive untouched.
+     */
+    public function testTheBuiltArchiveSaysWhenARotationStrandsIt(): void
+    {
+        $directory = $this->freshDir();
+        $target = $this->installedCopy($directory);
+        $expected = 'lockrot '.self::offeredVersion().' is signed with a self-update key this lockrot.phar does not carry ('
+            .GitHubReleases::fingerprint(SigningKeys::otherPublicPem()).'); only a release that carries that key can update to it'."\n"
+            .'lockrot: the newer releases are signed with a self-update key this lockrot.phar does not carry, and no release it can install carries that key; download lockrot.phar again by hand and verify it (see https://lockrot.dev/phar/#reinstalling-by-hand)'."\n";
+
+        foreach ([[], ['--check']] as $options) {
+            $process = $this->runSelfUpdate($target, 'stranded', $options);
+
+            self::assertSame(2, $process->getExitCode(), $process->getErrorOutput());
+            self::assertSame($expected, self::reported($process));
+        }
+        self::assertSame(hash_file('sha256', $this->phar()), hash_file('sha256', $target));
+    }
+
+    /** The transition release of the `rotated` channel: in the line, just below the offered one. */
+    private static function transitionVersion(): string
+    {
+        return ((int) Version::STRING).'.998.0';
     }
 
     /**
@@ -321,7 +566,7 @@ final class PharTest extends TestCase
     private function runSelfUpdate(string $target, string $channel, array $options = [], bool $testKey = true): Process
     {
         $environment = [
-            'LOCKROT_RELEASE_URL' => self::server()->url().'/'.$channel.'/latest.json',
+            'LOCKROT_RELEASE_URL' => self::server()->url().'/'.$channel.'/releases.json',
             // The release server is plain http on 127.0.0.1, which Composer's HttpDownloader
             // refuses under its default secure-http. Relaxing it in a throwaway COMPOSER_HOME
             // keeps that to the test process; nothing in lockrot itself lowers the bar.
@@ -367,8 +612,9 @@ final class PharTest extends TestCase
 
     /**
      * One server for the whole class, started on first use so a run without a built PHAR skips
-     * without ever binding a port. It offers two channels: `/release`, whose `lockrot.phar` is the
-     * small fixture archive, and `/same`, whose `lockrot.phar` is the built PHAR itself.
+     * without ever binding a port. Each channel is a release list of its own: `/release` offers the
+     * small fixture archive as an update, `/same` the built PHAR itself at its own version, and the
+     * rest one case each of what the archive must refuse or pass over.
      */
     private static function server(): StaticFileServer
     {
@@ -381,9 +627,29 @@ final class PharTest extends TestCase
         }
         self::$docroot = $docroot;
         $server = StaticFileServer::serving($docroot);
-        self::publishChannel($docroot, $server->url(), 'release', self::minimalPhar(), self::OFFERED_VERSION);
-        self::publishChannel($docroot, $server->url(), 'same', \dirname(__DIR__, 2).'/build/lockrot.phar', Version::STRING);
-        self::publishChannel($docroot, $server->url(), 'forged', self::minimalPhar(), self::OFFERED_VERSION, false);
+        $releaseKey = GitHubReleases::fingerprint(SigningKeys::releasePublicPem());
+        $otherKey = GitHubReleases::fingerprint(SigningKeys::otherPublicPem());
+        $built = \dirname(__DIR__, 2).'/build/lockrot.phar';
+        $minimal = self::minimalPhar();
+        $channels = [
+            'release' => [[$minimal, self::offeredVersion(), self::SIGNED_BY_RELEASE_KEY, $releaseKey]],
+            'same' => [[$built, Version::STRING, self::SIGNED_BY_RELEASE_KEY, $releaseKey]],
+            // A substituted release whose description lies about its key: it claims the one the
+            // archive trusts, so the signature check is what refuses it.
+            'forged' => [[$minimal, self::offeredVersion(), self::SIGNED_BY_OTHER_KEY, $releaseKey]],
+            // Signed with the test key, described as signed with the key built into the archive,
+            // for the one test that runs without the key seam.
+            'builtin' => [[$minimal, self::offeredVersion(), self::SIGNED_BY_RELEASE_KEY, GitHubReleases::fingerprint(ReleaseKey::PEM)]],
+            'major' => [[$minimal, GitHubReleases::nextMajor(Version::STRING), self::SIGNED_BY_RELEASE_KEY, $releaseKey]],
+            'rotated' => [
+                [$minimal, self::offeredVersion(), self::SIGNED_BY_OTHER_KEY, $otherKey],
+                [$minimal, self::transitionVersion(), self::SIGNED_BY_RELEASE_KEY, $releaseKey],
+            ],
+            'stranded' => [[$minimal, self::offeredVersion(), self::SIGNED_BY_OTHER_KEY, $otherKey]],
+        ];
+        foreach ($channels as $channel => $releases) {
+            self::publishChannel($docroot, $server->url(), $channel, $releases);
+        }
         $server->start();
         self::$server = $server;
 
@@ -391,40 +657,37 @@ final class PharTest extends TestCase
     }
 
     /**
-     * Writes one channel: the archive, its `sha256sum` file, its signature and a `releases/latest`-shaped
-     * document. The signature is by the test release key, or — for the channel that stands in for a
-     * substituted release — by a key of the same shape that is not it.
+     * Writes one channel: for each release, the archive, its `sha256sum` file, its signature and its
+     * `lockrot.phar.meta.json` under `<channel>/v<version>/`, and the release list naming them all
+     * as `<channel>/releases.json`. A signature is by the test release key, or — for a channel that
+     * stands in for a substituted or rotated release — by a key of the same shape that is not it; the
+     * description names whichever key the channel says, which need not be the signer.
+     *
+     * @param list<array{0: string, 1: string, 2: string, 3: string}> $releases archive, version, signer, described key
      */
-    private static function publishChannel(string $docroot, string $url, string $channel, string $archive, string $version, bool $signedByReleaseKey = true): void
+    private static function publishChannel(string $docroot, string $url, string $channel, array $releases): void
     {
-        $directory = $docroot.'/'.$channel;
-        if (!mkdir($directory, 0755, true) && !is_dir($directory)) {
-            throw new \RuntimeException('cannot create temp dir: '.$directory);
+        $entries = [];
+        foreach ($releases as [$archive, $version, $signer, $describedKey]) {
+            $tag = 'v'.$version;
+            $directory = $docroot.'/'.$channel.'/'.$tag;
+            if (!mkdir($directory, 0755, true) && !is_dir($directory)) {
+                throw new \RuntimeException('cannot create temp dir: '.$directory);
+            }
+            if (!copy($archive, $directory.'/lockrot.phar')) {
+                throw new \RuntimeException('cannot publish '.$archive);
+            }
+            $hash = hash_file('sha256', $archive);
+            file_put_contents($directory.'/lockrot.phar.sha256', $hash.'  lockrot.phar'."\n");
+            $bytes = (string) file_get_contents($archive);
+            file_put_contents(
+                $directory.'/lockrot.phar.sig.json',
+                $signer === self::SIGNED_BY_RELEASE_KEY ? SigningKeys::releaseSignatureFile($bytes) : SigningKeys::otherSignatureFile($bytes)
+            );
+            file_put_contents($directory.'/lockrot.phar.meta.json', GitHubReleases::meta('7.4.0', $describedKey));
+            $entries[] = GitHubReleases::entry($tag, GitHubReleases::ASSETS, false, false, $url.'/'.$channel.'/');
         }
-        if (!copy($archive, $directory.'/lockrot.phar')) {
-            throw new \RuntimeException('cannot publish '.$archive);
-        }
-        $hash = hash_file('sha256', $archive);
-        file_put_contents($directory.'/lockrot.phar.sha256', $hash.'  lockrot.phar'."\n");
-        $bytes = (string) file_get_contents($archive);
-        file_put_contents(
-            $directory.'/lockrot.phar.sig.json',
-            $signedByReleaseKey ? SigningKeys::releaseSignatureFile($bytes) : SigningKeys::otherSignatureFile($bytes)
-        );
-
-        $base = $url.'/'.$channel.'/';
-        $latest = json_encode([
-            'tag_name' => 'v'.$version,
-            'assets' => [
-                ['name' => 'lockrot.phar', 'browser_download_url' => $base.'lockrot.phar'],
-                ['name' => 'lockrot.phar.sha256', 'browser_download_url' => $base.'lockrot.phar.sha256'],
-                ['name' => 'lockrot.phar.sig.json', 'browser_download_url' => $base.'lockrot.phar.sig.json'],
-            ],
-        ]);
-        if ($latest === false) {
-            throw new \RuntimeException('cannot encode the release document for '.$channel);
-        }
-        file_put_contents($directory.'/latest.json', $latest);
+        file_put_contents($docroot.'/'.$channel.'/releases.json', GitHubReleases::listJson($entries));
     }
 
     private static function composerHome(): string

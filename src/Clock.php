@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot;
 
+/** @internal */
 final class Clock
 {
     /** The year every "years ago" and every libyear is counted in: 365.25 days. */

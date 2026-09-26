@@ -44,7 +44,11 @@ subdirectory. The same repository publishes `ghcr.io/somework/lockrot`, a signed
 |---|---|
 | `0` | No finding reached the `fail-on` threshold (or `fail-on=none`) |
 | `1` | A finding reached or exceeded the `fail-on` threshold, or carried an unrun check under `--fail-on=unchecked` |
-| `2` | Tool or configuration error (unparsable `composer.json`/`composer.lock`, invalid config value, unreadable or unwritable [baseline](baseline.md)) |
+| `2` | Tool, configuration or usage error: unparsable `composer.json`/`composer.lock`, invalid config value, unreadable or unwritable [baseline](baseline.md); an `--output` that names `composer.json`, `composer.lock` or the baseline, an unknown format, an empty or repeated path, a directory that does not exist, or a file that cannot be written; a command line lockrot cannot read — an unknown option, an option missing its value, a value given to a flag, an argument too many |
+
+A `2` writes nothing to stdout, except an `--output` file that cannot be written: that one is found after stdout has
+the report. stderr says what went wrong, starting `lockrot:` for a configuration or usage error and `lockrot failed:`
+for anything else.
 
 `composer audit` follows the same convention: exit `1` when it finds a security advisory or, with Composer's default
 `audit.abandoned=fail`, an abandoned package; exit `0` when it finds nothing. lockrot reads the same advisories
@@ -58,14 +62,72 @@ metadata: it is reported as a failure, not silently skipped. A `composer.lock` e
 load (missing `name`/`version`, an unnormalizable version, a malformed entry) stops the report with exit `2` rather
 than being skipped.
 
-As a Composer plugin, a `composer.json` that Composer itself cannot parse never reaches lockrot at all: Composer parses
-the project's manifest while collecting plugin commands, before any plugin class is loaded, so it stops with its own
-exit `1` first. `composer lockrot` on an unparsable `composer.json` exits `1`, not `2`. The standalone PHAR reads and
-validates `composer.json` itself, so the same failure there is exit `2`. `lockrot.phar self-update` uses the same three
-codes with its own meanings; see [phar.md](phar.md).
+Every usage or configuration error lockrot's own commands see — an unknown option, a missing or invalid value, an
+`extra.lockrot` the schema rejects — is exit `2`. Exit `1` can also come from Composer or Symfony, before lockrot runs:
+an unknown command (a typo such as `composer lokrot` or `lockrot.phar nope`, or a PHAR option whose value is separated
+by a space ahead of the command name, which Symfony reads as a command), or an error Composer raises itself. As a Composer plugin, a
+`composer.json` that Composer itself cannot parse, or that fails Composer's own schema, never reaches lockrot at all:
+Composer parses the project's manifest while collecting plugin commands, before any plugin class is loaded, so it
+stops with its own exit `1` first. The standalone PHAR reads and validates `composer.json` itself, so the same failure
+there is exit `2`. To tell the two `1`s apart: a `1` from lockrot comes with a report (under `--generate-baseline`,
+with a `lockrot: baseline written` line), while one from before lockrot runs comes with neither, and with Composer's
+error box or Symfony's message rather than a `lockrot:` line. `lockrot.phar
+self-update` uses the same three codes with its own meanings; see [phar.md](phar.md#self-update-exit-codes).
+
+Like Composer, lockrot reads the manifest the `COMPOSER` environment variable names: `COMPOSER=alt.json composer
+lockrot` reads `alt.json` and `alt.lock`, the default baseline sits next to `alt.json`, and the `github`, `sarif` and
+`gitlab` formats below point at `alt.lock`.
+
+With `LOCKROT_DISABLE=1` the analysis skips all of this: it reads nothing — not the command line, `composer.json`,
+`extra.lockrot` or the lock — prints `lockrot disabled via LOCKROT_DISABLE` on stderr and exits `0`. It does not
+disable `lockrot.phar self-update`.
 
 The [install-time summary](install-time.md) never sets an exit code unless `install-time-strict` is on. The exit code
 is identical for every output format below; only the output changes.
+
+## Several reports from one run
+
+`--format` decides what goes to stdout; `--output=<format>:<path>`, repeatable, writes more formats to files from the
+same run. The analysis runs once, so every file carries the same report — the same clock, the same findings, the same
+notes — where two runs could disagree on all three: a second run is a second round of requests, and offline it has its
+own notes and its own reasons for what it could not check. Annotations on stdout, and SARIF, a page and the JSON
+document as files:
+
+```yaml
+permissions:
+  contents: read
+  security-events: write
+
+steps:
+  - uses: actions/checkout@v7
+  - name: lockrot
+    run: >-
+      composer lockrot --format=github --fail-on=silent --target-php=8.4
+      --output=sarif:lockrot.sarif --output=html:lockrot-report.html --output=json:lockrot.json
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  - name: Upload SARIF
+    if: always()
+    uses: github/codeql-action/upload-sarif@v4
+    with:
+      sarif_file: lockrot.sarif
+  - name: Upload the page and the JSON
+    if: always()
+    uses: actions/upload-artifact@v4
+    with:
+      name: lockrot-report
+      path: |
+        lockrot-report.html
+        lockrot.json
+```
+
+Each file is byte for byte what its `--format` prints; a `table` file has no colours and is wrapped at 120 columns.
+Each one is written atomically after stdout, and named on stderr (`lockrot: sarif report written to lockrot.sarif`).
+A relative path is relative to the project directory (`-d` sets it), and the directory must exist: lockrot creates
+none. A path naming `composer.json`, `composer.lock` or the [baseline](baseline.md) is refused before the analysis
+starts (exit `2`); otherwise the exit code is the one `--fail-on` decides, with or without `--output`. The
+`> lockrot.sarif` redirections below still work; `--output` is for when one run should feed several consumers. Every
+rule is in [configuration.md](configuration.md#writing-reports-to-files).
 
 ## `--format=github`
 
@@ -124,14 +186,17 @@ steps:
 [priority](verdicts.md) as `rank`, the field SARIF 2.1.0 defines for it, and the same result's `properties` carry,
 among others, `priority`, `direct`, `dev`, `chain` and `direct_dependents` — every direct requirement the package is
 reachable from, see [transitive exposure](verdicts.md#transitive-exposure). The rule a result points at follows the
-verdict; its `level` follows `--fail-on`, whichever kind of threshold it names. Both `github` and `sarif` point at `composer.lock` in the checkout root, so run them from
-the directory that holds the lock file.
+verdict; its `level` follows `--fail-on`, whichever kind of threshold it names.
+
+`github`, `sarif` and `gitlab` name the lock the run analysed by its path relative to the project directory:
+`composer.lock`, `alt.lock` under `COMPOSER=alt.json`, `app/alt.lock` under `COMPOSER=app/alt.json`. GitHub and
+GitLab resolve that path against the checkout root, so run them from the checkout root (or pass `-d` to it). A lock
+outside the project directory is named by its file name alone.
 
 ## `--format=gitlab`
 
-A [GitLab Code Quality](https://docs.gitlab.com/ci/testing/code_quality/#implement-a-custom-tool) report: a JSON array
-with one issue per flagged finding (every finding with `--all`), so a merge request shows them inline in the diff of
-`composer.lock`. Publish it as a `codequality` artifact:
+A [GitLab Code Quality](https://docs.gitlab.com/ci/testing/code_quality/#code-quality-report-format) report: a JSON array
+with one issue per flagged finding (every finding with `--all`). Publish it as a `codequality` artifact:
 
 ```yaml
 lockrot:
@@ -141,6 +206,15 @@ lockrot:
     reports:
       codequality: lockrot-codequality.json
 ```
+
+Where the findings appear depends on your GitLab tier ([features per
+tier](https://docs.gitlab.com/ci/testing/code_quality/#features-per-tier)):
+
+- Every tier shows, in the merge request, the findings that are new or fixed compared with the target
+  branch's report, so a merge request that changes no verdict shows none.
+- Premium's pipeline **Code Quality** tab lists them all.
+- Ultimate also marks new findings on the lines of `composer.lock` in the merge request's **Changes**
+  view, when the merge request changes `composer.lock`.
 
 Code Quality has no title field of its own, so each issue's description opens with the package, the version and the
 same `<verdict> (<priority>)` phrase the GitHub annotation title uses:
@@ -238,12 +312,19 @@ query understands `verdict:`, `priority:`, `signal:`, `severity:`, `cve:`, `dire
 
 The page carries the run as JSON, and that payload's `report` key is the document `--format=json`
 writes, [schema](schema.md), envelope and every field — the page's copy is compact where the
-formatter pretty-prints, and identical once parsed:
+formatter pretty-prints, and identical once parsed. To have both from one run, ask for both:
 
 ```bash
-composer lockrot --format=html > lockrot-report.html
+composer lockrot --format=html --output=json:lockrot.json > lockrot-report.html
+```
+
+If all you have is the page, the document can be cut out of it. This relies on the page keeping its
+`<script id="lockrot-data">` element on one line, which is how lockrot writes it today but not a
+promise, so let the pipeline fail when nothing matched rather than write an empty file:
+
+```bash
 sed -n 's/.*<script id="lockrot-data" type="application\/json">\(.*\)<\/script>.*/\1/p' lockrot-report.html \
-  | jq .report > lockrot.json
+  | jq -e .report > lockrot.json
 ```
 
 Nothing in the page is fetched — no fonts, no CDN, no analytics — so it renders the same offline and

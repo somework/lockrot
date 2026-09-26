@@ -23,7 +23,11 @@ It writes `lockrot-baseline.json` next to `composer.json`, prints one line on st
 `0` whatever `--fail-on` says — the run records findings, it does not judge them.
 
 **Commit the file.** It is a statement about the project, and it is worth reviewing in a pull request
-like any other change. It is also the only file lockrot ever writes, and only on this explicit flag.
+like any other change. lockrot writes it only on this explicit flag, as it writes reports only where
+[`--output`](configuration.md#writing-reports-to-files) names them; `composer.json` and `composer.lock`
+never. With `--output` on the same run the reports are written first and the baseline last, so a report
+that cannot be written (exit `2`) leaves the baseline as it was; the reports carry no baseline
+comparison, since the baseline is what the run is writing.
 
 `--strict-network` is the one exception to that exit `0`: if a configured repository or a repository host could
 not be reached, the run still exits `1` after writing the file. A baseline generated from metadata
@@ -33,7 +37,7 @@ that never arrived would accept findings lockrot was not actually able to check.
 {
     "$schema": "https://lockrot.dev/schema/baseline-1.json",
     "lockrot": {
-        "version": "0.12.0",
+        "version": "0.13.0",
         "schema": 1
     },
     "generated_at": "2026-09-14T00:00:00+00:00",
@@ -90,7 +94,8 @@ findings, so a `--dev` run reports every one of them as new and fails.
 
 A baseline lockrot cannot read is a configuration error, not an absent baseline: a malformed or
 schema-invalid file, or a `--baseline`/`extra.lockrot.baseline` path that does not exist, exits `2`
-rather than silently running ungated. The default path simply not existing is not an error — that is
+rather than silently running ungated. The message names what is wrong and where — a field of the
+wrong type, or a key starting with a NUL byte, which lockrot cannot read. The default path simply not existing is not an error — that is
 every project before its first `--generate-baseline`. To start over from a file that has been
 damaged, delete it and generate a new one.
 

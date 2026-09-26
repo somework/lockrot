@@ -40,6 +40,8 @@ use Lockrot\Signal\Thresholds;
  * >=8.1) is the proof, 2.x (php >=7.2, released last month) is the branch to require. When no
  * releasing branch is within reach the signal says so and suggests nothing: the way forward is a
  * PHP upgrade, which is not a `composer.json` line.
+ *
+ * @internal
  */
 final class LeftBehindRule implements SignalRule
 {

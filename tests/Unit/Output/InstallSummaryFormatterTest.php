@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Output;
 
 use Lockrot\Analyzer\Report;
+use Lockrot\Output\ConsoleMarkup;
 use Lockrot\Output\InstallSummaryFormatter;
 use Lockrot\Signal\Signal;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class InstallSummaryFormatterTest extends TestCase
@@ -185,6 +187,67 @@ final class InstallSummaryFormatterTest extends TestCase
         $lines = (new InstallSummaryFormatter())->format($report);
         self::assertSame('  <comment>abandoned   </comment>vendor/b 2.0.0: marked abandoned by its repository (via vendor/a)', $lines[1]);
         self::assertSame('  <comment>stale       </comment>vendor/a 1.0.0: last release 2022-05-20 (4.3 years ago)', $lines[2]);
+    }
+
+    /**
+     * The package, its version, the evidence, the chain and the notes are the lock's and the
+     * repository's text. Rendered by {@see ConsoleMarkup}, which is how the block is written, each
+     * prints as written, with only lockrot's own `warning` and `comment` styles, each closed on its
+     * own line. The block used to reach Composer's formatter unescaped.
+     *
+     * @dataProvider textsThatLookLikeMarkup
+     */
+    #[DataProvider('textsThatLookLikeMarkup')]
+    public function testTextThatLooksLikeMarkupPrintsAsWrittenAndLeavesNoStyleBehind(string $text): void
+    {
+        $report = $this->report(
+            [$this->finding('vendor/'.$text, $text, Verdict::ABANDONED, 'marked abandoned: '.$text, ['vendor/'.$text.'-parent', 'vendor/'.$text.'-middle', 'vendor/'.$text])],
+            ['note: '.$text],
+            2
+        );
+
+        $lines = (new InstallSummaryFormatter())->format($report);
+        $plain = array_map(static fn (string $line): string => ConsoleMarkup::render($line, false), $lines);
+        $decorated = array_map(static fn (string $line): string => ConsoleMarkup::render($line, true), $lines);
+
+        self::assertSame([
+            'lockrot: dependency rot in 1 of 2 changed packages',
+            '  abandoned   vendor/'.$text.' '.$text.': marked abandoned: '.$text.' (via vendor/'.$text.'-parent > vendor/'.$text.'-middle)',
+            '  note: note: '.$text,
+            'Run composer lockrot for details.',
+        ], $plain);
+        self::assertSame("\033[30;43mlockrot: dependency rot in 1 of 2 changed packages\033[39;49m", $decorated[0]);
+        self::assertSame("  \033[33mabandoned   \033[39m".substr($plain[1], 14), $decorated[1]);
+        self::assertSame(\array_slice($plain, 2), \array_slice($decorated, 2));
+    }
+
+    /**
+     * Written raw, the block no longer passes through Composer's sanitising, so what a terminal
+     * would obey — an escape sequence in a version, a line break in the evidence — is shown as an
+     * escape instead of acted on.
+     */
+    public function testControlCharactersInTheProjectsTextAreShownRatherThanObeyed(): void
+    {
+        $report = $this->report([$this->finding("vendor/a\033[2J", "1.0\r", Verdict::SILENT, "last release\nlong ago")], ["a note\x07"], 1);
+
+        $lines = array_map(static fn (string $line): string => ConsoleMarkup::render($line, false), (new InstallSummaryFormatter())->format($report));
+
+        self::assertSame([
+            'lockrot: dependency rot in 1 of 1 changed package',
+            '  silent      vendor/a\\x1B[2J 1.0\\r: last release\\nlong ago',
+            '  note: a note\\x07',
+            'Run composer lockrot for details.',
+        ], $lines);
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function textsThatLookLikeMarkup(): iterable
+    {
+        yield 'a style tag' => ['<<fg=red>>'];
+        yield 'a link tag' => ['<<href=x>>'];
+        yield 'an escaped tag' => ['a\\<b'];
+        yield 'a trailing backslash' => ['a\\'];
+        yield 'a long run of <b' => [str_repeat('<b', 4000)];
     }
 
     /** Header and footer take two of the lines; with no notes, exactly eight findings fit and none is counted away. */

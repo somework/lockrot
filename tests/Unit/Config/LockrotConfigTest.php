@@ -157,6 +157,57 @@ final class LockrotConfigTest extends TestCase
         self::assertSame('silent', $cfg2->failOn());
     }
 
+    /**
+     * One rule for every source: extra.lockrot is validated in full whatever overrides it, and an
+     * environment variable whenever it is set — not only on the runs where no option outranks it.
+     * An invalid LOCKROT_FAIL_ON used to pass silently under `--fail-on`, while an invalid
+     * extra.lockrot fail-on under the same option was exit 2.
+     *
+     * @param array<string, string> $env
+     *
+     * @dataProvider invalidEnvironmentUnderAnOption
+     */
+    #[DataProvider('invalidEnvironmentUnderAnOption')]
+    public function testAnInvalidVariableIsAnErrorEvenWhereAnOptionOverridesIt(array $env, string $message): void
+    {
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage($message);
+        LockrotConfig::fromSources([], $env, ['fail-on' => 'silent', 'target-php' => '8.4'], '8.5.10', null);
+    }
+
+    /** @return iterable<string, array{0: array<string, string>, 1: string}> */
+    public static function invalidEnvironmentUnderAnOption(): iterable
+    {
+        yield 'LOCKROT_FAIL_ON' => [['LOCKROT_FAIL_ON' => 'dead'], 'LOCKROT_FAIL_ON must be one of none, abandoned, silent, pinned, left-behind, old-promise, stale, critical, high, medium, low, unchecked; got "dead"'];
+        yield 'LOCKROT_TARGET_PHP' => [['LOCKROT_TARGET_PHP' => 'latest'], 'LOCKROT_TARGET_PHP must look like "8.4"; got "latest"'];
+    }
+
+    /** The variable names itself in the message on the runs where it would have won, too. */
+    public function testAnInvalidVariableIsNamedWhereItWouldHaveWon(): void
+    {
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('LOCKROT_FAIL_ON must be one of');
+        LockrotConfig::fromSources(['fail-on' => 'silent'], ['LOCKROT_FAIL_ON' => 'dead'], [], '8.5.10', null);
+    }
+
+    /** A variable set to nothing is a variable not set: CI systems pass empty inputs through as empty strings. */
+    public function testAnEmptyVariableIsTreatedAsUnset(): void
+    {
+        $cfg = LockrotConfig::fromSources(['fail-on' => 'silent', 'target-php' => '8.2'], ['LOCKROT_FAIL_ON' => '', 'LOCKROT_TARGET_PHP' => ''], [], '8.5.10', null);
+
+        self::assertSame('silent', $cfg->failOn());
+        self::assertSame('8.2', $cfg->targetPhp());
+    }
+
+    /** Valid variables under an option still lose to it. */
+    public function testAValidVariableUnderAnOptionStillLoses(): void
+    {
+        $cfg = LockrotConfig::fromSources([], ['LOCKROT_FAIL_ON' => 'high', 'LOCKROT_TARGET_PHP' => '8.1'], ['fail-on' => 'silent', 'target-php' => '8.4'], '8.5.10', null);
+
+        self::assertSame('silent', $cfg->failOn());
+        self::assertSame('8.4', $cfg->targetPhp());
+    }
+
     public function testCliFlags(): void
     {
         $cfg = LockrotConfig::fromSources([], [], ['dev' => true, 'offline' => true, 'strict-network' => true, 'format' => 'json'], '8.5.10', null);

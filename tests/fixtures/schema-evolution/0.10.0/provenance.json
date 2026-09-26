@@ -1,0 +1,116 @@
+{
+    "lockrot": "0.10.0",
+    "tag": "v0.10.0",
+    "phar_sha256": "e0f7e783a1344fec6f43340f4f0712031facf7e064a4a3cec3ace98e82eb3d45",
+    "verified": {
+        "sha256": "lockrot.phar.sha256 of the release",
+        "gpg": "39ECC3F64AE8D06A9A63FD99AB6F7F52AE513141",
+        "attestation": "gh attestation verify lockrot.phar --repo somework/lockrot"
+    },
+    "recorded": "2026-09-25",
+    "today": "2026-09-25T00:00:00+00:00",
+    "php": "8.5.10",
+    "target_php": "8.4",
+    "lock": "tests/fixtures/apps/wallabag_wallabag",
+    "network": true,
+    "github_token": true,
+    "cache": "the baseline run on a cache of its own; the report on an empty one, shared with no other version; the explanations on the cache the report filled",
+    "files": {
+        "lockrot-schema-evolution-baseline.json": {
+            "args": [
+                "-d",
+                "<copy of tests/fixtures/apps/wallabag_wallabag>",
+                "--target-php=8.4",
+                "--no-ansi",
+                "--generate-baseline",
+                "--baseline=lockrot-schema-evolution-baseline.json"
+            ],
+            "exit": 0,
+            "sha256": "343624c4e32bd4e8ba0ade4ad05f7a6c3fdd82132b48f816c3e17d3ddbe6efb5"
+        },
+        "report.json": {
+            "args": [
+                "-d",
+                "<copy of tests/fixtures/apps/wallabag_wallabag>",
+                "--target-php=8.4",
+                "--no-ansi",
+                "--format=json",
+                "--baseline=lockrot-schema-evolution-baseline.json"
+            ],
+            "exit": 0,
+            "sha256": "0ee14ca6826fbb4ee4a75e4941dbcc11f5351701631cc676cc1dba97b676f069"
+        },
+        "explain/doctrine~cache.json": {
+            "args": [
+                "-d",
+                "<copy of tests/fixtures/apps/wallabag_wallabag>",
+                "--target-php=8.4",
+                "--no-ansi",
+                "--explain=doctrine/cache",
+                "--format=json"
+            ],
+            "exit": 0,
+            "sha256": "5402d0f46c742811ff0c46788553b8b2ca9f8cac891abbe764b8ca75ff2defe0"
+        },
+        "explain/sensio~framework-extra-bundle.json": {
+            "args": [
+                "-d",
+                "<copy of tests/fixtures/apps/wallabag_wallabag>",
+                "--target-php=8.4",
+                "--no-ansi",
+                "--explain=sensio/framework-extra-bundle",
+                "--format=json"
+            ],
+            "exit": 0,
+            "sha256": "7db87a4a82b8dfaff28cd462a2a438a0e1165aafaf804e528d684bbfbc586d00"
+        },
+        "explain/wallabag~rulerz.json": {
+            "args": [
+                "-d",
+                "<copy of tests/fixtures/apps/wallabag_wallabag>",
+                "--target-php=8.4",
+                "--no-ansi",
+                "--explain=wallabag/rulerz",
+                "--format=json"
+            ],
+            "exit": 0,
+            "sha256": "5d8c6db95a319d2363d76415deeca1a5ffed48ba73685431ae53d807ec1b40d7"
+        },
+        "explain/javibravo~simpleue.json": {
+            "args": [
+                "-d",
+                "<copy of tests/fixtures/apps/wallabag_wallabag>",
+                "--target-php=8.4",
+                "--no-ansi",
+                "--explain=javibravo/simpleue",
+                "--format=json"
+            ],
+            "exit": 0,
+            "sha256": "e58adc1f3caeb8712f92897eb0759d5972e8925f557a9ba0c53871ce46343b0e"
+        },
+        "explain/scheb~2fa-backup-code.json": {
+            "args": [
+                "-d",
+                "<copy of tests/fixtures/apps/wallabag_wallabag>",
+                "--target-php=8.4",
+                "--no-ansi",
+                "--explain=scheb/2fa-backup-code",
+                "--format=json"
+            ],
+            "exit": 0,
+            "sha256": "2cbdac397ce1f2fd0f27bd3316a4cad87936920d697ebe6bf7dfa5944acac650"
+        },
+        "explain/spomky-labs~otphp.json": {
+            "args": [
+                "-d",
+                "<copy of tests/fixtures/apps/wallabag_wallabag>",
+                "--target-php=8.4",
+                "--no-ansi",
+                "--explain=spomky-labs/otphp",
+                "--format=json"
+            ],
+            "exit": 0,
+            "sha256": "260cf8f329a06fcbab64a2819e069285fa0acb7a7597bf02fe948916d49cb04b"
+        }
+    }
+}

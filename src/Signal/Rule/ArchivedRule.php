@@ -8,6 +8,7 @@ use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\SignalRule;
 
+/** @internal */
 final class ArchivedRule implements SignalRule
 {
     public function evaluate(PackageFacts $facts): ?Signal

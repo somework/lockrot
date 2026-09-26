@@ -7,6 +7,313 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.13.0] - 2026-09-26
+
+### Changed
+
+- Every class, interface and trait under `src/` is now marked `@internal`, the Composer plugin class
+  that `composer.json` names in `extra.class` included. The PHP classes were never a public API —
+  CONTRIBUTING and the README said so in a sentence — but nothing in the code said it, so a project
+  that built on them got no warning from its IDE, or from PHPStan, which reports an `@internal` class
+  used from code outside the class's root namespace (`Lockrot\`), until a release moved one. After
+  1.0 that line could not be drawn without breaking someone, so it is drawn now, and a test fails on
+  a class, interface, trait or enum that arrives without the mark. The namespace
+  `Lockrot\Extension\` is reserved: nothing is declared in it, in any letter case, and reserving it
+  promises nothing about what, if anything, will be.
+
+- `self-update` stays within the major version it is running. It read GitHub's `releases/latest`
+  and installed whatever that named: on the day 2.0 is released every 1.x archive would have become
+  2.0 on its next self-update, a release needing a newer PHP would have installed and then refused
+  to start, and after a rotation of the self-update key the archive would have refused the new
+  release with a signature error and no way forward. It now reads the release list (drafts,
+  pre-releases and tags that are not a stable version skipped; a published release whose tag is not
+  a version at all is named on a line of its own) and takes the newest release in its own major
+  version — before 1.0 that is the whole 0.x line, so 0.x updates keep arriving as before. Versions
+  are compared the way Composer compares them (`v1.0`, `V1.0.0` and `1.0.0` are one version).
+  `--allow-major` moves to the next major version that has a stable release, one at a time; a newer
+  major is named on a line of its own, and the line suggesting `--allow-major` names the release it
+  would install, or says why none of that major can be installed here. A release whose lowest PHP is
+  above the running one (or is not spelled `major.minor.patch`) is passed over with a line saying
+  so, and so is one signed with a self-update key the archive does not carry, which makes the
+  transition release of a rotation the step in between. When newer releases exist only under a key
+  the archive does not carry and no release it can install carries it, the archive is stranded:
+  `self-update` and `--check` exit 2 and say it has to be reinstalled by hand. Otherwise `--check`
+  exits 1 exactly when `self-update` would install something (`--check --allow-major` for a next
+  major, whose advice line then says `self-update --allow-major`), exits 0 when every newer release
+  is held back for its major, PHP or floor, and ignores `--force`. `--check` also reads the chosen
+  release's `lockrot.phar.meta.json` from GitHub's release downloads, not only the API; a release of
+  the next major that is only advised and whose description cannot be read gets a line saying so,
+  and does not stop an update in the running major. `--force`
+  reinstalls the newest release at or below the running one in its major version, which can be
+  older than the running build (a 0.13.1 whose release was withdrawn gets 0.13.0), never looks
+  below that release, and never leaves the line: with nothing in the line to install it exits 2
+  rather than stepping back to 0.x. Notes and errors are printed as plain text, whatever the release
+  list puts in a tag or URL. The choice is made by the archive doing the update, so this starts with
+  archives from 0.13.0 on; 0.12 and older still follow `releases/latest` (see
+  [the PHAR page](https://lockrot.dev/phar/#keeping-it-updated)). `LOCKROT_RELEASE_URL`, the test
+  hook, now names a release list.
+
+- The semantic-versioning promise is narrower. `CONTRIBUTING.md` and the README used to say that
+  "the output formats" follow semantic versioning, which covered the wording of a `table` row and
+  the look of the HTML page as much as a SARIF `ruleId`. The public interface is now named as the
+  CLI and its exit codes, the PHAR's `self-update` with its options and exit codes, the environment
+  variables, the configuration keys, the machine-readable formats (`json`, `sarif`, `gitlab`,
+  `github`) and the baseline file; `table`, `markdown` and `html` are for people and may change in
+  any release. `CONTRIBUTING.md` holds the one list, and the README links to it instead of keeping
+  a second one. The promise is narrowed now because it can only be narrowed before 1.0.
+
+- A change that can alter the verdict or the priority lockrot gives a package, or what
+  `--fail-on=unchecked` matches (a new S10 reason, a newly supported host), ships in a minor release,
+  never in a patch, and is listed under a heading of its own, **Verdict changes**. The only patch
+  exception is a curated-data fix that moves a package to `finished` or `ok`. This is project
+  practice from 0.13 on, ahead of the rest of `docs/compatibility.md`. Until now such a change sat
+  under `Changed` or `Fixed` with everything else, and a team deciding whether an upgrade can turn
+  its pipeline red had to read every entry to find out.
+
+### Added
+
+- A schema evolution test. Under one schema number a document may only gain fields, so whatever an
+  older lockrot wrote has to keep validating against the newest `report-1.json`, `explain-1.json`
+  and `baseline-1.json`. Every document the schema tests checked was written by the current code,
+  which cannot notice a schema change that rejects an older one — a field made required, a type or
+  an enum value lost, a listed field dropped. Two checks now hold the schemas to it, both under
+  `tests/fixtures/schema-evolution/`:
+  - The report, explain, baseline and config schemas every release from 0.9.0 to 0.12.0 published
+    are kept, and each one under the current number must be accepted by the current file: a member
+    made required, a type or an enum value lost, a bound tightened, a listed property dropped or an
+    object closed fails the build, whether or not any recorded document carries it. A release that
+    does not add its schemas there fails it too.
+  - What the signed 0.9.0, 0.10.0 and 0.11.0 release archives wrote over wallabag's lock — the
+    baseline file, the `--format=json` report compared against it and six `--explain` documents —
+    recorded once by `bin/record-schema-evolution`, is validated against the schema each document
+    names, as published and with the strict copy that rejects a field the schema does not list.
+    The baseline is also read back as the current lockrot reads a committed one, and the signals
+    in each explanation are held to the report schema's signal definitions, since the explain
+    schema types no signal data. The recordings' provenance and the release archives' digests are
+    pinned in the test, so a document edited to validate fails whatever its recorded hash says.
+
+  This checks the backward direction only, old documents under the current schemas; a document a
+  newer lockrot writes, validated against a schema an older release published, is not what it
+  tests. The report, its schemas and the HTML page are unchanged.
+
+- `lockrot.phar.meta.json` on every release: the lowest PHP the archive runs on and the SHA-256
+  fingerprint of the key that signed `lockrot.phar.sig.json` — what `self-update` chooses by
+  without downloading the archive. The release workflow writes it from `build/phar/composer.json`
+  (and fails when its platform PHP is not spelled `major.minor.patch` or is not the floor both
+  manifests declare) and from the key it actually signed with. It decides only which release is
+  tried; the checksum and the signature still decide whether it is installed. A release from 0.13.0
+  on without it is an error naming the tag, and SECURITY.md now describes the key rotation it makes
+  possible, with today's fingerprint, and why a compromised key is not rotated that way: every
+  archive carrying it is replaced by hand.
+
+- The release workflow checks each release's self-update signature, and the key its
+  `lockrot.phar.meta.json` names, against the key the previous release carries — the one every
+  archive in the field verifies it with — instead of the key in the source tree. A rotation that
+  skips its transition release now fails the build, and the transition release itself passes
+  without any check switched off.
+
+- A warning for an `extra.lockrot` key lockrot does not know. The config accepted any key and
+  ignored the ones it does not read, so a typo changed nothing and said nothing: `install-tme: off`
+  left the install-time block printing, `failOn` left the build ungated, and an `ignore` entry's
+  `expire` made a temporary ignore permanent. Each unknown key now gets one line on stderr, with the
+  known key it was probably meant to be when one is close —
+  `lockrot: unknown key extra.lockrot.install-tme ignored (did you mean install-time?)` — the
+  closeness rule adapted from Symfony Console's own "Did you mean" for a mistyped command.
+  `composer lockrot` and the PHAR print it on every run, and the install-time summary above its
+  block (not with `install-time` off, not for a transaction that installs or updates nothing, but
+  whether or not anything is flagged); `LOCKROT_DISABLE` silences it. The key is printed as written,
+  never read as console markup, with control, bidirectional and invalid UTF-8 characters escaped and
+  anything past 255 bytes cut. Nothing else about the run changes — the same report, the same exit
+  code, nothing on stdout — and the config schema is untouched, so no `composer.json` that worked
+  before stops working. When the schema does reject the config, the error now ends with the same
+  lines, so an `ignore` entry with `reasn` for `reason` says why `reason` is missing. `extensions`
+  and keys starting with `x-` are reserved, for the configuration of extensions and for your own
+  tooling, and are never warned about; a project that keeps its own data under `extra.lockrot` can
+  move it under `x-` to stay quiet.
+
+- `--output=<format>:<path>`, repeatable: one run writes several reports. Until now a run had one
+  report, on stdout, in its one `--format`, and a second format meant a second run. lockrot-action
+  does exactly that for its job summary — `src/run.sh` runs lockrot again with `--format=markdown
+  --offline` — so the summary came from another run, with another clock and, offline, its own notes
+  and its own S10 reasons for what it could not check. Now the analysis runs once and every file is
+  rendered from the same report: the same `generated_at`, findings and notes, and each file is byte
+  for byte what its `--format` prints, except that a table in a file has no colours and is wrapped at
+  120 columns whatever the terminal is. `--format` still decides stdout. The spec is a format
+  `--format` takes, a colon, then the path verbatim, so `json:C:\reports\r.json` works; in the PHAR
+  give it with `=`, since `--output json:r.json` before the command name is read as a command. A
+  relative path is relative to the project directory lockrot runs in (`-d` sets it); an absolute
+  one is written where it points; the directory must already exist, since lockrot creates none.
+  Each file is written after stdout, through a temporary file beside it that is created exclusively
+  (nothing already at that name is followed) and renamed over the target, keeping a replaced file's
+  permission bits, and is named on stderr (`lockrot: sarif report written to lockrot.sarif`). A
+  configuration error (exit 2), found before the analysis starts: a path naming `composer.json` or
+  `composer.lock`, a baseline — this run's, and the project's own (`extra.lockrot.baseline`, else
+  `lockrot-baseline.json`) when `--baseline` points the run elsewhere — or the manifest `COMPOSER`
+  names and its lock, with dot segments folded by spelling as Windows folds them
+  (`missing\..\composer.lock` is the lock); an existing file that is on disk one of those or the
+  `composer.json`/`composer.lock` beside it — a symlink, a hard link, a Windows 8.3 short name, a
+  spelling the filesystem folds by Unicode rules such as `composer.locK` with a Kelvin sign on macOS
+  — compared by device and inode; an unknown format, an empty path, the same file twice (by spelling,
+  or on disk for files that exist), a missing directory, or a path that exists and is not a regular
+  file (a directory, a device such as `/dev/stdout`, a pipe — the write is a rename over the path,
+  and stdout is what `--format` is for); and a file name ending in a dot or a space or holding a
+  colon, on every system, since Windows reads `composer.lock.` and `composer.lock::$DATA` as the lock
+  itself. A file that cannot be written when its turn comes is exit 2, and so is one that turns out
+  to be a file this run already wrote (on macOS `café.json` precomposed and decomposed are one file),
+  instead of one report silently replacing another; otherwise the exit code is untouched.
+  `--explain` refuses `--output`; `--generate-baseline` writes the reports, then the baseline. The
+  README, `SECURITY.md`, `CONTRIBUTING.md` and the docs now say what lockrot writes — the files you
+  name, each through a temporary file beside it (so it needs write access to that directory, and an
+  interrupted run can leave a `*.tmp` there), its activity cache under Composer's cache directory,
+  and with `self-update` the PHAR; never `composer.json` or `composer.lock` — where they used to call
+  the baseline the only file lockrot writes.
+
+- `docs/compatibility.md`, a draft of the promise lockrot 1.0 will make, marked as a draft until
+  1.0.0-RC1. Until now the promise was one sentence in `CONTRIBUTING.md`, which said neither which
+  parts of a format are fixed nor whether a minor release may change the verdict a package gets. The
+  page names what 1.0 freezes (the machine-readable documents; the identity and severity fields of
+  SARIF, GitLab Code Quality and GitHub annotations; the CLI, `self-update` and the exit codes, with
+  the `1` Composer or Symfony can return before lockrot runs; the closed sets of verdicts,
+  priorities, levels and baseline standings, in their order), what it does not (human-readable
+  output, which verdict and priority a package gets), which open sets the schemas still spell out as
+  enums, what the Composer underneath changes between the plugin and the PHAR, how verdicts may
+  change between releases and what a baseline does and does not absorb, the names reserved for
+  extensions, the deprecation policy, and what lockrot never does, down to the hosts it talks to.
+  Items not in lockrot yet are marked *planned*.
+
+- A test that holds the code, the published report, explain and baseline schemas, and the
+  compatibility and verdicts pages to the same verdicts, priorities, signal levels and baseline
+  standings in the same order. The existing tests compared the lists through the class constants,
+  so they would have followed a changed value rather than caught it. It also holds the signal ids
+  in the code to every place the report schema spells them (the `signalId` enum, the enum on a
+  signal's `id`, and the `anyOf` branch that types each signal's `data`) and to the explain schema,
+  and keeps every name lockrot ships out of the names reserved for extensions: no verdict, priority,
+  `--fail-on` value, format, signal id or configuration key holds a colon; no configuration key,
+  top level or `ignore` entry, starts with `x-`; the configuration schema gives `extensions` no
+  meaning; nothing under `src/` or in `bin/lockrot` reads a `LOCKROT_X_` variable; and nothing is
+  declared under `Lockrot\Extension\`, in any letter case. `docs/verdicts.md` now lists all nine
+  verdicts in its severity line (`finished = ok` at the bottom); it used to leave out `finished`.
+
+- The docs build in CI now fails on a page left out of the site navigation and on a link to a
+  heading that does not exist. `mkdocs build --strict` let both through, because mkdocs reports them
+  as information rather than warnings; `mkdocs.yml` now makes them warnings.
+
+### Fixed
+
+- A package name, a version, a constraint or a note that looked like console markup could break the
+  report or restyle it. The table, `--explain` and a `table` file escaped that text with Symfony's
+  `OutputFormatter::escape()`, which on the symfony/console 5.4 inside Composer's PHARs and
+  lockrot's own leaves the second `<` of `<<` live: a lock entry with `<<fg=red>>` in it could throw
+  (`Invalid "red>" color`, exit `2` and no report), `<<href=…>>` opened a terminal link, a long run
+  of `<b` let a style run on past its row, and `a\<b` lost its backslash. The install-time block
+  and the `-v` Bitbucket token warning did not escape the text at all. lockrot now renders these
+  itself instead of handing them to Symfony's or Composer's formatter, on every console version
+  alike (2.8 in Composer 2.2 LTS, 5.4 and later): the lock's text prints as written, with the same
+  colours and layout as before and nothing running on into the next line. As they are now written
+  past Composer's own sanitising, the install-time block and the Bitbucket warning show a control
+  character in that text as an escape (`\x1B`, `\n`) rather than passing it to the terminal.
+
+- A configuration error from `composer lockrot`, and the install-time `check skipped` line, print
+  their message as written instead of handing it to Symfony's tag formatter: a message quoting text
+  from outside lockrot, such as an `--explain` argument like `<fg=red>x`, restyled the line instead
+  of printing it. Both keep their colours, and the `check skipped` line still escapes any control
+  character in the message.
+
+- A message on stderr that quoted something looking like a console tag — a path or a package name
+  with `<info>` in it, an exception's message, the `-v` stack trace — lost that part, because it went
+  through the console's tag formatter unescaped. Every line `composer lockrot` prints on stderr now
+  goes past the formatter, as the configuration errors above do, and every line `lockrot.phar
+  self-update` prints is escaped for it; each is printed as it was.
+
+- The baseline is now written through a temporary file created exclusively, so a file or symlink
+  already at that name fails the write instead of being followed, and a baseline that is replaced
+  keeps its permission bits instead of taking the umask's default.
+
+- A command line lockrot cannot read — an unknown option, an option missing its value, a value given to a flag, an
+  argument too many — exits `2` with one `lockrot:` line, from `composer lockrot` and `lockrot.phar self-update`
+  alike. It was Composer's error box and exit `1`, the code a CI gate reads as "findings": Symfony binds the command
+  line before any lockrot code runs, so the commands now bind it first. What never reaches a lockrot command — an
+  unknown command name, Composer stopping before it has chosen one — is still Composer's exit `1`, and
+  [ci.md](docs/ci.md#exit-codes) now says so.
+
+- A key starting with a NUL byte anywhere in `extra.lockrot` switched validation off: the schema library turned the
+  config into an object with a `json_encode`/`json_decode` round trip, the decode failed, and the empty object left
+  behind was valid — so `{"fail-on": "abandoned", "\u0000k": 1}` ran with `fail-on` `none` and exited `0`. lockrot
+  converts the config itself now, and such a key is a configuration error naming where it is. A number too large for
+  a float (`1e400`) made the same round trip throw, which the command did not catch as a configuration error; it now
+  reaches the schema, which rejects it under a key that wants an integer. Nothing that fails while the command starts
+  up escapes as exit `1` any more.
+
+- The baseline file went through the same round trip. A key starting with a NUL byte made lockrot validate an empty
+  object in its place, so the file was rejected for missing the `lockrot` and `findings` it had; a number too large
+  for a float (`1e400`) ended the run with `lockrot failed:` and the schema library's own encoding error. Both still
+  exit `2`, now with a `baseline file is invalid:` message naming the key or the field, through the conversion
+  `extra.lockrot` uses. A number too large for a float under a key lockrot does not read is left alone, as the file's
+  open objects promise.
+
+- lockrot reads the manifest and lock Composer reads: with `COMPOSER=alt.json` it takes `extra.lockrot` from
+  `alt.json`, analyses `alt.lock` and puts the default baseline next to `alt.json`, where it read `composer.json` and
+  `composer.lock` from the working directory whatever `COMPOSER` said. The install-time summary already did. A
+  missing lock is reported under its own name.
+
+- With `COMPOSER=alt.json`, `--format=github` (`file=`), `--format=gitlab` (`location.path`) and
+  `--format=sarif` (each result's `artifactLocation.uri`) still named the literal `composer.lock`,
+  so every annotation pointed at a file the run had not analysed — or at none — while its line
+  number came from `alt.lock`. They now name the analysed lock by its path relative to the project
+  directory, which is how GitHub and GitLab resolve it against the checkout: `alt.lock`, or
+  `app/alt.lock` under `COMPOSER=app/alt.json`, with SARIF's `%SRCROOT%` set to that directory. The
+  same goes for `--output` files. Without `COMPOSER` the output is byte for byte what it was,
+  `composer.lock` included. The GitLab fingerprint and the SARIF partial fingerprint never involved
+  the path and are unchanged, so no finding a merge request already tracks reappears as new. The
+  JSON report's `run.lock_file` already named the analysed lock and is unchanged.
+
+- `LOCKROT_DISABLE=1` skips `composer lockrot` entirely, as documented: it is checked before the command line,
+  `composer.json`, `extra.lockrot` or an option value is read, where a broken configuration or a bad option used to
+  exit `2` under it.
+
+- One validation rule for every configuration source: `extra.lockrot` is validated in full on every run, and
+  `LOCKROT_FAIL_ON`/`LOCKROT_TARGET_PHP` whenever they are set. An invalid variable under `--fail-on` or
+  `--target-php` was silently ignored, while an invalid `extra.lockrot` value under the same option was exit `2`; both
+  are exit `2` now, and the message names the variable.
+
+- `docs/ci.md` said a merge request shows `--format=gitlab` findings inline in the diff of
+  `composer.lock`. Every GitLab tier shows, in the merge request, the findings that are new or fixed
+  compared with the target branch's report, so a merge request that changes no verdict shows none;
+  Premium's pipeline Code Quality tab lists them all; Ultimate also marks new findings on
+  `composer.lock` lines in the Changes view when the merge request changes `composer.lock`. The page
+  now says so, and its link to GitLab's format description points at a heading that exists. The
+  format itself is unchanged.
+
+- `docs/verdicts.md` said `finished` and `ok` are never a finding. Neither is ever flagged, but
+  `--fail-on=unchecked` reads S10 rather than the verdict, so an `ok` package carrying S10 fails
+  the run; the page now says so.
+
+- `docs/schema.md` said a report from a newer lockrot validates against a copy of the schema
+  fetched or vendored earlier. Its objects are open, but signal ids, S10's `check`, `reason` and
+  `blocks`, S8's `floor_source` and the configuration schema's `format` are still enums, so a new
+  value there fails against an older copy. The page, and the docblock of the class that names the
+  schema URLs, now say so, and the vendoring recipe says to refresh the copy on an upgrade. The
+  schemas are unchanged; describing those values as open strings is planned before 1.0.
+
+- `SECURITY.md` said lockrot talks only to the configured Composer repositories and the GitHub API,
+  and reads only the GitHub token variables. It also talks to GitLab and Bitbucket for repository
+  activity and to GitHub's release downloads for `self-update`, and reads the GitLab token
+  variables and the credentials Composer holds; it now lists them.
+
+- `docs/ci.md` cut the report out of an HTML page with a `sed` recipe that wrote an empty file when
+  the page did not match. The recipe now fails instead, says it relies on the page's data element
+  staying on one line, and comes after the simpler route: `--output=json:lockrot.json` beside
+  `--format=html` in the same run. The README, `docs/schema.md` and `docs/verdicts.md` said there
+  are six output formats; there are seven.
+
+- The test suite no longer leaves `php -S` fixture servers running after an interrupted run. A test
+  process killed before its cleanup ran — Infection stopping a timed-out mutant, a `timeout`
+  wrapper, a fatal error — left each server it had started orphaned, holding its port until someone
+  killed it by hand. A watchdog beside each server now stops it within about a second of the test
+  process going away, however it went, and a normal stop returns only once the port is free; a
+  test kills the process that started a server and checks the port closes. No change to lockrot
+  itself.
+
 ## [0.12.0] - 2026-09-24
 
 ### Changed
@@ -692,7 +999,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The "GitHub token not set" note counts packages whose repository activity was checked, not
   distinct repositories, so packages sharing one repository are no longer under-reported.
 
-[Unreleased]: https://github.com/somework/lockrot/compare/v0.12.0...HEAD
+[Unreleased]: https://github.com/somework/lockrot/compare/v0.13.0...HEAD
+[0.13.0]: https://github.com/somework/lockrot/compare/v0.12.0...v0.13.0
 [0.12.0]: https://github.com/somework/lockrot/compare/v0.11.0...v0.12.0
 [0.11.0]: https://github.com/somework/lockrot/compare/v0.10.0...v0.11.0
 [0.10.0]: https://github.com/somework/lockrot/compare/v0.9.0...v0.10.0

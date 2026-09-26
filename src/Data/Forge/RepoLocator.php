@@ -17,6 +17,8 @@ use Composer\Config;
  * path prefix (`gitlab.example.com/gitlab`, a GitLab in a non-root context), matched the way
  * Composer matches it. GitHub Enterprise (`github-domains`) is not recognised: its API base and
  * authentication path differ from github.com's and nothing has asked for it yet.
+ *
+ * @internal
  */
 final class RepoLocator
 {

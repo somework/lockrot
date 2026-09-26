@@ -6,6 +6,7 @@ namespace Lockrot\Data\Cache;
 
 use Lockrot\Data\Http\HttpResult;
 
+/** @internal */
 final class ArrayCache implements CacheInterface
 {
     /** @var array<string, HttpResult> */

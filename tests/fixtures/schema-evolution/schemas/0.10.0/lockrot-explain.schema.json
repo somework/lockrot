@@ -1,0 +1,141 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "id": "https://lockrot.dev/schema/explain-1.json",
+    "title": "lockrot explanation",
+    "description": "The document `composer lockrot --explain=vendor/package --format=json` prints: the finding as the report carries it, and everything it was read from. Objects are open: a field added later validates against this file unchanged; the number in the id changes only when a field is removed or renamed.",
+    "type": "object",
+    "required": ["lockrot", "package", "version", "finding", "lock", "metadata", "activity", "thresholds", "target_php", "generated_at", "notes"],
+    "properties": {
+        "$schema": { "type": "string" },
+        "lockrot": {
+            "type": "object",
+            "required": ["version", "schema"],
+            "properties": {
+                "version": { "description": "The lockrot release that wrote the document.", "type": "string", "minLength": 1 },
+                "schema": { "description": "The document schema number this file describes.", "type": "integer", "enum": [1] }
+            }
+        },
+        "package": { "$ref": "#/definitions/packageName" },
+        "version": { "type": "string" },
+        "finding": { "$ref": "#/definitions/finding" },
+        "lock": {
+            "description": "The package's entry in composer.lock.",
+            "type": "object",
+            "required": ["php", "released", "repository", "from_composer_repository", "dev", "branch_snapshot", "type"],
+            "properties": {
+                "php": { "description": "The entry's php requirement, null when it has none.", "type": ["string", "null"] },
+                "released": { "oneOf": [{ "$ref": "#/definitions/dateTime" }, { "type": "null" }] },
+                "repository": { "type": ["string", "null"] },
+                "from_composer_repository": { "type": "boolean" },
+                "dev": { "type": "boolean" },
+                "branch_snapshot": { "type": "boolean" },
+                "type": { "type": "string" }
+            }
+        },
+        "metadata": {
+            "description": "What the Composer repository said about the package; null when it could not be loaded.",
+            "oneOf": [{ "$ref": "#/definitions/metadata" }, { "type": "null" }]
+        },
+        "activity": {
+            "description": "What the repository host said; null when the repository was not checked.",
+            "oneOf": [{ "$ref": "#/definitions/activity" }, { "type": "null" }]
+        },
+        "thresholds": {
+            "type": "object",
+            "required": ["release-warn-years", "release-high-years", "push-warn-years", "push-high-years"],
+            "properties": {
+                "release-warn-years": { "type": "integer", "minimum": 1 },
+                "release-high-years": { "type": "integer", "minimum": 1 },
+                "push-warn-years": { "type": "integer", "minimum": 1 },
+                "push-high-years": { "type": "integer", "minimum": 1 }
+            }
+        },
+        "target_php": { "type": "string" },
+        "generated_at": { "$ref": "#/definitions/dateTime" },
+        "notes": { "type": "array", "items": { "type": "string" } }
+    },
+    "definitions": {
+        "dateTime": { "type": "string", "format": "date-time" },
+        "packageName": { "description": "A Composer package name, vendor/name.", "type": "string", "pattern": "^[^\\/]+\\/[^\\/]+$" },
+        "verdict": { "type": "string", "enum": ["abandoned", "silent", "pinned", "left-behind", "old-promise", "stale", "unknown", "finished", "ok"] },
+        "priority": { "type": "string", "enum": ["critical", "high", "medium", "low", "none"] },
+        "finding": {
+            "description": "The same object the report's `findings[]` carries; see report-1.json for the per-signal `data` shapes.",
+            "type": "object",
+            "required": ["package", "version", "verdict", "priority", "direct", "dev", "signals", "chain", "direct_dependents", "evidence", "allowlist_reason", "note", "data_date"],
+            "properties": {
+                "package": { "$ref": "#/definitions/packageName" },
+                "version": { "type": "string" },
+                "verdict": { "$ref": "#/definitions/verdict" },
+                "priority": { "$ref": "#/definitions/priority" },
+                "direct": { "type": "boolean" },
+                "dev": { "type": "boolean" },
+                "signals": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": ["id", "level", "summary", "data"],
+                        "properties": {
+                            "id": { "type": "string", "enum": ["S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9"] },
+                            "level": { "type": "string", "enum": ["info", "warn", "high"] },
+                            "summary": { "type": "string" },
+                            "data": { "type": "object" }
+                        }
+                    }
+                },
+                "chain": { "type": "array", "minItems": 1, "items": { "$ref": "#/definitions/packageName" } },
+                "direct_dependents": { "type": "array", "items": { "$ref": "#/definitions/packageName" } },
+                "evidence": { "type": "string" },
+                "allowlist_reason": { "type": ["string", "null"] },
+                "note": { "type": ["string", "null"] },
+                "data_date": { "oneOf": [{ "$ref": "#/definitions/dateTime" }, { "type": "null" }] }
+            }
+        },
+        "metadata": {
+            "type": "object",
+            "required": ["abandoned", "replacement", "releases_listed", "has_stable_release", "last_stable_release", "last_stable_version", "last_stable_dated_by", "repository", "type", "data_date", "branches"],
+            "properties": {
+                "abandoned": { "type": "boolean" },
+                "replacement": { "type": ["string", "null"] },
+                "releases_listed": { "type": "integer", "minimum": 0 },
+                "has_stable_release": { "type": "boolean" },
+                "last_stable_release": { "oneOf": [{ "$ref": "#/definitions/dateTime" }, { "type": "null" }] },
+                "last_stable_version": { "type": ["string", "null"] },
+                "last_stable_dated_by": { "description": "The monorepo last_stable_release was read from through its `replace` list, null when it is the package's own.", "oneOf": [{ "$ref": "#/definitions/packageName" }, { "type": "null" }] },
+                "repository": { "type": ["string", "null"] },
+                "type": { "type": "string" },
+                "data_date": { "$ref": "#/definitions/dateTime" },
+                "branches": {
+                    "description": "Every release branch the repository lists, highest first.",
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": ["branch", "installed", "highest", "highest_released", "highest_commit_date", "newest_dated", "newest_dated_released", "dated_by"],
+                        "properties": {
+                            "branch": { "description": "The branch label, `10.x` or `0.3.x`.", "type": "string" },
+                            "installed": { "type": "boolean" },
+                            "highest": { "description": "The branch's highest stable tag as the repository prints it.", "type": "string" },
+                            "highest_released": { "description": "That tag's release date; null when the repository leaves it undated or dates it only by a commit other tags share.", "oneOf": [{ "$ref": "#/definitions/dateTime" }, { "type": "null" }] },
+                            "highest_commit_date": { "description": "The shared commit's date when highest_released is null for that reason.", "oneOf": [{ "$ref": "#/definitions/dateTime" }, { "type": "null" }] },
+                            "newest_dated": { "description": "The branch's newest dated stable release.", "type": "string" },
+                            "newest_dated_released": { "oneOf": [{ "$ref": "#/definitions/dateTime" }, { "type": "null" }] },
+                            "dated_by": { "description": "The monorepo this row's dates were read from, null when they are the package's own.", "oneOf": [{ "$ref": "#/definitions/packageName" }, { "type": "null" }] }
+                        }
+                    }
+                }
+            }
+        },
+        "activity": {
+            "type": "object",
+            "required": ["forge", "repository", "archived", "pushed_at", "fetched_at", "from_cache"],
+            "properties": {
+                "forge": { "type": "string" },
+                "repository": { "type": "string" },
+                "archived": { "type": "boolean" },
+                "pushed_at": { "oneOf": [{ "$ref": "#/definitions/dateTime" }, { "type": "null" }] },
+                "fetched_at": { "oneOf": [{ "$ref": "#/definitions/dateTime" }, { "type": "null" }] },
+                "from_cache": { "type": "boolean" }
+            }
+        }
+    }
+}

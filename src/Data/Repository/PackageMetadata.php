@@ -18,6 +18,8 @@ use Lockrot\Data\Forge\SupportSource;
  * ({@see $releaseDates}): a thousand dates for laravel/framework, nothing for anyone else; and
  * the stable tags that share their commit ({@see $sharedCommitVersions}), which is a set only a
  * subtree split fills.
+ *
+ * @internal
  */
 final class PackageMetadata
 {

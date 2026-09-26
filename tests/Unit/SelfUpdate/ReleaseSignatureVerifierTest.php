@@ -115,6 +115,89 @@ final class ReleaseSignatureVerifierTest extends TestCase
             ->verify(self::ARCHIVE, SigningKeys::releaseSignatureFile(self::ARCHIVE), self::URL);
     }
 
+    /**
+     * `sha256:` and the SHA-256 of the DER SubjectPublicKeyInfo, which is what
+     * `openssl pkey -pubin -outform DER | sha256sum` prints — the two pinned values were taken with
+     * that command. The DER is also read back through openssl here, so the fingerprint is of the key
+     * openssl loads, not of whatever text sits between the armour lines.
+     */
+    public function testTheFingerprintIsTheSha256OfTheDerPublicKey(): void
+    {
+        $pinned = [
+            'sha256:3c497788168deae9ea365ea31ff4d0ea702e357149a925ce843242e99c906e93' => SigningKeys::releasePublicPem(),
+            'sha256:a62913297acdb3f80692eae73426ffa992b476f360ce0b7aaa984da0a5b122b4' => SigningKeys::otherPublicPem(),
+        ];
+        foreach ($pinned as $fingerprint => $pem) {
+            $key = openssl_pkey_get_public($pem);
+            self::assertNotFalse($key);
+            $details = openssl_pkey_get_details($key);
+            self::assertIsArray($details);
+            self::assertIsString($details['key']);
+            $body = preg_replace('/-----[A-Z ]+-----|\s/', '', $details['key']);
+            $der = base64_decode((string) $body, true);
+            self::assertIsString($der);
+
+            self::assertSame('sha256:'.hash('sha256', $der), $this->verifier($pem)->keyFingerprint());
+            self::assertSame($fingerprint, $this->verifier($pem)->keyFingerprint());
+        }
+    }
+
+    /** A key file saved on Windows, or re-wrapped at another width, is still the same key. */
+    public function testLineEndingsAndWrappingDoNotChangeTheFingerprint(): void
+    {
+        $pem = SigningKeys::releasePublicPem();
+        $body = (string) preg_replace('/-----[A-Z ]+-----|\s/', '', $pem);
+        $rewrapped = "-----BEGIN PUBLIC KEY-----\r\n".chunk_split($body, 76, "\r\n")."-----END PUBLIC KEY-----\r\n";
+
+        self::assertSame($this->verifier($pem)->keyFingerprint(), $this->verifier(str_replace("\n", "\r\n", $pem))->keyFingerprint());
+        self::assertSame($this->verifier($pem)->keyFingerprint(), $this->verifier($rewrapped)->keyFingerprint());
+        self::assertSame($this->verifier($pem)->keyFingerprint(), $this->verifier(rtrim($pem))->keyFingerprint());
+    }
+
+    /** @return iterable<string, array{0: string}> */
+    public static function notAPublicKeyPem(): iterable
+    {
+        $pem = SigningKeys::releasePublicPem();
+        $body = (string) preg_replace('/-----[A-Z ]+-----|\s/', '', $pem);
+
+        yield 'not pem at all' => ['not a key'];
+        // PKCS#1 carries the same key in another structure, whose hash is not the DER
+        // SubjectPublicKeyInfo fingerprint a description names: a silent mismatch forever after.
+        yield 'an RSA PUBLIC KEY block' => ["-----BEGIN RSA PUBLIC KEY-----\n".$body."\n-----END RSA PUBLIC KEY-----\n"];
+        yield 'a private key block' => ["-----BEGIN PRIVATE KEY-----\n".$body."\n-----END PRIVATE KEY-----\n"];
+        yield 'text in front of the block' => ["a comment\n".$pem];
+        yield 'text after the block' => [$pem."a comment\n"];
+        yield 'a body that is not base64' => ["-----BEGIN PUBLIC KEY-----\nnot base64!\n-----END PUBLIC KEY-----\n"];
+        yield 'padding in the middle of the body' => ["-----BEGIN PUBLIC KEY-----\nab=cd\n-----END PUBLIC KEY-----\n"];
+        yield 'an empty body' => ["-----BEGIN PUBLIC KEY-----\n-----END PUBLIC KEY-----\n"];
+    }
+
+    /** @dataProvider notAPublicKeyPem */
+    #[DataProvider('notAPublicKeyPem')]
+    public function testAKeyThatIsNotAPublicKeyPemHasNoFingerprint(string $pem): void
+    {
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('the public key self-update verifies releases with is not a PEM "PUBLIC KEY" block, so it has no fingerprint');
+        $this->verifier($pem)->keyFingerprint();
+    }
+
+    /**
+     * A block that is well-formed base64 but not a key openssl can load has no fingerprint either:
+     * one that hashed would match no release's description, and every release would be passed over
+     * as signed with another key instead of this being the error verify() reports for the same key.
+     */
+    public function testAKeyOpensslCannotLoadHasNoFingerprint(): void
+    {
+        $lines = explode("\n", SigningKeys::releasePublicPem());
+        unset($lines[3]);
+        $damaged = implode("\n", $lines);
+        self::assertFalse(openssl_pkey_get_public($damaged), 'the fixture must be a key openssl refuses');
+
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('the public key self-update verifies releases with cannot be loaded; download the new release by hand and verify it');
+        $this->verifier($damaged)->keyFingerprint();
+    }
+
     /** The signature file is read before the key: garbage in is reported as garbage, not as a key fault. */
     public function testTheFileIsReadBeforeTheKeyIsLoaded(): void
     {

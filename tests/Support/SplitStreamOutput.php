@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Support;
 
+use Symfony\Component\Console\Formatter\OutputFormatterInterface;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\ConsoleSectionOutput;
@@ -23,10 +24,15 @@ final class SplitStreamOutput extends BufferedOutput implements ConsoleOutputInt
 {
     private OutputInterface $errorOutput;
 
-    public function __construct()
+    /**
+     * $formatter, when given, is shared by both streams, as ConsoleOutput shares one, and decides
+     * whether they are decorated.
+     */
+    public function __construct(?OutputFormatterInterface $formatter = null)
     {
-        parent::__construct();
-        $this->errorOutput = new BufferedOutput();
+        $decorated = $formatter !== null && $formatter->isDecorated();
+        parent::__construct(self::VERBOSITY_NORMAL, $decorated, $formatter);
+        $this->errorOutput = new BufferedOutput(self::VERBOSITY_NORMAL, $decorated, $formatter);
     }
 
     public function getErrorOutput(): OutputInterface

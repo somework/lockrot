@@ -15,6 +15,8 @@ use Composer\Semver\VersionParser;
  * belongs to no branch — S6 speaks for it.
  *
  * Keys are version strings on purpose (`"1"`, `"0.3"`, `"0.0.3"`): {@see Comparator} orders them.
+ *
+ * @internal
  */
 final class ReleaseBranch
 {

@@ -11,6 +11,7 @@ use Composer\Repository\RepositoryInterface;
 use Lockrot\Clock;
 use Lockrot\Deadline;
 
+/** @internal */
 final class RepositoryMetadataLoader implements MetadataLoaderInterface
 {
     public const CHUNK_SIZE = 10;

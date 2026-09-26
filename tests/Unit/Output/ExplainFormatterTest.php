@@ -11,6 +11,7 @@ use Lockrot\Data\Forge\RepositoryActivity;
 use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Explain\Explanation;
 use Lockrot\Lock\LockedPackage;
+use Lockrot\Output\ConsoleMarkup;
 use Lockrot\Output\ExplainFormatter;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\Thresholds;
@@ -18,6 +19,7 @@ use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
 use Lockrot\Version;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 
@@ -96,6 +98,42 @@ final class ExplainFormatterTest extends TestCase
         $raw = (new ExplainFormatter())->text($explanation);
         self::assertStringStartsWith("<options=bold>vendor/pkg 1.5.0</> — <fg=yellow>left-behind</fg=yellow>, priority high\n", $raw, 'a flagged verdict is coloured');
         self::assertStringContainsString('php \>=7.1 \<8.0', $raw, 'escaped for the console formatter, which the plain rendering resolves');
+    }
+
+    /**
+     * The package, its version, the note and the run's notes are the lock's and the repository's
+     * text. Rendered by {@see ConsoleMarkup}, which is what `--explain` writes, they print as
+     * written, and the only styles are lockrot's: the bold name, closed where lockrot closed it even
+     * when the version ends in a backslash, and the yellow verdict.
+     *
+     * @dataProvider textsThatLookLikeMarkup
+     */
+    #[DataProvider('textsThatLookLikeMarkup')]
+    public function testTextThatLooksLikeMarkupPrintsAsWrittenAndLeavesNoStyleBehind(string $text): void
+    {
+        $finding = new Finding('vendor/'.$text, $text, Verdict::ABANDONED, [new Signal('S1', 'high', 'marked abandoned: '.$text)], ['vendor/'.$text], null, new \DateTimeImmutable(F::NOW), 'lookup: '.$text);
+        $explanation = new Explanation($finding, F::facts(F::package(['version' => '1.0.0'])), new Thresholds(), '8.4', $this->report(['run: '.$text]));
+
+        $markup = (new ExplainFormatter())->text($explanation);
+        $plain = ConsoleMarkup::render($markup, false);
+        $decorated = ConsoleMarkup::render($markup, true);
+
+        self::assertStringStartsWith('vendor/'.$text.' '.$text." — abandoned, priority critical\n", $plain);
+        self::assertStringContainsString("\n  note: lookup: ".$text."\n", $plain);
+        self::assertStringContainsString("\n  S1 high marked abandoned: ".$text."\n", $plain);
+        self::assertStringEndsWith("\nnote: run: ".$text."\n", $plain);
+        self::assertStringStartsWith("\033[1mvendor/".$text.' '.$text."\033[22m — \033[33mabandoned\033[39m, priority critical\n", $decorated);
+        self::assertSame($plain, str_replace(["\033[1m", "\033[22m", "\033[33m", "\033[39m"], '', $decorated), 'nothing but those two styles');
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function textsThatLookLikeMarkup(): iterable
+    {
+        yield 'a style tag' => ['<<fg=red>>'];
+        yield 'a link tag' => ['<<href=x>>'];
+        yield 'an escaped tag' => ['a\\<b'];
+        yield 'a trailing backslash' => ['a\\'];
+        yield 'a long run of <b' => [str_repeat('<b', 4000)];
     }
 
     /**

@@ -9,11 +9,13 @@ use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Baseline\BaselineEntry;
 use Lockrot\Config\LockrotConfig;
+use Lockrot\Output\ConsoleMarkup;
 use Lockrot\Output\FormatContext;
 use Lockrot\Output\TableFormatter;
 use Lockrot\Signal\Signal;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 
@@ -279,6 +281,49 @@ final class TableFormatterTest extends TestCase
         self::assertStringContainsString(OutputFormatter::escape('vendor/<info>weird'), $out);
         self::assertStringContainsString(OutputFormatter::escape('note with <comment> in it'), $out);
         self::assertStringNotContainsString('vendor/<info>weird', $out);
+    }
+
+    /**
+     * A package name, a version and evidence are the lock's and the repository's text. Rendered by
+     * {@see ConsoleMarkup} — what stdout and an `--output` file get — they print as written, and
+     * the only colours on the page are lockrot's own: the red label and the bold group header, each
+     * closed where lockrot closed it, nothing running on into the text after them. symfony/console
+     * 5.4's own escape() left the second `<` of `<<fg=red>>` live, which threw from the formatter or
+     * opened a style or a link, and lost the backslash of `a\<b`.
+     *
+     * @dataProvider textsThatLookLikeMarkup
+     */
+    #[DataProvider('textsThatLookLikeMarkup')]
+    public function testTextThatLooksLikeMarkupPrintsAsWrittenAndLeavesNoStyleBehind(string $text): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $report = new Report([
+            new Finding('vendor/'.$text, $text, Verdict::ABANDONED, [new Signal('S1', 'high', 'marked abandoned: '.$text)], ['vendor/'.$text], null, $at),
+        ], ['note: '.$text], $at, 1, 0, false);
+
+        $out = $this->formatter(200)->format($report);
+        $plain = ConsoleMarkup::render($out, false);
+        $decorated = ConsoleMarkup::render($out, true);
+
+        // Compared without whitespace: the rows wrap a long run, and not only at its spaces.
+        $squeezed = static fn (string $text): string => (string) preg_replace('/\s+/', '', $text);
+        self::assertStringContainsString($squeezed('vendor/'.$text.' '.$text), $squeezed($plain));
+        self::assertStringContainsString($squeezed('marked abandoned: '.$text), $squeezed($plain));
+        self::assertStringContainsString($squeezed('note: note: '.$text), $squeezed($plain));
+        self::assertSame(1, substr_count($decorated, "\033[31m"), 'one red label');
+        self::assertSame(1, substr_count($decorated, "\033[1m"), 'one bold header');
+        self::assertSame($plain, str_replace(["\033[31m", "\033[39m", "\033[1m", "\033[22m"], '', $decorated), 'nothing but those two styles');
+        self::assertStringContainsString("\033[1mcritical (1)\033[22m\n  \033[31mabandoned\033[39m", $decorated);
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function textsThatLookLikeMarkup(): iterable
+    {
+        yield 'a style tag' => ['<<fg=red>>'];
+        yield 'a link tag' => ['<<href=x>>'];
+        yield 'an escaped tag' => ['a\\<b'];
+        yield 'a trailing backslash' => ['a\\'];
+        yield 'a long run of <b' => [str_repeat('<b', 4000)];
     }
 
     /** Rendered wide enough that no summary line folds, so the order can be asserted line for line. */

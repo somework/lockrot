@@ -32,7 +32,11 @@ use Lockrot\Signal\SignalSet;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\VerdictEngine;
 
-/** The analysis itself: metadata, repository activity, signals and verdicts for a set of locked packages. */
+/**
+ * The analysis itself: metadata, repository activity, signals and verdicts for a set of locked packages.
+ *
+ * @internal
+ */
 final class Analyzer
 {
     public const NOTE_NOT_IN_REPOSITORY = 'not from a Composer repository, not checked';

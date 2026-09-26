@@ -16,6 +16,7 @@ use Lockrot\Baseline\BaselineFile;
 use Lockrot\Clock;
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Config\Policy;
+use Lockrot\Config\UnknownKeys;
 use Lockrot\Data\Forge\Tokens;
 use Lockrot\Deadline;
 use Lockrot\Exception\ConfigException;
@@ -23,7 +24,9 @@ use Lockrot\Exception\InstallBlockedException;
 use Lockrot\Lock\LockedPackage;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
+use Lockrot\Output\ConsoleMarkup;
 use Lockrot\Output\InstallSummaryFormatter;
+use Lockrot\Output\TerminalText;
 
 /**
  * The `composer require`/`update`/`install` half of lockrot: on InstallerEvents::PRE_OPERATIONS_EXEC
@@ -40,6 +43,8 @@ use Lockrot\Output\InstallSummaryFormatter;
  * from an existing lock, which starts cold, is bounded by
  * {@see LockrotConfig::installTimeBudgetSeconds()} ({@see LockrotConfig::DEFAULT_INSTALL_TIME_BUDGET}
  * seconds unless the project sets `extra.lockrot.install-time-budget`).
+ *
+ * @internal
  */
 final class InstallTimeSummary
 {
@@ -66,13 +71,29 @@ final class InstallTimeSummary
             // install continues. Collapsed to one line: some exception messages (a wrapped
             // exception's chain, a multi-line library error) embed newlines of their own, which
             // would otherwise split this into more than the one line promised.
-            $io->writeError('<warning>lockrot: install-time check skipped: '.$this->oneLine($e->getMessage()).'</warning>');
+            self::writeWarning($io, 'lockrot: install-time check skipped: '.$this->oneLine($e->getMessage()));
         }
     }
 
+    /**
+     * The message on one line, with nothing left in it that a terminal would obey. Written raw (see
+     * {@see self::writeWarning()}), it no longer passes through Composer's own sanitising, so
+     * {@see TerminalText::neutralise()} does that job.
+     */
     private function oneLine(string $message): string
     {
-        return trim((string) preg_replace('/\s+/', ' ', $message));
+        return TerminalText::neutralise(trim((string) preg_replace('/\s+/', ' ', $message)));
+    }
+
+    /**
+     * One `warning`-coloured line on stderr, past Symfony's tag formatter: these lines quote the
+     * project's own text — an `extra.lockrot` key, a config error that names one — which is not
+     * console markup (see {@see TerminalText}). writeErrorRaw() is on IOInterface from Composer 2.2 on.
+     * IOInterface only says whether stdout is decorated; stderr is taken to be the same.
+     */
+    private static function writeWarning(IOInterface $io, string $line): void
+    {
+        $io->writeErrorRaw(TerminalText::warning($line, $io->isDecorated()));
     }
 
     private function run(InstallerEvent $event): void
@@ -97,6 +118,13 @@ final class InstallTimeSummary
         $packages = TransactionPackages::fromTransaction($transaction);
         if ($packages === []) {
             return;
+        }
+        // The warning's own gates, checked above: not under LOCKROT_DISABLE, not with install-time
+        // off, not without a transaction, not for one that installs or updates nothing. Unlike the
+        // block it does not wait for a finding: it is printed before the analysis, above the block,
+        // and is never a reason to stop.
+        foreach (UnknownKeys::warnings($project->lockrotExtra()) as $warning) {
+            self::writeWarning($event->getIO(), 'lockrot: '.$warning);
         }
 
         // By the time this event fires, `composer require`/`update` has already written the new lock
@@ -124,7 +152,10 @@ final class InstallTimeSummary
         $report = $this->withBaseline($report, \dirname($composerFile), $lockrot, $lock);
         $lines = (new InstallSummaryFormatter())->format($report);
         if ($lines !== []) {
-            $event->getIO()->writeError($lines);
+            // Raw, rendered by lockrot: the block quotes the lock, which is not console markup
+            // (see ConsoleMarkup).
+            $decorated = $event->getIO()->isDecorated();
+            $event->getIO()->writeErrorRaw(array_map(static fn (string $line): string => ConsoleMarkup::render($line, $decorated), $lines));
         }
 
         // isExecutingOperations() is false for a dry run, where nothing is about to land on disk and
