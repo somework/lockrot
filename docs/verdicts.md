@@ -83,7 +83,10 @@ never been tagged, from friendsofsymfony/oauth-server-bundle on `dev-master`, wh
   at, not a release. It is null for `no_stable_release`, and when the lock entry has no time.
 
 The verdict is `pinned` either way. `--explain` shows the same facts: `has_stable_release` and
-`last_stable_*` under `metadata`, the snapshot's date as `lock.released`.
+`last_stable_*` under `metadata`, the snapshot's date as `lock.released`. Its text prints S6's data
+keys that have a value on the line under the signal and leaves the null ones out, so rulerz reads
+`version dev-master · reason branch_snapshot · has_stable_release false · snapshot_time …`;
+`--format=json` carries every key, nulls included.
 
 S5 is not what `composer check-platform-reqs` checks. That command tests the platform against each
 constraint — PHP 8.4 satisfies `>=7.2`, so it passes — while S5 tests the constraint against the

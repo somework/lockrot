@@ -125,17 +125,26 @@ final class ExplainFormatter
      * A signal's data as lines: scalars joined `key value` on one line, the advisory list (S9) one
      * advisory per line, anything else as JSON.
      *
+     * S6 leaves out a key whose value is null. Its release facts are null when lockrot does not know
+     * them (no repository metadata) or when they do not apply (no tag, no snapshot), and printing
+     * each of those as `null` buried the facts a reader wants under words saying there are none; the
+     * JSON still carries every key. Every other signal prints a null as `null`, as it always has.
+     *
      * @return list<string>
      */
     private function signalData(Signal $signal): array
     {
         $scalars = [];
         $lines = [];
+        $skipNulls = $signal->id() === Signal::S6;
         foreach ($signal->data() as $key => $value) {
             if ($key === self::ADVISORY_LIST && \is_array($value)) {
                 foreach ($value as $row) {
                     $lines[] = \is_array($row) ? self::advisory($row) : self::encode($row);
                 }
+                continue;
+            }
+            if ($value === null && $skipNulls) {
                 continue;
             }
             if (\is_scalar($value) || $value === null) {
