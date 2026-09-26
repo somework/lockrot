@@ -89,11 +89,17 @@ reviews:
         code.
     - path: 'bin/**'
       instructions: |
-        Extensionless PHP scripts under the same PHP 7.4 floor as src/. Note that php-cs-fixer's
-        Finder covers only the files named in .php-cs-fixer.dist.php and PHPStan does not scan
-        bin/ at all, so nothing here is checked automatically. Progress and errors go to STDERR and
-        the single closing result line to STDOUT. A token is read as getenv('GITHUB_TOKEN') ?: null,
-        where unset means anonymous rather than an error.
+        The PHP scripts (bin/lockrot, bin/record-fixtures, bin/refresh-monorepo-parents) are
+        extensionless PHP under the same PHP 7.4 floor as src/. Note that php-cs-fixer's Finder
+        covers only the files named in .php-cs-fixer.dist.php and PHPStan does not scan bin/ at
+        all, so nothing here is checked automatically. In those PHP scripts, progress and errors go
+        to STDERR and the single closing result line to STDOUT, and a token is read as
+        getenv('GITHUB_TOKEN') ?: null, where unset means anonymous rather than an error.
+        The bash recorders (bin/record-schema-evolution, bin/record-demo) are run by hand and record
+        with a GitHub token on purpose: record-schema-evolution refuses to start without
+        GITHUB_TOKEN, because its provenance.json states that the recording used one and an
+        anonymous run would record rate-limited answers instead of what the release writes. Do not
+        suggest making the token optional there.
     - path: 'tests/**/*.php'
       instructions: |
         PHP 7.4 and 8.0 run this suite under phpunit9.xml.dist with a PHPUnit that reads only the

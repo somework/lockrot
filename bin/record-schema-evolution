@@ -199,5 +199,5 @@ done
 
 mkdir -p "$(dirname "$out")"
 mv "$work/out" "$out"
-echo "recorded $out" >&2
 ls -la "$out" "$out/explain" >&2
+echo "recorded $out"
