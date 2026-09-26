@@ -59,6 +59,32 @@ see [internals.md](internals.md) for how that data is fetched and cached, which 
 S8 reads the same release dates S2 does, one branch at a time — see [Left behind](#left-behind).
 S9 comes from the same Composer repositories, through the advisory API `composer audit` uses.
 
+S6 says which of its two cases fired, and whether the package has ever released. A snapshot is
+checked first, so the evidence line alone cannot tell wallabag/rulerz on `dev-master`, which has
+never been tagged, from friendsofsymfony/oauth-server-bundle on `dev-master`, which has; under
+`--format=json` the signal's data can:
+
+- `reason` is `branch_snapshot` when the installed version is a branch, `no_stable_release` when it
+  is not and the repository lists no tagged version. An open set: a later release may add a reason.
+  It is not libyears' `no_stable_release_date`, which counts packages whose newest release carries
+  no date.
+- `has_stable_release` says whether the repository lists any tagged version; a pre-release counts,
+  a branch does not. wallabag/rulerz is `false`, oauth-server-bundle `true`. It is null, not
+  false, when lockrot loaded no repository metadata for the package — a `vcs` or `path` entry, a
+  package the repository does not list, metadata that did not load; the report's notes say which —
+  because nothing then says it never released.
+- `last_stable_release` and `last_stable_version` are the newest *dated* tagged release, not the
+  highest tag: 1.6.2 of 2019-01-23 for oauth-server-bundle, whose 2.0.0-alpha.0 is higher and
+  older. They are null with no tagged release, with no metadata, and where tags exist but the
+  highest carries no date lockrot trusts (a subtree split, whose tags share a commit) unless the
+  monorepo it was split from dates it; `last_stable_dated_by` then names that monorepo. S2 carries
+  the same date as `last_release` and `last_version`.
+- `snapshot_time` is the lock's `time` for a snapshot: the date of the commit the branch pointed
+  at, not a release. It is null for `no_stable_release`, and when the lock entry has no time.
+
+The verdict is `pinned` either way. `--explain` shows the same facts: `has_stable_release` and
+`last_stable_*` under `metadata`, the snapshot's date as `lock.released`.
+
 S5 is not what `composer check-platform-reqs` checks. That command tests the platform against each
 constraint — PHP 8.4 satisfies `>=7.2`, so it passes — while S5 tests the constraint against the
 release history: a `>=7.2` written in 2019 says nothing about PHP 8, which did not exist. The line

@@ -198,6 +198,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   heading that does not exist. `mkdocs build --strict` let both through, because mkdocs reports them
   as information rather than warnings; `mkdocs.yml` now makes them warnings.
 
+- S6 now says whether a pinned package has ever released. The rule checks for a branch snapshot
+  before it checks for "no tagged release", and its data carried only the version, so
+  wallabag/rulerz on `dev-master`, which has never been tagged, read exactly like
+  friendsofsymfony/oauth-server-bundle on `dev-master`, which has; only `--explain` knew the
+  difference. The signal's `data` now carries `reason` (`branch_snapshot` or `no_stable_release`,
+  an open set), `has_stable_release` (whether the repository lists any tagged version; null, not
+  false, when lockrot loaded no repository metadata for the package, since nothing then says it
+  never released), `last_stable_release` and `last_stable_version` (the newest dated tagged release,
+  null also where the highest tag carries no date lockrot trusts), `last_stable_dated_by` (the
+  monorepo parent that dated it, as S2's `dated_by` does) and `snapshot_time` (the lock's `time` for
+  a snapshot: the commit the branch pointed at, not a release). The names are the ones the
+  explanation's `metadata` already uses. All are optional in `report-1.json`, so reports written
+  before still validate, and the schema snapshot for 0.13.0 is the file with them. The verdict,
+  priority, exit code, evidence line, baseline, SARIF and GitLab output are unchanged; the
+  `--explain` text and the HTML page list the new keys with the signal, as they list every
+  signal's data. See [verdicts.md](docs/verdicts.md#the-signals).
+
 ### Fixed
 
 - A package name, a version, a constraint or a note that looked like console markup could break the
