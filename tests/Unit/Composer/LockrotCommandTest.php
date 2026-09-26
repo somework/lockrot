@@ -28,7 +28,6 @@ use Lockrot\Data\Repository\MetadataLoaderInterface;
 use Lockrot\Data\Repository\RepositoryMetadataLoader;
 use Lockrot\Json\JsonReader;
 use Lockrot\Signal\SignalSet;
-use Lockrot\Tests\Support\ColdConfigSchema;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\MarkupRefusingFormatter;
@@ -894,13 +893,15 @@ final class LockrotCommandTest extends TestCase
     /**
      * `--format` on the command line wins over `extra.lockrot.format`, but a format the configuration
      * names and lockrot does not write is still a configuration error, exit 2: the published schema
-     * leaves `format` open for editors, and lockrot reads its `x-known-values` as the enum. The
-     * schema is read afresh, since the first validation of a process is the one that has to hold.
+     * leaves `format` open for editors, and lockrot reads its `x-known-values` as the enum. This pins
+     * the command's message and exit code, byte for byte. It does not pin the first validation of a
+     * process: the command validates extra.lockrot twice, in initialize() and again in execute(), so
+     * a first call that let the format through would still end here. ConfigSchemaTest and
+     * InstallTimeSummaryTest pin the first call.
      */
     public function testAnUnknownConfiguredFormatIsExit2EvenWhenTheCommandLineNamesOne(): void
     {
         $this->fixtureCopy(self::LARAVEL_LOCK, ['format' => 'xml', 'install-tme' => 'off']);
-        ColdConfigSchema::forget();
 
         [$code, $stdout, $stderr] = $this->runWithSplitStreams(['--format' => 'json']);
 
