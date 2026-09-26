@@ -212,10 +212,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   of `exposure` in the schema and in `docs/verdicts.md` now say that a direct requirement is listed
   only when it pulls in an attributable flagged package, its own verdict being on its finding, and
   the docs no longer say the `pulled in by:` line appears whenever a flagged package is transitive:
-  it appears when `exposure` is not empty. `exposure`, S7, the `pulled in by:` line and every other
-  format are unchanged, and both fields are optional in the report schema, so documents written
-  before 0.13.0 still validate. The 0.13.0 snapshot of the report schema under
-  `tests/fixtures/schema-evolution/` is refreshed to match, since 0.13.0 is not tagged yet.
+  it appears when `exposure` is not empty. `exposure`, S7 and the `pulled in by:` line are
+  unchanged, as are `--explain` and the table, markdown, GitHub, GitLab and SARIF formats. The HTML
+  page embeds the JSON report under its `report` key, so that embedded document carries the two new
+  fields too; the page itself does not show them yet. Both fields are optional in the report
+  schema, so documents written before 0.13.0 still validate. The 0.13.0 snapshot of the report
+  schema under `tests/fixtures/schema-evolution/` is refreshed to match, since 0.13.0 is not tagged
+  yet.
 
 ### Fixed
 
