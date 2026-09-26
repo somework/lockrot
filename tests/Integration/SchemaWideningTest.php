@@ -68,6 +68,7 @@ final class SchemaWideningTest extends TestCase
         yield 'baseline findings lose stale' => [Schemas::BASELINE, 'baseline-verdict', '#/properties/findings/additionalProperties/properties/verdict: no longer accepts "stale"'];
         yield 'baseline schema maximum lowered' => [Schemas::BASELINE, 'baseline-maximum', '#/properties/lockrot/properties/schema: maximum lowered to 0'];
         yield 'config budget maximum lowered' => [Schemas::CONFIG, 'budget-maximum', '#/properties/install-time-budget: maximum lowered to 60'];
+        yield 's6 reason loses no_stable_release' => [Schemas::REPORT, 's6-reason-dropped', '/properties/data/properties/reason: no longer accepts "no_stable_release"'];
     }
 
     /**
@@ -232,6 +233,9 @@ final class SchemaWideningTest extends TestCase
                 return self::with($s, ['properties', 'findings', 'additionalProperties', 'properties', 'verdict', 'enum'], ['abandoned', 'silent', 'pinned', 'left-behind', 'old-promise']);
             case 'baseline-maximum':
                 return self::with($s, ['properties', 'lockrot', 'properties', 'schema', 'maximum'], 0);
+            case 's6-reason-dropped':
+                // An open set, read strictly: a known reason dropped from x-known-values narrows it.
+                return self::with($s, ['definitions', 's6', 'properties', 'reason', KnownValues::KEYWORD], ['branch_snapshot']);
             case 'budget-maximum':
                 return self::with($s, ['properties', 'install-time-budget', 'maximum'], 60);
             case 'field-added':

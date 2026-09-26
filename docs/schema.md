@@ -63,8 +63,8 @@ describes the newest release under that number. The version that added a field i
 ## Open sets
 
 Objects are open, and so are the sets of values that grow in minor releases: signal ids (a
-signal's `id` and S10's `blocks`), S10's `check` and `reason`, S8's `floor_source`, and the
-configuration schema's `format`. Each is a string with a `pattern`, plus an `x-known-values` list of
+signal's `id` and S10's `blocks`), S10's `check` and `reason`, S6's `reason`, S8's `floor_source`,
+and the configuration schema's `format`. Each is a string with a `pattern`, plus an `x-known-values` list of
 the values this release writes. A validator ignores a keyword draft-04 does not define, so a copy of
 the schema taken from 0.13.0 on accepts a signal, a reason, a floor or a format that a later release
 adds, and a signal or format named `<vendor>:<name>`, the form reserved for those that do not come
@@ -148,6 +148,14 @@ consumer usually keys on:
 - A finding can carry `S10`, the signal that says a check did not run: its `data` names each
   missing check, why, and the signals it blocked. Added in 0.11.0; documents written before it
   simply have no such signal, and the id is part of the same schema number.
+- S6's `data` says why it fired and whether the package has ever released: `reason`
+  (`branch_snapshot` or `no_stable_release`; an open string, so a later reason validates too),
+  `has_stable_release` (null, not false, when lockrot loaded no repository metadata for the
+  package), `last_stable_release`, `last_stable_version` and `last_stable_dated_by` (the newest
+  dated tagged release and the monorepo that dated it, if one did), and `snapshot_time`, the lock's
+  commit date for a snapshot. Added in 0.13.0 under the same schema number and optional in the
+  schema, so reports written before it still validate. See
+  [verdicts.md](verdicts.md#the-signals) for when each is null.
 - Each finding carries `libyears` — years behind the package's newest stable release, at least 0,
   or null when not measured — and the document a `libyears` block derived from them: `total`,
   `direct_requirements` (both null when `measured` is 0, since nothing could be measured), `measured`,
