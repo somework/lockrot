@@ -99,7 +99,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   which cannot notice a schema change that rejects an older one — a field made required, a type or
   an enum value lost, a listed field dropped. Two checks now hold the schemas to it, both under
   `tests/fixtures/schema-evolution/`:
-  - The report, explain, baseline and config schemas every release from 0.9.0 to 0.12.0 published
+  - The report, explain, baseline and config schemas every release from 0.9.0 to 0.13.0 published
     are kept, and each one under the current number must be accepted by the current file: a member
     made required, a type or an enum value lost, a bound tightened, a listed property dropped or an
     object closed fails the build, whether or not any recorded document carries it. A release that
