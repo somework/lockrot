@@ -67,8 +67,7 @@
     //    on PHP >= 8.2 when clean; killed on the 7.4 leg), LockrotCommand.php:627 x2 (the Composer 2.2
     //    arm of the tryComposer() guard, never entered on the vendored Composer; covered by the Docker
     //    7.4/2.2 run outside Infection), SelfUpdateCommand.php:155 (Phar::running(false) differs only
-    //    inside a running PHAR; covered by the e2e PharTest Infection does not run) and :152 (the
-    //    class_exists() preload of TerminalText, which only a failure after a real archive swap sees).
+    //    inside a running PHAR; covered by the e2e PharTest Infection does not run).
     //  - Same result by another route: ActivityClient.php:70 (`<` to `<=` assigns an equal value),
     //    ProjectIgnoreList.php:76 and PhpReleaseDates.php:30 Concat (PHP's date parser accepts the
     //    reversed `T..` concatenation as the same instant), JsonReader.php:86 (array_keys([]) never
@@ -103,6 +102,11 @@
     // schemas, adds no escape (every mutant killed by tests/Unit/Json/KnownValuesTest.php and the
     // first-call tests of ConfigSchema); the four ConfigSchema escapes moved to :48, :60 and :64
     // with the docblock that says why the runtime reads `x-known-values` as the enum.
+    //
+    // 2026-09-27 (self-update writes raw): SelfUpdateCommand.php:152 FunctionCallRemoval, the
+    // class_exists() preload of TerminalText that only a failure after a real archive swap sees,
+    // replaces the :278 ConcatOperandRemoval from the --output round (writeError() no longer builds
+    // a tag); the count is unchanged. The :152 Phar::running(false) escape above moved to :155.
     //
     // Threshold 97 = floor of the honest MSI minus 1: at 3201 mutants that leaves room for ~40 new
     // escapes before the gate fails — close to the ~25 the narrower scope allowed — without the
