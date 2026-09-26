@@ -15,10 +15,13 @@ namespace Lockrot\Json;
  * field added later validates against a copy a consumer fetched earlier; the number moves only when
  * a field is removed or renamed. The `id` inside each resources/*.schema.json is this same URL.
  *
- * Objects are open, but some values are still enums: signal ids, S10's `check`, `reason` and
- * `blocks`, S8's `floor_source` and the config schema's `format`. A new value there needs a schema
- * update, and a copy fetched or vendored before it rejects the value until it is refreshed;
- * describing them as open strings is planned before 1.0 (docs/compatibility.md, "Open sets").
+ * Objects are open, and so are the sets of values that grow in minor releases: signal ids, S10's
+ * `check`, `reason` and `blocks`, S8's `floor_source` and the config schema's `format` are strings
+ * with a `pattern` and an `x-known-values` list of what this release writes
+ * ({@see KnownValues}), and the report types a signal whose id it does not list with a generic branch
+ * that takes any object as its data. A copy fetched from 0.13.0 on accepts a value a later release
+ * adds; the closed sets — verdicts, priorities, levels, standings, the schema number — stay enums
+ * (docs/compatibility.md, "Open sets").
  *
  * @internal
  */

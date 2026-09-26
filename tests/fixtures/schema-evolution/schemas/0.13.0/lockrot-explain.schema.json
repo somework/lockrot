@@ -59,6 +59,12 @@
         "packageName": { "description": "A Composer package name, vendor/name.", "type": "string", "pattern": "^[^\\/]+\\/[^\\/]+$" },
         "verdict": { "type": "string", "enum": ["abandoned", "silent", "pinned", "left-behind", "old-promise", "stale", "unknown", "finished", "ok"] },
         "priority": { "type": "string", "enum": ["critical", "high", "medium", "low", "none"] },
+        "signalId": {
+            "description": "A signal identifier: `S` and a number for lockrot's own, as `docs/verdicts.md` lists them, or `<vendor>:<name>` for one that does not come from lockrot. An open set: a later release under this schema number can add an id, so read one you do not know as \"other\". `x-known-values` lists the ids this release writes; read it as the enum to hold a document to them.",
+            "type": "string",
+            "pattern": "^(S[1-9][0-9]*|[a-z0-9][a-z0-9_.-]*:[a-z0-9][a-z0-9_.-]*)$",
+            "x-known-values": ["S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9", "S10"]
+        },
         "finding": {
             "description": "The same object the report's `findings[]` carries; see report-1.json for the per-signal `data` shapes.",
             "type": "object",
@@ -77,7 +83,7 @@
                         "type": "object",
                         "required": ["id", "level", "summary", "data"],
                         "properties": {
-                            "id": { "type": "string", "enum": ["S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9", "S10"] },
+                            "id": { "$ref": "#/definitions/signalId" },
                             "level": { "type": "string", "enum": ["info", "warn", "high"] },
                             "summary": { "type": "string" },
                             "data": { "type": "object" }

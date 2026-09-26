@@ -35,7 +35,10 @@ The shape of `extra.lockrot` is validated against its published JSON schema,
 (`resources/lockrot-config.schema.json` in the repository; see [schema.md](schema.md)). The keys below
 must have the listed type — in particular, the four threshold keys must be JSON integers (`3`, not
 `"3"`). A key lockrot does not know is still accepted, but no longer silently: see
-[Unknown keys](#unknown-keys).
+[Unknown keys](#unknown-keys). The published schema leaves `format` open, so an editor holding an
+older copy does not flag a format a later release adds; lockrot itself reads the formats the schema
+lists as the only ones there are, and a `format` it does not write is a configuration error, exit
+`2`, even when `--format` on the command line overrides it.
 
 ## `extra.lockrot` keys
 

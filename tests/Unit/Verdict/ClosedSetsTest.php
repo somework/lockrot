@@ -6,8 +6,11 @@ namespace Lockrot\Tests\Unit\Verdict;
 
 use Lockrot\Analyzer\RunSettings;
 use Lockrot\Config\LockrotConfig;
+use Lockrot\Json\KnownValues;
 use Lockrot\Json\Schemas;
 use Lockrot\Output\JsonFormatter;
+use Lockrot\Signal\PhpFloor;
+use Lockrot\Signal\Rule\NotCheckedRule;
 use Lockrot\Tests\Support\ClosedSets;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Verdict\FailOn;
@@ -25,7 +28,9 @@ use PHPUnit\Framework\TestCase;
  * lists here are spelled out as literals on purpose. The published schemas are held to the same
  * sets in the same order, because a consumer validating against them reads the order from there.
  *
- * The last test guards the names docs/compatibility.md reserves for extensions.
+ * The open sets are held the other way round: an open string in every schema, with the values
+ * lockrot writes listed in `x-known-values` and nowhere as an enum. The last test guards the names
+ * docs/compatibility.md reserves for extensions.
  */
 final class ClosedSetsTest extends TestCase
 {
@@ -34,6 +39,12 @@ final class ClosedSetsTest extends TestCase
     private const PRIORITIES = ['critical', 'high', 'medium', 'low', 'none'];
     private const LEVELS = ['info', 'warn', 'high'];
     private const STANDINGS = ['known', 'new', 'worsened'];
+    /** A signal id: lockrot's own `S<n>`, or a `<vendor>:<name>` one that does not come from lockrot. */
+    private const SIGNAL_ID = '^(S[1-9][0-9]*|[a-z0-9][a-z0-9_.-]*:[a-z0-9][a-z0-9_.-]*)$';
+    /** A format name: lockrot's own, or a `<vendor>:<name>` one. */
+    private const FORMAT = '^([a-z][a-z0-9-]*|[a-z0-9][a-z0-9_.-]*:[a-z0-9][a-z0-9_.-]*)$';
+    /** An S10 check or reason and an S8 floor source: a lower-case word. */
+    private const WORD = '^[a-z][a-z0-9_]*$';
     private const ROOT = __DIR__.'/../../../';
 
     public function testTheVerdictsAreFrozenInTheirOrder(): void
@@ -106,11 +117,43 @@ final class ClosedSetsTest extends TestCase
     }
 
     /**
+     * No closed set is described as open: nothing that spells one out carries `x-known-values`.
+     */
+    public function testNoClosedSetCarriesKnownValues(): void
+    {
+        $report = self::schema(Schemas::REPORT);
+        $explain = self::schema(Schemas::EXPLAIN);
+        $config = self::schema(Schemas::CONFIG);
+        $closed = [
+            JsonPath::arrayAt($report, ['definitions', 'verdict']),
+            JsonPath::arrayAt($report, ['definitions', 'priority']),
+            JsonPath::arrayAt($report, ['definitions', 'level']),
+            JsonPath::arrayAt($report, ['definitions', 'baselineStanding', 'oneOf', 0, 'properties', 'status']),
+            JsonPath::arrayAt($report, ['definitions', 'envelope', 'properties', 'schema']),
+            JsonPath::arrayAt($explain, ['definitions', 'verdict']),
+            JsonPath::arrayAt($explain, ['definitions', 'priority']),
+            JsonPath::arrayAt($explain, ['definitions', 'finding', 'properties', 'signals', 'items', 'properties', 'level']),
+            JsonPath::arrayAt($explain, ['properties', 'lockrot', 'properties', 'schema']),
+            JsonPath::arrayAt(self::schema(Schemas::BASELINE), ['properties', 'findings', 'additionalProperties', 'properties', 'verdict']),
+            JsonPath::arrayAt($config, ['properties', 'fail-on']),
+            JsonPath::arrayAt($config, ['properties', 'install-time']),
+        ];
+        foreach ($closed as $i => $node) {
+            self::assertArrayHasKey('enum', $node, 'closed set '.$i);
+            self::assertArrayNotHasKey(KnownValues::KEYWORD, $node, 'closed set '.$i);
+        }
+    }
+
+    /**
      * Signal ids are an open set — they grow in minor releases — but the ids lockrot ships are its
-     * own `S<n>`, and the schemas list exactly those while they still spell the set out. The report
-     * schema spells it three times: the `signalId` enum S10's `blocks` use, the enum on a signal's
-     * `id`, and one `anyOf` branch per id that types that signal's `data`. A signal added to the code
-     * and to one of the three would otherwise validate against the other two only by accident.
+     * own `S<n>`, and the schemas list exactly those in `x-known-values`. The report schema names
+     * them three times: `signalId`, which a signal's `id` and S10's `blocks` refer to, one typed
+     * `anyOf` branch per id that types that signal's `data`, and the last branch, which takes every
+     * id the schema does not list and says which those are with a `not` over the same list. A signal
+     * added to the code and to one of the three would otherwise validate against the others only by
+     * accident. The last branch carries no `type` and no `properties` of its own: the strict twin
+     * closes a typed object that lists its properties, and closed inside the `not` it would let every
+     * signal through, untyped.
      */
     public function testTheSignalIdsAreLockrotsOwnAndTheSchemasListThem(): void
     {
@@ -121,11 +164,19 @@ final class ClosedSetsTest extends TestCase
         }
 
         $report = self::schema(Schemas::REPORT);
-        self::assertSame($ids, JsonPath::arrayAt($report, ['definitions', 'signalId', 'enum']));
-        self::assertSame($ids, JsonPath::arrayAt($report, ['definitions', 'signal', 'properties', 'id', 'enum']));
+        self::assertSame($ids, JsonPath::arrayAt($report, ['definitions', 'signalId', KnownValues::KEYWORD]));
+        self::assertSame(['$ref' => '#/definitions/signalId'], JsonPath::arrayAt($report, ['definitions', 'signal', 'properties', 'id']));
+        self::assertSame(['$ref' => '#/definitions/signalId'], JsonPath::arrayAt($report, ['definitions', 's10', 'properties', 'blocks', 'items']));
+        self::assertSame(['$ref' => '#/definitions/signalId'], JsonPath::arrayAt($report, ['definitions', 's10', 'properties', 'unchecked', 'items', 'properties', 'blocks', 'items']));
+
+        $anyOf = JsonPath::arrayAt($report, ['definitions', 'signal', 'anyOf']);
+        $unknown = array_pop($anyOf);
+        self::assertIsArray($unknown, 'the last branch');
+        self::assertSame(['description', 'not'], array_keys($unknown), 'the last branch holds only its not');
+        self::assertSame(['properties' => ['id' => ['enum' => $ids]]], $unknown['not']);
 
         $branches = [];
-        foreach (JsonPath::arrayAt($report, ['definitions', 'signal', 'anyOf']) as $index => $branch) {
+        foreach ($anyOf as $index => $branch) {
             self::assertIsArray($branch, 'anyOf branch '.$index);
             self::assertCount(1, JsonPath::arrayAt($branch, ['properties', 'id', 'enum']), 'anyOf branch '.$index.' names one signal');
             $id = JsonPath::stringAt($branch, ['properties', 'id', 'enum', 0]);
@@ -138,7 +189,77 @@ final class ClosedSetsTest extends TestCase
         }
         self::assertSame($ids, $branches);
 
-        self::assertSame($ids, JsonPath::arrayAt(self::schema(Schemas::EXPLAIN), ['definitions', 'finding', 'properties', 'signals', 'items', 'properties', 'id', 'enum']));
+        $explain = self::schema(Schemas::EXPLAIN);
+        self::assertSame(JsonPath::arrayAt($report, ['definitions', 'signalId']), JsonPath::arrayAt($explain, ['definitions', 'signalId']), 'the explain schema spells signalId as the report does');
+        self::assertSame(['$ref' => '#/definitions/signalId'], JsonPath::arrayAt($explain, ['definitions', 'finding', 'properties', 'signals', 'items', 'properties', 'id']));
+    }
+
+    /**
+     * Every open set is a string with a `pattern` and the values lockrot writes in `x-known-values`,
+     * never an enum, and every known value fits the pattern. The patterns are spelled out, since the
+     * strict reading drops them and the widening check never sees one narrowed; the known values are
+     * held to the code. The list of places is complete: an `x-known-values` anywhere else fails.
+     */
+    public function testTheOpenSetsAreOpenStringsWithTheirKnownValues(): void
+    {
+        $report = self::schema(Schemas::REPORT);
+        $explain = self::schema(Schemas::EXPLAIN);
+        $config = self::schema(Schemas::CONFIG);
+        $s10Entry = ['definitions', 's10', 'properties', 'unchecked', 'items', 'properties'];
+        $open = [
+            'report #/definitions/signalId' => [JsonPath::arrayAt($report, ['definitions', 'signalId']), self::SIGNAL_ID, ClosedSets::signalIds()],
+            'report #/definitions/s10/properties/unchecked/items/properties/check' => [JsonPath::arrayAt($report, array_merge($s10Entry, ['check'])), self::WORD, ['repository_activity', 'release_dates']],
+            'report #/definitions/s10/properties/unchecked/items/properties/reason' => [
+                JsonPath::arrayAt($report, array_merge($s10Entry, ['reason'])),
+                self::WORD,
+                [NotCheckedRule::NO_TOKEN, NotCheckedRule::RATE_BUDGET, NotCheckedRule::BUDGET, NotCheckedRule::RATE_LIMIT, NotCheckedRule::FETCH_FAILED, NotCheckedRule::OFFLINE, 'undated_releases'],
+            ],
+            'report #/definitions/s8/properties/floor_source/oneOf/0' => [JsonPath::arrayAt($report, ['definitions', 's8', 'properties', 'floor_source', 'oneOf', 0]), self::WORD, [PhpFloor::PROJECT, PhpFloor::TARGET]],
+            'explain #/definitions/signalId' => [JsonPath::arrayAt($explain, ['definitions', 'signalId']), self::SIGNAL_ID, ClosedSets::signalIds()],
+            'config #/properties/format' => [JsonPath::arrayAt($config, ['properties', 'format']), self::FORMAT, LockrotConfig::FORMATS],
+        ];
+        foreach ($open as $where => [$node, $pattern, $known]) {
+            self::assertSame('string', $node['type'] ?? null, $where);
+            self::assertArrayNotHasKey('enum', $node, $where);
+            self::assertSame($pattern, $node['pattern'] ?? null, $where);
+            self::assertSame($known, $node[KnownValues::KEYWORD] ?? null, $where);
+            self::assertSame($known, array_values(array_unique($known)), $where);
+            foreach ($known as $value) {
+                self::assertMatchesRegularExpression('{'.$pattern.'}', $value, $where);
+            }
+        }
+        self::assertSame(['type' => 'null'], JsonPath::arrayAt($report, ['definitions', 's8', 'properties', 'floor_source', 'oneOf', 1]), 'floor_source is otherwise null');
+        self::assertCount(2, JsonPath::arrayAt($report, ['definitions', 's8', 'properties', 'floor_source', 'oneOf']));
+
+        $found = [];
+        foreach (['report' => $report, 'explain' => $explain, 'config' => $config, 'baseline' => self::schema(Schemas::BASELINE)] as $document => $schema) {
+            foreach (self::withKnownValues($schema, '#') as $path) {
+                $found[] = $document.' '.$path;
+            }
+        }
+        sort($found);
+        $expected = array_keys($open);
+        sort($expected);
+        self::assertSame($expected, $found);
+    }
+
+    /**
+     * The places in a decoded schema that carry `x-known-values`.
+     *
+     * @param array<mixed, mixed> $node
+     *
+     * @return list<string>
+     */
+    private static function withKnownValues(array $node, string $path): array
+    {
+        $found = \array_key_exists(KnownValues::KEYWORD, $node) ? [$path] : [];
+        foreach ($node as $key => $value) {
+            if (\is_array($value) && $key !== KnownValues::KEYWORD) {
+                $found = array_merge($found, self::withKnownValues($value, $path.'/'.$key));
+            }
+        }
+
+        return $found;
     }
 
     /**

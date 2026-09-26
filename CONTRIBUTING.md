@@ -71,6 +71,14 @@ Both are frozen — the script refuses to record a version again, and the test c
 against a pinned hash — so a failure there is a compatibility break to fix in the schema change, not
 in the fixture.
 
+A new value in an open set goes into the schemas' `x-known-values`, never into an `enum`. A new
+signal: its id goes into `x-known-values` of `signalId` in the report and explain schemas, into a
+typed `anyOf` branch of its own before the last one in `definitions.signal`, and into the last
+branch's `not` list; `ClosedSetsTest` fails until all of them agree with Signal's constants. A new S10
+reason or check, floor source or format goes into its node's `x-known-values`, and `ClosedSetsTest`
+holds each list to the code. The widening check reads `x-known-values` as the enum on both sides, so
+a value added there is a widening and a value dropped is a narrowing.
+
 ## Contributing a finished package
 
 `resources/finished-packages.json` is the built-in allowlist of packages that are complete rather
