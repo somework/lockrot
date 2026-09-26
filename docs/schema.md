@@ -124,6 +124,17 @@ consumer usually keys on:
   `unmeasured` (four reasons, every key present) and `furthest_behind`. Added in 0.11.0 under the same schema number, and optional in the schema like
   `run`, so reports written before 0.11.0 still validate; a document from 0.11.0 on always carries
   both. See [verdicts.md](verdicts.md#libyears) for the definition and what the number is not.
+- `exposure` lists a direct requirement only when it pulls in an attributable flagged package; a
+  flagged direct requirement that pulls in none is not there, and its own verdict is on its finding.
+  `exposure_rule` states the cap the report attributes by (`max_fan_in`, the most direct
+  requirements a flagged transitive package may be reached from and still count under each), and
+  `unattributed` lists the flagged transitive packages above it — `package`, `verdict` (the same
+  enum) and `fan_in`, the number of the run's direct requirements that reach it, `require-dev`
+  included under `--dev` — in report order: they count in no `exposure` entry and no S7. A flagged
+  package no direct requirement reaches (an empty `chain`, as in a run without `composer.json`) is
+  in neither. Added in 0.13.0 and optional in the schema like `run`, so documents written before
+  0.13.0 still validate; a document from 0.13.0 on always carries both. See
+  [verdicts.md](verdicts.md#transitive-exposure).
 - Each signal's `data` is typed per signal id (`S1` … `S10`): a signal claiming `S2` with `S4`'s
   fields does not validate.
 - Dates are RFC 3339 strings (`format: date-time`); `ga_date` in S5 and `first_seen` in the

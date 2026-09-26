@@ -10,7 +10,9 @@ use JsonSchema\Validator;
 use Lockrot\Allowlist\BuiltinAllowlist;
 use Lockrot\Analyzer\Analysis;
 use Lockrot\Analyzer\Analyzer;
+use Lockrot\Analyzer\Report;
 use Lockrot\Analyzer\RunSettings;
+use Lockrot\Analyzer\TransitiveExposure;
 use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Baseline\BaselineFile;
@@ -25,6 +27,7 @@ use Lockrot\Data\Http\RecordedHttpClient;
 use Lockrot\Data\Php\PhpReleaseDates;
 use Lockrot\Data\Repository\RepositoryMetadataLoader;
 use Lockrot\Explain\Explanation;
+use Lockrot\Graph\DependencyGraph;
 use Lockrot\Html\PageData;
 use Lockrot\Json\Schemas;
 use Lockrot\Lock\LockFile;
@@ -38,6 +41,8 @@ use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\ValidatesJsonSchemas;
+use Lockrot\Verdict\Finding;
+use Lockrot\Verdict\Verdict;
 use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -221,6 +226,52 @@ final class JsonSchemaConformanceTest extends TestCase
     }
 
     /**
+     * `unattributed` from a real dependency graph, through the formatter, against the strict twin.
+     *
+     * No recorded fixture reaches a flagged package from more than eight direct requirements
+     * (wallabag's widest is eight), so their documents all carry `unattributed: []` and the items
+     * schema is never applied. Here nine roots require one stale package, the first of them also a
+     * stale leaf of its own: the shared package is listed with its fan-in, the leaf is exposure.
+     */
+    public function testAReportWithUnattributedPackagesValidates(): void
+    {
+        $roots = [];
+        $packages = [['name' => 'vendor/shared', 'version' => '1.0.0'], ['name' => 'vendor/leaf', 'version' => '1.0.0']];
+        for ($i = 1; $i <= 9; ++$i) {
+            $root = \sprintf('root/r%02d', $i);
+            $roots[$root] = '^1';
+            $packages[] = ['name' => $root, 'version' => '1.0.0', 'require' => $i === 1 ? ['vendor/shared' => '^1', 'vendor/leaf' => '^1'] : ['vendor/shared' => '^1']];
+        }
+        $graph = DependencyGraph::fromLock(LockFile::fromArray(['packages' => $packages]), ProjectConfig::fromArray(['require' => $roots]), false);
+        $at = new \DateTimeImmutable(self::NOW);
+        $findings = [];
+        foreach (array_merge(['vendor/shared', 'vendor/leaf'], array_keys($roots)) as $package) {
+            $verdict = strpos($package, 'vendor/') === 0 ? Verdict::STALE : Verdict::OK;
+            $findings[] = new Finding($package, '1.0.0', $verdict, [], $graph->shortestChain($package), null, $at, null, false, array_keys($graph->chainsTo($package)));
+        }
+        $report = new Report(TransitiveExposure::attach($findings, $graph), [], $at, \count($findings), 0, false);
+
+        $json = (new JsonFormatter())->format($report);
+        $decoded = json_decode($json, true);
+        self::assertIsArray($decoded);
+        self::assertSame([['package' => 'vendor/shared', 'verdict' => 'stale', 'fan_in' => 9]], $decoded['unattributed']);
+        self::assertSame(['max_fan_in' => 8], $decoded['exposure_rule']);
+        self::assertSame([['package' => 'root/r01', 'flagged' => 1]], $decoded['exposure']);
+        $this->assertValid(Schemas::REPORT, $json, 'a report with an unattributed package');
+        $this->assertValid(Schemas::REPORT, $json, 'a report with an unattributed package', true);
+
+        // And the strict twin does close the items: a renamed member fails.
+        $renamed = json_decode($json);
+        self::assertInstanceOf(\stdClass::class, $renamed);
+        self::assertIsArray($renamed->unattributed);
+        $item = $renamed->unattributed[0];
+        self::assertInstanceOf(\stdClass::class, $item);
+        $item->fanin = $item->fan_in;
+        unset($item->fan_in);
+        self::assertNotSame([], $this->errors(Schemas::REPORT, (string) json_encode($renamed), true));
+    }
+
+    /**
      * The per-signal `data` branches are only tested if every signal really occurs in the fixtures.
      * S9 needs Composer's advisory API, which the 2.2 LTS does not have; there the run carries no
      * advisory and the S9 branch of the schema goes untested, as it does for a user on that LTS.
@@ -379,6 +430,11 @@ final class JsonSchemaConformanceTest extends TestCase
             self::assertSame([], $finding['chain'], 'no root, so no chain reaches the package');
             self::assertFalse($finding['direct']);
         }
+        // Nothing reaches any package, so nothing is attributed — and nothing is above the cap
+        // either: a package no direct requirement reaches is in neither list.
+        self::assertSame([], $decoded['exposure']);
+        self::assertSame([], $decoded['unattributed']);
+        self::assertSame(['max_fan_in' => 8], $decoded['exposure_rule']);
         $this->assertValid(Schemas::REPORT, $json, 'a lock without its composer.json');
         $this->assertValid(Schemas::REPORT, $json, 'a lock without its composer.json', true);
 

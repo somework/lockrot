@@ -398,7 +398,13 @@ counts it.
 A flagged transitive package reached from **more than eight** direct requirements is shared
 infrastructure — in a framework application, the framework's own contracts, reached from every
 bundle — and nobody's to remove, so it is left out of S7 and of the `pulled in by:` line. It keeps
-its own row, with `also via … and N more`, and `direct_dependents` still names every parent.
+its own row, with `also via … and N more`, and `direct_dependents` still names every parent. The
+JSON document states the cap as `exposure_rule.max_fan_in` and lists these packages under
+`unattributed`, each with its `verdict` and `fan_in` — how many direct requirements reach it — in
+report order. The direct requirements are the run's own: with `--dev`, `require-dev` counts too, so
+the same package can be attributed without it and shared above the cap with it. A flagged
+transitive package no direct requirement reaches — every one in a run without `composer.json`, or
+one the project reaches only through a name it provides or replaces — is in neither list.
 
 **The `pulled in by:` line.** The summary block sums the same thing up per direct requirement,
 most first:
@@ -409,7 +415,11 @@ pulled in by: wallabag/rulerz-bundle 15 · wallabag/rulerz 14 · wallabag/phpepu
 ```
 
 Five requirements are named, then the rest counted; the JSON document carries the whole list as
-`exposure`. The line is printed only when some flagged package is transitive.
+`exposure`. A direct requirement is there only when it pulls in a flagged package attributed to it;
+a flagged direct requirement that pulls in none is not listed, and its own verdict is on its
+finding. The line is printed only when some flagged package is attributed to a direct requirement —
+not merely when one is transitive, since every flagged transitive package may be shared above the
+cap or reached by none.
 
 > **S7 decides nothing.** A package is never flagged for what it depends on. The verdict, the
 > priority, `--fail-on`, the exit code and the baseline all ignore S7; it describes, the same way

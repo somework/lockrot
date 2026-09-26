@@ -405,9 +405,12 @@ final class ReportTest extends TestCase
         );
         $array = $report->toArray();
         self::assertSame(
-            ['generated_at', 'run', 'activity_cache_oldest_at', 'packages_checked', 'include_dev', 'not_from_composer_repository', 'network_failures', 'counts', 'abandoned', 'priorities', 'exposure', 'libyears', 'baseline', 'notes', 'findings'],
+            ['generated_at', 'run', 'activity_cache_oldest_at', 'packages_checked', 'include_dev', 'not_from_composer_repository', 'network_failures', 'counts', 'abandoned', 'priorities', 'exposure', 'exposure_rule', 'unattributed', 'libyears', 'baseline', 'notes', 'findings'],
             array_keys($array)
         );
+        // The literal, not the constant: the document states the value it attributed by.
+        self::assertSame(['max_fan_in' => 8], $array['exposure_rule']);
+        self::assertSame([], $array['unattributed']);
         self::assertIsArray($array['priorities']);
         self::assertSame(
             [Priority::CRITICAL, Priority::HIGH, Priority::MEDIUM, Priority::LOW, Priority::NONE],
@@ -563,6 +566,79 @@ final class ReportTest extends TestCase
 
         self::assertSame(['root/r01' => 1], $report->exposure());
         self::assertSame('pulled in by: root/r01 1', $report->exposureSummaryLine());
+    }
+
+    /** @return list<string> root/r01 … root/rNN */
+    private static function roots(int $count): array
+    {
+        $roots = [];
+        for ($i = 1; $i <= $count; ++$i) {
+            $roots[] = \sprintf('root/r%02d', $i);
+        }
+
+        return $roots;
+    }
+
+    /**
+     * What the cap gives to nobody is listed, with its verdict and how many direct requirements
+     * reach it — and listing it moves nothing the cap already decided: `exposure` and the `pulled in
+     * by:` line are what they were.
+     */
+    public function testAPackageReachedFromNineRootsIsUnattributedAndChangesNothingElse(): void
+    {
+        $report = $this->report(
+            $this->reachedFrom('vendor/shared', Verdict::ABANDONED, ...self::roots(9)),
+            $this->reachedFrom('vendor/leaf', Verdict::STALE, 'root/r01')
+        );
+
+        self::assertSame([['package' => 'vendor/shared', 'verdict' => 'abandoned', 'fan_in' => 9]], $report->toArray()['unattributed']);
+        self::assertSame(['root/r01' => 1], $report->exposure());
+        self::assertSame('pulled in by: root/r01 1', $report->exposureSummaryLine());
+        self::assertSame([['package' => 'root/r01', 'flagged' => 1]], $report->toArray()['exposure']);
+    }
+
+    public function testAPackageReachedFromExactlyEightRootsIsNotUnattributed(): void
+    {
+        $report = $this->report($this->reachedFrom('vendor/shared', Verdict::ABANDONED, ...self::roots(8)));
+
+        self::assertSame([], $report->toArray()['unattributed']);
+        self::assertCount(8, $report->exposure());
+    }
+
+    /**
+     * Only a flagged transitive package above the cap is unattributed: a direct requirement is its
+     * own finding, an unflagged or unknown row is nobody's exposure, and a package no direct
+     * requirement reaches (a lock-only run, a replace or provide) is in neither list.
+     */
+    public function testUnattributedLeavesOutDirectUnflaggedUnknownAndUnreachedPackages(): void
+    {
+        $nine = self::roots(9);
+        $cases = [
+            'direct, reached from eight more' => $this->reachedFrom('root/r01', Verdict::PINNED, ...$nine),
+            'ok' => $this->reachedFrom('vendor/ok', Verdict::OK, ...$nine),
+            'unknown' => $this->reachedFrom('vendor/unknown', Verdict::UNKNOWN, ...$nine),
+            'finished' => $this->reachedFrom('vendor/finished', Verdict::FINISHED, ...$nine),
+            'reached by nothing' => $this->reachedFrom('vendor/unreached', Verdict::ABANDONED),
+        ];
+        foreach ($cases as $case => $finding) {
+            self::assertSame([], $this->report($finding)->toArray()['unattributed'], $case);
+        }
+        self::assertTrue($cases['direct, reached from eight more']->isDirect());
+        self::assertCount(9, $cases['direct, reached from eight more']->directDependents());
+    }
+
+    public function testUnattributedFollowsReportOrderNotNameOrder(): void
+    {
+        $report = $this->report(
+            $this->reachedFrom('vendor/a', Verdict::STALE, ...self::roots(9)),
+            $this->reachedFrom('vendor/between', Verdict::SILENT, 'root/r01'),
+            $this->reachedFrom('vendor/z', Verdict::ABANDONED, ...self::roots(10))
+        );
+
+        self::assertSame(
+            [['package' => 'vendor/z', 'verdict' => 'abandoned', 'fan_in' => 10], ['package' => 'vendor/a', 'verdict' => 'stale', 'fan_in' => 9]],
+            $report->toArray()['unattributed']
+        );
     }
 
     public function testExposureSummaryLineWithExactlyFiveParentsNamesThemAllAndCountsNothing(): void
