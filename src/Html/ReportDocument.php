@@ -86,7 +86,7 @@ final class ReportDocument
             if ($facts === null) {
                 continue;
             }
-            $explained = (new Explanation($finding, $facts, $thresholds, $targetPhp, $this->report))->toArray();
+            $explained = (new Explanation($finding, $facts, $thresholds, $targetPhp, $this->report, $this->page->projectPhp()))->toArray();
             $metadata = $explained['metadata'] ?? null;
             $details[$finding->package()] = [
                 'metadata' => \is_array($metadata) ? $metadata : null,

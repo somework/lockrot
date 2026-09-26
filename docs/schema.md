@@ -63,8 +63,9 @@ describes the newest release under that number. The version that added a field i
 ## Open sets
 
 Objects are open, and so are the sets of values that grow in minor releases: signal ids (a
-signal's `id` and S10's `blocks`), S10's `check` and `reason`, S6's `reason`, S8's `floor_source`,
-and the configuration schema's `format`. Each is a string with a `pattern`, plus an `x-known-values` list of
+signal's `id` and S10's `blocks`), S10's `check` and `reason`, S6's `reason`, S8's `floor_source`
+and the explanation's `php_blocked_by`, which holds the same values, and the configuration schema's
+`format`. Each is a string with a `pattern`, plus an `x-known-values` list of
 the values this release writes. A validator ignores a keyword draft-04 does not define, so a copy of
 the schema taken from 0.13.0 on accepts a signal, a reason, a floor or a format that a later release
 adds, and a signal or format named `<vendor>:<name>`, the form reserved for those that do not come

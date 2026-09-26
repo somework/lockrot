@@ -266,7 +266,7 @@ final class LockrotCommand extends BaseCommand
 
             $page = $analysis === null
                 ? null
-                : new PageData($analysis, $lockrot->thresholds(), $lockrot->targetPhp());
+                : new PageData($analysis, $lockrot->thresholds(), $lockrot->targetPhp(), $project->requirePhp());
             $showAll = $input->getOption('all') === true;
             // The annotation formats name the lock relative to the directory lockrot runs in, as the
             // checkout does: alt.lock under COMPOSER=alt.json, and composer.lock as ever without it.
@@ -358,7 +358,7 @@ final class LockrotCommand extends BaseCommand
         if ($finding === null || $facts === null) {
             throw new ConfigException($name.' was not analysed');
         }
-        $explanation = new Explanation($finding, $facts, $lockrot->thresholds(), $lockrot->targetPhp(), $analysis->report());
+        $explanation = new Explanation($finding, $facts, $lockrot->thresholds(), $lockrot->targetPhp(), $analysis->report(), $project->requirePhp());
         $formatter = new ExplainFormatter();
         $output->write(
             $format === 'json' ? $formatter->json($explanation) : ConsoleMarkup::render($formatter->text($explanation), $output->isDecorated()),
