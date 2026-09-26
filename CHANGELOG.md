@@ -94,7 +94,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
   This checks the backward direction only, old documents under the current schemas; a document a
   newer lockrot writes, validated against a schema an older release published, is not what it
-  tests. The report, its schemas and the HTML page are unchanged.
+  tests. This check itself changes no document, schema or page.
 
 - `lockrot.phar.meta.json` on every release: the lowest PHP the archive runs on and the SHA-256
   fingerprint of the key that signed `lockrot.phar.sig.json` — what `self-update` chooses by
@@ -198,6 +198,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   heading that does not exist. `mkdocs build --strict` let both through, because mkdocs reports them
   as information rather than warnings; `mkdocs.yml` now makes them warnings.
 
+- Each release branch in the `--explain --format=json` document, and in the HTML page's package
+  details, now says whether the project can move onto it: `admits_target_php` (the branch's `php`
+  admits some version of the target PHP minor), `admits_project_php` (it admits the lowest PHP the
+  project's own `require.php` promises) and `php_blocked_by` (`project`, `target` or null). S8 made
+  that decision already, but the report showed it only for the newest branch it names, as
+  `floor_source`, and a reader of the branch table had to redo the constraint arithmetic for every
+  other row. Now every row carries it, computed by the same test from the same two floors, so the
+  row of the branch S8 names says what `floor_source` says; a test holds the two to it on every
+  fixture lock. A null `admits_*` is no answer, never admitted: the branch requires no PHP, its
+  requirement cannot be read, or, for the project, `composer.json` names no lowest PHP. S8 counts
+  such a branch as within reach, and `php_blocked_by` is null for it. The row is tested whatever its
+  place, so the installed branch can read `project` when the lock already needs more PHP than
+  `require.php` promises. The document also gains `project_php`, the `require.php` the rows were
+  tested against, next to `target_php`. `php_blocked_by` is described as an open string, not an
+  enum, so a later value is not a schema break. Nothing S8 decides changes, nor the `--explain`
+  text, the report or any other format; the explain schema only gains optional fields.
+
 ### Fixed
 
 - A package name, a version, a constraint or a note that looked like console markup could break the
@@ -293,7 +310,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `blocks`, S8's `floor_source` and the configuration schema's `format` are still enums, so a new
   value there fails against an older copy. The page, and the docblock of the class that names the
   schema URLs, now say so, and the vendoring recipe says to refresh the copy on an upgrade. The
-  schemas are unchanged; describing those values as open strings is planned before 1.0.
+  fix changes no schema; describing those values as open strings is planned before 1.0.
 
 - `SECURITY.md` said lockrot talks only to the configured Composer repositories and the GitHub API,
   and reads only the GitHub token variables. It also talks to GitLab and Bitbucket for repository

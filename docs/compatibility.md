@@ -72,7 +72,7 @@ These grow in minor releases:
 
 - signal ids;
 - the checks, reasons and blocked signals of S10;
-- S8's `floor_source`;
+- S8's `floor_source`, and the explanation's `php_blocked_by`, which holds the same values;
 - repository hosts;
 - format names.
 
@@ -82,7 +82,7 @@ Today the schemas still spell some of them out as enums: signal ids, S10's check
 blocked signals, S8's `floor_source`, and `format` in the configuration schema. A new value there
 arrives with a schema update, and a copy of the schema you vendored rejects it until you refresh the
 copy; the changelog says so when that happens. *Planned (before 1.0):* the schemas describe these as
-open strings.
+open strings. The explanation's `php_blocked_by` is one already.
 
 ### Finding identity
 

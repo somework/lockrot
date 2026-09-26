@@ -235,13 +235,17 @@ finding with everything it was decided on:
   changed, not a release. S8 measures neither kind of branch, and the table says so when it is the
   installed one (see [verdicts.md](verdicts.md#left-behind)). A split package the monorepo dates
   also reads `installed release v10.48.28 (2023-11-14, dated by laravel/framework)`, and one whose
-  lock date is a shared commit's with no parent to replace it says the date is not a release's;
+  lock date is a shared commit's with no parent to replace it says the date is not a release's. In
+  `--format=json` each row also says whether its php requirement admits the target PHP
+  (`admits_target_php`) and the lowest PHP the project's own `require.php` promises
+  (`admits_project_php`), and which of the two holds it back (`php_blocked_by`), as S8 decides it
+  (see [verdicts.md](verdicts.md#within-reach));
 - the repository activity S3 and S4 read, or that it was not fetched;
 - the thresholds and target PHP the signals were measured against, and the run's notes.
 
 `--format=json` prints the same as JSON (`package`, `version`, `finding` — the finding as
 `--format=json` carries it — `lock`, `metadata`, `activity`, `thresholds`, `target_php`,
-`generated_at`, `notes`); no other format has an explanation form. The exit code is `0`: the run answers a question, it does not gate. A
+`project_php`, `generated_at`, `notes`); no other format has an explanation form. The exit code is `0`: the run answers a question, it does not gate. A
 package that is not in the lock, or is in `packages-dev` on a run without `--dev`, is a configuration
 error (exit `2`). The baseline is not consulted.
 

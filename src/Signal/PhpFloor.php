@@ -17,7 +17,8 @@ use Lockrot\Data\Php\PhpReleaseDates;
  * Composer resolves against, `config.platform.php` or the running PHP, so a branch outside it will
  * not install at all). Composer enforces only the second; the first is the maintainers' to keep,
  * and they are the ones reading the report. S8 holds the branch it names to both
- * ({@see \Lockrot\Signal\Rule\LeftBehindRule}).
+ * ({@see \Lockrot\Signal\Rule\LeftBehindRule}), and `--explain` shows every branch's answer from
+ * each floor ({@see \Lockrot\Explain\Explanation::toArray()}).
  *
  * @internal
  */
@@ -48,27 +49,44 @@ final class PhpFloor
     /**
      * What holds a branch with this php requirement back: {@see self::PROJECT} when the project's
      * lowest PHP is outside it, else {@see self::TARGET} when no version of the target minor is,
-     * else null — within reach. A branch that requires no PHP, or whose requirement cannot be
-     * parsed, is within reach: there is nothing to hold it against.
+     * else null — not held back. A branch that requires no PHP, or whose requirement cannot be
+     * parsed, is not held back: there is nothing to hold it against. The two answers read in this
+     * order are {@see self::admitsProject()} and {@see self::admitsTarget()}, and a null from
+     * either is no answer, so it holds nothing back.
      */
     public function blocking(?string $constraint): ?string
     {
-        if ($constraint === null) {
-            return null;
-        }
-        try {
-            $parsed = $this->parser->parseConstraints($constraint);
-        } catch (\UnexpectedValueException $e) {
-            return null;
-        }
-        if ($this->projectLowest !== null && !$parsed->matches($this->projectLowest)) {
+        $parsed = $this->parse($constraint);
+        if ($this->projectAdmits($parsed) === false) {
             return self::PROJECT;
         }
-        if ($this->targetMinor !== null && !Intervals::haveIntersections($parsed, $this->targetMinor)) {
+        if ($this->targetAdmits($parsed) === false) {
             return self::TARGET;
         }
 
         return null;
+    }
+
+    /**
+     * Whether a branch with this php requirement admits the lowest PHP the project's own
+     * `require.php` promises. Null is no answer, never "admitted": the branch requires no PHP, its
+     * requirement cannot be parsed, or the project names no lowest PHP (no `require.php`, `*`, or
+     * one that cannot be parsed).
+     */
+    public function admitsProject(?string $constraint): ?bool
+    {
+        return $this->projectAdmits($this->parse($constraint));
+    }
+
+    /**
+     * Whether a branch with this php requirement admits some version of the target PHP minor —
+     * whether Composer resolving against the target could install it. Null is no answer, never
+     * "admitted": the branch requires no PHP, its requirement cannot be parsed, or there is no
+     * target to hold it against.
+     */
+    public function admitsTarget(?string $constraint): ?bool
+    {
+        return $this->targetAdmits($this->parse($constraint));
     }
 
     /** The floor named in a sentence: `the project's php >=7.2.5`, `the target PHP 7.2`. */
@@ -81,6 +99,36 @@ final class PhpFloor
     public function php(string $kind): ?string
     {
         return $kind === self::PROJECT ? $this->projectPhp : $this->targetLabel;
+    }
+
+    private function parse(?string $constraint): ?ConstraintInterface
+    {
+        if ($constraint === null) {
+            return null;
+        }
+        try {
+            return $this->parser->parseConstraints($constraint);
+        } catch (\UnexpectedValueException $e) {
+            return null;
+        }
+    }
+
+    private function projectAdmits(?ConstraintInterface $constraint): ?bool
+    {
+        if ($constraint === null || $this->projectLowest === null) {
+            return null;
+        }
+
+        return $constraint->matches($this->projectLowest);
+    }
+
+    private function targetAdmits(?ConstraintInterface $constraint): ?bool
+    {
+        if ($constraint === null || $this->targetMinor === null) {
+            return null;
+        }
+
+        return Intervals::haveIntersections($constraint, $this->targetMinor);
     }
 
     /** @return array{0: ?ConstraintInterface, 1: ?string} */

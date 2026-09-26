@@ -160,7 +160,13 @@ verdict is `left-behind` either way — the branch installed is the one the upst
 `--format=json` the signal carries `newest_php`, `newest_within_reach`, `floor_php` and
 `floor_source` (`project` or `target`), and `reachable_branch`, `reachable_version` and
 `reachable_release` for the branch `suggested_constraint` follows; `--explain` lists each branch's
-php requirement in its branch table. A branch that requires no PHP is within reach of anything.
+php requirement in its branch table, and with `--format=json` every branch row also carries
+`admits_target_php`, `admits_project_php` and `php_blocked_by`: the same test S8 applies, from the
+same two floors, so the row of the branch S8 names says what its `floor_source` says. A branch that
+requires no PHP is within reach of anything; its row reads `php_blocked_by: null` with both
+`admits_*` null, because there is nothing to test, and null there never means admitted. Every row is
+tested, the installed one and those below it too, though S8 only reads the dated branches above the
+installed one.
 
 A branch snapshot (`dev-master`, `2.x-dev`) belongs to no branch and is `pinned`. A package whose
 installed version the repository does not list — a private fork, or a lock written against a tag
