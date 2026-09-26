@@ -54,7 +54,9 @@ Objects are open; some values are not yet. Signal ids, S10's `check`, `reason` a
 `floor_source` and the configuration schema's `format` are enums today, so a new signal, a new
 reason a check could not run or a new format arrives with a schema update, and a copy of the schema
 fetched or vendored before it rejects the new value until it is refreshed. The changelog says when
-that happens. Describing those values as open strings is planned before 1.0.
+that happens. Describing those values as open strings is planned before 1.0. The explanation's
+`php_blocked_by`, added in 0.13.0 with the same values as `floor_source`, is an open string from the
+start.
 
 What else 1.0 will freeze — the closed sets and their order, the identity fields of the other
 formats, the command line — is drafted in [compatibility.md](compatibility.md).

@@ -45,12 +45,13 @@ mutant from the original, and says why.
 
 ## src/Signal/PhpFloor.php and src/Signal/Rule/LeftBehindRule.php (0.11.0, the branch within reach)
 
-- `src/Signal/PhpFloor.php:57` ReturnRemoval (`blocking()`, `if ($constraint === null) return null`)
-  and `:104` ReturnRemoval (`project()`, `if ($projectPhp === null) return [null, null]`) — without
+- `src/Signal/PhpFloor.php:107` ReturnRemoval (`parse()`, `if ($constraint === null) return null`; it
+  was `blocking()`'s until 0.13.0 split it into `admitsProject()` and `admitsTarget()`) and `:152`
+  ReturnRemoval (`project()`, `if ($projectPhp === null) return [null, null]`) — without
   the return, composer/semver's untyped `parseConstraints()` receives null, reads it as `""`, throws
   `UnexpectedValueException` ("Invalid version string"), and the `catch` below returns the same
   value. The early return says what a missing requirement means; the parser would say it too.
-- `src/Signal/PhpFloor.php:77` CastString — `describe()`: `php($kind)` is null only for a floor that
+- `src/Signal/PhpFloor.php:95` CastString — `describe()`: `php($kind)` is null only for a floor that
   is not there, and `blocking()` never names a floor that is not there, so the cast is for the type,
   not for a case.
 - `src/Signal/Rule/LeftBehindRule.php:84` LessThanOrEqualTo (`$release['at'] <= $own['at']` →
