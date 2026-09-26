@@ -554,8 +554,14 @@ final class SchemaWidening
         }
         if (isset($node['pattern'])) {
             $pattern = $node['pattern'];
+            // Delimited by a byte no schema pattern holds, which PHP does not pair up the way it
+            // pairs `{` with `}`: the pattern goes in as written, quantifiers and a lone `}` alike.
+            // A pattern that does hold the byte is one this check cannot decide.
+            $delimiter = "\x01";
 
-            return \is_string($pattern) && preg_match('{'.str_replace('}', '\}', $pattern).'}u', $value) === 1;
+            return \is_string($pattern)
+                && strpos($pattern, $delimiter) === false
+                && preg_match($delimiter.$pattern.$delimiter.'u', $value) === 1;
         }
 
         return true;

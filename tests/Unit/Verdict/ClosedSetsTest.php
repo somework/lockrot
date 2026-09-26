@@ -229,7 +229,9 @@ final class ClosedSetsTest extends TestCase
             self::assertSame($known, $node[KnownValues::KEYWORD] ?? null, $where);
             self::assertSame($known, array_values(array_unique($known)), $where);
             foreach ($known as $value) {
-                self::assertMatchesRegularExpression('{'.$pattern.'}', $value, $where);
+                // Delimited as SchemaWidening delimits a schema pattern, so a quantifier's braces
+                // or a lone `}` never end it early.
+                self::assertMatchesRegularExpression("\x01".$pattern."\x01", $value, $where);
             }
         }
         self::assertSame(['type' => 'null'], JsonPath::arrayAt($report, ['definitions', 's8', 'properties', 'floor_source', 'oneOf', 1]), 'floor_source is otherwise null');
