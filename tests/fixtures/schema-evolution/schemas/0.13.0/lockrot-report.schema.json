@@ -829,6 +829,55 @@
       "properties": {
         "version": {
           "type": "string"
+        },
+        "reason": {
+          "description": "Which of S6's two cases fired. `branch_snapshot`: the installed version is a branch (`dev-main`, `2.x-dev`); it is checked first, so a snapshot of a package that never released is `branch_snapshot` with has_stable_release false. `no_stable_release`: the installed version is not a branch and the repository lists no tagged version. An open set: read a value you do not know as another reason S6 fired. Optional: documents written before 0.13.0 do not carry it.",
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "x-known-values": [
+            "branch_snapshot",
+            "no_stable_release"
+          ]
+        },
+        "has_stable_release": {
+          "description": "Whether the repository lists any tagged version (a pre-release counts, a branch does not), as the explanation's metadata.has_stable_release. Null, not false, when lockrot loaded no repository metadata for the package, for example a `vcs` or `path` entry, a package the repository does not list, or metadata that did not load (the report's notes say which); null only ever comes with reason branch_snapshot. Optional: documents written before 0.13.0 do not carry it.",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "last_stable_release": {
+          "description": "The newest dated tagged release, as the explanation's metadata.last_stable_release: not necessarily the highest tag. Null when there is no tagged release, when no repository metadata was loaded, and when the highest tag carries no date lockrot trusts (undated, or on a commit other tags share) and no monorepo parent dates it; last_stable_dated_by names such a parent. Optional: documents written before 0.13.0 do not carry it.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/dateTime"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "last_stable_version": {
+          "description": "The version last_stable_release dates; null exactly when it is. Optional: documents written before 0.13.0 do not carry it.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "last_stable_dated_by": {
+          "description": "The monorepo parent whose tag dates last_stable_release, null when the date is the package's own or there is none. Optional: documents written before 0.13.0 do not carry it.",
+          "$ref": "#/definitions/datedBy"
+        },
+        "snapshot_time": {
+          "description": "For reason branch_snapshot, the lock's `time`: the date of the commit the branch pointed at, not a release. Null for reason no_stable_release, and when the lock entry carries no time. Optional: documents written before 0.13.0 do not carry it.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/dateTime"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       }
     },

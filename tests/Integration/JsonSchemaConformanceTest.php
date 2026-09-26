@@ -58,6 +58,8 @@ final class JsonSchemaConformanceTest extends TestCase
     private const FIXTURES = __DIR__.'/../fixtures/';
     private const DOCS = __DIR__.'/../../docs/';
     private const NOW = '2026-09-14T00:00:00+00:00';
+    /** A value for {@see withRulerzS6()} that removes the key. */
+    private const ABSENT = "\0absent";
     /** wallabag carries S1–S8 (left-behind rows included), matomo S3/S4 on live forges, laravel a clean lock. */
     private const DIRS = ['apps/wallabag_wallabag', 'apps/matomo-org_matomo', 'skeletons/laravel'];
 
@@ -273,11 +275,89 @@ final class JsonSchemaConformanceTest extends TestCase
         self::assertNotSame([], $this->errors(Schemas::REPORT, (string) json_encode($document), false));
     }
 
+    /**
+     * S6's data is typed, and its `reason` is an open set: a value a later release adds validates
+     * against the schema this one publishes, as published and against the strict twin. A wrong type
+     * on any of the new fields does not.
+     */
+    public function testS6DataIsTypedButItsReasonIsOpen(): void
+    {
+        $json = (new JsonFormatter())->format(self::analysis('apps/wallabag_wallabag')->report());
+        $valid = [
+            'a reason this release does not know' => ['reason' => 'something_new'],
+            'no metadata, so nothing known' => ['has_stable_release' => null],
+            'a tagged snapshot' => ['has_stable_release' => true, 'last_stable_release' => '2019-01-23T15:23:04+00:00', 'last_stable_version' => '1.6.2', 'last_stable_dated_by' => 'vendor/monorepo'],
+            'a document written before 0.13.0' => array_fill_keys(['reason', 'has_stable_release', 'last_stable_release', 'last_stable_version', 'last_stable_dated_by', 'snapshot_time'], self::ABSENT),
+        ];
+        foreach ($valid as $what => $change) {
+            $document = self::withRulerzS6($json, $change);
+            $this->assertValid(Schemas::REPORT, $document, $what);
+            $this->assertValid(Schemas::REPORT, $document, $what, true);
+        }
+        $invalid = [
+            'has_stable_release as a word' => ['has_stable_release' => 'no'],
+            'snapshot_time that is no date' => ['snapshot_time' => 'yesterday'],
+            'last_stable_release that is no date' => ['last_stable_release' => 'long ago'],
+            'last_stable_version as a number' => ['last_stable_version' => 1],
+            'last_stable_dated_by that is no package' => ['last_stable_dated_by' => 'polyfill'],
+            'reason as a number' => ['reason' => 6],
+            'reason in capitals' => ['reason' => 'Branch snapshot'],
+            'reason empty' => ['reason' => ''],
+        ];
+        foreach ($invalid as $what => $change) {
+            self::assertNotSame([], $this->errors(Schemas::REPORT, self::withRulerzS6($json, $change), false), $what);
+        }
+    }
+
+    /**
+     * The report with wallabag/rulerz's S6 data changed: a key set to {@see ABSENT} is removed.
+     *
+     * @param array<string, mixed> $change
+     */
+    private static function withRulerzS6(string $json, array $change): string
+    {
+        $document = json_decode($json, true);
+        self::assertIsArray($document);
+        $findings = JsonPath::arrayAt($document, ['findings']);
+        $changed = false;
+        foreach ($findings as $at => $finding) {
+            self::assertIsArray($finding);
+            if ($finding['package'] !== 'wallabag/rulerz') {
+                continue;
+            }
+            $signals = JsonPath::arrayAt($finding, ['signals']);
+            foreach ($signals as $i => $signal) {
+                self::assertIsArray($signal);
+                if ($signal['id'] !== Signal::S6) {
+                    continue;
+                }
+                $data = JsonPath::arrayAt($signal, ['data']);
+                foreach ($change as $key => $value) {
+                    if ($value === self::ABSENT) {
+                        unset($data[$key]);
+                    } else {
+                        $data[$key] = $value;
+                    }
+                }
+                $signal['data'] = $data;
+                $signals[$i] = $signal;
+                $changed = true;
+            }
+            $finding['signals'] = $signals;
+            $findings[$at] = $finding;
+        }
+        self::assertTrue($changed, 'wallabag/rulerz carries S6');
+        $document['findings'] = $findings;
+
+        return (string) json_encode($document);
+    }
+
     public function testTheExplanationValidatesAgainstItsSchemaAndItsStrictTwin(): void
     {
         $analysis = self::analysis('apps/wallabag_wallabag');
         // One package per data shape: a left-behind one with advisories on it, an abandoned direct
-        // one with an archived repository, and one the repository does not list at all.
+        // one with an archived repository, and a branch snapshot of one the repository lists
+        // branches for and not a single tag.
         foreach (['doctrine/cache', 'sensio/framework-extra-bundle', 'wallabag/rulerz'] as $package) {
             $finding = $analysis->finding($package);
             $facts = $analysis->facts($package);

@@ -200,6 +200,40 @@ final class AcceptanceTest extends TestCase
         }
     }
 
+    /**
+     * wallabag's four branch snapshots, read off the recorded repository data: the three
+     * wallabag/rulerz-* list dev branches and not one tag, friendsofsymfony/oauth-server-bundle has
+     * tags and its newest dated one is 1.6.2 (2.0.0-alpha.0 is higher, and older). S6 checks the
+     * snapshot first, so all four are `branch_snapshot`; has_stable_release is what tells the
+     * never-released three apart. Verdict and priority are what they were before S6 said so.
+     */
+    public function testWallabagSnapshotsSayWhetherThePackageEverReleased(): void
+    {
+        $f = $this->byName($this->analyze('apps/wallabag_wallabag'));
+        $expected = [
+            'wallabag/rulerz' => [false, null, null, '2023-12-24T00:53:44+00:00', Priority::HIGH],
+            'wallabag/rulerz-bundle' => [false, null, null, '2023-12-24T22:23:50+00:00', Priority::HIGH],
+            'wallabag/rulerz-bridge' => [false, null, null, '2023-12-24T01:18:26+00:00', Priority::MEDIUM],
+            'friendsofsymfony/oauth-server-bundle' => [true, '2019-01-23T15:23:04+00:00', '1.6.2', '2022-03-24T10:22:23+00:00', Priority::HIGH],
+        ];
+        foreach ($expected as $package => [$released, $lastRelease, $lastVersion, $snapshotTime, $priority]) {
+            $s6 = self::signal($f[$package], Signal::S6);
+            self::assertNotNull($s6, $package);
+            self::assertSame([
+                'version' => 'dev-master',
+                'reason' => 'branch_snapshot',
+                'has_stable_release' => $released,
+                'last_stable_release' => $lastRelease,
+                'last_stable_version' => $lastVersion,
+                'last_stable_dated_by' => null,
+                'snapshot_time' => $snapshotTime,
+            ], $s6->data(), $package);
+            self::assertSame('pinned to branch snapshot dev-master', $s6->summary(), $package);
+            self::assertSame(Verdict::PINNED, $f[$package]->verdict(), $package);
+            self::assertSame($priority, $f[$package]->priority(), $package);
+        }
+    }
+
     public function testNextcloud3rdparty(): void
     {
         $f = $this->byName($this->analyze('apps/nextcloud_3rdparty'));
@@ -225,6 +259,9 @@ final class AcceptanceTest extends TestCase
         self::assertStringContainsString('dev-master', $f['lox/xhprof']->evidence());
         $ids = array_map(static fn ($s) => $s->id(), $f['lox/xhprof']->signals());
         self::assertContains('S6', $ids, 'pinned-to-branch signal should still fire underneath the abandoned verdict');
+        $s6 = self::signal($f['lox/xhprof'], Signal::S6);
+        self::assertNotNull($s6);
+        self::assertSame('branch_snapshot', $s6->data()['reason']);
     }
 
     public function testOldPromiseExamplesOn84(): void
