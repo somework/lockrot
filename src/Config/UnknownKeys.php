@@ -107,7 +107,8 @@ final class UnknownKeys
                 // A JSON key like "5" arrives as the integer 5.
                 $key = (string) $key;
                 if (!\in_array($key, self::KNOWN_IN_IGNORE, true) && !self::isReserved($key)) {
-                    $warnings[] = self::message('extra.lockrot.ignore['.$index.'].', $key, self::nearest($key, self::KNOWN_IN_IGNORE));
+                    // The index is the project's text too: `ignore` can be an object in a config the schema refused.
+                    $warnings[] = self::message('extra.lockrot.ignore['.TerminalText::escape((string) $index, self::LONGEST_KEY).'].', $key, self::nearest($key, self::KNOWN_IN_IGNORE));
                 }
             }
         }
@@ -120,7 +121,7 @@ final class UnknownKeys
         return strpos($key, self::RESERVED_PREFIX) === 0;
     }
 
-    /** $parent is lockrot's own text; only $key, the project's, is escaped. */
+    /** $key is the project's text and is escaped here; $parent arrives escaped. */
     private static function message(string $parent, string $key, ?string $nearest): string
     {
         $message = 'unknown key '.$parent.TerminalText::escape($key, self::LONGEST_KEY).' ignored';

@@ -233,6 +233,18 @@ final class UnknownKeysTest extends TestCase
     }
 
     /**
+     * A config the schema refused is still read for unknown keys, and there `ignore` can be an
+     * object: its keys are the project's text too, and stay on one line.
+     */
+    public function testAnIgnoreObjectKeyIsEscapedLikeAnyOtherKey(): void
+    {
+        self::assertSame(
+            ['unknown key extra.lockrot.ignore[bad\nkey\x1B[31m].pinned ignored'],
+            UnknownKeys::warnings(['ignore' => ["bad\nkey\033[31m" => ['package' => 'a/b', 'reason' => 'r', 'pinned' => 1]]])
+        );
+    }
+
+    /**
      * A key is the project's text: shown as written, console tags and all, in both places a key can
      * be. How it reaches the terminal without Symfony's formatter is the printers' business.
      *
