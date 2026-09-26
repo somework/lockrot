@@ -14,6 +14,7 @@ use Lockrot\Data\Forge\Tokens;
 use Lockrot\Data\Http\HttpClientInterface;
 use Lockrot\Deadline;
 use Lockrot\Exception\ConfigException;
+use Lockrot\Output\TerminalText;
 use Lockrot\SelfUpdate\PharUpdater;
 use Lockrot\SelfUpdate\PharValidator;
 use Lockrot\SelfUpdate\PharValidatorInterface;
@@ -22,7 +23,6 @@ use Lockrot\SelfUpdate\ReleaseLocator;
 use Lockrot\SelfUpdate\ReleaseSignatureVerifier;
 use Lockrot\SelfUpdate\SignatureVerifierInterface;
 use Lockrot\Version;
-use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
@@ -140,13 +140,16 @@ final class SelfUpdateCommand extends BaseCommand
         // Read before anything can replace the archive this process is running from. After the
         // swap the running process can no longer load a class it has not already used, and
         // `Policy::EXIT_OK` in a return statement below would be exactly that — the first use of
-        // Policy in a self-update run, resolved too late to succeed. Everything else on the way out
-        // is already in memory: writeError() only calls `instanceof`, which never triggers the
-        // autoloader, OutputFormatter::escape() on a class the output's own formatter loaded, and
-        // `writeln()` on an output object built before the command ran.
+        // Policy in a self-update run, resolved too late to succeed. TerminalText is loaded here
+        // for the same reason: an error after the swap may be the first line writeError() colours.
+        // Everything else on the way out is already in memory: writeError() calls `instanceof`,
+        // which never triggers the autoloader, OutputFormatterStyle, which the output's own
+        // formatter loaded for its default styles, and `writeln()` on an output object built before
+        // the command ran.
         $exitOk = Policy::EXIT_OK;
         $exitError = Policy::EXIT_ERROR;
         $exitFindings = Policy::EXIT_FINDINGS;
+        class_exists(TerminalText::class);
 
         try {
             $phar = $this->runningPhar ?? \Phar::running(false);
@@ -205,11 +208,11 @@ final class SelfUpdateCommand extends BaseCommand
 
             return $exitOk;
         } catch (ConfigException $e) {
-            $this->writeError($output, 'lockrot: '.self::plain($e->getMessage()), 'error');
+            $this->writeError($output, 'lockrot: '.self::plain($e->getMessage()), true);
 
             return $exitError;
         } catch (\Throwable $e) {
-            $this->writeError($output, 'lockrot self-update failed: '.self::plain($e->getMessage()), 'error');
+            $this->writeError($output, 'lockrot self-update failed: '.self::plain($e->getMessage()), true);
 
             return $exitError;
         }
@@ -258,7 +261,8 @@ final class SelfUpdateCommand extends BaseCommand
      * $text with nothing a terminal would obey: the notes and the errors carry tags, versions and
      * URLs from the release list and its assets, which must not reach the terminal as a control
      * sequence. C0 controls, DEL and the C1 controls (in their UTF-8 form) become `?`; writeError()
-     * escapes the rest, so a `<href=…>` in it never opens a console style.
+     * writes the rest past the tag formatter, so a `<href=…>` or `<<fg=red>>` in it never opens a
+     * console style.
      */
     private static function plain(string $text): string
     {
@@ -266,15 +270,15 @@ final class SelfUpdateCommand extends BaseCommand
     }
 
     /**
-     * One line on stderr, $message escaped so that nothing in it — a version from the release
-     * document, an exception's message — is read as a console tag and lost; $style, when given,
-     * wraps it in that one tag of lockrot's own. OutputFormatter is loaded long before the archive
-     * can be replaced: the output this writes to was built with one.
+     * One line on stderr, written raw so that nothing in $message — a tag or URL from the release
+     * document, an exception's message — is read as a console tag, lost or thrown on
+     * ({@see TerminalText} on why OutputFormatter::escape() cannot do it); $error colours the line
+     * in the `error` style when the output is decorated. TerminalText is loaded before the archive
+     * can be replaced ({@see self::execute()}).
      */
-    private function writeError(OutputInterface $output, string $message, ?string $style = null): void
+    private function writeError(OutputInterface $output, string $message, bool $error = false): void
     {
         $target = $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output;
-        $escaped = OutputFormatter::escape($message);
-        $target->writeln($style === null ? $escaped : '<'.$style.'>'.$escaped.'</'.$style.'>');
+        $target->writeln($error ? TerminalText::error($message, $target->isDecorated()) : $message, OutputInterface::OUTPUT_RAW);
     }
 }

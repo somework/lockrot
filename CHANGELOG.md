@@ -324,8 +324,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A message on stderr that quoted something looking like a console tag — a path or a package name
   with `<info>` in it, an exception's message, the `-v` stack trace — lost that part, because it went
   through the console's tag formatter unescaped. Every line `composer lockrot` prints on stderr now
-  goes past the formatter, as the configuration errors above do, and every line `lockrot.phar
-  self-update` prints is escaped for it; each is printed as it was.
+  goes past the formatter, as the configuration errors above do, and so does every line `lockrot.phar
+  self-update` prints; each is printed as it was. Escaping would not have been enough for
+  self-update: a release tag or download URL with `<<fg=red>>` in it would still throw from the 5.4
+  formatter (exit `2` on a run that was up to date) and `<<href=…>>` would still open a link.
 
 - The baseline is now written through a temporary file created exclusively, so a file or symlink
   already at that name fails the write instead of being followed, and a baseline that is replaced

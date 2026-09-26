@@ -62,17 +62,24 @@ mutant from the original, and says why.
 
 ## src/SelfUpdate and src/Composer/SelfUpdateCommand.php
 
-src/Composer/SelfUpdateCommand.php:152 FalseValue (`\Phar::running(false)` → `\Phar::running(true)`) — the
+src/Composer/SelfUpdateCommand.php:155 FalseValue (`\Phar::running(false)` → `\Phar::running(true)`) — the
 two differ only inside a running PHAR, where `false` gives `/path/lockrot.phar` and `true` gives
 `phar:///path/lockrot.phar`; the unit suite is not running from a PHAR, so both return `''` and take the same
 branch. The difference is exercised by `tests/E2E/PharTest.php::testSelfUpdateFinishesCleanlyAfterReplacingTheRunningArchive`,
 which replaces a real archive in place and would fail on a `phar://` path, but Infection runs the `unit` and
 `integration` suites only (`@group e2e` is excluded in phpunit.xml.dist), so no test it runs can see it.
 
+src/Composer/SelfUpdateCommand.php:152 FunctionCallRemoval (`class_exists(TerminalText::class);` removed) —
+the call only loads `TerminalText` before `PharUpdater` can replace the archive the process runs from, so an
+error printed after the swap does not need the autoloader. The unit suite runs from the source tree, where
+the autoloader finds the class whenever `writeError()` first uses it, so the removal prints the same bytes.
+Only a failure after a real swap inside a running PHAR could see it, and Infection does not run the e2e
+`PharTest`.
+
 Two escapes listed here before 0.13.0, a ConcatOperandRemoval dropping the closing `'</error>'` on each of
-the two `catch` lines of `execute()`, went with the tag itself: both lines now hand their message to
-`writeError()` with the `error` style, and the one mutant left in that helper is listed with the `--output`
-entries below (`SelfUpdateCommand.php:278`).
+the two `catch` lines of `execute()`, went with the tag itself. So did the third, the same removal inside
+`writeError()` (`'</'.$style.'>'` to `'</>'`): the helper no longer builds a tag at all, since
+OutputFormatter::escape() left `<<fg=red>>` live, and writes its line raw through `TerminalText` instead.
 
 src/SelfUpdate/ReleaseLocator.php:447 CastString (`(string) preg_replace(...)` → `preg_replace(...)`) — the
 display version of a candidate. preg_replace() returns null only when the pattern fails to compile or the
@@ -430,10 +437,8 @@ its entry is gone. Four escapes are the entries above, at their new lines. The o
 equivalent (403 mutants, 9 escapes, Covered MSI 97.8%):
 
 - `src/Composer/SelfUpdateCommand.php:278` ConcatOperandRemoval — `'</'.$style.'>'` becomes `'</>'`.
-  Symfony's formatter reads `</>` as "close the style opened last", and the line opens exactly one,
-  `$style`, so both spellings render the same bytes. (`LockrotCommand` has no copy of the helper:
-  it writes its stderr lines past the formatter through `TerminalText`, a class self-update could not
-  load after it has replaced the archive it runs from.)
+  Gone since self-update writes its lines raw like `LockrotCommand` (see the self-update area above),
+  with `TerminalText` loaded before the archive can be replaced.
 - `src/Filesystem/Path.php:119` LogicalOr and DecrementInteger x2 — `$a['ino'] === 0 ||
   $b['ino'] === 0`, the fallback to comparing resolved paths where a filesystem reports no inode.
   Every filesystem CI and a developer machine run on (ext4, APFS, tmpfs) reports one, so the
