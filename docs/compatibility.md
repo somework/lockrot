@@ -207,6 +207,11 @@ pending a spike. Nothing on this page promises any of the three.
   `resources/` (`finished-packages.json`, `monorepo-parents.json`, `php-ga-dates.json`), the
   repository-host clients, and S10's reasons. All of these change under
   [Verdict changes](#verdict-changes).
+- **The exposure cap:** the value of `exposure_rule.max_fan_in`, and so which flagged transitive
+  packages land in `exposure` and S7 and which in `unattributed`. It is a heuristic a minor release
+  may change, with a changelog line; the report states the value it used. The fields' shape is
+  contract, the number is not. It never moves a verdict, a priority or the exit code, so it is not a
+  [verdict change](#verdict-changes).
 - **The PHP classes under `src/`.** They are internal and may change in any release.
 
 ## Verdict changes

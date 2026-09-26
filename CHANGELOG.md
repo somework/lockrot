@@ -198,6 +198,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   heading that does not exist. `mkdocs build --strict` let both through, because mkdocs reports them
   as information rather than warnings; `mkdocs.yml` now makes them warnings.
 
+- The JSON report states the rule behind `exposure`, and lists what that rule gives to nobody.
+  `exposure` counts a flagged transitive package under each direct requirement that reaches it only
+  when one to eight do; above eight it is shared infrastructure, every bundle's and nobody's to
+  remove, and it counted nowhere — not in `exposure`, not in S7, not on the `pulled in by:` line.
+  The number 8 was written only in the docs, so a reader of the document had to hard-code it to
+  tell a direct requirement that pulls in nothing attributable from one the rule left out, and
+  could not see the shared packages without redoing the arithmetic over every finding's
+  `direct_dependents`. Now `exposure_rule: {"max_fan_in": 8}` names the cap the run used, and
+  `unattributed` lists the flagged transitive packages above it, each with its `package`, `verdict`
+  and `fan_in` (how many direct requirements of the run reach it), in report order. A flagged
+  package no direct requirement reaches, as in a lock-only run, is in neither list. The descriptions
+  of `exposure` in the schema and in `docs/verdicts.md` now say that a direct requirement is listed
+  only when it pulls in an attributable flagged package, its own verdict being on its finding, and
+  the docs no longer say the `pulled in by:` line appears whenever a flagged package is transitive:
+  it appears when `exposure` is not empty. `exposure`, S7 and the `pulled in by:` line are
+  unchanged, as are `--explain` and the table, markdown, GitHub, GitLab and SARIF formats. The HTML
+  page embeds the JSON report under its `report` key, so that embedded document carries the two new
+  fields too; the page itself does not show them yet. Both fields are optional in the report
+  schema, so documents written before 0.13.0 still validate. The 0.13.0 snapshot of the report
+  schema under `tests/fixtures/schema-evolution/` is refreshed to match, since 0.13.0 is not tagged
+  yet.
+
 ### Fixed
 
 - A package name, a version, a constraint or a note that looked like console markup could break the

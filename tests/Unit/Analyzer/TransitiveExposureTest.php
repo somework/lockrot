@@ -210,6 +210,42 @@ final class TransitiveExposureTest extends TestCase
         self::assertNotNull($first);
         self::assertSame('pulls in 1 flagged package: vendor/leaf (stale)', $first->summary());
         self::assertNull(self::s7($f['root/r02']));
+
+        self::assertTrue(TransitiveExposure::sharedAboveCap($findings[0]), 'nine roots: above the cap');
+        self::assertFalse(TransitiveExposure::sharedAboveCap($findings[1]));
+        foreach ($findings as $finding) {
+            self::assertFalse(
+                TransitiveExposure::attributable($finding) && TransitiveExposure::sharedAboveCap($finding),
+                $finding->package().' is attributed or shared above the cap, never both'
+            );
+        }
+    }
+
+    /**
+     * `vendor/shared` with the given chain, reached from the given roots.
+     *
+     * @param list<string> $chain
+     * @param list<string> $roots
+     */
+    private static function shared(string $verdict, array $chain, array $roots): Finding
+    {
+        return new Finding('vendor/shared', '1.0.0', $verdict, [], $chain, null, null, null, false, $roots);
+    }
+
+    public function testSharedAboveCapRequiresFlaggedTransitiveAndMoreRootsThanTheCap(): void
+    {
+        $graph = $this->graph();
+        $nine = ['root/r1', 'root/r2', 'root/r3', 'root/r4', 'root/r5', 'root/r6', 'root/r7', 'root/r8', 'root/r9'];
+        $transitive = ['root/r1', 'vendor/shared'];
+
+        self::assertTrue(TransitiveExposure::sharedAboveCap(self::shared(Verdict::STALE, $transitive, $nine)));
+        self::assertFalse(TransitiveExposure::sharedAboveCap(self::shared(Verdict::STALE, $transitive, \array_slice($nine, 0, 8))), 'eight is still attributed');
+        self::assertFalse(TransitiveExposure::sharedAboveCap(self::shared(Verdict::OK, $transitive, $nine)));
+        self::assertFalse(TransitiveExposure::sharedAboveCap(self::shared(Verdict::UNKNOWN, $transitive, $nine)));
+        self::assertFalse(TransitiveExposure::sharedAboveCap(self::shared(Verdict::STALE, ['vendor/shared'], $nine)), 'a direct requirement is its own finding');
+        self::assertFalse(TransitiveExposure::sharedAboveCap($this->finding($graph, 'vendor/leaf', Verdict::STALE)), 'two roots');
+        self::assertFalse(TransitiveExposure::sharedAboveCap($this->finding($graph, 'vendor/lonely', Verdict::STALE)), 'nothing reaches it: in neither list');
+        self::assertFalse(TransitiveExposure::attributable($this->finding($graph, 'vendor/lonely', Verdict::STALE)));
     }
 
     public function testAttributableRequiresFlaggedAndTransitive(): void
