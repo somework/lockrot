@@ -6,8 +6,10 @@ namespace Lockrot\Tests\Unit\Signal\Rule;
 
 use Composer\Package\Loader\ArrayLoader;
 use Lockrot\Data\Repository\PackageMetadata;
+use Lockrot\Json\Schemas;
 use Lockrot\Signal\Rule\PinnedRule;
 use Lockrot\Signal\Signal;
+use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
 use PHPUnit\Framework\TestCase;
 
@@ -49,10 +51,26 @@ final class PinnedRuleTest extends TestCase
         ], $signal->data());
     }
 
-    public function testTheReasonsAreTheDocumentedValues(): void
+    /**
+     * `reason` is an open set, so neither the published schema nor its strict twin rejects a value
+     * the code emits and the schema never learned. What does is this: every `REASON_*` constant, in
+     * declaration order, is what the report schema lists under `x-known-values` — a third reason
+     * added to the rule without the schema, or the other way round, fails here.
+     */
+    public function testTheReasonsAreTheValuesTheReportSchemaKnows(): void
     {
-        self::assertSame('branch_snapshot', PinnedRule::REASON_BRANCH_SNAPSHOT);
-        self::assertSame('no_stable_release', PinnedRule::REASON_NO_STABLE_RELEASE);
+        $reasons = [];
+        foreach ((new \ReflectionClass(PinnedRule::class))->getReflectionConstants() as $constant) {
+            if (strncmp($constant->getName(), 'REASON_', 7) === 0) {
+                $reasons[] = $constant->getValue();
+            }
+        }
+
+        self::assertSame(['branch_snapshot', 'no_stable_release'], $reasons);
+        self::assertSame(
+            $reasons,
+            JsonPath::arrayAt(JsonPath::decodeFile(Schemas::path(Schemas::REPORT)), ['definitions', 's6', 'properties', 'reason', 'x-known-values'])
+        );
     }
 
     /** wallabag/rulerz on dev-master: the repository lists branches and no tag at all. */

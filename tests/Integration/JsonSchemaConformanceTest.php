@@ -277,14 +277,18 @@ final class JsonSchemaConformanceTest extends TestCase
 
     /**
      * S6's data is typed, and its `reason` is an open set: a value a later release adds validates
-     * against the schema this one publishes, as published and against the strict twin. A wrong type
-     * on any of the new fields does not.
+     * against the schema this one publishes, as a consumer holds it. The strict twin is this
+     * release's own contract, so it is only asked about the reasons this release lists under
+     * `x-known-values`; whether it rejects any other is the strict twin's business, not this test's.
+     * A wrong type on any of the new fields fails either way.
      */
     public function testS6DataIsTypedButItsReasonIsOpen(): void
     {
         $json = (new JsonFormatter())->format(self::analysis('apps/wallabag_wallabag')->report());
+        $this->assertValid(Schemas::REPORT, self::withRulerzS6($json, ['reason' => 'something_new']), 'a reason this release does not know');
         $valid = [
-            'a reason this release does not know' => ['reason' => 'something_new'],
+            'a snapshot' => ['reason' => 'branch_snapshot'],
+            'a release with no tag in its repository' => ['reason' => 'no_stable_release'],
             'no metadata, so nothing known' => ['has_stable_release' => null],
             'a tagged snapshot' => ['has_stable_release' => true, 'last_stable_release' => '2019-01-23T15:23:04+00:00', 'last_stable_version' => '1.6.2', 'last_stable_dated_by' => 'vendor/monorepo'],
             'a document written before 0.13.0' => array_fill_keys(['reason', 'has_stable_release', 'last_stable_release', 'last_stable_version', 'last_stable_dated_by', 'snapshot_time'], self::ABSENT),
