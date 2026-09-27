@@ -236,6 +236,9 @@ list, which `…` stands in for:
         "target_php": "8.4",
         "lock_file": "composer.lock",
         "fail_on": "none",
+        "fail_on_kind": "none",
+        "strict_network": false,
+        "mode": "check",
         "thresholds": {
             "release-warn-years": 3,
             "release-high-years": 5,
@@ -310,6 +313,11 @@ list, which `…` stands in for:
         }
     },
     "baseline": null,
+    "gate": {
+        "fails": false,
+        "tripped_by": [],
+        "fail_on_applied": true
+    },
     "notes": [],
     "findings": [
         {
@@ -360,7 +368,12 @@ list, which `…` stands in for:
                 "steps": []
             },
             "no_fix_expected": [],
-            "baseline": null
+            "baseline": null,
+            "gate": {
+                "reaches_fail_on": false,
+                "fails": false,
+                "exempt_by": null
+            }
         },
         …
     ]
@@ -370,14 +383,16 @@ list, which `…` stands in for:
 The cut signals have the same shape as S1 and S2; S7 carries the packages it names under `data`. So
 do the other 199 findings, each with its own `priority`, `direct`, `dev`, `from_composer_repository`,
 `replacement`, `signals`, `chain`, `direct_dependents`, `evidence`, `allowlist_reason`, `note`,
-`data_date`, `libyears`, `libyears_unmeasured`, `priority_basis`, `no_fix_expected` and `baseline`. `exposure` is the
+`data_date`, `libyears`, `libyears_unmeasured`, `priority_basis`, `no_fix_expected`, `baseline` and `gate`. `exposure` is the
 `pulled in by:` line in full — every direct requirement that pulls in an attributable flagged transitive
 package, with how many, most first. From 0.13.0 the document also carries `exposure_rule`, the cap that list
 is drawn by (`{"max_fan_in": 8}`), and `unattributed`, the flagged packages reached from more direct
 requirements than that and so counted under none; see
 [transitive exposure](verdicts.md#transitive-exposure). `libyears` is the [libyears block](verdicts.md#libyears), summed from the
 findings: sensio/framework-extra-bundle is abandoned and *zero* libyears behind — its last release is
-the one installed — which is the point of keeping the two numbers apart.
+the one installed — which is the point of keeping the two numbers apart. `gate`, also from 0.13.0, is the
+decision behind the exit code: under `fail_on` `none` no finding reaches the threshold, so the run passes (see
+[schema.md](schema.md#what-the-report-schema-types)).
 
 ## A clean run
 

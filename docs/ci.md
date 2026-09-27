@@ -50,6 +50,10 @@ A `2` writes nothing to stdout, except an `--output` file that cannot be written
 the report. stderr says what went wrong, starting `lockrot:` for a configuration or usage error and `lockrot failed:`
 for anything else.
 
+From 0.13.0 the JSON report, and the one inside an HTML page, carries the decision behind `0` and `1` as `gate.fails`,
+with the causes in `gate.tripped_by` and each finding's own standing in its `gate` ([schema.md](schema.md#what-the-report-schema-types)).
+A run whose report says `gate.fails` and which then cannot write an `--output` file or the baseline exits `2` instead.
+
 `composer audit` follows the same convention: exit `1` when it finds a security advisory or, with Composer's default
 `audit.abandoned=fail`, an abandoned package; exit `0` when it finds nothing. lockrot reads the same advisories
 ([signal S9](verdicts.md#security-advisories)) but never exits `1` for one alone: it raises the priority of a finding
