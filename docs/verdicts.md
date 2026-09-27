@@ -305,7 +305,8 @@ the finding says which release carries it.
 
 Two of the four were fixed within 3.x — v3.4.47 is out of their range — and a `composer update`
 gets them; the other two are fixed only in 8.x, which is what the branch will not get, so they earn
-the raise: `high` for a transitive requirement becomes `critical`. The same package `abandoned`
+the raise: left-behind starts at `high`, being transitive takes it to `medium`, and the raise puts
+it back at `high`. The same package `abandoned`
 rather than left behind would count fixes anywhere in it, since no branch of it will release again:
 
 ```text
@@ -349,7 +350,19 @@ source. `--format=json` carries each advisory under the signal's `data.advisorie
 `title`, `link`, `severity`, `reported_at` and `affected_versions` (the range, as Composer prints
 it), null where the repository gave none, with `fixed_by` — the listed release out of the range,
 null when there is none — and `fixed_on_branch`, true when that release is on the installed
-version's branch.
+version's branch. From 0.13.0 the signal's `data` also says whether the releases were read at all,
+`releases_read`: false when there was no metadata or the installed version is not one lockrot can
+compare, so every `fixed_by` is null without a release having been looked at.
+
+From 0.13.0 each finding also names the advisories no fix is expected for, as `no_fix_expected`: a
+list of `{id, reason}` in S9's order, `[]` when a no-fix verdict has none, and null on every other
+verdict, which makes no fix prediction. The `reason` is the first that applies —
+`not_on_installed_branch` (left behind, and fixed only on a higher branch),
+`releases_unknown` (`releases_read` is false: the advisory counts as unfixed, and raises the
+priority, although no fix was looked for), `affected_range_unknown` (the advisory gives no affected
+range) and `no_release_fixes` (the releases were read and none outside the range is listed). The
+list is read off the same loop as the `no fix expected` clause and the raise, so a non-empty list,
+the clause and the `no_fix_expected` step of `priority_basis` always go together.
 
 ## Priority
 
@@ -375,6 +388,13 @@ Four rules, in order:
 
 A package nothing in your `require`/`require-dev` can reach counts as transitive.
 
+From 0.13.0 `--format=json` writes the walk on every finding as `priority_basis`: the `base` and
+each step with its `reason` (`transitive`, `unreached` for a package nothing reaches, `dev`,
+`no_fix_expected`), `from` and `to`, in the order above. A step is there whenever its rule applies,
+also when the level cannot move; the transitive left-behind http-foundation above is
+`{"base": "high", "steps": [{"reason": "transitive", "from": "high", "to": "medium"},
+{"reason": "no_fix_expected", "from": "medium", "to": "high"}]}`.
+
 The priority orders the report — highest first, then by verdict severity, then direct dependencies
 ahead of transitive ones, then by package name — and it is carried in every format.
 
@@ -394,7 +414,7 @@ one step below the same finding on a production package.
 | Format | How the priority appears |
 |---|---|
 | `table` | Findings are grouped under the priority level, highest group first |
-| `json` | Each finding carries `priority`, `direct` and `dev`; the document carries a `priorities` object with all five counts next to `counts` |
+| `json` | Each finding carries `priority`, `direct` and `dev`, and from 0.13.0 `priority_basis`, the base and the steps that led to it; the document carries a `priorities` object with all five counts next to `counts` |
 | `github` | In each annotation's title: `lockrot: abandoned (critical)` |
 | `gitlab` | Opens each issue's description: `… — abandoned (critical): …` |
 | `markdown` | A first `Priority` column |

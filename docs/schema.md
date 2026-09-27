@@ -196,6 +196,29 @@ consumer usually keys on:
   validate, and always present from 0.13.0 on; a document without it predates the field, and its
   absence never means "measured". The `unmeasured` block's keys grow the same way: a key a later
   release adds is typed as a count and never joins `required`.
+- From 0.13.0 each finding carries `priority_basis`, how its `priority` was reached: `base`, the
+  level the verdict starts at (`none` for `unknown`, `finished` and `ok`), and `steps`, each
+  `{reason, from, to}` in the order applied — `transitive`, or `unreached` when `chain` is empty,
+  exactly when `direct` is false; then `dev`; then `no_fix_expected`. A step is recorded whenever
+  its fact holds, also when it cannot move the level (`from` equals `to`: a development package
+  already at `low`, a raise at `critical`). The first step starts at `base`, each later one where
+  the last ended, and the last ends at `priority`; with no steps `priority` is `base`. `from` and
+  `to` are the priority order without `none`, and a step's `reason` is an open string, so a step a
+  later release adds still reads as a move from one level to another. See
+  [verdicts.md](verdicts.md#priority).
+- From 0.13.0 each finding also carries `no_fix_expected`, the advisories lockrot expects no fix
+  for, each `{id, reason}` in S9's order. It has four states: absent, a document written before
+  0.13.0; null, the verdict makes no fix prediction (every verdict but `abandoned`, `silent` and
+  `left-behind`); `[]`, one of those three with every advisory fixed by a release it lets the project
+  reach, or no advisory at all; and a non-empty list, the advisories that raise the priority and put
+  `no fix expected` in the evidence. `id` is the `id` of one of the finding's S9 rows. `reason` is
+  the first that applies, an open string: `not_on_installed_branch` (left-behind, fixed only on a
+  higher branch), `releases_unknown` (S9's `releases_read` is false, so no fix was looked for),
+  `affected_range_unknown` (the advisory gives no affected range) or `no_release_fixes`. S9's `data`
+  gains `releases_read`: true when the releases were read and the installed version compared with
+  them, so a null `fixed_by` means none fixes it; false when there was no metadata or the installed
+  version is not one lockrot can compare. Both are optional in the schema, so earlier documents
+  validate. See [verdicts.md](verdicts.md#security-advisories).
 - `exposure` lists a direct requirement only when it pulls in an attributable flagged package; a
   flagged direct requirement that pulls in none is not there, and its own verdict is on its finding.
   `exposure_rule` states the cap the report attributes by (`max_fan_in`, the most direct
