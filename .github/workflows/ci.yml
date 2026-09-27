@@ -119,9 +119,9 @@ jobs:
       # Whole tree, 2026-09-17: 3202 mutants, 56 equivalent escapes, 2 timed out (infinite-loop
       # mutants, i.e. detections) -> MSI = Covered MSI 98.25%; ~6m20s on 8 threads locally, ~30 min
       # unsharded on a 4-core runner. infection.json5 records why the timeout is 180;
-      # tests/infection-equivalents.md records why every one of the 56 escapes is equivalent. No
-      # GitHub annotations: 56 warnings about documented equivalents per run would only teach people
-      # to ignore them; the escape listing is uploaded instead.
+      # tests/infection-equivalents.md records why every documented escape is equivalent. No
+      # GitHub annotations: dozens of warnings about documented equivalents per run would only teach
+      # people to ignore them; the escape listing is uploaded instead.
       - run: $(composer global config bin-dir --absolute)/infection --threads=max --min-msi=${{ matrix.shard.min_msi }} --min-covered-msi=${{ matrix.shard.min_msi }} ${{ matrix.shard.filter }}
       - if: always()
         uses: actions/upload-artifact@v7
