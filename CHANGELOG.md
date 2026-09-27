@@ -454,6 +454,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `--explain` text, the install-time summary and the baseline file. The 0.13.0 schema snapshot is
   refreshed.
 
+- The run's notes are typed: `note_details`, one entry per `notes` string at the same index, each
+  with `code` (what the run could not see: `offline`, `metadata_unavailable`,
+  `monorepo_parent_unavailable`, `advisory_ignore_unreadable`, `advisories_unavailable`,
+  `advisories_not_checked`, `repository_activity_not_checked`, `repository_activity_anonymous_cap`,
+  `repository_activity_rate_limited`, `repository_activity_unreachable`,
+  `repository_activity_not_found`, `not_from_composer_repository`), `text` (exactly the `notes`
+  string), `docs_url` (the code's section of the new [Run notes](https://lockrot.dev/notes/) page),
+  `sets_network_failures` and `data`, typed per code the way a signal's is per id: package counts,
+  each metadata failure's `reason` (`offline`, `install_time_budget`, `no_versions`, or
+  `fetch_failed` for any other message) and its message, the monorepo `parent`, the Composer
+  repository an advisory lookup failed on, how many advisory repositories were asked before the
+  install-time budget ran out, the forge (`forge_id`) and every repository a forge did not answer
+  for, by `host` and `repo`, with its own message. Until now all of it was prose: a consumer had to
+  match lockrot's sentences to tell a rate limit from an outage, the unreachable note named only the
+  first of several failures, the anonymous cap added its two kinds of skipped package into one
+  number, a repository that answered 404 was counted and never named, and nothing said which note
+  had made `network_failures` true — the HTML page guessed a docs link from the wording. Each note
+  is now built once from its facts, which give its sentence and decide whether it counts towards
+  `network_failures`, and `network_failures` is computed from the notes (true exactly when an
+  entry's `sets_network_failures` is), where the rule was composed a second time beside them; the
+  metadata reasons are classified in one place, which the analyzer's own two checks of them now
+  read too. The code, `forge_id` and the reasons are open strings with a `pattern` and
+  `x-known-values`, and a code the schema does not list carries any object as its `data`. The
+  `--explain` document carries the same `note_details` beside its `notes`. `note_details` is
+  optional in both schemas, so documents written before 0.13.0 still validate; from 0.13.0 on every
+  document carries it, `[]` when `notes` is. `notes`, `network_failures`, every verdict, priority,
+  exit code and baseline standing are unchanged, as are the table, markdown, GitHub, GitLab and
+  SARIF formats, the `--explain` text, the install-time summary and the baseline file: over every
+  fixture lock online, anonymously, offline and past the install-time budget, each of them is
+  byte-identical to the one before, and each JSON document is once `note_details` is removed.
+  `docs/compatibility.md` says what 1.0 freezes about the notes. The 0.13.0 schema snapshot is
+  refreshed.
+
 ### Fixed
 
 - A package name, a version, a constraint or a note that looked like console markup could break the

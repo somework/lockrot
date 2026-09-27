@@ -345,7 +345,7 @@ in it, at roughly 4 KB a package; without it a 100-package lock lands around 300
 The complete report, and the only format that carries every field: per-finding `signals`, `chain`,
 `direct_dependents`, `from_composer_repository` (whether the lock entry carries a notification-url, the only kind lockrot asks a repository about, see
 [schema.md](schema.md#what-the-report-schema-types)), `evidence`, `data_date`, `libyears`, `libyears_unmeasured` (why `libyears` is null, the `unmeasured` key the finding counts under), `priority_basis` (the level the verdict starts at and each step to the `priority`), `no_fix_expected` (the advisories no fix is expected for, and why) and `baseline` — where that finding stands against the
-baseline file — plus the document's `run`, `exposure`, `exposure_rule`, `unattributed`, `libyears` and `notes`. `run` is what the report is about and what
+baseline file — plus the document's `run`, `exposure`, `exposure_rule`, `unattributed`, `libyears`, `notes` and `note_details`, the same notes typed, each with a code and its facts ([notes.md](notes.md)). `run` is what the report is about and what
 its verdicts were decided against: what the project is called (`project`: composer.json's `name`,
 or `extra.lockrot.project` instead) and the name composer.json itself gives it (`root_package`),
 the target PHP and the project's own `require.php` (`project_php`), the thresholds, the `fail-on` and the name of the lock, with the list of verdicts

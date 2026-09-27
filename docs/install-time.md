@@ -61,6 +61,11 @@ lockrot: 4 of 4 changed packages could not be checked
 Run composer lockrot for details.
 ```
 
+The block prints the run's first notes only, in the order the run wrote them, so the note behind
+the failed lookup can fall past the cut when others come before it. `composer lockrot --format=json`
+lists every note, and each `note_details` entry's `sets_network_failures` says whether it is one
+behind the failure ([notes.md](notes.md)).
+
 The block itself is left out only when every changed package was checked and none was flagged.
 Even then the install is not necessarily silent: an unknown `extra.lockrot` key still gets its line
 (see above), because it is about the configuration, not about the packages.
