@@ -443,7 +443,7 @@ equivalent (403 mutants, 9 escapes, Covered MSI 97.8%):
 
 ## Annotations name the lock `COMPOSER` names (0.13.0)
 
-- `src/Output/FormatContext.php:184` CastString — `(string) substr($lock, \strlen($root))` in
+- `src/Output/FormatContext.php:183` CastString — `(string) substr($lock, \strlen($root))` in
   `relativePath()`: the branch is taken only when `$lock` starts with `$root`, which ends in `/`,
   and `Path::normalize()` never leaves a trailing `/` on `$lock`, so `$lock` is strictly longer and
   `substr()` can never return the `false` PHP 7.4 documents for an out-of-range start. The cast

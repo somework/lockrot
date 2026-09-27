@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Lockrot\Output;
 
 use Lockrot\Baseline\BaselineComparison;
-use Lockrot\Config\LockrotConfig;
 use Lockrot\Filesystem\Path;
 use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
@@ -65,7 +64,7 @@ final class FormatContext
 
     /**
      * @param null|string $lockPath         absolute path of the analysed lock, null when unknown
-     * @param string      $failOn           the resolved fail-on — a verdict, a priority or LockrotConfig::FAIL_ON_NONE
+     * @param string      $failOn           the resolved fail-on, one of {@see FailOn::allowed()}
      * @param int         $terminalWidth    columns available for `table`, clamped to MIN_WIDTH
      * @param null|string $projectDirectory absolute path of the directory lockrot runs in, which the
      *                                      annotation formats name the lock relative to; null when unknown
@@ -87,7 +86,7 @@ final class FormatContext
     /** The context for a run with nothing to say: no lock path, no fail-on threshold, default width. */
     public static function unknown(): self
     {
-        return new self(null, FailOn::fromString(LockrotConfig::FAIL_ON_NONE), Version::STRING, self::DEFAULT_WIDTH, null);
+        return new self(null, FailOn::none(), Version::STRING, self::DEFAULT_WIDTH, null);
     }
 
     public function lockPath(): ?string
@@ -155,7 +154,7 @@ final class FormatContext
      * annotation severity keeps matching the exit code. New and worsened findings map as usual.
      *
      * In the report's terms: `error` exactly where a finding's `gate.reaches_fail_on` is true and its
-     * `gate.exempt_by` is not `baseline`, in a `--generate-baseline` run too, which fails on nothing.
+     * `gate.exempt_by` is not `baseline`, in a `--generate-baseline` run too, where no finding fails.
      *
      * @param null|BaselineComparison $baseline the run's comparison, from Report::baseline()
      */
