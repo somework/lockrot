@@ -104,7 +104,7 @@ final class FailOn
 
     public function kind(): string
     {
-        if ($this->value === self::NONE) {
+        if ($this->isNone()) {
             return self::KIND_NONE;
         }
         if ($this->value === self::UNCHECKED) {
