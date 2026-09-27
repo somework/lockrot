@@ -260,7 +260,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   fixture lock. A null `admits_*` is no answer, never admitted: the branch requires no PHP, its
   requirement cannot be read, or, for the project, `composer.json` names no lowest PHP. S8 counts
   such a branch as within reach, and `php_blocked_by` is null for it. The row is tested whatever its
-  place, so the installed branch can read `project` when the lock already needs more PHP than
+  place, so the installed branch can read `project` too: its row's `php` is the requirement of
+  that branch's newest dated release, not of the installed version (the lock's own is `lock.php`),
+  so `project` there means a newer release on your branch needs more PHP than the lowest
   `require.php` promises. The document also gains `project_php`, the `require.php` the rows were
   tested against, next to `target_php`. `php_blocked_by` is described as an open string, not an
   enum, so a later value is not a schema break. Nothing S8 decides changes, nor the `--explain`
