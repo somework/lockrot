@@ -2528,7 +2528,8 @@ final class LockrotCommandTest extends TestCase
         // manifest present, what its require.php is set to (false: removed), then the expected run.project_php
         yield 'the manifest\'s own require.php, as written' => [true, '^8.3', '^8.3'];
         yield 'a manifest without require.php' => [true, false, null];
-        yield 'an empty require.php' => [true, '', null];
+        // An empty require.php is null too (ProjectConfigTest), but not a case for a whole run:
+        // Composer 2.2 refuses to load a manifest that holds one, before lockrot reads anything.
         yield 'a require.php that is not a string' => [true, ['8.3'], null];
         yield 'a lock without its composer.json' => [false, false, null];
     }
