@@ -82,10 +82,10 @@ from `1.2.3` to `1.3.0` while it stays abandoned keeps it accepted; a package th
 cleaned up behind your back — regenerate the baseline when you want them gone.
 
 Only flagged findings can be accepted, so a baseline never covers an `ok`, `finished` or `unknown`
-finding: one that carries S10 still fails `--fail-on=unchecked` however often you regenerate. The JSON report says where each
-finding stands in its `gate` (see [schema.md](schema.md#what-the-report-schema-types)): a `known`
-finding that reaches `--fail-on` has `exempt_by` `baseline` and does not fail, a `new` or `worsened`
-one fails like any other.
+finding: one that carries S10 still fails `--fail-on=unchecked` however often you regenerate. The
+JSON report says where each finding stands in its `gate` (see
+[schema.md](schema.md#what-the-report-schema-types)): a `known` finding that reaches `--fail-on`
+has `exempt_by` `baseline` and does not fail, a `new` or `worsened` one fails like any other.
 
 ## Generate it with the same `--dev` setting your CI run uses
 
