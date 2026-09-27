@@ -177,11 +177,14 @@ final class Libyears
         /** @var array{Finding, float}|null $worst the finding and its value, set together */
         $worst = null;
         foreach ($findings as $finding) {
+            $reason = $finding->libyearsUnmeasured();
+            if ($reason !== null) {
+                ++$unmeasured[$reason];
+                continue;
+            }
             $behind = $finding->libyears();
             if ($behind === null) {
-                // The measurement sets the reason whenever it sets no years; the fallback is for the type.
-                ++$unmeasured[$finding->libyearsUnmeasured() ?? self::NO_STABLE_RELEASE_DATE];
-                continue;
+                throw new \LogicException(\sprintf('%s has neither libyears nor a reason it has none.', $finding->package()));
             }
             ++$measured;
             $total += $behind;
