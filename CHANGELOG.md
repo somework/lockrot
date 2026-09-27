@@ -384,6 +384,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and exit code is unchanged, as are the table, markdown, GitHub, GitLab and SARIF formats, the
   `--explain` text and the baseline. The 0.13.0 schema snapshot is refreshed.
 
+- Each finding says how its priority was reached: `priority_basis`, the level the verdict starts at
+  (`base`, `none` for an unflagged verdict) and each step taken from it as `{reason, from, to}`, in
+  the order the rules apply — `transitive`, or `unreached` when nothing the run knows reaches the
+  package, then `dev`, then `no_fix_expected`. A step is recorded whenever its rule applies, also
+  when the level cannot move (`from` equals `to`: a development package already at `low`, a raise at
+  `critical`), so the steps chain from `base` to `priority` and a reader sees every fact that
+  applied. Until now only the end point was written, and the HTML page kept a second copy of the
+  base levels and the ladder in TypeScript to explain it. `Priority::of()` is now the end of the same
+  walk that writes the steps, and a test holds the walk to a table of every flagged verdict, reach,
+  dev and no-fix shape written out by hand. `from` and `to` take the priority order without `none`,
+  a new definition a test ties to the frozen order; the step `reason` is an open string with a
+  `pattern` and `x-known-values`. `docs/verdicts.md` said the transitive left-behind
+  http-foundation example went from `high` to `critical`; it goes `high`, `medium`, `high`, and the
+  page now says so.
+
+- Each finding names the advisories lockrot expects no fix for: `no_fix_expected`, a list of
+  `{id, reason}` in S9's order, `[]` when an `abandoned`, `silent` or `left-behind` finding has none,
+  and null on every other verdict, which makes no fix prediction. The reason is the first that
+  applies: `not_on_installed_branch` (left behind, fixed only on a higher branch),
+  `releases_unknown`, `affected_range_unknown` (the advisory gives no range) or `no_release_fixes`.
+  S9's `data` gains `releases_read`, false when there was no metadata or the installed version could
+  not be compared, so every `fixed_by` is null without a release having been looked at; that is
+  what `releases_unknown` reads. Until now the fact was only in the evidence as `no fix expected`,
+  and the HTML page found it with a regular expression over the prose. The list, the raise and the
+  clause come from one loop, so a non-empty list, the `no_fix_expected` step and the clause always
+  go together; a test seeds each advisory path over the fixture locks (an abandoned package a listed
+  release fixes and one nothing fixes, a left-behind one fixed on its branch and one fixed only on a
+  higher branch, an abandoned-in-the-lock one whose metadata failed, a stale, an allowlisted and an
+  ok one) and holds both fields to the rest of every report and `--explain` document. An abandoned
+  package whose metadata failed is still raised for its advisories although no fix was looked for;
+  `releases_unknown` now says so, and the raise is unchanged. Both fields and `releases_read` are
+  optional in the schemas, so documents written before 0.13.0 still validate; from 0.13.0 on every
+  finding carries both. They reach `--format=json`, the report inside the `--format=html` page (which
+  does not read them yet) and the `--explain` document's `finding`; every verdict, priority,
+  evidence line, count and exit code is unchanged, as are the table, markdown, GitHub, GitLab and
+  SARIF formats, the `--explain` text and the baseline. The 0.13.0 schema snapshot is refreshed.
+
 ### Fixed
 
 - A package name, a version, a constraint or a note that looked like console markup could break the
