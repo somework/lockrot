@@ -448,3 +448,22 @@ equivalent (403 mutants, 9 escapes, Covered MSI 97.8%):
   and `Path::normalize()` never leaves a trailing `/` on `$lock`, so `$lock` is strictly longer and
   `substr()` can never return the `false` PHP 7.4 documents for an out-of-range start. The cast
   states the type; it does not cover a case.
+
+## The gate (0.13.0, 2026-09-28)
+
+Measured over `src/Config/Gate.php`, `src/Config/GateStanding.php`, `src/Config/Policy.php`,
+`src/Verdict/FailOn.php`, `src/Analyzer/RunSettings.php`, `src/Analyzer/Report.php` and
+`src/Output/FormatContext.php`, whole files, locally under Xdebug on 10 threads: 323 mutants, 316
+killed, 3 escaped, 4 skipped, Covered MSI 99%, ~4m50s. The three escapes are entries above, at
+`Report.php:134`, `RunSettings.php:122` and `FormatContext.php:183` today. The gate adds none.
+
+A first pass looked clean and was not. `Report::toArray()` decides the gate, so every test that
+writes a document covers `Gate` and `FailOn`, and `GateAgreementTest`'s corpus sweep (45 s under
+Xdebug) pushed the summed time of their covering test classes past the 180 s timeout. Infection
+skips such a mutant unrun ("required more time than configured") and leaves it out of the MSI, so
+76 of the 108 mutants on the branch's changed lines were never run and the gate still read 100%.
+`GateAgreementTest` covers nothing now: the slowest line of `Gate` sums to 121 s, and a run with the
+timeout raised to 3600 s runs every mutant and escapes the same three (323 mutants, 320 killed).
+The four still skipped under Xdebug are `Report`'s constructor and `findings()` (180.4 s, since
+every test builds a report), none of them gate code, and the run without a timeout kills all four.
+CI's pcov shards skipped no mutant before this branch.

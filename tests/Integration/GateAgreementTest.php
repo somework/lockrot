@@ -36,6 +36,7 @@ use Lockrot\Tests\Support\ValidatesJsonSchemas;
 use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Verdict;
 use Lockrot\Verdict\VerdictEngine;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 
@@ -47,7 +48,13 @@ use PHPUnit\Framework\TestCase;
  * read under every fail-on value, with and without --strict-network, with and without a failed
  * lookup, with no baseline and with one taken from the report and then changed so that it holds
  * known, new and worsened findings, in both modes.
+ *
+ * It covers nothing: Infection skips a mutant whose covering tests together outlast its timeout, and
+ * this sweep would push every line of the gate past it. GateTest and ReportTest kill those mutants.
+ *
+ * @coversNothing
  */
+#[CoversNothing]
 final class GateAgreementTest extends TestCase
 {
     use ValidatesJsonSchemas;
