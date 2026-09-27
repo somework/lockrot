@@ -21,6 +21,7 @@ use Lockrot\Signal\Rule\AdvisoryRule;
 use Lockrot\Signal\Rule\PinnedRule;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\Thresholds;
+use Lockrot\Tests\Support\Notes;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
@@ -43,7 +44,7 @@ final class ExplainFormatterTest extends TestCase
     /** @param list<string> $notes */
     private function report(array $notes = []): Report
     {
-        return new Report([], $notes, new \DateTimeImmutable(F::NOW), 3, 0, false);
+        return new Report([], Notes::texts($notes), new \DateTimeImmutable(F::NOW), 3, 0);
     }
 
     /**

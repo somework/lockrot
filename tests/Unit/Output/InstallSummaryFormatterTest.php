@@ -8,6 +8,7 @@ use Lockrot\Analyzer\Report;
 use Lockrot\Output\ConsoleMarkup;
 use Lockrot\Output\InstallSummaryFormatter;
 use Lockrot\Signal\Signal;
+use Lockrot\Tests\Support\Notes;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -34,7 +35,7 @@ final class InstallSummaryFormatterTest extends TestCase
      */
     private function report(array $findings, array $notes = [], ?int $packagesChecked = null, bool $hadNetworkFailures = false): Report
     {
-        return new Report($findings, $notes, new \DateTimeImmutable(self::NOW), $packagesChecked ?? \count($findings), 0, $hadNetworkFailures);
+        return new Report($findings, Notes::texts($notes, $hadNetworkFailures), new \DateTimeImmutable(self::NOW), $packagesChecked ?? \count($findings), 0);
     }
 
     public function testNothingFlaggedAndNothingFailedProducesNoLinesAtAll(): void

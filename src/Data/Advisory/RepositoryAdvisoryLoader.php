@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Lockrot\Data\Advisory;
 
-use Composer\Downloader\TransportException;
 use Composer\Repository\AdvisoryProviderInterface;
 use Composer\Repository\RepositoryInterface;
 use Composer\Semver\Constraint\Constraint;
 use Composer\Semver\VersionParser;
+use Lockrot\Analyzer\RunNote;
 use Lockrot\Deadline;
 
 /**
@@ -34,14 +34,6 @@ use Lockrot\Deadline;
  */
 final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
 {
-    /**
-     * Each note says what the missing check costs: without S9 a finding no fix would come for sits
-     * one priority step lower than an online run would put it, and `--fail-on` decides on that.
-     */
-    public const NOTE_COMPOSER_TOO_OLD = 'security advisories not checked (needs Composer 2.4 or newer); a priority they would raise stays one step lower';
-    public const NOTE_OFFLINE = 'offline: security advisories not checked; a priority they would raise stays one step lower';
-    public const NOTE_BUDGET = 'security advisories not checked: install-time budget exhausted; a priority they would raise stays one step lower';
-
     /** @var list<RepositoryInterface> */
     private array $repositories;
     private bool $offline;
@@ -66,41 +58,40 @@ final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
             return AdvisoryBatch::empty();
         }
         if ($this->offline) {
-            return AdvisoryBatch::unavailable(self::NOTE_OFFLINE);
+            return AdvisoryBatch::unavailable(RunNote::advisoriesNotChecked(RunNote::ADVISORIES_OFFLINE, 0));
         }
         // The interface arrived in Composer 2.4; the guard is load-bearing on the 2.2 LTS.
         if (!interface_exists(AdvisoryProviderInterface::class)) {
-            return AdvisoryBatch::unavailable(self::NOTE_COMPOSER_TOO_OLD);
+            return AdvisoryBatch::unavailable(RunNote::advisoriesNotChecked(RunNote::ADVISORIES_COMPOSER_TOO_OLD, 0));
         }
 
         /** @var array<string, array<string, Advisory>> $byName name => advisory id => advisory, so two repositories serving the same advisory count it once */
         $byName = [];
-        $notes = $this->ignore->note() === null ? [] : [$this->ignore->note()];
-        $failed = false;
+        $whyUnreadable = $this->ignore->whyUnreadable();
+        $notes = $whyUnreadable === null ? [] : [RunNote::advisoryIgnoreUnreadable($whyUnreadable)];
+        $asked = 0;
         foreach ($this->repositories as $repository) {
             if (!$repository instanceof AdvisoryProviderInterface) {
                 continue;
             }
             if ($this->deadline->isPast()) {
-                return new AdvisoryBatch(self::lists($byName), array_merge($notes, [self::NOTE_BUDGET]), $failed);
+                return new AdvisoryBatch(self::lists($byName), array_merge($notes, [RunNote::advisoriesNotChecked(RunNote::INSTALL_TIME_BUDGET, $asked)]));
             }
+            ++$asked;
 
             try {
                 if (!$repository->hasSecurityAdvisories()) {
                     continue;
                 }
                 $answer = $repository->getSecurityAdvisories($map, false)['advisories'];
-            } catch (TransportException $e) {
-                $notes[] = self::unavailableNote($repository->getRepoName(), $e);
-                $failed = true;
-                continue;
             } catch (\Throwable $e) {
                 // ComposerRepository::fetchFile() lets a JSON ParsingException, a
                 // RepositorySecurityException and a LogicException past its own retry loop, none of
                 // them a RuntimeException. The metadata pass never reaches a repository once every
                 // name is resolved; this pass asks every advisory-capable one, as `composer audit`
-                // does, so what a repository throws is the report's note, not the report's end.
-                $notes[] = self::unavailableNote($repository->getRepoName(), $e);
+                // does, so what a repository throws is the report's note, not the report's end. Only
+                // a TransportException is a network failure, which the note decides.
+                $notes[] = RunNote::advisoriesUnavailable($repository->getRepoName(), $e);
                 continue;
             }
             foreach ($answer as $name => $advisories) {
@@ -113,18 +104,7 @@ final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
             }
         }
 
-        return new AdvisoryBatch(self::lists($byName), $notes, $failed);
-    }
-
-    /**
-     * One line: Composer's message for a partial record runs to a `var_export()` dump of it, and
-     * every format prints a note on one line.
-     */
-    private static function unavailableNote(string $repository, \Throwable $e): string
-    {
-        $message = (string) strtok($e->getMessage(), "\r\n");
-
-        return \sprintf('security advisories unavailable from %s: %s', $repository, $message === '' ? \get_class($e) : $message);
+        return new AdvisoryBatch(self::lists($byName), $notes);
     }
 
     /**

@@ -12,6 +12,7 @@ use Lockrot\Config\Gate;
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Config\Policy;
 use Lockrot\Signal\Signal;
+use Lockrot\Tests\Support\Notes;
 use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
@@ -187,7 +188,7 @@ final class GateTest extends TestCase
         }
         $notChecked = new Signal(Signal::S10, Signal::LEVEL_INFO, 'repository activity not checked', ['unchecked' => [], 'blocks' => ['S3', 'S4']]);
         $findings[] = new Finding('v/ok-unchecked', '1.0.0', Verdict::OK, [$notChecked], ['v/ok-unchecked'], null, $at);
-        $report = new Report($findings, [], $at, \count($findings), 0, $networkFailures);
+        $report = new Report($findings, $networkFailures ? [Notes::text('a lookup failed', true)] : [], $at, \count($findings), 0);
         if ($baseline === 'none') {
             return $report;
         }

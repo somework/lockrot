@@ -15,6 +15,7 @@ use Lockrot\Output\FormatContext;
 use Lockrot\Output\Formatters;
 use Lockrot\Output\MarkdownFormatter;
 use Lockrot\Signal\Signal;
+use Lockrot\Tests\Support\Notes;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\TestCase;
@@ -31,7 +32,7 @@ final class MarkdownFormatterTest extends TestCase
             new Finding('doctrine/cache', '1.13.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'marked abandoned by its repository')], ['doctrine/cache'], null, $at),
             new Finding('phpzip/phpzip', '2.0.8', Verdict::SILENT, [new Signal('S2', 'high', 'last release 2015-11-16 (10.8 years ago)')], ['wallabag/wallabag', 'grandt/phpepub', 'phpzip/phpzip'], null, $at),
             new Finding('vendor/ok', '1.0.0', Verdict::OK, [], ['vendor/ok'], null, $at),
-        ], ['GitHub token not set: repository activity checked only for 2 candidate packages'], $at, 3, 0, false);
+        ], Notes::texts(['GitHub token not set: repository activity checked only for 2 candidate packages']), $at, 3, 0);
     }
 
     private function formatter(string $failOn = LockrotConfig::FAIL_ON_NONE): MarkdownFormatter
@@ -62,7 +63,7 @@ final class MarkdownFormatterTest extends TestCase
             // Transitive and development-only: two steps below critical.
             new Finding('acme/dev-only', '2.0.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'marked abandoned by its repository')], ['a/parent', 'acme/dev-only'], null, $at, null, true),
             new Finding('vendor/ok', '1.0.0', Verdict::OK, [], ['vendor/ok'], null, $at),
-        ], [], $at, 3, 0, false);
+        ], [], $at, 3, 0);
 
         $lines = explode("\n", trim($this->formatter(Verdict::SILENT)->format($report, true)));
         $rows = array_values(array_filter($lines, static fn (string $line): bool => strpos($line, '` |') !== false));
@@ -77,7 +78,7 @@ final class MarkdownFormatterTest extends TestCase
     public function testZeroFlaggedHeadingHasNoTable(): void
     {
         $at = new \DateTimeImmutable(self::AT);
-        $report = new Report([new Finding('vendor/ok', '1.0.0', Verdict::OK, [], ['vendor/ok'], null, $at)], [], $at, 1, 0, false);
+        $report = new Report([new Finding('vendor/ok', '1.0.0', Verdict::OK, [], ['vendor/ok'], null, $at)], [], $at, 1, 0);
 
         $out = $this->formatter()->format($report);
 
@@ -112,7 +113,7 @@ final class MarkdownFormatterTest extends TestCase
         $report = new Report([
             new Finding('acme/leaf', '1.0.0', Verdict::STALE, [new Signal('S2', 'warn', 'old')], ['a/parent', 'acme/leaf'], null, $at, null, false, ['a/parent', 'b/parent']),
             new Finding('acme/twice', '1.0.0', Verdict::STALE, [new Signal('S2', 'warn', 'old')], ['acme/twice'], null, $at, null, false, ['acme/twice', 'b/parent']),
-        ], ['a note'], $at, 2, 0, false);
+        ], Notes::texts(['a note']), $at, 2, 0);
         $out = $this->formatter()->format($report);
         $lines = explode("\n", $out);
 
@@ -131,7 +132,7 @@ final class MarkdownFormatterTest extends TestCase
         $report = new Report([
             new Finding('acme/leaf', '1.0.0', Verdict::STALE, [new Signal('S2', 'warn', 'old')], ['a/parent', 'acme/leaf'], null, $at, null, false, ['a/parent'], LibyearsMeasurement::of(2.3)),
             new Finding('acme/<b>', '1.0.0', Verdict::STALE, [new Signal('S2', 'warn', 'old')], ['acme/<b>'], null, $at, null, false, ['acme/<b>'], LibyearsMeasurement::of(1.0)),
-        ], [], $at, 2, 0, false);
+        ], [], $at, 2, 0);
         $lines = explode("\n", $this->formatter()->format($report));
         $libyears = array_search('libyears: 3.3 behind across all 2 packages · 1.0 from direct requirements · furthest behind acme/leaf 1.0.0 at 2.3', $lines, true);
 
@@ -145,7 +146,7 @@ final class MarkdownFormatterTest extends TestCase
     {
         // the fixture findings carry no value
         self::assertStringContainsString("\nlibyears: none of the 3 packages could be measured\n", $this->formatter()->format($this->report()));
-        $empty = new Report([], [], new \DateTimeImmutable(self::AT), 0, 0, false);
+        $empty = new Report([], [], new \DateTimeImmutable(self::AT), 0, 0);
         self::assertContains('libyears: nothing to measure', explode("\n", $this->formatter()->format($empty)));
     }
 
@@ -172,7 +173,7 @@ final class MarkdownFormatterTest extends TestCase
     public function testTheFooterStatesTheAgeOfCachedActivity(): void
     {
         $at = new \DateTimeImmutable('2026-09-14T00:00:00+00:00');
-        $report = new Report([], [], $at, 0, 0, false, null, new \DateTimeImmutable('2026-09-13T05:00:00+00:00'));
+        $report = new Report([], [], $at, 0, 0, null, new \DateTimeImmutable('2026-09-13T05:00:00+00:00'));
 
         self::assertStringContainsString(" — data as of 2026-09-14 (package repositories; repository activity from lockrot's cache, up to 19 h old). Run", $this->formatter()->format($report));
     }
@@ -182,7 +183,7 @@ final class MarkdownFormatterTest extends TestCase
         $at = new \DateTimeImmutable(self::AT);
         $report = new Report([
             new Finding('acme/pkg', '1.0.0', Verdict::STALE, [new Signal('S2', 'warn', "evidence with a | pipe\nand a second line")], ['acme/pkg'], null, $at),
-        ], [], $at, 1, 0, false);
+        ], [], $at, 1, 0);
 
         $out = $this->formatter()->format($report);
         $line = self::findLine($out, 'acme/pkg');
@@ -270,7 +271,7 @@ final class MarkdownFormatterTest extends TestCase
         $at = new \DateTimeImmutable(self::AT);
         $report = new Report([
             new Finding('acme/ev`il', '1.0.0 <b>x</b>', Verdict::ABANDONED, [new Signal('S1', 'high', 'marked abandoned, replacement: <img src=x onerror=alert(1)> [fine](https://example.com) *ok* &lt;b&gt; #1')], ['acme/ev`il'], null, $at),
-        ], ['GitHub unreachable: <script>alert(1)</script> [x](y)'], $at, 1, 0, false);
+        ], Notes::texts(['GitHub unreachable: <script>alert(1)</script> [x](y)']), $at, 1, 0);
 
         $out = $this->formatter()->format($report);
 
@@ -286,7 +287,7 @@ final class MarkdownFormatterTest extends TestCase
         $report = new Report([
             new Finding('acme/a``b', '1.0.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'x')], ['acme/a``b'], null, $at),
             new Finding('acme/plain', '1.0.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'x')], ['acme/plain'], null, $at),
-        ], [], $at, 2, 0, false);
+        ], [], $at, 2, 0);
 
         $out = $this->formatter()->format($report);
 
@@ -340,7 +341,7 @@ final class MarkdownFormatterTest extends TestCase
         $package = "acme/pk\r\ng|x";
         $report = new Report([
             new Finding($package, '1.0.0', Verdict::STALE, [new Signal('S2', 'warn', "first\r\nsecond\rthird\nfourth")], [$package], null, $at),
-        ], ["note\r\nline"], $at, 1, 0, false);
+        ], Notes::texts(["note\r\nline"]), $at, 1, 0);
 
         $out = $this->formatter()->format($report);
 

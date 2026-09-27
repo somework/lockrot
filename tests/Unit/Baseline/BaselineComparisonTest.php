@@ -26,7 +26,7 @@ final class BaselineComparisonTest extends TestCase
             $findings[] = new Finding($package, $version, $verdict, [], [$package], null, $at);
         }
 
-        return new Report($findings, [], $at, \count($findings), 0, false);
+        return new Report($findings, [], $at, \count($findings), 0);
     }
 
     /** @param list<array{0: string, 1: string, 2: string, 3: string}> $rows package, version, verdict, first seen */

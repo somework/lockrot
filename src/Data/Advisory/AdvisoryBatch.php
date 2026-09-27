@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Lockrot\Data\Advisory;
 
+use Lockrot\Analyzer\RunNote;
+
 /**
  * What one {@see AdvisoryLoaderInterface::load()} call found, and what it could not do.
  *
@@ -13,20 +15,17 @@ final class AdvisoryBatch
 {
     /** @var array<string, list<Advisory>> */
     private array $byName;
-    /** @var list<string> */
+    /** @var list<RunNote> */
     private array $notes;
-    private bool $hadNetworkFailure;
 
     /**
-     * @param array<string, list<Advisory>> $byName            package name => the advisories affecting its installed version
-     * @param list<string>                  $notes             report notes: why the answer is incomplete, each a full sentence
-     * @param bool                          $hadNetworkFailure a repository could not be reached; what `--strict-network` fails on
+     * @param array<string, list<Advisory>> $byName package name => the advisories affecting its installed version
+     * @param list<RunNote>                 $notes  why the answer is incomplete
      */
-    public function __construct(array $byName, array $notes = [], bool $hadNetworkFailure = false)
+    public function __construct(array $byName, array $notes = [])
     {
         $this->byName = $byName;
         $this->notes = $notes;
-        $this->hadNetworkFailure = $hadNetworkFailure;
     }
 
     public static function empty(): self
@@ -35,7 +34,7 @@ final class AdvisoryBatch
     }
 
     /** No lookup at all, for the one reason given. */
-    public static function unavailable(string $note): self
+    public static function unavailable(RunNote $note): self
     {
         return new self([], [$note]);
     }
@@ -52,14 +51,21 @@ final class AdvisoryBatch
         return $this->byName;
     }
 
-    /** @return list<string> */
+    /** @return list<RunNote> */
     public function notes(): array
     {
         return $this->notes;
     }
 
+    /** A repository could not be reached: what `--strict-network` fails on, as the notes say. */
     public function hadNetworkFailure(): bool
     {
-        return $this->hadNetworkFailure;
+        foreach ($this->notes as $note) {
+            if ($note->setsNetworkFailures()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

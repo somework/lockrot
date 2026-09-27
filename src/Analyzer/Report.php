@@ -19,12 +19,11 @@ final class Report
 
     /** @var list<Finding> */
     private array $findings;
-    /** @var list<string> */
+    /** @var list<RunNote> */
     private array $notes;
     private \DateTimeImmutable $generatedAt;
     private int $packagesChecked;
     private int $notFromComposerRepository;
-    private bool $hadNetworkFailures;
     /** Null when the project has no baseline file, which is every run until one is generated. */
     private ?BaselineComparison $baseline;
     /** Null when the report was not told what the run was asked to do, which is only ever a test. */
@@ -45,9 +44,9 @@ final class Report
 
     /**
      * @param list<Finding> $findings
-     * @param list<string> $notes
+     * @param list<RunNote> $notes    what the run could not see, in the order it happened on it
      */
-    public function __construct(array $findings, array $notes, \DateTimeImmutable $generatedAt, int $packagesChecked, int $notFromComposerRepository, bool $hadNetworkFailures, ?BaselineComparison $baseline = null, ?\DateTimeImmutable $activityCacheOldestAt = null, bool $includesDev = false)
+    public function __construct(array $findings, array $notes, \DateTimeImmutable $generatedAt, int $packagesChecked, int $notFromComposerRepository, ?BaselineComparison $baseline = null, ?\DateTimeImmutable $activityCacheOldestAt = null, bool $includesDev = false)
     {
         usort($findings, [self::class, 'compare']);
         $this->findings = $findings;
@@ -55,7 +54,6 @@ final class Report
         $this->generatedAt = $generatedAt;
         $this->packagesChecked = $packagesChecked;
         $this->notFromComposerRepository = $notFromComposerRepository;
-        $this->hadNetworkFailures = $hadNetworkFailures;
         $this->baseline = $baseline;
         $this->activityCacheOldestAt = $activityCacheOldestAt;
         $this->includesDev = $includesDev;
@@ -85,7 +83,6 @@ final class Report
             $this->generatedAt,
             $this->packagesChecked,
             $this->notFromComposerRepository,
-            $this->hadNetworkFailures,
             $baseline,
             $this->activityCacheOldestAt,
             $this->includesDev
@@ -112,7 +109,6 @@ final class Report
             $this->generatedAt,
             $this->packagesChecked,
             $this->notFromComposerRepository,
-            $this->hadNetworkFailures,
             $this->baseline,
             $this->activityCacheOldestAt,
             $this->includesDev
@@ -302,11 +298,18 @@ final class Report
         return $this->includesDev;
     }
 
-    /** @return list<string> */
+    /** @return list<string> each note's sentence, which every format prints */
     public function notes(): array
+    {
+        return array_map(static fn (RunNote $note): string => $note->text(), $this->notes);
+    }
+
+    /** @return list<RunNote> */
+    public function runNotes(): array
     {
         return $this->notes;
     }
+
     public function generatedAt(): \DateTimeImmutable
     {
         return $this->generatedAt;
@@ -319,9 +322,16 @@ final class Report
     {
         return $this->notFromComposerRepository;
     }
+    /** Whether a lookup failed, which `--strict-network` fails on: exactly when a note says so. */
     public function hadNetworkFailures(): bool
     {
-        return $this->hadNetworkFailures;
+        foreach ($this->notes as $note) {
+            if ($note->setsNetworkFailures()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function activityCacheOldestAt(): ?\DateTimeImmutable
@@ -450,7 +460,7 @@ final class Report
             'packages_checked' => $this->packagesChecked,
             'include_dev' => $this->includesDev,
             'not_from_composer_repository' => $this->notFromComposerRepository,
-            'network_failures' => $this->hadNetworkFailures,
+            'network_failures' => $this->hadNetworkFailures(),
             'counts' => $counts,
             // The abandoned count split by what the reader can do about it: `with_replacement` names a
             // package to move to, the rest is dead. `total` repeats counts.abandoned so the block reads alone.
@@ -464,7 +474,9 @@ final class Report
             'libyears' => $this->libyears()->toArray(),
             'baseline' => $this->baseline === null ? null : $this->baseline->toArray(),
             'gate' => $gate === null ? null : $gate->toArray(),
-            'notes' => $this->notes,
+            'notes' => $this->notes(),
+            // The same notes, typed: one entry per `notes` string, at the same index.
+            'note_details' => array_map(static fn (RunNote $note): array => $note->toArray(), $this->notes),
             'findings' => array_map(
                 fn (Finding $f, int $at): array => $f->toArray() + [
                     'baseline' => $this->baselineStateOf($f),

@@ -28,7 +28,7 @@ final class BaselineTest extends TestCase
             $findings[] = new Finding($package, $version, $verdict, [], [$package], null, $at);
         }
 
-        return new Report($findings, [], $at, \count($findings), 0, false);
+        return new Report($findings, [], $at, \count($findings), 0);
     }
 
     public function testFromReportKeepsOnlyFlaggedVerdicts(): void

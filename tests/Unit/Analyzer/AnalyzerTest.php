@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Analyzer;
 
+use Composer\Downloader\TransportException;
 use Lockrot\Allowlist\Allowlist;
 use Lockrot\Allowlist\AllowlistEntry;
 use Lockrot\Analyzer\Analyzer;
 use Lockrot\Analyzer\Libyears;
 use Lockrot\Analyzer\Report;
+use Lockrot\Analyzer\RunNote;
 use Lockrot\Clock;
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Data\Advisory\Advisory;
@@ -209,7 +211,7 @@ final class AnalyzerTest extends TestCase
     public function testAdvisoryNotesAndNetworkFailuresReachTheReport(): void
     {
         $lock = LockFile::fromArray(['packages' => [['name' => 'vendor/direct', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/']]]);
-        $batch = new AdvisoryBatch([], ['security advisories unavailable from packagist.org: HTTP 503'], true);
+        $batch = new AdvisoryBatch([], [RunNote::advisoriesUnavailable('packagist.org', new TransportException('HTTP 503'))]);
         $analyzer = $this->analyzer($this->loader(['vendor/direct' => $this->ancient()]), $this->http([]), true, new Allowlist([]), false, ActivityFetchPlanner::DEFAULT_ANONYMOUS_BUDGET, null, $this->advisories($batch));
 
         $report = $analyzer->analyze($lock, ProjectConfig::empty(), false);

@@ -30,7 +30,7 @@ final class FormatContextTest extends TestCase
 
     private function report(Finding ...$findings): Report
     {
-        return new Report(array_values($findings), [], new \DateTimeImmutable(self::AT), \count($findings), 0, false);
+        return new Report(array_values($findings), [], new \DateTimeImmutable(self::AT), \count($findings), 0);
     }
 
     /** @param list<array{0: string, 1: string}> $entries package, verdict */

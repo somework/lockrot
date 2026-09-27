@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Verdict;
 
 use Lockrot\Analyzer\Libyears;
+use Lockrot\Analyzer\RunNote;
 use Lockrot\Analyzer\RunSettings;
 use Lockrot\Config\Gate;
 use Lockrot\Config\LockrotConfig;
+use Lockrot\Data\Forge\RepoRef;
+use Lockrot\Data\Repository\MetadataFailure;
 use Lockrot\Json\KnownValues;
 use Lockrot\Json\Schemas;
 use Lockrot\Output\JsonFormatter;
@@ -48,7 +51,11 @@ final class ClosedSetsTest extends TestCase
     private const SIGNAL_ID = '^(S[1-9][0-9]*|[a-z0-9][a-z0-9_.-]*:[a-z0-9][a-z0-9_.-]*)$';
     /** A format name: lockrot's own, or a `<vendor>:<name>` one. */
     private const FORMAT = '^([a-z][a-z0-9-]*|[a-z0-9][a-z0-9_.-]*:[a-z0-9][a-z0-9_.-]*)$';
-    /** An S10 check or reason, an S6 reason, an S8 floor source, a branch's php_blocked_by and misses_*_php, a finding's libyears_unmeasured, a priority step's and a no-fix advisory's reason, the run's mode and fail-on kind, and the gate's causes and exemptions: a lower-case word. */
+    /** A run note's code: lockrot's own, or a `<vendor>:<name>` one. */
+    private const NOTE_CODE = '^([a-z][a-z0-9_]*|[a-z0-9][a-z0-9_.-]*:[a-z0-9][a-z0-9_.-]*)$';
+    /** The words both pages name a run note's five vocabularies by: its code, and the forge and reasons in its data. */
+    private const NOTE_VOCABULARY = "a run note's `code`, and the `forge_id` and `reason` in its `data`";
+    /** An S10 check or reason, an S6 reason, an S8 floor source, a branch's php_blocked_by and misses_*_php, a finding's libyears_unmeasured, a priority step's and a no-fix advisory's reason, the run's mode and fail-on kind, the gate's causes and exemptions, and a run note's forge id and reasons: a lower-case word. */
     private const WORD = '^[a-z][a-z0-9_]*$';
     private const ROOT = __DIR__.'/../../../';
 
@@ -241,7 +248,7 @@ final class ClosedSetsTest extends TestCase
         $s10Entry = ['definitions', 's10', 'properties', 'unchecked', 'items', 'properties'];
         $branchRow = ['definitions', 'metadata', 'properties', 'branches', 'items', 'properties'];
 
-        return [
+        $open = [
             'report #/definitions/signalId' => [JsonPath::arrayAt($report, ['definitions', 'signalId']), self::SIGNAL_ID, ClosedSets::signalIds(), 'signal ids'],
             'report #/definitions/s10/properties/unchecked/items/properties/check' => [JsonPath::arrayAt($report, array_merge($s10Entry, ['check'])), self::WORD, ['repository_activity', 'release_dates'], "S10's `check` and `reason`"],
             'report #/definitions/s10/properties/unchecked/items/properties/reason' => [
@@ -268,6 +275,75 @@ final class ClosedSetsTest extends TestCase
             'explain #/definitions/signalId' => [JsonPath::arrayAt($explain, ['definitions', 'signalId']), self::SIGNAL_ID, ClosedSets::signalIds(), 'signal ids'],
             'config #/properties/format' => [JsonPath::arrayAt($config, ['properties', 'format']), self::FORMAT, LockrotConfig::FORMATS, "the configuration's `format`"],
         ];
+        foreach (['report' => $report, 'explain' => $explain] as $document => $schema) {
+            foreach (self::noteVocabularies() as $definition => [$pattern, $known]) {
+                $open[$document.' #/definitions/'.$definition] = [JsonPath::arrayAt($schema, ['definitions', $definition]), $pattern, $known, self::NOTE_VOCABULARY];
+            }
+        }
+
+        return $open;
+    }
+
+    /**
+     * The vocabularies of a run note's `code` and `data`, each declared once per schema under
+     * `definitions` and referenced from every place that uses it, with the PHP lists they hold.
+     *
+     * @return array<string, array{string, list<string>}>
+     */
+    private static function noteVocabularies(): array
+    {
+        return [
+            'noteCode' => [self::NOTE_CODE, RunNote::CODES],
+            'forgeId' => [self::WORD, RepoRef::FORGES],
+            'metadataFailureReason' => [self::WORD, MetadataFailure::REASONS],
+            'advisoriesNotCheckedReason' => [self::WORD, RunNote::ADVISORIES_NOT_CHECKED_REASONS],
+            'repositoryActivityNotCheckedReason' => [self::WORD, RunNote::REPOSITORY_ACTIVITY_NOT_CHECKED_REASONS],
+        ];
+    }
+
+    /**
+     * A run note's `data` is typed per code the way a signal's is per id: one `anyOf` branch per code
+     * RunNote writes, in RunNote::CODES order, each naming the one definition that types it, and a
+     * last branch holding only a `not` over the same codes, so an unknown code carries any object and
+     * a known one cannot borrow that branch. The explain schema spells every definition the notes use
+     * as the report does.
+     */
+    public function testARunNotesDataIsTypedPerCodeAndBothSchemasSpellItAlike(): void
+    {
+        $report = self::schema(Schemas::REPORT);
+        $explain = self::schema(Schemas::EXPLAIN);
+        foreach (['report' => $report, 'explain' => $explain] as $document => $schema) {
+            self::assertSame(['type' => 'array', 'items' => ['$ref' => '#/definitions/noteDetail']], array_diff_key(JsonPath::arrayAt($schema, ['properties', 'note_details']), ['description' => true]), $document);
+            self::assertNotContains('note_details', JsonPath::arrayAt($schema, ['required']), $document);
+            self::assertSame(['code', 'text', 'docs_url', 'sets_network_failures', 'data'], JsonPath::arrayAt($schema, ['definitions', 'noteDetail', 'required']), $document);
+            self::assertSame(['$ref' => '#/definitions/noteCode'], JsonPath::arrayAt($schema, ['definitions', 'noteDetail', 'properties', 'code']), $document);
+            self::assertArrayNotHasKey('additionalProperties', JsonPath::arrayAt($schema, ['definitions', 'noteDetail']), $document.': open');
+            $docsUrl = JsonPath::arrayAt($schema, ['definitions', 'noteDetail', 'properties', 'docs_url']);
+            self::assertSame(['string', 'null'], $docsUrl['type'] ?? null, $document);
+            self::assertArrayNotHasKey('pattern', $docsUrl, $document.': a pattern could never change under one schema number');
+            self::assertArrayNotHasKey('format', $docsUrl, $document);
+
+            $anyOf = JsonPath::arrayAt($schema, ['definitions', 'noteDetail', 'anyOf']);
+            $unknown = array_pop($anyOf);
+            self::assertIsArray($unknown);
+            self::assertSame(['description', 'not'], array_keys($unknown), $document.': the last branch holds only its not');
+            self::assertSame(['properties' => ['code' => ['enum' => RunNote::CODES]]], $unknown['not'], $document);
+            $codes = [];
+            foreach ($anyOf as $index => $branch) {
+                self::assertIsArray($branch);
+                self::assertSame(['properties'], array_keys($branch), $document.' branch '.$index);
+                self::assertCount(1, JsonPath::arrayAt($branch, ['properties', 'code', 'enum']));
+                $code = JsonPath::stringAt($branch, ['properties', 'code', 'enum', 0]);
+                $codes[] = $code;
+                self::assertSame('#/definitions/note'.str_replace('_', '', ucwords($code, '_')), JsonPath::stringAt($branch, ['properties', 'data', '$ref']), $document.' '.$code);
+            }
+            self::assertSame(RunNote::CODES, $codes, $document);
+        }
+        foreach (array_keys(JsonPath::arrayAt($report, ['definitions'])) as $name) {
+            if (strpos((string) $name, 'note') === 0 || \in_array($name, ['forgeId', 'forgeRepository', 'failedForgeRepository', 'metadataFailureReason', 'advisoriesNotCheckedReason', 'repositoryActivityNotCheckedReason'], true)) {
+                self::assertSame(JsonPath::arrayAt($report, ['definitions', $name]), JsonPath::arrayAt($explain, ['definitions', $name]), 'the explain schema spells '.$name.' as the report does');
+            }
+        }
     }
 
     /**
@@ -413,7 +489,7 @@ final class ClosedSetsTest extends TestCase
         $config = self::schema(Schemas::CONFIG);
         $topLevelKeys = self::keys(JsonPath::arrayAt($config, ['properties']));
         $ignoreKeys = self::keys(JsonPath::arrayAt($config, ['properties', 'ignore', 'items', 'properties']));
-        $names = array_merge(Verdict::all(), Priority::all(), FailOn::allowed(), LockrotConfig::FORMATS, ClosedSets::signalIds(), [PhpFloor::PROJECT, PhpFloor::TARGET, PhpFloor::NEEDS_NEWER, PhpFloor::STOPS_BEFORE, PhpFloor::SKIPS, PhpFloor::UNSATISFIABLE], Libyears::REASONS, PriorityBasis::STEPS, NoFix::REASONS, Gate::MODES, FailOn::KINDS, Gate::TRIPS, Gate::EXEMPTIONS, $topLevelKeys, $ignoreKeys);
+        $names = array_merge(Verdict::all(), Priority::all(), FailOn::allowed(), LockrotConfig::FORMATS, ClosedSets::signalIds(), [PhpFloor::PROJECT, PhpFloor::TARGET, PhpFloor::NEEDS_NEWER, PhpFloor::STOPS_BEFORE, PhpFloor::SKIPS, PhpFloor::UNSATISFIABLE], Libyears::REASONS, PriorityBasis::STEPS, NoFix::REASONS, Gate::MODES, FailOn::KINDS, Gate::TRIPS, Gate::EXEMPTIONS, RunNote::CODES, RepoRef::FORGES, MetadataFailure::REASONS, RunNote::ADVISORIES_NOT_CHECKED_REASONS, RunNote::REPOSITORY_ACTIVITY_NOT_CHECKED_REASONS, $topLevelKeys, $ignoreKeys);
 
         foreach ($names as $name) {
             self::assertStringNotContainsString(':', $name, '<vendor>:<name> is reserved for names that are not lockrot\'s');

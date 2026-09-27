@@ -236,7 +236,7 @@ final class RepositoryMetadataLoader implements MetadataLoaderInterface
                     // The repository reported this name as found (it has an entry in the file
                     // queried this pass) but every version was filtered out or the entry was empty.
                     if ($isDevOnlyPass) {
-                        $failed[$name] = 'repository listed the package but returned no versions';
+                        $failed[$name] = MetadataLoaderInterface::NO_VERSIONS_REASON;
                     } else {
                         $needDev[] = $name;
                     }

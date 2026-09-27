@@ -95,6 +95,13 @@ final class SchemaWideningTest extends TestCase
         yield 'exempt_by loses baseline' => [Schemas::REPORT, 'exempt-dropped', '/properties/exempt_by/oneOf/0: no longer accepts "baseline"'];
         yield 'a mode dropped' => [Schemas::REPORT, 'mode-dropped', '/properties/mode: no longer accepts "generate_baseline"'];
         yield 'tripped_by uniqueItems changed' => [Schemas::REPORT, 'tripped-unique-changed', '/properties/tripped_by: uniqueItems is a keyword this check does not compare'];
+        yield 'note_details made required' => [Schemas::REPORT, 'note-details-required', '#: made required note_details'];
+        yield 'explain note_details made required' => [Schemas::EXPLAIN, 'note-details-required', '#: made required note_details'];
+        yield 'a note code dropped' => [Schemas::REPORT, 'note-code-dropped', '/properties/code: no longer accepts "not_from_composer_repository"'];
+        yield 'explain note code dropped' => [Schemas::EXPLAIN, 'note-code-dropped', '/properties/code: no longer accepts "not_from_composer_repository"'];
+        yield 'a note detail closed' => [Schemas::REPORT, 'note-detail-closed', '#/properties/note_details/items/anyOf/0: closed, additionalProperties false'];
+        yield 'a note docs_url given a pattern' => [Schemas::REPORT, 'docs-url-pattern', '/properties/docs_url: pattern "^https://lockrot\\\\.dev/"'];
+        yield 'a note forge id dropped' => [Schemas::REPORT, 'forge-id-dropped', '/properties/forge_id: no longer accepts "bitbucket"'];
     }
 
     /**
@@ -132,6 +139,8 @@ final class SchemaWideningTest extends TestCase
         yield 'a no-fix reason added' => [Schemas::EXPLAIN, 'no-fix-reason-added'];
         yield 'an exemption added' => [Schemas::REPORT, 'exempt-added'];
         yield 'a fail-on kind added' => [Schemas::REPORT, 'kind-added'];
+        yield 'a note code added' => [Schemas::REPORT, 'note-code-added'];
+        yield 'a metadata failure reason added' => [Schemas::EXPLAIN, 'metadata-reason-added'];
     }
 
     /**
@@ -287,6 +296,28 @@ final class SchemaWideningTest extends TestCase
         self::assertArrayNotHasKey('gate', JsonPath::arrayAt(self::current(Schemas::EXPLAIN), ['definitions', 'finding', 'properties']));
     }
 
+    /**
+     * `note_details` joined the report and the explanation in 0.13.0, optional in both: from the
+     * schemas without it and the definitions it brought, the current ones only widen.
+     *
+     * @dataProvider findingSchemas
+     */
+    #[DataProvider('findingSchemas')]
+    public function testGainingNoteDetailsIsAWidening(string $document): void
+    {
+        $current = self::current($document);
+        $before = self::without($current, ['properties', 'note_details']);
+        foreach (array_keys(JsonPath::arrayAt($current, ['definitions'])) as $name) {
+            if (\in_array($name, ['noteDetail', 'noteCode', 'forgeId', 'forgeRepository', 'failedForgeRepository', 'metadataFailureReason', 'advisoriesNotCheckedReason', 'repositoryActivityNotCheckedReason'], true) || strpos((string) $name, 'note') === 0) {
+                $before = self::without($before, ['definitions', (string) $name]);
+            }
+        }
+
+        self::assertNotContains('note_details', JsonPath::arrayAt($current, ['required']));
+        self::assertArrayHasKey('note_details', JsonPath::arrayAt($current, ['properties']));
+        self::assertSame([], SchemaWidening::narrowings($before, $current));
+    }
+
     /** @return iterable<string, array{string}> */
     public static function findingSchemas(): iterable
     {
@@ -397,6 +428,20 @@ final class SchemaWideningTest extends TestCase
                 return self::with($s, ['definitions', 'run', 'properties', 'mode', KnownValues::KEYWORD], ['check']);
             case 'tripped-unique-changed':
                 return self::with($s, ['definitions', 'gate', 'properties', 'tripped_by', 'uniqueItems'], false);
+            case 'note-details-required':
+                return self::appended($s, ['required'], 'note_details');
+            case 'note-code-dropped':
+                return self::with($s, ['definitions', 'noteCode', KnownValues::KEYWORD], \array_slice(JsonPath::arrayAt($s, ['definitions', 'noteCode', KnownValues::KEYWORD]), 0, -1));
+            case 'note-code-added':
+                return self::appended($s, ['definitions', 'noteCode', KnownValues::KEYWORD], 'licence_scan_skipped');
+            case 'note-detail-closed':
+                return self::with($s, ['definitions', 'noteDetail', 'additionalProperties'], false);
+            case 'docs-url-pattern':
+                return self::with($s, ['definitions', 'noteDetail', 'properties', 'docs_url', 'pattern'], '^https://lockrot\\.dev/');
+            case 'forge-id-dropped':
+                return self::with($s, ['definitions', 'forgeId', KnownValues::KEYWORD], ['github', 'gitlab']);
+            case 'metadata-reason-added':
+                return self::appended($s, ['definitions', 'metadataFailureReason', KnownValues::KEYWORD], 'dns_failed');
             case 'run-required':
                 return self::appended($s, ['required'], 'run');
             case 'stale-integer':

@@ -17,6 +17,7 @@ use Lockrot\Data\Forge\RepoLocator;
 use Lockrot\Data\Forge\RepoRef;
 use Lockrot\Data\Forge\RepositoryActivity;
 use Lockrot\Data\Repository\MetadataBatch;
+use Lockrot\Data\Repository\MetadataFailure;
 use Lockrot\Data\Repository\MetadataLoaderInterface;
 use Lockrot\Data\Repository\MonorepoParents;
 use Lockrot\Data\Repository\PackageMetadata;
@@ -39,15 +40,6 @@ use Lockrot\Verdict\VerdictEngine;
  */
 final class Analyzer
 {
-    /**
-     * The note for a forge whose anonymous request cap shaped the run, so a zero-candidate run
-     * does not read as a complete one. GitLab has no cap and no note.
-     */
-    private const ANONYMOUS_CAP_NOTE = [
-        RepoRef::GITHUB => 'GitHub token not set: repository activity checked for %d candidate packages, %d packages skipped (set GITHUB_TOKEN to check all)',
-        RepoRef::BITBUCKET => 'Bitbucket credentials not set: repository activity checked for %d candidate packages, %d packages skipped (add bitbucket.org credentials to auth.json to check all)',
-    ];
-
     private MetadataLoaderInterface $metadata;
     private ActivityClient $activity;
     private ActivityFetchPlanner $planner;
@@ -135,17 +127,16 @@ final class Analyzer
         $now = $this->clock->now();
         $notes = [];
         if ($this->offline) {
-            $notes[] = "offline: repository metadata served from Composer's cache";
+            $notes[] = RunNote::offline();
         }
 
         $batch = $this->fetchMetadata($packages);
-        $metadataFailed = $batch->failed();
-        if ($metadataFailed !== []) {
-            $notes[] = $this->metadataUnavailableNote($metadataFailed);
+        if ($batch->failed() !== []) {
+            $notes[] = RunNote::metadataUnavailable($batch->failed());
         }
         [$metadata, $parentsFailed] = $this->dateSplitPackages($packages, $batch->metadata());
         foreach ($parentsFailed as $parent => $reason) {
-            $notes[] = \sprintf('Repository metadata unavailable for %s, which dates the packages split out of it: %s', $parent, $reason);
+            $notes[] = RunNote::monorepoParentUnavailable((string) $parent, $reason);
         }
 
         $advisories = $this->fetchAdvisories($packages);
@@ -159,7 +150,7 @@ final class Analyzer
             // would push the install past it, so the activity signals are dropped and the report
             // says so rather than reading as "checked, nothing found". Planning waits too: it may
             // exchange Bitbucket credentials over the network ({@see ForgeAuth}).
-            $activityNotes = ['repository activity not checked: install-time budget exhausted'];
+            $activityNotes = [RunNote::repositoryActivityNotChecked()];
             $plan = null;
         } else {
             $plan = $this->planner->select($repoByPackage, $candidateByPackage);
@@ -184,13 +175,13 @@ final class Analyzer
                 ++$notInRepository;
             }
         }
-        $notes = array_merge($notes, $this->notInRepositoryNotes($notInRepository));
+        if ($notInRepository > 0) {
+            $notes[] = RunNote::notFromComposerRepository($notInRepository);
+        }
         $findings = TransitiveExposure::attach($findings, $graph);
 
-        $hadNetworkFailures = $metadataFailed !== [] || $parentsFailed !== [] || $activityBatch->failed() !== [] || $advisories->hadNetworkFailure();
-
         return new Analysis(
-            new Report($findings, $notes, $now, \count($packages), $notInRepository, $hadNetworkFailures, null, self::oldestCachedActivity($activity), $includeDev),
+            new Report($findings, $notes, $now, \count($packages), $notInRepository, null, self::oldestCachedActivity($activity), $includeDev),
             $factsByPackage
         );
     }
@@ -239,7 +230,7 @@ final class Analyzer
             $batch = $this->metadata->load($missing);
             $metadata += $batch->metadata();
             foreach ($batch->failed() as $name => $reason) {
-                if ($reason !== MetadataLoaderInterface::BUDGET_REASON) {
+                if (MetadataFailure::reason($reason) !== MetadataFailure::INSTALL_TIME_BUDGET) {
                     $failed[$name] = $reason;
                 }
             }
@@ -353,28 +344,33 @@ final class Analyzer
         return $reasons;
     }
 
-    /** @return array{ActivityBatch, list<string>} the batch, and the notes the round produced */
+    /** @return array{ActivityBatch, list<RunNote>} the batch, and the notes the round produced */
     private function fetchActivity(ActivityFetchPlan $plan): array
     {
         $batch = $this->activity->fetch($plan->repos());
+        $repoByKey = [];
+        foreach ($plan->repos() as $repo) {
+            $repoByKey[$repo->key()] = $repo;
+        }
         $notes = [];
         // Anonymously the planner both filters to candidates and caps the request count on the
         // forges that need it; the report states the total left unchecked per forge.
         foreach ($plan->cappedForges() as $forge) {
-            $notes[] = \sprintf(self::ANONYMOUS_CAP_NOTE[$forge], $plan->checkedPackages($forge), $plan->skippedNoToken($forge) + $plan->skippedBudget($forge));
+            $notes[] = RunNote::repositoryActivityAnonymousCap($forge, $plan->checkedPackages($forge), $plan->skippedNoToken($forge), $plan->skippedBudget($forge));
         }
         foreach (RepoRef::FORGES as $forge) {
-            $failed = $batch->failedOn($forge);
-            if ($batch->rateLimited($forge)) {
-                $notes[] = \sprintf('%s API rate limit reached; repository activity missing for %d repositories', RepoRef::label($forge), \count($failed));
-            } elseif ($failed !== []) {
-                $notes[] = \sprintf('%s unreachable for %d repositories: %s', RepoRef::label($forge), \count($failed), (string) reset($failed));
+            $failed = [];
+            foreach ($batch->failedOn($forge) as $key => $message) {
+                $failed[] = [$repoByKey[$key], $message];
             }
-            // A 404 is an answer, not a failure — but a private repository looks exactly like a
-            // healthy one without this line, so the report says it was not answered for.
-            $notFound = $batch->notFoundOn($forge);
+            if ($batch->rateLimited($forge)) {
+                $notes[] = RunNote::repositoryActivityRateLimited($forge, $failed);
+            } elseif ($failed !== []) {
+                $notes[] = RunNote::repositoryActivityUnreachable($forge, $failed);
+            }
+            $notFound = array_map(static fn (string $key): RepoRef => $repoByKey[$key], $batch->notFoundOn($forge));
             if ($notFound !== []) {
-                $notes[] = \sprintf('%s did not answer for %d repositories (private, renamed or removed); repository activity missing', RepoRef::label($forge), \count($notFound));
+                $notes[] = RunNote::repositoryActivityNotFound($forge, $notFound);
             }
         }
 
@@ -422,57 +418,15 @@ final class Analyzer
     }
 
     /**
-     * One reason across every failed package reads as "Repository metadata unavailable for N
-     * packages: <reason>". Several distinct reasons each get their own count instead of only ever
-     * naming the first one reached — reasons appear in the order {@see MetadataBatch::failed()}
-     * reports them.
-     *
-     * @param array<string, string> $metadataFailed package name => reason
-     */
-    private function metadataUnavailableNote(array $metadataFailed): string
-    {
-        $label = \count($metadataFailed) === 1 ? '1 package' : \count($metadataFailed).' packages';
-
-        $countByReason = [];
-        foreach ($metadataFailed as $reason) {
-            $countByReason[$reason] = ($countByReason[$reason] ?? 0) + 1;
-        }
-        if (\count($countByReason) === 1) {
-            return \sprintf('Repository metadata unavailable for %s: %s', $label, (string) array_key_first($countByReason));
-        }
-
-        $parts = [];
-        foreach ($countByReason as $reason => $reasonCount) {
-            $parts[] = \sprintf('%s (%d)', $reason, $reasonCount);
-        }
-
-        return \sprintf('Repository metadata unavailable for %s: %s', $label, implode('; ', $parts));
-    }
-
-    /**
      * The offline and budget reasons already state why the metadata is missing, so prefixing them
      * would read as "Repository metadata unavailable: offline: ...". Every other reason is a bare
      * transport or repository message that needs the prefix to make sense on a finding.
      */
     private function metadataFailureNote(string $reason): string
     {
-        $selfExplanatory = [MetadataLoaderInterface::OFFLINE_NOT_FOUND_REASON, MetadataLoaderInterface::BUDGET_REASON];
-
-        return \in_array($reason, $selfExplanatory, true)
+        return \in_array(MetadataFailure::reason($reason), [MetadataFailure::OFFLINE, MetadataFailure::INSTALL_TIME_BUDGET], true)
             ? $reason
             : 'Repository metadata unavailable: '.$reason;
-    }
-
-    /** @return list<string> */
-    private function notInRepositoryNotes(int $notInRepository): array
-    {
-        if ($notInRepository === 0) {
-            return [];
-        }
-
-        return [$notInRepository === 1
-            ? '1 package is not from a Composer repository and was not checked'
-            : \sprintf('%d packages are not from a Composer repository and were not checked', $notInRepository)];
     }
 
     /** @param list<Signal> $signals */

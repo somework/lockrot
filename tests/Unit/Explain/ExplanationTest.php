@@ -14,6 +14,7 @@ use Lockrot\Signal\Rule\PinnedRule;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\JsonPath;
+use Lockrot\Tests\Support\Notes;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
@@ -23,7 +24,7 @@ final class ExplanationTest extends TestCase
 {
     private function report(): Report
     {
-        return new Report([], ['a note'], new \DateTimeImmutable(F::NOW), 1, 0, false);
+        return new Report([], Notes::texts(['a note']), new \DateTimeImmutable(F::NOW), 1, 0);
     }
 
     /** @param list<Signal> $signals */
@@ -147,7 +148,7 @@ final class ExplanationTest extends TestCase
 
         $array = $explanation->toArray();
 
-        self::assertSame(['package', 'version', 'finding', 'lock', 'metadata', 'activity', 'thresholds', 'target_php', 'project_php', 'generated_at', 'notes'], array_keys($array));
+        self::assertSame(['package', 'version', 'finding', 'lock', 'metadata', 'activity', 'thresholds', 'target_php', 'project_php', 'generated_at', 'notes', 'note_details'], array_keys($array));
         self::assertSame('vendor/pkg', $array['package']);
         self::assertSame($finding = $explanation->finding()->toArray(), $array['finding'], 'the finding as --format=json carries it');
         self::assertSame(Verdict::LEFT_BEHIND, $finding['verdict']);
@@ -176,6 +177,7 @@ final class ExplanationTest extends TestCase
         self::assertNull($array['project_php'], 'no project php was given');
         self::assertSame(F::NOW, $array['generated_at']);
         self::assertSame(['a note'], $array['notes']);
+        self::assertSame(['a note'], array_column(JsonPath::arrayAt($array, ['note_details']), 'text'), 'the same notes, typed');
     }
 
     public function testMissingMetadataAndActivityAreNullNotEmpty(): void

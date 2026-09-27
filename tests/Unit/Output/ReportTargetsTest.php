@@ -12,6 +12,7 @@ use Lockrot\Output\Formatters;
 use Lockrot\Output\ReportTarget;
 use Lockrot\Output\ReportTargets;
 use Lockrot\Signal\Signal;
+use Lockrot\Tests\Support\Notes;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -96,7 +97,7 @@ final class ReportTargetsTest extends TestCase
                 new Signal('S1', 'high', 'marked abandoned by its repository'),
                 new Signal('S5', 'warn', 'admits 8.4 untested (php ">=7.1 <8")'),
             ], ['acme/old'], null, $at),
-        ], ['a note with <info>tags</info> in it'], $at, 1, 0, false);
+        ], Notes::texts(['a note with <info>tags</info> in it']), $at, 1, 0);
     }
 
     public function testNoSpecsWantsNothingAndWritesNothing(): void
@@ -484,7 +485,7 @@ final class ReportTargetsTest extends TestCase
         $report = new Report([
             new Finding('acme/old', '1.0.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'marked abandoned by its repository')], ['acme/old'], null, $at),
             new Finding('acme/fine', '2.0.0', Verdict::OK, [], ['acme/fine'], null, $at),
-        ], [], $at, 2, 0, false);
+        ], [], $at, 2, 0);
 
         $targets->write($report, $context, null, true, static function (): void {
         });

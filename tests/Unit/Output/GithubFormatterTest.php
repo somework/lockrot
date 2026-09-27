@@ -15,6 +15,7 @@ use Lockrot\Output\Formatters;
 use Lockrot\Output\GithubFormatter;
 use Lockrot\Output\TableFormatter;
 use Lockrot\Signal\Signal;
+use Lockrot\Tests\Support\Notes;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
 use Lockrot\Version;
@@ -80,7 +81,7 @@ final class GithubFormatterTest extends TestCase
             new Finding('acme/silent', '2.0.8', Verdict::SILENT, [new Signal('S2', 'high', 'last release 2015-11-16 (10.8 years ago)')], ['a/parent', 'acme/silent'], null, $at),
             new Finding('acme/absent', '3.0.0', Verdict::STALE, [new Signal('S2', 'warn', 'last release 2022-05-20 (4.3 years ago)')], ['acme/absent'], null, $at),
             new Finding('acme/fine', '4.0.0', Verdict::OK, [], ['acme/fine'], null, $at),
-        ], ['GitHub token not set: repository activity checked only for 2 candidate packages'], $at, 4, 0, false);
+        ], Notes::texts(['GitHub token not set: repository activity checked only for 2 candidate packages']), $at, 4, 0);
     }
 
     private function formatter(string $failOn, ?string $lockPath): GithubFormatter
@@ -112,7 +113,7 @@ final class GithubFormatterTest extends TestCase
             // Transitive and development-only: two steps below critical.
             new Finding('acme/silent', '2.0.8', Verdict::ABANDONED, [new Signal('S1', 'high', 'marked abandoned by its repository')], ['a/parent', 'acme/silent'], null, $at, null, true),
             new Finding('acme/fine', '4.0.0', Verdict::OK, [], ['acme/fine'], null, $at),
-        ], [], $at, 3, 0, false);
+        ], [], $at, 3, 0);
 
         $out = $this->formatter(LockrotConfig::FAIL_ON_NONE, null)->format($report, true);
 
@@ -163,7 +164,7 @@ final class GithubFormatterTest extends TestCase
     public function testEmptyReportIsSummaryOnly(): void
     {
         $at = new \DateTimeImmutable(self::AT);
-        $report = new Report([], [], $at, 0, 0, false);
+        $report = new Report([], [], $at, 0, 0);
         $out = $this->formatter(Verdict::SILENT, $this->lockPath())->format($report);
 
         self::assertSame(
@@ -177,7 +178,7 @@ final class GithubFormatterTest extends TestCase
         $at = new \DateTimeImmutable(self::AT);
         $report = new Report([
             new Finding('acme/abandoned', '1.0.0', Verdict::STALE, [new Signal('S2', 'warn', "100% behind, see http://x:8080, line 1\nline 2")], ['acme/abandoned'], null, $at),
-        ], ["note with 100% and a comma, and a colon: here\nand a second line"], $at, 1, 0, false);
+        ], Notes::texts(["note with 100% and a comma, and a colon: here\nand a second line"]), $at, 1, 0);
 
         $out = $this->formatter(LockrotConfig::FAIL_ON_NONE, $this->lockPath())->format($report);
         $lines = explode("\n", trim($out));
@@ -198,7 +199,7 @@ final class GithubFormatterTest extends TestCase
         $at = new \DateTimeImmutable(self::AT);
         $report = new Report([
             new Finding('acme/abandoned', '1.0.0', Verdict::FINISHED, [], ['acme/abandoned'], 'interfaces', $at),
-        ], [], $at, 1, 0, false);
+        ], [], $at, 1, 0);
 
         self::assertStringContainsString(
             '::notice file=composer.lock,line=4,title=lockrot%3A finished (none)::acme/abandoned 1.0.0: allowlisted: interfaces',
@@ -321,7 +322,7 @@ final class GithubFormatterTest extends TestCase
         $report = new Report([
             new Finding('acme/leaf', '1.0.0', Verdict::STALE, [new Signal('S2', 'warn', 'last release 2022-05-20 (4.3 years ago)')], ['a/parent', 'acme/leaf'], null, $at, null, false, ['a/parent', 'b/parent']),
             new Finding('acme/twice', '1.0.0', Verdict::STALE, [new Signal('S2', 'warn', 'last release 2022-05-20 (4.3 years ago)')], ['acme/twice'], null, $at, null, false, ['acme/twice', 'b/parent']),
-        ], [], $at, 2, 0, false);
+        ], [], $at, 2, 0);
         $lines = explode("\n", trim($this->formatter(LockrotConfig::FAIL_ON_NONE, null)->format($report)));
 
         // The direct row sorts first (priority medium over low) and, being direct, names no other parent.
@@ -343,7 +344,7 @@ final class GithubFormatterTest extends TestCase
         $evil = "evil/root\n::error file=.github/workflows/ci.yml,line=1::injected";
         $report = new Report([
             new Finding('acme/leaf', '1.0.0', Verdict::STALE, [new Signal('S2', 'warn', 'old')], [$evil, 'acme/leaf'], null, $at, null, false, [$evil]),
-        ], [], $at, 1, 0, false);
+        ], [], $at, 1, 0);
         $lines = explode("\n", trim($this->formatter(LockrotConfig::FAIL_ON_NONE, null)->format($report)));
 
         // The runner reads a command only at the start of a line: the annotation carries the break
@@ -360,7 +361,7 @@ final class GithubFormatterTest extends TestCase
         $at = new \DateTimeImmutable('2026-09-14T06:00:00+00:00');
         $report = new Report([
             new Finding('acme/root', '1.0.0', Verdict::STALE, [new Signal('S2', 'warn', 'old'), new Signal(Signal::S7, Signal::LEVEL_INFO, 'pulls in 1 flagged package: acme/leaf (stale)', ['flagged' => 1, 'packages' => []])], ['acme/root'], null, $at, null, false, ['acme/root']),
-        ], [], $at, 1, 0, false);
+        ], [], $at, 1, 0);
         $lines = explode("\n", trim($this->formatter(LockrotConfig::FAIL_ON_NONE, null)->format($report)));
 
         self::assertStringEndsWith('::acme/root 1.0.0: old; pulls in 1 flagged package: acme/leaf (stale)', $lines[0]);
@@ -372,7 +373,7 @@ final class GithubFormatterTest extends TestCase
         $parent = "evil/root\r\ninjected";
         $report = new Report([
             new Finding('acme/leaf', '1.0.0', Verdict::STALE, [new Signal('S2', 'warn', 'old')], [$parent, 'acme/leaf'], null, $at, null, false, [$parent]),
-        ], [], $at, 1, 0, false);
+        ], [], $at, 1, 0);
 
         $lines = explode("\n", trim($this->formatter(LockrotConfig::FAIL_ON_NONE, null)->format($report)));
 

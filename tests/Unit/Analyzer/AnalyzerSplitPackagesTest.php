@@ -7,6 +7,7 @@ namespace Lockrot\Tests\Unit\Analyzer;
 use Lockrot\Allowlist\Allowlist;
 use Lockrot\Analyzer\Analyzer;
 use Lockrot\Analyzer\Report;
+use Lockrot\Analyzer\RunNote;
 use Lockrot\Clock;
 use Lockrot\Data\Forge\ActivityClient;
 use Lockrot\Data\Forge\ActivityFetchPlanner;
@@ -236,6 +237,10 @@ final class AnalyzerSplitPackagesTest extends TestCase
 
         self::assertSame(['Repository metadata unavailable for laravel/framework, which dates the packages split out of it: HTTP 503 from repo.packagist.org'], self::metadataNotes($report));
         self::assertTrue($report->hadNetworkFailures());
+        $details = array_values(array_filter($report->runNotes(), static fn (RunNote $note): bool => $note->code() === RunNote::MONOREPO_PARENT_UNAVAILABLE));
+        self::assertCount(1, $details);
+        self::assertSame(['parent' => 'laravel/framework', 'reason' => 'fetch_failed', 'message' => 'HTTP 503 from repo.packagist.org'], $details[0]->data());
+        self::assertTrue($details[0]->setsNetworkFailures());
     }
 
     public function testAnExhaustedInstallTimeBudgetSkipsTheParentSilently(): void

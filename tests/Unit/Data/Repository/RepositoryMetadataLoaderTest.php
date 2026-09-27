@@ -11,6 +11,7 @@ use Composer\Repository\ArrayRepository;
 use Composer\Repository\ComposerRepository;
 use Lockrot\Clock;
 use Lockrot\Data\Http\RecordedHttpClient;
+use Lockrot\Data\Repository\MetadataFailure;
 use Lockrot\Data\Repository\MetadataLoaderInterface;
 use Lockrot\Data\Repository\RepositoryMetadataLoader;
 use Lockrot\Deadline;
@@ -325,7 +326,7 @@ final class RepositoryMetadataLoaderTest extends TestCase
         self::assertSame([], $batch->notFound());
         self::assertSame([], $batch->metadata());
         self::assertSame(
-            ['test/empty-versions' => 'repository listed the package but returned no versions'],
+            ['test/empty-versions' => MetadataLoaderInterface::NO_VERSIONS_REASON],
             $batch->failed()
         );
 
@@ -516,6 +517,28 @@ final class RepositoryMetadataLoaderTest extends TestCase
                 self::assertArrayHasKey($name, $batch->metadata(), $name.' is in a later chunk and should resolve');
             }
             self::assertSame([], $batch->notFound());
+        } finally {
+            $server->stop();
+        }
+    }
+
+    /**
+     * Offline, a repository that throws while reading its cache fails the name with its own message,
+     * not the offline reason: the run notes read that as `fetch_failed`, the catch-all, which is what
+     * docs/notes.md says it can be under --offline.
+     */
+    public function testOfflineARepositoryThatThrowsFailsWithItsOwnMessage(): void
+    {
+        $server = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK]);
+        $server->start();
+        try {
+            $names = \array_slice($this->wallabagNames(), 0, 2);
+            $loader = new RepositoryMetadataLoader([$this->repositoryFailingFor($server, $names[0])], Clock::fixed(self::FIXED), true);
+
+            $failed = $loader->load($names)->failed();
+
+            self::assertSame(self::CHUNK_FAILURE, $failed[$names[0]] ?? null);
+            self::assertSame(MetadataFailure::FETCH_FAILED, MetadataFailure::reason($failed[$names[0]]));
         } finally {
             $server->stop();
         }

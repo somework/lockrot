@@ -35,7 +35,7 @@ final class ReportDocumentTest extends TestCase
     /** @param list<Finding> $findings */
     private function report(array $findings): Report
     {
-        return new Report($findings, [], new \DateTimeImmutable(F::NOW), \count($findings), 0, false);
+        return new Report($findings, [], new \DateTimeImmutable(F::NOW), \count($findings), 0);
     }
 
     /** @param array<string, PackageFacts> $facts */

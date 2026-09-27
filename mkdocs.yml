@@ -60,6 +60,7 @@ nav:
   - In CI: ci.md
   - Baseline: baseline.md
   - JSON schemas: schema.md
+  - Run notes: notes.md
   - Compatibility: compatibility.md
   - Install-time summary: install-time.md
   - PHAR and self-update: phar.md

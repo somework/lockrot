@@ -6,7 +6,9 @@ namespace Lockrot\Tests\Unit\Data\Advisory;
 
 use Composer\Repository\AdvisoryProviderInterface;
 use Composer\Repository\ArrayRepository;
+use Lockrot\Analyzer\RunNote;
 use Lockrot\Data\Advisory\Advisory;
+use Lockrot\Data\Advisory\AdvisoryBatch;
 use Lockrot\Data\Advisory\AdvisoryIgnore;
 use Lockrot\Data\Advisory\RepositoryAdvisoryLoader;
 use Lockrot\Deadline;
@@ -16,6 +18,7 @@ use PHPUnit\Framework\TestCase;
 final class RepositoryAdvisoryLoaderTest extends TestCase
 {
     private const WALLABAG_LOCK = __DIR__.'/../../../fixtures/apps/wallabag_wallabag/composer.lock';
+    private const BUDGET_NOTE = 'security advisories not checked: install-time budget exhausted; a priority they would raise stays one step lower';
 
     private static ?FixtureRepositoryServer $server = null;
 
@@ -79,7 +82,7 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
 
         $batch = $loader->load(['doctrine/cache' => '2.2.0', 'doctrine/annotations' => '2.0.2', 'symfony/console' => 'v5.4.47']);
 
-        self::assertSame([], $batch->notes());
+        self::assertSame([], self::texts($batch));
         self::assertFalse($batch->hadNetworkFailure());
         self::assertSame(['doctrine/cache', 'doctrine/annotations'], array_keys($batch->byName()));
         $advisories = $batch->for('doctrine/cache');
@@ -118,11 +121,13 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
         if (!interface_exists(AdvisoryProviderInterface::class)) {
             self::markTestSkipped('Composer without the advisory API');
         }
-        $loader = new RepositoryAdvisoryLoader($this->server()->repositories(), false, null, new AdvisoryIgnore([], [], 'ignore list not read'));
+        $loader = new RepositoryAdvisoryLoader($this->server()->repositories(), false, null, new AdvisoryIgnore([], [], 'Unknown key "licenses"'));
 
         $batch = $loader->load(['doctrine/cache' => '2.2.0']);
 
-        self::assertSame(['ignore list not read'], $batch->notes());
+        self::assertSame(["Composer's advisory ignore list not read (Unknown key \"licenses\"); every advisory counts"], self::texts($batch));
+        self::assertSame(RunNote::ADVISORY_IGNORE_UNREADABLE, $batch->notes()[0]->code());
+        self::assertSame(['message' => 'Unknown key "licenses"'], $batch->notes()[0]->data());
         self::assertCount(2, $batch->for('doctrine/cache'), 'nothing is ignored');
         self::assertFalse($batch->hadNetworkFailure());
     }
@@ -137,7 +142,7 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
         $batch = $loader->load(['doctrine/cache' => 'not a version']);
 
         self::assertSame([], $batch->byName());
-        self::assertSame([], $batch->notes());
+        self::assertSame([], self::texts($batch));
 
         $batch = $loader->load(['doctrine/annotations' => 'not a version', 'doctrine/cache' => '2.2.0']);
 
@@ -163,17 +168,17 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
             $batch = $loader->load(['doctrine/cache' => '2.2.0']);
 
             self::assertSame([], $batch->byName());
-            self::assertCount(1, $batch->notes());
-            self::assertStringContainsString('could not be loaded as a full advisory', $batch->notes()[0]);
-            self::assertStringNotContainsString("\n", $batch->notes()[0], 'one line: the var_export dump Composer appends is cut');
-            self::assertStringNotContainsString('advisoryId', $batch->notes()[0]);
+            self::assertCount(1, self::texts($batch));
+            self::assertStringContainsString('could not be loaded as a full advisory', self::texts($batch)[0]);
+            self::assertStringNotContainsString("\n", self::texts($batch)[0], 'one line: the var_export dump Composer appends is cut');
+            self::assertStringNotContainsString('advisoryId', self::texts($batch)[0]);
             self::assertFalse($batch->hadNetworkFailure());
 
             $behind = new RepositoryAdvisoryLoader(array_merge($partial->repositories(), $this->server()->repositories()));
 
             $batch = $behind->load(['doctrine/cache' => '2.2.0']);
 
-            self::assertCount(1, $batch->notes());
+            self::assertCount(1, self::texts($batch));
             self::assertCount(2, $batch->for('doctrine/cache'), 'the repository behind the partial one still answers');
         } finally {
             $partial->stop();
@@ -192,7 +197,7 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
 
             $batch = $loader->load(['doctrine/cache' => '2.2.0']);
 
-            self::assertSame([], $batch->notes());
+            self::assertSame([], self::texts($batch));
             self::assertCount(2, $batch->for('doctrine/cache'), 'the repository behind the plain one still answers');
         } finally {
             $plain->stop();
@@ -209,8 +214,10 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
 
         $batch = $loader->load(['doctrine/cache' => '2.2.0']);
 
-        self::assertCount(1, $batch->notes());
-        self::assertStringStartsWith('security advisories unavailable from ', $batch->notes()[0]);
+        self::assertCount(1, self::texts($batch));
+        self::assertStringStartsWith('security advisories unavailable from ', self::texts($batch)[0]);
+        self::assertSame(RunNote::ADVISORIES_UNAVAILABLE, $batch->notes()[0]->code());
+        self::assertTrue($batch->notes()[0]->setsNetworkFailures(), 'a transport failure');
         self::assertTrue($batch->hadNetworkFailure());
         self::assertCount(2, $batch->for('doctrine/cache'));
     }
@@ -222,7 +229,7 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
 
         $batch = (new RepositoryAdvisoryLoader($unreachable->repositories(), true))->load([]);
 
-        self::assertSame([], $batch->notes());
+        self::assertSame([], self::texts($batch));
         self::assertSame([], $batch->byName());
     }
 
@@ -240,9 +247,9 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
 
             $batch = $loader->load(['doctrine/cache' => '2.2.0']);
 
-            self::assertCount(1, $batch->notes());
-            self::assertStringContainsString('does not contain valid JSON', $batch->notes()[0]);
-            self::assertStringNotContainsString("\n", $batch->notes()[0]);
+            self::assertCount(1, self::texts($batch));
+            self::assertStringContainsString('does not contain valid JSON', self::texts($batch)[0]);
+            self::assertStringNotContainsString("\n", self::texts($batch)[0]);
             self::assertFalse($batch->hadNetworkFailure(), 'the server answered; what it said was the problem');
             self::assertCount(2, $batch->for('doctrine/cache'));
         } finally {
@@ -284,12 +291,14 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
         };
 
         $batch = (new RepositoryAdvisoryLoader(array_merge([$throwing(new \LogicException("first line\nsecond line"))], $this->server()->repositories())))->load(['doctrine/cache' => '2.2.0']);
-        self::assertSame(['security advisories unavailable from throwing repo: first line'], $batch->notes());
+        self::assertSame(['security advisories unavailable from throwing repo: first line'], self::texts($batch));
+        self::assertSame(['composer_repository' => 'throwing repo', 'message' => 'first line'], $batch->notes()[0]->data());
+        self::assertFalse($batch->notes()[0]->setsNetworkFailures());
         self::assertFalse($batch->hadNetworkFailure());
         self::assertCount(2, $batch->for('doctrine/cache'));
 
         $batch = (new RepositoryAdvisoryLoader([$throwing(new \RuntimeException(''))]))->load(['doctrine/cache' => '2.2.0']);
-        self::assertSame(['security advisories unavailable from throwing repo: RuntimeException'], $batch->notes());
+        self::assertSame(['security advisories unavailable from throwing repo: RuntimeException'], self::texts($batch));
     }
 
     public function testOfflineAsksNothing(): void
@@ -299,7 +308,8 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
 
         $batch = $loader->load(['doctrine/cache' => '2.2.0']);
 
-        self::assertSame([RepositoryAdvisoryLoader::NOTE_OFFLINE], $batch->notes());
+        self::assertSame(['offline: security advisories not checked; a priority they would raise stays one step lower'], self::texts($batch));
+        self::assertSame(['reason' => 'offline', 'composer_repositories_checked' => 0], $batch->notes()[0]->data());
         self::assertFalse($batch->hadNetworkFailure());
         self::assertSame([], $batch->byName());
     }
@@ -320,9 +330,11 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
 
         $batch = $loader->load(['doctrine/cache' => '2.2.0']);
 
-        self::assertCount(2, $batch->notes());
-        self::assertStringStartsWith('security advisories unavailable from ', $batch->notes()[0]);
-        self::assertSame(RepositoryAdvisoryLoader::NOTE_BUDGET, $batch->notes()[1]);
+        self::assertCount(2, self::texts($batch));
+        self::assertStringStartsWith('security advisories unavailable from ', self::texts($batch)[0]);
+        self::assertSame(self::BUDGET_NOTE, self::texts($batch)[1]);
+        self::assertSame(['reason' => 'install_time_budget', 'composer_repositories_checked' => 1], $batch->notes()[1]->data(), 'the first repository was asked before the budget ran out, so the check was partial');
+        self::assertTrue($batch->notes()[0]->setsNetworkFailures());
         self::assertTrue($batch->hadNetworkFailure());
         self::assertSame([], $batch->byName(), 'the second repository was never asked');
     }
@@ -337,7 +349,8 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
 
         $batch = $loader->load(['doctrine/cache' => '2.2.0']);
 
-        self::assertSame([RepositoryAdvisoryLoader::NOTE_BUDGET], $batch->notes());
+        self::assertSame([self::BUDGET_NOTE], self::texts($batch));
+        self::assertSame(['reason' => 'install_time_budget', 'composer_repositories_checked' => 0], $batch->notes()[0]->data());
         self::assertFalse($batch->hadNetworkFailure());
     }
 
@@ -349,10 +362,17 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
         $batch = $loader->load(['doctrine/cache' => '2.2.0']);
 
         if (interface_exists(AdvisoryProviderInterface::class)) {
-            self::assertNotContains(RepositoryAdvisoryLoader::NOTE_COMPOSER_TOO_OLD, $batch->notes());
+            self::assertSame([], $batch->notes());
         } else {
-            self::assertSame([RepositoryAdvisoryLoader::NOTE_COMPOSER_TOO_OLD], $batch->notes());
+            self::assertSame(['security advisories not checked (needs Composer 2.4 or newer); a priority they would raise stays one step lower'], self::texts($batch));
+            self::assertSame(['reason' => 'composer_too_old', 'composer_repositories_checked' => 0], $batch->notes()[0]->data());
             self::assertSame([], $batch->byName());
         }
+    }
+
+    /** @return list<string> */
+    private static function texts(AdvisoryBatch $batch): array
+    {
+        return array_map(static fn (RunNote $note): string => $note->text(), $batch->notes());
     }
 }

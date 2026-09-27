@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Analyzer;
 
+use Composer\Downloader\TransportException;
 use Lockrot\Analyzer\Libyears;
 use Lockrot\Analyzer\LibyearsMeasurement;
 use Lockrot\Analyzer\Report;
+use Lockrot\Analyzer\RunNote;
 use Lockrot\Analyzer\RunSettings;
 use Lockrot\Analyzer\TransitiveExposure;
 use Lockrot\Baseline\Baseline;
@@ -37,7 +39,7 @@ final class ReportTest extends TestCase
 
     private function report(Finding ...$findings): Report
     {
-        return new Report(array_values($findings), [], new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), \count($findings), 0, false);
+        return new Report(array_values($findings), [], new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), \count($findings), 0);
     }
 
     /** @return list<string> */
@@ -100,8 +102,7 @@ final class ReportTest extends TestCase
             [],
             new \DateTimeImmutable('2026-09-14T00:00:00+00:00'),
             6,
-            0,
-            false
+            0
         );
 
         self::assertSame(
@@ -126,8 +127,7 @@ final class ReportTest extends TestCase
             [],
             new \DateTimeImmutable('2026-09-14T00:00:00+00:00'),
             8,
-            0,
-            false
+            0
         );
 
         self::assertSame(
@@ -138,7 +138,7 @@ final class ReportTest extends TestCase
 
     public function testByVerdictHasAllNineKeysWithZeros(): void
     {
-        $report = new Report([], [], new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), 0, 0, false);
+        $report = new Report([], [], new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), 0, 0);
         self::assertSame(
             [
                 Verdict::ABANDONED => 0,
@@ -162,8 +162,7 @@ final class ReportTest extends TestCase
             [],
             new \DateTimeImmutable('2026-09-14T00:00:00+00:00'),
             3,
-            0,
-            false
+            0
         );
         $counts = $report->byVerdict();
         self::assertSame(2, $counts[Verdict::SILENT]);
@@ -197,7 +196,7 @@ final class ReportTest extends TestCase
 
     public function testByPriorityHasAllFiveKeysWithZeros(): void
     {
-        $report = new Report([], [], new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), 0, 0, false);
+        $report = new Report([], [], new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), 0, 0);
         self::assertSame(
             [
                 Priority::CRITICAL => 0,
@@ -238,7 +237,7 @@ final class ReportTest extends TestCase
 
     public function testPrioritySummaryLineOnAnEmptyReport(): void
     {
-        $report = new Report([], [], new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), 0, 0, false);
+        $report = new Report([], [], new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), 0, 0);
         self::assertSame('priority: critical 0 · high 0 · medium 0 · low 0', $report->prioritySummaryLine());
     }
 
@@ -496,15 +495,14 @@ final class ReportTest extends TestCase
     {
         $report = new Report(
             [$this->finding('vendor/a', Verdict::SILENT)],
-            ['a note'],
+            [RunNote::metadataUnavailable(['vendor/a' => 'HTTP 503'])],
             new \DateTimeImmutable('2026-09-14T00:00:00+00:00'),
             5,
-            1,
-            true
+            1
         );
         $array = $report->toArray();
         self::assertSame(
-            ['generated_at', 'run', 'activity_cache_oldest_at', 'packages_checked', 'include_dev', 'not_from_composer_repository', 'network_failures', 'counts', 'abandoned', 'priorities', 'exposure', 'exposure_rule', 'unattributed', 'libyears', 'baseline', 'gate', 'notes', 'findings'],
+            ['generated_at', 'run', 'activity_cache_oldest_at', 'packages_checked', 'include_dev', 'not_from_composer_repository', 'network_failures', 'counts', 'abandoned', 'priorities', 'exposure', 'exposure_rule', 'unattributed', 'libyears', 'baseline', 'gate', 'notes', 'note_details', 'findings'],
             array_keys($array)
         );
         // The literal, not the constant: the document states the value it attributed by.
@@ -523,9 +521,48 @@ final class ReportTest extends TestCase
         self::assertTrue($array['network_failures']);
         self::assertNull($array['baseline']);
         self::assertNull($array['run'], 'a report nothing told about the run says so rather than guessing');
-        self::assertSame(['a note'], $array['notes']);
+        self::assertSame(['Repository metadata unavailable for 1 package: HTTP 503'], $array['notes']);
         self::assertIsArray($array['findings']);
         self::assertCount(1, $array['findings']);
+    }
+
+    /**
+     * The notes are one list: `notes` is each note's text and `note_details` each note, in the same
+     * order, and `network_failures` is true exactly when one of them sets it — never a second answer
+     * a caller passes in beside the notes.
+     */
+    public function testTheNotesTheirDetailsAndTheNetworkFlagComeFromOneList(): void
+    {
+        $at = new \DateTimeImmutable('2026-09-14T00:00:00+00:00');
+        $quiet = [RunNote::offline(), RunNote::notFromComposerRepository(2)];
+        $failing = [RunNote::offline(), RunNote::advisoriesUnavailable('packagist.org', new TransportException('HTTP 503')), RunNote::notFromComposerRepository(2)];
+
+        self::assertFalse((new Report([], [], $at, 0, 0))->hadNetworkFailures());
+        self::assertFalse((new Report([], $quiet, $at, 0, 2))->hadNetworkFailures());
+        $report = new Report([], $failing, $at, 0, 2);
+        self::assertTrue($report->hadNetworkFailures());
+        self::assertSame($failing, $report->runNotes());
+        self::assertSame([
+            "offline: repository metadata served from Composer's cache",
+            'security advisories unavailable from packagist.org: HTTP 503',
+            '2 packages are not from a Composer repository and were not checked',
+        ], $report->notes());
+
+        $array = $report->toArray();
+        $details = JsonPath::arrayAt($array, ['note_details']);
+        self::assertTrue($array['network_failures']);
+        self::assertSame($array['notes'], array_column($details, 'text'));
+        self::assertSame(['offline', 'advisories_unavailable', 'not_from_composer_repository'], array_column($details, 'code'));
+        self::assertSame('{}', json_encode(JsonPath::arrayAt($details, [0])['data']), 'no parameters is an empty object, never a list');
+        self::assertSame('{"package_count":2}', json_encode(JsonPath::arrayAt($details, [2])['data']));
+        self::assertSame([], (new Report([], [], $at, 0, 0))->toArray()['note_details']);
+
+        $withRun = $report->withRun(new RunSettings(null, null, '8.4', null, FailOn::none(), new Thresholds()));
+        $withBaseline = $withRun->withBaseline(BaselineComparison::compare(Baseline::fromReport($report), $report, 'lockrot-baseline.json', []));
+        foreach ([$withRun, $withBaseline] as $copy) {
+            self::assertSame($failing, $copy->runNotes());
+            self::assertTrue($copy->hadNetworkFailures());
+        }
     }
 
     public function testWithBaselineLeavesTheOriginalReportUntouched(): void
@@ -535,8 +572,7 @@ final class ReportTest extends TestCase
             [],
             new \DateTimeImmutable('2026-09-14T00:00:00+00:00'),
             1,
-            0,
-            false
+            0
         );
         $comparison = BaselineComparison::compare(
             Baseline::of([new BaselineEntry('vendor/a', '1.0.0', Verdict::SILENT, '2026-01-15')], '2026-09-14T00:00:00+00:00'),
@@ -594,7 +630,7 @@ final class ReportTest extends TestCase
             new Finding('vendor/done', '1.0.0', Verdict::FINISHED, [$s9(4)], ['vendor/done'], 'interfaces', $at),
             new Finding('vendor/gone', '1.0.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'abandoned'), $s9(2)], ['vendor/gone'], null, $at),
             new Finding('vendor/clean', '1.0.0', Verdict::OK, [], ['vendor/clean'], null, $at),
-        ], [], $at, 4, 0, false, null, null, true);
+        ], [], $at, 4, 0, null, null, true);
 
         self::assertSame('16 security advisories on 2 packages the report does not flag; see composer audit', $report->unflaggedAdvisoriesLine());
     }
@@ -607,8 +643,8 @@ final class ReportTest extends TestCase
     {
         $at = new \DateTimeImmutable('2026-09-14T00:00:00+00:00');
         $finding = new Finding('vendor/ok', '1.0.0', Verdict::OK, [new Signal('S9', 'warn', '2 security advisories affect x', ['advisories' => [['id' => 'x'], ['id' => 'y']]])], ['vendor/ok'], null, $at);
-        $withoutDev = new Report([$finding], [], $at, 1, 0, false);
-        $withDev = new Report([$finding], [], $at, 1, 0, false, null, null, true);
+        $withoutDev = new Report([$finding], [], $at, 1, 0);
+        $withDev = new Report([$finding], [], $at, 1, 0, null, null, true);
 
         self::assertFalse($withoutDev->includesDev());
         self::assertSame(
@@ -625,8 +661,8 @@ final class ReportTest extends TestCase
     public function testUnflaggedAdvisoriesLineIsSingularAndEmptyWhenNoneAreThere(): void
     {
         $at = new \DateTimeImmutable('2026-09-14T00:00:00+00:00');
-        $one = new Report([new Finding('vendor/ok', '1.0.0', Verdict::OK, [new Signal('S9', 'warn', '1 security advisory affects x', ['advisories' => [['id' => 'x']]])], ['vendor/ok'], null, $at)], [], $at, 1, 0, false, null, null, true);
-        $none = new Report([new Finding('vendor/gone', '1.0.0', Verdict::ABANDONED, [new Signal('S9', 'warn', 'x', ['advisories' => [['id' => 'x']]])], ['vendor/gone'], null, $at)], [], $at, 1, 0, false);
+        $one = new Report([new Finding('vendor/ok', '1.0.0', Verdict::OK, [new Signal('S9', 'warn', '1 security advisory affects x', ['advisories' => [['id' => 'x']]])], ['vendor/ok'], null, $at)], [], $at, 1, 0, null, null, true);
+        $none = new Report([new Finding('vendor/gone', '1.0.0', Verdict::ABANDONED, [new Signal('S9', 'warn', 'x', ['advisories' => [['id' => 'x']]])], ['vendor/gone'], null, $at)], [], $at, 1, 0);
 
         self::assertSame('1 security advisory on 1 package the report does not flag; see composer audit', $one->unflaggedAdvisoriesLine());
         self::assertSame('', $none->unflaggedAdvisoriesLine());
@@ -768,7 +804,7 @@ final class ReportTest extends TestCase
     public function testTheDataSourcesClauseStatesTheAgeOfCachedActivity(): void
     {
         $at = new \DateTimeImmutable('2026-09-14T12:00:00+00:00');
-        $report = static fn (?string $oldest): Report => new Report([], [], $at, 0, 0, false, null, $oldest === null ? null : new \DateTimeImmutable($oldest));
+        $report = static fn (?string $oldest): Report => new Report([], [], $at, 0, 0, null, $oldest === null ? null : new \DateTimeImmutable($oldest));
 
         self::assertSame('package repositories, repository hosts', $report(null)->dataSourcesClause());
         self::assertSame("package repositories; repository activity from lockrot's cache, up to 1 h old", $report('2026-09-14T11:30:00+00:00')->dataSourcesClause(), '30 minutes rounds up to one hour');
@@ -785,7 +821,7 @@ final class ReportTest extends TestCase
     {
         $at = new \DateTimeImmutable('2026-09-14T12:00:00+00:00');
         $oldest = new \DateTimeImmutable('2026-09-13T20:00:00+00:00');
-        $report = new Report([], [], $at, 0, 0, false, null, $oldest);
+        $report = new Report([], [], $at, 0, 0, null, $oldest);
 
         self::assertSame($oldest, $report->activityCacheOldestAt());
         self::assertSame('2026-09-13T20:00:00+00:00', $report->toArray()['activity_cache_oldest_at']);

@@ -10,6 +10,7 @@ use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Baseline\BaselineEntry;
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Config\Policy;
+use Lockrot\Tests\Support\Notes;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Priority;
 use Lockrot\Verdict\Verdict;
@@ -25,7 +26,7 @@ final class PolicyTest extends TestCase
             $findings[] = new Finding('v/p'.$i, '1.0.0', $verdict, [], ['v/p'.$i], null, null);
         }
 
-        return new Report($findings, [], new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), \count($findings), 0, $networkFailures);
+        return new Report($findings, $networkFailures ? [Notes::text('a lookup failed', true)] : [], new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), \count($findings), 0);
     }
 
     private function config(string $failOn, bool $strict = false): LockrotConfig
@@ -59,7 +60,7 @@ final class PolicyTest extends TestCase
         $transitiveDev = new Finding('a/deep', '1.0.0', Verdict::ABANDONED, [], ['a/root', 'a/deep'], null, $at, null, true);
         self::assertSame(Priority::CRITICAL, $directProd->priority());
         self::assertSame(Priority::MEDIUM, $transitiveDev->priority());
-        $report = static fn (Finding ...$findings): Report => new Report(array_values($findings), [], $at, \count($findings), 0, false);
+        $report = static fn (Finding ...$findings): Report => new Report(array_values($findings), [], $at, \count($findings), 0);
 
         self::assertSame(1, Policy::exitCode($report($directProd), $this->config('critical')));
         self::assertSame(0, Policy::exitCode($report($transitiveDev), $this->config('critical')));
@@ -101,7 +102,7 @@ final class PolicyTest extends TestCase
         foreach ($baselined as [$package, $verdict]) {
             $entries[] = new BaselineEntry($package, '1.0.0', $verdict, '2026-01-15');
         }
-        $report = new Report($findings, [], $at, \count($findings), 0, $networkFailures);
+        $report = new Report($findings, $networkFailures ? [Notes::text('a lookup failed', true)] : [], $at, \count($findings), 0);
 
         return $report->withBaseline(BaselineComparison::compare(
             Baseline::of($entries, '2026-09-14T00:00:00+00:00'),

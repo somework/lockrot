@@ -23,7 +23,7 @@ final class HtmlFormatterTest extends TestCase
     /** @param list<Finding> $findings */
     private function report(array $findings, int $checked = 1): Report
     {
-        return new Report($findings, [], new \DateTimeImmutable(F::NOW), $checked, 0, false);
+        return new Report($findings, [], new \DateTimeImmutable(F::NOW), $checked, 0);
     }
 
     /** @param list<Signal> $signals */

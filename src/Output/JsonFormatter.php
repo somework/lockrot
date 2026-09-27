@@ -26,9 +26,9 @@ final class JsonFormatter implements FormatterInterface
         $data = ['$schema' => Schemas::url(Schemas::REPORT, self::SCHEMA), 'lockrot' => ['version' => self::VERSION, 'schema' => self::SCHEMA]] + $report->toArray();
 
         $json = json_encode($data, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES);
-        // Report::toArray() only ever produces scalars, arrays and ISO-8601 date strings, so this
-        // is unreachable in practice; guarded explicitly so a future encoding failure fails loudly
-        // instead of silently emitting the string "false".
+        // Report::toArray() only ever produces scalars, arrays, a note's `data` object and ISO-8601
+        // date strings, so this is unreachable in practice; guarded explicitly so a future encoding
+        // failure fails loudly instead of silently emitting the string "false".
         if ($json === false) {
             throw new \RuntimeException('Cannot encode report as JSON: '.json_last_error_msg());
         }

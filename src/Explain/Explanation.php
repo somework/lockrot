@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Explain;
 
 use Lockrot\Analyzer\Report;
+use Lockrot\Analyzer\RunNote;
 use Lockrot\Data\Repository\InstalledRelease;
 use Lockrot\Data\Repository\ReleaseBranch;
 use Lockrot\Data\Repository\RepositoryUrl;
@@ -253,6 +254,7 @@ final class Explanation
             'project_php' => $this->projectPhp,
             'generated_at' => self::date($this->report->generatedAt()),
             'notes' => $this->report->notes(),
+            'note_details' => array_map(static fn (RunNote $note): array => $note->toArray(), $this->report->runNotes()),
         ];
     }
 

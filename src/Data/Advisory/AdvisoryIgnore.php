@@ -28,18 +28,18 @@ final class AdvisoryIgnore
     private array $ids;
     /** @var array<string, true> */
     private array $severities;
-    /** Why the list is empty when the project meant it not to be; a report note. */
-    private ?string $note;
+    /** Why the list is empty when the project meant it not to be: the first line of what Composer rejected, which the run notes. */
+    private ?string $whyUnreadable;
 
     /**
      * @param list<string> $ids
      * @param list<string> $severities
      */
-    public function __construct(array $ids, array $severities = [], ?string $note = null)
+    public function __construct(array $ids, array $severities = [], ?string $whyUnreadable = null)
     {
         $this->ids = array_fill_keys($ids, true);
         $this->severities = array_fill_keys($severities, true);
-        $this->note = $note;
+        $this->whyUnreadable = $whyUnreadable;
     }
 
     public static function none(): self
@@ -59,7 +59,7 @@ final class AdvisoryIgnore
             try {
                 $policy = PolicyConfig::fromConfig($config);
             } catch (\Throwable $e) {
-                return new self([], [], \sprintf("Composer's advisory ignore list not read (%s); every advisory counts", (string) strtok($e->getMessage(), "\r\n")));
+                return new self([], [], (string) strtok($e->getMessage(), "\r\n"));
             }
 
             return new self(
@@ -115,10 +115,10 @@ final class AdvisoryIgnore
         return $this->ids === [] && $this->severities === [];
     }
 
-    /** The report note explaining an ignore list that could not be read, null when it was. */
-    public function note(): ?string
+    /** Why the ignore list could not be read, possibly empty; null when it was read. */
+    public function whyUnreadable(): ?string
     {
-        return $this->note;
+        return $this->whyUnreadable;
     }
 
     /**

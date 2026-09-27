@@ -26,6 +26,9 @@ interface MetadataLoaderInterface
      */
     public const BUDGET_REASON = 'not checked: install-time budget exhausted';
 
+    /** The repository lists the name, but no version it serves is left once filtered, in either pass. */
+    public const NO_VERSIONS_REASON = 'repository listed the package but returned no versions';
+
     /** @param list<string> $names */
     public function load(array $names): MetadataBatch;
 }

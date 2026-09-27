@@ -34,7 +34,8 @@ changes in minor releases under a heading of its own — see [Verdict changes](#
   archives wrote — so a field cannot quietly become required, narrowed or dropped.
 - *Planned:* lockrot 2.x keeps writing report-1 behind `--schema=1`.
 - Human-readable strings inside those documents — a signal's `summary`, a note, an evidence sentence —
-  are text, not contract. Key on ids and data fields, never on wording.
+  are text, not contract. Key on ids and data fields, never on wording: for a run's notes, on
+  `note_details` ([Run notes](#run-notes)), never on `notes`.
 - Whether a package's lock entry carries a Composer notification-url, the only kind of entry lockrot
   asks a repository about, is a finding's `from_composer_repository`, not its `note`: a boolean for
   all of 1.x. A finer account of where a lock entry came from would be a separate field with an open
@@ -83,6 +84,7 @@ These grow in minor releases:
 - a `priority_basis` step's `reason`, and a `no_fix_expected` item's `reason`;
 - `run.mode` and `run.fail_on_kind`;
 - `gate.tripped_by`, and a finding's `gate.exempt_by`;
+- a run note's `code`, and the `forge_id` and `reason` in its `data`;
 - repository hosts;
 - format names, the configuration's `format` among them.
 
@@ -93,13 +95,16 @@ The schemas describe signal ids (S10's `blocks` among them), S10's `check` and `
 `reason`, S8's `floor_source`, the explanation's `php_blocked_by`, `misses_target_php` and
 `misses_project_php`, a finding's `libyears_unmeasured`, a `priority_basis` step's `reason`, a
 `no_fix_expected` item's `reason`, `run.mode`, `run.fail_on_kind`, `gate.tripped_by`, a finding's
-`gate.exempt_by`, and the configuration's `format` as open strings: a `pattern`, which also admits the `<vendor>:<name>` form for a signal id and a format,
+`gate.exempt_by`, a run note's `code`, and the `forge_id` and `reason` in its `data`, and the
+configuration's `format` as open strings: a `pattern`, which also admits the `<vendor>:<name>` form for a signal id, a note's code and a format,
 plus `x-known-values`, the values lockrot writes, which only grows within 1.x. A signal whose id is
 not listed validates with any object as its `data`; a listed id keeps its `data` typed. A consumer
 that validates strictly reads `x-known-values` as an enum and refreshes its copy on upgrade. A copy
-of a schema taken before 0.13.0 still holds these as enums. Repository hosts are in no schema as a
-set: S3 and S4's `host` and the explanation's `forge` are plain strings. lockrot itself accepts only
-the format names it knows, in `--format`, `--output` and `extra.lockrot.format`.
+of a schema taken before 0.13.0 still holds these as enums. Repository hosts are a set in the schemas
+only as a run note's `forge_id` (`github`, `gitlab`, `bitbucket`): S3 and S4's `host` are plain
+strings, and so is the explanation's `activity.forge`, a display name (`GitHub`) that stays one.
+lockrot itself accepts only the format names it knows, in `--format`, `--output` and
+`extra.lockrot.format`.
 
 A `priority_basis` step's `from` and `to` take the priority order without `none`
 (`critical`, `high`, `medium`, `low`): the closed set restricted, not a set of its own, so it is
@@ -112,6 +117,35 @@ key a later minor release adds is always written from then on but never joins `r
 schema types any key it does not list as a count. A later minor release may also split a reason,
 `no_stable_release_date` included, into narrower ones, which moves findings out of the old key: a
 consumer does not assume a reason's population stays fixed.
+
+### Run notes
+
+What a run could not see is in the report and the explanation twice: as sentences in `notes`, and
+typed in `note_details` ([notes.md](notes.md)). Frozen for 1.x:
+
+- `note_details` has one entry per `notes` string, at the same index, with the same `text`, and
+  every document from 0.13.0 on carries it.
+- Each entry's keys — `code`, `text`, `docs_url`, `sets_network_failures`, `data` — and each code's
+  `data` keys, as the schemas list them.
+- A code's meaning. A new meaning gets a new code; a code is retired, never removed or reused.
+- `sets_network_failures`, and the rule that the report's `network_failures` is true exactly when
+  one entry's is.
+- Every `docs_url` a release has written resolves for all of 1.x.
+- The specific reasons: `offline`, `install_time_budget` and `no_versions` for metadata, `offline`,
+  `composer_too_old` and `install_time_budget` for advisories, and `install_time_budget` for
+  repository activity.
+
+Not frozen:
+
+- The wording: `text`, and every `message` in `data`, which are a repository's, a host's or
+  Composer's own words.
+- Which page a `docs_url` points at. A page that moves stays behind as a stub that keeps every id.
+- Which notes a run writes, and in what order.
+- `fetch_failed`, the catch-all among the metadata reasons, and any other catch-all: a minor release
+  may move cases out of it into reasons of their own.
+
+A new code or reason arrives only in a minor release. It changes no verdict, priority or exit code,
+so it is not a [Verdict change](#verdict-changes).
 
 ### Finding identity
 

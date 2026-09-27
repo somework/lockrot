@@ -7,6 +7,7 @@ namespace Lockrot\Tests\Integration;
 use Lockrot\Allowlist\BuiltinAllowlist;
 use Lockrot\Analyzer\Analyzer;
 use Lockrot\Analyzer\Report;
+use Lockrot\Analyzer\RunNote;
 use Lockrot\Analyzer\RunSettings;
 use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineComparison;
@@ -260,9 +261,15 @@ final class GateAgreementTest extends TestCase
         return $report->flagged() === [] ? null : Baseline::of($entries, self::NOW);
     }
 
+    /** The report with a failed lookup among its notes, or with none: the notes are what the flag is computed from. */
     private static function withNetworkFailures(Report $report, bool $failures): Report
     {
-        return new Report($report->findings(), $report->notes(), $report->generatedAt(), $report->packagesChecked(), $report->notFromComposerRepository(), $failures, null, $report->activityCacheOldestAt(), $report->includesDev());
+        $notes = array_values(array_filter($report->runNotes(), static fn (RunNote $note): bool => !$note->setsNetworkFailures()));
+        if ($failures) {
+            $notes[] = RunNote::metadataUnavailable(['vendor/unreachable' => 'HTTP 503']);
+        }
+
+        return new Report($report->findings(), $notes, $report->generatedAt(), $report->packagesChecked(), $report->notFromComposerRepository(), null, $report->activityCacheOldestAt(), $report->includesDev());
     }
 
     private function analyse(MetadataLoaderInterface $loader, string $dir): Report

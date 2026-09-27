@@ -63,8 +63,9 @@ final class ReportDocument
 
 
     /**
-     * The `--explain` document per package, keyed by name, minus `finding` and `notes` — the report
-     * already carries both, and repeating them would double the page for nothing.
+     * The `--explain` document per package, keyed by name, minus `finding`, `notes` and
+     * `note_details` — the report already carries them, and repeating them would double the page
+     * for nothing.
      *
      * @return array<string, array<string, mixed>>
      */

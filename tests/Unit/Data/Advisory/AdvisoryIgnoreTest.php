@@ -108,17 +108,17 @@ final class AdvisoryIgnoreTest extends TestCase
         $ignore = AdvisoryIgnore::fromConfig($config);
 
         self::assertTrue($ignore->isEmpty());
-        self::assertNotNull($ignore->note());
-        self::assertStringStartsWith("Composer's advisory ignore list not read (", $ignore->note());
-        self::assertStringEndsWith('); every advisory counts', $ignore->note());
-        self::assertStringNotContainsString("\n", $ignore->note());
+        $why = $ignore->whyUnreadable();
+        self::assertNotNull($why);
+        self::assertNotSame('', $why, 'Composer names what it rejected');
+        self::assertStringNotContainsString("\n", $why, 'the first line of Composer\'s message');
     }
 
-    public function testAReadableConfigCarriesNoNote(): void
+    public function testAReadableConfigSaysNothingIsWrong(): void
     {
-        self::assertNull(AdvisoryIgnore::fromConfig(new Config(false))->note());
-        self::assertNull(AdvisoryIgnore::none()->note());
-        self::assertNull(AdvisoryIgnore::fromRaw(['PKSA-1'], [])->note());
+        self::assertNull(AdvisoryIgnore::fromConfig(new Config(false))->whyUnreadable());
+        self::assertNull(AdvisoryIgnore::none()->whyUnreadable());
+        self::assertNull(AdvisoryIgnore::fromRaw(['PKSA-1'], [])->whyUnreadable());
     }
 
     public function testAnEmptyConfigIgnoresNothing(): void

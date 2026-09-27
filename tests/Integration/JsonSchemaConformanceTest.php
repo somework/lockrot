@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Integration;
 
+use Composer\Downloader\TransportException;
 use Composer\Repository\AdvisoryProviderInterface;
 use JsonSchema\Constraints\Constraint;
 use JsonSchema\Validator;
@@ -12,6 +13,7 @@ use Lockrot\Analyzer\Analysis;
 use Lockrot\Analyzer\Analyzer;
 use Lockrot\Analyzer\Libyears;
 use Lockrot\Analyzer\Report;
+use Lockrot\Analyzer\RunNote;
 use Lockrot\Analyzer\RunSettings;
 use Lockrot\Analyzer\TransitiveExposure;
 use Lockrot\Baseline\Baseline;
@@ -23,6 +25,7 @@ use Lockrot\Data\Forge\ActivityClient;
 use Lockrot\Data\Forge\ActivityFetchPlanner;
 use Lockrot\Data\Forge\ForgeAuth;
 use Lockrot\Data\Forge\RepoLocator;
+use Lockrot\Data\Forge\RepoRef;
 use Lockrot\Data\Forge\Tokens;
 use Lockrot\Data\Http\RecordedHttpClient;
 use Lockrot\Data\Php\PhpReleaseDates;
@@ -40,6 +43,7 @@ use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
+use Lockrot\Tests\Support\AssertsNoteDetails;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\ValidatesJsonSchemas;
@@ -61,6 +65,7 @@ use PHPUnit\Framework\TestCase;
  */
 final class JsonSchemaConformanceTest extends TestCase
 {
+    use AssertsNoteDetails;
     use ValidatesJsonSchemas;
 
     private const FIXTURES = __DIR__.'/../fixtures/';
@@ -157,6 +162,7 @@ final class JsonSchemaConformanceTest extends TestCase
         self::assertStringStartsWith("{\n    \"\$schema\": \"https://lockrot.dev/schema/report-1.json\",\n", $json);
         $this->assertValid(Schemas::REPORT, $json, $dir);
         $this->assertValid(Schemas::REPORT, $json, $dir, true);
+        self::assertNoteDetailsAgree(self::decoded($json), $dir);
     }
 
     /**
@@ -182,6 +188,7 @@ final class JsonSchemaConformanceTest extends TestCase
         $this->assertValid(Schemas::REPORT, $report, $dir.' (html payload)', true);
 
         self::assertNotSame([], (array) $payload->details, $dir.' explains the packages it flagged');
+        self::assertNoteDetailsAgree(self::decoded($report), $dir.' (html payload)');
         self::assertDoesNotMatchRegularExpression('{<script[^>]+src=}i', $page, $dir.' fetches no script');
         self::assertDoesNotMatchRegularExpression('{<link[^>]+rel="stylesheet"}i', $page, $dir.' fetches no stylesheet');
     }
@@ -205,6 +212,7 @@ final class JsonSchemaConformanceTest extends TestCase
 
         $this->assertValid(Schemas::REPORT, $json, 'a report that knows its run');
         $this->assertValid(Schemas::REPORT, $json, 'a report that knows its run', true);
+        self::assertNoteDetailsAgree(self::decoded($json), 'a report that knows its run');
 
         $decoded = json_decode($json, true);
         self::assertIsArray($decoded);
@@ -259,7 +267,7 @@ final class JsonSchemaConformanceTest extends TestCase
             $verdict = strpos($package, 'vendor/') === 0 ? Verdict::STALE : Verdict::OK;
             $findings[] = new Finding($package, '1.0.0', $verdict, [], $graph->shortestChain($package), null, $at, null, false, array_keys($graph->chainsTo($package)));
         }
-        $report = new Report(TransitiveExposure::attach($findings, $graph), [], $at, \count($findings), 0, false);
+        $report = new Report(TransitiveExposure::attach($findings, $graph), [], $at, \count($findings), 0);
 
         $json = (new JsonFormatter())->format($report);
         $decoded = json_decode($json, true);
@@ -947,6 +955,103 @@ final class JsonSchemaConformanceTest extends TestCase
     }
 
     /**
+     * Every note lockrot can write, one per code, through the published schema and its strict twin,
+     * and each of the five vocabularies open to a value a later release adds: the published schema
+     * takes it, the strict twin, which reads `x-known-values` as the enum, does not. A code the schema
+     * does not list carries any object; a listed one keeps its `data` typed. A document written
+     * before the field validates without it.
+     */
+    public function testARunNotesDataIsTypedPerCodeAndItsVocabulariesAreOpen(): void
+    {
+        $decoded = self::decoded((new JsonFormatter())->format(self::analysis('apps/wallabag_wallabag')->report()));
+        $repo = new RepoRef(RepoRef::GITLAB, 'gitlab.example.org', 'team/app');
+        $notes = [
+            RunNote::offline(),
+            RunNote::metadataUnavailable(['vendor/a' => 'HTTP 503', 'vendor/b' => "offline: not present in Composer's cache"]),
+            RunNote::monorepoParentUnavailable('laravel/framework', 'curl error 6'),
+            RunNote::advisoryIgnoreUnreadable(''),
+            RunNote::advisoriesUnavailable('packagist.org', new TransportException('HTTP 503')),
+            RunNote::advisoriesNotChecked(RunNote::INSTALL_TIME_BUDGET, 1),
+            RunNote::repositoryActivityNotChecked(),
+            RunNote::repositoryActivityAnonymousCap(RepoRef::GITHUB, 11, 80, 9),
+            RunNote::repositoryActivityRateLimited(RepoRef::GITLAB, [[$repo, 'HTTP 429']]),
+            RunNote::repositoryActivityUnreachable(RepoRef::GITLAB, [[$repo, 'curl error 7']]),
+            RunNote::repositoryActivityNotFound(RepoRef::BITBUCKET, [new RepoRef(RepoRef::BITBUCKET, 'bitbucket.org', 'workspace/one')]),
+            RunNote::notFromComposerRepository(2),
+        ];
+        self::assertSame(RunNote::CODES, array_map(static fn (RunNote $note): string => $note->code(), $notes), 'one of each');
+        $decoded['notes'] = array_map(static fn (RunNote $note): string => $note->text(), $notes);
+        $details = self::decoded((string) json_encode(array_map(static fn (RunNote $note): array => $note->toArray(), $notes)));
+        // Decoded to arrays, the offline note's `{}` would come back as a list.
+        $details[0] = array_merge(JsonPath::arrayAt($details, [0]), ['data' => new \stdClass()]);
+        $decoded['note_details'] = $details;
+        $this->assertValid(Schemas::REPORT, (string) json_encode($decoded), 'every code');
+        $this->assertValid(Schemas::REPORT, (string) json_encode($decoded), 'every code', true);
+
+        $open = [
+            'a code' => [['note_details', 0, 'code'], 'licence_scan_skipped', 'offlin', 'code'],
+            'a metadata reason' => [['note_details', 1, 'data', 'reasons', 0, 'reason'], 'dns_failed', 'fetch_faild', 'reason'],
+            'a monorepo parent\'s reason' => [['note_details', 2, 'data', 'reason'], 'dns_failed', 'no_version', 'reason'],
+            'an advisory reason' => [['note_details', 5, 'data', 'reason'], 'quota_exhausted', 'composer_to_old', 'reason'],
+            'an activity reason' => [['note_details', 6, 'data', 'reason'], 'offline', 'install_time_budgt', 'reason'],
+            'a forge id' => [['note_details', 7, 'data', 'forge_id'], 'forgejo', 'githbu', 'forge_id'],
+        ];
+        foreach ($open as $what => [$path, $later, $typo, $property]) {
+            $this->assertValid(Schemas::REPORT, self::changed($decoded, $path, $later), $what.': a value a later release adds');
+            $mistyped = self::changed($decoded, $path, $typo);
+            $this->assertValid(Schemas::REPORT, $mistyped, $what.': the published schema cannot tell a typo from a new value');
+            $errors = $this->errors(Schemas::REPORT, $mistyped, true);
+            self::assertNotSame([], array_filter($errors, static fn (string $error): bool => strpos($error, $property) !== false), $what.': '.implode("\n", $errors));
+        }
+        $extension = self::changed($decoded, ['note_details', 0], ['code' => 'acme:licence', 'text' => 'x', 'docs_url' => null, 'sets_network_failures' => false, 'data' => ['anything' => [1]]]);
+        $this->assertValid(Schemas::REPORT, $extension, 'a code that does not come from lockrot, with data of its own and no page');
+        $this->assertValid(Schemas::REPORT, self::changed($decoded, ['note_details', 0, 'docs_url'], null), 'no page', true);
+
+        foreach ([
+            'a code in capitals' => [['note_details', 0, 'code'], 'Offline'],
+            'a code with two colons' => [['note_details', 0, 'code'], 'acme:lint:licence'],
+            'offline data as a list' => [['note_details', 0, 'data'], []],
+            'a known code with another code\'s data' => [['note_details', 1, 'data'], ['message' => 'x']],
+            'a count of no packages' => [['note_details', 11, 'data', 'package_count'], 0],
+            'an unreachable note naming no repository' => [['note_details', 9, 'data', 'repositories'], []],
+            'a repository without its host' => [['note_details', 10, 'data', 'repositories', 0], ['repo' => 'workspace/one']],
+            'sets_network_failures as a word' => [['note_details', 0, 'sets_network_failures'], 'no'],
+            'a docs_url that is a number' => [['note_details', 0, 'docs_url'], 1],
+            'a note without its data' => [['note_details', 0], ['code' => 'offline', 'text' => 'x', 'docs_url' => null, 'sets_network_failures' => false]],
+        ] as $what => [$path, $value]) {
+            self::assertNotSame([], $this->errors(Schemas::REPORT, self::changed($decoded, $path, $value), false), $what);
+        }
+
+        $before = $decoded;
+        unset($before['note_details']);
+        $this->assertValid(Schemas::REPORT, (string) json_encode($before), 'a document written before note_details');
+        $this->assertValid(Schemas::REPORT, (string) json_encode($before), 'a document written before note_details', true);
+
+        $analysis = self::analysis('apps/wallabag_wallabag');
+        $finding = $analysis->finding('doctrine/cache');
+        $facts = $analysis->facts('doctrine/cache');
+        self::assertNotNull($finding);
+        self::assertNotNull($facts);
+        $explained = self::decoded((new ExplainFormatter())->json(new Explanation($finding, $facts, new Thresholds(), '8.4', $analysis->report())));
+        $explained['notes'] = $decoded['notes'];
+        $explained['note_details'] = $decoded['note_details'];
+        $this->assertValid(Schemas::EXPLAIN, (string) json_encode($explained), 'every code in an explanation', true);
+        $this->assertValid(Schemas::EXPLAIN, self::changed($explained, ['note_details', 7, 'data', 'forge_id'], 'forgejo'), 'an explanation with a forge a later release adds');
+        self::assertNotSame([], $this->errors(Schemas::EXPLAIN, self::changed($explained, ['note_details', 7, 'data', 'forge_id'], 'forgejo'), true));
+        unset($explained['note_details']);
+        $this->assertValid(Schemas::EXPLAIN, (string) json_encode($explained), 'an explanation written before note_details', true);
+    }
+
+    /** @return array<mixed, mixed> */
+    private static function decoded(string $json): array
+    {
+        $decoded = json_decode($json, true);
+        self::assertIsArray($decoded);
+
+        return $decoded;
+    }
+
+    /**
      * $document with the value at $path replaced, encoded.
      *
      * @param array<mixed, mixed> $document
@@ -1071,6 +1176,7 @@ final class JsonSchemaConformanceTest extends TestCase
             self::assertStringStartsWith("{\n    \"\$schema\": \"https://lockrot.dev/schema/explain-1.json\",\n", $json);
             $this->assertValid(Schemas::EXPLAIN, $json, $package);
             $this->assertValid(Schemas::EXPLAIN, $json, $package, true);
+            self::assertNoteDetailsAgree(self::decoded($json), $package);
         }
     }
 
@@ -1171,6 +1277,7 @@ final class JsonSchemaConformanceTest extends TestCase
         self::assertSame(['max_fan_in' => 8], $decoded['exposure_rule']);
         $this->assertValid(Schemas::REPORT, $json, 'a lock without its composer.json');
         $this->assertValid(Schemas::REPORT, $json, 'a lock without its composer.json', true);
+        self::assertNoteDetailsAgree($decoded, 'a lock without its composer.json');
         $run = JsonPath::arrayAt($decoded, ['run']);
         self::assertArrayHasKey('root_package', $run);
         self::assertNull($run['root_package']);

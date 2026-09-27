@@ -67,17 +67,19 @@ Objects are open, and so are the sets of values that grow in minor releases: sig
 explanation's `php_blocked_by`, which holds the same values, the explanation's `misses_target_php`
 and `misses_project_php`, a finding's `libyears_unmeasured`, a `priority_basis` step's `reason`, a
 `no_fix_expected` item's `reason`, `run.mode`, `run.fail_on_kind`, `gate.tripped_by`, a finding's
-`gate.exempt_by`, and the configuration's `format`. Each is a string with a
+`gate.exempt_by`, a run note's `code`, and the `forge_id` and `reason` in its `data`, and the
+configuration's `format`. Each is a string with a
 `pattern`, plus an `x-known-values` list of the values this release writes. A validator ignores a
 keyword draft-04 does not define, so a copy of the schema taken from 0.13.0 on accepts a signal, a
 reason, a floor, a way a branch misses a floor, a priority step, a kind of run or of threshold, a
-cause that failed a run, an exemption or a format that a later release adds, and a signal or format named `<vendor>:<name>`, the form reserved for those that do not come
+cause that failed a run, an exemption, a run note, a repository host or a format that a later release adds, and a signal, note code or format named `<vendor>:<name>`, the form reserved for those that do not come
 from lockrot ([compatibility.md](compatibility.md#names-reserved-for-extensions)). The vendor and
 the name are each lower-case letters, digits, `_`, `.` and `-`, starting with a letter or a digit;
 `acme:licence` validates, `Acme:Licence` does not.
 
 - A signal whose id the schema does not list validates with any object as its `data`. A listed id
   still has its `data` typed: S2's id with S4's data fails, and so does S2's id with no data at all.
+  A run note's `data` is typed per `code` the same way.
 - Read a value you do not know as "other": show it as written, and do not fail on it.
 - `x-known-values` only grows under one number, and every value in it matches the `pattern`. To hold
   a document to the values you know, read `x-known-values` as an `enum`. lockrot's own tests do that,
@@ -178,6 +180,14 @@ consumer usually keys on:
   `tripped_by` holds `fail_on` exactly when some finding's `fails` is true. Both `gate` keys are
   optional in the schema, so documents written before 0.13.0 validate. See
   [ci.md](ci.md#exit-codes).
+- `note_details`, from 0.13.0, is the run's notes typed: one entry per `notes` string, at the same
+  index and with the same `text`, each with a `code`, a `data` object typed per code (`{}` for a code
+  with no parameters), a `docs_url` to the code's section of [notes.md](notes.md) (null means no
+  page), and `sets_network_failures`. The root `network_failures` is true exactly when an entry's
+  `sets_network_failures` is. A code can repeat, so an entry is identified by its index. It is
+  optional in the schema, so documents written before 0.13.0 validate; from 0.13.0 on it is always
+  written, `[]` when `notes` is. The `--explain` document carries the same list beside its `notes`.
+  `notes` is unchanged: key on `note_details`, not on the sentences.
 - Each finding carries `baseline`, where it stands against the baseline file (`known`, `new` or
   `worsened`, with the verdict the baseline accepted), or null when the run read none. The report's
   own `baseline` block still carries the totals; this is the same judgement per finding, which is
