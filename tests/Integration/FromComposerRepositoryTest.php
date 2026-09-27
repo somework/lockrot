@@ -192,7 +192,9 @@ final class FromComposerRepositoryTest extends TestCase
         self::assertIsArray($lock);
         $entries = [];
         foreach (['packages' => false, 'packages-dev' => true] as $section => $dev) {
-            foreach ($lock[$section] ?? [] as $entry) {
+            $rows = $lock[$section] ?? [];
+            self::assertIsArray($rows);
+            foreach ($rows as $entry) {
                 self::assertIsArray($entry);
                 self::assertIsString($entry['name']);
                 $url = $entry['notification-url'] ?? null;
