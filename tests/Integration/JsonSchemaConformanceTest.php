@@ -803,6 +803,9 @@ final class JsonSchemaConformanceTest extends TestCase
      */
     public function testAFindingSaysHowItsPriorityWasReached(): void
     {
+        if (!interface_exists(AdvisoryProviderInterface::class)) {
+            self::markTestSkipped('Composer 2.2 has no advisory API, so doctrine/cache carries no S9.');
+        }
         foreach (self::documentsFor('doctrine/cache') as $schema => [$decoded, $path]) {
             $basis = JsonPath::arrayAt($decoded, array_merge($path, ['priority_basis']));
             self::assertSame(['base' => 'critical', 'steps' => [['reason' => 'transitive', 'from' => 'critical', 'to' => 'high'], ['reason' => 'no_fix_expected', 'from' => 'high', 'to' => 'critical']]], $basis, $schema.': doctrine/cache, abandoned, transitive, one advisory no release fixes');
@@ -840,6 +843,9 @@ final class JsonSchemaConformanceTest extends TestCase
      */
     public function testAFindingNamesTheAdvisoriesNoFixIsExpectedFor(): void
     {
+        if (!interface_exists(AdvisoryProviderInterface::class)) {
+            self::markTestSkipped('Composer 2.2 has no advisory API, so doctrine/cache carries no S9.');
+        }
         foreach (self::documentsFor('doctrine/cache') as $schema => [$decoded, $path]) {
             self::assertSame([['id' => 'PKSA-cache-1', 'reason' => 'no_release_fixes']], JsonPath::arrayAt($decoded, $path)['no_fix_expected'], $schema.': 2.2.0 is the highest release, and the range covers it');
             $item = static fn (string $reason): array => [['id' => 'PKSA-cache-1', 'reason' => $reason]];
@@ -870,6 +876,9 @@ final class JsonSchemaConformanceTest extends TestCase
     /** S9's `releases_read` is an optional boolean in the report schema; the explain schema types signal data as any object. */
     public function testS9SaysWhetherTheReleasesWereRead(): void
     {
+        if (!interface_exists(AdvisoryProviderInterface::class)) {
+            self::markTestSkipped('Composer 2.2 has no advisory API, so doctrine/cache carries no S9.');
+        }
         [$report] = self::documentsFor('doctrine/cache')[Schemas::REPORT];
         $signals = JsonPath::arrayAt($report, ['findings', 0, 'signals']);
         $at = array_search(Signal::S9, array_column($signals, 'id'), true);
