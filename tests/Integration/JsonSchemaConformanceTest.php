@@ -468,11 +468,16 @@ final class JsonSchemaConformanceTest extends TestCase
     }
 
     /**
-     * A branch row's `php_blocked_by` is an open set: a value a later release adds validates against
-     * the explain schema this release publishes, and the strict twin, which reads `x-known-values` as
-     * the enum, rejects it. The values lockrot writes, and null, pass both.
+     * A branch row's `php_blocked_by` and `misses_*_php` are open sets: a value a later release adds
+     * validates against the explain schema this release publishes, and the strict twin, which reads
+     * `x-known-values` as the enum, rejects it. The values lockrot writes, and null, pass both.
+     *
+     * @param list<?string> $known
+     *
+     * @dataProvider openRowFields
      */
-    public function testTheExplanationsPhpBlockedByIsOpenToALaterValue(): void
+    #[DataProvider('openRowFields')]
+    public function testAnOpenBranchRowFieldIsOpenToALaterValue(string $field, array $known): void
     {
         $analysis = self::analysis('apps/wallabag_wallabag');
         $finding = $analysis->finding('doctrine/cache');
@@ -480,26 +485,35 @@ final class JsonSchemaConformanceTest extends TestCase
         self::assertNotNull($finding);
         self::assertNotNull($facts);
         $json = (new ExplainFormatter())->json(new Explanation($finding, $facts, new Thresholds(), '8.4', $analysis->report()));
-        $withBlockedBy = static function ($value) use ($json): string {
+        $withValue = static function ($value) use ($json, $field): string {
             $document = self::object(json_decode($json));
             $rows = self::items(self::object($document->metadata)->branches);
             self::assertNotSame([], $rows, 'doctrine/cache lists its branches');
-            self::object($rows[0])->php_blocked_by = $value;
+            self::object($rows[0])->{$field} = $value;
 
             return (string) json_encode($document);
         };
 
-        foreach ([PhpFloor::PROJECT, PhpFloor::TARGET, null] as $known) {
-            $this->assertValid(Schemas::EXPLAIN, $withBlockedBy($known), (string) $known);
-            $this->assertValid(Schemas::EXPLAIN, $withBlockedBy($known), (string) $known, true);
+        foreach (array_merge($known, [null]) as $value) {
+            $this->assertValid(Schemas::EXPLAIN, $withValue($value), $field.' '.(string) $value);
+            $this->assertValid(Schemas::EXPLAIN, $withValue($value), $field.' '.(string) $value, true);
         }
-        $unknown = $withBlockedBy('extension');
+        $unknown = $withValue('extension');
         $this->assertValid(Schemas::EXPLAIN, $unknown, 'a value this release does not know');
         $errors = $this->errors(Schemas::EXPLAIN, $unknown, true);
-        self::assertNotSame([], array_filter($errors, static fn (string $error): bool => strpos($error, 'php_blocked_by') !== false), 'the strict twin holds php_blocked_by to the values it knows: '.implode("\n", $errors));
-        foreach (['', 'Project', 1] as $wrong) {
-            self::assertNotSame([], $this->errors(Schemas::EXPLAIN, $withBlockedBy($wrong), false), 'not a php_blocked_by: '.json_encode($wrong));
+        self::assertNotSame([], array_filter($errors, static fn (string $error): bool => strpos($error, $field) !== false), 'the strict twin holds '.$field.' to the values it knows: '.implode("\n", $errors));
+        foreach (['', 'Project', 'needs-newer', 1] as $wrong) {
+            self::assertNotSame([], $this->errors(Schemas::EXPLAIN, $withValue($wrong), false), 'not a '.$field.': '.json_encode($wrong));
         }
+    }
+
+    /** @return iterable<string, array{string, list<?string>}> */
+    public static function openRowFields(): iterable
+    {
+        $sides = [PhpFloor::NEEDS_NEWER, PhpFloor::STOPS_BEFORE, PhpFloor::SKIPS, PhpFloor::UNSATISFIABLE];
+        yield 'php_blocked_by' => ['php_blocked_by', [PhpFloor::PROJECT, PhpFloor::TARGET]];
+        yield 'misses_target_php' => ['misses_target_php', $sides];
+        yield 'misses_project_php' => ['misses_project_php', $sides];
     }
 
     /**

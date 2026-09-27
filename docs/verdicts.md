@@ -197,8 +197,18 @@ requires no PHP is within reach of anything; its row reads `php_blocked_by: null
 tested, the installed one and those below it too, though S8 only reads the dated branches above the
 installed one. A row's php is its branch's newest dated release's, which may be the version you
 have installed or a newer one. So on the installed row `project` says the newest dated release of
-your branch needs more PHP than the lowest `require.php` promises; it does not by itself say the
-version you have installed does, whose own requirement is the explanation's `lock.php`.
+your branch does not admit the lowest PHP `require.php` promises; it does not by itself say the
+version you have installed does not, whose own requirement is the explanation's `lock.php`.
+
+A row also says which side of each floor it misses, one answer per floor, so a branch that misses
+both — `~8.3.0` against `require.php` `>=8.2` and target 8.4 — shows both though
+`php_blocked_by` names only the project: `misses_target_php` and `misses_project_php` are
+`needs_newer` when everything the row's php admits is above the floor (symfony 8.x's `>=8.4.1`
+against `>=8.2`: move PHP up), `stops_before` when everything it admits is below it (`>=7.2 <8.4`
+against 8.4: move to another branch), `skips` when it admits PHP on both sides but not the floor
+(`^7.4 || ~8.2.0` against 8.1), and `unsatisfiable` when it admits no PHP at all. Each reads its
+floor as the `admits_*` beside it does — the target as a whole minor, the project as the lowest
+version `require.php` names — and is null exactly where that `admits_*` is not false.
 The report names both floors in `run`: `target_php`, and `project_php`, the `require.php` exactly as
 composer.json writes it.
 

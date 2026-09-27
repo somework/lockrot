@@ -262,11 +262,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   such a branch as within reach, and `php_blocked_by` is null for it. The row is tested whatever its
   place, so the installed branch can read `project` too. Its row's `php` is the requirement of
   that branch's newest dated release, which may be the installed version or a newer one, so
-  `project` there means the newest dated release of your branch needs more PHP than the lowest
+  `project` there means the newest dated release of your branch does not admit the lowest PHP
   `require.php` promises; the installed version's own requirement is `lock.php`. The document also gains `project_php`, the `require.php` the rows were
   tested against, next to `target_php`. `php_blocked_by` is described as an open string, not an
   enum, so a later value is not a schema break. Nothing S8 decides changes, nor the `--explain`
   text, the report or any other format; the explain schema only gains optional fields.
+
+- Each branch row also says which side of a floor it misses, one answer per floor:
+  `misses_target_php` and `misses_project_php`. `php_blocked_by` says which floor holds the branch
+  back, not which way, and the two ways ask different things of you: `needs_newer` (everything the
+  row's `php` admits is above the floor — symfony 8.x's `>=8.4.1` against `require.php` `>=8.2`:
+  raise PHP) and `stops_before` (everything it admits is below it — `>=7.2 <8.4` against target 8.4:
+  change branch). Over the 39-project corpus the blocked rows split about evenly between the two.
+  `skips` is a floor in a hole between the ranges `php` admits (`^7.4 || ~8.2.0` against 8.1), and
+  `unsatisfiable` a `php` that admits no PHP at all. Each floor answers on its own, so a row that
+  misses both, each its own way (`~8.3.0` against `>=8.2` and 8.4), shows both although
+  `php_blocked_by` names only the project. The installed row answers too: its branch's newest
+  release stopping before the target means moving to 8.4 takes another branch. Each field reads its
+  floor exactly as the `admits_*` beside it does, and is null exactly where that `admits_*` is not
+  false; a test holds this on every row of every fixture lock. The page can now say "needs a newer
+  PHP" or "stops before PHP 8.4" and quote `php` as written, without parsing a constraint. Both are
+  open strings with `x-known-values`, like `php_blocked_by`, and optional. Nothing else changes:
+  not S8, the `--explain` text, the report or any other format.
 
 - The JSON report states the rule behind `exposure`, and lists what that rule gives to nobody.
   `exposure` counts a flagged transitive package under each direct requirement that reaches it only

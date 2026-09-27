@@ -49,6 +49,10 @@ final class BranchFloorAgreementTest extends TestCase
 
     private const FIXTURES = __DIR__.'/../fixtures/';
     private const NOW = '2026-09-14T00:00:00+00:00';
+    private const SIDES = [PhpFloor::NEEDS_NEWER, PhpFloor::STOPS_BEFORE, PhpFloor::SKIPS, PhpFloor::UNSATISFIABLE];
+
+    /** @var array<string, true> every `<floor> <side>` the rows gave, so the check is seen to bite */
+    private array $sides = [];
 
     /**
      * Every fixture lock served at once, so a package has every branch any of them locks. That much
@@ -108,6 +112,12 @@ final class BranchFloorAgreementTest extends TestCase
         // Rows answering both ways went through the schema, not only rows with nothing to say.
         self::assertArrayHasKey('NULL', $validated, 'a row within reach, validated');
         self::assertArrayHasKey("'project'", $validated, 'a row wallabag\'s own php >=8.2 holds back, validated');
+        ksort($this->sides);
+        self::assertSame(
+            ['project needs_newer', 'project stops_before', 'target needs_newer', 'target stops_before'],
+            array_keys(array_intersect_key($this->sides, array_flip(['project needs_newer', 'project stops_before', 'target needs_newer', 'target stops_before']))),
+            'rows missing a floor from either side, or the side check proves little'
+        );
     }
 
     /**
@@ -179,6 +189,18 @@ final class BranchFloorAgreementTest extends TestCase
             // The row's verdict is its two answers read in S8's order, and null is no answer.
             $composed = $row['admits_project_php'] === false ? PhpFloor::PROJECT : ($row['admits_target_php'] === false ? PhpFloor::TARGET : null);
             self::assertSame($composed, $blockedBy, $what.' '.$row['branch']);
+            // Which side of each floor the row is on: given exactly where the floor is not
+            // admitted, whichever floor php_blocked_by names.
+            foreach ([PhpFloor::TARGET, PhpFloor::PROJECT] as $kind) {
+                $side = $row['misses_'.$kind.'_php'];
+                if ($row['admits_'.$kind.'_php'] === false) {
+                    self::assertContains($side, self::SIDES, $what.' '.$row['branch'].' '.$kind);
+                    self::assertIsString($side);
+                    $this->sides[$kind.' '.$side] = true;
+                } else {
+                    self::assertNull($side, $what.' '.$row['branch'].' '.$kind.': admitted or no answer');
+                }
+            }
             if ($row['php'] === null) {
                 self::assertNull($row['admits_target_php'], $what.': no requirement is no answer');
                 self::assertNull($row['admits_project_php'], $what.': no requirement is no answer');

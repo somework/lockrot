@@ -27,6 +27,15 @@ final class PhpFloor
     public const PROJECT = 'project';
     public const TARGET = 'target';
 
+    /** Every PHP the branch's php admits is above the floor: it needs a newer PHP. */
+    public const NEEDS_NEWER = 'needs_newer';
+    /** Every PHP the branch's php admits is below the floor: its support stops before it. */
+    public const STOPS_BEFORE = 'stops_before';
+    /** The branch's php admits PHP below the floor and above it, not the floor itself. */
+    public const SKIPS = 'skips';
+    /** The branch's php admits no PHP at all (`>=9 <8`, a branch name), so the floor has no side. */
+    public const UNSATISFIABLE = 'unsatisfiable';
+
     private VersionParser $parser;
     /** The whole target minor, `>=8.4.0 <8.5.0`; null when no target was given or it is not a version. */
     private ?ConstraintInterface $targetMinor;
@@ -89,6 +98,39 @@ final class PhpFloor
         return $this->targetAdmits($this->parse($constraint));
     }
 
+    /**
+     * Which side of the target PHP minor a branch with this php requirement is on, when it admits
+     * no version of it: {@see self::NEEDS_NEWER}, {@see self::STOPS_BEFORE}, {@see self::SKIPS} or
+     * {@see self::UNSATISFIABLE}. Null exactly where {@see self::admitsTarget()} is not false: the
+     * target is admitted, or there is no answer.
+     */
+    public function missesTarget(?string $constraint): ?string
+    {
+        $parsed = $this->parse($constraint);
+
+        if ($parsed === null || $this->targetMinor === null || Intervals::haveIntersections($parsed, $this->targetMinor)) {
+            return null;
+        }
+
+        return self::side($parsed, $this->targetMinor);
+    }
+
+    /**
+     * Which side of the project's lowest PHP a branch with this php requirement is on, when it does
+     * not admit it; the same answers as {@see self::missesTarget()}. Null exactly where
+     * {@see self::admitsProject()} is not false.
+     */
+    public function missesProject(?string $constraint): ?string
+    {
+        $parsed = $this->parse($constraint);
+
+        if ($parsed === null || $this->projectLowest === null || $parsed->matches($this->projectLowest)) {
+            return null;
+        }
+
+        return self::side($parsed, $this->projectLowest);
+    }
+
     /** The floor named in a sentence: `the project's php >=7.2.5`, `the target PHP 7.2`. */
     public function describe(string $kind): string
     {
@@ -129,6 +171,27 @@ final class PhpFloor
         }
 
         return Intervals::haveIntersections($constraint, $this->targetMinor);
+    }
+
+    /**
+     * Where a php requirement that admits nothing of the floor lies against it: whether it admits
+     * anything below the floor's lower bound, and anything above its upper bound. The floor is the
+     * target minor (`>=8.4.0.0-dev <8.5.0.0-dev`) or the project's point (`== 8.2.0.0-dev`): both
+     * start at a bound they include, and only the target's end is left out of it.
+     */
+    private static function side(ConstraintInterface $php, ConstraintInterface $floor): string
+    {
+        $upper = $floor->getUpperBound();
+        $below = Intervals::haveIntersections($php, new Constraint('<', $floor->getLowerBound()->getVersion()));
+        $above = Intervals::haveIntersections($php, new Constraint($upper->isInclusive() ? '>' : '>=', $upper->getVersion()));
+        if ($below && $above) {
+            return self::SKIPS;
+        }
+        if ($above) {
+            return self::NEEDS_NEWER;
+        }
+
+        return $below ? self::STOPS_BEFORE : self::UNSATISFIABLE;
     }
 
     /** @return array{0: ?ConstraintInterface, 1: ?string} */
