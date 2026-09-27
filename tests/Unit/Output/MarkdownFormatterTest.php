@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Output;
 
+use Lockrot\Analyzer\LibyearsMeasurement;
 use Lockrot\Analyzer\Report;
 use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineComparison;
@@ -128,8 +129,8 @@ final class MarkdownFormatterTest extends TestCase
     {
         $at = new \DateTimeImmutable(self::AT);
         $report = new Report([
-            new Finding('acme/leaf', '1.0.0', Verdict::STALE, [new Signal('S2', 'warn', 'old')], ['a/parent', 'acme/leaf'], null, $at, null, false, ['a/parent'], 2.3),
-            new Finding('acme/<b>', '1.0.0', Verdict::STALE, [new Signal('S2', 'warn', 'old')], ['acme/<b>'], null, $at, null, false, ['acme/<b>'], 1.0),
+            new Finding('acme/leaf', '1.0.0', Verdict::STALE, [new Signal('S2', 'warn', 'old')], ['a/parent', 'acme/leaf'], null, $at, null, false, ['a/parent'], LibyearsMeasurement::of(2.3)),
+            new Finding('acme/<b>', '1.0.0', Verdict::STALE, [new Signal('S2', 'warn', 'old')], ['acme/<b>'], null, $at, null, false, ['acme/<b>'], LibyearsMeasurement::of(1.0)),
         ], [], $at, 2, 0, false);
         $lines = explode("\n", $this->formatter()->format($report));
         $libyears = array_search('libyears: 3.3 behind across all 2 packages · 1.0 from direct requirements · furthest behind acme/leaf 1.0.0 at 2.3', $lines, true);

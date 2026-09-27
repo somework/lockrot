@@ -17,8 +17,8 @@ namespace Lockrot\Json;
  *
  * Objects are open, and so are the sets of values that grow in minor releases: signal ids (a
  * signal's `id`, and each entry of S10's `blocks` array), S10's `check` and `reason`, S8's
- * `floor_source`, S6's `reason`, the explain document's `php_blocked_by` and `misses_*_php`, and the
- * config schema's `format` are strings with a `pattern` and an `x-known-values` list of what this release writes
+ * `floor_source`, S6's `reason`, the explain document's `php_blocked_by` and `misses_*_php`, a
+ * finding's `libyears_unmeasured`, and the config schema's `format` are strings with a `pattern` and an `x-known-values` list of what this release writes
  * ({@see KnownValues}), and the report types a signal whose id it does not list with a generic
  * branch that takes any object as its data. A copy fetched from 0.13.0 on accepts a value a later
  * release adds; the closed sets — verdicts, priorities, levels, standings, a baseline entry's

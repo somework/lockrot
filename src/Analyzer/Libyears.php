@@ -24,7 +24,7 @@ use Lockrot\Verdict\Finding;
  * three years for a 3.x it will never need. Nothing about "now" enters either: two dates the run
  * already holds, so the number is stable on recorded fixtures and needs no clock.
  *
- * The per-package rule is {@see behind()}; the block a report carries is {@see fromFindings()},
+ * The per-package rule is {@see measure()}; the block a report carries is {@see fromFindings()},
  * derived from the findings so that every number in it can be checked against them by arithmetic.
  * Not php-libyear's number: that tool reads composer.json and sums the direct requirements only;
  * lockrot sums the whole lock, and {@see direct()} is the bridge between the two.
@@ -48,7 +48,7 @@ final class Libyears
     /** Metadata was asked for and did not come: not listed, offline, budget, transport. */
     public const METADATA_UNAVAILABLE = 'metadata_unavailable';
 
-    /** The reasons a package goes unmeasured, in the order the block lists them. */
+    /** The reasons a package goes unmeasured, in the order the block lists them; {@see measure()} checks them in another. */
     public const REASONS = [self::BRANCH_SNAPSHOT, self::NO_STABLE_RELEASE_DATE, self::NOT_FROM_COMPOSER_REPOSITORY, self::METADATA_UNAVAILABLE];
 
     /** Decimals the block and each finding print; the sums are taken before rounding. */
@@ -84,26 +84,39 @@ final class Libyears
      * The per-package rule: the newest stable release's date minus the installed version's, in
      * years of 365.25 days, never below zero — a lock on a pre-release above the last stable, or on
      * a tag the repository no longer lists, is measured and is not behind. Null when the package
-     * is not measured, in the order {@see reasonFor()} files it: outside every Composer repository,
-     * without metadata, a branch snapshot, or without a date to trust for one of the two ends. The
-     * date is the repository's for the newest release ({@see PackageMetadata::lastStableReleaseAt()})
-     * and the lock's for the installed one.
+     * is not measured; {@see measure()} says why. The date is the repository's for the newest
+     * release ({@see PackageMetadata::lastStableReleaseAt()}) and the lock's for the installed one.
      */
     public static function behind(LockedPackage $package, ?PackageMetadata $metadata): ?float
     {
-        if (!$package->isFromComposerRepository() || $metadata === null) {
-            return null;
+        return self::measure($package, $metadata)->years();
+    }
+
+    /**
+     * {@see behind()}, with the reason on each way out that gives no number, in the order they are
+     * checked: outside every Composer repository, without metadata, a branch snapshot, or without a
+     * date to trust for one of the two ends. The finding stores the result, so the reason the report
+     * counts is the one decided here, not read back off the finding's note.
+     */
+    public static function measure(LockedPackage $package, ?PackageMetadata $metadata): LibyearsMeasurement
+    {
+        if (!$package->isFromComposerRepository()) {
+            return LibyearsMeasurement::unmeasured(self::NOT_FROM_COMPOSER_REPOSITORY);
         }
+        if ($metadata === null) {
+            return LibyearsMeasurement::unmeasured(self::METADATA_UNAVAILABLE);
+        }
+        // A branch is never dated as a release, with a lock `time` or without one.
         $installed = InstalledRelease::of($package, $metadata)->at();
         if ($installed === null) {
-            return null;
+            return LibyearsMeasurement::unmeasured($package->isBranchSnapshot() ? self::BRANCH_SNAPSHOT : self::NO_STABLE_RELEASE_DATE);
         }
         $latest = $metadata->lastStableReleaseAt() ?? self::newestTrustedDateAbove($metadata, $package->version());
         if ($latest === null) {
-            return null;
+            return LibyearsMeasurement::unmeasured(self::NO_STABLE_RELEASE_DATE);
         }
 
-        return max(0.0, ($latest->getTimestamp() - $installed->getTimestamp()) / Clock::SECONDS_PER_YEAR);
+        return LibyearsMeasurement::of(max(0.0, ($latest->getTimestamp() - $installed->getTimestamp()) / Clock::SECONDS_PER_YEAR));
     }
 
     /**
@@ -166,7 +179,8 @@ final class Libyears
         foreach ($findings as $finding) {
             $behind = $finding->libyears();
             if ($behind === null) {
-                ++$unmeasured[self::reasonFor($finding)];
+                // The measurement sets the reason whenever it sets no years; the fallback is for the type.
+                ++$unmeasured[$finding->libyearsUnmeasured() ?? self::NO_STABLE_RELEASE_DATE];
                 continue;
             }
             ++$measured;
@@ -187,33 +201,16 @@ final class Libyears
     }
 
     /**
-     * Why a finding carries no value, read off what the finding already says: the note names a
-     * package no repository was asked about or one whose metadata did not come
-     * ({@see Analyzer::buildFinding()} sets it in exactly those cases), a dev version is a snapshot,
-     * and what is left had metadata and no pair of dates to compare.
-     */
-    private static function reasonFor(Finding $finding): string
-    {
-        $note = $finding->note();
-        if ($note === Finding::NOTE_NOT_IN_REPOSITORY) {
-            return self::NOT_FROM_COMPOSER_REPOSITORY;
-        }
-        if ($note !== null) {
-            return self::METADATA_UNAVAILABLE;
-        }
-        if (LockedPackage::isSnapshotVersion($finding->version())) {
-            return self::BRANCH_SNAPSHOT;
-        }
-
-        return self::NO_STABLE_RELEASE_DATE;
-    }
-
-    /**
-     * {@see reasonFor()} in the words a reader gets, rather than the key the report counts under.
-     * Every key has one: the map is over {@see REASONS}.
+     * The finding's {@see Finding::libyearsUnmeasured()} in the words a reader gets, rather than the
+     * key the report counts under. Every key has words: the map is over {@see REASONS}, the only
+     * reasons a measurement takes.
      */
     public static function reasonWords(Finding $finding): string
     {
+        $reason = $finding->libyearsUnmeasured();
+        if ($reason === null) {
+            throw new \LogicException(\sprintf('%s was measured, so there is no reason to put into words.', $finding->package()));
+        }
         $words = [
             self::BRANCH_SNAPSHOT => 'branch snapshot',
             self::NO_STABLE_RELEASE_DATE => 'no release date lockrot trusts',
@@ -221,7 +218,7 @@ final class Libyears
             self::METADATA_UNAVAILABLE => 'metadata unavailable',
         ];
 
-        return $words[self::reasonFor($finding)];
+        return $words[$reason];
     }
 
     /**

@@ -71,6 +71,11 @@ final class SchemaWideningTest extends TestCase
         yield 's6 reason loses no_stable_release' => [Schemas::REPORT, 's6-reason-dropped', '/properties/data/properties/reason: no longer accepts "no_stable_release"'];
         yield 'finding from_composer_repository made required' => [Schemas::REPORT, 'provenance-required', 'made required from_composer_repository'];
         yield 'explain finding from_composer_repository made required' => [Schemas::EXPLAIN, 'provenance-required', 'made required from_composer_repository'];
+        yield 'finding libyears_unmeasured made required' => [Schemas::REPORT, 'unmeasured-required', 'made required libyears_unmeasured'];
+        yield 'explain finding libyears_unmeasured made required' => [Schemas::EXPLAIN, 'unmeasured-required', 'made required libyears_unmeasured'];
+        yield 'finding libyears_unmeasured loses null' => [Schemas::REPORT, 'unmeasured-not-null', '/properties/libyears_unmeasured/oneOf/1: no longer accepts null'];
+        yield 'finding libyears_unmeasured loses a reason' => [Schemas::REPORT, 'unmeasured-reason-dropped', '/properties/libyears_unmeasured/oneOf/0: no longer accepts "metadata_unavailable"'];
+        yield 'libyears unmeasured closed' => [Schemas::REPORT, 'unmeasured-block-closed', '/properties/unmeasured: closed, additionalProperties false'];
     }
 
     /**
@@ -103,6 +108,7 @@ final class SchemaWideningTest extends TestCase
         yield 'a type list as oneOf' => [Schemas::REPORT, 'note-oneof'];
         yield 'a pattern dropped' => [Schemas::BASELINE, 'first-seen-any'];
         yield 'a config value added' => [Schemas::CONFIG, 'format-added'];
+        yield 'a libyears reason added' => [Schemas::REPORT, 'unmeasured-reason-added'];
     }
 
     /**
@@ -193,6 +199,27 @@ final class SchemaWideningTest extends TestCase
         self::assertSame([], SchemaWidening::narrowings($before, $current));
     }
 
+    /**
+     * `libyears_unmeasured` joined the finding in 0.13.0 as an optional open code, and the block it
+     * counts under gained a type for the keys it does not list: from the schemas without either, the
+     * current ones only widen.
+     *
+     * @dataProvider findingSchemas
+     */
+    #[DataProvider('findingSchemas')]
+    public function testTheFindingGainingLibyearsUnmeasuredIsAWidening(string $document): void
+    {
+        $current = self::current($document);
+        $before = self::without($current, ['definitions', 'finding', 'properties', 'libyears_unmeasured']);
+        if ($document === Schemas::REPORT) {
+            $before = self::without($before, ['properties', 'libyears', 'properties', 'unmeasured', 'additionalProperties']);
+            self::assertSame(['type' => 'integer', 'minimum' => 0], JsonPath::arrayAt($current, ['properties', 'libyears', 'properties', 'unmeasured', 'additionalProperties']));
+        }
+
+        self::assertNotContains('libyears_unmeasured', JsonPath::arrayAt($current, ['definitions', 'finding', 'required']));
+        self::assertSame([], SchemaWidening::narrowings($before, $current));
+    }
+
     /** @return iterable<string, array{string}> */
     public static function findingSchemas(): iterable
     {
@@ -257,6 +284,16 @@ final class SchemaWideningTest extends TestCase
                 return self::with($s, ['definitions', 'signal', 'anyOf', 0, 'required'], ['since']);
             case 'provenance-required':
                 return self::appended($s, ['definitions', 'finding', 'required'], 'from_composer_repository');
+            case 'unmeasured-required':
+                return self::appended($s, ['definitions', 'finding', 'required'], 'libyears_unmeasured');
+            case 'unmeasured-not-null':
+                return self::with($s, array_merge($finding, ['libyears_unmeasured']), JsonPath::arrayAt($s, array_merge($finding, ['libyears_unmeasured', 'oneOf', 0])));
+            case 'unmeasured-reason-dropped':
+                return self::with($s, array_merge($finding, ['libyears_unmeasured', 'oneOf', 0, KnownValues::KEYWORD]), ['branch_snapshot', 'no_stable_release_date', 'not_from_composer_repository']);
+            case 'unmeasured-reason-added':
+                return self::appended($s, array_merge($finding, ['libyears_unmeasured', 'oneOf', 0, KnownValues::KEYWORD]), 'installed_undated');
+            case 'unmeasured-block-closed':
+                return self::with($s, ['properties', 'libyears', 'properties', 'unmeasured', 'additionalProperties'], false);
             case 'run-required':
                 return self::appended($s, ['required'], 'run');
             case 'stale-integer':

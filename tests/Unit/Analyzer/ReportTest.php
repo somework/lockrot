@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Analyzer;
 
 use Lockrot\Analyzer\Libyears;
+use Lockrot\Analyzer\LibyearsMeasurement;
 use Lockrot\Analyzer\Report;
 use Lockrot\Analyzer\RunSettings;
 use Lockrot\Analyzer\TransitiveExposure;
@@ -388,9 +389,9 @@ final class ReportTest extends TestCase
     public function testTheLibyearsBlockIsTheArithmeticOverTheFindings(): void
     {
         $report = $this->report(
-            new Finding('vendor/direct', '1.0.0', Verdict::LEFT_BEHIND, [], ['vendor/direct'], null, null, null, false, [], 4.0),
-            new Finding('vendor/deep', '1.0.0', Verdict::OK, [], ['vendor/direct', 'vendor/deep'], null, null, null, false, [], 2.5),
-            new Finding('vendor/pinned', 'dev-main', Verdict::PINNED, [], ['vendor/pinned'], null, null)
+            new Finding('vendor/direct', '1.0.0', Verdict::LEFT_BEHIND, [], ['vendor/direct'], null, null, null, false, [], LibyearsMeasurement::of(4.0)),
+            new Finding('vendor/deep', '1.0.0', Verdict::OK, [], ['vendor/direct', 'vendor/deep'], null, null, null, false, [], LibyearsMeasurement::of(2.5)),
+            new Finding('vendor/pinned', 'dev-main', Verdict::PINNED, [], ['vendor/pinned'], null, null, null, false, [], LibyearsMeasurement::unmeasured(Libyears::BRANCH_SNAPSHOT))
         );
         $block = $report->libyears();
 

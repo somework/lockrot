@@ -261,7 +261,7 @@
           "minimum": 0
         },
         "unmeasured": {
-          "description": "Findings with `libyears: null`, by the first reason that applies.",
+          "description": "Findings with `libyears: null`, by the first reason that applies. Every non-null `libyears_unmeasured` on a finding is one of these keys, and each count is the number of findings carrying it. A later minor release may add a key, always written from then on but never added to `required`, since 0.13 documents would then fail. These keys are not a pattern plus x-known-values set: `required` lists the ones this release writes.",
           "type": "object",
           "required": [
             "branch_snapshot",
@@ -290,6 +290,10 @@
               "type": "integer",
               "minimum": 0
             }
+          },
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
           }
         },
         "furthest_behind": {
@@ -578,12 +582,30 @@
           ]
         },
         "libyears": {
-          "description": "Years (365.25 days) between the installed version's release and the package's newest stable release — or, when that release carries no date lockrot trusts, the newest trusted date of a release above the installed version, a lower bound — at least 0, two decimals; null when not measured: a branch snapshot, no dated stable release, not from a Composer repository, or metadata unavailable. Absent from documents written before 0.11.0.",
+          "description": "Years (365.25 days) between the installed version's release and the package's newest stable release — or, when that release carries no date lockrot trusts, the newest trusted date of a release above the installed version, a lower bound — at least 0, two decimals. Null when not measured; from 0.13.0 on, `libyears_unmeasured` says why. Absent from documents written before 0.11.0.",
           "type": [
             "number",
             "null"
           ],
           "minimum": 0
+        },
+        "libyears_unmeasured": {
+          "description": "Why `libyears` is null: the key of the report's `libyears.unmeasured` this finding is counted under. The reason is the first that applies, in this order: 1. not_from_composer_repository (a path, vcs or package entry: no metadata was asked for); 2. metadata_unavailable (asked for and did not come); 3. branch_snapshot (the installed version is a branch); 4. no_stable_release_date (no date lockrot trusts for one of the two ends; the code does not say which). The order of `x-known-values` is the block's key order, not this precedence. Null exactly where `libyears` is a number, 0 included. Counting findings by this value gives `libyears.unmeasured` key for key. An open set: a later minor release may add a reason, or split one into narrower ones, which moves findings out of the old code. Read a value you do not know as another reason the package was not measured. Optional: documents written before 0.13.0 do not carry it; from 0.13.0 on every finding does, as a string or null.",
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]*$",
+              "x-known-values": [
+                "branch_snapshot",
+                "no_stable_release_date",
+                "not_from_composer_repository",
+                "metadata_unavailable"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "baseline": {
           "$ref": "#/definitions/baselineStanding"

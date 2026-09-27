@@ -7,6 +7,7 @@ namespace Lockrot\Tests\Unit\Analyzer;
 use Lockrot\Allowlist\Allowlist;
 use Lockrot\Allowlist\AllowlistEntry;
 use Lockrot\Analyzer\Analyzer;
+use Lockrot\Analyzer\Libyears;
 use Lockrot\Analyzer\Report;
 use Lockrot\Clock;
 use Lockrot\Config\LockrotConfig;
@@ -366,6 +367,9 @@ final class AnalyzerTest extends TestCase
         self::assertContains('Repository metadata unavailable for 1 package: HTTP 503', $report->notes());
         self::assertSame('Repository metadata unavailable: HTTP 503', $report->findings()[0]->evidence());
         self::assertTrue($report->findings()[0]->isFromComposerRepository(), 'a note, and still a package a repository was asked about');
+        self::assertNull($report->findings()[0]->libyears());
+        self::assertSame(Libyears::METADATA_UNAVAILABLE, $report->findings()[0]->libyearsUnmeasured());
+        self::assertSame(1, $report->libyears()->unmeasured()[Libyears::METADATA_UNAVAILABLE]);
     }
 
     public function testTwoFailedPackagesAreCountedInThePlural(): void
@@ -456,6 +460,8 @@ final class AnalyzerTest extends TestCase
 
         self::assertEqualsWithDelta(2.0, (float) $byName['vendor/pkg']->libyears(), 0.01);
         self::assertNull($byName['vendor/pin']->libyears(), 'a branch snapshot is not measured');
+        self::assertNull($byName['vendor/pkg']->libyearsUnmeasured());
+        self::assertSame(Libyears::BRANCH_SNAPSHOT, $byName['vendor/pin']->libyearsUnmeasured());
         self::assertEqualsWithDelta(2.0, $report->libyears()->total(), 0.01);
         self::assertSame(1, $report->libyears()->unmeasured()['branch_snapshot']);
     }

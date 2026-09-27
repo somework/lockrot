@@ -65,11 +65,11 @@ describes the newest release under that number. The version that added a field i
 Objects are open, and so are the sets of values that grow in minor releases: signal ids (a
 signal's `id` and S10's `blocks`), S10's `check` and `reason`, S6's `reason`, S8's `floor_source`
 and the explanation's `php_blocked_by`, which holds the same values, the explanation's
-`misses_target_php` and `misses_project_php`, and the configuration schema's `format`. Each is a
-string with a `pattern`, plus an `x-known-values` list of the values this release writes. A
-validator ignores a keyword draft-04 does not define, so a copy of the schema taken from 0.13.0 on
-accepts a signal, a reason, a floor, a way a branch misses a floor or a format that a later release
-adds, and a signal or format named `<vendor>:<name>`, the form reserved for those that do not come
+`misses_target_php` and `misses_project_php`, a finding's `libyears_unmeasured`, and the
+configuration schema's `format`. Each is a string with a `pattern`, plus an `x-known-values` list
+of the values this release writes. A validator ignores a keyword draft-04 does not define, so a
+copy of the schema taken from 0.13.0 on accepts a signal, a reason, a floor, a way a branch misses a
+floor or a format that a later release adds, and a signal or format named `<vendor>:<name>`, the form reserved for those that do not come
 from lockrot ([compatibility.md](compatibility.md#names-reserved-for-extensions)). The vendor and
 the name are each lower-case letters, digits, `_`, `.` and `-`, starting with a letter or a digit;
 `acme:licence` validates, `Acme:Licence` does not.
@@ -189,6 +189,12 @@ consumer usually keys on:
   `unmeasured` (four reasons, every key present) and `furthest_behind`. Added in 0.11.0 under the same schema number, and optional in the schema like
   `run`, so reports written before 0.11.0 still validate; a document from 0.11.0 on always carries
   both. See [verdicts.md](verdicts.md#libyears) for the definition and what the number is not.
+- From 0.13.0 each finding also carries `libyears_unmeasured`: null when `libyears` is a number, 0
+  included, and otherwise the `unmeasured` key the finding is counted under, so counting findings by
+  it gives that block key for key. It is an open string, optional in the schema so earlier reports
+  validate, and always present from 0.13.0 on; a document without it predates the field, and its
+  absence never means "measured". The `unmeasured` block's keys grow the same way: a key a later
+  release adds is typed as a count and never joins `required`.
 - `exposure` lists a direct requirement only when it pulls in an attributable flagged package; a
   flagged direct requirement that pulls in none is not there, and its own verdict is on its finding.
   `exposure_rule` states the cap the report attributes by (`max_fan_in`, the most direct

@@ -416,7 +416,7 @@ final class Analyzer
             $note,
             $package->isDev(),
             array_keys($graph->chainsTo($package->name())),
-            Libyears::behind($package, $meta),
+            Libyears::measure($package, $meta),
             $fromRepository
         );
     }

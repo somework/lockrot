@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Lockrot\Verdict;
 
 use Composer\Package\Loader\ValidatingArrayLoader;
+use Lockrot\Analyzer\Libyears;
+use Lockrot\Analyzer\LibyearsMeasurement;
 use Lockrot\Data\Repository\ReleaseBranch;
 use Lockrot\Signal\Signal;
 
@@ -56,11 +58,11 @@ final class Finding
      */
     private array $directDependents;
     /**
-     * How many years the installed version is behind the package's newest stable release
-     * ({@see \Lockrot\Analyzer\Libyears::behind()}), unrounded; null when the package is not
-     * measured. Kept unrounded so the report's totals sum what was measured, not what was printed.
+     * How many years the installed version is behind the package's newest stable release, unrounded,
+     * or why it was not measured ({@see Libyears::measure()}). Kept unrounded so the report's totals
+     * sum what was measured, not what was printed.
      */
-    private ?float $libyears;
+    private LibyearsMeasurement $libyears;
     /**
      * The lock entry carries a Composer notification-url ({@see \Lockrot\Lock\LockedPackage::isFromComposerRepository()}),
      * the only kind of entry lockrot asks a repository about; when false, none was asked. Not "comes from packagist.org".
@@ -72,7 +74,7 @@ final class Finding
      * @param list<string> $chain
      * @param list<string> $directDependents
      */
-    public function __construct(string $package, string $version, string $verdict, array $signals, array $chain, ?string $allowlistReason, ?\DateTimeImmutable $dataDate, ?string $note = null, bool $dev = false, array $directDependents = [], ?float $libyears = null, bool $fromComposerRepository = true)
+    public function __construct(string $package, string $version, string $verdict, array $signals, array $chain, ?string $allowlistReason, ?\DateTimeImmutable $dataDate, ?string $note = null, bool $dev = false, array $directDependents = [], ?LibyearsMeasurement $libyears = null, bool $fromComposerRepository = true)
     {
         // The note says no repository was asked; a caller that forgot the flag would contradict it.
         if ($note === self::NOTE_NOT_IN_REPOSITORY && $fromComposerRepository) {
@@ -88,7 +90,8 @@ final class Finding
         $this->note = $note;
         $this->dev = $dev;
         $this->directDependents = $directDependents;
-        $this->libyears = $libyears;
+        // Without a measurement there were no dates to compare; the analyzer always passes one.
+        $this->libyears = $libyears ?? LibyearsMeasurement::unmeasured(Libyears::NO_STABLE_RELEASE_DATE);
         $this->fromComposerRepository = $fromComposerRepository;
     }
 
@@ -170,10 +173,16 @@ final class Finding
         return $this->directDependents;
     }
 
-    /** Years behind the newest stable release, unrounded; null when not measured ({@see \Lockrot\Analyzer\Libyears}). */
+    /** Years behind the newest stable release, unrounded; null when not measured ({@see Libyears}). */
     public function libyears(): ?float
     {
-        return $this->libyears;
+        return $this->libyears->years();
+    }
+
+    /** Why {@see libyears()} is null, one of {@see Libyears::REASONS}; null exactly when it is a number. */
+    public function libyearsUnmeasured(): ?string
+    {
+        return $this->libyears->unmeasuredReason();
     }
 
     /**
@@ -425,6 +434,7 @@ final class Finding
         foreach ($this->signals as $signal) {
             $signals[] = ['id' => $signal->id(), 'level' => $signal->level(), 'summary' => $signal->summary(), 'data' => $signal->data()];
         }
+        $libyears = $this->libyears->years();
 
         return [
             'package' => $this->package, 'version' => $this->version, 'verdict' => $this->verdict,
@@ -435,7 +445,8 @@ final class Finding
             'evidence' => $this->evidence(),
             'allowlist_reason' => $this->allowlistReason, 'note' => $this->note,
             'data_date' => $this->dataDate === null ? null : $this->dataDate->format(\DATE_ATOM),
-            'libyears' => $this->libyears === null ? null : round($this->libyears, 2),
+            'libyears' => $libyears === null ? null : round($libyears, 2),
+            'libyears_unmeasured' => $this->libyears->unmeasuredReason(),
         ];
     }
 }

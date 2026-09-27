@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Explain;
 
 use Composer\Package\Loader\ArrayLoader;
+use Lockrot\Analyzer\LibyearsMeasurement;
 use Lockrot\Analyzer\Report;
 use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Explain\Explanation;
@@ -33,7 +34,7 @@ final class ExplanationTest extends TestCase
 
     public function testTheExplanationCarriesTheFindingsLibyears(): void
     {
-        $finding = new Finding('vendor/pkg', '1.4.0', Verdict::LEFT_BEHIND, [], ['root/app', 'vendor/pkg'], null, new \DateTimeImmutable(F::NOW), null, false, [], 2.345);
+        $finding = new Finding('vendor/pkg', '1.4.0', Verdict::LEFT_BEHIND, [], ['root/app', 'vendor/pkg'], null, new \DateTimeImmutable(F::NOW), null, false, [], LibyearsMeasurement::of(2.345));
         $metadata = F::metadata([['1.5.0', '2021-06-01T00:00:00+00:00'], ['1.4.0', '2020-01-01T00:00:00+00:00']]);
         $explanation = new Explanation($finding, F::facts(F::package(['version' => '1.4.0']), $metadata), new Thresholds(), '8.4', $this->report());
 

@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Output;
 
 use Composer\Package\Loader\ArrayLoader;
+use Lockrot\Analyzer\Libyears;
+use Lockrot\Analyzer\LibyearsMeasurement;
 use Lockrot\Analyzer\Report;
 use Lockrot\Data\Forge\RepoRef;
 use Lockrot\Data\Forge\RepositoryActivity;
@@ -55,7 +57,7 @@ final class ExplainFormatterTest extends TestCase
             ['id' => 'PKSA-2', 'cve' => '', 'severity' => null, 'fixed_by' => null, 'fixed_on_branch' => false],
             'not-a-row',
         ], 'count' => 2]);
-        $finding = new Finding('vendor/pkg', '1.5.0', Verdict::LEFT_BEHIND, [$s8, $s9], ['root/app', 'vendor/mid', 'vendor/pkg'], null, new \DateTimeImmutable(F::NOW), null, false, ['root/app', 'root/other'], 4.58);
+        $finding = new Finding('vendor/pkg', '1.5.0', Verdict::LEFT_BEHIND, [$s8, $s9], ['root/app', 'vendor/mid', 'vendor/pkg'], null, new \DateTimeImmutable(F::NOW), null, false, ['root/app', 'root/other'], LibyearsMeasurement::of(4.58));
         // Branches listed out of order: the table sorts them.
         $metadata = F::metadata([['1.5.0', '2021-06-01T00:00:00+00:00', '>=7.1 <8.0'], ['1.4.9', '2021-01-01T00:00:00+00:00'], ['2.1.0', '2026-01-01T00:00:00+00:00', '>=8.1']], true, 'vendor/next');
         $package = F::package(['version' => '1.5.0', 'php' => '>=7.1 <8.0', 'time' => '2021-06-01T00:00:00+00:00']);
@@ -193,7 +195,7 @@ final class ExplainFormatterTest extends TestCase
 
     public function testAPackageWithoutMetadataShowsTheNoteInsteadOfATable(): void
     {
-        $finding = new Finding('vendor/pkg', '1.0.0', Verdict::UNKNOWN, [], ['vendor/pkg'], null, null, 'not from a Composer repository, not checked', true, [], null, false);
+        $finding = new Finding('vendor/pkg', '1.0.0', Verdict::UNKNOWN, [], ['vendor/pkg'], null, null, 'not from a Composer repository, not checked', true, [], LibyearsMeasurement::unmeasured(Libyears::NOT_FROM_COMPOSER_REPOSITORY), false);
         $sourceless = new LockedPackage('vendor/pkg', '1.0.0', null, null, [], null, 'library', false, true, false);
         $explanation = new Explanation($finding, F::facts($sourceless), new Thresholds(), '8.4', $this->report());
 
@@ -294,7 +296,7 @@ final class ExplainFormatterTest extends TestCase
     /** A split package dated by its monorepo: the rows read the parent's dates, and a footnote says whose they are. */
     public function testASplitPackageDatedByItsMonorepoSaysSo(): void
     {
-        $finding = new Finding('illuminate/contracts', 'v10.48.28', Verdict::OK, [], ['illuminate/contracts'], null, new \DateTimeImmutable(F::NOW), null, false, [], 2.74);
+        $finding = new Finding('illuminate/contracts', 'v10.48.28', Verdict::OK, [], ['illuminate/contracts'], null, new \DateTimeImmutable(F::NOW), null, false, [], LibyearsMeasurement::of(2.74));
         $loader = new ArrayLoader();
         $on = static fn (string $name, string $version, string $commit, string $time, array $replace = []): array => array_filter(['name' => $name, 'version' => $version, 'time' => $time, 'source' => ['type' => 'git', 'url' => 'https://github.com/'.$name.'.git', 'reference' => $commit], 'replace' => $replace]);
         $child = PackageMetadata::fromPackages('illuminate/contracts', [
@@ -379,7 +381,7 @@ final class ExplainFormatterTest extends TestCase
      */
     public function testTheLockBlockCallsTheSplitsOwnDateWhatItIs(): void
     {
-        $finding = new Finding('illuminate/contracts', 'v10.48.28', Verdict::OK, [], ['illuminate/contracts'], null, new \DateTimeImmutable(F::NOW), null, false, [], 2.74);
+        $finding = new Finding('illuminate/contracts', 'v10.48.28', Verdict::OK, [], ['illuminate/contracts'], null, new \DateTimeImmutable(F::NOW), null, false, [], LibyearsMeasurement::of(2.74));
         $loader = new ArrayLoader();
         $on = static fn (string $name, string $version, string $commit, string $time, array $replace = []): array => array_filter(['name' => $name, 'version' => $version, 'time' => $time, 'source' => ['type' => 'git', 'url' => 'https://github.com/'.$name.'.git', 'reference' => $commit], 'replace' => $replace]);
         $child = PackageMetadata::fromPackages('illuminate/contracts', [
@@ -407,7 +409,7 @@ final class ExplainFormatterTest extends TestCase
      */
     public function testABranchSnapshotIsNotToldItsTagsShareACommit(): void
     {
-        $finding = new Finding('vendor/pkg', 'dev-main', Verdict::PINNED, [], ['vendor/pkg'], null, new \DateTimeImmutable(F::NOW));
+        $finding = new Finding('vendor/pkg', 'dev-main', Verdict::PINNED, [], ['vendor/pkg'], null, new \DateTimeImmutable(F::NOW), null, false, [], LibyearsMeasurement::unmeasured(Libyears::BRANCH_SNAPSHOT));
         $loader = new ArrayLoader();
         $metadata = PackageMetadata::fromPackages('vendor/pkg', [
             $loader->load(['name' => 'vendor/pkg', 'version' => '1.2.0', 'time' => '2026-01-01T00:00:00+00:00', 'source' => ['type' => 'git', 'url' => 'https://github.com/vendor/pkg.git', 'reference' => 'tag-12']]),

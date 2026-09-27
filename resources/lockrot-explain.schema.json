@@ -98,7 +98,8 @@
                 "allowlist_reason": { "type": ["string", "null"] },
                 "note": { "type": ["string", "null"] },
                 "data_date": { "oneOf": [{ "$ref": "#/definitions/dateTime" }, { "type": "null" }] },
-                "libyears": { "description": "Years behind the newest stable release (a lower bound when that release is undated), at least 0; null when not measured; absent before 0.11.0. See report-1.json.", "type": ["number", "null"], "minimum": 0 }
+                "libyears": { "description": "Years behind the newest stable release (a lower bound when that release is undated), at least 0. Null when not measured; from 0.13.0 on, `libyears_unmeasured` says why. Absent before 0.11.0. See report-1.json.", "type": ["number", "null"], "minimum": 0 },
+                "libyears_unmeasured": { "description": "See report-1.json.", "oneOf": [{ "type": "string", "pattern": "^[a-z][a-z0-9_]*$", "x-known-values": ["branch_snapshot", "no_stable_release_date", "not_from_composer_repository", "metadata_unavailable"] }, { "type": "null" }] }
             }
         },
         "metadata": {

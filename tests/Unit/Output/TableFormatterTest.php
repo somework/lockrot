@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Output;
 
+use Lockrot\Analyzer\LibyearsMeasurement;
 use Lockrot\Analyzer\Report;
 use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineComparison;
@@ -353,8 +354,8 @@ final class TableFormatterTest extends TestCase
     {
         $at = new \DateTimeImmutable(self::AT);
         $report = new Report([
-            new Finding('smalot/pdfparser', 'v1.1.0', Verdict::LEFT_BEHIND, [new Signal('S8', 'warn', 'branch 1.x last released 2022-01-03')], ['smalot/pdfparser'], null, $at, null, false, ['smalot/pdfparser'], 4.7123),
-            new Finding('psr/log', '1.1.4', Verdict::FINISHED, [], ['smalot/pdfparser', 'psr/log'], 'interfaces', $at, null, false, ['smalot/pdfparser'], 3.36),
+            new Finding('smalot/pdfparser', 'v1.1.0', Verdict::LEFT_BEHIND, [new Signal('S8', 'warn', 'branch 1.x last released 2022-01-03')], ['smalot/pdfparser'], null, $at, null, false, ['smalot/pdfparser'], LibyearsMeasurement::of(4.7123)),
+            new Finding('psr/log', '1.1.4', Verdict::FINISHED, [], ['smalot/pdfparser', 'psr/log'], 'interfaces', $at, null, false, ['smalot/pdfparser'], LibyearsMeasurement::of(3.36)),
             new Finding('wallabag/rulerz', 'dev-master', Verdict::PINNED, [new Signal('S6', 'warn', 'pinned')], ['wallabag/rulerz'], null, $at, null, false, ['wallabag/rulerz']),
         ], [], $at, 3, 0, false);
         $lines = $this->plainLines($this->formatter(200)->format($report));

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Verdict;
 
+use Lockrot\Analyzer\Libyears;
+use Lockrot\Analyzer\LibyearsMeasurement;
 use Lockrot\Signal\Signal;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Priority;
@@ -335,7 +337,7 @@ final class FindingTest extends TestCase
         $finding = new Finding('vendor/pkg', '1.2.3', Verdict::STALE, [], ['vendor/root', 'vendor/pkg'], null, null, null, true);
         $array = $finding->toArray();
         self::assertSame(
-            ['package', 'version', 'verdict', 'priority', 'direct', 'dev', 'from_composer_repository', 'replacement', 'signals', 'chain', 'direct_dependents', 'evidence', 'allowlist_reason', 'note', 'data_date', 'libyears'],
+            ['package', 'version', 'verdict', 'priority', 'direct', 'dev', 'from_composer_repository', 'replacement', 'signals', 'chain', 'direct_dependents', 'evidence', 'allowlist_reason', 'note', 'data_date', 'libyears', 'libyears_unmeasured'],
             array_keys($array)
         );
         self::assertSame(Priority::LOW, $array['priority']);
@@ -368,13 +370,36 @@ final class FindingTest extends TestCase
 
     public function testAFindingCarriesItsLibyearsUnroundedAndPrintsThemToTwoDecimals(): void
     {
-        $measured = new Finding('smalot/pdfparser', 'v1.1.0', Verdict::LEFT_BEHIND, [], ['smalot/pdfparser'], null, null, null, false, [], 4.7123);
-        $unmeasured = new Finding('wallabag/rulerz', 'dev-master', Verdict::PINNED, [], ['wallabag/rulerz'], null, null);
+        $measured = new Finding('smalot/pdfparser', 'v1.1.0', Verdict::LEFT_BEHIND, [], ['smalot/pdfparser'], null, null, null, false, [], LibyearsMeasurement::of(4.7123));
+        $unmeasured = new Finding('wallabag/rulerz', 'dev-master', Verdict::PINNED, [], ['wallabag/rulerz'], null, null, null, false, [], LibyearsMeasurement::unmeasured(Libyears::BRANCH_SNAPSHOT));
 
         self::assertSame(4.7123, $measured->libyears());
         self::assertSame(4.71, $measured->toArray()['libyears']);
+        self::assertNull($measured->libyearsUnmeasured());
+        self::assertNull($measured->toArray()['libyears_unmeasured']);
         self::assertNull($unmeasured->libyears());
         self::assertNull($unmeasured->toArray()['libyears']);
+        self::assertSame(Libyears::BRANCH_SNAPSHOT, $unmeasured->libyearsUnmeasured());
+        self::assertSame(Libyears::BRANCH_SNAPSHOT, $unmeasured->toArray()['libyears_unmeasured']);
+        self::assertSame(Libyears::BRANCH_SNAPSHOT, $unmeasured->withSignals([])->toArray()['libyears_unmeasured'], 'S7 keeps it');
+    }
+
+    public function testAZeroIsMeasuredAndCarriesNoReason(): void
+    {
+        $current = new Finding('vendor/pkg', '1.0.0', Verdict::OK, [], ['vendor/pkg'], null, null, null, false, [], LibyearsMeasurement::of(0.0));
+
+        self::assertSame(0.0, $current->toArray()['libyears']);
+        self::assertNull($current->toArray()['libyears_unmeasured']);
+    }
+
+    /** A finding assembled without a measurement has no dates to compare; the analyzer always passes one. */
+    public function testAFindingBuiltWithoutAMeasurementHasNoDateToTrust(): void
+    {
+        $bare = new Finding('vendor/pkg', '1.0.0', Verdict::OK, [], ['vendor/pkg'], null, null);
+
+        self::assertNull($bare->libyears());
+        self::assertSame(Libyears::NO_STABLE_RELEASE_DATE, $bare->libyearsUnmeasured());
+        self::assertSame(Libyears::NO_STABLE_RELEASE_DATE, $bare->toArray()['libyears_unmeasured']);
     }
 
     public function testDirectDependentsDefaultToNoneAndAreCarriedInTheArray(): void

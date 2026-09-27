@@ -362,6 +362,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `finding`; every verdict, priority, note, evidence line and exit code is unchanged, as are the
   table, markdown, GitHub, GitLab and SARIF formats, the `--explain` text and the baseline.
 
+- Each finding says why its `libyears` is null: `libyears_unmeasured`, one of the keys of the
+  report's `libyears.unmeasured` (`not_from_composer_repository`, `metadata_unavailable`,
+  `branch_snapshot`, `no_stable_release_date`, the first that applies in that order), null exactly
+  where `libyears` is a number, 0 included. Until now only the block's counts carried the reason,
+  and the HTML page recovered each finding's by comparing its note to an English sentence and its
+  version to `dev-` and `-dev`. The reason was also read back the same way inside lockrot, off the
+  finding's note and version after the fact, apart from the rule that made the number null; it is
+  now decided on the branch of that rule that gives no number and stored on the finding, and the
+  block, the field and the `--explain` line `libyears not measured: …` all read that one value. A
+  test holds the field over every fixture lock to the block, to the lock entry and metadata the
+  analysis was decided on, to the `--explain` document's finding and to the rule 0.12 filed each
+  finding by, so the block's counts are those 0.12 wrote. An open string with a `pattern` and
+  `x-known-values` in both schemas, optional so documents written before 0.13.0 still validate;
+  from 0.13.0 on every finding carries the key, and a later minor release may add a reason or
+  split one into narrower ones. `libyears.unmeasured` now types a key it does not list as a count,
+  so a reason a later release adds validates against this schema; its four keys stay required.
+  The finding-level `libyears` descriptions point to the new field instead of listing the reasons
+  a second time. It reaches `--format=json`, the report inside the `--format=html` page (which does
+  not read it yet) and the `--explain` document's `finding`; every verdict, priority, note, count
+  and exit code is unchanged, as are the table, markdown, GitHub, GitLab and SARIF formats, the
+  `--explain` text and the baseline. The 0.13.0 schema snapshot is refreshed.
+
 ### Fixed
 
 - A package name, a version, a constraint or a note that looked like console markup could break the

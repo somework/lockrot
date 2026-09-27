@@ -10,6 +10,7 @@ use JsonSchema\Validator;
 use Lockrot\Allowlist\BuiltinAllowlist;
 use Lockrot\Analyzer\Analysis;
 use Lockrot\Analyzer\Analyzer;
+use Lockrot\Analyzer\Libyears;
 use Lockrot\Analyzer\Report;
 use Lockrot\Analyzer\RunSettings;
 use Lockrot\Analyzer\TransitiveExposure;
@@ -705,6 +706,69 @@ final class JsonSchemaConformanceTest extends TestCase
                 self::assertNotSame([], $this->errors($schema, self::withFindingKey($decoded, $path, 'from_composer_repository', $value), false), $schema.' '.var_export($value, true));
             }
         }
+    }
+
+    /**
+     * `libyears_unmeasured` is an open set in both schemas: a reason a later release adds, and null,
+     * validate against the published schema, and the strict twin holds the value to the reasons this
+     * release writes. A 0.12 finding without the key validates against both.
+     */
+    public function testAFindingSaysWhyItsLibyearsAreNullAsAnOpenCode(): void
+    {
+        $analysis = self::analysis('apps/wallabag_wallabag');
+        $finding = $analysis->finding('wallabag/rulerz');
+        $facts = $analysis->facts('wallabag/rulerz');
+        self::assertNotNull($finding);
+        self::assertNotNull($facts);
+        $report = json_decode((new JsonFormatter())->format($analysis->report()), true);
+        self::assertIsArray($report);
+        $at = null;
+        foreach (JsonPath::arrayAt($report, ['findings']) as $i => $row) {
+            self::assertIsArray($row);
+            if ($row['package'] === 'wallabag/rulerz') {
+                $at = $i;
+            }
+        }
+        self::assertIsInt($at);
+        // The helper edits the first finding: rulerz, a dev-master pin, is moved there.
+        $findings = JsonPath::arrayAt($report, ['findings']);
+        $report['findings'] = array_merge([$findings[$at]], array_values(array_diff_key($findings, [$at => true])));
+        $documents = [
+            Schemas::REPORT => [$report, ['findings', 0]],
+            Schemas::EXPLAIN => [json_decode((new ExplainFormatter())->json(new Explanation($finding, $facts, new Thresholds(), '8.4', $analysis->report())), true), ['finding']],
+        ];
+        foreach ($documents as $schema => [$decoded, $path]) {
+            self::assertIsArray($decoded);
+            self::assertSame(Libyears::BRANCH_SNAPSHOT, JsonPath::arrayAt($decoded, $path)['libyears_unmeasured'], $schema.': rulerz is a branch snapshot');
+            foreach (array_merge(Libyears::REASONS, [null, self::ABSENT]) as $value) {
+                $what = $schema.' '.var_export($value, true);
+                $changed = self::withFindingKey($decoded, $path, 'libyears_unmeasured', $value);
+                $this->assertValid($schema, $changed, $what);
+                $this->assertValid($schema, $changed, $what, true);
+            }
+            foreach (['some_future_reason', 'branch_snapshots'] as $value) {
+                $changed = self::withFindingKey($decoded, $path, 'libyears_unmeasured', $value);
+                $this->assertValid($schema, $changed, $schema.' '.$value.': the published schema cannot tell a typo from a new reason');
+                $errors = $this->errors($schema, $changed, true);
+                self::assertNotSame([], array_filter($errors, static fn (string $error): bool => strpos($error, 'libyears_unmeasured') !== false), $schema.' '.$value.': '.implode("\n", $errors));
+            }
+            foreach (['Branch-Snapshot', '', 1, false] as $value) {
+                self::assertNotSame([], $this->errors($schema, self::withFindingKey($decoded, $path, 'libyears_unmeasured', $value), false), $schema.' '.var_export($value, true));
+            }
+        }
+
+        // The block's keys: one a later release adds is a count; a key that is not a count fails.
+        $block = JsonPath::arrayAt($report, ['libyears', 'unmeasured']);
+        $withKey = static function ($value) use ($report, $block): string {
+            $libyears = JsonPath::arrayAt($report, ['libyears']);
+            $libyears['unmeasured'] = array_merge($block, ['installed_undated' => $value]);
+            $report['libyears'] = $libyears;
+
+            return (string) json_encode($report);
+        };
+        $this->assertValid(Schemas::REPORT, $withKey(2), 'a reason a later release counts');
+        self::assertNotSame([], $this->errors(Schemas::REPORT, $withKey('two'), false), 'a count that is a word');
+        self::assertNotSame([], $this->errors(Schemas::REPORT, $withKey(-1), false), 'a negative count');
     }
 
     /**

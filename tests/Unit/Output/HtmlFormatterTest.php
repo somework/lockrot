@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Output;
 
 use Lockrot\Analyzer\Analysis;
+use Lockrot\Analyzer\LibyearsMeasurement;
 use Lockrot\Analyzer\Report;
 use Lockrot\Html\PageData;
 use Lockrot\Output\Formatters;
@@ -123,7 +124,7 @@ final class HtmlFormatterTest extends TestCase
 
     public function testThePayloadCarriesTheLibyearsBlock(): void
     {
-        $measured = new Finding('smalot/pdfparser', 'v1.1.0', Verdict::LEFT_BEHIND, [], ['smalot/pdfparser'], null, new \DateTimeImmutable(F::NOW), null, false, ['smalot/pdfparser'], 4.7123);
+        $measured = new Finding('smalot/pdfparser', 'v1.1.0', Verdict::LEFT_BEHIND, [], ['smalot/pdfparser'], null, new \DateTimeImmutable(F::NOW), null, false, ['smalot/pdfparser'], LibyearsMeasurement::of(4.7123));
         $payload = self::payloadOf($this->page($this->report([$measured, $this->finding('vendor/pinned', Verdict::PINNED)], 2)));
 
         self::assertSame(4.71, J::arrayAt($payload, ['report', 'libyears'])['total']);

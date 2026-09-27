@@ -79,6 +79,7 @@ These grow in minor releases:
 - S8's `floor_source`, and the explanation's `php_blocked_by`, which holds the same values;
 - the explanation's `misses_target_php` and `misses_project_php`;
 - S6's `reason`;
+- a finding's `libyears_unmeasured`;
 - repository hosts;
 - format names.
 
@@ -86,8 +87,8 @@ A consumer treats a value it does not know as "other": it shows the value as wri
 fail on it.
 
 The schemas describe signal ids, S10's checks, reasons and blocked signals, S6's `reason`, S8's
-`floor_source`, the explanation's `php_blocked_by`, `misses_target_php` and `misses_project_php`, and
-the configuration's `format` as open strings: a `pattern`, which also admits the `<vendor>:<name>`
+`floor_source`, the explanation's `php_blocked_by`, `misses_target_php` and `misses_project_php`, a
+finding's `libyears_unmeasured`, and the configuration's `format` as open strings: a `pattern`, which also admits the `<vendor>:<name>`
 form for a signal id and a format, plus `x-known-values`, the values lockrot writes, which only grows
 within 1.x. A signal whose id is not listed validates with any object as its `data`; a listed id
 keeps its `data` typed. A consumer that validates strictly reads `x-known-values` as an enum and
@@ -95,6 +96,13 @@ refreshes its copy on upgrade. A copy of a schema taken before 0.13.0 still hold
 Repository hosts are in no schema as a set: S3 and S4's `host` and the explanation's `forge` are plain
 strings. lockrot itself accepts only the format names it knows, in `--format`, `--output` and
 `extra.lockrot.format`.
+
+The keys of the report's `libyears.unmeasured` grow with `libyears_unmeasured`, one key per reason.
+They are not a `pattern` plus `x-known-values` set: `required` lists the keys this release writes, a
+key a later minor release adds is always written from then on but never joins `required`, and the
+schema types any key it does not list as a count. A later minor release may also split a reason,
+`no_stable_release_date` included, into narrower ones, which moves findings out of the old key: a
+consumer does not assume a reason's population stays fixed.
 
 ### Finding identity
 
