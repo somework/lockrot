@@ -25,18 +25,18 @@ mutant from the original, and says why.
 
 ## src/Analyzer/Libyears.php (0.11.0)
 
-- `src/Analyzer/Libyears.php:195` LessThan (`strcmp(...) < 0` → `<= 0`) — `fromFindings()`: the
+- `src/Analyzer/Libyears.php:190` LessThan (`strcmp(...) < 0` → `<= 0`) — `fromFindings()`: the
   tie-break between two findings with the same value compares their package names, and two findings
   in one report never share a name (the lock is keyed by it), so `strcmp` never returns 0 there and
   `<` and `<=` decide identically.
 
-- `src/Analyzer/Libyears.php:156` GreaterThan (`$release['at'] > $newest` → `>=`) —
+- `src/Analyzer/Libyears.php:148` GreaterThan (`$release['at'] > $newest` → `>=`) —
   `newestTrustedDateAbove()`: on a tie the two dates are equal, so keeping the first or taking the
   second yields the same instant; nothing downstream reads which branch it came from.
 
 ## src/Verdict/Finding.php (0.11.0, the successor)
 
-- `src/Verdict/Finding.php:306` LogicalAnd (`is_string($replacement) && $replacement !== ''` → `||`)
+- `src/Verdict/Finding.php:312` LogicalAnd (`is_string($replacement) && $replacement !== ''` → `||`)
   — `replacement()`: the one caller is `successor()`, which then requires a `/` and a name Composer
   accepts. Under `||` a null stays null (the ternary returns the value itself) and an empty string
   is returned instead of null, and an empty string has no `/`, so `successor()` answers null either
