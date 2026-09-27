@@ -416,10 +416,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   package whose metadata failed is still raised for its advisories although no fix was looked for;
   `releases_unknown` now says so, and the raise is unchanged. Both fields and `releases_read` are
   optional in the schemas, so documents written before 0.13.0 still validate; from 0.13.0 on every
-  finding carries both. They reach `--format=json`, the report inside the `--format=html` page (which
-  does not read them yet) and the `--explain` document's `finding`; every verdict, priority,
-  evidence line, count and exit code is unchanged, as are the table, markdown, GitHub, GitLab and
-  SARIF formats, the `--explain` text and the baseline. The 0.13.0 schema snapshot is refreshed.
+  finding carries both. They reach `--format=json`, the report inside the `--format=html` page and
+  the `--explain` document's `finding`. The page does not interpret them yet, and its signal detail
+  shows S9's `releases_read` as one more raw data row, as it shows every key of a signal's `data`.
+  Every verdict, priority, evidence line, count and exit code is unchanged, as are the table,
+  markdown, GitHub, GitLab and SARIF formats, the `--explain` text (which leaves `releases_read` out)
+  and the baseline. The 0.13.0 schema snapshot is refreshed.
 
 ### Fixed
 
