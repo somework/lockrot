@@ -335,11 +335,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   GitHub, GitLab and SARIF formats and the baseline are unchanged, and so is every verdict. The
   install-time summary writes no `run`, as before.
 
-- Each finding says whether lockrot asked a repository about its package: `from_composer_repository`,
-  true when the lock entry carries a Composer `notification-url`. Until now the report said it only
-  in prose, as the note `not from a Composer repository, not checked`, a note that also carries a
-  metadata failure or `not found in the repository`, so the HTML page told the three apart by
-  comparing the note's words, which the [compatibility page](docs/compatibility.md) says are not
+- Each finding says whether its lock entry carries a Composer `notification-url`, the only kind of
+  entry lockrot asks a repository about: `from_composer_repository`; when it is false, lockrot asked
+  no repository about the package. Until now the report said that only in prose, as the note
+  `not from a Composer repository, not checked`, a note that also carries a metadata failure or
+  `not found in the repository`, so the HTML page told the three apart by comparing the note's
+  words, which the [compatibility page](docs/compatibility.md) says are not
   contract. The boolean is read from the same lock entry as the `--explain` document's
   `lock.from_composer_repository`, which it always equals, and the findings where it is false are
   the ones the root `not_from_composer_repository` and the libyears block's bucket of that name

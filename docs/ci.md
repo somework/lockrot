@@ -339,7 +339,7 @@ in it, at roughly 4 KB a package; without it a 100-package lock lands around 300
 ## `--format=json`
 
 The complete report, and the only format that carries every field: per-finding `signals`, `chain`,
-`direct_dependents`, `from_composer_repository` (whether lockrot asked a repository about the package, see
+`direct_dependents`, `from_composer_repository` (whether the lock entry carries a notification-url, the only kind lockrot asks a repository about, see
 [schema.md](schema.md#what-the-report-schema-types)), `evidence`, `data_date`, `libyears` and `baseline` — where that finding stands against the
 baseline file — plus the document's `run`, `exposure`, `exposure_rule`, `unattributed`, `libyears` and `notes`. `run` is what the report is about and what
 its verdicts were decided against: what the project is called (`project`: composer.json's `name`,
