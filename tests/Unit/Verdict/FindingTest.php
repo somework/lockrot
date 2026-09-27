@@ -10,6 +10,7 @@ use Lockrot\Signal\Signal;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Priority;
 use Lockrot\Verdict\Verdict;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class FindingTest extends TestCase
@@ -400,6 +401,35 @@ final class FindingTest extends TestCase
         self::assertNull($bare->libyears());
         self::assertSame(Libyears::NO_STABLE_RELEASE_DATE, $bare->libyearsUnmeasured());
         self::assertSame(Libyears::NO_STABLE_RELEASE_DATE, $bare->toArray()['libyears_unmeasured']);
+    }
+
+    /** Nothing was asked about a package outside every Composer repository, the first reason it goes unmeasured. */
+    public function testAFindingNotFromAComposerRepositoryIsUnmeasuredForThatReasonByDefault(): void
+    {
+        $bare = new Finding('local/pkg', '1.0.0', Verdict::UNKNOWN, [], ['local/pkg'], null, null, Finding::NOTE_NOT_IN_REPOSITORY, false, [], null, false);
+
+        self::assertNull($bare->libyears());
+        self::assertSame(Libyears::NOT_FROM_COMPOSER_REPOSITORY, $bare->toArray()['libyears_unmeasured']);
+    }
+
+    /** @return iterable<string, array{LibyearsMeasurement, bool}> a measurement and a flag that contradict each other */
+    public static function measurementsAgainstTheFlag(): iterable
+    {
+        yield 'not asked, on a finding from a repository' => [LibyearsMeasurement::unmeasured(Libyears::NOT_FROM_COMPOSER_REPOSITORY), true];
+        yield 'another reason, on a finding from no repository' => [LibyearsMeasurement::unmeasured(Libyears::NO_STABLE_RELEASE_DATE), false];
+        yield 'measured, on a finding from no repository' => [LibyearsMeasurement::of(1.0), false];
+    }
+
+    /**
+     * @dataProvider measurementsAgainstTheFlag
+     */
+    #[DataProvider('measurementsAgainstTheFlag')]
+    public function testAMeasurementCannotContradictWhereTheFindingComesFrom(LibyearsMeasurement $libyears, bool $fromComposerRepository): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('local/pkg');
+
+        new Finding('local/pkg', '1.0.0', Verdict::UNKNOWN, [], ['local/pkg'], null, null, null, false, [], $libyears, $fromComposerRepository);
     }
 
     public function testDirectDependentsDefaultToNoneAndAreCarriedInTheArray(): void

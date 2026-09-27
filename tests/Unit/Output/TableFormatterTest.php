@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Output;
 
+use Lockrot\Analyzer\Libyears;
 use Lockrot\Analyzer\LibyearsMeasurement;
 use Lockrot\Analyzer\Report;
 use Lockrot\Baseline\Baseline;
@@ -356,7 +357,7 @@ final class TableFormatterTest extends TestCase
         $report = new Report([
             new Finding('smalot/pdfparser', 'v1.1.0', Verdict::LEFT_BEHIND, [new Signal('S8', 'warn', 'branch 1.x last released 2022-01-03')], ['smalot/pdfparser'], null, $at, null, false, ['smalot/pdfparser'], LibyearsMeasurement::of(4.7123)),
             new Finding('psr/log', '1.1.4', Verdict::FINISHED, [], ['smalot/pdfparser', 'psr/log'], 'interfaces', $at, null, false, ['smalot/pdfparser'], LibyearsMeasurement::of(3.36)),
-            new Finding('wallabag/rulerz', 'dev-master', Verdict::PINNED, [new Signal('S6', 'warn', 'pinned')], ['wallabag/rulerz'], null, $at, null, false, ['wallabag/rulerz']),
+            new Finding('wallabag/rulerz', 'dev-master', Verdict::PINNED, [new Signal('S6', 'warn', 'pinned')], ['wallabag/rulerz'], null, $at, null, false, ['wallabag/rulerz'], LibyearsMeasurement::unmeasured(Libyears::BRANCH_SNAPSHOT)),
         ], [], $at, 3, 0, false);
         $lines = $this->plainLines($this->formatter(200)->format($report));
         $priority = array_search('priority: critical 0 · high 2 · medium 0 · low 0', $lines, true);

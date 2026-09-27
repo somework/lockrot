@@ -90,8 +90,13 @@ final class Finding
         $this->note = $note;
         $this->dev = $dev;
         $this->directDependents = $directDependents;
-        // Without a measurement there were no dates to compare; the analyzer always passes one.
-        $this->libyears = $libyears ?? LibyearsMeasurement::unmeasured(Libyears::NO_STABLE_RELEASE_DATE);
+        // Without a measurement no dates were compared, or no repository was asked; the analyzer always passes one.
+        $libyears = $libyears ?? LibyearsMeasurement::unmeasured($fromComposerRepository ? Libyears::NO_STABLE_RELEASE_DATE : Libyears::NOT_FROM_COMPOSER_REPOSITORY);
+        // Libyears::measure() reads the flag first, so its first reason and the flag always agree.
+        if (($libyears->unmeasuredReason() === Libyears::NOT_FROM_COMPOSER_REPOSITORY) === $fromComposerRepository) {
+            throw new \InvalidArgumentException(\sprintf('%s: a package goes unmeasured as not from a Composer repository exactly when it is not from one.', $package));
+        }
+        $this->libyears = $libyears;
         $this->fromComposerRepository = $fromComposerRepository;
     }
 
