@@ -354,6 +354,7 @@ list, which `…` stands in for:
             "note": null,
             "data_date": "2026-09-23T08:32:48+00:00",
             "libyears": 0,
+            "libyears_unmeasured": null,
             "baseline": null
         },
         …
@@ -364,7 +365,7 @@ list, which `…` stands in for:
 The cut signals have the same shape as S1 and S2; S7 carries the packages it names under `data`. So
 do the other 199 findings, each with its own `priority`, `direct`, `dev`, `from_composer_repository`,
 `replacement`, `signals`, `chain`, `direct_dependents`, `evidence`, `allowlist_reason`, `note`,
-`data_date`, `libyears` and `baseline`. `exposure` is the
+`data_date`, `libyears`, `libyears_unmeasured` and `baseline`. `exposure` is the
 `pulled in by:` line in full — every direct requirement that pulls in an attributable flagged transitive
 package, with how many, most first. From 0.13.0 the document also carries `exposure_rule`, the cap that list
 is drawn by (`{"max_fan_in": 8}`), and `unattributed`, the flagged packages reached from more direct

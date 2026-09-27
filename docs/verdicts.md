@@ -544,7 +544,9 @@ per measured finding, and `measured` plus every count in `unmeasured` is the num
 The HTML page shows the total in its ledger, the value in a sortable column, and the counts by
 reason on the Run tab.
 
-A package is **not measured**, and counted under one of four reasons, when:
+A package is **not measured**, and counted under one of four reasons, when the table says. From
+0.13.0 each finding names its reason as `libyears_unmeasured`, one of the keys below, and null
+where `libyears` is a number, 0 included; counting the findings by it gives `unmeasured` exactly.
 
 | `unmeasured` key | when |
 |---|---|
@@ -553,9 +555,19 @@ A package is **not measured**, and counted under one of four reasons, when:
 | `not_from_composer_repository` | No metadata was asked for: the lock entry carries no Composer `notification-url` — a `path`, `vcs`, `artifact` or inline `package` entry, or a package from a `type: composer` repository that advertises no notify URL. The finding's `from_composer_repository` is false. |
 | `metadata_unavailable` | Metadata was asked for and did not come: not listed, offline, budget, transport. |
 
-The reasons are checked in this order, and the first that applies is the one counted: not from a
-Composer repository, then metadata unavailable, then a branch snapshot, then no dated stable
-release — so a `dev-main` pin on a package that never released counts as a snapshot. A lock ahead
+The reasons are checked in this order, and the first that applies is the one counted:
+
+1. `not_from_composer_repository`
+2. `metadata_unavailable`
+3. `branch_snapshot`
+4. `no_stable_release_date`
+
+So a `dev-main` pin on a package that never released counts as a snapshot, and a `path` entry on
+`dev-main` as not from a Composer repository. The table lists the keys in the block's order, which
+is not this one. `no_stable_release_date` does not say which end, the installed version or the
+newest release, lacked a date lockrot trusts. The reasons are an open set: a later minor release may
+add one, or split one (`no_stable_release_date` included) into narrower ones, which moves findings
+out of the old key; read a reason you do not know as another way the package went unmeasured. A lock ahead
 of the last stable release — a pre-release above it, a tag the repository no longer lists — is
 measured as zero, not dropped; a lock with nothing behind names no package as furthest behind.
 
