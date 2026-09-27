@@ -268,7 +268,7 @@ final class ExplanationTest extends TestCase
 
     /**
      * The installed row gets the same test as any other: a project whose require.php promises
-     * 7.2.5 but whose lock already holds a branch needing 8.1 shows `project` on its own row.
+     * 7.2.5, on a branch whose newest dated release needs 8.1, shows `project` on its own row.
      */
     public function testTheInstalledRowIsTestedLikeAnyOther(): void
     {
@@ -281,6 +281,29 @@ final class ExplanationTest extends TestCase
         self::assertIsArray($meta['branches'][0]);
         self::assertTrue($meta['branches'][0]['installed']);
         self::assertSame('project', $meta['branches'][0]['php_blocked_by']);
+    }
+
+    /**
+     * What `project` on the installed row does not mean: that the locked version needs more PHP.
+     * A row's `php` is its branch's newest dated release's requirement, so a lock on 3.10.0, which
+     * asks for `^7.2|^8.0`, still reads `project` once 3.12.0 on the same branch asks for 8.1 — as
+     * laravel/socialite does in koel's lock. The locked version's own requirement is `lock.php`.
+     */
+    public function testTheInstalledRowIsHeldToItsBranchsNewestReleaseNotTheLockedVersion(): void
+    {
+        $metadata = F::metadata([
+            ['3.12.0', '2026-09-09T00:00:00+00:00', '>=8.1'],
+            ['3.10.0', '2025-01-01T00:00:00+00:00', '^7.2|^8.0'],
+        ]);
+        $package = F::package(['version' => '3.10.0', 'php' => '^7.2|^8.0', 'time' => '2025-01-01T00:00:00+00:00']);
+        $explanation = new Explanation($this->finding('3.10.0', Verdict::OK), F::facts($package, $metadata), new Thresholds(), '8.4', $this->report(), '>=7.2.5');
+
+        $document = $explanation->toArray();
+        self::assertSame('^7.2|^8.0', JsonPath::stringAt($document, ['lock', 'php']), 'the locked version admits 7.2.5');
+        self::assertSame('3.12.0', JsonPath::stringAt($document, ['metadata', 'branches', 0, 'newest_dated']));
+        self::assertSame('>=8.1', JsonPath::stringAt($document, ['metadata', 'branches', 0, 'php']));
+        self::assertTrue(JsonPath::arrayAt($document, ['metadata', 'branches', 0])['installed']);
+        self::assertSame('project', JsonPath::stringAt($document, ['metadata', 'branches', 0, 'php_blocked_by']));
     }
 
     /** The project php the rows were held against is in the document, as composer.json writes it. */
