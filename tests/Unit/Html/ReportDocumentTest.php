@@ -69,7 +69,7 @@ final class ReportDocumentTest extends TestCase
      */
     public function testThePayloadKeepsNoSecondCopyOfTheRun(): void
     {
-        $report = $this->report([])->withRun(new RunSettings('Acme app', 'acme/app', '8.4', '/home/someone/acme/composer.lock', FailOn::NONE, new Thresholds()));
+        $report = $this->report([])->withRun(new RunSettings('Acme app', 'acme/app', '8.4', '/home/someone/acme/composer.lock', FailOn::NONE, new Thresholds(), '^8.2'));
 
         $document = (new ReportDocument($report))->toArray();
 
@@ -78,6 +78,7 @@ final class ReportDocumentTest extends TestCase
         self::assertSame('composer.lock', J::stringAt($document, ['report', 'run', 'lock_file']));
         self::assertSame('acme/app', J::stringAt($document, ['report', 'run', 'root_package']));
         self::assertSame('Acme app', J::stringAt($document, ['report', 'run', 'project']));
+        self::assertSame('^8.2', J::stringAt($document, ['report', 'run', 'project_php']), 'the project\'s own php, once, in the report');
     }
 
 

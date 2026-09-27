@@ -196,7 +196,7 @@ final class JsonSchemaConformanceTest extends TestCase
         $report = self::analysis('apps/wallabag_wallabag')->report();
         $previous = Baseline::fromReport($report);
         $report = $report
-            ->withRun(new RunSettings('Acme internal API', 'acme/internal-api', '8.4', '/home/someone/clients/acme/composer.lock', 'silent', new Thresholds(2, 4, 2, 4)))
+            ->withRun(new RunSettings('Acme internal API', 'acme/internal-api', '8.4', '/home/someone/clients/acme/composer.lock', 'silent', new Thresholds(2, 4, 2, 4), '>=8.2'))
             ->withBaseline(BaselineComparison::compare($previous, $report, 'lockrot-baseline.json', []));
 
         $json = (new JsonFormatter())->format($report);
@@ -215,6 +215,8 @@ final class JsonSchemaConformanceTest extends TestCase
         // What Composer calls the project, beside what the report calls it: the manifest's own
         // name, whatever extra.lockrot.project says.
         self::assertSame('acme/internal-api', $run['root_package']);
+        // The project's own require.php, the second floor S8 holds a branch against.
+        self::assertSame('>=8.2', $run['project_php']);
         self::assertSame('composer.lock', $run['lock_file'], 'the lock is named, never located');
         self::assertStringNotContainsString('/home/someone', $json, 'and no path reaches the document');
         self::assertSame(2, JsonPath::arrayAt($decoded, ['run', 'thresholds'])['release-warn-years']);
@@ -823,6 +825,8 @@ final class JsonSchemaConformanceTest extends TestCase
         self::assertArrayHasKey('root_package', $run);
         self::assertNull($run['root_package']);
         self::assertNull($run['project']);
+        self::assertArrayHasKey('project_php', $run);
+        self::assertNull($run['project_php'], 'no manifest, so no require.php');
 
         $first = $analysis->report()->findings()[0];
         $facts = $analysis->facts($first->package());

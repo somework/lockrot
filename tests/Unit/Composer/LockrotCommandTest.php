@@ -553,7 +553,10 @@ final class LockrotCommandTest extends TestCase
         [$code, $page, $stderr] = $this->runWithSplitStreams(['--format' => 'html', '--all' => true, '--target-php' => '8.4'], $this->loader());
 
         self::assertSame(0, $code, $stderr);
-        $details = self::pagePayload($page)['details'];
+        $payload = self::pagePayload($page);
+        // The floor itself, not only the rows tested against it: the page can name the version.
+        self::assertSame('>=8.2', JsonPath::stringAt($payload, ['report', 'run', 'project_php']));
+        $details = $payload['details'];
         self::assertIsArray($details);
         self::assertIsArray($details['symfony/console']);
         $rows = self::admission($details['symfony/console']);
@@ -2519,6 +2522,54 @@ final class LockrotCommandTest extends TestCase
         });
     }
 
+    /** @return iterable<string, array{0: bool, 1: mixed, 2: null|string}> */
+    public static function projectPhpProvider(): iterable
+    {
+        // manifest present, what its require.php is set to (false: removed), then the expected run.project_php
+        yield 'the manifest\'s own require.php, as written' => [true, '^8.3', '^8.3'];
+        yield 'a manifest without require.php' => [true, false, null];
+        yield 'an empty require.php' => [true, '', null];
+        yield 'a require.php that is not a string' => [true, ['8.3'], null];
+        yield 'a lock without its composer.json' => [false, false, null];
+    }
+
+    /**
+     * `run.project_php` is the project's own `require.php`, the second floor S8 holds a branch
+     * against, exactly as the manifest writes it: the page can then name the version its branch
+     * rows were tested against. Written in every case, null where there is none to read.
+     *
+     * @dataProvider projectPhpProvider
+     *
+     * @param mixed $requirePhp
+     */
+    #[DataProvider('projectPhpProvider')]
+    public function testTheRunNamesTheProjectsOwnPhp(bool $manifest, $requirePhp, ?string $expected): void
+    {
+        $dir = $this->fixtureCopy(self::LARAVEL_LOCK);
+        $written = $this->readJsonFile($dir.'/composer.json');
+        self::assertIsArray($written['require']);
+        if ($requirePhp === false) {
+            unset($written['require']['php']);
+        } else {
+            $written['require']['php'] = $requirePhp;
+        }
+        file_put_contents($dir.'/composer.json', (string) json_encode($written, \JSON_UNESCAPED_SLASHES));
+        if (!$manifest) {
+            unlink($dir.'/composer.json');
+        }
+
+        $this->withComposerEnv($this->tempDir('lockrot-project-php-cache-'), $this->tempDir('lockrot-project-php-home-'), function () use ($expected): void {
+            [$code, $stdout, $stderr] = $this->runWithSplitStreams(['--format' => 'json', '--target-php' => '8.4'], $this->loader());
+
+            self::assertSame(0, $code, $stderr);
+            $json = json_decode($stdout, true);
+            self::assertIsArray($json);
+            $run = JsonPath::arrayAt($json, ['run']);
+            self::assertArrayHasKey('project_php', $run);
+            self::assertSame($expected, $run['project_php']);
+        });
+    }
+
     /**
      * `COMPOSER=alt.json composer install` reads alt.json and alt.lock, and so must `composer
      * lockrot`: it inspects the lock Composer uses, not whatever composer.lock sits beside it. Here
@@ -2542,6 +2593,13 @@ final class LockrotCommandTest extends TestCase
             self::assertSame(200, $json['packages_checked']);
             self::assertSame('alt.lock', JsonPath::stringAt($json, ['run', 'lock_file']));
             self::assertSame('wallabag/wallabag', JsonPath::stringAt($json, ['run', 'root_package']), 'the name comes from the manifest Composer reads');
+            self::assertSame('>=8.2', JsonPath::stringAt($json, ['run', 'project_php']), 'and so does the php it requires');
+
+            [$code, $stdout, $stderr] = $this->runWithSplitStreams(['--explain' => 'symfony/console', '--format' => 'json', '--target-php' => '8.4'], $this->loader());
+            self::assertSame(0, $code, $stderr);
+            $explained = json_decode($stdout, true);
+            self::assertIsArray($explained);
+            self::assertSame('>=8.2', $explained['project_php'], 'the report and --explain name the same floor');
         });
     }
 

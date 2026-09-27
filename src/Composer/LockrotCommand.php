@@ -262,7 +262,9 @@ final class LockrotCommand extends BaseCommand
                 $lockrot->targetPhp(),
                 $lockPath,
                 $lockrot->failOn(),
-                $lockrot->thresholds()
+                $lockrot->thresholds(),
+                // The same manifest's require.php the page and --explain test branch rows against.
+                $project->requirePhp()
             ));
 
             $page = $analysis === null

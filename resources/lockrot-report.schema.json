@@ -1247,7 +1247,7 @@
           ]
         },
         "root_package": {
-          "description": "What Composer calls this project: the `name` of the manifest Composer reads (composer.json, or the file `COMPOSER` names), exactly as written, whatever `extra.lockrot.project` says. `project` is what the report calls the project; this is the root package's own name. Not checked against the vendor/name form. Null where the manifest has no `name` (absent, empty or not a string), or where no composer.json was read (a lock-only run). The one key in `run` a document may omit: reports written before 0.13.0 do not carry it; from 0.13.0 on it is always written.",
+          "description": "What Composer calls this project: the `name` of the manifest Composer reads (composer.json, or the file `COMPOSER` names), exactly as written, whatever `extra.lockrot.project` says. `project` is what the report calls the project; this is the root package's own name. Not checked against the vendor/name form. Null where the manifest has no `name` (absent, empty or not a string), or where no composer.json was read (a lock-only run). One of the two keys in `run` a document may omit, with `project_php`: reports written before 0.13.0 do not carry it; from 0.13.0 on it is always written.",
           "oneOf": [
             {
               "type": "string",
@@ -1263,6 +1263,18 @@
           "oneOf": [
             {
               "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "project_php": {
+          "description": "The project's own `require.php`, exactly as the manifest Composer reads writes it (composer.json, or the file `COMPOSER` names): a constraint such as `>=8.2` or `^7.4 || ^8.0`, not a version, neither normalised nor checked. The second PHP floor, beside `target_php`, that left-behind (S8) holds a higher branch against, by the lowest PHP it promises. The same value `--explain` writes as `project_php`. Null where the manifest has no `require.php` (absent, empty or not a string), or where no composer.json was read (a lock-only run). Optional: reports written before 0.13.0 do not carry it; from 0.13.0 on it is always written.",
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1
             },
             {
               "type": "null"

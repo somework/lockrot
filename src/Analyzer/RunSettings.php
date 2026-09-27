@@ -32,6 +32,12 @@ use Lockrot\Verdict\Verdict;
  * uses, not the label the report was published under; a lock cannot say, since every lock in the
  * world is called composer.lock and none stores its root package's name.
  *
+ * `project_php` is the manifest's own `require.php`, as written and from the same manifest: the
+ * second floor, beside `target_php`, that S8 holds a higher branch against. `target_php` alone
+ * cannot explain why S8 passed over a branch the target admits, and the explanation's branch rows
+ * say only whether they admit it — a reader who is told "your require.php" should be able to see
+ * what it says. Null where the manifest has none, or the run read a lock without one.
+ *
  * The lock is named, never located: a report is something people publish, and an absolute path
  * carries the account it ran under and often the client's directory name. The project's own name is
  * a different thing — chosen metadata about the project the report already describes in full,
@@ -47,8 +53,9 @@ final class RunSettings
     private ?string $lockFile;
     private ?string $failOn;
     private ?Thresholds $thresholds;
+    private ?string $projectPhp;
 
-    public function __construct(?string $project, ?string $rootPackage, ?string $targetPhp, ?string $lockPath, ?string $failOn, ?Thresholds $thresholds)
+    public function __construct(?string $project, ?string $rootPackage, ?string $targetPhp, ?string $lockPath, ?string $failOn, ?Thresholds $thresholds, ?string $projectPhp = null)
     {
         $this->project = $project;
         $this->rootPackage = $rootPackage;
@@ -56,6 +63,7 @@ final class RunSettings
         $this->lockFile = $lockPath === null ? null : basename($lockPath);
         $this->failOn = $failOn;
         $this->thresholds = $thresholds;
+        $this->projectPhp = $projectPhp;
     }
 
     /** @return array<string, mixed> */
@@ -65,6 +73,7 @@ final class RunSettings
             'project' => $this->project,
             'root_package' => $this->rootPackage,
             'target_php' => $this->targetPhp,
+            'project_php' => $this->projectPhp,
             'lock_file' => $this->lockFile,
             'fail_on' => $this->failOn,
             'thresholds' => $this->thresholds === null ? null : [
