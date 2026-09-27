@@ -285,17 +285,14 @@ final class Finding
      */
     private function noFixClause(): ?string
     {
-        if (!$this->hasUnfixableAdvisory()) {
+        $list = $this->noFixExpected();
+        if ($list === null || $list === []) {
             return null;
         }
-        if ($this->verdict === Verdict::LEFT_BEHIND) {
-            foreach ($this->advisoryRows() as $row) {
-                if (($row['fixed_by'] ?? null) !== null && ($row['fixed_on_branch'] ?? false) !== true) {
-                    $branch = ReleaseBranch::of($this->version);
+        if (\in_array(NoFix::NOT_ON_INSTALLED_BRANCH, array_column($list, 'reason'), true)) {
+            $branch = ReleaseBranch::of($this->version);
 
-                    return $branch === null ? 'no fix expected' : 'no fix expected on '.ReleaseBranch::label($branch);
-                }
-            }
+            return $branch === null ? 'no fix expected' : 'no fix expected on '.ReleaseBranch::label($branch);
         }
         // The successor, not the raw marker: only a package name is somewhere to migrate to, and
         // the repository's free text is already in the evidence above this clause.
