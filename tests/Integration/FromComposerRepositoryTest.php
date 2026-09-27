@@ -69,6 +69,14 @@ final class FromComposerRepositoryTest extends TestCase
         'skeletons/laravel' => 0,
     ];
 
+    /**
+     * The same count with `--dev`: matomo's one entry without a notification-url is a
+     * packages-dev entry, so the false side gets a dev finding.
+     */
+    private const EXPECTED_WITH_DEV = [
+        'apps/matomo-org_matomo' => 1,
+    ];
+
     private static ?FixtureRepositoryServer $server = null;
 
     public static function setUpBeforeClass(): void
@@ -85,11 +93,14 @@ final class FromComposerRepositoryTest extends TestCase
         }
     }
 
-    /** @return iterable<string, array{string, int}> */
+    /** @return iterable<string, array{string, int, bool}> */
     public static function fixtures(): iterable
     {
         foreach (self::EXPECTED as $dir => $count) {
-            yield $dir => [$dir, $count];
+            yield $dir => [$dir, $count, false];
+        }
+        foreach (self::EXPECTED_WITH_DEV as $dir => $count) {
+            yield $dir.' --dev' => [$dir, $count, true];
         }
     }
 
@@ -97,9 +108,10 @@ final class FromComposerRepositoryTest extends TestCase
      * @dataProvider fixtures
      */
     #[DataProvider('fixtures')]
-    public function testEveryFindingSaysWhatItsLockEntrySays(string $dir, int $expected): void
+    public function testEveryFindingSaysWhatItsLockEntrySays(string $dir, int $expected, bool $includeDev): void
     {
-        $analysis = $this->analysis($dir);
+        $analysis = $this->analysis($dir, $includeDev);
+        $lockEntries = self::lockEntries($dir);
         $report = $analysis->report();
         $json = (new JsonFormatter())->format($report);
         $this->assertValid(Schemas::REPORT, $json, $dir);
@@ -123,7 +135,10 @@ final class FromComposerRepositoryTest extends TestCase
             self::assertNotNull($finding, $what);
             self::assertNotNull($facts, $what);
 
-            self::assertSame($facts->package()->isFromComposerRepository(), $value, $what.': the lock entry');
+            self::assertArrayHasKey($package, $lockEntries, $what);
+            self::assertSame($lockEntries[$package]['notified'], $value, $what.': the lock entry');
+            self::assertSame($lockEntries[$package]['dev'], $row['dev'], $what.': the lock section');
+            self::assertSame($facts->package()->isFromComposerRepository(), $value, $what.': the locked package');
             self::assertSame($value, $finding->isFromComposerRepository(), $what);
             self::assertSame($value, JsonPath::arrayAt($page, ['details', $package, 'lock'])['from_composer_repository'], $what.': the page\'s details');
             $explained = (new Explanation($finding, $facts, new Thresholds(), '8.4', $report))->toArray();
@@ -160,10 +175,35 @@ final class FromComposerRepositoryTest extends TestCase
             $this->assertValid(Schemas::EXPLAIN, $json, $finding->package(), true);
             ++$explained;
         }
-        self::assertSame(5, $explained);
+        self::assertSame(self::EXPECTED['apps/drupal_drupal'], $explained);
     }
 
-    private function analysis(string $dir): Analysis
+    /**
+     * The lock read as plain JSON, not through lockrot: per package, whether its entry carries a
+     * non-empty notification-url and whether it sits in packages-dev.
+     *
+     * @return array<string, array{notified: bool, dev: bool}>
+     */
+    private static function lockEntries(string $dir): array
+    {
+        $raw = file_get_contents(self::FIXTURES.$dir.'/composer.lock');
+        self::assertIsString($raw);
+        $lock = json_decode($raw, true);
+        self::assertIsArray($lock);
+        $entries = [];
+        foreach (['packages' => false, 'packages-dev' => true] as $section => $dev) {
+            foreach ($lock[$section] ?? [] as $entry) {
+                self::assertIsArray($entry);
+                self::assertIsString($entry['name']);
+                $url = $entry['notification-url'] ?? null;
+                $entries[$entry['name']] = ['notified' => \is_string($url) && $url !== '', 'dev' => $dev];
+            }
+        }
+
+        return $entries;
+    }
+
+    private function analysis(string $dir, bool $includeDev = false): Analysis
     {
         $server = self::$server;
         self::assertNotNull($server);
@@ -183,6 +223,6 @@ final class FromComposerRepositoryTest extends TestCase
         );
         $lock = LockFile::fromFile(self::FIXTURES.$dir.'/composer.lock');
 
-        return $analyzer->analyzeWithFacts($lock->packages(false), $lock, ProjectConfig::fromFile(self::FIXTURES.$dir.'/composer.json'), false);
+        return $analyzer->analyzeWithFacts($lock->packages($includeDev), $lock, ProjectConfig::fromFile(self::FIXTURES.$dir.'/composer.json'), $includeDev);
     }
 }
