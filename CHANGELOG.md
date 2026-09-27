@@ -280,8 +280,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `php_blocked_by` names only the project. The installed row answers too: its branch's newest
   release stopping before the target means moving to 8.4 takes another branch. Each field reads its
   floor exactly as the `admits_*` beside it does, and is null exactly where that `admits_*` is not
-  false; a test holds this on every row of every fixture lock. The page can now say "needs a newer
-  PHP" or "stops before PHP 8.4" and quote `php` as written, without parsing a constraint. Both are
+  false; a test holds this on every row of every fixture lock. A page can now say "needs a newer
+  PHP" or "stops before PHP 8.4" and quote `php` as written, without parsing a constraint; the
+  page's data carries both fields, and the page itself does not show them yet. Both are
   open strings with `x-known-values`, like `php_blocked_by`, and optional. Nothing else changes:
   not S8, the `--explain` text, the report or any other format.
 
