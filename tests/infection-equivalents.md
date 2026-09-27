@@ -25,12 +25,12 @@ mutant from the original, and says why.
 
 ## src/Analyzer/Libyears.php (0.11.0)
 
-- `src/Analyzer/Libyears.php:190` LessThan (`strcmp(...) < 0` → `<= 0`) — `fromFindings()`: the
+- `src/Analyzer/Libyears.php:194` LessThan (`strcmp(...) < 0` → `<= 0`) — `fromFindings()`: the
   tie-break between two findings with the same value compares their package names, and two findings
   in one report never share a name (the lock is keyed by it), so `strcmp` never returns 0 there and
   `<` and `<=` decide identically.
 
-- `src/Analyzer/Libyears.php:148` GreaterThan (`$release['at'] > $newest` → `>=`) —
+- `src/Analyzer/Libyears.php:152` GreaterThan (`$release['at'] > $newest` → `>=`) —
   `newestTrustedDateAbove()`: on a tie the two dates are equal, so keeping the first or taking the
   second yields the same instant; nothing downstream reads which branch it came from.
 

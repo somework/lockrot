@@ -51,5 +51,6 @@ final class LibyearsReasonListsTest extends TestCase
         preg_match_all('/(\d)\. ([a-z_]+)/', $description, $matches);
         self::assertSame(['1', '2', '3', '4'], $matches[1]);
         self::assertSame(self::PRECEDENCE, $matches[2]);
+        self::assertStringContainsString('exactly the findings whose `from_composer_repository` is false', $description, 'the first reason is the typed flag, not a list of repository types');
     }
 }

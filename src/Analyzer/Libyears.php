@@ -43,7 +43,11 @@ final class Libyears
      * not), or the lock entry without a `time`.
      */
     public const NO_STABLE_RELEASE_DATE = 'no_stable_release_date';
-    /** No metadata was asked for: a `path`, `vcs` or `package` repository entry. */
+    /**
+     * No metadata was asked for: the lock entry carries no Composer notification-url, as a `path`,
+     * `vcs`, `artifact` or inline `package` entry does, and so does a package from a `type: composer`
+     * repository that advertises no notify URL. Exactly the findings not from a Composer repository.
+     */
     public const NOT_FROM_COMPOSER_REPOSITORY = 'not_from_composer_repository';
     /** Metadata was asked for and did not come: not listed, offline, budget, transport. */
     public const METADATA_UNAVAILABLE = 'metadata_unavailable';
