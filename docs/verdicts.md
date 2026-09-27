@@ -195,9 +195,10 @@ same two floors, so the row of the branch S8 names says what its `floor_source` 
 requires no PHP is within reach of anything; its row reads `php_blocked_by: null` with both
 `admits_*` null, because there is nothing to test, and null there never means admitted. Every row is
 tested, the installed one and those below it too, though S8 only reads the dated branches above the
-installed one. A row's php is its branch's newest dated release's, so on the installed row
-`project` says a newer release on your branch needs more PHP than `require.php` promises, not that
-the version you have installed does; the lock's own requirement is the explanation's `lock.php`.
+installed one. A row's php is its branch's newest dated release's, which may be the version you
+have installed or a newer one. So on the installed row `project` says the newest dated release of
+your branch needs more PHP than the lowest `require.php` promises; it does not by itself say the
+version you have installed does, whose own requirement is the explanation's `lock.php`.
 The report names both floors in `run`: `target_php`, and `project_php`, the `require.php` exactly as
 composer.json writes it.
 

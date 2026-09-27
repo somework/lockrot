@@ -260,10 +260,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   fixture lock. A null `admits_*` is no answer, never admitted: the branch requires no PHP, its
   requirement cannot be read, or, for the project, `composer.json` names no lowest PHP. S8 counts
   such a branch as within reach, and `php_blocked_by` is null for it. The row is tested whatever its
-  place, so the installed branch can read `project` too: its row's `php` is the requirement of
-  that branch's newest dated release, not of the installed version (the lock's own is `lock.php`),
-  so `project` there means a newer release on your branch needs more PHP than the lowest
-  `require.php` promises. The document also gains `project_php`, the `require.php` the rows were
+  place, so the installed branch can read `project` too. Its row's `php` is the requirement of
+  that branch's newest dated release, which may be the installed version or a newer one, so
+  `project` there means the newest dated release of your branch needs more PHP than the lowest
+  `require.php` promises; the installed version's own requirement is `lock.php`. The document also gains `project_php`, the `require.php` the rows were
   tested against, next to `target_php`. `php_blocked_by` is described as an open string, not an
   enum, so a later value is not a schema break. Nothing S8 decides changes, nor the `--explain`
   text, the report or any other format; the explain schema only gains optional fields.
@@ -307,8 +307,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   it (`>=8.2` for wallabag). It is the second floor S8 holds a higher branch against, beside
   `run.target_php`, and the one each branch row's `admits_project_php` is tested against; until now
   the JSON report never named it, and the HTML page's data dropped it with the rest of the
-  `--explain` document's top level, so the page could say "your `require.php`" but not which
-  version that is. The value is the same one `--explain` writes as `project_php`, read from the same
+  `--explain` document's top level, so a page reading that data could not name the version its
+  branch rows were tested against. The page vendored here does not draw it yet. The value is the same one `--explain` writes as `project_php`, read from the same
   manifest (`COMPOSER=alt.json` reads alt.json), and null where the manifest has no `require.php`
   or the run read a lock without its composer.json; the key is always written. It is optional in
   the [published schema](docs/schema.md), so documents written before 0.13.0 still validate. It
