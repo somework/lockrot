@@ -318,7 +318,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and null where the manifest has no name or the run read a lock without its composer.json; the key
   is always written. `run.project` is unchanged. The field is listed but not required in the
   [published schema](docs/schema.md), so documents written before 0.13.0 still validate; it and
-  `run.project_php` are the two keys in `run` such a document omits. `--format=html` carries it in
+  `run.project_php` are among the keys in `run` such a document omits. `--format=html` carries it in
   the page's payload, which does not draw it; the other formats and `--explain` do not carry `run`
   at all.
 
@@ -422,6 +422,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Every verdict, priority, evidence line, count and exit code is unchanged, as are the table,
   markdown, GitHub, GitLab and SARIF formats, the `--explain` text (which leaves `releases_read` out)
   and the baseline. The 0.13.0 schema snapshot is refreshed.
+
+- The JSON report says whether the run failed and why: `gate`, with `fails` (the decision behind
+  exit `1` and `0`), `tripped_by` (each cause once, `strict_network` and `fail_on`, both when both
+  hold) and `fail_on_applied` (false in a `--generate-baseline` run, which judges no finding); and
+  each finding says where it stands in a `gate` of its own: `reaches_fail_on`, `exempt_by`
+  (`baseline` for a finding the baseline accepted as `known`; a `worsened` one is not exempt) and
+  `fails`. `run` gains the inputs the gate is decided by: `strict_network`, `mode` (`check` or
+  `generate_baseline`) and `fail_on_kind` (`none`, `verdict`, `priority` or `unchecked`), so a reader
+  need not know which fail-on words are verdicts and which priorities; the `run.fail_on` description
+  now names `unchecked` too. Until now none of this was in the document: a consumer had to know the
+  verdict and priority ladders, the baseline rule and what `--strict-network` does to rebuild the
+  exit code, and the HTML page showed `fail_on` as a bare label. The decision was composed twice
+  inside lockrot, by `Policy::exitCode()`'s loop and by the `--generate-baseline` return; it is now
+  `Gate::decide()`, which the exit code of both modes, the install-time block and the documents all
+  read, and a test holds it over every fail-on value,
+  baseline standing, `--strict-network` setting, network outcome and mode to the two it replaced,
+  frozen as they were, over a hand-built matrix and every fixture lock. The annotation level is
+  unchanged and keeps its own rule, now stated in the fields and held to them by the same tests:
+  `error` exactly where `reaches_fail_on` is true and `exempt_by` is not `baseline`, which in a
+  `--generate-baseline` run is also a finding that fails nothing. A run whose `gate.fails` is true
+  and which then cannot write a file or the baseline still exits `2`, as the field's description
+  says. `run.mode`, `run.fail_on_kind`, `gate.tripped_by` and a finding's `gate.exempt_by` are open
+  strings with a `pattern` and `x-known-values`; `tripped_by` is the first `uniqueItems` in any
+  lockrot schema. Every new key is optional in the schema, so documents written before 0.13.0 still
+  validate; from 0.13.0 on every document carries them, `gate` null only where `run` is. They reach
+  `--format=json` and the report inside the `--format=html` page, which does not read them yet; the
+  `--explain` document gets none of them, since an explanation gates nothing. Every verdict,
+  priority, exit code and baseline standing is unchanged, as are the table, markdown, GitHub, GitLab
+  and SARIF formats, the `--explain` text, the install-time summary and the baseline file. The
+  0.13.0 schema snapshot is refreshed.
 
 ### Fixed
 
