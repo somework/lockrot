@@ -58,6 +58,7 @@
       "type": "boolean"
     },
     "not_from_composer_repository": {
+      "description": "How many of the packages checked lockrot asked no repository about: the lock entry carries no Composer notification-url — a path, vcs, artifact or inline package entry, or a package from a `type: composer` repository that advertises no notify URL. Equals the number of findings whose `from_composer_repository` is false.",
       "type": "integer",
       "minimum": 0
     },
@@ -280,7 +281,7 @@
               "minimum": 0
             },
             "not_from_composer_repository": {
-              "description": "No metadata was asked for: a path, vcs or package repository entry.",
+              "description": "No metadata was asked for: the lock entry carries no Composer notification-url — a path, vcs, artifact or inline package entry, or a package from a `type: composer` repository that advertises no notify URL.",
               "type": "integer",
               "minimum": 0
             },
@@ -515,6 +516,10 @@
         },
         "dev": {
           "description": "Listed under packages-dev in the lock.",
+          "type": "boolean"
+        },
+        "from_composer_repository": {
+          "description": "True when the lock entry carries a Composer `notification-url`. Composer writes one only for a package served by a `type: composer` repository that advertises a notify URL (`notify-batch` or `notify` in its packages.json); packagist.org and Private Packagist do. lockrot asks a repository for metadata, advisories and repository activity only about such an entry. False otherwise: a `path`, `vcs`, `artifact` or inline `package` repository entry, and also a package from a `type: composer` repository that advertises no notify URL (asset-packagist.org; a Satis build without `notify-batch`). lockrot asked no repository about a false entry, so the finding has no metadata, advisories, activity or libyears. True does not mean packagist.org. Stays a boolean for 1.x: a finer account of where an entry came from would be a separate optional open-set field, never a new type for this key. Same value as the `--explain` document's `lock.from_composer_repository`. Absent from documents written before 0.13.0; from 0.13.0 on every finding carries it.",
           "type": "boolean"
         },
         "replacement": {

@@ -39,7 +39,7 @@ use Lockrot\Verdict\VerdictEngine;
  */
 final class Analyzer
 {
-    public const NOTE_NOT_IN_REPOSITORY = 'not from a Composer repository, not checked';
+    public const NOTE_NOT_IN_REPOSITORY = Finding::NOTE_NOT_IN_REPOSITORY;
 
     /**
      * The note for a forge whose anonymous request cap shaped the run, so a zero-candidate run
@@ -397,8 +397,9 @@ final class Analyzer
         }
         $verdict = $this->engine->decide($signals, $entry !== null, $meta !== null);
 
+        $fromRepository = $package->isFromComposerRepository();
         $note = null;
-        if (!$package->isFromComposerRepository()) {
+        if (!$fromRepository) {
             $note = self::NOTE_NOT_IN_REPOSITORY;
         } elseif ($meta === null && isset($batch->failed()[$package->name()])) {
             $note = $this->metadataFailureNote($batch->failed()[$package->name()]);
@@ -417,7 +418,8 @@ final class Analyzer
             $note,
             $package->isDev(),
             array_keys($graph->chainsTo($package->name())),
-            Libyears::behind($package, $meta)
+            Libyears::behind($package, $meta),
+            $fromRepository
         );
     }
 

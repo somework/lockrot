@@ -69,6 +69,8 @@ final class SchemaWideningTest extends TestCase
         yield 'baseline schema maximum lowered' => [Schemas::BASELINE, 'baseline-maximum', '#/properties/lockrot/properties/schema: maximum lowered to 0'];
         yield 'config budget maximum lowered' => [Schemas::CONFIG, 'budget-maximum', '#/properties/install-time-budget: maximum lowered to 60'];
         yield 's6 reason loses no_stable_release' => [Schemas::REPORT, 's6-reason-dropped', '/properties/data/properties/reason: no longer accepts "no_stable_release"'];
+        yield 'finding from_composer_repository made required' => [Schemas::REPORT, 'provenance-required', 'made required from_composer_repository'];
+        yield 'explain finding from_composer_repository made required' => [Schemas::EXPLAIN, 'provenance-required', 'made required from_composer_repository'];
     }
 
     /**
@@ -174,6 +176,30 @@ final class SchemaWideningTest extends TestCase
         self::assertSame([], array_values(array_filter($problems, static fn (string $problem): bool => strpos($problem, 'not is a keyword') !== false)), implode("\n", $problems));
     }
 
+    /**
+     * `from_composer_repository` joined the finding in 0.13.0 as an optional boolean: a schema
+     * without it is what 0.12 documents were written against, and the current one only widens it.
+     *
+     * @dataProvider findingSchemas
+     */
+    #[DataProvider('findingSchemas')]
+    public function testTheFindingGainingFromComposerRepositoryIsAWidening(string $document): void
+    {
+        $current = self::current($document);
+        $before = self::without($current, ['definitions', 'finding', 'properties', 'from_composer_repository']);
+
+        self::assertNotContains('from_composer_repository', JsonPath::arrayAt($current, ['definitions', 'finding', 'required']));
+        self::assertSame(['type' => 'boolean'], array_diff_key(JsonPath::arrayAt($current, ['definitions', 'finding', 'properties', 'from_composer_repository']), ['description' => true]));
+        self::assertSame([], SchemaWidening::narrowings($before, $current));
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function findingSchemas(): iterable
+    {
+        yield Schemas::REPORT => [Schemas::REPORT];
+        yield Schemas::EXPLAIN => [Schemas::EXPLAIN];
+    }
+
     /** @return array<mixed, mixed> */
     private static function current(string $document): array
     {
@@ -229,6 +255,8 @@ final class SchemaWideningTest extends TestCase
                 $s = self::appended($s, ['definitions', 's1', 'required'], 'since');
 
                 return self::with($s, ['definitions', 'signal', 'anyOf', 0, 'required'], ['since']);
+            case 'provenance-required':
+                return self::appended($s, ['definitions', 'finding', 'required'], 'from_composer_repository');
             case 'run-required':
                 return self::appended($s, ['required'], 'run');
             case 'stale-integer':

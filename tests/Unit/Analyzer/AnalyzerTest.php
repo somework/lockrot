@@ -278,6 +278,11 @@ final class AnalyzerTest extends TestCase
         self::assertSame(Verdict::PINNED, $byName['vendor/snapshot']->verdict());
         self::assertSame(Verdict::UNKNOWN, $byName['private/thing']->verdict());
         self::assertSame('not from a Composer repository, not checked', $byName['private/thing']->evidence());
+        // The lock entry is the one fact the note stands for: the other four carry a notification-url.
+        self::assertFalse($byName['private/thing']->isFromComposerRepository());
+        foreach (['vendor/direct', 'vendor/transitive', 'vendor/snapshot'] as $asked) {
+            self::assertTrue($byName[$asked]->isFromComposerRepository(), $asked);
+        }
         self::assertSame(4, $report->packagesChecked());
         self::assertSame(1, $report->notFromComposerRepository());
         self::assertFalse($report->hadNetworkFailures());
@@ -360,6 +365,7 @@ final class AnalyzerTest extends TestCase
         self::assertTrue($report->hadNetworkFailures());
         self::assertContains('Repository metadata unavailable for 1 package: HTTP 503', $report->notes());
         self::assertSame('Repository metadata unavailable: HTTP 503', $report->findings()[0]->evidence());
+        self::assertTrue($report->findings()[0]->isFromComposerRepository(), 'a note, and still a package a repository was asked about');
     }
 
     public function testTwoFailedPackagesAreCountedInThePlural(): void

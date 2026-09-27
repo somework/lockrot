@@ -37,7 +37,7 @@ final class LibyearsTest extends TestCase
 
     private static function finding(string $package, ?float $libyears, bool $direct = true, string $version = '1.0.0', ?string $note = null): Finding
     {
-        return new Finding($package, $version, Verdict::OK, [], $direct ? [$package] : ['vendor/root', $package], null, null, $note, false, [], $libyears);
+        return new Finding($package, $version, Verdict::OK, [], $direct ? [$package] : ['vendor/root', $package], null, null, $note, false, [], $libyears, $note !== Analyzer::NOTE_NOT_IN_REPOSITORY);
     }
 
     // ---- the per-package rule --------------------------------------------------------------

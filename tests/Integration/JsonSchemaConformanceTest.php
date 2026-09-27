@@ -677,6 +677,61 @@ final class JsonSchemaConformanceTest extends TestCase
     }
 
     /**
+     * `from_composer_repository` is a boolean on every finding lockrot writes from 0.13.0 on, and
+     * optional in both schemas, so a 0.12 finding without it still validates. Null and a word do not.
+     */
+    public function testAFindingSaysWhetherARepositoryWasAskedAboutItAsABoolean(): void
+    {
+        $analysis = self::analysis('apps/wallabag_wallabag');
+        $finding = $analysis->finding('doctrine/cache');
+        $facts = $analysis->facts('doctrine/cache');
+        self::assertNotNull($finding);
+        self::assertNotNull($facts);
+        $documents = [
+            Schemas::REPORT => [(new JsonFormatter())->format($analysis->report()), ['findings', 0]],
+            Schemas::EXPLAIN => [(new ExplainFormatter())->json(new Explanation($finding, $facts, new Thresholds(), '8.4', $analysis->report())), ['finding']],
+        ];
+        foreach ($documents as $schema => [$json, $path]) {
+            $decoded = json_decode($json, true);
+            self::assertIsArray($decoded);
+            self::assertTrue(JsonPath::arrayAt($decoded, $path)['from_composer_repository'], $schema.': wallabag\'s packages all come from Packagist');
+            foreach ([true, false, self::ABSENT] as $value) {
+                $what = $schema.' '.var_export($value, true);
+                $changed = self::withFindingKey($decoded, $path, 'from_composer_repository', $value);
+                $this->assertValid($schema, $changed, $what);
+                $this->assertValid($schema, $changed, $what, true);
+            }
+            foreach ([null, 'yes', 1] as $value) {
+                self::assertNotSame([], $this->errors($schema, self::withFindingKey($decoded, $path, 'from_composer_repository', $value), false), $schema.' '.var_export($value, true));
+            }
+        }
+    }
+
+    /**
+     * @param array<mixed, mixed> $document
+     * @param list<int|string>    $path
+     * @param mixed               $value {@see ABSENT} removes the key
+     */
+    private static function withFindingKey(array $document, array $path, string $key, $value): string
+    {
+        $finding = JsonPath::arrayAt($document, $path);
+        if ($value === self::ABSENT) {
+            unset($finding[$key]);
+        } else {
+            $finding[$key] = $value;
+        }
+        if ($path === ['finding']) {
+            $document['finding'] = $finding;
+        } else {
+            $findings = JsonPath::arrayAt($document, ['findings']);
+            $findings[0] = $finding;
+            $document['findings'] = $findings;
+        }
+
+        return (string) json_encode($document);
+    }
+
+    /**
      * The report with wallabag/rulerz's S6 data changed: a key set to {@see ABSENT} is removed.
      *
      * @param array<string, mixed> $change
