@@ -226,7 +226,8 @@ the run carries on unchanged; `extensions` and keys starting with `x-` are reser
 Package metadata comes
 from the repositories configured in your `composer.json`, through Composer's own repository layer —
 Private Packagist, Satis and mirrors included, with its authentication, proxy settings and metadata
-cache. Repository activity comes from GitHub, GitLab and Bitbucket Cloud and is cached for 24 hours.
+cache; a repository is asked about a package only when it advertises a notify URL, so a Satis build
+needs `notify-batch` set. Repository activity comes from GitHub, GitLab and Bitbucket Cloud and is cached for 24 hours.
 
 [Full configuration reference →](https://lockrot.dev/configuration/) ·
 [How lockrot fetches metadata →](https://lockrot.dev/internals/)

@@ -8,7 +8,10 @@ description: lockrot reads the Composer repositories you configured, Private Pac
 You do not have to configure anything for this. lockrot reads the repositories already configured in
 the project's `composer.json`, through Composer's own repository layer, so Private Packagist, Satis
 instances and mirrors are honoured the same way Packagist is, along with Composer's own
-authentication and proxy settings.
+authentication and proxy settings. A repository is asked about a package only when it advertises a
+notify URL, which is what gives the lock entry its `notification-url`: a Satis build needs
+`notify-batch` set, or its packages read as not from a Composer repository
+(`from_composer_repository` false in the report).
 
 This page explains what that means for freshness, memory and the "Data as of" line.
 
