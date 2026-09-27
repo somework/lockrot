@@ -8,14 +8,14 @@ namespace Lockrot\Json;
  * The strict reading of a published schema: every open set read as the enum it lists.
  *
  * The values that grow in minor releases — signal ids, S10's checks and reasons, S8's floor source,
- * S6's reason, an explained branch's `php_blocked_by` and `misses_*_php`, a finding's `libyears_unmeasured`,
- * the configuration's `format` — are open
- * strings in resources/*.schema.json: a `pattern`, so a copy a consumer took earlier accepts a value
- * a later release adds, and an `x-known-values` list of the values this release writes. Draft-04
- * validators ignore a keyword they do not know. Read strictly, the list is the `enum` and the pattern
- * goes, so exactly the known values pass and a mistyped one fails with the enum's message, one line,
- * as it did while the published files spelled the enum out. {@see \Lockrot\Config\ConfigSchema}
- * validates `extra.lockrot` this way, and the tests hold lockrot's own documents to it.
+ * S6's reason, an explained branch's `php_blocked_by` and `misses_*_php`, a finding's
+ * `libyears_unmeasured`, the configuration's `format` — are open strings in
+ * resources/*.schema.json: a `pattern`, so a copy a consumer took earlier accepts a value a later
+ * release adds, and an `x-known-values` list of the values this release writes. Draft-04 validators
+ * ignore a keyword they do not know. Read strictly, the list is the `enum` and the pattern goes, so
+ * exactly the known values pass and a mistyped one fails with the enum's message, one line, as it
+ * did while the published files spelled the enum out. {@see \Lockrot\Config\ConfigSchema} validates
+ * `extra.lockrot` this way, and the tests hold lockrot's own documents to it.
  *
  * Only places where a schema sits are read: an object that is a value (a `default`, an `enum` member)
  * keeps whatever it holds. A node that already has an `enum` keeps it.
