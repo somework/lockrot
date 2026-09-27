@@ -284,7 +284,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   PHP" or "stops before PHP 8.4" and quote `php` as written, without parsing a constraint; the
   page's data carries both fields, and the page itself does not show them yet. Both are
   open strings with `x-known-values`, like `php_blocked_by`, and optional. Nothing else changes:
-  not S8, the `--explain` text, the report or any other format.
+  not S8, the `--explain` text, the JSON report, what the HTML page shows, or any other format;
+  only the explain document and the page's embedded `details` gain the two fields.
 
 - The JSON report states the rule behind `exposure`, and lists what that rule gives to nobody.
   `exposure` counts a flagged transitive package under each direct requirement that reaches it only
