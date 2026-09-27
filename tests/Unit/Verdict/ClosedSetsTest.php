@@ -31,8 +31,8 @@ use PHPUnit\Framework\TestCase;
  * sets in the same order, because a consumer validating against them reads the order from there.
  *
  * The open sets are held the other way round: an open string in every schema, with the values
- * lockrot writes listed in `x-known-values` and nowhere as an enum. The last test guards the names
- * docs/compatibility.md reserves for extensions.
+ * lockrot writes listed in `x-known-values` and nowhere as an enum, and each named on the pages that
+ * say which sets grow. The last test guards the names docs/compatibility.md reserves for extensions.
  */
 final class ClosedSetsTest extends TestCase
 {
@@ -197,6 +197,42 @@ final class ClosedSetsTest extends TestCase
     }
 
     /**
+     * Every open set, by document and JSON pointer: its node, its pattern, the values lockrot writes,
+     * and the words docs/compatibility.md and docs/schema.md name it by. The one registry: a new set
+     * is added here and nowhere else.
+     *
+     * @return array<string, array{array<mixed, mixed>, string, list<string>, string}>
+     */
+    private static function openSets(): array
+    {
+        $report = self::schema(Schemas::REPORT);
+        $explain = self::schema(Schemas::EXPLAIN);
+        $config = self::schema(Schemas::CONFIG);
+        $s10Entry = ['definitions', 's10', 'properties', 'unchecked', 'items', 'properties'];
+        $branchRow = ['definitions', 'metadata', 'properties', 'branches', 'items', 'properties'];
+
+        return [
+            'report #/definitions/signalId' => [JsonPath::arrayAt($report, ['definitions', 'signalId']), self::SIGNAL_ID, ClosedSets::signalIds(), 'signal ids'],
+            'report #/definitions/s10/properties/unchecked/items/properties/check' => [JsonPath::arrayAt($report, array_merge($s10Entry, ['check'])), self::WORD, ['repository_activity', 'release_dates'], "S10's `check` and `reason`"],
+            'report #/definitions/s10/properties/unchecked/items/properties/reason' => [
+                JsonPath::arrayAt($report, array_merge($s10Entry, ['reason'])),
+                self::WORD,
+                [NotCheckedRule::NO_TOKEN, NotCheckedRule::RATE_BUDGET, NotCheckedRule::BUDGET, NotCheckedRule::RATE_LIMIT, NotCheckedRule::FETCH_FAILED, NotCheckedRule::OFFLINE, 'undated_releases'],
+                "S10's `check` and `reason`",
+            ],
+            'report #/definitions/s6/properties/reason' => [JsonPath::arrayAt($report, ['definitions', 's6', 'properties', 'reason']), self::WORD, [PinnedRule::REASON_BRANCH_SNAPSHOT, PinnedRule::REASON_NO_STABLE_RELEASE], "S6's `reason`"],
+            'report #/definitions/s8/properties/floor_source/oneOf/0' => [JsonPath::arrayAt($report, ['definitions', 's8', 'properties', 'floor_source', 'oneOf', 0]), self::WORD, [PhpFloor::PROJECT, PhpFloor::TARGET], "S8's `floor_source`"],
+            'report #/definitions/finding/properties/libyears_unmeasured/oneOf/0' => [JsonPath::arrayAt($report, ['definitions', 'finding', 'properties', 'libyears_unmeasured', 'oneOf', 0]), self::WORD, Libyears::REASONS, "a finding's `libyears_unmeasured`"],
+            'explain #/definitions/finding/properties/libyears_unmeasured/oneOf/0' => [JsonPath::arrayAt($explain, ['definitions', 'finding', 'properties', 'libyears_unmeasured', 'oneOf', 0]), self::WORD, Libyears::REASONS, "a finding's `libyears_unmeasured`"],
+            'explain #/definitions/metadata/properties/branches/items/properties/php_blocked_by/oneOf/0' => [JsonPath::arrayAt($explain, array_merge($branchRow, ['php_blocked_by', 'oneOf', 0])), self::WORD, [PhpFloor::PROJECT, PhpFloor::TARGET], "the explanation's `php_blocked_by`"],
+            'explain #/definitions/metadata/properties/branches/items/properties/misses_target_php/oneOf/0' => [JsonPath::arrayAt($explain, array_merge($branchRow, ['misses_target_php', 'oneOf', 0])), self::WORD, [PhpFloor::NEEDS_NEWER, PhpFloor::STOPS_BEFORE, PhpFloor::SKIPS, PhpFloor::UNSATISFIABLE], '`misses_target_php`'],
+            'explain #/definitions/metadata/properties/branches/items/properties/misses_project_php/oneOf/0' => [JsonPath::arrayAt($explain, array_merge($branchRow, ['misses_project_php', 'oneOf', 0])), self::WORD, [PhpFloor::NEEDS_NEWER, PhpFloor::STOPS_BEFORE, PhpFloor::SKIPS, PhpFloor::UNSATISFIABLE], '`misses_project_php`'],
+            'explain #/definitions/signalId' => [JsonPath::arrayAt($explain, ['definitions', 'signalId']), self::SIGNAL_ID, ClosedSets::signalIds(), 'signal ids'],
+            'config #/properties/format' => [JsonPath::arrayAt($config, ['properties', 'format']), self::FORMAT, LockrotConfig::FORMATS, "the configuration's `format`"],
+        ];
+    }
+
+    /**
      * Every open set is a string with a `pattern` and the values lockrot writes in `x-known-values`,
      * never an enum, and every known value fits the pattern. The patterns are spelled out, since the
      * strict reading drops them and the widening check never sees one narrowed; the known values are
@@ -207,26 +243,8 @@ final class ClosedSetsTest extends TestCase
         $report = self::schema(Schemas::REPORT);
         $explain = self::schema(Schemas::EXPLAIN);
         $config = self::schema(Schemas::CONFIG);
-        $s10Entry = ['definitions', 's10', 'properties', 'unchecked', 'items', 'properties'];
         $branchRow = ['definitions', 'metadata', 'properties', 'branches', 'items', 'properties'];
-        $open = [
-            'report #/definitions/signalId' => [JsonPath::arrayAt($report, ['definitions', 'signalId']), self::SIGNAL_ID, ClosedSets::signalIds()],
-            'report #/definitions/s10/properties/unchecked/items/properties/check' => [JsonPath::arrayAt($report, array_merge($s10Entry, ['check'])), self::WORD, ['repository_activity', 'release_dates']],
-            'report #/definitions/s10/properties/unchecked/items/properties/reason' => [
-                JsonPath::arrayAt($report, array_merge($s10Entry, ['reason'])),
-                self::WORD,
-                [NotCheckedRule::NO_TOKEN, NotCheckedRule::RATE_BUDGET, NotCheckedRule::BUDGET, NotCheckedRule::RATE_LIMIT, NotCheckedRule::FETCH_FAILED, NotCheckedRule::OFFLINE, 'undated_releases'],
-            ],
-            'report #/definitions/s6/properties/reason' => [JsonPath::arrayAt($report, ['definitions', 's6', 'properties', 'reason']), self::WORD, [PinnedRule::REASON_BRANCH_SNAPSHOT, PinnedRule::REASON_NO_STABLE_RELEASE]],
-            'report #/definitions/s8/properties/floor_source/oneOf/0' => [JsonPath::arrayAt($report, ['definitions', 's8', 'properties', 'floor_source', 'oneOf', 0]), self::WORD, [PhpFloor::PROJECT, PhpFloor::TARGET]],
-            'report #/definitions/finding/properties/libyears_unmeasured/oneOf/0' => [JsonPath::arrayAt($report, ['definitions', 'finding', 'properties', 'libyears_unmeasured', 'oneOf', 0]), self::WORD, Libyears::REASONS],
-            'explain #/definitions/finding/properties/libyears_unmeasured/oneOf/0' => [JsonPath::arrayAt($explain, ['definitions', 'finding', 'properties', 'libyears_unmeasured', 'oneOf', 0]), self::WORD, Libyears::REASONS],
-            'explain #/definitions/metadata/properties/branches/items/properties/php_blocked_by/oneOf/0' => [JsonPath::arrayAt($explain, array_merge($branchRow, ['php_blocked_by', 'oneOf', 0])), self::WORD, [PhpFloor::PROJECT, PhpFloor::TARGET]],
-            'explain #/definitions/metadata/properties/branches/items/properties/misses_target_php/oneOf/0' => [JsonPath::arrayAt($explain, array_merge($branchRow, ['misses_target_php', 'oneOf', 0])), self::WORD, [PhpFloor::NEEDS_NEWER, PhpFloor::STOPS_BEFORE, PhpFloor::SKIPS, PhpFloor::UNSATISFIABLE]],
-            'explain #/definitions/metadata/properties/branches/items/properties/misses_project_php/oneOf/0' => [JsonPath::arrayAt($explain, array_merge($branchRow, ['misses_project_php', 'oneOf', 0])), self::WORD, [PhpFloor::NEEDS_NEWER, PhpFloor::STOPS_BEFORE, PhpFloor::SKIPS, PhpFloor::UNSATISFIABLE]],
-            'explain #/definitions/signalId' => [JsonPath::arrayAt($explain, ['definitions', 'signalId']), self::SIGNAL_ID, ClosedSets::signalIds()],
-            'config #/properties/format' => [JsonPath::arrayAt($config, ['properties', 'format']), self::FORMAT, LockrotConfig::FORMATS],
-        ];
+        $open = self::openSets();
         foreach ($open as $where => [$node, $pattern, $known]) {
             self::assertSame('string', $node['type'] ?? null, $where);
             self::assertArrayNotHasKey('enum', $node, $where);
@@ -262,6 +280,62 @@ final class ClosedSetsTest extends TestCase
         $expected = array_keys($open);
         sort($expected);
         self::assertSame($expected, $found);
+    }
+
+    /**
+     * Every open set is named where a consumer reads which sets grow: the bullet list of
+     * docs/compatibility.md's "Open sets", the paragraph there that says which of them the schemas
+     * describe, and docs/schema.md's "Open sets" paragraph.
+     */
+    public function testEveryOpenSetIsNamedOnBothPages(): void
+    {
+        $compatibility = self::section(self::page('compatibility.md'), '### Open sets');
+        $bullets = self::flat(implode(' ', array_filter(explode("\n", $compatibility), static fn (string $line): bool => strpos($line, '- ') === 0)));
+        $schemas = self::paragraphStartingWith($compatibility, 'The schemas describe');
+        $schemaPage = self::paragraphStartingWith(self::section(self::page('schema.md'), '## Open sets'), 'Objects are open');
+        self::assertNotSame('', $bullets, 'the bullet list');
+
+        foreach (self::openSets() as $where => [, , , $phrase]) {
+            self::assertStringContainsString($phrase, $bullets, $where.': docs/compatibility.md\'s list of open sets');
+            self::assertStringContainsString($phrase, $schemas, $where.': docs/compatibility.md\'s "The schemas describe" paragraph');
+            self::assertStringContainsString($phrase, $schemaPage, $where.': docs/schema.md\'s "Open sets" paragraph');
+        }
+    }
+
+    /** From the heading to the next heading of the same or a higher level. */
+    private static function section(string $page, string $heading): string
+    {
+        $start = strpos($page, "\n".$heading."\n");
+        self::assertNotFalse($start, $heading);
+        $level = \strlen((string) strstr($heading, ' ', true));
+        $rest = substr($page, $start + \strlen($heading) + 2);
+        $end = preg_match('/^#{1,'.$level.'} /m', $rest, $match, \PREG_OFFSET_CAPTURE) === 1 ? $match[0][1] : \strlen($rest);
+
+        return substr($rest, 0, $end);
+    }
+
+    /** The paragraph that opens with these words, its lines joined. */
+    private static function paragraphStartingWith(string $text, string $opening): string
+    {
+        foreach (preg_split('/\n\s*\n/', $text) ?: [] as $paragraph) {
+            if (strpos(ltrim($paragraph), $opening) === 0) {
+                return self::flat($paragraph);
+            }
+        }
+        self::fail('no paragraph opens with "'.$opening.'"');
+    }
+
+    private static function flat(string $text): string
+    {
+        return (string) preg_replace('/\s+/', ' ', $text);
+    }
+
+    private static function page(string $name): string
+    {
+        $contents = file_get_contents(self::ROOT.'docs/'.$name);
+        self::assertIsString($contents, $name);
+
+        return $contents;
     }
 
     /**
