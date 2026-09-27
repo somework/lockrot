@@ -133,6 +133,11 @@ final class ExplainFormatterTest extends TestCase
             self::assertStringContainsString("\n".$expected."\n", $text, $case);
             self::assertStringNotContainsString('releases_read', $text, $case);
         }
+
+        // Skipped where it stands, not where AdvisoryRule happens to put it: the keys after it still print.
+        $reordered = new Signal(Signal::S9, Signal::LEVEL_WARN, '1 security advisory affects 1.0.0 (CVE-2024-0001)', ['releases_read' => true, 'advisories' => $s9->data()['advisories']]);
+        $finding = new Finding('vendor/pkg', '1.0.0', Verdict::ABANDONED, [new Signal(Signal::S1, Signal::LEVEL_HIGH, 'marked abandoned by its repository'), $reordered], ['vendor/pkg'], null, new \DateTimeImmutable(F::NOW));
+        self::assertStringContainsString("\n".$expected."\n", $this->plain(new Explanation($finding, F::facts($package), new Thresholds(), '8.4', $this->report())));
     }
 
     /**
