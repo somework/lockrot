@@ -36,7 +36,7 @@ mutant from the original, and says why.
 
 ## src/Verdict/Finding.php (0.11.0, the successor)
 
-- `src/Verdict/Finding.php:312` LogicalAnd (`is_string($replacement) && $replacement !== ''` → `||`)
+- `src/Verdict/Finding.php:344` LogicalAnd (`is_string($replacement) && $replacement !== ''` → `||`)
   — `replacement()`: the one caller is `successor()`, which then requires a `/` and a name Composer
   accepts. Under `||` a null stays null (the ternary returns the value itself) and an empty string
   is returned instead of null, and an empty string has no `/`, so `successor()` answers null either
