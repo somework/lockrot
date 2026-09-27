@@ -87,6 +87,14 @@ final class SchemaWideningTest extends TestCase
         yield 'a no-fix advisory loses a reason' => [Schemas::REPORT, 'no-fix-reason-dropped', '/properties/reason: no longer accepts "releases_unknown"'];
         yield 'explain no-fix advisory loses a reason' => [Schemas::EXPLAIN, 'no-fix-reason-dropped', '/properties/reason: no longer accepts "releases_unknown"'];
         yield 's9 releases_read made required' => [Schemas::REPORT, 'releases-read-required', 'made required releases_read'];
+        yield 'gate made required' => [Schemas::REPORT, 'gate-required', '#: made required gate'];
+        yield 'finding gate made required' => [Schemas::REPORT, 'finding-gate-required', 'made required gate'];
+        yield 'run mode made required' => [Schemas::REPORT, 'mode-required', 'made required mode'];
+        yield 'gate loses null' => [Schemas::REPORT, 'gate-not-null', '#/properties/gate/oneOf/1: no longer accepts null'];
+        yield 'finding gate loses null' => [Schemas::REPORT, 'finding-gate-not-null', '/properties/gate/oneOf/1: no longer accepts null'];
+        yield 'exempt_by loses baseline' => [Schemas::REPORT, 'exempt-dropped', '/properties/exempt_by/oneOf/0: no longer accepts "baseline"'];
+        yield 'a mode dropped' => [Schemas::REPORT, 'mode-dropped', '/properties/mode: no longer accepts "generate_baseline"'];
+        yield 'tripped_by uniqueItems changed' => [Schemas::REPORT, 'tripped-unique-changed', '/properties/tripped_by: uniqueItems is a keyword this check does not compare'];
     }
 
     /**
@@ -122,6 +130,8 @@ final class SchemaWideningTest extends TestCase
         yield 'a libyears reason added' => [Schemas::REPORT, 'unmeasured-reason-added'];
         yield 'a priority step reason added' => [Schemas::REPORT, 'step-reason-added'];
         yield 'a no-fix reason added' => [Schemas::EXPLAIN, 'no-fix-reason-added'];
+        yield 'an exemption added' => [Schemas::REPORT, 'exempt-added'];
+        yield 'a fail-on kind added' => [Schemas::REPORT, 'kind-added'];
     }
 
     /**
@@ -256,6 +266,27 @@ final class SchemaWideningTest extends TestCase
         self::assertSame([], SchemaWidening::narrowings($before, $current));
     }
 
+    /**
+     * `run.mode`, `run.strict_network` and `run.fail_on_kind`, the root `gate` and each finding's
+     * `gate` joined the report in 0.13.0, all optional: from the schema without them, the current one
+     * only widens. The explain schema gets none of them: an explanation gates nothing.
+     */
+    public function testTheReportGainingItsGateIsAWidening(): void
+    {
+        $current = self::current(Schemas::REPORT);
+        $before = self::without($current, ['properties', 'gate']);
+        $before = self::without($before, ['definitions', 'finding', 'properties', 'gate']);
+        foreach (['mode', 'strict_network', 'fail_on_kind'] as $key) {
+            $before = self::without($before, ['definitions', 'run', 'properties', $key]);
+            self::assertNotContains($key, JsonPath::arrayAt($current, ['definitions', 'run', 'required']));
+        }
+
+        self::assertNotContains('gate', JsonPath::arrayAt($current, ['required']));
+        self::assertNotContains('gate', JsonPath::arrayAt($current, ['definitions', 'finding', 'required']));
+        self::assertSame([], SchemaWidening::narrowings($before, $current));
+        self::assertArrayNotHasKey('gate', JsonPath::arrayAt(self::current(Schemas::EXPLAIN), ['definitions', 'finding', 'properties']));
+    }
+
     /** @return iterable<string, array{string}> */
     public static function findingSchemas(): iterable
     {
@@ -346,6 +377,26 @@ final class SchemaWideningTest extends TestCase
                 return self::appended($s, ['definitions', 'noFixAdvisory', 'properties', 'reason', KnownValues::KEYWORD], 'withdrawn_upstream');
             case 'releases-read-required':
                 return self::appended($s, ['definitions', 's9', 'required'], 'releases_read');
+            case 'gate-required':
+                return self::appended($s, ['required'], 'gate');
+            case 'finding-gate-required':
+                return self::appended($s, ['definitions', 'finding', 'required'], 'gate');
+            case 'mode-required':
+                return self::appended($s, ['definitions', 'run', 'required'], 'mode');
+            case 'gate-not-null':
+                return self::with($s, ['properties', 'gate'], ['$ref' => '#/definitions/gate']);
+            case 'finding-gate-not-null':
+                return self::with($s, array_merge($finding, ['gate']), ['$ref' => '#/definitions/findingGate']);
+            case 'exempt-dropped':
+                return self::with($s, ['definitions', 'findingGate', 'properties', 'exempt_by', 'oneOf', 0, KnownValues::KEYWORD], []);
+            case 'exempt-added':
+                return self::appended($s, ['definitions', 'findingGate', 'properties', 'exempt_by', 'oneOf', 0, KnownValues::KEYWORD], 'ignore_list');
+            case 'kind-added':
+                return self::appended($s, ['definitions', 'run', 'properties', 'fail_on_kind', 'oneOf', 0, KnownValues::KEYWORD], 'licence');
+            case 'mode-dropped':
+                return self::with($s, ['definitions', 'run', 'properties', 'mode', KnownValues::KEYWORD], ['check']);
+            case 'tripped-unique-changed':
+                return self::with($s, ['definitions', 'gate', 'properties', 'tripped_by', 'uniqueItems'], false);
             case 'run-required':
                 return self::appended($s, ['required'], 'run');
             case 'stale-integer':

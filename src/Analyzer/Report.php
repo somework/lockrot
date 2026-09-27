@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Analyzer;
 
 use Lockrot\Baseline\BaselineComparison;
+use Lockrot\Config\Gate;
 use Lockrot\Signal\Signal;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Priority;
@@ -279,6 +280,22 @@ final class Report
         return Libyears::fromFindings($this->findings);
     }
 
+    /**
+     * The run's gate, decided over this report as it stands — its findings, its baseline comparison,
+     * its network failures — by the policy its run carries, so a report compared with a baseline
+     * after the run was attached never keeps a stale answer. Null where the report was not told what
+     * the run was asked to do, or was told no fail-on, which is only ever a test.
+     */
+    public function gate(): ?Gate
+    {
+        if ($this->run === null) {
+            return null;
+        }
+        $failOn = $this->run->failOn();
+
+        return $failOn === null ? null : Gate::decide($this, $failOn, $this->run->strictNetwork(), $this->run->mode());
+    }
+
     /** Whether `packages-dev` was analysed alongside the production set. */
     public function includesDev(): bool
     {
@@ -421,6 +438,8 @@ final class Report
     public function toArray(): array
     {
         $counts = $this->byVerdict();
+        $gate = $this->gate();
+        $standings = $gate === null ? null : $gate->standings();
 
         return [
             'generated_at' => $this->generatedAt->format(\DATE_ATOM),
@@ -444,8 +463,16 @@ final class Report
             'unattributed' => $this->unattributedList(),
             'libyears' => $this->libyears()->toArray(),
             'baseline' => $this->baseline === null ? null : $this->baseline->toArray(),
+            'gate' => $gate === null ? null : $gate->toArray(),
             'notes' => $this->notes,
-            'findings' => array_map(fn (Finding $f): array => $f->toArray() + ['baseline' => $this->baselineStateOf($f)], $this->findings),
+            'findings' => array_map(
+                fn (Finding $f, int $at): array => $f->toArray() + [
+                    'baseline' => $this->baselineStateOf($f),
+                    'gate' => $standings === null ? null : $standings[$at]->toArray(),
+                ],
+                $this->findings,
+                array_keys($this->findings)
+            ),
         ];
     }
 }

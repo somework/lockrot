@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Lockrot\Analyzer;
 
+use Lockrot\Config\Gate;
 use Lockrot\Signal\Thresholds;
+use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Verdict;
 
 /**
@@ -38,6 +40,10 @@ use Lockrot\Verdict\Verdict;
  * say only whether they admit it — a reader who is told "your require.php" should be able to see
  * what it says. Null where the manifest has none, or the run read a lock without one.
  *
+ * `fail_on`, `strict_network` and `mode` are the policy the run's gate is decided by
+ * ({@see Gate::decide()}), and the report decides it from these very values; `fail_on_kind` says
+ * which of FailOn's families the threshold is, so a reader need not know which words are verdicts.
+ *
  * The lock is named, never located: a report is something people publish, and an absolute path
  * carries the account it ran under and often the client's directory name. The project's own name is
  * a different thing — chosen metadata about the project the report already describes in full,
@@ -51,11 +57,14 @@ final class RunSettings
     private ?string $rootPackage;
     private ?string $targetPhp;
     private ?string $lockFile;
-    private ?string $failOn;
+    private ?FailOn $failOn;
     private ?Thresholds $thresholds;
     private ?string $projectPhp;
+    private bool $strictNetwork;
+    private string $mode;
 
-    public function __construct(?string $project, ?string $rootPackage, ?string $targetPhp, ?string $lockPath, ?string $failOn, ?Thresholds $thresholds, ?string $projectPhp = null)
+    /** @param string $mode one of {@see Gate::MODES} */
+    public function __construct(?string $project, ?string $rootPackage, ?string $targetPhp, ?string $lockPath, ?FailOn $failOn, ?Thresholds $thresholds, ?string $projectPhp = null, bool $strictNetwork = false, string $mode = Gate::MODE_CHECK)
     {
         $this->project = $project;
         $this->rootPackage = $rootPackage;
@@ -64,6 +73,24 @@ final class RunSettings
         $this->failOn = $failOn;
         $this->thresholds = $thresholds;
         $this->projectPhp = $projectPhp;
+        $this->strictNetwork = $strictNetwork;
+        $this->mode = $mode;
+    }
+
+    /** Null only where nothing told the run, which is only ever a test. */
+    public function failOn(): ?FailOn
+    {
+        return $this->failOn;
+    }
+
+    public function strictNetwork(): bool
+    {
+        return $this->strictNetwork;
+    }
+
+    public function mode(): string
+    {
+        return $this->mode;
     }
 
     /** @return array<string, mixed> */
@@ -75,7 +102,10 @@ final class RunSettings
             'target_php' => $this->targetPhp,
             'project_php' => $this->projectPhp,
             'lock_file' => $this->lockFile,
-            'fail_on' => $this->failOn,
+            'fail_on' => $this->failOn === null ? null : $this->failOn->value(),
+            'fail_on_kind' => $this->failOn === null ? null : $this->failOn->kind(),
+            'strict_network' => $this->strictNetwork,
+            'mode' => $this->mode,
             'thresholds' => $this->thresholds === null ? null : [
                 'release-warn-years' => $this->thresholds->releaseWarnYears(),
                 'release-high-years' => $this->thresholds->releaseHighYears(),

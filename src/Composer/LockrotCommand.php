@@ -19,6 +19,7 @@ use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Baseline\BaselineFile;
 use Lockrot\Clock;
+use Lockrot\Config\Gate;
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Config\Policy;
 use Lockrot\Config\UnknownKeys;
@@ -38,6 +39,7 @@ use Lockrot\Output\ReportTarget;
 use Lockrot\Output\ReportTargets;
 use Lockrot\Output\TerminalText;
 use Lockrot\Output\TerminalWidth;
+use Lockrot\Verdict\FailOn;
 use Lockrot\Version;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -253,6 +255,8 @@ final class LockrotCommand extends BaseCommand
                 : null;
             $report = $analysis === null ? $analyzer->analyze($lock, $project, $lockrot->includeDev()) : $analysis->report();
 
+            // One threshold for the report's gate and for the annotation formats.
+            $failOn = FailOn::fromString($lockrot->failOn());
             // Before the baseline and before any formatter: every document the run writes should say
             // what the run was told to do, because that is what its verdicts were decided against.
             $report = $report->withRun(new RunSettings(
@@ -261,10 +265,12 @@ final class LockrotCommand extends BaseCommand
                 $project->name(),
                 $lockrot->targetPhp(),
                 $lockPath,
-                $lockrot->failOn(),
+                $failOn,
                 $lockrot->thresholds(),
                 // The same manifest's require.php the page and --explain test branch rows against.
-                $project->requirePhp()
+                $project->requirePhp(),
+                $lockrot->strictNetwork(),
+                $generate ? Gate::MODE_GENERATE_BASELINE : Gate::MODE_CHECK
             ));
 
             $page = $analysis === null
@@ -275,13 +281,13 @@ final class LockrotCommand extends BaseCommand
             // checkout does: alt.lock under COMPOSER=alt.json, and composer.lock as ever without it.
             // A file has no terminal, so a table in one is rendered at the default width whatever
             // this run's terminal is: the same file on a laptop and on a CI runner.
-            $fileContext = FormatContext::create($lockPath, $lockrot->failOn(), Version::STRING, FormatContext::DEFAULT_WIDTH, $cwd);
+            $fileContext = FormatContext::forFailOn($lockPath, $failOn, Version::STRING, FormatContext::DEFAULT_WIDTH, $cwd);
 
             if ($generate) {
                 // Before the baseline, so an exit 2 from a report never follows a replaced baseline.
                 $this->writeReports($output, $targets, $report, $fileContext, $page, $showAll);
 
-                return $this->generateBaseline($output, $baselineFile, $report, $existingBaseline, $lockrot);
+                return $this->generateBaseline($output, $baselineFile, $report, $existingBaseline);
             }
             if ($existingBaseline !== null) {
                 $report = $report->withBaseline(BaselineComparison::compare(
@@ -295,7 +301,7 @@ final class LockrotCommand extends BaseCommand
             // The annotation formats point back at the lock they were computed from; an unreadable
             // one throws ConfigException from here, which the catch below turns into exit 2 the
             // same way an unreadable lock does a few lines up.
-            $context = FormatContext::create($lockPath, $lockrot->failOn(), Version::STRING, TerminalWidth::detect($env, $this->getApplication()), $cwd);
+            $context = FormatContext::forFailOn($lockPath, $failOn, Version::STRING, TerminalWidth::detect($env, $this->getApplication()), $cwd);
             // Every format is written raw: the one that carries console markup is rendered by
             // lockrot rather than Symfony's tag formatter (see ConsoleMarkup), every
             // machine-readable one as it is, so a `<` in a constraint or a package name reaches
@@ -309,7 +315,7 @@ final class LockrotCommand extends BaseCommand
             // After stdout, so the report is in the log even when a file cannot be written.
             $this->writeReports($output, $targets, $report, $fileContext, $page, $showAll);
 
-            return Policy::exitCode($report, $lockrot);
+            return self::gateOf($report)->fails() ? Policy::EXIT_FINDINGS : Policy::EXIT_OK;
         } catch (ConfigException $e) {
             // Raw: a config error can quote the project's own keys (see ProjectConfig) or a path,
             // which are text, not console markup.
@@ -400,7 +406,7 @@ final class LockrotCommand extends BaseCommand
      * judge them. `--strict-network` still applies: a baseline written from metadata that never
      * arrived would accept findings lockrot could not actually check.
      */
-    private function generateBaseline(OutputInterface $output, BaselineFile $file, Report $report, ?Baseline $existing, LockrotConfig $lockrot): int
+    private function generateBaseline(OutputInterface $output, BaselineFile $file, Report $report, ?Baseline $existing): int
     {
         $baseline = Baseline::fromReport($report, $existing);
         $file->write($baseline);
@@ -410,7 +416,21 @@ final class LockrotCommand extends BaseCommand
             $baseline->count()
         ));
 
-        return Policy::strictNetworkTripped($report, $lockrot) ? Policy::EXIT_FINDINGS : Policy::EXIT_OK;
+        return self::gateOf($report)->fails() ? Policy::EXIT_FINDINGS : Policy::EXIT_OK;
+    }
+
+    /**
+     * The gate the run's documents write, which the exit code is. The report carries its run from
+     * the start of execute(), so a missing gate is a bug, never a pass.
+     */
+    private static function gateOf(Report $report): Gate
+    {
+        $gate = $report->gate();
+        if ($gate === null) {
+            throw new \LogicException('the report carries no run, so it has no gate');
+        }
+
+        return $gate;
     }
 
     /** The `--output` files, each followed by one line on stderr naming it, as the baseline's is. */

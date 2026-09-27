@@ -81,6 +81,8 @@ These grow in minor releases:
 - S6's `reason`;
 - a finding's `libyears_unmeasured`;
 - a `priority_basis` step's `reason`, and a `no_fix_expected` item's `reason`;
+- `run.mode` and `run.fail_on_kind`;
+- `gate.tripped_by`, and a finding's `gate.exempt_by`;
 - repository hosts;
 - format names, the configuration's `format` among them.
 
@@ -90,7 +92,8 @@ fail on it.
 The schemas describe signal ids (S10's `blocks` among them), S10's `check` and `reason`, S6's
 `reason`, S8's `floor_source`, the explanation's `php_blocked_by`, `misses_target_php` and
 `misses_project_php`, a finding's `libyears_unmeasured`, a `priority_basis` step's `reason`, a
-`no_fix_expected` item's `reason`, and the configuration's `format` as open strings: a `pattern`, which also admits the `<vendor>:<name>` form for a signal id and a format,
+`no_fix_expected` item's `reason`, `run.mode`, `run.fail_on_kind`, `gate.tripped_by`, a finding's
+`gate.exempt_by`, and the configuration's `format` as open strings: a `pattern`, which also admits the `<vendor>:<name>` form for a signal id and a format,
 plus `x-known-values`, the values lockrot writes, which only grows within 1.x. A signal whose id is
 not listed validates with any object as its `data`; a listed id keeps its `data` typed. A consumer
 that validates strictly reads `x-known-values` as an enum and refreshes its copy on upgrade. A copy
@@ -139,7 +142,10 @@ decides:
 - A SARIF rule's default level is `warning` for a flagged verdict and `note` otherwise.
 
 No schema checks this table, but it is contract all the same: changing it changes which pull
-requests are blocked.
+requests are blocked. In the report's own fields, from 0.13.0: a finding is at `error` exactly where
+its `gate.reaches_fail_on` is true and its `gate.exempt_by` is not `baseline`. That holds in a
+`--generate-baseline` run too, whose `gate.fail_on_applied` is false, so there a finding at `error`
+fails nothing.
 
 ### Command line
 
@@ -154,6 +160,9 @@ requests are blocked.
 - The variables listed in [Environment overrides](configuration.md#environment-overrides). The
   [testing hooks](configuration.md#testing-hooks) are not included.
 - Exit codes are the closed set `0`, `1` and `2`, as [ci.md](ci.md#exit-codes) defines them.
+    - From 0.13.0 the report carries the decision behind `0` and `1` as `gate.fails`, with what
+      tripped it in `gate.tripped_by`. A run whose report says `gate.fails` and which then fails to
+      write an `--output` file or the baseline exits `2` instead, and says so on stderr.
     - lockrot's own commands exit `2` on every usage or configuration error: an unknown option, a
       missing or invalid value, an `extra.lockrot` the schema rejects.
     - Exit `1` can also come from Composer or Symfony, before lockrot runs: an unknown command, or

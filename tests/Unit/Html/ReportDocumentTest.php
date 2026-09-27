@@ -69,7 +69,7 @@ final class ReportDocumentTest extends TestCase
      */
     public function testThePayloadKeepsNoSecondCopyOfTheRun(): void
     {
-        $report = $this->report([])->withRun(new RunSettings('Acme app', 'acme/app', '8.4', '/home/someone/acme/composer.lock', FailOn::NONE, new Thresholds(), '^8.2'));
+        $report = $this->report([])->withRun(new RunSettings('Acme app', 'acme/app', '8.4', '/home/someone/acme/composer.lock', FailOn::none(), new Thresholds(), '^8.2'));
 
         $document = (new ReportDocument($report))->toArray();
 

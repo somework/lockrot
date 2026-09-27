@@ -66,11 +66,12 @@ Objects are open, and so are the sets of values that grow in minor releases: sig
 `id` and S10's `blocks`), S10's `check` and `reason`, S6's `reason`, S8's `floor_source` and the
 explanation's `php_blocked_by`, which holds the same values, the explanation's `misses_target_php`
 and `misses_project_php`, a finding's `libyears_unmeasured`, a `priority_basis` step's `reason`, a
-`no_fix_expected` item's `reason`, and the configuration's `format`. Each is a string with a
+`no_fix_expected` item's `reason`, `run.mode`, `run.fail_on_kind`, `gate.tripped_by`, a finding's
+`gate.exempt_by`, and the configuration's `format`. Each is a string with a
 `pattern`, plus an `x-known-values` list of the values this release writes. A validator ignores a
 keyword draft-04 does not define, so a copy of the schema taken from 0.13.0 on accepts a signal, a
-reason, a floor, a way a branch misses a floor, a priority step or a format that a later release
-adds, and a signal or format named `<vendor>:<name>`, the form reserved for those that do not come
+reason, a floor, a way a branch misses a floor, a priority step, a kind of run or of threshold, a
+cause that failed a run, an exemption or a format that a later release adds, and a signal or format named `<vendor>:<name>`, the form reserved for those that do not come
 from lockrot ([compatibility.md](compatibility.md#names-reserved-for-extensions)). The vendor and
 the name are each lower-case letters, digits, `_`, `.` and `-`, starting with a letter or a digit;
 `acme:licence` validates, `Acme:Licence` does not.
@@ -153,9 +154,29 @@ consumer usually keys on:
   branch against, beside `target_php` (see [verdicts.md](verdicts.md#within-reach)), and the same
   value `--explain` writes as `project_php`. Null where the manifest has no `require.php`, or where
   the run read a lock without its composer.json.
-- `root_package` and `project_php` are the two keys in `run` a document may omit, because reports
-  written before 0.13.0 do not carry them; from 0.13.0 on lockrot always writes both, as a string
-  or as null.
+- `run.fail_on_kind` says which kind of threshold `fail_on` is — `none`, `verdict`, `priority` or
+  `unchecked` — so a reader need not know which words are verdicts and which are priorities; null
+  only where `fail_on` is. `run.strict_network` says whether `--strict-network` was on, and
+  `run.mode` what the run was asked to do: `check`, or `generate_baseline` for
+  `--generate-baseline`, which records the findings and judges none. `fail_on_kind` and `mode` are
+  open strings.
+- `root_package`, `project_php`, `fail_on_kind`, `strict_network` and `mode` are the keys in `run`
+  a document may omit, because reports written before 0.13.0 do not carry them; from 0.13.0 on
+  lockrot always writes all five.
+- `gate`, from 0.13.0, is the decision behind the exit code, taken over the document's own findings
+  by what `run` says: `fails`, `tripped_by` and `fail_on_applied`. `fails` true means the run exits
+  `1`, unless it then fails to write a file or the baseline, in which case it exits `2` and says so
+  on stderr. `tripped_by` lists each cause once, `strict_network` (it was on and a lookup failed)
+  and `fail_on` (a finding fails), both when both hold, and is empty exactly when `fails` is false;
+  it is an open set, and its order is not contract. `fail_on_applied` is false in a
+  `generate_baseline` run, which only `--strict-network` can fail. Null where `run` is.
+- Each finding carries `gate` beside `baseline`, from 0.13.0: `reaches_fail_on` (at or above
+  `run.fail_on`, decided in every mode), `exempt_by` (`baseline` when the baseline accepted a finding
+  that reaches, as `known`; a `worsened` one is not exempt; otherwise null; an open set) and `fails`,
+  which is exactly `reaches_fail_on`, no exemption and the root `fail_on_applied`; the root's
+  `tripped_by` holds `fail_on` exactly when some finding's `fails` is true. Both `gate` keys are
+  optional in the schema, so documents written before 0.13.0 validate. See
+  [ci.md](ci.md#exit-codes).
 - Each finding carries `baseline`, where it stands against the baseline file (`known`, `new` or
   `worsened`, with the verdict the baseline accepted), or null when the run read none. The report's
   own `baseline` block still carries the totals; this is the same judgement per finding, which is

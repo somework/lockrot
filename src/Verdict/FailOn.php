@@ -17,8 +17,8 @@ use Lockrot\Signal\Signal;
  * package). `none` fails on nothing. The two vocabularies do not overlap — the priority level `none`
  * is not a threshold and is not accepted as one — so one option serves both.
  *
- * The baseline is not consulted here: {@see \Lockrot\Config\Policy::exitCode()} skips a finding the
- * project has already accepted before asking, whichever kind of threshold is set.
+ * The baseline is not consulted here: {@see \Lockrot\Config\Gate::decide()} exempts a finding the
+ * project has already accepted, whichever kind of threshold is set.
  *
  * @internal
  */
@@ -31,6 +31,13 @@ final class FailOn
      * a complete run — the usual cause is a workflow that never passed `GITHUB_TOKEN` through.
      */
     public const UNCHECKED = 'unchecked';
+
+    /** What a value names, in the order {@see allowed()} lists them; a report writes it as `run.fail_on_kind`. */
+    public const KIND_NONE = 'none';
+    public const KIND_VERDICT = 'verdict';
+    public const KIND_PRIORITY = 'priority';
+    public const KIND_UNCHECKED = 'unchecked';
+    public const KINDS = [self::KIND_NONE, self::KIND_VERDICT, self::KIND_PRIORITY, self::KIND_UNCHECKED];
 
     private string $value;
 
@@ -95,25 +102,36 @@ final class FailOn
         return $this->value === self::NONE;
     }
 
+    public function kind(): string
+    {
+        if ($this->value === self::NONE) {
+            return self::KIND_NONE;
+        }
+        if ($this->value === self::UNCHECKED) {
+            return self::KIND_UNCHECKED;
+        }
+
+        return \in_array($this->value, self::priorities(), true) ? self::KIND_PRIORITY : self::KIND_VERDICT;
+    }
+
     /** Whether $finding is at or above the threshold; never for `none`. */
     public function reaches(Finding $finding): bool
     {
-        if ($this->isNone()) {
-            return false;
-        }
-        if ($this->value === self::UNCHECKED) {
-            foreach ($finding->signals() as $signal) {
-                if ($signal->id() === Signal::S10) {
-                    return true;
+        switch ($this->kind()) {
+            case self::KIND_NONE:
+                return false;
+            case self::KIND_UNCHECKED:
+                foreach ($finding->signals() as $signal) {
+                    if ($signal->id() === Signal::S10) {
+                        return true;
+                    }
                 }
-            }
 
-            return false;
+                return false;
+            case self::KIND_PRIORITY:
+                return Priority::rank($finding->priority()) >= Priority::rank($this->value);
+            default:
+                return Verdict::severity($finding->verdict()) >= Verdict::severity($this->value);
         }
-        if (\in_array($this->value, self::priorities(), true)) {
-            return Priority::rank($finding->priority()) >= Priority::rank($this->value);
-        }
-
-        return Verdict::severity($finding->verdict()) >= Verdict::severity($this->value);
     }
 }

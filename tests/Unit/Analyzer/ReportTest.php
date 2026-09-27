@@ -12,9 +12,11 @@ use Lockrot\Analyzer\TransitiveExposure;
 use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Baseline\BaselineEntry;
+use Lockrot\Config\Gate;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\JsonPath;
+use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Priority;
 use Lockrot\Verdict\Verdict;
@@ -250,7 +252,7 @@ final class ReportTest extends TestCase
     public function testTheReportRecordsWhatTheRunWasToldToDo(): void
     {
         $report = $this->report($this->finding('vendor/a', Verdict::SILENT))
-            ->withRun(new RunSettings('Acme shop', 'acme/shop', '8.4', '/home/someone/clients/acme/composer.lock', 'silent', new Thresholds(2, 4, 6, 8), '>=8.2'));
+            ->withRun(new RunSettings('Acme shop', 'acme/shop', '8.4', '/home/someone/clients/acme/composer.lock', FailOn::fromString('silent'), new Thresholds(2, 4, 6, 8), '>=8.2'));
 
         $run = JsonPath::arrayAt($report->toArray(), ['run']);
 
@@ -261,6 +263,9 @@ final class ReportTest extends TestCase
             'project_php' => '>=8.2',
             'lock_file' => 'composer.lock',
             'fail_on' => 'silent',
+            'fail_on_kind' => 'verdict',
+            'strict_network' => false,
+            'mode' => 'check',
             'thresholds' => [
                 'release-warn-years' => 2,
                 'release-high-years' => 4,
@@ -300,7 +305,7 @@ final class ReportTest extends TestCase
      */
     public function testTheRunNamesTheLockAndNeverLocatesIt(): void
     {
-        $report = $this->report()->withRun(new RunSettings(null, null, null, '/srv/deploy/acme-bank/composer.lock', 'none', null));
+        $report = $this->report()->withRun(new RunSettings(null, null, null, '/srv/deploy/acme-bank/composer.lock', FailOn::none(), null));
 
         $json = json_encode($report->toArray());
 
@@ -374,7 +379,7 @@ final class ReportTest extends TestCase
     public function testTheRunOutlivesWithBaseline(): void
     {
         $report = $this->report($this->finding('vendor/a', Verdict::SILENT))
-            ->withRun(new RunSettings(null, null, '8.3', null, 'none', null));
+            ->withRun(new RunSettings(null, null, '8.3', null, FailOn::none(), null));
 
         $compared = $report->withBaseline(BaselineComparison::compare(
             Baseline::fromReport($report),
@@ -384,6 +389,72 @@ final class ReportTest extends TestCase
         ));
 
         self::assertSame('8.3', JsonPath::stringAt($compared->toArray(), ['run', 'target_php']));
+    }
+
+    /** The run's own flags, as the command passes them: `--strict-network` and a generate run. */
+    public function testTheRunSaysHowItWasToldToGate(): void
+    {
+        $run = JsonPath::arrayAt($this->report()->withRun(new RunSettings(null, null, null, null, FailOn::fromString('high'), null, null, true, Gate::MODE_GENERATE_BASELINE))->toArray(), ['run']);
+
+        self::assertSame('high', $run['fail_on']);
+        self::assertSame('priority', $run['fail_on_kind']);
+        self::assertTrue($run['strict_network']);
+        self::assertSame('generate_baseline', $run['mode']);
+    }
+
+    /** A run told no fail-on, which only a test builds, has no kind and no gate. */
+    public function testARunWithoutAFailOnHasNoKindAndNoGate(): void
+    {
+        $report = $this->report($this->finding('vendor/a', Verdict::SILENT))->withRun(new RunSettings(null, null, null, null, null, null));
+        $document = $report->toArray();
+
+        self::assertNull(JsonPath::arrayAt($document, ['run'])['fail_on_kind']);
+        self::assertNull($report->gate());
+        self::assertArrayHasKey('gate', $document);
+        self::assertNull($document['gate']);
+        self::assertNull(JsonPath::arrayAt($document, ['findings', 0])['gate']);
+    }
+
+    /** Without `run` the gate has nothing to read: null at the root and on every finding, never absent. */
+    public function testAReportWithoutARunHasNoGate(): void
+    {
+        $report = $this->report($this->finding('vendor/a', Verdict::SILENT));
+        $document = $report->toArray();
+
+        self::assertNull($report->gate());
+        self::assertArrayHasKey('gate', $document);
+        self::assertNull($document['gate']);
+        $at = array_search('baseline', array_keys($document), true);
+        self::assertIsInt($at);
+        self::assertSame(['baseline', 'gate', 'notes'], \array_slice(array_keys($document), $at, 3), 'after the baseline block');
+        $finding = JsonPath::arrayAt($document, ['findings', 0]);
+        self::assertArrayHasKey('gate', $finding);
+        self::assertNull($finding['gate']);
+        self::assertSame(['baseline', 'gate'], \array_slice(array_keys($finding), -2), 'after the finding\'s baseline standing');
+    }
+
+    /**
+     * The gate is derived, not stored: the report compared with a baseline afterwards decides it
+     * again, so a finding accepted there is exempt and the run passes.
+     */
+    public function testTheGateIsDecidedOverTheReportAsItStands(): void
+    {
+        $report = $this->report($this->finding('vendor/known', Verdict::ABANDONED), $this->finding('vendor/fine', Verdict::OK))
+            ->withRun(new RunSettings(null, null, null, null, FailOn::fromString(Verdict::SILENT), null));
+        $before = $report->toArray();
+
+        self::assertSame(['fails' => true, 'tripped_by' => ['fail_on'], 'fail_on_applied' => true], $before['gate']);
+        self::assertSame(['reaches_fail_on' => true, 'fails' => true, 'exempt_by' => null], JsonPath::arrayAt($before, ['findings', 0, 'gate']));
+        self::assertSame(['reaches_fail_on' => false, 'fails' => false, 'exempt_by' => null], JsonPath::arrayAt($before, ['findings', 1, 'gate']));
+
+        $compared = $report->withBaseline(BaselineComparison::compare(Baseline::fromReport($report), $report, 'lockrot-baseline.json', ['vendor/known', 'vendor/fine']));
+        $after = $compared->toArray();
+
+        self::assertSame(['fails' => false, 'tripped_by' => [], 'fail_on_applied' => true], $after['gate']);
+        self::assertSame(['reaches_fail_on' => true, 'fails' => false, 'exempt_by' => 'baseline'], JsonPath::arrayAt($after, ['findings', 0, 'gate']));
+        $gate = $compared->gate();
+        self::assertNotNull($gate);
+        self::assertFalse($gate->fails());
     }
 
     public function testTheLibyearsBlockIsTheArithmeticOverTheFindings(): void
@@ -424,7 +495,7 @@ final class ReportTest extends TestCase
         );
         $array = $report->toArray();
         self::assertSame(
-            ['generated_at', 'run', 'activity_cache_oldest_at', 'packages_checked', 'include_dev', 'not_from_composer_repository', 'network_failures', 'counts', 'abandoned', 'priorities', 'exposure', 'exposure_rule', 'unattributed', 'libyears', 'baseline', 'notes', 'findings'],
+            ['generated_at', 'run', 'activity_cache_oldest_at', 'packages_checked', 'include_dev', 'not_from_composer_repository', 'network_failures', 'counts', 'abandoned', 'priorities', 'exposure', 'exposure_rule', 'unattributed', 'libyears', 'baseline', 'gate', 'notes', 'findings'],
             array_keys($array)
         );
         // The literal, not the constant: the document states the value it attributed by.

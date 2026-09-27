@@ -43,6 +43,7 @@ use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\ValidatesJsonSchemas;
+use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
 use Lockrot\Verdict\VerdictEngine;
@@ -197,7 +198,7 @@ final class JsonSchemaConformanceTest extends TestCase
         $report = self::analysis('apps/wallabag_wallabag')->report();
         $previous = Baseline::fromReport($report);
         $report = $report
-            ->withRun(new RunSettings('Acme internal API', 'acme/internal-api', '8.4', '/home/someone/clients/acme/composer.lock', 'silent', new Thresholds(2, 4, 2, 4), '>=8.2'))
+            ->withRun(new RunSettings('Acme internal API', 'acme/internal-api', '8.4', '/home/someone/clients/acme/composer.lock', FailOn::fromString('silent'), new Thresholds(2, 4, 2, 4), '>=8.2'))
             ->withBaseline(BaselineComparison::compare($previous, $report, 'lockrot-baseline.json', []));
 
         $json = (new JsonFormatter())->format($report);
@@ -879,6 +880,101 @@ final class JsonSchemaConformanceTest extends TestCase
     }
 
     /**
+     * The gate's inputs in `run`, the root `gate` and each finding's `gate`: four open vocabularies
+     * (`run.mode`, `run.fail_on_kind`, `gate.tripped_by`'s items, a finding's `gate.exempt_by`) take
+     * a value a later release adds and the strict twin holds each to the values this release writes;
+     * a cause listed twice fails; a document written before the fields validates against both.
+     */
+    public function testTheGateAndWhatItWasToldAreTypedAndTheirVocabulariesOpen(): void
+    {
+        $report = self::analysis('apps/wallabag_wallabag')->report();
+        $report = $report
+            ->withRun(new RunSettings(null, null, '8.4', null, FailOn::fromString(Verdict::STALE), new Thresholds(), null, true))
+            ->withBaseline(BaselineComparison::compare(Baseline::fromReport($report), $report, 'lockrot-baseline.json', []));
+        $decoded = json_decode((new JsonFormatter())->format($report), true);
+        self::assertIsArray($decoded);
+        self::assertSame(['fails' => false, 'tripped_by' => [], 'fail_on_applied' => true], $decoded['gate'], 'a baseline written from this report accepts every finding');
+        self::assertSame(['reaches_fail_on' => true, 'fails' => false, 'exempt_by' => 'baseline'], JsonPath::arrayAt($decoded, ['findings', 0, 'gate']));
+        $this->assertValid(Schemas::REPORT, (string) json_encode($decoded), 'the gate');
+        $this->assertValid(Schemas::REPORT, (string) json_encode($decoded), 'the gate', true);
+
+        $failing = self::changed($decoded, ['gate'], ['fails' => true, 'tripped_by' => ['strict_network', 'fail_on'], 'fail_on_applied' => true]);
+        $this->assertValid(Schemas::REPORT, $failing, 'both causes', true);
+        $open = [
+            'run.mode' => [['run', 'mode'], 'pull_request', 'generate_baselin'],
+            'run.fail_on_kind' => [['run', 'fail_on_kind'], 'licence', 'verdicts'],
+            'gate.tripped_by' => [['gate', 'tripped_by'], ['budget_exceeded'], ['failon']],
+            'exempt_by' => [['findings', 0, 'gate', 'exempt_by'], 'ignore_list', 'baselined'],
+        ];
+        foreach ($open as $what => [$path, $later, $typo]) {
+            $this->assertValid(Schemas::REPORT, self::changed($decoded, $path, $later), $what.': a value a later release adds');
+            $mistyped = self::changed($decoded, $path, $typo);
+            $this->assertValid(Schemas::REPORT, $mistyped, $what.': the published schema cannot tell a typo from a new value');
+            $errors = $this->errors(Schemas::REPORT, $mistyped, true);
+            self::assertNotSame([], array_filter($errors, static fn (string $error): bool => strpos($error, (string) end($path)) !== false), $what.': '.implode("\n", $errors));
+        }
+        foreach ([
+            'a cause listed twice' => [['gate', 'tripped_by'], ['fail_on', 'fail_on']],
+            'fails as a word' => [['gate', 'fails'], 'yes'],
+            'the gate without fail_on_applied' => [['gate'], ['fails' => false, 'tripped_by' => []]],
+            'a cause in capitals' => [['gate', 'tripped_by'], ['Fail_on']],
+            'a finding gate without exempt_by' => [['findings', 0, 'gate'], ['reaches_fail_on' => true, 'fails' => false]],
+            'reaches_fail_on as null' => [['findings', 0, 'gate', 'reaches_fail_on'], null],
+            'strict_network as null' => [['run', 'strict_network'], null],
+            'an empty mode' => [['run', 'mode'], ''],
+            'a kind that is a number' => [['run', 'fail_on_kind'], 1],
+        ] as $what => [$path, $value]) {
+            self::assertNotSame([], $this->errors(Schemas::REPORT, self::changed($decoded, $path, $value), false), $what);
+        }
+
+        $before = $decoded;
+        unset($before['gate']);
+        $run = JsonPath::arrayAt($before, ['run']);
+        unset($run['mode'], $run['strict_network'], $run['fail_on_kind']);
+        $before['run'] = $run;
+        $findings = JsonPath::arrayAt($before, ['findings']);
+        foreach ($findings as $at => $finding) {
+            self::assertIsArray($finding);
+            unset($finding['gate']);
+            $findings[$at] = $finding;
+        }
+        $before['findings'] = $findings;
+        $this->assertValid(Schemas::REPORT, (string) json_encode($before), 'a document written before the gate');
+        $this->assertValid(Schemas::REPORT, (string) json_encode($before), 'a document written before the gate', true);
+        foreach ([['gate'], ['findings', 0, 'gate'], ['run', 'fail_on_kind']] as $path) {
+            $this->assertValid(Schemas::REPORT, self::changed($decoded, $path, null), implode('.', $path).' null', true);
+        }
+    }
+
+    /**
+     * $document with the value at $path replaced, encoded.
+     *
+     * @param array<mixed, mixed> $document
+     * @param list<int|string>    $path
+     * @param mixed               $value
+     */
+    private static function changed(array $document, array $path, $value): string
+    {
+        return (string) json_encode(self::setAt($document, $path, $value));
+    }
+
+    /**
+     * @param array<mixed, mixed> $node
+     * @param list<int|string>    $path
+     * @param mixed               $value
+     *
+     * @return array<mixed, mixed>
+     */
+    private static function setAt(array $node, array $path, $value): array
+    {
+        $key = array_shift($path);
+        self::assertNotNull($key);
+        $node[$key] = $path === [] ? $value : self::setAt(JsonPath::arrayAt($node, [$key]), $path, $value);
+
+        return $node;
+    }
+
+    /**
      * Every key {@see Finding::toArray()} writes is a property both schemas' finding lists. The two
      * lists are not compared with each other: the report's finding also carries `baseline`.
      */
@@ -1057,7 +1153,7 @@ final class JsonSchemaConformanceTest extends TestCase
 
         // What the command records for a lock read without its manifest: no name to display and
         // no root package, both written as null — the null branch of each has to validate too.
-        $json = (new JsonFormatter())->format($analysis->report()->withRun(new RunSettings(null, null, '8.4', null, 'none', null)));
+        $json = (new JsonFormatter())->format($analysis->report()->withRun(new RunSettings(null, null, '8.4', null, FailOn::none(), null)));
 
         $decoded = json_decode($json, true);
         self::assertIsArray($decoded);

@@ -49,6 +49,35 @@ final class FailOnTest extends TestCase
         }
     }
 
+    /**
+     * `kind()` is the partition allowed() lists in: a report writes it beside `fail_on`, so a reader
+     * never has to know which words are verdicts and which are priorities.
+     */
+    public function testEveryAllowedValueHasTheKindItIsListedAs(): void
+    {
+        self::assertSame(['none', 'verdict', 'priority', 'unchecked'], FailOn::KINDS);
+        $kinds = [];
+        foreach (FailOn::allowed() as $value) {
+            $kinds[$value] = FailOn::fromString($value)->kind();
+        }
+
+        self::assertSame([
+            'none' => 'none',
+            'abandoned' => 'verdict',
+            'silent' => 'verdict',
+            'pinned' => 'verdict',
+            'left-behind' => 'verdict',
+            'old-promise' => 'verdict',
+            'stale' => 'verdict',
+            'critical' => 'priority',
+            'high' => 'priority',
+            'medium' => 'priority',
+            'low' => 'priority',
+            'unchecked' => 'unchecked',
+        ], $kinds);
+        self::assertSame(FailOn::KIND_NONE, FailOn::none()->kind());
+    }
+
     /** @dataProvider rejected */
     #[DataProvider('rejected')]
     public function testAnythingElseIsRejectedWithTheFullList(string $value): void

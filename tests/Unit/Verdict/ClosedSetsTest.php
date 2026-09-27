@@ -6,6 +6,7 @@ namespace Lockrot\Tests\Unit\Verdict;
 
 use Lockrot\Analyzer\Libyears;
 use Lockrot\Analyzer\RunSettings;
+use Lockrot\Config\Gate;
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Json\KnownValues;
 use Lockrot\Json\Schemas;
@@ -47,7 +48,7 @@ final class ClosedSetsTest extends TestCase
     private const SIGNAL_ID = '^(S[1-9][0-9]*|[a-z0-9][a-z0-9_.-]*:[a-z0-9][a-z0-9_.-]*)$';
     /** A format name: lockrot's own, or a `<vendor>:<name>` one. */
     private const FORMAT = '^([a-z][a-z0-9-]*|[a-z0-9][a-z0-9_.-]*:[a-z0-9][a-z0-9_.-]*)$';
-    /** An S10 check or reason, an S6 reason, an S8 floor source, a branch's php_blocked_by and misses_*_php, a finding's libyears_unmeasured, a priority step's and a no-fix advisory's reason: a lower-case word. */
+    /** An S10 check or reason, an S6 reason, an S8 floor source, a branch's php_blocked_by and misses_*_php, a finding's libyears_unmeasured, a priority step's and a no-fix advisory's reason, the run's mode and fail-on kind, and the gate's causes and exemptions: a lower-case word. */
     private const WORD = '^[a-z][a-z0-9_]*$';
     private const ROOT = __DIR__.'/../../../';
 
@@ -254,6 +255,10 @@ final class ClosedSetsTest extends TestCase
             'report #/definitions/finding/properties/libyears_unmeasured/oneOf/0' => [JsonPath::arrayAt($report, ['definitions', 'finding', 'properties', 'libyears_unmeasured', 'oneOf', 0]), self::WORD, Libyears::REASONS, "a finding's `libyears_unmeasured`"],
             'report #/definitions/priorityStep/properties/reason' => [JsonPath::arrayAt($report, ['definitions', 'priorityStep', 'properties', 'reason']), self::WORD, PriorityBasis::STEPS, "a `priority_basis` step's `reason`"],
             'report #/definitions/noFixAdvisory/properties/reason' => [JsonPath::arrayAt($report, ['definitions', 'noFixAdvisory', 'properties', 'reason']), self::WORD, NoFix::REASONS, "a `no_fix_expected` item's `reason`"],
+            'report #/definitions/run/properties/mode' => [JsonPath::arrayAt($report, ['definitions', 'run', 'properties', 'mode']), self::WORD, Gate::MODES, '`run.mode`'],
+            'report #/definitions/run/properties/fail_on_kind/oneOf/0' => [JsonPath::arrayAt($report, ['definitions', 'run', 'properties', 'fail_on_kind', 'oneOf', 0]), self::WORD, FailOn::KINDS, '`run.fail_on_kind`'],
+            'report #/definitions/gate/properties/tripped_by/items' => [JsonPath::arrayAt($report, ['definitions', 'gate', 'properties', 'tripped_by', 'items']), self::WORD, Gate::TRIPS, '`gate.tripped_by`'],
+            'report #/definitions/findingGate/properties/exempt_by/oneOf/0' => [JsonPath::arrayAt($report, ['definitions', 'findingGate', 'properties', 'exempt_by', 'oneOf', 0]), self::WORD, Gate::EXEMPTIONS, "a finding's `gate.exempt_by`"],
             'explain #/definitions/priorityStep/properties/reason' => [JsonPath::arrayAt($explain, ['definitions', 'priorityStep', 'properties', 'reason']), self::WORD, PriorityBasis::STEPS, "a `priority_basis` step's `reason`"],
             'explain #/definitions/noFixAdvisory/properties/reason' => [JsonPath::arrayAt($explain, ['definitions', 'noFixAdvisory', 'properties', 'reason']), self::WORD, NoFix::REASONS, "a `no_fix_expected` item's `reason`"],
             'explain #/definitions/finding/properties/libyears_unmeasured/oneOf/0' => [JsonPath::arrayAt($explain, ['definitions', 'finding', 'properties', 'libyears_unmeasured', 'oneOf', 0]), self::WORD, Libyears::REASONS, "a finding's `libyears_unmeasured`"],
@@ -298,6 +303,12 @@ final class ClosedSetsTest extends TestCase
             self::assertSame(['type' => 'null'], JsonPath::arrayAt($schema, ['definitions', 'finding', 'properties', 'libyears_unmeasured', 'oneOf', 1]), $document.': libyears_unmeasured is otherwise null');
             self::assertCount(2, JsonPath::arrayAt($schema, ['definitions', 'finding', 'properties', 'libyears_unmeasured', 'oneOf']));
         }
+        foreach ([['run', 'properties', 'fail_on_kind'], ['findingGate', 'properties', 'exempt_by']] as $nullable) {
+            $at = array_merge(['definitions'], $nullable, ['oneOf']);
+            self::assertSame(['type' => 'null'], JsonPath::arrayAt($report, array_merge($at, [1])), implode('/', $nullable).' is otherwise null');
+            self::assertCount(2, JsonPath::arrayAt($report, $at));
+        }
+        self::assertTrue(JsonPath::arrayAt($report, ['definitions', 'gate', 'properties', 'tripped_by'])['uniqueItems'] ?? null, 'a cause is listed once');
         foreach (['misses_target_php', 'misses_project_php'] as $side) {
             self::assertSame(['type' => 'null'], JsonPath::arrayAt($explain, array_merge($branchRow, [$side, 'oneOf', 1])), $side.' is otherwise null');
             self::assertCount(2, JsonPath::arrayAt($explain, array_merge($branchRow, [$side, 'oneOf'])));
@@ -402,7 +413,7 @@ final class ClosedSetsTest extends TestCase
         $config = self::schema(Schemas::CONFIG);
         $topLevelKeys = self::keys(JsonPath::arrayAt($config, ['properties']));
         $ignoreKeys = self::keys(JsonPath::arrayAt($config, ['properties', 'ignore', 'items', 'properties']));
-        $names = array_merge(Verdict::all(), Priority::all(), FailOn::allowed(), LockrotConfig::FORMATS, ClosedSets::signalIds(), [PhpFloor::PROJECT, PhpFloor::TARGET, PhpFloor::NEEDS_NEWER, PhpFloor::STOPS_BEFORE, PhpFloor::SKIPS, PhpFloor::UNSATISFIABLE], Libyears::REASONS, PriorityBasis::STEPS, NoFix::REASONS, $topLevelKeys, $ignoreKeys);
+        $names = array_merge(Verdict::all(), Priority::all(), FailOn::allowed(), LockrotConfig::FORMATS, ClosedSets::signalIds(), [PhpFloor::PROJECT, PhpFloor::TARGET, PhpFloor::NEEDS_NEWER, PhpFloor::STOPS_BEFORE, PhpFloor::SKIPS, PhpFloor::UNSATISFIABLE], Libyears::REASONS, PriorityBasis::STEPS, NoFix::REASONS, Gate::MODES, FailOn::KINDS, Gate::TRIPS, Gate::EXEMPTIONS, $topLevelKeys, $ignoreKeys);
 
         foreach ($names as $name) {
             self::assertStringNotContainsString(':', $name, '<vendor>:<name> is reserved for names that are not lockrot\'s');

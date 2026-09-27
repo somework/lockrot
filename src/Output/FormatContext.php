@@ -48,7 +48,7 @@ final class FormatContext
     private string $toolVersion;
     private int $terminalWidth;
 
-    private function __construct(?string $lockPath, string $failOn, string $toolVersion, int $terminalWidth, ?string $projectDirectory)
+    private function __construct(?string $lockPath, FailOn $failOn, string $toolVersion, int $terminalWidth, ?string $projectDirectory)
     {
         $this->lockPath = $lockPath;
         $this->lockName = self::DEFAULT_LOCK_NAME;
@@ -58,7 +58,7 @@ final class FormatContext
             $this->lockName = $relative ?? basename($lockPath);
             $this->lockDirectory = $relative === null ? \dirname($lockPath) : $projectDirectory;
         }
-        $this->failOn = FailOn::fromString($failOn);
+        $this->failOn = $failOn;
         $this->toolVersion = $toolVersion;
         $this->terminalWidth = max(self::MIN_WIDTH, $terminalWidth);
     }
@@ -72,13 +72,22 @@ final class FormatContext
      */
     public static function create(?string $lockPath, string $failOn, string $toolVersion = Version::STRING, int $terminalWidth = self::DEFAULT_WIDTH, ?string $projectDirectory = null): self
     {
+        return self::forFailOn($lockPath, FailOn::fromString($failOn), $toolVersion, $terminalWidth, $projectDirectory);
+    }
+
+    /**
+     * {@see create()} with the threshold already read, so a run hands the formats the same instance
+     * its report's gate is decided by.
+     */
+    public static function forFailOn(?string $lockPath, FailOn $failOn, string $toolVersion = Version::STRING, int $terminalWidth = self::DEFAULT_WIDTH, ?string $projectDirectory = null): self
+    {
         return new self($lockPath, $failOn, $toolVersion, $terminalWidth, $projectDirectory);
     }
 
     /** The context for a run with nothing to say: no lock path, no fail-on threshold, default width. */
     public static function unknown(): self
     {
-        return new self(null, LockrotConfig::FAIL_ON_NONE, Version::STRING, self::DEFAULT_WIDTH, null);
+        return new self(null, FailOn::fromString(LockrotConfig::FAIL_ON_NONE), Version::STRING, self::DEFAULT_WIDTH, null);
     }
 
     public function lockPath(): ?string
@@ -135,15 +144,18 @@ final class FormatContext
      *
      * The match is with the fail-on threshold, not with the exit code in every case: --strict-network
      * exits 1 on an unreachable repository or repository host even when nothing is flagged (see
-     * Policy::exitCode()), and no individual finding is the cause of that, so none is marked error
+     * Gate::decide()), and no individual finding is the cause of that, so none is marked error
      * for it. The reason is carried by the report notes instead, which both formats emit.
      *
      * SARIF spells the third level `note` (its own enum); the GitHub workflow command for it is
      * `notice`, which GithubFormatter translates.
      *
      * A baseline narrows the same rule rather than changing it: a finding the project has already
-     * accepted cannot fail the run (see Policy::exitCode()), so it is reported at `note` too —
+     * accepted cannot fail the run (see Gate::decide()), so it is reported at `note` too —
      * annotation severity keeps matching the exit code. New and worsened findings map as usual.
+     *
+     * In the report's terms: `error` exactly where a finding's `gate.reaches_fail_on` is true and its
+     * `gate.exempt_by` is not `baseline`, in a `--generate-baseline` run too, which fails on nothing.
      *
      * @param null|BaselineComparison $baseline the run's comparison, from Report::baseline()
      */

@@ -337,6 +337,17 @@
         }
       ]
     },
+    "gate": {
+      "description": "Whether the run failed and why, decided over this document's findings, their standings against the baseline and `network_failures` by `run.fail_on`, `run.strict_network` and `run.mode`. Each finding's `gate` says where that finding stands. Null exactly where `run` is null or carries no `fail_on`, which outside a test is nowhere. Optional: documents written before 0.13.0 do not carry it; from 0.13.0 on it is always written.",
+      "oneOf": [
+        {
+          "$ref": "#/definitions/gate"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
     "notes": {
       "type": "array",
       "items": {
@@ -705,6 +716,17 @@
         },
         "baseline": {
           "$ref": "#/definitions/baselineStanding"
+        },
+        "gate": {
+          "description": "Where the finding stands against `run.fail_on`. Null exactly where the root `gate` is null. Optional: documents written before 0.13.0 do not carry it; from 0.13.0 on every finding does.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/findingGate"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       }
     },
@@ -1374,7 +1396,7 @@
           ]
         },
         "root_package": {
-          "description": "What Composer calls this project: the `name` of the manifest Composer reads (composer.json, or the file `COMPOSER` names), exactly as written, whatever `extra.lockrot.project` says. `project` is what the report calls the project; this is the root package's own name. Not checked against the vendor/name form. Null where the manifest has no `name` (absent, empty or not a string), or where no composer.json was read (a lock-only run). One of the two keys in `run` a document may omit, with `project_php`: reports written before 0.13.0 do not carry it; from 0.13.0 on it is always written.",
+          "description": "What Composer calls this project: the `name` of the manifest Composer reads (composer.json, or the file `COMPOSER` names), exactly as written, whatever `extra.lockrot.project` says. `project` is what the report calls the project; this is the root package's own name. Not checked against the vendor/name form. Null where the manifest has no `name` (absent, empty or not a string), or where no composer.json was read (a lock-only run). One of the keys in `run` a document may omit, with `project_php`, `fail_on_kind`, `strict_network` and `mode`: reports written before 0.13.0 do not carry it; from 0.13.0 on it is always written.",
           "oneOf": [
             {
               "type": "string",
@@ -1420,7 +1442,7 @@
           ]
         },
         "fail_on": {
-          "description": "The verdict or priority at which the run exits 1, or \"none\".",
+          "description": "The fail-on threshold the run was given: `none`, a flagged verdict, a priority other than `none`, or `unchecked`; `fail_on_kind` says which.",
           "oneOf": [
             {
               "type": "string"
@@ -1428,6 +1450,37 @@
             {
               "type": "null"
             }
+          ]
+        },
+        "fail_on_kind": {
+          "description": "Which kind of threshold `fail_on` is: `none`, which no finding reaches; `verdict`, reached by a finding whose verdict is at least as severe; `priority`, reached by a finding whose priority is at least as high; `unchecked`, reached by a finding carrying S10, whatever its verdict. Null exactly where `fail_on` is null, which outside a test is nowhere. An open set: a later minor release may add a kind of threshold; read a value you do not know as another kind of threshold. Optional: documents written before 0.13.0 do not carry it; from 0.13.0 on it is always written.",
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]*$",
+              "x-known-values": [
+                "none",
+                "verdict",
+                "priority",
+                "unchecked"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "strict_network": {
+          "description": "Whether `--strict-network` was on: then a lookup that failed (the root `network_failures`) fails the run on its own. Optional: documents written before 0.13.0 do not carry it; from 0.13.0 on it is always written.",
+          "type": "boolean"
+        },
+        "mode": {
+          "description": "What the run was asked to do: `check`, the run that judges its findings against `fail_on`, or `generate_baseline` (`--generate-baseline`), which records them in the baseline file and judges none. An open set: a later minor release may add a kind of run; read a value you do not know as another kind of run. Optional: documents written before 0.13.0 do not carry it; from 0.13.0 on it is always written.",
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "x-known-values": [
+            "check",
+            "generate_baseline"
           ]
         },
         "thresholds": {
@@ -1503,6 +1556,72 @@
           "type": "null"
         }
       ]
+    },
+    "gate": {
+      "description": "The run's gate: whether it failed, what failed it, and whether it judged its findings at all.",
+      "type": "object",
+      "required": [
+        "fails",
+        "tripped_by",
+        "fail_on_applied"
+      ],
+      "properties": {
+        "fails": {
+          "description": "The gate's decision. True: the run exits 1, unless it then fails to write a file or the baseline, in which case it exits 2 and says so on stderr. False: it exits 0, under the same proviso. True exactly when `tripped_by` is not empty.",
+          "type": "boolean"
+        },
+        "tripped_by": {
+          "description": "What failed the run, each cause once: `strict_network`, `run.strict_network` is true and `network_failures` is true; `fail_on`, at least one finding's `gate.fails` is true. Both are listed when both hold. Empty exactly when `fails` is false. lockrot writes them in the order of `x-known-values`; do not rely on the position. An open set: a later minor release may add a cause; read a value you do not know as another condition that failed the run.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$",
+            "x-known-values": [
+              "strict_network",
+              "fail_on"
+            ]
+          }
+        },
+        "fail_on_applied": {
+          "description": "Whether the run judged its findings against `run.fail_on`: true in a `check` run, `fail_on` none included; false in a `generate_baseline` run, where only `--strict-network` can fail it. Where it is false no finding's `gate.fails` is true.",
+          "type": "boolean"
+        }
+      }
+    },
+    "findingGate": {
+      "description": "Where one finding stands against `run.fail_on`.",
+      "type": "object",
+      "required": [
+        "reaches_fail_on",
+        "fails",
+        "exempt_by"
+      ],
+      "properties": {
+        "reaches_fail_on": {
+          "description": "Whether the finding is at or above `run.fail_on`: a verdict at least as severe as a verdict threshold, a priority at least as high as a priority threshold, or, under `unchecked`, S10 among its signals. Always false under `none`. Decided in every mode, whether or not the run applied fail-on.",
+          "type": "boolean"
+        },
+        "fails": {
+          "description": "Whether this finding fails the run: exactly when `reaches_fail_on` is true, `exempt_by` is null and the root `gate.fail_on_applied` is true.",
+          "type": "boolean"
+        },
+        "exempt_by": {
+          "description": "What keeps a finding that reaches fail-on from failing the run, or null. `baseline`: the baseline accepted it, its `baseline.status` is `known`; a `worsened` finding is not exempt. Non-null only where `reaches_fail_on` is true. Only what exempts this one finding is recorded here: a run that applies fail-on to no finding says so in the root `gate.fail_on_applied`. An open set: a later minor release may add an exemption; read a value you do not know as exempt for another reason.",
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]*$",
+              "x-known-values": [
+                "baseline"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
     }
   }
 }
