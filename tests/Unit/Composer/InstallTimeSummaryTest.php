@@ -20,6 +20,7 @@ use Lockrot\Allowlist\BuiltinAllowlist;
 use Lockrot\Analyzer\Analyzer;
 use Lockrot\Clock;
 use Lockrot\Composer\InstallTimeSummary;
+use Lockrot\Config\Gate;
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Data\Forge\ActivityClient;
 use Lockrot\Data\Forge\ActivityFetchPlanner;
@@ -33,11 +34,14 @@ use Lockrot\Data\Repository\MetadataLoaderInterface;
 use Lockrot\Data\Repository\RepositoryMetadataLoader;
 use Lockrot\Deadline;
 use Lockrot\Exception\InstallBlockedException;
+use Lockrot\Lock\LockFile;
+use Lockrot\Lock\ProjectConfig;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Tests\Support\ColdConfigSchema;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\MarkupRefusingFormatter;
 use Lockrot\Tests\Support\RecordingIO;
+use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Formatter\OutputFormatter;
@@ -426,6 +430,39 @@ final class InstallTimeSummaryTest extends TestCase
         self::assertStringContainsString('install-time-strict', $thrown->getMessage());
         self::assertStringContainsString('fail-on=old-promise', $thrown->getMessage());
         self::assertStringContainsString('lockrot: dependency rot in 1 of 1 changed package', $io->getOutput());
+    }
+
+    /**
+     * The block is the gate a `composer lockrot` run is decided by, in check mode, over the report
+     * the transaction gives: under every fail-on value it blocks exactly where that gate fails.
+     */
+    public function testStrictModeBlocksExactlyWhereTheGateFails(): void
+    {
+        $server = self::$server;
+        self::assertNotNull($server);
+        $outcomes = [];
+        foreach (FailOn::allowed() as $value) {
+            $dir = $this->project(['install-time-strict' => true, 'fail-on' => $value]);
+            $project = ProjectConfig::fromFile($dir.'/composer.json');
+            $lock = LockFile::fromFile($dir.'/composer.lock');
+            $lockrot = LockrotConfig::fromSources($project->lockrotExtra(), [], [], \PHP_VERSION, $project->platformPhp());
+            $analyzer = ($this->analyzerFactory())(new BufferIO(), $server->config(), [], $lockrot, new Tokens('recorded', null), Clock::fixed(self::FIXED_NOW), Deadline::inSeconds(60.0));
+            $report = $analyzer->analyzePackages($lock->packages(false), $lock, $project, false);
+            $fails = Gate::decide($report, FailOn::fromString($value), false, Gate::MODE_CHECK)->fails();
+
+            $blocked = false;
+            try {
+                (new InstallTimeSummary($this->analyzerFactory()))->onPreOperationsExec($this->event(new BufferIO(), new Transaction([], [$this->loadPackage(self::PHPZIP)])));
+            } catch (InstallBlockedException $e) {
+                $blocked = true;
+            }
+
+            self::assertSame($fails, $blocked, 'fail-on='.$value);
+            $outcomes[$blocked ? 'blocked' : 'passed'] = true;
+        }
+
+        self::assertArrayHasKey('blocked', $outcomes, 'some fail-on value blocks the install');
+        self::assertArrayHasKey('passed', $outcomes, 'some fail-on value lets it through');
     }
 
     public function testStrictModeDoesNotBlockADryRunThatExecutesNoOperations(): void
