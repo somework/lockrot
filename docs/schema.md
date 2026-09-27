@@ -159,6 +159,19 @@ consumer usually keys on:
   `worsened`, with the verdict the baseline accepted), or null when the run read none. The report's
   own `baseline` block still carries the totals; this is the same judgement per finding, which is
   what a reader filtering for what is new actually needs.
+- Each finding carries `from_composer_repository`, true when its lock entry has a Composer
+  `notification-url`. Composer writes one only for a package served by a `type: composer`
+  repository that advertises a notify URL (`notify-batch` or `notify` in its packages.json), as
+  packagist.org and Private Packagist do, and lockrot asks a repository for metadata, advisories and
+  repository activity only about such an entry. False is a `path`, `vcs`, `artifact` or inline
+  `package` entry, and also a package from a `type: composer` repository that advertises no notify
+  URL (asset-packagist.org, a Satis build without `notify-batch`): nothing was asked, so the
+  finding has no metadata, advisories, activity or libyears. True does not mean packagist.org. The
+  value is the one `--explain` writes as `lock.from_composer_repository`, and the findings where it
+  is false are the ones the root `not_from_composer_repository` counts. Added in 0.13.0, optional in
+  the schema so earlier documents validate; from 0.13.0 on every finding carries it, true or false,
+  never null. It stays a boolean in 1.x: a finer account of where an entry came from would be a
+  separate optional field with an open set of values, never a new type for this key.
 - A finding can carry `S10`, the signal that says a check did not run: its `data` names each
   missing check, why, and the signals it blocked. Added in 0.11.0; documents written before it
   simply have no such signal, and the id is part of the same schema number.
