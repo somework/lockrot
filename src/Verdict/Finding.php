@@ -62,8 +62,8 @@ final class Finding
      */
     private ?float $libyears;
     /**
-     * The lock entry carries a Composer notification-url ({@see \Lockrot\Lock\LockedPackage::isFromComposerRepository()}):
-     * a repository was asked about the package. Not "comes from packagist.org".
+     * The lock entry carries a Composer notification-url ({@see \Lockrot\Lock\LockedPackage::isFromComposerRepository()}),
+     * the only kind of entry lockrot asks a repository about; when false, none was asked. Not "comes from packagist.org".
      */
     private bool $fromComposerRepository;
 
