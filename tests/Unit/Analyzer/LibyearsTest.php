@@ -63,7 +63,7 @@ final class LibyearsTest extends TestCase
 
     /**
      * Each way out of the rule gives its own reason, decided where the number is: the years and the
-     * reason never both, never neither, and {@see Libyears::behind()} is the same number.
+     * reason never both, never neither.
      *
      * @dataProvider measurements
      */
@@ -78,7 +78,6 @@ final class LibyearsTest extends TestCase
         if ($years !== null) {
             self::assertEqualsWithDelta($years, $measurement->years(), 0.005);
         }
-        self::assertSame($measurement->years(), Libyears::behind($package, $metadata));
     }
 
     public function testAMeasurementHoldsItsYearsOrItsReason(): void
@@ -163,12 +162,12 @@ final class LibyearsTest extends TestCase
         $lockedAt = new \DateTimeImmutable(self::LOCKED_AT);
         $latest = $lockedAt->modify('+'.Clock::SECONDS_PER_YEAR.' seconds');
 
-        self::assertSame(1.0, Libyears::behind(self::package(), self::metadata($latest->format(\DATE_ATOM))));
+        self::assertSame(1.0, Libyears::measure(self::package(), self::metadata($latest->format(\DATE_ATOM)))->years());
     }
 
     public function testFourYearsBehindOnTheDatesTheRepositoryReports(): void
     {
-        $behind = Libyears::behind(self::package(), self::metadata('2026-01-24T13:26:10+00:00'));
+        $behind = Libyears::measure(self::package(), self::metadata('2026-01-24T13:26:10+00:00'))->years();
 
         self::assertNotNull($behind);
         self::assertEqualsWithDelta(4.06, $behind, 0.005);
@@ -178,29 +177,29 @@ final class LibyearsTest extends TestCase
     {
         // A lock on a pre-release above the last stable, or on a tag the repository no longer
         // lists: measured, and not behind.
-        self::assertSame(0.0, Libyears::behind(self::package(), self::metadata('2019-01-23T15:23:04+00:00')));
+        self::assertSame(0.0, Libyears::measure(self::package(), self::metadata('2019-01-23T15:23:04+00:00'))->years());
     }
 
     public function testABranchSnapshotIsNotMeasuredEvenWithBothDates(): void
     {
-        self::assertNull(Libyears::behind(self::package('dev-master'), self::metadata('2026-01-24T13:26:10+00:00')));
-        self::assertNull(Libyears::behind(self::package('1.x-dev'), self::metadata('2026-01-24T13:26:10+00:00')));
+        self::assertNull(Libyears::measure(self::package('dev-master'), self::metadata('2026-01-24T13:26:10+00:00'))->years());
+        self::assertNull(Libyears::measure(self::package('1.x-dev'), self::metadata('2026-01-24T13:26:10+00:00'))->years());
     }
 
     public function testAPackageOutsideEveryComposerRepositoryIsNotMeasuredEvenWithMetadata(): void
     {
-        self::assertNull(Libyears::behind(self::package('v5.13.2', self::LOCKED_AT, false), self::metadata('2026-01-24T13:26:10+00:00')));
+        self::assertNull(Libyears::measure(self::package('v5.13.2', self::LOCKED_AT, false), self::metadata('2026-01-24T13:26:10+00:00'))->years());
     }
 
     public function testNoMetadataNoMeasure(): void
     {
-        self::assertNull(Libyears::behind(self::package(), null));
+        self::assertNull(Libyears::measure(self::package(), null)->years());
     }
 
     public function testAnUndatedLastStableReleaseIsNotMeasuredWhenNothingAboveIsDatedEither(): void
     {
-        self::assertNull(Libyears::behind(self::package(), self::metadata(null)));
-        self::assertNull(Libyears::behind(self::package(), self::metadata(null, ['8' => ['v8.6.1', null], '5' => ['v5.13.2', self::LOCKED_AT]])), 'the installed branch alone, and its newest is the installed version');
+        self::assertNull(Libyears::measure(self::package(), self::metadata(null))->years());
+        self::assertNull(Libyears::measure(self::package(), self::metadata(null, ['8' => ['v8.6.1', null], '5' => ['v5.13.2', self::LOCKED_AT]]))->years(), 'the installed branch alone, and its newest is the installed version');
     }
 
     /**
@@ -216,7 +215,7 @@ final class LibyearsTest extends TestCase
             '6' => ['v6.13.1', '2024-11-29T00:00:00+00:00'],
             '5' => ['v5.13.2', self::LOCKED_AT],
         ]);
-        $behind = Libyears::behind(self::package(), $metadata);
+        $behind = Libyears::measure(self::package(), $metadata)->years();
 
         self::assertNotNull($behind);
         self::assertEqualsWithDelta(4.06, $behind, 0.005);
@@ -236,7 +235,7 @@ final class LibyearsTest extends TestCase
             '6' => ['v6.13.1', '2024-11-29T00:00:00+00:00'],
             '7' => ['v7.14.0', '2026-01-24T13:26:10+00:00'],
         ]);
-        $behind = Libyears::behind(self::package(), $listedOldestFirst);
+        $behind = Libyears::measure(self::package(), $listedOldestFirst)->years();
 
         self::assertNotNull($behind);
         self::assertEqualsWithDelta(4.06, $behind, 0.005, 'the 7.x date, not the 6.x one listed before it, and none of the three that do not count');
@@ -249,32 +248,32 @@ final class LibyearsTest extends TestCase
             '4' => ['v4.9.9', '2026-03-01T00:00:00+00:00'],
         ]);
 
-        self::assertNull(Libyears::behind(self::package(), $metadata));
+        self::assertNull(Libyears::measure(self::package(), $metadata)->years());
     }
 
     public function testOnTheInstalledBranchOnlyAHigherVersionCounts(): void
     {
         $newerPatch = self::metadata(null, ['5' => ['v5.14.0', '2023-06-01T00:00:00+00:00']]);
-        $behind = Libyears::behind(self::package(), $newerPatch);
+        $behind = Libyears::measure(self::package(), $newerPatch)->years();
         self::assertNotNull($behind);
         self::assertEqualsWithDelta(1.41, $behind, 0.005);
 
         // the branch's newest dated release below the installed version — a re-tag dated later — is not movement forward
         $lowerDatedLater = self::metadata(null, ['5' => ['v5.13.1', '2023-06-01T00:00:00+00:00']]);
-        self::assertNull(Libyears::behind(self::package(), $lowerDatedLater));
+        self::assertNull(Libyears::measure(self::package(), $lowerDatedLater)->years());
     }
 
     public function testATrustedNewestReleaseDateOutranksTheBranchView(): void
     {
         // when the repository dates the newest release, that date is the one used, whatever the branches say
-        $behind = Libyears::behind(self::package(), self::metadata('2026-01-24T13:26:10+00:00', ['8' => ['v8.6.1', '2030-01-01T00:00:00+00:00']]));
+        $behind = Libyears::measure(self::package(), self::metadata('2026-01-24T13:26:10+00:00', ['8' => ['v8.6.1', '2030-01-01T00:00:00+00:00']]))->years();
         self::assertNotNull($behind);
         self::assertEqualsWithDelta(4.06, $behind, 0.005);
     }
 
     public function testALockEntryWithoutATimeIsNotMeasured(): void
     {
-        self::assertNull(Libyears::behind(self::package('v5.13.2', null), self::metadata('2026-01-24T13:26:10+00:00')));
+        self::assertNull(Libyears::measure(self::package('v5.13.2', null), self::metadata('2026-01-24T13:26:10+00:00'))->years());
     }
 
     // ---- a split package: the installed version is dated by its monorepo parent -------------
@@ -309,7 +308,7 @@ final class LibyearsTest extends TestCase
         // parent's v5.13.2 says two years before the newest, and that is the installed end.
         $metadata = self::splitPackage(['5.13.2.0' => self::twoYearsBefore(self::LATEST)]);
 
-        self::assertSame(2.0, Libyears::behind(self::package(), $metadata));
+        self::assertSame(2.0, Libyears::measure(self::package(), $metadata)->years());
         self::assertEquals(new \DateTimeImmutable(self::twoYearsBefore(self::LATEST)), InstalledRelease::of(self::package(), $metadata)->at());
         self::assertSame('laravel/framework', InstalledRelease::of(self::package(), $metadata)->datedBy());
     }
@@ -320,8 +319,8 @@ final class LibyearsTest extends TestCase
         // version is the shared commit's, a year and a half early, and would inflate the sum.
         $neighbour = self::splitPackage(['5.13.3.0' => self::twoYearsBefore(self::LATEST)]);
 
-        self::assertNull(Libyears::behind(self::package(), self::splitPackage([])));
-        self::assertNull(Libyears::behind(self::package(), $neighbour), 'a neighbouring version is not this one');
+        self::assertNull(Libyears::measure(self::package(), self::splitPackage([]))->years());
+        self::assertNull(Libyears::measure(self::package(), $neighbour)->years(), 'a neighbouring version is not this one');
         self::assertNull(InstalledRelease::of(self::package(), self::splitPackage([]))->at());
         self::assertSame('laravel/framework', $neighbour->releaseDatesBy());
         self::assertNull(InstalledRelease::of(self::package(), $neighbour)->datedBy(), 'the parent has dates, none of them for this version');
@@ -335,7 +334,7 @@ final class LibyearsTest extends TestCase
         $metadata = self::splitPackage(['5.13.2.0' => self::twoYearsBefore(self::LATEST)], null);
 
         self::assertNull($metadata->lastStableDatedBy());
-        self::assertSame(2.0, Libyears::behind(self::package(), $metadata));
+        self::assertSame(2.0, Libyears::measure(self::package(), $metadata)->years());
     }
 
     /**
@@ -345,7 +344,7 @@ final class LibyearsTest extends TestCase
      */
     public function testATagOnASharedCommitIsNotMeasuredFromTheLocksDate(): void
     {
-        self::assertNull(Libyears::behind(self::package(), self::splitPackage([], null)));
+        self::assertNull(Libyears::measure(self::package(), self::splitPackage([], null))->years());
     }
 
     public function testWithoutAParentAPackageIsMeasuredFromTheLocksDate(): void
@@ -354,7 +353,7 @@ final class LibyearsTest extends TestCase
         $metadata = self::splitPackage([], null, []);
 
         self::assertEquals(new \DateTimeImmutable(self::LOCKED_AT), InstalledRelease::of(self::package(), $metadata)->at());
-        self::assertEqualsWithDelta(4.06, Libyears::behind(self::package(), $metadata) ?? 0.0, 0.005);
+        self::assertEqualsWithDelta(4.06, Libyears::measure(self::package(), $metadata)->years() ?? 0.0, 0.005);
     }
 
     public function testAVersionComposerCannotNormalizeIsMeasuredFromTheLocksDate(): void
@@ -374,7 +373,7 @@ final class LibyearsTest extends TestCase
 
     public function testADevelopmentPackageIsMeasuredLikeAnyOther(): void
     {
-        $behind = Libyears::behind(self::package('v5.13.2', self::LOCKED_AT, true, true), self::metadata('2026-01-24T13:26:10+00:00'));
+        $behind = Libyears::measure(self::package('v5.13.2', self::LOCKED_AT, true, true), self::metadata('2026-01-24T13:26:10+00:00'))->years();
 
         self::assertNotNull($behind);
         self::assertEqualsWithDelta(4.06, $behind, 0.005);

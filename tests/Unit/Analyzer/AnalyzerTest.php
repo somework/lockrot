@@ -439,7 +439,7 @@ final class AnalyzerTest extends TestCase
 
     /**
      * The libyears on a finding come from the lock's `time` and the repository's newest stable
-     * release, through {@see \Lockrot\Analyzer\Libyears::behind()}: two years apart here, so a
+     * release, through {@see \Lockrot\Analyzer\Libyears::measure()}: two years apart here, so a
      * swapped argument or a dropped one would read as zero or null.
      */
     public function testAFindingCarriesTheLibyearsBetweenItsLockTimeAndTheNewestStableRelease(): void

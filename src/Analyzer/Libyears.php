@@ -83,20 +83,12 @@ final class Libyears
     /**
      * The per-package rule: the newest stable release's date minus the installed version's, in
      * years of 365.25 days, never below zero — a lock on a pre-release above the last stable, or on
-     * a tag the repository no longer lists, is measured and is not behind. Null when the package
-     * is not measured; {@see measure()} says why. The date is the repository's for the newest
-     * release ({@see PackageMetadata::lastStableReleaseAt()}) and the lock's for the installed one.
-     */
-    public static function behind(LockedPackage $package, ?PackageMetadata $metadata): ?float
-    {
-        return self::measure($package, $metadata)->years();
-    }
-
-    /**
-     * {@see behind()}, with the reason on each way out that gives no number, in the order they are
-     * checked: outside every Composer repository, without metadata, a branch snapshot, or without a
-     * date to trust for one of the two ends. The finding stores the result, so the reason the report
-     * counts is the one decided here, not read back off the finding's note.
+     * a tag the repository no longer lists, is measured and is not behind. The date is the
+     * repository's for the newest release ({@see PackageMetadata::lastStableReleaseAt()}) and the
+     * lock's for the installed one. No number comes with the first reason that applies, in this
+     * order: outside every Composer repository, without metadata, a branch snapshot, or without a
+     * date to trust for one of the two ends. The finding stores the result; the report's block
+     * counts it.
      */
     public static function measure(LockedPackage $package, ?PackageMetadata $metadata): LibyearsMeasurement
     {
