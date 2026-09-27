@@ -160,7 +160,9 @@ final class FindingFactsConsistencyTest extends TestCase
             if (!Verdict::flagged($finding->verdict()) && !self::carries($finding, Signal::S9)) {
                 continue;
             }
-            $explained = (new ExplainFormatter())->json(new Explanation($finding, $facts, new Thresholds(), '8.4', $report));
+            $explaining = new Explanation($finding, $facts, new Thresholds(), '8.4', $report);
+            self::assertStringNotContainsString('releases_read', (new ExplainFormatter())->text($explaining), $run.' --explain '.$package.': the text prints S9 as before the key');
+            $explained = (new ExplainFormatter())->json($explaining);
             $this->assertValid(Schemas::EXPLAIN, $explained, $run.' --explain '.$package);
             $this->assertValid(Schemas::EXPLAIN, $explained, $run.' --explain '.$package, true);
             $explanation = json_decode($explained, true);
@@ -218,6 +220,11 @@ final class FindingFactsConsistencyTest extends TestCase
             $rows[JsonPath::stringAt($advisory, ['id'])] = $advisory;
         }
         $order = array_keys($rows);
+        if (\is_array($noFix)) {
+            // From S9 alone: unfixed when no release the verdict lets the project reach carries the fix.
+            $unfixed = array_keys(array_filter($rows, static fn (array $advisory): bool => $row['verdict'] === Verdict::LEFT_BEHIND ? $advisory['fixed_on_branch'] !== true : $advisory['fixed_by'] === null));
+            self::assertSame($unfixed, array_column($noFix, 'id'), $what.': every unfixed S9 row is named, and only those');
+        }
         $ids = [];
         foreach (\is_array($noFix) ? $noFix : [] as $item) {
             self::assertIsArray($item);
@@ -238,11 +245,15 @@ final class FindingFactsConsistencyTest extends TestCase
                     break;
                 case NoFix::RELEASES_UNKNOWN:
                     self::assertFalse($read, $what);
+                    self::assertNull($advisory['fixed_by'], $what);
+                    self::assertFalse($advisory['fixed_on_branch'], $what);
 
                     break;
                 case NoFix::AFFECTED_RANGE_UNKNOWN:
                     self::assertTrue($read, $what);
                     self::assertNull($advisory['affected_versions'], $what);
+                    self::assertNull($advisory['fixed_by'], $what);
+                    self::assertFalse($advisory['fixed_on_branch'], $what);
 
                     break;
                 case NoFix::NO_RELEASE_FIXES:
