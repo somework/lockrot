@@ -2315,6 +2315,93 @@ final class LockrotCommandTest extends TestCase
         self::assertMatchesRegularExpression('/\Alockrot: Cannot write r\.json: \S[^\n]*\n\z/', $stderr);
     }
 
+    /**
+     * The exit code is the gate the documents write, and the SARIF level reads the same standing:
+     * `error` exactly where a finding reaches fail-on and the baseline did not accept it. In a
+     * generate run that is also a finding the run did not judge, which is the one place an `error`
+     * does not fail the run.
+     *
+     * @return iterable<string, array{array<string, mixed>, bool}>
+     */
+    public static function gatedRuns(): iterable
+    {
+        yield 'a failing check' => [['--fail-on' => 'silent'], false];
+        yield 'a check against a baseline' => [['--fail-on' => 'silent'], true];
+        yield 'a check under a priority' => [['--fail-on' => 'medium'], true];
+        yield 'a check with nothing to fail on' => [['--fail-on' => 'none'], false];
+        yield 'a generate run' => [['--generate-baseline' => true, '--fail-on' => 'silent'], false];
+    }
+
+    /**
+     * @param array<string, mixed> $args
+     *
+     * @dataProvider gatedRuns
+     */
+    #[DataProvider('gatedRuns')]
+    public function testTheExitCodeIsTheGateEveryDocumentWrites(array $args, bool $withBaseline): void
+    {
+        $dir = $this->fixtureCopy(self::WALLABAG_LOCK);
+        if ($withBaseline) {
+            self::assertSame(0, $this->tester($this->loader())->execute(['--generate-baseline' => true, '--target-php' => '8.4']));
+            // One accepted finding made worse, so the run holds known and worsened findings both.
+            $findings = $this->baselineFindings($dir.'/lockrot-baseline.json');
+            $findings['doctrine/annotations']['verdict'] = 'stale';
+            $this->writeBaselineFile($dir.'/lockrot-baseline.json', $findings);
+        }
+
+        [$code, , $stderr] = $this->runWithSplitStreams($args + ['--all' => true, '--output' => ['json:r.json', 'html:r.html', 'sarif:r.sarif'], '--target-php' => '8.4'], $this->loader());
+
+        $json = $this->readJsonFile($dir.'/r.json');
+        self::assertSame($json, self::pagePayload((string) file_get_contents($dir.'/r.html'))['report'], 'the page carries the same document');
+        $gate = JsonPath::arrayAt($json, ['gate']);
+        self::assertSame($gate['fails'] ? 1 : 0, $code, $stderr);
+        $generate = isset($args['--generate-baseline']);
+        self::assertSame($generate ? 'generate_baseline' : 'check', JsonPath::stringAt($json, ['run', 'mode']));
+        self::assertSame(!$generate, $gate['fail_on_applied']);
+
+        $levels = [];
+        foreach (JsonPath::arrayAt($this->readJsonFile($dir.'/r.sarif'), ['runs', 0, 'results']) as $result) {
+            self::assertIsArray($result);
+            $levels[JsonPath::stringAt($result, ['partialFingerprints', 'lockrot/package'])] = JsonPath::stringAt($result, ['level']);
+        }
+        $failing = $unjudged = 0;
+        foreach (JsonPath::arrayAt($json, ['findings']) as $finding) {
+            self::assertIsArray($finding);
+            $package = JsonPath::stringAt($finding, ['package']);
+            $standing = JsonPath::arrayAt($finding, ['gate']);
+            self::assertArrayHasKey($package, $levels, '--all gives every finding a result');
+            $error = $levels[$package] === 'error';
+            self::assertSame($standing['reaches_fail_on'] && $standing['exempt_by'] !== 'baseline', $error, $package);
+            self::assertSame($standing['reaches_fail_on'] && $standing['exempt_by'] === null && !$gate['fail_on_applied'], $error && !$standing['fails'], $package.': the one place an error does not fail');
+            $failing += $standing['fails'] ? 1 : 0;
+            $unjudged += $error && !$standing['fails'] ? 1 : 0;
+        }
+        self::assertSame($failing > 0, \in_array('fail_on', JsonPath::arrayAt($gate, ['tripped_by']), true));
+        self::assertSame($generate, $unjudged > 0, 'a generate run marks what reaches fail-on as error and fails nothing');
+    }
+
+    /**
+     * A run whose gate fails and which then cannot write a file exits 2, not 1, and says why on
+     * stderr: the `gate.fails` description says so, and this holds it to that.
+     */
+    public function testAFailingGateThatThenCannotWriteAFileExitsTwo(): void
+    {
+        $dir = $this->fixtureCopy(self::WALLABAG_LOCK);
+        $called = false;
+        $command = $this->recordingCommand($called, static function () use ($dir): void {
+            mkdir($dir.'/r.json');
+            touch($dir.'/r.json/occupied');
+        });
+
+        [$code, $stdout, $stderr] = $this->runCommandWithSplitStreams($command, ['--format' => 'json', '--fail-on' => 'silent', '--output' => ['json:r.json'], '--target-php' => '8.4']);
+
+        self::assertSame(2, $code);
+        $document = json_decode($stdout, true);
+        self::assertIsArray($document);
+        self::assertTrue(JsonPath::arrayAt($document, ['gate'])['fails'], 'the report on stdout says the gate failed');
+        self::assertMatchesRegularExpression('/\Alockrot: Cannot write r\.json: \S[^\n]*\n\z/', $stderr);
+    }
+
     public function testLockrotDisableWritesNoFile(): void
     {
         $dir = $this->fixtureCopy(self::WALLABAG_LOCK);
