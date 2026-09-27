@@ -251,4 +251,10 @@ final class PriorityTest extends TestCase
         }
         self::assertSame($expected, $reasons, 'one step for each fact that holds, in the order they apply');
     }
+
+    /** A caller that does not say whether the package is reached, as of() does not, gets `transitive`. */
+    public function testTheBasisTakesAPackageAsReachedUnlessToldOtherwise(): void
+    {
+        self::assertSame([['reason' => 'transitive', 'from' => 'medium', 'to' => 'low']], Priority::basis(Verdict::STALE, false, false, false)->steps());
+    }
 }
