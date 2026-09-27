@@ -241,7 +241,9 @@ finding with everything it was decided on:
   lock date is a shared commit's with no parent to replace it says the date is not a release's. In
   `--format=json` each row also says whether its php requirement admits the target PHP
   (`admits_target_php`) and the lowest PHP the project's own `require.php` promises
-  (`admits_project_php`), and which of the two holds it back (`php_blocked_by`), as S8 decides it
+  (`admits_project_php`), which of the two holds it back (`php_blocked_by`), as S8 decides it, and,
+  for each floor it does not admit, which side of it the branch is on (`misses_target_php`,
+  `misses_project_php`: `needs_newer`, `stops_before`, `skips` or `unsatisfiable`)
   (see [verdicts.md](verdicts.md#within-reach));
 - the repository activity S3 and S4 read, or that it was not fetched;
 - the thresholds and target PHP the signals were measured against, and the run's notes.

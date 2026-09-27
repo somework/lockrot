@@ -542,8 +542,8 @@ final class LockrotCommandTest extends TestCase
         self::assertIsArray($json);
         self::assertSame('>=8.2', $json['project_php']);
         $rows = self::admission($json);
-        self::assertSame(['>=8.4.1', true, false, 'project'], $rows['8.x'] ?? null);
-        self::assertSame(['>=7.2.5', true, true, null], $rows['5.x'] ?? null, 'the installed branch');
+        self::assertSame(['>=8.4.1', true, false, 'project', null, 'needs_newer'], $rows['8.x'] ?? null);
+        self::assertSame(['>=7.2.5', true, true, null, null, null], $rows['5.x'] ?? null, 'the installed branch');
     }
 
     /** The page's branch rows are held against the same two floors as `--explain`'s. */
@@ -560,8 +560,8 @@ final class LockrotCommandTest extends TestCase
         self::assertIsArray($details);
         self::assertIsArray($details['symfony/console']);
         $rows = self::admission($details['symfony/console']);
-        self::assertSame(['>=8.4.1', true, false, 'project'], $rows['8.x'] ?? null);
-        self::assertSame(['>=7.2.5', true, true, null], $rows['5.x'] ?? null, 'the installed branch');
+        self::assertSame(['>=8.4.1', true, false, 'project', null, 'needs_newer'], $rows['8.x'] ?? null);
+        self::assertSame(['>=7.2.5', true, true, null, null, null], $rows['5.x'] ?? null, 'the installed branch');
     }
 
     /**
@@ -577,7 +577,7 @@ final class LockrotCommandTest extends TestCase
         foreach ($explained['metadata']['branches'] as $row) {
             self::assertIsArray($row);
             self::assertIsString($row['branch']);
-            $rows[$row['branch']] = [$row['php'], $row['admits_target_php'], $row['admits_project_php'], $row['php_blocked_by']];
+            $rows[$row['branch']] = [$row['php'], $row['admits_target_php'], $row['admits_project_php'], $row['php_blocked_by'], $row['misses_target_php'], $row['misses_project_php']];
         }
 
         return $rows;

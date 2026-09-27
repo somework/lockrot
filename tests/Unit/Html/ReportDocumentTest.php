@@ -146,6 +146,9 @@ final class ReportDocumentTest extends TestCase
         self::assertSame([true, true], J::column($held, ['metadata', 'branches'], 'admits_target_php'));
         self::assertSame([null, null], J::column($free, ['metadata', 'branches'], 'php_blocked_by'));
         self::assertSame([null, null], J::column($free, ['metadata', 'branches'], 'admits_project_php'));
+        self::assertSame(['needs_newer', null], J::column($held, ['metadata', 'branches'], 'misses_project_php'));
+        self::assertSame([null, null], J::column($held, ['metadata', 'branches'], 'misses_target_php'));
+        self::assertSame([null, null], J::column($free, ['metadata', 'branches'], 'misses_project_php'), 'no project floor, no side');
     }
 
     /**

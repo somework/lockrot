@@ -44,7 +44,7 @@ final class ClosedSetsTest extends TestCase
     private const SIGNAL_ID = '^(S[1-9][0-9]*|[a-z0-9][a-z0-9_.-]*:[a-z0-9][a-z0-9_.-]*)$';
     /** A format name: lockrot's own, or a `<vendor>:<name>` one. */
     private const FORMAT = '^([a-z][a-z0-9-]*|[a-z0-9][a-z0-9_.-]*:[a-z0-9][a-z0-9_.-]*)$';
-    /** An S10 check or reason, an S6 reason, an S8 floor source and a branch's php_blocked_by: a lower-case word. */
+    /** An S10 check or reason, an S6 reason, an S8 floor source, a branch's php_blocked_by and misses_*_php: a lower-case word. */
     private const WORD = '^[a-z][a-z0-9_]*$';
     private const ROOT = __DIR__.'/../../../';
 
@@ -219,6 +219,8 @@ final class ClosedSetsTest extends TestCase
             'report #/definitions/s6/properties/reason' => [JsonPath::arrayAt($report, ['definitions', 's6', 'properties', 'reason']), self::WORD, [PinnedRule::REASON_BRANCH_SNAPSHOT, PinnedRule::REASON_NO_STABLE_RELEASE]],
             'report #/definitions/s8/properties/floor_source/oneOf/0' => [JsonPath::arrayAt($report, ['definitions', 's8', 'properties', 'floor_source', 'oneOf', 0]), self::WORD, [PhpFloor::PROJECT, PhpFloor::TARGET]],
             'explain #/definitions/metadata/properties/branches/items/properties/php_blocked_by/oneOf/0' => [JsonPath::arrayAt($explain, array_merge($branchRow, ['php_blocked_by', 'oneOf', 0])), self::WORD, [PhpFloor::PROJECT, PhpFloor::TARGET]],
+            'explain #/definitions/metadata/properties/branches/items/properties/misses_target_php/oneOf/0' => [JsonPath::arrayAt($explain, array_merge($branchRow, ['misses_target_php', 'oneOf', 0])), self::WORD, [PhpFloor::NEEDS_NEWER, PhpFloor::STOPS_BEFORE, PhpFloor::SKIPS, PhpFloor::UNSATISFIABLE]],
+            'explain #/definitions/metadata/properties/branches/items/properties/misses_project_php/oneOf/0' => [JsonPath::arrayAt($explain, array_merge($branchRow, ['misses_project_php', 'oneOf', 0])), self::WORD, [PhpFloor::NEEDS_NEWER, PhpFloor::STOPS_BEFORE, PhpFloor::SKIPS, PhpFloor::UNSATISFIABLE]],
             'explain #/definitions/signalId' => [JsonPath::arrayAt($explain, ['definitions', 'signalId']), self::SIGNAL_ID, ClosedSets::signalIds()],
             'config #/properties/format' => [JsonPath::arrayAt($config, ['properties', 'format']), self::FORMAT, LockrotConfig::FORMATS],
         ];
@@ -238,6 +240,10 @@ final class ClosedSetsTest extends TestCase
         self::assertCount(2, JsonPath::arrayAt($report, ['definitions', 's8', 'properties', 'floor_source', 'oneOf']));
         self::assertSame(['type' => 'null'], JsonPath::arrayAt($explain, array_merge($branchRow, ['php_blocked_by', 'oneOf', 1])), 'php_blocked_by is otherwise null');
         self::assertCount(2, JsonPath::arrayAt($explain, array_merge($branchRow, ['php_blocked_by', 'oneOf'])));
+        foreach (['misses_target_php', 'misses_project_php'] as $side) {
+            self::assertSame(['type' => 'null'], JsonPath::arrayAt($explain, array_merge($branchRow, [$side, 'oneOf', 1])), $side.' is otherwise null');
+            self::assertCount(2, JsonPath::arrayAt($explain, array_merge($branchRow, [$side, 'oneOf'])));
+        }
 
         $found = [];
         foreach (['report' => $report, 'explain' => $explain, 'config' => $config, 'baseline' => self::schema(Schemas::BASELINE)] as $document => $schema) {
@@ -282,7 +288,7 @@ final class ClosedSetsTest extends TestCase
         $config = self::schema(Schemas::CONFIG);
         $topLevelKeys = self::keys(JsonPath::arrayAt($config, ['properties']));
         $ignoreKeys = self::keys(JsonPath::arrayAt($config, ['properties', 'ignore', 'items', 'properties']));
-        $names = array_merge(Verdict::all(), Priority::all(), FailOn::allowed(), LockrotConfig::FORMATS, ClosedSets::signalIds(), $topLevelKeys, $ignoreKeys);
+        $names = array_merge(Verdict::all(), Priority::all(), FailOn::allowed(), LockrotConfig::FORMATS, ClosedSets::signalIds(), [PhpFloor::PROJECT, PhpFloor::TARGET, PhpFloor::NEEDS_NEWER, PhpFloor::STOPS_BEFORE, PhpFloor::SKIPS, PhpFloor::UNSATISFIABLE], $topLevelKeys, $ignoreKeys);
 
         foreach ($names as $name) {
             self::assertStringNotContainsString(':', $name, '<vendor>:<name> is reserved for names that are not lockrot\'s');

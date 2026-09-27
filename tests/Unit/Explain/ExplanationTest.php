@@ -8,6 +8,7 @@ use Composer\Package\Loader\ArrayLoader;
 use Lockrot\Analyzer\Report;
 use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Explain\Explanation;
+use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\Rule\PinnedRule;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\Thresholds;
@@ -96,7 +97,7 @@ final class ExplanationTest extends TestCase
         self::assertIsArray($meta);
         self::assertIsArray($meta['branches']);
         self::assertSame(
-            ['branch' => '10.x', 'installed' => true, 'highest' => '10.49.0', 'highest_released' => null, 'highest_commit_date' => '2023-06-05T12:46:42+00:00', 'newest_dated' => '10.49.0', 'newest_dated_released' => '2023-06-05T12:46:42+00:00', 'dated_by' => null, 'php' => null, 'admits_target_php' => null, 'admits_project_php' => null, 'php_blocked_by' => null],
+            ['branch' => '10.x', 'installed' => true, 'highest' => '10.49.0', 'highest_released' => null, 'highest_commit_date' => '2023-06-05T12:46:42+00:00', 'newest_dated' => '10.49.0', 'newest_dated_released' => '2023-06-05T12:46:42+00:00', 'dated_by' => null, 'php' => null, 'admits_target_php' => null, 'admits_project_php' => null, 'php_blocked_by' => null, 'misses_target_php' => null, 'misses_project_php' => null],
             $meta['branches'][0]
         );
     }
@@ -164,8 +165,8 @@ final class ExplanationTest extends TestCase
             'type' => 'library',
             'data_date' => F::NOW,
             'branches' => [
-                ['branch' => '2.x', 'installed' => false, 'highest' => '2.1.0', 'highest_released' => '2026-01-01T00:00:00+00:00', 'highest_commit_date' => null, 'newest_dated' => '2.1.0', 'newest_dated_released' => '2026-01-01T00:00:00+00:00', 'dated_by' => null, 'php' => null, 'admits_target_php' => null, 'admits_project_php' => null, 'php_blocked_by' => null],
-                ['branch' => '1.x', 'installed' => true, 'highest' => '1.5.0', 'highest_released' => '2021-06-01T00:00:00+00:00', 'highest_commit_date' => null, 'newest_dated' => '1.5.0', 'newest_dated_released' => '2021-06-01T00:00:00+00:00', 'dated_by' => null, 'php' => null, 'admits_target_php' => null, 'admits_project_php' => null, 'php_blocked_by' => null],
+                ['branch' => '2.x', 'installed' => false, 'highest' => '2.1.0', 'highest_released' => '2026-01-01T00:00:00+00:00', 'highest_commit_date' => null, 'newest_dated' => '2.1.0', 'newest_dated_released' => '2026-01-01T00:00:00+00:00', 'dated_by' => null, 'php' => null, 'admits_target_php' => null, 'admits_project_php' => null, 'php_blocked_by' => null, 'misses_target_php' => null, 'misses_project_php' => null],
+                ['branch' => '1.x', 'installed' => true, 'highest' => '1.5.0', 'highest_released' => '2021-06-01T00:00:00+00:00', 'highest_commit_date' => null, 'newest_dated' => '1.5.0', 'newest_dated_released' => '2021-06-01T00:00:00+00:00', 'dated_by' => null, 'php' => null, 'admits_target_php' => null, 'admits_project_php' => null, 'php_blocked_by' => null, 'misses_target_php' => null, 'misses_project_php' => null],
             ],
         ], $array['metadata']);
         self::assertSame(['forge' => 'GitHub', 'repository' => 'vendor/pkg', 'archived' => false, 'pushed_at' => '2026-02-01T00:00:00+00:00', 'fetched_at' => F::NOW, 'from_cache' => false], $array['activity']);
@@ -226,7 +227,7 @@ final class ExplanationTest extends TestCase
         self::assertSame('laravel/framework', $meta['installed_release_dated_by']);
         self::assertIsArray($meta['branches']);
         self::assertSame(
-            ['branch' => '10.x', 'installed' => true, 'highest' => 'v10.50.3', 'highest_released' => '2026-08-12T03:46:26+00:00', 'highest_commit_date' => null, 'newest_dated' => 'v10.50.3', 'newest_dated_released' => '2026-08-12T03:46:26+00:00', 'dated_by' => 'laravel/framework', 'php' => null, 'admits_target_php' => null, 'admits_project_php' => null, 'php_blocked_by' => null],
+            ['branch' => '10.x', 'installed' => true, 'highest' => 'v10.50.3', 'highest_released' => '2026-08-12T03:46:26+00:00', 'highest_commit_date' => null, 'newest_dated' => 'v10.50.3', 'newest_dated_released' => '2026-08-12T03:46:26+00:00', 'dated_by' => 'laravel/framework', 'php' => null, 'admits_target_php' => null, 'admits_project_php' => null, 'php_blocked_by' => null, 'misses_target_php' => null, 'misses_project_php' => null],
             $meta['branches'][0]
         );
     }
@@ -281,6 +282,44 @@ final class ExplanationTest extends TestCase
         self::assertIsArray($meta['branches'][0]);
         self::assertTrue($meta['branches'][0]['installed']);
         self::assertSame('project', $meta['branches'][0]['php_blocked_by']);
+        self::assertSame(PhpFloor::NEEDS_NEWER, $meta['branches'][0]['misses_project_php'], 'it needs a newer PHP than 7.2.5');
+        self::assertNull($meta['branches'][0]['misses_target_php'], '8.4 is admitted');
+    }
+
+    /**
+     * The installed branch's newest release stops before the target: phpstan-src locks nette/utils
+     * 3.x, whose newest release asks for `>=7.2 <8.4`. Moving to 8.4 means moving to another branch,
+     * which is not what a branch needing a newer PHP asks for.
+     */
+    public function testTheInstalledRowSaysItsBranchStopsBeforeTheTarget(): void
+    {
+        $metadata = F::metadata([['3.2.10', '2024-08-07T00:00:00+00:00', '>=7.2 <8.4']]);
+        $explanation = new Explanation($this->finding('3.2.10', Verdict::OK), F::facts(F::package(['version' => '3.2.10']), $metadata), new Thresholds(), '8.4', $this->report(), '^7.4 || ^8.0');
+
+        $row = JsonPath::arrayAt($explanation->toArray(), ['metadata', 'branches', 0]);
+        self::assertTrue($row['installed']);
+        self::assertSame([false, true, PhpFloor::TARGET, PhpFloor::STOPS_BEFORE, null], [$row['admits_target_php'], $row['admits_project_php'], $row['php_blocked_by'], $row['misses_target_php'], $row['misses_project_php']]);
+    }
+
+    /**
+     * A branch can miss both floors, each its own way: `~8.3.0` needs a newer PHP than wallabag's
+     * `>=8.2` and stops before 8.4. php_blocked_by names the project only; the target's side is
+     * still there.
+     */
+    public function testARowMissingBothFloorsSaysHowItMissesEach(): void
+    {
+        $rows = $this->sides('8.4', '>=8.2', [['2.0.0', '2026-01-01T00:00:00+00:00', '~8.3.0'], ['1.0.0', '2021-01-01T00:00:00+00:00', '>=7.4']]);
+
+        self::assertSame([PhpFloor::PROJECT, PhpFloor::STOPS_BEFORE, PhpFloor::NEEDS_NEWER], $rows['2.x']);
+        self::assertSame([null, null, null], $rows['1.x'], 'admits both');
+    }
+
+    /** No project floor: the project's side has no answer, and the target's is still given. */
+    public function testWithoutAProjectFloorOnlyTheTargetHasASide(): void
+    {
+        $rows = $this->sides('8.4', null, [['2.0.0', '2026-01-01T00:00:00+00:00', '^7.4 || ^8.5'], ['1.0.0', '2021-01-01T00:00:00+00:00', '>=7.4']]);
+
+        self::assertSame([PhpFloor::TARGET, PhpFloor::SKIPS, null], $rows['2.x']);
     }
 
     /**
@@ -314,6 +353,24 @@ final class ExplanationTest extends TestCase
         self::assertSame('^7.2.5 || ^8.0', $explanation->projectPhp());
         self::assertSame('^7.2.5 || ^8.0', $explanation->toArray()['project_php']);
         self::assertNull((new Explanation($this->finding('1.0.0', Verdict::OK), F::facts(F::package()), new Thresholds(), '8.4', $this->report()))->projectPhp());
+    }
+
+    /**
+     * @param list<array{0: string, 1: ?string, 2?: ?string}> $releases
+     *
+     * @return array<string, array{0: mixed, 1: mixed, 2: mixed}> php_blocked_by and the two sides, by branch
+     */
+    private function sides(string $target, ?string $project, array $releases): array
+    {
+        $explanation = new Explanation($this->finding('1.0.0', Verdict::OK), F::facts(F::package(['version' => '1.0.0']), F::metadata($releases)), new Thresholds(), $target, $this->report(), $project);
+        $rows = [];
+        foreach (JsonPath::arrayAt($explanation->toArray(), ['metadata', 'branches']) as $row) {
+            self::assertIsArray($row);
+            self::assertIsString($row['branch']);
+            $rows[$row['branch']] = [$row['php_blocked_by'], $row['misses_target_php'], $row['misses_project_php']];
+        }
+
+        return $rows;
     }
 
     /**

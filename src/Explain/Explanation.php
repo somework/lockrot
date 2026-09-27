@@ -172,8 +172,9 @@ final class Explanation
      * The `--explain --format=json` document. Each branch row also carries what S8's floors say
      * about its `php` ({@see PhpFloor}): whether it admits the target PHP, whether it admits the
      * lowest PHP the project's own `require.php` promises (null for no answer: no requirement, one
-     * that cannot be read, no project floor), and `php_blocked_by`, which of the two holds the
-     * branch back as S8 decides it. Only here, not in {@see self::branches()}: the text table does
+     * that cannot be read, no project floor), `php_blocked_by`, which of the two holds the
+     * branch back as S8 decides it, and `misses_target_php` and `misses_project_php`, which side of
+     * each floor the branch is on when it does not admit it. Only here, not in {@see self::branches()}: the text table does
      * not print them, and it reads the rows more than once.
      *
      * @return array<string, mixed>
@@ -199,6 +200,8 @@ final class Explanation
                 'admits_target_php' => $this->floor->admitsTarget($row['php']),
                 'admits_project_php' => $this->floor->admitsProject($row['php']),
                 'php_blocked_by' => $this->floor->blocking($row['php']),
+                'misses_target_php' => $this->floor->missesTarget($row['php']),
+                'misses_project_php' => $this->floor->missesProject($row['php']),
             ];
         }
 
