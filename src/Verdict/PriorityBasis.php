@@ -61,9 +61,7 @@ final class PriorityBasis
     /** Where the last step ended, or the base when none was taken. */
     public function priority(): string
     {
-        $last = end($this->steps);
-
-        return $last === false ? $this->base : $last['to'];
+        return $this->steps === [] ? $this->base : $this->steps[\count($this->steps) - 1]['to'];
     }
 
     /** @return array{base: string, steps: list<array{reason: string, from: string, to: string}>} */
