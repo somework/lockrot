@@ -169,13 +169,6 @@ are not listed here even though the area-B Infection config covers `src/Composer
   package never is. Even then the next guard raises a `ConfigException` when `file_get_contents()`
   returns false, so the method still refuses to run on an unreadable schema.
 
-### src/Config/Policy.php
-
-- `src/Config/Policy.php:24` ReturnRemoval — `FailOn::reaches()` returns false for `none` by contract
-  ("never for `none`"), so with the early return gone the loop rejects every finding and the method
-  still falls through to `return self::EXIT_OK`. The early return skips the loop; it does not decide
-  anything.
-
 ## src/Data, src/Baseline, src/Allowlist, src/Graph, src/Lock, src/Json
 
 One line per mutant no test can see. Line numbers are the ones `build/infection-C.log` reported
