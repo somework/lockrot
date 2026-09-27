@@ -335,6 +335,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   GitHub, GitLab and SARIF formats and the baseline are unchanged, and so is every verdict. The
   install-time summary writes no `run`, as before.
 
+- Each finding says whether lockrot asked a repository about its package: `from_composer_repository`,
+  true when the lock entry carries a Composer `notification-url`. Until now the report said it only
+  in prose, as the note `not from a Composer repository, not checked`, a note that also carries a
+  metadata failure or `not found in the repository`, so the HTML page told the three apart by
+  comparing the note's words, which the [compatibility page](docs/compatibility.md) says are not
+  contract. The boolean is read from the same lock entry as the `--explain` document's
+  `lock.from_composer_repository`, which it always equals, and the findings where it is false are
+  the ones the root `not_from_composer_repository` and the libyears block's bucket of that name
+  count; a test holds all four to the lock entry over every fixture lock that has such an entry
+  (drupal's five path entries, yii2's four asset-packagist packages, PrestaShop's and koel's vcs
+  entries, among others). Composer writes a `notification-url` only for a package served by a
+  `type: composer` repository that advertises a notify URL (`notify-batch` or `notify` in its
+  packages.json), as packagist.org and Private Packagist do; lockrot asks for metadata, advisories
+  and repository activity only about such a package, and that has not changed. So false is a
+  `path`, `vcs`, `artifact` or inline `package` entry, and also a package from a `type: composer`
+  repository that advertises no notify URL — asset-packagist.org, or a Satis build without
+  `notify-batch`. The descriptions of the root count and of `libyears.unmeasured.not_from_composer_repository`
+  in the schema, `docs/verdicts.md`, `docs/internals.md` and the README now state that rule; they
+  said "a path, vcs or package repository entry" and promised Satis without the `notify-batch` it
+  needs. The key stays a boolean for 1.x; a finer account of where an entry came from would be a
+  separate field. It is optional in both schemas, so documents written before 0.13.0 still
+  validate, and the 0.13.0 schema snapshot is refreshed. It reaches `--format=json`, the report
+  inside the `--format=html` page (which does not read it yet) and the `--explain` document's
+  `finding`; every verdict, priority, note, evidence line and exit code is unchanged, as are the
+  table, markdown, GitHub, GitLab and SARIF formats, the `--explain` text and the baseline.
+
 ### Fixed
 
 - A package name, a version, a constraint or a note that looked like console markup could break the

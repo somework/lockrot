@@ -319,6 +319,7 @@ list, which `…` stands in for:
             "priority": "critical",
             "direct": true,
             "dev": false,
+            "from_composer_repository": true,
             "replacement": null,
             "signals": [
                 {

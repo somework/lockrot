@@ -35,6 +35,9 @@ changes in minor releases under a heading of its own — see [Verdict changes](#
 - *Planned:* lockrot 2.x keeps writing report-1 behind `--schema=1`.
 - Human-readable strings inside those documents — a signal's `summary`, a note, an evidence sentence —
   are text, not contract. Key on ids and data fields, never on wording.
+- Whether lockrot asked a repository about a package is a finding's `from_composer_repository`, not
+  its `note`: a boolean for all of 1.x. A finer account of where a lock entry came from would be a
+  separate field with an open set of values, never a new type for this one.
 
 ### Closed sets and their order
 
