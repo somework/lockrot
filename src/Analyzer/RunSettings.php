@@ -63,9 +63,16 @@ final class RunSettings
     private bool $strictNetwork;
     private string $mode;
 
-    /** @param string $mode one of {@see Gate::MODES} */
+    /**
+     * @param string $mode one of {@see Gate::MODES}
+     *
+     * @throws \InvalidArgumentException for a mode not in {@see Gate::MODES}
+     */
     public function __construct(?string $project, ?string $rootPackage, ?string $targetPhp, ?string $lockPath, ?FailOn $failOn, ?Thresholds $thresholds, ?string $projectPhp = null, bool $strictNetwork = false, string $mode = Gate::MODE_CHECK)
     {
+        if (!\in_array($mode, Gate::MODES, true)) {
+            throw new \InvalidArgumentException(\sprintf('no run in mode "%s"; the modes are %s', $mode, implode(', ', Gate::MODES)));
+        }
         $this->project = $project;
         $this->rootPackage = $rootPackage;
         $this->targetPhp = $targetPhp;

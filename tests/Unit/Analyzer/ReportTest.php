@@ -402,6 +402,15 @@ final class ReportTest extends TestCase
         self::assertSame('generate_baseline', $run['mode']);
     }
 
+    /** A mode the gate does not know is refused where it is given, not when the document is written. */
+    public function testARunInAModeTheGateDoesNotKnowIsRefusedWhereItIsGiven(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('"pull_request"');
+
+        new RunSettings(null, null, null, null, FailOn::none(), null, null, false, 'pull_request');
+    }
+
     /** A run told no fail-on, which only a test builds, has no kind and no gate. */
     public function testARunWithoutAFailOnHasNoKindAndNoGate(): void
     {
