@@ -193,7 +193,7 @@ final class ExplainFormatterTest extends TestCase
 
     public function testAPackageWithoutMetadataShowsTheNoteInsteadOfATable(): void
     {
-        $finding = new Finding('vendor/pkg', '1.0.0', Verdict::UNKNOWN, [], ['vendor/pkg'], null, null, 'not from a Composer repository, not checked', true);
+        $finding = new Finding('vendor/pkg', '1.0.0', Verdict::UNKNOWN, [], ['vendor/pkg'], null, null, 'not from a Composer repository, not checked', true, [], null, false);
         $sourceless = new LockedPackage('vendor/pkg', '1.0.0', null, null, [], null, 'library', false, true, false);
         $explanation = new Explanation($finding, F::facts($sourceless), new Thresholds(), '8.4', $this->report());
 
@@ -202,6 +202,7 @@ final class ExplainFormatterTest extends TestCase
         self::assertStringContainsString("  direct requirement · packages-dev\n  note: not from a Composer repository, not checked\n", $text);
         self::assertStringContainsString("  version 1.0.0 · no php constraint · undated · not from a Composer repository\n", $text);
         self::assertStringContainsString("repository metadata\n  none — not from a Composer repository, not checked\n", $text);
+        self::assertStringContainsString("  libyears not measured: not from a Composer repository\n", $text);
         self::assertStringNotContainsString('branch     highest tag', $text);
         self::assertStringNotContainsString('  source ', $text, 'no source in the lock, no source line');
 

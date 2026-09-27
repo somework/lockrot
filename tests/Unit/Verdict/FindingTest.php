@@ -271,7 +271,7 @@ final class FindingTest extends TestCase
 
     public function testNoteWhenNoSignals(): void
     {
-        $finding = new Finding('private/thing', '3.0.0', Verdict::UNKNOWN, [], [], null, null, 'not from a Composer repository, not checked');
+        $finding = new Finding('private/thing', '3.0.0', Verdict::UNKNOWN, [], [], null, null, 'not from a Composer repository, not checked', false, [], null, false);
         self::assertSame('not from a Composer repository, not checked', $finding->evidence());
         self::assertNull($finding->toArray()['data_date']);
     }
@@ -335,12 +335,35 @@ final class FindingTest extends TestCase
         $finding = new Finding('vendor/pkg', '1.2.3', Verdict::STALE, [], ['vendor/root', 'vendor/pkg'], null, null, null, true);
         $array = $finding->toArray();
         self::assertSame(
-            ['package', 'version', 'verdict', 'priority', 'direct', 'dev', 'replacement', 'signals', 'chain', 'direct_dependents', 'evidence', 'allowlist_reason', 'note', 'data_date', 'libyears'],
+            ['package', 'version', 'verdict', 'priority', 'direct', 'dev', 'from_composer_repository', 'replacement', 'signals', 'chain', 'direct_dependents', 'evidence', 'allowlist_reason', 'note', 'data_date', 'libyears'],
             array_keys($array)
         );
         self::assertSame(Priority::LOW, $array['priority']);
         self::assertFalse($array['direct']);
         self::assertTrue($array['dev']);
+    }
+
+    public function testAFindingIsFromAComposerRepositoryUnlessItSaysOtherwise(): void
+    {
+        $asked = new Finding('vendor/pkg', '1.0.0', Verdict::OK, [], ['vendor/pkg'], null, null);
+        $notAsked = new Finding('local/pkg', 'dev-main', Verdict::UNKNOWN, [], ['local/pkg'], null, null, Finding::NOTE_NOT_IN_REPOSITORY, false, [], null, false);
+
+        self::assertTrue($asked->isFromComposerRepository());
+        self::assertTrue($asked->toArray()['from_composer_repository']);
+        self::assertFalse($notAsked->isFromComposerRepository());
+        self::assertFalse($notAsked->toArray()['from_composer_repository']);
+        self::assertFalse($notAsked->withSignals([new Signal(Signal::S7, Signal::LEVEL_INFO, 'pulls in 1 flagged package: a/b (stale)')])->toArray()['from_composer_repository'], 'S7 keeps it');
+        // A note other than that one is no claim about the lock entry: metadata can fail for a
+        // package a repository was asked about.
+        $failed = new Finding('vendor/gone', '1.0.0', Verdict::UNKNOWN, [], ['vendor/gone'], null, null, 'Repository metadata unavailable: HTTP 503');
+        self::assertTrue($failed->toArray()['from_composer_repository']);
+    }
+
+    public function testTheNotInARepositoryNoteCannotBeBuiltOnAFindingFromOne(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        new Finding('local/pkg', 'dev-main', Verdict::UNKNOWN, [], ['local/pkg'], null, null, Finding::NOTE_NOT_IN_REPOSITORY);
     }
 
     public function testAFindingCarriesItsLibyearsUnroundedAndPrintsThemToTwoDecimals(): void
@@ -397,7 +420,7 @@ final class FindingTest extends TestCase
     public function testTheNoteSurvivesS7AndOwnEvidenceLeavesS7Out(): void
     {
         $s7 = new Signal(Signal::S7, Signal::LEVEL_INFO, 'pulls in 2 flagged packages: a/b (stale), c/d (stale)', ['flagged' => 2, 'packages' => []]);
-        $unchecked = new Finding('local/pkg', 'dev-main', Verdict::UNKNOWN, [$s7], ['local/pkg'], null, null, 'not from a Composer repository, not checked');
+        $unchecked = new Finding('local/pkg', 'dev-main', Verdict::UNKNOWN, [$s7], ['local/pkg'], null, null, 'not from a Composer repository, not checked', false, [], null, false);
         self::assertSame('not from a Composer repository, not checked; pulls in 2 flagged packages: a/b (stale), c/d (stale)', $unchecked->evidence());
         self::assertSame('not from a Composer repository, not checked', $unchecked->ownEvidence());
 

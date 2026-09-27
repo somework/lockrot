@@ -19,6 +19,9 @@ final class Finding
      */
     public const NO_FIX_VERDICTS = [Verdict::ABANDONED, Verdict::SILENT, Verdict::LEFT_BEHIND];
 
+    /** The note of a finding whose lock entry carries no notification-url, so no repository was asked about it. */
+    public const NOTE_NOT_IN_REPOSITORY = 'not from a Composer repository, not checked';
+
     /**
      * The signals that can decide each verdict ({@see VerdictEngine}); the evidence line opens with
      * them, so the reason for the label is read before the rest of what was observed.
@@ -58,14 +61,23 @@ final class Finding
      * measured. Kept unrounded so the report's totals sum what was measured, not what was printed.
      */
     private ?float $libyears;
+    /**
+     * The lock entry carries a Composer notification-url ({@see \Lockrot\Lock\LockedPackage::isFromComposerRepository()}):
+     * a repository was asked about the package. Not "comes from packagist.org".
+     */
+    private bool $fromComposerRepository;
 
     /**
      * @param list<Signal> $signals
      * @param list<string> $chain
      * @param list<string> $directDependents
      */
-    public function __construct(string $package, string $version, string $verdict, array $signals, array $chain, ?string $allowlistReason, ?\DateTimeImmutable $dataDate, ?string $note = null, bool $dev = false, array $directDependents = [], ?float $libyears = null)
+    public function __construct(string $package, string $version, string $verdict, array $signals, array $chain, ?string $allowlistReason, ?\DateTimeImmutable $dataDate, ?string $note = null, bool $dev = false, array $directDependents = [], ?float $libyears = null, bool $fromComposerRepository = true)
     {
+        // The note says no repository was asked; a caller that forgot the flag would contradict it.
+        if ($note === self::NOTE_NOT_IN_REPOSITORY && $fromComposerRepository) {
+            throw new \InvalidArgumentException(\sprintf('%s is noted as not from a Composer repository, so it cannot be from one.', $package));
+        }
         $this->package = $package;
         $this->version = $version;
         $this->verdict = $verdict;
@@ -77,6 +89,7 @@ final class Finding
         $this->dev = $dev;
         $this->directDependents = $directDependents;
         $this->libyears = $libyears;
+        $this->fromComposerRepository = $fromComposerRepository;
     }
 
     /**
@@ -144,6 +157,11 @@ final class Finding
     public function isDev(): bool
     {
         return $this->dev;
+    }
+
+    public function isFromComposerRepository(): bool
+    {
+        return $this->fromComposerRepository;
     }
 
     /** @return list<string> */
@@ -411,6 +429,7 @@ final class Finding
         return [
             'package' => $this->package, 'version' => $this->version, 'verdict' => $this->verdict,
             'priority' => $this->priority(), 'direct' => $this->isDirect(), 'dev' => $this->dev,
+            'from_composer_repository' => $this->fromComposerRepository,
             'replacement' => $this->successor(),
             'signals' => $signals, 'chain' => $this->chain, 'direct_dependents' => $this->directDependents,
             'evidence' => $this->evidence(),
