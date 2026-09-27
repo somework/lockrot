@@ -67,7 +67,7 @@ final class GateAgreementTest extends TestCase
     #[RunInSeparateProcess]
     public function testEveryDocumentsGateAgreesWithTheExitCodeAndTheAnnotationLevels(): void
     {
-        $dirs = ['mini'];
+        $dirs = ['mini', 'mini-split'];
         foreach (['apps', 'skeletons'] as $group) {
             foreach ((array) glob(self::FIXTURES.$group.'/*/composer.lock') as $lock) {
                 $dirs[] = $group.'/'.basename(\dirname((string) $lock));
@@ -202,8 +202,8 @@ final class GateAgreementTest extends TestCase
 
     /**
      * The baseline this report would write, with the first finding more severe than `stale` accepted
-     * only at `stale` (so it is worsened) and the second flagged one left out (so it is new); every
-     * other one is known. Null when the lock has nothing flagged.
+     * only at `stale` (so it is worsened) and the second of the other flagged ones left out (so it is
+     * new); every other one is known. Null when the lock has nothing flagged.
      */
     private static function changedBaseline(Report $report): ?Baseline
     {
