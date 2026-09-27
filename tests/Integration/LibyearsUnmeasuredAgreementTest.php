@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Integration;
 
+use Composer\Semver\Comparator;
+use Composer\Semver\VersionParser;
 use Lockrot\Allowlist\BuiltinAllowlist;
 use Lockrot\Analyzer\Analysis;
 use Lockrot\Analyzer\Analyzer;
@@ -18,6 +20,7 @@ use Lockrot\Data\Http\RecordedHttpClient;
 use Lockrot\Data\Php\PhpReleaseDates;
 use Lockrot\Data\Repository\InstalledRelease;
 use Lockrot\Data\Repository\MetadataLoaderInterface;
+use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Data\Repository\RepositoryMetadataLoader;
 use Lockrot\Explain\Explanation;
 use Lockrot\Lock\LockedPackage;
@@ -45,6 +48,8 @@ final class LibyearsUnmeasuredAgreementTest extends TestCase
 {
     private const FIXTURES = __DIR__.'/../fixtures/';
     private const NOW = '2026-09-14T00:00:00+00:00';
+    /** A package measured from a release above the installed one, its newest release undated. */
+    private const LOWER_BOUND = 'measured from a release above';
 
     /** @var array<string, int> every code the findings gave, so the check is seen to bite */
     private array $seen = [];
@@ -77,7 +82,7 @@ final class LibyearsUnmeasuredAgreementTest extends TestCase
             $server->stop();
         }
 
-        foreach ([Libyears::NOT_FROM_COMPOSER_REPOSITORY, Libyears::BRANCH_SNAPSHOT, Libyears::NO_STABLE_RELEASE_DATE, 'measured'] as $code) {
+        foreach ([Libyears::NOT_FROM_COMPOSER_REPOSITORY, Libyears::BRANCH_SNAPSHOT, Libyears::NO_STABLE_RELEASE_DATE, 'measured', self::LOWER_BOUND] as $code) {
             self::assertArrayHasKey($code, $this->seen, 'the fixtures give '.$code.', or the agreement proves little: '.json_encode($this->seen));
         }
     }
@@ -113,11 +118,12 @@ final class LibyearsUnmeasuredAgreementTest extends TestCase
             $facts = $analysis->facts($package);
             self::assertNotNull($finding, $what);
             self::assertNotNull($facts, $what);
-            self::assertSame(self::fromFacts($facts->package(), $facts->metadata() !== null, $row['libyears'] === null), $code, $what.': the facts the analysis was decided on');
-            if ($code === Libyears::NO_STABLE_RELEASE_DATE) {
-                $metadata = $facts->metadata();
-                self::assertNotNull($metadata, $what);
-                self::assertTrue(InstalledRelease::of($facts->package(), $metadata)->at() === null || $metadata->lastStableReleaseAt() === null, $what.': one end has no trusted date');
+            [$reason, $years] = self::fromFacts($facts->package(), $facts->metadata());
+            self::assertSame($reason, $code, $what.': the facts the analysis was decided on');
+            self::assertSame($years === null ? null : round($years, 2), $row['libyears'], $what.': the years between the two ends');
+            $metadata = $facts->metadata();
+            if ($years !== null && $metadata !== null && $metadata->lastStableReleaseAt() === null) {
+                $this->seen[self::LOWER_BOUND] = ($this->seen[self::LOWER_BOUND] ?? 0) + 1;
             }
             $explained = (new Explanation($finding, $facts, new Thresholds(), '8.4', $report))->toArray();
             self::assertSame($code, JsonPath::arrayAt($explained, ['finding'])['libyears_unmeasured'], $what.': the explanation\'s finding');
@@ -129,22 +135,49 @@ final class LibyearsUnmeasuredAgreementTest extends TestCase
     }
 
     /**
-     * The reason from the lock entry and whether metadata came, with no call into the rule: exact
-     * for the first three, and the fourth is what is left of an unmeasured package.
+     * The reason, or the years, from the lock entry and the metadata, with no call into the rule.
+     * The newest end is the repository's date for its newest release or, failing that, the newest
+     * date of a release whose version is higher than the installed one: compared version to
+     * version here, where the rule walks the branches.
+     *
+     * @return array{?string, ?float}
      */
-    private static function fromFacts(LockedPackage $package, bool $hasMetadata, bool $unmeasured): ?string
+    private static function fromFacts(LockedPackage $package, ?PackageMetadata $metadata): array
     {
         if (!$package->isFromComposerRepository()) {
-            return Libyears::NOT_FROM_COMPOSER_REPOSITORY;
+            return [Libyears::NOT_FROM_COMPOSER_REPOSITORY, null];
         }
-        if (!$hasMetadata) {
-            return Libyears::METADATA_UNAVAILABLE;
+        if ($metadata === null) {
+            return [Libyears::METADATA_UNAVAILABLE, null];
         }
         if ($package->isBranchSnapshot()) {
-            return Libyears::BRANCH_SNAPSHOT;
+            return [Libyears::BRANCH_SNAPSHOT, null];
+        }
+        $installed = InstalledRelease::of($package, $metadata)->at();
+        $newest = $metadata->lastStableReleaseAt() ?? self::newestDatedAbove($metadata, $package->version());
+        if ($installed === null || $newest === null) {
+            return [Libyears::NO_STABLE_RELEASE_DATE, null];
         }
 
-        return $unmeasured ? Libyears::NO_STABLE_RELEASE_DATE : null;
+        return [null, max(0.0, ($newest->getTimestamp() - $installed->getTimestamp()) / Clock::SECONDS_PER_YEAR)];
+    }
+
+    private static function newestDatedAbove(PackageMetadata $metadata, string $installed): ?\DateTimeImmutable
+    {
+        $parser = new VersionParser();
+        $newest = null;
+        foreach ($metadata->latestStableByBranch() as $release) {
+            try {
+                $above = Comparator::greaterThan($parser->normalize($release['version']), $parser->normalize($installed));
+            } catch (\UnexpectedValueException $e) {
+                $above = false;
+            }
+            if ($above && $release['at'] !== null && ($newest === null || $release['at'] > $newest)) {
+                $newest = $release['at'];
+            }
+        }
+
+        return $newest;
     }
 
     /**
@@ -162,7 +195,7 @@ final class LibyearsUnmeasuredAgreementTest extends TestCase
         }
         self::assertIsString($row['version']);
 
-        return LockedPackage::isSnapshotVersion($row['version']) ? Libyears::BRANCH_SNAPSHOT : Libyears::NO_STABLE_RELEASE_DATE;
+        return VersionParser::parseStability($row['version']) === 'dev' ? Libyears::BRANCH_SNAPSHOT : Libyears::NO_STABLE_RELEASE_DATE;
     }
 
     private function analysis(MetadataLoaderInterface $loader, string $dir): Analysis
