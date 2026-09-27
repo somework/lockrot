@@ -56,7 +56,7 @@ final class AdvisoryRule implements SignalRule
             $named
         );
 
-        [$onBranch, $inPackage] = $this->fixCandidates($facts);
+        [$onBranch, $inPackage, $read] = $this->fixCandidates($facts);
         $rows = [];
         $fixedBy = [];
         foreach ($advisories as $advisory) {
@@ -78,7 +78,7 @@ final class AdvisoryRule implements SignalRule
             $summary .= '; '.self::fixedClause($fixedBy, $count);
         }
 
-        return new Signal(Signal::S9, Signal::LEVEL_WARN, $summary, ['advisories' => $rows]);
+        return new Signal(Signal::S9, Signal::LEVEL_WARN, $summary, ['advisories' => $rows, 'releases_read' => $read]);
     }
 
     /**
@@ -112,13 +112,16 @@ final class AdvisoryRule implements SignalRule
      * it. A branch snapshot is above no tag and below none; the package's highest tag stands for it
      * as it is.
      *
-     * @return array{?array{normalized: string, pretty: string}, ?array{normalized: string, pretty: string}}
+     * The third element says whether the releases were read at all: false without metadata or with
+     * an installed version no parser reads, where a null candidate means nothing was compared.
+     *
+     * @return array{?array{normalized: string, pretty: string}, ?array{normalized: string, pretty: string}, bool}
      */
     private function fixCandidates(PackageFacts $facts): array
     {
         $metadata = $facts->metadata();
         if ($metadata === null) {
-            return [null, null];
+            return [null, null, false];
         }
         $version = $facts->package()->version();
         $installed = null;
@@ -126,7 +129,7 @@ final class AdvisoryRule implements SignalRule
             try {
                 $installed = (new VersionParser())->normalize($version);
             } catch (\UnexpectedValueException $e) {
-                return [null, null];
+                return [null, null, false];
             }
         }
         $byBranch = $metadata->latestStableByBranch();
@@ -139,7 +142,7 @@ final class AdvisoryRule implements SignalRule
             }
         }
 
-        return [self::above($onBranch, $installed), self::above($inPackage, $installed)];
+        return [self::above($onBranch, $installed), self::above($inPackage, $installed), true];
     }
 
     /**

@@ -209,7 +209,13 @@ final class Finding
     /** Derived, never stored: the priority is a view of the verdict, the chain, the dev flag and S9. */
     public function priority(): string
     {
-        return Priority::of($this->verdict, $this->isDirect(), $this->dev, $this->hasUnfixableAdvisory());
+        return $this->priorityBasis()->priority();
+    }
+
+    /** The walk {@see priority()} is the end of: the verdict's base level and each step taken from it. */
+    public function priorityBasis(): PriorityBasis
+    {
+        return Priority::basis($this->verdict, $this->isDirect(), $this->dev, $this->hasUnfixableAdvisory(), $this->chain !== []);
     }
 
     /**
@@ -221,27 +227,53 @@ final class Finding
      */
     public function hasUnfixableAdvisory(): bool
     {
-        return $this->unfixableAdvisories() > 0;
+        return ($list = $this->noFixExpected()) !== null && $list !== [];
     }
 
     /**
-     * How many of the advisories on the finding no listed release fixes, in the sense
-     * {@see hasUnfixableAdvisory()} gives it; 0 when the verdict is not one of the no-fix ones.
+     * The advisories on the finding no fix is expected for, in the sense {@see hasUnfixableAdvisory()}
+     * gives it, in S9's order, each with why ({@see NoFix}). Null when the verdict makes no fix
+     * prediction, which is every verdict but the no-fix ones; empty when it does and every advisory
+     * is fixed by a release the verdict lets the project reach, or there is none.
+     *
+     * @return ?list<array{id: string, reason: string}>
      */
-    private function unfixableAdvisories(): int
+    public function noFixExpected(): ?array
     {
         if (!\in_array($this->verdict, self::NO_FIX_VERDICTS, true) || !Verdict::flagged($this->verdict)) {
-            return 0;
+            return null;
         }
-        $count = 0;
+        // Only S9 knows whether a null fixed_by was looked for; a signal without the key was.
+        $releasesRead = ($this->advisoryData()['releases_read'] ?? true) !== false;
+        $list = [];
         foreach ($this->advisoryRows() as $row) {
             $fixed = $this->verdict === Verdict::LEFT_BEHIND ? ($row['fixed_on_branch'] ?? false) === true : ($row['fixed_by'] ?? null) !== null;
             if (!$fixed) {
-                ++$count;
+                $list[] = ['id' => \is_string($row['id'] ?? null) ? $row['id'] : '', 'reason' => $this->noFixReason($row, $releasesRead)];
             }
         }
 
-        return $count;
+        return $list;
+    }
+
+    /**
+     * The first {@see NoFix} reason that applies to an advisory no reachable release fixes.
+     *
+     * @param array<mixed, mixed> $row
+     */
+    private function noFixReason(array $row, bool $releasesRead): string
+    {
+        if ($this->verdict === Verdict::LEFT_BEHIND && ($row['fixed_by'] ?? null) !== null) {
+            return NoFix::NOT_ON_INSTALLED_BRANCH;
+        }
+        if (!$releasesRead) {
+            return NoFix::RELEASES_UNKNOWN;
+        }
+        if (($row['affected_versions'] ?? null) === null) {
+            return NoFix::AFFECTED_RANGE_UNKNOWN;
+        }
+
+        return NoFix::NO_RELEASE_FIXES;
     }
 
     /**
@@ -253,7 +285,7 @@ final class Finding
      */
     private function noFixClause(): ?string
     {
-        if ($this->unfixableAdvisories() === 0) {
+        if (!$this->hasUnfixableAdvisory()) {
             return null;
         }
         if ($this->verdict === Verdict::LEFT_BEHIND) {
@@ -336,19 +368,24 @@ final class Finding
     /** @return list<array<mixed, mixed>> */
     private function advisoryRows(): array
     {
-        foreach ($this->signals as $signal) {
-            if ($signal->id() !== Signal::S9) {
-                continue;
+        $rows = [];
+        $list = $this->advisoryData()['advisories'] ?? [];
+        foreach (\is_array($list) ? $list : [] as $row) {
+            if (\is_array($row)) {
+                $rows[] = $row;
             }
-            $rows = [];
-            $list = $signal->data()['advisories'] ?? [];
-            foreach (\is_array($list) ? $list : [] as $row) {
-                if (\is_array($row)) {
-                    $rows[] = $row;
-                }
-            }
+        }
 
-            return $rows;
+        return $rows;
+    }
+
+    /** @return array<string, mixed> S9's data, empty when the finding carries no S9 */
+    private function advisoryData(): array
+    {
+        foreach ($this->signals as $signal) {
+            if ($signal->id() === Signal::S9) {
+                return $signal->data();
+            }
         }
 
         return [];
@@ -453,6 +490,8 @@ final class Finding
             'data_date' => $this->dataDate === null ? null : $this->dataDate->format(\DATE_ATOM),
             'libyears' => $libyears === null ? null : round($libyears, 2),
             'libyears_unmeasured' => $this->libyears->unmeasuredReason(),
+            'priority_basis' => $this->priorityBasis()->toArray(),
+            'no_fix_expected' => $this->noFixExpected(),
         ];
     }
 }

@@ -16,7 +16,9 @@ use Lockrot\Signal\Rule\PinnedRule;
 use Lockrot\Tests\Support\ClosedSets;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Verdict\FailOn;
+use Lockrot\Verdict\NoFix;
 use Lockrot\Verdict\Priority;
+use Lockrot\Verdict\PriorityBasis;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\TestCase;
 
@@ -45,7 +47,7 @@ final class ClosedSetsTest extends TestCase
     private const SIGNAL_ID = '^(S[1-9][0-9]*|[a-z0-9][a-z0-9_.-]*:[a-z0-9][a-z0-9_.-]*)$';
     /** A format name: lockrot's own, or a `<vendor>:<name>` one. */
     private const FORMAT = '^([a-z][a-z0-9-]*|[a-z0-9][a-z0-9_.-]*:[a-z0-9][a-z0-9_.-]*)$';
-    /** An S10 check or reason, an S6 reason, an S8 floor source, a branch's php_blocked_by and misses_*_php, a finding's libyears_unmeasured: a lower-case word. */
+    /** An S10 check or reason, an S6 reason, an S8 floor source, a branch's php_blocked_by and misses_*_php, a finding's libyears_unmeasured, a priority step's and a no-fix advisory's reason: a lower-case word. */
     private const WORD = '^[a-z][a-z0-9_]*$';
     private const ROOT = __DIR__.'/../../../';
 
@@ -101,6 +103,31 @@ final class ClosedSetsTest extends TestCase
         self::assertSame([JsonFormatter::SCHEMA], JsonPath::arrayAt($schema, ['definitions', 'envelope', 'properties', 'schema', 'enum']));
     }
 
+    /**
+     * A priority step's `from` and `to` are the priority order without `none`, in the same order:
+     * the frozen set restricted, not a set of its own. The explain schema copies the three
+     * definitions a finding's `priority_basis` and `no_fix_expected` use from the report's, verbatim.
+     */
+    public function testAStepMovesAlongThePriorityOrderWithoutNone(): void
+    {
+        $report = self::schema(Schemas::REPORT);
+        $explain = self::schema(Schemas::EXPLAIN);
+        $flagged = array_values(array_diff(Priority::all(), [Priority::NONE]));
+
+        self::assertSame(['critical', 'high', 'medium', 'low'], $flagged);
+        self::assertSame(['transitive', 'unreached', 'dev', 'no_fix_expected'], PriorityBasis::STEPS, 'in the order the steps apply');
+        self::assertSame(['not_on_installed_branch', 'releases_unknown', 'affected_range_unknown', 'no_release_fixes'], NoFix::REASONS, 'in the order the first that applies is picked');
+        foreach (['report' => $report, 'explain' => $explain] as $document => $schema) {
+            self::assertSame($flagged, JsonPath::arrayAt($schema, ['definitions', 'flaggedPriority', 'enum']), $document);
+            self::assertSame(['$ref' => '#/definitions/flaggedPriority'], JsonPath::arrayAt($schema, ['definitions', 'priorityStep', 'properties', 'from']), $document);
+            self::assertSame(['$ref' => '#/definitions/flaggedPriority'], JsonPath::arrayAt($schema, ['definitions', 'priorityStep', 'properties', 'to']), $document);
+            self::assertSame(['$ref' => '#/definitions/priority'], JsonPath::arrayAt($schema, ['definitions', 'finding', 'properties', 'priority_basis', 'properties', 'base']), $document);
+        }
+        foreach (['priorityStep', 'flaggedPriority', 'noFixAdvisory'] as $definition) {
+            self::assertSame(JsonPath::arrayAt($report, ['definitions', $definition]), JsonPath::arrayAt($explain, ['definitions', $definition]), 'the explain schema spells '.$definition.' as the report does');
+        }
+    }
+
     public function testTheExplainSchemaSpellsTheSameVerdictsPrioritiesAndLevels(): void
     {
         $schema = self::schema(Schemas::EXPLAIN);
@@ -129,11 +156,13 @@ final class ClosedSetsTest extends TestCase
         $closed = [
             JsonPath::arrayAt($report, ['definitions', 'verdict']),
             JsonPath::arrayAt($report, ['definitions', 'priority']),
+            JsonPath::arrayAt($report, ['definitions', 'flaggedPriority']),
             JsonPath::arrayAt($report, ['definitions', 'level']),
             JsonPath::arrayAt($report, ['definitions', 'baselineStanding', 'oneOf', 0, 'properties', 'status']),
             JsonPath::arrayAt($report, ['definitions', 'envelope', 'properties', 'schema']),
             JsonPath::arrayAt($explain, ['definitions', 'verdict']),
             JsonPath::arrayAt($explain, ['definitions', 'priority']),
+            JsonPath::arrayAt($explain, ['definitions', 'flaggedPriority']),
             JsonPath::arrayAt($explain, ['definitions', 'finding', 'properties', 'signals', 'items', 'properties', 'level']),
             JsonPath::arrayAt($explain, ['properties', 'lockrot', 'properties', 'schema']),
             JsonPath::arrayAt(self::schema(Schemas::BASELINE), ['properties', 'findings', 'additionalProperties', 'properties', 'verdict']),
@@ -223,6 +252,10 @@ final class ClosedSetsTest extends TestCase
             'report #/definitions/s6/properties/reason' => [JsonPath::arrayAt($report, ['definitions', 's6', 'properties', 'reason']), self::WORD, [PinnedRule::REASON_BRANCH_SNAPSHOT, PinnedRule::REASON_NO_STABLE_RELEASE], "S6's `reason`"],
             'report #/definitions/s8/properties/floor_source/oneOf/0' => [JsonPath::arrayAt($report, ['definitions', 's8', 'properties', 'floor_source', 'oneOf', 0]), self::WORD, [PhpFloor::PROJECT, PhpFloor::TARGET], "S8's `floor_source`"],
             'report #/definitions/finding/properties/libyears_unmeasured/oneOf/0' => [JsonPath::arrayAt($report, ['definitions', 'finding', 'properties', 'libyears_unmeasured', 'oneOf', 0]), self::WORD, Libyears::REASONS, "a finding's `libyears_unmeasured`"],
+            'report #/definitions/priorityStep/properties/reason' => [JsonPath::arrayAt($report, ['definitions', 'priorityStep', 'properties', 'reason']), self::WORD, PriorityBasis::STEPS, "a `priority_basis` step's `reason`"],
+            'report #/definitions/noFixAdvisory/properties/reason' => [JsonPath::arrayAt($report, ['definitions', 'noFixAdvisory', 'properties', 'reason']), self::WORD, NoFix::REASONS, "a `no_fix_expected` item's `reason`"],
+            'explain #/definitions/priorityStep/properties/reason' => [JsonPath::arrayAt($explain, ['definitions', 'priorityStep', 'properties', 'reason']), self::WORD, PriorityBasis::STEPS, "a `priority_basis` step's `reason`"],
+            'explain #/definitions/noFixAdvisory/properties/reason' => [JsonPath::arrayAt($explain, ['definitions', 'noFixAdvisory', 'properties', 'reason']), self::WORD, NoFix::REASONS, "a `no_fix_expected` item's `reason`"],
             'explain #/definitions/finding/properties/libyears_unmeasured/oneOf/0' => [JsonPath::arrayAt($explain, ['definitions', 'finding', 'properties', 'libyears_unmeasured', 'oneOf', 0]), self::WORD, Libyears::REASONS, "a finding's `libyears_unmeasured`"],
             'explain #/definitions/metadata/properties/branches/items/properties/php_blocked_by/oneOf/0' => [JsonPath::arrayAt($explain, array_merge($branchRow, ['php_blocked_by', 'oneOf', 0])), self::WORD, [PhpFloor::PROJECT, PhpFloor::TARGET], "the explanation's `php_blocked_by`"],
             'explain #/definitions/metadata/properties/branches/items/properties/misses_target_php/oneOf/0' => [JsonPath::arrayAt($explain, array_merge($branchRow, ['misses_target_php', 'oneOf', 0])), self::WORD, [PhpFloor::NEEDS_NEWER, PhpFloor::STOPS_BEFORE, PhpFloor::SKIPS, PhpFloor::UNSATISFIABLE], '`misses_target_php`'],
@@ -369,7 +402,7 @@ final class ClosedSetsTest extends TestCase
         $config = self::schema(Schemas::CONFIG);
         $topLevelKeys = self::keys(JsonPath::arrayAt($config, ['properties']));
         $ignoreKeys = self::keys(JsonPath::arrayAt($config, ['properties', 'ignore', 'items', 'properties']));
-        $names = array_merge(Verdict::all(), Priority::all(), FailOn::allowed(), LockrotConfig::FORMATS, ClosedSets::signalIds(), [PhpFloor::PROJECT, PhpFloor::TARGET, PhpFloor::NEEDS_NEWER, PhpFloor::STOPS_BEFORE, PhpFloor::SKIPS, PhpFloor::UNSATISFIABLE], Libyears::REASONS, $topLevelKeys, $ignoreKeys);
+        $names = array_merge(Verdict::all(), Priority::all(), FailOn::allowed(), LockrotConfig::FORMATS, ClosedSets::signalIds(), [PhpFloor::PROJECT, PhpFloor::TARGET, PhpFloor::NEEDS_NEWER, PhpFloor::STOPS_BEFORE, PhpFloor::SKIPS, PhpFloor::UNSATISFIABLE], Libyears::REASONS, PriorityBasis::STEPS, NoFix::REASONS, $topLevelKeys, $ignoreKeys);
 
         foreach ($names as $name) {
             self::assertStringNotContainsString(':', $name, '<vendor>:<name> is reserved for names that are not lockrot\'s');

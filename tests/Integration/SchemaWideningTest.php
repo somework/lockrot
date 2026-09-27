@@ -76,6 +76,17 @@ final class SchemaWideningTest extends TestCase
         yield 'finding libyears_unmeasured loses null' => [Schemas::REPORT, 'unmeasured-not-null', '/properties/libyears_unmeasured/oneOf/1: no longer accepts null'];
         yield 'finding libyears_unmeasured loses a reason' => [Schemas::REPORT, 'unmeasured-reason-dropped', '/properties/libyears_unmeasured/oneOf/0: no longer accepts "metadata_unavailable"'];
         yield 'libyears unmeasured closed' => [Schemas::REPORT, 'unmeasured-block-closed', '/properties/unmeasured: closed, additionalProperties false'];
+        yield 'finding priority_basis made required' => [Schemas::REPORT, 'basis-required', 'made required priority_basis'];
+        yield 'explain finding priority_basis made required' => [Schemas::EXPLAIN, 'basis-required', 'made required priority_basis'];
+        yield 'finding no_fix_expected made required' => [Schemas::REPORT, 'no-fix-required', 'made required no_fix_expected'];
+        yield 'explain finding no_fix_expected made required' => [Schemas::EXPLAIN, 'no-fix-required', 'made required no_fix_expected'];
+        yield 'finding no_fix_expected loses null' => [Schemas::REPORT, 'no-fix-not-null', '/properties/no_fix_expected/oneOf/1: no longer accepts null'];
+        yield 'explain finding no_fix_expected loses null' => [Schemas::EXPLAIN, 'no-fix-not-null', '/properties/no_fix_expected/oneOf/1: no longer accepts null'];
+        yield 'a priority step loses a reason' => [Schemas::REPORT, 'step-reason-dropped', '/properties/reason: no longer accepts "no_fix_expected"'];
+        yield 'explain priority step loses a reason' => [Schemas::EXPLAIN, 'step-reason-dropped', '/properties/reason: no longer accepts "no_fix_expected"'];
+        yield 'a no-fix advisory loses a reason' => [Schemas::REPORT, 'no-fix-reason-dropped', '/properties/reason: no longer accepts "releases_unknown"'];
+        yield 'explain no-fix advisory loses a reason' => [Schemas::EXPLAIN, 'no-fix-reason-dropped', '/properties/reason: no longer accepts "releases_unknown"'];
+        yield 's9 releases_read made required' => [Schemas::REPORT, 'releases-read-required', 'made required releases_read'];
     }
 
     /**
@@ -109,6 +120,8 @@ final class SchemaWideningTest extends TestCase
         yield 'a pattern dropped' => [Schemas::BASELINE, 'first-seen-any'];
         yield 'a config value added' => [Schemas::CONFIG, 'format-added'];
         yield 'a libyears reason added' => [Schemas::REPORT, 'unmeasured-reason-added'];
+        yield 'a priority step reason added' => [Schemas::REPORT, 'step-reason-added'];
+        yield 'a no-fix reason added' => [Schemas::EXPLAIN, 'no-fix-reason-added'];
     }
 
     /**
@@ -220,6 +233,29 @@ final class SchemaWideningTest extends TestCase
         self::assertSame([], SchemaWidening::narrowings($before, $current));
     }
 
+    /**
+     * `priority_basis` and `no_fix_expected` joined the finding in 0.13.0, and S9's data gained
+     * `releases_read`, all optional: from the schemas without them, the current ones only widen.
+     *
+     * @dataProvider findingSchemas
+     */
+    #[DataProvider('findingSchemas')]
+    public function testTheFindingGainingItsPriorityBasisAndNoFixListIsAWidening(string $document): void
+    {
+        $current = self::current($document);
+        $before = self::without($current, ['definitions', 'finding', 'properties', 'priority_basis']);
+        $before = self::without($before, ['definitions', 'finding', 'properties', 'no_fix_expected']);
+        if ($document === Schemas::REPORT) {
+            $before = self::without($before, ['definitions', 's9', 'properties', 'releases_read']);
+            self::assertNotContains('releases_read', JsonPath::arrayAt($current, ['definitions', 's9', 'required']));
+        }
+
+        foreach (['priority_basis', 'no_fix_expected'] as $key) {
+            self::assertNotContains($key, JsonPath::arrayAt($current, ['definitions', 'finding', 'required']));
+        }
+        self::assertSame([], SchemaWidening::narrowings($before, $current));
+    }
+
     /** @return iterable<string, array{string}> */
     public static function findingSchemas(): iterable
     {
@@ -294,6 +330,22 @@ final class SchemaWideningTest extends TestCase
                 return self::appended($s, array_merge($finding, ['libyears_unmeasured', 'oneOf', 0, KnownValues::KEYWORD]), 'installed_undated');
             case 'unmeasured-block-closed':
                 return self::with($s, ['properties', 'libyears', 'properties', 'unmeasured', 'additionalProperties'], false);
+            case 'basis-required':
+                return self::appended($s, ['definitions', 'finding', 'required'], 'priority_basis');
+            case 'no-fix-required':
+                return self::appended($s, ['definitions', 'finding', 'required'], 'no_fix_expected');
+            case 'no-fix-not-null':
+                return self::with($s, array_merge($finding, ['no_fix_expected']), JsonPath::arrayAt($s, array_merge($finding, ['no_fix_expected', 'oneOf', 0])));
+            case 'step-reason-dropped':
+                return self::with($s, ['definitions', 'priorityStep', 'properties', 'reason', KnownValues::KEYWORD], ['transitive', 'unreached', 'dev']);
+            case 'step-reason-added':
+                return self::appended($s, ['definitions', 'priorityStep', 'properties', 'reason', KnownValues::KEYWORD], 'vendored');
+            case 'no-fix-reason-dropped':
+                return self::with($s, ['definitions', 'noFixAdvisory', 'properties', 'reason', KnownValues::KEYWORD], ['not_on_installed_branch', 'affected_range_unknown', 'no_release_fixes']);
+            case 'no-fix-reason-added':
+                return self::appended($s, ['definitions', 'noFixAdvisory', 'properties', 'reason', KnownValues::KEYWORD], 'withdrawn_upstream');
+            case 'releases-read-required':
+                return self::appended($s, ['definitions', 's9', 'required'], 'releases_read');
             case 'run-required':
                 return self::appended($s, ['required'], 'run');
             case 'stale-integer':

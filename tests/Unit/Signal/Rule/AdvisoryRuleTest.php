@@ -60,7 +60,31 @@ final class AdvisoryRuleTest extends TestCase
             'affected_versions' => null,
             'fixed_by' => null,
             'fixed_on_branch' => false,
-        ]]], $signal->data());
+        ]], 'releases_read' => false], $signal->data());
+    }
+
+    /**
+     * Whether a null `fixed_by` was looked for: no metadata, or an installed version no parser reads,
+     * leaves every row null without a release having been compared; a branch snapshot is compared
+     * with the package's highest tag, and a tagged version with both candidates.
+     */
+    public function testTheDataSaysWhetherTheReleasesWereRead(): void
+    {
+        $range = $this->ranged('CVE-1', '>=1.0.0');
+        $meta = F::metadata([['2.0.0', '2026-01-01T00:00:00+00:00'], ['1.0.0', '2020-01-01T00:00:00+00:00']]);
+
+        foreach ([
+            'no metadata' => [F::facts(F::package(['version' => '1.0.0']), null, null, [$range]), false],
+            'an installed version that does not normalize' => [F::facts(F::package(['version' => 'not-a-version']), $meta, null, [$range]), false],
+            'a branch snapshot with metadata' => [F::facts(F::package(['version' => 'dev-main']), $meta, null, [$range]), true],
+            'a tagged version with metadata' => [F::facts(F::package(['version' => '1.0.0']), $meta, null, [$range]), true],
+        ] as $case => [$facts, $read]) {
+            $signal = (new AdvisoryRule())->evaluate($facts);
+            self::assertNotNull($signal, $case);
+            self::assertSame($read, $signal->data()['releases_read'], $case);
+            self::assertSame(['advisories', 'releases_read'], array_keys($signal->data()), $case.': next to the rows');
+            self::assertNull(self::row($signal, 0)['fixed_by'], $case.': nothing fixes it either way');
+        }
     }
 
     /** @return array<mixed, mixed> */

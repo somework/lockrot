@@ -80,6 +80,7 @@ These grow in minor releases:
 - the explanation's `misses_target_php` and `misses_project_php`;
 - S6's `reason`;
 - a finding's `libyears_unmeasured`;
+- a `priority_basis` step's `reason`, and a `no_fix_expected` item's `reason`;
 - repository hosts;
 - format names, the configuration's `format` among them.
 
@@ -88,14 +89,19 @@ fail on it.
 
 The schemas describe signal ids (S10's `blocks` among them), S10's `check` and `reason`, S6's
 `reason`, S8's `floor_source`, the explanation's `php_blocked_by`, `misses_target_php` and
-`misses_project_php`, a finding's `libyears_unmeasured`, and the configuration's `format` as open
-strings: a `pattern`, which also admits the `<vendor>:<name>` form for a signal id and a format,
+`misses_project_php`, a finding's `libyears_unmeasured`, a `priority_basis` step's `reason`, a
+`no_fix_expected` item's `reason`, and the configuration's `format` as open strings: a `pattern`, which also admits the `<vendor>:<name>` form for a signal id and a format,
 plus `x-known-values`, the values lockrot writes, which only grows within 1.x. A signal whose id is
 not listed validates with any object as its `data`; a listed id keeps its `data` typed. A consumer
 that validates strictly reads `x-known-values` as an enum and refreshes its copy on upgrade. A copy
 of a schema taken before 0.13.0 still holds these as enums. Repository hosts are in no schema as a
 set: S3 and S4's `host` and the explanation's `forge` are plain strings. lockrot itself accepts only
 the format names it knows, in `--format`, `--output` and `extra.lockrot.format`.
+
+A `priority_basis` step's `from` and `to` take the priority order without `none`
+(`critical`, `high`, `medium`, `low`): the closed set restricted, not a set of its own, so it is
+frozen with it. A step whose `reason` a consumer does not know still says which way it went, by
+comparing the two.
 
 The keys of the report's `libyears.unmeasured` grow with `libyears_unmeasured`, one key per reason.
 They are not a `pattern` plus `x-known-values` set: `required` lists the keys this release writes, a

@@ -338,7 +338,7 @@ final class FindingTest extends TestCase
         $finding = new Finding('vendor/pkg', '1.2.3', Verdict::STALE, [], ['vendor/root', 'vendor/pkg'], null, null, null, true);
         $array = $finding->toArray();
         self::assertSame(
-            ['package', 'version', 'verdict', 'priority', 'direct', 'dev', 'from_composer_repository', 'replacement', 'signals', 'chain', 'direct_dependents', 'evidence', 'allowlist_reason', 'note', 'data_date', 'libyears', 'libyears_unmeasured'],
+            ['package', 'version', 'verdict', 'priority', 'direct', 'dev', 'from_composer_repository', 'replacement', 'signals', 'chain', 'direct_dependents', 'evidence', 'allowlist_reason', 'note', 'data_date', 'libyears', 'libyears_unmeasured', 'priority_basis', 'no_fix_expected'],
             array_keys($array)
         );
         self::assertSame(Priority::LOW, $array['priority']);
@@ -487,6 +487,143 @@ final class FindingTest extends TestCase
         $clean = new Finding('vendor/ok', '1.0.0', Verdict::OK, [], ['vendor/ok'], null, null);
         self::assertSame('', $clean->evidence());
         self::assertSame('', $clean->ownEvidence());
+    }
+
+    /**
+     * An S9 row as {@see \Lockrot\Signal\Rule\AdvisoryRule} writes it.
+     *
+     * @return array{id: string, affected_versions: ?string, fixed_by: ?string, fixed_on_branch: bool}
+     */
+    private static function row(string $id, ?string $fixedBy = null, bool $onBranch = false, ?string $range = '>=1.0.0'): array
+    {
+        return ['id' => $id, 'affected_versions' => $range, 'fixed_by' => $fixedBy, 'fixed_on_branch' => $onBranch];
+    }
+
+    /** @param list<array<string, mixed>> $rows */
+    private static function s9(array $rows, bool $releasesRead = true): Signal
+    {
+        return new Signal(Signal::S9, Signal::LEVEL_WARN, \count($rows).' security advisories affect the installed version', ['advisories' => $rows, 'releases_read' => $releasesRead]);
+    }
+
+    /**
+     * Every shape the no-fix list takes, with the list lockrot must write for it.
+     *
+     * @return iterable<string, array{Finding, ?list<array{id: string, reason: string}>}>
+     */
+    public static function noFixShapes(): iterable
+    {
+        $s8 = new Signal(Signal::S8, Signal::LEVEL_HIGH, 'branch 3.x last released 2020-10-24 (5.9 years ago); 8.x released v8.1.7 (2026-09-14)');
+        $s1 = new Signal(Signal::S1, Signal::LEVEL_HIGH, 'marked abandoned by its repository');
+        $s2 = new Signal(Signal::S2, Signal::LEVEL_HIGH, 'last release 2015-11-16 (10.8 years ago)');
+        $s7 = new Signal(Signal::S7, Signal::LEVEL_INFO, 'pulls in 1 flagged package: a/b (stale)');
+
+        yield 'http-foundation left behind, fixed on its branch and on 8.x' => [
+            new Finding('symfony/http-foundation', 'v3.4.18', Verdict::LEFT_BEHIND, [$s8, self::s9([self::row('CVE-a', 'v8.1.7'), self::row('CVE-b', 'v8.1.7'), self::row('CVE-c', 'v3.4.47', true), self::row('CVE-d')])], ['laravel/framework', 'symfony/http-foundation'], null, null),
+            [['id' => 'CVE-a', 'reason' => 'not_on_installed_branch'], ['id' => 'CVE-b', 'reason' => 'not_on_installed_branch'], ['id' => 'CVE-d', 'reason' => 'no_release_fixes']],
+        ];
+        yield 'abandoned, fixed by v6.3.0' => [
+            new Finding('swiftmailer/swiftmailer', 'v6.1.3', Verdict::ABANDONED, [$s1, self::s9([self::row('CVE-2024-28859', '6.3.0', true)])], ['swiftmailer/swiftmailer'], null, null),
+            [],
+        ];
+        yield 'abandoned, no listed release fixes it' => [
+            new Finding('vendor/pkg', '1.0.0', Verdict::ABANDONED, [$s1, self::s9([self::row('PKSA-1')])], ['vendor/pkg'], null, null),
+            [['id' => 'PKSA-1', 'reason' => 'no_release_fixes']],
+        ];
+        yield 'abandoned, the releases were not read' => [
+            new Finding('vendor/pkg', '1.0.0', Verdict::ABANDONED, [$s1, self::s9([self::row('PKSA-1'), self::row('PKSA-2', null, false, null)], false)], ['root/app', 'vendor/pkg'], null, null),
+            [['id' => 'PKSA-1', 'reason' => 'releases_unknown'], ['id' => 'PKSA-2', 'reason' => 'releases_unknown']],
+        ];
+        yield 'silent, a partial advisory with no range' => [
+            new Finding('vendor/pkg', '1.0.0', Verdict::SILENT, [$s2, self::s9([self::row('PKSA-1', null, false, null), self::row('PKSA-2')])], ['vendor/pkg'], null, null),
+            [['id' => 'PKSA-1', 'reason' => 'affected_range_unknown'], ['id' => 'PKSA-2', 'reason' => 'no_release_fixes']],
+        ];
+        yield 'stale, nothing fixes it' => [
+            new Finding('vendor/pkg', '1.0.0', Verdict::STALE, [$s2, self::s9([self::row('PKSA-1')])], ['vendor/pkg'], null, null),
+            null,
+        ];
+        yield 'allowlisted' => [
+            new Finding('vendor/pkg', '1.0.0', Verdict::FINISHED, [$s8, self::s9([self::row('PKSA-1')])], ['vendor/pkg'], 'frozen', null),
+            null,
+        ];
+        yield 'ok' => [
+            new Finding('vendor/pkg', '1.0.0', Verdict::OK, [self::s9([self::row('PKSA-1')])], ['vendor/pkg'], null, null),
+            null,
+        ];
+        yield 'abandoned with no advisory' => [
+            new Finding('vendor/pkg', '1.0.0', Verdict::ABANDONED, [$s1], ['vendor/pkg'], null, null),
+            [],
+        ];
+        yield 'a direct requirement carrying S7' => [
+            new Finding('vendor/pkg', '1.0.0', Verdict::ABANDONED, [$s1, self::s9([self::row('PKSA-1')]), $s7], ['vendor/pkg'], null, null),
+            [['id' => 'PKSA-1', 'reason' => 'no_release_fixes']],
+        ];
+        yield 'reached by nothing' => [
+            new Finding('vendor/pkg', '1.0.0', Verdict::SILENT, [$s2, self::s9([self::row('PKSA-1')])], [], null, null, null, true),
+            [['id' => 'PKSA-1', 'reason' => 'no_release_fixes']],
+        ];
+    }
+
+    /**
+     * @param ?list<array{id: string, reason: string}> $expected
+     *
+     * @dataProvider noFixShapes
+     */
+    #[DataProvider('noFixShapes')]
+    public function testTheNoFixListNamesEachAdvisoryNoFixIsExpectedForAndWhy(Finding $finding, ?array $expected): void
+    {
+        $array = $finding->toArray();
+
+        self::assertSame($expected, $finding->noFixExpected());
+        self::assertSame($expected, $array['no_fix_expected']);
+        self::assertSame($expected === null, !\in_array($finding->verdict(), Finding::NO_FIX_VERDICTS, true), 'null exactly off the no-fix verdicts');
+        $ids = [];
+        foreach ($finding->signals() as $signal) {
+            if ($signal->id() === Signal::S9) {
+                $rows = $signal->data()['advisories'];
+                self::assertIsArray($rows);
+                $ids = array_column($rows, 'id');
+            }
+        }
+        foreach ($expected ?? [] as $item) {
+            self::assertContains($item['id'], $ids, 'every id is one of the finding\'s S9 rows');
+        }
+
+        $basis = $finding->priorityBasis()->toArray();
+        self::assertSame($basis, $array['priority_basis']);
+        $reasons = array_column($basis['steps'], 'reason');
+        $raised = \in_array('no_fix_expected', $reasons, true);
+        self::assertSame($raised, $expected !== null && $expected !== [], 'the raise is there exactly when the list names an advisory');
+        self::assertSame($raised, $finding->hasUnfixableAdvisory());
+        self::assertSame($raised, strpos($finding->ownEvidence(), 'no fix expected') !== false, 'and exactly when the evidence says so');
+        self::assertSame($finding->chain() === [], \in_array('unreached', $reasons, true), 'unreached exactly when nothing reaches the package');
+        self::assertSame($finding->priority(), $basis['steps'] === [] ? $basis['base'] : $basis['steps'][\count($basis['steps']) - 1]['to']);
+    }
+
+    /** http-foundation v3.4.18 via laravel/framework: `high`, one step down for being transitive, one up for the two fixes 3.x will not get. */
+    public function testTheBasisOfATransitiveLeftBehindPackageRaisedBackUp(): void
+    {
+        $s9 = self::s9([self::row('CVE-a', 'v8.1.7'), self::row('CVE-c', 'v3.4.47', true)]);
+        $finding = new Finding('symfony/http-foundation', 'v3.4.18', Verdict::LEFT_BEHIND, [$s9], ['laravel/framework', 'symfony/http-foundation'], null, null);
+
+        self::assertSame(['base' => 'high', 'steps' => [['reason' => 'transitive', 'from' => 'high', 'to' => 'medium'], ['reason' => 'no_fix_expected', 'from' => 'medium', 'to' => 'high']]], $finding->toArray()['priority_basis']);
+        self::assertSame(Priority::HIGH, $finding->priority());
+    }
+
+    /** A lock read without its composer.json: nothing reaches the package, and the step says so rather than `transitive`. */
+    public function testTheBasisOfAPackageNothingReachesSaysUnreached(): void
+    {
+        $finding = new Finding('vendor/pkg', '1.0.0', Verdict::STALE, [], [], null, null, null, true);
+
+        self::assertSame(['base' => 'medium', 'steps' => [['reason' => 'unreached', 'from' => 'medium', 'to' => 'low'], ['reason' => 'dev', 'from' => 'low', 'to' => 'low']]], $finding->toArray()['priority_basis']);
+        self::assertSame(['base' => 'none', 'steps' => []], (new Finding('vendor/pkg', '1.0.0', Verdict::OK, [], [], null, null))->toArray()['priority_basis']);
+    }
+
+    /** An S9 written before releases_read existed, or built by hand without it, reads as looked for. */
+    public function testAnS9WithoutReleasesReadReadsAsLookedFor(): void
+    {
+        $finding = new Finding('vendor/pkg', '1.0.0', Verdict::ABANDONED, [new Signal(Signal::S9, Signal::LEVEL_WARN, 'x', ['advisories' => [self::row('PKSA-1')]])], ['vendor/pkg'], null, null);
+
+        self::assertSame([['id' => 'PKSA-1', 'reason' => 'no_release_fixes']], $finding->noFixExpected());
     }
 
     public function testEvidenceLineAppendsTheAllowlistReasonAfterEverythingElse(): void

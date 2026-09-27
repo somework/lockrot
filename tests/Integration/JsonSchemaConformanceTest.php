@@ -772,6 +772,150 @@ final class JsonSchemaConformanceTest extends TestCase
     }
 
     /**
+     * wallabag's report with one package's finding moved first, where {@see withFindingKey()} edits,
+     * and that package's `--explain` document, both decoded.
+     *
+     * @return array<string, array{array<mixed, mixed>, list<int|string>}>
+     */
+    private static function documentsFor(string $package): array
+    {
+        $analysis = self::analysis('apps/wallabag_wallabag');
+        $finding = $analysis->finding($package);
+        $facts = $analysis->facts($package);
+        self::assertNotNull($finding, $package);
+        self::assertNotNull($facts, $package);
+        $report = json_decode((new JsonFormatter())->format($analysis->report()), true);
+        self::assertIsArray($report);
+        $findings = JsonPath::arrayAt($report, ['findings']);
+        $at = array_search($package, array_column($findings, 'package'), true);
+        self::assertIsInt($at, $package);
+        $report['findings'] = array_merge([$findings[$at]], array_values(array_diff_key($findings, [$at => true])));
+        $explain = json_decode((new ExplainFormatter())->json(new Explanation($finding, $facts, new Thresholds(), '8.4', $analysis->report())), true);
+        self::assertIsArray($explain);
+
+        return [Schemas::REPORT => [$report, ['findings', 0]], Schemas::EXPLAIN => [$explain, ['finding']]];
+    }
+
+    /**
+     * `priority_basis` in both schemas: a step reason a later release adds validates against the
+     * published schema and the strict twin holds the reason to the ones this release writes; `none`
+     * is no step's `from` or `to` in either; a 0.12 finding without the key validates against both.
+     */
+    public function testAFindingSaysHowItsPriorityWasReached(): void
+    {
+        foreach (self::documentsFor('doctrine/cache') as $schema => [$decoded, $path]) {
+            $basis = JsonPath::arrayAt($decoded, array_merge($path, ['priority_basis']));
+            self::assertSame(['base' => 'critical', 'steps' => [['reason' => 'transitive', 'from' => 'critical', 'to' => 'high'], ['reason' => 'no_fix_expected', 'from' => 'high', 'to' => 'critical']]], $basis, $schema.': doctrine/cache, abandoned, transitive, one advisory no release fixes');
+            $withStep = static fn (array $step): array => ['base' => 'high', 'steps' => [$step]];
+            foreach ([self::ABSENT, ['base' => 'none', 'steps' => []], $withStep(['reason' => 'dev', 'from' => 'high', 'to' => 'medium'])] as $value) {
+                $what = $schema.' '.json_encode($value);
+                $changed = self::withFindingKey($decoded, $path, 'priority_basis', $value);
+                $this->assertValid($schema, $changed, $what);
+                $this->assertValid($schema, $changed, $what, true);
+            }
+            $unknown = self::withFindingKey($decoded, $path, 'priority_basis', $withStep(['reason' => 'vendored', 'from' => 'high', 'to' => 'medium']));
+            $this->assertValid($schema, $unknown, $schema.': a step reason a later release adds');
+            $typo = self::withFindingKey($decoded, $path, 'priority_basis', $withStep(['reason' => 'transitve', 'from' => 'high', 'to' => 'medium']));
+            $this->assertValid($schema, $typo, $schema.': the published schema cannot tell a typo from a new reason');
+            $errors = $this->errors($schema, $typo, true);
+            self::assertNotSame([], array_filter($errors, static fn (string $error): bool => strpos($error, 'reason') !== false), $schema.': '.implode("\n", $errors));
+            foreach ([
+                'from none' => $withStep(['reason' => 'dev', 'from' => 'none', 'to' => 'low']),
+                'to none' => $withStep(['reason' => 'dev', 'from' => 'low', 'to' => 'none']),
+                'a step without its to' => $withStep(['reason' => 'dev', 'from' => 'high']),
+                'a base outside the order' => ['base' => 'urgent', 'steps' => []],
+                'no steps' => ['base' => 'high'],
+                'null' => null,
+                'a reason in capitals' => $withStep(['reason' => 'Dev', 'from' => 'high', 'to' => 'medium']),
+            ] as $what => $value) {
+                self::assertNotSame([], $this->errors($schema, self::withFindingKey($decoded, $path, 'priority_basis', $value), false), $schema.' '.$what);
+            }
+        }
+    }
+
+    /**
+     * `no_fix_expected` in both schemas: null, an empty list and a list of `{id, reason}` validate,
+     * a no-fix reason a later release adds passes the published schema and the strict twin rejects a
+     * typo in one; a 0.12 finding without the key validates against both.
+     */
+    public function testAFindingNamesTheAdvisoriesNoFixIsExpectedFor(): void
+    {
+        foreach (self::documentsFor('doctrine/cache') as $schema => [$decoded, $path]) {
+            self::assertSame([['id' => 'PKSA-cache-1', 'reason' => 'no_release_fixes']], JsonPath::arrayAt($decoded, $path)['no_fix_expected'], $schema.': 2.2.0 is the highest release, and the range covers it');
+            $item = static fn (string $reason): array => [['id' => 'PKSA-cache-1', 'reason' => $reason]];
+            foreach ([self::ABSENT, null, [], $item('releases_unknown'), $item('not_on_installed_branch')] as $value) {
+                $what = $schema.' '.json_encode($value);
+                $changed = self::withFindingKey($decoded, $path, 'no_fix_expected', $value);
+                $this->assertValid($schema, $changed, $what);
+                $this->assertValid($schema, $changed, $what, true);
+            }
+            $this->assertValid($schema, self::withFindingKey($decoded, $path, 'no_fix_expected', $item('withdrawn_upstream')), $schema.': a reason a later release adds');
+            $typo = self::withFindingKey($decoded, $path, 'no_fix_expected', $item('releses_unknown'));
+            $this->assertValid($schema, $typo, $schema.': the published schema cannot tell a typo from a new reason');
+            $errors = $this->errors($schema, $typo, true);
+            self::assertNotSame([], array_filter($errors, static fn (string $error): bool => strpos($error, 'reason') !== false), $schema.': '.implode("\n", $errors));
+            foreach ([
+                'an item without its reason' => [['id' => 'PKSA-cache-1']],
+                'an item without its id' => [['reason' => 'no_release_fixes']],
+                'a bare id' => ['PKSA-cache-1'],
+                'a boolean' => true,
+                'a count' => 1,
+                'an empty reason' => $item(''),
+            ] as $what => $value) {
+                self::assertNotSame([], $this->errors($schema, self::withFindingKey($decoded, $path, 'no_fix_expected', $value), false), $schema.' '.$what);
+            }
+        }
+    }
+
+    /** S9's `releases_read` is an optional boolean in the report schema; the explain schema types signal data as any object. */
+    public function testS9SaysWhetherTheReleasesWereRead(): void
+    {
+        [$report] = self::documentsFor('doctrine/cache')[Schemas::REPORT];
+        $signals = JsonPath::arrayAt($report, ['findings', 0, 'signals']);
+        $at = array_search(Signal::S9, array_column($signals, 'id'), true);
+        self::assertIsInt($at, 'doctrine/cache carries S9');
+        self::assertTrue(JsonPath::arrayAt($report, ['findings', 0, 'signals', $at, 'data'])['releases_read']);
+        $withValue = static function ($value) use ($report, $at): string {
+            $finding = JsonPath::arrayAt($report, ['findings', 0]);
+            $signals = JsonPath::arrayAt($finding, ['signals']);
+            $data = JsonPath::arrayAt($signals, [$at, 'data']);
+            if ($value === self::ABSENT) {
+                unset($data['releases_read']);
+            } else {
+                $data['releases_read'] = $value;
+            }
+            $signals[$at] = array_merge(JsonPath::arrayAt($signals, [$at]), ['data' => $data]);
+            $finding['signals'] = $signals;
+            $findings = JsonPath::arrayAt($report, ['findings']);
+            $findings[0] = $finding;
+            $report['findings'] = $findings;
+
+            return (string) json_encode($report);
+        };
+        foreach ([true, false, self::ABSENT] as $value) {
+            $this->assertValid(Schemas::REPORT, $withValue($value), var_export($value, true));
+            $this->assertValid(Schemas::REPORT, $withValue($value), var_export($value, true), true);
+        }
+        foreach ([null, 'yes', 1] as $value) {
+            self::assertNotSame([], $this->errors(Schemas::REPORT, $withValue($value), false), var_export($value, true));
+        }
+    }
+
+    /**
+     * Every key {@see Finding::toArray()} writes is a property both schemas' finding lists. The two
+     * lists are not compared with each other: the report's finding also carries `baseline`.
+     */
+    public function testEveryKeyAFindingWritesIsListedInBothSchemas(): void
+    {
+        $finding = self::analysis('apps/wallabag_wallabag')->finding('doctrine/cache');
+        self::assertNotNull($finding);
+        foreach ([Schemas::REPORT, Schemas::EXPLAIN] as $schema) {
+            $listed = array_keys(JsonPath::arrayAt(JsonPath::decodeFile(Schemas::path($schema)), ['definitions', 'finding', 'properties']));
+            self::assertSame([], array_values(array_diff(array_keys($finding->toArray()), $listed)), $schema);
+        }
+    }
+
+    /**
      * @param array<mixed, mixed> $document
      * @param list<int|string>    $path
      * @param mixed               $value {@see ABSENT} removes the key

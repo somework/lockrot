@@ -410,6 +410,69 @@
         "none"
       ]
     },
+    "flaggedPriority": {
+      "description": "The priority order without `none`: the levels a step of a finding's `priority_basis` moves between. The same order as `priority`, restricted; not a set of its own.",
+      "type": "string",
+      "enum": [
+        "critical",
+        "high",
+        "medium",
+        "low"
+      ]
+    },
+    "priorityStep": {
+      "description": "One step of a finding's `priority_basis`: why it was taken, and the level before and after it. A step that could not move the level has `from` equal to `to`; up or down is the direction from `from` to `to` in the priority order.",
+      "type": "object",
+      "required": [
+        "reason",
+        "from",
+        "to"
+      ],
+      "properties": {
+        "reason": {
+          "description": "Why the step was taken: `transitive` (no direct requirement names the package, and one reaches it: `chain` has two or more entries), `unreached` (no direct requirement the run knows reaches it: `chain` is empty, as in a run without composer.json; the same step down as `transitive`, named apart so the page need not read `chain`), `dev` (the finding's `dev` is true) or `no_fix_expected` (the finding's `no_fix_expected` names an advisory). The first three lower the level one step, never below `low`; the last raises it one step, never above `critical`. An open set: a later release can add a step; read an unknown value as \"other\" and show it as written with its `from` and `to`.",
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "x-known-values": [
+            "transitive",
+            "unreached",
+            "dev",
+            "no_fix_expected"
+          ]
+        },
+        "from": {
+          "$ref": "#/definitions/flaggedPriority"
+        },
+        "to": {
+          "$ref": "#/definitions/flaggedPriority"
+        }
+      }
+    },
+    "noFixAdvisory": {
+      "description": "One advisory a finding's `no_fix_expected` names, and why no fix is expected for it.",
+      "type": "object",
+      "required": [
+        "id",
+        "reason"
+      ],
+      "properties": {
+        "id": {
+          "description": "The `id` of one of this finding's S9 advisories (`data.advisories[].id`), unique within the finding. Not promised to be a Packagist id: any Composer repository can serve advisories.",
+          "type": "string"
+        },
+        "reason": {
+          "description": "Why no fix is expected, the first that applies: `not_on_installed_branch` (the finding is left-behind and the advisory's `fixed_by` names a release on a higher branch, which the installed branch will not get), `releases_unknown` (S9's `releases_read` is false: the release list was not read or the installed version could not be compared, so no fix was looked for, and this is not a prediction), `affected_range_unknown` (the advisory's `affected_versions` is null, so no release can be read as fixing it), `no_release_fixes` (the releases were read, the range is known, and no listed release above the installed version is outside it). An open set: a later release can add a reason; read an unknown value as \"other\" and show it as written.",
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "x-known-values": [
+            "not_on_installed_branch",
+            "releases_unknown",
+            "affected_range_unknown",
+            "no_release_fixes"
+          ]
+        }
+      }
+    },
     "signalId": {
       "description": "A signal identifier: `S` and a number for lockrot's own, as `docs/verdicts.md` lists them, or `<vendor>:<name>` for one that does not come from lockrot. An open set: a later release under this schema number can add an id, so read one you do not know as \"other\". `x-known-values` lists the ids this release writes; read it as the enum to hold a document to them.",
       "type": "string",
@@ -601,6 +664,39 @@
                 "not_from_composer_repository",
                 "metadata_unavailable"
               ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "priority_basis": {
+          "description": "How `priority` was reached: `base`, the level the verdict starts at (`none` for an unflagged verdict), and `steps`, each step taken from it in the order they apply: the reach step (`transitive` or `unreached`) exactly when `direct` is false, then `dev`, then `no_fix_expected`. A step is recorded whenever its fact holds on a flagged finding, also when it cannot move the level: a `dev` step at `low`, a `no_fix_expected` step at `critical`. The first step's `from` is `base`, each later one's is the previous step's `to`, and `priority` is the last step's `to`, or `base` when there are none. An unflagged verdict (`unknown`, `finished`, `ok`, so every allowlisted finding) gives `{\"base\": \"none\", \"steps\": []}`. Optional: documents written before 0.13.0 do not carry it; from 0.13.0 on every finding does.",
+          "type": "object",
+          "required": [
+            "base",
+            "steps"
+          ],
+          "properties": {
+            "base": {
+              "$ref": "#/definitions/priority"
+            },
+            "steps": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/priorityStep"
+              }
+            }
+          }
+        },
+        "no_fix_expected": {
+          "description": "The advisories on this finding lockrot expects no fix for, in the order of S9's `data.advisories` (worst severity first). Absent: a document written before 0.13.0. Null: the verdict makes no fix prediction, which is every verdict but `abandoned`, `silent` and `left-behind`. Empty: one of those three verdicts, and every S9 advisory is fixed by a release the verdict lets the project reach, or the finding carries no S9. Non-empty: the advisories no fix is expected for; they raise the priority one step (the `no_fix_expected` step of `priority_basis`) and put `no fix expected` in the evidence. On a left-behind finding only a fix on the installed branch counts as reachable; on an abandoned or silent one, any listed release above the installed version.",
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/noFixAdvisory"
+              }
             },
             {
               "type": "null"
@@ -1246,6 +1342,10 @@
               }
             }
           }
+        },
+        "releases_read": {
+          "description": "Whether a fix was looked for: true when the repository's releases were read and the installed version compared with them, so a null `fixed_by` means no listed release above the installed version fixes the advisory; false when the metadata was not loaded or the installed version could not be read as a version, so every `fixed_by` is null without a release having been checked. Optional: documents written before 0.13.0 do not carry it.",
+          "type": "boolean"
         }
       }
     },

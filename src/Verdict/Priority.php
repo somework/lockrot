@@ -68,33 +68,40 @@ final class Priority
         return array_keys(self::RANK);
     }
 
+    /** {@see basis()}'s end point. */
+    public static function of(string $verdict, bool $direct, bool $dev, bool $unfixableAdvisory = false): string
+    {
+        return self::basis($verdict, $direct, $dev, $unfixableAdvisory)->priority();
+    }
+
     /**
      * An unflagged verdict has no priority. A flagged one starts at its base level and drops one step
      * for being transitive and one more for being a development dependency, never below `low`.
      *
-     * A package with an empty chain — nothing in the project reaches it — counts as transitive.
+     * A package with an empty chain — nothing in the project reaches it — counts as transitive; the
+     * step is then named `unreached` ($reached false), at the same level.
      *
      * After those steps, a security advisory on a package whose verdict says no fix is coming
      * ($unfixableAdvisory) raises the result one step: `composer audit` already reports the
      * vulnerability; that no release will close it is what the verdict adds. An unflagged verdict
      * is never raised: the advisory alone is audit's finding, not lockrot's.
      */
-    public static function of(string $verdict, bool $direct, bool $dev, bool $unfixableAdvisory = false): string
+    public static function basis(string $verdict, bool $direct, bool $dev, bool $unfixableAdvisory, bool $reached = true): PriorityBasis
     {
         if (!isset(self::BASE[$verdict])) {
-            return self::NONE;
+            return PriorityBasis::startingAt(self::NONE);
         }
-        $priority = self::BASE[$verdict];
+        $basis = PriorityBasis::startingAt(self::BASE[$verdict]);
         if (!$direct) {
-            $priority = self::LOWER[$priority];
+            $basis = $basis->withStep($reached ? PriorityBasis::STEP_TRANSITIVE : PriorityBasis::STEP_UNREACHED, self::LOWER[$basis->priority()]);
         }
         if ($dev) {
-            $priority = self::LOWER[$priority];
+            $basis = $basis->withStep(PriorityBasis::STEP_DEV, self::LOWER[$basis->priority()]);
         }
         if ($unfixableAdvisory) {
-            $priority = self::RAISE[$priority];
+            $basis = $basis->withStep(PriorityBasis::STEP_NO_FIX_EXPECTED, self::RAISE[$basis->priority()]);
         }
 
-        return $priority;
+        return $basis;
     }
 }
