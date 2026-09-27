@@ -8,6 +8,7 @@ use Composer\Package\Loader\ArrayLoader;
 use Lockrot\Analyzer\Libyears;
 use Lockrot\Analyzer\LibyearsMeasurement;
 use Lockrot\Analyzer\Report;
+use Lockrot\Data\Advisory\Advisory;
 use Lockrot\Data\Forge\RepoRef;
 use Lockrot\Data\Forge\RepositoryActivity;
 use Lockrot\Data\Repository\PackageMetadata;
@@ -16,6 +17,7 @@ use Lockrot\Lock\LockedPackage;
 use Lockrot\Output\ConsoleMarkup;
 use Lockrot\Output\ExplainFormatter;
 use Lockrot\Signal\Rule\AbandonedRule;
+use Lockrot\Signal\Rule\AdvisoryRule;
 use Lockrot\Signal\Rule\PinnedRule;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\Thresholds;
@@ -102,6 +104,35 @@ final class ExplainFormatterTest extends TestCase
         $raw = (new ExplainFormatter())->text($explanation);
         self::assertStringStartsWith("<options=bold>vendor/pkg 1.5.0</> — <fg=yellow>left-behind</fg=yellow>, priority high\n", $raw, 'a flagged verdict is coloured');
         self::assertStringContainsString('php \>=7.1 \<8.0', $raw, 'escaped for the console formatter, which the plain rendering resolves');
+    }
+
+    /**
+     * S9 as {@see AdvisoryRule} writes it carries `releases_read` for the JSON and the no-fix list;
+     * the text prints the advisories exactly as it did before the key existed, read or not.
+     */
+    public function testTheAdvisoryBlockLeavesReleasesReadToTheJson(): void
+    {
+        $advisory = new Advisory('PKSA-1', 'CVE-2024-0001', 'Title of PKSA-1', 'https://example.test/PKSA-1', 'high', new \DateTimeImmutable('2024-03-01T12:00:00+00:00'));
+        $package = F::package(['version' => '1.0.0']);
+        $metadata = F::metadata([['1.0.0', '2020-01-01T00:00:00+00:00']]);
+        $expected = <<<'TEXT'
+              S9 warn 1 security advisory affects 1.0.0 (CVE-2024-0001)
+                       CVE-2024-0001 (PKSA-1) high · no listed release fixes it · reported 2024-03-01 · https://example.test/PKSA-1
+
+            TEXT;
+
+        foreach (['read' => [$metadata, true], 'not read' => [null, false]] as $case => [$meta, $read]) {
+            $facts = F::facts($package, $meta, null, [$advisory]);
+            $s9 = (new AdvisoryRule())->evaluate($facts);
+            self::assertNotNull($s9);
+            self::assertSame($read, $s9->data()['releases_read'], $case);
+            $finding = new Finding('vendor/pkg', '1.0.0', Verdict::ABANDONED, [new Signal(Signal::S1, Signal::LEVEL_HIGH, 'marked abandoned by its repository'), $s9], ['vendor/pkg'], null, new \DateTimeImmutable(F::NOW));
+
+            $text = $this->plain(new Explanation($finding, $facts, new Thresholds(), '8.4', $this->report()));
+
+            self::assertStringContainsString("\n".$expected."\n", $text, $case);
+            self::assertStringNotContainsString('releases_read', $text, $case);
+        }
     }
 
     /**

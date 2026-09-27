@@ -40,6 +40,8 @@ final class ExplainFormatter
 
     /** The signal data keys printed as a list of advisories rather than as scalars. */
     private const ADVISORY_LIST = 'advisories';
+    /** S9's key the text leaves out ({@see signalData()}). */
+    private const RELEASES_READ = 'releases_read';
 
     public function text(Explanation $explanation): string
     {
@@ -130,6 +132,9 @@ final class ExplainFormatter
      * each of those as `null` buried the facts a reader wants under words saying there are none; the
      * JSON still carries every key. Every other signal prints a null as `null`, as it always has.
      *
+     * S9 leaves out `releases_read`: the JSON and the no-fix list read it, and the text stays as it
+     * was before the key existed.
+     *
      * @return list<string>
      */
     private function signalData(Signal $signal): array
@@ -138,6 +143,9 @@ final class ExplainFormatter
         $lines = [];
         $skipNulls = $signal->id() === Signal::S6;
         foreach ($signal->data() as $key => $value) {
+            if ($key === self::RELEASES_READ && $signal->id() === Signal::S9) {
+                continue;
+            }
             if ($key === self::ADVISORY_LIST && \is_array($value)) {
                 foreach ($value as $row) {
                     $lines[] = \is_array($row) ? self::advisory($row) : self::encode($row);
