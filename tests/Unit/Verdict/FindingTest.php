@@ -595,6 +595,7 @@ final class FindingTest extends TestCase
         self::assertSame($raised, $expected !== null && $expected !== [], 'the raise is there exactly when the list names an advisory');
         self::assertSame($raised, $finding->hasUnfixableAdvisory());
         self::assertSame($raised, strpos($finding->ownEvidence(), 'no fix expected') !== false, 'and exactly when the evidence says so');
+        self::assertSame(\in_array('not_on_installed_branch', array_column($expected ?? [], 'reason'), true), strpos($finding->ownEvidence(), 'no fix expected on ') !== false, 'the clause names the branch exactly when the list says the fix is off it');
         self::assertSame($finding->chain() === [], \in_array('unreached', $reasons, true), 'unreached exactly when nothing reaches the package');
         self::assertSame($finding->priority(), $basis['steps'] === [] ? $basis['base'] : $basis['steps'][\count($basis['steps']) - 1]['to']);
     }
@@ -618,12 +619,25 @@ final class FindingTest extends TestCase
         self::assertSame(['base' => 'none', 'steps' => []], (new Finding('vendor/pkg', '1.0.0', Verdict::OK, [], [], null, null))->toArray()['priority_basis']);
     }
 
-    /** An S9 written before releases_read existed, or built by hand without it, reads as looked for. */
-    public function testAnS9WithoutReleasesReadReadsAsLookedFor(): void
+    /** An S9 without releases_read says nothing about whether a fix was looked for, so none was. */
+    public function testAnS9WithoutReleasesReadReadsAsNotLookedFor(): void
     {
         $finding = new Finding('vendor/pkg', '1.0.0', Verdict::ABANDONED, [new Signal(Signal::S9, Signal::LEVEL_WARN, 'x', ['advisories' => [self::row('PKSA-1')]])], ['vendor/pkg'], null, null);
 
+        self::assertSame([['id' => 'PKSA-1', 'reason' => 'releases_unknown']], $finding->noFixExpected());
+    }
+
+    /** A row without a string id is nothing the list could name, so it is no advisory, as a row that is not an array is none. */
+    public function testAnAdvisoryRowWithoutAnIdIsNoAdvisory(): void
+    {
+        $rows = [['fixed_by' => null, 'fixed_on_branch' => false], ['id' => 7, 'fixed_by' => null], 'not a row', self::row('PKSA-1')];
+        $finding = new Finding('vendor/pkg', '1.0.0', Verdict::ABANDONED, [new Signal(Signal::S9, Signal::LEVEL_WARN, 'x', ['advisories' => $rows, 'releases_read' => true])], ['vendor/pkg'], null, null);
+
         self::assertSame([['id' => 'PKSA-1', 'reason' => 'no_release_fixes']], $finding->noFixExpected());
+
+        $idless = new Finding('vendor/pkg', '1.0.0', Verdict::ABANDONED, [self::s9([['fixed_by' => null]])], ['vendor/pkg'], null, null);
+        self::assertSame([], $idless->noFixExpected());
+        self::assertFalse($idless->hasUnfixableAdvisory());
     }
 
     public function testEvidenceLineAppendsTheAllowlistReasonAfterEverythingElse(): void

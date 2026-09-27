@@ -243,13 +243,13 @@ final class Finding
         if (!\in_array($this->verdict, self::NO_FIX_VERDICTS, true) || !Verdict::flagged($this->verdict)) {
             return null;
         }
-        // Only S9 knows whether a null fixed_by was looked for; a signal without the key was.
-        $releasesRead = ($this->advisoryData()['releases_read'] ?? true) !== false;
+        // Only S9 knows whether a null fixed_by was looked for; without the key nothing says it was.
+        $releasesRead = ($this->advisoryData()['releases_read'] ?? false) === true;
         $list = [];
         foreach ($this->advisoryRows() as $row) {
             $fixed = $this->verdict === Verdict::LEFT_BEHIND ? ($row['fixed_on_branch'] ?? false) === true : ($row['fixed_by'] ?? null) !== null;
             if (!$fixed) {
-                $list[] = ['id' => \is_string($row['id'] ?? null) ? $row['id'] : '', 'reason' => $this->noFixReason($row, $releasesRead)];
+                $list[] = ['id' => $row['id'], 'reason' => $this->noFixReason($row, $releasesRead)];
             }
         }
 
@@ -365,13 +365,18 @@ final class Finding
         return \is_string($constraint) && $constraint !== '' ? 'require '.$constraint.' to follow' : null;
     }
 
-    /** @return list<array<mixed, mixed>> */
+    /**
+     * S9's advisory rows; one that is not an array, or has no string id, is nothing the no-fix list
+     * could name and counts as no advisory.
+     *
+     * @return list<array{id: string}&array<mixed, mixed>>
+     */
     private function advisoryRows(): array
     {
         $rows = [];
         $list = $this->advisoryData()['advisories'] ?? [];
         foreach (\is_array($list) ? $list : [] as $row) {
-            if (\is_array($row)) {
+            if (\is_array($row) && \is_string($row['id'] ?? null)) {
                 $rows[] = $row;
             }
         }
