@@ -446,12 +446,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   says. `run.mode`, `run.fail_on_kind`, `gate.tripped_by` and a finding's `gate.exempt_by` are open
   strings with a `pattern` and `x-known-values`; `tripped_by` is the first `uniqueItems` in any
   lockrot schema. Every new key is optional in the schema, so documents written before 0.13.0 still
-  validate; from 0.13.0 on every document carries them, `gate` null only where `run` is. They reach
-  `--format=json` and the report inside the `--format=html` page, which does not read them yet; the
-  `--explain` document gets none of them, since an explanation gates nothing. Every verdict,
-  priority, exit code and baseline standing is unchanged, as are the table, markdown, GitHub, GitLab
-  and SARIF formats, the `--explain` text, the install-time summary and the baseline file. The
-  0.13.0 schema snapshot is refreshed.
+  validate; from 0.13.0 on every document carries them, `gate` null only where `run` is null or
+  carries no `fail_on`, which outside a test is nowhere. They reach `--format=json` and the report
+  inside the `--format=html` page, which does not read them yet; the `--explain` document gets none
+  of them, since an explanation gates nothing. Every verdict, priority, exit code and baseline
+  standing is unchanged, as are the table, markdown, GitHub, GitLab and SARIF formats, the
+  `--explain` text, the install-time summary and the baseline file. The 0.13.0 schema snapshot is
+  refreshed.
 
 ### Fixed
 

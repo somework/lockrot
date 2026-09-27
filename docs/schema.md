@@ -169,7 +169,8 @@ consumer usually keys on:
   on stderr. `tripped_by` lists each cause once, `strict_network` (it was on and a lookup failed)
   and `fail_on` (a finding fails), both when both hold, and is empty exactly when `fails` is false;
   it is an open set, and its order is not contract. `fail_on_applied` is false in a
-  `generate_baseline` run, which only `--strict-network` can fail. Null where `run` is.
+  `generate_baseline` run, which only `--strict-network` can fail. Null where `run` is null or
+  carries no `fail_on`, which outside a test is nowhere.
 - Each finding carries `gate` beside `baseline`, from 0.13.0: `reaches_fail_on` (at or above
   `run.fail_on`, decided in every mode), `exempt_by` (`baseline` when the baseline accepted a finding
   that reaches, as `known`; a `worsened` one is not exempt; otherwise null; an open set) and `fails`,
