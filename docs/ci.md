@@ -343,7 +343,7 @@ The complete report, and the only format that carries every field: per-finding `
 baseline file — plus the document's `run`, `exposure`, `exposure_rule`, `unattributed`, `libyears` and `notes`. `run` is what the report is about and what
 its verdicts were decided against: what the project is called (`project`: composer.json's `name`,
 or `extra.lockrot.project` instead) and the name composer.json itself gives it (`root_package`),
-the target PHP, the thresholds, the `fail-on` and the name of the lock, with the list of verdicts
+the target PHP and the project's own `require.php` (`project_php`), the thresholds, the `fail-on` and the name of the lock, with the list of verdicts
 the run counted as findings. Without it a report could not be read twice the same
 way, because the same lock under different thresholds gives different verdicts and nothing said
 which had been used. The

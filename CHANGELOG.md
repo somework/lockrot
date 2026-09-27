@@ -296,9 +296,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (composer.json, or the file `COMPOSER` names), as written, whatever `extra.lockrot.project` says,
   and null where the manifest has no name or the run read a lock without its composer.json; the key
   is always written. `run.project` is unchanged. The field is listed but not required in the
-  [published schema](docs/schema.md), so documents written before 0.13.0 still validate; it is the
-  one key in `run` such a document omits. `--format=html` carries it in the page's payload, which
-  does not draw it; the other formats and `--explain` do not carry `run` at all.
+  [published schema](docs/schema.md), so documents written before 0.13.0 still validate; it and
+  `run.project_php` are the two keys in `run` such a document omits. `--format=html` carries it in
+  the page's payload, which does not draw it; the other formats and `--explain` do not carry `run`
+  at all.
+
+- `run.project_php`: the project's own `require.php`, exactly as the manifest Composer reads writes
+  it (`>=8.2` for wallabag). It is the second floor S8 holds a higher branch against, beside
+  `run.target_php`, and the one each branch row's `admits_project_php` is tested against; until now
+  the JSON report never named it, and the HTML page's data dropped it with the rest of the
+  `--explain` document's top level, so the page could say "your `require.php`" but not which
+  version that is. The value is the same one `--explain` writes as `project_php`, read from the same
+  manifest (`COMPOSER=alt.json` reads alt.json), and null where the manifest has no `require.php`
+  or the run read a lock without its composer.json; the key is always written. It is optional in
+  the [published schema](docs/schema.md), so documents written before 0.13.0 still validate. It
+  reaches `--format=json` and the report inside the `--format=html` page; the table, markdown,
+  GitHub, GitLab and SARIF formats and the baseline are unchanged, and so is every verdict. The
+  install-time summary writes no `run`, as before.
 
 ### Fixed
 

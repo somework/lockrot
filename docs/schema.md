@@ -145,9 +145,15 @@ consumer usually keys on:
 - `run.root_package` is what Composer calls the project: the `name` of the manifest it reads,
   exactly as written, whatever `extra.lockrot.project` says — the key to match a report to its
   repository or to join several projects' reports on, where `project` is only a label. Null where
-  the manifest has no `name`, or where the run read a lock without its composer.json. It is the one
-  key in `run` a document may omit, because reports written before 0.13.0 do not carry it; from
-  0.13.0 on lockrot always writes it, as a string or as null.
+  the manifest has no `name`, or where the run read a lock without its composer.json.
+- `run.project_php` is the project's own `require.php`, exactly as that same manifest writes it
+  (`>=8.2`, `^7.4 || ^8.0`): a constraint, not a version. It is the second floor S8 holds a higher
+  branch against, beside `target_php` (see [verdicts.md](verdicts.md#within-reach)), and the same
+  value `--explain` writes as `project_php`. Null where the manifest has no `require.php`, or where
+  the run read a lock without its composer.json.
+- `root_package` and `project_php` are the two keys in `run` a document may omit, because reports
+  written before 0.13.0 do not carry them; from 0.13.0 on lockrot always writes both, as a string
+  or as null.
 - Each finding carries `baseline`, where it stands against the baseline file (`known`, `new` or
   `worsened`, with the verdict the baseline accepted), or null when the run read none. The report's
   own `baseline` block still carries the totals; this is the same judgement per finding, which is

@@ -249,7 +249,7 @@ final class ReportTest extends TestCase
     public function testTheReportRecordsWhatTheRunWasToldToDo(): void
     {
         $report = $this->report($this->finding('vendor/a', Verdict::SILENT))
-            ->withRun(new RunSettings('Acme shop', 'acme/shop', '8.4', '/home/someone/clients/acme/composer.lock', 'silent', new Thresholds(2, 4, 6, 8)));
+            ->withRun(new RunSettings('Acme shop', 'acme/shop', '8.4', '/home/someone/clients/acme/composer.lock', 'silent', new Thresholds(2, 4, 6, 8), '>=8.2'));
 
         $run = JsonPath::arrayAt($report->toArray(), ['run']);
 
@@ -257,6 +257,7 @@ final class ReportTest extends TestCase
             'project' => 'Acme shop',
             'root_package' => 'acme/shop',
             'target_php' => '8.4',
+            'project_php' => '>=8.2',
             'lock_file' => 'composer.lock',
             'fail_on' => 'silent',
             'thresholds' => [
@@ -288,6 +289,8 @@ final class ReportTest extends TestCase
         self::assertArrayHasKey('root_package', $run);
         self::assertNull($run['root_package']);
         self::assertSame('Acme shop', $run['project']);
+        self::assertArrayHasKey('project_php', $run, 'and a manifest without require.php writes null, not nothing');
+        self::assertNull($run['project_php']);
     }
 
     /**
