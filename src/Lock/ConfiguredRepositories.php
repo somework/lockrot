@@ -304,8 +304,12 @@ final class ConfiguredRepositories
         }
         $directory = rtrim(self::localPath($directory), '/');
         $file = self::localPath($file);
+        // Composer lists an artifact directory's files as found under it, never through a `..`.
+        if (strpos('/'.$file.'/', '/../') !== false) {
+            return false;
+        }
         if ($directory === '' || $directory === '.') {
-            return preg_match('{^(/|[A-Za-z]:/|\.\./)}', $file) !== 1;
+            return preg_match('{^(/|[A-Za-z]:/)}', $file) !== 1;
         }
 
         return strpos($file, $directory.'/') === 0;

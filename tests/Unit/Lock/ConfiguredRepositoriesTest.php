@@ -242,6 +242,11 @@ final class ConfiguredRepositoriesTest extends TestCase
         yield 'absolute' => ['/srv/app/artifacts', '/srv/app/artifacts/lib-1.0.0.zip', 'artifact'];
         yield 'on Windows' => ['C:\\app\\artifacts', 'C:/app/artifacts/lib-1.0.0.zip', 'artifact'];
         yield 'a directory that only starts the same' => ['art', 'artifacts/lib-1.0.0.zip', null];
+        yield 'a path that climbs out of it' => ['artifacts', 'artifacts/../outside/lib-1.0.0.zip', null];
+        yield 'a path that climbs out of the root' => ['.', 'nested/../../lib-1.0.0.zip', null];
+        yield 'a path that ends climbing' => ['artifacts', 'artifacts/nested/..', null];
+        yield 'a path that starts climbing' => ['.', '../lib-1.0.0.zip', null];
+        yield 'a path that climbs and comes back, which Composer never writes' => ['artifacts', 'artifacts/nested/../lib-1.0.0.zip', null];
         yield 'a home directory lockrot does not expand' => ['~/artifacts', '/home/me/artifacts/lib-1.0.0.zip', 'unknown'];
         yield 'a variable lockrot does not expand' => ['$ARTIFACTS', '/srv/artifacts/lib-1.0.0.zip', 'unknown'];
         yield 'a URL, not a file' => ['artifacts', 'https://example.test/artifacts/lib-1.0.0.zip', null];
