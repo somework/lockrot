@@ -65,6 +65,11 @@ final class GateAgreementTest extends TestCase
     /** @var array<string, true> every standing and cause the corpus gave, so the check is seen to bite */
     private array $seen = [];
 
+    /** @var list<string> */
+    private array $mismatches = [];
+
+    private int $checks = 0;
+
     /**
      * Every fixture lock served at once, as BranchFloorAgreementTest serves them, in a process of
      * its own for the same memory reason.
@@ -93,6 +98,8 @@ final class GateAgreementTest extends TestCase
             $server->stop();
         }
 
+        self::assertGreaterThan(0, $this->checks);
+        self::assertSame([], \array_slice($this->mismatches, 0, 20), \sprintf('%d of %d checks disagree', \count($this->mismatches), $this->checks));
         foreach ([
             'finding {"reaches_fail_on":true,"fails":true,"exempt_by":null}',
             'finding {"reaches_fail_on":true,"fails":false,"exempt_by":"baseline"}',
@@ -142,47 +149,66 @@ final class GateAgreementTest extends TestCase
     private function holds(array $document, Report $report, FormatContext $levels, FailOn $failOn, bool $strict, string $mode, string $what): void
     {
         $run = JsonPath::arrayAt($document, ['run']);
-        self::assertSame($failOn->value(), $run['fail_on'], $what);
-        self::assertSame(FailOn::fromString($failOn->value())->kind(), $run['fail_on_kind'], $what);
-        self::assertSame($strict, $run['strict_network'], $what);
-        self::assertSame($mode, $run['mode'], $what);
+        $this->same($failOn->value(), $run['fail_on'], $what);
+        $this->same(FailOn::fromString($failOn->value())->kind(), $run['fail_on_kind'], $what);
+        $this->same($strict, $run['strict_network'], $what);
+        $this->same($mode, $run['mode'], $what);
         $gate = JsonPath::arrayAt($document, ['gate']);
-        self::assertSame(['fails', 'tripped_by', 'fail_on_applied'], array_keys($gate), $what);
+        $this->same(['fails', 'tripped_by', 'fail_on_applied'], array_keys($gate), $what);
         $trippedBy = JsonPath::arrayAt($gate, ['tripped_by']);
         $applied = $gate['fail_on_applied'];
-        self::assertSame($mode === Gate::MODE_CHECK, $applied, $what);
+        $this->same($mode === Gate::MODE_CHECK, $applied, $what);
 
         $anyFails = false;
         foreach (JsonPath::arrayAt($document, ['findings']) as $at => $row) {
-            self::assertIsArray($row);
+            if (!\is_array($row)) {
+                $this->same('an object', $row, $what.': a finding');
+
+                continue;
+            }
             $finding = $report->findings()[$at];
             $where = $what.' '.$finding->package();
             $standing = JsonPath::arrayAt($row, ['gate']);
             $this->seen['finding '.json_encode($standing)] = true;
             ['reaches_fail_on' => $reaches, 'fails' => $fails, 'exempt_by' => $exemptBy] = $standing;
-            self::assertSame($failOn->reaches($finding), $reaches, $where);
-            self::assertSame($reaches && $exemptBy === null && $applied, $fails, $where.': fails');
+            $this->same($failOn->reaches($finding), $reaches, $where);
+            $this->same($reaches && $exemptBy === null && $applied, $fails, $where.': fails');
             $status = $row['baseline'] === null ? null : JsonPath::stringAt($row, ['baseline', 'status']);
-            self::assertSame($status === 'known' && $reaches, $exemptBy === Gate::EXEMPT_BASELINE, $where.': exempt by the baseline');
+            $this->same($status === 'known' && $reaches, $exemptBy === Gate::EXEMPT_BASELINE, $where.': exempt by the baseline');
             if ($exemptBy !== null) {
-                self::assertTrue($reaches, $where.': only what reaches is exempt');
+                $this->same(true, $reaches, $where.': only what reaches is exempt');
             }
             if ($status === 'worsened' && $fails) {
                 $this->seen['worsened fails'] = true;
             }
             // The annotation level reads the same two primitives by its own rule, the same in both modes.
-            self::assertSame($reaches && $exemptBy !== Gate::EXEMPT_BASELINE, $levels->levelOf($finding, $report->baseline()) === FormatContext::LEVEL_ERROR, $where.': level');
+            $this->same($reaches && $exemptBy !== Gate::EXEMPT_BASELINE, $levels->levelOf($finding, $report->baseline()) === FormatContext::LEVEL_ERROR, $where.': level');
             $anyFails = $anyFails || $fails;
         }
 
-        self::assertSame($gate['fails'], $trippedBy !== [], $what);
-        self::assertSame($anyFails, \in_array(Gate::TRIP_FAIL_ON, $trippedBy, true), $what);
-        self::assertSame($strict && $report->hadNetworkFailures(), \in_array(Gate::TRIP_STRICT_NETWORK, $trippedBy, true), $what);
-        self::assertSame(array_values(array_filter(Gate::TRIPS, static fn (string $trip): bool => \in_array($trip, $trippedBy, true))), $trippedBy, $what.': unique, in order');
+        $this->same($gate['fails'], $trippedBy !== [], $what);
+        $this->same($anyFails, \in_array(Gate::TRIP_FAIL_ON, $trippedBy, true), $what);
+        $this->same($strict && $report->hadNetworkFailures(), \in_array(Gate::TRIP_STRICT_NETWORK, $trippedBy, true), $what);
+        $this->same(array_values(array_filter(Gate::TRIPS, static fn (string $trip): bool => \in_array($trip, $trippedBy, true))), $trippedBy, $what.': unique, in order');
         $this->seen['tripped_by '.json_encode($trippedBy)] = true;
 
         $oracle = $mode === Gate::MODE_CHECK ? self::oracleExitCode($report, $failOn, $strict) : ($strict && $report->hadNetworkFailures() ? 1 : 0);
-        self::assertSame($oracle, $gate['fails'] ? 1 : 0, $what.': the exit code the run returned before the gate');
+        $this->same($oracle, $gate['fails'] ? 1 : 0, $what.': the exit code the run returned before the gate');
+    }
+
+    /**
+     * One comparison of the sweep, kept out of PHPUnit's count: PHPUnit 10 (PHP 8.1) records an event
+     * per assertion and ships them all back from the child process, which millions of them crash.
+     *
+     * @param mixed $expected
+     * @param mixed $actual
+     */
+    private function same($expected, $actual, string $what): void
+    {
+        ++$this->checks;
+        if ($expected !== $actual) {
+            $this->mismatches[] = $what.': expected '.json_encode($expected).', got '.json_encode($actual);
+        }
     }
 
     /** Policy::exitCode() as it was before the gate, over the same inputs. */
