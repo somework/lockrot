@@ -151,7 +151,9 @@ them: their findings carry no S10, and their `--explain` document's `activity` i
 `package_count` packages carry no Composer `notification-url` — a `path`, `vcs`, `artifact` or inline
 `package` entry, or a package from a `type: composer` repository that advertises no notify URL — and
 lockrot asked no repository about them. It equals the report's `not_from_composer_repository`, and
-those findings' `from_composer_repository` is false. `sets_network_failures`: no.
+those findings' `from_composer_repository` is false; each one's `origin.kind` says what lockrot could
+tell about where it came from ([schema.md](schema.md#where-a-package-came-from)).
+`sets_network_failures`: no.
 
 ## Related
 

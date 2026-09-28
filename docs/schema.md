@@ -67,12 +67,12 @@ Objects are open, and so are the sets of values that grow in minor releases: sig
 explanation's `php_blocked_by`, which holds the same values, the explanation's `misses_target_php`
 and `misses_project_php`, a finding's `libyears_unmeasured`, a `priority_basis` step's `reason`, a
 `no_fix_expected` item's `reason`, `run.mode`, `run.fail_on_kind`, `gate.tripped_by`, a finding's
-`gate.exempt_by`, a run note's `code`, and the `forge_id` and `reason` in its `data`, and the
-configuration's `format`. Each is a string with a
+`gate.exempt_by`, a run note's `code`, and the `forge_id` and `reason` in its `data`, a finding's
+`origin.kind` and `origin.registry`, and the configuration's `format`. Each is a string with a
 `pattern`, plus an `x-known-values` list of the values this release writes. A validator ignores a
 keyword draft-04 does not define, so a copy of the schema taken from 0.13.0 on accepts a signal, a
 reason, a floor, a way a branch misses a floor, a priority step, a kind of run or of threshold, a
-cause that failed a run, an exemption, a run note, a repository host or a format that a later release adds, and a signal, note code or format named `<vendor>:<name>`, the form reserved for those that do not come
+cause that failed a run, an exemption, a run note, an origin kind or registry, a repository host or a format that a later release adds, and a signal, note code, origin kind or format named `<vendor>:<name>`, the form reserved for those that do not come
 from lockrot ([compatibility.md](compatibility.md#names-reserved-for-extensions)). The vendor and
 the name are each lower-case letters, digits, `_`, `.` and `-`, starting with a letter or a digit;
 `acme:licence` validates, `Acme:Licence` does not.
@@ -203,8 +203,10 @@ consumer usually keys on:
   value is the one `--explain` writes as `lock.from_composer_repository`, and the findings where it
   is false are the ones the root `not_from_composer_repository` counts. Added in 0.13.0, optional in
   the schema so earlier documents validate; from 0.13.0 on every finding carries it, true or false,
-  never null. It stays a boolean in 1.x: a finer account of where an entry came from would be a
-  separate optional field with an open set of values, never a new type for this key.
+  never null. It stays a boolean in 1.x: the finer account of where an entry came from is
+  `origin`, below, and this key is true exactly when `origin.kind` is `packagist` or `composer`.
+- Each finding carries `origin`, from 0.13.0: where its lock entry came from. See
+  [Where a package came from](#where-a-package-came-from).
 - A finding can carry `S10`, the signal that says a check did not run: its `data` names each
   missing check, why, and the signals it blocked. Added in 0.11.0; documents written before it
   simply have no such signal, and the id is part of the same schema number.
@@ -267,6 +269,73 @@ consumer usually keys on:
   [Open sets](#open-sets)).
 - Dates are RFC 3339 strings (`format: date-time`); `ga_date` in S5 and `first_seen` in the
   baseline are plain `YYYY-MM-DD`.
+
+## Where a package came from
+
+A finding's `origin` says where its lock entry came from, as lockrot tells it from the entry itself
+and the `repositories` of the manifest Composer reads (`COMPOSER=alt.json` means alt.json), without
+asking any repository: the same lock and manifest give the same `origin` on every machine. It has
+three keys, always written from 0.13.0 on, and is optional in the schema so earlier documents
+validate:
+
+- `kind`, an open string:
+    - `packagist`: the entry's notification-url reports to packagist.org — packagist.org itself, or
+      a mirror that keeps packagist.org's notify URL.
+    - `composer`: its notification-url reports to any other host — Private Packagist, WP Packages,
+      Drupal, a Satis with a notify URL, a registry lockrot does not know, or a package definition
+      that declares one itself.
+    - `path`: its dist is a local directory, from a `path` repository.
+    - `vcs`: its source is a VCS repository the manifest lists.
+    - `artifact`: its dist is an archive inside an `artifact` repository the manifest lists.
+    - `package`: an inline `package` definition in the manifest gives exactly this entry.
+    - `unknown`: none of these could be decided — a `type: composer` repository that advertises no
+      notify URL (asset-packagist.org, a Satis without one, some packagist mirrors), a repository
+      listed before the matching one that could have served the name, a VCS repository renamed or
+      removed since, or a run without composer.json.
+
+    `from_composer_repository` is true exactly for `packagist` and `composer`, and the root
+    `not_from_composer_repository` counts the rest. A kind you do not know: read it by
+    `from_composer_repository`, show it as written, link nothing.
+
+- `registry`, the Composer repository the entry came from, named by the host its notification-url
+  reports to, when lockrot knows it: `packagist.org`, `repo.packagist.com` (Private Packagist),
+  `wp-packages.org` or `packages.drupal.org`. It is `packagist.org` exactly when `kind` is
+  `packagist`, and null for every other kind and for a Composer repository lockrot does not know.
+  A label, never a template: build no URL from it.
+
+- `package_url`, the package's page on `registry`, written by lockrot for a registry that keeps a
+  public page per package name — packagist.org and wp-packages.org — from the name in the lock, and
+  only when that is a Composer package name. Null otherwise: Private Packagist has no public pages,
+  and a drupal.org project page is not a function of the package's name. Link it only when it is a
+  string, and never build one yourself. It is the page the registry keeps for that name; whether
+  this run's repositories still list the package is the finding's `note`.
+
+lockrot reads the manifest as it is at the time of the run. A lock written against repositories
+that have changed since can read as `unknown`.
+
+### What a report says about your repositories
+
+`origin` copies nothing from the entry's URLs or the manifest's: not the notification-url, which
+can carry a login and a password; not a dist, which for an `artifact` repository is a path on the
+machine that wrote the lock; not a mirror URL, which for Private Packagist names the organisation.
+It writes a kind, a registry from lockrot's own list and a URL built from that list. A private
+registry is `kind: composer` with `registry: null`: its host is not written, because a host once
+published cannot be withdrawn, while lockrot can learn to name more registries later.
+`repo.packagist.com` says that the project uses Private Packagist, never which organisation.
+
+To publish a report without even that, clear the two:
+
+```bash
+jq '.findings |= map(if .origin then .origin.registry = null | .origin.package_url = null else . end)' lockrot.json > lockrot.public.json
+```
+
+The document stays valid: both keys may be null. Other parts of a report can name a private
+registry or a repository host, and `origin` does not change them: a run note about a Composer
+repository it could not read (`advisories_unavailable`, `metadata_unavailable`,
+`monorepo_parent_unavailable`: the note's `text` and `notes` entry, and a `message` or
+`composer_repository` in its `data`), the hosts and repositories in S3, S4 and the repository
+activity notes, and, on the HTML page, each package's `details` (`lock.repository`,
+`metadata.repository`, `repository_link`, `activity`).
 
 ## Related
 

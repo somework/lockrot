@@ -38,8 +38,8 @@ changes in minor releases under a heading of its own — see [Verdict changes](#
   `note_details` ([Run notes](#run-notes)), never on `notes`.
 - Whether a package's lock entry carries a Composer notification-url, the only kind of entry lockrot
   asks a repository about, is a finding's `from_composer_repository`, not its `note`: a boolean for
-  all of 1.x. A finer account of where a lock entry came from would be a separate field with an open
-  set of values, never a new type for this one.
+  all of 1.x. The finer account of where a lock entry came from is the finding's `origin`
+  ([Package origins](#package-origins)), a separate field, never a new type for this one.
 
 ### Closed sets and their order
 
@@ -85,6 +85,7 @@ These grow in minor releases:
 - `run.mode` and `run.fail_on_kind`;
 - `gate.tripped_by`, and a finding's `gate.exempt_by`;
 - a run note's `code`, and the `forge_id` and `reason` in its `data`;
+- a finding's `origin.kind` and `origin.registry`;
 - repository hosts;
 - format names, the configuration's `format` among them.
 
@@ -95,14 +96,18 @@ The schemas describe signal ids (S10's `blocks` among them), S10's `check` and `
 `reason`, S8's `floor_source`, the explanation's `php_blocked_by`, `misses_target_php` and
 `misses_project_php`, a finding's `libyears_unmeasured`, a `priority_basis` step's `reason`, a
 `no_fix_expected` item's `reason`, `run.mode`, `run.fail_on_kind`, `gate.tripped_by`, a finding's
-`gate.exempt_by`, a run note's `code`, and the `forge_id` and `reason` in its `data`, and the
-configuration's `format` as open strings: a `pattern`, which also admits the `<vendor>:<name>` form for a signal id, a note's code and a format,
+`gate.exempt_by`, a run note's `code`, and the `forge_id` and `reason` in its `data`, a finding's
+`origin.kind` and `origin.registry`, and the configuration's `format` as open strings: a `pattern`,
+which also admits the `<vendor>:<name>` form for a signal id, a note's code, an origin kind and a format,
 plus `x-known-values`, the values lockrot writes, which only grows within 1.x. A signal whose id is
 not listed validates with any object as its `data`; a listed id keeps its `data` typed. A consumer
 that validates strictly reads `x-known-values` as an enum and refreshes its copy on upgrade. A copy
 of a schema taken before 0.13.0 still holds these as enums. Repository hosts are a set in the schemas
-only as a run note's `forge_id` (`github`, `gitlab`, `bitbucket`): S3 and S4's `host` are plain
-strings, and so is the explanation's `activity.forge`, a display name (`GitHub`) that stays one.
+only as a run note's `forge_id` (`github`, `gitlab`, `bitbucket`) and as a finding's
+`origin.registry`: S3 and S4's `host` are plain strings, and so is the explanation's
+`activity.forge`, a display name (`GitHub`) that stays one. `origin.registry` is the one host lockrot
+filters to a list of its own: a Composer repository it does not know is written as null, never as
+the host the lock names.
 lockrot itself accepts only the format names it knows, in `--format`, `--output` and
 `extra.lockrot.format`.
 
@@ -146,6 +151,32 @@ Not frozen:
 
 A new code or reason arrives only in a minor release. It changes no verdict, priority or exit code,
 so it is not a [Verdict change](#verdict-changes).
+
+### Package origins
+
+Where a lock entry came from is each finding's `origin` ([schema.md](schema.md#where-a-package-came-from)):
+a `kind`, the `registry` where lockrot can name it, and a `package_url`. Frozen for 1.x:
+
+- `origin`'s keys — `kind`, `registry`, `package_url` — on every finding from 0.13.0.
+- The notification-url check comes first and alone decides `from_composer_repository`: `packagist`
+  and `composer` are exactly the entries with a notification-url, and `from_composer_repository` is
+  true exactly for them.
+- A kind's meaning, and its `from_composer_repository` value. A kind a later release adds states its
+  own; a new meaning gets a new kind.
+- `registry` is null for every kind but `packagist` and `composer`, and is `packagist.org` exactly
+  when the kind is `packagist`.
+- `package_url` is written by lockrot, never built by a reader: a link only where it is a string.
+
+Not frozen:
+
+- Which registries lockrot names and links. A later minor release can add one, never withdraw one.
+- Which kind a given entry gets after a minor release that learns more: a new kind may take entries
+  out of `unknown`. lockrot reads the manifest as it is at the time of the run, not as it was when the
+  lock was written.
+- Whether a registry still keeps the page a `package_url` points at.
+
+A new kind or registry arrives only in a minor release. It changes no verdict, priority or exit
+code, so it is not a [Verdict change](#verdict-changes).
 
 ### Finding identity
 

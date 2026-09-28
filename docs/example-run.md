@@ -329,6 +329,11 @@ list, which `…` stands in for:
             "direct": true,
             "dev": false,
             "from_composer_repository": true,
+            "origin": {
+                "kind": "packagist",
+                "registry": "packagist.org",
+                "package_url": "https://packagist.org/packages/sensio/framework-extra-bundle"
+            },
             "replacement": null,
             "signals": [
                 {
@@ -383,7 +388,7 @@ list, which `…` stands in for:
 
 The cut signals have the same shape as S1 and S2; S7 carries the packages it names under `data`. So
 do the other 199 findings, each with its own `priority`, `direct`, `dev`,
-`from_composer_repository`, `replacement`, `signals`, `chain`, `direct_dependents`, `evidence`,
+`from_composer_repository`, `origin`, `replacement`, `signals`, `chain`, `direct_dependents`, `evidence`,
 `allowlist_reason`, `note`, `data_date`, `libyears`, `libyears_unmeasured`, `priority_basis`,
 `no_fix_expected`, `baseline` and `gate`. `exposure` is the `pulled in by:` line in full — every
 direct requirement that pulls in an attributable flagged transitive package, with how many, most
