@@ -13,7 +13,7 @@ mutant from the original, and says why.
 - `src/Signal/ConstraintOpenness.php:48` CastInt, `:50` CastInt, IncrementInteger, DecrementInteger,
   `:79` ConcatOperandRemoval — numeric strings compare numerically, every mutated integer stays
   below any PHP major, and `normalize("8.4")` equals `normalize("8.4.0")`.
-- `src/Analyzer/Report.php:133` UnwrapArrayValues — `flagged()`: the findings are sorted and every
+- `src/Analyzer/Report.php:134` UnwrapArrayValues — `flagged()`: the findings are sorted and every
   flagged one precedes every unflagged one, so the filtered keys are already `0..n`; the
   `array_values()` is what makes the `list` type true by construction.
 - `src/Output/JsonFormatter.php:22` FalseValue — the `$showAll` default of the interface's
@@ -352,7 +352,7 @@ its slashes unescaped. Two are equivalent:
   the list. Breaking out of the loop at the first of them selects exactly what stepping over each of
   them selects. It is `continue` because the loop's condition is about one package, not about where
   the list stops.
-- `src/Analyzer/RunSettings.php:85` UnwrapArrayValues — `array_values()` falls away from
+- `src/Analyzer/RunSettings.php:122` UnwrapArrayValues — `array_values()` falls away from
   `flagged_verdicts`. `Verdict::all()` returns the keys of `SEVERITY` in declaration order and the
   flagged ones are the first six of them, so `array_filter()` leaves 0..5 and the reindex changes
   nothing that a test can see. It stays because the day a flagged verdict is declared below an

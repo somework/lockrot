@@ -46,8 +46,9 @@
     // mutants (one added by the clock seam of that day), 56 escaped, 2 timed out (both genuine
     // infinite loops in RepositoryMetadataLoader::loadChunked(), i.e. detections), MSI = Covered MSI
     // 98.25%, ~6m20s on 8 threads locally. tests/infection-equivalents.md holds the reasoning for
-    // all 56; the 47 added that day, one line each, as an index (line numbers moved on 2026-09-25
-    // past the `@internal` docblock lines added that day, as in tests/infection-equivalents.md):
+    // all 56; the 47 added that day, one line each, as an index. Its line numbers are those of
+    // 2026-09-25 (past the `@internal` docblock lines added that day); tests/infection-equivalents.md
+    // keeps the current ones:
     //  - Set membership written as `= true` and read only through isset(): ActivityClient.php:82,
     //    ActivityFetchPlanner.php:53 and :69, RepositoryMetadataLoader.php:275 (TrueValue).
     //  - array_values() that only makes a `list` type true, every consumer iterates: ActivityClient.php:122,
