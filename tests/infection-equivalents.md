@@ -516,7 +516,7 @@ five lines and is killed or skipped in this reading, not changed.
 
 Measured over the files the change touched, whole files, locally under Xdebug on 11 threads: every
 escape but the one below is an entry above at a moved line. `src/Data/Repository/RepositoryUrl.php`
-alone: 197 mutants, 196 killed.
+alone: 199 mutants, 198 killed.
 
 - `src/Data/Repository/RepositoryUrl.php:234` LessThan — `$at < $line` becomes `$at <= $line` in
   `closer()`. `$at` is the offset of a closing quote or bracket and `$line` that of a line

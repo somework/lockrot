@@ -31,7 +31,7 @@ final class RepositoryUrl
     private const PATH = '{(?<=^|[\s"\'`(\[\{<=,|:])(?:/(?=[^\s/])|~/|[A-Za-z]:[\\\\/]|\\\\\\\\(?=[^\s\\\\]))}';
 
     /** The user of an scp-style remote in a text, `user@host:path`, which may be a token. */
-    private const REMOTE_USER = '{(?<=^|[\s"\'`(\[\{<=,|])[^\s@/\\\\"\'<>`()\[\]\{\}:=,|]+@(?=[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+:(?!//)\S)}';
+    private const REMOTE_USER = '{(?<=^|[\s"\'`(\[\{<=,|])[^\s@/\\\\"\'<>`()\[\]\{\}:=,|]+@(?=[A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9])?:(?!//)\S)}';
 
     /** What closes what an opening character delimits; PHP quotes a path as `` `path' ``. */
     private const CLOSERS = ['"' => '"', "'" => "'", '`' => "'", '(' => ')', '[' => ']', '{' => '}', '<' => '>'];
@@ -45,7 +45,7 @@ final class RepositoryUrl
     /** What ends a URL's authority: its path, or a JSON-escaped one, whitespace, a quote, an angle bracket. */
     private const AUTHORITY_END = "/\\\"<> \t\r\n\v\f";
 
-    /** What ends a URL, and what ends a local URL no quote delimits. */
+    /** What ends a URL, and a word of a local URL no quote delimits. */
     private const URL_END = "\"'<>`) \t\r\n\v\f";
     private const WHITESPACE = " \t\r\n\v\f";
 
@@ -156,7 +156,7 @@ final class RepositoryUrl
     {
         $start = $offset + \strlen($scheme);
         if (strncasecmp($scheme, 'file:', 5) === 0) {
-            $end = self::closer($text, $offset, $start, $closers) ?? self::trimmed($text, $start, $start + strcspn($text, self::WHITESPACE, $start, $limit - $start));
+            $end = self::closer($text, $offset, $start, $closers) ?? self::pathEnd($text, $start, self::WHITESPACE, $limit);
 
             $path = substr($text, $start, $end - $start);
 
@@ -184,7 +184,7 @@ final class RepositoryUrl
             if ($offset < $at) {
                 continue;
             }
-            $end = self::closer($text, $offset, $offset, $closers) ?? self::pathEnd($text, $offset);
+            $end = self::closer($text, $offset, $offset, $closers) ?? self::pathEnd($text, $offset, self::PATH_END, \strlen($text));
             $path = substr($text, $offset, $end - $offset);
             // `/downloads` is a URL's path more often than a directory, and locates nothing on its own.
             if ($path[0] === '/' && substr_count(rtrim($path, '/'), '/') < 2) {
@@ -255,12 +255,15 @@ final class RepositoryUrl
         return $offsets[$low] ?? null;
     }
 
-    /** The end of a path outside quotes: its word, and each next word with a separator in it, as a path with spaces has. */
-    private static function pathEnd(string $text, int $from): int
+    /**
+     * The end of a path outside quotes, before $limit: its word, and each next word with a separator
+     * in it, as a path with spaces has. A word ends at a character in $stops.
+     */
+    private static function pathEnd(string $text, int $from, string $stops, int $limit): int
     {
-        $end = $from + strcspn($text, self::PATH_END, $from);
-        while (($text[$end] ?? '') === ' ') {
-            $word = substr($text, $end + 1, strcspn($text, self::PATH_END, $end + 1));
+        $end = $from + strcspn($text, $stops, $from, $limit - $from);
+        while ($end < $limit && $text[$end] === ' ') {
+            $word = substr($text, $end + 1, strcspn($text, $stops, $end + 1, $limit - $end - 1));
             if (strpbrk($word, '/\\') === false || strpos($word, '://') !== false) {
                 break;
             }
@@ -276,11 +279,14 @@ final class RepositoryUrl
         return $from + \strlen(rtrim(substr($text, $from, $end - $from), self::TRAILING));
     }
 
-    /** `.../name`, the last segment of a path split on either separator; nothing for a path of separators alone. */
+    /**
+     * `.../name`, the last segment of a path split on either separator, and the separator after it,
+     * so what follows reads as it did; nothing for a path of separators alone.
+     */
     private static function lastSegment(string $path): string
     {
-        $path = rtrim($path, '/\\');
+        $name = rtrim($path, '/\\');
 
-        return $path === '' ? '' : '.../'.preg_replace('{^.*[\\\\/]}s', '', $path);
+        return $name === '' ? '' : '.../'.preg_replace('{^.*[\\\\/]}s', '', $name).substr($path, \strlen($name));
     }
 }

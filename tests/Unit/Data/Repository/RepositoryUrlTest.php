@@ -152,7 +152,7 @@ final class RepositoryUrlTest extends TestCase
             'The "file://.../missing.json" file could not be downloaded: Failed to open stream: No such file or directory',
         ];
         yield 'a local file in single quotes' => ["The 'file:///Users/Igor Pinchuk/repo/p2/acme/a.json' URL could not be read", "The 'file://.../a.json' URL could not be read"];
-        yield 'a local repository with a trailing separator' => ['composer repo (file:///srv/satis/)', 'composer repo (file://.../satis)'];
+        yield 'a local repository with a trailing separator' => ['composer repo (file:///srv/satis/)', 'composer repo (file://.../satis/)'];
         yield 'a quoted local file on Windows' => ['"file:///C:/Users/igor/repo/p2/acme/bad.json" does not contain valid JSON', '"file://.../bad.json" does not contain valid JSON'];
         yield 'two local urls and parentheses in the words' => [
             'Could not load packages in composer repo (file:///srv/r) from file:///srv/r/p2/a/b.json: [UnexpectedValueException] Invalid version string "x (y)"',
@@ -175,6 +175,14 @@ final class RepositoryUrlTest extends TestCase
         yield 'an scp-style remote with a login' => ['failed to clone ci-user@git.acme.test:team/private.git now', 'failed to clone git.acme.test:team/private.git now'];
         yield 'an scp-style remote with a token for a user' => ["cannot read 'glpat-x9secretsecret@gitlab.acme.test:team/p.git'", "cannot read 'gitlab.acme.test:team/p.git'"];
         yield 'an e-mail address is not a remote' => ['write to a@b.example: soon, or a@b.example', 'write to a@b.example: soon, or a@b.example'];
+        yield 'an scp-style remote on a host without a dot' => ["cannot read 'glpat-x9secretsecret@buildbox:team/private.git'", "cannot read 'buildbox:team/private.git'"];
+        yield 'an address on a host without a dot is not a remote' => ['mail root@localhost: now', 'mail root@localhost: now'];
+        yield 'a local file with a space and no quotes' => ['trust anchors from file:///Users/Alice Smith/client-x9/ca.pem now', 'trust anchors from file://.../ca.pem now'];
+        yield 'a local file with a space, then a url' => ['file:///Users/Alice Smith/x https://u:p@h.example/y', 'file://.../x https://h.example/y'];
+        yield 'a local file with a space, up to a url glued to it' => ['file:///Users/Alice Smith/x/https://u:p@h.example/y', 'file://.../x/https://h.example/y'];
+        yield 'a local file with a space, at the end' => ['from file:///Users/Alice Smith/ca.pem', 'from file://.../ca.pem'];
+        yield 'a local file with a space and a query, up to a url glued to it' => ['file:///Users/Alice Smith/x/?https://u:p@h.example/y', 'file://.../x/https://h.example/y'];
+        yield 'an apostrophe in a local file with no quotes' => ["from file:///Users/O'Brien/ca.pem now", 'from file://.../ca.pem now'];
         yield 'a local file with a query' => ['"file:///home/alice/ca.pem?token=secret" x', '"file://.../ca.pem" x'];
         yield 'a local file with a fragment' => ['(file:///home/alice/ca.pem#frag) y', '(file://.../ca.pem) y'];
         yield 'a port stays' => ['from https://repo.acme.test:8443/p2/a.json', 'from https://repo.acme.test:8443/p2/a.json'];
@@ -208,8 +216,9 @@ final class RepositoryUrlTest extends TestCase
         yield 'a path that opens a text ending in a quote' => ['/Users/igor/x "/a/b" "', '.../x ".../b" "'];
         yield 'a path after a quoted one with a path inside it' => ['"/Users/igor/a /x/y" and /Users/igor/z/w', '".../y" and .../w'];
         yield 'a path with spaces in two places' => ['fopen /Users/igor/Acme Corp/New Client/x failed', 'fopen .../x failed'];
-        yield 'a next word whose separator ends it' => ['cannot open C:\\Program Files\\Acme Corp\\ now', 'cannot open .../Acme Corp now'];
+        yield 'a next word whose separator ends it' => ['cannot open C:\\Program Files\\Acme Corp\\ now', 'cannot open .../Acme Corp\\ now'];
         yield 'a next word whose separator starts it' => ['cannot read /Users/igor/a /b now', 'cannot read .../b now'];
+        yield 'a directory whose name starts with a space' => ['fopen /Users/igor/Acme Corp/ Client/x failed', 'fopen .../x failed'];
         yield 'a path with a space' => ['fopen /Users/igor/Clients/Acme Corp/app/vendor/x failed', 'fopen .../x failed'];
         yield 'a path after an equals sign' => ['cafile=/etc/ssl/private/acme.pem', 'cafile=.../acme.pem'];
         yield 'a path in parentheses' => ['cannot read (/Users/igor/x/y): denied', 'cannot read (.../y): denied'];
@@ -231,7 +240,7 @@ final class RepositoryUrlTest extends TestCase
         $noise = 'see http://status.acme.test/'.str_repeat('.', 5000).'x at /Users/igor/'.str_repeat('a/', 10000);
 
         self::assertSame(
-            'see http://status.acme.test/'.str_repeat('.', 5000).'x at .../a and https://repo.acme.test/p',
+            'see http://status.acme.test/'.str_repeat('.', 5000).'x at .../a/ and https://repo.acme.test/p',
             RepositoryUrl::inText($noise.' and https://ci:s3cr3t@repo.acme.test/p')
         );
     }
