@@ -30,6 +30,9 @@ final class RepositoryUrl
     /** Where a path on the machine starts in a text: at a word, a quote or a bracket; Unix, home, a drive or a share. */
     private const PATH = '{(?<=^|[\s"\'`(\[\{<=,|:])(?:/(?=[^\s/])|~/|[A-Za-z]:[\\\\/]|\\\\\\\\(?=[^\s\\\\]))}';
 
+    /** The user of an scp-style remote in a text, `user@host:path`, which may be a token. */
+    private const REMOTE_USER = '{(?<=^|[\s"\'`(\[\{<=,|])[^\s@/\\\\"\'<>`()\[\]\{\}:=,|]+@(?=[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+:(?!//)\S)}';
+
     /** What closes what an opening character delimits; PHP quotes a path as `` `path' ``. */
     private const CLOSERS = ['"' => '"', "'" => "'", '`' => "'", '(' => ')', '[' => ']', '{' => '}', '<' => '>'];
 
@@ -103,9 +106,9 @@ final class RepositoryUrl
     }
 
     /**
-     * A message as a report may quote it: every URL in it as {@see shown()} leaves one, a `file://`
-     * URL and every other path on the machine down to its last segment (`.../ca.pem`), and every
-     * other word as it was. Composer masks only a password and an `access_token`; a token in the user
+     * A message as a report may quote it: every URL and scp-style remote in it as {@see shown()}
+     * leaves one, a `file://` URL and every other path on the machine down to its last segment
+     * (`.../ca.pem`), and every other word as it was. Composer masks only a password and an `access_token`; a token in the user
      * slot, a login, a `?token=` and the path of an unreadable certificate all reach its messages.
      *
      * The text is scanned, not matched as a whole, so its length costs time and never the redaction;
@@ -114,7 +117,8 @@ final class RepositoryUrl
     public static function inText(string $text): string
     {
         $urls = self::urlsIn($text);
-        $paths = $urls === null ? null : self::pathsIn($urls);
+        $remotes = $urls === null ? null : preg_replace(self::REMOTE_USER, '', $urls);
+        $paths = $remotes === null ? null : self::pathsIn($remotes);
 
         return $paths ?? self::WITHHELD;
     }
@@ -154,7 +158,9 @@ final class RepositoryUrl
         if (strncasecmp($scheme, 'file:', 5) === 0) {
             $end = self::closer($text, $offset, $start, $closers) ?? self::trimmed($text, $start, $start + strcspn($text, self::WHITESPACE, $start, $limit - $start));
 
-            return [$scheme.self::lastSegment(substr($text, $start, $end - $start)), $end];
+            $path = substr($text, $start, $end - $start);
+
+            return [$scheme.self::lastSegment(substr($path, 0, strcspn($path, '?#'))), $end];
         }
         // The next URL's scheme ends in `:/` or `:\\`, so the authority never runs into it.
         $authority = substr($text, $start, strcspn($text, self::AUTHORITY_END, $start));

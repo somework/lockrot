@@ -337,14 +337,15 @@ repository it could not read (`advisories_unavailable`, `metadata_unavailable`,
 come, the hosts and repositories in S3, S4 and the repository activity notes, and, on the HTML page,
 each package's `details` (`lock.repository`, `metadata.repository`, `repository_link`, `activity`).
 
-None of them carries what opens or locates anything. Every URL they quote is written without its
-userinfo, query and fragment, whatever Composer masked of it, and a `file://` URL and every other
-path of the machine keep their last segment alone (`.../ca.pem`); a message lockrot cannot read
-whole is replaced by `(withheld: lockrot could not redact this message)`. A repository without a
-scheme loses its user (`git.example.com:lib.git`), and `lock.repository` and `metadata.repository`
-are null for a checkout on the machine. `baseline.path` is relative to the project directory, or the
-file name alone, the way `run.lock_file` names the lock. The one absolute path a report carries is
-SARIF's `%SRCROOT%` ([ci.md](ci.md#-formatsarif)).
+None of them carries a credential or a path of the machine; hosts and the paths of URLs on them stay
+visible, and name a private repository as plainly as its host does. Every URL they quote is written
+without its userinfo, query and fragment, whatever Composer masked of it, and a `file://` URL and
+every other path of the machine keep their last segment alone (`.../ca.pem`); a message lockrot
+cannot read whole is replaced by `(withheld: lockrot could not redact this message)`. A repository
+without a scheme loses its user (`git.example.com:lib.git`), and `lock.repository` and
+`metadata.repository` are null for a checkout on the machine. `baseline.path` is relative to the
+project directory, or the file name alone, the way `run.lock_file` names the lock. The one absolute
+path a report carries is SARIF's `%SRCROOT%` ([ci.md](ci.md#-formatsarif)).
 
 ## Related
 

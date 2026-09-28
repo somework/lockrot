@@ -199,7 +199,8 @@ outside the project directory is named by its file name alone.
 
 `originalUriBaseIds.%SRCROOT%` is the project directory as an absolute `file://` URL, which code
 scanning resolves the lock's name against. It is the one path of the machine a lockrot report
-carries; to publish the file anywhere else, drop it: `jq 'del(.runs[].originalUriBaseIds)' lockrot.sarif`.
+carries; to publish the file anywhere else, publish a copy without it:
+`jq 'del(.runs[].originalUriBaseIds)' lockrot.sarif > lockrot.public.sarif`.
 
 ## `--format=gitlab`
 

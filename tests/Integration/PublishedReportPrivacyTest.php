@@ -34,6 +34,7 @@ use Lockrot\Output\Formatters;
 use Lockrot\Output\InstallSummaryFormatter;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
+use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\ValidatesJsonSchemas;
 use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\Attributes\CoversNothing;
@@ -99,8 +100,20 @@ final class PublishedReportPrivacyTest extends TestCase
         // Composer 2.2 has no advisories to ask a repository for.
         self::assertContains(interface_exists(AdvisoryProviderInterface::class) ? RunNote::ADVISORIES_UNAVAILABLE : RunNote::ADVISORIES_NOT_CHECKED, $codes);
         self::assertStringContainsString('http://127.0.0.1:'.$port.'/other', $written['json'], 'the host stays, which the reader is checking');
+        // SARIF's %SRCROOT% is the project directory on purpose: code scanning resolves results against it.
+        $sarif = json_decode($written['sarif'], true);
+        self::assertIsArray($sarif);
+        $runs = [];
+        foreach (JsonPath::arrayAt($sarif, ['runs']) as $run) {
+            self::assertIsArray($run);
+            unset($run['originalUriBaseIds']);
+            $runs[] = $run;
+        }
+        $sarif['runs'] = $runs;
+        $written['sarif'] = (string) json_encode($sarif, \JSON_UNESCAPED_SLASHES);
+        $project = array_unique([$this->dir, (string) realpath($this->dir)]);
         foreach ($written as $what => $text) {
-            foreach (self::NEVER_WRITTEN as $secret) {
+            foreach (array_merge(self::NEVER_WRITTEN, $project, str_replace('/', '\\/', $project)) as $secret) {
                 self::assertStringNotContainsString($secret, $text, $what.' carries '.$secret);
             }
         }

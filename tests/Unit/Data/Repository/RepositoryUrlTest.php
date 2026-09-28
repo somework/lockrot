@@ -172,8 +172,13 @@ final class RepositoryUrlTest extends TestCase
         yield 'a url right after a local one' => ['file:///srv/a/b,https://u:p@h.example/x', 'file://.../b,https://h.example/x'];
         yield 'an empty local url' => ['see "file://" and "/Users/igor/x/y"', 'see "file://" and ".../y"'];
         yield 'a url, then a word with an @' => ['see https://h.example and write to a@b.example', 'see https://h.example and write to a@b.example'];
+        yield 'an scp-style remote with a login' => ['failed to clone ci-user@git.acme.test:team/private.git now', 'failed to clone git.acme.test:team/private.git now'];
+        yield 'an scp-style remote with a token for a user' => ["cannot read 'glpat-x9secretsecret@gitlab.acme.test:team/p.git'", "cannot read 'gitlab.acme.test:team/p.git'"];
+        yield 'an e-mail address is not a remote' => ['write to a@b.example: soon, or a@b.example', 'write to a@b.example: soon, or a@b.example'];
+        yield 'a local file with a query' => ['"file:///home/alice/ca.pem?token=secret" x', '"file://.../ca.pem" x'];
+        yield 'a local file with a fragment' => ['(file:///home/alice/ca.pem#frag) y', '(file://.../ca.pem) y'];
         yield 'a port stays' => ['from https://repo.acme.test:8443/p2/a.json', 'from https://repo.acme.test:8443/p2/a.json'];
-        yield 'ssh, and an scp-style remote' => ['ssh://git@github.com/acme/lib.git; git@github.com:acme/lib.git', 'ssh://github.com/acme/lib.git; git@github.com:acme/lib.git'];
+        yield 'ssh, and an scp-style remote' => ['ssh://git@github.com/acme/lib.git; git@github.com:acme/lib.git', 'ssh://github.com/acme/lib.git; github.com:acme/lib.git'];
         yield 'a certificate file curl could not read' => [
             'curl error 77 while downloading https://repo.example.com/packages.json: error adding trust anchors from file: /Users/igor/client-x/certs/ca.pem',
             'curl error 77 while downloading https://repo.example.com/packages.json: error adding trust anchors from file: .../ca.pem',

@@ -518,8 +518,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- **A report no longer quotes a credential or a path of the machine it ran on.** A report is
-  published, and three parts of it carried what Composer, curl and the lock hold:
+- **A report no longer quotes a credential, nor, SARIF's `%SRCROOT%` aside, a path of the machine it
+  ran on.** A report is published, and three parts of it carried what Composer, curl and the lock hold:
   - The run notes about a Composer repository lockrot could not read quoted Composer's words:
     `advisories_unavailable` its name for the repository, and it, `metadata_unavailable` and
     `monorepo_parent_unavailable` the error, which a finding left without metadata carries too, as
