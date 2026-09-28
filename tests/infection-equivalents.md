@@ -13,7 +13,7 @@ mutant from the original, and says why.
 - `src/Signal/ConstraintOpenness.php:48` CastInt, `:50` CastInt, IncrementInteger, DecrementInteger,
   `:79` ConcatOperandRemoval — numeric strings compare numerically, every mutated integer stays
   below any PHP major, and `normalize("8.4")` equals `normalize("8.4.0")`.
-- `src/Analyzer/Report.php:134` UnwrapArrayValues — `flagged()`: the findings are sorted and every
+- `src/Analyzer/Report.php:130` UnwrapArrayValues — `flagged()`: the findings are sorted and every
   flagged one precedes every unflagged one, so the filtered keys are already `0..n`; the
   `array_values()` is what makes the `list` type true by construction.
 - `src/Output/JsonFormatter.php:22` FalseValue — the `$showAll` default of the interface's
@@ -312,7 +312,7 @@ slow test. They are listed here only so nobody reads them as an unexplained "2 t
 
 ## JSON schemas and monorepo-dated branches (2026-09-20)
 
-- `src/Analyzer/Analyzer.php:234` ReturnRemoval — `dateSplitPackages()` returns early when no
+- `src/Analyzer/Analyzer.php:227` ReturnRemoval — `dateSplitPackages()` returns early when no
   package needs dates. Without the return the method runs on: `missingCandidates()` intersects
   every parent's list with an empty children list and returns nothing, no request is made, and
   `date([])` hands the batch back untouched. The guard states the common case, it does not decide it.
@@ -352,7 +352,7 @@ its slashes unescaped. Two are equivalent:
   the list. Breaking out of the loop at the first of them selects exactly what stepping over each of
   them selects. It is `continue` because the loop's condition is about one package, not about where
   the list stops.
-- `src/Analyzer/RunSettings.php:122` UnwrapArrayValues — `array_values()` falls away from
+- `src/Analyzer/RunSettings.php:85` UnwrapArrayValues — `array_values()` falls away from
   `flagged_verdicts`. `Verdict::all()` returns the keys of `SEVERITY` in declaration order and the
   flagged ones are the first six of them, so `array_filter()` leaves 0..5 and the reindex changes
   nothing that a test can see. It stays because the day a flagged verdict is declared below an
@@ -467,3 +467,15 @@ timeout raised to 3600 s runs every mutant and escapes the same three (323 mutan
 The four still skipped under Xdebug are `Report`'s constructor and `findings()` (180.4 s, since
 every test builds a report), none of them gate code, and the run without a timeout kills all four.
 CI's pcov shards skipped no mutant before this branch.
+
+## Typed run notes (0.13.0, 2026-09-28)
+
+Measured over `src/Analyzer/RunNote.php`, `src/Data/Repository/MetadataFailure.php`,
+`src/Data/Advisory/AdvisoryBatch.php`, `src/Data/Advisory/RepositoryAdvisoryLoader.php`,
+`src/Data/Advisory/AdvisoryIgnore.php`, `src/Analyzer/Report.php`, `src/Analyzer/Analyzer.php` and
+`src/Explain/Explanation.php`, whole files, locally under Xdebug: the escapes left are the two
+entries above, which moved to `Report.php:130` and `Analyzer.php:227` when the notes left those
+files. Two `continue` → `break` mutants in `Analyzer::activityNotCheckedReasons()` (the offline and
+the spent-budget arms) escaped every test before this branch and are killed now by
+`AnalyzerRunNotesTest`, which reads two packages' reasons where one had been enough. The notes add
+no escape. `RunNoteAgreementTest` covers nothing, for the reason `GateAgreementTest` gives.
