@@ -683,18 +683,7 @@ final class JsonSchemaConformanceTest extends TestCase
      */
     public function testAFindingSaysWhetherARepositoryWasAskedAboutItAsABoolean(): void
     {
-        $analysis = self::analysis('apps/wallabag_wallabag');
-        $finding = $analysis->finding('doctrine/cache');
-        $facts = $analysis->facts('doctrine/cache');
-        self::assertNotNull($finding);
-        self::assertNotNull($facts);
-        $documents = [
-            Schemas::REPORT => [(new JsonFormatter())->format($analysis->report()), ['findings', 0]],
-            Schemas::EXPLAIN => [(new ExplainFormatter())->json(new Explanation($finding, $facts, new Thresholds(), '8.4', $analysis->report())), ['finding']],
-        ];
-        foreach ($documents as $schema => [$json, $path]) {
-            $decoded = json_decode($json, true);
-            self::assertIsArray($decoded);
+        foreach (self::documentsFor('doctrine/cache') as $schema => [$decoded, $path]) {
             self::assertTrue(JsonPath::arrayAt($decoded, $path)['from_composer_repository'], $schema.': wallabag\'s packages all come from Packagist');
             foreach ([true, false, self::ABSENT] as $value) {
                 $what = $schema.' '.var_export($value, true);
@@ -715,30 +704,8 @@ final class JsonSchemaConformanceTest extends TestCase
      */
     public function testAFindingSaysWhyItsLibyearsAreNullAsAnOpenCode(): void
     {
-        $analysis = self::analysis('apps/wallabag_wallabag');
-        $finding = $analysis->finding('wallabag/rulerz');
-        $facts = $analysis->facts('wallabag/rulerz');
-        self::assertNotNull($finding);
-        self::assertNotNull($facts);
-        $report = json_decode((new JsonFormatter())->format($analysis->report()), true);
-        self::assertIsArray($report);
-        $at = null;
-        foreach (JsonPath::arrayAt($report, ['findings']) as $i => $row) {
-            self::assertIsArray($row);
-            if ($row['package'] === 'wallabag/rulerz') {
-                $at = $i;
-            }
-        }
-        self::assertIsInt($at);
-        // The helper edits the first finding: rulerz, a dev-master pin, is moved there.
-        $findings = JsonPath::arrayAt($report, ['findings']);
-        $report['findings'] = array_merge([$findings[$at]], array_values(array_diff_key($findings, [$at => true])));
-        $documents = [
-            Schemas::REPORT => [$report, ['findings', 0]],
-            Schemas::EXPLAIN => [json_decode((new ExplainFormatter())->json(new Explanation($finding, $facts, new Thresholds(), '8.4', $analysis->report())), true), ['finding']],
-        ];
+        $documents = self::documentsFor('wallabag/rulerz');
         foreach ($documents as $schema => [$decoded, $path]) {
-            self::assertIsArray($decoded);
             self::assertSame(Libyears::BRANCH_SNAPSHOT, JsonPath::arrayAt($decoded, $path)['libyears_unmeasured'], $schema.': rulerz is a branch snapshot');
             foreach (array_merge(Libyears::REASONS, [null, self::ABSENT]) as $value) {
                 $what = $schema.' '.var_export($value, true);
@@ -758,6 +725,7 @@ final class JsonSchemaConformanceTest extends TestCase
         }
 
         // The block's keys: one a later release adds is a count; a key that is not a count fails.
+        [$report] = $documents[Schemas::REPORT];
         $block = JsonPath::arrayAt($report, ['libyears', 'unmeasured']);
         $withKey = static function ($value) use ($report, $block): string {
             $libyears = JsonPath::arrayAt($report, ['libyears']);
