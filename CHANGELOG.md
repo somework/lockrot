@@ -363,10 +363,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   table, markdown, GitHub, GitLab and SARIF formats, the `--explain` text and the baseline.
 
 - Each finding says where its lock entry came from: `origin`, with a `kind`, the `registry` where
-  lockrot can name it and the package's page there, `package_url`. Until now the HTML page linked
+  lockrot can name it and the package's page there, `package_url`. The report page links
   `https://packagist.org/packages/<name>` for every finding whose `from_composer_repository` is
   true, which Private Packagist, WP Packages, Drupal and a Satis with a notify URL all are, so a
-  package from any of them got a link to a page that is missing or belongs to someone else. `kind`
+  package from any of them gets a link to a page that is missing or belongs to someone else. `kind`
   is an open set: `packagist` and `composer` (the entry's notification-url reports to packagist.org,
   or to another host), exactly the two kinds whose `from_composer_repository` is true, which is now
   read from the kind; `path`, `vcs`, `artifact` and `package` (a path dist, or the source, archive or
@@ -375,8 +375,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   entries carry nothing of it. `registry` names `packagist.org`, `repo.packagist.com`,
   `wp-packages.org` or `packages.drupal.org`, and is null for any other host, so a private
   registry's host is not written. `package_url` is set for packagist.org and wp-packages.org when the
-  name is a Composer package name, and is otherwise null; the page links it and builds no URL of its
-  own. Nothing in `origin` is copied from the lock's or the manifest's URLs, which can carry logins,
+  name is a Composer package name, and is otherwise null, for a page to link without building a URL
+  of its own. Nothing in `origin` is copied from the lock's or the manifest's URLs, which can carry logins,
   an organisation or a machine path, and no repository is asked for it: the same lock and manifest
   give the same `origin` anywhere. [schema.md](docs/schema.md#where-a-package-came-from) says what
   each kind means and what a report says about a project's repositories, and the
@@ -385,8 +385,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the libyears bucket, the page's `details` and the `--explain` document over every fixture lock and
   a hand-built one with every kind. It is optional in both schemas, so documents written before
   0.13.0 still validate, and the 0.13.0 schema snapshot is refreshed. It reaches `--format=json`,
-  the report inside the `--format=html` page and the `--explain` document's `finding`; every
-  verdict, priority, note, evidence line, exit code and `from_composer_repository` is unchanged, as
+  the report inside the `--format=html` page (the page vendored here does not read it yet) and the
+  `--explain` document's `finding`; every verdict, priority, note, evidence line, exit code and
+  `from_composer_repository` is unchanged, as
   are the table, markdown, GitHub, GitLab and SARIF formats, the `--explain` text, the install-time
   summary and the baseline.
 

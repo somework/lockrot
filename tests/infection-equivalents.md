@@ -36,7 +36,7 @@ mutant from the original, and says why.
 
 ## src/Verdict/Finding.php (0.11.0, the successor)
 
-- `src/Verdict/Finding.php:341` LogicalAnd (`is_string($replacement) && $replacement !== ''` → `||`)
+- `src/Verdict/Finding.php:346` LogicalAnd (`is_string($replacement) && $replacement !== ''` → `||`)
   — `replacement()`: the one caller is `successor()`, which then requires a `/` and a name Composer
   accepts. Under `||` a null stays null (the ternary returns the value itself) and an empty string
   is returned instead of null, and an empty string has no `/`, so `successor()` answers null either
@@ -312,7 +312,7 @@ slow test. They are listed here only so nobody reads them as an unexplained "2 t
 
 ## JSON schemas and monorepo-dated branches (2026-09-20)
 
-- `src/Analyzer/Analyzer.php:225` ReturnRemoval — `dateSplitPackages()` returns early when no
+- `src/Analyzer/Analyzer.php:227` ReturnRemoval — `dateSplitPackages()` returns early when no
   package needs dates. Without the return the method runs on: `missingCandidates()` intersects
   every parent's list with an empty children list and returns nothing, no request is made, and
   `date([])` hands the batch back untouched. The guard states the common case, it does not decide it.
@@ -476,7 +476,7 @@ Measured over `src/Analyzer/RunNote.php`, `src/Data/Repository/MetadataFailure.p
 `src/Explain/Explanation.php`, whole files, locally under Xdebug on 10 threads with the timeout
 raised to 3600 s and `--only-covering-test-cases`, so that every mutant runs: 580 mutants, 577
 killed, 3 escaped, none skipped, ~6m45s. Two escapes are entries above, which moved to
-`Report.php:130` and `Analyzer.php:225` when the notes left those files; the third is below. The
+`Report.php:130` and `Analyzer.php:225` (`:227` since the origin) when the notes left those files; the third is below. The
 notes add no escape. Under the repository's 180 s timeout Infection skips many of these mutants
 unrun (it leaves a mutant out when its covering tests' summed time passes the timeout), and an
 earlier reading of these files taken that way claimed a clean result it had not measured.
@@ -484,12 +484,28 @@ earlier reading of these files taken that way claimed a clean result it had not 
 Two `continue` → `break` mutants in `Analyzer::activityNotCheckedReasons()` (the offline and the
 spent-budget arms) escaped every test before this branch and are killed now by
 `AnalyzerRunNotesTest`, which reads two packages' reasons where one had been enough. Two older
-escapes in `buildFinding()`'s S10 filter, the LogicalOr on `Analyzer.php:389` and the
-UnwrapArrayFilter on `:390`, went undocumented since S10 arrived: no test held an allowlisted
+escapes in `buildFinding()`'s S10 filter, the LogicalOr on `Analyzer.php:391` and the
+UnwrapArrayFilter on `:392`, went undocumented since S10 arrived: no test held an allowlisted
 package with an S10 to losing it. `AnalyzerTest::testS10IsLeftOffAnAllowlistedPackageAndAnAbandonedOne`
 kills both. `RunNoteAgreementTest` covers nothing, for the reason `GateAgreementTest` gives.
 
-- `src/Analyzer/Analyzer.php:390` UnwrapArrayValues — `array_values()` over the signals with S10
+- `src/Analyzer/Analyzer.php:392` UnwrapArrayValues — `array_values()` over the signals with S10
   filtered out. `SignalSet::evaluate()` sorts the signals by number and S10 is the highest, so it is
   always the last element: removing it leaves the keys `0..n-1` already, and the `array_values()`
   only makes the `list` type true by construction.
+
+## Where a lock entry came from (0.13.0, 2026-09-28)
+
+Measured over `src/Lock/PackageOrigin.php`, `src/Lock/ConfiguredRepositories.php`,
+`src/Lock/OriginFacts.php`, `src/Lock/LockedPackage.php`, `src/Lock/ProjectConfig.php`,
+`src/Analyzer/Analyzer.php`, `src/Verdict/Finding.php` and `src/Data/Forge/RepoLocator.php`, whole
+files, locally under Xdebug on 11 threads: 376 mutants, 372 killed, 4 escaped. Two escapes are
+entries above, `Analyzer.php:227` (moved two lines when the analyzer started resolving each
+package's origin) and `RepoLocator.php:141`; the other two are below. `Finding.php:346` (above) moved
+five lines and is killed or skipped in this reading, not changed.
+
+- `src/Lock/ConfiguredRepositories.php:285` CastString and
+- `src/Lock/ConfiguredRepositories.php:286` CastString — `(string) preg_replace(...)` on a VCS
+  repository's host and path in `remoteKey()`, the shape of `RepoLocator.php:141`: both patterns are
+  literals, so preg_replace returns a string and never null.
+

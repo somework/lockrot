@@ -115,7 +115,7 @@
     // Infection skipped their mutants unrun. That test covers nothing now; the measurement is in
     // tests/infection-equivalents.md.
     //
-    // 2026-09-28 (typed run notes): the notes add no escape; Analyzer.php:390 UnwrapArrayValues (S10
+    // 2026-09-28 (typed run notes): the notes add no escape; Analyzer.php:392 UnwrapArrayValues (S10
     // sorts last, so filtering it out leaves a list) is documented, and the two older escapes of
     // that S10 filter are killed. Measured with the timeout raised so every mutant runs.
     //
