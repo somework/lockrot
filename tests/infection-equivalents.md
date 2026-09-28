@@ -473,9 +473,23 @@ CI's pcov shards skipped no mutant before this branch.
 Measured over `src/Analyzer/RunNote.php`, `src/Data/Repository/MetadataFailure.php`,
 `src/Data/Advisory/AdvisoryBatch.php`, `src/Data/Advisory/RepositoryAdvisoryLoader.php`,
 `src/Data/Advisory/AdvisoryIgnore.php`, `src/Analyzer/Report.php`, `src/Analyzer/Analyzer.php` and
-`src/Explain/Explanation.php`, whole files, locally under Xdebug: the escapes left are the two
-entries above, which moved to `Report.php:130` and `Analyzer.php:227` when the notes left those
-files. Two `continue` → `break` mutants in `Analyzer::activityNotCheckedReasons()` (the offline and
-the spent-budget arms) escaped every test before this branch and are killed now by
-`AnalyzerRunNotesTest`, which reads two packages' reasons where one had been enough. The notes add
-no escape. `RunNoteAgreementTest` covers nothing, for the reason `GateAgreementTest` gives.
+`src/Explain/Explanation.php`, whole files, locally under Xdebug on 10 threads with the timeout
+raised to 3600 s and `--only-covering-test-cases`, so that every mutant runs: 580 mutants, 577
+killed, 3 escaped, none skipped, ~6m45s. Two escapes are entries above, which moved to
+`Report.php:130` and `Analyzer.php:227` when the notes left those files; the third is below. The
+notes add no escape. Under the repository's 180 s timeout Infection skips many of these mutants
+unrun (it leaves a mutant out when its covering tests' summed time passes the timeout), and an
+earlier reading of these files taken that way claimed a clean result it had not measured.
+
+Two `continue` → `break` mutants in `Analyzer::activityNotCheckedReasons()` (the offline and the
+spent-budget arms) escaped every test before this branch and are killed now by
+`AnalyzerRunNotesTest`, which reads two packages' reasons where one had been enough. Two older
+escapes in `buildFinding()`'s S10 filter, the LogicalOr on `Analyzer.php:391` and the
+UnwrapArrayFilter on `:392`, went undocumented since S10 arrived: no test held an allowlisted
+package with an S10 to losing it. `AnalyzerTest::testS10IsLeftOffAnAllowlistedPackageAndAnAbandonedOne`
+kills both. `RunNoteAgreementTest` covers nothing, for the reason `GateAgreementTest` gives.
+
+- `src/Analyzer/Analyzer.php:392` UnwrapArrayValues — `array_values()` over the signals with S10
+  filtered out. `SignalSet::evaluate()` sorts the signals by number and S10 is the highest, so it is
+  always the last element: removing it leaves the keys `0..n-1` already, and the `array_values()`
+  only makes the `list` type true by construction.

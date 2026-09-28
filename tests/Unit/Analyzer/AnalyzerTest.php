@@ -360,6 +360,26 @@ final class AnalyzerTest extends TestCase
         self::assertSame('complete', $report->findings()[0]->allowlistReason());
     }
 
+    /**
+     * S10 only where the missing check could have changed the verdict: each of the three packages
+     * has undated newest releases, and only the one neither allowlisted nor marked abandoned keeps it.
+     */
+    public function testS10IsLeftOffAnAllowlistedPackageAndAnAbandonedOne(): void
+    {
+        $undated = static fn (string $name, bool $abandoned): PackageMetadata => new PackageMetadata($name, $abandoned, null, true, null, '1.0.0', 1, null, 'library', new \DateTimeImmutable(F::NOW));
+        $metadata = ['vendor/allowlisted' => $undated('vendor/allowlisted', false), 'vendor/abandoned' => $undated('vendor/abandoned', true), 'vendor/plain' => $undated('vendor/plain', false)];
+        $allowlist = new Allowlist([new AllowlistEntry('vendor/allowlisted', null, 'complete', null, 'builtin')]);
+
+        $byName = self::byName($this->analyzeLock([self::locked('vendor/allowlisted'), self::locked('vendor/abandoned'), self::locked('vendor/plain')], $this->loader($metadata), $this->http([]), true, $allowlist));
+        $ids = static fn (string $name): array => array_map(static fn ($s) => $s->id(), $byName[$name]->signals());
+
+        self::assertSame(['S10'], $ids('vendor/plain'), 'the control: undated releases raise S10');
+        self::assertSame(Verdict::FINISHED, $byName['vendor/allowlisted']->verdict());
+        self::assertSame([], $ids('vendor/allowlisted'));
+        self::assertSame(Verdict::ABANDONED, $byName['vendor/abandoned']->verdict());
+        self::assertSame(['S1'], $ids('vendor/abandoned'));
+    }
+
     public function testRepositoryMetadataFailureIsUnknownWithNoteAndNetworkFlag(): void
     {
         $lock = LockFile::fromArray(['packages' => [['name' => 'vendor/direct', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/']]]);
