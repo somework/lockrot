@@ -56,16 +56,4 @@ final class AdvisoryBatch
     {
         return $this->notes;
     }
-
-    /** A repository could not be reached: what `--strict-network` fails on, as the notes say. */
-    public function hadNetworkFailure(): bool
-    {
-        foreach ($this->notes as $note) {
-            if ($note->setsNetworkFailures()) {
-                return true;
-            }
-        }
-
-        return false;
-    }
 }

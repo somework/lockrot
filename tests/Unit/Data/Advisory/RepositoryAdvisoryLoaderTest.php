@@ -83,7 +83,6 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
         $batch = $loader->load(['doctrine/cache' => '2.2.0', 'doctrine/annotations' => '2.0.2', 'symfony/console' => 'v5.4.47']);
 
         self::assertSame([], self::texts($batch));
-        self::assertFalse($batch->hadNetworkFailure());
         self::assertSame(['doctrine/cache', 'doctrine/annotations'], array_keys($batch->byName()));
         $advisories = $batch->for('doctrine/cache');
         self::assertSame(['PKSA-cache-1', 'PKSA-cache-3'], array_map(static fn (Advisory $a): string => $a->id(), $advisories));
@@ -129,7 +128,7 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
         self::assertSame(RunNote::ADVISORY_IGNORE_UNREADABLE, $batch->notes()[0]->code());
         self::assertSame(['message' => 'Unknown key "licenses"'], $batch->notes()[0]->data());
         self::assertCount(2, $batch->for('doctrine/cache'), 'nothing is ignored');
-        self::assertFalse($batch->hadNetworkFailure());
+        self::assertSame([false], self::networkFailures($batch));
     }
 
     public function testAnUnparsableInstalledVersionIsSkippedNotFatal(): void
@@ -172,7 +171,7 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
             self::assertStringContainsString('could not be loaded as a full advisory', self::texts($batch)[0]);
             self::assertStringNotContainsString("\n", self::texts($batch)[0], 'one line: the var_export dump Composer appends is cut');
             self::assertStringNotContainsString('advisoryId', self::texts($batch)[0]);
-            self::assertFalse($batch->hadNetworkFailure());
+            self::assertSame([false], self::networkFailures($batch));
 
             $behind = new RepositoryAdvisoryLoader(array_merge($partial->repositories(), $this->server()->repositories()));
 
@@ -217,8 +216,7 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
         self::assertCount(1, self::texts($batch));
         self::assertStringStartsWith('security advisories unavailable from ', self::texts($batch)[0]);
         self::assertSame(RunNote::ADVISORIES_UNAVAILABLE, $batch->notes()[0]->code());
-        self::assertTrue($batch->notes()[0]->setsNetworkFailures(), 'a transport failure');
-        self::assertTrue($batch->hadNetworkFailure());
+        self::assertSame([true], self::networkFailures($batch), 'a transport failure');
         self::assertCount(2, $batch->for('doctrine/cache'));
     }
 
@@ -250,7 +248,7 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
             self::assertCount(1, self::texts($batch));
             self::assertStringContainsString('does not contain valid JSON', self::texts($batch)[0]);
             self::assertStringNotContainsString("\n", self::texts($batch)[0]);
-            self::assertFalse($batch->hadNetworkFailure(), 'the server answered; what it said was the problem');
+            self::assertSame([false], self::networkFailures($batch), 'the server answered; what it said was the problem');
             self::assertCount(2, $batch->for('doctrine/cache'));
         } finally {
             $corrupt->stop();
@@ -293,8 +291,7 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
         $batch = (new RepositoryAdvisoryLoader(array_merge([$throwing(new \LogicException("first line\nsecond line"))], $this->server()->repositories())))->load(['doctrine/cache' => '2.2.0']);
         self::assertSame(['security advisories unavailable from throwing repo: first line'], self::texts($batch));
         self::assertSame(['composer_repository' => 'throwing repo', 'message' => 'first line'], $batch->notes()[0]->data());
-        self::assertFalse($batch->notes()[0]->setsNetworkFailures());
-        self::assertFalse($batch->hadNetworkFailure());
+        self::assertSame([false], self::networkFailures($batch));
         self::assertCount(2, $batch->for('doctrine/cache'));
 
         $batch = (new RepositoryAdvisoryLoader([$throwing(new \RuntimeException(''))]))->load(['doctrine/cache' => '2.2.0']);
@@ -310,7 +307,7 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
 
         self::assertSame(['offline: security advisories not checked; a priority they would raise stays one step lower'], self::texts($batch));
         self::assertSame(['reason' => 'offline', 'composer_repositories_checked' => 0], $batch->notes()[0]->data());
-        self::assertFalse($batch->hadNetworkFailure());
+        self::assertSame([false], self::networkFailures($batch));
         self::assertSame([], $batch->byName());
     }
 
@@ -334,8 +331,7 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
         self::assertStringStartsWith('security advisories unavailable from ', self::texts($batch)[0]);
         self::assertSame(self::BUDGET_NOTE, self::texts($batch)[1]);
         self::assertSame(['reason' => 'install_time_budget', 'composer_repositories_checked' => 1], $batch->notes()[1]->data(), 'the first repository was asked before the budget ran out, so the check was partial');
-        self::assertTrue($batch->notes()[0]->setsNetworkFailures());
-        self::assertTrue($batch->hadNetworkFailure());
+        self::assertSame([true, false], self::networkFailures($batch));
         self::assertSame([], $batch->byName(), 'the second repository was never asked');
     }
 
@@ -351,7 +347,7 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
 
         self::assertSame([self::BUDGET_NOTE], self::texts($batch));
         self::assertSame(['reason' => 'install_time_budget', 'composer_repositories_checked' => 0], $batch->notes()[0]->data());
-        self::assertFalse($batch->hadNetworkFailure());
+        self::assertSame([false], self::networkFailures($batch));
     }
 
     /** On the Composer 2.2 LTS the whole check is one note; on 2.4+ that note never appears. */
@@ -374,5 +370,11 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
     private static function texts(AdvisoryBatch $batch): array
     {
         return array_map(static fn (RunNote $note): string => $note->text(), $batch->notes());
+    }
+
+    /** @return list<bool> each note's `sets_network_failures`, in order */
+    private static function networkFailures(AdvisoryBatch $batch): array
+    {
+        return array_map(static fn (RunNote $note): bool => $note->setsNetworkFailures(), $batch->notes());
     }
 }
