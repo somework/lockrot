@@ -144,7 +144,7 @@ final class OriginAgreementTest extends TestCase
             self::assertIsString($kind, $what);
             $kinds[$kind] = ($kinds[$kind] ?? 0) + 1;
 
-            self::assertSame(PackageOrigin::isComposerRepositoryKind($kind), $row['from_composer_repository'], $what.': one rule');
+            self::assertSame(\in_array($kind, ['packagist', 'composer'], true), $row['from_composer_repository'], $what.': one rule');
             self::assertArrayHasKey($package, $notifications, $what);
             self::assertSame($notifications[$package] !== null, $row['from_composer_repository'], $what.': the lock entry\'s notification-url');
             self::assertSame(self::hostOf($notifications[$package]) === 'packagist.org', $kind === PackageOrigin::PACKAGIST, $what.': packagist is packagist.org\'s notification-url');

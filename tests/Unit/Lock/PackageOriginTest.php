@@ -63,6 +63,11 @@ final class PackageOriginTest extends TestCase
         self::assertSame('path', PackageOrigin::of('acme/lib', '2.0.0', $facts, $inline)->kind(), 'another version is not what the definition gives');
     }
 
+    public function testAnEmptyNotificationUrlIsNone(): void
+    {
+        self::assertSame('unknown', PackageOrigin::of('acme/lib', '1.0.0', new OriginFacts('', null, null, null, null), ConfiguredRepositories::none())->kind());
+    }
+
     public function testAnEntryNoConfiguredRepositoryServedIsUnknown(): void
     {
         $facts = new OriginFacts(null, 'zip', 'https://api.github.com/repos/jquery/jquery-dist/zipball/abc', 'git', 'git@github.com:jquery/jquery-dist.git');

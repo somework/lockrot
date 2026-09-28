@@ -22,11 +22,14 @@ final class ConfiguredRepositories
 {
     private const VCS_TYPES = ['vcs', 'git', 'github', 'gitlab', 'bitbucket', 'git-bitbucket', 'hg', 'svn', 'fossil', 'perforce'];
 
-    /** @var list<array{type: string, url: ?string, only: ?string, exclude: ?string, canonical: bool, packages: list<Definition>}> */
+    /** Every type Composer builds a root repository of, 2.2 to 2.10; a plugin's types exist only after the root repositories. */
+    private const TYPES = ['vcs', 'git', 'github', 'gitlab', 'bitbucket', 'git-bitbucket', 'hg', 'svn', 'fossil', 'perforce', 'composer', 'package', 'artifact', 'path'];
+
+    /** @var list<array{type: string, url: string, only: ?string, exclude: ?string, canonical: bool, packages: list<Definition>}> */
     private array $repositories;
     private bool $refused;
 
-    /** @param list<array{type: string, url: ?string, only: ?string, exclude: ?string, canonical: bool, packages: list<Definition>}> $repositories */
+    /** @param list<array{type: string, url: string, only: ?string, exclude: ?string, canonical: bool, packages: list<Definition>}> $repositories */
     private function __construct(array $repositories, bool $refused)
     {
         $this->repositories = $repositories;
@@ -89,7 +92,7 @@ final class ConfiguredRepositories
         return $path ? PackageOrigin::PATH : null;
     }
 
-    /** @param array{type: string, url: ?string, canonical: bool, packages: list<Definition>} $repository */
+    /** @param array{type: string, url: string, canonical: bool, packages: list<Definition>} $repository */
     private static function serving(array $repository, string $name, string $version, OriginFacts $facts): ?string
     {
         $type = $repository['type'];
@@ -110,11 +113,7 @@ final class ConfiguredRepositories
             return $inside === null ? PackageOrigin::UNKNOWN : ($inside ? PackageOrigin::ARTIFACT : null);
         }
         // A path repository would have left a path dist, and packagist.org a notification-url.
-        if ($type === 'path' || ($type === 'composer' && self::isPackagist($repository['url']))) {
-            return null;
-        }
-
-        return PackageOrigin::UNKNOWN;
+        return $type === 'path' || self::isPackagist($repository['url']) ? null : PackageOrigin::UNKNOWN;
     }
 
     /** @param array{type: string, packages: list<Definition>} $repository */
@@ -132,11 +131,11 @@ final class ConfiguredRepositories
      *
      * @param mixed $repository
      *
-     * @return array{type: string, url: ?string, only: ?string, exclude: ?string, canonical: bool, packages: list<Definition>}|null
+     * @return array{type: string, url: string, only: ?string, exclude: ?string, canonical: bool, packages: list<Definition>}|null
      */
     private static function read($repository): ?array
     {
-        if (!\is_array($repository) || !\is_string($repository['type'] ?? null)) {
+        if (!\is_array($repository) || !\in_array($repository['type'] ?? null, self::TYPES, true)) {
             return null;
         }
         $url = $repository['url'] ?? null;
@@ -144,7 +143,8 @@ final class ConfiguredRepositories
         $packages = self::definitions($repository['type'] === 'package' ? $repository['package'] ?? null : []);
         $only = self::filter($repository, 'only');
         $exclude = self::filter($repository, 'exclude');
-        if (($url !== null && !\is_string($url)) || !\is_bool($canonical) || $packages === null || $only === false || $exclude === false || ($only !== null && $exclude !== null)) {
+        $url = \is_string($url) ? $url : ($repository['type'] === 'package' && $url === null ? '' : null);
+        if ($url === null || !\is_bool($canonical) || $packages === null || $only === false || $exclude === false || ($only !== null && $exclude !== null)) {
             return null;
         }
 
@@ -182,11 +182,14 @@ final class ConfiguredRepositories
      */
     private static function filter(array $repository, string $key)
     {
-        if (!\array_key_exists($key, $repository)) {
+        if (!isset($repository[$key])) {
             return null;
         }
+        if (!\is_array($repository[$key])) {
+            return false;
+        }
         $names = [];
-        foreach (\is_array($repository[$key]) ? $repository[$key] : [false] as $name) {
+        foreach ($repository[$key] as $name) {
             if (!\is_string($name)) {
                 return false;
             }
@@ -250,31 +253,34 @@ final class ConfiguredRepositories
         return \is_array($reference) ? [$reference['type'] ?? null, $reference['url'] ?? null] : [null, null];
     }
 
-    private static function isPackagist(?string $url): bool
+    private static function isPackagist(string $url): bool
     {
-        $host = $url === null ? null : parse_url($url, \PHP_URL_HOST);
+        $host = parse_url($url, \PHP_URL_HOST);
         $host = \is_string($host) ? strtolower($host) : '';
 
         return $host === 'packagist.org' || substr($host, -\strlen('.packagist.org')) === '.packagist.org';
     }
 
-    private static function sameRepository(?string $configured, ?string $source): bool
+    private static function sameRepository(string $configured, ?string $source): bool
     {
-        $configured = self::repositoryKey($configured);
+        if ($source === null) {
+            return false;
+        }
+        $remote = self::remoteKey($configured);
+        if ($remote !== null) {
+            return $remote === self::remoteKey($source);
+        }
 
-        return $configured !== null && $configured === self::repositoryKey($source);
+        // GitDriver records a local repository as configured, less a trailing /.git; ~ and variables stay unexpanded.
+        return strpbrk($configured, '~$') === false && self::localKey($configured) === self::localKey($source);
     }
 
-    /** Host without its port, and path, as one repository reads over https and ssh alike; a local path as it is written. */
-    private static function repositoryKey(?string $url): ?string
+    /** Host without its port, and path, as one repository reads over https and ssh alike; null for a local path. */
+    private static function remoteKey(string $url): ?string
     {
-        if ($url === null || $url === '') {
-            return null;
-        }
-        $parts = RepoLocator::hostAndPath($url);
+        $parts = preg_match('{^[A-Za-z]:[\\\\/]}', $url) === 1 ? null : RepoLocator::hostAndPath($url);
         if ($parts === null) {
-            // GitDriver records a local repository as configured, less a trailing /.git; ~ and variables stay unexpanded.
-            return strpbrk($url, '~$') !== false ? null : 'local:'.preg_replace('{/\.git/?$}', '', rtrim(str_replace('\\', '/', $url), '/'));
+            return null;
         }
         $host = (string) preg_replace('{:\d+$}', '', strtolower($parts[0]));
         $path = (string) preg_replace('{\.git$}', '', trim(strtolower($parts[1]), '/'));
@@ -282,18 +288,27 @@ final class ConfiguredRepositories
         return ($host === 'www.github.com' ? 'github.com' : $host).'/'.$path;
     }
 
-    /** Whether a dist that is a local file lies inside the directory; null where the directory names `~` or a variable, which lockrot does not expand. */
-    private static function inside(?string $directory, ?string $file): ?bool
+    private static function localKey(string $path): string
     {
-        if ($directory === null || strpbrk($directory, '~$') !== false) {
-            return $directory === null ? false : null;
+        return (string) preg_replace('{/\.git$}', '', rtrim(str_replace('\\', '/', $path), '/'));
+    }
+
+    /** Whether a dist that is a local file lies inside the directory; null where the directory names `~` or a variable, which lockrot does not expand. */
+    private static function inside(string $directory, ?string $file): ?bool
+    {
+        if (strpbrk($directory, '~$') !== false) {
+            return null;
         }
         if ($file === null || strpos($file, '://') !== false) {
             return false;
         }
         $directory = rtrim(self::localPath($directory), '/');
+        $file = self::localPath($file);
+        if ($directory === '' || $directory === '.') {
+            return preg_match('{^(/|[A-Za-z]:/|\.\./)}', $file) !== 1;
+        }
 
-        return $directory !== '' && strpos(self::localPath($file), $directory.'/') === 0;
+        return strpos($file, $directory.'/') === 0;
     }
 
     private static function localPath(string $path): string

@@ -59,6 +59,9 @@ final class ConfiguredRepositoriesTest extends TestCase
         yield 'an inline package without a version' => [[['type' => 'package', 'package' => ['name' => 'acme/lib']], self::VCS]];
         yield 'an inline package whose name is not a string' => [[['type' => 'package', 'package' => [['name' => 7, 'version' => '1.0.0']]], self::VCS]];
         yield 'an inline repository without its package' => [[['type' => 'package'], self::VCS]];
+        yield 'a vcs repository without a url' => [[self::VCS, ['type' => 'vcs']]];
+        yield 'a type Composer does not register' => [[self::VCS, ['type' => 'acme-plugin', 'url' => 'https://acme.test']]];
+        yield 'a type in capitals' => [[self::VCS, ['type' => 'VCS', 'url' => 'https://github.com/acme/lib']]];
     }
 
     /**
@@ -86,7 +89,10 @@ final class ConfiguredRepositoriesTest extends TestCase
         yield 'with credentials' => ['https://ci:token@git.acme.test/team/lib', 'https://git.acme.test/team/lib.git'];
         yield 'www.github.com, as Composer reads it' => ['https://www.github.com/acme/lib', self::GITHUB_SOURCE];
         yield 'a GitLab subgroup' => ['https://gitlab.acme.test/group/sub/lib.git', 'git@gitlab.acme.test:group/sub/lib.git'];
+        yield 'a host in capitals' => ['https://GitHub.com/acme/lib', self::GITHUB_SOURCE];
         yield 'a local repository' => ['/srv/git/lib/.git', '/srv/git/lib'];
+        yield 'a local repository with a trailing slash' => ['/srv/git/lib/', '/srv/git/lib'];
+        yield 'a Windows repository' => ['C:\\repos\\lib\\.git', 'C:\\repos\\lib'];
         yield 'a relative local repository' => ['../lib', '../lib'];
         yield 'a file URL' => ['file:///srv/git/lib', 'file:///srv/git/lib'];
     }
@@ -114,12 +120,13 @@ final class ConfiguredRepositoriesTest extends TestCase
             ['type' => 'vcs', 'url' => 'https://gitlab.com/acme/lib'],
             ['type' => 'vcs', 'url' => 'https://github.com/acme'],
             ['type' => 'vcs', 'url' => '~/src/lib'],
-            ['type' => 'vcs'],
+            ['type' => 'vcs', 'url' => 'github.com/acme/lib'],
         ]);
 
         self::assertNull($repositories->kindServing('acme/lib', '1.0.0', self::fromGithub()));
         self::assertNull($repositories->kindServing('acme/lib', '1.0.0', new OriginFacts(null, 'zip', null, 'git', '~/src/lib')), 'a home directory lockrot does not expand');
         self::assertNull($repositories->kindServing('acme/lib', '1.0.0', new OriginFacts(null, 'zip', null, null, null)), 'no source, nothing to match');
+        self::assertNull(ConfiguredRepositories::fromManifest([['type' => 'vcs', 'url' => '../other']])->kindServing('acme/lib', '1.0.0', new OriginFacts(null, 'zip', null, 'git', '../lib')), 'another local repository');
     }
 
     /** Composer takes a name from the first repository that has it: one that could have, and left no trace, makes the entry unknown. */
@@ -160,6 +167,7 @@ final class ConfiguredRepositoriesTest extends TestCase
     public function testARepositoryThatDoesNotAdmitTheNameIsPassedOver(): void
     {
         self::assertSame('vcs', ConfiguredRepositories::fromManifest([['type' => 'composer', 'url' => 'https://satis.acme.test', 'only' => ['other/*']], self::VCS])->kindServing('acme/lib', '1.0.0', self::fromGithub()));
+        self::assertSame('vcs', ConfiguredRepositories::fromManifest([self::VCS + ['only' => null], ['type' => 'composer', 'url' => 'https://satis.acme.test', 'exclude' => null]])->kindServing('acme/lib', '1.0.0', self::fromGithub()), 'a null filter is no filter');
         self::assertSame('vcs', ConfiguredRepositories::fromManifest([['type' => 'composer', 'url' => 'https://satis.acme.test', 'only' => []], self::VCS])->kindServing('acme/lib', '1.0.0', self::fromGithub()), 'admits nothing');
         self::assertSame('vcs', ConfiguredRepositories::fromManifest([['type' => 'composer', 'url' => 'https://satis.acme.test', 'exclude' => ['acme/*']], self::VCS])->kindServing('acme/lib', '1.0.0', self::fromGithub()));
         self::assertSame('unknown', ConfiguredRepositories::fromManifest([['type' => 'composer', 'url' => 'https://satis.acme.test', 'only' => ['acme/*']], self::VCS])->kindServing('acme/lib', '1.0.0', self::fromGithub()));
@@ -188,6 +196,9 @@ final class ConfiguredRepositoriesTest extends TestCase
         self::assertSame('package', $list->kindServing('acme/lib', '1.0.0', $facts));
         self::assertSame('package', $one->kindServing('acme/lib', 'v1.0.0', $facts), 'the same version, spelt otherwise');
         self::assertSame('package', ConfiguredRepositories::fromManifest([['type' => 'package', 'package' => ['name' => 'acme/lib', 'version' => 3, 'dist' => $dist]]])->kindServing('acme/lib', '3', $facts), 'a version written as a number');
+        $unparsable = ConfiguredRepositories::fromManifest([['type' => 'package', 'package' => ['name' => 'acme/lib', 'version' => 'not a version!', 'dist' => $dist]]]);
+        self::assertSame('package', $unparsable->kindServing('acme/lib', 'not a version!', $facts), 'a version Composer cannot read, as written');
+        self::assertSame('unknown', $unparsable->kindServing('acme/lib', 'not a version?', $facts));
     }
 
     /** A canonical inline repository that has the name is the only one Composer asks for it: an entry it does not give came from nowhere lockrot can name. */
@@ -235,7 +246,11 @@ final class ConfiguredRepositoriesTest extends TestCase
         yield 'a variable lockrot does not expand' => ['$ARTIFACTS', '/srv/artifacts/lib-1.0.0.zip', 'unknown'];
         yield 'a URL, not a file' => ['artifacts', 'https://example.test/artifacts/lib-1.0.0.zip', null];
         yield 'a file URL' => ['/srv/artifacts', 'file:///srv/artifacts/lib-1.0.0.zip', null];
-        yield 'no url' => ['', 'artifacts/lib-1.0.0.zip', null];
+        yield 'the project root' => ['./', './lib-1.0.0.zip', 'artifact'];
+        yield 'the project root as a dot' => ['.', './nested/lib-1.0.0.zip', 'artifact'];
+        yield 'outside the project root' => ['.', '../lib-1.0.0.zip', null];
+        yield 'an absolute file, not under the root' => ['.', '/srv/lib-1.0.0.zip', null];
+        yield 'no url, which Composer refuses' => ['', 'artifacts/lib-1.0.0.zip', 'unknown'];
     }
 
     /** @dataProvider artifacts */
