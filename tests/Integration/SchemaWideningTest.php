@@ -308,7 +308,7 @@ final class SchemaWideningTest extends TestCase
         $current = self::current($document);
         $before = self::without($current, ['properties', 'note_details']);
         foreach (array_keys(JsonPath::arrayAt($current, ['definitions'])) as $name) {
-            if (\in_array($name, ['noteDetail', 'noteCode', 'forgeId', 'forgeRepository', 'failedForgeRepository', 'metadataFailureReason', 'advisoriesNotCheckedReason', 'repositoryActivityNotCheckedReason'], true) || strpos((string) $name, 'note') === 0) {
+            if (\in_array($name, ['forgeId', 'forgeRepository', 'failedForgeRepository', 'metadataFailureReason', 'advisoriesNotCheckedReason', 'repositoryActivityNotCheckedReason'], true) || strpos((string) $name, 'note') === 0) {
                 $before = self::without($before, ['definitions', (string) $name]);
             }
         }

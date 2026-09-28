@@ -312,7 +312,7 @@ slow test. They are listed here only so nobody reads them as an unexplained "2 t
 
 ## JSON schemas and monorepo-dated branches (2026-09-20)
 
-- `src/Analyzer/Analyzer.php:227` ReturnRemoval — `dateSplitPackages()` returns early when no
+- `src/Analyzer/Analyzer.php:225` ReturnRemoval — `dateSplitPackages()` returns early when no
   package needs dates. Without the return the method runs on: `missingCandidates()` intersects
   every parent's list with an empty children list and returns nothing, no request is made, and
   `date([])` hands the batch back untouched. The guard states the common case, it does not decide it.
@@ -352,7 +352,7 @@ its slashes unescaped. Two are equivalent:
   the list. Breaking out of the loop at the first of them selects exactly what stepping over each of
   them selects. It is `continue` because the loop's condition is about one package, not about where
   the list stops.
-- `src/Analyzer/RunSettings.php:85` UnwrapArrayValues — `array_values()` falls away from
+- `src/Analyzer/RunSettings.php:122` UnwrapArrayValues — `array_values()` falls away from
   `flagged_verdicts`. `Verdict::all()` returns the keys of `SEVERITY` in declaration order and the
   flagged ones are the first six of them, so `array_filter()` leaves 0..5 and the reindex changes
   nothing that a test can see. It stays because the day a flagged verdict is declared below an
@@ -455,7 +455,7 @@ Measured over `src/Config/Gate.php`, `src/Config/GateStanding.php`, `src/Config/
 `src/Verdict/FailOn.php`, `src/Analyzer/RunSettings.php`, `src/Analyzer/Report.php` and
 `src/Output/FormatContext.php`, whole files, locally under Xdebug on 10 threads: 323 mutants, 316
 killed, 3 escaped, 4 skipped, Covered MSI 99%, ~4m50s. The three escapes are entries above, at
-`Report.php:134`, `RunSettings.php:122` and `FormatContext.php:183` today. The gate adds none.
+`Report.php:130`, `RunSettings.php:122` and `FormatContext.php:183` today. The gate adds none.
 
 A first pass looked clean and was not. `Report::toArray()` decides the gate, so every test that
 writes a document covers `Gate` and `FailOn`, and `GateAgreementTest`'s corpus sweep (45 s under
@@ -476,7 +476,7 @@ Measured over `src/Analyzer/RunNote.php`, `src/Data/Repository/MetadataFailure.p
 `src/Explain/Explanation.php`, whole files, locally under Xdebug on 10 threads with the timeout
 raised to 3600 s and `--only-covering-test-cases`, so that every mutant runs: 580 mutants, 577
 killed, 3 escaped, none skipped, ~6m45s. Two escapes are entries above, which moved to
-`Report.php:130` and `Analyzer.php:227` when the notes left those files; the third is below. The
+`Report.php:130` and `Analyzer.php:225` when the notes left those files; the third is below. The
 notes add no escape. Under the repository's 180 s timeout Infection skips many of these mutants
 unrun (it leaves a mutant out when its covering tests' summed time passes the timeout), and an
 earlier reading of these files taken that way claimed a clean result it had not measured.
@@ -484,12 +484,12 @@ earlier reading of these files taken that way claimed a clean result it had not 
 Two `continue` → `break` mutants in `Analyzer::activityNotCheckedReasons()` (the offline and the
 spent-budget arms) escaped every test before this branch and are killed now by
 `AnalyzerRunNotesTest`, which reads two packages' reasons where one had been enough. Two older
-escapes in `buildFinding()`'s S10 filter, the LogicalOr on `Analyzer.php:391` and the
-UnwrapArrayFilter on `:392`, went undocumented since S10 arrived: no test held an allowlisted
+escapes in `buildFinding()`'s S10 filter, the LogicalOr on `Analyzer.php:389` and the
+UnwrapArrayFilter on `:390`, went undocumented since S10 arrived: no test held an allowlisted
 package with an S10 to losing it. `AnalyzerTest::testS10IsLeftOffAnAllowlistedPackageAndAnAbandonedOne`
 kills both. `RunNoteAgreementTest` covers nothing, for the reason `GateAgreementTest` gives.
 
-- `src/Analyzer/Analyzer.php:392` UnwrapArrayValues — `array_values()` over the signals with S10
+- `src/Analyzer/Analyzer.php:390` UnwrapArrayValues — `array_values()` over the signals with S10
   filtered out. `SignalSet::evaluate()` sorts the signals by number and S10 is the highest, so it is
   always the last element: removing it leaves the keys `0..n-1` already, and the `array_values()`
   only makes the `list` type true by construction.
