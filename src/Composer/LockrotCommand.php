@@ -293,7 +293,7 @@ final class LockrotCommand extends BaseCommand
                 $report = $report->withBaseline(BaselineComparison::compare(
                     $existingBaseline,
                     $report,
-                    $baselineFile->displayPath(),
+                    $baselineFile->reportedPath(),
                     self::lockPackageNames($lock)
                 ));
             }

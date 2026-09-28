@@ -53,7 +53,7 @@ final class FormatContext
         $this->lockName = self::DEFAULT_LOCK_NAME;
         $this->lockDirectory = null;
         if ($lockPath !== null) {
-            $relative = $projectDirectory === null ? null : self::relativePath($lockPath, $projectDirectory);
+            $relative = $projectDirectory === null ? null : Path::relativeTo($lockPath, $projectDirectory);
             $this->lockName = $relative ?? basename($lockPath);
             $this->lockDirectory = $relative === null ? \dirname($lockPath) : $projectDirectory;
         }
@@ -168,18 +168,5 @@ final class FormatContext
         }
 
         return Verdict::flagged($finding->verdict()) ? self::LEVEL_WARNING : self::LEVEL_NOTE;
-    }
-
-    /**
-     * $lockPath below $directory, both folded by spelling ({@see Path::normalize()}), or null when it
-     * is not below it. Only the spelling is compared: two spellings of one directory through a
-     * symlink read as unrelated, which gives the file name alone rather than a wrong path.
-     */
-    private static function relativePath(string $lockPath, string $directory): ?string
-    {
-        $root = rtrim(Path::normalize($directory), '/').'/';
-        $lock = Path::normalize($lockPath);
-
-        return strpos($lock, $root) === 0 ? (string) substr($lock, \strlen($root)) : null;
     }
 }

@@ -544,6 +544,27 @@ final class RepositoryMetadataLoaderTest extends TestCase
         }
     }
 
+    /**
+     * What a repository threw is the reason every note and finding quotes, and Composer masks only a
+     * password and an access_token in it: the login, a `?token=` and a machine path go here.
+     */
+    public function testAFailureIsKeptWithoutWhatLocatesOrOpensAnything(): void
+    {
+        $server = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK]);
+        $server->start();
+        try {
+            $names = \array_slice($this->wallabagNames(), 0, 1);
+            $thrown = 'The "https://ci-user:s3cr3t@repo.example.com/p2/x.json?token=t0k3n" file could not be downloaded: error adding trust anchors from file: /Users/igor/certs/ca.pem';
+            $loader = new RepositoryMetadataLoader([$this->repositoryFailingFor($server, $names[0], $thrown)], Clock::fixed(self::FIXED));
+
+            $failed = $loader->load($names)->failed();
+
+            self::assertSame('The "https://repo.example.com/p2/x.json" file could not be downloaded: error adding trust anchors from file: .../ca.pem', $failed[$names[0]] ?? null);
+        } finally {
+            $server->stop();
+        }
+    }
+
     public function testDevOnlyBranchAliasIsUnwrappedAndCountedOnce(): void
     {
         // ComposerRepository::loadPackages() returns an AliasPackage built from extra.branch-alias
@@ -716,12 +737,13 @@ final class RepositoryMetadataLoaderTest extends TestCase
      * containing $name, standing in for a repository whose root metadata is readable but whose
      * file for one package is not.
      */
-    private function repositoryFailingFor(FixtureRepositoryServer $server, string $name): ComposerRepository
+    private function repositoryFailingFor(FixtureRepositoryServer $server, string $name, string $message = self::CHUNK_FAILURE): ComposerRepository
     {
         $io = new NullIO();
         $config = $server->config();
         $repository = new class (['type' => 'composer', 'url' => $server->url()], $io, $config, Factory::createHttpDownloader($io, $config)) extends ComposerRepository {
             public string $failFor = '';
+            public string $message = '';
 
             /**
              * @param array<string, \Composer\Semver\Constraint\ConstraintInterface|null> $packageNameMap
@@ -735,13 +757,14 @@ final class RepositoryMetadataLoaderTest extends TestCase
             {
                 // The map is name => constraint-or-null, so isset() would miss every entry.
                 if (\array_key_exists($this->failFor, $packageNameMap)) {
-                    throw new \RuntimeException(RepositoryMetadataLoaderTest::CHUNK_FAILURE);
+                    throw new \RuntimeException($this->message);
                 }
 
                 return parent::loadPackages($packageNameMap, $acceptableStabilities, $stabilityFlags, $alreadyLoaded);
             }
         };
         $repository->failFor = $name;
+        $repository->message = $message;
 
         return $repository;
     }

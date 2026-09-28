@@ -197,6 +197,10 @@ verdict; its `level` follows `--fail-on`, whichever kind of threshold it names.
 GitLab resolve that path against the checkout root, so run them from the checkout root (or pass `-d` to it). A lock
 outside the project directory is named by its file name alone.
 
+`originalUriBaseIds.%SRCROOT%` is the project directory as an absolute `file://` URL, which code
+scanning resolves the lock's name against. It is the one path of the machine a lockrot report
+carries; to publish the file anywhere else, drop it: `jq 'del(.runs[].originalUriBaseIds)' lockrot.sarif`.
+
 ## `--format=gitlab`
 
 A [GitLab Code Quality](https://docs.gitlab.com/ci/testing/code_quality/#code-quality-report-format) report: a JSON array

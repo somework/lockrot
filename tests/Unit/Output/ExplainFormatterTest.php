@@ -290,6 +290,21 @@ final class ExplainFormatterTest extends TestCase
         );
     }
 
+    /** A source on the machine that wrote the lock has no line: its path carries the account. A remote loses its login. */
+    public function testASourceLineNeverLocatesTheMachine(): void
+    {
+        $at = new \DateTimeImmutable('2020-01-01T00:00:00+00:00');
+        $metadata = new PackageMetadata('vendor/pkg', false, null, true, $at, '1.0.0', 1, 'igor@git.acme.test:pkg.git', 'library', new \DateTimeImmutable(F::NOW));
+        $package = new LockedPackage('vendor/pkg', '1.0.0', $at, '>=7.4', [], '/Users/igor/client-x/pkg', 'library', Origins::facts(false), false, false);
+        $finding = new Finding('vendor/pkg', '1.0.0', Verdict::STALE, [], ['vendor/pkg'], null, null);
+
+        $text = $this->plain(new Explanation($finding, F::facts($package, $metadata), new Thresholds(), '8.4', $this->report()));
+
+        self::assertStringNotContainsString('igor', $text);
+        self::assertSame(1, substr_count($text, '  source '), 'only the metadata has a source to show');
+        self::assertStringContainsString('  source git.acme.test:pkg.git', $text);
+    }
+
     public function testTheBranchTableIsCappedAndAnAllowlistedPackageSaysSo(): void
     {
         $releases = [];

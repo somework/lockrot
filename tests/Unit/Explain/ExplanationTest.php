@@ -180,6 +180,25 @@ final class ExplanationTest extends TestCase
         self::assertSame(['a note'], array_column(JsonPath::arrayAt($array, ['note_details']), 'text'), 'the same notes, typed');
     }
 
+    /**
+     * A VCS repository on the machine that wrote the lock is a path with the account in it, and a
+     * repository's metadata can name one by `file://`: neither is shown. A remote keeps its host.
+     */
+    public function testARepositoryIsShownByItsHostAndNeverByAPathOnTheMachine(): void
+    {
+        $at = new \DateTimeImmutable('2020-01-01T00:00:00+00:00');
+        $remote = new PackageMetadata('vendor/pkg', false, null, true, $at, '1.0.0', 1, 'https://ci:t0k3n@git.acme.test/pkg.git?private_token=t0k3n', 'library', new \DateTimeImmutable(F::NOW));
+        $local = new PackageMetadata('vendor/pkg', false, null, true, $at, '1.0.0', 1, 'file:///Users/igor/client-x/pkg', 'library', new \DateTimeImmutable(F::NOW));
+
+        $onTheMachine = (new Explanation($this->finding('1.0.0', Verdict::STALE), F::facts(F::package(['source' => '/Users/igor/client-x/pkg']), $local), new Thresholds(), '8.4', $this->report()))->toArray();
+        $elsewhere = (new Explanation($this->finding('1.0.0', Verdict::STALE), F::facts(F::package(['source' => 'igor@git.acme.test:pkg.git']), $remote), new Thresholds(), '8.4', $this->report()))->toArray();
+
+        self::assertNull(JsonPath::arrayAt($onTheMachine, ['lock'])['repository']);
+        self::assertNull(JsonPath::arrayAt($onTheMachine, ['metadata'])['repository']);
+        self::assertSame('git.acme.test:pkg.git', JsonPath::arrayAt($elsewhere, ['lock'])['repository']);
+        self::assertSame('https://git.acme.test/pkg.git', JsonPath::arrayAt($elsewhere, ['metadata'])['repository']);
+    }
+
     public function testMissingMetadataAndActivityAreNullNotEmpty(): void
     {
         $explanation = new Explanation($this->finding('1.0.0', Verdict::UNKNOWN), F::facts(F::package(['fromComposerRepository' => false])), new Thresholds(), '8.4', $this->report());

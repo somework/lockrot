@@ -102,6 +102,23 @@ final class RunNoteTest extends TestCase
             true,
             ['composer_repository' => 'composer repo (https://repo.example.com)', 'message' => 'HTTP 503'],
         ];
+        yield 'advisories from a repository whose url carries a token' => [
+            static fn (): RunNote => RunNote::advisoriesUnavailable(
+                'composer repo (https://glpat-abcdefghij@repo.example.com/?token=t0k3n)',
+                new TransportException('The "https://glpat-abcdefghij@repo.example.com/api/security-advisories/?token=t0k3n" file could not be downloaded (HTTP/2 401 )')
+            ),
+            'advisories_unavailable',
+            'security advisories unavailable from composer repo (https://repo.example.com/): The "https://repo.example.com/api/security-advisories/" file could not be downloaded (HTTP/2 401 )',
+            true,
+            ['composer_repository' => 'composer repo (https://repo.example.com/)', 'message' => 'The "https://repo.example.com/api/security-advisories/" file could not be downloaded (HTTP/2 401 )'],
+        ];
+        yield 'advisories from a repository on the machine' => [
+            static fn (): RunNote => RunNote::advisoriesUnavailable('composer repo (file:///Users/Igor Pinchuk/client-x/satis)', new \LogicException('boom')),
+            'advisories_unavailable',
+            'security advisories unavailable from composer repo (file://.../satis): boom',
+            false,
+            ['composer_repository' => 'composer repo (file://.../satis)', 'message' => 'boom'],
+        ];
         yield 'advisories, another failure with no message' => [
             static fn (): RunNote => RunNote::advisoriesUnavailable('packagist.org', new \LogicException('')),
             'advisories_unavailable',

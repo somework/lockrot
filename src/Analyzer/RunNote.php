@@ -7,6 +7,7 @@ namespace Lockrot\Analyzer;
 use Composer\Downloader\TransportException;
 use Lockrot\Data\Forge\RepoRef;
 use Lockrot\Data\Repository\MetadataFailure;
+use Lockrot\Data\Repository\RepositoryUrl;
 use Lockrot\Signal\Rule\NotCheckedRule;
 
 /**
@@ -152,11 +153,13 @@ final class RunNote
     /**
      * One line of the message, or the class when there is none: Composer's message for a partial
      * record runs to a `var_export()` dump of it. Only a repository that could not be reached is a
-     * network failure; one that answered with something unreadable is not.
+     * network failure; one that answered with something unreadable is not. The repository's name is
+     * Composer's, whose URL keeps a token in the user slot, a login and a `?token=` on 2.4 to 2.9.
      */
     public static function advisoriesUnavailable(string $composerRepository, \Throwable $e): self
     {
-        $message = (string) strtok($e->getMessage(), "\r\n");
+        $composerRepository = RepositoryUrl::inText($composerRepository);
+        $message = RepositoryUrl::inText((string) strtok($e->getMessage(), "\r\n"));
         $message = $message === '' ? \get_class($e) : $message;
 
         return self::of(

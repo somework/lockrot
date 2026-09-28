@@ -30,6 +30,25 @@ final class Path
     }
 
     /**
+     * $path below $directory, both folded by spelling ({@see normalize()}), or null when it is not
+     * below it. Only the spelling is compared: two spellings of one directory through a symlink read
+     * as unrelated, which gives a caller the file name alone rather than a wrong path.
+     */
+    public static function relativeTo(string $path, string $directory): ?string
+    {
+        $root = rtrim(self::normalize($directory), '/').'/';
+        $path = self::normalize($path);
+
+        return strpos($path, $root) === 0 ? (string) substr($path, \strlen($root)) : null;
+    }
+
+    /** The last component, split on either separator, so a Windows path has the same name on every system. */
+    public static function name(string $path): string
+    {
+        return (string) preg_replace('{^.*[\\\\/]}s', '', $path);
+    }
+
+    /**
      * Whether the last component is a name Windows reads as another: Win32 drops trailing dots and
      * spaces (`composer.lock.` is `composer.lock`), and a colon names an NTFS stream of the file
      * before it (`composer.lock::$DATA` is the file itself). Only the last component is looked at,
@@ -38,7 +57,7 @@ final class Path
      */
     public static function isWindowsAlias(string $path): bool
     {
-        $name = (string) preg_replace('{^.*[\\\\/]}s', '', $path);
+        $name = self::name($path);
 
         return strpos($name, ':') !== false || preg_match('{[. ]$}', $name) === 1;
     }

@@ -543,6 +543,7 @@
       ],
       "properties": {
         "path": {
+          "description": "The baseline file as a report names it: the configured path when it is relative, the path relative to the project directory when an absolute one is inside it, and the file name alone otherwise, so a report never locates the machine that wrote it.",
           "type": "string"
         },
         "known": {
@@ -1984,7 +1985,7 @@
           "type": "string"
         },
         "message": {
-          "description": "Foreign text copied verbatim — a repository's, a host's or Composer's own words — possibly empty. Not contract.",
+          "description": "Foreign text — a repository's, a host's or Composer's own words — possibly empty, as a report may quote it: every URL in it without its userinfo, query and fragment, and every path on the machine down to its last segment (`.../name`). Not contract.",
           "type": "string"
         }
       }
@@ -2021,7 +2022,7 @@
                 "$ref": "#/definitions/metadataFailureReason"
               },
               "message": {
-                "description": "Foreign text copied verbatim — a repository's, a host's or Composer's own words — possibly empty. Not contract.",
+                "description": "Foreign text — a repository's, a host's or Composer's own words — possibly empty, as a report may quote it: every URL in it without its userinfo, query and fragment, and every path on the machine down to its last segment (`.../name`). Not contract.",
                 "type": "string"
               },
               "package_count": {
@@ -2049,7 +2050,7 @@
           "$ref": "#/definitions/metadataFailureReason"
         },
         "message": {
-          "description": "Foreign text copied verbatim — a repository's, a host's or Composer's own words — possibly empty. Not contract.",
+          "description": "Foreign text — a repository's, a host's or Composer's own words — possibly empty, as a report may quote it: every URL in it without its userinfo, query and fragment, and every path on the machine down to its last segment (`.../name`). Not contract.",
           "type": "string"
         }
       }
@@ -2062,13 +2063,13 @@
       ],
       "properties": {
         "message": {
-          "description": "Foreign text copied verbatim — a repository's, a host's or Composer's own words — possibly empty. Not contract.",
+          "description": "Foreign text — a repository's, a host's or Composer's own words — possibly empty, as a report may quote it: every URL in it without its userinfo, query and fragment, and every path on the machine down to its last segment (`.../name`). Not contract.",
           "type": "string"
         }
       }
     },
     "noteAdvisoriesUnavailable": {
-      "description": "`advisories_unavailable`: one Composer repository did not return advisories, and the others were still asked. `composer_repository` is Composer's name for it; `message` the first line of the error, or its class when it has none.",
+      "description": "`advisories_unavailable`: one Composer repository did not return advisories, and the others were still asked. `composer_repository` is Composer's name for it, its URL cut as `message` cuts one; `message` the first line of the error, or its class when it has none.",
       "type": "object",
       "required": [
         "composer_repository",
@@ -2079,7 +2080,7 @@
           "type": "string"
         },
         "message": {
-          "description": "Foreign text copied verbatim — a repository's, a host's or Composer's own words — possibly empty. Not contract.",
+          "description": "Foreign text — a repository's, a host's or Composer's own words — possibly empty, as a report may quote it: every URL in it without its userinfo, query and fragment, and every path on the machine down to its last segment (`.../name`). Not contract.",
           "type": "string"
         }
       }

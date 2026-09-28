@@ -220,6 +220,28 @@ final class ReportDocumentTest extends TestCase
         // A path-repository package: the lock records no source URL at all.
         yield 'neither knows' => [null, '', null];
         yield 'the metadata is not a url' => ['javascript:alert(1)', 'https://github.com/vendor/pkg.git', null];
+        yield 'the metadata is a checkout on the machine' => ['/Users/igor/client-x/pkg', 'https://github.com/vendor/pkg.git', null];
+        yield 'a token in the query' => ['https://gitlab.test/vendor/pkg.git?private_token=t0k3n', null, 'https://gitlab.test/vendor/pkg'];
+    }
+
+    /**
+     * The page embeds the explanation's repositories, and a checkout on the machine that wrote the
+     * lock is a path with the account in it: the detail carries none. The link is decided from what
+     * the package says, as before, and a path never became one.
+     */
+    public function testADetailNeverLocatesTheMachine(): void
+    {
+        $report = $this->report([$this->finding('vendor/pkg', Verdict::LEFT_BEHIND)]);
+        $at = new \DateTimeImmutable('2020-01-01T00:00:00+00:00');
+        $metadata = new PackageMetadata('vendor/pkg', false, null, true, $at, '1.0.0', 1, 'file:///Users/igor/client-x/pkg', 'library', new \DateTimeImmutable(F::NOW));
+        $facts = ['vendor/pkg' => F::facts(F::package(['source' => '/Users/igor/client-x/pkg']), $metadata)];
+
+        $detail = J::arrayAt($this->document($report, $facts)->toArray(), ['details', 'vendor/pkg']);
+
+        self::assertNull(J::arrayAt($detail, ['lock'])['repository']);
+        self::assertNull(J::arrayAt($detail, ['metadata'])['repository']);
+        self::assertNull($detail['repository_link']);
+        self::assertStringNotContainsString('igor', (string) json_encode($detail));
     }
 
     public function testWithoutFactsThePageStillHasAReportAndNoDetails(): void

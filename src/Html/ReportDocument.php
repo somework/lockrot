@@ -9,6 +9,7 @@ use Lockrot\Data\Repository\RepositoryUrl;
 use Lockrot\Explain\Explanation;
 use Lockrot\Json\Schemas;
 use Lockrot\Output\JsonFormatter;
+use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\Signal;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
@@ -93,7 +94,7 @@ final class ReportDocument
                 'metadata' => \is_array($metadata) ? $metadata : null,
                 'lock' => $explained['lock'] ?? null,
                 'activity' => $explained['activity'] ?? null,
-                'repository_link' => self::linkable(self::repositoryOf($metadata, $explained['lock'] ?? null)),
+                'repository_link' => self::linkable(self::repositoryOf($facts)),
             ];
         }
 
@@ -122,14 +123,14 @@ final class ReportDocument
 
 
     /**
-     * @param mixed $metadata
-     * @param mixed $lock
+     * What the package says, not what the explanation shows: a checkout on the machine is shown as
+     * null, and must not hand the link to the lock's URL behind it.
      */
-    private static function repositoryOf($metadata, $lock): ?string
+    private static function repositoryOf(PackageFacts $facts): ?string
     {
-        foreach ([$metadata, $lock] as $source) {
-            if (\is_array($source) && \is_string($source['repository'] ?? null) && $source['repository'] !== '') {
-                return $source['repository'];
+        foreach ([$facts->metadata() === null ? null : $facts->metadata()->repositoryUrl(), $facts->package()->repositoryUrl()] as $url) {
+            if ($url !== null && $url !== '') {
+                return $url;
             }
         }
 

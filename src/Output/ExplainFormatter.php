@@ -215,8 +215,8 @@ final class ExplainFormatter
             $parts[] = 'branch snapshot';
         }
         $lines = ['composer.lock', self::INDENT.self::escape(implode(' · ', $parts))];
-        if ($package->repositoryUrl() !== null) {
-            $lines[] = self::INDENT.self::escape('source '.RepositoryUrl::withoutCredentials($package->repositoryUrl()));
+        if (($source = RepositoryUrl::shown($package->repositoryUrl())) !== null) {
+            $lines[] = self::INDENT.self::escape('source '.$source);
         }
 
         return $lines;
@@ -242,8 +242,8 @@ final class ExplainFormatter
             $parts[] = 'not abandoned';
         }
         $lines[] = self::INDENT.self::escape(implode(' · ', $parts));
-        if ($metadata->repositoryUrl() !== null) {
-            $lines[] = self::INDENT.self::escape('source '.RepositoryUrl::withoutCredentials($metadata->repositoryUrl()));
+        if (($source = RepositoryUrl::shown($metadata->repositoryUrl())) !== null) {
+            $lines[] = self::INDENT.self::escape('source '.$source);
         }
         $lines[] = self::INDENT.self::escape($this->lastRelease($metadata, $explanation));
         $installed = $this->installedRelease($explanation, $metadata);

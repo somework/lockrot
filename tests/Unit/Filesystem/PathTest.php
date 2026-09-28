@@ -45,6 +45,34 @@ final class PathTest extends TestCase
         yield 'a colon later in the name is not a drive' => ['ab:/r.json', false];
     }
 
+    /** @return iterable<string, array{string, string, ?string}> path, directory, relative */
+    public static function relatives(): iterable
+    {
+        yield 'below the directory' => ['/p/app/alt.lock', '/p', 'app/alt.lock'];
+        yield 'a directory spelled with a trailing separator' => ['/p/app/alt.lock', '/p/', 'app/alt.lock'];
+        yield 'the filesystem root' => ['/app/alt.lock', '/', 'app/alt.lock'];
+        yield 'a drive root' => ['C:\\app\\alt.lock', 'C:\\', 'app/alt.lock'];
+        yield 'Windows separators' => ['C:\\p\\app\\alt.lock', 'C:\\p', 'app/alt.lock'];
+        yield 'dot segments fold first' => ['/p/app/../alt.lock', '/p', 'alt.lock'];
+        yield 'outside the directory' => ['/elsewhere/alt.lock', '/p', null];
+        yield 'a sibling sharing the prefix is outside' => ['/project-b/alt.lock', '/project', null];
+    }
+
+    /** @dataProvider relatives */
+    #[DataProvider('relatives')]
+    public function testRelativeToNamesAPathBelowADirectoryBySpelling(string $path, string $directory, ?string $relative): void
+    {
+        self::assertSame($relative, Path::relativeTo($path, $directory));
+    }
+
+    public function testNameIsTheLastComponentWhateverTheSeparator(): void
+    {
+        self::assertSame('rot.json', Path::name('/elsewhere/rot.json'));
+        self::assertSame('rot.json', Path::name('C:\\ci\\rot.json'));
+        self::assertSame('rot.json', Path::name('\\\\server\\share\\rot.json'));
+        self::assertSame('rot.json', Path::name('rot.json'));
+    }
+
     /**
      * @dataProvider paths
      */

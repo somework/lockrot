@@ -324,6 +324,20 @@ final class ComposerHttpClientTest extends TestCase
         ], self::summarize($results));
     }
 
+    /** The message is what a run note quotes, so Composer's words arrive without a login, a query or a machine path. */
+    public function testAFailedRequestsMessageLosesWhatLocatesOrOpensAnything(): void
+    {
+        [$client] = self::clientWith([
+            'https://gitlab.acme.test/api/v4/projects/1' => new TransportException('curl error 77 while downloading https://igor@gitlab.acme.test/api/v4/projects/1?private_token=t0k3n: error adding trust anchors from file: /Users/igor/certs/ca.pem'),
+        ]);
+
+        $results = $client->fetchAll(['https://gitlab.acme.test/api/v4/projects/1']);
+
+        self::assertSame([
+            'https://gitlab.acme.test/api/v4/projects/1' => [0, null, 'curl error 77 while downloading https://gitlab.acme.test/api/v4/projects/1: error adding trust anchors from file: .../ca.pem'],
+        ], self::summarize($results));
+    }
+
     /**
      * A URL the downloader never answers still gets a result: the caller reads the map by URL, and a
      * missing key would be indistinguishable from a URL it never asked for.

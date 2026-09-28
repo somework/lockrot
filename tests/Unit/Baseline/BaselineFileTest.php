@@ -92,7 +92,31 @@ final class BaselineFileTest extends TestCase
         $file = BaselineFile::resolve('/projects/app', '/elsewhere/rot.json');
 
         self::assertSame('/elsewhere/rot.json', $file->path());
-        self::assertSame('/elsewhere/rot.json', $file->displayPath());
+        self::assertSame('/elsewhere/rot.json', $file->displayPath(), 'the terminal says which file it means');
+    }
+
+    /** @return iterable<string, array{string, ?string, string}> project directory, configured, reported */
+    public static function reportedPaths(): iterable
+    {
+        yield 'the default' => ['/projects/app', null, 'lockrot-baseline.json'];
+        yield 'a relative path, as configured' => ['/projects/app', 'ci/rot.json', 'ci/rot.json'];
+        yield 'a relative path that climbs, as configured' => ['/projects/app', '../shared/rot.json', '../shared/rot.json'];
+        yield 'an absolute path in the project' => ['/projects/app', '/projects/app/ci/rot.json', 'ci/rot.json'];
+        yield 'an absolute path elsewhere' => ['/projects/app', '/home/igor/client-x/rot.json', 'rot.json'];
+        yield 'a Windows path in the project' => ['C:\\projects\\app', 'C:\\projects\\app\\ci\\rot.json', 'ci/rot.json'];
+        yield 'a Windows path elsewhere' => ['/projects/app', 'C:\\Users\\igor\\rot.json', 'rot.json'];
+    }
+
+    /**
+     * A report is published, and an absolute path carries the account it ran under: the report
+     * names the baseline as the checkout does, or by its file name, the way it names the lock.
+     *
+     * @dataProvider reportedPaths
+     */
+    #[DataProvider('reportedPaths')]
+    public function testTheReportNamesTheBaselineAndNeverLocatesTheMachine(string $projectDir, ?string $configured, string $reported): void
+    {
+        self::assertSame($reported, BaselineFile::resolve($projectDir, $configured)->reportedPath());
     }
 
     public function testATrailingSeparatorOnTheProjectDirectoryIsNotDoubled(): void

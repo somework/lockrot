@@ -212,7 +212,7 @@ final class Explanation
             'lock' => [
                 'php' => $package->requirePhp(),
                 'released' => self::date($package->time()),
-                'repository' => RepositoryUrl::withoutCredentials($package->repositoryUrl()),
+                'repository' => RepositoryUrl::shown($package->repositoryUrl()),
                 'from_composer_repository' => $package->isFromComposerRepository(),
                 'dev' => $package->isDev(),
                 'branch_snapshot' => $package->isBranchSnapshot(),
@@ -231,7 +231,7 @@ final class Explanation
                 // dated, null where lockrot trusts neither ({@see InstalledRelease::of()}).
                 'installed_release' => self::date($installed->at()),
                 'installed_release_dated_by' => $installed->datedBy(),
-                'repository' => RepositoryUrl::withoutCredentials($metadata->repositoryUrl()),
+                'repository' => RepositoryUrl::shown($metadata->repositoryUrl()),
                 'type' => $metadata->type(),
                 'data_date' => self::date($metadata->dataDate()),
                 'branches' => $branches,

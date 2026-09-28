@@ -207,7 +207,7 @@ final class RepositoryMetadataLoader implements MetadataLoaderInterface
                 $result = $repository->loadPackages(array_fill_keys($chunk, null), $acceptableStabilities, []);
             } catch (\RuntimeException $e) {
                 foreach ($chunk as $name) {
-                    $failed[$name] = $e->getMessage();
+                    $failed[$name] = RepositoryUrl::inText($e->getMessage());
                 }
                 continue;
             }

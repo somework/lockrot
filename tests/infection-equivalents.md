@@ -94,11 +94,11 @@ are not listed here even though the area-B Infection config covers `src/Composer
 
 ### src/Composer/ComposerHttpClient.php
 
-- `src/Composer/ComposerHttpClient.php:119` CastString — `(string) substr($origin, 4)`: the
+- `src/Composer/ComposerHttpClient.php:120` CastString — `(string) substr($origin, 4)`: the
   `in_array()` above admits only `api.bitbucket.org` and `api.github.com`, both far longer than 4
   characters, so `substr()` can never return the `false` PHP 7.4 documents for an out-of-range start.
   The cast states the type; it does not cover a case.
-- `src/Composer/ComposerHttpClient.php:175` CastInt — `(int) ($e->getStatusCode() ?? 0)`:
+- `src/Composer/ComposerHttpClient.php:176` CastInt — `(int) ($e->getStatusCode() ?? 0)`:
   `TransportException::getStatusCode()` is declared `?int`, so the `?? 0` already leaves an int and
   the cast can never change a value. The two integer mutants on the same line — the `: 0` arm for a
   failure that is not a `TransportException` — *are* observable and are covered by
@@ -346,7 +346,7 @@ five sources including one that is not a URL, `trim()` is exercised by a padded 
 value of `$showAll` is exercised against a run that has facts, and the payload is asserted to keep
 its slashes unescaped. Two are equivalent:
 
-- `src/Html/ReportDocument.php:83` Continue_ — `continue` becomes `break` in the skip for a package
+- `src/Html/ReportDocument.php:85` Continue_ — `continue` becomes `break` in the skip for a package
   that is not worth explaining. `Report::compare()` orders findings by priority rank first, and an
   unflagged package has no priority at all, so the packages this branch skips are always a suffix of
   the list. Breaking out of the loop at the first of them selects exactly what stepping over each of
@@ -413,7 +413,8 @@ and so is the one the Windows-alias refusal added (259 mutants, 5 escapes, after
   `ConsoleMarkup`, which returns a string: the cast and its mutant went with the formatter call.)
 - `src/Filesystem/Path.php:41` CastString — `(string) preg_replace(...)` in `isWindowsAlias()`, the
   shape of the `RepoLocator` cast above: preg_replace returns null only when the pattern fails to
-  compile, and this one is a literal. The cast is for the type.
+  compile, and this one is a literal. The cast is for the type. (Gone since `isWindowsAlias()` reads
+  the last component through `Path::name()`, whose cast Infection does not mutate.)
 
 ### The review fixes to `--output` (2026-09-26)
 
@@ -432,7 +433,7 @@ equivalent (403 mutants, 9 escapes, Covered MSI 97.8%):
 - `src/Composer/SelfUpdateCommand.php:278` ConcatOperandRemoval — `'</'.$style.'>'` becomes `'</>'`.
   Gone since self-update writes its lines raw like `LockrotCommand` (see the self-update area above),
   with `TerminalText` loaded before the archive can be replaced.
-- `src/Filesystem/Path.php:119` LogicalOr and DecrementInteger x2 — `$a['ino'] === 0 ||
+- `src/Filesystem/Path.php:138` LogicalOr and DecrementInteger x2 — `$a['ino'] === 0 ||
   $b['ino'] === 0`, the fallback to comparing resolved paths where a filesystem reports no inode.
   Every filesystem CI and a developer machine run on (ext4, APFS, tmpfs) reports one, so the
   condition is false on both sides and every mutant of it is false too; only a Windows filesystem
@@ -443,9 +444,10 @@ equivalent (403 mutants, 9 escapes, Covered MSI 97.8%):
 
 ## Annotations name the lock `COMPOSER` names (0.13.0)
 
-- `src/Output/FormatContext.php:183` CastString — `(string) substr($lock, \strlen($root))` in
-  `relativePath()`: the branch is taken only when `$lock` starts with `$root`, which ends in `/`,
-  and `Path::normalize()` never leaves a trailing `/` on `$lock`, so `$lock` is strictly longer and
+- `src/Filesystem/Path.php:42` CastString — `(string) substr($path, \strlen($root))` in
+  `relativeTo()`, which was `FormatContext.php:183` in `relativePath()` until the baseline's reported
+  path came to share it: the branch is taken only when `$path` starts with `$root`, which ends in `/`,
+  and `Path::normalize()` never leaves a trailing `/` on `$path`, so `$path` is strictly longer and
   `substr()` can never return the `false` PHP 7.4 documents for an out-of-range start. The cast
   states the type; it does not cover a case.
 
@@ -455,7 +457,7 @@ Measured over `src/Config/Gate.php`, `src/Config/GateStanding.php`, `src/Config/
 `src/Verdict/FailOn.php`, `src/Analyzer/RunSettings.php`, `src/Analyzer/Report.php` and
 `src/Output/FormatContext.php`, whole files, locally under Xdebug on 10 threads: 323 mutants, 316
 killed, 3 escaped, 4 skipped, Covered MSI 99%, ~4m50s. The three escapes are entries above, at
-`Report.php:130`, `RunSettings.php:122` and `FormatContext.php:183` today. The gate adds none.
+`Report.php:130`, `RunSettings.php:122` and `FormatContext.php:183` (now `Path.php:42`). The gate adds none.
 
 A first pass looked clean and was not. `Report::toArray()` decides the gate, so every test that
 writes a document covers `Gate` and `FailOn`, and `GateAgreementTest`'s corpus sweep (45 s under

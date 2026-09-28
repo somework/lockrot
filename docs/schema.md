@@ -333,9 +333,17 @@ The document stays valid: both keys may be null. Other parts of a report can nam
 registry or a repository host, and `origin` does not change them: a run note about a Composer
 repository it could not read (`advisories_unavailable`, `metadata_unavailable`,
 `monorepo_parent_unavailable`: the note's `text` and `notes` entry, and a `message` or
-`composer_repository` in its `data`), the hosts and repositories in S3, S4 and the repository
-activity notes, and, on the HTML page, each package's `details` (`lock.repository`,
-`metadata.repository`, `repository_link`, `activity`).
+`composer_repository` in its `data`), a finding's `note` and `evidence` when its metadata did not
+come, the hosts and repositories in S3, S4 and the repository activity notes, and, on the HTML page,
+each package's `details` (`lock.repository`, `metadata.repository`, `repository_link`, `activity`).
+
+None of them carries what opens or locates anything. Every URL they quote is written without its
+userinfo, query and fragment, whatever Composer masked of it, and a `file://` URL and every other
+path of the machine keep their last segment alone (`.../ca.pem`). A repository without a scheme
+loses its user (`git.example.com:lib.git`), and `lock.repository` and `metadata.repository` are null
+for a checkout on the machine. `baseline.path` is relative to the project directory, or the file
+name alone, the way `run.lock_file` names the lock. The one absolute path a report carries is SARIF's
+`%SRCROOT%` ([ci.md](ci.md#-formatsarif)).
 
 ## Related
 

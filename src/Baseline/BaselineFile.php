@@ -19,14 +19,14 @@ use Lockrot\Json\Schemas;
  * ({@see AtomicWriter}); its activity cache under Composer's cache directory; and, with
  * `self-update`, the PHAR. It never writes composer.json or composer.lock.
  *
- * Two paths are kept apart on purpose. {@see path()} is what the filesystem needs — absolute, so
+ * Three paths are kept apart on purpose. {@see path()} is what the filesystem needs — absolute, so
  * the file lands next to the project's composer.json whatever the process's working directory is.
- * {@see displayPath()} is what reports print: the path exactly as it was configured, or the default
- * file name. Both of those are relative, so two machines analysing the same project produce
- * byte-identical output; a project that configures an *absolute* baseline path gives up that
- * property, since the table line and the JSON `baseline.path` then carry the absolute path it asked
- * for. Printing it as given is the deliberate choice: a path the reader recognises beats a
- * relativised one they have to reconstruct.
+ * {@see displayPath()} is what the terminal prints: the path exactly as it was configured, or the
+ * default file name, so a message says which file it means. {@see reportedPath()} is what a report
+ * carries — the table line and the JSON `baseline.path` — and a report is published: a configured
+ * relative path as written, an absolute one relative to the project directory, and one outside it
+ * by its file name alone, as the report names its lock. An absolute path carries the account it ran
+ * under, and two machines analysing the same project now write the same line.
  *
  * @internal
  */
@@ -36,11 +36,13 @@ final class BaselineFile
 
     private string $path;
     private string $displayPath;
+    private string $reportedPath;
 
-    private function __construct(string $path, string $displayPath)
+    private function __construct(string $path, string $displayPath, string $reportedPath)
     {
         $this->path = $path;
         $this->displayPath = $displayPath;
+        $this->reportedPath = $reportedPath;
     }
 
     /**
@@ -50,8 +52,9 @@ final class BaselineFile
     public static function resolve(string $projectDir, ?string $configured): self
     {
         $name = ($configured === null || $configured === '') ? self::DEFAULT_NAME : $configured;
+        $reported = Path::isAbsolute($name) ? (Path::relativeTo($name, $projectDir) ?? Path::name($name)) : $name;
 
-        return new self(Path::resolve($projectDir, $name), $name);
+        return new self(Path::resolve($projectDir, $name), $name, $reported);
     }
 
     public function path(): string
@@ -62,6 +65,11 @@ final class BaselineFile
     public function displayPath(): string
     {
         return $this->displayPath;
+    }
+
+    public function reportedPath(): string
+    {
+        return $this->reportedPath;
     }
 
     public function exists(): bool

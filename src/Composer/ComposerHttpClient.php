@@ -14,6 +14,7 @@ use Composer\Util\Url;
 use Lockrot\Clock;
 use Lockrot\Data\Http\HttpClientInterface;
 use Lockrot\Data\Http\HttpResult;
+use Lockrot\Data\Repository\RepositoryUrl;
 use Lockrot\Deadline;
 
 /**
@@ -173,7 +174,7 @@ final class ComposerHttpClient implements HttpClientInterface
                 },
                 function (\Throwable $e) use ($url, &$results): void {
                     $status = $e instanceof TransportException ? (int) ($e->getStatusCode() ?? 0) : 0;
-                    $results[$url] = new HttpResult($url, $status, null, $this->clock->now(), $e->getMessage());
+                    $results[$url] = new HttpResult($url, $status, null, $this->clock->now(), RepositoryUrl::inText($e->getMessage()));
                 }
             );
         }

@@ -518,6 +518,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **A report no longer quotes a credential or a path of the machine it ran on.** A report is
+  published, and three parts of it carried what Composer, curl and the lock hold:
+  - The run notes about a Composer repository lockrot could not read quoted Composer's words:
+    `advisories_unavailable` its name for the repository, and it, `metadata_unavailable` and
+    `monorepo_parent_unavailable` the error, which a finding left without metadata carries too, as
+    its `note` and `evidence`. Composer masks only a password and an `access_token`. On Composer 2.4
+    to 2.9 a token in the user slot (`https://glpat-…@gitlab.example.com`) was printed whole, on
+    every version a login and a `?token=` were, and on PHP without the curl extension the whole
+    `user:password@`. A certificate curl could not read, or a corrupt file in Composer's cache, put a
+    path of the machine in the message. Every URL in these messages, and in the repository activity
+    notes', is now written without its userinfo, query and fragment, and every path of the machine
+    keeps its last segment alone (`.../ca.pem`). The host stays.
+  - `--explain`, and the HTML page's details, printed a VCS repository configured by a path
+    (`/Users/<you>/client/lib`, `~/src/lib`) as the lock records it. `lock.repository` and
+    `metadata.repository` are now null for a path or a `file://` URL, and the text output has no
+    `source` line for it. A remote without a scheme loses its user (`git.example.com:lib.git`), and a
+    URL its query and fragment. A password with an `@` in it lost only what came before its `@`;
+    it now goes whole. The page's repository link is decided from what the package says, as before.
+  - `baseline.path`, and the table's baseline line, printed an absolute `--baseline` or
+    `extra.lockrot.baseline` as configured. They now name it relative to the project directory, or
+    by its file name when it lies elsewhere, as `run.lock_file` names the lock. Messages on the
+    terminal still print the path as configured.
+
+  What a report still names — a private registry's host, a repository on a forge — and how to take
+  it out before publishing is in [schema.md](docs/schema.md#what-a-report-says-about-your-repositories).
+  SARIF keeps `%SRCROOT%`, the project directory's absolute URL that code scanning resolves results
+  against; [ci.md](docs/ci.md#-formatsarif) says how to drop it.
+
 - A package name, a version, a constraint or a note that looked like console markup could break the
   report or restyle it. The table, `--explain` and a `table` file escaped that text with Symfony's
   `OutputFormatter::escape()`, which on the symfony/console 5.4 inside Composer's PHARs and
