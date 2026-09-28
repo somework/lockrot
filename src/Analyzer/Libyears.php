@@ -195,7 +195,7 @@ final class Libyears
     private static function reasonFor(Finding $finding): string
     {
         $note = $finding->note();
-        if ($note === Analyzer::NOTE_NOT_IN_REPOSITORY) {
+        if ($note === Finding::NOTE_NOT_IN_REPOSITORY) {
             return self::NOT_FROM_COMPOSER_REPOSITORY;
         }
         if ($note !== null) {

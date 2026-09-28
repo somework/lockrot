@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Analyzer;
 
-use Lockrot\Analyzer\Analyzer;
 use Lockrot\Analyzer\Libyears;
 use Lockrot\Clock;
 use Lockrot\Data\Repository\InstalledRelease;
@@ -37,7 +36,7 @@ final class LibyearsTest extends TestCase
 
     private static function finding(string $package, ?float $libyears, bool $direct = true, string $version = '1.0.0', ?string $note = null): Finding
     {
-        return new Finding($package, $version, Verdict::OK, [], $direct ? [$package] : ['vendor/root', $package], null, null, $note, false, [], $libyears, $note !== Analyzer::NOTE_NOT_IN_REPOSITORY);
+        return new Finding($package, $version, Verdict::OK, [], $direct ? [$package] : ['vendor/root', $package], null, null, $note, false, [], $libyears, $note !== Finding::NOTE_NOT_IN_REPOSITORY);
     }
 
     // ---- the per-package rule --------------------------------------------------------------
@@ -287,7 +286,7 @@ final class LibyearsTest extends TestCase
     {
         $block = Libyears::fromFindings([
             self::finding('measured/one', 1.0),
-            self::finding('path/local', null, true, 'dev-main', Analyzer::NOTE_NOT_IN_REPOSITORY),
+            self::finding('path/local', null, true, 'dev-main', Finding::NOTE_NOT_IN_REPOSITORY),
             self::finding('gone/missing', null, true, '1.0.0', 'not found in the repository'),
             self::finding('gone/failed', null, true, '1.0.0', 'Repository metadata unavailable: timeout'),
             self::finding('pinned/main', null, true, 'dev-main'),
@@ -309,7 +308,7 @@ final class LibyearsTest extends TestCase
     {
         self::assertSame('branch snapshot', Libyears::reasonWords(self::finding('pinned/main', null, true, 'dev-main')));
         self::assertSame('no release date lockrot trusts', Libyears::reasonWords(self::finding('undated/split', null, true, 'v1.37.0')));
-        self::assertSame('not from a Composer repository', Libyears::reasonWords(self::finding('path/local', null, true, 'dev-main', Analyzer::NOTE_NOT_IN_REPOSITORY)));
+        self::assertSame('not from a Composer repository', Libyears::reasonWords(self::finding('path/local', null, true, 'dev-main', Finding::NOTE_NOT_IN_REPOSITORY)));
         self::assertSame('metadata unavailable', Libyears::reasonWords(self::finding('gone/failed', null, true, '1.0.0', 'Repository metadata unavailable: timeout')));
     }
 
