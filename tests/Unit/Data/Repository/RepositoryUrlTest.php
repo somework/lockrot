@@ -231,18 +231,15 @@ final class RepositoryUrlTest extends TestCase
         );
     }
 
-    /** What PCRE cannot finish is withheld, never passed on as it came. */
+    /**
+     * What PCRE cannot finish is withheld, never passed on as it came. The limits are set when a
+     * PHP starts: at run time, whether a pattern compiled earlier honours them varies with the build.
+     */
     public function testAMessageThatCannotBeRedactedIsWithheld(): void
     {
-        $limit = (string) \ini_get('pcre.backtrack_limit');
-        $jit = (string) \ini_get('pcre.jit');
-        ini_set('pcre.jit', '0');
-        ini_set('pcre.backtrack_limit', '1');
-        try {
-            self::assertSame(RepositoryUrl::WITHHELD, RepositoryUrl::inText('from https://ci:s3cr3t@repo.acme.test/p'));
-        } finally {
-            ini_set('pcre.backtrack_limit', $limit);
-            ini_set('pcre.jit', $jit);
-        }
+        $script = 'require '.var_export(\dirname(__DIR__, 4).'/vendor/autoload.php', true).'; echo '.RepositoryUrl::class.'::inText("from https://ci:s3cr3t@repo.acme.test/p");';
+        $output = shell_exec(escapeshellarg(\PHP_BINARY).' -d pcre.jit=0 -d pcre.backtrack_limit=1 -r '.escapeshellarg($script));
+
+        self::assertSame(RepositoryUrl::WITHHELD, $output);
     }
 }
