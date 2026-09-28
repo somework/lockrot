@@ -50,7 +50,7 @@ final class AnalyzerRunNotesTest extends TestCase
         $failed = ['vendor/a' => MetadataLoaderInterface::OFFLINE_NOT_FOUND_REASON, 'vendor/b' => 'the file for this package could not be read'];
         $advisories = new AdvisoryBatch([], [RunNote::advisoryIgnoreUnreadable('Unknown key'), RunNote::advisoriesNotChecked(RunNote::ADVISORIES_OFFLINE, 0)]);
 
-        $report = $this->analyze($packages, new MetadataBatch([], [], $failed), $this->http([]), true, $advisories)->report();
+        $report = $this->analyze($packages, new MetadataBatch([], [], $failed), $this->http([]), true, $advisories, false, true)->report();
 
         self::assertSame(['offline', 'metadata_unavailable', 'advisory_ignore_unreadable', 'advisories_not_checked', 'not_from_composer_repository'], array_map(static fn (RunNote $note): string => $note->code(), $report->runNotes()));
         self::assertSame($report->notes(), array_map(static fn (RunNote $note): string => $note->text(), $report->runNotes()));
@@ -104,7 +104,7 @@ final class AnalyzerRunNotesTest extends TestCase
             'https://gitlab.example.org/api/v4/projects/team%2Fdown/repository/commits?all=true&per_page=1' => [500, ''],
         ]);
 
-        $analysis = $this->analyze($packages, $metadata, $http, false, null, false, ['gitlab.com', 'gitlab.example.org']);
+        $analysis = $this->analyze($packages, $metadata, $http, false, null, false, false, ['gitlab.com', 'gitlab.example.org']);
         $report = $analysis->report();
 
         self::assertSame([
@@ -185,7 +185,7 @@ final class AnalyzerRunNotesTest extends TestCase
         $packages[] = self::locked('vendor/recent');
         $metadata['vendor/recent'] = self::metadata('vendor/recent', 'https://github.com/vendor/recent.git', self::RECENT);
 
-        $analysis = $this->analyze($packages, new MetadataBatch($metadata, [], []), $this->http($answers), false, null, false, ['gitlab.com'], 1);
+        $analysis = $this->analyze($packages, new MetadataBatch($metadata, [], []), $this->http($answers), false, null, false, false, ['gitlab.com'], 1);
         $cap = $analysis->report()->runNotes()[0];
 
         self::assertSame('GitHub token not set: repository activity checked for 1 candidate packages, 3 packages skipped (set GITHUB_TOKEN to check all)', $cap->text());
@@ -195,25 +195,45 @@ final class AnalyzerRunNotesTest extends TestCase
         self::assertSame([NotCheckedRule::RATE_BUDGET => 2, NotCheckedRule::NO_TOKEN => 1], $reasons);
     }
 
+    /** Every package whose repository was never asked carries the reason the note gives, not only the first. */
     public function testAnExhaustedBudgetSaysTheActivityWasNotChecked(): void
     {
-        $packages = [self::locked('vendor/a')];
-        $metadata = new MetadataBatch(['vendor/a' => self::metadata('vendor/a', 'https://github.com/vendor/a.git')], [], []);
+        $packages = [self::locked('vendor/a'), self::locked('vendor/b')];
+        $metadata = new MetadataBatch([
+            'vendor/a' => self::metadata('vendor/a', 'https://github.com/vendor/a.git'),
+            'vendor/b' => self::metadata('vendor/b', 'https://github.com/vendor/b.git'),
+        ], [], []);
 
-        $report = $this->analyze($packages, $metadata, $this->http([]), true, null, true)->report();
+        $analysis = $this->analyze($packages, $metadata, $this->http([]), true, null, true);
+        $report = $analysis->report();
 
         self::assertSame([RunNote::REPOSITORY_ACTIVITY_NOT_CHECKED], array_map(static fn (RunNote $note): string => $note->code(), $report->runNotes()));
         self::assertSame(['reason' => 'install_time_budget'], $report->runNotes()[0]->data());
         self::assertFalse($report->hadNetworkFailures());
+        self::assertSame(['vendor/a' => NotCheckedRule::BUDGET, 'vendor/b' => NotCheckedRule::BUDGET], self::activityReasons($analysis, ['vendor/a', 'vendor/b']));
+    }
+
+    /** Offline, every package whose activity lockrot's cache does not hold carries `offline`, as the offline note says. */
+    public function testOfflineEveryUnreadRepositoryIsOffline(): void
+    {
+        $packages = [self::locked('vendor/a'), self::locked('vendor/b')];
+        $metadata = new MetadataBatch([
+            'vendor/a' => self::metadata('vendor/a', 'https://github.com/vendor/a.git'),
+            'vendor/b' => self::metadata('vendor/b', 'https://github.com/vendor/b.git'),
+        ], [], []);
+
+        $analysis = $this->analyze($packages, $metadata, $this->http([]), true, null, false, true);
+
+        self::assertSame(RunNote::OFFLINE, $analysis->report()->runNotes()[0]->code());
+        self::assertSame(['vendor/a' => NotCheckedRule::OFFLINE, 'vendor/b' => NotCheckedRule::OFFLINE], self::activityReasons($analysis, ['vendor/a', 'vendor/b']));
     }
 
     /**
      * @param list<array<string, mixed>> $packages
      * @param list<string>               $gitlabDomains
      */
-    private function analyze(array $packages, MetadataBatch $metadata, HttpClientInterface $http, bool $token, ?AdvisoryBatch $advisories = null, bool $pastDeadline = false, array $gitlabDomains = ['gitlab.com'], int $anonymousBudget = ActivityFetchPlanner::DEFAULT_ANONYMOUS_BUDGET): Analysis
+    private function analyze(array $packages, MetadataBatch $metadata, HttpClientInterface $http, bool $token, ?AdvisoryBatch $advisories = null, bool $pastDeadline = false, bool $offline = false, array $gitlabDomains = ['gitlab.com'], int $anonymousBudget = ActivityFetchPlanner::DEFAULT_ANONYMOUS_BUDGET): Analysis
     {
-        $offline = $metadata->failed() !== [] && \in_array(MetadataLoaderInterface::OFFLINE_NOT_FOUND_REASON, $metadata->failed(), true);
         $clock = Clock::fixed(F::NOW);
         $auth = ForgeAuth::withTokens(new Tokens($token ? 't' : null, null));
         $analyzer = new Analyzer(

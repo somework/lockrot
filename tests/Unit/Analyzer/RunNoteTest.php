@@ -21,7 +21,12 @@ final class RunNoteTest extends TestCase
 {
     private const BUDGET = 'not checked: install-time budget exhausted';
 
-    /** @return iterable<string, array{RunNote, string, string, bool, array<string, mixed>}> */
+    /**
+     * Each note is built in the test, not here: a provider runs before coverage is recorded, and a
+     * constructor only a provider called would read as untested.
+     *
+     * @return iterable<string, array{callable(): RunNote, string, string, bool, array<string, mixed>}>
+     */
     public static function notes(): iterable
     {
         $github = new RepoRef(RepoRef::GITHUB, 'github.com', 'acme/lib');
@@ -30,23 +35,23 @@ final class RunNoteTest extends TestCase
         $gitlab = new RepoRef(RepoRef::GITLAB, 'gitlab.com', 'x/y');
         $bitbucket = new RepoRef(RepoRef::BITBUCKET, 'bitbucket.org', 'workspace/one');
 
-        yield 'offline' => [RunNote::offline(), 'offline', "offline: repository metadata served from Composer's cache", false, []];
+        yield 'offline' => [static fn (): RunNote => RunNote::offline(), 'offline', "offline: repository metadata served from Composer's cache", false, []];
         yield 'metadata, one reason' => [
-            RunNote::metadataUnavailable(['vendor/a' => 'HTTP 503']),
+            static fn (): RunNote => RunNote::metadataUnavailable(['vendor/a' => 'HTTP 503']),
             'metadata_unavailable',
             'Repository metadata unavailable for 1 package: HTTP 503',
             true,
             ['package_count' => 1, 'reasons' => [['reason' => 'fetch_failed', 'message' => 'HTTP 503', 'package_count' => 1]]],
         ];
         yield 'metadata, one reason in the plural' => [
-            RunNote::metadataUnavailable(['vendor/a' => MetadataLoaderInterface::OFFLINE_NOT_FOUND_REASON, 'vendor/b' => MetadataLoaderInterface::OFFLINE_NOT_FOUND_REASON]),
+            static fn (): RunNote => RunNote::metadataUnavailable(['vendor/a' => MetadataLoaderInterface::OFFLINE_NOT_FOUND_REASON, 'vendor/b' => MetadataLoaderInterface::OFFLINE_NOT_FOUND_REASON]),
             'metadata_unavailable',
             "Repository metadata unavailable for 2 packages: offline: not present in Composer's cache",
             true,
             ['package_count' => 2, 'reasons' => [['reason' => 'offline', 'message' => "offline: not present in Composer's cache", 'package_count' => 2]]],
         ];
         yield 'metadata, several reasons' => [
-            RunNote::metadataUnavailable(['vendor/a' => self::BUDGET, 'vendor/b' => self::BUDGET, 'vendor/c' => 'connection refused', 'vendor/d' => self::BUDGET]),
+            static fn (): RunNote => RunNote::metadataUnavailable(['vendor/a' => self::BUDGET, 'vendor/b' => self::BUDGET, 'vendor/c' => 'connection refused', 'vendor/d' => self::BUDGET]),
             'metadata_unavailable',
             'Repository metadata unavailable for 4 packages: not checked: install-time budget exhausted (3); connection refused (1)',
             true,
@@ -55,92 +60,99 @@ final class RunNoteTest extends TestCase
                 ['reason' => 'fetch_failed', 'message' => 'connection refused', 'package_count' => 1],
             ]],
         ];
+        yield 'metadata, a message PHP would read as a number' => [
+            static fn (): RunNote => RunNote::metadataUnavailable(['vendor/a' => '503', 'vendor/b' => '503']),
+            'metadata_unavailable',
+            'Repository metadata unavailable for 2 packages: 503',
+            true,
+            ['package_count' => 2, 'reasons' => [['reason' => 'fetch_failed', 'message' => '503', 'package_count' => 2]]],
+        ];
         yield 'metadata, no versions' => [
-            RunNote::metadataUnavailable(['vendor/a' => MetadataLoaderInterface::NO_VERSIONS_REASON]),
+            static fn (): RunNote => RunNote::metadataUnavailable(['vendor/a' => MetadataLoaderInterface::NO_VERSIONS_REASON]),
             'metadata_unavailable',
             'Repository metadata unavailable for 1 package: repository listed the package but returned no versions',
             true,
             ['package_count' => 1, 'reasons' => [['reason' => 'no_versions', 'message' => 'repository listed the package but returned no versions', 'package_count' => 1]]],
         ];
         yield 'a monorepo parent' => [
-            RunNote::monorepoParentUnavailable('laravel/framework', 'curl error 6: Could not resolve host'),
+            static fn (): RunNote => RunNote::monorepoParentUnavailable('laravel/framework', 'curl error 6: Could not resolve host'),
             'monorepo_parent_unavailable',
             'Repository metadata unavailable for laravel/framework, which dates the packages split out of it: curl error 6: Could not resolve host',
             true,
             ['parent' => 'laravel/framework', 'reason' => 'fetch_failed', 'message' => 'curl error 6: Could not resolve host'],
         ];
         yield 'the ignore list' => [
-            RunNote::advisoryIgnoreUnreadable('Unknown key "licenses"'),
+            static fn (): RunNote => RunNote::advisoryIgnoreUnreadable('Unknown key "licenses"'),
             'advisory_ignore_unreadable',
             'Composer\'s advisory ignore list not read (Unknown key "licenses"); every advisory counts',
             false,
             ['message' => 'Unknown key "licenses"'],
         ];
         yield 'the ignore list, no message' => [
-            RunNote::advisoryIgnoreUnreadable(''),
+            static fn (): RunNote => RunNote::advisoryIgnoreUnreadable(''),
             'advisory_ignore_unreadable',
             "Composer's advisory ignore list not read (); every advisory counts",
             false,
             ['message' => ''],
         ];
         yield 'advisories, a transport failure' => [
-            RunNote::advisoriesUnavailable('composer repo (https://repo.example.com)', new TransportException("HTTP 503\nthe body")),
+            static fn (): RunNote => RunNote::advisoriesUnavailable('composer repo (https://repo.example.com)', new TransportException("HTTP 503\nthe body")),
             'advisories_unavailable',
             'security advisories unavailable from composer repo (https://repo.example.com): HTTP 503',
             true,
             ['composer_repository' => 'composer repo (https://repo.example.com)', 'message' => 'HTTP 503'],
         ];
         yield 'advisories, another failure with no message' => [
-            RunNote::advisoriesUnavailable('packagist.org', new \LogicException('')),
+            static fn (): RunNote => RunNote::advisoriesUnavailable('packagist.org', new \LogicException('')),
             'advisories_unavailable',
             'security advisories unavailable from packagist.org: LogicException',
             false,
             ['composer_repository' => 'packagist.org', 'message' => 'LogicException'],
         ];
         yield 'advisories offline' => [
-            RunNote::advisoriesNotChecked(RunNote::ADVISORIES_OFFLINE, 0),
+            static fn (): RunNote => RunNote::advisoriesNotChecked(RunNote::ADVISORIES_OFFLINE, 0),
             'advisories_not_checked',
             'offline: security advisories not checked; a priority they would raise stays one step lower',
             false,
             ['reason' => 'offline', 'composer_repositories_checked' => 0],
         ];
         yield 'advisories on an old Composer' => [
-            RunNote::advisoriesNotChecked(RunNote::ADVISORIES_COMPOSER_TOO_OLD, 0),
+            static fn (): RunNote => RunNote::advisoriesNotChecked(RunNote::ADVISORIES_COMPOSER_TOO_OLD, 0),
             'advisories_not_checked',
             'security advisories not checked (needs Composer 2.4 or newer); a priority they would raise stays one step lower',
             false,
             ['reason' => 'composer_too_old', 'composer_repositories_checked' => 0],
         ];
         yield 'advisories past the budget' => [
-            RunNote::advisoriesNotChecked(RunNote::INSTALL_TIME_BUDGET, 2),
+            static fn (): RunNote => RunNote::advisoriesNotChecked(RunNote::INSTALL_TIME_BUDGET, 2),
             'advisories_not_checked',
             'security advisories not checked: install-time budget exhausted; a priority they would raise stays one step lower',
             false,
             ['reason' => 'install_time_budget', 'composer_repositories_checked' => 2],
         ];
         yield 'activity past the budget' => [
-            RunNote::repositoryActivityNotChecked(),
+            static fn (): RunNote => RunNote::repositoryActivityNotChecked(),
             'repository_activity_not_checked',
             'repository activity not checked: install-time budget exhausted',
             false,
             ['reason' => 'install_time_budget'],
         ];
         yield 'the GitHub cap' => [
-            RunNote::repositoryActivityAnonymousCap(RepoRef::GITHUB, 11, 80, 9),
+            static fn (): RunNote => RunNote::repositoryActivityAnonymousCap(RepoRef::GITHUB, 11, 80, 9),
             'repository_activity_anonymous_cap',
             'GitHub token not set: repository activity checked for 11 candidate packages, 89 packages skipped (set GITHUB_TOKEN to check all)',
             false,
             ['forge_id' => 'github', 'checked' => 11, 'skipped_no_token' => 80, 'skipped_budget' => 9],
         ];
         yield 'the Bitbucket cap' => [
-            RunNote::repositoryActivityAnonymousCap(RepoRef::BITBUCKET, 1, 0, 0),
+            static fn (): RunNote => RunNote::repositoryActivityAnonymousCap(RepoRef::BITBUCKET, 1, 0, 0),
             'repository_activity_anonymous_cap',
             'Bitbucket credentials not set: repository activity checked for 1 candidate packages, 0 packages skipped (add bitbucket.org credentials to auth.json to check all)',
             false,
             ['forge_id' => 'bitbucket', 'checked' => 1, 'skipped_no_token' => 0, 'skipped_budget' => 0],
         ];
         yield 'rate limited' => [
-            RunNote::repositoryActivityRateLimited(RepoRef::GITHUB, [[$github, 'HTTP 403'], [$private, 'HTTP 429']]),
+            static fn (): RunNote => RunNote::repositoryActivityRateLimited(RepoRef::GITHUB, [[$github, 'HTTP 403'], [$private, 'HTTP 429']]),
             'repository_activity_rate_limited',
             'GitHub API rate limit reached; repository activity missing for 2 repositories',
             true,
@@ -150,7 +162,7 @@ final class RunNoteTest extends TestCase
             ]],
         ];
         yield 'unreachable, the first reason printed' => [
-            RunNote::repositoryActivityUnreachable(RepoRef::GITLAB, [[$selfHosted, 'curl error 7: Failed to connect'], [$gitlab, 'HTTP 502']]),
+            static fn (): RunNote => RunNote::repositoryActivityUnreachable(RepoRef::GITLAB, [[$selfHosted, 'curl error 7: Failed to connect'], [$gitlab, 'HTTP 502']]),
             'repository_activity_unreachable',
             'GitLab unreachable for 2 repositories: curl error 7: Failed to connect',
             true,
@@ -160,21 +172,21 @@ final class RunNoteTest extends TestCase
             ]],
         ];
         yield 'not found' => [
-            RunNote::repositoryActivityNotFound(RepoRef::BITBUCKET, [$bitbucket, new RepoRef(RepoRef::BITBUCKET, 'bitbucket.org', 'workspace/two')]),
+            static fn (): RunNote => RunNote::repositoryActivityNotFound(RepoRef::BITBUCKET, [$bitbucket, new RepoRef(RepoRef::BITBUCKET, 'bitbucket.org', 'workspace/two')]),
             'repository_activity_not_found',
             'Bitbucket did not answer for 2 repositories (private, renamed or removed); repository activity missing',
             false,
             ['forge_id' => 'bitbucket', 'repositories' => [['host' => 'bitbucket.org', 'repo' => 'workspace/one'], ['host' => 'bitbucket.org', 'repo' => 'workspace/two']]],
         ];
         yield 'one package not from a Composer repository' => [
-            RunNote::notFromComposerRepository(1),
+            static fn (): RunNote => RunNote::notFromComposerRepository(1),
             'not_from_composer_repository',
             '1 package is not from a Composer repository and was not checked',
             false,
             ['package_count' => 1],
         ];
         yield 'several packages not from a Composer repository' => [
-            RunNote::notFromComposerRepository(2),
+            static fn (): RunNote => RunNote::notFromComposerRepository(2),
             'not_from_composer_repository',
             '2 packages are not from a Composer repository and were not checked',
             false,
@@ -183,13 +195,15 @@ final class RunNoteTest extends TestCase
     }
 
     /**
+     * @param callable(): RunNote   $build
      * @param array<string, mixed> $data
      *
      * @dataProvider notes
      */
     #[DataProvider('notes')]
-    public function testANoteSaysInTextWhatItsFieldsSay(RunNote $note, string $code, string $text, bool $setsNetworkFailures, array $data): void
+    public function testANoteSaysInTextWhatItsFieldsSay(callable $build, string $code, string $text, bool $setsNetworkFailures, array $data): void
     {
+        $note = $build();
         self::assertSame($code, $note->code());
         self::assertSame($text, $note->text());
         self::assertSame('https://lockrot.dev/notes/#'.$code, $note->docsUrl());
