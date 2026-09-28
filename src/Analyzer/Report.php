@@ -475,7 +475,6 @@ final class Report
             'baseline' => $this->baseline === null ? null : $this->baseline->toArray(),
             'gate' => $gate === null ? null : $gate->toArray(),
             'notes' => $this->notes(),
-            // The same notes, typed: one entry per `notes` string, at the same index.
             'note_details' => array_map(static fn (RunNote $note): array => $note->toArray(), $this->notes),
             'findings' => array_map(
                 fn (Finding $f, int $at): array => $f->toArray() + [
