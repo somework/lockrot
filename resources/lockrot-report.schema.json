@@ -2025,7 +2025,7 @@
       }
     },
     "noteAdvisoriesNotChecked": {
-      "description": "`advisories_not_checked`: no advisory was looked for past this point, so a priority an advisory would raise stays one step lower. `composer_repositories_checked` counts the advisory-capable repositories asked before the check stopped: always 0 for `offline` and `composer_too_old`; above 0 under `install_time_budget`, the check was partial and what those repositories returned is in the report.",
+      "description": "`advisories_not_checked`: no advisory was looked for past this point, so a priority an advisory would raise stays one step lower. `composer_repositories_checked` counts the advisory-capable repositories lockrot asked before the check stopped, whatever each gave: advisories, none at all, or a failure, which has its own `advisories_unavailable` note. Always 0 for `offline` and `composer_too_old`; above 0 under `install_time_budget`, the check was partial: the advisories those repositories returned are in the findings, and the rest were never asked.",
       "type": "object",
       "required": [
         "reason",

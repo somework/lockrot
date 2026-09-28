@@ -166,8 +166,8 @@ final class RunNote
 
     /**
      * @param string $reason  one of {@see ADVISORIES_NOT_CHECKED_REASONS}
-     * @param int    $checked the advisory-capable repositories asked before the check stopped; above
-     *                        zero, what they answered is in the report
+     * @param int    $checked the advisory-capable repositories asked before the check stopped,
+     *                        whatever each gave: advisories, none, or a failure noted on its own
      */
     public static function advisoriesNotChecked(string $reason, int $checked): self
     {

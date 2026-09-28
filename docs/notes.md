@@ -96,9 +96,12 @@ No advisory was looked for past this point, so a priority an advisory would rais
 - `composer_too_old` — Composer below 2.4 has no advisory API;
 - `install_time_budget` — the install-time budget ran out.
 
-`composer_repositories_checked` counts the advisory-capable repositories asked before the check
-stopped: 0 for `offline` and `composer_too_old`, and above 0 under `install_time_budget` when the
-check was partial — what those repositories returned is in the report. `sets_network_failures`: no.
+`composer_repositories_checked` counts the advisory-capable repositories lockrot asked before the
+check stopped, whatever each gave: advisories, none at all, or a failure, which has its own
+[`advisories_unavailable`](#advisories_unavailable) note. It is 0 for `offline` and
+`composer_too_old`; above 0 under `install_time_budget`, the check was partial: the advisories those
+repositories returned are in the findings, and the rest were never asked. `sets_network_failures`:
+no.
 
 ## Repository activity
 

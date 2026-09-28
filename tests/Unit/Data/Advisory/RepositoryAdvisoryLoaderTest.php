@@ -330,7 +330,7 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
         self::assertCount(2, self::texts($batch));
         self::assertStringStartsWith('security advisories unavailable from ', self::texts($batch)[0]);
         self::assertSame(self::BUDGET_NOTE, self::texts($batch)[1]);
-        self::assertSame(['reason' => 'install_time_budget', 'composer_repositories_checked' => 1], $batch->notes()[1]->data(), 'the first repository was asked before the budget ran out, so the check was partial');
+        self::assertSame(['reason' => 'install_time_budget', 'composer_repositories_checked' => 1], $batch->notes()[1]->data(), 'the first repository was asked, and failed, before the budget ran out: it counts all the same');
         self::assertSame([true, false], self::networkFailures($batch));
         self::assertSame([], $batch->byName(), 'the second repository was never asked');
     }
