@@ -1,0 +1,70 @@
+{
+    "name": "acme/origins",
+    "description": "Every kind of origin lockrot tells apart, and the URLs it must never write out.",
+    "require": {
+        "acme/from-packagist": "*",
+        "acme/from-private-packagist": "*",
+        "acme/from-wp-packages": "*",
+        "acme/from-drupal-path": "*",
+        "acme/from-private-registry": "*",
+        "acme/inline-copied": "*",
+        "acme/vcs-lib": "*",
+        "acme/renamed": "*",
+        "acme/inline": "*",
+        "acme/local": "*",
+        "acme/artifact": "*",
+        "acme/after-satis": "*",
+        "acme/metapackage": "*",
+        "acme/crafted\"onmouseover=\"x?next=evil.example#x": "*"
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://ci-user:s3cr3t@github.com/acme/vcs-lib"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/acme/old-name"
+        },
+        {
+            "type": "package",
+            "package": {
+                "name": "acme/inline",
+                "version": "1.0.0",
+                "dist": {
+                    "type": "zip",
+                    "url": "https://downloads.acme.test/inline-1.0.0.zip"
+                }
+            }
+        },
+        {
+            "type": "package",
+            "package": {
+                "name": "acme/inline-copied",
+                "version": "2.1.0",
+                "notification-url": "https://packagist.org/downloads/",
+                "dist": {
+                    "type": "zip",
+                    "url": "https://api.github.com/repos/acme/inline-copied/zipball/abc"
+                }
+            }
+        },
+        {
+            "type": "path",
+            "url": "packages/*"
+        },
+        {
+            "type": "artifact",
+            "url": "/home/ci-user/secret-client/artifacts"
+        },
+        {
+            "type": "composer",
+            "url": "https://ci-user:s3cr3t@satis.internal.acme.test"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/acme/after-satis"
+        }
+    ],
+    "minimum-stability": "dev"
+}

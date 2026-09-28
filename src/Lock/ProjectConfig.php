@@ -22,13 +22,14 @@ final class ProjectConfig
     private array $lockrotExtra;
     private ?string $platformPhp;
     private ?string $requirePhp;
+    private ConfiguredRepositories $repositories;
 
     /**
      * @param list<string> $requires
      * @param list<string> $devRequires
      * @param array<string, mixed> $lockrotExtra
      */
-    private function __construct(array $requires, array $devRequires, array $lockrotExtra, ?string $platformPhp, ?string $name = null, ?string $requirePhp = null)
+    private function __construct(array $requires, array $devRequires, array $lockrotExtra, ?string $platformPhp, ?string $name = null, ?string $requirePhp = null, ?ConfiguredRepositories $repositories = null)
     {
         $this->name = $name;
         $this->requires = $requires;
@@ -36,6 +37,7 @@ final class ProjectConfig
         $this->lockrotExtra = $lockrotExtra;
         $this->platformPhp = $platformPhp;
         $this->requirePhp = $requirePhp;
+        $this->repositories = $repositories ?? ConfiguredRepositories::none();
     }
 
     public static function empty(): self
@@ -75,7 +77,8 @@ final class ProjectConfig
             self::lockrotExtraFrom($extraRoot),
             \is_string($platform) ? $platform : null,
             \is_string($name) && $name !== '' ? $name : null,
-            \is_string($requirePhp) && $requirePhp !== '' ? $requirePhp : null
+            \is_string($requirePhp) && $requirePhp !== '' ? $requirePhp : null,
+            ConfiguredRepositories::fromManifest($json['repositories'] ?? null)
         );
     }
 
@@ -165,6 +168,12 @@ final class ProjectConfig
     public function name(): ?string
     {
         return $this->name;
+    }
+
+    /** The repositories this manifest configures, which say where a lock entry without a notification-url came from. */
+    public function repositories(): ConfiguredRepositories
+    {
+        return $this->repositories;
     }
 
     public function platformPhp(): ?string

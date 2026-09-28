@@ -8,6 +8,7 @@ use Composer\Package\Loader\ValidatingArrayLoader;
 use Lockrot\Analyzer\Libyears;
 use Lockrot\Analyzer\LibyearsMeasurement;
 use Lockrot\Data\Repository\ReleaseBranch;
+use Lockrot\Lock\PackageOrigin;
 use Lockrot\Signal\Signal;
 
 /** @internal */
@@ -63,19 +64,18 @@ final class Finding
      * sum what was measured, not what was printed.
      */
     private LibyearsMeasurement $libyears;
-    /**
-     * The lock entry carries a Composer notification-url ({@see \Lockrot\Lock\LockedPackage::isFromComposerRepository()}),
-     * the only kind of entry lockrot asks a repository about; when false, none was asked. Not "comes from packagist.org".
-     */
-    private bool $fromComposerRepository;
+    /** Where the lock entry came from; `from_composer_repository` is read from its kind. */
+    private PackageOrigin $origin;
 
     /**
      * @param list<Signal> $signals
      * @param list<string> $chain
      * @param list<string> $directDependents
      */
-    public function __construct(string $package, string $version, string $verdict, array $signals, array $chain, ?string $allowlistReason, ?\DateTimeImmutable $dataDate, ?string $note = null, bool $dev = false, array $directDependents = [], ?LibyearsMeasurement $libyears = null, bool $fromComposerRepository = true)
+    public function __construct(string $package, string $version, string $verdict, array $signals, array $chain, ?string $allowlistReason, ?\DateTimeImmutable $dataDate, ?string $note = null, bool $dev = false, array $directDependents = [], ?LibyearsMeasurement $libyears = null, ?PackageOrigin $origin = null)
     {
+        $origin ??= PackageOrigin::unattributed();
+        $fromComposerRepository = $origin->isComposerRepository();
         // The note says no repository was asked; a caller that forgot the flag would contradict it.
         if ($note === self::NOTE_NOT_IN_REPOSITORY && $fromComposerRepository) {
             throw new \InvalidArgumentException(\sprintf('%s is noted as not from a Composer repository, so it cannot be from one.', $package));
@@ -98,7 +98,7 @@ final class Finding
             throw new \InvalidArgumentException(\sprintf('%s: a package goes unmeasured as not from a Composer repository exactly when it is not from one.', $package));
         }
         $this->libyears = $libyears;
-        $this->fromComposerRepository = $fromComposerRepository;
+        $this->origin = $origin;
     }
 
     /**
@@ -170,7 +170,12 @@ final class Finding
 
     public function isFromComposerRepository(): bool
     {
-        return $this->fromComposerRepository;
+        return $this->origin->isComposerRepository();
+    }
+
+    public function origin(): PackageOrigin
+    {
+        return $this->origin;
     }
 
     /** @return list<string> */
@@ -484,7 +489,8 @@ final class Finding
         return [
             'package' => $this->package, 'version' => $this->version, 'verdict' => $this->verdict,
             'priority' => $this->priority(), 'direct' => $this->isDirect(), 'dev' => $this->dev,
-            'from_composer_repository' => $this->fromComposerRepository,
+            'from_composer_repository' => $this->isFromComposerRepository(),
+            'origin' => $this->origin->toArray(),
             'replacement' => $this->successor(),
             'signals' => $signals, 'chain' => $this->chain, 'direct_dependents' => $this->directDependents,
             'evidence' => $this->evidence(),

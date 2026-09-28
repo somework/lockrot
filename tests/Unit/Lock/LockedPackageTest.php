@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Lock;
 
 use Lockrot\Lock\LockedPackage;
+use Lockrot\Tests\Support\Origins;
 use PHPUnit\Framework\TestCase;
 
 final class LockedPackageTest extends TestCase
@@ -28,6 +29,6 @@ final class LockedPackageTest extends TestCase
 
     private static function package(string $version): LockedPackage
     {
-        return new LockedPackage('vendor/pkg', $version, null, null, [], null, 'library', true, false, false);
+        return new LockedPackage('vendor/pkg', $version, null, null, [], null, 'library', Origins::facts(true), false, false);
     }
 }

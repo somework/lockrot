@@ -10,6 +10,7 @@ use Lockrot\Clock;
 use Lockrot\Data\Repository\InstalledRelease;
 use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Lock\LockedPackage;
+use Lockrot\Tests\Support\Origins;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -21,7 +22,7 @@ final class LibyearsTest extends TestCase
 
     private static function package(string $version = 'v5.13.2', ?string $time = self::LOCKED_AT, bool $fromComposerRepository = true, bool $dev = false): LockedPackage
     {
-        return new LockedPackage('scheb/2fa-bundle', $version, $time === null ? null : new \DateTimeImmutable($time), null, [], null, 'library', $fromComposerRepository, $dev, false);
+        return new LockedPackage('scheb/2fa-bundle', $version, $time === null ? null : new \DateTimeImmutable($time), null, [], null, 'library', Origins::facts($fromComposerRepository), $dev, false);
     }
 
     /** @param array<array-key, array{string, ?string}> $branches branch key (an int where PHP makes one) => [newest dated version, its date] */
@@ -38,7 +39,7 @@ final class LibyearsTest extends TestCase
 
     private static function finding(string $package, LibyearsMeasurement $libyears, bool $direct = true, string $version = '1.0.0', ?string $note = null): Finding
     {
-        return new Finding($package, $version, Verdict::OK, [], $direct ? [$package] : ['vendor/root', $package], null, null, $note, false, [], $libyears, $note !== Finding::NOTE_NOT_IN_REPOSITORY);
+        return new Finding($package, $version, Verdict::OK, [], $direct ? [$package] : ['vendor/root', $package], null, null, $note, false, [], $libyears, Origins::of($note !== Finding::NOTE_NOT_IN_REPOSITORY, $package));
     }
 
     // ---- the measurement: the years, or the one reason there are none ------------------------

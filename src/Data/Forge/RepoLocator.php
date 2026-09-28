@@ -53,7 +53,7 @@ final class RepoLocator
         if ($url === null || $url === '') {
             return null;
         }
-        $parts = self::split($url);
+        $parts = self::hostAndPath($url);
         if ($parts === null) {
             return null;
         }
@@ -88,7 +88,7 @@ final class RepoLocator
      *
      * @return array{0: string, 1: string}|null
      */
-    private static function split(string $url): ?array
+    public static function hostAndPath(string $url): ?array
     {
         if (strpos($url, '://') !== false) {
             $host = parse_url($url, \PHP_URL_HOST);

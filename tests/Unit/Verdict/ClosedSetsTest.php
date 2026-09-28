@@ -13,6 +13,7 @@ use Lockrot\Data\Forge\RepoRef;
 use Lockrot\Data\Repository\MetadataFailure;
 use Lockrot\Json\KnownValues;
 use Lockrot\Json\Schemas;
+use Lockrot\Lock\PackageOrigin;
 use Lockrot\Output\JsonFormatter;
 use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\Rule\NotCheckedRule;
@@ -55,6 +56,12 @@ final class ClosedSetsTest extends TestCase
     private const NOTE_CODE = '^([a-z][a-z0-9_]*|[a-z0-9][a-z0-9_.-]*:[a-z0-9][a-z0-9_.-]*)$';
     /** The words both pages name a run note's five vocabularies by: its code, and the forge and reasons in its data. */
     private const NOTE_VOCABULARY = "a run note's `code`, and the `forge_id` and `reason` in its `data`";
+    /** A lock entry's origin kind: lockrot's own, or a `<vendor>:<name>` one, as a note's code. */
+    private const ORIGIN_KIND = self::NOTE_CODE;
+    /** A registry lockrot names: a lower-case host name. */
+    private const HOST = '^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$';
+    /** The words both pages name a finding's origin vocabularies by. */
+    private const ORIGIN_VOCABULARY = "a finding's `origin.kind` and `origin.registry`";
     /** An S10 check or reason, an S6 reason, an S8 floor source, a branch's php_blocked_by and misses_*_php, a finding's libyears_unmeasured, a priority step's and a no-fix advisory's reason, the run's mode and fail-on kind, the gate's causes and exemptions, and a run note's forge id and reasons: a lower-case word. */
     private const WORD = '^[a-z][a-z0-9_]*$';
     private const ROOT = __DIR__.'/../../../';
@@ -273,6 +280,10 @@ final class ClosedSetsTest extends TestCase
             'explain #/definitions/metadata/properties/branches/items/properties/misses_target_php/oneOf/0' => [JsonPath::arrayAt($explain, array_merge($branchRow, ['misses_target_php', 'oneOf', 0])), self::WORD, [PhpFloor::NEEDS_NEWER, PhpFloor::STOPS_BEFORE, PhpFloor::SKIPS, PhpFloor::UNSATISFIABLE], '`misses_target_php`'],
             'explain #/definitions/metadata/properties/branches/items/properties/misses_project_php/oneOf/0' => [JsonPath::arrayAt($explain, array_merge($branchRow, ['misses_project_php', 'oneOf', 0])), self::WORD, [PhpFloor::NEEDS_NEWER, PhpFloor::STOPS_BEFORE, PhpFloor::SKIPS, PhpFloor::UNSATISFIABLE], '`misses_project_php`'],
             'explain #/definitions/signalId' => [JsonPath::arrayAt($explain, ['definitions', 'signalId']), self::SIGNAL_ID, ClosedSets::signalIds(), 'signal ids'],
+            'report #/definitions/originKind' => [JsonPath::arrayAt($report, ['definitions', 'originKind']), self::ORIGIN_KIND, PackageOrigin::KINDS, self::ORIGIN_VOCABULARY],
+            'report #/definitions/originRegistry/oneOf/0' => [JsonPath::arrayAt($report, ['definitions', 'originRegistry', 'oneOf', 0]), self::HOST, PackageOrigin::REGISTRIES, self::ORIGIN_VOCABULARY],
+            'explain #/definitions/originKind' => [JsonPath::arrayAt($explain, ['definitions', 'originKind']), self::ORIGIN_KIND, PackageOrigin::KINDS, self::ORIGIN_VOCABULARY],
+            'explain #/definitions/originRegistry/oneOf/0' => [JsonPath::arrayAt($explain, ['definitions', 'originRegistry', 'oneOf', 0]), self::HOST, PackageOrigin::REGISTRIES, self::ORIGIN_VOCABULARY],
             'config #/properties/format' => [JsonPath::arrayAt($config, ['properties', 'format']), self::FORMAT, LockrotConfig::FORMATS, "the configuration's `format`"],
         ];
         foreach (['report' => $report, 'explain' => $explain] as $document => $schema) {
@@ -347,6 +358,30 @@ final class ClosedSetsTest extends TestCase
     }
 
     /**
+     * A finding's `origin` is one open object both schemas spell alike: its three members always
+     * written, a kind and a registry from their own open sets, and a page URL with no pattern, since a
+     * registry lockrot learns to link must not need a new schema number.
+     */
+    public function testAFindingsOriginIsAnOpenObjectBothSchemasSpellAlike(): void
+    {
+        $report = self::schema(Schemas::REPORT);
+        $explain = self::schema(Schemas::EXPLAIN);
+        foreach (['report' => $report, 'explain' => $explain] as $document => $schema) {
+            $origin = JsonPath::arrayAt($schema, ['definitions', 'packageOrigin']);
+            self::assertSame(['kind', 'registry', 'package_url'], $origin['required'] ?? null, $document);
+            self::assertArrayNotHasKey('additionalProperties', $origin, $document.': open');
+            self::assertSame(['$ref' => '#/definitions/originKind'], JsonPath::arrayAt($origin, ['properties', 'kind']), $document);
+            self::assertSame(['$ref' => '#/definitions/originRegistry'], JsonPath::arrayAt($origin, ['properties', 'registry']), $document);
+            self::assertSame(['type' => ['string', 'null']], array_diff_key(JsonPath::arrayAt($origin, ['properties', 'package_url']), ['description' => true]), $document);
+            self::assertSame('#/definitions/packageOrigin', JsonPath::stringAt($schema, ['definitions', 'finding', 'properties', 'origin', '$ref']), $document);
+            self::assertNotContains('origin', JsonPath::arrayAt($schema, ['definitions', 'finding', 'required']), $document);
+        }
+        foreach (['packageOrigin', 'originKind', 'originRegistry'] as $definition) {
+            self::assertSame(JsonPath::arrayAt($report, ['definitions', $definition]), JsonPath::arrayAt($explain, ['definitions', $definition]), 'the explain schema spells '.$definition.' as the report does');
+        }
+    }
+
+    /**
      * Every open set is a string with a `pattern` and the values lockrot writes in `x-known-values`,
      * never an enum, and every known value fits the pattern. The patterns are spelled out, since the
      * strict reading drops them and the widening check never sees one narrowed; the known values are
@@ -385,6 +420,10 @@ final class ClosedSetsTest extends TestCase
             self::assertCount(2, JsonPath::arrayAt($report, $at));
         }
         self::assertTrue(JsonPath::arrayAt($report, ['definitions', 'gate', 'properties', 'tripped_by'])['uniqueItems'] ?? null, 'a cause is listed once');
+        foreach (['report' => $report, 'explain' => $explain] as $document => $schema) {
+            self::assertSame(['type' => 'null'], JsonPath::arrayAt($schema, ['definitions', 'originRegistry', 'oneOf', 1]), $document.': a registry is otherwise null');
+            self::assertCount(2, JsonPath::arrayAt($schema, ['definitions', 'originRegistry', 'oneOf']));
+        }
         foreach (['misses_target_php', 'misses_project_php'] as $side) {
             self::assertSame(['type' => 'null'], JsonPath::arrayAt($explain, array_merge($branchRow, [$side, 'oneOf', 1])), $side.' is otherwise null');
             self::assertCount(2, JsonPath::arrayAt($explain, array_merge($branchRow, [$side, 'oneOf'])));
@@ -489,7 +528,7 @@ final class ClosedSetsTest extends TestCase
         $config = self::schema(Schemas::CONFIG);
         $topLevelKeys = self::keys(JsonPath::arrayAt($config, ['properties']));
         $ignoreKeys = self::keys(JsonPath::arrayAt($config, ['properties', 'ignore', 'items', 'properties']));
-        $names = array_merge(Verdict::all(), Priority::all(), FailOn::allowed(), LockrotConfig::FORMATS, ClosedSets::signalIds(), [PhpFloor::PROJECT, PhpFloor::TARGET, PhpFloor::NEEDS_NEWER, PhpFloor::STOPS_BEFORE, PhpFloor::SKIPS, PhpFloor::UNSATISFIABLE], Libyears::REASONS, PriorityBasis::STEPS, NoFix::REASONS, Gate::MODES, FailOn::KINDS, Gate::TRIPS, Gate::EXEMPTIONS, RunNote::CODES, RepoRef::FORGES, MetadataFailure::REASONS, RunNote::ADVISORIES_NOT_CHECKED_REASONS, RunNote::REPOSITORY_ACTIVITY_NOT_CHECKED_REASONS, $topLevelKeys, $ignoreKeys);
+        $names = array_merge(Verdict::all(), Priority::all(), FailOn::allowed(), LockrotConfig::FORMATS, ClosedSets::signalIds(), [PhpFloor::PROJECT, PhpFloor::TARGET, PhpFloor::NEEDS_NEWER, PhpFloor::STOPS_BEFORE, PhpFloor::SKIPS, PhpFloor::UNSATISFIABLE], Libyears::REASONS, PriorityBasis::STEPS, NoFix::REASONS, Gate::MODES, FailOn::KINDS, Gate::TRIPS, Gate::EXEMPTIONS, RunNote::CODES, RepoRef::FORGES, MetadataFailure::REASONS, RunNote::ADVISORIES_NOT_CHECKED_REASONS, RunNote::REPOSITORY_ACTIVITY_NOT_CHECKED_REASONS, PackageOrigin::KINDS, PackageOrigin::REGISTRIES, $topLevelKeys, $ignoreKeys);
 
         foreach ($names as $name) {
             self::assertStringNotContainsString(':', $name, '<vendor>:<name> is reserved for names that are not lockrot\'s');

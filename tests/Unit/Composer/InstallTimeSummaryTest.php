@@ -322,6 +322,41 @@ final class InstallTimeSummaryTest extends TestCase
      * requirement, so it drops `critical → high` and sits below phpzip/phpzip even though its name
      * sorts first. Read the wrong way round, the dev row would come first on the name tie-break.
      */
+    /**
+     * The manifest's `repositories` is read on every install now, for where each entry came from. A
+     * block lockrot cannot read, or one Composer itself would refuse, changes nothing the summary prints.
+     */
+    public function testARepositoriesBlockLockrotCannotReadChangesNothingAtInstallTime(): void
+    {
+        $unreadable = [
+            'https://github.com/acme/lib',
+            ['url' => 'https://github.com/acme/lib'],
+            ['type' => ['vcs']],
+            ['type' => 'vcs', 'url' => ['https://github.com/acme/lib']],
+            ['type' => 'vcs', 'url' => 'https://github.com/acme/lib', 'only' => 'acme/*'],
+            ['type' => 'vcs', 'url' => 'https://github.com/acme/lib', 'only' => ['acme/*'], 'exclude' => ['other/*']],
+            ['type' => 'vcs', 'url' => 'https://github.com/acme/lib', 'only' => [7]],
+            ['packagist.org' => false],
+            ['type' => 'package', 'package' => 'acme/lib'],
+        ];
+        $outputs = [];
+        foreach ([null, $unreadable, 'not a list'] as $repositories) {
+            $dir = $this->project();
+            if ($repositories !== null) {
+                $manifest = json_decode((string) file_get_contents($dir.'/composer.json'), true);
+                self::assertIsArray($manifest);
+                file_put_contents($dir.'/composer.json', (string) json_encode($manifest + ['repositories' => $repositories]));
+            }
+            $io = new BufferIO();
+            (new InstallTimeSummary($this->analyzerFactory()))->onPreOperationsExec($this->event($io, new Transaction([], [$this->loadPackage(self::PHPZIP)])));
+            $outputs[] = $io->getOutput();
+        }
+
+        self::assertStringContainsString('phpzip/phpzip 2.0.8', $outputs[0]);
+        self::assertSame($outputs[0], $outputs[1]);
+        self::assertSame($outputs[0], $outputs[2]);
+    }
+
     public function testADevRequirementInTheTransactionIsRankedBelowAnEqualProdRequirement(): void
     {
         $this->projectWithDevRequire(self::PHPZIP, self::BINSTRING);

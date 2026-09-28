@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Lock;
 
 use Lockrot\Exception\ConfigException;
+use Lockrot\Lock\OriginFacts;
 use Lockrot\Lock\ProjectConfig;
 use PHPUnit\Framework\TestCase;
 
@@ -72,6 +73,18 @@ final class ProjectConfigTest extends TestCase
         self::assertNull(ProjectConfig::fromArray(['name' => ''])->name());
         self::assertNull(ProjectConfig::fromArray(['name' => ['acme/shop']])->name(), 'a name is a string or it is nothing');
         self::assertNull(ProjectConfig::empty()->name());
+    }
+
+    /** The manifest's repositories say where an entry without a notification-url came from; a lock alone has none. */
+    public function testTheRepositoriesAreTheManifestsOwn(): void
+    {
+        $facts = new OriginFacts(null, 'zip', null, 'git', 'https://github.com/acme/lib.git');
+        $config = ProjectConfig::fromArray(['repositories' => [['type' => 'vcs', 'url' => 'https://github.com/acme/lib']]]);
+
+        self::assertSame('vcs', $config->repositories()->kindServing('acme/lib', '1.0.0', $facts));
+        self::assertNull(ProjectConfig::fromArray([])->repositories()->kindServing('acme/lib', '1.0.0', $facts));
+        self::assertNull(ProjectConfig::empty()->repositories()->kindServing('acme/lib', '1.0.0', $facts));
+        self::assertSame('unknown', ProjectConfig::fromArray(['repositories' => ['not a repository']])->repositories()->kindServing('acme/lib', '1.0.0', $facts), 'read, never refused');
     }
 
     public function testEmptyConfig(): void

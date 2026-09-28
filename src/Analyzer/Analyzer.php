@@ -123,6 +123,8 @@ final class Analyzer
      */
     public function analyzeWithFacts(array $packages, LockFile $lock, ProjectConfig $project, bool $includeDev): Analysis
     {
+        $repositories = $project->repositories();
+        $packages = array_map(static fn (LockedPackage $package): LockedPackage => $package->withRepositories($repositories), $packages);
         $graph = DependencyGraph::fromLock($lock, $project, $includeDev);
         $now = $this->clock->now();
         $notes = [];
@@ -391,9 +393,8 @@ final class Analyzer
         }
         $verdict = $this->engine->decide($signals, $entry !== null, $meta !== null);
 
-        $fromRepository = $package->isFromComposerRepository();
         $note = null;
-        if (!$fromRepository) {
+        if (!$package->isFromComposerRepository()) {
             $note = Finding::NOTE_NOT_IN_REPOSITORY;
         } elseif ($meta === null && isset($batch->failed()[$package->name()])) {
             $note = $this->metadataFailureNote($batch->failed()[$package->name()]);
@@ -413,7 +414,7 @@ final class Analyzer
             $package->isDev(),
             array_keys($graph->chainsTo($package->name())),
             Libyears::measure($package, $meta),
-            $fromRepository
+            $package->origin()
         );
     }
 

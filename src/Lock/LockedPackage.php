@@ -20,7 +20,8 @@ final class LockedPackage
     private array $requires;
     private ?string $repositoryUrl;
     private string $type;
-    private bool $fromComposerRepository;
+    private OriginFacts $originFacts;
+    private PackageOrigin $origin;
     private bool $dev;
     /** @var bool|string */
     private $abandonedInLock;
@@ -37,7 +38,7 @@ final class LockedPackage
         array $requires,
         ?string $repositoryUrl,
         string $type,
-        bool $fromComposerRepository,
+        OriginFacts $originFacts,
         bool $dev,
         $abandonedInLock
     ) {
@@ -48,7 +49,8 @@ final class LockedPackage
         $this->requires = $requires;
         $this->repositoryUrl = $repositoryUrl;
         $this->type = $type;
-        $this->fromComposerRepository = $fromComposerRepository;
+        $this->originFacts = $originFacts;
+        $this->origin = PackageOrigin::of($name, $version, $originFacts, ConfiguredRepositories::none());
         $this->dev = $dev;
         $this->abandonedInLock = $abandonedInLock;
     }
@@ -73,7 +75,6 @@ final class LockedPackage
             }
         }
 
-        $notificationUrl = $package->getNotificationUrl();
         $repositoryUrl = $package->getSourceUrl();
         if ($repositoryUrl === null || $repositoryUrl === '') {
             $repositoryUrl = SupportSource::url($package->getSupport());
@@ -87,7 +88,7 @@ final class LockedPackage
             $requires,
             $repositoryUrl,
             $package->getType(),
-            $notificationUrl !== null && $notificationUrl !== '',
+            OriginFacts::fromPackage($package),
             $dev,
             $package->isAbandoned() ? ($package->getReplacementPackage() ?? true) : false
         );
@@ -129,7 +130,21 @@ final class LockedPackage
     }
     public function isFromComposerRepository(): bool
     {
-        return $this->fromComposerRepository;
+        return $this->origin->isComposerRepository();
+    }
+
+    public function origin(): PackageOrigin
+    {
+        return $this->origin;
+    }
+
+    /** The same entry with its origin decided against the manifest's repositories; this instance is left unchanged. */
+    public function withRepositories(ConfiguredRepositories $repositories): self
+    {
+        $copy = clone $this;
+        $copy->origin = PackageOrigin::of($this->name, $this->version, $this->originFacts, $repositories);
+
+        return $copy;
     }
     /** The same locked entry flagged as a `packages-dev` (or `packages`) member; this instance is left unchanged. */
     public function withDev(bool $dev): self

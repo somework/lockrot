@@ -22,6 +22,7 @@ use Lockrot\Signal\Rule\PinnedRule;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\Notes;
+use Lockrot\Tests\Support\Origins;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
@@ -232,8 +233,8 @@ final class ExplainFormatterTest extends TestCase
 
     public function testAPackageWithoutMetadataShowsTheNoteInsteadOfATable(): void
     {
-        $finding = new Finding('vendor/pkg', '1.0.0', Verdict::UNKNOWN, [], ['vendor/pkg'], null, null, 'not from a Composer repository, not checked', true, [], LibyearsMeasurement::unmeasured(Libyears::NOT_FROM_COMPOSER_REPOSITORY), false);
-        $sourceless = new LockedPackage('vendor/pkg', '1.0.0', null, null, [], null, 'library', false, true, false);
+        $finding = new Finding('vendor/pkg', '1.0.0', Verdict::UNKNOWN, [], ['vendor/pkg'], null, null, 'not from a Composer repository, not checked', true, [], LibyearsMeasurement::unmeasured(Libyears::NOT_FROM_COMPOSER_REPOSITORY), Origins::of(false));
+        $sourceless = new LockedPackage('vendor/pkg', '1.0.0', null, null, [], null, 'library', Origins::facts(false), true, false);
         $explanation = new Explanation($finding, F::facts($sourceless), new Thresholds(), '8.4', $this->report());
 
         $text = $this->plain($explanation);
@@ -262,7 +263,7 @@ final class ExplainFormatterTest extends TestCase
     public function testNeitherSourceLineCarriesACredential(): void
     {
         $credentialed = 'https://gitlab-ci-token:glpat-abcdef123456@gitlab.internal.acme.com/team/service.git';
-        $package = new LockedPackage('vendor/pkg', '1.0.0', new \DateTimeImmutable('2020-01-01T00:00:00+00:00'), '>=7.4', [], $credentialed, 'library', true, false, false);
+        $package = new LockedPackage('vendor/pkg', '1.0.0', new \DateTimeImmutable('2020-01-01T00:00:00+00:00'), '>=7.4', [], $credentialed, 'library', Origins::facts(true), false, false);
         $metadata = new PackageMetadata(
             'vendor/pkg',
             false,

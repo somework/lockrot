@@ -1,0 +1,201 @@
+{
+    "_readme": [
+        "A hand-built lock: each entry is one kind of origin, or one URL lockrot must not write out."
+    ],
+    "content-hash": "origins-fixture",
+    "packages": [
+        {
+            "name": "acme/from-packagist",
+            "version": "1.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/acme/from-packagist.git",
+                "reference": "0123456789abcdef0123456789abcdef01234567"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/acme/from-packagist/zipball/0123456789abcdef0123456789abcdef01234567",
+                "reference": "0123456789abcdef0123456789abcdef01234567",
+                "shasum": ""
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "type": "library",
+            "time": "2025-01-15T10:00:00+00:00"
+        },
+        {
+            "name": "acme/from-private-packagist",
+            "version": "3.0.1",
+            "notification-url": "https://repo.packagist.com/secret-org/downloads/",
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/acme/from-private-packagist/zipball/abc",
+                "reference": "abc",
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://repo.packagist.com/secret-org/dists/%package%/%version%/r%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
+            },
+            "type": "library",
+            "time": "2025-01-15T10:00:00+00:00"
+        },
+        {
+            "name": "acme/from-wp-packages",
+            "version": "6.4",
+            "type": "wordpress-plugin",
+            "notification-url": "https://wp-packages.org/downloads",
+            "dist": {
+                "type": "zip",
+                "url": "https://downloads.wordpress.org/plugin/from-wp-packages.6.4.zip"
+            },
+            "time": "2025-01-15T10:00:00+00:00"
+        },
+        {
+            "name": "acme/from-drupal-path",
+            "version": "1.0.0",
+            "notification-url": "https://packages.drupal.org/8/downloads",
+            "dist": {
+                "type": "path",
+                "url": "packages/from-drupal-path",
+                "reference": "a1b2c3"
+            },
+            "transport-options": {
+                "relative": true
+            },
+            "type": "library",
+            "time": "2025-01-15T10:00:00+00:00"
+        },
+        {
+            "name": "acme/from-private-registry",
+            "version": "0.9.0",
+            "notification-url": "https://ci-user:s3cr3t@satis.internal.acme.test/downloads",
+            "dist": {
+                "type": "zip",
+                "url": "https://ci-user:s3cr3t@satis.internal.acme.test/dist/acme-from-private-registry-0.9.0.zip"
+            },
+            "type": "library",
+            "time": "2025-01-15T10:00:00+00:00"
+        },
+        {
+            "name": "acme/inline-copied",
+            "version": "2.1.0",
+            "notification-url": "https://packagist.org/downloads/",
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/acme/inline-copied/zipball/abc"
+            },
+            "type": "library",
+            "time": "2025-01-15T10:00:00+00:00"
+        },
+        {
+            "name": "acme/vcs-lib",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/acme/vcs-lib.git",
+                "reference": "0123456789abcdef0123456789abcdef01234567"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/acme/vcs-lib/zipball/0123456789abcdef0123456789abcdef01234567",
+                "reference": "0123456789abcdef0123456789abcdef01234567",
+                "shasum": ""
+            },
+            "type": "library",
+            "time": "2025-01-15T10:00:00+00:00"
+        },
+        {
+            "name": "acme/renamed",
+            "version": "1.4.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/acme/new-name.git",
+                "reference": "0123456789abcdef0123456789abcdef01234567"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/acme/new-name/zipball/0123456789abcdef0123456789abcdef01234567",
+                "reference": "0123456789abcdef0123456789abcdef01234567",
+                "shasum": ""
+            },
+            "type": "library",
+            "time": "2025-01-15T10:00:00+00:00"
+        },
+        {
+            "name": "acme/inline",
+            "version": "1.0.0",
+            "dist": {
+                "type": "zip",
+                "url": "https://downloads.acme.test/inline-1.0.0.zip"
+            },
+            "type": "library",
+            "time": "2025-01-15T10:00:00+00:00"
+        },
+        {
+            "name": "acme/local",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "packages/local",
+                "reference": "d4e5f6"
+            },
+            "transport-options": {
+                "relative": true
+            },
+            "type": "library",
+            "time": "2025-01-15T10:00:00+00:00"
+        },
+        {
+            "name": "acme/artifact",
+            "version": "1.0.0",
+            "dist": {
+                "type": "zip",
+                "url": "/home/ci-user/secret-client/artifacts/acme-artifact-1.0.0.zip",
+                "shasum": "0000000000000000000000000000000000000000"
+            },
+            "type": "library",
+            "time": "2025-01-15T10:00:00+00:00"
+        },
+        {
+            "name": "acme/after-satis",
+            "version": "2.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/acme/after-satis.git",
+                "reference": "0123456789abcdef0123456789abcdef01234567"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/acme/after-satis/zipball/0123456789abcdef0123456789abcdef01234567",
+                "reference": "0123456789abcdef0123456789abcdef01234567",
+                "shasum": ""
+            },
+            "type": "library",
+            "time": "2025-01-15T10:00:00+00:00"
+        },
+        {
+            "name": "acme/metapackage",
+            "version": "1.0.0",
+            "type": "metapackage",
+            "time": "2025-01-15T10:00:00+00:00"
+        },
+        {
+            "name": "acme/crafted\"onmouseover=\"x?next=evil.example#x",
+            "version": "1.0.0",
+            "notification-url": "https://packagist.org/downloads/",
+            "type": "library",
+            "time": "2025-01-15T10:00:00+00:00"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "dev",
+    "stability-flags": {},
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": {},
+    "platform-dev": {},
+    "plugin-api-version": "2.6.0"
+}

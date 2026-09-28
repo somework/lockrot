@@ -604,8 +604,12 @@
           "type": "boolean"
         },
         "from_composer_repository": {
-          "description": "True when the lock entry carries a Composer `notification-url`. Composer writes one only for a package served by a `type: composer` repository that advertises a notify URL (`notify-batch` or `notify` in its packages.json); packagist.org and Private Packagist do. lockrot asks a repository for metadata, advisories and repository activity only about such an entry. False otherwise: a `path`, `vcs`, `artifact` or inline `package` repository entry, and also a package from a `type: composer` repository that advertises no notify URL (asset-packagist.org; a Satis build without `notify-batch`). lockrot asked no repository about a false entry, so the finding has no metadata, advisories, activity or libyears. True does not mean packagist.org. Stays a boolean for 1.x: a finer account of where an entry came from would be a separate optional open-set field, never a new type for this key. Same value as the `--explain` document's `lock.from_composer_repository`. Absent from documents written before 0.13.0; from 0.13.0 on every finding carries it.",
+          "description": "True when the lock entry carries a Composer `notification-url`. Composer writes one only for a package served by a `type: composer` repository that advertises a notify URL (`notify-batch` or `notify` in its packages.json); packagist.org and Private Packagist do. lockrot asks a repository for metadata, advisories and repository activity only about such an entry. False otherwise: a `path`, `vcs`, `artifact` or inline `package` repository entry, and also a package from a `type: composer` repository that advertises no notify URL (asset-packagist.org; a Satis build without `notify-batch`). lockrot asked no repository about a false entry, so the finding has no metadata, advisories, activity or libyears. True does not mean packagist.org. Stays a boolean for 1.x: the finer account of where an entry came from is `origin`, and this key is true exactly when `origin.kind` is `packagist` or `composer`. Same value as the `--explain` document's `lock.from_composer_repository`. Absent from documents written before 0.13.0; from 0.13.0 on every finding carries it.",
           "type": "boolean"
+        },
+        "origin": {
+          "description": "Where the lock entry came from: its kind, the registry where lockrot can name it, and the package's page there. `from_composer_repository` is true exactly when `origin.kind` is `packagist` or `composer`, and the root `not_from_composer_repository` counts the other findings. Optional: documents written before 0.13.0 do not carry it; from 0.13.0 on every finding does.",
+          "$ref": "#/definitions/packageOrigin"
         },
         "replacement": {
           "description": "On an abandoned finding, the package its repository names as the replacement, when that is a Composer package name (Packagist's field is free text; `Symfony` or a sentence stays in the evidence and is null here). Null on every other finding. Absent from documents written before 0.11.0.",
@@ -1629,6 +1633,62 @@
           ]
         }
       }
+    },
+    "packageOrigin": {
+      "description": "Where a lock entry came from, as lockrot tells it from the entry and the manifest's own `repositories`, without asking any repository: `kind`, the `registry` where lockrot can name it, and the package's page there. Nothing in it is copied from the entry's URLs or the manifest's: a login, an organisation or a machine path is never written. Open: a later minor release may add a member.",
+      "type": "object",
+      "required": [
+        "kind",
+        "registry",
+        "package_url"
+      ],
+      "properties": {
+        "kind": {
+          "$ref": "#/definitions/originKind"
+        },
+        "registry": {
+          "$ref": "#/definitions/originRegistry"
+        },
+        "package_url": {
+          "description": "The package's page on `registry`, an absolute https URL lockrot writes for a registry that keeps a public page per package name (`packagist.org`, `wp-packages.org`), from the name the lock records. Null for any other registry, for a name that is not a Composer package name, and for every kind but `packagist` and `composer`. It is the page the registry keeps for that name; whether this run's repositories still list the package is the finding's `note`. Show a link only when it is a string; read it, never build it, from `registry`, the name or anything else.",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "originKind": {
+      "description": "What lockrot could tell about where the lock entry came from. `packagist`: its notification-url reports to packagist.org (packagist.org, or a mirror that keeps packagist.org's notify URL). `composer`: its notification-url reports to any other host (Private Packagist, WP Packages, Drupal, a Satis with a notify URL, a registry lockrot does not know, or a definition that declares one itself). These two are exactly the kinds whose `from_composer_repository` is true. `path`: its dist is a local directory (a `path` repository). `vcs`: its source is a VCS repository the manifest lists. `artifact`: its dist is an archive inside an `artifact` repository the manifest lists. `package`: an inline `package` definition in the manifest gives exactly this entry. `unknown`: none of these could be decided: a `type: composer` repository that advertises no notify URL (asset-packagist.org, a Satis without one, some packagist mirrors), a repository listed before the one that matches that could have served the name, a VCS repository renamed or removed since, or a run without composer.json. lockrot's kinds are lower-case words; `<vendor>:<name>` is reserved for a kind that does not come from lockrot. A kind keeps its meaning and its `from_composer_repository` value. An open set: a later minor release can add a kind, which may take entries out of `unknown`; read one you do not know by `from_composer_repository`, show it as written, and link nothing. The order of `x-known-values` is not the order lockrot decides in.",
+      "type": "string",
+      "pattern": "^([a-z][a-z0-9_]*|[a-z0-9][a-z0-9_.-]*:[a-z0-9][a-z0-9_.-]*)$",
+      "x-known-values": [
+        "packagist",
+        "composer",
+        "path",
+        "vcs",
+        "artifact",
+        "package",
+        "unknown"
+      ]
+    },
+    "originRegistry": {
+      "description": "The Composer repository the entry came from, named by the host its notification-url reports to, when lockrot knows it: `packagist.org`, `repo.packagist.com` (Private Packagist; the organisation is never written), `wp-packages.org` or `packages.drupal.org`. `packagist.org` exactly when `kind` is `packagist`. Null for every other kind, and for a Composer repository lockrot does not know, whose host is not written: a private registry's host stays out of a published report. A label, never a template: build no URL from it. An open set: a later minor release can name another registry.",
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$",
+          "x-known-values": [
+            "packagist.org",
+            "repo.packagist.com",
+            "wp-packages.org",
+            "packages.drupal.org"
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ]
     },
     "noteDetail": {
       "description": "One thing the run could not see: `code` says what, `data` the facts, typed per code by the branches below, and `text` the sentence every format prints. A note whose code this schema does not list carries any object as its `data`: show its `text`, link its `docs_url` when it is not null, ignore its `data`, and still honour its `sets_network_failures`.",

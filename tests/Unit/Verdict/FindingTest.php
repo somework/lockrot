@@ -7,6 +7,7 @@ namespace Lockrot\Tests\Unit\Verdict;
 use Lockrot\Analyzer\Libyears;
 use Lockrot\Analyzer\LibyearsMeasurement;
 use Lockrot\Signal\Signal;
+use Lockrot\Tests\Support\Origins;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Priority;
 use Lockrot\Verdict\Verdict;
@@ -274,7 +275,7 @@ final class FindingTest extends TestCase
 
     public function testNoteWhenNoSignals(): void
     {
-        $finding = new Finding('private/thing', '3.0.0', Verdict::UNKNOWN, [], [], null, null, 'not from a Composer repository, not checked', false, [], null, false);
+        $finding = new Finding('private/thing', '3.0.0', Verdict::UNKNOWN, [], [], null, null, 'not from a Composer repository, not checked', false, [], null, Origins::of(false));
         self::assertSame('not from a Composer repository, not checked', $finding->evidence());
         self::assertNull($finding->toArray()['data_date']);
     }
@@ -338,7 +339,7 @@ final class FindingTest extends TestCase
         $finding = new Finding('vendor/pkg', '1.2.3', Verdict::STALE, [], ['vendor/root', 'vendor/pkg'], null, null, null, true);
         $array = $finding->toArray();
         self::assertSame(
-            ['package', 'version', 'verdict', 'priority', 'direct', 'dev', 'from_composer_repository', 'replacement', 'signals', 'chain', 'direct_dependents', 'evidence', 'allowlist_reason', 'note', 'data_date', 'libyears', 'libyears_unmeasured', 'priority_basis', 'no_fix_expected'],
+            ['package', 'version', 'verdict', 'priority', 'direct', 'dev', 'from_composer_repository', 'origin', 'replacement', 'signals', 'chain', 'direct_dependents', 'evidence', 'allowlist_reason', 'note', 'data_date', 'libyears', 'libyears_unmeasured', 'priority_basis', 'no_fix_expected'],
             array_keys($array)
         );
         self::assertSame(Priority::LOW, $array['priority']);
@@ -349,7 +350,7 @@ final class FindingTest extends TestCase
     public function testAFindingIsFromAComposerRepositoryUnlessItSaysOtherwise(): void
     {
         $asked = new Finding('vendor/pkg', '1.0.0', Verdict::OK, [], ['vendor/pkg'], null, null);
-        $notAsked = new Finding('local/pkg', 'dev-main', Verdict::UNKNOWN, [], ['local/pkg'], null, null, Finding::NOTE_NOT_IN_REPOSITORY, false, [], null, false);
+        $notAsked = new Finding('local/pkg', 'dev-main', Verdict::UNKNOWN, [], ['local/pkg'], null, null, Finding::NOTE_NOT_IN_REPOSITORY, false, [], null, Origins::of(false));
 
         self::assertTrue($asked->isFromComposerRepository());
         self::assertTrue($asked->toArray()['from_composer_repository']);
@@ -406,7 +407,7 @@ final class FindingTest extends TestCase
     /** Nothing was asked about a package outside every Composer repository, the first reason it goes unmeasured. */
     public function testAFindingNotFromAComposerRepositoryIsUnmeasuredForThatReasonByDefault(): void
     {
-        $bare = new Finding('local/pkg', '1.0.0', Verdict::UNKNOWN, [], ['local/pkg'], null, null, Finding::NOTE_NOT_IN_REPOSITORY, false, [], null, false);
+        $bare = new Finding('local/pkg', '1.0.0', Verdict::UNKNOWN, [], ['local/pkg'], null, null, Finding::NOTE_NOT_IN_REPOSITORY, false, [], null, Origins::of(false));
 
         self::assertNull($bare->libyears());
         self::assertSame(Libyears::NOT_FROM_COMPOSER_REPOSITORY, $bare->toArray()['libyears_unmeasured']);
@@ -429,7 +430,7 @@ final class FindingTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('local/pkg');
 
-        new Finding('local/pkg', '1.0.0', Verdict::UNKNOWN, [], ['local/pkg'], null, null, null, false, [], $libyears, $fromComposerRepository);
+        new Finding('local/pkg', '1.0.0', Verdict::UNKNOWN, [], ['local/pkg'], null, null, null, false, [], $libyears, Origins::of($fromComposerRepository));
     }
 
     public function testDirectDependentsDefaultToNoneAndAreCarriedInTheArray(): void
@@ -475,7 +476,7 @@ final class FindingTest extends TestCase
     public function testTheNoteSurvivesS7AndOwnEvidenceLeavesS7Out(): void
     {
         $s7 = new Signal(Signal::S7, Signal::LEVEL_INFO, 'pulls in 2 flagged packages: a/b (stale), c/d (stale)', ['flagged' => 2, 'packages' => []]);
-        $unchecked = new Finding('local/pkg', 'dev-main', Verdict::UNKNOWN, [$s7], ['local/pkg'], null, null, 'not from a Composer repository, not checked', false, [], null, false);
+        $unchecked = new Finding('local/pkg', 'dev-main', Verdict::UNKNOWN, [$s7], ['local/pkg'], null, null, 'not from a Composer repository, not checked', false, [], null, Origins::of(false));
         self::assertSame('not from a Composer repository, not checked; pulls in 2 flagged packages: a/b (stale), c/d (stale)', $unchecked->evidence());
         self::assertSame('not from a Composer repository, not checked', $unchecked->ownEvidence());
 

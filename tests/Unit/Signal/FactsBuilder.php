@@ -11,6 +11,7 @@ use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Data\Repository\ReleaseBranch;
 use Lockrot\Lock\LockedPackage;
 use Lockrot\Signal\PackageFacts;
+use Lockrot\Tests\Support\Origins;
 
 final class FactsBuilder
 {
@@ -42,7 +43,7 @@ final class FactsBuilder
             $requires,
             \is_string($source) ? $source : null,
             \is_string($type) ? $type : 'library',
-            \is_bool($o['fromComposerRepository'] ?? null) ? $o['fromComposerRepository'] : true,
+            Origins::facts(\is_bool($o['fromComposerRepository'] ?? null) ? $o['fromComposerRepository'] : true),
             \is_bool($o['dev'] ?? null) ? $o['dev'] : false,
             \is_bool($abandonedInLock) || \is_string($abandonedInLock) ? $abandonedInLock : false
         );

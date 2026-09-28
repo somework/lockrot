@@ -102,6 +102,13 @@ final class SchemaWideningTest extends TestCase
         yield 'a note detail closed' => [Schemas::REPORT, 'note-detail-closed', '#/properties/note_details/items/anyOf/0: closed, additionalProperties false'];
         yield 'a note docs_url given a pattern' => [Schemas::REPORT, 'docs-url-pattern', '/properties/docs_url: pattern "^https://lockrot\\\\.dev/"'];
         yield 'a note forge id dropped' => [Schemas::REPORT, 'forge-id-dropped', '/properties/forge_id: no longer accepts "bitbucket"'];
+        yield 'finding origin made required' => [Schemas::REPORT, 'origin-required', 'made required origin'];
+        yield 'explain finding origin made required' => [Schemas::EXPLAIN, 'origin-required', 'made required origin'];
+        yield 'an origin closed' => [Schemas::REPORT, 'origin-closed', '/properties/origin: closed, additionalProperties false'];
+        yield 'explain origin closed' => [Schemas::EXPLAIN, 'origin-closed', '/properties/origin: closed, additionalProperties false'];
+        yield 'an origin kind dropped' => [Schemas::REPORT, 'origin-kind-dropped', '/properties/origin/properties/kind: no longer accepts "unknown"'];
+        yield 'an origin registry loses null' => [Schemas::REPORT, 'origin-registry-not-null', '/properties/origin/properties/registry/oneOf/1: no longer accepts null'];
+        yield 'an origin package_url loses null' => [Schemas::REPORT, 'package-url-not-null', '/properties/origin/properties/package_url: no longer accepts type null'];
     }
 
     /**
@@ -318,6 +325,26 @@ final class SchemaWideningTest extends TestCase
         self::assertSame([], SchemaWidening::narrowings($before, $current));
     }
 
+    /**
+     * `origin` joined the finding in 0.13.0 in both schemas, optional, with the three definitions it
+     * brought: from the schemas without them, the current ones only widen, and its object stays open.
+     *
+     * @dataProvider findingSchemas
+     */
+    #[DataProvider('findingSchemas')]
+    public function testTheFindingGainingItsOriginIsAWidening(string $document): void
+    {
+        $current = self::current($document);
+        $before = self::without($current, ['definitions', 'finding', 'properties', 'origin']);
+        foreach (['packageOrigin', 'originKind', 'originRegistry'] as $name) {
+            $before = self::without($before, ['definitions', $name]);
+        }
+
+        self::assertNotContains('origin', JsonPath::arrayAt($current, ['definitions', 'finding', 'required']));
+        self::assertArrayNotHasKey('additionalProperties', JsonPath::arrayAt($current, ['definitions', 'packageOrigin']));
+        self::assertSame([], SchemaWidening::narrowings($before, $current));
+    }
+
     /** @return iterable<string, array{string}> */
     public static function findingSchemas(): iterable
     {
@@ -440,6 +467,16 @@ final class SchemaWideningTest extends TestCase
                 return self::with($s, ['definitions', 'noteDetail', 'properties', 'docs_url', 'pattern'], '^https://lockrot\\.dev/');
             case 'forge-id-dropped':
                 return self::with($s, ['definitions', 'forgeId', KnownValues::KEYWORD], ['github', 'gitlab']);
+            case 'origin-required':
+                return self::appended($s, ['definitions', 'finding', 'required'], 'origin');
+            case 'origin-closed':
+                return self::with($s, ['definitions', 'packageOrigin', 'additionalProperties'], false);
+            case 'origin-kind-dropped':
+                return self::with($s, ['definitions', 'originKind', KnownValues::KEYWORD], \array_slice(JsonPath::arrayAt($s, ['definitions', 'originKind', KnownValues::KEYWORD]), 0, -1));
+            case 'origin-registry-not-null':
+                return self::with($s, ['definitions', 'originRegistry'], JsonPath::arrayAt($s, ['definitions', 'originRegistry', 'oneOf', 0]));
+            case 'package-url-not-null':
+                return self::with($s, ['definitions', 'packageOrigin', 'properties', 'package_url', 'type'], 'string');
             case 'metadata-reason-added':
                 return self::appended($s, ['definitions', 'metadataFailureReason', KnownValues::KEYWORD], 'dns_failed');
             case 'run-required':
