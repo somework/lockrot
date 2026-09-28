@@ -66,13 +66,15 @@ final class Finding
     private LibyearsMeasurement $libyears;
     /** Where the lock entry came from; `from_composer_repository` is read from its kind. */
     private PackageOrigin $origin;
+    /** The registry that named the replacement, which decides where it is linked. */
+    private ?string $replacementNamedBy;
 
     /**
      * @param list<Signal> $signals
      * @param list<string> $chain
      * @param list<string> $directDependents
      */
-    public function __construct(string $package, string $version, string $verdict, array $signals, array $chain, ?string $allowlistReason, ?\DateTimeImmutable $dataDate, ?string $note = null, bool $dev = false, array $directDependents = [], ?LibyearsMeasurement $libyears = null, ?PackageOrigin $origin = null)
+    public function __construct(string $package, string $version, string $verdict, array $signals, array $chain, ?string $allowlistReason, ?\DateTimeImmutable $dataDate, ?string $note = null, bool $dev = false, array $directDependents = [], ?LibyearsMeasurement $libyears = null, ?PackageOrigin $origin = null, ?string $replacementNamedBy = null)
     {
         $origin ??= PackageOrigin::unattributed();
         $fromComposerRepository = $origin->isComposerRepository();
@@ -99,6 +101,7 @@ final class Finding
         }
         $this->libyears = $libyears;
         $this->origin = $origin;
+        $this->replacementNamedBy = $replacementNamedBy;
     }
 
     /**
@@ -336,6 +339,14 @@ final class Finding
         return $replacement;
     }
 
+    /** The successor's page on the registry that named it ({@see PackageOrigin::replacementPage()}), or null. */
+    private function replacementUrl(): ?string
+    {
+        $successor = $this->successor();
+
+        return $successor === null ? null : PackageOrigin::replacementPage($this->replacementNamedBy, $successor);
+    }
+
     /** The replacement S1 carries — the repository's, or the lock's — null when none is named. */
     private function replacement(): ?string
     {
@@ -492,6 +503,7 @@ final class Finding
             'from_composer_repository' => $this->isFromComposerRepository(),
             'origin' => $this->origin->toArray(),
             'replacement' => $this->successor(),
+            'replacement_url' => $this->replacementUrl(),
             'signals' => $signals, 'chain' => $this->chain, 'direct_dependents' => $this->directDependents,
             'evidence' => $this->evidence(),
             'allowlist_reason' => $this->allowlistReason, 'note' => $this->note,

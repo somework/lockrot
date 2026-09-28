@@ -27,6 +27,7 @@ use Lockrot\Lock\LockedPackage;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Signal\PackageFacts;
+use Lockrot\Signal\Rule\AbandonedRule;
 use Lockrot\Signal\Rule\NotCheckedRule;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\SignalSet;
@@ -414,7 +415,8 @@ final class Analyzer
             $package->isDev(),
             array_keys($graph->chainsTo($package->name())),
             Libyears::measure($package, $meta),
-            $package->origin()
+            $package->origin(),
+            AbandonedRule::replacementNamedBy($facts)
         );
     }
 

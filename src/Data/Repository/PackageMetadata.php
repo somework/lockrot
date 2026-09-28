@@ -9,6 +9,7 @@ use Composer\Package\CompletePackage;
 use Composer\Semver\Comparator;
 use Composer\Semver\VersionParser;
 use Lockrot\Data\Forge\SupportSource;
+use Lockrot\Lock\PackageOrigin;
 
 /**
  * Memory: fromPackages() folds the given package objects into scalars in a single pass and
@@ -45,6 +46,7 @@ final class PackageMetadata
     private string $name;
     private bool $abandoned;
     private ?string $replacement;
+    private ?string $abandonedBy;
     private bool $hasStableRelease;
     private ?\DateTimeImmutable $lastStableReleaseAt;
     private ?string $lastStableVersion;
@@ -119,7 +121,8 @@ final class PackageMetadata
         ?string $lastStableDatedBy = null,
         array $releaseDates = [],
         ?string $releaseDatesBy = null,
-        array $sharedCommitVersions = []
+        array $sharedCommitVersions = [],
+        ?string $abandonedBy = null
     ) {
         $this->name = $name;
         $this->abandoned = $abandoned;
@@ -137,6 +140,7 @@ final class PackageMetadata
         $this->releaseDates = $releaseDates;
         $this->releaseDatesBy = $releaseDatesBy;
         $this->sharedCommitVersions = $sharedCommitVersions;
+        $this->abandonedBy = $abandonedBy;
     }
 
     /**
@@ -161,6 +165,7 @@ final class PackageMetadata
     {
         $abandoned = false;
         $replacement = null;
+        $abandonedBy = null;
         $hasStableRelease = false;
         $lastStableReleaseAt = null;
         $lastStableVersion = null;
@@ -194,6 +199,7 @@ final class PackageMetadata
             if (!$abandoned && $version instanceof CompletePackage && $version->isAbandoned()) {
                 $abandoned = true;
                 $replacement = $version->getReplacementPackage();
+                $abandonedBy = PackageOrigin::registryOf($version->getNotificationUrl());
             }
             if (!$version->isDev()) {
                 $hasStableRelease = true;
@@ -328,7 +334,8 @@ final class PackageMetadata
             null,
             $releaseDates,
             null,
-            $sharedCommitVersions
+            $sharedCommitVersions,
+            $abandonedBy
         );
     }
 
@@ -446,7 +453,8 @@ final class PackageMetadata
             $lastStableDatedBy,
             $parent->releaseDates,
             $parent->name,
-            $this->sharedCommitVersions
+            $this->sharedCommitVersions,
+            $this->abandonedBy
         );
     }
 
@@ -517,6 +525,15 @@ final class PackageMetadata
     public function replacement(): ?string
     {
         return $this->replacement;
+    }
+
+    /**
+     * The registry that marked the package abandoned, by the notification-url of the version that
+     * says so, when it is one lockrot names; the replacement is a name it gave. Null otherwise.
+     */
+    public function abandonedBy(): ?string
+    {
+        return $this->abandonedBy;
     }
     /**
      * Versions seen for this package. Dev branches are only counted for a package with no tagged

@@ -336,6 +336,7 @@ list, which `…` stands in for:
                 "local": false
             },
             "replacement": null,
+            "replacement_url": null,
             "signals": [
                 {
                     "id": "S1",
@@ -389,7 +390,7 @@ list, which `…` stands in for:
 
 The cut signals have the same shape as S1 and S2; S7 carries the packages it names under `data`. So
 do the other 199 findings, each with its own `priority`, `direct`, `dev`,
-`from_composer_repository`, `origin`, `replacement`, `signals`, `chain`, `direct_dependents`, `evidence`,
+`from_composer_repository`, `origin`, `replacement`, `replacement_url`, `signals`, `chain`, `direct_dependents`, `evidence`,
 `allowlist_reason`, `note`, `data_date`, `libyears`, `libyears_unmeasured`, `priority_basis`,
 `no_fix_expected`, `baseline` and `gate`. `exposure` is the `pulled in by:` line in full — every
 direct requirement that pulls in an attributable flagged transitive package, with how many, most

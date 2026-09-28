@@ -37,4 +37,16 @@ final class AbandonedRule implements SignalRule
 
         return null;
     }
+
+    /**
+     * Who named the replacement S1 carries, as {@see \Lockrot\Lock\PackageOrigin::registryOf()}
+     * names registries: the repository metadata's registry when there is metadata, which is what S1
+     * reads first, the lock entry's own otherwise.
+     */
+    public static function replacementNamedBy(PackageFacts $facts): ?string
+    {
+        $metadata = $facts->metadata();
+
+        return $metadata !== null ? $metadata->abandonedBy() : $facts->package()->origin()->registry();
+    }
 }

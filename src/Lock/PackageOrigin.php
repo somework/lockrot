@@ -55,15 +55,32 @@ final class PackageOrigin
         $local = self::installsFromTheMachine($facts);
         $notificationUrl = $facts->notificationUrl();
         if ($notificationUrl !== null && $notificationUrl !== '') {
-            $host = parse_url($notificationUrl, \PHP_URL_HOST);
-            $host = \is_string($host) ? strtolower($host) : null;
-            $registry = \in_array($host, self::REGISTRIES, true) ? $host : null;
+            $registry = self::registryOf($notificationUrl);
 
-            return new self($host === 'packagist.org' ? self::PACKAGIST : self::COMPOSER, $registry, self::packagePage($registry, $name), $local);
+            return new self($registry === 'packagist.org' ? self::PACKAGIST : self::COMPOSER, $registry, self::packagePage($registry, $name), $local);
         }
         $kind = $repositories->kindServing($name, $version, $facts) ?? self::UNKNOWN;
 
         return new self($kind, null, null, $local || $kind === self::PATH || $kind === self::ARTIFACT);
+    }
+
+    /** The registry a notification-url reports to, when it is one lockrot names ({@see REGISTRIES}). */
+    public static function registryOf(?string $notificationUrl): ?string
+    {
+        $host = parse_url((string) $notificationUrl, \PHP_URL_HOST);
+        $host = \is_string($host) ? strtolower($host) : null;
+
+        return \in_array($host, self::REGISTRIES, true) ? $host : null;
+    }
+
+    /**
+     * The replacement's page on the registry that named it, or null. Only packagist.org: the
+     * maintainer sets `abandoned` and its replacement there, while WP Packages never marks a
+     * package abandoned and Private Packagist keeps no public page.
+     */
+    public static function replacementPage(?string $namedBy, string $replacement): ?string
+    {
+        return $namedBy === 'packagist.org' ? self::packagePage($namedBy, $replacement) : null;
     }
 
     /** A finding's origin when its caller gives none: a Composer repository lockrot does not name. */

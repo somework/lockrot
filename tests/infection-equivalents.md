@@ -36,7 +36,7 @@ mutant from the original, and says why.
 
 ## src/Verdict/Finding.php (0.11.0, the successor)
 
-- `src/Verdict/Finding.php:346` LogicalAnd (`is_string($replacement) && $replacement !== ''` → `||`)
+- `src/Verdict/Finding.php:357` LogicalAnd (`is_string($replacement) && $replacement !== ''` → `||`)
   — `replacement()`: the one caller is `successor()`, which then requires a `/` and a name Composer
   accepts. Under `||` a null stays null (the ternary returns the value itself) and an empty string
   is returned instead of null, and an empty string has no `/`, so `successor()` answers null either
@@ -312,7 +312,7 @@ slow test. They are listed here only so nobody reads them as an unexplained "2 t
 
 ## JSON schemas and monorepo-dated branches (2026-09-20)
 
-- `src/Analyzer/Analyzer.php:227` ReturnRemoval — `dateSplitPackages()` returns early when no
+- `src/Analyzer/Analyzer.php:228` ReturnRemoval — `dateSplitPackages()` returns early when no
   package needs dates. Without the return the method runs on: `missingCandidates()` intersects
   every parent's list with an empty children list and returns nothing, no request is made, and
   `date([])` hands the batch back untouched. The guard states the common case, it does not decide it.

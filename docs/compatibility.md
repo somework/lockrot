@@ -168,6 +168,8 @@ a `kind`, the `registry` where lockrot can name it, and a `package_url`. Frozen 
 - `registry` is null for every kind but `packagist` and `composer`, and is `packagist.org` exactly
   when the kind is `packagist`.
 - `package_url` is written by lockrot, never built by a reader: a link only where it is a string.
+  So is a finding's `replacement_url`, the replacement's page on the registry that named it: null
+  whenever `replacement` is.
 
 Not frozen:
 
@@ -175,7 +177,8 @@ Not frozen:
 - Which kind a given entry gets after a minor release that learns more: a new kind may take entries
   out of `unknown`. lockrot reads the manifest as it is at the time of the run, not as it was when the
   lock was written.
-- Whether a registry still keeps the page a `package_url` points at.
+- Whether a registry still keeps the page a `package_url` or a `replacement_url` points at, and which
+  registries a `replacement_url` is written for.
 
 A new kind or registry arrives only in a minor release. It changes no verdict, priority or exit
 code, so it is not a [Verdict change](#verdict-changes).

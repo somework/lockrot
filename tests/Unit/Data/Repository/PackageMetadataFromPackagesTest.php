@@ -59,6 +59,25 @@ final class PackageMetadataFromPackagesTest extends TestCase
         self::assertSame('c/current', $meta->replacement());
     }
 
+    /**
+     * Which registry marked the package abandoned, from the notification-url Composer gives every
+     * version a repository serves: the replacement is a name that registry gave. The version that
+     * names the replacement names the registry.
+     */
+    public function testTheRegistryThatMarkedThePackageAbandonedIsTheOneItsVersionReportsTo(): void
+    {
+        $at = new \DateTimeImmutable(self::FIXED);
+        $packagist = $this->load(['name' => 'a/b', 'version' => '2.0.0', 'abandoned' => 'c/d', 'notification-url' => 'https://packagist.org/downloads/']);
+        $private = $this->load(['name' => 'a/b', 'version' => '1.0.0', 'abandoned' => 'c/e', 'notification-url' => 'https://repo.packagist.com/acme/downloads/']);
+        $silent = $this->load(['name' => 'a/b', 'version' => '1.0.0', 'abandoned' => 'c/d']);
+        $alive = $this->load(['name' => 'a/b', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/']);
+
+        self::assertSame('packagist.org', PackageMetadata::fromPackages('a/b', [$packagist, $private], $at)->abandonedBy());
+        self::assertSame('repo.packagist.com', PackageMetadata::fromPackages('a/b', [$private, $packagist], $at)->abandonedBy());
+        self::assertNull(PackageMetadata::fromPackages('a/b', [$silent], $at)->abandonedBy(), 'a repository without a notify URL names no registry');
+        self::assertNull(PackageMetadata::fromPackages('a/b', [$alive], $at)->abandonedBy(), 'not abandoned, nobody marked it');
+    }
+
     /** Two releases stamped with the same time: the first one seen stands, so the answer is stable. */
     public function testTwoReleasesWithTheSameTimeKeepTheFirstOneSeen(): void
     {

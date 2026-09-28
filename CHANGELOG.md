@@ -393,6 +393,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   are the table, markdown, GitHub, GitLab and SARIF formats, the `--explain` text, the install-time
   summary and the baseline.
 
+- An abandoned finding's replacement has its link: `replacement_url`, next to `replacement`. The
+  report page links `https://packagist.org/packages/<replacement>` for every named replacement,
+  though the name is one the package's own registry gave, and a package abandoned on Private
+  Packagist or a corporate registry names a package there. `replacement_url` is that page on
+  packagist.org when packagist.org named the replacement — the registry whose metadata marked the
+  package abandoned, by the notification-url Composer gives the version that says so, or, where no
+  metadata came, the one the lock entry came from — and null for every other registry and when
+  `replacement` is null. It is built like `origin.package_url`, only from a Composer package name,
+  and no repository is asked whether the page exists. It is optional in both schemas and reaches
+  `--format=json`, the report inside the `--format=html` page (the page vendored here still builds
+  its own link) and the `--explain` document's `finding`; nothing else changes.
+
 - Each finding says why its `libyears` is null: `libyears_unmeasured`, one of the keys of the
   report's `libyears.unmeasured` (`not_from_composer_repository`, `metadata_unavailable`,
   `branch_snapshot`, `no_stable_release_date`, the first that applies in that order), null exactly

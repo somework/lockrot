@@ -122,7 +122,10 @@ baseline, the SARIF rule and every count key on). Each finding carries `replacem
 in the field. The document carries the split next to the counts —
 `"abandoned": {"total": 7, "with_replacement": 6}` — and the summary line says
 `abandoned 7 (6 with a replacement)` where the number is not zero. The HTML page tags the row with
-the replacement and links it on the package card.
+the replacement and links it on the package card. The link is `replacement_url`: the page
+packagist.org keeps for the name, written by lockrot when packagist.org is the registry that named
+it — the one whose metadata marked the package abandoned, or the lock entry's own when no metadata
+came — and null otherwise, since a replacement a private registry names is a name there.
 
 A named replacement is where to go, not a string to swap: `psr/http-factory` for
 `php-http/message-factory`, `symfony/error-handler` for `symfony/debug` and `web-token/jwt-library`

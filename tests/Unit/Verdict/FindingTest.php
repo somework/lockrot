@@ -334,12 +334,29 @@ final class FindingTest extends TestCase
         self::assertSame(Priority::NONE, $finding->priority());
     }
 
+    /**
+     * The link to the replacement is lockrot's, written where the registry that named it keeps a
+     * page for the name: packagist.org. The page never builds one.
+     */
+    public function testAReplacementNamedByPackagistIsLinkedThere(): void
+    {
+        $s1 = static fn (string $replacement): Signal => new Signal('S1', 'high', 'marked abandoned by its repository, replacement: '.$replacement, ['replacement' => $replacement]);
+        $abandoned = static fn (Signal $signal, ?string $namedBy, string $verdict = Verdict::ABANDONED): Finding => new Finding('vendor/old', '1.0.0', $verdict, [$signal], ['vendor/old'], null, null, null, false, [], null, null, $namedBy);
+
+        self::assertSame('https://packagist.org/packages/symfony/mailer', $abandoned($s1('symfony/mailer'), 'packagist.org')->toArray()['replacement_url']);
+        self::assertNull($abandoned($s1('symfony/mailer'), 'repo.packagist.com')->toArray()['replacement_url'], 'Private Packagist named it, and keeps no public page');
+        self::assertNull($abandoned($s1('symfony/mailer'), null)->toArray()['replacement_url'], 'no registry lockrot knows named it');
+        self::assertNull($abandoned($s1('Symfony'), 'packagist.org')->toArray()['replacement_url'], 'free text is not a package');
+        self::assertNull($abandoned($s1('symfony/mailer'), 'packagist.org', Verdict::SILENT)->toArray()['replacement_url'], 'only an abandoned finding has a successor');
+        self::assertNull((new Finding('vendor/pkg', '1.0.0', Verdict::STALE, [], ['vendor/pkg'], null, null))->toArray()['replacement_url']);
+    }
+
     public function testToArrayCarriesPriorityDirectAndDevRightAfterTheVerdict(): void
     {
         $finding = new Finding('vendor/pkg', '1.2.3', Verdict::STALE, [], ['vendor/root', 'vendor/pkg'], null, null, null, true);
         $array = $finding->toArray();
         self::assertSame(
-            ['package', 'version', 'verdict', 'priority', 'direct', 'dev', 'from_composer_repository', 'origin', 'replacement', 'signals', 'chain', 'direct_dependents', 'evidence', 'allowlist_reason', 'note', 'data_date', 'libyears', 'libyears_unmeasured', 'priority_basis', 'no_fix_expected'],
+            ['package', 'version', 'verdict', 'priority', 'direct', 'dev', 'from_composer_repository', 'origin', 'replacement', 'replacement_url', 'signals', 'chain', 'direct_dependents', 'evidence', 'allowlist_reason', 'note', 'data_date', 'libyears', 'libyears_unmeasured', 'priority_basis', 'no_fix_expected'],
             array_keys($array)
         );
         self::assertSame(Priority::LOW, $array['priority']);

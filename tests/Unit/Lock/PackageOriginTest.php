@@ -139,6 +139,39 @@ final class PackageOriginTest extends TestCase
         self::assertSame(['packagist.org', 'repo.packagist.com', 'wp-packages.org', 'packages.drupal.org'], PackageOrigin::REGISTRIES);
     }
 
+    /** @return iterable<string, array{?string, ?string}> notification-url, registry */
+    public static function registries(): iterable
+    {
+        yield 'packagist.org' => [self::PACKAGIST, 'packagist.org'];
+        yield 'in capitals' => ['HTTPS://Packagist.ORG/downloads/', 'packagist.org'];
+        yield 'Private Packagist' => ['https://repo.packagist.com/acme-org/downloads/', 'repo.packagist.com'];
+        yield 'a registry lockrot does not name' => ['https://satis.internal.acme.test/downloads', null];
+        yield 'no host' => ['/downloads/', null];
+        yield 'empty' => ['', null];
+        yield 'none' => [null, null];
+    }
+
+    /** @dataProvider registries */
+    #[DataProvider('registries')]
+    public function testTheRegistryANotificationUrlNamesIsOneLockrotKnows(?string $url, ?string $registry): void
+    {
+        self::assertSame($registry, PackageOrigin::registryOf($url));
+    }
+
+    /**
+     * A replacement is a name the registry that marked the package abandoned gave, so its page is on
+     * that registry: packagist.org alone, where the maintainer sets both. Nothing is built for a
+     * name Composer would refuse, or for any other registry.
+     */
+    public function testAReplacementsPageIsPackagistsWhenPackagistNamedIt(): void
+    {
+        self::assertSame('https://packagist.org/packages/symfony/mailer', PackageOrigin::replacementPage('packagist.org', 'Symfony/Mailer'));
+        self::assertNull(PackageOrigin::replacementPage('repo.packagist.com', 'symfony/mailer'), 'Private Packagist keeps no public page');
+        self::assertNull(PackageOrigin::replacementPage('wp-packages.org', 'symfony/mailer'), 'WP Packages never marks a package abandoned');
+        self::assertNull(PackageOrigin::replacementPage(null, 'symfony/mailer'), 'nobody lockrot knows named it');
+        self::assertNull(PackageOrigin::replacementPage('packagist.org', 'a/../../login?next=//evil.example'), 'only a Composer package name goes into a URL');
+    }
+
     /** The finding's default when a caller passes none: from a Composer repository lockrot does not name, as the old flag's `true` said. */
     public function testTheUnattributedOriginIsAComposerRepositoryWithoutAName(): void
     {
