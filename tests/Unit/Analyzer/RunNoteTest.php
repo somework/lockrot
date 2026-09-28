@@ -218,7 +218,7 @@ final class RunNoteTest extends TestCase
         self::assertSame(json_encode($data === [] ? new \stdClass() : $data), json_encode($row['data']));
     }
 
-    public function testTheCodesAreListedInTheOrderARunWritesThem(): void
+    public function testTheCodesAreListedInTheOrderTheAnalyzersPassesRun(): void
     {
         self::assertSame([
             'offline',

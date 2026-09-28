@@ -31,7 +31,10 @@ final class RunNote
     public const REPOSITORY_ACTIVITY_UNREACHABLE = 'repository_activity_unreachable';
     public const REPOSITORY_ACTIVITY_NOT_FOUND = 'repository_activity_not_found';
     public const NOT_FROM_COMPOSER_REPOSITORY = 'not_from_composer_repository';
-    /** In the order a run writes them; what the schemas list in `x-known-values`. */
+    /**
+     * The codes lockrot writes, in the order the analyzer's passes run: a run writes each forge's
+     * activity notes together, so two forges' codes interleave. What the schemas list in `x-known-values`.
+     */
     public const CODES = [
         self::OFFLINE,
         self::METADATA_UNAVAILABLE,
