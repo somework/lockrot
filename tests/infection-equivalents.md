@@ -319,7 +319,7 @@ slow test. They are listed here only so nobody reads them as an unexplained "2 t
 
 ## JSON schemas and monorepo-dated branches (2026-09-20)
 
-- `src/Analyzer/Analyzer.php:232` ReturnRemoval — `dateSplitPackages()` returns early when no
+- `src/Analyzer/Analyzer.php:234` ReturnRemoval — `dateSplitPackages()` returns early when no
   package needs dates. Without the return the method runs on: `missingCandidates()` intersects
   every parent's list with an empty children list and returns nothing, no request is made, and
   `date([])` hands the batch back untouched. The guard states the common case, it does not decide it.

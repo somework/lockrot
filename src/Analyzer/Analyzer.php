@@ -39,8 +39,6 @@ use Lockrot\Verdict\VerdictEngine;
  */
 final class Analyzer
 {
-    public const NOTE_NOT_IN_REPOSITORY = Finding::NOTE_NOT_IN_REPOSITORY;
-
     /**
      * The note for a forge whose anonymous request cap shaped the run, so a zero-candidate run
      * does not read as a complete one. GitLab has no cap and no note.
@@ -400,7 +398,7 @@ final class Analyzer
         $fromRepository = $package->isFromComposerRepository();
         $note = null;
         if (!$fromRepository) {
-            $note = self::NOTE_NOT_IN_REPOSITORY;
+            $note = Finding::NOTE_NOT_IN_REPOSITORY;
         } elseif ($meta === null && isset($batch->failed()[$package->name()])) {
             $note = $this->metadataFailureNote($batch->failed()[$package->name()]);
         } elseif ($meta === null) {
