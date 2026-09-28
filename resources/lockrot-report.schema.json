@@ -1985,7 +1985,7 @@
           "type": "string"
         },
         "message": {
-          "description": "Foreign text — a repository's, a host's or Composer's own words — possibly empty, as a report may quote it: every URL in it without its userinfo, query and fragment, and every path on the machine down to its last segment (`.../name`). Not contract.",
+          "description": "Foreign text — a repository's, a host's or Composer's own words — possibly empty, as a report may quote it: every URL in it without its userinfo, query and fragment, and every path on the machine down to its last segment (`.../name`); a message lockrot could not read whole is `(withheld: lockrot could not redact this message)`. Not contract.",
           "type": "string"
         }
       }
@@ -2022,7 +2022,7 @@
                 "$ref": "#/definitions/metadataFailureReason"
               },
               "message": {
-                "description": "Foreign text — a repository's, a host's or Composer's own words — possibly empty, as a report may quote it: every URL in it without its userinfo, query and fragment, and every path on the machine down to its last segment (`.../name`). Not contract.",
+                "description": "Foreign text — a repository's, a host's or Composer's own words — possibly empty, as a report may quote it: every URL in it without its userinfo, query and fragment, and every path on the machine down to its last segment (`.../name`); a message lockrot could not read whole is `(withheld: lockrot could not redact this message)`. Not contract.",
                 "type": "string"
               },
               "package_count": {
@@ -2050,7 +2050,7 @@
           "$ref": "#/definitions/metadataFailureReason"
         },
         "message": {
-          "description": "Foreign text — a repository's, a host's or Composer's own words — possibly empty, as a report may quote it: every URL in it without its userinfo, query and fragment, and every path on the machine down to its last segment (`.../name`). Not contract.",
+          "description": "Foreign text — a repository's, a host's or Composer's own words — possibly empty, as a report may quote it: every URL in it without its userinfo, query and fragment, and every path on the machine down to its last segment (`.../name`); a message lockrot could not read whole is `(withheld: lockrot could not redact this message)`. Not contract.",
           "type": "string"
         }
       }
@@ -2063,7 +2063,7 @@
       ],
       "properties": {
         "message": {
-          "description": "Foreign text — a repository's, a host's or Composer's own words — possibly empty, as a report may quote it: every URL in it without its userinfo, query and fragment, and every path on the machine down to its last segment (`.../name`). Not contract.",
+          "description": "Composer's own words about the project's `audit` or `policy` configuration, the first line, possibly empty; they quote that configuration, never a repository. Not contract.",
           "type": "string"
         }
       }
@@ -2080,7 +2080,7 @@
           "type": "string"
         },
         "message": {
-          "description": "Foreign text — a repository's, a host's or Composer's own words — possibly empty, as a report may quote it: every URL in it without its userinfo, query and fragment, and every path on the machine down to its last segment (`.../name`). Not contract.",
+          "description": "Foreign text — a repository's, a host's or Composer's own words — possibly empty, as a report may quote it: every URL in it without its userinfo, query and fragment, and every path on the machine down to its last segment (`.../name`); a message lockrot could not read whole is `(withheld: lockrot could not redact this message)`. Not contract.",
           "type": "string"
         }
       }

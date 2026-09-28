@@ -511,3 +511,14 @@ five lines and is killed or skipped in this reading, not changed.
   repository's host and path in `remoteKey()`, the shape of `RepoLocator.php:141`: both patterns are
   literals, so preg_replace returns a string and never null.
 
+
+## A report quotes no credential and no path of the machine (0.13.0, 2026-09-29)
+
+Measured over the files the change touched, whole files, locally under Xdebug on 11 threads: every
+escape but the one below is an entry above at a moved line. `src/Data/Repository/RepositoryUrl.php`
+alone: 197 mutants, 196 killed.
+
+- `src/Data/Repository/RepositoryUrl.php:228` LessThan — `$at < $line` becomes `$at <= $line` in
+  `closer()`. `$at` is the offset of a closing quote or bracket and `$line` that of a line
+  break, both found by one pattern that matches one character at each, so the two are never the same
+  offset and the comparisons agree on every text.

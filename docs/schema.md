@@ -339,11 +339,12 @@ each package's `details` (`lock.repository`, `metadata.repository`, `repository_
 
 None of them carries what opens or locates anything. Every URL they quote is written without its
 userinfo, query and fragment, whatever Composer masked of it, and a `file://` URL and every other
-path of the machine keep their last segment alone (`.../ca.pem`). A repository without a scheme
-loses its user (`git.example.com:lib.git`), and `lock.repository` and `metadata.repository` are null
-for a checkout on the machine. `baseline.path` is relative to the project directory, or the file
-name alone, the way `run.lock_file` names the lock. The one absolute path a report carries is SARIF's
-`%SRCROOT%` ([ci.md](ci.md#-formatsarif)).
+path of the machine keep their last segment alone (`.../ca.pem`); a message lockrot cannot read
+whole is replaced by `(withheld: lockrot could not redact this message)`. A repository without a
+scheme loses its user (`git.example.com:lib.git`), and `lock.repository` and `metadata.repository`
+are null for a checkout on the machine. `baseline.path` is relative to the project directory, or the
+file name alone, the way `run.lock_file` names the lock. The one absolute path a report carries is
+SARIF's `%SRCROOT%` ([ci.md](ci.md#-formatsarif)).
 
 ## Related
 

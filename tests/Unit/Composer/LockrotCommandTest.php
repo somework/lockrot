@@ -1762,6 +1762,31 @@ final class LockrotCommandTest extends TestCase
         self::assertStringContainsString('baseline written to ci/rot.json', $stderr);
     }
 
+    /**
+     * A report is published, and an absolute baseline path carries the account it ran under: the
+     * JSON names the baseline relative to the project, or by its file name when it lies elsewhere,
+     * while the terminal says which file it means.
+     */
+    public function testAnAbsoluteBaselinePathIsReportedWithoutLocatingTheMachine(): void
+    {
+        // The run names the project by its resolved path; a symlinked temp directory would read as elsewhere.
+        $dir = (string) realpath($this->fixtureCopy(self::WALLABAG_LOCK));
+        mkdir($dir.'/ci');
+        $elsewhere = $this->tempDir('lockrot-baseline-elsewhere-').'/rot.json';
+
+        foreach ([$dir.'/ci/rot.json' => 'ci/rot.json', $elsewhere => 'rot.json'] as $absolute => $reported) {
+            [$code, , $stderr] = $this->runWithSplitStreams(['--generate-baseline' => true, '--baseline' => $absolute, '--target-php' => '8.4'], $this->loader());
+            self::assertSame(0, $code, $stderr);
+            self::assertStringContainsString('baseline written to '.$absolute, $stderr);
+
+            [, $stdout] = $this->runWithSplitStreams(['--format' => 'json', '--baseline' => $absolute, '--target-php' => '8.4'], $this->loader());
+            $json = json_decode($stdout, true);
+            self::assertIsArray($json);
+            self::assertSame($reported, JsonPath::stringAt($json, ['baseline', 'path']));
+            self::assertStringNotContainsString(\dirname($absolute), $stdout);
+        }
+    }
+
     /** Without --offline nothing is guarded and nothing is offline: a normal run may use the network. */
     public function testWithoutOfflineOptionComposerDisableNetworkEnvStaysUnset(): void
     {

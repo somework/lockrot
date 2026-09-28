@@ -37,6 +37,7 @@ final class RepositoryUrlTest extends TestCase
         yield 'a bare user name' => ['https://user@github.com/vendor/pkg.git', 'https://github.com/vendor/pkg.git'];
         yield 'a password with an @ in it' => ['https://ci:p@ss@git.acme.test/lib.git', 'https://git.acme.test/lib.git'];
         yield 'a token in the query' => ['https://git.acme.test/lib.git?private_token=t0k3n#readme', 'https://git.acme.test/lib.git'];
+        yield 'a question mark in the password' => ['https://igor:pw?x@git.acme.test/lib.git', 'https://git.acme.test/lib.git'];
         yield 'ssh keeps its host, loses its user' => ['ssh://git@gitlab.internal/team/svc.git', 'ssh://gitlab.internal/team/svc.git'];
         yield 'svn over ssh' => ['svn+ssh://igor@svn.acme.test/repo/trunk', 'svn+ssh://svn.acme.test/repo/trunk'];
         yield 'nothing to strip' => ['https://github.com/vendor/pkg.git', 'https://github.com/vendor/pkg.git'];
@@ -160,7 +161,18 @@ final class RepositoryUrlTest extends TestCase
         yield "lockrot's own query" => ['invalid JSON from https://api.bitbucket.org/2.0/repositories/acme/lib/commits?pagelen=1', 'invalid JSON from https://api.bitbucket.org/2.0/repositories/acme/lib/commits'];
         yield 'an e-mail beside a url' => ['{"url":"https://host.example","email":"a@b.example"}', '{"url":"https://host.example","email":"a@b.example"}'];
         yield 'an @ in a path, and mailto' => ['see https://host.example/path@v2/x and mailto:me@x.example', 'see https://host.example/path@v2/x and mailto:me@x.example'];
-        yield 'an @ in a query' => ['https://host.example?next=a@b', 'https://host.example'];
+        yield 'an @ in a query with no path before it takes the host with it, and leaks nothing' => ['https://host.example?next=a@b', 'https://b'];
+        yield 'a second url after a comma' => ['mirrors: https://u:p@h.example/p,https://q:r@h2.example/p', 'mirrors: https://h.example/p,https://h2.example/p'];
+        yield 'a second url after a semicolon' => ['https://u:p@h.example/p;https://q:r@h2.example/p', 'https://h.example/p;https://h2.example/p'];
+        yield 'a second url with nothing between' => ['https://a:b@h.example/phttps://c:d@h2.example/q', 'https://h.example/phttps://h2.example/q'];
+        yield 'a question mark in the password' => ['from https://igor:pw?x@repo.acme.test/p', 'from https://repo.acme.test/p'];
+        yield 'a hash in the password' => ['from https://igor:pw#x@repo.acme.test/p', 'from https://repo.acme.test/p'];
+        yield 'a url escaped for json' => ['{"url":"https:\\/\\/user:pw@h.example\\/p?token=t"}', '{"url":"https:\\/\\/h.example\\/p"}'];
+        yield 'a scheme that starts like file' => ['from files://u:p@h.example/x', 'from files://h.example/x'];
+        yield 'a url right after a local one' => ['file:///srv/a/b,https://u:p@h.example/x', 'file://.../b,https://h.example/x'];
+        yield 'an empty local url' => ['see "file://" and "/Users/igor/x/y"', 'see "file://" and ".../y"'];
+        yield 'a url, then a word with an @' => ['see https://h.example and write to a@b.example', 'see https://h.example and write to a@b.example'];
+        yield 'a port stays' => ['from https://repo.acme.test:8443/p2/a.json', 'from https://repo.acme.test:8443/p2/a.json'];
         yield 'ssh, and an scp-style remote' => ['ssh://git@github.com/acme/lib.git; git@github.com:acme/lib.git', 'ssh://github.com/acme/lib.git; git@github.com:acme/lib.git'];
         yield 'a certificate file curl could not read' => [
             'curl error 77 while downloading https://repo.example.com/packages.json: error adding trust anchors from file: /Users/igor/client-x/certs/ca.pem',
@@ -176,6 +188,24 @@ final class RepositoryUrlTest extends TestCase
         ];
         yield 'a path in the home directory' => ['failed to clone ~/src/lib.', 'failed to clone .../lib.'];
         yield 'a path in single quotes' => ["cannot read '/Users/Igor Pinchuk/certs/ca.pem'", "cannot read '.../ca.pem'"];
+        yield 'a path as PHP quotes it' => ["failed loading cafile stream: `/home/igor/acme-client/ca.pem'", "failed loading cafile stream: `.../ca.pem'"];
+        yield 'a Windows path as PHP quotes it' => ["failed loading cafile stream: `C:\\Users\\igor\\ca.pem'", "failed loading cafile stream: `.../ca.pem'"];
+        yield 'a path after a colon' => ['path:/home/igor/x', 'path:.../x'];
+        yield 'a path after a quote that does not close' => ['"/home/igor/x', '".../x'];
+        yield 'a Windows path with a space' => ['cannot open C:\\Users\\Igor Pinchuk\\repo', 'cannot open .../repo'];
+        yield 'a Windows path with a space in parentheses' => ['file_put_contents(C:\\Users\\Igor Pinchuk\\AppData\\Local\\Composer\\repo\\x.json): Failed to open stream', 'file_put_contents(.../x.json): Failed to open stream'];
+        yield 'a parenthesis in a path in parentheses' => ['file_put_contents(C:\\Program Files (x86)\\Composer\\x.json): Failed', 'file_put_contents(.../x.json): Failed'];
+        yield 'two segments' => ['cafile=/etc/ca.pem', 'cafile=.../ca.pem'];
+        yield 'a directory of one segment' => ['404 for /downloads/', '404 for /downloads/'];
+        yield 'a path after one of one segment' => ['404 for /downloads, see /Users/igor/x/y', '404 for /downloads, see .../y'];
+        yield 'several quoted paths' => ['"/a/b/c" and "/d/e/f" and "/g/h/i" and "/j/k/l"', '".../c" and ".../f" and ".../i" and ".../l"'];
+        yield 'a quoted path whose quote closes on the next line' => ["\"/Users/igor/x\n/srv/a/b\"", "\".../x\n.../b\""];
+        yield 'a path that opens a text ending in a quote' => ['/Users/igor/x "/a/b" "', '.../x ".../b" "'];
+        yield 'a path after a quoted one with a path inside it' => ['"/Users/igor/a /x/y" and /Users/igor/z/w', '".../y" and .../w'];
+        yield 'a path with spaces in two places' => ['fopen /Users/igor/Acme Corp/New Client/x failed', 'fopen .../x failed'];
+        yield 'a next word whose separator ends it' => ['cannot open C:\\Program Files\\Acme Corp\\ now', 'cannot open .../Acme Corp now'];
+        yield 'a next word whose separator starts it' => ['cannot read /Users/igor/a /b now', 'cannot read .../b now'];
+        yield 'a path with a space' => ['fopen /Users/igor/Clients/Acme Corp/app/vendor/x failed', 'fopen .../x failed'];
         yield 'a path after an equals sign' => ['cafile=/etc/ssl/private/acme.pem', 'cafile=.../acme.pem'];
         yield 'a path in parentheses' => ['cannot read (/Users/igor/x/y): denied', 'cannot read (.../y): denied'];
         yield 'a network share' => ['cannot open \\\\server\\share\\repo', 'cannot open .../repo'];
@@ -188,5 +218,31 @@ final class RepositoryUrlTest extends TestCase
         yield 'the budget' => ['not checked: install-time budget exhausted', 'not checked: install-time budget exhausted'];
         yield 'a status' => ['HTTP 502', 'HTTP 502'];
         yield 'nothing' => ['', ''];
+    }
+
+    /** A server writes part of what a failure says, so no length or shape of it may switch the redaction off. */
+    public function testALongMessageIsRedactedWhole(): void
+    {
+        $noise = 'see http://status.acme.test/'.str_repeat('.', 5000).'x at /Users/igor/'.str_repeat('a/', 10000);
+
+        self::assertSame(
+            'see http://status.acme.test/'.str_repeat('.', 5000).'x at .../a and https://repo.acme.test/p',
+            RepositoryUrl::inText($noise.' and https://ci:s3cr3t@repo.acme.test/p')
+        );
+    }
+
+    /** What PCRE cannot finish is withheld, never passed on as it came. */
+    public function testAMessageThatCannotBeRedactedIsWithheld(): void
+    {
+        $limit = (string) \ini_get('pcre.backtrack_limit');
+        $jit = (string) \ini_get('pcre.jit');
+        ini_set('pcre.jit', '0');
+        ini_set('pcre.backtrack_limit', '1');
+        try {
+            self::assertSame(RepositoryUrl::WITHHELD, RepositoryUrl::inText('from https://ci:s3cr3t@repo.acme.test/p'));
+        } finally {
+            ini_set('pcre.backtrack_limit', $limit);
+            ini_set('pcre.jit', $jit);
+        }
     }
 }

@@ -529,7 +529,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     `user:password@`. A certificate curl could not read, or a corrupt file in Composer's cache, put a
     path of the machine in the message. Every URL in these messages, and in the repository activity
     notes', is now written without its userinfo, query and fragment, and every path of the machine
-    keeps its last segment alone (`.../ca.pem`). The host stays.
+    keeps its last segment alone (`.../ca.pem`). The host stays. The message is scanned rather than
+    matched whole, so no length or shape of it can switch the redaction off, and one PCRE cannot
+    read is replaced by `(withheld: lockrot could not redact this message)` rather than printed.
   - `--explain`, and the HTML page's details, printed a VCS repository configured by a path
     (`/Users/<you>/client/lib`, `~/src/lib`) as the lock records it. `lock.repository` and
     `metadata.repository` are now null for a path or a `file://` URL, and the text output has no
