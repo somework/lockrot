@@ -7,6 +7,7 @@ namespace Lockrot\Analyzer;
 use Composer\Downloader\TransportException;
 use Lockrot\Data\Forge\RepoRef;
 use Lockrot\Data\Repository\MetadataFailure;
+use Lockrot\Signal\Rule\NotCheckedRule;
 
 /**
  * One thing a run could not see, as a code with typed facts and the sentence the report prints for
@@ -53,7 +54,8 @@ final class RunNote
     public const ADVISORIES_COMPOSER_TOO_OLD = 'composer_too_old';
     public const INSTALL_TIME_BUDGET = 'install_time_budget';
     public const ADVISORIES_NOT_CHECKED_REASONS = [self::ADVISORIES_OFFLINE, self::ADVISORIES_COMPOSER_TOO_OLD, self::INSTALL_TIME_BUDGET];
-    public const REPOSITORY_ACTIVITY_NOT_CHECKED_REASONS = [self::INSTALL_TIME_BUDGET];
+    /** S10's own reason for the same gap: the findings the note concerns carry it word for word. */
+    public const REPOSITORY_ACTIVITY_NOT_CHECKED_REASONS = [NotCheckedRule::BUDGET];
 
     /**
      * Each says what the missing check costs: without S9 a finding no fix would come for sits one
@@ -178,7 +180,7 @@ final class RunNote
 
     public static function repositoryActivityNotChecked(): self
     {
-        return self::of(self::REPOSITORY_ACTIVITY_NOT_CHECKED, 'repository activity not checked: install-time budget exhausted', false, ['reason' => self::INSTALL_TIME_BUDGET]);
+        return self::of(self::REPOSITORY_ACTIVITY_NOT_CHECKED, 'repository activity not checked: install-time budget exhausted', false, ['reason' => NotCheckedRule::BUDGET]);
     }
 
     /** The text counts both kinds of skipped package together; the data keeps them apart, as S10's two reasons do. */

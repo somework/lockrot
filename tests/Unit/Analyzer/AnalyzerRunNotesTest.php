@@ -210,7 +210,9 @@ final class AnalyzerRunNotesTest extends TestCase
         self::assertSame([RunNote::REPOSITORY_ACTIVITY_NOT_CHECKED], array_map(static fn (RunNote $note): string => $note->code(), $report->runNotes()));
         self::assertSame(['reason' => 'install_time_budget'], $report->runNotes()[0]->data());
         self::assertFalse($report->hadNetworkFailures());
-        self::assertSame(['vendor/a' => NotCheckedRule::BUDGET, 'vendor/b' => NotCheckedRule::BUDGET], self::activityReasons($analysis, ['vendor/a', 'vendor/b']));
+        $reason = $report->runNotes()[0]->data()['reason'];
+        self::assertSame(['vendor/a' => $reason, 'vendor/b' => $reason], self::activityReasons($analysis, ['vendor/a', 'vendor/b']), 'the note\'s reason is S10\'s, word for word');
+        self::assertSame(NotCheckedRule::BUDGET, $reason);
     }
 
     /** Offline, every package whose activity lockrot's cache does not hold carries `offline`, as the offline note says. */

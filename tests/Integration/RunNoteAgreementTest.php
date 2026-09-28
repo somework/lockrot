@@ -140,6 +140,7 @@ final class RunNoteAgreementTest extends TestCase
             }
             if ($reason === NotCheckedRule::BUDGET) {
                 self::assertArrayHasKey(RunNote::REPOSITORY_ACTIVITY_NOT_CHECKED, $byCode, $what);
+                self::assertSame($reason, $byCode[RunNote::REPOSITORY_ACTIVITY_NOT_CHECKED][0]->data()['reason'], $what.': the note carries S10\'s reason');
             }
             if ($reason === NotCheckedRule::OFFLINE) {
                 self::assertArrayHasKey(RunNote::OFFLINE, $byCode, $what);
