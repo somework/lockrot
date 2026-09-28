@@ -84,7 +84,7 @@
     //  - 2026-09-18 (left-behind, advisories): ReleaseBranch.php:35 PregMatchRemoveCaret (a normalized
     //    non-dev version always starts with its major digits), LeftBehindRule.php:68
     //    LessThanOrEqualTo (a same-instant higher release cannot be both alive and older than the
-    //    warn threshold), RepositoryAdvisoryLoader.php:69 ReturnRemoval (the Composer 2.2 arm, covered
+    //    warn threshold), RepositoryAdvisoryLoader.php:65 ReturnRemoval (the Composer 2.2 arm, covered
     //    by the Docker 7.4/2.2 run).
     //
     // 2026-09-20 (JSON schemas, monorepo-dated branches): four new equivalents, all in

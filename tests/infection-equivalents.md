@@ -281,7 +281,7 @@ The memo changes how often the work is done, not what it answers.
   while the installed branch's last release, the same instant, has to be at least
   `release-warn-years` old for the signal to fire: both cannot hold, so the admitted release never
   produces a signal.
-- `src/Data/Advisory/RepositoryAdvisoryLoader.php:69` ReturnRemoval — the Composer 2.2 arm of the
+- `src/Data/Advisory/RepositoryAdvisoryLoader.php:65` ReturnRemoval — the Composer 2.2 arm of the
   `interface_exists(AdvisoryProviderInterface::class)` guard, never entered on the vendored
   Composer; the Docker 7.4/2.2 run outside Infection covers it
   (`RepositoryAdvisoryLoaderTest::testTheComposerVersionNoteMatchesTheApi`).
