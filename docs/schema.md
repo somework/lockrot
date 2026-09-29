@@ -275,7 +275,7 @@ consumer usually keys on:
 A finding's `origin` says where its lock entry came from, as lockrot tells it from the entry itself
 and the `repositories` of the manifest Composer reads (`COMPOSER=alt.json` means alt.json), without
 asking any repository: the same lock and manifest give the same `origin` on every machine. It has
-three keys, always written from 0.13.0 on, and is optional in the schema so earlier documents
+four keys, always written from 0.13.0 on, and is optional in the schema so earlier documents
 validate:
 
 - `kind`, an open string:
