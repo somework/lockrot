@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Lockrot\Lock;
 
+use Lockrot\Data\Repository\RepositoryUrl;
+
 /**
  * Where a lock entry came from, as a finding's `origin`: a kind, the registry where lockrot can name
  * it, and the package's page there. {@see of()} is the one place the kind is decided, and the kind is
@@ -38,32 +40,36 @@ final class PackageOrigin
     private string $kind;
     private ?string $registry;
     private ?string $packageUrl;
+    private bool $local;
 
-    private function __construct(string $kind, ?string $registry, ?string $packageUrl)
+    private function __construct(string $kind, ?string $registry, ?string $packageUrl, bool $local)
     {
         $this->kind = $kind;
         $this->registry = $registry;
         $this->packageUrl = $packageUrl;
+        $this->local = $local;
     }
 
     public static function of(string $name, string $version, OriginFacts $facts, ConfiguredRepositories $repositories): self
     {
+        $local = self::installsFromTheMachine($facts);
         $notificationUrl = $facts->notificationUrl();
         if ($notificationUrl !== null && $notificationUrl !== '') {
             $host = parse_url($notificationUrl, \PHP_URL_HOST);
             $host = \is_string($host) ? strtolower($host) : null;
             $registry = \in_array($host, self::REGISTRIES, true) ? $host : null;
 
-            return new self($host === 'packagist.org' ? self::PACKAGIST : self::COMPOSER, $registry, self::packagePage($registry, $name));
+            return new self($host === 'packagist.org' ? self::PACKAGIST : self::COMPOSER, $registry, self::packagePage($registry, $name), $local);
         }
+        $kind = $repositories->kindServing($name, $version, $facts) ?? self::UNKNOWN;
 
-        return new self($repositories->kindServing($name, $version, $facts) ?? self::UNKNOWN, null, null);
+        return new self($kind, null, null, $local || $kind === self::PATH || $kind === self::ARTIFACT);
     }
 
     /** A finding's origin when its caller gives none: a Composer repository lockrot does not name. */
     public static function unattributed(): self
     {
-        return new self(self::COMPOSER, null, null);
+        return new self(self::COMPOSER, null, null, false);
     }
 
     /** Whether the kind is one whose entries lockrot asks a repository about: exactly the lock entries with a notification-url. */
@@ -92,10 +98,22 @@ final class PackageOrigin
         return $this->packageUrl;
     }
 
-    /** @return array{kind: string, registry: ?string, package_url: ?string} */
+    /** Whether Composer installed the package from the machine it ran on rather than from a server. */
+    public function isLocal(): bool
+    {
+        return $this->local;
+    }
+
+    /** @return array{kind: string, registry: ?string, package_url: ?string, local: bool} */
     public function toArray(): array
     {
-        return ['kind' => $this->kind, 'registry' => $this->registry, 'package_url' => $this->packageUrl];
+        return ['kind' => $this->kind, 'registry' => $this->registry, 'package_url' => $this->packageUrl, 'local' => $this->local];
+    }
+
+    /** A `path` dist, or a dist or source that is a path or a `file://` URL. */
+    private static function installsFromTheMachine(OriginFacts $facts): bool
+    {
+        return $facts->distType() === 'path' || RepositoryUrl::isLocalPath($facts->distUrl()) || RepositoryUrl::isLocalPath($facts->sourceUrl());
     }
 
     private static function packagePage(?string $registry, string $name): ?string

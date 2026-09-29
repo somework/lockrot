@@ -310,6 +310,12 @@ validate:
   string, and never build one yourself. It is the page the registry keeps for that name; whether
   this run's repositories still list the package is the finding's `note`.
 
+- `local`, true when Composer installed the package from the machine it ran on rather than from a
+  server: a `path` or `artifact` repository, or a dist or source that is a path or a `file://` URL,
+  such as a VCS repository checked out on the disk (`kind: vcs`). It says nothing about where: an
+  explanation's `lock.repository` shows such a path by its last segment alone (`.../lib`). A path
+  dist is local whichever registry's notification-url the entry carries.
+
 lockrot reads the manifest as it is at the time of the run. A lock written against repositories
 that have changed since can read as `unknown`.
 
@@ -343,7 +349,9 @@ without its userinfo, query and fragment, whatever Composer masked of it, and a 
 every other path of the machine keep their last segment alone (`.../ca.pem`); a message lockrot
 cannot read whole is replaced by `(withheld: lockrot could not redact this message)`. A repository
 without a scheme loses its user (`git.example.com:lib.git`), and `lock.repository` and
-`metadata.repository` are null for a checkout on the machine. `baseline.path` is relative to the
+`metadata.repository` show a checkout on the machine by its last segment (`.../lib`), a home
+directory as `...` alone; a value starting `...` is always such a path, and the finding's
+`origin.local` is true for it. `baseline.path` is relative to the
 project directory, or the file name alone, the way `run.lock_file` names the lock. The one absolute
 path a report carries is SARIF's `%SRCROOT%` ([ci.md](ci.md#-formatsarif)).
 

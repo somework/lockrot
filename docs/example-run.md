@@ -332,7 +332,8 @@ list, which `…` stands in for:
             "origin": {
                 "kind": "packagist",
                 "registry": "packagist.org",
-                "package_url": "https://packagist.org/packages/sensio/framework-extra-bundle"
+                "package_url": "https://packagist.org/packages/sensio/framework-extra-bundle",
+                "local": false
             },
             "replacement": null,
             "signals": [

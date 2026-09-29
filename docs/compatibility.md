@@ -157,7 +157,9 @@ so it is not a [Verdict change](#verdict-changes).
 Where a lock entry came from is each finding's `origin` ([schema.md](schema.md#where-a-package-came-from)):
 a `kind`, the `registry` where lockrot can name it, and a `package_url`. Frozen for 1.x:
 
-- `origin`'s keys — `kind`, `registry`, `package_url` — on every finding from 0.13.0.
+- `origin`'s keys — `kind`, `registry`, `package_url`, `local` — on every finding from 0.13.0.
+- `local` is true exactly when the entry's dist is a `path` one, its dist or source is a path or a
+  `file://` URL, or its kind is `path` or `artifact`.
 - The notification-url check comes first and alone decides `from_composer_repository`: `packagist`
   and `composer` are exactly the entries with a notification-url, and `from_composer_repository` is
   true exactly for them.

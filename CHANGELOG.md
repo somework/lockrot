@@ -378,7 +378,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   name is a Composer package name, and is otherwise null, for a page to link without building a URL
   of its own. Nothing in `origin` is copied from the lock's or the manifest's URLs, which can carry logins,
   an organisation or a machine path, and no repository is asked for it: the same lock and manifest
-  give the same `origin` anywhere. [schema.md](docs/schema.md#where-a-package-came-from) says what
+  give the same `origin` anywhere. `local` is true where Composer installed the package from the
+  machine it ran on: a `path` or `artifact` repository, or a dist or source that is a path or a
+  `file://` URL, such as a VCS repository checked out on the disk. [schema.md](docs/schema.md#where-a-package-came-from) says what
   each kind means and what a report says about a project's repositories, and the
   [compatibility page](docs/compatibility.md#package-origins) what is frozen. A test holds each
   finding's `origin` to its lock entry, its `from_composer_repository`, its note, the root count,
@@ -534,8 +536,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     read is replaced by `(withheld: lockrot could not redact this message)` rather than printed.
   - `--explain`, and the HTML page's details, printed a VCS repository configured by a path
     (`/Users/<you>/client/lib`, `~/src/lib`) as the lock records it. `lock.repository` and
-    `metadata.repository` are now null for a path or a `file://` URL, and the text output has no
-    `source` line for it. A remote without a scheme loses its user (`git.example.com:lib.git`), and a
+    `metadata.repository` now show a path or a `file://` URL by its last segment alone (`.../lib`,
+    and a home directory as `...`), and the text output's `source` line says it is a path on the
+    machine lockrot ran on; the finding's `origin.local` says so to a reader of the data. A remote without a scheme loses its user (`git.example.com:lib.git`), and a
     URL its query and fragment. A password with an `@` in it lost only what came before its `@`;
     it now goes whole. The page's repository link is decided from what the package says, as before.
   - `baseline.path`, and the table's baseline line, printed an absolute `--baseline` or

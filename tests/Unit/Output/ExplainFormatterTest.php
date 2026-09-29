@@ -290,7 +290,7 @@ final class ExplainFormatterTest extends TestCase
         );
     }
 
-    /** A source on the machine that wrote the lock has no line: its path carries the account. A remote loses its login. */
+    /** A source on the machine that wrote the lock is its last segment, and says so: its path carries the account. A remote loses its login. */
     public function testASourceLineNeverLocatesTheMachine(): void
     {
         $at = new \DateTimeImmutable('2020-01-01T00:00:00+00:00');
@@ -301,7 +301,7 @@ final class ExplainFormatterTest extends TestCase
         $text = $this->plain(new Explanation($finding, F::facts($package, $metadata), new Thresholds(), '8.4', $this->report()));
 
         self::assertStringNotContainsString('igor', $text);
-        self::assertSame(1, substr_count($text, '  source '), 'only the metadata has a source to show');
+        self::assertStringContainsString('  source .../pkg (a path on the machine lockrot ran on)', $text);
         self::assertStringContainsString('  source git.acme.test:pkg.git', $text);
     }
 

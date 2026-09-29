@@ -226,7 +226,7 @@ final class ReportDocumentTest extends TestCase
 
     /**
      * The page embeds the explanation's repositories, and a checkout on the machine that wrote the
-     * lock is a path with the account in it: the detail carries none. The link is decided from what
+     * lock is a path with the account in it: the detail carries its last segment alone. The link is decided from what
      * the package says, as before, and a path never became one.
      */
     public function testADetailNeverLocatesTheMachine(): void
@@ -238,8 +238,8 @@ final class ReportDocumentTest extends TestCase
 
         $detail = J::arrayAt($this->document($report, $facts)->toArray(), ['details', 'vendor/pkg']);
 
-        self::assertNull(J::arrayAt($detail, ['lock'])['repository']);
-        self::assertNull(J::arrayAt($detail, ['metadata'])['repository']);
+        self::assertSame('.../pkg', J::arrayAt($detail, ['lock'])['repository']);
+        self::assertSame('.../pkg', J::arrayAt($detail, ['metadata'])['repository']);
         self::assertNull($detail['repository_link']);
         self::assertStringNotContainsString('igor', (string) json_encode($detail));
     }

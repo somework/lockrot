@@ -55,6 +55,12 @@ final class RepositoryUrl
     /** Sentence punctuation after a URL or a path, which stays text. */
     private const TRAILING = '.,:;!';
 
+    /** A path on the machine: absolute, in the home directory, relative, on a drive, or on a share. */
+    private const LOCAL = '{^(?:/|~(?:[\\\\/]|$)|\.\.?(?:[\\\\/]|$)|[A-Za-z]:[\\\\/]|\\\\\\\\)}';
+
+    /** A home directory itself, whose name is the account's: `/Users/alice`, `/home/alice`, `C:\Users\alice`, `~`. */
+    private const HOME = '{(?:^|[\\\\/])(?:Users|home)[\\\\/][^\\\\/]+$|^~$}i';
+
     /** A remote without a scheme: an scp-style `[user@]host:path`, or a Perforce `[ssl:]host:port`. */
     private const REMOTE = '{^(?:(?<user>[^@\s/\\\\:]+)@)?(?<remote>(?:(?:ssl|tcp)[46]?:)?(?<host>[A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9])?):(?!//)[^\s\\\\].*)$}';
 
@@ -62,7 +68,9 @@ final class RepositoryUrl
      * The repository as a report may print it: a URL without its userinfo, query and fragment, so
      * `https://user:token@host/path?private_token=…` reads `https://host/path`, and a remote without
      * a scheme without its user, so `igor@git.acme.test:lib.git` reads `git.acme.test:lib.git`.
-     * Null for what locates the machine rather than a server: a path, or a `file://` URL.
+     * A path or a `file://` URL locates the machine rather than a server, and reads as a message
+     * quotes one, by its last segment: `/Users/igor/client-x/lib` reads `.../lib`. Null for what is
+     * none of these.
      *
      * The userinfo runs to the last `@` before the path, `?` and `#` included, since a password
      * written by hand is not always encoded. Redacting rather than dropping a URL keeps the host,
@@ -74,13 +82,25 @@ final class RepositoryUrl
             return $url;
         }
         if (preg_match('{^(?<scheme>[A-Za-z][A-Za-z0-9+.-]*://)(?:[^/]*@)?(?<rest>[^?#]*)}', $url, $m) === 1) {
-            return strcasecmp($m['scheme'], 'file://') === 0 ? null : $m['scheme'].$m['rest'];
+            return strcasecmp($m['scheme'], 'file://') === 0 ? self::local(substr($url, 7)) : $m['scheme'].$m['rest'];
         }
         if (preg_match(self::REMOTE, $url, $m) === 1 && ($m['user'] !== '' || strpos($m['host'], '.') !== false)) {
             return $m['remote'];
         }
 
-        return null;
+        return self::isLocalPath($url) ? self::local($url) : null;
+    }
+
+    /** Whether a repository or dist URL is a path on the machine, or a `file://` URL. */
+    public static function isLocalPath(?string $url): bool
+    {
+        return $url !== null && (strncasecmp($url, 'file://', 7) === 0 || preg_match(self::LOCAL, $url) === 1);
+    }
+
+    /** Whether {@see shown()} gave a path on the machine: every one starts `...`, and no URL or remote does. */
+    public static function isLocal(string $shown): bool
+    {
+        return strncmp($shown, '...', 3) === 0;
     }
 
     /**
@@ -279,14 +299,27 @@ final class RepositoryUrl
         return $from + \strlen(rtrim(substr($text, $from, $end - $from), self::TRAILING));
     }
 
+    /** A local repository as a report shows it: its last segment, `...` for the machine's root. */
+    private static function local(string $path): string
+    {
+        $shown = self::lastSegment(substr($path, 0, strcspn($path, '?#')));
+
+        return $shown === '' ? '...' : $shown;
+    }
+
     /**
      * `.../name`, the last segment of a path split on either separator, and the separator after it,
-     * so what follows reads as it did; nothing for a path of separators alone.
+     * so what follows reads as it did; nothing for a path of separators alone. A home directory is
+     * `...` alone, since its name is the account's.
      */
     private static function lastSegment(string $path): string
     {
         $name = rtrim($path, '/\\');
+        if ($name === '') {
+            return '';
+        }
+        $segment = $name === '...' || preg_match(self::HOME, $name) !== 0 ? '...' : '.../'.preg_replace('{^.*[\\\\/]}s', '', $name);
 
-        return $name === '' ? '' : '.../'.preg_replace('{^.*[\\\\/]}s', '', $name).substr($path, \strlen($name));
+        return $segment.substr($path, \strlen($name));
     }
 }

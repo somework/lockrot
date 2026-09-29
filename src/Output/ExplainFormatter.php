@@ -215,8 +215,8 @@ final class ExplainFormatter
             $parts[] = 'branch snapshot';
         }
         $lines = ['composer.lock', self::INDENT.self::escape(implode(' · ', $parts))];
-        if (($source = RepositoryUrl::shown($package->repositoryUrl())) !== null) {
-            $lines[] = self::INDENT.self::escape('source '.$source);
+        if (($source = self::source($package->repositoryUrl())) !== null) {
+            $lines[] = self::INDENT.self::escape($source);
         }
 
         return $lines;
@@ -242,8 +242,8 @@ final class ExplainFormatter
             $parts[] = 'not abandoned';
         }
         $lines[] = self::INDENT.self::escape(implode(' · ', $parts));
-        if (($source = RepositoryUrl::shown($metadata->repositoryUrl())) !== null) {
-            $lines[] = self::INDENT.self::escape('source '.$source);
+        if (($source = self::source($metadata->repositoryUrl())) !== null) {
+            $lines[] = self::INDENT.self::escape($source);
         }
         $lines[] = self::INDENT.self::escape($this->lastRelease($metadata, $explanation));
         $installed = $this->installedRelease($explanation, $metadata);
@@ -430,6 +430,17 @@ final class ExplainFormatter
     private static function string($value): ?string
     {
         return \is_string($value) && $value !== '' ? $value : null;
+    }
+
+    /** Where the entry says it came from, marked when that is a path on the machine lockrot ran on. */
+    private static function source(?string $url): ?string
+    {
+        $shown = RepositoryUrl::shown($url);
+        if ($shown === null) {
+            return null;
+        }
+
+        return 'source '.$shown.(RepositoryUrl::isLocal($shown) ? ' (a path on the machine lockrot ran on)' : '');
     }
 
     private static function escape(string $text): string

@@ -1656,6 +1656,10 @@
             "string",
             "null"
           ]
+        },
+        "local": {
+          "description": "Whether Composer installed the package from the machine it ran on rather than from a server: a `path` or `artifact` repository, or a dist or source that is a path or a `file://` URL (a VCS repository checked out on the disk). Where it is true, `lock.repository` and `metadata.repository` in an explanation show the path by its last segment (`.../lib`). Optional: documents written before 0.13.0 do not carry it; from 0.13.0 on every origin does.",
+          "type": "boolean"
         }
       }
     },

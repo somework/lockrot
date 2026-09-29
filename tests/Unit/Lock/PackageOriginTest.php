@@ -36,7 +36,7 @@ final class PackageOriginTest extends TestCase
     {
         $origin = PackageOrigin::of('acme/lib', '1.0.0', new OriginFacts($url, 'zip', 'https://example.test/lib.zip', 'git', 'https://github.com/acme/lib.git'), ConfiguredRepositories::none());
 
-        self::assertSame(['kind' => $kind, 'registry' => $registry, 'package_url' => $packageUrl], $origin->toArray());
+        self::assertSame(['kind' => $kind, 'registry' => $registry, 'package_url' => $packageUrl, 'local' => false], $origin->toArray());
         self::assertTrue($origin->isComposerRepository());
     }
 
@@ -58,7 +58,7 @@ final class PackageOriginTest extends TestCase
         $facts = new OriginFacts(null, 'path', 'packages/lib', null, null);
         $inline = ConfiguredRepositories::fromManifest([['type' => 'package', 'package' => ['name' => 'acme/lib', 'version' => '1.0.0', 'dist' => ['type' => 'path', 'url' => 'packages/lib']]]]);
 
-        self::assertSame(['kind' => 'path', 'registry' => null, 'package_url' => null], PackageOrigin::of('acme/lib', '1.0.0', $facts, ConfiguredRepositories::none())->toArray());
+        self::assertSame(['kind' => 'path', 'registry' => null, 'package_url' => null, 'local' => true], PackageOrigin::of('acme/lib', '1.0.0', $facts, ConfiguredRepositories::none())->toArray());
         self::assertSame('package', PackageOrigin::of('acme/lib', '1.0.0', $facts, $inline)->kind());
         self::assertSame('path', PackageOrigin::of('acme/lib', '2.0.0', $facts, $inline)->kind(), 'another version is not what the definition gives');
     }
@@ -72,7 +72,7 @@ final class PackageOriginTest extends TestCase
     {
         $facts = new OriginFacts(null, 'zip', 'https://api.github.com/repos/jquery/jquery-dist/zipball/abc', 'git', 'git@github.com:jquery/jquery-dist.git');
 
-        self::assertSame(['kind' => 'unknown', 'registry' => null, 'package_url' => null], PackageOrigin::of('bower-asset/jquery', '3.7.1', $facts, ConfiguredRepositories::none())->toArray());
+        self::assertSame(['kind' => 'unknown', 'registry' => null, 'package_url' => null, 'local' => false], PackageOrigin::of('bower-asset/jquery', '3.7.1', $facts, ConfiguredRepositories::none())->toArray());
         self::assertSame('unknown', PackageOrigin::of('bower-asset/jquery', '3.7.1', $facts, ConfiguredRepositories::fromManifest([['type' => 'composer', 'url' => 'https://asset-packagist.org']]))->kind());
         self::assertSame('vcs', PackageOrigin::of('bower-asset/jquery', '3.7.1', $facts, ConfiguredRepositories::fromManifest([['type' => 'vcs', 'url' => 'https://github.com/jquery/jquery-dist']]))->kind());
     }
@@ -94,7 +94,7 @@ final class PackageOriginTest extends TestCase
     {
         $origin = PackageOrigin::of($name, '1.0.0', new OriginFacts(self::PACKAGIST, null, null, null, null), ConfiguredRepositories::none());
 
-        self::assertSame(['kind' => 'packagist', 'registry' => 'packagist.org', 'package_url' => null], $origin->toArray());
+        self::assertSame(['kind' => 'packagist', 'registry' => 'packagist.org', 'package_url' => null, 'local' => false], $origin->toArray());
     }
 
     public function testAPackagePageReadsTheNameAsComposerDoes(): void
@@ -144,8 +144,30 @@ final class PackageOriginTest extends TestCase
     {
         $origin = PackageOrigin::unattributed();
 
-        self::assertSame(['kind' => 'composer', 'registry' => null, 'package_url' => null], $origin->toArray());
+        self::assertSame(['kind' => 'composer', 'registry' => null, 'package_url' => null, 'local' => false], $origin->toArray());
         self::assertTrue($origin->isComposerRepository());
         self::assertNull($origin->registry());
+    }
+
+    /**
+     * @dataProvider installs
+     */
+    #[DataProvider('installs')]
+    public function testAnOriginSaysWhetherComposerInstalledFromTheMachine(OriginFacts $facts, ConfiguredRepositories $repositories, bool $local): void
+    {
+        self::assertSame($local, PackageOrigin::of('acme/lib', '1.0.0', $facts, $repositories)->isLocal());
+    }
+
+    /** @return iterable<string, array{OriginFacts, ConfiguredRepositories, bool}> */
+    public static function installs(): iterable
+    {
+        yield 'from packagist.org' => [new OriginFacts(self::PACKAGIST, 'zip', 'https://api.github.com/repos/acme/lib/zipball/x', 'git', 'https://github.com/acme/lib.git'), ConfiguredRepositories::none(), false];
+        yield 'a path dist, relative' => [new OriginFacts(null, 'path', 'packages/lib', null, null), ConfiguredRepositories::none(), true];
+        yield 'a vcs repository on the disk' => [new OriginFacts(null, null, null, 'git', '/Users/igor/client/lib'), ConfiguredRepositories::none(), true];
+        yield 'a vcs repository by a file url' => [new OriginFacts(null, null, null, 'git', 'file:///srv/git/lib.git'), ConfiguredRepositories::none(), true];
+        yield 'a dist on a Windows drive' => [new OriginFacts(null, 'zip', 'C:\\artifacts\\lib.zip', null, null), ConfiguredRepositories::none(), true];
+        yield 'a vcs repository on a server' => [new OriginFacts(null, null, null, 'git', 'git@github.com:acme/lib.git'), ConfiguredRepositories::none(), false];
+        yield 'an artifact repository' => [new OriginFacts(null, 'zip', 'artifacts/lib-1.0.0.zip', null, null), ConfiguredRepositories::fromManifest([['type' => 'artifact', 'url' => 'artifacts/']]), true];
+        yield 'nothing to tell by' => [new OriginFacts(null, null, null, null, null), ConfiguredRepositories::none(), false];
     }
 }

@@ -182,7 +182,7 @@ final class ExplanationTest extends TestCase
 
     /**
      * A VCS repository on the machine that wrote the lock is a path with the account in it, and a
-     * repository's metadata can name one by `file://`: neither is shown. A remote keeps its host.
+     * repository's metadata can name one by `file://`: each shows its last segment alone. A remote keeps its host.
      */
     public function testARepositoryIsShownByItsHostAndNeverByAPathOnTheMachine(): void
     {
@@ -193,8 +193,9 @@ final class ExplanationTest extends TestCase
         $onTheMachine = (new Explanation($this->finding('1.0.0', Verdict::STALE), F::facts(F::package(['source' => '/Users/igor/client-x/pkg']), $local), new Thresholds(), '8.4', $this->report()))->toArray();
         $elsewhere = (new Explanation($this->finding('1.0.0', Verdict::STALE), F::facts(F::package(['source' => 'igor@git.acme.test:pkg.git']), $remote), new Thresholds(), '8.4', $this->report()))->toArray();
 
-        self::assertNull(JsonPath::arrayAt($onTheMachine, ['lock'])['repository']);
-        self::assertNull(JsonPath::arrayAt($onTheMachine, ['metadata'])['repository']);
+        self::assertSame('.../pkg', JsonPath::arrayAt($onTheMachine, ['lock'])['repository']);
+        self::assertSame('.../pkg', JsonPath::arrayAt($onTheMachine, ['metadata'])['repository']);
+        self::assertStringNotContainsString('igor', (string) json_encode($onTheMachine));
         self::assertSame('git.acme.test:pkg.git', JsonPath::arrayAt($elsewhere, ['lock'])['repository']);
         self::assertSame('https://git.acme.test/pkg.git', JsonPath::arrayAt($elsewhere, ['metadata'])['repository']);
     }

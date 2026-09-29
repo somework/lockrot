@@ -515,10 +515,15 @@ five lines and is killed or skipped in this reading, not changed.
 ## A report quotes no credential and no path of the machine (0.13.0, 2026-09-29)
 
 Measured over the files the change touched, whole files, locally under Xdebug on 11 threads: every
-escape but the one below is an entry above at a moved line. `src/Data/Repository/RepositoryUrl.php`
-alone: 199 mutants, 198 killed.
+escape but the two below is an entry above at a moved line. `src/Data/Repository/RepositoryUrl.php`,
+`src/Lock/PackageOrigin.php` and `src/Output/ExplainFormatter.php` together, after `origin.local`
+was added: 574 mutants, 572 killed, the two below.
 
-- `src/Data/Repository/RepositoryUrl.php:234` LessThan — `$at < $line` becomes `$at <= $line` in
+- `src/Data/Repository/RepositoryUrl.php:103` DecrementInteger — `strncmp($shown, '...', 3)` becomes
+  `strncmp($shown, '...', 2)` in `isLocal()`. What `shown()` returns starts with `...` for a path and
+  otherwise with a scheme's letter or a remote's host, which starts with a letter or a digit, so
+  nothing it returns starts `..` without a third dot and the two agree.
+- `src/Data/Repository/RepositoryUrl.php:254` LessThan — `$at < $line` becomes `$at <= $line` in
   `closer()`. `$at` is the offset of a closing quote or bracket and `$line` that of a line
   break, both found by one pattern that matches one character at each, so the two are never the same
   offset and the comparisons agree on every text.

@@ -81,22 +81,22 @@ final class OriginAgreementTest extends TestCase
     /** matomo's one VCS entry is a packages-dev entry. */
     private const EXPECTED_WITH_DEV = ['apps/matomo-org_matomo' => ['vcs' => 1]];
 
-    /** The origin of each entry of the hand-built lock. */
+    /** The origin of each entry of the hand-built lock; a `path` dist is on the machine whichever registry notified it. */
     private const ORIGINS = [
-        'acme/from-packagist' => ['packagist', 'packagist.org', 'https://packagist.org/packages/acme/from-packagist'],
-        'acme/from-private-packagist' => ['composer', 'repo.packagist.com', null],
-        'acme/from-wp-packages' => ['composer', 'wp-packages.org', 'https://wp-packages.org/packages/acme/from-wp-packages'],
-        'acme/from-drupal-path' => ['composer', 'packages.drupal.org', null],
-        'acme/from-private-registry' => ['composer', null, null],
-        'acme/inline-copied' => ['packagist', 'packagist.org', 'https://packagist.org/packages/acme/inline-copied'],
-        'acme/vcs-lib' => ['vcs', null, null],
-        'acme/renamed' => ['unknown', null, null],
-        'acme/inline' => ['package', null, null],
-        'acme/local' => ['path', null, null],
-        'acme/artifact' => ['artifact', null, null],
-        'acme/after-satis' => ['unknown', null, null],
-        'acme/metapackage' => ['unknown', null, null],
-        'acme/crafted"onmouseover="x?next=evil.example#x' => ['packagist', 'packagist.org', null],
+        'acme/from-packagist' => ['packagist', 'packagist.org', 'https://packagist.org/packages/acme/from-packagist', false],
+        'acme/from-private-packagist' => ['composer', 'repo.packagist.com', null, false],
+        'acme/from-wp-packages' => ['composer', 'wp-packages.org', 'https://wp-packages.org/packages/acme/from-wp-packages', false],
+        'acme/from-drupal-path' => ['composer', 'packages.drupal.org', null, true],
+        'acme/from-private-registry' => ['composer', null, null, false],
+        'acme/inline-copied' => ['packagist', 'packagist.org', 'https://packagist.org/packages/acme/inline-copied', false],
+        'acme/vcs-lib' => ['vcs', null, null, false],
+        'acme/renamed' => ['unknown', null, null, false],
+        'acme/inline' => ['package', null, null, false],
+        'acme/local' => ['path', null, null, true],
+        'acme/artifact' => ['artifact', null, null, true],
+        'acme/after-satis' => ['unknown', null, null, false],
+        'acme/metapackage' => ['unknown', null, null, false],
+        'acme/crafted"onmouseover="x?next=evil.example#x' => ['packagist', 'packagist.org', null, false],
     ];
 
     /** What the hand-built lock and manifest carry that no document may: logins, a password, an organisation, a machine path, a private host. */
@@ -139,7 +139,7 @@ final class OriginAgreementTest extends TestCase
             $package = JsonPath::stringAt($document, ['findings', $at, 'package']);
             $what = $dir.' '.$package;
             $origin = JsonPath::arrayAt($row, ['origin']);
-            self::assertSame(['kind', 'registry', 'package_url'], array_keys($origin), $what);
+            self::assertSame(['kind', 'registry', 'package_url', 'local'], array_keys($origin), $what);
             [$kind, $registry, $url] = [$origin['kind'], $origin['registry'], $origin['package_url']];
             self::assertIsString($kind, $what);
             $kinds[$kind] = ($kinds[$kind] ?? 0) + 1;
@@ -168,6 +168,14 @@ final class OriginAgreementTest extends TestCase
             $explained = (new Explanation($finding, $facts, new Thresholds(), '8.4', $report))->toArray();
             self::assertSame($origin, JsonPath::arrayAt($explained, ['finding', 'origin']), $what.': the explanation');
             self::assertSame($row['from_composer_repository'], JsonPath::arrayAt($explained, ['lock'])['from_composer_repository'], $what.': the explanation\'s lock');
+            self::assertIsBool($origin['local'], $what);
+            if (\in_array($kind, [PackageOrigin::PATH, PackageOrigin::ARTIFACT], true)) {
+                self::assertTrue($origin['local'], $what.': a path or artifact repository is on the machine');
+            }
+            $shown = JsonPath::arrayAt($explained, ['lock'])['repository'];
+            if (\is_string($shown) && strncmp($shown, '...', 3) === 0) {
+                self::assertTrue($origin['local'], $what.': the explanation shows a path');
+            }
         }
 
         $others = $kinds;
