@@ -168,8 +168,9 @@ a `kind`, the `registry` where lockrot can name it, and a `package_url`. Frozen 
 - `registry` is null for every kind but `packagist` and `composer`, and is `packagist.org` exactly
   when the kind is `packagist`.
 - `package_url` is written by lockrot, never built by a reader: a link only where it is a string.
-  So is a finding's `replacement_url`, the replacement's page on the registry that named it: null
-  whenever `replacement` is.
+  So is a finding's `replacement_url`: the replacement's page, written only where lockrot keeps one
+  for the registry that named it (packagist.org), null otherwise, and always null when
+  `replacement` is. A named replacement with a null `replacement_url` gets no link.
 
 Not frozen:
 
