@@ -6,287 +6,256 @@
 [![PHAR](https://img.shields.io/github/v/release/somework/lockrot?style=flat-square&label=phar)](https://github.com/somework/lockrot/releases/latest)
 [![License](https://img.shields.io/packagist/l/somework/lockrot.svg?style=flat-square)](LICENSE)
 
-**Finds the packages in `composer.lock` that quietly stopped being maintained.**
+**lockrot finds the packages in `composer.lock` that nobody maintains any more, including the ones
+`composer audit` passes because no maintainer marked them abandoned.**
 
-Composer warns you about one kind of neglected dependency: the `abandoned` flag a maintainer sets by
-hand. It says nothing about a package whose last release was in 2015, one pinned to a branch
-snapshot, or one accepted on PHP 8.4 only because its constraint reads `>=5.3.0`.
+Each finding carries its evidence and the dependency chain that pulled it in. lockrot reads
+`composer.lock` and `composer.json` and writes neither.
 
-lockrot reports all of them, with the evidence behind each call, the date the data was read, and the
-dependency chain that pulled it in. It reads `composer.lock` and `composer.json`, and writes neither.
+```bash
+composer require --dev somework/lockrot
+composer config allow-plugins.somework/lockrot true
+composer lockrot
+```
 
-Requires PHP 7.4+ and Composer 2.2+.
+Needs PHP 7.4+ and Composer 2.2+; the standalone PHAR needs only PHP 7.4+ ([Install](#install)).
+
+[See a full recorded run on a real project's lock →](https://lockrot.dev/example-run/)
 
 ## Contents
 
 [Install](#install) · [First run](#first-run) · [What it reports](#what-it-reports) ·
 [In CI](#in-ci) · [Not every finding is a problem](#not-every-finding-is-a-problem) ·
 [Configuration](#configuration) · [Documentation](#documentation) · [Limitations](#limitations) ·
-[Roadmap](#roadmap)
+[Roadmap](#roadmap) · [Contributing](#contributing) · [Security](#security) · [License](#license)
 
 ## Install
+
+The Composer plugin needs PHP 7.4+ and Composer 2.2+ and adds `composer lockrot` (alias
+`composer rot`):
 
 ```bash
 composer require --dev somework/lockrot
 composer config allow-plugins.somework/lockrot true
 ```
 
-Composer 2.2+ asks for plugin permission on the first `require`/`install`; the second command grants
-it. This installs `composer lockrot`, alias `composer rot`.
+The `composer config` line grants the plugin permission Composer asks for.
 
-Or run the PHAR, with no dependency added to your project:
+The plugin also prints a short summary of flagged packages during `composer require`, `update` and
+`install`; set `extra.lockrot.install-time` to `off` to silence it
+([Install-time summary](https://lockrot.dev/install-time/)).
+
+The standalone PHAR needs only PHP 7.4+ and adds nothing to your project:
 
 ```bash
 curl -fsSL -o lockrot.phar https://lockrot.dev/lockrot.phar
-php lockrot.phar -d /path/to/project --target-php=8.4
+php lockrot.phar -d /path/to/project
 ```
 
-To verify a download, take both files from the release:
-
-```bash
-curl -fsSL -O https://github.com/somework/lockrot/releases/latest/download/lockrot.phar
-curl -fsSL -O https://github.com/somework/lockrot/releases/latest/download/lockrot.phar.sha256
-sha256sum -c lockrot.phar.sha256   # shasum -a 256 -c on macOS
-```
-
-Releases from 0.5.0 on are also GPG-signed (`lockrot.phar.asc`, key `39EC C3F6 4AE8 D06A 9A63
-FD99 AB6F 7F52 AE51 3141`) and attested by GitHub (`gh attestation verify lockrot.phar --repo
-somework/lockrot`); `phive install somework/lockrot` does the download and the signature check in
-one step. From 0.6.0 on `php lockrot.phar self-update` verifies each release's `lockrot.phar.sig.json`
-against the key built into the archive, with nothing installed on the machine; from 0.13.0 on it
-stays within its major version (`--allow-major` moves to the next) and passes over a release that
-needs a newer PHP than the one running it.
-
-[The PHAR, signatures, `self-update` and the global plugin install →](https://lockrot.dev/phar/)
+- **Verify the download:** `phive install somework/lockrot` downloads the PHAR and checks its GPG
+  signature in one step. The sha256, GPG and build-attestation checks by hand are in
+  [Verifying the download](https://lockrot.dev/phar/#verifying-the-download).
+- **Update it:** `php lockrot.phar self-update` checks the new release's sha256 and signature
+  before it replaces the archive; see [Keeping it updated](https://lockrot.dev/phar/#keeping-it-updated).
 
 ## First run
 
-```bash
-composer lockrot --target-php=8.4
-```
+Goal: see what in your lock is unmaintained, why, and how to act on it. You need the plugin
+installed and, for a complete run, a GitHub token in `GITHUB_TOKEN`
+([Repository hosts and credentials](https://lockrot.dev/internals/#repository-hosts-and-credentials)).
 
-```text
-critical (3)
-  abandoned    sensio/framework-extra-bundle v6.2.10  direct
-               marked abandoned by its repository, replacement: Symfony; repository archived on
-               GitHub; last release 2023-02-24 (3.6 years ago); …; pulls in 1 flagged package:
-               doctrine/annotations (abandoned)
-  silent       javibravo/simpleue 2.1.0  direct
-               last release 2017-11-15 (8.8 years ago); last push 2017-11-18 (8.8 years ago); …
-  …
-high (58)
-  abandoned    doctrine/cache 2.2.0  via doctrine/doctrine-bundle, also via craue/config-bundle,
-               doctrine/doctrine-migrations-bundle, doctrine/orm and 2 more
-               marked abandoned by its repository; last release 2022-05-20 (4.3 years ago)
-  abandoned    hoa/ruler 2.17.05.16  via wallabag/rulerz, also via wallabag/rulerz-bundle
-               marked abandoned by its repository; last release 2017-05-16 (9.3 years ago); …
-  …
-200 packages checked · abandoned 19 · silent 8 · pinned 4 · left-behind 12 · old-promise 1 · stale 7 · …
-priority: critical 3 · high 37 · medium 7 · low 4
-libyears: 171.3 behind across 194 of 200 packages · 111.7 from direct requirements · furthest behind smalot/pdfparser v1.1.0 at 4.7
-pulled in by: wallabag/rulerz-bundle 15 · wallabag/rulerz 14 · wallabag/phpepub 5 · …
-…
-```
+1. Run it:
 
-Abridged — `…` marks where lines were cut. [The full run →](https://lockrot.dev/example-run/)
+    ```bash
+    composer lockrot
+    ```
 
-![composer lockrot on a real project: the grouped list, the summary block and the footer](docs/assets/lockrot-demo.gif)
+    lockrot checks against `config.platform.php`, else the PHP running Composer. Pass
+    `--target-php=<version>` when that is not the PHP your project runs on in production.
 
-> **Set `GITHUB_TOKEN` for a complete run.** Without one, repository-activity checks are capped at 50
-> packages, and lockrot reports how many were affected. Development dependencies are not checked
-> unless you pass `--dev`.
+    Findings are grouped by priority. Each row gives the verdict, the package, how it is reached
+    (`direct` or `via …`) and the evidence. The summary block under the list counts every verdict,
+    sums the [libyears](https://lockrot.dev/verdicts/#libyears), and names the direct requirements
+    that pull in the most flagged packages.
 
-Why is a row there — or why is a package you expected not? `composer lockrot --explain=vendor/package`
-prints that one package with everything it was decided on: every signal's raw data and dates, the
-release branches the repository lists with their dates, the repository activity, the thresholds.
-[Explaining one package →](https://lockrot.dev/configuration/#explaining-one-package)
+    A real run, recorded as a terminal session. The [recorded run on wallabag's
+    lock](https://lockrot.dev/example-run/) gives a larger one in full, as text.
+
+    ![composer lockrot on a real project: the grouped list, the summary block and the footer](docs/assets/lockrot-demo.gif)
+
+2. Ask why one package is flagged, or why it is not:
+
+    ```bash
+    composer lockrot --explain=vendor/package
+    ```
+
+    Prints the package's verdict, priority and every signal with its dates
+    ([Explaining one package](https://lockrot.dev/configuration/#explaining-one-package)).
+
+3. Accept what you have decided to live with, so CI fails only on what is new or worse:
+
+    ```bash
+    composer lockrot --generate-baseline
+    ```
+
+    Writes `lockrot-baseline.json` next to `composer.json` (or at the `baseline` path) and exits
+    `0` whatever `--fail-on` says; `--strict-network` still applies. Commit the file
+    ([Baseline](https://lockrot.dev/baseline/)).
+
+4. Fail the build on the findings that matter to you:
+
+    ```bash
+    composer lockrot --fail-on=silent
+    ```
+
+    Exits `1` when a finding that is new or worse than the baseline reaches `silent` or
+    `abandoned` ([In CI](#in-ci)).
+
+Next: [What it reports](https://lockrot.dev/verdicts/) for each verdict,
+[every configuration key](https://lockrot.dev/configuration/), and [CI setup](https://lockrot.dev/ci/).
 
 ## What it reports
 
+Each package gets one verdict:
+
 | Verdict | Meaning |
 |---|---|
-| `abandoned` | The package's Composer repository marks it abandoned (Packagist by default), or its repository is archived on GitHub or GitLab |
-| `silent` | No stable release for at least 5 years **and** no repository push for at least 5 years; an archived repository is reported as `abandoned` instead |
-| `pinned` | Installed version is a branch snapshot (`dev-*` or `#hash`), or the package has no stable release at all |
-| `left-behind` | No stable release on the installed version's release branch for at least 3 years while a higher branch has released since, and within the last 3 — the package is alive, the branch you are on is not |
-| `old-promise` | The installed version was written for an older PHP major and released before the target's major existed; its `require.php` admits the target only because it has no upper bound |
-| `stale` | Old release or old push, but not old enough (or not on both fronts) for `silent` |
+| `abandoned` | Its Composer repository marks it abandoned, or its repository is archived on GitHub or GitLab |
+| `silent` | No release and no push to its repository in years |
+| `pinned` | Installed from a branch snapshot (`dev-main` or any other `dev-*` branch, `2.x-dev`), or the package has no tagged release |
+| `left-behind` | The installed release branch stopped releasing while a newer branch still releases |
+| `old-promise` | Released before the target PHP major existed, and admits it only because `require.php` has no upper bound |
+| `stale` | An old release or an old push, short of `silent` |
 | `unknown` | No data could be obtained |
-| `finished` | Matched the built-in or project allowlist — the package is complete by design, not neglected |
+| `finished` | On the built-in or project allowlist, or a metapackage: complete by design |
 | `ok` | None of the above |
 
-Each finding also carries a priority — `critical`, `high`, `medium`, `low`, or `none` for a package
-the report does not flag. The verdict sets a base level, which drops one step for a transitive
-package and one more for a development-only one, never below `low`. A security advisory on a
-package nobody will fix — `abandoned`, `silent`, `left-behind` — is the vulnerability `composer audit` reports; here it raises the priority one step and marks the
-evidence `no fix expected`, unless a release the repository already lists is out of the advisory's range, which the evidence then names (`fixed by 6.3.0`). The priority orders the report and is carried in every format. **`--fail-on` takes a verdict, a priority, or `unchecked`**: `--fail-on=silent`
-fails on what was observed, wherever the package sits; `--fail-on=high` fails on how much it applies
-to this project. The baseline stays on the verdict.
+- **Priority** (`critical` to `low`) says how much a finding matters to this project: it starts
+  from the verdict and drops for a transitive or development-only package
+  ([Priority](https://lockrot.dev/verdicts/#priority)).
+- **Security advisories:** on a flagged package, lockrot names the release that fixes each
+  advisory `composer audit` reports, or says none is expected
+  ([Security advisories](https://lockrot.dev/verdicts/#security-advisories)).
+- **Transitive exposure:** a transitive finding names every direct requirement that reaches it, and
+  each direct requirement's evidence lists the flagged packages it pulls in
+  ([Transitive exposure](https://lockrot.dev/verdicts/#transitive-exposure)).
+- **Libyears:** the summary's `libyears:` line sums, over the lock, the years between each
+  installed release and the package's newest stable one ([Libyears](https://lockrot.dev/verdicts/#libyears)).
 
-A transitive finding names every direct requirement it is reachable from (`via a › b, also via c`),
-not only the one its shortest chain starts from, and each direct requirement's evidence says what
-flagged packages it pulls in. The `pulled in by:` summary line sums that up — [transitive
-exposure](https://lockrot.dev/verdicts/#transitive-exposure).
-
-The footer's `libyears:` line is one number for the whole lock: for each package, the years between
-the release installed and the package's newest stable release, summed — 171.3 for wallabag, with the
-package furthest behind named. It is laid over the verdicts, not one of them: every drift counts,
-healthy patches included, so it says how far behind the lock is and nothing about why. Each finding
-carries its own value in `--format=json`, and the report's block is the arithmetic over them —
-[libyears](https://lockrot.dev/verdicts/#libyears).
-
-[Every verdict, signal and priority rule →](https://lockrot.dev/verdicts/)
+[What it reports: every verdict, signal and threshold →](https://lockrot.dev/verdicts/)
 
 ## In CI
 
-| Code | Meaning |
-|---|---|
-| `0` | No finding reached the `fail-on` threshold (or `fail-on=none`) |
-| `1` | A finding reached or exceeded the `fail-on` threshold |
-| `2` | Tool, configuration or usage error (an unknown option, a bad value) |
+Run the same command as a CI step, with `GITHUB_TOKEN` in the step's environment:
 
-A network failure is reported as a note and never fails the run on its own, unless you pass
-`--strict-network`. `--format=github` turns findings into pull-request annotations, `--format=sarif`
-uploads them to the Security tab, `--format=gitlab` into a Code Quality report and
-`--format=markdown` into a PR comment, and `--format=html` into a single-file page you can upload as a CI artifact and open.
-One run can write several of them: `--format` decides stdout, and each `--output=<format>:<path>` adds a file
-rendered from the same report:
-
-```bash
-composer lockrot --format=github --fail-on=silent --target-php=8.4 \
-  --output=sarif:lockrot.sarif --output=html:lockrot-report.html --output=json:lockrot.json
+```yaml
+- name: lockrot
+  run: composer lockrot --fail-on=silent
+  env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-On GitHub Actions, [somework/lockrot-action](https://github.com/somework/lockrot-action) runs the
-verified release with annotations, a job summary and a metadata cache in one step:
+- **`--fail-on`** takes a verdict (fail on what was observed), a priority (fail on how much it
+  matters here) or `unchecked` (fail when a check could not run).
+- **Exit codes:** `0` passed, `1` a finding reached `--fail-on`, `2` lockrot could not run
+  ([Exit codes](https://lockrot.dev/ci/#exit-codes)).
+- **Lookup failures** are reported as run notes and do not fail the run; `--strict-network` makes
+  them exit `1`.
+- **Formats:** `--format` takes `table` (default), `json`, `github` (annotations), `sarif` (code
+  scanning), `gitlab` (Code Quality), `markdown` (PR comment) or `html` (one self-contained page).
+  Each `--output=<format>:<path>` writes one more from the same run
+  ([Writing reports to files](https://lockrot.dev/configuration/#writing-reports-to-files)).
+
+Choosing a threshold and what each format gives: [In CI](https://lockrot.dev/ci/).
+
+On GitHub Actions, [somework/lockrot-action](https://github.com/somework/lockrot-action) v1 runs
+lockrot in one step:
 
 ```yaml
 - uses: somework/lockrot-action@v1
   with:
-    target-php: '8.4'
     fail-on: silent
 ```
 
-Everywhere else, the PHAR or the Docker image `ghcr.io/somework/lockrot` does the same job.
-
-[Exit codes and every output format →](https://lockrot.dev/ci/)
+On other CI systems, use the PHAR or the Docker image `ghcr.io/somework/lockrot`
+([The Docker image](https://lockrot.dev/phar/#the-docker-image)).
 
 ## Not every finding is a problem
 
-A large project rarely starts clean. The **baseline** records the findings you have already seen and
-decided to live with, so CI fails only on what is new or has got worse, without turning `--fail-on`
-off and losing the check entirely. Commit the file: it is a statement about the project, worth
-reviewing like any other change, and lockrot writes it on this flag alone.
+- **Baseline:** `--generate-baseline` records the findings you accept; later runs fail only on new
+  or worsened ones. Matching is by package name, so a version bump stays accepted and a worse
+  verdict fails again ([Baseline](https://lockrot.dev/baseline/)).
+- **Allowlist:** packages finished by design report as `finished`. lockrot ships a built-in list
+  (`psr/*`, `fig/*`, `symfony/polyfill-*` and others). Add your own under `extra.lockrot.ignore`;
+  `package` and `reason` are required, `version` and `expires` optional:
 
-lockrot writes the files you name — reports with `--output`, the baseline with `--generate-baseline`
-— each through a temporary file beside it that is renamed over it, so it needs write access to that
-directory; its activity cache, under Composer's cache directory; and, with `self-update`, the PHAR.
-It never writes `composer.json` or `composer.lock`. An absolute path is written where it points, in
-the project or not, and a run interrupted mid-write can leave a `*.tmp` file beside the target.
+    ```json
+    { "extra": { "lockrot": { "ignore": [
+        { "package": "acme/legacy-bridge", "reason": "internal fork, tracked in ACME-123", "expires": "2027-01-01" }
+    ] } } }
+    ```
 
-```bash
-composer rot --target-php=8.4 --generate-baseline
-```
-
-An **allowlist** covers packages that are finished by design rather than neglected. lockrot ships a
-built-in one — `psr/*`, `fig/*`, `symfony/polyfill-*` and more — and those report as `finished`. To
-silence a dependency of your own, add it to `extra.lockrot.ignore`; `package` and `reason` are
-mandatory, `version` and `expires` optional:
-
-```json
-{ "extra": { "lockrot": { "ignore": [
-    { "package": "acme/legacy-bridge", "reason": "internal fork, tracked in ACME-123", "expires": "2027-01-01" }
-] } } }
-```
-
-[Baseline →](https://lockrot.dev/baseline/) · [Allowlist and `ignore` →](https://lockrot.dev/configuration/)
+    See [The allowlist](https://lockrot.dev/configuration/#the-allowlist).
 
 ## Configuration
 
-Settings live under `extra.lockrot` in `composer.json`. CLI options win over environment variables,
-which win over `composer.json`.
+Settings live under `extra.lockrot` in `composer.json`. A CLI option wins over an environment
+variable, which wins over `composer.json`. The keys most projects set:
 
-| `extra.lockrot` key | CLI option | Default | Meaning |
+| `extra.lockrot` key | CLI option | Default | Effect |
 |---|---|---|---|
-| `fail-on` | `--fail-on=<verdict or priority>` | `none` | Exit 1 threshold: a verdict (`stale`, `old-promise`, `left-behind`, `pinned`, `silent`, `abandoned`) or a priority (`low`, `medium`, `high`, `critical`) |
-| `target-php` | `--target-php=8.4` | `config.platform.php`, else the running PHP | PHP version the project runs on: decides `old-promise`, and which branch `left-behind` suggests |
-| `format` | `--format=<name>` | `table` | `table`, `json`, `github`, `sarif`, `gitlab`, `markdown` or `html` |
-| `include-dev` | `--dev` | `false` | Also check `packages-dev`, one priority step lower |
-| `install-time` | — | `on` | Print a compact block during `composer require`/`update`/`install` |
+| `fail-on` | `--fail-on` | `none` | Exit `1` threshold: a verdict, a priority or `unchecked` |
+| `target-php` | `--target-php` | `config.platform.php`, else the running PHP | The PHP version the project runs on: decides `old-promise`, and which newer branch a `left-behind` finding tells you to move to |
+| `include-dev` | `--dev` | `false` | Also check `packages-dev` |
+| `format` | `--format` | `table` | Output format |
 | `ignore` | — | `[]` | Project allowlist |
-| — | `--all` | | Show every checked package, not only flagged ones |
-| — | `--generate-baseline` | | Write this run's findings to the baseline file and exit 0 |
-| — | `--explain=vendor/package` | | One package: its verdict, every signal with its raw data, and the repository facts behind them; exit 0 |
-| — | `--output=<format>:<path>` | | Also write the report to a file, in any `--format` format; repeatable. Relative to the project directory; the directory must exist |
 
-`extra.lockrot` is validated against
-[`resources/lockrot-config.schema.json`](resources/lockrot-config.schema.json). A key lockrot does not
-know is not an error: it gets one line on stderr, with the known key it was probably meant to be, and
-the run carries on unchanged; `extensions` and keys starting with `x-` are reserved and stay quiet.
-Package metadata comes
-from the repositories configured in your `composer.json`, through Composer's own repository layer —
-Private Packagist, Satis and mirrors included, with its authentication, proxy settings and metadata
-cache; a repository is asked about a package only when it advertises a notify URL, so a Satis build
-needs `notify-batch` set.
-Repository activity comes from GitHub, GitLab and Bitbucket Cloud and is cached for 24 hours.
+A key lockrot does not know gets one warning line on stderr and changes nothing
+([Unknown keys](https://lockrot.dev/configuration/#unknown-keys)).
 
-[Full configuration reference →](https://lockrot.dev/configuration/) ·
-[How lockrot fetches metadata →](https://lockrot.dev/internals/)
+[Every key, environment variable and option →](https://lockrot.dev/configuration/)
 
 ## Documentation
 
-Everything is at [lockrot.dev](https://lockrot.dev).
-
-- [Verdicts](https://lockrot.dev/verdicts/) — the nine verdicts, the nine signals, and how priority is derived
-- [Configuration](https://lockrot.dev/configuration/) — every `extra.lockrot` key, environment variable and CLI option
-- [CI](https://lockrot.dev/ci/) — exit codes and all seven output formats, with GitHub and GitLab snippets
-- [Baseline](https://lockrot.dev/baseline/) — generating one, the four buckets, and how matching works
-- [Compatibility](https://lockrot.dev/compatibility/) — what 1.0 will freeze and what it will not, and how verdicts may change (draft)
-- [Install-time summary](https://lockrot.dev/install-time/) — the block Composer prints, its budgets, and the strict gate
-- [PHAR](https://lockrot.dev/phar/) — verified and signed downloads, PHIVE, `self-update`, and the global plugin install
-- [Internals](https://lockrot.dev/internals/) — the repository layer, two-pass fetching, caching and `--offline`
-- [Example run](https://lockrot.dev/example-run/) — one full run in three formats, plus a clean one
-- [Changelog](https://lockrot.dev/changelog/) — what changed in each release
+The full documentation is at [lockrot.dev](https://lockrot.dev); its home page routes you by task.
+What changed in each release is in the [changelog](https://lockrot.dev/changelog/).
 
 ## Limitations
 
-- Repository activity is checked on GitHub, on GitLab (gitlab.com and every instance in Composer's
-  `gitlab-domains`) and on Bitbucket Cloud. GitHub Enterprise and Bitbucket Server are not queried.
-- Without a GitHub token, only packages that already look stale on release age (no stable release
-  within `release-warn-years`, default 3y, and not already `abandoned`) are checked against GitHub,
-  capped at 50 per host per run; set `GITHUB_TOKEN` to lift the cap. The same cap applies on Bitbucket until
-  Composer has credentials for `bitbucket.org`. lockrot reports how many packages this affected.
-- GitLab is never capped, but its API hides the archived flag from anonymous callers: without
-  `GITLAB_TOKEN` (or Composer's `gitlab-token`) a GitLab package can be `silent` but is never
-  `abandoned` for being archived. Bitbucket Cloud has no archived state at all.
-- A package is never flagged for what *it* depends on. A direct requirement that pulls in flagged
-  packages says so in its evidence (signal S7) and on the `pulled in by:` line, but its own verdict,
-  the priority, `--fail-on` and the exit code read only what was observed about the package itself.
-- The baseline matches by package name only, and never rewrites itself — entries for packages that
-  have left the lock are reported as stale, not removed.
-- The install-time block reads a package's development flag from the lock the transaction is about to
-  leave behind. Under `composer require --dev … --dry-run` no such lock is written, so a package not
-  yet in the lock is treated as production and its priority can read one step high. `composer
-  lockrot` on the real lock always has the flag.
+- **Hosts:** repository activity comes from GitHub, GitLab (gitlab.com and every host in
+  Composer's `gitlab-domains`) and Bitbucket Cloud, not GitHub Enterprise or Bitbucket Server. The
+  archived flag needs a token on GitLab and does not exist on Bitbucket
+  ([Repository hosts and credentials](https://lockrot.dev/internals/#repository-hosts-and-credentials)).
+- **Anonymous caps:** without a GitHub token, GitHub is asked only about packages already stale on
+  release age, up to a per-run cap. Bitbucket Cloud has the same cap until Composer has credentials
+  for bitbucket.org. The report counts what the cap skipped
+  ([Repository hosts and credentials](https://lockrot.dev/internals/#repository-hosts-and-credentials)).
+- **Package metadata** comes from the Composer repositories your project configures; a Satis build
+  needs `notify-batch` set ([Which repository answers](https://lockrot.dev/internals/#two-passes)).
+- **No inherited verdicts:** a package is never flagged for what it depends on. Its evidence and the
+  `pulled in by:` line say what it pulls in
+  ([Transitive exposure](https://lockrot.dev/verdicts/#transitive-exposure)).
+- **`composer require --dev … --dry-run`:** the install-time summary can read a new package's priority
+  one step high ([Under `--dry-run`](https://lockrot.dev/install-time/#a-note-on-the-dry-run-development-flag)).
 
 ## Roadmap
 
-Next up: repository activity from Forgejo and Gitea hosts (Codeberg and Composer's
-`forgejo-domains`). GitHub Enterprise waits for someone with an instance to test against. Reading
-the lock files bundled inside PHAR tools is being evaluated.
+Planned and proposed work is tracked as
+[enhancement issues](https://github.com/somework/lockrot/issues?q=is%3Aissue+label%3Aenhancement).
 
 ## Contributing
 
-Bug reports, fixes and additions to the built-in allowlist are welcome — see
-[`CONTRIBUTING.md`](CONTRIBUTING.md), which also lists what the public interface is
-([Backward compatibility](CONTRIBUTING.md#backward-compatibility)); what 1.0 will freeze is drafted
-in [Compatibility](https://lockrot.dev/compatibility/). The PHP classes are not part of it: every one
-of them is marked `@internal`.
+Bug reports, fixes and additions to the built-in allowlist are welcome; see
+[`CONTRIBUTING.md`](CONTRIBUTING.md). What counts as public interface is in
+[Backward compatibility](CONTRIBUTING.md#backward-compatibility). The stability promise for reports
+and options: [Compatibility](https://lockrot.dev/compatibility/).
 
 ## Security
 
 To report a security issue, follow [`SECURITY.md`](SECURITY.md) rather than opening a public issue.
+What lockrot reads, writes and contacts is in
+[What lockrot does and does not do](SECURITY.md#what-lockrot-does-and-does-not-do).
 
 ## License
 
-MIT — see [`LICENSE`](LICENSE). Written by Igor Pinchuk.
+MIT; see [`LICENSE`](LICENSE). Written by Igor Pinchuk.

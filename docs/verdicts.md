@@ -1,386 +1,340 @@
 ---
-title: lockrot verdicts and priority — abandoned, silent, pinned
-description: The nine verdicts lockrot gives a package in composer.lock, the signals behind each one, and how direct, transitive and dev dependencies set the priority.
+title: Verdicts, signals and priority
+description: What each lockrot verdict means, the rule and signals behind it, what clears it, and how direct, transitive and dev dependencies set a finding's priority.
 ---
 
 # Verdicts and priority
 
-Every package in `composer.lock` gets exactly one verdict and one priority. The verdict says what
-was observed about the package. The priority says how much that applies to *your* project.
+Every package in `composer.lock` gets a verdict (what was observed about it) and a priority (how
+much that matters to your project). Find your finding's verdict below for the rule that fired and
+what clears it.
 
-## The nine verdicts
+## The verdicts {#the-nine-verdicts}
 
-| Verdict | Meaning | Signals |
-|---|---|---|
-| `abandoned` | The package's Composer repository marks it abandoned (Packagist by default), or its repository is archived on GitHub or GitLab | S1 or S3 |
-| `silent` | No stable release for at least `release-high-years` (default 5y) **and** no repository push for at least `push-high-years` (default 5y); an archived repository is reported as `abandoned` instead | S2 high AND S4 high, NOT S1, NOT S3 |
-| `pinned` | Installed version is a branch snapshot — `dev-master`, `dev-main`, any other `dev-*` branch, a `2.x-dev` alias or a `#hash` reference — or the package has no stable release at all | S6 |
-| `left-behind` | No stable release on the installed version's release branch for at least `release-warn-years` (default 3y), while a higher branch has released since and within `release-warn-years` — the package is alive, the branch you are on is not | S8 |
-| `old-promise` | The installed version was written for an older PHP major, or for none at all (`>=7.2`, `*`), and released before the target's major existed, and its `require.php` admits the target only because it has no upper bound | S5 |
-| `stale` | Old release or old push, but not old enough (or not on both fronts) for `silent` | one of S2/S4 |
-| `unknown` | No data could be obtained (not found in any configured Composer repository, or all lookups failed) | — |
-| `finished` | Matched the built-in or project allowlist — the package is complete by design, not neglected | allowlist match |
-| `ok` | None of the above | — |
+| Verdict | Rule | Signals | What you can do | What the maintainer can do |
+|---|---|---|---|---|
+| [`abandoned`](#abandoned-and-where-to) | The package's Composer repository marks it abandoned, or its repository is archived on its host | S1 or S3 | Move to the [named replacement](#abandoned-and-where-to) or another package | Lift the mark, or unarchive the repository |
+| `silent` | No release for `release-high-years` (default 5) **and** no push for `push-high-years` (default 5) | S2 high and S4 high | Replace it, or accept it with an [`ignore` entry](configuration.md#the-allowlist) or the [baseline](baseline.md) | Release and push; either alone lowers it to `stale` |
+| [`pinned`](#what-s6-carries) | The installed version is a branch snapshot (`dev-main`, any other `dev-*` branch, `2.x-dev`), or the package has no tagged release at all | S6 | Require a tagged release | Tag a release, for a package that has none |
+| [`left-behind`](#left-behind) | No stable release on the installed version's release branch for `release-warn-years` (default 3), while a higher branch keeps releasing | S8 | Require the branch the evidence names (`require ^3.0 to follow`) | Release on the old branch |
+| [`old-promise`](#old-promise) | The installed release predates the target PHP's major, and its `require.php` admits the target only because it has no upper bound | S5 | Update to a release cut after that major's GA, or to one whose `require.php` names the major | Release after that major's GA, or with a `require.php` that names it |
+| `stale` | No release for `release-warn-years` (default 3), or no push for `push-warn-years` (default 3), short of `silent` | S2 or S4 | Replace it, or accept it with an [`ignore` entry](configuration.md#the-allowlist) or the [baseline](baseline.md) | A release inside `release-warn-years` and a push inside `push-warn-years` |
+| `unknown` | No verdict signal fired, and lockrot has no repository metadata for the package: it is not from a Composer repository, the repository does not list it, or the lookup failed | none | Make its metadata load (the run's [notes](notes.md) say what failed); for a package not from a Composer repository, an [`ignore` entry](configuration.md#the-allowlist) if you vouch for it | Publish it to a Composer repository |
+| `finished` | The package matches the built-in allowlist or the project's `ignore` list | allowlist | Nothing: not flagged. An `ignore` entry past its `expires` date falls back to the normal verdict | Nothing |
+| `ok` | None of the rules above applies | none | Nothing: not flagged | Nothing |
 
-Severity order, used by `--fail-on` and the baseline:
+Severity order, used by [`--fail-on`](ci.md) (ci.md says which threshold to pick), the baseline
+and the report's sort order:
 `abandoned > silent > pinned > left-behind > old-promise > stale > unknown > finished = ok`.
 
-`finished` and `ok` sit equal and lowest in that ordering. Like `unknown`, neither is ever
-flagged: they have priority `none`, no verdict or priority threshold reaches them, and they are
-listed only with `--all`. `--fail-on=unchecked` is the exception, because it reads S10 rather than
-the verdict: a finding carrying S10 fails the run whatever its verdict, `ok` and `unknown` included
-(an allowlisted, `finished` package never carries S10). Where lockrot lists verdicts — `counts`, `run.flagged_verdicts`, the schema enums, this page —
-`finished` comes before `ok`. The order, and the six flagged verdicts above `unknown`, are frozen for
-1.x — see [compatibility.md](compatibility.md#closed-sets-and-their-order).
+- A transitive finding (`via …`) is cleared through the direct requirement that pulls it in:
+  update or replace that requirement. See [Transitive exposure](#transitive-exposure).
 
-An allowlist match never competes in the order at all. It is checked before any signal is read and
-always wins, so an allowlisted package reports `finished` whatever its signals say — see
-[configuration.md](configuration.md).
+- The verdicts above `unknown` are the flagged ones. `unknown`, `finished` and `ok` have priority
+  `none`, no verdict or priority threshold reaches them, and they are listed only with `--all`.
+
+- `--fail-on=unchecked` reads S10, not the verdict, so it can fail a finding of any verdict but
+  `finished`; see [What was not checked](#what-was-not-checked).
+
+- An allowlist match is checked before any signal and always wins: an allowlisted package is
+  `finished` whatever its signals say ([the allowlist](configuration.md#the-allowlist)).
+
+- Where lockrot lists verdicts (`counts`, `run.flagged_verdicts`, the schema enums, this page),
+  `finished` comes before `ok`. Which orders are frozen is in
+  [compatibility.md](compatibility.md#closed-sets-and-their-order).
 
 ## The signals
 
-| Signal | What it observes |
-|---|---|
-| S1 | The Composer repository marks the package abandoned, sometimes naming a replacement |
-| S2 | Time since the last stable release, against `release-warn-years` / `release-high-years` |
-| S3 | The repository is archived — on GitHub, or on GitLab when the run has credentials there (the anonymous API hides the flag); Bitbucket Cloud has no archived state |
-| S4 | Time since the last push to any branch (GitHub) or the newest commit on any branch (GitLab, Bitbucket), against `push-warn-years` / `push-high-years` |
-| S5 | The installed release predates the GA of the target PHP's major, and its `require.php` was written for an older major with no upper bound — it admits the target on a promise made before the major existed |
-| S6 | The installed version is a branch snapshot (`dev-master`, `dev-main`, `2.x-dev`, `#hash`), or the package has no stable release |
-| S7 | A direct requirement pulls in flagged transitive packages — informational, never a verdict; see [Transitive exposure](#transitive-exposure) |
-| S8 | Time since the last stable release on the installed version's release branch, against `release-warn-years` / `release-high-years`, counted only when a higher branch has released since and within `release-warn-years`; see [Left behind](#left-behind) |
-| S9 | Security advisories affecting the installed version — never a verdict; raises the priority where no fix is coming; see [Security advisories](#security-advisories) |
-| S10 | A check the verdict rests on did not run, and the signals it blocked — informational, never a verdict; see [What was not checked](#what-was-not-checked) |
+| Signal | What it observes | Reads | Decides |
+|---|---|---|---|
+| S1 | The Composer repository marks the package abandoned, sometimes naming a replacement; without repository metadata, the lock's own `abandoned` mark | Composer repository, else the lock | `abandoned` |
+| S2 | Time since the package's newest release (pre-releases count, branches do not), against `release-warn-years` / `release-high-years` | Composer repository | `silent`, `stale` |
+| S3 | The repository is archived on its host | Repository host; which hosts expose the flag, and with which credentials, is in [internals.md](internals.md#repository-hosts-and-credentials) | `abandoned` |
+| S4 | Time since the last push to any branch (GitHub) or the newest commit on any branch (GitLab, Bitbucket), against `push-warn-years` / `push-high-years` | Repository host | `silent`, `stale` |
+| S5 | An open-ended `require.php` on a release older than the target PHP's major; see [Old promise](#old-promise) | Lock and target PHP | `old-promise` |
+| S6 | A branch snapshot, or no tagged release; see [What S6 carries](#what-s6-carries) | Lock (snapshot), Composer repository (tags) | `pinned` |
+| S7 | The flagged transitive packages a direct requirement pulls in | Lock and `composer.json` | nothing; see [Transitive exposure](#transitive-exposure) |
+| S8 | Time since the newest stable release on the installed release branch, while a higher branch releases; see [Left behind](#left-behind) | Composer repository | `left-behind` |
+| S9 | Security advisories affecting the installed version | Composer repository | nothing; it can raise the priority, see [Security advisories](#security-advisories) |
+| S10 | A check the verdict rests on did not run, and the signals it blocked | The other checks | nothing; see [What was not checked](#what-was-not-checked) |
 
-S3 and S4 come from the repository host — GitHub, GitLab or Bitbucket — and need network access;
-see [internals.md](internals.md) for how that data is fetched and cached, which host reads what, and
-[configuration.md](configuration.md) for the thresholds.
-
-S8 reads the same release dates S2 does, one branch at a time — see [Left behind](#left-behind).
-S9 comes from the same Composer repositories, through the advisory API `composer audit` uses.
-
-S6 says which of its two cases fired, and whether the package has ever released. A snapshot is
-checked first, so the evidence line alone cannot tell wallabag/rulerz on `dev-master`, which has
-never been tagged, from friendsofsymfony/oauth-server-bundle on `dev-master`, which has; under
-`--format=json` the signal's data can:
-
-- `reason` is `branch_snapshot` when the installed version is a branch, `no_stable_release` when it
-  is not and the repository lists no tagged version. An open set: a later release may add a reason.
-  It is not libyears' `no_stable_release_date`, which counts packages whose newest release carries
-  no date.
-- `has_stable_release` says whether the repository lists any tagged version; a pre-release counts,
-  a branch does not. wallabag/rulerz is `false`, oauth-server-bundle `true`. It is null, not
-  false, when lockrot loaded no repository metadata for the package — a `vcs` or `path` entry, a
-  package the repository does not list, metadata that did not load; the report's notes say which —
-  because nothing then says it never released.
-- `last_stable_release` and `last_stable_version` are the newest *dated* tagged release, not the
-  highest tag: 1.6.2 of 2019-01-23 for oauth-server-bundle, whose 2.0.0-alpha.0 is higher and
-  older. They are null with no tagged release, with no metadata, and where tags exist but the
-  highest carries no date lockrot trusts (a subtree split, whose tags share a commit) unless the
-  monorepo it was split from dates it; `last_stable_dated_by` then names that monorepo. S2 carries
-  the same date as `last_release` and `last_version`.
-- `snapshot_time` is the lock's `time` for a snapshot: the date of the commit the branch pointed
-  at, not a release. It is null for `no_stable_release`, and when the lock entry has no time.
-
-The verdict is `pinned` either way. `--explain` shows the same facts: `has_stable_release` and
-`last_stable_*` under `metadata`, the snapshot's date as `lock.released`. Its text prints S6's data
-keys that have a value on the line under the signal and leaves the null ones out, so rulerz reads
-`version dev-master · reason branch_snapshot · has_stable_release false · snapshot_time …`;
-`--format=json` carries every key, nulls included.
-
-S5 is not what `composer check-platform-reqs` checks. That command tests the platform against each
-constraint — PHP 8.4 satisfies `>=7.2`, so it passes — while S5 tests the constraint against the
-release history: a `>=7.2` written in 2019 says nothing about PHP 8, which did not exist. The line
-is the GA of the target's *major* (8.0, 2020-11-26, for any 8.x target), not of the target minor:
-nothing older than PHP 8.4 was tested on 8.4, `^8.0` included, and a `>=7.2` cut in 2022 with PHP
-8.1 on every CI matrix differs from a `^7.2 || ^8.0` of the same day in spelling alone. A
-constraint that names the target's major (`^7.2 || ^8.0`) is a promise its author made on purpose
-and is never S5. Composer's own convention is silent on the upper bound — Symfony writes `>=8.2`,
-Laravel `^8.2` — and S5 does not fault the style; it reads the date.
-
-```text
-  old-promise  matomo/decompress 2.1.0  direct
-               released 2020-01-11 for PHP 5 (php ">=5.3.2"), before PHP 8 existed (8.0 GA
-               2020-11-26); admits 8.4 untested
-```
-
-Every finding's evidence line states the concrete fact — release date, push date, constraint string
-— and the report footer states the data date. There are no severity words beyond the verdict names
-above.
+- S2, S4 and S8 are `warn` past the warn threshold and `high` past the high one. Only `silent`
+  reads the level; the thresholds are [`extra.lockrot` keys](configuration.md#extralockrot-keys).
 
 ## Abandoned, and where to
 
-`abandoned` is one verdict for two situations. Packagist's marker comes with a free-text
-`replacement` field, and a good share of abandoned packages carry one: on the weekly watch over
-twenty applications, 19 of 72 did, 17 of them naming a package. For the reader those are different
-findings — `swiftmailer/swiftmailer` says to go to `symfony/mailer`, `hoa/ruler` says nothing — and
-the report keeps them apart without splitting the verdict (the verdict is what `--fail-on`, the
-baseline, the SARIF rule and every count key on). Each finding carries `replacement` in
-`--format=json`: the package the repository names, when what it names is a Composer package name.
-`Symfony` (sensio/framework-extra-bundle) and `EnglishInflector from the String component`
-(doctrine/inflector) are what Packagist has on record, and they stay in the evidence as text, not
-in the field. The document carries the split next to the counts —
-`"abandoned": {"total": 7, "with_replacement": 6}` — and the summary line says
-`abandoned 7 (6 with a replacement)` where the number is not zero. The HTML page tags the row with
-the replacement and links it on the package card. The link is `replacement_url`: the page
-packagist.org keeps for the name, written by lockrot when packagist.org is the registry that named
-it — the one whose metadata marked the package abandoned, or the lock entry's own when no metadata
-came — and null otherwise, since a replacement a private registry names is a name there.
+`abandoned` covers two cases: a package whose repository names a successor, and one that names
+nothing. The report tells them apart here:
 
-A named replacement is where to go, not a string to swap: `psr/http-factory` for
-`php-http/message-factory`, `symfony/error-handler` for `symfony/debug` and `web-token/jwt-library`
-for four `web-token/jwt-*` packages are migrations, not renames. Where the replacement is already in
-the lock, the work left is removing the old package.
+| Where | What it says |
+|---|---|
+| Evidence | The repository's replacement text as written: `replacement: symfony/mailer`, or free text such as `replacement: Symfony` |
+| `replacement` (JSON) | The successor, when the text is a Composer package name other than the package's own; null otherwise |
+| `replacement_url` (JSON) | The successor's page, where lockrot keeps one; see [schema.md](schema.md#where-a-package-came-from) |
+| `abandoned` object (JSON) | `total` and `with_replacement`, next to `counts` |
+| Summary line | `abandoned N (M with a replacement)`, the parenthesis only when M is not zero |
+| S9 clause | `no fix expected; migrate to symfony/mailer` on an advisory no release fixes |
+
+Moving to a successor is a migration; when it is already in the lock, remove the old package.
+
+## Pinned: what S6 carries {#what-s6-carries}
+
+S6's evidence reads the same whether or not the package ever released. Its `data` in
+`--format=json` tells the cases apart:
+
+| Key | Value |
+|---|---|
+| `reason` | `branch_snapshot` when the installed version is a branch (checked first), `no_stable_release` when it is not and the repository lists no tagged version. An [open set](schema.md#open-sets) |
+| `has_stable_release` | Whether the repository lists any tagged version; a pre-release counts, a branch does not. Null when lockrot loaded no repository metadata for the package (a `vcs` or `path` entry, a package the repository does not list, metadata that did not load) |
+| `last_stable_release`, `last_stable_version` | The newest *dated* tagged release, which is not always the highest tag. Null with no tagged release, with no metadata, or when the highest tag has no date lockrot trusts and no [monorepo parent](#dates-from-the-monorepo) dates it |
+| `last_stable_dated_by` | The monorepo parent that dated that release, else null |
+| `snapshot_time` | For a snapshot, the lock's `time`: the date of the commit the branch pointed at, not a release. Null for `no_stable_release`, and when the lock entry has no `time` |
+
+`no_stable_release` is not libyears' `no_stable_release_date`, which counts packages whose newest
+release carries no trusted date. [`--explain`](configuration.md#explaining-one-package) shows the
+same facts under `metadata`, and the snapshot's date as `lock.released`.
 
 ## Left behind
 
-`composer outdated --major-only` says a newer major exists. S2 says nothing, because the package's
-newest release is exactly the one that is fresh. Neither says that the branch you are on gets no
-fixes any more.
+`composer outdated --major-only` says a newer major exists, and S2 stays quiet while the package's
+newest release is recent. S8 says the branch you are on gets no releases.
 
-A version's *release branch* is what a caret constraint on it would stay inside: the major for
-anything `>= 1.0` (`1.x`, so `1.2` and `1.9` share it and `2.0` does not), the major and minor
-below that (`0.3.x` for `0.3.*`, as `^0.3` has it), and below `0.1` the patch alone (`^0.0.3` is
-`>=0.0.3 <0.0.4`, so `0.0.3` is a branch of its own). S8 takes the newest stable release on the
-installed branch — a backport on a lower minor counts, a pre-release does not — and measures its
-age against `release-warn-years` / `release-high-years`, the S2 thresholds. It fires only when some
-higher branch has released *after* that date and within `release-warn-years` of today: a `2.0` that
-was abandoned before `1.x` got its last release is not the upstream moving on, and a package whose
-every branch went quiet years ago is not alive — that is S2's case, `stale` or `silent`, not S8's.
-The verdict is `left-behind` at either threshold. Three years without a release is `stale` for a
-package, because a package can simply be done; for a branch below one that keeps shipping it is
-the branch left, and the higher branch's releases are the proof. The level (`warn` past three
-years, `high` past five) stays on the signal, in `--format=json` and in the evidence's years.
+A version's *release branch* is the range a caret constraint on it stays inside:
+
+| Installed version | Release branch | As in |
+|---|---|---|
+| `1.0` and above | The major: `1.2` and `1.9` are both `1.x`, `2.0` is not | `^1.2` |
+| `0.1` to below `1.0` | The major and minor: `0.3.x` | `^0.3` |
+| Below `0.1` | The patch alone: `0.0.3` | `^0.0.3`, which is `>=0.0.3 <0.0.4` |
+
+S8 fires when all of these hold:
+
+1. The newest stable release on the installed branch is at least `release-warn-years` old. A
+   backport on a lower minor counts; a pre-release does not.
+
+2. A higher branch has released after it.
+
+3. That higher branch's newest release is less than `release-warn-years` old.
+
+Without the last condition every branch has gone quiet, which is S2's case (`stale` or
+`silent`). The verdict is `left-behind` at either level; the level stays on the signal. From the
+[example run](example-run.md):
 
 ```text
   left-behind  smalot/pdfparser v1.1.0  via j0k3r/graby
-               branch 1.x last released 2021-08-03 (5.1 years ago); 2.x released v2.12.5
-               (2026-04-17)
+               branch 1.x last released 2021-08-03 (5.2 years ago); 2.x released v2.12.5 (2026-04-17)
 ```
 
-S2 has nothing to say — the package released five months ago — and S5 has nothing either: v1.1.0
-was cut in 2021, with PHP 8 on the table. The branch installed here has been quiet for 5.1 years
-while 2.x kept going. For a package the project requires itself the evidence adds what to change —
-`require ^2.12 to follow` — the constraint written as `composer require` would write it (`^2.12`
-from v2.12.5; `^0.4.3` below 1.0), so it can be pasted into `composer.json` or handed to a bot; a
-transitive package's parent owns that line, so there the clause stays off. The constraint is on
-the signal's data as `suggested_constraint` in every case. The second clause names the higher
-branch whose release is newest, with that release:
-it is where fixes land now, which with a living LTS below the current major can be the LTS.
+- The second clause names the higher branch with the most recent release, which can be an LTS
+  below the newest major.
+
+- For a direct requirement the evidence adds the line to write, `require ^3.0 to follow`, in the
+  form `composer require` would write it (`^0.4.3` below 1.0). A transitive package's parent owns
+  that line, so the clause is left off; the constraint is on the signal as
+  `suggested_constraint` either way.
+
+S8 is not measured, and stays silent, for:
+
+- A branch snapshot, which is on no branch and is `pinned` instead.
+
+- An installed version above the highest tag the repository lists on its branch: a private fork,
+  or a lock written against a tag since deleted.
+
+- A branch whose highest tag has no [trusted date](#dates-from-the-monorepo).
+
+The same rule applies to S2: with the package's highest tag untrusted, S2 stays quiet and
+[S10](#what-was-not-checked) says so. A [monorepo parent](#dates-from-the-monorepo) can supply the
+missing dates.
 
 ### Within reach
 
-The newest branch proves the upstream moved on; it is not always one the project can follow.
-Matomo 5.13 supports `php >=7.2.5` and locks monolog 1.27.1; monolog 3.x requires `php >=8.1`, so
-`require ^3.12` is a line Matomo cannot write without dropping PHP 7 — and 2.x, which requires
-`>=7.2` and released last month, is the branch it can move to. S8 holds every higher branch to two
-floors: the project's own `require.php` as written in `composer.json`, and the target PHP
-(`config.platform.php` or the running PHP, the version Composer resolves against — a branch outside
-it will not install at all). The branch it tells the project to follow is the newest releasing one
-within both, and when that is not the newest branch the evidence says what holds the newest back:
+S8 tells you to follow the newest releasing higher branch whose php requirement admits two floors:
+
+- the project's own `require.php` as `composer.json` writes it, read as the lowest version it
+  names;
+
+- the target PHP ([`target-php`](configuration.md#extralockrot-keys) or its option and environment
+  override, else `config.platform.php`, else the running PHP), as a whole minor: a branch outside
+  it will not install.
+
+When that is not the newest branch, the evidence says what holds the newest back, then names the
+branch within reach. Abridged from the [example run](example-run.md):
 
 ```text
-  left-behind  monolog/monolog 1.27.1  direct
-               branch 1.x last released 2022-06-09 (4.3 years ago); 3.x released 3.12.0
-               (2026-09-09), needs php >=8.1 above the project's php >=7.2.5; 2.x released 2.11.1
-               (2026-09-02); require ^2.11 to follow
+  left-behind  scheb/2fa-bundle v5.13.2  direct
+               branch 5.x last released 2022-04-16 (4.5 years ago); 8.x released v8.6.1 (2026-07-10), needs php ~8.4.0
+               || ~8.5.0 above the project's php >=8.2; 7.x released v7.14.0 (2026-06-12); require ^7.14 to follow;
+               pulls in 1 flagged package: symfony/security-guard (abandoned)
 ```
 
-When no releasing branch is within reach the evidence ends with `no releasing branch within reach`
-and suggests nothing: the way forward is a PHP upgrade, which is not a `composer.json` line. The
-verdict is `left-behind` either way — the branch installed is the one the upstream left. In
-`--format=json` the signal carries `newest_php`, `newest_within_reach`, `floor_php` and
-`floor_source` (`project` or `target`), and `reachable_branch`, `reachable_version` and
-`reachable_release` for the branch `suggested_constraint` follows; `--explain` lists each branch's
-php requirement in its branch table, and with `--format=json` every branch row also carries
-`admits_target_php`, `admits_project_php` and `php_blocked_by`: the same test S8 applies, from the
-same two floors, so the row of the branch S8 names says what its `floor_source` says. A branch that
-requires no PHP is within reach of anything; its row reads `php_blocked_by: null` with both
-`admits_*` null, because there is nothing to test, and null there never means admitted. Every row is
-tested, the installed one and those below it too, though S8 only reads the dated branches above the
-installed one. A row's php is its branch's newest dated release's, which may be the version you
-have installed or a newer one. So on the installed row `project` says the newest dated release of
-your branch does not admit the lowest PHP `require.php` promises; it does not by itself say the
-version you have installed does not, whose own requirement is the explanation's `lock.php`.
+With no releasing branch within reach, the evidence ends `no releasing branch within reach` and
+suggests nothing: the way forward is a PHP upgrade. The verdict stays `left-behind`.
 
-A row also says which side of each floor it misses, one answer per floor, so a branch that misses
-both — `~8.3.0` against `require.php` `>=8.2` and target 8.4 — shows both though
-`php_blocked_by` names only the project: `misses_target_php` and `misses_project_php` are
-`needs_newer` when everything the row's php admits is above the floor (symfony 8.x's `>=8.4.1`
-against `>=8.2`: move PHP up), `stops_before` when everything it admits is below it (`>=7.2 <8.4`
-against 8.4: move to another branch), `skips` when it admits PHP on both sides but not the floor
-(`^7.4 || ~8.2.0` against 8.1), and `unsatisfiable` when it admits no PHP at all. Each reads its
-floor as the `admits_*` beside it does — the target as a whole minor, the project as the lowest
-version `require.php` names — and is null exactly where that `admits_*` is not false.
-The report names both floors in `run`: `target_php`, and `project_php`, the `require.php` exactly as
-composer.json writes it.
+| Where | Fields |
+|---|---|
+| S8's `data` | `newest_php`, `newest_within_reach`, `floor_php`, `floor_source` (`project` or `target`), `reachable_branch`, `reachable_version`, `reachable_release`, `suggested_constraint` |
+| The report's `run` | `target_php`, and `project_php`, the `require.php` exactly as `composer.json` writes it |
 
-A branch snapshot (`dev-master`, `2.x-dev`) belongs to no branch and is `pinned`. A package whose
-installed version the repository does not list — a private fork, or a lock written against a tag
-since deleted, sitting above everything the repository has on that branch — carries no S8: the
-branch's dates say nothing about it. Nor does a branch whose highest tag the repository leaves
-undated: the dates are the repository's, and Packagist dates a tag by the commit it points at, so
-a package split out of a monorepo (`illuminate/*`, `symfony/*`) has tags with no date and tags
-dated by the last change to that directory, years before the release that carried them. With the
-branch's newest tag undated, how much younger it is than the newest dated one cannot be read, and
-the branch is not measured. A tag that shares its commit with two or more other stable tags counts
-as undated too: a split cuts a tag on every release whether or not the directory changed, so its
-tags pile up on one commit — `illuminate/macroable` has 83 stable tags on the commit behind
-`v10.49.0`, all dated 2023 — and the date on such a tag is the commit's, not the release's. Two tags
-on one commit are read as dated: that is a re-tag, or a branch's last two releases cut with nothing
-changed between them (`symfony/*` 3.4.46 and 3.4.47), where the date is one release interval off at
-most and a branch that really stopped stays measurable. The same reading
-applies to the package's own age (S2): with its highest tag undated or shared, the age is unknown
-and S2 stays quiet. A highest tag with a date and a commit of its own is read as it stands.
+#### The PHP test in `--explain` {#the-php-test-in-explain}
 
-### Dates from the monorepo
+[`--explain`](configuration.md#explaining-one-package) applies this test to every branch, the
+installed one and those below it included. A row's php is the requirement of its branch's newest
+dated release; on the installed row that can be newer than the version you have, whose own
+requirement is `lock.php`. Each branch row in the JSON carries:
 
-A split package's dates are missing for one reason: its tags are cut by a monorepo, and the
-monorepo's own tag for the same version is dated by the release that carried it. `laravel/framework`
-declares `replace: {illuminate/contracts: self.version}` — the two `v8.83.27` are one release — so
-where a branch of `illuminate/contracts` carries no date of its own, the branch of the same name in
-`laravel/framework` supplies it, and the finding says whose date it is:
+| Field | Value |
+|---|---|
+| `admits_target_php`, `admits_project_php` | Whether the branch's php admits that floor. Null where there is nothing to test: the branch requires no PHP, its requirement cannot be parsed, or the floor is missing. Null never means admitted |
+| `php_blocked_by` | `project` when the branch misses the project's floor, whether or not it also misses the target; else `target` when it misses the target; else null, within reach. A null `admits_*` blocks nothing. An [open set](schema.md#open-sets) |
+| `misses_target_php`, `misses_project_php` | Which side of that floor the branch's php lies on, from the next table; null exactly where the matching `admits_*` is not false. An [open set](schema.md#open-sets) |
+
+| `misses_*` | The branch's php admits | Example against the floor |
+|---|---|---|
+| `needs_newer` | Only PHP above the floor: move PHP up | `>=8.4.1` against `>=8.2` |
+| `stops_before` | Only PHP below the floor: move to another branch | `>=7.2 <8.4` against 8.4 |
+| `skips` | PHP on both sides, not the floor itself | `^7.4 || ~8.2.0` against 8.1 |
+| `unsatisfiable` | No PHP at all | `>=9 <8` |
+
+## Old promise
+
+S5 fires when all of these hold:
+
+1. The installed release was published before the GA of the target PHP's major: 8.0 for any 8.x
+   target, not the target minor.
+
+2. Its `require.php` has no upper bound.
+
+3. Its lower bound is on an older major (`>=7.2` against PHP 8.4), or it has none (`*`).
+
+A constraint that names the target's major (`^7.2 || ^8.0`) has an upper bound and is never S5. A
+`>=7.2` released after PHP 8.0's GA is not S5 either. `composer check-platform-reqs` asks a
+different question: whether the platform satisfies each constraint, which `>=7.2` does on PHP 8.4.
+
+Abridged from the [example run](example-run.md):
 
 ```text
-  left-behind  illuminate/contracts v5.8.36  direct
-               branch 5.x last released 2020-08-18 (6.1 years ago, dated by laravel/framework);
-               12.x released v12.69.2 (2026-09-08); require ^12.69 to follow
+  old-promise  mgargano/simplehtmldom 1.5  direct
+               released 2014-01-05 for PHP 5 (php ">=5.3.0"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4
+               untested; last release 2014-01-05 (12.7 years ago); last push 2022-08-04 (4.2 years ago)
 ```
 
-The parent is found in the lock first — a Laravel application already has `laravel/framework`, and
-nothing extra is fetched. Otherwise lockrot asks the configured repositories for it, one request,
-and only for a monorepo that
-[`resources/monorepo-parents.json`](https://github.com/somework/lockrot/blob/main/resources/monorepo-parents.json)
-lists as carrying a package this lock needs dates for. That file holds `laravel/framework`,
-`symfony/symfony` and `cakephp/cakephp` with the components each was last seen to replace, and it
-decides only what is worth fetching: what a parent dates is its live `replace` list. So
-`symfony/polyfill-ctype`, whose own tags are cut the same way by a repository no Packagist package
-replaces, costs nothing — it is in almost every lock, and nothing can date it.
+## Dates from the monorepo
 
-A branch the parent does not have, or does not date either, stays unmeasured as before; so does
-every branch during an install-time run that has used up its budget. The signal carries the parent
-as `dated_by` in `--format=json`, and `--explain` marks the rows it supplied.
+A tag has a *trusted date* unless it has no date, or its commit carries three or more stable tags.
+A subtree split (`illuminate/*`, `symfony/*`) piles its tags onto one commit, dated by the last
+change to that directory; a re-tag, two tags on one commit, stays trusted.
 
-The parent dates the installed version too. The lock's `time` for a split package is the date
-Packagist gave its tag — the shared commit's — so `illuminate/contracts` v8.83.27 is locked at
-2022-01-13 for a release of 2022-12-08. Where the parent lists the same version, its date is the
-installed version's for [libyears](#libyears), and `--explain` prints it as `installed release`
-(`installed_release_dated_by` in JSON); where it does not, the lock's date is not trusted and the
-package goes unmeasured rather than eleven months too far behind.
+The split's monorepo tags the same version with the release date, and its
+`replace: {child: self.version}` says the two tags are one release. So where a branch of the split
+carries no trusted date, the parent's branch of the same name dates it, and the evidence says whose
+date it is: `dated by laravel/framework`.
+
+lockrot finds the parent in this order:
+
+1. In the lock: a Laravel application already has `laravel/framework`, and nothing is fetched.
+
+2. Otherwise with one request to the configured repositories, and only for a monorepo that the
+   list lockrot ships,
+   [`resources/monorepo-parents.json`](https://github.com/somework/lockrot/blob/main/resources/monorepo-parents.json),
+   names as carrying a package this lock needs dates for.
+
+That list decides only what is worth fetching; what a parent dates is its own `replace` list. A
+split that no package replaces as `self.version` cannot be dated and costs no request.
+
+- The parent dates the installed version too. Where it lists the same version, its date replaces
+  the lock's shared-commit `time` for [libyears](#libyears); `--explain` prints it as `installed
+  release` (`installed_release_dated_by` in JSON). Where it does not, the package goes unmeasured.
+
+- A branch the parent does not have, or does not date either, stays unmeasured, as does every
+  branch in an install-time run that has spent its [budget](install-time.md#time-budget).
+
+- S2 and S8 carry the parent as `dated_by`, and `--explain` marks the branch rows it supplied.
 
 ## Security advisories
 
-`composer audit` reports the vulnerability. lockrot carries the same advisories on the finding, as
-S9, and says whether a fix is coming.
+`composer audit` reports the vulnerability. S9 carries the same advisories on the finding and says
+whether a fix is coming. It never decides a verdict.
 
 S9 lists every advisory whose affected range matches the installed version, fetched from the
-configured Composer repositories exactly as audit fetches them — one request to Packagist for the
-whole lock, the package files themselves on a repository that carries advisories inline. It never
-decides a verdict: a vulnerability on a healthy package is audit's finding and stays out of the
-priority.
+configured Composer repositories the way `composer audit` fetches them. Each advisory is then held
+against two releases the repository lists, each only when it is above the installed version:
 
-Each advisory is then held against two releases the repository already lists: the highest stable
-tag on the installed version's branch, and the package's highest stable tag — each only when it is
-above the installed version, since a tag the range spares is no fix when reaching it means going
-back, and a repository that lists nothing above what is installed names none. One that neither range
-covers is already fixed, and the line says by what — `fixed by v3.4.47` when the branch's tag is
-enough, since a `composer update` inside the constraint gets it; `fixed by v8.1.7` when only the
-package's is. On an `abandoned`, `silent` or `left-behind` package, the advisories nothing listed
-fixes are the ones no fix will come for: the evidence closes what was observed about the package
-itself with `no fix expected` — ahead of what it pulls in, when it is a direct requirement that
-does — and the priority goes up one step, `critical` at most. On a left-behind branch only a fix
-*on the branch* counts as one the project can reach, so `3 fixed by v8.1.7; no fix expected on
-3.x` is one line: the fix exists, and it will not land where this lock is. On an abandoned package
-whose repository names a replacement the clause says where to go — `no fix expected; migrate to
-symfony/mailer` — since the advisory will not be fixed here and the package that took over is
-where fixes land. A package whose every
-advisory is fixed by a listed release is not raised, whatever its verdict — the fix is out, and
-the finding says which release carries it.
+| Release | When that release is outside the advisory's affected range | Evidence |
+|---|---|---|
+| The highest stable tag on the installed branch | A `composer update` inside the constraint gets the fix (`fixed_on_branch: true`) | `fixed by <version>` |
+| The package's highest stable tag | The fix needs a higher branch | `fixed by <version>` |
+
+On `abandoned`, `silent` and `left-behind` findings, an advisory no reachable release fixes gets
+`no fix expected`, and the priority goes up one step, `critical` at most:
+
+| Verdict | A fix counts when it is | Clause |
+|---|---|---|
+| `abandoned`, `silent` | In any listed release | `no fix expected`, or `no fix expected; migrate to <successor>` when the repository [names one](#abandoned-and-where-to) |
+| `left-behind` | On the installed branch | `no fix expected on <branch>` |
+| Any other verdict | No fix prediction is made; the priority is never raised | none |
+
+Abridged from the [example run](example-run.md):
 
 ```text
-  left-behind  symfony/http-foundation v3.4.18  via laravel/framework, also via webklex/php-imap
-               branch 3.x last released 2020-10-24 (5.9 years ago); 8.x released v8.1.7
-               (2026-09-14); released 2018-10-31 for PHP 5 (php "^5.5.9|>=7.0.8"), before PHP 8
-               existed (8.0 GA 2020-11-26); admits 8.5 untested; 4 security advisories affect v3.4.18
-               (CVE-2019-10913, CVE-2025-64500, CVE-2019-18888 and 1 more); 2 fixed by v3.4.47, 2
-               fixed by v8.1.7; no fix expected on 3.x
+  left-behind  spomky-labs/otphp v10.0.3  via scheb/2fa-google-authenticator
+               branch 10.x last released 2022-03-17 (4.5 years ago); 11.x released 11.5.0 (2026-06-06); 2 security
+               advisories affect v10.0.3 (PKSA-kbc7-dq62-pt7d, PKSA-qv5y-crcz-9nxw); fixed by 11.5.0; no fix expected on
+               10.x
 ```
 
-Two of the four were fixed within 3.x — v3.4.47 is out of their range — and a `composer update`
-gets them; the other two are fixed only in 8.x, which is what the branch will not get, so they earn
-the raise: left-behind starts at `high`, being transitive takes it to `medium`, and the raise puts
-it back at `high`. The same package `abandoned`
-rather than left behind would count fixes anywhere in it, since no branch of it will release again:
+A package whose every advisory is fixed by a release it can reach is not raised; the evidence names
+that release. Where the raise falls among the priority rules is in [Priority](#priority).
 
-```text
-  abandoned    swiftmailer/swiftmailer v6.1.3  via laravel/framework
-               marked abandoned by its repository, replacement: symfony/mailer; repository archived
-               on GitHub; last release 2021-10-18 (4.9 years ago); last push 2021-10-25 (4.9 years
-               ago); released 2018-09-11 for PHP 7 (php ">=7.0.0"), before PHP 8 existed (8.0 GA
-               2020-11-26); admits 8.5 untested; 1 security advisory affects v6.1.3 (CVE-2024-28859);
-               fixed by v6.3.0
-```
+An advisory also counts as unfixed when lockrot could not read the package's releases (no
+metadata, or an installed version it cannot compare) or the advisory gives no affected range. Each
+finding lists the advisories behind the raise as `no_fix_expected`, each `{id, reason}`; the
+`reason` values and each state of the field are in
+[schema.md](schema.md#advisories-with-no-fix-expected). A non-empty list, the `no fix expected`
+clause and the `no_fix_expected` step of `priority_basis` always go together.
 
-The one advisory is fixed by the package's last release; the priority stays at the verdict's own
-`high`, and the line says where the fix is instead of claiming there is none.
+- **Naming.** Each advisory is named by its CVE, else its repository id, worst severity first; past
+  the first few, the rest are counted. `--format=json` carries every one under S9's
+  `data.advisories` ([schema.md](schema.md#signal-data)).
 
-An allowlisted package is
-never raised — `finished` says the project vouches for it — but its advisories are counted in the
-footer line. Each advisory is named by its CVE, or by its Packagist
-id when it has none; the worst severity first, three named, the rest counted. Advisories on
-packages the report does not flag stay off the rows (they are audit's findings), but the footer
-counts them — `53 security advisories on 17 packages the report does not flag; see composer audit`
-— so a clean-looking report does not read as a clean audit. The count covers the packages the
-run checked: without `--dev` that is the production set, which `composer audit --no-dev` also
-reports on, where plain `composer audit` counts development packages too — so the line then adds
-`(it counts packages-dev too, which this run skipped; pass --dev to include them)`, and
-`--format=json` records the scope as `include_dev`. An advisory the project
-has accepted is silenced where `composer audit` silences it, not in lockrot's own configuration: `config.policy.advisories` (`ignore-id`, `ignore`,
-`ignore-severity`) on Composer 2.10 and later, `config.audit.ignore` and `audit.ignore-severity`
-before. What audit drops, lockrot drops. A policy section Composer itself rejects — a key reserved
-for a later version, say — leaves lockrot with no ignore list at all; the report then carries a note
-saying so, and every advisory counts until the section parses.
+- **Unflagged packages.** Advisories on `unknown`, `finished` and `ok` packages stay off the rows
+  and are never raised. The footer counts them: `N security advisories on M packages the report
+  does not flag; see composer audit`.
 
-`stale`, `pinned` and `old-promise` are not raised: an old release, a branch snapshot or an open
-php constraint says nothing about whether a fix is coming. The [baseline](baseline.md) stays keyed on
-the verdict, so a baselined finding is `known` whatever S9 adds to its priority.
+- **Scope.** The count covers the packages the run checked. When `packages-dev` was not in the
+  run, the footer adds `(it counts packages-dev too, which this run skipped; pass --dev to include
+  them)`. The JSON document records the scope as `include_dev`.
 
-The check needs Composer 2.4 or newer — on the 2.2 LTS the report carries one note and nothing else
-changes — and cannot run under `--offline`, which is noted the same way; at install time it is
-skipped, with a note, once the [budget](install-time.md) is spent. A repository that could not be
-reached for advisories is a note and, under `--strict-network`, exit `1`, like any other unreachable
-source. `--format=json` carries each advisory under the signal's `data.advisories` as `id`, `cve`,
-`title`, `link`, `severity`, `reported_at` and `affected_versions` (the range, as Composer prints
-it), null where the repository gave none, with `fixed_by` — the listed release out of the range,
-null when there is none — and `fixed_on_branch`, true when that release is on the installed
-version's branch. From 0.13.0 the signal's `data` also says whether the releases were read at all,
-`releases_read`: false when there was no metadata or the installed version is not one lockrot can
-compare, so every `fixed_by` is null without a release having been looked at.
+- **Accepted advisories.** Silence an advisory where `composer audit` silences it:
+  `config.policy.advisories` (`ignore-id`, `ignore`, `ignore-severity`) on Composer 2.10 and later,
+  `config.audit.ignore` and `config.audit.ignore-severity` on 2.4 to 2.9. What audit drops, lockrot
+  drops. When Composer rejects the policy section, lockrot ignores no advisory and says so in a
+  [note](notes.md#advisory_ignore_unreadable).
 
-From 0.13.0 each finding also names the advisories no fix is expected for, as `no_fix_expected`: a
-list of `{id, reason}` in S9's order, `[]` when a no-fix verdict has none, and null on every other
-verdict, which makes no fix prediction. The `reason` is the first that applies —
-`not_on_installed_branch` (left behind, and fixed only on a higher branch),
-`releases_unknown` (`releases_read` is false: the advisory counts as unfixed, and raises the
-priority, although no fix was looked for), `affected_range_unknown` (the advisory gives no affected
-range) and `no_release_fixes` (the releases were read and none outside the range is listed). The
-list is read off the same loop as the `no fix expected` clause and the raise, so a non-empty list,
-the clause and the `no_fix_expected` step of `priority_basis` always go together.
+- **Baseline.** The [baseline](baseline.md) stays keyed on the verdict, so a baselined finding is
+  `known` whatever S9 adds to its priority.
+
+S9 is not looked up, and a [note](notes.md#advisories_not_checked) says so, on Composer older than
+2.4, under `--offline`, and at install time for the repositories left once the budget is spent. A
+repository that could not be reached for advisories is a [note](notes.md#advisories_unavailable)
+and, under `--strict-network`, exit `1` ([exit codes](ci.md#exit-codes)).
 
 ## Priority
 
-A package reported the same way matters less when nothing in the project requires it directly, and
-less again when it is only ever installed for development.
-
-Four rules, in order:
+The priority says how much a finding applies to your project. It is set by these rules, in order:
 
 1. A package the report does not flag (`unknown`, `finished`, `ok`) has priority `none`.
-2. Otherwise the verdict sets the base level: `abandoned` and `silent` start at **critical**,
-   `pinned`, `left-behind` and `old-promise` at **high**, `stale` at **medium**.
-3. The base drops one step when the package is transitive (nothing you require names it) and one
-   more step when it is a development dependency. It never drops below **low**.
-4. A security advisory on an `abandoned`, `silent` or `left-behind` package raises the result one
-   step, never above **critical**; see [Security advisories](#security-advisories).
+
+2. The verdict sets the base: `abandoned` and `silent` start at `critical`; `pinned`,
+   `left-behind` and `old-promise` at `high`; `stale` at `medium`.
+
+3. The base drops one step when the package is transitive and one more when it is a development
+   dependency, never below `low`. A package nothing in `require` or `require-dev` reaches counts
+   as transitive.
+
+4. An advisory with [no fix expected](#security-advisories) raises the result one step, never
+   above `critical`.
+
+Rules 1 to 3 give:
 
 | Verdict | direct, prod | transitive, prod | direct, dev | transitive, dev |
 |---|---|---|---|---|
@@ -389,241 +343,237 @@ Four rules, in order:
 | `stale` | `medium` | `low` | `low` | `low` |
 | `unknown`, `finished`, `ok` | `none` | `none` | `none` | `none` |
 
-A package nothing in your `require`/`require-dev` can reach counts as transitive.
+Development packages are in the run only with `--dev` or `include-dev`.
 
-From 0.13.0 `--format=json` writes the walk on every finding as `priority_basis`: the `base` and
-each step with its `reason` (`transitive`, `unreached` for a package nothing reaches, `dev`,
-`no_fix_expected`), `from` and `to`, in the order above. A step is there whenever its rule applies,
-also when the level cannot move; the transitive left-behind http-foundation above is
-`{"base": "high", "steps": [{"reason": "transitive", "from": "high", "to": "medium"},
-{"reason": "no_fix_expected", "from": "medium", "to": "high"}]}`.
+`--format=json` writes the walk on every finding as `priority_basis`: the `base`, then each step in
+the order above as `{reason, from, to}`. The `reason` is `transitive`, `unreached` (nothing
+reaches the package), `dev` or `no_fix_expected`. A step is recorded whenever its rule applies,
+also when the level cannot move. A transitive `left-behind` finding with an advisory no reachable
+release fixes has base `high`, a `transitive` step from `high` to `medium`, and a
+`no_fix_expected` step from `medium` to `high`.
 
-The priority orders the report — highest first, then by verdict severity, then direct dependencies
-ahead of transitive ones, then by package name — and it is carried in every format.
+The report is sorted by priority, highest first, then by verdict severity, then direct
+requirements ahead of transitive packages, then by package name.
 
-> **`--fail-on` takes a verdict, a priority, or `unchecked`.** The last one is not a severity at
-> all: it fails on a finding whose check did not run ([What was not checked](#what-was-not-checked)).
-> `--fail-on=silent` fails on what was observed,
-> wherever the package sits; `--fail-on=high` fails on a `critical` or `high` finding and lets the
-> same verdict pass on a transitive development package. Both are inclusive. The
-> [baseline](baseline.md) stays on the verdict: a finding it already carries never fails a run,
-> whichever kind of threshold is set.
-
-`--dev` is what brings development packages into the run at all. Once they are in, each of them sits
-one step below the same finding on a production package.
+`--fail-on` fails the run on a finding at or above a verdict, a priority or `unchecked`, except one
+the baseline carries; which to choose is in [ci.md](ci.md).
 
 ## Priority in each format
 
 | Format | How the priority appears |
 |---|---|
-| `table` | Findings are grouped under the priority level, highest group first |
-| `json` | Each finding carries `priority`, `direct` and `dev`, and from 0.13.0 `priority_basis`, the base and the steps that led to it; the document carries a `priorities` object with all five counts next to `counts` |
+| `table` | Findings grouped under their priority level, highest group first |
+| `json` | Each finding carries `priority`, `direct`, `dev` and `priority_basis`; the document carries a `priorities` object with every level's count, next to `counts` |
 | `github` | In each annotation's title: `lockrot: abandoned (critical)` |
-| `gitlab` | Opens each issue's description: `… — abandoned (critical): …` |
+| `gitlab` | In each issue's description, after the package and version, as the verdict with the priority in parentheses |
 | `markdown` | A first `Priority` column |
-| `sarif` | The result's `rank` (`critical` `100.0`, `high` `75.0`, `medium` `50.0`, `low` `25.0`, `none` `0.0`) plus `properties.priority`, `properties.direct` and `properties.dev` |
-
-The JSON `schema` number stays `1` — these are additions, so anything already reading the document
-keeps working.
+| `sarif` | The result's `rank` (`critical` `100.0`, `high` `75.0`, `medium` `50.0`, `low` `25.0`, `none` `0.0`), plus `properties.priority`, `properties.direct` and `properties.dev` |
+| `html` | The embedded JSON document carries what `json` does, and the page's search filters on `priority:` terms; see [ci.md](ci.md#-formathtml) |
 
 The GitLab fingerprint and the SARIF `ruleId` read the verdict alone. The GitHub annotation level,
-the GitLab severity and the SARIF `level` follow `--fail-on`, whichever kind of threshold it names,
-so the colour a reviewer sees matches the exit code either way.
+the GitLab severity and the SARIF `level` follow `--fail-on`; each format's section in
+[ci.md](ci.md) has the details.
 
 ## Transitive exposure
 
-You can only act on what `composer.json` names. So for a transitive finding the question is *which
-of my direct requirements pull this in*, and for a direct requirement *what does it drag in*. The
-report answers both.
+You can act only on what `composer.json` names. For a transitive finding the report says which
+direct requirements pull it in; for a direct requirement, which flagged packages it pulls in.
 
-**Every direct requirement a package is reachable from.** The `via` chain names the shortest path
-from one direct requirement. When others reach the package too, the row says so:
+### Every direct requirement that reaches a package
+
+The `via` chain is the shortest path from one direct requirement. `also via` names the other
+direct requirements that reach the package, the first few by name and the rest counted
+(`and N more`). Abridged from the [example run](example-run.md):
 
 ```text
   abandoned    hoa/ruler 2.17.05.16  via wallabag/rulerz, also via wallabag/rulerz-bundle
 ```
 
-Dropping `wallabag/rulerz` alone would leave `hoa/ruler` installed through `wallabag/rulerz-bundle`.
-The first three other requirements by name are named, then the rest counted (`and 12 more`);
+Removing the `via` requirement alone leaves the package installed through every `also via` one.
 `--format=json` carries the full list as `direct_dependents` on every finding, the package itself
-included when it is direct.
-A direct requirement's own row stays `direct`, even when other requirements reach it as well — in
-a framework application every bundle reaches the framework's own packages, and naming them there
-would say nothing.
+included when it is direct. A direct requirement's own row reads `direct`, whoever else reaches
+it.
 
-**Signal S7 on the direct requirement.** After every verdict is known, each direct requirement
-whose subtree holds flagged transitive packages gets an informational signal listing them, in
-report order, with the shortest chain from that requirement to each:
+### S7 on the direct requirement
+
+After every verdict is known, each direct requirement whose subtree holds attributed flagged
+packages gets S7, listing them in report order with the shortest chain to each. Abridged from the
+[example run](example-run.md):
 
 ```text
   pinned       wallabag/rulerz-bundle dev-master  direct
-               pinned to branch snapshot dev-master; pulls in 15 flagged packages:
-               hoa/compiler (abandoned), hoa/consistency (abandoned), hoa/event (abandoned),
-               hoa/exception (abandoned), hoa/file (abandoned) and 10 more
+               pinned to branch snapshot dev-master; pulls in 15 flagged packages: hoa/compiler (abandoned),
+               hoa/consistency (abandoned), hoa/event (abandoned), hoa/exception (abandoned), hoa/file (abandoned) and
+               10 more
 ```
 
-Five are named in the evidence; `--format=json` carries them all under the signal's `data`, each
-with its `verdict` and `chain`. A requirement whose own verdict is `ok` carries S7 too, so `--all`
-shows what a clean-looking requirement is responsible for — as does an allowlisted one, whose
-`finished` row is likewise only printed under `--all` while the `pulled in by:` line below still
-counts it.
+The evidence names the first few; `--format=json` carries them all under the signal's
+`data.packages`, each with its `verdict` and `chain`. A direct requirement whose own verdict is
+`ok` or `finished` carries S7 too: its row prints only under `--all`, and the `pulled in by:` line
+counts it either way.
 
-A flagged transitive package reached from **more than eight** direct requirements is shared
-infrastructure — in a framework application, the framework's own contracts, reached from every
-bundle — and nobody's to remove, so it is left out of S7 and of the `pulled in by:` line. It keeps
-its own row, with `also via … and N more`, and `direct_dependents` still names every parent. The
-JSON document states the cap as `exposure_rule.max_fan_in` and lists these packages under
-`unattributed`, each with its `verdict` and `fan_in` — how many direct requirements reach it — in
-report order. The direct requirements are the run's own: with `--dev`, `require-dev` counts too, so
-the same package can be attributed without it and shared above the cap with it. A flagged
-transitive package no direct requirement reaches — every one in a run without `composer.json`, or
-one the project reaches only through a name it provides or replaces — is in neither list.
+### Shared packages and `unattributed` {#shared-packages-and-unattributed}
 
-**The `pulled in by:` line.** The summary block sums the same thing up per direct requirement,
-most first:
+A flagged transitive package reached from more direct requirements than the run's
+`exposure_rule.max_fan_in` (the JSON document records the value the run used) is shared
+infrastructure, such as a framework's own contracts reached from every bundle, and nobody's to
+remove:
+
+- It is left out of S7 and of the `pulled in by:` line.
+
+- It keeps its own row, with `also via … and N more`, and `direct_dependents` still names every
+  parent.
+
+- The JSON document lists it under `unattributed`, with its `verdict` and `fan_in` (how many
+  direct requirements reach it), in report order.
+
+Fan-in counts the run's direct requirements, so under `--dev` `require-dev` counts too: a package
+can be attributed without `--dev` and shared with it. A flagged transitive package no direct
+requirement reaches is in neither list: every one in a run without `composer.json`, and one the
+project reaches only through a name it provides or replaces.
+
+### The `pulled in by:` line
+
+The summary block counts, per direct requirement, the attributed flagged packages it pulls in,
+most first. From the [example run](example-run.md):
 
 ```text
-pulled in by: wallabag/rulerz-bundle 15 · wallabag/rulerz 14 · wallabag/phpepub 5 · friendsofsymfony/jsrouting-bundle
-2 · friendsofsymfony/oauth-server-bundle 2 · … and 21 more
+pulled in by: wallabag/rulerz-bundle 15 · wallabag/rulerz 14 · wallabag/phpepub 5 ·
+scheb/2fa-google-authenticator 3 · friendsofsymfony/oauth-server-bundle 2 · … and 19 more
 ```
 
-Five requirements are named, then the rest counted; the JSON document carries the whole list as
-`exposure`. A direct requirement is there only when it pulls in a flagged package attributed to it;
-a flagged direct requirement that pulls in none is not listed, and its own verdict is on its
-finding. The line is printed only when some flagged package is attributed to a direct requirement —
-not merely when one is transitive, since every flagged transitive package may be shared above the
-cap or reached by none.
+The first few requirements are named and the rest counted; the JSON document carries the whole
+list as `exposure`. A direct requirement appears only when it pulls in an attributed package, and
+the line is printed only when some flagged package is attributed.
 
-> **S7 decides nothing.** A package is never flagged for what it depends on. The verdict, the
-> priority, `--fail-on`, the exit code and the baseline all ignore S7; it describes, the same way
-> the priority does. A flagged package the project requires directly is its own row's business
-> and counts under nobody, whoever else reaches it.
+!!! note "S7 decides nothing"
+    A package is never flagged for what it depends on. The verdict, the priority, `--fail-on`, the
+    exit code and the baseline all ignore S7. A flagged package the project requires directly
+    counts under nobody, whoever else reaches it.
 
-The graph is the lock's `require` edges. A requirement satisfied through `replace` or `provide` — a
-virtual package such as `psr/log-implementation`, or a package another one replaces — contributes
-no edge, so the provider can have fewer parents listed than actually pull it in. That case renders
-`?` in the `via` column when nothing else reaches the package.
+Limits:
 
-At install time only the packages the transaction touches are analysed, so a direct requirement
-gets S7 only when it is itself part of the transaction, and the compact block does not print S7 or
-the other parents at all; `composer lockrot` on the full lock always has the whole picture.
+- The graph is the lock's `require` edges. A requirement met through `replace` or `provide` (a
+  virtual package such as `psr/log-implementation`) adds no edge, so a provider can list fewer
+  parents than pull it in. The `via` column reads `?` when nothing reaches the package.
+
+- At install time only the packages the transaction touches are analysed: a direct requirement
+  gets S7 only when it is in the transaction, and the [compact block](install-time.md) prints
+  neither S7 nor the other parents. `composer lockrot` on the full lock has the whole picture.
 
 ## What was not checked
 
-`ok` is the absence of a finding, and without S10 it would mean two different things: every check
-ran and found nothing, or a check never ran. The difference matters most where it is least visible.
-Anonymously, GitHub allows 60 requests an hour, so the activity round asks only about packages that
-already look stale on release age ([internals.md](internals.md)) — a maintainer who tags a last
-release and archives the repository a week later has a *recent* release, and S3, the signal that
-would call that `abandoned`, never gets to run. The run says `89 packages skipped` in its notes and
-names none of them.
+`ok` is the absence of a finding: every check ran and found nothing, or a check never ran. S10
+marks the second case on the finding itself.
 
-S10 carries that fact on the finding itself. Two checks can be missing:
+Without a token or Composer credentials for a host that caps anonymous requests
+([credentials](internals.md#repository-hosts-and-credentials)), the activity round asks only about
+packages that already look stale on release age
+([anonymous cap](notes.md#repository_activity_anonymous_cap)). A package with
+a recent release and an archived repository then never gets S3, and reads `ok` instead of
+`abandoned`.
 
-| Check | Why it can be missing | What it blocks |
-|---|---|---|
-| `repository_activity` | `no_token` (the anonymous cap asks only about candidates), `anonymous_budget`, `install_time_budget`, `rate_limit`, `fetch_failed`, `offline` | S3, S4 |
-| `release_dates` | `undated_releases`: the repository dates the package's newest releases only by a commit their tags share, and no [monorepo parent](#dates-from-the-monorepo) dates them either | S2, S8 — S2 alone where the installed version is a branch snapshot, which is on no release branch for S8 to measure |
+| Check | `reason` | Cause | Blocks |
+|---|---|---|---|
+| `repository_activity` | `no_token` | No credentials for the host, and the package was not a candidate for the anonymous round | S3, S4 |
+| `repository_activity` | `anonymous_budget` | A candidate the anonymous request budget could not fit | S3, S4 |
+| `repository_activity` | `install_time_budget` | The install-time budget ran out | S3, S4 |
+| `repository_activity` | `rate_limit` | The host answered "too many requests" | S3, S4 |
+| `repository_activity` | `fetch_failed` | A timeout, a transport error or an unreachable host | S3, S4 |
+| `repository_activity` | `offline` | `--offline` | S3, S4 |
+| `release_dates` | `undated_releases` | The package's highest tag has no [trusted date](#dates-from-the-monorepo), and no monorepo parent dates it | S2 and S8; S2 alone on a branch snapshot, which has no release branch |
 
-It is informational, like S7 and S9: it never decides a verdict. It is raised only where the
-missing check could have changed one — a package the repository already marks `abandoned` has
-nothing left for the activity round to add, and an allowlisted package reports `finished` whatever
-its signals say, so neither carries it. Credentials for every host in the lock take away the
-`repository_activity` reasons, and only those: `release_dates` asks no forge, so a fully
-credentialed run can still carry S10 — and still fail `--fail-on=unchecked` on it.
+S10's `data` lists each missing check as `unchecked` (`{check, reason, blocks}`) and every blocked
+signal under `blocks`.
 
-`--fail-on=unchecked` fails on any finding that carries it: the one threshold that is neither a
-verdict nor a priority, for a pipeline that wants to hear about the workflow that never passed
-`GITHUB_TOKEN` through rather than a green run over unasked questions.
+- S10 decides no verdict. It is raised only where the missing check could have changed one, so
+  never on an allowlisted package or on one its Composer repository marks abandoned.
+
+- Credentials for every host remove `no_token` and `anonymous_budget`. `rate_limit`, `fetch_failed`,
+  `offline` and `install_time_budget` can still occur, and `release_dates` asks no host, so a fully
+  credentialed run can still carry S10.
+
+- `--fail-on=unchecked` fails the run on any finding that carries S10: the threshold for a
+  pipeline that wants to hear about a workflow that never passed `GITHUB_TOKEN` through. See
+  [ci.md](ci.md).
 
 ## Libyears
 
-One number for how far behind the whole lock is, laid over the verdicts rather than added to them:
+One number for how far behind the whole lock is, laid over the verdicts rather than added to them.
+From the [example run](example-run.md):
 
 ```text
-libyears: 171.3 behind across 194 of 200 packages · 111.7 from direct requirements ·
-furthest behind smalot/pdfparser v1.1.0 at 4.7
+libyears: 181.7 behind across 194 of 200 packages · 113.6 from direct requirements ·
+furthest behind phpdocumentor/reflection-common 2.2.0 at 5.4
 ```
 
-For each package, the years between the release of the version installed and the package's newest
-stable release — the lock's own `time` against the repository's date for its highest stable tag,
-in years of 365.25 days, never below zero — summed over the packages the run analysed (with
-`--dev`, `packages-dev` included). The *libyear* is the unit [libyear.com](https://libyear.com/)
-gives this measure — "Rails 5.0.0 (June 2016) is 1 libyear behind 5.1.2 (June 2017)"; the metric
-underneath is the version release date of [Cox, Bouwers, van Eekelen and Visser, *Measuring
-Dependency Freshness in Software Systems*, ICSE 2015](https://ericbouwers.github.io/papers/icse15.pdf),
-which that site cites. Nothing about today enters the number: two dates the run already holds, so
-it does not move between two runs on the same lock unless a package releases.
+For each package, the years from the installed version's release to the package's newest release
+(the date S2 reads), in years of 365.25 days and never below zero, summed over the packages the
+run analysed. The installed version's date is the lock's `time`, or its [monorepo parent's](#dates-from-the-monorepo). No clock enters: the
+number changes only when the lock changes or a package releases.
 
-Every finding carries its own value as `libyears` in `--format=json`, `null` when the package is not
-measured, and the report's `libyears` block is the arithmetic over them: `total`,
-`direct_requirements` (the same sum over the findings with `direct: true`), `measured`, `unmeasured`
-by reason, `furthest_behind`. `total` and `direct_requirements` are null when `measured` is 0 —
-nothing could be measured, so there is no sum; a run that measured packages and found none behind
-reports `0`, which is a different answer and says so. A consumer can recompute every number in the
-block from the findings:
-`total` is summed before rounding, so the sum of the printed values agrees with it to within 0.005
-per measured finding, and `measured` plus every count in `unmeasured` is the number of findings.
-The HTML page shows the total in its ledger, the value in a sortable column, and the counts by
-reason on the Run tab.
+The unit is the *libyear* of [libyear.com](https://libyear.com/), after [Cox, Bouwers, van Eekelen
+and Visser, *Measuring Dependency Freshness in Software Systems*, ICSE
+2015](https://ericbouwers.github.io/papers/icse15.pdf).
 
-A package is **not measured**, and counted under one of four reasons, when the table says. From
-0.13.0 each finding names its reason as `libyears_unmeasured`, one of the keys below, and null
-where `libyears` is a number, 0 included; counting the findings by it gives `unmeasured` exactly.
+Each finding carries `libyears` and `libyears_unmeasured`, and the document carries a root
+`libyears` block; its fields are in [schema.md](schema.md#libyears).
 
-| `unmeasured` key | when |
+An unmeasured package is counted under one key. They are checked in this order, and the first that
+applies is counted, so a `path` entry on `dev-main` counts as `not_from_composer_repository`:
+
+| `unmeasured` key | When |
 |---|---|
-| `branch_snapshot` | The installed version is a branch (`dev-main`, `2.x-dev`): it has a commit date, not a release date. Measured by push date a fresh `dev-main` reads as zero and an old one as years of nothing (lox/xhprof on Matomo would add ten). The `pinned` verdict already says what there is to say. |
-| `no_stable_release_date` | No date lockrot trusts for one of the two ends: no stable release exists; or the newest tag carries no date lockrot trusts — a subtree split whose tags share a commit — and nothing dated sits above the installed version either (symfony/polyfill-ctype v1.37.0: the newest tag, undated); or the installed version is dated only by such a shared commit and its [monorepo parent](#dates-from-the-monorepo) does not date it either (the lock's `time` for illuminate/macroable v10.48.28 is a year and a half before the release; where the parent lists the version, its date is used instead); or the lock entry has no `time`. Adding an unknown to a sum is not measuring. |
-| `not_from_composer_repository` | No metadata was asked for: the lock entry carries no Composer `notification-url` — a `path`, `vcs`, `artifact` or inline `package` entry, or a package from a `type: composer` repository that advertises no notify URL. The finding's `from_composer_repository` is false, and its `origin.kind` says which of these lockrot could tell. |
-| `metadata_unavailable` | Metadata was asked for and did not come: not listed, offline, budget, transport. |
+| `not_from_composer_repository` | No metadata was asked for: a `path`, `vcs`, `artifact` or inline `package` entry, or a `type: composer` repository that advertises no notify URL. The finding's `from_composer_repository` is false |
+| `metadata_unavailable` | Metadata was asked for and did not come: not listed, offline, budget, transport |
+| `branch_snapshot` | The installed version is a branch (`dev-main`, `2.x-dev`): it has a commit date, not a release date, and `pinned` already says what there is to say |
+| `no_stable_release_date` | One end has no [trusted date](#dates-from-the-monorepo) (the key does not say which); the cases follow the table |
 
-The reasons are checked in this order, and the first that applies is the one counted:
+`no_stable_release_date` covers:
 
-1. `not_from_composer_repository`
-2. `metadata_unavailable`
-3. `branch_snapshot`
-4. `no_stable_release_date`
+- a package with no tagged release;
 
-So a `dev-main` pin on a package that never released counts as a snapshot, and a `path` entry on
-`dev-main` as not from a Composer repository. The table lists the keys in the block's order, which
-is not this one. `no_stable_release_date` does not say which end, the installed version or the
-newest release, lacked a date lockrot trusts. The reasons are an open set: a later minor release may
-add one, or split one (`no_stable_release_date` included) into narrower ones, which moves findings
-out of the old key; read a reason you do not know as another way the package went unmeasured. A lock ahead
-of the last stable release — a pre-release above it, a tag the repository no longer lists — is
-measured as zero, not dropped; a lock with nothing behind names no package as furthest behind.
+- a newest tag with no trusted date, and nothing dated above the installed version;
 
-**When the newest release is undated, the number is a lower bound.** A subtree split's tags pile
-up on one commit — scheb/2fa-backup-code has v8.3.0 through v8.6.1 on one, all "2026-01-24" —
-and Packagist dates each by that commit, so the newest tag's date is not the release's and lockrot
-does not read it (that is also why S2 stays quiet there). But a tag's commit is never younger than
-the release it names, so the newest *trusted* date of a release above the installed version, read
-off the same branch view [left-behind](#left-behind) uses, is a date the package had certainly
-moved past. That is what such a package is measured to: at least 4.1 years for
-scheb/2fa-backup-code v5.13.2, possibly more. The HTML package card says "at least" on these.
+- an installed version dated only by a shared commit, with no monorepo parent to date it;
 
-Three things the number is not:
+- a lock entry with no `time`.
 
-- **A measure of rot.** It counts every drift, healthy patches included: on the wallabag lock
-  `psr/log 1.1.4` is `finished` and adds 3.4 years for a 3.x it will never need, while
-  `sensio/framework-extra-bundle` is `abandoned` and adds zero, because the release installed is
-  the last one there is; the package furthest behind, `smalot/pdfparser`, is `left-behind`. The
-  two axes do not track each other, which is why the number does not enter a priority, `--fail-on`
-  or the baseline.
-- **A security number.** An advisory is S9 and the priority ladder; this is distance.
-- **php-libyear's number.** [ecoAPM/php-libyear](https://github.com/ecoAPM/php-libyear) reads
-  `composer.json` and sums the direct requirements only; lockrot sums the whole lock, which on
-  wallabag is 171.3 against 111.7. `direct_requirements` is the same sum restricted to
-  `direct: true` — the nearest number to that tool's, not the same one: run with `--dev` to
-  compare, since php-libyear counts `require` and `require-dev` together; it picks the newest
-  version by the project's `minimum-stability` where lockrot always takes the newest stable; and it
-  scores an undated package as zero where lockrot leaves it unmeasured.
+The keys are an [open set](schema.md#open-sets): read one you do not know as another way a package
+went unmeasured ([compatibility.md](compatibility.md#open-sets)).
+
+- **Lower bounds.** When the newest tag has no trusted date, the package is measured to the newest
+  trusted date of a release above the installed version, on a higher branch or higher on its own.
+  A tag's commit is never younger than the release it names, so the value is a lower bound; the
+  HTML report marks it "at least".
+
+- **Ahead of the newest release.** A lock on a pre-release above it, or on a tag the repository does
+  not list, is measured as zero.
+
+What the number is not:
+
+- **A measure of rot or risk.** It counts every drift, healthy patches included, and no advisory
+  ([S9](#security-advisories)). An `abandoned` package whose installed release is its last adds
+  zero. The number enters no priority, `--fail-on` or baseline.
+
+- **php-libyear's number.** [php-libyear](https://github.com/ecoAPM/php-libyear) sums
+  `composer.json`'s direct requirements, `require-dev` included. The nearest lockrot number is
+  `direct_requirements` from a `--dev` run, and it still differs where lockrot leaves an undated
+  package unmeasured.
 
 ## Related
 
-- [example-run.md](example-run.md) — a full run with every verdict in it, and the libyears block
-- [configuration.md](configuration.md) — the thresholds behind S2 and S4, and the allowlist
-- [baseline.md](baseline.md) — accepting findings you have already decided to live with
-- [ci.md](ci.md) — exit codes and the seven output formats, and where each carries the exposure
-- [compatibility.md](compatibility.md) — which of these names and orders 1.0 freezes, and how a verdict may change between releases
+- [example-run.md](example-run.md) — a full recorded run with these verdicts, the priority groups
+  and the libyears line
+- [configuration.md](configuration.md#extralockrot-keys) — the thresholds, `target-php` and
+  `fail-on` keys with their defaults
+- [configuration.md](configuration.md#the-allowlist) — marking a package `finished`
+- [configuration.md](configuration.md#explaining-one-package) — every fact behind one finding,
+  with `--explain`
+- [baseline.md](baseline.md) — accepting findings you have decided to live with
+- [ci.md](ci.md) — choosing `--fail-on`, exit codes, and what each output format shows
+- [notes.md](notes.md) — what each run note means, including the checks S10 reports
+- [internals.md](internals.md) — which host needs which token, so fewer findings carry S10
+- [schema.md](schema.md) — every JSON field named here, and the release it appeared in
+- [compatibility.md](compatibility.md) — which names and orders are frozen, and how a verdict may
+  change between releases

@@ -1,206 +1,324 @@
 # Contributing to lockrot
 
+Build lockrot, run the checks CI runs, and change it without breaking a promise it makes to users.
+What semantic versioning covers is listed under [Backward compatibility](#backward-compatibility);
+how to write docs and changelog entries is in [the rule files](#writing-the-changelog-and-the-docs).
+
 ## Getting set up
 
-    git clone https://github.com/somework/lockrot.git
-    cd lockrot
-    composer install
+```bash
+git clone https://github.com/somework/lockrot.git
+cd lockrot
+composer install
+```
 
-Four commands make up the local check suite. CI runs them on every PHP/Composer pair of the matrix and adds three gates on top: a coverage threshold over the core directories (`phpunit.core-coverage.xml.dist`, 94 % of clover elements), an Infection mutation-score threshold over the verdict engine, the signals, the analyzer and the output formats (`infection.json5`, MSI 97), and composer-require-checker (`composer-require-checker.json`):
-
-| Command | What it does |
+| Command | What it checks |
 |---|---|
-| `composer test` | PHPUnit. On PHP 7.4 and 8.0 use `vendor/bin/phpunit -c phpunit9.xml.dist`. |
-| `composer stan` | PHPStan over `src/`, then over `tests/` with its own config. |
-| `composer cs` | php-cs-fixer in `--dry-run --diff` mode. |
-| `composer cs-fix` | The same fixer, applying the changes. |
+| `composer test` | PHPUnit: the unit and integration suites, offline, with the clock pinned by `LOCKROT_TODAY` in `phpunit.xml.dist` |
+| `composer stan` | PHPStan at level max: `src/` as PHP 7.4 (`phpstan.neon.dist`), then `tests/` (`phpstan.tests.neon.dist`) |
+| `composer cs` | php-cs-fixer, dry run with a diff (`.php-cs-fixer.dist.php`); `composer cs-fix` applies the fixes |
+| `LOCKROT_E2E=1 GITHUB_TOKEN=... vendor/bin/phpunit --group e2e --filter PluginTest` | The plugin inside a real Composer; needs the network |
+| `build/build-phar.sh && LOCKROT_E2E=1 vendor/bin/phpunit --group e2e --filter PharTest` | The built PHAR; skipped when `build/lockrot.phar` is missing |
+| `GITHUB_TOKEN=... vendor/bin/phpunit --group network` | The tests that reach the real network |
 
-The report page is not built here. It lives in its own repository,
-[somework/lockrot-report](https://github.com/somework/lockrot-report), with its own tests in real
-browsers; lockrot vendors a release of it as `resources/report/report.html` and `manifest.json`, so
-the PHAR is still built without node. To move to a new release:
+On PHP 7.4 and 8.0, call `vendor/bin/phpunit -c phpunit9.xml.dist` in place of `composer test`
+and add `-c phpunit9.xml.dist` to the other PHPUnit rows.
 
-    tools/report/update-renderer v1.2.3
+CI runs each check above (the PHPUnit suite on every PHP and Composer pair of the `tests` matrix
+in `.github/workflows/ci.yml`) and these gates:
 
-The script verifies the release's build provenance with `gh attestation verify`, then the page
-against the sha256 its manifest states, and `RendererManifestTest` checks the second part on every
-run. Do not edit the vendored page by hand: change the renderer, release it, update the pin. What
-goes into the page — which packages, which facts — is decided here, in `src/Html/ReportDocument.php`.
+| Gate | Where its scope and floor live | Run it locally |
+|---|---|---|
+| Core coverage | Directories: `phpunit.core-coverage.xml.dist`. Floor: the "Core coverage gate" step of `ci.yml` | With pcov or Xdebug: `vendor/bin/phpunit -c phpunit.core-coverage.xml.dist --coverage-clover build/clover-core.xml`, `composer global require rregeer/phpunit-coverage-check`, then `coverage-check build/clover-core.xml <floor>` |
+| Mutation score (Infection) | Shards and their `min_msi`: the `mutation` job of `ci.yml`. Whole-tree floor for a local run: `infection.json5` | On the PHP the `mutation` job uses, with pcov or Xdebug: `composer global config --no-plugins allow-plugins.infection/extension-installer true`, `composer global require infection/infection:<constraint in the mutation job>`, then `infection --threads=max` |
+| Undeclared dependencies | `composer-require-checker.json` | `composer global require maglnet/composer-require-checker`, then `composer-require-checker check --config-file=composer-require-checker.json composer.json` |
+| Docs build | `mkdocs.yml` | `pip install -r docs/requirements.txt`, then `mkdocs build --strict` |
+| Corpus self-test | `tools/corpus/tests/` | `tools/corpus/corpus selftest` |
+| PHAR build and byte-identical rebuild | `build/build-phar.sh` | `build/build-phar.sh` ([The PHAR](#the-phar)) |
+
+An escaped mutant that no test can kill is documented, with the reason, in
+`tests/infection-equivalents.md`.
 
 ## What the code has to run on
 
-Three floors are not negotiable, and CI enforces all three across a 7.4–8.5 × Composer 2.2/latest
-matrix.
+| Floor | Declared in | What it rules out |
+|---|---|---|
+| PHP 7.4 | `composer.json` `require.php`; `phpstan.neon.dist` `phpVersion` | PHP 8 syntax: `match`, enums, constructor promotion, `readonly`, union types in signatures, the nullsafe operator, named arguments. PHP 8 functions such as `str_contains()` without a guard |
+| Composer plugin API 2.2 | `composer.json` `"composer-plugin-api": "^2.2"` | Composer API added after 2.2 without a version guard |
+| symfony/console 2.8 API | The Composer 2.2 LTS binary, which bundles console 2.8 | Console API added after 2.8. `require-dev` resolves a newer console, so such a call passes locally and fails only in the plugin e2e step on the Composer 2.2 rows of CI |
 
-- **PHP 7.4 is the language floor.** No `match`, no enums, no constructor promotion, no `readonly`,
-  no union types in signatures, no `str_contains()` without a guard.
-- **Composer 2.2 is the plugin-API floor** (`"composer-plugin-api": "^2.2"`). The tested pair is
-  Composer 2.2.25 and 2.10.3, and anything the newer Composer added needs a version guard.
-- **Only the symfony/console 2.8 API.** `require-dev` resolves symfony/console 5.4, but Composer 2.2
-  LTS bundles 2.8.52, and the plugin runs inside the Composer process against whatever that process
-  bundles. Console API added after 2.8 will pass locally and fail on the 2.2 row of the matrix.
+PHPUnit 9 runs the 7.4 and 8.0 rows, so a test declares each data provider twice: `@dataProvider`
+in the docblock and `#[DataProvider]` as an attribute.
 
-## Fixtures are recorded, not written
+## Commits and pull requests
 
-`tests/fixtures/` holds real `composer.lock` and `composer.json` snapshots from public projects,
-plus the Packagist and GitHub HTTP responses that go with them, so the suite runs offline. Regenerate
-them with `bin/record-fixtures` (it takes `GITHUB_TOKEN` from the environment); see
-`tests/fixtures/README.md` for what each set covers and when it was last recorded. Do not hand-edit a
-recorded lock file or a recorded response — a fixture that no longer matches the source it was taken
-from is worth less than no fixture.
+- Commit messages follow [Conventional Commits](https://www.conventionalcommits.org/): `feat:`,
+  `fix:`, `refactor:`, `docs:`, `test:`, `chore:`, `perf:`, `ci:`, with the subject in the
+  imperative.
+- A pull request says what changed and why, and comes with tests.
+- A change a user can see updates the docs section that is its topic's home, in the same branch,
+  and adds or rewrites its entry under `## [Unreleased]` in `CHANGELOG.md`
+  ([rules](#writing-the-changelog-and-the-docs)).
 
-The README demo (`docs/assets/lockrot-demo.gif`) is recorded the same way, from a real run:
-`bin/record-demo` captures it with asciinema and renders it with agg — its header says what to
-export first. Re-record it when the table output changes shape, not for every release.
+## Documentation
 
-`tests/fixtures/schema-evolution/` holds what earlier releases published and wrote, and
-`SchemaEvolutionTest` holds the current schemas to it: a schema change that would reject a document
-an older lockrot wrote, or stop listing a field one carries, fails there. Two kinds of fixture:
+The public site, <https://lockrot.dev>, is built from `docs/` at the newest release tag, so a docs
+change appears there with the next release. The landing page and the blog are in
+[somework/lockrot.dev](https://github.com/somework/lockrot.dev), not here.
 
-- `schemas/<version>/` — the four `resources/lockrot-*.schema.json` files as that release's tag holds
-  them. A release adds its own: copy them in (`git show v<version>:resources/lockrot-report.schema.json`
-  and so on, or from `resources/` in the release PR itself) and pin their sha256 in
-  `RELEASED_SCHEMAS`. The test compares every release's changelog heading with this list, so a
-  release without its schemas fails.
-- `<version>/` — what a release's signed PHAR wrote, recorded by
-  `GITHUB_TOKEN=$(gh auth token) bin/record-schema-evolution <version> <today>`, which verifies the
-  PHAR first. Pin the new `provenance.json` sha256 and the release asset's digest
-  (`gh release view v<version> --json assets`) in the test, with the signals the recording carries.
+### Writing the changelog and the docs
 
-Both are frozen — the script refuses to record a version again, and the test checks every file
-against a pinned hash — so a failure there is a compatibility break to fix in the schema change, not
-in the fixture.
+A change to the docs or the changelog is reviewed against these files.
 
-A new value in an open set goes into the schemas' `x-known-values`, never into an `enum`. A new
-signal: its id goes into `x-known-values` of `signalId` in the report and explain schemas, into a
-typed `anyOf` branch of its own before the last one in `definitions.signal`, and into the last
-branch's `not` list; `ClosedSetsTest` fails until all of them agree with Signal's constants. A new S10
-reason or check, floor source or format goes into its node's `x-known-values`, and `ClosedSetsTest`
-holds each list to the code. The widening check reads `x-known-values` as the enum on both sides, so
-a value added there is a widening and a value dropped is a narrowing.
+| File | Covers |
+|---|---|
+| [`.claude/rules/documentation.md`](.claude/rules/documentation.md) | `README.md`, `CONTRIBUTING.md`, `SECURITY.md` and `docs/*.md`: the reader of each page, one page one mode, the home of each topic, wording that stays true, the anchors, layout and text that tests read |
+| [`.claude/rules/changelog.md`](.claude/rules/changelog.md) | `CHANGELOG.md`: the release structure, the shape of an entry, what goes in which section, and what never goes in |
 
-## Contributing a finished package
-
-`resources/finished-packages.json` is the built-in allowlist of packages that are complete rather
-than unmaintained: interface packages, polyfills, metapackages. Open a pull request that adds one
-entry with a one-line `reason` saying why the package is finished rather than stalled.
-
-    {"pattern": "psr/*", "reason": "PHP-FIG interface packages are complete by design; versions change only when the interface changes"}
-
-`pattern` accepts `*` wildcards and `version` pins one exact release. A reason like "it is fine"
-will be sent back; the reason is what a future maintainer reads when deciding whether the entry
-still holds.
+`composer test` includes the tests that read doc text and validate the JSON samples in `docs/`;
+`mkdocs build --strict` checks the links and anchors.
 
 ## Backward compatibility
 
 The public interface follows semantic versioning. It is:
 
-- the CLI — `composer lockrot` and the PHAR's `lockrot` — its options and its exit codes;
-- the PHAR's `self-update`: its options and its exit codes;
+- the CLI: the commands `composer lockrot` (alias `composer rot`) and the PHAR's `lockrot`, their
+  options and their exit codes;
+- the PHAR's `self-update` (alias `selfupdate`): its options and its exit codes;
 - the environment variables listed under
   [Environment overrides](docs/configuration.md#environment-overrides) (the testing hooks are not
   included);
 - the `extra.lockrot` configuration keys;
-- the machine-readable output formats (`json`, `sarif`, `gitlab`, `github`);
-- the baseline file.
+- the machine-readable output formats (`json`, `sarif`, `gitlab`, `github`) and the report-1
+  document the `html` page embeds under `report`;
+- the baseline file;
+- the schema URLs under `https://lockrot.dev/schema/`, and every `docs_url` lockrot has written
+  ([Run notes](docs/notes.md));
+- the PHAR's release asset names (`lockrot.phar` and every `lockrot.phar.*` file a release
+  publishes) and its [verification path](docs/phar.md#verifying-the-download).
 
-`table`, `markdown` and `html` are for people and may change in any release. The PHP classes under
-`src/` are not a public API and may change in any release too: every class, interface, trait and
-enum there is marked `@internal`, and `tests/Unit/PublicApiTest.php` fails on one that is not.
-PHPStan reports a use of an `@internal` class from code outside its root namespace, `Lockrot\`;
-code declared under `Lockrot\` itself, `Lockrot\Extension\` included, gets no warning. IDEs flag
-such uses too, by rules of their own.
+`table`, `markdown`, the `--explain` text and the look of the `html` page are for people and may
+change in any release. The full frozen surface, with the closed sets, finding identity and the
+reserved names, is in [What 1.0 freezes](docs/compatibility.md#what-10-freezes).
 
-The namespace `Lockrot\Extension\` is reserved. Nothing is declared in it, and the same test fails
-on a class that is, or on a `src/Extension/` directory, in any letter case: PHP matches namespaces
-without regard to case. The reservation keeps the name free; it is not a promise that anything will
-be published there, or in what form.
+The PHP classes under `src/` are not a public API and may change in any release. Every class,
+interface, trait and enum there is marked `@internal`, and `tests/Unit/PublicApiTest.php` fails on
+one that is not.
 
-This is the one list; the README points here rather than repeating it. The detail is drafted in
-[`docs/compatibility.md`](docs/compatibility.md): what 1.0 will freeze and what it will not, the four
-closed sets (verdicts, priorities, signal levels, and a finding's standing against the baseline)
-and their order, finding identity, the severity mapping, the names reserved for extensions, and the
-deprecation policy.
+The namespace `Lockrot\Extension\` is reserved. Nothing is declared in it, and `PublicApiTest`
+fails on a class that is, or on a `src/Extension/` directory, in any letter case: PHP matches
+namespaces without regard to case.
 
-A change that can alter the verdict or the priority a package gets, or what `--fail-on=unchecked`
-matches (a new S10 reason, a newly supported host), ships in a minor release, never in a patch, and
-gets a line under `### Verdict changes` in `CHANGELOG.md`. The only patch exception is a
-curated-data fix that moves a package to `finished` or `ok`. This is project practice from 0.13 on;
-the rest of `docs/compatibility.md` becomes binding at 1.0.0-RC1.
+Your duties when a change touches the contract:
+
+- A change that can alter the verdict or the priority a package gets, or what
+  `--fail-on=unchecked` matches, ships in a minor release and gets an entry under
+  `### Verdict changes`. A new signal that decides verdicts ships for one minor release as
+  evidence only. The policy and its patch exception are in
+  [Verdict changes](docs/compatibility.md#verdict-changes).
+- A deprecation follows [Deprecation](docs/compatibility.md#deprecation).
 
 ## What lockrot writes
 
-lockrot writes the files you name — reports with `--output`, the baseline with `--generate-baseline`
-— each through a temporary file beside it that is renamed over it, so it needs write access to that
-directory; its activity cache, under Composer's cache directory; and, with `self-update`, the PHAR.
-It never writes `composer.json` or `composer.lock`. An absolute path is written where it points, in
-the project or not, and a run interrupted mid-write can leave a `*.tmp` file beside the target.
+The canonical list of what lockrot reads, writes and contacts is
+[What lockrot does and does not do](SECURITY.md#what-lockrot-does-and-does-not-do).
 
-That paragraph is a promise the README, `SECURITY.md` and the docs make, so a change that writes
-anything else — a new file, a created directory, a cache in another place — is a change to the
-promise and needs the maintainer's decision first, not only a review. Every project file goes
-through `Lockrot\Filesystem\AtomicWriter`.
+- A change that writes anything the list does not name (a new file, a created directory, a cache
+  in another place) changes that promise. It needs the maintainer's decision before review, and it
+  updates `SECURITY.md` in the same branch.
+- Every file lockrot writes into a project goes through `Lockrot\Filesystem\AtomicWriter`.
 
-## Commits and pull requests
+## Fixtures are recorded, not written
 
-Commit messages follow [Conventional Commits](https://www.conventionalcommits.org/): `feat:`,
-`fix:`, `refactor:`, `docs:`, `test:`, `chore:`, `perf:`, `ci:`, with the subject in the imperative.
+- `tests/fixtures/` holds `composer.lock` and `composer.json` snapshots of public projects, with the
+  Packagist and GitHub responses that go with them, so the suite runs offline.
+  `tests/fixtures/README.md` lists every set.
+- Record responses with `GITHUB_TOKEN=$(gh auth token) bin/record-fixtures [fixtureDir ...]`.
+  Without arguments it records the default acceptance fixtures.
+- Never hand-edit a recorded lock or response: take a new snapshot of the lock from its project,
+  and re-record the responses. When a re-recording moves an acceptance assertion, compare that
+  package's signals and verdict before changing the expected value.
+- The README demo, `docs/assets/lockrot-demo.gif`, comes from a real run by `bin/record-demo`
+  (asciinema and agg; its header lists what to export). Re-record it when the table output changes
+  shape.
 
-A pull request should say what changed and why, come with tests, update the README when it changes
-behaviour a user can see, and add a line to the `Unreleased` section of `CHANGELOG.md`.
+## Changing a schema
+
+The published schemas are `resources/lockrot-*.schema.json`. Under one schema number they only
+widen: `tests/Integration/SchemaEvolutionTest.php` holds them to every release's copy in
+`tests/fixtures/schema-evolution/schemas/<version>/` and to the documents older release PHARs wrote
+in `tests/fixtures/schema-evolution/<version>/`. Both fixture sets are frozen by pinned hashes, so a
+failure there is fixed in the schema change, never in the fixture.
+
+| Change | Also required |
+|---|---|
+| A new value in an open set | Add it to that node's `x-known-values`, never to an `enum`. `tests/Unit/Verdict/ClosedSetsTest.php` holds each list to the code |
+| A new open set | Name it in the bullet list and the "The schemas describe" paragraph of `docs/compatibility.md` "Open sets", and in the "Objects are open" paragraph of `docs/schema.md` "Open sets" (`ClosedSetsTest`) |
+| A new signal | [Adding a signal](#adding-a-signal) |
+| A new run note code | [Adding a run note code](#adding-a-run-note-code) |
+| A value in a closed set | Not possible under the same schema number ([Closed sets](docs/compatibility.md#closed-sets-and-their-order)) |
+
+The widening check reads `x-known-values` as an enum on both sides: a value added there is a
+widening, a value dropped is a narrowing.
+
+### Adding a signal
+
+1. Add the constant to `Lockrot\Signal\Signal`.
+2. Add the id to `x-known-values` of `definitions.signalId` in the report and explain schemas.
+3. In the report schema, add a typed `anyOf` branch of its own to `definitions.signal`, before
+   the last branch, whose `data` references a new `definitions.s<n>` (the id in lower case).
+4. Add the id to the `not` list of that last branch.
+5. Add its row to [The signals](docs/verdicts.md#the-signals).
+6. Add an entry under `### Added` in `CHANGELOG.md`. A signal that decides verdicts ships as
+   evidence only for one minor release ([Verdict changes](docs/compatibility.md#verdict-changes)).
+
+`ClosedSetsTest` fails until steps 1 to 4 agree; nothing checks steps 5 and 6.
+
+### Adding a run note code
+
+1. Add the code to `RunNote::CODES`.
+2. In the report and explain schemas, add the code to `x-known-values` of `definitions.noteCode`.
+3. In the report and explain schemas, add a `definitions.note<Name>` for its data, and a branch
+   that references it in `definitions.noteDetail`, before the last branch.
+4. In the report and explain schemas, add the code to the `not` list of that last branch.
+5. Write a `docs/notes.md` section whose heading id is the code and which says whether the note
+   sets `sets_network_failures`.
+6. Append its URL to `PUBLISHED_NOTE_URLS` in `tests/Integration/NotesPageTest.php`.
+
+`ClosedSetsTest` and `NotesPageTest` fail until these agree.
+
+### Recording a release
+
+To record what a published release writes:
+
+```bash
+GITHUB_TOKEN=$(gh auth token) bin/record-schema-evolution <version> <YYYY-MM-DD>
+```
+
+The script verifies the release PHAR before it runs it and refuses a version already recorded.
+Then add the version to every per-version constant in `SchemaEvolutionTest`; each constant's
+docblock says what it holds and where its value comes from.
+
+## Curated data
+
+| File | What it decides | How to change it |
+|---|---|---|
+| `resources/finished-packages.json` | The built-in allowlist of packages that are complete rather than unmaintained: interface packages, polyfills, metapackages | A pull request adds one entry ([below](#contributing-a-finished-package)) |
+| `resources/monorepo-parents.json` | Which monorepo parents a lock is worth one request for | `bin/refresh-monorepo-parents [parent ...]`: with no arguments it refreshes the listed parents; a parent named on the command line is added |
+| `resources/php-ga-dates.json` | The release date of each PHP minor version | Edited by hand |
+
+A change to any of these files can move a verdict, so it is a
+[verdict change](docs/compatibility.md#verdict-changes) and gets an entry under
+`### Verdict changes`. A fix that only moves packages to `finished` or `ok` may ship in a patch
+release.
+
+### Contributing a finished package
+
+```json
+{"pattern": "psr/*", "reason": "PHP-FIG interface packages are complete by design; versions change only when the interface changes"}
+```
+
+| Field | Meaning |
+|---|---|
+| `pattern` | Package name; `*` is a wildcard |
+| `version` | Optional; pins one exact release |
+| `reason` | One line on why the package is finished rather than stalled; "it is fine" is sent back |
 
 ## The PHAR
 
-`build/build-phar.sh` builds `build/lockrot.phar` reproducibly; the comment at its top lists what
-it pins. The archive's dependencies are locked in `build/phar/composer.lock`, which is committed:
-when a dependency of the archive changes — a new requirement in `composer.json`, or a bump of
-`composer/composer` for the PHAR — run `composer update` in `build/phar/` and commit the lock with
-the change. CI builds the archive on two machines and fails when the bytes differ.
+`build/build-phar.sh` builds `build/lockrot.phar` reproducibly; the comment at its top lists what it
+pins. It needs the network to fetch Box, which it checks against a pinned sha256. CI rebuilds the
+archive on a second PHP version (`phar-reproducible` in `ci.yml`) and fails when the bytes differ.
+
+The archive's dependencies are locked in `build/phar/composer.lock`, which is committed:
+
+- When `require` or `autoload` in the root `composer.json` changes, refresh the lock and commit it
+  with the change. CI's `phar` job runs this command and fails when the lock differs:
+
+    ```bash
+    composer update somework/lockrot --no-install --no-plugins --no-interaction --working-dir=build/phar
+    ```
+
+- To bump `composer/composer` or another dependency of the archive, run `composer update` in
+  `build/phar/` and commit the lock.
+
+## The HTML report page
+
+The page `--format=html` writes is built in
+[somework/lockrot-report](https://github.com/somework/lockrot-report). lockrot vendors one release
+of it as `resources/report/report.html` and `manifest.json`, so the PHAR builds without node.
+
+```bash
+tools/report/update-renderer vX.Y.Z
+```
+
+- The script needs `gh`. It verifies the release's build provenance with `gh attestation verify`,
+  then the page against the sha256 its manifest states, then that the manifest names the requested
+  version. `tests/Unit/Output/RendererManifestTest.php` rechecks the page against the manifest on
+  every run.
+- `--from-dir DIR` vendors a local build for development. It is not attested; never release with it.
+- Do not edit the vendored page by hand: change the renderer, release it, update the pin.
+- A bump gets one `html` entry under `### Changed` (`.claude/rules/changelog.md`, "The renderer
+  entry").
+- Which packages and facts go into the page is decided in lockrot, in `src/Html/ReportDocument.php`.
 
 ## The corpus
 
-lockrot's suite, its mutation gate and its schemas all share one blind spot: they prove lockrot
-agrees with itself. `tools/corpus/` is the second reading — it takes a finished run and audits every
-claim against the Packagist data that run read, derived again by code that never touches lockrot's,
-and reads every `--explain` page against the JSON it was rendered from. Both of those caught a real
-bug the day they were written, and neither could have been written as a unit test, because a unit
-test encodes the same assumption the code does.
+`tools/corpus/` audits a finished run against the Packagist data that run read, re-derived by code
+independent of lockrot's, and reads every `--explain` page against the JSON it was rendered from.
+It catches what the suite cannot: an assumption the tests share with the code.
 
-It needs `GITHUB_TOKEN`, the network and a couple of hours over 39 real projects:
+Run it before a release that changes how release dates are chosen or trusted (`src/Data/`), the
+signal rules (`src/Signal/`) or any sentence lockrot prints. A full run needs `GITHUB_TOKEN` and
+the network, and takes hours:
 
-    tools/corpus/corpus fetch
-    tools/corpus/corpus run     --phar build/lockrot.phar --out head --today 2026-09-23
-    tools/corpus/corpus explain --phar build/lockrot.phar --out head --today 2026-09-23
-    tools/corpus/corpus check   --out head --explain-out head
+```bash
+tools/corpus/corpus fetch
+tools/corpus/corpus run     --phar build/lockrot.phar --out head --today <YYYY-MM-DD>
+tools/corpus/corpus explain --phar build/lockrot.phar --out head --today <YYYY-MM-DD>
+tools/corpus/corpus check   --out head --explain-out head
+```
 
-Exit 0 means every check ran and found nothing; 1 means it found something; 2 means it cannot tell
-you either way — a check that selected far less than it was measured to, a corrupt cached document,
-an empty tree. `--today` pins every "years ago", without which the same lock crosses a threshold
-between two runs and the calendar gets filed as a code change. `corpus diff base head` compares two
-archives and refuses two runs whose day, token mode or cache differ.
+- `--today` pins every age, so a threshold crossed by the calendar does not read as a code change.
+- `tools/corpus/corpus diff base head` compares two runs; it refuses runs whose day, token mode or
+  cache differ.
+- The tool is stdlib-only Python on the version in `.python-version`, with nothing to install. It
+  does not inherit lockrot's PHP floor.
+- Nothing under `tools/corpus/` may import or shell out to lockrot's PHP to decide what an answer
+  should be: a checker that asks its subject agrees with it by construction.
 
-Run it before a release that changes the date-trust layer, the signal rules, or any sentence lockrot
-prints — not for every release.
+Exit codes, the checks and the files are in `tools/corpus/README.md`.
 
-The offline half runs on every pull request and on every push to main, and needs none of that:
-`tools/corpus/corpus selftest`, under a second, which is what proves the checks have not quietly
-stopped checking — not that lockrot's wording has not moved, which only a re-record or a corpus run
-can say. The tool is stdlib-only
-Python on the version in `.python-version`, with nothing to install — the same arrangement as the
-node checks above — and it does not inherit lockrot's PHP 7.4 floor. Nothing under `tools/corpus/`
-may import or shell out to lockrot's PHP to decide what an answer should be; a checker that asks the
-subject what it is about agrees with it by construction. `tools/corpus/README.md` says why that
-matters and what each file does.
+## Cutting a release
 
-The third check of the same family is an ordinary unit test and needs no corpus:
-`tests/Unit/Signal/Rule/NotCheckedReachabilityTest.php` asks each rule whether a signal S10 names as
-blocked could have fired at all.
+1. On a release branch:
 
-## Documentation
+    - set `Lockrot\Version::STRING` in `src/Version.php` to the new version;
 
-`docs/` is the reference and changes with the code it describes: a new option, verdict or format
-lands with its page in the same branch. `mkdocs build --strict` (`pip install -r docs/requirements.txt`)
-is the linter CI runs on it. The public site, https://lockrot.dev, is built from the
-[somework/lockrot.dev](https://github.com/somework/lockrot.dev) repository, which checks this one out
-at its newest release tag — so a docs change appears there with the next release. The landing page
-and the blog live in that repository, not here.
+    - rename `## [Unreleased]` in `CHANGELOG.md` to `## [X.Y.Z] - YYYY-MM-DD`, dated on the tag
+      day, and write its summary (`.claude/rules/changelog.md`). Then open a new empty
+      `## [Unreleased]` above it and update the compare links at the bottom of the file: the
+      `[Unreleased]` link to `vX.Y.Z...HEAD`, and a new `[X.Y.Z]` link;
+
+    - copy every `resources/lockrot-*.schema.json` file to
+      `tests/fixtures/schema-evolution/schemas/X.Y.Z/` and pin their sha256 in `RELEASED_SCHEMAS`
+      in `SchemaEvolutionTest`. `SchemaEvolutionTest` fails while `CHANGELOG.md` lists a release
+      whose schemas are not pinned.
+
+2. Build the PHAR and check that `php build/lockrot.phar --version` prints the new version.
+3. Merge the release pull request into `main` with CI green.
+4. Tag the merge commit `vX.Y.Z` and push the tag. `.github/workflows/phar.yml` builds, signs and
+   attests the PHAR, publishes the GitHub release and asks lockrot.dev to rebuild.
+5. When the published release changes what lockrot writes (a schema differs from the previous
+   release's), record it and pin the hashes ([Recording a release](#recording-a-release)).
+
+## Related
+
+- [What 1.0 freezes](docs/compatibility.md#what-10-freezes): the full contract a change must keep.
+- [What lockrot does and does not do](SECURITY.md#what-lockrot-does-and-does-not-do): the list a
+  change that writes or contacts something new has to update.
+- [`tools/corpus/README.md`](tools/corpus/README.md): the corpus checks, their files and exit codes.
+- [`tests/fixtures/README.md`](tests/fixtures/README.md): every recorded fixture set and its source.
+- [`.claude/rules/documentation.md`](.claude/rules/documentation.md) and
+  [`.claude/rules/changelog.md`](.claude/rules/changelog.md): the rules a docs or changelog change
+  is reviewed against.

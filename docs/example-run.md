@@ -1,43 +1,19 @@
 ---
-title: lockrot example run — a 200-package composer.lock report
-description: "One complete lockrot run against wallabag's public 200-package composer.lock: the table output, the same lock as JSON, and what a clean run looks like."
+title: Example run — lockrot on wallabag's composer.lock
+description: "A recorded lockrot run on wallabag's public composer.lock: the full table output, the same lock as JSON, and a clean run to compare it with."
 ---
 
 # Example run
 
-This is what one run prints, start to finish. To produce your own:
+Recorded on 2026-09-30 with lockrot 0.13.0 on a snapshot of
+[wallabag](https://github.com/wallabag/wallabag)'s public `composer.lock`. The run had
+`GITHUB_TOKEN` set, so no repository check was capped, and `COLUMNS=120`, so the wrapping is fixed.
 
 ```bash
-php lockrot.phar -d path/to/project --target-php=8.4
+COLUMNS=120 php lockrot.phar --target-php=8.4
 ```
 
-The output below comes from `tests/fixtures/apps/wallabag_wallabag`, a real, public 200-package
-`composer.lock` carried in this repository for integration tests. wallabag is used because its lock
-file is public and large, not to single it out. The run had `GITHUB_TOKEN` set, so repository
-activity was checked for every candidate package, and `COLUMNS` was fixed at 120 so the wrapping is
-reproducible.
-
-## The table format
-
-Findings are grouped by [priority](verdicts.md), highest first, and every line — rows and the closing
-summary alike — wraps to the width of the terminal, so nothing has to be read sideways; a command the
-footer names (`composer audit`, `composer lockrot --format=json`) is never split across two lines. The width
-comes from `COLUMNS` when it is set, otherwise from the console itself, falling back to 120 columns
-and never going below 40. `--all` adds a final `not flagged` group with everything else in the lock.
-
-A transitive row names the direct requirement its shortest chain starts from, then — after
-`also via` — the other direct requirements that reach it too, so `hoa/ruler` is shown to stay
-installed as long as either `wallabag/rulerz` or `wallabag/rulerz-bundle` does. A direct
-requirement that pulls flagged packages in says so in its evidence (`pulls in 15 flagged packages:
-…`), and the `pulled in by:` line in the summary sums that up per direct requirement — see
-[verdicts.md](verdicts.md#transitive-exposure).
-
-"Data as of" in the footer is the date the report was generated, in UTC. Repository metadata is
-revalidated on every run; repository activity comes from lockrot's 24-hour cache when it is fresh
-enough, and when any of it did the footer says so and how old the oldest cached answer is —
-`(package repositories; repository activity from lockrot's cache, up to 23 h old)` — with the
-timestamp itself under `activity_cache_oldest_at` in `--format=json`. On a real terminal the
-`critical` and `high` rows are marked in red and the `medium` rows in yellow.
+On your project: `php lockrot.phar -d path/to/project`.
 
 ```text
 critical (3)
@@ -46,13 +22,13 @@ critical (3)
                2023-02-24 (3.6 years ago); last push 2023-02-24 (3.6 years ago); pulls in 1 flagged package:
                doctrine/annotations (abandoned)
   silent       javibravo/simpleue 2.1.0  direct
-               last release 2017-11-15 (8.9 years ago); last push 2017-11-18 (8.8 years ago); released 2017-11-15 for
+               last release 2017-11-15 (8.9 years ago); last push 2017-11-18 (8.9 years ago); released 2017-11-15 for
                PHP 5 (php ">=5.5"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
   silent       mnapoli/piwik-twig-extension 3.0.0  direct
                last release 2020-04-24 (6.4 years ago); last push 2020-04-28 (6.4 years ago); released 2020-04-24 for
                PHP 7 (php ">=7.0"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
 
-high (37)
+high (38)
   abandoned    behat/transliterator v1.5.0  via stof/doctrine-extensions-bundle › gedmo/doctrine-extensions
                marked abandoned by its repository; repository archived on GitHub; last release 2022-03-30 (4.5 years
                ago)
@@ -60,7 +36,7 @@ high (37)
                marked abandoned by its repository
   abandoned    doctrine/cache 2.2.0  via doctrine/doctrine-bundle, also via craue/config-bundle,
                doctrine/doctrine-migrations-bundle, doctrine/orm and 2 more
-               marked abandoned by its repository; last release 2022-05-20 (4.3 years ago)
+               marked abandoned by its repository; last release 2022-05-20 (4.4 years ago)
   abandoned    hoa/compiler 3.17.08.08  via wallabag/rulerz › hoa/ruler, also via wallabag/rulerz-bundle
                marked abandoned by its repository; repository archived on GitHub; last release 2017-08-08 (9.1 years
                ago); last push 2021-04-29 (5.4 years ago)
@@ -127,7 +103,7 @@ high (37)
                last release 2015-11-16 (10.9 years ago); last push 2015-11-16 (10.9 years ago); released 2015-11-16 for
                PHP 5 (php ">=5.3.0"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
   silent       pragmarx/random v0.2.2  via pragmarx/recovery
-               last release 2017-11-21 (8.8 years ago); last push 2017-12-18 (8.8 years ago); released 2017-11-21 for
+               last release 2017-11-21 (8.9 years ago); last push 2017-12-18 (8.8 years ago); released 2017-11-21 for
                PHP 7 (php ">=7.0"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
   pinned       friendsofsymfony/oauth-server-bundle dev-master  direct
                pinned to branch snapshot dev-master; last release 2019-01-23 (7.7 years ago); pulls in 2 flagged
@@ -141,10 +117,10 @@ high (37)
                hoa/consistency (abandoned), hoa/event (abandoned), hoa/exception (abandoned), hoa/file (abandoned) and
                10 more
   left-behind  craue/config-bundle 2.7.0  direct
-               branch 2.x last released 2023-08-06 (3.1 years ago); 3.x released 3.0.0 (2026-09-15); require ^3.0 to
+               branch 2.x last released 2023-08-06 (3.2 years ago); 3.x released 3.0.0 (2026-09-15); require ^3.0 to
                follow; pulls in 1 flagged package: doctrine/cache (abandoned)
   left-behind  doctrine/event-manager 1.2.0  direct
-               branch 1.x last released 2022-10-12 (3.9 years ago); 2.x released 2.1.1 (2026-01-29); require ^2.1 to
+               branch 1.x last released 2022-10-12 (4.0 years ago); 2.x released 2.1.1 (2026-01-29); require ^2.1 to
                follow
   left-behind  lcobucci/jwt 4.3.0  direct
                branch 4.x last released 2023-01-02 (3.7 years ago); 5.x released 5.6.0 (2025-10-17); require ^5.6 to
@@ -154,7 +130,7 @@ high (37)
                follow; the age of the package was not read (its newest releases are dated by a commit their tags share),
                so S2 and S8 could not measure it; pulls in 1 flagged package: symfony/security-guard (abandoned)
   left-behind  scheb/2fa-bundle v5.13.2  direct
-               branch 5.x last released 2022-04-16 (4.4 years ago); 8.x released v8.6.1 (2026-07-10), needs php ~8.4.0
+               branch 5.x last released 2022-04-16 (4.5 years ago); 8.x released v8.6.1 (2026-07-10), needs php ~8.4.0
                || ~8.5.0 above the project's php >=8.2; 7.x released v7.14.0 (2026-06-12); require ^7.14 to follow;
                pulls in 1 flagged package: symfony/security-guard (abandoned)
   left-behind  scheb/2fa-email v5.13.2  direct
@@ -169,19 +145,22 @@ high (37)
                branch 5.x last released 2022-01-03 (4.7 years ago); 7.x released v7.14.0 (2026-01-24); require ^7.14 to
                follow; the age of the package was not read (its newest releases are dated by a commit their tags share),
                so S2 and S8 could not measure it; pulls in 1 flagged package: symfony/security-guard (abandoned)
+  left-behind  symfony/webpack-encore-bundle v1.17.2  direct
+               branch 1.x last released 2023-09-26 (3.0 years ago); 2.x released 2.4.2 (2026-09-17); require ^2.4 to
+               follow
   left-behind  spomky-labs/otphp v10.0.3  via scheb/2fa-google-authenticator
                branch 10.x last released 2022-03-17 (4.5 years ago); 11.x released 11.5.0 (2026-06-06); 2 security
                advisories affect v10.0.3 (PKSA-kbc7-dq62-pt7d, PKSA-qv5y-crcz-9nxw); fixed by 11.5.0; no fix expected on
                10.x
   old-promise  mgargano/simplehtmldom 1.5  direct
                released 2014-01-05 for PHP 5 (php ">=5.3.0"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4
-               untested; last release 2014-01-05 (12.7 years ago); last push 2022-08-04 (4.1 years ago)
+               untested; last release 2014-01-05 (12.7 years ago); last push 2022-08-04 (4.2 years ago)
 
 medium (7)
   pinned       wallabag/rulerz-bridge dev-master  via wallabag/rulerz-bundle
                pinned to branch snapshot dev-master
   left-behind  smalot/pdfparser v1.1.0  via j0k3r/graby
-               branch 1.x last released 2021-08-03 (5.1 years ago); 2.x released v2.12.5 (2026-04-17)
+               branch 1.x last released 2021-08-03 (5.2 years ago); 2.x released v2.12.5 (2026-04-17)
   left-behind  symfony/psr-http-message-bridge v2.3.1  via sentry/sentry-symfony
                branch 2.x last released 2023-07-26 (3.2 years ago); 8.x released v8.1.0 (2026-05-29), needs php >=8.4.1
                above the project's php >=8.2; 7.x released v7.4.8 (2026-03-24)
@@ -196,44 +175,82 @@ medium (7)
                grandt/phpresizegif (silent), grandt/phpzipmerge (silent), grandt/relativepath (silent), phpzip/phpzip
                (silent)
 
-low (4)
+low (3)
   stale        friendsofsymfony/oauth2-php 1.3.1  via friendsofsymfony/oauth-server-bundle
                last release 2021-04-06 (5.5 years ago)
-  stale        phpdocumentor/reflection-common 2.2.0  via nelmio/api-doc-bundle › phpdocumentor/reflection-docblock
-               last release 2020-06-27 (6.2 years ago)
   stale        willdurand/jsonp-callback-validator v2.0.0  via friendsofsymfony/jsrouting-bundle, also via
                friendsofsymfony/rest-bundle
-               last release 2022-01-30 (4.6 years ago); last push 2023-07-29 (3.2 years ago)
+               last release 2022-01-30 (4.7 years ago); last push 2023-07-29 (3.2 years ago)
   stale        willdurand/negotiation 3.1.0  via friendsofsymfony/rest-bundle
-               last release 2022-01-30 (4.6 years ago); last push 2023-08-03 (3.1 years ago)
+               last release 2022-01-30 (4.7 years ago); last push 2023-08-03 (3.2 years ago)
 
-200 packages checked · abandoned 19 · silent 8 · pinned 4 · left-behind 12 · old-promise 1 · stale 7 ·
+200 packages checked · abandoned 19 · silent 8 · pinned 4 · left-behind 13 · old-promise 1 · stale 6 ·
 unknown 0 · finished 18 · ok 131
-priority: critical 3 · high 37 · medium 7 · low 4
-libyears: 171.3 behind across 194 of 200 packages · 111.7 from direct requirements ·
-furthest behind smalot/pdfparser v1.1.0 at 4.7
+priority: critical 3 · high 38 · medium 7 · low 3
+libyears: 181.7 behind across 194 of 200 packages · 113.6 from direct requirements ·
+furthest behind phpdocumentor/reflection-common 2.2.0 at 5.4
 pulled in by: wallabag/rulerz-bundle 15 · wallabag/rulerz 14 · wallabag/phpepub 5 ·
-scheb/2fa-google-authenticator 3 · friendsofsymfony/oauth-server-bundle 2 · … and 20 more
-Data as of 2026-09-23 (package repositories, repository hosts). Run composer lockrot --format=json for details.
+scheb/2fa-google-authenticator 3 · friendsofsymfony/oauth-server-bundle 2 · … and 19 more
+1 security advisory on 1 package the report does not flag; see composer audit (it counts packages-dev too, which this
+run skipped; pass --dev to include them)
+Data as of 2026-09-30 (package repositories, repository hosts). Run composer lockrot --format=json for details.
 ```
+
+## Reading the table {#the-table-format}
+
+- **Groups.** One per [priority](verdicts.md#priority), highest first, with its count. `--all` adds
+  a final `not flagged` group holding every other package.
+
+- **A row's first line.** The verdict, the package and its installed version, then `direct`, or
+  `via` and the shortest chain from a direct requirement. `also via` names the other direct
+  requirements that reach the package: `hoa/ruler` stays installed while either `wallabag/rulerz`
+  or `wallabag/rulerz-bundle` does. With a [baseline](baseline.md), the verdict also reads
+  `(baseline)` or `(was <verdict>)`.
+
+- **The lines under it.** The evidence: what each signal found, with its dates. `pulls in N flagged
+  packages:` on a direct requirement is [S7](verdicts.md#transitive-exposure).
+
+- **The summary.** In order, each line only when it applies:
+
+    - the count per verdict;
+    - `priority:`, when something is flagged;
+    - [`libyears:`](verdicts.md#libyears), on every run;
+    - `pulled in by:`, the S7 totals per direct requirement;
+    - the advisories on packages the report does not flag, left to `composer audit`
+      ([security advisories](verdicts.md#security-advisories));
+    - with a baseline, its summary line ([baseline.md](baseline.md)).
+
+- **The footer.** `Data as of` is the date the report was generated, in UTC, followed by the
+  sources; the clause changes when an answer came from lockrot's cache
+  ([how fresh the data is](internals.md#two-sources-two-clocks)). Run notes follow as `note:` lines
+  ([run notes](notes.md)), and with a baseline a `note:` line names its stale entries.
+
+- **Width.** Every line wraps to `COLUMNS` when it is a positive integer, else to the terminal's
+  width, else to 120 columns, and never narrower than 40. A command the footer names stays on one
+  line. For a `table` report written to a file, see
+  [Writing reports to files](configuration.md#writing-reports-to-files).
+
+- **Colour.** On a terminal, `critical` and `high` labels are red and `medium` labels yellow.
 
 ## The same lock as JSON
 
-`--format=json` is the only format that carries every field. Below is the document header and the
-first finding, complete except for signals S3, S4 and S7, and for the rest of the `exposure`
-list, which `…` stands in for:
+`--format=json` writes every field of the report; the `html` page embeds the same document. This
+is the same run's document, abridged: `…` marks each cut (signals S3, S4 and S7 of the first
+finding, the rest of `exposure`, the other findings).
 
 ```json
 {
     "$schema": "https://lockrot.dev/schema/report-1.json",
     "lockrot": {
-        "version": "0.11.0",
+        "version": "0.13.0",
         "schema": 1
     },
-    "generated_at": "2026-09-23T08:32:48+00:00",
+    "generated_at": "2026-09-30T19:18:50+00:00",
     "run": {
         "project": "wallabag/wallabag",
+        "root_package": "wallabag/wallabag",
         "target_php": "8.4",
+        "project_php": ">=8.2",
         "lock_file": "composer.lock",
         "fail_on": "none",
         "fail_on_kind": "none",
@@ -263,9 +280,9 @@ list, which `…` stands in for:
         "abandoned": 19,
         "silent": 8,
         "pinned": 4,
-        "left-behind": 12,
+        "left-behind": 13,
         "old-promise": 1,
-        "stale": 7,
+        "stale": 6,
         "unknown": 0,
         "finished": 18,
         "ok": 131
@@ -276,9 +293,9 @@ list, which `…` stands in for:
     },
     "priorities": {
         "critical": 3,
-        "high": 37,
+        "high": 38,
         "medium": 7,
-        "low": 4,
+        "low": 3,
         "none": 149
     },
     "exposure": [
@@ -296,9 +313,13 @@ list, which `…` stands in for:
         },
         …
     ],
+    "exposure_rule": {
+        "max_fan_in": 8
+    },
+    "unattributed": [],
     "libyears": {
-        "total": 171.34,
-        "direct_requirements": 111.72,
+        "total": 181.7,
+        "direct_requirements": 113.59,
         "measured": 194,
         "unmeasured": {
             "branch_snapshot": 4,
@@ -307,9 +328,9 @@ list, which `…` stands in for:
             "metadata_unavailable": 0
         },
         "furthest_behind": {
-            "package": "smalot/pdfparser",
-            "version": "v1.1.0",
-            "libyears": 4.7
+            "package": "phpdocumentor/reflection-common",
+            "version": "2.2.0",
+            "libyears": 5.37
         }
     },
     "baseline": null,
@@ -368,7 +389,7 @@ list, which `…` stands in for:
             "evidence": "marked abandoned by its repository, replacement: Symfony; repository archived on GitHub; last release 2023-02-24 (3.6 years ago); last push 2023-02-24 (3.6 years ago); pulls in 1 flagged package: doctrine/annotations (abandoned)",
             "allowlist_reason": null,
             "note": null,
-            "data_date": "2026-09-23T08:32:48+00:00",
+            "data_date": "2026-09-30T19:18:50+00:00",
             "libyears": 0,
             "libyears_unmeasured": null,
             "priority_basis": {
@@ -388,27 +409,26 @@ list, which `…` stands in for:
 }
 ```
 
-The cut signals have the same shape as S1 and S2; S7 carries the packages it names under `data`. So
-do the other 199 findings, each with its own `priority`, `direct`, `dev`,
-`from_composer_repository`, `origin`, `replacement`, `replacement_url`, `signals`, `chain`, `direct_dependents`, `evidence`,
-`allowlist_reason`, `note`, `data_date`, `libyears`, `libyears_unmeasured`, `priority_basis`,
-`no_fix_expected`, `baseline` and `gate`. `exposure` is the `pulled in by:` line in full — every
-direct requirement that pulls in an attributable flagged transitive package, with how many, most
-first. From 0.13.0 the document also carries `exposure_rule`, the cap that list is drawn by
-(`{"max_fan_in": 8}`), and `unattributed`, the flagged packages reached from more direct
-requirements than that and so counted under none; see [transitive
-exposure](verdicts.md#transitive-exposure). `libyears` is the [libyears
-block](verdicts.md#libyears), summed from the findings: sensio/framework-extra-bundle is abandoned
-and *zero* libyears behind — its last release is the one installed — which is the point of keeping
-the two numbers apart. `gate`, also from 0.13.0, is the decision behind the exit code: under
-`fail_on` `none` no finding reaches the threshold, so the run passes (see
-[schema.md](schema.md#what-the-report-schema-types)). `note_details` is `notes` typed, one entry per
-note, empty here as `notes` is; [run notes](notes.md) lists every code.
+- Every finding carries the keys the one shown carries; [schema.md](schema.md#what-the-report-schema-types)
+  defines each. The cut signals have the shape S1 and S2 show, and S7's `data` names the packages
+  it counts.
+
+- `exposure` is the `pulled in by:` line in full, most first. `exposure_rule` and `unattributed`
+  belong to the same count ([transitive exposure](verdicts.md#transitive-exposure)).
+
+- sensio/framework-extra-bundle is `abandoned` and 0 libyears behind: its last release is the one
+  installed. A verdict and [libyears](verdicts.md#libyears) measure different things.
+
+- `gate.fails` is false: under `fail_on` `none` no finding reaches the threshold, so the run exits
+  `0` ([exit codes](ci.md#exit-codes)).
+
+- `notes` and `note_details` are empty: every source answered and no cap applied
+  ([run notes](notes.md)).
 
 ## A clean run
 
-Most projects are not wallabag. Run against `tests/fixtures/skeletons/cakephp`, a 20-package lock
-with nothing to report, the same command prints:
+Recorded with the same version, on the same date, on a fresh `cakephp/app` skeleton whose lock has
+nothing to flag. The run exited `0` ([exit codes](ci.md#exit-codes)).
 
 ```text
 No dependency rot found in 20 packages.
@@ -417,14 +437,12 @@ No dependency rot found in 20 packages.
 finished 11 · ok 9
 libyears: 0.9 behind across all 20 packages · 0.0 from direct requirements ·
 furthest behind laminas/laminas-httphandlerrunner 2.13.0 at 0.9
-Data as of 2026-09-23 (package repositories, repository hosts). Run composer lockrot --format=json for details.
+Data as of 2026-09-30 (package repositories, repository hosts). Run composer lockrot --format=json for details.
 ```
-
-The `priority:` line is printed only when the run flagged something, so a clean run does not carry
-one. The exit code is `0`; see [ci.md](ci.md).
 
 ## Related
 
-- [verdicts.md](verdicts.md) — what each verdict and priority means
-- [ci.md](ci.md) — the other five output formats
-- [baseline.md](baseline.md) — accepting the findings above so CI fails only on new ones
+- [verdicts.md](verdicts.md) — what each verdict, signal and priority in this output means
+- [ci.md](ci.md) — every other output format, and the exit codes
+- [baseline.md](baseline.md) — accept these findings so CI fails only on new ones
+- [internals.md](internals.md) — where each date and the footer's sources come from

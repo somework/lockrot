@@ -1,43 +1,57 @@
 ---
 title: lockrot baseline — fail CI only on new dependency rot
-description: Record today's findings in lockrot-baseline.json with --generate-baseline, commit it, and CI fails only on findings that are new or have got worse since.
+description: Record the findings you accept in lockrot-baseline.json with --generate-baseline, commit it, and CI fails only on findings that are new or have got worse.
 ---
 
-# Baseline
+# Gate only new findings with a baseline {#baseline}
 
-Record the findings you have already seen and decided to live with, so CI fails only on what is
-**new** or has got **worse** since:
+Record the findings you have decided to live with, commit the file, and CI fails only on what is
+**new** or has got **worse**:
 
 ```bash
 composer lockrot --target-php=8.4 --generate-baseline
-git add lockrot-baseline.json && git commit -m "chore: accept current dependency rot"
+git add lockrot-baseline.json
+git commit -m "chore: accept current dependency rot"
 ```
 
-A large project rarely starts clean, and turning `--fail-on` off loses the check entirely. The
-baseline is the middle ground.
+Run it with the options your CI step uses (`--dev`, `--target-php`, any `LOCKROT_*` override, the
+same `COMPOSER` manifest), or the step can fail on findings the baseline was meant to accept
+([below](#generate-it-with-the-same-dev-setting-your-ci-run-uses)).
+
+Every later run (plugin or PHAR) reads `lockrot-baseline.json` without a flag and sorts each
+finding into one bucket:
+
+| Bucket | The finding | Fails the build |
+|---|---|---|
+| `new` | is flagged and not in the baseline | When it reaches `--fail-on`, as without a baseline |
+| `worsened` | is in the baseline at a less severe verdict than its current one | When it reaches `--fail-on` |
+| `known` | is in the baseline at its current verdict or a more severe one | Never |
+| `stale` (not the `stale` verdict) | is a baseline entry for a package that is not in `composer.lock` | Never; reported as a note |
 
 ## What `--generate-baseline` does
 
-It writes `lockrot-baseline.json` next to `composer.json`, prints one line on stderr
-(`lockrot: baseline written to lockrot-baseline.json (74 findings)`), nothing on stdout, and exits
-`0` whatever `--fail-on` says — the run records findings, it does not judge them.
-
-**Commit the file.** It is a statement about the project, and it is worth reviewing in a pull request
-like any other change. lockrot writes it only on this explicit flag, as it writes reports only where
-[`--output`](configuration.md#writing-reports-to-files) names them; `composer.json` and `composer.lock`
-never. With `--output` on the same run the reports are written first and the baseline last, so a report
-that cannot be written (exit `2`) leaves the baseline as it was; the reports carry no baseline
-comparison, since the baseline is what the run is writing.
-
-`--strict-network` is the one exception to that exit `0`: if a configured repository or a repository host could
-not be reached, the run still exits `1` after writing the file. A baseline generated from metadata
-that never arrived would accept findings lockrot was not actually able to check.
+- Writes `lockrot-baseline.json` next to `composer.json`, or the path in `--baseline` or
+  [`extra.lockrot.baseline`](configuration.md#extralockrot-keys), relative to `composer.json` or
+  absolute. Under `COMPOSER=app/alt.json` that is next to `alt.json`, in `app/`
+  ([environment overrides](configuration.md#environment-overrides)).
+- Records every flagged finding of the run. `ok`, `finished` and `unknown` are not findings and are
+  not recorded.
+- Replaces the file: a package this run does not flag loses its entry, and a package that stays
+  keeps its `first_seen`.
+- Never leaves a truncated baseline, even when interrupted.
+- Prints nothing on stdout; on stderr it ends with
+  `lockrot: baseline written to lockrot-baseline.json (<count> findings)`.
+- Exits `0` whatever `--fail-on` says. With `--strict-network`, a repository or repository host that
+  could not be reached still exits `1`, after the file is written.
+- With `--output` on the same run, writes the reports first and the baseline last. The reports carry
+  no baseline comparison, and a report that cannot be written (exit `2`) leaves the baseline as it
+  was.
 
 ```json
 {
     "$schema": "https://lockrot.dev/schema/baseline-1.json",
     "lockrot": {
-        "version": "0.13.0",
+        "version": "x.y.z",
         "schema": 1
     },
     "generated_at": "2026-09-14T00:00:00+00:00",
@@ -51,73 +65,114 @@ that never arrived would accept findings lockrot was not actually able to check.
 }
 ```
 
-`$schema` names the file's published [JSON schema](schema.md), which an editor uses to complete and
-check the file; lockrot itself validates every baseline it reads against the same schema.
+| Field | Meaning |
+|---|---|
+| `$schema` | The file's published [JSON schema](schema.md); lockrot validates every baseline it reads against it |
+| `lockrot.version` | The lockrot release that wrote the file |
+| `lockrot.schema` | The file's schema number |
+| `generated_at` | The timestamp of the run that wrote it |
+| `findings` | One entry per package, sorted by name so the diff stays reviewable |
+| `findings.<package>.version` | The version installed when the entry was written; informational, not matched |
+| `findings.<package>.verdict` | The verdict accepted |
+| `findings.<package>.first_seen` | The date the package first entered the baseline, kept across regenerations |
 
-Only flagged verdicts are recorded (`ok`, `finished` and `unknown` are not findings), entries are
-sorted by package name so the diff stays reviewable, and `first_seen` is carried over when you
-regenerate — the file keeps saying how long each finding has been tolerated.
+## Accept a new finding or drop a fixed one {#accept-a-new-finding-or-drop-a-fixed-one}
+
+Regenerating accepts every current finding at once, so review what it changes:
+
+1. Rerun the [generate command](#baseline).
+
+2. Review `git diff lockrot-baseline.json`. An added entry is a finding you accept, a changed
+   `verdict` is the verdict you accept, and a removed entry is fixed or not in `composer.lock`.
+
+3. Commit the file with the change that needs it.
+
+On a merge conflict in the file, take either side and regenerate on the merged branch. Entries on
+the side you took keep their `first_seen` dates.
 
 ## Reading a baseline
 
-Once the file exists, every normal run compares against it and says so:
+A run with a baseline adds one line to the `table` and `markdown` output:
 
 ```text
-200 packages checked · abandoned 19 · silent 8 · pinned 4 ·
-left-behind 11 · old-promise 38 · stale 3 · unknown 0 · finished 18 · ok 99
-priority: critical 3 · high 64 · medium 14 · low 2
-baseline: 81 known · 1 new · 1 worsened · 0 stale (lockrot-baseline.json)
+baseline: <known> known · <new> new · <worsened> worsened · <stale> stale (lockrot-baseline.json)
 ```
 
-| Bucket | Meaning | Effect on the exit code |
+Here `<stale>` counts stale entries, not findings with the `stale` verdict.
+
+Matching rules:
+
+- **By package name only.** Bumping `vendor/pkg` from `1.2.3` to `1.3.0` while it stays `abandoned`
+  keeps it `known`.
+- **By verdict only.** A finding that moves up the severity ladder (from the `stale` verdict to
+  `abandoned`) is `worsened` and can fail the build again. A change of
+  [priority](verdicts.md#priority) alone, such as a package moving from `require-dev` to `require`,
+  keeps it `known`.
+- **Whichever threshold.** A `known` finding does not fail the run under a verdict, a priority or
+  `unchecked` threshold.
+- **Flagged findings only.** A baseline never covers an `ok`, `finished` or `unknown` finding, so
+  one that carries [S10](verdicts.md#what-was-not-checked) still fails `--fail-on=unchecked`
+  however often you regenerate.
+- **Stale entries stay.** A normal run never edits the file; regenerate it to drop them.
+
+How each format shows the comparison:
+
+| Format | `known` | `worsened` |
 |---|---|---|
-| `known` | The baseline holds this package at this verdict or a worse one | Never fails the build. The table shows `abandoned (baseline)`, annotations drop to notice/note |
-| `new` | Flagged now, absent from the baseline | Compared against `--fail-on` as usual |
-| `worsened` | In the baseline, but at a lower verdict than today's | Compared against `--fail-on`. The table shows `abandoned (was stale)` |
-| `stale` | In the baseline, no longer in `composer.lock` | Never fails the build. Reported as a note so you know the entry can go |
+| `table` | `abandoned (baseline)` | `abandoned (was stale)`, naming the accepted verdict |
+| `github`, `sarif`, `gitlab`, `markdown` | Marked in the last row of [How each format marks a finding](ci.md#how-each-format-marks-a-finding) | Marked like a new finding |
+| `json` | `baseline.status` is `known`; when the finding reaches `--fail-on`, `gate.exempt_by` is `baseline` ([schema.md](schema.md#what-the-report-schema-types)) | `baseline.status` is `worsened` and `baseline.previous_verdict` names the accepted verdict; `gate.exempt_by` is null |
 
-Matching is **by package name only**. The recorded version is informational, so bumping `vendor/pkg`
-from `1.2.3` to `1.3.0` while it stays abandoned keeps it accepted; a package that gets *worse*
-(`stale` → `abandoned`) is reported as worsened and fails the build again. Stale entries are never
-cleaned up behind your back — regenerate the baseline when you want them gone.
+## Generate it with the options your CI step uses {#generate-it-with-the-same-dev-setting-your-ci-run-uses}
 
-Only flagged findings can be accepted, so a baseline never covers an `ok`, `finished` or `unknown`
-finding: one that carries S10 still fails `--fail-on=unchecked` however often you regenerate. The
-JSON report says where each finding stands in its `gate` (see
-[schema.md](schema.md#what-the-report-schema-types)): a `known` finding that reaches `--fail-on`
-has `exempt_by` `baseline` and does not fail, a `new` or `worsened` one fails like any other.
+Any option that changes verdicts must match between the generate run and the CI step, or the step
+reports accepted findings as `new` or `worsened`:
 
-## Generate it with the same `--dev` setting your CI run uses
+- **`--dev`.** Generated without it and checked with it, the baseline holds no development findings,
+  so the `--dev` run reports every one of them as `new` and can fail. Generated with `--dev` and
+  checked without it is no problem: `stale` entries are measured against the whole `composer.lock`,
+  `packages-dev` included, so the development entries are not reported as stale.
 
-`--dev` widens what is *analysed*, not what counts as present: staleness is measured against the
-whole `composer.lock`, `packages-dev` included, so a baseline generated with `--dev` never reports
-its development entries as stale on a run without it.
+- **The target PHP.** Pass the same `--target-php` or `LOCKROT_TARGET_PHP`. Without either, lockrot
+  uses `config.platform.php`, else the PHP that runs it, which can differ between your machine and
+  CI ([`target-php`](configuration.md#extralockrot-keys)).
 
-The other direction does matter. A baseline generated *without* `--dev` contains no development
-findings, so a `--dev` run reports every one of them as new and fails.
+- **The manifest.** Run with the same `COMPOSER` value, so both runs read the same lock.
+
+A change to a threshold key in `extra.lockrot` changes verdicts too: regenerate the baseline in the
+same change.
 
 ## When lockrot cannot read the file
 
-A baseline lockrot cannot read is a configuration error, not an absent baseline: a malformed or
-schema-invalid file, or a `--baseline`/`extra.lockrot.baseline` path that does not exist, exits `2`
-rather than silently running ungated. The message names what is wrong and where — a field of the
-wrong type, or a key starting with a NUL byte, which lockrot cannot read. The default path simply not existing is not an error — that is
-every project before its first `--generate-baseline`. To start over from a file that has been
-damaged, delete it and generate a new one.
+A baseline lockrot cannot read is a configuration error, never an absent baseline: the run exits
+`2` instead of running ungated. A default `lockrot-baseline.json` that does not exist is not an
+error; the run has no baseline.
+
+| Symptom on stderr | Cause | Fix |
+|---|---|---|
+| `lockrot: <path> not found` | `--baseline` or `extra.lockrot.baseline` names a file that does not exist | Fix the path, or create the file with `--generate-baseline` |
+| `lockrot: <path> is not valid JSON: …` or `… must contain a JSON object` | The file is damaged, for example by a merge conflict | Restore it from version control, or delete it and generate a new one |
+| `lockrot: baseline file is invalid:` and one `  - <field>: <message>` line per problem | The file does not match the [schema](schema.md): a field of the wrong type or a missing key | Fix the named field, or delete the file and generate a new one |
+| `lockrot: Cannot read <path>: …` | The file exists but cannot be read | Fix its permissions |
+
+`--generate-baseline` reads an existing file to keep its `first_seen` dates, so it stops on a
+damaged file too. Delete the file first.
 
 ## Install time
 
-`install-time-strict` uses the same comparison: a finding the baseline already carries does not stop
-a `composer require`. The compact block still lists it.
+`install-time-strict` uses the same comparison: a `known` finding (in the baseline at its current
+verdict or a more severe one) does not stop a `composer require`, and the compact block still
+lists it ([install-time.md](install-time.md)).
 
-Install time never fails on a configuration problem, so it handles an unreadable baseline differently
-from `composer lockrot`. An `extra.lockrot.baseline` pointing at a missing or unreadable file becomes
-the usual single `lockrot: install-time check skipped: …` line, and because the check was skipped the
-`install-time-strict` gate does not run for that install either. Fix the path or remove the key —
-`composer lockrot` reports the same problem as exit `2` and is the quicker way to see it.
+At install time an unreadable baseline, or an `extra.lockrot.baseline` naming a missing file, does
+not fail the install. The check is skipped with one `lockrot: install-time check skipped: …` line,
+and the `install-time-strict` gate does not run for that install. `composer lockrot` reports the
+same problem as exit `2`.
 
 ## Related
 
-- [configuration.md](configuration.md) — `baseline` and `--baseline=<path>`
-- [ci.md](ci.md) — exit codes and how each format renders a baseline-known finding
+- [configuration.md](configuration.md#extralockrot-keys) — the `baseline` key and `--baseline=<path>`
+- [ci.md](ci.md#exit-codes) — the exit codes a gated run returns
+- [ci.md](ci.md#how-each-format-marks-a-finding) — how each format marks a `known` finding
+- [schema.md](schema.md) — the published baseline schema and the report's `baseline` fields
 - [install-time.md](install-time.md) — the compact block and `install-time-strict`

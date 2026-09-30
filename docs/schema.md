@@ -1,12 +1,14 @@
 ---
-title: lockrot JSON schemas — the report, the explanation, the baseline and the configuration
-description: Published JSON schemas for every document lockrot reads or writes, the compatibility rule behind their numbers, and how to validate a report in CI.
+title: JSON schemas — lockrot report, explanation, baseline and configuration
+description: The published JSON Schema of every lockrot document, what may change under a schema number, which value sets grow, how to validate in CI, and the report's fields.
 ---
 
 # JSON schemas
 
-Every document lockrot writes for a machine, and the one it reads from `composer.json`, has a
-published schema:
+Validate lockrot's machine-readable documents against these schemas and build on the fields they
+type. Under one schema number a document only gains fields, the sets in [Open sets](#open-sets)
+only gain values and a field's type only widens. The field tables start at
+[What the report schema types](#what-the-report-schema-types).
 
 | Document | Schema | Written by / read from |
 |---|---|---|
@@ -15,15 +17,18 @@ published schema:
 | The baseline file | [`https://lockrot.dev/schema/baseline-1.json`](https://lockrot.dev/schema/baseline-1.json) | `--generate-baseline` writes `lockrot-baseline.json`; every later run reads it |
 | The configuration | [`https://lockrot.dev/schema/config-1.json`](https://lockrot.dev/schema/config-1.json) | `extra.lockrot` in `composer.json` |
 
-The same files ship in the repository and the PHAR under
-[`resources/`](https://github.com/somework/lockrot/tree/main/resources), as
-`lockrot-<name>.schema.json`. They are [JSON Schema draft-04](https://json-schema.org/specification-links#draft-4),
-the dialect Composer's own bundled validator speaks, which is what lockrot validates the baseline
-and the configuration with at runtime.
+- **Dialect.** [JSON Schema draft-04](https://json-schema.org/specification-links#draft-4).
+  `composer lockrot` exits `2` on a baseline file or an `extra.lockrot` that fails its schema
+  ([exit codes](ci.md#exit-codes)). At install time the check is skipped with a one-line warning
+  ([install-time.md](install-time.md#never-fails-the-install)).
+
+- **Copies.** The PHAR and each [release tag](https://github.com/somework/lockrot/tags) ship the
+  same files as `resources/lockrot-<name>.schema.json`. That copy matches the release you run; the
+  URL describes the newest release under its number.
 
 ## The documents say which schema they follow
 
-The report, the explanation and the baseline file open with a `$schema` key naming the URL above:
+The report, the explanation and the baseline file open with a `$schema` key naming their URL:
 
 ```json
 {
@@ -36,329 +41,476 @@ The report, the explanation and the baseline file open with a `$schema` key nami
 }
 ```
 
-An editor that reads `$schema` — VS Code and PhpStorm do — completes and checks a baseline file as
-you edit it. `extra.lockrot` lives inside `composer.json`, which has a schema of its own, so it
-carries no `$schema`; point your editor's JSON schema mapping at `config-1.json` for the
-`extra.lockrot` path if you want the same there.
+An editor that reads `$schema` completes and checks these documents as you edit them.
+
+`extra.lockrot` sits inside `composer.json`, which has a schema of its own, so it carries no
+`$schema`: map `config-1.json` to the `extra.lockrot` path in your editor's JSON schema settings.
 
 ## The number, and what may change under it
 
-The `1` in `report-1.json` is the `lockrot.schema` number the document carries. Under one number,
-a document only ever **gains** fields: every object in every schema is open (no
-`additionalProperties: false`), so a field a newer lockrot adds validates against the copy of the
-schema you fetched or vendored earlier, and a field your CI step does not know about is not an
-error. The number moves only when a field is removed or renamed, and then the old file stays
-published at its old URL.
+The `1` in `report-1.json` is the `lockrot.schema` value the document carries.
 
-Objects are open, and so are the sets of values that grow in minor releases: see
-[Open sets](#open-sets).
+- **Fields are only added.** No object sets `additionalProperties: false`, so a field your code
+  does not know is not an error.
 
-What else 1.0 will freeze — the closed sets and their order, the identity fields of the other
-formats, the command line — is drafted in [compatibility.md](compatibility.md).
+- **Types may widen.** A field may accept a further type (for example `null`) under the same
+  number. A document that uses the wider type fails an older copy, so refresh a pinned copy when
+  you upgrade.
 
-The schema files themselves are edited in place when a field is added, so the copy at the URL always
-describes the newest release under that number. The version that added a field is in the
-[changelog](changelog.md).
+- **The number moves** only when a field is removed or renamed, or a closed set changes. The old
+  file stays published at its old URL.
+
+- **The file at a URL widens in place:** it accepts every document an older copy of the same number
+  accepts.
+
+[compatibility.md](compatibility.md) lists what else 1.0 freezes: the closed sets and their order,
+the identity fields of the other formats and the command line.
 
 ## Open sets
 
-Objects are open, and so are the sets of values that grow in minor releases: signal ids (a signal's
-`id` and S10's `blocks`), S10's `check` and `reason`, S6's `reason`, S8's `floor_source` and the
-explanation's `php_blocked_by`, which holds the same values, the explanation's `misses_target_php`
-and `misses_project_php`, a finding's `libyears_unmeasured`, a `priority_basis` step's `reason`, a
-`no_fix_expected` item's `reason`, `run.mode`, `run.fail_on_kind`, `gate.tripped_by`, a finding's
-`gate.exempt_by`, a run note's `code`, and the `forge_id` and `reason` in its `data`, a finding's
-`origin.kind` and `origin.registry`, and the configuration's `format`. Each is a string with a
-`pattern`, plus an `x-known-values` list of the values this release writes. A validator ignores a
-keyword draft-04 does not define, so a copy of the schema taken from 0.13.0 on accepts a signal, a
-reason, a floor, a way a branch misses a floor, a priority step, a kind of run or of threshold, a
-cause that failed a run, an exemption, a run note, an origin kind or registry, a repository host or a format that a later release adds, and a signal, note code, origin kind or format named `<vendor>:<name>`, the form reserved for those that do not come
-from lockrot ([compatibility.md](compatibility.md#names-reserved-for-extensions)). The vendor and
-the name are each lower-case letters, digits, `_`, `.` and `-`, starting with a letter or a digit;
-`acme:licence` validates, `Acme:Licence` does not.
+Objects are open, and so are these sets of values, which grow in minor releases: signal ids (a
+signal's `id` and S10's `blocks`), S10's `check` and `reason`, S6's `reason` and S8's
+`floor_source`; a finding's `libyears_unmeasured`, a `priority_basis` step's `reason`, a
+`no_fix_expected` item's `reason`, a finding's `gate.exempt_by`, and a finding's `origin.kind` and
+`origin.registry`; `run.mode`, `run.fail_on_kind` and `gate.tripped_by`; a run note's `code`, and
+the `forge_id` and `reason` in its `data`; the explanation's `php_blocked_by`, `misses_target_php`
+and `misses_project_php`; the configuration's `format`.
+
+How the schemas write an open set:
+
+- It is a string with a `pattern`, plus `x-known-values`: the values this release writes. Every
+  known value matches the `pattern`, and the list only grows under one number.
+
+- A draft-04 validator ignores `x-known-values`, so your copy accepts a value a later release adds.
+
+- The pattern for signal ids, note codes, origin kinds and formats also admits `<vendor>:<name>`,
+  the form [reserved](compatibility.md#names-reserved-for-extensions) for names that do not come
+  from lockrot. The vendor and the name are each lower-case letters, digits, `_`, `.` and `-`,
+  starting with a letter or a digit: `acme:licence` validates, `Acme:Licence` does not.
 
 - A signal whose id the schema does not list validates with any object as its `data`. A listed id
-  still has its `data` typed: S2's id with S4's data fails, and so does S2's id with no data at all.
-  A run note's `data` is typed per `code` the same way.
+  keeps its `data` typed: `S2` with S4's data fails, and so does `S2` with no `data`. A run note's
+  `data` is typed per `code` the same way.
+
+- The keys of the report's `libyears.unmeasured` grow with `libyears_unmeasured`. A key a later
+  release adds is typed as a count and never joins `required`.
+
+How to read one:
+
 - Read a value you do not know as "other": show it as written, and do not fail on it.
-- `x-known-values` only grows under one number, and every value in it matches the `pattern`. To hold
-  a document to the values you know, read `x-known-values` as an `enum`. lockrot's own tests do that,
-  and so does lockrot when it validates `extra.lockrot`, which is why a mistyped `format` is still a
-  configuration error.
-- A copy taken before 0.13.0 still spells these values out as enums, and rejects a new one until you
-  refresh it.
+
+- To hold a document to the values you know, read `x-known-values` as an `enum`. lockrot does this
+  when it validates `extra.lockrot`, so a mistyped `format` is a configuration error.
 
 The closed sets stay enums: verdicts, priorities, signal levels, a finding's standing against the
 baseline, a baseline entry's verdict and the schema number. A new value there needs a new number.
 
-## Validating in CI
+!!! note "Older releases"
+    A copy of a schema taken before 0.13.0 spells these sets as enums, and rejects a value a later
+    release adds until you refresh it.
 
-Any draft-04 validator does. With [check-jsonschema](https://check-jsonschema.readthedocs.io/):
+## What the report schema types
+
+The report's fields and what each holds. **Since** is the release that added a field: the schema
+marks it optional so earlier reports validate, and lockrot writes it in every report from that
+release on. A field without one is in every report that has its parent. `report-1.json` itself
+holds every nested key.
+
+### The document
+
+| Field | Type | Since | Holds |
+|---|---|---|---|
+| `$schema` | string | | The URL of `report-1.json` |
+| `lockrot` | object | | `version`, the lockrot release that wrote the document, and `schema`, the schema number |
+| `generated_at` | date-time | | When the report was generated |
+| `run` | object or null | 0.10.0 | What the run was told to do: see [What the run was told](#what-the-run-was-told) |
+| `activity_cache_oldest_at` | date-time or null | | Fetch time of the oldest repository-activity answer served from lockrot's cache; null when every answer was fetched in this run |
+| `packages_checked` | integer | | Packages analysed |
+| `include_dev` | boolean | | Whether `packages-dev` were analysed |
+| `not_from_composer_repository` | integer | | Findings whose `from_composer_repository` is false |
+| `network_failures` | boolean | | True exactly when a `note_details` entry has `sets_network_failures: true`; `--strict-network` fails on it |
+| `counts` | object | | Findings per verdict; every verdict is a key, zero included |
+| `abandoned` | object | 0.11.0 | `total`, equal to `counts.abandoned`, and `with_replacement`, the abandoned findings whose `replacement` names a package |
+| `priorities` | object | | Findings per priority; every priority is a key, zero included |
+| `exposure` | array | | Direct requirements that pull in flagged packages: see [Transitive exposure](#transitive-exposure) |
+| `exposure_rule` | object | 0.13.0 | `max_fan_in`, the fan-in cap this run attributed `exposure` by: see [Transitive exposure](#transitive-exposure) |
+| `unattributed` | array | 0.13.0 | Flagged transitive packages above the cap |
+| `libyears` | object | 0.11.0 | Totals over the findings' `libyears`: see [Libyears](#libyears) |
+| `baseline` | object or null | | `path`, the counts `known`, `new` and `worsened`, and `stale`, the baselined names absent from the lock; null when the run read no baseline |
+| `gate` | object or null | 0.13.0 | Why the run exits as it does: see [The gate](#the-gate) |
+| `notes` | array of strings | | What the run could not see, as sentences: text, not contract |
+| `note_details` | array | 0.13.0 | The same notes, typed: see [Run notes](#run-notes) |
+| `findings` | array | | One per analysed package, by priority, then verdict severity, direct before transitive, then name |
+
+### Each finding
+
+| Field | Type | Since | Holds |
+|---|---|---|---|
+| `package` | string | | The package name, `vendor/name` |
+| `version` | string | | The installed version, as the lock records it |
+| `verdict` | enum | | A [verdict](verdicts.md#the-nine-verdicts) |
+| `priority` | enum | | A [priority](verdicts.md#priority) |
+| `priority_basis` | object | 0.13.0 | How `priority` was reached: see [How a priority was reached](#how-a-priority-was-reached) |
+| `direct` | boolean | | Whether the project requires the package directly |
+| `dev` | boolean | | Whether the lock lists it under `packages-dev` |
+| `signals` | array | | `{id, level, summary, data}` per [signal](verdicts.md#the-signals); `data` is typed per id, `summary` is text |
+| `chain` | array | | Package names from a direct requirement down to this one; one element when it is direct; empty when no direct requirement reaches it |
+| `direct_dependents` | array | | The run's direct requirements that reach the package, sorted by name; a direct package lists itself |
+| `evidence` | string | | The sentence behind the verdict: text, not contract |
+| `allowlist_reason` | string or null | | The reason the [allowlist](configuration.md#the-allowlist) gives; null when the package is not allowlisted |
+| `note` | string or null | | Why lockrot has no repository metadata for the package, as a sentence; null when it has |
+| `data_date` | date-time or null | | When the repository data behind the verdict was read: the later of the metadata and the repository activity; null when lockrot had neither |
+| `from_composer_repository` | boolean | 0.13.0 | Whether the lock entry carries a Composer `notification-url`: see [Where a package came from](#where-a-package-came-from) |
+| `origin` | object | 0.13.0 | Where the lock entry came from: see [Where a package came from](#where-a-package-came-from) |
+| `replacement` | string or null | 0.11.0 | On an abandoned finding, the package its repository names as the replacement, when that is a package name; null otherwise ([Abandoned](verdicts.md#abandoned-and-where-to)) |
+| `replacement_url` | string or null | 0.13.0 | The replacement's page: see [Where a package came from](#where-a-package-came-from) |
+| `libyears` | number or null | 0.11.0 | Years behind the newest stable release, at least 0, two decimals; null when not measured |
+| `libyears_unmeasured` | string or null | 0.13.0 | Null when `libyears` is a number, 0 included; otherwise the `libyears.unmeasured` key the finding counts under. An open set |
+| `no_fix_expected` | array or null | 0.13.0 | The advisories lockrot expects no fix for: see [Advisories with no fix expected](#advisories-with-no-fix-expected) |
+| `baseline` | object or null | 0.10.0 | `status` (`known`, `new` or `worsened`) and `previous_verdict`, the verdict the baseline accepted or null; null when the run read no baseline or the finding is not flagged |
+| `gate` | object or null | 0.13.0 | Where the finding stands against `run.fail_on`: see [The gate](#the-gate); null exactly when the root `gate` is |
+
+A finding without `libyears_unmeasured` comes from a report that predates the field; its absence
+never means "measured".
+
+### What the run was told
+
+`run` holds what every verdict was decided against. The command writes it on every run.
+
+| Key | Type | Since | Holds |
+|---|---|---|---|
+| `project` | string or null | | What the report calls the project: composer.json's `name`, or `extra.lockrot.project` instead. A display name, not an identifier; null when the manifest has no `name` and `extra.lockrot.project` is unset |
+| `root_package` | string or null | 0.13.0 | The `name` of the manifest Composer reads, exactly as written, whatever `extra.lockrot.project` says: the key to match a report to its repository or to join several projects' reports on |
+| `target_php` | string or null | | The PHP version the verdicts target, from `--target-php`, `config.platform.php` or the running PHP |
+| `project_php` | string or null | 0.13.0 | The manifest's `require.php` exactly as written (`>=8.2`): a constraint, not a version. The second floor S8 holds a higher branch against ([Within reach](verdicts.md#within-reach)); `--explain` writes the same value |
+| `lock_file` | string or null | | The lock's file name, never its path |
+| `fail_on` | string or null | | The `--fail-on` threshold ([ci.md](ci.md)) |
+| `fail_on_kind` | string or null | 0.13.0 | Which kind of threshold `fail_on` is: `none`, `verdict`, `priority` or `unchecked`. An open set; null only where `fail_on` is |
+| `strict_network` | boolean | 0.13.0 | Whether `--strict-network` was on |
+| `mode` | string | 0.13.0 | `check`, or `generate_baseline` for `--generate-baseline`, which records the findings and judges none. An open set |
+| `thresholds` | object or null | | `release-warn-years`, `release-high-years`, `push-warn-years` and `push-high-years` ([keys](configuration.md#extralockrot-keys)) |
+| `flagged_verdicts` | array | | The verdicts this run counted as findings, most severe first |
+
+`root_package` and `project_php` are null when the manifest has no such key, and in a run that read
+a lock without its composer.json.
+
+### The gate
+
+The root `gate` is the decision behind the exit code, taken over the document's own findings by
+what `run` says. It is null only where `run` is null or has no `fail_on`; the command always writes
+both.
+
+| Key | Type | Holds |
+|---|---|---|
+| `fails` | boolean | True: the run exits `1`; false: `0`. A later write error overrides both with `2` ([exit codes](ci.md#exit-codes)) |
+| `tripped_by` | array | Each cause once: `strict_network` (it was on and `network_failures` is true) and `fail_on` (some finding's `gate.fails` is true). Empty exactly when `fails` is false. An open set; the order is not contract |
+| `fail_on_applied` | boolean | True in a `check` run; false in a `generate_baseline` run, which only `--strict-network` can fail |
+
+Each finding's `gate`:
+
+| Key | Type | Holds |
+|---|---|---|
+| `reaches_fail_on` | boolean | Whether the finding is at or above `run.fail_on`, decided in every mode; always false under `none` |
+| `exempt_by` | string or null | `baseline` when the baseline accepted the finding (`baseline.status` is `known`; a `worsened` finding is not exempt); otherwise null. An open set |
+| `fails` | boolean | True exactly when `reaches_fail_on` is true, `exempt_by` is null and the root `fail_on_applied` is true |
+
+### Run notes
+
+`note_details` has one entry per `notes` string, at the same index and with the same `text`. A code
+can repeat, so identify an entry by its index. It is `[]` when `notes` is. The `--explain` document
+carries the same list beside its own `notes`.
+
+| Key | Type | Holds |
+|---|---|---|
+| `code` | string | What the run could not see; the id of its section in [notes.md](notes.md). An open set |
+| `text` | string | The `notes` string: text, not contract |
+| `data` | object | The facts behind the note, typed per `code`; `{}` for a code with none |
+| `docs_url` | string or null | The code's section on lockrot.dev; null means no page. Read it, never build it |
+| `sets_network_failures` | boolean | Whether this note makes the root `network_failures` true |
+
+For a code the schema does not list, show `text`, link `docs_url` when it is a string, ignore
+`data`, and still honour `sets_network_failures`. Key on `note_details`, never on the `notes`
+sentences.
+
+### How a priority was reached
+
+`priority_basis` has `base`, the level the verdict starts at, and `steps`, each `{reason, from, to}`
+in the order applied:
+
+1. `transitive`, or `unreached` when `chain` is empty: exactly when `direct` is false.
+
+2. `dev`: the finding's `dev` is true.
+
+3. `no_fix_expected`: the finding's `no_fix_expected` names an advisory.
+
+How the steps chain:
+
+- A step is recorded whenever its fact holds on a flagged finding, also when it cannot move the
+  level: `from` then equals `to`.
+
+- The first step starts at `base`, each later one where the last ended, and the last ends at
+  `priority`. With no steps, `priority` is `base`.
+
+- An unflagged verdict (`unknown`, `finished`, `ok`) gives `{"base": "none", "steps": []}`.
+
+- `from` and `to` take the priority order without `none`. A step whose `reason` you do not know
+  still reads as a move from one level to another.
+
+What each step does to the level is in [Priority](verdicts.md#priority).
+
+### Advisories with no fix expected
+
+| `no_fix_expected` | Meaning |
+|---|---|
+| absent | A report written before 0.13.0 |
+| `null` | The verdict makes no fix prediction: every verdict but `abandoned`, `silent` and `left-behind` |
+| `[]` | One of those three verdicts, and every advisory is fixed by a release it lets the project reach, or there is none |
+| non-empty | `{id, reason}` per advisory no fix is expected for, in S9's order. They raise the priority ([Priority](verdicts.md#priority)) |
+
+`id` is the `id` of one of the finding's S9 advisories. `reason` is the first that applies, from an
+open set:
+
+| `reason` | When |
+|---|---|
+| `not_on_installed_branch` | The finding is left-behind and the fix is only on a higher branch |
+| `releases_unknown` | S9's `releases_read` is false, so no fix was looked for |
+| `affected_range_unknown` | The advisory gives no affected range |
+| `no_release_fixes` | No listed release above the installed version fixes it |
+
+### Libyears
+
+The root `libyears` block is derived from the findings' `libyears`:
+
+| Key | Type | Holds |
+|---|---|---|
+| `total` | number or null | Sum over the measured findings, two decimals; null when `measured` is 0. It sums the unrounded values, so it can differ from the sum of the findings' printed `libyears` by up to 0.005 per measured finding |
+| `direct_requirements` | number or null | The same sum over `direct: true`; null when `measured` is 0 |
+| `measured` | integer | Findings whose `libyears` is a number |
+| `unmeasured` | object | Findings whose `libyears` is null, counted per reason; every key this release writes is present |
+| `furthest_behind` | object or null | `{package, version, libyears}` of the finding furthest behind; null when nothing measured is behind |
+
+`measured` plus every `unmeasured` value is the number of findings, and counting findings by
+`libyears_unmeasured` gives `unmeasured` key for key. [Libyears](verdicts.md#libyears) defines the
+number and says what it is not.
+
+### Transitive exposure
+
+- `exposure` lists `{package, flagged}` for each direct requirement that pulls in attributable
+  flagged packages, most first, then by name. `flagged` is the count S7 carries on that
+  requirement's finding. A flagged direct requirement that pulls in none is not listed.
+
+- `exposure_rule.max_fan_in` is the most direct requirements a flagged transitive package may be
+  reached from and still count under each. It is what this run used: read it, do not hard-code it.
+
+- `unattributed` lists `{package, verdict, fan_in}` for the flagged transitive packages above that
+  cap, in report order. They count in no `exposure` entry and no S7. `fan_in` is the number of the
+  run's direct requirements that reach the package, `require-dev` included when `include_dev` is
+  true.
+
+- A flagged package no direct requirement reaches (an empty `chain`) is in neither list.
+
+See [Transitive exposure](verdicts.md#transitive-exposure).
+
+### Signal data
+
+Every signal's `data` is typed in `report-1.json` (`S9` in `definitions.s9`), and
+[The signals](verdicts.md#the-signals) says when each fires and what each field holds. This table
+lists only the fields later releases added or changed, with when each appeared and what its null
+means; a field it leaves out is still typed and still written.
+
+| Signal | Field | Since | Holds |
+|---|---|---|---|
+| S5 | `target_major` | 0.11.0 | The first release of the target's major, `8.0` for a target of `8.4` |
+| S5 | `ga_date` | | The GA date of `target_major`; in a report written before 0.11.0, the GA of the target minor |
+| S5 | `written_for_php` | 0.11.0 | The PHP major of the constraint's lower bound; null when it has none (`*`) |
+| S6 | `reason` | 0.13.0 | `branch_snapshot` or `no_stable_release`. An open set |
+| S6 | `has_stable_release` | 0.13.0 | Whether the repository lists a tagged version; null, not false, when lockrot loaded no metadata for the package |
+| S6 | `last_stable_release`, `last_stable_version` | 0.13.0 | The newest dated tagged release and its version |
+| S6 | `last_stable_dated_by` | 0.13.0 | The monorepo parent whose tag dates that release, or null |
+| S6 | `snapshot_time` | 0.13.0 | For `branch_snapshot`, the lock's commit date |
+| S8 | `newest_php` | 0.11.0 | The php requirement of the newest branch's release; null when it requires no PHP |
+| S8 | `newest_within_reach` | 0.11.0 | Whether the project's own `require.php` and the target PHP both admit the newest branch |
+| S8 | `floor_php`, `floor_source` | 0.11.0 | What holds the newest branch back, and which floor that is (`project` or `target`, an open set); both null when it is within reach |
+| S8 | `reachable_branch`, `reachable_version`, `reachable_release` | 0.11.0 | The newest releasing higher branch within reach, the one `suggested_constraint` follows; null when none is |
+| S9 | `releases_read` | 0.13.0 | True when the releases were read and compared with the installed version, so a null `fixed_by` means none fixes it; false with no metadata or an incomparable version ([Security advisories](verdicts.md#security-advisories)) |
+| S10 | `unchecked`, `blocks` | 0.11.0 | Each check that did not run, as `{check, reason, blocks}`, and every signal they blocked ([What was not checked](verdicts.md#what-was-not-checked)) |
+
+### Dates
+
+Dates are RFC 3339 strings (`format: date-time`). S5's `ga_date` and a baseline entry's
+`first_seen` are plain `YYYY-MM-DD`.
+
+### The explanation
+
+The explanation's `finding` has a report finding's fields without `baseline` and `gate`. Its
+`project_php` and `note_details` are the report's. `explain-1.json` types its `lock`, `metadata` and
+`activity`; [Explaining one package](configuration.md#explaining-one-package) says what each shows.
+
+`explain-1.json` does not type a signal's `data`: validate it against the matching
+`definitions.s<N>` of `report-1.json` (`S9` → `definitions.s9`), or read it as the report types it.
+
+| Field | Since |
+|---|---|
+| `metadata.installed_release`, `metadata.installed_release_dated_by` | 0.11.0 |
+| `metadata.branches[].php` | 0.11.0 |
+| `metadata.branches[].admits_target_php`, `admits_project_php`, `php_blocked_by`, `misses_target_php`, `misses_project_php` | 0.13.0 |
+| `project_php`, `note_details` | 0.13.0 |
+
+## Where a package came from
+
+A finding's `origin` says where its lock entry came from. lockrot reads it from the entry and the
+`repositories` of the manifest Composer reads (`COMPOSER=alt.json` means alt.json), without asking
+any repository: the same lock and manifest give the same `origin` on every machine.
+
+| Key | Type | Holds |
+|---|---|---|
+| `kind` | string | How the entry was served; see the next table. An open set |
+| `registry` | string or null | The known host the notification-url reports to, or null; the next table gives it per `kind`. A label: build no URL from it. An open set |
+| `package_url` | string or null | The package's page on `registry`, for a registry that keeps a public page per package name, when the lock's name is a package name; null otherwise. Link it only when it is a string; never build one |
+| `local` | boolean | Whether Composer installed the package from the machine it ran on: a `path` or `artifact` repository, or a dist or source that is a path or a `file://` URL, such as a VCS checkout on the disk |
+
+| `kind` | The lock entry | `registry` | `from_composer_repository` |
+|---|---|---|---|
+| `packagist` | Its notification-url reports to packagist.org: packagist.org itself, or a mirror that keeps packagist.org's notify URL | `packagist.org` | true |
+| `composer` | Its notification-url reports to a host other than packagist.org | A known host, or null for a host lockrot does not know | true |
+| `path` | Its dist is a local directory, from a `path` repository | null | false |
+| `vcs` | Its source is a VCS repository the manifest lists | null | false |
+| `artifact` | Its dist is an archive inside an `artifact` repository the manifest lists | null | false |
+| `package` | An inline `package` definition in the manifest gives exactly this entry | null | false |
+| `unknown` | None of these could be decided (see below) | null | false |
+
+An entry is `unknown` when it is one of these:
+
+- an entry with no notification-url that no `path`, `vcs`, `artifact` or `package` repository
+  accounts for, such as one from a `type: composer` repository that advertises no notify URL (a
+  Satis build without `notify-batch`; see [Which repository answers](internals.md#two-passes));
+
+- a name a repository listed earlier could also have served;
+
+- an entry from a VCS repository renamed or removed since the lock was written: lockrot reads the
+  manifest as it is at the time of the run;
+
+- any entry of a run without composer.json.
+
+Read a kind you do not know by `from_composer_repository`, show it as written and link nothing.
+
+- **`from_composer_repository`** is true when the lock entry carries a `notification-url`. True
+  does not mean packagist.org. lockrot asks a repository for metadata, advisories and repository
+  activity only about such an entry, so a false one has no metadata, advisories, activity or
+  libyears. `--explain` writes it as `lock.from_composer_repository`, and the root
+  `not_from_composer_repository` counts the false ones.
+
+- **`registry`** takes its values from the schema's `x-known-values`, the hosts this release knows. Of
+  `packagist.org`, `repo.packagist.com`, `wp-packages.org` and `packages.drupal.org`, only
+  packagist.org and wp-packages.org get a `package_url`: Private Packagist keeps no public pages,
+  and a drupal.org project page does not follow from the package name.
+
+- **`package_url`** is the page the registry keeps for that name. Whether this run's repositories
+  still list the package is the finding's `note`.
+
+- **`replacement_url`** is the page packagist.org keeps for an abandoned finding's `replacement`.
+  It is a string only when the registry that named the replacement is packagist.org. That registry
+  is the one whose metadata marked the package abandoned or, with no metadata, the one the lock
+  entry came from. Otherwise it is null. lockrot does not check that the page exists: link it only
+  when it is a string, and never build one from `replacement`.
+
+- **`local`** says nothing about where. An explanation's `lock.repository` shows such a path by its
+  last segment (`.../lib`). A path dist is local whichever notification-url the entry carries.
+
+### What a report says about your repositories
+
+`origin` copies nothing from the entry's URLs or the manifest's. It writes a kind, a registry from
+lockrot's own list and a URL built from that list. It never writes:
+
+- the notification-url, which can carry a login and a password;
+
+- a dist, which for an `artifact` repository is a path on the machine that wrote the lock;
+
+- a mirror URL, which for Private Packagist names the organisation.
+
+A private registry is `kind: composer` with `registry: null`: its host is not written.
+`repo.packagist.com` says that the project uses Private Packagist, never which organisation.
+
+Other parts of a report can name a private registry or a repository host, and `origin` does not
+change them:
+
+- a run note about a Composer repository lockrot could not read (`advisories_unavailable`,
+  `metadata_unavailable`, `monorepo_parent_unavailable`): its `text`, its `notes` entry, and a
+  `message` or `composer_repository` in its `data`;
+
+- a finding's `note` and `evidence` when its metadata did not come;
+
+- the hosts and repositories in S3, S4 and the repository activity notes;
+
+- on the HTML page, each package's `details` (`lock.repository`, `metadata.repository`,
+  `repository_link`, `activity`).
+
+None of them carries a credential or a local path. Hosts and URL paths stay visible, and name a
+private repository as plainly as its host does.
+
+lockrot redacts what it quotes:
+
+- A URL loses its userinfo, query and fragment, whatever Composer masked of it.
+
+- A repository without a scheme loses its user (`git.example.com:lib.git`).
+
+- A `file://` URL and every other path of the machine keep their last segment alone (`.../ca.pem`),
+  and a home directory is `...` alone.
+
+- A value starting `...` is a redacted local path. When `lock.repository` is one, the finding's
+  `origin.local` is true.
+
+- A message lockrot cannot read whole is replaced by
+  `(withheld: lockrot could not redact this message)`.
+
+- `baseline.path` is relative to the project directory, or the file name alone; `run.lock_file` is
+  the lock's name alone.
+
+The one absolute path a report carries is SARIF's `%SRCROOT%` ([ci.md](ci.md#-formatsarif)).
+
+To remove the registry label from `origin`, and only from `origin`, clear both keys. The document
+stays valid, since both may be null:
 
 ```bash
-composer lockrot --target-php=8.4 --format=json > lockrot.json
+jq '.findings |= map(if .origin then .origin.registry = null | .origin.package_url = null else . end)' lockrot.json > lockrot.public.json
+```
+
+## Validating in CI
+
+Any draft-04 validator works. With [check-jsonschema](https://check-jsonschema.readthedocs.io/):
+
+```bash
+composer lockrot --target-php=8.4 --format=json > lockrot.json || test $? -eq 1
 check-jsonschema --schemafile https://lockrot.dev/schema/report-1.json lockrot.json
 ```
 
-Or with the schema pinned next to the workflow, so the check does not depend on lockrot.dev being
-up — refresh the copy when you upgrade lockrot, to get new fields listed and a new signal's `data`
-typed; a copy from before 0.13.0 also rejects a new signal id, S10 reason or format (see
-[Open sets](#open-sets)):
+`|| test $? -eq 1` lets the check run when findings fail the run (exit `1`). On an error (exit `2`)
+it fails the step when the shell stops on a failing command (`set -e`); add `set -e` where your CI
+does not set it. See [exit codes](ci.md#exit-codes).
+
+To keep the check independent of lockrot.dev, pin the schema next to the workflow. Refresh the copy
+when you upgrade lockrot, so new fields are listed and a new signal's `data` is typed:
 
 ```bash
 curl -fsSL -o ci/lockrot-report.schema.json https://lockrot.dev/schema/report-1.json
 check-jsonschema --schemafile ci/lockrot-report.schema.json lockrot.json
 ```
 
-[Ajv](https://ajv.js.org/) needs three things for these files: `ajv-draft-04` for the dialect,
-`ajv-formats` for `date-time`, and a word about `x-known-values`, since its default strict mode
-refuses a keyword it does not know. Declare it — `ajv.addKeyword({keyword: "x-known-values",
-schemaType: "array"})` — or turn strict mode off with `strict: false`.
+[Ajv](https://ajv.js.org/) needs three things for these files:
 
-lockrot's own test suite validates every document its formatters write against these files, with a
-strict copy that rejects any field the schema does not list and any value outside `x-known-values`,
-and the JSON samples in these docs too — so the published schema, the code and the docs cannot drift
-apart.
+- `ajv-draft-04`, for the dialect;
 
-It also holds the current files to the older ones, in the backward direction: whatever an older
-lockrot wrote keeps validating against the newest schema of the same number. Every schema a release
-from 0.9.0 on published is kept, and a change that would make a field required, lose a type, an
-enum value or a value from `x-known-values`, tighten a bound, stop listing a field or close an object
-fails the build against each of them. The baseline files, reports and explanations 0.9.0, 0.10.0
-and 0.11.0 wrote, recorded from their signed PHARs and never edited, are validated against the
-current files in the same two ways.
-A document a newer lockrot writes, checked against a copy of the schema an older release published,
-is not what these checks test.
+- `ajv-formats`, for `date-time`;
 
-## What the report schema types
-
-Beyond the field list [ci.md](ci.md#-formatjson) gives, the report schema pins down the parts a
-consumer usually keys on:
-
-- `verdict`, `priority` and a signal's `level` are enums — the nine verdicts, five priorities and
-  three levels from [verdicts.md](verdicts.md).
-- `counts` and `priorities` always carry every key, zero included; `abandoned` splits that count
-  into `total` and `with_replacement`, and an abandoned finding's `replacement` is a package name or
-  null, with `replacement_url` its page on packagist.org when packagist.org named it, else null (see
-  [verdicts.md](verdicts.md#abandoned-and-where-to)). Link it only when it is a string.
-- `run` says what the report is about and what it was decided against — what the project is called
-  (composer.json's own `name`, or `extra.lockrot.project` instead; a display name, not an
-  identifier, because a monorepo package or a private project is routinely called something that is
-  not a `vendor/name`), the target PHP, the thresholds, the `fail-on`, the name of the lock — plus
-  `flagged_verdicts`, the verdicts this run counted as findings. It is
-  optional in the schema so that documents written before 0.10.0 still validate, and null only
-  where nothing filled it in.
-- `run.root_package` is what Composer calls the project: the `name` of the manifest it reads,
-  exactly as written, whatever `extra.lockrot.project` says — the key to match a report to its
-  repository or to join several projects' reports on, where `project` is only a label. Null where
-  the manifest has no `name`, or where the run read a lock without its composer.json.
-- `run.project_php` is the project's own `require.php`, exactly as that same manifest writes it
-  (`>=8.2`, `^7.4 || ^8.0`): a constraint, not a version. It is the second floor S8 holds a higher
-  branch against, beside `target_php` (see [verdicts.md](verdicts.md#within-reach)), and the same
-  value `--explain` writes as `project_php`. Null where the manifest has no `require.php`, or where
-  the run read a lock without its composer.json.
-- `run.fail_on_kind` says which kind of threshold `fail_on` is — `none`, `verdict`, `priority` or
-  `unchecked` — so a reader need not know which words are verdicts and which are priorities; null
-  only where `fail_on` is. `run.strict_network` says whether `--strict-network` was on, and
-  `run.mode` what the run was asked to do: `check`, or `generate_baseline` for
-  `--generate-baseline`, which records the findings and judges none. `fail_on_kind` and `mode` are
-  open strings.
-- `root_package`, `project_php`, `fail_on_kind`, `strict_network` and `mode` are the keys in `run`
-  a document may omit, because reports written before 0.13.0 do not carry them; from 0.13.0 on
-  lockrot always writes all five.
-- `gate`, from 0.13.0, is the decision behind the exit code, taken over the document's own findings
-  by what `run` says: `fails`, `tripped_by` and `fail_on_applied`. `fails` true means the run exits
-  `1`, unless it then fails to write a file or the baseline, in which case it exits `2` and says so
-  on stderr. `tripped_by` lists each cause once, `strict_network` (it was on and a lookup failed)
-  and `fail_on` (a finding fails), both when both hold, and is empty exactly when `fails` is false;
-  it is an open set, and its order is not contract. `fail_on_applied` is false in a
-  `generate_baseline` run, which only `--strict-network` can fail. Null where `run` is null or
-  carries no `fail_on`, which outside a test is nowhere.
-- Each finding carries `gate` beside `baseline`, from 0.13.0: `reaches_fail_on` (at or above
-  `run.fail_on`, decided in every mode), `exempt_by` (`baseline` when the baseline accepted a finding
-  that reaches, as `known`; a `worsened` one is not exempt; otherwise null; an open set) and `fails`,
-  which is exactly `reaches_fail_on`, no exemption and the root `fail_on_applied`; the root's
-  `tripped_by` holds `fail_on` exactly when some finding's `fails` is true. Both `gate` keys are
-  optional in the schema, so documents written before 0.13.0 validate. See
-  [ci.md](ci.md#exit-codes).
-- `note_details`, from 0.13.0, is the run's notes typed: one entry per `notes` string, at the same
-  index and with the same `text`, each with a `code`, a `data` object typed per code (`{}` for a code
-  with no parameters), a `docs_url` to the code's section of [notes.md](notes.md) (null means no
-  page), and `sets_network_failures`. The root `network_failures` is true exactly when an entry's
-  `sets_network_failures` is. A code can repeat, so an entry is identified by its index. It is
-  optional in the schema, so documents written before 0.13.0 validate; from 0.13.0 on it is always
-  written, `[]` when `notes` is. The `--explain` document carries the same list beside its `notes`.
-  `notes` is unchanged: key on `note_details`, not on the sentences.
-- Each finding carries `baseline`, where it stands against the baseline file (`known`, `new` or
-  `worsened`, with the verdict the baseline accepted), or null when the run read none. The report's
-  own `baseline` block still carries the totals; this is the same judgement per finding, which is
-  what a reader filtering for what is new actually needs.
-- Each finding carries `from_composer_repository`, true when its lock entry has a Composer
-  `notification-url`. Composer writes one only for a package served by a `type: composer`
-  repository that advertises a notify URL (`notify-batch` or `notify` in its packages.json), as
-  packagist.org and Private Packagist do, and lockrot asks a repository for metadata, advisories and
-  repository activity only about such an entry. False is a `path`, `vcs`, `artifact` or inline
-  `package` entry, and also a package from a `type: composer` repository that advertises no notify
-  URL (asset-packagist.org, a Satis build without `notify-batch`): nothing was asked, so the
-  finding has no metadata, advisories, activity or libyears. True does not mean packagist.org. The
-  value is the one `--explain` writes as `lock.from_composer_repository`, and the findings where it
-  is false are the ones the root `not_from_composer_repository` counts. Added in 0.13.0, optional in
-  the schema so earlier documents validate; from 0.13.0 on every finding carries it, true or false,
-  never null. It stays a boolean in 1.x: the finer account of where an entry came from is
-  `origin`, below, and this key is true exactly when `origin.kind` is `packagist` or `composer`.
-- Each finding carries `origin`, from 0.13.0: where its lock entry came from. See
-  [Where a package came from](#where-a-package-came-from).
-- A finding can carry `S10`, the signal that says a check did not run: its `data` names each
-  missing check, why, and the signals it blocked. Added in 0.11.0; documents written before it
-  simply have no such signal, and the id is part of the same schema number.
-- S6's `data` says why it fired and whether the package has ever released: `reason`
-  (`branch_snapshot` or `no_stable_release`; an open string, so a later reason validates too),
-  `has_stable_release` (null, not false, when lockrot loaded no repository metadata for the
-  package), `last_stable_release`, `last_stable_version` and `last_stable_dated_by` (the newest
-  dated tagged release and the monorepo that dated it, if one did), and `snapshot_time`, the lock's
-  commit date for a snapshot. Added in 0.13.0 under the same schema number and optional in the
-  schema, so reports written before it still validate. See
-  [verdicts.md](verdicts.md#the-signals) for when each is null.
-- Each finding carries `libyears` — years behind the package's newest stable release, at least 0,
-  or null when not measured — and the document a `libyears` block derived from them: `total`,
-  `direct_requirements` (both null when `measured` is 0, since nothing could be measured), `measured`,
-  `unmeasured` (four reasons, every key present) and `furthest_behind`. Added in 0.11.0 under the same schema number, and optional in the schema like
-  `run`, so reports written before 0.11.0 still validate; a document from 0.11.0 on always carries
-  both. See [verdicts.md](verdicts.md#libyears) for the definition and what the number is not.
-- From 0.13.0 each finding also carries `libyears_unmeasured`: null when `libyears` is a number, 0
-  included, and otherwise the `unmeasured` key the finding is counted under, so counting findings by
-  it gives that block key for key. It is an open string, optional in the schema so earlier reports
-  validate, and always present from 0.13.0 on; a document without it predates the field, and its
-  absence never means "measured". The `unmeasured` block's keys grow the same way: a key a later
-  release adds is typed as a count and never joins `required`.
-- From 0.13.0 each finding carries `priority_basis`, how its `priority` was reached: `base`, the
-  level the verdict starts at (`none` for `unknown`, `finished` and `ok`), and `steps`, each
-  `{reason, from, to}` in the order applied — `transitive`, or `unreached` when `chain` is empty,
-  exactly when `direct` is false; then `dev`; then `no_fix_expected`. A step is recorded whenever
-  its fact holds, also when it cannot move the level (`from` equals `to`: a development package
-  already at `low`, a raise at `critical`). The first step starts at `base`, each later one where
-  the last ended, and the last ends at `priority`; with no steps `priority` is `base`. `from` and
-  `to` are the priority order without `none`, and a step's `reason` is an open string, so a step a
-  later release adds still reads as a move from one level to another. See
-  [verdicts.md](verdicts.md#priority).
-- From 0.13.0 each finding also carries `no_fix_expected`, the advisories lockrot expects no fix
-  for, each `{id, reason}` in S9's order. It has four states: absent, a document written before
-  0.13.0; null, the verdict makes no fix prediction (every verdict but `abandoned`, `silent` and
-  `left-behind`); `[]`, one of those three with every advisory fixed by a release it lets the project
-  reach, or no advisory at all; and a non-empty list, the advisories that raise the priority and put
-  `no fix expected` in the evidence. `id` is the `id` of one of the finding's S9 rows. `reason` is
-  the first that applies, an open string: `not_on_installed_branch` (left-behind, fixed only on a
-  higher branch), `releases_unknown` (S9's `releases_read` is false, so no fix was looked for),
-  `affected_range_unknown` (the advisory gives no affected range) or `no_release_fixes`. S9's `data`
-  gains `releases_read`: true when the releases were read and the installed version compared with
-  them, so a null `fixed_by` means none fixes it; false when there was no metadata or the installed
-  version is not one lockrot can compare. Both are optional in the schema, so earlier documents
-  validate. See [verdicts.md](verdicts.md#security-advisories).
-- `exposure` lists a direct requirement only when it pulls in an attributable flagged package; a
-  flagged direct requirement that pulls in none is not there, and its own verdict is on its finding.
-  `exposure_rule` states the cap the report attributes by (`max_fan_in`, the most direct
-  requirements a flagged transitive package may be reached from and still count under each), and
-  `unattributed` lists the flagged transitive packages above it — `package`, `verdict` (the same
-  enum) and `fan_in`, the number of the run's direct requirements that reach it, `require-dev`
-  included under `--dev` — in report order: they count in no `exposure` entry and no S7. A flagged
-  package no direct requirement reaches (an empty `chain`, as in a run without `composer.json`) is
-  in neither. Added in 0.13.0 and optional in the schema like `run`, so documents written before
-  0.13.0 still validate; a document from 0.13.0 on always carries both. See
-  [verdicts.md](verdicts.md#transitive-exposure).
-- Each signal's `data` is typed per signal id (`S1` … `S10`): a signal claiming `S2` with `S4`'s
-  fields does not validate. A signal whose id the schema does not list carries any object (see
-  [Open sets](#open-sets)).
-- Dates are RFC 3339 strings (`format: date-time`); `ga_date` in S5 and `first_seen` in the
-  baseline are plain `YYYY-MM-DD`.
-
-## Where a package came from
-
-A finding's `origin` says where its lock entry came from, as lockrot tells it from the entry itself
-and the `repositories` of the manifest Composer reads (`COMPOSER=alt.json` means alt.json), without
-asking any repository: the same lock and manifest give the same `origin` on every machine. It has
-four keys, always written from 0.13.0 on, and is optional in the schema so earlier documents
-validate:
-
-- `kind`, an open string:
-    - `packagist`: the entry's notification-url reports to packagist.org — packagist.org itself, or
-      a mirror that keeps packagist.org's notify URL.
-    - `composer`: its notification-url reports to any other host — Private Packagist, WP Packages,
-      Drupal, a Satis with a notify URL, a registry lockrot does not know, or a package definition
-      that declares one itself.
-    - `path`: its dist is a local directory, from a `path` repository.
-    - `vcs`: its source is a VCS repository the manifest lists.
-    - `artifact`: its dist is an archive inside an `artifact` repository the manifest lists.
-    - `package`: an inline `package` definition in the manifest gives exactly this entry.
-    - `unknown`: none of these could be decided — a `type: composer` repository that advertises no
-      notify URL (asset-packagist.org, a Satis without one, some packagist mirrors), a repository
-      listed before the matching one that could have served the name, a VCS repository renamed or
-      removed since, or a run without composer.json.
-
-    `from_composer_repository` is true exactly for `packagist` and `composer`, and the root
-    `not_from_composer_repository` counts the rest. A kind you do not know: read it by
-    `from_composer_repository`, show it as written, link nothing.
-
-- `registry`, the Composer repository the entry came from, named by the host its notification-url
-  reports to, when lockrot knows it: `packagist.org`, `repo.packagist.com` (Private Packagist),
-  `wp-packages.org` or `packages.drupal.org`. It is `packagist.org` exactly when `kind` is
-  `packagist`, and null for every other kind and for a Composer repository lockrot does not know.
-  A label, never a template: build no URL from it.
-
-- `package_url`, the package's page on `registry`, written by lockrot for a registry that keeps a
-  public page per package name — packagist.org and wp-packages.org — from the name in the lock, and
-  only when that is a Composer package name. Null otherwise: Private Packagist has no public pages,
-  and a drupal.org project page is not a function of the package's name. Link it only when it is a
-  string, and never build one yourself. It is the page the registry keeps for that name; whether
-  this run's repositories still list the package is the finding's `note`.
-
-- `local`, true when Composer installed the package from the machine it ran on rather than from a
-  server: a `path` or `artifact` repository, or a dist or source that is a path or a `file://` URL,
-  such as a VCS repository checked out on the disk (`kind: vcs`). It says nothing about where: an
-  explanation's `lock.repository` shows such a path by its last segment alone (`.../lib`). A path
-  dist is local whichever registry's notification-url the entry carries.
-
-lockrot reads the manifest as it is at the time of the run. A lock written against repositories
-that have changed since can read as `unknown`.
-
-### What a report says about your repositories
-
-`origin` copies nothing from the entry's URLs or the manifest's: not the notification-url, which
-can carry a login and a password; not a dist, which for an `artifact` repository is a path on the
-machine that wrote the lock; not a mirror URL, which for Private Packagist names the organisation.
-It writes a kind, a registry from lockrot's own list and a URL built from that list. A private
-registry is `kind: composer` with `registry: null`: its host is not written, because a host once
-published cannot be withdrawn, while lockrot can learn to name more registries later.
-`repo.packagist.com` says that the project uses Private Packagist, never which organisation.
-
-To publish a report without even that, clear the two:
-
-```bash
-jq '.findings |= map(if .origin then .origin.registry = null | .origin.package_url = null else . end)' lockrot.json > lockrot.public.json
-```
-
-The document stays valid: both keys may be null. Other parts of a report can name a private
-registry or a repository host, and `origin` does not change them: a run note about a Composer
-repository it could not read (`advisories_unavailable`, `metadata_unavailable`,
-`monorepo_parent_unavailable`: the note's `text` and `notes` entry, and a `message` or
-`composer_repository` in its `data`), a finding's `note` and `evidence` when its metadata did not
-come, the hosts and repositories in S3, S4 and the repository activity notes, and, on the HTML page,
-each package's `details` (`lock.repository`, `metadata.repository`, `repository_link`, `activity`).
-
-None of them carries a credential or a path of the machine; hosts and the paths of URLs on them stay
-visible, and name a private repository as plainly as its host does. Every URL they quote is written
-without its userinfo, query and fragment, whatever Composer masked of it, and a `file://` URL and
-every other path of the machine keep their last segment alone (`.../ca.pem`); a message lockrot
-cannot read whole is replaced by `(withheld: lockrot could not redact this message)`. A repository
-without a scheme loses its user (`git.example.com:lib.git`), and `lock.repository` and
-`metadata.repository` show a checkout on the machine by its last segment (`.../lib`), a home
-directory as `...` alone; a value starting `...` is always such a path, and the finding's
-`origin.local` is true for it. `baseline.path` is relative to the
-project directory, or the file name alone, the way `run.lock_file` names the lock. The one absolute
-path a report carries is SARIF's `%SRCROOT%` ([ci.md](ci.md#-formatsarif)).
+- `x-known-values` declared, since strict mode refuses a keyword it does not know:
+  `ajv.addKeyword({keyword: "x-known-values", schemaType: "array"})`, or `strict: false`.
 
 ## Related
 
-- [ci.md](ci.md) — the seven output formats
-- [baseline.md](baseline.md) — the baseline file
-- [configuration.md](configuration.md) — `extra.lockrot`
-- [compatibility.md](compatibility.md) — what 1.0 freezes beyond the schemas (draft)
+- [ci.md](ci.md) — every output format, and what each exit code means
+- [verdicts.md](verdicts.md) — what the verdicts, signals and priorities in a report mean
+- [notes.md](notes.md) — each run note code, its `data` and what to do about it
+- [baseline.md](baseline.md) — writing and updating the file `baseline-1.json` describes
+- [configuration.md](configuration.md) — the `extra.lockrot` keys `config-1.json` types, and `--explain`
+- [compatibility.md](compatibility.md) — what 1.0 freezes beyond the schemas
+- [changelog](changelog.md) — the release each schema change shipped in

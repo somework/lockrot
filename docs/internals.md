@@ -1,115 +1,199 @@
 ---
-title: How lockrot fetches metadata — Composer repositories, APIs
-description: lockrot reads the Composer repositories you configured, Private Packagist and Satis included, plus the GitHub, GitLab and Bitbucket APIs, cached for 24 h.
+title: Data sources — repositories, host APIs, credentials and cache
+description: What lockrot asks your Composer repositories and the GitHub, GitLab and Bitbucket APIs, which credentials go where, the anonymous caps, and the 24-hour cache.
 ---
 
-# How lockrot fetches metadata
+# Where lockrot's data comes from {#how-lockrot-fetches-metadata}
 
-You do not have to configure anything for this. lockrot reads the repositories already configured in
-the project's `composer.json`, through Composer's own repository layer, so Private Packagist, Satis
-instances and mirrors are honoured the same way Packagist is, along with Composer's own
-authentication and proxy settings. A repository is asked about a package only when it advertises a
-notify URL, which is what gives the lock entry its `notification-url`: a Satis build needs
-`notify-batch` set, or its packages read as not from a Composer repository
-(`from_composer_repository` false in the report).
+lockrot asks two sources about each package: the Composer repositories `composer.json` configures,
+and the API of the code host its source lives on. Credentials for GitHub or Bitbucket lift the
+anonymous cap. For a missing or wrong date, start at
+[When a date is missing or wrong](#when-a-date-is-missing-or-wrong).
 
-This page explains what that means for freshness, memory and the "Data as of" line.
+| Source | What lockrot asks | Credentials | Without credentials | Cache |
+|---|---|---|---|---|
+| Composer repositories: Packagist, Private Packagist, Satis, mirrors | Metadata: abandoned flag, versions, release dates (S1, S2, S6, S8); the releases S9 looks in for a fix; advisories on the installed version (S9) | Composer's own, from `auth.json` or `COMPOSER_AUTH` | What the repository serves anonymously | Composer's |
+| GitHub, `api.github.com` | Archived flag (S3), last push to any branch (S4) | `LOCKROT_GITHUB_TOKEN`, else `GITHUB_TOKEN`, else Composer's `github-oauth`; Composer's `http-basic` for github.com counts too | Candidates only, at most 50 repositories a run | lockrot's, 24 h |
+| GitLab: gitlab.com and every host in Composer's `gitlab-domains` | Newest commit on any branch (S4); archived flag (S3) with credentials only | `LOCKROT_GITLAB_TOKEN`, else `GITLAB_TOKEN`, for gitlab.com only; Composer's `gitlab-token` or `gitlab-oauth` for any GitLab host | Every package, but the archived flag is hidden, so S3 cannot fire | lockrot's, 24 h |
+| Bitbucket Cloud, `api.bitbucket.org` | Newest commit on any branch (S4); Bitbucket has no archived state | Composer's `http-basic` (an Atlassian API token), `bearer` or `bitbucket-oauth` | Candidates only, at most 50 repositories a run | lockrot's, 24 h |
 
-## Two sources, two clocks
+S5 reads the lock entry (its `time` and `require.php`) and asks no source.
 
-| Source | What it provides | Freshness |
-|---|---|---|
-| The configured Composer repositories | The abandoned flag (S1), release dates and versions (S2, S5, S6, S8, and the releases S9 looks for a fix in). A release date is what the repository says it is — Packagist dates a tag by its commit, and a tag it has no date for is read as "age unknown", so a branch or package whose highest tag is undated gets no S8 or S2, unless a monorepo that `replace`s it dates the same branch (one extra request, only for a lock holding a package `resources/monorepo-parents.json` lists that monorepo as carrying) | Revalidated on every run |
-| The same repositories, through Composer's advisory API | Security advisories on the installed version (S9); Packagist answers one request for the whole lock | Packagist's answer is fetched on every run; a repository carrying advisories in its package files answers from Composer's metadata cache; Composer 2.4+ only |
-| GitHub, GitLab, Bitbucket | The last push or commit (S4); the archived state (S3) on GitHub, and on GitLab with credentials | 24-hour cache |
+A candidate is a package whose release age already raises S2 and that its repository does not mark
+abandoned. A package the cap skips carries S10 ([What was not checked](verdicts.md#what-was-not-checked)),
+and the run notes count the skipped packages per host
+([Anonymous cap](notes.md#repository_activity_anonymous_cap)).
 
-Composer's metadata cache is reused and revalidated (`If-Modified-Since`) on every run, which is why
-the repository side of "Data as of" tracks the run itself. Repository-activity data keeps the
-timestamp of its own 24-hour cache and can lag behind — by up to a day on a fresh hit, by more when
-a refetch failed and lockrot fell back to the stale entry, or under `--offline`, which serves the cache
-however old it is. When any of it did, the report says so: the footer's source clause becomes
-`repository activity from lockrot's cache, up to 23 h old` (the oldest cached answer, in whole hours
-rounded up; `1 h` is the floor, so a minutes-old hit reads as an hour too), and `--format=json`
-carries that answer's fetch time as `activity_cache_oldest_at`, null when everything was fetched in
-this run.
+The cap exists because GitHub and Bitbucket publish a limit of about 60 anonymous requests an
+hour. GitLab publishes 500 a minute, so it is not capped.
 
-"Data as of" in the report footer is the date the report was generated, in UTC.
-
-## Two passes
-
-Metadata is fetched in two passes — tagged releases first, then the `~dev` branch file only for
-packages with no tagged release at all. That roughly halves the number of requests on a cold cache.
-
-## Memory and the p2 protocol
-
-Only repositories that publish a `metadata-url` — the Composer v2 "p2" protocol — are read one
-package file at a time, which is what keeps memory flat on a large lock file.
-
-A repository without one — a Composer v1-style or static repository, including `packages.json`-only
-Satis output — is loaded whole by Composer before any name can be looked up, so its full package list
-is held in memory for the run.
-
-## Caching
-
-Repository metadata is cached and revalidated by Composer itself, under Composer's own cache
-directory. lockrot adds no cache of its own for it, and there is no `--refresh` or `cache-ttl` knob to
-bypass or resize it.
-
-Repository-activity responses — GitHub, GitLab and Bitbucket alike — are cached separately under
-Composer's cache directory, in a `lockrot/` subfolder, with a fixed 24-hour TTL. When Composer's
-cache is disabled (`composer --no-cache`), they are kept in memory for the run only and nothing is
-written to disk.
-
-## Working offline
-
-`--offline` sets `COMPOSER_DISABLE_NETWORK=1` and rebuilds the configured repositories behind it. In
-plugin mode Composer has already built its own, network-enabled repositories before any command runs,
-so rebuilding them is what actually makes the flag effective. Repository metadata is then served from
-Composer's own cache and repository activity from lockrot's cache.
-
-A package missing from the cache is reported as unavailable, not as absent from the repository. With
-`--strict-network` that becomes exit `1`; see [ci.md](ci.md).
+Every request, to a repository or a host, goes through Composer's HTTP layer, so Composer's proxy
+and TLS settings apply to both.
 
 ## Repository hosts and credentials
 
-The package's repository decides which host is asked — the `source` URL of its highest stable
-release, else that release's `support.source` (a `…/tree/<ref>` or `…/src/<ref>` page address is
-reduced to the repository), else the lock entry's `source` or `support.source`; an older release's
-`source` is never substituted, so a package whose highest stable release names no repository gets
-no activity check at all. The host is `github.com`, `bitbucket.org`, or a GitLab instance —
-`gitlab.com` and every entry of Composer's own `gitlab-domains` setting, so a self-hosted GitLab
-the project already installs from needs no lockrot configuration of its own. GitHub
-Enterprise (`github-domains`) and Bitbucket Server are not queried.
+### Which host is asked {#which-repository}
 
-| Host | What is read | Anonymously | With credentials |
+lockrot reads the host from the first of these URLs that is set:
+
+1. the `source` URL of the package's highest stable release, in the repository metadata;
+2. that release's `support.source`, with a `/tree/<ref>`, `/-/tree/<ref>` or `/src/<ref>` page
+   suffix cut off;
+3. the lock entry's `source` URL, then its `support.source`.
+
+An older release's URL is never used. No host is asked about a package that:
+
+- has no such URL, or one that names none of github.com, bitbucket.org or a host in
+  `gitlab-domains`, so GitHub Enterprise (`github-domains`) and Bitbucket Server are not queried;
+- is allowlisted;
+- is not from a Composer repository.
+
+Such a package gets no S3, S4 or S10.
+
+### What is sent
+
+One set of requests per repository, however many packages share it. Each request carries
+`User-Agent: lockrot`.
+
+| Host | Requests | lockrot's own credential header |
+|---|---|---|
+| GitHub | `GET https://api.github.com/repos/{owner}/{repo}` | `Authorization: token …` |
+| GitLab | `GET https://{host}/api/v4/projects/{path}/repository/commits?all=true&per_page=1`; with credentials, also `GET https://{host}/api/v4/projects/{path}`. `{path}` is the project path URL-encoded as one segment, e.g. `group%2Fproject` | `PRIVATE-TOKEN: …`, to gitlab.com only |
+| Bitbucket | `GET https://api.bitbucket.org/2.0/repositories/{workspace}/{slug}/commits?pagelen=1` | None: Composer's credentials only |
+
+### Which credentials
+
+The token variables and their order are in the table above and in
+[Environment overrides](configuration.md#environment-overrides).
+
+- A host counts as authenticated, with no cap, when lockrot has a token for it or Composer holds
+  credentials for it (in `auth.json`, `COMPOSER_AUTH`, or what a CI setup step writes there). On
+  GitLab, credentials also unlock the archived flag.
+
+- When both exist, only Composer's header is sent. Hosts reject a request that carries two
+  credential headers.
+
+- Exception: when Composer's entry for the host is a client certificate, or custom headers that
+  carry no credential header, lockrot's own header is sent as well.
+
+- A `bitbucket-oauth` consumer is exchanged for a bearer token, once per run, the first time a
+  Bitbucket repository is asked about: a `client_credentials` request to
+  `https://bitbucket.org/site/oauth2/access_token`. Nothing is written to `auth.json`. When the
+  exchange fails, `-v` prints why, the run counts as anonymous on Bitbucket, and the refused
+  requests appear in the [Unreachable](notes.md#repository_activity_unreachable) note.
+
+`self-update` sends the same GitHub token to GitHub's release API
+([Keeping it updated](phar.md#keeping-it-updated)).
+
+## Which Composer repository answers {#two-passes}
+
+- lockrot looks up only lock entries that carry a `notification-url`, which Composer records for a
+  package from a Composer repository. A Satis build without
+  [`notify-batch`](https://getcomposer.org/doc/articles/handling-private-packages.md#other-options) gives its packages none, so
+  they read as not from a Composer repository (`from_composer_repository` false,
+  [note](notes.md#not_from_composer_repository)).
+
+- Composer repositories are asked in Composer's lookup order, and the first that lists a package
+  answers for it. A repository that fails or does not list the package passes it on to the next.
+
+- Each repository is asked for tagged releases first. A package's `~dev` branch file is fetched
+  only when it has no tagged release.
+
+- Dating a split package by its monorepo can cost one more request
+  ([Dates from the monorepo](verdicts.md#dates-from-the-monorepo)).
+
+- Advisories come from every repository that publishes them, not only the first
+  ([Advisories not checked](notes.md#advisories_not_checked)). A repository
+  with an advisory API, such as Packagist, receives the package names being checked, not their
+  versions. How advisories are matched and ignored is in
+  [Security advisories](verdicts.md#security-advisories).
+
+## Caching
+
+| Data | Where | How long | When it is refetched |
 |---|---|---|---|
-| GitHub | `archived`; the last push to any branch | 60 requests an hour, so only packages that already look stale on release age — no stable release within `release-warn-years` (default 3y), not already `abandoned` — are checked, capped at 50 per host per run | Everything |
-| GitLab | The newest commit on any branch; `archived` from the project document | 500 requests a minute: every package is checked, but the API hides `archived` from anonymous callers, so a package can be `silent` and is never `abandoned` for being archived | Everything, `archived` included |
-| Bitbucket Cloud | The newest commit on any branch; there is no archived state | 60 requests an hour: candidates only, capped at 50 per host per run, like GitHub | Everything |
+| Repository metadata | Composer's cache | Revalidated each run (`If-Modified-Since`) | Every run |
+| Advisories from an advisory API, such as Packagist's | Not cached | None | Every run |
+| Advisories a repository carries in its package files | Composer's cache, inside the metadata | Revalidated with the metadata | Every run |
+| Repository activity | `lockrot/` under Composer's `cache-dir` | 24 hours, fixed | When the answer is 24 hours old. A failed refetch keeps the older answer; `--offline` never refetches |
 
-lockrot reports how many packages a cap affected. GitLab's `last_activity_at` is deliberately not
-what S4 reads: it moves on stars, forks and issue traffic, so a repository untouched since 2012 can
-show activity from 2022. The newest commit is.
+- Each cached answer holds the response's status, body and fetch time. No request header is
+  stored, so no token is.
 
-Credentials come from two places. lockrot's own: `LOCKROT_GITHUB_TOKEN`, else `GITHUB_TOKEN`, else
-Composer's `github-oauth.github.com` for github.com, and `LOCKROT_GITLAB_TOKEN`, else `GITLAB_TOKEN`
-for gitlab.com only — a token issued by one instance is never sent to another. And Composer's own, from `auth.json` or `COMPOSER_AUTH`: `gitlab-token` or `gitlab-oauth`
-for any GitLab domain, `http-basic` (an Atlassian API token) or a `bitbucket-oauth` consumer for
-`bitbucket.org`, `github-oauth` or `http-basic` for github.com. Composer's HTTP layer adds those
-headers itself, so lockrot only needs to know they are there: they lift the caps and, on GitLab,
-unlock the project document. A `bitbucket-oauth` consumer is exchanged for a bearer token the first
-time a Bitbucket repository is asked about — the same `client_credentials` request Composer makes,
-minus the `auth.json` write Composer's helper does on the way, so nothing on disk changes. A
-repository the host does not answer for (a private one, or a renamed or removed one) is counted in a
-note of its own rather than passing for a healthy one.
+- A failed request (a transport error, 401, 403, 429 or 5xx) is not cached. When an older answer
+  for the URL is cached, lockrot uses it, and the footer shows its age. A 404 is an answer and is
+  cached.
 
-When Composer has credentials for a host — `github-oauth` in `auth.json` or `COMPOSER_AUTH`, or
-what setup-php configures on a CI runner — its header is the one on the wire and lockrot sends none
-of its own, because a request carrying two is refused (GitHub answers 401 "Bad credentials",
-whatever the tokens are). The environment token still lifts the cap.
+- With Composer's cache disabled (`composer --no-cache`), answers are kept in memory for the run and
+  nothing is written.
+
+- `composer clear-cache` clears lockrot's cache with Composer's. To refetch repository activity
+  alone, delete the `lockrot` directory under the path `composer config cache-dir` prints.
+
+### How fresh the data is {#two-sources-two-clocks}
+
+The footer states the report's date, in UTC, and its sources. From the
+[example run](example-run.md):
+
+```text
+Data as of 2026-09-30 (package repositories, repository hosts). Run composer lockrot --format=json for details.
+```
+
+When any activity answer came from the cache, the parenthesis reads
+`package repositories; repository activity from lockrot's cache, up to N h old`: N is the age of
+the oldest cached answer in whole hours, rounded up, at least 1. `--format=json` carries that
+answer's fetch time as `activity_cache_oldest_at`, null when every answer was fetched during the
+run.
+
+## When a date is missing or wrong
+
+`--explain=vendor/package` prints every date a finding was decided on and where it came from
+([Explaining one package](configuration.md#explaining-one-package)).
+
+| Symptom | Cause | Fix or reference |
+|---|---|---|
+| No S2 or S8, and S10 names `release_dates` | The Composer repository dates the newest tags only by a commit they share (a subtree split), and no monorepo parent dates them | [Left behind](verdicts.md#left-behind), [Dates from the monorepo](verdicts.md#dates-from-the-monorepo) |
+| A release date older than the release | The Composer repository dates a tag by its commit, so a tag cut on an old commit carries that commit's date | [Left behind](verdicts.md#left-behind) |
+| S5's release date is wrong | S5 reads the lock entry's `time`, the release date the Composer repository reported when the lock was last updated | Check the lock entry's `time` |
+| S10 names `repository_activity` with `no_token` or `anonymous_budget` | An anonymous run on GitHub or Bitbucket | Set `GITHUB_TOKEN`, or add bitbucket.org credentials to `auth.json` |
+| S10 names `repository_activity` with `install_time_budget` or `offline` | The install-time budget ran out, or `--offline` found no cached answer | [install-time.md](install-time.md), [Working offline](#working-offline) |
+| S10 with `rate_limit` or `fetch_failed`; the [Rate limited](notes.md#repository_activity_rate_limited) or [Unreachable](notes.md#repository_activity_unreachable) note | The code host refused or did not answer | Rerun; for a rate limit, add credentials for the code host |
+| The [Not found](notes.md#repository_activity_not_found) note | The code host answered 404: the repository is private, renamed or removed, or the credentials cannot see it | Credentials with read access to the repository |
+| No S3 or S4, and no S10 | No URL names a code host lockrot reads; the package is allowlisted or not from a Composer repository; or, on an anonymous run on GitHub or Bitbucket, its Composer repository already marks it abandoned (S1): it is not a candidate, so its code host is not asked, and S10 is left off because nothing could make its verdict more serious | [Which host is asked](#which-repository) |
+| No S3 on an archived GitLab repository | Anonymous GitLab hides the archived flag | `GITLAB_TOKEN` for gitlab.com, Composer's `gitlab-token` for other GitLab hosts |
+| S4 on GitLab older than the project's "last activity" | S4 is the newest commit date, not GitLab's "last activity" | None: S4 is the commit date |
+| Activity up to a day behind the code host | lockrot's 24-hour cache | Delete the cache ([Caching](#caching)) |
+
+## Working offline
+
+`--offline` makes no network request. It sets `COMPOSER_DISABLE_NETWORK=1` for the run.
+
+- Repository metadata comes from Composer's cache. A package missing from it is reported as
+  unavailable ([Metadata unavailable](notes.md#metadata_unavailable)), not as absent from the
+  repository.
+
+- Repository activity comes from lockrot's cache, however old. A package whose repository is
+  missing from it carries S10 with reason `offline`
+  ([What was not checked](verdicts.md#what-was-not-checked)).
+
+- Advisories are not checked ([Advisories not checked](notes.md#advisories_not_checked)).
+
+- The report carries the [Offline](notes.md#offline) note. With `--strict-network`, metadata or
+  activity missing from the caches makes the run exit `1` ([exit codes](ci.md#exit-codes)).
+
+## Memory on a large lock {#memory-and-the-p2-protocol}
+
+A repository that publishes a `metadata-url` (Composer's v2 "p2" protocol) is read one package file
+at a time, so memory stays flat on a large lock.
+
+A repository without one (a Composer v1-style or static repository, including `packages.json`-only
+Satis output) is loaded whole by Composer before any name can be looked up. Its full package list
+stays in memory for the run.
 
 ## Related
 
-- [verdicts.md](verdicts.md) — which signal each source feeds
-- [configuration.md](configuration.md) — thresholds, tokens and `--offline`
-- [example-run.md](example-run.md) — what the footer looks like in a real run
+- [verdicts.md](verdicts.md) — the signals each source feeds, and what an unchecked one means
+- [notes.md](notes.md) — every note a failed or capped source leaves in the report
+- [configuration.md](configuration.md#environment-overrides) — the token variables and `--offline`
+- [SECURITY.md](https://github.com/somework/lockrot/blob/main/SECURITY.md#what-lockrot-does-and-does-not-do) — everything lockrot reads, writes and contacts
+- [example-run.md](example-run.md) — a footer from a real run
