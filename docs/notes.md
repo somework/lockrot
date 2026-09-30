@@ -13,16 +13,16 @@ do, what each gap does to findings, and what to do about it.
 |---|---|---|---|---|
 | [`offline`](#offline) | `--offline`: metadata came from Composer's cache | no | S10 `offline` where activity is not cached | Run once online to fill the caches ([working offline](internals.md#working-offline)) |
 | [`metadata_unavailable`](#metadata_unavailable) | Metadata did not arrive for some packages | yes | Those packages are `unknown` | Depends on the [`reason`](#metadata_unavailable) |
-| [`monorepo_parent_unavailable`](#monorepo_parent_unavailable) | A monorepo's metadata did not arrive | yes | Its split packages keep their own dates | Rerun |
+| [`monorepo_parent_unavailable`](#monorepo_parent_unavailable) | A monorepo's metadata did not arrive | yes | Split packages it would date stay unmeasured, with S10 `undated_releases` | Rerun |
 | [`advisory_ignore_unreadable`](#advisory_ignore_unreadable) | Composer rejected the advisory ignore settings | no | Every advisory counts, ignored ones included | Fix `config.policy` or `config.audit`, as the note's `message` says |
-| [`advisories_unavailable`](#advisories_unavailable) | A Composer repository's advisory request failed | yes when unreachable, no when its answer was unreadable | That repository's advisories are missing | Rerun; for an unreadable answer, check the repository `composer_repository` names |
+| [`advisories_unavailable`](#advisories_unavailable) | A Composer repository's advisory request failed | yes when unreachable, no for any other error the repository raised, such as an answer lockrot could not read | That repository's advisories are missing | Rerun; for any other error, check the repository `composer_repository` names |
 | [`advisories_not_checked`](#advisories_not_checked) | Advisories were not looked up, or only partly | no | A priority an advisory would raise stays one step lower | `offline`: run online; `composer_too_old`: use Composer 2.4 or newer; `install_time_budget`: raise the [budget](install-time.md#time-budget) |
 | [`repository_activity_not_checked`](#repository_activity_not_checked) | No repository host was asked | no | S10 `install_time_budget` | Raise the [budget](install-time.md#time-budget), or run `composer lockrot` |
 | [`repository_activity_anonymous_cap`](#repository_activity_anonymous_cap) | Without credentials, only some packages were asked about | no | S10 `no_token`, `anonymous_budget` | Set a token ([credentials](internals.md#repository-hosts-and-credentials)) |
 | [`repository_activity_rate_limited`](#repository_activity_rate_limited) | A host answered "too many requests" | yes | S10 `rate_limit` | Rerun, or add credentials for the host ([credentials](internals.md#repository-hosts-and-credentials)) |
 | [`repository_activity_unreachable`](#repository_activity_unreachable) | A host did not answer | yes | S10 `fetch_failed` | Rerun |
-| [`repository_activity_not_found`](#repository_activity_not_found) | A host answered 404: private, renamed or removed | no | None: the note is the only record | For a private repository, credentials that can read it ([fixes](internals.md#when-a-date-is-missing-or-wrong)) |
-| [`not_from_composer_repository`](#not_from_composer_repository) | Some packages come from no Composer repository and were not checked | no | `from_composer_repository` is false | Nothing for `path`, `vcs`, `artifact` and inline `package` entries; for a Composer repository with no notify URL, its packages are not checked ([see the section](#not_from_composer_repository)) |
+| [`repository_activity_not_found`](#repository_activity_not_found) | A host answered 404: private, renamed or removed | no | None, so the note is the only record; S10 `rate_limit` when the host also rate-limited | For a private repository, credentials that can read it ([fixes](internals.md#when-a-date-is-missing-or-wrong)) |
+| [`not_from_composer_repository`](#not_from_composer_repository) | Some packages come from no Composer repository and were not checked | no | `from_composer_repository` is false | Nothing on the project's side; a `type: composer` repository's operator can make it advertise a notify URL |
 
 ## Reading a note {#reading-a-note}
 
@@ -40,16 +40,9 @@ Every output format prints each note as a sentence. The [JSON report](schema.md)
 }
 ```
 
-| Key | Contents |
-|---|---|
-| `code` | What the note is about. A run can write a code more than once (per repository host, Composer repository or monorepo parent), so identify an entry by its index, not its code |
-| `text` | The sentence in `notes`, verbatim. Prose, not contract |
-| `docs_url` | The code's section on this page, or null for no page. Read it; do not build it |
-| `sets_network_failures` | Whether this note makes the report's `network_failures` true (it is true exactly when one entry's is). `--strict-network` fails on it, and the install-time summary [reports it](install-time.md#never-silent-about-a-package-it-could-not-check) |
-| `data` | The facts, typed per code in the sections below; `{}` for a code with none. Every `message` in it is a repository's, a host's or Composer's own words, not contract |
-
-For a code you do not know, show `text`, link `docs_url` when it is not null, ignore `data`, and
-still honour `sets_network_failures`. [compatibility.md](compatibility.md#run-notes) lists what stays
+[The schema](schema.md#run-notes) defines each key, and what to do with a code you do not know.
+The sections below type each code's `data`; every `message` in it is a repository's, a host's or
+Composer's own words, not contract. [compatibility.md](compatibility.md#run-notes) lists what stays
 stable for 1.x, and which `reason` values a minor release may split.
 
 !!! note "Older releases"
@@ -71,9 +64,9 @@ over the network.
 
 Metadata was asked for and did not arrive for `package_count` packages.
 
-- `data`: `package_count`, and `reasons`, one entry per distinct `message` in the order the sentence
-  lists them. Each entry has a `reason`, the `message` and its own `package_count`; the counts sum to
-  the note's.
+- `data`: `package_count`, and `reasons`, one entry per distinct `message` in the order the
+  sentence lists them. Each entry has a `reason`, the `message` and its own `package_count`; the
+  counts sum to the note's.
 - Findings: each such package is `unknown`, with `libyears_unmeasured` `metadata_unavailable`.
 - `sets_network_failures`: yes, whatever the reasons, `offline` and `install_time_budget` included.
 
@@ -93,7 +86,9 @@ metadata did not arrive.
 - `data`: `parent`, the monorepo, with a `reason` and a `message` as in
   [metadata unavailable](#metadata_unavailable). `reason` is never `install_time_budget`: when the
   install-time budget runs out first, the parent is not asked, and no note is written.
-- Findings: split packages are dated by their own tags, not the monorepo's.
+- Findings: the split packages the parent would date stay unmeasured. S2 and S8 cannot read their
+  undated branches, and those findings carry S10 `undated_releases`
+  ([what was not checked](verdicts.md#what-was-not-checked)).
 - `sets_network_failures`: yes.
 
 ## Security advisories
@@ -114,11 +109,11 @@ as its fallback), so lockrot ignores no advisory.
 
 One Composer repository did not return advisories. The other repositories were still asked.
 
-- `data`: `composer_repository`, Composer's name for the repository, and `message`, the first line of
-  the error, or the error's class when it has no message.
+- `data`: `composer_repository`, Composer's name for the repository, and `message`, the first line
+  of the error, or the error's class when it has no message.
 - Findings: advisories from that repository are missing.
-- `sets_network_failures`: yes when the repository could not be reached; no when it answered with
-  something lockrot could not read.
+- `sets_network_failures`: yes when the repository could not be reached; no for any other error it
+  raised, such as an answer lockrot could not read.
 
 ### Advisories not checked {#advisories_not_checked}
 
@@ -139,20 +134,21 @@ The advisory lookup did not run, or stopped before every repository was asked.
 
 ## Repository activity
 
-The activity round asks GitHub, GitLab and Bitbucket about the repository behind each package, for
-signals S3 and S4 ([the signals](verdicts.md#the-signals)). In these notes:
+lockrot asks GitHub, GitLab and Bitbucket about the repository behind each package, for signals
+S3 and S4 ([the signals](verdicts.md#the-signals)). In these notes:
 
 - `forge_id` is `github`, `gitlab` (gitlab.com and every host in Composer's `gitlab-domains`) or
   `bitbucket`.
 - Each entry of `repositories` is a `host` and a `repo`, plus a `message` where the host gave no
   answer.
 
-Tokens and credentials for each host are in [internals.md](internals.md#repository-hosts-and-credentials).
+Tokens and credentials for each host are in
+[internals.md](internals.md#repository-hosts-and-credentials).
 
 ### Repository activity not checked {#repository_activity_not_checked}
 
-No repository host was asked at all: the passes before it (metadata, monorepo parents, advisories)
-used the whole install-time budget.
+No repository host was asked at all: the metadata, monorepo-parent and advisory lookups used the
+whole install-time budget.
 
 - `data`: `reason`, which is `install_time_budget`.
 - Findings: S10 `install_time_budget`.
@@ -165,15 +161,15 @@ could change their verdict, and only up to a budget of them
 ([credentials](internals.md#repository-hosts-and-credentials)). GitLab has no cap.
 
 - `data`: `forge_id`; `checked`, the packages asked about; `skipped_no_token`, packages that were
-  not candidates; `skipped_budget`, candidates beyond the budget. The sentence prints the two skipped
-  counts as one number.
+  not candidates; `skipped_budget`, candidates beyond the budget. The sentence prints the two
+  skipped counts as one number.
 - Findings: S10 `no_token` on the non-candidates, `anonymous_budget` on the candidates beyond the
   budget.
 - `sets_network_failures`: no.
 
 ### Rate limited {#repository_activity_rate_limited}
 
-A `forge_id` host answered "too many requests".
+A repository host answered "too many requests".
 
 - `data`: `forge_id`, and `repositories`: every repository on any host of that `forge_id` that got
   no answer, each with its `message`. The count in `text` is the number of entries in
@@ -207,11 +203,13 @@ The host answered 404 for some repositories: private, renamed or removed.
 
 Some lock entries carry no Composer `notification-url`, and lockrot asked no repository about them.
 Such an entry is a `path`, `vcs`, `artifact` or inline `package` one, or comes from a
-`type: composer` repository that advertises no notify URL.
+`type: composer` repository that advertises no notify URL. Nothing on the project's side changes
+this; the operator of such a repository can make it advertise one.
 
 - `data`: `package_count`, equal to the report's `not_from_composer_repository`.
 - Findings: `from_composer_repository` is false, and `origin.kind` says what lockrot could tell
-  about where the package came from ([where a package came from](schema.md#where-a-package-came-from)).
+  about where the package came from
+  ([where a package came from](schema.md#where-a-package-came-from)).
 - `sets_network_failures`: no.
 
 ## Related

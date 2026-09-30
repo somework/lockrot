@@ -225,12 +225,14 @@ Data as of 2026-09-30 (package repositories, repository hosts). Run composer loc
   ([how fresh the data is](internals.md#two-sources-two-clocks)). Run notes follow as `note:` lines
   ([run notes](notes.md)), and with a baseline a `note:` line names its stale entries.
 
-- **Width.** Every line wraps to `COLUMNS` when it is a positive integer, else to the terminal's
-  width, else to 120 columns, and never narrower than 40. A command the footer names stays on one
-  line. For a `table` report written to a file, see
+- **Width.** Every line wraps to `COLUMNS` when it is a positive integer. With `COLUMNS` unset, it
+  wraps to the width Composer's console reports, which can be 80 with no terminal; otherwise to 120
+  columns. It is never narrower than 40. A command or path in the summary stays on one line, so
+  the line can be wider. For a `table` report written to a file, see
   [Writing reports to files](configuration.md#writing-reports-to-files).
 
-- **Colour.** On a terminal, `critical` and `high` labels are red and `medium` labels yellow.
+- **Colour.** On a terminal, a row's verdict label is red in the `critical` and `high` groups and
+  yellow in `medium`.
 
 ## The same lock as JSON
 
@@ -409,12 +411,13 @@ finding, the rest of `exposure`, the other findings).
 }
 ```
 
-- Every finding carries the keys the one shown carries; [schema.md](schema.md#what-the-report-schema-types)
-  defines each. The cut signals have the shape S1 and S2 show, and S7's `data` names the packages
-  it counts.
+- Every finding carries the keys the one shown carries;
+  [schema.md](schema.md#what-the-report-schema-types) defines each. The cut signals have the shape
+  S1 and S2 show, and S7's `data` names the packages it counts.
 
 - `exposure` is the `pulled in by:` line in full, most first. `exposure_rule` and `unattributed`
-  belong to the same count ([transitive exposure](verdicts.md#transitive-exposure)).
+  belong to the same count
+  ([shared packages and `unattributed`](verdicts.md#shared-packages-and-unattributed)).
 
 - sensio/framework-extra-bundle is `abandoned` and 0 libyears behind: its last release is the one
   installed. A verdict and [libyears](verdicts.md#libyears) measure different things.

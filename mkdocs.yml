@@ -65,7 +65,7 @@ nav:
   - Install-time summary: install-time.md
   - PHAR and self-update: phar.md
   - Example run: example-run.md
-  - How it fetches metadata: internals.md
+  - Data sources: internals.md
   - Changelog: changelog.md
 
 markdown_extensions:

@@ -1,6 +1,6 @@
 ---
 title: lockrot documentation — unmaintained packages in composer.lock
-description: "lockrot finds the unmaintained, abandoned and branch-pinned packages in composer.lock that composer audit passes. Install it, see a real run, find your page."
+description: "lockrot finds the unmaintained, archived and branch-pinned packages in composer.lock that composer audit passes. Install it, see a real run, find your page."
 ---
 
 # lockrot documentation
@@ -15,12 +15,11 @@ description: "lockrot finds the unmaintained, abandoned and branch-pinned packag
 | **Clear a flag on a package I maintain**: which rule fired and what clears it | [The verdicts](verdicts.md#the-nine-verdicts), [The signals](verdicts.md#the-signals) |
 | **Fail CI on the right findings**, and read every exit code | [In CI](ci.md), [Exit codes](ci.md#exit-codes), [Baseline](baseline.md), [Configuration](configuration.md), [Run notes](notes.md) |
 | **Read the JSON report from my own tooling**: stable fields, schemas, sets that may grow | [JSON schemas](schema.md), [Run notes](notes.md), [Compatibility](compatibility.md), [Changelog](changelog.md) |
-| **Review what it reads, writes and contacts**, and verify the PHAR | [What lockrot reads, writes and contacts](https://github.com/somework/lockrot/blob/main/SECURITY.md#what-lockrot-does-and-does-not-do), [PHAR and self-update](phar.md), [How it fetches metadata](internals.md) |
+| **Review what it reads, writes and contacts**, and verify the PHAR | [What lockrot does and does not do](https://github.com/somework/lockrot/blob/main/SECURITY.md#what-lockrot-does-and-does-not-do), [PHAR and self-update](phar.md), [Data sources](internals.md) |
 | **Build, test or contribute** | [CONTRIBUTING.md](https://github.com/somework/lockrot/blob/main/CONTRIBUTING.md) |
 
 These pages describe the newest release; the [changelog](changelog.md) says what differs in older
-ones. The lockrot.dev landing page and blog live in
-[somework/lockrot.dev](https://github.com/somework/lockrot.dev).
+ones.
 
 ## Install
 
@@ -39,11 +38,12 @@ curl -fsSL -o lockrot.phar https://lockrot.dev/lockrot.phar
 php lockrot.phar -d /path/to/project
 ```
 
-To check the archive before running it, see [Verifying the download](phar.md#verifying-the-download).
-Set `GITHUB_TOKEN` for a complete run;
+To check the archive before running it, see
+[Verifying the download](phar.md#verifying-the-download). Set `GITHUB_TOKEN` for a complete run;
 [Repository hosts and credentials](internals.md#repository-hosts-and-credentials) says what an
 anonymous run leaves out. lockrot checks against `config.platform.php`, else the PHP running it;
-pass `--target-php=<version>` when that is not the PHP the project runs on in production.
+pass `--target-php=<version>` ([`extra.lockrot` keys](configuration.md#extralockrot-keys)) when
+that is not the PHP the project runs on in production.
 
 ## One real run
 

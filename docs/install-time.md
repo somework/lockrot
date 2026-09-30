@@ -3,17 +3,17 @@ title: Install-time summary — what composer require prints, and how to make it
 description: "The block lockrot prints during composer require, update and install: what it covers, its line and time budgets, when it stays silent, and the install-time-strict gate."
 ---
 
-# Read the install-time summary {#install-time-summary}
+# Install-time summary {#install-time-summary}
 
 With the [plugin installed](index.md#install), `composer require`, `composer update` and
-`composer install` print a block about the packages the transaction installs or updates, above
-Composer's own operations list. It never fails the install unless you set
+`composer install` print a block above Composer's operations list. It covers only the packages the
+transaction installs or updates, not the whole lock. It never fails the install unless you set
 [`install-time-strict`](#install-time-strict).
 
 | To | Use |
 |---|---|
 | See why one package is flagged | `composer lockrot --explain=<package>` ([explaining one package](configuration.md#explaining-one-package)) |
-| Accept what is flagged today | A [baseline](baseline.md) |
+| Accept what is flagged | A [baseline](baseline.md) |
 | Never flag one package | The [allowlist](configuration.md#the-allowlist) |
 | Turn the block off for a project | `"install-time": "off"` in [`extra.lockrot`](configuration.md#extralockrot-keys) |
 | Silence all of lockrot for one command | [`LOCKROT_DISABLE=1`](configuration.md#environment-overrides): not even the skipped line prints |
@@ -26,22 +26,19 @@ full report:
 ```text
 lockrot: dependency rot in <flagged> of <changed> changed packages
   <verdict>   <package> <version>: <evidence>
-  <verdict>   <package> <version>: <evidence> (via <direct> > <package>)
+  <verdict>   <package> <version>: <evidence> (via <direct> > <intermediate>)
+  … and <n> more
   note: <note text>
 Run composer lockrot for details.
 ```
-
-- The block covers only the packages this transaction installs or updates, not the whole lock.
-- With no `target-php` set, lockrot measures against `config.platform.php`, else the running PHP
-  ([`extra.lockrot` keys](configuration.md#extralockrot-keys)).
 
 ## At most ten lines, always {#at-most-10-lines-always}
 
 The block is at most ten lines, in this order:
 
 - the header;
-- one line per flagged package, most severe first in the report's
-  [priority](verdicts.md#priority) order, cut with `… and N more` when they do not fit;
+- one line per flagged package, in the report's order (highest [priority](verdicts.md#priority)
+  first), cut with `… and <n> more` when they do not fit;
 - up to three of the run's notes, in the order the run wrote them ([run notes](notes.md));
 - the footer, `Run composer lockrot for details.`
 
@@ -53,13 +50,14 @@ for a direct requirement, the flagged packages it pulls in (S7). `composer lockr
 ([transitive exposure](verdicts.md#transitive-exposure)).
 
 An `extra.lockrot` key lockrot does not read adds one `lockrot: unknown key …` line above the
-block, outside its ten, whether or not anything is flagged ([unknown keys](configuration.md#unknown-keys)).
-It prints whenever the block would run: not under `LOCKROT_DISABLE`, not with `install-time: off`,
-and only for a transaction that installs or updates something.
+block, outside its ten, whether or not anything is flagged
+([unknown keys](configuration.md#unknown-keys)). It prints whenever the block would run: not under
+`LOCKROT_DISABLE`, not with `install-time: off`, and only for a transaction that installs or
+updates something.
 
 ## Never silent about a package it could not check {#never-silent-about-a-package-it-could-not-check}
 
-A package whose metadata never arrived is `unknown`, which is not a finding. When nothing is
+A package whose metadata never arrived is `unknown`, which is not flagged. When nothing is
 flagged but the run had a network failure (a note with `sets_network_failures: true`), a short
 block prints instead of nothing:
 
@@ -73,13 +71,15 @@ behind the failure can fall past the cut. `composer lockrot --format=json` lists
 with its `sets_network_failures` ([run notes](notes.md)).
 
 Silence means nothing is flagged and no note is a network failure. It does not mean every check
-ran: a skipped activity round, a skipped advisory check or the anonymous cap
+ran: skipped repository activity, a skipped advisory check or the anonymous cap
 ([run notes](notes.md)) prints nothing on its own. The unknown-key line still prints.
 
 ## Time budget
 
-The install-time check stops asking repositories once `install-time-budget` seconds have passed,
-so it cannot hold up an install. `composer lockrot` has no budget.
+Once `install-time-budget` seconds have passed, the install-time check starts no new metadata or
+advisory request, and repository-activity requests are cut to the time left. A request already
+running finishes first, so an install can take somewhat longer than the budget. `composer lockrot`
+has no budget.
 
 ```json
 {
@@ -101,20 +101,21 @@ the one `composer lockrot` gives for the same package.
 |---|---|---|
 | A package's metadata | The package is `unknown`; when nothing is flagged, the [could-not-be-checked header](#never-silent-about-a-package-it-could-not-check) counts it | [`metadata_unavailable`](notes.md#metadata_unavailable), a network failure |
 | The advisory check | A priority an advisory would raise stays one step lower | [`advisories_not_checked`](notes.md#advisories_not_checked) |
-| The repository activity round, before it began | S3 and S4 are not read; findings carry S10 `install_time_budget` | [`repository_activity_not_checked`](notes.md#repository_activity_not_checked) |
-| The repository activity round, part way | Requests still running are cut to the time left; those that time out have no activity, and their findings carry S10 `fetch_failed` | [`repository_activity_unreachable`](notes.md#repository_activity_unreachable), a network failure |
+| A monorepo parent's metadata | Split packages whose own tags have no trusted date stay unmeasured and carry S10 `undated_releases` ([dates from the monorepo](verdicts.md#dates-from-the-monorepo)) | None |
+| The repository activity check, before it began | S3 and S4 are not read; findings carry S10 `install_time_budget` | [`repository_activity_not_checked`](notes.md#repository_activity_not_checked) |
+| The repository activity check, part way | Requests still running are cut to the time left; those that time out have no activity, and their findings carry S10 `fetch_failed` | [`repository_activity_unreachable`](notes.md#repository_activity_unreachable), a network failure |
 
 `composer require` and `composer update` reuse the metadata Composer has just fetched in the same
 process, so they rarely run out. A `composer install` with a cold cache on a large lock, such as a
 fresh clone or a CI job, can run out before every package is checked. Raise the budget for such a
-lock, or lower it for a stricter cap on install time.
+lock, or lower it to spend less time checking.
 
 ## When the install continues and when it stops {#never-fails-the-install}
 
 | Symptom | Cause | Install | What to do |
 |---|---|---|---|
-| A note in the block | A lookup failed: an unreachable repository, an exhausted budget | Continues, unless `install-time-strict` is on with `fail-on: unchecked` | [Run notes](notes.md), for that code |
-| One `lockrot: install-time check skipped: …` line | lockrot could not run the check: a malformed `extra.lockrot`, an unreadable `composer.lock`, a configured [baseline](baseline.md#install-time) file that is missing or unreadable, or a defect in lockrot | Continues, and `install-time-strict` does not apply | Run `composer lockrot`; for a configuration problem it names the problem and exits `2` ([exit codes](ci.md#exit-codes)) |
+| A note in the block | Something the run could not see: an unreachable repository, an exhausted budget, a missing token | Continues, unless `install-time-strict` is on with `fail-on: unchecked` and a finding carries S10 | Look up its code in [run notes](notes.md) |
+| One `lockrot: install-time check skipped: …` line | lockrot could not run the check: a malformed `extra.lockrot` or lockrot environment variable, an unreadable `composer.lock`, an unreadable [baseline](baseline.md#install-time) file, an `extra.lockrot.baseline` naming a missing one, or a defect in lockrot | Continues, and `install-time-strict` does not apply | Run `composer lockrot`; for a configuration problem it names the problem and exits `2` ([exit codes](ci.md#exit-codes)) |
 | `lockrot: findings at or above fail-on=…` and Composer exits `1` | [`install-time-strict`](#install-time-strict) is on and a finding reaches `fail-on` | Stopped | See [after a stop](#install-time-strict) |
 
 ## `install-time-strict` {#install-time-strict}
@@ -136,10 +137,13 @@ package operation runs, and Composer exits `1`. [Choosing `--fail-on`](ci.md) co
 
 - A finding in the [baseline](baseline.md#install-time) does not stop the install unless its
   verdict is worse than the baseline recorded. The block lists both kinds.
-- A failed lookup stops the install only through `fail-on: unchecked`, which matches every finding
-  that carries S10 ([what was not checked](verdicts.md#what-was-not-checked)). At install time that
-  includes the S10 a missing token, a rate limit or an exhausted budget adds, and such a finding
-  can be `ok` and missing from the block. `--strict-network` has no install-time counterpart.
+- A gap in what the run could see stops the install only through `fail-on: unchecked`, which
+  matches every finding that carries S10 ([what was not checked](verdicts.md#what-was-not-checked)).
+  A repository-activity gap adds S10 `no_token`, `anonymous_budget`, `rate_limit`, `fetch_failed`
+  or `install_time_budget`; a monorepo parent that never arrived adds `undated_releases` to the
+  split packages it would date. Such a finding can be `ok` and missing from the block. Advisory
+  gaps and `metadata_unavailable` do not stop the install on their own, and `--strict-network` has
+  no install-time counterpart.
 - `--dry-run` is never stopped, since no operation is about to run.
 
 A stopped `composer require` or `composer update` leaves `composer.lock` updated (and, for
@@ -148,20 +152,25 @@ finding. Either:
 
 - undo the change: run `composer remove <package>`, or restore `composer.json` and `composer.lock`
   from version control;
-- or accept the finding into the [baseline](baseline.md), then run `composer install`;
+- or, for a flagged finding, accept it into the [baseline](baseline.md), then run
+  `composer install`;
 - or allowlist the package ([the allowlist](configuration.md#the-allowlist)), then run
   `composer install`.
 
+A baseline covers only flagged findings: a `fail-on: unchecked` stop on an `ok` or `unknown`
+finding clears through the allowlist, or, for a repository-activity gap, when that check runs (set a
+token, raise the budget or rerun).
+
 ## Under `--dry-run` {#a-note-on-the-dry-run-development-flag}
 
-Under `composer require --dev … --dry-run`, a package not yet in the lock on disk is treated as
+Under `composer require --dev … --dry-run`, a package absent from the lock on disk is treated as
 production, so its [priority](verdicts.md#priority) can read one step high. `composer lockrot` on
 the real lock has the flag.
 
 ## Related
 
-- [configuration.md](configuration.md#extralockrot-keys) — the `install-time`, `install-time-strict`
-  and `install-time-budget` keys
+- [configuration.md](configuration.md#extralockrot-keys) — the `install-time`,
+  `install-time-strict` and `install-time-budget` keys
 - [notes.md](notes.md) — every note the block can print, and which are network failures
 - [baseline.md](baseline.md#install-time) — how the baseline applies at install time
 - [verdicts.md](verdicts.md) — what the verdicts and priorities mean

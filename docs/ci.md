@@ -15,8 +15,10 @@ threshold, `1` when one does, and `2` when lockrot could not run ([Exit codes](#
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-`--target-php` is the PHP version the project runs on ([configuration.md](configuration.md#extralockrot-keys)).
-`GITHUB_TOKEN` lifts the anonymous cap on repository-activity checks ([internals.md](internals.md)).
+`--target-php` is the PHP version the project runs on
+([configuration.md](configuration.md#extralockrot-keys)). `GITHUB_TOKEN` lifts the anonymous cap
+on repository-activity checks
+([Repository hosts and credentials](internals.md#repository-hosts-and-credentials)).
 Without the plugin installed, run the PHAR instead ([phar.md](phar.md#in-ci)).
 
 `--fail-on` takes one value, and every threshold is inclusive:
@@ -28,7 +30,7 @@ Without the plugin installed, run the PHAR instead ([phar.md](phar.md#in-ci)).
 | A finding whose check did not run: no token passed through, an exhausted rate limit | `--fail-on=unchecked` | [What was not checked](verdicts.md#what-was-not-checked); the failing packages are listed only with `--all`, or in `json` and `html` ([below](#unchecked-in-the-formats)) |
 | Nothing: report only | `--fail-on=none` (the default) | |
 
-- **Where to start.** A priority such as `--fail-on=high` gates on what applies to this project. If
+- **Where to start.** Use `--fail-on=high`: a priority gates on what applies to this project. If
   the project does not start clean, add a [baseline](baseline.md): the same step then fails only on
   findings that are new or have got worse, and reads the default baseline file without a flag.
 
@@ -41,9 +43,9 @@ Every accepted value is listed at [`fail-on` values](configuration.md#fail-on-va
 
 | Code | Meaning | stdout |
 |---|---|---|
-| `0` | No finding reached `--fail-on` except ones the baseline accepts, and no `--strict-network` trip; or `--fail-on=none` | The report; nothing under `--generate-baseline` |
-| `1` | A finding reached `--fail-on` and the baseline does not already accept it, or `--strict-network` is on and a lookup failed | The report; nothing under `--generate-baseline` |
-| `2` | lockrot could not run or could not finish: an input, configuration or usage error, or a file it could not write | Nothing, except when an `--output` file fails: the report is already on stdout |
+| `0` | No finding reached `--fail-on` (never under `--fail-on=none`) except ones the baseline accepts, and no `--strict-network` trip | The report; nothing under `--generate-baseline` |
+| `1` | A finding reached `--fail-on` and the baseline does not already accept it, or `--strict-network` is on and a run note counts as a network failure (below) | The report; nothing under `--generate-baseline` |
+| `2` | lockrot could not run or could not finish: an input, configuration or usage error, or a file it could not write | Nothing, except when an `--output` file fails (outside `--generate-baseline`): the report is already on stdout |
 
 The exit code is the same for every output format. On stderr, a configuration or usage error starts
 with `lockrot:`, any other failure with `lockrot failed:`; `-v` adds the stack trace to the second.
@@ -124,26 +126,37 @@ For other CI systems, run the [container image](phar.md#the-docker-image).
 
 ### How each format marks a finding {#how-each-format-marks-a-finding}
 
-The formats with a severity mark each finding by the same rule, so the mark matches the exit code:
+The formats with a severity give each finding one mark by the same rule, so the mark matches the
+exit code. The first row that matches decides:
 
-| Finding | `github` | `sarif` `level` | `gitlab` `severity` | `markdown` verdict |
-|---|---|---|---|---|
-| Reaches `--fail-on`, not accepted by the baseline | `error` | `error` | `major` | bold |
-| Any other flagged finding | `warning` | `warning` | `minor` | bold |
-| Accepted by the baseline (`known`), or unflagged (listed only with `--all`) | `notice` | `note` | `info` | plain |
+| # | The finding | `github` | `sarif` `level` | `gitlab` `severity` | `markdown` verdict |
+|---|---|---|---|---|---|
+| 1 | Accepted by the baseline (`known`) | `notice` | `note` | `info` | plain |
+| 2 | Reaches `--fail-on` (for `--fail-on=unchecked`: carries S10, whatever its verdict) | `error` | `error` | `major` | bold |
+| 3 | Any other flagged finding | `warning` | `warning` | `minor` | bold |
+| 4 | Anything else (listed only with `--all`) | `notice` | `note` | `info` | plain |
 
-`--strict-network` marks no finding: its cause is in the report's notes.
+- SARIF `rank` is the [priority](verdicts.md#priority) as a number: `critical` `100.0`, `high`
+  `75.0`, `medium` `50.0`, `low` `25.0`, `none` `0.0`.
+- A SARIF rule's default level is `warning` for a flagged verdict and `note` otherwise.
+- In the json report, a finding is at `error` exactly where its `gate.reaches_fail_on` is true and
+  its `gate.exempt_by` is not `baseline`. That holds in a `--generate-baseline` run too, whose
+  `gate.fail_on_applied` is false, so there a finding at `error` fails nothing.
+- `--strict-network` marks no finding: its cause is in the report's notes.
 
+### Where annotations point
+
+Annotations or Code Quality issues that do not land on the lock come from a run in a subdirectory.
 `github`, `sarif` and `gitlab` name the analysed lock by its path relative to the project
-directory: `composer.lock`, `alt.lock` under `COMPOSER=alt.json`, `app/alt.lock` under
-`COMPOSER=app/alt.json`. GitHub and GitLab resolve that path against the checkout root, so run
-lockrot from the checkout root or pass `-d` to it. A lock outside the project directory is named by
-its file name alone.
+directory (`composer.lock`, `alt.lock` under `COMPOSER=alt.json`, `app/alt.lock` under
+`COMPOSER=app/alt.json`), or by its file name alone when it lies outside it. GitHub and GitLab
+resolve that path against the checkout root: run lockrot from there, or pass `-d` to it.
 
 ### `--fail-on=unchecked` in the formats {#unchecked-in-the-formats}
 
-The findings that fail such a run are often `ok` ones carrying S10. `table`, `github`, `sarif`,
-`gitlab` and `markdown` list those only with `--all`, where they are marked like the first row.
+The findings that fail such a run are often `ok` ones carrying S10, which every format but `json`
+and `html` lists only with `--all`. There `github`, `sarif`, `gitlab` and `markdown` mark them by
+row 2 of [How each format marks a finding](#how-each-format-marks-a-finding).
 Pass `--all`, or read `gate` in the json report, to see which packages failed the step.
 
 ## Several reports from one run
@@ -207,8 +220,9 @@ The shape of one annotation:
   `(via a > b, also via c, d)` ([transitive exposure](verdicts.md#transitive-exposure)).
 - The report's notes, the stale-baseline note included, follow as `::notice title=lockrot::`
   lines.
-- The output ends with plain log lines, not annotations: `pulled in by:`, the advisories on packages
-  the report does not flag, and the summary line with the full counts.
+- The output ends with plain log lines, not annotations: `pulled in by:`, a count of the advisories
+  on packages the report does not flag, pointing to `composer audit`, and the summary line with the
+  full counts.
 - GitHub displays a limited number of annotations per step. The step log holds every line, and
   `--format=sarif` uploads the complete set.
 
@@ -240,13 +254,14 @@ steps:
 |---|---|
 | `ruleId` | `lockrot/<verdict>`; one rule per verdict present in the report |
 | `level` | The mark from [How each format marks a finding](#how-each-format-marks-a-finding) |
-| `rank` | The [priority](verdicts.md#priority-in-each-format) as a number |
+| `rank` | The priority as a number ([ranks](#how-each-format-marks-a-finding)) |
 | `locations` | The package's line in the analysed lock |
 | `partialFingerprints` | `lockrot/package`: the package name, so a finding keeps its identity when its line moves |
 | `properties` | `package`, `version`, `verdict`, `priority`, `direct`, `dev`, `signals`, `chain`, `direct_dependents`, `data_date`, and on a flagged finding `baseline` (`known`, `new` or `worsened`) when the run read one |
 | `invocations[].toolExecutionNotifications` | The report's notes |
 
-`originalUriBaseIds.%SRCROOT%` is the project directory as an absolute `file://` URL on the machine
+`originalUriBaseIds.%SRCROOT%` is the directory the lock's path is relative to (the project
+directory, or the lock's own when it lies outside it), as an absolute `file://` URL on the machine
 that ran lockrot; code scanning resolves the lock's path against it. To publish the file anywhere
 else, strip it first ([what a report reveals](schema.md#where-a-package-came-from)):
 
@@ -322,11 +337,12 @@ Top to bottom, it holds:
    `### lockrot: no dependency rot found in <checked> packages` and no table unless `--all` is
    given, which lists every package under it.
 2. With a [baseline](baseline.md), its `known`/`new`/`worsened`/`stale` counts.
-3. A table of the findings in report order, led by [priority](verdicts.md#priority). Its `Via`
-   column holds the shortest chain from a direct requirement and the other direct requirements that
-   reach the package, shortened with `and N more`; `?` when nothing reaches it.
-4. The libyears line, the `pulled in by:` line, and the advisories on packages the report does not
-   flag.
+3. A table of the flagged findings (every finding with `--all`) in report order, led by
+   [priority](verdicts.md#priority). Its `Via` column holds the shortest chain from a direct
+   requirement and the other direct requirements that reach the package, shortened with
+   `and N more`; `?` when nothing reaches it.
+4. The libyears line, the `pulled in by:` line, and a count of the advisories on packages the
+   report does not flag, pointing to `composer audit`.
 5. The report's notes as a bullet list, and a `<sub>` footer with the summary counts.
 
 The shape of the table:
@@ -337,8 +353,9 @@ The shape of the table:
 | <priority> | `<package>` | <version> | **<verdict>** | <evidence> | direct, or <a> › <b>, also via <c> |
 ```
 
-Every value from the project or from package metadata is rendered as plain text, with Markdown and HTML punctuation backslash-escaped, so
-a `composer.lock` under someone else's control cannot put an image, a tag or a link into the comment.
+Every value from the project or from package metadata is rendered as plain text, with Markdown and
+HTML punctuation backslash-escaped, so a `composer.lock` under someone else's control cannot put an
+image, a tag or link markup into the comment; a bare URL still autolinks.
 
 ## `--format=html` {#-formathtml}
 
@@ -346,8 +363,10 @@ The whole run as one self-contained page: it fetches nothing, so it opens from `
 one CI artifact and attaches to a ticket.
 
 ```yaml
-- run: composer lockrot --format=html --target-php=8.4 > lockrot-report.html
-  if: always()
+- name: lockrot
+  run: composer lockrot --format=html --fail-on=high --target-php=8.4 > lockrot-report.html
+  env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 - uses: actions/upload-artifact@v7
   if: always()
   with:
@@ -380,7 +399,9 @@ host that adds its own policy header gets the intersection of the two;
 `script-src 'unsafe-inline'` and `style-src 'unsafe-inline'` in that header are enough, because the
 page's policy narrows them to its hashes.
 
-**The JSON too.** To keep the report as a file next to the page, ask for both in one run:
+### The JSON beside the page {#the-json-beside-the-page}
+
+To keep the report as a JSON file next to the page, ask for both in one run:
 
 ```bash
 composer lockrot --format=html --output=json:lockrot.json > lockrot-report.html

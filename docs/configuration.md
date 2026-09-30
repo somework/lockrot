@@ -3,7 +3,7 @@ title: lockrot configuration — extra.lockrot keys, environment and CLI options
 description: Every extra.lockrot key with its default, the environment variables, every command-line option, --output, --explain, caching and the allowlist.
 ---
 
-# Configuration reference
+# Configuration
 
 Set project defaults under `extra.lockrot` in `composer.json`, and override them for one run with
 an environment variable or a command-line option. The first source that sets a value wins: option,
@@ -13,7 +13,7 @@ then environment variable, then `extra.lockrot`, then the default.
 {
     "extra": {
         "lockrot": {
-            "fail-on": "silent",
+            "fail-on": "high",
             "target-php": "8.4",
             "include-dev": true
         }
@@ -40,15 +40,16 @@ then environment variable, then `extra.lockrot`, then the default.
 
 ### `fail-on` values {#fail-on-values}
 
-| Value | Exit `1` when |
-|---|---|
-| A [verdict](verdicts.md#the-nine-verdicts): `abandoned`, `silent`, `pinned`, `left-behind`, `old-promise`, `stale` | A finding has that verdict or a more severe one |
-| A [priority](verdicts.md#priority): `critical`, `high`, `medium`, `low` | A finding has that priority or a higher one |
-| `unchecked` | A finding's check did not run ([What was not checked](verdicts.md#what-was-not-checked)) |
-| `none` | No finding fails the run |
+The `fail-on` key, `--fail-on` and `LOCKROT_FAIL_ON` each take one of these values:
 
-A finding the [baseline](baseline.md) already accepts does not fail the run, and `--strict-network`
-can exit `1` whatever the threshold ([exit codes](ci.md#exit-codes)).
+| Kind | Values |
+|---|---|
+| A [verdict](verdicts.md#the-nine-verdicts) | `abandoned`, `silent`, `pinned`, `left-behind`, `old-promise`, `stale` |
+| A [priority](verdicts.md#priority) | `critical`, `high`, `medium`, `low` |
+| [What was not checked](verdicts.md#what-was-not-checked) | `unchecked` |
+| No threshold | `none`, the default |
+
+What each value fails the run on, and which to start with, is in [Running lockrot in CI](ci.md).
 
 ## CLI options
 
@@ -62,9 +63,9 @@ can exit `1` whatever the threshold ([exit codes](ci.md#exit-codes)).
 | `--dev` | Also check `packages-dev` | `include-dev` |
 | `--all` | List every checked package, not only flagged ones (in `table`, under a final `not flagged` group) | — |
 | `--offline` | Never reach the network: repository metadata comes from Composer's cache, activity from lockrot's. A package missing from the cache is reported as unavailable ([Working offline](internals.md#working-offline)) | — |
-| `--strict-network` | Exit `1` when a configured repository or an activity host cannot be reached. Hosts: [internals](internals.md#repository-hosts-and-credentials); codes: [ci.md](ci.md#exit-codes) | — |
-| `--baseline=<path>` | Baseline file to read, or to write with `--generate-baseline`; relative to `composer.json` or absolute | `baseline` |
-| `--generate-baseline` | Write this run's findings to the [baseline](baseline.md) file and exit `0` whatever `--fail-on` says; `--strict-network` still applies | — |
+| `--strict-network` | Exit `1` when a run note counts as a network failure ([which notes do](notes.md), [exit codes](ci.md#exit-codes)) | — |
+| `--baseline=<path>` | Baseline file to read, or to write with `--generate-baseline`; relative to `composer.json` or absolute; a file named here must exist, except under `--generate-baseline` | `baseline` |
+| `--generate-baseline` | Write this run's flagged findings to the [baseline](baseline.md) file and exit `0` whatever `--fail-on` says; `--strict-network` still applies | — |
 | `--explain=<vendor/package>` | Explain one package and exit `0`; see [Explaining one package](#explaining-one-package) | — |
 | `--output=<format>:<path>` | Also write the report to a file; repeatable; see [Writing reports to files](#writing-reports-to-files) | — (command line only) |
 
@@ -80,19 +81,18 @@ Join the directory to the option (`--working-dir=app` or `-dapp`): Composer 2.2 
 | `LOCKROT_DISABLE` | `1` or `true`: `composer lockrot` and the PHAR print `lockrot disabled via LOCKROT_DISABLE` on stderr and exit `0` before reading anything — the command line, `composer.json` or the lock. The install-time summary is skipped too. `lockrot.phar self-update` ignores it |
 | `LOCKROT_FAIL_ON` | Overrides `fail-on` |
 | `LOCKROT_TARGET_PHP` | Overrides `target-php` |
-| `LOCKROT_GITHUB_TOKEN`, else `GITHUB_TOKEN` | Token for github.com (S3, S4); falls back to Composer's `github-oauth.github.com`. How it combines with Composer's credentials: [credentials](internals.md#repository-hosts-and-credentials) |
+| `LOCKROT_GITHUB_TOKEN`, else `GITHUB_TOKEN` | Token for github.com (S3, S4); when Composer holds credentials for github.com, Composer's are sent instead ([credentials](internals.md#repository-hosts-and-credentials)) |
 | `LOCKROT_GITLAB_TOKEN`, else `GITLAB_TOKEN` | Personal access token, sent to gitlab.com only. Without credentials, GitLab hides the archived flag (S3). A self-hosted instance uses Composer's `gitlab-token` or `gitlab-oauth` ([credentials](internals.md#repository-hosts-and-credentials)) |
 | `COMPOSER` | The manifest, as for every Composer command: `COMPOSER=alt.json composer lockrot` reads `extra.lockrot` from `alt.json`, analyses `alt.lock` and looks for the baseline next to `alt.json` |
 
 Variables starting with `LOCKROT_X_` are reserved for your own tooling
-([reserved names](compatibility.md#names-reserved-for-extensions)). The
-[testing hooks](#testing-hooks) are not part of this contract.
+([reserved names](compatibility.md#names-reserved-for-extensions)).
 
 ## Validation {#validation}
 
 Every `composer lockrot` and PHAR run validates the whole configuration, and any error is exit `2`
 (unless `LOCKROT_DISABLE` is set). At install time an error is the `install-time check skipped`
-line instead ([install-time.md](install-time.md)).
+line instead ([install-time.md](install-time.md#never-fails-the-install)).
 
 - Every source is validated, even one a higher source overrides. An environment variable set to
   the empty string counts as unset.
@@ -146,7 +146,7 @@ lockrot: unknown key extra.lockrot.ignore[1].expire ignored (did you mean expire
 gets, with the same `generated_at`, findings and notes.
 
 ```bash
-composer lockrot --format=github --fail-on=silent --target-php=8.4 \
+composer lockrot --format=github --fail-on=high --target-php=8.4 \
   --output=sarif:lockrot.sarif --output=html:lockrot-report.html --output=json:lockrot.json
 ```
 
@@ -159,14 +159,15 @@ composer lockrot --format=github --fail-on=silent --target-php=8.4 \
   columns, whatever the terminal.
 - **Relative paths.** Relative to the directory lockrot runs in. `-d <dir>` changes it, so
   `composer --working-dir=app lockrot --output=json:r.json` writes `app/r.json`. In plugin mode,
-  Composer's [`use-parent-dir`](https://getcomposer.org/doc/06-config.md#use-parent-dir) can move
-  the run to a parent project, and the path is then relative to it. The PHAR never walks up.
-- **Directories.** The directory must exist; lockrot creates none (`mkdir -p` first). An existing
-  file is replaced.
-- **Writing.** Files are written after stdout, in the order given. Each file is replaced
-  atomically; an interrupted run can leave a `*.tmp` file beside it. A replaced file keeps its
-  permission bits, not its owner or ACLs; a new file gets the umask default. Each file gets a line
-  on stderr: `lockrot: sarif report written to lockrot.sarif`.
+  when the current directory has no `composer.json`, Composer's
+  [`use-parent-dir`](https://getcomposer.org/doc/06-config.md#use-parent-dir) can move the run to a
+  parent project, and the path is then relative to it. The PHAR never walks up.
+- **Directories.** The directory must exist; lockrot creates none (`mkdir -p` first). lockrot needs
+  write access to the directory, not only to the file. An existing file is replaced.
+- **Writing.** Files are written after stdout, in the order given; a new file gets the umask
+  default. The atomic replace, a leftover `*.tmp` and what a replaced file keeps are in
+  [How a file is written](https://github.com/somework/lockrot/blob/main/SECURITY.md#what-lockrot-does-and-does-not-do).
+  Each file gets a line on stderr: `lockrot: sarif report written to lockrot.sarif`.
 - **Exit code.** `0` or `1` by `--fail-on`, as without `--output`. A file that cannot be written is
   exit `2` with the reason. Files written before it stay, and outside `--generate-baseline` stdout
   already has the report.
@@ -183,13 +184,14 @@ These are refused before the analysis starts (exit `2`, nothing fetched, nothing
 | `composer.json` or `composer.lock` | Any file of that name, in any directory and any letter case |
 | The files this run reads | The manifest `COMPOSER` names and its lock |
 | A baseline | This run's baseline, and the project's own (`extra.lockrot.baseline`, else `lockrot-baseline.json`) when `--baseline` points elsewhere |
-| Another name for a refused file | Any spelling or link that reaches one on disk: dot segments, symlinks, hard links, 8.3 short names, case folds |
+| Another name for a refused file | By spelling: dot segments, as Windows folds them, even through a directory that does not exist. On disk, for files that exist: symlinks, hard links, 8.3 short names, case folds |
 | A name Windows reads as another | A file name ending in a dot or a space, or holding a colon (`composer.lock.`, `composer.lock::$DATA`), on every system |
 | The same file twice | Compared case-insensitively on every system (`r.json` and `R.json`), and on disk for files that exist |
 | A place that cannot take the file | A directory that does not exist; a path that exists and is not a regular file, such as a directory, `/dev/stdout` or a pipe |
 
-Two paths that turn out to be one file once written stop the run with exit `2` before either report
-is replaced.
+Two paths that turn out to be one file once the first is written (on macOS, `café.json` spelled
+precomposed and decomposed) stop the run with exit `2` before the second overwrites the first; the
+files already written stay.
 
 lockrot never writes `composer.json` or `composer.lock`. Every file it writes and every host it
 contacts is listed in
@@ -207,7 +209,7 @@ and the priority are the report's.
 | Chain | `direct requirement`, or the shortest `via` chain and the other direct requirements that reach the package | `finding.direct`, `finding.chain`, `finding.direct_dependents` |
 | Allowlist reason | Why the allowlist accepts the package | `finding.allowlist_reason` |
 | Libyears | The package's [libyears](verdicts.md#libyears), or why they were not measured | `finding.libyears`, `finding.libyears_unmeasured` |
-| Origin | Where the package came from and, when abandoned, where its replacement is listed ([Where a package came from](schema.md#where-a-package-came-from)) | `finding.origin`, `finding.replacement_url` |
+| Origin | Where the package came from and, for an abandoned package whose replacement packagist.org names, the replacement's page ([Where a package came from](schema.md#where-a-package-came-from)) | `finding.origin`, `finding.replacement_url` |
 | Signals | Every signal with its summary and raw data: the dates behind each age, and for S9 each advisory with what fixes it | `finding.signals` |
 | Lock entry | Version, `php` constraint, source, and the entry's date with what it is dated by: a release, a branch snapshot's commit, or a commit a subtree split's tags share | `lock` |
 | Repository metadata | Number of versions, whether the package is abandoned and what replaces it, the last stable release, and the release-branch table S8 reads | `metadata` |
@@ -228,18 +230,9 @@ The document also carries `lockrot`, `package`, `version` and `generated_at`; th
   `--dev`, is exit `2`. So is `--explain` with `--output`.
 - **Baseline.** Not read, so a missing or unreadable baseline does not stop an explanation.
 
-The release-branch table under Repository metadata reads:
-
-- **Rows.** One per branch: its highest tag, that tag's date, the branch's newest dated release and
-  its `php`. The installed branch is marked `*`.
-- **`undated`.** A highest tag with no release date. S8 does not measure it
-  ([Left behind](verdicts.md#left-behind)).
-- **`commit <date>`.** A highest tag dated only by a commit other tags share. S8 does not measure it
-  either.
-- **Split packages.** A split package the monorepo dates says so
-  ([Dates from the monorepo](verdicts.md#dates-from-the-monorepo)).
-- **In JSON.** Each row also carries S8's PHP test ([Within reach](verdicts.md#within-reach),
-  [explain-1 fields](schema.md#the-explanation)).
+In the release-branch table, S8 does not measure a branch whose highest tag is `undated` or dated
+only by a `commit <date>` other tags share ([Left behind](verdicts.md#left-behind),
+[Dates from the monorepo](verdicts.md#dates-from-the-monorepo)).
 
 ## Caching
 
@@ -277,10 +270,8 @@ To accept a dependency of your own, add it to `extra.lockrot.ignore`:
 | `version` | no | Match only this exact version of the package |
 | `expires` | no | `YYYY-MM-DD`, a real date. After that day (UTC) the entry is skipped and the package gets its normal verdict |
 
-An entry silences the whole finding. To accept one security advisory and keep the rest of the
-package's report, ignore it in Composer's own configuration (`config.policy.advisories.ignore-id`, or
-`config.audit.ignore` before Composer 2.10): lockrot drops exactly what `composer audit` drops
-([Security advisories](verdicts.md#security-advisories)).
+An entry silences the whole finding; to accept one security advisory and keep the rest, ignore it
+where `composer audit` does ([Security advisories](verdicts.md#security-advisories)).
 
 To propose an addition to the built-in list, see
 [Contributing a finished package](https://github.com/somework/lockrot/blob/main/CONTRIBUTING.md#contributing-a-finished-package).

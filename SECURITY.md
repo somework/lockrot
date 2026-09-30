@@ -44,18 +44,19 @@ The self-update key's fingerprint is the SHA-256 of its DER public key:
 
 | Action | What |
 |---|---|
-| **Reads** | `composer.json` and `composer.lock` (or the manifest `COMPOSER` names, and its lock), the baseline, Composer's configuration and credentials, the environment variables under Credentials below, and lockrot's own cache |
+| **Reads** | `composer.json` and `composer.lock` (or the manifest `COMPOSER` names, and its lock), the baseline, Composer's configuration and credentials, lockrot's own cache, and the environment: the variables in [Environment overrides](docs/configuration.md#environment-overrides) and [Testing hooks](docs/configuration.md#testing-hooks), `COLUMNS` for the table width, and Composer's own |
 | **Writes** | The files you name: reports with `--output`, the baseline with `--generate-baseline`. Its repository-activity cache, under Composer's cache directory. With `self-update`, the PHAR |
 | **Never writes** | `composer.json` or `composer.lock` |
-| **Never runs** | In the PHAR, the inspected project's Composer plugins and scripts |
+| **Never runs** | In the PHAR, the inspected project's Composer plugins: it runs the project with `--no-plugins` |
 
-How a file is written:
+How a report or baseline is written:
 
-- Each file goes to a temporary file beside it, created exclusively so a file or symlink already at
-  that name is never followed, then renamed over the target. lockrot needs write access to that
-  directory.
+- Each report and baseline goes to a temporary file beside it, created exclusively so a file or
+  symlink already at that name is never followed, then renamed over the target. lockrot needs write
+  access to that directory.
 
-- A run interrupted mid-write can leave a `*.tmp` file beside the target.
+- A run interrupted mid-write can leave a `*.tmp` file beside the target. `self-update` stages the
+  new archive beside the PHAR ([Keeping it updated](docs/phar.md#keeping-it-updated)).
 
 - An absolute path is written where it points, inside the project or not.
 
@@ -65,7 +66,8 @@ How a file is written:
   that reaches the same file, is refused before anything runs. The full list of refusals is in
   [Writing reports to files](docs/configuration.md#writing-reports-to-files).
 
-Network access is limited to these hosts. `--offline` reaches none of them.
+Network access is limited to these hosts, unless `LOCKROT_RELEASE_URL` points `self-update`
+elsewhere ([below](#how-self-update-trusts-a-release)). `--offline` reaches none of them.
 
 | Host | When | What for |
 |---|---|---|
@@ -94,7 +96,7 @@ What a report reveals about your repositories (their URLs, names and paths) is i
 ## Known vulnerabilities
 
 lockrot is not a vulnerability scanner: an advisory can raise a finding's priority but never
-creates a finding ([Security advisories](docs/verdicts.md#security-advisories)). Gate on known
+flags a package ([Security advisories](docs/verdicts.md#security-advisories)). Gate on known
 vulnerabilities with `composer audit`.
 
 ## How self-update trusts a release
@@ -102,6 +104,10 @@ vulnerabilities with `composer audit`.
 - **Trust starts with the first download.** Verify that one by hand with the GPG signature or the
   attestation. Every `self-update` after it checks against the self-update key that download
   carries.
+
+- **Two variables replace the trust root.** With `LOCKROT_RELEASE_URL` or `LOCKROT_RELEASE_KEY` set
+  ([Testing hooks](docs/configuration.md#testing-hooks)), `self-update` reads the release list, and
+  checks signatures, against what they name instead of GitHub and the built-in key.
 
 - **What is checked before install.** `self-update` checks the checksum and the self-update
   signature, and installs nothing when either fails
@@ -147,9 +153,9 @@ The self-update key:
   transition release, and verifies with the new key from then on. The transition release's
   changelog names the new fingerprint.
 
-- An archive that finds newer releases only under a key it does not carry, and no installable
-  release that carries that key (the transition release is missing, pulled, or needs a newer PHP),
-  is stranded. `self-update` and `self-update --check` exit `2` and say so; the archive has to be
+- An archive is stranded when a newer release it would take is signed with a key it does not
+  carry and no release can be installed (the transition release is missing, pulled, or needs a
+  newer PHP). `self-update` and `self-update --check` exit `2` and say so; the archive has to be
   [reinstalled by hand](docs/phar.md#reinstalling-by-hand).
 
 - A compromised key cannot vouch for a transition release. Every release signed with it is pulled,
@@ -157,8 +163,8 @@ The self-update key:
   download verified with the GPG signature or the attestation. The advisory and the changelog name
   the new fingerprint.
 
-Archives from before these rules follow a rotation differently; see
-[Keeping it updated](docs/phar.md#keeping-it-updated).
+Archives before 0.13.0 follow a rotation differently:
+[Older releases](docs/phar.md#which-release-it-installs).
 
 ## Related
 

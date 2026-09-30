@@ -3,7 +3,7 @@ title: lockrot baseline — fail CI only on new dependency rot
 description: Record the findings you accept in lockrot-baseline.json with --generate-baseline, commit it, and CI fails only on findings that are new or have got worse.
 ---
 
-# Gate only new findings with a baseline {#baseline}
+# Baseline {#baseline}
 
 Record the findings you have decided to live with, commit the file, and CI fails only on what is
 **new** or has got **worse**:
@@ -15,11 +15,11 @@ git commit -m "chore: accept current dependency rot"
 ```
 
 Run it with the options your CI step uses (`--dev`, `--target-php`, any `LOCKROT_*` override, the
-same `COMPOSER` manifest), or the step can fail on findings the baseline was meant to accept
-([below](#generate-it-with-the-same-dev-setting-your-ci-run-uses)).
+same `COMPOSER` manifest, the same token), or the step can fail on findings the baseline was meant
+to accept ([below](#generate-it-with-the-same-dev-setting-your-ci-run-uses)).
 
-Every later run (plugin or PHAR) reads `lockrot-baseline.json` without a flag and sorts each
-finding into one bucket:
+Every later run (plugin or PHAR) reads the baseline file (`lockrot-baseline.json`, or the
+`baseline` key's path) without a flag and sorts each finding into one bucket:
 
 | Bucket | The finding | Fails the build |
 |---|---|---|
@@ -34,15 +34,16 @@ finding into one bucket:
   [`extra.lockrot.baseline`](configuration.md#extralockrot-keys), relative to `composer.json` or
   absolute. Under `COMPOSER=app/alt.json` that is next to `alt.json`, in `app/`
   ([environment overrides](configuration.md#environment-overrides)).
-- Records every flagged finding of the run. `ok`, `finished` and `unknown` are not findings and are
-  not recorded.
+- Records every flagged finding of the run. `ok`, `finished` and `unknown` findings are not
+  recorded.
 - Replaces the file: a package this run does not flag loses its entry, and a package that stays
   keeps its `first_seen`.
 - Never leaves a truncated baseline, even when interrupted.
 - Prints nothing on stdout; on stderr it ends with
   `lockrot: baseline written to lockrot-baseline.json (<count> findings)`.
-- Exits `0` whatever `--fail-on` says. With `--strict-network`, a repository or repository host that
-  could not be reached still exits `1`, after the file is written.
+- Exits `0` whatever `--fail-on` says. With `--strict-network`, it still exits `1`, after the file
+  is written, when a [run note](notes.md) counts as a network failure
+  ([exit codes](ci.md#exit-codes)).
 - With `--output` on the same run, writes the reports first and the baseline last. The reports carry
   no baseline comparison, and a report that cannot be written (exit `2`) leaves the baseline as it
   was.
@@ -83,7 +84,9 @@ Regenerating accepts every current finding at once, so review what it changes:
 1. Rerun the [generate command](#baseline).
 
 2. Review `git diff lockrot-baseline.json`. An added entry is a finding you accept, a changed
-   `verdict` is the verdict you accept, and a removed entry is fixed or not in `composer.lock`.
+   `verdict` is the verdict you accept. A removed entry is a package this run does not flag: fixed,
+   allowlisted, gone from `composer.lock`, or `unknown` because a lookup failed (the run's
+   [notes](notes.md) say so).
 
 3. Commit the file with the change that needs it.
 
@@ -98,14 +101,12 @@ A run with a baseline adds one line to the `table` and `markdown` output:
 baseline: <known> known · <new> new · <worsened> worsened · <stale> stale (lockrot-baseline.json)
 ```
 
-Here `<stale>` counts stale entries, not findings with the `stale` verdict.
-
 Matching rules:
 
 - **By package name only.** Bumping `vendor/pkg` from `1.2.3` to `1.3.0` while it stays `abandoned`
   keeps it `known`.
-- **By verdict only.** A finding that moves up the severity ladder (from the `stale` verdict to
-  `abandoned`) is `worsened` and can fail the build again. A change of
+- **Compared by verdict, not priority.** A finding that moves up the severity ladder (from the
+  `stale` verdict to `abandoned`) is `worsened` and can fail the build again. A change of
   [priority](verdicts.md#priority) alone, such as a package moving from `require-dev` to `require`,
   keeps it `known`.
 - **Whichever threshold.** A `known` finding does not fail the run under a verdict, a priority or
@@ -120,7 +121,7 @@ How each format shows the comparison:
 | Format | `known` | `worsened` |
 |---|---|---|
 | `table` | `abandoned (baseline)` | `abandoned (was stale)`, naming the accepted verdict |
-| `github`, `sarif`, `gitlab`, `markdown` | Marked in the last row of [How each format marks a finding](ci.md#how-each-format-marks-a-finding) | Marked like a new finding |
+| `github`, `sarif`, `gitlab`, `markdown` | Marked by row 1 of [How each format marks a finding](ci.md#how-each-format-marks-a-finding) | Marked like a new finding |
 | `json` | `baseline.status` is `known`; when the finding reaches `--fail-on`, `gate.exempt_by` is `baseline` ([schema.md](schema.md#what-the-report-schema-types)) | `baseline.status` is `worsened` and `baseline.previous_verdict` names the accepted verdict; `gate.exempt_by` is null |
 
 ## Generate it with the options your CI step uses {#generate-it-with-the-same-dev-setting-your-ci-run-uses}
@@ -129,13 +130,18 @@ Any option that changes verdicts must match between the generate run and the CI 
 reports accepted findings as `new` or `worsened`:
 
 - **`--dev`.** Generated without it and checked with it, the baseline holds no development findings,
-  so the `--dev` run reports every one of them as `new` and can fail. Generated with `--dev` and
-  checked without it is no problem: `stale` entries are measured against the whole `composer.lock`,
-  `packages-dev` included, so the development entries are not reported as stale.
+  so the `--dev` run reports every one of them as `new` and can fail. The reverse is safe: `stale`
+  entries are measured against the whole `composer.lock`, `packages-dev` included.
 
-- **The target PHP.** Pass the same `--target-php` or `LOCKROT_TARGET_PHP`. Without either, lockrot
-  uses `config.platform.php`, else the PHP that runs it, which can differ between your machine and
-  CI ([`target-php`](configuration.md#extralockrot-keys)).
+- **The target PHP.** Pass the same `--target-php` or `LOCKROT_TARGET_PHP`, or set the `target-php`
+  key so both runs read it. Without any of them, lockrot uses `config.platform.php`, else the PHP
+  that runs it, which can differ between your machine and CI
+  ([`target-php`](configuration.md#extralockrot-keys)).
+
+- **Credentials and network.** Generate with the token the CI step has (`GITHUB_TOKEN`, …) and
+  not `--offline`. Without it, checks a verdict rests on do not run, the baseline records weaker
+  verdicts, and CI reports those packages as `new` or `worsened`
+  ([repository hosts](internals.md#repository-hosts-and-credentials)).
 
 - **The manifest.** Run with the same `COMPOSER` value, so both runs read the same lock.
 

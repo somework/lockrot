@@ -1,6 +1,6 @@
 ---
 title: Compatibility — what lockrot 1.0 freezes
-description: Draft of the lockrot 1.0 promise — which fields, sets, exit codes and names stay stable, how a release may change verdicts, reserved names and deprecation.
+description: Draft of the lockrot 1.0 promise — which fields, sets, exit codes and options stay stable, how a release may change verdicts, reserved names and deprecation.
 ---
 
 # Compatibility
@@ -13,8 +13,8 @@ description: Draft of the lockrot 1.0 promise — which fields, sets, exit codes
 
     - **Decided at 1.0.0-RC1:** the [default thresholds](#configuration), the
       [Docker tag scheme](#distribution) and the [PHP and Composer floor](#php-platform) for 1.x.
-    - ***Planned***, not implemented: [`--schema=1` in 2.x](#documents), an
-      [`extends`ed configuration file](#configuration) and the
+    - *Planned:* [`--schema=1` in 2.x](#documents), a
+      [configuration file named by `extends`](#configuration) and the
       [floor-rise warning](#php-platform).
 
 Key your integration on the Contract column. The Not contract column can change in any release,
@@ -26,14 +26,13 @@ patches included; verdicts and priorities change only as [Verdict changes](#verd
 | [Configuration](#configuration) | `extra.lockrot` keys and the environment variables | The [testing hooks](configuration.md#testing-hooks) |
 | [Machine output](#documents) | `json`, `sarif`, `gitlab` and `github`, the baseline file, and the `report` embedded in `html` | `table`, `markdown`, the look of `html`, the `--explain` text and the install-time summary |
 | [Inside documents](#documents) | Ids, codes, keys and data fields | Every human-readable sentence: summaries, notes, evidence, messages |
-| [Verdicts](#closed-sets-and-their-order) | The closed sets and their order | Which verdict and priority a package gets |
-| [Distribution](#distribution) | The PHAR asset names and verification path, `lockrot-action@v1` and its inputs, `self-update` staying within its major | The Docker tag scheme, until 1.0.0-RC1 chooses it |
+| [Closed sets](#closed-sets-and-their-order) | The closed sets and their order | Which verdict and priority a package gets |
+| [Distribution](#distribution) | The PHAR asset names and verification path, `lockrot-action@v1` and its inputs, `self-update` staying within its major and on a PHP it runs on | The Docker tag scheme, until 1.0.0-RC1 chooses it |
 | [PHP platform](#php-platform) | — | The PHP and Composer floor, until 1.0.0-RC1 chooses the one for 1.x |
 | [PHP code](#what-is-not-contract) | — | The classes under `src/` |
 
 CI owners: pin the lockrot version, and read a release's [Verdict changes](#verdict-changes)
-before you move the pin. The full lists are [What 1.0 freezes](#what-10-freezes) and
-[What is not contract](#what-is-not-contract).
+before you move the pin.
 
 ## What 1.0 freezes
 
@@ -51,9 +50,8 @@ before you move the pin. The full lists are [What 1.0 freezes](#what-10-freezes)
 
 - *Planned:* lockrot 2.x keeps writing report-1 behind `--schema=1`.
 
-- Human-readable strings inside a document (a signal's `summary`, a note, an evidence sentence) are
-  text, not contract. Key on ids and data fields: for a run's notes, on `note_details`
-  ([Run notes](#run-notes)), never on `notes`.
+- Key on ids and data fields: for a run's notes, on `note_details` ([Run notes](#run-notes)),
+  never on `notes`.
 
 ### Closed sets and their order
 
@@ -101,26 +99,21 @@ These sets grow in minor releases:
 - a finding's `origin.kind` and `origin.registry`;
 - format names, the configuration's `format` among them.
 
-The schemas describe these as open strings, except the keys of `libyears.unmeasured` and the format
-names given on the command line: a `pattern` plus `x-known-values`, the values lockrot writes, a
-list that only grows within 1.x. By name: signal ids, S10's `check` and `reason`, S6's `reason`,
-S8's `floor_source`, the explanation's `php_blocked_by`, `misses_target_php` and
-`misses_project_php`, a finding's `libyears_unmeasured`, a `priority_basis` step's `reason`, a
-`no_fix_expected` item's `reason`, `run.mode`, `run.fail_on_kind`, `gate.tripped_by`, a finding's
-`gate.exempt_by`, a run note's `code`, and the `forge_id` and `reason` in its `data`, a finding's
-`origin.kind` and `origin.registry`, and the configuration's `format`.
-[schema.md](schema.md#open-sets) says how a validator reads them.
+The schemas describe signal ids, S10's `check` and `reason`, S6's `reason`, S8's `floor_source`,
+the explanation's `php_blocked_by`, `misses_target_php` and `misses_project_php`, a finding's
+`libyears_unmeasured`, a `priority_basis` step's `reason`, a `no_fix_expected` item's `reason`,
+`run.mode`, `run.fail_on_kind`, `gate.tripped_by`, a finding's `gate.exempt_by`, a run note's
+`code`, and the `forge_id` and `reason` in its `data`, a finding's `origin.kind` and
+`origin.registry`, and the configuration's `format` as open strings.
 
-Repository hosts grow only through a run note's `forge_id` and a finding's `origin.registry`. The
-other host fields, S3 and S4's `host` and the explanation's `activity.forge`, are plain strings.
+Repository hosts are an open set only in a run note's `forge_id`, and Composer registries only in a
+finding's `origin.registry`; S3 and S4's `host` and the explanation's `activity.forge` are plain
+strings.
 
-Reading a value you do not know:
-
-- Read it as "other": show it as written, and do not fail on it.
-- A `priority_basis` step whose `reason` you do not know still shows its direction: compare `from`
-  and `to`.
-- In lockrot's own input it is an error: `--format`, `--output` and `extra.lockrot.format` accept
-  only the format names the release knows.
+[schema.md](schema.md#open-sets) says how to read a value you do not know. A `priority_basis` step
+whose `reason` you do not know still shows its direction: compare `from` and `to`. In lockrot's own
+input an unknown format name is an error: `--format`, `--output` and
+`extra.lockrot.format` accept only the names the release knows.
 
 A minor release may split a `libyears_unmeasured` reason, `no_stable_release_date` included, into
 narrower ones, which moves findings out of the old `libyears.unmeasured` key
@@ -158,7 +151,8 @@ Not frozen:
 - A catch-all reason: a minor release may move cases out of it into reasons of their own.
 
 A new code or reason arrives only in a minor release, and changes no verdict or priority. Under
-`--strict-network`, a new code whose `sets_network_failures` is true can make a run exit `1`.
+`--strict-network`, a new code whose `sets_network_failures` is true can make a run exit `1`
+([what trips it](ci.md#exit-codes)).
 
 ### Package origins
 
@@ -199,21 +193,9 @@ code.
 
 ### Severity mapping
 
-Each finding gets one level: the first rule that matches decides. The table is contract.
-
-| # | The finding is… | SARIF `level` | GitLab `severity` | GitHub annotation |
-|---|---|---|---|---|
-| 1 | `known` to the baseline | `note` | `info` | `notice` |
-| 2 | at or above `--fail-on` (for `--fail-on=unchecked`: carrying S10, whatever its verdict) | `error` | `major` | `error` |
-| 3 | any other flagged verdict | `warning` | `minor` | `warning` |
-| 4 | anything else (shown only with `--all`) | `note` | `info` | `notice` |
-
-- SARIF `rank` follows the priority: `critical` 100.0, `high` 75.0, `medium` 50.0, `low` 25.0,
-  `none` 0.0.
-- A SARIF rule's default level is `warning` for a flagged verdict and `note` otherwise.
-- In the report's own fields: a finding is at `error` exactly where its `gate.reaches_fail_on` is
-  true and its `gate.exempt_by` is not `baseline`. That holds in a `--generate-baseline` run too,
-  whose `gate.fail_on_applied` is false, so there a finding at `error` fails nothing.
+The `github`, `sarif` and `gitlab` columns of
+[How each format marks a finding](ci.md#how-each-format-marks-a-finding), and its rules for SARIF
+`rank` and a SARIF rule's default level, are frozen for 1.x.
 
 ### Command line
 
@@ -221,16 +203,15 @@ Each finding gets one level: the first rule that matches decides. The table is c
   `self-update` (alias `selfupdate`).
 - The options in [CLI options](configuration.md#cli-options), and `self-update`'s `--check`,
   `--force`, `--offline` and `--allow-major` ([phar.md](phar.md#keeping-it-updated)).
-- Every format name a release has shipped keeps its meaning for all of 1.x; new names may arrive
-  ([Open sets](#open-sets)). [Which output is contract](#compatibility).
+- Every format name a release has shipped keeps its meaning for all of 1.x, and new names may
+  arrive ([Open sets](#open-sets)); the [table](#compatibility) says whose contents are contract.
 - The `--fail-on` values.
-- The variables in [Environment overrides](configuration.md#environment-overrides). The
-  [testing hooks](configuration.md#testing-hooks) are not included.
 - Exit codes: the closed set `0`, `1` and `2`, as [ci.md](ci.md#exit-codes) defines them.
   `self-update` gives them [meanings of its own](phar.md#self-update-exit-codes).
     - lockrot's own commands exit `2` on every usage or configuration error.
-    - `0` and `1` follow the report's `gate.fails`, with its causes in `gate.tripped_by`; a run
-      that then cannot write an `--output` file or the baseline exits `2` instead.
+    - In a check or `--generate-baseline` run, `0` and `1` follow the report's `gate.fails`, with
+      its causes in `gate.tripped_by`; a run that then cannot write an `--output` file or the
+      baseline exits `2` instead.
     - An exit `1` from Composer or Symfony before lockrot runs is not lockrot's
       ([ci.md](ci.md#exit-1-not-from-lockrot)).
 - Messages about lockrot itself (a failure, a warning, a deprecation) go to stderr, never into the
@@ -239,21 +220,24 @@ Each finding gets one level: the first rule that matches decides. The table is c
 ### Configuration
 
 - `extra.lockrot` keys are never removed within 1.x.
+- The variables in [Environment overrides](configuration.md#environment-overrides) are frozen with
+  the keys; the [testing hooks](configuration.md#testing-hooks) are not.
 - Precedence, where the first that sets a value wins: CLI options, environment variables,
-  `extra.lockrot`, the defaults. The one exception: a credential
-  Composer already holds for a host (`auth.json`, `COMPOSER_AUTH`) is the one sent, whatever the
-  token variables say ([internals.md](internals.md#repository-hosts-and-credentials)).
+  `extra.lockrot`, the defaults. The one exception: when Composer already holds a credential
+  header for a host (`auth.json`, `COMPOSER_AUTH`), lockrot sends that header instead of its own
+  token ([Which credentials](internals.md#which-credentials)).
 - A key lockrot does not know, at the top level or inside an `ignore` entry, prints one warning on
-  stderr and changes nothing else ([Unknown keys](configuration.md#unknown-keys)). The
+  stderr and changes nothing else, as [Unknown keys](configuration.md#unknown-keys) describes. The
   [reserved names](#names-reserved-for-extensions) never warn.
 - The default thresholds are chosen at 1.0.0-RC1, and a later change to one is a
   [Verdict change](#verdict-changes). To hold the numbers fixed, set them in `extra.lockrot`.
-- *Planned:* an `extends`ed configuration file, read after `extra.lockrot` and before the defaults.
+- *Planned:* a configuration file named by `extends`, read after `extra.lockrot` and before the
+  defaults.
 
-### Blocking at `composer require`
+### Blocking at install time {#blocking-at-composer-require}
 
-The `install-time-strict` key and its effect, stopping a `composer require` that brings in a
-finding at or above `fail-on`, are frozen with the rest of the [configuration](#configuration)
+The `install-time-strict` key and its effect, stopping a `composer require`, `update` or `install`
+when a finding reaches `fail-on`, are frozen with the rest of the [configuration](#configuration)
 ([install-time.md](install-time.md#install-time-strict)).
 
 ### Distribution
@@ -263,13 +247,13 @@ finding at or above `fail-on`, are frozen with the rest of the [configuration](#
 - The PHAR, and the image and the Action that run it, bundle a Composer new enough for every check,
   so only the plugin, which runs on the project's Composer, checks less under an older one
   ([`advisories_not_checked`](notes.md#advisories_not_checked),
-  [which advisory settings it reads](configuration.md#the-allowlist)).
+  [which advisory settings it reads](verdicts.md#security-advisories)).
 - The PHAR's asset names and the [verification path](phar.md#verifying-the-download) are stable.
 - `lockrot-action@v1` follows lockrot 1.x, and its inputs follow Semantic Versioning. lockrot 2.0
   means action v2.
-- The Docker tag scheme is chosen at 1.0.0-RC1.
-- `self-update` stays within the running major version unless `--allow-major` is given
-  ([which release it installs](phar.md#which-release-it-installs)).
+- `self-update` stays within the running major version unless `--allow-major` is given, and passes
+  over a release that needs a newer PHP than the running one or is signed with a key the archive
+  does not carry ([which release it installs](phar.md#which-release-it-installs)).
 
 ### PHP platform
 
@@ -308,8 +292,9 @@ verdicts only under these rules:
   the report and decides nothing until the next minor release.
 
 A committed baseline does not make an upgrade silent: a package a release starts flagging is `new`,
-one whose verdict worsens is `worsened`, and either fails at or above `--fail-on`. An unchanged lock
-can cross a threshold too, as its packages' releases age ([baseline.md](baseline.md)).
+one whose verdict worsens is `worsened`, and either one fails the run when it reaches `--fail-on`.
+An unchanged lock can cross a threshold too, as its packages' releases age
+([baseline.md](baseline.md)).
 
 ## Extending lockrot
 
@@ -318,7 +303,7 @@ can cross a threshold too, as its packages' releases age ([baseline.md](baseline
 - **JSON out.** Every [distribution](#distribution) writes report-1 and explain-1 from the same
   code. Dashboards, fleet summaries, other formats and organisation policy (a `jq -e` gate) are
   programs over those documents.
-- **Composer configuration in.** lockrot reads repository hosts from Composer's own configuration
+- **Composer configuration in.** lockrot reads extra GitLab hosts from Composer's `gitlab-domains`
   and has no host keys of its own ([hosts](internals.md#repository-hosts-and-credentials)).
 - **A pull request for code.** New signals, S10 reasons, hosts and fields go into lockrot itself,
   in minor releases, under the [additive rule](#documents) and [Verdict changes](#verdict-changes).

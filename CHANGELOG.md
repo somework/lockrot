@@ -12,25 +12,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Act if you publish reports, set `COMPOSER`, `LOCKROT_FAIL_ON` or `LOCKROT_TARGET_PHP`, use lockrot's
 PHP classes, validate with Ajv strict or a vendored schema copy, or run `self-update --check` where
 only `api.github.com` is reachable. A bad command line now exits `2`, not `1`. No verdict or
-priority rule changed; earlier documents still validate.
+priority rule changed, but under `COMPOSER` verdicts can differ; earlier documents still validate.
 
 ### Verdict changes
 
-No rule changed. With `COMPOSER` set, verdicts and priorities can differ, because that manifest's
-thresholds, `ignore` and baseline now apply. Action: keep `extra.lockrot` and the baseline with the
-manifest `COMPOSER` names (see Fixed).
+- **Breaking:** **Config:** with `COMPOSER=alt.json`, lockrot reads `extra.lockrot` from `alt.json`,
+  keeps the default baseline beside it and analyses `alt.lock`, so its thresholds, `ignore` and
+  `fail-on` apply and verdicts can differ. `github`, `gitlab` and `sarif` name `alt.lock`, with
+  unchanged fingerprints. Action: keep `extra.lockrot` and the baseline with that manifest.
+  ([Environment overrides](docs/configuration.md#environment-overrides))
 
 ### Security
 
-- **json, html:** `run.root_package` carries the `name` of the manifest Composer reads, whatever
-  `extra.lockrot.project` says: `project` renames the project in a report and hides nothing.
-  Action: if you set `project` to keep a client's name out of published reports, check each report
-  before you publish it. ([What the run was told](docs/schema.md#what-the-run-was-told))
+- **Breaking:** **json, html:** reports gain `run.root_package`, the `name` of the manifest
+  Composer reads, to match a report to its repository. `extra.lockrot.project` renames the project
+  and hides nothing, and no option hides `root_package`. Action: if you set `project` to keep a
+  client's name out of published reports, remove the name from each report before publishing it.
+  ([What the run was told](docs/schema.md#what-the-run-was-told))
 
-- **CLI:** reports and `--explain` quote no credential and no machine path (SARIF's `%SRCROOT%`
-  aside): a URL loses userinfo, query and fragment, a path keeps its last segment, `baseline.path`
-  is project-relative. Earlier releases printed logins and `?token=` queries whole, and on Composer
-  2.4 to 2.9 tokens in the URL's user part. Action: check older published reports; rotate any token.
+- **CLI (every format):** reports and `--explain` quote no credential and no machine path (SARIF's
+  `%SRCROOT%` aside): a URL loses userinfo, query and fragment, a path keeps its last segment,
+  `baseline.path` keeps no absolute path. Earlier releases printed logins and URL tokens whole.
+  Action: check older published reports; rotate any token.
   ([What a report reveals](docs/schema.md#what-a-report-says-about-your-repositories))
 
 - **CLI:** text from outside lockrot (a package name, version or constraint, a note, an error
@@ -43,13 +46,13 @@ manifest `COMPOSER` names (see Fixed).
   created exclusively beside the target: a file or symlink already at that temporary name fails the
   write instead of being followed, and a replaced file keeps its permission bits. Action: let the
   job write to the target's directory; an interrupted run can leave a `*.tmp` there.
-  ([Writing reports to files](docs/configuration.md#writing-reports-to-files))
+  ([What lockrot does and does not do](https://github.com/somework/lockrot/blob/v0.13.0/SECURITY.md#what-lockrot-does-and-does-not-do))
 
-- **PHAR:** every release publishes `lockrot.phar.meta.json`, naming the lowest PHP the archive runs
-  on and the fingerprint of the key that signed `lockrot.phar.sig.json`; `self-update` reads it, a
-  0.13.0+ release without it is an error, and the checksum and signature still decide what installs.
-  A release must be signed with the last one's key, so no rotation skips its transition release.
-  ([Which release it installs](docs/phar.md#which-release-it-installs), [Key custody and rotation](https://github.com/somework/lockrot/blob/v0.13.0/SECURITY.md#key-custody-and-rotation))
+- **PHAR:** every release publishes `lockrot.phar.meta.json`, naming its PHP floor and signing key,
+  which `self-update` and `--check` read from `github.com`; the checksum and signature still decide
+  what installs. A key rotation ships a release signed with the old key that carries the new one.
+  ([Which release it installs](docs/phar.md#which-release-it-installs),
+  [Key custody and rotation](https://github.com/somework/lockrot/blob/v0.13.0/SECURITY.md#key-custody-and-rotation))
 
 - **Docs:** `SECURITY.md` lists every host lockrot contacts, every credential it reads and every
   file it writes. Action: none.
@@ -57,16 +60,16 @@ manifest `COMPOSER` names (see Fixed).
 
 ### Added
 
-- **CLI:** `--output=<format>:<path>`, repeatable, writes several reports from one run, each byte
-  for byte what its `--format` prints, except that a `table` file has no colours and is 120 columns
-  wide. A relative path starts from the working directory, and the file's directory must exist. A
-  path to `composer.json`, the lock or a baseline is refused (exit `2`). In the PHAR, join the value
-  with `=`. ([Writing reports to files](docs/configuration.md#writing-reports-to-files))
+- **CLI:** `--output=<format>:<path>`, repeatable, writes several reports from one run, each as its
+  `--format` prints it (a `table` file has no colours and is 120 columns wide). A relative path is
+  relative to the directory lockrot runs in (`-d` changes it); the directory must exist. A path to
+  `composer.json`, the lock or a baseline, and `--output` with `--explain`, are refused (exit `2`).
+  ([Writing reports to files](docs/configuration.md#writing-reports-to-files))
 
 - **Config:** each `extra.lockrot` key lockrot does not read gets one line on stderr, with the key
   it was probably meant to be: `lockrot: unknown key extra.lockrot.install-tme ignored (did you mean
-  install-time?)`. The exit code does not change. When the schema rejects `extra.lockrot`, the error
-  lists the unknown keys too. `extensions` and keys starting with `x-` are never warned about.
+  install-time?)`. When the schema rejects `extra.lockrot`, the error lists the unknown keys too.
+  `extensions` and keys starting with `x-` are never warned about.
   ([Unknown keys](docs/configuration.md#unknown-keys))
 
 - **json:** `gate` says whether the run fails and why: `fails`, `tripped_by` (`strict_network`,
@@ -74,13 +77,9 @@ manifest `COMPOSER` names (see Fixed).
   (`baseline`) and `fails`, and `run` gains the inputs: `strict_network`, `mode` and
   `fail_on_kind`. ([The gate](docs/schema.md#the-gate))
 
-- **json:** `run.root_package` is the `name` of the manifest Composer reads, null when it has none:
-  the key to match a report to its repository. Security says what it reveals.
-  ([What the run was told](docs/schema.md#what-the-run-was-told))
-
 - **json:** `note_details` types each entry of `notes`, at the same index: `code`, `text`,
   `docs_url` (the code's section of the Run notes page), `sets_network_failures` and `data`, typed
-  per code. The `--explain` document carries it too. ([Run notes](docs/notes.md))
+  per code. The `--explain` document carries it too. ([Run notes](docs/schema.md#run-notes))
 
 - **json:** each finding says where its lock entry came from: `origin` (`kind`, `registry`,
   `package_url`, `local`), `from_composer_repository` (whether lockrot asks a repository about it)
@@ -97,9 +96,10 @@ manifest `COMPOSER` names (see Fixed).
   `libyears.unmeasured`. `libyears.unmeasured` accepts keys it does not list, each a count
   ([Open sets](docs/schema.md#open-sets)). ([Libyears](docs/verdicts.md#libyears))
 
-- **json:** `exposure_rule.max_fan_in` is the fan-in above which a flagged transitive package is
-  attributed to no direct requirement; `unattributed` lists those packages (`package`, `verdict`,
-  `fan_in`). ([Shared packages](docs/verdicts.md#shared-packages-and-unattributed))
+- **json:** `exposure_rule.max_fan_in`: a flagged transitive package reached from more direct
+  requirements than this is attributed to none of them; `unattributed` lists those packages
+  (`package`, `verdict`, `fan_in`).
+  ([Shared packages](docs/verdicts.md#shared-packages-and-unattributed))
 
 - **json:** `run.project_php` is the project's own `require.php`. In `--explain --format=json` each
   release branch says whether the project can move onto it: `admits_target_php`,
@@ -110,7 +110,7 @@ manifest `COMPOSER` names (see Fixed).
 - **json:** S6's `data` says whether a pinned package ever released: `reason`,
   `has_stable_release`, `last_stable_release`, `last_stable_version`, `last_stable_dated_by` and
   `snapshot_time`. The `--explain` text prints those that have a value.
-  ([The signals](docs/verdicts.md#the-signals))
+  ([Pinned: what S6 carries](docs/verdicts.md#what-s6-carries))
 
 - **Docs:** [Compatibility](docs/compatibility.md) drafts what 1.0 freezes, the verdict-change
   policy and deprecation.
@@ -119,19 +119,19 @@ manifest `COMPOSER` names (see Fixed).
 
 - **Breaking:** **json, Config:** the value sets that grow in minor releases (signal ids and others,
   see [Open sets](docs/schema.md#open-sets)) are open strings in the published schemas: a `pattern`
-  plus `x-known-values`. The schema URLs already serve them, so a validator that fetches them is
-  affected even if you stay on 0.12. Action: with Ajv strict, declare `x-known-values` or set
-  `strict: false`; refresh an earlier vendored copy, whose enums reject new values.
+  plus `x-known-values`. The schema URLs serve the newest release's files, so a validator that
+  fetches them is affected even if you stay on 0.12. Action: with Ajv strict, declare
+  `x-known-values` or set `strict: false`; refresh an earlier vendored copy.
 
 - **Breaking:** **Config:** an invalid `LOCKROT_FAIL_ON` or `LOCKROT_TARGET_PHP` is a configuration
   error (exit `2`) naming the variable, even when `--fail-on` or `--target-php` overrides it.
   Action: fix or unset the variable.
   ([Environment overrides](docs/configuration.md#environment-overrides))
 
-- **Breaking:** **self-update:** `--check` exits `2` when it cannot read the chosen release's
-  `lockrot.phar.meta.json` from github.com release downloads, or when the archive is stranded by a
-  key rotation; it exits `1` only when an update would install something. Action: where only
-  `api.github.com` is reachable, also allow github.com release downloads.
+- **Breaking:** **self-update:** `--check` exits `1` only when an update would install. With or
+  without `--check`, it exits `2` when it cannot read the chosen release's `lockrot.phar.meta.json`,
+  or when a newer release it would take is signed with a key this archive lacks and none installs.
+  Action: where only `api.github.com` is reachable, allow `github.com` and the host it redirects to.
   ([`self-update` exit codes](docs/phar.md#self-update-exit-codes))
 
 - **Breaking:** **PHP API:** every class, interface and trait under `src/`, the plugin class
@@ -141,21 +141,21 @@ manifest `COMPOSER` names (see Fixed).
   ([Names reserved for extensions](docs/compatibility.md#names-reserved-for-extensions))
 
 - **self-update:** installs only within the running major (all of 0.x is one) and skips, saying why,
-  a release needing a newer PHP or a key it lacks; a stranded archive exits `2`. `--allow-major`
-  moves one major; `--force` reinstalls the newest release at or below the running one in its major,
-  else exits `2`. Archives up to 0.12 still follow `releases/latest`. `LOCKROT_RELEASE_URL` now
-  names a release list. ([Which release it installs](docs/phar.md#which-release-it-installs))
+  a release needing a newer PHP or a key it lacks. `--allow-major` moves one major; `--force`
+  installs as a plain run does, else reinstalls the newest release at or below the running one in
+  its major, else exits `2`. Archives up to 0.12 still follow `releases/latest`.
+  ([Which release it installs](docs/phar.md#which-release-it-installs))
 
-- **html:** the page is [lockrot-report](https://github.com/somework/lockrot-report) 0.13.0, which
+- **html:** the page is lockrot-report 0.13.0
+  ([changelog](https://github.com/somework/lockrot-report/blob/v0.13.0/CHANGELOG.md#0130)). It
   reads `gate`, `origin.package_url`, `replacement_url`, `priority_basis`, `no_fix_expected` and
-  `note_details`, so its package and replacement links are the ones the report gives; its changelog
-  lists what the page shows.
+  `note_details`.
 
-- **Docs:** the semantic-versioning promise covers the CLI and its exit codes, `self-update`, the
-  environment variables, the configuration keys, the `json`, `sarif`, `gitlab` and `github` formats
-  and the baseline file; `table`, `markdown`, `html` and the PHP code under `src/` are outside it.
-  Action: parse `json`, not `table` or `markdown`.
-  ([Backward compatibility](https://github.com/somework/lockrot/blob/v0.13.0/CONTRIBUTING.md#backward-compatibility))
+- **Docs:** the semantic-versioning promise covers the command line, the `extra.lockrot` keys and
+  environment variables (not the testing hooks), `json`, `sarif`, `gitlab`, `github`, the report
+  `html` embeds, the baseline and `lockrot-action@v1`'s inputs. `table`, `markdown`, the look of
+  `html`, the `--explain` text, the install-time summary and `src/` classes are not: parse `json`.
+  ([What 1.0 freezes](docs/compatibility.md#what-10-freezes))
 
 - **Docs:** a change that can move a verdict, a priority or what `--fail-on=unchecked` matches
   ships only in a minor release, under **Verdict changes**; the one patch exception is a
@@ -164,19 +164,13 @@ manifest `COMPOSER` names (see Fixed).
 
 ### Fixed
 
-- **Breaking:** **CLI:** with `COMPOSER=alt.json`, lockrot reads `extra.lockrot` from `alt.json`,
-  analyses `alt.lock` and keeps the default baseline beside `alt.json`, so its thresholds, `ignore`
-  and `fail-on` apply. `github`, `gitlab` and `sarif` name `alt.lock`; GitLab and SARIF fingerprints
-  are unchanged. Action: keep `extra.lockrot` and the baseline with the manifest `COMPOSER` names.
-  ([Environment overrides](docs/configuration.md#environment-overrides))
-
 - **Breaking:** **CLI:** a command line lockrot cannot read (an unknown option, a missing value, a
   value given to a flag, an extra argument) exits `2` with one `lockrot:` line, from
   `composer lockrot` and `self-update` alike, instead of Composer's error box and exit `1`. An
   unknown command name is still exit `1`. Action: a job that allows exit `1` now fails on a bad
   option; fix the command line. ([Exit codes](docs/ci.md#exit-codes))
 
-- **CLI:** `LOCKROT_DISABLE=1` skips `composer lockrot` before anything is read, so a broken
+- **Config:** `LOCKROT_DISABLE=1` skips `composer lockrot` before anything is read, so a broken
   configuration or a bad option no longer exits `2` under it.
   ([Environment overrides](docs/configuration.md#environment-overrides))
 
@@ -195,7 +189,7 @@ manifest `COMPOSER` names (see Fixed).
   ([What was not checked](docs/verdicts.md#what-was-not-checked))
 
 - **Docs:** an advisory with no fix expected raises the priority reached after the transitive and
-  dev steps, so a transitive `left-behind` package with one is `high`, not `critical`.
+  dev steps, so a transitive production `left-behind` package with one is `high`, not `critical`.
   ([Priority](docs/verdicts.md#priority))
 
 - **Docs:** `not_from_composer_repository` counts every lock entry without a Composer
@@ -206,9 +200,10 @@ manifest `COMPOSER` names (see Fixed).
   a direct requirement only when it pulls in an attributable flagged package.
   ([Transitive exposure](docs/verdicts.md#transitive-exposure))
 
-- **Docs:** the recipe that cuts the report out of an `html` page fails instead of writing an empty
-  file when the page does not match; `--output=json:lockrot.json` in the same run is the simpler
-  route. ([`--format=html`](docs/ci.md#-formathtml))
+- **Docs:** to keep the JSON report beside an `html` page, write both from one run with
+  `--output=json:lockrot.json`. The earlier recipe that cut the report out of the page wrote an
+  empty file when the page did not match. Action: if you copied it, replace it with `--output`.
+  ([The JSON beside the page](docs/ci.md#the-json-beside-the-page))
 
 ## [0.12.0] - 2026-09-24
 

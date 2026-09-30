@@ -1,8 +1,9 @@
 # Contributing to lockrot
 
 Build lockrot, run the checks CI runs, and change it without breaking a promise it makes to users.
-What semantic versioning covers is listed under [Backward compatibility](#backward-compatibility);
-how to write docs and changelog entries is in [the rule files](#writing-the-changelog-and-the-docs).
+What semantic versioning covers is in [What 1.0 freezes](docs/compatibility.md#what-10-freezes),
+and your duties when a change touches it are under [Backward compatibility](#backward-compatibility).
+How to write docs and changelog entries is in [the rule files](#writing-the-changelog-and-the-docs).
 
 ## Getting set up
 
@@ -27,11 +28,11 @@ and add `-c phpunit9.xml.dist` to the other PHPUnit rows.
 CI runs each check above (the PHPUnit suite on every PHP and Composer pair of the `tests` matrix
 in `.github/workflows/ci.yml`) and these gates:
 
-| Gate | Where its scope and floor live | Run it locally |
+| Gate | Configured in | Run it locally |
 |---|---|---|
-| Core coverage | Directories: `phpunit.core-coverage.xml.dist`. Floor: the "Core coverage gate" step of `ci.yml` | With pcov or Xdebug: `vendor/bin/phpunit -c phpunit.core-coverage.xml.dist --coverage-clover build/clover-core.xml`, `composer global require rregeer/phpunit-coverage-check`, then `coverage-check build/clover-core.xml <floor>` |
-| Mutation score (Infection) | Shards and their `min_msi`: the `mutation` job of `ci.yml`. Whole-tree floor for a local run: `infection.json5` | On the PHP the `mutation` job uses, with pcov or Xdebug: `composer global config --no-plugins allow-plugins.infection/extension-installer true`, `composer global require infection/infection:<constraint in the mutation job>`, then `infection --threads=max` |
-| Undeclared dependencies | `composer-require-checker.json` | `composer global require maglnet/composer-require-checker`, then `composer-require-checker check --config-file=composer-require-checker.json composer.json` |
+| Core coverage | Directories: `phpunit.core-coverage.xml.dist`. Floor: the "Core coverage gate" step of `ci.yml` | With pcov or Xdebug: `vendor/bin/phpunit -c phpunit.core-coverage.xml.dist --coverage-clover build/clover-core.xml`, `composer global require rregeer/phpunit-coverage-check`, then `$(composer global config bin-dir --absolute)/coverage-check build/clover-core.xml <floor>` |
+| Mutation score (Infection) | Shards and their `min_msi`: the `mutation` job of `ci.yml`. Whole-tree floor for a local run: `infection.json5` | On the PHP the `mutation` job uses, with pcov or Xdebug: `composer global config --no-plugins allow-plugins.infection/extension-installer true`, `composer global require infection/infection:<constraint in the mutation job>`, then `$(composer global config bin-dir --absolute)/infection --threads=max` |
+| Undeclared dependencies | `composer-require-checker.json` | `composer global require maglnet/composer-require-checker`, then `$(composer global config bin-dir --absolute)/composer-require-checker check --config-file=composer-require-checker.json composer.json` |
 | Docs build | `mkdocs.yml` | `pip install -r docs/requirements.txt`, then `mkdocs build --strict` |
 | Corpus self-test | `tools/corpus/tests/` | `tools/corpus/corpus selftest` |
 | PHAR build and byte-identical rebuild | `build/build-phar.sh` | `build/build-phar.sh` ([The PHAR](#the-phar)) |
@@ -78,30 +79,14 @@ A change to the docs or the changelog is reviewed against these files.
 | [`.claude/rules/changelog.md`](.claude/rules/changelog.md) | `CHANGELOG.md`: the release structure, the shape of an entry, what goes in which section, and what never goes in |
 
 `composer test` includes the tests that read doc text and validate the JSON samples in `docs/`;
-`mkdocs build --strict` checks the links and anchors.
+`mkdocs build --strict` checks the links and anchors in `docs/` and in `CHANGELOG.md`, which the
+site includes. Links in `README.md`, `CONTRIBUTING.md` and `SECURITY.md` are not built, so check
+them by hand.
 
 ## Backward compatibility
 
-The public interface follows semantic versioning. It is:
-
-- the CLI: the commands `composer lockrot` (alias `composer rot`) and the PHAR's `lockrot`, their
-  options and their exit codes;
-- the PHAR's `self-update` (alias `selfupdate`): its options and its exit codes;
-- the environment variables listed under
-  [Environment overrides](docs/configuration.md#environment-overrides) (the testing hooks are not
-  included);
-- the `extra.lockrot` configuration keys;
-- the machine-readable output formats (`json`, `sarif`, `gitlab`, `github`) and the report-1
-  document the `html` page embeds under `report`;
-- the baseline file;
-- the schema URLs under `https://lockrot.dev/schema/`, and every `docs_url` lockrot has written
-  ([Run notes](docs/notes.md));
-- the PHAR's release asset names (`lockrot.phar` and every `lockrot.phar.*` file a release
-  publishes) and its [verification path](docs/phar.md#verifying-the-download).
-
-`table`, `markdown`, the `--explain` text and the look of the `html` page are for people and may
-change in any release. The full frozen surface, with the closed sets, finding identity and the
-reserved names, is in [What 1.0 freezes](docs/compatibility.md#what-10-freezes).
+Check a change against [What 1.0 freezes](docs/compatibility.md#what-10-freezes) and
+[What is not contract](docs/compatibility.md#what-is-not-contract) before review.
 
 The PHP classes under `src/` are not a public API and may change in any release. Every class,
 interface, trait and enum there is marked `@internal`, and `tests/Unit/PublicApiTest.php` fails on
@@ -109,15 +94,15 @@ one that is not.
 
 The namespace `Lockrot\Extension\` is reserved. Nothing is declared in it, and `PublicApiTest`
 fails on a class that is, or on a `src/Extension/` directory, in any letter case: PHP matches
-namespaces without regard to case.
+namespaces without regard to case. The other reserved names are in
+[Names reserved for extensions](docs/compatibility.md#names-reserved-for-extensions).
 
 Your duties when a change touches the contract:
 
 - A change that can alter the verdict or the priority a package gets, or what
   `--fail-on=unchecked` matches, ships in a minor release and gets an entry under
   `### Verdict changes`. A new signal that decides verdicts ships for one minor release as
-  evidence only. The policy and its patch exception are in
-  [Verdict changes](docs/compatibility.md#verdict-changes).
+  evidence only. The policy is in [Verdict changes](docs/compatibility.md#verdict-changes).
 - A deprecation follows [Deprecation](docs/compatibility.md#deprecation).
 
 ## What lockrot writes
@@ -148,17 +133,17 @@ The canonical list of what lockrot reads, writes and contacts is
 
 The published schemas are `resources/lockrot-*.schema.json`. Under one schema number they only
 widen: `tests/Integration/SchemaEvolutionTest.php` holds them to every release's copy in
-`tests/fixtures/schema-evolution/schemas/<version>/` and to the documents older release PHARs wrote
-in `tests/fixtures/schema-evolution/<version>/`. Both fixture sets are frozen by pinned hashes, so a
-failure there is fixed in the schema change, never in the fixture.
+`tests/fixtures/schema-evolution/schemas/<version>/`. It also holds them to the documents older
+release PHARs wrote, in `tests/fixtures/schema-evolution/<version>/`. Both fixture sets are
+frozen by pinned hashes, so a failure there is fixed in the schema change, never in the fixture.
 
 | Change | Also required |
 |---|---|
 | A new value in an open set | Add it to that node's `x-known-values`, never to an `enum`. `tests/Unit/Verdict/ClosedSetsTest.php` holds each list to the code |
-| A new open set | Name it in the bullet list and the "The schemas describe" paragraph of `docs/compatibility.md` "Open sets", and in the "Objects are open" paragraph of `docs/schema.md` "Open sets" (`ClosedSetsTest`) |
+| A new open set | Register its node, pattern, values and doc phrase in `openSets()` in `ClosedSetsTest`, the one registry of open sets. Name it in the bullet list and the "The schemas describe" paragraph of `docs/compatibility.md` "Open sets", and in the "Objects are open" paragraph of `docs/schema.md` "Open sets" (`ClosedSetsTest`) |
 | A new signal | [Adding a signal](#adding-a-signal) |
 | A new run note code | [Adding a run note code](#adding-a-run-note-code) |
-| A value in a closed set | Not possible under the same schema number ([Closed sets](docs/compatibility.md#closed-sets-and-their-order)) |
+| A new value in a closed set | Not possible under the same schema number ([Closed sets](docs/compatibility.md#closed-sets-and-their-order)) |
 
 The widening check reads `x-known-values` as an enum on both sides: a value added there is a
 widening, a value dropped is a narrowing.
@@ -170,11 +155,13 @@ widening, a value dropped is a narrowing.
 3. In the report schema, add a typed `anyOf` branch of its own to `definitions.signal`, before
    the last branch, whose `data` references a new `definitions.s<n>` (the id in lower case).
 4. Add the id to the `not` list of that last branch.
-5. Add its row to [The signals](docs/verdicts.md#the-signals).
-6. Add an entry under `### Added` in `CHANGELOG.md`. A signal that decides verdicts ships as
-   evidence only for one minor release ([Verdict changes](docs/compatibility.md#verdict-changes)).
+5. Add the id to the expected list in `testTheFixturesExerciseEverySignal`
+   (`JsonSchemaConformanceTest`), and make sure a recorded fixture produces it.
+6. Add its row to [The signals](docs/verdicts.md#the-signals).
+7. Add an entry under `### Added` in `CHANGELOG.md`: for its first minor release the signal is
+   evidence only ([Verdict changes](docs/compatibility.md#verdict-changes)).
 
-`ClosedSetsTest` fails until steps 1 to 4 agree; nothing checks steps 5 and 6.
+`composer test` fails until steps 1 to 5 agree; nothing checks steps 6 and 7.
 
 ### Adding a run note code
 
@@ -186,8 +173,10 @@ widening, a value dropped is a narrowing.
 5. Write a `docs/notes.md` section whose heading id is the code and which says whether the note
    sets `sets_network_failures`.
 6. Append its URL to `PUBLISHED_NOTE_URLS` in `tests/Integration/NotesPageTest.php`.
+7. Add the code to the list in `RunNoteTest`, and a sample note to the one-of-each list in
+   `JsonSchemaConformanceTest`.
 
-`ClosedSetsTest` and `NotesPageTest` fail until these agree.
+`composer test` fails until these agree.
 
 ### Recording a release
 
@@ -206,13 +195,11 @@ docblock says what it holds and where its value comes from.
 | File | What it decides | How to change it |
 |---|---|---|
 | `resources/finished-packages.json` | The built-in allowlist of packages that are complete rather than unmaintained: interface packages, polyfills, metapackages | A pull request adds one entry ([below](#contributing-a-finished-package)) |
-| `resources/monorepo-parents.json` | Which monorepo parents a lock is worth one request for | `bin/refresh-monorepo-parents [parent ...]`: with no arguments it refreshes the listed parents; a parent named on the command line is added |
+| `resources/monorepo-parents.json` | The monorepos that can date their split packages' releases, and the packages each replaces. lockrot requests a listed monorepo only when the lock needs dates for one of its packages and does not hold the monorepo ([Dates from the monorepo](docs/verdicts.md#dates-from-the-monorepo)) | `bin/refresh-monorepo-parents [parent ...]`: with no arguments it refreshes the listed parents; a parent named on the command line is added |
 | `resources/php-ga-dates.json` | The release date of each PHP minor version | Edited by hand |
 
-A change to any of these files can move a verdict, so it is a
-[verdict change](docs/compatibility.md#verdict-changes) and gets an entry under
-`### Verdict changes`. A fix that only moves packages to `finished` or `ok` may ship in a patch
-release.
+A change to any of these files is a [verdict change](docs/compatibility.md#verdict-changes); a
+fix that only moves packages to `finished` or `ok` may ship in a patch.
 
 ### Contributing a finished package
 
@@ -304,8 +291,8 @@ Exit codes, the checks and the files are in `tools/corpus/README.md`.
 
     - copy every `resources/lockrot-*.schema.json` file to
       `tests/fixtures/schema-evolution/schemas/X.Y.Z/` and pin their sha256 in `RELEASED_SCHEMAS`
-      in `SchemaEvolutionTest`. `SchemaEvolutionTest` fails while `CHANGELOG.md` lists a release
-      whose schemas are not pinned.
+      in `SchemaEvolutionTest`. `SchemaEvolutionTest` fails unless the releases `CHANGELOG.md`
+      lists, the keys of `RELEASED_SCHEMAS` and the directories under `schemas/` match exactly.
 
 2. Build the PHAR and check that `php build/lockrot.phar --version` prints the new version.
 3. Merge the release pull request into `main` with CI green.
@@ -321,6 +308,5 @@ Exit codes, the checks and the files are in `tools/corpus/README.md`.
   change that writes or contacts something new has to update.
 - [`tools/corpus/README.md`](tools/corpus/README.md): the corpus checks, their files and exit codes.
 - [`tests/fixtures/README.md`](tests/fixtures/README.md): every recorded fixture set and its source.
-- [`.claude/rules/documentation.md`](.claude/rules/documentation.md) and
-  [`.claude/rules/changelog.md`](.claude/rules/changelog.md): the rules a docs or changelog change
-  is reviewed against.
+- [Writing the changelog and the docs](#writing-the-changelog-and-the-docs): the rule files a docs
+  or changelog change is reviewed against.
