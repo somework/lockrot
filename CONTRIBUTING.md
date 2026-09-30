@@ -72,7 +72,9 @@ A change to the docs or the changelog is reviewed against these files.
 
 | File | Covers |
 |---|---|
-| [`.claude/rules/documentation.md`](.claude/rules/documentation.md) | `README.md`, `CONTRIBUTING.md`, `SECURITY.md` and `docs/*.md`: the reader of each page, one page one mode, the home of each topic, wording that stays true, the anchors, layout and text that tests read |
+| [`.claude/rules/docs/writing.md`](.claude/rules/docs/writing.md) | `README.md`, `CONTRIBUTING.md`, `SECURITY.md` and `docs/*.md`: the reader of each page, one page one mode, concision, terms, wording that stays true |
+| [`.claude/rules/docs/topic-homes.md`](.claude/rules/docs/topic-homes.md) | The one page that holds each recurring topic, and what the other pages say about it |
+| [`.claude/rules/docs/contracts.md`](.claude/rules/docs/contracts.md) | Anchors, links, list nesting, validated JSON samples, text that tests read, and the commands that check them |
 | [`.claude/rules/changelog.md`](.claude/rules/changelog.md) | `CHANGELOG.md`: the release structure, the shape of an entry, what goes in which section, and what never goes in |
 
 `composer test` includes the tests that read doc text and validate the JSON samples in `docs/`;
