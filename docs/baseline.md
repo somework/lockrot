@@ -1,5 +1,5 @@
 ---
-title: lockrot baseline — fail CI only on new dependency rot
+title: Baseline — fail CI only on new dependency rot
 description: Record the findings you accept in lockrot-baseline.json with --generate-baseline, commit it, and CI fails only on findings that are new or have got worse.
 ---
 

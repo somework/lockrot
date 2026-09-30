@@ -85,7 +85,9 @@ Credentials:
   credentials Composer already holds.
 
 - Each credential is sent only to its own host and is never written anywhere. `self-update` adds
-  its GitHub token to the `api.github.com` request only, never to a download.
+  its GitHub token to the release-list request only, never to a download. With
+  `LOCKROT_RELEASE_URL` set, that request, and the token with it, goes to the host the variable
+  names, unless Composer holds credentials of its own for that host.
 
 - Which host takes which credential, and the anonymous limits, are in
   [Repository hosts and credentials](docs/internals.md#repository-hosts-and-credentials).
@@ -107,7 +109,9 @@ vulnerabilities with `composer audit`.
 
 - **Two variables replace the trust root.** With `LOCKROT_RELEASE_URL` or `LOCKROT_RELEASE_KEY` set
   ([Testing hooks](docs/configuration.md#testing-hooks)), `self-update` reads the release list, and
-  checks signatures, against what they name instead of GitHub and the built-in key.
+  checks signatures, against what they name instead of GitHub and the built-in key. The release-list
+  request carries the GitHub token wherever `LOCKROT_RELEASE_URL` points, so set neither outside a
+  test.
 
 - **What is checked before install.** `self-update` checks the checksum and the self-update
   signature, and installs nothing when either fails

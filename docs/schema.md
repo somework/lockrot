@@ -307,10 +307,10 @@ See [Transitive exposure](verdicts.md#transitive-exposure).
 
 ### Signal data
 
-Every signal's `data` is typed in `report-1.json` (`S9` in `definitions.s9`), and
-[The signals](verdicts.md#the-signals) says when each fires. This table lists only the fields added or
-changed after 0.9.0, the first published schema, with when each appeared; a field it leaves out is still typed and still
-written.
+Every signal's `data` is typed in `report-1.json` (`S9` in `definitions.s9`), and [The
+signals](verdicts.md#the-signals) says when each fires. This table lists only the fields added or
+changed after 0.9.0, the first published schema, with when each appeared; a field it leaves out is
+still typed and still written.
 
 | Signal | Field | Since | Holds |
 |---|---|---|---|
@@ -360,8 +360,11 @@ any repository: the same lock and manifest give the same `origin` on every machi
 | `package_url` | string or null | The package's page on `registry`, for a registry that keeps a public page per package name, when the lock's name is a package name; null otherwise. Link it only when it is a string; never build one |
 | `local` | boolean | Whether Composer installed the package from the machine it ran on: a `path` or `artifact` repository, or a dist or source that is a path or a `file://` URL, such as a VCS checkout on the disk |
 
-The first row that matches decides; an entry with a notification-url is always `packagist` or
-`composer`.
+An entry with a notification-url is `packagist` or `composer`. For any other entry, lockrot walks
+the manifest's repositories in the order Composer consults them (one named `packagist` last, `only`
+and `exclude` applied), and the first repository that could have served the entry decides its
+kind. An entry no repository accounts for is `path` when its dist is a local directory, and
+`unknown` otherwise.
 
 | `kind` | The lock entry | `registry` | `from_composer_repository` |
 |---|---|---|---|
@@ -385,7 +388,8 @@ An entry is `unknown` when lockrot cannot decide, for example:
 - an entry from a VCS repository renamed or removed since the lock was written: lockrot reads the
   manifest as it is at the time of the run;
 
-- any entry of a run without composer.json.
+- in a run without composer.json, or with a `repositories` list Composer would refuse, every
+  entry that has no notification-url and no local dist: there is no repository to read.
 
 Read a kind you do not know by `from_composer_repository`, show it as written and link nothing.
 

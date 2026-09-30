@@ -264,7 +264,7 @@ signature decide whether one is installed. What doctored metadata can and cannot
 
 | Code | Meaning |
 |---|---|
-| `0` | A release was installed, or nothing is installable: the build is current in its major version, or every newer release is held back by a [rule above](#which-release-it-installs), each printed on a line |
+| `0` | A release was installed, or nothing is installable: the build is current in its major version, or every newer release is in a later major version or needs a PHP this machine lacks ([rules above](#which-release-it-installs)), each printed on a line. A newer release held back by its key is exit `2` |
 | `1` | `--check` only: `self-update` would install a release, in the running major version or, with `--allow-major`, in the next one. A line names it |
 | `2` | A failure; the running `lockrot.phar` is untouched |
 
@@ -285,8 +285,8 @@ The exit `2` causes include:
 - a command line it cannot read (`self-update --nope`, `--check=yes`).
 
 A mistyped command name (`php lockrot.phar self-updte`) is not a `self-update` error: it exits `1`
-as any unknown command does ([exit `1` that is not lockrot's](ci.md#exit-1-not-from-lockrot)). A unique prefix such as `self-up`
-runs `self-update`.
+as any unknown command does ([exit `1` that is not lockrot's](ci.md#exit-1-not-from-lockrot)). A
+unique prefix such as `self-up` runs `self-update`.
 
 ### Reinstalling by hand
 

@@ -1,9 +1,9 @@
 ---
-title: lockrot configuration — extra.lockrot keys, environment and CLI options
+title: Configuration — extra.lockrot keys, environment and CLI options
 description: Every extra.lockrot key with its default, the environment variables, every command-line option, --output, --explain, caching and the allowlist.
 ---
 
-# Configuration
+# Configuration {#configuration-reference}
 
 Set project defaults under `extra.lockrot` in `composer.json`, and override them for one run with
 an environment variable or a command-line option. The first source that sets a value wins: option,
@@ -166,7 +166,7 @@ composer lockrot --format=github --fail-on=high --target-php=8.4 \
   write access to the directory, not only to the file. An existing file is replaced.
 - **Writing.** Files are written after stdout, in the order given; a new file gets the umask
   default. The atomic replace, a leftover `*.tmp` and what a replaced file keeps are in
-  [How a file is written](https://github.com/somework/lockrot/blob/main/SECURITY.md#what-lockrot-does-and-does-not-do).
+  [What lockrot does and does not do](https://github.com/somework/lockrot/blob/main/SECURITY.md#what-lockrot-does-and-does-not-do).
   Each file gets a line on stderr: `lockrot: sarif report written to lockrot.sarif`.
 - **Exit code.** `0` or `1` by `--fail-on`, as without `--output`. A file that cannot be written is
   exit `2` with the reason. Files written before it stay, and outside `--generate-baseline` stdout

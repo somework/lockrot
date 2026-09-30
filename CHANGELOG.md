@@ -30,7 +30,7 @@ priority rule changed, but under `COMPOSER` verdicts can differ; earlier documen
   client's name out of published reports, remove the name from each report before publishing it.
   ([What the run was told](docs/schema.md#what-the-run-was-told))
 
-- **CLI (every format):** reports and `--explain` quote no credential and no machine path (SARIF's
+- **CLI:** every format and `--explain` quote no credential and no machine path (SARIF's
   `%SRCROOT%` aside): a URL loses userinfo, query and fragment, a path keeps its last segment,
   `baseline.path` keeps no absolute path. Earlier releases printed logins and URL tokens whole.
   Action: check older published reports; rotate any token.
@@ -55,7 +55,10 @@ priority rule changed, but under `COMPOSER` verdicts can differ; earlier documen
   [Key custody and rotation](https://github.com/somework/lockrot/blob/v0.13.0/SECURITY.md#key-custody-and-rotation))
 
 - **Docs:** `SECURITY.md` lists every host lockrot contacts, every credential it reads and every
-  file it writes. Action: none.
+  file it writes. Earlier releases also contacted GitLab, Bitbucket and GitHub's release downloads
+  and read the GitLab token variables and Composer's credentials, which the 0.12.0 page left out.
+  Action: if you reviewed lockrot or set an egress allowlist from that page, check it against this
+  list.
   ([What lockrot does and does not do](https://github.com/somework/lockrot/blob/v0.13.0/SECURITY.md#what-lockrot-does-and-does-not-do))
 
 ### Added

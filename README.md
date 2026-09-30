@@ -156,7 +156,7 @@ Run the same command as a CI step, with `GITHUB_TOKEN` in the step's environment
 - **`--fail-on`** takes a verdict (fail on what was observed), a priority (fail on how much it
   matters here) or `unchecked` (fail when a check could not run).
 - **Exit codes:** `0` passed, `1` a finding reached `--fail-on` (or, with `--strict-network`, a
-  lookup failed), `2` lockrot could not run or finish
+  network lookup failed), `2` lockrot could not run or finish
   ([Exit codes](https://lockrot.dev/ci/#exit-codes)).
 - **Formats:** `--format` takes `table` (default), `json`, `github` (annotations), `sarif` (code
   scanning), `gitlab` (Code Quality), `markdown` (PR comment) or `html` (one self-contained page).

@@ -171,7 +171,7 @@ widening, a value dropped is a narrowing.
    that references it in `definitions.noteDetail`, before the last branch.
 4. In the report and explain schemas, add the code to the `not` list of that last branch.
 5. Write a `docs/notes.md` section whose heading id is the code and which says whether the note
-   sets `sets_network_failures`.
+   sets `sets_network_failures`, and add its row to the table at the top of that page.
 6. Append its URL to `PUBLISHED_NOTE_URLS` in `tests/Integration/NotesPageTest.php`.
 7. Add the code to the list in `RunNoteTest`, and a sample note to the one-of-each list in
    `JsonSchemaConformanceTest`.

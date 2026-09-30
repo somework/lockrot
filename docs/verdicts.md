@@ -1,5 +1,5 @@
 ---
-title: What it reports
+title: What it reports — verdicts, signals and priority
 description: What each lockrot verdict means, the rule and signals behind it, what clears it, and how direct, transitive and dev dependencies set a finding's priority.
 ---
 

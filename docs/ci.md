@@ -1,5 +1,5 @@
 ---
-title: lockrot in CI — GitHub Actions, GitLab CI, SARIF, exit codes
+title: In CI — GitHub Actions, GitLab CI, SARIF, exit codes
 description: "Fail a pipeline on dependency rot: the step to copy, choosing --fail-on, exit codes 0, 1 and 2, and what each output format gives GitHub, GitLab and reviewers."
 ---
 
@@ -374,24 +374,14 @@ one CI artifact and attaches to a ticket.
     path: lockrot-report.html
 ```
 
-What the page shows beyond the other formats:
-
-- **Each signal on its own line**, linked to what that signal observes.
-- **The release branches on a time axis**: every branch the repository lists, its newest release,
-  the branch you are on and the one still shipping.
-- **Advisories grouped by what the fix costs**: a patch on your own branch, or a move to another
-  branch (`fixed_by`, `fixed_on_branch`).
-- **What changed since the [baseline](baseline.md)**: new, worsened and accepted, filterable.
-- **[Libyears](verdicts.md#libyears)**: the total, and every package's value as a sortable column.
-- **What the run could not see**: the notes, the thresholds it used and the schema, on their own tab.
+The page is [lockrot-report](https://github.com/somework/lockrot-report), vendored at the
+version the [changelog](changelog.md) names; what it shows and how to navigate it are in that
+repository. It carries the run as JSON in `<script id="lockrot-data" type="application/json">`,
+and that document's `report` key is the [report-1 document](schema.md), the part of the page that
+is [contract](compatibility.md#what-is-not-contract).
 
 Without `--all` the page carries release detail for flagged packages and for unflagged ones with an
 advisory. `--all` adds that detail for every package, so the file grows with the lock.
-
-**Links to a view.** Filters, the open package and the search live in the URL hash, so a copied
-address opens the same view. The search takes `verdict:`, `priority:`, `signal:`, `severity:`,
-`cve:`, `direct:` and `dev:` terms. Keys: `/` searches, `j`/`k` move, `?` opens a glossary of every
-verdict and signal.
 
 **Content-Security-Policy.** The page carries its own policy: its script and stylesheet are pinned by
 sha256, and `default-src` is `'none'`, so nothing the page renders can run or be sent anywhere. A
