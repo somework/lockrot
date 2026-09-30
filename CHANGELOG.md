@@ -11,6 +11,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- The `--format=html` page is [lockrot-report](https://github.com/somework/lockrot-report) 0.13.0,
+  the page for this release's report. It reads the fields below that the 0.12.0 page left in its
+  data: the header and the summary say whether the run fails and why, from `gate`, and each row
+  says "fails" or "exempt"; release branches say which one your `require.php` and the target PHP
+  can take, from `misses_target_php` and `misses_project_php`; Blast radius names the packages in
+  `unattributed`; a package links `origin.package_url` and a replacement `replacement_url` instead
+  of a packagist.org page built from the name; "Why this is <priority>" words `priority_basis`, a
+  raise for advisories `no_fix_expected`, and "fix not checked" `releases_read`; the libyears
+  reason is `libyears_unmeasured` and "not from a Composer repository" `from_composer_repository`,
+  instead of the page's own reading of the note. Run data shows `run.root_package`,
+  `run.project_php`, `run.mode`, `run.strict_network` and `run.fail_on_kind`. The rest — the
+  Advisories tab as a ledger, printing, and the phone and tablet layouts among it — is in the
+  renderer's changelog. The page is larger, about 650 KB against 170 KB.
+
 - Every class, interface and trait under `src/` is now marked `@internal`, the Composer plugin class
   that `composer.json` names in `extra.class` included. The PHP classes were never a public API —
   CONTRIBUTING and the README said so in a sentence — but nothing in the code said it, so a project
@@ -282,32 +296,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   floor exactly as the `admits_*` beside it does, and is null exactly where that `admits_*` is not
   false; a test holds this on every row of every fixture lock. A page can now say "needs a newer
   PHP" or "stops before PHP 8.4" and quote `php` as written, without parsing a constraint; the
-  page's data carries both fields, and the page itself does not show them yet. Both are
+  page's data carries both fields, and the page's release branches say it in those words. Both are
   open strings with `x-known-values`, like `php_blocked_by`, and optional. Nothing else changes:
-  not S8, the `--explain` text, the JSON report, what the HTML page shows, or any other format;
-  only the explain document and the page's embedded `details` gain the two fields.
+  not S8, the `--explain` text, the JSON report, or any other format; only the explain document
+  and the page's embedded `details` gain the two fields.
 
 - The JSON report states the rule behind `exposure`, and lists what that rule gives to nobody.
   `exposure` counts a flagged transitive package under each direct requirement that reaches it only
   when one to eight do; above eight it is shared infrastructure, every bundle's and nobody's to
   remove, and it counted nowhere — not in `exposure`, not in S7, not on the `pulled in by:` line.
-  The number 8 was written only in the docs, so a reader of the document had to hard-code it to
-  tell a direct requirement that pulls in nothing attributable from one the rule left out, and
-  could not see the shared packages without redoing the arithmetic over every finding's
-  `direct_dependents`. Now `exposure_rule: {"max_fan_in": 8}` names the cap the run used, and
-  `unattributed` lists the flagged transitive packages above it, each with its `package`, `verdict`
-  and `fan_in` (how many direct requirements of the run reach it), in report order. A flagged
-  package no direct requirement reaches, as in a lock-only run, is in neither list. The descriptions
-  of `exposure` in the schema and in `docs/verdicts.md` now say that a direct requirement is listed
-  only when it pulls in an attributable flagged package, its own verdict being on its finding, and
-  the docs no longer say the `pulled in by:` line appears whenever a flagged package is transitive:
-  it appears when `exposure` is not empty. `exposure`, S7 and the `pulled in by:` line are
-  unchanged, as are `--explain` and the table, markdown, GitHub, GitLab and SARIF formats. The HTML
-  page embeds the JSON report under its `report` key, so that embedded document carries the two new
-  fields too; the page itself does not show them yet. Both fields are optional in the report
-  schema, so documents written before 0.13.0 still validate. The 0.13.0 snapshot of the report
-  schema under `tests/fixtures/schema-evolution/` is refreshed to match, since 0.13.0 is not tagged
-  yet.
+  The number 8 was written only in the docs, so a reader of the document had to hard-code it to tell
+  a direct requirement that pulls in nothing attributable from one the rule left out, and could not
+  see the shared packages without redoing the arithmetic over every finding's `direct_dependents`.
+  Now `exposure_rule: {"max_fan_in": 8}` names the cap the run used, and `unattributed` lists the
+  flagged transitive packages above it, each with its `package`, `verdict` and `fan_in` (how many
+  direct requirements of the run reach it), in report order. A flagged package no direct requirement
+  reaches, as in a lock-only run, is in neither list. The descriptions of `exposure` in the schema
+  and in `docs/verdicts.md` now say that a direct requirement is listed only when it pulls in an
+  attributable flagged package, its own verdict being on its finding, and the docs no longer say the
+  `pulled in by:` line appears whenever a flagged package is transitive: it appears when `exposure`
+  is not empty. `exposure`, S7 and the `pulled in by:` line are unchanged, as are `--explain` and
+  the table, markdown, GitHub, GitLab and SARIF formats. The HTML page embeds the JSON report under
+  its `report` key, so that embedded document carries the two new fields too, and its Blast radius
+  names the unattributed packages. Both fields are optional in the report schema, so documents
+  written before 0.13.0 still validate. The 0.13.0 snapshot of the report schema under
+  `tests/fixtures/schema-evolution/` is refreshed to match, since 0.13.0 is not tagged yet.
 
 - `run.root_package`: what Composer calls the project, beside what the report calls it.
   `run.project` is a display name — composer.json's own `name`, unless `extra.lockrot.project` says
@@ -319,7 +332,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   is always written. `run.project` is unchanged. The field is listed but not required in the
   [published schema](docs/schema.md), so documents written before 0.13.0 still validate; it and
   `run.project_php` are among the keys in `run` such a document omits. `--format=html` carries it in
-  the page's payload, which does not draw it; the other formats and `--explain` do not carry `run`
+  the page's payload, whose Run data shows it; the other formats and `--explain` do not carry `run`
   at all.
 
 - `run.project_php`: the project's own `require.php`, exactly as the manifest Composer reads writes
@@ -327,7 +340,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `run.target_php`, and the one each branch row's `admits_project_php` is tested against; until now
   the JSON report never named it, and the HTML page's data dropped it with the rest of the
   `--explain` document's top level, so a page reading that data could not name the version its
-  branch rows were tested against. The page vendored here does not draw it yet. The value is the same one `--explain` writes as `project_php`, read from the same
+  branch rows were tested against. The page now names it where its release branches speak of your
+  `require.php`. The value is the same one `--explain` writes as `project_php`, read from the same
   manifest (`COMPOSER=alt.json` reads alt.json), and null where the manifest has no `require.php`
   or the run read a lock without its composer.json; the key is always written. It is optional in
   the [published schema](docs/schema.md), so documents written before 0.13.0 still validate. It
@@ -358,15 +372,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   needs. The key stays a boolean for 1.x; the finer account of where an entry came from is
   `origin`, below. It is optional in both schemas, so documents written before 0.13.0 still
   validate, and the 0.13.0 schema snapshot is refreshed. It reaches `--format=json`, the report
-  inside the `--format=html` page (which does not read it yet) and the `--explain` document's
-  `finding`; every verdict, priority, note, evidence line and exit code is unchanged, as are the
-  table, markdown, GitHub, GitLab and SARIF formats, the `--explain` text and the baseline.
+  inside the `--format=html` page (which reads it instead of the note's words) and the `--explain`
+  document's `finding`; every verdict, priority, note, evidence line and exit code is unchanged, as
+  are the table, markdown, GitHub, GitLab and SARIF formats, the `--explain` text and the baseline.
 
 - Each finding says where its lock entry came from: `origin`, with a `kind`, the `registry` where
-  lockrot can name it and the package's page there, `package_url`. The report page links
+  lockrot can name it and the package's page there, `package_url`. The 0.12.0 report page linked
   `https://packagist.org/packages/<name>` for every finding whose `from_composer_repository` is
   true, which Private Packagist, WP Packages, Drupal and a Satis with a notify URL all are, so a
-  package from any of them gets a link to a page that is missing or belongs to someone else. `kind`
+  package from any of them got a link to a page that is missing or belongs to someone else. `kind`
   is an open set: `packagist` and `composer` (the entry's notification-url reports to packagist.org,
   or to another host), exactly the two kinds whose `from_composer_repository` is true, which is now
   read from the kind; `path`, `vcs`, `artifact` and `package` (a path dist, or the source, archive or
@@ -387,23 +401,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the libyears bucket, the page's `details` and the `--explain` document over every fixture lock and
   a hand-built one with every kind. It is optional in both schemas, so documents written before
   0.13.0 still validate, and the 0.13.0 schema snapshot is refreshed. It reaches `--format=json`,
-  the report inside the `--format=html` page (the page vendored here does not read it yet) and the
+  the report inside the `--format=html` page (which links `package_url`) and the
   `--explain` document's `finding`; every verdict, priority, note, evidence line, exit code and
   `from_composer_repository` is unchanged, as
   are the table, markdown, GitHub, GitLab and SARIF formats, the `--explain` text, the install-time
   summary and the baseline.
 
 - An abandoned finding's replacement has its link: `replacement_url`, next to `replacement`. The
-  report page links `https://packagist.org/packages/<replacement>` for every named replacement,
-  though the name is one the package's own registry gave, and a package abandoned on Private
-  Packagist or a corporate registry names a package there. `replacement_url` is that page on
+  0.12.0 report page linked `https://packagist.org/packages/<replacement>` for every named
+  replacement, though the name is one the package's own registry gave, and a package abandoned on
+  Private Packagist or a corporate registry names a package there. `replacement_url` is that page on
   packagist.org when packagist.org named the replacement — the registry whose metadata marked the
   package abandoned, by the notification-url Composer gives the version that says so, or, where no
   metadata came, the one the lock entry came from — and null for every other registry and when
   `replacement` is null. It is built like `origin.package_url`, only from a Composer package name,
   and no repository is asked whether the page exists. It is optional in both schemas and reaches
-  `--format=json`, the report inside the `--format=html` page (the page vendored here still builds
-  its own link) and the `--explain` document's `finding`; nothing else changes.
+  `--format=json`, the report inside the `--format=html` page (which links it instead of building
+  its own) and the `--explain` document's `finding`; nothing else changes.
 
 - Each finding says why its `libyears` is null: `libyears_unmeasured`, one of the keys of the
   report's `libyears.unmeasured` (`not_from_composer_repository`, `metadata_unavailable`,
@@ -417,15 +431,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   test holds the field over every fixture lock to the block, to the lock entry and metadata the
   analysis was decided on, to the `--explain` document's finding and to the rule 0.12 filed each
   finding by, so the block's counts are those 0.12 wrote. An open string with a `pattern` and
-  `x-known-values` in both schemas, optional so documents written before 0.13.0 still validate;
-  from 0.13.0 on every finding carries the key, and a later minor release may add a reason or
-  split one into narrower ones. `libyears.unmeasured` now types a key it does not list as a count,
-  so a reason a later release adds validates against this schema; its four keys stay required.
-  The finding-level `libyears` descriptions point to the new field instead of listing the reasons
-  a second time. It reaches `--format=json`, the report inside the `--format=html` page (which does
-  not read it yet) and the `--explain` document's `finding`; every verdict, priority, note, count
-  and exit code is unchanged, as are the table, markdown, GitHub, GitLab and SARIF formats, the
-  `--explain` text and the baseline. The 0.13.0 schema snapshot is refreshed.
+  `x-known-values` in both schemas, optional so documents written before 0.13.0 still validate; from
+  0.13.0 on every finding carries the key, and a later minor release may add a reason or split one
+  into narrower ones. `libyears.unmeasured` now types a key it does not list as a count, so a reason
+  a later release adds validates against this schema; its four keys stay required. The finding-level
+  `libyears` descriptions point to the new field instead of listing the reasons a second time. It
+  reaches `--format=json`, the report inside the `--format=html` page (whose "not measured" reason
+  is now this field alone) and the `--explain` document's `finding`; every verdict, priority, note,
+  count and exit code is unchanged, as are the table, markdown, GitHub, GitLab and SARIF formats,
+  the `--explain` text and the baseline. The 0.13.0 schema snapshot is refreshed.
 
 - Each finding says how its priority was reached: `priority_basis`, the level the verdict starts at
   (`base`, `none` for an unflagged verdict) and each step taken from it as `{reason, from, to}`, in
@@ -460,8 +474,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `releases_unknown` now says so, and the raise is unchanged. Both fields and `releases_read` are
   optional in the schemas, so documents written before 0.13.0 still validate; from 0.13.0 on every
   finding carries both. They reach `--format=json`, the report inside the `--format=html` page and
-  the `--explain` document's `finding`. The page does not interpret them yet, and its signal detail
-  shows S9's `releases_read` as one more raw data row, as it shows every key of a signal's `data`.
+  the `--explain` document's `finding`. The page words a raised priority from each advisory's
+  reason and says "fix not checked" where `releases_read` is false.
   Every verdict, priority, evidence line, count and exit code is unchanged, as are the table,
   markdown, GitHub, GitLab and SARIF formats, the `--explain` text (which leaves `releases_read` out)
   and the baseline. The 0.13.0 schema snapshot is refreshed.
@@ -472,26 +486,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   each finding says where it stands in a `gate` of its own: `reaches_fail_on`, `exempt_by`
   (`baseline` for a finding the baseline accepted as `known`; a `worsened` one is not exempt) and
   `fails`. `run` gains the inputs the gate is decided by: `strict_network`, `mode` (`check` or
-  `generate_baseline`) and `fail_on_kind` (`none`, `verdict`, `priority` or `unchecked`), so a reader
-  need not know which fail-on words are verdicts and which priorities; the `run.fail_on` description
-  now names `unchecked` too. Until now none of this was in the document: a consumer had to know the
-  verdict and priority ladders, the baseline rule and what `--strict-network` does to rebuild the
-  exit code, and the HTML page showed `fail_on` as a bare label. The decision was composed twice
-  inside lockrot, by `Policy::exitCode()`'s loop and by the `--generate-baseline` return; it is now
-  `Gate::decide()`, which the exit code of both modes, the install-time block and the documents all
-  read, and a test holds it over every fail-on value,
-  baseline standing, `--strict-network` setting, network outcome and mode to the two it replaced,
-  frozen as they were, over a hand-built matrix and every fixture lock. The annotation level is
-  unchanged and keeps its own rule, now stated in the fields and held to them by the same tests:
-  `error` exactly where `reaches_fail_on` is true and `exempt_by` is not `baseline`, which in a
-  `--generate-baseline` run is also a finding that fails nothing. A run whose `gate.fails` is true
-  and which then cannot write a file or the baseline still exits `2`, as the field's description
-  says. `run.mode`, `run.fail_on_kind`, `gate.tripped_by` and a finding's `gate.exempt_by` are open
-  strings with a `pattern` and `x-known-values`; `tripped_by` is the first `uniqueItems` in any
-  lockrot schema. Every new key is optional in the schema, so documents written before 0.13.0 still
-  validate; from 0.13.0 on every document carries them, `gate` null only where `run` is null or
-  carries no `fail_on`, which outside a test is nowhere. They reach `--format=json` and the report
-  inside the `--format=html` page, which does not read them yet; the `--explain` document gets none
+  `generate_baseline`) and `fail_on_kind` (`none`, `verdict`, `priority` or `unchecked`), so a
+  reader need not know which fail-on words are verdicts and which priorities; the `run.fail_on`
+  description now names `unchecked` too. Until now none of this was in the document: a consumer had
+  to know the verdict and priority ladders, the baseline rule and what `--strict-network` does to
+  rebuild the exit code, and the HTML page showed `fail_on` as a bare label. The decision was
+  composed twice inside lockrot, by `Policy::exitCode()`'s loop and by the `--generate-baseline`
+  return; it is now `Gate::decide()`, which the exit code of both modes, the install-time block and
+  the documents all read, and a test holds it over every fail-on value, baseline standing,
+  `--strict-network` setting, network outcome and mode to the two it replaced, frozen as they were,
+  over a hand-built matrix and every fixture lock. The annotation level is unchanged and keeps its
+  own rule, now stated in the fields and held to them by the same tests: `error` exactly where
+  `reaches_fail_on` is true and `exempt_by` is not `baseline`, which in a `--generate-baseline` run
+  is also a finding that fails nothing. A run whose `gate.fails` is true and which then cannot write
+  a file or the baseline still exits `2`, as the field's description says. `run.mode`,
+  `run.fail_on_kind`, `gate.tripped_by` and a finding's `gate.exempt_by` are open strings with a
+  `pattern` and `x-known-values`; `tripped_by` is the first `uniqueItems` in any lockrot schema.
+  Every new key is optional in the schema, so documents written before 0.13.0 still validate; from
+  0.13.0 on every document carries them, `gate` null only where `run` is null or carries no
+  `fail_on`, which outside a test is nowhere. They reach `--format=json` and the report inside the
+  `--format=html` page, whose header, rows and Run data say them; the `--explain` document gets none
   of them, since an explanation gates nothing. Every verdict, priority, exit code and baseline
   standing is unchanged, as are the table, markdown, GitHub, GitLab and SARIF formats, the
   `--explain` text, the install-time summary and the baseline file. The 0.13.0 schema snapshot is
