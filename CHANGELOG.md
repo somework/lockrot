@@ -9,10 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.13.0] - 2026-09-26
 
-Act if you publish reports, set `COMPOSER`, `LOCKROT_FAIL_ON` or `LOCKROT_TARGET_PHP`, use lockrot's
-PHP classes, validate with Ajv strict or a vendored schema copy, or run `self-update --check` where
-only `api.github.com` is reachable. A bad command line now exits `2`, not `1`. No verdict or
-priority rule changed, but under `COMPOSER` verdicts can differ; earlier documents still validate.
+Act if you publish reports, set `COMPOSER` or an invalid `LOCKROT_FAIL_ON` or `LOCKROT_TARGET_PHP`,
+use lockrot's PHP classes, validate with Ajv strict or a vendored schema, run `self-update` in CI or
+set an egress allowlist from 0.12.0's `SECURITY.md`. A bad command line now exits `2`, not `1`. No
+verdict or priority rule changed, but `COMPOSER` can change verdicts; old documents still validate.
 
 ### Verdict changes
 
@@ -30,35 +30,34 @@ priority rule changed, but under `COMPOSER` verdicts can differ; earlier documen
   client's name out of published reports, remove the name from each report before publishing it.
   ([What the run was told](docs/schema.md#what-the-run-was-told))
 
-- **CLI:** every format and `--explain` quote no credential and no machine path (SARIF's
-  `%SRCROOT%` aside): a URL loses userinfo, query and fragment, a path keeps its last segment,
-  `baseline.path` keeps no absolute path. Earlier releases printed logins and URL tokens whole.
-  Action: check older published reports; rotate any token.
-  ([What a report reveals](docs/schema.md#what-a-report-says-about-your-repositories))
+- **All formats:** no report and no `--explain` output quotes a credential or a machine path
+  (SARIF's `%SRCROOT%` aside): a URL loses userinfo, query and fragment, a path keeps its last
+  segment, `baseline.path` keeps no absolute path. Earlier releases printed logins and URL tokens
+  whole. Action: check older published reports; rotate any token.
+  ([What a report says about your repositories](docs/schema.md#what-a-report-says-about-your-repositories))
 
 - **CLI:** text from outside lockrot (a package name, version or constraint, a note, an error
   message, an `--explain` argument, a `self-update` tag or URL) prints as written, never as console
   markup: it can no longer restyle a line, open a terminal link or end the run with exit `2`. The
   install-time block and the `-v` Bitbucket token warning show a control character as an escape
-  (`\x1B`, `\n`). Action: none.
+  (`\x1B`, `\n`).
 
 - **Baseline, CLI:** the baseline and each `--output` file are written through a temporary file
   created exclusively beside the target: a file or symlink already at that temporary name fails the
-  write instead of being followed, and a replaced file keeps its permission bits. Action: let the
-  job write to the target's directory; an interrupted run can leave a `*.tmp` there.
+  write instead of being followed, and a replaced file keeps its permission bits. Action: give
+  `--output` a directory the job can write to; an interrupted run can leave a `*.tmp` there.
   ([What lockrot does and does not do](https://github.com/somework/lockrot/blob/v0.13.0/SECURITY.md#what-lockrot-does-and-does-not-do))
 
-- **PHAR:** every release publishes `lockrot.phar.meta.json`, naming its PHP floor and signing key,
-  which `self-update` and `--check` read from `github.com`; the checksum and signature still decide
-  what installs. A key rotation ships a release signed with the old key that carries the new one.
-  ([Which release it installs](docs/phar.md#which-release-it-installs),
-  [Key custody and rotation](https://github.com/somework/lockrot/blob/v0.13.0/SECURITY.md#key-custody-and-rotation))
+- **PHAR:** each release publishes `lockrot.phar.meta.json` (its PHP floor and signing key), which
+  `self-update` and `--check` read from `github.com`; checksum and signature still decide what
+  installs. A release ships only if it verifies against the previous release's key, so a rotation
+  ships a release signed with the old key that carries the new one.
+  ([Which release it installs](docs/phar.md#which-release-it-installs), [Key custody and rotation](https://github.com/somework/lockrot/blob/v0.13.0/SECURITY.md#key-custody-and-rotation))
 
 - **Docs:** `SECURITY.md` lists every host lockrot contacts, every credential it reads and every
   file it writes. Earlier releases also contacted GitLab, Bitbucket and GitHub's release downloads
-  and read the GitLab token variables and Composer's credentials, which the 0.12.0 page left out.
-  Action: if you reviewed lockrot or set an egress allowlist from that page, check it against this
-  list.
+  and read the GitLab token variables and Composer's credentials. Action: recheck a review or an
+  egress allowlist based on the 0.12.0 page against this list.
   ([What lockrot does and does not do](https://github.com/somework/lockrot/blob/v0.13.0/SECURITY.md#what-lockrot-does-and-does-not-do))
 
 ### Added
@@ -69,9 +68,9 @@ priority rule changed, but under `COMPOSER` verdicts can differ; earlier documen
   `composer.json`, the lock or a baseline, and `--output` with `--explain`, are refused (exit `2`).
   ([Writing reports to files](docs/configuration.md#writing-reports-to-files))
 
-- **Config:** each `extra.lockrot` key lockrot does not read gets one line on stderr, with the key
-  it was probably meant to be: `lockrot: unknown key extra.lockrot.install-tme ignored (did you mean
-  install-time?)`. When the schema rejects `extra.lockrot`, the error lists the unknown keys too.
+- **Config:** an `extra.lockrot` key lockrot does not read gets a line on stderr, above the
+  install-time block too, naming the nearest known key when one is close (`did you mean
+  install-time?`). When the schema rejects `extra.lockrot`, the error lists the unknown keys too.
   `extensions` and keys starting with `x-` are never warned about.
   ([Unknown keys](docs/configuration.md#unknown-keys))
 
@@ -81,8 +80,9 @@ priority rule changed, but under `COMPOSER` verdicts can differ; earlier documen
   `fail_on_kind`. ([The gate](docs/schema.md#the-gate))
 
 - **json:** `note_details` types each entry of `notes`, at the same index: `code`, `text`,
-  `docs_url` (the code's section of the Run notes page), `sets_network_failures` and `data`, typed
-  per code. The `--explain` document carries it too. ([Run notes](docs/schema.md#run-notes))
+  `docs_url` (the code's section of [Run notes](docs/notes.md#reading-a-note)),
+  `sets_network_failures` and `data`, typed per code. The `--explain` document carries it too.
+  ([`note_details`](docs/schema.md#run-notes))
 
 - **json:** each finding says where its lock entry came from: `origin` (`kind`, `registry`,
   `package_url`, `local`), `from_composer_repository` (whether lockrot asks a repository about it)
@@ -115,8 +115,8 @@ priority rule changed, but under `COMPOSER` verdicts can differ; earlier documen
   `snapshot_time`. The `--explain` text prints those that have a value.
   ([Pinned: what S6 carries](docs/verdicts.md#what-s6-carries))
 
-- **Docs:** [Compatibility](docs/compatibility.md) drafts what 1.0 freezes, the verdict-change
-  policy and deprecation.
+- **Docs:** [Compatibility](docs/compatibility.md#what-10-freezes) drafts what 1.0 freezes, the
+  verdict-change policy and deprecation.
 
 ### Changed
 
@@ -137,33 +137,36 @@ priority rule changed, but under `COMPOSER` verdicts can differ; earlier documen
   Action: where only `api.github.com` is reachable, allow `github.com` and the host it redirects to.
   ([`self-update` exit codes](docs/phar.md#self-update-exit-codes))
 
+- **Breaking:** **self-update:** from a 0.13 archive on, installs only within the running major
+  (all of 0.x is one; `--allow-major` moves one) and skips, saying why, a release needing a newer
+  PHP or a key it lacks. With nothing newer to install, `--force` reinstalls the newest release at
+  or below the running one in its major, else exits `2`. Action: a job running `--force` should
+  allow exit `2`. ([Which release it installs](docs/phar.md#which-release-it-installs))
+
 - **Breaking:** **PHP API:** every class, interface and trait under `src/`, the plugin class
   included, is marked `@internal`, so PHPStan and IDEs can flag its use from code outside
   `Lockrot\`; the namespace `Lockrot\Extension\` is reserved. Action: depend on the CLI and the
   `json` report, not on lockrot's classes.
   ([Names reserved for extensions](docs/compatibility.md#names-reserved-for-extensions))
 
-- **self-update:** installs only within the running major (all of 0.x is one) and skips, saying why,
-  a release needing a newer PHP or a key it lacks. `--allow-major` moves one major; `--force`
-  installs as a plain run does, else reinstalls the newest release at or below the running one in
-  its major, else exits `2`. Archives up to 0.12 still follow `releases/latest`.
-  ([Which release it installs](docs/phar.md#which-release-it-installs))
-
 - **html:** the page is lockrot-report 0.13.0
-  ([changelog](https://github.com/somework/lockrot-report/blob/v0.13.0/CHANGELOG.md#0130)). It
-  reads `gate`, `origin.package_url`, `replacement_url`, `priority_basis`, `no_fix_expected` and
-  `note_details`.
+  ([changelog](https://github.com/somework/lockrot-report/blob/v0.13.0/CHANGELOG.md#0130)).
+  It reads the fields this release adds, among them `gate`, `priority_basis` and `run.root_package`.
 
-- **Docs:** the semantic-versioning promise covers the command line, the `extra.lockrot` keys and
+- **Docs:** the semver promise, drafted for 1.0, covers the command line, `extra.lockrot` keys and
   environment variables (not the testing hooks), `json`, `sarif`, `gitlab`, `github`, the report
-  `html` embeds, the baseline and `lockrot-action@v1`'s inputs. `table`, `markdown`, the look of
-  `html`, the `--explain` text, the install-time summary and `src/` classes are not: parse `json`.
+  `html` embeds, the baseline and `lockrot-action@v1`'s inputs; not `table`, `markdown`, the look of
+  `html`, the `--explain` text, the install-time summary or `src/` classes: parse `json`.
   ([What 1.0 freezes](docs/compatibility.md#what-10-freezes))
 
 - **Docs:** a change that can move a verdict, a priority or what `--fail-on=unchecked` matches
   ships only in a minor release, under **Verdict changes**; the one patch exception is a
   curated-data fix that moves a package to `finished` or `ok`.
   ([Verdict changes](docs/compatibility.md#verdict-changes))
+
+- **Config:** `LOCKROT_RELEASE_URL`, the testing hook that points `self-update` away from GitHub,
+  names a release list in the shape of GitHub's `releases` API instead of one release document.
+  ([Testing hooks](docs/configuration.md#testing-hooks))
 
 ### Fixed
 

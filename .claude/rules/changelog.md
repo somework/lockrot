@@ -42,8 +42,8 @@ only contributors — tests, CI, fixtures, refactors, corpus tooling — is not 
 ```
 
 - `<Surface>` is what a user names: `CLI`, `Config`, `Baseline`, `PHAR`, `self-update`,
-  `Install-time`, `Docs`, or a format (`json`, `sarif`, `gitlab`, `github`, `markdown`, `table`,
-  `html`). A change to an environment variable is `Config`.
+  `Install-time`, `PHP API`, `Docs`, `All formats`, or a format (`json`, `sarif`, `gitlab`,
+  `github`, `markdown`, `table`, `html`). A change to an environment variable is `Config`.
 - A change that can break a working setup starts `**Breaking:**`, sorts first in its section and
   ends with a sentence starting `Action:`. Changing what an existing option, variable, field or
   exit code means is breaking even when the name stays.

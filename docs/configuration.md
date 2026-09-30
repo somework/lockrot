@@ -49,7 +49,7 @@ The `fail-on` key, `--fail-on` and `LOCKROT_FAIL_ON` each take one of these valu
 | [What was not checked](verdicts.md#what-was-not-checked) | `unchecked` |
 | No threshold | `none`, the default |
 
-What each value fails the run on, and which to start with, is in [Running lockrot in CI](ci.md).
+What each value fails the run on, and which to start with, is in [In CI](ci.md).
 
 ## CLI options
 

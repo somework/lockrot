@@ -156,8 +156,8 @@ whole install-time budget.
 
 ### Anonymous cap {#repository_activity_anonymous_cap}
 
-Without a GitHub token or Bitbucket credentials, lockrot asks only about packages whose activity
-could change their verdict, and only up to a budget of them
+Without a GitHub token or Bitbucket credentials, lockrot asks only about packages already stale on
+release age (S2 and no S1), and only up to a budget of them
 ([credentials](internals.md#repository-hosts-and-credentials)). GitLab has no cap.
 
 - `data`: `forge_id`; `checked`, the packages asked about; `skipped_no_token`, packages that were

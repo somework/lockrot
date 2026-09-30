@@ -14,19 +14,18 @@ git add lockrot-baseline.json
 git commit -m "chore: accept current dependency rot"
 ```
 
-Run it with the options your CI step uses (`--dev`, `--target-php`, any `LOCKROT_*` override, the
-same `COMPOSER` manifest, the same token), or the step can fail on findings the baseline was meant
-to accept ([below](#generate-it-with-the-same-dev-setting-your-ci-run-uses)).
+Generate it with the options your CI step uses, or the step can fail on findings the baseline was
+meant to accept ([below](#generate-it-with-the-same-dev-setting-your-ci-run-uses)).
 
-Every later run (plugin or PHAR) reads the baseline file (`lockrot-baseline.json`, or the
-`baseline` key's path) without a flag and sorts each finding into one bucket:
+Every later run (plugin or PHAR) reads `lockrot-baseline.json`, or the file `--baseline` or the
+`baseline` key names, and sorts each finding into one bucket:
 
 | Bucket | The finding | Fails the build |
 |---|---|---|
 | `new` | is flagged and not in the baseline | When it reaches `--fail-on`, as without a baseline |
 | `worsened` | is in the baseline at a less severe verdict than its current one | When it reaches `--fail-on` |
 | `known` | is in the baseline at its current verdict or a more severe one | Never |
-| `stale` (not the `stale` verdict) | is a baseline entry for a package that is not in `composer.lock` | Never; reported as a note |
+| `stale` (not the `stale` verdict) | is a baseline entry for a package that is not in `composer.lock` | Never; reported as a note (in `json`: `baseline.stale`) |
 
 ## What `--generate-baseline` does
 

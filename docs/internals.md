@@ -6,8 +6,9 @@ description: What lockrot asks your Composer repositories and the GitHub, GitLab
 # Data sources {#how-lockrot-fetches-metadata}
 
 lockrot asks the Composer repositories `composer.json` configures, and the API of the repository
-host a package's source lives on. Credentials for GitHub or Bitbucket lift the anonymous cap of 50
-repositories per host a run ([Repository hosts and credentials](#repository-hosts-and-credentials)).
+host a package's source lives on. Credentials for GitHub or Bitbucket lift the anonymous cap of
+50 repositories per host per run
+([Repository hosts and credentials](#repository-hosts-and-credentials)).
 For a missing or wrong date, start at
 [When a date is missing or wrong](#when-a-date-is-missing-or-wrong).
 
@@ -15,19 +16,22 @@ For a missing or wrong date, start at
 
 | Source | What lockrot asks | Credentials | Without credentials | Cache |
 |---|---|---|---|---|
-| The lock file | Nothing: S5 reads the lock entry's `time` and `require.php` | None | Every package | None |
 | Composer repositories: Packagist, Private Packagist, Satis, mirrors | Metadata: abandoned flag, versions, release dates (S1, S2, S6, S8); the releases S9 looks in for a fix; advisories on the installed version (S9) | Composer's own, from `auth.json` or `COMPOSER_AUTH` | What the repository serves anonymously | Composer's |
-| GitHub, `api.github.com` | Archived flag (S3), last push to any branch (S4) | `LOCKROT_GITHUB_TOKEN`, else `GITHUB_TOKEN`, else Composer's `github-oauth`; Composer's `http-basic` for github.com counts too | Candidates only, at most 50 repositories a run | lockrot's, 24 h |
-| GitLab: gitlab.com and every host in Composer's `gitlab-domains` | Newest commit on any branch (S4); archived flag (S3) with credentials only | `LOCKROT_GITLAB_TOKEN`, else `GITLAB_TOKEN`, for gitlab.com only; Composer's `gitlab-token` or `gitlab-oauth` for any GitLab host | Every package, but the archived flag is hidden, so S3 cannot fire | lockrot's, 24 h |
+| GitHub, `api.github.com` | Archived flag (S3), last push to any branch (S4) | `LOCKROT_GITHUB_TOKEN`, else `GITHUB_TOKEN`, else Composer's `github-oauth`; any other Composer credential for github.com counts too | Candidates only, at most 50 repositories a run | lockrot's, 24 h |
+| GitLab: gitlab.com and every host in Composer's `gitlab-domains` | Newest commit on any branch (S4); archived flag (S3) with credentials only | `LOCKROT_GITLAB_TOKEN`, else `GITLAB_TOKEN`, for gitlab.com only; any Composer credential for the host, such as `gitlab-token` | Every package, but the archived flag is hidden, so S3 cannot fire | lockrot's, 24 h |
 | Bitbucket Cloud, `api.bitbucket.org` | Newest commit on any branch (S4); Bitbucket has no archived state | Composer's `http-basic` (an Atlassian API token), `bearer` or `bitbucket-oauth` | Candidates only, at most 50 repositories a run | lockrot's, 24 h |
 
-A candidate is a package S2 flags (its newest dated stable release is at least
-`release-warn-years` old, [thresholds](configuration.md#extralockrot-keys)) that its repository
-does not mark abandoned (S1); a package with no dated stable release is not one. A package the cap
-skips carries S10, except one marked abandoned
-([What was not checked](verdicts.md#what-was-not-checked)), and the run notes count the skipped
-packages per host
-([Anonymous cap](notes.md#repository_activity_anonymous_cap)).
+- A candidate has [S2](verdicts.md#the-signals) and no S1; a package with no dated release is
+  not one.
+
+- A package the cap skips carries S10, except one marked abandoned
+  ([What was not checked](verdicts.md#what-was-not-checked)).
+
+- The [Anonymous cap](notes.md#repository_activity_anonymous_cap) note counts the skipped packages
+  per host.
+
+The lock file needs no request: S5 reads its entry's `time` and `require.php`, and S6 a
+branch-snapshot version.
 
 Every request, to a repository or a host, goes through Composer's HTTP layer, so Composer's proxy
 and TLS settings apply to both.
@@ -36,7 +40,8 @@ and TLS settings apply to both.
 
 lockrot reads the host from the first of these URLs that is set:
 
-1. the `source` URL of the package's highest stable release, in the repository metadata;
+1. the `source` URL of the package's highest tagged release (a pre-release counts), in the
+   repository metadata;
 2. that release's `support.source`, with a `/tree/<ref>`, `/-/tree/<ref>` or `/src/<ref>` page
    suffix cut off;
 3. the lock entry's `source` URL, then its `support.source`.
@@ -62,9 +67,6 @@ One set of requests per repository, however many packages share it. Each request
 | Bitbucket | `GET https://api.bitbucket.org/2.0/repositories/{workspace}/{slug}/commits?pagelen=1` | None: Composer's credentials only |
 
 ### Which credentials
-
-The token variables and their order are in the table above and in
-[Environment overrides](configuration.md#environment-overrides).
 
 - A host counts as authenticated, with no cap, when lockrot has a token for it or Composer holds
   credentials for it (in `auth.json`, `COMPOSER_AUTH`, or what a CI setup step writes there). On

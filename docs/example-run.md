@@ -5,15 +5,15 @@ description: "A recorded lockrot run on wallabag's public composer.lock: the ful
 
 # Example run
 
-Recorded on 2026-09-30 with lockrot 0.13.0 on a snapshot of
-[wallabag](https://github.com/wallabag/wallabag)'s public `composer.lock`. The run had
+What lockrot prints on a real lock, and how to read it. Recorded on 2026-09-30 with lockrot 0.13.0
+on a snapshot of [wallabag](https://github.com/wallabag/wallabag)'s public `composer.lock`, with
 `GITHUB_TOKEN` set, so no repository check was capped, and `COLUMNS=120`, so the wrapping is fixed.
 
 ```bash
 COLUMNS=120 php lockrot.phar --target-php=8.4
 ```
 
-On your project: `php lockrot.phar -d path/to/project`.
+On your project: `composer lockrot`, or `php lockrot.phar -d path/to/project`.
 
 ```text
 critical (3)
@@ -201,11 +201,11 @@ Data as of 2026-09-30 (package repositories, repository hosts). Run composer loc
 - **Groups.** One per [priority](verdicts.md#priority), highest first, with its count. `--all` adds
   a final `not flagged` group holding every other package.
 
-- **A row's first line.** The verdict, the package and its installed version, then `direct`, or
-  `via` and the shortest chain from a direct requirement. `also via` names the other direct
-  requirements that reach the package: `hoa/ruler` stays installed while either `wallabag/rulerz`
-  or `wallabag/rulerz-bundle` does. With a [baseline](baseline.md), the verdict also reads
-  `(baseline)` or `(was <verdict>)`.
+- **A row's first line.** The verdict, the package and its installed version, then `direct`, `via`
+  and the shortest chain from a direct requirement, or `?` when nothing in the project reaches it.
+  `also via` names up to three other direct requirements that reach it, then `and N more`:
+  `hoa/ruler` stays installed while either `wallabag/rulerz` or `wallabag/rulerz-bundle` does. With
+  a [baseline](baseline.md), the verdict also reads `(baseline)` or `(was <verdict>)`.
 
 - **The lines under it.** The evidence: what each signal found, with its dates. `pulls in N flagged
   packages:` on a direct requirement is [S7](verdicts.md#transitive-exposure).
@@ -225,10 +225,9 @@ Data as of 2026-09-30 (package repositories, repository hosts). Run composer loc
   ([how fresh the data is](internals.md#two-sources-two-clocks)). Run notes follow as `note:` lines
   ([run notes](notes.md)), and with a baseline a `note:` line names its stale entries.
 
-- **Width.** Every line wraps to `COLUMNS` when it is a positive integer. With `COLUMNS` unset, it
-  wraps to the width Composer's console reports, which can be 80 with no terminal; otherwise to 120
-  columns. It is never narrower than 40. A command or path in the summary stays on one line, so
-  the line can be wider. For a `table` report written to a file, see
+- **Width.** Lines wrap to `COLUMNS` when it is a positive integer; with `COLUMNS` unset, to the
+  width Composer's console reports (with no terminal: 80, or none under Composer 2.2 LTS); otherwise
+  to 120. Never below 40. A command or path in the summary stays on one line, so it can be wider. For a `table` report written to a file, see
   [Writing reports to files](configuration.md#writing-reports-to-files).
 
 - **Colour.** On a terminal, a row's verdict label is red in the `critical` and `high` groups and
@@ -236,8 +235,8 @@ Data as of 2026-09-30 (package repositories, repository hosts). Run composer loc
 
 ## The same lock as JSON
 
-`--format=json` writes every field of the report; the `html` page embeds the same document. This
-is the same run's document, abridged: `…` marks each cut (signals S3, S4 and S7 of the first
+`--format=json` writes every field of the report; the `html` page carries it as its embedded data's
+`report` key ([`--format=html`](ci.md#-formathtml)). This is the same run's document, abridged: `…` marks each cut (signals S3, S4 and S7 of the first
 finding, the rest of `exposure`, the other findings).
 
 ```json

@@ -6,8 +6,8 @@ description: What each lockrot verdict means, the rule and signals behind it, wh
 # What it reports {#verdicts-and-priority}
 
 Every package in `composer.lock` gets a verdict (what was observed about it) and a priority (how
-much that matters to your project). Find your finding's verdict below for the rule that fired and
-what clears it.
+much that matters to your project). The first table gives each verdict's rule, its signals, and
+what you and the package's maintainer can do to clear it.
 
 ## The verdicts {#the-nine-verdicts}
 
@@ -23,8 +23,7 @@ what clears it.
 | `finished` | The package matches the built-in allowlist or the project's `ignore` list | allowlist | Nothing: not flagged. An `ignore` entry past its `expires` date falls back to the normal verdict | Nothing |
 | `ok` | None of the rules above applies | none | Nothing: not flagged | Nothing |
 
-Severity order, used by [`--fail-on`](ci.md) (ci.md says which threshold to pick), the baseline
-and the report's sort order:
+Severity order, used by [`--fail-on`](ci.md), the baseline and the report's sort order:
 `abandoned > silent > pinned > left-behind > old-promise > stale > unknown > finished = ok`.
 
 - A *finding* is any entry in the report's `findings`: one per analysed package, `ok` included. A
@@ -53,24 +52,23 @@ and the report's sort order:
 | S1 | The Composer repository marks the package abandoned, sometimes naming a replacement; without repository metadata, the lock's own `abandoned` mark | Composer repository, else the lock | `abandoned` |
 | S2 | Time since the package's newest release (pre-releases count, branches do not), against `release-warn-years` / `release-high-years` | Composer repository | `silent`, `stale` |
 | S3 | The repository is archived on its host | Repository host; which hosts expose the flag, and with which credentials, is in [internals.md](internals.md#repository-hosts-and-credentials) | `abandoned` |
-| S4 | Time since the last push to any branch (GitHub) or the newest commit on any branch (GitLab, Bitbucket), against `push-warn-years` / `push-high-years` | Repository host | `silent`, `stale` |
+| S4 | Time since the repository's last activity on any branch, against `push-warn-years` / `push-high-years`; what each host reports is in [internals.md](internals.md#repository-hosts-and-credentials) | Repository host | `silent`, `stale` |
 | S5 | An open-ended `require.php` on a release older than the target PHP's major; see [Old promise](#old-promise) | Lock and target PHP | `old-promise` |
 | S6 | A branch snapshot, or no tagged release; see [What S6 carries](#what-s6-carries) | Lock (snapshot), Composer repository (tags) | `pinned` |
 | S7 | The flagged transitive packages a direct requirement pulls in | Lock and `composer.json` | nothing; see [Transitive exposure](#transitive-exposure) |
-| S8 | Time since the newest stable release on the installed release branch, while a higher branch releases; see [Left behind](#left-behind) | Composer repository | `left-behind` |
+| S8 | Time since the newest stable release on the installed release branch, against `release-warn-years` / `release-high-years`, while a higher branch releases; see [Left behind](#left-behind) | Composer repository | `left-behind` |
 | S9 | Security advisories affecting the installed version | Composer repository | nothing; it can raise the priority, see [Security advisories](#security-advisories) |
 | S10 | A check the verdict rests on did not run, and the signals it blocked | The other checks | nothing; see [What was not checked](#what-was-not-checked) |
 
 - S2, S4 and S8 are `warn` from the warn threshold and `high` from the high one. Only `silent`
   reads the level; the thresholds are [`extra.lockrot` keys](configuration.md#extralockrot-keys).
 
-- Only the signals in the Decides column set a verdict. S7 and S10 change no verdict, priority or
-  baseline entry; S9 changes only the priority.
+- Only the Decides column sets a verdict; S9 can raise the priority.
 
 - S2's `data` is the release it measures from (`last_version`, `last_release`), the `years` since
   it, and `dated_by`, the [monorepo parent](#dates-from-the-monorepo) that dated it, else null.
-  S6's, S8's and S9's are in their sections below; [schema.md](schema.md#signal-data) lists the
-  fields later releases added, with the release of each.
+  S6's, S8's and S9's are in their sections below; [schema.md](schema.md#signal-data) lists when
+  each field appeared.
 
 ## Abandoned, and where to
 
@@ -81,7 +79,7 @@ nothing. The report tells them apart here:
 |---|---|
 | Evidence | The repository's replacement text as written: `replacement: symfony/mailer`, or free text such as `replacement: Symfony` |
 | `replacement` (JSON) | The successor, when the text is a Composer package name other than the package's own; null otherwise |
-| `replacement_url` (JSON) | The successor's page, where lockrot keeps one; see [schema.md](schema.md#where-a-package-came-from) |
+| `replacement_url` (JSON) | The successor's packagist.org page when packagist.org named the replacement; null otherwise ([schema.md](schema.md#where-a-package-came-from)) |
 | `abandoned` object (JSON) | `total` and `with_replacement`, next to `counts` |
 | Summary line | `abandoned N (M with a replacement)`, the parenthesis only when M is not zero |
 | S9 clause | `no fix expected; migrate to symfony/mailer` on an advisory no release fixes |
@@ -95,6 +93,7 @@ S6's evidence reads the same whether or not the package ever released. Its `data
 
 | Key | Value |
 |---|---|
+| `version` | The installed version, as the lock writes it |
 | `reason` | `branch_snapshot` when the installed version is a branch (checked first), `no_stable_release` when it is not and the repository lists no tagged version. An [open set](schema.md#open-sets) |
 | `has_stable_release` | Whether the repository lists any tagged version; a pre-release counts, a branch does not. Null when lockrot loaded no repository metadata for the package (a `vcs` or `path` entry, a package the repository does not list, metadata that did not load) |
 | `last_stable_release`, `last_stable_version` | The newest *dated* tagged release, which is not always the highest tag. Null with no tagged release, with no metadata, or when the highest tag has no date lockrot trusts and no [monorepo parent](#dates-from-the-monorepo) dates it |
@@ -188,12 +187,12 @@ branch within reach. Abridged from the [example run](example-run.md):
                pulls in 1 flagged package: symfony/security-guard (abandoned)
 ```
 
-With no releasing branch within reach, the evidence ends `no releasing branch within reach` and
+With no releasing branch within reach, S8's clause ends `no releasing branch within reach` and
 suggests nothing: the way forward is a PHP upgrade. The verdict stays `left-behind`.
 
 | Where | Fields |
 |---|---|
-| S8's `data` | `newest_php`, `newest_within_reach`, `floor_php`, `floor_source` (`project` or `target`), `reachable_branch`, `reachable_version`, `reachable_release`, `suggested_constraint` |
+| S8's `data` | `newest_php`, `newest_within_reach`, `floor_php`, `floor_source` (`project` or `target`; both null when the newest branch is within reach), `reachable_branch`, `reachable_version`, `reachable_release`, `suggested_constraint` |
 | The report's `run` | `target_php`, and `project_php`, the `require.php` exactly as `composer.json` writes it |
 
 #### The PHP test in `--explain` {#the-php-test-in-explain}
@@ -243,7 +242,7 @@ Abridged from the [example run](example-run.md):
 
 A tag has a *trusted date* unless it has no date, or its commit carries three or more stable tags.
 A subtree split (`illuminate/*`, `symfony/*`) piles its tags onto one commit, dated by the last
-change to that directory; a re-tag, two tags on one commit, stays trusted.
+change to that directory. A re-tag, two tags on one commit, stays trusted.
 
 The split's monorepo tags the same version with the release date, and its
 `replace: {child: self.version}` says the two tags are one release. So where a branch of the split
@@ -283,6 +282,9 @@ against two releases the repository lists, each only when it is above the instal
 |---|---|---|
 | The highest stable tag on the installed branch | A `composer update` inside the constraint gets the fix (`fixed_on_branch: true`) | `fixed by <version>` |
 | The package's highest stable tag | The fix needs a higher branch | `fixed by <version>` |
+
+When one release does not fix every advisory, the clause counts each: `1 fixed by v3.4.47, 3 fixed
+by v8.1.7`.
 
 On `abandoned`, `silent` and `left-behind` findings, an advisory no reachable release fixes gets
 `no fix expected`, and the priority goes up one step, `critical` at most:
@@ -405,11 +407,7 @@ direct requirements pull it in; for a direct requirement, which flagged packages
 
 The `via` chain is the shortest path from one direct requirement. `also via` names the other
 direct requirements that reach the package, the first few by name and the rest counted
-(`and N more`). Abridged from the [example run](example-run.md):
-
-```text
-  abandoned    hoa/ruler 2.17.05.16  via wallabag/rulerz, also via wallabag/rulerz-bundle
-```
+(`and N more`).
 
 Removing the `via` requirement alone leaves the package installed through every `also via` one.
 `--format=json` carries the full list as `direct_dependents` on every finding, the package itself
@@ -419,7 +417,8 @@ it.
 ### S7 on the direct requirement
 
 After every verdict is known, each direct requirement whose subtree holds attributed flagged
-packages gets S7, listing them in report order with the shortest chain to each. Abridged from the
+packages gets S7, listing them in report order with the shortest chain to each. A flagged package
+the project requires directly counts under nobody, whoever else reaches it. Abridged from the
 [example run](example-run.md):
 
 ```text
@@ -457,20 +456,9 @@ project reaches only through a name it provides or replaces.
 ### The `pulled in by:` line
 
 The summary block counts, per direct requirement, the attributed flagged packages it pulls in,
-most first. Abridged from the [example run](example-run.md):
-
-```text
-pulled in by: wallabag/rulerz-bundle 15 · wallabag/rulerz 14 · wallabag/phpepub 5 ·
-scheb/2fa-google-authenticator 3 · friendsofsymfony/oauth-server-bundle 2 · … and 19 more
-```
-
-The first few requirements are named and the rest counted; the JSON document carries the whole
+most first. The first few requirements are named and the rest counted; the JSON document carries the whole
 list as `exposure`. A direct requirement appears only when it pulls in an attributed package, and
 the line is printed only when some flagged package is attributed.
-
-!!! note "S7 decides nothing"
-    A package is never flagged for what it depends on ([The signals](#the-signals)). A flagged
-    package the project requires directly counts under nobody, whoever else reaches it.
 
 Limits:
 
@@ -488,7 +476,7 @@ Limits:
 second case on the finding itself.
 
 Without a token or Composer credentials for a host that caps anonymous requests
-([credentials](internals.md#repository-hosts-and-credentials)), the activity round asks only about
+([credentials](internals.md#repository-hosts-and-credentials)), lockrot asks the host only about
 packages that already look stale on release age
 ([anonymous cap](notes.md#repository_activity_anonymous_cap)). A package with
 a recent release and an archived repository then never gets S3, and reads `ok` instead of
@@ -496,7 +484,7 @@ a recent release and an archived repository then never gets S3, and reads `ok` i
 
 | Check | `reason` | Cause | Blocks |
 |---|---|---|---|
-| `repository_activity` | `no_token` | No credentials for the host, and the package was not a candidate for the anonymous round | S3, S4 |
+| `repository_activity` | `no_token` | No credentials for the host, and the package was not among those asked about | S3, S4 |
 | `repository_activity` | `anonymous_budget` | A candidate the anonymous request budget could not fit | S3, S4 |
 | `repository_activity` | `install_time_budget` | The install-time budget ran out | S3, S4 |
 | `repository_activity` | `rate_limit` | The host answered "too many requests" | S3, S4 |
@@ -578,10 +566,9 @@ What the number is not:
   ([S9](#security-advisories)). An `abandoned` package whose installed release is its last adds
   zero.
 
-- **php-libyear's number.** [php-libyear](https://github.com/ecoAPM/php-libyear) sums
-  `composer.json`'s direct requirements, `require-dev` included. The nearest lockrot number is
-  `direct_requirements` from a `--dev` run. It still differs where lockrot leaves an undated
-  package unmeasured.
+- **Another tool's number.** The nearest lockrot number to a tool that sums `composer.json`'s
+  direct requirements, such as [php-libyear](https://github.com/ecoAPM/php-libyear), is
+  `direct_requirements` from a `--dev` run; lockrot leaves an undated package unmeasured.
 
 ## Related
 
