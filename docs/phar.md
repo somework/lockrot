@@ -17,7 +17,11 @@ curl -fsSL https://raw.githubusercontent.com/somework/lockrot/main/lockrot-relea
 sha256sum -c lockrot.phar.sha256                            # intact (macOS: shasum -a 256 -c)
 gpg --verify lockrot.phar.asc lockrot.phar                  # compare the printed fingerprint with SECURITY.md
 gh attestation verify lockrot.phar --repo somework/lockrot  # optional: needs gh, signed in; built by lockrot's release workflow
+```
 
+Run it only when every check above passed and the fingerprint matches:
+
+```bash
 php lockrot.phar -d /path/to/project --target-php=8.4
 ```
 
@@ -307,11 +311,12 @@ these lines in a shell step, with `GITHUB_TOKEN` set from the CI's secret store 
 anonymous rate limit:
 
 ```bash
+set -e                  # stop at the first failed download or check, before php runs
 LOCKROT_VERSION=<tag>   # the release to run; a pinned tag keeps the archive and its checksum from one release
 curl -fsSL -O https://github.com/somework/lockrot/releases/download/$LOCKROT_VERSION/lockrot.phar
 curl -fsSL -O https://github.com/somework/lockrot/releases/download/$LOCKROT_VERSION/lockrot.phar.sha256
 sha256sum -c lockrot.phar.sha256
-gh attestation verify lockrot.phar --repo somework/lockrot   # optional: where the runner has gh and GH_TOKEN
+gh attestation verify lockrot.phar --repo somework/lockrot   # drop this line where the runner lacks gh or GH_TOKEN
 php lockrot.phar --fail-on=high --target-php=8.4
 ```
 
