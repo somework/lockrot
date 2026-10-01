@@ -3,9 +3,9 @@
 The escapes the mutation gate (`infection.json5`, whole `src/` tree) tolerates, with the reason each
 one is equivalent to the original code. One entry per mutant, by area, the nine escapes of the
 original gate (src/Verdict, src/Signal, src/Output, src/Analyzer) first. Line numbers are those of
-the CI mutation run of 93be938 (lockrot 0.13.0) on 2026-10-02; a later edit may shift them without
-changing the argument. "Hard to test" is not "equivalent": every entry here claims that no test
-could tell the mutant from the original, and says why.
+the CI mutation run of 93be938 (lockrot 0.13.0) on 2026-10-01 (UTC); a later edit may shift them
+without changing the argument. "Hard to test" is not "equivalent": every equivalence entry here
+claims that no test could tell the mutant from the original, and says why.
 
 ## src/Verdict, src/Signal, src/Analyzer, src/Output (the original gate, 2026-09-16)
 
@@ -272,10 +272,11 @@ The memo changes how often the work is done, not what it answers.
   `^(\d+)\.(\d+)\.(\d+)\.` against a string `VersionParser::normalize()` returned for a non-dev version,
   which always starts with the major digits: the anchor cannot move the match.
 
-### Not equivalent: the two mutants this run reports as timed out
+### Not equivalent: mutants that time out
 
-Both are genuine infinite loops in `loadChunked()`, so the timeout is a real detection and not a
-slow test. They are listed here only so nobody reads them as an unexplained "2 time outs":
+A timeout counts as a detection, and these are genuine infinite loops in `loadChunked()`, not slow
+tests. They are listed only so nobody reads the time-outs as unexplained; the run times out on
+other mutants of the same loop and of `RepositoryUrl`'s scanner for the same reason:
 
 - `src/Data/Repository/RepositoryMetadataLoader.php:195` NotIdentical — `while ($toChunk !== [])`
   becoming `=== []` spins forever once the queue is empty: the condition stays true, the deadline
