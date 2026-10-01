@@ -171,10 +171,10 @@ composer lockrot --format=github --fail-on=high --target-php=8.4 \
 - **Exit code.** `0` or `1` by `--fail-on`, as without `--output`. A file that cannot be written is
   exit `2` with the reason. Files written before it stay, and outside `--generate-baseline` stdout
   already has the report.
-- **With other options.** `--explain` refuses it ([Explaining one package](#explaining-one-package)).
-  `--generate-baseline` writes the reports first, without a baseline comparison, then the baseline;
-  a report that fails stops the run before the baseline is replaced. Under `LOCKROT_DISABLE`
-  nothing is written.
+- **With other options.** `--explain` refuses it ([Explaining one
+  package](#explaining-one-package)). `--generate-baseline` writes the reports first, without a
+  baseline comparison, then the baseline; a report that fails stops the run before the baseline is
+  replaced. Under `LOCKROT_DISABLE` nothing is written.
 
 These are refused before the analysis starts (exit `2`, nothing fetched, nothing written):
 

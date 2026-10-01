@@ -28,10 +28,10 @@ these fails CI or a published link, so check it before committing.
   holding only `…` is allowed) and, if it is a report, explanation, baseline or `composer.json`,
   validate against the published schema. Use ```` ```text ```` for fragments.
 - **Text that tests read.** Read the test before changing its text:
-    - `compatibility.md` "### Open sets", the draft admonition, closed-set order; the severity
+    - `compatibility.md` the draft admonition and the closed-set order; the severity
       ladder in backticks in `verdicts.md` — `tests/Unit/Verdict/ClosedSetsTest.php`,
       `tests/Integration/CompatibilityPageTest.php`.
-    - `schema.md` "## Open sets", the paragraph starting "Objects are open" — `ClosedSetsTest.php`.
+    - `schema.md` "## Open sets", the list after "Objects are open" — `ClosedSetsTest.php`.
     - `notes.md` sections and its nav entry — `tests/Integration/NotesPageTest.php`.
     - The reserved namespace in `CONTRIBUTING.md` — `tests/Unit/PublicApiTest.php`.
     - The key fingerprint in `SECURITY.md` — `tests/Unit/SelfUpdate/ReleaseKeyTest.php`.

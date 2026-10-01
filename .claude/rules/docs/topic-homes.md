@@ -36,7 +36,7 @@ its page.
 | `--output`, `--explain`, allowlist | `configuration.md` sections of those names | `ci.md#several-reports-from-one-run`: the snippet |
 | Install-time block | `install-time.md` | `configuration.md` key rows |
 | Run notes | `notes.md` (section id = note code) | `schema.md`: the `note_details` shape |
-| Schema URLs, number, open sets, fields | `schema.md` | `compatibility.md` states what is frozen |
+| Schema URLs, number, open sets, fields | `schema.md` (the open-set list: `#open-sets`) | `compatibility.md` states what is frozen and links the list |
 | `origin`, `replacement_url`, what a report reveals | `schema.md#where-a-package-came-from` | `SECURITY.md`: a link |
 | What 1.0 freezes, public surface, verdict-change policy, deprecation | `compatibility.md` | `CONTRIBUTING.md#backward-compatibility`: contributor duties and a link |
 | Reserved names | `compatibility.md#names-reserved-for-extensions` | `CONTRIBUTING.md` keeps the sentence `PublicApiTest` reads |

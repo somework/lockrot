@@ -442,23 +442,32 @@ final class ClosedSetsTest extends TestCase
     }
 
     /**
-     * Every open set is named where a consumer reads which sets grow: the bullet list of
-     * docs/compatibility.md's "Open sets", the paragraph there that says which of them the schemas
-     * describe, and docs/schema.md's "Open sets" paragraph.
+     * Every open set is named in the one list a consumer reads to learn which sets grow: the list
+     * after "Objects are open" in docs/schema.md's "Open sets". docs/compatibility.md links it
+     * rather than repeating it, so a set added to a schema has one sentence to update.
      */
-    public function testEveryOpenSetIsNamedOnBothPages(): void
+    public function testEveryOpenSetIsNamedInTheSchemaPagesList(): void
     {
-        $compatibility = self::section(self::page('compatibility.md'), '### Open sets');
-        $bullets = self::flat(implode(' ', array_filter(explode("\n", $compatibility), static fn (string $line): bool => strpos($line, '- ') === 0)));
-        $schemas = self::paragraphStartingWith($compatibility, 'The schemas describe');
-        $schemaPage = self::paragraphStartingWith(self::section(self::page('schema.md'), '## Open sets'), 'Objects are open');
-        self::assertNotSame('', $bullets, 'the bullet list');
+        $list = self::listAfter(self::section(self::page('schema.md'), '## Open sets'), 'Objects are open');
+        self::assertNotSame('', $list, 'the list after "Objects are open"');
 
         foreach (self::openSets() as $where => [, , , $phrase]) {
-            self::assertStringContainsString($phrase, $bullets, $where.': docs/compatibility.md\'s list of open sets');
-            self::assertStringContainsString($phrase, $schemas, $where.': docs/compatibility.md\'s "The schemas describe" paragraph');
-            self::assertStringContainsString($phrase, $schemaPage, $where.': docs/schema.md\'s "Open sets" paragraph');
+            self::assertStringContainsString($phrase, $list, $where.': docs/schema.md\'s list of open sets');
         }
+    }
+
+    /** The list that follows the paragraph opening with these words, its items joined. */
+    private static function listAfter(string $text, string $opening): string
+    {
+        $blocks = preg_split('/\n\s*\n/', $text) ?: [];
+        foreach ($blocks as $index => $block) {
+            if (strpos(ltrim($block), $opening) === 0) {
+                $list = $blocks[$index + 1] ?? '';
+
+                return strpos(ltrim($list), '- ') === 0 ? self::flat($list) : '';
+            }
+        }
+        self::fail('no paragraph opens with "'.$opening.'"');
     }
 
     /** From the heading to the next heading of the same or a higher level. */
@@ -471,17 +480,6 @@ final class ClosedSetsTest extends TestCase
         $end = preg_match('/^#{1,'.$level.'} /m', $rest, $match, \PREG_OFFSET_CAPTURE) === 1 ? $match[0][1] : \strlen($rest);
 
         return substr($rest, 0, $end);
-    }
-
-    /** The paragraph that opens with these words, its lines joined. */
-    private static function paragraphStartingWith(string $text, string $opening): string
-    {
-        foreach (preg_split('/\n\s*\n/', $text) ?: [] as $paragraph) {
-            if (strpos(ltrim($paragraph), $opening) === 0) {
-                return self::flat($paragraph);
-            }
-        }
-        self::fail('no paragraph opens with "'.$opening.'"');
     }
 
     private static function flat(string $text): string

@@ -227,8 +227,9 @@ Data as of 2026-09-30 (package repositories, repository hosts). Run composer loc
 
 - **Width.** Lines wrap to `COLUMNS` when it is a positive integer; with `COLUMNS` unset, to the
   width Composer's console reports (with no terminal: 80, or none under Composer 2.2 LTS); otherwise
-  to 120. Never below 40. A command or path in the summary stays on one line, so it can be wider. For a `table` report written to a file, see
-  [Writing reports to files](configuration.md#writing-reports-to-files).
+  to 120. Never below 40. A command or path in the summary stays on one line, so it can be wider.
+  For a `table` report written to a file, see [Writing reports to
+  files](configuration.md#writing-reports-to-files).
 
 - **Colour.** On a terminal, a row's verdict label is red in the `critical` and `high` groups and
   yellow in `medium`.
@@ -236,8 +237,9 @@ Data as of 2026-09-30 (package repositories, repository hosts). Run composer loc
 ## The same lock as JSON
 
 `--format=json` writes every field of the report; the `html` page carries it as its embedded data's
-`report` key ([`--format=html`](ci.md#-formathtml)). This is the same run's document, abridged: `…` marks each cut (signals S3, S4 and S7 of the first
-finding, the rest of `exposure`, the other findings).
+`report` key ([`--format=html`](ci.md#-formathtml)). This is the same run's document, abridged: `…`
+marks each cut (signals S3, S4 and S7 of the first finding, the rest of `exposure`, the other
+findings).
 
 ```json
 {

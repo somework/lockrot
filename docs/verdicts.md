@@ -455,10 +455,10 @@ project reaches only through a name it provides or replaces.
 
 ### The `pulled in by:` line
 
-The summary block counts, per direct requirement, the attributed flagged packages it pulls in,
-most first. The first few requirements are named and the rest counted; the JSON document carries the whole
-list as `exposure`. A direct requirement appears only when it pulls in an attributed package, and
-the line is printed only when some flagged package is attributed.
+The summary block counts, per direct requirement, the attributed flagged packages it pulls in, most
+first. The first few requirements are named and the rest counted; the JSON document carries the
+whole list as `exposure`. A direct requirement appears only when it pulls in an attributed package,
+and the line is printed only when some flagged package is attributed.
 
 Limits:
 

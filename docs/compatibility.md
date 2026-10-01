@@ -84,40 +84,14 @@ The order decides:
 
 ### Open sets
 
-These sets grow in minor releases:
-
-- signal ids, S10's `blocks` included;
-- S10's `check` and `reason`;
-- S8's `floor_source`, and the explanation's `php_blocked_by`, which holds the same values;
-- the explanation's `misses_target_php` and `misses_project_php`;
-- S6's `reason`;
-- a finding's `libyears_unmeasured`, and the keys of the report's `libyears.unmeasured`;
-- a `priority_basis` step's `reason`, and a `no_fix_expected` item's `reason`;
-- `run.mode` and `run.fail_on_kind`;
-- `gate.tripped_by`, and a finding's `gate.exempt_by`;
-- a run note's `code`, and the `forge_id` and `reason` in its `data`;
-- a finding's `origin.kind` and `origin.registry`;
-- format names, the configuration's `format` among them.
-
-The schemas describe signal ids, S10's `check` and `reason`, S6's `reason`, S8's `floor_source`,
-the explanation's `php_blocked_by`, `misses_target_php` and `misses_project_php`, a finding's
-`libyears_unmeasured`, a `priority_basis` step's `reason`, a `no_fix_expected` item's `reason`,
-`run.mode`, `run.fail_on_kind`, `gate.tripped_by`, a finding's `gate.exempt_by`, a run note's
-`code`, and the `forge_id` and `reason` in its `data`, a finding's `origin.kind` and
-`origin.registry`, and the configuration's `format` as open strings.
-
-Repository hosts are an open set only in a run note's `forge_id`, and Composer registries only in a
-finding's `origin.registry`; S3 and S4's `host` and the explanation's `activity.forge` are plain
-strings.
-
-[schema.md](schema.md#open-sets) says how to read a value you do not know. A `priority_basis` step
-whose `reason` you do not know still shows its direction: compare `from` and `to`. In lockrot's own
-input an unknown format name is an error: `--format`, `--output` and
+The sets listed under [Open sets](schema.md#open-sets) grow in minor releases; the [closed
+sets](#closed-sets-and-their-order) do not. Read a value you do not know as described there. A
+`priority_basis` step whose `reason` you do not know still shows its direction: compare `from` and
+`to`. In lockrot's own input an unknown format name is an error: `--format`, `--output` and
 `extra.lockrot.format` accept only the names the release knows.
 
 A minor release may split a `libyears_unmeasured` reason, `no_stable_release_date` included, into
-narrower ones, which moves findings out of the old `libyears.unmeasured` key
-([schema.md](schema.md#open-sets)).
+narrower ones, which moves findings out of the old `libyears.unmeasured` key.
 
 ### Run notes
 

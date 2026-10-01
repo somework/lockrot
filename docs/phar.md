@@ -109,19 +109,8 @@ public repositories. Prefer it where `gh` is already installed.
 
 The PHAR is [reproducible](https://reproducible-builds.org/): the tagged commit and the Composer
 version the release was built with give the same bytes, on any PHP that the pinned Box runs on.
-
-```bash
-git clone https://github.com/somework/lockrot.git && cd lockrot
-git checkout <tag>                                     # the release you downloaded
-mkdir -p /tmp/composer-pin                             # a Composer for this build only
-curl -fsSL -o /tmp/composer-pin/composer https://getcomposer.org/download/<version>/composer.phar
-chmod +x /tmp/composer-pin/composer
-PATH=/tmp/composer-pin:$PATH build/build-phar.sh       # fetches the Box version it pins and checks its sha256
-sha256sum build/lockrot.phar                           # compare with the release's lockrot.phar.sha256
-```
-
-`<version>` is the Composer version the release was built with: the `composer:<version>` that
-`.github/workflows/phar.yml` pins at that tag, in its `tools:` entry. Your global Composer stays as it is.
+The steps are in
+[CONTRIBUTING.md](https://github.com/somework/lockrot/blob/main/CONTRIBUTING.md#rebuilding-a-release).
 
 ### Installing with PHIVE
 
@@ -156,8 +145,9 @@ verify it.
 - **No walk-up.** The PHAR never moves up to a parent directory's project; Composer's
   `use-parent-dir` is not honoured. Run it from the project root or point `-d` there.
 
-- **Option values.** Write option values with `=` (`--output=json:r.json`). Written with a space
-  and no command name before it, the value is read as a command name and the run exits `1`.
+- **Option values.** Give lockrot's own options (`--output`, `--format`, `--fail-on`, …) their
+  value with `=` (`--output=json:r.json`): written with a space and no command name before it, the
+  value is read as a command name and the run exits `1`. `-d <dir>` takes a space.
 
 - **`COMPOSER`.** Honoured as Composer honours it: `COMPOSER=alt.json php lockrot.phar` reads
   `alt.json` and `alt.lock` ([Environment overrides](configuration.md#environment-overrides)).
@@ -337,8 +327,8 @@ composer global require somework/lockrot
 composer global config allow-plugins.somework/lockrot true
 ```
 
-It is a plugin, not a PHAR, so it prints the [install-time summary](install-time.md) in every project
-you run Composer in. It reads `extra.lockrot` from each project, not from the global
+It is a plugin, not a PHAR, so it prints the [install-time summary](install-time.md) in every
+project you run Composer in. It reads `extra.lockrot` from each project, not from the global
 `composer.json`; [install-time.md](install-time.md) lists the switches that turn the summary off.
 
 ## When it fails

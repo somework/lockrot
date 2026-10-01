@@ -1,8 +1,8 @@
 # Contributing to lockrot
 
 Build lockrot, run the checks CI runs, and change it without breaking a promise it makes to users.
-What semantic versioning covers is in [What 1.0 freezes](docs/compatibility.md#what-10-freezes),
-and your duties when a change touches it are under [Backward compatibility](#backward-compatibility).
+What semantic versioning covers is in [What 1.0 freezes](docs/compatibility.md#what-10-freezes), and
+your duties when a change touches it are under [Backward compatibility](#backward-compatibility).
 How to write docs and changelog entries is in [the rule files](#writing-the-changelog-and-the-docs).
 
 ## Getting set up
@@ -140,7 +140,7 @@ frozen by pinned hashes, so a failure there is fixed in the schema change, never
 | Change | Also required |
 |---|---|
 | A new value in an open set | Add it to that node's `x-known-values`, never to an `enum`. `tests/Unit/Verdict/ClosedSetsTest.php` holds each list to the code |
-| A new open set | Register its node, pattern, values and doc phrase in `openSets()` in `ClosedSetsTest`, the one registry of open sets. Name it in the bullet list and the "The schemas describe" paragraph of `docs/compatibility.md` "Open sets", and in the "Objects are open" paragraph of `docs/schema.md` "Open sets" (`ClosedSetsTest`) |
+| A new open set | Register its node, pattern, values and doc phrase in `openSets()` in `ClosedSetsTest`, the one registry of open sets. Name it in the list after "Objects are open" in `docs/schema.md` "Open sets", the one list `ClosedSetsTest` reads |
 | A new signal | [Adding a signal](#adding-a-signal) |
 | A new run note code | [Adding a run note code](#adding-a-run-note-code) |
 | A new value in a closed set | Not possible under the same schema number ([Closed sets](docs/compatibility.md#closed-sets-and-their-order)) |
@@ -230,6 +230,24 @@ The archive's dependencies are locked in `build/phar/composer.lock`, which is co
 
 - To bump `composer/composer` or another dependency of the archive, run `composer update` in
   `build/phar/` and commit the lock.
+
+### Rebuilding a release
+
+To check that a published `lockrot.phar` is the one its tag builds:
+
+```bash
+git clone https://github.com/somework/lockrot.git && cd lockrot
+git checkout <tag>                                     # the release you downloaded
+mkdir -p /tmp/composer-pin                             # a Composer for this build only
+curl -fsSL -o /tmp/composer-pin/composer https://getcomposer.org/download/<version>/composer.phar
+chmod +x /tmp/composer-pin/composer
+PATH=/tmp/composer-pin:$PATH build/build-phar.sh       # fetches the Box version it pins and checks its sha256
+sha256sum build/lockrot.phar                           # compare with the release's lockrot.phar.sha256
+```
+
+`<version>` is the Composer version the release was built with: the `composer:<version>` that
+`.github/workflows/phar.yml` pins at that tag, in its `tools:` entry. Your global Composer stays as
+it is.
 
 ## The HTML report page
 

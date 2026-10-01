@@ -69,13 +69,22 @@ the identity fields of the other formats and the command line.
 
 ## Open sets
 
-Objects are open, and so are these sets of values, which grow in minor releases: signal ids (a
-signal's `id` and S10's `blocks`), S10's `check` and `reason`, S6's `reason` and S8's
-`floor_source`; a finding's `libyears_unmeasured`, a `priority_basis` step's `reason`, a
-`no_fix_expected` item's `reason`, a finding's `gate.exempt_by`, and a finding's `origin.kind` and
-`origin.registry`; `run.mode`, `run.fail_on_kind` and `gate.tripped_by`; a run note's `code`, and
-the `forge_id` and `reason` in its `data`; the explanation's `php_blocked_by`, `misses_target_php`
-and `misses_project_php`; the configuration's `format`.
+Objects are open, and so are these sets of values, which grow in minor releases:
+
+- signal ids: a signal's `id` and S10's `blocks`;
+- S10's `check` and `reason`;
+- S6's `reason`, and S8's `floor_source`;
+- a finding's `libyears_unmeasured`, and the keys of the report's `libyears.unmeasured`;
+- a `priority_basis` step's `reason`, and a `no_fix_expected` item's `reason`;
+- `run.mode`, `run.fail_on_kind` and `gate.tripped_by`, and a finding's `gate.exempt_by`;
+- a finding's `origin.kind` and `origin.registry`;
+- a run note's `code`, and the `forge_id` and `reason` in its `data`;
+- the explanation's `php_blocked_by`, `misses_target_php` and `misses_project_php`;
+- the configuration's `format`, and format names wherever lockrot writes one.
+
+Repository hosts are an open set only in a run note's `forge_id`, and Composer registries only in a
+finding's `origin.registry`; S3 and S4's `host` and the explanation's `activity.forge` are plain
+strings.
 
 How the schemas write an open set:
 

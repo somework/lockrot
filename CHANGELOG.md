@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.13.0] - 2026-09-26
+## [0.13.0] - 2026-10-01
 
 Act if you publish reports, set `COMPOSER` or an invalid `LOCKROT_FAIL_ON` or `LOCKROT_TARGET_PHP`,
 use lockrot's PHP classes, validate with Ajv strict or a vendored schema, run `self-update` in CI or
