@@ -3,10 +3,9 @@
 The escapes the mutation gate (`infection.json5`, whole `src/` tree) tolerates, with the reason each
 one is equivalent to the original code. One entry per mutant, by area, the nine escapes of the
 original gate (src/Verdict, src/Signal, src/Output, src/Analyzer) first. Line numbers are those of
-the Infection run each entry was written from, moved on 2026-09-25 past the `@internal` lines added
-to every class docblock that day, so each still names the line it named before; a later edit may
-shift them without changing the argument. "Hard to test" is not "equivalent": every entry here claims that no test could tell the
-mutant from the original, and says why.
+the CI mutation run of 93be938 (lockrot 0.13.0) on 2026-10-02; a later edit may shift them without
+changing the argument. "Hard to test" is not "equivalent": every entry here claims that no test
+could tell the mutant from the original, and says why.
 
 ## src/Verdict, src/Signal, src/Analyzer, src/Output (the original gate, 2026-09-16)
 
@@ -16,7 +15,7 @@ mutant from the original, and says why.
 - `src/Analyzer/Report.php:130` UnwrapArrayValues — `flagged()`: the findings are sorted and every
   flagged one precedes every unflagged one, so the filtered keys are already `0..n`; the
   `array_values()` is what makes the `list` type true by construction.
-- `src/Output/JsonFormatter.php:22` FalseValue — the `$showAll` default of the interface's
+- `src/Output/JsonFormatter.php:24` FalseValue — the `$showAll` default of the interface's
   parameter, which the JSON document does not read (it always lists every finding).
 - `src/Output/TableFormatter.php:176` CastString — `label()`: `previousVerdictOf()` is never null
   once the comparison says "worsened"; the cast is for the type, not for a case.
@@ -62,14 +61,14 @@ mutant from the original, and says why.
 
 ## src/SelfUpdate and src/Composer/SelfUpdateCommand.php
 
-src/Composer/SelfUpdateCommand.php:155 FalseValue (`\Phar::running(false)` → `\Phar::running(true)`) — the
+`src/Composer/SelfUpdateCommand.php:155` FalseValue (`\Phar::running(false)` → `\Phar::running(true)`) — the
 two differ only inside a running PHAR, where `false` gives `/path/lockrot.phar` and `true` gives
 `phar:///path/lockrot.phar`; the unit suite is not running from a PHAR, so both return `''` and take the same
 branch. The difference is exercised by `tests/E2E/PharTest.php::testSelfUpdateFinishesCleanlyAfterReplacingTheRunningArchive`,
 which replaces a real archive in place and would fail on a `phar://` path, but Infection runs the `unit` and
 `integration` suites only (`@group e2e` is excluded in phpunit.xml.dist), so no test it runs can see it.
 
-src/Composer/SelfUpdateCommand.php:152 FunctionCallRemoval (`class_exists(TerminalText::class);` removed) —
+`src/Composer/SelfUpdateCommand.php:152` FunctionCallRemoval (`class_exists(TerminalText::class);` removed) —
 the call only loads `TerminalText` before `PharUpdater` can replace the archive the process runs from, so an
 error printed after the swap does not need the autoloader. The unit suite runs from the source tree, where
 the autoloader finds the class whenever `writeError()` first uses it, so the removal prints the same bytes.
@@ -81,7 +80,7 @@ the two `catch` lines of `execute()`, went with the tag itself. So did the third
 `writeError()` (`'</'.$style.'>'` to `'</>'`): the helper no longer builds a tag at all, since
 OutputFormatter::escape() left `<<fg=red>>` live, and writes its line raw through `TerminalText` instead.
 
-src/SelfUpdate/ReleaseLocator.php:447 CastString (`(string) preg_replace(...)` → `preg_replace(...)`) — the
+`src/SelfUpdate/ReleaseLocator.php:447` CastString (`(string) preg_replace(...)` → `preg_replace(...)`) — the
 display version of a candidate. preg_replace() returns null only when the pattern fails to compile or the
 backtrack limit is hit; the pattern is a literal that compiles, and the subject is a normalised stable version
 (`\d+.\d+.\d+.\d+` with at most a short suffix), far below any limit. The cast states the `string` type the
@@ -110,8 +109,8 @@ are not listed here even though the area-B Infection config covers `src/Composer
   is only ever grown by `addRepository()` (append) and `prependRepository()` (`array_unshift`), so it
   is already a list and `array_values()` returns an identical array. It is what makes the
   `list<RepositoryInterface>` parameter type true, not a normalisation any input needs.
-- `src/Composer/InstallTimeSummary.php:188` TrueValue — and
-- `src/Composer/InstallTimeSummary.php:188` Foreach_ — the names this loop collects reach
+- `src/Composer/InstallTimeSummary.php:217` TrueValue — and
+- `src/Composer/InstallTimeSummary.php:217` Foreach_ — the names this loop collects reach
   `BaselineComparison::compare()` as `$presentPackages`, which uses them for the *stale* list only.
   Nothing on the install-time path reads that list: `InstallSummaryFormatter` has no baseline section,
   and `Policy::exitCode()` consults only `isKnown()`, which comes from the statuses map. The same
@@ -120,9 +119,8 @@ are not listed here even though the area-B Infection config covers `src/Composer
 
 ### src/Composer/LockrotCommand.php
 
-- `src/Composer/LockrotCommand.php:638` CastString — and
-- `src/Composer/LockrotCommand.php:208` CastString — `(string) getcwd()`, in `composerFile()` and for
-  the directory `--output` paths are relative to in `execute()`: `getcwd()` returns false only when the
+- `src/Composer/LockrotCommand.php:208` CastString — `(string) getcwd()`, for the directory
+  `--output` paths are relative to in `execute()`: `getcwd()` returns false only when the
   working directory has been removed or become unreadable under the running process, which would
   already have broken PHPUnit's own bootstrap. The cast is for the type. (The cast `initialize()` had
   went when it started asking `composerFile()` for the manifest, 0.13.)
@@ -171,9 +169,7 @@ are not listed here even though the area-B Infection config covers `src/Composer
 
 ## src/Data, src/Baseline, src/Allowlist, src/Graph, src/Lock, src/Json
 
-One line per mutant no test can see. Line numbers are the ones `build/infection-C.log` reported
-after this round of work, moved on 2026-09-25 like every other in this file; all 27 escapes of that
-run are listed below.
+One line per mutant no test can see.
 
 ### Set membership written as `= true`, read only through `isset()`
 
@@ -181,9 +177,9 @@ The value is never read, so writing `false` there is the same program. Four of t
 
 - `src/Data/Forge/ActivityClient.php:82` TrueValue — `$rateLimited[$forge] = true`; the only reader is
   `ActivityBatch::rateLimited()`, which is `isset($this->rateLimited[$forge])`.
-- `src/Data/Forge/ActivityFetchPlanner.php:53` TrueValue — `$capped[$forge] = true`; read by
+- `src/Data/Forge/ActivityFetchPlanner.php:55` TrueValue — `$capped[$forge] = true`; read by
   `isset($capped[$forge])` in the `array_filter` that builds `cappedForges()`.
-- `src/Data/Forge/ActivityFetchPlanner.php:69` TrueValue — `$seen[$repo->key()] = true`; read by
+- `src/Data/Forge/ActivityFetchPlanner.php:73` TrueValue — `$seen[$repo->key()] = true`; read by
   `isset($seen[$repo->key()])`.
 - `src/Data/Repository/RepositoryMetadataLoader.php:275` TrueValue — `$seen[$id] = true`; read by
   `isset($seen[$id])`.
@@ -230,7 +226,7 @@ The memo changes how often the work is done, not what it answers.
   missing or unreadable, and both operands are false for the file that is there.
 - `src/Filesystem/AtomicWriter.php:43` FunctionCallRemoval — `error_clear_last()` before the write
   (moved out of `BaselineFile::write()` on 2026-09-25, when the reports of `--output` started going
-  through the same writer; it was `src/Baseline/BaselineFile.php:112`).
+  through the same writer).
   It only changes the reported reason if the failing call records no warning of its own, and every
   fopen/chmod/rename failure on a real file records one, which replaces whatever was there
   regardless. (A short write records none — a full disk — and then the reason may be an older
@@ -265,26 +261,16 @@ The memo changes how often the work is done, not what it answers.
   the names in `needDev` with BUDGET_REASON — which is what the removed early return did by hand.
   Pass 1's `stillRemaining()` is always empty (only pass 2 populates it), so the batch that comes
   out is identical either way. Pass 2's own exhausted flag is never read.
-- `src/Data/Forge/ActivityFetchPlanner.php:62` DecrementInteger and IncrementInteger — the `?? 0`
+- `src/Data/Forge/ActivityFetchPlanner.php:65` DecrementInteger and IncrementInteger — the `?? 0`
   in `$checkedPackages[$forge] = ($checkedPackages[$forge] ?? 0) + 1` inside the already-seen
   branch. Reaching that branch means some earlier package selected this repository, which set
   `$checkedPackages[$forge]` on the same forge, so the default is unreachable there.
 
-## src/Data/Repository/ReleaseBranch.php and src/Signal/Rule/LeftBehindRule.php (left-behind, 2026-09-18)
+## src/Data/Repository/ReleaseBranch.php (left-behind, 2026-09-18)
 
 - `src/Data/Repository/ReleaseBranch.php:35` PregMatchRemoveCaret — `of()` matches
   `^(\d+)\.(\d+)\.(\d+)\.` against a string `VersionParser::normalize()` returned for a non-dev version,
   which always starts with the major digits: the anchor cannot move the match.
-- `src/Signal/Rule/LeftBehindRule.php:68` LessThanOrEqualTo — `$release['at'] <= $own['at']`
-  becoming `<` admits a higher branch released the very same instant as the installed one's last
-  release. That release then has to pass the liveness check (younger than `release-warn-years`)
-  while the installed branch's last release, the same instant, has to be at least
-  `release-warn-years` old for the signal to fire: both cannot hold, so the admitted release never
-  produces a signal.
-- `src/Data/Advisory/RepositoryAdvisoryLoader.php:65` ReturnRemoval — the Composer 2.2 arm of the
-  `interface_exists(AdvisoryProviderInterface::class)` guard, never entered on the vendored
-  Composer; the Docker 7.4/2.2 run outside Infection covers it
-  (`RepositoryAdvisoryLoaderTest::testTheComposerVersionNoteMatchesTheApi`).
 
 ### Not equivalent: the two mutants this run reports as timed out
 
@@ -299,11 +285,6 @@ slow test. They are listed here only so nobody reads them as an unexplained "2 t
 
 ## pre-post-fixes (2026-09-19)
 
-- `src/Signal/Rule/LeftBehindRule.php:72` LessThanOrEqualTo — a higher branch released at the very
-  instant the installed branch's last release was is skipped by `<=` and kept by `<`; kept, it is the
-  newest candidate at the installed branch's own date, and the signal then needs that date to be
-  both at least `release-warn-years` old (the branch) and younger than `release-warn-years` (the
-  move-on) — impossible, so the rule returns null either way.
 - `src/Composer/LockrotCommand.php:367` `explain()` LogicalOr on `$finding === null || $facts === null` —
   `Analysis::finding()` and `Analysis::facts()` are filled by the same loop over the same packages
   in `Analyzer::analyzeWithFacts()`, so one is null exactly when the other is; and the lock lookup
@@ -319,13 +300,13 @@ slow test. They are listed here only so nobody reads them as an unexplained "2 t
 - `src/Data/Repository/MonorepoParents.php:116` ReturnRemoval — the same guard one level down, with
   the same argument: `array_intersect($replaces, [])` is empty for every parent, so the loop below
   selects nothing and the method returns `[]` either way.
-- `src/Data/Repository/PackageMetadata.php:191` TrueValue — `$replaces[$link->getTarget()] = true`
+- `src/Data/Repository/PackageMetadata.php:196` TrueValue — `$replaces[$link->getTarget()] = true`
   is set membership read only through `array_keys()`; the value is never looked at, so `false`
   builds the same list. The same shape as `ActivityClient.php:82` above.
-- `src/Data/Repository/PackageMetadata.php:308` TrueValue — `$sharedCommitVersions[$normalized] = true`
+- `src/Data/Repository/PackageMetadata.php:314` TrueValue — `$sharedCommitVersions[$normalized] = true`
   is set membership read only through `isset()`, which is true for a `false` value as well; the
   value is never looked at.
-- `src/Data/Repository/PackageMetadata.php:353` ReturnRemoval — `needsParentDates()` returns false
+- `src/Data/Repository/PackageMetadata.php:360` ReturnRemoval — `needsParentDates()` returns false
   for a branch snapshot, which has no branch. Without the return the lookup runs with a null key,
   PHP reads it as `''`, no branch is keyed by the empty string, and the version check after it
   finds a branch name (`dev-main`, `2.x-dev`) among no stable tags, so the method returns false all
@@ -359,11 +340,12 @@ its slashes unescaped. Two are equivalent:
   unflagged one, the filter leaves a gap in the keys and `json_encode` writes an object where the
   page expects a list. The defence is for a future ordering, and a test cannot reach it without
   rewriting `SEVERITY`.
-- `src/Output/HtmlFormatter.php:129` BitwiseOr — `ENT_QUOTES | ENT_SUBSTITUTE` becomes `&`, which is
-  `0`, so quotes stay unescaped and invalid UTF-8 is not substituted. `text()` has one caller and it
-  is `title()`, which builds its string from two integers and literal words: no quote and no invalid
-  byte can reach it today. The flags are there so that stays true if the title ever grows a value
-  from the lock, and a test cannot tell the difference until it does.
+- `src/Output/HtmlFormatter.php:122` BitwiseOr — `ENT_QUOTES | ENT_SUBSTITUTE` becomes `&`, which is
+  `0`, so quotes stay unescaped and invalid UTF-8 is not substituted. `text()` escapes only what
+  `title()` and `description()` return, and both build their strings from integers, verdict names
+  and literal words: no quote and no invalid byte can reach it today. The flags are there so that
+  stays true if either ever grows a value from the lock, and a test cannot tell the difference until
+  it does.
 
 
 ## Unknown `extra.lockrot` keys (0.13.0)
@@ -400,21 +382,17 @@ that the page an `--output=html:` file carries has its facts (`details`) when st
 which left the facts gate and the `PageData` ternary free, and the `COMPOSER` manifest was only
 tested with a trimmed `.json` name, which left `trim()` and the `.lock`-appending arm free. Two
 escapes are the `AtomicWriter` pair above, moved from `BaselineFile` (the `reason()` LogicalAnd of
-that pair has since been killed, see below). The other two are equivalent,
-and so is the one the Windows-alias refusal added (259 mutants, 5 escapes, after it):
+that pair has since been killed, see below). The other two were equivalent,
+and so was the one the Windows-alias refusal added (259 mutants, 5 escapes, after it). Two of those
+three have gone with their code: the `(string)` around `OutputFormatter::format()` in `ReportTargets`
+went when the table came to be rendered by `ConsoleMarkup`, which returns a string, and the
+`(string) preg_replace(...)` in `isWindowsAlias()` went when it came to read the last component
+through `Path::name()`, whose cast Infection does not mutate. The one still there:
 
 - `src/Composer/LockrotCommand.php:491` CastArray — `(array) $input->getOption('output')`. The option
   is declared `VALUE_IS_ARRAY`, and symfony/console returns an array for it in every case — `[]` when
   it is not given — so the cast never changes the value. It is there because `getOption()` is typed
   `mixed`, and a `foreach` over `mixed` is not something PHPStan lets through.
-- `src/Output/ReportTargets.php:174` CastString — `(string)` around `OutputFormatter::format()`,
-  which symfony/console types `?string` and returns null only for a null message; the table
-  formatter always hands it a string. The cast is for the type. (Gone since the table is rendered by
-  `ConsoleMarkup`, which returns a string: the cast and its mutant went with the formatter call.)
-- `src/Filesystem/Path.php:41` CastString — `(string) preg_replace(...)` in `isWindowsAlias()`, the
-  shape of the `RepoLocator` cast above: preg_replace returns null only when the pattern fails to
-  compile, and this one is a literal. The cast is for the type. (Gone since `isWindowsAlias()` reads
-  the last component through `Path::name()`, whose cast Infection does not mutate.)
 
 ### The review fixes to `--output` (2026-09-26)
 
@@ -425,14 +403,13 @@ were real gaps and are killed now (three of them on one line) — the project's 
 name rule, never as a second name on disk; no test replaced a file with execute bits; a short
 write was never simulated (a stream wrapper stands in for the full disk now); and nothing pinned a
 file in the root directory, which left the `rtrim()` in `Path::canonical()` free. The short-write
-test also killed `reason()`'s LogicalAnd (`src/Filesystem/AtomicWriter.php:75`), listed as
+test also killed `reason()`'s LogicalAnd (`AtomicWriter.php:75` then), listed as
 equivalent until then: a short write records no warning, so the generic reason is reachable, and
-its entry is gone. Four escapes are the entries above, at their new lines. The other five are
-equivalent (403 mutants, 9 escapes, Covered MSI 97.8%):
+its entry is gone. Four escapes are the entries above, at their new lines. The other five were
+equivalent (403 mutants, 9 escapes, Covered MSI 97.8%). One, the ConcatOperandRemoval that turned
+`writeError()`'s `'</'.$style.'>'` into `'</>'`, has gone since with the tag it closed: self-update
+writes its lines raw like `LockrotCommand` (see the self-update area above). The other four:
 
-- `src/Composer/SelfUpdateCommand.php:278` ConcatOperandRemoval — `'</'.$style.'>'` becomes `'</>'`.
-  Gone since self-update writes its lines raw like `LockrotCommand` (see the self-update area above),
-  with `TerminalText` loaded before the archive can be replaced.
 - `src/Filesystem/Path.php:138` LogicalOr and DecrementInteger x2 — `$a['ino'] === 0 ||
   $b['ino'] === 0`, the fallback to comparing resolved paths where a filesystem reports no inode.
   Every filesystem CI and a developer machine run on (ext4, APFS, tmpfs) reports one, so the
@@ -478,7 +455,7 @@ Measured over `src/Analyzer/RunNote.php`, `src/Data/Repository/MetadataFailure.p
 `src/Explain/Explanation.php`, whole files, locally under Xdebug on 10 threads with the timeout
 raised to 3600 s and `--only-covering-test-cases`, so that every mutant runs: 580 mutants, 577
 killed, 3 escaped, none skipped, ~6m45s. Two escapes are entries above, which moved to
-`Report.php:130` and `Analyzer.php:225` (`:227` since the origin) when the notes left those files; the third is below. The
+`Report.php:130` and `Analyzer.php:225` (`Analyzer.php:228` today) when the notes left those files; the third is below. The
 notes add no escape. Under the repository's 180 s timeout Infection skips many of these mutants
 unrun (it leaves a mutant out when its covering tests' summed time passes the timeout), and an
 earlier reading of these files taken that way claimed a clean result it had not measured.
@@ -486,12 +463,12 @@ earlier reading of these files taken that way claimed a clean result it had not 
 Two `continue` → `break` mutants in `Analyzer::activityNotCheckedReasons()` (the offline and the
 spent-budget arms) escaped every test before this branch and are killed now by
 `AnalyzerRunNotesTest`, which reads two packages' reasons where one had been enough. Two older
-escapes in `buildFinding()`'s S10 filter, the LogicalOr on `Analyzer.php:391` and the
-UnwrapArrayFilter on `:392`, went undocumented since S10 arrived: no test held an allowlisted
+escapes in `buildFinding()`'s S10 filter, the LogicalOr on `Analyzer.php:392` and the
+UnwrapArrayFilter on `Analyzer.php:393`, went undocumented since S10 arrived: no test held an allowlisted
 package with an S10 to losing it. `AnalyzerTest::testS10IsLeftOffAnAllowlistedPackageAndAnAbandonedOne`
 kills both. `RunNoteAgreementTest` covers nothing, for the reason `GateAgreementTest` gives.
 
-- `src/Analyzer/Analyzer.php:392` UnwrapArrayValues — `array_values()` over the signals with S10
+- `src/Analyzer/Analyzer.php:393` UnwrapArrayValues — `array_values()` over the signals with S10
   filtered out. `SignalSet::evaluate()` sorts the signals by number and S10 is the highest, so it is
   always the last element: removing it leaves the keys `0..n-1` already, and the `array_values()`
   only makes the `list` type true by construction.
