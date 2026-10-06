@@ -1,31 +1,12 @@
 #!/usr/bin/env bash
-# Records the documents an earlier lockrot release wrote, for tests/Integration/SchemaEvolutionTest:
-# the baseline file its `--generate-baseline` writes, its `--format=json` report compared against
-# that baseline, and a few `--explain … --format=json` documents, over wallabag's lock.
+# Records what an earlier lockrot release writes, for tests/Integration/SchemaEvolutionTest: the
+# baseline file of its `--generate-baseline`, its `--format=json` report compared against that
+# baseline and a few `--explain … --format=json` documents, over wallabag's lock.
 #
 #   GITHUB_TOKEN=$(gh auth token) bin/record-schema-evolution <version> <today>
 #
-#   <version>  a published release, e.g. 0.11.0; its signed lockrot.phar is what runs
-#   <today>    the recording day, e.g. 2026-09-25; lockrot's clock is pinned to its midnight UTC
-#
-# The PHAR comes from the GitHub release and is checked three ways before it runs: its sha256
-# against lockrot.phar.sha256, its GPG signature against lockrot-release-key.asc (with gpgv and a
-# throwaway keyring, never yours; a revoked signing key fails, an expired one does not, since an
-# older release was signed by a subkey that has expired since), and its build attestation with
-# `gh attestation verify`. It runs with network and GITHUB_TOKEN, over a copy of
-# tests/fixtures/apps/wallabag_wallabag in a scratch directory (nothing is written into
-# tests/fixtures but the result).
-#
-# Caches: the baseline run fills a Composer cache of its own, and the report run starts from another,
-# empty one, so the report is what that release writes on a fresh machine — every answer fetched in
-# the run, `activity_cache_oldest_at: null`. The explanations run after it on the cache it filled,
-# as a second run on that machine would, so they carry `from_cache: true`.
-#
-# A recorded version is frozen: the script refuses a version whose directory exists. A document
-# there that stops validating is a compatibility break to raise, not a fixture to refresh.
-# `provenance.json` next to the documents names the release, the PHAR's sha256, the PHP that ran it,
-# the arguments of every run and the sha256 of every file written; SchemaEvolutionTest pins the
-# sha256 of provenance.json itself and the release asset's digest.
+#   <version>  a published release, for example 0.11.0. Its signed lockrot.phar runs.
+#   <today>    the recording day, for example 2026-09-25. The clock of lockrot is pinned to its midnight UTC.
 set -euo pipefail
 
 usage='usage: GITHUB_TOKEN=$(gh auth token) bin/record-schema-evolution <version> <today>'
@@ -41,23 +22,25 @@ out=$root/tests/fixtures/schema-evolution/$version
 lock=tests/fixtures/apps/wallabag_wallabag
 fingerprint=39ECC3F64AE8D06A9A63FD99AB6F7F52AE513141
 target_php=8.4
-# Relative on purpose: the report prints the baseline path as given, so an absolute one would
-# carry the scratch directory into the document. The file is kept under this same name.
+# A relative path: the report prints the baseline path as given, and an absolute one carries the
+# scratch directory into the document.
 baseline=lockrot-schema-evolution-baseline.json
-# Packages whose explanations, between them, carry every signal wallabag's lock has (measured
-# 2026-09-25): abandoned (doctrine/cache), abandoned with an archived repository
-# (sensio/framework-extra-bundle), a pinned branch snapshot (wallabag/rulerz), silent with S5
-# (javibravo/simpleue), left-behind with S8, and S10 from 0.11.0 on (scheb/2fa-backup-code),
-# left-behind with a security advisory (spomky-labs/otphp). Not every verdict or priority: the
-# report carries those, and the schema widening check covers what no recording does.
+# Packages whose explanations between them carry every signal that wallabag's lock has:
+#   doctrine/cache abandoned, sensio/framework-extra-bundle abandoned with an archived repository,
+#   wallabag/rulerz a pinned branch snapshot, javibravo/simpleue silent with S5, scheb/2fa-backup-code
+#   left-behind with S8 and, where the release has it, S10, spomky-labs/otphp left-behind with a
+#   security advisory.
 packages=(doctrine/cache sensio/framework-extra-bundle wallabag/rulerz javibravo/simpleue scheb/2fa-backup-code spomky-labs/otphp)
 
+# A recorded version is frozen. A document there that stops validating is a compatibility break to
+# raise, not a fixture to refresh.
 if [[ -e $out ]]; then
     echo "$out exists: a recorded version is never re-recorded" >&2
     exit 1
 fi
 
-# GNU and busybox mktemp want the X's in the template; BSD mktemp takes them too.
+# The script works in a scratch directory and writes only its result into tests/fixtures.
+# GNU and busybox mktemp need the X's in the template, and BSD mktemp accepts them.
 work=$(mktemp -d "${TMPDIR:-/tmp}/lockrot-schema-evolution.XXXXXX")
 trap 'rm -rf "$work"' EXIT
 mkdir -p "$work/release" "$work/project" "$work/cache-baseline" "$work/cache" "$work/home" "$work/out/explain" "$work/log"
@@ -67,11 +50,11 @@ echo "downloading v$version" >&2
 gh release download "v$version" --repo somework/lockrot --dir "$work/release" \
     -p lockrot.phar -p lockrot.phar.sha256 -p lockrot.phar.asc
 (cd "$work/release" && shasum -a 256 -c lockrot.phar.sha256 >&2)
-# gpgv against a keyring holding the release key alone: no agent, and nothing touches your keyring.
-# gpgv does not look at revocations, but it reports them: REVKEYSIG in place of GOODSIG. VALIDSIG
-# ends with the primary key's fingerprint, anchored so the signature is this key's, not a key's
-# whose fingerprint merely contains it. EXPKEYSIG passes on purpose: the subkey that signed an
-# older release may have expired since, which does not make that signature any less its.
+# gpgv checks against a keyring that holds the release key alone: it needs no agent and never touches
+# your keyring. It does not act on revocations, but it reports them as REVKEYSIG in place of GOODSIG.
+# VALIDSIG ends with the fingerprint of the primary key. The grep anchors it, so a key whose
+# fingerprint only contains this one does not pass. EXPKEYSIG passes: the subkey that signed an older
+# release can be expired, and that does not make its signature less valid.
 GNUPGHOME=$work/gnupg gpg --batch --dearmor < "$root/lockrot-release-key.asc" > "$work/release-key.gpg"
 gpgv --keyring "$work/release-key.gpg" --status-fd 1 "$work/release/lockrot.phar.asc" "$work/release/lockrot.phar" \
     > "$work/log/gpg-status" 2>/dev/null || true
@@ -87,7 +70,7 @@ gh attestation verify "$work/release/lockrot.phar" --repo somework/lockrot >&2
 phar_sha256=$(shasum -a 256 "$work/release/lockrot.phar" | cut -d' ' -f1)
 cp "$root/$lock/composer.json" "$root/$lock/composer.lock" "$work/project/"
 
-# The runs: "<file>\t<exit>\t<arg>\t<arg>…" per line, with the scratch copy named rather than located.
+# One line per run: "<file>\t<exit>\t<arg>\t<arg>…", with the name of the scratch copy and not its location.
 runs=$work/log/runs.tsv
 : > "$runs"
 cache=$work/cache
@@ -112,6 +95,10 @@ lockrot() {
 }
 
 echo "recording with lockrot $version" >&2
+# The baseline run fills a Composer cache of its own. The report run starts from another, empty one,
+# so the report is what the release writes on a fresh machine: every answer is fetched in the run
+# and `activity_cache_oldest_at` is null. The explanations run on the cache that the report filled,
+# as a second run does, so they carry `from_cache: true`.
 cache=$work/cache-baseline
 lockrot "$baseline" 0 --generate-baseline --baseline="$baseline"
 mv "$work/project/$baseline" "$work/out/$baseline"
@@ -127,10 +114,9 @@ for package in "${packages[@]}"; do
     mv "$work/log/stdout" "$work/out/$file"
 done
 
-# Each document is JSON, names its schema first, says it was written by $version under the schema
-# number its `$schema` names, and carries no path of this machine and no token. A path counts only
-# as a whole path: `/lockrot` is in every document's `https://lockrot.dev/…`, and HOME=/ is in all
-# of them.
+# Each document must be JSON. It must name its schema first and say that $version wrote it under the
+# schema number that its `$schema` names. It must carry no token and no path of this machine. A path
+# counts only as a whole path: `/lockrot` is in every `https://lockrot.dev/…`, and HOME=/ is in all of them.
 for path in "$work/out/$baseline" "$work"/out/report.json "$work"/out/explain/*.json; do
     case $path in
         */report.json) kind=report ;;
@@ -167,6 +153,9 @@ for path in "$work/out/$baseline" "$work"/out/report.json "$work"/out/explain/*.
     ' "$path" "$kind" "$version" "$GITHUB_TOKEN" "$work" "$(cd "$work" && pwd -P)" "$root" "$HOME"
 done
 
+# provenance.json names the release, the sha256 of the PHAR, the PHP that ran it, the arguments of
+# every run and the sha256 of every file written. SchemaEvolutionTest pins its sha256 and the digest
+# of the release asset.
 "$php" -r '
     [, $runs, $out, $version, $sha256, $today, $recorded, $lock, $targetPhp, $fingerprint] = $argv;
     $files = [];

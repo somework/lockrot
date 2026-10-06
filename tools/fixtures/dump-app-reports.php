@@ -2,21 +2,12 @@
 
 declare(strict_types=1);
 
-// The hermetic harness for "the report-1 output of the fixture apps": one `--format=json` report
-// per app under tests/fixtures/apps, built as AcceptanceTest::analyze() builds it — the recorded
-// p2 envelopes served by FixtureRepositoryServer, the recorded GitHub answers, no network — with
-// the clock pinned and the target PHP 8.4. Run it at a PR's base and at its head and diff the two
-// directories:
-//
-//   php tools/fixtures/dump-app-reports.php <out-dir>
-//
-// `bin/lockrot --offline` is no substitute: it reads Composer's cache, and with a cold cache it
-// dates nothing, so an empty diff would prove nothing. That is why the run fails unless wallabag's
-// report carries at least WALLABAG_YEARS_MIN signals with `years`.
-//
-// LOCKROT_TODAY overrides the clock (default 2026-10-01). The script keeps to the API of v0.13.0
-// so that it runs unchanged on a base checkout: copy it there, or point LOCKROT_ROOT at the
-// checkout to analyse with that checkout's code.
+// Dumps one `--format=json` report per app in tests/fixtures/apps, built as AcceptanceTest::analyze()
+// builds it: recorded answers, no network. Run it at the base and at the head of a PR, then diff the
+// two output directories. LOCKROT_TODAY sets the clock.
+// The script keeps to the API of v0.13.0, so it runs unchanged on a base checkout: copy it there, or
+// set LOCKROT_ROOT to that checkout. `bin/lockrot --offline` is no substitute: with a cold Composer
+// cache it dates nothing, so an empty diff proves nothing.
 
 use Lockrot\Allowlist\BuiltinAllowlist;
 use Lockrot\Analyzer\Analyzer;
