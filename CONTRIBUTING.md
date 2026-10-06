@@ -3,7 +3,7 @@
 Build lockrot, run the checks CI runs, and change it without breaking a promise it makes to users.
 What semantic versioning covers is in [What 1.0 freezes](docs/compatibility.md#what-10-freezes), and
 your duties when a change touches it are under [Backward compatibility](#backward-compatibility).
-How to write docs and changelog entries is in [the rule files](#writing-the-changelog-and-the-docs).
+How to write docs, comments, tests and changelog entries is in [the rule files](#writing-the-changelog-and-the-docs).
 
 ## Getting set up
 
@@ -69,11 +69,14 @@ change appears there with the next release. The landing page and the blog are in
 
 ### Writing the changelog and the docs
 
-A change to the docs or the changelog is reviewed against these files.
+Reviewers check the docs, comments, tests and changelog entry of every change against these files.
 
 | File | Covers |
 |---|---|
-| [`.claude/rules/docs/writing.md`](.claude/rules/docs/writing.md) | `README.md`, `CONTRIBUTING.md`, `SECURITY.md` and `docs/*.md`: the reader of each page, one page one mode, concision, terms, wording that stays true |
+| [`.claude/rules/writing.md`](.claude/rules/writing.md) | Every sentence: Simplified Technical English adapted to lockrot, wording that stays true, less text, the glossary |
+| [`.claude/rules/code-comments.md`](.claude/rules/code-comments.md) | Comments, docblocks and config comments: no comment by default, what a comment holds, docblock types |
+| [`.claude/rules/tests.md`](.claude/rules/tests.md) | Tests that fail only on a defect: what to assert, numbers over recorded fixtures, hermetic tests |
+| [`.claude/rules/docs/writing.md`](.claude/rules/docs/writing.md) | `README.md`, `CONTRIBUTING.md`, `SECURITY.md` and `docs/*.md`: the reader of each page, one page one mode, docs-only wording |
 | [`.claude/rules/docs/topic-homes.md`](.claude/rules/docs/topic-homes.md) | The one page that holds each recurring topic, and what the other pages say about it |
 | [`.claude/rules/docs/contracts.md`](.claude/rules/docs/contracts.md) | Anchors, links, list nesting, validated JSON samples, text that tests read, and the commands that check them |
 | [`.claude/rules/changelog.md`](.claude/rules/changelog.md) | `CHANGELOG.md`: the release structure, the shape of an entry, what goes in which section, and what never goes in |
@@ -266,8 +269,8 @@ tools/report/update-renderer vX.Y.Z
   every run.
 - `--from-dir DIR` vendors a local build for development. It is not attested; never release with it.
 - Do not edit the vendored page by hand: change the renderer, release it, update the pin.
-- A bump gets one `html` entry under `### Changed` (`.claude/rules/changelog.md`, "The renderer
-  entry").
+- A bump gets one `html` entry under `### Changed` (`.claude/rules/changelog.md`, "Entry
+  shape").
 - Which packages and facts go into the page is decided in lockrot, in `src/Html/ReportDocument.php`.
 
 ## The corpus
@@ -327,5 +330,3 @@ Exit codes, the checks and the files are in `tools/corpus/README.md`.
   change that writes or contacts something new has to update.
 - [`tools/corpus/README.md`](tools/corpus/README.md): the corpus checks, their files and exit codes.
 - [`tests/fixtures/README.md`](tests/fixtures/README.md): every recorded fixture set and its source.
-- [Writing the changelog and the docs](#writing-the-changelog-and-the-docs): the rule files a docs
-  or changelog change is reviewed against.
