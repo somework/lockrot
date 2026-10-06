@@ -6,6 +6,7 @@ namespace Lockrot\Tests\Unit\Json;
 
 use Lockrot\Exception\ConfigException;
 use Lockrot\Json\JsonReader;
+use Lockrot\Tests\Support\UnreadableFiles;
 use PHPUnit\Framework\TestCase;
 
 final class JsonReaderTest extends TestCase
@@ -39,18 +40,17 @@ final class JsonReaderTest extends TestCase
     }
 
     /**
-     * Composer's JsonFile::read() throws \RuntimeException when the file cannot be read (as opposed
-     * to not existing at all). A directory path is rejected earlier by the "not found" check
-     * (is_file() is false for directories too), so this branch needs a path that IS a regular file
-     * but is not readable. chmod(0000) does not stop root, hence the skip.
-     *
-     * Composer's own permission probe (Filesystem::isReadable(), via Silencer) triggers a
-     * "Permission denied" PHP warning that its error_reporting-based suppression does not keep from
-     * PHPUnit (failOnWarning is on for this project); the temporary no-op error handler keeps that
-     * warning from ever reaching PHPUnit's handler.
+     * A directory path never reaches this branch: the "not found" check rejects it (is_file() is
+     * false for directories), so the test needs a regular file that is not readable. chmod(0000)
+     * does not stop root, hence the skip. Composer's permission probe raises a "Permission denied"
+     * warning that PHPUnit reports (failOnWarning is on), so a no-op error handler hides it.
      */
     public function testUnreadableFileThrows(): void
     {
+        // Infection's include interceptor reports a mode-0000 file as missing: the UnreadableFiles test covers the branch there.
+        if (getenv('INFECTION') === '1') {
+            self::markTestSkipped('a mode-0000 file reads as missing under Infection');
+        }
         if (\function_exists('posix_getuid') && posix_getuid() === 0) {
             self::markTestSkipped('Cannot simulate an unreadable file while running as root.');
         }
@@ -66,6 +66,24 @@ final class JsonReaderTest extends TestCase
             self::fail('Expected a ConfigException.');
         } catch (ConfigException $e) {
             self::assertMatchesRegularExpression('{^Cannot read '.preg_quote($path, '{').': .+}', $e->getMessage());
+        } finally {
+            restore_error_handler();
+        }
+    }
+
+    public function testAFileThatExistsAndCannotBeReadIsRefused(): void
+    {
+        $path = UnreadableFiles::path('a.json');
+
+        set_error_handler(static function (): bool {
+            return true;
+        });
+        try {
+            JsonReader::readObject($path);
+            self::fail('Expected a ConfigException.');
+        } catch (ConfigException $e) {
+            self::assertMatchesRegularExpression('{^Cannot read '.preg_quote($path, '{').': .+}', $e->getMessage());
+            self::assertInstanceOf(\RuntimeException::class, $e->getPrevious());
         } finally {
             restore_error_handler();
         }

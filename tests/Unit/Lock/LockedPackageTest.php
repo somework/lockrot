@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Lock;
 
+use Lockrot\Lock\ConfiguredRepositories;
 use Lockrot\Lock\LockedPackage;
 use Lockrot\Tests\Support\Origins;
 use PHPUnit\Framework\TestCase;
@@ -25,6 +26,16 @@ final class LockedPackageTest extends TestCase
         self::assertFalse(self::package('1.2.3#a1b2c3d')->isBranchSnapshot());
         self::assertFalse(self::package('2.0.0-RC1')->isBranchSnapshot());
         self::assertFalse(self::package('1.0.0-beta.2')->isBranchSnapshot());
+    }
+
+    public function testWithRepositoriesLeavesTheEntryItWasCalledOnUnchanged(): void
+    {
+        $package = self::package('1.0.0');
+        $origin = $package->origin();
+
+        $package->withRepositories(ConfiguredRepositories::fromManifest([['type' => 'composer', 'url' => 'https://satis.acme.test']]));
+
+        self::assertSame($origin, $package->origin());
     }
 
     private static function package(string $version): LockedPackage

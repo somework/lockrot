@@ -6,24 +6,31 @@ namespace Lockrot\Tests\Unit\Lock;
 
 use Lockrot\Exception\ConfigException;
 use Lockrot\Lock\LockLineIndex;
+use Lockrot\Tests\Support\UnreadableFiles;
 use PHPUnit\Framework\TestCase;
 
 final class LockLineIndexTest extends TestCase
 {
     private const LARAVEL_LOCK = __DIR__.'/../../fixtures/skeletons/laravel/composer.lock';
 
-    /**
-     * Both numbers come from `grep -n '"name": "<package>"' composer.lock` against the committed
-     * fixture; they change only if the fixture itself is re-recorded.
-     */
     public function testLineOfAPackageInPackages(): void
     {
-        self::assertSame(1063, LockLineIndex::fromFile(self::LARAVEL_LOCK)->lineOf('laravel/framework'));
+        self::assertOnItsNameLine('laravel/framework');
     }
 
     public function testLineOfAPackageInPackagesDev(): void
     {
-        self::assertSame(7232, LockLineIndex::fromFile(self::LARAVEL_LOCK)->lineOf('phpunit/phpunit'));
+        self::assertOnItsNameLine('phpunit/phpunit');
+    }
+
+    private static function assertOnItsNameLine(string $package): void
+    {
+        $line = LockLineIndex::fromFile(self::LARAVEL_LOCK)->lineOf($package);
+        $lines = file(self::LARAVEL_LOCK);
+
+        self::assertNotNull($line);
+        self::assertIsArray($lines);
+        self::assertSame('"name": "'.$package.'",', trim($lines[$line - 1]));
     }
 
     public function testUnknownPackageHasNoLine(): void
@@ -84,9 +91,8 @@ final class LockLineIndexTest extends TestCase
     }
 
     /**
-     * `extra.thanks.name` names another package entirely, and it is spelled exactly like a package
-     * name, so "first occurrence wins" alone would map that package to the wrong line — here to a
-     * line inside a different entry, 6 lines above its own.
+     * `extra.thanks.name` names another package and is spelled exactly like a package name, so
+     * "first occurrence wins" alone maps that package to a line inside a different entry.
      */
     public function testThanksTargetDoesNotShadowTheRealEntry(): void
     {
@@ -115,7 +121,6 @@ final class LockLineIndexTest extends TestCase
         self::assertSame(13, $index->lineOf('acme/later'));
     }
 
-    /** A "name" outside packages/packages-dev is not a package entry either. */
     public function testTopLevelSectionsOtherThanPackagesAreIgnored(): void
     {
         $json = <<<'JSON'
@@ -140,8 +145,8 @@ final class LockLineIndexTest extends TestCase
     }
 
     /**
-     * Braces inside a string value must not move the nesting depth the scan tracks; a description
-     * full of them would otherwise push every later entry out of reach.
+     * Braces inside a string value must not move the nesting depth the scan tracks, or a description
+     * full of them pushes every later entry out of reach.
      */
     public function testBracesInsideStringValuesDoNotConfuseTheScan(): void
     {
@@ -160,8 +165,7 @@ final class LockLineIndexTest extends TestCase
     }
 
     /**
-     * A lock written on one line carries no line to point at; the index is empty rather than wrong,
-     * and the formatters simply omit the line from their annotations.
+     * A lock written on one line carries no line to point at: the index is empty rather than wrong.
      */
     public function testMinifiedLockYieldsNoLines(): void
     {
@@ -179,7 +183,7 @@ final class LockLineIndexTest extends TestCase
                 ]
             }
             JSON;
-        // Composer writes the name member alone on its line; one that shares its line is a lock
+        // Composer writes the name member alone on its line. One that shares its line is a lock
         // Composer did not write, and the index leaves it out rather than guess.
         self::assertNull(LockLineIndex::fromString($json)->lineOf('acme/pkg'));
     }
@@ -199,8 +203,33 @@ final class LockLineIndexTest extends TestCase
         LockLineIndex::fromFile(sys_get_temp_dir());
     }
 
+    public function testAFileThatExistsAndCannotBeReadIsRefusedWithoutAWarning(): void
+    {
+        $path = UnreadableFiles::path('composer.lock');
+        $warnings = [];
+
+        set_error_handler(static function (int $level, string $message) use (&$warnings): bool {
+            $warnings[] = $message;
+
+            return true;
+        });
+        try {
+            LockLineIndex::fromFile($path);
+            self::fail('Expected a ConfigException.');
+        } catch (ConfigException $e) {
+            self::assertSame('Cannot read '.$path, $e->getMessage());
+        } finally {
+            restore_error_handler();
+        }
+        self::assertSame([], $warnings);
+    }
+
     public function testUnreadableFileThrows(): void
     {
+        // Infection's include interceptor reports a mode-0000 file as missing: the UnreadableFiles test covers the branch there.
+        if (getenv('INFECTION') === '1') {
+            self::markTestSkipped('a mode-0000 file reads as missing under Infection');
+        }
         $path = tempnam(sys_get_temp_dir(), 'lockrot-unreadable-');
         self::assertIsString($path);
         file_put_contents($path, '{"packages":[]}');

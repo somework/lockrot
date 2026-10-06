@@ -40,7 +40,7 @@ final class ConfiguredRepositoriesTest extends TestCase
     }
 
     /**
-     * A manifest Composer would refuse could not have produced the lock: reading it neither throws
+     * A manifest that Composer refuses cannot have produced the lock: reading it neither throws
      * nor warns, and it serves nothing lockrot can name, while a path dist is still a path.
      *
      * @return iterable<string, array{mixed}>
@@ -139,7 +139,7 @@ final class ConfiguredRepositoriesTest extends TestCase
         self::assertSame('vcs', ConfiguredRepositories::fromManifest([self::VCS, ['type' => 'composer', 'url' => 'https://satis.acme.test']])->kindServing('acme/lib', '1.0.0', self::fromGithub()), 'listed after the match');
     }
 
-    /** packagist.org would have written its notification-url; an entry without one did not come from it. */
+    /** packagist.org writes a notification-url, so an entry without one did not come from it. */
     public function testPackagistListedFirstIsPassedOver(): void
     {
         foreach (['https://repo.packagist.org', 'https://packagist.org', 'http://packagist.org/', 'https://Repo.Packagist.org/', 'https://u:p@packagist.org:443'] as $url) {
@@ -161,6 +161,7 @@ final class ConfiguredRepositoriesTest extends TestCase
             $repositories = ConfiguredRepositories::fromManifest([$name => ['type' => 'composer', 'url' => 'https://mirrors.tencent.com/composer/'], 'mine' => self::VCS]);
 
             self::assertSame('vcs', $repositories->kindServing('acme/lib', '1.0.0', self::fromGithub()), $name);
+            self::assertSame('unknown', ConfiguredRepositories::fromManifest([$name => ['type' => 'composer', 'url' => 'https://mirrors.tencent.com/composer/']])->kindServing('acme/lib', '1.0.0', self::fromGithub()), $name.' alone');
         }
     }
 

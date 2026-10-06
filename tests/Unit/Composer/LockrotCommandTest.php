@@ -27,6 +27,7 @@ use Lockrot\Data\Repository\MetadataBatch;
 use Lockrot\Data\Repository\MetadataLoaderInterface;
 use Lockrot\Data\Repository\RepositoryMetadataLoader;
 use Lockrot\Json\JsonReader;
+use Lockrot\Lock\LockFile;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\JsonPath;
@@ -64,12 +65,9 @@ final class LockrotCommandTest extends TestCase
     {
         self::$server = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK, self::LARAVEL_LOCK]);
         self::$server->start();
-        // One loader shared across every test in this class, matching how a real analyzer run uses
-        // it: one instance queried repeatedly rather than rebuilt per call. It remembers what it
-        // has already been asked for, because every test here runs the command over the same
-        // 200-package lock and fetching all two hundred again for each of them was 30 of this
-        // class's 40 seconds — and the class is most of the unit suite, and mutation testing pays
-        // it again per mutant. What loading really does is tested in RepositoryMetadataLoaderTest.
+        // One loader for the class, which remembers its answers: every test runs the command over the
+        // same lock, and fetching its metadata again for each test is slow. A mutation run pays that
+        // again per mutant. RepositoryMetadataLoaderTest tests what loading does.
         self::$loader = new MemoisingMetadataLoader(
             new RepositoryMetadataLoader(self::$server->repositories(), Clock::fixed(self::FIXED_NOW))
         );
@@ -92,9 +90,9 @@ final class LockrotCommandTest extends TestCase
     protected function tearDown(): void
     {
         chdir($this->cwd);
-        // The baseline tests write next to composer.json of the *copy* fixtureCopy() makes; if one
-        // ever runs in the tracked fixture instead (a lost chdir), the file is removed and the test
-        // fails here rather than the fixture directory quietly growing an untracked baseline.
+        // The baseline tests write next to composer.json of the copy that fixtureCopy() makes. A lost
+        // chdir writes into the tracked fixture instead. Fail here, so that the fixture directory does
+        // not grow an untracked baseline.
         $stray = \dirname(self::WALLABAG_LOCK).'/lockrot-baseline.json';
         if (is_file($stray)) {
             unlink($stray);
@@ -114,10 +112,7 @@ final class LockrotCommandTest extends TestCase
         return $loader;
     }
 
-    /**
-     * A trivial in-memory loader for tests whose command path never reaches the analyzer (a
-     * disabled run, a config error, a missing lock) — real fixture metadata is irrelevant there.
-     */
+    /** The loader for tests whose run never reaches the analyzer: a disabled run, a config error, a missing lock. */
     private function emptyLoader(): MetadataLoaderInterface
     {
         return new class () implements MetadataLoaderInterface {
@@ -184,9 +179,8 @@ final class LockrotCommandTest extends TestCase
     }
 
     /**
-     * Snapshots COMPOSER_CACHE_DIR/COMPOSER_HOME, sets them to $cacheDir/$home for the duration of
-     * $body, and restores both in a finally block, so a caller running with these already set (e.g.
-     * a nested Composer invocation) is left the way it found them rather than wiped.
+     * Sets COMPOSER_CACHE_DIR and COMPOSER_HOME for the duration of $body, then restores both, so a
+     * caller that had them set, such as a nested Composer invocation, keeps its values.
      *
      * @param callable(): void $body
      */
@@ -213,12 +207,10 @@ final class LockrotCommandTest extends TestCase
     }
 
     /**
-     * Runs the command with genuinely separate stdout/stderr streams, without CommandTester's
+     * Runs the command with separate stdout and stderr streams, without CommandTester's
      * `capture_stderr_separately` option: on PHP 8.5 that option triggers a
      * `ReflectionProperty::setAccessible()` deprecation inside
-     * Symfony\Component\Console\Tester\TesterTrait::initOutput(), which would pollute otherwise
-     * pristine test output. Command::run() only needs an InputInterface and an OutputInterface, so a
-     * minimal ConsoleOutputInterface double gives the same stream separation directly.
+     * Symfony\Component\Console\Tester\TesterTrait::initOutput(), which pollutes the test output.
      *
      * @param array<string, mixed> $args
      *
@@ -275,9 +267,8 @@ final class LockrotCommandTest extends TestCase
      * Runs the command with a factory that records the process environment and the resolved
      * configuration as the analysis saw them.
      *
-     * None of this is visible from outside the run: --offline's network guard is in place only while
-     * the command is running, and the COMPOSER_ROOT_VERSION default only while Composer might still
-     * guess one. Both are put back before execute() returns.
+     * The command puts back the --offline network guard and the COMPOSER_ROOT_VERSION default before
+     * execute() returns, so only the factory can see them.
      *
      * @param array<string, mixed> $args
      *
@@ -325,9 +316,8 @@ final class LockrotCommandTest extends TestCase
     }
 
     /**
-     * `--help` is where a person looks for the list, and it was written out by hand, so adding a
-     * format left it behind — `html` was accepted and unlisted. The option's description now has to
-     * name every format the config will take.
+     * `--help` is where a person looks for the list, so the option's description must name every
+     * format that the config accepts.
      */
     public function testTheHelpTextNamesEveryFormatTheToolAccepts(): void
     {
@@ -345,7 +335,7 @@ final class LockrotCommandTest extends TestCase
         $code = $tester->execute(['--fail-on' => 'silent', '--target-php' => '8.4']);
         self::assertSame(1, $code, $tester->getDisplay());
         self::assertStringContainsString('phpzip/phpzip', $tester->getDisplay());
-        self::assertStringContainsString('200 packages checked', $tester->getDisplay());
+        self::assertStringContainsString($this->wallabagTotals()[0].' packages checked', $tester->getDisplay());
     }
 
     /**
@@ -401,10 +391,9 @@ final class LockrotCommandTest extends TestCase
     }
 
     /**
-     * `table` is not written through Symfony's tag formatter either: lockrot renders its markup
-     * (ConsoleMarkup) and writes the result with OUTPUT_RAW, as every machine-readable format goes
-     * out, so a `<` in a constraint or a package name can never be read as a console tag
-     * (OutputInterface::OUTPUT_RAW is 2 in both symfony/console 5.4 and 2.8).
+     * lockrot renders the table markup itself (ConsoleMarkup) and writes it with OUTPUT_RAW, like
+     * every machine-readable format, so a `<` in a constraint or a package name never reads as a
+     * console tag.
      */
     public function testTheTableFormatIsRenderedByLockrotAndWrittenRaw(): void
     {
@@ -484,7 +473,7 @@ final class LockrotCommandTest extends TestCase
         self::assertIsArray($json['lockrot']);
         self::assertIsArray($json['counts']);
         self::assertSame(1, $json['lockrot']['schema']);
-        self::assertSame(19, $json['counts']['abandoned']);
+        self::assertAbandonedCountAgreesWithTheFindings($json);
     }
 
     public function testExplainPrintsOnePackageWithItsSignalsAndFactsAndExitsZero(): void
@@ -643,7 +632,8 @@ final class LockrotCommandTest extends TestCase
         self::assertSame(1, $code, $display);
         self::assertMatchesRegularExpression('{^::error file=composer\.lock,line=\d+,title=lockrot%3A abandoned \(critical\)::}', $lines[0]);
         self::assertStringContainsString('phpzip/phpzip', $display);
-        self::assertStringStartsWith('200 packages checked · abandoned 19 · ', $lines[\count($lines) - 1]);
+        [$checked, $abandoned] = $this->wallabagTotals();
+        self::assertStringStartsWith($checked.' packages checked · abandoned '.$abandoned.' · ', $lines[\count($lines) - 1]);
     }
 
     public function testSarifOutputOnWallabag(): void
@@ -693,8 +683,8 @@ final class LockrotCommandTest extends TestCase
         $display = $tester->getDisplay();
 
         self::assertSame(1, $code, $display);
-        // 51 flagged: 0.11.0 moved S5's line to PHP 8.0's GA, and 32 of wallabag's old-promise rows were PHP 8-era releases.
-        self::assertStringStartsWith('### lockrot: dependency rot in 51 of 200 packages', $display);
+        [$checked, , $flagged] = $this->wallabagTotals();
+        self::assertStringStartsWith('### lockrot: dependency rot in '.$flagged.' of '.$checked.' packages', $display);
         self::assertStringContainsString('| Package | Version | Verdict | Evidence | Via |', $display);
     }
 
@@ -725,8 +715,8 @@ final class LockrotCommandTest extends TestCase
 
     /**
      * `composer lockrot` never walks up to a parent project the way `composer` does, so the message
-     * has to name the directory it did look in and say that it looked nowhere else — otherwise the
-     * only reading left is "this project has no lock".
+     * must name the directory it looked in and say that it looked nowhere else. Otherwise the only
+     * reading left is "this project has no lock".
      */
     public function testMissingLockIsExit2(): void
     {
@@ -749,7 +739,7 @@ final class LockrotCommandTest extends TestCase
     }
 
     /**
-     * The command the plugin registers, with no analyzer factory of its own, has to build a working
+     * The command the plugin registers, with no analyzer factory of its own, must build a working
      * one through {@see ServiceFactory::createAnalyzer()}.
      *
      * Kept off the network the same way {@see InstallTimeSummaryTest} keeps its equivalent test off
@@ -830,6 +820,15 @@ final class LockrotCommandTest extends TestCase
         chdir(__DIR__.'/../../fixtures/skeletons/laravel');
         $tester = $this->tester();
         self::assertSame(2, $tester->execute(['--fail-on' => 'dead']));
+    }
+
+    public function testAnInvalidTargetPhpOnTheCommandLineIsExit2(): void
+    {
+        chdir(__DIR__.'/../../fixtures/skeletons/laravel');
+        [$code, , $stderr] = $this->runWithSplitStreams(['--target-php' => 'eight']);
+
+        self::assertSame(2, $code);
+        self::assertStringContainsString('target-php must look like "8.4"; got "eight"', $stderr);
     }
 
     public function testDisabledEnv(): void
@@ -929,7 +928,7 @@ final class LockrotCommandTest extends TestCase
     }
 
     /**
-     * A config the schema rejects is exit 2 with the schema's message, and the unknown key that may
+     * A config the schema rejects is exit 2 with the schema's message, and the unknown key that can
      * have caused it is named in the same error, with its suggestion. A misspelt required key is
      * reported by the schema as the right one missing, so the suggestion is what says why.
      */
@@ -949,11 +948,10 @@ final class LockrotCommandTest extends TestCase
     /**
      * `--format` on the command line wins over `extra.lockrot.format`, but a format the configuration
      * names and lockrot does not write is still a configuration error, exit 2: the published schema
-     * leaves `format` open for editors, and lockrot reads its `x-known-values` as the enum. This pins
-     * the command's message and exit code, byte for byte. It does not pin the first validation of a
-     * process: the command validates extra.lockrot twice, in initialize() and again in execute(), so
-     * a first call that let the format through would still end here. ConfigSchemaTest and
-     * InstallTimeSummaryTest pin the first call.
+     * leaves `format` open for editors, and lockrot reads its `x-known-values` as the enum. The
+     * command validates extra.lockrot twice, in initialize() and in execute(), so a first call that
+     * lets the format through still ends here. ConfigSchemaTest and InstallTimeSummaryTest pin
+     * the first call.
      */
     public function testAnUnknownConfiguredFormatIsExit2EvenWhenTheCommandLineNamesOne(): void
     {
@@ -1009,9 +1007,9 @@ final class LockrotCommandTest extends TestCase
 
     /**
      * A key is the project's text, never console markup, and the line never reaches Symfony's tag
-     * formatter: some symfony/console 5.4 releases in Composer's PHARs throw on `<<fg=red>>`, which
-     * turned a warning into exit 2 with nothing on stdout. A formatter that refuses the text proves
-     * it is not even asked; `a\<b` keeps its backslash, escaped like any other.
+     * formatter: some symfony/console 5.4 releases in Composer's PHARs throw on `<<fg=red>>`. A
+     * formatter that refuses the text proves that nothing asks it. `a\<b` keeps its backslash,
+     * escaped like any other.
      *
      * @dataProvider keysThatLookLikeMarkup
      */
@@ -1057,8 +1055,7 @@ final class LockrotCommandTest extends TestCase
 
     /**
      * Decorated, the warning is coloured by lockrot itself, whole and on stderr alone. The key is
-     * thousands of `<b` — the text that once exhausted PCRE's JIT in the formatter, so the closing
-     * tag printed literally and the style ran on into the report, which shares the formatter.
+     * thousands of `<b`, a text that exhausts PCRE's JIT in Symfony's tag formatter.
      */
     public function testADecoratedWarningIsColouredWholeAndNothingLeaksOntoTheReport(): void
     {
@@ -1096,8 +1093,8 @@ final class LockrotCommandTest extends TestCase
     /**
      * A package name is the lock's text. The table and `--explain` are written past Symfony's tag
      * formatter, rendered by lockrot, so a name that looks like markup prints as written, on a
-     * decorated stdout too, and the formatter — which on symfony/console 5.4 threw on `<<fg=red>>`,
-     * turning the report into exit 2 — is not even asked.
+     * decorated stdout too, and the formatter, which throws on `<<fg=red>>` on symfony/console 5.4,
+     * is not even asked.
      *
      * @dataProvider namesThatLookLikeMarkup
      */
@@ -1156,18 +1153,13 @@ final class LockrotCommandTest extends TestCase
     }
 
     /**
-     * The end-to-end guarantee behind --offline, exercised through the real
-     * ServiceFactory::createAnalyzer (not the in-memory test loader) against a project whose
-     * composer.json points at the class-level fixture repository: with a cold Composer cache,
-     * nothing at all may be fetched.
+     * The end-to-end guarantee behind --offline, through the real ServiceFactory::createAnalyzer and
+     * not the in-memory test loader: with a cold Composer cache, nothing may be fetched.
      *
-     * Setting COMPOSER_DISABLE_NETWORK is on its own not enough, and this is the condition that
-     * shows it: in plugin mode Composer\Console\Application::doRun() builds the Composer instance
-     * while collecting plugin commands (getPluginCommands() -> getComposer()), so its
-     * HttpDownloader — which latches COMPOSER_DISABLE_NETWORK in its own constructor — and its
-     * RepositoryManager both exist before any command's initialize() runs. The
-     * $app->getComposer(false, false) call below is exactly that call, reproduced here because
-     * CommandTester invokes Command::run() directly and would otherwise never trigger it.
+     * COMPOSER_DISABLE_NETWORK alone is not enough. In plugin mode Composer\Console\Application::doRun()
+     * builds the Composer instance, with its HttpDownloader (which latches COMPOSER_DISABLE_NETWORK in
+     * its constructor) and its RepositoryManager, before any initialize() runs. The
+     * `$app->getComposer(false, false)` call reproduces that, because CommandTester skips doRun().
      */
     public function testOfflineInPluginModeFetchesNothingIntoComposersCache(): void
     {
@@ -1214,13 +1206,10 @@ final class LockrotCommandTest extends TestCase
     }
 
     /**
-     * In plugin mode, Composer\Console\Application::doRun() builds the Composer instance (and its
-     * EventDispatcher) before this command's initialize() ever runs — see composerBootstrap()'s
-     * docblock. composerBootstrap() rebuilds the RepositoryManager from Config alone, so unless that
-     * instance's EventDispatcher is threaded through, mirror/proxy/CDN plugins listening for
-     * PluginEvents::PRE_FILE_DOWNLOAD never see lockrot's own repository metadata requests. This
-     * registers such a listener directly on $composer->getEventDispatcher() and runs the command
-     * online (no --offline) against the fixture repository, asserting the listener actually fires.
+     * In plugin mode, Composer builds its Composer instance and EventDispatcher before this command's
+     * initialize() runs. composerBootstrap() rebuilds the RepositoryManager from Config alone, so
+     * unless that EventDispatcher is threaded through, mirror, proxy and CDN plugins that listen for
+     * PluginEvents::PRE_FILE_DOWNLOAD never see lockrot's own repository metadata requests.
      */
     public function testPluginModeThreadsEventDispatcherThroughRebuiltRepositories(): void
     {
@@ -1268,15 +1257,11 @@ final class LockrotCommandTest extends TestCase
     }
 
     /**
-     * Symfony's Command::run() calls initialize() with no try/catch of its own, so a failure inside
-     * Composer's own BaseCommand::initialize() — here, a plugin's PRE_COMMAND_RUN listener throwing,
-     * which BaseCommand::initialize() dispatches and Composer itself does not catch — must still
-     * leave COMPOSER_DISABLE_NETWORK/COMPOSER_ROOT_VERSION as initialize() found them, even though
-     * execute() (and its own finally) never runs. Reuses the plugin-mode setup from
-     * testPluginModeThreadsEventDispatcherThroughRebuiltRepositories(): a Composer instance built
-     * ahead of time via Application::getComposer() so tryComposer() inside BaseCommand::initialize()
-     * returns it non-null, which is what makes the PRE_COMMAND_RUN dispatch (and so the listener)
-     * run at all.
+     * Symfony's Command::run() calls initialize() with no try/catch, so a plugin's PRE_COMMAND_RUN
+     * listener that throws inside BaseCommand::initialize() must still leave COMPOSER_DISABLE_NETWORK
+     * and COMPOSER_ROOT_VERSION as initialize() found them, although execute() and its finally never
+     * run. The Composer instance built ahead of time via Application::getComposer() makes
+     * tryComposer() return it, which is what dispatches PRE_COMMAND_RUN at all.
      */
     public function testInitializeRestoresTheEnvironmentWhenAPreCommandRunListenerThrows(): void
     {
@@ -1429,9 +1414,9 @@ final class LockrotCommandTest extends TestCase
      */
     public static function rootVersionPreStates(): iterable
     {
-        // Nothing set and an empty value are the two states in which RootPackageLoader would fall
-        // back to VersionGuesser — shelling out to git/hg/fossil/svn and then warning about the
-        // 1.0.0 default it lands on anyway. Setting that default up front skips both.
+        // Nothing set and an empty value are the two states in which RootPackageLoader falls back
+        // to VersionGuesser. That shells out to git, hg, fossil and svn, then warns about the 1.0.0
+        // default it lands on anyway. Setting that default up front skips both.
         yield 'unset' => [false, '1.0.0'];
         yield 'empty' => ['', '1.0.0'];
         // Anything the caller chose is theirs: lockrot never reads the root package's own version,
@@ -1462,8 +1447,7 @@ final class LockrotCommandTest extends TestCase
 
     /**
      * --offline's guard is COMPOSER_DISABLE_NETWORK, set for the duration of the run and then put
-     * back — including when the caller had already set it to something of their own, which clearing
-     * it would silently discard.
+     * back, including a value that the caller set already: clearing it discards that value.
      */
     public function testOfflineSetsTheNetworkGuardForTheRunAndPutsBackWhatWasThere(): void
     {
@@ -1507,6 +1491,40 @@ final class LockrotCommandTest extends TestCase
         return $dir;
     }
 
+    /**
+     * Packages checked, abandoned and flagged in the JSON report of the wallabag fixture, against
+     * which the other formats of the same run are read.
+     *
+     * @return array{int, int, int}
+     */
+    private function wallabagTotals(): array
+    {
+        $cwd = (string) getcwd();
+        chdir(\dirname(self::WALLABAG_LOCK));
+        $tester = $this->tester($this->loader());
+        $tester->execute(['--format' => 'json', '--target-php' => '8.4']);
+        chdir($cwd);
+        $json = json_decode($tester->getDisplay(), true);
+        self::assertIsArray($json);
+        $verdicts = array_column(JsonPath::arrayAt($json, ['findings']), 'verdict');
+        $flagged = JsonPath::arrayAt($json, ['run', 'flagged_verdicts']);
+
+        return [
+            JsonPath::intAt($json, ['packages_checked']),
+            \count(array_keys($verdicts, 'abandoned', true)),
+            \count(array_filter($verdicts, static fn ($verdict): bool => \in_array($verdict, $flagged, true))),
+        ];
+    }
+
+    /** @param array<mixed, mixed> $json a report of the wallabag fixture */
+    private static function assertAbandonedCountAgreesWithTheFindings(array $json): void
+    {
+        $verdicts = array_column(JsonPath::arrayAt($json, ['findings']), 'verdict', 'package');
+
+        self::assertSame('abandoned', $verdicts['doctrine/annotations'] ?? null);
+        self::assertSame(\count(array_keys($verdicts, 'abandoned', true)), JsonPath::intAt($json, ['counts', 'abandoned']));
+    }
+
     /** @return array<string, mixed> */
     private function readJsonFile(string $path): array
     {
@@ -1518,7 +1536,7 @@ final class LockrotCommandTest extends TestCase
 
     /**
      * The `findings` map of a written baseline, with every entry narrowed to the three strings the
-     * schema guarantees, so the tests below can read and rewrite it without fighting `mixed`.
+     * schema guarantees, so a test can read and rewrite it without fighting `mixed`.
      *
      * @return array<string, array<string, string>>
      */
@@ -1652,9 +1670,8 @@ final class LockrotCommandTest extends TestCase
 
     /**
      * Staleness is a question about composer.lock, not about the current run's scope. A baseline
-     * generated with --dev holds packages-dev findings; a later run without --dev does not analyse
-     * them, but they are still in the lock, so reporting them as "no longer in composer.lock" would
-     * be false.
+     * generated with --dev holds packages-dev findings. A later run without --dev does not analyse
+     * them, but they are still in the lock, so "no longer in composer.lock" is false for them.
      */
     public function testABaselineGeneratedWithDevReportsNoStaleEntriesOnARunWithoutDev(): void
     {
@@ -1715,15 +1732,12 @@ final class LockrotCommandTest extends TestCase
     /** @return iterable<string, array{0: string, 1: string}> */
     public static function baselinesTheSchemaCouldNotSee(): iterable
     {
-        // json_decode() into objects cannot keep a property whose name starts with a NUL byte: the
-        // validator was handed `(object) null`, and the file was called invalid for missing the
-        // `lockrot` and `findings` it had.
+        // json_decode() into objects cannot keep a property whose name starts with a NUL byte.
         yield 'a key starting with a NUL byte' => [
             '{"lockrot": {"version": "0.1.0", "schema": 1}, "findings": {"\u0000acme/a": {}}}',
             'findings.\000acme/a: a key starting with a NUL byte cannot be read',
         ];
-        // 1e400 reads as INF, which json_encode() refuses: the validator's own conversion threw a
-        // library exception, reported as `lockrot failed:`.
+        // 1e400 reads as INF, which json_encode() refuses.
         yield 'a number too large for a float' => [
             '{"lockrot": {"version": "0.1.0", "schema": 1e400}, "findings": {}}',
             '  - lockrot.schema: ',
@@ -1769,7 +1783,7 @@ final class LockrotCommandTest extends TestCase
      */
     public function testAnAbsoluteBaselinePathIsReportedWithoutLocatingTheMachine(): void
     {
-        // The run names the project by its resolved path; a symlinked temp directory would read as elsewhere.
+        // The run names the project by its resolved path, so a symlinked temp directory reads as elsewhere.
         $dir = (string) realpath($this->fixtureCopy(self::WALLABAG_LOCK));
         mkdir($dir.'/ci');
         $elsewhere = $this->tempDir('lockrot-baseline-elsewhere-').'/rot.json';
@@ -1825,8 +1839,8 @@ final class LockrotCommandTest extends TestCase
 
     /**
      * Anything the command did not anticipate is still exit 2 and a line a user can read. Symfony's
-     * Command::run() has no try/catch of its own, so an exception left to reach it would surface as
-     * a Composer crash instead.
+     * Command::run() has no try/catch of its own, so an exception that reaches it surfaces as a
+     * Composer crash.
      */
     public function testAnUnexpectedFailureIsExit2AndSaysWhichKindOfFailureItWas(): void
     {
@@ -1845,8 +1859,8 @@ final class LockrotCommandTest extends TestCase
     }
 
     /**
-     * Without `--all` the table lists what was flagged; with it, every package the run checked gets
-     * a row. The laravel skeleton has one finding among 76 packages, so the two are far apart.
+     * Without `--all` the table lists what was flagged. With it, every package the run checked gets
+     * a row. The laravel skeleton flags few packages, so the two differ.
      */
     public function testAllListsEveryCheckedPackageAndTheDefaultOnlyTheFlaggedOnes(): void
     {
@@ -1953,11 +1967,11 @@ final class LockrotCommandTest extends TestCase
         [$code, $stdout, $stderr] = $this->runWithSplitStreams(['--output' => ['json:r.json'], '--target-php' => '8.4'], $this->loader());
 
         self::assertSame(0, $code, $stderr);
-        self::assertStringContainsString('200 packages checked', $stdout, 'stdout is still the table');
+        self::assertStringContainsString($this->wallabagTotals()[0].' packages checked', $stdout, 'stdout is still the table');
         self::assertSame("lockrot: json report written to r.json\n", $stderr);
         $json = $this->readJsonFile($dir.'/r.json');
         self::assertIsArray($json['counts']);
-        self::assertSame(19, $json['counts']['abandoned']);
+        self::assertAbandonedCountAgreesWithTheFindings($json);
     }
 
     /** Without --output nothing new reaches stderr: a report run says nothing there. */
@@ -1987,7 +2001,7 @@ final class LockrotCommandTest extends TestCase
 
     /**
      * The page needs the facts behind each finding, which only an html run collects. A run whose
-     * stdout is the table has to collect them too when a file asks for html, or the page loses its
+     * stdout is the table must collect them too when a file asks for html, or the page loses its
      * release branches.
      */
     public function testTheHtmlFileIsThePageAnHtmlRunWouldPrint(): void
@@ -2118,7 +2132,7 @@ final class LockrotCommandTest extends TestCase
         yield 'the default baseline, which does not exist yet' => [[], 'json:lockrot-baseline.json', 'that is the baseline file, which lockrot writes only with --generate-baseline', null];
         yield 'the baseline --baseline names' => [['--baseline' => 'custom.json'], 'json:custom.json', 'that is the baseline file, which lockrot writes only with --generate-baseline', null];
         yield 'the baseline extra.lockrot names' => [[], 'json:ci-baseline.json', 'that is the baseline file, which lockrot writes only with --generate-baseline', ['baseline' => 'ci-baseline.json']];
-        // --baseline points this run elsewhere; the project's committed baseline is still its baseline
+        // --baseline points this run elsewhere, but the project's committed baseline is still its baseline
         yield 'the baseline extra.lockrot names, when --baseline names another' => [['--baseline' => 'other.json'], 'json:ci-baseline.json', 'that is the baseline file, which lockrot writes only with --generate-baseline', ['baseline' => 'ci-baseline.json']];
         yield 'the default baseline, when --baseline names another' => [['--baseline' => 'other.json'], 'json:lockrot-baseline.json', 'that is the baseline file, which lockrot writes only with --generate-baseline', null];
     }
@@ -2164,15 +2178,15 @@ final class LockrotCommandTest extends TestCase
     }
 
     /**
-     * Composer reads the manifest COMPOSER names, and its lock beside it; neither is a place for a
-     * report either.
+     * Composer reads the manifest that COMPOSER names and its lock beside it. Neither is a place
+     * for a report.
      *
      * @dataProvider composerManifests
      */
     #[DataProvider('composerManifests')]
     public function testTheManifestComposerNamesAndItsLockAreProtected(string $composer, string $manifest, string $lock): void
     {
-        // Composer reads the manifest COMPOSER names and the lock beside it, so they have to exist.
+        // Composer reads both files, so both must exist.
         $dir = $this->fixtureCopy(self::WALLABAG_LOCK);
         copy($dir.'/composer.json', $dir.'/'.$manifest);
         copy($dir.'/composer.lock', $dir.'/'.$lock);
@@ -2299,7 +2313,7 @@ final class LockrotCommandTest extends TestCase
         $json = $this->readJsonFile($dir.'/r.json');
         self::assertNull($json['baseline']);
         self::assertIsArray($json['counts']);
-        self::assertSame(19, $json['counts']['abandoned']);
+        self::assertAbandonedCountAgreesWithTheFindings($json);
     }
 
     public function testAReportThatCannotBeWrittenUnderGenerateBaselineLeavesTheBaselineAlone(): void
@@ -2320,8 +2334,8 @@ final class LockrotCommandTest extends TestCase
     }
 
     /**
-     * The checks run before the analysis; a path taken in the meantime fails at the write, with the
-     * reason, as exit 2 — after the report is already on stdout, which is written first.
+     * The checks run before the analysis. A path taken in the meantime fails at the write, with the
+     * reason, as exit 2, after the report is already on stdout.
      */
     public function testAFileThatCannotBeWrittenIsExit2WithTheReason(): void
     {
@@ -2336,7 +2350,7 @@ final class LockrotCommandTest extends TestCase
 
         self::assertTrue($called);
         self::assertSame(2, $code);
-        self::assertStringContainsString('200 packages checked', $stdout, 'stdout already holds the report');
+        self::assertStringContainsString($this->wallabagTotals()[0].' packages checked', $stdout, 'stdout already holds the report');
         self::assertMatchesRegularExpression('/\Alockrot: Cannot write r\.json: \S[^\n]*\n\z/', $stderr);
     }
 
@@ -2482,15 +2496,15 @@ final class LockrotCommandTest extends TestCase
         yield 'an option missing its value' => ['lockrot --format', '"--format" option requires a value'];
         yield 'a value given to a flag' => ['lockrot --dev=yes', '"--dev" option does not accept a value'];
         yield 'an argument too many' => ['lockrot surplus', 'got "surplus"'];
-        // Printed as typed: the line goes past the tag formatter, which would read this as a style.
+        // Printed as typed: the line goes past the tag formatter, which reads this as a style.
         yield 'an option that looks like a console tag' => ['lockrot --<fg=red>', '"--<fg" option does not exist'];
     }
 
     /**
      * A command line the command cannot read is a usage error like any other configuration error:
      * exit 2 and one `lockrot:` line. Symfony binds the command line before initialize() and
-     * execute() and lets the failure escape, which Composer rendered in its own box with exit 1 —
-     * the code a CI gate reads as "findings".
+     * execute() and lets the failure escape, which Composer renders in its own box with exit 1, the
+     * code that a CI gate reads as "findings".
      *
      * @dataProvider unreadableCommandLines
      */
@@ -2532,8 +2546,8 @@ final class LockrotCommandTest extends TestCase
 
     /**
      * LOCKROT_DISABLE is the off switch, and it is documented as skipping lockrot entirely: nothing
-     * the run would read — composer.json, extra.lockrot, the option values, the lock — may turn it
-     * into an exit 2. It used to be checked only after the configuration was read and resolved.
+     * the run reads (composer.json, extra.lockrot, the option values, the lock) can turn it into an
+     * exit 2.
      *
      * @param array<string, mixed> $args
      *
@@ -2703,7 +2717,7 @@ final class LockrotCommandTest extends TestCase
             self::assertSame(1, $code, $stderr);
             $json = json_decode($stdout, true);
             self::assertIsArray($json);
-            self::assertSame(200, $json['packages_checked']);
+            self::assertSame(\count(LockFile::fromFile('alt.lock')->packages(false)), $json['packages_checked']);
             self::assertSame('alt.lock', JsonPath::stringAt($json, ['run', 'lock_file']));
             self::assertSame('wallabag/wallabag', JsonPath::stringAt($json, ['run', 'root_package']), 'the name comes from the manifest Composer reads');
             self::assertSame('>=8.2', JsonPath::stringAt($json, ['run', 'project_php']), 'and so does the php it requires');
@@ -2750,9 +2764,8 @@ final class LockrotCommandTest extends TestCase
     }
 
     /**
-     * The annotation formats point at the lock the run analysed. They used to name composer.lock
-     * whatever COMPOSER said — here a file that does not even exist — while the line numbers came
-     * from alt.lock.
+     * The annotation formats point at the lock the run analysed, whatever COMPOSER says. Here
+     * composer.lock does not even exist, and the line numbers come from alt.lock.
      *
      * @dataProvider annotationsUnderComposer
      */
@@ -2846,8 +2859,8 @@ final class LockrotCommandTest extends TestCase
 
     /**
      * Composer 2.3 and later refuse a COMPOSER that names a directory, with an exception of their
-     * own; that happens while the command is starting up, where only a ConfigException used to be
-     * caught — so it escaped as a Composer crash, exit 1.
+     * own. That happens while the command starts. An exception that the command does not catch
+     * escapes as a Composer crash, exit 1.
      */
     public function testNothingThatFailsWhileTheCommandStartsEscapesAsExitOne(): void
     {
@@ -2867,12 +2880,9 @@ final class LockrotCommandTest extends TestCase
     /** @return iterable<string, array{0: string, 1: string}> */
     public static function manifestsTheSchemaCouldNotSee(): iterable
     {
-        // json_decode() into objects cannot keep a property whose name starts with a NUL byte, and
-        // the validator used to be handed `(object) null` — an empty object, which is valid — so a
-        // gate configured next to such a key ran with fail-on none and exited 0.
+        // json_decode() into objects cannot keep a property whose name starts with a NUL byte.
         yield 'a key starting with a NUL byte' => ['{"extra": {"lockrot": {"fail-on": "abandoned", "\u0000k": 1}}}', 'NUL byte'];
-        // 1e400 reads as INF, which json_encode() refuses: the validator's own conversion threw a
-        // library exception, and the command exited 1.
+        // 1e400 reads as INF, which json_encode() refuses.
         yield 'a number too large for a float' => ['{"extra": {"lockrot": {"release-warn-years": 1e400}}}', 'release-warn-years'];
     }
 

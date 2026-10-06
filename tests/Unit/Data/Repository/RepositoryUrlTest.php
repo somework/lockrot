@@ -12,7 +12,7 @@ final class RepositoryUrlTest extends TestCase
 {
     /**
      * A private Composer source is routinely configured with a token in the URL, and Composer keeps
-     * it in the lock because it has to fetch with it; a VCS repository can be a directory on the
+     * it in the lock because it must fetch with it. A VCS repository can be a directory on the
      * machine that wrote the lock. Every one of these reaches a report.
      *
      * @dataProvider repositories
@@ -58,6 +58,10 @@ final class RepositoryUrlTest extends TestCase
         yield 'a file url in capitals' => ['FILE:///srv/git/pkg.git', '.../pkg.git'];
         yield 'a file url with a query' => ['file:///srv/git/pkg.git?token=t', '.../pkg.git'];
         yield 'a file url on Windows' => ['file:///C:/Users/igor/pkg', '.../pkg'];
+        yield 'a file url to the home directory' => ['file://~', '...'];
+        yield 'a file url to the root' => ['file:///', '...'];
+        yield 'a file url of one segment' => ['file://pkg', '.../pkg'];
+        yield 'a file: url without the two slashes, which is neither' => ['file:/srv/pkg', null];
         yield 'a home directory' => ['/Users/Alice Smith', '...'];
         yield 'a home directory with a separator after it' => ['/home/alice/', '.../'];
         yield 'a home directory on Windows' => ['C:\\Users\\alice', '...'];
@@ -245,7 +249,7 @@ final class RepositoryUrlTest extends TestCase
         yield 'nothing' => ['', ''];
     }
 
-    /** A server writes part of what a failure says, so no length or shape of it may switch the redaction off. */
+    /** A server writes part of what a failure says, so no length or shape of it can switch the redaction off. */
     public function testALongMessageIsRedactedWhole(): void
     {
         $noise = 'see http://status.acme.test/'.str_repeat('.', 5000).'x at /Users/igor/'.str_repeat('a/', 10000);
