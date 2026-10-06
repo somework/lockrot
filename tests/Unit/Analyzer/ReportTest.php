@@ -51,7 +51,7 @@ final class ReportTest extends TestCase
 
     public function testFindingsAreSortedByPriorityThenSeverityThenDirectThenName(): void
     {
-        // abandoned transitive dev -> medium; pinned direct prod -> high, so the pinned row sorts first
+        // abandoned transitive dev -> medium, pinned direct prod -> high, so the pinned row sorts first
         // even though abandoned outranks pinned on verdict severity.
         $report = $this->report(
             $this->transitive('vendor/abandoned-transitive-dev', Verdict::ABANDONED, true),
@@ -68,7 +68,7 @@ final class ReportTest extends TestCase
 
     public function testWithinOnePriorityTheHigherVerdictSeverityComesFirst(): void
     {
-        // Both are high: silent transitive prod and pinned direct prod. Silent (50) outranks pinned (40).
+        // Both are high: silent transitive prod and pinned direct prod. Silent outranks pinned.
         $report = $this->report(
             $this->finding('vendor/pinned-direct', Verdict::PINNED),
             $this->transitive('vendor/silent-transitive', Verdict::SILENT)
@@ -171,10 +171,7 @@ final class ReportTest extends TestCase
         self::assertSame(0, $counts[Verdict::ABANDONED]);
     }
 
-    /**
-     * `abandoned` alone does not say whether a package died or moved. The report counts the findings
-     * that name a package to move to, next to the total, and the summary line says so where it is not zero.
-     */
+    /** `abandoned` alone does not say whether a package died or moved. */
     public function testTheAbandonedCountIsSplitByWhetherAReplacementIsNamed(): void
     {
         $s1 = static fn (?string $replacement): Signal => new Signal('S1', 'high', 'marked abandoned by its repository', ['replacement' => $replacement]);
@@ -242,13 +239,7 @@ final class ReportTest extends TestCase
         self::assertSame('priority: critical 0 · high 0 · medium 0 · low 0', $report->prioritySummaryLine());
     }
 
-    /**
-     * The verdicts in a report were decided against settings the report did not record. Until the
-     * `run` block, `--format=json` named the target PHP in exactly one place — inside the data of
-     * an S5 signal — so a run where S5 never fired left no trace of what it aimed at, and the
-     * thresholds left none at all. Two people comparing two reports could not tell whether they
-     * differ because the locks do or because the settings do.
-     */
+    /** The `run` block records the settings, so two reports show whether the locks or the settings differ. */
     public function testTheReportRecordsWhatTheRunWasToldToDo(): void
     {
         $report = $this->report($this->finding('vendor/a', Verdict::SILENT))
@@ -284,9 +275,8 @@ final class ReportTest extends TestCase
     }
 
     /**
-     * `root_package` is always written where `run` is, null included: a consumer reading a report
-     * lockrot 0.13.0 or later wrote finds the key, and null means the manifest names no package,
-     * not that the field went missing.
+     * `root_package` is always written where `run` is, null included: null means the manifest names
+     * no package, not that the field is missing.
      */
     public function testARunWithoutAManifestNameWritesARootPackageOfNull(): void
     {
@@ -317,7 +307,7 @@ final class ReportTest extends TestCase
 
     /**
      * `flagged_verdicts` is the vocabulary, not a setting: a consumer deciding what counts as a
-     * finding should not have to know the severity ladder by heart. `unknown` is the case it
+     * finding does not need the severity order. `unknown` is the case it
      * settles — a package lockrot could not check is a note, not a finding.
      */
     public function testTheRunNamesWhichVerdictsAreFindings(): void
@@ -344,7 +334,6 @@ final class ReportTest extends TestCase
             $this->finding('vendor/worse', Verdict::ABANDONED),
             $this->finding('vendor/fresh', Verdict::LEFT_BEHIND)
         );
-        // The baseline a run wrote a month ago, when the second package was merely stale.
         $before = $this->report($this->finding('vendor/known', Verdict::STALE), $this->finding('vendor/worse', Verdict::STALE));
         $compared = $report->withBaseline(BaselineComparison::compare(
             Baseline::fromReport($before),
@@ -364,7 +353,6 @@ final class ReportTest extends TestCase
         self::assertSame(['status' => 'new', 'previous_verdict' => null], $standings['vendor/fresh']);
     }
 
-    /** Without a baseline there is nothing to stand against, and the key says so rather than lying. */
     public function testAFindingWithoutABaselineStandsNowhere(): void
     {
         $findings = JsonPath::arrayAt($this->report($this->finding('vendor/a', Verdict::SILENT))->toArray(), ['findings']);
@@ -391,7 +379,6 @@ final class ReportTest extends TestCase
         self::assertSame('8.3', JsonPath::stringAt($compared->toArray(), ['run', 'target_php']));
     }
 
-    /** The run's own flags, as the command passes them: `--strict-network` and a generate run. */
     public function testTheRunSaysHowItWasToldToGate(): void
     {
         $run = JsonPath::arrayAt($this->report()->withRun(new RunSettings(null, null, null, null, FailOn::fromString('high'), null, null, true, Gate::MODE_GENERATE_BASELINE))->toArray(), ['run']);
@@ -402,7 +389,6 @@ final class ReportTest extends TestCase
         self::assertSame('generate_baseline', $run['mode']);
     }
 
-    /** A mode the gate does not know is refused where it is given, not when the document is written. */
     public function testARunInAModeTheGateDoesNotKnowIsRefusedWhereItIsGiven(): void
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -594,7 +580,7 @@ final class ReportTest extends TestCase
         self::assertSame($report->summaryLine(), $withBaseline->summaryLine());
     }
 
-    /** A finding reachable from the named roots; the chain starts at the first of them, or is empty without any. */
+    /** A finding reachable from the named roots. The chain starts at the first of them, or is empty without any. */
     private function reachedFrom(string $package, string $verdict, string ...$roots): Finding
     {
         $chain = $roots === [] ? [] : ($roots[0] === $package ? [$package] : [$roots[0], $package]);
@@ -638,7 +624,7 @@ final class ReportTest extends TestCase
 
     /**
      * `composer audit` counts `packages-dev` by default and a run without `--dev` does not, so the
-     * two totals differ on most projects; the line says why before a reader has to ask.
+     * two totals differ on most projects. The line says why before a reader asks.
      */
     public function testWithoutDevTheFooterSaysWhyAuditCountsMore(): void
     {
@@ -718,7 +704,7 @@ final class ReportTest extends TestCase
     /**
      * What the cap gives to nobody is listed, with its verdict and how many direct requirements
      * reach it — and listing it moves nothing the cap already decided: `exposure` and the `pulled in
-     * by:` line are what they were.
+     * by:` line stay the same.
      */
     public function testAPackageReachedFromNineRootsIsUnattributedAndChangesNothingElse(): void
     {

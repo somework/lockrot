@@ -12,11 +12,6 @@ use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * S10 is the difference between "checked, nothing found" and "not checked". Every other signal
- * reports an observation; this one reports the absence of one, and names the signals that could
- * not be read without it.
- */
 final class NotCheckedRuleTest extends TestCase
 {
     private const NOW = '2026-09-14T00:00:00+00:00';
@@ -143,7 +138,7 @@ final class NotCheckedRuleTest extends TestCase
 
     public function testAPackageWithoutMetadataIsNotToldItsAgeWasNotRead(): void
     {
-        // Nothing is known about it at all, which is what `unknown` says; the run's notes carry why.
+        // Nothing is known about it at all, which is what `unknown` says. The run's notes carry why.
         $signal = $this->rule()->evaluate(new PackageFacts(F::package(), null, F::activity(false, '2026-09-01T00:00:00+00:00'), []));
 
         self::assertNull($signal);
@@ -151,7 +146,7 @@ final class NotCheckedRuleTest extends TestCase
 
     public function testAPackageWithNoStableReleaseIsNotToldItsAgeWasNotRead(): void
     {
-        // S6 already says the package has no stable release; there is no age to read, not a missing check.
+        // S6 already says the package has no stable release. There is no age to read, not a missing check.
         $metadata = new PackageMetadata('vendor/pkg', false, null, false, null, null, 3, null, 'library', new \DateTimeImmutable(self::NOW));
 
         self::assertNull($this->rule()->evaluate(new PackageFacts(F::package(), $metadata, F::activity(false, '2026-09-01T00:00:00+00:00'), [])));

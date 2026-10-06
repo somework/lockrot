@@ -11,19 +11,14 @@ use Lockrot\Data\Repository\MetadataLoaderInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * Each run note's text, byte for byte as lockrot printed it before the notes were typed, and the
- * typed facts the same constructor derives it from. The strings below are literals on purpose: they
- * were copied from the sprintf sites the constructors replaced, so a template edited in RunNote fails
- * here rather than changing every format's output unnoticed.
- */
+/** The strings below are literals, so a template that changes in RunNote fails here and not in the output of every format. */
 final class RunNoteTest extends TestCase
 {
     private const BUDGET = 'not checked: install-time budget exhausted';
 
     /**
      * Each note is built in the test, not here: a provider runs before coverage is recorded, and a
-     * constructor only a provider called would read as untested.
+     * constructor that only a provider calls reads as untested.
      *
      * @return iterable<string, array{callable(): RunNote, string, string, bool, array<string, mixed>}>
      */

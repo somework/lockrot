@@ -26,8 +26,7 @@ final class FindingBuilderTest extends TestCase
     }
 
     /**
-     * Each with*() sets the one constructor argument it names and leaves the others at the defaults;
-     * the builder it was called on keeps its own value.
+     * The builder that with*() was called on keeps its own value.
      *
      * @param \Closure(FindingBuilder): FindingBuilder $with
      *

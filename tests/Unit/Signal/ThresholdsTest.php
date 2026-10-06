@@ -67,8 +67,7 @@ final class ThresholdsTest extends TestCase
 
     public function testFromArrayDigitStringThrows(): void
     {
-        // The schema is the only layer allowed to accept/reject the shape of extra.lockrot values;
-        // fromArray() must stay just as strict for a caller that bypasses it.
+        // fromArray() must be as strict as the schema for a caller that bypasses the schema.
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage('extra.lockrot.release-warn-years must be an integer');
         Thresholds::fromArray(['release-warn-years' => '4']);

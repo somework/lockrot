@@ -49,7 +49,7 @@ final class RepositoryRulesTest extends TestCase
         self::assertNull($rule->evaluate(F::facts(F::package())));
     }
 
-    /** Each forge names what it measured: GitHub a push, GitLab and Bitbucket the newest commit. */
+    /** Each repository host names what it measured: GitHub a push, GitLab and Bitbucket the newest commit. */
     public function testTheSummariesNameTheForgeAndWhatItMeasured(): void
     {
         $archived = (new ArchivedRule())->evaluate(F::facts(F::package(), null, F::activity(true, '2020-01-01', RepoRef::GITLAB)));

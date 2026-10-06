@@ -96,7 +96,6 @@ final class TransitiveExposureTest extends TestCase
         self::assertNotNull($b);
         // The chain is from this parent, not the one the finding's own chain starts from.
         self::assertSame([['package' => 'vendor/leaf', 'verdict' => Verdict::STALE, 'chain' => ['root/b', 'vendor/mid', 'vendor/leaf']]], $b->data()['packages']);
-        // Intermediate packages are not parents; nothing reaches vendor/lonely; the leaf itself keeps its signals.
         self::assertNull(self::s7($f['vendor/mid']));
         self::assertNull(self::s7($f['vendor/lonely']));
         self::assertSame([$stale], $f['vendor/leaf']->signals());
@@ -223,8 +222,6 @@ final class TransitiveExposureTest extends TestCase
     }
 
     /**
-     * `vendor/shared` with the given chain, reached from the given roots.
-     *
      * @param list<string> $chain
      * @param list<string> $roots
      */

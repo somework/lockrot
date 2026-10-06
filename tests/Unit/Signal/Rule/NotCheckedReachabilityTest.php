@@ -20,18 +20,11 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
- * S10 names the signals a missing check blocked, and a name it has no business carrying is a
- * claim the data does not support. Nothing inside the rule can tell: it writes down ids, and a
- * list of ids is right or wrong only against what the rules it names could have done. Asserting
- * the list against a list is worth nothing — both sides then carry the same assumption, which is
- * how `release_dates` came to claim S8 on a branch snapshot, a version that is on no release
- * branch for S8 to measure.
- *
- * So each id S10 returns is asked directly: fill the missing check in with the answer most likely
- * to raise that signal, run that signal's own rule over the same package, and see whether it
- * fires. An id no filling can reach is a lie the finding tells; an id this test has no filling for
- * fails it outright, so a signal added to the list later has to be shown reachable before it can
- * be claimed.
+ * S10 names the signals that a missing check blocked. A list asserted against a list proves
+ * nothing, because both sides carry the same assumption. So each id is asked directly: fill the
+ * missing check with the answer most likely to raise that signal, run that signal's rule over the
+ * same package, and see whether it fires. An id without a filling fails the test, so a signal
+ * added to the list must be shown reachable.
  */
 final class NotCheckedReachabilityTest extends TestCase
 {

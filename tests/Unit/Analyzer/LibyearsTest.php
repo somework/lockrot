@@ -42,8 +42,6 @@ final class LibyearsTest extends TestCase
         return (new FindingBuilder())->withPackage($package)->withVersion($version)->withChain($direct ? [$package] : ['vendor/root', $package])->withNote($note)->withLibyears($libyears)->withOrigin(Origins::of($note !== Finding::NOTE_NOT_IN_REPOSITORY, $package))->build();
     }
 
-    // ---- the measurement: the years, or the one reason there are none ------------------------
-
     /** @return iterable<string, array{LockedPackage, ?PackageMetadata, ?float, ?string}> the package, its metadata, the years and the reason */
     public static function measurements(): iterable
     {
@@ -63,8 +61,7 @@ final class LibyearsTest extends TestCase
     }
 
     /**
-     * Each way out of the rule gives its own reason, decided where the number is: the years and the
-     * reason never both, never neither.
+     * The years and the reason: never both, never neither.
      *
      * @dataProvider measurements
      */
@@ -112,11 +109,7 @@ final class LibyearsTest extends TestCase
         Libyears::reasonWords(self::finding('a/a', LibyearsMeasurement::of(1.0)));
     }
 
-    /**
-     * 0.12 read the reason back off the finding's note, and any note but "not from a Composer
-     * repository" counted as metadata unavailable. The reason is now the one the rule gave, so a
-     * finding with metadata, a note, and a tag on a shared commit is counted under the missing date.
-     */
+    /** A finding with metadata, a note and a tag on a shared commit counts under the missing date, not under the note. */
     public function testTheReasonIsTheRulesNotTheNotes(): void
     {
         $measurement = Libyears::measure(self::package(), self::splitPackage([], null));
@@ -128,10 +121,6 @@ final class LibyearsTest extends TestCase
         self::assertSame('no release date lockrot trusts', Libyears::reasonWords($finding));
     }
 
-    /**
-     * Counting the findings' `libyears_unmeasured` by value, onto every key at zero, is the block's
-     * `unmeasured`: the same integers in the same key order.
-     */
     public function testTheBlockIsTheFindingsReasonsCounted(): void
     {
         $findings = [
@@ -155,8 +144,6 @@ final class LibyearsTest extends TestCase
         self::assertSame([Libyears::BRANCH_SNAPSHOT => 2, Libyears::NO_STABLE_RELEASE_DATE => 0, Libyears::NOT_FROM_COMPOSER_REPOSITORY => 0, Libyears::METADATA_UNAVAILABLE => 1], $block['unmeasured']);
         self::assertSame(2, $block['measured']);
     }
-
-    // ---- the per-package rule --------------------------------------------------------------
 
     public function testAYearOfSecondsIsOneLibyear(): void
     {
@@ -223,9 +210,8 @@ final class LibyearsTest extends TestCase
     }
 
     /**
-     * The branch view is a map in whatever order the repository listed the branches; an undated
-     * branch, a backport below, or a lower version on the installed branch listed *first* must be
-     * stepped over, not stop the scan, and the newest date wins whatever position it sits in.
+     * The repository lists the branches in any order. An undated branch, a backport below, or a
+     * lower version on the installed branch listed first must not stop the scan. The newest date wins.
      */
     public function testTheScanStepsOverWhatDoesNotCountAndKeepsTheNewestDateWhereverItIsListed(): void
     {
@@ -266,7 +252,6 @@ final class LibyearsTest extends TestCase
 
     public function testATrustedNewestReleaseDateOutranksTheBranchView(): void
     {
-        // when the repository dates the newest release, that date is the one used, whatever the branches say
         $behind = Libyears::measure(self::package(), self::metadata('2026-01-24T13:26:10+00:00', ['8' => ['v8.6.1', '2030-01-01T00:00:00+00:00']]))->years();
         self::assertNotNull($behind);
         self::assertEqualsWithDelta(4.06, $behind, 0.005);
@@ -276,8 +261,6 @@ final class LibyearsTest extends TestCase
     {
         self::assertNull(Libyears::measure(self::package('v5.13.2', null), self::metadata('2026-01-24T13:26:10+00:00'))->years());
     }
-
-    // ---- a split package: the installed version is dated by its monorepo parent -------------
 
     private const LATEST = '2026-01-24T13:26:10+00:00';
 
@@ -305,7 +288,7 @@ final class LibyearsTest extends TestCase
 
     public function testASplitPackageIsMeasuredFromItsParentsDateForTheInstalledVersion(): void
     {
-        // The lock says 2022-01-03 for v5.13.2 — the commit its tags share, not the release; the
+        // The lock says 2022-01-03 for v5.13.2, the commit its tags share, not the release. The
         // parent's v5.13.2 says two years before the newest, and that is the installed end.
         $metadata = self::splitPackage(['5.13.2.0' => self::twoYearsBefore(self::LATEST)]);
 
@@ -317,7 +300,7 @@ final class LibyearsTest extends TestCase
     public function testASplitPackageWhoseParentDoesNotDateTheInstalledVersionIsNotMeasured(): void
     {
         // The newest release's date came from the parent, so the lock's date for the installed
-        // version is the shared commit's, a year and a half early, and would inflate the sum.
+        // version is the shared commit's, which inflates the sum.
         $neighbour = self::splitPackage(['5.13.3.0' => self::twoYearsBefore(self::LATEST)]);
 
         self::assertNull(Libyears::measure(self::package(), self::splitPackage([]))->years());
@@ -330,19 +313,15 @@ final class LibyearsTest extends TestCase
     public function testTheParentsDateOutranksTheLocksEvenWhenThePackageDatedItsNewestReleaseItself(): void
     {
         // illuminate/contracts: the newest tag sits on a commit of its own and is dated by the
-        // package itself, but the installed v8.83.27 sits on one 31 tags share — the lock's date
-        // is eleven months early. The parent dates the installed version whenever it can.
+        // package itself, but the installed v8.83.27 sits on a commit that many tags share, so the
+        // lock's date is early. The parent dates the installed version whenever it can.
         $metadata = self::splitPackage(['5.13.2.0' => self::twoYearsBefore(self::LATEST)], null);
 
         self::assertNull($metadata->lastStableDatedBy());
         self::assertSame(2.0, Libyears::measure(self::package(), $metadata)->years());
     }
 
-    /**
-     * And where no parent dates it either, the lock's date is a commit's and nothing to measure
-     * from. Reading the newest release's own answer instead measured pagerfanta/twig from a date
-     * that was never its release's.
-     */
+    /** Where no parent dates the installed version, the lock's date is a commit's: nothing to measure from. */
     public function testATagOnASharedCommitIsNotMeasuredFromTheLocksDate(): void
     {
         self::assertNull(Libyears::measure(self::package(), self::splitPackage([], null))->years());
@@ -379,8 +358,6 @@ final class LibyearsTest extends TestCase
         self::assertNotNull($behind);
         self::assertEqualsWithDelta(4.06, $behind, 0.005);
     }
-
-    // ---- the block the report derives -------------------------------------------------------
 
     public function testTheTotalsSumTheUnroundedValuesAndRoundOnce(): void
     {
@@ -420,7 +397,6 @@ final class LibyearsTest extends TestCase
         self::assertSame(1, $block->measured());
     }
 
-    /** The same four reasons in the words `--explain` prints, one per key the block counts under. */
     public function testEveryReasonHasWordsOfItsOwn(): void
     {
         self::assertSame('branch snapshot', Libyears::reasonWords(self::finding('pinned/main', LibyearsMeasurement::unmeasured(Libyears::BRANCH_SNAPSHOT), true, 'dev-main')));
@@ -454,7 +430,6 @@ final class LibyearsTest extends TestCase
         self::assertSame(2, $block->measured());
         self::assertNull($block->toArray()['furthest_behind']);
         self::assertSame('libyears: 0.0 behind across all 2 packages', $block->line());
-        // and a package at zero never outranks one that is behind, whatever the order
         $worst = Libyears::fromFindings([self::finding('a/a', LibyearsMeasurement::of(0.0)), self::finding('b/b', LibyearsMeasurement::of(0.4))])->worst();
         self::assertNotNull($worst);
         self::assertSame('b/b', $worst->package());
@@ -476,8 +451,8 @@ final class LibyearsTest extends TestCase
 
     /**
      * Zero and null are different answers: a run that measured packages and found none behind is
-     * `0.0`, a run that could measure nothing at all has no number. A reader summing the field over
-     * several projects would otherwise count an unmeasurable lock as a lock with nothing to fix.
+     * `0.0`, a run that could measure nothing at all has no number. A reader that sums the field over
+     * several projects must not count an unmeasurable lock as a lock with nothing to fix.
      */
     public function testNothingMeasuredHasNoTotalWhileNothingBehindIsZero(): void
     {

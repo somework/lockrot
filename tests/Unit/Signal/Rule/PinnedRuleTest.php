@@ -25,7 +25,7 @@ final class PinnedRuleTest extends TestCase
         self::assertSame(Signal::LEVEL_WARN, $signal->level());
         self::assertSame('pinned to branch snapshot dev-master', $signal->summary());
         // No repository metadata, and no lock time either: nothing is known about releases, and
-        // null says so where false would claim the package never released.
+        // null says so where false claims the package never released.
         self::assertSame([
             'version' => 'dev-master',
             'reason' => PinnedRule::REASON_BRANCH_SNAPSHOT,
@@ -54,11 +54,10 @@ final class PinnedRuleTest extends TestCase
     }
 
     /**
-     * `reason` is an open set, so the published schema does not reject a value the code emits and
-     * the schema never learned; the strict twin does, but only on a report that happens to carry it.
-     * What always does is this: every `REASON_*` constant, in declaration order, is what the report
-     * schema lists under `x-known-values` — a third reason added to the rule without the schema, or
-     * the other way round, fails here.
+     * `reason` is an open set, so the published schema does not reject a value that the code emits
+     * and the schema does not list. The strict twin rejects it only on a report that carries it.
+     * This test always does: every `REASON_*` constant, in declaration order, is what the report
+     * schema lists under `x-known-values`.
      */
     public function testTheReasonsAreTheValuesTheReportSchemaKnows(): void
     {

@@ -32,18 +32,13 @@ use Lockrot\Verdict\Verdict;
 use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\TestCase;
 
-/**
- * The analyzer's metadata stage dates split packages by their monorepo parent: a parent in the
- * lock is used as loaded, a listed one outside it is fetched once, and the findings then read the
- * parent's dates. What is asked of the loader is what these tests watch.
- */
 final class AnalyzerSplitPackagesTest extends TestCase
 {
     /** @var list<list<string>> every load() call's names, in order */
     private array $asked = [];
 
     /**
-     * @param list<MetadataBatch> $answers one batch per load() call, by call index; a call past the end answers "not found"
+     * @param list<MetadataBatch> $answers one batch per load() call, by call index. A call past the end answers "not found"
      */
     private function loader(array $answers): MetadataLoaderInterface
     {
@@ -144,7 +139,7 @@ final class AnalyzerSplitPackagesTest extends TestCase
     }
 
     /**
-     * The notes about repository metadata; the activity stage adds its own (no GitHub token here).
+     * The activity stage adds its own notes (no GitHub token here).
      *
      * @return list<string>
      */

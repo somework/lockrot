@@ -34,11 +34,6 @@ use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
 use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\TestCase;
 
-/**
- * The typed run notes through the real Analyzer: one per condition, the network flag computed from
- * them, and the activity notes held against the reason each package's own facts give (what S10
- * reads), so a note and the findings it explains cannot tell two stories.
- */
 final class AnalyzerRunNotesTest extends TestCase
 {
     private const OLD = '2015-01-01T00:00:00+00:00';
@@ -67,7 +62,6 @@ final class AnalyzerRunNotesTest extends TestCase
         self::assertSame([false, true, false, false, false], array_map(static fn (RunNote $note): bool => $note->setsNetworkFailures(), $report->runNotes()));
     }
 
-    /** A repository that could not be reached fails `--strict-network`; one that answered with something lockrot could not read does not. */
     public function testAnAdvisoryFailureSetsTheNetworkFlagOnlyWhenTheRepositoryWasNotReached(): void
     {
         $packages = [self::locked('vendor/a')];
@@ -85,11 +79,8 @@ final class AnalyzerRunNotesTest extends TestCase
     }
 
     /**
-     * Two GitLab hosts, one rate-limiting and one down, plus a repository that answered 404: the
-     * rate-limit note, which is all the text says, lists both failed repositories with their own
-     * host and message, and the 404 is typed in its own note. Every package on the rate-limited
-     * forge carries `rate_limit`, the 404 one included, because the analyzer asks about the rate
-     * limit before it asks what happened to the repository.
+     * Every package on the rate-limited repository host carries `rate_limit`, the 404 one included:
+     * the analyzer asks about the rate limit first.
      */
     public function testTheActivityNotesListEachRepositoryAndAgreeWithEachPackagesReason(): void
     {
@@ -131,7 +122,6 @@ final class AnalyzerRunNotesTest extends TestCase
         );
     }
 
-    /** A repository down on a forge that is not rate-limiting: every failure's own message, and `fetch_failed` on exactly those packages. */
     public function testUnreachableRepositoriesKeepEveryMessageAndMatchFetchFailed(): void
     {
         $packages = [self::locked('vendor/one'), self::locked('vendor/two'), self::locked('vendor/fine')];
@@ -158,7 +148,6 @@ final class AnalyzerRunNotesTest extends TestCase
         self::assertSame(['vendor/one' => NotCheckedRule::FETCH_FAILED, 'vendor/two' => NotCheckedRule::FETCH_FAILED], self::activityReasons($analysis, ['vendor/one', 'vendor/two', 'vendor/fine']));
     }
 
-    /** A 404 without rate limiting has no reason on its finding: the note is its only record. */
     public function testARepositoryThatAnswered404IsTypedOnlyInItsNote(): void
     {
         $packages = [self::locked('vendor/gone')];
@@ -171,7 +160,6 @@ final class AnalyzerRunNotesTest extends TestCase
         self::assertFalse($analysis->report()->hadNetworkFailures());
     }
 
-    /** The cap's two parts are the packages that carry `no_token` and `anonymous_budget`. */
     public function testTheAnonymousCapSplitsWhatItSkippedByTheReasonsThePackagesCarry(): void
     {
         $packages = [];
@@ -195,7 +183,6 @@ final class AnalyzerRunNotesTest extends TestCase
         self::assertSame([NotCheckedRule::RATE_BUDGET => 2, NotCheckedRule::NO_TOKEN => 1], $reasons);
     }
 
-    /** Every package whose repository was never asked carries the reason the note gives, not only the first. */
     public function testAnExhaustedBudgetSaysTheActivityWasNotChecked(): void
     {
         $packages = [self::locked('vendor/a'), self::locked('vendor/b')];
@@ -215,7 +202,6 @@ final class AnalyzerRunNotesTest extends TestCase
         self::assertSame(NotCheckedRule::BUDGET, $reason);
     }
 
-    /** Offline, every package whose activity lockrot's cache does not hold carries `offline`, as the offline note says. */
     public function testOfflineEveryUnreadRepositoryIsOffline(): void
     {
         $packages = [self::locked('vendor/a'), self::locked('vendor/b')];
@@ -259,8 +245,6 @@ final class AnalyzerRunNotesTest extends TestCase
     }
 
     /**
-     * Why each package's repository activity was not read, by package, for those that have a reason.
-     *
      * @param list<string> $names
      *
      * @return array<string, string>
@@ -342,7 +326,7 @@ final class AnalyzerRunNotesTest extends TestCase
         };
     }
 
-    /** @param array<string, array{int, string}> $map url => [status, body]; any other URL answers 404 */
+    /** @param array<string, array{int, string}> $map url => [status, body]. Any other URL answers 404 */
     private function http(array $map): HttpClientInterface
     {
         return new class ($map) implements HttpClientInterface {
