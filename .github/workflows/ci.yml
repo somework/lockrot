@@ -90,13 +90,12 @@ jobs:
   # it came from and, for the three older ones, the name the main branch's ruleset requires: src/Signal
   # and src/Analyzer left `verdicts and output`, the repository loading left `data and the rest`.
   # src/Html and src/Explain, in no shard until then although tests/infection-equivalents.md
-  # measured them, joined `verdicts and output`. Measured on run 37506614872 (src/Data/Php,
-  # src/Data/Advisory and src/Graph still in `repository data` then): 11m00s, 15m24s, 10m36s,
-  # 21m24s and 14m30s, no mutant skipped, against 17m48s, 13m30s and 28m18s on the same tree
-  # before (run 37473741014, where `verdicts and output` skipped 885 of its 2908 mutants). Across
-  # the shards that is 171 runner thread-minutes against 148, for 6736 mutants run against 5723.
-  # Those three directories then moved to `data and the rest`: about a fifth of the repository
-  # shard's mutant time, locally.
+  # measured them, joined `verdicts and output`. Measured on run 37512184324: 7m54s, 16m18s, 9m48s,
+  # 10m12s and 17m18s in the order below, no mutant skipped, against 17m48s, 13m30s and 28m18s on
+  # the same tree before (run 37473741014, where `verdicts and output` skipped 885 of its 2908
+  # mutants). Across the shards, counting each initial run once and each mutation phase three
+  # times (three threads), that is 144 thread-minutes for the 6736 mutants run against 148 for 5723
+  # (184 for 6511 on run 37433846698). The two runs after the change gave the same 94 escapes.
   mutation:
     runs-on: ubuntu-latest
     # 50, not 30: the composer/self-update shard measured 20m02s on 2026-09-19 and was cancelled at
@@ -115,7 +114,7 @@ jobs:
     # timeout each, every surviving mutant ran every method of the test classes covering its line,
     # and a slow runner skipped hundreds of mutants outright. With tests/Support/MutantTestTimeLimit.php,
     # the 600-second timeout, --only-covering-test-cases and five shards the run of the same day
-    # measured 10m36s to 21m24s per shard with no mutant skipped (run 37506614872, see below); every
+    # measured 7m54s to 17m18s per shard with no mutant skipped (run 37512184324, see below); every
     # verdict is unchanged but for seven kills a failing test used to fake, which tests now make.
     timeout-minutes: 50
     strategy:
