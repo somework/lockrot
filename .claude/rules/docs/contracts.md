@@ -25,8 +25,8 @@ a published link.
   a blank line after an item's paragraph. Two-space nesting renders flat. A test checks
   `docs/*.md`.
 - **JSON samples are validated.** Every ```` ```json ```` block in `docs/*.md` must decode (a line
-  that holds only `…` is allowed) and, if it is a report, explanation, baseline or `composer.json`,
-  validate against the published schema. Use ```` ```text ```` for fragments.
+  that holds only `…` is allowed). A report, explanation, baseline or `composer.json` sample must
+  also validate against the published schema. Use ```` ```text ```` for fragments.
 - **Text that tests read.** Before you change a page or `mkdocs.yml`, search `tests/` for its file
   name, and read each test that reads it. Tests that glob `docs/*.md` check every page.
 - **Nav.** Every page in `docs/` is in `mkdocs.yml` nav or `exclude_docs`, or the strict build

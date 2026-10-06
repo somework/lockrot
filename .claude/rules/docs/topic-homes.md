@@ -8,7 +8,7 @@ paths:
 ---
 # One home per topic
 
-Each recurring topic has one canonical section (the rule: `../writing.md`, "Less text"). Write a
+Each topic that recurs has one canonical section (the rule: `../writing.md`, "Less text"). Write a
 fact in full twice only when a test reads every copy. Link the home's anchor when the home is a section.
 
 | Topic | Home | Elsewhere |
@@ -42,4 +42,4 @@ fact in full twice only when a test reads every copy. Link the home's anchor whe
 | Page list and labels | `mkdocs.yml` nav | `docs/index.md` routes with the same labels |
 | History of a behaviour | `CHANGELOG.md` | Only the version notes that `docs/writing.md` allows |
 
-A new recurring topic gets a row here in the same change that writes its home.
+A new topic that recurs gets a row here in the same change that writes its home.
