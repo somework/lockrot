@@ -16,8 +16,8 @@ exclude_docs: |
   requirements.txt
   superpowers/
 
-# `mkdocs build --strict` fails on warnings, and by default a page left out of the nav, or a link to
-# a heading that does not exist, is only an info line. These make both warnings, so CI fails on them.
+# `mkdocs build --strict` fails on warnings. By default, a page omitted from the nav or a link to a
+# missing heading is only an info line. These settings make both a warning, so CI fails on them.
 validation:
   nav:
     omitted_files: warn
