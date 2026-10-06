@@ -34,6 +34,7 @@ use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\ValidatesJsonSchemas;
 use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 
@@ -46,8 +47,11 @@ use PHPUnit\Framework\TestCase;
  * the budget, and every package the forge failed for is a repository the notes name.
  *
  * @coversNothing
+ *
+ * @group covers-nothing
  */
 #[CoversNothing]
+#[Group('covers-nothing')]
 final class RunNoteAgreementTest extends TestCase
 {
     use AssertsNoteDetails;
