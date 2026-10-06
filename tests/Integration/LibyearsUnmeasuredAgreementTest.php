@@ -38,11 +38,10 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * A finding's `libyears_unmeasured` against everything else that says why a package was not
- * measured, on every fixture lock: the report's `libyears.unmeasured` block (the counts are the
- * findings' codes counted, which is wiring — both read one stored value), the facts the analysis was
- * decided on, read here without going through {@see Libyears::measure()}, the rule 0.12 used to file
- * each finding off its note and version, which proves the block's counts did not move, and the
- * `--explain` document's copy of the finding.
+ * measured, on every fixture lock: the report's `libyears.unmeasured` block (its counts are the
+ * findings' codes counted, which is wiring: both read one stored value), the facts the analysis was
+ * decided on, read here without {@see Libyears::measure()}, the `rule012()` filing of each finding
+ * off its note and version, and the `--explain` document's copy of the finding.
  */
 final class LibyearsUnmeasuredAgreementTest extends TestCase
 {
@@ -181,7 +180,7 @@ final class LibyearsUnmeasuredAgreementTest extends TestCase
     }
 
     /**
-     * How 0.12 filed an unmeasured finding, off what the finding says: the note, then the version.
+     * How an unmeasured finding is filed off what the finding says: the note, then the version.
      *
      * @param array<mixed, mixed> $row
      */

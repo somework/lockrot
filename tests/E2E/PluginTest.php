@@ -72,9 +72,8 @@ final class PluginTest extends TestCase
 
     public function testComposerLockrotRunsThroughThePlugin(): void
     {
-        // The only e2e test whose assertions depend on the GitHub-derived verdict for phpzip/phpzip
-        // (see the rate-limit fallback below); the other three assert on generic shapes that hold
-        // regardless of GitHub activity data, so they run locally without a token.
+        // These assertions depend on the GitHub-derived verdict for phpzip/phpzip, so the test needs a
+        // token. The other tests assert generic shapes that hold whatever the GitHub activity data says.
         if (getenv('GITHUB_TOKEN') === false || getenv('GITHUB_TOKEN') === '') {
             self::markTestSkipped('set GITHUB_TOKEN: anonymous GitHub requests hit the 60/h rate limit and change the expected verdicts');
         }
@@ -87,11 +86,9 @@ final class PluginTest extends TestCase
         self::assertIsArray($json['findings']);
         self::assertIsArray($json['notes']);
         $verdicts = array_column($json['findings'], 'verdict', 'package');
-        // Even with GITHUB_TOKEN set, a shared CI token can be rate-limited by the time this runs,
-        // which drops the S4 (repository push) signal. S2 (no stable release) and S5 (old release,
-        // open-ended constraint) still fire on their own, giving old-promise rather than silent — and
-        // old-promise outranks stale in verdict precedence, so those are the only two verdicts phpzip
-        // can land on here.
+        // A shared CI token can be rate-limited by the time this runs, which drops the S4 (repository
+        // push) signal. S2 (no stable release) and S5 (old release, open-ended constraint) still fire.
+        // They give old-promise, which outranks stale, so phpzip lands on old-promise or silent only.
         $rateLimited = (bool) preg_grep('/rate limit/', $json['notes']);
         if ($rateLimited) {
             self::assertSame('old-promise', $verdicts['phpzip/phpzip'], (string) json_encode($json['notes']));
@@ -99,9 +96,8 @@ final class PluginTest extends TestCase
             self::assertSame('silent', $verdicts['phpzip/phpzip']);
         }
         self::assertSame($verdicts['phpzip/phpzip'] === 'silent' ? 1 : 0, $run->getExitCode());
-        // Every finding carries a priority, and the report carries the five totals. The exact level of
-        // any one package depends on the same rate-limit dice as the verdict above, so this asserts the
-        // field is present and valid rather than pinning a value.
+        // The level of any one package depends on the same rate limit as the verdict, so assert that
+        // the field is present and valid rather than pin a value.
         self::assertIsArray($json['priorities']);
         self::assertSame(['critical', 'high', 'medium', 'low', 'none'], array_keys($json['priorities']));
         foreach ($json['findings'] as $finding) {
@@ -116,16 +112,10 @@ final class PluginTest extends TestCase
         self::assertSame(0, $alias->getExitCode(), $alias->getErrorOutput());
 
         // The table path is the only code that touches symfony/console's style tags and its terminal-width
-        // API. Composer 2.2 LTS bundles symfony/console 2.8.52 while require-dev resolves 5.4, so only a run
-        // through the real binary covers 2.8. COLUMNS is deliberately NOT set here: with it set,
-        // TerminalWidth::detect() answers at step 1 and neither console's own width lookup is ever entered.
-        // Without it, and with this test driving composer through Symfony Process rather than a terminal,
-        // the run exercises step 2 on Composer 2.10.3 — symfony/console 5.4's Terminal::getWidth() finds
-        // no COLUMNS and no stty and returns its own 80 fallback — and step 3 on Composer 2.2.25, where
-        // there is no Terminal class at all: 2.8.52's Application::getTerminalDimensions() shells out to
-        // `stty -a | grep columns` with the inherited non-TTY stdin, gets an empty string, and returns
-        // [null, null] — so lockrot falls through to FormatContext::DEFAULT_WIDTH, 120. Every assertion
-        // below is width-agnostic for exactly that reason.
+        // API. Composer 2.2 LTS bundles symfony/console 2.8 while require-dev resolves 5.4, so only a run
+        // through the real binary covers 2.8. COLUMNS stays unset: with it set, TerminalWidth::detect()
+        // answers first and neither console's own width lookup is entered. Without it, each console finds
+        // no terminal and the width differs per Composer version, so every assertion is width-agnostic.
         $table = $this->composer(['lockrot', '--target-php=8.4'], [], 120);
         $stdout = $table->getOutput();
         self::assertSame(0, $table->getExitCode(), $table->getErrorOutput().$stdout);
@@ -134,17 +124,15 @@ final class PluginTest extends TestCase
         self::assertStringContainsString('phpzip/phpzip', $stdout);
         self::assertMatchesRegularExpression('/\d+ packages checked/', $stdout);
         self::assertMatchesRegularExpression('/^priority: critical \d+ · high \d+ · medium \d+ · low \d+$/m', $stdout);
-        // no style tag reaches a redirected (non-TTY) stdout, and nothing is left half-rendered
         self::assertStringNotContainsString('<fg=', $stdout);
         self::assertStringNotContainsString('<options=', $stdout);
     }
 
     /**
      * `composer -d <dir>` changes into the project before any command runs, so relative `--output`
-     * paths land there, not in the shell's directory. The table file is the one place the plugin's
-     * own symfony/console strips the markup — 2.8 under Composer 2.2 LTS, 5.4 under 2.10 — so this is
-     * the test that covers both. Offline, so no verdict depends on GitHub: the assertions are about
-     * where the files go and what is in them, not what they report.
+     * paths land there, not in the shell's directory. The plugin's own symfony/console strips the
+     * markup from the table file, 2.8 under Composer 2.2 LTS and 5.4 under 2.10, and this test covers
+     * both. It runs offline, so no verdict depends on GitHub.
      */
     public function testOutputFilesAreRelativeToTheDirectoryComposerRunsIn(): void
     {
@@ -184,13 +172,13 @@ final class PluginTest extends TestCase
 
         $stderr = $require->getErrorOutput();
         self::assertSame(0, $require->getExitCode(), $stderr);
-        // `composer require phpzip/phpzip` also locks its three grandt/* dependencies, and all four
-        // are flagged, so the counts are "4 of 4" rather than "1 of N".
+        // `composer require phpzip/phpzip` also locks its grandt/* dependencies, so the counts are not
+        // "1 of N".
         self::assertMatchesRegularExpression('/lockrot: dependency rot in \d+ of \d+ changed packages?/', $stderr);
         self::assertStringContainsString('phpzip/phpzip 2.0.8', $stderr);
         self::assertStringContainsString('Run composer lockrot for details.', $stderr);
         // Composer fires PRE_OPERATIONS_EXEC before printing its own operations list, so the block
-        // appears above it.
+        // comes first.
         $blockAt = strpos($stderr, 'lockrot: dependency rot in');
         $operationsAt = strpos($stderr, 'Package operations:');
         self::assertIsInt($blockAt, $stderr);
@@ -200,16 +188,12 @@ final class PluginTest extends TestCase
     }
 
     /**
-     * Strict mode stops the install: the operations never execute, so nothing lands in vendor/.
-     *
-     * What it does NOT do is make Composer undo the manifest edit. RequireCommand::doUpdate()
-     * registers its own PRE_OPERATIONS_EXEC listener at priority 10000 which sets
-     * `dependencyResolutionCompleted = true`, and its catch block only calls revertComposerFile()
-     * while that flag is false. A plugin listener on the same event always runs after Composer's own,
-     * so by the time InstallBlockedException is thrown the revert path is already disarmed. Composer
-     * has also written the new lock by then, in Installer::doUpdate(), before doInstall() dispatches
-     * the event. The outcome is exit 1 with composer.json and composer.lock updated and
-     * vendor/phpzip absent.
+     * Strict mode stops the install, so nothing lands in vendor/. Composer does not undo the
+     * manifest edit. RequireCommand::doUpdate() registers a PRE_OPERATIONS_EXEC listener at priority
+     * 10000 that sets `dependencyResolutionCompleted = true`, and it reverts only while that flag is
+     * false. A plugin listener runs after it, so the revert is disarmed when InstallBlockedException
+     * is thrown, and Installer::doUpdate() has written the lock by then. The outcome is exit 1 with
+     * composer.json and composer.lock updated and vendor/phpzip absent.
      */
     public function testInstallTimeStrictStopsTheRequire(): void
     {
@@ -225,11 +209,7 @@ final class PluginTest extends TestCase
         self::assertDirectoryDoesNotExist($this->dir.'/vendor/phpzip');
     }
 
-    /**
-     * Through the real plugin: one rendered warning line on stderr (Composer's `<warning>` style, no
-     * literal tag), the report on stdout, and the run otherwise unchanged. `x-ci` is reserved and stays
-     * quiet.
-     */
+    /** The warning renders through the real plugin. `x-ci` is reserved and stays quiet. */
     public function testAnUnknownKeyIsWarnedAboutThroughThePlugin(): void
     {
         $this->createProject(['install-tme' => 'off', 'x-ci' => true]);

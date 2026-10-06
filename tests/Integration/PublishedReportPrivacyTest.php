@@ -100,7 +100,7 @@ final class PublishedReportPrivacyTest extends TestCase
         // Composer 2.2 has no advisories to ask a repository for.
         self::assertContains(interface_exists(AdvisoryProviderInterface::class) ? RunNote::ADVISORIES_UNAVAILABLE : RunNote::ADVISORIES_NOT_CHECKED, $codes);
         self::assertStringContainsString('http://127.0.0.1:'.$port.'/other', $written['json'], 'the host stays, which the reader is checking');
-        // SARIF's %SRCROOT% is the project directory on purpose: code scanning resolves results against it.
+        // SARIF's %SRCROOT% is the project directory: code scanning resolves results against it.
         $sarif = json_decode($written['sarif'], true);
         self::assertIsArray($sarif);
         $runs = [];

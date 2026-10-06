@@ -30,10 +30,10 @@ use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\TestCase;
 
 /**
- * The regression the 0.8.0 shared-commit rule left behind, over the real recorded Packagist data:
- * `illuminate/contracts` v8.83.27 sits on a commit 31 stable tags share, so its 8.x branch carries
- * no date of its own and S8 cannot measure it. laravel/framework replaces it and dates the same
- * branch by its own release, and that is what the analyzer now reads.
+ * Over the recorded Packagist data: `illuminate/contracts` v8.83.27 sits on a commit that many
+ * stable tags share, so its 8.x branch carries no date of its own and S8 cannot measure it.
+ * laravel/framework replaces it and dates the same branch by its own release, which the analyzer
+ * reads.
  */
 final class SplitPackageDatesTest extends TestCase
 {
@@ -107,7 +107,7 @@ final class SplitPackageDatesTest extends TestCase
         return null;
     }
 
-    /** Without a parent the branch is undated, as it has been since 0.8.0: nothing to measure. */
+    /** Without a parent the branch is undated: nothing to measure. */
     public function testWithoutAParentTheSplitBranchIsNotMeasured(): void
     {
         $report = $this->report(MonorepoParents::none(), new Thresholds(1, 1));
@@ -121,7 +121,7 @@ final class SplitPackageDatesTest extends TestCase
     public function testTheMonorepoDatesTheBranchAndTheFindingSaysWhose(): void
     {
         // 8.x last released 2024-11-20 (laravel/framework v8.83.29), 1.8 years before the fixed now:
-        // above a one-year threshold, below the default three, which is what the CHANGELOG states.
+        // above a one-year threshold, below the default three.
         $report = $this->report(MonorepoParents::load(), new Thresholds(1, 1));
         $finding = self::contracts($report);
         $s8 = self::signal($finding, Signal::S8);
@@ -146,12 +146,11 @@ final class SplitPackageDatesTest extends TestCase
     }
 
     /**
-     * The lock dates v8.83.27 at 2022-01-13 — the commit its 31 tags share; laravel/framework
-     * v8.83.27 released 2022-12-08. The package dates its own newest release (v13.32.0,
-     * 2026-09-06, a commit two tags share) so nothing else in the finding needs the parent —
-     * which is exactly the case where reading what dated *that* release says nothing about the
-     * installed tag. Without a parent the 31 tags on one commit are all lockrot has, and a commit
-     * is not a release: the package goes unmeasured rather than 4.65 libyears behind for 3.75.
+     * The lock dates v8.83.27 at 2022-01-13, the commit that its tags share. laravel/framework
+     * v8.83.27 released 2022-12-08. The package dates its own newest release (v13.32.0, 2026-09-06),
+     * so nothing else in the finding needs the parent, and what dated that release says nothing
+     * about the installed tag. Without a parent the tags on one commit are all lockrot has, and a
+     * commit is not a release: the package goes unmeasured rather than overstated.
      */
     public function testTheMonorepoDatesTheInstalledVersionForLibyears(): void
     {

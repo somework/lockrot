@@ -42,12 +42,9 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * A finding's `priority_basis` and `no_fix_expected` against the rest of the document, in every
- * report and `--explain` document written here, with the advisory paths seeded so each runs end to
- * end: an abandoned package a listed release fixes and one nothing fixes, a silent one nothing
- * fixes, a left-behind one whose branch carries the fix and one fixed only on a higher branch, an
- * abandoned-in-the-lock one whose metadata failed, a stale one, an allowlisted one and an ok one.
- * Hand-written expectations per package, then the general rules on every finding. Every document is
- * validated against its schema and the strict twin.
+ * report and `--explain` document written here. The seeded advisories (see `advisories()`) run each
+ * path end to end. Hand-written expectations per package come first, then the general rules on
+ * every finding. Every document is validated against its schema and the strict twin.
  *
  * Composer builds every advisory with an affected range, and a repository that serves them inline
  * must serve them whole, so `affected_range_unknown` cannot come through here: FindingTest covers it.
@@ -59,7 +56,7 @@ final class FindingFactsConsistencyTest extends TestCase
     private const FIXTURES = __DIR__.'/../fixtures/';
     private const NOW = '2026-09-14T00:00:00+00:00';
     private const WALLABAG = 'apps/wallabag_wallabag';
-    /** The package whose metadata the repository fails to serve; its lock marks it abandoned. */
+    /** The package whose metadata the repository fails to serve. Its lock marks it abandoned. */
     private const METADATA_FAILS = 'hoa/compiler';
 
     /** Per package: the verdict, the basis as base and steps, and the no-fix list. */

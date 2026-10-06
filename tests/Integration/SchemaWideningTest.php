@@ -12,12 +12,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
- * The widening check SchemaEvolutionTest holds every released schema to, held to what it has to
- * catch: deliberately narrowed copies of the current schemas, each of which a document an older
- * release wrote could fail, and widened copies, which none could.
- *
- * The first twelve narrowings are the ones a review found the recorded documents alone let through,
- * because no recording happens to carry the value or shape they take away.
+ * The widening check that SchemaEvolutionTest holds every released schema to, held to what it must
+ * catch: deliberately narrowed copies of the current schemas, each of which a document that an
+ * older release wrote could fail, and widened copies, which none could. Narrowings of a value or
+ * shape that no recorded document carries are found only here.
  */
 final class SchemaWideningTest extends TestCase
 {
@@ -62,7 +60,7 @@ final class SchemaWideningTest extends TestCase
         self::assertSame([], SchemaWidening::narrowings($schema, $schema));
     }
 
-    /** @return iterable<string, array{string, string, string}> the document, the narrowing, and what the check has to say about it */
+    /** @return iterable<string, array{string, string, string}> the document, the narrowing, and what the check must say about it */
     public static function narrowings(): iterable
     {
         yield 'report verdict loses unknown' => [Schemas::REPORT, 'verdict-unknown', '/properties/verdict: no longer accepts "unknown"'];
@@ -185,7 +183,7 @@ final class SchemaWideningTest extends TestCase
     }
 
     /**
-     * @return iterable<string, array{string, string, string}> the fixture, the change, and what the check has to say about it ('' for nothing)
+     * @return iterable<string, array{string, string, string}> the fixture, the change, and what the check must say about it ('' for nothing)
      */
     public static function relationChanges(): iterable
     {
@@ -194,8 +192,6 @@ final class SchemaWideningTest extends TestCase
         $ruleId = '^(([a-rt-z][a-z0-9]*|s([a-np-z0-9][a-z0-9]*)?|so([a-qs-z0-9][a-z0-9]*)?|sor([a-su-z0-9][a-z0-9]*)?|sort[a-z0-9]+)(-[a-z0-9]+)*|sort(-[a-z0-9]+)+)$';
         $package = '#/properties/findings/patternProperties/^[^\/]+\/[^\/]+$';
 
-        // One per keyword; `allOf` added, changed and dropped, `uniqueItems` off and `x-known-keys`
-        // gaining a key are among the planted changes below.
         yield 'not changed' => ['relations', 'not-changed', $findings.'/properties/security: not {"required":["fixed_by"]} where the older schema had {"required":["fix"]}'];
         yield 'not added' => ['relations', 'not-added', $findings.'/properties/chain: not {"maxItems":0} where the older schema had null'];
         yield 'uniqueItems turned on' => ['relations', 'unique-on', $findings.'/properties/chain: uniqueItems turned on'];
@@ -208,8 +204,6 @@ final class SchemaWideningTest extends TestCase
         yield 'a patternProperties regex removed' => ['findings-map', 'regex-removed', $package.': pattern property removed or its regex changed'];
         yield 'an open set gains a value with its constraints in a new allOf entry' => ['relations', 'value-and-relation-added', $findings.'/allOf/2: a relation the older schema did not hold'];
 
-        // The planted changes the relation keywords were first checked against, on the shapes of
-        // the -2 report and baseline.
         yield 'a relation added' => ['relations', 'relation-added', $findings.'/allOf/2: a relation the older schema did not hold'];
         yield 'a relation dropped' => ['relations', 'relation-dropped', ''];
         yield 'a relation branch dropped' => ['relations', 'relation-branch-dropped', $findings.'/allOf/0: a relation the older schema did not hold'];
@@ -291,7 +285,7 @@ final class SchemaWideningTest extends TestCase
 
     /**
      * The check is not blind to the difference between releases: read the other way round — the
-     * current schema as the older one — it finds what 0.9.0's schemas cannot accept, which is why
+     * current schema as the older one — it finds what the oldest schemas cannot accept, which is why
      * a document a newer lockrot writes is not promised to validate against an older copy.
      */
     public function testTheForwardDirectionIsNarrowing(): void
@@ -306,9 +300,9 @@ final class SchemaWideningTest extends TestCase
 
     /**
      * The branch for unknown signal ids admits none of the ids its schema knows, so the check skips
-     * it on the older side and never compares an older signal with it on the newer side: adding S11
-     * reads as a widening above, and a narrowed typed branch is reported as that branch's problem.
-     * Read against the schemas released before the branch existed, the current one only widens.
+     * it on the older side and never compares an older signal with it on the newer side. The `s11`
+     * case of testEachWideningPasses is a widening, and a narrowed typed branch is reported as that
+     * branch's problem. Against the released schemas that lack the branch, the current one only widens.
      */
     public function testTheBranchForUnknownIdsIsNeitherANarrowingNorAHidingPlace(): void
     {
@@ -322,8 +316,8 @@ final class SchemaWideningTest extends TestCase
     }
 
     /**
-     * `from_composer_repository` joined the finding in 0.13.0 as an optional boolean: a schema
-     * without it is what 0.12 documents were written against, and the current one only widens it.
+     * `from_composer_repository` is an optional boolean on the finding: from a schema without it,
+     * the current one only widens.
      *
      * @dataProvider findingSchemas
      */
@@ -339,9 +333,8 @@ final class SchemaWideningTest extends TestCase
     }
 
     /**
-     * `libyears_unmeasured` joined the finding in 0.13.0 as an optional open code, and the block it
-     * counts under gained a type for the keys it does not list: from the schemas without either, the
-     * current ones only widen.
+     * `libyears_unmeasured` is an optional open code on the finding, and the block it counts under
+     * types the keys it does not list: from the schemas without either, the current ones only widen.
      *
      * @dataProvider findingSchemas
      */
@@ -360,8 +353,8 @@ final class SchemaWideningTest extends TestCase
     }
 
     /**
-     * `priority_basis` and `no_fix_expected` joined the finding in 0.13.0, and S9's data gained
-     * `releases_read`, all optional: from the schemas without them, the current ones only widen.
+     * `priority_basis` and `no_fix_expected` are optional on the finding, and so is S9's
+     * `releases_read`: from the schemas without them, the current ones only widen.
      *
      * @dataProvider findingSchemas
      */
@@ -384,8 +377,8 @@ final class SchemaWideningTest extends TestCase
 
     /**
      * `run.mode`, `run.strict_network` and `run.fail_on_kind`, the root `gate` and each finding's
-     * `gate` joined the report in 0.13.0, all optional: from the schema without them, the current one
-     * only widens. The explain schema gets none of them: an explanation gates nothing.
+     * `gate` are optional in the report: from the schema without them, the current one only widens.
+     * The explain schema has none of them: an explanation gates nothing.
      */
     public function testTheReportGainingItsGateIsAWidening(): void
     {
@@ -404,8 +397,8 @@ final class SchemaWideningTest extends TestCase
     }
 
     /**
-     * `note_details` joined the report and the explanation in 0.13.0, optional in both: from the
-     * schemas without it and the definitions it brought, the current ones only widen.
+     * `note_details` is optional in the report and the explanation: from the schemas without it and
+     * its definitions, the current ones only widen.
      *
      * @dataProvider findingSchemas
      */
@@ -426,8 +419,8 @@ final class SchemaWideningTest extends TestCase
     }
 
     /**
-     * `origin` joined the finding in 0.13.0 in both schemas, optional, with the three definitions it
-     * brought: from the schemas without them, the current ones only widen, and its object stays open.
+     * `origin` is optional on the finding in both schemas, with its definitions: from the schemas
+     * without them, the current ones only widen, and its object stays open.
      *
      * @dataProvider findingSchemas
      */
@@ -499,7 +492,7 @@ final class SchemaWideningTest extends TestCase
                 return [$s, self::without($s, array_merge($properties, ['libyears', 'multipleOf']))];
             case 'value-and-relation-added':
                 // A release adds `later-kind` to the open set and puts what it requires in an entry
-                // of its own; every existing relation stays as it was.
+                // of its own, and every existing relation stays unchanged.
                 $s2 = self::appended($s, ['definitions', 'move', 'properties', 'kind', 'x-known-values'], 'later-kind');
 
                 return [$s, self::appended($s2, array_merge($finding, ['allOf']), [
@@ -554,8 +547,6 @@ final class SchemaWideningTest extends TestCase
     }
 
     /**
-     * A map node whose `patternProperties` regex is replaced by another, its schema kept.
-     *
      * @param array<mixed, mixed> $schema
      * @param list<int|string>    $map
      *
@@ -595,8 +586,6 @@ final class SchemaWideningTest extends TestCase
     }
 
     /**
-     * The current schema with one change applied.
-     *
      * @return array<mixed, mixed>
      */
     private static function narrowed(string $document, string $change): array
@@ -622,13 +611,14 @@ final class SchemaWideningTest extends TestCase
             case 'format-dropped':
                 return self::with($s, ['properties', 'format', KnownValues::KEYWORD], ['table', 'json', 'github', 'sarif', 'gitlab', 'markdown']);
             case 'not-list-drifted':
-                // Read the other way round below: the older schema's last branch leaves S10 out of its
-                // not-list, so it takes an S10 with any data, which the current S10 branch refuses.
+                // testEachNarrowingIsFound reads this one the other way round: the older schema's last
+                // branch leaves S10 out of its not-list, so it takes an S10 with any data, which the
+                // current S10 branch refuses.
                 return self::with($s, ['definitions', 'signal', 'anyOf', 10, 'not', 'properties', 'id', 'enum'], ['S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8', 'S9']);
             case 's1-three-places':
                 // Three places in S1's own branch: the signal, its data and the replacement in it.
                 // Compared with the branch for unknown ids an older S1 differs in two (the `not`, and
-                // the replacement that branch does not list), so the fewest-places rule alone would
+                // the replacement that branch does not list), so the fewest-places rule alone can
                 // report that branch's problems instead of these.
                 $s = self::with($s, ['definitions', 's1', 'properties', 'replacement', 'type'], 'string');
                 $s = self::appended($s, ['definitions', 's1', 'required'], 'since');
@@ -731,7 +721,7 @@ final class SchemaWideningTest extends TestCase
             case 'notes-unique':
                 return self::with($s, ['properties', 'notes', 'uniqueItems'], true);
             case 's1-branch':
-                // The S1 data now demands a replacement: an older S1 with a null one fits no branch.
+                // The S1 data demands a replacement: an older S1 with a null one fits no branch.
                 return self::with($s, ['definitions', 's1', 'properties', 'replacement', 'type'], 'string');
             case 'baseline-verdict':
                 return self::with($s, ['properties', 'findings', 'additionalProperties', 'properties', 'verdict', 'enum'], ['abandoned', 'silent', 'pinned', 'left-behind', 'old-promise']);
@@ -754,7 +744,7 @@ final class SchemaWideningTest extends TestCase
                 return self::with($s, ['properties', 'exposure', 'items', 'properties', 'flagged', 'minimum'], 0);
             case 's11':
                 // Known to the schema, typed by a branch of its own before the one for unknown ids, and
-                // no longer unknown to that one.
+                // excluded from that one.
                 $s = self::appended($s, ['definitions', 'signalId', KnownValues::KEYWORD], 'S11');
                 $anyOf = JsonPath::arrayAt($s, ['definitions', 'signal', 'anyOf']);
                 $unknown = array_pop($anyOf);

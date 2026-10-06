@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
 /**
- * The `php -S` servers the suite starts must never outlive the test run. stop() has to leave the
+ * The `php -S` servers the suite starts must never outlive the test run. stop() must leave the
  * port closed by the time it returns, and a run that dies without cleaning up — Infection killing a
  * timed-out mutant, a `timeout` wrapper, Ctrl-C, a fatal error — must not leave php -S behind,
  * orphaned to init and holding its port: no destructor or tearDownAfterClass() runs in any of those.

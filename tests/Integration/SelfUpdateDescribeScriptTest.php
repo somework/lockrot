@@ -13,7 +13,7 @@ use Symfony\Component\Process\Process;
 
 /**
  * `build/selfupdate-signature.php describe` writes the `lockrot.phar.meta.json` every release
- * publishes. The release workflow runs it; the archive reads its output. This runs the one against
+ * publishes. The release workflow runs it. The archive reads its output. This runs the one against
  * the other so the two formats cannot drift apart.
  *
  * `verify` is the workflow's check that archives in the field can follow a release: it is signed
@@ -135,7 +135,7 @@ final class SelfUpdateDescribeScriptTest extends TestCase
 
     /**
      * Composer accepts each of these as the platform, and each equals the declared floor once
-     * normalised; an archive reads none of them as a floor, so the release would never be offered.
+     * normalised. An archive reads none of them as a floor, so it never offers the release.
      *
      * @dataProvider floorsInAnotherSpelling
      */
@@ -176,8 +176,8 @@ final class SelfUpdateDescribeScriptTest extends TestCase
 
     /**
      * The platform PHP the archive's dependencies are resolved for is what the description
-     * advertises, so it has to be the floor both manifests declare: a raised `require.php` with a
-     * platform left at 7.4.0 would describe a floor the archive cannot run on.
+     * advertises, so it must be the floor both manifests declare. A raised `require.php` with a
+     * platform left at 7.4.0 will describe a floor the archive cannot run on.
      */
     public function testAPlatformThatIsNotTheDeclaredFloorFailsTheRelease(): void
     {

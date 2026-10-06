@@ -25,7 +25,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Years are integer tenths on the run clock (SPEC §2.1): `intdiv(10 * Δs + SPY / 2, SPY) / 10`,
+ * Years are integer tenths on the run clock: `intdiv(10 * Δs + SPY / 2, SPY) / 10`,
  * Δs clamped to 0, thresholds on the exact ratio, and every JSON writer pinned to the shortest
  * float form, so an inherited `serialize_precision=17` cannot print `6.9000000000000004`.
  */
@@ -86,7 +86,7 @@ final class YearsOnTheRunClockTest extends TestCase
     {
         $clock = Clock::fixed(self::NOW);
         $thresholds = new Thresholds();
-        // 3.05 years exactly: the float form printed 3.0 or 3.1 depending on the binary noise.
+        // 3.05 years exactly: a float form can print 3.0 or 3.1 from the binary noise.
         $at = self::ago(61 * intdiv(Clock::SECONDS_PER_YEAR, 20));
         $facts = FactsBuilder::facts(
             FactsBuilder::package(['version' => '1.2.0']),
