@@ -1,10 +1,8 @@
 name: CI
-# A pull request runs once, on its pull_request event: a push to a branch other than main runs
-# nothing on its own, so a branch with an open PR is not checked twice per push. main runs on push
-# (every merge is a PR, so that is the post-merge record), and so does a release/** branch, whose push
-# is where the mutation gate runs over the whole tree. Tags are phar.yml's. A new push to a PR
-# cancels the run still going for the old head — the checks the ruleset waits for are the new
-# head's — while on main every push keeps its own run.
+# A pull request runs once, on its pull_request event, so CI does not check a branch with an open
+# PR twice per push. main runs on push for the post-merge record. A release/** push runs the
+# mutation gate over the whole tree. A new push to a PR cancels the run for the old head, because
+# the ruleset waits for the new head's checks. On main, every push keeps its own run.
 on:
   push:
     branches: [main, 'release/**']
@@ -42,8 +40,8 @@ jobs:
           else
             vendor/bin/phpunit
           fi
-      # Composer 2.2 LTS bundles symfony/console 2.8.52 while require-dev resolves 5.4; the plugin e2e test through the
-      # real 2.2 binary (table and json output) is the only check that exercises the bundled 2.8 API.
+      # Composer 2.2 LTS bundles symfony/console 2.8, older than the version that require-dev resolves.
+      # This step runs the plugin e2e test through the real 2.2 binary, so it exercises the bundled 2.8 API.
       - name: Run the plugin e2e test through the Composer 2.2 binary
         if: matrix.composer == '2.2'
         env: {LOCKROT_E2E: '1', GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'}
@@ -69,31 +67,24 @@ jobs:
           $(composer global config bin-dir --absolute)/composer-require-checker check --config-file=composer-require-checker.json composer.json
       - name: Tests with coverage (whole src, informational)
         run: vendor/bin/phpunit --coverage-text --only-summary-for-coverage-text
-      # coverage-check reads the clover <metrics> "elements" attribute (methods + statements + conditionals
-      # combined), not PHPUnit's "Lines" %. The gated set measures 97.42% elements (2232/2291, 2026-09-16, src/Data/Forge included);
-      # among the uncovered ones are PharUpdater's Windows copy() branch, short-write branch and
-      # chmod-refused branch, none of which can be provoked on the runner.
-      # The formula would give floor(97.42) - 2 = 95; the gate stays at 94, which the suite clears with
-      # ~3 points to spare, so the number does not move every time a file is added.
+      # coverage-check reads the clover "elements" metric (methods, statements and conditionals), not
+      # PHPUnit's line percentage. Some branches cannot run on the runner, for example PharUpdater's
+      # Windows copy(), short-write and chmod-refused branches. Keep the gate some points below the
+      # measured value, so that a new file does not move it.
+      # Measurement: https://github.com/somework/lockrot/commit/238255e817a6f43a84b3f4fb3e484463457a313c
       - name: Core coverage gate
         run: |
           vendor/bin/phpunit -c phpunit.core-coverage.xml.dist --coverage-clover build/clover-core.xml
           composer global require --no-interaction "rregeer/phpunit-coverage-check:^0.3"
           $(composer global config bin-dir --absolute)/coverage-check build/clover-core.xml 94
-  # Its own job, sharded three ways: over the whole src tree one Infection run took 30 minutes on
-  # a 4-core runner, and a style or type error should not wait for it. Each shard runs the same
-  # configuration filtered to a group of directories, against its own threshold: the shards are
-  # unequal populations (measured 2026-09-17: 99.23%, 97.28% and 97.8% covered MSI), and one shared
-  # number would leave the middle one two mutants from red. Each threshold is that shard's floor
-  # minus one; infection.json5 keeps the whole-tree number for a local run.
+  # Mutation testing is a separate job, so a style or type error does not wait for it. Each shard runs
+  # the same configuration over a group of src directories. Each shard has its own minimum MSI, one
+  # below a measured covered MSI, because the shards have unequal populations. infection.json5 keeps
+  # the whole-tree threshold for a local run. Every directory of src must belong to one shard: a
+  # directory in none is never mutated. Measurements: https://github.com/somework/lockrot/pull/65
   #
-  # Five shards, each keeping the threshold of the shard it was cut from and, for the three older
-  # ones, the name main's ruleset requires. Every directory of src belongs to one shard: a directory
-  # in none is never mutated. Measurements: PR #65.
-  # The full run collects the coverage once and hands it to the five shards, which would otherwise
-  # each repeat the same instrumented suite. Its PHPUnit groups are the ones
-  # infection.json5 passes to Infection, so the shards read the coverage their own run would have
-  # collected. A pull request does not use it: most of its shards mutate nothing. Measurements: PR #65.
+  # The full run collects coverage once for all shards, with the PHPUnit groups that infection.json5
+  # passes to Infection. A pull request does not use it: most of its shards mutate nothing.
   mutation-coverage:
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
@@ -107,20 +98,11 @@ jobs:
         with: {name: mutation-coverage, path: build/coverage, retention-days: 1}
   mutation:
     needs: mutation-coverage
-    # Runs when the coverage job ran or was skipped (a pull request), not when it failed.
+    # Without this condition, a skipped coverage job (a pull request) skips this job too.
     if: ${{ !cancelled() && needs.mutation-coverage.result != 'failure' }}
     runs-on: ubuntu-latest
-    # 50, not 30: the composer/self-update shard measured 20m02s on 2026-09-19 and was cancelled at
-    # the 30-minute cap on the very next run of the same commit range, with its summary already
-    # printed (97% covered MSI against a threshold of 96) — a runner minute slower and a green shard
-    # reads as a failure. The cap is there to stop a runaway run, not to pace this one.
-    #
-    # It reached 40m23s on 2026-09-21 before the command tests stopped fetching the same two hundred
-    # packages once per test (tests/Support/MemoisingMetadataLoader.php). On the same runners, at the
-    # same three threads, the three shards then measured 7m05s, 9m31s and 2m47s against 40m23s,
-    # 18m09s and 9m05s, with every mutant verdict unchanged. The cap stays at 50 because its job is
-    # to catch a run that has gone wrong, and there is no cost to the headroom.
-    #
+    # Keep the cap far above a shard's run time: a slow runner cancels a green shard. The cap only
+    # stops a runaway run. Measurements: https://github.com/somework/lockrot/pull/6, /pull/10
     timeout-minutes: 50
     strategy:
       fail-fast: false
@@ -139,7 +121,7 @@ jobs:
       # A push to main or release/** mutates the whole tree against the shard's minimum MSI. A pull
       # request mutates only its changed lines, where a minimum MSI over few mutants is noise. There,
       # tools/mutation/pr_gate.py fails on an escape that tests/infection-equivalents.md does not
-      # account for. Keep the job names: main's ruleset requires them. Reasons: PR #65.
+      # account for. Keep the job names: main's ruleset requires them. Reasons: https://github.com/somework/lockrot/pull/65
       - name: What this shard mutates
         id: scope
         env: {EVENT: '${{ github.event_name }}', BASE_REF: '${{ github.base_ref }}', FILTER: '${{ matrix.shard.filter }}'}
@@ -175,18 +157,13 @@ jobs:
         run: |
           composer global config --no-plugins allow-plugins.infection/extension-installer true
           composer global require "infection/infection:^0.35"
-      # Infection 0.35 dropped --only-covered (uncovered code is skipped by default; --with-uncovered opts in).
-      # Whole tree, 2026-09-17: 3202 mutants, 56 equivalent escapes, 2 timed out (infinite-loop
-      # mutants, i.e. detections) -> MSI = Covered MSI 98.25%; ~6m20s on 8 threads locally, ~30 min
-      # unsharded on a 4-core runner. infection.json5 records why the timeout is what it is;
-      # tests/infection-equivalents.md records why every documented escape is equivalent. No
-      # GitHub annotations: dozens of warnings about documented equivalents per run would only teach
-      # people to ignore them; the escape listing is uploaded instead.
+      # infection.json5 gives the reason for its timeout, and tests/infection-equivalents.md the reason
+      # for each documented escape. The job writes no GitHub annotations: annotations for documented
+      # equivalents on every run teach people to ignore them. The job uploads the escape listing.
       #
-      # --only-covering-test-cases: a mutant runs the test methods that cover its line, not every
-      # method of their classes. A test that never runs the line cannot tell the mutant apart, and a
-      # surviving mutant would otherwise pay for every slow method of each class that covers it.
-      # Measurements: PR #65.
+      # --only-covering-test-cases: a mutant runs only the test methods that cover its line. A test that
+      # never runs the line cannot kill the mutant. Without the option, a surviving mutant runs every
+      # slow method of each class that covers it. Measurements: https://github.com/somework/lockrot/pull/65
       - if: steps.scope.outputs.mode == 'full'
         uses: actions/download-artifact@v8
         with: {name: mutation-coverage, path: build/coverage}
@@ -217,10 +194,10 @@ jobs:
       - if: always()
         uses: actions/upload-artifact@v7
         with: {name: 'infection (${{ matrix.shard.name }})', path: 'build/infection*.log', if-no-files-found: ignore}
-  # docs/ is rendered at lockrot.dev from the newest tag by the somework/lockrot.dev repository;
-  # --strict here is the only place a broken link, a link to a missing anchor or a page outside the
-  # nav fails before a release. The last two are warnings only because mkdocs.yml's `validation`
-  # block makes them so; mkdocs's defaults print them as info lines, which --strict lets through.
+  # somework/lockrot.dev renders docs/ from the newest tag. Before a release, --strict fails on a
+  # broken link, a link to a missing anchor or a page outside the nav. mkdocs.yml's `validation`
+  # block makes the last two warnings: by default mkdocs prints them as info lines, which --strict
+  # lets through.
   docs:
     runs-on: ubuntu-latest
     steps:
@@ -229,15 +206,11 @@ jobs:
         with: {python-version-file: .python-version, cache: pip, cache-dependency-path: docs/requirements.txt}
       - run: pip install -r docs/requirements.txt
       - run: mkdocs build --strict
-  # The corpus checks read lockrot's output against the data lockrot read, and the thing that can
-  # go wrong with them is that they quietly stop reading it: a renamed field, a skip path that
-  # swallows the population, a branch somebody deleted. This job is what proves they still check
-  # something — every problem key a check can emit has a recorded document mutated to make exactly
-  # that key come out, or a dated reason why no mutation can reach it. It does not watch lockrot:
-  # the recorded pages are frozen at their recording date, and a sentence reworded in src/Output/
-  # surfaces at the next re-record or on the next corpus run, as `unparsable`. Deliberately the
-  # opposite of a corpus run: no network, no token, no clock, nothing installed (the tool is
-  # stdlib-only Python, as CONTRIBUTING says the node checks are stdlib-only node).
+  # This job proves that the corpus checks read lockrot's output at all. Every problem key that a
+  # check can emit has a recorded document mutated to emit that key, or a reason why no mutation can
+  # reach it. The recorded pages are frozen, so a reworded sentence in src/Output/ shows as
+  # `unparsable` at the next re-record or corpus run. The job uses no network, token or clock and
+  # installs nothing: the tool is stdlib-only Python.
   corpus-selftest:
     runs-on: ubuntu-latest
     steps:
@@ -246,7 +219,7 @@ jobs:
         with: {python-version-file: .python-version}
       - run: python -m compileall -q tools/corpus
       - run: python -m unittest discover -s tools/corpus/tests -t tools/corpus/tests
-      # The pull-request mutation gate and its shard configuration, stdlib-only for the same reasons.
+      # The pull-request mutation gate and its shard configuration, also stdlib-only Python.
       - run: python -m compileall -q tools/mutation
       - run: python -m unittest discover -s tools/mutation/tests -t tools/mutation/tests
   e2e:
@@ -258,13 +231,13 @@ jobs:
       - run: composer install --no-interaction
       - run: LOCKROT_E2E=1 vendor/bin/phpunit --group e2e --filter PluginTest
         env: {GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'}
-      # The token is what lets ComposerHttpClientNetworkTest prove that Composer's github-oauth and
-      # lockrot's own header no longer meet on the wire; without it that test is skipped.
+      # ComposerHttpClientNetworkTest needs the token to prove that Composer's github-oauth and
+      # lockrot's own header do not meet on the wire. Without the token, the test skips.
       - run: vendor/bin/phpunit --group network
         env: {GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'}
-  # PharTest is the only check that the PHAR still exposes lockrot's two commands and nothing else,
-  # and that it never loads the inspected project's classes. phar.yml builds on tags alone, so
-  # without this job a regression in bin/lockrot would merge green and surface at release time.
+  # PharTest checks that the PHAR exposes lockrot's two commands and nothing else, and that it never
+  # loads the inspected project's classes. phar.yml builds on tags alone, so without this job a
+  # regression in bin/lockrot can merge green and show only at release time.
   phar:
     runs-on: ubuntu-latest
     steps:
@@ -272,17 +245,17 @@ jobs:
       - uses: shivammathur/setup-php@v2
         with: {php-version: '8.4', tools: 'composer:2.10.3'}
       - run: composer install --no-interaction
-      # build/phar/composer.lock records lockrot's own require and autoload as they were when the
-      # lock was written, and `composer install` does not notice when composer.json in the root
-      # changes them (the lock's content-hash covers build/phar/composer.json alone). Refresh the
-      # entry and fail if that changes the lock: the fix is to commit the refreshed lock.
+      # build/phar/composer.lock records lockrot's own require and autoload, and `composer install` does
+      # not notice when the root composer.json changes them (the lock's content-hash covers
+      # build/phar/composer.json alone). Refresh the entry and fail if that changes the lock: the fix
+      # is to commit the refreshed lock.
       - run: composer update somework/lockrot --no-install --no-plugins --no-interaction --working-dir=build/phar
       - run: git diff --exit-code build/phar/composer.lock
       - run: build/build-phar.sh
       - run: LOCKROT_E2E=1 vendor/bin/phpunit --group e2e --filter PharTest
-      # The release workflow's signing helper, exercised on every commit with a throw-away key:
-      # wrap and unwrap must round-trip, openssl must accept the unwrapped bytes, and the archive's
-      # verifier must refuse a signature by a key that is not the release key.
+      # This step runs the release workflow's signing helper with a throw-away key: wrap and unwrap
+      # must round-trip, openssl must accept the unwrapped bytes, and the archive's verifier must
+      # refuse a signature by a key that is not the release key.
       - name: Self-update signature helper round trip
         run: |
           openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out /tmp/throwaway.pem

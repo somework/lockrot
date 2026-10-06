@@ -2,21 +2,15 @@ name: PHAR
 on:
   push: {tags: ['v*']}
   workflow_dispatch:
-# Tag builds and default-branch dispatches are signed twice and attested by GitHub. The GPG
-# signature (lockrot.phar.asc) is for people and PHIVE: the key's public half is
-# lockrot-release-key.asc in the repository root (also on keys.openpgp.org and
-# keyserver.ubuntu.com); CI holds only its signing subkey (GPG_PRIVATE_KEY, GPG_PASSPHRASE). The
-# RSA signature (lockrot.phar.sig.json) is for the archive's own self-update, checked against the key
-# built into it (ReleaseKey::PEM, published as lockrot-selfupdate-key.pub); CI holds the private
-# half as SELFUPDATE_PRIVATE_KEY with SELFUPDATE_PASSPHRASE. The GPG signature is checked against the
-# committed public key, and the self-update signature against the key the previous release's
-# archive carries — what every archive in the field will check — so a key rotation that skips its
-# transition release, or a secret that no longer matches the key in the field, fails the build
-# instead of shipping an archive nobody can follow.
+# A signed build carries two signatures and a GitHub attestation. The GPG signature (lockrot.phar.asc)
+# is for people and PHIVE, and the build checks it against lockrot-release-key.asc. The RSA signature
+# (lockrot.phar.sig.json) is for self-update (ReleaseKey::PEM), and the build checks it against the
+# key that the previous release's archive carries. Thus a key rotation that skips its transition
+# release, or a secret that does not match the key in the field, fails the build.
 #
-# Signing and attestation run for a tag (pushed or dispatched) and for a dispatch from the default
-# branch (a key rotation is rehearsed there), never for a dispatch from another branch: a
-# write-access dispatch must not be able to mint a release-signed archive out of arbitrary code.
+# Signing and attestation run for a tag and for a dispatch from the default branch, where a key
+# rotation is rehearsed. They never run for a dispatch from another branch: a write-access dispatch
+# must not mint a release-signed archive out of arbitrary code.
 env:
   LOCKROT_SIGNING_KEY: 39ECC3F64AE8D06A9A63FD99AB6F7F52AE513141
   SIGN: ${{ startsWith(github.ref, 'refs/tags/') || github.ref == format('refs/heads/{0}', github.event.repository.default_branch) }}
@@ -28,19 +22,17 @@ jobs:
       id-token: write # build provenance attestation
       attestations: write
     steps:
-      # Full history and tags: the self-update check below reads the key the previous release
-      # carries from its tag.
+      # Full history and tags: the self-update verification reads the previous release's key from its tag.
       - uses: actions/checkout@v7
         with: {fetch-depth: 0}
-      # Composer is part of the reproducible-build recipe (it writes vendor/composer/*.php from its
-      # own source); the version here is what docs/phar.md tells a rebuilder to use, at the tag.
+      # Composer is part of the reproducible-build recipe: it writes vendor/composer/*.php from its own
+      # source. A rebuilder uses the version that this file pins at the tag.
       - uses: shivammathur/setup-php@v2
         with: {php-version: '8.4', tools: 'composer:2.10.3'}
       - run: composer install --no-interaction
       - run: build/build-phar.sh
-      # Written from inside build/ so the file reads "<hex>  lockrot.phar": `sha256sum -c` is run by
-      # whoever downloaded the PHAR, next to their own copy, not against a build/ path that only
-      # exists here. lockrot.phar self-update reads the hash and ignores the name either way.
+      # Run from inside build/ so the file reads "<hex>  lockrot.phar": a downloader runs `sha256sum -c`
+      # next to their own copy, not against a build/ path. lockrot.phar self-update ignores the name.
       - run: cd build && sha256sum lockrot.phar > lockrot.phar.sha256
       # A throw-away GNUPGHOME per step: the signing key never touches the runner's default keyring,
       # and the passphrase travels over a pipe, never in an argument that `ps` could show.
@@ -69,21 +61,16 @@ jobs:
           # place of GOODSIG — and a signature every downloader's gpg will complain about.
           grep -E "^\[GNUPG:\] VALIDSIG [0-9A-F]{40} .* ${LOCKROT_SIGNING_KEY}$" build/gpg-status.txt
           grep -E "^\[GNUPG:\] GOODSIG " build/gpg-status.txt
-      # The second signature is for the archive's own self-update: an RSA (PKCS#1 v1.5, SHA-384)
-      # signature over the same bytes, in Composer's `{"sha384": "<base64>"}` file format, checked
-      # by Lockrot\SelfUpdate\ReleaseSignatureVerifier against the key built into the archive. The
-      # private key lives in a throw-away directory for the length of the step — removed on every
-      # exit, a failed openssl included — and the passphrase is read from the environment by
-      # openssl itself, never from an argument.
+      # The self-update signature is RSA (PKCS#1 v1.5, SHA-384) over the same bytes, in Composer's
+      # `{"sha384": "<base64>"}` format, for Lockrot\SelfUpdate\ReleaseSignatureVerifier. The private
+      # key lives in a throw-away directory that the trap removes on every exit. openssl reads the
+      # passphrase from the environment, never from an argument.
       #
-      # The same step writes lockrot.phar.meta.json, which self-update chooses a release by without
-      # downloading it: the lowest PHP the archive runs on (config.platform.php of
-      # build/phar/composer.json) and the SHA-256 fingerprint of the key that signed it. The
-      # fingerprint is taken from the public half of the private key just used, not from the
-      # committed key file, so the description names the actual signer — which is what makes a
-      # rotation's transition release (signed with the old key, carrying the new one) describe
-      # itself correctly. build/selfupdate-signer.pub and build/previous-selfupdate-key.pub are not
-      # release assets: the upload glob is build/lockrot.phar*.
+      # lockrot.phar.meta.json lets self-update choose a release without a download. It holds the
+      # lowest PHP that the archive runs on (config.platform.php of build/phar/composer.json) and the
+      # SHA-256 fingerprint of the signing key. The fingerprint comes from the private key that signed,
+      # not from the committed key file, so a rotation's transition release names its real signer.
+      # The upload glob build/lockrot.phar* omits the .pub files.
       - name: Sign the PHAR for self-update
         if: env.SIGN == 'true'
         env:
@@ -98,21 +85,15 @@ jobs:
           rm build/lockrot.phar.sig.bin
           openssl pkey -in "$KEYDIR/key.pem" -passin env:SELFUPDATE_PASSPHRASE -pubout -out build/selfupdate-signer.pub
           build/selfupdate-signature.php describe build/phar/composer.json build/selfupdate-signer.pub > build/lockrot.phar.meta.json
-      # Every check is against the key the previous release carries — lockrot-selfupdate-key.pub at
-      # the newest v* tag before this commit — because that is the key every archive in the field
-      # verifies this release with. openssl checks the signature against it and against the signer's
-      # own public half; the archive's own verifier class checks it again (the code a user's
-      # self-update runs); and the description must name it. A rotation done in one step — the new
-      # key in ReleaseKey::PEM, the .pub and the secret at once — fails all of these, as it must: no
-      # archive in the field could follow it.
+      # The checks use the key that the previous release carries (lockrot-selfupdate-key.pub at the
+      # newest earlier v* tag), because every archive in the field verifies this release with it.
+      # openssl checks the signature against it and against the signer's public half. The archive's
+      # own verifier class checks it again, and the description must name it. A rotation done in one
+      # step fails these checks, as it must: no archive in the field can follow it.
       #
-      # There is nothing to relax for the transition release of a rotation (signed with the old key,
-      # carrying the new one in ReleaseKey::PEM and the .pub): it is signed with the previous
-      # release's key, so it passes, and `verify` says it is a transition release because the key
-      # this build carries is another one. What a transition release is exempt from is only the
-      # check this build's own key would make — that it signed the release — which the next release
-      # makes instead: its previous release is the transition release, so it must be signed with
-      # the new key (see SECURITY.md).
+      # A rotation's transition release carries the new key and the previous key's signature, so it
+      # passes, and `verify` reports a transition release. The next release must then carry the new
+      # key's signature (SECURITY.md).
       - name: Verify the self-update signature with the key the previous release carries
         if: env.SIGN == 'true'
         run: |
@@ -134,10 +115,10 @@ jobs:
       - if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v3
         with: {files: 'build/lockrot.phar*'}
-      # lockrot.dev renders docs/ from the newest tag; this tells it a new one exists. The release is
-      # already published at this point, so a missing SITE_DISPATCH_TOKEN (a fine-grained token with
-      # Contents: write on somework/lockrot.dev only) must not turn a good release red — the site
-      # also rebuilds on a weekly schedule.
+      # lockrot.dev renders docs/ from the newest tag, and this step tells it that a new tag exists.
+      # The release is published at this point, so a missing SITE_DISPATCH_TOKEN (a fine-grained token
+      # with Contents: write on somework/lockrot.dev only) must not turn it red. The site also
+      # rebuilds on a weekly schedule.
       - if: startsWith(github.ref, 'refs/tags/')
         name: Ask lockrot.dev to rebuild
         continue-on-error: true
