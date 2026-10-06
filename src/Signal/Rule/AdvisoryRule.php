@@ -13,17 +13,10 @@ use Lockrot\Signal\Signal;
 use Lockrot\Signal\SignalRule;
 
 /**
- * S9: security advisories that affect the installed version — what `composer audit` reports,
- * carried on the finding so the report can say what lockrot alone knows: whether a fix is coming.
- * The signal never decides a verdict; {@see \Lockrot\Verdict\Finding} raises the priority when the
- * verdict says nobody will publish the fix.
- *
- * Each advisory is checked against two releases the repository already lists: the highest stable
- * tag on the installed version's branch, and the highest stable tag of the package. One that
- * neither affects is already fixed — by the branch's tag when that is enough (a `composer update`
- * inside the constraint gets it), else by the package's (a new major). "No fix expected" is then
- * said only of the advisories nothing listed fixes; the finding decides which of the two releases
- * counts, since a left-behind branch will not see the package's fix land on it.
+ * S9: the security advisories that affect the installed version, each with the release that fixes
+ * it (docs/verdicts.md#security-advisories). The signal never decides a verdict.
+ * {@see \Lockrot\Verdict\Finding} decides which of the two fixing releases counts and raises the
+ * priority.
  *
  * @internal
  */
@@ -32,7 +25,7 @@ final class AdvisoryRule implements SignalRule
     /** Advisories named in the summary before the rest are counted. */
     public const NAMED = 3;
 
-    /** Packagist's severity scale, worst first; an advisory without one sorts last. */
+    /** Packagist's severity scale, worst first. An advisory without one sorts last. */
     private const SEVERITY_RANK = ['critical' => 0, 'high' => 1, 'medium' => 2, 'low' => 3];
 
     public function evaluate(PackageFacts $facts): ?Signal
@@ -82,9 +75,6 @@ final class AdvisoryRule implements SignalRule
     }
 
     /**
-     * `fixed by 6.3.0` when every advisory is, else one count per fixing release, the branch's
-     * first: `1 fixed by v3.4.47, 3 fixed by v8.1.7`.
-     *
      * @param array<string, int> $fixedBy
      */
     private static function fixedClause(array $fixedBy, int $count): string
@@ -101,19 +91,12 @@ final class AdvisoryRule implements SignalRule
     }
 
     /**
-     * The two releases a fix is looked for in: the highest stable tag on the installed version's
-     * branch (none for a branch snapshot, or a branch the repository does not list) and the
-     * package's highest stable tag across branches. When the two are one release the second is
-     * checked to no effect: what the first did not fix, the same tag does not fix either.
-     *
-     * Either counts only above the installed version. The repository can list nothing newer than
-     * what is installed — a lock written against a tag since deleted, a pre-release ahead of every
-     * stable tag — and an advisory whose range spares an older tag is not fixed by going back to
-     * it. A branch snapshot is above no tag and below none; the package's highest tag stands for it
-     * as it is.
-     *
-     * The third element says whether the releases were read at all: false without metadata or with
-     * an installed version no parser reads, where a null candidate means nothing was compared.
+     * The releases that a fix is looked for in: the highest stable tag on the installed version's
+     * branch (none for a branch snapshot or an unlisted branch) and the package's highest stable
+     * tag. Either counts only above the installed version, because going back to an older tag that
+     * an advisory range spares is not a fix. A branch snapshot is above no tag and below none.
+     * The third element is false when nothing was compared: no metadata, or an installed version
+     * that no parser reads.
      *
      * @return array{?array{normalized: string, pretty: string}, ?array{normalized: string, pretty: string}, bool}
      */
@@ -146,10 +129,8 @@ final class AdvisoryRule implements SignalRule
     }
 
     /**
-     * The tag as a fix candidate, null when there is none or it is not above the installed version.
-     *
      * @param ?array{normalized: string, pretty: string, at: ?\DateTimeImmutable} $tag
-     * @param ?string                                                             $installed normalized; null for a branch snapshot, which no tag is compared with
+     * @param ?string                                                             $installed normalized, null for a branch snapshot that no tag is compared with
      *
      * @return ?array{normalized: string, pretty: string}
      */
@@ -163,8 +144,8 @@ final class AdvisoryRule implements SignalRule
     }
 
     /**
-     * Severity first, worst on top, then the repository's own order (newest report first on
-     * Packagist) — so the three names the line carries are the three that matter most.
+     * Worst severity first, then the repository's own order (newest report first on Packagist),
+     * so the three names that the summary carries are the three that matter most.
      *
      * @param list<Advisory> $advisories
      *

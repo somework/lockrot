@@ -20,10 +20,10 @@ final class PackageFacts
     private ?string $activityNotChecked;
 
     /**
-     * @param list<Advisory> $advisories         the security advisories affecting the installed version
+     * @param list<Advisory> $advisories
      * @param ?string        $activityNotChecked why the repository was never asked about, null when it was
-     *                                           ({@see \Lockrot\Analyzer\Analyzer::activityNotCheckedReasons()});
-     *                                           an answer of "no such repository" is a check that ran
+     *                                           ({@see \Lockrot\Analyzer\Analyzer::activityNotCheckedReasons()}).
+     *                                           An answer of "no such repository" is a check that ran.
      */
     public function __construct(LockedPackage $package, ?PackageMetadata $metadata, ?RepositoryActivity $activity, array $advisories = [], ?string $activityNotChecked = null)
     {
@@ -34,7 +34,6 @@ final class PackageFacts
         $this->activityNotChecked = $activityNotChecked;
     }
 
-    /** Why the repository activity behind S3 and S4 was never fetched, null when it was. */
     public function activityNotChecked(): ?string
     {
         return $this->activityNotChecked;

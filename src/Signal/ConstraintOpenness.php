@@ -10,8 +10,7 @@ use Composer\Semver\VersionParser;
 use Lockrot\Data\Php\PhpReleaseDates;
 
 /**
- * Decides whether a php requirement is an "open promise": it accepts the target PHP version only because
- * it has no upper bound, and was written for an older major (e.g. ">=5.3.0" accepting PHP 8.4).
+ * Decides whether a php requirement is an open promise, the test of S5: docs/verdicts.md#old-promise.
  *
  * @internal
  */
@@ -53,8 +52,8 @@ final class ConstraintOpenness
     }
 
     /**
-     * The PHP major the constraint was written for: the major of its lower bound (`>=5.3.0` → 5,
-     * `>= 7` → 7), 0 for one with no lower bound (`*`), null when the string cannot be parsed.
+     * The PHP major that the constraint was written for: the major of its lower bound (`>=5.3.0`
+     * is 5, `>= 7` is 7). It is 0 with no lower bound (`*`) and null when the string cannot be parsed.
      */
     public function lowerMajor(string $constraint): ?int
     {
@@ -68,8 +67,6 @@ final class ConstraintOpenness
     }
 
     /**
-     * Parses the constraint and builds the target-version constraint used to test it.
-     *
      * @return array{0: ConstraintInterface, 1: Constraint}|null null when the constraint string is not parseable
      */
     private function parse(string $constraint, string $targetPhp): ?array

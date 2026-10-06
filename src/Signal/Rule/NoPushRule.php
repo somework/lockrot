@@ -27,7 +27,6 @@ final class NoPushRule implements SignalRule
         if ($activity === null) {
             return null;
         }
-        // The reading S4 judges is the one it quotes: date, years and level all come from it.
         $reading = $this->age->pushOf($activity);
         $level = $reading->level();
         if ($level === null) {

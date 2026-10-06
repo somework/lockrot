@@ -12,15 +12,9 @@ use Lockrot\Signal\SignalRule;
 
 /**
  * S5: the installed release was written for an older PHP major and admits the target PHP only
- * because nothing in its constraint stops it. Three things have to hold: the constraint's lower
- * bound is on a major below the target's (`>=7.2` against PHP 8.4), it has no upper bound (so the
- * target satisfies it — `^7.2 || ^8.0` names PHP 8 and is a promise its author made on purpose),
- * and the release predates the target *major*: a `>=7.2` cut in 2019 could not have been tested on
- * PHP 8 because PHP 8 did not exist, while one cut in 2022 was written with PHP 8.1 on every CI
- * matrix and differs from `^7.2 || ^8.0` in spelling alone. The target minor's own GA is not the
- * line — nothing older than PHP 8.4 was tested on 8.4, `^8.0` included, and that is not a promise
- * about a major the author never saw. On the weekly watch, 156 of the 178 `old-promise` verdicts
- * the minor line produced were releases of the PHP 8 era.
+ * because its constraint has no upper bound (docs/verdicts.md#old-promise). The line is the GA of
+ * the target's major, not of its minor: a release cut after PHP 8.0 was written with PHP 8 on
+ * its CI matrix, so its open `>=7.2` differs from `^7.2 || ^8.0` in spelling alone.
  *
  * @internal
  */

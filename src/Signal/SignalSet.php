@@ -29,8 +29,8 @@ final class SignalSet
     }
 
     /**
-     * @param string  $targetPhp  the PHP the run targets: S5 measures the installed release against it, S8 names no branch outside it
-     * @param ?string $projectPhp the project's own `require.php`, the other floor S8 keeps to ({@see PhpFloor}); null when the manifest has none
+     * @param ?string $projectPhp the project's own `require.php`, the other floor S8 keeps to
+     *                            ({@see PhpFloor}), null when composer.json has none
      */
     public static function default(Clock $clock, Thresholds $thresholds, string $targetPhp, PhpReleaseDates $dates, ?string $projectPhp = null): self
     {
