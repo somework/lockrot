@@ -38,7 +38,7 @@ final class CachingHttpClientTest extends TestCase
                 $out = [];
                 foreach ($urls as $url) {
                     ++$this->calls;
-                    $out[$url] = $this->responses[$url] ?? HttpResult::failure($url, 'unexpected', new \DateTimeImmutable());
+                    $out[$url] = $this->responses[$url] ?? HttpResult::failure($url, 'unexpected', new \DateTimeImmutable('2026-09-14T00:00:00+00:00'));
                 }
                 return $out;
             }
@@ -85,7 +85,6 @@ final class CachingHttpClientTest extends TestCase
         self::assertSame('new', $client->fetchAll(['https://a'])['https://a']->body());
         self::assertSame(1, $calls);
 
-        // One second younger and it is still fresh.
         $calls = 0;
         $cache->set('https://a', new HttpResult('https://a', 200, 'old', $clock->now()->modify('-'.(self::TTL - 1).' seconds')));
         $client = new CachingHttpClient($this->inner(['https://a' => $fresh], $calls), $cache, self::TTL, $clock);
@@ -153,7 +152,7 @@ final class CachingHttpClientTest extends TestCase
                 $this->seenHeaders = $headers;
                 $out = [];
                 foreach ($urls as $url) {
-                    $out[$url] = new HttpResult($url, 200, 'ok', new \DateTimeImmutable());
+                    $out[$url] = new HttpResult($url, 200, 'ok', new \DateTimeImmutable('2026-09-14T00:00:00+00:00'));
                 }
                 return $out;
             }
@@ -163,7 +162,6 @@ final class CachingHttpClientTest extends TestCase
         self::assertSame(['Authorization: token abc'], $inner->seenHeaders);
     }
 
-    /** A hit, an offline hit and the stale-on-failure fallback all say so; a fetch does not. */
     public function testAnswersServedFromTheCacheAreMarkedAsSuch(): void
     {
         $clock = Clock::fixed('2026-09-14T12:00:00+00:00');
