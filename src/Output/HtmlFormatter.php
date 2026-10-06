@@ -7,6 +7,7 @@ namespace Lockrot\Output;
 use Lockrot\Analyzer\Report;
 use Lockrot\Html\PageData;
 use Lockrot\Html\ReportDocument;
+use Lockrot\Json\JsonWriter;
 use Lockrot\Verdict\Verdict;
 
 /**
@@ -108,8 +109,8 @@ final class HtmlFormatter implements FormatterInterface
      */
     private static function payload(array $document): string
     {
-        $json = json_encode($document, \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE);
-        if ($json === false) {
+        $json = JsonWriter::encode($document, \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE);
+        if ($json === null) {
             throw new \RuntimeException('Cannot encode the report for the page: '.json_last_error_msg());
         }
 

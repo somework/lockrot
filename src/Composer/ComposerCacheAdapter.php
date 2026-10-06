@@ -7,6 +7,7 @@ namespace Lockrot\Composer;
 use Composer\Cache;
 use Lockrot\Data\Cache\CacheInterface;
 use Lockrot\Data\Http\HttpResult;
+use Lockrot\Json\JsonWriter;
 
 /**
  * Stores HTTP envelopes in Composer's own cache directory, through Composer\Cache.
@@ -38,8 +39,8 @@ final class ComposerCacheAdapter implements CacheInterface
 
     public function set(string $key, HttpResult $result): void
     {
-        $json = json_encode($result->toEnvelope(), \JSON_UNESCAPED_SLASHES);
-        if ($json !== false) {
+        $json = JsonWriter::encode($result->toEnvelope(), \JSON_UNESCAPED_SLASHES);
+        if ($json !== null) {
             $this->cache->write($this->file($key), $json);
         }
     }
