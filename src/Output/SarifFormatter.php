@@ -13,23 +13,10 @@ use Lockrot\Verdict\Priority;
 use Lockrot\Verdict\Verdict;
 
 /**
- * SARIF 2.1.0 (OASIS), the format GitHub code scanning ingests through
- * `github/codeql-action/upload-sarif`, so a `composer lockrot` run can show up in a repository's
- * Security tab and on the pull request.
+ * SARIF 2.1.0 for GitHub code scanning: docs/ci.md#-formatsarif. The specification is at
+ * https://docs.oasis-open.org/sarif/sarif/v2.1.0/os/sarif-v2.1.0-os.html
  *
- * One run, one rule per verdict actually present in the report, one result per finding, each
- * located on the `"name"` line of the package's entry in the analysed lock. `results` keeps the report's
- * own priority-then-severity-then-name order so two runs over the same lock produce byte-identical
- * output.
- *
- * A result carries the priority twice, for the two ways a consumer reads it: as `rank`, the numeric
- * field SARIF defines for exactly this, and as `properties.priority` next to `properties.direct`
- * and `properties.dev`, the two facts it is derived from. `ruleId` stays on the verdict; `level`
- * follows the run's fail-on threshold ({@see FormatContext::levelOf()}), whichever kind it names.
- *
- * The location's `uri` is the lock's path relative to the project directory
- * ({@see FormatContext::lockName()}) — `composer.lock`, or `alt.lock` under `COMPOSER=alt.json` — and
- * `%SRCROOT%` is that directory, so the two resolve to the file the run read.
+ * `results` keeps the report's order, so two runs over the same lock give byte-identical output.
  *
  * @internal
  */
@@ -41,15 +28,13 @@ final class SarifFormatter implements FormatterInterface
     private const URI_BASE_ID = '%SRCROOT%';
 
     /**
-     * SARIF 2.1.0 §3.27.20 types `result.rank` as a number from 0.0 to 100.0. The five priority
-     * levels are evenly spaced over it, so `none` is 0.0 and `critical` 100.0 and a consumer that
-     * sorts by rank reads the report in the order lockrot prints it.
+     * SARIF 2.1.0 §3.27.20 types `result.rank` as a number from 0.0 to 100.0. The priorities spread
+     * evenly over it: docs/ci.md#how-each-format-marks-a-finding.
      */
     private const RANK_STEP = 25.0;
 
     /**
-     * The README's verdict table, as {short, full} per verdict. Kept in the same wording so a
-     * code-scanning alert says exactly what the README says.
+     * The rule text per verdict, as {short, full}: docs/verdicts.md#the-nine-verdicts.
      *
      * @var array<string, array{0: string, 1: string}>
      */
@@ -146,8 +131,6 @@ final class SarifFormatter implements FormatterInterface
             'name' => $verdict,
             'shortDescription' => ['text' => $verdict.': '.$short],
             'fullDescription' => ['text' => $full],
-            // The rule's own level, before the run's fail-on threshold is applied to a finding:
-            // every flagged verdict warns, the rest are notes.
             'defaultConfiguration' => ['level' => Verdict::flagged($verdict) ? FormatContext::LEVEL_WARNING : FormatContext::LEVEL_NOTE],
             'helpUri' => self::HELP_URI,
         ];
@@ -183,8 +166,7 @@ final class SarifFormatter implements FormatterInterface
             'direct_dependents' => $finding->directDependents(),
             'data_date' => $dataDate === null ? null : $dataDate->format(\DATE_ATOM),
         ];
-        // Only when the run actually had a baseline to compare against: a null here would read as
-        // "compared and unclassified" rather than "not compared at all".
+        // Only with a baseline: a null reads as compared and unclassified, not as uncompared.
         $status = $baseline === null ? null : $baseline->statusOf($finding->package());
         if ($status !== null) {
             $properties['baseline'] = $status;
@@ -197,8 +179,8 @@ final class SarifFormatter implements FormatterInterface
             'rank' => Priority::rank($finding->priority()) * self::RANK_STEP,
             'message' => ['text' => $this->message($finding)],
             'locations' => [['physicalLocation' => $physicalLocation]],
-            // The package name alone identifies a finding across runs: one result per package, and
-            // the line it sits on moves whenever anything above it in the lock changes.
+            // The line of an entry moves when the lock changes, so only the package name identifies
+            // a finding across runs.
             'partialFingerprints' => ['lockrot/package' => $finding->package()],
             'properties' => $properties,
         ];
@@ -207,8 +189,7 @@ final class SarifFormatter implements FormatterInterface
     /** @return array<string, mixed> */
     private function invocation(Report $report): array
     {
-        // lockrot ran to completion whatever the findings say: a failed lookup is carried by the
-        // notes below and by the `unknown` verdict, never by claiming the tool itself failed.
+        // A failed lookup shows in the notes and the `unknown` verdict, never as a tool failure.
         $invocation = ['executionSuccessful' => true];
 
         $notes = $report->notes();
@@ -239,11 +220,9 @@ final class SarifFormatter implements FormatterInterface
     }
 
     /**
-     * The `originalUriBaseIds` entry for %SRCROOT%: an absolute file URI for the directory the lock's
-     * name is relative to, with the trailing slash SARIF 2.1.0 §3.4.4 requires of a directory URI.
-     *
-     * Each path segment is percent-encoded on its own so the separators survive: a checkout
-     * directory may legally hold a space, `#`, `?` or non-ASCII, none of which a URI can carry raw.
+     * An absolute file URI with the trailing slash that SARIF 2.1.0 §3.4.4 requires of a directory.
+     * Each segment is percent-encoded on its own so the separators survive: a directory can hold a
+     * space, `#`, `?` or non-ASCII.
      */
     private static function directoryUri(string $directory): string
     {
@@ -258,9 +237,9 @@ final class SarifFormatter implements FormatterInterface
     }
 
     /**
-     * The lock's `/`-separated relative name as a relative URI reference, each segment
-     * percent-encoded on its own. Unlike in {@see directoryUri()}, `:` is escaped too: in the first
-     * segment of a relative reference it would read as the end of a URI scheme (RFC 3986 §4.2).
+     * The lock's name as a relative URI reference, each segment percent-encoded on its own. A `:`
+     * in the first segment ends a URI scheme (RFC 3986 §4.2), so it is escaped here, unlike in
+     * {@see directoryUri()}.
      */
     private static function relativeUri(string $name): string
     {
@@ -270,12 +249,9 @@ final class SarifFormatter implements FormatterInterface
     /** @param array<string, mixed> $document */
     private static function encode(array $document): string
     {
-        // PRESERVE_ZERO_FRACTION keeps `rank` a JSON number with a fraction — 100.0, not 100 — so a
-        // consumer that distinguishes the two reads every rank as the float SARIF types it as.
+        // PRESERVE_ZERO_FRACTION writes `rank` as 100.0, not 100, the float that SARIF types it as.
         $json = JsonWriter::encode($document, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_PRESERVE_ZERO_FRACTION);
-        // Everything above is scalars, lists and string-keyed arrays built from Report data, so this
-        // is unreachable in practice; guarded explicitly so a future encoding failure fails loudly
-        // instead of silently emitting the string "false" (same guard as JsonFormatter).
+        // Report data always encodes. This guard keeps a failure from becoming the string "false".
         if ($json === null) {
             throw new \RuntimeException('Cannot encode report as SARIF: '.json_last_error_msg());
         }

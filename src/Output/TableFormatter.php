@@ -10,27 +10,20 @@ use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Priority;
 
 /**
- * The default format: a grouped, width-aware list.
+ * The `table` format, a list grouped by priority (docs/example-run.md#the-table-format). A row is
+ * prose, not a cell in a box, because a box needs a terminal wider than the widest evidence string.
  *
- * Findings are grouped by priority, headed by their level and count, and each row is two lines of
- * prose rather than a cell in a five-column box — a box only reads on a terminal wide enough to
- * hold the widest evidence string, which is not a terminal anybody has. Nothing machine-readable
- * depends on this shape; `--format=json` exists for that.
- *
- * The result is {@see ConsoleMarkup}, which only {@see ConsoleMarkup::render()} reads — never
- * Symfony's tag formatter. Every string that comes from the analysed project is passed through
- * {@see ConsoleMarkup::escape()} before it is written, so a `<` or a backslash in a constraint, a
- * package name or a note prints as written and can never be read as a tag. Styles use explicit
- * closing tags rather than `</>`, so the markup says which style each one ends.
+ * The result is {@see ConsoleMarkup}, which only {@see ConsoleMarkup::render()} reads, never
+ * Symfony's tag formatter. Every string from the analysed project goes through
+ * {@see ConsoleMarkup::escape()}, so a `<` or a backslash prints as written and is never a tag.
  *
  * @internal
  */
 final class TableFormatter implements FormatterInterface
 {
-    /** `old-promise` and `left-behind`, the longest bare verdicts: the label column never gets narrower than this. */
+    /** The width of `old-promise` and `left-behind`, the longest bare verdicts. */
     private const MIN_LABEL_WIDTH = 11;
 
-    /** However narrow the terminal claims to be, text is never wrapped tighter than this. */
     private const MIN_WRAP_WIDTH = 20;
 
     /** Columns of whitespace before the label and between the label and the text. */
@@ -59,9 +52,6 @@ final class TableFormatter implements FormatterInterface
     }
 
     /**
-     * The grouped rows, followed by the blank line that separates them from the summary block — the
-     * same blank line the clean report puts under its one line, so both shapes read alike.
-     *
      * @param list<Finding> $rows
      *
      * @return list<string>
@@ -89,8 +79,7 @@ final class TableFormatter implements FormatterInterface
     }
 
     /**
-     * The rows split by priority, in {@see Priority::all()} order, empty levels dropped. The order
-     * inside a group is the report's own, which already sorts by priority first.
+     * Groups in {@see Priority::all()} order. Inside a group, the order is the report's.
      *
      * @param list<Finding> $rows
      *
@@ -106,18 +95,12 @@ final class TableFormatter implements FormatterInterface
         return array_filter($groups, static fn (array $group): bool => $group !== []);
     }
 
-    /** `critical (2)`; the unflagged rows `--all` adds are headed by what they are instead. */
     private static function header(string $priority, int $count): string
     {
         return ($priority === Priority::NONE ? 'not flagged' : $priority).' ('.$count.')';
     }
 
     /**
-     * One row: the label, the package, the version and where it is required from on the first line,
-     * the evidence on the lines after it. Both halves are wrapped to the terminal and every
-     * continuation line is indented past the label column, so the label stays the only thing in the
-     * left margin.
-     *
      * @return list<string>
      */
     private function rowLines(Finding $finding, ?BaselineComparison $baseline, int $labelWidth, int $indent, int $wrap): array
@@ -142,12 +125,7 @@ final class TableFormatter implements FormatterInterface
         return $lines;
     }
 
-    /**
-     * Widest label among the rows about to be printed, so the column fits without measuring the
-     * findings that are not shown.
-     *
-     * @param list<Finding> $rows
-     */
+    /** @param list<Finding> $rows */
     private function labelWidth(array $rows, ?BaselineComparison $baseline): int
     {
         $width = self::MIN_LABEL_WIDTH;
@@ -158,11 +136,7 @@ final class TableFormatter implements FormatterInterface
         return $width;
     }
 
-    /**
-     * The verdict, annotated with how the baseline sees this package: `(baseline)` for a finding the
-     * project already accepted, `(was stale)` for one that has got worse since. A new finding, and
-     * every row of a run with no baseline, shows the bare verdict.
-     */
+    /** The verdict, annotated by the baseline (docs/baseline.md#reading-a-baseline). */
     private function label(Finding $finding, ?BaselineComparison $baseline): string
     {
         if ($baseline === null) {
@@ -179,11 +153,7 @@ final class TableFormatter implements FormatterInterface
         return $finding->verdict();
     }
 
-    /**
-     * Colour by priority rather than by verdict: the same verdict deserves a different amount of a
-     * reader's attention depending on how this project pulls the package in. Low and unflagged rows
-     * are left alone so the coloured ones stand out.
-     */
+    /** Colour follows priority, not verdict (docs/example-run.md#the-table-format). */
     private function styled(Finding $finding, string $escapedLabel): string
     {
         $priority = $finding->priority();
@@ -198,21 +168,12 @@ final class TableFormatter implements FormatterInterface
     }
 
     /**
-     * Wrapped to $wrap columns, each resulting line escaped. With $cut a word longer than the width
-     * is cut rather than allowed to overflow — what the rows need, so a row is never wider than the
-     * terminal. The summary block passes false: its only long tokens are paths (a baseline file in
-     * a note), and a path split across two lines cannot be copied, so there the line may overflow.
-     * Wrapping happens before escaping: escaping inserts backslashes the terminal never shows, and
-     * counting those would wrap early. Lines are right-trimmed — a run of spaces in the source text
-     * can otherwise end a line with invisible padding.
-     *
-     * `wordwrap()` counts bytes, which is deliberate here: measuring bytes can only ever wrap a
-     * line *earlier* than its display width demands, so a row is never wider than the terminal.
-     * The chain separator is the one routine multi-byte character and is always its own
-     * space-delimited token, so it is never cut. A single non-ASCII word longer than $wrap — only
-     * reachable through an allowlist reason written in `extra.lockrot` — would be cut
-     * mid-codepoint; that is the known limit of doing this without ext-mbstring, which lockrot
-     * does not require.
+     * With $cut, a word longer than $wrap is cut, so a row is never wider than the terminal. The
+     * summary passes false: a path split across two lines cannot be copied. The text is wrapped
+     * before it is escaped, because the added backslashes do not print. `wordwrap()` counts bytes,
+     * which can only wrap earlier than the display width needs. The chain separator is its own
+     * token and is never cut. A non-ASCII word longer than $wrap is cut mid-codepoint, because
+     * lockrot does not require ext-mbstring.
      *
      * @return list<string>
      */
@@ -227,19 +188,10 @@ final class TableFormatter implements FormatterInterface
     }
 
     /**
-     * The block every run ends with: the counts, the priority totals, the libyears line, which
-     * direct requirements the transitive findings are pulled in by, what the baseline made of the run, the data date, and
-     * the notes.
-     *
-     * Wrapped like the rows, but to the full width, with no indent, and without cutting a long
-     * token (see {@see wrap()}): these lines are facts in their own right rather than continuations
-     * of a label, so nothing hangs under a column. The strings themselves are untouched —
-     * {@see Report::summaryLine()} is shared with the `github` format, which pins itself against it,
-     * so only this renderer decides where it folds.
-     *
-     * The priority totals are printed only when there is something flagged to total. On a clean
-     * report `critical 0 · high 0 · medium 0 · low 0` is four zeros under "No dependency rot
-     * found", which is noise on the one report that should be shortest.
+     * The summary block (docs/example-run.md#the-table-format). {@see Report::summaryLine()} is
+     * shared with the `github` format, which pins itself against it, so only this renderer decides
+     * where it folds. The priority totals print only when something is flagged, because a clean
+     * report shows only zeros.
      *
      * @return list<string>
      */
@@ -249,8 +201,7 @@ final class TableFormatter implements FormatterInterface
         if ($hasFlagged) {
             $texts[] = $report->prioritySummaryLine();
         }
-        // Always, clean report included: a lock with nothing to flag can still be years behind, and
-        // that is the one number this report has that a reader can quote.
+        // A clean report prints it too: a lock with nothing to flag can still be behind.
         $texts[] = $report->libyears()->line();
         $exposure = $report->exposureSummaryLine();
         if ($exposure !== '') {
@@ -286,16 +237,10 @@ final class TableFormatter implements FormatterInterface
         return $lines;
     }
 
-    /**
-     * The commands the footer tells the reader to run. Folded at a space like any other words,
-     * `see composer` / `audit` is what an 80-column CI log shows; a command is one thing to copy,
-     * so each is held together as one token and, like a long path, may overflow rather than split.
-     */
+    /** Commands the footer names: one thing to copy, so each stays on one line and can overflow. */
     private const COMMANDS = ['composer lockrot --format=json', 'composer audit'];
 
     /**
-     * {@see wrap()} without cutting, with every command in {@see self::COMMANDS} kept on one line.
-     *
      * @return list<string>
      */
     private static function wrapKeepingCommands(string $text, int $wrap): array
@@ -313,15 +258,10 @@ final class TableFormatter implements FormatterInterface
     }
 
     /**
-     * The counts, priority and `pulled in by:` lines are lists of `label N` items joined by ` · `;
-     * folding them at any space can part a label from its number (`… · stale` / `0 · unknown 0`).
-     * They fold between items instead: an item that does not fit starts the next line, and the
-     * separator stays at the end of the line it closes. An item wider than the terminal is left
-     * whole, as {@see wrap()} leaves a long token.
-     *
-     * Counted in bytes as {@see wrap()} counts: the four of the ` · ` an item is joined with, and
-     * for any item but the last the three of the ` ·` that closes the line should the next item
-     * not fit — so a line is never wider than $wrap, closing separator included.
+     * Folds a list of `label N` items joined by ` · ` between items, because a fold at any space
+     * can part a label from its number. The separator stays at the end of the line it closes, and
+     * an item wider than the terminal stays whole. Bytes are counted as in {@see wrap()}, including
+     * the closing ` ·` of every item but the last, so a line is never wider than $wrap.
      *
      * @return list<string>
      */

@@ -16,17 +16,11 @@ use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
 
 /**
- * `--explain <package>`: one package, every signal with its raw data, and the facts the signals
- * read — the lock entry, the repository's branches with their dates, the repository activity —
- * so "why is this flagged?" (or "why is it not?") is one command rather than `--format=json`
- * piped through jq. Text for a terminal, or the same as JSON under `--format=json`.
- *
- * The text is meant to be read top to bottom: the verdict and how the package is reached, then
- * what fired, then the data — a reader who disagrees with a signal finds the number it was
- * computed from two blocks down, in the same units the signal used.
- *
- * The text is {@see ConsoleMarkup}, with every piece of the lock's and the repository's text
- * escaped, for {@see ConsoleMarkup::render()} rather than Symfony's tag formatter.
+ * `--explain <package>` as text, or as JSON under `--format=json`
+ * (docs/configuration.md#explaining-one-package). The text reads top to bottom: the verdict and
+ * the chain, then the signals that fired, then the data they read, in the units the signal used.
+ * It is {@see ConsoleMarkup} for {@see ConsoleMarkup::render()}, with all text from the lock and
+ * the repository escaped.
  *
  * @internal
  */
@@ -39,7 +33,6 @@ final class ExplainFormatter
     /** Under a signal's `S8 warn ` line: the data hangs beneath the summary's first character. */
     private const DATA_INDENT = '           ';
 
-    /** The signal data keys printed as a list of advisories rather than as scalars. */
     private const ADVISORY_LIST = 'advisories';
     /** S9's key the text leaves out ({@see signalData()}). */
     private const RELEASES_READ = 'releases_read';
@@ -93,7 +86,7 @@ final class ExplainFormatter
         if ($finding->note() !== null) {
             $lines[] = self::INDENT.self::escape('note: '.$finding->note());
         }
-        // Last in the block: where the package is unmeasured, the note above is usually the reason.
+        // After the note, which is usually the reason when libyears are not measured.
         $libyears = $finding->libyears();
         $lines[] = self::INDENT.self::escape($libyears === null
             ? 'libyears not measured: '.Libyears::reasonWords($finding)
@@ -103,8 +96,7 @@ final class ExplainFormatter
     }
 
     /**
-     * Every signal on the finding, its summary first and its raw data under it — dates as the
-     * repository gave them, so a reader can check the arithmetic in the summary.
+     * Dates stay as the repository gave them, so a reader can check the arithmetic in the summary.
      *
      * @return list<string>
      */
@@ -125,16 +117,10 @@ final class ExplainFormatter
     }
 
     /**
-     * A signal's data as lines: scalars joined `key value` on one line, the advisory list (S9) one
-     * advisory per line, anything else as JSON.
-     *
-     * S6 leaves out a key whose value is null. Its release facts are null when lockrot does not know
-     * them (no repository metadata) or when they do not apply (no tag, no snapshot), and printing
-     * each of those as `null` buried the facts a reader wants under words saying there are none; the
-     * JSON still carries every key. Every other signal prints a null as `null`, as it always has.
-     *
-     * S9 leaves out `releases_read`: the JSON and the no-fix list read it, and the text stays as it
-     * was before the key existed.
+     * Scalars are joined as `key value` on one line, the advisory list (S9) takes one line per
+     * advisory, and anything else is JSON. S6 skips a null value: its release facts are null
+     * when unknown or not applicable, and they bury the facts a reader wants
+     * (docs/verdicts.md#what-s6-carries). S9 skips `releases_read`. The JSON carries every key.
      *
      * @return list<string>
      */
@@ -170,8 +156,7 @@ final class ExplainFormatter
     }
 
     /**
-     * `CVE-2026-69246 (PKSA-xxxx) high · fixed by 8.2.0, not on the installed branch · https://…`:
-     * the row as {@see \Lockrot\Signal\Rule\AdvisoryRule} shapes it; a key it does not set is left out.
+     * The row as {@see \Lockrot\Signal\Rule\AdvisoryRule} shapes it. A key it does not set is left out.
      *
      * @param array<mixed, mixed> $row
      */
@@ -223,12 +208,7 @@ final class ExplainFormatter
         return $lines;
     }
 
-    /**
-     * What the Composer repository said about the package, and the branch table S8 reads: every
-     * release branch with its highest tag and that tag's date, the installed branch marked.
-     *
-     * @return list<string>
-     */
+    /** @return list<string> */
     private function metadata(Explanation $explanation): array
     {
         $metadata = $explanation->facts()->metadata();
@@ -279,12 +259,10 @@ final class ExplainFormatter
     }
 
     /**
-     * The lock's `time` for the installed version, and what it is a date of. Composer writes the
-     * date the repository gave the version, which is a release's only where the repository dated it
-     * by one: a branch snapshot's is its commit's, and a subtree split's tag is dated by a commit
-     * its other tags share ({@see PackageMetadata::SHARED_COMMIT_TAGS}). Calling either a release
-     * would contradict {@see installedRelease()} four lines below. Without metadata there is
-     * nothing to tell the two apart, and the lock is read as it reads itself.
+     * The lock's `time` for the installed version, and what dates it. A branch snapshot's `time` is
+     * its commit's, and a subtree split's tag is dated by a commit its other tags share
+     * ({@see PackageMetadata::SHARED_COMMIT_TAGS}), so neither is a release date. Without metadata,
+     * the lock is read as it reads itself.
      */
     private function lockDate(InstalledRelease $installed): string
     {
@@ -305,12 +283,10 @@ final class ExplainFormatter
     }
 
     /**
-     * When the installed version released, where the lock's own `time` is not the answer: the
-     * monorepo parent's tag of the same version dates it, or nothing does although the lock
-     * carries a date — a split package's `time` is the date of the commit its tags share, and
-     * measuring from it would add that artefact to the libyears. Null when the lock's date is the
-     * one read, which the block above already prints, and for a branch snapshot, which is undated
-     * for a reason of its own that the block above gives ({@see InstalledRelease}).
+     * When the installed version released, where the lock's `time` is not the answer: the monorepo
+     * parent's tag dates it, or nothing does. A split package's `time` is the date of a commit its
+     * tags share, and measuring from it adds that artefact to the libyears. Null when the
+     * lock's date is the one read, and for a branch snapshot ({@see InstalledRelease}).
      */
     private function installedRelease(Explanation $explanation, PackageMetadata $metadata): ?string
     {
@@ -347,7 +323,7 @@ final class ExplainFormatter
                 $released = 'undated';
             }
             $newest = $row['newest_dated_released'] === null ? '—' : $row['newest_dated'].' ('.$row['newest_dated_released']->format('Y-m-d').')';
-            // The em dash is three bytes and one column; sprintf and str_pad count bytes, so that cell
+            // The em dash is three bytes and one column. sprintf and str_pad count bytes, so that cell
             // is padded to 24 columns by adding the bytes the multibyte characters cost.
             $lines[] = \sprintf('%s%-10s %-18s %-18s %s %s', $row['installed'] ? '* ' : '  ', $row['branch'], $row['highest'], $released, str_pad($newest, 24 + \strlen($newest) - self::columns($newest)), $row['php'] ?? '—');
         }
@@ -366,7 +342,7 @@ final class ExplainFormatter
         return $lines;
     }
 
-    /** Characters in a UTF-8 string, without ext-mbstring: every byte that does not continue a multibyte sequence starts a character. */
+    /** Characters in a UTF-8 string, without ext-mbstring: a continuation byte starts none. */
     private static function columns(string $text): int
     {
         return \strlen((string) preg_replace('/[\x80-\xBF]/', '', $text));
@@ -431,7 +407,6 @@ final class ExplainFormatter
         return \is_string($value) && $value !== '' ? $value : null;
     }
 
-    /** Where the entry says it came from, marked when that is a path on the machine lockrot ran on. */
     private static function source(?string $url): ?string
     {
         $shown = RepositoryUrl::shown($url);

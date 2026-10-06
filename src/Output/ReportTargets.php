@@ -11,40 +11,18 @@ use Lockrot\Filesystem\Path;
 use Lockrot\Html\PageData;
 
 /**
- * The files one run writes its report to: every `--output=<format>:<path>`, checked before the
- * analysis starts and written after it, from the same report stdout gets.
+ * The files one run writes its report to: docs/configuration.md#writing-reports-to-files.
  *
- * The checks are the whole promise of `--output` — lockrot writes the files it is told to and
- * nothing else — so a spec that would write anything else is refused up front, with exit 2, before
- * a single repository is asked anything:
- *
- * - a file name Windows reads as another — one ending in a dot or a space, or holding a colon
- *   (`composer.lock.` and `composer.lock::$DATA` are the lock) — on every system, so the rule is one;
- * - a file named `composer.json` or `composer.lock`, in any directory and any letter case, with dot
- *   segments folded by spelling as Windows folds them (`missing\..\composer.lock` is the lock there);
- * - a file the caller protects — the baseline, the manifest Composer reads and its lock — spelled any
- *   way that folds to it, as above;
- * - an existing file that is on disk one of those, or the composer.json or composer.lock beside it:
- *   a symlink, a hard link, a Windows 8.3 short name, or a spelling the filesystem folds by Unicode
- *   rules (`composer.locK` with a Kelvin sign is the lock on macOS), compared by device and inode;
- * - the same file named twice, by spelling or, for files that exist, on disk;
- * - a file whose directory does not exist, or is not a directory: lockrot creates none;
- * - a path that already exists and is not a regular file (a directory, a device such as
- *   /dev/stdout, a pipe): the write is a rename over the path, and stdout is what --format is for.
- *
- * Two names that do not exist yet can still be one file once the first is written (on APFS, a name
- * spelled precomposed and decomposed), so {@see write()} asks again before each file and stops with
- * exit 2 rather than write one report over another.
- *
- * Writability is not checked in advance: is_writable() is unreliable under ACLs and root, so an
- * unwritable target fails at the write instead, with PHP's reason, as exit 2 all the same.
+ * {@see resolve()} refuses a spec that writes anything but a report, before the analysis
+ * starts. Two names that do not exist yet can become one file once the first is written, so
+ * {@see write()} checks again before each file. resolve() does not check writability, because
+ * is_writable() is unreliable under ACLs and root. An unwritable target fails at the write.
  *
  * @internal
  */
 final class ReportTargets
 {
     private const COMPOSER_FILES = ['composer.json', 'composer.lock'];
-    /** The reason given for every composer.json and composer.lock, whichever rule caught it. */
     public const COMPOSER_REASON = 'lockrot never writes composer.json or composer.lock';
 
     /** @var list<ReportTarget> */
@@ -59,7 +37,7 @@ final class ReportTargets
     /**
      * @param list<string>                      $specs     every `--output` value, in the order given
      * @param string                            $cwd       the directory relative paths are relative to
-     * @param list<array{0: string, 1: string}> $protected absolute paths no report may be written to,
+     * @param list<array{0: string, 1: string}> $protected absolute paths that no report can be written to,
      *                                                     each with the reason given when one is named
      *
      * @throws ConfigException for the first spec that breaks a rule, after every spec has parsed
@@ -152,17 +130,14 @@ final class ReportTargets
     }
 
     /**
-     * Renders and writes every file, in the order given, calling $onWritten after each one.
-     *
-     * Each file is what `--format=<its format>` prints for the same report and context. The format
-     * that carries console markup ({@see Formatters::carriesConsoleMarkup()}) is rendered the way a
-     * redirected stdout renders it ({@see ConsoleMarkup::render()}): no colours, no tags, the brackets back
-     * as the evidence wrote them.
+     * Writes every file in the order given, calling $onWritten after each one. Each file is what
+     * `--format=<its format>` prints, except that console markup renders the way a redirected
+     * stdout renders it ({@see ConsoleMarkup::render()}).
      *
      * @param callable(ReportTarget): void $onWritten
      *
      * @throws ConfigException at the first file that cannot be written, or that is on disk a file
-     *                         this run has already written; the files before it stay
+     *                         this run has already written, and the files before it stay
      */
     public function write(Report $report, FormatContext $context, ?PageData $page, bool $showAll, callable $onWritten): void
     {
