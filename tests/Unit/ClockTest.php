@@ -79,8 +79,8 @@ final class ClockTest extends TestCase
 
     public function testTheThirtyTwoBitPathNeverMultipliesInAnInteger(): void
     {
-        // Past PHP_INT_MAX / 10 seconds the integer path cannot take `10 * $seconds`; the float
-        // path still can, and gives the exact half-up tenths.
+        // Past PHP_INT_MAX / 10 seconds the integer path cannot take `10 * $seconds`. The float
+        // path can, and gives the exact half-up tenths.
         $seconds = intdiv(\PHP_INT_MAX, 10) + 1;
         $exact = intdiv($seconds, Clock::SECONDS_PER_YEAR) * 10 + Clock::tenthsOf($seconds % Clock::SECONDS_PER_YEAR);
 
@@ -90,7 +90,7 @@ final class ClockTest extends TestCase
     public function testSixtyFourBitIntegersStayOffTheFloatPath(): void
     {
         // A second below a half-tenth, where 10 * seconds passes 2^53: the integer path is exact,
-        // a float would round it up. No age comes near this; it only proves which path runs.
+        // and a float rounds it up. No age comes near this. It only proves which path runs.
         self::assertSame(292271023044, Clock::tenthsOf(922337203682911319, 8));
     }
 

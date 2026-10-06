@@ -1,5 +1,3 @@
-"""A shard's Infection configuration for a pull request: the shard's directories as the configured source."""
-
 import os
 import sys
 import unittest

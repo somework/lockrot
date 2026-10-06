@@ -4,9 +4,9 @@
     python3 tools/mutation/shard_config.py infection.json5 src/Verdict src/Output ... > infection.shard.json5
 
 Infection refuses positional paths together with --git-diff-lines, and in that mode it reads the
-changed lines only under the configured source directories, ignoring `excludes`. So on a pull request
-a shard is its directories, written into a copy of the configuration; everything else in the file is
-kept. A file at the root of src cannot be a source directory: ci.yml mutates such a file whole, by
+changed lines only under the configured source directories, ignoring `excludes`. So a shard is
+its directories, written into a copy of the configuration. Everything else in the file is kept.
+A file at the root of src cannot be a source directory: ci.yml mutates such a file whole, by
 path, when the pull request changes it. Standard library only, as tools/corpus.
 """
 

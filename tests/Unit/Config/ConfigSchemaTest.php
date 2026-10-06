@@ -34,7 +34,6 @@ final class ConfigSchemaTest extends TestCase
         $this->addToAssertionCount(4);
     }
 
-    /** The schema's hand-written enum and the resolver's list are the same list, in both directions. */
     public function testTheSchemaEnumIsExactlyWhatFailOnAccepts(): void
     {
         $schema = json_decode((string) file_get_contents(Schemas::path(Schemas::CONFIG, ConfigSchema::NUMBER)), true);
@@ -86,7 +85,7 @@ final class ConfigSchemaTest extends TestCase
 
     /**
      * The published schema lists the formats as `x-known-values` on an open string, so an editor's
-     * older copy accepts a format a later release adds; lockrot itself accepts exactly these.
+     * older copy accepts a format a later release adds. lockrot itself accepts exactly these.
      */
     public function testTheSchemaFormatsAreExactlyWhatLockrotAccepts(): void
     {
@@ -98,10 +97,9 @@ final class ConfigSchemaTest extends TestCase
     }
 
     /**
-     * The runtime reads `x-known-values` as the enum, so what it says about a configuration is what
-     * it said while `format` was an enum in the published file: the same lines in the same order, a
-     * mistyped format included, and nothing about a pattern. 0.12.0's copy is the reference because
-     * it was released with the enum.
+     * The runtime reads `x-known-values` as the enum, so its message for a configuration equals the
+     * message of a schema that holds `format` as an enum: the same lines in the same order, a
+     * mistyped format included, and nothing about a pattern. The 0.12.0 copy is that schema.
      *
      * @param array<string, mixed> $extra
      *
@@ -144,8 +142,8 @@ final class ConfigSchemaTest extends TestCase
     }
 
     /**
-     * The first validation of a process is the one the install-time path makes, and the only one it
-     * makes: it has to hold `format` to the known values as every later one does.
+     * The first validation of a process is the only one that the install-time path makes. It must
+     * hold `format` to the known values as every later one does.
      */
     public function testTheFirstValidationInAProcessHoldsTheFormatToTheKnownValues(): void
     {
@@ -178,7 +176,7 @@ final class ConfigSchemaTest extends TestCase
     }
 
     /**
-     * The unknown-key warning knows the settings from a hand-written list; the schema is the
+     * The unknown-key warning knows the settings from a hand-written list. The schema is the
      * contract. Sorted on both sides because the list is kept in alphabetical order, which is what
      * breaks a tie between two equally near keys.
      */
@@ -200,7 +198,7 @@ final class ConfigSchemaTest extends TestCase
         self::assertSame($keys, UnknownKeys::KNOWN_IN_IGNORE);
     }
 
-    /** The warning walks one level down, into `ignore` entries: a second nested object would go unchecked. */
+    /** The warning walks one level down, into `ignore` entries: a second nested object goes unchecked. */
     public function testIgnoreIsTheOnlyNestedObjectInTheSchema(): void
     {
         $nested = [];
@@ -236,9 +234,8 @@ final class ConfigSchemaTest extends TestCase
     }
 
     /**
-     * A key starting with a NUL byte is valid JSON no PHP object can hold. The library's own
-     * array-to-object conversion decoded it to null and validated `(object) null` — an empty object,
-     * so every other key went unchecked — and this `fail-on` passed.
+     * A key starting with a NUL byte is valid JSON that no PHP object can hold. If a conversion
+     * drops it, every other key goes unchecked, `fail-on` included.
      *
      * @param array<string, mixed> $extra
      *
@@ -260,7 +257,6 @@ final class ConfigSchemaTest extends TestCase
         yield 'inside an unknown key' => [['custom' => ['deep' => ["\0k" => true]]], 'custom.deep.\000k'];
     }
 
-    /** A NUL byte anywhere else in a key is an ordinary character. */
     public function testANulByteInsideAKeyIsAnOrdinaryCharacter(): void
     {
         ConfigSchema::validate(["k\0" => 1, 'ignore' => [['package' => 'a/b', 'reason' => 'x', "x\0y" => 1]]]);
@@ -268,9 +264,8 @@ final class ConfigSchemaTest extends TestCase
     }
 
     /**
-     * 1e400 reads as INF, which json_encode() refuses: the library's conversion threw its own
-     * exception rather than a configuration error. INF now reaches the schema, which says what is
-     * wrong with it wherever an integer is wanted, and leaves it alone under a key it does not know.
+     * 1e400 reads as INF, which json_encode() refuses. The schema must judge it: an error wherever
+     * an integer is wanted, and none under a key it does not know.
      */
     public function testANumberTooLargeForAFloatIsJudgedByTheSchema(): void
     {
@@ -283,7 +278,7 @@ final class ConfigSchemaTest extends TestCase
 
     /**
      * Below the top level an empty array stays an array — `ignore: []` is valid — and a map whose keys
-     * are not 0..n-1 is an object, not a list, exactly as json_encode() would have written it.
+     * are not 0..n-1 is an object, not a list, exactly as json_encode() writes it.
      */
     public function testNestedValuesKeepTheirJsonShape(): void
     {
@@ -328,7 +323,6 @@ final class ConfigSchemaTest extends TestCase
         yield 'target-php bad pattern' => [['target-php' => 'v8.4'], 'target-php'];
         yield 'format not in enum' => [['format' => 'xml'], 'format'];
         yield 'include-dev wrong type' => [['include-dev' => 'yes'], 'include-dev'];
-        // `summary` is not an accepted install-time value.
         yield 'install-time not in enum' => [['install-time' => 'summary'], 'install-time'];
         yield 'install-time-strict wrong type' => [['install-time-strict' => 'yes'], 'install-time-strict'];
         yield 'install-time-budget wrong type' => [['install-time-budget' => '5'], 'install-time-budget'];

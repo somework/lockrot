@@ -84,7 +84,7 @@ final class AllowlistTest extends TestCase
 
     /**
      * The built-in list carries the finished types and a project ignore list carries none, so the
-     * merge has to keep them whichever of the two it is called on.
+     * merge must keep them whichever of the two it is called on.
      */
     public function testMergeKeepsTheFinishedTypesOfBothSides(): void
     {
@@ -97,10 +97,7 @@ final class AllowlistTest extends TestCase
         self::assertNull($withoutTypes->merge($withoutTypes)->match($metapackage, null, $this->now));
     }
 
-    /**
-     * `expires: 2026-06-01` covers the whole of that day: the entry still holds at 23:59:59 and is
-     * spent one second later.
-     */
+    /** `expires: 2026-06-01` covers the whole of that day. */
     public function testAnEntryIsNotYetExpiredAtItsExpiryInstant(): void
     {
         $at = new \DateTimeImmutable('2026-06-01T23:59:59+00:00');

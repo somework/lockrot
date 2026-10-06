@@ -84,11 +84,7 @@ final class AtomicWriterTest extends TestCase
         self::assertSame('', file_get_contents($dir.'/r.txt'));
     }
 
-    /**
-     * The temp file is written and only the move fails: a non-empty directory sits at the target. The
-     * message names the path as the caller spelled it, then PHP's own reason, and the temp file is
-     * gone.
-     */
+    /** The temp file is written and only the move fails: a non-empty directory sits at the target. */
     public function testAFailingRenameIsAConfigExceptionWithTheReasonAndLeavesNoTemporaryFile(): void
     {
         $dir = $this->tempDir();
@@ -176,7 +172,7 @@ final class AtomicWriterTest extends TestCase
 
     /**
      * A write that stores fewer bytes than it was given — a full disk — fails, even though the
-     * file was created and closed and the rename would go through: a truncated report is never
+     * file was created and closed and the rename succeeds: a truncated report is never
      * moved into place. A stream wrapper stands in for the full disk.
      */
     public function testAShortWriteFailsAndIsNeverRenamedIntoPlace(): void

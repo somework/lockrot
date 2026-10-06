@@ -162,7 +162,6 @@ final class KnownValuesTest extends TestCase
         self::assertSame($expected, json_encode(KnownValues::closed(self::decode($schema))));
     }
 
-    /** A node that already lists its properties keeps them, as one that already has an `enum` keeps it. */
     public function testPropertiesAlreadyThereAreKept(): void
     {
         $schema = '{"properties":{"a":{"type":"null"}},"patternProperties":{"^b$":{"type":"integer"}},"x-known-keys":["b"]}';

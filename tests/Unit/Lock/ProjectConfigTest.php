@@ -24,7 +24,7 @@ final class ProjectConfigTest extends TestCase
         self::assertSame('^7.4 || ^8.0', $cfg->requirePhp());
     }
 
-    /** `require.php` is read as written; a project that promises no PHP, or an unreadable promise, has none. */
+    /** `require.php` is read as written. A project that promises no PHP, or an unreadable promise, has none. */
     public function testThePhpRequirementIsReadAsWrittenOrIsNothing(): void
     {
         self::assertSame('>=7.2.5', ProjectConfig::fromArray(['require' => ['php' => '>=7.2.5']])->requirePhp());
@@ -63,7 +63,7 @@ final class ProjectConfigTest extends TestCase
 
     /**
      * The one thing that says which project a report is about: every lock in the world is called
-     * composer.lock, so the name has to come from the manifest. An application is not required to
+     * composer.lock, so the name must come from the manifest. An application is not required to
      * name itself, and a name that is there but empty is not a name.
      */
     public function testTheProjectNamesItselfOrDoesNot(): void
@@ -75,7 +75,7 @@ final class ProjectConfigTest extends TestCase
         self::assertNull(ProjectConfig::empty()->name());
     }
 
-    /** The manifest's repositories say where an entry without a notification-url came from; a lock alone has none. */
+    /** The manifest's repositories say where an entry without a notification-url came from. A lock alone has none. */
     public function testTheRepositoriesAreTheManifestsOwn(): void
     {
         $facts = new OriginFacts(null, 'zip', null, 'git', 'https://github.com/acme/lib.git');

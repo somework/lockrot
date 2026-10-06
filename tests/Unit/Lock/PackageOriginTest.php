@@ -161,7 +161,7 @@ final class PackageOriginTest extends TestCase
     /**
      * A replacement is a name the registry that marked the package abandoned gave, so its page is on
      * that registry: packagist.org alone, where the maintainer sets both. Nothing is built for a
-     * name Composer would refuse, or for any other registry.
+     * name that Composer refuses, or for any other registry.
      */
     public function testAReplacementsPageIsPackagistsWhenPackagistNamedIt(): void
     {
@@ -172,7 +172,7 @@ final class PackageOriginTest extends TestCase
         self::assertNull(PackageOrigin::replacementPage('packagist.org', 'a/../../login?next=//evil.example'), 'only a Composer package name goes into a URL');
     }
 
-    /** The finding's default when a caller passes none: from a Composer repository lockrot does not name, as the old flag's `true` said. */
+    /** The finding's default when a caller passes none: from a Composer repository that lockrot does not name. */
     public function testTheUnattributedOriginIsAComposerRepositoryWithoutAName(): void
     {
         $origin = PackageOrigin::unattributed();

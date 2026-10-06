@@ -32,8 +32,8 @@ final class LockrotConfigTest extends TestCase
         self::assertSame('8.5', $cfg->targetPhp());
         self::assertFalse($cfg->includeDev());
         // A source that names neither flag leaves both off: install time passes an empty $cli, so a
-        // default of "offline" would silence every install-time repository lookup, and a default of
-        // "strict-network" would fail an install on the first unreachable repository.
+        // default of "offline" silences every install-time repository lookup, and a default of
+        // "strict-network" fails an install on the first unreachable repository.
         self::assertFalse($cfg->offline());
         self::assertFalse($cfg->strictNetwork());
         self::assertSame('table', $cfg->format());
@@ -59,8 +59,8 @@ final class LockrotConfigTest extends TestCase
     }
 
     /**
-     * `--baseline=` reaches here as an empty string. Falling through to the default path would mean
-     * a typo silently gates against a different file than the one the caller named.
+     * `--baseline=` reaches here as an empty string. A fall-through to the default path gates
+     * silently against a different file than the one the caller named.
      */
     public function testAnEmptyCliBaselineIsRejected(): void
     {
@@ -74,7 +74,7 @@ final class LockrotConfigTest extends TestCase
         self::assertSame(30, LockrotConfig::fromSources(['install-time-budget' => 30], [], [], '8.5.10', null)->installTimeBudgetSeconds());
     }
 
-    /** Both ends of the documented range are accepted; {@see invalidInstallTimeBudgets} covers the values just outside it. */
+    /** {@see invalidInstallTimeBudgets} covers the values outside the range. */
     public function testTheInstallTimeBudgetRangeIsInclusiveAtBothEnds(): void
     {
         self::assertSame(1, LockrotConfig::fromSources(['install-time-budget' => 1], [], [], '8.5.10', null)->installTimeBudgetSeconds());
@@ -161,8 +161,6 @@ final class LockrotConfigTest extends TestCase
     /**
      * One rule for every source: extra.lockrot is validated in full whatever overrides it, and an
      * environment variable whenever it is set — not only on the runs where no option outranks it.
-     * An invalid LOCKROT_FAIL_ON used to pass silently under `--fail-on`, while an invalid
-     * extra.lockrot fail-on under the same option was exit 2.
      *
      * @param array<string, string> $env
      *
@@ -183,7 +181,6 @@ final class LockrotConfigTest extends TestCase
         yield 'LOCKROT_TARGET_PHP' => [['LOCKROT_TARGET_PHP' => 'latest'], 'LOCKROT_TARGET_PHP must look like "8.4"; got "latest"'];
     }
 
-    /** The variable names itself in the message on the runs where it would have won, too. */
     public function testAnInvalidVariableIsNamedWhereItWouldHaveWon(): void
     {
         $this->expectException(ConfigException::class);
@@ -200,7 +197,6 @@ final class LockrotConfigTest extends TestCase
         self::assertSame('8.2', $cfg->targetPhp());
     }
 
-    /** Valid variables under an option still lose to it. */
     public function testAValidVariableUnderAnOptionStillLoses(): void
     {
         $cfg = LockrotConfig::fromSources([], ['LOCKROT_FAIL_ON' => 'high', 'LOCKROT_TARGET_PHP' => '8.1'], ['fail-on' => 'silent', 'target-php' => '8.4'], '8.5.10', null);
@@ -253,8 +249,8 @@ final class LockrotConfigTest extends TestCase
     }
 
     /**
-     * The rejection has to carry both halves a user acts on: the value that was refused, and the
-     * list of the ones that would have worked.
+     * The rejection must carry both halves a user acts on: the value that was refused, and the
+     * list of the ones that work.
      */
     public function testInvalidFormat(): void
     {

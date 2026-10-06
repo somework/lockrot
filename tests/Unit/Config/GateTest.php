@@ -20,12 +20,10 @@ use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\TestCase;
 
 /**
- * {@see Gate::decide()} is the one place a run's pass or fail and each finding's standing against
- * fail-on are decided. It replaced two compositions of the same primitives, frozen below as oracles:
- * the loop Policy::exitCode() ran before it, and the expression `--generate-baseline` returned. Over
- * every fail-on value, every baseline standing, both --strict-network settings, both network
- * outcomes and both modes, the gate gives the exit code the oracles give, and its fields hold to
- * one another.
+ * {@see Gate::decide()} decides a run's pass or fail and each finding's standing against fail-on.
+ * Over every fail-on value, every baseline standing, both --strict-network settings, both network
+ * outcomes and both modes, the gate gives the exit code of `oracleExitCode()` and
+ * `oracleGenerateExitCode()`, and its fields hold to one another.
  */
 final class GateTest extends TestCase
 {
@@ -105,7 +103,7 @@ final class GateTest extends TestCase
         self::assertSame(['fail_on'], $gate->trippedBy(), 'abandoned was accepted at stale and reaches silent');
     }
 
-    /** Both causes are recorded when both hold: the gate does not stop at the first, as Policy's loop did. */
+    /** Both causes are recorded when both hold: the gate does not stop at the first. */
     public function testBothCausesAreRecordedInTheirOrder(): void
     {
         $gate = Gate::decide(self::report('none', true), FailOn::fromString(Verdict::STALE), true, Gate::MODE_CHECK);
@@ -175,9 +173,9 @@ final class GateTest extends TestCase
 
     /**
      * One finding of every flagged verdict, direct and transitive, a development one, an unflagged
-     * one with priority none, and an ok one carrying S10; seen against a baseline in one of four
-     * ways: none read, every flagged finding known, none known (every one new), and every one
-     * accepted at `stale` (so the stale one is known and every other worsened).
+     * one with priority none, and an ok one carrying S10. The baseline is one of four: none read,
+     * every flagged finding known, none known (every one new), and every one accepted at `stale`
+     * (so the stale one is known and every other worsened).
      */
     private static function report(string $baseline, bool $networkFailures): Report
     {
@@ -206,7 +204,7 @@ final class GateTest extends TestCase
         return $report->withBaseline(BaselineComparison::compare(Baseline::of($entries, self::AT), $report, 'lockrot-baseline.json', $names));
     }
 
-    /** Policy::exitCode() as it was before the gate, verbatim. */
+    /** Oracle: the exit code of a check run, as a loop over the findings. */
     private static function oracleExitCode(Report $report, LockrotConfig $config): int
     {
         if ($config->strictNetwork() && $report->hadNetworkFailures()) {
@@ -229,7 +227,7 @@ final class GateTest extends TestCase
         return 0;
     }
 
-    /** What `--generate-baseline` returned before the gate. */
+    /** Oracle: the exit code of a `--generate-baseline` run. */
     private static function oracleGenerateExitCode(Report $report, LockrotConfig $config): int
     {
         return $config->strictNetwork() && $report->hadNetworkFailures() ? 1 : 0;

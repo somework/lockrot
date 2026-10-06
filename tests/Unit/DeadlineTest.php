@@ -19,11 +19,10 @@ final class DeadlineTest extends TestCase
     }
 
     /**
-     * Deadline::inSeconds() calls $now() exactly once itself, to compute expiresAt (here
-     * 100.0 + 5.0 = 105.0); every later isPast()/remainingSeconds() call makes one further call. To
-     * observe isPast() and remainingSeconds() agreeing at the same simulated instant, this fake
-     * supplies each of the three instants (100.0, 104.9, 105.0) twice in a row: once for isPast(),
-     * once for remainingSeconds(), called in that order.
+     * Deadline::inSeconds() calls $now() once to compute expiresAt (here 100.0 + 5.0 = 105.0), and
+     * every later isPast() or remainingSeconds() call makes one more call. So that both read the
+     * same simulated instant, the fake supplies each of the three instants (100.0, 104.9, 105.0)
+     * twice in a row, once for isPast() and once for remainingSeconds(), in that order.
      */
     public function testInSecondsBecomesPastAtTheExpectedInstant(): void
     {
