@@ -56,7 +56,6 @@ final class PharUpdaterTest extends TestCase
         return $dir;
     }
 
-    /** @return string the path of the installed "phar" */
     private function installedPhar(string $dir, int $mode = 0755): string
     {
         $path = $dir.'/lockrot.phar';
@@ -72,7 +71,7 @@ final class PharUpdaterTest extends TestCase
     }
 
     /**
-     * The three downloads of a release, with the signature the release key would publish for the
+     * The three downloads of a release, with the signature the release key publishes for the
      * archive body unless $signatureBody says otherwise.
      */
     private function http(string $checksumBody, string $pharBody = self::NEW_PHAR, ?string $signatureBody = null): FakeHttpClient
@@ -133,8 +132,7 @@ final class PharUpdaterTest extends TestCase
 
     /**
      * Asserts that $message carries each of $fragments, in this order and without overlapping.
-     *
-     * The messages below are built by concatenation, and a reader needs every part of them in the
+     * The messages are built by concatenation, and a reader needs every part of them in the
      * right place: the path before what is wrong with it, the URL before what to do with it. This
      * says that much without pinning the wording in between.
      *
@@ -175,9 +173,8 @@ final class PharUpdaterTest extends TestCase
     }
 
     /**
-     * Every one of the nine permission bits is carried over, 0755 included: an install whose
-     * `lockrot.phar` came back without the bits its group and everyone else had would still run for
-     * the user who updated it and for nobody else.
+     * Every one of the nine permission bits is carried over, 0755 included: a `lockrot.phar` without
+     * the bits of its group and of everyone else runs for the user who updated it and for nobody else.
      *
      * @dataProvider carriedPermissions
      */
@@ -329,7 +326,7 @@ final class PharUpdaterTest extends TestCase
 
     /**
      * A request that never reached a server has no status to report, so the transport's own reason
-     * is what the message carries instead — `HTTP 0` would tell a reader nothing.
+     * is what the message carries instead — `HTTP 0` tells a reader nothing.
      */
     public function testADownloadThatNeverConnectedReportsTheTransportReasonRatherThanAStatus(): void
     {
@@ -358,7 +355,7 @@ final class PharUpdaterTest extends TestCase
     /**
      * The last step can still fail after a verified download — a target that cannot be written over
      * although its directory can. That must be reported, and must not leave the temporary archive
-     * lying next to the PHAR.
+     * next to the PHAR.
      *
      * The message is matched whole because both paths in it are what a reader needs — what could
      * not be written, and what it would have been written from — and because that also pins the
@@ -419,7 +416,7 @@ final class PharUpdaterTest extends TestCase
     /**
      * A process killed between the write and the rename leaves its temporary archive behind for
      * good. The next install clears them out — but only the ones old enough that no other process
-     * could still be writing one.
+     * can still write one.
      */
     public function testAnInstallSweepsTemporaryArchivesLeftByAnInterruptedRun(): void
     {
@@ -441,8 +438,8 @@ final class PharUpdaterTest extends TestCase
 
     /**
      * The cutoff itself is not stale. A self-update that started exactly
-     * {@see PharUpdater::STALE_TEMPORARY_SECONDS} ago may still be downloading into its temporary
-     * archive, and deleting that would turn a working update into a failure — so the sweep takes
+     * {@see PharUpdater::STALE_TEMPORARY_SECONDS} ago can still download into its temporary
+     * archive, and deleting that turns a working update into a failure — so the sweep takes
      * what is older than the cutoff, not what has reached it. The updater's clock is pinned, so the
      * boundary is exact rather than a race against the wall clock's whole seconds.
      */
@@ -465,17 +462,12 @@ final class PharUpdaterTest extends TestCase
     }
 
     /**
-     * A process running from a PHAR loses every class it has not already loaded the moment that file
-     * is swapped, so the swap has to be the last step: the archive is staged and the message is
-     * built while the old bytes are still readable.
-     *
-     * Watched at the seam the failure actually happened on. Composing the message is the only work
-     * left between staging and the swap, and it is the one step that reaches for a class of its own,
-     * `Composer\Semver\Comparator`. A prepended autoloader records what the target file held the
-     * moment that class was resolved: the old bytes if the message came first, the new ones if the
-     * swap did. `--force` is the case the report came from, because it skips isUpdateAvailable() and
-     * so leaves the message as the run's first use of the comparison — hence the separate process,
-     * where nothing has loaded it yet.
+     * A process running from a PHAR loses every class it has not loaded once that file is swapped,
+     * so the swap must be the last step. Composing the message is the one step between staging and
+     * the swap that loads a class of its own, `Composer\Semver\Comparator`: a prepended autoloader
+     * records what the target file held when that class resolved. `--force` skips
+     * isUpdateAvailable(), so the message is the run's first use of the comparison, hence the
+     * separate process.
      *
      * @runInSeparateProcess
      *
@@ -508,7 +500,6 @@ final class PharUpdaterTest extends TestCase
         self::assertSame(self::NEW_PHAR, file_get_contents($phar));
     }
 
-    /** The other half of the same order: the download is checked while the running archive is untouched. */
     public function testTheDownloadIsValidatedWhileTheOldArchiveIsStillInPlace(): void
     {
         $dir = $this->tempDir();

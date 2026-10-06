@@ -19,7 +19,7 @@ final class TransactionPackagesTest extends TestCase
         return (new ArrayLoader())->load(array_merge([
             'name' => $name,
             'version' => $version,
-            // Without a notification-url the package would read as "not from a Composer repository".
+            // Without a notification-url the package reads as "not from a Composer repository".
             'notification-url' => 'https://packagist.org/downloads/',
         ], $overrides));
     }

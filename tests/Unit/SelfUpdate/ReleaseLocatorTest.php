@@ -63,7 +63,7 @@ final class ReleaseLocatorTest extends TestCase
     }
 
     /**
-     * The same, with every tag described as the release workflow would describe it: PHP 7.4.0 and
+     * A client with every tag described as the release workflow describes it: PHP 7.4.0 and
      * the test release key.
      *
      * @param list<string> $tags
@@ -90,7 +90,7 @@ final class ReleaseLocatorTest extends TestCase
     }
 
     /**
-     * locate() throws $message; the notes it decided on the way stay readable afterwards.
+     * locate() throws $message. The notes it decided on the way stay readable afterwards.
      */
     private static function assertLocateFails(string $message, ReleaseLocator $locator, bool $allowMajor = false, bool $force = false): void
     {
@@ -196,7 +196,7 @@ final class ReleaseLocatorTest extends TestCase
         self::assertChose('0.12.0', $this->locator($http, '0.11.0')->locate());
     }
 
-    /** Only a flag that says so makes a draft or a pre-release; a list that leaves them out lists releases. */
+    /** Only a flag that says so makes a draft or a pre-release. A list that omits them lists releases. */
     public function testAnEntryWithoutTheFlagsIsARelease(): void
     {
         $entry = array_diff_key(GitHubReleases::entry('v0.12.0'), ['draft' => true, 'prerelease' => true]);
@@ -205,7 +205,6 @@ final class ReleaseLocatorTest extends TestCase
         self::assertChose('0.12.0', $this->locator($http, '0.11.0')->locate());
     }
 
-    /** A tag GitHub was not told is a pre-release is still one if its version says so. */
     public function testATagWithAPreReleaseSuffixIsSkippedEvenWhenNotFlagged(): void
     {
         $http = self::http([GitHubReleases::entry('v0.12.1-RC1'), GitHubReleases::entry('v0.12.0')]);
@@ -228,10 +227,10 @@ final class ReleaseLocatorTest extends TestCase
     public static function unusableEntries(): iterable
     {
         yield 'a tag that is not a version' => [GitHubReleases::entry('nightly')];
-        // Only a `v` at the very front is a version prefix; a tag that merely contains one is not
-        // rewritten into whatever part of it the parser would accept.
+        // Only a `v` at the very front is a version prefix. A tag that merely contains one is not
+        // rewritten into whatever part of it the parser accepts.
         yield 'a tag that only contains a version' => [GitHubReleases::entry('lockrot-v0.2.0')];
-        // The same on the other side: a tag is a version or it is not, never its first line.
+        // A tag is a version or it is not, never its first line.
         yield 'a tag of two lines' => [GitHubReleases::entry("v0.2.0\nand whatever follows")];
         yield 'an empty tag' => [GitHubReleases::entry('')];
         yield 'a tag that is not a string' => [array_merge(GitHubReleases::entry('v0.2.0'), ['tag_name' => 20])];
@@ -296,7 +295,7 @@ final class ReleaseLocatorTest extends TestCase
             ['lockrot 2.1.0 is in the next major version; run lockrot.phar self-update --allow-major to move to it'],
             $locator->notes()
         );
-        // The next major is described once, for the advice; the rest of its line is not.
+        // The next major is described once, for the advice, and the rest of its line is not.
         self::assertSame([self::URL, self::metaUrl('v2.1.0'), self::metaUrl('v1.3.0')], $http->requested());
     }
 
@@ -462,9 +461,9 @@ final class ReleaseLocatorTest extends TestCase
     }
 
     /**
-     * Every release before 0.13.0 was built for PHP 7.4.0 (build/phar/composer.json has said so
-     * since the first commit) and describes nothing, so it is read as exactly that: the 7.4 floor,
-     * and no claim about its key — the signature check alone decides, as it always has.
+     * Every release before 0.13.0 was built for PHP 7.4.0 (build/phar/composer.json) and describes
+     * nothing, so it is read as exactly that: the 7.4 floor, and no claim about its key. The
+     * signature check alone decides.
      */
     public function testAReleaseBeforeDescriptionsIsReadAsTheSevenFourFloorWithNoKeyClaim(): void
     {
@@ -580,7 +579,7 @@ final class ReleaseLocatorTest extends TestCase
 
     /**
      * The description is unsigned. A lying one for the newest release at or below the running
-     * version must not walk --force down to an older one: that would be a downgrade chosen by a file
+     * version must not walk --force down to an older one: that is a downgrade chosen by a file
      * nobody signed. --force considers that one release and no other below it.
      */
     public function testForceNeverWalksBelowTheNewestReleaseAtOrBelowTheRunningOne(): void
@@ -620,7 +619,7 @@ final class ReleaseLocatorTest extends TestCase
      * @param int<1, max> $count
      *
      * @return list<array<string, mixed>> releases 0.1.($first + $count - 1) down to 0.1.$first, newest
-     *                                    first as GitHub lists them; all from before descriptions
+     *                                    first as GitHub lists them, all from before descriptions
      */
     private static function page(int $first, int $count): array
     {
@@ -738,13 +737,12 @@ final class ReleaseLocatorTest extends TestCase
     {
         yield 'the archive' => [ReleaseLocator::PHAR_ASSET];
         yield 'the checksum' => [ReleaseLocator::CHECKSUM_ASSET];
-        // A release from before signing (0.5.0 and earlier) is not one this build can install.
+        // A release from before signing is not one this build can install.
         yield 'the signature' => [ReleaseLocator::SIGNATURE_ASSET];
     }
 
     /**
-     * The chosen release fails loudly on a missing asset, rather than quietly falling back to an
-     * older one.
+     * The chosen release fails on a missing asset. It does not fall back to an older one.
      *
      * @dataProvider missingAssets
      */
@@ -762,7 +760,6 @@ final class ReleaseLocatorTest extends TestCase
         $this->locator($http, '0.13.0')->locate();
     }
 
-    /** An asset listed under the right name but with nothing to download from is no asset at all. */
     public function testAnAssetWithoutADownloadUrlCountsAsMissing(): void
     {
         $entry = GitHubReleases::entry('v0.12.0');
@@ -787,10 +784,9 @@ final class ReleaseLocatorTest extends TestCase
     }
 
     /**
-     * PHIVE reads any release asset ending in `.asc` or `.sig` as the GPG signature of the PHAR —
-     * last one wins — so neither the self-update signature nor the description may carry either
-     * suffix: 0.6.0 shipped `lockrot.phar.sig` and `phive install somework/lockrot` broke until the
-     * asset was renamed.
+     * PHIVE reads any release asset that ends in `.asc` or `.sig` as the GPG signature of the PHAR —
+     * last one wins — so neither the self-update signature nor the description can carry either
+     * suffix. A `.sig` asset breaks `phive install somework/lockrot`.
      */
     public function testNoSelfUpdateAssetNameIsOnePhiveTakesForAGpgSignature(): void
     {
@@ -831,7 +827,7 @@ final class ReleaseLocatorTest extends TestCase
 
     /**
      * A rotation whose transition release is missing (never shipped, or pulled): every newer
-     * release names a key this archive does not carry, and nothing it could install carries it. No
+     * release names a key this archive does not carry, and nothing it can install carries it. No
      * later run changes that, so it is an error on every run — not "up to date" forever.
      */
     public function testNewerReleasesOnlyUnderAnotherKeyStrandTheArchive(): void
@@ -847,7 +843,6 @@ final class ReleaseLocatorTest extends TestCase
         self::assertSame([self::URL, self::metaUrl('v0.15.0'), self::metaUrl('v0.14.0')], $http->requested());
     }
 
-    /** A transition release this PHP cannot run leaves the archive just as stranded. */
     public function testATransitionReleaseThisPhpCannotRunStillStrandsTheArchive(): void
     {
         $http = self::http(
@@ -860,7 +855,6 @@ final class ReleaseLocatorTest extends TestCase
         self::assertSame([self::keyNote('0.15.0'), 'lockrot 0.14.0 needs PHP 99.0.0 or newer, and this is PHP '.self::PHP], $locator->notes());
     }
 
-    /** Held back by the PHP floor alone: nothing this PHP can install, which is not an error. */
     public function testNewerReleasesHeldBackOnlyByThePhpFloorAreNotAnError(): void
     {
         $http = self::http(
@@ -873,7 +867,6 @@ final class ReleaseLocatorTest extends TestCase
         self::assertSame(['lockrot 0.15.0 needs PHP 8.2.0 or newer, and this is PHP 7.4.33'], $locator->notes());
     }
 
-    /** --allow-major into a line signed only with another key is stranded too. */
     public function testAllowMajorIntoALineOnlyUnderAnotherKeyIsStranded(): void
     {
         $http = self::http([GitHubReleases::entry('v1.0.0'), GitHubReleases::entry('v0.13.0')], ['v1.0.0' => GitHubReleases::meta('7.4.0', self::otherKey())]);
@@ -885,7 +878,7 @@ final class ReleaseLocatorTest extends TestCase
 
     /**
      * Without --allow-major the next major is advice, not the target: one signed with another key
-     * says so instead of advising a flag that would install nothing, and strands nothing.
+     * says so instead of advising a flag that installs nothing, and strands nothing.
      */
     public function testANextMajorUnderAnotherKeyIsNamedForItsKeyNotAdvised(): void
     {
@@ -897,7 +890,7 @@ final class ReleaseLocatorTest extends TestCase
     }
 
     /**
-     * The advice names the release --allow-major would install: a newer 1.x this PHP cannot run is
+     * The advice names the release that --allow-major installs: a newer 1.x this PHP cannot run is
      * named for its floor, and the newest one it can run is the one advised.
      */
     public function testTheAdviceNamesTheNextMajorReleaseAllowMajorWouldInstall(): void
@@ -948,7 +941,6 @@ final class ReleaseLocatorTest extends TestCase
         self::assertSame(['lockrot 1.0.0 is in the next major version, and its description could not be read: '.$reason], $locator->notes());
     }
 
-    /** An unreadable newest release of the next major does not hide the advice about an older one. */
     public function testTheAdviceGoesOnPastANextMajorReleaseThatCannotBeDescribed(): void
     {
         $url = self::metaUrl('v1.1.0');
@@ -965,7 +957,6 @@ final class ReleaseLocatorTest extends TestCase
         ], $locator->notes());
     }
 
-    /** With --allow-major the next major is the target, and a target that cannot be described still fails loudly. */
     public function testWithAllowMajorANextMajorThatCannotBeDescribedIsAnError(): void
     {
         $url = self::metaUrl('v1.0.0');
@@ -977,7 +968,6 @@ final class ReleaseLocatorTest extends TestCase
         self::assertLocateFails('could not download '.$url.': HTTP 404', $this->locator($http, '0.13.0'), true);
     }
 
-    /** A next major this PHP cannot run at all gets the floor, never the advice. */
     public function testANextMajorThisPhpCannotRunIsNotAdvised(): void
     {
         $http = self::http([GitHubReleases::entry('v1.0.0'), GitHubReleases::entry('v0.13.0')], ['v1.0.0' => GitHubReleases::meta('8.1.0', self::releaseKey())]);
@@ -1024,8 +1014,8 @@ final class ReleaseLocatorTest extends TestCase
     }
 
     /**
-     * A floor spelled other than `major.minor.patch` is compared with nothing: `v8.1.0` would sort
-     * below every PHP and install an archive that refuses to start. The release is passed over
+     * A floor spelled other than `major.minor.patch` is compared with nothing: `v8.1.0` sorts
+     * below every PHP and installs an archive that refuses to start. The release is passed over
      * with a note that does not repeat the value.
      */
     public function testAReleaseWhoseFloorIsNotMajorMinorPatchIsNotInstalled(): void
@@ -1056,7 +1046,6 @@ final class ReleaseLocatorTest extends TestCase
         self::assertSame(['lockrot 1.0.0 needs PHP 99.0.0 or newer, and this is PHP '.self::PHP], $locator->notes());
     }
 
-    /** --force from 0.12.0 does not leave its line for a `V1.0.0`. */
     public function testForceWithACapitalVTagStaysInTheLine(): void
     {
         $http = self::http([GitHubReleases::entry('V1.0.0'), GitHubReleases::entry('v0.12.0', [ReleaseLocator::PHAR_ASSET, ReleaseLocator::CHECKSUM_ASSET, ReleaseLocator::SIGNATURE_ASSET])], [
@@ -1118,8 +1107,8 @@ final class ReleaseLocatorTest extends TestCase
 
     /**
      * A published release whose tag is not a version is skipped — but not in silence, when it is
-     * newer than the running version by list order: a signed release nobody can install would
-     * otherwise look like "up to date" forever.
+     * newer than the running version by list order: a signed release nobody can install otherwise
+     * looks like "up to date" forever.
      */
     public function testAPublishedReleaseWithATagThatIsNotAVersionIsNamed(): void
     {
@@ -1157,7 +1146,6 @@ final class ReleaseLocatorTest extends TestCase
         self::assertSame([], $locator->notes());
     }
 
-    /** A draft or a pre-release under such a tag is not published, so it is not named either. */
     public function testAnUnpublishedTagThatIsNotAVersionIsNotNamed(): void
     {
         $http = self::http([
@@ -1173,7 +1161,7 @@ final class ReleaseLocatorTest extends TestCase
 
     /**
      * A failure further down the list keeps the notes decided before it: the reason the newer
-     * release was passed over — here the flag that would route around the broken one — is still
+     * release was passed over — here the flag that routes around the broken one — is still
      * there to print ahead of the error.
      */
     public function testNotesSurviveAFailureFurtherDownTheList(): void
@@ -1189,7 +1177,6 @@ final class ReleaseLocatorTest extends TestCase
         self::assertSame(['lockrot 1.0.0 is in the next major version; run lockrot.phar self-update --allow-major to move to it'], $locator->notes());
     }
 
-    /** Each locate() starts from no notes. */
     public function testNotesAreThoseOfTheLastLocate(): void
     {
         $http = self::described(['v1.0.0', 'v0.13.0']);

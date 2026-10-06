@@ -72,7 +72,7 @@ final class AnalyzerBootstrapTest extends TestCase
         self::assertContains('vendor/project', $patterns, 'the project ignore list must be merged in');
     }
 
-    /** The project's own php requirement reaches the factory: it is one of the two floors S8 keeps the branch it names within. */
+    /** The project's php requirement is one of the two floors that S8 keeps the branch it names within. */
     public function testCreatePassesTheProjectsPhpRequirementThroughToTheFactory(): void
     {
         $lockrot = LockrotConfig::fromSources([], [], [], '8.4.0', null);
