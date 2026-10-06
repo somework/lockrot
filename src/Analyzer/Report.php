@@ -14,7 +14,6 @@ use Lockrot\Verdict\Verdict;
 /** @internal */
 final class Report
 {
-    /** Parents named on the `pulled in by:` line before the rest is counted. */
     public const EXPOSURE_NAMES = 5;
 
     /** @var list<Finding> */
@@ -24,22 +23,16 @@ final class Report
     private \DateTimeImmutable $generatedAt;
     private int $packagesChecked;
     private int $notFromComposerRepository;
-    /** Null when the project has no baseline file, which is every run until one is generated. */
+    /** Null when the project has no baseline file. */
     private ?BaselineComparison $baseline;
     /** Null when the report was not told what the run was asked to do, which is only ever a test. */
     private ?RunSettings $run = null;
     /**
-     * When the oldest repository-activity answer served from lockrot's cache was fetched — usually
-     * within the last day, older after a failed refetch fell back to a stale entry or under
-     * `--offline`; null when every answer was fetched in this run (or none was needed). Repository metadata is
-     * revalidated on every run, so this is the one source whose age the report has to state.
+     * Fetch time of the oldest repository-activity answer from lockrot's cache, null when every
+     * answer was fetched in this run or none was needed. Repository metadata is revalidated on
+     * every run, so this is the one source whose age the report must state.
      */
     private ?\DateTimeImmutable $activityCacheOldestAt;
-    /**
-     * Whether `packages-dev` was part of the run (`--dev`, `include-dev`). The footer says so where
-     * it points at `composer audit`, which counts development packages by default: the two totals
-     * differ on most projects, and a reader comparing them should be told why by the report itself.
-     */
     private bool $includesDev;
 
     /**
@@ -60,10 +53,8 @@ final class Report
     }
 
     /**
-     * The report's order: priority first, then the verdict's own severity, then direct dependencies
-     * ahead of transitive ones, then the package name — a total order, so the report reads the same
-     * way on every run. Descending keys take the other finding's value, ascending ones take their
-     * own. Public so the transitive-exposure pass lists a parent's descendants the same way.
+     * Descending keys take the other finding's value, ascending keys their own. Public so
+     * {@see TransitiveExposure} lists a parent's descendants in the same order.
      */
     public static function compare(Finding $a, Finding $b): int
     {
@@ -71,10 +62,7 @@ final class Report
             <=> [Priority::rank($a->priority()), Verdict::severity($a->verdict()), $a->isDirect(), $b->package()];
     }
 
-    /**
-     * The same report, seen next to the project's baseline. A new instance rather than a mutation,
-     * so a caller that already handed the report somewhere else keeps the report it handed over.
-     */
+    /** Returns a copy: a caller that handed the report on keeps the report it handed over. */
     public function withBaseline(BaselineComparison $baseline): self
     {
         $copy = new self(
@@ -97,10 +85,7 @@ final class Report
         return $this->baseline;
     }
 
-    /**
-     * The same report, carrying what the run was told to do. A new instance rather than a mutation,
-     * for the reason {@see self::withBaseline()} gives.
-     */
+    /** Returns a copy, like {@see self::withBaseline()}. */
     public function withRun(RunSettings $run): self
     {
         $copy = new self(
@@ -142,10 +127,8 @@ final class Report
     }
 
     /**
-     * How many `abandoned` findings name a package to move to ({@see Finding::successor()}). The
-     * marker alone does not say whether a package died or moved: on the weekly watch 19 of 72
-     * abandoned packages carried a replacement, 17 of them a package name. A reader comparing two
-     * reports, or two projects, wants the two apart.
+     * The `abandoned` findings that name a package to move to ({@see Finding::successor()}):
+     * docs/verdicts.md#abandoned-and-where-to.
      */
     public function abandonedWithReplacement(): int
     {
@@ -171,15 +154,9 @@ final class Report
     }
 
     /**
-     * Transitive exposure by direct requirement: each root require that pulls in a flagged
-     * transitive package, with how many, most first and then by name. Which findings count is
-     * {@see TransitiveExposure::attributable()} — the rule S7 uses, so the number here is the number
-     * on the parent's signal. A flagged package the project requires directly is its own
-     * responsibility and counts under nobody, and so is one reached from more direct requirements
-     * than anyone could remove — the JSON document lists those under `unattributed`
-     * ({@see TransitiveExposure::sharedAboveCap()}). Derived from the findings'
-     * {@see Finding::directDependents()}, so it is as complete as the analysed set — the whole lock
-     * for `composer lockrot`, the transaction at install time.
+     * Transitive exposure by direct requirement, most first and then by name
+     * (docs/verdicts.md#transitive-exposure). {@see TransitiveExposure::attributable()} decides
+     * which findings count, the rule that S7 uses, so this number equals the number on S7.
      *
      * @return array<string, int> parent => attributable packages reachable from it
      */
@@ -194,7 +171,7 @@ final class Report
                 $counts[$parent] = ($counts[$parent] ?? 0) + 1;
             }
         }
-        // Count descending, then name ascending — strcmp, the same byte order chainsTo() sorts by.
+        // Count descending, then name ascending by strcmp, the byte order that chainsTo() sorts by.
         uksort($counts, static function (string $a, string $b) use ($counts): int {
             return $counts[$b] <=> $counts[$a] ?: strcmp($a, $b);
         });
@@ -203,12 +180,8 @@ final class Report
     }
 
     /**
-     * `pulled in by: acme/a 16 · acme/b 3`, naming at most
-     * {@see EXPOSURE_NAMES} parents before counting the rest — in a framework application a
-     * transitive core package is reached from every bundle, and the long tail of equal counts that
-     * makes is what `--format=json` is for; the empty string when {@see exposure()} is empty — no
-     * flagged package is attributed to a direct requirement, which is also the case when every
-     * flagged transitive one is shared above the cap or reached by none.
+     * The `pulled in by:` line, empty when {@see exposure()} is empty:
+     * docs/verdicts.md#transitive-exposure.
      */
     public function exposureSummaryLine(): string
     {
@@ -228,14 +201,10 @@ final class Report
     }
 
     /**
-     * `53 security advisories on 17 packages the report does not flag; see composer audit` — the
-     * advisories S9 fetched for `ok` and `finished` packages, which no row prints without `--all`.
-     * They are audit's findings, not lockrot's, but a footer that totals every verdict and says
-     * nothing about them reads as "nothing to report"; the empty string when there are none.
-     *
-     * Without `--dev` the line adds that `composer audit` counts `packages-dev` too and this run did
-     * not: plain `composer audit` on the same project usually prints a bigger number, and the
-     * difference should read as the scope it is, not as one of the two tools missing something.
+     * The footer line for S9 advisories on packages that the report does not flag, empty when there
+     * are none. A footer that totals every verdict and omits them reads as "nothing to report".
+     * Without `--dev` the line says that `composer audit` counts `packages-dev` too, so the two
+     * totals differ by scope, not by a miss in one tool.
      */
     public function unflaggedAdvisoriesLine(): string
     {
@@ -266,21 +235,16 @@ final class Report
         );
     }
 
-    /**
-     * How far behind the lock is, in libyears ({@see Libyears}): derived from the findings every
-     * time it is asked for, so the block the report prints is exactly the arithmetic over the
-     * findings it prints — nothing to thread through the constructor, nothing that can disagree.
-     */
+    /** Derived from the findings on every call, so the block cannot disagree with them. */
     public function libyears(): Libyears
     {
         return Libyears::fromFindings($this->findings);
     }
 
     /**
-     * The run's gate, decided over this report as it stands — its findings, its baseline comparison,
-     * its network failures — by the policy its run carries, so a report compared with a baseline
-     * after the run was attached never keeps a stale answer. Null where the report was not told what
-     * the run was asked to do, or was told no fail-on, which is only ever a test.
+     * Decided on every call, over the findings, the baseline comparison and the network failures,
+     * so it cannot go stale when a baseline is attached. Null without a run or without a fail-on,
+     * which only a test does.
      */
     public function gate(): ?Gate
     {
@@ -292,7 +256,6 @@ final class Report
         return $failOn === null ? null : Gate::decide($this, $failOn, $this->run->strictNetwork(), $this->run->mode());
     }
 
-    /** Whether `packages-dev` was analysed alongside the production set. */
     public function includesDev(): bool
     {
         return $this->includesDev;
@@ -322,7 +285,6 @@ final class Report
     {
         return $this->notFromComposerRepository;
     }
-    /** Whether a lookup failed, which `--strict-network` fails on: exactly when a note says so. */
     public function hadNetworkFailures(): bool
     {
         foreach ($this->notes as $note) {
@@ -340,12 +302,10 @@ final class Report
     }
 
     /**
-     * How the footer describes the sources behind the report: the plain pair when everything was
-     * fetched in this run, otherwise how old the oldest cached activity answer is, in whole hours
-     * rounded up and never below one (a minutes-old answer and a clock that ran backwards both read
-     * as one hour). A fresh hit is under a day old, so this usually reads up to 24; it goes past
-     * that when a refetch failed and lockrot fell back to a stale entry, or when `--offline` served
-     * the cache however old it was. The wording is shared by the table and markdown footers.
+     * The footer's data sources: the plain pair when every answer was fetched in this run, else
+     * the age of the oldest cached activity answer in whole hours, rounded up and never below one.
+     * A minutes-old answer and a clock that runs backwards both read as one hour. The age passes 24
+     * after a failed refetch or under `--offline`. The table and markdown footers share it.
      */
     public function dataSourcesClause(): string
     {
@@ -358,8 +318,8 @@ final class Report
     }
 
     /**
-     * One-line totals, e.g. `200 packages checked · abandoned 19 (6 with a replacement) · silent 1 · …`,
-     * shared by the table and GitHub formats. The replacement count is there only when it is not zero.
+     * One-line totals, shared by the table and GitHub formats. The replacement count shows only
+     * when it is not zero.
      */
     public function summaryLine(): string
     {
@@ -373,8 +333,8 @@ final class Report
     }
 
     /**
-     * The four flagged levels, e.g. `priority: critical 2 · high 12 · medium 5 · low 3`. `none` is left
-     * out: it counts the rows the report does not flag, which {@see summaryLine()} already totals.
+     * The four flagged levels. `none` is omitted: it counts the unflagged rows, which
+     * {@see summaryLine()} totals.
      */
     public function prioritySummaryLine(): string
     {
@@ -388,8 +348,8 @@ final class Report
     }
 
     /**
-     * {@see exposure()} as a list of objects, so an empty one encodes as `[]` rather than as a
-     * PHP array that would encode as `[]` when empty and as an object otherwise.
+     * {@see exposure()} as a list, so the JSON document always encodes it as an array, never as an
+     * object keyed by parent.
      *
      * @return list<array{package: string, flagged: int}>
      */
@@ -403,13 +363,7 @@ final class Report
         return $list;
     }
 
-    /**
-     * The flagged transitive packages {@see exposure()} counts under nobody because too many direct
-     * requirements reach them ({@see TransitiveExposure::sharedAboveCap()}), in report order, with
-     * how many reach each.
-     *
-     * @return list<array{package: string, verdict: string, fan_in: int}>
-     */
+    /** @return list<array{package: string, verdict: string, fan_in: int}> */
     private function unattributedList(): array
     {
         $list = [];
@@ -423,11 +377,7 @@ final class Report
     }
 
     /**
-     * Where a finding stands against the baseline, or null when the run read none or the baseline
-     * has nothing to say about this package.
-     *
-     * The totals are in the `baseline` block above; this is the same judgement per finding, which
-     * is what a reader filtering for what is new actually needs and what the block cannot give.
+     * Null when the run read no baseline or the baseline has nothing on this package.
      *
      * @return array{status: string, previous_verdict: ?string}|null
      */
@@ -453,8 +403,6 @@ final class Report
 
         return [
             'generated_at' => $this->generatedAt->format(\DATE_ATOM),
-            // What the verdicts below were decided against. Null only where nothing told the report,
-            // which outside a test is nowhere.
             'run' => $this->run === null ? null : $this->run->toArray(),
             'activity_cache_oldest_at' => $this->activityCacheOldestAt === null ? null : $this->activityCacheOldestAt->format(\DATE_ATOM),
             'packages_checked' => $this->packagesChecked,
@@ -462,13 +410,9 @@ final class Report
             'not_from_composer_repository' => $this->notFromComposerRepository,
             'network_failures' => $this->hadNetworkFailures(),
             'counts' => $counts,
-            // The abandoned count split by what the reader can do about it: `with_replacement` names a
-            // package to move to, the rest is dead. `total` repeats counts.abandoned so the block reads alone.
             'abandoned' => ['total' => $counts[Verdict::ABANDONED], 'with_replacement' => $this->abandonedWithReplacement()],
             'priorities' => $this->byPriority(),
             'exposure' => $this->exposureList(),
-            // The rule `exposure` and S7 attribute by, stated so a reader need not know the number,
-            // and what that rule gives to nobody.
             'exposure_rule' => ['max_fan_in' => TransitiveExposure::MAX_FAN_IN],
             'unattributed' => $this->unattributedList(),
             'libyears' => $this->libyears()->toArray(),

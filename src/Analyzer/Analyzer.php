@@ -34,11 +34,7 @@ use Lockrot\Signal\SignalSet;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\VerdictEngine;
 
-/**
- * The analysis itself: metadata, repository activity, signals and verdicts for a set of locked packages.
- *
- * @internal
- */
+/** @internal */
 final class Analyzer
 {
     private MetadataLoaderInterface $metadata;
@@ -68,7 +64,6 @@ final class Analyzer
         $this->offline = $offline;
         $this->advisories = $advisories;
         $this->parents = $parents ?? MonorepoParents::load();
-        // Only the install-time path sets a budget; `composer lockrot` runs unbounded.
         $this->deadline = Deadline::never();
     }
 
@@ -86,9 +81,8 @@ final class Analyzer
     }
 
     /**
-     * The budget that bounds an install-time run ({@see Deadline}). It reaches the activity half of
-     * the analysis here and the repository half through the metadata loader, which takes its own
-     * copy; both are given the same instance by {@see \Lockrot\Composer\ServiceFactory}.
+     * Give the metadata loader the same {@see Deadline} instance: it keeps its own copy of the
+     * budget ({@see \Lockrot\Composer\ServiceFactory}).
      */
     public function withDeadline(Deadline $deadline): self
     {
@@ -104,10 +98,8 @@ final class Analyzer
     }
 
     /**
-     * Checks only $packages — the install-time path passes the transaction's packages, not the whole
-     * lock. $lock, $project and $includeDev are still the full picture: they build the dependency
-     * graph, so a package's "via" chain is resolved through every locked package, not only the
-     * changed ones.
+     * Analyses only $packages. $lock, $project and $includeDev still describe the whole lock: they
+     * build the dependency graph, so a `via` chain runs through every locked package.
      *
      * @param list<LockedPackage> $packages
      */
@@ -117,8 +109,8 @@ final class Analyzer
     }
 
     /**
-     * {@see analyzePackages()}, keeping the facts each finding was decided on ({@see Analysis}).
-     * The same run, the same report: `--explain` prints exactly what the report would.
+     * The same run and report as {@see analyzePackages()}, with the facts behind each finding
+     * ({@see Analysis}).
      *
      * @param list<LockedPackage> $packages
      */
@@ -149,10 +141,10 @@ final class Analyzer
 
         $activityBatch = ActivityBatch::empty();
         if ($this->deadline->isPast()) {
-            // The metadata pass already used the whole budget. Starting the forge round-trips now
-            // would push the install past it, so the activity signals are dropped and the report
-            // says so rather than reading as "checked, nothing found". Planning waits too: it may
-            // exchange Bitbucket credentials over the network ({@see ForgeAuth}).
+            // The metadata pass used the whole budget. Requests to the repository hosts will push
+            // the install past it, so the activity signals are dropped and a run note says so: the
+            // report must not read as "checked, nothing found". Planning waits too: it can exchange
+            // Bitbucket credentials over the network ({@see ForgeAuth}).
             $activityNotes = [RunNote::repositoryActivityNotChecked()];
             $plan = null;
         } else {
@@ -190,8 +182,8 @@ final class Analyzer
     }
 
     /**
-     * The fetch time of the oldest activity answer that came from lockrot's cache, or null when
-     * every answer was fetched in this run: what the report's footer states as the data's age.
+     * Fetch time of the oldest activity answer from lockrot's cache, null when every answer was
+     * fetched in this run.
      *
      * @param array<string, RepositoryActivity> $activity
      */
@@ -208,13 +200,11 @@ final class Analyzer
     }
 
     /**
-     * The batch with every split package's branches dated by its monorepo parent
-     * ({@see MonorepoParents}). A parent not in the batch is loaded from the same repositories —
-     * one request, skipped under an exhausted install-time budget like the forge round-trips are,
-     * and dropped silently when the budget runs out mid-way: the branch stays undated, as it was.
-     * A parent the repositories do not list is no failure (a mirror without laravel/framework is
-     * a mirror); one they could not deliver is returned as a note and a network failure, since the
-     * report would otherwise read as measured where it is not.
+     * The batch with each split package's branches dated by its monorepo parent
+     * ({@see MonorepoParents}). A parent missing from the batch is loaded in one request, unless
+     * the install-time budget is gone. A parent that the repositories do not list is no failure. A
+     * parent that they could not deliver is returned as failed, so the report does not read as
+     * measured. A budget failure is dropped: the branch stays undated.
      *
      * @param list<LockedPackage>            $packages
      * @param array<string, PackageMetadata> $metadata
@@ -302,13 +292,10 @@ final class Analyzer
         return [$allowlisted, $repoByPackage, $candidateByPackage];
     }
 
-    /** @return array{0: ActivityBatch, 1: list<string>} */
     /**
-     * Why each package's repository was never asked about, by package name. A check that ran and
-     * came back empty — a 404, a repository the forge hides — is not in here: it was answered for,
-     * and the report's notes say how many. Only a check that never happened is, so a finding can
-     * carry that fact instead of reading as "checked, nothing found"
-     * ({@see \Lockrot\Signal\Rule\NotCheckedRule}).
+     * Why a package's repository was never asked about, by package name. A check that ran and came
+     * back empty (a 404, a hidden repository) is not listed: S10
+     * ({@see \Lockrot\Signal\Rule\NotCheckedRule}) marks only a check that never happened.
      *
      * @param array<string, RepoRef> $repoByPackage
      *
@@ -356,8 +343,6 @@ final class Analyzer
             $repoByKey[$repo->key()] = $repo;
         }
         $notes = [];
-        // Anonymously the planner both filters to candidates and caps the request count on the
-        // forges that need it; the report states the total left unchecked per forge.
         foreach ($plan->cappedForges() as $forge) {
             $notes[] = RunNote::repositoryActivityAnonymousCap($forge, $plan->checkedPackages($forge), $plan->skippedNoToken($forge), $plan->skippedBudget($forge));
         }
@@ -386,9 +371,9 @@ final class Analyzer
         $meta = $facts->metadata();
         $activity = $facts->activity();
         $signals = $this->signals->evaluate($facts);
-        // S10 says a missing check could have changed the verdict. It could not have changed an
-        // allowlisted one, which is `finished` whatever the signals say, nor one the repository
-        // already marks abandoned, which is the most serious verdict there is.
+        // S10 means that a missing check could change the verdict. It cannot change an allowlisted
+        // verdict, which is `finished` whatever the signals say, or one that the repository marks
+        // abandoned, the most serious verdict there is.
         if ($entry !== null || ($meta !== null && $meta->isAbandoned())) {
             $signals = array_values(array_filter($signals, static fn (Signal $signal): bool => $signal->id() !== Signal::S10));
         }
@@ -421,9 +406,9 @@ final class Analyzer
     }
 
     /**
-     * The offline and budget reasons already state why the metadata is missing, so prefixing them
-     * would read as "Repository metadata unavailable: offline: ...". Every other reason is a bare
-     * transport or repository message that needs the prefix to make sense on a finding.
+     * The offline and budget reasons state why the metadata is missing, so a prefix reads
+     * "Repository metadata unavailable: offline: ...". Every other reason is a bare message that
+     * needs the prefix to make sense on a finding.
      */
     private function metadataFailureNote(string $reason): string
     {
@@ -444,7 +429,7 @@ final class Analyzer
         return false;
     }
 
-    /** The newer of the two dates, or the one there is: null compares below any object, so max() is exactly that. */
+    /** Null compares below any object, so max() returns the newer date, or the only one. */
     private function dataDate(?PackageMetadata $meta, ?RepositoryActivity $activity): ?\DateTimeImmutable
     {
         return max($meta !== null ? $meta->dataDate() : null, $activity !== null ? $activity->fetchedAt() : null);

@@ -14,48 +14,20 @@ use Lockrot\Lock\LockedPackage;
 use Lockrot\Verdict\Finding;
 
 /**
- * How far behind the lock is, in libyears: for each package, the years between the release of the
- * version installed and the package's newest stable release, summed over the analysed set.
- *
- * A verdict is a judgement about one package; this is one sentence about the whole lock —
- * "wallabag is 163.7 libyears behind". It is laid over the verdicts, not one of them: it does not enter a priority, a
- * `--fail-on` or the baseline, and it is not a measure of rot or of security — a package three
- * healthy patches behind adds as much as an abandoned one, and a `finished` psr/log 1.1.4 adds
- * three years for a 3.x it will never need. Nothing about "now" enters either: two dates the run
- * already holds, so the number is stable on recorded fixtures and needs no clock.
- *
- * The per-package rule is {@see measure()}; the block a report carries is {@see fromFindings()},
- * derived from the findings so that every number in it can be checked against them by arithmetic.
- * Not php-libyear's number: that tool reads composer.json and sums the direct requirements only;
- * lockrot sums the whole lock, and {@see direct()} is the bridge between the two.
+ * The number and what it is not: docs/verdicts.md#libyears.
  *
  * @internal
  */
 final class Libyears
 {
-    /** A dev pin (`dev-main`, `2.x-dev`) has a commit date, not a release date; the `pinned` verdict covers it. */
     public const BRANCH_SNAPSHOT = 'branch_snapshot';
-    /**
-     * No date lockrot trusts for one of the two ends: no stable release at all, no dated release
-     * above the installed version (the newest tags share a commit, as a subtree split's do, and
-     * nothing dated sits between), the installed version dated only by such a shared commit (a
-     * split whose newest release the monorepo parent dated and whose installed version it does
-     * not), or the lock entry without a `time`.
-     */
     public const NO_STABLE_RELEASE_DATE = 'no_stable_release_date';
-    /**
-     * No metadata was asked for: the lock entry carries no Composer notification-url, as a `path`,
-     * `vcs`, `artifact` or inline `package` entry does, and so does a package from a `type: composer`
-     * repository that advertises no notify URL. Exactly the findings not from a Composer repository.
-     */
     public const NOT_FROM_COMPOSER_REPOSITORY = 'not_from_composer_repository';
-    /** Metadata was asked for and did not come: not listed, offline, budget, transport. */
     public const METADATA_UNAVAILABLE = 'metadata_unavailable';
 
-    /** The reasons a package goes unmeasured, in the order the block lists them; {@see measure()} checks them in another. */
+    /** The block lists the reasons in this order. {@see measure()} checks them in another. */
     public const REASONS = [self::BRANCH_SNAPSHOT, self::NO_STABLE_RELEASE_DATE, self::NOT_FROM_COMPOSER_REPOSITORY, self::METADATA_UNAVAILABLE];
 
-    /** Decimals the block and each finding print; the sums are taken before rounding. */
     private const DECIMALS = 2;
 
     private float $total;
@@ -64,8 +36,7 @@ final class Libyears
     /** @var array<string, int> every key of {@see REASONS}, zero included */
     private array $unmeasured;
     /**
-     * The finding furthest behind and its value, kept as the pair they were set as; null when
-     * nothing was measured, or nothing measured is behind.
+     * Null when nothing measured is behind.
      *
      * @var array{Finding, float}|null
      */
@@ -84,16 +55,6 @@ final class Libyears
         $this->worst = $worst;
     }
 
-    /**
-     * The per-package rule: the newest stable release's date minus the installed version's, in
-     * years of 365.25 days, never below zero — a lock on a pre-release above the last stable, or on
-     * a tag the repository no longer lists, is measured and is not behind. The date is the
-     * repository's for the newest release ({@see PackageMetadata::lastStableReleaseAt()}) and the
-     * lock's for the installed one. No number comes with the first reason that applies, in this
-     * order: outside every Composer repository, without metadata, a branch snapshot, or without a
-     * date to trust for one of the two ends. The finding stores the result; the report's block
-     * counts it.
-     */
     public static function measure(LockedPackage $package, ?PackageMetadata $metadata): LibyearsMeasurement
     {
         if (!$package->isFromComposerRepository()) {
@@ -116,14 +77,11 @@ final class Libyears
     }
 
     /**
-     * When the repository dates no newest release lockrot trusts — the highest tag shares its
-     * commit with other tags, as a subtree split's do (scheb/2fa-backup-code: v8.3.0 to v8.6.1 all
-     * on one commit, all "2026-01-24") — the newest *trusted* date of a release above the installed
-     * version still bounds the answer from below: a tag's commit is never younger than the release
-     * it names, so whatever released above the installed version, it released no earlier than this.
-     * Read off the branch view S8 already keeps: every branch above the installed one, and the
-     * installed branch itself when its newest dated release is a higher version. A branch below
-     * (a backport released later) is not "ahead" and does not count. Null when nothing above is dated.
+     * The newest trusted date of a release above the installed version: a lower bound for the
+     * newest release when its own tag has no trusted date, because a tag's commit is never younger
+     * than the release it names. Reads the branch view of S8: each branch above the installed one,
+     * and the installed branch when its newest dated release is higher. A backport on a lower
+     * branch does not count. Null when nothing above is dated.
      */
     private static function newestTrustedDateAbove(PackageMetadata $metadata, string $installedVersion): ?\DateTimeImmutable
     {
@@ -158,9 +116,8 @@ final class Libyears
     }
 
     /**
-     * The block for a set of findings: the sums of the unrounded values, how many were measured and
-     * how many were not and why, and the worst one — the greatest value above zero, ties going to
-     * the package that sorts first by name, so two runs over the same lock name the same package.
+     * Ties for the furthest behind go to the package that sorts first by name, so two runs over
+     * the same lock name the same package.
      *
      * @param list<Finding> $findings
      */
@@ -170,7 +127,7 @@ final class Libyears
         $direct = 0.0;
         $measured = 0;
         $unmeasured = array_fill_keys(self::REASONS, 0);
-        /** @var array{Finding, float}|null $worst the finding and its value, set together */
+        /** @var array{Finding, float}|null $worst */
         $worst = null;
         foreach ($findings as $finding) {
             $reason = $finding->libyearsUnmeasured();
@@ -187,10 +144,8 @@ final class Libyears
             if ($finding->isDirect()) {
                 $direct += $behind;
             }
-            // Only a package that is behind can be the worst: a lock with every package on its
-            // newest release names nobody. Two findings never share a package name — the lock is
-            // keyed by it — so on a tie the comparison decides between two different names, never
-            // between a name and itself.
+            // Only a package that is behind can be the furthest behind. Package names are unique,
+            // so strcmp on a tie never compares a name with itself.
             if ($behind > 0.0 && ($worst === null || $behind > $worst[1] || ($behind === $worst[1] && strcmp($finding->package(), $worst[0]->package()) < 0))) {
                 $worst = [$finding, $behind];
             }
@@ -200,9 +155,8 @@ final class Libyears
     }
 
     /**
-     * The finding's {@see Finding::libyearsUnmeasured()} in the words a reader gets, rather than the
-     * key the report counts under. Every key has words: the map is over {@see REASONS}, the only
-     * reasons a measurement takes.
+     * The words for a finding's {@see Finding::libyearsUnmeasured()} key. The map covers every key
+     * of {@see REASONS}.
      */
     public static function reasonWords(Finding $finding): string
     {
@@ -221,10 +175,8 @@ final class Libyears
     }
 
     /**
-     * The sum over every measured package, unrounded; null when no package could be measured.
-     * Zero is an answer — every package measured and none behind — and null is the absence of one,
-     * so a reader adding the field up over several projects does not count a lock nothing could be
-     * read from as a lock with nothing to fix.
+     * Unrounded sum over the measured packages. Null when none was measured, which is not zero:
+     * nothing could be read.
      */
     public function total(): ?float
     {
@@ -232,8 +184,8 @@ final class Libyears
     }
 
     /**
-     * The sum over the measured direct requirements, unrounded — what php-libyear would count.
-     * Null on the same terms as {@see total()}.
+     * Unrounded sum over the measured direct requirements. Null on the same terms as
+     * {@see total()}.
      */
     public function direct(): ?float
     {
@@ -262,17 +214,9 @@ final class Libyears
     }
 
     /**
-     * The footer line: `libyears: 163.7 behind across 195 of 200 packages · 106.7 from direct
-     * requirements · furthest behind smalot/pdfparser v1.1.0 at 4.7`. Every number carries its
-     * noun: the scope says how many packages the sum covers and how many the run analysed, the
-     * direct share says whose number it is (php-libyear's, near enough), and the package furthest
-     * behind is named as that, not as "worst" — it may well be an `ok` package, and the table above
-     * the line lists flagged rows. When every measured package is on its newest release the line
-     * stops at the scope; when nothing could be measured it says so and how many packages there
-     * were; on an empty run there is nothing to measure. Joined with ` · ` like the counts line, so
-     * the table folds it between items rather than inside one. `%F`, not `%f`: the decimal point
-     * does not follow the process locale, which another plugin in the same Composer process may
-     * have set.
+     * The footer line: docs/verdicts.md#libyears shows it. Items join with ` · ` like the counts
+     * line, so the table folds between items, not inside one. `%F`, not `%f`: the decimal point
+     * must not follow the process locale, which another plugin in the Composer process can set.
      */
     public function line(): string
     {
@@ -297,7 +241,6 @@ final class Libyears
         ]);
     }
 
-    /** `191 of 200 packages`, or `all 200 packages` when every analysed package was measured. */
     private function scope(int $packages): string
     {
         if ($this->measured === $packages) {

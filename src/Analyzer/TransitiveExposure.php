@@ -10,16 +10,9 @@ use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
 
 /**
- * The parent-side view of transitive rot — signal S7.
- *
- * A maintainer can only act on what composer.json names, so once every verdict is known, each
- * direct requirement whose subtree holds flagged packages gets an `info` signal listing them, with
- * the shortest chain from that requirement to each. The signal is attached after the verdicts are
- * decided and {@see \Lockrot\Verdict\VerdictEngine} never reads it: a package is not flagged for
- * what it depends on, only described. Priority, exit code and baseline are equally untouched.
- *
- * "Flagged" is the same line every other part of the report draws ({@see Verdict::flagged()}), so
- * the packages a parent is said to pull in are exactly the rows the default report prints.
+ * Signal S7, the parent-side view of transitive exposure (docs/verdicts.md#transitive-exposure).
+ * The signal is attached after the verdicts are decided and {@see \Lockrot\Verdict\VerdictEngine}
+ * never reads it: priority, exit code and baseline stay untouched.
  *
  * @internal
  */
@@ -30,21 +23,16 @@ final class TransitiveExposure
 
     /**
      * A flagged transitive package reached from more direct requirements than this is shared
-     * infrastructure — in a framework application its framework's own contracts, reached from every
-     * bundle — and nobody's to remove, so it is attributed to no parent. On a 200-package Symfony
-     * lock the fan-in of flagged transitive packages was 1 or 2 for 32 of 37, then 6, 8, 16, 33 and
-     * 44: the cap sits in the gap. The package keeps its own row, with `also via … and N more`, and
-     * `direct_dependents` in the JSON document names every parent. The JSON document states the cap
-     * as `exposure_rule.max_fan_in` and lists these packages under `unattributed`
-     * ({@see sharedAboveCap()}), so a reader never has to know the number.
+     * infrastructure, such as a framework's contracts reached from every bundle, and counts under
+     * no parent: docs/verdicts.md#shared-packages-and-unattributed. The JSON document states the
+     * cap as `exposure_rule.max_fan_in`.
      */
     public const MAX_FAN_IN = 8;
 
     /**
-     * Whether a finding is exposure some direct requirement is answerable for: flagged, transitive,
-     * and reached from at least one and at most {@see MAX_FAN_IN} direct requirements. The one rule
-     * behind S7 and {@see Report::exposure()}, so the signal's count and the `pulled in by:` line
-     * always agree.
+     * Whether a direct requirement answers for the finding: flagged, transitive, and reached from
+     * one to {@see MAX_FAN_IN} direct requirements. S7 and {@see Report::exposure()} share this
+     * rule, so their counts agree.
      */
     public static function attributable(Finding $finding): bool
     {
@@ -57,10 +45,9 @@ final class TransitiveExposure
     }
 
     /**
-     * Whether a finding is what the cap gives to nobody: flagged, transitive, and reached from more
-     * than {@see MAX_FAN_IN} direct requirements — {@see attributable()}'s complement above the cap.
-     * A flagged transitive package no direct requirement reaches (an empty chain: a lock-only run, or
-     * a package reached only through a name it provides or replaces) is neither, having no fan-in.
+     * The complement of {@see attributable()} above the cap: flagged, transitive, and reached from
+     * more than {@see MAX_FAN_IN} direct requirements. A flagged transitive package that no direct
+     * requirement reaches has no fan-in and is neither.
      */
     public static function sharedAboveCap(Finding $finding): bool
     {
@@ -70,12 +57,9 @@ final class TransitiveExposure
     }
 
     /**
-     * The same findings, with S7 attached to every direct requirement that pulls in an
-     * {@see attributable()} one. A flagged package the project requires directly is nobody's
-     * exposure, whoever else reaches it, and neither is one every bundle reaches
-     * ({@see Report::exposure()} draws the same line). Only findings in $findings can be annotated:
-     * at install time that is the transaction, so a parent left untouched by the transaction is
-     * not in the list and gets nothing.
+     * Attaches S7 to every direct requirement that pulls in an {@see attributable()} finding. Only
+     * findings in $findings can carry it, so at install time a parent outside the transaction gets
+     * none.
      *
      * @param list<Finding> $findings
      *
@@ -91,8 +75,7 @@ final class TransitiveExposure
                 $result[] = $finding;
                 continue;
             }
-            // Sorted by number, as SignalSet leaves them: S7 belongs between S6 and S8, not after
-            // whatever the finding already carried.
+            // Sort by number, as SignalSet does: S7 belongs between S6 and S8.
             $signals = array_merge($finding->signals(), [self::signal($descendants)]);
             usort($signals, static fn (Signal $a, Signal $b): int => strnatcmp($a->id(), $b->id()));
             $result[] = $finding->withSignals($signals);
@@ -134,12 +117,7 @@ final class TransitiveExposure
         return new Signal(Signal::S7, Signal::LEVEL_INFO, self::summary($packages), ['flagged' => \count($packages), 'packages' => $packages]);
     }
 
-    /**
-     * `pulls in 3 flagged packages: a (abandoned), b (silent), c (stale)`, the tail counted once the
-     * named ones would stop being readable as a line of evidence.
-     *
-     * @param non-empty-list<array{package: string, verdict: string, chain: list<string>}> $packages
-     */
+    /** @param non-empty-list<array{package: string, verdict: string, chain: list<string>}> $packages */
     private static function summary(array $packages): string
     {
         $count = \count($packages);
