@@ -2,22 +2,14 @@
     "source": {
         "directories": ["src"]
     },
-    // The full suite takes ~30s on a developer machine, well past Infection's 10s default. With that
-    // default, every mutant whose covering tests reach the integration suite came back as "required
-    // more time than configured", which Infection counts as *detected*: 253 of 269 mutants timed out,
-    // 16 were actually killed, and the gate still reported MSI 100% and exited 0, i.e. it could not
-    // fail. A timeout has to exceed the slowest covering test run, not the fastest. With 180 the
-    // only mutants that time out are the two genuine infinite loops in
-    // RepositoryMetadataLoader::loadChunked() (the `!== []` loop guard and the splice offset), which
-    // Infection counts as detected — correctly, since a test that never returns is a failing test.
-    //
-    // Keep the cap far above the slowest covering run: Infection skips a mutant whose covering
-    // tests alone reach it, and reports a slow escape as timed out. tests/Support/MutantTestTimeLimit.php
-    // stops an endless loop per test instead. Measurements: PR #65.
+    // Keep the cap far above the slowest covering run. Infection counts a timed-out mutant as
+    // detected, and it skips a mutant whose covering tests alone reach the cap. A low cap lets the
+    // gate pass with no test that kills the mutant. tests/Support/MutantTestTimeLimit.php stops an
+    // endless loop per test instead. Evidence: https://github.com/somework/lockrot/pull/65
     "timeout": 600,
     // The covers-nothing group adds no line to the coverage, so the coverage run skips it. The
-    // option replaces the exclude list of phpunit.xml.dist, so e2e and network come back here. Use
-    // one flag per group: PHPUnit warns on a comma list, and failOnWarning then fails every run.
+    // option replaces the exclude list of phpunit.xml.dist, so it repeats e2e and network. Use one
+    // flag per group: PHPUnit warns on a comma list, and failOnWarning then fails every run.
     "testFrameworkOptions": "--exclude-group=e2e --exclude-group=network --exclude-group=covers-nothing",
     "logs": {
         "text": "build/infection.log"
@@ -25,111 +17,10 @@
     "mutators": {
         "@default": true
     },
-    // Scope widened to src/Output + src/Analyzer on 2026-09-16. Before: 1175 mutants, 76 escaped,
-    // MSI 93.53%; 67 of those were closed, most by tests and the rest by removing the code they sat
-    // in, and 4 more turned out to be equivalent (see the tests and refactors of that date). After: 1130 mutants, 9 escaped, 0 timed out -> MSI = Covered MSI 99.2%, ~1m35s on
-    // 8 threads. Each escape was checked by hand and is equivalent, the honest floor of this scope
-    // (the reasoning, with every later escape, is in tests/infection-equivalents.md):
-    //  - src/Signal/ConstraintOpenness.php (5: CastInt x2, IncrementInteger, DecrementInteger,
-    //    ConcatOperandRemoval): numeric strings compare numerically, every mutated integer stays
-    //    below any PHP major, and normalize("8.4") equals normalize("8.4.0").
-    //  - src/Analyzer/Report.php flagged() UnwrapArrayValues: the findings are sorted and every
-    //    flagged one precedes every unflagged one, so the filtered keys are already 0..n; the
-    //    array_values() is what makes the `list` type true by construction.
-    //  - src/Output/JsonFormatter.php format() FalseValue: the `$showAll` default of the interface's
-    //    parameter, which the JSON document does not read (it always lists every finding).
-    //  - src/Output/TableFormatter.php label() CastString: previousVerdictOf() is never null once
-    //    the comparison says "worsened"; the cast is for the type, not for a case.
-    //  - src/Output/TerminalWidth.php detect() Coalesce: step 2 (symfony Terminal) refuses whenever
-    //    COLUMNS is set, so swapping it with step 1 (COLUMNS) is unobservable by design.
-    //
-    // Re-measured 2026-09-16 with FailOn, the per-forge analyzer notes and the activity cache age
-    // in scope: 1175 mutants, the same 9 escapes, MSI = Covered MSI 99.23%, ~1m40s on 8 threads.
-    //
-    // Widened to the whole src tree on 2026-09-17. Before: 3160 mutants, 269 escaped, MSI 91%.
-    // 209 were closed by sharper tests, 9 by removing statements no test could observe (a redundant
-    // array_unique, a sort over an already-sorted list, a root filter every walk guards against, a
-    // trim its only reader repeats, an unused constructor parameter, Composer\Cache guards that
-    // Cache::read()/write() already apply), and 47 more turned out to be equivalent. After: 3202
-    // mutants (one added by the clock seam of that day), 56 escaped, 2 timed out (both genuine
-    // infinite loops in RepositoryMetadataLoader::loadChunked(), i.e. detections), MSI = Covered MSI
-    // 98.25%, ~6m20s on 8 threads locally. tests/infection-equivalents.md holds the reasoning for
-    // all 56; the 47 added that day, one line each, as an index. Its line numbers are those of
-    // 2026-09-25 (past the `@internal` docblock lines added that day); tests/infection-equivalents.md
-    // keeps the current ones:
-    //  - Set membership written as `= true` and read only through isset(): ActivityClient.php:82,
-    //    ActivityFetchPlanner.php:53 and :69, RepositoryMetadataLoader.php:275 (TrueValue).
-    //  - array_values() that only makes a `list` type true, every consumer iterates: ActivityClient.php:122,
-    //    RepositoryMetadataLoader.php:73, InstallTimeSummary.php:144, LockrotCommand.php:597.
-    //  - Casts the type system already guarantees: RepoLocator.php:141 and SupportSource.php:30
-    //    (preg_replace with a literal pattern), PhpReleaseDates.php:30 (a `\d+.\d+` key is never an int),
-    //    ComposerHttpClient.php:120 (substr of a host longer than 4) and :176 (`?? 0` on a ?int),
-    //    LockrotCommand.php:616 and :206 (getcwd() false only in a removed working directory).
-    //  - Memoisation of a pure function: AllowlistEntry.php:37 (VersionParser is stateless),
-    //    BaselineSchema.php:76, ConfigSchema.php:60, DependencyGraph.php:116 (recomputed, equal answer).
-    //  - Branches the shipped inputs cannot enter: BaselineSchema.php:43 x2 and ConfigSchema.php:48 x2
-    //    (the PHPStan narrowing over json-schema errors, which are always arrays of strings),
-    //    BaselineSchema.php:80 and ConfigSchema.php:64 (a schema shipped in the package is never
-    //    unreadable), AtomicWriter.php:43 (was BaselineFile.php:112; error_clear_last before a write
-    //    that records its own warning), ProjectIgnoreList.php:72
-    //    ((int) of the whole YYYY-MM-DD match is the year), HttpResult.php:85 (getLastErrors() is false
-    //    on PHP >= 8.2 when clean; killed on the 7.4 leg), LockrotCommand.php:627 x2 (the Composer 2.2
-    //    arm of the tryComposer() guard, never entered on the vendored Composer; covered by the Docker
-    //    7.4/2.2 run outside Infection), SelfUpdateCommand.php:155 (Phar::running(false) differs only
-    //    inside a running PHAR; covered by the e2e PharTest Infection does not run).
-    //  - Same result by another route: ActivityClient.php:70 (`<` to `<=` assigns an equal value),
-    //    ProjectIgnoreList.php:76 and PhpReleaseDates.php:30 Concat (PHP's date parser accepts the
-    //    reversed `T..` concatenation as the same instant), JsonReader.php:86 (array_keys([]) never
-    //    equals range(0, -1)), RepositoryMetadataLoader.php:159 and :201 (pass 2 after an exhausted
-    //    deadline starts no chunk and marks the same names), ActivityFetchPlanner.php:62 x2 (the `?? 0`
-    //    default inside the already-seen branch is unreachable), LockrotCommand.php:201 (the next
-    //    statement raises the identical ConfigException), :621 (tryComposer() on a missing manifest
-    //    returns null anyway), Policy.php:24 (FailOn::reaches() is false for `none`, the loop rejects
-    //    everything and falls through to EXIT_OK), InstallTimeSummary.php:188 x2 (the stale list the
-    //    names feed is never rendered on the install-time path; kept for a truthful comparison),
-    //    ReleaseLocator.php:435 CastString (preg_replace() on a literal pattern and a normalised
-    //    version is never null).
-    //  - 2026-09-18 (left-behind, advisories): ReleaseBranch.php:35 PregMatchRemoveCaret (a normalized
-    //    non-dev version always starts with its major digits), LeftBehindRule.php:68
-    //    LessThanOrEqualTo (a same-instant higher release cannot be both alive and older than the
-    //    warn threshold), RepositoryAdvisoryLoader.php:69 ReturnRemoval (the Composer 2.2 arm, covered
-    //    by the Docker 7.4/2.2 run).
-    //
-    // 2026-09-20 (JSON schemas, monorepo-dated branches): four new equivalents, all in
-    // tests/infection-equivalents.md — Analyzer::dateSplitPackages() and
-    // MonorepoParents::missingCandidates() early-return guards whose bodies are reached anyway,
-    // the `= true` set membership in PackageMetadata::fromPackages() and the branch-snapshot guard
-    // in needsParentDates(). Both CI shards re-measured against their own thresholds on the branch:
-    // verdicts and output 99% covered MSI (11 escapes), data and the rest 98% (33 escapes).
-    //
-    // 2026-09-25 (--output): the two BaselineFile escapes moved to src/Filesystem/AtomicWriter.php
-    // with the write they sit in, and two new equivalents — the `(array)` over the VALUE_IS_ARRAY
-    // option in LockrotCommand::outputSpecs() and the `(string)` over OutputFormatter::format() in
-    // ReportTargets::write(). src/Filesystem joins the "data and the rest" CI shard.
-    //
-    // 2026-09-26 (open vocabularies): src/Json/KnownValues.php, the strict reading of the published
-    // schemas, adds no escape (every mutant killed by tests/Unit/Json/KnownValuesTest.php and the
-    // first-call tests of ConfigSchema); the four ConfigSchema escapes moved to :48, :60 and :64
-    // with the docblock that says why the runtime reads `x-known-values` as the enum.
-    //
-    // 2026-09-27 (self-update writes raw): SelfUpdateCommand.php:152 FunctionCallRemoval, the
-    // class_exists() preload of TerminalText that only a failure after a real archive swap sees,
-    // replaces the :278 ConcatOperandRemoval from the --output round (writeError() no longer builds
-    // a tag); the count is unchanged. The :152 Phar::running(false) escape above moved to :155.
-    //
-    // 2026-09-28 (the gate): the Policy.php:24 escape went with the loop Gate::decide() replaced.
-    // Report::toArray() decides the gate, so every test that writes a document covers Gate and
-    // FailOn; GateAgreementTest's corpus sweep on top of them passed this timeout under Xdebug and
-    // Infection skipped their mutants unrun. That test covers nothing now; the measurement is in
-    // tests/infection-equivalents.md.
-    //
-    // 2026-09-28 (typed run notes): the notes add no escape; Analyzer.php:392 UnwrapArrayValues (S10
-    // sorts last, so filtering it out leaves a list) is documented, and the two older escapes of
-    // that S10 filter are killed. Measured with the timeout raised so every mutant runs.
-    //
-    // Threshold 97 = floor of the honest MSI minus 1: at 3201 mutants that leaves room for ~40 new
-    // escapes before the gate fails — close to the ~25 the narrower scope allowed — without the
-    // number moving every time a test is added.
+    // tests/infection-equivalents.md gives the reason that each tolerated escape is equivalent.
+    // The floor is the whole-tree MSI rounded down, minus one. A few new escapes then do not fail
+    // the gate, and the floor does not move with each new test.
+    // Evidence: https://github.com/somework/lockrot/commit/71d0e6e81cdaea30048807b86673f6b97a887b57
     "minMsi": 97,
     "minCoveredMsi": 97
 }
