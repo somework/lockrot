@@ -57,10 +57,19 @@ def entries(markdown: str) -> List[Entry]:
     """The entries of the documented-equivalents file.
 
     An entry is a list item (a line starting `- ` and its indented continuation) or a paragraph whose
-    first word is a `src/...php:line` reference; prose around them documents nothing.
+    first word is a `src/...php:line` reference; prose around them documents nothing, and neither does
+    a section whose heading says its mutants are not equivalent.
     """
     blocks: List[List[str]] = []
+    not_equivalent = False
     for line in markdown.splitlines():
+        if line.startswith('#'):
+            # A section listing mutants that are detections, not equivalents, accounts for nothing.
+            not_equivalent = 'not equivalent' in line.lower()
+            blocks.append([])
+            continue
+        if not_equivalent:
+            continue
         if line.startswith('- ') or OPENS_WITH_REFERENCE.match(line):
             blocks.append([line])
         elif blocks and blocks[-1] and line.strip() and (line.startswith((' ', '\t')) or not blocks[-1][0].startswith('- ')):
