@@ -206,6 +206,13 @@ jobs:
         with: {python-version-file: .python-version, cache: pip, cache-dependency-path: docs/requirements.txt}
       - run: pip install -r docs/requirements.txt
       - run: mkdocs build --strict
+      # .claude/rules/ loads into every AI session that works on this repository: hold it to the
+      # budget that https://github.com/somework/lockrot/pull/66 set.
+      - name: .claude/rules/ stays within 440 lines
+        run: |
+          lines=$(find .claude/rules -name '*.md' -exec cat {} + | wc -l)
+          echo "$lines of 440 lines in .claude/rules/"
+          test "$lines" -le 440
   # This job proves that the corpus checks read lockrot's output at all. Every problem key that a
   # check can emit has a recorded document mutated to emit that key, or a reason why no mutation can
   # reach it. The recorded pages are frozen, so a reworded sentence in src/Output/ shows as
