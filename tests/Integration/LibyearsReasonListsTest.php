@@ -7,6 +7,8 @@ namespace Lockrot\Tests\Integration;
 use Lockrot\Analyzer\Libyears;
 use Lockrot\Json\KnownValues;
 use Lockrot\Json\Schemas;
+use Lockrot\Output\ExplainFormatter;
+use Lockrot\Output\JsonFormatter;
 use Lockrot\Tests\Support\JsonPath;
 use PHPUnit\Framework\TestCase;
 
@@ -28,8 +30,8 @@ final class LibyearsReasonListsTest extends TestCase
 
     public function testEveryListOfReasonsIsTheCodesInItsOrder(): void
     {
-        $report = JsonPath::decodeFile(Schemas::path(Schemas::REPORT));
-        $explain = JsonPath::decodeFile(Schemas::path(Schemas::EXPLAIN));
+        $report = JsonPath::decodeFile(Schemas::path(Schemas::REPORT, JsonFormatter::SCHEMA));
+        $explain = JsonPath::decodeFile(Schemas::path(Schemas::EXPLAIN, ExplainFormatter::SCHEMA));
         $field = ['definitions', 'finding', 'properties', 'libyears_unmeasured', 'oneOf', 0, KnownValues::KEYWORD];
         $block = ['properties', 'libyears', 'properties', 'unmeasured'];
 
@@ -47,7 +49,7 @@ final class LibyearsReasonListsTest extends TestCase
         sort($reasons);
         self::assertSame($reasons, $sorted);
 
-        $description = JsonPath::stringAt(JsonPath::decodeFile(Schemas::path(Schemas::REPORT)), ['definitions', 'finding', 'properties', 'libyears_unmeasured', 'description']);
+        $description = JsonPath::stringAt(JsonPath::decodeFile(Schemas::path(Schemas::REPORT, JsonFormatter::SCHEMA)), ['definitions', 'finding', 'properties', 'libyears_unmeasured', 'description']);
         preg_match_all('/(\d)\. ([a-z_]+)/', $description, $matches);
         self::assertSame(['1', '2', '3', '4'], $matches[1]);
         self::assertSame(self::PRECEDENCE, $matches[2]);

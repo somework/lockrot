@@ -1,0 +1,16 @@
+{
+    "$schema": "https://lockrot.dev/schema/baseline-1.json",
+    "lockrot": {
+        "version": "0.13.0",
+        "schema": 1,
+        "schema_url": "https://lockrot.dev/schema/baseline-1.json"
+    },
+    "generated_at": "2026-10-01T00:00:00+00:00",
+    "findings": {
+        "league/config": {
+            "version": "v1.2.0",
+            "verdict": "stale",
+            "first_seen": "2026-10-01"
+        }
+    }
+}

@@ -152,19 +152,19 @@ are not listed here even though the area-B Infection config covers `src/Composer
 
 ### src/Config/ConfigSchema.php
 
-- `src/Config/ConfigSchema.php:48` LogicalOr (both mutants) — the PHPStan narrowing the source comment
+- `src/Config/ConfigSchema.php:55` LogicalOr (both mutants) — the PHPStan narrowing the source comment
   describes. Every error justinrainbow/json-schema produces is an array carrying string `property` and
   `message`, so no `extra.lockrot` can make the three operands disagree and no input reaches the
   `continue`.
-- `src/Config/ConfigSchema.php:60` ReturnRemoval — dropping the memo makes `schema()` re-read,
+- `src/Config/ConfigSchema.php:67` ReturnRemoval — dropping the memo makes `schema()` re-read,
   re-decode and re-close (`KnownValues::closed()`, a pure function of the file)
-  `resources/lockrot-config.schema.json` and return an equal object; nothing compares the
+  `resources/lockrot-config-1.schema.json` and return an equal object; nothing compares the
   schema by identity, so validation behaves identically and only the number of reads differs. Making
   that observable means removing or unreading a tracked resource file *while Infection runs the suite
   in parallel processes against it*, which would make other mutants fail for the wrong reason. This is
   the weakest equivalence claim in this list: the memo saves one 2 KB read per process, and removing
   it instead of documenting it is a defensible alternative.
-- `src/Config/ConfigSchema.php:64` LogicalOr — `!is_file($path) && !is_readable($path)`: the two
+- `src/Config/ConfigSchema.php:71` LogicalOr — `!is_file($path) && !is_readable($path)`: the two
   operands disagree only for a file that exists and cannot be read, which a file shipped inside the
   package never is. Even then the next guard raises a `ConfigException` when `file_get_contents()`
   returns false, so the method still refuses to run on an unreadable schema.
@@ -214,20 +214,29 @@ The memo changes how often the work is done, not what it answers.
 
 - `src/Allowlist/AllowlistEntry.php:37` AssignCoalesce — `self::$parser ??= new VersionParser()`;
   VersionParser is stateless, so a fresh one normalises identically.
-- `src/Baseline/BaselineSchema.php:76` ReturnRemoval — dropping the early `return self::$schema`
-  re-reads and re-decodes the same bundled schema file and reassigns it.
+- `src/Baseline/BaselineSchema.php:94` ReturnRemoval — dropping the early
+  `return self::$schemas[$number]` re-reads and re-decodes the same bundled schema file and
+  reassigns it.
 - `src/Graph/DependencyGraph.php:116` ReturnRemoval — dropping the early
   `return $this->trees[$root]` recomputes the BFS tree of immutable edges and gets the same map.
 
 ### Branches the shipped inputs cannot enter
 
-- `src/Baseline/BaselineSchema.php:43` LogicalOr (two mutants) — the narrowing guard over
+- `src/Baseline/BaselineSchema.php:46` LogicalOr (two mutants) — the narrowing guard over
   `$validator->getErrors()`. Every error justinrainbow/json-schema produces is an array with string
   `property` and `message`, so all three operands are false and `&&` agrees with `||` whichever
   pair is joined. The guard exists for PHPStan, as its own comment says.
-- `src/Baseline/BaselineSchema.php:80` LogicalOr — `!is_file($path) || !is_readable($path)` on
-  `resources/lockrot-baseline.schema.json`, a file shipped inside the package. No test can make it
+- `src/Baseline/BaselineSchema.php:98` LogicalOr — `!is_file($path) || !is_readable($path)` on
+  `resources/lockrot-baseline-1.schema.json`, a file shipped inside the package. No test can make it
   missing or unreadable, and both operands are false for the file that is there.
+- `src/Baseline/BaselineSchema.php:86` Ternary — `numberOf()` swapping the branches of
+  `\is_array($envelope) ? ($envelope['schema'] ?? null) : null`. lockrot ships one baseline schema
+  number, 1, and `numberOf()` answers 1 for every file: the number read when it is 1, else
+  `Baseline::SCHEMA`, which is 1. The mutant reads null for an array envelope, which falls back to
+  1, and `$envelope['schema'] ?? null` for any other value, which is null, since `??` reads no
+  offset of a scalar or of null. The baseline-1 schema then refuses every other envelope with its
+  own message, as `BaselineTest::testANumberNoSchemaIsShippedForIsRefusedByBaseline1` asserts. A
+  test can tell the two apart once a second baseline number ships.
 - `src/Filesystem/AtomicWriter.php:43` FunctionCallRemoval — `error_clear_last()` before the write
   (moved out of `BaselineFile::write()` on 2026-09-25, when the reports of `--output` started going
   through the same writer; it was `src/Baseline/BaselineFile.php:112`).

@@ -355,7 +355,7 @@ final class SchemaWideningTest extends TestCase
     /** @return array<mixed, mixed> */
     private static function current(string $document): array
     {
-        return self::decode(Schemas::path($document));
+        return self::decode(Schemas::path($document, 1));
     }
 
     /** @return array<mixed, mixed> */

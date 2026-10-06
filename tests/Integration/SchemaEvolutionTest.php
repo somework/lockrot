@@ -7,7 +7,6 @@ namespace Lockrot\Tests\Integration;
 use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineFile;
 use Lockrot\Json\Schemas;
-use Lockrot\Output\ExplainFormatter;
 use Lockrot\Output\JsonFormatter;
 use Lockrot\Signal\Signal;
 use Lockrot\Tests\Support\JsonPath;
@@ -89,38 +88,57 @@ final class SchemaEvolutionTest extends TestCase
     /** The first release whose schemas carry a number in their URL. */
     private const FIRST_NUMBERED = '0.9.0';
 
-    /** The sha256 of every schema file each release published, as its tag holds it. */
+    /**
+     * The sha256 of every schema file each release published, as its tag holds it, by file name.
+     * Up to 0.13.0 a release published one unnumbered file per document; from 0.14.0 on, one file per
+     * document and number, `lockrot-<document>-<number>.schema.json`.
+     */
     private const RELEASED_SCHEMAS = [
         '0.9.0' => [
-            Schemas::REPORT => 'b08abbab7b6116551a474dcc07b6b2bf6d889da23ebf1d941b80fa2dbe60c738',
-            Schemas::EXPLAIN => '72f4ef4d21c016f6b56eb4aa479c296208aeff01666f7c21843d436fd0908e27',
-            Schemas::BASELINE => '4435c03d9d9927b5da58b48a4df85deaa9c8b25f88703f3c6081e63b7c2ed9f9',
-            Schemas::CONFIG => '0a1a20627764525f5e78a89863bd1fdf133c9275e86ef525dd613e41f286829a',
+            'lockrot-baseline.schema.json' => '4435c03d9d9927b5da58b48a4df85deaa9c8b25f88703f3c6081e63b7c2ed9f9',
+            'lockrot-config.schema.json' => '0a1a20627764525f5e78a89863bd1fdf133c9275e86ef525dd613e41f286829a',
+            'lockrot-explain.schema.json' => '72f4ef4d21c016f6b56eb4aa479c296208aeff01666f7c21843d436fd0908e27',
+            'lockrot-report.schema.json' => 'b08abbab7b6116551a474dcc07b6b2bf6d889da23ebf1d941b80fa2dbe60c738',
         ],
         '0.10.0' => [
-            Schemas::REPORT => '020a83517b4c4c4ee59c8e0f00d628a6d54e938d1c8b8ad784796cc5c7d85cc9',
-            Schemas::EXPLAIN => '72f4ef4d21c016f6b56eb4aa479c296208aeff01666f7c21843d436fd0908e27',
-            Schemas::BASELINE => '4435c03d9d9927b5da58b48a4df85deaa9c8b25f88703f3c6081e63b7c2ed9f9',
-            Schemas::CONFIG => '7457dbfe567f35f13aa9f27dbdf323b507eeb344973874412f5804bc206b98c1',
+            'lockrot-baseline.schema.json' => '4435c03d9d9927b5da58b48a4df85deaa9c8b25f88703f3c6081e63b7c2ed9f9',
+            'lockrot-config.schema.json' => '7457dbfe567f35f13aa9f27dbdf323b507eeb344973874412f5804bc206b98c1',
+            'lockrot-explain.schema.json' => '72f4ef4d21c016f6b56eb4aa479c296208aeff01666f7c21843d436fd0908e27',
+            'lockrot-report.schema.json' => '020a83517b4c4c4ee59c8e0f00d628a6d54e938d1c8b8ad784796cc5c7d85cc9',
         ],
         '0.11.0' => [
-            Schemas::REPORT => 'b2295ceebef2c97bef526975fd43fc2d5768af0fa066192407c7e6f03873f4a6',
-            Schemas::EXPLAIN => '4802ed4b9e93322a266232170a52dd04bc65d15be0afc4368704f387b8c8b1db',
-            Schemas::BASELINE => '4435c03d9d9927b5da58b48a4df85deaa9c8b25f88703f3c6081e63b7c2ed9f9',
-            Schemas::CONFIG => 'c643d1740ea647848a7372a3e083ce766a12a536c01470368adba273caa6843b',
+            'lockrot-baseline.schema.json' => '4435c03d9d9927b5da58b48a4df85deaa9c8b25f88703f3c6081e63b7c2ed9f9',
+            'lockrot-config.schema.json' => 'c643d1740ea647848a7372a3e083ce766a12a536c01470368adba273caa6843b',
+            'lockrot-explain.schema.json' => '4802ed4b9e93322a266232170a52dd04bc65d15be0afc4368704f387b8c8b1db',
+            'lockrot-report.schema.json' => 'b2295ceebef2c97bef526975fd43fc2d5768af0fa066192407c7e6f03873f4a6',
         ],
         '0.12.0' => [
-            Schemas::REPORT => 'b2295ceebef2c97bef526975fd43fc2d5768af0fa066192407c7e6f03873f4a6',
-            Schemas::EXPLAIN => '4802ed4b9e93322a266232170a52dd04bc65d15be0afc4368704f387b8c8b1db',
-            Schemas::BASELINE => '4435c03d9d9927b5da58b48a4df85deaa9c8b25f88703f3c6081e63b7c2ed9f9',
-            Schemas::CONFIG => 'c643d1740ea647848a7372a3e083ce766a12a536c01470368adba273caa6843b',
+            'lockrot-baseline.schema.json' => '4435c03d9d9927b5da58b48a4df85deaa9c8b25f88703f3c6081e63b7c2ed9f9',
+            'lockrot-config.schema.json' => 'c643d1740ea647848a7372a3e083ce766a12a536c01470368adba273caa6843b',
+            'lockrot-explain.schema.json' => '4802ed4b9e93322a266232170a52dd04bc65d15be0afc4368704f387b8c8b1db',
+            'lockrot-report.schema.json' => 'b2295ceebef2c97bef526975fd43fc2d5768af0fa066192407c7e6f03873f4a6',
         ],
         '0.13.0' => [
-            Schemas::REPORT => '90f8cd0a32544d1247449779ca5b23720ceb33944819471246c0dfd666a24a73',
-            Schemas::EXPLAIN => '8c8c7808410fe2b99aa59ca8095f9774701f06a7f7a6b0564e20f58a3295b639',
-            Schemas::BASELINE => '4435c03d9d9927b5da58b48a4df85deaa9c8b25f88703f3c6081e63b7c2ed9f9',
-            Schemas::CONFIG => 'c42bed80452e31db4989f8f03f5d4fcbfc29e9be4486831783a4e060267cf91d',
+            'lockrot-baseline.schema.json' => '4435c03d9d9927b5da58b48a4df85deaa9c8b25f88703f3c6081e63b7c2ed9f9',
+            'lockrot-config.schema.json' => 'c42bed80452e31db4989f8f03f5d4fcbfc29e9be4486831783a4e060267cf91d',
+            'lockrot-explain.schema.json' => '8c8c7808410fe2b99aa59ca8095f9774701f06a7f7a6b0564e20f58a3295b639',
+            'lockrot-report.schema.json' => '90f8cd0a32544d1247449779ca5b23720ceb33944819471246c0dfd666a24a73',
         ],
+    ];
+
+    /** The first release that publishes a file per document and number. */
+    private const FIRST_FILE_NUMBERED = '0.14.0';
+
+    /** The row of the synthetic/ directory: two numbered files per document, each read only for its `id`. */
+    private const SYNTHETIC = [
+        'lockrot-baseline-1.schema.json' => '1d88e4ae739bffafd49366bd1bd532197cb88008d12dc7f96289d4807216c47b',
+        'lockrot-baseline-2.schema.json' => 'f8dd9f744b9c76ff0d24408071964f35d6cefae94e8a9c5b0ea15fcec56b8f51',
+        'lockrot-config-1.schema.json' => 'e42dd09a5f1be059f7c917768f29eea58732fa3f9550d1db84eaf68de69face3',
+        'lockrot-config-2.schema.json' => 'df8349e8b78471ddf1fa323750d39fc406d9e35ecd09d2783eaa2c526c5c0eec',
+        'lockrot-explain-1.schema.json' => 'b05f838aa33da3ffe505bbdcb77a942c1739ed809676b7e525cd850992014d82',
+        'lockrot-explain-2.schema.json' => '031831d4a2c5582fc06c0bf0e00a6faae73b37e28411c36784640c81d9f9d19c',
+        'lockrot-report-1.schema.json' => '9a1f39251d3ef750b9086f948eb2074cced36b0f330a856730fe16e042f8fa1f',
+        'lockrot-report-2.schema.json' => '2a0ee33f954cb325d485dfe38a953a24aa8cfd3ad0f171d62ad43a4a3212f17b',
     ];
 
     private const RELEASE_KEY = '39ECC3F64AE8D06A9A63FD99AB6F7F52AE513141';
@@ -162,19 +180,55 @@ final class SchemaEvolutionTest extends TestCase
         }
     }
 
-    /** @return iterable<string, array{string, string}> every schema every release published, by version and document */
+    /** @return iterable<string, array{string, string}> every schema file every release published, by version and file name */
     public static function releasedSchemas(): iterable
     {
-        foreach (self::RELEASED_SCHEMAS as $version => $schemas) {
-            foreach (array_keys($schemas) as $document) {
-                yield $version.' '.$document => [$version, $document];
+        return self::schemaRows(self::RELEASED_SCHEMAS);
+    }
+
+    /**
+     * @param array<string, array<string, string>> $map file name => sha256, per row
+     *
+     * @return iterable<string, array{string, string}>
+     */
+    private static function schemaRows(array $map): iterable
+    {
+        foreach ($map as $row => $files) {
+            foreach (array_keys($files) as $file) {
+                yield $row.' '.$file => [$row, $file];
             }
         }
     }
 
     public function testEveryRecordedVersionIsKeptAndNothingElse(): void
     {
-        self::assertSame(array_merge(self::RECORDED, ['schemas']), self::entries(self::DIR, true));
+        self::assertSame(array_merge(self::RECORDED, ['schemas', 'synthetic']), self::entries(self::DIR, true));
+    }
+
+    /**
+     * The provider and {@see numberOf()} on a directory with two files per document, the layout a
+     * release from 0.14.0 on publishes: one row per file, and under each number the file of that
+     * number, never its sibling.
+     */
+    public function testTheProviderAndNumberOfPickTheFileOfEachNumber(): void
+    {
+        $dir = self::DIR.'synthetic';
+        $rows = iterator_to_array(self::schemaRows(['synthetic' => self::SYNTHETIC]));
+
+        self::assertSame(array_keys(self::SYNTHETIC), self::entries($dir, false), 'the files the row lists');
+        self::assertCount(8, $rows);
+        foreach (self::SYNTHETIC as $file => $sha256) {
+            self::assertSame(['synthetic', $file], $rows['synthetic '.$file] ?? null, $file);
+            self::assertSame($sha256, hash_file('sha256', $dir.'/'.$file), $file);
+            [$document, $number] = self::fileNameOf($file);
+            self::assertNotNull($number, $file);
+            self::assertSame($number, self::numberOf(self::decodeFile($dir.'/'.$file), $document), $file);
+            self::assertSame($dir.'/'.$file, self::fileUnder($dir, $document, $number), $file);
+        }
+        foreach ([Schemas::REPORT, Schemas::EXPLAIN, Schemas::BASELINE, Schemas::CONFIG] as $document) {
+            self::assertNull(self::fileUnder($dir, $document, 3), $document.' has no file numbered 3');
+            self::assertSame(self::SCHEMAS.'0.13.0/lockrot-'.$document.'.schema.json', self::fileUnder(self::SCHEMAS.'0.13.0', $document, 1), $document.': an unnumbered file is found by its id');
+        }
     }
 
     /**
@@ -196,22 +250,25 @@ final class SchemaEvolutionTest extends TestCase
      * @dataProvider releasedSchemas
      */
     #[DataProvider('releasedSchemas')]
-    public function testEachReleasedSchemaIsAcceptedByTheCurrentOneUnderTheSameNumber(string $version, string $document): void
+    public function testEachReleasedSchemaIsAcceptedByTheCurrentOneUnderTheSameNumber(string $version, string $file): void
     {
-        $path = self::SCHEMAS.$version.'/lockrot-'.$document.'.schema.json';
-        self::assertSame(self::RELEASED_SCHEMAS[$version][$document], hash_file('sha256', $path), $version.' '.$document.' is what the release published');
-        self::assertSame(['lockrot-baseline.schema.json', 'lockrot-config.schema.json', 'lockrot-explain.schema.json', 'lockrot-report.schema.json'], self::entries(self::SCHEMAS.$version, false));
+        $path = self::SCHEMAS.$version.'/'.$file;
+        self::assertSame(self::RELEASED_SCHEMAS[$version][$file], hash_file('sha256', $path), $version.' '.$file.' is what the release published');
+        self::assertSame(array_keys(self::RELEASED_SCHEMAS[$version]), self::entries(self::SCHEMAS.$version, false), $version.': the files the release published');
 
+        [$document, $named] = self::fileNameOf($file);
+        self::assertSame(version_compare($version, self::FIRST_FILE_NUMBERED, '>='), $named !== null, $file.': a number in the file name from '.self::FIRST_FILE_NUMBERED.' on, none before');
         $released = self::decodeFile($path);
-        $current = self::decodeFile(Schemas::path($document));
-        if (self::numberOf($released, $document) !== self::numberOf($current, $document)) {
-            // A different number is a different contract: nothing is promised across it.
-            $this->addToAssertionCount(1);
-
-            return;
+        $number = self::numberOf($released, $document);
+        if ($named !== null) {
+            self::assertSame($named, $number, $file.' names the number its id carries');
         }
 
-        self::assertSame([], SchemaWidening::narrowings($released, $current), $version.'\'s '.$document.' schema accepts documents the current one rejects');
+        // Every number a release published stays shipped: a different number is a different
+        // contract, and the current file under the same number is the one held to this release's.
+        self::assertContains($number, Schemas::numbers($document), 'resources/ keeps '.Schemas::url($document, $number));
+        $current = self::decodeFile(Schemas::path($document, $number));
+        self::assertSame([], SchemaWidening::narrowings($released, $current), $version.'\'s '.$file.' accepts documents the current one rejects');
     }
 
     /**
@@ -584,28 +641,53 @@ final class SchemaEvolutionTest extends TestCase
     }
 
     /**
-     * The schema file of a document under a number: the current one under the number lockrot writes
-     * today, else the newest copy a release published under that number. A number no release
-     * published fails.
+     * The schema file of a document under a number: the current one when lockrot ships that number,
+     * else the newest copy a release published under it. A number no release published fails.
      */
     private static function schemaFile(string $document, int $number): string
     {
-        $current = [
-            Schemas::REPORT => JsonFormatter::SCHEMA,
-            Schemas::EXPLAIN => ExplainFormatter::SCHEMA,
-            Schemas::BASELINE => Baseline::SCHEMA,
-        ];
-        if ($number === $current[$document]) {
-            return Schemas::path($document);
+        if (\in_array($number, Schemas::numbers($document), true)) {
+            return Schemas::path($document, $number);
         }
         foreach (array_reverse(array_keys(self::RELEASED_SCHEMAS)) as $version) {
-            $path = self::SCHEMAS.$version.'/lockrot-'.$document.'.schema.json';
-            if (self::numberOf(self::decodeFile($path), $document) === $number) {
+            $path = self::fileUnder(self::SCHEMAS.$version, $document, $number);
+            if ($path !== null) {
                 return $path;
             }
         }
 
         self::fail('no release published '.Schemas::url($document, $number));
+    }
+
+    /**
+     * The file in one directory that holds a document's schema under a number, found by the file
+     * names a release uses (`lockrot-<document>.schema.json` up to 0.13.0,
+     * `lockrot-<document>-<number>.schema.json` after) and picked by the number its `id` carries.
+     */
+    private static function fileUnder(string $dir, string $document, int $number): ?string
+    {
+        foreach (self::entries($dir, false) as $file) {
+            if (self::fileNameOf($file)[0] === $document && self::numberOf(self::decodeFile($dir.'/'.$file), $document) === $number) {
+                return $dir.'/'.$file;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * The document a schema file name is for, and the number in the name when it has one.
+     *
+     * @return array{string, ?int}
+     */
+    private static function fileNameOf(string $file): array
+    {
+        $documents = Schemas::REPORT.'|'.Schemas::EXPLAIN.'|'.Schemas::BASELINE.'|'.Schemas::CONFIG;
+        if (preg_match('{^lockrot-('.$documents.')(?:-([1-9]\d*))?\.schema\.json$}', $file, $match) !== 1) {
+            self::fail($file.' is not the name of a lockrot schema file');
+        }
+
+        return [$match[1], isset($match[2]) ? (int) $match[2] : null];
     }
 
     /** @param array<mixed, mixed> $schema */

@@ -1,0 +1,6 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "id": "https://lockrot.dev/schema/baseline-1.json",
+    "title": "synthetic baseline-1: only its id is read",
+    "type": "object"
+}

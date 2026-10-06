@@ -1,0 +1,195 @@
+{
+    "$expect": {
+        "strict": false,
+        "error": null
+    },
+    "$schema": "https://lockrot.dev/schema/report-1.json",
+    "lockrot": {
+        "version": "0.13.0",
+        "schema": 1
+    },
+    "generated_at": "2026-10-01T00:00:00+00:00",
+    "run": {
+        "project": "laravel/laravel",
+        "root_package": "laravel/laravel",
+        "target_php": "8.4",
+        "project_php": "^8.3",
+        "lock_file": "composer.lock",
+        "fail_on": "none",
+        "fail_on_kind": "none",
+        "strict_network": false,
+        "mode": "check",
+        "thresholds": {
+            "release-warn-years": 3,
+            "release-high-years": 5,
+            "push-warn-years": 3,
+            "push-high-years": 5
+        },
+        "flagged_verdicts": [
+            "abandoned",
+            "silent",
+            "pinned",
+            "left-behind",
+            "old-promise",
+            "stale"
+        ]
+    },
+    "activity_cache_oldest_at": "2026-09-30T18:30:39+00:00",
+    "packages_checked": 76,
+    "include_dev": false,
+    "not_from_composer_repository": 0,
+    "network_failures": false,
+    "counts": {
+        "abandoned": 0,
+        "silent": 0,
+        "pinned": 0,
+        "left-behind": 0,
+        "old-promise": 0,
+        "stale": 1,
+        "unknown": 0,
+        "finished": 19,
+        "ok": 56
+    },
+    "abandoned": {
+        "total": 0,
+        "with_replacement": 0
+    },
+    "priorities": {
+        "critical": 0,
+        "high": 0,
+        "medium": 0,
+        "low": 1,
+        "none": 75
+    },
+    "exposure": [
+        {
+            "package": "laravel/framework",
+            "flagged": 1
+        }
+    ],
+    "exposure_rule": {
+        "max_fan_in": 8
+    },
+    "unattributed": [],
+    "libyears": {
+        "total": 5.5,
+        "direct_requirements": 0.06,
+        "measured": 73,
+        "unmeasured": {
+            "branch_snapshot": 0,
+            "no_stable_release_date": 3,
+            "not_from_composer_repository": 0,
+            "metadata_unavailable": 0
+        },
+        "furthest_behind": {
+            "package": "doctrine/lexer",
+            "version": "3.0.1",
+            "libyears": 2.36
+        }
+    },
+    "baseline": null,
+    "gate": {
+        "fails": false,
+        "tripped_by": [],
+        "fail_on_applied": true
+    },
+    "notes": [
+        "offline: repository metadata served from Composer's cache",
+        "offline: security advisories not checked; a priority they would raise stays one step lower",
+        "GitHub token not set: repository activity checked for 1 candidate packages, 56 packages skipped (set GITHUB_TOKEN to check all)"
+    ],
+    "note_details": [
+        {
+            "code": "offline",
+            "text": "offline: repository metadata served from Composer's cache",
+            "docs_url": "https://lockrot.dev/notes/#offline",
+            "sets_network_failures": false,
+            "data": {}
+        },
+        {
+            "code": "advisories_not_checked",
+            "text": "offline: security advisories not checked; a priority they would raise stays one step lower",
+            "docs_url": "https://lockrot.dev/notes/#advisories_not_checked",
+            "sets_network_failures": false,
+            "data": {
+                "reason": "offline",
+                "composer_repositories_checked": 0
+            }
+        },
+        {
+            "code": "repository_activity_anonymous_cap",
+            "text": "GitHub token not set: repository activity checked for 1 candidate packages, 56 packages skipped (set GITHUB_TOKEN to check all)",
+            "docs_url": "https://lockrot.dev/notes/#repository_activity_anonymous_cap",
+            "sets_network_failures": false,
+            "data": {
+                "forge_id": "github",
+                "checked": 1,
+                "skipped_no_token": 56,
+                "skipped_budget": 0
+            }
+        }
+    ],
+    "findings": [
+        {
+            "package": "league/config",
+            "version": "v1.2.0",
+            "verdict": "stale",
+            "priority": "low",
+            "direct": false,
+            "dev": false,
+            "from_composer_repository": true,
+            "origin": {
+                "kind": "packagist",
+                "registry": "packagist.org",
+                "package_url": "https://packagist.org/packages/league/config",
+                "local": false
+            },
+            "replacement": null,
+            "replacement_url": null,
+            "signals": [
+                {
+                    "id": "S2",
+                    "level": "warn",
+                    "summary": "last release 2022-12-11 (3.8 years ago)",
+                    "data": {
+                        "last_release": "2022-12-11T20:36:23+00:00",
+                        "last_version": "v1.2.0",
+                        "years": 3.8,
+                        "dated_by": null
+                    }
+                }
+            ],
+            "chain": [
+                "laravel/framework",
+                "league/commonmark",
+                "league/config"
+            ],
+            "direct_dependents": [
+                "laravel/framework"
+            ],
+            "evidence": "last release 2022-12-11 (3.8 years ago)",
+            "allowlist_reason": null,
+            "note": null,
+            "data_date": "2026-10-01T00:00:00+00:00",
+            "libyears": 0,
+            "libyears_unmeasured": null,
+            "priority_basis": {
+                "base": "medium",
+                "steps": [
+                    {
+                        "reason": "transitive",
+                        "from": "medium",
+                        "to": "low"
+                    }
+                ]
+            },
+            "no_fix_expected": null,
+            "baseline": null,
+            "gate": {
+                "reaches_fail_on": false,
+                "fails": false,
+                "exempt_by": null
+            }
+        }
+    ]
+}

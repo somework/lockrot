@@ -79,7 +79,7 @@ final class BaselineFile
 
     /**
      * @throws ConfigException when the file is missing, unreadable, not JSON, or does not match
-     *                         resources/lockrot-baseline.schema.json
+     *                         resources/lockrot-baseline-1.schema.json
      */
     public function read(): Baseline
     {
@@ -110,8 +110,8 @@ final class BaselineFile
     /**
      * The baseline as JSON sees it. `Baseline::toArray()` is the PHP view, where an empty findings
      * map is an empty array — and `json_encode()` writes that as `[]`, which
-     * resources/lockrot-baseline.schema.json rejects, since it requires an object there. An explicit
-     * stdClass keeps a baseline with nothing in it valid against its own schema.
+     * resources/lockrot-baseline-1.schema.json rejects, since it requires an object there. An
+     * explicit stdClass keeps a baseline with nothing in it valid against its own schema.
      *
      * @return array<string, mixed>
      */

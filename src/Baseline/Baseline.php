@@ -84,7 +84,7 @@ final class Baseline
     /**
      * @param array<string, mixed> $data a decoded baseline document
      *
-     * @throws ConfigException when the document does not match resources/lockrot-baseline.schema.json
+     * @throws ConfigException when the document does not match resources/lockrot-baseline-1.schema.json
      */
     public static function fromArray(array $data): self
     {

@@ -1,0 +1,13 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "synthetic: one integer set, to prove ClosedSetsTest's clause for integer sets",
+    "type": "object",
+    "properties": {
+        "divisor": {
+            "description": "An integer from an open set: a later release may write a divisor this list does not hold.",
+            "type": "integer",
+            "minimum": 1,
+            "x-known-values": [1, 2, 4]
+        }
+    }
+}
