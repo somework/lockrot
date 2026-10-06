@@ -5,21 +5,18 @@ declare(strict_types=1);
 namespace Lockrot\Data\Forge;
 
 /**
- * The repository named by a package's `support.source`, reduced to something {@see RepoLocator}
- * reads.
+ * The repository named by a package's `support.source`, reduced for {@see RepoLocator}.
  *
- * `support.source` is a web address, not a clone URL. Packagist fills it in for every package
- * whose composer.json leaves it out, as `<repository>/tree/<version>` — phpunit, php-cs-fixer,
- * rector all carry that shape — GitLab's own pages read `<repository>/-/tree/<ref>` and
- * Bitbucket's `<repository>/src/<ref>`. Those tails are cut here, once, so the locator only ever
- * sees the repository. A maintainer-set value
- * such as phpstan's `https://github.com/phpstan/phpstan-src` passes through unchanged.
+ * The value is a web address, not a clone URL: Packagist fills in `<repository>/tree/<version>`,
+ * GitLab pages read `<repository>/-/tree/<ref>` and Bitbucket pages `<repository>/src/<ref>`.
+ * The tail is cut here, once, so that the locator sees only the repository.
+ * docs/internals.md, "Which host is asked".
  *
  * @internal
  */
 final class SupportSource
 {
-    /** @param array<mixed> $support a package's `support` map, as Composer exposes it */
+    /** @param array<mixed> $support */
     public static function url(array $support): ?string
     {
         $url = $support['source'] ?? null;

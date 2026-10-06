@@ -10,15 +10,10 @@ use Composer\Config;
 use Composer\Policy\PolicyConfig;
 
 /**
- * The advisories the project told Composer to ignore, applied the way `composer audit` applies
- * them: by package name, advisory id, CVE, source id (`GHSA-…`) or severity. A project that
- * accepted a vulnerability in `config.policy.advisories` (Composer 2.10+) or `config.audit.ignore`
- * (2.4+) does not need lockrot to raise it again.
- *
- * On a Composer with {@see PolicyConfig} the lists come from it — the same object the audit command
- * reads, flattened as audit flattens them: per-operation flags and reasons are resolved there, and
- * a per-package version constraint is dropped there too, so an entry ignores the package whole on
- * both sides. Older versions had one flat list under `config.audit.ignore`, read directly.
+ * The advisories that the project told Composer to ignore, applied as `composer audit` applies
+ * them (docs/verdicts.md#security-advisories). With {@see PolicyConfig}, the lists come from it,
+ * flattened as audit flattens them: Composer drops a per-package version constraint there, so an
+ * entry ignores the whole package.
  *
  * @internal
  */
@@ -28,7 +23,6 @@ final class AdvisoryIgnore
     private array $ids;
     /** @var array<string, true> */
     private array $severities;
-    /** Why the list is empty when the project meant it not to be: the first line of what Composer rejected, which the run notes. */
     private ?string $whyUnreadable;
 
     /**
@@ -49,13 +43,11 @@ final class AdvisoryIgnore
 
     public static function fromConfig(Config $config): self
     {
-        // Composer 2.10 introduced the policy object; the guard is load-bearing on every older version.
+        // PolicyConfig exists only on Composer 2.10 and later. The guard must stay for older versions.
         if (class_exists(PolicyConfig::class)) {
-            // It rejects what it does not know — a `licenses` section reserved for a later
-            // Composer, an unknown `ignore-*` key, a constraint it cannot parse — by throwing. A
-            // report is not the place to enforce Composer's config schema: the PHAR carries one
-            // Composer version and reads projects written for another, so a rejected policy means
-            // no ignore list, never no report — and a note, since accepted advisories reappear.
+            // PolicyConfig throws on a policy it does not know. The PHAR reads projects written for
+            // another Composer version, so a rejected policy gives no ignore list and a run note,
+            // never no report.
             try {
                 $policy = PolicyConfig::fromConfig($config);
             } catch (\Throwable $e) {
@@ -77,7 +69,7 @@ final class AdvisoryIgnore
     }
 
     /**
-     * The 2.4–2.9 shape: each list is either a plain list of strings or a map of string to reason.
+     * Each list is a plain list of strings or a map of string to reason, as on Composer 2.4 to 2.9.
      *
      * @param array<mixed> $ignore
      * @param array<mixed> $ignoreSeverity
@@ -115,7 +107,7 @@ final class AdvisoryIgnore
         return $this->ids === [] && $this->severities === [];
     }
 
-    /** Why the ignore list could not be read, possibly empty; null when it was read. */
+    /** Why the ignore list could not be read, possibly empty. Null when it was read. */
     public function whyUnreadable(): ?string
     {
         return $this->whyUnreadable;

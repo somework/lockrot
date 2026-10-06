@@ -12,23 +12,12 @@ use Lockrot\Analyzer\RunNote;
 use Lockrot\Deadline;
 
 /**
- * Security advisories through Composer's own repository layer — the same call `composer audit`
- * makes ({@see \Composer\Repository\RepositorySet::getMatchingSecurityAdvisories()}): every
- * repository that publishes advisories is asked for every name, with the installed version as the
- * constraint, and the answers are merged. Full records only, as audit's own report asks for them:
- * Packagist then answers one POST for the whole list, while the partial records Composer keeps in
- * its package-file cache — an id and a range, possibly withdrawn since — are never the answer. A
- * repository that carries advisories in its package files answers from Composer's cache, and one
- * whose inline records are partial is a note. Advisories the project ignores in Composer's own
- * configuration ({@see AdvisoryIgnore}) are dropped, as audit drops them.
- *
- * The POST goes through the repository's own HttpDownloader with the ten-second timeout Composer
- * hard-codes for it, which lockrot cannot shorten: under the install-time budget the deadline is
- * checked before each repository, not inside the call — the same bound the metadata pass has.
- *
- * Composer 2.2 has no advisory API at all: the run says so in a note and checks nothing else
- * differently. Offline, nothing is asked — the POST cannot be served from a cache — and the note
- * says so too.
+ * Fetches security advisories through Composer's repository layer, as `composer audit` does
+ * ({@see \Composer\Repository\RepositorySet::getMatchingSecurityAdvisories()}), and drops those
+ * that {@see AdvisoryIgnore} lists. It asks for full records only: the partial records in
+ * Composer's package-file cache are never the answer. Composer hard-codes a ten-second timeout for
+ * the POST, so lockrot checks the deadline before each repository, not inside the call.
+ * Notes and scope: docs/verdicts.md#security-advisories.
  *
  * @internal
  */
@@ -60,7 +49,7 @@ final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
         if ($this->offline) {
             return AdvisoryBatch::unavailable(RunNote::advisoriesNotChecked(RunNote::ADVISORIES_OFFLINE, 0));
         }
-        // The interface arrived in Composer 2.4; the guard is load-bearing on the 2.2 LTS.
+        // The interface exists only on Composer 2.4 and later. The guard must stay for 2.2.
         if (!interface_exists(AdvisoryProviderInterface::class)) {
             return AdvisoryBatch::unavailable(RunNote::advisoriesNotChecked(RunNote::ADVISORIES_COMPOSER_TOO_OLD, 0));
         }
@@ -85,12 +74,10 @@ final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
                 }
                 $answer = $repository->getSecurityAdvisories($map, false)['advisories'];
             } catch (\Throwable $e) {
-                // ComposerRepository::fetchFile() lets a JSON ParsingException, a
-                // RepositorySecurityException and a LogicException past its own retry loop, none of
-                // them a RuntimeException. The metadata pass never reaches a repository once every
-                // name is resolved; this pass asks every advisory-capable one, as `composer audit`
-                // does, so what a repository throws is the report's note, not the report's end. Only
-                // a TransportException is a network failure, which the note decides.
+                // ComposerRepository::fetchFile() can throw a ParsingException, a
+                // RepositorySecurityException or a LogicException, none of them a RuntimeException.
+                // A failing repository must become a run note, never the end of the report. Only a
+                // TransportException is a network failure, which the note decides.
                 $notes[] = RunNote::advisoriesUnavailable($repository->getRepoName(), $e);
                 continue;
             }
@@ -123,8 +110,8 @@ final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
     }
 
     /**
-     * `== <normalized version>` per name, as Composer's audit builds it; a version the parser
-     * rejects is left out, since no advisory range could be matched against it anyway.
+     * One `== <normalized version>` constraint per name, as `composer audit` builds it. A version
+     * that the parser rejects has no constraint.
      *
      * @param array<string, string> $versionByName
      *

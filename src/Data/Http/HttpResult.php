@@ -12,7 +12,7 @@ final class HttpResult
     private ?string $body;
     private \DateTimeImmutable $fetchedAt;
     private ?string $error;
-    /** Set on the copy {@see asCached()} returns; never part of the envelope. */
+    /** Set on the copy that {@see asCached()} returns, never part of the envelope. */
     private bool $fromCache = false;
 
     public function __construct(string $url, int $status, ?string $body, \DateTimeImmutable $fetchedAt, ?string $error = null)
@@ -30,10 +30,8 @@ final class HttpResult
     }
 
     /**
-     * The result an envelope describes, or null when the envelope cannot be one: no `fetched_at`,
-     * or one that does not parse. A stored answer without a readable fetch time has no age, and an
-     * age is what every reader of a cached answer needs ({@see CachingHttpClient} decides freshness
-     * by it, the report prints it), so such an envelope is not an answer at all.
+     * Null when `fetched_at` is missing or does not parse: a stored answer without an age is no
+     * answer, because {@see CachingHttpClient} decides freshness by it and the report prints it.
      *
      * @param array<string, mixed> $envelope
      */
@@ -51,11 +49,7 @@ final class HttpResult
         return new self($url, \is_int($status) ? $status : 0, \is_string($body) ? $body : null, $at, \is_string($error) ? $error : null);
     }
 
-    /**
-     * Decodes a raw JSON envelope and returns the HttpResult it describes, or null when the JSON
-     * is invalid, not an object, missing the required `status` field, or without a readable
-     * `fetched_at` ({@see fromEnvelope()}).
-     */
+    /** Null for invalid JSON, a non-object, a missing `status` or an unreadable `fetched_at`. */
     public static function fromEnvelopeJson(string $url, ?string $raw): ?self
     {
         if ($raw === null) {
@@ -72,11 +66,10 @@ final class HttpResult
     }
 
     /**
-     * Strictly the format {@see toEnvelope()} writes: the loose constructor reads `""` as now and
-     * `"garbage"` as an exception, and a stored answer of unknown age must be neither. A parse
-     * error makes createFromFormat() return false; a date that parses but is not real (a 30th of
-     * February) comes back as a date with a warning, which getLastErrors() reports (as an array
-     * on every PHP; before 8.2 also when there is nothing to report).
+     * Strict, in the format {@see toEnvelope()} writes: the loose constructor reads `""` as now, and
+     * a stored answer of unknown age must not. A date that parses but is not real (a 30th of
+     * February) comes back with a warning that getLastErrors() reports. Before PHP 8.2
+     * getLastErrors() also returns an array when nothing is wrong, so the code counts warnings.
      */
     private static function parseDate(string $iso): ?\DateTimeImmutable
     {
@@ -116,13 +109,11 @@ final class HttpResult
         return $this->error;
     }
 
-    /** Whether this answer was served from lockrot's cache rather than fetched in this run. */
     public function fromCache(): bool
     {
         return $this->fromCache;
     }
 
-    /** The same answer, marked as served from the cache; this instance is left unchanged. */
     public function asCached(): self
     {
         $copy = clone $this;

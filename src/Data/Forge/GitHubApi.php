@@ -7,7 +7,7 @@ namespace Lockrot\Data\Forge;
 use Lockrot\Data\Http\HttpResult;
 
 /**
- * `GET /repos/{owner}/{repo}`: `archived` and `pushed_at` (the last push to any branch).
+ * `pushed_at` is the last push to any branch.
  *
  * @internal
  */
@@ -33,11 +33,8 @@ final class GitHubApi implements ForgeApi
     }
 
     /**
-     * The headers every lockrot call to api.github.com carries.
-     *
-     * Static because self-update reaches the same API without an analyzer behind it
-     * ({@see \Lockrot\SelfUpdate\ReleaseLocator}), and the authorization scheme must not be written
-     * down in two places.
+     * Static because self-update ({@see \Lockrot\SelfUpdate\ReleaseLocator}) calls the same API
+     * without an analyzer, and the authorization scheme must have one home.
      *
      * @return list<string>
      */

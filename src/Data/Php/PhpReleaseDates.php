@@ -43,8 +43,8 @@ final class PhpReleaseDates
     }
 
     /**
-     * Extracts the "major.minor" prefix from a version string (e.g. "8.4.25" -> "8.4", "8" -> "8.0").
-     * Input that is not shaped like a version (does not start with digits) is returned unchanged.
+     * `8.4.25` gives `8.4` and `8` gives `8.0`. Input that does not start with digits comes back
+     * unchanged.
      */
     public static function minorOf(string $version): string
     {

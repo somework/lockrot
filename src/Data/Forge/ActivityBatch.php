@@ -4,11 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Data\Forge;
 
-/**
- * The outcome of one {@see ActivityClient::fetch()}: activity per repository, and what went wrong, per forge.
- *
- * @internal
- */
+/** @internal */
 final class ActivityBatch
 {
     /** @var array<string, RepositoryActivity> */
@@ -22,9 +18,9 @@ final class ActivityBatch
 
     /**
      * @param array<string, RepositoryActivity>    $activity    keyed by {@see RepoRef::key()}
-     * @param array<string, list<string>>          $notFound    forge => keys of repositories the forge does not know (or hides)
-     * @param array<string, array<string, string>> $failed      forge => (key => reason)
-     * @param array<string, true>                  $rateLimited forges that answered "too many requests"
+     * @param array<string, list<string>>          $notFound    host => keys of repositories that it does not know or hides
+     * @param array<string, array<string, string>> $failed      host => (key => reason)
+     * @param array<string, true>                  $rateLimited hosts that answered "too many requests"
      */
     public function __construct(array $activity, array $notFound, array $failed, array $rateLimited)
     {
@@ -45,25 +41,25 @@ final class ActivityBatch
         return $this->activity;
     }
 
-    /** @return list<string> keys, across forges */
+    /** @return list<string> keys, across hosts */
     public function notFound(): array
     {
         return array_merge([], ...array_values($this->notFound));
     }
 
-    /** @return list<string> keys, for one forge */
+    /** @return list<string> keys, for one host */
     public function notFoundOn(string $forge): array
     {
         return $this->notFound[$forge] ?? [];
     }
 
-    /** @return array<string, string> key => reason, across forges */
+    /** @return array<string, string> key => reason, across hosts */
     public function failed(): array
     {
         return array_merge([], ...array_values($this->failed));
     }
 
-    /** @return array<string, string> key => reason, for one forge */
+    /** @return array<string, string> key => reason, for one host */
     public function failedOn(string $forge): array
     {
         return $this->failed[$forge] ?? [];

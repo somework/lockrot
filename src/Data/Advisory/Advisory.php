@@ -10,10 +10,9 @@ use Composer\Semver\Constraint\Constraint;
 use Composer\Semver\Constraint\ConstraintInterface;
 
 /**
- * One security advisory that affects an installed version, reduced to what the report prints and
- * the JSON document carries. Built from Composer's own advisory objects; a repository that serves
- * only the partial form (id and affected range) leaves title, link, severity and date null. The
- * affected range is what says whether a later release already carries the fix.
+ * A security advisory that affects an installed version, as S9 carries it
+ * (docs/verdicts.md#security-advisories). A partial Composer record sets every field to null
+ * except the id and the affected range.
  *
  * @internal
  */
@@ -47,7 +46,6 @@ final class Advisory
         return new self($advisory->advisoryId, $advisory->cve, $advisory->title, $advisory->link, $advisory->severity, $advisory->reportedAt, $advisory->affectedVersions);
     }
 
-    /** The advisory's Packagist or GitHub id (`PKSA-…`, `GHSA-…`). */
     public function id(): string
     {
         return $this->id;
@@ -58,7 +56,6 @@ final class Advisory
         return $this->cve;
     }
 
-    /** The CVE when the advisory has one, else its id: how the evidence line names it. */
     public function label(): string
     {
         return $this->cve ?? $this->id;
@@ -85,8 +82,9 @@ final class Advisory
     }
 
     /**
-     * Whether the advisory's affected range covers a version, given normalized (`3.4.47.0`); null
-     * when the range is not known, which no fix can then be read from.
+     * Null when the advisory gives no affected range.
+     *
+     * @param string $normalized a normalized version, such as `3.4.47.0`
      */
     public function affects(string $normalized): ?bool
     {

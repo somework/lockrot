@@ -5,12 +5,8 @@ declare(strict_types=1);
 namespace Lockrot\Data\Forge;
 
 /**
- * Decides which repositories to ask about.
- *
- * With credentials every repository is fetched. Anonymously, GitHub allows 60 requests an hour and
- * Bitbucket 60, so on those forges an anonymous run asks only about candidate packages — the ones
- * that already look stale on release age, where activity data can still change the verdict — and
- * no more than the budget. GitLab's anonymous limit is 500 a minute, so it is never capped.
+ * Decides which repositories to ask about: docs/internals.md, "Repository hosts and credentials".
+ * GitLab is never capped, because its anonymous limit is far above the budget.
  *
  * @internal
  */
@@ -60,8 +56,7 @@ final class ActivityFetchPlanner
                 continue;
             }
             if (isset($seen[$repo->key()])) {
-                // A repository already selected by an earlier package: this package receives the
-                // same activity data without adding another request.
+                // An earlier package selected this repository: this package reuses its activity data.
                 $checkedPackages[$forge] = ($checkedPackages[$forge] ?? 0) + 1;
                 continue;
             }

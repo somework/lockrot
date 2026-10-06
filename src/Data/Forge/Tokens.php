@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Data\Forge;
 
 /**
- * The access tokens lockrot itself resolved for one run — as opposed to the credentials Composer
- * holds in `auth.json`/`COMPOSER_AUTH`, which Composer's own HTTP layer applies without lockrot's
- * help ({@see ForgeAuth}).
+ * Only lockrot's own tokens: Composer's HTTP layer applies its own credentials ({@see ForgeAuth}).
  *
  * @internal
  */
@@ -33,9 +31,7 @@ final class Tokens
     }
 
     /**
-     * GitHub: `LOCKROT_GITHUB_TOKEN`, then `GITHUB_TOKEN`, then Composer's `github-oauth.github.com`.
-     * GitLab: `LOCKROT_GITLAB_TOKEN`, then `GITLAB_TOKEN`; Composer's `gitlab-token`/`gitlab-oauth`
-     * need no resolving here because Composer sends them itself.
+     * The order of the sources: docs/internals.md, "Repository hosts and credentials".
      *
      * @param array<string, mixed> $env
      */
