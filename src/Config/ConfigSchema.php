@@ -11,29 +11,23 @@ use Lockrot\Json\SchemaPayload;
 use Lockrot\Json\Schemas;
 
 /**
- * Validates the shape of composer.json's extra.lockrot against
- * resources/lockrot-config-1.schema.json, using Composer's own bundled justinrainbow/json-schema
- * validator.
+ * The validator is the justinrainbow/json-schema that Composer bundles.
  *
- * The published file leaves `format` open — a pattern and the formats this release writes in
- * `x-known-values` — so an editor holding an older copy does not flag a format a later release adds.
- * lockrot itself accepts exactly the formats it writes: it reads the file strictly
- * ({@see KnownValues::closed()}), on the first validation of a process as on every later one, so a
- * mistyped `format` is the enum's error, exit 2, even when `--format` on the command line overrides it.
+ * The published schema leaves `format` open, so an editor with an older copy does not flag a format
+ * that a later release adds. lockrot reads it strictly ({@see KnownValues::closed()}), so a mistyped
+ * `format` is a validation error, exit 2, even when `--format` overrides it.
+ * See docs/schema.md#open-sets.
  *
  * @internal
  */
 final class ConfigSchema
 {
-    /**
-     * The config schema number lockrot reads extra.lockrot against. A config document carries no
-     * number of its own, so this one decides which file validates it.
-     */
+    /** A config document carries no number of its own, so this constant selects the schema file. */
     public const NUMBER = 1;
 
     private static ?object $schema = null;
 
-    /** @param array<string, mixed> $lockrotExtra contents of composer.json extra.lockrot */
+    /** @param array<string, mixed> $lockrotExtra */
     public static function validate(array $lockrotExtra): void
     {
         // The validator reads JSON objects as PHP objects, and composer.json arrives as arrays.
@@ -48,10 +42,8 @@ final class ConfigSchema
 
         $lines = ['extra.lockrot is invalid:'];
         foreach ($validator->getErrors() as $error) {
-            // Every error the validator produces is documented as {property, message, ...}, so this
-            // narrows for PHPStan rather than guards against a real gap: skipping a malformed entry
-            // here never hides the failure itself, since the method still throws below either way,
-            // at worst with a shorter list of lines than errors reported.
+            // The validator documents every error as {property, message, ...}, so this narrows the
+            // type for PHPStan. Skipping a malformed entry hides nothing: the method still throws.
             if (!\is_array($error) || !\is_string($error['property'] ?? null) || !\is_string($error['message'] ?? null)) {
                 continue;
             }
