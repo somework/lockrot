@@ -6,6 +6,7 @@ namespace Lockrot\Output;
 
 use Lockrot\Analyzer\Report;
 use Lockrot\Baseline\BaselineComparison;
+use Lockrot\Json\JsonWriter;
 use Lockrot\Lock\LockLineIndex;
 use Lockrot\Verdict\Finding;
 
@@ -118,11 +119,11 @@ final class GitlabFormatter implements FormatterInterface
     /** @param list<array<string, mixed>> $issues */
     private static function encode(array $issues): string
     {
-        $json = json_encode($issues, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES);
+        $json = JsonWriter::encode($issues, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES);
         // Every value above is a scalar, list or string-keyed array built from Report data, so this
         // is unreachable in practice; guarded explicitly so a future encoding failure fails loudly
         // instead of silently emitting the string "false" (same guard as JsonFormatter).
-        if ($json === false) {
+        if ($json === null) {
             throw new \RuntimeException('Cannot encode report as GitLab Code Quality JSON: '.json_last_error_msg());
         }
 

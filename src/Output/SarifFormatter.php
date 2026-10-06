@@ -6,6 +6,7 @@ namespace Lockrot\Output;
 
 use Lockrot\Analyzer\Report;
 use Lockrot\Baseline\BaselineComparison;
+use Lockrot\Json\JsonWriter;
 use Lockrot\Lock\LockLineIndex;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Priority;
@@ -271,11 +272,11 @@ final class SarifFormatter implements FormatterInterface
     {
         // PRESERVE_ZERO_FRACTION keeps `rank` a JSON number with a fraction — 100.0, not 100 — so a
         // consumer that distinguishes the two reads every rank as the float SARIF types it as.
-        $json = json_encode($document, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_PRESERVE_ZERO_FRACTION);
+        $json = JsonWriter::encode($document, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_PRESERVE_ZERO_FRACTION);
         // Everything above is scalars, lists and string-keyed arrays built from Report data, so this
         // is unreachable in practice; guarded explicitly so a future encoding failure fails loudly
         // instead of silently emitting the string "false" (same guard as JsonFormatter).
-        if ($json === false) {
+        if ($json === null) {
             throw new \RuntimeException('Cannot encode report as SARIF: '.json_last_error_msg());
         }
 

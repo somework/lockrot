@@ -9,6 +9,7 @@ use Lockrot\Data\Repository\InstalledRelease;
 use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Data\Repository\RepositoryUrl;
 use Lockrot\Explain\Explanation;
+use Lockrot\Json\JsonWriter;
 use Lockrot\Json\Schemas;
 use Lockrot\Signal\Signal;
 use Lockrot\Verdict\Finding;
@@ -66,8 +67,8 @@ final class ExplainFormatter
     public function json(Explanation $explanation): string
     {
         $data = ['$schema' => Schemas::url(Schemas::EXPLAIN, self::SCHEMA), 'lockrot' => ['version' => JsonFormatter::VERSION, 'schema' => self::SCHEMA]] + $explanation->toArray();
-        $json = json_encode($data, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES);
-        if ($json === false) {
+        $json = JsonWriter::encode($data, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES);
+        if ($json === null) {
             throw new \RuntimeException('Cannot encode explanation as JSON: '.json_last_error_msg());
         }
 
@@ -421,9 +422,7 @@ final class ExplainFormatter
     /** @param mixed $value */
     private static function encode($value): string
     {
-        $json = json_encode($value, \JSON_UNESCAPED_SLASHES);
-
-        return $json === false ? '?' : $json;
+        return JsonWriter::encode($value, \JSON_UNESCAPED_SLASHES) ?? '?';
     }
 
     /** @param mixed $value */

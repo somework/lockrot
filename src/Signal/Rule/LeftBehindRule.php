@@ -7,11 +7,11 @@ namespace Lockrot\Signal\Rule;
 use Composer\Package\Package;
 use Composer\Package\Version\VersionSelector;
 use Composer\Repository\RepositorySet;
-use Composer\Semver\Comparator;
 use Composer\Semver\VersionParser;
 use Lockrot\Clock;
 use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Data\Repository\ReleaseBranch;
+use Lockrot\Signal\AgeMeasure;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\Signal;
@@ -47,6 +47,7 @@ final class LeftBehindRule implements SignalRule
 {
     private Clock $clock;
     private Thresholds $thresholds;
+    private AgeMeasure $age;
     private PhpFloor $floor;
     private VersionParser $parser;
 
@@ -54,6 +55,7 @@ final class LeftBehindRule implements SignalRule
     {
         $this->clock = $clock;
         $this->thresholds = $thresholds;
+        $this->age = new AgeMeasure($clock, $thresholds);
         $this->floor = $floor ?? new PhpFloor(null);
         $this->parser = new VersionParser();
     }
@@ -61,27 +63,28 @@ final class LeftBehindRule implements SignalRule
     public function evaluate(PackageFacts $facts): ?Signal
     {
         $metadata = $facts->metadata();
-        if ($metadata === null) {
-            return null;
-        }
         $branch = ReleaseBranch::of($facts->package()->version());
-        $byBranch = $metadata->latestStableByBranch();
-        // An undated highest tag means the branch's newest release is one the repository does not
-        // date; how much younger than the newest dated release it is cannot be known, so the branch
-        // is not measured (a subtree split — illuminate/*, symfony/* — dates tags by the commit they
-        // point at, and leaves many with no date at all; a tag sharing its commit with another is
-        // handed over undated for the same reason, see PackageMetadata::fromPackages()).
-        $own = $branch === null ? null : ($byBranch[$branch] ?? null);
-        if ($branch === null || $own === null || $own['at'] === null || $own['highest']['at'] === null || $this->isAhead($facts->package()->version(), $own['highest']['normalized'])) {
+        if ($metadata === null || $branch === null) {
             return null;
         }
+        $byBranch = $metadata->latestStableByBranch();
+        // The installed branch's own reading: its newest dated release, or no reading where the
+        // branch's highest tag is undated or the installed version is above every listed tag
+        // ({@see AgeMeasure::branchRelease()}). S8 quotes the reading it judges, and only a branch
+        // past `release-warn-years` can be left behind.
+        $reading = $this->age->branchRelease($facts);
+        $level = $reading->level();
+        if ($level === null) {
+            return null;
+        }
+        $ownAt = $reading->measuredAt();
 
         /** @var array{branch: string, version: string, at: \DateTimeImmutable, php: ?string}|null $newest */
         $newest = null;
         /** @var array{branch: string, version: string, at: \DateTimeImmutable, php: ?string}|null $reachable */
         $reachable = null;
         foreach ($byBranch as $key => $release) {
-            if ($release['at'] === null || !ReleaseBranch::isAbove((string) $key, $branch) || $release['at'] <= $own['at']) {
+            if ($release['at'] === null || !ReleaseBranch::isAbove((string) $key, $branch) || $release['at'] <= $ownAt) {
                 continue;
             }
             $candidate = ['branch' => (string) $key, 'version' => $release['version'], 'at' => $release['at'], 'php' => $release['php'] ?? null];
@@ -102,23 +105,17 @@ final class LeftBehindRule implements SignalRule
         }
         $blocking = $this->floor->blocking($newest['php']);
 
-        $years = $this->clock->yearsSince($own['at']);
-        $level = Thresholds::levelFor($years, $this->thresholds->releaseWarnYears(), $this->thresholds->releaseHighYears());
-        if ($level === null) {
-            return null;
-        }
-
         // The branch is named, not only the release: the branch is what a maintainer moves to, and
         // it is the newest *releasing* higher branch — with a living LTS below the current major
         // that can be the LTS, which is a fact about where fixes land, not a claim about the latest.
         // A branch dated by the monorepo says so: the date is laravel/framework's release, read
         // through `replace`, not one this package's own tags carry ({@see PackageMetadata::datedBy()}).
-        $datedBy = $own['dated_by'] ?? null;
+        $datedBy = $reading->datedBy();
         $summary = \sprintf(
             'branch %s last released %s (%.1f years ago%s); %s released %s (%s)',
             ReleaseBranch::label($branch),
-            $own['at']->format('Y-m-d'),
-            $years,
+            $ownAt->format('Y-m-d'),
+            $reading->years(),
             $datedBy === null ? '' : ', dated by '.$datedBy,
             ReleaseBranch::label($newest['branch']),
             $newest['version'],
@@ -134,9 +131,9 @@ final class LeftBehindRule implements SignalRule
 
         return new Signal(Signal::S8, $level, $summary, [
             'branch' => ReleaseBranch::label($branch),
-            'branch_last_release' => $own['at']->format(\DATE_ATOM),
-            'branch_last_version' => $own['version'],
-            'years' => round($years, 1),
+            'branch_last_release' => $ownAt->format(\DATE_ATOM),
+            'branch_last_version' => $reading->version(),
+            'years' => $reading->years(),
             'newest_branch' => ReleaseBranch::label($newest['branch']),
             'newest_version' => $newest['version'],
             'newest_release' => $newest['at']->format(\DATE_ATOM),
@@ -173,20 +170,5 @@ final class LeftBehindRule implements SignalRule
         }
 
         return (new VersionSelector(new RepositorySet()))->findRecommendedRequireVersion(new Package($package, $normalized, $newestVersion));
-    }
-
-    /**
-     * Whether the installed version is above the highest stable tag the repository lists on its
-     * branch — not above its newest release, which a backport on a lower minor can be.
-     *
-     * @param string $branchHighest already normalized ({@see PackageMetadata::latestStableByBranch()})
-     */
-    private function isAhead(string $installed, string $branchHighest): bool
-    {
-        try {
-            return Comparator::greaterThan($this->parser->normalize($installed), $branchHighest);
-        } catch (\UnexpectedValueException $e) {
-            return true;
-        }
     }
 }

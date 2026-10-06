@@ -54,7 +54,7 @@ mutant from the original, and says why.
 - `src/Signal/PhpFloor.php:137` CastString — `describe()`: `php($kind)` is null only for a floor that
   is not there, and `blocking()` never names a floor that is not there, so the cast is for the type,
   not for a case.
-- `src/Signal/Rule/LeftBehindRule.php:84` LessThanOrEqualTo (`$release['at'] <= $own['at']` →
+- `src/Signal/Rule/LeftBehindRule.php:87` LessThanOrEqualTo (`$release['at'] <= $ownAt` →
   `<`) — a higher branch released at the very instant of the installed branch's last release would
   become a candidate. For S8 to fire it would then have to be alive (released within
   `release-warn-years`) while the installed branch, released at the same instant, is at least
@@ -536,3 +536,17 @@ was added: 574 mutants, 572 killed, the two below.
   `closer()`. `$at` is the offset of a closing quote or bracket and `$line` that of a line
   break, both found by one pattern that matches one character at each, so the two are never the same
   offset and the comparisons agree on every text.
+
+## Years in tenths on the run clock (0.14.0, 2026-10-06)
+
+Measured over `src/Clock.php`, `src/Json/JsonWriter.php`, `src/Signal/AgeMeasure.php`,
+`src/Signal/AgeReading.php` and the three rules that read them (`NoReleaseRule`, `NoPushRule`,
+`LeftBehindRule`), whole files, locally under Xdebug on 4 threads with their tests: 202 mutants,
+the two below and `LeftBehindRule.php:87` (above, moved by the reading) escaped.
+
+- `src/Clock.php:72` DecrementInteger and IncrementInteger — `max(0, $seconds)` becoming
+  `max(-1, $seconds)` or `max(1, $seconds)` in `tenthsOf()`. The clamp exists for dates after the run
+  clock, and any value it lands on within a second of 0 is 0 tenths on both paths: one second is
+  10 / 31557600 of a tenth, far below the half that rounds up, and for -1 second the integer path
+  divides `-10 + SECONDS_PER_YEAR / 2`, which stays between 0 and `SECONDS_PER_YEAR`. A date far in the future (the `-7 years` row) still
+  kills the removal of the clamp.
