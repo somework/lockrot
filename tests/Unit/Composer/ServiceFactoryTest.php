@@ -53,7 +53,7 @@ final class ServiceFactoryTest extends TestCase
 
     private function tempCacheDir(): string
     {
-        $dir = sys_get_temp_dir().'/lockrot-sf-'.uniqid();
+        $dir = sys_get_temp_dir().'/lockrot-sf-'.uniqid('', true);
         $this->cacheDirs[] = $dir;
 
         return $dir;
