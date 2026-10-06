@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace Lockrot\Data\Repository;
 
 /**
- * Why a package's metadata did not come, as the code the report's notes carry: one per reason
- * lockrot writes itself ({@see MetadataLoaderInterface}), and `fetch_failed` for every other message
- * — a transport error, or what a repository threw — so a later release can move a case out of the
- * catch-all into a code of its own.
+ * The `reason` code of a package whose metadata did not arrive: one per message that lockrot writes
+ * ({@see MetadataLoaderInterface}), and `fetch_failed` for every other message.
+ * See docs/notes.md#metadata_unavailable.
  *
  * @internal
  */

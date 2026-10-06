@@ -5,17 +5,10 @@ declare(strict_types=1);
 namespace Lockrot\Data\Repository;
 
 /**
- * A package's repository URL, and any text that quotes one, on its way out of lockrot and into
- * something a person reads.
- *
- * The value is whatever the package's `source.url` or `support.source` says, and for a private
- * repository that is routinely a URL with credentials in it: `https://gitlab-ci-token:$CI_JOB_TOKEN@…`
- * is how GitLab CI hands a job access to a private Composer source, and Bitbucket's app passwords
- * take the same shape. Composer keeps them because it has to fetch with them. lockrot only ever
- * shows them, and a report — a terminal buffer pasted into a ticket, a JSON file uploaded as a CI
- * artifact, an HTML page published in a blog post — is exactly where a token should never appear.
- * Nor should a path on the machine that ran: it carries the account and often the client's
- * directory name, which is why a report names its lock and never locates it.
+ * A package's repository URL, and any text that quotes one, as a report prints it. The URL of a
+ * private repository can carry a token, as `https://gitlab-ci-token:$CI_JOB_TOKEN@…` does, and a
+ * path on the machine carries the account name. A report must show neither. See
+ * docs/schema.md#what-a-report-says-about-your-repositories.
  *
  * @internal
  */
@@ -27,13 +20,13 @@ final class RepositoryUrl
     /** Where a URL starts in a text: a scheme and `://`, or `:\/\/` as JSON escapes it. */
     private const SCHEME = '{(?<![A-Za-z0-9+.\-])[A-Za-z][A-Za-z0-9+.\-]*:(?://|\\\\/\\\\/)}';
 
-    /** Where a path on the machine starts in a text: at a word, a quote or a bracket; Unix, home, a drive or a share. */
+    /** Where a path on the machine starts in a text, at a word, a quote or a bracket: Unix, home, drive or share. */
     private const PATH = '{(?<=^|[\s"\'`(\[\{<=,|:])(?:/(?=[^\s/])|~/|[A-Za-z]:[\\\\/]|\\\\\\\\(?=[^\s\\\\]))}';
 
-    /** The user of an scp-style remote in a text, `user@host:path`, which may be a token. */
+    /** The user of an scp-style remote in a text, `user@host:path`, which can be a token. */
     private const REMOTE_USER = '{(?<=^|[\s"\'`(\[\{<=,|])[^\s@/\\\\"\'<>`()\[\]\{\}:=,|]+@(?=[A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9])?:(?!//)\S)}';
 
-    /** What closes what an opening character delimits; PHP quotes a path as `` `path' ``. */
+    /** What closes what an opening character delimits. PHP quotes a path as `` `path' ``. */
     private const CLOSERS = ['"' => '"', "'" => "'", '`' => "'", '(' => ')', '[' => ']', '{' => '}', '<' => '>'];
 
     /**
@@ -65,16 +58,12 @@ final class RepositoryUrl
     private const REMOTE = '{^(?:(?<user>[^@\s/\\\\:]+)@)?(?<remote>(?:(?:ssl|tcp)[46]?:)?(?<host>[A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9])?):(?!//)[^\s\\\\].*)$}';
 
     /**
-     * The repository as a report may print it: a URL without its userinfo, query and fragment, so
-     * `https://user:token@host/path?private_token=…` reads `https://host/path`, and a remote without
-     * a scheme without its user, so `igor@git.acme.test:lib.git` reads `git.acme.test:lib.git`.
-     * A path or a `file://` URL locates the machine rather than a server, and reads as a message
-     * quotes one, by its last segment: `/Users/igor/client-x/lib` reads `.../lib`. Null for what is
-     * none of these.
+     * The repository as a report can print it. A URL loses its userinfo, query and fragment
+     * (`https://user:token@host/path?x=1` reads `https://host/path`), and a remote loses its user.
+     * A path or a `file://` URL reads by its last segment (`.../lib`). Null for anything else.
      *
-     * The userinfo runs to the last `@` before the path, `?` and `#` included, since a password
-     * written by hand is not always encoded. Redacting rather than dropping a URL keeps the host,
-     * which is the part a reader is actually checking.
+     * The userinfo runs to the last `@` before the path, since a hand-written password can hold `?`
+     * and `#`.
      */
     public static function shown(?string $url): ?string
     {
@@ -104,12 +93,10 @@ final class RepositoryUrl
     }
 
     /**
-     * The URL as something a page may put in an `href`, or null when it is not one.
-     *
-     * `.git` and Composer's `git+` prefix are dropped, an scp-style `git@host:vendor/name` is
-     * rewritten to the https form it means, the rest goes as {@see shown()} leaves it, and what is
-     * left has to be an http(s) URL with nothing in it that could break out of an attribute. A
-     * `javascript:` or `data:` URL from a package's own metadata never becomes a link.
+     * The URL as something a page can put in an `href`, or null when it is not one. It drops `.git`
+     * and Composer's `git+` prefix, rewrites an scp-style `git@host:vendor/name` to https, and then
+     * reads the URL as {@see shown()} leaves it. The result must be an http(s) URL that cannot
+     * break out of an attribute, so a `javascript:` or `data:` URL never becomes a link.
      */
     public static function linkable(?string $url): ?string
     {
@@ -126,13 +113,13 @@ final class RepositoryUrl
     }
 
     /**
-     * A message as a report may quote it: every URL and scp-style remote in it as {@see shown()}
-     * leaves one, a `file://` URL and every other path on the machine down to its last segment
-     * (`.../ca.pem`), and every other word as it was. Composer masks only a password and an `access_token`; a token in the user
-     * slot, a login, a `?token=` and the path of an unreadable certificate all reach its messages.
+     * A message as a report can quote it. Each URL and scp-style remote reads as {@see shown()}
+     * leaves it. Each path on the machine, `file://` URLs included, reads by its last segment
+     * (`.../ca.pem`). Composer masks only a password and an `access_token`, so a token in the user
+     * slot or a `?token=` reaches its messages.
      *
-     * The text is scanned, not matched as a whole, so its length costs time and never the redaction;
-     * a message PCRE still cannot read is {@see WITHHELD} rather than passed on as it came.
+     * The text is scanned, not matched as a whole, so its length costs time and never the redaction.
+     * A message that PCRE cannot read is {@see WITHHELD}.
      */
     public static function inText(string $text): string
     {
@@ -165,12 +152,12 @@ final class RepositoryUrl
     }
 
     /**
-     * One URL, which ends where the next one starts at the latest: the userinfo runs to the last `@`
+     * One URL. It ends where the next one starts at the latest. The userinfo runs to the last `@`
      * before the path, so a raw `'`, `)`, `?` or `@` in a password goes with it.
      *
      * @param array<string, list<int>> $closers {@see closers()}
      *
-     * @return array{0: string, 1: int} the URL as a report may quote it, and where it ends in $text
+     * @return array{0: string, 1: int} the URL as a report can quote it, and where it ends in $text
      */
     private static function url(string $text, int $offset, string $scheme, int $limit, array $closers): array
     {
@@ -218,7 +205,7 @@ final class RepositoryUrl
     }
 
     /**
-     * Where each closer that ends a run is, and each line break, found once per text so that a text
+     * Where each closer that ends a run is, and each line break. Found once per text, so a text
      * full of quotes costs no more than one without.
      *
      * @return null|array<string, list<int>> offsets by character, a line break under "\n"
@@ -276,8 +263,8 @@ final class RepositoryUrl
     }
 
     /**
-     * The end of a path outside quotes, before $limit: its word, and each next word with a separator
-     * in it, as a path with spaces has. A word ends at a character in $stops.
+     * The end of a path outside quotes, before $limit. It takes the first word, and each next word
+     * with a separator in it, as a path with spaces has. A word ends at a character in $stops.
      */
     private static function pathEnd(string $text, int $from, string $stops, int $limit): int
     {
@@ -293,7 +280,6 @@ final class RepositoryUrl
         return self::trimmed($text, $from, $end);
     }
 
-    /** $end moved back over sentence punctuation, which stays text. */
     private static function trimmed(string $text, int $from, int $end): int
     {
         return $from + \strlen(rtrim(substr($text, $from, $end - $from), self::TRAILING));
@@ -308,9 +294,9 @@ final class RepositoryUrl
     }
 
     /**
-     * `.../name`, the last segment of a path split on either separator, and the separator after it,
-     * so what follows reads as it did; nothing for a path of separators alone. A home directory is
-     * `...` alone, since its name is the account's.
+     * The last segment of a path as `.../name`, split on either separator. The separator after it
+     * stays, so what follows reads as it did. Empty for a path of separators alone. A home directory
+     * is `...` alone, since its name is the account's.
      */
     private static function lastSegment(string $path): string
     {
