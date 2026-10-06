@@ -10,9 +10,9 @@ use Symfony\Component\Console\Formatter\OutputFormatter;
  * A console formatter that fails the moment it is handed a given piece of text.
  *
  * Some symfony/console 5.4 releases inside Composer's PHARs throw on a `<<fg=red>>` that
- * OutputFormatter::escape() left half-live, and the one in this repository's vendor does not: a
- * test cannot reproduce the crash with the real formatter. What it can prove is that the text never
- * reaches a formatter at all, which is the fix, and this is how.
+ * OutputFormatter::escape() left half-live, and the one in this repository's vendor does not, so a
+ * test cannot reproduce the crash with the real formatter. It can prove that the text never reaches
+ * a formatter at all, and this class is how.
  */
 final class MarkupRefusingFormatter extends OutputFormatter
 {

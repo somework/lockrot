@@ -7,18 +7,12 @@ namespace Lockrot\Tests\Support;
 use Symfony\Component\Process\Process;
 
 /**
- * One `php -S` process on a free local port: the part {@see FixtureRepositoryServer} and
- * {@see StaticFileServer} share, so neither can leave a server behind.
- *
- * Two lessons are built into how php -S is launched. Its access log goes straight to a file:
- * php -S writes one line per request to stderr, and piped through Symfony\Process that stream fills
- * the OS pipe buffer (~64 KiB, a few hundred requests) the moment nothing polls the Process object,
- * after which php -S blocks in write(2) — a silent hang. And php -S is never left to outlive the
- * test process: stop() waits until php -S has exited, and a watchdog kills php -S within about a
- * second once the process that started it is gone, however it went. A PHP process killed by a
- * signal (Infection stopping a timed-out mutant, a `timeout` wrapper, Ctrl-C) or dying of a fatal
- * error runs no destructor, no tearDownAfterClass() and no stop(), and php -S, reparented to init,
- * used to keep running and holding its port indefinitely.
+ * One `php -S` process on a free local port, shared by {@see FixtureRepositoryServer} and
+ * {@see StaticFileServer}. Its access log goes to a file. Piped through Symfony\Process, php -S's
+ * stderr fills the OS pipe buffer once nothing polls the Process object, and php -S then blocks in
+ * write(2). stop() waits until php -S has exited, and a watchdog kills it once its owner is gone.
+ * The watchdog covers a PHP process killed by a signal or a fatal error, which runs no destructor
+ * and no stop().
  */
 final class PhpBuiltinServer
 {
@@ -28,13 +22,10 @@ final class PhpBuiltinServer
 
     /**
      * Runs under `sh -c`, whose PID is the one Symfony\Process tracks and signals. php -S runs in the
-     * background and the shell waits on it; a SIGTERM from stop() interrupts that wait, and the trap
+     * background and the shell waits on it. A SIGTERM from stop() interrupts that wait, and the trap
      * kills php -S and waits for it too, so the shell exits only once the port is free. The
-     * watchdog polls the owning PID and kills php -S once the owner is gone; it is a separate
-     * process because nothing else is left to act once the owner has been SIGKILLed.
-     *
-     * Arguments, in order: the PHP binary, the owner PID, the port, the docroot, the router script,
-     * the log file.
+     * watchdog is a separate process because nothing else is left to act once the owner has been
+     * SIGKILLed.
      */
     private const LAUNCHER = <<<'SH'
         php_binary=$1 owner=$2 port=$3 docroot=$4 router=$5 log=$6
@@ -127,7 +118,7 @@ final class PhpBuiltinServer
         }
     }
 
-    /** The access log so far; empty before start() and after stop(). */
+    /** The access log so far, empty before start() and after stop(). */
     public function readLog(): string
     {
         if ($this->logFile === null || !is_file($this->logFile)) {

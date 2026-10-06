@@ -8,11 +8,9 @@ use Lockrot\Data\Http\HttpClientInterface;
 use Lockrot\Data\Http\HttpResult;
 
 /**
- * A map of URL to canned {@see HttpResult}, plus a log of what was asked for.
- *
- * The self-update tests need both halves: the responses drive the code under test, and the log is
- * how "up to date means nothing is downloaded" is asserted at all. {@see \Lockrot\Data\Http\RecordedHttpClient}
- * cannot do that — it is production playback keyed by file name, with no recording side.
+ * A map of URL to canned {@see HttpResult}, plus a log of what was asked for. The self-update tests
+ * assert "up to date means nothing is downloaded" from the log, which
+ * {@see \Lockrot\Data\Http\RecordedHttpClient} does not keep.
  */
 final class FakeHttpClient implements HttpClientInterface
 {

@@ -11,14 +11,12 @@ use Symfony\Component\Console\Output\ConsoleSectionOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * A buffered stdout with a genuinely separate buffered stderr, so a test can assert that a command
- * keeps stdout clean.
- *
- * CommandTester's `capture_stderr_separately` option would do the same, but on PHP 8.5 it triggers
- * a `ReflectionProperty::setAccessible()` deprecation inside
- * Symfony\Component\Console\Tester\TesterTrait::initOutput(), which pollutes otherwise-pristine
- * test output. Command::run() only needs an InputInterface and an OutputInterface, so this double
- * gives the same stream separation directly.
+ * A buffered stdout with a separate buffered stderr, so a test can assert that a command keeps
+ * stdout clean. CommandTester's `capture_stderr_separately` option does the same, but on PHP 8.5 it
+ * triggers a `ReflectionProperty::setAccessible()` deprecation inside
+ * Symfony\Component\Console\Tester\TesterTrait::initOutput(), which pollutes the test output.
+ * Command::run() only needs an InputInterface and an OutputInterface, so this double separates the
+ * streams directly.
  */
 final class SplitStreamOutput extends BufferedOutput implements ConsoleOutputInterface
 {

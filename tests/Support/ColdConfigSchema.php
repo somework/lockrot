@@ -8,9 +8,9 @@ use Lockrot\Config\ConfigSchema;
 
 /**
  * Forgets the schema {@see ConfigSchema} keeps for the rest of the process, so the next validation is
- * the first one of a process again. PHPUnit runs every test in one process, and whichever test ran
- * first would otherwise have warmed the cache for all the others: a first call that reads the file
- * differently from a later one — the install-time path makes exactly one — would go unseen.
+ * the first one of a process again. PHPUnit runs every test in one process. Without this class the
+ * first test warms the cache for all the others, and a first call that reads the file differently
+ * from a later one (the install-time path makes exactly one) goes unseen.
  */
 final class ColdConfigSchema
 {

@@ -7,22 +7,14 @@ namespace Lockrot\Tests\Support;
 use Lockrot\Json\Schemas;
 
 /**
- * The negative schema fixtures: documents a published schema must reject, each with the error it
- * must be rejected for, so a fixture rejected for another reason fails.
- *
- * A fixture lives in `<root>/<document>-<number>/`, and is validated against that document's schema
- * under that number. It names its expectation in one of two forms, as the generators write them:
- *
- * - embedded, as a root `$expect` object `{"strict": <bool>, "error": <string or null>}`, removed
- *   before the document is validated (report-2 and the SARIF property bags);
- * - in the directory's `EXPECT.json`, which maps each file name to its error, the expectation strict
- *   when the name ends in `.strict.json` (explain-2, baseline-2 and config-2).
- *
- * A strict expectation is validated against the strict twin
- * ({@see ValidatesJsonSchemas::strictTwin()}), any other against the schema as published. A fixture
- * passes when it has at least one error and, when its expectation names one, at least one error
- * (`<property>: <message>`) contains it, case-insensitive. A file with no expectation is an error of
- * the fixture set, never a fixture that silently loses its check.
+ * The negative schema fixtures: documents a published schema must reject, each for the error it
+ * names, so a fixture rejected for another reason fails. A fixture in `<root>/<document>-<number>/`
+ * is validated against that document's schema under that number. Its expectation is a root `$expect`
+ * object `{"strict": <bool>, "error": <string or null>}`, removed before validation, or an entry in
+ * the directory's `EXPECT.json` (strict when the file name ends in `.strict.json`). A strict
+ * expectation is validated against the strict twin ({@see ValidatesJsonSchemas::strictTwin()}), any
+ * other as published. A fixture passes when one of its errors contains the error it names,
+ * case-insensitive. A file with no expectation is an error of the fixture set.
  */
 final class NegativeFixtures
 {
@@ -112,11 +104,7 @@ final class NegativeFixtures
         return [(string) json_encode($document, \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE), $strict, $error];
     }
 
-    /**
-     * Whether the errors a fixture produced are a rejection for the reason it names.
-     *
-     * @param list<string> $errors
-     */
+    /** @param list<string> $errors */
     public static function rejects(array $errors, ?string $error): bool
     {
         if ($errors === []) {
@@ -173,7 +161,7 @@ final class NegativeFixtures
         return $entries;
     }
 
-    /** @return list<string> the names in a directory, sorted; scandir() rather than glob(), so a path holding `[` is no pattern */
+    /** @return list<string> the names in a directory, sorted, read with scandir() rather than glob() so a path holding `[` is no pattern */
     private static function entries(string $dir): array
     {
         $names = scandir($dir);

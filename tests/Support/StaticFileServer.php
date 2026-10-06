@@ -7,11 +7,10 @@ namespace Lockrot\Tests\Support;
 /**
  * Serves a directory of prepared files over a real `php -S` HTTP server.
  *
- * Separate from {@see FixtureRepositoryServer} because that one is a p2 metadata mirror: it builds
- * its own docroot out of recorded Composer envelopes and its router exists to send the
- * `Last-Modified` header ComposerRepository revalidates against. What a self-update test needs is
- * the opposite — a docroot the test itself writes, and bytes handed back untouched — so the two
- * share only the process underneath, {@see PhpBuiltinServer}.
+ * Separate from {@see FixtureRepositoryServer}, which mirrors recorded p2 metadata and sends the
+ * `Last-Modified` header that ComposerRepository revalidates against. A self-update test needs a
+ * docroot that the test writes and bytes handed back untouched, so the two share only
+ * {@see PhpBuiltinServer}.
  */
 final class StaticFileServer
 {

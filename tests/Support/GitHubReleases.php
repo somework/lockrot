@@ -12,7 +12,7 @@ use Lockrot\SelfUpdate\ReleaseSignatureVerifier;
  * `lockrot.phar.meta.json` descriptions next to them, for the self-update tests.
  *
  * Generated rather than recorded: a paging test needs a page of exactly 100 entries, and a
- * selection test needs versions around whatever {@see \Lockrot\Version::STRING} is today.
+ * selection test needs versions around {@see \Lockrot\Version::STRING}.
  * `tests/fixtures/http/github-releases/releases.json` is the one recorded-shape list, kept so
  * the reader is also checked against the fields GitHub actually sends.
  */
@@ -20,7 +20,7 @@ final class GitHubReleases
 {
     public const BASE = 'https://github.com/somework/lockrot/releases/download/';
 
-    /** Every asset a release from 0.13.0 on publishes, in the names self-update looks for. */
+    /** Every asset a release publishes, in the names self-update looks for. */
     public const ASSETS = [
         ReleaseLocator::PHAR_ASSET,
         ReleaseLocator::CHECKSUM_ASSET,
@@ -37,7 +37,7 @@ final class GitHubReleases
      * One entry of the list, shaped the way GitHub sends it (the fields self-update reads, plus a
      * few it ignores).
      *
-     * @param list<string> $assets asset names to publish
+     * @param list<string> $assets
      *
      * @return array<string, mixed>
      */
