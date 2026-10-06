@@ -80,7 +80,6 @@ final class ActivityFetchPlannerTest extends TestCase
         self::assertSame(3, $plan->checkedPackages(RepoRef::GITHUB), 'three packages checked over two repositories: the shared one counts once per package');
     }
 
-    /** A budget of zero asks about nothing, and every candidate it turns away is counted. */
     public function testAZeroBudgetSkipsEveryCappedCandidate(): void
     {
         $plan = (new ActivityFetchPlanner(ForgeAuth::anonymous(), 0))->select(
@@ -130,7 +129,7 @@ final class ActivityFetchPlannerTest extends TestCase
         self::assertSame([], $plan->cappedForges());
     }
 
-    /** Each forge keeps its own budget and its own counts; the capped list follows the forge order. */
+    /** The capped list follows the `RepoRef::FORGES` order. */
     public function testBudgetsAndCountsAreKeptPerForge(): void
     {
         $plan = (new ActivityFetchPlanner(ForgeAuth::anonymous(), 1))->select(

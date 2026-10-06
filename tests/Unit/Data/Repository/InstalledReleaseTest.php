@@ -10,11 +10,8 @@ use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
 use PHPUnit\Framework\TestCase;
 
 /**
- * One reading of the installed version's date, for every surface that prints or measures it. The
- * lock's `time` is a release date only sometimes, and the three answers it can hide — a branch's
- * commit, a commit a split package's tags share, a release the monorepo parent dates — used to be
- * re-derived by each caller, which is how one explanation came to call a date a release four lines
- * above saying it was not one.
+ * The lock's `time` is a release date only sometimes. It can hide a branch's commit, a commit that
+ * a split package's tags share, or a release that the monorepo parent dates.
  */
 final class InstalledReleaseTest extends TestCase
 {
@@ -89,7 +86,7 @@ final class InstalledReleaseTest extends TestCase
     {
         // the package's own newest release had to be dated by the parent, and the parent does not
         // list this version: the lock's date is the commit its tags share, and measuring from it
-        // would add that artefact to every number read off it
+        // adds that artefact to every number read off it
         $installed = InstalledRelease::of(
             F::package(['version' => 'v5.13.2', 'time' => self::LOCKED_AT]),
             self::metadata('laravel/framework', ['5.13.3.0' => '2024-11-21T00:00:00+00:00'], ['5.13.2.0' => true])
@@ -105,8 +102,7 @@ final class InstalledReleaseTest extends TestCase
     /**
      * A package that has ever declared `replace: <other> self.version` keeps a date per release of
      * its own — guzzlehttp/guzzle replaces the old `guzzle/*` packages, and so does every monorepo
-     * that is nobody's child. Those dates are not a parent's, and reading them as one made the
-     * explanation call an ordinary release "dated by a commit its tags share".
+     * that is nobody's child. Those dates are not a parent's.
      */
     public function testAPackagesOwnReleaseDatesAreNotAParents(): void
     {
@@ -136,10 +132,8 @@ final class InstalledReleaseTest extends TestCase
     }
 
     /**
-     * The other reading of the same fact, and the one that was missing: the repository marks the
-     * installed tag itself as dated by a commit its neighbours share, while dating its own newest
-     * release perfectly well. Asking only what dated the newest release measured pagerfanta/twig
-     * from a commit's date.
+     * The repository marks the installed tag as dated by a commit that its neighbours share, while
+     * it dates its own newest release.
      */
     public function testATagOnASharedCommitIsUndatedThoughTheNewestReleaseDatesItself(): void
     {

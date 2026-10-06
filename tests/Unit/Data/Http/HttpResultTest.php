@@ -28,7 +28,7 @@ final class HttpResultTest extends TestCase
     /**
      * A failure is a transport error, a server error, or the three answers that mean "not this
      * time": rate limited (429), forbidden (403) and unauthorized (401). Every other 4xx is the
-     * forge answering, so a cached copy must not be preferred over it.
+     * repository host answering, so a cached copy must not be preferred over it.
      *
      * @dataProvider statuses
      */
@@ -68,7 +68,7 @@ final class HttpResultTest extends TestCase
         self::assertSame('{"a":1}', $copy->body());
         self::assertSame('2026-09-14T12:34:56+00:00', $copy->fetchedAt()->format(\DATE_ATOM));
         self::assertNull((new HttpResult('u', 200, 'not json', $at))->json());
-        // Valid JSON that is not an object or an array is not a body a forge api can read either.
+        // Valid JSON that is not an object or an array is not a body a repository host API can read either.
         self::assertNull((new HttpResult('u', 200, '42', $at))->json());
         self::assertNull((new HttpResult('u', 200, '"a string"', $at))->json());
         self::assertNull((new HttpResult('u', 200, 'null', $at))->json());

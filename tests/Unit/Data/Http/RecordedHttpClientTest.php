@@ -29,7 +29,6 @@ final class RecordedHttpClientTest extends TestCase
         rmdir($dir);
     }
 
-    /** The recording directory is named by content hash, and a trailing separator on it is not doubled. */
     public function testPathForHashesTheUrlAndTrimsTheDirectory(): void
     {
         $url = 'https://x/a.json';

@@ -8,10 +8,6 @@ use Lockrot\Data\Repository\MetadataFailure;
 use Lockrot\Data\Repository\MetadataLoaderInterface;
 use PHPUnit\Framework\TestCase;
 
-/**
- * Why a package's metadata did not come, as a code: lockrot's own reasons each have one, and any
- * other message — a transport error, a repository's own answer — is `fetch_failed`.
- */
 final class MetadataFailureTest extends TestCase
 {
     public function testLockrotsOwnReasonsHaveCodesAndEveryOtherMessageIsAFetchFailure(): void
@@ -25,7 +21,7 @@ final class MetadataFailureTest extends TestCase
         }
     }
 
-    /** A reason constant added to the loader without a code of its own would read as a fetch failure. */
+    /** A reason constant added to the loader without a code of its own will read as a fetch failure. */
     public function testEveryReasonTheLoaderDeclaresHasACodeOfItsOwn(): void
     {
         $reasons = [];

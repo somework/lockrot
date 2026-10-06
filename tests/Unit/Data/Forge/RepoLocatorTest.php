@@ -103,7 +103,7 @@ final class RepoLocatorTest extends TestCase
 
     /**
      * Composer's rule: an entry matches the URL's host with its port, or the bare host when the
-     * entry names no port; a URL that omits a port the entry spells out is not that GitLab. The
+     * entry names no port. A URL that omits a port the entry spells out is not that GitLab. The
      * ref's host is the URL's host, port included — Composer's origin — so the API request and the
      * credential lookup agree with Composer's own.
      */

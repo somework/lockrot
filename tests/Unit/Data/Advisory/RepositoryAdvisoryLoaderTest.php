@@ -149,9 +149,9 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
     }
 
     /**
-     * A repository whose inline advisory records carry only an id and a range: Composer refuses
-     * them as full advisories, and the answer is a note, not a network failure and not a finding
-     * built on a record that may have been withdrawn since it was cached.
+     * Composer refuses an inline advisory record with only an id and a range as a full advisory.
+     * The answer is a note, not a network failure, and no finding rests on a record that a
+     * repository can withdraw after the cache holds it.
      */
     public function testARepositoryServingPartialRecordsIsANoteNotAFailure(): void
     {
@@ -231,7 +231,7 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
         self::assertSame([], $batch->byName());
     }
 
-    /** ComposerRepository lets a JSON ParsingException past its retry loop; it is not a RuntimeException. */
+    /** ComposerRepository lets a JSON ParsingException past its retry loop. It is not a RuntimeException. */
     public function testARepositoryWhosePackagesJsonIsNotJsonIsANoteAndTheNextOneStillAnswers(): void
     {
         if (!interface_exists(AdvisoryProviderInterface::class)) {
@@ -311,7 +311,6 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
         self::assertSame([], $batch->byName());
     }
 
-    /** The budget runs out between two repositories: the first one's note is kept next to the budget note. */
     public function testABudgetSpentAfterTheFirstRepositoryKeepsItsNote(): void
     {
         if (!interface_exists(AdvisoryProviderInterface::class)) {
@@ -350,7 +349,7 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
         self::assertSame([false], self::networkFailures($batch));
     }
 
-    /** On the Composer 2.2 LTS the whole check is one note; on 2.4+ that note never appears. */
+    /** On the Composer 2.2 LTS the whole check is one note. On 2.4 or newer that note never appears. */
     public function testTheComposerVersionNoteMatchesTheApi(): void
     {
         $loader = new RepositoryAdvisoryLoader($this->server()->repositories());

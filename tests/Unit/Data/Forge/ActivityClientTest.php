@@ -21,8 +21,6 @@ final class ActivityClientTest extends TestCase
     private const BB_COMMITS = 'https://api.bitbucket.org/2.0/repositories/workspace/repo/commits?pagelen=1';
 
     /**
-     * A fake that answers from a map and records every batch it was given as [urls, headers].
-     *
      * @param array<string, HttpResult|array{int, string}>       $map
      * @param \ArrayObject<int, array{list<string>, list<string>}> $batches
      */
@@ -115,8 +113,8 @@ final class ActivityClientTest extends TestCase
         $client = new ActivityClient($this->http([self::GH_URL => HttpResult::failure(self::GH_URL, 'timed out', new \DateTimeImmutable(self::FETCHED))], new \ArrayObject()), ForgeAuth::anonymous());
         self::assertSame(['github.com/Grandt/PHPZip' => 'timed out'], $client->fetch([self::github()])->failed());
 
-        // GitHub answers an exhausted quota with 403 and a secondary limit with 429; no other
-        // status is the forge asking to be left alone.
+        // GitHub answers an exhausted quota with 403 and a secondary limit with 429. No other
+        // status is the repository host asking to be left alone.
         $client = new ActivityClient($this->http([self::GH_URL => [429, '']], new \ArrayObject()), ForgeAuth::anonymous());
         $batch = $client->fetch([self::github()]);
         self::assertTrue($batch->rateLimited(RepoRef::GITHUB));
@@ -126,7 +124,6 @@ final class ActivityClientTest extends TestCase
         self::assertFalse($client->fetch([self::github()])->rateLimited(RepoRef::GITHUB));
     }
 
-    /** One repository failing must not take the rest of its host's batch down with it. */
     public function testAFailingRepositoryLeavesTheOthersOnTheSameHostAnswered(): void
     {
         $other = new RepoRef(RepoRef::GITHUB, 'github.com', 'other/repo');
@@ -159,7 +156,7 @@ final class ActivityClientTest extends TestCase
         self::assertNull($fresh->cachedAt());
     }
 
-    /** A cached enrichment answer counts for the age even when the deciding answer was fetched now; the deciding time stays the deciding time. */
+    /** A cached enrichment answer counts for the age even when the deciding answer was fetched in this run. The deciding time stays the deciding time. */
     public function testACachedEnrichmentAnswerCountsForTheAge(): void
     {
         $project = (new HttpResult(self::GL_PROJECT, 200, '{"archived":true}', new \DateTimeImmutable('2026-09-13T06:00:00+00:00')))->asCached();
@@ -193,7 +190,7 @@ final class ActivityClientTest extends TestCase
         self::assertFalse($client->fetch([self::github()])->activity()['github.com/Grandt/PHPZip']->isArchived());
     }
 
-    /** Anonymously only the commits call is made: the project document would not carry `archived` anyway. */
+    /** Anonymously only the commits call is made: the project document does not carry `archived` anyway. */
     public function testGitlabAnonymousAsksForTheNewestCommitOnly(): void
     {
         $batches = new \ArrayObject();
@@ -230,7 +227,7 @@ final class ActivityClientTest extends TestCase
         self::assertNull($client->fetch([self::gitlab()])->activity()['gitlab.com/group/sub/project']->pushedAt());
     }
 
-    /** A private project answers 404 anonymously; a bad token 401; 429 is the rate limit. */
+    /** A private project answers 404 anonymously and a bad token 401. 429 is the rate limit. */
     public function testGitlabFailuresPerAnswer(): void
     {
         $client = new ActivityClient($this->http([], new \ArrayObject()), ForgeAuth::anonymous());
@@ -242,9 +239,8 @@ final class ActivityClientTest extends TestCase
         self::assertFalse($batch->rateLimited(RepoRef::GITHUB));
         self::assertSame(['gitlab.com/group/sub/project' => 'HTTP 429'], $batch->failedOn(RepoRef::GITLAB));
 
-        // The commits call decides; the project call is enrichment. When it fails the commit date
-        // stands and the archived flag simply stays unknown (false) — nothing is lost that the
-        // anonymous run would have had.
+        // The commits call decides. The project call is enrichment. When it fails the commit date
+        // stands and the archived flag stays unknown (false), as in the anonymous run.
         $client = new ActivityClient($this->http([self::GL_COMMITS => [200, '[{"committed_date":"2012-01-11T17:34:28.000+01:00"}]'], self::GL_PROJECT => [403, '{"message":"403 Forbidden"}']], new \ArrayObject()), ForgeAuth::withTokens(new Tokens(null, 'glpat-x')));
         $batch = $client->fetch([self::gitlab()]);
         $activity = $batch->activity()['gitlab.com/group/sub/project'];
@@ -316,7 +312,6 @@ final class ActivityClientTest extends TestCase
         self::assertArrayHasKey('github.com/other/repo', $batch->activity());
     }
 
-    /** One batch per host, each with its own headers, and every repository back under its own key. */
     public function testAMixedListIsFetchedHostByHost(): void
     {
         $batches = new \ArrayObject();
