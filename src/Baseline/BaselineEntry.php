@@ -5,12 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Baseline;
 
 /**
- * One accepted finding as the baseline file records it: the package it is about, the version and
- * verdict at the time the baseline was written, and the date lockrot first saw it.
- *
- * `version` is informational — matching is by package name only, so a version bump that keeps the
- * same verdict stays accepted. `firstSeen` is carried over across regenerations so the file says
- * how long a finding has been tolerated.
+ * One accepted finding of the baseline file: docs/baseline.md, "What `--generate-baseline` does".
  *
  * @internal
  */

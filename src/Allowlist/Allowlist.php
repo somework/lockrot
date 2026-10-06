@@ -43,10 +43,7 @@ final class Allowlist
         return null;
     }
 
-    /**
-     * Both lists of finished types are kept. A type listed by both sides is not deduplicated,
-     * because {@see match()} only ever asks `in_array()` whether a type is in the list.
-     */
+    /** A type that both sides list stays twice: {@see match()} only asks `in_array()`. */
     public function merge(Allowlist $other): self
     {
         return new self(array_merge($this->entries, $other->entries), array_merge($this->finishedTypes, $other->finishedTypes));
