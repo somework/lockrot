@@ -15,20 +15,15 @@ use Lockrot\Signal\Signal;
 final class Finding
 {
     /**
-     * The verdicts under which a security advisory will not be fixed upstream: the package is
-     * abandoned, nobody has touched it for years, or the installed branch is the one the upstream
-     * moved on from. `pinned` and `old-promise` are not here — a branch snapshot or an open php
-     * constraint says nothing about whether a fix is coming.
+     * The verdicts under which nobody fixes an advisory upstream. `pinned` and `old-promise` are absent:
+     * a branch snapshot or an open php constraint says nothing about a coming fix.
      */
     public const NO_FIX_VERDICTS = [Verdict::ABANDONED, Verdict::SILENT, Verdict::LEFT_BEHIND];
 
-    /** The note of a finding whose lock entry carries no notification-url, so no repository was asked about it. */
+    /** The note for a lock entry with no notification-url: no repository was asked. */
     public const NOTE_NOT_IN_REPOSITORY = 'not from a Composer repository, not checked';
 
-    /**
-     * The signals that can decide each verdict ({@see VerdictEngine}); the evidence line opens with
-     * them, so the reason for the label is read before the rest of what was observed.
-     */
+    /** Must match the signals that {@see VerdictEngine} reads for each verdict. */
     private const DECIDING = [
         Verdict::ABANDONED => [Signal::S1, Signal::S3],
         Verdict::SILENT => [Signal::S2, Signal::S4],
@@ -48,23 +43,17 @@ final class Finding
     private ?string $allowlistReason;
     private ?\DateTimeImmutable $dataDate;
     private ?string $note;
-    /** Whether the package is installed only for development (`packages-dev` in the lock). */
+    /** True for `packages-dev` in the lock. */
     private bool $dev;
     /**
-     * The project's direct requirements from which the package is reachable, sorted by name — the
-     * package itself among them when it is direct. Empty exactly when the chain is: nothing in the
-     * project reaches the package.
+     * Sorted by name, with the package itself when it is direct. Empty exactly when the chain is.
      *
      * @var list<string>
      */
     private array $directDependents;
-    /**
-     * How many years the installed version is behind the package's newest stable release, unrounded,
-     * or why it was not measured ({@see Libyears::measure()}). Kept unrounded so the report's totals
-     * sum what was measured, not what was printed.
-     */
+    /** Kept unrounded: the report's totals must sum what was measured, not what was printed. */
     private LibyearsMeasurement $libyears;
-    /** Where the lock entry came from; `from_composer_repository` is read from its kind. */
+    /** `from_composer_repository` is read from its kind. */
     private PackageOrigin $origin;
     /** The registry that named the replacement, which decides where it is linked. */
     private ?string $replacementNamedBy;
@@ -78,7 +67,7 @@ final class Finding
     {
         $origin ??= PackageOrigin::unattributed();
         $fromComposerRepository = $origin->isComposerRepository();
-        // The note says no repository was asked; a caller that forgot the flag would contradict it.
+        // The note says no repository was asked; a caller that forgets the flag contradicts it.
         if ($note === self::NOTE_NOT_IN_REPOSITORY && $fromComposerRepository) {
             throw new \InvalidArgumentException(\sprintf('%s is noted as not from a Composer repository, so it cannot be from one.', $package));
         }
@@ -92,7 +81,7 @@ final class Finding
         $this->note = $note;
         $this->dev = $dev;
         $this->directDependents = $directDependents;
-        // Without a measurement no dates were compared, or no repository was asked; the analyzer always passes one.
+        // No measurement means no dates were compared, or no repository was asked.
         $libyears = $libyears ?? LibyearsMeasurement::unmeasured($fromComposerRepository ? Libyears::NO_STABLE_RELEASE_DATE : Libyears::NOT_FROM_COMPOSER_REPOSITORY);
         // Libyears::measure() reads the flag first, so its first reason and the flag always agree.
         $unmeasuredAsNotAsked = $libyears->unmeasuredReason() === Libyears::NOT_FROM_COMPOSER_REPOSITORY;
@@ -105,9 +94,8 @@ final class Finding
     }
 
     /**
-     * The same finding with a different signal list — how the transitive-exposure pass adds S7 to a
-     * direct requirement after every verdict is known. A new instance: the verdict, which was decided
-     * from the original signals, is deliberately left as it is.
+     * Adds S7 after every verdict is known. The verdict does not change: it comes from the original
+     * signals.
      *
      * @param list<Signal> $signals
      */
@@ -187,23 +175,21 @@ final class Finding
         return $this->directDependents;
     }
 
-    /** Years behind the newest stable release, unrounded; null when not measured ({@see Libyears}). */
+    /** Unrounded years: docs/verdicts.md#libyears. */
     public function libyears(): ?float
     {
         return $this->libyears->years();
     }
 
-    /** Why {@see libyears()} is null, one of {@see Libyears::REASONS}; null exactly when it is a number. */
+    /** One of {@see Libyears::REASONS}, null exactly when {@see libyears()} is a number. */
     public function libyearsUnmeasured(): ?string
     {
         return $this->libyears->unmeasuredReason();
     }
 
     /**
-     * The direct requirements the chain does not already name: the other ways the project reaches
-     * the package. For a direct package that is every other root that also reaches it; for a
-     * transitive one every root but the one its chain starts from. Removing the chain's root from
-     * composer.json would leave the package installed through any of these.
+     * The direct requirements that the chain does not name. Removing the chain's root from
+     * composer.json leaves the package installed through any of them.
      *
      * @return list<string>
      */
@@ -220,29 +206,19 @@ final class Finding
         return $this->priorityBasis()->priority();
     }
 
-    /** The walk {@see priority()} is the end of: the verdict's base level and each step taken from it. */
     public function priorityBasis(): PriorityBasis
     {
         return Priority::basis($this->verdict, $this->isDirect(), $this->dev, $this->hasUnfixableAdvisory(), $this->chain !== []);
     }
 
-    /**
-     * A security advisory affects the installed version (S9), the verdict is one under which nobody
-     * publishes fixes ({@see self::NO_FIX_VERDICTS}), and the fix is not already out: on a
-     * left-behind branch, the branch's highest release does not carry it (a fix in a higher branch
-     * is exactly what the branch will not get); on an abandoned or silent package, no release does.
-     * What raises the priority one step and adds `no fix expected` to the evidence.
-     */
+    /** Rules: docs/verdicts.md#security-advisories. */
     public function hasUnfixableAdvisory(): bool
     {
         return ($list = $this->noFixExpected()) !== null && $list !== [];
     }
 
     /**
-     * The advisories on the finding no fix is expected for, in the sense {@see hasUnfixableAdvisory()}
-     * gives it, in S9's order, each with why ({@see NoFix}). Null when the verdict makes no fix
-     * prediction, which is every verdict but the no-fix ones; empty when it does and every advisory
-     * is fixed by a release the verdict lets the project reach, or there is none.
+     * Null, empty and non-empty: docs/schema.md#advisories-with-no-fix-expected.
      *
      * @return ?list<array{id: string, reason: string}>
      */
@@ -264,11 +240,7 @@ final class Finding
         return $list;
     }
 
-    /**
-     * The first {@see NoFix} reason that applies to an advisory no reachable release fixes.
-     *
-     * @param array<mixed, mixed> $row
-     */
+    /** @param array<mixed, mixed> $row */
     private function noFixReason(array $row, bool $releasesRead): string
     {
         if ($this->verdict === Verdict::LEFT_BEHIND && ($row['fixed_by'] ?? null) !== null) {
@@ -284,13 +256,7 @@ final class Finding
         return NoFix::NO_RELEASE_FIXES;
     }
 
-    /**
-     * `no fix expected`, qualified with where the fix is when that is known: `no fix expected on
-     * 3.x` reads next to `3 fixed by v8.1.7` on a left-behind branch, and `no fix expected; migrate
-     * to symfony/mailer` on an abandoned package whose repository names a replacement — the
-     * advisory is not going to be fixed here, and the package that took over is where to go. Null
-     * when every advisory is fixed by a release the finding's verdict lets the project reach.
-     */
+    /** The clause texts: docs/verdicts.md#security-advisories. */
     private function noFixClause(): ?string
     {
         $list = $this->noFixExpected();
@@ -302,8 +268,7 @@ final class Finding
 
             return $branch === null ? 'no fix expected' : 'no fix expected on '.ReleaseBranch::label($branch);
         }
-        // The successor, not the raw marker: only a package name is somewhere to migrate to, and
-        // the repository's free text is already in the evidence above this clause.
+        // The successor, not the raw marker: only a package name is somewhere to migrate to.
         if (($replacement = $this->successor()) !== null) {
             return 'no fix expected; migrate to '.$replacement;
         }
@@ -312,16 +277,9 @@ final class Finding
     }
 
     /**
-     * The package the repository names as this one's replacement, when it names a package: the
-     * `replacement` of an abandoned finding on Packagist is free text — `symfony/mailer` for
-     * swiftmailer, but also `Symfony` for sensio/framework-extra-bundle and `EnglishInflector from
-     * the String component` for doctrine/inflector — and only a Composer package name is something a
-     * reader can migrate to, count, or link. Free text stays in the evidence, where it is read as
-     * text. A name that is this package's own is not a successor either — a repository that names
-     * itself says there is nowhere to go, and `migrate to` would point back at the abandoned
-     * package. Null on every finding but an abandoned one with such a name. What the `migrate to`
-     * clause ({@see noFixClause()}), the JSON `replacement` and the report's `with_replacement`
-     * count all read, so the three cannot disagree.
+     * The repository's replacement is free text: only a Composer package name other than this package's
+     * own counts as a successor. The `migrate to` clause, the JSON `replacement` and the
+     * `with_replacement` count all read it and must agree. See docs/verdicts.md#abandoned-and-where-to.
      */
     public function successor(): ?string
     {
@@ -339,7 +297,6 @@ final class Finding
         return $replacement;
     }
 
-    /** The successor's page on the registry that named it ({@see PackageOrigin::replacementPage()}), or null. */
     private function replacementUrl(): ?string
     {
         $successor = $this->successor();
@@ -347,7 +304,6 @@ final class Finding
         return $successor === null ? null : PackageOrigin::replacementPage($this->replacementNamedBy, $successor);
     }
 
-    /** The replacement S1 carries — the repository's, or the lock's — null when none is named. */
     private function replacement(): ?string
     {
         foreach ($this->signals as $signal) {
@@ -362,11 +318,8 @@ final class Finding
     }
 
     /**
-     * `require ^8.2 to follow` after S8, for a `left-behind` package the project requires itself:
-     * the constraint S8 suggests ({@see \Lockrot\Signal\Rule\LeftBehindRule}) is the one line in
-     * composer.json that moves the project onto the branch fixes land on. A transitive package is
-     * not the project's to require — its parent is — so the clause stays off; the constraint is
-     * still on the signal's data for whoever does own the requirement.
+     * Only a direct requirement gets the clause: the project cannot require a transitive package.
+     * See docs/verdicts.md#left-behind.
      */
     private function followClause(Signal $s8): ?string
     {
@@ -379,8 +332,7 @@ final class Finding
     }
 
     /**
-     * S9's advisory rows; one that is not an array, or has no string id, is nothing the no-fix list
-     * could name and counts as no advisory.
+     * A row that is not an array, or has no string id, counts as no advisory.
      *
      * @return list<array{id: string}&array<mixed, mixed>>
      */
@@ -397,7 +349,7 @@ final class Finding
         return $rows;
     }
 
-    /** @return array<string, mixed> S9's data, empty when the finding carries no S9 */
+    /** @return array<string, mixed> */
     private function advisoryData(): array
     {
         foreach ($this->signals as $signal) {
@@ -409,11 +361,7 @@ final class Finding
         return [];
     }
 
-    /**
-     * What was observed about the package itself — every signal but S7, the ones that decided the
-     * verdict first ({@see self::DECIDING}), the rest in signal order — and, when nothing was, the
-     * note that says why (not from a Composer repository, metadata unavailable, …).
-     */
+    /** Every signal but S7, the deciding ones ({@see self::DECIDING}) first. The note when there is none. */
     public function ownEvidence(): string
     {
         $parts = [];
@@ -453,11 +401,7 @@ final class Finding
         return array_merge($first, $rest);
     }
 
-    /**
-     * {@see ownEvidence()} followed by what the package pulls in (S7), when it is a direct
-     * requirement that does. The note is kept ahead of S7 rather than replaced by it: a path or VCS
-     * package that pulls in flagged packages is still "not from a Composer repository, not checked".
-     */
+    /** S7 does not replace the note: a path package can pull in flagged packages and stay unchecked. */
     public function evidence(): string
     {
         $parts = [];
@@ -474,10 +418,6 @@ final class Finding
         return implode('; ', $parts);
     }
 
-    /**
-     * {@see evidence()} followed by `allowlisted: <reason>` when an allowlist entry decided the
-     * verdict — the one line the table, markdown, github, gitlab and SARIF formats print.
-     */
     public function evidenceLine(): string
     {
         if ($this->allowlistReason === null) {

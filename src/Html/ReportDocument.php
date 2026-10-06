@@ -16,18 +16,10 @@ use Lockrot\Verdict\Verdict;
 use Lockrot\Version;
 
 /**
- * Everything `--format=html` puts inside the page, as one array.
- *
- * The page itself renders; this decides what it has to render from. The two live in different
- * repositories: the renderer (somework/lockrot-report) is tested in browsers against real payloads,
- * while the decisions — which packages get their release branches, what the baseline says about
- * each finding, which repository URL is safe to turn into a link — are made here and asserted in
- * {@see \Lockrot\Tests\Unit\Html\ReportDocumentTest}. This array is the contract between them.
- *
- * The `report` key is exactly what `--format=json` writes under its envelope, so a consumer who
- * pulls the payload out of the page gets a document that validates against the published report
- * schema. `details` is the `--explain` document for the packages worth explaining, minus the parts
- * the report already carries; the page draws the branch timeline out of it.
+ * This array is the contract with the renderer in https://github.com/somework/lockrot-report, which
+ * lives in another repository. The decisions are made here and asserted in
+ * {@see \Lockrot\Tests\Unit\Html\ReportDocumentTest}. The `report` key validates against the
+ * published report schema. `details` is the `--explain` document of the packages worth explaining.
  *
  * @internal
  */
@@ -43,20 +35,16 @@ final class ReportDocument
     }
 
     /**
-     * @param bool $showAll explain every package, not only the flagged ones. Costs roughly 4 KB a
-     *                      package, so the default keeps a 100-package report around 300 KB rather
-     *                      than a megabyte
+     * @param bool $showAll explain every package, not only the flagged ones: the page grows with the lock
      *
      * @return array<string, mixed>
      */
     public function toArray(bool $showAll = false): array
     {
         return [
-            // The document `--format=json` writes, envelope included — compact here where the
-            // formatter pretty-prints, and identical once parsed — so `jq .report` out of
-            // the page gives a document the published schema describes. What the run was told to
-            // do and where each finding stands against the baseline are in there too, so the page
-            // reads them from the report rather than keeping a second copy that could disagree.
+            // The `--format=json` document, envelope included, so `jq .report` out of the page gives a
+            // document the published schema describes. The page reads the run's settings and baseline
+            // standing from it: a second copy could disagree.
             'report' => ['$schema' => Schemas::url(Schemas::REPORT, JsonFormatter::SCHEMA), 'lockrot' => ['version' => Version::STRING, 'schema' => JsonFormatter::SCHEMA]] + $this->report->toArray(),
             'details' => $this->details($showAll),
         ];
@@ -64,9 +52,8 @@ final class ReportDocument
 
 
     /**
-     * The `--explain` document per package, keyed by name, minus `finding`, `notes` and
-     * `note_details` — the report already carries them, and repeating them would double the page
-     * for nothing.
+     * The `--explain` document per package, minus `finding`, `notes` and `note_details`: the report
+     * already carries them.
      *
      * @return array<string, array<string, mixed>>
      */
@@ -102,10 +89,8 @@ final class ReportDocument
     }
 
     /**
-     * A flagged package, or an unflagged one carrying an advisory. The second case is the one the
-     * terminal cannot show: a package on a branch that still gets security releases has no rot
-     * verdict at all, so it is `ok`, and its advisories would otherwise be absent from a report
-     * that did not pass `--all`.
+     * A flagged package, or an unflagged one with an advisory: a package on a branch that still gets
+     * security releases is `ok`, and without `--all` its advisories are absent.
      */
     private static function worthExplaining(Finding $finding): bool
     {
@@ -137,11 +122,7 @@ final class ReportDocument
         return null;
     }
 
-    /**
-     * A repository URL only becomes an `href` when it is one, and never carries the credentials a
-     * private source routinely has in it ({@see RepositoryUrl}). The page checks the scheme again
-     * before it writes the attribute.
-     */
+    /** A repository URL becomes an `href` only when it is a link and has no credentials ({@see RepositoryUrl}). */
     public static function linkable(?string $url): ?string
     {
         return RepositoryUrl::linkable($url);
