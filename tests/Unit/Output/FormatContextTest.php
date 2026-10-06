@@ -12,6 +12,7 @@ use Lockrot\Config\LockrotConfig;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Output\FormatContext;
 use Lockrot\Signal\Signal;
+use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
@@ -25,7 +26,7 @@ final class FormatContextTest extends TestCase
 
     private function finding(string $package, string $verdict): Finding
     {
-        return new Finding($package, '1.0.0', $verdict, [], [$package], null, new \DateTimeImmutable(self::AT));
+        return (new FindingBuilder())->withPackage($package)->withVerdict($verdict)->withChain([$package])->withDataDate(new \DateTimeImmutable(self::AT))->build();
     }
 
     private function report(Finding ...$findings): Report
@@ -63,7 +64,7 @@ final class FormatContextTest extends TestCase
     {
         $context = FormatContext::create(null, 'high', Version::STRING);
         $directAbandoned = $this->finding('a/direct', Verdict::ABANDONED);
-        $transitiveStale = new Finding('a/deep', '1.0.0', Verdict::STALE, [], ['a/root', 'a/deep'], null, new \DateTimeImmutable(self::AT));
+        $transitiveStale = (new FindingBuilder())->withPackage('a/deep')->withVerdict(Verdict::STALE)->withChain(['a/root', 'a/deep'])->withDataDate(new \DateTimeImmutable(self::AT))->build();
 
         self::assertSame('high', $context->failOn());
         self::assertSame(FormatContext::LEVEL_ERROR, $context->levelOf($directAbandoned));
@@ -129,7 +130,7 @@ final class FormatContextTest extends TestCase
     public function testUnderUncheckedAnUnflaggedFindingWhoseCheckDidNotRunIsAnError(): void
     {
         $context = FormatContext::create(null, FailOn::UNCHECKED, Version::STRING);
-        $unchecked = new Finding('a/b', '1.0.0', Verdict::OK, [new Signal(Signal::S10, Signal::LEVEL_INFO, 'not checked')], ['a/b'], null, new \DateTimeImmutable(self::AT));
+        $unchecked = (new FindingBuilder())->withPackage('a/b')->withSignals([new Signal(Signal::S10, Signal::LEVEL_INFO, 'not checked')])->withChain(['a/b'])->withDataDate(new \DateTimeImmutable(self::AT))->build();
 
         self::assertSame(FormatContext::LEVEL_ERROR, $context->levelOf($unchecked));
         self::assertSame(FormatContext::LEVEL_WARNING, $context->levelOf($this->finding('a/c', Verdict::ABANDONED)), 'flagged without S10');
@@ -143,7 +144,7 @@ final class FormatContextTest extends TestCase
     public function testUnderUncheckedAFindingTheBaselineKnowsStaysANote(): void
     {
         $context = FormatContext::create(null, FailOn::UNCHECKED, Version::STRING);
-        $unchecked = new Finding('a/b', '1.0.0', Verdict::ABANDONED, [new Signal(Signal::S10, Signal::LEVEL_INFO, 'not checked')], ['a/b'], null, new \DateTimeImmutable(self::AT));
+        $unchecked = (new FindingBuilder())->withPackage('a/b')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal(Signal::S10, Signal::LEVEL_INFO, 'not checked')])->withChain(['a/b'])->withDataDate(new \DateTimeImmutable(self::AT))->build();
 
         self::assertSame(FormatContext::LEVEL_ERROR, $context->levelOf($unchecked), 'without the baseline');
         self::assertSame(FormatContext::LEVEL_NOTE, $context->levelOf($unchecked, $this->comparison([['a/b', Verdict::ABANDONED]], $this->report($unchecked))));

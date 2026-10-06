@@ -14,6 +14,7 @@ use Lockrot\Output\FormatContext;
 use Lockrot\Output\Formatters;
 use Lockrot\Output\SarifFormatter;
 use Lockrot\Signal\Signal;
+use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\Notes;
 use Lockrot\Verdict\Finding;
@@ -80,10 +81,10 @@ final class SarifFormatterTest extends TestCase
         $at = new \DateTimeImmutable(self::AT);
 
         return new Report([
-            new Finding('acme/abandoned', '1.0.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'marked abandoned by its repository')], ['acme/abandoned'], null, $at),
-            new Finding('acme/also-abandoned', '1.1.0', Verdict::ABANDONED, [new Signal('S3', 'high', 'repository archived')], ['acme/also-abandoned'], null, $at),
-            new Finding('acme/silent', '2.0.8', Verdict::SILENT, [new Signal('S2', 'high', 'last release 2015-11-16'), new Signal('S4', 'high', 'last push 2015-11-16')], ['a/parent', 'acme/silent'], null, $at),
-            new Finding('acme/fine', '4.0.0', Verdict::OK, [], ['acme/fine'], null, $at),
+            (new FindingBuilder())->withPackage('acme/abandoned')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('S1', 'high', 'marked abandoned by its repository')])->withChain(['acme/abandoned'])->withDataDate($at)->build(),
+            (new FindingBuilder())->withPackage('acme/also-abandoned')->withVersion('1.1.0')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('S3', 'high', 'repository archived')])->withChain(['acme/also-abandoned'])->withDataDate($at)->build(),
+            (new FindingBuilder())->withPackage('acme/silent')->withVersion('2.0.8')->withVerdict(Verdict::SILENT)->withSignals([new Signal('S2', 'high', 'last release 2015-11-16'), new Signal('S4', 'high', 'last push 2015-11-16')])->withChain(['a/parent', 'acme/silent'])->withDataDate($at)->build(),
+            (new FindingBuilder())->withPackage('acme/fine')->withVersion('4.0.0')->withChain(['acme/fine'])->withDataDate($at)->build(),
         ], Notes::texts(['GitHub token not set: repository activity checked only for 2 candidate packages']), $at, 4, 0);
     }
 
@@ -195,8 +196,8 @@ final class SarifFormatterTest extends TestCase
     {
         $at = new \DateTimeImmutable(self::AT);
         $report = new Report([
-            new Finding('z/z', '1.0.0', Verdict::FINISHED, [], ['a/parent', 'z/z'], null, $at),
-            new Finding('a/a', '1.0.0', Verdict::OK, [], ['a/a'], null, $at),
+            (new FindingBuilder())->withPackage('z/z')->withVerdict(Verdict::FINISHED)->withChain(['a/parent', 'z/z'])->withDataDate($at)->build(),
+            (new FindingBuilder())->withPackage('a/a')->withChain(['a/a'])->withDataDate($at)->build(),
         ], [], $at, 2, 0);
 
         $run = $this->singleRun($this->formatter(LockrotConfig::FAIL_ON_NONE, null)->format($report, true));
@@ -265,11 +266,11 @@ final class SarifFormatterTest extends TestCase
         $at = new \DateTimeImmutable(self::AT);
 
         return new Report([
-            new Finding('acme/abandoned', '1.0.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'marked abandoned by its repository')], ['acme/abandoned'], null, $at),
-            new Finding('acme/transitive', '5.0.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'marked abandoned by its repository')], ['a/parent', 'acme/transitive'], null, $at),
-            new Finding('acme/dev-only', '2.0.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'marked abandoned by its repository')], ['a/parent', 'acme/dev-only'], null, $at, null, true),
-            new Finding('acme/stale', '3.0.0', Verdict::STALE, [new Signal('S2', 'warn', 'last release 2022-05-20')], ['a/parent', 'acme/stale'], null, $at),
-            new Finding('acme/fine', '4.0.0', Verdict::OK, [], ['acme/fine'], null, $at),
+            (new FindingBuilder())->withPackage('acme/abandoned')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('S1', 'high', 'marked abandoned by its repository')])->withChain(['acme/abandoned'])->withDataDate($at)->build(),
+            (new FindingBuilder())->withPackage('acme/transitive')->withVersion('5.0.0')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('S1', 'high', 'marked abandoned by its repository')])->withChain(['a/parent', 'acme/transitive'])->withDataDate($at)->build(),
+            (new FindingBuilder())->withPackage('acme/dev-only')->withVersion('2.0.0')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('S1', 'high', 'marked abandoned by its repository')])->withChain(['a/parent', 'acme/dev-only'])->withDataDate($at)->withDev(true)->build(),
+            (new FindingBuilder())->withPackage('acme/stale')->withVersion('3.0.0')->withVerdict(Verdict::STALE)->withSignals([new Signal('S2', 'warn', 'last release 2022-05-20')])->withChain(['a/parent', 'acme/stale'])->withDataDate($at)->build(),
+            (new FindingBuilder())->withPackage('acme/fine')->withVersion('4.0.0')->withChain(['acme/fine'])->withDataDate($at)->build(),
         ], [], $at, 5, 0);
     }
 
@@ -447,7 +448,7 @@ final class SarifFormatterTest extends TestCase
         $at = new \DateTimeImmutable(self::AT);
         $findings = [];
         foreach (Verdict::all() as $index => $verdict) {
-            $findings[] = new Finding('acme/pkg'.$index, '1.0.'.$index, $verdict, [new Signal('S2', 'warn', 'last release 2015-11-16')], ['acme/pkg'.$index], null, $at);
+            $findings[] = (new FindingBuilder())->withPackage('acme/pkg'.$index)->withVersion('1.0.'.$index)->withVerdict($verdict)->withSignals([new Signal('S2', 'warn', 'last release 2015-11-16')])->withChain(['acme/pkg'.$index])->withDataDate($at)->build();
         }
 
         return new Report($findings, [], $at, \count($findings), 0);
@@ -565,7 +566,7 @@ final class SarifFormatterTest extends TestCase
     {
         $at = new \DateTimeImmutable('2026-09-14T06:00:00+00:00');
         $report = new Report([
-            new Finding('acme/leaf', '1.0.0', Verdict::STALE, [], ['a/parent', 'acme/leaf'], null, $at, null, false, ['a/parent', 'b/parent']),
+            (new FindingBuilder())->withPackage('acme/leaf')->withVerdict(Verdict::STALE)->withChain(['a/parent', 'acme/leaf'])->withDataDate($at)->withDirectDependents(['a/parent', 'b/parent'])->build(),
         ], [], $at, 1, 0);
         $sarif = $this->formatter(LockrotConfig::FAIL_ON_NONE, null)->format($report);
         $this->assertValidSarif($sarif);
@@ -577,7 +578,7 @@ final class SarifFormatterTest extends TestCase
     {
         $at = new \DateTimeImmutable('2026-09-14T06:00:00+00:00');
         $report = new Report([
-            new Finding('acme/root', '1.0.0', Verdict::STALE, [new Signal('S2', 'warn', 'old'), new Signal(Signal::S7, Signal::LEVEL_INFO, 'pulls in 1 flagged package: acme/leaf (stale)', ['flagged' => 1, 'packages' => []])], ['acme/root'], null, $at, null, false, ['acme/root']),
+            (new FindingBuilder())->withPackage('acme/root')->withVerdict(Verdict::STALE)->withSignals([new Signal('S2', 'warn', 'old'), new Signal(Signal::S7, Signal::LEVEL_INFO, 'pulls in 1 flagged package: acme/leaf (stale)', ['flagged' => 1, 'packages' => []])])->withChain(['acme/root'])->withDataDate($at)->withDirectDependents(['acme/root'])->build(),
         ], [], $at, 1, 0);
         $sarif = $this->formatter(LockrotConfig::FAIL_ON_NONE, null)->format($report);
         $this->assertValidSarif($sarif);
@@ -602,7 +603,7 @@ final class SarifFormatterTest extends TestCase
     public function testAVerdictWithoutADescriptionStillGetsAValidRule(): void
     {
         $at = new \DateTimeImmutable(self::AT);
-        $report = new Report([new Finding('acme/odd', '1.0.0', 'unheard-of', [], ['acme/odd'], null, $at)], [], $at, 1, 0);
+        $report = new Report([(new FindingBuilder())->withPackage('acme/odd')->withVerdict('unheard-of')->withChain(['acme/odd'])->withDataDate($at)->build()], [], $at, 1, 0);
 
         $sarif = $this->formatter(LockrotConfig::FAIL_ON_NONE, null)->format($report, true);
 

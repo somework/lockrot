@@ -8,8 +8,8 @@ use Lockrot\Analyzer\Report;
 use Lockrot\Output\Formatters;
 use Lockrot\Output\JsonFormatter;
 use Lockrot\Output\TableFormatter;
+use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\Notes;
-use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
 use Lockrot\Version;
 use PHPUnit\Framework\TestCase;
@@ -19,7 +19,7 @@ final class JsonFormatterTest extends TestCase
     public function testJsonShape(): void
     {
         $at = new \DateTimeImmutable('2026-09-14T00:00:00+00:00');
-        $report = new Report([new Finding('a/b', '1.0.0', Verdict::STALE, [], ['a/b'], null, $at)], Notes::texts(['n']), $at, 1, 0);
+        $report = new Report([(new FindingBuilder())->withPackage('a/b')->withVerdict(Verdict::STALE)->withChain(['a/b'])->withDataDate($at)->build()], Notes::texts(['n']), $at, 1, 0);
         $json = json_decode((new JsonFormatter())->format($report), true);
         self::assertIsArray($json);
         self::assertIsArray($json['lockrot']);
@@ -37,8 +37,8 @@ final class JsonFormatterTest extends TestCase
         $at = new \DateTimeImmutable('2026-09-14T00:00:00+00:00');
         $report = new Report(
             [
-                new Finding('a/direct', '1.0.0', Verdict::ABANDONED, [], ['a/direct'], null, $at),
-                new Finding('a/dev', '1.0.0', Verdict::ABANDONED, [], ['a/root', 'a/dev'], null, $at, null, true),
+                (new FindingBuilder())->withPackage('a/direct')->withVerdict(Verdict::ABANDONED)->withChain(['a/direct'])->withDataDate($at)->build(),
+                (new FindingBuilder())->withPackage('a/dev')->withVerdict(Verdict::ABANDONED)->withChain(['a/root', 'a/dev'])->withDataDate($at)->withDev(true)->build(),
             ],
             [],
             $at,
@@ -74,8 +74,8 @@ final class JsonFormatterTest extends TestCase
         $at = new \DateTimeImmutable('2026-09-14T00:00:00+00:00');
         $report = new Report(
             [
-                new Finding('a/leaf', '1.0.0', Verdict::STALE, [], ['a/root', 'a/leaf'], null, $at, null, false, ['a/root', 'b/root']),
-                new Finding('a/root', '1.0.0', Verdict::OK, [], ['a/root'], null, $at, null, false, ['a/root']),
+                (new FindingBuilder())->withPackage('a/leaf')->withVerdict(Verdict::STALE)->withChain(['a/root', 'a/leaf'])->withDataDate($at)->withDirectDependents(['a/root', 'b/root'])->build(),
+                (new FindingBuilder())->withPackage('a/root')->withChain(['a/root'])->withDataDate($at)->withDirectDependents(['a/root'])->build(),
             ],
             [],
             $at,
@@ -89,7 +89,7 @@ final class JsonFormatterTest extends TestCase
         self::assertSame(['a/root', 'b/root'], $json['findings'][0]['direct_dependents']);
         self::assertSame([['package' => 'a/root', 'flagged' => 1], ['package' => 'b/root', 'flagged' => 1]], $json['exposure']);
 
-        $empty = new Report([new Finding('a/root', '1.0.0', Verdict::OK, [], ['a/root'], null, $at, null, false, ['a/root'])], [], $at, 1, 0);
+        $empty = new Report([(new FindingBuilder())->withPackage('a/root')->withChain(['a/root'])->withDataDate($at)->withDirectDependents(['a/root'])->build()], [], $at, 1, 0);
         $emptyJson = (new JsonFormatter())->format($empty);
         self::assertStringContainsString('"exposure": []', $emptyJson);
         // The rule is an object and the list a list, whether or not anything is above the cap.

@@ -12,8 +12,8 @@ use Lockrot\Output\Formatters;
 use Lockrot\Output\ReportTarget;
 use Lockrot\Output\ReportTargets;
 use Lockrot\Signal\Signal;
+use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\Notes;
-use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -93,10 +93,10 @@ final class ReportTargetsTest extends TestCase
         $at = new \DateTimeImmutable(self::AT);
 
         return new Report([
-            new Finding('acme/old', '1.0.0', Verdict::ABANDONED, [
+            (new FindingBuilder())->withPackage('acme/old')->withVerdict(Verdict::ABANDONED)->withSignals([
                 new Signal('S1', 'high', 'marked abandoned by its repository'),
                 new Signal('S5', 'warn', 'admits 8.4 untested (php ">=7.1 <8")'),
-            ], ['acme/old'], null, $at),
+            ])->withChain(['acme/old'])->withDataDate($at)->build(),
         ], Notes::texts(['a note with <info>tags</info> in it']), $at, 1, 0);
     }
 
@@ -483,8 +483,8 @@ final class ReportTargetsTest extends TestCase
         $context = FormatContext::create(null, LockrotConfig::FAIL_ON_NONE);
         $at = new \DateTimeImmutable(self::AT);
         $report = new Report([
-            new Finding('acme/old', '1.0.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'marked abandoned by its repository')], ['acme/old'], null, $at),
-            new Finding('acme/fine', '2.0.0', Verdict::OK, [], ['acme/fine'], null, $at),
+            (new FindingBuilder())->withPackage('acme/old')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('S1', 'high', 'marked abandoned by its repository')])->withChain(['acme/old'])->withDataDate($at)->build(),
+            (new FindingBuilder())->withPackage('acme/fine')->withVersion('2.0.0')->withChain(['acme/fine'])->withDataDate($at)->build(),
         ], [], $at, 2, 0);
 
         $targets->write($report, $context, null, true, static function (): void {

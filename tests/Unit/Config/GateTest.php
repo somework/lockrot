@@ -12,6 +12,7 @@ use Lockrot\Config\Gate;
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Config\Policy;
 use Lockrot\Signal\Signal;
+use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\Notes;
 use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
@@ -183,11 +184,11 @@ final class GateTest extends TestCase
         $at = new \DateTimeImmutable(self::AT);
         $findings = [];
         foreach (Verdict::all() as $verdict) {
-            $findings[] = new Finding('v/'.$verdict, '1.0.0', $verdict, [], ['v/'.$verdict], null, $at);
-            $findings[] = new Finding('v/'.$verdict.'-deep', '1.0.0', $verdict, [], ['v/root', 'v/'.$verdict.'-deep'], null, $at, null, true);
+            $findings[] = (new FindingBuilder())->withPackage('v/'.$verdict)->withVerdict($verdict)->withChain(['v/'.$verdict])->withDataDate($at)->build();
+            $findings[] = (new FindingBuilder())->withPackage('v/'.$verdict.'-deep')->withVerdict($verdict)->withChain(['v/root', 'v/'.$verdict.'-deep'])->withDataDate($at)->withDev(true)->build();
         }
         $notChecked = new Signal(Signal::S10, Signal::LEVEL_INFO, 'repository activity not checked', ['unchecked' => [], 'blocks' => ['S3', 'S4']]);
-        $findings[] = new Finding('v/ok-unchecked', '1.0.0', Verdict::OK, [$notChecked], ['v/ok-unchecked'], null, $at);
+        $findings[] = (new FindingBuilder())->withPackage('v/ok-unchecked')->withSignals([$notChecked])->withChain(['v/ok-unchecked'])->withDataDate($at)->build();
         $report = new Report($findings, $networkFailures ? [Notes::text('a lookup failed', true)] : [], $at, \count($findings), 0);
         if ($baseline === 'none') {
             return $report;

@@ -21,10 +21,10 @@ use Lockrot\Signal\Rule\AdvisoryRule;
 use Lockrot\Signal\Rule\PinnedRule;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\Thresholds;
+use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\Notes;
 use Lockrot\Tests\Support\Origins;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
-use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
 use Lockrot\Version;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -61,7 +61,7 @@ final class ExplainFormatterTest extends TestCase
             ['id' => 'PKSA-2', 'cve' => '', 'severity' => null, 'fixed_by' => null, 'fixed_on_branch' => false],
             'not-a-row',
         ], 'count' => 2]);
-        $finding = new Finding('vendor/pkg', '1.5.0', Verdict::LEFT_BEHIND, [$s8, $s9], ['root/app', 'vendor/mid', 'vendor/pkg'], null, new \DateTimeImmutable(F::NOW), null, false, ['root/app', 'root/other'], LibyearsMeasurement::of(4.58));
+        $finding = (new FindingBuilder())->withVersion('1.5.0')->withVerdict(Verdict::LEFT_BEHIND)->withSignals([$s8, $s9])->withChain(['root/app', 'vendor/mid', 'vendor/pkg'])->withDataDate(new \DateTimeImmutable(F::NOW))->withDirectDependents(['root/app', 'root/other'])->withLibyears(LibyearsMeasurement::of(4.58))->build();
         // Branches listed out of order: the table sorts them.
         $metadata = F::metadata([['1.5.0', '2021-06-01T00:00:00+00:00', '>=7.1 <8.0'], ['1.4.9', '2021-01-01T00:00:00+00:00'], ['2.1.0', '2026-01-01T00:00:00+00:00', '>=8.1']], true, 'vendor/next');
         $package = F::package(['version' => '1.5.0', 'php' => '>=7.1 <8.0', 'time' => '2021-06-01T00:00:00+00:00']);
@@ -128,7 +128,7 @@ final class ExplainFormatterTest extends TestCase
             $s9 = (new AdvisoryRule())->evaluate($facts);
             self::assertNotNull($s9);
             self::assertSame($read, $s9->data()['releases_read'], $case);
-            $finding = new Finding('vendor/pkg', '1.0.0', Verdict::ABANDONED, [new Signal(Signal::S1, Signal::LEVEL_HIGH, 'marked abandoned by its repository'), $s9], ['vendor/pkg'], null, new \DateTimeImmutable(F::NOW));
+            $finding = (new FindingBuilder())->withVerdict(Verdict::ABANDONED)->withSignals([new Signal(Signal::S1, Signal::LEVEL_HIGH, 'marked abandoned by its repository'), $s9])->withDataDate(new \DateTimeImmutable(F::NOW))->build();
 
             $text = $this->plain(new Explanation($finding, $facts, new Thresholds(), '8.4', $this->report()));
 
@@ -138,7 +138,7 @@ final class ExplainFormatterTest extends TestCase
 
         // Skipped where it stands, not where AdvisoryRule happens to put it: the keys after it still print.
         $reordered = new Signal(Signal::S9, Signal::LEVEL_WARN, '1 security advisory affects 1.0.0 (CVE-2024-0001)', ['releases_read' => true, 'advisories' => $s9->data()['advisories']]);
-        $finding = new Finding('vendor/pkg', '1.0.0', Verdict::ABANDONED, [new Signal(Signal::S1, Signal::LEVEL_HIGH, 'marked abandoned by its repository'), $reordered], ['vendor/pkg'], null, new \DateTimeImmutable(F::NOW));
+        $finding = (new FindingBuilder())->withVerdict(Verdict::ABANDONED)->withSignals([new Signal(Signal::S1, Signal::LEVEL_HIGH, 'marked abandoned by its repository'), $reordered])->withDataDate(new \DateTimeImmutable(F::NOW))->build();
         self::assertStringContainsString("\n".$expected."\n", $this->plain(new Explanation($finding, F::facts($package), new Thresholds(), '8.4', $this->report())));
     }
 
@@ -153,7 +153,7 @@ final class ExplainFormatterTest extends TestCase
     #[DataProvider('textsThatLookLikeMarkup')]
     public function testTextThatLooksLikeMarkupPrintsAsWrittenAndLeavesNoStyleBehind(string $text): void
     {
-        $finding = new Finding('vendor/'.$text, $text, Verdict::ABANDONED, [new Signal('S1', 'high', 'marked abandoned: '.$text)], ['vendor/'.$text], null, new \DateTimeImmutable(F::NOW), 'lookup: '.$text);
+        $finding = (new FindingBuilder())->withPackage('vendor/'.$text)->withVersion($text)->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('S1', 'high', 'marked abandoned: '.$text)])->withChain(['vendor/'.$text])->withDataDate(new \DateTimeImmutable(F::NOW))->withNote('lookup: '.$text)->build();
         $explanation = new Explanation($finding, F::facts(F::package(['version' => '1.0.0'])), new Thresholds(), '8.4', $this->report(['run: '.$text]));
 
         $markup = (new ExplainFormatter())->text($explanation);
@@ -186,7 +186,7 @@ final class ExplainFormatterTest extends TestCase
      */
     public function testAnUnflaggedSplitPackageSaysWhyItsBranchIsNotMeasured(): void
     {
-        $finding = new Finding('vendor/pkg', '10.48.28', Verdict::OK, [], ['vendor/pkg'], null, new \DateTimeImmutable(F::NOW));
+        $finding = (new FindingBuilder())->withVersion('10.48.28')->withDataDate(new \DateTimeImmutable(F::NOW))->build();
         $loader = new ArrayLoader();
         $on = static fn (string $version, ?string $commit, ?string $time): array => array_filter(['name' => 'vendor/pkg', 'version' => $version, 'time' => $time, 'source' => $commit === null ? null : ['type' => 'git', 'url' => 'https://github.com/vendor/pkg.git', 'reference' => $commit]]);
         $metadata = PackageMetadata::fromPackages('vendor/pkg', [
@@ -233,7 +233,7 @@ final class ExplainFormatterTest extends TestCase
 
     public function testAPackageWithoutMetadataShowsTheNoteInsteadOfATable(): void
     {
-        $finding = new Finding('vendor/pkg', '1.0.0', Verdict::UNKNOWN, [], ['vendor/pkg'], null, null, 'not from a Composer repository, not checked', true, [], LibyearsMeasurement::unmeasured(Libyears::NOT_FROM_COMPOSER_REPOSITORY), Origins::of(false));
+        $finding = (new FindingBuilder())->withVerdict(Verdict::UNKNOWN)->withNote('not from a Composer repository, not checked')->withDev(true)->withLibyears(LibyearsMeasurement::unmeasured(Libyears::NOT_FROM_COMPOSER_REPOSITORY))->withOrigin(Origins::of(false))->build();
         $sourceless = new LockedPackage('vendor/pkg', '1.0.0', null, null, [], null, 'library', Origins::facts(false), true, false);
         $explanation = new Explanation($finding, F::facts($sourceless), new Thresholds(), '8.4', $this->report());
 
@@ -250,7 +250,7 @@ final class ExplainFormatterTest extends TestCase
         self::assertStringNotContainsString('branch     highest tag', $this->plain($devOnly), 'a package with no release branch has no table, not an empty one');
         self::assertStringContainsString("\n  no stable release\n", $this->plain($devOnly), 'and its last release is said to be none, not unknown');
 
-        $noNote = new Explanation(new Finding('vendor/pkg', '1.0.0', Verdict::UNKNOWN, [], ['vendor/pkg'], null, null), F::facts(F::package()), new Thresholds(), '8.4', $this->report());
+        $noNote = new Explanation((new FindingBuilder())->withVerdict(Verdict::UNKNOWN)->build(), F::facts(F::package()), new Thresholds(), '8.4', $this->report());
         self::assertStringContainsString("repository metadata\n  none — not available\n", $this->plain($noNote));
     }
 
@@ -276,7 +276,7 @@ final class ExplainFormatterTest extends TestCase
             'library',
             new \DateTimeImmutable(F::NOW)
         );
-        $finding = new Finding('vendor/pkg', '1.0.0', Verdict::STALE, [], ['vendor/pkg'], null, null);
+        $finding = (new FindingBuilder())->withVerdict(Verdict::STALE)->build();
         $explanation = new Explanation($finding, F::facts($package, $metadata), new Thresholds(), '8.4', $this->report());
 
         $text = $this->plain($explanation);
@@ -296,7 +296,7 @@ final class ExplainFormatterTest extends TestCase
         $at = new \DateTimeImmutable('2020-01-01T00:00:00+00:00');
         $metadata = new PackageMetadata('vendor/pkg', false, null, true, $at, '1.0.0', 1, 'igor@git.acme.test:pkg.git', 'library', new \DateTimeImmutable(F::NOW));
         $package = new LockedPackage('vendor/pkg', '1.0.0', $at, '>=7.4', [], '/Users/igor/client-x/pkg', 'library', Origins::facts(false), false, false);
-        $finding = new Finding('vendor/pkg', '1.0.0', Verdict::STALE, [], ['vendor/pkg'], null, null);
+        $finding = (new FindingBuilder())->withVerdict(Verdict::STALE)->build();
 
         $text = $this->plain(new Explanation($finding, F::facts($package, $metadata), new Thresholds(), '8.4', $this->report()));
 
@@ -311,7 +311,7 @@ final class ExplainFormatterTest extends TestCase
         for ($i = 20; $i >= 1; --$i) {
             $releases[] = ['0.0.'.$i, '2020-01-01T00:00:00+00:00'];
         }
-        $finding = new Finding('vendor/pkg', '0.0.3', Verdict::FINISHED, [], ['vendor/pkg'], 'interfaces only', new \DateTimeImmutable(F::NOW));
+        $finding = (new FindingBuilder())->withVersion('0.0.3')->withVerdict(Verdict::FINISHED)->withAllowlistReason('interfaces only')->withDataDate(new \DateTimeImmutable(F::NOW))->build();
         $explanation = new Explanation($finding, F::facts(F::package(['version' => '0.0.3']), F::metadata($releases), F::activity(false, '2026-02-01T00:00:00+00:00')), new Thresholds(), '8.4', $this->report());
 
         $text = $this->plain($explanation);
@@ -327,7 +327,7 @@ final class ExplainFormatterTest extends TestCase
 
     public function testJsonCarriesTheEnvelopeAndTheExplanation(): void
     {
-        $finding = new Finding('vendor/pkg', '1.0.0', Verdict::OK, [], ['vendor/pkg'], null, new \DateTimeImmutable(F::NOW));
+        $finding = (new FindingBuilder())->withDataDate(new \DateTimeImmutable(F::NOW))->build();
         $explanation = new Explanation($finding, F::facts(F::package(), F::metadata([['1.0.0', '2026-01-01T00:00:00+00:00']])), new Thresholds(), '8.4', $this->report());
 
         $encoded = (new ExplainFormatter())->json($explanation);
@@ -349,7 +349,7 @@ final class ExplainFormatterTest extends TestCase
     /** A split package dated by its monorepo: the rows read the parent's dates, and a footnote says whose they are. */
     public function testASplitPackageDatedByItsMonorepoSaysSo(): void
     {
-        $finding = new Finding('illuminate/contracts', 'v10.48.28', Verdict::OK, [], ['illuminate/contracts'], null, new \DateTimeImmutable(F::NOW), null, false, [], LibyearsMeasurement::of(2.74));
+        $finding = (new FindingBuilder())->withPackage('illuminate/contracts')->withVersion('v10.48.28')->withChain(['illuminate/contracts'])->withDataDate(new \DateTimeImmutable(F::NOW))->withLibyears(LibyearsMeasurement::of(2.74))->build();
         $loader = new ArrayLoader();
         $on = static fn (string $name, string $version, string $commit, string $time, array $replace = []): array => array_filter(['name' => $name, 'version' => $version, 'time' => $time, 'source' => ['type' => 'git', 'url' => 'https://github.com/'.$name.'.git', 'reference' => $commit], 'replace' => $replace]);
         $child = PackageMetadata::fromPackages('illuminate/contracts', [
@@ -406,7 +406,7 @@ final class ExplainFormatterTest extends TestCase
      */
     public function testALockDateThatIsASharedCommitsSaysItIsNotAReleases(): void
     {
-        $finding = new Finding('illuminate/contracts', 'v10.48.28', Verdict::OK, [], ['illuminate/contracts'], null, new \DateTimeImmutable(F::NOW));
+        $finding = (new FindingBuilder())->withPackage('illuminate/contracts')->withVersion('v10.48.28')->withChain(['illuminate/contracts'])->withDataDate(new \DateTimeImmutable(F::NOW))->build();
         $loader = new ArrayLoader();
         $on = static fn (string $name, string $version, string $commit, string $time, array $replace = []): array => array_filter(['name' => $name, 'version' => $version, 'time' => $time, 'source' => ['type' => 'git', 'url' => 'https://github.com/'.$name.'.git', 'reference' => $commit], 'replace' => $replace]);
         $child = PackageMetadata::fromPackages('illuminate/contracts', [
@@ -434,7 +434,7 @@ final class ExplainFormatterTest extends TestCase
      */
     public function testTheLockBlockCallsTheSplitsOwnDateWhatItIs(): void
     {
-        $finding = new Finding('illuminate/contracts', 'v10.48.28', Verdict::OK, [], ['illuminate/contracts'], null, new \DateTimeImmutable(F::NOW), null, false, [], LibyearsMeasurement::of(2.74));
+        $finding = (new FindingBuilder())->withPackage('illuminate/contracts')->withVersion('v10.48.28')->withChain(['illuminate/contracts'])->withDataDate(new \DateTimeImmutable(F::NOW))->withLibyears(LibyearsMeasurement::of(2.74))->build();
         $loader = new ArrayLoader();
         $on = static fn (string $name, string $version, string $commit, string $time, array $replace = []): array => array_filter(['name' => $name, 'version' => $version, 'time' => $time, 'source' => ['type' => 'git', 'url' => 'https://github.com/'.$name.'.git', 'reference' => $commit], 'replace' => $replace]);
         $child = PackageMetadata::fromPackages('illuminate/contracts', [
@@ -462,7 +462,7 @@ final class ExplainFormatterTest extends TestCase
      */
     public function testABranchSnapshotIsNotToldItsTagsShareACommit(): void
     {
-        $finding = new Finding('vendor/pkg', 'dev-main', Verdict::PINNED, [], ['vendor/pkg'], null, new \DateTimeImmutable(F::NOW), null, false, [], LibyearsMeasurement::unmeasured(Libyears::BRANCH_SNAPSHOT));
+        $finding = (new FindingBuilder())->withVersion('dev-main')->withVerdict(Verdict::PINNED)->withDataDate(new \DateTimeImmutable(F::NOW))->withLibyears(LibyearsMeasurement::unmeasured(Libyears::BRANCH_SNAPSHOT))->build();
         $loader = new ArrayLoader();
         $metadata = PackageMetadata::fromPackages('vendor/pkg', [
             $loader->load(['name' => 'vendor/pkg', 'version' => '1.2.0', 'time' => '2026-01-01T00:00:00+00:00', 'source' => ['type' => 'git', 'url' => 'https://github.com/vendor/pkg.git', 'reference' => 'tag-12']]),
@@ -489,7 +489,7 @@ final class ExplainFormatterTest extends TestCase
         $facts = F::facts(F::package(['version' => $version, 'time' => '2026-09-13T00:00:00+00:00']), $metadata);
         $s6 = (new PinnedRule())->evaluate($facts);
         self::assertNotNull($s6);
-        $finding = new Finding('vendor/pkg', $version, Verdict::PINNED, [$s6], ['vendor/pkg'], null, new \DateTimeImmutable(F::NOW));
+        $finding = (new FindingBuilder())->withVersion($version)->withVerdict(Verdict::PINNED)->withSignals([$s6])->withDataDate(new \DateTimeImmutable(F::NOW))->build();
 
         $text = $this->plain(new Explanation($finding, $facts, new Thresholds(), '8.4', $this->report()));
 
@@ -536,7 +536,7 @@ final class ExplainFormatterTest extends TestCase
         $s1 = (new AbandonedRule())->evaluate($facts);
         self::assertNotNull($s1);
         self::assertSame(['replacement' => null], $s1->data());
-        $finding = new Finding('vendor/pkg', '1.0.0', Verdict::ABANDONED, [$s1], ['vendor/pkg'], null, new \DateTimeImmutable(F::NOW));
+        $finding = (new FindingBuilder())->withVerdict(Verdict::ABANDONED)->withSignals([$s1])->withDataDate(new \DateTimeImmutable(F::NOW))->build();
 
         $text = $this->plain(new Explanation($finding, $facts, new Thresholds(), '8.4', $this->report()));
 

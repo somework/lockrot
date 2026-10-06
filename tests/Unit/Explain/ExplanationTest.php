@@ -13,6 +13,7 @@ use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\Rule\PinnedRule;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\Thresholds;
+use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\Notes;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
@@ -30,12 +31,12 @@ final class ExplanationTest extends TestCase
     /** @param list<Signal> $signals */
     private function finding(string $version, string $verdict, array $signals = []): Finding
     {
-        return new Finding('vendor/pkg', $version, $verdict, $signals, ['root/app', 'vendor/pkg'], null, new \DateTimeImmutable(F::NOW));
+        return (new FindingBuilder())->withVersion($version)->withVerdict($verdict)->withSignals($signals)->withChain(['root/app', 'vendor/pkg'])->withDataDate(new \DateTimeImmutable(F::NOW))->build();
     }
 
     public function testTheExplanationCarriesTheFindingsLibyears(): void
     {
-        $finding = new Finding('vendor/pkg', '1.4.0', Verdict::LEFT_BEHIND, [], ['root/app', 'vendor/pkg'], null, new \DateTimeImmutable(F::NOW), null, false, [], LibyearsMeasurement::of(2.345));
+        $finding = (new FindingBuilder())->withVersion('1.4.0')->withVerdict(Verdict::LEFT_BEHIND)->withChain(['root/app', 'vendor/pkg'])->withDataDate(new \DateTimeImmutable(F::NOW))->withLibyears(LibyearsMeasurement::of(2.345))->build();
         $metadata = F::metadata([['1.5.0', '2021-06-01T00:00:00+00:00'], ['1.4.0', '2020-01-01T00:00:00+00:00']]);
         $explanation = new Explanation($finding, F::facts(F::package(['version' => '1.4.0']), $metadata), new Thresholds(), '8.4', $this->report());
 
