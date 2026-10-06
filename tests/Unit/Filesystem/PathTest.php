@@ -109,10 +109,6 @@ final class PathTest extends TestCase
         self::assertNotSame($expected, Path::canonical($dir.'/ci/other.json'));
     }
 
-    /**
-     * A directory that does not exist cannot be resolved through the filesystem, so the path is
-     * compared as it is spelled, still case-insensitively.
-     */
     public function testCanonicalFallsBackToTheSpellingWhenTheDirectoryDoesNotExist(): void
     {
         $dir = $this->tempDir();
@@ -122,11 +118,28 @@ final class PathTest extends TestCase
         self::assertNotSame(Path::canonical($dir.'/nope/base.json'), Path::canonical($dir.'/other/base.json'));
     }
 
+    /** Once folded, the path is resolved again, so a symlinked directory before a missing one is followed. */
+    public function testCanonicalResolvesTheFoldedPathThroughTheFilesystem(): void
+    {
+        $dir = $this->tempDir();
+        mkdir($dir.'/real');
+        $this->tempDirs[] = $dir.'/real';
+        if (!@symlink($dir.'/real', $dir.'/link')) {
+            self::markTestSkipped('this filesystem cannot hold a symlink');
+        }
+
+        try {
+            self::assertSame(Path::canonical($dir.'/real/base.json'), Path::canonical($dir.'/link/missing/../base.json'));
+        } finally {
+            unlink($dir.'/link');
+        }
+    }
+
     /**
      * Windows folds `..` by spelling alone, before it asks the disk anything, so
      * `missing\..\lockrot-baseline.json` is the baseline there even though `missing` does not exist.
      * The key folds dot segments the same way, with either separator, so that spelling is caught on
-     * every system — a directory that cannot be resolved no longer hides what the path names.
+     * every system — a directory that cannot be resolved does not hide what the path names.
      *
      * @return iterable<string, array{string, string}>
      */
