@@ -136,7 +136,10 @@ jobs:
           changed_dirs=$(git diff --name-only --diff-filter=AM "$base" HEAD -- "${dirs[@]}" | grep '\.php$' || true)
           changed_files=""
           if [ ${#files[@]} -gt 0 ]; then changed_files=$(git diff --name-only --diff-filter=AM "$base" HEAD -- "${files[@]}" | tr '\n' ' '); fi
-          if [ -z "$changed_dirs" ] && [ -z "${changed_files// /}" ]; then
+          # --git-diff-lines reads added and modified files only; a renamed one is mutated whole, by path.
+          renamed=$(git diff --name-only --diff-filter=R "$base" HEAD -- "${dirs[@]}" | grep '\.php$' | tr '\n' ' ' || true)
+          changed_files=$(echo $changed_files $renamed)
+          if [ -z "$changed_dirs" ] && [ -z "$changed_files" ]; then
             echo "mode=none" >> "$GITHUB_OUTPUT"
             echo "This pull request changes no source file of this shard: nothing to mutate." >> "$GITHUB_STEP_SUMMARY"
             exit 0
@@ -175,7 +178,8 @@ jobs:
       # Infection refuses positional paths with --git-diff-lines and reads changed lines only under its
       # configured source directories, so the shard's directories become a copy of the configuration.
       # A file at the root of src cannot be one; when the pull request changes it, it is mutated whole.
-      - name: Mutate the files at the root of src the pull request changes
+      # So is a renamed file, which --git-diff-lines does not read.
+      - name: Mutate whole the root and renamed files the pull request changes
         if: steps.scope.outputs.mode == 'diff' && steps.scope.outputs.files != ''
         run: |
           $(composer global config bin-dir --absolute)/infection --threads=max --only-covering-test-cases --min-msi=0 --min-covered-msi=0 ${{ steps.scope.outputs.files }}
