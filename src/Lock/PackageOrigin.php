@@ -8,8 +8,8 @@ use Lockrot\Data\Repository\RepositoryUrl;
 
 /**
  * Where a lock entry came from, as a finding's `origin` (docs/schema.md#where-a-package-came-from).
- * {@see of()} is the one place that decides the kind, and `from_composer_repository` reads the
- * kind through {@see isComposerRepository()}.
+ * {@see of()} decides the kind, and `from_composer_repository` reads the kind through
+ * {@see isComposerRepository()}.
  *
  * @internal
  */
@@ -25,10 +25,7 @@ final class PackageOrigin
     /** What the schemas list in `x-known-values`. It is not the order that {@see of()} decides in. */
     public const KINDS = [self::PACKAGIST, self::COMPOSER, self::PATH, self::VCS, self::ARTIFACT, self::PACKAGE, self::UNKNOWN];
 
-    /**
-     * The registries that lockrot names, by the host that a notification-url reports to. It writes
-     * no other host.
-     */
+    /** The registries that lockrot names, by the host of a notification-url. No other host is written. */
     public const REGISTRIES = ['packagist.org', 'repo.packagist.com', 'wp-packages.org', 'packages.drupal.org'];
 
     /** The registries that keep a public page per package name. */
@@ -37,10 +34,7 @@ final class PackageOrigin
         'wp-packages.org' => 'https://wp-packages.org/packages/',
     ];
 
-    /**
-     * Composer's package-name rule (ValidatingArrayLoader, the same on 2.2 and later). Only such a
-     * name goes into a URL.
-     */
+    /** Composer's package-name rule (ValidatingArrayLoader, 2.2 and later): only such a name goes into a URL. */
     private const PACKAGE_NAME = '{^[a-z0-9](?:[_.-]?[a-z0-9]++)*+/[a-z0-9](?:(?:[_.]|-{1,2})?[a-z0-9]++)*+$}iD';
 
     private string $kind;

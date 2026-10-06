@@ -53,7 +53,7 @@ final class LockrotConfig
     }
 
     /**
-     * @param array<string, mixed> $extra
+     * @param array<string, mixed> $extra `extra.lockrot` of composer.json, not the whole `extra`
      * @param array<string, mixed> $env
      * @param array<string, mixed> $cli   the options fail-on, target-php, dev, offline, strict-network, format and baseline
      */
@@ -97,7 +97,7 @@ final class LockrotConfig
     /**
      * No install-time key has a CLI option or an environment override, because the summary is a
      * per-project decision and LOCKROT_DISABLE covers a single command.
-     * See docs/install-time.md#time-budget.
+     * See docs/install-time.md#install-time-summary.
      *
      * @param array<string, mixed> $extra
      */

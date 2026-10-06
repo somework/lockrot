@@ -14,8 +14,8 @@ use Lockrot\Verdict\Finding;
  * GitLab Code Quality JSON: docs/ci.md#-formatgitlab. The report format is at
  * https://docs.gitlab.com/ci/testing/code_quality/#code-quality-report-format
  *
- * The `fingerprint` must not hold the line, the version, the lock's path or the priority, so the
- * GitLab issue keeps its identity when they change (docs/compatibility.md#finding-identity).
+ * The `fingerprint` must not hold the line, the version, the lock's path or the priority, so a
+ * Code Quality entry keeps its identity when they change (docs/compatibility.md#finding-identity).
  *
  * @internal
  */
@@ -24,7 +24,7 @@ final class GitlabFormatter implements FormatterInterface
     /** GitLab does not require `type` or `categories`. Tools that expect CodeClimate read them. */
     private const CATEGORIES = ['Bug Risk'];
 
-    /** GitLab requires a line, and LockLineIndex can find none. */
+    /** GitLab requires a line: this one stands in when LockLineIndex finds none. */
     private const FALLBACK_LINE = 1;
 
     private FormatContext $context;

@@ -31,15 +31,12 @@ final class Explanation
     private string $targetPhp;
     private Report $report;
     private ?string $projectPhp;
-    /**
-     * Must be built from the same target and project php as S8's floor
-     * ({@see \Lockrot\Signal\SignalSet::default()}).
-     */
+    /** Built from the same target and project php as S8's floor ({@see \Lockrot\Signal\SignalSet::default()}). */
     private PhpFloor $floor;
 
     /**
-     * @param ?string $projectPhp the project's own `require.php` as composer.json writes it, the
-     *                            one S8 was given; null when the manifest has none
+     * @param ?string $projectPhp the project's own `require.php` as composer.json writes it, the one
+     *                            that S8 was given, null when the manifest has none
      */
     public function __construct(Finding $finding, PackageFacts $facts, Thresholds $thresholds, string $targetPhp, Report $report, ?string $projectPhp = null)
     {

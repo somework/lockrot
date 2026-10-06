@@ -67,7 +67,7 @@ final class Finding
     {
         $origin ??= PackageOrigin::unattributed();
         $fromComposerRepository = $origin->isComposerRepository();
-        // The note says no repository was asked; a caller that forgets the flag contradicts it.
+        // The note says that no repository was asked. A caller that forgets the flag contradicts it.
         if ($note === self::NOTE_NOT_IN_REPOSITORY && $fromComposerRepository) {
             throw new \InvalidArgumentException(\sprintf('%s is noted as not from a Composer repository, so it cannot be from one.', $package));
         }
@@ -94,8 +94,8 @@ final class Finding
     }
 
     /**
-     * Adds S7 after every verdict is known. The verdict does not change: it comes from the original
-     * signals.
+     * A copy with $signals as its whole signal list, so that S7 can join after every verdict is
+     * known. The verdict does not change: it comes from the original signals.
      *
      * @param list<Signal> $signals
      */
@@ -227,7 +227,7 @@ final class Finding
         if (!\in_array($this->verdict, self::NO_FIX_VERDICTS, true) || !Verdict::flagged($this->verdict)) {
             return null;
         }
-        // Only S9 knows whether a null fixed_by was looked for; without the key nothing says it was.
+        // Only S9 knows whether a null fixed_by was looked for. Without the key, nothing says that it was.
         $releasesRead = ($this->advisoryData()['releases_read'] ?? false) === true;
         $list = [];
         foreach ($this->advisoryRows() as $row) {

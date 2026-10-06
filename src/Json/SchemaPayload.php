@@ -11,8 +11,9 @@ use Lockrot\Exception\ConfigException;
  * justinrainbow/json-schema validator reads. The library's own round trip through `json_encode()`
  * and `json_decode()` hides a key that starts with a NUL byte (the decode returns null) and throws
  * on a number too large for a float. Here the key is a ConfigException, and the number (INF)
- * reaches the schema, which rejects it. The top level always becomes an object, and below it `[]`
- * stays an array.
+ * reaches the schema, which rejects it. The top level always becomes an object, so a caller must
+ * check first that it read an object. Below it, `[]` stays an array and an object passes through
+ * unchanged.
  *
  * @internal
  */
@@ -23,7 +24,7 @@ final class SchemaPayload
      * @param string                  $subject what the document is, as the error names it:
      *                                         "<subject> is invalid:"
      *
-     * @throws ConfigException on a key starting with a NUL byte, naming where it is
+     * @throws ConfigException on a key that starts with a NUL byte. The message names where the key is.
      */
     public static function of(array $document, string $subject): object
     {

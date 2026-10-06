@@ -173,8 +173,8 @@ final class LockrotCommand extends BaseCommand
                 throw $this->bootstrapError;
             }
             $env = getenv();
-            // --output paths are relative to the directory lockrot runs in; the manifest, its lock
-            // and the baseline are where Composer reads them.
+            // --output paths are relative to the directory that lockrot runs in. The manifest, its
+            // lock and the baseline are where Composer reads them.
             $cwd = (string) getcwd();
             $composerFile = self::composerFile();
             $project = ProjectConfig::fromFile($composerFile);
@@ -234,7 +234,7 @@ final class LockrotCommand extends BaseCommand
                 $lockPath,
                 $failOn,
                 $lockrot->thresholds(),
-                // The same manifest's require.php the page and --explain test branch rows against.
+                // The project's require.php, which the page and --explain test branch rows against.
                 $project->requirePhp(),
                 $lockrot->strictNetwork(),
                 $generate ? Gate::MODE_GENERATE_BASELINE : Gate::MODE_CHECK
@@ -397,6 +397,9 @@ final class LockrotCommand extends BaseCommand
     /**
      * The files that an `--output` must not name, besides each composer.json and composer.lock that
      * {@see ReportTargets} refuses by name: docs/configuration.md#writing-reports-to-files.
+     * The order sets the reason: without `COMPOSER`, the composer.json and composer.lock of the
+     * working directory come first and keep their reason. A path entry also catches a second name
+     * of the file on disk, which a refusal by name misses.
      *
      * @return list<array{0: string, 1: string}> path, reason
      */
@@ -540,7 +543,7 @@ final class LockrotCommand extends BaseCommand
     private static function composerFile(): string
     {
         $file = Factory::getComposerFile();
-        // Composer's default is `./composer.json`; without the `./` every path built from it reads
+        // Composer's default is `./composer.json`. Without the `./`, every path built from it reads
         // the way the working directory does.
         if (strpos($file, './') === 0) {
             $file = substr($file, 2);
@@ -555,7 +558,7 @@ final class LockrotCommand extends BaseCommand
             return null;
         }
 
-        // Composer >= 2.3 has tryComposer(); 2.2 LTS only has getComposer(bool $required).
+        // Composer 2.3 and later has tryComposer(). Composer 2.2 LTS has only getComposer(bool $required).
         // @phpstan-ignore function.alreadyNarrowedType (tryComposer() does not exist in Composer 2.2 LTS; guard is load-bearing there)
         $composer = method_exists($this, 'tryComposer') ? $this->tryComposer() : $this->getComposer(false);
 

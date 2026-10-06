@@ -57,7 +57,7 @@ final class SignalSet
                 $signals[] = $signal;
             }
         }
-        // by number, not by string: S10 follows S9 rather than sitting between S1 and S2
+        // By number, not by string: S10 follows S9 and does not sort between S1 and S2.
         usort($signals, static fn (Signal $a, Signal $b): int => strnatcmp($a->id(), $b->id()));
 
         return $signals;

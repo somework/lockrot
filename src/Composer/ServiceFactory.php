@@ -38,7 +38,7 @@ final class ServiceFactory
 {
     /**
      * @param list<RepositoryInterface> $repositories the project's configured Composer repositories, in lookup order
-     * @param ?Deadline                 $deadline     install-time budget; null (and `composer lockrot`) means unlimited
+     * @param ?Deadline                 $deadline     install-time budget, null for no limit
      * @param ?string                   $projectPhp   the project's `require.php`, or null when the manifest has none, see {@see \Lockrot\Signal\PhpFloor}
      */
     public static function createAnalyzer(IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, Tokens $tokens, Clock $clock, ?Deadline $deadline = null, ?string $projectPhp = null): Analyzer
@@ -75,7 +75,7 @@ final class ServiceFactory
      * exchange the consumer pair stays in the IO, because IOInterface cannot clear one entry.
      * See docs/internals.md#which-credentials.
      *
-     * @param null|callable(): HttpDownloader $downloaderFactory the downloader to post with; Composer's own when null
+     * @param null|callable(): HttpDownloader $downloaderFactory the downloader to post with, Composer's own when null
      *
      * @return callable(): bool
      */

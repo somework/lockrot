@@ -77,7 +77,8 @@ final class ActivityFetchPlan
     }
 
     /**
-     * The hosts with at least one repository and no credentials, in {@see RepoRef::FORGES} order.
+     * The capped hosts that had at least one repository and no credentials, in
+     * {@see RepoRef::FORGES} order.
      *
      * @return list<string>
      */

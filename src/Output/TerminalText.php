@@ -49,10 +49,9 @@ final class TerminalText
 
     /**
      * Writes each character that could break the line, recolour or reorder the terminal, or print
-     * as nothing as an escape, and the backslash as `\\`, so two different texts never print alike
-     * (docs/configuration.md#unknown-keys). Past $maxBytes of output, the text is cut and
-     * {@see self::ELLIPSIS} follows. An escape or a character is shown whole or not at all, so the
-     * cut can land a few bytes short of the limit.
+     * as nothing as an escape, and the backslash as `\\`, so two different texts never print alike.
+     * Past $maxBytes of output, the text is cut and {@see self::ELLIPSIS} follows. An escape or a
+     * character is shown whole or not at all, so the cut can land a few bytes short of the limit.
      */
     public static function escape(string $text, int $maxBytes = \PHP_INT_MAX): string
     {

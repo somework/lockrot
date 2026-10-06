@@ -58,10 +58,10 @@ final class SelfUpdateCommand extends BaseCommand
     private ?SignatureVerifierInterface $signatures;
 
     /**
-     * @param null|callable(IOInterface): array{0: HttpClientInterface, 1: ?string} $httpFactory client and GitHub token;
+     * @param null|callable(IOInterface): array{0: HttpClientInterface, 1: ?string} $httpFactory client and GitHub token,
      *                                                                                          null builds both from
      *                                                                                          Composer's own config
-     * @param ?string $runningPhar the archive to replace; null asks the runtime (`\Phar::running(false)`)
+     * @param ?string $runningPhar the archive to replace, null asks the runtime (`\Phar::running(false)`)
      * @param ?SignatureVerifierInterface $signatures null checks against the release key built into this archive
      */
     public function __construct(
@@ -197,7 +197,7 @@ final class SelfUpdateCommand extends BaseCommand
 
     /**
      * COMPOSER_DISABLE_NETWORK, as `composer --no-network` sets it, forbids every request. Refuse
-     * early instead of failing with a transport error.
+     * early, before a request fails with a transport error.
      */
     private static function networkDisabled(): bool
     {

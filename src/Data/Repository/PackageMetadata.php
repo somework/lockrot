@@ -12,9 +12,9 @@ use Lockrot\Data\Forge\SupportSource;
 use Lockrot\Lock\PackageOrigin;
 
 /**
- * Keeps scalars only: fromPackages() retains no per-release object. The exceptions are a date per
- * stable tag of a monorepo parent ({@see $releaseDates}) and the stable tags that share a commit
- * ({@see $sharedCommitVersions}).
+ * Keeps scalars only, so that a large lock costs little memory: fromPackages() retains no
+ * per-release object. The exceptions are a date per stable tag of a monorepo parent
+ * ({@see $releaseDates}) and the stable tags that share a commit ({@see $sharedCommitVersions}).
  *
  * @internal
  */
@@ -22,7 +22,9 @@ final class PackageMetadata
 {
     /**
      * The number of stable tags on one source commit from which their date counts as the commit's,
-     * not a release's. See docs/verdicts.md#dates-from-the-monorepo.
+     * not a release's. See docs/verdicts.md#dates-from-the-monorepo. Two tags on one commit (a
+     * re-tag, two releases with no change between them) stay trusted: the date is at most one
+     * release interval off, and the branch stays measurable.
      */
     public const SHARED_COMMIT_TAGS = 3;
 
@@ -62,9 +64,9 @@ final class PackageMetadata
     private ?string $lastStableDatedBy;
     /**
      * The release date of every stable tag that the repository dates by a release, by normalized
-     * version. A monorepo parent keeps its own, and each split package that it dates ({@see datedBy()})
-     * takes them: the lock copies a shared commit's date as the installed version's `time`, and
-     * this map holds the real release date. Empty for an ordinary package.
+     * version. A monorepo parent keeps its own, and each split package that it dates
+     * ({@see datedBy()}) takes them. The lock copies a shared commit's date as the installed
+     * version's `time`, and this map holds the real release date. Empty for an ordinary package.
      *
      * @var array<string, \DateTimeImmutable>
      */
@@ -128,8 +130,8 @@ final class PackageMetadata
      * can name a one-off repository, and the activity check then flags the package `abandoned`.
      * The release is picked by version, not by date or listing order. `time` is optional, and a
      * hand-written packages.json or a Satis build can omit it or reorder releases. When that
-     * release names no repository, the activity check skips the package: a false `abandoned`
-     * costs more than a missed one.
+     * release names no repository, the analyzer reads the lock entry's URL. When that names none
+     * either, the activity check skips the package: a false `abandoned` costs more than a missed one.
      *
      * @param list<BasePackage> $versions the releases of one package, with no AliasPackage
      */
@@ -183,12 +185,13 @@ final class PackageMetadata
                         $lastStableVersion = $version->getPrettyVersion();
                     }
                 }
-                // The branch view keeps the newest dated stable release per branch: a backport on a
-                // lower minor is the branch's last word, and an alpha on a new major is not a branch
-                // that upstream moved to. The branch's highest tag travels with it, with its date:
-                // with no date, the branch's age is unknown. A branch with no dated release shows
-                // that tag as its newest. Compare normalized strings only: a repository can put
-                // anything in `version`, and the loader never parses it.
+                // The branch view keeps the newest dated stable release per branch. A backport on a
+                // lower minor is the branch's last word. An alpha on a new major is not a branch
+                // that upstream moved to. S2 counts pre-releases too: there a tag can only make the
+                // package look younger, here it makes findings. The branch's highest tag travels
+                // with it, with its date: with no date, the branch's age is unknown. A branch with
+                // no dated release shows that tag as its newest. Compare normalized strings only: a
+                // repository can put anything in `version`, and the loader never parses it.
                 $normalized = $version->getVersion();
                 $branch = ReleaseBranch::of($normalized);
                 if ($branch !== null && VersionParser::parseStability($normalized) === 'stable') {
@@ -302,7 +305,7 @@ final class PackageMetadata
      * Other branches do not count: every split package has old branches with undated tags.
      *
      * @param ?string $installedBranch  {@see ReleaseBranch::of()} of the installed version, null for a snapshot
-     * @param ?string $installedVersion the installed version as the lock prints it; null leaves the branch to decide
+     * @param ?string $installedVersion the installed version as the lock prints it, null to let the branch decide
      */
     public function needsParentDates(?string $installedBranch, ?string $installedVersion = null): bool
     {

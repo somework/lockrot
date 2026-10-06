@@ -77,11 +77,11 @@ final class Libyears
     }
 
     /**
-     * The newest trusted date of a release above the installed version: a lower bound for the
-     * newest release when its own tag has no trusted date, because a tag's commit is never younger
-     * than the release it names. Reads the branch view of S8: each branch above the installed one,
-     * and the installed branch when its newest dated release is higher. A backport on a lower
-     * branch does not count. Null when nothing above is dated.
+     * The newest trusted date of a release above the installed version. It is a lower bound for
+     * the newest release when that tag has no trusted date. A tag's commit is never younger than
+     * the release it names. Reads the branch view of S8: each branch above the installed one, and
+     * the installed branch when its newest dated release is higher. A backport on a lower branch
+     * does not count. Null when nothing above is dated.
      */
     private static function newestTrustedDateAbove(PackageMetadata $metadata, string $installedVersion): ?\DateTimeImmutable
     {

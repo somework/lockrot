@@ -61,6 +61,7 @@ final class RepositoryUrl
      * The repository as a report can print it. A URL loses its userinfo, query and fragment
      * (`https://user:token@host/path?x=1` reads `https://host/path`), and a remote loses its user.
      * A path or a `file://` URL reads by its last segment (`.../lib`). Null for anything else.
+     * Redact the URL, do not drop it: the host is what a reader checks.
      *
      * The userinfo runs to the last `@` before the path, since a hand-written password can hold `?`
      * and `#`.

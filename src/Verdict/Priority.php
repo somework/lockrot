@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Verdict;
 
 /**
- * The levels and their rules: docs/verdicts.md#priority.
+ * The priorities and their rules: docs/verdicts.md#priority.
  *
  * @internal
  */

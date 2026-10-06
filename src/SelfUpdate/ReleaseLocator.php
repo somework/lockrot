@@ -18,7 +18,8 @@ use Lockrot\Version;
  * self-update installs, by the rules in docs/phar.md#which-release-it-installs. It does not use
  * `releases/latest`, which names one release and does not say whether this archive can take it.
  * The walk stops at the page that reaches the running version: GitHub lists newest first, and
- * SECURITY.md rules out backports.
+ * SECURITY.md rules out backports. `--allow-major` moves one major version per run, so a release
+ * that warns about the next step is not skipped.
  *
  * @internal
  */
@@ -84,15 +85,20 @@ final class ReleaseLocator
      * Walks the releases newest first and returns the first one that can be installed, or null when
      * the build is current in its line. Each release passed over leaves a note ({@see notes()}).
      *
-     * With $force, the newest release at or below the running version is also a candidate, in the
-     * running major version only and nothing below it: the description is unsigned, and a lying one
-     * must not walk a reinstall further down.
+     * With $force, the newest release at or below the running version is also a candidate. It stays
+     * in the running major version: the description is unsigned, and a lying one must not walk a
+     * reinstall further down.
+     *
+     * With $allowMajor, a release of the next major version is also a candidate: the lowest major
+     * above the running line that has a stable release. Without it, the notes name that release, or
+     * say why none can be installed.
      *
      * @return ?Release the release to install, null when none is newer
      *
-     * @throws ConfigException on every failure, and when the archive is stranded: newer releases
-     *                         are signed with a key it does not carry, and no release that it can
-     *                         install carries that key
+     * @throws ConfigException on every failure, when the archive is stranded (newer releases are
+     *                         signed with a key that it does not carry, and no release that it can
+     *                         install carries that key), and, with $force, when no release in the
+     *                         running line can be installed
      */
     public function locate(bool $allowMajor = false, bool $force = false): ?Release
     {
@@ -165,7 +171,7 @@ final class ReleaseLocator
      * Returns true once a release is named, so the rest of that major is not described.
      *
      * A release that is only advised is not chosen, so a description that cannot be read is a note,
-     * not a failure: a next major without its description, or one failed download, must not stop an
+     * not a failure. A next major without its description, or one failed download, must not stop an
      * update in the running major. The walk goes on to older releases of that major.
      *
      * @param array{version: string, normalized: string, tag: string, entry: array<mixed>} $candidate
@@ -190,7 +196,7 @@ final class ReleaseLocator
 
     /**
      * One line for each reason that a newer release was passed over in the last {@see locate()},
-     * naming the newest release held back for it. The lines stay when locate() throws.
+     * that names the newest release held back for it. The lines stay when locate() throws.
      *
      * The text carries tags and versions from the release list: whoever prints it must escape it.
      *
@@ -355,9 +361,9 @@ final class ReleaseLocator
     }
 
     /**
-     * $entry as a candidate, its tag when the tag is not a version, or null when it is no published
-     * stable release: a draft, a pre-release, an entry without a string tag, or a version that is
-     * not stable (`v1.0.0-RC1` published without the pre-release flag).
+     * $entry as a candidate, or its tag when the tag is not a version. Null when the entry is no
+     * published stable release: a draft, a pre-release, an entry without a string tag, or a version
+     * that is not stable (`v1.0.0-RC1` published without the pre-release flag).
      *
      * @param mixed $entry
      *

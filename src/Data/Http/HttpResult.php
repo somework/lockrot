@@ -68,7 +68,7 @@ final class HttpResult
     /**
      * Strict, in the format {@see toEnvelope()} writes: the loose constructor reads `""` as now, and
      * a stored answer of unknown age must not. A date that parses but is not real (a 30th of
-     * February) comes back with a warning that getLastErrors() reports. Before PHP 8.2
+     * February) comes back with a warning that getLastErrors() reports. On PHP below 8.2,
      * getLastErrors() also returns an array when nothing is wrong, so the code counts warnings.
      */
     private static function parseDate(string $iso): ?\DateTimeImmutable

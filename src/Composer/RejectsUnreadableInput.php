@@ -23,6 +23,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 trait RejectsUnreadableInput
 {
+    /** Exit 2 with the reason when the command line cannot be bound, null when it can. */
     private function unreadableInput(InputInterface $input, OutputInterface $output): ?int
     {
         try {

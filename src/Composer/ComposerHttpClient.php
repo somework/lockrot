@@ -36,7 +36,7 @@ final class ComposerHttpClient implements HttpClientInterface
 
     /**
      * @param IOInterface $io       the IO that the downloader was built with, see {@see withoutRedundantAuthorization()}
-     * @param Config      $config   the Config that the downloader was built with
+     * @param Config      $config   the Config that the downloader was built with: Composer resolves the origin of a request against its `gitlab-domains`
      * @param ?Deadline   $deadline install-time budget, where null or a never-expiring deadline keeps {@see DEFAULT_TIMEOUT}
      */
     public function __construct(HttpDownloader $downloader, IOInterface $io, Config $config, Clock $clock, ?Deadline $deadline = null)
