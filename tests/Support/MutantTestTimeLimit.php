@@ -18,24 +18,21 @@ use PHPUnit\TextUI\Configuration\Configuration;
 /**
  * Ends a mutant's test run as a failure once a single test has run for {@see self::SECONDS}.
  *
- * A mutant that turns a loop into one that never ends (a queue that never empties, a write offset
- * that never moves) holds one of the mutation job's threads until Infection's timeout for that
- * mutant: five times the time its covering tests took in the initial run, capped by infection.json5.
- * On a line every integration test reaches, that is the cap, which cannot come down because it bounds
- * the whole run of a mutant's covering tests. A single test can be held far tighter: no test that
- * covers a line comes near the limit below, so a test still running then is stuck, and failing it is
- * the same detection the timeout made, sooner. The process exits from the alarm instead of throwing:
- * code under test that catches \RuntimeException would swallow an exception and keep looping.
- * Measurements: PR #65.
+ * A mutant that turns a loop into one that never ends holds a mutation thread until Infection's
+ * timeout for that mutant, which on a line every integration test reaches is the configured cap; the
+ * cap bounds the whole run of the mutant's covering tests, so it cannot come down. A single test can
+ * be held far tighter: no covering test comes near the limit, so a test still running then is stuck,
+ * and failing it is the detection the timeout would have made, sooner.
  *
- * The alarm is armed when PHPUnit prepares a test in this process and cleared when it finishes, so
- * nothing else is held: not a class's setUpBeforeClass(), and not a test in a separate process, of
- * which the parent hears only once the child is done (PHPUnit bootstraps no extension in the child).
- * Those keep Infection's own timeout; no mutant's loop was found in either.
+ * PHPUnit's own time limit is not used because it stops a test by throwing an exception that extends
+ * \RuntimeException: product code that catches \RuntimeException to degrade gracefully swallows it,
+ * and a loop mutant inside such code never ends. Exiting from the signal handler cannot be caught.
  *
- * Only Infection's mutant processes, which it starts with INFECTION=1, arm the alarm: the initial
- * run, where a corpus sweep covering nothing runs longer than the limit, and every ordinary test run are
- * untouched. Without pcntl the extension does nothing, and Infection's own timeout still applies.
+ * The alarm runs from a test's preparation to its end in this process, so it holds neither a class's
+ * before-class methods nor a test in a separate process (PHPUnit bootstraps no extension in the
+ * child, and the parent hears of the test only once the child is done); those keep Infection's
+ * timeout. Only Infection's mutant processes, started with INFECTION=1, arm it: the initial run and
+ * every ordinary test run are untouched. Without pcntl the extension does nothing.
  *
  * Registered in phpunit.xml.dist, so a class that fails to load fails every ordinary test run too;
  * PHPUnit 10 or later (phpunit9.xml.dist leaves it out).
