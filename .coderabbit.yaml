@@ -98,7 +98,8 @@ reviews:
         @dataProvider annotation, not the #[DataProvider] attribute. A data-provider test therefore
         needs BOTH, and a test carrying only the attribute passes locally and errors on two rows of
         the matrix with "Too few arguments".
-        Review against .claude/rules/tests.md. Flag an exact total over recorded fixtures
+        Review against .claude/rules/tests.md. An old exact total over recorded fixtures stays
+        until its per-package replacement exists. Flag a new exact total over recorded fixtures
         (tests/fixtures/apps, recorded HTTP answers), exact text that is not an output format, a
         line another tool parses or a docs sentence that states a value the code holds, the real
         clock (time(), date(), DateTime without a fixed instant) outside a test of the real clock or
