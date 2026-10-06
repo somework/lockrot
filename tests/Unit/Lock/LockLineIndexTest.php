@@ -168,11 +168,29 @@ final class LockLineIndexTest extends TestCase
         self::assertNull(LockLineIndex::fromString('{"packages":[{"name":"acme/pkg"}]}')->lineOf('acme/pkg'));
     }
 
+    public function testMinifiedLockYieldsNoLinesEvenWithLineBreaksAroundTheEntry(): void
+    {
+        $json = <<<'JSON'
+            {
+                "packages": [
+                    {
+                        "name": "acme/pkg", "version": "1.0.0"
+                    }
+                ]
+            }
+            JSON;
+        // Composer writes the name member alone on its line; one that shares its line is a lock
+        // Composer did not write, and the index leaves it out rather than guess.
+        self::assertNull(LockLineIndex::fromString($json)->lineOf('acme/pkg'));
+    }
+
     public function testMissingFileThrows(): void
     {
+        $path = sys_get_temp_dir().'/lockrot-no-such-lock-'.uniqid('', true).'.lock';
+
         $this->expectException(ConfigException::class);
-        $this->expectExceptionMessageMatches('/not found/');
-        LockLineIndex::fromFile(sys_get_temp_dir().'/lockrot-no-such-lock-'.uniqid('', true).'.lock');
+        $this->expectExceptionMessage($path.' not found');
+        LockLineIndex::fromFile($path);
     }
 
     public function testDirectoryPathThrows(): void

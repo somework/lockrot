@@ -77,6 +77,8 @@ final class JsonReaderTest extends TestCase
 
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessageMatches('{is not valid JSON.*Parse error on line}s');
+        // The code is the parser's (none), not one of its own: ProjectConfig passes it on.
+        $this->expectExceptionCode(0);
         JsonReader::readObject($path);
     }
 
@@ -86,6 +88,7 @@ final class JsonReaderTest extends TestCase
 
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessageMatches('{^'.preg_quote($path, '{').' is not valid JSON: .+}');
+        $this->expectExceptionCode(0);
         JsonReader::readObject($path);
     }
 
