@@ -10,7 +10,17 @@
     // only mutants that time out are the two genuine infinite loops in
     // RepositoryMetadataLoader::loadChunked() (the `!== []` loop guard and the splice offset), which
     // Infection counts as detected — correctly, since a test that never returns is a failing test.
-    "timeout": 180,
+    //
+    // 600 since 2026-10-06. Infection gives each mutant min(5 + 5 x the time its covering tests took
+    // in the initial run, this value), and leaves a mutant out unrun, outside the MSI, when that time
+    // alone reaches this value. A line every integration test reaches takes about a minute locally
+    // and three to four times that on a slow runner: at 180 such a runner skipped 987 mutants of the
+    // data shard, and a documented escape on such a line came back as "timed out", i.e. detected,
+    // on one runner and as escaped on another (PhpFloor.php:215, ConstraintOpenness.php:50 on the
+    // run of PR #61). 600 keeps every mutant run to its end on any runner. What the old
+    // value saved, the time an endless loop holds a thread, tests/Support/MutantTestTimeLimit.php now
+    // saves: it fails a test still running after 60 seconds in a mutant's process.
+    "timeout": 600,
     "logs": {
         "text": "build/infection.log"
     },

@@ -85,6 +85,12 @@ jobs:
   # unequal populations (measured 2026-09-17: 99.23%, 97.28% and 97.8% covered MSI), and one shared
   # number would leave the middle one two mutants from red. Each threshold is that shard's floor
   # minus one; infection.json5 keeps the whole-tree number for a local run.
+  #
+  # Five shards since 2026-10-06, each a slice of the three before, keeping the threshold of the shard
+  # it came from and, for the three older ones, the name the main branch's ruleset requires: src/Signal
+  # and src/Analyzer left `verdicts and output`, the repository loading left `data and the rest`.
+  # src/Html and src/Explain, in no shard until then although tests/infection-equivalents.md
+  # measured them, joined `verdicts and output`.
   mutation:
     runs-on: ubuntu-latest
     # 50, not 30: the composer/self-update shard measured 20m02s on 2026-09-19 and was cancelled at
@@ -102,14 +108,17 @@ jobs:
       fail-fast: false
       matrix:
         shard:
-          - {name: verdicts and output, filter: 'src/Verdict src/Signal src/Analyzer src/Output', min_msi: 98}
+          - {name: verdicts and output, filter: 'src/Verdict src/Output src/Html src/Explain', min_msi: 98}
+          - {name: signals and analyzer, filter: 'src/Signal src/Analyzer', min_msi: 98}
           - {name: composer and self-update, filter: 'src/Composer src/Config src/SelfUpdate', min_msi: 96}
-          - {name: data and the rest, filter: 'src/Data src/Baseline src/Filesystem src/Allowlist src/Graph src/Lock src/Json src/Exception src/Version.php src/Clock.php src/Deadline.php', min_msi: 96}
+          - {name: repository data, filter: 'src/Data/Repository src/Data/Php src/Data/Advisory src/Graph', min_msi: 96}
+          - {name: data and the rest, filter: 'src/Data/Forge src/Data/Http src/Data/Cache src/Baseline src/Filesystem src/Allowlist src/Lock src/Json src/Exception src/Version.php src/Clock.php src/Deadline.php', min_msi: 96}
     name: mutation (${{ matrix.shard.name }})
     steps:
       - uses: actions/checkout@v7
       - uses: shivammathur/setup-php@v2
-        with: {php-version: '8.4', coverage: pcov}
+        # pcntl for tests/Support/MutantTestTimeLimit.php, which does nothing without it.
+        with: {php-version: '8.4', coverage: pcov, extensions: pcntl}
       - run: composer install --no-interaction
       - name: Install Infection (not in require-dev, PHP ^8.2 floor)
         run: |
@@ -118,7 +127,7 @@ jobs:
       # Infection 0.35 dropped --only-covered (uncovered code is skipped by default; --with-uncovered opts in).
       # Whole tree, 2026-09-17: 3202 mutants, 56 equivalent escapes, 2 timed out (infinite-loop
       # mutants, i.e. detections) -> MSI = Covered MSI 98.25%; ~6m20s on 8 threads locally, ~30 min
-      # unsharded on a 4-core runner. infection.json5 records why the timeout is 180;
+      # unsharded on a 4-core runner. infection.json5 records why the timeout is 600;
       # tests/infection-equivalents.md records why every documented escape is equivalent. No
       # GitHub annotations: dozens of warnings about documented equivalents per run would only teach
       # people to ignore them; the escape listing is uploaded instead.
