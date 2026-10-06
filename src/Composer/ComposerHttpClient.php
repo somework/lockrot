@@ -18,14 +18,9 @@ use Lockrot\Data\Repository\RepositoryUrl;
 use Lockrot\Deadline;
 
 /**
- * Parallel HTTP through Composer's HttpDownloader (curl multi when available), using its
- * add()/wait() pair.
- *
- * A HttpDownloader returned by Factory::createHttpDownloader() defaults to sync-only mode: add()
- * throws a LogicException until async is enabled. Composer enables it by wrapping the downloader in
- * Composer\Util\Loop, whose constructor calls HttpDownloader::enableAsync(). Loop is used here for
- * that reason rather than calling enableAsync() directly, which Composer marks internal; the
- * process-executor half of Loop stays unused.
+ * A HttpDownloader from Factory::createHttpDownloader() is sync-only, and add() throws a
+ * LogicException until async is enabled. The constructor of Composer\Util\Loop enables it, and
+ * Composer marks HttpDownloader::enableAsync() internal, so this class wraps the downloader in Loop.
  *
  * @internal
  */
@@ -40,12 +35,9 @@ final class ComposerHttpClient implements HttpClientInterface
     private Deadline $deadline;
 
     /**
-     * @param IOInterface $io       the IO the downloader was built with: its authentications are what
-     *                              Composer's AuthHelper adds to requests, see
-     *                              {@see withoutRedundantAuthorization()}
-     * @param Config      $config   the Config the downloader was built with: its `gitlab-domains` are
-     *                              what Composer resolves a request's origin against
-     * @param ?Deadline   $deadline install-time budget; null (and a never-expiring deadline) keeps {@see DEFAULT_TIMEOUT}
+     * @param IOInterface $io       the IO that the downloader was built with, see {@see withoutRedundantAuthorization()}
+     * @param Config      $config   the Config that the downloader was built with
+     * @param ?Deadline   $deadline install-time budget, where null or a never-expiring deadline keeps {@see DEFAULT_TIMEOUT}
      */
     public function __construct(HttpDownloader $downloader, IOInterface $io, Config $config, Clock $clock, ?Deadline $deadline = null)
     {
@@ -57,17 +49,15 @@ final class ComposerHttpClient implements HttpClientInterface
     }
 
     /**
-     * The per-request timeout for the next fetchAll(): the default, or what is left of the
-     * install-time budget at this moment (never below one second). Computed at request time rather
-     * than at construction because the repository-metadata pass runs in between — a value frozen
-     * when the client was built would let the GitHub round outlast the budget by a whole timeout.
+     * The timeout of each request in the next fetchAll(): the default, or the time left of the
+     * budget, at least one second. It is read at request time, because the repository-metadata pass
+     * runs after construction, and with a frozen value the activity requests outlast the budget.
      */
     public function timeoutSeconds(): int
     {
         return self::timeoutFor($this->deadline);
     }
 
-    /** The per-request timeout a request issued now under $deadline may take, see {@see timeoutSeconds()}. */
     public static function timeoutFor(Deadline $deadline): int
     {
         if ($deadline->isNever()) {
@@ -78,28 +68,11 @@ final class ComposerHttpClient implements HttpClientInterface
     }
 
     /**
-     * The headers a request to $url carries: $headers, minus lockrot's own credential headers
-     * (`Authorization`, `PRIVATE-TOKEN`) when Composer is about to add credentials of its own.
-     *
-     * Composer's AuthHelper adds a header to every request whose origin it holds credentials for —
-     * `github-oauth`, `gitlab-token`, `gitlab-oauth`, `http-basic` or `bearer` in auth.json or
-     * COMPOSER_AUTH, or what setup-php writes on a CI runner. {@see \Lockrot\Data\Forge\GitHubApi}
-     * and {@see \Lockrot\Data\Forge\GitLabApi} send their own header for the token lockrot
-     * resolved, and a request carrying two is refused (GitHub answers 401 "Bad credentials",
-     * whatever the tokens are). So whenever Composer has credentials for the origin, its header is
-     * the one on the wire and lockrot's is dropped here. The token lockrot resolved still decides
-     * whether the repository-activity cap is lifted; only the header changes.
-     *
-     * The predicate is AuthHelper's own, on both Composer 2.2 and 2.10: the origin is
-     * `Url::getOrigin()`'s — every `*.github.com` host folds into `github.com`, and a host that is
-     * (or is the host part of) a `gitlab-domains` entry resolves to that entry — and credentials
-     * count when they are stored under that origin or, for `api.github.com`/`api.bitbucket.org`,
-     * under the site host. Credentials stored under `api.github.com` alone never reach AuthHelper
-     * and are left alone here too; a github.com OAuth token is added to api.github.com requests
-     * only, so a release download from github.com keeps lockrot's header. Two shapes of credentials
-     * make AuthHelper add no credential header at all — `client-certificate` (an SSL option) and
-     * `custom-headers` whose lines carry no `Authorization`/`PRIVATE-TOKEN` — and under those
-     * lockrot's own header stays, since nothing else would authenticate the request.
+     * $headers without lockrot's own credential headers (`Authorization`, `PRIVATE-TOKEN`) when
+     * Composer's AuthHelper adds credentials of its own, because a request with two is refused and
+     * GitHub answers 401 "Bad credentials". The origin and credential rules copy AuthHelper, so the
+     * header that Composer adds is the one on the wire. The token that lockrot resolved still lifts
+     * the repository-activity cap. See docs/internals.md#which-credentials.
      *
      * @param list<string> $headers
      *
@@ -112,21 +85,21 @@ final class ComposerHttpClient implements HttpClientInterface
         }
         $origin = Url::getOrigin($config, $url);
         if (!$io->hasAuthentication($origin)) {
-            // AuthHelper::findAuthOrigin()'s fallback, verbatim: `api.github.com` never arrives here
-            // (getOrigin() folds it into github.com) but stays listed so the two read the same.
+            // The fallback of AuthHelper::findAuthOrigin(). getOrigin() folds `api.github.com` into
+            // github.com, so it never arrives here, but it stays listed to match.
             if (!\in_array($origin, ['api.bitbucket.org', 'api.github.com'], true) || !$io->hasAuthentication((string) substr($origin, 4))) {
                 return $headers;
             }
             $origin = (string) substr($origin, 4);
         }
         $auth = $io->getAuthentication($origin);
-        // AuthHelper's one exception: a github.com OAuth token is added to api.github.com requests
-        // only, so on any other github.com URL (a release download, say) lockrot's header stays.
+        // AuthHelper adds a github.com OAuth token to api.github.com requests only, so lockrot's
+        // header stays on any other github.com URL.
         if ($origin === 'github.com' && $auth['password'] === 'x-oauth-basic' && preg_match('{^https?://api\.github\.com/}', $url) !== 1) {
             return $headers;
         }
-        // Two shapes add no credential header: an SSL client certificate, and custom headers that
-        // do not carry one themselves.
+        // AuthHelper adds no credential header for an SSL client certificate, or for custom headers
+        // that carry none, so lockrot's header stays.
         if ($auth['username'] === 'client-certificate') {
             return $headers;
         }

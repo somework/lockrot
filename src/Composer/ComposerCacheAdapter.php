@@ -10,14 +10,10 @@ use Lockrot\Data\Http\HttpResult;
 use Lockrot\Json\JsonWriter;
 
 /**
- * Stores HTTP envelopes in Composer's own cache directory, through Composer\Cache.
- *
- * A cache that is disabled (COMPOSER_CACHE_DIR=/dev/null from `composer --no-cache`, an unwritable
- * directory) or read-only (`cache-read-only`) needs no guard here: Composer\Cache::read() and
- * ::write() both check isEnabled() themselves and answer false, so a read is a miss and a write is a
- * no-op either way. {@see ServiceFactory::createCache()} does not hand such a cache over in the first
- * place — it falls back to an in-memory cache — so this only covers a cache that turns disabled
- * mid-run.
+ * A disabled or read-only cache needs no guard here: Composer\Cache::read() and ::write() check
+ * isEnabled() themselves, so a read is a miss and a write does nothing. Only a cache that turns
+ * disabled during a run reaches this class disabled, because {@see ServiceFactory::createCache()}
+ * hands over an enabled cache only.
  *
  * @internal
  */
@@ -46,10 +42,8 @@ final class ComposerCacheAdapter implements CacheInterface
     }
 
     /**
-     * One file per URL, named after its SHA-1 so that a query string or a path cannot collide with
-     * Composer's own cache file names, and suffixed `.json` because that is what the file holds —
-     * an envelope Composer's own `cache-files-*` housekeeping and a human reading the cache
-     * directory both see.
+     * The SHA-1 of the key names the file, so a query string or a path cannot collide with
+     * Composer's own cache file names.
      */
     private function file(string $key): string
     {

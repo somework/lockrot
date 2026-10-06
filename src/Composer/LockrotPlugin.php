@@ -14,8 +14,6 @@ use Composer\Plugin\Capable;
 use Composer\Plugin\PluginInterface;
 
 /**
- * The Composer plugin entry point: registers the install-time listener and the `composer lockrot` command.
- *
  * @internal
  */
 final class LockrotPlugin implements PluginInterface, Capable, EventSubscriberInterface
@@ -33,11 +31,11 @@ final class LockrotPlugin implements PluginInterface, Capable, EventSubscriberIn
     }
 
     /**
-     * Composer's PluginManager registers a plugin implementing EventSubscriberInterface with the
-     * event dispatcher right after activate(), so no wiring is needed in activate() itself.
+     * Composer registers a plugin that implements EventSubscriberInterface right after activate(),
+     * so activate() needs no wiring.
      *
      * The interface declares getSubscribedEvents() without a return type in both supported Composer
-     * trees, which allows adding one here.
+     * trees, so adding one is safe.
      *
      * @return array<string, string>
      */

@@ -33,17 +33,13 @@ use Lockrot\Output\TerminalText;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Verdict\VerdictEngine;
 
-/**
- * Builds the analyzer and its HTTP stack from Composer's own IO, Config and repositories.
- *
- * @internal
- */
+/** @internal */
 final class ServiceFactory
 {
     /**
      * @param list<RepositoryInterface> $repositories the project's configured Composer repositories, in lookup order
      * @param ?Deadline                 $deadline     install-time budget; null (and `composer lockrot`) means unlimited
-     * @param ?string                   $projectPhp   the project's own `require.php`, one of the two floors S8 keeps the branch it names within ({@see \Lockrot\Signal\PhpFloor}); null when the manifest has none
+     * @param ?string                   $projectPhp   the project's `require.php`, or null when the manifest has none, see {@see \Lockrot\Signal\PhpFloor}
      */
     public static function createAnalyzer(IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, Tokens $tokens, Clock $clock, ?Deadline $deadline = null, ?string $projectPhp = null): Analyzer
     {
@@ -72,25 +68,12 @@ final class ServiceFactory
     }
 
     /**
-     * Composer's credentials for bitbucket.org, made sendable. `http-basic` (an Atlassian API token)
-     * and `bearer` entries, under either `bitbucket.org` or `api.bitbucket.org`, need nothing:
-     * Composer's AuthHelper puts them on the wire. A `bitbucket-oauth` consumer is different —
-     * Composer loads it into the IO as a plain username/password pair, and only exchanges it for a
-     * bearer token when a request comes back 401, a retry lockrot switches off
-     * ({@see ComposerHttpClient::fetchAll()}). So the exchange Composer would do on that challenge is
-     * done here, up front: the same `POST /site/oauth2/access_token` with `client_credentials` that
-     * {@see Bitbucket} sends, through a downloader whose AuthHelper adds the consumer pair as HTTP
-     * Basic, and the token is stored in the IO as `x-token-auth` — what AuthHelper sends as
-     * `Authorization: Bearer` on api.bitbucket.org from then on. Composer's own helper is not used
-     * for the exchange because it also rewrites `composer.json` and `auth.json` on the way, and a
-     * report never writes.
-     *
-     * Run at most once per run and only when a Bitbucket repository is actually planned
-     * ({@see ForgeAuth}), never once the install-time budget is spent ({@see Analyzer}). An exchange
-     * that fails is reported at -v and the run counts as unauthenticated on Bitbucket (the cap
-     * applies); the consumer pair stays in the IO, where AuthHelper keeps sending it as HTTP Basic,
-     * so those requests are refused and land in the "Bitbucket unreachable" note rather than
-     * going out anonymous — one IO entry cannot be cleared through IOInterface.
+     * Exchanges a `bitbucket-oauth` consumer for a bearer token up front. Composer exchanges it only
+     * after a 401, and lockrot switches that retry off ({@see ComposerHttpClient::fetchAll()}). The
+     * request is the one that {@see Bitbucket} sends. Composer's own helper is not used, because it
+     * also rewrites `composer.json` and `auth.json`, and a report never writes. After a failed
+     * exchange the consumer pair stays in the IO, because IOInterface cannot clear one entry.
+     * See docs/internals.md#which-credentials.
      *
      * @param null|callable(): HttpDownloader $downloaderFactory the downloader to post with; Composer's own when null
      *
@@ -129,7 +112,7 @@ final class ServiceFactory
                 return true;
             } catch (\Throwable $e) {
                 // Raw, past Composer's formatter: the transport's message is not console markup
-                // (see TerminalText), and what a terminal would obey in it is shown instead.
+                // (see TerminalText), and what a terminal obeys in it is shown instead.
                 $line = 'lockrot: Bitbucket OAuth token request failed, continuing without credentials: '.TerminalText::neutralise($e->getMessage());
                 $io->writeErrorRaw(TerminalText::warning($line, $io->isDecorated()), true, IOInterface::VERBOSE);
 
@@ -139,15 +122,10 @@ final class ServiceFactory
     }
 
     /**
-     * Repository activity only: repository metadata goes through Composer's own repository layer
-     * (RepositoryMetadataLoader), which has its own cache via Composer's HttpDownloader.
-     *
-     * A deadline shortens the per-request timeout of the activity calls to what is left of the budget
-     * at the moment the calls are issued ({@see ComposerHttpClient::timeoutSeconds()}), so a single
-     * slow response cannot outlast it. The repository half cannot be bounded the same way: those
-     * requests are issued by the project's own ComposerRepository instances through the
-     * HttpDownloader Composer built for them, whose timeouts lockrot does not get to set — there,
-     * the between-chunk deadline check in RepositoryMetadataLoader is the only bound.
+     * HTTP for repository activity only. The deadline cuts each activity request to the time left
+     * ({@see ComposerHttpClient::timeoutSeconds()}). Repository metadata requests come from the
+     * project's own ComposerRepository instances, whose HttpDownloader timeouts lockrot cannot set,
+     * so the deadline check between chunks in RepositoryMetadataLoader is their only bound.
      */
     public static function createHttp(IOInterface $io, Config $config, LockrotConfig $lockrot, Clock $clock, ?Deadline $deadline = null): CachingHttpClient
     {
@@ -157,10 +135,9 @@ final class ServiceFactory
     }
 
     /**
-     * Cache backing for one run: Composer's own cache directory when it is enabled, otherwise a
-     * request-scoped in-memory cache. `composer --no-cache` sets COMPOSER_CACHE_DIR=/dev/null, which
-     * makes Composer\Cache::isEnabled() false; writing to sys_get_temp_dir() instead would quietly
-     * re-enable on-disk caching the user just asked to turn off.
+     * `composer --no-cache` sets COMPOSER_CACHE_DIR=/dev/null, which makes Composer\Cache::isEnabled()
+     * false. The fallback is a memory cache, because a cache in sys_get_temp_dir() writes to
+     * disk after the user asked for no cache.
      */
     public static function createCache(IOInterface $io, Config $config): CacheInterface
     {
