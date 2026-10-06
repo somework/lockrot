@@ -22,7 +22,7 @@ in the same pull request.
 
 ## What a comment never holds
 
-`writing.md` ("Text that stays true") forbids time words, counts of open sets and positions. Also:
+`writing.md`, "Text that stays true", applies. Also:
 
 - **History:** dates, the lockrot version where behaviour changed, "was", "dropped", "before",
   "after" or "since" about earlier code, output or tool versions, the story of a bug hunt. History

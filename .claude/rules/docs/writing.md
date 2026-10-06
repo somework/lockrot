@@ -21,29 +21,30 @@ paths:
 
 - Outside `CONTRIBUTING.md`, name only the public surface (options, exit codes, environment
   variables, config keys, JSON fields, published files, URLs), never a class, a test or a script.
-- The text before the first `##` has at most three sentences and holds a command, a snippet, a
-  table of values or the rule itself. An Explanation page can open with its question. Bad: "This page describes the configuration." Good: "The
-  first source that sets a value wins: option, then environment variable, then `extra.lockrot`."
+- The text before the first `##` has at most three sentences. It holds a command, a snippet, a
+  table of values or the rule itself. An Explanation page can open with its question. Bad: "This
+  page describes the configuration." Good: "The first source that sets a value wins: option, then
+  environment variable, then `extra.lockrot`."
 
 ## One page, one mode (Diátaxis)
 
 | Mode | Pages | Shape |
 |---|---|---|
 | Tutorial | README "First run" | Goal, prerequisites, numbered steps with command and output, next step |
-| How-to | `ci.md`, `baseline.md`, `install-time.md`, `phar.md` | Working snippet before the first `##`, variants as `##`, failures as symptom → cause → fix |
+| How-to | `ci.md`, `baseline.md`, `install-time.md`, `phar.md` | A snippet that works, before the first `##`, variants as `##`, failures as symptom → cause → fix |
 | Reference | `configuration.md`, `schema.md`, `notes.md`, `compatibility.md` | Tables first (name, type, default, effect, link). Prose only where a cell cannot hold it |
 | Explanation | `verdicts.md`, `internals.md` | The question, the model, one recorded example, limits, links to reference |
 | Landing | README, `docs/index.md` | Value in one sentence, install, one real run, routes onward |
 
-A how-to section that lists every value of an option or key moves that list to the reference page
-and leaves a link, unless `topic-homes.md` makes the how-to its home. Pages other than the
-landings, `changelog.md` and `example-run.md` end with `## Related`: links, each with a clause that
-names what the reader finds there.
+When a how-to section lists every value of an option or key, move the list to the reference page.
+Leave a link, unless `topic-homes.md` makes the how-to its home. End each page with `## Related`,
+except the landings, `changelog.md` and `example-run.md`. Each link there gets a clause that names
+what the reader finds.
 
 ## Docs only
 
 - Write to the reader as "you". Outside the Explanation pages and `CONTRIBUTING.md`, state inputs,
-  outputs, guarantees and limits, not the order of internal steps, caches or data structures.
+  outputs, guarantees and limits. Do not describe internal steps, caches or data structures.
 - **Versions of a change only where a reader needs them.** These are a `schema.md` field row, a
   `compatibility.md` policy with its effective version, and one `!!! note "Older releases"` in the
   canonical section. An action for older releases goes in that section's text, with the version as

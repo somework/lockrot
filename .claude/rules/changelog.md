@@ -24,7 +24,8 @@ fixtures, refactors, corpus tooling).
   other empty sections.
 - Keep the section order: what can break a pipeline comes first.
 - A leak of a name, path or credential into a report goes under `### Security`, never `### Fixed`.
-  So does a verification gap or a change to what lockrot writes or contacts.
+  So does a change to what lockrot writes or contacts, or to what it verifies (a signature, a
+  checksum, an attestation), including a check that it skips.
 - The summary's compatibility line ("the schemas gained optional fields only") replaces
   per-entry "X is unchanged" sentences, except for alert fingerprints and exit codes.
 
@@ -38,9 +39,9 @@ fixtures, refactors, corpus tooling).
 - `<Surface>` is what a user names: `CLI`, `Config`, `Baseline`, `PHAR`, `self-update`,
   `Install-time`, `PHP API`, `Docs`, `All formats`, or a format (`json`, `sarif`, `gitlab`,
   `github`, `markdown`, `table`, `html`). A change to an environment variable is `Config`.
-- A change that can break a setup that works starts `**Breaking:**`, sorts first in its section and
-  ends with a sentence that starts `Action:`. A change to what an option, variable, field or
-  exit code means is breaking even when the name stays.
+- Start an entry that can break a setup that works with `**Breaking:**`, and sort it first in its
+  section. End it with a sentence that starts `Action:`. A change to what an option, variable,
+  field or exit code means is breaking even when the name stays.
 - Name the changed option, key, field or command within the first eight words after the surface.
 - An entry has at most five lines at 100 columns, and the link line counts as one at any width.
   Aim for three. If you need more, write the missing docs section.
@@ -50,8 +51,8 @@ fixtures, refactors, corpus tooling).
 - Give the reason in one clause, only when the reader needs it to decide.
 - A home outside `docs/` gets a GitHub URL pinned to the tag.
 - Define or avoid internal jargon ("stranded archive"): the reader has not read the code.
-- A bump of the vendored lockrot-report page is one `### Changed` entry, surface `html`: its
-  version, its changelog link, and at most one line on the report fields it reads.
+- A bump of the vendored lockrot-report page is one `### Changed` entry with the surface `html`.
+  It gives the version and a changelog link, and at most one line on the report fields it reads.
 
 ## What an entry never contains
 
@@ -65,9 +66,8 @@ Never:
 ## Unreleased and released sections
 
 - A pull request with a user-visible change writes its entry under `## [Unreleased]` in final
-  form. In `CHANGELOG.md`, the release pull request only renames the heading, writes the summary
-  and the tag in pinned URLs, opens a new `## [Unreleased]` and updates the compare links
-  (CONTRIBUTING, "Cutting a release").
+  form. In `CHANGELOG.md`, the release pull request changes only the heading, the summary, the tag
+  in pinned URLs, a new `## [Unreleased]` and the compare links (CONTRIBUTING, "Cutting a release").
 - Until its tag exists, you can rewrite a release section entirely: merge, drop superseded
   entries, move between sections, shorten.
 - After the tag the section is frozen. Fix only a broken link, anchor or rendering fault in
