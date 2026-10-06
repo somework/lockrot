@@ -149,10 +149,10 @@ final class AgeSignalParityTest extends TestCase
         } finally {
             $server->stop();
         }
-        // Enough of each signal fired for the equality to mean something (on 2026-10-01: 160, 42, 24).
-        self::assertGreaterThan(100, $fired[Signal::S2]);
-        self::assertGreaterThan(30, $fired[Signal::S4]);
-        self::assertGreaterThan(20, $fired[Signal::S8]);
+        // The clock is pinned and the answers recorded, so the counts are exact: a signal that
+        // stops firing on one package shows here, where the parity checks above only see the
+        // signals that fired. A re-recorded fixture moves them on purpose.
+        self::assertSame([Signal::S2 => 160, Signal::S4 => 42, Signal::S8 => 24], $fired);
     }
 
     /**
