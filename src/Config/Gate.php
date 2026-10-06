@@ -8,19 +8,12 @@ use Lockrot\Analyzer\Report;
 use Lockrot\Verdict\FailOn;
 
 /**
- * Whether a run fails, and where each finding stands against fail-on: the one decision behind the
- * exit code of `composer lockrot`, the `gate` its json and html documents write, and the install-time
- * block. {@see Policy::exitCode()} and the report read it; nothing else composes the same rule.
+ * The one decision behind the exit code of `composer lockrot`, the `gate` of the json and html
+ * reports, and the install-time block. {@see Policy::exitCode()} and the report read it. The rules
+ * are in docs/schema.md#the-gate.
  *
- * A finding reaches fail-on by {@see FailOn::reaches()}. It is exempt when the baseline already
- * accepted it (`known`; a worsened finding is measured like a new one), and it fails the run when it
- * reaches, nothing exempts it and the run judges findings at all, which a `--generate-baseline` run
- * does not. The run fails when a finding does, or when --strict-network is on and a lookup failed;
- * both causes are recorded when both hold.
- *
- * The annotation level the machine formats print ({@see \Lockrot\Output\FormatContext::levelOf()})
- * reads the same two primitives by a rule of its own: `error` exactly where a finding reaches and the
- * baseline did not accept it, in either mode.
+ * The annotation level of the machine formats ({@see \Lockrot\Output\FormatContext::levelOf()})
+ * reads the same two primitives by a rule of its own, see docs/ci.md#how-each-format-marks-a-finding.
  *
  * @internal
  */
@@ -94,7 +87,7 @@ final class Gate
         return $this->trippedBy !== [];
     }
 
-    /** @return list<string> the causes, in the order of {@see TRIPS}; empty exactly when the run passes */
+    /** @return list<string> the causes in the order of {@see TRIPS}, empty when the run passes */
     public function trippedBy(): array
     {
         return $this->trippedBy;

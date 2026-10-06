@@ -18,7 +18,6 @@ final class LockrotConfig
     private const INSTALL_TIME_BUDGET_MIN = 1;
     private const INSTALL_TIME_BUDGET_MAX = 120;
 
-    /** `on` prints the install-time block, `off` silences it. */
     public const INSTALL_TIME_VALUES = ['on', 'off'];
     public const INSTALL_TIME_ON = 'on';
 
@@ -54,9 +53,9 @@ final class LockrotConfig
     }
 
     /**
-     * @param array<string, mixed> $extra composer.json extra.lockrot
-     * @param array<string, mixed> $env environment variables
-     * @param array<string, mixed> $cli command-line options (fail-on, target-php, dev, offline, strict-network, format, baseline)
+     * @param array<string, mixed> $extra
+     * @param array<string, mixed> $env
+     * @param array<string, mixed> $cli   the options fail-on, target-php, dev, offline, strict-network, format and baseline
      */
     public static function fromSources(array $extra, array $env, array $cli, string $runtimePhp, ?string $platformPhp): self
     {
@@ -84,9 +83,9 @@ final class LockrotConfig
     }
 
     /**
-     * LOCKROT_DISABLE=1 (or `true`) silences all of lockrot for one command. Exposed on its own so
-     * the install-time hook can honour it before it parses `extra.lockrot` at all — otherwise a
-     * malformed config would still print a "check skipped" line on every install.
+     * Public, so that the install-time hook reads LOCKROT_DISABLE before it parses `extra.lockrot`:
+     * else a malformed config prints a "check skipped" line on every install.
+     * See docs/configuration.md#environment-overrides.
      *
      * @param array<string, mixed> $env
      */
@@ -96,9 +95,9 @@ final class LockrotConfig
     }
 
     /**
-     * Neither install-time key — nor install-time-budget, below — has a CLI option or an environment
-     * override: the install-time summary is a per-project decision, and LOCKROT_DISABLE already
-     * covers the "not right now" case.
+     * No install-time key has a CLI option or an environment override, because the summary is a
+     * per-project decision and LOCKROT_DISABLE covers a single command.
+     * See docs/install-time.md#time-budget.
      *
      * @param array<string, mixed> $extra
      */
@@ -117,9 +116,7 @@ final class LockrotConfig
     }
 
     /**
-     * See the docblock on {@see resolveInstallTime()}: no CLI option or environment override.
-     * Mirrors {@see Thresholds::fromArray()}'s integer-only rule (a digit string like "5" is
-     * rejected, not silently accepted).
+     * Takes integers only, like {@see Thresholds::fromArray()}: a digit string such as "5" is rejected.
      *
      * @param array<string, mixed> $extra
      */
@@ -143,19 +140,17 @@ final class LockrotConfig
      * @param array<string, mixed> $env
      * @param array<string, mixed> $cli
      *
-     * @return string a verdict, a priority or `none`; {@see FailOn::fromString()} rejects anything else
+     * @return string a verdict, a priority or `none`, as {@see FailOn::fromString()} accepts them
      */
     private static function resolveFailOn(array $extra, array $env, array $cli): string
     {
-        // `--fail-on=` arrives as an empty string. Falling through to the next source (or to `none`)
-        // would let a typo silently turn a gated build into an ungated one, the way an empty
-        // `--baseline=` would point it at a file nobody named; both are rejected.
+        // `--fail-on=` arrives as an empty string. If it falls through to the next source, a
+        // typo turns a gated build into an ungated one.
         if (($cli['fail-on'] ?? null) === '') {
             throw new ConfigException('--fail-on must not be empty');
         }
-        // Checked whenever it is set, not only when it wins: extra.lockrot is validated in full even
-        // where an option overrides it, and a variable a CI system carries into every run is no less
-        // a mistake on the runs where a command line happens to override it.
+        // Checked whenever it is set, not only when it wins, as extra.lockrot is validated in full
+        // even where an option overrides it.
         $fromEnv = $env['LOCKROT_FAIL_ON'] ?? null;
         if (\is_string($fromEnv) && $fromEnv !== '' && !\in_array($fromEnv, FailOn::allowed(), true)) {
             throw new ConfigException(\sprintf('LOCKROT_FAIL_ON must be one of %s; got "%s"', implode(', ', FailOn::allowed()), $fromEnv));
@@ -204,15 +199,9 @@ final class LockrotConfig
     }
 
     /**
-     * The name the report should call this project, when the manifest's own `name` is not it.
-     *
-     * A composer.json is not required to carry a name, and where it carries one it is not always
-     * the one a reader knows the project by: a package inside a monorepo names itself after the
-     * package, and a private project often after the client. This is read from the manifest rather
-     * than from a flag because it describes the project, not the run.
-     *
-     * It renames the report's `run.project` and nothing else. It does not keep the manifest's name
-     * out of a report: `run.root_package` is always that name, in every json and html report.
+     * The key renames the report's `run.project` and nothing else, as `run.root_package` always
+     * holds the manifest's name. It is read from the manifest rather than from a flag, because it
+     * describes the project, not the run. See docs/configuration.md#extralockrot-keys.
      *
      * @param array<string, mixed> $extra
      */
@@ -224,19 +213,17 @@ final class LockrotConfig
     }
 
     /**
-     * The baseline file's path, or null for the default `lockrot-baseline.json` next to
-     * composer.json. No environment override: which findings a project has accepted is a property
-     * of the project, not of the machine the run happens on.
+     * No environment override, because the findings that a project accepted belong to the project,
+     * not to the machine that runs it. See docs/baseline.md.
      *
      * @param array<string, mixed> $extra
      * @param array<string, mixed> $cli
      */
     private static function resolveBaseline(array $extra, array $cli): ?string
     {
-        // `--baseline=` arrives as an empty string. Falling through to the default file would mean a
-        // typo silently gates the build against a file the caller never named, so it is rejected
-        // instead. An empty `extra.lockrot.baseline` is caught earlier, by the config schema's
-        // minLength, and is left to fall through here.
+        // `--baseline=` arrives as an empty string. If it falls through to the default file, it gates
+        // the build against a file that nobody named. The config schema's minLength rejects an empty
+        // `extra.lockrot.baseline` earlier, so it falls through here.
         if (($cli['baseline'] ?? null) === '') {
             throw new ConfigException('--baseline must not be empty');
         }
@@ -262,7 +249,7 @@ final class LockrotConfig
         return $default;
     }
 
-    /** The resolved `fail-on` value — a verdict, a priority or `none`; {@see FailOn::fromString()} reads it. */
+    /** A verdict, a priority or `none`, as {@see FailOn::fromString()} reads it. */
     public function failOn(): string
     {
         return $this->failOn;
@@ -287,7 +274,6 @@ final class LockrotConfig
     {
         return $this->format;
     }
-    /** What `extra.lockrot.project` calls this project, or null where it says nothing. */
     public function project(): ?string
     {
         return $this->project;

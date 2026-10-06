@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace Lockrot\Config;
 
 /**
- * Where one finding stands against fail-on, as {@see Gate::decide()} decided it: whether it reaches
- * the threshold, what exempts it if something does, and whether it fails the run. A report writes it
- * as the finding's `gate`.
+ * Where one finding stands against fail-on, as {@see Gate::decide()} decided it. A report writes it
+ * as the finding's `gate`, see docs/schema.md#the-gate.
  *
  * @internal
  */
