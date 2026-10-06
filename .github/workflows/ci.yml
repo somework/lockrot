@@ -131,7 +131,16 @@ jobs:
       # tests/infection-equivalents.md records why every documented escape is equivalent. No
       # GitHub annotations: dozens of warnings about documented equivalents per run would only teach
       # people to ignore them; the escape listing is uploaded instead.
-      - run: $(composer global config bin-dir --absolute)/infection --threads=max --min-msi=${{ matrix.shard.min_msi }} --min-covered-msi=${{ matrix.shard.min_msi }} ${{ matrix.shard.filter }}
+      #
+      # --only-covering-test-cases since 2026-10-06: a mutant runs the test methods that cover its
+      # line, not every method of their classes. A test that never runs the line cannot tell the
+      # mutant apart; by file, a surviving mutant on a line JsonSchemaConformanceTest reaches paid for
+      # its 374 schema validations (20s) whatever few of them covered it. Over the whole tree locally
+      # the 91 escapes cost 2839 thread-seconds by file and 1777 by test case, the whole run 19m54s
+      # against 16m08s on 4 threads. The only verdicts it moved were seven kills by a test that fails
+      # in every mutant process (an unreadable file under Infection's include interceptor); tests
+      # that cover those lines kill all seven now.
+      - run: $(composer global config bin-dir --absolute)/infection --threads=max --only-covering-test-cases --min-msi=${{ matrix.shard.min_msi }} --min-covered-msi=${{ matrix.shard.min_msi }} ${{ matrix.shard.filter }}
       - if: always()
         uses: actions/upload-artifact@v7
         with: {name: 'infection (${{ matrix.shard.name }})', path: build/infection.log, if-no-files-found: ignore}
