@@ -6,11 +6,7 @@ namespace Lockrot\Data\Advisory;
 
 use Lockrot\Analyzer\RunNote;
 
-/**
- * What one {@see AdvisoryLoaderInterface::load()} call found, and what it could not do.
- *
- * @internal
- */
+/** @internal */
 final class AdvisoryBatch
 {
     /** @var array<string, list<Advisory>> */
@@ -33,7 +29,6 @@ final class AdvisoryBatch
         return new self([]);
     }
 
-    /** No lookup at all, for the one reason given. */
     public static function unavailable(RunNote $note): self
     {
         return new self([], [$note]);

@@ -4,18 +4,14 @@ declare(strict_types=1);
 
 namespace Lockrot\Data\Http;
 
-/**
- * Replays HTTP responses recorded on disk, so an acceptance run needs no network.
- *
- * @internal
- */
+/** @internal */
 final class RecordedHttpClient implements HttpClientInterface
 {
     private string $dir;
 
     public function __construct(string $dir)
     {
-        // Kept as given; pathFor() is the only reader and trims the trailing separator itself.
+        // Kept as given: pathFor() is the only reader and trims the trailing separator itself.
         $this->dir = $dir;
     }
 
@@ -26,7 +22,7 @@ final class RecordedHttpClient implements HttpClientInterface
 
     /**
      * @param list<string> $urls
-     * @param list<string> $headers ignored; recordings are headers-agnostic playback
+     * @param list<string> $headers ignored: a recording replays for any headers
      * @return array<string, HttpResult>
      */
     public function fetchAll(array $urls, array $headers = []): array

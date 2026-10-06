@@ -4,21 +4,12 @@ declare(strict_types=1);
 
 namespace Lockrot\Data\Forge;
 
-/**
- * What {@see ActivityFetchPlanner} decided to fetch, and what it left out and why, per forge.
- *
- * The two skip counts are kept apart because they have different remedies: packages skipped for
- * lack of credentials were never candidates for an activity-based verdict, while budget drops are
- * candidates that the anonymous request cap could not fit. The report adds them together, but the
- * split keeps the planner honest and testable.
- *
- * @internal
- */
+/** @internal */
 final class ActivityFetchPlan
 {
-    /** The run is anonymous on a capped forge and the package is not a candidate for an activity verdict. */
+    /** Anonymous run on a capped repository host, and no candidate for an activity verdict. */
     public const NO_TOKEN = 'no_token';
-    /** A candidate the anonymous request budget could not fit. */
+    /** A candidate that the anonymous request budget could not fit. */
     public const BUDGET = 'budget';
 
     /** @var list<RepoRef> */
@@ -36,10 +27,10 @@ final class ActivityFetchPlan
 
     /**
      * @param list<RepoRef>      $repos           unique repositories, ordered by package name
-     * @param array<string, int> $checkedPackages forge => packages that will receive activity data
-     * @param array<string, int> $skippedNoToken  forge => packages skipped as non-candidates under the anonymous cap
-     * @param array<string, int> $skippedBudget   forge => candidates the anonymous budget could not fit
-     * @param list<string>       $cappedForges    forges that were planned anonymously under a cap and had at least one repository
+     * @param array<string, int> $checkedPackages host => packages that will receive activity data
+     * @param array<string, int> $skippedNoToken  host => packages skipped as non-candidates under the anonymous cap
+     * @param array<string, int> $skippedBudget   host => candidates that the anonymous budget could not fit
+     * @param list<string>       $cappedForges    hosts planned anonymously under a cap with at least one repository
      * @param array<string, string> $skippedPackages package name => why its repository was not asked about ({@see self::NO_TOKEN}, {@see self::BUDGET})
      */
     public function __construct(array $repos, array $checkedPackages, array $skippedNoToken, array $skippedBudget, array $cappedForges, array $skippedPackages = [])
@@ -53,8 +44,7 @@ final class ActivityFetchPlan
     }
 
     /**
-     * Why each package's repository was not asked about, by package name — the counts above say how
-     * many, this says which, so a finding can record that the check behind it never ran
+     * Names the skipped packages, so that a finding can record that its check never ran
      * ({@see \Lockrot\Signal\Rule\NotCheckedRule}).
      *
      * @return array<string, string>
@@ -70,31 +60,24 @@ final class ActivityFetchPlan
         return $this->repos;
     }
 
-    /**
-     * Packages on $forge that will receive activity data: every package whose repository was
-     * selected, plus every package that shares a repository already selected by an earlier package.
-     * Two packages from the same repository both count here even though repos() lists it once.
-     */
+    /** Counts packages, not repositories: two packages of one repository count twice. */
     public function checkedPackages(string $forge): int
     {
         return $this->checkedPackages[$forge] ?? 0;
     }
 
-    /** Packages on $forge skipped because the run is anonymous there and they are not candidates for an activity verdict. */
     public function skippedNoToken(string $forge): int
     {
         return $this->skippedNoToken[$forge] ?? 0;
     }
 
-    /** Candidate packages on $forge dropped because the anonymous request budget was already spent. */
     public function skippedBudget(string $forge): int
     {
         return $this->skippedBudget[$forge] ?? 0;
     }
 
     /**
-     * The forges whose anonymous cap shaped this plan — each had at least one repository and no
-     * credentials — in {@see RepoRef::FORGES} order. The report states the cap for each.
+     * The hosts with at least one repository and no credentials, in {@see RepoRef::FORGES} order.
      *
      * @return list<string>
      */

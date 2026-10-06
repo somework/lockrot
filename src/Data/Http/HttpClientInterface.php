@@ -10,7 +10,7 @@ interface HttpClientInterface
     /**
      * @param list<string> $urls
      * @param list<string> $headers raw "Name: value" lines applied to every request in the batch
-     * @return array<string, HttpResult> keyed by URL; every requested URL is present
+     * @return array<string, HttpResult> keyed by URL, every requested URL is present
      */
     public function fetchAll(array $urls, array $headers = []): array;
 }

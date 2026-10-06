@@ -7,20 +7,17 @@ namespace Lockrot\Data\Forge;
 use Lockrot\Data\Http\HttpClientInterface;
 
 /**
- * Fetches repository activity from every forge in one go: the repositories are grouped by host
- * (headers differ per forge, and lockrot's GitLab token goes to gitlab.com alone), each group is
- * one parallel `fetchAll`, and each forge's {@see ForgeApi} reads its own answers.
+ * Groups the repositories by host (the headers differ per host, and lockrot's GitLab token goes
+ * to gitlab.com alone) and sends each group as one parallel `fetchAll`.
  *
- * The first request an api lists for a repository is the one that decides: a 404 there is "not
- * found", any other failure fails the repository. A later request is enrichment (GitLab's project
- * document, for the archived flag) and is read when it answered; when it did not, the repository
- * keeps what the first request said.
+ * The first request that a {@see ForgeApi} lists for a repository decides: a 404 there means not
+ * found, any other failure fails the repository. A later request only enriches the answer, and
+ * the repository keeps the first answer when that request fails.
  *
  * @internal
  */
 final class ActivityClient
 {
-    /** Fixed cache TTL for repository activity, whichever forge; there is no user-facing knob for it. */
     public const CACHE_TTL = 86400;
 
     private HttpClientInterface $http;
@@ -72,7 +69,6 @@ final class ActivityClient
                         $cachedAt = $result->fetchedAt();
                     }
                     if ($fetchedAt === null) {
-                        // The deciding request.
                         if ($result->isNotFound()) {
                             $notFound[$forge][] = $repo->key();
                             continue 2;
@@ -101,7 +97,7 @@ final class ActivityClient
         return new ActivityBatch($activity, $notFound, $failed, $rateLimited);
     }
 
-    /** Unreachable: every api lists at least one request, so a fetch time is always recorded. Typed for PHPStan. */
+    /** Unreachable: every api lists at least one request. Typed for PHPStan. */
     private function neverFetched(): \DateTimeImmutable
     {
         throw new \LogicException('a forge api listed no request');

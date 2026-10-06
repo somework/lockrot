@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace Lockrot\Data\Forge;
 
 /**
- * A source repository on one of the hosts lockrot can ask about activity: which forge, which host,
- * and the repository's path there (`owner/repo` on GitHub and Bitbucket, `group/sub/project` on
- * GitLab, where subgroups nest).
+ * The path is `owner/repo` on GitHub and Bitbucket, and `group/sub/project` on GitLab, where
+ * subgroups nest.
  *
  * @internal
  */
@@ -17,16 +16,12 @@ final class RepoRef
     public const GITLAB = 'gitlab';
     public const BITBUCKET = 'bitbucket';
 
-    /** Every forge, in the order the report's notes name them. */
+    /** Every repository host, in the order that the report's notes name them. */
     public const FORGES = [self::GITHUB, self::GITLAB, self::BITBUCKET];
 
     private const LABEL = [self::GITHUB => 'GitHub', self::GITLAB => 'GitLab', self::BITBUCKET => 'Bitbucket'];
 
-    /**
-     * What the S4 date measures on each forge. GitHub reports the last push to any branch; GitLab
-     * and Bitbucket are asked for the newest commit across all branches, which is the closest
-     * observable equivalent and is named for what it is.
-     */
+    /** GitLab and Bitbucket have no push date: the newest commit on any branch is the closest. */
     private const ACTIVITY = [self::GITHUB => 'last push', self::GITLAB => 'last commit', self::BITBUCKET => 'last commit'];
 
     private string $forge;
@@ -34,9 +29,8 @@ final class RepoRef
     private string $path;
 
     /**
-     * @param string $host the host as Composer names it in its own configuration: `github.com`,
-     *                     `bitbucket.org`, or an entry of `gitlab-domains` (which may carry a
-     *                     port or a path prefix, `gitlab.example.com/gitlab`)
+     * @param string $host `github.com`, `bitbucket.org` or an entry of `gitlab-domains`, which can
+     *                     carry a port or a path prefix (`gitlab.example.com/gitlab`)
      */
     public function __construct(string $forge, string $host, string $path)
     {
@@ -60,7 +54,7 @@ final class RepoRef
         return $this->path;
     }
 
-    /** One string per repository, across forges: `github.com/owner/repo`. */
+    /** Unique across repository hosts: `github.com/owner/repo`. */
     public function key(): string
     {
         return $this->host.'/'.$this->path;
@@ -76,7 +70,6 @@ final class RepoRef
         return self::LABEL[$forge];
     }
 
-    /** The wording of the S4 signal on this forge: `last push` or `last commit`. */
     public function activityWording(): string
     {
         return self::ACTIVITY[$this->forge];

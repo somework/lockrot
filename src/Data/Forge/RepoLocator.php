@@ -7,16 +7,12 @@ namespace Lockrot\Data\Forge;
 use Composer\Config;
 
 /**
- * Turns a package's repository URL — its clone URL, or a `support.source` already reduced to the
- * repository by {@see SupportSource} — into a {@see RepoRef}, or null when the URL points somewhere
- * lockrot does not ask about activity.
+ * Turns a clone URL, or a `support.source` that {@see SupportSource} reduced, into a {@see RepoRef}.
+ * It returns null for a host that lockrot does not ask: docs/internals.md, "Which host is asked".
  *
- * `github.com` and `bitbucket.org` are fixed. GitLab hosts come from Composer's own
- * `gitlab-domains` setting (`gitlab.com` by default), so a self-hosted instance the project already
- * installs from is recognised without any lockrot configuration of its own. A domain may carry a
- * path prefix (`gitlab.example.com/gitlab`, a GitLab in a non-root context), matched the way
- * Composer matches it. GitHub Enterprise (`github-domains`) is not recognised: its API base and
- * authentication path differ from github.com's and nothing has asked for it yet.
+ * GitLab hosts come from Composer's `gitlab-domains`. A domain can carry a path prefix, matched as
+ * Composer matches it. GitHub Enterprise is not recognised: its API base and authentication
+ * differ from github.com's.
  *
  * @internal
  */
@@ -60,7 +56,7 @@ final class RepoLocator
         [$host, $path] = $parts;
         $lowerHost = strtolower($host);
         if ($lowerHost === 'www.github.com') {
-            // Composer's GitHubDriver reads the www. form as github.com; so does lockrot.
+            // Composer's GitHubDriver reads the www. form as github.com, and so does lockrot.
             $lowerHost = 'github.com';
         }
         if ($lowerHost === 'github.com') {
@@ -80,11 +76,11 @@ final class RepoLocator
     }
 
     /**
-     * Host (with its port, when the URL names one) and path of a clone URL in any of the shapes a
-     * lock file records: `https://host/path.git`, `https://user@host/path`, `git://host/path`,
-     * `ssh://git@host/path.git` and the scp-like `git@host:path.git`. The slash-separated
-     * `git@host/path.git` is not a URL git accepts, but locks have carried it and earlier lockrot
-     * versions read it, so it stays readable; a bare `host/path` without the user part does not.
+     * Host (with its port, when the URL names one) and path of a clone URL in any shape that a lock
+     * records: `https://host/path.git`, `https://user@host/path`, `git://host/path`,
+     * `ssh://git@host/path.git` and the scp-like `git@host:path.git`. The slash form
+     * `git@host/path.git` is no URL that git accepts, but locks carry it, so it stays readable. A
+     * bare `host/path` without the user part is not readable.
      *
      * @return array{0: string, 1: string}|null
      */
@@ -120,14 +116,11 @@ final class RepoLocator
     }
 
     /**
-     * Host and port are matched the way Composer's GitLabDriver matches a `gitlab-domains` entry
-     * against a clone URL ({@see \Composer\Repository\Vcs\GitLabDriver::determineOrigin()}): the
-     * entry matches the URL's host with its port, or its bare host when the entry names no port.
-     * A URL that omits a port the entry spells out is not that GitLab for Composer, so not for
-     * lockrot either. The ref's host is the URL's host, port included, plus the entry's path prefix
-     * — Composer's origin for the URL, which is both the API base and the key Composer files the
-     * credentials under. (So a `gitlab.com:443` URL is not `gitlab.com` to {@see ForgeAuth} and gets
-     * no `GITLAB_TOKEN`; Composer's origin has the same quirk.)
+     * Matched as Composer's GitLabDriver matches a `gitlab-domains` entry against a clone URL
+     * ({@see \Composer\Repository\Vcs\GitLabDriver::determineOrigin()}): the entry matches the URL's
+     * host with its port, or its bare host when the entry names no port. The ref's host is
+     * Composer's origin for the URL: the API base and the key of its credentials. So a
+     * `gitlab.com:443` URL is not `gitlab.com` to {@see ForgeAuth}, and gets no `GITLAB_TOKEN`.
      *
      * @param string $domain    a `gitlab-domains` entry: `host`, `host:port` or `host[:port]/prefix`
      * @param string $lowerHost the URL's host, lowercased, with its port when it has one
@@ -151,8 +144,8 @@ final class RepoLocator
             $path = substr($path, \strlen($prefix));
         }
         $path = ltrim($path, '/');
-        // Two segments at least; a segment that is exactly `-` starts GitLab's web routes
-        // (`/group/project/-/tree/main`), which is a page, not a clone URL.
+        // Two segments at least. A segment that is exactly `-` starts GitLab's web routes
+        // (`/group/project/-/tree/main`), a page and no clone URL.
         if (preg_match('{^'.self::SEGMENT.'(?:/'.self::SEGMENT.')+$}', $path) !== 1 || \in_array('-', explode('/', $path), true)) {
             return null;
         }
@@ -160,7 +153,6 @@ final class RepoLocator
         return new RepoRef(RepoRef::GITLAB, $lowerHost.$prefix, $path);
     }
 
-    /** Without a trailing slash or `.git`, with one leading slash. */
     private static function normalise(string $path): string
     {
         $path = rtrim($path, '/');

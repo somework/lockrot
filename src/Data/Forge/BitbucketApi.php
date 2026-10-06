@@ -7,14 +7,12 @@ namespace Lockrot\Data\Forge;
 use Lockrot\Data\Http\HttpResult;
 
 /**
- * `GET /2.0/repositories/{workspace}/{slug}/commits?pagelen=1`: the newest commit across every
- * branch. Bitbucket Cloud has no archived state, so S3 never fires here. The repository document
- * would add nothing (`updated_on` moves on settings changes as well as pushes) and the anonymous
- * quota is 60 requests an hour, so it is not fetched.
+ * Reads the newest commit across every branch: docs/internals.md, "What is sent". The repository
+ * document is not fetched: `updated_on` moves on settings changes as well as pushes, and a second
+ * request uses the anonymous cap.
  *
- * lockrot sends no credentials of its own to Bitbucket; Composer's (`http-basic` with an API
- * token, or a `bitbucket-oauth` consumer once exchanged, see {@see ForgeAuth}) are added by
- * Composer's HTTP layer.
+ * lockrot sends no credentials of its own to Bitbucket: Composer's HTTP layer adds Composer's
+ * ({@see ForgeAuth}).
  *
  * @internal
  */

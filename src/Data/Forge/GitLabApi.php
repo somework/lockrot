@@ -7,17 +7,11 @@ namespace Lockrot\Data\Forge;
 use Lockrot\Data\Http\HttpResult;
 
 /**
- * Two calls under `/api/v4/projects/{path}`, on gitlab.com or a self-hosted instance.
+ * The newest commit across every branch is the nearest thing to GitHub's `pushed_at`. The
+ * project's `last_activity_at` is not used: it moves on stars, forks and issue traffic.
  *
- * `repository/commits?all=true&per_page=1` is the newest commit across every branch — the
- * nearest thing to GitHub's `pushed_at` — and answers anonymously for a public project. The
- * project's `last_activity_at` is not used: it moves on stars, forks and issue traffic, so a
- * repository untouched since 2012 can show activity from 2022.
- *
- * The project document itself is what carries `archived`, and only for an authenticated caller:
- * an anonymous request gets GitLab's basic projection, which leaves the flag out. So that call is
- * made only when the request carries credentials, and without them a GitLab repository can be
- * `silent` but never `abandoned` for being archived.
+ * Only an authenticated request to the project document carries `archived`: an anonymous request
+ * gets GitLab's basic projection, which omits it. See docs/internals.md, "What is sent".
  *
  * @internal
  */
