@@ -10,6 +10,7 @@ use Composer\Package\Loader\ArrayLoader;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Lock\LockedPackage;
 use Lockrot\Lock\LockFile;
+use Lockrot\Tests\Support\JsonPath;
 use PHPUnit\Framework\TestCase;
 
 final class LockFileTest extends TestCase
@@ -267,8 +268,8 @@ final class LockFileTest extends TestCase
 
     /**
      * TransactionPackages::fromTransaction() cannot know a package's dev-ness and always says
-     * false; an entry the lock already lists under packages-dev must stay dev when overlaid, or
-     * `--no-dev` chain building would start seeing it.
+     * false. An entry that the lock lists under packages-dev must stay dev when overlaid, or
+     * `--no-dev` chain building sees it.
      */
     public function testWithPackagesKeepsTheExistingEntrysDevFlagWhenOverridden(): void
     {
@@ -296,8 +297,9 @@ final class LockFileTest extends TestCase
 
     public function testRealFixtureCounts(): void
     {
-        $lock = LockFile::fromFile(__DIR__.'/../../fixtures/apps/wallabag_wallabag/composer.lock');
-        self::assertCount(200, $lock->packages(false));
+        $path = __DIR__.'/../../fixtures/apps/wallabag_wallabag/composer.lock';
+        $lock = LockFile::fromFile($path);
+        self::assertCount(\count(JsonPath::arrayAt(JsonPath::decodeFile($path), ['packages'])), $lock->packages(false));
         $rulerz = $lock->find('wallabag/rulerz');
         self::assertNotNull($rulerz);
         self::assertTrue($rulerz->isBranchSnapshot());
