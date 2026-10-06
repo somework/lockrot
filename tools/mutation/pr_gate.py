@@ -3,24 +3,16 @@
 
     python3 tools/mutation/pr_gate.py build/infection.log [more.log ...] tests/infection-equivalents.md
 
-On a pull request each mutation shard mutates only the lines the request changes (ci.yml), so a
-shard sees a handful of mutants, often none, and a minimum MSI over a handful is noise. This gate
-reads the escaped mutants of Infection's text log instead, and fails on one that no entry of
-tests/infection-equivalents.md accounts for. Every escape goes to the step summary either way.
+On a pull request each mutation shard mutates only the lines the request changes (ci.yml), and a
+minimum MSI over a handful of mutants is noise. This gate reads the escaped mutants of Infection's
+text log instead, and fails on one that no entry of tests/infection-equivalents.md accounts for.
+Every escape goes to the step summary either way.
 
-An escape is keyed so that a line added or removed above it leaves the key alone: its file, its
-mutator and the line Infection mutated, whitespace-normalised (read from the checked-out file at the
-line the log reports, since the log's diff drops comments). When that text occurs more than once in
-the file, the enclosing method is the key instead. An entry of the documented list gives that key in
-one of two forms:
-
-- `src/Path/File.php` Mutator `the original line` -- the form that does not drift;
-- `src/Path/File.php:123` Mutator -- read through the checked-out source (the text at line 123),
-  until the list is re-keyed in the first form.
-
-An entry accounts for as many escapes as it names the mutator ("x2" counts twice). A section whose
-heading says its mutants are not equivalent accounts for nothing. Exit code 1 when an escape is not
-accounted for, 2 when a log or the list cannot be read, 0 otherwise. Standard library only.
+An escape is keyed on its file, its mutator and the line Infection mutated, whitespace-normalised,
+so that a line added or removed above it leaves the key alone. When that text occurs more than once
+in the file, the enclosing method is the key instead. tests/infection-equivalents.md gives the form
+of an entry. Exit code 1 when an escape is not accounted for, 2 when a log or the list cannot be
+read, 0 otherwise. Standard library only.
 """
 
 import os
@@ -30,11 +22,9 @@ from typing import Dict, List, NamedTuple, Optional, Tuple
 
 HEADER = re.compile(r'^\d+\) \S*?/?(src/\S+\.php):(\d+)\s+\[M\] (\w+) \[ID\]')
 SECTION = re.compile(r'^([A-Z][A-Za-z ]+) mutants:$')
-TOKEN = re.compile(
-    r'`(?P<path>src/[\w/]+\.php)(?::(?P<line>\d+))?`'
-    r'|`:(?P<bare>\d+)`'
-    r'|`(?P<code>[^`]+)`'
-    r'|(?<![A-Za-z])(?P<mutator>[A-Z][a-z]+(?:[A-Z][a-z0-9]*)*_?)(?:\s+x(?P<times>\d+))?(?![A-Za-z])'
+MUTATOR = r'[A-Z]\w*(?: x\d+)?'
+ENTRY = re.compile(
+    r'^- `(?P<path>src/[\w/]+\.php)` (?P<mutators>' + MUTATOR + r'(?:(?:,| and|, and) ' + MUTATOR + r')*) `(?P<code>[^`]+)`(?P<reason>.*)$'
 )
 FUNCTION = re.compile(r'\bfunction\s+(\w+)\s*\(')
 Key = Tuple[str, str, str]
@@ -99,66 +89,45 @@ class Source:
                 return match.group(1)
         return ''
 
-    def keys(self, path: str, mutator: str, line: int, text: str) -> List[Key]:
+    def keys(self, path: str, mutator: str, line: int, text: str, methods: Tuple[str, ...] = ()) -> List[Key]:
         """The one key a mutant answers to: the line's text when it is unique in the file, else the
-        enclosing method. Never both: the method would let one documented mutant cover another line."""
+        enclosing method. Never both: the method would let one documented mutant cover another line.
+        An entry has no line: of the methods that hold its text, it takes the one its reason names."""
         occurrences = [n for n, candidate in enumerate(self.lines(path), 1) if normalise(candidate) == text]
         if text and len(occurrences) == 1:
             return [(path, mutator, 'text:' + text)]
-        method = self.method(path, line or (occurrences[0] if occurrences else 0))
+        if line:
+            method = self.method(path, line)
+        else:
+            method = next((m for m in (self.method(path, n) for n in occurrences) if m in methods), '')
         return [(path, mutator, 'method:' + method)] if method else []
 
 
 def entries(markdown: str) -> List[str]:
-    """The entries of the documented list: list items, and paragraphs opening with a source reference."""
-    blocks: List[List[str]] = []
-    not_equivalent = False
+    """The list items of the documented list, each joined with its indented continuation lines."""
+    found: List[str] = []
     for line in markdown.splitlines():
-        if line.startswith('#'):
-            # A section listing mutants that are detections, not equivalents, accounts for nothing.
-            not_equivalent = 'not equivalent' in line.lower()
-            blocks.append([])
-            continue
-        if not_equivalent:
-            continue
-        if line.startswith('- ') or re.match(r'^`?src/[\w/]+\.php:\d+', line):
-            blocks.append([line])
-        elif blocks and blocks[-1] and line.strip() and (line.startswith((' ', '\t')) or not blocks[-1][0].startswith('- ')):
-            blocks[-1].append(line)
-        else:
-            blocks.append([])
-    return [' '.join(block) for block in blocks if block]
+        if line.startswith('- '):
+            found.append(line)
+        elif found and line.startswith((' ', '\t')) and line.strip():
+            found[-1] += ' ' + line.strip()
+        elif line.strip():
+            found.append('')
+    return [entry for entry in found if entry]
 
 
 def allowances(markdown: str, source: Source) -> List[list]:
     """One claim per mutator an entry names: [the keys it answers to, how many escapes it covers]."""
     found: List[list] = []
-
-    def add(keys: List[Key], count: int) -> None:
-        if keys:
-            found.append([set(keys), count])
-
     for entry in entries(markdown):
-        # A paragraph entry may open with an unquoted reference; quote it so it reads as one.
-        entry = re.sub(r'^(src/[\w/]+\.php:\d+)', r'`\1`', entry)
-        path: Optional[str] = None
-        line = 0
-        pending: List[Tuple[str, int]] = []
-        for match in TOKEN.finditer(entry):
-            if match.group('path'):
-                path, line, pending = match.group('path'), int(match.group('line') or 0), []
-            elif match.group('bare') and path:
-                line, pending = int(match.group('bare')), []
-            elif match.group('mutator') and path:
-                count = int(match.group('times') or 1)
-                if line:
-                    add(source.keys(path, match.group('mutator'), line, source.text(path, line)), count)
-                else:
-                    pending.append((match.group('mutator'), count))
-            elif match.group('code') and path and not line and pending:
-                for mutator, count in pending:
-                    add(source.keys(path, mutator, 0, normalise(match.group('code'))), count)
-                pending = []
+        match = ENTRY.match(entry)
+        if not match:
+            continue
+        methods = tuple(re.findall(r'\b(\w+)\(\)', match.group('reason')))
+        for mutator in re.finditer(r'([A-Z]\w*)(?: x(\d+))?', match.group('mutators')):
+            keys = source.keys(match.group('path'), mutator.group(1), 0, normalise(match.group('code')), methods)
+            if keys:
+                found.append([set(keys), int(mutator.group(2) or 1)])
     return found
 
 

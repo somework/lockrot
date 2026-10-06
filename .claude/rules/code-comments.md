@@ -58,5 +58,5 @@ after a tag gives only what the type cannot: a unit, a key, an order, the allowe
 A comment or docblock has at most six lines of text, tag lines not counted. A file header that
 `CONTRIBUTING.md` points to can be longer. A longer reason goes in a repository Markdown file or
 the PR, and the comment links it. A ledger (`tests/infection-equivalents.md`) is the one list of
-its sites. Other files link it. Each entry names the symbol and the mutator, with no line, date,
-version or measurement.
+its sites. Other files link it. Each entry names the file, the mutator and the mutated line, with
+no line number, date, version or measurement.
