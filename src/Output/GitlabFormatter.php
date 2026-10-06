@@ -11,44 +11,20 @@ use Lockrot\Lock\LockLineIndex;
 use Lockrot\Verdict\Finding;
 
 /**
- * GitLab Code Quality JSON, one object per flagged finding (every finding with `--all`), for a job
- * that publishes `artifacts.reports.codequality`. Every tier shows, in the merge request, the
- * findings that are new or fixed compared with the target branch's report, so a merge request that
- * changes no verdict shows none; Premium's pipeline Code Quality tab lists them all; Ultimate also
- * marks new findings on the lock's lines in the Changes view when the merge request changes the
- * lock. `location.path` is the analysed lock's path relative to the project directory
- * ({@see FormatContext::lockName()}): `composer.lock`, or `alt.lock` under `COMPOSER=alt.json`.
+ * GitLab Code Quality JSON: docs/ci.md#-formatgitlab. The report format is at
+ * https://docs.gitlab.com/ci/testing/code_quality/#code-quality-report-format
  *
- * Shape per https://docs.gitlab.com/ci/testing/code_quality/#code-quality-report-format ("Code
- * Quality report format"): each issue needs `description`, `check_name`, `fingerprint`, `severity` (one of
- * `info`, `minor`, `major`, `critical`, `blocker`) and a location with either `lines.begin` or
- * `positions.begin.line`; `type` and `categories` are accepted but not required by GitLab's own
- * parser — kept here for compatibility with tools that still expect the CodeClimate shape GitLab's
- * format is descended from.
- *
- * Severity reuses FormatContext::levelOf() so an issue's colour tracks the same fail-on threshold
- * the exit code does: `error` -> `major`, `warning` -> `minor`, `note` (a baselined-known finding,
- * or an unflagged row only visible under `--all`) -> `info`.
- *
- * Report::notes() has no field to carry a document-level note in this shape, so notes are dropped
- * here; use `--format=json` for them. `--strict-network` still drives the exit code independently
- * of the chosen format.
- *
- * The fingerprint is `sha256("lockrot|<package>|<verdict>")`: stable across machines and runs, and
- * deliberately excludes the line number and version, so a version bump that keeps the same verdict
- * — or a reformatted composer.lock that moves the entry to a different line — keeps the same GitLab
- * issue identity instead of appearing as a new one. Nor is the lock's path, so pointing
- * `COMPOSER` at another manifest does not reopen every issue. The priority is deliberately not part of it:
- * a package that moves from a `require` to a `require-dev` would otherwise open a second issue for
- * a finding GitLab already tracks.
+ * The `fingerprint` must not hold the line, the version, the lock's path or the priority, so the
+ * GitLab issue keeps its identity when they change (docs/compatibility.md#finding-identity).
  *
  * @internal
  */
 final class GitlabFormatter implements FormatterInterface
 {
+    /** GitLab does not require `type` or `categories`. Tools that expect CodeClimate read them. */
     private const CATEGORIES = ['Bug Risk'];
 
-    /** The line GitLab is told about when LockLineIndex could not find one; GitLab requires a line. */
+    /** GitLab requires a line, and LockLineIndex can find none. */
     private const FALLBACK_LINE = 1;
 
     private FormatContext $context;
@@ -105,8 +81,7 @@ final class GitlabFormatter implements FormatterInterface
     {
         $evidence = $finding->evidenceLine();
 
-        // Code Quality has no title field of its own, so the verdict and priority ride in the
-        // description — the same `<verdict> (<priority>)` phrase the GitHub annotation title uses.
+        // Code Quality has no title field, so the verdict and the priority go in the description.
         $message = $finding->package().' '.$finding->version()
             .' — '.$finding->verdict().' ('.$finding->priority().')';
         if ($evidence !== '') {
@@ -120,9 +95,7 @@ final class GitlabFormatter implements FormatterInterface
     private static function encode(array $issues): string
     {
         $json = JsonWriter::encode($issues, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES);
-        // Every value above is a scalar, list or string-keyed array built from Report data, so this
-        // is unreachable in practice; guarded explicitly so a future encoding failure fails loudly
-        // instead of silently emitting the string "false" (same guard as JsonFormatter).
+        // Report data always encodes. This guard keeps a failure from becoming the string "false".
         if ($json === null) {
             throw new \RuntimeException('Cannot encode report as GitLab Code Quality JSON: '.json_last_error_msg());
         }

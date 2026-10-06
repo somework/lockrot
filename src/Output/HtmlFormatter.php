@@ -11,21 +11,13 @@ use Lockrot\Json\JsonWriter;
 use Lockrot\Verdict\Verdict;
 
 /**
- * The report as one page: `--format=html`.
+ * The report as one self-contained page: docs/ci.md#-formathtml.
  *
- * Self-contained on purpose. Playwright's HTML reporter ships a folder and a server because it has
- * traces and videos to serve; lockrot has nothing that cannot live inside the document, so the whole
- * run goes into one file that opens from `file://`, downloads from CI as a single artifact and
- * attaches to a ticket. No server, no network.
- *
- * The page itself is built in its own repository, somework/lockrot-report, and vendored here as
- * resources/report/report.html: its script and stylesheet already inline, both pinned by the
- * Content-Security-Policy the page carries. tools/report/update-renderer brings a release in after
- * checking its build provenance, and {@see \Lockrot\Tests\Unit\Output\RendererManifestTest} checks
- * the file against the manifest that came with it. This class fills three placeholders and adds
- * nothing to the page that could run.
- *
- * What the page renders from is {@see ReportDocument}; this class only assembles.
+ * The page is built in https://github.com/somework/lockrot-report and vendored as
+ * resources/report/report.html, which tools/report/update-renderer updates. A test checks the file
+ * against its manifest ({@see \Lockrot\Tests\Unit\Output\RendererManifestTest}). Its script and
+ * stylesheet are inline and pinned by its Content-Security-Policy, so this class only fills three
+ * placeholders.
  *
  * @internal
  */
@@ -36,9 +28,8 @@ final class HtmlFormatter implements FormatterInterface
     private PageData $page;
 
     /**
-     * Alone among the formatters, this one takes no FormatContext: what the page needs from the
-     * run — the target PHP, the thresholds, the lock's name, the fail-on — is in the report
-     * itself, and a second copy beside it could only disagree with it.
+     * Takes no FormatContext: the report holds what the page needs, and a second copy can disagree
+     * with it.
      */
     public function __construct(?PageData $page = null)
     {
@@ -56,11 +47,6 @@ final class HtmlFormatter implements FormatterInterface
         ]);
     }
 
-    /**
-     * The sentence under the title wherever the page is linked — a search result, a Slack unfurl, a
-     * post. It says what was found, because that is what the reader is deciding whether to open,
-     * and it names the three verdicts that carried the most packages rather than all nine.
-     */
     private static function description(Report $report): string
     {
         $flagged = \count($report->flagged());
@@ -86,7 +72,6 @@ final class HtmlFormatter implements FormatterInterface
             .'. Each finding carries its evidence, the release branches behind it and any security advisory.';
     }
 
-    /** What the tab says, which is the first thing anyone sees of a downloaded artifact. */
     private static function title(Report $report): string
     {
         $flagged = \count($report->flagged());
@@ -98,12 +83,9 @@ final class HtmlFormatter implements FormatterInterface
     }
 
     /**
-     * The payload, safe to sit inside `<script type="application/json">`.
-     *
-     * An HTML parser ends that element at the first `</script`, wherever it appears, and it stops
-     * parsing at `<!--` too. Both can reach here through a package's own description, name or
-     * advisory title, so both are written as escapes that JSON reads back as the same string.
-     * `JSON_HEX_*` would do it as well but at the cost of every quote in the document.
+     * Safe inside `<script type="application/json">`: an HTML parser ends that element at the first
+     * `</script` and stops parsing at `<!--`, and package metadata can hold both. JSON reads the
+     * escapes back as the same string. `JSON_HEX_*` also escapes every quote.
      *
      * @param array<string, mixed> $document
      */
@@ -117,7 +99,6 @@ final class HtmlFormatter implements FormatterInterface
         return str_replace(['</', '<!--'], ['<\\/', '<\\u0021--'], $json);
     }
 
-    /** Escapes a string for HTML text, the way the page's own renderer does for everything else. */
     private static function text(string $value): string
     {
         return htmlspecialchars($value, \ENT_QUOTES | \ENT_SUBSTITUTE, 'UTF-8');
@@ -126,8 +107,7 @@ final class HtmlFormatter implements FormatterInterface
     private static function template(): string
     {
         $contents = file_get_contents(self::TEMPLATE);
-        // The page ships inside the package and the PHAR, so a failure here means a broken
-        // install rather than anything a run can recover from.
+        // A failure here is a broken install, not something a run can recover from.
         if ($contents === false) {
             throw new \RuntimeException('Cannot read the report page '.basename(self::TEMPLATE));
         }

@@ -9,22 +9,10 @@ use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
 
 /**
- * The install-time block: a report compressed into at most ten Composer IO lines, meant to be read
- * in passing while `composer require` runs, not studied.
- *
- * Two blocks, never both: the flagged one, and — when nothing is flagged but a lookup failed — a
- * shorter "could not be checked" one. Only a run where nothing is flagged *and* every lookup
- * succeeded prints nothing at all, so silence always means "checked, and clean".
- *
- * {@see MAX_LINES} counts logical lines — one array entry in the returned list, one line as
- * IOInterface::writeErrorRaw() writes it — not rendered terminal rows; a long evidence line can still
- * wrap past one row in a narrow terminal.
- *
- * Unlike {@see TableFormatter} this returns lines rather than one string, because
- * IOInterface::writeErrorRaw() takes string|string[] and writes each as a line of its own. Each line
- * is {@see ConsoleMarkup} for {@see ConsoleMarkup::render()}, written raw: never Composer's
- * formatter, which cannot be trusted with the lock's text ({@see ConsoleMarkup} says why) and whose
- * sanitising a raw write skips. What the lock and the repository wrote is therefore neutralised
+ * The install-time block: at most ten Composer IO lines (docs/install-time.md). It returns a list,
+ * because IOInterface::writeErrorRaw() writes each entry as a line, and {@see MAX_LINES} counts
+ * those entries, not terminal rows. Each line is {@see ConsoleMarkup}, written raw: a raw write
+ * skips Composer's sanitising, so text from the lock and the repository is neutralised
  * ({@see TerminalText::neutralise()}) as well as escaped.
  *
  * @internal
@@ -32,25 +20,24 @@ use Lockrot\Verdict\Verdict;
 final class InstallSummaryFormatter
 {
     public const MAX_LINES = 10;
-    /** Metadata, repository activity and advisories can each leave one note; the block shows them all. */
+    /** Metadata, repository activity and advisories can each leave one note, and the block shows them all. */
     public const MAX_NOTES = 3;
 
-    /** Header and footer always take one line each; the rest is shared by findings and notes. */
+    /** Header and footer always take one line each, and findings and notes share the rest. */
     private const FIXED_LINES = 2;
 
     private const FOOTER = 'Run composer lockrot for details.';
 
     /**
-     * @return list<string> Composer IO-formatted lines; [] only when nothing is flagged *and*
-     *                      every lookup succeeded
+     * @return list<string> Composer IO lines, empty only when nothing is flagged and every lookup
+     *                      succeeded
      */
     public function format(Report $report): array
     {
         $flagged = $report->flagged();
         if ($flagged === []) {
-            // A package whose metadata never arrived is `unknown`, which sits below the flagged
-            // threshold — so an exhausted budget or an unreachable repository would otherwise print
-            // nothing at all and read as a clean install. Say what could not be checked instead.
+            // `unknown` is not flagged, so without this branch an exhausted budget or an unreachable
+            // repository prints nothing and reads as a clean install.
             return $report->hadNetworkFailures() ? $this->uncheckedLines($report) : [];
         }
 
@@ -76,19 +63,13 @@ final class InstallSummaryFormatter
         return $lines;
     }
 
-    /**
-     * Header, the notes carrying the reason (e.g. "Repository metadata unavailable for 4 packages:
-     * not checked: install-time budget exhausted"), footer — at most 4 lines.
-     *
-     * @return list<string>
-     */
+    /** @return list<string> */
     private function uncheckedLines(Report $report): array
     {
         $checked = $report->packagesChecked();
         $unknown = $report->byVerdict()[Verdict::UNKNOWN];
-        // Metadata arrived for every package but a later lookup failed — the advisory request, a
-        // repository host: nothing is `unknown`, and "0 of 3 could not be checked" would say the
-        // opposite of what the notes below say.
+        // Nothing is `unknown` when a later lookup failed (advisories, a repository host), and
+        // "0 of 3 could not be checked" contradicts the notes.
         $lines = [$unknown === 0
             ? \sprintf('<warning>lockrot: %d changed %s checked, one check incomplete</warning>', $checked, $checked === 1 ? 'package' : 'packages')
             : \sprintf('<warning>lockrot: %d of %d changed %s could not be checked</warning>', $unknown, $checked, $checked === 1 ? 'package' : 'packages')];
@@ -111,9 +92,8 @@ final class InstallSummaryFormatter
     }
 
     /**
-     * The verdict, the package, what was observed about it and the chain it arrives by. Neither the
-     * other direct requirements that reach it nor what it pulls in (S7) belong here: the block is
-     * read while `composer require` runs, and both answer questions asked over the full report.
+     * Omits the other direct requirements and S7: the block is read in passing, and both answer
+     * questions about the full report (docs/install-time.md#at-most-10-lines-always).
      */
     private function findingLine(Finding $finding): string
     {

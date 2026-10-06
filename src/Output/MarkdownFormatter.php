@@ -9,35 +9,7 @@ use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Verdict\Finding;
 
 /**
- * A PR-comment-shaped Markdown report: a heading with the flagged/checked counts, a table of the
- * flagged findings (or every finding with `--all`), the report's notes as a bullet list, and a
- * `<sub>` footer carrying the full summary line — meant to be posted verbatim, e.g.
- * `composer lockrot --format=markdown > comment.md` piped into `gh pr comment --body-file`.
- *
- * The heading always uses the same flagged/checked counts as the install-time block
- * (InstallSummaryFormatter::header()), so it follows `Report::flagged()` alone. The table follows
- * the rows this call would actually print — flagged only, or every finding under `--all` — and is
- * omitted when those are empty. The two conditions are not the same one: `--all` on a report with
- * nothing flagged prints the "no dependency rot found in N packages" heading *and* a full table of
- * every checked package underneath, which is what `--all` was asked for.
- *
- * Priority leads the row: the table keeps the report's own order, which is by priority, so a
- * reviewer reads down the first column and stops where the rows stop applying to the project. The
- * verdict keeps its own column next to it — the two axes answer different questions.
- *
- * Everything that comes from the project or from package metadata — names, versions, evidence, the
- * replacement string of an abandoned package, notes, the baseline file name — is rendered as plain
- * text: line breaks become a single space, and every Markdown or HTML punctuation character is
- * backslash-escaped, `|` included, so a crafted composer.lock can neither break the table nor put
- * an image, a tag or link markup of its own into a pull-request comment or a job summary (a bare
- * URL still autolinks, as it does in any GitHub comment). The package
- * name is a code span, delimited by more backticks than the name itself contains. The verdict cell
- * is bold only when FormatContext::levelOf() is not `note` — the same rule GitHub annotations and
- * GitLab severities use, so a reviewer's eye is drawn to exactly the findings that can fail the
- * build. The `Via` chain is joined with "›", which reads more naturally inline in a table cell than
- * the plain ">" the annotation formats use, and names the other direct requirements the package is
- * reachable from (`, also via …`). The `pulled in by:` line under the table sums that up per direct
- * requirement — see Report::exposureSummaryLine().
+ * A pull-request comment as Markdown: docs/ci.md#-formatmarkdown.
  *
  * @internal
  */
@@ -138,10 +110,10 @@ final class MarkdownFormatter implements FormatterInterface
     }
 
     /**
-     * The characters that carry meaning in Markdown or start HTML, each backslash-escaped. CommonMark
-     * lets any ASCII punctuation be escaped this way, and GitHub renders `\<` as a literal `<`, so an
-     * `<img>` or a `[link](…)` in package metadata comes out as the text it is. `&` is escaped too,
-     * so an entity such as `&lt;` cannot smuggle a tag past the `<` escape.
+     * The characters that carry meaning in Markdown or start HTML. CommonMark lets a backslash
+     * escape any ASCII punctuation (https://spec.commonmark.org/current/#backslash-escapes), and
+     * GitHub renders `\<` as a literal `<`. `&` is escaped too, so an entity such as `&lt;` cannot
+     * smuggle a tag past the `<` escape.
      */
     private const ESCAPED = ['\\', '|', '`', '*', '_', '[', ']', '<', '>', '&', '~', '#'];
 
@@ -157,10 +129,9 @@ final class MarkdownFormatter implements FormatterInterface
     }
 
     /**
-     * A code span. Backslash escapes do not apply inside one, so a backtick in the content is
-     * handled the CommonMark way: the delimiter is one backtick longer than the longest run inside,
-     * and a leading or trailing backtick gets a space of padding. `|` still has to be escaped, as
-     * GitHub's table parser reads it before the code span does.
+     * A code span. Backslash escapes do not apply inside one, so the delimiter is one backtick
+     * longer than the longest run inside, as CommonMark requires. `|` is still escaped: GitHub's
+     * table parser reads it before the code span.
      */
     private static function code(string $value): string
     {

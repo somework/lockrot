@@ -8,25 +8,17 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Terminal;
 
 /**
- * How wide the terminal `composer lockrot` is printing into is, in the four places the answer can
- * come from, best first.
+ * The terminal width, from the first source that answers (docs/example-run.md#the-table-format).
  *
- * lockrot runs under two very different symfony/console versions: 5.4 under Composer 2.10, and 2.8
- * inside the Composer 2.2 LTS PHAR. 2.8 has no Terminal class at all — it answers the same question
- * through Application::getTerminalDimensions(), a method 5.4 does not have. Neither call can be
- * made unconditionally, so each source is guarded and each is a method of its own: under 5.4 the
- * Terminal step always answers, which makes the two later steps unreachable from this side.
+ * lockrot runs under symfony/console 5.4 and 2.8 (the Composer 2.2 LTS PHAR). 2.8 has no Terminal
+ * class, and 5.4 has no Application::getTerminalDimensions(), so each source is guarded and is a
+ * method of its own. Under 5.4 the Terminal step always answers, so the later steps cannot run.
  *
  * @internal
  */
 final class TerminalWidth
 {
-    /**
-     * COLUMNS first, then this console version's own idea of the width, then the default — clamped
-     * so a terminal too narrow to render a list into is treated as no answer at all.
-     *
-     * @param array<string, string> $env the process environment, as getenv() returns it
-     */
+    /** @param array<string, string> $env the process environment, as getenv() returns it */
     public static function detect(array $env, ?Application $application): int
     {
         $width = self::fromEnv($env) ?? self::fromConsoleTerminal($env) ?? self::fromApplication($application) ?? FormatContext::DEFAULT_WIDTH;
@@ -35,8 +27,7 @@ final class TerminalWidth
     }
 
     /**
-     * COLUMNS, when it is a plain positive integer. Anything else — unset, empty, padded, fractional
-     * or non-numeric — is not an answer, rather than an answer of zero.
+     * COLUMNS, when it is a plain positive integer. Anything else is no answer, not zero.
      *
      * @param array<string, string> $env
      */
@@ -51,14 +42,9 @@ final class TerminalWidth
     }
 
     /**
-     * symfony/console 5.4 `Terminal::getWidth()`; the class does not exist in 2.8.
-     *
-     * Terminal reads `COLUMNS` itself, and far more leniently than {@see fromEnv()} does — whenever
-     * the variable is merely present it answers `(int) trim($value)`, so `abc` becomes 0 and the
-     * clamp in {@see detect()} would turn that into the narrowest width lockrot accepts instead of
-     * the documented default. A `COLUMNS` step 1 has already looked at and rejected is therefore
-     * out of play for this step too: handing it over would only get the same junk read a second
-     * time, by a reader that does not check it.
+     * symfony/console 5.4 `Terminal::getWidth()`. Terminal reads `COLUMNS` more leniently than
+     * {@see fromEnv()}: `abc` becomes 0, and the clamp in {@see detect()} then picks the
+     * narrowest width, not the default. So a `COLUMNS` that is set but rejected skips this step.
      *
      * @param array<string, string> $env
      */
@@ -72,10 +58,9 @@ final class TerminalWidth
     }
 
     /**
-     * symfony/console 2.8 `Application::getTerminalDimensions(): array{width, height}`, which
-     * returns `[null, null]` when it could not tell. The method is gone in 5.4, so it is reached
-     * through reflection rather than named on a type that no longer declares it — a
-     * `method_exists()` guard alone would leave the call itself unresolvable.
+     * symfony/console 2.8 `Application::getTerminalDimensions()`, which returns `[null, null]` when
+     * it cannot tell. 5.4 has no such method, so it is called through reflection: a
+     * `method_exists()` guard alone leaves the call unresolvable for static analysis.
      */
     public static function fromApplication(?Application $application): ?int
     {

@@ -9,7 +9,7 @@ use Lockrot\Exception\ConfigException;
 use Lockrot\Filesystem\Path;
 
 /**
- * One `--output=<format>:<path>`: which format, the file it goes to, and that path as it was given.
+ * One `--output=<format>:<path>`: docs/configuration.md#writing-reports-to-files.
  *
  * @internal
  */
@@ -29,11 +29,9 @@ final class ReportTarget
     }
 
     /**
-     * The spec starts with a format `--format` takes, spelled the same way, and a colon; everything
-     * after that colon is the path, verbatim — `json:C:\out\r.json` included, and a name with spaces
-     * at either end. The format is found by matching the known names, the longest first, rather than
-     * by cutting at the first colon, so a format whose own name holds a colon — an extension's
-     * `<vendor>:<name>` — would still parse.
+     * The path is everything after the format and its colon, verbatim. The format is the longest
+     * known name that matches, not the text before the first colon, so a name that holds a colon
+     * (an extension's `<vendor>:<name>`) parses.
      *
      * @param string $spec what follows `--output=`
      * @param string $cwd  the directory a relative path is relative to
@@ -67,7 +65,7 @@ final class ReportTarget
         return new self($option, $format, Path::resolve($cwd, $path), $path);
     }
 
-    /** `--output=<spec>`, as the option was given: what every message about this target starts with. */
+    /** `--output=<spec>` as given: the start of every message about this target. */
     public function option(): string
     {
         return $this->option;
