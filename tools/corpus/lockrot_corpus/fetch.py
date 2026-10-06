@@ -1,15 +1,7 @@
-"""Materialising the corpus from the manifest, and never from whatever upstream happens to hold.
+"""Materialises the corpus from the pinned manifest and never from the upstream HEAD.
 
-Two rules, both taken from bin/record-fixtures, which learned them the hard way.
-
-A digest that does not match is not a new pin. It is the tool saying the bytes at that commit are
-not the bytes that were recorded, which is either a rewritten history or a corrupted download, and
-either one needs a person. Silently re-pinning converts "upstream changed under us" into "we agreed
-with whatever we got".
-
-And a transport failure is not a recorded fact. record-fixtures re-fetches an envelope whose
-recorded status is 0 for exactly this reason: without the distinction a DNS blip is cached as
-evidence and the fixture set lies for months.
+A digest mismatch is not a new pin. It means that the bytes at that commit differ from the recorded
+bytes, so a person must look. A transport failure is never recorded as a fact.
 """
 
 import os
@@ -68,8 +60,8 @@ def _copy_fixture(project: dict, repo_root: str, target: str) -> bool:
 def _already_correct(project: dict, target: str) -> bool:
     files = project.get('files') or {}
     if not files:
-        # Nothing recorded is not "already correct" — it is a project nobody pinned, and answering
-        # True here skips it silently and leaves the corpus one project short of what it claims.
+        # A project without recorded files is unpinned, not already correct: a skip leaves
+        # the corpus one project short.
         return False
     for name, recorded in files.items():
         path = os.path.join(target, name)
@@ -84,11 +76,10 @@ def _already_correct(project: dict, target: str) -> bool:
 
 
 def _download(project: dict, target: str) -> None:
-    """Both files fetched and verified before either is written.
+    """Fetches and verifies both files before it writes either.
 
-    A project is two files at one commit. Writing composer.lock and only then finding that
-    composer.json hashes to something else leaves a new lock beside an old manifest — a pairing that
-    exists in no upstream tree and that the next run would happily audit.
+    A run that writes the first file before it verifies the second can leave a pair that exists
+    in no upstream tree, and the next run audits it.
     """
     commit = project.get('commit')
     if not commit:

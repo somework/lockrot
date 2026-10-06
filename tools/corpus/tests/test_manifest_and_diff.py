@@ -1,10 +1,7 @@
-"""The pinning, and the refusals that make a comparison mean something.
+"""The pinning, and the refusals that make a comparison meaningful.
 
-The refusal paths are the reason the run metadata is recorded at all. A differ that compares
-whatever it is handed is the mechanism by which the calendar, an expired cache or a missing token
-gets filed as a code regression — which is exactly what happened to the first corpus comparison of
-this project, where a package crossing the three-year threshold between two runs read as a change
-the branch had made.
+The run metadata exists for the refusal paths. A differ that compares whatever it gets files the
+calendar, an expired cache or a missing token as a code regression.
 """
 
 import os
@@ -50,10 +47,8 @@ class Manifest(unittest.TestCase):
 class RefreshChurn(unittest.TestCase):
     """A refresh that finds nothing new must leave no diff, unavailable projects included.
 
-    The marker used to be dropped the moment the commit resolved and set again the moment the files
-    did not, so a project whose composer.lock is simply still missing counted two changes and had
-    its date rewritten on every single run — losing the one thing the date is for, which is the day
-    it first went missing.
+    The `unavailable` date records the day a project first went missing, so a refresh must not
+    rewrite it while the files stay missing.
     """
 
     def setUp(self):

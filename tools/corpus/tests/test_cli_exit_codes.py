@@ -1,8 +1,7 @@
-"""The four answers this tool is allowed to give, and which trouble maps to which.
+"""The exit codes of the tool, and which kind of trouble maps to which.
 
-The header of `corpus` promises 0 clean, 1 found something, 2 cannot tell, 3 you asked wrong. Two
-paths used to break that promise in the direction that matters most: a bug in this tool, and a
-mistyped flag, both came back as a code that reads as a verdict about lockrot's output.
+A bug in this tool and a mistyped flag must never return a code that reads as a verdict about
+lockrot's output.
 """
 
 import importlib.machinery
@@ -18,7 +17,7 @@ CLI = os.path.join(support.TOOL, 'corpus')
 
 
 def _cli():
-    """The entry point imported under a name of its own; it has no .py extension to import by."""
+    """The entry point imported under a name of its own. It has no .py extension to import by."""
     loader = importlib.machinery.SourceFileLoader('corpus_cli', CLI)
     spec = importlib.util.spec_from_file_location('corpus_cli', CLI, loader=loader)
     module = importlib.util.module_from_spec(spec)
@@ -32,7 +31,7 @@ class ExitCodes(unittest.TestCase):
         self.cli = _cli()
 
     def test_a_bug_in_this_tool_is_not_reported_as_a_problem_with_the_output(self):
-        """FrameworkError means the checker is broken. Uncaught it exits 1 — the verdict code."""
+        """FrameworkError means the checker is broken. Uncaught, it exits 1, the code for problems."""
         def broken(options):
             raise checks.FrameworkError('C9.assert_ returned None for a selected pair')
 

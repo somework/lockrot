@@ -1,25 +1,10 @@
-"""Running one lockrot archive over the corpus, and recording enough to compare the result later.
+"""Runs one lockrot archive over the corpus and records enough to compare the result later.
 
-This replaces eight near-identical shell loops that differed by one literal each, so a fix to one
-never reached the others. Four things they got wrong are fixed here by construction:
-
-  * `[ -s file ] && continue` accepts any non-empty file. A run killed at the 900-second timeout
-    leaves a half-written JSON of non-zero size, and the target is then never retried again — one
-    downstream reader aborts on it, another counts it unreadable, and none of them is right. A
-    target is complete here only when the manifest says so *and* the file still hashes to what was
-    recorded.
-  * `gh auth token` failing yields an empty string, which `set -u` does not catch. The run then
-    completes tokenless and reports S10 across the whole corpus, which is the single most likely
-    way to make a diff show a large regression that is not there. So the token is asserted, and
-    running without one is something you ask for.
-  * Most of those loops sent stderr to /dev/null, so a PHP fatal left no evidence beyond an exit
-    code in a log nobody read. Every run keeps its stderr beside its output.
-  * Most of them did not create the output directory. The redirect then failed inside the subshell,
-    php never ran, and 39 exit codes looked like a uniformly failing run rather than a total no-op.
-
-The day is pinned. lockrot's age-based verdicts move at the three- and five-year boundaries with no
-code change, so a comparison whose two halves ran on different days attributes the calendar to the
-code. libyears itself is clock-free by design and is unaffected either way.
+A target is complete only when the manifest says so and its file still hashes to the recorded
+digest, because a run killed at the timeout leaves a non-empty half-written file. The GitHub token
+is asserted, and a run without one needs `--anon`: a tokenless run reports S10 across the corpus and
+must not be compared with a run that had a token. Every run keeps its stderr beside its output. The
+day is pinned, because lockrot's age-based verdicts change with the calendar and not with the code.
 """
 
 import datetime
@@ -35,8 +20,8 @@ from .report import note
 
 DEFAULT_TIMEOUT = 900
 EXPLAIN_TIMEOUT = 300
-# The text is rendered at a fixed width because every anchored pattern in catalog.py reads a line
-# whose shape depends on where it wrapped.
+# A fixed width, because the line shape that the patterns in catalog.py read depends on where the
+# text wraps.
 EXPLAIN_COLUMNS = '200'
 
 
@@ -45,11 +30,10 @@ class RunError(Exception):
 
 
 def token_from_environment(anon: bool) -> 'str | None':
-    """The GitHub token this run will use, asserted rather than assumed.
+    """The GitHub token that this run uses, asserted and not assumed.
 
-    Anonymous GitHub allows 60 requests an hour, so a tokenless run does not produce a slower
-    version of the same answer — it produces a different one, full of "repository activity not
-    checked". That is a legitimate thing to want, and `--anon` is how you say you want it.
+    Without a token, lockrot gives a different answer and not a slower one: it reports "repository
+    activity not checked". `--anon` asks for that answer.
     """
     if anon:
         return None
@@ -68,18 +52,14 @@ def token_from_environment(anon: bool) -> 'str | None':
     return token
 
 
-# Every name that could hand the child a credential or change what it does, cleared before the run
-# decides what to put back. Removing GITHUB_TOKEN alone is not a tokenless run: lockrot reads
-# LOCKROT_GITHUB_TOKEN first (src/Data/Forge/Tokens.php), falls back to Composer's github-oauth out
-# of COMPOSER_AUTH or a global auth.json, and has its own GitLab pair. On any machine where
-# `composer config --global github-oauth.github.com …` has ever been run, a `--anon` run would be
-# fully authenticated while the manifest recorded it as anonymous — and two such runs would then
-# pass every comparability check and differ by S10 across the whole corpus.
+# Every name that could give the child a credential or change what it does. Removal of GITHUB_TOKEN
+# alone does not make a run tokenless: lockrot reads LOCKROT_GITHUB_TOKEN first (`Tokens`), then
+# Composer's github-oauth from COMPOSER_AUTH or a global auth.json, and it has a GitLab pair of its
+# own. Otherwise an `--anon` run could authenticate while its manifest says anonymous.
 INHERITED = ('LOCKROT_GITHUB_TOKEN', 'GITHUB_TOKEN', 'LOCKROT_GITLAB_TOKEN', 'GITLAB_TOKEN',
              'COMPOSER_AUTH',
-             # Not credentials: LOCKROT_DISABLE short-circuits the command entirely and
-             # LOCKROT_FAIL_ON changes the exit code the manifest records, since the runner passes
-             # no --fail-on of its own.
+             # Not credentials: LOCKROT_DISABLE skips the command and LOCKROT_FAIL_ON changes
+             # the exit code that the manifest records.
              'LOCKROT_DISABLE', 'LOCKROT_FAIL_ON')
 
 
@@ -111,22 +91,20 @@ def new_manifest(kind: str, phar: str, today: str, cache_root: str, anon: bool,
         'kind': kind,
         'phar': os.path.abspath(phar),
         'phar_sha256': sha256_file(phar),
-        'lockrot_version': None,  # filled from the first report that names it
+        'lockrot_version': None,
         'today': today,
         'cache_root': os.path.abspath(cache_root),
-        # The token itself is never recorded anywhere — only whether there was one, which is the
-        # part that makes two runs comparable or not.
+        # Never record the token itself, only whether there was one.
         'token_mode': 'anonymous' if anon else 'token',
-        # Recorded when the run starts, not stamped on afterwards: a run resumed after the corpus
-        # was re-pinned would otherwise claim a membership half of its output never saw.
+        # Recorded at the start of the run, so a run resumed after a re-pin does not claim a
+        # membership that part of its output never saw.
         'corpus_digest': corpus_digest,
-        # Real wall-clock, unlike `today`, which is the pinned day lockrot is told to believe in.
-        # Two runs only read the same upstream while they are inside one activity cache lifetime.
+        # Real wall-clock time, unlike `today`, the pinned day. The differ reads these against
+        # `ACTIVITY_TTL_SECONDS`.
         'started': _now(),
         'finished': None,
-        # What this invocation set out to cover, written before it covers any of it. A target only
-        # reaches `targets` once the run reaches it, so without this a run killed partway through
-        # is indistinguishable from a smaller corpus that finished.
+        # Written before any target runs. A target reaches `targets` only when the run reaches
+        # it, so a killed run looks like a smaller corpus that finished.
         'intended': [],
         'targets': {},
     }
@@ -145,11 +123,9 @@ def _is_complete(manifest: dict, key: str, path: str) -> bool:
 
 
 def _begin(manifest: dict, intended: 'Sequence[str]') -> None:
-    """Open this invocation: record what it means to cover and unsay any earlier completion.
+    """Records what this invocation covers and clears `finished`, on a resume too.
 
-    `finished` is cleared on every pass, resume included. It used to survive a resume, so a run that
-    completed, had one output edited, and was then killed on the way back through still carried the
-    first run's timestamp and read as whole.
+    A killed resume must not keep the timestamp of an earlier completion and read as whole.
     """
     manifest['finished'] = None
     manifest['intended'] = list(intended)
@@ -169,9 +145,8 @@ def run_reports(phar: str, projects_dir: str, out_dir: str, cache_root: str, tod
                 anon: bool = False, timeout: int = DEFAULT_TIMEOUT, target_php: str = '8.4',
                 interpreter: str = 'php', corpus_digest: 'str | None' = None) -> dict:
     """One JSON report per project, resumable, with every run's stderr kept beside it."""
-    # Absolute, because every invocation runs with the project directory as its working directory:
-    # a relative path here reaches php as a file that is not there, and the whole run writes empty
-    # reports whose stderr nobody looks at until the checks report a corpus of nothing.
+    # Absolute, because each run uses the project directory as its working directory, where a
+    # relative path does not exist.
     phar = os.path.abspath(phar)
     token = token_from_environment(anon)
     os.makedirs(out_dir, exist_ok=True)
@@ -179,8 +154,8 @@ def run_reports(phar: str, projects_dir: str, out_dir: str, cache_root: str, tod
                                                       corpus_digest)
     _assert_same_run(manifest, phar, today, cache_root, anon, corpus_digest)
     environment = run_environment(token, cache_root, today)
-    # The interpreter is a parameter so the resume contract can be proved against a stub that fails
-    # on purpose: a real archive cannot be asked to die halfway through a write.
+    # The interpreter is a parameter so that a test can pass a stub that fails halfway through a
+    # write.
     projects = sorted(name for name in os.listdir(projects_dir)
                       if os.path.isfile(os.path.join(projects_dir, name, 'composer.lock')))
     if not projects:
@@ -205,17 +180,16 @@ def run_reports(phar: str, projects_dir: str, out_dir: str, cache_root: str, tod
         write_text_atomic(os.path.join(out_dir, project + '.err'),
                           finished.stderr.decode('utf-8', 'replace'))
         if finished.returncode not in (0, 1, 2, 3, 4):
-            # lockrot's documented exit codes are the verdict levels; anything else is the process
-            # failing rather than the tool answering.
+            # Exit codes 0 to 4 are lockrot's own answers. Any other code means that the process
+            # failed.
             _record(manifest, project, 'failed', exit_code=finished.returncode,
                     seconds=time.time() - started)
             note('%s: lockrot exited %d; stderr kept in %s.err' % (project, finished.returncode, project))
             write_json_atomic(os.path.join(out_dir, 'run.json'), manifest)
             continue
         write_text_atomic(output, finished.stdout.decode('utf-8', 'replace'))
-        # An exit code of 0-4 is lockrot answering, but an answer still has to be a report. A
-        # project whose output will not parse is recorded as failed and the run carries on: one
-        # unreadable file must not take the other 38 with it, and its stderr is already on disk.
+        # An answer must still be a report. Record an unparsable output and go on, so that one
+        # project does not stop the others.
         try:
             report = read_json(output)
         except CorpusDataError as error:
@@ -247,11 +221,10 @@ def run_explains(phar: str, projects_dir: str, targets: 'Sequence[tuple[str, str
                  cache_root: str, today: str, anon: bool = False,
                  timeout: int = EXPLAIN_TIMEOUT, target_php: str = '8.4',
                  interpreter: str = 'php', corpus_digest: 'str | None' = None) -> dict:
-    """Two renderings per target — the page and the document — and a target is done only when both are.
+    """Two renderings per target, the page and the document. A target is done only when both are.
 
-    The text is written before the JSON, so an interruption used to leave a fresh page beside a
-    stale document: exactly the pairing the contradiction checks assume cannot happen, since their
-    whole subject is the two disagreeing.
+    The page is written before the document, so an interruption can leave a fresh page beside a
+    stale document, and the contradiction checks assume that pair cannot exist.
     """
     phar = os.path.abspath(phar)
     token = token_from_environment(anon)
@@ -296,9 +269,8 @@ def run_explains(phar: str, projects_dir: str, targets: 'Sequence[tuple[str, str
             continue
         write_text_atomic(text_path, page.stdout.decode('utf-8', 'replace'))
         write_text_atomic(json_path, document.stdout.decode('utf-8', 'replace'))
-        # Parsed before it is called `ok`, the way a report is. A rendering recorded `ok` unread is
-        # one the loader has to open to discover is not one, and a target recorded `ok` is never
-        # retried on a resume — so an unreadable one would have stayed unreadable for good.
+        # Parse the output before the run records `ok`. A target recorded `ok` is never retried on
+        # a resume, so an unreadable one stays unreadable.
         try:
             parsed = read_json(json_path)
         except CorpusDataError as error:

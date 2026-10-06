@@ -1,20 +1,11 @@
-"""The answer to "what stops a check going quietly dead".
+"""What stops a check from going quietly dead.
 
-Two halves. The recorded fixtures, unmutated, must produce no problem at all — that is the baseline.
-Then every declared poison is applied to the JSON of one recorded document, and the check it targets
-must produce that exact problem key, once.
+The recorded fixtures, unmutated, must produce no problem. Each declared poison mutates the JSON of
+one recorded document, and the targeted check must produce that exact problem key, once.
 
-The exactness is the point. Asserting merely that something was reported passes when a reworded
-sentence turns every document into `unparsable`, which would read as a check working while it has
-in fact stopped reading lockrot's output.
-
-What this proves, precisely: the checks still read the *recorded* pages, and each one still produces
-its own problem key rather than collapsing into `unparsable`. It does not watch lockrot — the pages
-here are frozen at the day they were recorded, so a sentence reworded in src/Output/ tomorrow leaves
-this suite green. That drift surfaces in two places: the next `tools/corpus/record`, whose diff is a
-changed page, and the next corpus run, where the check reports `unparsable` on every document the
-JSON says should carry the sentence. This suite's job is the other direction — that the checker has
-not drifted away from output that has not changed.
+The exact key matters: asserting only that something was reported passes when a reworded sentence
+turns every document into `unparsable`. The suite does not watch lockrot. The limit is in
+tools/corpus/README.md, "The rule that makes the rest worth running".
 """
 
 import unittest
@@ -43,8 +34,6 @@ class CleanFixtures(unittest.TestCase):
 
 
 class Poisons(unittest.TestCase):
-    """Each declared mutation must produce its declared key, and nothing else may change."""
-
     def test_every_check_has_a_poison(self):
         declared = {poison['check'] for poison in support.poisons()}
         for check in ClaimChecks().checks() + explain_checks():
@@ -52,12 +41,10 @@ class Poisons(unittest.TestCase):
                           '%s has no poison, so nothing proves it can still fire' % check.ident)
 
     def test_every_problem_key_a_check_can_emit_has_a_poison_or_a_dated_exemption(self):
-        """The per-key half of the promise, enforced rather than asserted in a comment.
+        """The keys come from the source, not from a list kept beside it.
 
-        Read out of the source rather than declared beside it: a list of keys kept by hand drifts
-        from the branches it describes, and a branch nobody poisoned can be deleted outright with
-        the suite still green — which is the hole this whole tool exists to close, reopened one
-        branch at a time.
+        A list that people keep by hand drifts from its branches, and someone can delete an
+        unpoisoned branch with the suite still green.
         """
         poisoned = {poison['expect'] for poison in support.poisons()}
         exempt = {row['key'] for row in support.unreachable_keys()['keys']}
@@ -77,8 +64,10 @@ class Poisons(unittest.TestCase):
                          'a key with a working poison is not unreachable; remove the exemption')
 
     def test_every_declared_key_is_one_a_check_can_actually_emit(self):
-        """Both lists age the other way too: a key renamed in the code leaves a poison for a
-        branch that no longer exists, which passes forever and proves nothing."""
+        """A key renamed in the code leaves a poison for a branch that does not exist.
+
+        That poison passes forever and proves nothing.
+        """
         emitted = set(support.emitted_keys())
         for key in {poison['expect'] for poison in support.poisons()}:
             self.assertIn(key, emitted, 'no check emits %r any more' % key)

@@ -1,15 +1,7 @@
 #!/usr/bin/env python3
-# Audits a lockrot run against the repository data it read, rather than against lockrot.
-# Usage: tools/corpus/corpus {fetch,run,explain,check,diff,refresh,selftest} [options]
-#
-# A full run needs GITHUB_TOKEN and the network and takes hours; `selftest` needs neither and takes
-# seconds. The day is pinned with --today so two runs can be compared at all. Exit 0 means every
-# check ran and found nothing, 1 means it found something, 2 means it cannot tell you either way —
-# a check that selected almost nothing, a corrupt cached document, an empty input tree.
-#
-# Nothing here may import or shell out to lockrot's PHP to work out what the answer should be. The
-# independence is the entire product: a checker that asks the subject what it is about agrees with
-# it by construction, and no test in this repository could tell.
+# Do not import or run lockrot's PHP to work out what an answer must be. A checker that asks the
+# subject agrees with it by construction, and no test in this repository can tell.
+# The exit codes are in tools/corpus/README.md, "Running it".
 
 import argparse
 import os
@@ -25,11 +17,9 @@ DEFAULT_WORK = os.path.join(REPO_ROOT, 'build', 'corpus')
 
 
 class _Parser(argparse.ArgumentParser):
-    """argparse, but a usage error exits 3 rather than 2.
+    """A usage error exits 3, because argparse's own 2 is this tool's "cannot tell" code.
 
-    argparse's own default is 2, which is this tool's "I cannot tell you whether it is clean" — so
-    `corpus run` with no --phar used to report the same code as a corrupt cached document. The
-    subparsers inherit this class: add_subparsers defaults parser_class to type(self).
+    The subparsers inherit this class: add_subparsers defaults parser_class to type(self).
     """
 
     def error(self, message: str) -> 'NoReturn':
@@ -96,8 +86,8 @@ def main(argv: 'list[str]') -> int:
 
         return report.CANNOT_TELL
     except checks.FrameworkError as error:
-        # A bug in this tool, not a finding about lockrot. Left to escape it exits 1, which is the
-        # code that says the audited output has problems — the one answer it has no right to give.
+        # Left to escape, this exits 1, the code for problems in the audited output. A bug in this
+        # tool must never give that answer.
         report.note('this tool is broken, not the output it read: %s' % error)
 
         return report.CANNOT_TELL
@@ -138,10 +128,9 @@ def _run(options: argparse.Namespace) -> int:
 
 
 def _closing_line(out_dir: str, manifest_document: dict) -> int:
-    """What a run came to, and a non-zero code when part of it did not.
+    """A partial run is not a run of the corpus, so an unfinished target makes the code non-zero.
 
-    A run that finished 30 of 39 projects is not a run of the corpus, and saying so here is what
-    stops the next command from auditing three quarters of the evidence and calling it clean.
+    That stops the next command from auditing part of the evidence and calling it clean.
     """
     failed = sorted(name for name, recorded in manifest_document['targets'].items()
                     if (recorded or {}).get('status') != 'ok')
@@ -173,10 +162,9 @@ def _check(options: argparse.Namespace) -> int:
 
     census, listing = _audit(options)
     if options.partial:
-        # Deliberately narrow, and narrower than it looks: only the measured floors are waived. A
-        # check that judged nothing at all, a decline over the share it declared, and a project the
-        # run never finished all still fail, because none of those is a smaller population — they
-        # are the tool not having an answer.
+        # Waive only the floors, which the filter finds by the wording "below its floor". A check
+        # that judged nothing, a decline over its declared share and an unfinished project still
+        # fail: none of them is a smaller population, they are missing answers.
         census.failures = [failure for failure in census.failures if 'below its floor' not in failure]
     if options.format == 'json':
         print(_json(report.render_json(census)))

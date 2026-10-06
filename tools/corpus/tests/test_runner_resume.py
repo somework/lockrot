@@ -1,9 +1,7 @@
 """The resume contract, proved against a stub archive rather than a real one.
 
-The case that matters is not "a finished target is not re-run" — it is "a half-written one is not
-treated as finished". A run killed at the timeout leaves a JSON of non-zero size, and the shell
-guard it replaces (`[ -s file ] && continue`) accepted that forever: one reader aborted on it, one
-counted it unreadable, none of them retried it.
+The case that matters is that a half-written target is not treated as finished. A run killed at the
+timeout leaves a JSON file of non-zero size, and the next run must retry it.
 """
 
 import os
@@ -18,7 +16,6 @@ from lockrot_corpus import runner
 from lockrot_corpus.jsonio import read_json, write_text_atomic
 
 STUB = """#!/bin/sh
-# Stands in for lockrot.phar: prints a report and counts how often it was asked to.
 echo "$PWD" >> "$COUNTER"
 printf '%s' '{"lockrot":{"version":"0.0.0-stub"},"findings":[]}'
 """
@@ -97,10 +94,10 @@ class Resume(unittest.TestCase):
                          'the token itself must never reach a recorded file')
 
     def test_the_run_records_what_it_set_out_to_cover_before_it_covers_any_of_it(self):
-        """A target reaches the manifest when the run reaches it; the intent has to be there first.
+        """A target reaches the manifest when the run reaches it, so the intent must be there first.
 
-        Otherwise a run killed at the 35th of 39 projects holds 35 records and nothing anywhere
-        names the other four — not the status list, not a file, not the directory.
+        Otherwise a killed run holds records for the targets that it reached, and nothing names the
+        others.
         """
         os.makedirs(os.path.join(self.projects, 'b-project'))
         write_text_atomic(os.path.join(self.projects, 'b-project', 'composer.lock'), '{}')
@@ -108,7 +105,7 @@ class Resume(unittest.TestCase):
         self.assertEqual(['a-project', 'b-project'], manifest['intended'])
 
     def test_a_resumed_run_stops_claiming_the_first_run_s_finish(self):
-        """`finished` used to survive a resume, so a second interruption kept the first completion."""
+        """A resumed run must clear `finished`, or a second interruption keeps the first completion."""
         first = self._run()
         self.assertIsNotNone(first['finished'])
         write_text_atomic(os.path.join(self.out, 'a-project.json'), '{"findings": [ ')
@@ -137,11 +134,10 @@ class Resume(unittest.TestCase):
 
 
 class ExplainRenderings(unittest.TestCase):
-    """A rendering is called `ok` only once it has been read, the way a report is.
+    """The run calls a rendering `ok` only after it reads it, as it does for a report.
 
-    A target recorded `ok` is never retried on a resume, so one recorded unread would have stayed
-    unreadable for the life of the run directory — and the loader would have been the first thing
-    to find out, by opening it.
+    A resume never retries a target recorded `ok`, so an unread rendering recorded `ok` stays
+    unreadable for the life of the run directory.
     """
 
     PAGE = '''#!/bin/sh

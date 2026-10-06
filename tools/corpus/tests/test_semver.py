@@ -1,14 +1,8 @@
 """Composer's version semantics, checked against Composer's own recorded answers.
 
-This is what makes a hand-rolled re-implementation defensible rather than reckless. p2 documents
-carry `version_normalized` beside the pretty `version` and list their versions newest first, so
-Composer's answer to both questions is available as data, offline, without Composer being anywhere
-near the checker.
-
-The oracle rows are recorded by `tools/corpus/record --semver-oracle` and never computed here: a
-test that generates its expectations with the function under test is a tautology that reads like
-coverage. The hand-written boundary rows below are the other half — the corpus is overwhelmingly
-well-formed, so the shapes that break a parser have to be written down on purpose.
+The oracle rows come from `tools/corpus/record --semver-oracle` and are never computed here: a test
+that generates its expectations with the function under test is a tautology. The boundary rows
+cover the shapes that break a parser, because the corpus is almost entirely well-formed.
 """
 
 import os
@@ -21,16 +15,15 @@ from lockrot_corpus.semver import branch_is_above, normalize, order_key, release
 
 ORACLE = read_json(os.path.join(support.FIXTURES, 'semver-oracle.json'))
 
-# Shapes the corpus does not happen to contain, or contains so rarely that a regression would be
-# invisible. Each one is a mistake this module has already made or could plausibly make.
+# Shapes that the corpus lacks, or contains so rarely that a regression is invisible.
 BOUNDARIES = [
-    ('1.0.0-RC1', '1.0.0.0-RC1'),   # uppercase RC: the trap that manufactured false findings
-    ('1.0.0-rc1', '1.0.0.0-RC1'),   # and Composer spells it back in capitals either way
+    ('1.0.0-RC1', '1.0.0.0-RC1'),
+    ('1.0.0-rc1', '1.0.0.0-RC1'),   # Composer spells it in capitals either way
     ('v1.0.0', '1.0.0.0'),
-    ('V1.0.0', '1.0.0.0'),          # an upper-case prefix, which 44 recorded tags use
+    ('V1.0.0', '1.0.0.0'),
     ('1.0.0+build.5', '1.0.0.0'),   # build metadata does not order and is dropped
-    ('1.0.0-beta-7', '1.0.0.0-beta7'),   # a dash before the number
-    ('1.0.0a1', '1.0.0.0-alpha1'),  # the short spelling expands
+    ('1.0.0-beta-7', '1.0.0.0-beta7'),
+    ('1.0.0a1', '1.0.0.0-alpha1'),
     ('1.0.0-pl2', '1.0.0.0-patch2'),
     ('1.0', '1.0.0.0'),
     ('1', '1.0.0.0'),
@@ -53,11 +46,11 @@ class Normalization(unittest.TestCase):
                 self.assertEqual(expected, normalize(pretty))
 
     def test_the_known_divergences_are_still_exactly_the_ones_recorded(self):
-        """A divergence that is written down is a decision; one that is not is a bug in waiting.
+        """A divergence that is written down is a decision. One that is not is a bug in waiting.
 
-        There is one, and it is a pre-release nothing in the audit path reads: Composer normalizes
-        `v0.14.1-alpha0` to `0.14.1.0-alpha` and drops the zero. If this list grows, something
-        changed and somebody has to look.
+        The recorded divergence is a pre-release that nothing in the audit path reads: Composer
+        normalizes `v0.14.1-alpha0` to `0.14.1.0-alpha` and drops the zero. If this list grows,
+        someone must look.
         """
         for row in ORACLE['known_divergences']:
             with self.subTest(pretty=row['pretty']):
@@ -72,9 +65,8 @@ class Ordering(unittest.TestCase):
     def test_every_recorded_version_list_is_newest_first_under_this_ordering(self):
         """p2 serves versions newest first, so the document order is Composer's ordering, recorded.
 
-        This is the oracle for order_key(), whose silent None on an unknown suffix moves which tag
-        is the highest — and the highest tag is what decides whether a package's newest release date
-        is trusted at all.
+        This is the oracle for order_key(). Its silent None on an unknown suffix changes which tag is
+        the highest, and that tag decides whether the newest release date of a package is trusted.
         """
         for row in ORACLE['order']:
             with self.subTest(package=row['package']):

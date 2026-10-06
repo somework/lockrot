@@ -1,19 +1,10 @@
-"""Two corpus runs compared, and — more importantly — refused when they are not comparable.
+"""Two corpus runs compared, and refused when they are not comparable.
 
-A diff between two archives is only evidence about the code while everything else is held still.
-The shared Composer cache is what holds it still, and it holds for one day: lockrot keeps an
-activity answer for 86400 seconds from its own fetched_at, after which individual packages quietly
-refetch live and the diff files an upstream change as a regression. The clock moves verdicts at the
-three- and five-year boundaries on its own. And a run with a token and a run without one differ
-across the whole corpus by construction.
-
-So this refuses, loudly, rather than comparing anything it is handed. That refusal is the feature;
-the comparison is the easy part.
-
-What it compares is deliberately narrow — verdict, priority, the set of signal ids, each signal's
-summary sentence, and libyears — and the libyears change is classified three ways, because
-measured-becoming-null is a different event from a number moving, and this project has already
-shipped a regression that was only visible as the former.
+A diff is evidence about the code only while everything else holds still. The runs must share the
+pinned day, the token mode and the Composer cache, and must lie inside one activity-cache lifetime.
+The comparison covers verdict, priority, signal ids, signal summaries and libyears. A libyears
+change has one of three classes, because a measured value that becomes null differs from a number
+that moves.
 """
 
 import datetime
@@ -22,8 +13,8 @@ import os
 from .jsonio import read_json
 from .runner import load_manifest
 
-# lockrot's ActivityClient keeps a repository answer for a day (src/Data/Forge/ActivityClient.php).
-# Two runs further apart than that were not reading the same upstream.
+# The cache lifetime of `ActivityClient` (`CACHE_TTL`). Runs further apart than this can read
+# different upstream answers.
 ACTIVITY_TTL_SECONDS = 86400
 
 
@@ -36,9 +27,8 @@ def compare(root_a: str, root_b: str, corpus_digest: 'str | None' = None) -> dic
     _assert_comparable(manifest_a, manifest_b, root_a, root_b, corpus_digest)
 
     changes, rows, missing = {}, [], []
-    # The union of what both runs were meant to cover, not a listing of one side: enumerating only
-    # B makes a project that died in B invisible — no file to list, so neither compared nor missed —
-    # which is the same silence in the differ that load.py had in the checks.
+    # The union of what both runs meant to cover. A listing of one side hides a project that is
+    # missing from it.
     for project in _projects(root_a, root_b, manifest_a, manifest_b):
         entry = project + '.json'
         path_a, path_b = os.path.join(root_a, entry), os.path.join(root_b, entry)
@@ -143,13 +133,11 @@ def _assert_comparable(manifest_a: 'dict | None', manifest_b: 'dict | None', roo
 
 def _assert_close_enough_in_time(manifest_a: dict, manifest_b: dict, root_a: str,
                                  root_b: str) -> None:
-    """Two runs read the same upstream only while they are inside one activity-cache lifetime.
+    """Refuse two runs that are further apart than one activity-cache lifetime.
 
-    lockrot keeps a repository answer for ACTIVITY_TTL_SECONDS from that answer's own fetched_at,
-    after which individual packages quietly refetch live — so the further apart the two halves ran,
-    the more of the difference is the calendar rather than the code. Missing timestamps are not an
-    excuse: a run recorded by an older version of this tool cannot be shown to be comparable, and
-    this refuses rather than assuming.
+    Past `ACTIVITY_TTL_SECONDS` packages refetch live, so the difference becomes the calendar
+    and not the code. A manifest without timestamps cannot show that it is comparable, so this
+    refuses it.
     """
     stamps = []
     for manifest, root in ((manifest_a, root_a), (manifest_b, root_b)):

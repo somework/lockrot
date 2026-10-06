@@ -1,11 +1,7 @@
 """The corpus checkers: lockrot's claims read against the data lockrot read, not against lockrot.
 
-Nothing is imported here on purpose. Every module under this package is meant to be importable on
-its own, so `python -m compileall tools/corpus` says something, and so a cycle between two modules
-is a syntax-level mistake rather than an import-order accident.
+This module imports nothing, so every other module can import it without a cycle.
 """
 
-# Stamped into every run manifest and every JSON census, so an output recorded months ago can be
-# told from a current one without guessing. Bumped when a check changes what it asserts, not when
-# a comment is reworded.
+# Written into every run manifest. Change it when a check changes what it asserts.
 VERSION = '1'

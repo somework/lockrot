@@ -1,7 +1,5 @@
-"""Loading the recorded fixtures, and applying a declared mutation to one of them.
-
-Used by every test here. Deliberately thin: the fixtures are read through the same loaders the real
-run uses, so a change that breaks loading breaks the offline suite too, in seconds, with no corpus.
+"""Loads the recorded fixtures through the loaders of the real run, so a change that breaks loading
+also breaks the offline suite.
 """
 
 import copy
@@ -34,11 +32,9 @@ def fixture_claims() -> 'list':
 
 
 def fixture_pairs() -> 'list[Pair]':
-    """The recorded pairs, taken from the index rather than from a directory listing.
+    """Read the pairs from the index, not from a directory listing.
 
-    The index is what says which pairs were recorded and what each one covers; globbing would pick
-    the index itself up as a target and would judge anything else that happened to be left in the
-    directory.
+    Globbing would take the index for a target and would judge any file left in the directory.
     """
     index = read_json(os.path.join(FIXTURES, 'explain', 'index.json'))
     pairs = []
@@ -63,11 +59,10 @@ _KEY = re.compile(r"""(?:problem|unparsable)\(\s*(['"])((?:(?!\1)[^\\]|\\.)*)\1"
 
 
 def emitted_keys() -> 'dict[str, str]':
-    """Every problem key the check modules can report, read out of their source.
+    """Read every problem key that the check modules can report out of their source.
 
-    The keys are the first argument of a `problem(...)` or `unparsable(...)` call and are always
-    literals, deliberately: a key built from a variable could not be enumerated here, and a key
-    nobody can enumerate is a branch nobody can prove still fires.
+    A key must be the literal first argument of a `problem(...)` or `unparsable(...)` call. A key
+    built from a variable cannot be enumerated here, so nobody can prove that its branch still fires.
     """
     found = {}
     for module in ('claims', 'explain'):
@@ -80,7 +75,6 @@ def emitted_keys() -> 'dict[str, str]':
 
 
 def apply_mutation(document: dict, mutations: 'list[dict]') -> dict:
-    """A deep copy of `document` with each declared mutation applied, by dotted path."""
     poisoned = copy.deepcopy(document)
     for mutation in mutations:
         _set_path(poisoned, mutation['path'].split('.'), mutation.get('set'))
