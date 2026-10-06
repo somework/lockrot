@@ -85,7 +85,7 @@ try {
         $report = $analyzer->analyze(LockFile::fromFile($dir.'/composer.lock'), $project, false);
         $json = (new JsonFormatter())->format($report);
         $path = $out.'/'.basename($dir).'.json';
-        if (file_put_contents($path, $json) === false) {
+        if (file_put_contents($path, $json) !== \strlen($json)) {
             fwrite(\STDERR, "cannot write {$path}\n");
             exit(1);
         }
