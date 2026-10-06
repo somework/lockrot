@@ -8,25 +8,21 @@ namespace Lockrot\Data\Repository;
 interface MetadataLoaderInterface
 {
     /**
-     * Composer's ComposerRepository::asyncFetchFile() turns a "network disabled" transport error
-     * into a synthetic 404 whenever it has no cached copy to fall back on (no last-modified date to
-     * revalidate against) — so a name that comes back genuinely `notFound` while offline is
-     * indistinguishable from one that simply was never cached. Since that cannot be trusted as
-     * "this package really does not exist", every such name is reported failed with this reason
-     * instead of notFound. It reads as a complete statement on its own, so callers rendering it
+     * Composer's ComposerRepository::asyncFetchFile() turns a "network disabled" error into a
+     * synthetic 404 when it has no cached copy. A `notFound` while offline therefore proves nothing,
+     * so the loader reports the name as failed with this reason. It is a complete statement: callers
      * must not prefix it with another explanation.
      */
     public const OFFLINE_NOT_FOUND_REASON = 'offline: not present in Composer\'s cache';
 
     /**
-     * Reported for a name the loader never got to query against a repository at all because the
-     * install-time budget ({@see \Lockrot\Deadline}) had already run out. Distinct from every
-     * other failure reason: those describe an answer (or the lack of one) the repository actually
-     * gave; this one means the repository was never asked.
+     * The loader never asked the repository for this name: the install-time budget
+     * ({@see \Lockrot\Deadline}) ran out. Every other failure reason describes an answer, or the
+     * lack of one, from the repository.
      */
     public const BUDGET_REASON = 'not checked: install-time budget exhausted';
 
-    /** The repository lists the name, but no version it serves is left once filtered, in either pass. */
+    /** The repository lists the name, but no version is left after filtering in either pass. */
     public const NO_VERSIONS_REASON = 'repository listed the package but returned no versions';
 
     /** @param list<string> $names */

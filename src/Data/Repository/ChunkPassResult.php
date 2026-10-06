@@ -6,8 +6,8 @@ namespace Lockrot\Data\Repository;
 
 /**
  * What one pass of {@see RepositoryMetadataLoader::loadChunked()} resolved. `needDev` and
- * `stillRemaining` are mutually exclusive; that method's own docblock says which pass populates
- * which.
+ * `stillRemaining` are mutually exclusive: the first pass fills `needDev`, and the dev-only pass
+ * fills `stillRemaining`.
  *
  * @internal
  */

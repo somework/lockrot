@@ -17,13 +17,9 @@ final class RepositoryMetadataLoader implements MetadataLoaderInterface
     public const CHUNK_SIZE = 10;
 
     /**
-     * Packagist puts `abandoned` on every version entry of a package, including its tagged
-     * releases, so a name with at least one tag never needs its `~dev` file just to see that flag.
-     * Pass 1 therefore asks only for these stabilities first; a name Composer reports as found here
-     * with at least one version is fully resolved without ever touching {name}~dev.json.
-     *
-     * The map is spelled out from the individual BasePackage::STABILITY_* constants because those
-     * exist in every supported Composer, while the BasePackage::STABILITIES constant does not.
+     * Packagist puts `abandoned` on every tagged release, so a name with one tag does not need its
+     * `~dev` file for that flag. The map uses the single BasePackage::STABILITY_* constants because
+     * every supported Composer has them, and BasePackage::STABILITIES does not exist in all.
      */
     private const STABLE_STABILITIES = [
         'stable' => BasePackage::STABILITY_STABLE,
@@ -33,12 +29,8 @@ final class RepositoryMetadataLoader implements MetadataLoaderInterface
     ];
 
     /**
-     * Pass 2, queried only for names pass 1 could not resolve — a package with no tagged release at
-     * all. Requesting only `dev` here matters: Composer's own
-     * ComposerRepository::loadAsyncPackages() adds `{name}~dev` to the request list whenever `dev`
-     * is an acceptable stability, and skips the non-dev `{name}` file entirely when `dev` is the
-     * *only* acceptable stability — so this constant alone is what keeps pass 2 from re-fetching
-     * the stable file pass 1 already asked for.
+     * Pass 2 asks for `dev` only. ComposerRepository::loadAsyncPackages() skips the non-dev `{name}`
+     * file when `dev` is the only acceptable stability, so pass 2 does not fetch it again.
      */
     private const DEV_ONLY_STABILITIES = [
         'dev' => BasePackage::STABILITY_DEV,
@@ -60,11 +52,9 @@ final class RepositoryMetadataLoader implements MetadataLoaderInterface
     }
 
     /**
-     * Repositories are consulted in their configured order and the first one to resolve a name
-     * wins. A name a repository could not answer for — absent from it, or a failure against it —
-     * stays in the queue for the repositories behind it: one repository being unable to answer
-     * says nothing about whether the next one holds the package. A failure reason is therefore only
-     * reported once every repository has been given the name and none of them resolved it.
+     * The first repository, in configured order, that resolves a name wins. A name that a
+     * repository could not answer, absent or failed, stays in the queue for the next one. A failure
+     * reason is reported only when no repository resolved the name.
      *
      * @param list<string> $names
      */
@@ -105,7 +95,7 @@ final class RepositoryMetadataLoader implements MetadataLoaderInterface
 
     /**
      * @param list<string>                   $names
-     * @param array<string, PackageMetadata> $metadata everything resolved so far, by any repository
+     * @param array<string, PackageMetadata> $metadata
      *
      * @return list<string>
      */
@@ -122,35 +112,22 @@ final class RepositoryMetadataLoader implements MetadataLoaderInterface
     }
 
     /**
-     * Two passes over this one repository. Pass 1 asks only for tagged-release stabilities; a name
-     * with at least one version there is fully resolved — abandonment, replacement, repository URL and
-     * type all come from a tagged release's own metadata, so nothing further is needed. A name
-     * pass 1 could not resolve (absent, or found with an empty version list) goes to pass 2, which
-     * asks only for `dev` — Composer then requests just {name}~dev.json, never re-fetching the
-     * stable file pass 1 already has an answer for.
+     * Pass 1 asks for tagged-release stabilities, and a name with a version there is resolved: a
+     * tagged release holds abandonment, replacement, repository URL and type. Pass 2 asks for `dev`
+     * only, for the names that pass 1 could not resolve. Before every chunk, an expired
+     * {@see Deadline} marks each name that no chunk received as failed with
+     * {@see MetadataLoaderInterface::BUDGET_REASON} and starts no further chunk in either pass.
      *
-     * Before every chunk in either pass, a budget check ({@see Deadline}) can end the whole call
-     * early: every name not yet handed to a chunk (the rest of pass 1, or all of pass 2 if pass 1
-     * never finished) is marked failed with {@see MetadataLoaderInterface::BUDGET_REASON} and no
-     * further chunk is started, in either pass.
+     * @param list<string> $remaining
      *
-     * @param list<string> $remaining names to query against this one repository
-     *
-     * @return MetadataBatch metadata()/failed() as this one repository answered them; notFound()
-     *                       carries the names it reported as absent. load() rebuilds the queue for
-     *                       the next repository from what has been resolved, so both the absent and
-     *                       the failed names are offered on.
+     * @return MetadataBatch notFound() carries the names that this repository reported as absent
      */
     private function loadFromRepository(ComposerRepository $repository, array $remaining): MetadataBatch
     {
         $pass1 = $this->loadChunked($repository, $remaining, self::STABLE_STABILITIES, false);
         if ($pass1->budgetExhausted()) {
-            // Every name pass 1 could not get to is already in $pass1->failed(); pass 2 must not
-            // run at all, per the "stop, break out of both loops" behaviour. A name pass 1 *did*
-            // get to before the deadline hit but that needed pass 2 (found tagless, or not found
-            // at all) is sitting in $pass1->needDev() — it was never asked for its dev file either,
-            // so it belongs in $failed with BUDGET_REASON too, not silently dropped (which would
-            // otherwise surface it as notFound() once load() runs out of repositories).
+            // Pass 2 must not run. A name that pass 1 reached but sent to needDev() never had its dev
+            // file requested, so it fails with BUDGET_REASON instead of surfacing as notFound().
             $failed = $pass1->failed();
             foreach ($pass1->needDev() as $name) {
                 $failed[$name] = MetadataLoaderInterface::BUDGET_REASON;
@@ -161,8 +138,8 @@ final class RepositoryMetadataLoader implements MetadataLoaderInterface
 
         $pass2 = $this->loadChunked($repository, $pass1->needDev(), self::DEV_ONLY_STABILITIES, true);
 
-        // Neither array can share a key with the other: a name only reaches pass 2 via pass 1's
-        // needDev list, which is disjoint from pass 1's own metadata/failed.
+        // The unions are safe: a name reaches pass 2 only through needDev(), which is disjoint from
+        // the metadata and the failed names of pass 1.
         return new MetadataBatch(
             $pass1->metadata() + $pass2->metadata(),
             $pass2->stillRemaining(),
@@ -171,18 +148,13 @@ final class RepositoryMetadataLoader implements MetadataLoaderInterface
     }
 
     /**
-     * Runs one pass of chunked loadPackages() calls against $names. A name pass 1 (stable
-     * stabilities) could not resolve — found with no versions, or not found at all — is returned in
-     * `needDev` for pass 2 to retry against the dev-only file. Pass 2 has no further pass to hand
-     * those two cases on to, so it routes them straight to `failed` / `stillRemaining` instead.
+     * Runs one pass of chunked loadPackages() calls. Pass 1 returns a name that it could not
+     * resolve, found with no versions or not found, in `needDev`. Pass 2 has no later pass, so it
+     * routes that name to `failed` or `stillRemaining`. A result never fills both `needDev` and
+     * `stillRemaining`.
      *
      * @param list<string>                $names
-     * @param array<'alpha'|'beta'|'dev'|'RC'|'stable', 0|5|10|15|20> $acceptableStabilities self::STABLE_STABILITIES
-     *                                                                                        for pass 1, self::DEV_ONLY_STABILITIES for pass 2
-     * @param bool                        $isDevOnlyPass whether this is pass 2 (dev-only); needDev and stillRemaining
-     *                                                    are mutually exclusive: pass 1 only ever populates needDev
-     *                                                    (stillRemaining stays empty), pass 2 only ever populates
-     *                                                    stillRemaining (needDev stays empty)
+     * @param array<'alpha'|'beta'|'dev'|'RC'|'stable', 0|5|10|15|20> $acceptableStabilities
      */
     private function loadChunked(ComposerRepository $repository, array $names, array $acceptableStabilities, bool $isDevOnlyPass): ChunkPassResult
     {
@@ -212,11 +184,8 @@ final class RepositoryMetadataLoader implements MetadataLoaderInterface
                 continue;
             }
 
-            // loadPackages() itself has no native return type, but RepositoryInterface documents
-            // it as @phpstan-return array{namesFound: array<string>, packages: array<BasePackage>},
-            // which PHPStan resolves through ComposerRepository's inherited signature; grouping
-            // still guards each element (AliasPackage vs BasePackage) since that shape says nothing
-            // about which concrete package class comes back.
+            // loadPackages() has no native return type. Its @phpstan-return shape says nothing about
+            // the concrete package class, so groupByName() checks each element.
             $namesFound = $result['namesFound'];
             $versionsByName = $this->groupByName($result['packages']);
             unset($result);
@@ -233,8 +202,7 @@ final class RepositoryMetadataLoader implements MetadataLoaderInterface
                 }
                 $versions = $versionsByName[$name] ?? [];
                 if ($versions === []) {
-                    // The repository reported this name as found (it has an entry in the file
-                    // queried this pass) but every version was filtered out or the entry was empty.
+                    // Found, but every version was filtered out or the entry was empty.
                     if ($isDevOnlyPass) {
                         $failed[$name] = MetadataLoaderInterface::NO_VERSIONS_REASON;
                     } else {
@@ -260,9 +228,9 @@ final class RepositoryMetadataLoader implements MetadataLoaderInterface
         $seen = [];
         foreach ($packages as $package) {
             if ($package instanceof AliasPackage) {
-                // loadPackages() returns an AliasPackage built from extra.branch-alias *and*, as a
-                // separate entry, the package it aliases, so unwrapping without deduplicating would
-                // count that release twice.
+                // loadPackages() returns an AliasPackage built from extra.branch-alias and, as a
+                // separate entry, the package it aliases. Unwrapping without deduplicating counts
+                // that release twice.
                 $package = $package->getAliasOf();
             }
             if (!$package instanceof BasePackage) {

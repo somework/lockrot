@@ -8,18 +8,13 @@ use Composer\Semver\VersionParser;
 use Lockrot\Lock\LockedPackage;
 
 /**
- * What the lock's `time` for the installed version is a date of, and which date lockrot reads as
- * the release's. Composer writes the date the repository gave the version, and that is a release's
- * only where the repository dated it by one:
+ * Which date lockrot reads as the installed version's release date. The lock's `time` is a
+ * release's only where the repository dated the version by a release: a branch snapshot carries
+ * its commit's date, and a subtree split's tag carries the date of a commit that its other tags
+ * share. See docs/verdicts.md#dates-from-the-monorepo.
  *
- *  - a branch snapshot carries its commit's date, and no release of it exists;
- *  - a subtree split's tag is dated by a commit its other tags share — illuminate/macroable
- *    v10.48.28 is locked at 2023-06-05 for a release of 2024-11-21 — so the lock's date is a year
- *    and a half early, and the monorepo parent's tag of the same version is what dates it;
- *  - a lock entry can carry no date at all.
- *
- * Every surface that prints or measures the installed version's date reads this one object, so the
- * same date cannot be called a release in one line and a commit in the next.
+ * Every surface that prints or measures the installed version's date reads this one object, so
+ * the same date is never a release in one line and a commit in the next.
  *
  * @internal
  */
@@ -27,7 +22,7 @@ final class InstalledRelease
 {
     /** The lock's date is the release's, and nothing says otherwise. */
     public const RELEASE = 'release';
-    /** The monorepo parent's tag of the same version dates the release; {@see datedBy()} names it. */
+    /** The monorepo parent's tag of the same version dates the release. {@see datedBy()} names it. */
     public const DATED_BY_PARENT = 'dated_by_parent';
     /** The lock's date is a commit this package's tags share, and no parent dates the version. */
     public const SHARED_COMMIT = 'shared_commit';
@@ -49,10 +44,7 @@ final class InstalledRelease
         $this->datedBy = $datedBy;
     }
 
-    /**
-     * Read off the lock entry and the repository metadata. Without metadata there is nothing to
-     * tell a release date from a commit's, and the lock is read as it reads itself.
-     */
+    /** Without metadata nothing tells a release date from a commit's, so the lock's date stands. */
     public static function of(LockedPackage $package, ?PackageMetadata $metadata): self
     {
         $time = $package->time();
@@ -63,11 +55,10 @@ final class InstalledRelease
         if ($metadata === null) {
             return new self($time === null ? self::UNDATED : self::RELEASE, $time, $time, null);
         }
-        // The parent dates the version whether or not the lock carries a date of its own. Only a
-        // parent's, though: fromPackages() keeps a date per release for any package that declares
-        // `replace: <other> self.version`, so that its children can read them, and guzzlehttp/guzzle
-        // — which replaces the old `guzzle/*` packages — would otherwise be dated by itself and
-        // told its own release was a commit two tags share.
+        // The parent dates the version whether or not the lock has a date. Only a parent counts:
+        // fromPackages() keeps release dates for any package that declares `replace: <other>
+        // self.version`, else guzzlehttp/guzzle dates itself and reads its own release
+        // as a shared commit.
         $datedBy = $metadata->releaseDatesBy();
         $parent = $datedBy === null ? null : self::parentDateOf($package, $metadata);
         if ($parent !== null) {
@@ -76,14 +67,10 @@ final class InstalledRelease
         if ($time === null) {
             return new self(self::UNDATED, null, null, null);
         }
-        // Two readings of the same fact, and either is enough to set the lock's date aside. The
-        // first is the installed tag itself: fromPackages() marks every tag it dates by a commit
-        // the tag's neighbours share. The second is the package — one that could not date its own
-        // newest release and took a parent's is a split, and a split's tags are all dated that
-        // way, including a tag the repository no longer lists for the first reading to mark.
-        // Asking only the second read a commit's date as a release's wherever no parent was
-        // involved: illuminate/contracts v8.83.27 without one, and wallabag's pagerfanta/twig
-        // v4.8.0, whose newest release nothing dates either.
+        // Either reading sets the lock's date aside. First: fromPackages() marked the installed tag
+        // as dated by a commit its neighbours share. Second: the package took a parent's date for
+        // its newest release, so it is a split and all its tags are dated that way, even one that
+        // the repository does not list. The second alone misses a split that no parent dates.
         if ($metadata->sharesItsCommit($package->version()) || $metadata->lastStableDatedBy() !== null) {
             return new self(self::SHARED_COMMIT, null, $time, null);
         }
@@ -91,7 +78,7 @@ final class InstalledRelease
         return new self(self::RELEASE, $time, $time, null);
     }
 
-    /** One of the constants above. */
+    /** One of the kind constants of this class. */
     public function kind(): string
     {
         return $this->kind;
@@ -115,7 +102,6 @@ final class InstalledRelease
         return $this->datedBy;
     }
 
-    /** Whether a release date was found at all — the one question every measurement asks first. */
     public function isDated(): bool
     {
         return $this->at !== null;

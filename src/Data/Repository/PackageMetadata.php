@@ -12,34 +12,23 @@ use Lockrot\Data\Forge\SupportSource;
 use Lockrot\Lock\PackageOrigin;
 
 /**
- * Memory: fromPackages() folds the given package objects into scalars in a single pass and
- * retains nothing beyond them. Nothing here retains a per-release object, so a 200-package lock
- * costs kilobytes rather than the tens of megabytes the full release history would. The one
- * per-release values kept are a date per stable tag, and only for a monorepo parent
- * ({@see $releaseDates}): a thousand dates for laravel/framework, nothing for anyone else; and
- * the stable tags that share their commit ({@see $sharedCommitVersions}), which is a set only a
- * subtree split fills.
+ * Keeps scalars only: fromPackages() retains no per-release object. The exceptions are a date per
+ * stable tag of a monorepo parent ({@see $releaseDates}) and the stable tags that share a commit
+ * ({@see $sharedCommitVersions}).
  *
  * @internal
  */
 final class PackageMetadata
 {
     /**
-     * How many stable tags have to sit on one source commit before their date is read as the
-     * commit's rather than a release's. A subtree split piles them up by the dozen — 83 on the
-     * commit behind illuminate/macroable v10.49.0, dated a year and a half before the release.
-     * Two on one commit is what an ordinary repository does now and then: a re-tag, or the last
-     * two releases of a branch cut with nothing changed in between (symfony/* 3.4.46 and 3.4.47);
-     * there the date is at most one release interval off, and reading it keeps a dead branch
-     * measurable. The understatement grows with the count, which is the only handle there is —
-     * every tag on the commit carries the same date, so the span between them cannot be read.
+     * The number of stable tags on one source commit from which their date counts as the commit's,
+     * not a release's. See docs/verdicts.md#dates-from-the-monorepo.
      */
     public const SHARED_COMMIT_TAGS = 3;
 
     /**
-     * The `replace` constraint a subtree split carries: the component's `vX.Y.Z` is the monorepo's
-     * own `vX.Y.Z`. Composer resolves it to an exact-version constraint and keeps the written form
-     * on the link, which is the form that can be told apart from a range.
+     * The `replace` constraint of a subtree split: the component's `vX.Y.Z` is the monorepo's own.
+     * Composer resolves it to an exact version, so only the written form tells it from a range.
      */
     private const SELF_VERSION = 'self.version';
 
@@ -55,45 +44,36 @@ final class PackageMetadata
     private string $type;
     private \DateTimeImmutable $dataDate;
     /**
-     * Per release branch ({@see ReleaseBranch}), by branch key — an integer key where PHP makes one
-     * of `"1"`: the newest dated stable release (`version`, `at`) and the branch's highest stable
-     * tag (`highest`: as Composer normalizes it, as the repository prints it, and when it was
-     * released, null when the repository does not say). What {@see \Lockrot\Signal\Rule\LeftBehindRule}
-     * compares the installed branch against. A branch this package could not date itself and its
-     * monorepo parent did ({@see datedBy()}) names the parent under `dated_by`.
+     * By {@see ReleaseBranch} key, an integer where PHP makes one of `"1"`: the newest dated stable
+     * release (`version`, `at`) and the branch's highest stable tag (`highest`). A branch that a
+     * monorepo parent dated ({@see datedBy()}) names the parent under `dated_by`.
      *
      * @var array<array-key, array{version: string, at: ?\DateTimeImmutable, highest: array{normalized: string, pretty: string, at: ?\DateTimeImmutable}, dated_by?: string, php: ?string}>
      */
     private array $latestStableByBranch;
     /**
-     * Every package name a version of this one `replace`s at `self.version` — the split packages of
-     * a monorepo (`laravel/framework` names `illuminate/*`), empty for an ordinary package. The union
-     * over the versions seen: a component that left the monorepo is still one it once carried.
+     * Every package name that a version of this package `replace`s at `self.version`: the split
+     * packages of a monorepo. The union over the versions seen, so a component that left the
+     * monorepo stays in the set.
      *
      * @var list<string>
      */
     private array $replaces;
-    /** The monorepo parent whose dates `lastStableReleaseAt`/`lastStableVersion` come from, null when they are this package's own. */
     private ?string $lastStableDatedBy;
     /**
-     * The release date of every stable tag the repository dates by a release, by normalized
-     * version — kept for a monorepo parent (a package that `replace`s others), whose tag for a
-     * version is the release date of every split package's tag of the same version, and handed to
-     * each child {@see datedBy()} dates. A split package's own tag is dated by a commit other tags
-     * share, and the lock copies that date as the installed version's `time`; this map is where
-     * the installed version's real release date is read from. Empty for an ordinary package.
+     * The release date of every stable tag that the repository dates by a release, by normalized
+     * version. A monorepo parent keeps its own, and each split package that it dates ({@see datedBy()})
+     * takes them: the lock copies a shared commit's date as the installed version's `time`, and
+     * this map holds the real release date. Empty for an ordinary package.
      *
      * @var array<string, \DateTimeImmutable>
      */
     private array $releaseDates;
-    /** The monorepo parent {@see $releaseDates} came from, null when they are this package's own. */
     private ?string $releaseDatesBy;
     /**
-     * Every stable tag, by normalized version, that sits on a commit SHARED_COMMIT_TAGS or more
-     * stable tags share: the tags whose date is the commit's, not a release's. The lock copies that
-     * date as the installed version's `time`, so an installed version in here needs its parent's
-     * date even when its branch's highest tag is dated by a commit of its own
-     * ({@see needsParentDates()}). Empty for an ordinary package, whose tags do not pile up.
+     * Every stable tag, by normalized version, on a commit that SHARED_COMMIT_TAGS or more stable
+     * tags share. The lock copies that commit's date as the installed version's `time`, so such a
+     * version needs its parent's date ({@see needsParentDates()}). Empty for an ordinary package.
      *
      * @var array<string, true>
      */
@@ -144,22 +124,14 @@ final class PackageMetadata
     }
 
     /**
-     * Derived directly from Composer's own package objects for one package name. $versions is
-     * already unwrapped (no AliasPackage) — that is the caller's job, since only the caller knows
-     * how to group loadPackages()'s flat package list by name.
+     * The repository URL is the highest stable release's, not an older release's. An older release
+     * can name a one-off repository, and the activity check then flags the package `abandoned`.
+     * The release is picked by version, not by date or listing order. `time` is optional, and a
+     * hand-written packages.json or a Satis build can omit it or reorder releases. When that
+     * release names no repository, the activity check skips the package: a false `abandoned`
+     * costs more than a missed one.
      *
-     * The repository URL is the highest stable release's, never an older release's. A package's
-     * home is where its *current* code lives: phpstan/phpstan publishes its recent releases with
-     * no `source` at all (`support.source` names phpstan/phpstan-src) and three old releases
-     * pointing at a one-off, since archived, build repository — reading "the first release with a
-     * source" made the package `abandoned`. The release is picked by version, not by date or by
-     * the order the repository lists it in: `time` is optional and a hand-written packages.json or
-     * a Satis build can leave it out or mix it up. When that release names no repository the lock
-     * entry is the next place to look ({@see \Lockrot\Lock\LockedPackage::repositoryUrl()}),
-     * and after that the activity check is skipped, because a false `abandoned` costs more than
-     * a missed one.
-     *
-     * @param list<BasePackage> $versions
+     * @param list<BasePackage> $versions the releases of one package, with no AliasPackage
      */
     public static function fromPackages(string $name, array $versions, \DateTimeImmutable $dataDate): self
     {
@@ -172,26 +144,22 @@ final class PackageMetadata
         $highestStable = null;
         $type = null;
         $byBranch = [];
-        // Stable tags per source commit, and the commit each branch's highest tag points at: a tag
-        // that shares its commit with another stable tag was cut without a change in this repository,
-        // so its `time` — the commit's — is not the release's. See the pass over $byBranch below.
         $tagsOnCommit = [];
         $highestCommitByBranch = [];
         $highestCommit = null;
         $replaces = [];
-        // Every dated stable tag and its commit; kept past this method only for a parent, and
-        // only where the commit is a release's ({@see $releaseDates}).
+        // Kept past this method only for a monorepo parent, and only for tags whose commit is a
+        // release's ({@see $releaseDates}).
         $releaseDates = [];
         $commitByVersion = [];
-        // Every stable tag's commit, dated or not: what the set of shared-commit tags is read from.
+        // Dated or not, unlike $commitByVersion: the shared-commit tags are read from it.
         $commitOfTag = [];
 
         foreach ($versions as $version) {
             foreach ($version->getReplaces() as $link) {
-                // Only `self.version`: that is the subtree split's claim that the two tags are one
-                // release, which is what makes the parent's dates this package's. A replace with a
-                // range (`symplify/easy-coding-standard` replaces `symfony/polyfill-ctype` at `*`)
-                // says "do not install that one too" and says nothing about when either released.
+                // Only `self.version`: it says that the two tags are one release, so the parent's
+                // dates are this package's. A replace with a range says "do not install both" and
+                // nothing about release dates.
                 if (self::SELF_VERSION === $link->getPrettyConstraint()) {
                     $replaces[$link->getTarget()] = true;
                 }
@@ -215,18 +183,12 @@ final class PackageMetadata
                         $lastStableVersion = $version->getPrettyVersion();
                     }
                 }
-                // The branch view keeps the newest *dated stable* release per branch: a backport on a
-                // lower minor released later is the branch's last word, and an alpha on a new major
-                // is not a branch the upstream moved on to. (S2 above counts every tag, pre-releases
-                // included: there a tag can only make the package look younger, here it would make
-                // findings.) The branch's highest tag travels next to it, with its date: it is the
-                // "installed version above everything listed" check, the release a fix on the branch
-                // is looked for in, and — when it carries no date — the sign that the branch's age is
-                // not known (Packagist dates a tag by its commit, and a subtree split repository has
-                // tags without one). A branch with no dated release shows that tag as its newest.
-                // Only normalized strings are compared — a repository that sends both `version` and
-                // `version_normalized` is trusted on the latter and may put anything in the former,
-                // which the loader never parses; the pretty form is only ever printed.
+                // The branch view keeps the newest dated stable release per branch: a backport on a
+                // lower minor is the branch's last word, and an alpha on a new major is not a branch
+                // that upstream moved to. The branch's highest tag travels with it, with its date:
+                // with no date, the branch's age is unknown. A branch with no dated release shows
+                // that tag as its newest. Compare normalized strings only: a repository can put
+                // anything in `version`, and the loader never parses it.
                 $normalized = $version->getVersion();
                 $branch = ReleaseBranch::of($normalized);
                 if ($branch !== null && VersionParser::parseStability($normalized) === 'stable') {
@@ -241,8 +203,8 @@ final class PackageMetadata
                     }
                     $pretty = $version->getPrettyVersion();
                     $tag = ['normalized' => $normalized, 'pretty' => $pretty, 'at' => $releaseDate];
-                    // The php requirement travels with the release the branch names: it is what a
-                    // project moving onto the branch has to satisfy ({@see \Lockrot\Signal\PhpFloor}).
+                    // The php requirement stays with the release that the branch names: a project that
+                    // moves onto the branch must satisfy it ({@see \Lockrot\Signal\PhpFloor}).
                     $php = self::phpOf($version);
                     $entry = $byBranch[$branch] ?? null;
                     if ($entry === null) {
@@ -269,34 +231,27 @@ final class PackageMetadata
                 $type = $version->getType();
             }
         }
-        // A subtree split (illuminate/*, symfony/*) cuts a tag on every release of the monorepo
-        // whether or not this directory changed, so tags pile up on one commit — illuminate/macroable
-        // has 83 stable tags on the commit behind v10.49.0 — and Packagist dates each by that
-        // commit: `time` says when the directory last changed, years before the release it names.
-        // A tag sharing its commit with SHARED_COMMIT_TAGS - 1 other stable tags or more is therefore
-        // dated by no release, and is treated as the undated tag it effectively is: the branch's age
-        // is not known. Fewer than that is a re-tag or a branch's last releases cut with nothing
-        // changed, where the date is one release interval off at most and stays readable.
-        // Dev branches and pre-releases do not count: `dev-main` sits on the newest tag's commit by
-        // construction, and a final cut on its release candidate's commit is dated days late, not years.
+        // A subtree split cuts a tag on every release of the monorepo, so tags pile up on one
+        // commit, and Packagist dates each by that commit. A tag on a commit that SHARED_COMMIT_TAGS
+        // or more stable tags share is dated by no release: it counts as undated, and the branch's
+        // age is unknown. Dev branches and pre-releases do not count: `dev-main` sits on the newest
+        // tag's commit, and a final cut on its candidate's commit is dated days late.
+        // See docs/verdicts.md#dates-from-the-monorepo.
         foreach ($byBranch as $branch => $entry) {
             $commit = $highestCommitByBranch[$branch] ?? null;
             if ($commit !== null && $tagsOnCommit[$commit] >= self::SHARED_COMMIT_TAGS) {
                 $byBranch[$branch] = ['version' => $entry['version'], 'at' => $entry['at'], 'highest' => ['normalized' => $entry['highest']['normalized'], 'pretty' => $entry['highest']['pretty'], 'at' => null], 'php' => $entry['php'] ?? null];
             }
         }
-        // The package's age is its highest tag's age. When that tag carries no date — or, as above,
-        // a date that is the commit's rather than the release's — the newest dated one below it is
-        // not "the last release": it is the last release the repository dated, and how much
-        // younger the tags above it are cannot be known; S2 then has nothing to measure and stays quiet.
+        // The package's age is its highest tag's age. When that tag has no trusted date, an older
+        // dated tag is not the last release, and S2 has nothing to measure.
         if ($highestStable !== null && ($highestStable->getReleaseDate() === null || ($highestCommit !== null && isset($tagsOnCommit[$highestCommit]) && $tagsOnCommit[$highestCommit] >= self::SHARED_COMMIT_TAGS))) {
             $lastStableReleaseAt = null;
             $lastStableVersion = null;
         }
-        // A monorepo parent keeps a date per release for its children to read; the same rule as
-        // above decides which dates are a release's: a tag on a commit SHARED_COMMIT_TAGS or more
-        // stable tags sit on is dated by none. Anyone else keeps nothing — the map is a thousand
-        // entries for laravel/framework, and no ordinary package has children to hand it to.
+        // A monorepo parent keeps a date per release for its children, minus the tags on a shared
+        // commit. Any other package keeps none: it has no children, and the map holds one entry
+        // per release.
         if ($replaces === []) {
             $releaseDates = [];
         } else {
@@ -306,16 +261,16 @@ final class PackageMetadata
                 }
             }
         }
-        // The same rule, per tag: the installed version may be one of these under a branch whose
-        // highest tag has a commit of its own, and then the lock's date for it is the shared commit's.
+        // The same rule, per tag: the installed version can be a shared-commit tag under a branch
+        // whose highest tag has a commit of its own.
         $sharedCommitVersions = [];
         foreach ($commitOfTag as $normalized => $commit) {
             if ($tagsOnCommit[$commit] >= self::SHARED_COMMIT_TAGS) {
                 $sharedCommitVersions[$normalized] = true;
             }
         }
-        // A package with dev branches only has no version order worth the name; its first branch
-        // (Packagist lists the default branch first) is read.
+        // A package with dev branches only has no version order: read its first branch, which
+        // Packagist lists as the default branch.
         $anchor = $highestStable ?? ($versions[0] ?? null);
 
         return new self(
@@ -340,13 +295,11 @@ final class PackageMetadata
     }
 
     /**
-     * Whether the dates this package's findings read are missing in a way a monorepo parent could
-     * fill: the installed branch's highest tag is undated, or the package's own last release is
-     * ({@see fromPackages()} hands both over undated when the tag shares its commit with other
-     * stable tags, as a subtree split's do), or the installed version's own tag shares its commit
-     * that way and no parent has dated it yet — the lock's `time` for it is then the commit's,
-     * whatever the branch above it says. Branches other than the installed one do not count —
-     * every split package has old branches with undated tags, and they decide nothing.
+     * Whether a monorepo parent could fill a missing date. It can when:
+     * - the package's last release is undated
+     * - the installed branch's highest tag is undated
+     * - the installed version's tag shares its commit and no parent has dated it
+     * Other branches do not count: every split package has old branches with undated tags.
      *
      * @param ?string $installedBranch  {@see ReleaseBranch::of()} of the installed version, null for a snapshot
      * @param ?string $installedVersion the installed version as the lock prints it; null leaves the branch to decide
@@ -368,10 +321,8 @@ final class PackageMetadata
     }
 
     /**
-     * Whether the version, in any form the parser takes, is one of {@see $sharedCommitVersions} —
-     * a tag the repository dates by a commit its neighbours share, so its date is not a release's.
-     * Asked per version: the package's newest release sharing a commit says nothing about an older
-     * installed tag, nor the other way round.
+     * Whether the version, in any form the parser takes, is in {@see $sharedCommitVersions}. Asked
+     * per version: a newest release on a shared commit says nothing about an older installed tag.
      */
     public function sharesItsCommit(string $version): bool
     {
@@ -383,17 +334,11 @@ final class PackageMetadata
     }
 
     /**
-     * This package's branches dated by its monorepo parent's. A split package's `vX.Y.Z` is the
-     * parent's `vX.Y.Z` (`replace: {child: self.version}`), and the parent's tag is dated by its own
-     * release where the split's is dated by a commit other tags share, or not at all. So every branch
-     * whose highest tag carries no date takes the parent's entry for the same branch — newest dated
-     * release, highest tag, dates — and is marked `dated_by`; the package's own last release follows
-     * when it was undated for the same reason and the parent dates the branch it is on. A branch the
-     * parent does not have, or leaves undated too, is left as it was; a package the parent does not
-     * replace is returned unchanged. The dated child also takes the parent's date per release
-     * ({@see releaseDateOf()}): the installed version's own date in the lock is the shared commit's,
-     * and the parent's tag of the same version is what dates it. Immutable: a new object, this one
-     * untouched.
+     * This package's branches, dated by its monorepo parent's. A branch whose highest tag has no
+     * date takes the parent's entry for the same branch and names the parent under `dated_by`. The
+     * last release and the per-release dates ({@see releaseDateOf()}) follow. A branch that the
+     * parent does not date stays as it was, and a package that the parent does not replace comes
+     * back unchanged. Immutable: it returns a new object. See docs/verdicts.md#dates-from-the-monorepo.
      */
     public function datedBy(self $parent): self
     {
@@ -411,22 +356,19 @@ final class PackageMetadata
             if ($theirs === null || $theirs['at'] === null || $theirs['highest']['at'] === null) {
                 continue;
             }
-            // The date is the parent's; the php requirement stays this package's own — the split is
-            // what the lock installs, and it is not obliged to require what its parent does.
+            // The date is the parent's. The php requirement stays this package's own: the lock
+            // installs the split, and the split can require less than its parent.
             $byBranch[$key] = ['version' => $theirs['version'], 'at' => $theirs['at'], 'highest' => $theirs['highest'], 'dated_by' => $parent->name, 'php' => $entry['php'] ?? null];
             $datedBranches[] = (string) $key;
         }
-        // A parent that dates no branch of this package still dates its releases: the installed
-        // version may sit on a shared commit while its branch's highest tag does not, and the
-        // parent's tag for it is the date to read. Only a parent with nothing to give leaves this
-        // object as it is.
+        // A parent that dates no branch can still date releases: the installed version can sit on
+        // a shared commit while its branch's highest tag does not.
         if ($datedBranches === [] && $parent->releaseDates === []) {
             return $this;
         }
 
-        // The package's own age is its highest branch's. That branch is in $datedBranches exactly
-        // when this package could not date its own highest tag — which is when fromPackages() left
-        // lastStableReleaseAt null — so asking whether the parent dated it is the whole question.
+        // The package's age is its highest branch's. That branch is in $datedBranches only when
+        // the package could not date its own highest tag.
         $lastStableReleaseAt = $this->lastStableReleaseAt;
         $lastStableVersion = $this->lastStableVersion;
         $lastStableDatedBy = $this->lastStableDatedBy;
@@ -459,9 +401,8 @@ final class PackageMetadata
     }
 
     /**
-     * The branch the package's highest stable tag is on: the greatest key as versions go
-     * (`10` above `9`, `0.3` above `0.0.3`). A package with no branches answers `''`, which is no
-     * branch key — every key is a version — and so matches nothing the caller compares it against.
+     * The greatest branch key in version order (`10` is greater than `9`, `0.3` than `0.0.3`). A
+     * package with no branch gives `''`, which is no branch key and matches nothing.
      *
      * @param array<array-key, mixed> $byBranch
      */
@@ -478,7 +419,6 @@ final class PackageMetadata
         return $highest;
     }
 
-    /** The release's `require.php` as the repository lists it, null when it requires no PHP. */
     private static function phpOf(BasePackage $version): ?string
     {
         $link = $version->getRequires()['php'] ?? null;
@@ -486,7 +426,6 @@ final class PackageMetadata
         return $link === null ? null : $link->getPrettyConstraint();
     }
 
-    /** The commit the release's `source` points at, null when the repository names none. */
     private static function commitOf(BasePackage $version): ?string
     {
         $reference = $version->getSourceReference();
@@ -494,7 +433,6 @@ final class PackageMetadata
         return $reference === null || $reference === '' ? null : $reference;
     }
 
-    /** The release's `source` URL, else its `support.source` reduced to the repository, else null. */
     private static function repositoryOf(BasePackage $version): ?string
     {
         $url = $version->getSourceUrl();
@@ -528,25 +466,21 @@ final class PackageMetadata
     }
 
     /**
-     * The registry that marked the package abandoned, by the notification-url of the version that
-     * says so, when it is one lockrot names; the replacement is a name it gave. Null otherwise.
+     * The registry that marked the package abandoned, from the notification-url of the version that
+     * says so. The replacement is a name that this registry gave. Null when lockrot names no registry.
      */
     public function abandonedBy(): ?string
     {
         return $this->abandonedBy;
     }
     /**
-     * Versions seen for this package. Dev branches are only counted for a package with no tagged
-     * release, since the `~dev` file is not fetched otherwise.
+     * The number of versions seen. Dev branches count only for a package with no tagged release,
+     * because the `~dev` file is not fetched otherwise (docs/internals.md#two-passes).
      */
     public function releaseCount(): int
     {
         return $this->releaseCount;
     }
-    /**
-     * Where the package's current code lives: the highest stable release's `source` URL, else its
-     * `support.source`. Null when that release names neither.
-     */
     public function repositoryUrl(): ?string
     {
         return $this->repositoryUrl;
@@ -565,7 +499,7 @@ final class PackageMetadata
         return $this->hasStableRelease;
     }
 
-    /** The highest non-dev tag's release date; null when the repository dates none, or not that one. */
+    /** The newest dated stable release. Null when the highest tag has no trusted date. */
     public function lastStableReleaseAt(): ?\DateTimeImmutable
     {
         return $this->lastStableReleaseAt;
@@ -576,24 +510,23 @@ final class PackageMetadata
         return $this->lastStableVersion;
     }
 
-    /** The monorepo parent `lastStableReleaseAt()` was read from ({@see datedBy()}), null when it is this package's own date. */
+    /** The monorepo parent that dated `lastStableReleaseAt()` ({@see datedBy()}). Null when the date is the package's own. */
     public function lastStableDatedBy(): ?string
     {
         return $this->lastStableDatedBy;
     }
 
-    /** @return list<string> every package name a version of this one replaces; {@see $replaces} */
+    /** @return list<string> */
     public function replaces(): array
     {
         return $this->replaces;
     }
 
     /**
-     * When the given version released, as a monorepo parent's tag of that version dates it —
-     * this package's own tags for a parent, the parent's for a split package it dated
-     * ({@see datedBy()}; {@see releaseDatesBy()} names it). Null for a version the parent does
-     * not list or dates by a shared commit, and for every version of an ordinary package, whose
-     * release dates are the lock's business.
+     * The release date of the version, as a monorepo parent's tag of it gives it: this package's
+     * own tags for a parent, the parent's for a split package that it dated ({@see datedBy()}).
+     * Null for a version that the parent does not list or dates by a shared commit, and for every
+     * version of an ordinary package.
      *
      * @param string $normalizedVersion as Composer normalizes it (`8.83.27.0`)
      */
@@ -602,17 +535,15 @@ final class PackageMetadata
         return $this->releaseDates[$normalizedVersion] ?? null;
     }
 
-    /** The monorepo parent {@see releaseDateOf()} reads, null when the dates are this package's own or it has none. */
+    /** The monorepo parent that dated {@see releaseDateOf()}. Null when the dates are the package's own or absent. */
     public function releaseDatesBy(): ?string
     {
         return $this->releaseDatesBy;
     }
 
     /**
-     * The newest dated stable release on every release branch (`version`, `at`) and the branch's
-     * highest stable tag (`highest`: `normalized`, `pretty`, `at`), keyed by {@see ReleaseBranch} key
-     * (an integer where PHP makes one of `"1"`); pre-releases do not count. A branch whose releases
-     * carry no `time` at all shows its highest tag as its newest, with a null date.
+     * The branches that {@see $latestStableByBranch} describes. Pre-releases do not count. A branch
+     * whose releases carry no `time` shows its highest tag as its newest, with a null date.
      *
      * @return array<array-key, array{version: string, at: ?\DateTimeImmutable, highest: array{normalized: string, pretty: string, at: ?\DateTimeImmutable}, dated_by?: string, php: ?string}>
      */

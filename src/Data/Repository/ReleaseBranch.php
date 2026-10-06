@@ -8,13 +8,9 @@ use Composer\Semver\Comparator;
 use Composer\Semver\VersionParser;
 
 /**
- * The release branch a version belongs to: the range a caret constraint on it would stay inside.
- * `1.2.3` and `1.9.0` share branch `1`; `0.3.1` and `0.3.9` share `0.3`, `0.4.0` is another branch,
- * as `^0.3` would have it; below `0.1` every patch is a branch of its own (`^0.0.3` is
- * `>=0.0.3 <0.0.4`), so `0.0.3` and `0.0.4` are two. A branch snapshot (`dev-master`, `2.x-dev`)
- * belongs to no branch — S6 speaks for it.
- *
- * Keys are version strings on purpose (`"1"`, `"0.3"`, `"0.0.3"`): {@see Comparator} orders them.
+ * The release branch a version belongs to: the range a caret constraint on it stays inside. A
+ * branch snapshot (`dev-master`, `2.x-dev`) belongs to no branch. Keys are version strings (`"1"`,
+ * `"0.3"`, `"0.0.3"`), so that {@see Comparator} orders them. See docs/verdicts.md#left-behind.
  *
  * @internal
  */
