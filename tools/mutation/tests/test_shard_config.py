@@ -23,6 +23,11 @@ class TheShardConfig(unittest.TestCase):
         with self.assertRaises(ValueError):
             shard_config.config(CONFIG, ['src/Verdict', 'src/Version.php'])
 
+    def test_src_itself_and_a_path_leaving_it_are_refused(self):
+        for path in ('src', 'src/', 'src/../lib', 'src/Verdict/../../lib'):
+            with self.subTest(path=path), self.assertRaises(ValueError):
+                shard_config.config(CONFIG, [path])
+
     def test_a_path_outside_src_is_refused(self):
         with self.assertRaises(ValueError):
             shard_config.config(CONFIG, ['lib/Thing'])

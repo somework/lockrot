@@ -11,6 +11,7 @@ path, when the pull request changes it. Standard library only, as tools/corpus.
 """
 
 import json
+import posixpath
 import sys
 from typing import List
 
@@ -22,10 +23,11 @@ def config(text: str, directories: List[str]) -> str:
         raise ValueError('infection.json5 no longer reads {}'.format(SOURCE))
     if not directories:
         raise ValueError('a shard needs at least one directory')
-    for directory in directories:
+    normalised = [posixpath.normpath(directory) for directory in directories]
+    for directory in normalised:
         if not directory.startswith('src/') or directory.endswith('.php'):
             raise ValueError('not a directory under src: ' + directory)
-    return text.replace(SOURCE, '"directories": ' + json.dumps([d.rstrip('/') for d in directories]), 1)
+    return text.replace(SOURCE, '"directories": ' + json.dumps(normalised), 1)
 
 
 if __name__ == '__main__':
