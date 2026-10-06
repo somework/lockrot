@@ -59,13 +59,12 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
- * The published schemas under resources/ describe what the formatters really write. Every document
- * lockrot emits for a machine — the `--format=json` report, the `--explain` document, the baseline
- * file — is produced here from recorded fixtures and validated against its schema twice: as
- * published (objects open, so a consumer's older copy keeps validating), and against a strict
- * twin with `additionalProperties: false` on every declared object, so a field a formatter gains
- * without the schema learning it fails this test rather than reaching a user undocumented. The
- * JSON samples in docs/ are validated the same way, so the docs cannot drift either.
+ * The published schemas under resources/ describe what the formatters write. This test produces
+ * each document from recorded fixtures: the `--format=json` report, the `--explain` document and
+ * the baseline file. It validates each against its schema as published (objects open, so an older
+ * copy of the schema keeps validating) and against a strict twin with `additionalProperties: false`
+ * on every declared object. A field that a formatter gains without the schema fails here. The JSON
+ * samples in docs/ are validated the same way.
  */
 final class JsonSchemaConformanceTest extends TestCase
 {
@@ -177,9 +176,9 @@ final class JsonSchemaConformanceTest extends TestCase
     }
 
     /**
-     * `--format=html` embeds the same document the JSON format writes, so a consumer who pulls the
-     * payload out of the page gets something the published schema describes. The page also has to
-     * survive being a page: nothing fetched, and no string able to close the script it sits in.
+     * `--format=html` embeds the same document as the JSON format, so the published schema describes
+     * the payload that a consumer pulls out of the page. The page must also fetch nothing, and no
+     * string can close the script that holds it.
      *
      * @dataProvider fixtureDirs
      */
@@ -205,11 +204,9 @@ final class JsonSchemaConformanceTest extends TestCase
     }
 
     /**
-     * The two blocks a report only carries once something has filled them in.
-     *
-     * The conformance run above builds its reports straight from the analyzer, so `run` is null and
-     * no finding has a baseline standing — valid, and proving nothing about the shape of either.
-     * This fills both and validates against the strict twin, where an undeclared key fails.
+     * A report built straight from the analyzer has `run` null and no baseline standing, which
+     * proves nothing about the shape of either. This test fills both and validates against the
+     * strict twin, where an undeclared key fails.
      */
     public function testAReportThatKnowsItsRunAndItsBaselineValidatesToo(): void
     {
@@ -229,9 +226,8 @@ final class JsonSchemaConformanceTest extends TestCase
         self::assertIsArray($decoded);
         $run = JsonPath::arrayAt($decoded, ['run']);
         self::assertSame('8.4', $run['target_php']);
-        // A display name, not a vendor/name: `extra.lockrot.project` exists precisely so a project
-        // can be called something that is not its package name, and typing the field as one made
-        // the published schema reject the value the documentation recommends.
+        // A display name, not a vendor/name: `extra.lockrot.project` lets a project carry a name that
+        // is not its package name, which a vendor/name type would reject.
         self::assertSame('Acme internal API', $run['project']);
         // What Composer calls the project, beside what the report calls it: the manifest's own
         // name, whatever extra.lockrot.project says.
@@ -255,12 +251,10 @@ final class JsonSchemaConformanceTest extends TestCase
     }
 
     /**
-     * `unattributed` from a real dependency graph, through the formatter, against the strict twin.
-     *
-     * No recorded fixture reaches a flagged package from more than eight direct requirements
-     * (wallabag's widest is eight), so their documents all carry `unattributed: []` and the items
-     * schema is never applied. Here nine roots require one stale package, the first of them also a
-     * stale leaf of its own: the shared package is listed with its fan-in, the leaf is exposure.
+     * No recorded fixture reaches a flagged package from more than eight direct requirements, so
+     * their documents all carry `unattributed: []` and the items schema is never applied. Here nine
+     * roots require one stale package, the first of them also a stale leaf of its own: the shared
+     * package is listed with its fan-in, the leaf is exposure.
      */
     public function testAReportWithUnattributedPackagesValidates(): void
     {
@@ -301,9 +295,9 @@ final class JsonSchemaConformanceTest extends TestCase
     }
 
     /**
-     * The per-signal `data` branches are only tested if every signal really occurs in the fixtures.
-     * S9 needs Composer's advisory API, which the 2.2 LTS does not have; there the run carries no
-     * advisory and the S9 branch of the schema goes untested, as it does for a user on that LTS.
+     * The per-signal `data` branches are only tested if every signal occurs in the fixtures. S9
+     * needs Composer's advisory API, which the 2.2 LTS does not have. On that LTS the run carries no
+     * advisory and the S9 branch of the schema goes untested.
      */
     public function testTheFixturesExerciseEverySignal(): void
     {
@@ -328,7 +322,6 @@ final class JsonSchemaConformanceTest extends TestCase
         self::assertSame($expected, array_keys($seen));
     }
 
-    /** A signal's `data` must match its own branch, not just any branch: a wrong id/data pair fails. */
     public function testASignalWhoseDataBelongsToAnotherSignalIsRejected(): void
     {
         $json = (new JsonFormatter())->format(self::analysis('apps/wallabag_wallabag')->report());
@@ -356,8 +349,8 @@ final class JsonSchemaConformanceTest extends TestCase
 
     /**
      * The sets that grow in minor releases are open strings in the published schema: a signal id, an
-     * S10 check or reason and an S8 floor source a later release adds validate against a copy taken
-     * now, and so do the `<vendor>:<name>` names reserved for signals that do not come from lockrot.
+     * S10 check or reason and an S8 floor source that a later release adds validate against this
+     * release's schema, and so do the `<vendor>:<name>` names reserved for signals from elsewhere.
      * A signal whose id the schema does not list carries any object as its data.
      */
     public function testValuesALaterReleaseOrAnExtensionAddsValidateAgainstThePublishedSchema(): void
@@ -380,8 +373,8 @@ final class JsonSchemaConformanceTest extends TestCase
 
     /**
      * A mistyped value that still fits the open pattern passes the published schema, which cannot
-     * tell it from a value a later release adds; the strict twin reads `x-known-values` as the enum
-     * and rejects it, which is how lockrot's own output is held to the values it documents.
+     * tell it from a value a later release adds. The strict twin reads `x-known-values` as the enum
+     * and rejects it, which holds lockrot's own output to the values it documents.
      *
      * @dataProvider typosInKnownValues
      */
@@ -437,10 +430,9 @@ final class JsonSchemaConformanceTest extends TestCase
     }
 
     /**
-     * The published schema is open to new ids but not to any string: a signal or a block named
-     * outside `S<n>` and the `<vendor>:<name>` rule docs/compatibility.md states — lower-case letters,
-     * digits, `_`, `.` and `-`, starting with a letter or a digit — is rejected, so the documented rule
-     * and the pattern cannot drift apart.
+     * The published schema is open to new ids but not to any string. A signal or a block named
+     * outside `S<n>` and the `<vendor>:<name>` rule of docs/compatibility.md is rejected, so the
+     * documented rule and the pattern cannot drift apart.
      *
      * @dataProvider namesThatAreNotSignalIds
      */
@@ -538,9 +530,9 @@ final class JsonSchemaConformanceTest extends TestCase
     }
 
     /**
-     * The published configuration schema accepts a format a later release adds, and a vendor's, so an
-     * editor holding an older copy does not flag it; the strict reading, which is what lockrot
-     * validates `extra.lockrot` with, does not.
+     * The published configuration schema accepts a format that a later release adds, and a vendor's,
+     * so an editor with an older copy does not flag it. The strict reading, which lockrot uses to
+     * validate `extra.lockrot`, does not.
      */
     public function testThePublishedConfigSchemaAcceptsAFormatALaterReleaseOrAnExtensionAdds(): void
     {
@@ -555,17 +547,11 @@ final class JsonSchemaConformanceTest extends TestCase
         }
     }
 
-    /** wallabag's report, decoded to objects. */
     private static function wallabagReport(): \stdClass
     {
         return self::object(json_decode((new JsonFormatter())->format(self::analysis('apps/wallabag_wallabag')->report())));
     }
 
-    /**
-     * The document with a value in every open set that no lockrot has written: a signal S99 and a
-     * signal acme:licence with data of their own, an S10 check and reason, both blocking those two,
-     * and an S8 floor source.
-     */
     private static function withNewValues(\stdClass $document): \stdClass
     {
         $s10 = self::firstSignal($document, Signal::S10);
@@ -582,7 +568,7 @@ final class JsonSchemaConformanceTest extends TestCase
         return $document;
     }
 
-    /** @return list<\stdClass> a signal with an id no lockrot wrote, and one named as a vendor's */
+    /** @return list<\stdClass> */
     private static function signalsNoLockrotWrote(): array
     {
         $signals = [];
@@ -661,7 +647,7 @@ final class JsonSchemaConformanceTest extends TestCase
      * S6's data is typed, and its `reason` is an open set: a value a later release adds validates
      * against the schema this one publishes, as a consumer holds it. The strict twin is this
      * release's own contract and reads `x-known-values` as the enum, so it takes the reasons this
-     * release lists and rejects any other. A wrong type on any of the new fields fails either way.
+     * release lists and rejects any other. A wrong type on any typed field fails either way.
      */
     public function testS6DataIsTypedButItsReasonIsOpen(): void
     {
@@ -698,8 +684,8 @@ final class JsonSchemaConformanceTest extends TestCase
     }
 
     /**
-     * `from_composer_repository` is a boolean on every finding lockrot writes from 0.13.0 on, and
-     * optional in both schemas, so a 0.12 finding without it still validates. Null and a word do not.
+     * `from_composer_repository` is a boolean on every finding lockrot writes, and optional in both
+     * schemas, so a finding without it still validates. Null and a word do not.
      */
     public function testAFindingSaysWhetherARepositoryWasAskedAboutItAsABoolean(): void
     {
@@ -720,7 +706,7 @@ final class JsonSchemaConformanceTest extends TestCase
     /**
      * `libyears_unmeasured` is an open set in both schemas: a reason a later release adds, and null,
      * validate against the published schema, and the strict twin holds the value to the reasons this
-     * release writes. A 0.12 finding without the key validates against both.
+     * release writes. A finding without the key validates against both.
      */
     public function testAFindingSaysWhyItsLibyearsAreNullAsAnOpenCode(): void
     {
@@ -744,7 +730,7 @@ final class JsonSchemaConformanceTest extends TestCase
             }
         }
 
-        // The block's keys: one a later release adds is a count; a key that is not a count fails.
+        // The block's keys: one that a later release adds is a count, and a key that is not a count fails.
         [$report] = $documents[Schemas::REPORT];
         $block = JsonPath::arrayAt($report, ['libyears', 'unmeasured']);
         $withKey = static function ($value) use ($report, $block): string {
@@ -785,9 +771,9 @@ final class JsonSchemaConformanceTest extends TestCase
     }
 
     /**
-     * `priority_basis` in both schemas: a step reason a later release adds validates against the
-     * published schema and the strict twin holds the reason to the ones this release writes; `none`
-     * is no step's `from` or `to` in either; a 0.12 finding without the key validates against both.
+     * `priority_basis` in both schemas: a step reason that a later release adds validates against the
+     * published schema, and the strict twin holds the reason to the ones this release writes. `none`
+     * is no step's `from` or `to` in either. A finding without the key validates against both.
      */
     public function testAFindingSaysHowItsPriorityWasReached(): void
     {
@@ -825,9 +811,9 @@ final class JsonSchemaConformanceTest extends TestCase
     }
 
     /**
-     * `no_fix_expected` in both schemas: null, an empty list and a list of `{id, reason}` validate,
-     * a no-fix reason a later release adds passes the published schema and the strict twin rejects a
-     * typo in one; a 0.12 finding without the key validates against both.
+     * `no_fix_expected` in both schemas: null, an empty list and a list of `{id, reason}` validate.
+     * A no-fix reason that a later release adds passes the published schema, and the strict twin
+     * rejects a typo in one. A finding without the key validates against both.
      */
     public function testAFindingNamesTheAdvisoriesNoFixIsExpectedFor(): void
     {
@@ -861,7 +847,7 @@ final class JsonSchemaConformanceTest extends TestCase
         }
     }
 
-    /** S9's `releases_read` is an optional boolean in the report schema; the explain schema types signal data as any object. */
+    /** S9's `releases_read` is an optional boolean in the report schema. The explain schema types signal data as any object. */
     public function testS9SaysWhetherTheReleasesWereRead(): void
     {
         if (!interface_exists(AdvisoryProviderInterface::class)) {
@@ -901,8 +887,8 @@ final class JsonSchemaConformanceTest extends TestCase
     /**
      * The gate's inputs in `run`, the root `gate` and each finding's `gate`: four open vocabularies
      * (`run.mode`, `run.fail_on_kind`, `gate.tripped_by`'s items, a finding's `gate.exempt_by`) take
-     * a value a later release adds and the strict twin holds each to the values this release writes;
-     * a cause listed twice fails; a document written before the fields validates against both.
+     * a value that a later release adds, and the strict twin holds each to the values this release
+     * writes. A cause listed twice fails. A document without the fields validates against both.
      */
     public function testTheGateAndWhatItWasToldAreTypedAndTheirVocabulariesOpen(): void
     {
@@ -967,10 +953,10 @@ final class JsonSchemaConformanceTest extends TestCase
 
     /**
      * Every note lockrot can write, one per code, through the published schema and its strict twin,
-     * and each of the five vocabularies open to a value a later release adds: the published schema
-     * takes it, the strict twin, which reads `x-known-values` as the enum, does not. A code the schema
-     * does not list carries any object; a listed one keeps its `data` typed. A document written
-     * before the field validates without it.
+     * and each open vocabulary with a value that a later release adds: the published schema takes
+     * it, the strict twin, which reads `x-known-values` as the enum, does not. A code that the schema
+     * does not list carries any object. A listed code keeps its `data` typed. A document without the
+     * field validates.
      */
     public function testARunNotesDataIsTypedPerCodeAndItsVocabulariesAreOpen(): void
     {
@@ -993,7 +979,7 @@ final class JsonSchemaConformanceTest extends TestCase
         self::assertSame(RunNote::CODES, array_map(static fn (RunNote $note): string => $note->code(), $notes), 'one of each');
         $decoded['notes'] = array_map(static fn (RunNote $note): string => $note->text(), $notes);
         $details = self::decoded((string) json_encode(array_map(static fn (RunNote $note): array => $note->toArray(), $notes)));
-        // Decoded to arrays, the offline note's `{}` would come back as a list.
+        // Decoded to arrays, the offline note's `{}` comes back as a list.
         $details[0] = array_merge(JsonPath::arrayAt($details, [0]), ['data' => new \stdClass()]);
         $decoded['note_details'] = $details;
         $this->assertValid(Schemas::REPORT, (string) json_encode($decoded), 'every code');
@@ -1063,8 +1049,6 @@ final class JsonSchemaConformanceTest extends TestCase
     }
 
     /**
-     * $document with the value at $path replaced, encoded.
-     *
      * @param array<mixed, mixed> $document
      * @param list<int|string>    $path
      * @param mixed               $value
@@ -1257,7 +1241,7 @@ final class JsonSchemaConformanceTest extends TestCase
         }
     }
 
-    /** Every document ships exactly these numbers, a file for each; a number joins in the PR that adds its file. */
+    /** Every document ships exactly these numbers, a file for each. A number joins in the PR that adds its file. */
     public function testEachDocumentShipsTheFilesOfItsNumbers(): void
     {
         $shipped = [];
@@ -1293,7 +1277,7 @@ final class JsonSchemaConformanceTest extends TestCase
         $analysis = self::analyzer()->analyzeWithFacts($lock->packages(false), $lock, ProjectConfig::empty(), false);
 
         // What the command records for a lock read without its manifest: no name to display and
-        // no root package, both written as null — the null branch of each has to validate too.
+        // no root package, both written as null — the null branch of each must validate too.
         $json = (new JsonFormatter())->format($analysis->report()->withRun(new RunSettings(null, null, '8.4', null, FailOn::none(), null)));
 
         $decoded = json_decode($json, true);
@@ -1335,7 +1319,7 @@ final class JsonSchemaConformanceTest extends TestCase
     {
         $schema = self::schemaAt(Schemas::path($document, $number));
 
-        // validate() takes its subject by reference; a copy keeps $schema typed for the reads below.
+        // validate() takes its subject by reference, so a copy keeps $schema typed.
         $subject = self::schemaAt(Schemas::path($document, $number));
         $validator = new Validator();
         $validator->validate($subject, (object) ['$ref' => 'http://json-schema.org/draft-04/schema#'], Constraint::CHECK_MODE_VALIDATE_SCHEMA);
@@ -1348,8 +1332,8 @@ final class JsonSchemaConformanceTest extends TestCase
     }
 
     /**
-     * A docs sample names its schema by `$schema`, else by `lockrot.schema` and its shape; a
-     * composer.json sample is held to the config schema lockrot reads.
+     * A docs sample names its schema by `$schema`, else by `lockrot.schema` and its shape. A
+     * composer.json sample is held to the config schema that lockrot reads.
      *
      * @return iterable<string, array{array<string, mixed>, array{string, int}|null}>
      */
@@ -1383,7 +1367,6 @@ final class JsonSchemaConformanceTest extends TestCase
         self::assertSame($expected, self::schemaFor($document));
     }
 
-    /** A docs sample that names report-1 is checked against resources/lockrot-report-1.schema.json. */
     public function testADocsSampleNamingReport1IsCheckedAgainstTheReport1File(): void
     {
         $found = 0;
@@ -1399,11 +1382,11 @@ final class JsonSchemaConformanceTest extends TestCase
     }
 
     /**
-     * The validation helper picks the file of the number a document names, not the newest one: with
-     * a report-2 file beside report-1 (a temporary copy of resources/, the report-2 file rejecting
-     * every document), a report-1 document validates against report-1, and one naming report-2 is
-     * held to report-2. A document that names no number takes the one given, and one that names
-     * another number than the one given fails.
+     * The validation helper picks the file of the number a document names, not the newest one. A
+     * temporary copy of resources/ holds a report-2 file beside report-1, and the report-2 file
+     * rejects every document. A report-1 document validates against report-1, and a document that
+     * names report-2 is held to report-2. A document that names no number takes the one given, and
+     * a document that names another number than the one given fails.
      */
     public function testADocumentIsHeldToTheFileOfTheNumberItNamesWhileANewerFileSitsBesideIt(): void
     {
@@ -1446,8 +1429,8 @@ final class JsonSchemaConformanceTest extends TestCase
     }
 
     /**
-     * Every negative fixture is rejected, with the error it names: one row per file. Until the
-     * first negatives land the directory holds only its .gitkeep, and the one row says so.
+     * Every negative fixture is rejected, with the error it names: one row per file. A directory
+     * without fixtures holds only its .gitkeep, and one row says so.
      *
      * @return iterable<string, array{string}>
      */
@@ -1501,7 +1484,6 @@ final class JsonSchemaConformanceTest extends TestCase
             'report-1/verdict-outside-the-closed-set.json' => [true, false],
         ], $outcomes);
 
-        // The strict-only fixture is valid as published: only the strict twin rejects it.
         [$json] = NegativeFixtures::read($rows['baseline-1/envelope-gains-a-key.strict.json'][0]);
         $this->assertValid(Schemas::BASELINE, $json, 'a strict-only fixture as published');
         // The rejected one is rejected for the error it names, and a fixture naming another is not a pass.
@@ -1549,8 +1531,8 @@ final class JsonSchemaConformanceTest extends TestCase
     }
 
     /**
-     * A docs sample as a decoded document. The samples in docs/ elide with `…` lines, which leave a
-     * trailing comma behind; both are removed before decoding.
+     * The samples in docs/ elide with `…` lines, which leave a trailing comma behind. The method
+     * removes both before it decodes the sample.
      *
      * @return array<string, mixed>
      */
@@ -1571,7 +1553,7 @@ final class JsonSchemaConformanceTest extends TestCase
     /**
      * The schema a docs sample follows, by document and number: the document and number its
      * `$schema` URL names, else its shape and its `lockrot.schema`. A composer.json sample is held to
-     * the config schema lockrot reads; an envelope-only fragment is not validated.
+     * the config schema that lockrot reads. An envelope-only fragment is not validated.
      *
      * @param array<string, mixed> $document
      *

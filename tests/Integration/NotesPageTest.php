@@ -8,16 +8,16 @@ use Lockrot\Analyzer\RunNote;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Every `docs_url` a run note carries opens a page that explains it. The URLs lockrot has written
- * are frozen below and only grow: a code is retired, never removed, and a page that moves stays
- * behind as a stub keeping every id, so a link in a report written years ago still lands on its
+ * Every `docs_url` a run note carries opens a page that explains it. PUBLISHED_NOTE_URLS freezes the
+ * URLs lockrot has written, and it only grows: a code is retired, never removed, and a page that moves
+ * stays behind as a stub keeping every id, so a link in a report written years ago still lands on its
  * section. The mkdocs build checks the page is in the nav; this checks each id is on it.
  */
 final class NotesPageTest extends TestCase
 {
     private const DOCS = __DIR__.'/../../docs/';
 
-    /** Every note URL a lockrot release has written, from 0.13.0 on. Append; never edit or remove. */
+    /** Every note URL that a lockrot release has written. Append, never edit or remove. */
     private const PUBLISHED_NOTE_URLS = [
         'https://lockrot.dev/notes/#offline',
         'https://lockrot.dev/notes/#metadata_unavailable',
@@ -59,7 +59,7 @@ final class NotesPageTest extends TestCase
         self::assertMatchesRegularExpression('/^  - [^:\n]+: notes\.md$/m', (string) file_get_contents(self::DOCS.'../mkdocs.yml'));
     }
 
-    /** Each section says whether its note sets `network_failures`, which is what `--strict-network` fails on. */
+    /** `network_failures` is what `--strict-network` fails on. */
     public function testEachSectionSaysWhetherItsNoteSetsNetworkFailures(): void
     {
         $page = (string) file_get_contents(self::DOCS.'notes.md');

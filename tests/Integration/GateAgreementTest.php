@@ -44,12 +44,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * The gate a document writes against everything else that decides the same thing, on every fixture
- * lock: the exit code the run returned before the gate (Policy's loop and `--generate-baseline`'s
- * expression, frozen here), the rules that tie the gate's fields together, and the annotation level
- * the machine formats print, which reads the same two primitives by a rule of its own. Each lock is
- * read under every fail-on value, with and without --strict-network, with and without a failed
- * lookup, with no baseline and with one taken from the report and then changed so that it holds
- * known, new and worsened findings, in both modes.
+ * lock: the exit code that `oracleExitCode()` computes, the rules that tie the gate's fields
+ * together, and the annotation level that the machine formats print.
  *
  * It covers nothing: Infection skips a mutant whose covering tests together outlast its timeout, and
  * this sweep would push every line of the gate past it. GateTest and ReportTest kill those mutants.
@@ -135,7 +131,7 @@ final class GateAgreementTest extends TestCase
                             $withRun = $compared->withRun(new RunSettings(null, null, '8.4', null, $failOn, new Thresholds(), null, $strict, $mode));
                             $this->holds($withRun->toArray(), $compared, $levels, $failOn, $strict, $mode, $what);
                             // One document per lock and mode through both schemas: the fields' shape
-                            // does not depend on the threshold, and validating all of them is minutes.
+                            // does not depend on the threshold, and validating every document is slow.
                             if ($value === 'medium' && $strict && $networkFailures && ($baseline !== null) === ($mode === Gate::MODE_CHECK)) {
                                 $json = (new JsonFormatter())->format($withRun);
                                 $this->assertValid(Schemas::REPORT, $json, $what);
@@ -216,7 +212,7 @@ final class GateAgreementTest extends TestCase
         }
     }
 
-    /** Policy::exitCode() as it was before the gate, over the same inputs. */
+    /** The exit code rule, written out here independently of the gate. */
     private static function oracleExitCode(Report $report, FailOn $threshold, bool $strict): int
     {
         if ($strict && $report->hadNetworkFailures()) {

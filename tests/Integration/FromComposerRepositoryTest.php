@@ -159,7 +159,6 @@ final class FromComposerRepositoryTest extends TestCase
         self::assertCount(\count($report->findings()), $details, $dir.': every package explained');
     }
 
-    /** The explanation of a package no repository was asked about, against its schema and the strict twin. */
     public function testAnExplanationOfAnEntryNoRepositoryWasAskedAboutValidates(): void
     {
         $analysis = $this->analysis('apps/drupal_drupal');

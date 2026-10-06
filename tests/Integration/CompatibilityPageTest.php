@@ -12,12 +12,11 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * docs/compatibility.md states the order of the closed sets lockrot freezes for 1.x, and
- * docs/verdicts.md states the severity ladder; both are read here against the code, so a page and
- * the engine cannot come to disagree about which verdict is worse. ClosedSetsTest holds the code and
- * the schemas to the same lists.
+ * docs/verdicts.md states the severity order. Both are read here against the code. ClosedSetsTest
+ * holds the code and the schemas to the same lists.
  *
- * Whether every page is in the site navigation, and every link's anchor exists, is `mkdocs build
- * --strict` in CI, through the `validation` block in mkdocs.yml.
+ * `mkdocs build --strict` in CI checks that every page is in the navigation and every link's anchor
+ * exists, through the `validation` block in mkdocs.yml.
  */
 final class CompatibilityPageTest extends TestCase
 {
@@ -41,7 +40,7 @@ final class CompatibilityPageTest extends TestCase
 
     /**
      * The SARIF rules follow the order the results first use them (SarifFormatterTest pins that),
-     * so neither page may name them among the lists kept in Verdict::all() order.
+     * so neither page can name them among the lists kept in Verdict::all() order.
      */
     public function testThePagesDoNotClaimVerdictOrderForTheSarifRules(): void
     {
@@ -59,7 +58,7 @@ final class CompatibilityPageTest extends TestCase
         self::assertStringContainsString('!!! warning "Draft until 1.0.0-RC1"', self::read('compatibility.md'));
     }
 
-    /** `>` where the next verdict is less severe, `=` where the two tie — `finished = ok` today. */
+    /** `>` where the next verdict is less severe, `=` where the two tie. */
     public function testTheVerdictsPageStatesTheSameLadder(): void
     {
         $verdicts = Verdict::all();

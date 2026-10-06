@@ -34,14 +34,13 @@ use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 
 /**
- * S8 decides whether the newest releasing branch above the installed one is within reach, and says
- * so as `floor_source`; `--explain` and the page say it again for every branch row as
- * `php_blocked_by`. Two answers to one question have to agree, so every fixture lock is analysed
- * with S8 and the explanation built from the same two floors — the target PHP and the project's own
- * `require.php` — as the command builds them, and every S8 finding is read against its rows.
+ * S8 says as `floor_source` whether the newest releasing branch above the installed one is within
+ * reach. `--explain` and the page say it again for every branch row as `php_blocked_by`. The two
+ * answers must agree. Every fixture lock is analysed with S8 and with the explanation, both built
+ * from the target PHP and the project's `require.php`, and every S8 finding is read against its rows.
  *
- * The floors are passed to both sides here on purpose: this is the one place that holds S8 to the
- * project's php over the fixtures, so the agreement is tested where both sides see the same floor.
+ * Both sides get the same floors: this is the one place that holds S8 to the project's php over the
+ * fixtures.
  */
 final class BranchFloorAgreementTest extends TestCase
 {
@@ -184,7 +183,7 @@ final class BranchFloorAgreementTest extends TestCase
             self::assertIsArray($row, $what);
             self::assertIsString($row['branch'], $what);
             $blockedBy = $row['php_blocked_by'];
-            // The schema leaves the value open; the values lockrot writes today are these.
+            // The schema leaves the value open: lockrot writes only these.
             self::assertContains($blockedBy, [PhpFloor::PROJECT, PhpFloor::TARGET, null], $what);
             // The row's verdict is its two answers read in S8's order, and null is no answer.
             $composed = $row['admits_project_php'] === false ? PhpFloor::PROJECT : ($row['admits_target_php'] === false ? PhpFloor::TARGET : null);

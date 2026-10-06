@@ -16,29 +16,12 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Backward compatibility of the published schemas: under one schema number, whatever an earlier
- * release's schema accepted, the current one accepts too, and what an earlier release wrote still
- * validates.
- *
- * Two checks, on two kinds of fixture under tests/fixtures/schema-evolution/:
- *
- * - `schemas/<version>/` holds the report, explain, baseline and config schemas each release from
- *   0.9.0 on published (the first with a number in its URL). Each one under the current number must
- *   be accepted by the current file: {@see SchemaWidening} finds a member made required, a type or an
- *   enum value lost, a bound tightened, a listed property dropped or an object closed. This is the
- *   primary check: it covers every branch of the schema, whatever a recording happens to carry.
- * - `<version>/` holds what the signed release PHAR of that version wrote over wallabag's lock,
- *   recorded once by bin/record-schema-evolution: its baseline file, the `--format=json` report
- *   compared against it, and six `--explain --format=json` documents. Each is validated against the
- *   schema its `$schema` names — the current file, or for an older number the newest published copy
- *   of it — as published and against the strict twin, which also catches a field the older document
- *   carries and the current schema stopped listing. The baseline is also read back through
- *   BaselineFile, as a user's committed baseline is. This is the second, real-output check.
- *
- * This is the backward direction only. The forward one — a document the newest lockrot writes,
- * validated against a copy of the schema an older release published — does not hold: 0.10.0's
- * schemas list signal ids S1–S9 and demand a non-empty `chain`, and current documents can carry S10
- * and an empty chain.
+ * Backward compatibility of the published schemas under one schema number: whatever an earlier
+ * release's schema accepted, the current one accepts, and what an earlier release wrote still
+ * validates. {@see SchemaWidening} holds each release's schemas (`schemas/<version>/`) to the current
+ * file on every branch. Each document that a release PHAR wrote over wallabag's lock (`<version>/`,
+ * bin/record-schema-evolution) is validated against its schema. The forward direction does not hold:
+ * a current document can carry an S10 or an empty chain.
  */
 final class SchemaEvolutionTest extends TestCase
 {
@@ -68,7 +51,7 @@ final class SchemaEvolutionTest extends TestCase
         '0.11.0' => 'd8196dbe5b5dbe4aa8cb626f5b135e3cb0ccd8d6989b587b8fe05eee8ceb301a',
     ];
 
-    /** The signal ids each recorded report carries, and its explanations between them, as measured on the recording. */
+    /** The signal ids each recorded report carries, and its explanations between them. */
     private const SIGNALS = [
         '0.9.0' => [Signal::S1, Signal::S2, Signal::S3, Signal::S4, Signal::S5, Signal::S6, Signal::S7, Signal::S8, Signal::S9],
         '0.10.0' => [Signal::S1, Signal::S2, Signal::S3, Signal::S4, Signal::S5, Signal::S6, Signal::S7, Signal::S8, Signal::S9],
@@ -76,9 +59,8 @@ final class SchemaEvolutionTest extends TestCase
     ];
 
     /**
-     * Whether the release writes the report's `run` block and each finding's `baseline` standing,
-     * both new in 0.10.0. The schema keeps them optional for 0.9.0's reports, which is what the
-     * 0.9.0 recording holds it to.
+     * Whether the release writes the report's `run` block and each finding's `baseline` standing.
+     * The schema keeps both optional, which the recording of a release that writes neither holds it to.
      */
     private const WRITES_RUN_AND_STANDING = ['0.9.0' => false, '0.10.0' => true, '0.11.0' => true];
 
@@ -90,8 +72,8 @@ final class SchemaEvolutionTest extends TestCase
 
     /**
      * The sha256 of every schema file each release published, as its tag holds it, by file name.
-     * Up to 0.13.0 a release published one unnumbered file per document; from 0.14.0 on, one file per
-     * document and number, `lockrot-<document>-<number>.schema.json`.
+     * A release from {@see self::FIRST_FILE_NUMBERED} on publishes a file per document and number,
+     * `lockrot-<document>-<number>.schema.json`, and an earlier release one file per document.
      */
     private const RELEASED_SCHEMAS = [
         '0.9.0' => [
@@ -206,8 +188,8 @@ final class SchemaEvolutionTest extends TestCase
     }
 
     /**
-     * The provider and {@see numberOf()} on a directory with two files per document, the layout a
-     * release from 0.14.0 on publishes: one row per file, and under each number the file of that
+     * The provider and {@see numberOf()} on a directory with two files per document, the layout of a
+     * release that numbers its files: one row per file, and under each number the file of that
      * number, never its sibling.
      */
     public function testTheProviderAndNumberOfPickTheFileOfEachNumber(): void
@@ -233,7 +215,7 @@ final class SchemaEvolutionTest extends TestCase
 
     /**
      * Every release from the first numbered one keeps a copy of its schemas here, so a later change
-     * is held to each of them. A release that has none yet fails: copy resources/lockrot-*.schema.json
+     * is held to each of them. A release that has none fails: copy resources/lockrot-*.schema.json
      * as that release's tag holds them to schemas/<version>/ and pin their sha256 in RELEASED_SCHEMAS.
      */
     public function testEveryReleaseKeepsTheSchemasItPublished(): void
@@ -324,8 +306,8 @@ final class SchemaEvolutionTest extends TestCase
     }
 
     /**
-     * The baseline an older release wrote is one a user has committed; the current lockrot reads it
-     * back through the same schema check, and refuses one it does not match.
+     * The baseline that an older release wrote is one that a user has committed. The current lockrot
+     * reads it back through the same schema check, and refuses one that does not match.
      *
      * @dataProvider versions
      */
@@ -343,8 +325,8 @@ final class SchemaEvolutionTest extends TestCase
      * explain-1 types a signal's `data` as a bare object, so validating an explanation checks none of
      * it. Its finding is the object the report's `findings[]` carries (explain-1 says so and points
      * to report-1 for the data), so each explanation's signals are held to report-1's signal
-     * definitions, published and strict. That is this test's check, not one a consumer validating
-     * against explain-1 gets.
+     * definitions, published and strict. That is this test's check. A consumer who validates
+     * against explain-1 does not get it.
      *
      * @dataProvider explanations
      */
@@ -363,8 +345,8 @@ final class SchemaEvolutionTest extends TestCase
     }
 
     /**
-     * The per-signal `data` branches are only exercised if the older documents really carry them; a
-     * signal missing here is a branch whose recorded output goes unchecked (the widening check still
+     * The per-signal `data` branches are only exercised if the older documents carry them. A signal
+     * missing here is a branch whose recorded output goes unchecked (the widening check still
      * covers its schema). The report carries every signal the lock has, and so do the explanations
      * between them.
      *
@@ -391,8 +373,8 @@ final class SchemaEvolutionTest extends TestCase
 
     /**
      * `run` and a finding's `baseline` are optional: absent or null, they validate without proving
-     * anything about their shape, and present, they prove nothing about their absence. 0.9.0 wrote
-     * neither, which is what keeps them optional; 0.10.0 on fill both.
+     * anything about their shape, and present, they prove nothing about their absence. The recording
+     * of a release that writes neither keeps them optional, and the later ones fill both.
      *
      * @dataProvider versions
      */
@@ -424,7 +406,7 @@ final class SchemaEvolutionTest extends TestCase
      * The recordings are committed, so they must not carry the machine they were recorded on: no
      * absolute path (the report prints the baseline path as given, which is why the recorder names a
      * relative one), and no token. Checked on the bytes and on the unescaped form, since a JSON
-     * encoder may write a path as `\/Users\/…`.
+     * encoder can write a path as `\/Users\/…`.
      */
     public function testTheRecordingsNameNoMachineAndCarryNoToken(): void
     {
@@ -477,7 +459,7 @@ final class SchemaEvolutionTest extends TestCase
 
     /**
      * The check can fail: an older document with a required member removed is rejected by the
-     * published schema, and one carrying a field the schema does not list passes the published
+     * published schema, and one that carries a field the schema does not list passes the published
      * schema (objects stay open) and fails the strict twin. One finding is enough to show it.
      */
     public function testTheCheckRejectsWhatAnIncompatibleSchemaWouldBreak(): void
@@ -504,7 +486,7 @@ final class SchemaEvolutionTest extends TestCase
         unset($explanation->lock);
         self::assertNotSame([], $this->errors(Schemas::EXPLAIN, (string) json_encode($explanation), false), 'an explanation without its lock');
 
-        // explain-1 takes any signal data; report-1's signal definitions do not.
+        // explain-1 takes any signal data, and report-1's signal definitions do not.
         $garbled = json_decode(self::read($version, 'explain/scheb~2fa-backup-code.json'));
         self::assertInstanceOf(\stdClass::class, $garbled);
         self::assertInstanceOf(\stdClass::class, $garbled->finding);
@@ -535,8 +517,8 @@ final class SchemaEvolutionTest extends TestCase
     }
 
     /**
-     * The documents of one recording, relative to its directory, as its provenance.json lists them:
-     * a later version may record other explanations than an earlier one did.
+     * The documents of one recording, relative to its directory, as its provenance.json lists them.
+     * Each version can record other explanations.
      *
      * @return list<string> sorted
      */
@@ -567,7 +549,7 @@ final class SchemaEvolutionTest extends TestCase
 
     /**
      * The directories, or the files, in one directory, naturally sorted. scandir() rather than
-     * glob(): a checkout under a path holding `[` or `*` is no pattern.
+     * glob(): a checkout under a path that holds `[` or `*` is no pattern.
      *
      * @return list<string>
      */
@@ -621,8 +603,8 @@ final class SchemaEvolutionTest extends TestCase
 
     /**
      * The schema a document names in its `$schema`, never one guessed from its file name: which
-     * document it is and under which number. A URL that is not one of lockrot's fails rather than
-     * being skipped.
+     * document it is and under which number. A URL that is not one of lockrot's fails and is not
+     * skipped.
      *
      * @param array<mixed, mixed> $document
      *
@@ -661,8 +643,8 @@ final class SchemaEvolutionTest extends TestCase
 
     /**
      * The file in one directory that holds a document's schema under a number, found by the file
-     * names a release uses (`lockrot-<document>.schema.json` up to 0.13.0,
-     * `lockrot-<document>-<number>.schema.json` after) and picked by the number its `id` carries.
+     * names a release uses (`lockrot-<document>.schema.json` or
+     * `lockrot-<document>-<number>.schema.json`) and picked by the number its `id` carries.
      */
     private static function fileUnder(string $dir, string $document, int $number): ?string
     {

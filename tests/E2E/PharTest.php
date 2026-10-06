@@ -115,8 +115,8 @@ final class PharTest extends TestCase
         self::assertSame(0, $process->getExitCode(), $process->getErrorOutput());
         self::assertStringContainsString('self-update', $output);
         self::assertStringContainsString('lockrot', $output);
-        // The PHAR is a Composer application; without an explicit command list it would also offer
-        // to install, update and require packages in whatever project it is pointed at.
+        // The PHAR is a Composer application. Without an explicit command list it also offers to
+        // install, update and require packages in whatever project it is pointed at.
         foreach (['install', 'update', 'require', 'remove', 'dump-autoload'] as $composerCommand) {
             self::assertStringNotContainsString("\n  ".$composerCommand.' ', $output, $composerCommand.' must not be reachable from lockrot.phar');
         }
@@ -125,7 +125,7 @@ final class PharTest extends TestCase
     /**
      * Composer's application turns the scripts of whatever project it is run in into commands of
      * its own. This runs from lockrot's own checkout, whose composer.json defines `cs`, so a build
-     * that stopped filtering registrations would list and run it.
+     * that does not filter registrations lists and runs it.
      */
     public function testAProjectScriptIsNotAReachableCommand(): void
     {
@@ -139,9 +139,9 @@ final class PharTest extends TestCase
 
     /**
      * A project whose `scripts` map a name to a class name. Composer >= 2.9 registers the project's
-     * own autoloader and calls `class_exists()` on that value, which loads the project's file and
-     * runs whatever sits at its top level; here that writes `marker.txt`. lockrot reads a project,
-     * it never executes one, so running the PHAR in this directory must leave no marker behind.
+     * own autoloader and calls `class_exists()` on that value. That loads the project's file and
+     * runs whatever sits at its top level, which here writes `marker.txt`. lockrot reads a project
+     * and never executes one, so running the PHAR in this directory must leave no marker behind.
      *
      * @return array{0: string, 1: string} project directory, marker path
      */
@@ -217,9 +217,8 @@ final class PharTest extends TestCase
     }
 
     /**
-     * The PHAR runs the same command on Composer's application, so the warning renders there too:
-     * one line on stderr in Composer's `<warning>` style rather than a literal tag, and stdout still
-     * the report alone.
+     * The PHAR runs the same command on Composer's application, so the warning renders there too,
+     * in Composer's `<warning>` style rather than as a literal tag.
      */
     public function testThePharWarnsAboutAnUnknownKeyOnStderr(): void
     {
@@ -241,10 +240,9 @@ final class PharTest extends TestCase
     }
 
     /**
-     * The symfony/console inside the PHAR is where a key like `<<fg=red>>` broke the run: escaped by
-     * OutputFormatter::escape() and handed to the formatter, it threw `Invalid "red>" color`, exit 2
-     * with nothing on stdout. Written raw, the key prints as written — in the warning, and in the
-     * config error that quotes it when the schema rejects the config.
+     * The symfony/console inside the PHAR throws `Invalid "red>" color` on a key like `<<fg=red>>`
+     * that OutputFormatter::escape() left half-live. lockrot writes the key raw, so it prints as
+     * written in the warning and in the config error that quotes it.
      */
     public function testAKeyThatLooksLikeMarkupPrintsAsWrittenFromThePhar(): void
     {
@@ -273,9 +271,9 @@ final class PharTest extends TestCase
     }
 
     /**
-     * The same console, handed a package name like `<<fg=red>>` in the table or `--explain`: escaped
-     * by OutputFormatter::escape(), the second `<` stayed live. lockrot renders both itself, so
-     * the name prints as written, and a `table` file carries it the same way.
+     * The same console, handed a package name like `<<fg=red>>` in the table or `--explain`, leaves
+     * the second `<` live after OutputFormatter::escape(). lockrot renders both itself, so the name
+     * prints as written, in a `table` file too.
      */
     public function testAPackageNameThatLooksLikeMarkupPrintsAsWrittenFromThePhar(): void
     {
@@ -303,9 +301,9 @@ final class PharTest extends TestCase
     }
 
     /**
-     * `-d` makes the project directory the working directory before lockrot runs, so a relative
-     * `--output` path lands in the project, not in the directory the PHAR was started from — the
-     * same base a relative `--baseline` has. The table file carries no console markup.
+     * `-d` makes the project directory the working directory before lockrot runs. A relative
+     * `--output` path lands in the project, as a relative `--baseline` does, not where the PHAR
+     * started. The table file carries no console markup.
      */
     public function testOutputPathsAreRelativeToTheDirectoryDashDNames(): void
     {
@@ -350,8 +348,8 @@ final class PharTest extends TestCase
 
     /**
      * The PHAR points COMPOSER at the null device while Composer's preamble runs (see bin/lockrot)
-     * and puts the caller's value back before the command: `COMPOSER=alt.json` has to reach the
-     * command, which then reads alt.json and alt.lock as Composer would.
+     * and puts the caller's value back before the command. `COMPOSER=alt.json` must reach the
+     * command, which then reads alt.json and alt.lock as Composer does.
      */
     public function testComposerTheEnvironmentVariableReachesTheCommand(): void
     {
@@ -369,14 +367,12 @@ final class PharTest extends TestCase
     }
 
     /**
-     * A real self-update, end to end: a real PHAR replaces itself with a different, valid archive
-     * and then has to finish. Everything up to the swap is covered by unit tests; what only a
-     * separate process can show is what happens afterwards, when the code the running archive still
-     * has to load is no longer the code its manifest describes.
+     * A real PHAR replaces itself with a different, valid archive and then must finish. A separate
+     * process shows what happens after the swap, when the code the running archive still has to load
+     * is no longer the code its manifest describes.
      *
-     * The replacement is deliberately `minimal.phar` — a few hundred bytes with nothing of lockrot
-     * in it — because an archive that happens to contain the same classes at the same offsets would
-     * hide the failure this test exists for.
+     * The replacement is `minimal.phar`, which has nothing of lockrot in it. An archive with the
+     * same classes at the same offsets hides the failure this test exists for.
      */
     public function testSelfUpdateFinishesCleanlyAfterReplacingTheRunningArchive(): void
     {
@@ -403,9 +399,8 @@ final class PharTest extends TestCase
     }
 
     /**
-     * `--force` onto the bytes already installed. This is the path the 0.1.0 release was verified
-     * with, and the one that cannot go wrong on its own: the archive is rewritten with what it
-     * already held, so every class stays loadable whatever order the code runs in.
+     * `--force` onto the bytes already installed. The archive is rewritten with what it already
+     * held, so every class stays loadable whatever order the code runs in.
      */
     public function testForcingAReinstallOfTheSameBytesAlsoFinishesCleanly(): void
     {
@@ -422,13 +417,9 @@ final class PharTest extends TestCase
     }
 
     /**
-     * The built archive enforcing its own signature check end to end: a release whose `.sig.json` is by
-     * a key the archive does not trust is reported on one line, exits 2, and leaves the running
-     * archive — bytes and permissions — and its directory exactly as they were.
-     *
-     * The channel's description claims the key the archive trusts, which is what a doctored
-     * `lockrot.phar.meta.json` would do: the description only chooses what is tried, and the
-     * signature still decides.
+     * The channel's description claims the key the archive trusts, as a doctored
+     * `lockrot.phar.meta.json` does. The description only chooses what is tried, and the signature
+     * still decides.
      */
     public function testSelfUpdateRefusesAReleaseSignedWithAnotherKey(): void
     {
@@ -452,11 +443,11 @@ final class PharTest extends TestCase
     }
 
     /**
-     * Without the seam, the archive verifies with the key built into it — which proves that key
+     * Without the seam, the archive verifies with the key built into it, which proves that key
      * is packed and loads twice over. Its fingerprint matches the one the channel's description
-     * names, so the release is tried rather than passed over; and the release, signed with the test
-     * key, is then "does not match", never "the key cannot be loaded". A box.json that stopped
-     * packing ReleaseKey.php would fail here.
+     * names, so the release is tried. The release, signed with the test key, then fails as "does
+     * not match", never as "the key cannot be loaded". A box.json that omits ReleaseKey.php fails
+     * here.
      */
     public function testWithoutTheSeamTheBuiltInKeyIsWhatTheArchiveVerifiesWith(): void
     {
@@ -473,10 +464,6 @@ final class PharTest extends TestCase
         self::assertSame(hash_file('sha256', $this->phar()), hash_file('sha256', $target));
     }
 
-    /**
-     * A new major version is not installed without --allow-major: the archive says so on one line,
-     * says it is up to date on the next, exits 0 and stays exactly as it was.
-     */
     public function testTheBuiltArchiveHoldsBackANewMajor(): void
     {
         $directory = $this->freshDir();
@@ -495,8 +482,7 @@ final class PharTest extends TestCase
 
     /**
      * A key rotation, with the test keys standing in: the newest release is signed with a key the
-     * archive does not carry, the one before it — the transition release — with the key it does. The
-     * archive passes over the first, names it, and installs the second.
+     * archive does not carry, the transition release before it with the key it does.
      */
     public function testTheBuiltArchiveStepsThroughATransitionRelease(): void
     {
@@ -515,11 +501,7 @@ final class PharTest extends TestCase
         self::assertSame(hash_file('sha256', self::minimalPhar()), hash_file('sha256', $target));
     }
 
-    /**
-     * The same rotation with its transition release missing: the archive names the release it
-     * cannot verify, then says it is stranded and has to be reinstalled by hand — exit 2, for
-     * `--check` too, and the running archive untouched.
-     */
+    /** The same rotation with its transition release missing. */
     public function testTheBuiltArchiveSaysWhenARotationStrandsIt(): void
     {
         $directory = $this->freshDir();
@@ -569,12 +551,12 @@ final class PharTest extends TestCase
             'LOCKROT_RELEASE_URL' => self::server()->url().'/'.$channel.'/releases.json',
             // The release server is plain http on 127.0.0.1, which Composer's HttpDownloader
             // refuses under its default secure-http. Relaxing it in a throwaway COMPOSER_HOME
-            // keeps that to the test process; nothing in lockrot itself lowers the bar.
+            // keeps that to the test process. Nothing in lockrot itself lowers the bar.
             'COMPOSER_HOME' => self::composerHome(),
         ];
         if ($testKey) {
             // The channels are signed with the test key, not the release key built into the
-            // archive; this is the seam that lets the built PHAR verify them.
+            // archive. This seam lets the built PHAR verify them.
             $environment['LOCKROT_RELEASE_KEY'] = \dirname(__DIR__).'/fixtures/signing/release-key.pub';
         }
         $process = new Process(array_merge(['php', $target, 'self-update'], $options), \dirname($target), $environment);
@@ -657,11 +639,9 @@ final class PharTest extends TestCase
     }
 
     /**
-     * Writes one channel: for each release, the archive, its `sha256sum` file, its signature and its
-     * `lockrot.phar.meta.json` under `<channel>/v<version>/`, and the release list naming them all
-     * as `<channel>/releases.json`. A signature is by the test release key, or — for a channel that
-     * stands in for a substituted or rotated release — by a key of the same shape that is not it; the
-     * description names whichever key the channel says, which need not be the signer.
+     * A signature is by the test release key, or, for a channel that stands in for a substituted or
+     * rotated release, by a key of the same shape that is not it. The description names whichever
+     * key the channel says, which need not be the signer.
      *
      * @param list<array{0: string, 1: string, 2: string, 3: string}> $releases archive, version, signer, described key
      */

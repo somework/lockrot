@@ -48,7 +48,7 @@ final class OriginAgreementTest extends TestCase
     private const NOW = '2026-09-14T00:00:00+00:00';
 
     /**
-     * The findings of every kind but `packagist`, per fixture, without `--dev`; every other finding
+     * The findings of every kind but `packagist`, per fixture, without `--dev`. Every other finding
      * is `packagist`. `origins` is the hand-built lock with one entry per case.
      */
     private const EXPECTED = [
@@ -99,7 +99,7 @@ final class OriginAgreementTest extends TestCase
         'acme/crafted"onmouseover="x?next=evil.example#x' => ['packagist', 'packagist.org', null, false],
     ];
 
-    /** What the hand-built lock and manifest carry that no document may: logins, a password, an organisation, a machine path, a private host. */
+    /** Values in the hand-built lock and manifest that a document must not carry: logins, a password, an organisation, a machine path, a private host. */
     private const NEVER_WRITTEN = ['ci-user', 's3cr3t', 'secret-org', 'secret-client', 'satis.internal'];
 
     /** @return iterable<string, array{string, array<string, int>, bool}> */

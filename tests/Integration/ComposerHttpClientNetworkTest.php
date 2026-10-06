@@ -12,13 +12,7 @@ use Lockrot\Data\Forge\GitHubApi;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
-/**
- * Exercises ComposerHttpClient against the real Packagist p2 endpoint. Requires
- * network access, so it is tagged `network` and excluded from the default suite
- * (see phpunit.xml.dist / phpunit9.xml.dist <groups><exclude>).
- *
- * @group network
- */
+/** @group network */
 #[Group('network')]
 final class ComposerHttpClientNetworkTest extends TestCase
 {
@@ -43,9 +37,9 @@ final class ComposerHttpClientNetworkTest extends TestCase
     }
 
     /**
-     * Composer credentials for github.com plus lockrot's own token header used to reach GitHub as
-     * two Authorization headers, which GitHub rejects with 401 whatever the tokens are. Needs a
-     * real token, so it runs where the e2e job runs.
+     * Composer credentials for github.com plus lockrot's own token header must not reach GitHub as
+     * two Authorization headers: GitHub rejects them with 401 whatever the tokens are. The test
+     * needs a real token, so it runs where the e2e job runs.
      */
     public function testComposerGithubCredentialsDoNotDoubleTheAuthorizationHeader(): void
     {

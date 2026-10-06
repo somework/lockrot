@@ -13,14 +13,14 @@ use Lockrot\Tests\Support\JsonPath;
 use PHPUnit\Framework\TestCase;
 
 /**
- * The reasons a package goes unmeasured are listed in five places — the code, both schemas'
- * `libyears_unmeasured`, and the report block's `required` and `properties` — and all five list them
- * in one order, the block's key order. The order they are checked in is a different list, spelled
- * out as a numbered list in the field's description; it names the same four.
+ * The reasons a package goes unmeasured are listed in the code, both schemas'
+ * `libyears_unmeasured`, and the report block's `required` and `properties`. All list them in one
+ * order, the block's key order. The order they are checked in is a different list, a numbered list
+ * in the field's description that names the same reasons.
  */
 final class LibyearsReasonListsTest extends TestCase
 {
-    /** The order {@see Libyears::measure()} checks them in; LibyearsTest pins each step. */
+    /** The order {@see Libyears::measure()} checks them in. LibyearsTest pins each step. */
     private const PRECEDENCE = [
         Libyears::NOT_FROM_COMPOSER_REPOSITORY,
         Libyears::METADATA_UNAVAILABLE,
