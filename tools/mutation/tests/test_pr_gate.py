@@ -1,9 +1,4 @@
-"""The pull-request mutation gate: which escapes it lets through, and which it stops.
-
-The key of an escape is its file, its mutator and the original line Infection mutated (or the
-enclosing method, where that text is not unique), so that a line added above a documented
-equivalent does not turn it into an unexplained escape.
-"""
+"""The pull-request mutation gate: which escapes it lets through, and which it stops."""
 
 import os
 import sys
@@ -76,50 +71,51 @@ class ReadingTheLog(unittest.TestCase):
 
 
 class TheKey(Gate):
-    def test_a_line_reference_reads_the_current_text_so_a_moved_line_still_matches(self):
-        escape = log((9, 'Plus', '        return (int) $parts[0] + 0;'))
-        self.assertEqual(0, self.run_gate([escape], '- `src/Signal/Openness.php:7` Plus -- why.\n')[0])
-
-    def test_the_form_without_a_line_number_matches_on_the_original_text(self):
+    def test_an_entry_matches_on_the_original_text_wherever_the_line_moved(self):
         escape = log((40, 'Plus', 'return (int) $parts[0] + 0;'))
         ledger = '- `src/Signal/Openness.php` Plus `return (int) $parts[0] + 0;` -- why.\n'
         self.assertEqual(0, self.run_gate([escape], ledger)[0])
 
     def test_another_mutator_on_the_documented_line_is_not_documented(self):
         escape = log((7, 'CastInt', '        return (int) $parts[0] + 0;'))
-        code, summary = self.run_gate([escape], '- `src/Signal/Openness.php:7` Plus -- why.\n')
+        code, summary = self.run_gate([escape], '- `src/Signal/Openness.php` Plus `return (int) $parts[0] + 0;` -- why.\n')
         self.assertEqual(1, code)
         self.assertIn('CastInt', summary)
 
-    def test_a_text_that_is_not_unique_falls_back_to_the_method(self):
+    def test_several_mutators_share_one_code_span(self):
+        escapes = log((7, 'Plus', 'return (int) $parts[0] + 0;'), (7, 'CastInt', 'return (int) $parts[0] + 0;'))
+        ledger = '- `src/Signal/Openness.php` Plus, CastInt `return (int) $parts[0] + 0;` -- why.\n'
+        self.assertEqual(0, self.run_gate([escapes], ledger)[0])
+
+    def test_a_text_that_is_not_unique_needs_the_method_its_reason_names(self):
         documented = log((13, 'IncrementInteger', '        return 1;'))
         other_method = log((18, 'IncrementInteger', '        return 1;'))
-        ledger = '- `src/Signal/Openness.php:12` IncrementInteger -- in minor() only.\n'
+        ledger = '- `src/Signal/Openness.php` IncrementInteger `return 1;` -- in minor() only.\n'
         self.assertEqual(0, self.run_gate([documented], ledger)[0])
         self.assertEqual(1, self.run_gate([other_method], ledger)[0])
+        unnamed = '- `src/Signal/Openness.php` IncrementInteger `return 1;` -- why.\n'
+        self.assertEqual(1, self.run_gate([documented], unnamed)[0])
 
     def test_a_unique_line_is_not_covered_by_an_entry_for_another_line_of_its_method(self):
         escape = log((6, 'Plus', "        $parts = explode('.', $v);"))
-        self.assertEqual(1, self.run_gate([escape], '- `src/Signal/Openness.php:7` Plus -- why.\n')[0])
+        ledger = '- `src/Signal/Openness.php` Plus `return (int) $parts[0] + 0;` -- in major().\n'
+        self.assertEqual(1, self.run_gate([escape], ledger)[0])
 
     def test_x2_accounts_for_two_and_not_three(self):
         twice = log((7, 'Plus', 'return (int) $parts[0] + 0;'), (7, 'Plus', 'return (int) $parts[0] + 0;'))
         thrice = log(*[(7, 'Plus', 'return (int) $parts[0] + 0;')] * 3)
-        ledger = '- `src/Signal/Openness.php:7` Plus x2 -- why.\n'
+        ledger = '- `src/Signal/Openness.php` Plus x2 `return (int) $parts[0] + 0;` -- why.\n'
         self.assertEqual(0, self.run_gate([twice], ledger)[0])
         self.assertEqual(1, self.run_gate([thrice], ledger)[0])
 
-    def test_a_section_of_mutants_that_are_not_equivalent_accounts_for_nothing(self):
-        ledger = '### Not equivalent: detections\n\n- `src/Signal/Openness.php:7` Plus -- a loop.\n'
+    def test_a_line_number_is_not_a_key(self):
+        ledger = '- `src/Signal/Openness.php:7` Plus -- why.\n'
         self.assertEqual(1, self.run_gate([log((7, 'Plus', 'return (int) $parts[0] + 0;'))], ledger)[0])
-
-    def test_a_paragraph_opening_with_its_reference_is_an_entry(self):
-        ledger = 'src/Signal/Openness.php:7 Plus (`+ 0` removed) -- why.\n'
-        self.assertEqual(0, self.run_gate([log((7, 'Plus', 'return (int) $parts[0] + 0;'))], ledger)[0])
 
     def test_the_escapes_of_every_log_count_together(self):
         one = log((7, 'Plus', 'return (int) $parts[0] + 0;'))
-        self.assertEqual(1, self.run_gate([one, one], '- `src/Signal/Openness.php:7` Plus -- why.\n')[0])
+        ledger = '- `src/Signal/Openness.php` Plus `return (int) $parts[0] + 0;` -- why.\n'
+        self.assertEqual(1, self.run_gate([one, one], ledger)[0])
 
 
 class TheVerdict(Gate):
