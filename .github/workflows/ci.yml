@@ -2,7 +2,7 @@ name: CI
 # A pull request runs once, on its pull_request event: a push to a branch other than main runs
 # nothing on its own, so a branch with an open PR is not checked twice per push. main runs on push
 # (every merge is a PR, so that is the post-merge record), and so does a release/** branch, whose push
-# is where the mutation gate runs over the whole tree; tags are phar.yml's. A new push to a PR
+# is where the mutation gate runs over the whole tree. Tags are phar.yml's. A new push to a PR
 # cancels the run still going for the old head — the checks the ruleset waits for are the new
 # head's — while on main every push keeps its own run.
 on:
@@ -91,7 +91,7 @@ jobs:
   # ones, the name main's ruleset requires. Every directory of src belongs to one shard: a directory
   # in none is never mutated. Measurements: PR #65.
   # The full run collects the coverage once and hands it to the five shards, which would otherwise
-  # each repeat the same instrumented suite before mutating. Its PHPUnit groups are the ones
+  # each repeat the same instrumented suite. Its PHPUnit groups are the ones
   # infection.json5 passes to Infection, so the shards read the coverage their own run would have
   # collected. A pull request does not use it: most of its shards mutate nothing. Measurements: PR #65.
   mutation-coverage:
@@ -136,13 +136,10 @@ jobs:
       # A pull request is diffed against its base branch: it needs the history down to the merge base.
       - uses: actions/checkout@v7
         with: {fetch-depth: "${{ github.event_name == 'pull_request' && '0' || '1' }}"}
-      # Two modes, one set of job names, since main's ruleset requires the names. A push to main or to
-      # release/** mutates the shard's whole tree against its minimum MSI. A pull request mutates only
-      # the lines it changes in the shard: a minimum MSI over a handful of mutants is noise, one
-      # documented equivalent on a touched line is several points, so tools/mutation/pr_gate.py fails
-      # the job on an escape tests/infection-equivalents.md does not account for instead, and lists
-      # every escape in the job summary. The full run on the release branch still holds the thresholds
-      # before anything reaches main. A shard the pull request does not touch passes without running.
+      # A push to main or release/** mutates the whole tree against the shard's minimum MSI. A pull
+      # request mutates only its changed lines, where a minimum MSI over few mutants is noise. There,
+      # tools/mutation/pr_gate.py fails on an escape that tests/infection-equivalents.md does not
+      # account for. Keep the job names: main's ruleset requires them. Reasons: PR #65.
       - name: What this shard mutates
         id: scope
         env: {EVENT: '${{ github.event_name }}', BASE_REF: '${{ github.base_ref }}', FILTER: '${{ matrix.shard.filter }}'}
@@ -154,7 +151,7 @@ jobs:
           changed_dirs=$(git diff --name-only --diff-filter=AM "$base" HEAD -- "${dirs[@]}" | grep '\.php$' || true)
           changed_files=""
           if [ ${#files[@]} -gt 0 ]; then changed_files=$(git diff --name-only --diff-filter=AM "$base" HEAD -- "${files[@]}" | tr '\n' ' '); fi
-          # --git-diff-lines reads added and modified files only; a renamed one is mutated whole, by path.
+          # --git-diff-lines reads added and modified files only. A renamed file is mutated whole, by path.
           renamed=$(git diff --name-only --diff-filter=R "$base" HEAD -- "${dirs[@]}" | grep '\.php$' | tr '\n' ' ' || true)
           changed_files=$(echo $changed_files $renamed)
           if [ -z "$changed_dirs" ] && [ -z "$changed_files" ]; then
@@ -198,7 +195,7 @@ jobs:
         run: $(composer global config bin-dir --absolute)/infection --threads=max --only-covering-test-cases --coverage=build/coverage --skip-initial-tests --min-msi=${{ matrix.shard.min_msi }} --min-covered-msi=${{ matrix.shard.min_msi }} ${{ matrix.shard.filter }}
       # Infection refuses positional paths with --git-diff-lines and reads changed lines only under its
       # configured source directories, so the shard's directories become a copy of the configuration.
-      # A file at the root of src cannot be one; when the pull request changes it, it is mutated whole.
+      # A file at the root of src cannot be one. When the pull request changes it, it is mutated whole.
       # So is a renamed file, which --git-diff-lines does not read.
       - name: Mutate whole the root and renamed files the pull request changes
         if: steps.scope.outputs.mode == 'diff' && steps.scope.outputs.files != ''

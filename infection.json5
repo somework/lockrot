@@ -11,19 +11,13 @@
     // RepositoryMetadataLoader::loadChunked() (the `!== []` loop guard and the splice offset), which
     // Infection counts as detected — correctly, since a test that never returns is a failing test.
     //
-    // Infection gives each mutant min(5 + 5 x the time its covering tests took in the initial run,
-    // this value), and leaves a mutant out unrun, outside the MSI, when that time alone reaches it.
-    // A line every integration test reaches takes long enough that a slow runner passes a low value:
-    // it then skips mutants, or reports a documented escape as "timed out", i.e. detected. This value
-    // keeps every mutant run to its end on any runner. The time an endless loop would hold a thread is
-    // saved per test instead: tests/Support/MutantTestTimeLimit.php. Measurements: PR #65.
+    // Keep the cap far above the slowest covering run: Infection skips a mutant whose covering
+    // tests alone reach it, and reports a slow escape as timed out. tests/Support/MutantTestTimeLimit.php
+    // stops an endless loop per test instead. Measurements: PR #65.
     "timeout": 600,
-    // The initial run collects the coverage the mutants are matched against. RunNoteAgreementTest
-    // and GateAgreementTest cover nothing by declaration and run in a process of their own, so they
-    // add no line to it and change no state another test reads; coverage instruments them all the
-    // same, so they only cost time there. They run in every ordinary test job. --exclude-group
-    // replaces phpunit.xml.dist's own list instead of adding to it, hence e2e and network again, one
-    // flag each: PHPUnit warns on a comma list, and under failOnWarning that warning fails every run.
+    // The covers-nothing group adds no line to the coverage, so the coverage run skips it. The
+    // option replaces the exclude list of phpunit.xml.dist, so e2e and network come back here. Use
+    // one flag per group: PHPUnit warns on a comma list, and failOnWarning then fails every run.
     "testFrameworkOptions": "--exclude-group=e2e --exclude-group=network --exclude-group=covers-nothing",
     "logs": {
         "text": "build/infection.log"

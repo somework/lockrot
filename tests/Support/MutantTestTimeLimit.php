@@ -16,26 +16,11 @@ use PHPUnit\Runner\Extension\ParameterCollection;
 use PHPUnit\TextUI\Configuration\Configuration;
 
 /**
- * Ends a mutant's test run as a failure once a single test has run for {@see self::SECONDS}.
+ * Fails a test that still runs after {@see self::SECONDS} in an Infection mutant process (INFECTION=1).
  *
- * A mutant that turns a loop into one that never ends holds a mutation thread until Infection's
- * timeout for that mutant, which on a line every integration test reaches is the configured cap; the
- * cap bounds the whole run of the mutant's covering tests, so it cannot come down. A single test can
- * be held far tighter: no covering test comes near the limit, so a test still running then is stuck,
- * and failing it is the detection the timeout would have made, sooner.
- *
- * PHPUnit's own time limit is not used because it stops a test by throwing an exception that extends
- * \RuntimeException: product code that catches \RuntimeException to degrade gracefully swallows it,
- * and a loop mutant inside such code never ends. Exiting from the signal handler cannot be caught.
- *
- * The alarm runs from a test's preparation to its end in this process, so it holds neither a class's
- * before-class methods nor a test in a separate process (PHPUnit bootstraps no extension in the
- * child, and the parent hears of the test only once the child is done); those keep Infection's
- * timeout. Only Infection's mutant processes, started with INFECTION=1, arm it: the initial run and
- * every ordinary test run are untouched. Without pcntl the extension does nothing.
- *
- * Registered in phpunit.xml.dist, so a class that fails to load fails every ordinary test run too;
- * PHPUnit 10 or later (phpunit9.xml.dist leaves it out).
+ * PHPUnit's own time limit throws a \RuntimeException subclass. Product code that catches
+ * \RuntimeException swallows it, and a loop mutant there never ends. An exit from the signal handler
+ * cannot be caught. Without pcntl the extension does nothing. Reasons and measurements: PR #65.
  */
 final class MutantTestTimeLimit implements Extension
 {
