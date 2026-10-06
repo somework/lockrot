@@ -11,25 +11,19 @@
     // RepositoryMetadataLoader::loadChunked() (the `!== []` loop guard and the splice offset), which
     // Infection counts as detected — correctly, since a test that never returns is a failing test.
     //
-    // 600 since 2026-10-06. Infection gives each mutant min(5 + 5 x the time its covering tests took
-    // in the initial run, this value), and leaves a mutant out unrun, outside the MSI, when that time
-    // alone reaches this value. A line every integration test reaches takes about a minute locally
-    // and three to four times that on a slow runner: at 180 such a runner skipped 987 mutants of the
-    // data shard, and a documented escape on such a line came back as "timed out", i.e. detected,
-    // on one runner and as escaped on another (PhpFloor.php:215, ConstraintOpenness.php:50 on the
-    // run of PR #61). 600 keeps every mutant run to its end on any runner. What the old
-    // value saved, the time an endless loop holds a thread, tests/Support/MutantTestTimeLimit.php now
-    // saves: it fails a test still running after 60 seconds in a mutant's process.
+    // Infection gives each mutant min(5 + 5 x the time its covering tests took in the initial run,
+    // this value), and leaves a mutant out unrun, outside the MSI, when that time alone reaches it.
+    // A line every integration test reaches takes long enough that a slow runner passes a low value:
+    // it then skips mutants, or reports a documented escape as "timed out", i.e. detected. This value
+    // keeps every mutant run to its end on any runner. The time an endless loop would hold a thread is
+    // saved per test instead: tests/Support/MutantTestTimeLimit.php. Measurements: PR #65.
     "timeout": 600,
     // The initial run collects the coverage the mutants are matched against. RunNoteAgreementTest
     // and GateAgreementTest cover nothing by declaration and run in a process of their own, so they
-    // add no line to it and change no state another test reads: the coverage is the same line for
-    // line without them (4939 covered lines, the same covering tests on each), and it takes 314s
-    // instead of 492s locally under Xdebug. On CI's pcov the shards' initial runs measured 3.6 to
-    // 4.2 minutes without them (run 37506614872) against 3.0 to 6.3 with them, inside the spread
-    // of the runners. They run in every ordinary test job. --exclude-group replaces
-    // phpunit.xml.dist's own list instead of adding to it, hence e2e and network again, one flag
-    // each: PHPUnit 11 warns on a comma list, and under failOnWarning that warning fails every run.
+    // add no line to it and change no state another test reads; coverage instruments them all the
+    // same, so they only cost time there. They run in every ordinary test job. --exclude-group
+    // replaces phpunit.xml.dist's own list instead of adding to it, hence e2e and network again, one
+    // flag each: PHPUnit warns on a comma list, and under failOnWarning that warning fails every run.
     "testFrameworkOptions": "--exclude-group=e2e --exclude-group=network --exclude-group=covers-nothing",
     "logs": {
         "text": "build/infection.log"
