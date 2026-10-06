@@ -1,14 +1,14 @@
 ---
 title: Compatibility — what lockrot 1.0 freezes
-description: Draft of the lockrot 1.0 promise — which fields, sets, exit codes and options stay stable, how a release may change verdicts, reserved names and deprecation.
+description: Draft of the lockrot 1.0 promise — which fields, sets, exit codes and options stay stable, how a release can change verdicts, reserved names and deprecation.
 ---
 
 # Compatibility
 
 !!! warning "Draft until 1.0.0-RC1"
-    lockrot is 0.x, so a minor release may change anything on this page; the
+    lockrot is 0.x, so a minor release can change anything on this page. The
     [changelog](changelog.md) says what changed. The page becomes binding with 1.0.0-RC1. From
-    0.13.0, lockrot follows [how a release may change a verdict](#verdict-changes) as project
+    0.13.0, lockrot follows [how a release can change a verdict](#verdict-changes) as project
     practice.
 
     - **Decided at 1.0.0-RC1:** the [default thresholds](#configuration), the
@@ -18,7 +18,7 @@ description: Draft of the lockrot 1.0 promise — which fields, sets, exit codes
       [floor-rise warning](#php-platform).
 
 Key your integration on the Contract column. The Not contract column can change in any release,
-patches included; verdicts and priorities change only as [Verdict changes](#verdict-changes) allows.
+patches included. Verdicts and priorities change only as [Verdict changes](#verdict-changes) allows.
 
 | Surface | Contract for all of 1.x | Not contract |
 |---|---|---|
@@ -72,7 +72,8 @@ value means.
 
 - `finished` and `ok` share the lowest severity: no threshold and no comparison tells them apart.
   Where lockrot lists verdicts — `counts`, `run.flagged_verdicts`, the schema enums, this page —
-  `finished` comes before `ok`; the SARIF rules appear in the order the results first use them.
+  `finished` comes before `ok`. In SARIF output, the SARIF rules appear in the order the results
+  first use them.
 
 The order decides:
 
@@ -84,13 +85,13 @@ The order decides:
 
 ### Open sets
 
-The sets listed under [Open sets](schema.md#open-sets) grow in minor releases; the [closed
-sets](#closed-sets-and-their-order) do not. Read a value you do not know as described there. A
+The sets that [Open sets](schema.md#open-sets) lists grow in minor releases. The [closed
+sets](#closed-sets-and-their-order) do not. Read a value that you do not know as that page says. A
 `priority_basis` step whose `reason` you do not know still shows its direction: compare `from` and
 `to`. In lockrot's own input an unknown format name is an error: `--format`, `--output` and
 `extra.lockrot.format` accept only the names the release knows.
 
-A minor release may split a `libyears_unmeasured` reason, `no_stable_release_date` included, into
+A minor release can split a `libyears_unmeasured` reason, `no_stable_release_date` included, into
 narrower ones, which moves findings out of the old `libyears.unmeasured` key.
 
 ### Run notes
@@ -104,11 +105,12 @@ Frozen for 1.x:
   document from 0.13.0 on carries it.
 - Each entry's keys (`code`, `text`, `docs_url`, `sets_network_failures`, `data`) and each code's
   `data` keys, as the schemas list them.
-- A code's meaning. A new meaning gets a new code; a retired code is never removed or reused.
+- A code's meaning. A new meaning gets a new code, and lockrot never removes or reuses a retired
+  code.
 - `sets_network_failures`, and the rule that the report's `network_failures` is true exactly when an
   entry's is.
 - Every `docs_url` a release has written resolves for all of 1.x.
-- The specific reasons in `data`, in the table below.
+- The specific reasons in `data`, as the Frozen reasons column lists them.
 
 | Note codes | Frozen reasons | Catch-all |
 |---|---|---|
@@ -122,7 +124,7 @@ Not frozen:
 - Every `message` in `data`: a repository's, a host's or Composer's own words.
 - Which page a `docs_url` points at. A page that moves stays behind as a stub that keeps every id.
 - Which notes a run writes, and in what order.
-- A catch-all reason: a minor release may move cases out of it into reasons of their own.
+- A catch-all reason: a minor release can move cases out of it into reasons of their own.
 
 A new code or reason arrives only in a minor release, and changes no verdict or priority. Under
 `--strict-network`, a new code whose `sets_network_failures` is true can make a run exit `1`
@@ -138,17 +140,17 @@ A finding's `origin` says where its lock entry came from
 - The rules [schema.md](schema.md#where-a-package-came-from) gives for `kind`, `registry`, `local`
   and `from_composer_repository`. A new case gets a new kind, never a new meaning for an old one.
 - A minor release can add a registry lockrot names or links, never withdraw one.
-- `package_url` and a finding's `replacement_url` are written by lockrot, never built by a reader:
-  link one only where it is a string. `replacement_url` is null when lockrot keeps no page for the
+- lockrot writes `package_url` and a finding's `replacement_url`, and a reader never builds them.
+  Link one only where it is a string. `replacement_url` is null when lockrot keeps no page for the
   registry that named the replacement, and always null when `replacement` is.
 
 Not frozen:
 
 - Which further registries lockrot names and links.
-- Which kind an entry gets after a minor release that learns more: a new kind may take entries out
+- Which kind an entry gets after a minor release that learns more: a new kind can take entries out
   of `unknown`.
-- Which registries a `replacement_url` is written for, and whether a registry still keeps the page a
-  URL points at.
+- Which registries lockrot writes a `replacement_url` for, and whether a registry still keeps the
+  page that a URL points at.
 
 A new kind or registry arrives only in a minor release, and changes no verdict, priority or exit
 code.
@@ -177,14 +179,14 @@ The `github`, `sarif` and `gitlab` columns of
   `self-update` (alias `selfupdate`).
 - The options in [CLI options](configuration.md#cli-options), and `self-update`'s `--check`,
   `--force`, `--offline` and `--allow-major` ([phar.md](phar.md#keeping-it-updated)).
-- Every format name a release has shipped keeps its meaning for all of 1.x, and new names may
-  arrive ([Open sets](#open-sets)); the [table](#compatibility) says whose contents are contract.
+- Every format name a release has shipped keeps its meaning for all of 1.x, and new names can
+  arrive ([Open sets](#open-sets)). The [table](#compatibility) says whose contents are contract.
 - The `--fail-on` values.
 - Exit codes: the closed set `0`, `1` and `2`, as [ci.md](ci.md#exit-codes) defines them.
   `self-update` gives them [meanings of its own](phar.md#self-update-exit-codes).
     - lockrot's own commands exit `2` on every usage or configuration error.
     - In a check or `--generate-baseline` run, `0` and `1` follow the report's `gate.fails`, with
-      its causes in `gate.tripped_by`; a run that then cannot write an `--output` file or the
+      its causes in `gate.tripped_by`. A run that then cannot write an `--output` file or the
       baseline exits `2` instead.
     - An exit `1` from Composer or Symfony before lockrot runs is not lockrot's
       ([ci.md](ci.md#exit-1-not-from-lockrot)).
@@ -195,7 +197,7 @@ The `github`, `sarif` and `gitlab` columns of
 
 - `extra.lockrot` keys are never removed within 1.x.
 - The variables in [Environment overrides](configuration.md#environment-overrides) are frozen with
-  the keys; the [testing hooks](configuration.md#testing-hooks) are not.
+  the keys. The [testing hooks](configuration.md#testing-hooks) are not.
 - Precedence, where the first that sets a value wins: CLI options, environment variables,
   `extra.lockrot`, the defaults. The one exception: when Composer already holds a credential
   header for a host (`auth.json`, `COMPOSER_AUTH`), lockrot sends that header instead of its own
@@ -218,20 +220,20 @@ when a finding reaches `fail-on`, are frozen with the rest of the [configuration
 
 - The Composer plugin, the signed PHAR, the Docker image `ghcr.io/somework/lockrot` and
   `somework/lockrot-action` run the same lockrot code and write documents to the same schemas.
-- The PHAR, and the image and the Action that run it, bundle a Composer new enough for every check,
-  so only the plugin, which runs on the project's Composer, checks less under an older one
+- The PHAR, and the image and the Action that run it, bundle a Composer new enough for every check.
+  Only the plugin runs on the project's Composer, and it checks less under an older one
   ([`advisories_not_checked`](notes.md#advisories_not_checked),
   [which advisory settings it reads](verdicts.md#security-advisories)).
 - The PHAR's asset names and the [verification path](phar.md#verifying-the-download) are stable.
 - `lockrot-action@v1` follows lockrot 1.x, and its inputs follow Semantic Versioning. lockrot 2.0
   means action v2.
-- `self-update` stays within the running major version unless `--allow-major` is given, and passes
-  over a release that needs a newer PHP than the running one or is signed with a key the archive
-  does not carry ([which release it installs](phar.md#which-release-it-installs)).
+- Unless you give `--allow-major`, `self-update` stays within the running major version. It skips a
+  release that needs a newer PHP than the running one. It also skips a release signed with a key
+  that the archive does not carry ([which release it installs](phar.md#which-release-it-installs)).
 
 ### PHP platform
 
-- The PHP and Composer floors are in the [install requirements](index.md#install); the floor for
+- The PHP and Composer floors are in the [install requirements](index.md#install). The floor for
   1.x is chosen at 1.0.0-RC1.
 - *Planned:* within 1.x the floor rises only in a minor release, never in a patch, with a warning
   on stderr one minor release ahead.
@@ -240,17 +242,17 @@ when a finding reaches `fail-on`, are frozen with the rest of the [configuration
 
 - **Human-readable output:** the formats in the [table](#compatibility)'s Not contract column.
   The `html` page embeds the report-1 document under its `report` key, and that document is
-  contract; the rest of the page's payload is internal to lockrot and its renderer.
+  contract. The rest of the page's payload is internal to lockrot and its renderer.
 - **Which verdict and priority a package gets:** thresholds and their defaults, heuristics, the
   [priority rules](verdicts.md#priority), the curated package data lockrot ships, the
   repository-host clients, and S10's reasons. These change under
   [Verdict changes](#verdict-changes).
 - **The exposure cap:** the value of `exposure_rule.max_fan_in`, and with it which flagged
   transitive packages count in `exposure` and S7 and which in `unattributed`
-  ([verdicts.md](verdicts.md#transitive-exposure)). The fields' shape is contract; the number is
+  ([verdicts.md](verdicts.md#transitive-exposure)). The fields' shape is contract. The number is
   not. The report states the value it used, and a change gets a changelog line and is not a
   [verdict change](#verdict-changes).
-- **The PHP classes under `src/`:** internal, and may change in any release
+- **The PHP classes under `src/`:** internal, and can change in any release
   ([CONTRIBUTING.md](https://github.com/somework/lockrot/blob/main/CONTRIBUTING.md#backward-compatibility)).
 
 ## Verdict changes
@@ -259,15 +261,15 @@ Semantic Versioning covers shapes and names, not which verdict a package gets. A
 verdicts only under these rules:
 
 - A change that can alter the verdict or the priority a package gets, or what
-  `--fail-on=unchecked` matches (a new S10 reason, a newly supported host), ships in a minor
+  `--fail-on=unchecked` matches (a new S10 reason, support for another host), ships in a minor
   release, never in a patch. The changelog lists it under **Verdict changes**.
 - The one patch exception is a curated-data fix that moves a package to `finished` or `ok`.
 - A new signal that decides verdicts ships for one minor release as evidence only: it appears in
   the report and decides nothing until the next minor release.
 
-A committed baseline does not make an upgrade silent: a package a release starts flagging is `new`,
-one whose verdict worsens is `worsened`, and either one fails the run when it reaches `--fail-on`.
-An unchanged lock can cross a threshold too, as its packages' releases age
+A committed baseline does not make an upgrade silent. A package that a release starts to flag is
+`new`, and a package whose verdict worsens is `worsened`. Either one fails the run when it reaches
+`--fail-on`. An unchanged lock can cross a threshold too, as its packages' releases age
 ([baseline.md](baseline.md)).
 
 ## Extending lockrot
@@ -286,14 +288,15 @@ An unchanged lock can cross a threshold too, as its packages' releases age
 
 - `S<n>` belongs to lockrot. A retired signal keeps its number, and no number is reused.
 - A signal, run note code, origin kind or format that does not come from lockrot is named
-  `<vendor>:<name>`. The vendor and the name are each lower-case letters, digits, `_`, `.` and `-`,
-  starting with a letter or a digit. `acme:licence` fits; `Acme:Licence` and `acme:lint:licence` do
-  not, and the published schemas reject them. No name lockrot ships contains a colon.
+  `<vendor>:<name>`. The vendor and the name each consist of lower-case letters, digits, `_`, `.`
+  and `-`, and each starts with a letter or a digit. `acme:licence` fits. `Acme:Licence` and
+  `acme:lint:licence` do not fit, and the published schemas reject them. No name that lockrot ships
+  contains a colon.
 - lockrot never gives a meaning of its own to:
-    - `extensions` at the top level of `extra.lockrot`;
+    - `extensions` at the top level of `extra.lockrot`
     - any key that starts with `x-`, at the top level of `extra.lockrot` or inside an `ignore`
-      entry;
-    - any environment variable that starts with `LOCKROT_X_`.
+      entry
+    - any environment variable that starts with `LOCKROT_X_`
 - The PHP namespace `Lockrot\Extension\` is reserved and declares nothing.
 
 ## Deprecation
@@ -301,13 +304,13 @@ An unchanged lock can cross a threshold too, as its packages' releases age
 - Nothing in the contract is removed within 1.x.
 - An option, environment variable, configuration key, format name or Action input can be
   deprecated in a minor release. From then on it:
-    - keeps working unchanged until the next major version;
-    - prints one line to stderr when used;
-    - is listed under `Deprecated` in the changelog and in the register below;
+    - keeps working unchanged until the next major version
+    - prints one line to stderr when you use it
+    - appears under `Deprecated` in the changelog and in this section's register
     - is removed only in the next major version, and no sooner than six months after it was
-      deprecated.
-- Exit codes and format names never take on a new meaning.
-- A JSON field is never deprecated on its own. It keeps being written, the schema marks it
+      deprecated
+- Exit codes and format names never get a new meaning.
+- A JSON field is never deprecated on its own. lockrot keeps writing it, the schema marks it
   `x-deprecated: true`, and it disappears only with report-2. A draft-04 validator ignores
   `x-deprecated`, as it ignores `x-known-values`.
 - A signal is retired, never removed.
@@ -323,9 +326,9 @@ The register lists every deprecated or *Experimental* surface:
 ## What lockrot does not do
 
 lockrot never writes `composer.json` or `composer.lock`, opens no pull or merge request, and has no
-hosted service or telemetry. Every file it writes, every host it contacts and where each credential
-goes:
-[SECURITY.md](https://github.com/somework/lockrot/blob/main/SECURITY.md#what-lockrot-does-and-does-not-do).
+hosted service or telemetry.
+[SECURITY.md](https://github.com/somework/lockrot/blob/main/SECURITY.md#what-lockrot-does-and-does-not-do)
+lists every file that lockrot writes, every host it contacts and where each credential goes.
 
 ## Related
 
@@ -334,5 +337,5 @@ goes:
 - [ci.md](ci.md#exit-codes) — what each exit code means, and each output format
 - [configuration.md](configuration.md) — every key, variable and option this page freezes
 - [notes.md](notes.md) — every run note code and what to do about it
-- [phar.md](phar.md) — verifying the PHAR, and the `self-update` rules
+- [phar.md](phar.md) — PHAR verification, and the `self-update` rules
 - [changelog.md](changelog.md) — each release's Verdict changes and deprecations
