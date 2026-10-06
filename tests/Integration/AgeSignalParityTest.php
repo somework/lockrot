@@ -29,15 +29,16 @@ use Lockrot\Signal\Signal;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
+use Lockrot\Tests\Support\Golden;
 use Lockrot\Tests\Unit\Signal\FactsBuilder;
 use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\TestCase;
 
 /**
- * A signal quotes the reading it judged (issue #39.3, SPEC §2.1): S2, S4 and S8 take their date,
+ * A signal quotes the reading it judged: S2, S4 and S8 take their date,
  * version, years, `dated_by` and level from {@see AgeMeasure}, so S2 fires exactly when the release
  * reading has a level, S4 exactly when the push reading has one, and S8 only when the branch
- * reading has one. Checked over a sweep of dates around every threshold and over every fixture app.
+ * reading has one.
  */
 final class AgeSignalParityTest extends TestCase
 {
@@ -114,14 +115,14 @@ final class AgeSignalParityTest extends TestCase
     {
         $dirs = glob(self::FIXTURES.'apps/*', \GLOB_ONLYDIR);
         self::assertIsArray($dirs);
-        self::assertCount(12, $dirs);
+        self::assertNotSame([], $dirs);
         $locks = array_map(static fn (string $dir): string => $dir.'/composer.lock', $dirs);
         $server = FixtureRepositoryServer::fromLockFiles($locks);
         $server->start();
         $clock = Clock::fixed(self::NOW);
         $thresholds = new Thresholds();
         $measure = new AgeMeasure($clock, $thresholds);
-        $fired = [Signal::S2 => 0, Signal::S4 => 0, Signal::S8 => 0];
+        $fired = [];
         try {
             foreach ($dirs as $dir) {
                 $project = ProjectConfig::fromFile($dir.'/composer.json');
@@ -136,10 +137,9 @@ final class AgeSignalParityTest extends TestCase
                     }
                     $what = basename($dir).' '.$finding->package();
                     self::assertParity($measure, $facts, $signals, $what);
-                    // What the report publishes is the same signal the rules give on the facts.
                     foreach ($finding->signals() as $published) {
-                        if (isset($fired[$published->id()])) {
-                            ++$fired[$published->id()];
+                        if (\in_array($published->id(), [Signal::S2, Signal::S4, Signal::S8], true)) {
+                            $fired[basename($dir)][$finding->package()] = trim(($fired[basename($dir)][$finding->package()] ?? '').' '.$published->id());
                             self::assertSame($signals[$published->id()]->data(), $published->data(), $what);
                             self::assertSame($signals[$published->id()]->level(), $published->level(), $what);
                         }
@@ -149,10 +149,8 @@ final class AgeSignalParityTest extends TestCase
         } finally {
             $server->stop();
         }
-        // The clock is pinned and the answers recorded, so the counts are exact: a signal that
-        // stops firing on one package shows here, where the parity checks above only see the
-        // signals that fired. A re-recorded fixture moves them on purpose.
-        self::assertSame([Signal::S2 => 160, Signal::S4 => 42, Signal::S8 => 24], $fired);
+        // The parity checks see only the signals that fired: a signal that stops firing shows here.
+        Golden::assertMatches('age-signals.json', $fired, 'testOverEveryFixtureAppEverySignalEqualsItsReading');
     }
 
     /**

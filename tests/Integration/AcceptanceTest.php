@@ -6,7 +6,6 @@ namespace Lockrot\Tests\Integration;
 
 use Lockrot\Allowlist\BuiltinAllowlist;
 use Lockrot\Analyzer\Analyzer;
-use Lockrot\Analyzer\Libyears;
 use Lockrot\Analyzer\Report;
 use Lockrot\Analyzer\TransitiveExposure;
 use Lockrot\Clock;
@@ -24,6 +23,7 @@ use Lockrot\Signal\Signal;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
+use Lockrot\Tests\Support\Golden;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\MemoisingMetadataLoader;
 use Lockrot\Verdict\Finding;
@@ -47,10 +47,8 @@ final class AcceptanceTest extends TestCase
         $lockFiles = array_map(static fn (string $dir): string => self::FIXTURES.$dir.'/composer.lock', self::DIRS);
         self::$server = FixtureRepositoryServer::fromLockFiles($lockFiles);
         self::$server->start();
-        // One loader shared across every test in this class, matching how a real analyzer run uses
-        // it: one instance queried repeatedly rather than rebuilt per call. It remembers what it
-        // has already been asked for: three of the tests here analyse the same wallabag lock, and
-        // without the memory each of them fetched all two hundred of its packages again.
+        // One loader for the class: it remembers what it was asked, so the tests that analyse the
+        // same wallabag lock do not fetch its packages again.
         self::$loader = new MemoisingMetadataLoader(
             new RepositoryMetadataLoader(self::$server->repositories(), Clock::fixed(self::NOW))
         );
@@ -84,11 +82,6 @@ final class AcceptanceTest extends TestCase
         return null;
     }
 
-    /**
-     * $loader defaults to the shared class-level loader built in setUpBeforeClass(); testWallabag()
-     * passes its own private one instead, since it runs in a separate process where that static
-     * state was never built (see the comment on that test).
-     */
     private function analyze(string $dir, ?RepositoryMetadataLoader $loader = null): Report
     {
         $clock = Clock::fixed(self::NOW);
@@ -119,13 +112,9 @@ final class AcceptanceTest extends TestCase
         return $out;
     }
 
-    // The peak-memory assertion below reads memory_get_peak_usage(true), a whole-process high-water
-    // mark that PHPUnit never resets between tests. With every other suite test contributing to that
-    // same peak, the assertion would measure how much the entire run allocated before this point
-    // rather than this analysis alone, and it sits close enough to the 64 MB budget that unrelated
-    // suite growth trips it. Isolating it in its own process makes the peak reflect only this test.
-    // That process never calls setUpBeforeClass(), so the class-level $server/$loader do not exist
-    // here and this test builds its own private single-use server instead.
+    // The peak-memory assertion reads a whole-process high-water mark that PHPUnit never resets, so
+    // this test runs in its own process. That process never calls setUpBeforeClass(): the test
+    // builds its own server and loader.
     /** @runInSeparateProcess */
     #[RunInSeparateProcess]
     public function testWallabag(): void
@@ -137,11 +126,9 @@ final class AcceptanceTest extends TestCase
         try {
             $report = $this->analyze('apps/wallabag_wallabag', $loader);
             $f = $this->byName($report);
-            self::assertSame(200, $report->packagesChecked());
-            // Packagist data moves over time, so the abandoned count is pinned to the recorded
-            // fixtures. If this assertion needs updating after a re-recording, print byVerdict() and
-            // diff the package names before touching the number.
-            self::assertSame(19, $report->byVerdict()[Verdict::ABANDONED], 'flagged abandoned 19 of 200 prod');
+            self::assertSame(\count(LockFile::fromFile(self::FIXTURES.'apps/wallabag_wallabag/composer.lock')->packages(false)), $report->packagesChecked());
+            $verdicts = array_map(static fn (Finding $finding): string => $finding->verdict(), $f);
+            self::assertSame(\count(array_keys($verdicts, Verdict::ABANDONED, true)), $report->byVerdict()[Verdict::ABANDONED]);
             self::assertSame(Verdict::SILENT, $f['phpzip/phpzip']->verdict());
             self::assertStringContainsString('last release 2015-11-16', $f['phpzip/phpzip']->evidence());
             self::assertStringContainsString('last push 2015-11-16', $f['phpzip/phpzip']->evidence());
@@ -163,7 +150,7 @@ final class AcceptanceTest extends TestCase
             self::assertFalse($f['phpzip/phpzip']->isDev());
             // Transitive exposure (S7). hoa/ruler is reached from two root requires, so the second
             // one is what directDependents() adds over the chain; both roots carry S7 naming it, and
-            // wallabag/rulerz keeps the pinned verdict and high priority it had before the pass.
+            // wallabag/rulerz keeps the pinned verdict and high priority.
             self::assertSame(['wallabag/rulerz', 'wallabag/rulerz-bundle'], $f['hoa/ruler']->directDependents());
             self::assertSame(['wallabag/rulerz-bundle'], $f['hoa/ruler']->otherDirectDependents());
             $rulerzS7 = self::signal($f['wallabag/rulerz'], Signal::S7);
@@ -182,13 +169,7 @@ final class AcceptanceTest extends TestCase
             for ($i = 1; $i < \count($counts); ++$i) {
                 self::assertGreaterThanOrEqual($counts[$i], $counts[$i - 1], 'exposure is ordered most first');
             }
-            // Pinned from the run before the report stated its exposure rule and listed what the
-            // rule gives to nobody: stating it moved neither the list nor the line.
-            self::assertCount(25, $exposure);
-            self::assertSame(
-                'pulled in by: wallabag/rulerz-bundle 15 · wallabag/rulerz 14 · wallabag/phpepub 5 · scheb/2fa-google-authenticator 3 · friendsofsymfony/oauth-server-bundle 2 · … and 20 more',
-                $report->exposureSummaryLine()
-            );
+            Golden::assertMatches('wallabag.json', ['verdicts' => $verdicts, 'exposure' => $exposure, 'exposure_summary_line' => $report->exposureSummaryLine()], 'testWallabag');
             // Every flagged transitive package is attributed, shared above the cap, or reached by no
             // direct requirement — exactly one of the three. wallabag's widest fan-in is 8, so the
             // document lists nothing above the cap.
@@ -225,8 +206,8 @@ final class AcceptanceTest extends TestCase
      * wallabag's four branch snapshots, read off the recorded repository data: the three
      * wallabag/rulerz-* list dev branches and not one tag, friendsofsymfony/oauth-server-bundle has
      * tags and its newest dated one is 1.6.2 (2.0.0-alpha.0 is higher, and older). S6 checks the
-     * snapshot first, so all four are `branch_snapshot`; has_stable_release is what tells the
-     * never-released three apart. Verdict and priority are what they were before S6 said so.
+     * snapshot first, so all four are `branch_snapshot`. has_stable_release tells the
+     * never-released three apart.
      */
     public function testWallabagSnapshotsSayWhetherThePackageEverReleased(): void
     {
@@ -294,34 +275,18 @@ final class AcceptanceTest extends TestCase
     }
 
     /**
-     * The libyears of the recorded fixtures, pinned like the verdict counts are.
+     * The libyears of each recorded fixture, per package, and the block as the arithmetic over them.
      *
-     * The research table these numbers were first written against (wallabag 171.6, nextcloud 47.1,
-     * matomo 11.8) was computed from ecosyste.ms's `latest_release_published_at`, which dates a
-     * package with no release at all by its branch's last push. That is where the gap is:
-     * lox/xhprof on `dev-master` (10.5 of matomo's 11.8) and the three wallabag/rulerz-* on
-     * `dev-master` (8.1 of wallabag's). lockrot leaves them unmeasured and says so in the block.
-     * The three scheb/2fa-* splits, whose newest tags share one commit and carry no date lockrot
-     * trusts, are measured to the newest dated release above the installed one — a lower bound,
-     * 4.06 each — which is what the table had for them too. pagerfanta/twig is the other way
-     * round: its own v4.8.0 is one of the tags on a shared commit, so the lock dates it by that
-     * commit and there is no installed end to measure from at all. The packages furthest behind
-     * are the same on every fixture.
+     * lockrot leaves a package on `dev-master` unmeasured: lox/xhprof and the wallabag/rulerz-*
+     * packages. The scheb/2fa-* splits share one commit among their newest tags, which carry no
+     * date lockrot trusts, so each is measured to the newest dated release above the installed one,
+     * a lower bound. pagerfanta/twig has no installed end to measure from: its own v4.8.0 is one of
+     * the tags on a shared commit, so the lock dates it by that commit.
      */
     public function testLibyearsOnTheRecordedFixtures(): void
     {
         $wallabag = $this->analyze('apps/wallabag_wallabag');
-        $block = $wallabag->libyears();
-        self::assertEqualsWithDelta(163.69, $block->total(), 0.005);
-        self::assertEqualsWithDelta(106.7, $block->direct(), 0.005);
-        self::assertSame(194, $block->measured());
-        self::assertSame([
-            Libyears::BRANCH_SNAPSHOT => 4,
-            Libyears::NO_STABLE_RELEASE_DATE => 2,
-            Libyears::NOT_FROM_COMPOSER_REPOSITORY => 0,
-            Libyears::METADATA_UNAVAILABLE => 0,
-        ], $block->unmeasured());
-        $worst = $block->worst();
+        $worst = $wallabag->libyears()->worst();
         self::assertNotNull($worst);
         self::assertSame('smalot/pdfparser', $worst->package());
         self::assertEqualsWithDelta(4.70, (float) $worst->libyears(), 0.005);
@@ -333,49 +298,30 @@ final class AcceptanceTest extends TestCase
         self::assertNull($f['pagerfanta/twig']->libyears(), 'the installed tag itself shares a commit: the lock dates it by that, not by its release');
         self::assertSame(0.0, $f['sensio/framework-extra-bundle']->libyears(), 'abandoned, and zero libyears behind: the installed release is the last one');
         self::assertEqualsWithDelta(3.36, (float) $f['psr/log']->libyears(), 0.005, 'finished, and three years behind a 3.x it will never need — the docs quote this');
-        // The block is the arithmetic over the findings the document prints, to within the
-        // rounding of each printed value.
-        $sum = 0.0;
-        $measured = 0;
-        foreach (JsonPath::arrayAt($wallabag->toArray(), ['findings']) as $finding) {
-            self::assertIsArray($finding);
-            if ($finding['libyears'] !== null) {
-                self::assertIsFloat($finding['libyears']);
-                ++$measured;
-                $sum += $finding['libyears'];
-            }
-        }
-        self::assertSame($block->measured(), $measured);
-        self::assertEqualsWithDelta($block->toArray()['total'], $sum, 0.005 * $measured);
 
-        // The other fixtures, each block pinned and each checked against its own findings.
-        $expected = [
-            'apps/nextcloud_3rdparty' => ['total' => 47.47, 'direct' => 13.3, 'measured' => 94, 'unmeasured' => [0, 0, 0, 0], 'worst' => ['punic/punic', 3.45]],
-            // lox/xhprof and the two matomo/* lists on dev-master; two symfony/polyfill-* splits undated
-            'apps/matomo-org_matomo' => ['total' => 0.87, 'direct' => 0.07, 'measured' => 47, 'unmeasured' => [3, 2, 0, 0], 'worst' => ['maxmind-db/reader', 0.8]],
-            'skeletons/laravel' => ['total' => 0.46, 'direct' => 0.02, 'measured' => 73, 'unmeasured' => [0, 3, 0, 0], 'worst' => ['brick/math', 0.25]],
-        ];
-        foreach ($expected as $dir => $want) {
-            $report = $this->analyze($dir);
+        $golden = [];
+        foreach (self::DIRS as $dir) {
+            $report = $dir === 'apps/wallabag_wallabag' ? $wallabag : $this->analyze($dir);
             $block = $report->libyears();
-            self::assertEqualsWithDelta($want['total'], $block->total(), 0.005, $dir);
-            self::assertEqualsWithDelta($want['direct'], $block->direct(), 0.005, $dir);
-            self::assertSame($want['measured'], $block->measured(), $dir);
-            self::assertSame(array_combine(Libyears::REASONS, $want['unmeasured']), $block->unmeasured(), $dir);
-            $worst = $block->worst();
-            self::assertNotNull($worst, $dir);
-            self::assertSame($want['worst'][0], $worst->package(), $dir);
-            self::assertEqualsWithDelta($want['worst'][1], (float) $worst->libyears(), 0.005, $dir);
+            $packages = [];
             $sum = 0.0;
             foreach (JsonPath::arrayAt($report->toArray(), ['findings']) as $finding) {
                 self::assertIsArray($finding);
+                self::assertIsString($finding['package']);
+                $packages[$finding['package']] = $finding['libyears'];
                 if ($finding['libyears'] !== null) {
                     self::assertIsFloat($finding['libyears']);
                     $sum += $finding['libyears'];
                 }
             }
-            self::assertEqualsWithDelta($block->toArray()['total'], $sum, 0.005 * $block->measured(), $dir.': the block is the arithmetic over the findings');
+            $measured = \count(array_filter($packages, static fn ($libyears): bool => $libyears !== null));
+            self::assertSame($block->measured(), $measured, $dir);
+            self::assertSame($report->packagesChecked(), $measured + array_sum($block->unmeasured()), $dir.': every package is measured or has a reason');
+            // The block is the arithmetic over the printed findings, to within the rounding of each value.
+            self::assertEqualsWithDelta($block->toArray()['total'], $sum, 0.005 * $measured, $dir);
+            $golden[$dir] = ['block' => $block->toArray(), 'packages' => $packages];
         }
+        Golden::assertMatches('libyears.json', $golden, 'testLibyearsOnTheRecordedFixtures');
     }
 
     public function testOutputWordingIsNeutral(): void
