@@ -793,7 +793,7 @@ final class LockrotCommandTest extends TestCase
 
     public function testMalformedComposerJsonIsExit2(): void
     {
-        $dir = sys_get_temp_dir().'/lockrot-badjson-'.uniqid();
+        $dir = sys_get_temp_dir().'/lockrot-badjson-'.uniqid('', true);
         mkdir($dir);
         file_put_contents($dir.'/composer.json', '{broken');
         chdir($dir);
@@ -810,7 +810,7 @@ final class LockrotCommandTest extends TestCase
 
     public function testInvalidLockrotSchemaIsExit2(): void
     {
-        $dir = sys_get_temp_dir().'/lockrot-badschema-'.uniqid();
+        $dir = sys_get_temp_dir().'/lockrot-badschema-'.uniqid('', true);
         mkdir($dir);
         file_put_contents($dir.'/composer.json', json_encode(['extra' => ['lockrot' => ['fail-on' => 'dead']]]));
         chdir($dir);

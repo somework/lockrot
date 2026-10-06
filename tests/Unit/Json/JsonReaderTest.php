@@ -31,7 +31,7 @@ final class JsonReaderTest extends TestCase
 
     public function testMissingFileThrows(): void
     {
-        $path = sys_get_temp_dir().'/lockrot-jsonreader-missing-'.uniqid().'.json';
+        $path = sys_get_temp_dir().'/lockrot-jsonreader-missing-'.uniqid('', true).'.json';
 
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage($path.' not found');
@@ -107,7 +107,7 @@ final class JsonReaderTest extends TestCase
 
     private function tempJson(string $contents): string
     {
-        $path = sys_get_temp_dir().'/lockrot-jsonreader-'.uniqid().'.json';
+        $path = sys_get_temp_dir().'/lockrot-jsonreader-'.uniqid('', true).'.json';
         file_put_contents($path, $contents);
         $this->tempPaths[] = $path;
 

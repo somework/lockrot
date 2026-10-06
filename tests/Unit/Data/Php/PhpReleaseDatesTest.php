@@ -36,7 +36,7 @@ final class PhpReleaseDatesTest extends TestCase
 
     public function testLoadThrowsConfigExceptionOnMalformedDate(): void
     {
-        $path = sys_get_temp_dir().'/lockrot-php-ga-dates-'.uniqid().'.json';
+        $path = sys_get_temp_dir().'/lockrot-php-ga-dates-'.uniqid('', true).'.json';
         file_put_contents($path, '{"8.0": "not a date"}');
 
         $thrown = null;

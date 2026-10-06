@@ -172,7 +172,7 @@ final class LockLineIndexTest extends TestCase
     {
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessageMatches('/not found/');
-        LockLineIndex::fromFile(sys_get_temp_dir().'/lockrot-no-such-lock-'.uniqid().'.lock');
+        LockLineIndex::fromFile(sys_get_temp_dir().'/lockrot-no-such-lock-'.uniqid('', true).'.lock');
     }
 
     public function testDirectoryPathThrows(): void

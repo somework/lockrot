@@ -206,7 +206,7 @@ final class ProjectConfigTest extends TestCase
 
     private function tempComposerJson(string $contents): string
     {
-        $dir = sys_get_temp_dir().'/lockrot-projectconfig-'.uniqid();
+        $dir = sys_get_temp_dir().'/lockrot-projectconfig-'.uniqid('', true);
         mkdir($dir);
         $path = $dir.'/composer.json';
         file_put_contents($path, $contents);
