@@ -98,6 +98,10 @@ class TheKey(Gate):
         self.assertEqual(0, self.run_gate([documented], ledger)[0])
         self.assertEqual(1, self.run_gate([other_method], ledger)[0])
 
+    def test_a_unique_line_is_not_covered_by_an_entry_for_another_line_of_its_method(self):
+        escape = log((6, 'Plus', "        $parts = explode('.', $v);"))
+        self.assertEqual(1, self.run_gate([escape], '- `src/Signal/Openness.php:7` Plus -- why.\n')[0])
+
     def test_x2_accounts_for_two_and_not_three(self):
         twice = log((7, 'Plus', 'return (int) $parts[0] + 0;'), (7, 'Plus', 'return (int) $parts[0] + 0;'))
         thrice = log(*[(7, 'Plus', 'return (int) $parts[0] + 0;')] * 3)
