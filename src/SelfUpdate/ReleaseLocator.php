@@ -14,67 +14,33 @@ use Lockrot\Json\JsonReader;
 use Lockrot\Version;
 
 /**
- * Reads lockrot's release list (`GET /repos/somework/lockrot/releases`) and chooses the release
- * self-update installs: the newest one in the running major version that this PHP can run and this
- * archive can verify.
- *
- * Not `releases/latest`, which names one release and says nothing about whether it may be taken:
- * on the day 2.0 is published every 1.x archive would install it, a release needing a newer PHP
- * would install and then refuse to start, and a release signed after a rotation of the self-update
- * key would be refused with a signature error and no way forward. So:
- *
- * - The major version is the first number of the version, taken literally: all of 0.x is one line,
- *   and 0.x to 1.0 is a new major like any other. A newer major is passed over with a note, and
- *   `--allow-major` moves to the next one — the lowest major above the running one that has a
- *   stable release — one step, never several at once, so a release that exists only to warn about
- *   the step after it is not skipped on the way.
- * - A release's lowest PHP and the key that signed it come from its `lockrot.phar.meta.json`
- *   ({@see ReleaseDescription}), fetched only for a release that would otherwise be installed, and
- *   for the newest releases of the next major until one could be, so the advice to use
- *   `--allow-major` is given only when it would install something. Releases before 0.13.0 have none
- *   and are read as what they are: built for PHP 7.4.0, with no claim about their key.
- * - Drafts (listed for a token with push access), pre-releases, and tags that are not a stable
- *   version are not candidates; a published release whose tag is not a version at all is named in a
- *   note. One odd entry does not stop an update, and neither does a release of the next major that
- *   is only advised and whose description cannot be read; a chosen release that lacks an asset, or
- *   whose description cannot be read, still fails loudly rather than falling back.
- * - Versions are compared in Composer's normalised form (`v1.0`, `V1.0.0` and `1.0.0` are one
- *   version), and shown as `major.minor.patch`.
- *
- * The request carries the same headers the analyzer's GitHub calls do
- * ({@see GitHubApi::headersFor()}), so `GITHUB_TOKEN`, `LOCKROT_GITHUB_TOKEN` and Composer's
- * `github-oauth` all lift the 60-requests-per-hour anonymous limit here too. The list is paged by
- * count (a page shorter than {@see PER_PAGE} is the last), and stops early at the page that reaches
- * the running version: GitHub lists newest first, and SECURITY.md rules out backports.
- *
- * Every failure is a {@see ConfigException}, which the command reports on stderr and turns into
- * exit 2. So is an archive stranded by a key rotation — newer releases signed with a key it does
- * not carry and no release it can install that carries it — which no later run would fix. Releases before 0.6.0 carry no signature, so `--force` cannot install one from a build
- * that checks signatures; that is the one direction the check closes on purpose.
+ * Reads the release list (`GET /repos/somework/lockrot/releases`) and chooses the release that
+ * self-update installs, by the rules in docs/phar.md#which-release-it-installs. It does not use
+ * `releases/latest`, which names one release and does not say whether this archive can take it.
+ * The walk stops at the page that reaches the running version: GitHub lists newest first, and
+ * SECURITY.md rules out backports.
  *
  * @internal
  */
 final class ReleaseLocator
 {
     public const DEFAULT_URL = 'https://api.github.com/repos/somework/lockrot/releases?per_page=100';
-    /** The page size DEFAULT_URL asks for; a page with fewer entries is the last one. */
+    /** The page size that DEFAULT_URL asks for: a page with fewer entries is the last one. */
     public const PER_PAGE = 100;
-    /** A bound on the list, whatever it answers: a thousand releases back is far past any update. */
+    /** A bound on the list, whatever GitHub answers. */
     public const MAX_PAGES = 10;
     public const PHAR_ASSET = 'lockrot.phar';
     public const CHECKSUM_ASSET = 'lockrot.phar.sha256';
     /**
-     * Not `lockrot.phar.sig`: PHIVE takes any release asset ending in `.asc` or `.sig` for the GPG
-     * signature (phar-io/phive, GithubRepository::getReleasesByRequestedPhar(), last match wins),
-     * and `phive install somework/lockrot` failed on 0.6.0 until its asset was renamed. The
-     * suffix says what the file is — Composer's `{"sha384": …}` document — and PHIVE ignores it.
+     * Not `lockrot.phar.sig`: PHIVE takes any release asset that ends in `.asc` or `.sig` for the
+     * GPG signature, and the last match wins (`GithubRepository::getReleasesByRequestedPhar()` in
+     * https://github.com/phar-io/phive). The suffix `.json` names the format and PHIVE ignores it.
      */
     public const SIGNATURE_ASSET = 'lockrot.phar.sig.json';
-    /** {@see ReleaseDescription}; `.json` for the same reason as the signature. */
+    /** `.json` for the same reason as {@see SIGNATURE_ASSET}. */
     public const METADATA_ASSET = 'lockrot.phar.meta.json';
-    /** The first release that publishes {@see METADATA_ASSET}; a release from here on without it is an error. */
+    /** The first release that publishes {@see METADATA_ASSET}: a later one without it is an error. */
     public const FIRST_DESCRIBED_VERSION = '0.13.0';
-    /** Where a stranded archive is sent: what to do when self-update cannot follow a new key. */
     public const REINSTALL_DOCS = 'https://lockrot.dev/phar/#reinstalling-by-hand';
 
     private HttpClientInterface $http;
@@ -83,14 +49,14 @@ final class ReleaseLocator
     private string $url;
     private string $currentVersion;
     private string $phpVersion;
-    /** @var array<array-key, string> the notes of the last locate(): keyed by reason, a skipped tag's appended */
+    /** @var array<array-key, string> keyed by reason, with the line of a skipped tag appended */
     private array $notes = [];
 
     /**
      * @param string  $trustedKey the fingerprint of the key this archive verifies with
      *                            ({@see SignatureVerifierInterface::keyFingerprint()})
-     * @param string  $url        the release list; a page after the first adds `page=N` to it
-     * @param ?string $phpVersion the PHP to choose for, `major.minor.patch`; null is the running one
+     * @param string  $url        the release list, where a page after the first adds `page=N`
+     * @param ?string $phpVersion the PHP to choose for as `major.minor.patch`, null for the running one
      */
     public function __construct(
         HttpClientInterface $http,
@@ -108,38 +74,25 @@ final class ReleaseLocator
         $this->phpVersion = $phpVersion ?? \sprintf('%d.%d.%d', \PHP_MAJOR_VERSION, \PHP_MINOR_VERSION, \PHP_RELEASE_VERSION);
     }
 
-    /** The first number of $version: its major version line, with all of 0.x as line 0. */
+    /** The first number of $version, so all of 0.x is major version 0. */
     public static function majorOf(string $version): int
     {
         return (int) $version;
     }
 
     /**
-     * Walks the releases newest first and returns the first one that may be installed, or null when
-     * the build is current in its line. Every release passed over on the way leaves a note
-     * ({@see notes()}).
+     * Walks the releases newest first and returns the first one that can be installed, or null when
+     * the build is current in its line. Each release passed over leaves a note ({@see notes()}).
      *
-     * Without $force the walk ends at the running version: nothing at or below it is an update, so
-     * an up-to-date check reads the list and nothing else. With $force the newest release at or
-     * below the running version is also a candidate — the one it reinstalls, or the one a build
-     * ahead of every release goes back to, which may be older than the running build — as long as
-     * it is in the running major version, and nothing below it: the description is unsigned, and a
-     * lying one must not walk a reinstall further down.
+     * With $force, the newest release at or below the running version is also a candidate, in the
+     * running major version only and nothing below it: the description is unsigned, and a lying one
+     * must not walk a reinstall further down.
      *
-     * The next major version is the lowest one above the running line that has a stable release, so
-     * a major that was skipped or withdrawn is no dead end. Without $allowMajor its newest release
-     * that this PHP can run and this archive can verify is described and named as the one
-     * `--allow-major` would install; when none can be, the notes say why instead.
+     * @return ?Release the release to install, null when none is newer
      *
-     * @param bool $allowMajor also take a release of the next major version
-     * @param bool $force      also take the newest release at or below the running version
-     *
-     * @return ?Release the release to install; null when there is none newer to take
-     *
-     * @throws ConfigException on every failure, and when the newer releases are signed with a key
-     *                         this archive does not carry and none it could install carries it (the
-     *                         archive is stranded, and only a download by hand moves it on), or,
-     *                         with $force, when no release in the running line can be installed
+     * @throws ConfigException on every failure, and when the archive is stranded: newer releases
+     *                         are signed with a key it does not carry, and no release that it can
+     *                         install carries that key
      */
     public function locate(bool $allowMajor = false, bool $force = false): ?Release
     {
@@ -153,9 +106,8 @@ final class ReleaseLocator
         foreach ($candidates as $candidate) {
             $major = self::majorOf($candidate['normalized']);
             $newer = Comparator::greaterThan($candidate['normalized'], $current);
-            // --force stays in the running line: a build ahead of every release of its major (one
-            // rehearsed before its tag, or one whose release was pulled) does not fall back to the
-            // newest release of the line below.
+            // --force stays in the running line: a build ahead of every release of its major does
+            // not fall back to the line below.
             if (!$newer && (!$force || $major < $line)) {
                 $this->failUnlessCurrent($stranded, $force, $line);
 
@@ -190,11 +142,11 @@ final class ReleaseLocator
     }
 
     /**
-     * The end of a walk that found nothing to install, which means "current in its line" unless
-     * this throws: when that is not the whole story.
+     * Ends a walk that found nothing to install. That means "current in its line" unless this
+     * throws.
      *
-     * @param bool $stranded a release the walk would have taken was signed with a key this archive
-     *                       does not carry
+     * @param bool $stranded a release that the walk can take is signed with a key this archive does
+     *                       not carry
      *
      * @throws ConfigException
      */
@@ -209,15 +161,12 @@ final class ReleaseLocator
     }
 
     /**
-     * Advice about a release of the next major version while `--allow-major` is not given: a note
-     * naming it as the one the flag would install, or, when it could not be installed either, the
-     * note saying why. True once the advice has been given, so the rest of that major is not
-     * described.
+     * Notes the release that `--allow-major` installs, or the reason that none can be installed.
+     * Returns true once a release is named, so the rest of that major is not described.
      *
-     * A release that is only advised is not chosen, so a description that cannot be read is a note
-     * here, not a failure: a next major published without its description, or a download that fails
-     * once, must not stop an update in the running major. The walk goes on to that major's older
-     * releases for the advice.
+     * A release that is only advised is not chosen, so a description that cannot be read is a note,
+     * not a failure: a next major without its description, or one failed download, must not stop an
+     * update in the running major. The walk goes on to older releases of that major.
      *
      * @param array{version: string, normalized: string, tag: string, entry: array<mixed>} $candidate
      */
@@ -240,13 +189,10 @@ final class ReleaseLocator
     }
 
     /**
-     * One line for each reason a newer release was passed over during the last {@see locate()} —
-     * a new major version, a PHP floor above this one or unreadable, a key this archive does not
-     * carry, a next major whose description cannot be read, a tag that is not a version — naming the newest release held back for it. Kept when
-     * locate() throws, so a failure further down the list still comes after the reason the newer
-     * release was not taken.
+     * One line for each reason that a newer release was passed over in the last {@see locate()},
+     * naming the newest release held back for it. The lines stay when locate() throws.
      *
-     * The text carries tags and versions from the release list: whoever prints it escapes it.
+     * The text carries tags and versions from the release list: whoever prints it must escape it.
      *
      * @return list<string>
      */
@@ -262,8 +208,8 @@ final class ReleaseLocator
     }
 
     /**
-     * The lowest major version above $line that has a candidate, or null when there is none: the
-     * candidates are newest first, so it is the major of the last one above the line.
+     * The lowest major version above $line that has a candidate, or null. The candidates are newest
+     * first, so it is the major of the last one above the line.
      *
      * @param list<array{version: string, normalized: string, tag: string, entry: array<mixed>}> $candidates
      */
@@ -282,9 +228,8 @@ final class ReleaseLocator
     }
 
     /**
-     * Why $candidate may not be installed, as a reason and the line that says so, or null when it
-     * may. Only the major version is decided before this, from the tag alone, so a release beyond
-     * the next major costs no request.
+     * The reason that $candidate cannot be installed and the note line for it, or null when it can
+     * be. This fetches the description, so a caller decides the major version from the tag first.
      *
      * @param array{version: string, normalized: string, tag: string, entry: array<mixed>} $candidate
      *
@@ -314,8 +259,8 @@ final class ReleaseLocator
     }
 
     /**
-     * The release's description, fetched from its download URL the way the archive is — without
-     * the API token, which is not for the CDN a download redirects to.
+     * Fetched like the archive, without the API token: that token is not for the CDN that a
+     * download redirects to.
      *
      * @param array{version: string, normalized: string, tag: string, entry: array<mixed>} $candidate
      */
@@ -334,14 +279,12 @@ final class ReleaseLocator
     }
 
     /**
-     * Every usable release in the list, newest first by version — not by list order, which is by
-     * date and would put a patch of an older line above a newer minor. Two tags of one version
-     * (`v1.0` and `v1.0.0`) are ordered by the tag itself, so every PHP picks the same one: usort()
-     * is stable only from PHP 8.0 on.
+     * Every usable release in the list, newest first by version. The list is ordered by date, which
+     * puts a patch of an older line above a newer minor. Two tags of one version (`v1.0` and
+     * `v1.0.0`) sort by tag, so every PHP picks the same one: `usort()` is stable only from 8.0.
      *
-     * A published release whose tag is not a version is skipped with a note naming the tag, when
-     * it is listed before any release at or below the running version — a tag nobody can compare
-     * would otherwise hide a new release in silence.
+     * A tag that is not a version gets a note when it is listed before any release at or below the
+     * running version. Otherwise a tag that nobody can compare hides a new release in silence.
      *
      * @param string $current the running version, normalised
      *
@@ -384,9 +327,9 @@ final class ReleaseLocator
     }
 
     /**
-     * One page of the list. `[]` — and `{}`, which json_decode() cannot tell from it — is an empty
-     * page; any other JSON that is not a list, such as the single release `releases/latest`
-     * answers, is not a release list at all.
+     * One page of the list. `[]` and `{}`, which `json_decode()` cannot tell apart, are an empty
+     * page. Any other JSON that is not a list, such as the single release of `releases/latest`, is
+     * refused.
      *
      * @return array<mixed>
      */
@@ -412,10 +355,9 @@ final class ReleaseLocator
     }
 
     /**
-     * $entry as a candidate; its tag when it is a published release whose tag is not a version;
-     * or null when it is not a published stable release at all: a draft, a pre-release, an entry
-     * without a string tag, or a version that is not stable (`v1.0.0-RC1` published without the
-     * pre-release flag).
+     * $entry as a candidate, its tag when the tag is not a version, or null when it is no published
+     * stable release: a draft, a pre-release, an entry without a string tag, or a version that is
+     * not stable (`v1.0.0-RC1` published without the pre-release flag).
      *
      * @param mixed $entry
      *
@@ -430,8 +372,8 @@ final class ReleaseLocator
         if (!\is_string($tag)) {
             return null;
         }
-        // Composer's parser takes the tag as it is: a leading `v` or `V` is part of its grammar, and
-        // anything around a version (`lockrot-v0.2.0`, a second line) is not a version.
+        // Composer's parser takes the tag as it is: a leading `v` or `V` is part of its grammar,
+        // and anything around a version (`lockrot-v0.2.0`, a second line) is not a version.
         try {
             $normalized = (new VersionParser())->normalize($tag);
         } catch (\UnexpectedValueException $e) {
@@ -441,8 +383,7 @@ final class ReleaseLocator
             return null;
         }
 
-        // Every comparison is on the normalised form; the version shown is its `major.minor.patch`
-        // (the fourth number kept only when it is not 0), whatever spelling the tag used.
+        // Comparisons use the normalised form. The shown version drops a fourth number that is 0.
         return [
             'version' => (string) preg_replace('/^(\d+\.\d+\.\d+)\.0(?!\d)/', '$1', $normalized),
             'normalized' => $normalized,
@@ -474,9 +415,9 @@ final class ReleaseLocator
     }
 
     /**
-     * The `browser_download_url` of the asset published under exactly $name. GitHub keeps assets in
-     * an unordered list, so the match is by name rather than by position, and a partial match is not
-     * accepted: `lockrot.phar` and `lockrot.phar.sha256` are distinguished only by their full names.
+     * The `browser_download_url` of the asset named exactly $name. GitHub lists assets in no fixed
+     * order, and `lockrot.phar` is a prefix of `lockrot.phar.sha256`, so neither a position nor a
+     * partial match works.
      *
      * @param array<mixed> $entry
      */

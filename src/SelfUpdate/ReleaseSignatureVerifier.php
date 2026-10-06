@@ -7,24 +7,12 @@ namespace Lockrot\SelfUpdate;
 use Lockrot\Exception\ConfigException;
 
 /**
- * Verifies a release the way Composer's own self-update verifies composer.phar
- * ({@see \Composer\Command\SelfUpdateCommand::verifyPhar()}): the signature file is a JSON object
- * `{"sha384": "<base64>"}` holding an RSA signature (PKCS#1 v1.5 over SHA-384, what
- * `openssl dgst -sha384 -sign` produces) over the archive's bytes, checked with `openssl_verify()`
- * against a public key that ships inside the running archive ({@see ReleaseKey}).
+ * Verifies a release as Composer's `SelfUpdateCommand::verifyPhar()` does: the signature file is
+ * `{"sha384": "<base64>"}`, an RSA signature (PKCS#1 v1.5 over SHA-384) over the archive's bytes,
+ * checked with `openssl_verify()` against the public key in {@see ReleaseKey}.
  *
- * The check needs nothing from the machine: no `gpg`, no keyring, no network beyond the two
- * downloads. It does need ext-openssl, which every PHP that can download over https has — and the
- * download that precedes this check is over https.
- *
- * The key is the one the archive was built with, so trust starts with the first download: verify
- * that one by hand (`lockrot.phar.asc` with the GPG key, or the attestation), and every self-update
- * after it is checked against the key that download carried. A rotated key reaches an old archive
- * the same way, through the transition release: signed with the old key, carrying the new one. An
- * archive on the old key passes over the releases after it, whose description names a key it does
- * not carry ({@see keyFingerprint()}, {@see ReleaseLocator}), installs the transition release, and
- * from there verifies with the new key. That is for a planned rotation only: a compromised key
- * cannot vouch for a transition release, and every archive carrying it is replaced by hand.
+ * Trust starts with the first download, and a key rotation arrives in a transition release:
+ * SECURITY.md#how-self-update-trusts-a-release
  *
  * @internal
  */
@@ -32,7 +20,6 @@ final class ReleaseSignatureVerifier implements SignatureVerifierInterface
 {
     private string $publicKeyPem;
 
-    /** @param string $publicKeyPem a `-----BEGIN PUBLIC KEY-----` block */
     public function __construct(string $publicKeyPem)
     {
         $this->publicKeyPem = $publicKeyPem;
@@ -51,10 +38,8 @@ final class ReleaseSignatureVerifier implements SignatureVerifierInterface
         if ($key === false) {
             throw new ConfigException('the public key self-update verifies releases with cannot be loaded; download the new release by hand and verify it');
         }
-        // 1 is a match, 0 a mismatch (a wrong key, other bytes, a signature of the wrong length —
-        // openssl reports them all as 0), -1 an error inside openssl itself. The last is this
-        // machine's fault, not the release's, and is reported as such rather than as a forgery; no
-        // input from outside reaches it, so no test can either.
+        // openssl reports every kind of mismatch as 0 and an error inside openssl as -1. The error
+        // is this machine's fault and is not reported as a forgery. No outside input reaches it.
         $verified = openssl_verify($archive, $signature, $key, \OPENSSL_ALGO_SHA384);
         if ($verified === -1) {
             $reason = openssl_error_string();
@@ -70,18 +55,11 @@ final class ReleaseSignatureVerifier implements SignatureVerifierInterface
     }
 
     /**
-     * The DER is the base64 between the armour lines, so the value is the same in the release
-     * workflow's `describe` step and in a user's archive, and needs no openssl to compute. Only a
-     * `PUBLIC KEY` block (SubjectPublicKeyInfo) is read; an `RSA PUBLIC KEY` block holds the same
-     * key in PKCS#1, whose hash is another value, and would otherwise mismatch every description in
-     * silence. The line breaks inside the block need no stripping: base64_decode() skips whitespace
-     * even in strict mode, which rejects anything else outside the alphabet.
-     *
-     * Where openssl is available the key must also load, as {@see verify()} will need it to: a
-     * damaged key would otherwise have a fingerprint no release names, and every release would be
-     * passed over as signed with another key rather than reported as the error it is. Without
-     * openssl nothing can be installed anyway — verify() refuses first — so the fingerprint alone
-     * still serves `--check`.
+     * The DER is the base64 between the armour lines, so the release workflow computes the same
+     * value without openssl. lockrot reads only a `PUBLIC KEY` block: an `RSA PUBLIC KEY` block
+     * holds the same key in PKCS#1, whose hash differs and mismatches every description in silence.
+     * With openssl present the key must also load, so a damaged key is an error and not a
+     * fingerprint that no release names. Without openssl, `--check` still gets its fingerprint.
      */
     public function keyFingerprint(): string
     {
@@ -98,10 +76,8 @@ final class ReleaseSignatureVerifier implements SignatureVerifierInterface
     }
 
     /**
-     * The raw signature bytes out of the `.sig.json` file. Only the one shape is accepted — a JSON
-     * object whose `sha384` member is base64 in the strict alphabet — so a truncated download, an
-     * HTML error page or a file signed under another scheme is a readable message, never bytes
-     * handed to the verifier.
+     * Accepts only a JSON object whose `sha384` member is strict base64: any other file, such as an
+     * HTML error page, gets a message and never reaches the verifier.
      */
     private static function signatureIn(string $signatureFile, string $signatureUrl): string
     {

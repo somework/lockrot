@@ -5,20 +5,12 @@ declare(strict_types=1);
 namespace Lockrot\SelfUpdate;
 
 /**
- * The public half of the lockrot self-update signing key, built into every archive so
- * {@see ReleaseSignatureVerifier} needs nothing from the machine it runs on. The same key is
- * `lockrot-selfupdate-key.pub` in the repository root; a test keeps the two identical.
+ * The public half of the self-update signing key, built into every archive. The same key is
+ * `lockrot-selfupdate-key.pub` in the repository root, and a test keeps the two identical.
  *
- * This is not the GPG release key: that one signs `lockrot.phar.asc` for people and PHIVE, this
- * one signs `lockrot.phar.sig.json` for the archive's own self-update, the way Composer keeps its
- * self-update keys apart from its maintainers' GPG keys. RSA 4096, held by the release workflow
- * as the SELFUPDATE_PRIVATE_KEY secret; SECURITY.md says how it is rotated.
- *
- * Its fingerprint, `sha256:ec3ca71b1a3ced86f871b89cff7973b58454e5694136683680b72b18070a8f87`
- * ({@see ReleaseSignatureVerifier::keyFingerprint()}, pinned by a test), is what each release's
- * `lockrot.phar.meta.json` names when this key signed it. A rotation replaces this constant in a
- * transition release signed with the old key, which an archive carrying the old key installs before
- * any release signed with the new one ({@see ReleaseLocator}).
+ * This is not the GPG release key: that key signs `lockrot.phar.asc` for people and PHIVE, and
+ * this one signs `lockrot.phar.sig.json` for self-update. Rotation:
+ * SECURITY.md#key-custody-and-rotation
  *
  * @internal
  */

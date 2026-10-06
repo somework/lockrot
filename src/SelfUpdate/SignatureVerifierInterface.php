@@ -10,27 +10,20 @@ use Lockrot\Exception\ConfigException;
 interface SignatureVerifierInterface
 {
     /**
-     * Checks that $signatureFile — the body of the release's `lockrot.phar.sig.json` — is the release
-     * key's signature over exactly $archive.
-     *
-     * @param string $archive       the downloaded archive, byte for byte
-     * @param string $signatureFile the downloaded signature file
+     * @param string $signatureFile the body of the release's `lockrot.phar.sig.json`
      * @param string $signatureUrl  where the signature came from, for the message
      *
-     * @throws ConfigException when the signature cannot be read, cannot be checked, or does not
-     *                         match — every one of which means the archive is not installed
+     * @throws ConfigException when the signature cannot be read or checked, or does not match the
+     *                         archive: the caller installs nothing
      */
     public function verify(string $archive, string $signatureFile, string $signatureUrl): void;
 
     /**
-     * `sha256:` followed by the hex SHA-256 of the DER public key this verifier trusts — the value
-     * `openssl pkey -pubin -outform DER | sha256sum` prints, and the one a release's
-     * `lockrot.phar.meta.json` names for the key that signed it. {@see ReleaseLocator} passes over a
-     * release whose key is not this one.
+     * `sha256:` and the hex SHA-256 of the DER public key, the value that a release's
+     * `lockrot.phar.meta.json` names for its signing key (SECURITY.md#verifying-a-downloaded-phar).
      *
-     * @throws ConfigException when the key is not one a fingerprint can be taken of, or not one
-     *                         {@see verify()} could load: a fingerprint no release names would pass
-     *                         every release over instead of reporting the broken key
+     * @throws ConfigException when the key has no fingerprint or {@see verify()} cannot load it:
+     *                         otherwise every release is passed over for a key no release names
      */
     public function keyFingerprint(): string;
 }
