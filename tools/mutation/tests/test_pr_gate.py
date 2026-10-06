@@ -1,9 +1,8 @@
 """The pull-request mutation gate: which escapes it lets through, and which it stops.
 
-A pull request mutates only the lines it changes. Its gate is not a score: on a few dozen mutants one
-documented equivalent moves the MSI by whole points. It reads the escaped mutants instead, and stops
-the run on an escape tests/infection-equivalents.md does not account for, while one it does account
-for passes and is still listed.
+The key of an escape is its file, its mutator and the original line Infection mutated (or the
+enclosing method, where that text is not unique), so that a line added above a documented
+equivalent does not turn it into an unexplained escape.
 """
 
 import os
@@ -15,164 +14,118 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'
 
 import pr_gate  # noqa: E402
 
-LOG = """Escaped mutants:
-================
+SOURCE = """<?php
+final class Openness
+{
+    public function major(string $v): int
+    {
+        $parts = explode('.', $v);
+        return (int) $parts[0] + 0;
+    }
 
-1) /home/runner/work/lockrot/lockrot/src/Signal/ConstraintOpenness.php:50    [M] IncrementInteger [ID] 6ac96be7bce021e69c64b1d1b380cac3
+    public function minor(string $v): int
+    {
+        return 1;
+    }
 
-@@ @@
--        $x = 0;
-+        $x = 1;
-
-2) /home/runner/work/lockrot/lockrot/src/Lock/LockedPackage.php:91    [M] Identical [ID] 1111aaaa2222bbbb3333cccc4444dddd
-
-@@ @@
--        if ($a === $b) {
-+        if ($a !== $b) {
-
-Timed Out mutants:
-==================
-
-1) /home/runner/work/lockrot/lockrot/src/Data/Repository/RepositoryUrl.php:264    [M] DecrementInteger [ID] 429b75690e4a2a08bc8df415452881f5
-
-Skipped mutants:
-================
+    public function patch(string $v): int
+    {
+        return 1;
+    }
+}
 """
 
-EQUIVALENTS = """# Mutants no test can observe
 
-## src/Verdict, src/Signal (the original gate)
+def log(*escaped):
+    out = ['Escaped mutants:', '================', '']
+    for n, (line, mutator, original) in enumerate(escaped, 1):
+        out += ['{}) /home/runner/work/lockrot/lockrot/src/Signal/Openness.php:{}    [M] {} [ID] {}'.format(n, line, mutator, 'a' * 32),
+                '', '@@ @@', '     {', '-' + original, '+        changed', '']
+    return '\n'.join(out + ['Timed Out mutants:', '==================', ''])
 
-- `src/Signal/ConstraintOpenness.php:48` CastInt, `:50` CastInt, IncrementInteger, DecrementInteger,
-  `:79` ConcatOperandRemoval — numeric strings compare numerically.
-- `src/Lock/ConfiguredRepositories.php:285` CastString and
-- `src/Lock/ConfiguredRepositories.php:286` CastString — both patterns are literals.
-- `src/Filesystem/Path.php:138` LogicalOr and DecrementInteger x2 — the inode test.
 
-src/Composer/SelfUpdateCommand.php:155 FalseValue (`\\Phar::running(false)`) — a paragraph that opens
-with its reference is an entry too.
+class Gate(unittest.TestCase):
+    def setUp(self):
+        self.directory = tempfile.TemporaryDirectory()
+        self.root = self.directory.name
+        os.makedirs(os.path.join(self.root, 'src', 'Signal'))
+        with open(os.path.join(self.root, 'src', 'Signal', 'Openness.php'), 'w', encoding='utf-8') as handle:
+            handle.write(SOURCE)
 
-Prose mentioning src/Lock/LockedPackage.php and Identical outside an entry documents nothing.
+    def tearDown(self):
+        self.directory.cleanup()
 
-### Not equivalent: the two mutants this run reports as timed out
-
-- `src/Data/Repository/RepositoryMetadataLoader.php:195` NotIdentical — a genuine infinite loop.
-
-## Later
-
-- `src/Data/Repository/RepositoryUrl.php:254` LessThan — two offsets of one pattern never coincide.
-"""
+    def run_gate(self, logs, ledger):
+        paths = []
+        for n, text in enumerate(logs):
+            paths.append(os.path.join(self.root, 'infection{}.log'.format(n)))
+            with open(paths[-1], 'w', encoding='utf-8') as handle:
+                handle.write(text)
+        paths.append(os.path.join(self.root, 'equivalents.md'))
+        with open(paths[-1], 'w', encoding='utf-8') as handle:
+            handle.write(ledger)
+        return pr_gate.main(paths, self.root)
 
 
 class ReadingTheLog(unittest.TestCase):
-    def test_only_the_escaped_section_is_read(self):
-        self.assertEqual(
-            [('src/Signal/ConstraintOpenness.php', 50, 'IncrementInteger'),
-             ('src/Lock/LockedPackage.php', 91, 'Identical')],
-            pr_gate.escapes(LOG),
-        )
-
-    def test_a_log_without_escapes_has_none(self):
-        self.assertEqual([], pr_gate.escapes('Escaped mutants:\n================\n\nTimed Out mutants:\n'))
+    def test_only_escapes_are_read_each_with_its_original_line(self):
+        text = log((7, 'Plus', '        return (int) $parts[0] + 0;'))
+        text += '\n1) /x/src/Signal/Openness.php:12    [M] Plus [ID] ' + 'b' * 32 + '\n@@ @@\n-        return 1;\n'
+        self.assertEqual([('src/Signal/Openness.php', 7, 'Plus', 'return (int) $parts[0] + 0;')],
+                         [tuple(e) for e in pr_gate.escapes(text)])
 
 
-class ReadingTheDocumentedList(unittest.TestCase):
-    def setUp(self):
-        self.entries = pr_gate.entries(EQUIVALENTS)
+class TheKey(Gate):
+    def test_a_line_reference_reads_the_current_text_so_a_moved_line_still_matches(self):
+        escape = log((9, 'Plus', '        return (int) $parts[0] + 0;'))
+        self.assertEqual(0, self.run_gate([escape], '- `src/Signal/Openness.php:7` Plus -- why.\n')[0])
 
-    def test_a_mutator_named_after_a_continued_line_reference_is_documented(self):
-        self.assertTrue(pr_gate.documented(('src/Signal/ConstraintOpenness.php', 50, 'IncrementInteger'), self.entries))
+    def test_the_form_without_a_line_number_matches_on_the_original_text(self):
+        escape = log((40, 'Plus', 'return (int) $parts[0] + 0;'))
+        ledger = '- `src/Signal/Openness.php` Plus `return (int) $parts[0] + 0;` -- why.\n'
+        self.assertEqual(0, self.run_gate([escape], ledger)[0])
 
-    def test_the_line_number_does_not_decide_because_lines_drift(self):
-        self.assertTrue(pr_gate.documented(('src/Signal/ConstraintOpenness.php', 61, 'CastInt'), self.entries))
-
-    def test_a_mutator_the_entry_does_not_name_is_not_documented(self):
-        self.assertFalse(pr_gate.documented(('src/Signal/ConstraintOpenness.php', 50, 'Plus'), self.entries))
-
-    def test_a_mutator_documented_for_another_file_is_not_documented_here(self):
-        self.assertFalse(pr_gate.documented(('src/Lock/LockedPackage.php', 10, 'CastString'), self.entries))
-
-    def test_prose_outside_a_list_entry_documents_nothing(self):
-        self.assertFalse(pr_gate.documented(('src/Lock/LockedPackage.php', 91, 'Identical'), self.entries))
-
-    def test_a_paragraph_that_opens_with_its_reference_is_an_entry(self):
-        self.assertTrue(pr_gate.documented(('src/Composer/SelfUpdateCommand.php', 155, 'FalseValue'), self.entries))
-
-    def test_a_mutant_listed_as_not_equivalent_is_not_documented(self):
-        self.assertFalse(pr_gate.documented(('src/Data/Repository/RepositoryMetadataLoader.php', 195, 'NotIdentical'), self.entries))
-
-    def test_entries_after_the_not_equivalent_section_count_again(self):
-        self.assertTrue(pr_gate.documented(('src/Data/Repository/RepositoryUrl.php', 254, 'LessThan'), self.entries))
-
-    def test_each_of_two_adjacent_entries_stands_on_its_own(self):
-        self.assertTrue(pr_gate.documented(('src/Lock/ConfiguredRepositories.php', 286, 'CastString'), self.entries))
-
-
-class CountingTheDocumentedOnes(unittest.TestCase):
-    """Lines drift, so the gate cannot match on them; it matches on how many there are instead."""
-
-    def setUp(self):
-        self.entries = pr_gate.entries(EQUIVALENTS)
-
-    def test_one_documented_mutant_covers_one_escape_not_two(self):
-        found = [('src/Signal/ConstraintOpenness.php', 50, 'IncrementInteger'),
-                 ('src/Signal/ConstraintOpenness.php', 90, 'IncrementInteger')]
-        self.assertEqual([True, False], pr_gate.accounted(found, self.entries))
-
-    def test_a_mutator_named_twice_covers_two(self):
-        found = [('src/Signal/ConstraintOpenness.php', 48, 'CastInt'), ('src/Signal/ConstraintOpenness.php', 50, 'CastInt')]
-        self.assertEqual([True, True], pr_gate.accounted(found, self.entries))
-
-    def test_x2_counts_twice(self):
-        found = [('src/Filesystem/Path.php', 138, 'DecrementInteger'), ('src/Filesystem/Path.php', 140, 'DecrementInteger'),
-                 ('src/Filesystem/Path.php', 141, 'DecrementInteger')]
-        self.assertEqual([True, True, False], pr_gate.accounted(found, self.entries))
-
-
-class TheVerdict(unittest.TestCase):
-    def run_gate(self, log):
-        with tempfile.TemporaryDirectory() as directory:
-            log_path = os.path.join(directory, 'infection.log')
-            list_path = os.path.join(directory, 'equivalents.md')
-            with open(log_path, 'w', encoding='utf-8') as handle:
-                handle.write(log)
-            with open(list_path, 'w', encoding='utf-8') as handle:
-                handle.write(EQUIVALENTS)
-            return pr_gate.main([log_path, list_path])
-
-    def test_an_undocumented_escape_fails_and_is_named(self):
-        code, summary = self.run_gate(LOG)
+    def test_another_mutator_on_the_documented_line_is_not_documented(self):
+        escape = log((7, 'CastInt', '        return (int) $parts[0] + 0;'))
+        code, summary = self.run_gate([escape], '- `src/Signal/Openness.php:7` Plus -- why.\n')
         self.assertEqual(1, code)
-        self.assertIn('src/Lock/LockedPackage.php:91', summary)
-        self.assertIn('Identical', summary)
+        self.assertIn('CastInt', summary)
 
-    def test_a_documented_escape_passes_and_is_still_listed(self):
-        documented_only = LOG.split('2) ')[0] + 'Timed Out mutants:\n'
-        code, summary = self.run_gate(documented_only)
-        self.assertEqual(0, code)
-        self.assertIn('src/Signal/ConstraintOpenness.php:50', summary)
+    def test_a_text_that_is_not_unique_falls_back_to_the_method(self):
+        documented = log((13, 'IncrementInteger', '        return 1;'))
+        other_method = log((18, 'IncrementInteger', '        return 1;'))
+        ledger = '- `src/Signal/Openness.php:12` IncrementInteger -- in minor() only.\n'
+        self.assertEqual(0, self.run_gate([documented], ledger)[0])
+        self.assertEqual(1, self.run_gate([other_method], ledger)[0])
 
+    def test_x2_accounts_for_two_and_not_three(self):
+        twice = log((7, 'Plus', 'return (int) $parts[0] + 0;'), (7, 'Plus', 'return (int) $parts[0] + 0;'))
+        thrice = log(*[(7, 'Plus', 'return (int) $parts[0] + 0;')] * 3)
+        ledger = '- `src/Signal/Openness.php:7` Plus x2 -- why.\n'
+        self.assertEqual(0, self.run_gate([twice], ledger)[0])
+        self.assertEqual(1, self.run_gate([thrice], ledger)[0])
+
+    def test_a_section_of_mutants_that_are_not_equivalent_accounts_for_nothing(self):
+        ledger = '### Not equivalent: detections\n\n- `src/Signal/Openness.php:7` Plus -- a loop.\n'
+        self.assertEqual(1, self.run_gate([log((7, 'Plus', 'return (int) $parts[0] + 0;'))], ledger)[0])
+
+    def test_a_paragraph_opening_with_its_reference_is_an_entry(self):
+        ledger = 'src/Signal/Openness.php:7 Plus (`+ 0` removed) -- why.\n'
+        self.assertEqual(0, self.run_gate([log((7, 'Plus', 'return (int) $parts[0] + 0;'))], ledger)[0])
+
+    def test_the_escapes_of_every_log_count_together(self):
+        one = log((7, 'Plus', 'return (int) $parts[0] + 0;'))
+        self.assertEqual(1, self.run_gate([one, one], '- `src/Signal/Openness.php:7` Plus -- why.\n')[0])
+
+
+class TheVerdict(Gate):
     def test_no_escape_passes(self):
-        code, summary = self.run_gate('Escaped mutants:\n================\n\nTimed Out mutants:\n')
+        code, summary = self.run_gate(['Escaped mutants:\n================\n\nTimed Out mutants:\n'], '')
         self.assertEqual(0, code)
         self.assertIn('No mutant escaped', summary)
 
-    def test_the_escapes_of_every_log_are_counted_together(self):
-        with tempfile.TemporaryDirectory() as directory:
-            paths = []
-            for name in ('diff.log', 'files.log'):
-                paths.append(os.path.join(directory, name))
-                with open(paths[-1], 'w', encoding='utf-8') as handle:
-                    handle.write(LOG.split('2) ')[0] + 'Timed Out mutants:\n')
-            list_path = os.path.join(directory, 'equivalents.md')
-            with open(list_path, 'w', encoding='utf-8') as handle:
-                handle.write(EQUIVALENTS)
-            code, summary = pr_gate.main(paths + [list_path])
-        self.assertEqual(1, code, 'IncrementInteger is documented once in that file, and escaped twice')
-
     def test_a_missing_log_is_an_error_not_a_pass(self):
-        with tempfile.TemporaryDirectory() as directory:
-            code, summary = pr_gate.main([os.path.join(directory, 'absent.log'), os.path.join(directory, 'absent.md')])
+        code, _ = pr_gate.main([os.path.join(self.root, 'absent.log'), os.path.join(self.root, 'absent.md')], self.root)
         self.assertEqual(2, code)
 
 
