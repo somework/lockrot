@@ -10,16 +10,13 @@ use PHPUnit\Event\Test\PreparationStarted;
 use PHPUnit\Event\Test\PreparationStartedSubscriber;
 use PHPUnit\Event\TestRunner\Finished as TestRunnerFinished;
 use PHPUnit\Event\TestRunner\FinishedSubscriber as TestRunnerFinishedSubscriber;
-use PHPUnit\Event\TestSuite\Started as TestSuiteStarted;
-use PHPUnit\Event\TestSuite\StartedSubscriber as TestSuiteStartedSubscriber;
 use PHPUnit\Runner\Extension\Extension;
 use PHPUnit\Runner\Extension\Facade;
 use PHPUnit\Runner\Extension\ParameterCollection;
 use PHPUnit\TextUI\Configuration\Configuration;
 
 /**
- * Ends a mutant's test run as a failure once a single test, or a class's before-class methods, has
- * run for {@see self::SECONDS}.
+ * Ends a mutant's test run as a failure once a single test has run for {@see self::SECONDS}.
  *
  * A mutant that turns a loop into one that never ends (a queue that never empties, a write offset
  * that never moves) holds one of the mutation job's threads until Infection's timeout for that
@@ -33,8 +30,10 @@ use PHPUnit\TextUI\Configuration\Configuration;
  * sooner. A mutant whose loop sits on a line only fast tests reach already gets a timeout of a few
  * seconds from Infection, so the alarm never comes into play for it.
  *
- * A test that runs in a separate process is not held: PHPUnit bootstraps no extension in the child,
- * and the parent only hears of the test once the child is done. Such a test keeps Infection's timeout.
+ * The alarm is armed when PHPUnit prepares a test in this process and cleared when it finishes, so
+ * nothing else is held: not a class's setUpBeforeClass(), and not a test in a separate process, of
+ * which the parent hears only once the child is done (PHPUnit bootstraps no extension in the child).
+ * Those keep Infection's own timeout; no mutant's loop was found in either.
  *
  * Only Infection's mutant processes, which it starts with INFECTION=1, arm the alarm: the initial
  * run, where a corpus sweep covering nothing takes over 30 seconds, and every ordinary test run are
@@ -62,24 +61,6 @@ final class MutantTestTimeLimit implements Extension
         });
 
         $facade->registerSubscribers(
-            // A suite starts before its class's setUpBeforeClass() runs; the event named for the
-            // before-class methods only fires once they have returned.
-            new class ($running) implements TestSuiteStartedSubscriber {
-                /** @var \ArrayObject<string, string> */
-                private \ArrayObject $running;
-
-                /** @param \ArrayObject<string, string> $running */
-                public function __construct(\ArrayObject $running)
-                {
-                    $this->running = $running;
-                }
-
-                public function notify(TestSuiteStarted $event): void
-                {
-                    $this->running['test'] = $event->testSuite()->name();
-                    pcntl_alarm(MutantTestTimeLimit::SECONDS);
-                }
-            },
             new class ($running) implements PreparationStartedSubscriber {
                 /** @var \ArrayObject<string, string> */
                 private \ArrayObject $running;
