@@ -4,17 +4,12 @@ declare(strict_types=1);
 
 namespace Lockrot\Filesystem;
 
-/**
- * The little lockrot needs to know about a path it is handed: whether it is absolute, where a
- * relative one lands, and a form two spellings of the same file can be compared in.
- *
- * @internal
- */
+/** @internal */
 final class Path
 {
     /**
-     * Unix absolute paths start with a separator; Windows ones with a drive letter (`C:\project`)
-     * or a UNC prefix (`\\server\share`), both of which the leading-separator test already covers.
+     * A Windows form is absolute on every system: a drive letter (`C:\project`) or a UNC prefix
+     * (`\\server\share`).
      */
     public static function isAbsolute(string $path): bool
     {
@@ -23,16 +18,14 @@ final class Path
             || preg_match('{^[A-Za-z]:[\\\\/]}', $path) === 1;
     }
 
-    /** $path as given when it is absolute, otherwise joined onto $base. */
     public static function resolve(string $base, string $path): string
     {
         return self::isAbsolute($path) ? $path : rtrim($base, '/\\').'/'.$path;
     }
 
     /**
-     * $path below $directory, both folded by spelling ({@see normalize()}), or null when it is not
-     * below it. Only the spelling is compared: two spellings of one directory through a symlink read
-     * as unrelated, which gives a caller the file name alone rather than a wrong path.
+     * Only the spelling is compared ({@see normalize()}): two spellings of one directory through a
+     * symlink read as unrelated, so a caller gets the file name alone, not a wrong path.
      */
     public static function relativeTo(string $path, string $directory): ?string
     {
@@ -49,11 +42,9 @@ final class Path
     }
 
     /**
-     * Whether the last component is a name Windows reads as another: Win32 drops trailing dots and
-     * spaces (`composer.lock.` is `composer.lock`), and a colon names an NTFS stream of the file
-     * before it (`composer.lock::$DATA` is the file itself). Only the last component is looked at,
-     * split on either separator, so a drive letter (`C:\`) never counts, and the answer is the same
-     * on every system.
+     * Win32 drops trailing dots and spaces (`composer.lock.` is `composer.lock`), and a colon names an
+     * NTFS stream (`composer.lock::$DATA` is the file itself). Only the last component counts, so a
+     * drive letter (`C:\`) never matches. The answer is the same on every system.
      */
     public static function isWindowsAlias(string $path): bool
     {
@@ -64,20 +55,11 @@ final class Path
 
     /**
      * A key under which two spellings of one file compare equal: the directory resolved through the
-     * filesystem (dot segments, symlinked directories such as macOS's temp directory), dot segments
-     * folded, either separator read as `/`, and lower case — so `Composer.lock` on a case-insensitive
-     * filesystem, which is the lock, is caught. On a case-sensitive one that makes two distinct names
-     * compare equal, and on Unix a backslash is a character of the name rather than a separator;
-     * both only ever err on the side of refusing.
-     *
-     * A directory that does not exist cannot be resolved as spelled. Windows does not need it to:
-     * it folds `..` by spelling alone, so `missing\..\lockrot-baseline.json` is the baseline there.
-     * The path is then folded the same way ({@see normalize()}) and resolved again, and compared as
-     * it is spelled only when even that directory does not exist.
-     *
-     * The file itself is not resolved: a symlink at the target is replaced by the write, not
-     * followed, so the link is the file that is written. {@see sameFile()} is the question about
-     * what is on disk.
+     * filesystem, dot segments folded, either separator read as `/`, and lower case. Distinct names can
+     * compare equal, on a case-sensitive filesystem or with a Unix backslash. That only errs on the
+     * side of refusing. A missing directory is folded by spelling first, as Windows does
+     * (`missing\..\lockrot-baseline.json` is the baseline there). The file itself is not resolved:
+     * the write replaces a symlink at the target.
      */
     public static function canonical(string $absolute): string
     {
@@ -91,13 +73,12 @@ final class Path
     }
 
     /**
-     * $path with `.` and `..` segments folded by spelling alone, the way Windows folds them before it
-     * looks at the disk: either separator is one, `/` is written back, repeated separators are one,
-     * and nothing climbs above a root (`/`, a drive such as `C:/`, a UNC `//`). A relative path keeps
-     * the leading `..` it cannot fold.
+     * Folds `.` and `..` by spelling alone, the way Windows does before it looks at the disk. Nothing
+     * climbs above a root (`/`, a drive such as `C:/`, a UNC `//`). A relative path keeps the leading
+     * `..` it cannot fold.
      *
-     * The disk is not consulted, so on Unix a `..` after a symlinked directory is folded lexically
-     * here where the kernel would follow the link; {@see canonical()} resolves what exists first.
+     * The disk is not consulted: on Unix a `..` after a symlinked directory is folded where the kernel
+     * follows the link. {@see canonical()} resolves what exists first.
      */
     public static function normalize(string $path): string
     {
@@ -122,11 +103,10 @@ final class Path
     }
 
     /**
-     * Whether two paths name one file on disk, links followed: the same device and inode — a hard
-     * link, a symlink, and on a case-insensitive filesystem any spelling it folds to the same entry
-     * (`composer.locK` with a Kelvin sign is the lock on macOS). Where the filesystem reports no inode
-     * (0, as on some Windows filesystems) the resolved paths are compared instead, case-insensitively
-     * as Windows compares them. A path that does not exist is the same file as nothing.
+     * Same device and inode, so a hard link, a symlink and a case-folded spelling count as one file
+     * (`composer.locK` with a Kelvin sign is the lock on macOS). Where the filesystem reports inode 0,
+     * as on some Windows filesystems, the resolved paths are compared case-insensitively. A missing
+     * path is the same file as nothing.
      */
     public static function sameFile(string $first, string $second): bool
     {

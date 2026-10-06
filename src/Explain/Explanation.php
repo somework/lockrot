@@ -15,11 +15,8 @@ use Lockrot\Signal\Thresholds;
 use Lockrot\Verdict\Finding;
 
 /**
- * Everything one finding was decided on, laid out for a developer asking "why is this flagged?" —
- * or "why is it not?": the finding with every signal's raw data, the lock entry, the repository
- * metadata with the release date of every branch, the repository activity, the thresholds the
- * signals were measured against, and the run's notes. Nothing here is computed anew: the finding
- * is the report's, the facts are the ones the rules read ({@see \Lockrot\Analyzer\Analysis}).
+ * What it shows: docs/configuration.md#explaining-one-package. The finding is the report's and the
+ * facts are the ones the rules read ({@see \Lockrot\Analyzer\Analysis}).
  *
  * @internal
  */
@@ -34,7 +31,10 @@ final class Explanation
     private string $targetPhp;
     private Report $report;
     private ?string $projectPhp;
-    /** The two floors S8 holds a branch to, built from the same target and project php S8's is ({@see \Lockrot\Signal\SignalSet::default()}). */
+    /**
+     * Must be built from the same target and project php as S8's floor
+     * ({@see \Lockrot\Signal\SignalSet::default()}).
+     */
     private PhpFloor $floor;
 
     /**
@@ -77,28 +77,20 @@ final class Explanation
         return $this->report;
     }
 
-    /** The project's own `require.php` the branch rows were held against, null when it names none. */
     public function projectPhp(): ?string
     {
         return $this->projectPhp;
     }
 
-    /** The installed version's release branch key ({@see ReleaseBranch::of()}), null for a branch snapshot. */
     public function installedBranch(): ?string
     {
         return ReleaseBranch::of($this->finding->version());
     }
 
     /**
-     * The repository's release branches, highest first, each with its highest stable tag and that
-     * tag's release date (null when the repository leaves it undated or dates it by a commit other
-     * tags share — see {@see \Lockrot\Data\Repository\PackageMetadata::fromPackages()}), and the
-     * branch's newest dated release; `installed` marks the branch the locked version is on.
-     * `highest_commit_date` is the date such a shared-commit tag carried before it was set aside —
-     * the branch's newest dated release *is* that tag, so the date it shows is the commit's — and
-     * null for a tag that is dated as a release or not at all; what lets a reader tell "no date"
-     * from "a date that is not the release's". `php` is what the branch's newest dated release
-     * requires, the requirement S8 holds against the project's own and the target PHP.
+     * Highest branch first. `highest_commit_date` is the commit date of a highest tag that shares its
+     * commit with other tags, else null. It tells "no date" from "a date that is not the release's".
+     * See docs/configuration.md#explaining-one-package.
      *
      * @return list<array{branch: string, installed: bool, highest: string, highest_released: ?\DateTimeImmutable, highest_commit_date: ?\DateTimeImmutable, newest_dated: string, newest_dated_released: ?\DateTimeImmutable, dated_by: ?string, php: ?string}>
      */
@@ -137,8 +129,8 @@ final class Explanation
     }
 
     /**
-     * The monorepo parent whose dates some branch rows carry, null when every row is this
-     * package's own ({@see PackageMetadata::datedBy()}); with the branch labels it dated.
+     * The monorepo parent that dated some rows, with those branch labels.
+     * See docs/verdicts.md#dates-from-the-monorepo.
      *
      * @return array{0: string, 1: list<string>}|null
      */
@@ -156,7 +148,7 @@ final class Explanation
         return $parent === null ? null : [$parent, $branches];
     }
 
-    /** Whether the installed branch's highest tag carries no usable date — the reason S8 does not measure it. */
+    /** S8 does not measure a branch whose highest tag has no usable date. */
     public function installedBranchIsUndated(): bool
     {
         foreach ($this->branches() as $row) {
@@ -169,13 +161,8 @@ final class Explanation
     }
 
     /**
-     * The `--explain --format=json` document. Each branch row also carries what S8's floors say
-     * about its `php` ({@see PhpFloor}): whether it admits the target PHP, whether it admits the
-     * lowest PHP the project's own `require.php` promises (null for no answer: no requirement, one
-     * that cannot be read, no project floor), `php_blocked_by`, which of the two holds the
-     * branch back as S8 decides it, and `misses_target_php` and `misses_project_php`, which side of
-     * each floor the branch is on when it does not admit it. Only here, not in {@see self::branches()}: the text table does
-     * not print them, and it reads the rows more than once.
+     * The floor fields of a branch row (docs/verdicts.md#the-php-test-in-explain) are only here, not in
+     * {@see self::branches()}: the text table does not print them and reads the rows more than once.
      *
      * @return array<string, mixed>
      */
@@ -226,9 +213,7 @@ final class Explanation
                 'last_stable_release' => self::date($metadata->lastStableReleaseAt()),
                 'last_stable_version' => $metadata->lastStableVersion(),
                 'last_stable_dated_by' => $metadata->lastStableDatedBy(),
-                // The installed end of the package's libyears, and whose date it is: the lock's own
-                // `time` for an ordinary package, the monorepo parent's tag for a split package it
-                // dated, null where lockrot trusts neither ({@see InstalledRelease::of()}).
+                // The installed end of the libyears, as {@see InstalledRelease::of()} dates it.
                 'installed_release' => self::date($installed->at()),
                 'installed_release_dated_by' => $installed->datedBy(),
                 'repository' => RepositoryUrl::shown($metadata->repositoryUrl()),

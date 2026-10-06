@@ -8,16 +8,8 @@ use Lockrot\Analyzer\Analysis;
 use Lockrot\Signal\Thresholds;
 
 /**
- * What the page can show beyond the report itself, and what a caller can leave out.
- *
- * `--format=html` is the only format that wants more than a {@see \Lockrot\Analyzer\Report}: the
- * release branches come from the facts a run keeps only when asked
- * ({@see \Lockrot\Analyzer\Analyzer::analyzeWithFacts()}), the new/known/worsened column from the
- * baseline comparison, and both the thresholds and the target PHP are needed to explain a package
- * at all. The project's own `require.php` is the second floor a branch row is held against, as S8
- * holds it ({@see \Lockrot\Signal\PhpFloor}); without it the rows' project column has no answer.
- * Bundling them keeps {@see \Lockrot\Output\Formatters::for()} to one extra argument, and every one
- * of them is optional: the install-time path holds none of it and still renders a page.
+ * Every field is optional: the install-time path holds none of it and still renders a page. Without
+ * `projectPhp`, the project column of the branch rows has no answer ({@see \Lockrot\Signal\PhpFloor}).
  *
  * @internal
  */
@@ -40,7 +32,6 @@ final class PageData
         $this->projectPhp = $projectPhp;
     }
 
-    /** Nothing but the report: no release branches, no baseline column, no thresholds. */
     public static function none(): self
     {
         return new self();
@@ -62,7 +53,7 @@ final class PageData
         return $this->targetPhp;
     }
 
-    /** The project's own `require.php` as composer.json writes it, null when it names none. */
+    /** `require.php` as composer.json writes it. */
     public function projectPhp(): ?string
     {
         return $this->projectPhp;

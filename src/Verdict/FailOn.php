@@ -8,31 +8,18 @@ use Lockrot\Exception\ConfigException;
 use Lockrot\Signal\Signal;
 
 /**
- * The `fail-on` threshold: the verdict or the priority at or above which a finding fails the run.
- *
- * A verdict threshold reads what was observed about the package (`silent` fails on `silent` and
- * `abandoned`, wherever the package sits in the project). A priority threshold reads how much that
- * applies to the project (`high` fails on a `critical` or `high` finding — an abandoned direct
- * production requirement, say — and lets the same verdict pass on a transitive development
- * package). `none` fails on nothing. The two vocabularies do not overlap — the priority level `none`
- * is not a threshold and is not accepted as one — so one option serves both.
- *
- * The baseline is not consulted here: {@see \Lockrot\Config\Gate::decide()} exempts a finding the
- * project has already accepted, whichever kind of threshold is set.
+ * The accepted values: docs/configuration.md#fail-on-values. The verdict and priority vocabularies must
+ * not overlap, because one option serves both. The priority level `none` is not a threshold.
  *
  * @internal
  */
 final class FailOn
 {
     public const NONE = 'none';
-    /**
-     * Not a verdict and not a priority: a run where a check did not happen. It fails on any finding
-     * carrying S10 ({@see \Lockrot\Signal\Rule\NotCheckedRule}), which is how a pipeline asks for
-     * a complete run — the usual cause is a workflow that never passed `GITHUB_TOKEN` through.
-     */
+    /** Fails on any finding that carries S10: docs/verdicts.md#what-was-not-checked. */
     public const UNCHECKED = 'unchecked';
 
-    /** What a value names, in the order {@see allowed()} lists them; a report writes it as `run.fail_on_kind`. */
+    /** A report writes the kind as `run.fail_on_kind`. */
     public const KIND_NONE = 'none';
     public const KIND_VERDICT = 'verdict';
     public const KIND_PRIORITY = 'priority';
@@ -62,8 +49,8 @@ final class FailOn
     }
 
     /**
-     * Every accepted value, `none` first, then the verdicts from the most severe down, then the
-     * priorities from the highest down.
+     * `none` first, then the flagged verdicts from the most severe down, then the priorities from the
+     * highest down, then `unchecked`.
      *
      * @return list<string>
      */
@@ -79,7 +66,7 @@ final class FailOn
         return array_merge([self::NONE], $verdicts, self::priorities(), [self::UNCHECKED]);
     }
 
-    /** @return list<string> the priorities a threshold can name — every level but `none`, which is no threshold */
+    /** @return list<string> */
     private static function priorities(): array
     {
         $priorities = [];
@@ -114,7 +101,6 @@ final class FailOn
         return \in_array($this->value, self::priorities(), true) ? self::KIND_PRIORITY : self::KIND_VERDICT;
     }
 
-    /** Whether $finding is at or above the threshold; never for `none`. */
     public function reaches(Finding $finding): bool
     {
         switch ($this->kind()) {

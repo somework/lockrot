@@ -15,8 +15,8 @@ final class DependencyGraph
     /** @var list<string> */
     private array $roots;
     /**
-     * BFS parent maps, one per root, built on first use by {@see chainsTo()}. A memo of a pure
-     * function of the immutable edges, so the graph still reads the same however often it is asked.
+     * BFS parent maps, one per root, memoised by {@see tree()}. The edges are immutable, so a map
+     * never goes stale.
      *
      * @var array<string, array<string, string|null>>
      */
@@ -24,8 +24,8 @@ final class DependencyGraph
 
     /**
      * @param array<string, list<string>> $edges
-     * @param list<string> $roots may name a package the lock does not carry; every walk below
-     *                            only ever follows an edge that exists, so such a root leads nowhere
+     * @param list<string> $roots can name a package that the lock does not carry: a walk follows only
+     *                            an existing edge, so such a root leads nowhere
      */
     private function __construct(array $edges, array $roots)
     {
@@ -77,14 +77,10 @@ final class DependencyGraph
     }
 
     /**
-     * Every direct requirement of the project from which $target is reachable, each with the
-     * shortest chain from it to $target, keyed and sorted by the requirement's name. A direct
-     * package maps to itself with a one-element chain; a package nothing reaches maps to nothing.
+     * Keyed and sorted by the direct requirement's name. A direct package maps to itself.
      *
-     * {@see shortestChain()} keeps its own multi-source search: the two agree on chain length for
-     * the root the shortest chain starts from, but where a root has several equally short paths
-     * the single-source tree here may pick a different one, so the chain a finding carries is
-     * never rebuilt from this method.
+     * Do not rebuild a finding's chain from this method: with several equally short paths from one
+     * root, its single-source tree can pick a different one than {@see shortestChain()}.
      *
      * @return array<string, list<string>>
      */
