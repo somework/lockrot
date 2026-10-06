@@ -1,6 +1,6 @@
 # `minimal.phar`
 
-A 254-byte PHP archive used by `tests/Unit/SelfUpdate/PharValidatorTest.php`. It is checked in
+A minimal PHP archive used by `tests/Unit/SelfUpdate/PharValidatorTest.php`. It is checked in
 rather than generated at test time because `phar.readonly` defaults to On, so a test run cannot
 create one.
 
@@ -17,7 +17,7 @@ unset($p);
 '
 ```
 
-The fixed alias is deliberate: `PharValidatorTest` opens two copies of this archive in one process
+The alias is fixed because `PharValidatorTest` opens two copies of this archive in one process
 to show that an alias already mapped by one file does not make the next one look damaged, which is
 the situation `lockrot.phar self-update` is in when it checks a freshly downloaded archive.
 

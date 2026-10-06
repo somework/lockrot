@@ -31,7 +31,6 @@ final class ProjectIgnoreListTest extends TestCase
         self::assertSame('project', $entry->source());
     }
 
-    /** A leap day is a real date and must be accepted. */
     public function testALeapDayIsAcceptedAsAnExpiryDate(): void
     {
         $list = ProjectIgnoreList::fromExtra(['ignore' => [
@@ -59,17 +58,16 @@ final class ProjectIgnoreListTest extends TestCase
     public function testWhitespaceOnlyReasonThrows(): void
     {
         // The schema's minLength only counts characters, so a reason that is only whitespace
-        // passes it; trim($reason) === '' is the check the schema cannot express, and stays here.
+        // passes it. trim($reason) === '' is the check the schema cannot express.
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage('reason');
         ProjectIgnoreList::fromExtra(['ignore' => [['package' => 'a/b', 'reason' => '   ']]]);
     }
 
     /**
-     * The schema's pattern only checks the YYYY-MM-DD shape; checkdate() catches a date that looks
-     * right but is not a real calendar day, which stays here. "2026-02-30" is the case that needs
-     * the day to be read as the day: every month has at least 28 days, so a date the month alone
-     * cannot make impossible is the only one that tells the two apart.
+     * The schema's pattern only checks the YYYY-MM-DD shape. checkdate() catches a date that looks
+     * right but is not a real calendar day. "2026-02-30" tells the two apart: every month has at
+     * least 28 days, so the month alone cannot make it impossible.
      *
      * @dataProvider impossibleDates
      */

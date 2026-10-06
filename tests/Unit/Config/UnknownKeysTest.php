@@ -44,7 +44,6 @@ final class UnknownKeysTest extends TestCase
     /** @return iterable<string, array{string, string}> */
     public static function typos(): iterable
     {
-        // one edit away, the everyday typo
         yield 'camel case' => ['failOn', 'fail-on'];
         yield 'underscore' => ['include_dev', 'include-dev'];
         yield 'plural' => ['ignores', 'ignore'];
@@ -61,7 +60,7 @@ final class UnknownKeysTest extends TestCase
         yield 'the nearest of several substrings' => ['years', 'push-high-years'];
     }
 
-    /** Distance 3 on a 7-byte key is past a third; a looser threshold would reach `format`. */
+    /** Distance 3 on a 7-byte key is past a third. A looser threshold reaches `format`. */
     public function testJustPastTheThresholdGetsNoSuggestion(): void
     {
         self::assertSame(['unknown key extra.lockrot.fromatt ignored'], UnknownKeys::warnings(['fromatt' => 'json']));
@@ -178,7 +177,6 @@ final class UnknownKeysTest extends TestCase
         );
     }
 
-    /** An ignore entry is only compared with the keys an ignore entry has, not with the top level's. */
     public function testAnIgnoreEntryKeyIsComparedWithTheIgnoreEntryKeys(): void
     {
         self::assertSame(
@@ -187,7 +185,6 @@ final class UnknownKeysTest extends TestCase
         );
     }
 
-    /** A top-level key is only compared with the top level's keys, not with an ignore entry's. */
     public function testATopLevelKeyIsComparedWithTheTopLevelKeys(): void
     {
         self::assertSame(['unknown key extra.lockrot.reason ignored'], UnknownKeys::warnings(['reason' => 'r']));
@@ -245,8 +242,7 @@ final class UnknownKeysTest extends TestCase
     }
 
     /**
-     * A key is the project's text: shown as written, console tags and all, in both places a key can
-     * be. How it reaches the terminal without Symfony's formatter is the printers' business.
+     * A key is the project's text: shown as written, console tags and all, in both places it can be.
      *
      * @dataProvider keysShownAsWritten
      */
@@ -291,7 +287,7 @@ final class UnknownKeysTest extends TestCase
 
     /**
      * PHP 7.4's levenshtein() gives up on strings longer than 255 bytes and returns -1, which is not
-     * a distance; and a key that long is never a near-miss. It is shown cut at 255 bytes.
+     * a distance. A key that long is never a near-miss. It is shown cut at 255 bytes.
      */
     public function testAVeryLongKeyIsCutAndGetsNoSuggestion(): void
     {
@@ -308,7 +304,6 @@ final class UnknownKeysTest extends TestCase
         self::assertSame(['unknown key extra.lockrot.'.$key.' ignored'], UnknownKeys::warnings([$key => 1]));
     }
 
-    /** Cut to the same 255 bytes, two long keys would print the same line twice: it is printed once. */
     public function testTwoLongKeysThatLookTheSameOnceCutAreOneLine(): void
     {
         $prefix = str_repeat('f', 300);
@@ -319,7 +314,7 @@ final class UnknownKeysTest extends TestCase
         );
     }
 
-    /** PHP turns a JSON key like "5" into the integer 5; at the top level too, it is named, never a TypeError. */
+    /** PHP turns a JSON key like "5" into the integer 5, at the top level too. It is named, never a TypeError. */
     public function testANumericTopLevelKeyIsNamed(): void
     {
         self::assertSame(['unknown key extra.lockrot.5 ignored'], UnknownKeys::warnings([5 => 'five']));
@@ -343,7 +338,7 @@ final class UnknownKeysTest extends TestCase
     }
 
     /**
-     * The schema rejects both before this is ever asked; asked anyway, there is nothing to walk.
+     * The schema rejects both before this is ever asked. Asked anyway, there is nothing to walk.
      *
      * @param mixed $ignore
      *

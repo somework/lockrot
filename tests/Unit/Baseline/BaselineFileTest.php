@@ -127,8 +127,8 @@ final class BaselineFileTest extends TestCase
 
     /**
      * A Windows absolute path is recognised on any platform, so a baseline configured on Windows
-     * and read back by a tool run elsewhere resolves to the same file rather than being glued onto
-     * the project directory. A drive letter is its own case: it starts with neither separator.
+     * and read back by a tool run elsewhere resolves to the same file, not a path below the
+     * project directory. A drive letter is its own case: it starts with neither separator.
      *
      * @dataProvider windowsAbsolutePaths
      */
@@ -211,7 +211,7 @@ final class BaselineFileTest extends TestCase
     /**
      * The reported reason must be the write that actually failed, not the cleanup that follows it:
      * with no directory to write into there is no temp file to remove either, so an unlink() run
-     * before the reason is read would overwrite the real error with its own.
+     * before the reason is read overwrites the real error with its own.
      */
     public function testAMissingDirectoryReportsTheFailedWriteAndNotTheCleanup(): void
     {
@@ -251,9 +251,8 @@ final class BaselineFileTest extends TestCase
     }
 
     /**
-     * rename() fails when the target is an existing non-empty directory, which exercises the second
-     * failure branch of the only write lockrot performs: the temp file is written successfully and
-     * only the move fails.
+     * rename() fails when the target is an existing non-empty directory: the temp file is written
+     * and only the move fails.
      */
     public function testAFailingRenameIsAConfigExceptionAndLeavesNoTemporaryFile(): void
     {
@@ -314,11 +313,8 @@ final class BaselineFileTest extends TestCase
     }
 
     /**
-     * The schema library turned the baseline into an object with a json_encode()/json_decode() round
-     * trip that checked only the encode. A key starting with a NUL byte is valid JSON no PHP object
-     * can hold, so the decode returned null, `(object) null` was validated, and the file was reported
-     * as missing `lockrot` and `findings` it plainly had. 1e400 reads as INF, which json_encode()
-     * refused with the library's own exception, not a configuration error.
+     * A key starting with a NUL byte is valid JSON that no PHP object can hold, and 1e400 reads as
+     * INF, which json_encode() refuses. The reader must name each one as a configuration error.
      *
      * @dataProvider baselinesTheValidatorCouldNotRead
      */

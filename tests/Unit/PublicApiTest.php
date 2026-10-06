@@ -13,14 +13,13 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
- * The PHP classes are not lockrot's public interface (CONTRIBUTING.md, "Backward compatibility"),
- * and this is where the code says so: every class, interface, trait and enum under src/ carries an
- * `@internal` tag. PHPStan reports a use of one from code outside the `Lockrot\` root namespace, and
- * IDEs flag it.
+ * The PHP classes are not lockrot's public interface (CONTRIBUTING.md, "Backward compatibility"):
+ * every class, interface, trait and enum under src/ carries an `@internal` tag. PHPStan reports a
+ * use of one from code outside the `Lockrot\` root namespace.
  *
- * The declarations are read by nikic/php-parser rather than by loading or reflecting src/, and the
- * parser is asked for the newest PHP it knows on every matrix row, so PHP 7.4 reads attributes,
- * enums and qualified names the way 8.x does.
+ * nikic/php-parser reads the declarations instead of loading or reflecting src/, and it targets the
+ * newest PHP it knows on every matrix row, so PHP 7.4 reads attributes, enums and qualified names
+ * the way 8.x does.
  */
 final class PublicApiTest extends TestCase
 {
@@ -46,8 +45,8 @@ final class PublicApiTest extends TestCase
     }
 
     /**
-     * Keeps the check above from passing on a scan that finds nothing: every file under src/ has to
-     * yield exactly the one declaration its PSR-4 path names.
+     * Keeps testEveryClassInterfaceTraitAndEnumUnderSrcIsMarkedInternal from passing on a scan that
+     * finds nothing: every file under src/ must yield exactly the one declaration its PSR-4 path names.
      */
     public function testEveryFileUnderSrcDeclaresTheOneClassItsPathNames(): void
     {

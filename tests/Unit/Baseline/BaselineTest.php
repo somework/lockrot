@@ -58,8 +58,8 @@ final class BaselineTest extends TestCase
         self::assertSame(['acme/first', 'mid/middle', 'zzz/last'], $baseline->packages());
         self::assertSame(['acme/first', 'mid/middle', 'zzz/last'], array_keys($findings));
 
-        // Report order already happens to be alphabetical above; of() takes entries in any order,
-        // so the sort is what makes a regenerated baseline's diff reviewable.
+        // The report rows are already alphabetical, but of() takes entries in any order, so the
+        // sort is what makes a regenerated baseline's diff reviewable.
         $unordered = Baseline::of([
             new BaselineEntry('zzz/last', '1.0.0', Verdict::STALE, '2026-01-01'),
             new BaselineEntry('acme/first', '1.0.0', Verdict::ABANDONED, '2026-01-01'),
@@ -184,7 +184,7 @@ final class BaselineTest extends TestCase
     /**
      * The reader takes the schema of the number `lockrot.schema` names. A number lockrot ships no
      * schema for, or no number at all, is still read against baseline-1 and refused with its
-     * message, as before files were numbered: never an error of lockrot's own.
+     * message: never an error of lockrot's own.
      *
      * @return iterable<string, array{mixed, string}> the `lockrot` envelope, and what the message names
      */

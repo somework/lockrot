@@ -36,7 +36,6 @@ final class BuiltinAllowlistTest extends TestCase
         self::assertNull($list->match(F::package(['name' => 'phpzip/phpzip', 'version' => '2.0.8']), null, $now));
     }
 
-    /** A path given explicitly is the file that is read; the bundled list is only the default. */
     public function testAnExplicitPathIsReadInsteadOfTheBundledList(): void
     {
         $path = $this->tempJson(['entries' => [['pattern' => 'only/here', 'reason' => 'named by the given file']]]);
@@ -54,7 +53,7 @@ final class BuiltinAllowlistTest extends TestCase
     }
 
     /**
-     * Every entry needs both a pattern and a reason: a pattern with no reason would produce a
+     * Every entry needs both a pattern and a reason: a pattern with no reason produces a
      * finding nobody can explain, and a reason with no pattern matches nothing.
      *
      * @param array<string, mixed> $entry
