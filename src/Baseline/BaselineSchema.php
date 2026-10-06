@@ -10,13 +10,12 @@ use Lockrot\Json\SchemaPayload;
 use Lockrot\Json\Schemas;
 
 /**
- * Validates the shape of a baseline file against the schema of the number its `lockrot.schema`
- * names, resources/lockrot-baseline-<number>.schema.json, using Composer's own bundled
- * justinrainbow/json-schema validator — the same mechanism, and the same draft-04 schema style, as
- * {@see \Lockrot\Config\ConfigSchema} uses for extra.lockrot.
+ * Validates a baseline file against resources/lockrot-baseline-<number>.schema.json, where the
+ * number is its `lockrot.schema`. The validator is the justinrainbow/json-schema one that Composer
+ * bundles, as in {@see \Lockrot\Config\ConfigSchema}.
  *
- * A baseline lockrot cannot read is never treated as "no baseline": it is a configuration error, so
- * CI cannot silently start failing — or silently stop failing — on a file nobody noticed was damaged.
+ * An unreadable baseline is a configuration error, never an absent baseline: docs/baseline.md,
+ * "When lockrot cannot read the file".
  *
  * @internal
  */
@@ -40,9 +39,8 @@ final class BaselineSchema
 
         $lines = ['baseline file is invalid:'];
         foreach ($validator->getErrors() as $error) {
-            // Every error the validator produces is documented as {property, message, ...}, so this
-            // narrows for PHPStan rather than guards against a real gap: skipping a malformed entry
-            // here never hides the failure itself, since the method still throws below either way.
+            // Narrows the error shape for PHPStan. Skipping a malformed entry cannot hide the
+            // failure: the method throws either way.
             if (!\is_array($error) || !\is_string($error['property'] ?? null) || !\is_string($error['message'] ?? null)) {
                 continue;
             }
@@ -53,14 +51,11 @@ final class BaselineSchema
     }
 
     /**
-     * json_decode(..., true) turns both an empty JSON object ({}) and an empty JSON array ([]) into
-     * [], so a baseline with no findings at all arrives here with the "this was an object"
-     * information already gone. A bare stdClass restores it for that one case; every other value is
-     * left exactly as read, so a `findings` that really was a JSON array is still rejected below.
+     * `json_decode(..., true)` turns `{}` and `[]` into `[]`, so an empty `findings` object needs a
+     * `stdClass` to stay an object. Every other value stays as read, so a real JSON array is rejected.
      *
-     * The rest is turned into objects by {@see SchemaPayload}, not by the library's JSON round trip:
-     * that trip validated an empty object in place of a file with a key starting with a NUL byte, and
-     * threw its own exception on a number too large for a float.
+     * Do not replace {@see SchemaPayload} with the library's JSON round trip: it validates a key
+     * that starts with a NUL byte as an empty object and throws on a number too large for a float.
      *
      * @param array<string, mixed> $baseline
      */
@@ -74,9 +69,8 @@ final class BaselineSchema
     }
 
     /**
-     * The number the file's `lockrot.schema` names, when lockrot ships a schema for it. Any other
-     * value — a number with no schema, a string, nothing — is read against the schema of the number
-     * lockrot writes, which refuses it with its own message.
+     * A `lockrot.schema` value without a shipped schema (an unknown number, a string, a missing key)
+     * falls back to Baseline::SCHEMA, so that schema refuses it.
      *
      * @param array<string, mixed> $baseline
      */

@@ -11,18 +11,13 @@ use Lockrot\Verdict\Finding;
 use Lockrot\Version;
 
 /**
- * The findings a project has already accepted, as read from — or about to be written to —
- * `lockrot-baseline.json`.
- *
- * Only flagged verdicts are recorded: `ok`, `finished` and `unknown` are not findings, so accepting
- * them would mean nothing. Entries are keyed and sorted by package name, which keeps the file's
- * diff stable across runs and makes a regenerated baseline reviewable.
+ * The findings a project has accepted, as `lockrot-baseline.json` records them: docs/baseline.md.
  *
  * @internal
  */
 final class Baseline
 {
-    /** Bumped only when the file layout changes in a way an older lockrot could misread. */
+    /** Increase it only when an older lockrot could misread the new file layout. */
     public const SCHEMA = 1;
 
     /** @var array<string, BaselineEntry> package name => entry, sorted by name */
@@ -39,8 +34,8 @@ final class Baseline
     }
 
     /**
-     * @param list<BaselineEntry> $entries in any order; sorted by package name here
-     * @param string              $generatedAt ISO-8601 timestamp of the run that produced this baseline
+     * @param list<BaselineEntry> $entries in any order, sorted by package name here
+     * @param string              $generatedAt ISO-8601 timestamp
      */
     public static function of(array $entries, string $generatedAt, string $toolVersion = Version::STRING): self
     {
@@ -53,11 +48,6 @@ final class Baseline
         return new self($byName, $generatedAt, $toolVersion);
     }
 
-    /**
-     * The baseline a run would write for $report, carrying `first_seen` over from $previous for
-     * every package it already knew — the version and the verdict are refreshed, the date a finding
-     * first appeared is not.
-     */
     public static function fromReport(Report $report, ?self $previous = null): self
     {
         $today = $report->generatedAt()->format('Y-m-d');
@@ -82,7 +72,7 @@ final class Baseline
     }
 
     /**
-     * @param array<string, mixed> $data a decoded baseline document
+     * @param array<string, mixed> $data
      *
      * @throws ConfigException when the document does not match resources/lockrot-baseline-1.schema.json
      */
@@ -90,9 +80,8 @@ final class Baseline
     {
         BaselineSchema::validate($data);
 
-        // Guaranteed by the schema above (findings is a required object whose every value carries
-        // three required strings); re-checked here only to narrow `mixed` for PHPStan, which cannot
-        // see through the validator.
+        // The schema guarantees this. The check only narrows `mixed` for PHPStan, which cannot read
+        // the validator.
         $findings = $data['findings'] ?? [];
         if (!\is_array($findings)) {
             throw new ConfigException('baseline file is invalid: findings must be an object');

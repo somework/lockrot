@@ -12,21 +12,10 @@ use Lockrot\Json\JsonReader;
 use Lockrot\Json\Schemas;
 
 /**
- * Where the baseline lives and how it is read and written.
- *
- * lockrot writes the files the caller names — reports with `--output`, this file with
- * `--generate-baseline` — each through a temporary file beside it that is renamed over it
- * ({@see AtomicWriter}); its activity cache under Composer's cache directory; and, with
- * `self-update`, the PHAR. It never writes composer.json or composer.lock.
- *
- * Three paths are kept apart on purpose. {@see path()} is what the filesystem needs — absolute, so
- * the file lands next to the project's composer.json whatever the process's working directory is.
- * {@see displayPath()} is what the terminal prints: the path exactly as it was configured, or the
- * default file name, so a message says which file it means. {@see reportedPath()} is what a report
- * carries — the table line and the JSON `baseline.path` — and a report is published: a configured
- * relative path as written, an absolute one relative to the project directory, and one outside it
- * by its file name alone, as the report names its lock. An absolute path carries the account it ran
- * under, and two machines analysing the same project now write the same line.
+ * The baseline file has three paths. {@see path()} is absolute for the filesystem.
+ * {@see displayPath()} is the configured path for terminal messages. {@see reportedPath()} goes
+ * into a report. A report is published, so it must not carry an absolute path: that path names
+ * the account that ran lockrot, and two machines then write different lines.
  *
  * @internal
  */
@@ -46,8 +35,7 @@ final class BaselineFile
     }
 
     /**
-     * @param string      $projectDir the directory holding composer.json
-     * @param null|string $configured `extra.lockrot.baseline` or `--baseline`; null for the default
+     * @param null|string $configured `extra.lockrot.baseline` or `--baseline`, null for the default
      */
     public static function resolve(string $projectDir, ?string $configured): self
     {
@@ -87,13 +75,9 @@ final class BaselineFile
     }
 
     /**
-     * Writes the baseline atomically ({@see AtomicWriter}), so a run interrupted mid-write can never
-     * leave a truncated baseline behind — which would read as "these findings were never accepted"
-     * on the next CI run.
-     *
-     * JsonFile::encode() is used for the encoding, so the file is laid out exactly like
-     * composer.json — 4-space indent, unescaped slashes and unicode — and the trailing newline
-     * JsonFile::write() appends for a pretty-printed document is added here too.
+     * The write is atomic ({@see AtomicWriter}): a truncated baseline reads as "these findings
+     * were never accepted" on the next CI run. JsonFile::encode() lays the file out like
+     * composer.json, and the trailing newline matches JsonFile::write().
      *
      * @throws ConfigException when the target cannot be written
      */
@@ -108,10 +92,8 @@ final class BaselineFile
     }
 
     /**
-     * The baseline as JSON sees it. `Baseline::toArray()` is the PHP view, where an empty findings
-     * map is an empty array — and `json_encode()` writes that as `[]`, which
-     * resources/lockrot-baseline-1.schema.json rejects, since it requires an object there. An
-     * explicit stdClass keeps a baseline with nothing in it valid against its own schema.
+     * An empty `findings` map must encode as `{}`: `json_encode()` writes the PHP empty array as
+     * `[]`, which resources/lockrot-baseline-1.schema.json rejects.
      *
      * @return array<string, mixed>
      */

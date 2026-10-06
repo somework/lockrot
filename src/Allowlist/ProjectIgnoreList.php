@@ -11,9 +11,8 @@ use Lockrot\Json\JsonReader;
 final class ProjectIgnoreList
 {
     /**
-     * @param array<string, mixed> $lockrotExtra contents of composer.json extra.lockrot; the shape is
-     *                                            re-checked here rather than trusted from the config
-     *                                            schema, for a caller that bypasses it
+     * @param array<string, mixed> $lockrotExtra `extra.lockrot` of composer.json. The shape is checked
+     *                                            again for a caller that bypasses the config schema
      */
     public static function fromExtra(array $lockrotExtra): Allowlist
     {
@@ -30,9 +29,8 @@ final class ProjectIgnoreList
     }
 
     /**
-     * The schema cannot express two checks, which stay here regardless of what validated this data:
-     * that "reason" is not merely whitespace (minLength only counts characters), and that "expires"
-     * is a real calendar date (the pattern only checks its YYYY-MM-DD shape).
+     * The schema cannot express two checks: that "reason" is not only whitespace (`minLength` counts
+     * characters) and that "expires" is a real calendar date (the pattern checks only the shape).
      *
      * @param mixed $row
      */
