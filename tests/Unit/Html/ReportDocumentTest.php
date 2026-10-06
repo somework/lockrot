@@ -42,8 +42,8 @@ final class ReportDocumentTest extends TestCase
     /** @param array<string, PackageFacts> $facts */
     private function document(Report $report, array $facts = [], ?BaselineComparison $baseline = null): ReportDocument
     {
-        // The baseline lives in the report now, not beside it: the page reads a finding's standing
-        // out of the same document `--format=json` writes.
+        // The baseline lives in the report: the page reads a finding's standing out of the same
+        // document `--format=json` writes.
         return new ReportDocument(
             $baseline === null ? $report : $report->withBaseline($baseline),
             new PageData($facts === [] ? null : new Analysis($report, $facts), new Thresholds(), '8.4')
@@ -63,11 +63,7 @@ final class ReportDocumentTest extends TestCase
         );
     }
 
-    /**
-     * What the run was told to do used to be a key of its own beside the report. It is in the
-     * report now — the page reads it from there, and so does anyone with `jq` — so what this asserts
-     * is that the page did not keep a second copy of it.
-     */
+    /** The report carries the run settings. The page payload keeps no second copy of them. */
     public function testThePayloadKeepsNoSecondCopyOfTheRun(): void
     {
         $report = $this->report([])->withRun(new RunSettings('Acme app', 'acme/app', '8.4', '/home/someone/acme/composer.lock', FailOn::none(), new Thresholds(), '^8.2'));
@@ -99,8 +95,8 @@ final class ReportDocumentTest extends TestCase
 
     /**
      * A package on a branch that still ships security releases has no rot verdict, so it is `ok`
-     * and no format lists it. Its advisories are still the most urgent thing in the lock, so the
-     * page has to be able to show them without `--all`.
+     * and no format lists it. Its advisories are the most urgent thing in the lock, so the page
+     * must show them without `--all`.
      */
     public function testAnUnflaggedPackageCarryingAnAdvisoryIsExplainedAnyway(): void
     {
@@ -181,7 +177,7 @@ final class ReportDocumentTest extends TestCase
     }
 
     /**
-     * The link the page may turn into an `href`, decided here so the page does not have to trust
+     * The link the page can turn into an `href`, decided here so the page never trusts
      * its own payload. The metadata's repository wins over the lock's: it is the one that follows a
      * package that moved house.
      *
@@ -227,8 +223,8 @@ final class ReportDocumentTest extends TestCase
 
     /**
      * The page embeds the explanation's repositories, and a checkout on the machine that wrote the
-     * lock is a path with the account in it: the detail carries its last segment alone. The link is decided from what
-     * the package says, as before, and a path never became one.
+     * lock is a path with the account in it: the detail carries its last segment alone. A path is
+     * never a link.
      */
     public function testADetailNeverLocatesTheMachine(): void
     {

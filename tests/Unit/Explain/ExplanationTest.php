@@ -72,10 +72,10 @@ final class ExplanationTest extends TestCase
     }
 
     /**
-     * A highest tag dated only by a commit other tags share is handed over undated by
-     * {@see PackageMetadata::fromPackages()}, but the date it carried is still the branch's newest
-     * dated release; the row keeps it as `highest_commit_date` so the reader can tell "no date"
-     * from "the commit's date". A tag with no date at all has neither.
+     * A highest tag dated only by a commit that other tags share comes out of
+     * {@see PackageMetadata::fromPackages()} undated, and the row keeps that date as
+     * `highest_commit_date`. The reader can then tell "no date" from "the commit's date". A tag with
+     * no date at all has neither.
      */
     public function testASharedCommitTagKeepsItsCommitDateNextToTheMissingReleaseDate(): void
     {
@@ -115,9 +115,8 @@ final class ExplanationTest extends TestCase
     }
 
     /**
-     * S6 repeats on the finding what the explanation's metadata and lock already say, under the same
-     * names: one name means one fact on both surfaces. The signal comes from the rule itself, over
-     * the same facts the explanation reads.
+     * S6 repeats on the finding what the explanation's metadata and lock say, under the same
+     * names: one name means one fact on both surfaces.
      */
     public function testS6AndTheExplanationStateTheSameReleaseFacts(): void
     {
@@ -214,7 +213,6 @@ final class ExplanationTest extends TestCase
         self::assertFalse($array['lock']['from_composer_repository']);
     }
 
-    /** A branch the monorepo parent dated ({@see PackageMetadata::datedBy()}) carries the parent on its row. */
     public function testABranchDatedByTheMonorepoIsMarkedAndNamed(): void
     {
         $loader = new ArrayLoader();
@@ -265,7 +263,7 @@ final class ExplanationTest extends TestCase
 
     /**
      * Matomo (`require.php >=7.2.5`) on PHP 8.4 locking monolog 1.x: 3.x needs php >=8.1, which
-     * PHP 8.4 installs and Matomo's 7.2.5 does not; 2.x admits both; 1.x requires no PHP, so
+     * PHP 8.4 installs and Matomo's 7.2.5 does not. 2.x admits both. 1.x requires no PHP, so
      * neither floor has anything to say about it.
      */
     public function testEachBranchRowSaysWhichFloorAdmitsIt(): void
@@ -327,7 +325,7 @@ final class ExplanationTest extends TestCase
 
     /**
      * A branch can miss both floors, each its own way: `~8.3.0` needs a newer PHP than wallabag's
-     * `>=8.2` and stops before 8.4. php_blocked_by names the project only; the target's side is
+     * `>=8.2` and stops before 8.4. php_blocked_by names the project only. The target's side is
      * still there.
      */
     public function testARowMissingBothFloorsSaysHowItMissesEach(): void

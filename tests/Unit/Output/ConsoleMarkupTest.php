@@ -13,10 +13,9 @@ use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 final class ConsoleMarkupTest extends TestCase
 {
     /**
-     * Text lockrot did not write, escaped and rendered, is the text again — coloured or not, and
-     * whatever it looks like: the style and link tags symfony/console 5.4's own escape() leaves
-     * half-live, a backslash before a bracket, a backslash at the very end, and a run of `<b` long
-     * enough to exhaust PCRE's JIT had a regular expression been asked to read it.
+     * Text that lockrot did not write, escaped and rendered, is the same text, coloured or not.
+     * symfony/console 5.4's own escape() leaves some of these inputs half-live. A regular expression
+     * exhausts PCRE's JIT on the long run of `<b`.
      *
      * @dataProvider textsThatLookLikeMarkup
      */
@@ -45,10 +44,6 @@ final class ConsoleMarkupTest extends TestCase
         yield 'nothing' => [''];
     }
 
-    /**
-     * A backslash at the end of the escaped text is not taken as escaping the tag after it, so the
-     * style still closes where lockrot closed it and the text that follows is not coloured.
-     */
     public function testATrailingBackslashDoesNotSwallowTheClosingTag(): void
     {
         $markup = '<fg=red>'.ConsoleMarkup::escape('a\\').'</fg=red>'.ConsoleMarkup::escape('<b');
@@ -57,7 +52,6 @@ final class ConsoleMarkupTest extends TestCase
         self::assertSame('a\\<b', ConsoleMarkup::render($markup, false));
     }
 
-    /** The style closes after the long run: the line after it is printed without any colour. */
     public function testAStyleAroundALongRunEndsWithIt(): void
     {
         $run = str_repeat('<b', 100000);
@@ -67,9 +61,9 @@ final class ConsoleMarkupTest extends TestCase
     }
 
     /**
-     * Every style lockrot writes renders exactly as Symfony's formatter rendered it before — with
-     * Composer's `warning` style added, as Composer adds it — decorated and not, nested and closed
-     * with `</>`. The escapes of text without a backslash are the ones symfony/console 5.4 wrote.
+     * Every style that lockrot writes renders as Symfony's formatter renders it, with Composer's
+     * `warning` style added as Composer adds it: decorated and not, nested and closed with `</>`.
+     * The escapes of text without a backslash are the ones that symfony/console 5.4 writes.
      *
      * @dataProvider lockrotMarkup
      */
@@ -106,8 +100,8 @@ final class ConsoleMarkupTest extends TestCase
 
     /**
      * The markup is lockrot's own, so a tag it does not know, a closing tag nothing opened, one that
-     * closes another style than the open one, or a tag left without its `>` is a bug in lockrot:
-     * rendering it any way at all would hide that.
+     * closes another style than the open one, or a tag left without its `>` is a bug in lockrot.
+     * Any rendering of it hides that.
      *
      * @dataProvider markupLockrotNeverWrites
      */

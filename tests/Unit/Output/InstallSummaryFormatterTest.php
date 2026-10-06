@@ -19,7 +19,6 @@ final class InstallSummaryFormatterTest extends TestCase
 {
     private const NOW = '2026-09-14T00:00:00+00:00';
 
-    /** Words banned from every piece of lockrot output. */
     private const BANNED_WORDS = ['vulnerable', 'broken', 'insecure', 'dead'];
 
     /** @param list<string> $chain */
@@ -48,8 +47,8 @@ final class InstallSummaryFormatterTest extends TestCase
 
     /**
      * An exhausted budget (or an unreachable repository) leaves every affected package `unknown`,
-     * which is below the flagged threshold — so without this block the install would print nothing
-     * and read as clean when in fact nothing was checked.
+     * which is below the flagged threshold — so without this block the install prints nothing
+     * and reads as clean when in fact nothing was checked.
      */
     public function testNothingFlaggedButAFailedLookupReportsTheUncheckedPackages(): void
     {
@@ -86,7 +85,7 @@ final class InstallSummaryFormatterTest extends TestCase
         ], $lines);
     }
 
-    /** Metadata arrived for every package, only the advisory request failed: nothing is unknown, and "0 of 3" would say the opposite of the note. */
+    /** Metadata arrived for every package, only the advisory request failed: nothing is unknown, so "0 of 3" contradicts the note. */
     public function testALookupThatFailedWithNothingUnknownSaysSoInsteadOfCountingZero(): void
     {
         $report = $this->report([
@@ -195,7 +194,7 @@ final class InstallSummaryFormatterTest extends TestCase
      * The package, its version, the evidence, the chain and the notes are the lock's and the
      * repository's text. Rendered by {@see ConsoleMarkup}, which is how the block is written, each
      * prints as written, with only lockrot's own `warning` and `comment` styles, each closed on its
-     * own line. The block used to reach Composer's formatter unescaped.
+     * own line.
      *
      * @dataProvider textsThatLookLikeMarkup
      */
@@ -224,9 +223,8 @@ final class InstallSummaryFormatterTest extends TestCase
     }
 
     /**
-     * Written raw, the block no longer passes through Composer's sanitising, so what a terminal
-     * would obey — an escape sequence in a version, a line break in the evidence — is shown as an
-     * escape instead of acted on.
+     * The block is written raw, without Composer's sanitising, so what a terminal obeys — an escape
+     * sequence in a version, a line break in the evidence — is shown as an escape, not acted on.
      */
     public function testControlCharactersInTheProjectsTextAreShownRatherThanObeyed(): void
     {
@@ -252,7 +250,7 @@ final class InstallSummaryFormatterTest extends TestCase
         yield 'a long run of <b' => [str_repeat('<b', 4000)];
     }
 
-    /** Header and footer take two of the lines; with no notes, exactly eight findings fit and none is counted away. */
+    /** Header and footer take two of the lines. */
     public function testExactlyAsManyFindingsAsThereAreSlotsAreAllShownWithoutACountLine(): void
     {
         $slots = InstallSummaryFormatter::MAX_LINES - 2;

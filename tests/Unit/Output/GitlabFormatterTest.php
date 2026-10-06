@@ -219,7 +219,7 @@ final class GitlabFormatterTest extends TestCase
     /**
      * Under `COMPOSER=alt.json` the analysed lock is alt.lock: `location.path` is the lock's path
      * relative to the project directory, so GitLab marks the file the merge request changes. The
-     * fingerprint does not move with it — a changed identity would make every finding look new.
+     * fingerprint does not move with it — a changed identity makes every finding look new.
      */
     public function testTheLocationNamesTheAnalysedLockAndTheFingerprintStays(): void
     {
@@ -237,7 +237,6 @@ final class GitlabFormatterTest extends TestCase
         self::assertSame(hash('sha256', 'lockrot|acme/abandoned|abandoned'), $issues[0]['fingerprint']);
     }
 
-    /** The default lock in the project directory produces exactly the report it always did. */
     public function testTheDefaultLockKeepsTheReportByteForByte(): void
     {
         $lockPath = $this->lockPath();
@@ -390,7 +389,7 @@ final class GitlabFormatterTest extends TestCase
         self::assertSame(hash('sha256', 'lockrot|acme/root|stale'), $issues[0]['fingerprint']);
     }
 
-    /** GitLab reads compact JSON as well; the pretty, slash-unescaped form is for the human diffing the artifact. */
+    /** GitLab reads compact JSON as well. The pretty, slash-unescaped form is for the human diffing the artifact. */
     public function testTheDocumentIsPrettyPrintedWithSlashesLeftAlone(): void
     {
         $json = $this->formatter(LockrotConfig::FAIL_ON_NONE, null)->format($this->report());

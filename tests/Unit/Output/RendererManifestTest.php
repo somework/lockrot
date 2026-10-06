@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * resources/report/report.html is built in another repository (somework/lockrot-report) and
  * vendored with the manifest its release published. tools/report/update-renderer verifies the
- * release's build provenance when it brings the two in; this test keeps them honest afterwards: a
+ * release's build provenance when it brings the two in. This test keeps them honest afterwards: a
  * hand edit to the page, or a page copied in without its manifest, fails here rather than shipping
  * inside a signed PHAR under another release's name.
  */
@@ -41,7 +41,7 @@ final class RendererManifestTest extends TestCase
     /**
      * The page's policy pins its inline script and stylesheet by hash. The manifest records those
      * hashes too, and they must be the ones in the page: a policy that names another build's
-     * script would refuse to run this one, and the reader would get a blank page.
+     * script refuses to run this one, and the reader gets a blank page.
      */
     public function testThePolicyInThePageIsTheOneTheManifestRecords(): void
     {
@@ -60,7 +60,7 @@ final class RendererManifestTest extends TestCase
      * The hashes in the policy are what the browser checks the inline script and stylesheet
      * against, so they are checked here the same way: sha256 over the exact text between the tags.
      * A policy that does not match the code it guards renders a blank page, and a manifest written
-     * by the same build would agree with it.
+     * by the same build agrees with it.
      */
     public function testThePolicyHashesAreTheHashesOfTheInlineCode(): void
     {

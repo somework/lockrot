@@ -109,8 +109,8 @@ final class ExplainFormatterTest extends TestCase
     }
 
     /**
-     * S9 as {@see AdvisoryRule} writes it carries `releases_read` for the JSON and the no-fix list;
-     * the text prints the advisories exactly as it did before the key existed, read or not.
+     * S9 as {@see AdvisoryRule} writes it carries `releases_read` for the JSON and the no-fix list.
+     * The text prints the advisories the same, read or not.
      */
     public function testTheAdvisoryBlockLeavesReleasesReadToTheJson(): void
     {
@@ -181,8 +181,8 @@ final class ExplainFormatterTest extends TestCase
     /**
      * The question `--explain` exists for: a package the report does not flag, and the rows that
      * say why S8 stayed quiet. Two of the three branches are dated only by a commit their tags share
-     * (a subtree split, as {@see PackageMetadata::fromPackages()} reads it) and read `commit <date>`;
-     * the third carries no date at all and reads `undated`.
+     * (a subtree split, as {@see PackageMetadata::fromPackages()} reads it) and read `commit <date>`.
+     * The third carries no date at all and reads `undated`.
      */
     public function testAnUnflaggedSplitPackageSaysWhyItsBranchIsNotMeasured(): void
     {
@@ -258,7 +258,7 @@ final class ExplainFormatterTest extends TestCase
      * Two lines say `source`: the lock's URL and the repository metadata's. Both come from a place
      * that routinely carries a token — `https://gitlab-ci-token:$CI_JOB_TOKEN@…` is how GitLab CI
      * hands a job access to a private Composer source — and `--explain` is printed into tickets and
-     * CI logs. The lock line was redacted and the metadata line was not, which this pins.
+     * CI logs. Both lines must redact it.
      */
     public function testNeitherSourceLineCarriesACredential(): void
     {
@@ -429,7 +429,7 @@ final class ExplainFormatterTest extends TestCase
 
     /**
      * The lock's date for a version the monorepo parent dates is the split's own tag's — the commit
-     * its tags share — so the block says so there too, and `installed release` below it gives the
+     * its tags share — so the block says so there too, and `installed release` gives the
      * date that is a release's.
      */
     public function testTheLockBlockCallsTheSplitsOwnDateWhatItIs(): void
@@ -456,8 +456,8 @@ final class ExplainFormatterTest extends TestCase
 
     /**
      * A branch snapshot is undated for a reason of its own: the lock's `time` is the commit's,
-     * which the `composer.lock` block already says next to `branch snapshot`. The shared-commit
-     * sentence is about a tag, and claiming it of `dev-main` would be a fact the data does not
+     * which the `composer.lock` block says next to `branch snapshot`. The shared-commit
+     * sentence is about a tag, and claiming it of `dev-main` states a fact the data does not
      * carry.
      */
     public function testABranchSnapshotIsNotToldItsTagsShareACommit(): void
@@ -477,7 +477,7 @@ final class ExplainFormatterTest extends TestCase
     }
 
     /**
-     * The explain text prints S6's release facts that have a value and leaves out the ones that are
+     * The explain text prints S6's release facts that have a value and omits the ones that are
      * null (not known, or not applicable to the reason): a null there reads as noise on a line a
      * person scans, and the JSON carries every key, nulls included.
      *
@@ -526,9 +526,8 @@ final class ExplainFormatterTest extends TestCase
     }
 
     /**
-     * Only S6 leaves its nulls out. Every other signal's data line prints a null as `null`, as it
-     * did before S6 carried release facts, so those lines stay byte for byte what they were: S1
-     * without a replacement here, S8's `suggested_constraint` in the full text above.
+     * Only S6 omits its nulls. Every other signal's data line prints a null as `null`: S1 without a
+     * replacement here, S8's `suggested_constraint` in testAFlaggedPackageReadsVerdictSignalsDataAndBranches.
      */
     public function testAnotherSignalStillPrintsItsNullData(): void
     {

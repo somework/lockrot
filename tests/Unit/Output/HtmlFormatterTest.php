@@ -64,8 +64,8 @@ final class HtmlFormatterTest extends TestCase
     /**
      * The page pins its one script and one stylesheet by hash and allows no connection: whatever a
      * package's name or an advisory's title manages to put in the markup cannot run, and nothing
-     * the page renders can be sent anywhere. The policy is written by the renderer's build; what
-     * lockrot owes it is not to add anything to the page that the policy would have to allow.
+     * the page renders can be sent anywhere. The renderer's build writes the policy. lockrot must
+     * add nothing to the page beyond what the policy allows.
      */
     public function testThePageCarriesAPolicyThatAllowsOnlyItsOwnCode(): void
     {
@@ -81,8 +81,8 @@ final class HtmlFormatterTest extends TestCase
 
     /**
      * A report about dependency risk does not phone home, and a CI artifact is often opened from
-     * `file://` or under a strict CSP. Only the documentation links the page renders may point
-     * outward, and those are written by the reader's click, not fetched.
+     * `file://` or under a strict CSP. Only the documentation links the page renders can point
+     * outward, and the reader's click opens those, not a fetch.
      */
     public function testThePageFetchesNothing(): void
     {
@@ -145,16 +145,15 @@ final class HtmlFormatterTest extends TestCase
     {
         $payload = self::payloadOf($this->page($this->report([$this->finding('vendor/pkg')])));
 
-        // Two keys, not four: what the run was told to do and where each finding stands against
-        // the baseline live in the report itself now, so the page reads them from there.
+        // The run settings and each finding's standing against the baseline live in the report.
         self::assertSame(['report', 'details'], array_keys($payload));
         self::assertSame('https://lockrot.dev/schema/report-1.json', J::stringAt($payload, ['report', '$schema']));
         self::assertSame([], J::arrayAt($payload, ['details']), 'no facts were passed, so there is nothing to explain');
     }
 
     /**
-     * Without `--all` the page explains the flagged packages and leaves the rest as rows, which is
-     * what keeps a 100-package report near 250 KB rather than a megabyte.
+     * Without `--all` the page explains the flagged packages and leaves the rest as rows, which keeps
+     * the page small.
      */
     public function testTheDefaultIsTheFlaggedPackagesOnly(): void
     {
@@ -170,7 +169,7 @@ final class HtmlFormatterTest extends TestCase
     }
 
     /**
-     * Escaping every slash would inflate a page full of URLs for nothing: the payload sits in a
+     * Escaping every slash inflates a page full of URLs for nothing: the payload sits in a
      * script element, where a slash is only dangerous next to `</`, and that pair is escaped on its
      * own.
      */
@@ -183,7 +182,7 @@ final class HtmlFormatterTest extends TestCase
     }
 
     /**
-     * Whether a published report may be indexed is the publisher's call, made in their robots.txt
+     * Whether a published report can be indexed is the publisher's call, made in their robots.txt
      * and their headers. What the page owes a link is a sentence and a card.
      */
     public function testThePageCarriesWhatALinkNeedsAndNoIndexingPolicy(): void
@@ -231,11 +230,9 @@ final class HtmlFormatterTest extends TestCase
     }
 
     /**
-     * The page states nothing about the run outside its payload. The header used to carry a slot
-     * for the target PHP that read `8.4` before the script filled it — a claim made by a file that
-     * had not read the run. The renderer now draws every value from the payload, so the only place
-     * a PHP version, a lock file or a verdict may appear is the payload itself and the two lines
-     * lockrot writes about it, the title and the description.
+     * The page states nothing about the run outside its payload. A PHP version, a lock file or a
+     * verdict can appear only in the payload and in the two lines that lockrot writes about it, the
+     * title and the description.
      */
     public function testThePageSaysNothingAboutTheRunOutsideItsPayload(): void
     {

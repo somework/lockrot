@@ -263,7 +263,7 @@ final class MarkdownFormatterTest extends TestCase
 
     /**
      * A composer.lock is under the control of whoever opens the pull request, and the report is
-     * posted into that pull request or its job summary: nothing a package carries may render as
+     * posted into that pull request or its job summary: nothing a package carries can render as
      * markup there.
      */
     public function testPackageMetadataCannotInjectMarkup(): void

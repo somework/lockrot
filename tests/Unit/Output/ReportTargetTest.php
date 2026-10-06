@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
 final class ReportTargetTest extends TestCase
 {
     /**
-     * The spec starts with a format name lockrot knows and a colon; the rest is the path, colons
+     * The spec starts with a format name lockrot knows and a colon. The rest is the path, colons
      * included. A name is matched whole, not cut at the first colon, so a format whose name holds a
      * colon (the `<vendor>:<name>` form docs/compatibility.md reserves) stays parseable.
      */
@@ -47,7 +47,7 @@ final class ReportTargetTest extends TestCase
         self::assertSame('/srv/reports/lockrot.html', $target->displayPath());
     }
 
-    /** Paths may carry spaces at either end; nothing is trimmed. */
+    /** Paths can carry spaces at either end. Nothing is trimmed. */
     public function testThePathIsTakenVerbatim(): void
     {
         self::assertSame('/projects/app/ my report.json ', ReportTarget::parse('json: my report.json ', '/projects/app')->path());
