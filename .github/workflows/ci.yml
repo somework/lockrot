@@ -90,7 +90,13 @@ jobs:
   # it came from and, for the three older ones, the name the main branch's ruleset requires: src/Signal
   # and src/Analyzer left `verdicts and output`, the repository loading left `data and the rest`.
   # src/Html and src/Explain, in no shard until then although tests/infection-equivalents.md
-  # measured them, joined `verdicts and output`.
+  # measured them, joined `verdicts and output`. Measured on run 37506614872 (src/Data/Php,
+  # src/Data/Advisory and src/Graph still in `repository data` then): 11m00s, 15m24s, 10m36s,
+  # 21m24s and 14m30s, no mutant skipped, against 17m48s, 13m30s and 28m18s on the same tree
+  # before (run 37473741014, where `verdicts and output` skipped 885 of its 2908 mutants). Across
+  # the shards that is 171 runner thread-minutes against 148, for 6736 mutants run against 5723.
+  # Those three directories then moved to `data and the rest`: about a fifth of the repository
+  # shard's mutant time, locally.
   mutation:
     runs-on: ubuntu-latest
     # 50, not 30: the composer/self-update shard measured 20m02s on 2026-09-19 and was cancelled at
@@ -103,6 +109,14 @@ jobs:
     # same three threads, the three shards then measured 7m05s, 9m31s and 2m47s against 40m23s,
     # 18m09s and 9m05s, with every mutant verdict unchanged. The cap stays at 50 because its job is
     # to catch a run that has gone wrong, and there is no cost to the headroom.
+    #
+    # By 2026-10-06 the shards were back to 10m26s, 33m53s and 26m16s (run 37433846698): eight
+    # endless-loop mutants on lines every integration test reaches held a thread for the full
+    # timeout each, every surviving mutant ran every method of the test classes covering its line,
+    # and a slow runner skipped hundreds of mutants outright. With tests/Support/MutantTestTimeLimit.php,
+    # the 600-second timeout, --only-covering-test-cases and five shards the run of the same day
+    # measured 10m36s to 21m24s per shard with no mutant skipped (run 37506614872, see below); every
+    # verdict is unchanged but for seven kills a failing test used to fake, which tests now make.
     timeout-minutes: 50
     strategy:
       fail-fast: false
@@ -111,8 +125,8 @@ jobs:
           - {name: verdicts and output, filter: 'src/Verdict src/Output src/Html src/Explain', min_msi: 98}
           - {name: signals and analyzer, filter: 'src/Signal src/Analyzer', min_msi: 98}
           - {name: composer and self-update, filter: 'src/Composer src/Config src/SelfUpdate', min_msi: 96}
-          - {name: repository data, filter: 'src/Data/Repository src/Data/Php src/Data/Advisory src/Graph', min_msi: 96}
-          - {name: data and the rest, filter: 'src/Data/Forge src/Data/Http src/Data/Cache src/Baseline src/Filesystem src/Allowlist src/Lock src/Json src/Exception src/Version.php src/Clock.php src/Deadline.php', min_msi: 96}
+          - {name: repository data, filter: 'src/Data/Repository', min_msi: 96}
+          - {name: data and the rest, filter: 'src/Data/Forge src/Data/Http src/Data/Cache src/Data/Php src/Data/Advisory src/Graph src/Baseline src/Filesystem src/Allowlist src/Lock src/Json src/Exception src/Version.php src/Clock.php src/Deadline.php', min_msi: 96}
     name: mutation (${{ matrix.shard.name }})
     steps:
       - uses: actions/checkout@v7

@@ -23,10 +23,11 @@
     "timeout": 600,
     // The initial run collects the coverage the mutants are matched against. RunNoteAgreementTest
     // and GateAgreementTest cover nothing by declaration and run in a process of their own, so they
-    // add no line to it and change no state another test reads. Coverage instruments them all the
-    // same: on 2026-09-28 the branches that added them took every shard's initial run from about 2
-    // to 5.5 minutes (RunNoteAgreementTest) and 3.7 (GateAgreementTest), runs 36357647206,
-    // 36368563462 and 36368534391. They run in every ordinary test job. --exclude-group replaces
+    // add no line to it and change no state another test reads: the coverage is the same line for
+    // line without them (4939 covered lines, the same covering tests on each), and it takes 314s
+    // instead of 492s locally under Xdebug. On CI's pcov the shards' initial runs measured 3.6 to
+    // 4.2 minutes without them (run 37506614872) against 3.0 to 6.3 with them, inside the spread
+    // of the runners. They run in every ordinary test job. --exclude-group replaces
     // phpunit.xml.dist's own list instead of adding to it, hence e2e and network again, one flag
     // each: PHPUnit 11 warns on a comma list, and under failOnWarning that warning fails every run.
     "testFrameworkOptions": "--exclude-group=e2e --exclude-group=network --exclude-group=covers-nothing",
