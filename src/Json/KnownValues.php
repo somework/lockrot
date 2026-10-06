@@ -16,7 +16,13 @@ namespace Lockrot\Json;
  * release adds, and an `x-known-values` list of the values this release writes. Draft-04 validators
  * ignore a keyword they do not know. Read strictly, the list is the `enum` and the pattern goes, so
  * exactly the known values pass and a mistyped one fails with the enum's message, one line, as it did
- * while the published files spelled the enum out.
+ * while the published files spelled the enum out. A list of integers is read the same way: an integer
+ * set has no pattern, and its list becomes its enum.
+ *
+ * An open map — keys that grow in minor releases — is `patternProperties` plus an `x-known-keys` list
+ * of the keys this release writes. Read strictly, the known keys become the map's only properties,
+ * each typed by every regex it matches (by `additionalProperties` when it matches none), and the map
+ * is closed. A node that already lists its properties keeps them.
  * {@see \Lockrot\Config\ConfigSchema} validates `extra.lockrot` this way, and the tests hold
  * lockrot's own documents to it.
  *
@@ -28,6 +34,8 @@ namespace Lockrot\Json;
 final class KnownValues
 {
     public const KEYWORD = 'x-known-values';
+
+    public const KEYS = 'x-known-keys';
 
     /** Keywords whose value is one schema. */
     private const ONE = ['additionalItems', 'additionalProperties', 'items', 'not'];
@@ -58,7 +66,48 @@ final class KnownValues
             unset($copy->pattern);
         }
 
+        $keys = $copy->{self::KEYS} ?? null;
+        if (\is_array($keys) && !property_exists($copy, 'properties')) {
+            $copy->properties = self::knownKeys($copy, $keys);
+            unset($copy->patternProperties);
+            $copy->additionalProperties = false;
+        }
+
         return $copy;
+    }
+
+    /**
+     * Each known key of a map with the schema a validator holds it to: that of every
+     * `patternProperties` regex it matches, else `additionalProperties`. A key no schema admits is
+     * left out.
+     *
+     * @param array<mixed> $keys
+     */
+    private static function knownKeys(\stdClass $map, array $keys): \stdClass
+    {
+        $patterns = ($map->patternProperties ?? null) instanceof \stdClass ? get_object_vars($map->patternProperties) : [];
+        $others = $map->additionalProperties ?? true;
+        $properties = new \stdClass();
+        foreach ($keys as $key) {
+            if (!\is_string($key)) {
+                continue;
+            }
+            $schemas = [];
+            foreach ($patterns as $regex => $schema) {
+                // As justinrainbow/json-schema delimits a pattern.
+                if (preg_match('~'.str_replace('~', '\\~', (string) $regex).'~u', $key) === 1) {
+                    $schemas[] = $schema;
+                }
+            }
+            if ($schemas === [] && $others !== false) {
+                $schemas[] = $others === true ? new \stdClass() : $others;
+            }
+            if ($schemas !== []) {
+                $properties->{$key} = \count($schemas) === 1 ? $schemas[0] : (object) ['allOf' => $schemas];
+            }
+        }
+
+        return $properties;
     }
 
     private static function closedMembers(\stdClass $map): \stdClass

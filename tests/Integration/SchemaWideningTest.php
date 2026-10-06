@@ -21,13 +21,33 @@ use PHPUnit\Framework\TestCase;
  */
 final class SchemaWideningTest extends TestCase
 {
+    /**
+     * Narrowings a release makes on purpose, per published file name: the narrowing as
+     * {@see SchemaWidening::narrowings()} words it, and why no document an older release wrote can
+     * fail it.
+     *
+     * A row is allowed for one case only: a release adds a value to an open set and puts the new
+     * value's constraints in a new `allOf` entry, keeping every existing relation byte for byte
+     * (each one's branch for a value it does not list already admits the new value). The check reads
+     * the new entry as a relation the older schema did not hold. No older document held the value,
+     * because the strict twin in ValidatesJsonSchemas bound lockrot's output to the known list, so
+     * none can fail the entry. Any other narrowing moves the schema number instead.
+     *
+     * @var array<string, array<string, string>>
+     */
+    public const ACCEPTED_NARROWINGS = [];
+
     private const OLDEST = __DIR__.'/../fixtures/schema-evolution/schemas/0.9.0/';
 
-    /** @return iterable<string, array{string}> */
+    private const FIXTURES = __DIR__.'/../fixtures/schema-widening/';
+
+    /** @return iterable<string, array{string, int}> every numbered schema file resources/ ships */
     public static function schemaDocuments(): iterable
     {
-        foreach ([Schemas::REPORT, Schemas::EXPLAIN, Schemas::BASELINE, Schemas::CONFIG] as $document) {
-            yield $document => [$document];
+        foreach (glob(__DIR__.'/../../resources/lockrot-*-*.schema.json') ?: [] as $file) {
+            if (preg_match('/^lockrot-([a-z]+)-(\d+)\.schema\.json$/', basename($file), $name) === 1) {
+                yield $name[1].'-'.$name[2] => [$name[1], (int) $name[2]];
+            }
         }
     }
 
@@ -35,9 +55,11 @@ final class SchemaWideningTest extends TestCase
      * @dataProvider schemaDocuments
      */
     #[DataProvider('schemaDocuments')]
-    public function testASchemaOnlyWidensOnItself(string $document): void
+    public function testASchemaOnlyWidensOnItself(string $document, int $number): void
     {
-        self::assertSame([], SchemaWidening::narrowings(self::current($document), self::current($document)));
+        $schema = self::decode(Schemas::path($document, $number));
+
+        self::assertSame([], SchemaWidening::narrowings($schema, $schema));
     }
 
     /** @return iterable<string, array{string, string, string}> the document, the narrowing, and what the check has to say about it */
@@ -63,7 +85,7 @@ final class SchemaWideningTest extends TestCase
         yield 'finding evidence no longer listed' => [Schemas::REPORT, 'evidence-dropped', '/properties/evidence: no longer listed'];
         yield 'counts closed' => [Schemas::REPORT, 'counts-closed', '/properties/counts: closed, additionalProperties false'];
         yield 'package name pattern changed' => [Schemas::REPORT, 'package-pattern', '/properties/package: pattern "^[a-z]+/[a-z]+$"'];
-        yield 'notes with an uncompared keyword' => [Schemas::REPORT, 'notes-unique', '/properties/notes: uniqueItems is a keyword this check does not compare'];
+        yield 'notes made unique' => [Schemas::REPORT, 'notes-unique', '#/properties/notes: uniqueItems turned on'];
         yield 'a new signal branch that narrows S1' => [Schemas::REPORT, 's1-branch', '/properties/replacement: no longer accepts type null'];
         yield 'baseline findings lose stale' => [Schemas::BASELINE, 'baseline-verdict', '#/properties/findings/additionalProperties/properties/verdict: no longer accepts "stale"'];
         yield 'baseline schema maximum lowered' => [Schemas::BASELINE, 'baseline-maximum', '#/properties/lockrot/properties/schema: maximum lowered to 0'];
@@ -94,7 +116,6 @@ final class SchemaWideningTest extends TestCase
         yield 'finding gate loses null' => [Schemas::REPORT, 'finding-gate-not-null', '/properties/gate/oneOf/1: no longer accepts null'];
         yield 'exempt_by loses baseline' => [Schemas::REPORT, 'exempt-dropped', '/properties/exempt_by/oneOf/0: no longer accepts "baseline"'];
         yield 'a mode dropped' => [Schemas::REPORT, 'mode-dropped', '/properties/mode: no longer accepts "generate_baseline"'];
-        yield 'tripped_by uniqueItems changed' => [Schemas::REPORT, 'tripped-unique-changed', '/properties/tripped_by: uniqueItems is a keyword this check does not compare'];
         yield 'note_details made required' => [Schemas::REPORT, 'note-details-required', '#: made required note_details'];
         yield 'explain note_details made required' => [Schemas::EXPLAIN, 'note-details-required', '#: made required note_details'];
         yield 'a note code dropped' => [Schemas::REPORT, 'note-code-dropped', '/properties/code: no longer accepts "not_from_composer_repository"'];
@@ -148,6 +169,7 @@ final class SchemaWideningTest extends TestCase
         yield 'a fail-on kind added' => [Schemas::REPORT, 'kind-added'];
         yield 'a note code added' => [Schemas::REPORT, 'note-code-added'];
         yield 'a metadata failure reason added' => [Schemas::EXPLAIN, 'metadata-reason-added'];
+        yield 'tripped_by no longer unique' => [Schemas::REPORT, 'tripped-unique-changed'];
     }
 
     /**
@@ -160,6 +182,84 @@ final class SchemaWideningTest extends TestCase
         self::assertNotSame(self::current($document), $widened, 'the copy differs');
 
         self::assertSame([], SchemaWidening::narrowings(self::current($document), $widened));
+    }
+
+    /**
+     * @return iterable<string, array{string, string, string}> the fixture, the change, and what the check has to say about it ('' for nothing)
+     */
+    public static function relationChanges(): iterable
+    {
+        $findings = '#/properties/findings/items';
+        $rules = '#/properties/run/properties/score_rules_used';
+        $ruleId = '^(([a-rt-z][a-z0-9]*|s([a-np-z0-9][a-z0-9]*)?|so([a-qs-z0-9][a-z0-9]*)?|sor([a-su-z0-9][a-z0-9]*)?|sort[a-z0-9]+)(-[a-z0-9]+)*|sort(-[a-z0-9]+)+)$';
+        $package = '#/properties/findings/patternProperties/^[^\/]+\/[^\/]+$';
+
+        // One per keyword; `allOf` added, changed and dropped, `uniqueItems` off and `x-known-keys`
+        // gaining a key are among the planted changes below.
+        yield 'not changed' => ['relations', 'not-changed', $findings.'/properties/security: not {"required":["fixed_by"]} where the older schema had {"required":["fix"]}'];
+        yield 'not added' => ['relations', 'not-added', $findings.'/properties/chain: not {"maxItems":0} where the older schema had null'];
+        yield 'uniqueItems turned on' => ['relations', 'unique-on', $findings.'/properties/chain: uniqueItems turned on'];
+        yield 'minProperties raised' => ['relations', 'min-properties-raised', $findings.'/properties/facts: minProperties raised to 2'];
+        yield 'minProperties lowered' => ['relations', 'min-properties-lowered', ''];
+        yield 'multipleOf added' => ['relations', 'multiple-added', $findings.'/properties/age: multipleOf 0.5 where the older schema had null'];
+        yield 'multipleOf changed' => ['relations', 'multiple-changed', $findings.'/properties/libyears: multipleOf 0.25 where the older schema had 0.5'];
+        yield 'multipleOf the same number written another way' => ['relations', 'multiple-rewritten', ''];
+        yield 'multipleOf dropped' => ['relations', 'multiple-dropped', ''];
+        yield 'a patternProperties regex removed' => ['findings-map', 'regex-removed', $package.': pattern property removed or its regex changed'];
+        yield 'an open set gains a value with its constraints in a new allOf entry' => ['relations', 'value-and-relation-added', $findings.'/allOf/2: a relation the older schema did not hold'];
+
+        // The planted changes the relation keywords were first checked against, on the shapes of
+        // the -2 report and baseline.
+        yield 'a relation added' => ['relations', 'relation-added', $findings.'/allOf/2: a relation the older schema did not hold'];
+        yield 'a relation dropped' => ['relations', 'relation-dropped', ''];
+        yield 'a relation branch dropped' => ['relations', 'relation-branch-dropped', $findings.'/allOf/0: a relation the older schema did not hold'];
+        yield 'uniqueItems off' => ['relations', 'unique-off', ''];
+        yield 'an open set gains a value' => ['relations', 'kind-added', ''];
+        yield 'an open set loses a value' => ['relations', 'kind-dropped', $findings.'/properties/next_step/oneOf/0/properties/kind: no longer accepts "replace"'];
+        yield 'nothing' => ['relations', 'nothing', ''];
+        yield 'a later rule id in x-known-keys' => ['relations', 'known-key-added', ''];
+        yield 'a rule id dropped from x-known-keys' => ['relations', 'known-key-dropped', $rules.'/properties/lead-first: no longer listed'];
+        yield 'an x-rendered-from list edited' => ['relations', 'rendered-from-edited', ''];
+        yield 'a finding gains an optional key' => ['relations', 'finding-key-added', ''];
+        yield 'a description reworded' => ['relations', 'description-reworded', ''];
+        yield 'the rule-id regex narrowed' => ['relations', 'rule-regex-narrowed', $rules.'/properties/lead-first: no longer listed'];
+        yield 'a rule count retyped to string' => ['relations', 'rule-count-string', $rules.'/properties/counted: no longer accepts type integer'];
+        yield 'the rule map opened' => ['relations', 'rule-map-opened', ''];
+        yield 'a map without known keys: its regex changed' => ['relations', 'bare-regex-changed', $rules.'/patternProperties/'.$ruleId.': pattern property removed or its regex changed'];
+        yield 'a map without known keys: a value schema narrowed' => ['relations', 'bare-value-narrowed', $rules.'/patternProperties/'.$ruleId.': maximum lowered to 10'];
+        yield 'a map without known keys: a literal regex added, typed like its peers' => ['relations', 'bare-literal-added', ''];
+        yield 'a map without known keys: a literal regex added that retypes a key' => ['relations', 'bare-literal-retypes', $rules.'/patternProperties/^lead-first$: no longer accepts type integer (a key '.$ruleId.' admits may also match the added regex)'];
+        yield 'the package-name regex changed' => ['findings-map', 'package-regex-changed', $package.': pattern property removed or its regex changed'];
+        yield 'the entry a regex types made stricter' => ['findings-map', 'entry-stricter', 'made required later_key'];
+        yield 'a literal regex no older regex matches added' => ['findings-map', 'literal-added', ''];
+        // Overlap of two regexes is undecidable in general, so the check errs towards reporting.
+        yield 'a regex that is not literal added' => ['findings-map', 'regex-added', '(a key ^[^\/]+\/[^\/]+$ admits may also match the added regex)'];
+        yield 'the map opened' => ['findings-map', 'map-opened', ''];
+    }
+
+    /**
+     * The relation keywords of the -2 schemas: `allOf`, `not`, `uniqueItems`, `minProperties`,
+     * `multipleOf`, `patternProperties`, and the annotations `x-known-keys` and `x-rendered-from`.
+     *
+     * @dataProvider relationChanges
+     */
+    #[DataProvider('relationChanges')]
+    public function testEachRelationChangeReadsAsItShould(string $fixture, string $change, string $expected): void
+    {
+        [$older, $newer] = self::planted($fixture, $change);
+        if ($change !== 'nothing') {
+            self::assertNotSame($older, $newer, 'the copy differs');
+        }
+
+        $problems = SchemaWidening::narrowings($older, $newer);
+
+        if ($expected === '') {
+            self::assertSame([], $problems);
+
+            return;
+        }
+        $found = array_filter($problems, static fn (string $problem): bool => strpos($problem, $expected) !== false);
+        self::assertNotSame([], $found, 'expected "'.$expected.'" among '.json_encode($problems, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
     }
 
     /** @return iterable<string, array{array<mixed, mixed>, array<mixed, mixed>, list<string>}> an older node, a newer one, and the narrowings between them */
@@ -343,6 +443,133 @@ final class SchemaWideningTest extends TestCase
         self::assertNotContains('origin', JsonPath::arrayAt($current, ['definitions', 'finding', 'required']));
         self::assertArrayNotHasKey('additionalProperties', JsonPath::arrayAt($current, ['definitions', 'packageOrigin']));
         self::assertSame([], SchemaWidening::narrowings($before, $current));
+    }
+
+    /**
+     * A fixture under tests/fixtures/schema-widening/ before and after one change.
+     *
+     * @return array{array<mixed, mixed>, array<mixed, mixed>}
+     */
+    private static function planted(string $fixture, string $change): array
+    {
+        $s = self::decode(self::FIXTURES.$fixture.'.schema.json');
+        $finding = ['definitions', 'finding'];
+        $properties = ['definitions', 'finding', 'properties'];
+        $rules = ['definitions', 'run', 'properties', 'score_rules_used'];
+        // The relations fixture's rule map, and the same map read with no x-known-keys (a map that
+        // never had a list), which is compared per regex.
+        $ruleId = '';
+        $bare = $s;
+        if ($fixture === 'relations') {
+            $ruleId = (string) array_keys(JsonPath::arrayAt($s, array_merge($rules, ['patternProperties'])))[1];
+            $bare = self::without($s, array_merge($rules, ['x-known-keys']));
+        }
+        $map = ['properties', 'findings', 'patternProperties'];
+        $package = '^[^\\/]+\\/[^\\/]+$';
+        switch ($change) {
+            case 'nothing':
+                return [$s, $s];
+            case 'relation-added':
+                return [$s, self::appended($s, array_merge($finding, ['allOf']), ['properties' => ['dev' => ['enum' => [false]]]])];
+            case 'relation-dropped':
+                return [$s, self::with($s, array_merge($finding, ['allOf']), \array_slice(JsonPath::arrayAt($s, array_merge($finding, ['allOf'])), 0, 1))];
+            case 'relation-branch-dropped':
+                return [$s, self::with($s, array_merge($finding, ['allOf', 0, 'anyOf']), \array_slice(JsonPath::arrayAt($s, array_merge($finding, ['allOf', 0, 'anyOf'])), 1))];
+            case 'not-changed':
+                return [$s, self::with($s, array_merge($properties, ['security', 'not']), ['required' => ['fixed_by']])];
+            case 'not-added':
+                return [$s, self::with($s, array_merge($properties, ['chain', 'not']), ['maxItems' => 0])];
+            case 'unique-on':
+                return [$s, self::with($s, array_merge($properties, ['chain', 'uniqueItems']), true)];
+            case 'unique-off':
+                return [$s, self::with($s, array_merge($properties, ['flags', 'uniqueItems']), false)];
+            case 'min-properties-raised':
+                return [$s, self::with($s, array_merge($properties, ['facts', 'minProperties']), 2)];
+            case 'min-properties-lowered':
+                return [$s, self::with($s, array_merge($properties, ['facts', 'minProperties']), 0)];
+            case 'multiple-added':
+                return [$s, self::with($s, array_merge($properties, ['age', 'multipleOf']), 0.5)];
+            case 'multiple-changed':
+                return [$s, self::with($s, array_merge($properties, ['libyears', 'multipleOf']), 0.25)];
+            case 'multiple-rewritten':
+                $whole = self::with($s, array_merge($properties, ['libyears', 'multipleOf']), 1);
+
+                return [$whole, self::with($s, array_merge($properties, ['libyears', 'multipleOf']), 1.0)];
+            case 'multiple-dropped':
+                return [$s, self::without($s, array_merge($properties, ['libyears', 'multipleOf']))];
+            case 'value-and-relation-added':
+                // A release adds `later-kind` to the open set and puts what it requires in an entry
+                // of its own; every existing relation stays as it was.
+                $s2 = self::appended($s, ['definitions', 'move', 'properties', 'kind', 'x-known-values'], 'later-kind');
+
+                return [$s, self::appended($s2, array_merge($finding, ['allOf']), [
+                    'anyOf' => [
+                        ['properties' => ['next_step' => ['properties' => ['kind' => ['not' => ['enum' => ['later-kind']]]]]]],
+                        ['properties' => ['dev' => ['enum' => [true]]]],
+                    ],
+                ])];
+            case 'kind-added':
+                return [$s, self::appended($s, ['definitions', 'move', 'properties', 'kind', 'x-known-values'], 'later-kind')];
+            case 'kind-dropped':
+                return [$s, self::with($s, ['definitions', 'move', 'properties', 'kind', 'x-known-values'], \array_slice(JsonPath::arrayAt($s, ['definitions', 'move', 'properties', 'kind', 'x-known-values']), 1))];
+            case 'known-key-added':
+                return [$s, self::appended($s, array_merge($rules, ['x-known-keys']), 'later-rule')];
+            case 'known-key-dropped':
+                return [$s, self::with($s, array_merge($rules, ['x-known-keys']), array_values(array_filter(JsonPath::arrayAt($s, array_merge($rules, ['x-known-keys'])), static fn ($key): bool => $key !== 'lead-first')))];
+            case 'rendered-from-edited':
+                return [$s, self::appended($s, ['properties', 'notes', 'items', 'x-rendered-from'], 'code')];
+            case 'finding-key-added':
+                return [$s, self::with($s, array_merge($properties, ['later_key']), ['description' => 'A key a later release adds.', 'type' => ['string', 'null']])];
+            case 'description-reworded':
+                return [$s, self::with($s, array_merge($properties, ['lead', 'description']), 'Reworded.')];
+            case 'rule-regex-narrowed':
+                return [$s, self::regexRenamed($s, $rules, $ruleId, '^[a-z]+$')];
+            case 'rule-count-string':
+                return [$s, self::with($s, array_merge($rules, ['patternProperties', $ruleId]), ['type' => 'string'])];
+            case 'rule-map-opened':
+                return [$s, self::with($s, array_merge($rules, ['additionalProperties']), true)];
+            case 'bare-regex-changed':
+                return [$bare, self::regexRenamed($bare, $rules, $ruleId, '^[a-z]+$')];
+            case 'bare-value-narrowed':
+                return [$bare, self::with($bare, array_merge($rules, ['patternProperties', $ruleId, 'maximum']), 10)];
+            case 'bare-literal-added':
+                return [$bare, self::with($bare, array_merge($rules, ['patternProperties', '^later-rule$']), ['type' => 'integer', 'minimum' => 0])];
+            case 'bare-literal-retypes':
+                return [$bare, self::with($bare, array_merge($rules, ['patternProperties', '^lead-first$']), ['type' => 'string'])];
+            case 'regex-removed':
+                return [$s, self::without($s, array_merge($map, [$package]))];
+            case 'package-regex-changed':
+                return [$s, self::regexRenamed($s, ['properties', 'findings'], $package, '^[a-z0-9-]+\\/[a-z0-9-]+$')];
+            case 'entry-stricter':
+                return [$s, self::appended($s, ['definitions', 'entry', 'required'], 'later_key')];
+            case 'literal-added':
+                return [$s, self::with($s, array_merge($map, ['^@root$']), ['type' => 'object'])];
+            case 'regex-added':
+                return [$s, self::with($s, array_merge($map, ['^@[a-z]+$']), ['type' => 'object'])];
+            case 'map-opened':
+                return [$s, self::with($s, ['properties', 'findings', 'additionalProperties'], true)];
+        }
+
+        self::fail('no change named '.$change);
+    }
+
+    /**
+     * A map node whose `patternProperties` regex is replaced by another, its schema kept.
+     *
+     * @param array<mixed, mixed> $schema
+     * @param list<int|string>    $map
+     *
+     * @return array<mixed, mixed>
+     */
+    private static function regexRenamed(array $schema, array $map, string $regex, string $replacement): array
+    {
+        $patterns = JsonPath::arrayAt($schema, array_merge($map, ['patternProperties']));
+        self::assertArrayHasKey($regex, $patterns, 'the change names what the schema has');
+        $value = $patterns[$regex];
+        unset($patterns[$regex]);
+        $patterns[$replacement] = $value;
+
+        return self::with($schema, array_merge($map, ['patternProperties']), $patterns);
     }
 
     /** @return iterable<string, array{string}> */
