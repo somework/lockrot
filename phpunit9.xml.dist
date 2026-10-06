@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Identical to phpunit.xml.dist except for the coverage element: PHPUnit 9.6, which the PHP 7.4
-     and 8.0 matrix legs resolve, reads <coverage><include>, while 10+ reads <source><include>.
-     ci.yml picks this file on those two legs. It also leaves out phpunit.xml.dist's extension,
-     which is written against PHPUnit 10's extension API and only acts under Infection. -->
+<!-- Keep in step with phpunit.xml.dist. PHPUnit 9.6, on the PHP 7.4 and 8.0 legs, reads
+     <coverage><include> where PHPUnit 10+ reads <source><include>. It cannot load the extension of
+     phpunit.xml.dist, which uses the PHPUnit 10 extension API. -->
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          bootstrap="vendor/autoload.php" colors="true" failOnWarning="true"
          beStrictAboutOutputDuringTests="true">

@@ -59,7 +59,7 @@ body:
       label: JSON output
       description: >
         The relevant part of `composer lockrot --format=json` (or
-        `php lockrot.phar --format=json`). Redact package names if you need to.
+        `php lockrot.phar --format=json`). You can redact package names.
       render: json
     validations:
       required: false
