@@ -11,8 +11,8 @@ tests/infection-equivalents.md accounts for. Every escape goes to the step summa
 An escape is keyed so that a line added or removed above it leaves the key alone: its file, its
 mutator and the line Infection mutated, whitespace-normalised (read from the checked-out file at the
 line the log reports, since the log's diff drops comments). When that text occurs more than once in
-the file, or an entry's text does not match, the enclosing method is the key. An entry of the
-documented list gives that key in one of two forms:
+the file, the enclosing method is the key instead. An entry of the documented list gives that key in
+one of two forms:
 
 - `src/Path/File.php` Mutator `the original line` -- the form that does not drift;
 - `src/Path/File.php:123` Mutator -- read through the checked-out source (the text at line 123),
@@ -100,14 +100,13 @@ class Source:
         return ''
 
     def keys(self, path: str, mutator: str, line: int, text: str) -> List[Key]:
-        """The keys a mutant answers to, most precise first: the line's text when it is unique in the
-        file, then the enclosing method."""
+        """The one key a mutant answers to: the line's text when it is unique in the file, else the
+        enclosing method. Never both: the method would let one documented mutant cover another line."""
         occurrences = [n for n, candidate in enumerate(self.lines(path), 1) if normalise(candidate) == text]
-        found = [(path, mutator, 'text:' + text)] if text and len(occurrences) == 1 else []
+        if text and len(occurrences) == 1:
+            return [(path, mutator, 'text:' + text)]
         method = self.method(path, line or (occurrences[0] if occurrences else 0))
-        if method:
-            found.append((path, mutator, 'method:' + method))
-        return found
+        return [(path, mutator, 'method:' + method)] if method else []
 
 
 def entries(markdown: str) -> List[str]:
@@ -158,7 +157,7 @@ def allowances(markdown: str, source: Source) -> List[list]:
                     pending.append((match.group('mutator'), count))
             elif match.group('code') and path and not line and pending:
                 for mutator, count in pending:
-                    add(source.keys(path, mutator, 0, normalise(match.group('code')))[:1], count)
+                    add(source.keys(path, mutator, 0, normalise(match.group('code'))), count)
                 pending = []
     return found
 
