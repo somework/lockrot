@@ -8,24 +8,14 @@ use Composer\Json\JsonFile;
 use Lockrot\Exception\ConfigException;
 use Seld\JsonLint\ParsingException;
 
-/**
- * Reads a JSON file through Composer's own JsonFile, translating its exceptions into the
- * single ConfigException contract every lockrot caller relies on.
- *
- * @internal
- */
+/** @internal */
 final class JsonReader
 {
     /**
-     * Reads a JSON file whose top level is an object and returns it as a string-keyed array.
-     *
      * @return array<string, mixed>
-     * @throws ConfigException  "<path> not found" when the file is missing;
-     *                          "Cannot read <path>: <reason>" when unreadable;
-     *                          "<path> is not valid JSON: <jsonlint message>" on syntax errors;
-     *                          "<path> must contain a JSON object" when the top level is a scalar or a
-     *                          non-empty list (an empty top-level [] is accepted: {} and [] decode to
-     *                          the same PHP value via json_decode(..., true), so they are indistinguishable).
+     * @throws ConfigException when the file is missing, unreadable or not valid JSON, or when its top
+     *                         level is a scalar or a non-empty list. An empty top-level `[]` is
+     *                         accepted, because `{}` and `[]` decode to the same array.
      */
     public static function readObject(string $path): array
     {
@@ -38,9 +28,8 @@ final class JsonReader
         } catch (ParsingException $e) {
             throw new ConfigException($path.' is not valid JSON: '.$e->getMessage(), 0, $e);
         } catch (\UnexpectedValueException $e) {
-            // JsonFile::read() -> parseJson() -> validateSyntax() throws this (a \RuntimeException
-            // subclass) instead of ParsingException when the content contains invalid UTF-8 bytes;
-            // it must be caught ahead of the plain \RuntimeException case below.
+            // JsonFile::read() throws this RuntimeException subclass instead of ParsingException on
+            // invalid UTF-8 bytes. Catch it before the plain RuntimeException.
             throw new ConfigException($path.' is not valid JSON: '.$e->getMessage(), 0, $e);
         } catch (\RuntimeException $e) {
             throw new ConfigException('Cannot read '.$path.': '.$e->getMessage(), 0, $e);
@@ -54,9 +43,7 @@ final class JsonReader
     }
 
     /**
-     * Filters an array down to its string keys, e.g. dropping the PHP-integer-cast key that
-     * a JSON object like {"123": 1} decodes to. Shared by readObject() and by callers that
-     * need the same guarantee for a nested object pulled out of an already-read document.
+     * Drops the keys that are not strings, such as the integer that PHP makes of the JSON key `"123"`.
      *
      * @param array<mixed, mixed> $data
      * @return array<string, mixed>
@@ -74,9 +61,8 @@ final class JsonReader
     }
 
     /**
-     * True when $data's keys are exactly 0..count-1 in order — i.e. json_decode(..., true) turned
-     * a JSON array into it. An empty array is deliberately NOT a list here, since {} and [] are
-     * indistinguishable after that decode and callers need [] to stay acceptable as "empty object".
+     * An empty array is not a list here: `{}` and `[]` decode to the same array, and `[]` must stay
+     * acceptable as an empty object.
      *
      * @param array<mixed, mixed> $data
      */

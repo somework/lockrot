@@ -5,17 +5,14 @@ declare(strict_types=1);
 namespace Lockrot;
 
 /**
- * A budget for how long a piece of work may keep going.
- *
- * Built on a monotonic clock rather than {@see Clock}/wall-clock time: a budget must not be
- * shortened or extended by a system-clock adjustment (NTP sync, DST) happening mid-run. `$now` is
- * injectable so a caller can drive it from a counter of its own.
+ * Reads a monotonic clock, not {@see Clock}, so a system-clock adjustment (NTP, DST) mid-run
+ * cannot shorten or extend the budget.
  *
  * @internal
  */
 final class Deadline
 {
-    /** @var float|null seconds on the monotonic clock at which this deadline expires; null = never */
+    /** @var float|null seconds on the monotonic clock when the deadline expires, null for never */
     private ?float $expiresAt;
     /** @var callable(): float */
     private $now;
@@ -32,7 +29,7 @@ final class Deadline
         return new self(null, self::monotonic());
     }
 
-    /** @param null|callable(): float $now monotonic seconds; defaults to hrtime() */
+    /** @param null|callable(): float $now monotonic seconds, hrtime() when null */
     public static function inSeconds(float $seconds, ?callable $now = null): self
     {
         $now ??= self::monotonic();
@@ -50,7 +47,7 @@ final class Deadline
         return $this->expiresAt !== null && ($this->now)() >= $this->expiresAt;
     }
 
-    /** @return float seconds left before expiry; INF when this deadline never expires */
+    /** @return float seconds left before expiry, INF when the deadline never expires */
     public function remainingSeconds(): float
     {
         if ($this->expiresAt === null) {

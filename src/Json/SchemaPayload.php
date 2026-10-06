@@ -7,21 +7,12 @@ namespace Lockrot\Json;
 use Lockrot\Exception\ConfigException;
 
 /**
- * Turns a document read with json_decode(..., true) back into the object form the bundled
- * justinrainbow/json-schema validator reads, for {@see \Lockrot\Config\ConfigSchema} and
- * {@see \Lockrot\Baseline\BaselineSchema} alike.
- *
- * The library's own BaseConstraint::arrayToObjectRecursive() does it with a json_encode() and
- * json_decode() round trip, and checks only the encode. A key starting with a NUL byte is valid JSON
- * that no PHP object can hold, so the decode returned null — and `(object) null`, an empty object,
- * was what got validated. A number too large for a float (1e400, read as INF) failed the encode
- * instead, with a library exception no caller reported as a configuration error. Here the first is
- * a ConfigException naming the key, and INF simply reaches the schema, which rejects it wherever a
- * known key wants an integer or a string.
- *
- * The top level is always an object: `{}` and `[]` both decode to [] with json_decode(..., true),
- * and every caller has already checked that it read an object. Below it, [] stays an array — the
- * round trip read it that way too — and a value that already is an object is passed through as is.
+ * Turns a document read with `json_decode(..., true)` into the object form that the bundled
+ * justinrainbow/json-schema validator reads. The library's own round trip through `json_encode()`
+ * and `json_decode()` hides a key that starts with a NUL byte (the decode returns null) and throws
+ * on a number too large for a float. Here the key is a ConfigException, and the number (INF)
+ * reaches the schema, which rejects it. The top level always becomes an object, and below it `[]`
+ * stays an array.
  *
  * @internal
  */

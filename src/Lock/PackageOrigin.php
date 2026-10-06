@@ -7,9 +7,9 @@ namespace Lockrot\Lock;
 use Lockrot\Data\Repository\RepositoryUrl;
 
 /**
- * Where a lock entry came from, as a finding's `origin`: a kind, the registry where lockrot can name
- * it, and the package's page there. {@see of()} is the one place the kind is decided, and the kind is
- * what `from_composer_repository` is read from ({@see isComposerRepository()}).
+ * Where a lock entry came from, as a finding's `origin` (docs/schema.md#where-a-package-came-from).
+ * {@see of()} is the one place that decides the kind, and `from_composer_repository` reads the
+ * kind through {@see isComposerRepository()}.
  *
  * @internal
  */
@@ -22,10 +22,13 @@ final class PackageOrigin
     public const ARTIFACT = 'artifact';
     public const PACKAGE = 'package';
     public const UNKNOWN = 'unknown';
-    /** What the schemas list in `x-known-values`; not the order {@see of()} decides in. */
+    /** What the schemas list in `x-known-values`. It is not the order that {@see of()} decides in. */
     public const KINDS = [self::PACKAGIST, self::COMPOSER, self::PATH, self::VCS, self::ARTIFACT, self::PACKAGE, self::UNKNOWN];
 
-    /** The registries lockrot names, by the host a notification-url reports to; any other host is not written. */
+    /**
+     * The registries that lockrot names, by the host that a notification-url reports to. It writes
+     * no other host.
+     */
     public const REGISTRIES = ['packagist.org', 'repo.packagist.com', 'wp-packages.org', 'packages.drupal.org'];
 
     /** The registries that keep a public page per package name. */
@@ -34,7 +37,10 @@ final class PackageOrigin
         'wp-packages.org' => 'https://wp-packages.org/packages/',
     ];
 
-    /** Composer's own package-name rule (ValidatingArrayLoader, unchanged since 2.2): only such a name goes into a URL. */
+    /**
+     * Composer's package-name rule (ValidatingArrayLoader, the same on 2.2 and later). Only such a
+     * name goes into a URL.
+     */
     private const PACKAGE_NAME = '{^[a-z0-9](?:[_.-]?[a-z0-9]++)*+/[a-z0-9](?:(?:[_.]|-{1,2})?[a-z0-9]++)*+$}iD';
 
     private string $kind;
@@ -74,9 +80,8 @@ final class PackageOrigin
     }
 
     /**
-     * The replacement's page on the registry that named it, or null. Only packagist.org: the
-     * maintainer sets `abandoned` and its replacement there, while WP Packages never marks a
-     * package abandoned and Private Packagist keeps no public page.
+     * The replacement's page on the registry that named it, or null. Only packagist.org: WP Packages
+     * never marks a package abandoned, and Private Packagist keeps no public page.
      */
     public static function replacementPage(?string $namedBy, string $replacement): ?string
     {
@@ -89,7 +94,7 @@ final class PackageOrigin
         return new self(self::COMPOSER, null, null, false);
     }
 
-    /** Whether the kind is one whose entries lockrot asks a repository about: exactly the lock entries with a notification-url. */
+    /** Whether lockrot asks a repository about entries of this kind: those with a notification-url. */
     public static function isComposerRepositoryKind(string $kind): bool
     {
         return $kind === self::PACKAGIST || $kind === self::COMPOSER;
@@ -115,7 +120,7 @@ final class PackageOrigin
         return $this->packageUrl;
     }
 
-    /** Whether Composer installed the package from the machine it ran on rather than from a server. */
+    /** The `local` key of the origin (docs/schema.md#where-a-package-came-from). */
     public function isLocal(): bool
     {
         return $this->local;
@@ -127,7 +132,6 @@ final class PackageOrigin
         return ['kind' => $this->kind, 'registry' => $this->registry, 'package_url' => $this->packageUrl, 'local' => $this->local];
     }
 
-    /** A `path` dist, or a dist or source that is a path or a `file://` URL. */
     private static function installsFromTheMachine(OriginFacts $facts): bool
     {
         return $facts->distType() === 'path' || RepositoryUrl::isLocalPath($facts->distUrl()) || RepositoryUrl::isLocalPath($facts->sourceUrl());

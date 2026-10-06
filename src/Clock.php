@@ -7,7 +7,7 @@ namespace Lockrot;
 /** @internal */
 final class Clock
 {
-    /** The year every "years ago" and every libyear is counted in: 365.25 days. */
+    /** The year that every "years ago" and every libyears value counts in: 365.25 days. */
     public const SECONDS_PER_YEAR = 31557600;
     private \DateTimeImmutable $now;
 
@@ -22,9 +22,9 @@ final class Clock
     }
 
     /**
-     * LOCKROT_TODAY pins every "years ago" calculation to a fixed instant. It is a testing hook
-     * (README "Testing hooks"), not part of the configuration contract, which is why it is read
-     * here rather than through LockrotConfig.
+     * LOCKROT_TODAY pins every age to a fixed instant. It is a testing hook, not part of the
+     * configuration contract (docs/configuration.md, "Testing hooks"), so this method reads it and
+     * LockrotConfig does not.
      *
      * @param array<string, mixed> $env
      */
@@ -41,9 +41,9 @@ final class Clock
     }
 
     /**
-     * The exact ratio of the seconds since $date to a year, negative for a date after the run
-     * clock: what every threshold compares ({@see \Lockrot\Signal\Thresholds::levelFor()}), never
-     * the published tenths, so a reading of 4.95 years prints 5.0 and stays below a 5-year threshold.
+     * The exact years since `$date`, negative for a date after the run clock. Every threshold
+     * compares this value ({@see \Lockrot\Signal\Thresholds::levelFor()}), never the published
+     * tenths: 4.95 years prints 5.0 and stays below a 5-year threshold.
      */
     public function yearsSince(\DateTimeInterface $date): float
     {
@@ -51,8 +51,8 @@ final class Clock
     }
 
     /**
-     * The years since $date in integer tenths, rounded half up: the one form every published years
-     * value takes (`tenths / 10`). A date after the run clock reads 0.
+     * The years since `$date` in integer tenths, rounded half up: the form of every published years
+     * value (`tenths / 10`). A date after the run clock reads 0.
      */
     public function tenthsSince(\DateTimeInterface $date): int
     {
@@ -60,12 +60,12 @@ final class Clock
     }
 
     /**
-     * $seconds in tenths of a year, half up, clamped to 0 below. `10 * $seconds` passes a 32-bit
-     * int at 6.8 years, so with 4-byte integers the same rounding is taken in a float, where it is
-     * exact: `10 * $seconds` stays far below 2^53, and a quotient that is not a half lies at least
+     * `$seconds` in tenths of a year, half up, clamped at 0. `10 * $seconds` overflows a 32-bit
+     * int at 6.8 years, so with 4-byte integers the rounding runs in a float. It is exact there:
+     * `10 * $seconds` stays far below 2^53, and a quotient that is not a half lies at least
      * 1 / (2 * SECONDS_PER_YEAR) away from one, far beyond the float's error.
      *
-     * @param int $intSize the integer width to compute for, {@see \PHP_INT_SIZE} unless a test asks
+     * @param int $intSize the integer width in bytes, {@see \PHP_INT_SIZE} unless a test sets it
      */
     public static function tenthsOf(int $seconds, int $intSize = \PHP_INT_SIZE): int
     {
