@@ -500,7 +500,7 @@ UnwrapArrayFilter on `:392`, went undocumented since S10 arrived: no test held a
 package with an S10 to losing it. `AnalyzerTest::testS10IsLeftOffAnAllowlistedPackageAndAnAbandonedOne`
 kills both. `RunNoteAgreementTest` covers nothing, for the reason `GateAgreementTest` gives.
 
-- `src/Analyzer/Analyzer.php:392` UnwrapArrayValues — `array_values()` over the signals with S10
+- `src/Analyzer/Analyzer.php:393` UnwrapArrayValues — `array_values()` over the signals with S10
   filtered out. `SignalSet::evaluate()` sorts the signals by number and S10 is the highest, so it is
   always the last element: removing it leaves the keys `0..n-1` already, and the `array_values()`
   only makes the `list` type true by construction.
