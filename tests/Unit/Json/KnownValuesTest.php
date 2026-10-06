@@ -83,6 +83,100 @@ final class KnownValuesTest extends TestCase
         self::assertSame($schema, json_encode(KnownValues::closed(self::decode($schema))));
     }
 
+    public function testAnIntegerListBecomesTheEnumToo(): void
+    {
+        $closed = KnownValues::closed(self::decode('{"type": "integer", "minimum": 1, "x-known-values": [1, 4]}'));
+
+        self::assertSame('{"type":"integer","minimum":1,"x-known-values":[1,4],"enum":[1,4]}', json_encode($closed));
+    }
+
+    /**
+     * An open map read strictly: its known keys become its only properties, each typed by every
+     * `patternProperties` regex it matches (one schema, or an `allOf` of them), and the map closes.
+     */
+    public function testTheKnownKeysBecomeTheMapsOnlyProperties(): void
+    {
+        $closed = KnownValues::closed(self::decode(
+            '{"type": "object", "patternProperties": {"^sort$": {"type": "null"}, "^[a-z-]+$": {"type": "integer"}}, "x-known-keys": ["counted", "sort"]}'
+        ));
+
+        self::assertSame(
+            '{"type":"object","x-known-keys":["counted","sort"],"properties":{"counted":{"type":"integer"},"sort":{"allOf":[{"type":"null"},{"type":"integer"}]}},"additionalProperties":false}',
+            json_encode($closed)
+        );
+        // A schema, as the validator reads one: an object, not an array that encodes like one.
+        $properties = $closed->properties ?? null;
+        self::assertInstanceOf(\stdClass::class, $properties);
+        self::assertInstanceOf(\stdClass::class, $properties->sort ?? null);
+    }
+
+    /** @return iterable<string, array{string, string}> an open map, and that map read strictly */
+    public static function knownKeys(): iterable
+    {
+        yield 'a key no regex matches takes the schema of the other keys' => [
+            '{"patternProperties":{"^a$":{"type":"null"}},"additionalProperties":{"type":"string"},"x-known-keys":["a","b"]}',
+            '{"additionalProperties":false,"x-known-keys":["a","b"],"properties":{"a":{"type":"null"},"b":{"type":"string"}}}',
+        ];
+        yield 'a key no regex matches, other keys left open' => [
+            '{"patternProperties":{"^a$":{"type":"null"}},"x-known-keys":["b"]}',
+            '{"x-known-keys":["b"],"properties":{"b":{}},"additionalProperties":false}',
+        ];
+        yield 'a key no regex matches, other keys open in so many words' => [
+            '{"patternProperties":{"^a$":{"type":"null"}},"additionalProperties":true,"x-known-keys":["b"]}',
+            '{"additionalProperties":false,"x-known-keys":["b"],"properties":{"b":{}}}',
+        ];
+        yield 'a key no regex matches, other keys refused, is left out' => [
+            '{"patternProperties":{"^a$":{"type":"null"}},"additionalProperties":false,"x-known-keys":["a","b"]}',
+            '{"additionalProperties":false,"x-known-keys":["a","b"],"properties":{"a":{"type":"null"}}}',
+        ];
+        yield 'a map with no regexes' => [
+            '{"additionalProperties":{"type":"integer"},"x-known-keys":["a"]}',
+            '{"additionalProperties":false,"x-known-keys":["a"],"properties":{"a":{"type":"integer"}}}',
+        ];
+        yield 'regexes that are not a map' => [
+            '{"patternProperties":[{"type":"null"}],"x-known-keys":["a"]}',
+            '{"x-known-keys":["a"],"properties":{"a":{}},"additionalProperties":false}',
+        ];
+        yield 'a regex holding the delimiter the validator puts around it' => [
+            '{"patternProperties":{"^a~b$":{"type":"null"}},"x-known-keys":["a~b"]}',
+            '{"x-known-keys":["a~b"],"properties":{"a~b":{"type":"null"}},"additionalProperties":false}',
+        ];
+        yield 'a known key that is not a string is left out' => [
+            '{"patternProperties":{"^1$":{"type":"null"}},"x-known-keys":[1,"x"]}',
+            '{"x-known-keys":[1,"x"],"properties":{"x":{}},"additionalProperties":false}',
+        ];
+        yield 'an open set in a regex schema is read too' => [
+            '{"patternProperties":{"^a$":{"pattern":"^x$","x-known-values":["x"]}},"x-known-keys":["a"]}',
+            '{"x-known-keys":["a"],"properties":{"a":{"x-known-values":["x"],"enum":["x"]}},"additionalProperties":false}',
+        ];
+        yield 'deep down' => [
+            '{"definitions":{"run":{"properties":{"rules":{"patternProperties":{"^a$":{"type":"integer"}},"x-known-keys":["a"]}}}}}',
+            '{"definitions":{"run":{"properties":{"rules":{"x-known-keys":["a"],"properties":{"a":{"type":"integer"}},"additionalProperties":false}}}}}',
+        ];
+    }
+
+    /** @dataProvider knownKeys */
+    #[DataProvider('knownKeys')]
+    public function testEveryKnownKeyIsTypedAsTheMapTypesIt(string $schema, string $expected): void
+    {
+        self::assertSame($expected, json_encode(KnownValues::closed(self::decode($schema))));
+    }
+
+    /** A node that already lists its properties keeps them, as one that already has an `enum` keeps it. */
+    public function testPropertiesAlreadyThereAreKept(): void
+    {
+        $schema = '{"properties":{"a":{"type":"null"}},"patternProperties":{"^b$":{"type":"integer"}},"x-known-keys":["b"]}';
+
+        self::assertSame($schema, json_encode(KnownValues::closed(self::decode($schema))));
+    }
+
+    public function testKnownKeysThatAreNotAListAreIgnored(): void
+    {
+        $schema = '{"patternProperties":{"^b$":{"type":"integer"}},"x-known-keys":"b"}';
+
+        self::assertSame($schema, json_encode(KnownValues::closed(self::decode($schema))));
+    }
+
     /** The validator is free to annotate what it is given, and the runtime keeps the result: the input stays as it was. */
     public function testTheInputIsNotTouched(): void
     {

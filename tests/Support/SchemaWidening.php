@@ -18,16 +18,32 @@ use Lockrot\Json\KnownValues;
  *
  * It covers the draft-04 keywords lockrot's schemas use — `$ref` into the same file, `type`, `enum`,
  * `oneOf`/`anyOf`, `properties`, `required`, `items`, `additionalProperties`, `minimum`/`maximum`,
- * `minItems`/`maxItems`, `minLength`/`maxLength`, `pattern`, `format`, and `not` in the one shape
- * described below — and fails closed on any other: a keyword it cannot compare, in the newer schema,
- * is reported unless the older node carries it with the same value. Where it cannot be exact it errs
- * towards reporting:
+ * `minItems`/`maxItems`, `minLength`/`maxLength`, `pattern`, `format`, `patternProperties`, and the
+ * relation keywords `allOf`, `not`, `uniqueItems`, `minProperties` and `multipleOf` — and fails
+ * closed on any other: a keyword it cannot compare, in the newer schema, is reported unless the
+ * older node carries it with the same value. Where it cannot be exact it errs towards reporting:
  *
+ * - A subtree that is the same text in both schemas, every `$ref` in it naming a definition that is
+ *   itself the same in both, is unchanged and accepts what it accepted.
  * - Both schemas are read strictly ({@see KnownValues::closed()}): an open set's `x-known-values`
  *   is its enum and its `pattern` is dropped. No older lockrot wrote a value outside the list, since
  *   the strict twin in ValidatesJsonSchemas holds its output to it, so a value dropped from the list
  *   is a narrowing and a value added is not. A known value that stops matching a narrowed pattern is
- *   not seen here; ClosedSetsTest spells each open set's pattern out instead.
+ *   not seen here; ClosedSetsTest spells each open set's pattern out instead. An open map's
+ *   `x-known-keys` is read the same way: its known keys become its properties, each typed by every
+ *   regex it matches, so a key dropped from the list is a narrowing and a key added is not.
+ *   `x-rendered-from` names the fields a string is rendered from and constrains nothing.
+ * - The relations: an `allOf` entry the newer node adds or changes is a narrowing unless the older
+ *   node holds the same entry, and a dropped entry only widens. A `not` has to be the same;
+ *   `uniqueItems` turned on, a raised `minProperties` and a `multipleOf` added or changed are
+ *   narrowings. A release that adds a value to an open set keeps every relation as it was and puts
+ *   the new value's constraints in a new `allOf` entry, which this check reports; the release lists
+ *   it in SchemaWideningTest::ACCEPTED_NARROWINGS with its reason.
+ * - `patternProperties` is compared per regex: one removed or changed is a narrowing, and one in
+ *   both compares its value schemas. A regex only the newer node holds is a narrowing beside an
+ *   open `additionalProperties`; beside a closed one it only widens when no older key can match it:
+ *   a literal regex (`^name$`) is tested against every older regex, and any other has to accept
+ *   what every older regex's schema accepted, since whether two regexes overlap is undecidable.
  * - A `not` of exactly `{properties: {K: {enum: L}}}` — the report's branch for signal ids it does
  *   not list — admits no object whose K is in L. On the older side it takes L away from the values
  *   K admits there, and a branch left with none admits nothing an older lockrot wrote and is skipped;
@@ -52,10 +68,17 @@ final class SchemaWidening
     private const COMPARED = [
         '$ref', 'type', 'enum', 'oneOf', 'anyOf', 'properties', 'required', 'items', 'additionalProperties',
         'minimum', 'maximum', 'minItems', 'maxItems', 'minLength', 'maxLength', 'pattern', 'format',
+        'patternProperties', 'allOf', 'not', 'uniqueItems', 'minProperties', 'multipleOf',
     ];
 
+    /** The relation keywords that bear on a single value, which {@see accepts()} does not decide. */
+    private const VALUE_RELATIONS = ['allOf', 'not', 'multipleOf'];
+
     /** Keywords that say nothing about which documents validate. */
-    private const ANNOTATIONS = ['$schema', 'id', '$id', 'title', 'description', 'default', 'examples', 'definitions', KnownValues::KEYWORD];
+    private const ANNOTATIONS = [
+        '$schema', 'id', '$id', 'title', 'description', 'default', 'examples', 'definitions',
+        KnownValues::KEYWORD, KnownValues::KEYS, 'x-rendered-from',
+    ];
 
     private const ALTERNATIVES = ['oneOf', 'anyOf'];
 
@@ -66,6 +89,9 @@ final class SchemaWidening
     private const UNMERGEABLE = "\0unmergeable";
 
     private const MAX_DEPTH = 64;
+
+    /** Set on an older node whose `not` {@see withoutNot()} folded in, for the comparison of the two `not`s. */
+    private const OLD_NOT = "\0oldnot";
 
     /** @var array<mixed, mixed> */
     private array $oldRoot;
@@ -127,8 +153,15 @@ final class SchemaWidening
         if ($depth > self::MAX_DEPTH) {
             return [$path.': nested too deep to compare'];
         }
+        if ($this->identical($old, $new, [])) {
+            return [];
+        }
         try {
-            $old = $this->withoutNot($this->resolve($old, $this->oldRoot));
+            $resolved = $this->resolve($old, $this->oldRoot);
+            $old = $this->withoutNot($resolved);
+            if ($old !== null && \array_key_exists('not', $resolved)) {
+                $old[self::OLD_NOT] = $resolved['not'];
+            }
             $new = $this->resolve($new, $this->newRoot);
         } catch (\UnexpectedValueException $e) {
             return [$path.': '.$e->getMessage()];
@@ -304,7 +337,7 @@ final class SchemaWidening
      */
     private function plain(array $old, array $new, string $path, int $depth): array
     {
-        $problems = $this->uncompared($old, $new, $path);
+        $problems = array_merge($this->uncompared($old, $new, $path), $this->relations($old, $new, $path));
 
         $values = self::finiteValues($old);
         if ($values !== null) {
@@ -380,6 +413,7 @@ final class SchemaWidening
             }
             $problems = array_merge($problems, $this->compare(self::node($schema, $at), self::node($newProperties[$name], $at), $at, $depth + 1));
         }
+        $problems = array_merge($problems, $this->patternProperties($old, $new, $path, $depth));
 
         // Members the older node does not list: none when it lists its properties (the strict twin
         // closes such a node), anything when it lists none and leaves additionalProperties open.
@@ -392,6 +426,58 @@ final class SchemaWidening
         }
 
         return $problems;
+    }
+
+    /**
+     * An open map's keys, per regex. A map read through `x-known-keys` has become properties in
+     * {@see strictly()}, and is compared there.
+     *
+     * @param array<mixed, mixed> $old
+     * @param array<mixed, mixed> $new
+     *
+     * @return list<string>
+     */
+    private function patternProperties(array $old, array $new, string $path, int $depth): array
+    {
+        $problems = [];
+        $oldPatterns = self::map($old['patternProperties'] ?? [], $path);
+        $newPatterns = self::map($new['patternProperties'] ?? [], $path);
+        foreach ($oldPatterns as $regex => $schema) {
+            $at = $path.'/patternProperties/'.$regex;
+            if (!\array_key_exists($regex, $newPatterns)) {
+                $problems[] = $at.': pattern property removed or its regex changed';
+
+                continue;
+            }
+            $problems = array_merge($problems, $this->compare(self::node($schema, $at), self::node($newPatterns[$regex], $at), $at, $depth + 1));
+        }
+        foreach (array_diff_key($newPatterns, $oldPatterns) as $regex => $schema) {
+            $at = $path.'/patternProperties/'.$regex;
+            if (($old['additionalProperties'] ?? true) !== false) {
+                // The older node's other keys, whatever they were, now have to match its schema.
+                $problems[] = $at.': a pattern property added where the older node left other keys open';
+
+                continue;
+            }
+            // A literal regex holds no metacharacter between its anchors.
+            $literal = preg_match('/^\^([^\\\\.^$|?*+()\[\]{}]+)\$$/', (string) $regex, $match) === 1 ? $match[1] : null;
+            foreach ($oldPatterns as $oldRegex => $oldSchema) {
+                if ($literal !== null && !self::matches((string) $oldRegex, $literal)) {
+                    continue;
+                }
+                foreach ($this->compare(self::node($oldSchema, $at), self::node($schema, $at), $at, $depth + 1) as $problem) {
+                    $problems[] = $problem.' (a key '.$oldRegex.' admits may also match the added regex)';
+                }
+            }
+        }
+
+        return $problems;
+    }
+
+    /** Whether a schema regex matches a key, delimited as justinrainbow/json-schema delimits it. */
+    private static function matches(string $regex, string $key): bool
+    {
+        return preg_match('~'.str_replace('~', '\\~', $regex).'~u', $key) === 1;
     }
 
     /**
@@ -466,6 +552,99 @@ final class SchemaWidening
     }
 
     /**
+     * The relations: an `allOf` entry the newer node adds or changes, unless the older node holds the
+     * same entry; a `not` that differs; `uniqueItems` turned on; a raised `minProperties`; a
+     * `multipleOf` added or changed.
+     *
+     * @param array<mixed, mixed> $old
+     * @param array<mixed, mixed> $new
+     *
+     * @return list<string>
+     */
+    private function relations(array $old, array $new, string $path): array
+    {
+        $problems = [];
+        $oldEntries = self::node($old['allOf'] ?? [], $path.'/allOf');
+        foreach (self::node($new['allOf'] ?? [], $path.'/allOf') as $i => $entry) {
+            $held = array_filter($oldEntries, fn ($was): bool => $this->identical($was, $entry, []));
+            if ($held === []) {
+                $problems[] = $path.'/allOf/'.$i.': a relation the older schema did not hold';
+            }
+        }
+        $oldNot = $old[self::OLD_NOT] ?? ($old['not'] ?? null);
+        if (\array_key_exists('not', $new) && !$this->identical($oldNot, $new['not'], [])) {
+            $problems[] = $path.': not '.self::show($new['not']).' where the older schema had '.self::show($oldNot);
+        }
+        if (($new['uniqueItems'] ?? false) === true && ($old['uniqueItems'] ?? false) !== true) {
+            $problems[] = $path.': uniqueItems turned on';
+        }
+        if (isset($new['minProperties']) && self::number($new['minProperties'], $path) > self::number($old['minProperties'] ?? 0, $path)) {
+            $problems[] = $path.': minProperties raised to '.self::show($new['minProperties']);
+        }
+        if (isset($new['multipleOf']) && (!isset($old['multipleOf']) || (float) self::number($new['multipleOf'], $path) !== (float) self::number($old['multipleOf'], $path))) {
+            $problems[] = $path.': multipleOf '.self::show($new['multipleOf']).' where the older schema had '.self::show($old['multipleOf'] ?? null);
+        }
+
+        return $problems;
+    }
+
+    /**
+     * Whether two nodes are the same text, every `$ref` in them naming a definition that is the same
+     * in both roots, each followed once.
+     *
+     * @param mixed               $old
+     * @param mixed               $new
+     * @param array<string, true> $seen
+     */
+    private function identical($old, $new, array $seen): bool
+    {
+        if ($old !== $new) {
+            return false;
+        }
+        foreach (array_keys(self::refsOf($old)) as $reference) {
+            if (isset($seen[$reference])) {
+                continue;
+            }
+            $seen[$reference] = true;
+            try {
+                $before = $this->resolve(['$ref' => $reference], $this->oldRoot);
+                $after = $this->resolve(['$ref' => $reference], $this->newRoot);
+            } catch (\UnexpectedValueException $e) {
+                return false;
+            }
+            if (!$this->identical($before, $after, $seen)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Every `$ref` a node holds, at any depth.
+     *
+     * @param mixed $node
+     *
+     * @return array<string, true>
+     */
+    private static function refsOf($node): array
+    {
+        if (!\is_array($node)) {
+            return [];
+        }
+        $references = [];
+        foreach ($node as $key => $value) {
+            if ($key === '$ref' && \is_string($value)) {
+                $references[$value] = true;
+            } else {
+                $references += self::refsOf($value);
+            }
+        }
+
+        return $references;
+    }
+
+    /**
      * Keywords of the newer node this check cannot compare, unless the older node says the same.
      *
      * @param array<mixed, mixed> $old
@@ -517,7 +696,7 @@ final class SchemaWidening
 
             return false;
         }
-        if ($this->uncompared([], $node, '') !== [] || \is_array($value)) {
+        if ($this->uncompared([], $node, '') !== [] || array_intersect_key($node, array_flip(self::VALUE_RELATIONS)) !== [] || \is_array($value)) {
             return false;
         }
 

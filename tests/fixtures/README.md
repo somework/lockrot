@@ -62,6 +62,10 @@ comment rather than editing the recorded fixture files by hand.
   About 1.1 MB in all. A version is added, never re-recorded or edited: a document here that stops
   validating against the current schemas is a compatibility break to raise, not a fixture to
   refresh.
+- `schema-widening/` — two hand-written schemas for `SchemaWideningTest`'s relation changes: the
+  relation keywords of a `-2` report (`allOf` groups, `not`, `uniqueItems`, `minProperties`,
+  `multipleOf`, an open set, an `x-known-keys` map and an `x-rendered-from` string) and a closed map
+  keyed by package name with no `x-known-keys`, as a `-2` baseline holds its findings.
 - `big-summary.json`, `phar-summary.json`, `skeletons-summary.json`, `summary.json`,
   `top500.json`, `liveness.py`, `pre8.py` — research artefacts kept for provenance. No test reads
   them.

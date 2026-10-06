@@ -1,0 +1,83 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "The relation keywords of a -2 report schema, in miniature (SchemaWideningTest)",
+  "type": "object",
+  "required": ["run", "findings", "notes"],
+  "properties": {
+    "run": {"$ref": "#/definitions/run"},
+    "findings": {"type": "array", "items": {"$ref": "#/definitions/finding"}},
+    "notes": {
+      "description": "The run notes' text.",
+      "type": "array",
+      "items": {"description": "Prose; key on the fields it is rendered from.", "type": "string", "x-rendered-from": ["note_details[].data"]}
+    }
+  },
+  "definitions": {
+    "verdict": {"enum": ["critical", "high", "low", "unknown", "ok"]},
+    "priority": {"enum": ["critical", "high", "low", "none"]},
+    "finding": {
+      "type": "object",
+      "required": ["verdict", "priority", "score", "next_step", "flags", "chain", "facts", "age", "libyears", "lead", "dev", "security"],
+      "properties": {
+        "verdict": {"$ref": "#/definitions/verdict"},
+        "priority": {"$ref": "#/definitions/priority"},
+        "score": {
+          "oneOf": [
+            {"type": "object", "required": ["terms"], "properties": {"terms": {"type": "array", "items": {"type": "integer"}}}},
+            {"type": "object", "not": {"required": ["terms"]}}
+          ]
+        },
+        "next_step": {"oneOf": [{"$ref": "#/definitions/move"}, {"type": "null"}]},
+        "flags": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "chain": {"type": "array", "items": {"type": "string"}},
+        "facts": {"type": "object", "minProperties": 1},
+        "age": {"type": "number", "minimum": 0},
+        "libyears": {"type": "number", "minimum": 0, "multipleOf": 0.5},
+        "lead": {"description": "The first counted flag; null when none counts.", "oneOf": [{"type": "string"}, {"type": "null"}]},
+        "dev": {"type": "boolean"},
+        "security": {"type": "object", "not": {"required": ["fix"]}}
+      },
+      "allOf": [
+        {
+          "description": "The verdict, its priority, the score's shape and next_step agree.",
+          "anyOf": [
+            {"properties": {"verdict": {"enum": ["critical"]}, "priority": {"enum": ["critical"]}, "score": {"required": ["terms"]}, "next_step": {"type": "object"}}},
+            {"properties": {"verdict": {"enum": ["high"]}, "priority": {"enum": ["high"]}, "score": {"required": ["terms"]}, "next_step": {"type": "object"}}},
+            {"properties": {"verdict": {"enum": ["low"]}, "priority": {"enum": ["low"]}, "score": {"required": ["terms"]}, "next_step": {"type": "object"}}},
+            {"properties": {"verdict": {"enum": ["unknown", "ok"]}, "priority": {"enum": ["none"]}, "score": {"not": {"required": ["terms"]}}, "next_step": {"type": "null"}}}
+          ]
+        },
+        {
+          "description": "A dev package is never critical.",
+          "anyOf": [
+            {"properties": {"dev": {"enum": [false]}}},
+            {"properties": {"priority": {"enum": ["high", "low", "none"]}}}
+          ]
+        }
+      ]
+    },
+    "move": {
+      "type": "object",
+      "required": ["kind"],
+      "properties": {
+        "kind": {"description": "The move; an open set.", "type": "string", "pattern": "^[a-z][a-z0-9-]*$", "x-known-values": ["replace", "tag", "update", "no-move"]}
+      }
+    },
+    "run": {
+      "type": "object",
+      "required": ["score_rules_used"],
+      "properties": {
+        "score_rules_used": {
+          "description": "Rule id to the number of findings the rule decided.",
+          "type": "object",
+          "additionalProperties": false,
+          "patternProperties": {
+            "^sort$": {"description": "sort orders, it changes no number.", "type": "null"},
+            "^(([a-rt-z][a-z0-9]*|s([a-np-z0-9][a-z0-9]*)?|so([a-qs-z0-9][a-z0-9]*)?|sor([a-su-z0-9][a-z0-9]*)?|sort[a-z0-9]+)(-[a-z0-9]+)*|sort(-[a-z0-9]+)+)$": {"type": "integer", "minimum": 0}
+          },
+          "x-known-keys": ["counted", "lead-first", "sum", "band-floors", "sort"]
+        }
+      }
+    }
+  }
+}

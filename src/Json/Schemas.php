@@ -24,7 +24,8 @@ namespace Lockrot\Json;
  * `run.fail_on_kind`, `gate.tripped_by`, a finding's `gate.exempt_by`, and the config schema's
  * `format` are strings with a `pattern` and an `x-known-values` list of what this
  * release writes ({@see KnownValues}), and the report types a signal whose id it does not list with
- * a generic branch that takes any object as its data. A copy fetched from 0.13.0 on accepts a value
+ * a generic branch that takes any object as its data. An open set of integers is an `integer` with an
+ * `x-known-values` list of integers and no pattern. A copy fetched from 0.13.0 on accepts a value
  * a later release adds; the closed sets — verdicts, priorities, levels, standings, a baseline
  * entry's verdict, the schema number — stay enums (docs/compatibility.md, "Open sets").
  *
