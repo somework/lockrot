@@ -24,7 +24,6 @@ final class ComposerCacheAdapterTest extends TestCase
         $this->dirs = [];
     }
 
-    /** A cache directory of this test's own, removed in tearDown whether or not the assertions passed. */
     private function cacheDir(): string
     {
         $dir = sys_get_temp_dir().'/lockrot-ccache-'.bin2hex(random_bytes(8)).'/';
@@ -73,7 +72,7 @@ final class ComposerCacheAdapterTest extends TestCase
     {
         $cache = new Cache(new NullIO(), '/dev/null/nope');
         $adapter = new ComposerCacheAdapter($cache);
-        $adapter->set('k', new HttpResult('k', 200, 'x', new \DateTimeImmutable()));
+        $adapter->set('k', new HttpResult('k', 200, 'x', new \DateTimeImmutable('2026-09-14T00:00:00+00:00')));
         self::assertNull($adapter->get('k'));
     }
 }
