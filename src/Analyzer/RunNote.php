@@ -11,10 +11,9 @@ use Lockrot\Data\Repository\RepositoryUrl;
 use Lockrot\Signal\Rule\NotCheckedRule;
 
 /**
- * One thing a run could not see, as a code with typed facts and the sentence the report prints for
- * it. Each code has one named constructor, which derives the sentence from the facts, so the text a
- * format prints and the `data` the JSON document carries cannot disagree; whether the note counts
- * towards `network_failures` (what `--strict-network` fails on) is decided here too, once.
+ * Each code has one named constructor, which derives the sentence from the facts, so the text and
+ * the `data` cannot disagree. The same constructor decides whether the note sets
+ * `network_failures`. Docs: docs/notes.md.
  *
  * @internal
  */
@@ -33,8 +32,9 @@ final class RunNote
     public const REPOSITORY_ACTIVITY_NOT_FOUND = 'repository_activity_not_found';
     public const NOT_FROM_COMPOSER_REPOSITORY = 'not_from_composer_repository';
     /**
-     * The codes lockrot writes, in the order the analyzer's passes run: a run writes each forge's
-     * activity notes together, so two forges' codes interleave. What the schemas list in `x-known-values`.
+     * The codes lockrot writes, in the order of the analyzer's passes, as the schemas list them in
+     * `x-known-values`. A run writes the activity notes of one repository host together, so the
+     * codes of two hosts interleave.
      */
     public const CODES = [
         self::OFFLINE,
@@ -51,19 +51,19 @@ final class RunNote
         self::NOT_FROM_COMPOSER_REPOSITORY,
     ];
 
-    /** Every code's section on the site: the page lives at the code's own id, never moved without a stub. */
+    /** Each code has a section on the site at its own id. Never move one without a stub. */
     public const DOCS_URL = 'https://lockrot.dev/notes/#';
 
     public const ADVISORIES_OFFLINE = 'offline';
     public const ADVISORIES_COMPOSER_TOO_OLD = 'composer_too_old';
     public const INSTALL_TIME_BUDGET = 'install_time_budget';
     public const ADVISORIES_NOT_CHECKED_REASONS = [self::ADVISORIES_OFFLINE, self::ADVISORIES_COMPOSER_TOO_OLD, self::INSTALL_TIME_BUDGET];
-    /** S10's own reason for the same gap: the findings the note concerns carry it word for word. */
+    /** The same reason strings as S10 carries on the findings that the note concerns. */
     public const REPOSITORY_ACTIVITY_NOT_CHECKED_REASONS = [NotCheckedRule::BUDGET];
 
     /**
-     * Each says what the missing check costs: without S9 a finding no fix would come for sits one
-     * priority step lower than an online run would put it, and `--fail-on` decides on that.
+     * Each text states the cost of the missing check: a priority that S9 raises stays one
+     * step lower, and `--fail-on` decides on it.
      */
     private const ADVISORIES_NOT_CHECKED_TEXT = [
         self::ADVISORIES_OFFLINE => 'offline: security advisories not checked; a priority they would raise stays one step lower',
@@ -106,8 +106,7 @@ final class RunNote
     }
 
     /**
-     * One count per distinct message, in the order the packages are listed; a single message reads
-     * without its count, as "Repository metadata unavailable for N packages: <message>".
+     * One count per distinct message, in package order. A single message has no count.
      *
      * @param array<string, string> $failed package name => the message {@see \Lockrot\Data\Repository\MetadataBatch::failed()} gives
      */
@@ -152,9 +151,9 @@ final class RunNote
 
     /**
      * One line of the message, or the class when there is none: Composer's message for a partial
-     * record runs to a `var_export()` dump of it. Only a repository that could not be reached is a
-     * network failure; one that answered with something unreadable is not. The repository's name is
-     * Composer's, whose URL keeps a token in the user slot, a login and a `?token=` on 2.4 to 2.9.
+     * record runs to a `var_export()` dump of it. Only an unreachable repository is a network
+     * failure, not one that answered with something unreadable. {@see RepositoryUrl::inText()}
+     * hides the token, login and `?token=` that the repository URL keeps on Composer 2.4 to 2.9.
      */
     public static function advisoriesUnavailable(string $composerRepository, \Throwable $e): self
     {
@@ -205,8 +204,8 @@ final class RunNote
     }
 
     /**
-     * Every repository on the forge that got no answer, on any of its hosts, rate-limited or not: the
-     * sentence says only that the forge rate-limited, the data says what happened to each.
+     * The data lists each repository of the repository host that got no answer, whatever its
+     * domain and cause. The sentence says only that the host rate-limited.
      *
      * @param list<array{0: RepoRef, 1: string}> $failed each repository and its message
      */
@@ -240,8 +239,8 @@ final class RunNote
     }
 
     /**
-     * A 404 is an answer, not a failure — but a private repository looks exactly like a healthy one
-     * without this note, and nothing else in the report names it.
+     * A 404 is an answer, not a failure, but without this note a private repository looks like a
+     * healthy one.
      *
      * @param list<RepoRef> $repositories
      */
@@ -309,8 +308,8 @@ final class RunNote
     }
 
     /**
-     * The document's `note_details` entry. `data` is an object even when empty: PHP's `[]` would
-     * encode as a JSON list.
+     * The document's `note_details` entry. `data` is an object even when empty: PHP's `[]`
+     * encodes as a JSON list.
      *
      * @return array{code: string, text: string, docs_url: ?string, sets_network_failures: bool, data: \stdClass}
      */

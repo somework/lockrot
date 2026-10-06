@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Analyzer;
 
 /**
- * One package's libyears as {@see Libyears::measure()} decided them: the years, or the reason there
- * are none, never both and never neither. The finding keeps this object, so the number it prints and
- * the key the report counts it under come from the one branch that decided them.
+ * The years, or the reason there are none: never both and never neither.
  *
  * @internal
  */
