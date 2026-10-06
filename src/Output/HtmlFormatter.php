@@ -14,10 +14,10 @@ use Lockrot\Verdict\Verdict;
  * The report as one self-contained page: docs/ci.md#-formathtml.
  *
  * The page is built in https://github.com/somework/lockrot-report and vendored as
- * resources/report/report.html, which tools/report/update-renderer updates. A test checks the file
- * against its manifest ({@see \Lockrot\Tests\Unit\Output\RendererManifestTest}). Its script and
- * stylesheet are inline and pinned by its Content-Security-Policy, so this class only fills three
- * placeholders.
+ * resources/report/report.html. tools/report/update-renderer checks its build provenance before it
+ * updates the file, and {@see \Lockrot\Tests\Unit\Output\RendererManifestTest} checks the file
+ * against its manifest. The page's Content-Security-Policy pins its inline script and stylesheet,
+ * so this class fills only three placeholders and must add nothing that can run.
  *
  * @internal
  */

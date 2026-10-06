@@ -11,7 +11,7 @@ final class RecordedHttpClient implements HttpClientInterface
 
     public function __construct(string $dir)
     {
-        // Kept as given: pathFor() is the only reader and trims the trailing separator itself.
+        // Kept as given: pathFor() trims the trailing separator.
         $this->dir = $dir;
     }
 

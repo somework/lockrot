@@ -41,8 +41,8 @@ final class PinnedRule implements SignalRule
     }
 
     /**
-     * The S6 data (docs/verdicts.md#what-s6-carries). Without metadata every release fact is null:
-     * `has_stable_release: false` claims that the package never released.
+     * The S6 data (docs/verdicts.md#what-s6-carries). Without metadata every release fact is null,
+     * never `has_stable_release: false`, which claims that the package never released.
      *
      * @return array<string, mixed>
      */

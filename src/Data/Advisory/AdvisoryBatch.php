@@ -15,7 +15,7 @@ final class AdvisoryBatch
     private array $notes;
 
     /**
-     * @param array<string, list<Advisory>> $byName package name => the advisories affecting its installed version
+     * @param array<string, list<Advisory>> $byName package name => the advisories that affect its installed version
      * @param list<RunNote>                 $notes  why the answer is incomplete
      */
     public function __construct(array $byName, array $notes = [])

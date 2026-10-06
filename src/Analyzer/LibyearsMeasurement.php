@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace Lockrot\Analyzer;
 
 /**
- * The years, or the reason there are none: never both and never neither.
+ * The years, or the reason there are none: never both and never neither. The finding keeps this
+ * object, so the number that it prints and the key that the report counts come from one decision.
  *
  * @internal
  */
@@ -35,13 +36,13 @@ final class LibyearsMeasurement
         return new self(null, $reason);
     }
 
-    /** Unrounded; null when not measured. */
+    /** Unrounded, null when not measured. */
     public function years(): ?float
     {
         return $this->years;
     }
 
-    /** One of {@see Libyears::REASONS}; null when measured, zero included. */
+    /** One of {@see Libyears::REASONS}, null when measured, zero included. */
     public function unmeasuredReason(): ?string
     {
         return $this->unmeasured;

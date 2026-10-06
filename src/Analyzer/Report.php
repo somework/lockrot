@@ -25,7 +25,7 @@ final class Report
     private int $notFromComposerRepository;
     /** Null when the project has no baseline file. */
     private ?BaselineComparison $baseline;
-    /** Null when the report was not told what the run was asked to do, which is only ever a test. */
+    /** Null when the report was not told what the run was asked to do. */
     private ?RunSettings $run = null;
     /**
      * Fetch time of the oldest repository-activity answer from lockrot's cache, null when every
@@ -171,7 +171,7 @@ final class Report
                 $counts[$parent] = ($counts[$parent] ?? 0) + 1;
             }
         }
-        // Count descending, then name ascending by strcmp, the byte order that chainsTo() sorts by.
+        // Ties sort by strcmp, the byte order that chainsTo() sorts by.
         uksort($counts, static function (string $a, string $b) use ($counts): int {
             return $counts[$b] <=> $counts[$a] ?: strcmp($a, $b);
         });
@@ -243,8 +243,7 @@ final class Report
 
     /**
      * Decided on every call, over the findings, the baseline comparison and the network failures,
-     * so it cannot go stale when a baseline is attached. Null without a run or without a fail-on,
-     * which only a test does.
+     * so it cannot go stale when a baseline is attached. Null without a run or without a fail-on.
      */
     public function gate(): ?Gate
     {
@@ -302,10 +301,11 @@ final class Report
     }
 
     /**
-     * The footer's data sources: the plain pair when every answer was fetched in this run, else
-     * the age of the oldest cached activity answer in whole hours, rounded up and never below one.
-     * A minutes-old answer and a clock that runs backwards both read as one hour. The age passes 24
-     * after a failed refetch or under `--offline`. The table and markdown footers share it.
+     * The footer's data sources. When every answer was fetched in this run, it is the plain pair.
+     * Else it gives the age of the oldest cached activity answer in whole hours, rounded up and
+     * never below one. A minutes-old answer and a clock that runs backwards both read as one hour.
+     * The age passes {@see \Lockrot\Data\Forge\ActivityClient::CACHE_TTL} after a failed refetch or
+     * under `--offline`. The table and markdown footers share it.
      */
     public function dataSourcesClause(): string
     {
@@ -333,7 +333,7 @@ final class Report
     }
 
     /**
-     * The four flagged levels. `none` is omitted: it counts the unflagged rows, which
+     * The four flagged priorities. `none` is omitted: it counts the unflagged rows, which
      * {@see summaryLine()} totals.
      */
     public function prioritySummaryLine(): string

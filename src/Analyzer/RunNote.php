@@ -32,9 +32,8 @@ final class RunNote
     public const REPOSITORY_ACTIVITY_NOT_FOUND = 'repository_activity_not_found';
     public const NOT_FROM_COMPOSER_REPOSITORY = 'not_from_composer_repository';
     /**
-     * The codes lockrot writes, in the order of the analyzer's passes, as the schemas list them in
-     * `x-known-values`. A run writes the activity notes of one repository host together, so the
-     * codes of two hosts interleave.
+     * The codes lockrot writes, as the schemas list them in `x-known-values`, in the order of the
+     * analyzer's passes. The codes of two repository hosts interleave.
      */
     public const CODES = [
         self::OFFLINE,
@@ -152,8 +151,8 @@ final class RunNote
     /**
      * One line of the message, or the class when there is none: Composer's message for a partial
      * record runs to a `var_export()` dump of it. Only an unreachable repository is a network
-     * failure, not one that answered with something unreadable. {@see RepositoryUrl::inText()}
-     * hides the token, login and `?token=` that the repository URL keeps on Composer 2.4 to 2.9.
+     * failure, not one that answered with something unreadable. Composer's repository URL can keep
+     * a token, a login and a `?token=` on Composer 2.4 to 2.9: {@see RepositoryUrl::inText()}.
      */
     public static function advisoriesUnavailable(string $composerRepository, \Throwable $e): self
     {
@@ -188,7 +187,7 @@ final class RunNote
         return self::of(self::REPOSITORY_ACTIVITY_NOT_CHECKED, 'repository activity not checked: install-time budget exhausted', false, ['reason' => NotCheckedRule::BUDGET]);
     }
 
-    /** The text counts both kinds of skipped package together; the data keeps them apart, as S10's two reasons do. */
+    /** The text counts both kinds of skipped package together. The data keeps them apart, as the two S10 reasons do. */
     public static function repositoryActivityAnonymousCap(string $forge, int $checked, int $skippedNoToken, int $skippedBudget): self
     {
         if (!isset(self::ANONYMOUS_CAP_TEXT[$forge])) {
@@ -220,7 +219,7 @@ final class RunNote
     }
 
     /**
-     * The sentence names the first message; the data keeps every one.
+     * The sentence names the first message, and the data keeps every one.
      *
      * @param list<array{0: RepoRef, 1: string}> $failed each repository and its message
      */
@@ -285,7 +284,7 @@ final class RunNote
         return $this->code;
     }
 
-    /** The sentence every format prints; prose, not contract. */
+    /** The sentence that every format prints: prose, not contract. */
     public function text(): string
     {
         return $this->text;

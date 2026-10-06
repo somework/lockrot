@@ -11,9 +11,9 @@ use Lockrot\Signal\SignalRule;
 
 /**
  * S10: a check that this package's verdict rests on did not run, and what it could not decide
- * (docs/verdicts.md#what-was-not-checked). The signal never decides a verdict. It does not skip an
- * allowlisted package or one that the repository marks abandoned:
- * {@see \Lockrot\Analyzer\Analyzer} leaves it off those.
+ * (docs/verdicts.md#what-was-not-checked). The signal never decides a verdict.
+ * {@see \Lockrot\Analyzer\Analyzer}, not this rule, keeps S10 off an allowlisted package and off
+ * one that the repository marks abandoned.
  *
  * @internal
  */
@@ -27,7 +27,7 @@ final class NotCheckedRule implements SignalRule
     public const FETCH_FAILED = 'fetch_failed';
     public const OFFLINE = 'offline';
 
-    /** Short enough for the evidence line a flagged row prints; the reason key carries the rest. */
+    /** Short enough for the evidence line of a flagged row. The reason key carries the rest. */
     private const ACTIVITY_WORDS = [
         self::NO_TOKEN => 'no token for the repository host',
         self::RATE_BUDGET => 'the anonymous request budget was spent',

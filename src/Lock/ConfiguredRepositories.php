@@ -22,10 +22,7 @@ final class ConfiguredRepositories
 {
     private const VCS_TYPES = ['vcs', 'git', 'github', 'gitlab', 'bitbucket', 'git-bitbucket', 'hg', 'svn', 'fossil', 'perforce'];
 
-    /**
-     * Every type that Composer 2.2 to 2.10 builds a root repository of. A plugin's types exist only
-     * after the root repositories.
-     */
+    /** Root repository types of Composer 2.2 to 2.10. A plugin's types exist only after the root repositories. */
     private const TYPES = ['vcs', 'git', 'github', 'gitlab', 'bitbucket', 'git-bitbucket', 'hg', 'svn', 'fossil', 'perforce', 'composer', 'package', 'artifact', 'path'];
 
     /** @var list<array{type: string, url: string, only: ?string, exclude: ?string, canonical: bool, packages: list<Definition>}> */
@@ -72,9 +69,9 @@ final class ConfiguredRepositories
     }
 
     /**
-     * The kind of the first listed repository that served the entry, walking them as Composer does.
-     * The result is `unknown` when an earlier repository could have served the name without leaving
-     * a trace. The result is null when none did and the entry has no path dist.
+     * The kind of the first listed repository that served the entry, in the order that Composer
+     * walks them. The result is `unknown` when an earlier repository could have served the name and
+     * left no trace. The result is null when none did and the entry has no path dist.
      */
     public function kindServing(string $name, string $version, OriginFacts $facts): ?string
     {
@@ -279,10 +276,7 @@ final class ConfiguredRepositories
         return strpbrk($configured, '~$') === false && self::localKey($configured) === self::localKey($source);
     }
 
-    /**
-     * The host without its port, and the path: one key for a repository over https and ssh alike.
-     * Null for a local path.
-     */
+    /** Host without port, and path: one key over https and ssh alike. Null for a local path. */
     private static function remoteKey(string $url): ?string
     {
         $parts = preg_match('{^[A-Za-z]:[\\\\/]}', $url) === 1 ? null : RepoLocator::hostAndPath($url);
@@ -300,10 +294,7 @@ final class ConfiguredRepositories
         return (string) preg_replace('{/\.git$}', '', rtrim(str_replace('\\', '/', $path), '/'));
     }
 
-    /**
-     * Whether a local dist file lies inside the directory. Null where the directory names `~` or a
-     * variable, which lockrot does not expand.
-     */
+    /** Whether a local dist file lies inside the directory. Null for a `~` or a variable, which lockrot does not expand. */
     private static function inside(string $directory, ?string $file): ?bool
     {
         if (strpbrk($directory, '~$') !== false) {

@@ -59,7 +59,7 @@ final class Path
      * compare equal, on a case-sensitive filesystem or with a Unix backslash. That only errs on the
      * side of refusing. A missing directory is folded by spelling first, as Windows does
      * (`missing\..\lockrot-baseline.json` is the baseline there). The file itself is not resolved:
-     * the write replaces a symlink at the target.
+     * the write replaces a symlink at the target. {@see sameFile()} answers what is on disk.
      */
     public static function canonical(string $absolute): string
     {

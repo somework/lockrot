@@ -11,8 +11,8 @@ use Lockrot\Html\PageData;
 final class Formatters
 {
     /**
-     * Whether $format's text needs {@see ConsoleMarkup::render()} before anyone reads it. Every
-     * other format is written as it is, so a `<` in a package name reaches the parser untouched.
+     * Whether $format's text needs {@see ConsoleMarkup::render()} before anyone reads it. A format
+     * that does not is written as it is, so a `<` in a package name reaches the parser untouched.
      */
     public static function carriesConsoleMarkup(string $format): bool
     {

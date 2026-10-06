@@ -17,10 +17,13 @@ use Lockrot\Exception\ConfigException;
  */
 final class ReleaseDescription
 {
-    /** The floor of a release without a description: `build/phar/composer.json` pins it. */
+    /**
+     * The floor of every release before {@see ReleaseLocator::FIRST_DESCRIBED_VERSION}, which has no
+     * description. Those archives were built for PHP 7.4.0: never change it with the PHAR build.
+     */
     public const UNDESCRIBED_PHP_FLOOR = '7.4.0';
 
-    /** The value is printed, so lockrot reads only digits: a terminal can act on nothing else. */
+    /** Only `major.minor.patch` in digits: the value is printed, so it must carry nothing that a terminal acts on. */
     public const PHP_FLOOR_PATTERN = '/^\d+\.\d+\.\d+$/D';
 
     private ?string $phpFloor;
@@ -39,8 +42,8 @@ final class ReleaseDescription
 
     /**
      * Reads only `{"php": "<major.minor.patch>", "selfupdate-key": "sha256:<64 hex>"}` and ignores
-     * other members. Any other document is an error naming $url: a description that cannot be read
-     * cannot say the release is fit to try. A `php` string in another spelling is no floor.
+     * other members. Any other document is an error that names $url: a description that cannot be
+     * read cannot say the release is fit to try. A `php` string in another spelling is no floor.
      *
      * @throws ConfigException
      */

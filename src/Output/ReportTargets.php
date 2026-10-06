@@ -130,7 +130,7 @@ final class ReportTargets
     }
 
     /**
-     * Writes every file in the order given, calling $onWritten after each one. Each file is what
+     * Writes every file in the order given and calls $onWritten after each one. Each file is what
      * `--format=<its format>` prints, except that console markup renders the way a redirected
      * stdout renders it ({@see ConsoleMarkup::render()}).
      *

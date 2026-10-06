@@ -9,9 +9,9 @@ use Lockrot\Lock\LockedPackage;
 
 /**
  * Which date lockrot reads as the installed version's release date. The lock's `time` is a
- * release's only where the repository dated the version by a release: a branch snapshot carries
- * its commit's date, and a subtree split's tag carries the date of a commit that its other tags
- * share. See docs/verdicts.md#dates-from-the-monorepo.
+ * release date only where the repository dated the version by a release. A branch snapshot
+ * carries its commit's date. A subtree split's tag carries the date of a commit that its other
+ * tags share. See docs/verdicts.md#dates-from-the-monorepo.
  *
  * Every surface that prints or measures the installed version's date reads this one object, so
  * the same date is never a release in one line and a commit in the next.

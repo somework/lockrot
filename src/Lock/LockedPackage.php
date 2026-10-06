@@ -137,7 +137,6 @@ final class LockedPackage
         return $this->origin;
     }
 
-    /** A copy whose origin comes from the manifest's repositories. */
     public function withRepositories(ConfiguredRepositories $repositories): self
     {
         $copy = clone $this;

@@ -47,7 +47,7 @@ final class Analyzer
     private Clock $clock;
     private bool $offline;
     private Deadline $deadline;
-    /** Null when the run has no advisory source at all; then nothing is asked and nothing is noted. */
+    /** Null when the run has no advisory source. Then the run asks nothing and notes nothing. */
     private ?AdvisoryLoaderInterface $advisories;
     private MonorepoParents $parents;
 
@@ -142,9 +142,9 @@ final class Analyzer
         $activityBatch = ActivityBatch::empty();
         if ($this->deadline->isPast()) {
             // The metadata pass used the whole budget. Requests to the repository hosts will push
-            // the install past it, so the activity signals are dropped and a run note says so: the
-            // report must not read as "checked, nothing found". Planning waits too: it can exchange
-            // Bitbucket credentials over the network ({@see ForgeAuth}).
+            // the install past it. So the run drops the activity signals, and a run note says so:
+            // the report must not read as "checked, nothing found". Planning waits too: it can
+            // exchange Bitbucket credentials over the network ({@see \Lockrot\Data\Forge\ForgeAuth}).
             $activityNotes = [RunNote::repositoryActivityNotChecked()];
             $plan = null;
         } else {

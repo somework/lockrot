@@ -110,7 +110,7 @@ final class UnknownKeys
         return strpos($key, self::RESERVED_PREFIX) === 0;
     }
 
-    /** $key is the project's text and is escaped here; $parent arrives escaped. */
+    /** $key is the project's text and is escaped here. $parent arrives escaped. */
     private static function message(string $parent, string $key, ?string $nearest): string
     {
         $message = 'unknown key '.$parent.TerminalText::escape($key, self::LONGEST_KEY).' ignored';
@@ -127,8 +127,6 @@ final class UnknownKeys
      */
     private static function nearest(string $key, array $known): ?string
     {
-        // PHP 7.4's levenshtein() warns and returns -1 past 255 bytes, and no key that long is near
-        // a known one.
         if (\strlen($key) > self::LONGEST_KEY) {
             return null;
         }

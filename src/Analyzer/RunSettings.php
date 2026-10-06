@@ -49,7 +49,7 @@ final class RunSettings
         $this->mode = $mode;
     }
 
-    /** Null only where nothing told the run, which is only ever a test. */
+    /** Null only where nothing told the run. */
     public function failOn(): ?FailOn
     {
         return $this->failOn;

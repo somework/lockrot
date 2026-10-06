@@ -10,7 +10,8 @@ use Lockrot\Exception\ConfigException;
  * Maps a package name to the 1-based line of its `"name"` member in the text of the lock, for the
  * formats that annotate a line. The scan reads text, because a decoded structure has no lines. It
  * accepts a `"name"` member only at depth 3 inside `packages` or `packages-dev`, because `authors[]`
- * and `extra.thanks.name` hold other names. A lock with no line breaks yields no lines, and the
+ * and `extra.thanks.name` hold other names. The depth does not depend on indentation, so a
+ * reformatted lock still resolves. A lock with no line breaks yields no lines, and the
  * formats then omit the line number.
  *
  * @internal
@@ -46,7 +47,6 @@ final class LockLineIndex
         return self::fromString($contents);
     }
 
-    /** Top-level keys whose array elements are package entries. */
     private const PACKAGE_SECTIONS = ['packages', 'packages-dev'];
 
     /** The nesting depth of a package entry's own members: root object > section array > entry. */

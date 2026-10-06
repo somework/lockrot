@@ -8,8 +8,8 @@ use Lockrot\Exception\ConfigException;
 use Lockrot\Signal\Signal;
 
 /**
- * The accepted values: docs/configuration.md#fail-on-values. The verdict and priority vocabularies must
- * not overlap, because one option serves both. The priority level `none` is not a threshold.
+ * The accepted values: docs/configuration.md#fail-on-values. The verdict and priority vocabularies
+ * must not overlap, because one option serves both. The priority `none` is not a threshold.
  *
  * @internal
  */

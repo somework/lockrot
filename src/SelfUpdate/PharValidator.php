@@ -11,7 +11,9 @@ namespace Lockrot\SelfUpdate;
  * Composer skips the check when `phar.readonly` is On, which is the default. lockrot always runs
  * it, because opening an existing archive is a read that `phar.readonly` does not restrict. The
  * catch covers only `UnexpectedValueException`: `Phar::__construct()` does not declare
- * `PharException`, and PHPStan rejects that catch. Any other exception propagates.
+ * `PharException`, and PHPStan rejects that catch. Any other exception propagates, so an unknown
+ * fault is not reported as a damaged download. The copy can carry the alias that the running PHAR
+ * maps: PHP rejects a duplicate alias only when it registers one, not when it opens one.
  *
  * @internal
  */

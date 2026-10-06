@@ -84,7 +84,7 @@ final class Advisory
     /**
      * Null when the advisory gives no affected range.
      *
-     * @param string $normalized a normalized version, such as `3.4.47.0`
+     * @param string $normalized such as `3.4.47.0`
      */
     public function affects(string $normalized): ?bool
     {

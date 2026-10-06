@@ -8,11 +8,12 @@ use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 
 /**
  * The markup of lockrot's terminal formats (`<fg=red>`, `<options=bold>`, Composer's `<warning>`,
- * `\<` for a literal bracket) and its renderer, in place of Symfony's tag formatter. That formatter
- * cannot be trusted with text lockrot did not write: on the symfony/console 5.4 releases inside
- * Composer's PHARs, `<<fg=red>>` stays live and a `\<` loses its backslash, and 2.8 unescapes `\<`
- * but not `\>`. So {@see self::escape()} escapes every bracket and backslash, and the result is
- * written raw (OutputInterface::OUTPUT_RAW, IOInterface::writeErrorRaw()) on every console version.
+ * `\<` for a literal bracket) and its renderer, in place of Symfony's tag formatter. lockrot cannot
+ * trust that formatter with text that lockrot did not write. On the symfony/console 5.4 releases
+ * inside Composer's PHARs, `<<fg=red>>` stays live and a `\<` loses its backslash. 2.8 unescapes
+ * `\<` but not `\>`. So {@see self::escape()} escapes every bracket and backslash, and the result
+ * is written raw (OutputInterface::OUTPUT_RAW, IOInterface::writeErrorRaw()) on every console
+ * version.
  *
  * @internal
  */
@@ -40,7 +41,8 @@ final class ConsoleMarkup
 
     /**
      * Undoes each escape, drops each tag and, when $decorated, colours the text a style encloses.
-     * Styles nest, and the innermost one colours.
+     * Styles nest, and the innermost one colours. Do not use a regular expression here: a long run
+     * of `<b` exhausts PCRE's JIT and lets a style run past its closing tag.
      *
      * @throws \LogicException on markup lockrot does not write: an unknown style, a closing tag that
      *                         closes nothing or another style than the open one, a `<` with no `>`,

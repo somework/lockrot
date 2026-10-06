@@ -54,7 +54,7 @@ final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
             return AdvisoryBatch::unavailable(RunNote::advisoriesNotChecked(RunNote::ADVISORIES_COMPOSER_TOO_OLD, 0));
         }
 
-        /** @var array<string, array<string, Advisory>> $byName name => advisory id => advisory, so two repositories serving the same advisory count it once */
+        /** @var array<string, array<string, Advisory>> $byName name => advisory id => advisory, so an advisory that two repositories serve counts once */
         $byName = [];
         $whyUnreadable = $this->ignore->whyUnreadable();
         $notes = $whyUnreadable === null ? [] : [RunNote::advisoryIgnoreUnreadable($whyUnreadable)];
