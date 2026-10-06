@@ -67,7 +67,8 @@ final class InstallTimeSummaryTest extends TestCase
      * grandt/binstring 1.0.0 as it appears in the wallabag lock: last release 2015-08-13, and its
      * GitHub repository is recorded in tests/fixtures/http/github. Same `silent` verdict as
      * {@see self::PHPZIP}, and its name sorts *before* it — so the two rows can only be told apart
-     * by the priority, which is the point of the dev-flag test below.
+     * by the priority, which
+     * {@see self::testADevRequirementInTheTransactionIsRankedBelowAnEqualProdRequirement()} pins.
      */
     private const BINSTRING = [
         'name' => 'grandt/binstring',
@@ -157,8 +158,8 @@ final class InstallTimeSummaryTest extends TestCase
     }
 
     /**
-     * Temp project the summary reads through Factory::getComposerFile()/getLockFile(), i.e. relative
-     * to the working directory; tearDown() chdirs back.
+     * Temp project the summary reads through Factory::getComposerFile()/getLockFile(), relative
+     * to the working directory. tearDown() chdirs back.
      *
      * @param array<string, mixed>       $extraLockrot merged on top of target-php 8.4
      * @param list<array<string, mixed>> $lockPackages entries for composer.lock
@@ -213,8 +214,6 @@ final class InstallTimeSummaryTest extends TestCase
     }
 
     /**
-     * The two fields a lock entry has to carry to be turned into a root requirement.
-     *
      * @param array<string, mixed> $entry
      *
      * @return array{0: string, 1: string} name, version
@@ -316,15 +315,8 @@ final class InstallTimeSummaryTest extends TestCase
     }
 
     /**
-     * A Composer transaction carries no `require-dev` membership, so the packages it hands over are
-     * all prod until the lock is consulted. Both rows here are `silent` and both are root requires,
-     * which leaves the priority as the only thing that can order them: grandt/binstring is a dev
-     * requirement, so it drops `critical → high` and sits below phpzip/phpzip even though its name
-     * sorts first. Read the wrong way round, the dev row would come first on the name tie-break.
-     */
-    /**
-     * The manifest's `repositories` is read on every install now, for where each entry came from. A
-     * block lockrot cannot read, or one Composer itself would refuse, changes nothing the summary prints.
+     * The manifest's `repositories` is read on every install, for where each entry came from. A
+     * block lockrot cannot read, or one that Composer refuses, changes nothing the summary prints.
      */
     public function testARepositoriesBlockLockrotCannotReadChangesNothingAtInstallTime(): void
     {
@@ -357,6 +349,12 @@ final class InstallTimeSummaryTest extends TestCase
         self::assertSame($outputs[0], $outputs[2]);
     }
 
+    /**
+     * A Composer transaction carries no `require-dev` membership, so every package in it is prod
+     * until the lock is consulted. Both rows are `silent` root requires, so only the priority
+     * orders them: grandt/binstring is a dev requirement, so it drops a step and sits below
+     * phpzip/phpzip, although its name sorts first.
+     */
     public function testADevRequirementInTheTransactionIsRankedBelowAnEqualProdRequirement(): void
     {
         $this->projectWithDevRequire(self::PHPZIP, self::BINSTRING);
@@ -387,7 +385,7 @@ final class InstallTimeSummaryTest extends TestCase
 
     /**
      * A package whose metadata was never fetched is `unknown`, which is below the flagged threshold.
-     * Silence would read as a clean install, so the summary says what could not be checked instead.
+     * Silence reads as a clean install, so the summary says what could not be checked instead.
      */
     public function testAnExhaustedBudgetPrintsWhatCouldNotBeCheckedRatherThanNothing(): void
     {
@@ -420,7 +418,7 @@ final class InstallTimeSummaryTest extends TestCase
         self::assertSame('', $io->getOutput());
     }
 
-    /** LOCKROT_DISABLE promises to silence all of lockrot — including the "check skipped" line a malformed extra.lockrot would otherwise print on every install. */
+    /** LOCKROT_DISABLE promises to silence all of lockrot — including the "check skipped" line a malformed extra.lockrot otherwise prints on every install. */
     public function testLockrotDisableAlsoSilencesAMalformedConfig(): void
     {
         $this->project(['fail-on' => 'dead']);
@@ -656,10 +654,10 @@ final class InstallTimeSummaryTest extends TestCase
     }
 
     /**
-     * The skipped-check line is in the `warning` colours from end to end: a message that fell outside
-     * them would print as plain text in the middle of an install. It is written raw — it can quote
-     * the project's own keys — so the colour is lockrot's, and so is the job Composer's sanitising
-     * did: nothing in the message is left for the terminal to obey.
+     * The skipped-check line is in the `warning` colours from end to end: a message that falls
+     * outside them prints as plain text in the middle of an install. It is written raw — it can
+     * quote the project's own keys — so the colour is lockrot's, and so is the job that Composer's
+     * sanitising does: nothing in the message is left for the terminal to obey.
      */
     public function testTheSkippedCheckLineIsColouredWholeAndCarriesNoControlCharacters(): void
     {
@@ -677,13 +675,11 @@ final class InstallTimeSummaryTest extends TestCase
 
     /**
      * The plugin's own default wiring: constructed the way {@see \Lockrot\Composer\LockrotPlugin}
-     * constructs it, with no analyzer factory, the summary has to build one through
+     * constructs it, with no analyzer factory, the summary must build one through
      * {@see \Lockrot\Composer\ServiceFactory::createAnalyzer()} and print a real block — not fall
      * into the "check skipped" line because the default is not callable.
-     *
-     * {@see self::PHPZIP_WITHOUT_SOURCE} keeps this off the network: its metadata comes from the
-     * class-level fixture server, and with no `source` URL no repository activity round is planned,
-     * so nothing reaches GitHub.
+     * {@see self::PHPZIP_WITHOUT_SOURCE} has no `source` URL, so no repository activity round is
+     * planned and nothing reaches GitHub.
      */
     public function testTheDefaultAnalyzerFactoryBuildsAWorkingAnalyzer(): void
     {
@@ -699,7 +695,7 @@ final class InstallTimeSummaryTest extends TestCase
         self::assertStringContainsString('phpzip/phpzip 2.0.8', $output);
     }
 
-    /** `install-tme: off` is the typo nobody would understand from the install: the block keeps printing. */
+    /** `install-tme: off` is the typo nobody understands from the install: the block keeps printing. */
     public function testAnUnknownKeyIsWarnedAboutAboveTheBlock(): void
     {
         $this->project(['install-tme' => 'off']);
@@ -726,9 +722,8 @@ final class InstallTimeSummaryTest extends TestCase
     }
 
     /**
-     * The key is the project's text, and the line never reaches a console formatter: one that would
-     * choke on it is not even asked. Before, the formatter's exception became "check skipped" — and
-     * with it the install-time-strict block the project asked for was skipped too.
+     * The key is the project's text. The line never reaches a console formatter, so a formatter
+     * that chokes on the key cannot skip the install-time-strict block.
      */
     public function testAKeyThatLooksLikeMarkupNeverReachesTheFormatter(): void
     {
@@ -794,7 +789,6 @@ final class InstallTimeSummaryTest extends TestCase
         self::assertSame("\033[30;43mlockrot: unknown key extra.lockrot.<b> ignored\033[39;49m\n", $io->getOutput());
     }
 
-    /** With install-time correctly off, the project asked for silence and gets it, unknown key or not. */
     public function testInstallTimeOffStaysSilentDespiteAnUnknownKey(): void
     {
         $this->project(['install-time' => 'off', 'slack-webhook' => 'https://example.com']);
@@ -936,9 +930,9 @@ final class InstallTimeSummaryTest extends TestCase
 
     /**
      * The pre-transaction lock on disk knows nothing about the transaction's own new packages or
-     * requirements — the normal state during a `--dry-run`, or whenever the lock has not caught up
-     * yet. LockFile::withPackages() overlays the transaction onto the chain source so that a package
-     * new to the graph still resolves a "via" chain.
+     * requirements — the normal state during a `--dry-run`, or whenever the lock is behind the
+     * transaction. LockFile::withPackages() overlays the transaction onto the chain source so that
+     * a package new to the graph still resolves a "via" chain.
      */
     public function testAPreTransactionLockMissingTheTransitivePackageStillShowsTheViaChain(): void
     {
@@ -999,10 +993,8 @@ final class InstallTimeSummaryTest extends TestCase
         self::assertLessThanOrEqual(5.0, $deadline->remainingSeconds());
     }
 
-    /** Set by {@see recordingAnalyzerFactory()} while {@see recordDeadline()} runs. */
     private ?Deadline $recordedDeadline = null;
 
-    /** Runs the summary with a factory that records the {@see Deadline} it is handed, then returns it. */
     private function recordDeadline(InstallerEvent $event): ?Deadline
     {
         (new InstallTimeSummary(\Closure::fromCallable([$this, 'recordingAnalyzerFactory'])))->onPreOperationsExec($event);

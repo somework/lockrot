@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 final class PharValidatorTest extends TestCase
 {
     /**
-     * A 254-byte archive built once with `php -d phar.readonly=0` and checked in, because
+     * An archive built once with `php -d phar.readonly=0` and checked in, because
      * phar.readonly defaults to On and a test cannot create a phar at runtime. The exact command
      * that produced it is in tests/fixtures/phar/README.md.
      */
@@ -46,7 +46,7 @@ final class PharValidatorTest extends TestCase
 
     /**
      * The downloaded file is opened under a fresh name while the running archive already holds its
-     * own alias; that must not be mistaken for a damaged download.
+     * own alias. That must not be mistaken for a damaged download.
      */
     public function testACopyOfAnArchiveWhoseAliasIsAlreadyMappedStillPasses(): void
     {

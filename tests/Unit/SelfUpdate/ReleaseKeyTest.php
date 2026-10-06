@@ -11,10 +11,9 @@ use PHPUnit\Framework\TestCase;
 
 final class ReleaseKeyTest extends TestCase
 {
-    /** The key inside the archive is the one published in the repository root, byte for byte. */
     public function testTheBuiltInKeyIsThePublishedOne(): void
     {
-        // The file ends in a newline, as PEM files do; the nowdoc in ReleaseKey does not carry one.
+        // The file ends in a newline, as PEM files do. The nowdoc in ReleaseKey does not carry one.
         self::assertSame(file_get_contents(__DIR__.'/../../../lockrot-selfupdate-key.pub'), ReleaseKey::PEM."\n");
     }
 
@@ -31,7 +30,7 @@ final class ReleaseKeyTest extends TestCase
     /**
      * The fingerprint SECURITY.md and every release's `lockrot.phar.meta.json` name, the same value
      * `openssl pkey -pubin -in lockrot-selfupdate-key.pub -outform DER | sha256sum` prints. A
-     * rotation changes it on purpose, and this line with it.
+     * rotation changes it, and this line with it.
      */
     public function testTheBuiltInKeyFingerprintIsPinned(): void
     {

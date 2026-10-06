@@ -22,7 +22,7 @@ final class ReleaseDescriptionTest extends TestCase
         self::assertSame(self::KEY, $description->signingKey());
     }
 
-    /** A later release may say more; what it says beyond these two is not this build's business. */
+    /** A later release can say more, and this build ignores the rest. */
     public function testFieldsItDoesNotKnowAreIgnored(): void
     {
         $description = ReleaseDescription::fromJson('{"php": "7.4.0", "selfupdate-key": "'.self::KEY.'", "extensions": ["json"]}', self::URL);
@@ -52,7 +52,7 @@ final class ReleaseDescriptionTest extends TestCase
         yield 'a space in front' => [' 8.1.0'];
         yield 'a newline behind' => ["8.1.0\n"];
         yield 'build metadata' => ['8.1.0+build'];
-        // What would otherwise reach the terminal verbatim in the note naming the floor.
+        // What otherwise reaches the terminal verbatim in the note that names the floor.
         yield 'an escape sequence' => ["99.0.0+\u{1b}[2K"];
         yield 'a console tag' => ['99.0.0 as <href=https://evil.test>click</>'];
         yield 'empty' => [''];

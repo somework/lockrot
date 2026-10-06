@@ -61,10 +61,7 @@ final class ComposerHttpClientTest extends TestCase
         self::assertSame(self::WITHOUT_AUTHORIZATION, self::strip($io, self::GITHUB, self::HEADERS));
     }
 
-    /**
-     * Composer's AuthHelper sends Basic for http-basic credentials on github.com; that is still an
-     * Authorization header, so lockrot's must still go.
-     */
+    /** Composer's AuthHelper sends http-basic credentials on github.com as an Authorization header, so lockrot's must go. */
     public function testHttpBasicCredentialsForGithubCountToo(): void
     {
         $io = new BufferIO();
@@ -75,8 +72,8 @@ final class ComposerHttpClientTest extends TestCase
 
     /**
      * HttpDownloader folds every *.github.com host into the github.com origin before AuthHelper
-     * looks credentials up, so credentials stored under api.github.com are never sent by Composer
-     * — and lockrot's own header has to stay.
+     * looks credentials up. Composer never sends credentials stored under api.github.com, so
+     * lockrot's own header must stay.
      */
     public function testCredentialsStoredUnderTheApiHostDoNotCount(): void
     {
@@ -87,8 +84,8 @@ final class ComposerHttpClientTest extends TestCase
     }
 
     /**
-     * The header name is matched case-insensitively; the host is not, because Composer's own
-     * origin lookup is exact and adds nothing for `API.GITHUB.COM` — so lockrot's header stays.
+     * The header name is matched case-insensitively. The host is not, because Composer's own
+     * origin lookup is exact and adds nothing for `API.GITHUB.COM`, so lockrot's header stays.
      */
     public function testTheHeaderNameIsMatchedCaseInsensitivelyAndTheHostExactly(): void
     {
@@ -111,9 +108,8 @@ final class ComposerHttpClientTest extends TestCase
 
     /**
      * Url::getOrigin() resolves an empty URL to an empty origin, which an auth.json entry with an
-     * empty host would match — and Composer would then add credentials to a request it cannot even
-     * send. There is nothing to authenticate, so the headers are handed back before the origin is
-     * ever looked up.
+     * empty host matches, so Composer can add credentials to a request it cannot send. There is
+     * nothing to authenticate, so the headers come back before the origin lookup.
      */
     public function testAnEmptyUrlKeepsItsHeadersEvenWhenSomethingIsStoredUnderTheEmptyOrigin(): void
     {
@@ -127,7 +123,7 @@ final class ComposerHttpClientTest extends TestCase
      * A GitHub Enterprise host is a `github-domains` entry with its own `github-oauth` token, which
      * Composer stores exactly as it stores a github.com one — username the token, password
      * `x-oauth-basic`. AuthHelper sends it as Basic on every request to that host, api path or not,
-     * so lockrot's own Authorization header has to go: the `api.github.com`-only exception belongs
+     * so lockrot's own Authorization header must go. The `api.github.com`-only exception belongs
      * to github.com alone.
      */
     public function testAGithubEnterpriseTokenReplacesLockrotsHeaderOnEveryPath(): void
@@ -143,8 +139,8 @@ final class ComposerHttpClientTest extends TestCase
      * Bitbucket credentials are stored under the site host and read for the API host, so which
      * origin the four characters of `api.` are stripped down to decides whose credentials are
      * inspected. A `client-certificate` entry under bitbucket.org adds no credential header of its
-     * own, so lockrot's token must stay — read under any other origin, the entry is not found and
-     * the token would be dropped from a request nothing then authenticates.
+     * own, so lockrot's token must stay. Read under any other origin, the entry is not found and
+     * the token is dropped from a request nothing then authenticates.
      */
     public function testTheApiHostFallsBackToTheExactSiteHostWhoseCredentialsDecide(): void
     {
@@ -179,8 +175,8 @@ final class ComposerHttpClientTest extends TestCase
 
     /**
      * Two credential shapes make AuthHelper add no credential header — an SSL client certificate,
-     * and custom headers without one — so lockrot's own token has to stay, or the request would go
-     * out anonymous while the cap is lifted.
+     * and custom headers without one — so lockrot's own token must stay, or the request goes out
+     * anonymous while the cap is lifted.
      */
     public function testCredentialsThatAddNoCredentialHeaderLeaveLockrotsTokenAlone(): void
     {
@@ -201,7 +197,7 @@ final class ComposerHttpClientTest extends TestCase
         self::assertSame(self::WITHOUT_AUTHORIZATION, self::strip($io, self::GITHUB, self::HEADERS), 'custom headers that do carry a credential replace lockrot\'s');
     }
 
-    /** Composer's `gitlab-token` for gitlab.com becomes a PRIVATE-TOKEN header of its own; lockrot's goes. */
+    /** Composer's `gitlab-token` for gitlab.com becomes a PRIVATE-TOKEN header of its own, so lockrot's goes. */
     public function testThePrivateTokenIsDroppedWhenComposerAuthenticatesGitlab(): void
     {
         $io = new BufferIO();
@@ -235,7 +231,7 @@ final class ComposerHttpClientTest extends TestCase
         self::assertSame(self::GITLAB_HEADERS, self::strip($io, $url, self::GITLAB_HEADERS, self::config(['gitlab.com'])));
     }
 
-    /** Bitbucket credentials live under bitbucket.org while the API is api.bitbucket.org; AuthHelper bridges the two. */
+    /** Bitbucket credentials live under bitbucket.org while the API is api.bitbucket.org, and AuthHelper bridges the two. */
     public function testBitbucketCredentialsUnderTheSiteHostCoverTheApiHost(): void
     {
         $io = new BufferIO();
@@ -246,10 +242,7 @@ final class ComposerHttpClientTest extends TestCase
     }
 
     /**
-     * A client over a downloader that answers from $script, plus that downloader so a test can read
-     * the requests it saw.
-     *
-     * @param array<string, array{0: int, 1: string}|\Throwable> $script url => [status, body], or an exception to reject with; a URL the script does not mention is never answered at all
+     * @param array<string, array{0: int, 1: string}|\Throwable> $script url => [status, body], or an exception to reject with. A URL the script does not mention is never answered at all
      *
      * @return array{0: ComposerHttpClient, 1: ScriptedDownloader}
      */
@@ -277,7 +270,6 @@ final class ComposerHttpClientTest extends TestCase
         return $summary;
     }
 
-    /** Every answer is turned into an HttpResult keyed by its own URL, carrying the clock's fetch time. */
     public function testEveryAnsweredRequestBecomesItsOwnResult(): void
     {
         [$client] = self::clientWith([
@@ -298,8 +290,8 @@ final class ComposerHttpClientTest extends TestCase
      * A refused request keeps the transport's own status and message, so the caller can tell a 403
      * from "connection refused". Status 0 means "no HTTP answer to read a status from", which covers
      * both a transport error that never got one and a failure that is not a transport error at all —
-     * a plugin listening on PRE_FILE_DOWNLOAD throwing, say. Anything other than 0 there would read
-     * as a status the server never sent.
+     * a plugin that listens on PRE_FILE_DOWNLOAD and throws, say. Any other value there reads as a
+     * status the server never sent.
      */
     public function testAFailedRequestKeepsItsStatusAndMessage(): void
     {
@@ -340,7 +332,7 @@ final class ComposerHttpClientTest extends TestCase
 
     /**
      * A URL the downloader never answers still gets a result: the caller reads the map by URL, and a
-     * missing key would be indistinguishable from a URL it never asked for.
+     * missing key is indistinguishable from a URL it never asked for.
      */
     public function testAUrlWithNoAnswerAtAllBecomesAFailureResult(): void
     {
@@ -354,7 +346,7 @@ final class ComposerHttpClientTest extends TestCase
         ], self::summarize($results));
     }
 
-    /** The results only exist once the downloader has been waited on; returning before that would report every URL as unanswered. */
+    /** The results exist only once the downloader has been waited on. Returning before that reports every URL as unanswered. */
     public function testTheRequestsAreWaitedOnBeforeTheResultsAreRead(): void
     {
         [$client, $downloader] = self::clientWith(['https://a.example.com/1' => [200, 'body']]);
@@ -365,7 +357,6 @@ final class ComposerHttpClientTest extends TestCase
         self::assertSame('body', $results['https://a.example.com/1']->body());
     }
 
-    /** The same URL asked for twice is one request, and one entry in the answer. */
     public function testARepeatedUrlIsRequestedOnce(): void
     {
         [$client, $downloader] = self::clientWith(['https://a.example.com/1' => [200, 'body']]);
@@ -377,8 +368,7 @@ final class ComposerHttpClientTest extends TestCase
     }
 
     /**
-     * Each request carries the headers this URL is allowed to send, the timeout the deadline leaves
-     * it, and `retry-auth-failure` off — a retry would let Composer's AuthHelper exchange a
+     * `retry-auth-failure` is off because a retry lets Composer's AuthHelper exchange a
      * bitbucket-oauth consumer on a 401 and rewrite composer.json/auth.json on the way, which a
      * report must never do ({@see \Lockrot\Composer\ServiceFactory::bitbucketAuthorizer()} does the
      * exchange itself instead).
@@ -420,7 +410,6 @@ final class ScriptedDownloader extends HttpDownloader
 {
     /** @var list<array{url: string, options: array<string, mixed>}> the requests add() saw, in order */
     public array $requests = [];
-    /** @var int how often wait() was called */
     public int $waits = 0;
 
     /** @var array<string, array{0: int, 1: string}|\Throwable> */
@@ -457,8 +446,8 @@ final class ScriptedDownloader extends HttpDownloader
     }
 
     /**
-     * Settles every promise added since the last call, from the script. A URL the script does not
-     * mention is left pending for good — the real downloader's "no answer ever arrived" case.
+     * A URL the script does not mention is left pending for good — the real downloader's "no answer
+     * ever arrived" case.
      *
      * @param ?int $index
      *

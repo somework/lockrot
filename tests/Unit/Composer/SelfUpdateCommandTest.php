@@ -76,8 +76,8 @@ final class SelfUpdateCommandTest extends TestCase
     }
 
     /**
-     * The release list for $versions, newest first, each described as the release workflow would
-     * describe it — PHP 7.4.0 and the test key the command verifies with — with its archive,
+     * The release list for $versions, newest first, each described as the release workflow
+     * describes it — PHP 7.4.0 and the test key the command verifies with — with its archive,
      * checksum and signature ready to download.
      *
      * @param list<string>              $versions
@@ -161,7 +161,7 @@ final class SelfUpdateCommandTest extends TestCase
 
     /**
      * @param array<string, mixed> $args
-     * @param bool                 $decorated render stderr as a terminal would, with the styles applied
+     * @param bool                 $decorated render stderr as a terminal does, with the styles applied
      *
      * @return array{0: int, 1: string, 2: string} exit code, stdout, stderr
      */
@@ -176,8 +176,8 @@ final class SelfUpdateCommandTest extends TestCase
 
     /**
      * The pattern for "$message is styled, all of it": one escape sequence in front of the whole
-     * line and one behind it, and none in between. A style that closed after the `lockrot:` prefix
-     * would print the reason itself unhighlighted.
+     * line and one behind it, and none in between. A style that closes after the `lockrot:` prefix
+     * prints the reason itself unhighlighted.
      */
     private static function styledWhole(string $message): string
     {
@@ -252,7 +252,7 @@ final class SelfUpdateCommandTest extends TestCase
         self::assertSame(self::NEW_PHAR, file_get_contents($phar));
     }
 
-    /** --check only ever reports; with --force it still says whether anything newer exists. */
+    /** --check only ever reports. With --force it still says whether anything newer exists. */
     public function testCheckWithForceOnTheRunningVersionIsUpToDate(): void
     {
         $http = self::http([Version::STRING]);
@@ -265,7 +265,7 @@ final class SelfUpdateCommandTest extends TestCase
     }
 
     /**
-     * Where --force alone would fail (nothing in the running line to reinstall), --check --force
+     * Where --force alone fails (nothing in the running line to reinstall), --check --force
      * reports exactly what --check does: --check never installs, so --force changes nothing.
      */
     public function testCheckWithForceReportsWhatCheckReports(): void
@@ -303,7 +303,6 @@ final class SelfUpdateCommandTest extends TestCase
         }
     }
 
-    /** Held back by the PHP floor alone, nothing is wrong: the note, "up to date", exit 0. */
     public function testNewerReleasesHeldBackByThePhpFloorAloneAreExitZero(): void
     {
         $extra = [self::metaUrl(self::newer()) => FakeHttpClient::ok(self::metaUrl(self::newer()), GitHubReleases::meta('99.0.0', GitHubReleases::fingerprint(SigningKeys::releasePublicPem())))];
@@ -319,8 +318,8 @@ final class SelfUpdateCommandTest extends TestCase
     }
 
     /**
-     * The walk failing further down the list still prints what it decided first: here the
-     * --allow-major advice, ahead of the error about the broken release below it.
+     * A failure further down the list still prints what the walk decided first: here the
+     * --allow-major advice, ahead of the error about the broken release.
      */
     public function testNotesArePrintedBeforeAnErrorFurtherDownTheList(): void
     {
@@ -360,7 +359,7 @@ final class SelfUpdateCommandTest extends TestCase
         self::assertStringContainsString('<href=https://evil.test>click</>', $decorated);
     }
 
-    /** The same for an error, which names URLs the release list chose. */
+    /** An error names URLs that the release list chose, so it prints as text too. */
     public function testAnErrorIsPrintedAsTextWhateverTheUrlHoldsInIt(): void
     {
         $metaUrl = "https://example.test/\e[2K<href=https://evil.test>m</>";
@@ -380,8 +379,8 @@ final class SelfUpdateCommandTest extends TestCase
 
     /**
      * A doubled `<` is text too. OutputFormatter::escape() on symfony/console 5.4, the one inside
-     * the PHAR, leaves the second `<` of `<<` live, so a tag like `<<fg=red>>` would throw from the
-     * formatter and turn an up-to-date run into exit 2, and `<<href=…>>` would open a hyperlink.
+     * the PHAR, leaves the second `<` of `<<` live. Through that formatter a tag like `<<fg=red>>`
+     * throws and turns an up-to-date run into exit 2, and `<<href=…>>` opens a hyperlink.
      */
     public function testANoteWithADoubledAngleBracketIsPrintedAsText(): void
     {
@@ -407,7 +406,7 @@ final class SelfUpdateCommandTest extends TestCase
         self::assertStringNotContainsString("\e]8", $decorated, 'no hyperlink may be opened');
     }
 
-    /** The same for an error: the URL is printed as the release list gave it, and the run is exit 2. */
+    /** An error prints the URL as the release list gave it, and the run is exit 2. */
     public function testAnErrorWithADoubledAngleBracketIsPrintedAsText(): void
     {
         $metaUrl = 'https://example.test/<<fg=red>>m';
@@ -441,7 +440,7 @@ final class SelfUpdateCommandTest extends TestCase
         self::assertSame('', $stdout);
         self::assertSame(self::heldBackNote()."\n".'lockrot '.Version::STRING." is up to date\n", $stderr);
         self::assertSame($before, file_get_contents($phar));
-        // The next major's description is read before --allow-major is advised; nothing else is.
+        // The next major's description is read before --allow-major is advised, and nothing else is.
         self::assertSame([self::URL, self::metaUrl(self::nextMajor())], $http->requested());
     }
 
@@ -458,8 +457,8 @@ final class SelfUpdateCommandTest extends TestCase
     }
 
     /**
-     * Exit 1 means "self-update would install something", and without the flag it would not. A
-     * scheduled job keeps its meaning and still reads the new major on the line above.
+     * Exit 1 means "self-update installs something", and without the flag it does not. A
+     * scheduled job keeps its meaning and still reads the new major in the output.
      */
     public function testCheckNamesANewerMajorButExitsZero(): void
     {
@@ -478,14 +477,13 @@ final class SelfUpdateCommandTest extends TestCase
         [$code, , $stderr] = $this->runCommand($this->command($http, $this->installedPhar()), ['--check' => true, '--allow-major' => true]);
 
         self::assertSame(1, $code, $stderr);
-        // A plain self-update would hold this release back, so the advice carries the flag.
+        // A plain self-update holds this release back, so the advice carries the flag.
         self::assertSame(
             'lockrot '.self::nextMajor().' is available (installed: '.Version::STRING.'); run lockrot.phar self-update --allow-major'."\n",
             $stderr
         );
     }
 
-    /** --allow-major that finds nothing beyond the running line advises the plain command. */
     public function testCheckWithAllowMajorInTheSameLineAdvisesThePlainCommand(): void
     {
         $http = self::http([self::newer(), Version::STRING]);
@@ -499,7 +497,7 @@ final class SelfUpdateCommandTest extends TestCase
         );
     }
 
-    /** The notes say why; the error says that nothing in the line was left to install. */
+    /** The notes say why. The error says that nothing in the line is left to install. */
     public function testForceWithNoInstallableReleaseInTheLineIsExitTwo(): void
     {
         $http = self::http([self::nextMajor()]);
@@ -639,7 +637,7 @@ final class SelfUpdateCommandTest extends TestCase
     /**
      * Pinned: the facts a user needs (the source, the major line, the checksum, the signature, the
      * PHP floor, the flag, the writable directory, the untouched archive on failure), in that order,
-     * followed by the three example lines. Rewording around those phrases passes; dropping one of
+     * followed by the three example lines. Rewording around those phrases passes. Dropping one of
      * them, or moving an example above the explanation, fails.
      */
     public function testTheHelpExplainsTheUpdateBeforeGivingTheExamples(): void
@@ -670,8 +668,8 @@ final class SelfUpdateCommandTest extends TestCase
 
     /**
      * Anything that is not a ConfigException is still exit 2, and still one line on stderr — the
-     * command is the outermost frame of the PHAR, so an unhandled failure here would otherwise
-     * reach the user as a stack trace.
+     * command is the outermost frame of the PHAR, so an unhandled failure here otherwise
+     * reaches the user as a stack trace.
      */
     public function testAFailureThatIsNotAConfigErrorIsStillOneLineAndExitTwo(): void
     {
@@ -693,7 +691,6 @@ final class SelfUpdateCommandTest extends TestCase
         );
     }
 
-    /** A message that looks like a console tag reaches stderr as it was, not with the tag swallowed. */
     public function testAFailureMessageIsPrintedAsGiven(): void
     {
         $command = $this->registered(new SelfUpdateCommand(
@@ -726,7 +723,7 @@ final class SelfUpdateCommandTest extends TestCase
         self::assertSame("lockrot: no release at <comment>here\n", $stderr);
     }
 
-    /** The same for the errors lockrot raises itself, which is every failure a user normally sees. */
+    /** The errors that lockrot raises itself are every failure a user normally sees, so they are styled whole too. */
     public function testOnATerminalTheWholeErrorIsStyledAndNotJustItsPrefix(): void
     {
         $body = file_get_contents(self::FIXTURES.'/not-found.json');

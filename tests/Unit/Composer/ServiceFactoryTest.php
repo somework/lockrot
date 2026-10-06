@@ -71,7 +71,7 @@ final class ServiceFactoryTest extends TestCase
     /**
      * A Deadline driven by a scripted monotonic clock instead of hrtime(): the first reading (0.0)
      * is the one Deadline::inSeconds() uses to fix the expiry, every later reading is what
-     * isPast()/remainingSeconds() then see. No real time passes in these tests.
+     * isPast()/remainingSeconds() then see.
      */
     private static function deadline(float $seconds, float $laterReadings): Deadline
     {
@@ -94,7 +94,6 @@ final class ServiceFactoryTest extends TestCase
         return $config;
     }
 
-    /** ServiceFactory::createHttp() must wrap a ComposerHttpClient; this reads back its request timeout. */
     private static function timeoutOf(CachingHttpClient $client): int
     {
         $inner = $client->inner();
@@ -105,7 +104,7 @@ final class ServiceFactoryTest extends TestCase
     }
 
     /**
-     * The deadline has to travel all the way into the Analyzer (via withDeadline()), not only into
+     * The deadline must travel all the way into the Analyzer (via withDeadline()), not only into
      * the metadata loader — an exhausted budget must stop the GitHub round too. Nothing here can
      * reach the network: the repository list is empty and the GitHub branch is the one being skipped.
      */
@@ -157,7 +156,7 @@ final class ServiceFactoryTest extends TestCase
 
     /**
      * The timeout must track the budget at request time, not at construction time: the metadata pass
-     * runs between createHttp() and the GitHub round, so a value frozen at construction would let the
+     * runs between createHttp() and the GitHub round, so a value frozen at construction lets the
      * GitHub round outlast the budget by a whole request timeout.
      */
     public function testTheGitHubRequestTimeoutFollowsTheDeadlineAsItDrains(): void
@@ -280,7 +279,6 @@ final class ServiceFactoryTest extends TestCase
         }
     }
 
-    /** The transport's message reaches the user as it was, even when it looks like a console tag. */
     public function testARefusalMessageThatLooksLikeAConsoleTagIsPrintedAsGiven(): void
     {
         $config = self::bitbucketConfig();
@@ -320,9 +318,9 @@ final class ServiceFactoryTest extends TestCase
 
     /**
      * The transport's message is not console markup: the line never reaches Composer's formatter,
-     * which on symfony/console 5.4 threw on a `<<fg=red>>` that OutputFormatter::escape() left
-     * half-live. It is coloured by lockrot, whole, in the `warning` style, with nothing in the
-     * message a terminal would obey.
+     * which throws on a `<<fg=red>>` that OutputFormatter::escape() leaves half-live on
+     * symfony/console 5.4. It is coloured by lockrot, whole, in the `warning` style, with nothing
+     * in the message that a terminal obeys.
      */
     public function testARefusalMessageThatLooksLikeMarkupNeverReachesTheFormatter(): void
     {
@@ -409,13 +407,13 @@ final class ServiceFactoryTest extends TestCase
     /**
      * lockrot's envelopes live in their own `lockrot/` subdirectory of Composer's cache, whatever the
      * configured path looks like — writing them next to Composer's own `repo/` and `files/` trees
-     * would put them in reach of Composer's cache housekeeping.
+     * puts them in reach of Composer's cache housekeeping.
      */
     public function testTheCacheLivesInItsOwnSubdirectoryOfComposersCacheDir(): void
     {
         $dir = $this->tempCacheDir();
         $config = new Config(false, sys_get_temp_dir());
-        // A trailing slash is what Composer's own cache-dir often carries; it must not produce `//`.
+        // A trailing slash is what Composer's own cache-dir often carries, and it must not produce `//`.
         $config->merge(['config' => ['cache-dir' => $dir.'/', 'home' => sys_get_temp_dir()]]);
 
         $cache = ServiceFactory::createCache(new NullIO(), $config);
@@ -433,7 +431,7 @@ final class ServiceFactoryTest extends TestCase
         self::assertNull(ServiceFactory::githubTokenFromComposer(new Config(false, sys_get_temp_dir())));
     }
 
-    /** An empty `github-oauth` entry is no token: sending `Authorization: token ` would fail the request rather than run it anonymously. */
+    /** An empty `github-oauth` entry is no token: the header `Authorization: token ` fails the request, where no header runs it anonymously. */
     public function testAnEmptyGithubOauthEntryIsNoToken(): void
     {
         $config = new Config(false, sys_get_temp_dir());
