@@ -25,7 +25,6 @@ final class AgeMeasureTest extends TestCase
         return new AgeMeasure(Clock::fixed(self::NOW), $thresholds ?? new Thresholds());
     }
 
-    /** An instant the given number of seconds before the run clock, as an ISO 8601 string. */
     private static function ago(int $seconds): string
     {
         return (new \DateTimeImmutable(self::NOW))->modify(\sprintf('%+d seconds', -$seconds))->format(\DATE_ATOM);
@@ -120,7 +119,7 @@ final class AgeMeasureTest extends TestCase
 
     public function testTheMetadataReasonComesBeforeTheReadingsOwn(): void
     {
-        // A vcs snapshot: no metadata, and a branch. The metadata's reason wins (§8.4.3 rule 5).
+        // A vcs snapshot: no metadata, and a branch.
         $facts = FactsBuilder::facts(FactsBuilder::package(['version' => 'dev-main', 'fromComposerRepository' => false]));
 
         self::assertUnmeasured(AgeMeasure::NOT_FROM_COMPOSER_REPOSITORY, $this->measure()->branchRelease($facts));
@@ -182,7 +181,6 @@ final class AgeMeasureTest extends TestCase
         $measure = $this->measure();
         // The branch's highest tag is undated: how much younger than the newest dated release it is cannot be known.
         $undatedHighest = FactsBuilder::metadata([['2.0.0', self::ago(86400)], ['1.3.0', null], ['1.2.0', self::ago(4 * Clock::SECONDS_PER_YEAR)]]);
-        // No tag on the branch is dated at all.
         $undatedBranch = FactsBuilder::metadata([['2.0.0', self::ago(86400)], ['1.2.0', null]]);
         // The installed version is above every tag the repository lists on its branch.
         $listed = FactsBuilder::metadata([['2.0.0', self::ago(86400)], ['1.2.0', self::ago(4 * Clock::SECONDS_PER_YEAR)]]);
@@ -228,7 +226,7 @@ final class AgeMeasureTest extends TestCase
         self::assertUnmeasured(NotCheckedRule::RATE_LIMIT, $measure->push(new PackageFacts($package, null, null, [], NotCheckedRule::RATE_LIMIT)));
         self::assertUnmeasured(AgeMeasure::NOT_FROM_COMPOSER_REPOSITORY, $measure->push(FactsBuilder::facts(FactsBuilder::package(['fromComposerRepository' => false]))));
         self::assertUnmeasured(AgeMeasure::NO_REPOSITORY, $measure->push(FactsBuilder::facts($package)));
-        // The caller's own reason (§5.8: allowlisted, a 404, a host lockrot cannot ask) comes first.
+        // The caller's own reason (allowlisted, a 404, a host lockrot cannot ask) comes first.
         self::assertUnmeasured(AgeMeasure::ALLOWLISTED, $measure->push(new PackageFacts($package, null, null, [], NotCheckedRule::OFFLINE), AgeMeasure::ALLOWLISTED));
         self::assertUnmeasured(AgeMeasure::REPOSITORY_NOT_FOUND, $measure->push(FactsBuilder::facts($package), AgeMeasure::REPOSITORY_NOT_FOUND));
         // A dated answer is a reading whatever reason the caller holds.

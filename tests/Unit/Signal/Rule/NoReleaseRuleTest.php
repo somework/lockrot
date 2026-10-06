@@ -60,7 +60,6 @@ final class NoReleaseRuleTest extends TestCase
         self::assertNull($this->rule()->evaluate(F::facts(F::package(), F::metadata([['1.0.0', null]]))));
     }
 
-    /** A last release read from the monorepo parent ({@see PackageMetadata::datedBy()}) says so. */
     public function testALastReleaseDatedByTheMonorepoNamesIt(): void
     {
         $meta = new PackageMetadata('illuminate/contracts', false, null, true, new \DateTimeImmutable('2021-11-20T15:55:41+00:00'), 'v8.83.29', 1, null, 'library', new \DateTimeImmutable(F::NOW), [], [], 'laravel/framework');

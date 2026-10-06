@@ -115,7 +115,7 @@ final class LeftBehindRuleTest extends TestCase
 
     public function testTheHigherBranchMustHaveReleasedWithinTheWarnYears(): void
     {
-        // 3 × 365.25 days before NOW is 2023-09-14T06:00: exactly the warn threshold, no longer alive.
+        // 3 × 365.25 days before NOW is 2023-09-14T06:00: exactly the warn threshold, not alive.
         $exactlyAtThreshold = F::metadata([['2.0.0', '2023-09-14T06:00:00+00:00'], ['1.9.2', '2019-03-02']]);
         $justTooOld = F::metadata([['2.0.0', '2023-09-13T00:00:00+00:00'], ['1.9.2', '2019-03-02']]);
         $alive = F::metadata([['2.0.0', '2023-09-15T00:00:00+00:00'], ['1.9.2', '2019-03-02']]);
@@ -184,7 +184,6 @@ final class LeftBehindRuleTest extends TestCase
         self::assertStringEndsWith('; 2.x released 2.5.0 (2026-02-02)', $signal->summary());
     }
 
-    /** A branch listed first that is not above ours must not end the search for one that is. */
     public function testALowerBranchListedFirstDoesNotHideAHigherOne(): void
     {
         $meta = F::metadata([['0.9.0', '2015-01-01'], ['2.0.0', '2026-01-01'], ['1.9.2', '2019-03-02']]);
@@ -220,7 +219,7 @@ final class LeftBehindRuleTest extends TestCase
         self::assertNull($this->rule()->evaluate(F::facts(F::package(['version' => '0.9.0']), $meta)));
     }
 
-    /** A lock written against a tag the repository no longer lists: the branch's last date says nothing about it. */
+    /** A lock written against a tag that the repository does not list: the branch's last date says nothing about it. */
     public function testAnInstalledVersionAboveEverythingListedOnItsBranchIsNull(): void
     {
         $meta = F::metadata([['2.0.0', '2026-01-01'], ['1.9.2', '2019-03-02']]);
@@ -241,7 +240,6 @@ final class LeftBehindRuleTest extends TestCase
         self::assertNull($this->rule()->evaluate(F::facts(F::package(['version' => '10.48.28']), $meta)));
     }
 
-    /** Two branches released the same second: neither came after the other, and the upstream did not move on. */
     public function testAHigherBranchReleasedAtTheSameInstantIsNotAMoveOn(): void
     {
         $meta = F::metadata([['2.0.0', '2022-09-14T00:00:00+00:00'], ['1.0.0', '2022-09-14T00:00:00+00:00']]);
@@ -268,7 +266,7 @@ final class LeftBehindRuleTest extends TestCase
      * A higher branch dated only by a commit its tags share still counts as the upstream moving
      * on: the commit's date is when the directory last changed, which is at or before the release
      * that carried it — a lower bound. If that lower bound is recent, the release is more recent
-     * still, so the S8 it supports is real; an understated date can only make a move-on less
+     * still, so the S8 it supports is real. An understated date can only make a move-on less
      * likely, never invent one. The installed branch is measured by its own, release-dated tag.
      */
     public function testAHigherBranchDatedByASharedCommitStillCountsAsAMoveOn(): void
@@ -310,7 +308,6 @@ final class LeftBehindRuleTest extends TestCase
         self::assertSame('^0.4.3', $minor->data()['suggested_constraint']);
     }
 
-    /** A branch the monorepo parent dated ({@see PackageMetadata::datedBy()}) says so in the summary and the data. */
     public function testABranchDatedByTheMonorepoNamesIt(): void
     {
         /** @return array{version: string, at: \DateTimeImmutable, highest: array{normalized: string, pretty: string, at: \DateTimeImmutable}, dated_by?: string, php: ?string} */
@@ -378,7 +375,6 @@ final class LeftBehindRuleTest extends TestCase
         self::assertNull($data['suggested_constraint']);
     }
 
-    /** A project that declares no php: the target PHP — `config.platform.php` or the running one — is the floor, and is named as such. */
     public function testTheTargetPhpIsTheFloorWhenTheProjectDeclaresNone(): void
     {
         $meta = F::metadata([['3.12.0', '2026-09-09', '>=8.1'], ['2.11.1', '2026-09-02', '>=7.2'], ['1.27.1', '2022-06-09', '>=5.3.0']]);
@@ -392,7 +388,6 @@ final class LeftBehindRuleTest extends TestCase
         self::assertSame('^2.11', $signal->data()['suggested_constraint']);
     }
 
-    /** A branch within reach that stopped releasing is no branch to follow: the one named has to be alive, as the newest one has to be. */
     public function testABranchWithinReachThatWentQuietIsNotNamed(): void
     {
         $meta = F::metadata([['3.0.0', '2026-01-01', '>=8.1'], ['2.5.0', '2022-06-01', '>=7.2'], ['1.9.2', '2019-03-02', '>=5.6']]);
@@ -416,7 +411,6 @@ final class LeftBehindRuleTest extends TestCase
         self::assertSame('^2.9', $signal->data()['suggested_constraint']);
     }
 
-    /** With the newest branch within reach the summary reads as before: the floor changes nothing it does not have to. */
     public function testANewestBranchWithinReachIsNamedAsBefore(): void
     {
         $meta = F::metadata([['2.0.0', '2024-01-10', '>=7.2'], ['1.9.2', '2022-08-01', '>=5.6']]);

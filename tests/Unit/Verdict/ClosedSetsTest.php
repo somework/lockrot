@@ -28,18 +28,11 @@ use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
 
 /**
- * The closed sets docs/compatibility.md freezes for 1.x, and the order they come in.
- *
- * Verdicts, priorities, signal levels and a finding's standing against the baseline never grow or
- * reorder under one schema number: `--fail-on` reads "at or above" off the order, the baseline reads
- * "worsened" off it, and the report is sorted by it. The other tests that touch these lists go
- * through the class constants, so they would follow a changed value instead of catching it; the
- * lists here are spelled out as literals on purpose. The published schemas are held to the same
- * sets in the same order, because a consumer validating against them reads the order from there.
- *
- * The open sets are held the other way round: an open string in every schema, with the values
- * lockrot writes listed in `x-known-values` and nowhere as an enum, and each named on the pages that
- * say which sets grow. The last test guards the names docs/compatibility.md reserves for extensions.
+ * The closed sets that docs/compatibility.md freezes for 1.x, and their order. `--fail-on`, the
+ * baseline and the report sort read that order. Other tests read the class constants and follow a
+ * changed value, so the lists here are literals. The schemas must list the same sets in the same
+ * order. An open set is an open string with the values lockrot writes in `x-known-values`, never
+ * an enum. The last test guards the names that docs/compatibility.md reserves for extensions.
  */
 final class ClosedSetsTest extends TestCase
 {
@@ -172,9 +165,6 @@ final class ClosedSetsTest extends TestCase
         );
     }
 
-    /**
-     * No closed set is described as open: nothing that spells one out carries `x-known-values`.
-     */
     public function testNoClosedSetCarriesKnownValues(): void
     {
         $report = self::schema(Schemas::REPORT, 1);
@@ -203,15 +193,12 @@ final class ClosedSetsTest extends TestCase
     }
 
     /**
-     * Signal ids are an open set — they grow in minor releases — but the ids lockrot ships are its
-     * own `S<n>`, and the schemas list exactly those in `x-known-values`. The report schema names
-     * them three times: `signalId`, which a signal's `id` and S10's `blocks` refer to, one typed
-     * `anyOf` branch per id that types that signal's `data`, and the last branch, which takes every
-     * id the schema does not list and says which those are with a `not` over the same list. A signal
-     * added to the code and to one of the three would otherwise validate against the others only by
-     * accident. The last branch carries no `type` and no `properties` of its own: the strict twin
-     * closes a typed object that lists its properties, and closed inside the `not` it would let every
-     * signal through, untyped.
+     * Signal ids are an open set, but the ids lockrot ships are its own `S<n>`, and the schemas
+     * list exactly those in `x-known-values`. The report schema names them three times: `signalId`,
+     * one typed `anyOf` branch per id, and a last branch with a `not` over the same list. A signal
+     * added to only one of the three validates against the others by accident. The last branch has
+     * no `type` and no `properties`: the strict twin closes a typed object that lists its
+     * properties, and closed inside the `not` it lets every signal through, untyped.
      */
     public function testTheSignalIdsAreLockrotsOwnAndTheSchemasListThem(): void
     {
@@ -523,7 +510,6 @@ final class ClosedSetsTest extends TestCase
         }
     }
 
-    /** The list that follows the paragraph opening with these words, its items joined. */
     private static function listAfter(string $text, string $opening): string
     {
         $blocks = preg_split('/\n\s*\n/', $text) ?: [];
@@ -563,8 +549,6 @@ final class ClosedSetsTest extends TestCase
     }
 
     /**
-     * The places in a decoded schema that carry `x-known-values`.
-     *
      * @param array<mixed, mixed> $node
      *
      * @return list<string>

@@ -81,10 +81,6 @@ final class AnalyzerTest extends TestCase
     }
 
     /**
-     * A fake metadata loader that ignores the requested names and always returns the same
-     * prepared batch — the analyzer only ever calls load() once per analyze(), so there is nothing
-     * to distinguish between calls in these tests.
-     *
      * @param array<string, PackageMetadata> $metadata
      * @param list<string>                   $notFound
      * @param array<string, string>          $failed
@@ -127,8 +123,6 @@ final class AnalyzerTest extends TestCase
     }
 
     /**
-     * An advisory source answering one fixed batch, recording what it was asked for.
-     *
      * @param \ArrayObject<string, string>|null $asked
      */
     private function advisories(AdvisoryBatch $batch, ?\ArrayObject $asked = null): AdvisoryLoaderInterface
@@ -156,7 +150,6 @@ final class AnalyzerTest extends TestCase
         };
     }
 
-    /** `--explain` reads the facts the rules read: the same run, the same report, plus what each finding was decided on. */
     public function testAnalyzeWithFactsKeepsWhatEachFindingWasDecidedOn(): void
     {
         $lock = LockFile::fromArray(['packages' => [
@@ -266,13 +259,10 @@ final class AnalyzerTest extends TestCase
         foreach ($report->findings() as $finding) {
             $byName[$finding->package()] = $finding;
         }
-        // vendor/direct is released 2024-01-10 with an open-ended "php": ">=7.4" constraint. That is
-        // after PHP 8.0's GA (2020-11-26), the line S5 reads for a target of 8.4: a release of the
-        // PHP 8 era is no old promise about PHP 8, so S5 stays quiet and the verdict is OK. (Until
-        // 0.11.0 the line was the target minor's own GA, 2024-11-21, and this was OLD_PROMISE.)
-        // vendor/transitive, released 2015 with ">=5.3.0", is the old promise here — under `silent`,
-        // which outranks it. The mini fixture is shared with LockFileTest/DependencyGraphTest/
-        // ProjectConfigTest, so the interaction is documented here instead of edited into the fixture.
+        // vendor/direct is released 2024-01-10 with "php": ">=7.4", after PHP 8.0's GA (2020-11-26), the
+        // line S5 reads for a target of 8.4. A release of the PHP 8 era is no old promise, so S5 stays
+        // quiet and the verdict is OK. vendor/transitive (2015, ">=5.3.0") is the old promise here, but
+        // `silent` outranks it. The fixture is shared, so the interaction is documented here.
         self::assertSame(Verdict::OK, $byName['vendor/direct']->verdict());
         self::assertSame(Verdict::SILENT, $byName['vendor/transitive']->verdict());
         self::assertSame(['vendor/direct', 'vendor/transitive'], $byName['vendor/transitive']->chain());
@@ -281,7 +271,7 @@ final class AnalyzerTest extends TestCase
         self::assertSame(Verdict::PINNED, $byName['vendor/snapshot']->verdict());
         self::assertSame(Verdict::UNKNOWN, $byName['private/thing']->verdict());
         self::assertSame('not from a Composer repository, not checked', $byName['private/thing']->evidence());
-        // The lock entry is the one fact the note stands for: the other four carry a notification-url.
+        // Only private/thing carries no notification-url.
         self::assertFalse($byName['private/thing']->isFromComposerRepository());
         foreach (['vendor/direct', 'vendor/transitive', 'vendor/snapshot'] as $asked) {
             self::assertTrue($byName[$asked]->isFromComposerRepository(), $asked);
@@ -290,9 +280,8 @@ final class AnalyzerTest extends TestCase
         self::assertSame(1, $report->notFromComposerRepository());
         self::assertFalse($report->hadNetworkFailures());
         // Sort order is priority desc, then severity desc, then direct first, then name asc.
-        // vendor/snapshot is PINNED(40) but nothing in the lock reaches it, so its chain is empty, it
-        // counts as transitive and its `high` base drops to `medium`; the two unflagged rows follow,
-        // UNKNOWN(10) ahead of OK(0).
+        // Nothing in the lock reaches vendor/snapshot, so its chain is empty, it counts as transitive
+        // and its `high` base drops to `medium`. The two unflagged rows follow, unknown ahead of ok.
         self::assertSame(Priority::HIGH, $byName['vendor/transitive']->priority());
         self::assertSame(Priority::NONE, $byName['vendor/direct']->priority());
         self::assertSame([], $byName['vendor/snapshot']->chain());
@@ -300,8 +289,8 @@ final class AnalyzerTest extends TestCase
         self::assertSame(Priority::NONE, $byName['private/thing']->priority());
         self::assertSame(['vendor/transitive', 'vendor/snapshot', 'private/thing', 'vendor/direct'], array_map(static fn ($f) => $f->package(), $report->findings()));
         self::assertNotEmpty(array_filter($report->notes(), static fn (string $n): bool => strpos($n, 'GitHub token not set') !== false));
-        // Transitive exposure: vendor/direct is the one root and pulls in the silent package, so it
-        // carries S7 — with the verdict and priority it had without it.
+        // vendor/direct is the one root and pulls in the silent package, so it carries S7, with no
+        // change of verdict or priority.
         self::assertSame(['vendor/direct'], $byName['vendor/transitive']->directDependents());
         self::assertSame(['vendor/direct'], $byName['vendor/direct']->directDependents());
         self::assertSame([], $byName['vendor/snapshot']->directDependents());
@@ -443,9 +432,6 @@ final class AnalyzerTest extends TestCase
     }
 
     /**
-     * One package from a Composer repository with a GitHub source, optionally with a canned
-     * GitHub response.
-     *
      * @param array{int, string}|null $github status and body for api.github.com/repos/vendor/pkg
      */
     private function singlePackageReport(PackageMetadata $meta, bool $token, ?array $github = null): Report
@@ -459,11 +445,7 @@ final class AnalyzerTest extends TestCase
         return $this->analyzer($this->loader(['vendor/pkg' => $meta]), $this->http($map), $token, new Allowlist([]))->analyze($lock, ProjectConfig::empty(), false);
     }
 
-    /**
-     * The libyears on a finding come from the lock's `time` and the repository's newest stable
-     * release, through {@see \Lockrot\Analyzer\Libyears::measure()}: two years apart here, so a
-     * swapped argument or a dropped one would read as zero or null.
-     */
+    /** The lock's `time` and the newest stable release are two years apart: a swapped or dropped argument reads as zero or null. */
     public function testAFindingCarriesTheLibyearsBetweenItsLockTimeAndTheNewestStableRelease(): void
     {
         $lock = LockFile::fromArray(['packages' => [
@@ -557,7 +539,7 @@ final class AnalyzerTest extends TestCase
 
     /**
      * Install time checks only the packages in the transaction, but the chain still has to be
-     * resolved through the whole lock file — the mini fixture's vendor/transitive is pulled in by
+     * resolved through the whole lock — the mini fixture's vendor/transitive is pulled in by
      * vendor/direct, which is not part of the subset handed to analyzePackages().
      */
     public function testAnalyzePackagesChecksOnlyTheSubsetButResolvesChainsThroughTheFullLock(): void
@@ -746,10 +728,6 @@ final class AnalyzerTest extends TestCase
         self::assertFalse($report->hadNetworkFailures());
     }
 
-    /**
-     * The lock's `support.source` is the last place asked, and when nothing names a repository the
-     * package is judged on its release dates alone: no request, no S3, no `abandoned`.
-     */
     public function testTheLocksSupportSourceIsTheLastResortAndNoRepositoryMeansNoRequest(): void
     {
         $answer = [200, '{"archived":true,"pushed_at":"2015-01-01T00:00:00Z"}'];
@@ -868,7 +846,7 @@ final class AnalyzerTest extends TestCase
         self::assertTrue($report->hadNetworkFailures());
     }
 
-    /** A private repository answers 404 anonymously; without this note it would look like a healthy one. */
+    /** A private repository answers 404 anonymously. Without the note it looks like a healthy one. */
     public function testARepositoryTheHostDoesNotAnswerForIsCountedInANote(): void
     {
         $packages = [self::locked('vendor/one'), self::locked('vendor/two'), self::locked('vendor/gl')];
@@ -938,7 +916,6 @@ final class AnalyzerTest extends TestCase
         self::assertSame('2026-09-14T12:00:00+00:00', self::dataDateOf($metadataNewer));
     }
 
-    /** The report states the oldest cached activity answer, and nothing when every answer was fetched in this run. */
     public function testTheReportCarriesTheOldestCachedActivityAnswer(): void
     {
         $packages = [self::locked('vendor/a'), self::locked('vendor/b'), self::locked('vendor/c')];
@@ -969,10 +946,6 @@ final class AnalyzerTest extends TestCase
         self::assertSame('package repositories, repository hosts', $fresh->dataSourcesClause());
     }
 
-    /**
-     * The wired path, end to end: a seeded cache behind the real CachingHttpClient, through
-     * ActivityClient and the analyzer, out through the table footer.
-     */
     public function testACachedActivityAnswerReachesTheTableFooterThroughTheRealCache(): void
     {
         $clock = Clock::fixed(F::NOW);
@@ -1002,8 +975,8 @@ final class AnalyzerTest extends TestCase
     }
 
     /**
-     * A fake that hands back the prepared results for the URLs asked, as they are — cache flags
-     * included; a URL without a prepared result gets a failure, as the real clients answer.
+     * Hands back the prepared results as they are, cache flags included. A URL without a prepared
+     * result gets a failure, as the real clients answer.
      *
      * @param array<string, HttpResult> $results
      */

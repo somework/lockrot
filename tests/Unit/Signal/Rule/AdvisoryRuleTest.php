@@ -65,7 +65,7 @@ final class AdvisoryRuleTest extends TestCase
 
     /**
      * Whether a null `fixed_by` was looked for: no metadata, or an installed version no parser reads,
-     * leaves every row null without a release having been compared; a branch snapshot is compared
+     * leaves every row null without a release having been compared. A branch snapshot is compared
      * with the package's highest tag, and a tagged version with both candidates.
      */
     public function testTheDataSaysWhetherTheReleasesWereRead(): void
@@ -156,7 +156,6 @@ final class AdvisoryRuleTest extends TestCase
         self::assertTrue(self::row($signal, 0)['fixed_on_branch'], 'the branch\'s highest tag is the package\'s: one candidate, named once');
     }
 
-    /** Nothing to check against: no metadata, a branch snapshot with no branch, or a range that covers every listed release. */
     public function testWithoutAFixingReleaseTheRowsSayNullAndTheSummaryAddsNothing(): void
     {
         $range = $this->ranged('CVE-1', '>=1.0.0');
@@ -175,7 +174,7 @@ final class AdvisoryRuleTest extends TestCase
     }
 
     /**
-     * The repository lists nothing above what is installed — a tag since deleted, a pre-release
+     * The repository lists nothing above what is installed — a deleted tag, a pre-release
      * ahead of every stable tag, a pretty version no parser reads. A tag the range spares is not a
      * fix when reaching it means going back, so none is named.
      */

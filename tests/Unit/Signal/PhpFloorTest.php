@@ -20,7 +20,6 @@ final class PhpFloorTest extends TestCase
         self::assertSame('the project\'s php >=7.2.5', $floor->describe(PhpFloor::PROJECT));
     }
 
-    /** No composer.json, or one without `require.php`: the target PHP is the only floor. */
     public function testTheTargetPhpIsTheFloorWhenTheProjectDeclaresNone(): void
     {
         $floor = new PhpFloor('7.2', null);
@@ -53,7 +52,6 @@ final class PhpFloorTest extends TestCase
         self::assertSame('the project\'s php ^7.2.5 || ^8.0', (new PhpFloor('8.4', '^7.2.5 || ^8.0'))->describe(PhpFloor::PROJECT));
     }
 
-    /** A branch that requires no PHP at all, or one whose requirement cannot be parsed, is not held back by anything. */
     public function testNoRequirementOrAnUnparsableOneIsWithinReach(): void
     {
         $floor = new PhpFloor('7.2', '>=7.2.5');
@@ -62,7 +60,6 @@ final class PhpFloorTest extends TestCase
         self::assertNull($floor->blocking('not a constraint'));
     }
 
-    /** `*` and a project requirement that cannot be parsed give no floor: nothing is held against nothing. */
     public function testAnUnboundedOrUnparsableProjectRequirementIsNoFloor(): void
     {
         self::assertNull((new PhpFloor('8.4', '*'))->blocking('>=8.1'));
@@ -77,14 +74,13 @@ final class PhpFloorTest extends TestCase
         self::assertNull((new PhpFloor(null))->blocking('>=8.1'));
     }
 
-    /** A branch with an upper bound below the target is out of reach too: `<8.0` on a PHP 8.4 project. */
     public function testAnUpperBoundBelowTheTargetIsOutOfReach(): void
     {
         self::assertSame(PhpFloor::TARGET, (new PhpFloor('8.4'))->blocking('>=7.1 <8.0'));
         self::assertNull((new PhpFloor('7.4'))->blocking('>=7.1 <8.0'));
     }
 
-    /** Matomo again, one floor at a time: monolog 3.x admits PHP 8.4 but not the 7.2.5 Matomo promises. */
+    /** Matomo, one floor at a time: monolog 3.x admits PHP 8.4 but not the 7.2.5 that Matomo promises. */
     public function testEachFloorAnswersOnItsOwn(): void
     {
         $floor = new PhpFloor('8.4', '>=7.2.5');
@@ -96,7 +92,6 @@ final class PhpFloorTest extends TestCase
         self::assertFalse((new PhpFloor('8.4', '^8.2|^8.3|^8.4|^8.5'))->admitsProject('^8.3'), 'the lowest of the whole constraint, 8.2.0');
     }
 
-    /** The target is read as its whole minor here too, and a branch capped below it does not admit it. */
     public function testTheTargetAdmitsABranchWhenAnyVersionOfItsMinorDoes(): void
     {
         self::assertFalse((new PhpFloor('8.3'))->admitsTarget('>=8.4.1'));
@@ -105,7 +100,6 @@ final class PhpFloorTest extends TestCase
         self::assertFalse((new PhpFloor('8.4'))->admitsTarget('>=7.1 <8.0'));
     }
 
-    /** A branch with no requirement, or one that cannot be read, gets no answer from either floor: null, never true. */
     public function testNoRequirementOrAnUnreadableOneGivesNoAnswer(): void
     {
         $floor = new PhpFloor('7.2', '>=7.2.5');
@@ -116,7 +110,6 @@ final class PhpFloorTest extends TestCase
         self::assertNull($floor->admitsTarget('not a constraint'));
     }
 
-    /** A floor that is not there (no require.php, `*`, one that cannot be read, no target) answers nothing either. */
     public function testAFloorThatIsNotThereGivesNoAnswer(): void
     {
         self::assertNull((new PhpFloor('8.4', null))->admitsProject('>=8.1'));
@@ -127,12 +120,7 @@ final class PhpFloorTest extends TestCase
         self::assertFalse((new PhpFloor(null, '>=7.2.5'))->admitsProject('>=8.1'), 'the project floor holds without a target');
     }
 
-    /**
-     * blocking() is the two answers read in S8's order: the project first, then the target, and
-     * nothing when neither says no.
-     *
-     * @dataProvider floors
-     */
+    /** @dataProvider floors */
     #[DataProvider('floors')]
     public function testBlockingIsTheTwoAnswersInOrder(?string $target, ?string $project, ?string $constraint, ?string $expected): void
     {
@@ -196,10 +184,6 @@ final class PhpFloorTest extends TestCase
         yield 'no target' => [null, '>=8.2', '^7.0', null, PhpFloor::STOPS_BEFORE];
     }
 
-    /**
-     * The side is given exactly where the floor is not admitted: null wherever admits_* is true or
-     * has no answer, and one of the known sides wherever it is false.
-     */
     public function testASideIsGivenExactlyWhereTheFloorIsNotAdmitted(): void
     {
         $sides = [PhpFloor::NEEDS_NEWER, PhpFloor::STOPS_BEFORE, PhpFloor::SKIPS, PhpFloor::UNSATISFIABLE];

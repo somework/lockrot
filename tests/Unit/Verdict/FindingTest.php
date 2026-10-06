@@ -91,7 +91,7 @@ final class FindingTest extends TestCase
         }
     }
 
-    /** A row without the fix keys (an older JSON, a hand-built signal) is an advisory nothing fixes; a list that is not one is no advisory. */
+    /** A row without the fix keys (a hand-built signal) is an advisory nothing fixes. A list that is not one is no advisory. */
     public function testAnAdvisoryRowWithoutFixKeysCountsAsUnfixedAndAMalformedListAsNone(): void
     {
         $bare = (new FindingBuilder())->withVerdict(Verdict::LEFT_BEHIND)->withSignals([new Signal('S9', 'warn', 'x', ['advisories' => [['id' => 'PKSA-1']]])])->build();
@@ -155,7 +155,7 @@ final class FindingTest extends TestCase
         self::assertSame(['id' => 'S8', 'level' => 'warn', 'summary' => $s8->summary(), 'data' => ['suggested_constraint' => '^8.2']], $signals[1] ?? null, 'the data travels into --format=json');
     }
 
-    /** S8 at either level makes the verdict `left-behind` ({@see VerdictEngine}); the raise follows the verdict, not the signal. */
+    /** S8 at either level makes the verdict `left-behind` ({@see VerdictEngine}). The raise follows the verdict, not the signal. */
     public function testAnAdvisoryOnALeftBehindBranchIsUnfixableAtEitherLevel(): void
     {
         $s9 = new Signal('S9', 'warn', '14 security advisories affect 6.5.5 (CVE-a, CVE-b, CVE-c and 11 more)', ['advisories' => [self::OPEN]]);
@@ -203,10 +203,10 @@ final class FindingTest extends TestCase
     }
 
     /**
-     * Packagist's `replacement` is free text. swiftmailer names `symfony/mailer`;
+     * Packagist's `replacement` is free text. swiftmailer names `symfony/mailer`,
      * sensio/framework-extra-bundle names `Symfony`, doctrine/inflector `EnglishInflector from the
      * String component`. Only a package name is a successor: something to migrate to, count and
-     * link. The free text stays in the evidence; the JSON field holds the name or null.
+     * link. The free text stays in the evidence. The JSON field holds the name or null.
      */
     public function testTheSuccessorIsTheReplacementWhenItNamesAPackage(): void
     {
@@ -412,7 +412,7 @@ final class FindingTest extends TestCase
         self::assertNull($current->toArray()['libyears_unmeasured']);
     }
 
-    /** A finding assembled without a measurement has no dates to compare; the analyzer always passes one. */
+    /** A finding assembled without a measurement has no dates to compare. */
     public function testAFindingBuiltWithoutAMeasurementHasNoDateToTrust(): void
     {
         $bare = (new FindingBuilder())->build();
@@ -461,7 +461,7 @@ final class FindingTest extends TestCase
         $finding = (new FindingBuilder())->withVerdict(Verdict::STALE)->withChain(['vendor/root', 'vendor/pkg'])->withDirectDependents(['vendor/other', 'vendor/root'])->build();
         self::assertSame(['vendor/other', 'vendor/root'], $finding->directDependents());
         self::assertSame(['vendor/other', 'vendor/root'], $finding->toArray()['direct_dependents']);
-        // The chain's own root is what "via" already shows; the others are what is left.
+        // The chain's own root is what "via" already shows. The others are what is left.
         self::assertSame(['vendor/other'], $finding->otherDirectDependents());
     }
 
@@ -525,8 +525,6 @@ final class FindingTest extends TestCase
     }
 
     /**
-     * Every shape the no-fix list takes, with the list lockrot must write for it.
-     *
      * @return iterable<string, array{Finding, ?list<array{id: string, reason: string}>}>
      */
     public static function noFixShapes(): iterable
