@@ -151,7 +151,7 @@ jobs:
           echo "files=$changed_files" >> "$GITHUB_OUTPUT"
       - if: steps.scope.outputs.mode != 'none'
         uses: shivammathur/setup-php@v2
-        # pcntl: a mutant's test that never ends is stopped by an alarm (infection.json5 says how).
+        # pcntl: a mutant's test that never ends is stopped by an alarm (tests/Support/MutantTestTimeLimit.php).
         with: {php-version: '8.4', coverage: pcov, extensions: pcntl}
       - if: steps.scope.outputs.mode != 'none'
         run: composer install --no-interaction
