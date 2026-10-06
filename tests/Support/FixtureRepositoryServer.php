@@ -251,7 +251,7 @@ final class FixtureRepositoryServer
 
     private static function freshTempDir(string $prefix): string
     {
-        $dir = sys_get_temp_dir().'/'.$prefix.uniqid('', true);
+        $dir = sys_get_temp_dir().'/'.$prefix.bin2hex(random_bytes(8));
         if (!mkdir($dir, 0777, true) && !is_dir($dir)) {
             throw new \RuntimeException('cannot create temp dir: '.$dir);
         }

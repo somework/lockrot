@@ -122,7 +122,7 @@ final class PublishedReportPrivacyTest extends TestCase
     /** @param list<string> $urls */
     private function analyse(array $urls): Analysis
     {
-        $this->dir = sys_get_temp_dir().'/lockrot-privacy-'.uniqid('', true);
+        $this->dir = sys_get_temp_dir().'/lockrot-privacy-'.bin2hex(random_bytes(8));
         self::assertTrue(mkdir($this->dir.'/cache', 0777, true));
         $repositories = array_map(static fn (string $url): array => ['type' => 'composer', 'url' => $url], $urls);
         file_put_contents($this->dir.'/composer.json', (string) json_encode(['name' => 'acme/app', 'repositories' => $repositories, 'require' => ['acme/private-lib' => '^1.0', 'acme/local-lib' => 'dev-main']]));

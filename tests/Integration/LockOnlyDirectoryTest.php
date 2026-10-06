@@ -22,7 +22,7 @@ final class LockOnlyDirectoryTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->dir = sys_get_temp_dir().'/lockrot-lockonly-'.uniqid('', true);
+        $this->dir = sys_get_temp_dir().'/lockrot-lockonly-'.bin2hex(random_bytes(8));
         mkdir($this->dir);
         mkdir($this->dir.'/cache');
         mkdir($this->dir.'/home');

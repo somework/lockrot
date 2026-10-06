@@ -186,7 +186,7 @@ final class LockLineIndexTest extends TestCase
 
     public function testMissingFileThrows(): void
     {
-        $path = sys_get_temp_dir().'/lockrot-no-such-lock-'.uniqid('', true).'.lock';
+        $path = sys_get_temp_dir().'/lockrot-no-such-lock-'.bin2hex(random_bytes(8)).'.lock';
 
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage($path.' not found');
@@ -201,7 +201,8 @@ final class LockLineIndexTest extends TestCase
 
     public function testUnreadableFileThrows(): void
     {
-        $path = sys_get_temp_dir().'/lockrot-unreadable-'.uniqid('', true).'.lock';
+        $path = tempnam(sys_get_temp_dir(), 'lockrot-unreadable-');
+        self::assertIsString($path);
         file_put_contents($path, '{"packages":[]}');
         chmod($path, 0000);
         clearstatcache(true, $path);

@@ -12,7 +12,7 @@ final class RecordedHttpClientTest extends TestCase
 {
     public function testReadsEnvelopeAndReportsMissing(): void
     {
-        $dir = sys_get_temp_dir().'/lockrot-rec-'.uniqid('', true);
+        $dir = sys_get_temp_dir().'/lockrot-rec-'.bin2hex(random_bytes(8));
         mkdir($dir);
         $result = new HttpResult('https://x/a.json', 200, '{"ok":true}', new \DateTimeImmutable('2026-09-14T00:00:00+00:00'));
         file_put_contents(RecordedHttpClient::pathFor($dir, 'https://x/a.json'), json_encode($result->toEnvelope()));
@@ -42,7 +42,7 @@ final class RecordedHttpClientTest extends TestCase
 
     public function testEmptyObjectEnvelopeIsTreatedAsNotRecorded(): void
     {
-        $dir = sys_get_temp_dir().'/lockrot-rec-'.uniqid('', true);
+        $dir = sys_get_temp_dir().'/lockrot-rec-'.bin2hex(random_bytes(8));
         mkdir($dir);
         file_put_contents(RecordedHttpClient::pathFor($dir, 'https://x/empty.json'), '{}');
         $client = new RecordedHttpClient($dir);
@@ -55,7 +55,7 @@ final class RecordedHttpClientTest extends TestCase
 
     public function testAcceptsAndIgnoresHeaders(): void
     {
-        $dir = sys_get_temp_dir().'/lockrot-rec-'.uniqid('', true);
+        $dir = sys_get_temp_dir().'/lockrot-rec-'.bin2hex(random_bytes(8));
         mkdir($dir);
         $result = new HttpResult('https://x/a.json', 200, '{"ok":true}', new \DateTimeImmutable('2026-09-14T00:00:00+00:00'));
         file_put_contents(RecordedHttpClient::pathFor($dir, 'https://x/a.json'), json_encode($result->toEnvelope()));

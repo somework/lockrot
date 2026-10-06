@@ -64,7 +64,7 @@ final class SelfUpdateCommandTest extends TestCase
 
     private function installedPhar(): string
     {
-        $dir = sys_get_temp_dir().'/lockrot-selfupdate-cmd-'.uniqid('', true);
+        $dir = sys_get_temp_dir().'/lockrot-selfupdate-cmd-'.bin2hex(random_bytes(8));
         if (!mkdir($dir, 0755, true) && !is_dir($dir)) {
             throw new \RuntimeException('cannot create temp dir: '.$dir);
         }

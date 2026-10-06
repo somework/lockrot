@@ -101,7 +101,7 @@ final class FixtureServerLifetimeTest extends TestCase
 
     private function tempDir(): string
     {
-        $dir = sys_get_temp_dir().'/lockrot-server-lifetime-'.uniqid('', true);
+        $dir = sys_get_temp_dir().'/lockrot-server-lifetime-'.bin2hex(random_bytes(8));
         if (!mkdir($dir, 0777, true) && !is_dir($dir)) {
             throw new \RuntimeException('cannot create temp dir: '.$dir);
         }

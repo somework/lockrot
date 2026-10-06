@@ -113,7 +113,7 @@ final class PublicApiTest extends TestCase
      */
     public function testAReservedDirectoryIsFoundInAnyCase(): void
     {
-        $dir = sys_get_temp_dir().'/lockrot-public-api-'.uniqid('', true);
+        $dir = sys_get_temp_dir().'/lockrot-public-api-'.bin2hex(random_bytes(8));
         $children = ['extension', 'Extensions', 'Composer'];
         foreach ($children as $child) {
             self::assertTrue(mkdir($dir.'/'.$child, 0777, true));

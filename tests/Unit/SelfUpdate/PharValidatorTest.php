@@ -30,7 +30,7 @@ final class PharValidatorTest extends TestCase
     /** Phar only opens a file whose name ends in a recognised extension, so every path here is *.phar. */
     private function tempPhar(string $contents): string
     {
-        $path = sys_get_temp_dir().'/lockrot-validator-'.uniqid('', true).'.phar';
+        $path = sys_get_temp_dir().'/lockrot-validator-'.bin2hex(random_bytes(8)).'.phar';
         file_put_contents($path, $contents);
         $this->tempFiles[] = $path;
 

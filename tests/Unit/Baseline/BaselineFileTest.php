@@ -30,7 +30,7 @@ final class BaselineFileTest extends TestCase
 
     private function tempDir(): string
     {
-        $dir = sys_get_temp_dir().'/lockrot-baseline-file-'.uniqid('', true);
+        $dir = sys_get_temp_dir().'/lockrot-baseline-file-'.bin2hex(random_bytes(8));
         if (!mkdir($dir, 0777, true) && !is_dir($dir)) {
             throw new \RuntimeException('cannot create temp dir: '.$dir);
         }

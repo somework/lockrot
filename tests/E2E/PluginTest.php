@@ -19,7 +19,7 @@ final class PluginTest extends TestCase
         if (getenv('LOCKROT_E2E') !== '1') {
             self::markTestSkipped('set LOCKROT_E2E=1 to run the e2e plugin test (needs network and the composer binary)');
         }
-        $this->dir = sys_get_temp_dir().'/lockrot-e2e-'.uniqid('', true);
+        $this->dir = sys_get_temp_dir().'/lockrot-e2e-'.bin2hex(random_bytes(8));
         mkdir($this->dir);
     }
 
@@ -150,7 +150,7 @@ final class PluginTest extends TestCase
     {
         $this->createProject(['target-php' => '8.4'], ['somework/lockrot' => '*', 'phpzip/phpzip' => '2.0.8']);
         $this->install();
-        $elsewhere = sys_get_temp_dir().'/lockrot-e2e-elsewhere-'.uniqid('', true);
+        $elsewhere = sys_get_temp_dir().'/lockrot-e2e-elsewhere-'.bin2hex(random_bytes(8));
         mkdir($elsewhere);
         try {
             $run = new Process(

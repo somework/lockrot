@@ -27,7 +27,7 @@ final class ComposerCacheAdapterTest extends TestCase
     /** A cache directory of this test's own, removed in tearDown whether or not the assertions passed. */
     private function cacheDir(): string
     {
-        $dir = sys_get_temp_dir().'/lockrot-ccache-'.uniqid('', true).'/';
+        $dir = sys_get_temp_dir().'/lockrot-ccache-'.bin2hex(random_bytes(8)).'/';
         $this->dirs[] = $dir;
 
         return $dir;

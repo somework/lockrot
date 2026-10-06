@@ -52,7 +52,7 @@ final class SarifFormatterTest extends TestCase
     /** acme/abandoned is on line 4 of the lock written here, acme/silent on line 8. */
     private function lockPath(string $name = 'composer.lock'): string
     {
-        $dir = sys_get_temp_dir().'/lockrot-sarif-'.uniqid('', true);
+        $dir = sys_get_temp_dir().'/lockrot-sarif-'.bin2hex(random_bytes(8));
         if (!mkdir($dir, 0777, true) && !is_dir($dir)) {
             throw new \RuntimeException('cannot create temp dir: '.$dir);
         }
@@ -328,7 +328,7 @@ final class SarifFormatterTest extends TestCase
      */
     public function testDirectoryUriIsPercentEncoded(): void
     {
-        $dir = sys_get_temp_dir().'/lockrot sarif #uri-'.uniqid('', true);
+        $dir = sys_get_temp_dir().'/lockrot sarif #uri-'.bin2hex(random_bytes(8));
         if (!mkdir($dir, 0777, true) && !is_dir($dir)) {
             throw new \RuntimeException('cannot create temp dir: '.$dir);
         }
@@ -621,7 +621,7 @@ final class SarifFormatterTest extends TestCase
      */
     public function testDirectoryUriKeepsAColonAndTreatsABackslashAsASeparator(): void
     {
-        $suffix = uniqid('', true);
+        $suffix = bin2hex(random_bytes(8));
         $dir = sys_get_temp_dir().'/lockrot-sarif-c:\\drive-'.$suffix;
         if (!mkdir($dir, 0777, true) && !is_dir($dir)) {
             throw new \RuntimeException('cannot create temp dir: '.$dir);

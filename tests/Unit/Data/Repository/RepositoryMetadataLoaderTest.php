@@ -295,7 +295,7 @@ final class RepositoryMetadataLoaderTest extends TestCase
         // land in failed(), not metadata() or notFound(). Both the stable and the ~dev file are
         // empty here (a package registered with no releases and no branches at all), so the loader
         // reaches this outcome from pass 2 after pass 1's stable file routes it to $needDev.
-        $dir = sys_get_temp_dir().'/lockrot-empty-versions-'.uniqid('', true);
+        $dir = sys_get_temp_dir().'/lockrot-empty-versions-'.bin2hex(random_bytes(8));
         $envelopeDir = $dir.'/envelopes';
         self::assertNotFalse(mkdir($envelopeDir, 0777, true));
 
@@ -823,7 +823,7 @@ final class RepositoryMetadataLoaderTest extends TestCase
 
     private function tempDir(string $prefix): string
     {
-        $dir = sys_get_temp_dir().'/'.$prefix.uniqid('', true);
+        $dir = sys_get_temp_dir().'/'.$prefix.bin2hex(random_bytes(8));
         if (!mkdir($dir, 0777, true) && !is_dir($dir)) {
             throw new \RuntimeException('cannot create temp dir: '.$dir);
         }

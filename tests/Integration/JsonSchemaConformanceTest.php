@@ -1193,7 +1193,7 @@ final class JsonSchemaConformanceTest extends TestCase
 
     public function testTheBaselineFileValidatesAgainstItsSchemaAndItsStrictTwin(): void
     {
-        $dir = sys_get_temp_dir().'/lockrot-schema-'.uniqid('', true);
+        $dir = sys_get_temp_dir().'/lockrot-schema-'.bin2hex(random_bytes(8));
         mkdir($dir);
         try {
             foreach (['apps/wallabag_wallabag', 'skeletons/laravel'] as $fixture) {
@@ -1407,7 +1407,7 @@ final class JsonSchemaConformanceTest extends TestCase
      */
     public function testADocumentIsHeldToTheFileOfTheNumberItNamesWhileANewerFileSitsBesideIt(): void
     {
-        $dir = sys_get_temp_dir().'/lockrot-numbered-'.uniqid('', true);
+        $dir = sys_get_temp_dir().'/lockrot-numbered-'.bin2hex(random_bytes(8));
         mkdir($dir);
         try {
             copy(Schemas::path(Schemas::REPORT, 1), $dir.'/lockrot-report-1.schema.json');
@@ -1518,7 +1518,7 @@ final class JsonSchemaConformanceTest extends TestCase
     /** A fixture without an expectation, or a directory that is no document and number, is an error of the fixture set. */
     public function testTheNegativeRunnerRefusesAFixtureWithoutAnExpectation(): void
     {
-        $root = sys_get_temp_dir().'/lockrot-negative-'.uniqid('', true);
+        $root = sys_get_temp_dir().'/lockrot-negative-'.bin2hex(random_bytes(8));
         mkdir($root.'/report-1', 0777, true);
         try {
             file_put_contents($root.'/report-1/plain.json', '{"lockrot": {"schema": 1}}');

@@ -83,7 +83,8 @@ final class BuiltinAllowlistTest extends TestCase
     /** @param array<string, mixed> $document */
     private function tempJson(array $document): string
     {
-        $path = sys_get_temp_dir().'/lockrot-builtin-allowlist-'.uniqid('', true).'.json';
+        $path = tempnam(sys_get_temp_dir(), 'lockrot-builtin-allowlist-');
+        self::assertIsString($path);
         file_put_contents($path, (string) json_encode($document));
         $this->tempPaths[] = $path;
 
