@@ -142,6 +142,7 @@ jobs:
             exit 0
           fi
           echo "mode=diff" >> "$GITHUB_OUTPUT"
+          echo "base=$base" >> "$GITHUB_OUTPUT"
           echo "dirs=${dirs[*]}" >> "$GITHUB_OUTPUT"
           echo "diff=$([ -n "$changed_dirs" ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
           echo "files=$changed_files" >> "$GITHUB_OUTPUT"
@@ -181,10 +182,9 @@ jobs:
           if [ -f build/infection.log ]; then mv build/infection.log build/infection-files.log; fi
       - name: Mutate the lines the pull request changes
         if: steps.scope.outputs.mode == 'diff' && steps.scope.outputs.diff == 'true'
-        env: {BASE_REF: '${{ github.base_ref }}'}
         run: |
           python3 tools/mutation/shard_config.py infection.json5 ${{ steps.scope.outputs.dirs }} > infection.shard.json5
-          $(composer global config bin-dir --absolute)/infection --configuration=infection.shard.json5 --threads=max --only-covering-test-cases --git-diff-lines "--git-diff-base=origin/$BASE_REF" --min-msi=0 --min-covered-msi=0
+          $(composer global config bin-dir --absolute)/infection --configuration=infection.shard.json5 --threads=max --only-covering-test-cases --git-diff-lines --git-diff-base=${{ steps.scope.outputs.base }} --min-msi=0 --min-covered-msi=0
       - name: Escapes against tests/infection-equivalents.md
         if: steps.scope.outputs.mode == 'diff'
         run: |

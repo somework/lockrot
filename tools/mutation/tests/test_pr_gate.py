@@ -53,6 +53,14 @@ src/Composer/SelfUpdateCommand.php:155 FalseValue (`\\Phar::running(false)`) —
 with its reference is an entry too.
 
 Prose mentioning src/Lock/LockedPackage.php and Identical outside an entry documents nothing.
+
+### Not equivalent: the two mutants this run reports as timed out
+
+- `src/Data/Repository/RepositoryMetadataLoader.php:195` NotIdentical — a genuine infinite loop.
+
+## Later
+
+- `src/Data/Repository/RepositoryUrl.php:254` LessThan — two offsets of one pattern never coincide.
 """
 
 
@@ -89,6 +97,12 @@ class ReadingTheDocumentedList(unittest.TestCase):
 
     def test_a_paragraph_that_opens_with_its_reference_is_an_entry(self):
         self.assertTrue(pr_gate.documented(('src/Composer/SelfUpdateCommand.php', 155, 'FalseValue'), self.entries))
+
+    def test_a_mutant_listed_as_not_equivalent_is_not_documented(self):
+        self.assertFalse(pr_gate.documented(('src/Data/Repository/RepositoryMetadataLoader.php', 195, 'NotIdentical'), self.entries))
+
+    def test_entries_after_the_not_equivalent_section_count_again(self):
+        self.assertTrue(pr_gate.documented(('src/Data/Repository/RepositoryUrl.php', 254, 'LessThan'), self.entries))
 
     def test_each_of_two_adjacent_entries_stands_on_its_own(self):
         self.assertTrue(pr_gate.documented(('src/Lock/ConfiguredRepositories.php', 286, 'CastString'), self.entries))
