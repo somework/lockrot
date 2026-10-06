@@ -152,7 +152,7 @@ jobs:
           changed_files=""
           if [ ${#files[@]} -gt 0 ]; then changed_files=$(git diff --name-only --diff-filter=AM "$base" HEAD -- "${files[@]}" | tr '\n' ' '); fi
           # --git-diff-lines reads added and modified files only. A renamed file is mutated whole, by path.
-          renamed=$(git diff --name-only --diff-filter=R "$base" HEAD -- "${dirs[@]}" | grep '\.php$' | tr '\n' ' ' || true)
+          renamed=$(git diff --name-only --diff-filter=R "$base" HEAD -- "${dirs[@]}" "${files[@]}" | grep '\.php$' | tr '\n' ' ' || true)
           changed_files=$(echo $changed_files $renamed)
           if [ -z "$changed_dirs" ] && [ -z "$changed_files" ]; then
             echo "mode=none" >> "$GITHUB_OUTPUT"
