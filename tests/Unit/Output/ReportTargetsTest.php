@@ -234,7 +234,7 @@ final class ReportTargetsTest extends TestCase
     }
 
     /**
-     * A name that resolves on disk to a protected file — a symlink here; an 8.3 short name such as
+     * A name that resolves on disk to a protected file — a symlink here, an 8.3 short name such as
      * `LOCKRO~1.JSO` on Windows — is that file.
      */
     public function testALinkToAProtectedFileIsRefused(): void
@@ -262,7 +262,7 @@ final class ReportTargetsTest extends TestCase
     }
 
     /**
-     * A second name for the file itself — a hard link here; on macOS's case-insensitive APFS any
+     * A second name for the file itself — a hard link here, on macOS's case-insensitive APFS any
      * spelling Unicode case folding sends to the same entry, such as `composer.locK` with a Kelvin
      * sign, which lower-casing ASCII never matches — is that file.
      */
@@ -343,7 +343,6 @@ final class ReportTargetsTest extends TestCase
         self::assertSame($message, $this->refusal(fn () => $this->resolve($specs)));
     }
 
-    /** Two names that exist and are one file on disk — a hard link here — are the same file named twice. */
     public function testTwoNamesForOneFileOnDiskAreTheSameFileTwice(): void
     {
         file_put_contents($this->cwd.'/a.json', 'the last run');
@@ -356,10 +355,10 @@ final class ReportTargetsTest extends TestCase
     }
 
     /**
-     * A name that does not exist yet can still turn out to be a file this run has just written — on
+     * A name that does not exist can still turn out to be a file this run has written — on
      * APFS `café.json` spelled precomposed and decomposed is one file. Checked again before each
-     * write, it stops the run with exit 2 naming both, instead of losing the first report silently;
-     * the first file is kept as written.
+     * write, it stops the run with exit 2 naming both, instead of losing the first report silently.
+     * The first file is kept as written.
      */
     public function testAFileThatTurnsOutToBeOneAlreadyWrittenStopsTheRun(): void
     {
@@ -476,7 +475,6 @@ final class ReportTargetsTest extends TestCase
         self::assertSame(Formatters::for('markdown', $context)->format(self::report()), file_get_contents($this->cwd.'/r.md'));
     }
 
-    /** `--all` reaches the files as it reaches stdout. */
     public function testShowAllIsPassedToTheFormatter(): void
     {
         $targets = $this->resolve(['markdown:all.md']);

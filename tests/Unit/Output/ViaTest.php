@@ -31,7 +31,7 @@ final class ViaTest extends TestCase
         self::assertSame('', Via::suffix($f, ' > '));
     }
 
-    /** The other roots are still on the finding for the machine formats; the phrase leaves them out. */
+    /** The other roots stay on the finding for the machine formats. The phrase omits them. */
     public function testDirectPackageAnotherRootAlsoReachesStaysDirect(): void
     {
         $f = self::finding(['acme/pkg'], ['acme/pkg', 'r/one']);

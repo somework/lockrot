@@ -44,7 +44,7 @@ final class GithubFormatterTest extends TestCase
     }
 
     /**
-     * A two-package lock whose line numbers are fixed by the literal below: acme/abandoned is on
+     * A two-package lock whose line numbers are fixed by its literal: acme/abandoned is on
      * line 4, acme/silent on line 8.
      */
     private function lockPath(string $name = 'composer.lock'): string
@@ -184,7 +184,7 @@ final class GithubFormatterTest extends TestCase
         $out = $this->formatter(LockrotConfig::FAIL_ON_NONE, $this->lockPath())->format($report);
         $lines = explode("\n", trim($out));
 
-        // Message values escape % CR LF only; ":" and "," stay literal there.
+        // Message values escape % CR LF only. ":" and "," stay literal there.
         self::assertSame(
             '::warning file=composer.lock,line=4,title=lockrot%3A stale (medium)::acme/abandoned 1.0.0: 100%25 behind, see http://x:8080, line 1%0Aline 2',
             $lines[0]
@@ -221,9 +221,9 @@ final class GithubFormatterTest extends TestCase
     }
 
     /**
-     * Under `COMPOSER=alt.json` the analysed lock is alt.lock, and an annotation on composer.lock
-     * pointed at a file the run never read. `file=` is the lock's path relative to the project
-     * directory, the subdirectory `COMPOSER=app/alt.json` puts it in included.
+     * Under `COMPOSER=alt.json` the analysed lock is alt.lock, not composer.lock. `file=` is the
+     * lock's path relative to the project directory, the subdirectory `COMPOSER=app/alt.json` puts
+     * it in included.
      */
     public function testTheAnnotationNamesTheAnalysedLockRelativeToTheProjectDirectory(): void
     {
@@ -237,7 +237,6 @@ final class GithubFormatterTest extends TestCase
         self::assertSame('::warning file='.$name.',title=lockrot%3A stale (medium)::acme/absent 3.0.0: last release 2022-05-20 (4.3 years ago)', $lines[2]);
     }
 
-    /** The default lock in the project directory annotates exactly what it always did. */
     public function testTheDefaultLockKeepsEveryAnnotationByteForByte(): void
     {
         $lockPath = $this->lockPath();
@@ -248,7 +247,7 @@ final class GithubFormatterTest extends TestCase
         self::assertStringStartsWith('::error file=composer.lock,line=4,title=', $out);
     }
 
-    /** A lock name is a property value: a `,` or `:` in it would end the property or the command. */
+    /** A lock name is a property value: a `,` or `:` in it ends the property or the command. */
     public function testTheLockNameIsEscapedAsAProperty(): void
     {
         $lockPath = $this->lockPath('a,b%c.lock');
@@ -266,7 +265,7 @@ final class GithubFormatterTest extends TestCase
         }
     }
 
-    /** A finding the baseline already carries is annotated as a notice, so the colour still matches the exit code. */
+    /** A finding the baseline carries is annotated as a notice, so the colour matches the exit code. */
     public function testABaselinedFindingIsAnnotatedAsANotice(): void
     {
         $report = $this->report();
@@ -309,7 +308,7 @@ final class GithubFormatterTest extends TestCase
         );
     }
 
-    /** A context does not make an unknown format acceptable; LockrotConfig rejects it first. */
+    /** A context does not make an unknown format acceptable. LockrotConfig rejects it first. */
     public function testFactoryStillRejectsAnUnknownFormat(): void
     {
         $this->expectException(ConfigException::class);

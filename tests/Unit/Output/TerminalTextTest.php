@@ -88,7 +88,7 @@ final class TerminalTextTest extends TestCase
         self::assertSame('abc€', TerminalText::escape('abc€', 6));
     }
 
-    /** The cut lands on the limit exactly: one byte fewer and the last one would be missing, one more and it would be past. */
+    /** The cut lands on the limit exactly: one byte fewer drops the last one, one more goes past it. */
     public function testTheCutKeepsEverythingThatFits(): void
     {
         self::assertSame('abcd…', TerminalText::escape('abcdefgh', 4));

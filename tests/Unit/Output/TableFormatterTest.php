@@ -47,7 +47,7 @@ final class TableFormatterTest extends TestCase
     }
 
     /**
-     * At 74 columns `see composer` fits and `audit` does not; at 80, `Run composer` fits and
+     * At 74 columns `see composer` fits and `audit` does not. At 80, `Run composer` fits and
      * `lockrot --format=json` does not. A command is one thing to copy, so it moves down whole.
      */
     public function testACommandTheFooterNamesIsNeverSplitAcrossLines(): void
@@ -167,10 +167,9 @@ final class TableFormatterTest extends TestCase
     }
 
     /**
-     * Every rendered row of every group: everything above the blank line that separates the last
-     * group from the summary block. Only the rows are wrapped — the summary block is one line per
-     * fact by design, and a terminal soft-wraps those itself — so the blank lines *between* groups
-     * have to stay inside the region, which means slicing at the last one rather than the first.
+     * Every rendered row of every group: everything before the blank line that separates the last
+     * group from the summary block. The blank lines between groups stay inside the region, so the
+     * slice ends at the last blank line, not the first.
      *
      * @return list<string>
      */
@@ -189,7 +188,7 @@ final class TableFormatterTest extends TestCase
         $rows = $this->rowRegion($out);
 
         // every row of every group, not just the first one: the tail of line 1 only wraps on a row
-        // with a long chain, and those sit below the critical group
+        // with a long chain, and those are not in the critical group
         foreach (['critical (1)', 'high (1)', 'medium (1)', 'low (1)', 'not flagged (2)'] as $header) {
             self::assertContains($header, $rows, 'the measured region has to span every group');
         }
@@ -201,7 +200,6 @@ final class TableFormatterTest extends TestCase
             "  abandoned    hoa/compiler 3.17.08.08  via wallabag/rulerz\n".str_repeat(' ', 15)."› hoa/ruler\n",
             $this->plain($out)
         );
-        // and so did the evidence underneath it
         self::assertStringContainsString(
             str_repeat(' ', 15)."marked abandoned by its repository; last\n".str_repeat(' ', 15).'release 2022-05-20',
             $this->plain($out)
@@ -210,7 +208,7 @@ final class TableFormatterTest extends TestCase
 
     /**
      * Baseline annotations push the label column to 21, so the indent is 25 and the narrowest
-     * terminal lockrot accepts would leave 15 columns for the text. The floor takes over at 20 and
+     * terminal lockrot accepts leaves 15 columns for the text. The floor takes over at 20 and
      * the row overruns the terminal, rather than the text being squeezed into nothing.
      */
     public function testAVeryNarrowTerminalStillLeavesTwentyColumnsForTheText(): void
@@ -246,7 +244,7 @@ final class TableFormatterTest extends TestCase
 
     /**
      * A php constraint is the one piece of evidence that routinely looks like a console tag. The
-     * text has to come out of a *decorated* formatter byte-for-byte, styles aside: the label is
+     * text must come out of a *decorated* formatter byte-for-byte, styles aside: the label is
      * coloured, the constraint is not touched.
      */
     public function testAPhpConstraintInEvidenceSurvivesADecoratedFormatter(): void
@@ -291,8 +289,8 @@ final class TableFormatterTest extends TestCase
      * {@see ConsoleMarkup} — what stdout and an `--output` file get — they print as written, and
      * the only colours on the page are lockrot's own: the red label and the bold group header, each
      * closed where lockrot closed it, nothing running on into the text after them. symfony/console
-     * 5.4's own escape() left the second `<` of `<<fg=red>>` live, which threw from the formatter or
-     * opened a style or a link, and lost the backslash of `a\<b`.
+     * 5.4's own escape() leaves the second `<` of `<<fg=red>>` live, which throws from the formatter or
+     * opens a style or a link, and loses the backslash of `a\<b`.
      *
      * @dataProvider textsThatLookLikeMarkup
      */
@@ -384,10 +382,6 @@ final class TableFormatterTest extends TestCase
     }
 
     /**
-     * The summary block is part of a width-aware report too: its lines fold at the full width with
-     * no indent, since each is a fact of its own rather than a continuation hanging under a label.
-     */
-    /**
      * The counts line folds between items, by byte length as {@see TableFormatter::wrap()} counts:
      * `6 packages checked · abandoned 2 · silent 0 · pinned 0` is 57 bytes (three two-byte dots),
      * ` · left-behind 0` adds 17 and the ` ·` that closes the line 3 more, so the 77-byte line
@@ -412,7 +406,7 @@ final class TableFormatterTest extends TestCase
 
     /**
      * The last item closes no line, so nothing is reserved after it: the 137-byte counts line is
-     * one line at 137, where a closing separator would not have fit, and `ok 1` folds at 136.
+     * one line at 137, where a closing separator does not fit, and `ok 1` folds at 136.
      */
     public function testTheLastItemNeedsNoRoomForAClosingSeparator(): void
     {
@@ -425,6 +419,7 @@ final class TableFormatterTest extends TestCase
         self::assertContains('ok 1', $folded);
     }
 
+    /** Summary lines fold at the full width with no indent: each is a fact of its own, not a continuation under a label. */
     public function testTheSummaryBlockIsWrappedToTheTerminalWidth(): void
     {
         $lines = $this->plainLines($this->formatter(60)->format($this->report()));
@@ -440,9 +435,9 @@ final class TableFormatterTest extends TestCase
 
     /**
      * A summary line folds at spaces only: a single token longer than the width — an absolute
-     * baseline path in a note — is kept whole on its own line rather than cut mid-path, which
-     * would leave the reader unable to copy it. Rows keep cutting long tokens, so they never exceed
-     * the terminal; the summary block trades that guarantee for an intact path.
+     * baseline path in a note — is kept whole on its own line rather than cut mid-path, so the
+     * reader can copy it. Rows keep cutting long tokens, so they never exceed the terminal. The
+     * summary block trades that guarantee for an intact path.
      */
     public function testALongTokenInTheSummaryBlockIsNeverCut(): void
     {
@@ -455,7 +450,7 @@ final class TableFormatterTest extends TestCase
         self::assertContains('note: baseline written to', $lines);
     }
 
-    /** The other half of the rule above: a row never exceeds the terminal, whatever token it carries. */
+    /** A row never exceeds the terminal, whatever token it carries. */
     public function testALongTokenInARowIsCutSoTheRowNeverExceedsTheWidth(): void
     {
         $at = new \DateTimeImmutable(self::AT);
@@ -522,7 +517,7 @@ final class TableFormatterTest extends TestCase
 
     /**
      * wordwrap() breaks at the first of a run of spaces and leaves the rest at the end of the line,
-     * so the two-space gutter before `direct` would otherwise trail invisibly off several rows.
+     * so the two-space gutter before `direct` otherwise trails invisibly off several rows.
      */
     public function testNoRenderedLineEndsWithWhitespace(): void
     {
@@ -543,8 +538,7 @@ final class TableFormatterTest extends TestCase
 
     /**
      * The report of {@see report()} compared against a baseline that knows doctrine/cache as
-     * abandoned, vendor/stale-direct as worse than it was, and one package that has since left the
-     * lock.
+     * abandoned, hoa/compiler as only stale (worsened), and vendor/departed, which the lock lacks.
      */
     private function baselinedReport(): Report
     {

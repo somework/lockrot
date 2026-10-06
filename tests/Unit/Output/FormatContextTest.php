@@ -59,7 +59,6 @@ final class FormatContextTest extends TestCase
         self::assertSame(FormatContext::LEVEL_NOTE, $context->levelOf($this->finding('a/b', Verdict::OK)));
     }
 
-    /** The annotation level follows a priority threshold the way it follows a verdict one. */
     public function testAPriorityThresholdDrawsTheErrorLineByPriority(): void
     {
         $context = FormatContext::create(null, 'high', Version::STRING);
@@ -138,8 +137,8 @@ final class FormatContextTest extends TestCase
     }
 
     /**
-     * The mapping's first rule wins: a finding the baseline already accepted is a note even when
-     * `--fail-on=unchecked` would otherwise make it an error for carrying S10.
+     * The mapping's first rule wins: a finding the baseline accepted is a note even when
+     * `--fail-on=unchecked` makes it an error for carrying S10.
      */
     public function testUnderUncheckedAFindingTheBaselineKnowsStaysANote(): void
     {

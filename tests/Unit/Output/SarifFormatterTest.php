@@ -25,9 +25,8 @@ use PHPUnit\Framework\TestCase;
 final class SarifFormatterTest extends TestCase
 {
     /**
-     * The official SARIF 2.1.0 JSON schema, downloaded on 2026-09-15 from
-     * https://json.schemastore.org/sarif-2.1.0.json and committed unchanged, so this test never
-     * depends on the network.
+     * The official SARIF 2.1.0 JSON schema from https://json.schemastore.org/sarif-2.1.0.json,
+     * committed unchanged, so this test never depends on the network.
      */
     private const SCHEMA = __DIR__.'/../../fixtures/sarif/sarif-schema-2.1.0.json';
     private const AT = '2026-09-14T06:00:00+00:00';
@@ -93,11 +92,7 @@ final class SarifFormatterTest extends TestCase
         return new SarifFormatter(FormatContext::create($lockPath, $failOn));
     }
 
-    /**
-     * The single run of a formatted report, as a decoded array.
-     *
-     * @return array<mixed, mixed>
-     */
+    /** @return array<mixed, mixed> */
     private function singleRun(string $sarif): array
     {
         self::assertStringEndsWith("\n", $sarif);
@@ -190,7 +185,7 @@ final class SarifFormatterTest extends TestCase
     /**
      * Rules follow the order the results first use them, which is the report's order, not
      * Verdict::all(): `finished` and `ok` tie, so a direct `ok` package comes before a `finished`
-     * one. docs/compatibility.md says so; changing it would change machine-readable output.
+     * one. docs/compatibility.md says so. Changing it changes machine-readable output.
      */
     public function testRulesFollowTheOrderTheResultsFirstUseThem(): void
     {
@@ -288,7 +283,7 @@ final class SarifFormatterTest extends TestCase
         self::assertSame([100.0, 75.0, 50.0, 25.0, 0.0], JsonPath::column($run, ['results'], 'rank'));
 
         // A whole number is still a JSON float here: SARIF types rank as a number, and an integer
-        // 100 would read as a different type to a strict consumer.
+        // 100 reads as a different type to a strict consumer.
         self::assertStringContainsString('"rank": 100.0', $sarif);
         self::assertStringContainsString('"rank": 75.0', $sarif);
         self::assertStringContainsString('"rank": 0.0', $sarif);
@@ -322,7 +317,7 @@ final class SarifFormatterTest extends TestCase
     }
 
     /**
-     * A checkout directory may legally contain characters a URI cannot carry raw. The bundled
+     * A checkout directory can contain characters that a URI cannot carry raw. The bundled
      * validator's `uri-reference` format check is lenient enough to accept a raw space, so this
      * asserts the encoding directly rather than relying on schema validation to catch it.
      */
@@ -385,7 +380,6 @@ final class SarifFormatterTest extends TestCase
         self::assertSame(['lockrot/package' => 'acme/abandoned'], JsonPath::arrayAt($run, ['results', 0, 'partialFingerprints']));
     }
 
-    /** The default lock in the project directory produces exactly the document it always did. */
     public function testTheDefaultLockKeepsTheDocumentByteForByte(): void
     {
         $lockPath = $this->lockPath();
@@ -398,7 +392,7 @@ final class SarifFormatterTest extends TestCase
 
     /**
      * The lock's name is a relative URI reference, so it is percent-encoded per segment — a colon
-     * included, which in a first segment would otherwise read as a URI scheme.
+     * included, which in a first segment otherwise reads as a URI scheme.
      */
     public function testTheArtifactUriIsPercentEncoded(): void
     {
@@ -463,8 +457,8 @@ final class SarifFormatterTest extends TestCase
     }
 
     /**
-     * The four-finding report compared against a baseline that knows acme/abandoned as it is,
-     * acme/silent as only stale (worsened now) and nothing about acme/also-abandoned (new).
+     * The report compared against a baseline that knows acme/abandoned as it is,
+     * acme/silent as only stale (worsened) and nothing about acme/also-abandoned (new).
      */
     private function baselinedReport(): Report
     {
@@ -537,8 +531,6 @@ final class SarifFormatterTest extends TestCase
     }
 
     /**
-     * One string member of every result's property bag, in the order the results are in.
-     *
      * @param array<mixed, mixed> $run
      *
      * @return list<string>
@@ -615,7 +607,7 @@ final class SarifFormatterTest extends TestCase
     }
 
     /**
-     * A backslash is a legal character in a POSIX directory name; lockrot reads it as the separator
+     * A backslash is a legal character in a POSIX directory name. lockrot reads it as the separator
      * it is on Windows, on every platform, and never encodes a colon. The URI starts with exactly
      * three slashes: the directory's leading one is the authority/path boundary, not a segment.
      */
