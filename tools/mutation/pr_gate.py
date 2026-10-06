@@ -4,62 +4,114 @@
     python3 tools/mutation/pr_gate.py build/infection.log [more.log ...] tests/infection-equivalents.md
 
 On a pull request each mutation shard mutates only the lines the request changes (ci.yml), so a
-shard sees a handful of mutants, often none. A minimum MSI over a handful is noise: one documented
-equivalent on a touched line is several points. This gate reads the escaped mutants of Infection's
-text log instead. tests/infection-equivalents.md says its line numbers drift as the code above them
-moves, so an escape is not matched by line: it is accounted for while the entries naming its file
-(a list item, or a paragraph opening with a `src/...php:line` reference) name its mutator at least as
-many times as the run has escapes of that file and mutator ("x2" counts twice). Every escape goes to
-the step summary, accounted for or not; the exit code is 1 when any is not, 2 when the log cannot be
-read, 0 otherwise.
+shard sees a handful of mutants, often none, and a minimum MSI over a handful is noise. This gate
+reads the escaped mutants of Infection's text log instead, and fails on one that no entry of
+tests/infection-equivalents.md accounts for. Every escape goes to the step summary either way.
 
-The full run on a push to release/** and main keeps the per-shard minimum MSI; this gate does not
-replace it. Standard library only, as tools/corpus.
+An escape is keyed so that a line added or removed above it leaves the key alone: its file, its
+mutator and the line Infection mutated, whitespace-normalised (read from the checked-out file at the
+line the log reports, since the log's diff drops comments). When that text occurs more than once in
+the file, or an entry's text does not match, the enclosing method is the key. An entry of the
+documented list gives that key in one of two forms:
+
+- `src/Path/File.php` Mutator `the original line` -- the form that does not drift;
+- `src/Path/File.php:123` Mutator -- read through the checked-out source (the text at line 123),
+  until the list is re-keyed in the first form.
+
+An entry accounts for as many escapes as it names the mutator ("x2" counts twice). A section whose
+heading says its mutants are not equivalent accounts for nothing. Exit code 1 when an escape is not
+accounted for, 2 when a log or the list cannot be read, 0 otherwise. Standard library only.
 """
 
+import os
 import re
 import sys
-from typing import List, NamedTuple, Optional, Tuple
+from typing import Dict, List, NamedTuple, Optional, Tuple
 
-ESCAPE = re.compile(r'^\d+\) \S*?/?(src/\S+\.php):(\d+)\s+\[M\] (\w+) \[ID\]')
+HEADER = re.compile(r'^\d+\) \S*?/?(src/\S+\.php):(\d+)\s+\[M\] (\w+) \[ID\]')
 SECTION = re.compile(r'^([A-Z][A-Za-z ]+) mutants:$')
-SOURCE = re.compile(r'src/[\w/]+\.php')
-OPENS_WITH_REFERENCE = re.compile(r'^`?src/[\w/]+\.php:\d+')
+TOKEN = re.compile(
+    r'`(?P<path>src/[\w/]+\.php)(?::(?P<line>\d+))?`'
+    r'|`:(?P<bare>\d+)`'
+    r'|`(?P<code>[^`]+)`'
+    r'|(?<![A-Za-z])(?P<mutator>[A-Z][a-z]+(?:[A-Z][a-z0-9]*)*_?)(?:\s+x(?P<times>\d+))?(?![A-Za-z])'
+)
+FUNCTION = re.compile(r'\bfunction\s+(\w+)\s*\(')
+Key = Tuple[str, str, str]
 
 
 class Escape(NamedTuple):
     path: str
     line: int
     mutator: str
-
-
-class Entry(NamedTuple):
-    paths: frozenset
     text: str
 
 
-def escapes(log: str) -> List[Tuple[str, int, str]]:
-    """The escaped mutants of an Infection text log, as (path under src/, line, mutator)."""
-    found = []
+def normalise(text: str) -> str:
+    return ' '.join(text.split())
+
+
+def escapes(log: str) -> List[Escape]:
+    """The escaped mutants of an Infection text log, each with the first original line its diff removes."""
+    found: List[list] = []
     section: Optional[str] = None
+    current: Optional[list] = None
     for line in log.splitlines():
         heading = SECTION.match(line)
         if heading:
-            section = heading.group(1)
+            section, current = heading.group(1), None
             continue
-        match = ESCAPE.match(line)
-        if section == 'Escaped' and match:
-            found.append(Escape(match.group(1), int(match.group(2)), match.group(3)))
-    return [tuple(escape) for escape in found]
+        match = HEADER.match(line)
+        if match:
+            current = [match.group(1), int(match.group(2)), match.group(3), ''] if section == 'Escaped' else None
+            if current is not None:
+                found.append(current)
+            continue
+        if current is not None and not current[3] and line.startswith('-') and not line.startswith('---'):
+            current[3] = normalise(line[1:])
+    return [Escape(*item) for item in found]
 
 
-def entries(markdown: str) -> List[Entry]:
-    """The entries of the documented-equivalents file.
+class Source:
+    """The checked-out source the keys are read from."""
 
-    An entry is a list item (a line starting `- ` and its indented continuation) or a paragraph whose
-    first word is a `src/...php:line` reference; prose around them documents nothing, and neither does
-    a section whose heading says its mutants are not equivalent.
-    """
+    def __init__(self, root: str):
+        self.root = root
+        self.cache: Dict[str, List[str]] = {}
+
+    def lines(self, path: str) -> List[str]:
+        if path not in self.cache:
+            try:
+                with open(os.path.join(self.root, path), encoding='utf-8') as handle:
+                    self.cache[path] = handle.read().splitlines()
+            except OSError:
+                self.cache[path] = []
+        return self.cache[path]
+
+    def text(self, path: str, line: int) -> str:
+        lines = self.lines(path)
+        return normalise(lines[line - 1]) if 0 < line <= len(lines) else ''
+
+    def method(self, path: str, line: int) -> str:
+        for candidate in reversed(self.lines(path)[:line]):
+            match = FUNCTION.search(candidate)
+            if match:
+                return match.group(1)
+        return ''
+
+    def keys(self, path: str, mutator: str, line: int, text: str) -> List[Key]:
+        """The keys a mutant answers to, most precise first: the line's text when it is unique in the
+        file, then the enclosing method."""
+        occurrences = [n for n, candidate in enumerate(self.lines(path), 1) if normalise(candidate) == text]
+        found = [(path, mutator, 'text:' + text)] if text and len(occurrences) == 1 else []
+        method = self.method(path, line or (occurrences[0] if occurrences else 0))
+        if method:
+            found.append((path, mutator, 'method:' + method))
+        return found
+
+
+def entries(markdown: str) -> List[str]:
+    """The entries of the documented list: list items, and paragraphs opening with a source reference."""
     blocks: List[List[str]] = []
     not_equivalent = False
     for line in markdown.splitlines():
@@ -70,68 +122,76 @@ def entries(markdown: str) -> List[Entry]:
             continue
         if not_equivalent:
             continue
-        if line.startswith('- ') or OPENS_WITH_REFERENCE.match(line):
+        if line.startswith('- ') or re.match(r'^`?src/[\w/]+\.php:\d+', line):
             blocks.append([line])
         elif blocks and blocks[-1] and line.strip() and (line.startswith((' ', '\t')) or not blocks[-1][0].startswith('- ')):
             blocks[-1].append(line)
         else:
             blocks.append([])
-    found = []
-    for block in blocks:
-        text = ' '.join(block)
-        paths = frozenset(SOURCE.findall(text))
-        if paths:
-            found.append(Entry(paths, text))
+    return [' '.join(block) for block in blocks if block]
+
+
+def allowances(markdown: str, source: Source) -> List[list]:
+    """One claim per mutator an entry names: [the keys it answers to, how many escapes it covers]."""
+    found: List[list] = []
+
+    def add(keys: List[Key], count: int) -> None:
+        if keys:
+            found.append([set(keys), count])
+
+    for entry in entries(markdown):
+        # A paragraph entry may open with an unquoted reference; quote it so it reads as one.
+        entry = re.sub(r'^(src/[\w/]+\.php:\d+)', r'`\1`', entry)
+        path: Optional[str] = None
+        line = 0
+        pending: List[Tuple[str, int]] = []
+        for match in TOKEN.finditer(entry):
+            if match.group('path'):
+                path, line, pending = match.group('path'), int(match.group('line') or 0), []
+            elif match.group('bare') and path:
+                line, pending = int(match.group('bare')), []
+            elif match.group('mutator') and path:
+                count = int(match.group('times') or 1)
+                if line:
+                    add(source.keys(path, match.group('mutator'), line, source.text(path, line)), count)
+                else:
+                    pending.append((match.group('mutator'), count))
+            elif match.group('code') and path and not line and pending:
+                for mutator, count in pending:
+                    add(source.keys(path, mutator, 0, normalise(match.group('code')))[:1], count)
+                pending = []
     return found
 
 
-def _mentions(mutator: str, text: str) -> int:
-    count = 0
-    for match in re.finditer(r'(?<![A-Za-z])' + re.escape(mutator) + r'(?![A-Za-z])(\s+x(\d+))?', text):
-        count += int(match.group(2)) if match.group(2) else 1
-    return count
-
-
-def documented(escape: Tuple[str, int, str], known: List[Entry]) -> bool:
-    """Whether any entry naming the escape's file names its mutator."""
-    return allowance(escape[0], escape[2], known) > 0
-
-
-def allowance(path: str, mutator: str, known: List[Entry]) -> int:
-    """How many escapes of this file and mutator the entries account for."""
-    return sum(_mentions(mutator, entry.text) for entry in known if path in entry.paths)
-
-
-def accounted(found: List[Tuple[str, int, str]], known: List[Entry]) -> List[bool]:
-    """Per escape, in order: whether it is within the number the entries document for its file and mutator."""
-    used: dict = {}
-    result = []
-    for path, _, mutator in found:
-        key = (path, mutator)
-        used[key] = used.get(key, 0) + 1
-        result.append(used[key] <= allowance(path, mutator, known))
-    return result
-
-
-def summary(found: List[Tuple[str, int, str]], known: List[Entry]) -> Tuple[int, str]:
+def summary(found: List[Escape], claims: List[list], source: Source) -> Tuple[int, str]:
     if not found:
         return 0, 'No mutant escaped on the lines this pull request changes.\n'
-    lines = ['| escaped mutant | in tests/infection-equivalents.md |', '|---|---|']
+    rows = ['| escaped mutant | original line | in tests/infection-equivalents.md |', '|---|---|---|']
     undocumented = 0
-    for escape, ok in zip(found, accounted(found, known)):
+    for escape in found:
+        # The text Infection mutated is the checked-out line it reports; its diff drops comments.
+        text = source.text(escape.path, escape.line) or escape.text
+        ok = False
+        for key in source.keys(escape.path, escape.mutator, escape.line, text):
+            claim = next((c for c in claims if c[1] > 0 and key in c[0]), None)
+            if claim is not None:
+                claim[1] -= 1
+                ok = True
+                break
         undocumented += 0 if ok else 1
-        lines.append('| `{}:{}` {} | {} |'.format(escape[0], escape[1], escape[2], 'yes' if ok else '**no**'))
+        rows.append('| `{}` {} (line {}) | `{}` | {} |'.format(
+            escape.path, escape.mutator, escape.line, text.replace('|', '\\|'), 'yes' if ok else '**no**'))
     head = ('{} escaped mutant(s) no entry of tests/infection-equivalents.md accounts for: kill them with a test, '
             'or document why no test can.\n\n'.format(undocumented) if undocumented
-            else 'Every escaped mutant is one tests/infection-equivalents.md accounts for (file, mutator and count).\n\n')
-    return (1 if undocumented else 0), head + '\n'.join(lines) + '\n'
+            else 'Every escaped mutant is one tests/infection-equivalents.md accounts for.\n\n')
+    return (1 if undocumented else 0), head + '\n'.join(rows) + '\n'
 
 
-def main(argv: List[str]) -> Tuple[int, str]:
+def main(argv: List[str], root: str = '.') -> Tuple[int, str]:
     """The logs of every Infection pass of one shard, then the documented-equivalents file."""
     if len(argv) < 2:
         return 2, 'usage: pr_gate.py <infection.log>... <infection-equivalents.md>\n'
-    found: List[Tuple[str, int, str]] = []
+    found: List[Escape] = []
     try:
         for path in argv[:-1]:
             with open(path, encoding='utf-8') as handle:
@@ -140,7 +200,8 @@ def main(argv: List[str]) -> Tuple[int, str]:
             markdown = handle.read()
     except OSError as error:
         return 2, 'Cannot read the mutation log or the documented list: {}\n'.format(error)
-    return summary(found, entries(markdown))
+    source = Source(root)
+    return summary(found, allowances(markdown, source), source)
 
 
 if __name__ == '__main__':
