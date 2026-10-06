@@ -84,7 +84,11 @@ try {
         );
         $report = $analyzer->analyze(LockFile::fromFile($dir.'/composer.lock'), $project, false);
         $json = (new JsonFormatter())->format($report);
-        file_put_contents($out.'/'.basename($dir).'.json', $json);
+        $path = $out.'/'.basename($dir).'.json';
+        if (file_put_contents($path, $json) === false) {
+            fwrite(\STDERR, "cannot write {$path}\n");
+            exit(1);
+        }
 
         $years = 0;
         foreach ($report->findings() as $finding) {
