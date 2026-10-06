@@ -10,61 +10,12 @@ use Lockrot\Json\KnownValues;
  * Whether a newer JSON schema accepts every document an older one accepts: the rule docs/schema.md
  * states for one schema number, checked on the two schema files rather than on documents.
  *
- * {@see narrowings()} compares the older schema with the newer one node by node and lists every way
- * the newer one is narrower: a member made required, a type or an enum value lost, a lower bound
- * raised or an upper one lowered, a `pattern` or `format` added or changed, `items` or
- * `additionalProperties` constrained, a listed property no longer listed, an object closed. An
- * empty list means the newer schema only widened.
- *
- * It covers the draft-04 keywords lockrot's schemas use — `$ref` into the same file, `type`, `enum`,
- * `oneOf`/`anyOf`, `properties`, `required`, `items`, `additionalProperties`, `minimum`/`maximum`,
- * `minItems`/`maxItems`, `minLength`/`maxLength`, `pattern`, `format`, `patternProperties`, and the
- * relation keywords `allOf`, `not`, `uniqueItems`, `minProperties` and `multipleOf` — and fails
- * closed on any other: a keyword it cannot compare, in the newer schema, is reported unless the
- * older node carries it with the same value. Where it cannot be exact it errs towards reporting:
- *
- * - A subtree that is the same text in both schemas, every `$ref` in it naming a definition that is
- *   itself the same in both, is unchanged and accepts what it accepted.
- * - Both schemas are read strictly ({@see KnownValues::closed()}): an open set's `x-known-values`
- *   is its enum and its `pattern` is dropped. No older lockrot wrote a value outside the list, since
- *   the strict twin in ValidatesJsonSchemas holds its output to it, so a value dropped from the list
- *   is a narrowing and a value added is not. A known value that stops matching a narrowed pattern is
- *   not seen here; ClosedSetsTest spells each open set's pattern out instead. An open map's
- *   `x-known-keys` is read the same way: its known keys become its properties, each typed by every
- *   regex it matches, so a key dropped from the list is a narrowing and a key added is not.
- *   `x-rendered-from` names the fields a string is rendered from and constrains nothing.
- * - The relations: an `allOf` entry the newer node adds or changes is a narrowing unless the older
- *   node holds the same entry, and a dropped entry only widens. A `not` has to be the same;
- *   `uniqueItems` turned on, a raised `minProperties` and a `multipleOf` added or changed are
- *   narrowings. A release that adds a value to an open set keeps every relation as it was and puts
- *   the new value's constraints in a new `allOf` entry, which this check reports; the release lists
- *   it in SchemaWideningTest::ACCEPTED_NARROWINGS with its reason.
- * - `patternProperties` is compared per regex: one removed or changed is a narrowing, and one in
- *   both compares its value schemas. A regex only the newer node holds is a narrowing beside an
- *   open `additionalProperties`; beside a closed one it only widens when no older key can match it:
- *   a literal regex (`^name$`) is tested against every older regex, and any other has to accept
- *   what every older regex's schema accepted, since whether two regexes overlap is undecidable.
- * - A `not` of exactly `{properties: {K: {enum: L}}}` — the report's branch for signal ids it does
- *   not list — admits no object whose K is in L. On the older side it takes L away from the values
- *   K admits there, and a branch left with none admits nothing an older lockrot wrote and is skipped;
- *   on the newer side a branch whose `not` excludes every value the older node's K admits is not a
- *   candidate for it. Any other older `not` is dropped, which only widens the older node.
- *
- * - An older `oneOf`/`anyOf` is split into its branches, each joined with the rest of its node, and
- *   every branch has to fit the newer node; a newer one is split the same way, and each older
- *   branch has to fit one of its branches. `oneOf` is read as `anyOf`: lockrot uses it only for a
- *   value or null, whose branches never overlap.
- * - An older node that admits finitely many values (an `enum`, or only `null` and booleans) is
- *   checked value by value against the newer one.
- * - A property the newer schema lists and the older one does not is not compared. No older document
- *   carries it: the strict twin in ValidatesJsonSchemas holds lockrot's own output to the fields its
- *   schema lists, which is also why a listed property that stops being listed counts as a narrowing.
- *   The config schema describes what a person writes, where a key a later release starts listing
- *   may already sit with another meaning; that is outside what this check says.
+ * {@see narrowings()} lists every way the newer schema is narrower, node by node. It fails closed on
+ * a keyword outside COMPARED: one in the newer schema is reported unless the older node carries it
+ * with the same value. Where it cannot be exact, it reports.
  */
 final class SchemaWidening
 {
-    /** The keywords compared. */
     private const COMPARED = [
         '$ref', 'type', 'enum', 'oneOf', 'anyOf', 'properties', 'required', 'items', 'additionalProperties',
         'minimum', 'maximum', 'minItems', 'maxItems', 'minLength', 'maxLength', 'pattern', 'format',
@@ -113,7 +64,7 @@ final class SchemaWidening
      * @param array<mixed, mixed> $old a schema as json_decode(…, true) returns it
      * @param array<mixed, mixed> $new
      *
-     * @return list<string> every narrowing, each naming the path in the older schema's terms; empty when the newer schema only widens
+     * @return list<string> every narrowing, each naming the path in the older schema's terms. Empty when the newer schema only widens
      */
     public static function narrowings(array $old, array $new): array
     {
@@ -124,6 +75,13 @@ final class SchemaWidening
     }
 
     /**
+     * Both schemas are read strictly ({@see KnownValues::closed()}): an open set's `x-known-values`
+     * is its enum and its `pattern` is dropped, and an open map's `x-known-keys` are its properties,
+     * each typed by every regex it matches. No older lockrot wrote a value outside the list, because
+     * the strict twin in ValidatesJsonSchemas holds its output to it. A value or key dropped from a
+     * list is a narrowing, and one added is not. This check does not see a known value that stops
+     * matching a narrowed pattern, so ClosedSetsTest spells out each open set's pattern.
+     *
      * @param array<mixed, mixed> $schema
      *
      * @return array<mixed, mixed>
@@ -189,7 +147,7 @@ final class SchemaWidening
 
         $oldTypes = self::types($old) ?? [];
         if (\count($oldTypes) > 1) {
-            // `["string", "null"]` against `oneOf: [string, null]`: each type has to find its branch.
+            // `["string", "null"]` against `oneOf: [string, null]`: each type must find its branch.
             $problems = [];
             foreach ($oldTypes as $type) {
                 $problems = array_merge($problems, $this->compare(['type' => $type] + $old, $new, $path, $depth + 1));
@@ -203,7 +161,7 @@ final class SchemaWidening
 
     /**
      * The problems of the newer branch that fits the older node best: none when one fits, else those
-     * of the branch that narrows it in the fewest places — the branch it was meant for, as a rule,
+     * of the branch that narrows it in the fewest places — the branch it targets, as a rule,
      * whose problems are the ones worth reading.
      *
      * @param array<mixed, mixed>                $old
@@ -306,8 +264,8 @@ final class SchemaWidening
     }
 
     /**
-     * The property and the values a `not` of exactly `{properties: {K: {enum: L}}}` excludes; null
-     * for a `not` of any other shape.
+     * The property and the values that a `not` of exactly `{properties: {K: {enum: L}}}` excludes.
+     * That shape is the report's branch for signal ids it does not list. Null for any other `not`.
      *
      * @param mixed $not
      *
@@ -404,6 +362,9 @@ final class SchemaWidening
 
         $oldProperties = self::map($old['properties'] ?? [], $path);
         $newProperties = self::map($new['properties'] ?? [], $path);
+        // A property that only the newer node lists is not compared: no older document carries it, since
+        // the strict twin in ValidatesJsonSchemas holds lockrot's output to the listed fields. A config key
+        // that a later release starts to list can already sit with another meaning, outside this check.
         foreach ($oldProperties as $name => $schema) {
             $at = $path.'/properties/'.$name;
             if (!\array_key_exists($name, $newProperties)) {
@@ -429,8 +390,11 @@ final class SchemaWidening
     }
 
     /**
-     * An open map's keys, per regex. A map read through `x-known-keys` has become properties in
-     * {@see strictly()}, and is compared there.
+     * An open map's keys, per regex. A map read through `x-known-keys` becomes properties in
+     * {@see strictly()}, and is compared there. A regex that only the newer node holds beside a
+     * closed `additionalProperties` widens only when no older key can match it. A literal regex is
+     * tested against each older regex, and any other must accept what every older regex's schema
+     * accepted, since whether two regexes overlap is undecidable.
      *
      * @param array<mixed, mixed> $old
      * @param array<mixed, mixed> $new
@@ -454,7 +418,7 @@ final class SchemaWidening
         foreach (array_diff_key($newPatterns, $oldPatterns) as $regex => $schema) {
             $at = $path.'/patternProperties/'.$regex;
             if (($old['additionalProperties'] ?? true) !== false) {
-                // The older node's other keys, whatever they were, now have to match its schema.
+                // The older node's other keys, whatever they were, must match its schema.
                 $problems[] = $at.': a pattern property added where the older node left other keys open';
 
                 continue;
@@ -552,9 +516,10 @@ final class SchemaWidening
     }
 
     /**
-     * The relations: an `allOf` entry the newer node adds or changes, unless the older node holds the
-     * same entry; a `not` that differs; `uniqueItems` turned on; a raised `minProperties`; a
-     * `multipleOf` added or changed.
+     * The relations: an `allOf` entry that the newer node adds or changes, unless the older node holds
+     * the same entry, a `not` that differs, `uniqueItems` turned on, a raised `minProperties` and a
+     * `multipleOf` added or changed. A release that adds a value to an open set adds such an `allOf`
+     * entry, and lists it in SchemaWideningTest::ACCEPTED_NARROWINGS with its reason.
      *
      * @param array<mixed, mixed> $old
      * @param array<mixed, mixed> $new
@@ -747,9 +712,10 @@ final class SchemaWidening
     }
 
     /**
-     * The node's `oneOf`/`anyOf` split into branches, each joined with the rest of the node; null
-     * when it has none. Only the first of the two is split here; the other stays on every branch
-     * and is split when the branch is compared.
+     * The node's `oneOf`/`anyOf` split into branches, each joined with the rest of the node, or null
+     * when it has none. Only the first of the two is split here, and the other stays on every branch
+     * until the branch is compared. `oneOf` is read as `anyOf`: lockrot uses it only for a value or
+     * null, whose branches never overlap.
      *
      * @param array<mixed, mixed> $node resolved
      * @param array<mixed, mixed> $root
@@ -779,7 +745,7 @@ final class SchemaWidening
     /**
      * Two nodes an instance must satisfy both of, as one node. For the older schema a keyword the
      * two cannot share is dropped, which only widens the older node and so can only add a reported
-     * narrowing; for the newer one it is marked, and reported.
+     * narrowing. For the newer one it is marked, and reported.
      *
      * @param array<mixed, mixed> $a
      * @param array<mixed, mixed> $b
@@ -848,7 +814,7 @@ final class SchemaWidening
     }
 
     /**
-     * Follows `$ref` to the node it names; draft-04 ignores whatever else sits beside a `$ref`.
+     * Follows `$ref` to the node it names. Draft-04 ignores whatever else sits beside a `$ref`.
      *
      * @param array<mixed, mixed> $node
      * @param array<mixed, mixed> $root

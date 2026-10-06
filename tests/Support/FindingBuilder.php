@@ -11,9 +11,9 @@ use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
 
 /**
- * The one place the test suite constructs a {@see Finding}. The defaults give the suite's most
- * common finding: `vendor/pkg` 1.0.0, ok, no signals, a chain of the package alone, no data date; every
- * optional argument keeps the constructor's own default. Each with*() returns a new builder.
+ * The one place the test suite constructs a {@see Finding}. The defaults: `vendor/pkg` 1.0.0, ok, no
+ * signals, a chain of the package alone, no data date. Every optional argument keeps the
+ * constructor's own default. Each with*() returns a new builder.
  */
 final class FindingBuilder
 {

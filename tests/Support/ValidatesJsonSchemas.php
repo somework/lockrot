@@ -10,21 +10,11 @@ use Lockrot\Json\Schemas;
 
 /**
  * Validates a document against one of the published schemas under resources/, as published or
- * against its strict twin.
- *
- * The published schemas keep every object open, so a field the schema does not list is not an
- * error, and describe the sets that grow in minor releases as open strings. The strict twin closes
- * every object that declares its `properties`, so a field the schema does not list fails: a formatter
- * that gains a field the schema never learned, or an older document carrying a field the current
- * schema stopped listing. It also reads every `x-known-values` as the enum it lists
- * ({@see KnownValues::closed()}), so a value outside it fails too: a mistyped reason, or a signal id
- * the schema was never taught.
- *
- * A document is held to the file of the schema number it names (`resources/lockrot-<document>-<number>.schema.json`),
- * never to whichever number is current: {@see schemaFileFor()}.
- *
- * For a {@see \PHPUnit\Framework\TestCase}; shared by the tests that validate what the current
- * formatters write and what earlier releases wrote.
+ * against its strict twin. The published schemas keep every object open and describe the growing
+ * sets as open strings. The strict twin closes every object that declares its `properties` and
+ * reads every `x-known-values` as the enum it lists ({@see KnownValues::closed()}), so an unlisted
+ * field or value fails. A document is held to the file of the schema number it names, never to the
+ * current number: {@see schemaFileFor()}.
  */
 trait ValidatesJsonSchemas
 {
@@ -75,9 +65,7 @@ trait ValidatesJsonSchemas
     }
 
     /**
-     * Whether a negative fixture is rejected as it expects ({@see NegativeFixtures}): validated
-     * against the published schema of its directory's document and number, or against the strict
-     * twin when its expectation is strict.
+     * Whether a negative fixture is rejected as it expects ({@see NegativeFixtures}).
      *
      * @return array{bool, bool, list<string>} rejected as expected, read against the strict twin, the errors
      */
@@ -146,8 +134,8 @@ trait ValidatesJsonSchemas
     /**
      * The same schema with `additionalProperties: false` on every node that declares `properties`
      * and leaves the question open. Nodes that only say `type: object` (a signal's generic `data`)
-     * and maps that already say what their members are (a baseline's `findings`) are left alone;
-     * so are the `anyOf` branches, which have no `type` of their own.
+     * and maps that already say what their members are (a baseline's `findings`) are left alone.
+     * So are the `anyOf` branches, which have no `type` of their own.
      */
     private static function strictTwin(\stdClass $node): \stdClass
     {

@@ -76,8 +76,8 @@ final class JsonPath
     }
 
     /**
-     * A JSON file decoded to arrays, read once per process: the schemas under resources/ are read
-     * by several tests, and a file that is missing or not a JSON object fails the test that asked.
+     * A JSON file decoded to arrays, read once per process. A file that is missing or not a JSON
+     * object fails the test that asked.
      *
      * @return array<mixed, mixed>
      */
@@ -99,7 +99,7 @@ final class JsonPath
     }
 
     /**
-     * True when every segment of $path exists; used to assert a member was deliberately omitted.
+     * True when every segment of $path exists.
      *
      * @param array<mixed, mixed> $data
      * @param list<int|string>    $path

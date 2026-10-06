@@ -14,12 +14,11 @@ use Lockrot\Data\Http\RecordedHttpClient;
 use Lockrot\Lock\LockFile;
 
 /**
- * Serves recorded p2 envelopes over a real `php -S` HTTP server so tests can exercise
- * Composer\Repository\ComposerRepository against a `type: composer` repository without
- * touching the network. The docroot is a plain filesystem mirror of the p2 metadata-url
- * layout (`packages.json` + `p2/<vendor>/<name>[~dev].json`); recorded envelopes with a
- * non-200 status (or missing entirely) are simply not written, so the server answers 404
- * for them exactly like the real Packagist p2 endpoint would.
+ * Serves recorded p2 envelopes over a real `php -S` HTTP server, so tests can exercise
+ * Composer\Repository\ComposerRepository against a `type: composer` repository without the
+ * network. The docroot mirrors the p2 metadata-url layout (`packages.json` +
+ * `p2/<vendor>/<name>[~dev].json`). A recorded envelope with a non-200 status, or none, is not
+ * written, so the server answers 404 for it as the real Packagist p2 endpoint does.
  */
 final class FixtureRepositoryServer
 {
@@ -28,14 +27,11 @@ final class FixtureRepositoryServer
 
     /**
      * Serves every request itself rather than falling through to php -S's built-in static handler
-     * (`return false`): that built-in handler resets the response headers it generates, discarding
-     * anything the router already sent via `header()`, so a `Last-Modified` header set before
-     * `return false` never reaches the client. Composer's ComposerRepository caches that header on a
-     * first fetch and revalidates against it on later ones (offline, a cached `last-modified` is
-     * what lets it fake a 304 rather than a synthetic 404), so without a router that sends it itself,
-     * an offline re-fetch of an already-cached file could never be told apart from one that was
-     * never cached at all. `Connection: close` on every response makes curl open a fresh connection
-     * per request instead of reusing one across the whole load.
+     * with `return false`: that handler resets the response headers, so a `Last-Modified` header set
+     * before `return false` never reaches the client. Composer's ComposerRepository caches that header
+     * and revalidates against it. Offline, a cached `last-modified` lets it fake a 304 rather than a
+     * synthetic 404. `Connection: close` on every response makes curl open a fresh connection per
+     * request.
      */
     private const ROUTER_SCRIPT = <<<'PHP'
         <?php
@@ -162,7 +158,6 @@ final class FixtureRepositoryServer
         return $count;
     }
 
-    /** Truncates the access log so a subsequent requestCount() reflects only requests made after this call. */
     public function resetRequestCount(): void
     {
         $this->server->clearLog();

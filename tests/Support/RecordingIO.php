@@ -14,8 +14,7 @@ use Symfony\Component\Console\Output\StreamOutput;
  *
  * `getOutput()` alone cannot tell `<warning>text</warning>` from `<warning>text` or from
  * `text<warning>`: an undecorated formatter removes the tags, so all three render as `text`. The
- * tags are what decides whether Composer colours the line and where the colouring stops, so a test
- * that cares about them has to read the message before formatting.
+ * tags decide whether Composer colours the line and where the colouring stops.
  */
 final class RecordingIO extends BufferIO
 {
@@ -68,7 +67,7 @@ final class RecordingIO extends BufferIO
     /** @param string|string[] $messages */
     private function record($messages, int $verbosity): void
     {
-        // Only what ConsoleIO would print: a debug-level line Composer writes on its own way through
+        // Only what ConsoleIO prints: a debug-level line Composer writes on its own way through
         // must not count against a test that expects exactly one message.
         $wanted = self::SYMFONY_VERBOSITY[$verbosity] ?? OutputInterface::VERBOSITY_NORMAL;
         if ($wanted <= $this->output->getVerbosity()) {

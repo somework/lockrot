@@ -6,13 +6,11 @@ namespace Lockrot\Tests\Support;
 
 /**
  * The test-only RSA key pairs under tests/fixtures/signing, and the release signature file format
- * built from them — the same `{"sha384": "<base64>"}` the release workflow publishes as
- * `lockrot.phar.sig.json` and {@see \Lockrot\SelfUpdate\ReleaseSignatureVerifier} reads.
- *
- * `release` stands in for the lockrot release key; `other` is a key of the same shape that is not
- * it. Both are checked in on purpose: generating keys in a test is slow on some runners and needs
- * an openssl.cnf the php Docker images do not always have, and a key that only ever signs test
- * strings protects nothing.
+ * built from them: the `{"sha384": "<base64>"}` that the release workflow publishes as
+ * `lockrot.phar.sig.json`. `release` stands in for the lockrot release key, and `other` is a key of
+ * the same shape that is not it. Both are checked in because generating keys in a test is slow on
+ * some runners and needs an openssl.cnf that the php Docker images do not always have, and a key
+ * that only ever signs test strings protects nothing.
  */
 final class SigningKeys
 {
@@ -70,7 +68,7 @@ final class SigningKeys
      *
      * The check lives behind a `mixed` parameter because PHPStan cannot decide what that variable
      * is at the call site: its openssl_sign() stub declares the by-reference parameter `string`, so
-     * 2.2.15 reports an is_string() there as always true, while the same stub carries no
+     * PHPStan reports an is_string() there as always true, while the same stub carries no
      * `@param-out` and the inferred type after the call is `mixed`. Neither keeping the check nor
      * dropping it passes. Here the parameter is mixed by declaration, so the check is a check.
      *
