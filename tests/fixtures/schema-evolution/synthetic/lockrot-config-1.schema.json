@@ -1,0 +1,6 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "id": "https://lockrot.dev/schema/config-1.json",
+    "title": "synthetic config-1: only its id is read",
+    "type": "object"
+}

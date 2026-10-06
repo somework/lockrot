@@ -1,0 +1,8 @@
+{
+    "$schema": "https://lockrot.dev/schema/baseline-1.json",
+    "lockrot": {
+        "version": "0.13.0",
+        "schema": 1
+    },
+    "generated_at": "2026-10-01T00:00:00+00:00"
+}

@@ -13,7 +13,9 @@ namespace Lockrot\Json;
  * The number in the URL is the document's schema number ({@see \Lockrot\Output\JsonFormatter::SCHEMA},
  * {@see \Lockrot\Baseline\Baseline::SCHEMA}): a file under one number only ever gains fields, so a
  * field added later validates against a copy a consumer fetched earlier; the number moves only when
- * a field is removed or renamed. The `id` inside each resources/*.schema.json is this same URL.
+ * a field is removed or renamed. Each number ships as its own file,
+ * resources/lockrot-<document>-<number>.schema.json ({@see path()}), and the `id` inside it is this
+ * same URL.
  *
  * Objects are open, and so are the sets of values that grow in minor releases: signal ids (a
  * signal's `id`, and each entry of S10's `blocks` array), S10's `check` and `reason`, S8's
@@ -37,15 +39,47 @@ final class Schemas
     public const BASELINE = 'baseline';
     public const CONFIG = 'config';
 
+    /**
+     * The numbers lockrot ships a schema file for, per document. A number stays once its file has
+     * shipped: a document written under it keeps validating against the file of its number.
+     */
+    private const NUMBERS = [
+        self::REPORT => [1],
+        self::EXPLAIN => [1],
+        self::BASELINE => [1],
+        self::CONFIG => [1],
+    ];
+
     /** @return non-empty-string e.g. `https://lockrot.dev/schema/report-1.json` */
     public static function url(string $document, int $schema): string
     {
         return self::BASE_URL.$document.'-'.$schema.'.json';
     }
 
-    /** The bundled copy of a document's schema, as JsonSchema's Validator wants it. */
-    public static function path(string $document): string
+
+    /** @return non-empty-list<int> the schema numbers lockrot ships a file for, oldest first */
+    public static function numbers(string $document): array
     {
-        return __DIR__.'/../../resources/lockrot-'.$document.'.schema.json';
+        if (!isset(self::NUMBERS[$document])) {
+            throw new \InvalidArgumentException('lockrot ships no '.$document.' schema');
+        }
+
+        return self::NUMBERS[$document];
+    }
+
+    /** @return non-empty-string e.g. `lockrot-report-1.schema.json` */
+    public static function fileName(string $document, int $number): string
+    {
+        return 'lockrot-'.$document.'-'.$number.'.schema.json';
+    }
+
+    /** The bundled copy of a document's schema under a number, as JsonSchema's Validator wants it. */
+    public static function path(string $document, int $number): string
+    {
+        if (!\in_array($number, self::numbers($document), true)) {
+            throw new \InvalidArgumentException('lockrot ships no '.$document.'-'.$number.' schema');
+        }
+
+        return __DIR__.'/../../resources/'.self::fileName($document, $number);
     }
 }

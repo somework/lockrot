@@ -235,7 +235,7 @@ final class BaselineFileTest extends TestCase
     }
 
     /**
-     * A baseline with nothing in it must still satisfy resources/lockrot-baseline.schema.json, which
+     * A baseline with nothing in it must still satisfy resources/lockrot-baseline-1.schema.json, which
      * requires `findings` to be an object. PHP encodes an empty array as `[]`, so the empty map is
      * written as an explicit `{}` instead.
      */

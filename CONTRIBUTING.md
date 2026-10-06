@@ -131,8 +131,9 @@ The canonical list of what lockrot reads, writes and contacts is
 
 ## Changing a schema
 
-The published schemas are `resources/lockrot-*.schema.json`. Under one schema number they only
-widen: `tests/Integration/SchemaEvolutionTest.php` holds them to every release's copy in
+The published schemas are `resources/lockrot-<document>-<number>.schema.json`, one file per
+document and schema number. Under one schema number they only widen:
+`tests/Integration/SchemaEvolutionTest.php` holds them to every release's copy in
 `tests/fixtures/schema-evolution/schemas/<version>/`. It also holds them to the documents older
 release PHARs wrote, in `tests/fixtures/schema-evolution/<version>/`. Both fixture sets are
 frozen by pinned hashes, so a failure there is fixed in the schema change, never in the fixture.

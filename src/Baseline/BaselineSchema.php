@@ -7,11 +7,13 @@ namespace Lockrot\Baseline;
 use JsonSchema\Validator;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Json\SchemaPayload;
+use Lockrot\Json\Schemas;
 
 /**
- * Validates the shape of a baseline file against resources/lockrot-baseline.schema.json using
- * Composer's own bundled justinrainbow/json-schema validator — the same mechanism, and the same
- * draft-04 schema style, as {@see \Lockrot\Config\ConfigSchema} uses for extra.lockrot.
+ * Validates the shape of a baseline file against the schema of the number its `lockrot.schema`
+ * names, resources/lockrot-baseline-<number>.schema.json, using Composer's own bundled
+ * justinrainbow/json-schema validator — the same mechanism, and the same draft-04 schema style, as
+ * {@see \Lockrot\Config\ConfigSchema} uses for extra.lockrot.
  *
  * A baseline lockrot cannot read is never treated as "no baseline": it is a configuration error, so
  * CI cannot silently start failing — or silently stop failing — on a file nobody noticed was damaged.
@@ -20,7 +22,8 @@ use Lockrot\Json\SchemaPayload;
  */
 final class BaselineSchema
 {
-    private static ?object $schema = null;
+    /** @var array<int, object> by schema number */
+    private static array $schemas = [];
 
     /** @param array<string, mixed> $baseline the decoded baseline document */
     public static function validate(array $baseline): void
@@ -29,7 +32,7 @@ final class BaselineSchema
         $payload = self::payload($baseline);
 
         $validator = new Validator();
-        $validator->validate($payload, self::schema());
+        $validator->validate($payload, self::schema(self::numberOf($baseline)));
 
         if ($validator->isValid()) {
             return;
@@ -70,13 +73,28 @@ final class BaselineSchema
         return SchemaPayload::of($baseline, 'baseline file');
     }
 
-    private static function schema(): object
+    /**
+     * The number the file's `lockrot.schema` names, when lockrot ships a schema for it. Any other
+     * value — a number with no schema, a string, nothing — is read against the schema of the number
+     * lockrot writes, which refuses it with its own message.
+     *
+     * @param array<string, mixed> $baseline
+     */
+    private static function numberOf(array $baseline): int
     {
-        if (self::$schema !== null) {
-            return self::$schema;
+        $envelope = $baseline['lockrot'] ?? null;
+        $number = \is_array($envelope) ? ($envelope['schema'] ?? null) : null;
+
+        return \in_array($number, Schemas::numbers(Schemas::BASELINE), true) ? $number : Baseline::SCHEMA;
+    }
+
+    private static function schema(int $number): object
+    {
+        if (isset(self::$schemas[$number])) {
+            return self::$schemas[$number];
         }
 
-        $path = __DIR__.'/../../resources/lockrot-baseline.schema.json';
+        $path = Schemas::path(Schemas::BASELINE, $number);
         if (!is_file($path) || !is_readable($path)) {
             throw new ConfigException('Cannot read lockrot baseline schema from '.$path);
         }
@@ -91,7 +109,7 @@ final class BaselineSchema
             throw new ConfigException($path.' must contain a JSON object');
         }
 
-        self::$schema = $decoded;
+        self::$schemas[$number] = $decoded;
 
         return $decoded;
     }

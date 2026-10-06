@@ -11,6 +11,7 @@ use Lockrot\Config\UnknownKeys;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Json\KnownValues;
 use Lockrot\Json\SchemaPayload;
+use Lockrot\Json\Schemas;
 use Lockrot\Tests\Support\ColdConfigSchema;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Verdict\FailOn;
@@ -36,7 +37,7 @@ final class ConfigSchemaTest extends TestCase
     /** The schema's hand-written enum and the resolver's list are the same list, in both directions. */
     public function testTheSchemaEnumIsExactlyWhatFailOnAccepts(): void
     {
-        $schema = json_decode((string) file_get_contents(__DIR__.'/../../../resources/lockrot-config.schema.json'), true);
+        $schema = json_decode((string) file_get_contents(Schemas::path(Schemas::CONFIG, ConfigSchema::NUMBER)), true);
         self::assertIsArray($schema);
         $properties = $schema['properties'] ?? null;
         self::assertIsArray($properties);
@@ -228,7 +229,7 @@ final class ConfigSchemaTest extends TestCase
     /** @return array<array-key, mixed> */
     private static function schemaProperties(): array
     {
-        $schema = json_decode((string) file_get_contents(__DIR__.'/../../../resources/lockrot-config.schema.json'), true);
+        $schema = json_decode((string) file_get_contents(Schemas::path(Schemas::CONFIG, ConfigSchema::NUMBER)), true);
         self::assertIsArray($schema);
 
         return JsonPath::arrayAt($schema, ['properties']);

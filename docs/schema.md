@@ -24,8 +24,9 @@ only gain values and a field's type only widens.
   ([install-time.md](install-time.md#never-fails-the-install)).
 
 - **Copies.** The PHAR and each [release tag](https://github.com/somework/lockrot/tags) ship the
-  same files as `resources/lockrot-<name>.schema.json`. The copy in your PHAR, or at your release's
-  tag, describes exactly that release; the URL describes the newest release under the same number.
+  same files as `resources/lockrot-<name>-<number>.schema.json`. The copy in your PHAR, or at your
+  release's tag, describes exactly that release; the URL describes the newest release under the
+  same number.
 
 ## The documents say which schema they follow
 

@@ -14,7 +14,6 @@ use Lockrot\Data\Repository\MetadataFailure;
 use Lockrot\Json\KnownValues;
 use Lockrot\Json\Schemas;
 use Lockrot\Lock\PackageOrigin;
-use Lockrot\Output\JsonFormatter;
 use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\Rule\NotCheckedRule;
 use Lockrot\Signal\Rule\PinnedRule;
@@ -25,6 +24,7 @@ use Lockrot\Verdict\NoFix;
 use Lockrot\Verdict\Priority;
 use Lockrot\Verdict\PriorityBasis;
 use Lockrot\Verdict\Verdict;
+use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -65,6 +65,18 @@ final class ClosedSetsTest extends TestCase
     /** An S10 check or reason, an S6 reason, an S8 floor source, a branch's php_blocked_by and misses_*_php, a finding's libyears_unmeasured, a priority step's and a no-fix advisory's reason, the run's mode and fail-on kind, the gate's causes and exemptions, and a run note's forge id and reasons: a lower-case word. */
     private const WORD = '^[a-z][a-z0-9_]*$';
     private const ROOT = __DIR__.'/../../../';
+    /**
+     * The values report-1 and explain-1 list for three open sets whose PHP lists later releases
+     * retire, frozen here so their rows outlive the constants: `run.fail_on_kind`
+     * ({@see FailOn::KINDS}), a `priority_basis` step's `reason` ({@see PriorityBasis::STEPS}) and a
+     * `no_fix_expected` item's `reason` ({@see NoFix::REASONS}). Every other `-1` row reads its live
+     * constant while its file is still widened under its number.
+     */
+    private const FAIL_ON_KINDS_1 = ['none', 'verdict', 'priority', 'unchecked'];
+    private const PRIORITY_STEPS_1 = ['transitive', 'unreached', 'dev', 'no_fix_expected'];
+    private const NO_FIX_REASONS_1 = ['not_on_installed_branch', 'releases_unknown', 'affected_range_unknown', 'no_release_fixes'];
+    /** A synthetic schema holding one integer set, the shape report-2's divisors and multipliers take. */
+    private const INTEGER_SET = self::ROOT.'tests/fixtures/schema/closed-sets/integer-set.schema.json';
 
     public function testTheVerdictsAreFrozenInTheirOrder(): void
     {
@@ -109,13 +121,13 @@ final class ClosedSetsTest extends TestCase
 
     public function testTheReportSchemaSpellsTheSameClosedSetsInTheSameOrder(): void
     {
-        $schema = self::schema(Schemas::REPORT);
+        $schema = self::schema(Schemas::REPORT, 1);
 
         self::assertSame(self::VERDICTS, JsonPath::arrayAt($schema, ['definitions', 'verdict', 'enum']));
         self::assertSame(self::PRIORITIES, JsonPath::arrayAt($schema, ['definitions', 'priority', 'enum']));
         self::assertSame(self::LEVELS, JsonPath::arrayAt($schema, ['definitions', 'level', 'enum']));
         self::assertSame(self::STANDINGS, JsonPath::arrayAt($schema, ['definitions', 'baselineStanding', 'oneOf', 0, 'properties', 'status', 'enum']));
-        self::assertSame([JsonFormatter::SCHEMA], JsonPath::arrayAt($schema, ['definitions', 'envelope', 'properties', 'schema', 'enum']));
+        self::assertSame([1], JsonPath::arrayAt($schema, ['definitions', 'envelope', 'properties', 'schema', 'enum']), 'report-1 names its own number');
     }
 
     /**
@@ -125,8 +137,8 @@ final class ClosedSetsTest extends TestCase
      */
     public function testAStepMovesAlongThePriorityOrderWithoutNone(): void
     {
-        $report = self::schema(Schemas::REPORT);
-        $explain = self::schema(Schemas::EXPLAIN);
+        $report = self::schema(Schemas::REPORT, 1);
+        $explain = self::schema(Schemas::EXPLAIN, 1);
         $flagged = array_values(array_diff(Priority::all(), [Priority::NONE]));
 
         self::assertSame(['critical', 'high', 'medium', 'low'], $flagged);
@@ -145,7 +157,7 @@ final class ClosedSetsTest extends TestCase
 
     public function testTheExplainSchemaSpellsTheSameVerdictsPrioritiesAndLevels(): void
     {
-        $schema = self::schema(Schemas::EXPLAIN);
+        $schema = self::schema(Schemas::EXPLAIN, 1);
 
         self::assertSame(self::VERDICTS, JsonPath::arrayAt($schema, ['definitions', 'verdict', 'enum']));
         self::assertSame(self::PRIORITIES, JsonPath::arrayAt($schema, ['definitions', 'priority', 'enum']));
@@ -156,7 +168,7 @@ final class ClosedSetsTest extends TestCase
     {
         self::assertSame(
             self::FLAGGED,
-            JsonPath::arrayAt(self::schema(Schemas::BASELINE), ['properties', 'findings', 'additionalProperties', 'properties', 'verdict', 'enum'])
+            JsonPath::arrayAt(self::schema(Schemas::BASELINE, 1), ['properties', 'findings', 'additionalProperties', 'properties', 'verdict', 'enum'])
         );
     }
 
@@ -165,9 +177,9 @@ final class ClosedSetsTest extends TestCase
      */
     public function testNoClosedSetCarriesKnownValues(): void
     {
-        $report = self::schema(Schemas::REPORT);
-        $explain = self::schema(Schemas::EXPLAIN);
-        $config = self::schema(Schemas::CONFIG);
+        $report = self::schema(Schemas::REPORT, 1);
+        $explain = self::schema(Schemas::EXPLAIN, 1);
+        $config = self::schema(Schemas::CONFIG, 1);
         $closed = [
             JsonPath::arrayAt($report, ['definitions', 'verdict']),
             JsonPath::arrayAt($report, ['definitions', 'priority']),
@@ -180,7 +192,7 @@ final class ClosedSetsTest extends TestCase
             JsonPath::arrayAt($explain, ['definitions', 'flaggedPriority']),
             JsonPath::arrayAt($explain, ['definitions', 'finding', 'properties', 'signals', 'items', 'properties', 'level']),
             JsonPath::arrayAt($explain, ['properties', 'lockrot', 'properties', 'schema']),
-            JsonPath::arrayAt(self::schema(Schemas::BASELINE), ['properties', 'findings', 'additionalProperties', 'properties', 'verdict']),
+            JsonPath::arrayAt(self::schema(Schemas::BASELINE, 1), ['properties', 'findings', 'additionalProperties', 'properties', 'verdict']),
             JsonPath::arrayAt($config, ['properties', 'fail-on']),
             JsonPath::arrayAt($config, ['properties', 'install-time']),
         ];
@@ -209,7 +221,7 @@ final class ClosedSetsTest extends TestCase
             self::assertMatchesRegularExpression('/^S[1-9][0-9]*$/', $id);
         }
 
-        $report = self::schema(Schemas::REPORT);
+        $report = self::schema(Schemas::REPORT, 1);
         self::assertSame($ids, JsonPath::arrayAt($report, ['definitions', 'signalId', KnownValues::KEYWORD]));
         self::assertSame(['$ref' => '#/definitions/signalId'], JsonPath::arrayAt($report, ['definitions', 'signal', 'properties', 'id']));
         self::assertSame(['$ref' => '#/definitions/signalId'], JsonPath::arrayAt($report, ['definitions', 's10', 'properties', 'blocks', 'items']));
@@ -235,58 +247,58 @@ final class ClosedSetsTest extends TestCase
         }
         self::assertSame($ids, $branches);
 
-        $explain = self::schema(Schemas::EXPLAIN);
+        $explain = self::schema(Schemas::EXPLAIN, 1);
         self::assertSame(JsonPath::arrayAt($report, ['definitions', 'signalId']), JsonPath::arrayAt($explain, ['definitions', 'signalId']), 'the explain schema spells signalId as the report does');
         self::assertSame(['$ref' => '#/definitions/signalId'], JsonPath::arrayAt($explain, ['definitions', 'finding', 'properties', 'signals', 'items', 'properties', 'id']));
     }
 
     /**
-     * Every open set, by document and JSON pointer: its node, its pattern, the values lockrot writes,
-     * and the words docs/compatibility.md and docs/schema.md name it by. The one registry: a new set
-     * is added here and nowhere else.
+     * Every open set, by schema file (document and number) and JSON pointer: its node, its pattern
+     * (null for an integer set), the values lockrot writes, and the words docs/compatibility.md and
+     * docs/schema.md name it by. The one registry: a new set is added here and nowhere else.
      *
-     * @return array<string, array{array<mixed, mixed>, string, list<string>, string}>
+     * @return array<string, array{array<mixed, mixed>, ?string, list<string>|list<int>, string}>
      */
     private static function openSets(): array
     {
-        $report = self::schema(Schemas::REPORT);
-        $explain = self::schema(Schemas::EXPLAIN);
-        $config = self::schema(Schemas::CONFIG);
+        $report = self::schema(Schemas::REPORT, 1);
+        $explain = self::schema(Schemas::EXPLAIN, 1);
+        $config = self::schema(Schemas::CONFIG, 1);
         $s10Entry = ['definitions', 's10', 'properties', 'unchecked', 'items', 'properties'];
         $branchRow = ['definitions', 'metadata', 'properties', 'branches', 'items', 'properties'];
 
         $open = [
-            'report #/definitions/signalId' => [JsonPath::arrayAt($report, ['definitions', 'signalId']), self::SIGNAL_ID, ClosedSets::signalIds(), 'signal ids'],
-            'report #/definitions/s10/properties/unchecked/items/properties/check' => [JsonPath::arrayAt($report, array_merge($s10Entry, ['check'])), self::WORD, ['repository_activity', 'release_dates'], "S10's `check` and `reason`"],
-            'report #/definitions/s10/properties/unchecked/items/properties/reason' => [
+            'report-1 #/definitions/signalId' => [JsonPath::arrayAt($report, ['definitions', 'signalId']), self::SIGNAL_ID, ClosedSets::signalIds(), 'signal ids'],
+            'report-1 #/definitions/s10/properties/unchecked/items/properties/check' => [JsonPath::arrayAt($report, array_merge($s10Entry, ['check'])), self::WORD, ['repository_activity', 'release_dates'], "S10's `check` and `reason`"],
+            'report-1 #/definitions/s10/properties/unchecked/items/properties/reason' => [
                 JsonPath::arrayAt($report, array_merge($s10Entry, ['reason'])),
                 self::WORD,
                 [NotCheckedRule::NO_TOKEN, NotCheckedRule::RATE_BUDGET, NotCheckedRule::BUDGET, NotCheckedRule::RATE_LIMIT, NotCheckedRule::FETCH_FAILED, NotCheckedRule::OFFLINE, 'undated_releases'],
                 "S10's `check` and `reason`",
             ],
-            'report #/definitions/s6/properties/reason' => [JsonPath::arrayAt($report, ['definitions', 's6', 'properties', 'reason']), self::WORD, [PinnedRule::REASON_BRANCH_SNAPSHOT, PinnedRule::REASON_NO_STABLE_RELEASE], "S6's `reason`"],
-            'report #/definitions/s8/properties/floor_source/oneOf/0' => [JsonPath::arrayAt($report, ['definitions', 's8', 'properties', 'floor_source', 'oneOf', 0]), self::WORD, [PhpFloor::PROJECT, PhpFloor::TARGET], "S8's `floor_source`"],
-            'report #/definitions/finding/properties/libyears_unmeasured/oneOf/0' => [JsonPath::arrayAt($report, ['definitions', 'finding', 'properties', 'libyears_unmeasured', 'oneOf', 0]), self::WORD, Libyears::REASONS, "a finding's `libyears_unmeasured`"],
-            'report #/definitions/priorityStep/properties/reason' => [JsonPath::arrayAt($report, ['definitions', 'priorityStep', 'properties', 'reason']), self::WORD, PriorityBasis::STEPS, "a `priority_basis` step's `reason`"],
-            'report #/definitions/noFixAdvisory/properties/reason' => [JsonPath::arrayAt($report, ['definitions', 'noFixAdvisory', 'properties', 'reason']), self::WORD, NoFix::REASONS, "a `no_fix_expected` item's `reason`"],
-            'report #/definitions/run/properties/mode' => [JsonPath::arrayAt($report, ['definitions', 'run', 'properties', 'mode']), self::WORD, Gate::MODES, '`run.mode`'],
-            'report #/definitions/run/properties/fail_on_kind/oneOf/0' => [JsonPath::arrayAt($report, ['definitions', 'run', 'properties', 'fail_on_kind', 'oneOf', 0]), self::WORD, FailOn::KINDS, '`run.fail_on_kind`'],
-            'report #/definitions/gate/properties/tripped_by/items' => [JsonPath::arrayAt($report, ['definitions', 'gate', 'properties', 'tripped_by', 'items']), self::WORD, Gate::TRIPS, '`gate.tripped_by`'],
-            'report #/definitions/findingGate/properties/exempt_by/oneOf/0' => [JsonPath::arrayAt($report, ['definitions', 'findingGate', 'properties', 'exempt_by', 'oneOf', 0]), self::WORD, Gate::EXEMPTIONS, "a finding's `gate.exempt_by`"],
-            'explain #/definitions/priorityStep/properties/reason' => [JsonPath::arrayAt($explain, ['definitions', 'priorityStep', 'properties', 'reason']), self::WORD, PriorityBasis::STEPS, "a `priority_basis` step's `reason`"],
-            'explain #/definitions/noFixAdvisory/properties/reason' => [JsonPath::arrayAt($explain, ['definitions', 'noFixAdvisory', 'properties', 'reason']), self::WORD, NoFix::REASONS, "a `no_fix_expected` item's `reason`"],
-            'explain #/definitions/finding/properties/libyears_unmeasured/oneOf/0' => [JsonPath::arrayAt($explain, ['definitions', 'finding', 'properties', 'libyears_unmeasured', 'oneOf', 0]), self::WORD, Libyears::REASONS, "a finding's `libyears_unmeasured`"],
-            'explain #/definitions/metadata/properties/branches/items/properties/php_blocked_by/oneOf/0' => [JsonPath::arrayAt($explain, array_merge($branchRow, ['php_blocked_by', 'oneOf', 0])), self::WORD, [PhpFloor::PROJECT, PhpFloor::TARGET], "the explanation's `php_blocked_by`"],
-            'explain #/definitions/metadata/properties/branches/items/properties/misses_target_php/oneOf/0' => [JsonPath::arrayAt($explain, array_merge($branchRow, ['misses_target_php', 'oneOf', 0])), self::WORD, [PhpFloor::NEEDS_NEWER, PhpFloor::STOPS_BEFORE, PhpFloor::SKIPS, PhpFloor::UNSATISFIABLE], '`misses_target_php`'],
-            'explain #/definitions/metadata/properties/branches/items/properties/misses_project_php/oneOf/0' => [JsonPath::arrayAt($explain, array_merge($branchRow, ['misses_project_php', 'oneOf', 0])), self::WORD, [PhpFloor::NEEDS_NEWER, PhpFloor::STOPS_BEFORE, PhpFloor::SKIPS, PhpFloor::UNSATISFIABLE], '`misses_project_php`'],
-            'explain #/definitions/signalId' => [JsonPath::arrayAt($explain, ['definitions', 'signalId']), self::SIGNAL_ID, ClosedSets::signalIds(), 'signal ids'],
-            'report #/definitions/originKind' => [JsonPath::arrayAt($report, ['definitions', 'originKind']), self::ORIGIN_KIND, PackageOrigin::KINDS, self::ORIGIN_VOCABULARY],
-            'report #/definitions/originRegistry/oneOf/0' => [JsonPath::arrayAt($report, ['definitions', 'originRegistry', 'oneOf', 0]), self::HOST, PackageOrigin::REGISTRIES, self::ORIGIN_VOCABULARY],
-            'explain #/definitions/originKind' => [JsonPath::arrayAt($explain, ['definitions', 'originKind']), self::ORIGIN_KIND, PackageOrigin::KINDS, self::ORIGIN_VOCABULARY],
-            'explain #/definitions/originRegistry/oneOf/0' => [JsonPath::arrayAt($explain, ['definitions', 'originRegistry', 'oneOf', 0]), self::HOST, PackageOrigin::REGISTRIES, self::ORIGIN_VOCABULARY],
-            'config #/properties/format' => [JsonPath::arrayAt($config, ['properties', 'format']), self::FORMAT, LockrotConfig::FORMATS, "the configuration's `format`"],
+            'report-1 #/definitions/s6/properties/reason' => [JsonPath::arrayAt($report, ['definitions', 's6', 'properties', 'reason']), self::WORD, [PinnedRule::REASON_BRANCH_SNAPSHOT, PinnedRule::REASON_NO_STABLE_RELEASE], "S6's `reason`"],
+            'report-1 #/definitions/s8/properties/floor_source/oneOf/0' => [JsonPath::arrayAt($report, ['definitions', 's8', 'properties', 'floor_source', 'oneOf', 0]), self::WORD, [PhpFloor::PROJECT, PhpFloor::TARGET], "S8's `floor_source`"],
+            'report-1 #/definitions/finding/properties/libyears_unmeasured/oneOf/0' => [JsonPath::arrayAt($report, ['definitions', 'finding', 'properties', 'libyears_unmeasured', 'oneOf', 0]), self::WORD, Libyears::REASONS, "a finding's `libyears_unmeasured`"],
+            'report-1 #/definitions/priorityStep/properties/reason' => [JsonPath::arrayAt($report, ['definitions', 'priorityStep', 'properties', 'reason']), self::WORD, self::PRIORITY_STEPS_1, "a `priority_basis` step's `reason`"],
+            'report-1 #/definitions/noFixAdvisory/properties/reason' => [JsonPath::arrayAt($report, ['definitions', 'noFixAdvisory', 'properties', 'reason']), self::WORD, self::NO_FIX_REASONS_1, "a `no_fix_expected` item's `reason`"],
+            'report-1 #/definitions/run/properties/mode' => [JsonPath::arrayAt($report, ['definitions', 'run', 'properties', 'mode']), self::WORD, Gate::MODES, '`run.mode`'],
+            'report-1 #/definitions/run/properties/fail_on_kind/oneOf/0' => [JsonPath::arrayAt($report, ['definitions', 'run', 'properties', 'fail_on_kind', 'oneOf', 0]), self::WORD, self::FAIL_ON_KINDS_1, '`run.fail_on_kind`'],
+            'report-1 #/definitions/gate/properties/tripped_by/items' => [JsonPath::arrayAt($report, ['definitions', 'gate', 'properties', 'tripped_by', 'items']), self::WORD, Gate::TRIPS, '`gate.tripped_by`'],
+            'report-1 #/definitions/findingGate/properties/exempt_by/oneOf/0' => [JsonPath::arrayAt($report, ['definitions', 'findingGate', 'properties', 'exempt_by', 'oneOf', 0]), self::WORD, Gate::EXEMPTIONS, "a finding's `gate.exempt_by`"],
+            'explain-1 #/definitions/priorityStep/properties/reason' => [JsonPath::arrayAt($explain, ['definitions', 'priorityStep', 'properties', 'reason']), self::WORD, self::PRIORITY_STEPS_1, "a `priority_basis` step's `reason`"],
+            'explain-1 #/definitions/noFixAdvisory/properties/reason' => [JsonPath::arrayAt($explain, ['definitions', 'noFixAdvisory', 'properties', 'reason']), self::WORD, self::NO_FIX_REASONS_1, "a `no_fix_expected` item's `reason`"],
+            'explain-1 #/definitions/finding/properties/libyears_unmeasured/oneOf/0' => [JsonPath::arrayAt($explain, ['definitions', 'finding', 'properties', 'libyears_unmeasured', 'oneOf', 0]), self::WORD, Libyears::REASONS, "a finding's `libyears_unmeasured`"],
+            'explain-1 #/definitions/metadata/properties/branches/items/properties/php_blocked_by/oneOf/0' => [JsonPath::arrayAt($explain, array_merge($branchRow, ['php_blocked_by', 'oneOf', 0])), self::WORD, [PhpFloor::PROJECT, PhpFloor::TARGET], "the explanation's `php_blocked_by`"],
+            'explain-1 #/definitions/metadata/properties/branches/items/properties/misses_target_php/oneOf/0' => [JsonPath::arrayAt($explain, array_merge($branchRow, ['misses_target_php', 'oneOf', 0])), self::WORD, [PhpFloor::NEEDS_NEWER, PhpFloor::STOPS_BEFORE, PhpFloor::SKIPS, PhpFloor::UNSATISFIABLE], '`misses_target_php`'],
+            'explain-1 #/definitions/metadata/properties/branches/items/properties/misses_project_php/oneOf/0' => [JsonPath::arrayAt($explain, array_merge($branchRow, ['misses_project_php', 'oneOf', 0])), self::WORD, [PhpFloor::NEEDS_NEWER, PhpFloor::STOPS_BEFORE, PhpFloor::SKIPS, PhpFloor::UNSATISFIABLE], '`misses_project_php`'],
+            'explain-1 #/definitions/signalId' => [JsonPath::arrayAt($explain, ['definitions', 'signalId']), self::SIGNAL_ID, ClosedSets::signalIds(), 'signal ids'],
+            'report-1 #/definitions/originKind' => [JsonPath::arrayAt($report, ['definitions', 'originKind']), self::ORIGIN_KIND, PackageOrigin::KINDS, self::ORIGIN_VOCABULARY],
+            'report-1 #/definitions/originRegistry/oneOf/0' => [JsonPath::arrayAt($report, ['definitions', 'originRegistry', 'oneOf', 0]), self::HOST, PackageOrigin::REGISTRIES, self::ORIGIN_VOCABULARY],
+            'explain-1 #/definitions/originKind' => [JsonPath::arrayAt($explain, ['definitions', 'originKind']), self::ORIGIN_KIND, PackageOrigin::KINDS, self::ORIGIN_VOCABULARY],
+            'explain-1 #/definitions/originRegistry/oneOf/0' => [JsonPath::arrayAt($explain, ['definitions', 'originRegistry', 'oneOf', 0]), self::HOST, PackageOrigin::REGISTRIES, self::ORIGIN_VOCABULARY],
+            'config-1 #/properties/format' => [JsonPath::arrayAt($config, ['properties', 'format']), self::FORMAT, LockrotConfig::FORMATS, "the configuration's `format`"],
         ];
-        foreach (['report' => $report, 'explain' => $explain] as $document => $schema) {
+        foreach (['report-1' => $report, 'explain-1' => $explain] as $document => $schema) {
             foreach (self::noteVocabularies() as $definition => [$pattern, $known]) {
                 $open[$document.' #/definitions/'.$definition] = [JsonPath::arrayAt($schema, ['definitions', $definition]), $pattern, $known, self::NOTE_VOCABULARY];
             }
@@ -321,8 +333,8 @@ final class ClosedSetsTest extends TestCase
      */
     public function testARunNotesDataIsTypedPerCodeAndBothSchemasSpellItAlike(): void
     {
-        $report = self::schema(Schemas::REPORT);
-        $explain = self::schema(Schemas::EXPLAIN);
+        $report = self::schema(Schemas::REPORT, 1);
+        $explain = self::schema(Schemas::EXPLAIN, 1);
         foreach (['report' => $report, 'explain' => $explain] as $document => $schema) {
             self::assertSame(['type' => 'array', 'items' => ['$ref' => '#/definitions/noteDetail']], array_diff_key(JsonPath::arrayAt($schema, ['properties', 'note_details']), ['description' => true]), $document);
             self::assertNotContains('note_details', JsonPath::arrayAt($schema, ['required']), $document);
@@ -364,8 +376,8 @@ final class ClosedSetsTest extends TestCase
      */
     public function testAFindingsOriginIsAnOpenObjectBothSchemasSpellAlike(): void
     {
-        $report = self::schema(Schemas::REPORT);
-        $explain = self::schema(Schemas::EXPLAIN);
+        $report = self::schema(Schemas::REPORT, 1);
+        $explain = self::schema(Schemas::EXPLAIN, 1);
         foreach (['report' => $report, 'explain' => $explain] as $document => $schema) {
             $origin = JsonPath::arrayAt($schema, ['definitions', 'packageOrigin']);
             self::assertSame(['kind', 'registry', 'package_url'], $origin['required'] ?? null, $document);
@@ -383,28 +395,19 @@ final class ClosedSetsTest extends TestCase
 
     /**
      * Every open set is a string with a `pattern` and the values lockrot writes in `x-known-values`,
-     * never an enum, and every known value fits the pattern. The patterns are spelled out, since the
-     * strict reading drops them and the widening check never sees one narrowed; the known values are
-     * held to the code. The list of places is complete: an `x-known-values` anywhere else fails.
+     * or an integer with no pattern and its known integers there, never an enum, and every known
+     * value fits the pattern. The patterns are spelled out, since the strict reading drops them and
+     * the widening check never sees one narrowed; the known values are held to the code. The list of
+     * places is complete: an `x-known-values` anywhere in a shipped file else fails.
      */
     public function testTheOpenSetsAreOpenStringsWithTheirKnownValues(): void
     {
-        $report = self::schema(Schemas::REPORT);
-        $explain = self::schema(Schemas::EXPLAIN);
-        $config = self::schema(Schemas::CONFIG);
+        $report = self::schema(Schemas::REPORT, 1);
+        $explain = self::schema(Schemas::EXPLAIN, 1);
         $branchRow = ['definitions', 'metadata', 'properties', 'branches', 'items', 'properties'];
         $open = self::openSets();
         foreach ($open as $where => [$node, $pattern, $known]) {
-            self::assertSame('string', $node['type'] ?? null, $where);
-            self::assertArrayNotHasKey('enum', $node, $where);
-            self::assertSame($pattern, $node['pattern'] ?? null, $where);
-            self::assertSame($known, $node[KnownValues::KEYWORD] ?? null, $where);
-            self::assertSame($known, array_values(array_unique($known)), $where);
-            foreach ($known as $value) {
-                // Delimited as SchemaWidening delimits a schema pattern, so a quantifier's braces
-                // or a lone `}` never end it early.
-                self::assertMatchesRegularExpression("\x01".$pattern."\x01", $value, $where);
-            }
+            self::assertOpenSet($where, $node, $pattern, $known);
         }
         self::assertSame(['type' => 'null'], JsonPath::arrayAt($report, ['definitions', 's8', 'properties', 'floor_source', 'oneOf', 1]), 'floor_source is otherwise null');
         self::assertCount(2, JsonPath::arrayAt($report, ['definitions', 's8', 'properties', 'floor_source', 'oneOf']));
@@ -430,15 +433,79 @@ final class ClosedSetsTest extends TestCase
         }
 
         $found = [];
-        foreach (['report' => $report, 'explain' => $explain, 'config' => $config, 'baseline' => self::schema(Schemas::BASELINE)] as $document => $schema) {
-            foreach (self::withKnownValues($schema, '#') as $path) {
-                $found[] = $document.' '.$path;
+        foreach ([Schemas::REPORT, Schemas::EXPLAIN, Schemas::CONFIG, Schemas::BASELINE] as $document) {
+            foreach (Schemas::numbers($document) as $number) {
+                foreach (self::withKnownValues(self::schema($document, $number), '#') as $path) {
+                    $found[] = $document.'-'.$number.' '.$path;
+                }
             }
         }
         sort($found);
         $expected = array_keys($open);
         sort($expected);
         self::assertSame($expected, $found);
+    }
+
+    /**
+     * The clause for integer sets, on a synthetic schema that holds one: no shipped file has an
+     * integer set yet. Its row passes, and the same node read as a string set, or with a value that
+     * is no integer, fails.
+     */
+    public function testAnIntegerSetIsAnIntegerWithItsKnownIntegersAndNoPattern(): void
+    {
+        $schema = JsonPath::decodeFile(self::INTEGER_SET);
+        self::assertSame(['#/properties/divisor'], self::withKnownValues($schema, '#'), 'the synthetic schema holds one open set');
+        $node = JsonPath::arrayAt($schema, ['properties', 'divisor']);
+
+        self::assertOpenSet('synthetic #/properties/divisor', $node, null, [1, 2, 4]);
+
+        $misread = 0;
+        foreach ([
+            'as a string set' => [$node, self::WORD, [1, 2, 4]],
+            'with a value that is no integer' => [array_merge($node, [KnownValues::KEYWORD => [1, '2', 4]]), null, [1, '2', 4]],
+            'with a pattern' => [array_merge($node, ['pattern' => '^[0-9]+$']), null, [1, 2, 4]],
+            'listing other values' => [$node, null, [1, 2]],
+        ] as $what => [$changed, $pattern, $known]) {
+            try {
+                self::assertOpenSet($what, $changed, $pattern, $known);
+            } catch (AssertionFailedError $expected) {
+                ++$misread;
+                continue;
+            }
+            self::fail('the clause accepts an integer set '.$what);
+        }
+        self::assertSame(4, $misread);
+    }
+
+    /**
+     * One open set: a string with its pattern, or, with no pattern, an integer; never an enum; its
+     * `x-known-values` exactly the values given, each once, each fitting the pattern or an integer.
+     *
+     * @param array<mixed, mixed>   $node
+     * @param list<string>|list<int> $known
+     */
+    private static function assertOpenSet(string $where, array $node, ?string $pattern, array $known): void
+    {
+        self::assertArrayNotHasKey('enum', $node, $where);
+        self::assertSame($known, $node[KnownValues::KEYWORD] ?? null, $where);
+        self::assertSame($known, array_values(array_unique($known, \SORT_REGULAR)), $where);
+        if ($pattern === null) {
+            self::assertSame('integer', $node['type'] ?? null, $where);
+            self::assertArrayNotHasKey('pattern', $node, $where.': an integer set has no pattern');
+            foreach ($known as $value) {
+                self::assertIsInt($value, $where);
+            }
+
+            return;
+        }
+        self::assertSame('string', $node['type'] ?? null, $where);
+        self::assertSame($pattern, $node['pattern'] ?? null, $where);
+        foreach ($known as $value) {
+            self::assertIsString($value, $where);
+            // Delimited as SchemaWidening delimits a schema pattern, so a quantifier's braces
+            // or a lone `}` never end it early.
+            self::assertMatchesRegularExpression("\x01".$pattern."\x01", $value, $where);
+        }
     }
 
     /**
@@ -523,7 +590,7 @@ final class ClosedSetsTest extends TestCase
      */
     public function testNoCoreNameUsesANameReservedForExtensions(): void
     {
-        $config = self::schema(Schemas::CONFIG);
+        $config = self::schema(Schemas::CONFIG, 1);
         $topLevelKeys = self::keys(JsonPath::arrayAt($config, ['properties']));
         $ignoreKeys = self::keys(JsonPath::arrayAt($config, ['properties', 'ignore', 'items', 'properties']));
         $names = array_merge(Verdict::all(), Priority::all(), FailOn::allowed(), LockrotConfig::FORMATS, ClosedSets::signalIds(), [PhpFloor::PROJECT, PhpFloor::TARGET, PhpFloor::NEEDS_NEWER, PhpFloor::STOPS_BEFORE, PhpFloor::SKIPS, PhpFloor::UNSATISFIABLE], Libyears::REASONS, PriorityBasis::STEPS, NoFix::REASONS, Gate::MODES, FailOn::KINDS, Gate::TRIPS, Gate::EXEMPTIONS, RunNote::CODES, RepoRef::FORGES, MetadataFailure::REASONS, RunNote::ADVISORIES_NOT_CHECKED_REASONS, RunNote::REPOSITORY_ACTIVITY_NOT_CHECKED_REASONS, PackageOrigin::KINDS, PackageOrigin::REGISTRIES, $topLevelKeys, $ignoreKeys);
@@ -579,8 +646,8 @@ final class ClosedSetsTest extends TestCase
     }
 
     /** @return array<mixed, mixed> */
-    private static function schema(string $document): array
+    private static function schema(string $document, int $number): array
     {
-        return JsonPath::decodeFile(Schemas::path($document));
+        return JsonPath::decodeFile(Schemas::path($document, $number));
     }
 }

@@ -8,6 +8,7 @@ use Composer\Package\Loader\ArrayLoader;
 use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Json\KnownValues;
 use Lockrot\Json\Schemas;
+use Lockrot\Output\JsonFormatter;
 use Lockrot\Signal\Rule\PinnedRule;
 use Lockrot\Signal\Signal;
 use Lockrot\Tests\Support\JsonPath;
@@ -71,7 +72,7 @@ final class PinnedRuleTest extends TestCase
         self::assertSame(['branch_snapshot', 'no_stable_release'], $reasons);
         self::assertSame(
             $reasons,
-            JsonPath::arrayAt(JsonPath::decodeFile(Schemas::path(Schemas::REPORT)), ['definitions', 's6', 'properties', 'reason', KnownValues::KEYWORD])
+            JsonPath::arrayAt(JsonPath::decodeFile(Schemas::path(Schemas::REPORT, JsonFormatter::SCHEMA)), ['definitions', 's6', 'properties', 'reason', KnownValues::KEYWORD])
         );
     }
 

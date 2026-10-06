@@ -1,0 +1,6 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "id": "https://lockrot.dev/schema/explain-2.json",
+    "title": "synthetic explain-2: only its id is read",
+    "type": "object"
+}

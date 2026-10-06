@@ -20,6 +20,7 @@ use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Baseline\BaselineFile;
 use Lockrot\Clock;
+use Lockrot\Config\ConfigSchema;
 use Lockrot\Data\Advisory\RepositoryAdvisoryLoader;
 use Lockrot\Data\Forge\ActivityClient;
 use Lockrot\Data\Forge\ActivityFetchPlanner;
@@ -46,11 +47,13 @@ use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\AssertsNoteDetails;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\JsonPath;
+use Lockrot\Tests\Support\NegativeFixtures;
 use Lockrot\Tests\Support\ValidatesJsonSchemas;
 use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
 use Lockrot\Verdict\VerdictEngine;
+use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -70,6 +73,13 @@ final class JsonSchemaConformanceTest extends TestCase
 
     private const FIXTURES = __DIR__.'/../fixtures/';
     private const DOCS = __DIR__.'/../../docs/';
+    private const RESOURCES = __DIR__.'/../../resources/';
+    /** The schema numbers each document ships a file for. */
+    private const NUMBERS = [Schemas::REPORT => [1], Schemas::EXPLAIN => [1], Schemas::BASELINE => [1], Schemas::CONFIG => [1]];
+    /** The negative fixtures: one directory per document and number ({@see NegativeFixtures}). */
+    private const NEGATIVE = self::FIXTURES.'schema/negative';
+    /** The runner's own fixtures, which prove it can fail. */
+    private const NEGATIVE_SELFTEST = self::FIXTURES.'schema/negative-selftest';
     private const NOW = '2026-09-14T00:00:00+00:00';
     /** A value for {@see withRulerzS6()} that removes the key. */
     private const ABSENT = "\0absent";
@@ -536,11 +546,11 @@ final class JsonSchemaConformanceTest extends TestCase
         foreach (['csv', 'acme:csv'] as $format) {
             $json = (string) json_encode(['format' => $format]);
 
-            self::assertSame([], $this->errors(Schemas::CONFIG, $json, false), $format);
-            self::assertNotSame([], $this->errors(Schemas::CONFIG, $json, true), $format);
+            self::assertSame([], $this->errors(Schemas::CONFIG, $json, false, ConfigSchema::NUMBER), $format);
+            self::assertNotSame([], $this->errors(Schemas::CONFIG, $json, true, ConfigSchema::NUMBER), $format);
         }
         foreach (['', 'CSV', 'a:b:c', ':csv', 'Acme:csv', 'acme:CSV', 'acme:', '-csv'] as $format) {
-            self::assertNotSame([], $this->errors(Schemas::CONFIG, (string) json_encode(['format' => $format]), false), 'not a format name: '.$format);
+            self::assertNotSame([], $this->errors(Schemas::CONFIG, (string) json_encode(['format' => $format]), false, ConfigSchema::NUMBER), 'not a format name: '.$format);
         }
     }
 
@@ -1087,8 +1097,8 @@ final class JsonSchemaConformanceTest extends TestCase
     {
         $finding = self::analysis('apps/wallabag_wallabag')->finding('doctrine/cache');
         self::assertNotNull($finding);
-        foreach ([Schemas::REPORT, Schemas::EXPLAIN] as $schema) {
-            $listed = array_keys(JsonPath::arrayAt(JsonPath::decodeFile(Schemas::path($schema)), ['definitions', 'finding', 'properties']));
+        foreach ([Schemas::REPORT => JsonFormatter::SCHEMA, Schemas::EXPLAIN => ExplainFormatter::SCHEMA] as $schema => $number) {
+            $listed = array_keys(JsonPath::arrayAt(JsonPath::decodeFile(Schemas::path($schema, $number)), ['definitions', 'finding', 'properties']));
             self::assertSame([], array_values(array_diff(array_keys($finding->toArray()), $listed)), $schema);
         }
     }
@@ -1202,7 +1212,7 @@ final class JsonSchemaConformanceTest extends TestCase
         }
     }
 
-    /** @return iterable<string, array{string, string}> every ```json block in docs/, with the schema it must match */
+    /** @return iterable<string, array{string, int, string}> every ```json block in docs/, with the schema and number it must match */
     public static function docSamples(): iterable
     {
         foreach (glob(self::DOCS.'*.md') ?: [] as $path) {
@@ -1214,7 +1224,7 @@ final class JsonSchemaConformanceTest extends TestCase
                 if ($schema === null) {
                     continue;
                 }
-                yield basename($path).' #'.($i + 1) => [$schema, $block];
+                yield basename($path).' #'.($i + 1) => [$schema[0], $schema[1], $block];
             }
         }
     }
@@ -1223,7 +1233,7 @@ final class JsonSchemaConformanceTest extends TestCase
      * @dataProvider docSamples
      */
     #[DataProvider('docSamples')]
-    public function testTheDocsSamplesValidate(string $schema, string $block): void
+    public function testTheDocsSamplesValidate(string $schema, int $number, string $block): void
     {
         $document = self::documentOf($block);
         if ($schema === Schemas::CONFIG) {
@@ -1232,16 +1242,40 @@ final class JsonSchemaConformanceTest extends TestCase
         }
         $json = (string) json_encode($document);
 
-        $this->assertValid($schema, $json, 'docs sample');
-        $this->assertValid($schema, $json, 'docs sample', true);
+        $this->assertValid($schema, $json, 'docs sample', false, $number);
+        $this->assertValid($schema, $json, 'docs sample', true, $number);
     }
 
-    /** @return iterable<string, array{string}> */
+    /** @return iterable<string, array{string, int}> every schema file lockrot ships, by document and number */
     public static function schemaDocuments(): iterable
     {
-        foreach ([Schemas::REPORT, Schemas::EXPLAIN, Schemas::BASELINE, Schemas::CONFIG] as $document) {
-            yield $document => [$document];
+        foreach (self::NUMBERS as $document => $numbers) {
+            foreach ($numbers as $number) {
+                yield $document.'-'.$number => [$document, $number];
+            }
         }
+    }
+
+    /** Every document ships exactly these numbers, a file for each; a number joins in the PR that adds its file. */
+    public function testEachDocumentShipsTheFilesOfItsNumbers(): void
+    {
+        $shipped = [];
+        foreach (scandir(self::RESOURCES) ?: [] as $file) {
+            if (preg_match('/^lockrot-[a-z]+(-[0-9]+)?\.schema\.json$/', $file) === 1) {
+                $shipped[] = $file;
+            }
+        }
+        $expected = [];
+        foreach (self::NUMBERS as $document => $numbers) {
+            self::assertSame($numbers, Schemas::numbers($document), $document);
+            foreach ($numbers as $number) {
+                $expected[] = 'lockrot-'.$document.'-'.$number.'.schema.json';
+                self::assertSame(realpath(self::RESOURCES.'lockrot-'.$document.'-'.$number.'.schema.json'), realpath(Schemas::path($document, $number)), $document.'-'.$number);
+            }
+        }
+        sort($shipped);
+        sort($expected);
+        self::assertSame($expected, $shipped);
     }
 
     /**
@@ -1296,21 +1330,221 @@ final class JsonSchemaConformanceTest extends TestCase
      * @dataProvider schemaDocuments
      */
     #[DataProvider('schemaDocuments')]
-    public function testEachSchemaIsValidDraft04AndNamesItsPublishedUrl(string $document): void
+    public function testEachSchemaIsValidDraft04AndNamesItsPublishedUrl(string $document, int $number): void
     {
-        $schema = self::schema($document);
+        $schema = self::schemaAt(Schemas::path($document, $number));
 
         // validate() takes its subject by reference; a copy keeps $schema typed for the reads below.
-        $subject = self::schema($document);
+        $subject = self::schemaAt(Schemas::path($document, $number));
         $validator = new Validator();
         $validator->validate($subject, (object) ['$ref' => 'http://json-schema.org/draft-04/schema#'], Constraint::CHECK_MODE_VALIDATE_SCHEMA);
         self::assertTrue($validator->isValid(), $document.': '.json_encode($validator->getErrors()));
 
-        $number = $document === Schemas::BASELINE ? Baseline::SCHEMA : JsonFormatter::SCHEMA;
         $header = get_object_vars($schema);
         self::assertSame('http://json-schema.org/draft-04/schema#', $header['$schema'] ?? null);
         self::assertSame(Schemas::url($document, $number), $header['id'] ?? null);
         self::assertSame('https://lockrot.dev/schema/'.$document.'-'.$number.'.json', $header['id'] ?? null);
+    }
+
+    /**
+     * A docs sample names its schema by `$schema`, else by `lockrot.schema` and its shape; a
+     * composer.json sample is held to the config schema lockrot reads.
+     *
+     * @return iterable<string, array{array<string, mixed>, array{string, int}|null}>
+     */
+    public static function samplesAndTheirSchemas(): iterable
+    {
+        $findingsList = [['package' => 'a/b']];
+        $findingsMap = ['a/b' => ['version' => '1.0.0', 'verdict' => 'stale', 'first_seen' => '2026-10-01']];
+        yield 'report-1 by $schema' => [['$schema' => 'https://lockrot.dev/schema/report-1.json', 'lockrot' => ['schema' => 1], 'findings' => $findingsList], [Schemas::REPORT, 1]];
+        yield 'report-2 by $schema, whatever lockrot.schema says' => [['$schema' => 'https://lockrot.dev/schema/report-2.json', 'lockrot' => ['schema' => 1], 'findings' => $findingsList], [Schemas::REPORT, 2]];
+        yield 'explain-1 by $schema, whatever its shape' => [['$schema' => 'https://lockrot.dev/schema/explain-1.json', 'lockrot' => ['schema' => 1], 'findings' => $findingsList], [Schemas::EXPLAIN, 1]];
+        yield 'baseline-2 by $schema' => [['$schema' => 'https://lockrot.dev/schema/baseline-2.json', 'lockrot' => [], 'findings' => $findingsMap], [Schemas::BASELINE, 2]];
+        yield 'an envelope fragment naming report-1' => [['$schema' => 'https://lockrot.dev/schema/report-1.json', 'lockrot' => ['schema' => 1]], null];
+        yield 'a report by its shape' => [['lockrot' => ['schema' => 1], 'findings' => $findingsList], [Schemas::REPORT, 1]];
+        yield 'a baseline by its shape' => [['lockrot' => ['schema' => 2], 'findings' => $findingsMap], [Schemas::BASELINE, 2]];
+        yield 'an explanation by its shape' => [['lockrot' => ['schema' => 1], 'finding' => [], 'lock' => []], [Schemas::EXPLAIN, 1]];
+        yield 'composer.json' => [['extra' => ['lockrot' => ['format' => 'json']]], [Schemas::CONFIG, 1]];
+        yield 'an envelope fragment' => [['lockrot' => ['schema' => 1]], null];
+        yield 'no number' => [['lockrot' => ['version' => '0.13.0'], 'findings' => $findingsList], null];
+        yield 'another schema' => [['$schema' => 'https://json.schemastore.org/sarif-2.1.0.json'], null];
+    }
+
+    /**
+     * @param array<string, mixed>       $document
+     * @param array{string, int}|null    $expected
+     *
+     * @dataProvider samplesAndTheirSchemas
+     */
+    #[DataProvider('samplesAndTheirSchemas')]
+    public function testADocsSampleIsHeldToTheSchemaItNames(array $document, ?array $expected): void
+    {
+        self::assertSame($expected, self::schemaFor($document));
+    }
+
+    /** A docs sample that names report-1 is checked against resources/lockrot-report-1.schema.json. */
+    public function testADocsSampleNamingReport1IsCheckedAgainstTheReport1File(): void
+    {
+        $found = 0;
+        foreach (self::docSamples() as $name => [$document, $number, $block]) {
+            if (strpos($block, '"$schema": "https://lockrot.dev/schema/report-1.json"') === false) {
+                continue;
+            }
+            self::assertSame([Schemas::REPORT, 1], [$document, $number], $name);
+            self::assertSame('lockrot-report-1.schema.json', basename(self::schemaFileFor($document, (string) json_encode(self::documentOf($block)), $number)), $name);
+            ++$found;
+        }
+        self::assertGreaterThan(0, $found, 'docs/ holds a report-1 sample');
+    }
+
+    /**
+     * The validation helper picks the file of the number a document names, not the newest one: with
+     * a report-2 file beside report-1 (a temporary copy of resources/, the report-2 file rejecting
+     * every document), a report-1 document validates against report-1, and one naming report-2 is
+     * held to report-2. A document that names no number takes the one given, and one that names
+     * another number than the one given fails.
+     */
+    public function testADocumentIsHeldToTheFileOfTheNumberItNamesWhileANewerFileSitsBesideIt(): void
+    {
+        $dir = sys_get_temp_dir().'/lockrot-numbered-'.uniqid('', true);
+        mkdir($dir);
+        try {
+            copy(Schemas::path(Schemas::REPORT, 1), $dir.'/lockrot-report-1.schema.json');
+            file_put_contents($dir.'/lockrot-report-2.schema.json', (string) json_encode(['$schema' => 'http://json-schema.org/draft-04/schema#', 'id' => Schemas::url(Schemas::REPORT, 2), 'not' => new \stdClass()]));
+
+            $report = (new JsonFormatter())->format(self::analysis('skeletons/laravel')->report());
+            self::assertStringStartsWith("{\n    \"\$schema\": \"https://lockrot.dev/schema/report-1.json\",\n", $report);
+            $report1 = self::schemaFileFor(Schemas::REPORT, $report, null, $dir);
+            self::assertSame($dir.'/lockrot-report-1.schema.json', $report1);
+            $this->assertValidAgainst(self::schemaAt($report1), $report, 'report-1 beside report-2');
+            $this->assertValidAgainst(self::schemaAt($report1), $report, 'report-1 beside report-2', true);
+
+            $decoded = self::decoded($report);
+            $naming2 = (string) json_encode(['$schema' => Schemas::url(Schemas::REPORT, 2)] + $decoded);
+            $report2 = self::schemaFileFor(Schemas::REPORT, $naming2, null, $dir);
+            self::assertSame($dir.'/lockrot-report-2.schema.json', $report2);
+            self::assertNotSame([], $this->errorsAgainst(self::schemaAt($report2), $naming2, false), 'held to report-2');
+
+            unset($decoded['$schema'], $decoded['lockrot']);
+            $unnamed = (string) json_encode($decoded);
+            self::assertSame($dir.'/lockrot-report-2.schema.json', self::schemaFileFor(Schemas::REPORT, $unnamed, 2, $dir), 'no number named: the one given');
+            self::assertSame($dir.'/lockrot-report-1.schema.json', self::schemaFileFor(Schemas::REPORT, (string) json_encode(['lockrot' => ['schema' => 1]] + $decoded), null, $dir), 'lockrot.schema names it');
+
+            foreach ([[$report, 2, 'a number the document contradicts'], [$unnamed, null, 'no number at all']] as [$json, $number, $what]) {
+                try {
+                    self::schemaFileFor(Schemas::REPORT, $json, $number, $dir);
+                } catch (AssertionFailedError $expected) {
+                    continue;
+                }
+                self::fail($what.' is refused');
+            }
+        } finally {
+            array_map('unlink', glob($dir.'/*') ?: []);
+            rmdir($dir);
+        }
+    }
+
+    /**
+     * Every negative fixture is rejected, with the error it names: one row per file. Until the
+     * first negatives land the directory holds only its .gitkeep, and the one row says so.
+     *
+     * @return iterable<string, array{string}>
+     */
+    public static function negativeFixtures(): iterable
+    {
+        $rows = NegativeFixtures::rows(self::NEGATIVE);
+
+        return $rows === [] ? ['(none yet)' => ['']] : $rows;
+    }
+
+    /**
+     * @dataProvider negativeFixtures
+     */
+    #[DataProvider('negativeFixtures')]
+    public function testEveryNegativeFixtureIsRejectedWithTheErrorItNames(string $path): void
+    {
+        if ($path === '') {
+            self::assertSame(['.gitkeep'], array_values(array_diff(scandir(self::NEGATIVE) ?: [], ['.', '..'])), 'no negative fixture yet');
+
+            return;
+        }
+        [$rejected, $strict, $errors] = $this->negativeOutcome($path);
+        self::assertTrue($rejected, $path.($strict ? ' (strict twin)' : '').' is rejected with its error: '.json_encode($errors, \JSON_PRETTY_PRINT));
+    }
+
+    /**
+     * The runner can fail. Of the planted fixtures, one is rejected with the error it names, one is
+     * a valid report-1 document and so no negative, and an `EXPECT.json` directory holds a plain
+     * fixture, checked against the published schema, and a `.strict.json` one that only the strict
+     * twin rejects. `EXPECT.json` itself is never read as a fixture.
+     */
+    public function testTheNegativeRunnerTellsARejectedFixtureFromAnAcceptedOne(): void
+    {
+        $rows = NegativeFixtures::rows(self::NEGATIVE_SELFTEST);
+        self::assertSame([
+            'baseline-1/envelope-gains-a-key.strict.json',
+            'baseline-1/findings-missing.json',
+            'report-1/accepted-valid-report.json',
+            'report-1/verdict-outside-the-closed-set.json',
+        ], array_keys($rows));
+
+        $outcomes = [];
+        foreach ($rows as $name => [$path]) {
+            [$rejected, $strict] = $this->negativeOutcome($path);
+            $outcomes[$name] = [$rejected, $strict];
+        }
+        self::assertSame([
+            'baseline-1/envelope-gains-a-key.strict.json' => [true, true],
+            'baseline-1/findings-missing.json' => [true, false],
+            'report-1/accepted-valid-report.json' => [false, false],
+            'report-1/verdict-outside-the-closed-set.json' => [true, false],
+        ], $outcomes);
+
+        // The strict-only fixture is valid as published: only the strict twin rejects it.
+        [$json] = NegativeFixtures::read($rows['baseline-1/envelope-gains-a-key.strict.json'][0]);
+        $this->assertValid(Schemas::BASELINE, $json, 'a strict-only fixture as published');
+        // The rejected one is rejected for the error it names, and a fixture naming another is not a pass.
+        [$json, , $error] = NegativeFixtures::read($rows['report-1/verdict-outside-the-closed-set.json'][0]);
+        self::assertSame('findings[0].verdict', $error);
+        $errors = $this->errors(Schemas::REPORT, $json, false);
+        self::assertTrue(NegativeFixtures::rejects($errors, 'FINDINGS[0].VERDICT'), 'case-insensitive');
+        self::assertFalse(NegativeFixtures::rejects($errors, 'findings[0].priority'), 'rejected for another reason');
+        self::assertFalse(NegativeFixtures::rejects([], null), 'no error, no rejection');
+        self::assertTrue(NegativeFixtures::rejects(['(root): The property findings is required'], null), 'any error, when none is named');
+        self::assertStringNotContainsString('$expect', $json, 'the expectation is removed before validating');
+    }
+
+    /** A fixture without an expectation, or a directory that is no document and number, is an error of the fixture set. */
+    public function testTheNegativeRunnerRefusesAFixtureWithoutAnExpectation(): void
+    {
+        $root = sys_get_temp_dir().'/lockrot-negative-'.uniqid('', true);
+        mkdir($root.'/report-1', 0777, true);
+        try {
+            file_put_contents($root.'/report-1/plain.json', '{"lockrot": {"schema": 1}}');
+            $refused = 0;
+            foreach ([
+                static fn () => NegativeFixtures::read($root.'/report-1/plain.json'),
+                static fn () => NegativeFixtures::documentOf('report'),
+                static fn () => NegativeFixtures::documentOf('sarif-2'),
+            ] as $call) {
+                try {
+                    $call();
+                } catch (\UnexpectedValueException $expected) {
+                    ++$refused;
+                }
+            }
+            file_put_contents($root.'/report-1/'.NegativeFixtures::EXPECT, '{"gone.json": "findings"}');
+            try {
+                NegativeFixtures::rows($root);
+            } catch (\UnexpectedValueException $expected) {
+                ++$refused;
+            }
+            self::assertSame(4, $refused);
+        } finally {
+            array_map('unlink', glob($root.'/report-1/*') ?: []);
+            rmdir($root.'/report-1');
+            rmdir($root);
+        }
     }
 
     /**
@@ -1333,26 +1567,41 @@ final class JsonSchemaConformanceTest extends TestCase
         return $typed;
     }
 
-    /** @param array<string, mixed> $document */
-    private static function schemaFor(array $document): ?string
+    /**
+     * The schema a docs sample follows, by document and number: the document and number its
+     * `$schema` URL names, else its shape and its `lockrot.schema`. A composer.json sample is held to
+     * the config schema lockrot reads; an envelope-only fragment is not validated.
+     *
+     * @param array<string, mixed> $document
+     *
+     * @return array{string, int}|null
+     */
+    private static function schemaFor(array $document): ?array
     {
         $extra = $document['extra'] ?? null;
         if (\is_array($extra) && isset($extra['lockrot'])) {
-            return Schemas::CONFIG;
+            return [Schemas::CONFIG, ConfigSchema::NUMBER];
         }
         if (!isset($document['lockrot'])) {
             return null;
         }
         if (isset($document['finding'], $document['lock'])) {
-            return Schemas::EXPLAIN;
-        }
-        if (!isset($document['findings'])) {
+            $shape = Schemas::EXPLAIN;
+        } elseif (!isset($document['findings'])) {
             // An envelope-only fragment, as schema.md shows one: nothing to validate.
             return null;
+        } else {
+            $findings = $document['findings'];
+            $shape = \is_array($findings) && $findings !== [] && array_keys($findings) === range(0, \count($findings) - 1) ? Schemas::REPORT : Schemas::BASELINE;
         }
 
-        $findings = $document['findings'] ?? null;
+        $url = $document['$schema'] ?? null;
+        if (\is_string($url) && preg_match('{^'.preg_quote(Schemas::BASE_URL, '{').'('.Schemas::REPORT.'|'.Schemas::EXPLAIN.'|'.Schemas::BASELINE.')-([1-9]\d*)\.json$}', $url, $match) === 1) {
+            return [$match[1], (int) $match[2]];
+        }
+        $lockrot = $document['lockrot'];
+        $number = \is_array($lockrot) ? ($lockrot['schema'] ?? null) : null;
 
-        return \is_array($findings) && $findings !== [] && array_keys($findings) === range(0, \count($findings) - 1) ? Schemas::REPORT : Schemas::BASELINE;
+        return \is_int($number) ? [$shape, $number] : null;
     }
 }

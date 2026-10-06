@@ -28,8 +28,8 @@ use Lockrot\Output\TerminalText;
 final class UnknownKeys
 {
     /**
-     * The properties of resources/lockrot-config.schema.json, in alphabetical order: the first of two
-     * equally near keys is the suggestion. ConfigSchemaTest pins the list to the schema.
+     * The properties of resources/lockrot-config-1.schema.json, in alphabetical order: the first of
+     * two equally near keys is the suggestion. ConfigSchemaTest pins the list to the schema.
      */
     public const KNOWN = [
         'baseline',

@@ -8,10 +8,11 @@ use JsonSchema\Validator;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Json\KnownValues;
 use Lockrot\Json\SchemaPayload;
+use Lockrot\Json\Schemas;
 
 /**
  * Validates the shape of composer.json's extra.lockrot against
- * resources/lockrot-config.schema.json, using Composer's own bundled justinrainbow/json-schema
+ * resources/lockrot-config-1.schema.json, using Composer's own bundled justinrainbow/json-schema
  * validator.
  *
  * The published file leaves `format` open — a pattern and the formats this release writes in
@@ -24,6 +25,12 @@ use Lockrot\Json\SchemaPayload;
  */
 final class ConfigSchema
 {
+    /**
+     * The config schema number lockrot reads extra.lockrot against. A config document carries no
+     * number of its own, so this one decides which file validates it.
+     */
+    public const NUMBER = 1;
+
     private static ?object $schema = null;
 
     /** @param array<string, mixed> $lockrotExtra contents of composer.json extra.lockrot */
@@ -60,7 +67,7 @@ final class ConfigSchema
             return self::$schema;
         }
 
-        $path = __DIR__.'/../../resources/lockrot-config.schema.json';
+        $path = Schemas::path(Schemas::CONFIG, self::NUMBER);
         if (!is_file($path) || !is_readable($path)) {
             throw new ConfigException('Cannot read lockrot config schema from '.$path);
         }

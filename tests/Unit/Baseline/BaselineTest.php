@@ -181,6 +181,41 @@ final class BaselineTest extends TestCase
         ]);
     }
 
+    /**
+     * The reader takes the schema of the number `lockrot.schema` names. A number lockrot ships no
+     * schema for, or no number at all, is still read against baseline-1 and refused with its
+     * message, as before files were numbered: never an error of lockrot's own.
+     *
+     * @return iterable<string, array{mixed, string}> the `lockrot` envelope, and what the message names
+     */
+    public static function envelopesNamingNoShippedNumber(): iterable
+    {
+        yield 'a number lockrot ships no schema for' => [['version' => '0.14.0', 'schema' => 2], 'lockrot.schema'];
+        yield 'a number below the first' => [['version' => '0.14.0', 'schema' => 0], 'lockrot.schema'];
+        yield 'the number as a string' => [['version' => '0.13.0', 'schema' => '1'], 'lockrot.schema'];
+        yield 'no number' => [['version' => '0.13.0'], 'lockrot.schema'];
+        yield 'no envelope object' => ['0.13.0', 'lockrot'];
+    }
+
+    /**
+     * @param mixed $envelope
+     *
+     * @dataProvider envelopesNamingNoShippedNumber
+     */
+    #[DataProvider('envelopesNamingNoShippedNumber')]
+    public function testANumberNoSchemaIsShippedForIsRefusedByBaseline1($envelope, string $expectedMessage): void
+    {
+        $thrown = null;
+        try {
+            Baseline::fromArray(['lockrot' => $envelope, 'findings' => []]);
+        } catch (ConfigException $e) {
+            $thrown = $e;
+        }
+
+        self::assertInstanceOf(ConfigException::class, $thrown);
+        self::assertStringStartsWith("baseline file is invalid:\n  - ".$expectedMessage, $thrown->getMessage());
+    }
+
     /** @return iterable<string, array{string, string}> */
     public static function schemaInvalidFixtures(): iterable
     {
