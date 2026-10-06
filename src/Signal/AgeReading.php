@@ -5,11 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Signal;
 
 /**
- * One reading of {@see AgeMeasure}: a date lockrot holds and how long before the run clock it was,
- * or why there is none. A measured reading carries the date, the years in integer tenths (the
- * published form), the exact ratio its level was decided on, and the level; an unmeasured one
- * carries only its reason. S2, S4 and S8 copy their reading, so a fired signal and its reading
- * cannot disagree.
+ * One reading of {@see AgeMeasure}: a date with its age, or the reason that there is none.
  *
  * @internal
  */
@@ -88,7 +84,7 @@ final class AgeReading
         return $this->tenths;
     }
 
-    /** The exact years, which thresholds compare; never published. */
+    /** The exact years that thresholds compare, never published. */
     public function ratio(): ?float
     {
         return $this->ratio;

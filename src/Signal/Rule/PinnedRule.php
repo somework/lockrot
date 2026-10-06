@@ -12,18 +12,15 @@ use Lockrot\Signal\Signal;
 use Lockrot\Signal\SignalRule;
 
 /**
- * S6. Two cases, checked in this order: the installed version is a branch, or it is not and the
- * repository lists no tagged version. The first is checked first, so a snapshot of a package that
- * never released is a `branch_snapshot` — and `has_stable_release` in the data is what says it never
- * released, where the summary alone read like any other snapshot.
+ * S6: docs/verdicts.md#what-s6-carries. A branch snapshot is checked before a missing tagged
+ * release, so a snapshot of a package that never released is a `branch_snapshot`. Its
+ * `has_stable_release` says that it never released.
  *
  * @internal
  */
 final class PinnedRule implements SignalRule
 {
-    /** The installed version is a branch (`dev-main`, `2.x-dev`). */
     public const REASON_BRANCH_SNAPSHOT = 'branch_snapshot';
-    /** The installed version is not a branch, and the repository lists no tagged version. */
     public const REASON_NO_STABLE_RELEASE = 'no_stable_release';
 
     public function evaluate(PackageFacts $facts): ?Signal
@@ -31,8 +28,7 @@ final class PinnedRule implements SignalRule
         $package = $facts->package();
         $metadata = $facts->metadata();
         if ($package->isBranchSnapshot()) {
-            // The lock dates a snapshot by the commit the branch pointed at, as InstalledRelease
-            // reads it for every other surface; it is not a release date.
+            // The lock dates a snapshot by the commit the branch pointed at. That is not a release date.
             $snapshotTime = InstalledRelease::of($package, $metadata)->lockTime();
 
             return new Signal(Signal::S6, Signal::LEVEL_WARN, 'pinned to branch snapshot '.$package->version(), self::data($package, $metadata, self::REASON_BRANCH_SNAPSHOT, $snapshotTime));
@@ -45,9 +41,8 @@ final class PinnedRule implements SignalRule
     }
 
     /**
-     * What the repository says about the package's releases, as `--explain` names it under
-     * `metadata`. Without metadata nothing is known, and every release fact is null — never a
-     * `has_stable_release: false` that would claim the package never released.
+     * The S6 data (docs/verdicts.md#what-s6-carries). Without metadata every release fact is null:
+     * `has_stable_release: false` claims that the package never released.
      *
      * @return array<string, mixed>
      */

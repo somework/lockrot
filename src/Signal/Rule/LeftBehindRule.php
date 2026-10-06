@@ -19,27 +19,13 @@ use Lockrot\Signal\SignalRule;
 use Lockrot\Signal\Thresholds;
 
 /**
- * S8: the package is alive, the installed branch is not. The highest stable release on the
- * installed version's branch ({@see ReleaseBranch}) is older than `release-warn-years`, while
- * some higher branch has released since. The verdict is `left-behind` at either level; the level
- * only records whether the branch has also passed `release-high-years`. S2 cannot see this — it reads the package's newest
- * release, which is exactly the one that is fresh here — and `composer outdated` says a newer
- * major exists without saying that the one installed gets no fixes.
+ * S8: the installed release branch has gone quiet while a higher branch kept releasing
+ * (docs/verdicts.md#left-behind). The verdict is `left-behind` at either level, and the level only
+ * records whether the branch also passed `release-high-years`.
  *
- * "Moved on" means a higher branch released after the installed one's last release *and* within
- * `release-warn-years` of today: a package whose every branch went quiet years ago is not alive,
- * it is S2's case (`stale`, or `silent` with S4), and a 2.0 that was itself abandoned before 1.x
- * stopped says nothing about 1.x. An installed version the repository does not list — above
- * everything it has on that branch, as a lock written against a since-removed tag would be —
- * cannot be measured by that branch's last date, so it carries no S8 either; nor does a branch
- * whose highest tag the repository leaves undated.
- *
- * The newest branch proves the move; the branch the signal tells the project to follow is the newest
- * releasing one *within reach* — one whose php requirement the project's own `require.php` and the
- * target PHP admit ({@see PhpFloor}). Matomo supports php >=7.2.5 and locks monolog 1.x: 3.x (php
- * >=8.1) is the proof, 2.x (php >=7.2, released last month) is the branch to require. When no
- * releasing branch is within reach the signal says so and suggests nothing: the way forward is a
- * PHP upgrade, which is not a `composer.json` line.
+ * The newest higher branch proves the move. The branch to follow is the newest releasing one
+ * within reach of the project's `require.php` and the target PHP ({@see PhpFloor},
+ * docs/verdicts.md#within-reach).
  *
  * @internal
  */
@@ -68,10 +54,8 @@ final class LeftBehindRule implements SignalRule
             return null;
         }
         $byBranch = $metadata->latestStableByBranch();
-        // The installed branch's own reading: its newest dated release, or no reading where the
-        // branch's highest tag is undated or the installed version is above every listed tag
-        // ({@see AgeMeasure::branchRelease()}). S8 quotes the reading it judges, and only a branch
-        // past `release-warn-years` can be left behind.
+        // Only a branch past `release-warn-years` has a level, and S8 quotes the reading it judges
+        // ({@see AgeMeasure::branchRelease()}).
         $reading = $this->age->branchRelease($facts);
         $level = $reading->level();
         if ($level === null) {
@@ -98,18 +82,16 @@ final class LeftBehindRule implements SignalRule
         if ($newest === null || !$this->isAlive($newest['at'])) {
             return null;
         }
-        // The branch to follow has to be releasing too: one within reach that went quiet is S2's
-        // case for whoever installs it, not a place to move to.
+        // The branch to follow must release too: a quiet branch within reach is S2's case, not a
+        // place to move to.
         if ($reachable !== null && !$this->isAlive($reachable['at'])) {
             $reachable = null;
         }
         $blocking = $this->floor->blocking($newest['php']);
 
-        // The branch is named, not only the release: the branch is what a maintainer moves to, and
-        // it is the newest *releasing* higher branch — with a living LTS below the current major
-        // that can be the LTS, which is a fact about where fixes land, not a claim about the latest.
-        // A branch dated by the monorepo says so: the date is laravel/framework's release, read
-        // through `replace`, not one this package's own tags carry ({@see PackageMetadata::datedBy()}).
+        // The summary names the branch, not only the release: a maintainer moves to a branch. It
+        // is the newest releasing higher branch, which can be an LTS below the current major. A
+        // date from a monorepo parent says so ({@see PackageMetadata::datedBy()}).
         $datedBy = $reading->datedBy();
         $summary = \sprintf(
             'branch %s last released %s (%.1f years ago%s); %s released %s (%s)',
@@ -121,7 +103,6 @@ final class LeftBehindRule implements SignalRule
             $newest['version'],
             $newest['at']->format('Y-m-d')
         );
-        // Out of reach: say what holds it back, then the branch that is not — or that there is none.
         if ($blocking !== null) {
             $summary .= \sprintf(', needs php %s above %s', (string) $newest['php'], $this->floor->describe($blocking));
             $summary .= $reachable === null
@@ -156,10 +137,9 @@ final class LeftBehindRule implements SignalRule
     }
 
     /**
-     * The constraint that follows the upstream onto the newest releasing branch within reach —
-     * `^8.2` for 8.2.0, `^0.4.3` below 1.0 — written the way `composer require` would write it
-     * ({@see VersionSelector::findRecommendedRequireVersion()}), so it can be pasted into
-     * composer.json or handed to a bot; null when the repository's version string cannot be parsed.
+     * The constraint that `composer require` writes for the version
+     * ({@see VersionSelector::findRecommendedRequireVersion()}), null when the repository's
+     * version string cannot be parsed.
      */
     private function suggestedConstraint(string $package, string $newestVersion): ?string
     {

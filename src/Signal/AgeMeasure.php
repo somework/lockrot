@@ -12,16 +12,13 @@ use Lockrot\Data\Repository\InstalledRelease;
 use Lockrot\Data\Repository\ReleaseBranch;
 
 /**
- * The one producer of every age reading (issue #39.3, SPEC §8.4.1): how long before the run clock
- * the installed release, the package's newest release, the installed branch's newest release and
- * the repository's last push were. S2 judges {@see release()}, S4 {@see push()} and S8
- * {@see branchRelease()}; each copies its reading's date, version, years, `dated_by` and level,
- * so a fired signal quotes the reading it judged. Years are integer tenths on the run clock; a
- * level is decided on the exact ratio, so 4.95 years prints 5.0 and stays `warn` below a 5-year
- * `release-high-years`.
+ * The one producer of every age reading. S2 judges {@see release()}, S4 {@see push()} and S8
+ * {@see branchRelease()}, and each copies its reading, so a fired signal quotes what it judged.
+ * Years are integer tenths. A level is decided on the exact ratio, so 4.95 years prints `5.0` and
+ * stays `warn` below a `release-high-years` of 5.
  *
- * A reading that cannot be taken says why. When the repository metadata was not read, that is the
- * metadata's reason, before any reason of the reading's own (SPEC §8.4.3 rule 5).
+ * A reading that cannot be taken says why. When the repository metadata was not read, the reading
+ * gives that reason before any reason of its own.
  *
  * @internal
  */
@@ -31,7 +28,7 @@ final class AgeMeasure
     public const BRANCH_SNAPSHOT = 'branch_snapshot';
     /** The lock's date for the installed tag is a commit other tags share, and no monorepo parent dates it. */
     public const SHARED_COMMIT = 'shared_commit';
-    /** The lock entry carries no date; or the repository answered with no push date. */
+    /** The lock entry carries no date, or the repository answered with no push date. */
     public const UNDATED = 'undated';
     /** The package is not from a Composer repository: no metadata is asked for, no repository activity either. */
     public const NOT_FROM_COMPOSER_REPOSITORY = 'not_from_composer_repository';
@@ -39,13 +36,11 @@ final class AgeMeasure
     public const UNAVAILABLE = 'unavailable';
     /** The Composer repository does not list the package. */
     public const NOT_FOUND = 'not_found';
-    /** The package has no stable release at all. */
     public const NO_STABLE_RELEASE = 'no_stable_release';
-    /** The releases that would be read carry no date lockrot trusts. */
+    /** The releases to read carry no date that lockrot trusts. */
     public const UNDATED_RELEASES = 'undated_releases';
     /** The repository lists no stable release on the installed branch. */
     public const NO_BRANCH_ROW = 'no_branch_row';
-    /** The installed version is above every tag the repository lists on its branch. */
     public const ABOVE_LISTED_RELEASES = 'above_listed_releases';
     /** No repository the activity lookup could ask. */
     public const NO_REPOSITORY = 'no_repository';
@@ -85,11 +80,8 @@ final class AgeMeasure
     }
 
     /**
-     * The package's newest tag by date, pre-releases counted: what S2 judges against
-     * `release-warn-years` and `release-high-years`.
-     *
-     * @param ?string $metadataStatus why the metadata was not read when the caller knows
-     *                                (`not_found`); otherwise it is told from the package's origin
+     * @param ?string $metadataStatus why the metadata was not read, when the caller knows it
+     *                                (`not_found`). Else the package's origin gives the reason.
      */
     public function release(PackageFacts $facts, ?string $metadataStatus = null): AgeReading
     {
@@ -109,13 +101,9 @@ final class AgeMeasure
     }
 
     /**
-     * The newest dated stable release on the installed version's branch ({@see ReleaseBranch}),
-     * dated as S8 dates it: the release S8 judges. An undated highest tag means the branch's newest
-     * release is one the repository does not date, so how much younger it is than the newest dated
-     * one cannot be known (a subtree split dates tags by the commit they point at, and leaves many
-     * undated; a tag sharing its commit with others is handed over undated for the same reason). An
-     * installed version above every tag the branch lists — a lock written against a since-removed
-     * tag — cannot be measured by that branch's last date either.
+     * The newest dated stable release on the installed version's branch ({@see ReleaseBranch}):
+     * the release S8 judges. A branch whose highest tag is undated, or an installed version above
+     * every listed tag, has no reading. See docs/verdicts.md#left-behind.
      *
      * @param ?string $metadataStatus as for {@see release()}
      */
@@ -146,13 +134,13 @@ final class AgeMeasure
     }
 
     /**
-     * The repository's last push (GitHub) or last commit (GitLab, Bitbucket): what S4 judges
-     * against `push-warn-years` and `push-high-years`.
+     * The repository's last activity, which S4 judges. What each host reports:
+     * docs/internals.md#repository-hosts-and-credentials.
      *
-     * @param ?string $notRead why the repository was not read when the caller decided it (SPEC
-     *                         §5.8: allowlisted, a 404, a host lockrot cannot ask); otherwise
-     *                         the plan cause the facts carry, the package's origin, or
-     *                         `no_repository`
+     * @param ?string $notRead why the caller did not read the repository (allowlisted, a 404, a
+     *                         host lockrot cannot ask). Else the reason comes from
+     *                         {@see PackageFacts::activityNotChecked()}, the package's origin or
+     *                         `no_repository`.
      */
     public function push(PackageFacts $facts, ?string $notRead = null): AgeReading
     {
@@ -200,8 +188,8 @@ final class AgeMeasure
     }
 
     /**
-     * Whether the installed version is above the highest stable tag the repository lists on its
-     * branch — not above its newest release, which a backport on a lower minor can be.
+     * Whether the installed version is above the highest stable tag on its branch. Compare with
+     * that tag, not with the newest release: a backport on a lower minor can be the newest.
      *
      * @param string $branchHighest already normalized ({@see \Lockrot\Data\Repository\PackageMetadata::latestStableByBranch()})
      */

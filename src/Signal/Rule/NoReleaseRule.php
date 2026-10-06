@@ -23,7 +23,6 @@ final class NoReleaseRule implements SignalRule
 
     public function evaluate(PackageFacts $facts): ?Signal
     {
-        // The reading S2 judges is the one it quotes: date, version, years and level all come from it.
         $reading = $this->age->release($facts);
         $level = $reading->level();
         if ($level === null) {

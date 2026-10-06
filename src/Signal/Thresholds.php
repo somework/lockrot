@@ -28,10 +28,9 @@ final class Thresholds
     }
 
     /**
-     * @param array<string, mixed> $extra composer.json extra.lockrot; each key here must be a JSON
-     *                                     integer, re-checked rather than trusted from the config
-     *                                     schema for callers that bypass it (a digit string like
-     *                                     "4" is rejected)
+     * @param array<string, mixed> $extra `extra.lockrot` of composer.json. Each key here must be a
+     *                                     JSON integer, and the string "4" is rejected: a caller
+     *                                     can bypass the config schema.
      */
     public static function fromArray(array $extra): self
     {
