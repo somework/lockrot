@@ -2,14 +2,13 @@
 <?php
 
 declare(strict_types=1);
-// Records Composer repository (p2) and GitHub responses for the acceptance fixtures so tests run
+// Records Composer repository (p2) and GitHub responses for the acceptance fixtures, so tests run
 // offline. Usage: GITHUB_TOKEN=... bin/record-fixtures [fixtureDir ...]
 //
-// p2 bodies are trimmed to KEEP (below) before being written; GitHub repo bodies are trimmed
-// separately to the keys GitHubApi reads. The fixtures hold GitHub-hosted packages only, so no
-// GitLab or Bitbucket answer is recorded. An envelope already on disk is only reused when
-// its recorded `status` is not 0 — status 0 means the previous recording run hit a transport
-// failure (timeout, DNS, etc.), so it is treated as not-yet-recorded and fetched again.
+// The script trims each p2 body to KEEP and each GitHub body to the keys that GitHubApi reads. The
+// fixtures hold GitHub-hosted packages only, so it records no GitLab or Bitbucket answer. It reuses
+// an envelope on disk only when its recorded `status` is not 0: status 0 is a transport failure (a
+// timeout or a DNS error), so the script fetches that answer again.
 require __DIR__.'/../vendor/autoload.php';
 
 use Composer\Factory;
@@ -73,7 +72,7 @@ $isRecorded = static function (string $path): bool {
     }
     $envelope = json_decode($body, true);
 
-    return \is_array($envelope) && ($envelope['status'] ?? 0) !== 0; // status 0 = transport failure while recording: fetch again
+    return \is_array($envelope) && ($envelope['status'] ?? 0) !== 0;
 };
 $io = new NullIO();
 $composerConfig = Factory::createConfig($io);
@@ -94,7 +93,7 @@ $recordP2 = static function (string $name) use ($p2Dir, $repositoryHttp, $trim, 
         fwrite(STDERR, \sprintf("p2 %s%s %d\n", $name, $dev ? '~dev' : '', $result->status()));
     }
 };
-// The monorepos the analyzer may load to date a split package's branches (resources/monorepo-parents.json).
+// The monorepos that the analyzer can load to date the branches of a split package.
 foreach (MonorepoParents::load()->candidates() as $parent) {
     $recordP2($parent);
 }

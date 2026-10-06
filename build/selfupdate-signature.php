@@ -3,30 +3,12 @@
 
 declare(strict_types=1);
 
-// The self-update signature file, for the release workflow: `wrap` turns the raw signature bytes
-// `openssl dgst -sha384 -sign` wrote into the `{"sha384": "<base64>"}` file lockrot.phar self-update
-// reads, and `unwrap` does the reverse so `openssl dgst -verify` can check it.
-//
-// `verify` runs the archive's own ReleaseSignatureVerifier with the key the *previous* release
-// carries — the check every archive in the field will run on this release — so a signing key those
-// archives do not have fails the release build, not the users. That includes a rotation done in
-// one step (new key in ReleaseKey::PEM, the .pub and the secret at once): no archive in the field
-// could follow it. It then compares that key with the one this build carries (ReleaseKey::PEM, or
-// the fourth argument): the same key is an ordinary release; another one makes this the transition
-// release of a rotation — signed with the old key, carrying the new one — which is said on stdout,
-// and from which the next release must be signed with the new key, or fail this same check.
-//
-// `describe` prints the release's lockrot.phar.meta.json, which self-update chooses a release by
-// without downloading its archive: the lowest PHP the archive runs on (config.platform.php of the
-// PHAR's composer.json, spelled `major.minor.patch` — the only spelling an archive reads — and the
-// lowest PHP its and the root composer.json's require.php allow) and the fingerprint of the public
-// key given — in the workflow, the key derived from the private key the release was actually
-// signed with.
-//
-//   build/selfupdate-signature.php wrap     build/lockrot.phar.sig.bin > build/lockrot.phar.sig.json
-//   build/selfupdate-signature.php unwrap   build/lockrot.phar.sig.json     > build/lockrot.phar.sig.bin
-//   build/selfupdate-signature.php verify   build/lockrot.phar build/lockrot.phar.sig.json build/previous-selfupdate-key.pub [carried.pub]
-//   build/selfupdate-signature.php describe build/phar/composer.json build/selfupdate-signer.pub > build/lockrot.phar.meta.json
+// The self-update signature file, for the release workflow, with four commands:
+// - wrap: the raw signature bytes of `openssl dgst -sha384 -sign` to the `{"sha384": "<base64>"}` file
+//   that lockrot.phar self-update reads.
+// - unwrap: the reverse, so `openssl dgst -verify` can check the signature.
+// - verify: the signature against the key of the previous release, see verify().
+// - describe: the lockrot.phar.meta.json of the release, see describe().
 
 require __DIR__.'/../vendor/autoload.php';
 
@@ -85,7 +67,14 @@ function fingerprintOf(string $publicKey): string
     }
 }
 
-/** What `verify` reports; see the top of this file. Exits 1 on a signature the field cannot verify. */
+/**
+ * Checks the signature with the key that the previous release carries. Every archive in the field runs
+ * this check, so a key that those archives lack fails the release build, not the users. A rotation in
+ * one step (new key in ReleaseKey::PEM, the .pub and the secret at once) fails too: no archive in the
+ * field could follow it. Returns the message for stdout. A build whose key (ReleaseKey::PEM, or
+ * `$carriedKey`) differs from that key is the transition release of a rotation, and the next release
+ * must be signed with the new key. Exits 1 on a signature that the archives in the field cannot verify.
+ */
 function verify(string $phar, string $signatureFile, string $previousKey, ?string $carriedKey): string
 {
     try {
@@ -104,6 +93,14 @@ function verify(string $phar, string $signatureFile, string $previousKey, ?strin
         ."so this is the transition release of a rotation, and the next release must be signed with the new key\n";
 }
 
+/**
+ * The content of the release's lockrot.phar.meta.json. Self-update reads it to choose a release before
+ * it downloads the archive. It holds the lowest PHP of the archive and the fingerprint of the public
+ * key. In the workflow, that key derives from the private key that signed the release. The lowest PHP
+ * is config.platform.php of the PHAR's composer.json, spelled `major.minor.patch` (the only spelling
+ * that an archive reads). It must equal the lowest PHP that require.php allows there and in the root
+ * composer.json.
+ */
 function describe(string $composerJson, string $publicKey): string
 {
     $config = manifest($composerJson)['config'] ?? null;

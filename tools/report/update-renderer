@@ -4,13 +4,10 @@
 #   tools/report/update-renderer v1.2.3           a release of somework/lockrot-report
 #   tools/report/update-renderer --from-dir DIR   a local dist/ (development only; CI refuses it)
 #
-# The page lockrot writes with --format=html is built in its own repository
-# (https://github.com/somework/lockrot-report). lockrot does not build it: it vendors the built
-# report.html and the manifest that describes it, so the PHAR is still built without node and still
-# carries exactly the bytes that are in this repository. What makes those bytes trustworthy is
-# checked here, once, when they come in: the release's build provenance attestation, then every
-# file against the sha256 the manifest states. tests/Unit/Output/RendererManifestTest.php checks the
-# second half again on every run.
+# The page that `--format=html` writes comes from https://github.com/somework/lockrot-report. This
+# script vendors its report.html and manifest, so the PHAR builds without node. It verifies once, when
+# the files come in, the build provenance attestation of the release and every file against the sha256
+# in the manifest. RendererManifestTest checks the sha256 on every run.
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 
@@ -37,7 +34,6 @@ else
   done
 fi
 
-# The manifest names every file's sha256; the page must be the one it describes.
 expected=$(php -r '$m = json_decode(file_get_contents($argv[1]), true); echo $m["files"]["report.html"] ?? "";' "$work/manifest.json")
 actual=$(php -r 'echo hash_file("sha256", $argv[1]);' "$work/report.html")
 [ -n "$expected" ] && [ "$expected" = "$actual" ] || {
@@ -45,8 +41,8 @@ actual=$(php -r 'echo hash_file("sha256", $argv[1]);' "$work/report.html")
   exit 1
 }
 
-# A release names its version in its manifest; it must be the version that was asked for, or the
-# pin and the CHANGELOG would name one renderer while the page is another.
+# The manifest of a release names its version. That version must match the requested tag, or the pin
+# and the CHANGELOG names another renderer than the page.
 if [ "${tag:-}" != "" ]; then
   named=$(php -r 'echo json_decode(file_get_contents($argv[1]), true)["version"] ?? "";' "$work/manifest.json")
   [ "v$named" = "$tag" ] || { echo "update-renderer: $tag carries a manifest for version ${named:-nothing}" >&2; exit 1; }
