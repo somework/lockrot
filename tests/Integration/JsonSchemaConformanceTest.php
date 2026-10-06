@@ -45,6 +45,7 @@ use Lockrot\Signal\Signal;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\AssertsNoteDetails;
+use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\NegativeFixtures;
@@ -275,7 +276,7 @@ final class JsonSchemaConformanceTest extends TestCase
         $findings = [];
         foreach (array_merge(['vendor/shared', 'vendor/leaf'], array_keys($roots)) as $package) {
             $verdict = strpos($package, 'vendor/') === 0 ? Verdict::STALE : Verdict::OK;
-            $findings[] = new Finding($package, '1.0.0', $verdict, [], $graph->shortestChain($package), null, $at, null, false, array_keys($graph->chainsTo($package)));
+            $findings[] = (new FindingBuilder())->withPackage($package)->withVerdict($verdict)->withChain($graph->shortestChain($package))->withDataDate($at)->withDirectDependents(array_keys($graph->chainsTo($package)))->build();
         }
         $report = new Report(TransitiveExposure::attach($findings, $graph), [], $at, \count($findings), 0);
 

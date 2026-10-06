@@ -9,6 +9,7 @@ use Lockrot\Graph\DependencyGraph;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Signal\Signal;
+use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Priority;
 use Lockrot\Verdict\Verdict;
@@ -40,7 +41,7 @@ final class TransitiveExposureTest extends TestCase
     /** @param list<Signal> $signals */
     private function finding(DependencyGraph $graph, string $package, string $verdict, array $signals = []): Finding
     {
-        return new Finding($package, '1.0.0', $verdict, $signals, $graph->shortestChain($package), null, null, null, false, array_keys($graph->chainsTo($package)));
+        return (new FindingBuilder())->withPackage($package)->withVerdict($verdict)->withSignals($signals)->withChain($graph->shortestChain($package))->withDirectDependents(array_keys($graph->chainsTo($package)))->build();
     }
 
     /**
@@ -229,7 +230,7 @@ final class TransitiveExposureTest extends TestCase
      */
     private static function shared(string $verdict, array $chain, array $roots): Finding
     {
-        return new Finding('vendor/shared', '1.0.0', $verdict, [], $chain, null, null, null, false, $roots);
+        return (new FindingBuilder())->withPackage('vendor/shared')->withVerdict($verdict)->withChain($chain)->withDirectDependents($roots)->build();
     }
 
     public function testSharedAboveCapRequiresFlaggedTransitiveAndMoreRootsThanTheCap(): void

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Output;
 
 use Lockrot\Output\Via;
+use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\TestCase;
@@ -17,7 +18,7 @@ final class ViaTest extends TestCase
      */
     private static function finding(array $chain, array $dependents): Finding
     {
-        return new Finding('acme/pkg', '1.0.0', Verdict::STALE, [], $chain, null, null, null, false, $dependents);
+        return (new FindingBuilder())->withPackage('acme/pkg')->withVerdict(Verdict::STALE)->withChain($chain)->withDirectDependents($dependents)->build();
     }
 
     public function testDirectPackageNothingElseReaches(): void

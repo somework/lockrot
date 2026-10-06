@@ -10,9 +10,9 @@ use Lockrot\Clock;
 use Lockrot\Data\Repository\InstalledRelease;
 use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Lock\LockedPackage;
+use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\Origins;
 use Lockrot\Verdict\Finding;
-use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -39,7 +39,7 @@ final class LibyearsTest extends TestCase
 
     private static function finding(string $package, LibyearsMeasurement $libyears, bool $direct = true, string $version = '1.0.0', ?string $note = null): Finding
     {
-        return new Finding($package, $version, Verdict::OK, [], $direct ? [$package] : ['vendor/root', $package], null, null, $note, false, [], $libyears, Origins::of($note !== Finding::NOTE_NOT_IN_REPOSITORY, $package));
+        return (new FindingBuilder())->withPackage($package)->withVersion($version)->withChain($direct ? [$package] : ['vendor/root', $package])->withNote($note)->withLibyears($libyears)->withOrigin(Origins::of($note !== Finding::NOTE_NOT_IN_REPOSITORY, $package))->build();
     }
 
     // ---- the measurement: the years, or the one reason there are none ------------------------

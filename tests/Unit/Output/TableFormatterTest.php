@@ -15,8 +15,8 @@ use Lockrot\Output\ConsoleMarkup;
 use Lockrot\Output\FormatContext;
 use Lockrot\Output\TableFormatter;
 use Lockrot\Signal\Signal;
+use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\Notes;
-use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -55,7 +55,7 @@ final class TableFormatterTest extends TestCase
         $at = new \DateTimeImmutable(self::AT);
         $advisories = array_fill(0, 3, ['id' => 'x']);
         $report = new Report([
-            new Finding('vendor/ok', '1.0.0', Verdict::OK, [new Signal('S9', 'warn', '3 security advisories affect 1.0.0 (a, b, c)', ['advisories' => $advisories])], ['vendor/ok'], null, $at),
+            (new FindingBuilder())->withPackage('vendor/ok')->withSignals([new Signal('S9', 'warn', '3 security advisories affect 1.0.0 (a, b, c)', ['advisories' => $advisories])])->withChain(['vendor/ok'])->withDataDate($at)->build(),
         ], [], $at, 1, 0, null, null, true);
 
         $at74 = $this->plainLines($this->formatter(74)->format($report));
@@ -77,12 +77,12 @@ final class TableFormatterTest extends TestCase
         $at = new \DateTimeImmutable(self::AT);
 
         return new Report([
-            new Finding('doctrine/cache', '2.2.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'marked abandoned by its repository'), new Signal('S2', 'high', 'last release 2022-05-20 (4.3 years ago)')], ['doctrine/cache'], null, $at),
-            new Finding('hoa/compiler', '3.17.08.08', Verdict::ABANDONED, [new Signal('S1', 'high', 'marked abandoned by its repository'), new Signal('S4', 'high', 'repository archived on GitHub; last push 2021-04-29 (5.4 years ago)')], ['wallabag/rulerz', 'hoa/ruler', 'hoa/compiler'], null, $at),
-            new Finding('vendor/stale-direct', '2.1.0', Verdict::STALE, [new Signal('S2', 'warn', 'last release 2022-05-20 (4.3 years ago)')], ['vendor/stale-direct'], null, $at),
-            new Finding('vendor/stale-deep', '1.0.0', Verdict::STALE, [new Signal('S2', 'warn', 'last release 2022-01-04 (4.7 years ago)')], ['vendor/root', 'vendor/stale-deep'], null, $at),
-            new Finding('psr/cache', '3.0.0', Verdict::FINISHED, [], ['psr/cache'], 'interfaces', $at),
-            new Finding('vendor/ok', '1.0.0', Verdict::OK, [], ['vendor/ok'], null, $at),
+            (new FindingBuilder())->withPackage('doctrine/cache')->withVersion('2.2.0')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('S1', 'high', 'marked abandoned by its repository'), new Signal('S2', 'high', 'last release 2022-05-20 (4.3 years ago)')])->withChain(['doctrine/cache'])->withDataDate($at)->build(),
+            (new FindingBuilder())->withPackage('hoa/compiler')->withVersion('3.17.08.08')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('S1', 'high', 'marked abandoned by its repository'), new Signal('S4', 'high', 'repository archived on GitHub; last push 2021-04-29 (5.4 years ago)')])->withChain(['wallabag/rulerz', 'hoa/ruler', 'hoa/compiler'])->withDataDate($at)->build(),
+            (new FindingBuilder())->withPackage('vendor/stale-direct')->withVersion('2.1.0')->withVerdict(Verdict::STALE)->withSignals([new Signal('S2', 'warn', 'last release 2022-05-20 (4.3 years ago)')])->withChain(['vendor/stale-direct'])->withDataDate($at)->build(),
+            (new FindingBuilder())->withPackage('vendor/stale-deep')->withVerdict(Verdict::STALE)->withSignals([new Signal('S2', 'warn', 'last release 2022-01-04 (4.7 years ago)')])->withChain(['vendor/root', 'vendor/stale-deep'])->withDataDate($at)->build(),
+            (new FindingBuilder())->withPackage('psr/cache')->withVersion('3.0.0')->withVerdict(Verdict::FINISHED)->withChain(['psr/cache'])->withAllowlistReason('interfaces')->withDataDate($at)->build(),
+            (new FindingBuilder())->withPackage('vendor/ok')->withChain(['vendor/ok'])->withDataDate($at)->build(),
         ], Notes::texts(['GitHub token not set: repository activity checked only for 2 candidate packages (0 skipped); set GITHUB_TOKEN to check all']), $at, 6, 0);
     }
 
@@ -98,7 +98,7 @@ final class TableFormatterTest extends TestCase
     {
         $at = new \DateTimeImmutable(self::AT);
         $report = new Report([
-            new Finding('vendor/stale-deep', '1.0.0', Verdict::STALE, [new Signal('S2', 'warn', 'last release 2022-01-04 (4.7 years ago)')], ['vendor/root', 'vendor/stale-deep'], null, $at),
+            (new FindingBuilder())->withPackage('vendor/stale-deep')->withVerdict(Verdict::STALE)->withSignals([new Signal('S2', 'warn', 'last release 2022-01-04 (4.7 years ago)')])->withChain(['vendor/root', 'vendor/stale-deep'])->withDataDate($at)->build(),
         ], [], $at, 1, 0);
         $out = $this->plain($this->formatter()->format($report));
 
@@ -145,7 +145,7 @@ final class TableFormatterTest extends TestCase
     {
         $at = new \DateTimeImmutable(self::AT);
         $report = new Report([
-            new Finding('vendor/orphan', '1.0.0', Verdict::PINNED, [new Signal('S6', 'warn', 'pinned to branch snapshot dev-master')], [], null, $at),
+            (new FindingBuilder())->withPackage('vendor/orphan')->withVerdict(Verdict::PINNED)->withSignals([new Signal('S6', 'warn', 'pinned to branch snapshot dev-master')])->withChain([])->withDataDate($at)->build(),
         ], [], $at, 1, 0);
 
         self::assertStringContainsString('  pinned       vendor/orphan 1.0.0  ?', $this->plain($this->formatter()->format($report)));
@@ -254,7 +254,7 @@ final class TableFormatterTest extends TestCase
         $at = new \DateTimeImmutable(self::AT);
         $evidence = 'released 2017-05-02, before PHP 8.4 GA (2024-11-21); php constraint ">=7.2" has no upper bound; sibling pins "<8.0"';
         $report = new Report([
-            new Finding('vendor/constraint', '1.0.0', Verdict::OLD_PROMISE, [new Signal('S5', 'warn', $evidence)], ['vendor/constraint'], null, $at),
+            (new FindingBuilder())->withPackage('vendor/constraint')->withVerdict(Verdict::OLD_PROMISE)->withSignals([new Signal('S5', 'warn', $evidence)])->withChain(['vendor/constraint'])->withDataDate($at)->build(),
         ], [], $at, 1, 0);
 
         $raw = (new TableFormatter(FormatContext::create(null, LockrotConfig::FAIL_ON_NONE, '0.1.0', 200)))->format($report);
@@ -272,7 +272,7 @@ final class TableFormatterTest extends TestCase
     {
         $at = new \DateTimeImmutable(self::AT);
         $report = new Report([
-            new Finding('vendor/<info>weird', '1.0.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'marked abandoned by its repository')], ['vendor/<info>weird'], null, $at),
+            (new FindingBuilder())->withPackage('vendor/<info>weird')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('S1', 'high', 'marked abandoned by its repository')])->withChain(['vendor/<info>weird'])->withDataDate($at)->build(),
         ], Notes::texts(['note with <comment> in it']), $at, 1, 0);
 
         $out = (new TableFormatter(FormatContext::create(null, LockrotConfig::FAIL_ON_NONE, '0.1.0', 200)))->format($report);
@@ -301,7 +301,7 @@ final class TableFormatterTest extends TestCase
     {
         $at = new \DateTimeImmutable(self::AT);
         $report = new Report([
-            new Finding('vendor/'.$text, $text, Verdict::ABANDONED, [new Signal('S1', 'high', 'marked abandoned: '.$text)], ['vendor/'.$text], null, $at),
+            (new FindingBuilder())->withPackage('vendor/'.$text)->withVersion($text)->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('S1', 'high', 'marked abandoned: '.$text)])->withChain(['vendor/'.$text])->withDataDate($at)->build(),
         ], Notes::texts(['note: '.$text]), $at, 1, 0);
 
         $out = $this->formatter(200)->format($report);
@@ -356,9 +356,9 @@ final class TableFormatterTest extends TestCase
     {
         $at = new \DateTimeImmutable(self::AT);
         $report = new Report([
-            new Finding('smalot/pdfparser', 'v1.1.0', Verdict::LEFT_BEHIND, [new Signal('S8', 'warn', 'branch 1.x last released 2022-01-03')], ['smalot/pdfparser'], null, $at, null, false, ['smalot/pdfparser'], LibyearsMeasurement::of(4.7123)),
-            new Finding('psr/log', '1.1.4', Verdict::FINISHED, [], ['smalot/pdfparser', 'psr/log'], 'interfaces', $at, null, false, ['smalot/pdfparser'], LibyearsMeasurement::of(3.36)),
-            new Finding('wallabag/rulerz', 'dev-master', Verdict::PINNED, [new Signal('S6', 'warn', 'pinned')], ['wallabag/rulerz'], null, $at, null, false, ['wallabag/rulerz'], LibyearsMeasurement::unmeasured(Libyears::BRANCH_SNAPSHOT)),
+            (new FindingBuilder())->withPackage('smalot/pdfparser')->withVersion('v1.1.0')->withVerdict(Verdict::LEFT_BEHIND)->withSignals([new Signal('S8', 'warn', 'branch 1.x last released 2022-01-03')])->withChain(['smalot/pdfparser'])->withDataDate($at)->withDirectDependents(['smalot/pdfparser'])->withLibyears(LibyearsMeasurement::of(4.7123))->build(),
+            (new FindingBuilder())->withPackage('psr/log')->withVersion('1.1.4')->withVerdict(Verdict::FINISHED)->withChain(['smalot/pdfparser', 'psr/log'])->withAllowlistReason('interfaces')->withDataDate($at)->withDirectDependents(['smalot/pdfparser'])->withLibyears(LibyearsMeasurement::of(3.36))->build(),
+            (new FindingBuilder())->withPackage('wallabag/rulerz')->withVersion('dev-master')->withVerdict(Verdict::PINNED)->withSignals([new Signal('S6', 'warn', 'pinned')])->withChain(['wallabag/rulerz'])->withDataDate($at)->withDirectDependents(['wallabag/rulerz'])->withLibyears(LibyearsMeasurement::unmeasured(Libyears::BRANCH_SNAPSHOT))->build(),
         ], [], $at, 3, 0);
         $lines = $this->plainLines($this->formatter(200)->format($report));
         $priority = array_search('priority: critical 0 · high 2 · medium 0 · low 0', $lines, true);
@@ -448,7 +448,7 @@ final class TableFormatterTest extends TestCase
     {
         $at = new \DateTimeImmutable(self::AT);
         $path = '/Users/someone/projects/with/a/rather/long/directory/name/lockrot-baseline.json';
-        $report = new Report([new Finding('vendor/ok', '1.0.0', Verdict::OK, [], ['vendor/ok'], null, $at)], Notes::texts(['baseline written to '.$path]), $at, 1, 0);
+        $report = new Report([(new FindingBuilder())->withPackage('vendor/ok')->withChain(['vendor/ok'])->withDataDate($at)->build()], Notes::texts(['baseline written to '.$path]), $at, 1, 0);
         $lines = $this->plainLines($this->formatter(60)->format($report));
 
         self::assertContains($path, $lines, 'the path stays one whole line');
@@ -461,7 +461,7 @@ final class TableFormatterTest extends TestCase
         $at = new \DateTimeImmutable(self::AT);
         $package = 'vendor/'.str_repeat('a', 60);
         $evidence = 'marked abandoned, replacement: https://example.com/'.str_repeat('b', 60);
-        $report = new Report([new Finding($package, '1.0.0', Verdict::ABANDONED, [new Signal('S1', 'high', $evidence)], [$package], null, $at)], [], $at, 1, 0);
+        $report = new Report([(new FindingBuilder())->withPackage($package)->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('S1', 'high', $evidence)])->withChain([$package])->withDataDate($at)->build()], [], $at, 1, 0);
         $lines = $this->plainLines($this->formatter(40)->format($report));
 
         $rows = array_values(array_filter($lines, static fn (string $line): bool => strpos($line, '  ') === 0));
@@ -476,7 +476,7 @@ final class TableFormatterTest extends TestCase
     public function testCleanReport(): void
     {
         $at = new \DateTimeImmutable(self::AT);
-        $report = new Report([new Finding('vendor/ok', '1.0.0', Verdict::OK, [], ['vendor/ok'], null, $at)], [], $at, 1, 0);
+        $report = new Report([(new FindingBuilder())->withPackage('vendor/ok')->withChain(['vendor/ok'])->withDataDate($at)->build()], [], $at, 1, 0);
         // wide enough that the nine-verdict counts line does not fold
         $lines = $this->plainLines($this->formatter(200)->format($report));
 
@@ -498,8 +498,8 @@ final class TableFormatterTest extends TestCase
     {
         $at = new \DateTimeImmutable(self::AT);
         $clean = new Report([
-            new Finding('vendor/ok', '1.0.0', Verdict::OK, [], ['vendor/ok'], null, $at),
-            new Finding('psr/cache', '3.0.0', Verdict::FINISHED, [], ['psr/cache'], 'interfaces', $at),
+            (new FindingBuilder())->withPackage('vendor/ok')->withChain(['vendor/ok'])->withDataDate($at)->build(),
+            (new FindingBuilder())->withPackage('psr/cache')->withVersion('3.0.0')->withVerdict(Verdict::FINISHED)->withChain(['psr/cache'])->withAllowlistReason('interfaces')->withDataDate($at)->build(),
         ], [], $at, 2, 0);
 
         self::assertStringNotContainsString('priority:', $this->plain($this->formatter()->format($clean)));
@@ -611,7 +611,7 @@ final class TableFormatterTest extends TestCase
     {
         $at = new \DateTimeImmutable(self::AT);
         $report = new Report([
-            new Finding('vendor/allowed', '1.0.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'marked abandoned by its repository')], ['vendor/allowed'], 'replaced upstream', $at),
+            (new FindingBuilder())->withPackage('vendor/allowed')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('S1', 'high', 'marked abandoned by its repository')])->withChain(['vendor/allowed'])->withAllowlistReason('replaced upstream')->withDataDate($at)->build(),
         ], [], $at, 1, 0);
 
         self::assertStringContainsString(
@@ -624,10 +624,10 @@ final class TableFormatterTest extends TestCase
     {
         $at = new \DateTimeImmutable(self::AT);
         $findings = array_merge($this->report()->findings(), [
-            new Finding('vendor/pinned', '1.2.3', Verdict::PINNED, [new Signal('S6', 'warn', 'pinned to branch snapshot dev-master')], ['vendor/pinned'], null, $at),
-            new Finding('vendor/old-promise', '0.9.0', Verdict::OLD_PROMISE, [new Signal('S5', 'warn', 'released 2015-11-16, before PHP 8.4 GA (2024-11-21); php constraint ">=5.3.0" has no upper bound')], ['vendor/old-promise'], null, $at),
-            new Finding('vendor/silent', '2.0.8', Verdict::SILENT, [new Signal('S2', 'high', 'last release 2015-11-16 (10.8 years ago)')], ['vendor/root', 'vendor/silent'], null, $at),
-            new Finding('vendor/unknown', '1.0.0', Verdict::UNKNOWN, [new Signal('S3', 'info', 'not from a Composer repository, not checked')], ['vendor/unknown'], null, $at),
+            (new FindingBuilder())->withPackage('vendor/pinned')->withVersion('1.2.3')->withVerdict(Verdict::PINNED)->withSignals([new Signal('S6', 'warn', 'pinned to branch snapshot dev-master')])->withChain(['vendor/pinned'])->withDataDate($at)->build(),
+            (new FindingBuilder())->withPackage('vendor/old-promise')->withVersion('0.9.0')->withVerdict(Verdict::OLD_PROMISE)->withSignals([new Signal('S5', 'warn', 'released 2015-11-16, before PHP 8.4 GA (2024-11-21); php constraint ">=5.3.0" has no upper bound')])->withChain(['vendor/old-promise'])->withDataDate($at)->build(),
+            (new FindingBuilder())->withPackage('vendor/silent')->withVersion('2.0.8')->withVerdict(Verdict::SILENT)->withSignals([new Signal('S2', 'high', 'last release 2015-11-16 (10.8 years ago)')])->withChain(['vendor/root', 'vendor/silent'])->withDataDate($at)->build(),
+            (new FindingBuilder())->withPackage('vendor/unknown')->withVerdict(Verdict::UNKNOWN)->withSignals([new Signal('S3', 'info', 'not from a Composer repository, not checked')])->withChain(['vendor/unknown'])->withDataDate($at)->build(),
         ]);
 
         return new Report($findings, $this->report()->runNotes(), $at, \count($findings), 1);
@@ -637,9 +637,9 @@ final class TableFormatterTest extends TestCase
     {
         $at = new \DateTimeImmutable(self::AT);
         $report = new Report([
-            new Finding('hoa/ruler', '2.17.05.16', Verdict::ABANDONED, [new Signal('S1', 'high', 'marked abandoned by its repository')], ['wallabag/rulerz', 'hoa/ruler'], null, $at, null, false, ['wallabag/rulerz', 'wallabag/rulerz-bundle']),
-            new Finding('vendor/twice', '1.0.0', Verdict::STALE, [new Signal('S2', 'warn', 'last release 2022-05-20 (4.3 years ago)')], ['vendor/twice'], null, $at, null, false, ['vendor/other', 'vendor/twice']),
-            new Finding('vendor/many', '1.0.0', Verdict::STALE, [new Signal('S2', 'warn', 'last release 2022-05-20 (4.3 years ago)')], ['r/a', 'vendor/many'], null, $at, null, false, ['r/a', 'r/b', 'r/c', 'r/d', 'r/e']),
+            (new FindingBuilder())->withPackage('hoa/ruler')->withVersion('2.17.05.16')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('S1', 'high', 'marked abandoned by its repository')])->withChain(['wallabag/rulerz', 'hoa/ruler'])->withDataDate($at)->withDirectDependents(['wallabag/rulerz', 'wallabag/rulerz-bundle'])->build(),
+            (new FindingBuilder())->withPackage('vendor/twice')->withVerdict(Verdict::STALE)->withSignals([new Signal('S2', 'warn', 'last release 2022-05-20 (4.3 years ago)')])->withChain(['vendor/twice'])->withDataDate($at)->withDirectDependents(['vendor/other', 'vendor/twice'])->build(),
+            (new FindingBuilder())->withPackage('vendor/many')->withVerdict(Verdict::STALE)->withSignals([new Signal('S2', 'warn', 'last release 2022-05-20 (4.3 years ago)')])->withChain(['r/a', 'vendor/many'])->withDataDate($at)->withDirectDependents(['r/a', 'r/b', 'r/c', 'r/d', 'r/e'])->build(),
         ], [], $at, 3, 0);
         $lines = $this->plainLines($this->formatter(200)->format($report));
 

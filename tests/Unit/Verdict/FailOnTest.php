@@ -6,6 +6,7 @@ namespace Lockrot\Tests\Unit\Verdict;
 
 use Lockrot\Exception\ConfigException;
 use Lockrot\Signal\Signal;
+use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Priority;
@@ -20,7 +21,7 @@ final class FailOnTest extends TestCase
     /** @param list<string> $chain */
     private static function finding(string $verdict, array $chain = ['a/pkg'], bool $dev = false): Finding
     {
-        return new Finding('a/pkg', '1.0.0', $verdict, [], $chain, null, new \DateTimeImmutable(self::AT), null, $dev);
+        return (new FindingBuilder())->withPackage('a/pkg')->withVerdict($verdict)->withChain($chain)->withDataDate(new \DateTimeImmutable(self::AT))->withDev($dev)->build();
     }
 
     /**
@@ -31,9 +32,9 @@ final class FailOnTest extends TestCase
     {
         $threshold = FailOn::fromString(FailOn::UNCHECKED);
         $notChecked = new Signal(Signal::S10, Signal::LEVEL_INFO, 'repository activity not checked', ['unchecked' => [], 'blocks' => ['S3', 'S4']]);
-        $ok = new Finding('vendor/ok', '1.0.0', Verdict::OK, [], ['vendor/ok'], null, null);
-        $okUnchecked = new Finding('vendor/ok', '1.0.0', Verdict::OK, [$notChecked], ['vendor/ok'], null, null);
-        $abandoned = new Finding('vendor/gone', '1.0.0', Verdict::ABANDONED, [new Signal(Signal::S1, Signal::LEVEL_HIGH, 'marked abandoned', [])], ['vendor/gone'], null, null);
+        $ok = (new FindingBuilder())->withPackage('vendor/ok')->withChain(['vendor/ok'])->build();
+        $okUnchecked = (new FindingBuilder())->withPackage('vendor/ok')->withSignals([$notChecked])->withChain(['vendor/ok'])->build();
+        $abandoned = (new FindingBuilder())->withPackage('vendor/gone')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal(Signal::S1, Signal::LEVEL_HIGH, 'marked abandoned', [])])->withChain(['vendor/gone'])->build();
 
         self::assertTrue($threshold->reaches($okUnchecked), 'the check behind this ok did not run');
         self::assertFalse($threshold->reaches($ok), 'checked, and nothing was found');

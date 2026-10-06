@@ -12,6 +12,7 @@ use Lockrot\Output\Formatters;
 use Lockrot\Output\HtmlFormatter;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\Thresholds;
+use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\JsonPath as J;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
 use Lockrot\Verdict\Finding;
@@ -29,7 +30,7 @@ final class HtmlFormatterTest extends TestCase
     /** @param list<Signal> $signals */
     private function finding(string $package, string $verdict = Verdict::STALE, array $signals = []): Finding
     {
-        return new Finding($package, '1.0.0', $verdict, $signals, ['root/app', $package], null, new \DateTimeImmutable(F::NOW));
+        return (new FindingBuilder())->withPackage($package)->withVerdict($verdict)->withSignals($signals)->withChain(['root/app', $package])->withDataDate(new \DateTimeImmutable(F::NOW))->build();
     }
 
     private function page(Report $report, bool $showAll = false): string
@@ -124,7 +125,7 @@ final class HtmlFormatterTest extends TestCase
 
     public function testThePayloadCarriesTheLibyearsBlock(): void
     {
-        $measured = new Finding('smalot/pdfparser', 'v1.1.0', Verdict::LEFT_BEHIND, [], ['smalot/pdfparser'], null, new \DateTimeImmutable(F::NOW), null, false, ['smalot/pdfparser'], LibyearsMeasurement::of(4.7123));
+        $measured = (new FindingBuilder())->withPackage('smalot/pdfparser')->withVersion('v1.1.0')->withVerdict(Verdict::LEFT_BEHIND)->withChain(['smalot/pdfparser'])->withDataDate(new \DateTimeImmutable(F::NOW))->withDirectDependents(['smalot/pdfparser'])->withLibyears(LibyearsMeasurement::of(4.7123))->build();
         $payload = self::payloadOf($this->page($this->report([$measured, $this->finding('vendor/pinned', Verdict::PINNED)], 2)));
 
         self::assertSame(4.71, J::arrayAt($payload, ['report', 'libyears'])['total']);

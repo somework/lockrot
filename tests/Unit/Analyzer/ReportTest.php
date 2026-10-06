@@ -17,6 +17,7 @@ use Lockrot\Baseline\BaselineEntry;
 use Lockrot\Config\Gate;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\Thresholds;
+use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
@@ -28,13 +29,13 @@ final class ReportTest extends TestCase
 {
     private function finding(string $package, string $verdict): Finding
     {
-        return new Finding($package, '1.0.0', $verdict, [], [$package], null, null);
+        return (new FindingBuilder())->withPackage($package)->withVerdict($verdict)->withChain([$package])->build();
     }
 
     /** A transitive finding: the chain is a root plus the package itself, so isDirect() is false. */
     private function transitive(string $package, string $verdict, bool $dev = false): Finding
     {
-        return new Finding($package, '1.0.0', $verdict, [], ['vendor/root', $package], null, null, null, $dev);
+        return (new FindingBuilder())->withPackage($package)->withVerdict($verdict)->withChain(['vendor/root', $package])->withDev($dev)->build();
     }
 
     private function report(Finding ...$findings): Report
@@ -82,7 +83,7 @@ final class ReportTest extends TestCase
         // is direct-before-transitive, which has to beat the alphabetical package name.
         $report = $this->report(
             $this->transitive('vendor/aaa-transitive', Verdict::STALE, true),
-            new Finding('vendor/zzz-direct', '1.0.0', Verdict::STALE, [], ['vendor/zzz-direct'], null, null, null, true)
+            (new FindingBuilder())->withPackage('vendor/zzz-direct')->withVerdict(Verdict::STALE)->withChain(['vendor/zzz-direct'])->withDev(true)->build()
         );
 
         self::assertSame(['vendor/zzz-direct', 'vendor/aaa-transitive'], $this->names($report));
@@ -178,9 +179,9 @@ final class ReportTest extends TestCase
     {
         $s1 = static fn (?string $replacement): Signal => new Signal('S1', 'high', 'marked abandoned by its repository', ['replacement' => $replacement]);
         $report = $this->report(
-            new Finding('vendor/moved', '1.0.0', Verdict::ABANDONED, [$s1('vendor/successor')], ['vendor/moved'], null, null),
-            new Finding('vendor/dead', '1.0.0', Verdict::ABANDONED, [$s1(null)], ['vendor/dead'], null, null),
-            new Finding('vendor/text', '1.0.0', Verdict::ABANDONED, [$s1('Symfony')], ['vendor/text'], null, null),
+            (new FindingBuilder())->withPackage('vendor/moved')->withVerdict(Verdict::ABANDONED)->withSignals([$s1('vendor/successor')])->withChain(['vendor/moved'])->build(),
+            (new FindingBuilder())->withPackage('vendor/dead')->withVerdict(Verdict::ABANDONED)->withSignals([$s1(null)])->withChain(['vendor/dead'])->build(),
+            (new FindingBuilder())->withPackage('vendor/text')->withVerdict(Verdict::ABANDONED)->withSignals([$s1('Symfony')])->withChain(['vendor/text'])->build(),
             $this->finding('vendor/quiet', Verdict::SILENT)
         );
 
@@ -468,9 +469,9 @@ final class ReportTest extends TestCase
     public function testTheLibyearsBlockIsTheArithmeticOverTheFindings(): void
     {
         $report = $this->report(
-            new Finding('vendor/direct', '1.0.0', Verdict::LEFT_BEHIND, [], ['vendor/direct'], null, null, null, false, [], LibyearsMeasurement::of(4.0)),
-            new Finding('vendor/deep', '1.0.0', Verdict::OK, [], ['vendor/direct', 'vendor/deep'], null, null, null, false, [], LibyearsMeasurement::of(2.5)),
-            new Finding('vendor/pinned', 'dev-main', Verdict::PINNED, [], ['vendor/pinned'], null, null, null, false, [], LibyearsMeasurement::unmeasured(Libyears::BRANCH_SNAPSHOT))
+            (new FindingBuilder())->withPackage('vendor/direct')->withVerdict(Verdict::LEFT_BEHIND)->withChain(['vendor/direct'])->withLibyears(LibyearsMeasurement::of(4.0))->build(),
+            (new FindingBuilder())->withPackage('vendor/deep')->withChain(['vendor/direct', 'vendor/deep'])->withLibyears(LibyearsMeasurement::of(2.5))->build(),
+            (new FindingBuilder())->withPackage('vendor/pinned')->withVersion('dev-main')->withVerdict(Verdict::PINNED)->withChain(['vendor/pinned'])->withLibyears(LibyearsMeasurement::unmeasured(Libyears::BRANCH_SNAPSHOT))->build()
         );
         $block = $report->libyears();
 
@@ -598,7 +599,7 @@ final class ReportTest extends TestCase
     {
         $chain = $roots === [] ? [] : ($roots[0] === $package ? [$package] : [$roots[0], $package]);
 
-        return new Finding($package, '1.0.0', $verdict, [], $chain, null, null, null, false, array_values($roots));
+        return (new FindingBuilder())->withPackage($package)->withVerdict($verdict)->withChain($chain)->withDirectDependents(array_values($roots))->build();
     }
 
     public function testExposureCountsFlaggedFindingsPerParentMostFirstThenByName(): void
@@ -626,10 +627,10 @@ final class ReportTest extends TestCase
         $at = new \DateTimeImmutable('2026-09-14T00:00:00+00:00');
         $s9 = static fn (int $n): Signal => new Signal('S9', 'warn', $n.' security advisories affect x', ['advisories' => array_fill(0, $n, ['id' => 'x'])]);
         $report = new Report([
-            new Finding('vendor/ok', '1.0.0', Verdict::OK, [$s9(12)], ['vendor/ok'], null, $at),
-            new Finding('vendor/done', '1.0.0', Verdict::FINISHED, [$s9(4)], ['vendor/done'], 'interfaces', $at),
-            new Finding('vendor/gone', '1.0.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'abandoned'), $s9(2)], ['vendor/gone'], null, $at),
-            new Finding('vendor/clean', '1.0.0', Verdict::OK, [], ['vendor/clean'], null, $at),
+            (new FindingBuilder())->withPackage('vendor/ok')->withSignals([$s9(12)])->withChain(['vendor/ok'])->withDataDate($at)->build(),
+            (new FindingBuilder())->withPackage('vendor/done')->withVerdict(Verdict::FINISHED)->withSignals([$s9(4)])->withChain(['vendor/done'])->withAllowlistReason('interfaces')->withDataDate($at)->build(),
+            (new FindingBuilder())->withPackage('vendor/gone')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('S1', 'high', 'abandoned'), $s9(2)])->withChain(['vendor/gone'])->withDataDate($at)->build(),
+            (new FindingBuilder())->withPackage('vendor/clean')->withChain(['vendor/clean'])->withDataDate($at)->build(),
         ], [], $at, 4, 0, null, null, true);
 
         self::assertSame('16 security advisories on 2 packages the report does not flag; see composer audit', $report->unflaggedAdvisoriesLine());
@@ -642,7 +643,7 @@ final class ReportTest extends TestCase
     public function testWithoutDevTheFooterSaysWhyAuditCountsMore(): void
     {
         $at = new \DateTimeImmutable('2026-09-14T00:00:00+00:00');
-        $finding = new Finding('vendor/ok', '1.0.0', Verdict::OK, [new Signal('S9', 'warn', '2 security advisories affect x', ['advisories' => [['id' => 'x'], ['id' => 'y']]])], ['vendor/ok'], null, $at);
+        $finding = (new FindingBuilder())->withPackage('vendor/ok')->withSignals([new Signal('S9', 'warn', '2 security advisories affect x', ['advisories' => [['id' => 'x'], ['id' => 'y']]])])->withChain(['vendor/ok'])->withDataDate($at)->build();
         $withoutDev = new Report([$finding], [], $at, 1, 0);
         $withDev = new Report([$finding], [], $at, 1, 0, null, null, true);
 
@@ -661,8 +662,8 @@ final class ReportTest extends TestCase
     public function testUnflaggedAdvisoriesLineIsSingularAndEmptyWhenNoneAreThere(): void
     {
         $at = new \DateTimeImmutable('2026-09-14T00:00:00+00:00');
-        $one = new Report([new Finding('vendor/ok', '1.0.0', Verdict::OK, [new Signal('S9', 'warn', '1 security advisory affects x', ['advisories' => [['id' => 'x']]])], ['vendor/ok'], null, $at)], [], $at, 1, 0, null, null, true);
-        $none = new Report([new Finding('vendor/gone', '1.0.0', Verdict::ABANDONED, [new Signal('S9', 'warn', 'x', ['advisories' => [['id' => 'x']]])], ['vendor/gone'], null, $at)], [], $at, 1, 0);
+        $one = new Report([(new FindingBuilder())->withPackage('vendor/ok')->withSignals([new Signal('S9', 'warn', '1 security advisory affects x', ['advisories' => [['id' => 'x']]])])->withChain(['vendor/ok'])->withDataDate($at)->build()], [], $at, 1, 0, null, null, true);
+        $none = new Report([(new FindingBuilder())->withPackage('vendor/gone')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('S9', 'warn', 'x', ['advisories' => [['id' => 'x']]])])->withChain(['vendor/gone'])->withDataDate($at)->build()], [], $at, 1, 0);
 
         self::assertSame('1 security advisory on 1 package the report does not flag; see composer audit', $one->unflaggedAdvisoriesLine());
         self::assertSame('', $none->unflaggedAdvisoriesLine());

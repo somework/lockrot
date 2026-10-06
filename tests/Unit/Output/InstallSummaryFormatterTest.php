@@ -8,6 +8,7 @@ use Lockrot\Analyzer\Report;
 use Lockrot\Output\ConsoleMarkup;
 use Lockrot\Output\InstallSummaryFormatter;
 use Lockrot\Signal\Signal;
+use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\Notes;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
@@ -26,7 +27,7 @@ final class InstallSummaryFormatterTest extends TestCase
     {
         // No signals: Finding::evidence() then falls back to the note, which keeps these cases
         // independent of the signal wording.
-        return new Finding($package, $version, $verdict, [], $chain, null, null, $evidence);
+        return (new FindingBuilder())->withPackage($package)->withVersion($version)->withVerdict($verdict)->withChain($chain)->withNote($evidence)->build();
     }
 
     /**
@@ -181,8 +182,8 @@ final class InstallSummaryFormatterTest extends TestCase
     {
         $s7 = new Signal(Signal::S7, Signal::LEVEL_INFO, 'pulls in 1 flagged package: vendor/b (abandoned)', ['flagged' => 1, 'packages' => []]);
         $report = $this->report([
-            new Finding('vendor/b', '2.0.0', Verdict::ABANDONED, [], ['vendor/a', 'vendor/b'], null, null, 'marked abandoned by its repository', false, ['vendor/a', 'vendor/c']),
-            new Finding('vendor/a', '1.0.0', Verdict::STALE, [new Signal('S2', 'warn', 'last release 2022-05-20 (4.3 years ago)'), $s7], ['vendor/a'], null, null, null, false, ['vendor/a']),
+            (new FindingBuilder())->withPackage('vendor/b')->withVersion('2.0.0')->withVerdict(Verdict::ABANDONED)->withChain(['vendor/a', 'vendor/b'])->withNote('marked abandoned by its repository')->withDirectDependents(['vendor/a', 'vendor/c'])->build(),
+            (new FindingBuilder())->withPackage('vendor/a')->withVerdict(Verdict::STALE)->withSignals([new Signal('S2', 'warn', 'last release 2022-05-20 (4.3 years ago)'), $s7])->withChain(['vendor/a'])->withDirectDependents(['vendor/a'])->build(),
         ], [], 3);
 
         $lines = (new InstallSummaryFormatter())->format($report);

@@ -8,7 +8,7 @@ use Lockrot\Analyzer\Report;
 use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineEntry;
 use Lockrot\Exception\ConfigException;
-use Lockrot\Verdict\Finding;
+use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Verdict\Verdict;
 use Lockrot\Version;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -25,7 +25,7 @@ final class BaselineTest extends TestCase
         $at = new \DateTimeImmutable(self::AT);
         $findings = [];
         foreach ($rows as [$package, $version, $verdict]) {
-            $findings[] = new Finding($package, $version, $verdict, [], [$package], null, $at);
+            $findings[] = (new FindingBuilder())->withPackage($package)->withVersion($version)->withVerdict($verdict)->withChain([$package])->withDataDate($at)->build();
         }
 
         return new Report($findings, [], $at, \count($findings), 0);

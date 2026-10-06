@@ -15,8 +15,8 @@ use Lockrot\Output\FormatContext;
 use Lockrot\Output\Formatters;
 use Lockrot\Output\MarkdownFormatter;
 use Lockrot\Signal\Signal;
+use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\Notes;
-use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\TestCase;
 
@@ -29,9 +29,9 @@ final class MarkdownFormatterTest extends TestCase
         $at = new \DateTimeImmutable(self::AT);
 
         return new Report([
-            new Finding('doctrine/cache', '1.13.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'marked abandoned by its repository')], ['doctrine/cache'], null, $at),
-            new Finding('phpzip/phpzip', '2.0.8', Verdict::SILENT, [new Signal('S2', 'high', 'last release 2015-11-16 (10.8 years ago)')], ['wallabag/wallabag', 'grandt/phpepub', 'phpzip/phpzip'], null, $at),
-            new Finding('vendor/ok', '1.0.0', Verdict::OK, [], ['vendor/ok'], null, $at),
+            (new FindingBuilder())->withPackage('doctrine/cache')->withVersion('1.13.0')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('S1', 'high', 'marked abandoned by its repository')])->withChain(['doctrine/cache'])->withDataDate($at)->build(),
+            (new FindingBuilder())->withPackage('phpzip/phpzip')->withVersion('2.0.8')->withVerdict(Verdict::SILENT)->withSignals([new Signal('S2', 'high', 'last release 2015-11-16 (10.8 years ago)')])->withChain(['wallabag/wallabag', 'grandt/phpepub', 'phpzip/phpzip'])->withDataDate($at)->build(),
+            (new FindingBuilder())->withPackage('vendor/ok')->withChain(['vendor/ok'])->withDataDate($at)->build(),
         ], Notes::texts(['GitHub token not set: repository activity checked only for 2 candidate packages']), $at, 3, 0);
     }
 
@@ -59,10 +59,10 @@ final class MarkdownFormatterTest extends TestCase
     {
         $at = new \DateTimeImmutable(self::AT);
         $report = new Report([
-            new Finding('doctrine/cache', '1.13.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'marked abandoned by its repository')], ['doctrine/cache'], null, $at),
+            (new FindingBuilder())->withPackage('doctrine/cache')->withVersion('1.13.0')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('S1', 'high', 'marked abandoned by its repository')])->withChain(['doctrine/cache'])->withDataDate($at)->build(),
             // Transitive and development-only: two steps below critical.
-            new Finding('acme/dev-only', '2.0.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'marked abandoned by its repository')], ['a/parent', 'acme/dev-only'], null, $at, null, true),
-            new Finding('vendor/ok', '1.0.0', Verdict::OK, [], ['vendor/ok'], null, $at),
+            (new FindingBuilder())->withPackage('acme/dev-only')->withVersion('2.0.0')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('S1', 'high', 'marked abandoned by its repository')])->withChain(['a/parent', 'acme/dev-only'])->withDataDate($at)->withDev(true)->build(),
+            (new FindingBuilder())->withPackage('vendor/ok')->withChain(['vendor/ok'])->withDataDate($at)->build(),
         ], [], $at, 3, 0);
 
         $lines = explode("\n", trim($this->formatter(Verdict::SILENT)->format($report, true)));
@@ -78,7 +78,7 @@ final class MarkdownFormatterTest extends TestCase
     public function testZeroFlaggedHeadingHasNoTable(): void
     {
         $at = new \DateTimeImmutable(self::AT);
-        $report = new Report([new Finding('vendor/ok', '1.0.0', Verdict::OK, [], ['vendor/ok'], null, $at)], [], $at, 1, 0);
+        $report = new Report([(new FindingBuilder())->withPackage('vendor/ok')->withChain(['vendor/ok'])->withDataDate($at)->build()], [], $at, 1, 0);
 
         $out = $this->formatter()->format($report);
 
@@ -111,8 +111,8 @@ final class MarkdownFormatterTest extends TestCase
     {
         $at = new \DateTimeImmutable(self::AT);
         $report = new Report([
-            new Finding('acme/leaf', '1.0.0', Verdict::STALE, [new Signal('S2', 'warn', 'old')], ['a/parent', 'acme/leaf'], null, $at, null, false, ['a/parent', 'b/parent']),
-            new Finding('acme/twice', '1.0.0', Verdict::STALE, [new Signal('S2', 'warn', 'old')], ['acme/twice'], null, $at, null, false, ['acme/twice', 'b/parent']),
+            (new FindingBuilder())->withPackage('acme/leaf')->withVerdict(Verdict::STALE)->withSignals([new Signal('S2', 'warn', 'old')])->withChain(['a/parent', 'acme/leaf'])->withDataDate($at)->withDirectDependents(['a/parent', 'b/parent'])->build(),
+            (new FindingBuilder())->withPackage('acme/twice')->withVerdict(Verdict::STALE)->withSignals([new Signal('S2', 'warn', 'old')])->withChain(['acme/twice'])->withDataDate($at)->withDirectDependents(['acme/twice', 'b/parent'])->build(),
         ], Notes::texts(['a note']), $at, 2, 0);
         $out = $this->formatter()->format($report);
         $lines = explode("\n", $out);
@@ -130,8 +130,8 @@ final class MarkdownFormatterTest extends TestCase
     {
         $at = new \DateTimeImmutable(self::AT);
         $report = new Report([
-            new Finding('acme/leaf', '1.0.0', Verdict::STALE, [new Signal('S2', 'warn', 'old')], ['a/parent', 'acme/leaf'], null, $at, null, false, ['a/parent'], LibyearsMeasurement::of(2.3)),
-            new Finding('acme/<b>', '1.0.0', Verdict::STALE, [new Signal('S2', 'warn', 'old')], ['acme/<b>'], null, $at, null, false, ['acme/<b>'], LibyearsMeasurement::of(1.0)),
+            (new FindingBuilder())->withPackage('acme/leaf')->withVerdict(Verdict::STALE)->withSignals([new Signal('S2', 'warn', 'old')])->withChain(['a/parent', 'acme/leaf'])->withDataDate($at)->withDirectDependents(['a/parent'])->withLibyears(LibyearsMeasurement::of(2.3))->build(),
+            (new FindingBuilder())->withPackage('acme/<b>')->withVerdict(Verdict::STALE)->withSignals([new Signal('S2', 'warn', 'old')])->withChain(['acme/<b>'])->withDataDate($at)->withDirectDependents(['acme/<b>'])->withLibyears(LibyearsMeasurement::of(1.0))->build(),
         ], [], $at, 2, 0);
         $lines = explode("\n", $this->formatter()->format($report));
         $libyears = array_search('libyears: 3.3 behind across all 2 packages · 1.0 from direct requirements · furthest behind acme/leaf 1.0.0 at 2.3', $lines, true);
@@ -182,7 +182,7 @@ final class MarkdownFormatterTest extends TestCase
     {
         $at = new \DateTimeImmutable(self::AT);
         $report = new Report([
-            new Finding('acme/pkg', '1.0.0', Verdict::STALE, [new Signal('S2', 'warn', "evidence with a | pipe\nand a second line")], ['acme/pkg'], null, $at),
+            (new FindingBuilder())->withPackage('acme/pkg')->withVerdict(Verdict::STALE)->withSignals([new Signal('S2', 'warn', "evidence with a | pipe\nand a second line")])->withChain(['acme/pkg'])->withDataDate($at)->build(),
         ], [], $at, 1, 0);
 
         $out = $this->formatter()->format($report);
@@ -270,7 +270,7 @@ final class MarkdownFormatterTest extends TestCase
     {
         $at = new \DateTimeImmutable(self::AT);
         $report = new Report([
-            new Finding('acme/ev`il', '1.0.0 <b>x</b>', Verdict::ABANDONED, [new Signal('S1', 'high', 'marked abandoned, replacement: <img src=x onerror=alert(1)> [fine](https://example.com) *ok* &lt;b&gt; #1')], ['acme/ev`il'], null, $at),
+            (new FindingBuilder())->withPackage('acme/ev`il')->withVersion('1.0.0 <b>x</b>')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('S1', 'high', 'marked abandoned, replacement: <img src=x onerror=alert(1)> [fine](https://example.com) *ok* &lt;b&gt; #1')])->withChain(['acme/ev`il'])->withDataDate($at)->build(),
         ], Notes::texts(['GitHub unreachable: <script>alert(1)</script> [x](y)']), $at, 1, 0);
 
         $out = $this->formatter()->format($report);
@@ -285,8 +285,8 @@ final class MarkdownFormatterTest extends TestCase
     {
         $at = new \DateTimeImmutable(self::AT);
         $report = new Report([
-            new Finding('acme/a``b', '1.0.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'x')], ['acme/a``b'], null, $at),
-            new Finding('acme/plain', '1.0.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'x')], ['acme/plain'], null, $at),
+            (new FindingBuilder())->withPackage('acme/a``b')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('S1', 'high', 'x')])->withChain(['acme/a``b'])->withDataDate($at)->build(),
+            (new FindingBuilder())->withPackage('acme/plain')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('S1', 'high', 'x')])->withChain(['acme/plain'])->withDataDate($at)->build(),
         ], [], $at, 2, 0);
 
         $out = $this->formatter()->format($report);
@@ -340,7 +340,7 @@ final class MarkdownFormatterTest extends TestCase
         $at = new \DateTimeImmutable(self::AT);
         $package = "acme/pk\r\ng|x";
         $report = new Report([
-            new Finding($package, '1.0.0', Verdict::STALE, [new Signal('S2', 'warn', "first\r\nsecond\rthird\nfourth")], [$package], null, $at),
+            (new FindingBuilder())->withPackage($package)->withVerdict(Verdict::STALE)->withSignals([new Signal('S2', 'warn', "first\r\nsecond\rthird\nfourth")])->withChain([$package])->withDataDate($at)->build(),
         ], Notes::texts(["note\r\nline"]), $at, 1, 0);
 
         $out = $this->formatter()->format($report);

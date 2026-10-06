@@ -15,6 +15,7 @@ use Lockrot\Html\ReportDocument;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\Thresholds;
+use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\JsonPath as J;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
 use Lockrot\Verdict\FailOn;
@@ -29,7 +30,7 @@ final class ReportDocumentTest extends TestCase
     /** @param list<Signal> $signals */
     private function finding(string $package, string $verdict, array $signals = [], string $version = '1.0.0'): Finding
     {
-        return new Finding($package, $version, $verdict, $signals, ['root/app', $package], null, new \DateTimeImmutable(F::NOW));
+        return (new FindingBuilder())->withPackage($package)->withVersion($version)->withVerdict($verdict)->withSignals($signals)->withChain(['root/app', $package])->withDataDate(new \DateTimeImmutable(F::NOW))->build();
     }
 
     /** @param list<Finding> $findings */

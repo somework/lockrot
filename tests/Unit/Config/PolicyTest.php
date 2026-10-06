@@ -10,6 +10,7 @@ use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Baseline\BaselineEntry;
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Config\Policy;
+use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\Notes;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Priority;
@@ -23,7 +24,7 @@ final class PolicyTest extends TestCase
     {
         $findings = [];
         foreach ($verdicts as $i => $verdict) {
-            $findings[] = new Finding('v/p'.$i, '1.0.0', $verdict, [], ['v/p'.$i], null, null);
+            $findings[] = (new FindingBuilder())->withPackage('v/p'.$i)->withVerdict($verdict)->withChain(['v/p'.$i])->build();
         }
 
         return new Report($findings, $networkFailures ? [Notes::text('a lookup failed', true)] : [], new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), \count($findings), 0);
@@ -56,8 +57,8 @@ final class PolicyTest extends TestCase
     public function testAPriorityThresholdReadsThePriorityNotTheVerdict(): void
     {
         $at = new \DateTimeImmutable('2026-09-14T00:00:00+00:00');
-        $directProd = new Finding('a/direct', '1.0.0', Verdict::ABANDONED, [], ['a/direct'], null, $at);
-        $transitiveDev = new Finding('a/deep', '1.0.0', Verdict::ABANDONED, [], ['a/root', 'a/deep'], null, $at, null, true);
+        $directProd = (new FindingBuilder())->withPackage('a/direct')->withVerdict(Verdict::ABANDONED)->withChain(['a/direct'])->withDataDate($at)->build();
+        $transitiveDev = (new FindingBuilder())->withPackage('a/deep')->withVerdict(Verdict::ABANDONED)->withChain(['a/root', 'a/deep'])->withDataDate($at)->withDev(true)->build();
         self::assertSame(Priority::CRITICAL, $directProd->priority());
         self::assertSame(Priority::MEDIUM, $transitiveDev->priority());
         $report = static fn (Finding ...$findings): Report => new Report(array_values($findings), [], $at, \count($findings), 0);
@@ -95,7 +96,7 @@ final class PolicyTest extends TestCase
         $findings = [];
         $names = [];
         foreach ($found as [$package, $verdict]) {
-            $findings[] = new Finding($package, '1.0.0', $verdict, [], [$package], null, $at);
+            $findings[] = (new FindingBuilder())->withPackage($package)->withVerdict($verdict)->withChain([$package])->withDataDate($at)->build();
             $names[] = $package;
         }
         $entries = [];

@@ -7,6 +7,7 @@ namespace Lockrot\Tests\Unit\Verdict;
 use Lockrot\Analyzer\Libyears;
 use Lockrot\Analyzer\LibyearsMeasurement;
 use Lockrot\Signal\Signal;
+use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\Origins;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Priority;
@@ -31,7 +32,7 @@ final class FindingTest extends TestCase
             new Signal('S2', 'high', 'last release 2015-11-16 (10.8 years ago)', ['years' => 10.8]),
             new Signal('S4', 'high', 'last push 2015-11-16 (10.8 years ago)', ['years' => 10.8]),
         ];
-        $finding = new Finding('phpzip/phpzip', '2.0.8', Verdict::SILENT, $signals, ['wallabag/wallabag', 'phpzip/phpzip'], null, new \DateTimeImmutable('2026-09-14T10:00:00+00:00'));
+        $finding = (new FindingBuilder())->withPackage('phpzip/phpzip')->withVersion('2.0.8')->withVerdict(Verdict::SILENT)->withSignals($signals)->withChain(['wallabag/wallabag', 'phpzip/phpzip'])->withDataDate(new \DateTimeImmutable('2026-09-14T10:00:00+00:00'))->build();
         self::assertSame('last release 2015-11-16 (10.8 years ago); last push 2015-11-16 (10.8 years ago)', $finding->evidence());
         $array = $finding->toArray();
         self::assertSame('phpzip/phpzip', $array['package']);
@@ -56,8 +57,8 @@ final class FindingTest extends TestCase
             new Signal('S1', 'high', 'marked abandoned by its repository'),
             new Signal('S9', 'warn', '1 security advisory affects 1.0.0 (CVE-2024-0001)', ['advisories' => [self::OPEN]]),
         ];
-        $direct = new Finding('vendor/pkg', '1.0.0', Verdict::ABANDONED, $signals, ['vendor/pkg'], null, null, null, false, ['vendor/pkg']);
-        $transitiveDev = new Finding('vendor/pkg', '1.0.0', Verdict::ABANDONED, $signals, ['root/app', 'vendor/pkg'], null, null, null, true, ['root/app']);
+        $direct = (new FindingBuilder())->withVerdict(Verdict::ABANDONED)->withSignals($signals)->withDirectDependents(['vendor/pkg'])->build();
+        $transitiveDev = (new FindingBuilder())->withVerdict(Verdict::ABANDONED)->withSignals($signals)->withChain(['root/app', 'vendor/pkg'])->withDev(true)->withDirectDependents(['root/app'])->build();
 
         self::assertTrue($direct->hasUnfixableAdvisory());
         self::assertSame(Priority::CRITICAL, $direct->priority());
@@ -69,8 +70,8 @@ final class FindingTest extends TestCase
     public function testAnAdvisoryAloneChangesNeitherThePriorityNorTheWording(): void
     {
         $s9 = new Signal('S9', 'warn', '1 security advisory affects 1.0.0 (CVE-2024-0001)', ['advisories' => [self::OPEN]]);
-        $pinned = new Finding('vendor/pkg', 'dev-main', Verdict::PINNED, [new Signal('S6', 'warn', 'pinned to branch snapshot dev-main'), $s9], ['vendor/pkg'], null, null, null, false, ['vendor/pkg']);
-        $ok = new Finding('vendor/pkg', '1.0.0', Verdict::OK, [$s9], ['vendor/pkg'], null, null, null, false, ['vendor/pkg']);
+        $pinned = (new FindingBuilder())->withVersion('dev-main')->withVerdict(Verdict::PINNED)->withSignals([new Signal('S6', 'warn', 'pinned to branch snapshot dev-main'), $s9])->withDirectDependents(['vendor/pkg'])->build();
+        $ok = (new FindingBuilder())->withSignals([$s9])->withDirectDependents(['vendor/pkg'])->build();
 
         self::assertFalse($pinned->hasUnfixableAdvisory());
         self::assertSame(Priority::HIGH, $pinned->priority());
@@ -85,7 +86,7 @@ final class FindingTest extends TestCase
         self::assertSame([Verdict::ABANDONED, Verdict::SILENT, Verdict::LEFT_BEHIND], Finding::NO_FIX_VERDICTS);
         $s9 = new Signal('S9', 'warn', 'advisory', ['advisories' => [self::OPEN]]);
         foreach (Verdict::all() as $verdict) {
-            $finding = new Finding('vendor/pkg', '1.0.0', $verdict, [$s9], ['vendor/pkg'], null, null);
+            $finding = (new FindingBuilder())->withVerdict($verdict)->withSignals([$s9])->build();
             self::assertSame(\in_array($verdict, Finding::NO_FIX_VERDICTS, true), $finding->hasUnfixableAdvisory(), $verdict);
         }
     }
@@ -93,17 +94,17 @@ final class FindingTest extends TestCase
     /** A row without the fix keys (an older JSON, a hand-built signal) is an advisory nothing fixes; a list that is not one is no advisory. */
     public function testAnAdvisoryRowWithoutFixKeysCountsAsUnfixedAndAMalformedListAsNone(): void
     {
-        $bare = new Finding('vendor/pkg', '1.0.0', Verdict::LEFT_BEHIND, [new Signal('S9', 'warn', 'x', ['advisories' => [['id' => 'PKSA-1']]])], ['vendor/pkg'], null, null);
+        $bare = (new FindingBuilder())->withVerdict(Verdict::LEFT_BEHIND)->withSignals([new Signal('S9', 'warn', 'x', ['advisories' => [['id' => 'PKSA-1']]])])->build();
         self::assertTrue($bare->hasUnfixableAdvisory());
         self::assertSame('x; no fix expected', $bare->ownEvidence());
 
-        $fixedSomewhere = new Finding('vendor/pkg', '1.0.0', Verdict::LEFT_BEHIND, [new Signal('S9', 'warn', 'x', ['advisories' => [['id' => 'PKSA-1', 'fixed_by' => '2.0.0']]])], ['vendor/pkg'], null, null);
+        $fixedSomewhere = (new FindingBuilder())->withVerdict(Verdict::LEFT_BEHIND)->withSignals([new Signal('S9', 'warn', 'x', ['advisories' => [['id' => 'PKSA-1', 'fixed_by' => '2.0.0']]])])->build();
         self::assertSame('x; no fix expected on 1.x', $fixedSomewhere->ownEvidence(), 'no fixed_on_branch key reads as off the branch');
 
-        $onBranchAndOpen = new Finding('vendor/pkg', '1.0.0', Verdict::LEFT_BEHIND, [new Signal('S9', 'warn', 'x', ['advisories' => [self::fixed('1.9.0', true), self::OPEN]])], ['vendor/pkg'], null, null);
+        $onBranchAndOpen = (new FindingBuilder())->withVerdict(Verdict::LEFT_BEHIND)->withSignals([new Signal('S9', 'warn', 'x', ['advisories' => [self::fixed('1.9.0', true), self::OPEN]])])->build();
         self::assertSame('x; no fix expected', $onBranchAndOpen->ownEvidence(), 'a fix on the branch is not the kind that qualifies the clause');
 
-        $malformed = new Finding('vendor/pkg', '1.0.0', Verdict::ABANDONED, [new Signal('S9', 'warn', 'x', ['advisories' => 'not a list'])], ['vendor/pkg'], null, null);
+        $malformed = (new FindingBuilder())->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('S9', 'warn', 'x', ['advisories' => 'not a list'])])->build();
         self::assertFalse($malformed->hasUnfixableAdvisory());
     }
 
@@ -115,9 +116,9 @@ final class FindingTest extends TestCase
         $s8 = new Signal('S8', 'high', 'branch 3.x last released 2020-09-28 (6.0 years ago); 7.x released 7.0.0 (2026-02-06)');
         $s7 = new Signal('S7', 'info', 'pulls in 1 flagged package: a/b (stale)');
 
-        $pinned = new Finding('vendor/pkg', 'dev-master', Verdict::PINNED, [$s5, $s6, $s7], ['vendor/pkg'], null, null);
-        $leftBehind = new Finding('vendor/pkg', '3.1.1', Verdict::LEFT_BEHIND, [$s5, $s8], ['root/app', 'vendor/pkg'], null, null);
-        $oldPromise = new Finding('vendor/pkg', '3.1.1', Verdict::OLD_PROMISE, [$s5, new Signal('S2', 'warn', 'last release 2022-01-01 …')], ['vendor/pkg'], null, null);
+        $pinned = (new FindingBuilder())->withVersion('dev-master')->withVerdict(Verdict::PINNED)->withSignals([$s5, $s6, $s7])->build();
+        $leftBehind = (new FindingBuilder())->withVersion('3.1.1')->withVerdict(Verdict::LEFT_BEHIND)->withSignals([$s5, $s8])->withChain(['root/app', 'vendor/pkg'])->build();
+        $oldPromise = (new FindingBuilder())->withVersion('3.1.1')->withVerdict(Verdict::OLD_PROMISE)->withSignals([$s5, new Signal('S2', 'warn', 'last release 2022-01-01 …')])->build();
 
         self::assertSame($s6->summary().'; '.$s5->summary().'; '.$s7->summary(), $pinned->evidence(), 'S7 still closes the line');
         self::assertSame($s8->summary().'; '.$s5->summary(), $leftBehind->ownEvidence());
@@ -126,7 +127,7 @@ final class FindingTest extends TestCase
         self::assertIsArray($signals);
         self::assertSame(['S5', 'S6', 'S7'], array_column($signals, 'id'), 'the JSON keeps signal order');
 
-        $s7First = new Finding('vendor/pkg', 'dev-master', Verdict::PINNED, [$s7, $s6, $s5], ['vendor/pkg'], null, null);
+        $s7First = (new FindingBuilder())->withVersion('dev-master')->withVerdict(Verdict::PINNED)->withSignals([$s7, $s6, $s5])->build();
         self::assertSame($s6->summary().'; '.$s5->summary(), $s7First->ownEvidence(), 'S7 anywhere in the list is skipped, not a stop');
     }
 
@@ -140,10 +141,10 @@ final class FindingTest extends TestCase
         $s8 = new Signal('S8', 'warn', 'branch 6.x last released 2022-06-20 (4.2 years ago); 8.x released 8.2.0 (2026-09-06)', ['suggested_constraint' => '^8.2']);
         $s5 = new Signal('S5', 'warn', 'released 2022-06-20, before PHP 8.4 GA (2024-11-21); php constraint ">=5.5" has no upper bound');
 
-        $direct = new Finding('guzzlehttp/guzzle', '6.5.8', Verdict::LEFT_BEHIND, [$s5, $s8], ['guzzlehttp/guzzle'], null, null);
-        $transitive = new Finding('guzzlehttp/guzzle', '6.5.8', Verdict::LEFT_BEHIND, [$s5, $s8], ['root/app', 'guzzlehttp/guzzle'], null, null);
-        $finished = new Finding('guzzlehttp/guzzle', '6.5.8', Verdict::FINISHED, [$s8], ['guzzlehttp/guzzle'], 'frozen', null);
-        $noConstraint = new Finding('guzzlehttp/guzzle', '6.5.8', Verdict::LEFT_BEHIND, [new Signal('S8', 'warn', $s8->summary())], ['guzzlehttp/guzzle'], null, null);
+        $direct = (new FindingBuilder())->withPackage('guzzlehttp/guzzle')->withVersion('6.5.8')->withVerdict(Verdict::LEFT_BEHIND)->withSignals([$s5, $s8])->withChain(['guzzlehttp/guzzle'])->build();
+        $transitive = (new FindingBuilder())->withPackage('guzzlehttp/guzzle')->withVersion('6.5.8')->withVerdict(Verdict::LEFT_BEHIND)->withSignals([$s5, $s8])->withChain(['root/app', 'guzzlehttp/guzzle'])->build();
+        $finished = (new FindingBuilder())->withPackage('guzzlehttp/guzzle')->withVersion('6.5.8')->withVerdict(Verdict::FINISHED)->withSignals([$s8])->withChain(['guzzlehttp/guzzle'])->withAllowlistReason('frozen')->build();
+        $noConstraint = (new FindingBuilder())->withPackage('guzzlehttp/guzzle')->withVersion('6.5.8')->withVerdict(Verdict::LEFT_BEHIND)->withSignals([new Signal('S8', 'warn', $s8->summary())])->withChain(['guzzlehttp/guzzle'])->build();
 
         self::assertSame($s8->summary().'; require ^8.2 to follow; '.$s5->summary(), $direct->ownEvidence());
         self::assertSame($s8->summary().'; '.$s5->summary(), $transitive->ownEvidence(), 'not the project\'s line to change');
@@ -161,9 +162,9 @@ final class FindingTest extends TestCase
         $s8warn = new Signal('S8', 'warn', 'branch 6.x last released 2022-06-20 (4.2 years ago); 8.x released 8.2.0 (2026-09-06)');
         $s5 = new Signal('S5', 'warn', 'released 2020-06-16, before PHP 8.4 GA (2024-11-21); php constraint ">=5.5" has no upper bound');
 
-        $leftBehind = new Finding('guzzlehttp/guzzle', '6.5.5', Verdict::LEFT_BEHIND, [$s5, $s8warn, $s9], ['guzzlehttp/guzzle'], null, null, null, false, ['guzzlehttp/guzzle']);
-        $oldPromise = new Finding('guzzlehttp/guzzle', '6.5.5', Verdict::OLD_PROMISE, [$s5, $s9], ['guzzlehttp/guzzle'], null, null, null, false, ['guzzlehttp/guzzle']);
-        $finished = new Finding('guzzlehttp/guzzle', '6.5.5', Verdict::FINISHED, [$s8warn, $s9], ['guzzlehttp/guzzle'], 'frozen', null, null, false, ['guzzlehttp/guzzle']);
+        $leftBehind = (new FindingBuilder())->withPackage('guzzlehttp/guzzle')->withVersion('6.5.5')->withVerdict(Verdict::LEFT_BEHIND)->withSignals([$s5, $s8warn, $s9])->withChain(['guzzlehttp/guzzle'])->withDirectDependents(['guzzlehttp/guzzle'])->build();
+        $oldPromise = (new FindingBuilder())->withPackage('guzzlehttp/guzzle')->withVersion('6.5.5')->withVerdict(Verdict::OLD_PROMISE)->withSignals([$s5, $s9])->withChain(['guzzlehttp/guzzle'])->withDirectDependents(['guzzlehttp/guzzle'])->build();
+        $finished = (new FindingBuilder())->withPackage('guzzlehttp/guzzle')->withVersion('6.5.5')->withVerdict(Verdict::FINISHED)->withSignals([$s8warn, $s9])->withChain(['guzzlehttp/guzzle'])->withAllowlistReason('frozen')->withDirectDependents(['guzzlehttp/guzzle'])->build();
 
         self::assertTrue($leftBehind->hasUnfixableAdvisory());
         self::assertSame(Priority::CRITICAL, $leftBehind->priority(), 'high raised to critical');
@@ -184,11 +185,11 @@ final class FindingTest extends TestCase
         $replaced = new Signal('S1', 'high', 'marked abandoned by its repository, replacement: symfony/mailer', ['replacement' => 'symfony/mailer']);
         $bare = new Signal('S1', 'high', 'marked abandoned by its repository', ['replacement' => '']);
 
-        $withReplacement = new Finding('swiftmailer/swiftmailer', 'v5.4.12', Verdict::ABANDONED, [$replaced, $s9], ['root/app', 'swiftmailer/swiftmailer'], null, null);
-        $withoutReplacement = new Finding('swiftmailer/swiftmailer', 'v5.4.12', Verdict::ABANDONED, [$bare, $s9], ['swiftmailer/swiftmailer'], null, null);
-        $silent = new Finding('swiftmailer/swiftmailer', 'v5.4.12', Verdict::SILENT, [$replaced, $s9], ['swiftmailer/swiftmailer'], null, null);
-        $itself = new Finding('swiftmailer/swiftmailer', 'v5.4.12', Verdict::ABANDONED, [new Signal('S1', 'high', 'marked abandoned by its repository, replacement: swiftmailer/swiftmailer', ['replacement' => 'swiftmailer/swiftmailer']), $s9], ['swiftmailer/swiftmailer'], null, null);
-        $fixed = new Finding('swiftmailer/swiftmailer', 'v5.4.12', Verdict::ABANDONED, [$replaced, new Signal('S9', 'warn', 'x; fixed by 6.3.0', ['advisories' => [self::fixed('6.3.0', false)]])], ['swiftmailer/swiftmailer'], null, null);
+        $withReplacement = (new FindingBuilder())->withPackage('swiftmailer/swiftmailer')->withVersion('v5.4.12')->withVerdict(Verdict::ABANDONED)->withSignals([$replaced, $s9])->withChain(['root/app', 'swiftmailer/swiftmailer'])->build();
+        $withoutReplacement = (new FindingBuilder())->withPackage('swiftmailer/swiftmailer')->withVersion('v5.4.12')->withVerdict(Verdict::ABANDONED)->withSignals([$bare, $s9])->withChain(['swiftmailer/swiftmailer'])->build();
+        $silent = (new FindingBuilder())->withPackage('swiftmailer/swiftmailer')->withVersion('v5.4.12')->withVerdict(Verdict::SILENT)->withSignals([$replaced, $s9])->withChain(['swiftmailer/swiftmailer'])->build();
+        $itself = (new FindingBuilder())->withPackage('swiftmailer/swiftmailer')->withVersion('v5.4.12')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('S1', 'high', 'marked abandoned by its repository, replacement: swiftmailer/swiftmailer', ['replacement' => 'swiftmailer/swiftmailer']), $s9])->withChain(['swiftmailer/swiftmailer'])->build();
+        $fixed = (new FindingBuilder())->withPackage('swiftmailer/swiftmailer')->withVersion('v5.4.12')->withVerdict(Verdict::ABANDONED)->withSignals([$replaced, new Signal('S9', 'warn', 'x; fixed by 6.3.0', ['advisories' => [self::fixed('6.3.0', false)]])])->withChain(['swiftmailer/swiftmailer'])->build();
 
         self::assertSame($replaced->summary().'; '.$s9->summary().'; no fix expected; migrate to symfony/mailer', $withReplacement->ownEvidence(), 'transitive or not: the replacement is where the fix is');
         self::assertTrue($withReplacement->hasUnfixableAdvisory());
@@ -197,7 +198,7 @@ final class FindingTest extends TestCase
         self::assertSame($replaced->summary().'; x; fixed by 6.3.0', $fixed->ownEvidence(), 'the fix is out: nothing to migrate for');
         self::assertSame('marked abandoned by its repository, replacement: swiftmailer/swiftmailer; '.$s9->summary().'; no fix expected', $itself->ownEvidence(), 'a repository naming the package itself names nowhere to migrate');
 
-        $freeText = new Finding('sensiolabs/framework-extra-bundle', 'v6.2.10', Verdict::ABANDONED, [new Signal('S1', 'high', 'marked abandoned by its repository, replacement: Symfony', ['replacement' => 'Symfony']), $s9], ['sensiolabs/framework-extra-bundle'], null, null);
+        $freeText = (new FindingBuilder())->withPackage('sensiolabs/framework-extra-bundle')->withVersion('v6.2.10')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('S1', 'high', 'marked abandoned by its repository, replacement: Symfony', ['replacement' => 'Symfony']), $s9])->withChain(['sensiolabs/framework-extra-bundle'])->build();
         self::assertSame('marked abandoned by its repository, replacement: Symfony; '.$s9->summary().'; no fix expected', $freeText->ownEvidence(), 'free text is not a package to migrate to; the clause stays bare and the text is still read as text above it');
     }
 
@@ -210,7 +211,7 @@ final class FindingTest extends TestCase
     public function testTheSuccessorIsTheReplacementWhenItNamesAPackage(): void
     {
         $s1 = static fn (string $replacement): Signal => new Signal('S1', 'high', 'marked abandoned by its repository, replacement: '.$replacement, ['replacement' => $replacement]);
-        $abandoned = static fn (Signal $signal): Finding => new Finding('vendor/old', '1.0.0', Verdict::ABANDONED, [$signal], ['vendor/old'], null, null);
+        $abandoned = static fn (Signal $signal): Finding => (new FindingBuilder())->withPackage('vendor/old')->withVerdict(Verdict::ABANDONED)->withSignals([$signal])->withChain(['vendor/old'])->build();
 
         self::assertSame('symfony/mailer', $abandoned($s1('symfony/mailer'))->successor());
         self::assertSame('symfony/mailer', $abandoned($s1('symfony/mailer'))->toArray()['replacement']);
@@ -224,9 +225,9 @@ final class FindingTest extends TestCase
         self::assertNull($abandoned($s1('Vendor/Old'))->successor(), 'Composer reads a package name without case, and so does this');
         self::assertSame('marked abandoned by its repository, replacement: vendor/old', $abandoned($s1('vendor/old'))->evidence(), 'the free text is still read as text');
 
-        $archivedOnly = new Finding('vendor/old', '1.0.0', Verdict::ABANDONED, [new Signal('S3', 'high', 'repository archived', [])], ['vendor/old'], null, null);
+        $archivedOnly = (new FindingBuilder())->withPackage('vendor/old')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('S3', 'high', 'repository archived', [])])->withChain(['vendor/old'])->build();
         self::assertNull($archivedOnly->successor(), 'an archived repository names nothing');
-        $silent = new Finding('vendor/old', '1.0.0', Verdict::SILENT, [$s1('symfony/mailer')], ['vendor/old'], null, null);
+        $silent = (new FindingBuilder())->withPackage('vendor/old')->withVerdict(Verdict::SILENT)->withSignals([$s1('symfony/mailer')])->withChain(['vendor/old'])->build();
         self::assertNull($silent->successor(), 'only an abandoned finding has a successor, whatever S1 says underneath');
     }
 
@@ -237,7 +238,7 @@ final class FindingTest extends TestCase
     public function testAnAdvisoryAlreadyFixedByAListedReleaseNeitherRaisesNorSaysNoFixExpected(): void
     {
         $s9 = new Signal('S9', 'warn', '1 security advisory affects v6.1.3 (CVE-2024-28859); fixed by 6.3.0', ['advisories' => [self::fixed('6.3.0', false)]]);
-        $abandoned = new Finding('swiftmailer/swiftmailer', 'v6.1.3', Verdict::ABANDONED, [new Signal('S1', 'high', 'marked abandoned by its repository'), $s9], ['swiftmailer/swiftmailer'], null, null, null, false, ['swiftmailer/swiftmailer']);
+        $abandoned = (new FindingBuilder())->withPackage('swiftmailer/swiftmailer')->withVersion('v6.1.3')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('S1', 'high', 'marked abandoned by its repository'), $s9])->withChain(['swiftmailer/swiftmailer'])->withDirectDependents(['swiftmailer/swiftmailer'])->build();
 
         self::assertFalse($abandoned->hasUnfixableAdvisory());
         self::assertSame(Priority::CRITICAL, $abandoned->priority(), 'the base, not a raise');
@@ -254,41 +255,41 @@ final class FindingTest extends TestCase
     {
         $s8 = new Signal('S8', 'high', 'branch 3.x last released 2020-10-24 (5.9 years ago); 8.x released v8.1.7 (2026-09-14)');
         $s9 = new Signal('S9', 'warn', '4 security advisories affect v3.4.18 (a, b, c and 1 more); 3 fixed by v8.1.7, 1 fixed by v3.4.47', ['advisories' => [self::fixed('v8.1.7', false), self::fixed('v8.1.7', false), self::fixed('v8.1.7', false), self::fixed('v3.4.47', true)]]);
-        $finding = new Finding('symfony/http-foundation', 'v3.4.18', Verdict::LEFT_BEHIND, [$s8, $s9], ['symfony/http-foundation'], null, null, null, false, ['symfony/http-foundation']);
+        $finding = (new FindingBuilder())->withPackage('symfony/http-foundation')->withVersion('v3.4.18')->withVerdict(Verdict::LEFT_BEHIND)->withSignals([$s8, $s9])->withChain(['symfony/http-foundation'])->withDirectDependents(['symfony/http-foundation'])->build();
 
         self::assertTrue($finding->hasUnfixableAdvisory());
         self::assertSame(Priority::CRITICAL, $finding->priority());
         self::assertStringEndsWith('; 3 fixed by v8.1.7, 1 fixed by v3.4.47; no fix expected on 3.x', $finding->ownEvidence());
 
-        $allOnBranch = new Finding('symfony/http-foundation', 'v3.4.18', Verdict::LEFT_BEHIND, [$s8, new Signal('S9', 'warn', '1 security advisory affects v3.4.18 (a); fixed by v3.4.47', ['advisories' => [self::fixed('v3.4.47', true)]])], ['symfony/http-foundation'], null, null, null, false, ['symfony/http-foundation']);
+        $allOnBranch = (new FindingBuilder())->withPackage('symfony/http-foundation')->withVersion('v3.4.18')->withVerdict(Verdict::LEFT_BEHIND)->withSignals([$s8, new Signal('S9', 'warn', '1 security advisory affects v3.4.18 (a); fixed by v3.4.47', ['advisories' => [self::fixed('v3.4.47', true)]])])->withChain(['symfony/http-foundation'])->withDirectDependents(['symfony/http-foundation'])->build();
         self::assertFalse($allOnBranch->hasUnfixableAdvisory(), 'a composer update inside the constraint gets the fix');
         self::assertSame(Priority::HIGH, $allOnBranch->priority());
         self::assertStringEndsWith('; fixed by v3.4.47', $allOnBranch->ownEvidence());
 
-        $openEverywhere = new Finding('symfony/http-foundation', 'v3.4.18', Verdict::LEFT_BEHIND, [$s8, new Signal('S9', 'warn', '1 security advisory affects v3.4.18 (a)', ['advisories' => [self::OPEN]])], ['symfony/http-foundation'], null, null, null, false, ['symfony/http-foundation']);
+        $openEverywhere = (new FindingBuilder())->withPackage('symfony/http-foundation')->withVersion('v3.4.18')->withVerdict(Verdict::LEFT_BEHIND)->withSignals([$s8, new Signal('S9', 'warn', '1 security advisory affects v3.4.18 (a)', ['advisories' => [self::OPEN]])])->withChain(['symfony/http-foundation'])->withDirectDependents(['symfony/http-foundation'])->build();
         self::assertStringEndsWith('(a); no fix expected', $openEverywhere->ownEvidence(), 'nothing fixes it anywhere: no branch to point away from');
 
-        $abandonedWithAFixElsewhere = new Finding('vendor/pkg', '1.0.0', Verdict::ABANDONED, [new Signal('S1', 'high', 'marked abandoned by its repository'), new Signal('S9', 'warn', '2 security advisories affect 1.0.0 (a, b); 1 fixed by 2.0.0', ['advisories' => [self::fixed('2.0.0', false), self::OPEN]])], ['vendor/pkg'], null, null, null, false, ['vendor/pkg']);
+        $abandonedWithAFixElsewhere = (new FindingBuilder())->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('S1', 'high', 'marked abandoned by its repository'), new Signal('S9', 'warn', '2 security advisories affect 1.0.0 (a, b); 1 fixed by 2.0.0', ['advisories' => [self::fixed('2.0.0', false), self::OPEN]])])->withDirectDependents(['vendor/pkg'])->build();
         self::assertTrue($abandonedWithAFixElsewhere->hasUnfixableAdvisory(), 'one of the two has no fix at all');
         self::assertStringEndsWith('; 1 fixed by 2.0.0; no fix expected', $abandonedWithAFixElsewhere->ownEvidence(), 'an abandoned package has no branch to qualify with');
     }
 
     public function testNoteWhenNoSignals(): void
     {
-        $finding = new Finding('private/thing', '3.0.0', Verdict::UNKNOWN, [], [], null, null, 'not from a Composer repository, not checked', false, [], null, Origins::of(false));
+        $finding = (new FindingBuilder())->withPackage('private/thing')->withVersion('3.0.0')->withVerdict(Verdict::UNKNOWN)->withChain([])->withNote('not from a Composer repository, not checked')->withOrigin(Origins::of(false))->build();
         self::assertSame('not from a Composer repository, not checked', $finding->evidence());
         self::assertNull($finding->toArray()['data_date']);
     }
 
     public function testEvidenceIsEmptyStringWhenNoSignalsAndNoNote(): void
     {
-        $finding = new Finding('private/thing', '3.0.0', Verdict::UNKNOWN, [], [], null, null);
+        $finding = (new FindingBuilder())->withPackage('private/thing')->withVersion('3.0.0')->withVerdict(Verdict::UNKNOWN)->withChain([])->build();
         self::assertSame('', $finding->evidence());
     }
 
     public function testToArrayIncludesAllowlistReasonAndNote(): void
     {
-        $finding = new Finding('vendor/pkg', '1.2.3', Verdict::FINISHED, [], ['vendor/pkg'], 'audited by security team', null, 'no signals fired');
+        $finding = (new FindingBuilder())->withVersion('1.2.3')->withVerdict(Verdict::FINISHED)->withAllowlistReason('audited by security team')->withNote('no signals fired')->build();
         $array = $finding->toArray();
         self::assertSame('vendor/pkg', $array['package']);
         self::assertSame('1.2.3', $array['version']);
@@ -301,7 +302,7 @@ final class FindingTest extends TestCase
 
     public function testFindingsAreProdByDefault(): void
     {
-        $finding = new Finding('vendor/pkg', '1.2.3', Verdict::ABANDONED, [], ['vendor/pkg'], null, null);
+        $finding = (new FindingBuilder())->withVersion('1.2.3')->withVerdict(Verdict::ABANDONED)->build();
         self::assertFalse($finding->isDev());
         self::assertTrue($finding->isDirect());
         self::assertSame(Priority::CRITICAL, $finding->priority());
@@ -309,28 +310,28 @@ final class FindingTest extends TestCase
 
     public function testDevIsTheLastConstructorParameterAndLowersThePriority(): void
     {
-        $finding = new Finding('vendor/pkg', '1.2.3', Verdict::ABANDONED, [], ['vendor/pkg'], null, null, null, true);
+        $finding = (new FindingBuilder())->withVersion('1.2.3')->withVerdict(Verdict::ABANDONED)->withDev(true)->build();
         self::assertTrue($finding->isDev());
         self::assertSame(Priority::HIGH, $finding->priority());
     }
 
     public function testATransitiveDevFindingIsLoweredTwice(): void
     {
-        $finding = new Finding('vendor/pkg', '1.2.3', Verdict::ABANDONED, [], ['vendor/root', 'vendor/pkg'], null, null, null, true);
+        $finding = (new FindingBuilder())->withVersion('1.2.3')->withVerdict(Verdict::ABANDONED)->withChain(['vendor/root', 'vendor/pkg'])->withDev(true)->build();
         self::assertFalse($finding->isDirect());
         self::assertSame(Priority::MEDIUM, $finding->priority());
     }
 
     public function testAnEmptyChainCountsAsTransitive(): void
     {
-        $finding = new Finding('vendor/pkg', '1.2.3', Verdict::ABANDONED, [], [], null, null);
+        $finding = (new FindingBuilder())->withVersion('1.2.3')->withVerdict(Verdict::ABANDONED)->withChain([])->build();
         self::assertFalse($finding->isDirect());
         self::assertSame(Priority::HIGH, $finding->priority());
     }
 
     public function testAnUnflaggedFindingHasNoPriority(): void
     {
-        $finding = new Finding('vendor/pkg', '1.2.3', Verdict::OK, [], ['vendor/pkg'], null, null);
+        $finding = (new FindingBuilder())->withVersion('1.2.3')->build();
         self::assertSame(Priority::NONE, $finding->priority());
     }
 
@@ -341,19 +342,19 @@ final class FindingTest extends TestCase
     public function testAReplacementNamedByPackagistIsLinkedThere(): void
     {
         $s1 = static fn (string $replacement): Signal => new Signal('S1', 'high', 'marked abandoned by its repository, replacement: '.$replacement, ['replacement' => $replacement]);
-        $abandoned = static fn (Signal $signal, ?string $namedBy, string $verdict = Verdict::ABANDONED): Finding => new Finding('vendor/old', '1.0.0', $verdict, [$signal], ['vendor/old'], null, null, null, false, [], null, null, $namedBy);
+        $abandoned = static fn (Signal $signal, ?string $namedBy, string $verdict = Verdict::ABANDONED): Finding => (new FindingBuilder())->withPackage('vendor/old')->withVerdict($verdict)->withSignals([$signal])->withChain(['vendor/old'])->withReplacementNamedBy($namedBy)->build();
 
         self::assertSame('https://packagist.org/packages/symfony/mailer', $abandoned($s1('symfony/mailer'), 'packagist.org')->toArray()['replacement_url']);
         self::assertNull($abandoned($s1('symfony/mailer'), 'repo.packagist.com')->toArray()['replacement_url'], 'Private Packagist named it, and keeps no public page');
         self::assertNull($abandoned($s1('symfony/mailer'), null)->toArray()['replacement_url'], 'no registry lockrot knows named it');
         self::assertNull($abandoned($s1('Symfony'), 'packagist.org')->toArray()['replacement_url'], 'free text is not a package');
         self::assertNull($abandoned($s1('symfony/mailer'), 'packagist.org', Verdict::SILENT)->toArray()['replacement_url'], 'only an abandoned finding has a successor');
-        self::assertNull((new Finding('vendor/pkg', '1.0.0', Verdict::STALE, [], ['vendor/pkg'], null, null))->toArray()['replacement_url']);
+        self::assertNull(((new FindingBuilder())->withVerdict(Verdict::STALE)->build())->toArray()['replacement_url']);
     }
 
     public function testToArrayCarriesPriorityDirectAndDevRightAfterTheVerdict(): void
     {
-        $finding = new Finding('vendor/pkg', '1.2.3', Verdict::STALE, [], ['vendor/root', 'vendor/pkg'], null, null, null, true);
+        $finding = (new FindingBuilder())->withVersion('1.2.3')->withVerdict(Verdict::STALE)->withChain(['vendor/root', 'vendor/pkg'])->withDev(true)->build();
         $array = $finding->toArray();
         self::assertSame(
             ['package', 'version', 'verdict', 'priority', 'direct', 'dev', 'from_composer_repository', 'origin', 'replacement', 'replacement_url', 'signals', 'chain', 'direct_dependents', 'evidence', 'allowlist_reason', 'note', 'data_date', 'libyears', 'libyears_unmeasured', 'priority_basis', 'no_fix_expected'],
@@ -366,8 +367,8 @@ final class FindingTest extends TestCase
 
     public function testAFindingIsFromAComposerRepositoryUnlessItSaysOtherwise(): void
     {
-        $asked = new Finding('vendor/pkg', '1.0.0', Verdict::OK, [], ['vendor/pkg'], null, null);
-        $notAsked = new Finding('local/pkg', 'dev-main', Verdict::UNKNOWN, [], ['local/pkg'], null, null, Finding::NOTE_NOT_IN_REPOSITORY, false, [], null, Origins::of(false));
+        $asked = (new FindingBuilder())->build();
+        $notAsked = (new FindingBuilder())->withPackage('local/pkg')->withVersion('dev-main')->withVerdict(Verdict::UNKNOWN)->withChain(['local/pkg'])->withNote(Finding::NOTE_NOT_IN_REPOSITORY)->withOrigin(Origins::of(false))->build();
 
         self::assertTrue($asked->isFromComposerRepository());
         self::assertTrue($asked->toArray()['from_composer_repository']);
@@ -376,7 +377,7 @@ final class FindingTest extends TestCase
         self::assertFalse($notAsked->withSignals([new Signal(Signal::S7, Signal::LEVEL_INFO, 'pulls in 1 flagged package: a/b (stale)')])->toArray()['from_composer_repository'], 'S7 keeps it');
         // A note other than that one is no claim about the lock entry: metadata can fail for a
         // package a repository was asked about.
-        $failed = new Finding('vendor/gone', '1.0.0', Verdict::UNKNOWN, [], ['vendor/gone'], null, null, 'Repository metadata unavailable: HTTP 503');
+        $failed = (new FindingBuilder())->withPackage('vendor/gone')->withVerdict(Verdict::UNKNOWN)->withChain(['vendor/gone'])->withNote('Repository metadata unavailable: HTTP 503')->build();
         self::assertTrue($failed->toArray()['from_composer_repository']);
     }
 
@@ -384,13 +385,13 @@ final class FindingTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
 
-        new Finding('local/pkg', 'dev-main', Verdict::UNKNOWN, [], ['local/pkg'], null, null, Finding::NOTE_NOT_IN_REPOSITORY);
+        (new FindingBuilder())->withPackage('local/pkg')->withVersion('dev-main')->withVerdict(Verdict::UNKNOWN)->withChain(['local/pkg'])->withNote(Finding::NOTE_NOT_IN_REPOSITORY)->build();
     }
 
     public function testAFindingCarriesItsLibyearsUnroundedAndPrintsThemToTwoDecimals(): void
     {
-        $measured = new Finding('smalot/pdfparser', 'v1.1.0', Verdict::LEFT_BEHIND, [], ['smalot/pdfparser'], null, null, null, false, [], LibyearsMeasurement::of(4.7123));
-        $unmeasured = new Finding('wallabag/rulerz', 'dev-master', Verdict::PINNED, [], ['wallabag/rulerz'], null, null, null, false, [], LibyearsMeasurement::unmeasured(Libyears::BRANCH_SNAPSHOT));
+        $measured = (new FindingBuilder())->withPackage('smalot/pdfparser')->withVersion('v1.1.0')->withVerdict(Verdict::LEFT_BEHIND)->withChain(['smalot/pdfparser'])->withLibyears(LibyearsMeasurement::of(4.7123))->build();
+        $unmeasured = (new FindingBuilder())->withPackage('wallabag/rulerz')->withVersion('dev-master')->withVerdict(Verdict::PINNED)->withChain(['wallabag/rulerz'])->withLibyears(LibyearsMeasurement::unmeasured(Libyears::BRANCH_SNAPSHOT))->build();
 
         self::assertSame(4.7123, $measured->libyears());
         self::assertSame(4.71, $measured->toArray()['libyears']);
@@ -405,7 +406,7 @@ final class FindingTest extends TestCase
 
     public function testAZeroIsMeasuredAndCarriesNoReason(): void
     {
-        $current = new Finding('vendor/pkg', '1.0.0', Verdict::OK, [], ['vendor/pkg'], null, null, null, false, [], LibyearsMeasurement::of(0.0));
+        $current = (new FindingBuilder())->withLibyears(LibyearsMeasurement::of(0.0))->build();
 
         self::assertSame(0.0, $current->toArray()['libyears']);
         self::assertNull($current->toArray()['libyears_unmeasured']);
@@ -414,7 +415,7 @@ final class FindingTest extends TestCase
     /** A finding assembled without a measurement has no dates to compare; the analyzer always passes one. */
     public function testAFindingBuiltWithoutAMeasurementHasNoDateToTrust(): void
     {
-        $bare = new Finding('vendor/pkg', '1.0.0', Verdict::OK, [], ['vendor/pkg'], null, null);
+        $bare = (new FindingBuilder())->build();
 
         self::assertNull($bare->libyears());
         self::assertSame(Libyears::NO_STABLE_RELEASE_DATE, $bare->libyearsUnmeasured());
@@ -424,7 +425,7 @@ final class FindingTest extends TestCase
     /** Nothing was asked about a package outside every Composer repository, the first reason it goes unmeasured. */
     public function testAFindingNotFromAComposerRepositoryIsUnmeasuredForThatReasonByDefault(): void
     {
-        $bare = new Finding('local/pkg', '1.0.0', Verdict::UNKNOWN, [], ['local/pkg'], null, null, Finding::NOTE_NOT_IN_REPOSITORY, false, [], null, Origins::of(false));
+        $bare = (new FindingBuilder())->withPackage('local/pkg')->withVerdict(Verdict::UNKNOWN)->withChain(['local/pkg'])->withNote(Finding::NOTE_NOT_IN_REPOSITORY)->withOrigin(Origins::of(false))->build();
 
         self::assertNull($bare->libyears());
         self::assertSame(Libyears::NOT_FROM_COMPOSER_REPOSITORY, $bare->toArray()['libyears_unmeasured']);
@@ -447,17 +448,17 @@ final class FindingTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('local/pkg');
 
-        new Finding('local/pkg', '1.0.0', Verdict::UNKNOWN, [], ['local/pkg'], null, null, null, false, [], $libyears, Origins::of($fromComposerRepository));
+        (new FindingBuilder())->withPackage('local/pkg')->withVerdict(Verdict::UNKNOWN)->withChain(['local/pkg'])->withLibyears($libyears)->withOrigin(Origins::of($fromComposerRepository))->build();
     }
 
     public function testDirectDependentsDefaultToNoneAndAreCarriedInTheArray(): void
     {
-        $bare = new Finding('vendor/pkg', '1.0.0', Verdict::STALE, [], ['vendor/root', 'vendor/pkg'], null, null);
+        $bare = (new FindingBuilder())->withVerdict(Verdict::STALE)->withChain(['vendor/root', 'vendor/pkg'])->build();
         self::assertSame([], $bare->directDependents());
         self::assertSame([], $bare->otherDirectDependents());
         self::assertSame([], $bare->toArray()['direct_dependents']);
 
-        $finding = new Finding('vendor/pkg', '1.0.0', Verdict::STALE, [], ['vendor/root', 'vendor/pkg'], null, null, null, false, ['vendor/other', 'vendor/root']);
+        $finding = (new FindingBuilder())->withVerdict(Verdict::STALE)->withChain(['vendor/root', 'vendor/pkg'])->withDirectDependents(['vendor/other', 'vendor/root'])->build();
         self::assertSame(['vendor/other', 'vendor/root'], $finding->directDependents());
         self::assertSame(['vendor/other', 'vendor/root'], $finding->toArray()['direct_dependents']);
         // The chain's own root is what "via" already shows; the others are what is left.
@@ -466,7 +467,7 @@ final class FindingTest extends TestCase
 
     public function testADirectPackageAlsoRequiredByAnotherRootListsThatRootAsOther(): void
     {
-        $finding = new Finding('vendor/pkg', '1.0.0', Verdict::STALE, [], ['vendor/pkg'], null, null, null, false, ['vendor/other', 'vendor/pkg']);
+        $finding = (new FindingBuilder())->withVerdict(Verdict::STALE)->withDirectDependents(['vendor/other', 'vendor/pkg'])->build();
         self::assertTrue($finding->isDirect());
         self::assertSame(['vendor/other'], $finding->otherDirectDependents());
     }
@@ -474,7 +475,7 @@ final class FindingTest extends TestCase
     public function testWithSignalsReturnsANewFindingWithTheVerdictAndEverythingElseKept(): void
     {
         $at = new \DateTimeImmutable('2026-09-14T10:00:00+00:00');
-        $original = new Finding('vendor/pkg', '1.0.0', Verdict::OK, [], ['vendor/pkg'], null, $at, null, true, ['vendor/pkg']);
+        $original = (new FindingBuilder())->withDataDate($at)->withDev(true)->withDirectDependents(['vendor/pkg'])->build();
         $s7 = new Signal(Signal::S7, Signal::LEVEL_INFO, 'pulls in 1 flagged package: vendor/dep (stale)', ['flagged' => 1, 'packages' => []]);
 
         $annotated = $original->withSignals([$s7]);
@@ -493,16 +494,16 @@ final class FindingTest extends TestCase
     public function testTheNoteSurvivesS7AndOwnEvidenceLeavesS7Out(): void
     {
         $s7 = new Signal(Signal::S7, Signal::LEVEL_INFO, 'pulls in 2 flagged packages: a/b (stale), c/d (stale)', ['flagged' => 2, 'packages' => []]);
-        $unchecked = new Finding('local/pkg', 'dev-main', Verdict::UNKNOWN, [$s7], ['local/pkg'], null, null, 'not from a Composer repository, not checked', false, [], null, Origins::of(false));
+        $unchecked = (new FindingBuilder())->withPackage('local/pkg')->withVersion('dev-main')->withVerdict(Verdict::UNKNOWN)->withSignals([$s7])->withChain(['local/pkg'])->withNote('not from a Composer repository, not checked')->withOrigin(Origins::of(false))->build();
         self::assertSame('not from a Composer repository, not checked; pulls in 2 flagged packages: a/b (stale), c/d (stale)', $unchecked->evidence());
         self::assertSame('not from a Composer repository, not checked', $unchecked->ownEvidence());
 
         $own = new Signal('S2', 'warn', 'last release 2022-05-20 (4.3 years ago)');
-        $stale = new Finding('vendor/pkg', '1.0.0', Verdict::STALE, [$own, $s7], ['vendor/pkg'], null, null, 'a note nobody reads');
+        $stale = (new FindingBuilder())->withVerdict(Verdict::STALE)->withSignals([$own, $s7])->withNote('a note nobody reads')->build();
         self::assertSame('last release 2022-05-20 (4.3 years ago); pulls in 2 flagged packages: a/b (stale), c/d (stale)', $stale->evidence());
         self::assertSame('last release 2022-05-20 (4.3 years ago)', $stale->ownEvidence());
 
-        $clean = new Finding('vendor/ok', '1.0.0', Verdict::OK, [], ['vendor/ok'], null, null);
+        $clean = (new FindingBuilder())->withPackage('vendor/ok')->withChain(['vendor/ok'])->build();
         self::assertSame('', $clean->evidence());
         self::assertSame('', $clean->ownEvidence());
     }
@@ -536,47 +537,47 @@ final class FindingTest extends TestCase
         $s7 = new Signal(Signal::S7, Signal::LEVEL_INFO, 'pulls in 1 flagged package: a/b (stale)');
 
         yield 'http-foundation left behind, fixed on its branch and on 8.x' => [
-            new Finding('symfony/http-foundation', 'v3.4.18', Verdict::LEFT_BEHIND, [$s8, self::s9([self::row('CVE-a', 'v8.1.7'), self::row('CVE-b', 'v8.1.7'), self::row('CVE-c', 'v3.4.47', true), self::row('CVE-d')])], ['laravel/framework', 'symfony/http-foundation'], null, null),
+            (new FindingBuilder())->withPackage('symfony/http-foundation')->withVersion('v3.4.18')->withVerdict(Verdict::LEFT_BEHIND)->withSignals([$s8, self::s9([self::row('CVE-a', 'v8.1.7'), self::row('CVE-b', 'v8.1.7'), self::row('CVE-c', 'v3.4.47', true), self::row('CVE-d')])])->withChain(['laravel/framework', 'symfony/http-foundation'])->build(),
             [['id' => 'CVE-a', 'reason' => 'not_on_installed_branch'], ['id' => 'CVE-b', 'reason' => 'not_on_installed_branch'], ['id' => 'CVE-d', 'reason' => 'no_release_fixes']],
         ];
         yield 'abandoned, fixed by v6.3.0' => [
-            new Finding('swiftmailer/swiftmailer', 'v6.1.3', Verdict::ABANDONED, [$s1, self::s9([self::row('CVE-2024-28859', '6.3.0', true)])], ['swiftmailer/swiftmailer'], null, null),
+            (new FindingBuilder())->withPackage('swiftmailer/swiftmailer')->withVersion('v6.1.3')->withVerdict(Verdict::ABANDONED)->withSignals([$s1, self::s9([self::row('CVE-2024-28859', '6.3.0', true)])])->withChain(['swiftmailer/swiftmailer'])->build(),
             [],
         ];
         yield 'abandoned, no listed release fixes it' => [
-            new Finding('vendor/pkg', '1.0.0', Verdict::ABANDONED, [$s1, self::s9([self::row('PKSA-1')])], ['vendor/pkg'], null, null),
+            (new FindingBuilder())->withVerdict(Verdict::ABANDONED)->withSignals([$s1, self::s9([self::row('PKSA-1')])])->build(),
             [['id' => 'PKSA-1', 'reason' => 'no_release_fixes']],
         ];
         yield 'abandoned, the releases were not read' => [
-            new Finding('vendor/pkg', '1.0.0', Verdict::ABANDONED, [$s1, self::s9([self::row('PKSA-1'), self::row('PKSA-2', null, false, null)], false)], ['root/app', 'vendor/pkg'], null, null),
+            (new FindingBuilder())->withVerdict(Verdict::ABANDONED)->withSignals([$s1, self::s9([self::row('PKSA-1'), self::row('PKSA-2', null, false, null)], false)])->withChain(['root/app', 'vendor/pkg'])->build(),
             [['id' => 'PKSA-1', 'reason' => 'releases_unknown'], ['id' => 'PKSA-2', 'reason' => 'releases_unknown']],
         ];
         yield 'silent, a partial advisory with no range' => [
-            new Finding('vendor/pkg', '1.0.0', Verdict::SILENT, [$s2, self::s9([self::row('PKSA-1', null, false, null), self::row('PKSA-2')])], ['vendor/pkg'], null, null),
+            (new FindingBuilder())->withVerdict(Verdict::SILENT)->withSignals([$s2, self::s9([self::row('PKSA-1', null, false, null), self::row('PKSA-2')])])->build(),
             [['id' => 'PKSA-1', 'reason' => 'affected_range_unknown'], ['id' => 'PKSA-2', 'reason' => 'no_release_fixes']],
         ];
         yield 'stale, nothing fixes it' => [
-            new Finding('vendor/pkg', '1.0.0', Verdict::STALE, [$s2, self::s9([self::row('PKSA-1')])], ['vendor/pkg'], null, null),
+            (new FindingBuilder())->withVerdict(Verdict::STALE)->withSignals([$s2, self::s9([self::row('PKSA-1')])])->build(),
             null,
         ];
         yield 'allowlisted' => [
-            new Finding('vendor/pkg', '1.0.0', Verdict::FINISHED, [$s8, self::s9([self::row('PKSA-1')])], ['vendor/pkg'], 'frozen', null),
+            (new FindingBuilder())->withVerdict(Verdict::FINISHED)->withSignals([$s8, self::s9([self::row('PKSA-1')])])->withAllowlistReason('frozen')->build(),
             null,
         ];
         yield 'ok' => [
-            new Finding('vendor/pkg', '1.0.0', Verdict::OK, [self::s9([self::row('PKSA-1')])], ['vendor/pkg'], null, null),
+            (new FindingBuilder())->withSignals([self::s9([self::row('PKSA-1')])])->build(),
             null,
         ];
         yield 'abandoned with no advisory' => [
-            new Finding('vendor/pkg', '1.0.0', Verdict::ABANDONED, [$s1], ['vendor/pkg'], null, null),
+            (new FindingBuilder())->withVerdict(Verdict::ABANDONED)->withSignals([$s1])->build(),
             [],
         ];
         yield 'a direct requirement carrying S7' => [
-            new Finding('vendor/pkg', '1.0.0', Verdict::ABANDONED, [$s1, self::s9([self::row('PKSA-1')]), $s7], ['vendor/pkg'], null, null),
+            (new FindingBuilder())->withVerdict(Verdict::ABANDONED)->withSignals([$s1, self::s9([self::row('PKSA-1')]), $s7])->build(),
             [['id' => 'PKSA-1', 'reason' => 'no_release_fixes']],
         ];
         yield 'reached by nothing' => [
-            new Finding('vendor/pkg', '1.0.0', Verdict::SILENT, [$s2, self::s9([self::row('PKSA-1')])], [], null, null, null, true),
+            (new FindingBuilder())->withVerdict(Verdict::SILENT)->withSignals([$s2, self::s9([self::row('PKSA-1')])])->withChain([])->withDev(true)->build(),
             [['id' => 'PKSA-1', 'reason' => 'no_release_fixes']],
         ];
     }
@@ -622,7 +623,7 @@ final class FindingTest extends TestCase
     public function testTheBasisOfATransitiveLeftBehindPackageRaisedBackUp(): void
     {
         $s9 = self::s9([self::row('CVE-a', 'v8.1.7'), self::row('CVE-c', 'v3.4.47', true)]);
-        $finding = new Finding('symfony/http-foundation', 'v3.4.18', Verdict::LEFT_BEHIND, [$s9], ['laravel/framework', 'symfony/http-foundation'], null, null);
+        $finding = (new FindingBuilder())->withPackage('symfony/http-foundation')->withVersion('v3.4.18')->withVerdict(Verdict::LEFT_BEHIND)->withSignals([$s9])->withChain(['laravel/framework', 'symfony/http-foundation'])->build();
 
         self::assertSame(['base' => 'high', 'steps' => [['reason' => 'transitive', 'from' => 'high', 'to' => 'medium'], ['reason' => 'no_fix_expected', 'from' => 'medium', 'to' => 'high']]], $finding->toArray()['priority_basis']);
         self::assertSame(Priority::HIGH, $finding->priority());
@@ -631,16 +632,16 @@ final class FindingTest extends TestCase
     /** A lock read without its composer.json: nothing reaches the package, and the step says so rather than `transitive`. */
     public function testTheBasisOfAPackageNothingReachesSaysUnreached(): void
     {
-        $finding = new Finding('vendor/pkg', '1.0.0', Verdict::STALE, [], [], null, null, null, true);
+        $finding = (new FindingBuilder())->withVerdict(Verdict::STALE)->withChain([])->withDev(true)->build();
 
         self::assertSame(['base' => 'medium', 'steps' => [['reason' => 'unreached', 'from' => 'medium', 'to' => 'low'], ['reason' => 'dev', 'from' => 'low', 'to' => 'low']]], $finding->toArray()['priority_basis']);
-        self::assertSame(['base' => 'none', 'steps' => []], (new Finding('vendor/pkg', '1.0.0', Verdict::OK, [], [], null, null))->toArray()['priority_basis']);
+        self::assertSame(['base' => 'none', 'steps' => []], ((new FindingBuilder())->withChain([])->build())->toArray()['priority_basis']);
     }
 
     /** An S9 without releases_read says nothing about whether a fix was looked for, so none was. */
     public function testAnS9WithoutReleasesReadReadsAsNotLookedFor(): void
     {
-        $finding = new Finding('vendor/pkg', '1.0.0', Verdict::ABANDONED, [new Signal(Signal::S9, Signal::LEVEL_WARN, 'x', ['advisories' => [self::row('PKSA-1')]])], ['vendor/pkg'], null, null);
+        $finding = (new FindingBuilder())->withVerdict(Verdict::ABANDONED)->withSignals([new Signal(Signal::S9, Signal::LEVEL_WARN, 'x', ['advisories' => [self::row('PKSA-1')]])])->build();
 
         self::assertSame([['id' => 'PKSA-1', 'reason' => 'releases_unknown']], $finding->noFixExpected());
     }
@@ -649,11 +650,11 @@ final class FindingTest extends TestCase
     public function testAnAdvisoryRowWithoutAnIdIsNoAdvisory(): void
     {
         $rows = [['fixed_by' => null, 'fixed_on_branch' => false], ['id' => 7, 'fixed_by' => null], 'not a row', self::row('PKSA-1')];
-        $finding = new Finding('vendor/pkg', '1.0.0', Verdict::ABANDONED, [new Signal(Signal::S9, Signal::LEVEL_WARN, 'x', ['advisories' => $rows, 'releases_read' => true])], ['vendor/pkg'], null, null);
+        $finding = (new FindingBuilder())->withVerdict(Verdict::ABANDONED)->withSignals([new Signal(Signal::S9, Signal::LEVEL_WARN, 'x', ['advisories' => $rows, 'releases_read' => true])])->build();
 
         self::assertSame([['id' => 'PKSA-1', 'reason' => 'no_release_fixes']], $finding->noFixExpected());
 
-        $idless = new Finding('vendor/pkg', '1.0.0', Verdict::ABANDONED, [self::s9([['fixed_by' => null]])], ['vendor/pkg'], null, null);
+        $idless = (new FindingBuilder())->withVerdict(Verdict::ABANDONED)->withSignals([self::s9([['fixed_by' => null]])])->build();
         self::assertSame([], $idless->noFixExpected());
         self::assertFalse($idless->hasUnfixableAdvisory());
     }
@@ -662,9 +663,9 @@ final class FindingTest extends TestCase
     {
         $own = new Signal('S2', 'warn', 'last release 2022-05-20 (4.3 years ago)');
         $s7 = new Signal(Signal::S7, 'info', 'pulls in 1 flagged package: vendor/leaf (stale)');
-        $allowlisted = new Finding('vendor/pkg', '1.0.0', Verdict::FINISHED, [$own, $s7], ['vendor/pkg'], 'interfaces', null);
-        $allowlistedWithoutEvidence = new Finding('vendor/pkg', '1.0.0', Verdict::FINISHED, [], ['vendor/pkg'], 'interfaces', null);
-        $notAllowlisted = new Finding('vendor/pkg', '1.0.0', Verdict::STALE, [$own], ['vendor/pkg'], null, null);
+        $allowlisted = (new FindingBuilder())->withVerdict(Verdict::FINISHED)->withSignals([$own, $s7])->withAllowlistReason('interfaces')->build();
+        $allowlistedWithoutEvidence = (new FindingBuilder())->withVerdict(Verdict::FINISHED)->withAllowlistReason('interfaces')->build();
+        $notAllowlisted = (new FindingBuilder())->withVerdict(Verdict::STALE)->withSignals([$own])->build();
 
         self::assertSame(
             'last release 2022-05-20 (4.3 years ago); pulls in 1 flagged package: vendor/leaf (stale); allowlisted: interfaces',
