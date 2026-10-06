@@ -1,15 +1,7 @@
 #!/usr/bin/env python3
-# Records the offline fixture set from a finished corpus run, so the checks can be exercised with no
-# corpus, no token and no network.
-# Usage: tools/corpus/record --work <dir> --out <report run> --explain-out <explain run>
-#
-# Run deliberately and rarely: when lockrot changes a sentence these checks read, or when a check is
-# added and its poison needs a document to mutate. Everything written here is lockrot's own output
-# and Composer's own metadata, trimmed but never edited — a fixture that no longer matches the
-# source it was taken from is worth less than no fixture.
-#
-# The p2 documents keep their minified shape, `__unset` sentinels and all. Expanding them before
-# committing would remove the one thing the reader under test has to get right.
+# Never edit a recorded fixture: one that does not match its source is worth less than none.
+# Keep the p2 documents minified, `__unset` sentinels included: expanding them removes the one thing
+# that the reader under test must get right.
 
 import argparse
 import os
@@ -24,8 +16,8 @@ from lockrot_corpus.jsonio import read_json, write_json_atomic, write_text_atomi
 HERE = os.path.dirname(os.path.abspath(__file__))
 FIXTURES = os.path.join(HERE, 'fixtures')
 
-# What a recorded p2 entry keeps, mirroring bin/record-fixtures' KEEP list: everything the checks
-# read and nothing else. `source` is cut to its reference, which is all the shared-commit rule uses.
+# Mirrors the KEEP list of bin/record-fixtures. `source` is cut to its reference, the only part that
+# the shared-commit rule reads.
 KEEP = ('name', 'version', 'version_normalized', 'time', 'abandoned', 'replace', 'source')
 
 PACKAGIST_HOST = 'https---repo.packagist.org'
@@ -61,13 +53,7 @@ def main(argv: 'list[str]') -> int:
     return 0
 
 
-# --- the Composer version oracle -------------------------------------------------------------------
-#
-# p2 documents carry Composer's own `version_normalized` beside the pretty `version`, and list their
-# versions newest first. That is Composer's answer to both questions this tool re-implements, free
-# and offline — so the re-implementation is checked against Composer without Composer being on the
-# path. Recorded here and never computed by the test, which would make the test a tautology.
-
+# Record Composer's answers here and never compute them in the test, which makes it a tautology.
 def _write_semver_oracle(cache: str) -> None:
     import glob
     import re as _re
@@ -98,11 +84,10 @@ def _write_semver_oracle(cache: str) -> None:
                 bucket = by_shape.setdefault(shape, [])
                 if len(bucket) < 2:
                     bucket.append({'pretty': pretty, 'normalized': normalized})
-            # Recorded by what the list CONTAINS, never by whether this tool already agrees with
-            # it. Keeping only the packages that sort correctly is how an oracle comes to confirm
-            # the code it validates: the recorder drops every counter-example and the test then
-            # passes over the twelve survivors. Selection is by stability coverage instead, so the
-            # suffixes the corpus is thin on — RC and patch — are the ones most likely to be kept.
+            # Select by what the list contains, never by whether this tool already agrees with it.
+            # Keeping only the packages that sort correctly drops every counter-example, and the
+            # oracle then confirms the code it validates. Stability coverage ranks the lists, so the
+            # thin suffixes (RC, patch) are likely kept.
             versions = [entry.get('version_normalized') for entry in entries
                         if entry.get('version_normalized')]
             if len(versions) >= 8:
@@ -113,8 +98,6 @@ def _write_semver_oracle(cache: str) -> None:
 
     recorded = [row for bucket in by_shape.values() for row in bucket]
     recorded.sort(key=lambda row: row['pretty'])
-    # The richest lists first, then a stable name order, and only then the cap — so the twelve kept
-    # are the twelve that exercise the most of the ordering, not the first twelve alphabetically.
     order_rows.sort(key=lambda row: (-row['rank'][0], -row['rank'][1], row['package']))
     order_rows = [{'package': row['package'], 'covers': row['covers'],
                    'newest_first': row['newest_first']} for row in order_rows[:12]]
@@ -134,10 +117,10 @@ def _write_semver_oracle(cache: str) -> None:
 
 
 def _clear() -> None:
-    """The recorded set is exactly what this run chose, and nothing left over from the last one.
+    """Remove the last recording, so that no stale report sits beside a rewritten lock.
 
-    A stale report beside a rewritten lock is not a fixture — it is a project whose findings name
-    packages the lock no longer carries, which every check then declines for the wrong reason.
+    A stale report names packages that the lock does not carry, and every check then declines it for
+    the wrong reason.
     """
     for relative in ('claims/reports', 'claims/projects', 'claims/cache'):
         shutil.rmtree(os.path.join(FIXTURES, relative), ignore_errors=True)
@@ -148,7 +131,6 @@ def _clear() -> None:
 
 
 def _choose_claims(claims: 'list', cache: str) -> dict:
-    """One finding per shape the checks have to reach, picked by what the data is rather than by name."""
     wanted = {
         'a tag on a commit its siblings share, left unmeasured':
             lambda c: c.metadata and c.shares_commit and c.libyears is None and c.parent_date is None,
@@ -187,20 +169,16 @@ def _choose_claims(claims: 'list', cache: str) -> dict:
 
 
 def _has_unset(package: str, cache: str) -> bool:
-    """Whether the cached document really uses the deletion sentinel, read from the cache itself.
-
-    Asked before anything is written, because a fixture chosen for a property it does not have
-    leaves the reader under test with nothing to read.
+    """Ask before anything is written: a fixture chosen for a property that it lacks leaves the reader
+    under test with nothing to read.
     """
     document = read_json(os.path.join(cache, 'repo', PACKAGIST_HOST,
                                       'provider-%s.json' % package.replace('/', '~')))
     if document is None:
         return False
 
-    # The sentinel has to sit on a key the recording keeps. In the repository's own p2 corpus it
-    # lands on `extra` 478 times and on `replace` once — so a package chosen for a sentinel on
-    # `extra` loses it to the trim, and the committed fixture then proves nothing about the one
-    # line of p2.py that exists to honour it.
+    # The sentinel must sit on a key that the recording keeps. A sentinel on `extra` is lost to the
+    # trim, and the fixture then proves nothing about the line of p2.py that honours it.
     return any(value == '__unset' and key in KEEP
                for entry in document.get('packages', {}).get(package, [])
                if isinstance(entry, dict)
@@ -221,8 +199,8 @@ def _write_claims(chosen: dict, cache: str) -> None:
         project_locks.setdefault(claim.project, {})[package] = claim.entry
         _copy_provider(package, cache)
         if claim.parent:
-            # The parent the run actually resolved, not a guess from the candidate table: a fixture
-            # whose parent is not the one that dated it proves nothing about the parent path.
+            # Use the parent that the run resolved, not a guess from the candidate table: any other
+            # parent proves nothing about the parent path.
             _copy_provider(claim.parent, cache)
 
     write_json_atomic(os.path.join(FIXTURES, 'claims', 'cases.json'),
@@ -243,7 +221,6 @@ def _write_claims(chosen: dict, cache: str) -> None:
 
 
 def _copy_provider(package: str, cache: str) -> None:
-    """The package's p2 document, trimmed to KEEP, with its minified shape left alone."""
     source = os.path.join(cache, 'repo', PACKAGIST_HOST,
                           'provider-%s.json' % package.replace('/', '~'))
     document = read_json(source)
@@ -272,8 +249,7 @@ def _choose_pairs(pairs: 'list') -> dict:
         'a parent dates the installed release': lambda p: p.dated_by is not None,
         'the installed release is undated': lambda p: (p.metadata and p.installed_at is None
                                                        and p.lock_day and not p.is_snapshot),
-        # With a metadata block: a snapshot the repository never answered for cannot exercise any
-        # check that reads one, and most of what is interesting about a snapshot is in that block.
+        # Require a metadata block: a snapshot without one cannot exercise any check that reads it.
         'a branch snapshot': lambda p: p.is_snapshot and p.metadata is not None,
         'no metadata block at all': lambda p: p.metadata is None,
         'S10 says the age was not read': lambda p: 'the age of the package was not read (' in p.text,

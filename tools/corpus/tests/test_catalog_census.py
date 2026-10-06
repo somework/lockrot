@@ -1,13 +1,8 @@
 """The phrase census, asserted in both directions, and the rule that keeps the census complete.
 
-A phrase that stops matching has gone dead. A phrase marked as unexercised that starts matching has
-come back to life, and the marker on it is now a lie. Both are failures here, which is what makes
-the dated `unexercised` marker cost something: it is not a way of silencing a phrase, it is a claim
-about the corpus that gets checked.
-
-The two currently dead paths — `migrate to` and `repository activity not checked (`, each matching
-none of the 283 explain pairs of 2026-09-23 — are dated markers rather than code nobody knows is
-dead.
+A phrase that stops matching has gone dead. A phrase marked `unexercised` that starts to match has
+come back to life, so its marker is wrong. Both fail here, so the dated marker is a claim about the
+corpus that the suite checks, not a way to silence a phrase.
 """
 
 import os

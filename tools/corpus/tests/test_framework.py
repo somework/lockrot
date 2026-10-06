@@ -1,7 +1,7 @@
-"""The framework's own invariants, on synthetic documents that mention lockrot nowhere.
+"""The framework's own invariants, on synthetic documents that do not mention lockrot.
 
-Every one of these is a negative case, and that is deliberate. The framework is a machine for making
-absence loud, so a suite that only proves the happy path is the joke this whole tool is about.
+Every test is a negative case: the framework makes absence loud, so a suite that proves only the
+happy path would miss its purpose.
 """
 
 import unittest
@@ -68,8 +68,8 @@ class LivenessFloors(unittest.TestCase):
     def test_a_check_that_declines_everything_it_is_offered_has_not_answered(self):
         """A floor of zero is not permission to judge nothing.
 
-        This is the shape `--partial` used to hide: an entire scope loads nothing, every check
-        reports `selected 0 of 0`, and the run exits 0 under a line saying every check ran.
+        If a scope loads nothing, every check reports `selected 0 of 0`, and the run must not exit 0
+        under a line that says every check ran.
         """
         reason = Decline('a declared reason', 'because', max_share=1.0, measured_on='a date')
         census = run([_check(selects=lambda doc: decline('a declared reason'), declines=[reason])],
@@ -133,7 +133,7 @@ class TheOutputCarriesItsPopulation(unittest.TestCase):
 
 
 class TheLibyearsPopulation(unittest.TestCase):
-    """The aggregate that exists because no single row reports it — and had no test of its own."""
+    """The aggregate over all findings, which no single row reports."""
 
     def _errors(self, errors):
         from lockrot_corpus.claims import _A3
@@ -174,8 +174,8 @@ class TheLibyearsPopulation(unittest.TestCase):
 
     def test_values_that_round_down_to_zero_are_not_counted_as_a_direction(self):
         """libyears cannot be negative, so every value under half a printed digit rounds to 0.00
-        and its error is negative by construction. On the 2026-09-23 corpus that is 2,156 of 3,958
-        findings — enough to make a correct run look like a five-sigma bias."""
+        and its error is negative by construction. Counted as a direction, those errors make a
+        correct run look like a large bias."""
         floored = [(-value, value) for value in [0.004, 0.003, 0.002, 0.001] * 200]
         keys = [key for key, _ in self._errors(floored)]
         self.assertNotIn('libyears errs in one direction far more often than rounding would', keys)

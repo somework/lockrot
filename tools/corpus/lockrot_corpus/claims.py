@@ -1,26 +1,9 @@
 """What lockrot claimed about each package, audited against the repository data the same run read.
 
-The p2 documents come out of the very cache the run consumed, so a disagreement is an
-interpretation and never Packagist moving underneath. That only holds while the cache has not been
-refreshed since; `corpus check` records the cache root and the run's day for exactly that reason.
-
-The five assertions, each stated as a precondition and a consequence:
-
-  A1  an installed tag on a commit its siblings share, with no parent to date it, has no end to
-      measure from — libyears must be null.
-  A2  both ends dated and trusted — a number must come out.
-  A3  and the number must be the difference between them.
-  A4  an S2 signal that credits no parent must name the newest release this tool also finds.
-  A5  an S10 `undated_releases` entry must not sit on a package whose newest release is datable.
-
-A3 additionally keeps a signed error per finding, because a per-item tolerance hides a systematic
-bias smaller than itself: fifty findings each 0.004 years early is a real drift and no single row
-reports it. The mean is asserted separately, in aggregate_problems().
-
-Selection for A4 and A5 deliberately requires neither the lock entry nor the installed version's
-stability. In the scratchpad ancestor those two `continue`s sat above the signal loop and suppressed
-A4 and A5 as well, although neither depends on them — the largest silent-coverage hole in the
-original, inherited by accident rather than decided.
+The p2 documents come from the cache that the run consumed, so a disagreement is an interpretation
+and never a change in Packagist. That holds only while the cache stays unrefreshed. A3 keeps a
+signed error for each finding, because a per-item tolerance hides a bias smaller than itself, and
+`aggregate_problems()` asserts the mean separately.
 """
 
 import datetime
@@ -28,24 +11,21 @@ import math
 
 from .checks import Check, Decline, Selection, Verdict, decline, ok, problem, select
 from .metadata import Metadata
-from .metadata import parse_time  # noqa: F401 - re-exported shape kept beside Metadata
+from .metadata import parse_time
 from .semver import SECONDS_PER_YEAR, normalize, release_branch, stability
 
-# Half of the last digit lockrot prints. The report rounds once, at output, to two decimals and sums
-# the unrounded values; PHP rounds half away from zero where Python rounds half to even, so a value
-# landing exactly on the boundary may differ in the last digit and only there.
+# Half of the last digit that lockrot prints. PHP rounds half away from zero and Python rounds half
+# to even, so a value on the boundary can differ in the last digit.
 LIBYEARS_TOLERANCE = 0.005
 
-# lockrot rounds libyears once, at output, to two decimals. So every recomputation here differs
-# from the reported number by a rounding error uniform in +/- half of that last digit, which over a
-# population has a standard deviation of ULP/sqrt(12) and a standard error of that over sqrt(n).
-# A fixed threshold is wrong in both directions: on 4,000 findings it is looser than the noise it
-# was meant to catch, and on 40 it fires on runs that are correct.
+# Rounding to two decimals gives each recomputation an error that is uniform in +/- half of
+# LIBYEARS_ULP, so a population of n findings has a standard error of ULP/sqrt(12 n). A fixed
+# threshold is too loose for a large population and too strict for a small one.
 LIBYEARS_ULP = 0.01
 MEAN_SIGMAS = 3
 
-# The `reason` lockrot writes into an S10 entry when the releases carry no date. A rename in lockrot
-# does not make this check lie — it makes A5 select nothing, which trips its floor and fails the run.
+# The `reason` that lockrot writes into an S10 entry for releases without a date. If lockrot
+# renames it, A5 selects nothing and fails its floor.
 UNDATED_RELEASES = 'undated_releases'
 
 
@@ -72,7 +52,10 @@ class Claim:
 
     @property
     def noted(self) -> bool:
-        """lockrot declaring a fallback of its own. Auditing those as clean cases invents findings."""
+        """A finding with a note, where lockrot declares a fallback of its own.
+
+        Auditing it as a clean case invents findings.
+        """
         return self.finding.get('note') is not None
 
     @property
@@ -84,11 +67,9 @@ class Claim:
 
     @property
     def version_mismatch(self) -> bool:
-        """The report and the lock disagree about which version is installed.
+        """The report and the lock name different versions, so they come from different trees.
 
-        Which means they came from different trees: a report kept from an older fetch, or a corpus
-        refreshed under a finished run. Every claim below is about a version, so auditing the two
-        against each other produces findings that belong to neither.
+        Auditing one against the other produces findings that belong to neither.
         """
         return self.entry is not None and self.entry.get('version') != self.finding.get('version')
 
@@ -184,8 +165,6 @@ def _needs_stable_entry(claim: Claim) -> 'Selection | None':
     return None
 
 
-# --- A1: a shared commit is not a date ------------------------------------------------------------
-
 def _a1_selects(claim: Claim) -> Selection:
     declined = _needs_stable_entry(claim)
     if declined is not None:
@@ -208,11 +187,12 @@ def _a1_assert(claim: Claim) -> Verdict:
     return ok()
 
 
-# --- A2 and A3: both ends dated, so a number must come out and must be the right one ----------------
-
 def _clean_pair(claim: Claim) -> Selection:
-    """The case where neither end needs a fallback: the lock dates the install, the repository dates
-    the newest release, no parent is involved and the tag is not on a shared commit."""
+    """Neither end needs a fallback.
+
+    The lock dates the install, the repository dates the newest release, no parent is involved and
+    the tag is not on a shared commit.
+    """
     declined = _needs_stable_entry(claim)
     if declined is not None:
         return declined
@@ -238,14 +218,12 @@ def _a2_assert(claim: Claim) -> Verdict:
 
 
 class _A3:
-    """A3 keeps its errors, so the population can be asked a question no single row answers."""
+    """Keeps the signed errors, so that `aggregate_problems` can test the whole population."""
 
     def __init__(self) -> None:
-        # (error, the exact value it is an error in). The second is needed because the sign of a
-        # rounding error is only a coin toss away from zero: libyears cannot be negative, so every
-        # value under half a printed digit rounds down to 0.00 and its error is negative by
-        # construction. On the 2026-09-23 corpus that is 2,156 of 3,958 findings, and counting them
-        # turns a clean run into a 5-sigma accusation.
+        # (error, exact value). The exact value matters because libyears cannot be negative: a value
+        # under half a printed digit rounds down to 0.00, so its error is negative by construction.
+        # A count of those errors reads as a bias.
         self.errors: 'list[tuple[float, float]]' = []
 
     def selects(self, claim: Claim) -> Selection:
@@ -253,7 +231,6 @@ class _A3:
         if not selection.selected:
             return selection
         if claim.libyears is None:
-            # A2 is the check that reports this; A3 has no number to compare.
             return decline('no number was measured')
 
         return selection
@@ -273,16 +250,13 @@ class _A3:
     def aggregate_problems(self) -> 'list[tuple[str, str]]':
         """What the population says that no single row does.
 
-        Two questions, because a drift can hide from either one alone. The mean catches a bias in
-        the same direction everywhere, measured against the noise floor rounding alone would
-        produce. The sign balance catches a bias that is large in a subset and absent elsewhere,
-        which a mean dilutes towards zero: rounding is a coin toss, so a population where four in
-        five errors share a sign is not rounding.
+        Two tests, because a drift can hide from either one. The mean catches a bias in one
+        direction everywhere, measured against the noise floor of rounding alone. The sign balance
+        catches a bias that is large in a subset, which the mean dilutes towards zero.
         """
         count = len(self.errors)
         if count < 30:
-            # Below that neither statistic says anything: the mean's own noise floor is wider than
-            # the per-finding tolerance, and the sign test has no power.
+            # Below this count neither statistic has enough power.
             return []
         problems = []
         mean = sum(error for error, _ in self.errors) / count
@@ -293,9 +267,8 @@ class _A3:
                 'mean signed error %.6g years over %d findings, against a rounding noise floor of '
                 '%.6g at %d sigma — every row was inside the per-finding tolerance of %s'
                 % (mean, count, limit, MEAN_SIGMAS, LIBYEARS_TOLERANCE)))
-        # Only where rounding could have gone either way. A value further than half a printed digit
-        # from zero has nothing pushing its error one way; below that the floor does, and including
-        # those findings measures the floor rather than lockrot.
+        # Only values where rounding can go either way. Below half a printed digit the 0.00 floor
+        # forces a negative error, so those values measure the floor and not lockrot.
         signed = [error for error, exact in self.errors
                   if error and exact >= LIBYEARS_ULP / 2]
         positive = sum(1 for error in signed if error > 0)
@@ -310,13 +283,13 @@ class _A3:
         return problems
 
 
-# --- A4: what S2 calls the newest release -----------------------------------------------------------
-
 def _s2_unparented(claim: Claim) -> 'list[dict]':
     return [signal for signal in claim.signals('S2')
             if (signal.get('data') or {}).get('dated_by') is None]
 
 
+# A4 and A5 need neither the lock entry nor a stable installed version. Do not call
+# `_needs_stable_entry` here: it declines packages that these checks can judge.
 def _a4_selects(claim: Claim) -> Selection:
     declined = _needs_metadata(claim)
     if declined is not None:
@@ -345,8 +318,6 @@ def _a4_assert(claim: Claim) -> Verdict:
 
     return ok()
 
-
-# --- A5: what S10 calls an undated release ------------------------------------------------------------
 
 def _s10_undated(claim: Claim) -> 'list[dict]':
     entries = []
@@ -377,7 +348,7 @@ def _a5_assert(claim: Claim) -> Verdict:
 
 
 class ClaimChecks:
-    """The five checks plus the aggregate, held together so A3's population can be asked about bias."""
+    """The five checks, with A3's errors kept for `aggregate_problems`."""
 
     def __init__(self) -> None:
         self.a3 = _A3()

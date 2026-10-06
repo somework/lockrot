@@ -1,24 +1,17 @@
 """Rendering a census, and the exit codes that make it mean something.
 
-Neither scratchpad ancestor could gate anything: both printed `none` on an empty problem list and
-both exited 0 whether they had found four hundred contradictions or had been handed an empty
-directory. So two rules hold here.
-
-The formatter takes a census, never a list of problems. There is no code path that can print a
-clean verdict without the population it was reached over, and a census with no population renders
-as exit 2 rather than as good news. The bare word `none` is not an output of this tool.
-
-And a run has three answers, not two. Exit 0 is "I read this much and it holds". Exit 1 is "I found
-problems". Exit 2 is "I cannot tell you whether it is clean" — a check below its floor, a decline
-over the share it declared, a corrupt cached document, an empty input tree, two runs that are not
-comparable. Both non-zero codes fail a gate, and the first line tells a human which one it was.
+The formatter takes a census and never a list of problems, so a clean result always prints with
+its population. Exit 0 means that everything read holds, exit 1 means that the run found
+problems, and exit 2 means that the run cannot say whether it is clean: a check below its floor,
+a decline over its ceiling, a corrupt cached document, an empty input tree or two runs that are
+not comparable. Both non-zero codes fail a gate.
 """
 
 import sys
 from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:  # the census is the only thing this module renders, and importing it at
-    from .checks import Census  # runtime would make checks.py and report.py a cycle
+if TYPE_CHECKING:
+    from .checks import Census
 
 OK = 0
 PROBLEMS = 1
@@ -73,9 +66,6 @@ def render_text(census: 'Census', listing_path: 'str | None' = None) -> str:
             for row in rows[:ROWS_INLINE]:
                 lines.append('  ' + str(row))
             if len(rows) > ROWS_INLINE:
-                # The rest is written out in full beside the report rather than dropped: a group of
-                # four hundred used to show twenty and the other three hundred and eighty were only
-                # recoverable by running the whole thing again.
                 lines.append('  … %d more%s' % (len(rows) - ROWS_INLINE,
                                                 ' — all of them in ' + listing_path if listing_path else ''))
     elif code == OK:
@@ -130,9 +120,8 @@ def _problem_groups(census: 'Census') -> 'list[tuple[str, list]]':
 
 
 def note(message: str) -> None:
-    """Progress and trouble go to stderr; the closing result goes to stdout.
+    """Writes progress and trouble to stderr.
 
-    Piping this tool has to yield the result and not the log — the same split bin/record-fixtures
-    keeps.
+    A pipe from the tool then yields the result and not the log.
     """
     print(message, file=sys.stderr)

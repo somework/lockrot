@@ -1,19 +1,9 @@
 """The pinned membership of the corpus.
 
-The scratchpad fetcher pulled each project's composer.lock from its default branch through the
-contents API and kept nothing — no commit, no digest, no timestamp. Six months later the same
-script produces a different corpus under the same directory names, and nothing on disk says so. It
-also fetched composer.json through a second, independent call, which can straddle a push and pair a
-new manifest with an older lock.
-
-So every project is pinned. Twenty-one of the thirty-nine are pinned already, by git: they are the
-recorded fixtures this repository ships, and a design that treats the corpus as one homogeneous set
-throws away the majority of the evidence that is reproducible today. The other eighteen carry a
-commit SHA and a sha256 for each of the two files, both fetched from that one ref.
-
-A project that has been renamed, archived, made private or has dropped its lock is marked, with a
-date, and kept. Deleting it would make the corpus shrink silently — and the differ, which skips
-anything missing on one side, reads a shrunken corpus as an unchanged one.
+Every project is pinned: a fixture project by git, and a GitHub project by a commit SHA and a sha256
+for each of its two files, both fetched from that one ref. A project that is renamed, archived, made
+private or without its lock gets an `unavailable` date and stays in the manifest. A deletion
+shrinks the corpus silently, and the differ reads a smaller corpus as unchanged.
 """
 
 import hashlib
@@ -64,8 +54,8 @@ def digest_of(document: dict) -> str:
 def refresh(repo_root: str, today: str, only: 'Sequence[str] | None' = None) -> int:
     """Re-resolve each GitHub project's default branch to a commit and re-record the two digests.
 
-    The only code path allowed to ask GitHub what HEAD is. Everything else fetches a ref this file
-    already names, which is what makes a run reproducible rather than merely repeatable.
+    This is the only code path that asks GitHub for HEAD. Everything else fetches a ref that the
+    manifest already names, so a run is reproducible.
     """
     document = load(repo_root)
     changed = 0
@@ -77,17 +67,15 @@ def refresh(repo_root: str, today: str, only: 'Sequence[str] | None' = None) -> 
         owner_repo = project['repo']
         commit = _resolve_head(owner_repo)
         if commit is None:
-            # Gone, not unreachable: _resolve_head raises on a transport failure, so reaching here
-            # means GitHub answered and the repository is not there.
+            # `_resolve_head` raises on a transport failure, so None means that GitHub answered and
+            # the repository is gone.
             if not project.get('unavailable'):
                 project['unavailable'] = today
                 note('%s: no longer resolves; marked unavailable and kept' % owner_repo)
                 changed += 1
             continue
-        # The marker is dropped only once both files are in hand. Dropping it here and setting it
-        # again below counted two changes and rewrote the date on every single refresh, for a
-        # project whose files are simply still missing — and a file rewritten by a refresh that
-        # found nothing new is the one thing this function promises never to do.
+        # Keep the `unavailable` marker until both files are in hand. If the code drops it early
+        # and sets it again, every refresh rewrites the date.
         digests = {}
         absent = None
         for name in FILES:
@@ -98,8 +86,8 @@ def refresh(repo_root: str, today: str, only: 'Sequence[str] | None' = None) -> 
                 break
             digests[name] = {'sha256': sha256_bytes(body), 'bytes': len(body)}
         if digests is None:
-            # The commit resolved, so the repository is reachable; this file is genuinely not in it.
-            # The date kept is the day it first went missing, which is the only one worth having.
+            # The commit resolved, so the file is not in the repository. An existing marker keeps
+            # the first day that the file went missing.
             if not project.get('unavailable'):
                 project['unavailable'] = today
                 note('%s: %s missing at %s; marked unavailable' % (owner_repo, absent, commit[:12]))
@@ -114,23 +102,21 @@ def refresh(repo_root: str, today: str, only: 'Sequence[str] | None' = None) -> 
             changed += 1
         project['commit'] = commit
         project['files'] = digests
+    # Write only on a change, so a routine refresh leaves no diff.
     if changed:
         document['refreshed'] = today
         write_json_atomic(path_for(repo_root), document)
-    # Nothing rewritten when nothing moved: a routine refresh that finds no change must leave no
-    # diff, or the file stops being reviewable.
     note('%d project(s) changed' % changed)
 
     return changed
 
 
 def _resolve_head(owner_repo: str) -> 'str | None':
-    """The repository's current HEAD commit, or None when the repository is genuinely not there.
+    """The repository's HEAD commit, or None when the repository is not there.
 
-    A network that was not reachable is not an answer about the repository, and this raises rather
-    than returning None for it — otherwise one flaky afternoon marks a third of the corpus
-    `unavailable` and the next run audits a quarter of the evidence while reporting it clean. The
-    rule is bin/record-fixtures': "recorded a failure" and "failed to record" are different facts.
+    This raises on a network failure, which is not an answer about the repository. A None return
+    marks projects `unavailable` after a failed request, and the next run audits a smaller corpus
+    and reports it clean.
     """
     branch = _gh(['api', 'repos/%s' % owner_repo, '--jq', '.default_branch'], owner_repo)
     if branch is None:
@@ -141,8 +127,8 @@ def _resolve_head(owner_repo: str) -> 'str | None':
     return commit.strip() if commit else None
 
 
-# curl's exit status for "the server answered with an HTTP error", which with -f is what a 404 is.
-# Anything else it returns is DNS, TLS, a refused connection or a timeout — not an answer.
+# curl's exit status for an HTTP error answer, which `-f` gives for a 404. Any other failure status
+# is DNS, TLS, a refused connection or a timeout, and is not an answer.
 CURL_HTTP_ERROR = 22
 
 

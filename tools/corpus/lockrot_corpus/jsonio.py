@@ -1,16 +1,9 @@
-"""Every file this tool reads or writes goes through here, for three reasons that each cost a day.
+"""Every file that this tool reads or writes goes through here.
 
-`encoding='utf-8'` on every open: the rendered `--explain` text carries `·` and em dashes, and the
-check that reads the composer.lock line is welded to `·` as its field separator. Under a process
-whose default encoding is not UTF-8 that check matches nothing and the run reports a clean census
-over a corpus it never parsed.
-
-A missing file and an unreadable one stay apart. The scratchpad ancestor of this tool collapsed both
-into `None` with a bare `except Exception`, which put a corrupt cached document into the same bucket
-as a package nobody cached — the largest and least-read counter in the output.
-
-Writes go through a `.part` file and `os.replace`. A run killed at the 900-second timeout used to
-leave a half-written JSON of non-zero size, and every resume guard downstream accepted it forever.
+Every open names `encoding='utf-8'`. The check that reads the composer.lock line depends on `·` as
+its separator and matches nothing under another default encoding. A missing file and an unreadable
+one stay apart: `None` and `CorpusDataError`. A write goes through a `.part` file and `os.replace`,
+so a killed run never leaves a half-written file that a resume guard accepts.
 """
 
 import hashlib
@@ -19,10 +12,10 @@ import os
 
 
 class CorpusDataError(Exception):
-    """A file the tool was told to read exists but does not hold what it must.
+    """A file that the tool must read exists but does not hold what it must.
 
-    Distinct from a missing file, which is an ordinary answer with an ordinary handling. This one
-    means the run cannot say whether anything is clean, and the caller turns it into exit 2.
+    It differs from a missing file: the run cannot say whether anything is clean, and the caller
+    turns it into exit 2.
     """
 
     def __init__(self, path: str, reason: str) -> None:
@@ -54,12 +47,10 @@ def read_text(path: str) -> 'str | None':
 
 
 def write_json_atomic(path: str, document: object, pretty: bool = True) -> None:
-    """Write `document`, visible at `path` only once whole.
+    """Writes `document` so that it becomes visible at `path` only once whole.
 
-    `sort_keys` stays off and `ensure_ascii` off: a tracked file keeps the key order it was written
-    with and its accented characters, so a routine refresh diffs as the one line that changed rather
-    than as a rewrite. This is the rule `bin/refresh-monorepo-parents` follows for
-    resources/monorepo-parents.json, and the reason a reviewer can read that file's diff at all.
+    `sort_keys` and `ensure_ascii` stay off, so a tracked file keeps its key order and its accented
+    characters and a routine refresh diffs as the one changed line.
     """
     if pretty:
         body = json.dumps(document, indent=2, ensure_ascii=False, sort_keys=False) + '\n'
@@ -81,11 +72,7 @@ def write_text_atomic(path: str, text: str) -> None:
 
 
 def sha256_file(path: str) -> 'str | None':
-    """The digest of a file on disk, or None when it is not there.
-
-    What makes a resumed target complete is this digest still matching what the run manifest
-    recorded — not the file being non-empty, which is what a timeout leaves behind.
-    """
+    """The digest of a file on disk, or None when it is not there."""
     digest = hashlib.sha256()
     try:
         with open(path, 'rb') as handle:

@@ -1,25 +1,8 @@
-"""lockrot's date-trust layer, derived again from the p2 documents rather than read off lockrot.
+"""lockrot's date-trust layer, derived again from the p2 documents and not read off lockrot.
 
-Which dates lockrot is willing to call a release is the whole subject of the claims checks, so it
-is the one thing that cannot be taken from lockrot. What follows mirrors
-src/Data/Repository/PackageMetadata.php as a specification, not as a port.
-
-The trap, and the reason three sets live here instead of one: lockrot applies SHARED_COMMIT_TAGS
-through three different filters at three different scopes, and they are not interchangeable.
-
-  * `shared_commit_versions` marks every stable on-branch tag sitting on a commit that carries
-    three or more of them — dated or not (PackageMetadata.php:305-310).
-  * `last_stable_release_at` is the newest date among *non-dev* tags, pre-releases included, and is
-    discarded entirely when the *highest* non-dev tag is undated or sits on a shared commit
-    (PackageMetadata.php:286). It is not "the newest dated tag": it is nothing, when the top of the
-    list cannot be trusted.
-  * `times`, and `parent_dates` which is `times` minus the shared set, count stable on-branch tags
-    only — a parent hands a child only the dates that are a release's.
-
-Computing one "is this tag commit-dated" set and reusing it for all three gets the illuminate/* and
-the scheb/2fa cases wrong in opposite directions. Narrowing the newest-release set to stable
-on-branch tags moves the date earlier on every package whose newest tag is an RC, which turns two
-checks into false accusations against correct output.
+It mirrors src/Data/Repository/PackageMetadata.php as a specification and not as a port. That class
+applies `SHARED_COMMIT_TAGS` through three filters at three scopes, and one shared set cannot serve
+all three: `Metadata` keeps `shared_commit_versions`, `last_stable_release_at` and `times` apart.
 """
 
 import datetime
@@ -30,19 +13,16 @@ from . import p2  # noqa: F401 - imported for the type of what Metadata is built
 from .jsonio import read_json
 from .semver import SHARED_COMMIT_TAGS, order_key, release_branch, stability
 
-# `replace` links only hand dates over when they are pinned to the replacer's own version. A range
-# replace — symplify/easy-coding-standard replacing symfony/polyfill-ctype at `*` — says "do not
-# install that one as well", and reading it as a monorepo link starts unrelated packages dating
-# each other (PackageMetadata.php:43).
+# Only a `replace` pinned to the replacer's own version links a monorepo child. A range such as `*`
+# means "do not install both". If it counts as a link, unrelated packages date each other.
 SELF_VERSION = 'self.version'
 
 
 def parse_time(value: object) -> 'datetime.datetime | None':
     """A p2 or lock timestamp as an aware datetime, or None.
 
-    Comparing these as raw strings is correct only while every cached time is spelled as UTC with
-    the same suffix; a single `+02:00` picks the wrong newest release and turns the libyears checks
-    into false accusations. So they are parsed, always.
+    A comparison of raw strings is correct only while every time uses the same UTC suffix: a
+    single `+02:00` picks the wrong newest release. Always parse them.
     """
     if not value:
         return None
@@ -64,7 +44,7 @@ class Metadata:
 
     def __init__(self, provider: 'p2.Provider') -> None:
         self.name = provider.name
-        self.unordered = 0  # tags whose suffix this tool cannot order; see order_key()
+        self.unordered = 0  # tags with a suffix that order_key() cannot order
 
         on_commit = {}
         commit_of = {}
@@ -74,11 +54,8 @@ class Metadata:
             normalized = version.get('version_normalized') or ''
             reference = (version.get('source') or {}).get('reference')
             if reference and stability(normalized) != 'dev':
-                # Every non-dev tag's commit, counted nowhere. The count is over stable on-branch
-                # tags only, but the *lookup* at the veto below is for the highest non-dev tag,
-                # pre-release included — that is the pairing PackageMetadata.php:286 uses, and
-                # looking the highest tag up in a stable-only map silently answers "not shared"
-                # for every package whose newest tag is a beta or an RC.
+                # The veto for the highest non-dev tag looks up its commit here, and that tag can
+                # be a pre-release. A stable-only map answers "not shared" for a beta or an RC.
                 commit_of_any[normalized] = reference
         for version in provider.versions:
             normalized = version.get('version_normalized') or ''
@@ -97,13 +74,15 @@ class Metadata:
             if on_commit[reference] >= SHARED_COMMIT_TAGS
         }
         self.times = times
-        # A parent hands over only the dates that are a release's: a tag its siblings share dates
-        # nothing, least of all somebody else's version of the same number.
+        # A parent hands over only a release's own dates, so a tag on a shared commit hands over
+        # nothing.
         self.parent_dates = {
             normalized: released for normalized, released in times.items()
             if normalized not in self.shared_commit_versions
         }
 
+        # The newest release date covers every non-dev tag, pre-releases included. A narrower set of
+        # stable on-branch tags moves the date earlier for a package whose newest tag is an RC.
         non_dev = []
         for version in provider.versions:
             normalized = version.get('version_normalized') or ''
@@ -127,15 +106,13 @@ class Metadata:
             reference = commit_of_any.get(highest_normalized)
             shared = reference is not None and on_commit.get(reference, 0) >= SHARED_COMMIT_TAGS
             if not highest.get('time') or shared:
-                # The top of the list is undated, or dated only by a commit three tags share. There
-                # is no newest release to measure from, and lockrot says so rather than reaching one
-                # tag further down.
+                # The highest tag is undated or shares a commit, so there is no newest release.
+                # lockrot does not fall back to the next tag.
                 self.last_stable_release_at = None
                 self.last_stable_version = None
 
-        # Unioned over every version entry, because p2 lists newest first and a monorepo declares
-        # its children in whichever releases had them. Reading one end of the array gave
-        # laravel/framework no children at all.
+        # Union over every version entry: a monorepo declares its children only in the releases that
+        # had them, so one end of the array can miss children.
         self.replaces = {
             target for version in provider.versions
             for target, constraint in (version.get('replace') or {}).items()
@@ -146,17 +123,11 @@ class Metadata:
 class Parents:
     """Which monorepo, if any, dates a package's releases.
 
-    The file is not the map. resources/monorepo-parents.json decides only which extra repository
-    request is worth making for a lock that does not already contain the parent
-    (MonorepoParents::missingCandidates(), :113); what makes a package a child is that *some package
-    in the batch* declares `replace: <child> self.version`, and MonorepoParents::parentOf() (:152)
-    scans the whole batch for one. Gating on the file inverts that, and the inversion is not
-    theoretical: sylius/sylius has 44 children in a real lock and is not in the file, so every one
-    of them would be read as unparented and audited against dates lockrot never used.
-
-    The batch here is the same batch lockrot has: every package of the project's own lock, plus the
-    candidates the file would have made it fetch. Not the whole cache — a parent lockrot never
-    loaded cannot have dated anything.
+    resources/monorepo-parents.json only lists the extra repositories that are worth a request
+    (`MonorepoParents::missingCandidates()`). A child is any package for which a package in the
+    batch declares `replace: <child> self.version` (`MonorepoParents::parentOf()`), so a gate on
+    the file reads the children of an unlisted monorepo as unparented. The batch is the lock plus
+    the candidates and never the whole cache: a parent that lockrot never loaded dates nothing.
     """
 
     def __init__(self, repo_root: str) -> None:
@@ -169,10 +140,8 @@ class Parents:
                  metadata_for: 'Callable[[str], Metadata | None]') -> 'dict[str, str]':
         """Every child in this batch, mapped to the package that replaces it at its own version.
 
-        First match wins, over the lock's own packages before the fetched candidates. lockrot takes
-        the first in its own batch order and its docblock says a parent that is itself a child does
-        not happen; where two packages replace the same child this and lockrot could disagree, and
-        neither is more right than the other.
+        First match wins, over the lock's own packages before the fetched candidates. Where two
+        packages replace the same child, this tool and lockrot can pick different parents.
         """
         parent_of = {}
         for name in list(batch) + self.candidates:

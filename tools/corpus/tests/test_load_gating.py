@@ -1,9 +1,8 @@
 """What the loaders refuse to treat as evidence about a run.
 
-Every case here is one the tool used to audit and call clean. The run records what became of each
-target and what it set out to cover; reading a file the run already disowned, or one something else
-rewrote afterwards, is reading something other than that run's answer. And a corpus the run never
-reached the end of is not a smaller corpus — it is an unfinished sentence.
+The run records what became of each target and what it set out to cover. A file that the run
+disowned, or that something else rewrote afterwards, is not the answer of that run. A corpus that the
+run did not finish is not a smaller corpus.
 """
 
 import os
@@ -52,10 +51,11 @@ class Reports(unittest.TestCase):
         return {'status': 'ok', 'sha256': sha256_file(os.path.join(self.reports, name + '.json'))}
 
     def test_a_report_the_run_disowned_is_named_and_never_read(self):
-        """`unreadable output` leaves its bytes on disk beside its stderr, on purpose.
+        """`unreadable output` leaves its bytes on disk beside its stderr, so that a human can see what
+        lockrot printed.
 
-        The run keeps them so a human can see what lockrot printed. Reading them back as a report
-        aborted the whole audit on the one file the run had already refused to call a report.
+        The loader must not read them back as a report: that aborts the whole audit on the one file
+        that the run refused to call a report.
         """
         self._project('good')
         self._project('bad', '{"findings": [ truncated')
@@ -67,7 +67,7 @@ class Reports(unittest.TestCase):
         self.assertEqual(['bad (unreadable output)'], missing)
 
     def test_one_report_that_will_not_parse_does_not_take_the_others_with_it(self):
-        """Without a manifest there is no status to go on, so the parse itself has to be survivable."""
+        """Without a manifest there is no status to go on, so the parse itself must be survivable."""
         self._project('good', {'findings': [{'package': 'x/y'}]})
         self._project('bad', 'not json at all')
         claims, missing = self._load()
@@ -144,8 +144,8 @@ class MultiHostPackages(unittest.TestCase):
     def test_asking_without_a_url_first_does_not_settle_the_answer_for_the_url(self):
         """The parent scan asks about every package in the lock before any finding does.
 
-        Memoised on the name alone, that first answer was `None` plus a permanent AMBIGUOUS mark,
-        and the `notification-url` sitting in the lock entry could never be heard.
+        A memo keyed on the name alone keeps that first answer, `None` plus a permanent AMBIGUOUS
+        mark, so the `notification-url` in the lock entry is never heard.
         """
         corpus = load.Corpus(self.root, support.REPO_ROOT)
         self.assertIsNone(corpus.metadata('x/y'))

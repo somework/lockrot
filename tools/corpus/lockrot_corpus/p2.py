@@ -1,19 +1,10 @@
 """The Composer repository cache, read as the run under audit read it.
 
-Two properties of a p2 document decide everything downstream and both have already been got wrong:
-
-Entries are minified. Each one carries only what differs from the entry before it, and a key it
-means to delete carries the string `__unset`. Merge first, then drop the sentinels — in that order.
-A package that keeps a `time`, a `source` or a `replace` a later version explicitly removed corrupts
-the newest-release date, the shared-commit counts and monorepo detection at the same time.
-
-Entries are newest first. A `replace: <other> self.version` link read off one end of the array gave
-laravel/framework no children at all, which silently removed the parent-dating branch from three of
-the five claims checks while the counters still looked busy.
-
-Every repository host under the cache root is indexed, not just repo.packagist.org. The scratchpad
-ancestor read one host and counted every drupal and wp-packages package as uncached, in the same
-bucket as a package that genuinely has no document.
+Entries are minified: each carries only what differs from the entry before it, and a key to
+delete carries the string `__unset`. Merge first and drop the sentinels second, or a package keeps
+a `time`, `source` or `replace` that a later version removed. Entries are newest first. This
+module indexes every repository host under the cache root, because a read of
+repo.packagist.org alone counts every drupal and wp-packages package as uncached.
 """
 
 import os
@@ -27,9 +18,8 @@ _PROVIDER = re.compile(r'^provider-(.+)\.json$')
 class AmbiguousProvider(Exception):
     """A package cached under more than one repository, with nothing in the lock to settle it.
 
-    Not a data error: the cache is fine and so is the lock. It is a package this tool declines to
-    audit, by name, because auditing it against the wrong repository's releases would produce a
-    finding lockrot does not have.
+    It is not a data error. The caller declines the package, because the wrong repository's
+    releases produce a finding that lockrot does not have.
     """
 
     def __init__(self, name: str, hosts: 'list[str]') -> None:
@@ -50,10 +40,9 @@ class Provider:
 class ProviderCache:
     """Every `provider-*.json` under a Composer cache's `repo/` directory, indexed by package name.
 
-    A package present under more than one host is kept as a list rather than resolved: the lock's
-    `notification_url` names the repository that served it, and where it does not settle the
-    question the caller declines the package by name instead of guessing. Guessing is how a package
-    gets audited against the wrong repository's idea of its releases.
+    A package under more than one host is kept as a list and not resolved. The lock's
+    `notification-url` can name the repository that served it, and where it does not, the caller
+    declines the package, because a guess audits it against the wrong repository.
     """
 
     def __init__(self, cache_root: str) -> None:
@@ -106,9 +95,8 @@ class ProviderCache:
             raise CorpusDataError(path, 'is not a JSON object')
         if 'security-advisories' in document and 'packages' not in document:
             # Composer files an advisories answer under the same `provider-<vendor>~<package>.json`
-            # name as a version list — packages.drupal.org serves one for drupal/core. It carries no
-            # versions, so there is nothing here to audit a claim against, and that is an absence
-            # rather than a corruption.
+            # name as a version list, and packages.drupal.org does so for drupal/core. It holds no
+            # versions, so it is an absence and not a corruption.
             self._parsed[path] = None
 
             return None
@@ -124,10 +112,9 @@ class ProviderCache:
 def _expand(entries: object, path: str) -> 'list[dict]':
     """Minified entries folded into whole ones, in the document's own order (newest first).
 
-    A repository that is not Packagist may answer in Composer's older shape, where the package maps
-    version strings to whole entries with nothing minified — repo.wp-packages.org does. Nothing
-    downstream depends on the order, only on each entry being whole, so that shape is read as it is
-    rather than converted.
+    A repository other than Packagist can answer in Composer's older shape, where the package maps
+    version strings to whole entries. Nothing depends on the order, only on whole entries, so that
+    shape is read as it is.
     """
     if isinstance(entries, dict):
         return [dict(entry) for entry in entries.values() if isinstance(entry, dict)]
@@ -147,13 +134,12 @@ def _expand(entries: object, path: str) -> 'list[dict]':
 
 
 def _netloc(notification_url: object) -> str:
-    """The host out of a notification URL, which is all of it that identifies the repository.
+    """The host of a notification URL, which is the part that identifies the repository.
 
     Composer names a cache directory after the whole repository URL with every non-alphanumeric run
-    replaced by a dash, and a repository's notification URL is neither that URL nor a prefix of it:
-    packagist.org notifies from `packagist.org` while serving p2 from `repo.packagist.org`, and
-    drupal notifies from `/8/downloads` while its directory ends `-8`. The host is the part the two
-    share, so it is the part compared.
+    replaced by a dash, and a notification URL is neither that URL nor a prefix of it: packagist.org
+    notifies from `packagist.org` while it serves p2 from `repo.packagist.org`. The host is the part
+    that the two share.
     """
     match = re.match(r'^[a-z][a-z0-9+.-]*://([^/]+)', str(notification_url).lower())
 

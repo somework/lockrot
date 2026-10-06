@@ -1,16 +1,9 @@
-"""Turning a finished corpus run into the documents the checks read.
+"""Turns a finished corpus run into the documents that the checks read.
 
-Both halves are driven by the run manifest, not by a directory listing, and that is the whole of the
-design here. A project lockrot died on leaves *no file at all* — so a reader that lists the directory
-cannot tell a corpus of 39 from the 30 that survived, and the checks then pass over 77% of the
-evidence and report a clean census. The manifest is the only record that the other nine were ever
-attempted, and its `intended` list is the only record that a run killed at the 35th project was
-ever going to reach the other four.
-
-The same for a pair: a target is judged only when the manifest records both of its files whole and
-both still hash to what was recorded. The text is written before the JSON, so an interruption leaves
-a fresh page beside a stale document — the one pairing every contradiction check assumes cannot
-happen — and a file replaced after the run is not evidence about that run at all.
+Both loaders follow the run manifest and never a directory listing, because a project that lockrot
+died on leaves no file. A target counts only when the manifest records it whole and its files still
+hash to the recorded digests. A run writes the text before the JSON, so an interruption can leave a
+fresh page beside a stale document.
 """
 
 import datetime
@@ -44,12 +37,9 @@ class Corpus:
     def metadata(self, name: str, notification_url: 'str | None' = None) -> 'Metadata | None':
         """The metadata for `name` as the repository that serves it holds it.
 
-        Memoised on the pair, never on the name alone. A package cached under two hosts is only
-        ambiguous until something says which host the lock names, and the parent scan asks about
-        every package in the lock before the findings do — so a memo keyed on the name would answer
-        the second question with the first question's `None` and decline the package as AMBIGUOUS
-        with its `notification-url` sitting right there in the lock entry. It would also carry the
-        first project's answer into every later one.
+        The memo key is `(name, notification_url)` and never the name alone. A package cached under
+        two hosts is ambiguous only until a lock entry's `notification-url` names one, and a
+        name-only memo answers the later question with the earlier answer, `None`.
         """
         key = (name, notification_url)
         if key in self._metadata:
@@ -77,15 +67,12 @@ def load_claims(reports_dir: str, projects_dir: str, cache_root: str, repo_root:
                 manifest: 'dict | None' = None) -> 'tuple[list[Claim], list[str]]':
     """Every finding of every project report, with its lock entry and its derived metadata.
 
-    Returns (claims, missing). `missing` names every project the run was supposed to cover and did
-    not finish: one lockrot crashed on, one that timed out, one the run never reached at all, one
-    whose report is empty or will not parse, one whose report was replaced after the run wrote it.
-    It is not a diagnostic — the caller turns it into a run-level failure, because a check that ran
-    over three quarters of the corpus has not answered the question that was asked.
+    Returns (claims, missing). `missing` names each project that the run was meant to cover and did
+    not finish: a crash, a timeout, a project never reached, an empty or unparsable report, or a
+    report replaced after the run wrote it. The caller turns it into a run-level failure, because a
+    check over part of the corpus does not answer the question.
 
-    Every one of those is decided from the manifest before the file is opened, on the same status
-    and digest `load_pairs` holds a pair to. A report is read only when the run recorded it `ok` and
-    it still hashes to what was recorded.
+    A report is read only when the run recorded it `ok` and it still hashes to the recorded digest.
     """
     if not os.path.isdir(reports_dir):
         raise LoadError('%s: no such run directory' % reports_dir)
@@ -95,9 +82,8 @@ def load_claims(reports_dir: str, projects_dir: str, cache_root: str, repo_root:
     for project, expected in _projects(reports_dir, manifest):
         recorded = _recorded(manifest, project)
         if recorded is not None and recorded.get('status') != 'ok':
-            # Including `unreadable output`, whose file the run deliberately leaves on disk beside
-            # its stderr. Reading it back here would be reading exactly what the run already
-            # refused to call a report.
+            # This includes `unreadable output`: the run leaves that file on disk, and it is not a
+            # report.
             missing.append('%s (%s)' % (project, expected))
             continue
         path = os.path.join(reports_dir, project + '.json')
@@ -105,15 +91,12 @@ def load_claims(reports_dir: str, projects_dir: str, cache_root: str, repo_root:
             missing.append('%s (%s)' % (project, expected))
             continue
         if recorded is not None and sha256_file(path) != recorded.get('sha256'):
-            # The same rule load_pairs holds a pair to, and for the same reason: a file the run
-            # wrote and something else changed afterwards is not evidence about that run.
             missing.append('%s (replaced since the run wrote it)' % project)
             continue
         try:
             report = read_json(path)
         except CorpusDataError:
-            # A report that will not parse is one project's answer missing, which the docstring
-            # above promises, and not a reason the other thirty-eight go unaudited.
+            # An unparsable report is one missing project and does not stop the audit of the others.
             report = None
         if not isinstance(report, dict) or not isinstance(report.get('findings'), list):
             missing.append('%s (the report does not parse as one)' % project)
@@ -138,9 +121,8 @@ def load_claims(reports_dir: str, projects_dir: str, cache_root: str, repo_root:
 def _resolver(corpus: Corpus, lock_entries: 'dict[str, dict]') -> 'Callable[[str], Metadata | None]':
     """Metadata for a package as *this lock* names its repository.
 
-    The parent scan is offered every package in the lock, so this is the first thing that asks the
-    cache about most of them — and asking without the lock's own `notification-url` is what used to
-    settle a multi-host package as ambiguous for the rest of the run.
+    The parent scan asks about every package in the lock. A call without the lock's
+    `notification-url` settles a multi-host package as ambiguous for the rest of the run.
     """
     def metadata_for(package: str) -> 'Metadata | None':
         return corpus.metadata(package, (lock_entries.get(package) or {}).get('notification-url'))
@@ -149,11 +131,10 @@ def _resolver(corpus: Corpus, lock_entries: 'dict[str, dict]') -> 'Callable[[str
 
 
 def _recorded(manifest: 'dict | None', key: str) -> 'dict | None':
-    """What the run manifest says became of this target, or None when there is no manifest at all.
+    """What the run manifest records for this target, or None when there is no manifest.
 
-    None and an empty dict are different answers. None means nothing records what this run did, so
-    there is nothing to gate on and the caller is told as much; an empty record is a record, and it
-    gates like any other target that is not `ok`.
+    None and an empty dict differ. None means that nothing records the run, so there is nothing to
+    gate on. An empty record gates like any other target that is not `ok`.
     """
     if manifest is None:
         return None
@@ -162,10 +143,10 @@ def _recorded(manifest: 'dict | None', key: str) -> 'dict | None':
 
 
 def _projects(reports_dir: str, manifest: 'dict | None') -> 'list[tuple[str, str]]':
-    """Every project this run was meant to cover, with what the manifest says became of it.
+    """Every project that this run was meant to cover, with what the manifest records for it.
 
-    Without a manifest the directory is listed, which can only see what survived — so the caller is
-    told that too, rather than being left to assume the corpus was whole.
+    Without a manifest this lists the directory, which shows only what survived, and each entry
+    says so.
     """
     if manifest is not None:
         targets = manifest.get('targets', {})
@@ -180,12 +161,10 @@ def _projects(reports_dir: str, manifest: 'dict | None') -> 'list[tuple[str, str
 
 
 def _never_reached(manifest: dict, recorded: dict) -> 'list[tuple[str, str]]':
-    """Every target the run set out to cover and has no record of at all.
+    """Every target that the run set out to cover and has no record of.
 
-    A target is written to the manifest when the run reaches it, so a run killed after 35 of 39
-    projects holds 35 records and the other four are named by nothing — not by the status list, not
-    by a file on disk, not by the directory. The intended membership is written when the run starts
-    precisely so that an interruption is a countable absence rather than a smaller corpus.
+    A target reaches the manifest only when the run reaches it, so a run killed partway names the
+    rest only in `intended`, which the run writes at its start.
     """
     return [(name, 'the run never reached it')
             for name in sorted(manifest.get('intended') or ()) if name not in recorded]
@@ -195,9 +174,8 @@ def _parent_date(corpus: Corpus, parent: 'str | None', lock_entry: 'dict | None'
                  lock_entries: 'dict[str, dict]') -> 'datetime.datetime | None':
     """The date the parent hands this exact version, or None.
 
-    Only dates that are a release's are handed over — `parent_dates` rather than `times` — because a
-    parent tag sitting on a commit three of its siblings share dates nothing, least of all somebody
-    else's version of the same number.
+    Only `parent_dates` count and not `times`: a parent tag on a commit that its siblings share
+    dates nothing.
     """
     if parent is None or lock_entry is None:
         return None
@@ -227,11 +205,10 @@ def _lock_entries(path: str) -> 'dict[str, dict]':
 def load_pairs(explain_dir: str, manifest: 'dict | None' = None) -> 'tuple[list[Pair], list[str]]':
     """Every explain target rendered whole, as a (text, JSON) pair.
 
-    Returns (pairs, incomplete). With a run manifest, the target list is the manifest's and a target
-    recorded as anything but complete is named in `incomplete` — which is also how a slug left over
-    from an ad-hoc single-target run against a different PHAR stops being judged as current. Without
-    one the directory is globbed, and the census says so, because a globbed directory cannot tell
-    the tool which PHAR wrote what.
+    Returns (pairs, incomplete). With a manifest, its targets are the target list, and a target not
+    recorded complete is named in `incomplete`. This also keeps a slug from an ad-hoc run against
+    another PHAR out of the current set. Without a manifest the directory is globbed, and the census
+    says so, because a globbed directory cannot tell the tool which PHAR wrote what.
     """
     if not os.path.isdir(explain_dir):
         raise LoadError('%s: no such explain directory' % explain_dir)
@@ -257,17 +234,14 @@ def load_pairs(explain_dir: str, manifest: 'dict | None' = None) -> 'tuple[list[
             continue
         if recorded is not None and (sha256_file(json_path) != recorded.get('sha256')
                                      or sha256_file(text_path) != recorded.get('text_sha256')):
-            # Written by the run and changed since. Whatever it is now, it is not evidence about
-            # that run, and the digests are recorded precisely so this is not a judgement call.
             incomplete.append('%s (replaced since the run wrote it)' % slug)
             continue
         try:
             document = read_json(json_path)
             text = read_text(text_path)
         except CorpusDataError:
-            # The same rule load_claims holds a report to. Reachable two ways: a globbed directory,
-            # where there is no recorded status to gate on at all, and a target the run recorded
-            # `ok` without reading — which is what `run_explains` used to do.
+            # Without a manifest no recorded status gates the target, so an unreadable file reaches
+            # this point.
             document, text = None, None
         if not isinstance(document, dict) or 'finding' not in document or text is None:
             incomplete.append('%s (the document does not parse as one)' % slug)
