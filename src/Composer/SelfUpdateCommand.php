@@ -29,22 +29,11 @@ use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * `lockrot.phar self-update` — replaces the running PHAR with the newest GitHub release of its
- * major version that this PHP can run and this archive can verify ({@see ReleaseLocator}).
+ * Registered in bin/lockrot only. The Composer plugin must not expose it: there the code lives in
+ * the project's vendor directory, and `composer update` updates lockrot.
  *
- * Registered in bin/lockrot only. The Composer plugin must never expose it: there the code lives in
- * the project's vendor directory, where the way to update lockrot is `composer update`.
- *
- * Exit codes follow the rest of lockrot: 0 for a successful update or an already-current build, 2
- * for every error. `--check` decides exactly as a plain run would and adds one case of its own —
- * exit 1 when that run would install something — so a scheduled CI job can notice a new release
- * without this command ever writing to disk; `--force` does not change what it reports. A newer
- * release held back for its major version (without `--allow-major`) or its PHP floor is named on a
- * line of its own and is still exit 0. An archive stranded by a key rotation is exit 2 under
- * `--check` too, since no later run would change it ({@see ReleaseLocator::locate()}).
- *
- * Every message goes to stderr; stdout stays empty, as it does for every lockrot run that produces
- * no report.
+ * Release rules and exit codes: docs/phar.md#keeping-it-updated and
+ * docs/phar.md#self-update-exit-codes. Every message goes to stderr, so stdout stays empty.
  *
  * @internal
  */
@@ -53,11 +42,10 @@ final class SelfUpdateCommand extends BaseCommand
     use RejectsUnreadableInput;
 
     /**
-     * How long the whole self-update round may take. {@see ComposerHttpClient} turns this into the
-     * per-request timeout, which Composer maps to curl's CURLOPT_TIMEOUT — the *total* transfer
-     * time, not just the connect time. A never-expiring deadline would leave
-     * {@see ComposerHttpClient::DEFAULT_TIMEOUT} at 10 seconds, which is ample for the release JSON
-     * but not for a megabyte of PHAR on a slow link.
+     * {@see ComposerHttpClient} turns the budget into the per-request timeout, which Composer maps
+     * to curl's CURLOPT_TIMEOUT, the total transfer time. A never-expiring deadline leaves
+     * {@see ComposerHttpClient::DEFAULT_TIMEOUT} in force, and it is too short for the PHAR on a
+     * slow link.
      */
     private const BUDGET_SECONDS = 120.0;
 
@@ -70,8 +58,7 @@ final class SelfUpdateCommand extends BaseCommand
     private ?SignatureVerifierInterface $signatures;
 
     /**
-     * @param null|callable(IOInterface): array{0: HttpClientInterface, 1: ?string} $httpFactory HTTP client plus the
-     *                                                                                          resolved GitHub token;
+     * @param null|callable(IOInterface): array{0: HttpClientInterface, 1: ?string} $httpFactory client and GitHub token;
      *                                                                                          null builds both from
      *                                                                                          Composer's own config
      * @param ?string $runningPhar the archive to replace; null asks the runtime (`\Phar::running(false)`)
@@ -95,9 +82,8 @@ final class SelfUpdateCommand extends BaseCommand
     protected function configure(): void
     {
         $this
-            // Composer's own application registers a `self-update` with a `selfupdate` alias; the
-            // PHAR replaces both entries so neither spelling can reach Composer's updater, which
-            // would go looking for a composer.phar that is not there.
+            // The PHAR replaces both of Composer's `self-update` and `selfupdate` entries: its
+            // updater looks for a composer.phar that is not there.
             ->setAliases(['selfupdate'])
             ->setDescription('Replaces this lockrot.phar with the newest release of its major version from GitHub')
             ->addOption('check', null, InputOption::VALUE_NONE, 'Only report whether an update exists; exits 1 when one does')
@@ -119,17 +105,14 @@ final class SelfUpdateCommand extends BaseCommand
             );
     }
 
-    /** A command line this command cannot read is exit 2 and a `lockrot:` line ({@see RejectsUnreadableInput}). */
     public function run(InputInterface $input, OutputInterface $output): int
     {
         return $this->unreadableInput($input, $output) ?? parent::run($input, $output);
     }
 
     /**
-     * Composer's BaseCommand::initialize() builds a Composer instance from the current directory,
-     * falling back to the global one. self-update needs none of it — it reads no project — and
-     * going through it would make updating the PHAR depend on whatever composer.json happens to sit
-     * in the working directory. Overridden empty so `lockrot.phar self-update` works from anywhere.
+     * Empty, so that `lockrot.phar self-update` works from anywhere: Composer's initialize() builds
+     * a Composer instance from the working directory, and self-update reads no project.
      */
     protected function initialize(InputInterface $input, OutputInterface $output): void
     {
@@ -137,15 +120,10 @@ final class SelfUpdateCommand extends BaseCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        // Read before anything can replace the archive this process is running from. After the
-        // swap the running process can no longer load a class it has not already used, and
-        // `Policy::EXIT_OK` in a return statement below would be exactly that — the first use of
-        // Policy in a self-update run, resolved too late to succeed. TerminalText is loaded here
-        // for the same reason: an error after the swap may be the first line writeError() colours.
-        // Everything else on the way out is already in memory: writeError() calls `instanceof`,
-        // which never triggers the autoloader, OutputFormatterStyle, which the output's own
-        // formatter loaded for its default styles, and `writeln()` on an output object built before
-        // the command ran.
+        // Read before anything can replace the archive: after the swap this process cannot load a
+        // class it has not used. Policy is the first use in a self-update run, and TerminalText is
+        // loaded for the same reason: an error after the swap can be the first line that
+        // writeError() colours. Every other class on the way out is already in memory.
         $exitOk = Policy::EXIT_OK;
         $exitError = Policy::EXIT_ERROR;
         $exitFindings = Policy::EXIT_FINDINGS;
@@ -162,17 +140,16 @@ final class SelfUpdateCommand extends BaseCommand
 
             [$http, $token] = $this->httpAndToken();
             $check = $input->getOption('check') === true;
-            // --check only ever reports: with --force as well it says what a plain run would do.
+            // --check only ever reports: with --force as well it says what a plain run does.
             $force = !$check && $input->getOption('force') === true;
             $signatures = $this->signatures ?? new ReleaseSignatureVerifier(ReleaseKey::PEM);
             $locator = new ReleaseLocator($http, $signatures->keyFingerprint(), $token, $this->releaseUrl);
             try {
                 $release = $locator->locate($input->getOption('allow-major') === true, $force);
             } finally {
-                // Every line is written before anything is installed — see PharUpdater on why
-                // nothing new may be loaded once the archive has been swapped — and also when the
-                // walk failed further down the list, so the error follows the reason a newer
-                // release was passed over.
+                // Write every note before anything is installed (see PharUpdater), and also when
+                // locate() fails, so the error follows the reason that a newer release was passed
+                // over.
                 foreach ($locator->notes() as $note) {
                     $this->writeError($output, self::plain($note));
                 }
@@ -219,9 +196,8 @@ final class SelfUpdateCommand extends BaseCommand
     }
 
     /**
-     * `composer --no-network` and anything else that sets COMPOSER_DISABLE_NETWORK mean the caller
-     * has asked for no requests at all; self-update has nothing it could do offline, so it says so
-     * instead of failing later with a transport error.
+     * COMPOSER_DISABLE_NETWORK, as `composer --no-network` sets it, forbids every request. Refuse
+     * early instead of failing with a transport error.
      */
     private static function networkDisabled(): bool
     {
@@ -231,12 +207,10 @@ final class SelfUpdateCommand extends BaseCommand
     }
 
     /**
-     * The HTTP client and the GitHub token, built the way the analyzer builds them: Composer's own
-     * Config and HttpDownloader, with the token resolved from LOCKROT_GITHUB_TOKEN, GITHUB_TOKEN or
-     * Composer's `github-oauth`, so a self-update is not the one lockrot call that hits the
-     * anonymous rate limit.
+     * Built as the analyzer builds them, so that the token lifts the anonymous rate limit for a
+     * self-update too (docs/configuration.md#environment-overrides).
      *
-     * @return array{0: HttpClientInterface, 1: ?string}
+     * @return array{0: HttpClientInterface, 1: ?string} client, GitHub token
      */
     private function httpAndToken(): array
     {
@@ -258,11 +232,9 @@ final class SelfUpdateCommand extends BaseCommand
     }
 
     /**
-     * $text with nothing a terminal would obey: the notes and the errors carry tags, versions and
-     * URLs from the release list and its assets, which must not reach the terminal as a control
-     * sequence. C0 controls, DEL and the C1 controls (in their UTF-8 form) become `?`; writeError()
-     * writes the rest past the tag formatter, so a `<href=…>` or `<<fg=red>>` in it never opens a
-     * console style.
+     * Replaces C0 controls, DEL and the C1 controls (in UTF-8) with `?`: a tag or URL from the
+     * release list must not reach the terminal as a control sequence. writeError() writes the rest
+     * past the tag formatter.
      */
     private static function plain(string $text): string
     {
@@ -270,11 +242,9 @@ final class SelfUpdateCommand extends BaseCommand
     }
 
     /**
-     * One line on stderr, written raw so that nothing in $message — a tag or URL from the release
-     * document, an exception's message — is read as a console tag, lost or thrown on
-     * ({@see TerminalText} on why OutputFormatter::escape() cannot do it); $error colours the line
-     * in the `error` style when the output is decorated. TerminalText is loaded before the archive
-     * can be replaced ({@see self::execute()}).
+     * Raw, so that no tag or URL from the release document is read as a console tag
+     * ({@see TerminalText} on why OutputFormatter::escape() cannot do it). TerminalText is loaded
+     * before the archive is replaced ({@see self::execute()}).
      */
     private function writeError(OutputInterface $output, string $message, bool $error = false): void
     {

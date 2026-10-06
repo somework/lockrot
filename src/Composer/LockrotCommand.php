@@ -47,8 +47,6 @@ use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * `composer lockrot` — analyses composer.lock and prints a report in the configured format.
- *
  * @internal
  */
 final class LockrotCommand extends BaseCommand
@@ -59,17 +57,14 @@ final class LockrotCommand extends BaseCommand
     private $analyzerFactory;
 
     /**
-     * Set by initialize() when the project manifest is unusable, or anything else fails before
-     * Composer has been bootstrapped; rethrown inside execute(), whose catch blocks decide the line
-     * and the exit code.
+     * A failure of initialize(), rethrown in execute() so that its catch blocks choose the line and
+     * the exit code.
      */
     private ?\Throwable $bootstrapError = null;
 
     /**
-     * Snapshot of COMPOSER_DISABLE_NETWORK/COMPOSER_ROOT_VERSION taken at the top of initialize(),
-     * before either is set; execute() restores exactly these values in a finally block so a
-     * lockrot invocation never leaves the process environment changed behind it. null only before
-     * initialize() has run.
+     * COMPOSER_DISABLE_NETWORK and COMPOSER_ROOT_VERSION as initialize() found them. execute()
+     * restores them in a finally block, so a run leaves the process environment unchanged.
      *
      * @var array<string, string|false>|null
      */
@@ -101,12 +96,9 @@ final class LockrotCommand extends BaseCommand
     }
 
     /**
-     * LOCKROT_DISABLE is the off switch, documented as skipping lockrot entirely, so it is checked
-     * before anything the run would read: the command line, composer.json and its extra.lockrot, the
-     * option values, the lock. None of them can turn a disabled run into an exit 2.
-     *
-     * Then the command line is bound here, before Symfony's run() does it, so one this command
-     * cannot read is exit 2 and a `lockrot:` line ({@see RejectsUnreadableInput}).
+     * Check LOCKROT_DISABLE before any read of the run: no unreadable input can turn a disabled run
+     * into exit 2 (docs/configuration.md#environment-overrides). The command line is bound here,
+     * before Symfony's run(), so an unreadable one is exit 2 ({@see RejectsUnreadableInput}).
      */
     public function run(InputInterface $input, OutputInterface $output): int
     {
@@ -120,27 +112,17 @@ final class LockrotCommand extends BaseCommand
     }
 
     /**
-     * Composer's BaseCommand::initialize() bootstraps a Composer instance from the project's
-     * composer.json and lets a JSON parse error escape as a Composer crash — exit 1, before
-     * execute() is ever reached. lockrot documents a malformed manifest as a configuration error
-     * (exit 2, README "Exit codes"), so the file is checked here first and the failure is carried
-     * into execute()'s error handling instead. So is any other failure on the way there — Composer
-     * refusing a COMPOSER that names a directory, say: Symfony calls initialize() outside any
-     * try/catch, and nothing this command does may leave it as a Composer crash.
+     * Composer's initialize() lets a manifest error escape as a crash with exit 1, before execute()
+     * runs. This method carries it, and any failure before the bootstrap, into execute() as exit 2
+     * (docs/ci.md#exit-codes).
      *
-     * --offline sets COMPOSER_DISABLE_NETWORK as early as this command can, but that alone is not
-     * the mechanism, and cannot be: HttpDownloader reads the variable once, in its own constructor,
-     * and in plugin mode Composer\Console\Application::doRun() has already built the Composer
-     * instance — with its HttpDownloader and RepositoryManager — while collecting plugin commands,
-     * long before any command's initialize() runs. What makes --offline effective is
-     * composerBootstrap() rebuilding the repositories afterwards, so that they get an
-     * HttpDownloader constructed after this point.
+     * COMPOSER_DISABLE_NETWORK alone cannot make --offline work: in plugin mode Composer built its
+     * HttpDownloader before this runs. composerBootstrap() rebuilds the repositories to cover that.
      */
     protected function initialize(InputInterface $input, OutputInterface $output): void
     {
         $this->bootstrapError = null;
-        // Captured before either variable is touched below, so execute()'s finally block can put
-        // the environment back exactly as it found it regardless of which branches ran.
+        // Before this method sets either variable.
         $this->envSnapshot = [
             'COMPOSER_DISABLE_NETWORK' => Platform::getEnv('COMPOSER_DISABLE_NETWORK'),
             'COMPOSER_ROOT_VERSION' => Platform::getEnv('COMPOSER_ROOT_VERSION'),
@@ -161,10 +143,8 @@ final class LockrotCommand extends BaseCommand
         try {
             parent::initialize($input, $output);
         } catch (\Throwable $e) {
-            // Symfony's Command::run() calls initialize() outside any try/catch of its own, so a
-            // failure here would otherwise skip execute() entirely — and with it the finally block
-            // that normally restores the environment. Restored here instead, then rethrown
-            // unchanged so Composer's own error handling still sees the original failure.
+            // After a failure here execute() and its finally block do not run, so restore the
+            // environment here and rethrow the original failure to Composer.
             $this->restoreEnv();
 
             throw $e;
@@ -172,21 +152,11 @@ final class LockrotCommand extends BaseCommand
     }
 
     /**
-     * lockrot never reads the root package's own version (it inspects composer.lock, not the
-     * project's own release), so there is nothing for it to lose by pre-empting Composer's guess.
-     * Without COMPOSER_ROOT_VERSION set, RootPackageLoader falls back to VersionGuesser, which
-     * shells out to git/hg/fossil/svn looking for a tag or branch to derive a version from, and
-     * then warns "could not detect the root package version, defaulting to '1.0.0'". Setting the
-     * variable to that same default up front skips both the probing and the warning.
-     *
-     * This has to run before parent::initialize() rather than in resolveComposer(): Composer's own
-     * BaseCommand::initialize() already builds the first Composer instance itself, so by the time
-     * resolveComposer() runs that instance exists and is returned as-is.
-     *
-     * In plugin mode a Composer instance already exists before any of this runs — built while
-     * Composer's own Application was collecting plugin commands — so the guess never re-triggers
-     * there regardless. This guard therefore only takes effect on the path that has no pre-existing
-     * instance to reuse: the standalone PHAR, or any other lock-only invocation.
+     * lockrot never reads the root package's version, so it sets Composer's default up front. That
+     * skips the VersionGuesser probe of git, hg, fossil and svn, and its warning "could not detect
+     * the root package version". Call it before parent::initialize(), which builds the first
+     * Composer instance. In plugin mode Composer already built its instance, so this takes effect
+     * only without one.
      */
     private function quietRootVersionGuessing(): void
     {
@@ -216,7 +186,7 @@ final class LockrotCommand extends BaseCommand
             foreach (UnknownKeys::warnings($project->lockrotExtra()) as $warning) {
                 $this->writeWarning($output, 'lockrot: '.$warning);
             }
-            // The lock Composer itself would read: alt.lock beside COMPOSER=alt.json.
+            // The lock that Composer reads: alt.lock beside COMPOSER=alt.json.
             $lockPath = Factory::getLockFile($composerFile);
             if (!is_file($lockPath)) {
                 // Unlike `composer`, lockrot never walks up to a parent project (the PHAR hides the
@@ -229,27 +199,24 @@ final class LockrotCommand extends BaseCommand
             if (\is_string($explain) && $specs !== []) {
                 throw new ConfigException('--explain prints one package on stdout and --output writes whole-run reports; run them separately');
             }
-            // Resolving the path touches nothing, and the files --output may not name include it.
+            // Resolving the path touches nothing, and the files that --output must not name include it.
             $baselineFile = BaselineFile::resolve(\dirname($composerFile), $lockrot->baseline());
-            // Checked before the analysis, like the baseline below: a typo in a path fails now,
-            // not after a full repository round.
+            // Checked before the analysis, like the baseline: a typo in a path fails before a
+            // full repository round.
             $targets = ReportTargets::resolve($specs, $cwd, $specs === [] ? [] : self::protectedFiles($cwd, $composerFile, $lockPath, $baselineFile, $project));
-            // `composer lockrot` is the deliberate, full run: no time budget, unlike the
-            // install-time summary.
+            // No time budget, unlike the install-time summary (docs/install-time.md#time-budget).
             $analyzer = AnalyzerBootstrap::create($this->analyzerFactory, $io, $config, $repositories, $project, $lockrot, $env, Deadline::never());
-            // Before the baseline is even read: an explanation does not consult it, so a
-            // baseline that is missing or unreadable must not stand between the question and the answer.
+            // Before the baseline is read: an explanation ignores it, so a missing or unreadable
+            // baseline must not block it.
             if (\is_string($explain)) {
                 return $this->explain($output, $explain, $analyzer, $lock, $project, $lockrot);
             }
-            // Read before the analysis so a missing explicit path or an unreadable file fails
-            // immediately, rather than after a full repository round. A generate run is the one case
-            // where the target is allowed not to exist yet: it is about to be created.
+            // Read before the analysis, so a missing explicit path or an unreadable file fails before
+            // a full repository round. A generate run can name a file that does not exist: it creates it.
             $generate = $input->getOption('generate-baseline') === true;
             $existingBaseline = $this->readBaseline($baselineFile, $lockrot->baseline() !== null && !$generate);
             $format = $lockrot->format();
-            // `html` draws a release-branch timeline per package, which is the one thing only the
-            // facts carry; every other format is happy with the report and lets them go.
+            // Only `html` needs the facts: it draws a release-branch timeline per package.
             $analysis = $format === 'html' || $targets->wants('html')
                 ? $analyzer->analyzeWithFacts($lock->packages($lockrot->includeDev()), $lock, $project, $lockrot->includeDev())
                 : null;
@@ -257,8 +224,8 @@ final class LockrotCommand extends BaseCommand
 
             // One threshold for the report's gate and for the annotation formats.
             $failOn = FailOn::fromString($lockrot->failOn());
-            // Before the baseline and before any formatter: every document the run writes should say
-            // what the run was told to do, because that is what its verdicts were decided against.
+            // Before the baseline and any formatter: every document must record the settings that
+            // its verdicts were decided against.
             $report = $report->withRun(new RunSettings(
                 // The report's name for the project, then Composer's, which no lockrot config renames.
                 $lockrot->project() ?? $project->name(),
@@ -278,9 +245,8 @@ final class LockrotCommand extends BaseCommand
                 : new PageData($analysis, $lockrot->thresholds(), $lockrot->targetPhp(), $project->requirePhp());
             $showAll = $input->getOption('all') === true;
             // The annotation formats name the lock relative to the directory lockrot runs in, as the
-            // checkout does: alt.lock under COMPOSER=alt.json, and composer.lock as ever without it.
-            // A file has no terminal, so a table in one is rendered at the default width whatever
-            // this run's terminal is: the same file on a laptop and on a CI runner.
+            // checkout does. A file has no terminal, so a table in one uses the default width: the
+            // same file on a laptop and on a CI runner.
             $fileContext = FormatContext::forFailOn($lockPath, $failOn, Version::STRING, FormatContext::DEFAULT_WIDTH, $cwd);
 
             if ($generate) {
@@ -298,14 +264,11 @@ final class LockrotCommand extends BaseCommand
                 ));
             }
 
-            // The annotation formats point back at the lock they were computed from; an unreadable
-            // one throws ConfigException from here, which the catch below turns into exit 2 the
-            // same way an unreadable lock does a few lines up.
+            // The annotation formats point back at the lock: an unreadable one throws
+            // ConfigException here, which is exit 2.
             $context = FormatContext::forFailOn($lockPath, $failOn, Version::STRING, TerminalWidth::detect($env, $this->getApplication()), $cwd);
-            // Every format is written raw: the one that carries console markup is rendered by
-            // lockrot rather than Symfony's tag formatter (see ConsoleMarkup), every
-            // machine-readable one as it is, so a `<` in a constraint or a package name reaches
-            // the terminal or the parser on the other end untouched.
+            // Written raw: lockrot renders console markup itself (see ConsoleMarkup), so a `<` in a
+            // constraint or a package name reaches the terminal or the parser untouched.
             $rendered = Formatters::for($format, $context, $page)->format($report, $showAll);
             $output->write(
                 Formatters::carriesConsoleMarkup($format) ? ConsoleMarkup::render($rendered, $output->isDecorated()) : $rendered,
@@ -334,14 +297,7 @@ final class LockrotCommand extends BaseCommand
         }
     }
 
-    /**
-     * `--explain <package>`: the same run every other invocation makes — the whole lock, so the
-     * chain, the transitive exposure and the priority are the report's — then one package's
-     * finding printed with the facts it was decided on ({@see Explanation}), and exit 0: the run
-     * answers a question, it does not gate anything. A package the run did not analyse is a
-     * configuration error (exit 2) with the reason: not in the lock, or in `packages-dev` without
-     * `--dev`. The baseline is not consulted — what the project has accepted is not what is asked.
-     */
+    /** `--explain <package>`: docs/configuration.md#explaining-one-package. */
     private function explain(OutputInterface $output, string $name, Analyzer $analyzer, LockFile $lock, ProjectConfig $project, LockrotConfig $lockrot): int
     {
         $format = $lockrot->format();
@@ -362,8 +318,8 @@ final class LockrotCommand extends BaseCommand
         $analysis = $analyzer->analyzeWithFacts($lock->packages($lockrot->includeDev()), $lock, $project, $lockrot->includeDev());
         $finding = $analysis->finding($name);
         $facts = $analysis->facts($name);
-        // Both come from the same pass over the same packages, so one is null exactly when the
-        // other is; the check is for the types, the lock lookup above already ruled the case out.
+        // Both come from the same pass, so one is null exactly when the other is: the check
+        // narrows the types.
         if ($finding === null || $facts === null) {
             throw new ConfigException($name.' was not analysed');
         }
@@ -379,13 +335,9 @@ final class LockrotCommand extends BaseCommand
     }
 
     /**
-     * The baseline on disk, or null when the default file simply does not exist yet — the state of
-     * every project that has not generated one.
-     *
-     * A path the project asked for explicitly is different: a typo in `--baseline` or in
-     * `extra.lockrot.baseline` would otherwise silently turn a gated build into an ungated one, so
-     * a missing file there is a configuration error. So is a file that exists but cannot be read:
-     * an unreadable baseline is never treated as an empty one.
+     * Null when the default baseline file does not exist. A missing explicit path is a
+     * configuration error: a typo must not turn a gated build into an ungated one. An unreadable
+     * file is an error too (docs/baseline.md#when-lockrot-cannot-read-the-file).
      */
     private function readBaseline(BaselineFile $file, bool $explicit): ?Baseline
     {
@@ -401,10 +353,9 @@ final class LockrotCommand extends BaseCommand
     }
 
     /**
-     * `--generate-baseline`: write what this run found, say so on stderr, print nothing on stdout,
-     * and exit 0 whatever `fail-on` says — the point of the run is to record the findings, not to
-     * judge them. `--strict-network` still applies: a baseline written from metadata that never
-     * arrived would accept findings lockrot could not actually check.
+     * `--generate-baseline`: docs/baseline.md#what-generate-baseline-does. `--strict-network` still
+     * applies, because a baseline written from metadata that never arrived accepts findings
+     * that lockrot could not check.
      */
     private function generateBaseline(OutputInterface $output, BaselineFile $file, Report $report, ?Baseline $existing): int
     {
@@ -419,10 +370,7 @@ final class LockrotCommand extends BaseCommand
         return self::gateOf($report)->fails() ? Policy::EXIT_FINDINGS : Policy::EXIT_OK;
     }
 
-    /**
-     * The gate the run's documents write, which the exit code is. The report carries its run from
-     * the start of execute(), so a missing gate is a bug, never a pass.
-     */
+    /** The gate that the run's documents write is also the exit code. */
     private static function gateOf(Report $report): Gate
     {
         $gate = $report->gate();
@@ -433,7 +381,6 @@ final class LockrotCommand extends BaseCommand
         return $gate;
     }
 
-    /** The `--output` files, each followed by one line on stderr naming it, as the baseline's is. */
     private function writeReports(OutputInterface $output, ReportTargets $targets, Report $report, FormatContext $context, ?PageData $page, bool $showAll): void
     {
         $targets->write(
@@ -448,21 +395,10 @@ final class LockrotCommand extends BaseCommand
     }
 
     /**
-     * The files an `--output` may not name, besides every composer.json and composer.lock by name,
-     * which {@see ReportTargets} refuses on its own:
+     * The files that an `--output` must not name, besides each composer.json and composer.lock that
+     * {@see ReportTargets} refuses by name: docs/configuration.md#writing-reports-to-files.
      *
-     * - every baseline the project names: this run's (`--baseline`, else `extra.lockrot.baseline`,
-     *   else `lockrot-baseline.json`) and the project's own (`extra.lockrot.baseline`, else
-     *   `lockrot-baseline.json`), which `--baseline` does not stop being the committed one — each
-     *   whether or not it exists yet;
-     * - the composer.json and composer.lock this run reads, so a second name for either on disk is
-     *   caught wherever the report would go;
-     * - the manifest Composer reads, as {@see self::composerFile()} names it (`COMPOSER`), and the
-     *   lock {@see Factory::getLockFile()} pairs with it (`composer-8.json` -> `composer-8.lock`),
-     *   the two this run reads. Without `COMPOSER` these are the two above, which come first and
-     *   keep their reason.
-     *
-     * @return list<array{0: string, 1: string}>
+     * @return list<array{0: string, 1: string}> path, reason
      */
     private static function protectedFiles(string $cwd, string $composerFile, string $lockPath, BaselineFile $baseline, ProjectConfig $project): array
     {
@@ -480,8 +416,7 @@ final class LockrotCommand extends BaseCommand
     }
 
     /**
-     * Every `--output` value. The option is declared as an array of values, so anything else is
-     * a console library's doing, not the user's, and is dropped.
+     * Drops a value that is not a string: only the console library can produce one.
      *
      * @return list<string>
      */
@@ -498,12 +433,9 @@ final class LockrotCommand extends BaseCommand
     }
 
     /**
-     * Every package the lock holds, `packages-dev` included and whatever this run's `--dev` says.
-     *
-     * "Stale" is a statement about composer.lock, not about the scope of one run: a baselined
-     * package that is now `ok`, and a dev package a run without `--dev` never analysed, are both
-     * still in the lock and must not be reported as gone. {@see InstallTimeSummary::withBaseline()}
-     * measures it the same way, for the same reason.
+     * Every package the lock holds, `packages-dev` included whatever `--dev` says. A baselined
+     * package that is `ok`, or that this run did not analyse, is still in the lock, so it is not
+     * stale. {@see InstallTimeSummary::withBaseline()} measures the same way.
      *
      * @return list<string>
      */
@@ -517,12 +449,6 @@ final class LockrotCommand extends BaseCommand
         return $names;
     }
 
-    /**
-     * Puts COMPOSER_DISABLE_NETWORK/COMPOSER_ROOT_VERSION back exactly as initialize() found them:
-     * putEnv() when the snapshot was a string, clearEnv() when it was unset. Runs from execute()'s
-     * finally block, so --offline's network guard is still in place for the whole run and only
-     * disappears once this command is done with it.
-     */
     private function restoreEnv(): void
     {
         if ($this->envSnapshot === null) {
@@ -539,27 +465,22 @@ final class LockrotCommand extends BaseCommand
     }
 
     /**
-     * One line on stderr, written past Symfony's tag formatter: $message is lockrot's words around
-     * text it did not write — a path, a package name, an exception's message, a stack trace — and
-     * none of that is console markup (see {@see TerminalText}), so a `<` in it prints as given and
-     * nothing needs escaping.
+     * Written past Symfony's tag formatter: $message quotes text that is not console markup, such
+     * as a path, an exception message or a stack trace ({@see TerminalText}).
      */
     private function writeError(OutputInterface $output, string $message): void
     {
         self::errorOutput($output)->writeln($message, OutputInterface::OUTPUT_RAW);
     }
 
-    /**
-     * $line on stderr in the `warning` colours, past Symfony's tag formatter: it quotes the
-     * project's text, which is not console markup (see {@see TerminalText}).
-     */
+    /** Raw for the reason of writeError(). */
     private function writeWarning(OutputInterface $output, string $line): void
     {
         $target = self::errorOutput($output);
         $target->writeln(TerminalText::warning($line, $target->isDecorated()), OutputInterface::OUTPUT_RAW);
     }
 
-    /** $text on stderr in the `error` colours, past the formatter for the same reason. */
+    /** Raw for the reason of writeError(). */
     private function writeFailure(OutputInterface $output, string $text): void
     {
         $target = self::errorOutput($output);
@@ -591,17 +512,10 @@ final class LockrotCommand extends BaseCommand
     }
 
     /**
-     * Reuses the project's own Composer configuration (and so its configured repositories, in their
-     * configured order — the public package repository by default, but private repositories, Satis
-     * instances and mirrors are honoured the same way) when a Composer instance is available; falls
-     * back to Composer's own defaults for a lock-only directory with no Composer instance to reuse,
-     * e.g. inside the standalone PHAR.
-     *
-     * The repositories are rebuilt from that Config rather than taken from the instance's
-     * RepositoryManager, because in plugin mode the manager and its HttpDownloader predate this
-     * command entirely (see initialize()), so --offline could never reach them.
-     * RepositoryFactory::defaultRepos() reads Config::getRepositories() — the same list, in the
-     * same order, that Composer itself builds the manager from.
+     * Reuses the project's Composer configuration and its repositories, in their order. Without a
+     * Composer instance (a lock-only directory, the standalone PHAR) it uses Composer's defaults.
+     * The repositories are rebuilt from Config, not taken from the instance's RepositoryManager: in
+     * plugin mode its HttpDownloader predates this command, so --offline could not reach it.
      *
      * @return array{0: Config, 1: list<RepositoryInterface>}
      */
@@ -609,10 +523,9 @@ final class LockrotCommand extends BaseCommand
     {
         $composer = $this->resolveComposer($hasComposerJson);
         $config = $composer instanceof Composer ? $composer->getConfig() : Factory::createConfig($io);
-        // Thread the project's own EventDispatcher through so plugins hooking
-        // PRE_FILE_DOWNLOAD/POST_FILE_DOWNLOAD (mirror/proxy/CDN plugins) still see lockrot's
-        // metadata requests on the rebuilt manager; the lock-only path (no Composer instance) has no
-        // plugins loaded to reach anyway, so it keeps rebuilding without one.
+        // Pass the project's EventDispatcher so plugins on PRE_FILE_DOWNLOAD/POST_FILE_DOWNLOAD
+        // (mirror, proxy, CDN) still see lockrot's metadata requests. The lock-only path has no
+        // plugins.
         $eventDispatcher = $composer instanceof Composer ? $composer->getEventDispatcher() : null;
         $manager = RepositoryFactory::manager($io, $config, Factory::createHttpDownloader($io, $config), $eventDispatcher);
 
@@ -620,11 +533,9 @@ final class LockrotCommand extends BaseCommand
     }
 
     /**
-     * The manifest Composer itself reads — the one the COMPOSER environment variable names, else
-     * composer.json — as an absolute path, so the lock beside it, the baseline next to it and every
-     * message naming it point at the file Composer would use (`COMPOSER=alt.json` means alt.json and
-     * alt.lock, exactly as `composer install` reads them). {@see InstallTimeSummary} resolves it the
-     * same way, and the files `--output` may not name are derived from it ({@see self::protectedFiles()}).
+     * The manifest that Composer reads (`COMPOSER`, else composer.json) as an absolute path, so the
+     * lock, the baseline and every message point at the file that Composer uses.
+     * {@see InstallTimeSummary} resolves it the same way.
      */
     private static function composerFile(): string
     {
