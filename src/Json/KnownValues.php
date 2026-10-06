@@ -5,29 +5,12 @@ declare(strict_types=1);
 namespace Lockrot\Json;
 
 /**
- * The strict reading of a published schema: every open set read as the enum it lists.
- *
- * The values that grow in minor releases — signal ids, S10's checks and reasons, S8's floor source,
- * S6's reason, an explained branch's `php_blocked_by` and `misses_*_php`, a finding's
- * `libyears_unmeasured`, a priority step's and a no-fix advisory's `reason`, `run.mode`,
- * `run.fail_on_kind`, `gate.tripped_by`, a finding's `gate.exempt_by`, a run note's `code` and the
- * `forge_id` and `reason` in its `data`, the configuration's `format` — are open strings in
- * resources/*.schema.json: a `pattern`, so a copy a consumer took earlier accepts a value a later
- * release adds, and an `x-known-values` list of the values this release writes. Draft-04 validators
- * ignore a keyword they do not know. Read strictly, the list is the `enum` and the pattern goes, so
- * exactly the known values pass and a mistyped one fails with the enum's message, one line, as it did
- * while the published files spelled the enum out. A list of integers is read the same way: an integer
- * set has no pattern, and its list becomes its enum.
- *
- * An open map — keys that grow in minor releases — is `patternProperties` plus an `x-known-keys` list
- * of the keys this release writes. Read strictly, the known keys become the map's only properties,
- * each typed by every regex it matches (by `additionalProperties` when it matches none), and the map
- * is closed. A node that already lists its properties keeps them.
- * {@see \Lockrot\Config\ConfigSchema} validates `extra.lockrot` this way, and the tests hold
- * lockrot's own documents to it.
- *
- * Only places where a schema sits are read: an object that is a value (a `default`, an `enum` member)
- * keeps whatever it holds. A node that already has an `enum` keeps it.
+ * The strict reading of a published schema (docs/schema.md#open-sets): each `x-known-values` list
+ * becomes the `enum` and its `pattern` goes. An open map is `patternProperties` plus an
+ * `x-known-keys` list: the known keys become its only properties, each typed by every regex it
+ * matches, else by `additionalProperties`. A node that already has an `enum` or `properties` keeps
+ * it. An object that is a value (a `default`, an `enum` member) is not read as a schema.
+ * {@see \Lockrot\Config\ConfigSchema} validates `extra.lockrot` this way.
  *
  * @internal
  */
@@ -46,7 +29,7 @@ final class KnownValues
     /** Keywords whose value maps names to schemas. */
     private const MAP = ['definitions', 'dependencies', 'patternProperties', 'properties'];
 
-    /** A copy of the schema read strictly; the schema given is left as it was. */
+    /** A copy of the schema read strictly. The schema given stays unchanged. */
     public static function closed(\stdClass $schema): \stdClass
     {
         $copy = clone $schema;
@@ -78,8 +61,8 @@ final class KnownValues
 
     /**
      * Each known key of a map with the schema a validator holds it to: that of every
-     * `patternProperties` regex it matches, else `additionalProperties`. A key no schema admits is
-     * left out.
+     * `patternProperties` regex it matches, else `additionalProperties`. The result omits a key that
+     * no schema admits.
      *
      * @param array<mixed> $keys
      */

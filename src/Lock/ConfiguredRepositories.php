@@ -11,10 +11,10 @@ use Lockrot\Data\Forge\RepoLocator;
 /**
  * @phpstan-type Definition array{name: string, version: string, dist: mixed, source: mixed}
  *
- * The manifest's own `repositories`, in the order Composer looks names up in, read only to say which
- * one served a lock entry without a notification-url. Composer's global configuration is not read, so
- * the answer depends on the project's files alone. Reading never throws: a manifest Composer would
- * refuse could not have produced the lock, so it serves nothing lockrot can name.
+ * The manifest's `repositories`, in the order Composer consults them, read only to say which one
+ * served a lock entry without a notification-url. Composer's global configuration is not read.
+ * Reading never throws: a manifest that Composer refuses cannot have produced the lock, so
+ * it serves nothing (docs/schema.md#where-a-package-came-from).
  *
  * @internal
  */
@@ -22,7 +22,10 @@ final class ConfiguredRepositories
 {
     private const VCS_TYPES = ['vcs', 'git', 'github', 'gitlab', 'bitbucket', 'git-bitbucket', 'hg', 'svn', 'fossil', 'perforce'];
 
-    /** Every type Composer builds a root repository of, 2.2 to 2.10; a plugin's types exist only after the root repositories. */
+    /**
+     * Every type that Composer 2.2 to 2.10 builds a root repository of. A plugin's types exist only
+     * after the root repositories.
+     */
     private const TYPES = ['vcs', 'git', 'github', 'gitlab', 'bitbucket', 'git-bitbucket', 'hg', 'svn', 'fossil', 'perforce', 'composer', 'package', 'artifact', 'path'];
 
     /** @var list<array{type: string, url: string, only: ?string, exclude: ?string, canonical: bool, packages: list<Definition>}> */
@@ -69,9 +72,9 @@ final class ConfiguredRepositories
     }
 
     /**
-     * The kind of the first listed repository that served the entry, walking them as Composer does:
-     * `unknown` when one listed before it could have served the name without leaving a trace; null
-     * when none did and the entry has no path dist.
+     * The kind of the first listed repository that served the entry, walking them as Composer does.
+     * The result is `unknown` when an earlier repository could have served the name without leaving
+     * a trace. The result is null when none did and the entry has no path dist.
      */
     public function kindServing(string $name, string $version, OriginFacts $facts): ?string
     {
@@ -112,7 +115,7 @@ final class ConfiguredRepositories
 
             return $inside === null ? PackageOrigin::UNKNOWN : ($inside ? PackageOrigin::ARTIFACT : null);
         }
-        // A path repository would have left a path dist, and packagist.org a notification-url.
+        // A path repository leaves a path dist, and packagist.org a notification-url.
         return $type === 'path' || self::isPackagist($repository['url']) ? null : PackageOrigin::UNKNOWN;
     }
 
@@ -127,7 +130,7 @@ final class ConfiguredRepositories
     }
 
     /**
-     * One repository as Composer would build it, or null where Composer would refuse it.
+     * One repository as Composer builds it, or null where Composer refuses it.
      *
      * @param mixed $repository
      *
@@ -154,7 +157,7 @@ final class ConfiguredRepositories
     /**
      * @param mixed $packages an inline repository's `package`: one definition, or a list of them
      *
-     * @return list<Definition>|null null where one is no definition Composer would load
+     * @return list<Definition>|null null where one is no definition that Composer loads
      */
     private static function definitions($packages): ?array
     {
@@ -178,7 +181,7 @@ final class ConfiguredRepositories
     /**
      * @param array<mixed> $repository
      *
-     * @return string|false|null the filter as a pattern; false where Composer would refuse it
+     * @return string|false|null the filter as a pattern, false where Composer refuses it
      */
     private static function filter(array $repository, string $key)
     {
@@ -271,11 +274,15 @@ final class ConfiguredRepositories
             return $remote === self::remoteKey($source);
         }
 
-        // GitDriver records a local repository as configured, less a trailing /.git; ~ and variables stay unexpanded.
+        // GitDriver records a local repository as configured, less a trailing /.git. It leaves ~ and
+        // variables unexpanded.
         return strpbrk($configured, '~$') === false && self::localKey($configured) === self::localKey($source);
     }
 
-    /** Host without its port, and path, as one repository reads over https and ssh alike; null for a local path. */
+    /**
+     * The host without its port, and the path: one key for a repository over https and ssh alike.
+     * Null for a local path.
+     */
     private static function remoteKey(string $url): ?string
     {
         $parts = preg_match('{^[A-Za-z]:[\\\\/]}', $url) === 1 ? null : RepoLocator::hostAndPath($url);
@@ -293,7 +300,10 @@ final class ConfiguredRepositories
         return (string) preg_replace('{/\.git$}', '', rtrim(str_replace('\\', '/', $path), '/'));
     }
 
-    /** Whether a dist that is a local file lies inside the directory; null where the directory names `~` or a variable, which lockrot does not expand. */
+    /**
+     * Whether a local dist file lies inside the directory. Null where the directory names `~` or a
+     * variable, which lockrot does not expand.
+     */
     private static function inside(string $directory, ?string $file): ?bool
     {
         if (strpbrk($directory, '~$') !== false) {

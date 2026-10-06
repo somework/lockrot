@@ -116,9 +116,8 @@ final class LockedPackage
         return $this->requires;
     }
     /**
-     * The lock entry's `source` URL, else its `support.source` reduced to the repository. Consulted
-     * only when the repository metadata names no repository for the highest release
-     * ({@see \Lockrot\Data\Repository\PackageMetadata::repositoryUrl()}).
+     * The lock entry's `source` URL, else its `support.source` reduced to the repository. It is the
+     * fallback for {@see \Lockrot\Data\Repository\PackageMetadata::repositoryUrl()}.
      */
     public function repositoryUrl(): ?string
     {
@@ -138,7 +137,7 @@ final class LockedPackage
         return $this->origin;
     }
 
-    /** The same entry with its origin decided against the manifest's repositories; this instance is left unchanged. */
+    /** A copy whose origin comes from the manifest's repositories. */
     public function withRepositories(ConfiguredRepositories $repositories): self
     {
         $copy = clone $this;
@@ -146,7 +145,6 @@ final class LockedPackage
 
         return $copy;
     }
-    /** The same locked entry flagged as a `packages-dev` (or `packages`) member; this instance is left unchanged. */
     public function withDev(bool $dev): self
     {
         $copy = clone $this;

@@ -55,14 +55,13 @@ final class LockFile
                         $e->getMessage()
                     ), 0, $e);
                 }
-                // A package declaring extra.branch-alias (e.g. dev-master aliased to 1.0.x-dev)
-                // loads as a CompleteAliasPackage; unwrap it to the underlying CompletePackage so
-                // the locked entry's own version/require/source fields are what gets read.
+                // A package that declares extra.branch-alias loads as an alias package. Unwrap it, so
+                // that the entry's own version, require and source fields are read.
                 if ($loaded instanceof AliasPackage) {
                     $loaded = $loaded->getAliasOf();
                 }
-                // Unreachable with ArrayLoader::load()'s default $class arg (it returns CompletePackage,
-                // or the CompleteAliasPackage already unwrapped above); this narrows the type for PHPStan.
+                // Unreachable: ArrayLoader::load() returns a CompletePackage. The check narrows the
+                // type for PHPStan.
                 if (!$loaded instanceof CompletePackage) {
                     throw new ConfigException(\sprintf(
                         'composer.lock entry #%d in %s cannot be loaded: loader returned %s instead of a CompletePackage',
@@ -80,20 +79,17 @@ final class LockFile
         return new self($packages, \is_string($hash) ? $hash : null);
     }
 
-    /** A lock with no packages and no content hash — the base {@see withPackages()} builds onto. */
     public static function empty(): self
     {
         return new self([], null);
     }
 
     /**
-     * A new lock where each given package replaces (by name) or adds to this one's entries; every
-     * other entry, and this instance itself, is left unchanged. The install-time path uses this to
-     * make a Composer transaction's own packages part of the dependency-chain source regardless of
-     * whether a lock existed on disk or was stale — see {@see \Lockrot\Composer\InstallTimeSummary}.
-     * An entry this lock already lists keeps its `packages`/`packages-dev` membership: a Composer
-     * transaction carries no dev flag ({@see \Lockrot\Composer\TransactionPackages} always says
-     * false), and the lock is the only source that knows.
+     * A new lock where each given package replaces the entry of its name or adds one. The
+     * install-time path uses it to make a Composer transaction's packages part of the dependency
+     * chains ({@see \Lockrot\Composer\InstallTimeSummary}). An entry that the lock already lists keeps
+     * its `packages` or `packages-dev` membership. A transaction carries no dev flag, and only the
+     * lock knows it.
      *
      * @param list<LockedPackage> $packages
      */

@@ -46,9 +46,8 @@ final class ProjectConfig
     }
 
     /**
-     * A missing composer.json is legitimate (lockrot only needs composer.lock), but a composer.json
-     * that is present and unreadable or malformed is an error worth reporting rather than silently
-     * treating as "no direct requires, no extra.lockrot config" — same contract as LockFile.
+     * A missing composer.json gives an empty config, because lockrot needs only the lock. An
+     * unreadable or malformed one is a ConfigException, never an empty config.
      */
     public static function fromFile(string $path): self
     {
@@ -108,9 +107,9 @@ final class ProjectConfig
     }
 
     /**
-     * The schema's error followed by the unknown-key lines a valid config would have printed as
-     * warnings. A misspelt required key (`reasn`) fails the schema as a missing `reason`; the line
-     * naming `reasn` and suggesting `reason` is what says why.
+     * The schema's error, then the unknown-key lines that a valid config prints as warnings. A
+     * misspelt required key (`reasn`) fails the schema as a missing `reason`, and its unknown-key
+     * line says why.
      *
      * @param array<string, mixed> $lockrotExtra
      */
@@ -160,17 +159,15 @@ final class ProjectConfig
     }
 
     /**
-     * The project's own `name` from composer.json, or null where it has none — an application is
-     * not required to name itself. It is what says which project a report is about, since the lock
-     * is called composer.lock in every project there is: always the report's `run.root_package`,
-     * and its `run.project` too unless `extra.lockrot.project` names the project something else.
+     * The `name` from composer.json, or null when it has none. It is the report's `run.root_package`
+     * and, unless `extra.lockrot.project` is set, its `run.project`
+     * (docs/schema.md#what-the-run-was-told).
      */
     public function name(): ?string
     {
         return $this->name;
     }
 
-    /** The repositories this manifest configures, which say where a lock entry without a notification-url came from. */
     public function repositories(): ConfiguredRepositories
     {
         return $this->repositories;
@@ -182,11 +179,10 @@ final class ProjectConfig
     }
 
     /**
-     * The project's own `require.php` as written — `>=7.2.5`, `^8.2` — or null where the manifest
-     * makes no promise. It is the lowest PHP the project says it runs on, which is what a branch
-     * S8 tells the project to follow has to admit ({@see \Lockrot\Signal\PhpFloor}). Composer
-     * itself never resolves against it (only against the platform), so a project can lock what
-     * its own requirement forbids; the report's job is to not suggest doing so.
+     * The project's own `require.php` as written (`>=7.2.5`, `^8.2`), or null when the manifest
+     * makes no promise. A branch that S8 tells the project to follow must admit it
+     * ({@see \Lockrot\Signal\PhpFloor}, docs/verdicts.md#within-reach). Composer resolves only
+     * against the platform, so a lock can hold what the requirement forbids.
      */
     public function requirePhp(): ?string
     {

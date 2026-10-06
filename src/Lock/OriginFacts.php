@@ -7,8 +7,9 @@ namespace Lockrot\Lock;
 use Composer\Package\PackageInterface;
 
 /**
- * The lock entry's own record of where it was fetched from, as {@see PackageOrigin} reads it. Kept
- * in memory only: these URLs can carry credentials or machine paths, and none of them is written out.
+ * The lock entry's record of where it was fetched from, as {@see PackageOrigin} reads it. These
+ * URLs can carry credentials or machine paths, so keep them in memory and never write them out
+ * (docs/schema.md#what-a-report-says-about-your-repositories).
  *
  * @internal
  */
