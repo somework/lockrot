@@ -203,7 +203,8 @@ final class LockFileTest extends TestCase
 
     public function testInvalidJsonThrows(): void
     {
-        $path = sys_get_temp_dir().'/lockrot-bad-'.uniqid('', true).'.lock';
+        $path = tempnam(sys_get_temp_dir(), 'lockrot-bad-');
+        self::assertIsString($path);
         file_put_contents($path, '{not json');
         try {
             $this->expectException(ConfigException::class);

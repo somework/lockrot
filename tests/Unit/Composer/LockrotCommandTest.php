@@ -793,7 +793,7 @@ final class LockrotCommandTest extends TestCase
 
     public function testMalformedComposerJsonIsExit2(): void
     {
-        $dir = sys_get_temp_dir().'/lockrot-badjson-'.uniqid('', true);
+        $dir = sys_get_temp_dir().'/lockrot-badjson-'.bin2hex(random_bytes(8));
         mkdir($dir);
         file_put_contents($dir.'/composer.json', '{broken');
         chdir($dir);
@@ -810,7 +810,7 @@ final class LockrotCommandTest extends TestCase
 
     public function testInvalidLockrotSchemaIsExit2(): void
     {
-        $dir = sys_get_temp_dir().'/lockrot-badschema-'.uniqid('', true);
+        $dir = sys_get_temp_dir().'/lockrot-badschema-'.bin2hex(random_bytes(8));
         mkdir($dir);
         file_put_contents($dir.'/composer.json', json_encode(['extra' => ['lockrot' => ['fail-on' => 'dead']]]));
         chdir($dir);
@@ -1363,7 +1363,7 @@ final class LockrotCommandTest extends TestCase
 
     private function tempDir(string $prefix): string
     {
-        $dir = sys_get_temp_dir().'/'.$prefix.uniqid('', true);
+        $dir = sys_get_temp_dir().'/'.$prefix.bin2hex(random_bytes(8));
         if (!mkdir($dir, 0777, true) && !is_dir($dir)) {
             throw new \RuntimeException('cannot create temp dir: '.$dir);
         }

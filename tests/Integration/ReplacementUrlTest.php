@@ -63,7 +63,7 @@ final class ReplacementUrlTest extends TestCase
 
     public function testAReplacementIsLinkedWhereTheRegistryThatNamedItKeepsItsPage(): void
     {
-        $this->dir = sys_get_temp_dir().'/lockrot-replacement-'.uniqid('', true);
+        $this->dir = sys_get_temp_dir().'/lockrot-replacement-'.bin2hex(random_bytes(8));
         self::assertTrue(mkdir($this->dir));
         $entry = static fn (string $name, string $notificationUrl, ?string $abandonedInLock = null): array => array_filter([
             'name' => $name,

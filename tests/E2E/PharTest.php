@@ -147,7 +147,7 @@ final class PharTest extends TestCase
      */
     private function projectWithAClassScript(): array
     {
-        $dir = sys_get_temp_dir().'/lockrot-script-class-'.uniqid('', true);
+        $dir = sys_get_temp_dir().'/lockrot-script-class-'.bin2hex(random_bytes(8));
         if (!mkdir($dir.'/src', 0755, true) && !is_dir($dir.'/src')) {
             throw new \RuntimeException('cannot create temp dir: '.$dir);
         }
@@ -596,7 +596,7 @@ final class PharTest extends TestCase
 
     private function freshDir(): string
     {
-        $dir = sys_get_temp_dir().'/lockrot-selfupdate-e2e-'.uniqid('', true);
+        $dir = sys_get_temp_dir().'/lockrot-selfupdate-e2e-'.bin2hex(random_bytes(8));
         if (!mkdir($dir, 0755, true) && !is_dir($dir)) {
             throw new \RuntimeException('cannot create temp dir: '.$dir);
         }
@@ -621,7 +621,7 @@ final class PharTest extends TestCase
         if (self::$server !== null) {
             return self::$server;
         }
-        $docroot = sys_get_temp_dir().'/lockrot-release-server-'.uniqid('', true);
+        $docroot = sys_get_temp_dir().'/lockrot-release-server-'.bin2hex(random_bytes(8));
         if (!mkdir($docroot, 0755, true) && !is_dir($docroot)) {
             throw new \RuntimeException('cannot create temp dir: '.$docroot);
         }
@@ -695,7 +695,7 @@ final class PharTest extends TestCase
         if (self::$composerHome !== null) {
             return self::$composerHome;
         }
-        $home = sys_get_temp_dir().'/lockrot-composer-home-'.uniqid('', true);
+        $home = sys_get_temp_dir().'/lockrot-composer-home-'.bin2hex(random_bytes(8));
         if (!mkdir($home, 0755, true) && !is_dir($home)) {
             throw new \RuntimeException('cannot create temp dir: '.$home);
         }

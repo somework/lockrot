@@ -46,7 +46,7 @@ final class GitlabFormatterTest extends TestCase
     /** acme/abandoned is on line 4 of the lock written here, acme/silent on line 8. */
     private function lockPath(string $name = 'composer.lock'): string
     {
-        $dir = sys_get_temp_dir().'/lockrot-gitlab-'.uniqid('', true);
+        $dir = sys_get_temp_dir().'/lockrot-gitlab-'.bin2hex(random_bytes(8));
         if (!mkdir($dir, 0777, true) && !is_dir($dir)) {
             throw new \RuntimeException('cannot create temp dir: '.$dir);
         }
@@ -167,7 +167,7 @@ final class GitlabFormatterTest extends TestCase
      */
     private function shiftedLockPath(): string
     {
-        $dir = sys_get_temp_dir().'/lockrot-gitlab-'.uniqid('', true);
+        $dir = sys_get_temp_dir().'/lockrot-gitlab-'.bin2hex(random_bytes(8));
         if (!mkdir($dir, 0777, true) && !is_dir($dir)) {
             throw new \RuntimeException('cannot create temp dir: '.$dir);
         }
