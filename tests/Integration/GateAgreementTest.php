@@ -38,6 +38,7 @@ use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Verdict;
 use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 
@@ -54,8 +55,11 @@ use PHPUnit\Framework\TestCase;
  * this sweep would push every line of the gate past it. GateTest and ReportTest kill those mutants.
  *
  * @coversNothing
+ *
+ * @group covers-nothing
  */
 #[CoversNothing]
+#[Group('covers-nothing')]
 final class GateAgreementTest extends TestCase
 {
     use ValidatesJsonSchemas;
