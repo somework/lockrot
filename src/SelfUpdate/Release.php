@@ -4,16 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\SelfUpdate;
 
-/**
- * One published GitHub release of lockrot, reduced to what self-update needs: the version to
- * compare against {@see \Lockrot\Version::STRING}, the tag it came from (for messages), and the
- * three asset URLs to download — the archive, its sha256 and its signature.
- *
- * Built only by {@see ReleaseLocator}, which chooses it from the release list and is where the
- * validation lives; this is an immutable carrier, not a parser.
- *
- * @internal
- */
+/** @internal */
 final class Release
 {
     private string $version;
@@ -31,16 +22,12 @@ final class Release
         $this->signatureUrl = $signatureUrl;
     }
 
-    /**
-     * The version the tag names, `major.minor.patch`: Composer's normalised form without its fourth
-     * number when that is 0, whatever spelling the tag used (`v0.13`, `V0.13.0` are both 0.13.0).
-     */
+    /** The version as `major.minor.patch`, whatever spelling the tag used (`v0.13` is 0.13.0). */
     public function version(): string
     {
         return $this->version;
     }
 
-    /** The tag exactly as GitHub published it, e.g. `v0.2.0`. */
     public function tag(): string
     {
         return $this->tag;
@@ -56,7 +43,6 @@ final class Release
         return $this->checksumUrl;
     }
 
-    /** The `lockrot.phar.sig.json` of the release, see {@see ReleaseSignatureVerifier}. */
     public function signatureUrl(): string
     {
         return $this->signatureUrl;

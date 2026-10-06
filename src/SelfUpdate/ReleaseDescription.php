@@ -7,35 +7,20 @@ namespace Lockrot\SelfUpdate;
 use Lockrot\Exception\ConfigException;
 
 /**
- * What a release's `lockrot.phar.meta.json` says about it — the lowest PHP its archive runs on,
- * and the fingerprint of the self-update key that signed its `lockrot.phar.sig.json` — so
- * {@see ReleaseLocator} can pass over a release this machine cannot run, or this archive cannot
- * verify, without downloading it.
- *
- * The file is written by the release workflow (`build/selfupdate-signature.php describe`) from
- * build/phar/composer.json and the key the release was actually signed with, and is published from
- * 0.13.0 on. It is not signed: it decides only which release is tried. The checksum and the
- * signature still decide whether one is installed, so a doctored description cannot get an archive
- * installed that the release key did not sign. It can hold an update back, and it can understate the
- * floor: a signed release this PHP cannot run is then installed and refuses to start, and has to be
- * replaced by hand. A floor that is not plain `major.minor.patch` — what the workflow always writes —
- * is never compared at all ({@see phpFloor()}), so a doctored spelling cannot slip past the check.
+ * What a release's `lockrot.phar.meta.json` says: its lowest PHP and the fingerprint of the key
+ * that signed it. The file is unsigned and decides only which release is tried: the checksum and
+ * the signature decide whether one is installed. A floor that is not plain `major.minor.patch` is
+ * never compared ({@see phpFloor()}). What a doctored file can do:
+ * SECURITY.md#how-self-update-trusts-a-release
  *
  * @internal
  */
 final class ReleaseDescription
 {
-    /**
-     * The floor of every release before 0.13.0: build/phar/composer.json has pinned the platform to
-     * PHP 7.4.0 since the first commit, and CI runs each archive once on PHP 7.4.
-     */
+    /** The floor of a release without a description: `build/phar/composer.json` pins it. */
     public const UNDESCRIBED_PHP_FLOOR = '7.4.0';
 
-    /**
-     * The one spelling of a floor that is read: `major.minor.patch`, digits only. No `v`, no fourth
-     * number, no build metadata, nothing around it — the workflow writes nothing else, and the value
-     * is also printed, so it must not carry anything a terminal would act on.
-     */
+    /** The value is printed, so lockrot reads only digits: a terminal can act on nothing else. */
     public const PHP_FLOOR_PATTERN = '/^\d+\.\d+\.\d+$/D';
 
     private ?string $phpFloor;
@@ -47,20 +32,15 @@ final class ReleaseDescription
         $this->signingKey = $signingKey;
     }
 
-    /**
-     * A release from before descriptions: the 7.4 floor it was built for, and no claim about its
-     * key, so the signature check alone decides — as it did before descriptions existed.
-     */
     public static function undescribed(): self
     {
         return new self(self::UNDESCRIBED_PHP_FLOOR, null);
     }
 
     /**
-     * Only the one shape is read — `{"php": "<major.minor.patch>", "selfupdate-key": "sha256:<64 hex>"}`,
-     * anything more ignored. A document without that shape is an error naming where it came from,
-     * never a guess: a description that cannot be read cannot say the release is fit to try. A floor
-     * that is a string in another spelling is read as no floor ({@see phpFloor()}).
+     * Reads only `{"php": "<major.minor.patch>", "selfupdate-key": "sha256:<64 hex>"}` and ignores
+     * other members. Any other document is an error naming $url: a description that cannot be read
+     * cannot say the release is fit to try. A `php` string in another spelling is no floor.
      *
      * @throws ConfigException
      */
@@ -77,16 +57,15 @@ final class ReleaseDescription
     }
 
     /**
-     * The lowest PHP version the release's archive runs on, `major.minor.patch` (e.g. `7.4.0`), or
-     * null when the description spells it any other way: such a release is not installed, since its
-     * real floor is unknown.
+     * `major.minor.patch`, or null when the description spells the floor any other way, because the
+     * real floor is unknown then.
      */
     public function phpFloor(): ?string
     {
         return $this->phpFloor;
     }
 
-    /** `sha256:<hex>` of the key that signed the release, or null when the release does not say. */
+    /** `sha256:<hex>`, or null when the release names no key. */
     public function signingKey(): ?string
     {
         return $this->signingKey;

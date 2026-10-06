@@ -5,23 +5,13 @@ declare(strict_types=1);
 namespace Lockrot\SelfUpdate;
 
 /**
- * Opens the downloaded file as a PHP archive, the same check Composer's own self-update runs before
- * it swaps the file in (`Composer\Command\SelfUpdateCommand::validatePhar()`).
+ * Opens the downloaded file as a PHP archive, as Composer's
+ * `SelfUpdateCommand::validatePhar()` does, with two differences.
  *
- * Two deliberate differences from Composer's version:
- *
- * - Composer returns early (treating the archive as good) when `phar.readonly` is On, which is the
- *   default, so in practice its check rarely runs. lockrot always runs it: opening an existing
- *   archive is a read, which `phar.readonly` does not restrict.
- * - Only `UnexpectedValueException` is turned into a message. Composer also catches `PharException`,
- *   but `Phar::__construct()` is not declared to throw it, so PHPStan max rejects that catch as
- *   unreachable. Anything else propagates, exactly as Composer lets it: {@see PharUpdater::install()}
- *   has already removed the temporary file by then and the running archive is untouched, so the
- *   command reports the failure rather than treating an unknown fault as "the download is damaged".
- *
- * The file being checked is a copy of an archive whose alias may already be mapped by the running
- * PHAR. That is not a conflict: PHP only rejects a duplicate alias when it is being registered, not
- * when an archive is opened for reading.
+ * Composer skips the check when `phar.readonly` is On, which is the default. lockrot always runs
+ * it, because opening an existing archive is a read that `phar.readonly` does not restrict. The
+ * catch covers only `UnexpectedValueException`: `Phar::__construct()` does not declare
+ * `PharException`, and PHPStan rejects that catch. Any other exception propagates.
  *
  * @internal
  */
