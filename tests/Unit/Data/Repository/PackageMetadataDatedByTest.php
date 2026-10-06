@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * A split package dated by its monorepo parent: illuminate/contracts by laravel/framework. The
- * child's tags pile up on one commit and are handed over undated by fromPackages(); the parent's
+ * child's tags pile up on one commit and are handed over undated by fromPackages(). The parent's
  * tag for the same version is dated by its release, and `replace` says the versions are the same.
  */
 final class PackageMetadataDatedByTest extends TestCase
@@ -125,8 +125,8 @@ final class PackageMetadataDatedByTest extends TestCase
     }
 
     /**
-     * The parent dates the branch; what the branch requires stays the child's own. illuminate/contracts
-     * 8.x asks for `^7.3|^8.0` and laravel/framework 8.x for the same plus a dozen extensions, but a
+     * The parent dates the branch. What the branch requires stays the child's own. illuminate/contracts
+     * 8.x asks for `^7.3|^8.0` and laravel/framework 8.x for the same plus extensions, but a
      * split is not obliged to mirror its parent, and the requirement S8 reads is the split's — the
      * package the lock installs.
      */
@@ -271,8 +271,6 @@ final class PackageMetadataDatedByTest extends TestCase
         self::assertSame($polyfill, $polyfill->datedBy($tool));
     }
 
-    // ---- the parent's date per release, for the installed version of a child -------------------
-
     public function testAParentKeepsADatePerStableReleaseAndAnOrdinaryPackageKeepsNone(): void
     {
         $parent = PackageMetadata::fromPackages('laravel/framework', [
@@ -385,7 +383,6 @@ final class PackageMetadataDatedByTest extends TestCase
         ];
     }
 
-    /** A branch the parent cannot date does not stop the ones below it from being dated. */
     public function testABranchTheParentCannotDateDoesNotEndTheWalk(): void
     {
         $child = self::metadata('illuminate/contracts', [
@@ -428,7 +425,6 @@ final class PackageMetadataDatedByTest extends TestCase
         self::assertNull($dated->lastStableDatedBy());
     }
 
-    /** A package that dates its own highest tag keeps its own age, whatever the parent dated below. */
     public function testAPackageThatKnowsItsOwnAgeKeepsIt(): void
     {
         $child = self::metadata('illuminate/contracts', [

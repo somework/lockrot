@@ -111,14 +111,13 @@ final class RepositoryMetadataLoaderTest extends TestCase
 
     /**
      * A single pass over ALL_STABILITIES makes Composer fetch both {name}.json and {name}~dev.json
-     * for every name: 403 requests for these 201 names. The two-pass loader instead fetches the
-     * stable file for every name once, and the dev file only for names with no tagged release — 206
-     * requests for the same 201 names (1 packages.json + 201 stable files + 4 dev-only files).
+     * for every name. The two-pass loader instead fetches the stable file for every name once, and
+     * the dev file only for names with no tagged release.
      */
     public function testFullWallabagLoadRequestsOneFilePerNamePlusDevForTaglessNames(): void
     {
         // Dedicated server, never the shared class-level self::$server: counting requests against
-        // a server other tests have already been hitting would not reflect this load alone.
+        // a server that other tests already hit does not reflect this load alone.
         $server = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK, self::MATOMO_LOCK]);
         $server->start();
         try {
@@ -165,8 +164,8 @@ final class RepositoryMetadataLoaderTest extends TestCase
     }
 
     /**
-     * Only a ComposerRepository can be queried by name, so a path or vcs repository in the list has
-     * to be stepped over rather than end the walk. The second repository here was never started,
+     * Only a ComposerRepository can be queried by name, so a path or vcs repository in the list must
+     * be stepped over rather than end the walk. The second repository here was never started,
      * so every name comes back failed — which can only happen if the walk reached it at all.
      */
     public function testARepositoryThatIsNotAComposerRepositoryIsSteppedOver(): void
@@ -184,7 +183,6 @@ final class RepositoryMetadataLoaderTest extends TestCase
         self::assertArrayHasKey('phpzip/phpzip', $batch->failed());
     }
 
-    /** Every repository adds to what the earlier ones resolved; none of them replaces it. */
     public function testEachRepositoryAddsToWhatTheEarlierOnesResolved(): void
     {
         $first = $this->syntheticServer(['one/pkg' => [$this->p2Version('one/pkg', '1.0.0')]]);
@@ -222,14 +220,9 @@ final class RepositoryMetadataLoaderTest extends TestCase
     }
 
     /**
-     * Regression test for a real hang: php -S writes one access-log line per request to stderr, and
-     * Symfony\Process only drains that pipe while something calls back into the Process object
-     * (which the startup poll loop does, but nothing does afterward). A single ~200-package load is
-     * already ~1000 requests; three of them back-to-back through the one shared loader/server this
-     * class builds in setUpBeforeClass() is ~3000 requests, which filled the pipe and wedged the
-     * server well before completing. PhpBuiltinServer::start(), which FixtureRepositoryServer runs
-     * on, redirects the child's stdout/stderr to a file instead of a pipe, which removes the pipe to
-     * fill in the first place.
+     * `php -S` writes one access-log line per request to stderr, and a pipe that nobody drains
+     * fills and wedges the server. PhpBuiltinServer::start() redirects the output to a file. Three
+     * full loads through the one shared server send enough requests to fill such a pipe.
      */
     public function testThreeConsecutiveFullWallabagLoadsThroughSharedServerAllResolve(): void
     {
@@ -246,7 +239,7 @@ final class RepositoryMetadataLoaderTest extends TestCase
     // memory_get_peak_usage(true) is a whole-process high-water mark that PHPUnit never resets
     // between tests, so this assertion is order-dependent on whatever else already ran earlier in
     // the same process (same root cause as AcceptanceTest::testWallabag's identical isolation).
-    // Running this one test in its own process makes the peak reflect only this load again; that
+    // Running this one test in its own process makes the peak reflect only this load. That
     // process never runs setUpBeforeClass(), so this test builds its own single-use server instead
     // of reaching for the class-level self::$server/self::$loader.
     /** @runInSeparateProcess */
@@ -290,7 +283,7 @@ final class RepositoryMetadataLoaderTest extends TestCase
     public function testNameFoundWithNoVersionsIsTreatedAsFailed(): void
     {
         // A repository whose only envelopes for this name each have an entry (so Composer marks
-        // the name as "found") but an empty version list — e.g. every version filtered out, or the
+        // the name as "found") but an empty version list — such as every version filtered out, or the
         // p2 entry itself is empty. There is nothing to build a PackageMetadata from, so this must
         // land in failed(), not metadata() or notFound(). Both the stable and the ~dev file are
         // empty here (a package registered with no releases and no branches at all), so the loader
@@ -341,13 +334,12 @@ final class RepositoryMetadataLoaderTest extends TestCase
 
     public function testOfflineWithColdCacheFailsEveryNameWithNetworkDisabledReason(): void
     {
-        // Warm just the repository's root metadata online first (any successful load does that),
-        // but never touch the two names queried below — those stay cold at the per-package level.
+        // Warm just the repository's root metadata online first (any successful load does that).
+        // The two names that the offline load queries stay cold at the per-package level.
         // Composer\Repository\ComposerRepository::asyncFetchFile() (used for the per-package p2
         // file, unlike the root file's own synchronous fetch) turns the "network disabled" transport
         // error into a synthetic 404 when it has no last-modified date for that file to revalidate
-        // against, so these come back as plain `notFound` from Composer's own API — not trustworthy
-        // while offline, hence the loader's own reclassification into failed().
+        // against. That `notFound` is not trustworthy offline, so the loader reclassifies it into failed().
         $server = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK]);
         $server->start();
         try {
@@ -498,8 +490,6 @@ final class RepositoryMetadataLoaderTest extends TestCase
 
     public function testOneFailingChunkLeavesTheOtherChunksResolvable(): void
     {
-        // Names are queried in chunks of CHUNK_SIZE; a chunk that throws must fail only its own
-        // names, not the whole load.
         $server = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK]);
         $server->start();
         try {
@@ -596,14 +586,11 @@ final class RepositoryMetadataLoaderTest extends TestCase
     }
 
     /**
-     * Real-fixture counterpart to testDevOnlyBranchAliasIsUnwrappedAndCountedOnce(): wallabag/rulerz
-     * has no tagged release at all (its `wallabag/rulerz.json` stable file lists zero versions for
-     * the name), so it resolves entirely through the loader's dev-only pass against the recorded
-     * `wallabag/rulerz~dev.json`. That file's `packages["wallabag/rulerz"]` has 2 entries
-     * (dev-master, dev-support-symfony-7), and dev-master carries `extra.branch-alias`
-     * (dev-master => 1.0.x-dev). ComposerRepository::loadPackages() unwraps that into a separate
-     * AliasPackage entry alongside the package it aliases, so without the loader's own dedup this
-     * would count 3 releases instead of 2.
+     * Real-fixture counterpart to testDevOnlyBranchAliasIsUnwrappedAndCountedOnce().
+     * wallabag/rulerz has no tagged release, so it resolves through the loader's dev-only pass
+     * against the recorded `wallabag/rulerz~dev.json`. Its dev-master carries `extra.branch-alias`,
+     * which ComposerRepository::loadPackages() unwraps into a separate AliasPackage entry. Without
+     * the loader's own dedup the release counts twice.
      */
     public function testRealDevOnlyPackageWithBranchAliasIsCountedOnce(): void
     {
@@ -683,14 +670,11 @@ final class RepositoryMetadataLoaderTest extends TestCase
     }
 
     /**
-     * Regression test: a tagless name (wallabag/rulerz) that lands in pass 1's $needDev *before*
-     * the budget expires must not be silently dropped. $fake returns 100.0 for its first 2 calls
-     * (construction, then the isPast() check before chunk 1) and 200.0 from the 3rd call onward
-     * (the isPast() check before chunk 2), so chunk 1 (10 names, including wallabag/rulerz as its
-     * last name) is processed normally and chunk 2 (5 names) never starts. wallabag/rulerz has no
-     * tagged release, so pass 1's stable-file query finds it with zero versions and would normally
-     * hand it to pass 2 — but pass 2 never runs here, so it must be reported failed with
-     * BUDGET_REASON (never asked for its dev file) rather than vanishing into notFound().
+     * A tagless name (wallabag/rulerz) that lands in pass 1's $needDev before the budget expires
+     * must not be dropped. $fake returns 100.0 for its first 2 calls (construction, then the
+     * isPast() check before chunk 1) and 200.0 after, so chunk 1 (10 names, with wallabag/rulerz
+     * last) is processed and chunk 2 (5 names) never starts. Pass 2 never runs, so the name must
+     * be reported failed with BUDGET_REASON, not vanish into notFound().
      */
     public function testDeadlinePassingMidPassOneLeavesATaglessNameFailedNotDropped(): void
     {
@@ -755,7 +739,7 @@ final class RepositoryMetadataLoaderTest extends TestCase
              */
             public function loadPackages(array $packageNameMap, array $acceptableStabilities, array $stabilityFlags, array $alreadyLoaded = [])
             {
-                // The map is name => constraint-or-null, so isset() would miss every entry.
+                // The map is name => constraint-or-null, so isset() misses every entry.
                 if (\array_key_exists($this->failFor, $packageNameMap)) {
                     throw new \RuntimeException($this->message);
                 }
@@ -803,7 +787,7 @@ final class RepositoryMetadataLoaderTest extends TestCase
     }
 
     /**
-     * One p2 version entry. `version_normalized` is deliberately left out so Composer's own
+     * One p2 version entry. `version_normalized` is left out so Composer's own
      * VersionParser derives it, which is what keeps `dev-*` entries valid.
      *
      * @param array<string, mixed> $overrides

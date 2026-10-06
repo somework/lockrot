@@ -91,7 +91,7 @@ final class MonorepoParentsTest extends TestCase
         }
     }
 
-    /** The bundled snapshot is what the parents really replace; bin/refresh-monorepo-parents rewrites it. */
+    /** The bundled snapshot is what the parents really replace, and bin/refresh-monorepo-parents rewrites it. */
     public function testTheBundledSnapshotCarriesTheComponentsEachMonorepoIsKnownFor(): void
     {
         $parents = MonorepoParents::load();
@@ -196,8 +196,8 @@ final class MonorepoParentsTest extends TestCase
 
     /**
      * The batch is scanned for a package whose `replace` names the child, not for the first package
-     * that is not the child: a tool listed before the monorepo must not be taken for the parent,
-     * which would leave the child undated.
+     * that is not the child. A tool listed before the monorepo must not be taken for the parent,
+     * which leaves the child undated.
      */
     public function testAPackageThatDoesNotReplaceTheChildIsSteppedOverEvenWhenItComesFirst(): void
     {

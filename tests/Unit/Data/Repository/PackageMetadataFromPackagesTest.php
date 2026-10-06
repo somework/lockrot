@@ -113,7 +113,7 @@ final class PackageMetadataFromPackagesTest extends TestCase
      * monolog: 1.x requires `>=5.3.0`, 2.x `>=7.2`, 3.x `>=8.1`. Each branch carries the php requirement
      * of the release it names — its newest dated one — so S8 can tell which higher branch a project
      * can move onto ({@see \Lockrot\Signal\PhpFloor}). A branch with no dated release carries its
-     * highest tag's; a release that requires no PHP carries null.
+     * highest tag's. A release that requires no PHP carries null.
      */
     public function testEachBranchCarriesThePhpRequirementOfTheReleaseItNames(): void
     {
@@ -144,7 +144,7 @@ final class PackageMetadataFromPackagesTest extends TestCase
         }
     }
 
-    /** php-http/promise: 1.3.1 (2024-03) is the highest 1.x tag, 1.2.2 (2025-11) its last release. */
+    /** php-http/promise: the highest 1.x tag is older than the branch's last release. */
     public function testTheNewestDatedReleaseOnABranchWinsOverAHigherOlderOne(): void
     {
         $higherButOlderDate = $this->load(['name' => 'a/b', 'version' => '1.5.0', 'time' => '2020-01-01T00:00:00+00:00']);
@@ -158,7 +158,6 @@ final class PackageMetadataFromPackagesTest extends TestCase
         }
     }
 
-    /** As for the package's last release: two releases on one branch with the same time keep the first one seen. */
     public function testTwoReleasesOnABranchWithTheSameTimeKeepTheFirstOneSeen(): void
     {
         $first = $this->load(['name' => 'a/b', 'version' => '1.0.0', 'time' => '2021-01-01T00:00:00+00:00']);
@@ -183,7 +182,7 @@ final class PackageMetadataFromPackagesTest extends TestCase
         }
     }
 
-    /** illuminate/macroable 10.x on Packagist: 112 of 115 tags carry no time. The branch keeps its newest dated release, but the highest tag says it is undated. */
+    /** illuminate/macroable 10.x on Packagist: most tags carry no time. The branch keeps its newest dated release, but the highest tag says it is undated. */
     public function testAnUndatedHighestTagIsReportedAsSuchNextToTheNewestDatedRelease(): void
     {
         $undatedHighest = $this->load(['name' => 'a/b', 'version' => 'v10.49.0']);
@@ -198,8 +197,8 @@ final class PackageMetadataFromPackagesTest extends TestCase
     }
 
     /**
-     * illuminate/macroable 10.x: 83 stable tags point at one commit, and Packagist dates every one of
-     * them 2023-06-05 — the day the directory last changed, not the day v10.49.0 was cut. A highest
+     * illuminate/macroable 10.x: many stable tags point at one commit, and Packagist dates every one
+     * of them by the day the directory last changed, not the day v10.49.0 was cut. A highest
      * tag that shares its commit with another stable tag is dated by no release, so the branch reads
      * as undated, and the package's own age is unknown when its highest tag is such a one.
      */
@@ -238,8 +237,8 @@ final class PackageMetadataFromPackagesTest extends TestCase
     }
 
     /**
-     * `dev-main` sits on the newest tag's commit after every release, and a final is now and then
-     * cut on its release candidate's commit; neither says the tag's date is not the release's.
+     * `dev-main` sits on the newest tag's commit after every release, and a final is sometimes
+     * cut on its release candidate's commit. Neither says the tag's date is not the release's.
      */
     public function testADevBranchOrAPreReleaseOnTheTagsCommitDoesNotMakeItShared(): void
     {
@@ -268,7 +267,7 @@ final class PackageMetadataFromPackagesTest extends TestCase
         self::assertSame(3, PackageMetadata::SHARED_COMMIT_TAGS, 'the threshold the tests above cross with a third tag');
     }
 
-    /** A highest tag that is a pre-release sits on a commit no stable tag counts; its date stands as before. */
+    /** A highest tag that is a pre-release sits on a commit that no stable tag counts, so its date stands. */
     public function testAPreReleaseHighestTagOnItsOwnCommitKeepsItsDate(): void
     {
         $on = static fn (string $version, string $commit): array => ['name' => 'a/b', 'version' => $version, 'time' => '2026-02-01T00:00:00+00:00', 'source' => ['type' => 'git', 'url' => 'https://github.com/a/b.git', 'reference' => $commit]];
@@ -421,8 +420,8 @@ final class PackageMetadataFromPackagesTest extends TestCase
 
     /**
      * The phpstan/phpstan shape: the newest releases carry no `source`, `support.source` names the
-     * live repository, and a few old releases point at a one-off build repository that has since
-     * been archived. The old repository must not be the one asked.
+     * live repository, and a few old releases point at a one-off build repository that is
+     * archived. The old repository must not be the one asked.
      */
     public function testTheNewestReleasesSupportSourceOutranksAnOlderReleasesSource(): void
     {
@@ -490,9 +489,9 @@ final class PackageMetadataFromPackagesTest extends TestCase
     }
 
     /**
-     * The package's age is its highest tag's. With that tag undated, "last release 2026-01-01" would
-     * date the 1.x LTS patch and say nothing about 2.0.0, which may be a day or five years old: the
-     * age is unknown and S2 stays quiet. A dated highest tag reads as before, whatever is undated below it.
+     * The package's age is its highest tag's. With that tag undated, "last release 2026-01-01"
+     * dates the 1.x LTS patch and says nothing about 2.0.0, which can be a day or five years old: the
+     * age is unknown and S2 stays quiet. A dated highest tag sets the age, whatever is undated below it.
      */
     public function testAnUndatedHighestTagLeavesThePackagesLastReleaseUnknown(): void
     {
@@ -509,7 +508,7 @@ final class PackageMetadataFromPackagesTest extends TestCase
         self::assertSame('2.0.1', $known->lastStableVersion());
     }
 
-    /** An empty `source` URL is no repository; the release's `support.source` is read instead, and a mistyped one is nothing. */
+    /** An empty `source` URL is no repository. The release's `support.source` is read instead, and a mistyped one is nothing. */
     public function testAnEmptySourceUrlFallsBackToSupportSourceAndAMistypedSupportSourceToNothing(): void
     {
         $empty = new CompletePackage('a/b', '1.0.0.0', '1.0.0');

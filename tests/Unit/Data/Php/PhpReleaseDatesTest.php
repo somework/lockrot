@@ -57,7 +57,7 @@ final class PhpReleaseDatesTest extends TestCase
 
     /**
      * A GA date is a calendar day read as midnight UTC. Reading it in the machine's own timezone
-     * instead would move every PHP-version age by up to a day depending on where the run happens.
+     * instead moves every PHP-version age by up to a day, depending on where the run happens.
      */
     public function testGaDatesAreReadAsUtcWhateverTheMachineTimezone(): void
     {
