@@ -41,6 +41,7 @@ final class SortTest extends TestCase
         yield 'finished and ok as one group: by name' => [self::graded('vendor/a', []), self::graded('vendor/b', [Signal::S2], [], self::entry('vendor/b'))];
         yield 'ok and finished as one group: by name' => [self::graded('vendor/a', [Signal::S2], [], self::entry('vendor/a')), self::graded('vendor/b', [])];
         yield 'in one band, the security points first' => [self::graded('vendor/b', [], [Score::advisory('PKSA-1', 'high', 'update')]), self::graded('vendor/a', [Signal::S8], [Score::advisory('PKSA-2', 'low', 'update')])];
+        yield 'the security points after the dev halving' => [self::graded('vendor/a', [], [Score::advisory('PKSA-1', 'medium', 'update')]), self::graded('vendor/b', [], [Score::advisory('PKSA-2', 'high', 'update')], null, true, null, true)];
         yield 'with equal security points, the higher score first' => [self::graded('vendor/b', [Signal::S8, Signal::S5]), self::graded('vendor/a', [Signal::S8])];
         yield 'a half point counts' => [self::graded('vendor/b', [Signal::S8, Signal::S5], [], null, true, ['vendor/root', 'vendor/b'], true), self::graded('vendor/a', [Signal::S8], [], null, true, ['vendor/root', 'vendor/a'], true)];
         yield 'with an equal score, direct first' => [self::graded('vendor/b', [Signal::S2]), self::graded('vendor/a', [Signal::S8], [], null, true, ['vendor/root', 'vendor/a'])];

@@ -66,7 +66,10 @@ def main(argv):
     reports = []
     for path in paths:
         name = path[len(WATCH):-len('.json')]
-        reports.append(reduce_report(name, json.loads(git(checkout, 'show', commit + ':' + path))))
+        try:
+            reports.append(reduce_report(name, json.loads(git(checkout, 'show', commit + ':' + path))))
+        except (KeyError, TypeError, ValueError) as error:
+            raise SystemExit('%s at %s is not a lockrot.dev report page: %r' % (path, commit, error))
     floor = {
         'generated_from': {'repository': REPOSITORY, 'commit': commit, 'path': WATCH, 'tool': 'tools/corpus/floor.py'},
         'reports': reports,
