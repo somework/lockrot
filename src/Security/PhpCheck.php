@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Lockrot\Security;
 
+use Composer\Semver\Intervals;
+use Composer\Semver\VersionParser;
 use Lockrot\Signal\PhpFloor;
 
 /**
  * What a release needs from PHP, and whether the project's `require.php` and the target admit it
- * (`php_check` of SPEC-0.14 5.3). A null answer means lockrot could not compare, never "no".
+ * (`php_check`). A null answer means lockrot could not compare, never "no".
  *
  * @internal
  */
@@ -43,15 +45,37 @@ final class PhpCheck
     {
         $allows = $floor->admitsProject($php);
         $project = $floor->lowestAsString();
-        $release = $php === null ? null : PhpFloor::pointOf($php);
+        $release = $allows === false && $php !== null && $project !== null ? self::pointAbove($php, $project) : null;
         $raiseTo = null;
         $raiseSize = null;
-        if ($project !== null && $release !== null && version_compare($release, $project, '>')) {
+        if ($release !== null) {
             $raiseTo = '>='.preg_replace('/\.0$/', '', $release);
             $raiseSize = self::size($project, $release);
         }
 
         return new self($php, $allows, $floor->admitsTarget($php), $raiseTo, $raiseSize);
+    }
+
+    /**
+     * The lowest point of $php above the project's point. A disjunction such as `7.1.* || >=8.1`
+     * starts below the project's point and admits it nowhere, so its first range above it counts.
+     */
+    private static function pointAbove(string $php, string $project): ?string
+    {
+        try {
+            $intervals = Intervals::get((new VersionParser())->parseConstraints($php))['numeric'];
+        } catch (\UnexpectedValueException $e) {
+            return null;
+        }
+        foreach ($intervals as $interval) {
+            $start = $interval->getStart();
+            $point = PhpFloor::pointOf($start->getOperator().$start->getVersion());
+            if ($point !== null && version_compare($point, $project, '>')) {
+                return $point;
+            }
+        }
+
+        return null;
     }
 
     /** @return self::MAJOR|self::MINOR|self::PATCH */

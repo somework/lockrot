@@ -200,7 +200,7 @@ final class DependencyGraphTest extends TestCase
 
     /**
      * wallabag requires ocramius/proxy-manager, and its lock holds friendsofphp/proxy-manager-lts,
-     * which replaces it. RotDepthTest reuses this fixture.
+     * which replaces it.
      */
     public function testARootRequireOfAReplacedNameMakesTheReplacerDirect(): void
     {
@@ -229,6 +229,23 @@ final class DependencyGraphTest extends TestCase
         self::assertSame(['foo/bar'], $graph->shortestChain('foo/bar'));
         self::assertSame(['foo/bar', 'vendor/dep'], $graph->shortestChain('vendor/dep'));
         self::assertSame([ProjectConfig::REQUIRE], $graph->namedIn('foo/bar'));
+    }
+
+    /** A require-dev name that a dev package carries does not move to a prod provider without `--dev`. */
+    public function testNamedInDoesNotDependOnDev(): void
+    {
+        $lock = LockFile::fromArray([
+            'packages' => [
+                ['name' => 'vendor/impl', 'version' => '1.0.0', 'provide' => ['vendor/iface' => '1.0.0']],
+                ['name' => 'app/x', 'version' => '1.0.0', 'require' => ['vendor/impl' => '^1']],
+            ],
+            'packages-dev' => [['name' => 'vendor/iface', 'version' => '1.0.0']],
+        ]);
+        $project = ProjectConfig::fromArray(['require' => ['app/x' => '^1'], 'require-dev' => ['vendor/iface' => '^1']]);
+
+        foreach ([true, false] as $includeDev) {
+            self::assertSame([], DependencyGraph::fromLock($lock, $project, $includeDev)->namedIn('vendor/impl'), $includeDev ? 'with dev' : 'without dev');
+        }
     }
 
     /** Both sections are read whatever `--dev` says, in the order require, require-dev. */

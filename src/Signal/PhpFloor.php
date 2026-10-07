@@ -53,7 +53,6 @@ final class PhpFloor
      * The project's lowest PHP as the stable point that every project comparison checks, written
      * `MAJOR.MINOR.PATCH`: `>=8.2` gives `8.2.0`, `>=7.4.0-RC1` gives `7.4.0`, `>7.1` gives
      * `7.1.1`. Null with no `require.php`, no lower bound (`*`, `<8`) or an unreadable one.
-     * See SPEC-0.14 5.3 `run.project_php_lowest`.
      */
     public function lowestAsString(): ?string
     {
@@ -158,7 +157,7 @@ final class PhpFloor
     /**
      * Correct only for a $php that admits none of $floor: an admitting $php can read as `skips`.
      * The floor is the target minor (`>=8.4.0.0-dev <8.5.0.0-dev`) or the project's point
-     * (`== 8.2.0.0-dev`). Both include their lower bound, and only the target excludes its upper
+     * (`== 8.2.0.0`). Both include their lower bound, and only the target excludes its upper
      * bound.
      */
     private static function side(ConstraintInterface $php, ConstraintInterface $floor): string
@@ -202,7 +201,7 @@ final class PhpFloor
      * The lowest stable `X.Y.Z` that a php constraint admits by its lower bound, as
      * {@see lowestAsString()} reads `require.php`. An exclusive bound, or one with a non-zero
      * fourth segment, admits no `X.Y.Z` of its own, so the point is the next patch. Null with no
-     * lower bound or an unreadable constraint.
+     * lower bound, an unreadable constraint or a date version such as `>=201001`.
      */
     public static function pointOf(string $constraint): ?string
     {
@@ -216,7 +215,11 @@ final class PhpFloor
         }
         $version = $lower->getVersion();
         $numbers = explode('-', $version)[0];
-        [$major, $minor, $patch, $fourth] = array_map('intval', explode('.', $numbers));
+        $segments = explode('.', $numbers);
+        if (\count($segments) !== 4) {
+            return null;
+        }
+        [$major, $minor, $patch, $fourth] = array_map('intval', $segments);
         if ($fourth !== 0 || (!$lower->isInclusive() && $numbers === $version)) {
             ++$patch;
         }

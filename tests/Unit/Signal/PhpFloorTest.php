@@ -211,7 +211,7 @@ final class PhpFloorTest extends TestCase
     }
 
     /**
-     * The stable point that every project comparison reads (SPEC 5.3, items/C67.md 3.5): an
+     * The stable point that every project comparison reads: an
      * inclusive bound gives its `X.Y.Z`, an exclusive bound or a non-zero fourth segment the next
      * patch, an exclusive pre-release bound its `X.Y.Z`. No lower bound, or no readable constraint,
      * gives no point.
@@ -250,12 +250,13 @@ final class PhpFloorTest extends TestCase
         yield 'any version' => ['*', null];
         yield 'an upper bound only' => ['<8', null];
         yield 'an unreadable constraint' => ['whatever', null];
+        yield 'a date version' => ['>=201001', null];
         yield 'no require.php' => [null, null];
     }
 
     /**
-     * items/C67.md 3.5: the point moves what a branch row admits only at the edge. The last column
-     * is 0.13's answer, kept to show which rows the point changes.
+     * The point moves what a branch row admits only at the edge. The last column is the answer of
+     * the lower bound as Composer writes it, suffix kept: it shows which rows the point changes.
      *
      * @dataProvider floorPointEdges
      */
@@ -268,7 +269,7 @@ final class PhpFloorTest extends TestCase
         self::assertSame($admits, $floor->missesProject($branchPhp) === null, 'missesProject() reads the same point');
         $parser = new VersionParser();
         $bound = $parser->parseConstraints($requirePhp)->getLowerBound()->getVersion();
-        self::assertSame($before, $parser->parseConstraints($branchPhp)->matches(new Constraint('==', $bound)), 'the 0.13 rule: the bound as written, suffix kept');
+        self::assertSame($before, $parser->parseConstraints($branchPhp)->matches(new Constraint('==', $bound)), 'the lower bound as written, suffix kept');
     }
 
     /** @return iterable<string, array{string, string, bool, bool}> */
@@ -289,8 +290,8 @@ final class PhpFloorTest extends TestCase
     }
 
     /**
-     * The display rows of the floor point, which lockrot-report's display rule reads: a trailing
-     * `.0` patch is dropped when the point is printed, any other patch is kept.
+     * The display rows of the floor point, which lockrot-report's display rule reads: it drops a
+     * trailing `.0` patch when it prints the point and keeps any other patch.
      */
     public function testTheDisplayRowsOfTheFloorPointAreRecorded(): void
     {
