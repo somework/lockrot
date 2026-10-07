@@ -43,10 +43,11 @@ final class ScoreBasis
     }
 
     /**
-     * @param Context $context `maintenance_judged`: the release metadata was read; `advisories_complete`:
-     *                         every advisory feed answered; `liveness_complete`: S2 and S4 were both read;
-     *                         `s3_unread`: no S3 answer; `s8_unread`: S8 cannot date a branch that a
-     *                         tag can land on
+     * @param Context $context `maintenance_judged`: lockrot read the release metadata.
+     *                         `advisories_complete`: every advisory feed answered.
+     *                         `liveness_complete`: lockrot read S2 and S4.
+     *                         `s3_unread`: no S3 answer.
+     *                         `s8_unread`: S8 cannot date a branch that a tag can land on.
      */
     public static function of(FlagSet $flags, string $reach, bool $dev, array $context): self
     {
@@ -113,8 +114,8 @@ final class ScoreBasis
 
     /**
      * Each halving whose fact holds on a score with a term, in application order: reach on
-     * maintenance, then dev on the total. A halving that removes nothing is listed with `before`
-     * equal to `after`.
+     * maintenance, then dev on the total. The list holds a halving that removes nothing, with
+     * `before` equal to `after`.
      *
      * @return list<Modifier>
      */
@@ -207,8 +208,8 @@ final class ScoreBasis
     }
 
     /**
-     * A without[abandoned] row read without S4, beside S2 absent or at high: S4 could still bring back
-     * silent or stale. A without[pinned] row whose tag could be left behind unseen.
+     * True for a without[abandoned] row when lockrot did not read S4 and S2 is absent or at high: S4
+     * can restore silent or stale. True for a without[pinned] row when S8 cannot date the tag's branch.
      */
     private function atLeast(string $flag): bool
     {

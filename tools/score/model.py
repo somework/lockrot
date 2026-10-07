@@ -156,7 +156,7 @@ def score_obj(E, ctx):
 
 
 def accepted_of(E, ctx):
-    """`at_least` is set only on `stale` with S4 or S3 unread. A lookup can add S4 (silent) or S3 (abandoned)."""
+    """Only `stale` with S4 or S3 unread carries `at_least`. A lookup can add S4 (silent) or S3 (abandoned)."""
     acc = []
     for f in E['accepted']:
         E2 = engine(E['flags'], E['cadvs'], E['reach'], E['dev'], accepted=[x for x in E['accept_set'] if x != f], under=E['under'])
@@ -169,7 +169,7 @@ def accepted_of(E, ctx):
 
 
 def without_flags(E, f):
-    """The flag set without the signals that raise f, derived again. Without `abandoned` (S1, S3), S2 and S4 give back
+    """The flag set without the signals that raise f, derived again. Without `abandoned` (S1, S3), S2 and S4 restore
     the liveness word that abandoned hid (`revealed`)."""
     fl = [x for x in E['flags'] if x != f]
     revealed = []

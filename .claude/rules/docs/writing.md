@@ -13,7 +13,7 @@ paths:
 |---|---|---|
 | Evaluator | What does this find that `composer audit` does not, is it worth a try? | README, `docs/index.md` |
 | Developer who triages a finding | Why is this package graded, what do I do? | `verdicts.md`, `baseline.md`, `configuration.md` |
-| Maintainer of a graded package | Which flag graded my package, what clears it? | `verdicts.md` |
+| Maintainer of a graded package | Which flags gave my package its grade, what clears them? | `verdicts.md` |
 | CI owner | Which step fails the build on the right thing, what does each exit code mean? | `ci.md`, `baseline.md` |
 | Integrator | Which fields are stable, where is the schema, which sets can grow? | `schema.md`, `notes.md`, `compatibility.md` |
 | Security reviewer | What does lockrot read, write, contact, and how do I verify the PHAR? | `SECURITY.md`, `phar.md` |

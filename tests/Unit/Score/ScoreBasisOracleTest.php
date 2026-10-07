@@ -101,7 +101,7 @@ final class ScoreBasisOracleTest extends TestCase
      * @param array{floor: int, next: ?string, to_next: ?int} $band
      */
     #[DataProvider('bandEdges')]
-    public function testTheBandOfATotalOnEachSideOfAnEdge(array $flags, array $advisories, string $reach, bool $dev, int $total, bool $roundedDown, array $band): void
+    public function testATotalOnEachSideOfAnEdgeGetsItsBand(array $flags, array $advisories, string $reach, bool $dev, int $total, bool $roundedDown, array $band): void
     {
         $score = self::score($flags, $advisories, $reach, $dev);
 

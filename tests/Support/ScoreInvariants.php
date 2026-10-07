@@ -9,8 +9,8 @@ use Lockrot\Score\ScoreText;
 use Lockrot\Verdict\ScoreModel;
 
 /**
- * The invariants I0 to I17b of the structured basis, checked on one sweep input and its score object. I12b and I14 to I15b are not here: ScoreInterpreterTest re-derives
- * every rerun, and the moves and the gate have their own tests.
+ * The invariants I0 to I17b of the structured basis, checked on one sweep input and its score object,
+ * except I12b and I14 to I15b. ScoreInterpreterTest checks I12b: it derives every rerun again.
  *
  * @phpstan-import-type Inputs from ScoreSweep
  * @phpstan-import-type Graded from ScoreBasis

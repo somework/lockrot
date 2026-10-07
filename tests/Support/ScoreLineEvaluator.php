@@ -26,8 +26,8 @@ final class ScoreLineEvaluator
         if ($at !== \count($tokens[0])) {
             throw new \UnexpectedValueException('unbalanced: '.$line);
         }
-        if (isset($m[3]) && (int) round(2 * (float) $m[3]) !== $value) {
-            throw new \UnexpectedValueException('the rounded-down tail is not the body: '.$line);
+        if (isset($m[3]) !== ($value % 2 !== 0) || (isset($m[3]) && (int) round(2 * (float) $m[3]) !== $value)) {
+            throw new \UnexpectedValueException('the rounded-down tail is missing, extra or not the body: '.$line);
         }
 
         return [(int) $m[1], $value];
@@ -57,10 +57,15 @@ final class ScoreLineEvaluator
             if (($tokens[$at++] ?? null) !== ')') {
                 throw new \UnexpectedValueException('a parenthesis is not closed');
             }
-        } else {
+        } elseif (preg_match('/^\d+(?:\.5)?$/', $tokens[$at]) === 1) {
             $value = (int) round(2 * (float) $tokens[$at++]);
+        } else {
+            throw new \UnexpectedValueException('not an operand: '.$tokens[$at]);
         }
         while (($tokens[$at] ?? null) === '÷') {
+            if (preg_match('/^[1-9]\d*$/', $tokens[$at + 1] ?? '') !== 1) {
+                throw new \UnexpectedValueException('not a divisor');
+            }
             $divisor = (int) $tokens[$at + 1];
             $at += 2;
             if ($value % $divisor !== 0) {

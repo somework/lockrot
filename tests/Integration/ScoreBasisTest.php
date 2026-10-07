@@ -12,9 +12,9 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
- * The invariants I0 to I17b on every score of the sweep: the base enumeration and its three extra
- * axes, in integer half points. One method per axis iterates its rows: a data set per row forks one
- * process per row. ScoreBasisSampleTest runs a sample (ScoreSweep::SAMPLE) in the default suite.
+ * The invariants I0 to I17b on every score of the sweep, on every axis of ScoreSweep::AXES, in
+ * integer half points. One method per axis iterates its rows: a data set per row builds one test
+ * case per row. ScoreBasisSampleTest runs a sample (ScoreSweep::SAMPLE) in the default suite.
  *
  * It covers nothing and runs only in the sweep group (sweep.yml): Infection skips a mutant whose
  * covering tests together outlast its timeout.

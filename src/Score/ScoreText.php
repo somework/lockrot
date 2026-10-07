@@ -7,7 +7,6 @@ namespace Lockrot\Score;
 /**
  * The one score line, text grammar 1, rendered from the score object's fields alone:
  *
- *     36 = left-behind 16 + old-promise 4 [¼ of 16] + vulnerable 16 [high advisory]
  *     4 = ((left-behind 16 + stale 2 [¼ of 8]) ÷ 2 transitive) ÷ 2 dev (4.5, rounded down)
  *     0 (left-behind accepted)
  *

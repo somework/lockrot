@@ -2,7 +2,7 @@
 *.phar binary
 # The documents older releases wrote are checked against the sha256 their recording took.
 /tests/fixtures/schema-evolution/** -text
-# tools/score/sweep.py writes the sweep stream: no text diff of the gzip, and GitHub folds it in a pull request.
+# tools/score/sweep.py's output, gzipped: no text diff of the gzip, and GitHub folds it in a pull request.
 /tests/fixtures/score/sweep-rows.txt.gz binary linguist-generated
 
 /tests export-ignore
