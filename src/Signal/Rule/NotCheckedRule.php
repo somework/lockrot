@@ -56,7 +56,7 @@ final class NotCheckedRule implements SignalRule
         // dates it: S2 cannot measure that.
         if ($metadata !== null && $metadata->hasStableRelease() && $metadata->lastStableReleaseAt() === null) {
             // A branch snapshot is on no release branch, so S8 misses nothing there. S2 reads the
-            // package's newest release whatever the lock installs, and with S4 it makes
+            // package's newest release whatever the lock installs, and with S4 it can make
             // the snapshot `silent`, not `pinned`.
             $ageBlocks = ReleaseBranch::of($facts->package()->version()) === null ? [Signal::S2] : [Signal::S2, Signal::S8];
             $unchecked[] = ['check' => 'release_dates', 'reason' => 'undated_releases', 'blocks' => $ageBlocks];

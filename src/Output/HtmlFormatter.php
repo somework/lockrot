@@ -85,7 +85,7 @@ final class HtmlFormatter implements FormatterInterface
     /**
      * Safe inside `<script type="application/json">`: an HTML parser ends that element at the first
      * `</script` and stops parsing at `<!--`, and package metadata can hold both. JSON reads the
-     * escapes back as the same string. `JSON_HEX_*` also escapes every quote.
+     * escapes back as the same string. Not `JSON_HEX_*`: it also escapes every quote.
      *
      * @param array<string, mixed> $document
      */
