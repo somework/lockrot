@@ -169,7 +169,7 @@ final class NotCheckedRuleTest extends TestCase
     }
 
     /**
-     * SPEC-0.14 5.5: release data that a Composer repository listing the package did not serve
+     * Release data that a Composer repository listing the package did not serve
      * leaves every fix unknown, so S9 is incomplete. Computed here, written by report-2 only:
      * report-1's S10 `check` list has no `releases`.
      */

@@ -6,7 +6,7 @@ namespace Lockrot\Security;
 
 /**
  * The `update` release on the installed branch that clears some, not all, counted advisories,
- * when the security move is not an `update` (`security.partial` of SPEC-0.14 5.3). The engine
+ * when the security move is not an `update` (`security.partial`). The engine
  * rerun and `unverified[]` are the move layer's.
  *
  * @internal

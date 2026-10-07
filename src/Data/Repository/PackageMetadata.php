@@ -15,7 +15,7 @@ use Lockrot\Lock\PackageOrigin;
  * Keeps scalars only, so that a large lock costs little memory: fromPackages() retains no
  * Composer object. The exceptions are a date per stable tag of a monorepo parent
  * ({@see $releaseDates}), the stable tags that share a commit ({@see $sharedCommitVersions}) and
- * the release scan's five fields per release above the installed one ({@see $releasesAbove}).
+ * a {@see StableRelease} per release above the installed one ({@see $releasesAbove}).
  *
  * @internal
  */
@@ -321,9 +321,9 @@ final class PackageMetadata
     }
 
     /**
-     * The release scan's lists: the stable releases above the installed one, and for C08 the
+     * The release scan's lists: the stable releases above the installed one, and for the next step's `through[]` the
      * `require` names of the installed release and of the newest stable release on the run clock.
-     * Nothing else per release (DECISIONS.md 2.34).
+     * Nothing else per release.
      *
      * @param list<BasePackage>                                                     $versions
      * @param array<string, array{0: BasePackage, 1: ?\DateTimeImmutable, 2: ?string}> $stable

@@ -22,7 +22,7 @@ use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\Signal;
 use PHPUnit\Framework\TestCase;
 
-/** The details block's branch rows (SPEC-0.14 7.6.2), as values: report-1 writes none of the new keys. */
+/** The details block's branch rows, as values: report-1 writes none of the new keys. */
 final class BranchRowTest extends TestCase
 {
     private const NOW = '2026-09-14T00:00:00+00:00';

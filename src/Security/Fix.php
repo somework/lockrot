@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Security;
 
 /**
- * The fix of one advisory: an S9 row's `fix` (SPEC-0.14 5.3). A fix of kind `unknown` or `none`
+ * The fix of one advisory: an S9 row's `fix`. A fix of kind `unknown` or `none`
  * names no release, so its branch, versions, php and {@see onInstalledBranch()} are null together
  * and {@see reason()} says why.
  *
@@ -65,7 +65,7 @@ final class Fix
     }
 
     /**
-     * The ease order of SPEC-0.14 5.3: update, upgrade, raise-php with no holder, raise-php with
+     * The ease order: update, upgrade, raise-php with no holder, raise-php with
      * holders, blocked. Lower is easier.
      *
      * @param self::UPDATE|self::UPGRADE|self::RAISE_PHP|self::BLOCKED $kind

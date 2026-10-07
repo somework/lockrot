@@ -35,7 +35,7 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * The release scan over the recorded wallabag fixture, whose advisories are recorded too: the
- * invariants of SPEC-0.14 5.3 on every vulnerable package, and each package's classes in a golden
+ * invariants on every vulnerable package, and each package's classes in a golden
  * file. Re-record the answers with `bin/record-fixtures tests/fixtures/apps/wallabag_wallabag`.
  */
 final class FixFinderWallabagTest extends TestCase

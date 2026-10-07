@@ -6,7 +6,7 @@ namespace Lockrot\Security;
 
 /**
  * What `composer update <package>` installs on the installed branch, and which counted advisories
- * it clears (`security.gets` of SPEC-0.14 5.3). Composer resolves against the target, never the
+ * it clears (`security.gets`). Composer resolves against the target, never the
  * project's `require.php`, so the floor does not filter it: {@see phpCheck()} says what it needs.
  *
  * @internal

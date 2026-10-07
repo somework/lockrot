@@ -23,13 +23,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ([What was not checked](docs/verdicts.md#what-was-not-checked))
 - **All formats:** a locked package that replaces or provides a required name is reached through
   that name (`friendsofphp/proxy-manager-lts` through `ocramius/proxy-manager`), so it is no longer
-  `unreached` or transitive for that reason. Its `chain` and `direct_dependents` can change.
-  Action: if you gate on a verdict, run once without the gate and compare the reach of each row.
-  ([The score](docs/verdicts.md#score))
+  `unreached` or transitive for that reason. A replacer that `composer.json` names through the
+  replaced name is direct. Its `direct`, `chain` and `direct_dependents` can change. Its priority
+  can rise one step, so a `--fail-on` priority gate can fail where 0.13 passed. Action: if
+  you gate on a priority, run once without the gate and compare the priority of each finding.
+  ([Priority](docs/verdicts.md#priority), [The score](docs/verdicts.md#score))
 - **All formats:** S8 reads the project's lowest PHP as a full version: an inclusive bound gives
-  `X.Y.0` (`>=8.2` now admits a branch that needs `8.2.0`), an exclusive bound the next patch
+  `X.Y.Z` (`>=8.2` now admits a branch that needs `8.2.0`), an exclusive bound the next patch
   (`>7.1` no longer admits a branch that needs exactly `7.1.0`). S8 can then name another branch
-  to follow. ([Left behind](docs/verdicts.md#left-behind))
+  to follow. ([Within reach](docs/verdicts.md#within-reach))
 
 ### Security
 

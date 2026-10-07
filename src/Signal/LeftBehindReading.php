@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Signal;
 
 /**
- * What S8 judged: the signal as report-1 writes it, and the keys report-2 adds (SPEC-0.14 2.1).
+ * What S8 judged: the signal as report-1 writes it, and the keys report-2 adds.
  * report-1's S8 is closed, so the added keys stay here until report-2 writes them.
  *
  * @internal

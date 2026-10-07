@@ -218,7 +218,7 @@ and the priority are the report's.
 | Lock entry | Version, `php` constraint, source, and the entry's date with what it is dated by: a release, a branch snapshot's commit, or a commit a subtree split's tags share | `lock` |
 | Repository metadata | Number of versions, whether the package is abandoned and what replaces it, the last stable release, and the release-branch table S8 reads | `metadata` |
 | Repository activity | What S3 and S4 read, or that nothing was fetched | `activity` |
-| Settings | Thresholds, target PHP, and the project's own `require.php` as composer.json writes it (lockrot tests the branch rows against its lowest version) | `thresholds`, `target_php`, `project_php` |
+| Settings | Thresholds, target PHP, and the project's own `require.php` as composer.json writes it (lockrot tests the branch rows against the lowest stable version it admits) | `thresholds`, `target_php`, `project_php` |
 | Run notes | The run's notes | `notes`, `note_details` |
 
 The document also carries `lockrot`, `package`, `version` and `generated_at`. The full shape is in

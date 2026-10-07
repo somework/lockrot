@@ -14,12 +14,11 @@ use Lockrot\Lock\LockFile;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
 use PHPUnit\Framework\TestCase;
 
-/** What PackageMetadata keeps for the release scan: SPEC-0.14 5.3, DECISIONS.md 2.34. */
 final class PackageMetadataTest extends TestCase
 {
     private const NOW = '2026-09-14T00:00:00+00:00';
     private const KOEL_LOCK = __DIR__.'/../../../fixtures/apps/koel_koel/composer.lock';
-    /** Where the kept lists can grow a run's memory: about 1,000 releases of five short fields. */
+    /** How far the kept lists can grow a run's memory: a laravel/framework history of short fields. */
     private const KEPT_LISTS_BYTES = 4 * 1024 * 1024;
 
     /** @param array<string, mixed> $config */
@@ -69,7 +68,7 @@ final class PackageMetadataTest extends TestCase
         self::assertSame('>=8.2', $releases[2]->php(), 'each release keeps its own php');
     }
 
-    /** SPEC-0.14 5.3: for a branch snapshot, every stable release is a candidate. */
+    /** For a branch snapshot, every stable release is a candidate. */
     public function testABranchSnapshotKeepsEveryStableRelease(): void
     {
         $meta = PackageMetadata::fromPackages('a/b', $this->history(), new \DateTimeImmutable(self::NOW), 'dev-main');
@@ -93,7 +92,7 @@ final class PackageMetadataTest extends TestCase
         self::assertNull(PackageMetadata::fromPackages('a/b', $this->history(), new \DateTimeImmutable(self::NOW), 'not a version')->releasesAbove());
     }
 
-    /** C08 reads two name lists per package: the installed release's and the newest stable one's. */
+    /** Two name lists per package: the installed release's and the newest stable one's. */
     public function testItKeepsTheRequireNamesOfTheInstalledAndOfTheNewestStableRelease(): void
     {
         $meta = PackageMetadata::fromPackages('a/b', $this->history(), new \DateTimeImmutable(self::NOW), '1.2.0.0');
@@ -179,8 +178,8 @@ final class PackageMetadataTest extends TestCase
     }
 
     /**
-     * laravel/framework lists about 1,300 versions. Installed at its first stable tag, every stable
-     * release is kept. The test compares two loads of the same 200-package lock in one process, one
+     * laravel/framework has one of the longest histories. Installed at its first stable tag, every
+     * stable release is kept. The test compares two loads of the koel lock in one process, one
      * that keeps the lists and one that keeps none (a monorepo parent's shape), so no number measured
      * on one machine is in it.
      */

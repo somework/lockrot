@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Security;
 
 /**
- * What the release scan found for one package (SPEC-0.14 5.3 and maintainer rule P2): a fix per
+ * What the release scan found for one package: a fix per
  * counted advisory, a row per release branch, what `composer update` gets, the security move and a
  * partial update. Nothing here is serialised: the report layer writes it.
  *
@@ -40,7 +40,7 @@ final class PackageFixes
         return $this->fixes;
     }
 
-    /** @throws \OutOfBoundsException for an id the scan was not given */
+    /** @throws \OutOfBoundsException for an id that the caller did not give the scan */
     public function forAdvisory(string $id): Fix
     {
         if (!isset($this->fixes[$id])) {
@@ -52,7 +52,7 @@ final class PackageFixes
 
     /**
      * Every release branch of the package, highest first. A branch below the installed one has no
-     * candidate. Empty when the releases were not read.
+     * candidate. Empty when lockrot did not read the releases.
      *
      * @return list<BranchFixes>
      */
@@ -61,7 +61,7 @@ final class PackageFixes
         return $this->branches;
     }
 
-    /** The installed branch's row, `security.installed_branch_fixes`; null for a branch snapshot or unread releases. */
+    /** The installed branch's row, `security.installed_branch_fixes`. Null for a branch snapshot or unread releases. */
     public function installedBranch(): ?BranchFixes
     {
         foreach ($this->branches as $row) {

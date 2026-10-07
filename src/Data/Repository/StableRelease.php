@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Lockrot\Data\Repository;
 
 /**
- * One stable release that {@see PackageMetadata} keeps for the release scan (SPEC-0.14 5.3,
- * DECISIONS.md 2.34). Five fields and nothing else: a large package keeps one per release.
+ * One stable release that {@see PackageMetadata} keeps for the release scan. Do not add a field: a
+ * large package keeps one per release, and `PackageMetadataTest` bounds the memory they cost.
  *
  * @internal
  */

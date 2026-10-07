@@ -23,13 +23,12 @@ use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\PhpFloor;
 use PHPUnit\Framework\TestCase;
 
-/** The release scan: SPEC-0.14 5.3 and maintainer rule P2. */
 final class FixFinderTest extends TestCase
 {
     private const NOW = '2026-09-14T00:00:00+00:00';
     private const PACKAGIST = 'https://packagist.org/downloads/';
 
-    /** The release scan relies on it, and the Composer 2.2 leg of CI runs this test. */
+    /** The release scan compares two ranges with it, on every Composer version that lockrot supports. */
     public function testComposersIntervalsCanCompareTwoRanges(): void
     {
         self::assertTrue((new \ReflectionClass(Intervals::class))->hasMethod('haveIntersections'));
@@ -59,7 +58,7 @@ final class FixFinderTest extends TestCase
         }
     }
 
-    /** P2: every branch keeps its own way out, the installed one and the lower one included. */
+    /** Every branch keeps its own way out, the installed one and the lower one included. */
     public function testTwigInPhpbbKeepsARowPerBranch(): void
     {
         $rows = $this->twigInPhpbb()->branches();
@@ -105,7 +104,7 @@ final class FixFinderTest extends TestCase
         self::assertSame(Fix::RAISE_PHP, $move->kind());
     }
 
-    /** prestashop-v1: twig v1.43.1 under require.php >=7.1.3; v1.44.8 needs >=7.2.5. */
+    /** prestashop-v1: twig v1.43.1 under require.php >=7.1.3. v1.44.8 needs >=7.2.5. */
     public function testComposerUpdateIgnoresTheProjectFloorAndSaysWhatTheReleaseNeeds(): void
     {
         $fixes = $this->find(
@@ -180,7 +179,7 @@ final class FixFinderTest extends TestCase
         self::assertSame(Fix::RAISE_PHP, $three->fixKind());
     }
 
-    /** SPEC-0.14 5.3: for a branch snapshot, every stable release is a candidate. */
+    /** For a branch snapshot, every stable release is a candidate. */
     public function testABranchSnapshotTakesEveryStableReleaseAsACandidate(): void
     {
         $fixes = $this->find(
@@ -452,7 +451,7 @@ final class FixFinderTest extends TestCase
         self::assertSame([], $fix->heldBy());
     }
 
-    /** guzzle-5: wallabag's guzzlehttp/guzzle 5.3.4; the root requires ^5.3, 6.x fixes it. */
+    /** guzzle-5: wallabag's guzzlehttp/guzzle 5.3.4. The root requires ^5.3, and 6.x fixes it. */
     public function testGuzzleFiveIsAnUpgradeHeldByTheRoot(): void
     {
         $fixes = $this->find(
@@ -494,7 +493,7 @@ final class FixFinderTest extends TestCase
         self::assertSame('v7.3.5', $fixes->branches()[0]->lowest(), 'v7.3.0 is inside the range on 7.x');
     }
 
-    /** SPEC-0.14 5.3 invariant: upgrade implies a holder; raise-php and blocked carry holders on their own. */
+    /** Upgrade implies a holder. Raise-php and blocked carry holders on their own. */
     public function testEveryUpgradeNamesAHolder(): void
     {
         foreach ([$this->twigInPhpbb()] as $fixes) {
