@@ -479,6 +479,9 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
 
     public function testAMetadataPathRepositoryCountsTheRecordsOfThePackageFile(): void
     {
+        if (!interface_exists(AdvisoryProviderInterface::class)) {
+            self::markTestSkipped('Composer without the advisory API');
+        }
         $batch = (new RepositoryAdvisoryLoader($this->server()->repositories()))->load(['doctrine/cache' => '2.2.0', 'symfony/console' => 'v5.4.47']);
 
         self::assertSame(['answer' => AdvisoryCoverage::ANSWERED, 'reason' => null, 'records' => 3], self::feed($batch, 'doctrine/cache', 0));
@@ -534,6 +537,9 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
 
     public function testAnAnswerLockrotCannotReadIsAnInvalidResponseAndNoNetworkFailure(): void
     {
+        if (!interface_exists(AdvisoryProviderInterface::class)) {
+            self::markTestSkipped('Composer without the advisory API');
+        }
         $corrupt = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK]);
         $corrupt->withCorruptPackagesJson();
         $corrupt->start();
