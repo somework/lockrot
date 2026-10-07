@@ -88,13 +88,20 @@ class TheKey(Gate):
         self.assertEqual(0, self.run_gate([escapes], ledger)[0])
 
     def test_a_text_that_is_not_unique_needs_the_method_its_reason_names(self):
-        documented = log((13, 'IncrementInteger', '        return 1;'))
-        other_method = log((18, 'IncrementInteger', '        return 1;'))
+        documented = log((12, 'IncrementInteger', '        return 1;'))
+        other_method = log((17, 'IncrementInteger', '        return 1;'))
         ledger = '- `src/Signal/Openness.php` IncrementInteger `return 1;` -- in minor(): unlike patch().\n'
         self.assertEqual(0, self.run_gate([documented], ledger)[0])
         self.assertEqual(1, self.run_gate([other_method], ledger)[0])
         unnamed = '- `src/Signal/Openness.php` IncrementInteger `return 1;` -- why, unlike minor().\n'
         self.assertEqual(1, self.run_gate([documented], unnamed)[0])
+
+    def test_a_repeated_line_is_not_covered_by_an_entry_for_another_repeated_line_of_its_method(self):
+        with open(os.path.join(self.root, 'src', 'Signal', 'Openness.php'), 'a', encoding='utf-8') as handle:
+            handle.write('function both(): void\n{\n    $a = 1;\n    $b = 2;\n    $a = 1;\n    $b = 2;\n}\n')
+        escape = log((23, 'IncrementInteger', '    $b = 2;'))
+        self.assertEqual(1, self.run_gate([escape], '- `src/Signal/Openness.php` IncrementInteger `$a = 1;` -- in both(): why.\n')[0])
+        self.assertEqual(0, self.run_gate([escape], '- `src/Signal/Openness.php` IncrementInteger `$b = 2;` -- in both(): why.\n')[0])
 
     def test_a_line_that_holds_a_backtick_goes_in_a_double_backtick_span(self):
         with open(os.path.join(self.root, 'src', 'Signal', 'Openness.php'), 'a', encoding='utf-8') as handle:

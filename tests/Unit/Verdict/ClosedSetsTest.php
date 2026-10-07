@@ -55,7 +55,13 @@ final class ClosedSetsTest extends TestCase
     private const HOST = '^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$';
     /** The words both pages name a finding's origin vocabularies by. */
     private const ORIGIN_VOCABULARY = "a finding's `origin.kind` and `origin.registry`";
-    /** An S10 check or reason, an S6 reason, an S8 floor source, a branch's php_blocked_by and misses_*_php, a finding's libyears_unmeasured, a priority step's and a no-fix advisory's reason, the run's mode and fail-on kind, the gate's causes and exemptions, and a run note's `forge_id` and reasons: a lower-case word. */
+    /**
+     * A lower-case word. These fields hold one:
+     * - an S10 check or reason, an S6 reason, an S8 floor source
+     * - a branch's php_blocked_by and misses_*_php, a finding's libyears_unmeasured
+     * - a priority step's and a no-fix advisory's reason, the run's mode and fail-on kind
+     * - the gate's causes and exemptions, a run note's `forge_id` and reasons
+     */
     private const WORD = '^[a-z][a-z0-9_]*$';
     private const ROOT = __DIR__.'/../../../';
     /**
