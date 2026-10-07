@@ -61,7 +61,7 @@ final class RepositoryUrlTest extends TestCase
         yield 'a file url to the home directory' => ['file://~', '...'];
         yield 'a file url to the root' => ['file:///', '...'];
         yield 'a file url of one segment' => ['file://pkg', '.../pkg'];
-        yield 'a file: url without the two slashes, which is neither' => ['file:/srv/pkg', null];
+        yield 'a file: url without the two slashes is not shown' => ['file:/srv/pkg', null];
         yield 'a home directory' => ['/Users/Alice Smith', '...'];
         yield 'a home directory with a separator after it' => ['/home/alice/', '.../'];
         yield 'a home directory on Windows' => ['C:\\Users\\alice', '...'];

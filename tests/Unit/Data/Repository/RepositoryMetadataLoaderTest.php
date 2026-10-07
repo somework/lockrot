@@ -238,7 +238,7 @@ final class RepositoryMetadataLoaderTest extends TestCase
 
     // memory_get_peak_usage(true) is a whole-process high-water mark that PHPUnit never resets
     // between tests, so this assertion is order-dependent on whatever else already ran earlier in
-    // the same process (same root cause as AcceptanceTest::testWallabag's identical isolation).
+    // the same process (same root cause as AcceptanceTest::testWallabagKeepsItsVerdictsPrioritiesAndExposure's identical isolation).
     // Running this one test in its own process makes the peak reflect only this load. That
     // process never runs setUpBeforeClass(), so this test builds its own single-use server instead
     // of reaching for the class-level self::$server/self::$loader.
@@ -561,8 +561,7 @@ final class RepositoryMetadataLoaderTest extends TestCase
         // *and*, as a separate entry, the package it aliases, so unwrapping aliases without
         // deduplicating counts that release twice. This package has no stable file at all
         // (lox/xhprof-style: registered, but tagless), so it resolves entirely through the loader's
-        // dev-only pass, where the same dedup must still apply. The recorded p2 fixtures have
-        // `extra` stripped, hence the hand-written envelope here.
+        // dev-only pass, where the same dedup must still apply.
         $server = $this->syntheticServer([
             'alias/pkg~dev' => [$this->p2Version('alias/pkg', 'dev-main', [
                 'extra' => ['branch-alias' => ['dev-main' => '2.0.x-dev']],
@@ -589,8 +588,9 @@ final class RepositoryMetadataLoaderTest extends TestCase
      * Real-fixture counterpart to testDevOnlyBranchAliasIsUnwrappedAndCountedOnce().
      * wallabag/rulerz has no tagged release, so it resolves through the loader's dev-only pass
      * against the recorded `wallabag/rulerz~dev.json`. Its dev-master carries `extra.branch-alias`,
-     * which ComposerRepository::loadPackages() unwraps into a separate AliasPackage entry. Without
-     * the loader's own dedup the release counts twice.
+     * which ComposerRepository::loadPackages() unwraps into a separate AliasPackage entry. The file
+     * lists two entries (dev-master, dev-support-symfony-7). Without the loader's own dedup the
+     * alias makes the count 3, not 2.
      */
     public function testRealDevOnlyPackageWithBranchAliasIsCountedOnce(): void
     {

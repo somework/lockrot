@@ -24,7 +24,7 @@ final class ComposerHttpClientNetworkTest extends TestCase
     {
         $io = new NullIO();
         $config = Factory::createConfig($io);
-        $client = new ComposerHttpClient(Factory::createHttpDownloader($io, $config), $io, $config, new Clock());
+        $client = new ComposerHttpClient(Factory::createHttpDownloader($io, $config), $io, $config, Clock::fixed('2026-09-14T00:00:00+00:00'));
 
         $results = $client->fetchAll([self::OK_URL, self::MISSING_URL]);
 
@@ -50,7 +50,7 @@ final class ComposerHttpClientNetworkTest extends TestCase
         $io = new NullIO();
         $io->setAuthentication('github.com', $token, 'x-oauth-basic');
         $config = Factory::createConfig($io);
-        $client = new ComposerHttpClient(Factory::createHttpDownloader($io, $config), $io, $config, new Clock());
+        $client = new ComposerHttpClient(Factory::createHttpDownloader($io, $config), $io, $config, Clock::fixed('2026-09-14T00:00:00+00:00'));
 
         $result = $client->fetchAll([self::GITHUB_URL], GitHubApi::headersFor($token))[self::GITHUB_URL];
 

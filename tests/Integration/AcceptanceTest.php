@@ -117,7 +117,7 @@ final class AcceptanceTest extends TestCase
     // builds its own server and loader.
     /** @runInSeparateProcess */
     #[RunInSeparateProcess]
-    public function testWallabag(): void
+    public function testWallabagKeepsItsVerdictsPrioritiesAndExposure(): void
     {
         $server = FixtureRepositoryServer::fromLockFiles([self::FIXTURES.'apps/wallabag_wallabag/composer.lock']);
         $server->start();
@@ -169,7 +169,7 @@ final class AcceptanceTest extends TestCase
             for ($i = 1; $i < \count($counts); ++$i) {
                 self::assertGreaterThanOrEqual($counts[$i], $counts[$i - 1], 'exposure is ordered most first');
             }
-            Golden::assertMatches('wallabag.json', ['verdicts' => $verdicts, 'exposure' => $exposure, 'exposure_summary_line' => $report->exposureSummaryLine()], 'testWallabag');
+            Golden::assertMatches('wallabag.json', ['verdicts' => $verdicts, 'exposure' => $exposure, 'exposure_summary_line' => $report->exposureSummaryLine()], 'testWallabagKeepsItsVerdictsPrioritiesAndExposure');
             // Every flagged transitive package is attributed, shared above the cap, or reached by no
             // direct requirement — exactly one of the three. wallabag's widest fan-in is 8, so the
             // document lists nothing above the cap.
@@ -194,8 +194,8 @@ final class AcceptanceTest extends TestCase
             self::assertSame('sensio/framework-extra-bundle', $report->findings()[0]->package());
             self::assertSame(Priority::CRITICAL, $report->findings()[0]->priority());
             self::assertFalse($report->hadNetworkFailures(), implode("\n", $report->notes()));
-            // Regression guard for the PHAR OOM at PHP's default 128M memory_limit: analysing a
-            // 200-package lock must not retain the expanded Packagist release history.
+            // The PHAR runs under PHP's default 128M memory_limit: analysing wallabag's lock must not
+            // retain the expanded Packagist release history.
             self::assertLessThan(64 * 1024 * 1024, memory_get_peak_usage(true), 'peak memory');
         } finally {
             $server->stop();
@@ -236,7 +236,7 @@ final class AcceptanceTest extends TestCase
         }
     }
 
-    public function testNextcloud3rdparty(): void
+    public function testNextcloudBantuIniGetWrapperIsSilent(): void
     {
         $f = $this->byName($this->analyze('apps/nextcloud_3rdparty'));
         self::assertSame(Verdict::SILENT, $f['bantu/ini-get-wrapper']->verdict());
@@ -266,10 +266,10 @@ final class AcceptanceTest extends TestCase
         self::assertSame('branch_snapshot', $s6->data()['reason']);
     }
 
-    public function testOldPromiseExamplesOn84(): void
+    public function testPhpzipCarriesS5UnderItsSilentVerdict(): void
     {
         $f = $this->byName($this->analyze('apps/wallabag_wallabag'));
-        // phpzip/phpzip 2.0.8: released 2015, require php >=5.3.0 -> S5 fires but silent has precedence
+        // phpzip/phpzip's installed release requires php >=5.3.0, so S5 fires, but silent has precedence.
         $ids = array_map(static fn ($s) => $s->id(), $f['phpzip/phpzip']->signals());
         self::assertContains('S5', $ids);
     }

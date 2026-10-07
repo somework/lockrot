@@ -107,7 +107,7 @@ final class InstallTimeSummaryTest extends TestCase
     ];
 
     /**
-     * A package nothing can be said about without repository metadata: released recently, a bounded
+     * A package nothing can be said about without repository metadata: released 2026-08-01, inside every threshold, a bounded
      * `php` constraint (so S5 never fires) and no source URL (so no GitHub round is even planned).
      * With the metadata missing it lands on `unknown`, which is *below* the flagged threshold.
      */
@@ -352,8 +352,9 @@ final class InstallTimeSummaryTest extends TestCase
     /**
      * A Composer transaction carries no `require-dev` membership, so every package in it is prod
      * until the lock is consulted. Both rows are `silent` root requires, so only the priority
-     * orders them: grandt/binstring is a dev requirement, so it drops a step and sits below
-     * phpzip/phpzip, although its name sorts first.
+     * orders them: grandt/binstring is a dev requirement, so it drops from `critical` to `high` and
+     * sits below phpzip/phpzip, although its name sorts first. Read the wrong way round, the dev row
+     * comes first on the name tie-break.
      */
     public function testADevRequirementInTheTransactionIsRankedBelowAnEqualProdRequirement(): void
     {
@@ -763,7 +764,7 @@ final class InstallTimeSummaryTest extends TestCase
         self::assertStringNotContainsString('check skipped', $output);
     }
 
-    /** Decorated, the block has the colours Composer's formatter gave it: the header in `warning`, the verdict in `comment`. */
+    /** Decorated, the block has the colours of Composer's styles, applied by lockrot: the header in `warning`, the verdict in `comment`. */
     public function testTheBlockIsColouredWhenTheOutputIsDecorated(): void
     {
         $this->project();
@@ -973,11 +974,11 @@ final class InstallTimeSummaryTest extends TestCase
         $io = new BufferIO();
         $event = $this->event($io, new Transaction([], [$this->loadPackage(self::PHPZIP)]));
 
-        $deadline = $this->recordDeadline($event);
+        $remaining = $this->remainingAtHandOver($event);
 
-        self::assertNotNull($deadline);
-        self::assertGreaterThan(0.0, $deadline->remainingSeconds());
-        self::assertLessThanOrEqual(1.0, $deadline->remainingSeconds());
+        self::assertNotNull($remaining);
+        self::assertGreaterThan(0.0, $remaining);
+        self::assertLessThanOrEqual(1.0, $remaining);
     }
 
     public function testInstallTimeBudgetDefaultsToFiveSeconds(): void
@@ -986,26 +987,27 @@ final class InstallTimeSummaryTest extends TestCase
         $io = new BufferIO();
         $event = $this->event($io, new Transaction([], [$this->loadPackage(self::PHPZIP)]));
 
-        $deadline = $this->recordDeadline($event);
+        $remaining = $this->remainingAtHandOver($event);
 
-        self::assertNotNull($deadline);
-        self::assertGreaterThan(4.0, $deadline->remainingSeconds());
-        self::assertLessThanOrEqual(5.0, $deadline->remainingSeconds());
+        self::assertNotNull($remaining);
+        self::assertGreaterThan(4.0, $remaining);
+        self::assertLessThanOrEqual(5.0, $remaining);
     }
 
-    private ?Deadline $recordedDeadline = null;
+    private ?float $remainingAtHandOver = null;
 
-    private function recordDeadline(InstallerEvent $event): ?Deadline
+    /** The seconds the deadline has left when the factory gets it, read before the analysis runs. */
+    private function remainingAtHandOver(InstallerEvent $event): ?float
     {
         (new InstallTimeSummary(\Closure::fromCallable([$this, 'recordingAnalyzerFactory'])))->onPreOperationsExec($event);
 
-        return $this->recordedDeadline;
+        return $this->remainingAtHandOver;
     }
 
     /** @param list<RepositoryInterface> $repositories */
     private function recordingAnalyzerFactory(IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, Tokens $tokens, Clock $clock, Deadline $deadline): Analyzer
     {
-        $this->recordedDeadline = $deadline;
+        $this->remainingAtHandOver = $deadline->remainingSeconds();
 
         return ($this->analyzerFactory())($io, $config, $repositories, $lockrot, $tokens, $clock, $deadline);
     }

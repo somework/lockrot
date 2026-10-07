@@ -25,7 +25,7 @@ final class DependencyGraphTest extends TestCase
         self::assertSame(['vendor/direct'], $this->graph(false)->shortestChain('vendor/direct'));
     }
 
-    public function testTransitiveChain(): void
+    public function testATransitivePackageIsReachedThroughItsRoot(): void
     {
         self::assertSame(['vendor/direct', 'vendor/transitive'], $this->graph(false)->shortestChain('vendor/transitive'));
     }
@@ -35,13 +35,13 @@ final class DependencyGraphTest extends TestCase
         self::assertSame([], $this->graph(false)->shortestChain('vendor/snapshot'));
     }
 
-    public function testDevRootsOnlyWhenIncluded(): void
+    public function testADevRootCountsOnlyWhenDevIsIncluded(): void
     {
         self::assertSame([], $this->graph(false)->shortestChain('vendor/devtool'));
         self::assertSame(['vendor/devtool'], $this->graph(true)->shortestChain('vendor/devtool'));
     }
 
-    public function testWallabagChainEndsWithPackage(): void
+    public function testAChainOverWallabagEndsWithThePackage(): void
     {
         $graph = $this->wallabag();
         $chain = $graph->shortestChain('phpzip/phpzip');
