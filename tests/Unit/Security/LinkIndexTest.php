@@ -60,6 +60,19 @@ final class LinkIndexTest extends TestCase
         self::assertSame([], $index->excluding('laravel/framework', '12.70.0.0'));
     }
 
+    /** Composer applies a conflict to the names a package has and replaces, not to the names it provides. */
+    public function testAConflictOnAProvidedNameHoldsNothing(): void
+    {
+        $index = LinkIndex::of(LockFile::fromArray(['packages' => [
+            ['name' => 'v/p', 'version' => '2.0.0', 'provide' => ['x/virtual' => 'self.version']],
+            ['name' => 'v/q', 'version' => '1.0.0', 'conflict' => ['x/virtual' => '>=2.1']],
+            ['name' => 'v/r', 'version' => '1.0.0', 'require' => ['x/virtual' => '^2.0']],
+        ]]), ProjectConfig::empty());
+
+        self::assertSame([], $index->excluding('v/p', '2.1.0.0'));
+        self::assertSame(['v/r'], array_map(static fn (Holder $holder): ?string => $holder->package(), $index->excluding('v/p', '3.0.0.0')));
+    }
+
     /** Composer satisfies a name with the package of that name when the lock carries one. */
     public function testALockedPackageKeepsTheLinksOnItsOwnName(): void
     {

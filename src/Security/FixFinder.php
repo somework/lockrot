@@ -198,7 +198,8 @@ final class FixFinder
 
     /**
      * `composer update <package>` installs the highest release on the installed branch that the
-     * lock's links allow, whatever `require.php` says.
+     * lock's links allow and the target runs, whatever `require.php` says. With none that the target
+     * runs, the highest one that the links allow says why.
      *
      * @param list<Candidate>                    $onInstalled ascending
      * @param array<string, ConstraintInterface> $ranged
@@ -206,11 +207,18 @@ final class FixFinder
     private function gets(array $onInstalled, array $ranged, int $of): ?Gets
     {
         $release = null;
+        $blocked = null;
         foreach ($onInstalled as $candidate) {
-            if ($candidate->heldBy() === []) {
+            if ($candidate->heldBy() !== []) {
+                continue;
+            }
+            if ($candidate->kind() === Fix::BLOCKED) {
+                $blocked = $candidate;
+            } else {
                 $release = $candidate;
             }
         }
+        $release ??= $blocked;
         if ($release === null) {
             return null;
         }

@@ -159,6 +159,23 @@ final class FixFinderTest extends TestCase
         self::assertSame('2.x', $fixes->installedBranch() === null ? null : $fixes->installedBranch()->branch());
     }
 
+    /** Composer resolves against the target, so it installs the highest release that the target runs. */
+    public function testComposerUpdateSkipsAReleaseTheTargetCannotRun(): void
+    {
+        $fixes = $this->find(
+            ['name' => 'a/b', 'version' => '2.0.0'],
+            [['2.0.0', '>=7.2'], ['2.0.5', '>=7.2'], ['2.0.6', '~8.0.0']],
+            ['A' => '<2.0.5'],
+            new PhpFloor('8.4', '>=7.2.5')
+        );
+
+        $gets = $fixes->gets();
+        self::assertNotNull($gets);
+        self::assertSame('2.0.5', $gets->version());
+        self::assertSame(['A'], $gets->clears());
+        self::assertTrue($gets->phpCheck()->targetRuns());
+    }
+
     public function testPhpThatRisesInsideAMajorGivesEachAdvisoryItsOwnClass(): void
     {
         $fixes = $this->find(
