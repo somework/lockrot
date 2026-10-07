@@ -341,7 +341,7 @@ final class FindingFactsConsistencyTest extends TestCase
             'lcobucci/jwt' => [$full('lcobucci/jwt', 'PKSA-jwt-1', '>=4.0,<4.3.0', 'high')],
             // left behind on 10.x: one fixed only by 11.5.0, one fixed nowhere
             'spomky-labs/otphp' => [$full('spomky-labs/otphp', 'PKSA-otphp-1', '>=10.0,<11.0', 'high'), $full('spomky-labs/otphp', 'PKSA-otphp-2', '>=10.0', 'low')],
-            // abandoned in the lock; the metadata it would be checked against fails
+            // abandoned in the lock: if lockrot checks it, its metadata will fail
             self::METADATA_FAILS => [$full(self::METADATA_FAILS, 'PKSA-compiler-1', '>=3.0', 'high')],
             // stale, allowlisted and ok: no fix prediction
             'defuse/php-encryption' => [$full('defuse/php-encryption', 'PKSA-defuse-1', '>=2.0', 'high')],

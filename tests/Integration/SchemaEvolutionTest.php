@@ -16,13 +16,11 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Backward compatibility of the published schemas under one schema number: whatever an earlier
- * release's schema accepted, the current one accepts, and what an earlier release wrote still
- * validates. {@see SchemaWidening} holds each release's schemas (`schemas/<version>/`) to the current
- * file on every branch. Each document that a release PHAR wrote over wallabag's lock (`<version>/`,
- * bin/record-schema-evolution) is validated against its schema as published and against the strict
- * twin, which also catches a field that an older document carries and the current schema stopped
- * listing. The forward direction does not hold: the oldest schemas list S1–S9 and demand a non-empty
+ * Backward compatibility of the published schemas under one schema number: what an earlier release
+ * wrote still validates. This test validates each document that a release PHAR wrote over wallabag's
+ * lock (`<version>/`, bin/record-schema-evolution) against its schema and against the strict twin,
+ * which catches a field that the current schema stopped listing. {@see SchemaWidening} compares the
+ * schemas. The forward direction does not hold: the oldest schemas list S1–S9 and demand a non-empty
  * `chain`, and a current document can carry S10 or an empty chain.
  */
 final class SchemaEvolutionTest extends TestCase

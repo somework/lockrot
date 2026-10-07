@@ -7,14 +7,12 @@ namespace Lockrot\Tests\Support;
 use Lockrot\Json\Schemas;
 
 /**
- * The negative schema fixtures: documents a published schema must reject, each for the error it
- * names, so a fixture rejected for another reason fails. A fixture in `<root>/<document>-<number>/`
- * is validated against that document's schema under that number. Its expectation is a root `$expect`
- * object `{"strict": <bool>, "error": <string or null>}`, removed before validation, or an entry in
- * the directory's `EXPECT.json` (strict when the file name ends in `.strict.json`). A strict
- * expectation is validated against the strict twin ({@see ValidatesJsonSchemas::strictTwin()}), any
- * other as published. A fixture passes when it has at least one error and, if it names an error,
- * one of its errors contains it, case-insensitive. A file with no expectation is an error of the fixture set.
+ * Each fixture in `<root>/<document>-<number>/` must fail the schema of that document and number
+ * for the error that it names: a root `$expect` object `{"strict": <bool>, "error": <string|null>}`,
+ * removed before validation, or an entry in `EXPECT.json` (strict for a `.strict.json` name). A
+ * strict fixture validates against {@see ValidatesJsonSchemas::strictTwin()}. It passes when it has
+ * an error and, if it names one, an error contains that text, case-insensitive. A fixture with no
+ * expectation fails the set.
  */
 final class NegativeFixtures
 {

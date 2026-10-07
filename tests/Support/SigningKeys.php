@@ -26,13 +26,13 @@ final class SigningKeys
         return self::read('other-key.pub');
     }
 
-    /** The `.sig.json` file the release key would publish for $archive. */
+    /** The `.sig.json` file that the release key will publish if it signs $archive. */
     public static function releaseSignatureFile(string $archive): string
     {
         return self::signatureFile($archive, 'release-key.pem');
     }
 
-    /** The `.sig.json` file a key that is not the release key would produce for $archive. */
+    /** The `.sig.json` file that a key other than the release key will produce if it signs $archive. */
     public static function otherSignatureFile(string $archive): string
     {
         return self::signatureFile($archive, 'other-key.pem');
