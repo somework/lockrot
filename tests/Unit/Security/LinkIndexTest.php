@@ -83,6 +83,19 @@ final class LinkIndexTest extends TestCase
         self::assertSame(['v/r'], array_map(static fn (Holder $holder): ?string => $holder->package(), $index->excluding('v/p', '3.0.0.0')));
     }
 
+    /** A root constraint that does not parse holds nothing, and a package never holds itself. */
+    public function testAnUnreadableConstraintAndAPackagesOwnLinkHoldNothing(): void
+    {
+        $index = LinkIndex::of(
+            LockFile::fromArray(['packages' => [
+                ['name' => 'v/p', 'version' => '1.0.0', 'replace' => ['x/n' => 'self.version'], 'require' => ['x/n' => '^1.0']],
+            ]]),
+            ProjectConfig::fromArray(['require' => ['v/p' => 'not a constraint']])
+        );
+
+        self::assertSame([], $index->excluding('v/p', '2.0.0.0'));
+    }
+
     /** Composer satisfies a name with the package of that name when the lock carries one. */
     public function testALockedPackageKeepsTheLinksOnItsOwnName(): void
     {

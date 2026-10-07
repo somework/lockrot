@@ -460,6 +460,20 @@ final class FixFinderTest extends TestCase
         self::assertSame(['2.7.0', Fix::RAISE_PHP], [$two->lowest(), $two->fixKind()]);
     }
 
+    /** Two branch lower bounds at one ease: the lower release leads. */
+    public function testATieInEaseGoesToTheLowerBranch(): void
+    {
+        $move = $this->find(
+            ['name' => 'a/b', 'version' => '1.0.0'],
+            [['1.0.0', null], ['2.0.0', null], ['3.0.0', null]],
+            ['A' => '<2.0.0'],
+            new PhpFloor('8.4', null)
+        )->move();
+
+        self::assertNotNull($move);
+        self::assertSame(['2.0.0', Fix::UPDATE], [$move->release()->pretty(), $move->kind()]);
+    }
+
     /** A row's class is its lower bound's class, so the row, the move to its branch and the fix of that release agree. */
     public function testARowsClassIsItsLowerBoundsClass(): void
     {
