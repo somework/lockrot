@@ -53,7 +53,8 @@ final class Report
     }
 
     /**
-     * Descending keys take the other finding's value, ascending keys their own. Public so
+     * The package name is the last key, so the order is total and the report reads the same on every
+     * run. Descending keys take the other finding's value, ascending keys their own. Public so
      * {@see TransitiveExposure} lists a parent's descendants in the same order.
      */
     public static function compare(Finding $a, Finding $b): int

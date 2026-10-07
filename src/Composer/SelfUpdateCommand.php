@@ -123,8 +123,9 @@ final class SelfUpdateCommand extends BaseCommand
         // Read before anything can replace the archive: after the swap this process cannot load a
         // class it has not used. Without these locals, a `Policy::EXIT_*` in a later return is the
         // first use of Policy. TerminalText is loaded for the same reason: an error after the swap
-        // can be the first line that writeError() colours. Every other class on the way out is
-        // already in memory: `instanceof` does not autoload.
+        // can be the first line that writeError() colours. Every other class on the way out is in
+        // memory: `instanceof` does not autoload, the output's formatter loaded OutputFormatterStyle,
+        // and `writeln()` runs on an output object built before the command ran.
         $exitOk = Policy::EXIT_OK;
         $exitError = Policy::EXIT_ERROR;
         $exitFindings = Policy::EXIT_FINDINGS;

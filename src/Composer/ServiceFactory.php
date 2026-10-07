@@ -68,12 +68,12 @@ final class ServiceFactory
     }
 
     /**
-     * Exchanges a `bitbucket-oauth` consumer for a bearer token up front. Composer exchanges it only
-     * after a 401, and lockrot switches that retry off ({@see ComposerHttpClient::fetchAll()}). The
-     * request is the one that {@see Bitbucket} sends. Composer's own helper is not used, because it
-     * also rewrites `composer.json` and `auth.json`. AuthHelper adds the consumer pair to the POST as
-     * HTTP Basic, and sends a token stored as `x-token-auth` as a bearer token on api.bitbucket.org.
-     * A failed exchange leaves the pair in the IO: IOInterface cannot clear one entry.
+     * Exchanges a `bitbucket-oauth` consumer for a bearer token up front: Composer does it only
+     * after a 401, a retry that lockrot switches off. Call it through {@see ForgeAuth}: at most once
+     * per run, only when a Bitbucket repository is planned, never after the install-time budget is
+     * spent. AuthHelper adds the consumer pair to the POST as HTTP Basic and sends a token stored as
+     * `x-token-auth` as a bearer token. Not {@see Bitbucket}'s helper: it rewrites `composer.json` and
+     * `auth.json`. A failed exchange leaves the pair in the IO: IOInterface cannot clear one entry.
      *
      * @param null|callable(): HttpDownloader $downloaderFactory the downloader to post with, Composer's own when null
      *
