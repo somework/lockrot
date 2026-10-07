@@ -30,6 +30,7 @@ use Lockrot\Data\Repository\MetadataBatch;
 use Lockrot\Data\Repository\MetadataLoaderInterface;
 use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Deadline;
+use Lockrot\Legacy\Priority013;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Output\FormatContext;
@@ -38,7 +39,6 @@ use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
-use Lockrot\Verdict\Priority;
 use Lockrot\Verdict\Verdict;
 use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\TestCase;
@@ -217,7 +217,7 @@ final class AnalyzerTest extends TestCase
         $finding = $report->findings()[0];
         self::assertSame('vendor/direct', $finding->package());
         self::assertSame(Verdict::ABANDONED, $finding->verdict());
-        self::assertSame(Priority::CRITICAL, $finding->priority());
+        self::assertSame(Priority013::CRITICAL, $finding->priority());
         self::assertSame('marked abandoned by its repository; 1 security advisory affects 1.0.0 (CVE-2024-0001); no fix expected', $finding->evidence());
         self::assertSame(['1 package is not from a Composer repository and was not checked'], $report->notes(), 'no advisory note on a complete answer');
         self::assertFalse($report->hadNetworkFailures());
@@ -305,11 +305,11 @@ final class AnalyzerTest extends TestCase
         // Sort order is priority desc, then severity desc, then direct first, then name asc.
         // vendor/snapshot is pinned, but nothing in the lock reaches it, so its chain is empty, it counts as transitive
         // and its `high` base drops to `medium`. The two unflagged rows follow, unknown ahead of ok.
-        self::assertSame(Priority::HIGH, $byName['vendor/transitive']->priority());
-        self::assertSame(Priority::NONE, $byName['vendor/direct']->priority());
+        self::assertSame(Priority013::HIGH, $byName['vendor/transitive']->priority());
+        self::assertSame(Priority013::NONE, $byName['vendor/direct']->priority());
         self::assertSame([], $byName['vendor/snapshot']->chain());
-        self::assertSame(Priority::MEDIUM, $byName['vendor/snapshot']->priority());
-        self::assertSame(Priority::NONE, $byName['private/thing']->priority());
+        self::assertSame(Priority013::MEDIUM, $byName['vendor/snapshot']->priority());
+        self::assertSame(Priority013::NONE, $byName['private/thing']->priority());
         self::assertSame(['vendor/transitive', 'vendor/snapshot', 'private/thing', 'vendor/direct'], array_map(static fn ($f) => $f->package(), $report->findings()));
         self::assertNotEmpty(array_filter($report->notes(), static fn (string $n): bool => strpos($n, 'GitHub token not set') !== false));
         // vendor/direct is the one root and pulls in the silent package, so it carries S7, with no
@@ -352,8 +352,8 @@ final class AnalyzerTest extends TestCase
         self::assertSame(Verdict::SILENT, $byName['vendor/devtool']->verdict());
         self::assertFalse($byName['vendor/prod']->isDev());
         self::assertTrue($byName['vendor/devtool']->isDev());
-        self::assertSame(Priority::CRITICAL, $byName['vendor/prod']->priority());
-        self::assertSame(Priority::HIGH, $byName['vendor/devtool']->priority());
+        self::assertSame(Priority013::CRITICAL, $byName['vendor/prod']->priority());
+        self::assertSame(Priority013::HIGH, $byName['vendor/devtool']->priority());
         // Priority orders the report: the prod row comes first even though the two verdicts are equal.
         self::assertSame(['vendor/prod', 'vendor/devtool'], array_map(static fn ($f) => $f->package(), $report->findings()));
         // A dev root is a parent like any other once --dev brings it in.

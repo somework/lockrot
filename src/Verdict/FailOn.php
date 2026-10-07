@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Verdict;
 
 use Lockrot\Exception\ConfigException;
+use Lockrot\Legacy\Priority013;
 use Lockrot\Signal\Signal;
 
 /**
@@ -71,8 +72,8 @@ final class FailOn
     private static function priorities(): array
     {
         $priorities = [];
-        foreach (Priority::all() as $priority) {
-            if ($priority !== Priority::NONE) {
+        foreach (Priority013::all() as $priority) {
+            if ($priority !== Priority013::NONE) {
                 $priorities[] = $priority;
             }
         }
@@ -116,7 +117,7 @@ final class FailOn
 
                 return false;
             case self::KIND_PRIORITY:
-                return Priority::rank($finding->priority()) >= Priority::rank($this->value);
+                return Priority013::rank($finding->priority()) >= Priority013::rank($this->value);
             default:
                 return Verdict::severity($finding->verdict()) >= Verdict::severity($this->value);
         }

@@ -6,9 +6,12 @@ namespace Lockrot\Analyzer;
 
 use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Config\Gate;
+use Lockrot\Legacy\Compare013;
+use Lockrot\Legacy\Priority013;
+use Lockrot\Legacy\Verdict013;
 use Lockrot\Signal\Signal;
 use Lockrot\Verdict\Finding;
-use Lockrot\Verdict\Priority;
+use Lockrot\Verdict\ScoreModel;
 use Lockrot\Verdict\Verdict;
 
 /** @internal */
@@ -53,14 +56,34 @@ final class Report
     }
 
     /**
-     * The package name is the last key, so the order is total and the report reads the same on every
-     * run. Descending keys take the other finding's value, ascending keys their own. Public so
-     * {@see TransitiveExposure} lists a parent's descendants in the same order.
+     * The order of {@see findings()} and {@see flagged()}. Public so {@see TransitiveExposure} lists a
+     * parent's descendants in the same order.
      */
     public static function compare(Finding $a, Finding $b): int
     {
-        return [Priority::rank($b->priority()), Verdict::severity($b->verdict()), $b->isDirect(), $a->package()]
-            <=> [Priority::rank($a->priority()), Verdict::severity($a->verdict()), $a->isDirect(), $b->package()];
+        return Compare013::compare($a, $b);
+    }
+
+    /**
+     * The order of {@see sorted()}: the keys of {@see ScoreModel::toArray()} `sort`, which a consumer
+     * re-sorts by. Descending keys take the other finding's value, ascending keys their own.
+     */
+    public static function compareGraded(Finding $a, Finding $b): int
+    {
+        return [self::verdictGroup($a), $b->score()->securityHalves(), $b->score()->exactHalves(), $b->isDirect()]
+            <=> [self::verdictGroup($b), $a->score()->securityHalves(), $a->score()->exactHalves(), $a->isDirect()]
+            ?: strcmp($a->package(), $b->package());
+    }
+
+    private static function verdictGroup(Finding $finding): int
+    {
+        foreach (ScoreModel::VERDICT_ORDER as $group => $verdicts) {
+            if (\in_array($finding->grade(), $verdicts, true)) {
+                return $group;
+            }
+        }
+
+        throw new \LogicException(\sprintf('%s has a verdict outside the verdict order: %s', $finding->package(), $finding->grade()));
     }
 
     /** Returns a copy: a caller that handed the report on keeps the report it handed over. */
@@ -113,15 +136,41 @@ final class Report
     /** @return list<Finding> */
     public function flagged(): array
     {
-        return array_values(array_filter($this->findings, static fn (Finding $f): bool => Verdict::flagged($f->verdict())));
+        return array_values(array_filter($this->findings, static fn (Finding $f): bool => Verdict013::flagged($f->verdict())));
+    }
+
+    /** @return list<Finding> every finding in the order of {@see compareGraded()} */
+    public function sorted(): array
+    {
+        $sorted = $this->findings;
+        usort($sorted, [self::class, 'compareGraded']);
+
+        return $sorted;
+    }
+
+    /** @return list<Finding> the findings with a grade, in the order of {@see sorted()} */
+    public function graded(): array
+    {
+        return array_values(array_filter($this->sorted(), static fn (Finding $f): bool => $f->isGraded()));
     }
 
     /** @return array<string, int> */
     public function byVerdict(): array
     {
-        $counts = array_fill_keys(Verdict::all(), 0);
+        $counts = array_fill_keys(Verdict013::all(), 0);
         foreach ($this->findings as $finding) {
             ++$counts[$finding->verdict()];
+        }
+
+        return $counts;
+    }
+
+    /** @return array<string, int> the findings by {@see Finding::grade()}, every verdict in sort order */
+    public function byGrade(): array
+    {
+        $counts = array_fill_keys(array_merge(...ScoreModel::VERDICT_ORDER), 0);
+        foreach ($this->findings as $finding) {
+            ++$counts[$finding->grade()];
         }
 
         return $counts;
@@ -146,7 +195,7 @@ final class Report
     /** @return array<string, int> */
     public function byPriority(): array
     {
-        $counts = array_fill_keys(Priority::all(), 0);
+        $counts = array_fill_keys(Priority013::all(), 0);
         foreach ($this->findings as $finding) {
             ++$counts[$finding->priority()];
         }
@@ -212,7 +261,7 @@ final class Report
         $packages = 0;
         $advisories = 0;
         foreach ($this->findings as $finding) {
-            if (Verdict::flagged($finding->verdict())) {
+            if (Verdict013::flagged($finding->verdict())) {
                 continue;
             }
             foreach ($finding->signals() as $signal) {
@@ -341,7 +390,7 @@ final class Report
     {
         $counts = $this->byPriority();
         $parts = [];
-        foreach ([Priority::CRITICAL, Priority::HIGH, Priority::MEDIUM, Priority::LOW] as $level) {
+        foreach ([Priority013::CRITICAL, Priority013::HIGH, Priority013::MEDIUM, Priority013::LOW] as $level) {
             $parts[] = $level.' '.$counts[$level];
         }
 

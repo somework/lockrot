@@ -21,11 +21,16 @@ final class SignalSet
 {
     /** @var list<SignalRule> */
     private array $rules;
+    private PhpFloor $floor;
 
-    /** @param list<SignalRule> $rules */
-    public function __construct(array $rules)
+    /**
+     * @param list<SignalRule> $rules
+     * @param ?PhpFloor        $floor the floor that S8 and the fix kinds read, null for no target and no project PHP
+     */
+    public function __construct(array $rules, ?PhpFloor $floor = null)
     {
         $this->rules = $rules;
+        $this->floor = $floor ?? new PhpFloor(null);
     }
 
     /**
@@ -34,6 +39,8 @@ final class SignalSet
      */
     public static function default(Clock $clock, Thresholds $thresholds, string $targetPhp, PhpReleaseDates $dates, ?string $projectPhp = null): self
     {
+        $floor = new PhpFloor($targetPhp, $projectPhp);
+
         return new self([
             new AbandonedRule(),
             new NoReleaseRule($clock, $thresholds),
@@ -41,10 +48,15 @@ final class SignalSet
             new NoPushRule($clock, $thresholds),
             new OldPromiseRule(new ConstraintOpenness(), $dates, $targetPhp),
             new PinnedRule(),
-            new LeftBehindRule($clock, $thresholds, new PhpFloor($targetPhp, $projectPhp)),
+            new LeftBehindRule($clock, $thresholds, $floor),
             new AdvisoryRule(),
             new NotCheckedRule(),
-        ]);
+        ], $floor);
+    }
+
+    public function phpFloor(): PhpFloor
+    {
+        return $this->floor;
     }
 
     /** @return list<Signal> */

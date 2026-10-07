@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Lockrot\Verdict;
+namespace Lockrot\Legacy;
 
 /**
  * The priorities and their rules: docs/verdicts.md#priority.
  *
  * @internal
  */
-final class Priority
+final class Priority013
 {
     public const CRITICAL = 'critical';
     public const HIGH = 'high';
@@ -21,14 +21,14 @@ final class Priority
         self::CRITICAL => 4, self::HIGH => 3, self::MEDIUM => 2, self::LOW => 1, self::NONE => 0,
     ];
 
-    /** Its keys are the flagged verdicts ({@see Verdict::flagged()}). A verdict missing here has no priority. */
+    /** Its keys are the flagged verdicts ({@see Verdict013::flagged()}). A verdict missing here has no priority. */
     private const BASE = [
-        Verdict::ABANDONED => self::CRITICAL,
-        Verdict::SILENT => self::CRITICAL,
-        Verdict::PINNED => self::HIGH,
-        Verdict::LEFT_BEHIND => self::HIGH,
-        Verdict::OLD_PROMISE => self::HIGH,
-        Verdict::STALE => self::MEDIUM,
+        Verdict013::ABANDONED => self::CRITICAL,
+        Verdict013::SILENT => self::CRITICAL,
+        Verdict013::PINNED => self::HIGH,
+        Verdict013::LEFT_BEHIND => self::HIGH,
+        Verdict013::OLD_PROMISE => self::HIGH,
+        Verdict013::STALE => self::MEDIUM,
     ];
 
     /** `low` is the floor: a flagged finding stays in the report. */
@@ -63,20 +63,20 @@ final class Priority
     }
 
     /** The steps and their order: docs/verdicts.md#priority. $reached is false for an empty chain. */
-    public static function basis(string $verdict, bool $direct, bool $dev, bool $unfixableAdvisory, bool $reached = true): PriorityBasis
+    public static function basis(string $verdict, bool $direct, bool $dev, bool $unfixableAdvisory, bool $reached = true): PriorityBasis013
     {
         if (!isset(self::BASE[$verdict])) {
-            return PriorityBasis::startingAt(self::NONE);
+            return PriorityBasis013::startingAt(self::NONE);
         }
-        $basis = PriorityBasis::startingAt(self::BASE[$verdict]);
+        $basis = PriorityBasis013::startingAt(self::BASE[$verdict]);
         if (!$direct) {
-            $basis = $basis->withStep($reached ? PriorityBasis::STEP_TRANSITIVE : PriorityBasis::STEP_UNREACHED, self::LOWER[$basis->priority()]);
+            $basis = $basis->withStep($reached ? PriorityBasis013::STEP_TRANSITIVE : PriorityBasis013::STEP_UNREACHED, self::LOWER[$basis->priority()]);
         }
         if ($dev) {
-            $basis = $basis->withStep(PriorityBasis::STEP_DEV, self::LOWER[$basis->priority()]);
+            $basis = $basis->withStep(PriorityBasis013::STEP_DEV, self::LOWER[$basis->priority()]);
         }
         if ($unfixableAdvisory) {
-            $basis = $basis->withStep(PriorityBasis::STEP_NO_FIX_EXPECTED, self::RAISE[$basis->priority()]);
+            $basis = $basis->withStep(PriorityBasis013::STEP_NO_FIX_EXPECTED, self::RAISE[$basis->priority()]);
         }
 
         return $basis;

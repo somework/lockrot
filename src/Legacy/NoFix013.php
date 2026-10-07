@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Lockrot\Verdict;
+namespace Lockrot\Legacy;
 
 /**
  * The reasons: docs/schema.md#advisories-with-no-fix-expected.
  *
  * @internal
  */
-final class NoFix
+final class NoFix013
 {
     public const NOT_ON_INSTALLED_BRANCH = 'not_on_installed_branch';
     public const RELEASES_UNKNOWN = 'releases_unknown';

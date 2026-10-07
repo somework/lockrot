@@ -21,7 +21,7 @@ start the reason with `in method():`.
 - `src/Analyzer/Analyzer.php` ReturnRemoval `return [$metadata, []];` — in dateSplitPackages(): with no package to date, the rest of the method finds no candidate and makes no request.
 - `src/Analyzer/Libyears.php` GreaterThan `if ($newest === null || $release['at'] > $newest) {` — on a tie the two dates are the same instant, and nothing reads which release gave it.
 - `src/Analyzer/Libyears.php` LessThan `if ($behind > 0.0 && ($worst === null || $behind > $worst[1] || ($behind === $worst[1] && strcmp($finding->package(), $worst[0]->package()) < 0))) {` — two findings of one report never share a package name, so `strcmp()` never returns 0 here.
-- `src/Analyzer/Report.php` UnwrapArrayValues `return array_values(array_filter($this->findings, static fn (Finding $f): bool => Verdict::flagged($f->verdict())));` — the findings are sorted with every flagged one first, so the filter leaves the keys `0..n-1`.
+- `src/Analyzer/Report.php` UnwrapArrayValues `return array_values(array_filter($this->findings, static fn (Finding $f): bool => Verdict013::flagged($f->verdict())));` — the findings are sorted with every flagged one first, so the filter leaves the keys `0..n-1`.
 - `src/Analyzer/RunSettings.php` UnwrapArrayValues `'flagged_verdicts' => array_values(array_filter(Verdict::all(), [Verdict::class, 'flagged'])),` — the flagged verdicts come first in `Verdict::SEVERITY`, so the filter leaves the keys `0..n-1`. The call keeps the JSON a list if that order changes.
 
 ## src/Baseline

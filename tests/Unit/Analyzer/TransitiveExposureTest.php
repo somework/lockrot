@@ -6,12 +6,12 @@ namespace Lockrot\Tests\Unit\Analyzer;
 
 use Lockrot\Analyzer\TransitiveExposure;
 use Lockrot\Graph\DependencyGraph;
+use Lockrot\Legacy\Priority013;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Signal\Signal;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Verdict\Finding;
-use Lockrot\Verdict\Priority;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\TestCase;
 
@@ -113,7 +113,7 @@ final class TransitiveExposureTest extends TestCase
         $f = $this->byName(TransitiveExposure::attach($findings, $graph));
 
         self::assertSame(Verdict::PINNED, $f['root/a']->verdict());
-        self::assertSame(Priority::HIGH, $f['root/a']->priority());
+        self::assertSame(Priority013::HIGH, $f['root/a']->priority());
         self::assertSame([Signal::S6, Signal::S7], array_map(static fn (Signal $s): string => $s->id(), $f['root/a']->signals()));
         self::assertSame('pinned to branch snapshot dev-main; pulls in 1 flagged package: vendor/leaf (abandoned)', $f['root/a']->evidence());
     }

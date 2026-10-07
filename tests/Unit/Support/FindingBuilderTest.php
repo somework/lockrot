@@ -10,6 +10,7 @@ use Lockrot\Signal\Signal;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\Origins;
 use Lockrot\Verdict\Finding;
+use Lockrot\Verdict\FlagSet;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -52,6 +53,7 @@ final class FindingBuilderTest extends TestCase
         $at = new \DateTimeImmutable('2026-09-14T00:00:00+00:00');
         $libyears = LibyearsMeasurement::of(2.74);
         $origin = Origins::of(false);
+        $flags = FlagSet::fromSignals($signals, null, []);
 
         yield 'package' => [static fn (FindingBuilder $b): FindingBuilder => $b->withPackage('acme/other'), new Finding('acme/other', '1.0.0', Verdict::OK, [], ['vendor/pkg'], null, null)];
         yield 'version' => [static fn (FindingBuilder $b): FindingBuilder => $b->withVersion('2.3.4'), new Finding('vendor/pkg', '2.3.4', Verdict::OK, [], ['vendor/pkg'], null, null)];
@@ -66,5 +68,6 @@ final class FindingBuilderTest extends TestCase
         yield 'libyears' => [static fn (FindingBuilder $b): FindingBuilder => $b->withLibyears($libyears), new Finding('vendor/pkg', '1.0.0', Verdict::OK, [], ['vendor/pkg'], null, null, null, false, [], $libyears)];
         yield 'origin' => [static fn (FindingBuilder $b): FindingBuilder => $b->withOrigin($origin), new Finding('vendor/pkg', '1.0.0', Verdict::OK, [], ['vendor/pkg'], null, null, null, false, [], null, $origin)];
         yield 'replacement named by' => [static fn (FindingBuilder $b): FindingBuilder => $b->withReplacementNamedBy(PackageOrigin::PACKAGIST), new Finding('vendor/pkg', '1.0.0', Verdict::OK, [], ['vendor/pkg'], null, null, null, false, [], null, null, PackageOrigin::PACKAGIST)];
+        yield 'flags' => [static fn (FindingBuilder $b): FindingBuilder => $b->withFlags($flags, false), new Finding('vendor/pkg', '1.0.0', Verdict::OK, [], ['vendor/pkg'], null, null, null, false, [], null, null, null, $flags, false)];
     }
 }

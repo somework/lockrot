@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Integration;
 
+use Lockrot\Legacy\Priority013;
 use Lockrot\Tests\Support\ClosedSets;
-use Lockrot\Verdict\Priority;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -34,7 +34,7 @@ final class CompatibilityPageTest extends TestCase
         $page = self::prose('compatibility.md');
 
         self::assertStringContainsString('Verdicts, most severe first: `'.implode('`, `', Verdict::all()).'`.', $page);
-        self::assertStringContainsString('Priorities, highest first: `'.implode('`, `', Priority::all()).'`.', $page);
+        self::assertStringContainsString('Priorities, highest first: `'.implode('`, `', Priority013::all()).'`.', $page);
         self::assertStringContainsString('Signal levels, lowest first: `'.implode('`, `', ClosedSets::levels()).'`.', $page);
         self::assertStringContainsString("A finding's standing against the baseline: `".implode('`, `', ClosedSets::standings()).'`.', $page);
     }

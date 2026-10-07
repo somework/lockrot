@@ -22,6 +22,9 @@ use Lockrot\Data\Repository\MetadataLoaderInterface;
 use Lockrot\Data\Repository\RepositoryMetadataLoader;
 use Lockrot\Explain\Explanation;
 use Lockrot\Json\Schemas;
+use Lockrot\Legacy\NoFix013;
+use Lockrot\Legacy\Priority013;
+use Lockrot\Legacy\PriorityBasis013;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Output\ExplainFormatter;
@@ -33,9 +36,6 @@ use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\ValidatesJsonSchemas;
 use Lockrot\Verdict\Finding;
-use Lockrot\Verdict\NoFix;
-use Lockrot\Verdict\Priority;
-use Lockrot\Verdict\PriorityBasis;
 use Lockrot\Verdict\Verdict;
 use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\TestCase;
@@ -113,7 +113,7 @@ final class FindingFactsConsistencyTest extends TestCase
             $this->agree($analysis, $name);
         }
 
-        foreach (array_merge(PriorityBasis::STEPS, array_diff(NoFix::REASONS, [NoFix::AFFECTED_RANGE_UNKNOWN])) as $reason) {
+        foreach (array_merge(PriorityBasis013::STEPS, array_diff(NoFix013::REASONS, [NoFix013::AFFECTED_RANGE_UNKNOWN])) as $reason) {
             self::assertArrayHasKey($reason, $this->seen, 'the documents give '.$reason.', or the rules prove little: '.json_encode($this->seen));
         }
     }
@@ -196,16 +196,16 @@ final class FindingFactsConsistencyTest extends TestCase
         $expected = [];
         if (Verdict::flagged(JsonPath::stringAt($row, ['verdict']))) {
             if ($row['direct'] !== true) {
-                $expected[] = $row['chain'] === [] ? PriorityBasis::STEP_UNREACHED : PriorityBasis::STEP_TRANSITIVE;
+                $expected[] = $row['chain'] === [] ? PriorityBasis013::STEP_UNREACHED : PriorityBasis013::STEP_TRANSITIVE;
             }
             if ($row['dev'] === true) {
-                $expected[] = PriorityBasis::STEP_DEV;
+                $expected[] = PriorityBasis013::STEP_DEV;
             }
             if (\is_array($noFix) && $noFix !== []) {
-                $expected[] = PriorityBasis::STEP_NO_FIX_EXPECTED;
+                $expected[] = PriorityBasis013::STEP_NO_FIX_EXPECTED;
             }
         } else {
-            self::assertSame(Priority::NONE, $basis['base'], $what);
+            self::assertSame(Priority013::NONE, $basis['base'], $what);
         }
         self::assertSame($expected, $reasons, $what.': one step for each fact that holds, in order');
         self::assertSame(\is_array($noFix) && $noFix !== [], strpos(JsonPath::stringAt($row, ['evidence']), 'no fix expected') !== false, $what.': the evidence says it exactly when the list names one');
@@ -234,26 +234,26 @@ final class FindingFactsConsistencyTest extends TestCase
             self::assertNotNull($s9);
             $read = $s9['releases_read'];
             switch ($reason) {
-                case NoFix::NOT_ON_INSTALLED_BRANCH:
+                case NoFix013::NOT_ON_INSTALLED_BRANCH:
                     self::assertSame(Verdict::LEFT_BEHIND, $row['verdict'], $what);
                     self::assertNotNull($advisory['fixed_by'], $what);
                     self::assertFalse($advisory['fixed_on_branch'], $what);
 
                     break;
-                case NoFix::RELEASES_UNKNOWN:
+                case NoFix013::RELEASES_UNKNOWN:
                     self::assertFalse($read, $what);
                     self::assertNull($advisory['fixed_by'], $what);
                     self::assertFalse($advisory['fixed_on_branch'], $what);
 
                     break;
-                case NoFix::AFFECTED_RANGE_UNKNOWN:
+                case NoFix013::AFFECTED_RANGE_UNKNOWN:
                     self::assertTrue($read, $what);
                     self::assertNull($advisory['affected_versions'], $what);
                     self::assertNull($advisory['fixed_by'], $what);
                     self::assertFalse($advisory['fixed_on_branch'], $what);
 
                     break;
-                case NoFix::NO_RELEASE_FIXES:
+                case NoFix013::NO_RELEASE_FIXES:
                     self::assertTrue($read, $what);
                     self::assertNull($advisory['fixed_by'], $what);
                     self::assertNotNull($advisory['affected_versions'], $what);

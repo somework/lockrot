@@ -7,9 +7,9 @@ namespace Lockrot\Output;
 use Lockrot\Analyzer\Report;
 use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Json\JsonWriter;
+use Lockrot\Legacy\Priority013;
 use Lockrot\Lock\LockLineIndex;
 use Lockrot\Verdict\Finding;
-use Lockrot\Verdict\Priority;
 use Lockrot\Verdict\Verdict;
 
 /**
@@ -177,7 +177,7 @@ final class SarifFormatter implements FormatterInterface
             'ruleId' => 'lockrot/'.$finding->verdict(),
             'ruleIndex' => $ruleIndex,
             'level' => $this->context->levelOf($finding, $baseline),
-            'rank' => Priority::rank($finding->priority()) * self::RANK_STEP,
+            'rank' => Priority013::rank($finding->priority()) * self::RANK_STEP,
             'message' => ['text' => $this->message($finding)],
             'locations' => [['physicalLocation' => $physicalLocation]],
             // The line of an entry moves when the lock changes, so only the package name identifies

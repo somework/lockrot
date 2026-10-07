@@ -9,7 +9,7 @@ use Lockrot\Signal\Signal;
 
 /**
  * The closed and open sets docs/compatibility.md names, read off the code in one place for the
- * tests that hold the schemas and the pages to them. Verdict::all() and Priority::all() are lists
+ * tests that hold the schemas and the pages to them. Verdict::all() and Priority013::all() are lists
  * already. The signal levels, the baseline standings and the signal ids are constants, not lists.
  */
 final class ClosedSets
