@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Security;
 
+use Composer\Semver\Constraint\Constraint;
 use Composer\Semver\Intervals;
 use Composer\Semver\VersionParser;
 use Lockrot\Signal\PhpFloor;
@@ -38,8 +39,8 @@ final class PhpCheck
     }
 
     /**
-     * `raise_to` and `raise_size` are set together, only when the release's lowest PHP is above
-     * the project's: then there is a floor to write.
+     * `raise_to` and `raise_size` are set together, only when the project's point does not satisfy
+     * the release's php and a stable version above that point does: then there is a floor to write.
      */
     public static function of(?string $php, PhpFloor $floor): self
     {
@@ -57,21 +58,29 @@ final class PhpCheck
     }
 
     /**
-     * The lowest point of $php above the project's point. A disjunction such as `7.1.* || >=8.1`
-     * starts below the project's point and admits it nowhere, so its first range above it counts.
+     * The lowest stable `X.Y.Z` above the project's point that $php admits, read at the start of
+     * each of its ranges and at the patch after it: a start such as `>=7.4.0-p1` or `>7.4.0` admits
+     * no `X.Y.Z` of its own. A disjunction such as `7.1.* || >=8.1` starts below the project's
+     * point, so its first range above the point counts.
      */
     private static function pointAbove(string $php, string $project): ?string
     {
         try {
-            $intervals = Intervals::get((new VersionParser())->parseConstraints($php))['numeric'];
+            $constraint = (new VersionParser())->parseConstraints($php);
         } catch (\UnexpectedValueException $e) {
             return null;
         }
-        foreach ($intervals as $interval) {
+        foreach (Intervals::get($constraint)['numeric'] as $interval) {
             $start = $interval->getStart();
             $point = PhpFloor::pointOf($start->getOperator().$start->getVersion());
-            if ($point !== null && version_compare($point, $project, '>')) {
-                return $point;
+            if ($point === null) {
+                continue;
+            }
+            [$major, $minor, $patch] = explode('.', $point);
+            foreach ([$point, $major.'.'.$minor.'.'.((int) $patch + 1)] as $candidate) {
+                if (version_compare($candidate, $project, '>') && $constraint->matches(new Constraint('==', $candidate.'.0'))) {
+                    return $candidate;
+                }
             }
         }
 

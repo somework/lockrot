@@ -231,21 +231,29 @@ final class DependencyGraphTest extends TestCase
         self::assertSame([ProjectConfig::REQUIRE], $graph->namedIn('foo/bar'));
     }
 
-    /** A require-dev name that a dev package carries does not move to a prod provider without `--dev`. */
-    public function testNamedInDoesNotDependOnDev(): void
+    /**
+     * Without `--dev`, Composer satisfies a name with the packages that it installs: a prod provider
+     * wins over a dev package of that name.
+     */
+    public function testWithoutDevANameResolvesToTheProdProvider(): void
     {
         $lock = LockFile::fromArray([
             'packages' => [
-                ['name' => 'vendor/impl', 'version' => '1.0.0', 'provide' => ['vendor/iface' => '1.0.0']],
-                ['name' => 'app/x', 'version' => '1.0.0', 'require' => ['vendor/impl' => '^1']],
+                ['name' => 'app/a', 'version' => '1.0.0', 'require' => ['vendor/x' => '^1']],
+                ['name' => 'vendor/p', 'version' => '1.0.0', 'provide' => ['vendor/x' => '1.0.0']],
             ],
-            'packages-dev' => [['name' => 'vendor/iface', 'version' => '1.0.0']],
+            'packages-dev' => [
+                ['name' => 'dev/d', 'version' => '1.0.0', 'require' => ['vendor/p' => '^1', 'vendor/x' => '^2']],
+                ['name' => 'vendor/x', 'version' => '2.0.0'],
+            ],
         ]);
-        $project = ProjectConfig::fromArray(['require' => ['app/x' => '^1'], 'require-dev' => ['vendor/iface' => '^1']]);
 
-        foreach ([true, false] as $includeDev) {
-            self::assertSame([], DependencyGraph::fromLock($lock, $project, $includeDev)->namedIn('vendor/impl'), $includeDev ? 'with dev' : 'without dev');
-        }
+        $transitive = DependencyGraph::fromLock($lock, ProjectConfig::fromArray(['require' => ['app/a' => '^1'], 'require-dev' => ['dev/d' => '^1']]), false);
+        self::assertSame(['app/a', 'vendor/p'], $transitive->shortestChain('vendor/p'));
+
+        $direct = DependencyGraph::fromLock($lock, ProjectConfig::fromArray(['require' => ['vendor/x' => '^1'], 'require-dev' => ['dev/d' => '^1']]), false);
+        self::assertSame(['vendor/p'], $direct->shortestChain('vendor/p'));
+        self::assertSame([ProjectConfig::REQUIRE], $direct->namedIn('vendor/p'));
     }
 
     /** Both sections are read whatever `--dev` says, in the order require, require-dev. */
