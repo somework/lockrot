@@ -121,9 +121,10 @@ final class SelfUpdateCommand extends BaseCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         // Read before anything can replace the archive: after the swap this process cannot load a
-        // class it has not used. A `Policy::EXIT_*` in a later return is the first use of Policy.
-        // TerminalText is loaded for the same reason: an error after the swap can be the first line that
-        // writeError() colours. Every other class on the way out is already in memory.
+        // class it has not used. Without these locals, a `Policy::EXIT_*` in a later return is the
+        // first use of Policy. TerminalText is loaded for the same reason: an error after the swap
+        // can be the first line that writeError() colours. Every other class on the way out is
+        // already in memory: `instanceof` does not autoload.
         $exitOk = Policy::EXIT_OK;
         $exitError = Policy::EXIT_ERROR;
         $exitFindings = Policy::EXIT_FINDINGS;

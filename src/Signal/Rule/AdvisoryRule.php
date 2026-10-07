@@ -92,12 +92,11 @@ final class AdvisoryRule implements SignalRule
 
     /**
      * The releases that a fix is looked for in: the highest stable tag on the installed version's
-     * branch (none for a branch snapshot or an unlisted branch) and the package's highest stable
-     * tag. Either counts only above the installed version, because going back to an older tag that
-     * an advisory range spares is not a fix. A branch snapshot is compared with no tag, so the
-     * package's highest stable tag counts as it is.
-     * The third element is false when nothing was compared: no metadata, or an installed version
-     * that no parser reads.
+     * branch (none for a branch snapshot or an unlisted branch) and the package's highest stable tag.
+     * Either counts only above the installed version: an older tag that an advisory range spares is
+     * not a fix. For a branch snapshot, the package's highest stable tag counts as it is. The third
+     * element is false when nothing was compared: no metadata, or an installed version that no
+     * parser reads.
      *
      * @return array{?array{normalized: string, pretty: string}, ?array{normalized: string, pretty: string}, bool}
      */

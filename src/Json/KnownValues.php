@@ -10,7 +10,6 @@ namespace Lockrot\Json;
  * `x-known-keys` list: the known keys become its only properties, each typed by every regex it
  * matches, else by `additionalProperties`. A node that already has an `enum` or `properties` keeps
  * it. An object that is a value (a `default`, an `enum` member) is not read as a schema.
- * {@see \Lockrot\Config\ConfigSchema} validates `extra.lockrot` this way.
  *
  * @internal
  */

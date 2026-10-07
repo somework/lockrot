@@ -9,11 +9,11 @@ use Lockrot\Verdict\FailOn;
 
 /**
  * The decision behind the exit code of `composer lockrot`, the `gate` of the json and html
- * reports, and the install-time block. The rules
- * are in docs/schema.md#the-gate.
+ * reports, and the install-time block. The rules are in docs/schema.md#the-gate.
  *
  * The annotation level of the machine formats ({@see \Lockrot\Output\FormatContext::levelOf()})
- * reads the same two primitives by a rule of its own, see docs/ci.md#how-each-format-marks-a-finding.
+ * reads {@see FailOn::reaches()} and the baseline's `known` status by a rule of its own:
+ * docs/ci.md#how-each-format-marks-a-finding.
  *
  * @internal
  */

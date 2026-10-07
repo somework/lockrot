@@ -11,9 +11,7 @@ use Lockrot\Json\JsonWriter;
 
 /**
  * A disabled or read-only cache needs no guard here: Composer\Cache::read() and ::write() check
- * isEnabled() themselves, so a read is a miss and a write does nothing. Only a cache that turns
- * disabled during a run reaches this class disabled, because {@see ServiceFactory::createCache()}
- * hands over an enabled cache only.
+ * isEnabled() themselves, so a read is a miss and a write does nothing.
  *
  * @internal
  */

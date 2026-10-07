@@ -9,7 +9,7 @@ use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 /**
  * The markup of lockrot's terminal formats (`<fg=red>`, `<options=bold>`, Composer's `<warning>`,
  * `\<` for a literal bracket) and its renderer, in place of Symfony's tag formatter. lockrot cannot
- * trust that formatter with text that it did not write. In symfony/console 5.4 inside Composer's
+ * trust that formatter with text that lockrot did not write. In symfony/console 5.4 inside Composer's
  * PHARs, `<<fg=red>>` stays live and `\<` loses its backslash. symfony/console 2.8 (Composer 2.2
  * LTS) unescapes `\<` but not `\>`. So {@see self::escape()} escapes every bracket and backslash,
  * and lockrot writes the result raw (OutputInterface::OUTPUT_RAW, IOInterface::writeErrorRaw()).

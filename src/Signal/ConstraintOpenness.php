@@ -10,7 +10,8 @@ use Composer\Semver\VersionParser;
 use Lockrot\Data\Php\PhpReleaseDates;
 
 /**
- * Decides whether a php requirement is an open promise, the constraint half of S5's test: docs/verdicts.md#old-promise.
+ * Decides whether a php requirement is an open promise, the constraint half of S5's test:
+ * docs/verdicts.md#old-promise.
  *
  * @internal
  */

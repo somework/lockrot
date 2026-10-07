@@ -22,7 +22,10 @@ final class Release
         $this->signatureUrl = $signatureUrl;
     }
 
-    /** The version as `major.minor.patch`, plus a fourth number that is not 0, whatever spelling the tag used (`v0.13` is 0.13.0). */
+    /**
+     * The version as `major.minor.patch`, with a fourth number only when it is not 0, whatever
+     * spelling the tag used (`v0.13` is 0.13.0).
+     */
     public function version(): string
     {
         return $this->version;

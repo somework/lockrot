@@ -14,10 +14,10 @@ use Lockrot\Deadline;
 /**
  * Fetches security advisories through Composer's repository layer, as `composer audit` does
  * ({@see \Composer\Repository\RepositorySet::getMatchingSecurityAdvisories()}), and drops those
- * that {@see AdvisoryIgnore} lists. It asks for full records only: the partial records in
- * Composer's package-file cache are never the answer. Composer hard-codes a ten-second timeout for
- * the POST, so lockrot checks the deadline before each repository, not inside the call.
- * Notes and scope: docs/verdicts.md#security-advisories.
+ * that {@see AdvisoryIgnore} lists. It asks for full records only: a partial record in Composer's
+ * package-file cache holds only an id and a range, and can be withdrawn. Composer hard-codes a
+ * ten-second timeout for the POST, so lockrot checks the deadline before each repository, not
+ * inside the call. Notes and scope: docs/verdicts.md#security-advisories.
  *
  * @internal
  */

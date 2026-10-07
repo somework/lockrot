@@ -54,8 +54,9 @@ final class BaselineSchema
      * `json_decode(..., true)` turns `{}` and `[]` into `[]`, so an empty `findings` object needs a
      * `stdClass` to stay an object. Every other value stays as read, so a real JSON array is rejected.
      *
-     * Do not replace {@see SchemaPayload} with the library's JSON round trip: it validates a key
-     * that starts with a NUL byte as an empty object and throws on a number too large for a float.
+     * Do not replace {@see SchemaPayload} with the library's JSON round trip. That round trip
+     * validates a key that starts with a NUL byte as an empty object, and throws on a number too
+     * large for a float.
      *
      * @param array<string, mixed> $baseline
      */

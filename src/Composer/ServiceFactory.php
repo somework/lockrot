@@ -125,7 +125,8 @@ final class ServiceFactory
      * HTTP for repository activity only. The deadline cuts each activity request to the time left
      * ({@see ComposerHttpClient::timeoutSeconds()}). Repository metadata requests come from the
      * project's own ComposerRepository instances, whose HttpDownloader timeouts lockrot cannot set,
-     * so the deadline check between chunks bounds them ({@see \Lockrot\Data\Repository\RepositoryMetadataLoader}).
+     * so the deadline check between chunks of {@see \Lockrot\Data\Repository\RepositoryMetadataLoader}
+     * bounds them.
      */
     public static function createHttp(IOInterface $io, Config $config, LockrotConfig $lockrot, Clock $clock, ?Deadline $deadline = null): CachingHttpClient
     {

@@ -7,11 +7,11 @@ namespace Lockrot\SelfUpdate;
 use Lockrot\Exception\ConfigException;
 
 /**
- * What a release's `lockrot.phar.meta.json` says: its lowest PHP and the fingerprint of the key
- * that signed it. The file is unsigned and decides only which release is tried: the checksum and
- * the signature decide whether one is installed. A floor that is not plain `major.minor.patch` is
- * never compared ({@see phpFloor()}). What a doctored file can do:
- * SECURITY.md#how-self-update-trusts-a-release
+ * What a release's `lockrot.phar.meta.json` says, as `build/selfupdate-signature.php describe`
+ * writes it: its lowest PHP and the fingerprint of the key that signed it. The file is unsigned
+ * and decides only which release is tried: the checksum and the signature decide whether one is
+ * installed. A floor that is not plain `major.minor.patch` is never compared ({@see phpFloor()}).
+ * What a doctored file can do: SECURITY.md#how-self-update-trusts-a-release
  *
  * @internal
  */

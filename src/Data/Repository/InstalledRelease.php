@@ -13,8 +13,8 @@ use Lockrot\Lock\LockedPackage;
  * carries its commit's date. A subtree split's tag carries the date of a commit that its other
  * tags share. See docs/verdicts.md#dates-from-the-monorepo.
  *
- * Every surface that prints or measures the installed version's date reads this one object, so
- * the same date is never a release in one line and a commit in the next.
+ * Read the installed version's date through this class, so that the same date is never a release
+ * in one line and a commit in the next.
  *
  * @internal
  */
@@ -56,9 +56,8 @@ final class InstalledRelease
             return new self($time === null ? self::UNDATED : self::RELEASE, $time, $time, null);
         }
         // The parent dates the version whether or not the lock has a date. Only a parent counts:
-        // fromPackages() keeps release dates for any package that declares `replace: <other>
-        // self.version`, else guzzlehttp/guzzle dates itself and reads its own release
-        // as a shared commit.
+        // PackageMetadata::fromPackages() keeps release dates for any package with a `self.version`
+        // replace, else guzzlehttp/guzzle dates itself and reads its own release as a shared commit.
         $datedBy = $metadata->releaseDatesBy();
         $parent = $datedBy === null ? null : self::parentDateOf($package, $metadata);
         if ($parent !== null) {

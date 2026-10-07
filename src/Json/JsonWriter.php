@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Lockrot\Json;
 
 /**
- * Every JSON document lockrot writes goes through here, so a float prints in its shortest form
- * whatever `serialize_precision` the process inherited: `6.9`, never `6.9000000000000004`. The
- * setting is pinned to -1 for this one call and restored after it.
+ * Encodes with `serialize_precision` set to -1 for this one call, so a float prints in its shortest
+ * form whatever the process inherited: `6.9`, never `6.9000000000000004`. The method restores the
+ * setting after the call.
  *
  * @internal
  */

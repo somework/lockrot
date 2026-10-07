@@ -34,8 +34,8 @@ final class SarifFormatter implements FormatterInterface
     private const RANK_STEP = 25.0;
 
     /**
-     * The rule text per verdict, as {short, full}, that a code-scanning alert shows. Keep it true to
-     * docs/verdicts.md#the-nine-verdicts: no test compares the two.
+     * The rule text per verdict, as {short, full}, that a code-scanning alert shows. Keep it the
+     * same as docs/verdicts.md#the-nine-verdicts.
      *
      * @var array<string, array{0: string, 1: string}>
      */

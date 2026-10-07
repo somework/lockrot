@@ -70,8 +70,9 @@ final class ComposerHttpClient implements HttpClientInterface
     /**
      * $headers without lockrot's own credential headers (`Authorization`, `PRIVATE-TOKEN`) when
      * Composer's AuthHelper adds credentials of its own, because a request with two is refused and
-     * GitHub answers 401 "Bad credentials". The origin and credential rules copy AuthHelper of Composer 2.2 to 2.10, so the
-     * header that Composer adds is the one on the wire. The token that lockrot resolved still lifts
+     * GitHub answers 401 "Bad credentials". The origin and credential rules copy AuthHelper of
+     * Composer 2.2 and 2.10, so the header that Composer adds is the one on the wire. The token that
+     * lockrot resolved still lifts
      * the repository-activity cap. See docs/internals.md#which-credentials.
      *
      * @param list<string> $headers
