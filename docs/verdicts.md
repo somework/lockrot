@@ -404,6 +404,11 @@ then direct requirements ahead of transitive packages, then by package name.
 `--fail-on` fails the run on a finding at or above a verdict, a priority or `unchecked`, except one
 the baseline carries. [ci.md](ci.md) says which to choose.
 
+## The score {#score}
+
+lockrot follows the `require` links of each lock entry to find what composer.json reaches. A
+required name that a locked package replaces or provides leads to that package.
+
 ## Priority in each format {#priority-in-each-format}
 
 Every output format carries the priority: the `table` groups findings under it, the JSON gives
