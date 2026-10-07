@@ -34,6 +34,7 @@ final class PhpFloor
     private ?string $targetLabel;
     /** The lowest PHP the project promises to run on, as `== 7.2.5.0`, or null with no readable promise. */
     private ?Constraint $projectLowest;
+    private ?string $projectPoint;
     private ?string $projectPhp;
 
     /**
@@ -44,7 +45,19 @@ final class PhpFloor
     {
         $this->parser = new VersionParser();
         [$this->targetMinor, $this->targetLabel] = $this->target($targetPhp);
-        [$this->projectLowest, $this->projectPhp] = $this->project($projectPhp);
+        [$this->projectPoint, $this->projectPhp] = $this->project($projectPhp);
+        $this->projectLowest = $this->projectPoint === null ? null : new Constraint('==', $this->projectPoint.'.0');
+    }
+
+    /**
+     * The project's lowest PHP as the stable point that every project comparison checks, written
+     * `MAJOR.MINOR.PATCH`: `>=8.2` gives `8.2.0`, `>=7.4.0-RC1` gives `7.4.0`, `>7.1` gives
+     * `7.1.1`. Null with no `require.php`, no lower bound (`*`, `<8`) or an unreadable one.
+     * See SPEC-0.14 5.3 `run.project_php_lowest`.
+     */
+    public function lowestAsString(): ?string
+    {
+        return $this->projectPoint;
     }
 
     /**
@@ -177,21 +190,36 @@ final class PhpFloor
         }
     }
 
-    /** @return array{0: ?Constraint, 1: ?string} */
+    /** @return array{0: ?string, 1: ?string} the point, and `require.php` as written */
     private function project(?string $projectPhp): array
     {
-        if ($projectPhp === null) {
-            return [null, null];
-        }
+        $point = $projectPhp === null ? null : self::pointOf($projectPhp);
+
+        return $point === null ? [null, null] : [$point, $projectPhp];
+    }
+
+    /**
+     * The lowest stable `X.Y.Z` that a php constraint admits by its lower bound, as
+     * {@see lowestAsString()} reads `require.php`. An exclusive bound, or one with a non-zero
+     * fourth segment, admits no `X.Y.Z` of its own, so the point is the next patch. Null with no
+     * lower bound or an unreadable constraint.
+     */
+    public static function pointOf(string $constraint): ?string
+    {
         try {
-            $lower = $this->parser->parseConstraints($projectPhp)->getLowerBound();
+            $lower = (new VersionParser())->parseConstraints($constraint)->getLowerBound();
         } catch (\UnexpectedValueException $e) {
-            return [null, null];
+            return null;
         }
         if ($lower->isZero()) {
-            return [null, null];
+            return null;
+        }
+        $parts = explode('-', $lower->getVersion(), 2);
+        [$major, $minor, $patch, $fourth] = array_map('intval', explode('.', $parts[0]));
+        if ($fourth !== 0 || (!$lower->isInclusive() && !isset($parts[1]))) {
+            ++$patch;
         }
 
-        return [new Constraint('==', $lower->getVersion()), $projectPhp];
+        return $major.'.'.$minor.'.'.$patch;
     }
 }

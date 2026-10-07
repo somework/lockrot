@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Signal;
 
+use Composer\Semver\Constraint\Constraint;
+use Composer\Semver\VersionParser;
 use Lockrot\Signal\PhpFloor;
+use Lockrot\Tests\Support\Golden;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -205,5 +208,100 @@ final class PhpFloorTest extends TestCase
         }
         ksort($seen);
         self::assertSame([PhpFloor::NEEDS_NEWER, PhpFloor::SKIPS, PhpFloor::STOPS_BEFORE, PhpFloor::UNSATISFIABLE], array_keys($seen), 'every side, or the matrix proves little');
+    }
+
+    /**
+     * The stable point that every project comparison reads (SPEC 5.3, items/C67.md 3.5): an
+     * inclusive bound gives its `X.Y.Z`, an exclusive bound or a non-zero fourth segment the next
+     * patch. No lower bound, or no readable constraint, gives no point.
+     *
+     * @dataProvider floorPoints
+     */
+    #[DataProvider('floorPoints')]
+    public function testTheProjectsLowestPhpIsAStablePoint(?string $requirePhp, ?string $point): void
+    {
+        $floor = new PhpFloor('8.4', $requirePhp);
+
+        self::assertSame($point, $floor->lowestAsString());
+        if ($point !== null) {
+            self::assertTrue($floor->admitsProject($point), 'the published point is the point admitsProject() checks');
+            self::assertNull($floor->missesProject($point));
+        }
+    }
+
+    /** @return iterable<string, array{?string, ?string}> */
+    public static function floorPoints(): iterable
+    {
+        yield 'a caret' => ['^7.2', '7.2.0'];
+        yield 'an inclusive bound with a patch' => ['>=7.2.5', '7.2.5'];
+        yield 'an exclusive bound' => ['>7.1', '7.1.1'];
+        yield 'a tilde on a patch' => ['~8.0.0', '8.0.0'];
+        yield 'a pre-release bound' => ['>=7.4.0-RC1', '7.4.0'];
+        yield 'a wildcard' => ['7.*', '7.0.0'];
+        yield 'a caret on a patch' => ['^7.2.5', '7.2.5'];
+        yield 'an inclusive bound' => ['>=8.2', '8.2.0'];
+        yield 'alternatives, the lowest' => ['^7.4 || ^8.0', '7.4.0'];
+        yield 'a non-zero fourth segment' => ['>=7.2.5.1', '7.2.6'];
+        yield 'an exclusive bound on a patch' => ['>7.1.3', '7.1.4'];
+        yield 'an exact version' => ['8.1.2', '8.1.2'];
+        yield 'a hyphen range' => ['7.3 - 8.1', '7.3.0'];
+        yield 'any version' => ['*', null];
+        yield 'an upper bound only' => ['<8', null];
+        yield 'an unreadable constraint' => ['whatever', null];
+        yield 'no require.php' => [null, null];
+    }
+
+    /**
+     * items/C67.md 3.5: the point moves what a branch row admits only at the edge. The last column
+     * is 0.13's answer, kept to show which rows the point changes.
+     *
+     * @dataProvider floorPointEdges
+     */
+    #[DataProvider('floorPointEdges')]
+    public function testTheFloorPointDecidesTheEdgeOfABranchsPhp(string $requirePhp, string $branchPhp, bool $admits, bool $before): void
+    {
+        $floor = new PhpFloor('8.4', $requirePhp);
+
+        self::assertSame($admits, $floor->admitsProject($branchPhp));
+        self::assertSame($admits, $floor->missesProject($branchPhp) === null, 'missesProject() reads the same point');
+        $parser = new VersionParser();
+        $bound = $parser->parseConstraints($requirePhp)->getLowerBound()->getVersion();
+        self::assertSame($before, $parser->parseConstraints($branchPhp)->matches(new Constraint('==', $bound)), 'the 0.13 rule: the bound as written, suffix kept');
+    }
+
+    /** @return iterable<string, array{string, string, bool, bool}> */
+    public static function floorPointEdges(): iterable
+    {
+        yield '>=8.2 against 8.2.0' => ['>=8.2', '8.2.0', true, false];
+        yield '>=8.2 against >=8.2.0-alpha1' => ['>=8.2', '>=8.2.0-alpha1', true, false];
+        yield '>=8.2 against >8.2.0' => ['>=8.2', '>8.2.0', false, false];
+        yield '>=8.2 against >=8.2.1' => ['>=8.2', '>=8.2.1', false, false];
+        yield '^7.2.5 against 7.2.5' => ['^7.2.5', '7.2.5', true, false];
+        yield '>=7.4.0-RC1 against 7.4.0' => ['>=7.4.0-RC1', '7.4.0', true, false];
+        yield '>7.1 against >7.1' => ['>7.1', '>7.1', true, false];
+        yield '>7.1 against >=7.1.1' => ['>7.1', '>=7.1.1', true, false];
+        yield '>7.1 against 7.1.0' => ['>7.1', '7.1.0', false, true];
+        yield '>=8.2 against ^8.2' => ['>=8.2', '^8.2', true, true];
+        yield '>=8.2 against 8.2.*' => ['>=8.2', '8.2.*', true, true];
+        yield '>=8.2 against <8.2' => ['>=8.2', '<8.2', false, false];
+    }
+
+    /**
+     * The display rows of the floor point, which lockrot-report's display rule reads: a trailing
+     * `.0` patch is dropped when the point is printed, any other patch is kept.
+     */
+    public function testTheDisplayRowsOfTheFloorPointAreRecorded(): void
+    {
+        $rows = [];
+        foreach (['^7.2', '>=7.2.5', '>7.1', '~8.0.0', '>=7.4.0-RC1', '7.*', '*', '<8', 'whatever', null] as $requirePhp) {
+            $point = (new PhpFloor(null, $requirePhp))->lowestAsString();
+            $rows[] = [
+                'require_php' => $requirePhp,
+                'project_php_lowest' => $point,
+                'printed' => $point === null ? null : preg_replace('/\\.0$/', '', $point),
+            ];
+        }
+
+        Golden::assertMatches('php-versions.json', ['rows' => $rows], 'testTheDisplayRowsOfTheFloorPointAreRecorded', \dirname(__DIR__, 2).'/fixtures/contract/en/');
     }
 }
