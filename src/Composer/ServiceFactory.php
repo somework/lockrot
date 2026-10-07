@@ -16,6 +16,7 @@ use Lockrot\Allowlist\BuiltinAllowlist;
 use Lockrot\Analyzer\Analyzer;
 use Lockrot\Clock;
 use Lockrot\Config\LockrotConfig;
+use Lockrot\Data\Abandoned\AbandonedIgnore;
 use Lockrot\Data\Advisory\AdvisoryIgnore;
 use Lockrot\Data\Advisory\RepositoryAdvisoryLoader;
 use Lockrot\Data\Cache\ArrayCache;
@@ -61,7 +62,9 @@ final class ServiceFactory
             new VerdictEngine(),
             $clock,
             $lockrot->offline(),
-            new RepositoryAdvisoryLoader($repositories, $lockrot->offline(), $deadline, AdvisoryIgnore::fromConfig($config))
+            new RepositoryAdvisoryLoader($repositories, $lockrot->offline(), $deadline, AdvisoryIgnore::fromConfig($config), $lockrot->advisoryLookup(), $lockrot->advisoryLookupSource()),
+            null,
+            AbandonedIgnore::fromConfig($config)
         );
 
         return $analyzer->withDeadline($deadline);

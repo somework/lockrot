@@ -16,14 +16,18 @@ final class AllowlistEntry
     private string $reason;
     private ?\DateTimeImmutable $expires;
     private string $source;
+    /** @var list<string>|null */
+    private ?array $flags;
 
-    public function __construct(string $pattern, ?string $version, string $reason, ?\DateTimeImmutable $expires, string $source)
+    /** @param list<string>|null $flags the maintenance flags the entry accepts, null for every one */
+    public function __construct(string $pattern, ?string $version, string $reason, ?\DateTimeImmutable $expires, string $source, ?array $flags = null)
     {
         $this->pattern = $pattern;
         $this->version = $version;
         $this->reason = $reason;
         $this->expires = $expires;
         $this->source = $source;
+        $this->flags = $flags;
     }
 
     public function matches(string $name, string $version): bool
@@ -70,5 +74,16 @@ final class AllowlistEntry
     public function source(): string
     {
         return $this->source;
+    }
+
+    /** @return list<string>|null null when the entry accepts every maintenance flag */
+    public function flags(): ?array
+    {
+        return $this->flags;
+    }
+
+    public function acceptsAll(): bool
+    {
+        return $this->flags === null;
     }
 }

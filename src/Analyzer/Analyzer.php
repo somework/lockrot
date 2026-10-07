@@ -7,6 +7,8 @@ namespace Lockrot\Analyzer;
 use Lockrot\Allowlist\Allowlist;
 use Lockrot\Allowlist\AllowlistEntry;
 use Lockrot\Clock;
+use Lockrot\Data\Abandoned\AbandonedIgnore;
+use Lockrot\Data\Abandoned\AbandonedIgnoreMatch;
 use Lockrot\Data\Advisory\AdvisoryBatch;
 use Lockrot\Data\Advisory\AdvisoryLoaderInterface;
 use Lockrot\Data\Forge\ActivityBatch;
@@ -50,8 +52,9 @@ final class Analyzer
     /** Null when the run has no advisory source. Then the run asks nothing and notes nothing. */
     private ?AdvisoryLoaderInterface $advisories;
     private MonorepoParents $parents;
+    private AbandonedIgnore $abandonedIgnore;
 
-    public function __construct(MetadataLoaderInterface $metadata, ActivityClient $activity, ActivityFetchPlanner $planner, RepoLocator $locator, Allowlist $allowlist, SignalSet $signals, VerdictEngine $engine, Clock $clock, bool $offline, ?AdvisoryLoaderInterface $advisories = null, ?MonorepoParents $parents = null)
+    public function __construct(MetadataLoaderInterface $metadata, ActivityClient $activity, ActivityFetchPlanner $planner, RepoLocator $locator, Allowlist $allowlist, SignalSet $signals, VerdictEngine $engine, Clock $clock, bool $offline, ?AdvisoryLoaderInterface $advisories = null, ?MonorepoParents $parents = null, ?AbandonedIgnore $abandonedIgnore = null)
     {
         $this->metadata = $metadata;
         $this->activity = $activity;
@@ -64,6 +67,7 @@ final class Analyzer
         $this->offline = $offline;
         $this->advisories = $advisories;
         $this->parents = $parents ?? MonorepoParents::load();
+        $this->abandonedIgnore = $abandonedIgnore ?? AbandonedIgnore::none();
         $this->deadline = Deadline::never();
     }
 
@@ -137,7 +141,11 @@ final class Analyzer
         $advisories = $this->fetchAdvisories($packages);
         $notes = array_merge($notes, $advisories->notes());
 
-        [$allowlisted, $repoByPackage, $candidateByPackage] = $this->classify($packages, $metadata, $now);
+        $abandonedIgnore = [];
+        foreach ($packages as $package) {
+            $abandonedIgnore[$package->name()] = $this->abandonedIgnore->match($package->name());
+        }
+        [$allowlisted, $repoByPackage, $candidateByPackage] = $this->classify($packages, $metadata, $abandonedIgnore, $now);
 
         $activityBatch = ActivityBatch::empty();
         if ($this->deadline->isPast()) {
@@ -163,7 +171,7 @@ final class Analyzer
             $repo = $repoByPackage[$package->name()] ?? null;
             $act = $repo !== null ? ($activity[$repo->key()] ?? null) : null;
             $entry = $allowlisted[$package->name()];
-            $facts = new PackageFacts($package, $meta, $act, $advisories->for($package->name()), $notChecked[$package->name()] ?? null);
+            $facts = new PackageFacts($package, $meta, $act, $advisories->for($package->name()), $notChecked[$package->name()] ?? null, $abandonedIgnore[$package->name()], $advisories->coverage()->for($package->name()));
             $factsByPackage[$package->name()] = $facts;
             $findings[] = $this->buildFinding($facts, $entry, $graph, $batch);
             if (!$package->isFromComposerRepository()) {
@@ -246,8 +254,8 @@ final class Analyzer
     }
 
     /**
-     * The same names the metadata pass asks for, each with its locked version: a package outside
-     * every Composer repository has no advisory feed either.
+     * Every package the run checks, whatever its origin, as `composer audit` asks: a packages-dev
+     * one only when the run reads packages-dev. The loader applies the scope.
      *
      * @param list<LockedPackage> $packages
      */
@@ -257,36 +265,44 @@ final class Analyzer
             return AdvisoryBatch::empty();
         }
         $versionByName = [];
+        $outside = [];
         foreach ($packages as $package) {
-            if ($package->isFromComposerRepository()) {
-                $versionByName[$package->name()] = $package->version();
+            $versionByName[$package->name()] = $package->version();
+            if (!$package->isFromComposerRepository()) {
+                $outside[] = $package->name();
             }
         }
 
-        return $this->advisories->load($versionByName);
+        return $this->advisories->load($versionByName, $outside);
     }
 
     /**
-     * @param list<LockedPackage>              $packages
-     * @param array<string, PackageMetadata>   $metadata
+     * A candidate for a tokenless activity lookup raised no S1, and either S2 fired or Composer's
+     * list ignores its marking: then S3 is the only abandonment fact left for it.
+     *
+     * @param list<LockedPackage>                        $packages
+     * @param array<string, PackageMetadata>             $metadata
+     * @param array<string, AbandonedIgnoreMatch|null>   $abandonedIgnore
      *
      * @return array{0: array<string, AllowlistEntry|null>, 1: array<string, RepoRef>, 2: array<string, bool>}
      */
-    private function classify(array $packages, array $metadata, \DateTimeImmutable $now): array
+    private function classify(array $packages, array $metadata, array $abandonedIgnore, \DateTimeImmutable $now): array
     {
         $allowlisted = [];
         $repoByPackage = [];
         $candidateByPackage = [];
         foreach ($packages as $package) {
             $meta = $metadata[$package->name()] ?? null;
-            $allowlisted[$package->name()] = $this->allowlist->match($package, $meta, $now);
+            $entry = $this->allowlist->match($package, $meta, $now);
+            $allowlisted[$package->name()] = $entry;
             $repo = $this->locator->locate(($meta !== null ? $meta->repositoryUrl() : null) ?? $package->repositoryUrl());
-            if ($repo === null || $allowlisted[$package->name()] !== null || !$package->isFromComposerRepository()) {
+            if ($repo === null || ($entry !== null && $entry->acceptsAll()) || !$package->isFromComposerRepository()) {
                 continue;
             }
             $repoByPackage[$package->name()] = $repo;
-            $first = $this->signals->evaluate(new PackageFacts($package, $meta, null));
-            $candidateByPackage[$package->name()] = $this->hasSignal($first, Signal::S2) && !$this->hasSignal($first, Signal::S1);
+            $facts = new PackageFacts($package, $meta, null, [], null, $abandonedIgnore[$package->name()] ?? null);
+            $first = $this->signals->evaluate($facts);
+            $candidateByPackage[$package->name()] = !$this->hasSignal($first, Signal::S1) && ($this->hasSignal($first, Signal::S2) || AbandonedRule::ignored($facts) !== null);
         }
 
         return [$allowlisted, $repoByPackage, $candidateByPackage];
@@ -371,11 +387,11 @@ final class Analyzer
         $meta = $facts->metadata();
         $activity = $facts->activity();
         $signals = $this->signals->evaluate($facts);
-        // S10 means that a missing check could change the verdict. It cannot change an allowlisted
-        // verdict, which is `finished` whatever the signals say, or one that the repository marks
-        // abandoned, the most serious verdict there is.
-        if ($entry !== null || ($meta !== null && $meta->isAbandoned())) {
-            $signals = array_values(array_filter($signals, static fn (Signal $signal): bool => $signal->id() !== Signal::S10));
+        // A maintenance gap cannot change a verdict that an entry accepts whole, or one that a
+        // raised S1 already makes `abandoned`. It reads the raised S1, never the metadata's
+        // abandoned bit: a marking that Composer's list ignores leaves S3 to decide.
+        if (($entry !== null && $entry->acceptsAll()) || $this->hasSignal($signals, Signal::S1)) {
+            $signals = NotCheckedRule::withoutMaintenanceGaps($signals);
         }
         $verdict = $this->engine->decide($signals, $entry !== null, $meta !== null);
 

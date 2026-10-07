@@ -22,6 +22,7 @@ final class UnknownKeys
      * two equally near keys is the suggestion. ConfigSchemaTest pins the list to the schema.
      */
     public const KNOWN = [
+        'advisory-lookup',
         'baseline',
         'fail-on',
         'format',

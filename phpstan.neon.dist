@@ -3,3 +3,12 @@ parameters:
     phpVersion: 70400
     paths: [src]
     treatPhpDocTypesAsCertain: false
+    # phpstan reads the newest Composer. AuditConfig::fromConfig() exists on Composer 2.9 only,
+    # behind a capability probe in each reader.
+    ignoreErrors:
+        -
+            identifier: staticMethod.notFound
+            path: src/Data/Abandoned/ComposerAbandonedPolicyReader.php
+        -
+            identifier: staticMethod.notFound
+            path: src/Data/Advisory/ComposerAdvisoryPolicyReader.php

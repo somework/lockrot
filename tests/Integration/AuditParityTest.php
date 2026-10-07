@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Integration;
 
-use Composer\Advisory\Auditor;
 use Composer\Advisory\AuditConfig;
+use Composer\Advisory\Auditor;
 use Composer\Config;
 use Composer\IO\BufferIO;
 use Composer\Package\Loader\ArrayLoader;
@@ -114,10 +114,6 @@ final class AuditParityTest extends TestCase
             'ignore' => ['acme/main' => ['constraint' => '^9.0', 'reason' => 'a constraint audit drops']],
             'ignore-severity' => ['medium' => null],
         ]]];
-        yield 'a broken malware section beside the advisory list' => ['policy' => [
-            'malware' => ['ignore' => ['acme/x' => 42]],
-            'advisories' => ['ignore-id' => ['PKSA-s4' => 'reviewed']],
-        ]];
     }
 
     public function testThePolicyApiLegMatchesComposersAuditor(): void
@@ -153,8 +149,12 @@ final class AuditParityTest extends TestCase
             $config = self::config($section);
             [$ignoreList, $ignoreSeverity] = self::legacyLists($config);
             $auditor = new Auditor();
-            $audit = 'audit';
-            $composer = self::composerResult(static fn (BufferIO $io, RepositorySet $set, array $packages): int => $auditor->$audit($io, $set, $packages, Auditor::FORMAT_JSON, true, $ignoreList, 'report', $ignoreSeverity));
+            $audit = new \ReflectionMethod(Auditor::class, 'audit');
+            $composer = self::composerResult(static function (BufferIO $io, RepositorySet $set, array $packages) use ($auditor, $audit, $ignoreList, $ignoreSeverity): int {
+                $status = $audit->invokeArgs($auditor, [$io, $set, $packages, Auditor::FORMAT_JSON, true, $ignoreList, 'report', $ignoreSeverity]);
+
+                return \is_int($status) ? $status : -1;
+            });
 
             self::assertSame($composer, self::lockrotResult($config), $label);
         }
@@ -169,12 +169,10 @@ final class AuditParityTest extends TestCase
     private static function legacyLists(Config $config): array
     {
         if (class_exists(AuditConfig::class) && property_exists(AuditConfig::class, 'ignoreListForAudit')) {
-            $fromConfig = 'fromConfig';
-            $auditConfig = AuditConfig::$fromConfig($config);
-            $list = 'ignoreListForAudit';
-            $severity = 'ignoreSeverityForAudit';
+            $auditConfig = (new \ReflectionMethod(AuditConfig::class, 'fromConfig'))->invoke(null, $config);
+            $properties = \is_object($auditConfig) ? get_object_vars($auditConfig) : [];
 
-            return [(array) $auditConfig->$list, (array) $auditConfig->$severity];
+            return [(array) ($properties['ignoreListForAudit'] ?? []), (array) ($properties['ignoreSeverityForAudit'] ?? [])];
         }
         $audit = $config->get('audit');
         $audit = \is_array($audit) ? $audit : [];

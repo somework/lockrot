@@ -224,16 +224,21 @@ final class AdvisoryIgnoreTest extends TestCase
     }
 
     /**
-     * @param array{list: array<string, ?string>, severities: array<string, ?string>}|\Throwable $lists what Composer 2.9's AuditConfig holds for audit
+     * @param AdvisoryPolicyReader::POLICY|AdvisoryPolicyReader::AUDIT_CONFIG|AdvisoryPolicyReader::RAW $api
+     * @param array{list: array<string, ?string>, severities: array<string, ?string>}|\Throwable          $lists what Composer 2.9's AuditConfig holds for audit
      */
     private static function reader(string $api, $lists): AdvisoryPolicyReader
     {
         return new class ($api, $lists) implements AdvisoryPolicyReader {
+            /** @var AdvisoryPolicyReader::POLICY|AdvisoryPolicyReader::AUDIT_CONFIG|AdvisoryPolicyReader::RAW */
             private string $api;
             /** @var array{list: array<string, ?string>, severities: array<string, ?string>}|\Throwable */
             private $lists;
 
-            /** @param array{list: array<string, ?string>, severities: array<string, ?string>}|\Throwable $lists */
+            /**
+             * @param AdvisoryPolicyReader::POLICY|AdvisoryPolicyReader::AUDIT_CONFIG|AdvisoryPolicyReader::RAW $api
+             * @param array{list: array<string, ?string>, severities: array<string, ?string>}|\Throwable $lists
+             */
             public function __construct(string $api, $lists)
             {
                 $this->api = $api;

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Integration;
 
-use Composer\Advisory\Auditor;
 use Composer\Advisory\AuditConfig;
+use Composer\Advisory\Auditor;
 use Composer\Config;
 use Composer\Package\CompletePackage;
 use Composer\Package\PackageInterface;
@@ -71,11 +71,11 @@ final class AbandonedIgnoreParityTest extends TestCase
         }
         foreach (self::auditConfigs() as $label => $section) {
             $config = self::config($section);
-            $fromConfig = 'fromConfig';
-            $auditConfig = AuditConfig::$fromConfig($config);
-            $property = property_exists($auditConfig, 'ignoreAbandonedForAudit') ? 'ignoreAbandonedForAudit' : 'ignoreAbandonedPackages';
+            $auditConfig = (new \ReflectionMethod(AuditConfig::class, 'fromConfig'))->invoke(null, $config);
+            $properties = \is_object($auditConfig) ? get_object_vars($auditConfig) : [];
+            $list = $properties['ignoreAbandonedForAudit'] ?? $properties['ignoreAbandonedPackages'] ?? [];
 
-            self::assertSame(self::kept((array) $auditConfig->$property), self::lockrotKept(AbandonedIgnore::fromConfig($config)), $label);
+            self::assertSame(self::kept(\is_array($list) ? $list : []), self::lockrotKept(AbandonedIgnore::fromConfig($config)), $label);
         }
     }
 
@@ -106,7 +106,11 @@ final class AbandonedIgnoreParityTest extends TestCase
      */
     private static function kept(array $ignoreAbandoned): array
     {
-        $kept = array_map(static fn (PackageInterface $package): string => $package->getName(), (new Auditor())->filterAbandonedPackages(self::packages(), $ignoreAbandoned));
+        // Through reflection: the parameter type of Composer 2.9 and 2.10 differ, and phpstan reads 2.10.
+        $filter = new \ReflectionMethod(Auditor::class, 'filterAbandonedPackages');
+        $kept = $filter->invoke(new Auditor(), self::packages(), $ignoreAbandoned);
+        self::assertIsArray($kept);
+        $kept = array_map(static fn ($package): string => $package instanceof PackageInterface ? $package->getName() : '', $kept);
 
         return array_values($kept);
     }

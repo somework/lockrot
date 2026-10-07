@@ -286,12 +286,17 @@ final class Finding
         if ($this->verdict !== Verdict::ABANDONED) {
             return null;
         }
-        $replacement = $this->replacement();
+        return self::successorOf($this->package, $this->replacement());
+    }
+
+    /** The replacement when it names another Composer package, else null. */
+    public static function successorOf(string $package, ?string $replacement): ?string
+    {
         if ($replacement === null || strpos($replacement, '/') === false || ValidatingArrayLoader::hasPackageNamingError($replacement) !== null) {
             return null;
         }
         // Composer reads a package name without case, and so do the repositories that write them.
-        if (strcasecmp($replacement, $this->package) === 0) {
+        if (strcasecmp($replacement, $package) === 0) {
             return null;
         }
         return $replacement;
