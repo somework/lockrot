@@ -16,8 +16,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * lockrot's abandoned ignore list matches a name exactly when Composer's own
  * `Auditor::filterAbandonedPackages` drops the package. Keyed by capability: Composer 2.2 to 2.8
- * have no list, 2.9 reads `AuditConfig`, 2.10 and later the policy API. CI runs Composer 2.2 and
- * the newest release, so the 2.9 leg runs only by hand on Composer 2.9.
+ * have no list, 2.9 reads `AuditConfig`, 2.10 and later the policy API.
  */
 final class AbandonedIgnoreParityTest extends TestCase
 {

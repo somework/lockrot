@@ -13,16 +13,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   is asked for advisories (see Security).
   ([Which advisories count](docs/verdicts.md#which-advisories-count))
 - **All formats:** lockrot reads Composer's abandoned ignore list (`config.policy.abandoned.ignore`
-  on Composer 2.10+, `config.audit.ignore-abandoned` on 2.9), as `composer audit` does: a listed
-  package's abandoned marking no longer counts. An archived repository still does.
+  on Composer 2.10+, else `config.audit.ignore-abandoned` from 2.9), as `composer audit` does: a
+  listed package's abandoned marking no longer counts. An archived repository still does.
   ([Abandoned](docs/verdicts.md#abandoned))
+- **All formats:** a package marked abandoned only in `composer.lock` no longer carries S10 for its
+  repository activity: S1 decides it, as for a package that its repository marks. So
+  `--fail-on=unchecked` can pass where 0.13 failed.
+  ([What was not checked](docs/verdicts.md#what-was-not-checked))
 
 ### Security
 
 - **All formats:** security advisories are looked up by name for every package the run checks,
-  whatever its origin (packages-dev with `--dev`), so the names of packages installed from vcs, path
-  or archives now reach each Composer repository that publishes advisories. Action: set
-  `extra.lockrot.advisory-lookup` to `composer-repositories` to keep 0.13's boundary.
+  whatever its origin (packages-dev with `--dev`), so the names of packages from vcs, a path, an
+  archive, an inline `package` entry or an origin lockrot cannot tell now reach each Composer
+  repository that publishes advisories. Action: set `extra.lockrot.advisory-lookup` to
+  `composer-repositories` to send only the names that a Composer repository serves.
   ([What lockrot contacts](https://github.com/somework/lockrot/blob/v0.14.0/SECURITY.md#what-lockrot-does-and-does-not-do))
 
 ## [0.13.0] - 2026-10-01

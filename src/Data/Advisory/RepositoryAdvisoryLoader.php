@@ -7,6 +7,7 @@ namespace Lockrot\Data\Advisory;
 use Composer\Advisory\PartialSecurityAdvisory;
 use Composer\Downloader\TransportException;
 use Composer\Repository\AdvisoryProviderInterface;
+use Composer\Repository\FilterRepository;
 use Composer\Repository\RepositoryInterface;
 use Composer\Semver\Constraint\Constraint;
 use Composer\Semver\Constraint\MatchAllConstraint;
@@ -16,14 +17,12 @@ use Lockrot\Data\Repository\RepositoryUrl;
 use Lockrot\Deadline;
 
 /**
- * The one advisory lookup of a run: one request per advisory-capable repository, every advisory of
- * every asked name ({@see \Composer\Repository\AdvisoryProviderInterface} documents
- * `MatchAllConstraint` for that). lockrot then attributes each advisory to the installed version
- * locally, as `composer audit` matches it ({@see \Composer\Repository\RepositorySet::getMatchingSecurityAdvisories()}).
- * It asks for full records only: a partial record in Composer's package-file cache holds only an
- * id and a range, and can be withdrawn. Composer hard-codes a ten-second timeout for the POST, so
- * lockrot checks the deadline before each repository, not inside the call. Scope and records:
- * docs/verdicts.md#which-advisories-count.
+ * One request per advisory-capable repository asks every advisory of every name
+ * ({@see \Composer\Repository\AdvisoryProviderInterface}: `MatchAllConstraint`), then attributes them
+ * locally as {@see \Composer\Repository\RepositorySet::getMatchingSecurityAdvisories()} does. Full
+ * records only: a partial cached record holds an id and a range, and can be withdrawn. Composer
+ * hard-codes a ten-second POST timeout, so the deadline is checked before each repository.
+ * Scope and records: docs/verdicts.md#which-advisories-count.
  *
  * @internal
  */
@@ -53,10 +52,10 @@ final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
         $this->parser = new VersionParser();
     }
 
-    public function load(array $versionByName, array $notFromComposerRepository = []): AdvisoryBatch
+    public function load(array $versionByName, array $notFromComposerRepository = [], array $aliasVersionsByName = []): AdvisoryBatch
     {
         if ($versionByName === []) {
-            return AdvisoryBatch::empty();
+            return new AdvisoryBatch([], [], [], [], new AdvisoryCoverage($this->scope, $this->scopeSource, [], 0, []));
         }
         $whyUnreadable = $this->ignore->whyUnreadable();
         $notes = $whyUnreadable === null ? [] : [RunNote::advisoryIgnoreUnreadable($whyUnreadable)];
@@ -72,7 +71,7 @@ final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
 
         [$repositories, $answers, $askNotes] = $this->ask(array_keys($asked));
 
-        return $this->batch($versionByName, $outside, $repositories, $answers, array_merge($notes, $askNotes));
+        return $this->batch($versionByName, $outside, $aliasVersionsByName, $repositories, $answers, array_merge($notes, $askNotes));
     }
 
     /**
@@ -104,7 +103,7 @@ final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
     {
         $repositories = [];
         foreach ($this->repositories as $repository) {
-            if ($repository instanceof AdvisoryProviderInterface) {
+            if (self::isAdvisoryCapable($repository)) {
                 $repositories[] = self::repository($repository->getRepoName(), AdvisoryCoverage::NOT_ASKED, $reason);
             }
         }
@@ -129,7 +128,7 @@ final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
         $checked = 0;
         $budgetSpent = false;
         foreach ($this->repositories as $repository) {
-            if (!$repository instanceof AdvisoryProviderInterface) {
+            if (!$repository instanceof AdvisoryProviderInterface || !self::isAdvisoryCapable($repository)) {
                 continue;
             }
             if ($budgetSpent || $this->deadline->isPast()) {
@@ -164,6 +163,19 @@ final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
         return [$repositories, $answers, $notes];
     }
 
+    /**
+     * Composer wraps a repository with `only`, `exclude` or `canonical` in a FilterRepository, which
+     * implements the interface whatever it wraps. Naming a wrapped vcs repository can start network I/O.
+     */
+    private static function isAdvisoryCapable(RepositoryInterface $repository): bool
+    {
+        if ($repository instanceof FilterRepository) {
+            return $repository->getRepository() instanceof AdvisoryProviderInterface;
+        }
+
+        return $repository instanceof AdvisoryProviderInterface;
+    }
+
     /** @return array{composer_repository: string, outcome: string, reason: ?string, message: ?string, records: ?int, packages_with_records: ?int} */
     private static function repository(string $name, string $outcome, ?string $reason = null, ?string $message = null): array
     {
@@ -173,14 +185,15 @@ final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
     /**
      * @param array<string, string>                                                                                                                  $versionByName
      * @param array<string, true>                                                                                                                    $outside
+     * @param array<string, list<string>>                                                                                                            $aliasVersionsByName
      * @param list<array{composer_repository: string, outcome: string, reason: ?string, message: ?string, records: ?int, packages_with_records: ?int}> $repositories
      * @param array<int, array<string, list<PartialSecurityAdvisory>>>                                                                               $answers
      * @param list<RunNote>                                                                                                                          $notes
      */
-    private function batch(array $versionByName, array $outside, array $repositories, array $answers, array $notes): AdvisoryBatch
+    private function batch(array $versionByName, array $outside, array $aliasVersionsByName, array $repositories, array $answers, array $notes): AdvisoryBatch
     {
-        /** @var array<string, array<string, PartialSecurityAdvisory>> $every name => advisory id => advisory, so an advisory that two repositories serve counts once */
-        $every = [];
+        /** @var array<string, array<string, list<PartialSecurityAdvisory>>> $records name => advisory id => each repository's record of it */
+        $records = [];
         foreach ($repositories as $index => $repository) {
             if (!isset($answers[$index])) {
                 continue;
@@ -189,7 +202,7 @@ final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
             $withRecords = 0;
             foreach ($answers[$index] as $name => $advisories) {
                 foreach ($advisories as $advisory) {
-                    $every[$name][$advisory->advisoryId] = $advisory;
+                    $records[$name][$advisory->advisoryId][] = $advisory;
                     $ids[$advisory->advisoryId] = true;
                 }
                 $withRecords += $advisories === [] ? 0 : 1;
@@ -198,48 +211,68 @@ final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
             $repository['packages_with_records'] = $withRecords;
             $repositories[$index] = $repository;
         }
-        [$counted, $ignored, $kept] = $this->attribute($every, $versionByName, $outside);
+        [$counted, $ignored, $kept] = $this->attribute($records, $versionByName, $outside, $aliasVersionsByName);
         $complete = $answers !== [] && \count($answers) === \count(array_filter($repositories, static fn (array $repository): bool => $repository['outcome'] !== AdvisoryCoverage::NO_FEED));
 
         return new AdvisoryBatch($counted, $notes, $ignored, $kept, $this->coverage($repositories, $versionByName, $outside, $answers, null), $complete);
     }
 
     /**
-     * Counts each advisory that affects the installed version, unless the ignore lists keep it out,
-     * as Composer's Auditor matches it: the advisory's range against `== <normalized version>`.
-     * A version the parser rejects is not attributed.
+     * Counts each advisory that affects the installed version or one of its aliases, unless the
+     * ignore lists keep it out, as Composer's Auditor matches it: each repository's record of the
+     * advisory against `== <normalized version>`. A version the parser rejects is not attributed.
      *
-     * @param array<string, array<string, PartialSecurityAdvisory>> $every
-     * @param array<string, string>                                 $versionByName
-     * @param array<string, true>                                   $outside
+     * @param array<string, array<string, list<PartialSecurityAdvisory>>> $records
+     * @param array<string, string>                                       $versionByName
+     * @param array<string, true>                                         $outside
+     * @param array<string, list<string>>                                 $aliasVersionsByName
      *
      * @return array{array<string, list<Advisory>>, array<string, list<IgnoredAdvisory>>, array<string, list<Advisory>>}
      */
-    private function attribute(array $every, array $versionByName, array $outside): array
+    private function attribute(array $records, array $versionByName, array $outside, array $aliasVersionsByName): array
     {
         $counted = [];
         $ignored = [];
         $kept = [];
-        foreach ($every as $name => $advisories) {
+        foreach ($records as $name => $byId) {
             $name = (string) $name;
             $installed = isset($outside[$name]) ? null : $this->normalized($versionByName[$name] ?? null);
-            foreach ($advisories as $advisory) {
-                $match = $this->ignore->match($name, $advisory);
+            $versions = $installed === null ? [] : array_merge([$installed], $aliasVersionsByName[$name] ?? []);
+            foreach ($byId as $copies) {
+                $match = $this->ignore->match($name, $copies[0]);
                 if ($match === null) {
-                    $kept[$name][] = Advisory::fromComposer($advisory);
+                    $kept[$name][] = Advisory::fromComposer($copies[0]);
                 }
-                if ($installed === null || !$advisory->affectedVersions->matches(new Constraint('==', $installed))) {
+                $affecting = self::affecting($copies, $versions);
+                if ($affecting === null) {
                     continue;
                 }
                 if ($match === null) {
-                    $counted[$name][] = Advisory::fromComposer($advisory);
+                    $counted[$name][] = Advisory::fromComposer($affecting);
                 } else {
-                    $ignored[$name][] = new IgnoredAdvisory(Advisory::fromComposer($advisory), $match);
+                    $ignored[$name][] = new IgnoredAdvisory(Advisory::fromComposer($affecting), $match);
                 }
             }
         }
 
         return [$counted, $ignored, $kept];
+    }
+
+    /**
+     * @param list<PartialSecurityAdvisory> $copies
+     * @param list<string>                  $versions
+     */
+    private static function affecting(array $copies, array $versions): ?PartialSecurityAdvisory
+    {
+        foreach ($copies as $advisory) {
+            foreach ($versions as $version) {
+                if ($advisory->affectedVersions->matches(new Constraint('==', $version))) {
+                    return $advisory;
+                }
+            }
+        }
+
+        return null;
     }
 
     private function normalized(?string $version): ?string
@@ -305,7 +338,7 @@ final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
                 $ids += array_fill_keys($records, true);
                 $feeds[] = ['composer_repository' => $repository['composer_repository'], 'answer' => AdvisoryCoverage::ANSWERED, 'reason' => null, 'message' => null, 'records' => \count(array_unique($records))];
             } elseif ($repository['outcome'] === AdvisoryCoverage::FAILED) {
-                $feeds[] = ['composer_repository' => $repository['composer_repository'], 'answer' => AdvisoryCoverage::FAILED, 'reason' => $repository['reason'], 'message' => $repository['message'], 'records' => null];
+                $feeds[] = ['composer_repository' => $repository['composer_repository'], 'answer' => AdvisoryCoverage::FAILED, 'reason' => AdvisoryCoverage::LOOKUP_FAILED, 'message' => $repository['message'], 'records' => null];
             }
         }
         $answered = array_filter($feeds, static fn (array $feed): bool => $feed['answer'] === AdvisoryCoverage::ANSWERED);

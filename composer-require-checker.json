@@ -1,6 +1,7 @@
 {
     "symbol-whitelist": [
         "Composer\\Advisory\\AuditConfig",
+        "Composer\\Advisory\\Auditor",
         "Composer\\Advisory\\PartialSecurityAdvisory",
         "Composer\\Advisory\\SecurityAdvisory",
         "Composer\\Cache",
@@ -35,6 +36,7 @@
         "Composer\\Policy\\PolicyConfig",
         "Composer\\Repository\\AdvisoryProviderInterface",
         "Composer\\Repository\\ComposerRepository",
+        "Composer\\Repository\\FilterRepository",
         "Composer\\Repository\\PlatformRepository",
         "Composer\\Repository\\RepositoryFactory",
         "Composer\\Repository\\RepositoryInterface",

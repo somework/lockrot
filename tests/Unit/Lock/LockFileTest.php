@@ -317,4 +317,21 @@ final class LockFileTest extends TestCase
         self::assertNotSame($prod, $dev);
         self::assertSame('vendor/pkg', $dev->name());
     }
+
+    /** `composer audit` matches an advisory against the aliases Composer's loader builds for the entry. */
+    public function testAnEntryKeepsTheVersionsOfItsAliases(): void
+    {
+        $lock = LockFile::fromArray(['packages' => [
+            ['name' => 'acme/aliased', 'version' => 'dev-main', 'extra' => ['branch-alias' => ['dev-main' => '4.3.x-dev']]],
+            ['name' => 'acme/plain', 'version' => '1.0.0'],
+        ]]);
+        $byName = [];
+        foreach ($lock->packages(false) as $package) {
+            $byName[$package->name()] = $package;
+        }
+
+        self::assertSame('dev-main', $byName['acme/aliased']->version());
+        self::assertSame(['4.3.9999999.9999999-dev'], $byName['acme/aliased']->aliasVersions());
+        self::assertSame([], $byName['acme/plain']->aliasVersions());
+    }
 }

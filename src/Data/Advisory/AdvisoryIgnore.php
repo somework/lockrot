@@ -73,6 +73,9 @@ final class AdvisoryIgnore
             if ($api === AdvisoryPolicyReader::POLICY) {
                 return self::fromPolicy($config, $reader);
             }
+            if ($api === AdvisoryPolicyReader::NONE) {
+                return self::none();
+            }
             if ($api === AdvisoryPolicyReader::AUDIT_CONFIG) {
                 $lists = $reader->auditConfig($config);
 
@@ -108,17 +111,37 @@ final class AdvisoryIgnore
         return new self($lists['list'], $lists['severities'], isset($policy['advisories']));
     }
 
-    /** Composer 2.4 to 2.9.1 read `config.audit` raw, and none of them ignores by package name. */
+    /** Composer 2.6 to 2.9.1 read `config.audit` raw, and none of them ignores by package name. */
     private static function fromAuditSection(Config $config, bool $severities): self
     {
         $audit = $config->get('audit');
         if (!\is_array($audit)) {
             return self::none();
         }
-        $ignore = \is_array($audit['ignore'] ?? null) ? self::keysOrValues($audit['ignore']) : [];
-        $ignoreSeverity = $severities && \is_array($audit['ignore-severity'] ?? null) ? self::keysOrValues($audit['ignore-severity']) : [];
+        $ignore = \is_array($audit['ignore'] ?? null) ? self::idsAsComposerReadsThem($audit['ignore']) : [];
+        $ignoreSeverity = $severities && \is_array($audit['ignore-severity'] ?? null) ? array_fill_keys(array_map('strval', array_filter($audit['ignore-severity'], 'is_scalar')), null) : [];
 
         return new self($ignore, $ignoreSeverity, false, null, null, false);
+    }
+
+    /**
+     * The keys of a map, the values of a list: Composer 2.6 to 2.9.1 read the whole array one way.
+     *
+     * @param array<mixed> $list
+     *
+     * @return array<string, ?string>
+     */
+    private static function idsAsComposerReadsThem(array $list): array
+    {
+        if (array_values($list) === $list) {
+            return array_fill_keys(array_map('strval', array_filter($list, 'is_scalar')), null);
+        }
+        $ids = [];
+        foreach ($list as $key => $reason) {
+            $ids[(string) $key] = \is_string($reason) ? $reason : null;
+        }
+
+        return $ids;
     }
 
     /**
@@ -145,8 +168,10 @@ final class AdvisoryIgnore
         if (!$advisory instanceof SecurityAdvisory) {
             return $match;
         }
-        if ($advisory->severity !== null && \array_key_exists($advisory->severity, $this->severities)) {
-            $match = new AdvisoryIgnoreMatch(AdvisoryIgnoreMatch::SEVERITY, $advisory->severity, $this->severities[$advisory->severity], $this->fromPolicy ? AdvisoryIgnoreMatch::BY_POLICY : AdvisoryIgnoreMatch::BY_AUDIT_SEVERITY);
+        // SecurityAdvisory has no severity on Composer 2.4 to 2.6.
+        $severity = $advisory->severity ?? null;
+        if ($severity !== null && \array_key_exists($severity, $this->severities)) {
+            $match = new AdvisoryIgnoreMatch(AdvisoryIgnoreMatch::SEVERITY, $severity, $this->severities[$severity], $this->fromPolicy ? AdvisoryIgnoreMatch::BY_POLICY : AdvisoryIgnoreMatch::BY_AUDIT_SEVERITY);
         }
         if ($advisory->cve !== null) {
             $match = $this->listed(AdvisoryIgnoreMatch::CVE, $advisory->cve) ?? $match;

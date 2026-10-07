@@ -57,7 +57,9 @@ final class LockFile
                 }
                 // A package that declares extra.branch-alias loads as an alias package. Unwrap it, so
                 // that the entry's own version, require and source fields are read.
+                $aliasVersions = [];
                 if ($loaded instanceof AliasPackage) {
+                    $aliasVersions[] = $loaded->getVersion();
                     $loaded = $loaded->getAliasOf();
                 }
                 // Unreachable: with its default class, ArrayLoader::load() returns a CompletePackage or
@@ -70,7 +72,7 @@ final class LockFile
                         \get_class($loaded)
                     ));
                 }
-                $package = LockedPackage::fromPackage($loaded, $dev);
+                $package = LockedPackage::fromPackage($loaded, $dev)->withAliasVersions($aliasVersions);
                 $packages[$package->name()] = $package;
             }
         }

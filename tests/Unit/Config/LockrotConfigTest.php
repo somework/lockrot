@@ -46,7 +46,7 @@ final class LockrotConfigTest extends TestCase
         self::assertNull($cfg->baseline());
     }
 
-    public function testTheAdvisoryLookupScopeAndWhereItCameFrom(): void
+    public function testTheAdvisoryLookupScopeDefaultsToAllAndNamesItsSource(): void
     {
         $default = LockrotConfig::fromSources([], [], [], '8.5.10', null);
         self::assertSame([AdvisoryCoverage::SCOPE_ALL, AdvisoryCoverage::SOURCE_DEFAULT], [$default->advisoryLookup(), $default->advisoryLookupSource()]);

@@ -337,8 +337,8 @@ the field. A non-empty list, the `no fix expected` clause and the `no_fix_expect
 
 - **Accepted advisories.** Silence an advisory where `composer audit` silences it:
   `config.policy.advisories` (`ignore-id`, `ignore`, `ignore-severity`) on Composer 2.10 and later,
-  `config.audit.ignore` and `config.audit.ignore-severity` on 2.4 to 2.9. What audit drops, lockrot
-  drops. When Composer rejects the policy section, lockrot ignores no advisory and says so in a
+  `config.audit.ignore` from 2.6 and `config.audit.ignore-severity` from 2.9. What audit drops on
+  the Composer that runs lockrot, lockrot drops. When Composer rejects the policy section, lockrot ignores no advisory and says so in a
   [note](notes.md#advisory_ignore_unreadable).
 
 - **Baseline.** The [baseline](baseline.md) stays keyed on the verdict, so a baselined finding is
@@ -506,7 +506,8 @@ S10's `data` lists each missing check as `unchecked` (`{check, reason, blocks}`)
 signal under `blocks`.
 
 - lockrot raises S10 only where the missing check could have changed the verdict. So it never
-  raises S10 on an allowlisted package, or on one that its Composer repository marks abandoned.
+  raises S10 on an allowlisted package, or for repository activity or release dates on a package
+  that S1 marks abandoned.
 
 - Credentials for every host remove `no_token` and `anonymous_budget`. `rate_limit`, `fetch_failed`,
   `offline` and `install_time_budget` can still occur, and `release_dates` asks no host, so a fully
