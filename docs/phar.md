@@ -173,7 +173,7 @@ the running file exactly as it was.
 | Option | Effect |
 |---|---|
 | none | Installs the newest release that passes the [release rules](#which-release-it-installs) |
-| `--check` | Decides as a plain run does and installs nothing. Exit `1` when a plain run installs a release. `--force` does not change what it reports |
+| `--check` | Decides as a plain run does and installs nothing. Exit `1` when `self-update` finds a release to install. `--force` does not change what it reports |
 | `--allow-major` | Also takes the next major version, one major version per run |
 | `--force` | Reinstalls the newest release at or below the running version in its major version, when nothing newer is installable |
 | `--offline` | Refuses to run (exit `2`), as `COMPOSER_DISABLE_NETWORK=1` does: an update needs the network |
@@ -224,11 +224,11 @@ no further: from 1.x it installs the newest 2.x even when 3.0 exists. `self-upda
 The PHP floor and the signing key come from the release metadata, `lockrot.phar.meta.json`, which
 each release publishes beside the archive: `{"php": "7.4.0", "selfupdate-key": "sha256:…"}`.
 
-- Release metadata that cannot be read, for the release that `self-update` chooses, is an error
-  (exit `2`) naming the tag.
+- If `self-update` cannot read the release metadata of the release that it chooses, it exits `2`,
+  and the error names the tag.
 
-- Release metadata that cannot be read, for a next-major release that is only suggested, gets a
-  line saying so, and the update within the running major version goes ahead.
+- If `self-update` cannot read the release metadata of a next-major release that it only suggests,
+  it prints a line that says so, and the update within the running major version goes ahead.
 
 The release metadata is not signed: it decides which release is tried, and the checksum and the
 signature decide whether one is installed. What doctored metadata can and cannot do is in
@@ -267,9 +267,9 @@ The exit `2` causes include:
 - the chosen release lacks an asset, or its release metadata cannot be read
 - a checksum mismatch, a signature that does not verify, a PHP whose openssl extension is missing
   or has no SHA-384, or a download PHP cannot open
-- an archive stranded by a key rotation: only its key holds back a newer release that it can take,
-  in the running major version (or the next one with `--allow-major`), and no release can be
-  installed (under `--check` too)
+- an archive stranded by a key rotation, under `--check` too: the archive does not carry the key of
+  a newer release that it can take, in the running major version (or the next one with
+  `--allow-major`), and `self-update` finds no other release to install
 - an unwritable PHAR directory, or a file that cannot be written or moved beside the PHAR
 - `--force` when the newest release at or below the running version, in its major version, is
   missing or held back
@@ -295,7 +295,7 @@ unique prefix such as `self-up` runs `self-update`.
 
 To reinstall:
 
-1. Download `lockrot.phar` again, as at the [top of this page](#the-standalone-phar).
+1. Download `lockrot.phar` again, as [PHAR and self-update](#the-standalone-phar) shows.
 2. Verify it with the [GPG signature](#gpg-signature) or the [build provenance](#build-provenance),
    not with a key the old archive carried.
 3. Put it in place of the old file.

@@ -140,7 +140,7 @@ A finding's `origin` says where its lock entry came from
 - The rules [schema.md](schema.md#where-a-package-came-from) gives for `kind`, `registry`, `local`
   and `from_composer_repository`. A new case gets a new kind, never a new meaning for an old one.
 - A minor release can add a registry lockrot names or links, never withdraw one.
-- lockrot writes `package_url` and a finding's `replacement_url`, and a reader never builds them.
+- lockrot writes `package_url` and a finding's `replacement_url`. Do not build them.
   Link one only where it is a string. `replacement_url` is null when lockrot keeps no page for the
   registry that named the replacement, and always null when `replacement` is.
 
@@ -205,7 +205,7 @@ The `github`, `sarif` and `gitlab` columns of
 - A key lockrot does not know, at the top level or inside an `ignore` entry, prints one warning on
   stderr and changes nothing else, as [Unknown keys](configuration.md#unknown-keys) describes. The
   [reserved names](#names-reserved-for-extensions) never warn.
-- The default thresholds are chosen at 1.0.0-RC1, and a later change to one is a
+- 1.0.0-RC1 chooses the default thresholds, and a later change to one is a
   [Verdict change](#verdict-changes). To hold the numbers fixed, set them in `extra.lockrot`.
 - *Planned:* a configuration file named by `extends`, read after `extra.lockrot` and before the
   defaults.
@@ -233,8 +233,8 @@ when a finding reaches `fail-on`, are frozen with the rest of the [configuration
 
 ### PHP platform
 
-- The PHP and Composer floors are in the [install requirements](index.md#install). The floor for
-  1.x is chosen at 1.0.0-RC1.
+- The PHP and Composer floors are in the [install requirements](index.md#install). 1.0.0-RC1 chooses
+  the floor for 1.x.
 - *Planned:* within 1.x the floor rises only in a minor release, never in a patch, with a warning
   on stderr one minor release ahead.
 
