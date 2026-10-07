@@ -50,13 +50,13 @@ final class LinkIndex
             foreach ([Holder::REQUIRE => $package->requireConstraints(), Holder::CONFLICT => $package->conflicts()] as $link => $constraints) {
                 foreach ($constraints as $target => $constraint) {
                     if ($target !== $package->name()) {
-                        $index->add($parser, (string) $target, new Holder(Holder::PACKAGE, $package->name(), $package->version(), $link, $constraint), $package->normalizedVersion() ?? $package->version());
+                        $index->add($parser, (string) $target, new Holder(Holder::PACKAGE, $package->name(), $package->version(), $link, $constraint), $package->version());
                     }
                 }
             }
             foreach ([[$package->provides(), false], [$package->replaces(), true]] as [$names, $replaced]) {
                 foreach ($names as $name => $constraint) {
-                    if (!isset($locked[$name]) && strtolower($constraint) === self::SELF_VERSION) {
+                    if (!isset($locked[$name]) && $constraint === self::SELF_VERSION) {
                         $index->alsoNamed[$package->name()][$name] = $replaced;
                     }
                 }
@@ -69,8 +69,8 @@ final class LinkIndex
     /**
      * The links that exclude the release, in index order: the root first, then the lock's packages.
      * A requirement excludes what it does not match, a conflict what it matches. A constraint that
-     * does not parse excludes nothing. A holder with several links on the package and on the names
-     * it replaces is listed once per link kind.
+     * does not parse excludes nothing. Links that read the same, such as one package's requirements
+     * on two names that one package replaces, give one holder.
      *
      * @return list<Holder>
      */
@@ -89,24 +89,23 @@ final class LinkIndex
         usort($links, static fn (array $a, array $b): int => $a[0] <=> $b[0]);
         $holders = [];
         foreach ($links as [, $holder, $constraint]) {
-            $key = $holder->source().' '.$holder->package().' '.$holder->link();
-            if ($constraint === null || isset($holders[$key]) || $holder->package() === $package) {
+            if ($constraint === null || $holder->package() === $package || \in_array($holder, $holders)) {
                 continue;
             }
             $matches = $constraint->matches($release);
             if ($holder->link() === Holder::CONFLICT ? $matches : !$matches) {
-                $holders[$key] = $holder;
+                $holders[] = $holder;
             }
         }
 
-        return array_values($holders);
+        return $holders;
     }
 
-    /** @param ?string $selfVersion the normalised version of the package that holds the link, null for the root */
+    /** @param ?string $selfVersion the version of the package that holds the link, null for the root */
     private function add(VersionParser $parser, string $target, Holder $holder, ?string $selfVersion): void
     {
         $text = $holder->constraint();
-        if ($selfVersion !== null && strtolower($text) === self::SELF_VERSION) {
+        if ($selfVersion !== null && $text === self::SELF_VERSION) {
             $text = $selfVersion;
         }
         try {

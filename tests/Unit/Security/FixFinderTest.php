@@ -218,15 +218,7 @@ final class FixFinderTest extends TestCase
 
     public function testAConflictHoldsTheRelease(): void
     {
-        $fixes = $this->find(
-            ['name' => 'a/b', 'version' => '1.0.0'],
-            [['1.0.0', null], ['1.2.0', null]],
-            ['A' => '<1.2.0'],
-            new PhpFloor('8.4', null),
-            [['name' => 'c/conflicting', 'version' => '3.0.0', 'conflict' => ['a/b' => '>=1.2']]]
-        );
-
-        $fix = $fixes->forAdvisory('A');
+        $fix = $this->conflicting()->forAdvisory('A');
         self::assertSame(Fix::UPGRADE, $fix->kind());
         self::assertSame([['source' => Holder::PACKAGE, 'package' => 'c/conflicting', 'version' => '3.0.0', 'link' => Holder::CONFLICT, 'constraint' => '>=1.2']], self::holders($fix->heldBy()));
     }
@@ -234,31 +226,14 @@ final class FixFinderTest extends TestCase
     /** The links come from packages and packages-dev, whatever --dev says: composer update reads both. */
     public function testADevPackageHoldsAProdPackage(): void
     {
-        $fixes = $this->find(
-            ['name' => 'a/b', 'version' => '1.0.0'],
-            [['1.0.0', null], ['2.0.0', null]],
-            ['A' => '<2.0.0'],
-            new PhpFloor('8.4', null),
-            [],
-            [['name' => 'd/tool', 'version' => '1.0.0', 'require' => ['a/b' => '^1.0']]]
-        );
-
-        $fix = $fixes->forAdvisory('A');
+        $fix = $this->heldByADevPackage()->forAdvisory('A');
         self::assertSame(Fix::UPGRADE, $fix->kind());
         self::assertSame([['source' => Holder::PACKAGE, 'package' => 'd/tool', 'version' => '1.0.0', 'link' => Holder::REQUIRE, 'constraint' => '^1.0']], self::holders($fix->heldBy()));
     }
 
     public function testTheRootRequireDevAndRootConflictHoldTheReleaseToo(): void
     {
-        $fixes = $this->find(
-            ['name' => 'a/b', 'version' => '1.0.0'],
-            [['1.0.0', null], ['2.0.0', null]],
-            ['A' => '<2.0.0'],
-            new PhpFloor('8.4', null),
-            [],
-            [],
-            ['require-dev' => ['a/b' => '^1.0'], 'conflict' => ['A/B' => '>=2']]
-        );
+        $fixes = $this->heldByTheRootDevAndConflict();
 
         self::assertSame([
             ['source' => Holder::ROOT, 'package' => null, 'version' => null, 'link' => Holder::REQUIRE_DEV, 'constraint' => '^1.0'],
@@ -378,6 +353,16 @@ final class FixFinderTest extends TestCase
         $gets = $fixes->gets();
         self::assertNotNull($gets);
         self::assertSame('2.1.0', $gets->version());
+
+        $above = $this->find(
+            ['name' => 'a/b', 'version' => '2.0.0'],
+            [['2.0.0', null], ['2.1.0', null], ['2.2.0', null]],
+            ['A' => '<2.1.0'],
+            new PhpFloor('8.4', null),
+            [['name' => 'c/c', 'version' => '1.0.0', 'conflict' => ['a/b' => '2.1.0']]]
+        )->gets();
+        self::assertNotNull($above);
+        self::assertSame('2.2.0', $above->version(), 'a held release below a free one');
     }
 
     public function testWhatTheScanCannotJudgeIsUnknownWithItsReason(): void
@@ -449,6 +434,69 @@ final class FixFinderTest extends TestCase
         $row = $fixes->installedBranch();
         self::assertNotNull($row);
         self::assertSame('2.7.0', $row->lowest(), '2.5.0 and 2.6.0 are affected again');
+        $move = $fixes->move();
+        self::assertNotNull($move);
+        self::assertSame(['2.7.0', Fix::UPDATE], [$move->release()->pretty(), $move->kind()], 'the move is the branch lower bound, as its row');
+    }
+
+    /** The move takes each branch's lower bound, then the ease order: 2.4.0 is no lower bound, since ^2.4.0 admits 2.5.0. */
+    public function testTheMoveIsTheEasiestBranchLowerBound(): void
+    {
+        $fixes = $this->find(
+            ['name' => 'a/b', 'version' => '2.3.0'],
+            [['2.3.0', '>=7.2'], ['2.4.0', '>=7.2'], ['2.5.0', '>=7.2'], ['2.6.0', '>=7.2'], ['2.7.0', '>=8.1'], ['3.0.0', '>=7.2']],
+            ['A' => '<2.4.0 || >=2.5.0,<2.7.0'],
+            new PhpFloor('8.4', '>=7.2'),
+            [],
+            [],
+            ['require' => ['a/b' => '^2.3']]
+        );
+
+        $move = $fixes->move();
+        self::assertNotNull($move);
+        self::assertSame(['3.0.0', Fix::UPGRADE], [$move->release()->pretty(), $move->kind()], 'upgrade 3.0.0 beats raise-php 2.7.0');
+        $two = $fixes->installedBranch();
+        self::assertNotNull($two);
+        self::assertSame(['2.7.0', Fix::RAISE_PHP], [$two->lowest(), $two->fixKind()]);
+    }
+
+    /** A row's class is its lower bound's class, so the row, the move to its branch and the fix of that release agree. */
+    public function testARowsClassIsItsLowerBoundsClass(): void
+    {
+        $fixes = $this->find(
+            ['name' => 'a/b', 'version' => '1.0.0'],
+            [['1.0.0', null], ['2.0.0', null]],
+            ['A' => '<2.0.0'],
+            new PhpFloor('8.4', null),
+            [],
+            [],
+            ['require' => ['a/b' => '^1.0']]
+        );
+
+        $two = $fixes->branches()[0];
+        $candidate = $two->candidate();
+        self::assertNotNull($candidate);
+        self::assertSame([Fix::UPGRADE, Fix::UPGRADE, Fix::UPGRADE], [$two->fixKind(), $candidate->kind(), $fixes->forAdvisory('A')->kind()]);
+        self::assertCount(1, $candidate->heldBy());
+    }
+
+    /**
+     * A row's `fixed` counts the advisories that the branch's newest release lies outside: the
+     * branch has a lower bound for them. One that a later release reintroduces is not fixed on it.
+     */
+    public function testARowFixesOnlyWhatItsNewestReleaseClears(): void
+    {
+        $fixes = $this->find(
+            ['name' => 'a/b', 'version' => '2.3.0'],
+            [['2.3.0', null], ['2.4.0', null], ['2.5.0', null], ['2.7.0', null]],
+            ['A' => '<2.4.0 || >=2.7.0'],
+            new PhpFloor('8.4', null)
+        );
+
+        $row = $fixes->installedBranch();
+        self::assertNotNull($row);
+        self::assertSame([0, null, null], [$row->fixed(), $row->lowest(), $row->fixKind()]);
+        self::assertSame('2.4.0', $fixes->forAdvisory('A')->version(), 'the advisory itself has a release outside its range');
     }
 
     /** Among two raise-php candidates, the one that nothing holds is easier. */
@@ -468,18 +516,9 @@ final class FixFinderTest extends TestCase
         self::assertSame([], $fix->heldBy());
     }
 
-    /** guzzle-5: wallabag's guzzlehttp/guzzle 5.3.4. The root requires ^5.3, and 6.x fixes it. */
     public function testGuzzleFiveIsAnUpgradeHeldByTheRoot(): void
     {
-        $fixes = $this->find(
-            ['name' => 'guzzlehttp/guzzle', 'version' => '5.3.4'],
-            [['5.3.4', '>=5.4.0'], ['6.5.7', '>=5.5'], ['6.5.8', '>=5.5'], ['7.4.5', '^7.2.5 || ^8.0'], ['7.10.0', '^7.2.5 || ^8.0']],
-            ['CVE-2022-31042' => '<6.5.8 || >=7.0.0,<7.4.5'],
-            new PhpFloor('8.4', '>=8.2'),
-            [],
-            [],
-            ['require' => ['guzzlehttp/guzzle' => '^5.3']]
-        );
+        $fixes = $this->guzzleFive();
 
         $fix = $fixes->forAdvisory('CVE-2022-31042');
         self::assertSame(Fix::UPGRADE, $fix->kind());
@@ -513,19 +552,73 @@ final class FixFinderTest extends TestCase
     /** Upgrade implies a holder. Raise-php and blocked carry holders on their own. */
     public function testEveryUpgradeNamesAHolder(): void
     {
-        foreach ([$this->twigInPhpbb()] as $fixes) {
+        $upgrades = 0;
+        foreach ([$this->twigInPhpbb(), $this->conflicting(), $this->heldByADevPackage(), $this->heldByTheRootDevAndConflict(), $this->guzzleFive()] as $fixes) {
             foreach ($fixes->fixes() as $fix) {
                 if ($fix->kind() === Fix::UPGRADE) {
+                    ++$upgrades;
                     self::assertNotSame([], $fix->heldBy());
                 }
             }
             foreach ($fixes->branches() as $row) {
                 $candidate = $row->candidate();
                 if ($candidate !== null && $candidate->kind() === Fix::UPGRADE) {
+                    ++$upgrades;
                     self::assertNotSame([], $candidate->heldBy());
                 }
             }
         }
+        self::assertGreaterThan(0, $upgrades);
+    }
+
+    private function conflicting(): PackageFixes
+    {
+        return $this->find(
+            ['name' => 'a/b', 'version' => '1.0.0'],
+            [['1.0.0', null], ['1.2.0', null]],
+            ['A' => '<1.2.0'],
+            new PhpFloor('8.4', null),
+            [['name' => 'c/conflicting', 'version' => '3.0.0', 'conflict' => ['a/b' => '>=1.2']]]
+        );
+    }
+
+    private function heldByADevPackage(): PackageFixes
+    {
+        return $this->find(
+            ['name' => 'a/b', 'version' => '1.0.0'],
+            [['1.0.0', null], ['2.0.0', null]],
+            ['A' => '<2.0.0'],
+            new PhpFloor('8.4', null),
+            [],
+            [['name' => 'd/tool', 'version' => '1.0.0', 'require' => ['a/b' => '^1.0']]]
+        );
+    }
+
+    private function heldByTheRootDevAndConflict(): PackageFixes
+    {
+        return $this->find(
+            ['name' => 'a/b', 'version' => '1.0.0'],
+            [['1.0.0', null], ['2.0.0', null]],
+            ['A' => '<2.0.0'],
+            new PhpFloor('8.4', null),
+            [],
+            [],
+            ['require-dev' => ['a/b' => '^1.0'], 'conflict' => ['A/B' => '>=2']]
+        );
+    }
+
+    /** guzzle-5: wallabag's guzzlehttp/guzzle 5.3.4. The root requires ^5.3, and 6.x fixes it. */
+    private function guzzleFive(): PackageFixes
+    {
+        return $this->find(
+            ['name' => 'guzzlehttp/guzzle', 'version' => '5.3.4'],
+            [['5.3.4', '>=5.4.0'], ['6.5.7', '>=5.5'], ['6.5.8', '>=5.5'], ['7.4.5', '^7.2.5 || ^8.0'], ['7.10.0', '^7.2.5 || ^8.0']],
+            ['CVE-2022-31042' => '<6.5.8 || >=7.0.0,<7.4.5'],
+            new PhpFloor('8.4', '>=8.2'),
+            [],
+            [],
+            ['require' => ['guzzlehttp/guzzle' => '^5.3']]
+        );
     }
 
     private function twigInPhpbb(): PackageFixes

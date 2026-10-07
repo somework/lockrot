@@ -17,25 +17,22 @@ final class BranchFixes
     private int $fixed;
     private int $unknown;
     private int $of;
-    private ?string $fixKind;
     private ?Candidate $candidate;
     private ?string $newest;
     /** @var list<string> */
     private array $clears;
 
     /**
-     * @param ?string      $fixKind   {@see fixKind()}
      * @param ?Candidate   $candidate the branch's lower bound with its class and holders, null when the branch fixes nothing
      * @param list<string> $clears    the ids of the counted advisories that the branch fixes
      */
-    public function __construct(string $branch, bool $installed, int $fixed, int $unknown, int $of, ?string $fixKind, ?Candidate $candidate, ?string $newest, array $clears)
+    public function __construct(string $branch, bool $installed, int $fixed, int $unknown, int $of, ?Candidate $candidate, ?string $newest, array $clears)
     {
         $this->branch = $branch;
         $this->installed = $installed;
         $this->fixed = $fixed;
         $this->unknown = $unknown;
         $this->of = $of;
-        $this->fixKind = $fixKind;
         $this->candidate = $candidate;
         $this->newest = $newest;
         $this->clears = $clears;
@@ -52,7 +49,10 @@ final class BranchFixes
         return $this->installed;
     }
 
-    /** Counted advisories that the branch's newest release lies outside of. */
+    /**
+     * Counted advisories that the branch's newest release lies outside of: the branch has a lower
+     * bound for each. One that a later release on the branch reintroduces is not fixed on it.
+     */
     public function fixed(): int
     {
         return $this->fixed;
@@ -70,13 +70,14 @@ final class BranchFixes
     }
 
     /**
-     * The branch's class for this project, read from its newest release's php: `update`, or
-     * `raise-php` or `blocked` when the project's floor or the target does not admit it. Null when
-     * the branch fixes nothing.
+     * The class of the branch's lower bound ({@see candidate()}), so the row, a move to the branch
+     * and the fix of that release agree. Null when the branch fixes nothing.
+     *
+     * @return Fix::UPDATE|Fix::UPGRADE|Fix::RAISE_PHP|Fix::BLOCKED|null
      */
     public function fixKind(): ?string
     {
-        return $this->fixKind;
+        return $this->candidate === null ? null : $this->candidate->kind();
     }
 
     /** The lowest release from which every release up to the branch's newest lies outside every range the branch fixes. */

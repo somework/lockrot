@@ -363,6 +363,11 @@ If lockrot cannot reach a repository for advisories, the run gets a
 lockrot asks for the advisories of every package that the run checks, whatever its origin, unless
 `extra.lockrot.advisory-lookup` is `composer-repositories`.
 
+## The score {#score}
+
+The reach of a package decides whether the score halves it as `unreached`, and a required name
+that a locked package replaces or provides reaches that package.
+
 ## Priority
 
 The priority says how much a finding applies to your project. lockrot sets it by these rules, in
@@ -403,11 +408,6 @@ then direct requirements ahead of transitive packages, then by package name.
 
 `--fail-on` fails the run on a finding at or above a verdict, a priority or `unchecked`, except one
 the baseline carries. [ci.md](ci.md) says which to choose.
-
-## The score {#score}
-
-lockrot follows the `require` links of each lock entry to find what composer.json reaches. A
-required name that a locked package replaces or provides leads to that package.
 
 ## Priority in each format {#priority-in-each-format}
 

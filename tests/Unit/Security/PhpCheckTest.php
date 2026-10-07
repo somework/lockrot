@@ -30,6 +30,7 @@ final class PhpCheckTest extends TestCase
         yield 'a minor' => ['>=8.1', '>=8.2', '>=8.2', PhpCheck::MINOR];
         yield 'a patch' => ['>=8.1.0', '>=8.1.5', '>=8.1.5', PhpCheck::PATCH];
         yield 'a release the project admits' => ['>=8.2', '>=8.1', null, null];
+        yield 'a release that admits the project floor and more' => ['>=7.4', '>=7.4', null, null];
         yield 'no project floor' => [null, '>=8.2', null, null];
         yield 'alternatives that skip the project floor' => ['>=7.4', '7.1.* || >=8.1', '>=8.1', PhpCheck::MAJOR];
         yield 'alternatives with a gap at the project floor' => ['^7.4 || ^8.0', '>=7.1,!=7.4.0', '>=7.4.1', PhpCheck::PATCH];

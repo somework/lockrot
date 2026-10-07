@@ -119,6 +119,7 @@ start the reason with `in method():`.
 ## src/Security
 
 - `src/Security/FixFinder.php` CastString `$newest[(string) $key] = $branch['highest']['pretty'];` — PHP stores a decimal string key such as `"1"` as an int, so the cast changes no key. The cast is for the type.
+- `src/Security/LinkIndex.php` TrueValue `$locked[$package->name()] = true;` — a set. Only `isset()` reads it.
 
 ## src/SelfUpdate
 
