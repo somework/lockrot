@@ -20,8 +20,8 @@
 #    composer.json), so an untracked file in the checkout cannot end up in the archive.
 # Composer writes vendor/composer/*.php from its own source, so the Composer version is part of the
 # recipe. The release workflow pins it with `tools: composer:<version>` in .github/workflows/phar.yml,
-# and the script prints the version that it ran with. PHP only runs Box.
-# The lockrot composer.json inside the archive is not read at runtime.
+# and the script prints the version that it ran with. PHP only runs Box: the phar-reproducible job
+# in .github/workflows/ci.yml rebuilds on another PHP and compares the bytes.
 set -euo pipefail
 # Set unconditionally: a value that the caller exported (common with path repositories) changes
 # installed.php and the hash.

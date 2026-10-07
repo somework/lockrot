@@ -34,7 +34,7 @@ def fixture_claims() -> 'list':
 def fixture_pairs() -> 'list[Pair]':
     """Read the pairs from the index, not from a directory listing.
 
-    Globbing would take the index for a target and would judge any file left in the directory.
+    A glob takes the index for a target and judges any file left in the directory.
     """
     index = read_json(os.path.join(FIXTURES, 'explain', 'index.json'))
     pairs = []

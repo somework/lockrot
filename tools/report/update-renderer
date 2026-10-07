@@ -2,7 +2,7 @@
 # Vendor a release of the report renderer into resources/report/.
 #
 #   tools/report/update-renderer v1.2.3           a release of somework/lockrot-report
-#   tools/report/update-renderer --from-dir DIR   a local dist/ (development only; CI refuses it)
+#   tools/report/update-renderer --from-dir DIR   a local dist/, for development only. It is not attested.
 #
 # The page that `--format=html` writes comes from https://github.com/somework/lockrot-report. This
 # script vendors its report.html and manifest, so the PHAR builds without node. It verifies once, when
@@ -42,7 +42,7 @@ actual=$(php -r 'echo hash_file("sha256", $argv[1]);' "$work/report.html")
 }
 
 # The manifest of a release names its version. That version must match the requested tag, or the pin
-# and the CHANGELOG names another renderer than the page.
+# and the CHANGELOG name a renderer that differs from the page.
 if [ "${tag:-}" != "" ]; then
   named=$(php -r 'echo json_decode(file_get_contents($argv[1]), true)["version"] ?? "";' "$work/manifest.json")
   [ "v$named" = "$tag" ] || { echo "update-renderer: $tag carries a manifest for version ${named:-nothing}" >&2; exit 1; }

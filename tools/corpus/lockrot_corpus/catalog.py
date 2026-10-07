@@ -116,7 +116,7 @@ S10_ACTIVITY = _phrase(
     's10-activity',
     r'repository activity not checked \(',
     'the S10 sentence for a repository round that did not run',
-    unexercised=('this half of S10 needs a run without a token, and every corpus run carries one',
+    unexercised=('this half of S10 needs a run with `--anon`, and the recorded corpus runs carry a token',
                  '2026-09-23'),
 )
 

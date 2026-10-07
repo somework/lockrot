@@ -52,10 +52,10 @@ def token_from_environment(anon: bool) -> 'str | None':
     return token
 
 
-# Every name that could give the child a credential or change what it does. Removal of GITHUB_TOKEN
+# Every name that can give the child a credential or change what it does. Removal of GITHUB_TOKEN
 # alone does not make a run tokenless: lockrot reads LOCKROT_GITHUB_TOKEN first (`Tokens`), then
 # Composer's github-oauth from COMPOSER_AUTH or a global auth.json, and it has a GitLab pair of its
-# own. Otherwise an `--anon` run could authenticate while its manifest says anonymous.
+# own. Otherwise an `--anon` run can authenticate while its manifest says anonymous.
 INHERITED = ('LOCKROT_GITHUB_TOKEN', 'GITHUB_TOKEN', 'LOCKROT_GITLAB_TOKEN', 'GITLAB_TOKEN',
              'COMPOSER_AUTH',
              # Not credentials: LOCKROT_DISABLE skips the command and LOCKROT_FAIL_ON changes
@@ -104,7 +104,7 @@ def new_manifest(kind: str, phar: str, today: str, cache_root: str, anon: bool,
         'started': _now(),
         'finished': None,
         # Written before any target runs. A target reaches `targets` only when the run reaches
-        # it, so a killed run looks like a smaller corpus that finished.
+        # it, so without this list a killed run looks like a smaller corpus that finished.
         'intended': [],
         'targets': {},
     }
@@ -180,8 +180,7 @@ def run_reports(phar: str, projects_dir: str, out_dir: str, cache_root: str, tod
         write_text_atomic(os.path.join(out_dir, project + '.err'),
                           finished.stderr.decode('utf-8', 'replace'))
         if finished.returncode not in (0, 1, 2, 3, 4):
-            # Exit codes 0 to 4 are lockrot's own answers. Any other code means that the process
-            # failed.
+            # Any exit code outside this tuple means that the process failed, not that lockrot answered.
             _record(manifest, project, 'failed', exit_code=finished.returncode,
                     seconds=time.time() - started)
             note('%s: lockrot exited %d; stderr kept in %s.err' % (project, finished.returncode, project))
