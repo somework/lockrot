@@ -3,7 +3,7 @@
 A target is complete only when the manifest says so and its file still hashes to the recorded
 digest, because a run killed at the timeout leaves a non-empty half-written file. The GitHub token
 is asserted, and a run without one needs `--anon`: a tokenless run reports S10 across the corpus and
-must not be compared with a run that had a token. Every run keeps its stderr beside its output. The
+must not be compared with a run that had a token. Every run that returns keeps its stderr beside its output. The
 day is pinned, because lockrot's age-based verdicts change with the calendar and not with the code.
 """
 
@@ -144,7 +144,9 @@ def _record(manifest: dict, key: str, status: str, path: 'str | None' = None,
 def run_reports(phar: str, projects_dir: str, out_dir: str, cache_root: str, today: str,
                 anon: bool = False, timeout: int = DEFAULT_TIMEOUT, target_php: str = '8.4',
                 interpreter: str = 'php', corpus_digest: 'str | None' = None) -> dict:
-    """One JSON report per project, resumable, with every run's stderr kept beside it."""
+    """One JSON report per project, resumable, with the stderr of every run that returns kept
+    beside it.
+    """
     # Absolute, because each run uses the project directory as its working directory, where a
     # relative path does not exist.
     phar = os.path.abspath(phar)

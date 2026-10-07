@@ -22,7 +22,7 @@ do, what each gap does to findings, and what to do about it.
 | [`repository_activity_rate_limited`](#repository_activity_rate_limited) | A host answered "too many requests" | yes | S10 `rate_limit` | Rerun, or add credentials for the host ([credentials](internals.md#repository-hosts-and-credentials)) |
 | [`repository_activity_unreachable`](#repository_activity_unreachable) | A host did not answer | yes | S10 `fetch_failed` | Rerun |
 | [`repository_activity_not_found`](#repository_activity_not_found) | A host answered 404: private, renamed or removed | no | None, so the note is the only record. S10 `rate_limit` when the host also rate-limited | For a private repository, credentials that can read it ([fixes](internals.md#when-a-date-is-missing-or-wrong)) |
-| [`not_from_composer_repository`](#not_from_composer_repository) | Some packages come from no Composer repository and were not checked | no | `from_composer_repository` is false | Nothing on the project's side. A `type: composer` repository's operator can make it advertise a notify URL |
+| [`not_from_composer_repository`](#not_from_composer_repository) | Some packages come from no Composer repository, and lockrot does not check them | no | `from_composer_repository` is false | Nothing on the project's side. A `type: composer` repository's operator can make it advertise a notify URL |
 
 ## Reading a note {#reading-a-note}
 

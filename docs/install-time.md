@@ -105,8 +105,8 @@ the one `composer lockrot` gives for the same package.
 | The repository activity check, part way | lockrot cuts the requests that are still running to the time left. Those that time out have no activity, and their findings carry S10 `fetch_failed` | [`repository_activity_unreachable`](notes.md#repository_activity_unreachable), a network failure |
 
 `composer require` and `composer update` reuse the metadata that Composer fetched in the same
-process, so they rarely run out. A `composer install` with a cold cache on a large lock, such as a
-fresh clone or a CI job, can run out before lockrot checks every package. Raise the budget for such
+process, so they rarely run out. A `composer install` with a cold cache on a large lock (a fresh
+clone, a CI job) can run out before lockrot checks every package. Raise the budget for such
 a lock, or lower it to spend less time on the check.
 
 ## When the install continues and when it stops {#never-fails-the-install}

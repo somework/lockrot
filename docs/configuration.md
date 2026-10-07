@@ -127,8 +127,8 @@ lockrot: unknown key extra.lockrot.ignore[1].expire ignored (did you mean expire
   even when nothing is flagged. `LOCKROT_DISABLE` suppresses them, and `-q` silences them with
   everything else lockrot prints.
 - **How a key is printed.** As written, with every byte that a terminal can act on escaped (control
-  bytes, invalid UTF-8, bidirectional controls, and a backslash as `\\`), so two keys never print
-  alike. lockrot cuts a key longer than 255 bytes there and ends it in `…`.
+  bytes, invalid UTF-8, bidirectional controls, and a backslash as `\\`), so two keys of up to 255
+  bytes never print alike. lockrot cuts a longer key at 255 bytes and ends it in `…`.
 - **With a schema error.** lockrot appends the unknown-key lines to the list of schema errors, so
   an `ignore` entry that misspells a required key says why the key is missing:
 
