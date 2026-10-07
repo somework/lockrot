@@ -55,6 +55,8 @@ reviews:
     - '!resources/monorepo-parents.json'
     # Written only by `composer update --working-dir=build/phar`. CI fails on an unexpected diff.
     - '!build/phar/composer.lock'
+    # Written only by tools/score/sweep.py: the sweep stream, gzipped. SweepDifferentialTest reads it.
+    - '!tests/fixtures/score/sweep-rows.txt.gz'
     # Re-recorded from a real run. The numbers in it are output, not prose.
     - '!docs/example-run.md'
     # Recorded with asciinema and rendered with agg by bin/record-demo.

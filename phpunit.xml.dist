@@ -7,7 +7,7 @@
         <testsuite name="integration"><directory>tests/Integration</directory></testsuite>
         <testsuite name="e2e"><directory>tests/E2E</directory></testsuite>
     </testsuites>
-    <groups><exclude><group>e2e</group><group>network</group></exclude></groups>
+    <groups><exclude><group>e2e</group><group>network</group><group>sweep</group></exclude></groups>
     <php><ini name="memory_limit" value="-1"/><env name="LOCKROT_TODAY" value="2026-09-14T00:00:00+00:00"/></php>
     <source><include><directory>src</directory></include></source>
     <!-- Does nothing outside Infection's mutant processes: tests/Support/MutantTestTimeLimit.php. -->
