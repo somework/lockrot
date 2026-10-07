@@ -9,9 +9,15 @@ on:
     paths:
       - 'src/Score/**'
       - 'src/Verdict/**'
+      - 'src/Security/Severity.php'
       - 'src/Config/Gate.php'
       - 'tools/score/**'
       - 'tests/fixtures/score/**'
+      - 'tests/Support/Score*.php'
+      - 'tests/Integration/Score*Test.php'
+      - 'tests/Integration/SweepDifferentialTest.php'
+      - 'phpunit*.xml.dist'
+      - '.github/workflows/sweep.yml'
   schedule:
     - cron: '17 4 * * 1'
   workflow_dispatch:
