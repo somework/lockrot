@@ -510,6 +510,7 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
         self::assertSame(2, self::feed($batch, 'doctrine/cache', 0)['records']);
         self::assertSame(2, self::feed($batch, 'doctrine/cache', 1)['records']);
         self::assertSame(3, self::nameCoverage($batch, 'doctrine/cache')->records(), 'PKSA-cache-1 counts once');
+        self::assertSame(['PKSA-cache-1', 'PKSA-cache-8', 'PKSA-cache-9'], array_map(static fn (Advisory $a): string => $a->id(), $batch->every('doctrine/cache')), 'every() lists an id once');
         self::assertCount(1, $batch->for('doctrine/cache'));
     }
 
