@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Lock;
 
 use Composer\Package\CompletePackage;
+use Composer\Package\Link;
 use Composer\Repository\PlatformRepository;
 use Composer\Semver\VersionParser;
 use Lockrot\Data\Forge\SupportSource;
@@ -28,6 +29,14 @@ final class LockedPackage
     /** @var list<string> */
     private array $aliasVersions = [];
     private ?string $normalizedVersion = null;
+    /** @var array<string, string> */
+    private array $requireConstraints = [];
+    /** @var array<string, string> */
+    private array $conflicts = [];
+    /** @var array<string, string> */
+    private array $replaces = [];
+    /** @var array<string, string> */
+    private array $provides = [];
 
     /**
      * @param list<string> $requires
@@ -96,8 +105,29 @@ final class LockedPackage
             $package->isAbandoned() ? ($package->getReplacementPackage() ?? true) : false
         );
         $locked->normalizedVersion = $package->getVersion();
+        $locked->requireConstraints = self::constraints($links);
+        $locked->conflicts = self::constraints($package->getConflicts());
+        $locked->replaces = self::constraints($package->getReplaces());
+        $locked->provides = self::constraints($package->getProvides());
 
         return $locked;
+    }
+
+    /**
+     * @param array<string, Link> $links
+     *
+     * @return array<string, string> lowercased target => the constraint as written, platform packages left out
+     */
+    private static function constraints(array $links): array
+    {
+        $constraints = [];
+        foreach ($links as $link) {
+            if (!PlatformRepository::isPlatformPackage($link->getTarget())) {
+                $constraints[$link->getTarget()] = $link->getPrettyConstraint();
+            }
+        }
+
+        return $constraints;
     }
 
     public function name(): string
@@ -121,6 +151,30 @@ final class LockedPackage
     {
         return $this->requires;
     }
+    /** @return array<string, string> lowercased package name => constraint, platform packages left out */
+    public function requireConstraints(): array
+    {
+        return $this->requireConstraints;
+    }
+
+    /** @return array<string, string> lowercased package name => constraint */
+    public function conflicts(): array
+    {
+        return $this->conflicts;
+    }
+
+    /** @return array<string, string> lowercased package name => constraint */
+    public function replaces(): array
+    {
+        return $this->replaces;
+    }
+
+    /** @return array<string, string> lowercased package name => constraint */
+    public function provides(): array
+    {
+        return $this->provides;
+    }
+
     /**
      * The lock entry's `source` URL, else its `support.source` reduced to the repository.
      */

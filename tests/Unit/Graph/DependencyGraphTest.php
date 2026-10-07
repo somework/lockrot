@@ -154,4 +154,109 @@ final class DependencyGraphTest extends TestCase
         self::assertSame(['root/a' => ['root/a', 'vendor/x']], $graph->chainsTo('vendor/x'));
         self::assertSame(['root/a' => ['root/a']], $graph->chainsTo('root/a'));
     }
+
+    /** new-sylius locks symfony/contracts, which replaces every symfony/*-contracts, and none of them. */
+    public function testAPackageThatReplacesARequiredNameIsReachedThroughIt(): void
+    {
+        $lock = LockFile::fromArray(['packages' => [
+            ['name' => 'root/app', 'version' => '1.0.0', 'require' => ['symfony/service-contracts' => '^3.0']],
+            ['name' => 'symfony/contracts', 'version' => 'v3.5.0', 'replace' => ['symfony/service-contracts' => 'self.version', 'symfony/cache-contracts' => 'self.version']],
+        ]]);
+        $graph = DependencyGraph::fromLock($lock, ProjectConfig::fromArray(['require' => ['root/app' => '^1']]), false);
+
+        self::assertSame(['root/app', 'symfony/contracts'], $graph->shortestChain('symfony/contracts'));
+        self::assertSame(['root/app' => ['root/app', 'symfony/contracts']], $graph->chainsTo('symfony/contracts'));
+        self::assertSame([], $graph->namedIn('symfony/contracts'));
+    }
+
+    public function testAPackageThatProvidesARequiredNameIsReachedThroughIt(): void
+    {
+        $lock = LockFile::fromArray(['packages' => [
+            ['name' => 'root/app', 'version' => '1.0.0', 'require' => ['psr/log-implementation' => '^1.0']],
+            ['name' => 'monolog/monolog', 'version' => '2.9.0', 'provide' => ['psr/log-implementation' => '1.0.0']],
+        ]]);
+        $graph = DependencyGraph::fromLock($lock, ProjectConfig::fromArray(['require' => ['root/app' => '^1']]), false);
+
+        self::assertSame(['root/app', 'monolog/monolog'], $graph->shortestChain('monolog/monolog'));
+    }
+
+    /**
+     * Composer installs one package of a name: when the lock carries the required name itself, that
+     * package satisfies the requirement, and a package that only provides the name is not reached
+     * through it.
+     */
+    public function testALockedPackageOfTheRequiredNameWinsOverAProvider(): void
+    {
+        $lock = LockFile::fromArray(['packages' => [
+            ['name' => 'root/app', 'version' => '1.0.0', 'require' => ['psr/log' => '^1.0']],
+            ['name' => 'psr/log', 'version' => '1.1.4'],
+            ['name' => 'vendor/logger', 'version' => '1.0.0', 'provide' => ['psr/log' => '1.1.4']],
+        ]]);
+        $graph = DependencyGraph::fromLock($lock, ProjectConfig::fromArray(['require' => ['root/app' => '^1']]), false);
+
+        self::assertSame(['root/app', 'psr/log'], $graph->shortestChain('psr/log'));
+        self::assertSame([], $graph->shortestChain('vendor/logger'));
+    }
+
+    /**
+     * wallabag requires ocramius/proxy-manager, and its lock holds friendsofphp/proxy-manager-lts,
+     * which replaces it. RotDepthTest reuses this fixture.
+     */
+    public function testARootRequireOfAReplacedNameMakesTheReplacerDirect(): void
+    {
+        $lock = LockFile::fromArray(['packages' => [
+            ['name' => 'friendsofphp/proxy-manager-lts', 'version' => 'v1.0.18', 'replace' => ['ocramius/proxy-manager' => '^2.1']],
+            ['name' => 'laminas/laminas-code', 'version' => '4.16.0'],
+        ]]);
+        $project = ProjectConfig::fromArray(['require' => ['ocramius/proxy-manager' => '^2.1', 'laminas/laminas-code' => '^4.16']]);
+        $graph = DependencyGraph::fromLock($lock, $project, false);
+
+        self::assertSame(['friendsofphp/proxy-manager-lts'], $graph->shortestChain('friendsofphp/proxy-manager-lts'));
+        self::assertSame(['friendsofphp/proxy-manager-lts' => ['friendsofphp/proxy-manager-lts']], $graph->chainsTo('friendsofphp/proxy-manager-lts'));
+        self::assertSame([DependencyGraph::REQUIRE], $graph->namedIn('friendsofphp/proxy-manager-lts'));
+        self::assertSame([DependencyGraph::REQUIRE], $graph->namedIn('laminas/laminas-code'));
+    }
+
+    /** Composer compares package names case-insensitively, and the lock writes them in lower case. */
+    public function testARootNameIsMatchedWhateverItsCase(): void
+    {
+        $lock = LockFile::fromArray(['packages' => [
+            ['name' => 'foo/bar', 'version' => '1.0.0', 'require' => ['vendor/dep' => '^1']],
+            ['name' => 'vendor/dep', 'version' => '1.0.0'],
+        ]]);
+        $graph = DependencyGraph::fromLock($lock, ProjectConfig::fromArray(['require' => ['Foo/Bar' => '^1']]), false);
+
+        self::assertSame(['foo/bar'], $graph->shortestChain('foo/bar'));
+        self::assertSame(['foo/bar', 'vendor/dep'], $graph->shortestChain('vendor/dep'));
+        self::assertSame([DependencyGraph::REQUIRE], $graph->namedIn('foo/bar'));
+    }
+
+    /** Both sections are read whatever `--dev` says, in the order require, require-dev. */
+    public function testNamedInListsEverySectionThatNamesThePackage(): void
+    {
+        $lock = LockFile::fromArray(['packages' => [
+            ['name' => 'vendor/both', 'version' => '1.0.0'],
+            ['name' => 'vendor/prod', 'version' => '1.0.0', 'require' => ['vendor/deep' => '^1']],
+            ['name' => 'vendor/deep', 'version' => '1.0.0'],
+            ['name' => 'vendor/split', 'version' => '1.0.0', 'replace' => ['vendor/old' => 'self.version']],
+        ], 'packages-dev' => [
+            ['name' => 'vendor/tool', 'version' => '1.0.0'],
+        ]]);
+        $project = ProjectConfig::fromArray([
+            'require' => ['vendor/prod' => '^1', 'vendor/both' => '^1'],
+            'require-dev' => ['vendor/both' => '^1', 'Vendor/Tool' => '^1', 'vendor/old' => '^1'],
+        ]);
+
+        foreach ([false, true] as $dev) {
+            $graph = DependencyGraph::fromLock($lock, $project, $dev);
+            self::assertSame([DependencyGraph::REQUIRE, DependencyGraph::REQUIRE_DEV], $graph->namedIn('vendor/both'));
+            self::assertSame([DependencyGraph::REQUIRE], $graph->namedIn('vendor/prod'));
+            self::assertSame([DependencyGraph::REQUIRE_DEV], $graph->namedIn('vendor/split'));
+            self::assertSame([], $graph->namedIn('vendor/deep'));
+            self::assertSame([], $graph->namedIn('vendor/not-in-lock'));
+        }
+        self::assertSame([DependencyGraph::REQUIRE_DEV], DependencyGraph::fromLock($lock, $project, true)->namedIn('vendor/tool'));
+        self::assertSame(['vendor/split'], DependencyGraph::fromLock($lock, $project, true)->shortestChain('vendor/split'));
+        self::assertSame([], DependencyGraph::fromLock($lock, $project, false)->shortestChain('vendor/split'), 'a require-dev root is walked only with --dev');
+    }
 }

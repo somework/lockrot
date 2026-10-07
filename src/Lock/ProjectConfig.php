@@ -13,6 +13,10 @@ use Lockrot\Json\JsonReader;
 /** @internal */
 final class ProjectConfig
 {
+    public const REQUIRE = 'require';
+    public const REQUIRE_DEV = 'require-dev';
+    public const CONFLICT = 'conflict';
+
     private ?string $name;
     /** @var list<string> */
     private array $requires;
@@ -23,6 +27,8 @@ final class ProjectConfig
     private ?string $platformPhp;
     private ?string $requirePhp;
     private ConfiguredRepositories $repositories;
+    /** @var array<string, array<string, string>> section => lowercased package name => constraint */
+    private array $constraints = [];
 
     /**
      * @param list<string> $requires
@@ -70,7 +76,7 @@ final class ProjectConfig
         $require = $json['require'] ?? null;
         $requirePhp = \is_array($require) ? ($require['php'] ?? null) : null;
 
-        return new self(
+        $config = new self(
             self::packageNames($require),
             self::packageNames($json['require-dev'] ?? null),
             self::lockrotExtraFrom($extraRoot),
@@ -79,6 +85,28 @@ final class ProjectConfig
             \is_string($requirePhp) && $requirePhp !== '' ? $requirePhp : null,
             ConfiguredRepositories::fromManifest($json['repositories'] ?? null)
         );
+        foreach ([self::REQUIRE, self::REQUIRE_DEV, self::CONFLICT] as $section) {
+            $config->constraints[$section] = self::constraintsOf($json[$section] ?? null);
+        }
+
+        return $config;
+    }
+
+    /**
+     * @param mixed $links
+     * @return array<string, string>
+     */
+    private static function constraintsOf($links): array
+    {
+        $constraints = [];
+        foreach (\is_array($links) ? $links : [] as $name => $constraint) {
+            $name = strtolower((string) $name);
+            if (\is_string($constraint) && !PlatformRepository::isPlatformPackage($name)) {
+                $constraints[$name] = $constraint;
+            }
+        }
+
+        return $constraints;
     }
 
     /**
@@ -150,6 +178,19 @@ final class ProjectConfig
     public function directDevRequires(): array
     {
         return $this->devRequires;
+    }
+
+    /**
+     * The root's links of one section, as Composer reads them: names in lower case, platform
+     * packages left out.
+     *
+     * @param self::REQUIRE|self::REQUIRE_DEV|self::CONFLICT $section
+     *
+     * @return array<string, string> package name => constraint as written
+     */
+    public function constraints(string $section): array
+    {
+        return $this->constraints[$section] ?? [];
     }
 
     /** @return array<string, mixed> */

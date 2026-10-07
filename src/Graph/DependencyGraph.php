@@ -10,10 +10,15 @@ use Lockrot\Lock\ProjectConfig;
 /** @internal */
 final class DependencyGraph
 {
+    public const REQUIRE = ProjectConfig::REQUIRE;
+    public const REQUIRE_DEV = ProjectConfig::REQUIRE_DEV;
+
     /** @var array<string, list<string>> package => list of packages it requires */
     private array $edges;
     /** @var list<string> */
     private array $roots;
+    /** @var array<string, list<self::REQUIRE|self::REQUIRE_DEV>> package => the root sections that name it */
+    private array $namedIn = [];
     /**
      * BFS parent maps, one per root, memoised by {@see tree()}. The edges are immutable, so a map
      * never goes stale.
@@ -33,18 +38,61 @@ final class DependencyGraph
         $this->roots = $roots;
     }
 
+    /**
+     * A required name resolves to the locked package of that name, else to every locked package that
+     * replaces or provides it, as Composer's solver reads the lock. Root names are compared in lower
+     * case, as Composer compares them. `namedIn()` reads both root sections whatever $includeDev says.
+     */
     public static function fromLock(LockFile $lock, ProjectConfig $project, bool $includeDev): self
     {
-        $edges = [];
-        foreach ($lock->packages($includeDev) as $package) {
-            $edges[$package->name()] = $package->requires();
+        $packages = $lock->packages($includeDev);
+        $present = [];
+        $satisfiedBy = [];
+        foreach ($packages as $package) {
+            $present[$package->name()] = true;
+            foreach (array_keys($package->replaces() + $package->provides()) as $name) {
+                $satisfiedBy[$name][] = $package->name();
+            }
         }
-        $roots = $project->directRequires();
+        $resolve = static function (array $names) use ($present, $satisfiedBy): array {
+            $resolved = [];
+            foreach ($names as $name) {
+                $name = strtolower($name);
+                foreach (isset($present[$name]) ? [$name] : ($satisfiedBy[$name] ?? [$name]) as $package) {
+                    $resolved[$package] = true;
+                }
+            }
+
+            return array_keys($resolved);
+        };
+        $edges = [];
+        foreach ($packages as $package) {
+            $edges[$package->name()] = $resolve($package->requires());
+        }
+        $sections = [self::REQUIRE => $resolve($project->directRequires()), self::REQUIRE_DEV => $resolve($project->directDevRequires())];
+        $roots = $sections[self::REQUIRE];
         if ($includeDev) {
-            $roots = array_merge($roots, $project->directDevRequires());
+            $roots = array_values(array_unique(array_merge($roots, $sections[self::REQUIRE_DEV])));
+        }
+        $graph = new self($edges, $roots);
+        foreach ($sections as $section => $names) {
+            foreach ($names as $name) {
+                $graph->namedIn[$name][] = $section;
+            }
         }
 
-        return new self($edges, $roots);
+        return $graph;
+    }
+
+    /**
+     * The root sections whose keys name the package, directly or through a name that it replaces or
+     * provides, in the order require, require-dev. Empty for a package that no root line names.
+     *
+     * @return list<self::REQUIRE|self::REQUIRE_DEV>
+     */
+    public function namedIn(string $package): array
+    {
+        return isset($this->edges[$package]) ? ($this->namedIn[$package] ?? []) : [];
     }
 
     /** @return list<string> */

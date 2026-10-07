@@ -2,7 +2,7 @@
     "apps/wallabag_wallabag": {
         "block": {
             "total": 163.69,
-            "direct_requirements": 106.7,
+            "direct_requirements": 108.31,
             "measured": 194,
             "unmeasured": {
                 "branch_snapshot": 4,
@@ -79,6 +79,7 @@
             "doctrine/persistence": 0.64,
             "egulias/email-validator": 0.0,
             "enshrined/svg-sanitize": 1.05,
+            "friendsofphp/proxy-manager-lts": 1.61,
             "friendsofsymfony/jsrouting-bundle": 0.0,
             "friendsofsymfony/rest-bundle": 0.0,
             "friendsofsymfony/user-bundle": 1.64,
@@ -160,7 +161,6 @@
             "doctrine/lexer": 0.0,
             "doctrine/sql-formatter": 0.29,
             "fossar/htmlawed": 0.0,
-            "friendsofphp/proxy-manager-lts": 1.61,
             "gedmo/doctrine-extensions": 1.43,
             "gregwar/captcha": 1.18,
             "http-interop/http-factory-guzzle": 0.0,
