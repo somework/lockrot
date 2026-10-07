@@ -110,7 +110,7 @@ final class ScoreText
         if (!\is_int($value) && !\is_float($value)) {
             throw new \LogicException('not a number: '.var_export($value, true));
         }
-        $halves = (int) round(2 * $value);
+        $halves = (int) (2 * $value);
 
         return intdiv($halves, 2).($halves % 2 === 0 ? '' : '.5');
     }

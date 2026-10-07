@@ -164,6 +164,24 @@ final class ScoreBasisOracleTest extends TestCase
         self::assertSame([4, 0.5, 4], array_column($score['terms'], 'contribution'));
     }
 
+    public function testTheGradedShapeWritesEveryKeyInItsOrder(): void
+    {
+        $score = self::score(['old-promise'], [], 'direct', false);
+
+        self::assertSame(['model', 'total', 'exact', 'rounded_down', 'band', 'decided_by', 'parts', 'terms', 'modifiers', 'accepted', 'without', 'text'], array_keys($score));
+        self::assertSame(1, $score['model']);
+    }
+
+    public function testAWholePackageEntryListsEveryFiredMaintenanceFlagAsAccepted(): void
+    {
+        $flags = FlagSet::fromSignals(self::signalsOf([['S5', 'high'], ['S2', 'warn']]), new AllowlistEntry('vendor/pkg', null, 'finished', null, 'builtin'), ScoreSweep::advisories([['low', 'update']]));
+        $score = ScoreSweep::graded(ScoreBasis::of($flags, 'direct', false, ScoreSweep::CONTEXT)->toArray());
+
+        self::assertSame(['old-promise', 'stale'], array_column($score['accepted'], 'flag'));
+        self::assertSame([18, 10], array_column(array_column($score['accepted'], 'if_counted'), 'total'));
+        self::assertSame('accepted', $score['parts']['maintenance']['status']);
+    }
+
     public function testEveryRowOfWithoutIsAnEngineRerun(): void
     {
         $score = self::score(['abandoned', 'old-promise'], [['high', 'update'], ['high', 'none']], 'direct', false, 'silent');

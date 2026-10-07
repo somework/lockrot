@@ -7,8 +7,8 @@ namespace Lockrot\Tests\Unit;
 use PHPUnit\Framework\TestCase;
 
 /**
- * The three PHPUnit configurations exclude the same groups, so the default suite, the PHPUnit 9 legs
- * and the core coverage gate skip the same slow tests.
+ * The PHPUnit configurations in CONFIGS exclude the same groups, so the default suite, the PHPUnit 9
+ * legs and the core coverage gate skip the same slow tests.
  */
 final class PhpunitConfigsTest extends TestCase
 {

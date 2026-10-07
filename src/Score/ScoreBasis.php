@@ -173,7 +173,8 @@ final class ScoreBasis
         if (\count($score->maintenanceTerms()) + ($deciding === null ? 0 : 1) >= 2) {
             foreach ($score->maintenanceTerms() as $term) {
                 $flags = $this->flags->without($term['flag']);
-                $rows[] = $this->rerun('flag', $term['flag'], $flags, array_values(array_diff($flags->fired(), $this->flags->fired())), $this->atLeast($term['flag']));
+                $hidden = $term['flag'] === FlagSet::ABANDONED ? $this->flags->hidden() : null;
+                $rows[] = $this->rerun('flag', $term['flag'], $flags, $hidden === null ? [] : [$hidden], $this->atLeast($term['flag']));
             }
             if ($deciding !== null) {
                 $rows[] = $this->rerun('flag', FlagSet::VULNERABLE, $this->flags->without(FlagSet::VULNERABLE), [], false);
@@ -187,7 +188,7 @@ final class ScoreBasis
     }
 
     /**
-     * @param list<string> $revealed the words the removal brings back
+     * @param list<string> $revealed the words that the removal restores
      *
      * @return Without
      */
@@ -258,9 +259,9 @@ final class ScoreBasis
         return ['total' => intdiv($halves, 2), 'verdict' => ScoreModel::band(intdiv($halves, 2))];
     }
 
-    /** @return int|float a whole number as an integer, a half as 0.5: both exact */
+    /** @return int|float PHP's `/` gives an integer for a whole quotient and an exact float for a half */
     private static function number(int $halves)
     {
-        return $halves % 2 === 0 ? intdiv($halves, 2) : $halves / 2;
+        return $halves / 2;
     }
 }

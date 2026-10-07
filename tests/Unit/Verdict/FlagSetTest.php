@@ -116,6 +116,7 @@ final class FlagSetTest extends TestCase
         yield 'a whole-package entry' => [$staleOldPromise, null, ['old-promise', 'stale'], [], ['abandoned', 'silent', 'pinned', 'left-behind', 'old-promise', 'stale']];
         yield 'abandoned covers silent and stale' => [$staleOldPromise, ['abandoned'], ['stale'], ['old-promise'], ['abandoned', 'silent', 'stale']];
         yield 'silent covers stale' => [$staleOldPromise, ['silent'], ['stale'], ['old-promise'], ['silent', 'stale']];
+        yield 'an accepted flag before a counted one' => [[['S6', 'high'], ['S5', 'high']], ['pinned'], ['pinned'], ['old-promise'], ['pinned']];
         yield 'a liveness word beside another flag' => [$staleOldPromise, ['old-promise', 'silent'], ['old-promise', 'stale'], [], ['silent', 'old-promise', 'stale']];
         yield 'stale covers no other word' => [[['S2', 'high'], ['S4', 'high']], ['stale'], [], ['silent'], ['stale']];
     }
@@ -152,6 +153,7 @@ final class FlagSetTest extends TestCase
         $counting = FlagSet::fromSignals(self::signals([['S2', 'warn'], ['S5', 'high']]), $entry, [])->counting('stale');
         self::assertSame(['old-promise', 'stale'], $counting->countedMaintenance());
         self::assertSame(['silent'], $counting->acceptSet());
+        self::assertSame(['stale'], FlagSet::fromSignals(self::signals([['S2', 'warn']]), $entry, [])->counting('silent')->acceptSet(), 'a list');
     }
 
     public function testTheReleaseLevelIsS2s(): void
