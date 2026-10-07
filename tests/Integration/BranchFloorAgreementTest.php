@@ -55,9 +55,8 @@ final class BranchFloorAgreementTest extends TestCase
 
     /**
      * Every fixture lock served at once, so a package has every branch any of them locks. That much
-     * metadata leaves composer's static constraint caches and the allocator well above where the
-     * suite's other tests start, under the 128 MB memory_limit they share: the test runs in a
-     * process of its own, which never calls setUpBeforeClass(), so it builds its own server.
+     * metadata fills Composer's static constraint caches, which stay for every later test of a
+     * shared process: the test runs in a process of its own, which never calls setUpBeforeClass(), so it builds its own server.
      *
      * @runInSeparateProcess
      */

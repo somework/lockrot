@@ -255,7 +255,7 @@ final class AcceptanceTest extends TestCase
     {
         $f = $this->byName($this->analyze('apps/matomo-org_matomo'));
         // lox/xhprof carries S1 (abandoned on Packagist) and S3 (archived) as well as S6 (a
-        // dev-master pin), and the verdict is abandoned.
+        // dev-master pin). abandoned outranks pinned in the severity order, so S6 stays underneath.
         self::assertSame(Verdict::ABANDONED, $f['lox/xhprof']->verdict());
         self::assertStringContainsString('dev-master', $f['lox/xhprof']->evidence());
         $ids = array_map(static fn ($s) => $s->id(), $f['lox/xhprof']->signals());

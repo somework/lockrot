@@ -73,8 +73,8 @@ final class GateAgreementTest extends TestCase
 
     /**
      * Every fixture lock served at once, as BranchFloorAgreementTest serves them, in a process of
-     * its own: that much metadata leaves Composer's caches high under the 128 MB memory_limit that
-     * the suite's tests share.
+     * its own: that much metadata fills Composer's static caches, which stay for every later test of
+     * a shared process.
      *
      * @runInSeparateProcess
      */
