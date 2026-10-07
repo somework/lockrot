@@ -16,7 +16,7 @@ use Lockrot\Verdict\Verdict;
  * SARIF 2.1.0 for GitHub code scanning: docs/ci.md#-formatsarif. The specification is at
  * https://docs.oasis-open.org/sarif/sarif/v2.1.0/os/sarif-v2.1.0-os.html
  *
- * `results` keeps the report's order.
+ * `results` keeps the report's order, so the same lock and the same data give byte-identical output.
  *
  * @internal
  */
