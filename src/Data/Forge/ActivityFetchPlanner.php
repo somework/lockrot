@@ -6,7 +6,7 @@ namespace Lockrot\Data\Forge;
 
 /**
  * Decides which repositories to ask about: docs/internals.md, "Repository hosts and credentials".
- * GitLab is never capped, because its anonymous limit is far above the budget.
+ * GitLab is never capped: its anonymous rate limit is far above {@see DEFAULT_ANONYMOUS_BUDGET}.
  *
  * @internal
  */

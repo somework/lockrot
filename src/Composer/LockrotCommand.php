@@ -397,9 +397,9 @@ final class LockrotCommand extends BaseCommand
     /**
      * The files that an `--output` must not name, besides each composer.json and composer.lock that
      * {@see ReportTargets} refuses by name: docs/configuration.md#writing-reports-to-files.
-     * The order sets the reason: without `COMPOSER`, the composer.json and composer.lock of the
-     * working directory come first and keep their reason. A path entry also catches a second name
-     * of the file on disk, which a refusal by name misses.
+     * The order sets the reason that a refusal prints: without `COMPOSER`, the composer.json and
+     * composer.lock of the working directory come before the `COMPOSER` pair. A path entry also
+     * catches a second name of the file on disk, which a refusal by name misses.
      *
      * @return list<array{0: string, 1: string}> path, reason
      */
@@ -559,7 +559,7 @@ final class LockrotCommand extends BaseCommand
         }
 
         // Composer 2.3 and later has tryComposer(). Composer 2.2 LTS has only getComposer(bool $required).
-        // @phpstan-ignore function.alreadyNarrowedType (tryComposer() does not exist in Composer 2.2 LTS; guard is load-bearing there)
+        // @phpstan-ignore function.alreadyNarrowedType (the guard is for Composer 2.2 LTS)
         $composer = method_exists($this, 'tryComposer') ? $this->tryComposer() : $this->getComposer(false);
 
         return $composer instanceof Composer ? $composer : null;

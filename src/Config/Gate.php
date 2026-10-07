@@ -8,8 +8,8 @@ use Lockrot\Analyzer\Report;
 use Lockrot\Verdict\FailOn;
 
 /**
- * The one decision behind the exit code of `composer lockrot`, the `gate` of the json and html
- * reports, and the install-time block. {@see Policy::exitCode()} and the report read it. The rules
+ * The decision behind the exit code of `composer lockrot`, the `gate` of the json and html
+ * reports, and the install-time block. The rules
  * are in docs/schema.md#the-gate.
  *
  * The annotation level of the machine formats ({@see \Lockrot\Output\FormatContext::levelOf()})

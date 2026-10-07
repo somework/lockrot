@@ -42,7 +42,7 @@ final class LibyearsMeasurement
         return $this->years;
     }
 
-    /** One of {@see Libyears::REASONS}, null when measured, zero included. */
+    /** One of {@see Libyears::REASONS}, null when measured, also for zero years. */
     public function unmeasuredReason(): ?string
     {
         return $this->unmeasured;

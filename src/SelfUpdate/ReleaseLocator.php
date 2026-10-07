@@ -84,14 +84,9 @@ final class ReleaseLocator
     /**
      * Walks the releases newest first and returns the first one that can be installed, or null when
      * the build is current in its line. Each release passed over leaves a note ({@see notes()}).
-     *
-     * With $force, the newest release at or below the running version is also a candidate. It stays
-     * in the running major version: the description is unsigned, and a lying one must not walk a
-     * reinstall further down.
-     *
-     * With $allowMajor, a release of the next major version is also a candidate: the lowest major
-     * above the running line that has a stable release. Without it, the notes name that release, or
-     * say why none can be installed.
+     * With $force, the newest release at or below the running version is also a candidate, in the
+     * running major only: an unsigned description can lie and must not walk a reinstall further
+     * down. With $allowMajor, the lowest higher major with a stable release is also a candidate.
      *
      * @return ?Release the release to install, null when none is newer
      *
@@ -195,8 +190,9 @@ final class ReleaseLocator
     }
 
     /**
-     * One line for each reason that a newer release was passed over in the last {@see locate()},
-     * that names the newest release held back for it. The lines stay when locate() throws.
+     * One line for each reason that a newer release was passed over in the last {@see locate()}.
+     * Each line names the newest release held back for that reason. The lines stay when locate()
+     * throws.
      *
      * The text carries tags and versions from the release list: whoever prints it must escape it.
      *

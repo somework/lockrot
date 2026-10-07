@@ -51,7 +51,7 @@ final class FormatContext
     }
 
     /**
-     * @param null|string $lockPath         absolute path of the analysed lock
+     * @param null|string $lockPath         absolute path of the analysed lock, null when unknown
      * @param string      $failOn           one of {@see FailOn::allowed()}
      * @param int         $terminalWidth    columns for `table`, raised to MIN_WIDTH when lower
      * @param null|string $projectDirectory absolute path that {@see lockName()} is relative to

@@ -12,7 +12,7 @@ use Symfony\Component\Console\Terminal;
  *
  * lockrot runs under symfony/console 5.4 and 2.8 (the Composer 2.2 LTS PHAR). 2.8 has no Terminal
  * class, and 5.4 has no Application::getTerminalDimensions(), so each source is guarded and is a
- * method of its own. Under 5.4 the Terminal step always answers, so the later steps cannot run.
+ * method of its own. Under 5.4, {@see fromApplication()} never answers.
  *
  * @internal
  */

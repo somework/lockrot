@@ -71,9 +71,9 @@ final class ServiceFactory
      * Exchanges a `bitbucket-oauth` consumer for a bearer token up front. Composer exchanges it only
      * after a 401, and lockrot switches that retry off ({@see ComposerHttpClient::fetchAll()}). The
      * request is the one that {@see Bitbucket} sends. Composer's own helper is not used, because it
-     * also rewrites `composer.json` and `auth.json`, and a report never writes. After a failed
-     * exchange the consumer pair stays in the IO, because IOInterface cannot clear one entry.
-     * See docs/internals.md#which-credentials.
+     * also rewrites `composer.json` and `auth.json`. AuthHelper adds the consumer pair to the POST as
+     * HTTP Basic, and sends a token stored as `x-token-auth` as a bearer token on api.bitbucket.org.
+     * A failed exchange leaves the pair in the IO: IOInterface cannot clear one entry.
      *
      * @param null|callable(): HttpDownloader $downloaderFactory the downloader to post with, Composer's own when null
      *
@@ -125,7 +125,7 @@ final class ServiceFactory
      * HTTP for repository activity only. The deadline cuts each activity request to the time left
      * ({@see ComposerHttpClient::timeoutSeconds()}). Repository metadata requests come from the
      * project's own ComposerRepository instances, whose HttpDownloader timeouts lockrot cannot set,
-     * so the deadline check between chunks in RepositoryMetadataLoader is their only bound.
+     * so the deadline check between chunks bounds them ({@see \Lockrot\Data\Repository\RepositoryMetadataLoader}).
      */
     public static function createHttp(IOInterface $io, Config $config, LockrotConfig $lockrot, Clock $clock, ?Deadline $deadline = null): CachingHttpClient
     {

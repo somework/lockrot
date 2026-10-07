@@ -152,9 +152,8 @@ final class InstallTimeSummary
     /**
      * A transaction cannot say which section a package belongs to, so every entry arrives as prod
      * ({@see TransactionPackages::fromTransaction()}). Without this flag a `composer require --dev`
-     * package ranks one priority step too high. The merged lock is the only source of the flag. Under
-     * `--dry-run` or in a project with no lock, the package stays prod, as
-     * {@see LockFile::withPackages()} documents.
+     * package ranks one priority step too high. The merged lock carries the flag. Under `--dry-run`
+     * or in a project with no lock, the package stays prod ({@see LockFile::withPackages()}).
      *
      * @param list<LockedPackage> $packages
      *

@@ -130,8 +130,8 @@ final class PackageMetadata
      * can name a one-off repository, and the activity check then flags the package `abandoned`.
      * The release is picked by version, not by date or listing order. `time` is optional, and a
      * hand-written packages.json or a Satis build can omit it or reorder releases. When that
-     * release names no repository, the analyzer reads the lock entry's URL. When that names none
-     * either, the activity check skips the package: a false `abandoned` costs more than a missed one.
+     * release names no repository, {@see repositoryUrl()} is null, not an older release's URL, and
+     * {@see \Lockrot\Lock\LockedPackage::repositoryUrl()} is the fallback.
      *
      * @param list<BasePackage> $versions the releases of one package, with no AliasPackage
      */
@@ -189,9 +189,8 @@ final class PackageMetadata
                 // lower minor is the branch's last word. An alpha on a new major is not a branch
                 // that upstream moved to. S2 counts pre-releases too: there a tag can only make the
                 // package look younger, here it makes findings. The branch's highest tag travels
-                // with it, with its date: with no date, the branch's age is unknown. A branch with
-                // no dated release shows that tag as its newest. Compare normalized strings only: a
-                // repository can put anything in `version`, and the loader never parses it.
+                // with it, with its date: with no date, the branch's age is unknown. Compare
+                // normalized strings only: the loader never parses `version`.
                 $normalized = $version->getVersion();
                 $branch = ReleaseBranch::of($normalized);
                 if ($branch !== null && VersionParser::parseStability($normalized) === 'stable') {
@@ -502,7 +501,10 @@ final class PackageMetadata
         return $this->hasStableRelease;
     }
 
-    /** The newest dated stable release. Null when the highest tag has no trusted date. */
+    /**
+     * The newest release date of a non-dev version, pre-releases included, or the parent's date
+     * ({@see datedBy()}). Null when the highest tag has no trusted date.
+     */
     public function lastStableReleaseAt(): ?\DateTimeImmutable
     {
         return $this->lastStableReleaseAt;

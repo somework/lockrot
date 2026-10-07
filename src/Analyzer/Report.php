@@ -37,7 +37,7 @@ final class Report
 
     /**
      * @param list<Finding> $findings
-     * @param list<RunNote> $notes    what the run could not see, in the order it happened on it
+     * @param list<RunNote> $notes    what the run could not see, in the order that the run noted it
      */
     public function __construct(array $findings, array $notes, \DateTimeImmutable $generatedAt, int $packagesChecked, int $notFromComposerRepository, ?BaselineComparison $baseline = null, ?\DateTimeImmutable $activityCacheOldestAt = null, bool $includesDev = false)
     {
@@ -304,8 +304,8 @@ final class Report
      * The footer's data sources. When every answer was fetched in this run, it is the plain pair.
      * Else it gives the age of the oldest cached activity answer in whole hours, rounded up and
      * never below one. A minutes-old answer and a clock that runs backwards both read as one hour.
-     * The age passes {@see \Lockrot\Data\Forge\ActivityClient::CACHE_TTL} after a failed refetch or
-     * under `--offline`. The table and markdown footers share it.
+     * The age passes the cache lifetime ({@see \Lockrot\Data\Forge\ActivityClient::CACHE_TTL}, in
+     * seconds) after a failed refetch or under `--offline`. The table and markdown footers share it.
      */
     public function dataSourcesClause(): string
     {

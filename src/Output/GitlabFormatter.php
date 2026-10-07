@@ -95,7 +95,7 @@ final class GitlabFormatter implements FormatterInterface
     private static function encode(array $issues): string
     {
         $json = JsonWriter::encode($issues, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES);
-        // Report data always encodes. This guard keeps a failure from becoming the string "false".
+        // Report data always encodes. Without this guard, a failure prints an empty document.
         if ($json === null) {
             throw new \RuntimeException('Cannot encode report as GitLab Code Quality JSON: '.json_last_error_msg());
         }

@@ -7,9 +7,10 @@ namespace Lockrot\Data\Forge;
 use Lockrot\Data\Http\HttpResult;
 
 /**
- * Reads the newest commit across every branch: docs/internals.md, "What is sent". The repository
- * document is not fetched: `updated_on` moves on settings changes as well as pushes, and a second
- * request uses the anonymous cap.
+ * Reads the newest commit across every branch: docs/internals.md, "What is sent". Bitbucket Cloud
+ * has no archived state, so `archived` is always false. The repository document is not fetched:
+ * `updated_on` moves on settings changes too, and a second request spends Bitbucket's anonymous
+ * rate limit.
  *
  * lockrot sends no credentials of its own to Bitbucket: Composer's HTTP layer adds Composer's
  * ({@see ForgeAuth}).

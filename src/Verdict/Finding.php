@@ -318,7 +318,7 @@ final class Finding
     }
 
     /**
-     * Only a direct requirement gets the clause: the project cannot require a transitive package.
+     * Only a direct requirement gets the clause: a transitive package's parent owns its requirement.
      * See docs/verdicts.md#left-behind.
      */
     private function followClause(Signal $s8): ?string

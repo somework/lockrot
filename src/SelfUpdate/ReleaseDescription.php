@@ -18,8 +18,8 @@ use Lockrot\Exception\ConfigException;
 final class ReleaseDescription
 {
     /**
-     * The floor of every release before {@see ReleaseLocator::FIRST_DESCRIBED_VERSION}, which has no
-     * description. Those archives were built for PHP 7.4.0: never change it with the PHAR build.
+     * A release before {@see ReleaseLocator::FIRST_DESCRIBED_VERSION} has no description, and its
+     * archive needs PHP 7.4.0. Do not change this value with the PHAR build.
      */
     public const UNDESCRIBED_PHP_FLOOR = '7.4.0';
 
