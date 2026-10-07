@@ -180,6 +180,7 @@ final class NotCheckedRuleTest extends TestCase
 
         self::assertSame(['check' => 'releases', 'reason' => 'releases_unknown', 'blocks' => [Signal::S9]], NotCheckedRule::releasesUnchecked($unavailable));
         self::assertSame(PackageFacts::METADATA_UNAVAILABLE, $unavailable->metadataStatus());
+        self::assertSame(PackageFacts::METADATA_NOT_FOUND, (new PackageFacts(F::package(), null, null, [$advisory]))->metadataStatus(), 'facts built without the flag: no repository failed');
         self::assertNull($this->rule()->evaluate($unavailable), 'the signal itself does not carry it');
     }
 

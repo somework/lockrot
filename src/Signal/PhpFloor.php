@@ -214,9 +214,10 @@ final class PhpFloor
         if ($lower->isZero()) {
             return null;
         }
-        $parts = explode('-', $lower->getVersion(), 2);
-        [$major, $minor, $patch, $fourth] = array_map('intval', explode('.', $parts[0]));
-        if ($fourth !== 0 || (!$lower->isInclusive() && !isset($parts[1]))) {
+        $version = $lower->getVersion();
+        $numbers = explode('-', $version)[0];
+        [$major, $minor, $patch, $fourth] = array_map('intval', explode('.', $numbers));
+        if ($fourth !== 0 || (!$lower->isInclusive() && $numbers === $version)) {
             ++$patch;
         }
 

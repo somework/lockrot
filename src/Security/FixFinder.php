@@ -251,7 +251,7 @@ final class FixFinder
         $cleared = [];
         foreach ($ranged as $id => $range) {
             if (self::clearsAll($candidate, [$range])) {
-                $cleared[] = (string) $id;
+                $cleared[] = $id;
             }
         }
 

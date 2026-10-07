@@ -60,7 +60,7 @@ final class RepositoryMetadataLoader implements MetadataLoaderInterface
      */
     public function load(array $installedByName): MetadataBatch
     {
-        $remaining = array_map('strval', array_keys($installedByName));
+        $remaining = array_keys($installedByName);
         $metadata = [];
         $reasons = [];
 
