@@ -25,7 +25,7 @@ final class LinkIndex
 {
     private const SELF_VERSION = 'self.version';
 
-    /** @var array<string, list<array{0: int, 1: Holder, 2: ?ConstraintInterface}>> package name => its links in index order, with the parsed constraint */
+    /** @var array<string, array<int, array{0: Holder, 1: ?ConstraintInterface}>> package name => its links keyed by index order, with the parsed constraint */
     private array $links = [];
     /** @var array<string, array<string, bool>> package => each name it replaces or provides at its own version => whether it replaces it */
     private array $alsoNamed = [];
@@ -80,15 +80,15 @@ final class LinkIndex
         $release = new Constraint('==', $normalized);
         $links = $this->links[$package] ?? [];
         foreach ($this->alsoNamed[$package] ?? [] as $name => $replaced) {
-            foreach ($this->links[$name] ?? [] as $link) {
-                if ($replaced || $link[1]->link() !== Holder::CONFLICT) {
-                    $links[] = $link;
+            foreach ($this->links[$name] ?? [] as $order => $link) {
+                if ($replaced || $link[0]->link() !== Holder::CONFLICT) {
+                    $links[$order] = $link;
                 }
             }
         }
-        usort($links, static fn (array $a, array $b): int => $a[0] <=> $b[0]);
+        ksort($links);
         $holders = [];
-        foreach ($links as [, $holder, $constraint]) {
+        foreach ($links as [$holder, $constraint]) {
             if ($constraint === null || $holder->package() === $package || \in_array($holder, $holders)) {
                 continue;
             }
@@ -113,6 +113,6 @@ final class LinkIndex
         } catch (\UnexpectedValueException $e) {
             $constraint = null;
         }
-        $this->links[$target][] = [$this->added++, $holder, $constraint];
+        $this->links[$target][$this->added++] = [$holder, $constraint];
     }
 }
