@@ -6,6 +6,7 @@
 /tests/fixtures/score/sweep-rows.txt.gz binary linguist-generated
 # tools/corpus/floor.py's output, gzipped, and the priorities that tools/fixtures/record-legacy-priority.php records.
 /tests/fixtures/corpus/report-1-floor.json.gz binary linguist-generated
+/tests/fixtures/corpus/report-1-floor.provenance.json linguist-generated
 /tests/fixtures/legacy/priority-0.13.0.json linguist-generated
 
 /tests export-ignore

@@ -140,7 +140,7 @@ final class Finding
         return $this->version;
     }
 
-    /** The cause word that report-1 writes. */
+    /** The verdict that report-1 writes. */
     public function verdict(): string
     {
         return $this->verdict;

@@ -22,7 +22,8 @@ use PHPUnit\Framework\Assert;
  */
 final class CorpusFloor
 {
-    private const PATH = __DIR__.'/../fixtures/corpus/report-1-floor.json.gz';
+    public const PATH = __DIR__.'/../fixtures/corpus/report-1-floor.json.gz';
+    public const PROVENANCE = __DIR__.'/../fixtures/corpus/report-1-floor.provenance.json';
 
     /** @var list<FloorReport>|null */
     private static ?array $reports = null;
@@ -83,10 +84,10 @@ final class CorpusFloor
     }
 
     /**
-     * The finding as the Analyzer builds it from these facts: the cause word that the first-match
-     * engine decides, and the flags under an entry that accepts the whole package when report-1
-     * recorded an allowlist reason: report-1 has no entry that accepts some flags only. The cause
-     * word `unknown` is the floor's one trace of release metadata that lockrot did not read.
+     * The finding of these facts, with the report-1 verdict that {@see VerdictEngine} decides. An
+     * allowlist reason becomes an entry that accepts the whole package. Report-1 has no entry that
+     * accepts some flags only. The verdict `unknown` is the one trace of release metadata that
+     * lockrot did not read.
      *
      * @param FloorFinding $finding
      * @param list<array{id: string, severity: string, fix_kind: string}> $advisories

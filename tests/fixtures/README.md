@@ -66,8 +66,9 @@ Packagist/GitHub data moves over time. The per-package results over these fixtur
   keyed by package name with no `x-known-keys`, the way a baseline can hold its findings.
 - `corpus/report-1-floor.json.gz` — the report-1 documents of lockrot.dev's watch list, reduced
   to each finding's signals and what report-1 recorded, for `CorpusFloorTest`,
-  `LegacyPriority013Test` and `SortTest`. `generated_from` names the lockrot.dev commit. Rebuild it
-  with `python3 tools/corpus/floor.py <lockrot.dev checkout> <commit> <this path>`.
+  `LegacyPriority013Test` and `SortTest`. `report-1-floor.provenance.json` beside it names the
+  lockrot.dev commit, the counts and the sha256. Rebuild both with
+  `python3 tools/corpus/floor.py <lockrot.dev checkout> <commit> <this path>`.
 - `legacy/priority-0.13.0.json` — each fixture app finding's `priority` and `no_fix_expected` as
   v0.13.0 computes them, for `LegacyPriorityPinTest`. Record it on a v0.13.0 checkout:
   `LOCKROT_ROOT=<checkout> php tools/fixtures/record-legacy-priority.php`. Never rewrite it from a

@@ -6,10 +6,12 @@ Usage: python3 tools/corpus/floor.py <lockrot.dev checkout> <commit> <out.json.g
 The tool reads `data/reports/watch/*.json` at <commit> with `git show`, so the checkout's working
 tree stays as it is. Every report must be report-1. Each finding keeps the facts the 0.14 engine
 reads and what 0.13 recorded: its signals without their summaries, its verdict and its priority.
-The output is gzipped with no name and no time, as `gzip -n` writes it, so a rebuild from the same
-commit is byte for byte equal. Standard library only.
+The gzip header holds no file name and no time, so a rebuild from the same commit with the same
+zlib gives the same bytes. Beside the output, <out>.provenance.json names the source, the counts and
+the sha256 of the output. Standard library only.
 """
 import gzip
+import hashlib
 import io
 import json
 import subprocess
@@ -49,6 +51,10 @@ def reduce_report(name, page):
     }
 
 
+def provenance_path(out):
+    return (out[:-len('.json.gz')] if out.endswith('.json.gz') else out) + '.provenance.json'
+
+
 def main(argv):
     if len(argv) != 3:
         raise SystemExit(__doc__.split('\n\n')[1])
@@ -66,9 +72,19 @@ def main(argv):
     buffer = io.BytesIO()
     with gzip.GzipFile(filename='', mode='wb', fileobj=buffer, mtime=0, compresslevel=9) as handle:
         handle.write(body)
+    data = buffer.getvalue()
     with open(out, 'wb') as handle:
-        handle.write(buffer.getvalue())
-    print('%d reports, %d findings' % (len(reports), sum(len(r['findings']) for r in reports)))
+        handle.write(data)
+    provenance = dict(floor['generated_from'])
+    provenance.update({
+        'reports': len(reports),
+        'findings': sum(len(r['findings']) for r in reports),
+        'sha256': hashlib.sha256(data).hexdigest(),
+    })
+    with open(provenance_path(out), 'w', encoding='utf-8') as handle:
+        handle.write(json.dumps(provenance, indent=4) + '\n')
+    print('%d reports, %d findings' % (provenance['reports'], provenance['findings']))
+
 
 
 if __name__ == '__main__':

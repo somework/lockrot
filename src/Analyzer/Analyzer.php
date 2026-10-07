@@ -427,7 +427,7 @@ final class Analyzer
             $package->origin(),
             AbandonedRule::replacementNamedBy($facts),
             FlagSet::fromSignals($signals, $entry, self::countedAdvisories($facts, $fixes)),
-            $meta !== null
+            $facts->metadataStatus() === PackageFacts::METADATA_READ
         );
     }
 

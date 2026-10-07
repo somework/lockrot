@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Legacy;
 
 /**
- * The cause words that report-1 writes as `verdict`, with their order and the flagged predicate:
+ * The verdicts that report-1 writes, with their order and the flagged predicate:
  * docs/verdicts.md#the-nine-verdicts.
  *
  * @internal
