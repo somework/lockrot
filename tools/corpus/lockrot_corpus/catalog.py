@@ -107,7 +107,7 @@ MIGRATE_TO = _phrase(
     'migrate-to',
     r'^.*\bmigrate to (\S+)',
     'the evidence clause telling the reader which package to move to',
-    unexercised=('`Finding::fix()` writes this clause only for a package that has an advisory with '
+    unexercised=('`Finding::noFixClause()` writes this clause only for a package that has an advisory with '
                  'no fixed release and names a successor, and no fixture or corpus target is of '
                  'that shape', '2026-09-23'),
 )
@@ -116,7 +116,7 @@ S10_ACTIVITY = _phrase(
     's10-activity',
     r'repository activity not checked \(',
     'the S10 sentence for a repository round that did not run',
-    unexercised=('this half of S10 needs a run with `--anon`, and the recorded corpus runs carry a token',
+    unexercised=('no recorded finding carries a repository_activity S10: the runs carry a token and every host answered',
                  '2026-09-23'),
 )
 

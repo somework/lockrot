@@ -186,8 +186,8 @@ def run_reports(phar: str, projects_dir: str, out_dir: str, cache_root: str, tod
             write_json_atomic(os.path.join(out_dir, 'run.json'), manifest)
             continue
         write_text_atomic(output, finished.stdout.decode('utf-8', 'replace'))
-        # An answer must still be a report. Record an unparsable output and go on, so that one
-        # project does not stop the others.
+        # An exit code from 0 to 4 is an answer from lockrot, but an answer must still be a report.
+        # Record an unparsable output and go on, so that one project does not stop the others.
         try:
             report = read_json(output)
         except CorpusDataError as error:
