@@ -99,7 +99,7 @@ final class AbandonedIgnore
         return $rules;
     }
 
-    /** Every pattern that matches the name, in config order; null when none does. */
+    /** Every pattern that matches the name, in config order. Null when none does. */
     public function match(string $name): ?AbandonedIgnoreMatch
     {
         $matched = array_values(array_filter($this->rules, static fn (array $rule): bool => preg_match(BasePackage::packageNameToRegexp($rule['pattern']), $name) === 1));
