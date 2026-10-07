@@ -109,8 +109,9 @@ advisory.
 
 ### Advisories disabled by policy {#advisories_disabled_by_policy}
 
-The project's Composer policy stops Composer from warning about security advisories. lockrot still
-asks every repository, and every advisory counts. The note says that Composer will not warn.
+The project's Composer policy stops Composer from warning about security advisories. lockrot asks
+its repositories as usual, and the advisories they return count. The note says that Composer will
+not warn, and lockrot writes it only when the lookup ran.
 
 - `data`: `policy_key`, the setting, and `value`, its value.
 - Findings: no change.
