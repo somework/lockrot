@@ -35,7 +35,7 @@ final class PolicyTest extends TestCase
         return LockrotConfig::fromSources([], [], ['fail-on' => $failOn, 'strict-network' => $strict], '8.4.0', null);
     }
 
-    public function testFailOnNoneNeverFails(): void
+    public function testFailOnNoneExitsZeroOnAnAbandonedFinding(): void
     {
         self::assertSame(0, Policy::exitCode($this->report([Verdict::ABANDONED]), $this->config('none')));
     }

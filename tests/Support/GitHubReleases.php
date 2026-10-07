@@ -20,7 +20,7 @@ final class GitHubReleases
 {
     public const BASE = 'https://github.com/somework/lockrot/releases/download/';
 
-    /** Every asset a release publishes, in the names self-update looks for. */
+    /** The assets that entry() gives a release by default, in the names self-update looks for. */
     public const ASSETS = [
         ReleaseLocator::PHAR_ASSET,
         ReleaseLocator::CHECKSUM_ASSET,
