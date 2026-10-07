@@ -114,8 +114,7 @@ final class MonorepoParents
 
     /**
      * Dates each child's metadata by the parent in the batch whose `replace` names the child, and
-     * leaves the rest of the batch as it is. A parent that is also a child of another package is
-     * dated first, in batch order.
+     * leaves the rest of the batch as it is.
      *
      * @param list<string>                   $children {@see children()}
      * @param array<string, PackageMetadata> $metadata by package name, parents included

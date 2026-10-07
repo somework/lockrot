@@ -29,8 +29,8 @@ final class InstallSummaryFormatter
     private const FOOTER = 'Run composer lockrot for details.';
 
     /**
-     * @return list<string> Composer IO lines, empty only when nothing is flagged and every lookup
-     *                      succeeded
+     * @return list<string> Composer IO lines, empty only when nothing is flagged and the report has
+     *                      no network failure
      */
     public function format(Report $report): array
     {

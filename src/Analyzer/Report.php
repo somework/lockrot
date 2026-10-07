@@ -156,7 +156,7 @@ final class Report
     /**
      * Transitive exposure by direct requirement, most first and then by name
      * (docs/verdicts.md#transitive-exposure). {@see TransitiveExposure::attributable()} decides
-     * which findings count, the rule that S7 uses, so this number equals the number on S7.
+     * which findings count, the rule that S7 uses.
      *
      * @return array<string, int> parent => attributable packages reachable from it
      */
