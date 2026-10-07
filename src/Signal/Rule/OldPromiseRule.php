@@ -14,7 +14,7 @@ use Lockrot\Signal\SignalRule;
  * S5: the installed release was written for an older PHP major and admits the target PHP only
  * because its constraint has no upper bound (docs/verdicts.md#old-promise). The line is the GA of
  * the target's major, not of its minor. A release cut after PHP 8.0 was written with PHP 8 on
- * its CI matrix. So its open `>=7.2` differs from `^7.2 || ^8.0` in spelling alone.
+ * its CI matrix. So for a PHP 8 target, its open `>=7.2` promises what `^7.2 || ^8.0` promises.
  *
  * @internal
  */
