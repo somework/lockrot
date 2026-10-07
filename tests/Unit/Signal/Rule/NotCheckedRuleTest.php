@@ -151,4 +151,19 @@ final class NotCheckedRuleTest extends TestCase
 
         self::assertNull($this->rule()->evaluate(new PackageFacts(F::package(), $metadata, F::activity(false, '2026-09-01T00:00:00+00:00'), [])));
     }
+
+    /** A raised S1 makes the upkeep gaps moot, never another check: that entry keeps its own words. */
+    public function testDroppingTheMaintenanceGapsKeepsAnyOtherEntryWithItsSummary(): void
+    {
+        $s10 = new \Lockrot\Signal\Signal(\Lockrot\Signal\Signal::S10, \Lockrot\Signal\Signal::LEVEL_INFO, 'repository activity not checked (the run is offline), so S3 and S4 could not be read; advisories not checked (offline), so S9 could not be read', ['unchecked' => [
+            ['check' => 'repository_activity', 'reason' => 'offline', 'blocks' => ['S3', 'S4']],
+            ['check' => 'advisories', 'reason' => 'offline', 'blocks' => ['S9']],
+        ], 'blocks' => ['S3', 'S4', 'S9']]);
+
+        $kept = \Lockrot\Signal\Rule\NotCheckedRule::withoutMaintenanceGaps([$s10]);
+
+        self::assertCount(1, $kept);
+        self::assertSame('advisories not checked (offline), so S9 could not be read', $kept[0]->summary());
+        self::assertSame(['unchecked' => [['check' => 'advisories', 'reason' => 'offline', 'blocks' => ['S9']]], 'blocks' => ['S9']], $kept[0]->data());
+    }
 }

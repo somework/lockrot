@@ -142,6 +142,37 @@ final class AuditParityTest extends TestCase
         self::assertGreaterThan(0, $compared);
     }
 
+    /** Composer's policy switches stop install-time blocking, never `composer audit`: every advisory still counts. */
+    public function testThePolicyOffSettingsStillCountAsComposersAuditorCounts(): void
+    {
+        if (!interface_exists(AdvisoryProviderInterface::class) || !class_exists(PolicyConfig::class)) {
+            self::markTestSkipped('Composer below 2.10 has no policy switch');
+        }
+        $before = getenv('COMPOSER_POLICY');
+        $cases = [
+            'policy: false' => [['policy' => false], null],
+            'policy.advisories: false' => [['policy' => ['advisories' => false]], null],
+            'policy.advisories.audit: ignore' => [['policy' => ['advisories' => ['audit' => 'ignore', 'ignore-id' => ['PKSA-s1' => 'reviewed']]]], null],
+            'COMPOSER_POLICY=0' => [['audit' => ['ignore' => ['PKSA-s1']]], '0'],
+        ];
+        try {
+            foreach ($cases as $label => [$section, $env]) {
+                putenv($env === null ? 'COMPOSER_POLICY' : 'COMPOSER_POLICY='.$env);
+                $config = self::config($section);
+                $auditor = new Auditor();
+                $composer = self::composerResult(static fn (BufferIO $io, RepositorySet $set, array $packages): int => $auditor->audit($io, $set, PolicyConfig::fromConfig($config), $packages, Auditor::FORMAT_JSON));
+                $ignore = AdvisoryIgnore::fromConfig($config);
+
+                self::assertSame($composer, self::lockrotResult($config), $label);
+                self::assertNotSame([], $composer['counted'], $label.': advisories count');
+                self::assertNotNull($ignore->disabledBy(), $label.': the note is written');
+                self::assertNull($ignore->whyUnreadable(), $label);
+            }
+        } finally {
+            putenv($before === false ? 'COMPOSER_POLICY' : 'COMPOSER_POLICY='.$before);
+        }
+    }
+
     /** Composer 2.4 to 2.9 only. No CI leg has such a Composer. */
     public function testTheAuditConfigLegMatchesComposersAuditor(): void
     {

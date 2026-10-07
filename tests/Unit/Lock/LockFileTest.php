@@ -324,6 +324,7 @@ final class LockFileTest extends TestCase
         $lock = LockFile::fromArray(['packages' => [
             ['name' => 'acme/aliased', 'version' => 'dev-main', 'extra' => ['branch-alias' => ['dev-main' => '4.3.x-dev']]],
             ['name' => 'acme/plain', 'version' => '1.0.0'],
+            ['name' => 'acme/normalised', 'version' => 'v1.2', 'version_normalized' => '1.2.0.0'],
         ]]);
         $byName = [];
         foreach ($lock->packages(false) as $package) {
@@ -333,6 +334,8 @@ final class LockFileTest extends TestCase
         self::assertSame('dev-main', $byName['acme/aliased']->version());
         self::assertSame(['4.3.9999999.9999999-dev'], $byName['acme/aliased']->aliasVersions());
         self::assertSame([], $byName['acme/plain']->aliasVersions());
+        self::assertSame('1.2.0.0', $byName['acme/normalised']->normalizedVersion(), 'Composer matches advisories on version_normalized as the lock gives it');
+        self::assertSame('1.0.0.0', $byName['acme/plain']->normalizedVersion());
         $byName['acme/plain']->withAliasVersions(['9999999-dev']);
         self::assertSame([], $byName['acme/plain']->aliasVersions(), 'a copy, never the original');
     }

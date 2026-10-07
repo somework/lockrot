@@ -193,7 +193,7 @@ final class AnalyzerTest extends TestCase
 
         $report = $analyzer->analyze($lock, $project, false);
 
-        self::assertSame(['vendor/direct' => '1.0.0', 'vendor/local' => '1.0.0'], $asked->getArrayCopy(), 'every package the run checks, whatever its origin');
+        self::assertSame(['vendor/direct' => '1.0.0.0', 'vendor/local' => '1.0.0.0'], $asked->getArrayCopy(), 'every package the run checks, whatever its origin, by its normalised version');
         $finding = $report->findings()[0];
         self::assertSame('vendor/direct', $finding->package());
         self::assertSame(Verdict::ABANDONED, $finding->verdict());
