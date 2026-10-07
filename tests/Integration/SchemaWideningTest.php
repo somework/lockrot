@@ -13,23 +13,19 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * The widening check that SchemaEvolutionTest holds every released schema to, held to what it must
- * catch: deliberately narrowed copies of the current schemas, each of which a document that an
- * older release wrote could fail, and widened copies, which none could. Narrowings of a value or
- * shape that no recorded document carries are found only here.
+ * catch: narrowed copies of the current schemas, each of which a document that an older release
+ * wrote could fail, and widened copies, which none could. This test checks narrowings of a value or
+ * shape that no recorded document carries.
  */
 final class SchemaWideningTest extends TestCase
 {
     /**
-     * Narrowings a release makes on purpose, per published file name: the narrowing as
+     * Narrowings that a release accepts, per published file name: the narrowing as
      * {@see SchemaWidening::narrowings()} words it, and why no document an older release wrote can
-     * fail it.
-     *
-     * A row is allowed for one case only: a release adds a value to an open set and puts the new
-     * value's constraints in a new `allOf` entry, keeping every existing relation byte for byte
-     * (each one's branch for a value it does not list already admits the new value). The check reads
-     * the new entry as a relation the older schema did not hold. No older document held the value,
-     * because the strict twin in ValidatesJsonSchemas bound lockrot's output to the known list, so
-     * none can fail the entry. Any other narrowing moves the schema number instead.
+     * fail it. A row is allowed only for a value added to an open set whose constraints go in a new
+     * `allOf` entry, with every existing relation unchanged. The strict twin bound older output to
+     * the known list, so no older document can fail the entry. Any other narrowing moves the
+     * schema number.
      *
      * @var array<string, array<string, string>>
      */
@@ -192,6 +188,7 @@ final class SchemaWideningTest extends TestCase
         $ruleId = '^(([a-rt-z][a-z0-9]*|s([a-np-z0-9][a-z0-9]*)?|so([a-qs-z0-9][a-z0-9]*)?|sor([a-su-z0-9][a-z0-9]*)?|sort[a-z0-9]+)(-[a-z0-9]+)*|sort(-[a-z0-9]+)+)$';
         $package = '#/properties/findings/patternProperties/^[^\/]+\/[^\/]+$';
 
+        // One change per relation keyword in SchemaWidening::COMPARED: add a case when a keyword joins it.
         yield 'not changed' => ['relations', 'not-changed', $findings.'/properties/security: not {"required":["fixed_by"]} where the older schema had {"required":["fix"]}'];
         yield 'not added' => ['relations', 'not-added', $findings.'/properties/chain: not {"maxItems":0} where the older schema had null'];
         yield 'uniqueItems turned on' => ['relations', 'unique-on', $findings.'/properties/chain: uniqueItems turned on'];
@@ -232,7 +229,7 @@ final class SchemaWideningTest extends TestCase
     }
 
     /**
-     * The relation keywords of the -2 schemas: `allOf`, `not`, `uniqueItems`, `minProperties`,
+     * The relation keywords of the planted fixtures under tests/fixtures/schema-widening/: `allOf`, `not`, `uniqueItems`, `minProperties`,
      * `multipleOf`, `patternProperties`, and the annotations `x-known-keys` and `x-rendered-from`.
      *
      * @dataProvider relationChanges

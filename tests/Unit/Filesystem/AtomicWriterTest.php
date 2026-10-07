@@ -172,7 +172,7 @@ final class AtomicWriterTest extends TestCase
 
     /**
      * A write that stores fewer bytes than it was given — a full disk — fails, even though the
-     * file was created and closed and the rename succeeds: a truncated report is never
+     * file was created and closed and the rename can go through: a truncated report is never
      * moved into place. A stream wrapper stands in for the full disk.
      */
     public function testAShortWriteFailsAndIsNeverRenamedIntoPlace(): void

@@ -250,7 +250,7 @@ final class InstallSummaryFormatterTest extends TestCase
         yield 'a long run of <b' => [str_repeat('<b', 4000)];
     }
 
-    /** Header and footer take two of the lines. */
+    /** Header and footer take two of the lines. With no notes, exactly that many findings fit and none is counted away. */
     public function testExactlyAsManyFindingsAsThereAreSlotsAreAllShownWithoutACountLine(): void
     {
         $slots = InstallSummaryFormatter::MAX_LINES - 2;

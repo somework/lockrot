@@ -20,7 +20,7 @@ use PHPUnit\TextUI\Configuration\Configuration;
  *
  * PHPUnit's own time limit throws a \RuntimeException subclass. Product code that catches
  * \RuntimeException swallows it, and a loop mutant there never ends. An exit from the signal handler
- * cannot be caught. Without pcntl the extension does nothing. Reasons and measurements: PR #65.
+ * cannot be caught. Without pcntl the extension does nothing. Reasons and measurements: https://github.com/somework/lockrot/pull/65.
  */
 final class MutantTestTimeLimit implements Extension
 {

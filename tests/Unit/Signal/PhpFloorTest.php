@@ -43,7 +43,7 @@ final class PhpFloorTest extends TestCase
         self::assertSame(PhpFloor::PROJECT, (new PhpFloor('7.4', '>=7.2.5'))->blocking('>=8.1'));
     }
 
-    /** `^7.2.5 || ^8.0` (phpmyadmin) has a lower bound of 7.2.5; `^8.2|^8.3|^8.4|^8.5` (invoiceninja) of 8.2.0. */
+    /** `^7.2.5 || ^8.0` (phpmyadmin) has a lower bound of 7.2.5, and `^8.2|^8.3|^8.4|^8.5` (invoiceninja) one of 8.2.0. */
     public function testTheProjectsFloorIsTheLowerBoundOfItsWholeConstraint(): void
     {
         self::assertSame(PhpFloor::PROJECT, (new PhpFloor('8.4', '^7.2.5 || ^8.0'))->blocking('^8.1'));

@@ -57,7 +57,8 @@ final class PinnedRuleTest extends TestCase
      * `reason` is an open set, so the published schema does not reject a value that the code emits
      * and the schema does not list. The strict twin rejects it only on a report that carries it.
      * This test always does: every `REASON_*` constant, in declaration order, is what the report
-     * schema lists under `x-known-values`.
+     * schema lists under `x-known-values`. A reason added to the rule without the schema, or the
+     * other way round, fails here.
      */
     public function testTheReasonsAreTheValuesTheReportSchemaKnows(): void
     {

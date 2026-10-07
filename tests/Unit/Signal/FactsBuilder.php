@@ -68,9 +68,8 @@ final class FactsBuilder
                 $lastStableReleaseAt = $at;
                 $lastStableVersion = $version;
             }
-            // As PackageMetadata::fromPackages() has it: the newest dated stable release per branch,
-            // pre-releases left out, an undated branch keeping its first (highest) tag, and the
-            // branch's highest tag (normalized) next to it. Callers list releases highest first.
+            // Mirrors PackageMetadata::fromPackages() (PackageMetadataFromPackagesTest pins it).
+            // Callers list releases highest first.
             $branch = ReleaseBranch::of($version);
             if ($branch !== null && VersionParser::parseStability($version) === 'stable') {
                 $seen = $byBranch[$branch] ?? null;

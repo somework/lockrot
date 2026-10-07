@@ -29,9 +29,9 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * The closed sets that docs/compatibility.md freezes for 1.x, and their order. `--fail-on`, the
- * baseline and the report sort read that order. Other tests read the class constants and follow a
- * changed value, so the lists here are literals. The schemas must list the same sets in the same
- * order. An open set is an open string with the values lockrot writes in `x-known-values`, never
+ * baseline and the report sort read that order. The lists here are literals, not the class
+ * constants, so a changed value fails here. The schemas must list the same sets in the same order,
+ * because a consumer that validates against them reads the order from there. An open set is an open string with the values lockrot writes in `x-known-values`, never
  * an enum. The last test guards the names that docs/compatibility.md reserves for extensions.
  */
 final class ClosedSetsTest extends TestCase
@@ -47,7 +47,7 @@ final class ClosedSetsTest extends TestCase
     private const FORMAT = '^([a-z][a-z0-9-]*|[a-z0-9][a-z0-9_.-]*:[a-z0-9][a-z0-9_.-]*)$';
     /** A run note's code: lockrot's own, or a `<vendor>:<name>` one. */
     private const NOTE_CODE = '^([a-z][a-z0-9_]*|[a-z0-9][a-z0-9_.-]*:[a-z0-9][a-z0-9_.-]*)$';
-    /** The words both pages name a run note's five vocabularies by: its code, and the forge and reasons in its data. */
+    /** The words both pages name a run note's five vocabularies by: its code, and the `forge_id` and reasons in its data. */
     private const NOTE_VOCABULARY = "a run note's `code`, and the `forge_id` and `reason` in its `data`";
     /** A lock entry's origin kind: lockrot's own, or a `<vendor>:<name>` one, as a note's code. */
     private const ORIGIN_KIND = self::NOTE_CODE;
@@ -55,7 +55,7 @@ final class ClosedSetsTest extends TestCase
     private const HOST = '^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$';
     /** The words both pages name a finding's origin vocabularies by. */
     private const ORIGIN_VOCABULARY = "a finding's `origin.kind` and `origin.registry`";
-    /** An S10 check or reason, an S6 reason, an S8 floor source, a branch's php_blocked_by and misses_*_php, a finding's libyears_unmeasured, a priority step's and a no-fix advisory's reason, the run's mode and fail-on kind, the gate's causes and exemptions, and a run note's forge id and reasons: a lower-case word. */
+    /** An S10 check or reason, an S6 reason, an S8 floor source, a branch's php_blocked_by and misses_*_php, a finding's libyears_unmeasured, a priority step's and a no-fix advisory's reason, the run's mode and fail-on kind, the gate's causes and exemptions, and a run note's `forge_id` and reasons: a lower-case word. */
     private const WORD = '^[a-z][a-z0-9_]*$';
     private const ROOT = __DIR__.'/../../../';
     /**
@@ -384,7 +384,7 @@ final class ClosedSetsTest extends TestCase
      * Every open set is a string with a `pattern` and the values lockrot writes in `x-known-values`,
      * or an integer with no pattern and its known integers there, never an enum, and every known
      * value fits the pattern. The patterns are spelled out, since the strict reading drops them and
-     * the widening check never sees one narrowed; the known values are held to the code. The list of
+     * the widening check never sees one narrowed. The known values are held to the code. The list of
      * places is complete: an `x-known-values` anywhere in a shipped file else fails.
      */
     public function testTheOpenSetsAreOpenStringsWithTheirKnownValues(): void
@@ -435,7 +435,7 @@ final class ClosedSetsTest extends TestCase
 
     /**
      * The clause for integer sets, on a synthetic schema that holds one: no shipped file has an
-     * integer set yet. Its row passes, and the same node read as a string set, or with a value that
+     * integer set. Its row passes, and the same node read as a string set, or with a value that
      * is no integer, fails.
      */
     public function testAnIntegerSetIsAnIntegerWithItsKnownIntegersAndNoPattern(): void
@@ -465,8 +465,8 @@ final class ClosedSetsTest extends TestCase
     }
 
     /**
-     * One open set: a string with its pattern, or, with no pattern, an integer; never an enum; its
-     * `x-known-values` exactly the values given, each once, each fitting the pattern or an integer.
+     * One open set: a string with its pattern, or, with no pattern, an integer. It is never an enum.
+     * Its `x-known-values` are exactly the values given, each once, each fitting the pattern or an integer.
      *
      * @param array<mixed, mixed>   $node
      * @param list<string>|list<int> $known
@@ -566,9 +566,9 @@ final class ClosedSetsTest extends TestCase
     }
 
     /**
-     * No name lockrot ships holds a colon, since `<vendor>:<name>` is for everyone else; no
-     * configuration key starts with `x-`, at the top level or in an `ignore` entry; `extensions` at
-     * the top level means nothing to lockrot; nothing reads a `LOCKROT_X_` variable; and nothing is
+     * No name lockrot ships holds a colon, since `<vendor>:<name>` is for everyone else. No
+     * configuration key starts with `x-`, at the top level or in an `ignore` entry. `extensions` at
+     * the top level means nothing to lockrot. Nothing reads a `LOCKROT_X_` variable. Nothing is
      * declared under `Lockrot\Extension\`, in any letter case, since PHP class names are
      * case-insensitive.
      */

@@ -63,8 +63,8 @@ final class ReleaseLocatorTest extends TestCase
     }
 
     /**
-     * A client with every tag described as the release workflow describes it: PHP 7.4.0 and
-     * the test release key.
+     * A client with a description for every tag, in the shape that the release workflow publishes,
+     * with PHP 7.4.0 and the test release key in place of the real one.
      *
      * @param list<string> $tags
      */
@@ -1014,8 +1014,9 @@ final class ReleaseLocatorTest extends TestCase
     }
 
     /**
-     * A floor spelled other than `major.minor.patch` is compared with nothing: `v8.1.0` sorts
-     * below every PHP and installs an archive that refuses to start. The release is passed over
+     * A floor spelled other than `major.minor.patch` is compared with nothing. Compared as a
+     * version, `v8.1.0` sorts below every PHP and admits an archive that refuses to start. The
+     * release is passed over
      * with a note that does not repeat the value.
      */
     public function testAReleaseWhoseFloorIsNotMajorMinorPatchIsNotInstalled(): void

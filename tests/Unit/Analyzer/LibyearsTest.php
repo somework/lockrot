@@ -163,8 +163,8 @@ final class LibyearsTest extends TestCase
 
     public function testALockAheadOfTheLastStableReleaseIsMeasuredAsZeroNotDropped(): void
     {
-        // A lock on a pre-release above the last stable, or on a tag the repository no longer
-        // lists: measured, and not behind.
+        // A lock on a pre-release above the last stable, or on a tag that the repository does not
+        // list: measured, and not behind.
         self::assertSame(0.0, Libyears::measure(self::package(), self::metadata('2019-01-23T15:23:04+00:00'))->years());
     }
 
@@ -300,7 +300,7 @@ final class LibyearsTest extends TestCase
     public function testASplitPackageWhoseParentDoesNotDateTheInstalledVersionIsNotMeasured(): void
     {
         // The newest release's date came from the parent, so the lock's date for the installed
-        // version is the shared commit's, which inflates the sum.
+        // version is the shared commit's, and a measurement from that date inflates the sum.
         $neighbour = self::splitPackage(['5.13.3.0' => self::twoYearsBefore(self::LATEST)]);
 
         self::assertNull(Libyears::measure(self::package(), self::splitPackage([]))->years());
@@ -430,6 +430,7 @@ final class LibyearsTest extends TestCase
         self::assertSame(2, $block->measured());
         self::assertNull($block->toArray()['furthest_behind']);
         self::assertSame('libyears: 0.0 behind across all 2 packages', $block->line());
+        // A package at zero never outranks one that is behind, whatever the order.
         $worst = Libyears::fromFindings([self::finding('a/a', LibyearsMeasurement::of(0.0)), self::finding('b/b', LibyearsMeasurement::of(0.4))])->worst();
         self::assertNotNull($worst);
         self::assertSame('b/b', $worst->package());
@@ -452,7 +453,7 @@ final class LibyearsTest extends TestCase
     /**
      * Zero and null are different answers: a run that measured packages and found none behind is
      * `0.0`, a run that could measure nothing at all has no number. A reader that sums the field over
-     * several projects must not count an unmeasurable lock as a lock with nothing to fix.
+     * several projects otherwise counts an unmeasurable lock as a lock with nothing to fix.
      */
     public function testNothingMeasuredHasNoTotalWhileNothingBehindIsZero(): void
     {

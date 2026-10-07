@@ -76,9 +76,9 @@ final class SelfUpdateCommandTest extends TestCase
     }
 
     /**
-     * The release list for $versions, newest first, each described as the release workflow
-     * describes it — PHP 7.4.0 and the test key the command verifies with — with its archive,
-     * checksum and signature ready to download.
+     * The release list for $versions, newest first, each with a description in the shape that the
+     * release workflow publishes, but with PHP 7.4.0 and the test key the command verifies with, and
+     * with its archive, checksum and signature ready to download.
      *
      * @param list<string>              $versions
      * @param array<string, HttpResult> $extra
@@ -691,6 +691,7 @@ final class SelfUpdateCommandTest extends TestCase
         );
     }
 
+    /** A message that looks like a console tag reaches stderr as it was, not with the tag swallowed. */
     public function testAFailureMessageIsPrintedAsGiven(): void
     {
         $command = $this->registered(new SelfUpdateCommand(

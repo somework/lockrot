@@ -39,8 +39,8 @@ use PHPUnit\Framework\TestCase;
  * answers must agree. Every fixture lock is analysed with S8 and with the explanation, both built
  * from the target PHP and the project's `require.php`, and every S8 finding is read against its rows.
  *
- * Both sides get the same floors: this is the one place that holds S8 to the project's php over the
- * fixtures.
+ * Both sides get the same floors, so the agreement is tested where both sides see the same floor.
+ * This test holds S8 to the project's php over the fixtures.
  */
 final class BranchFloorAgreementTest extends TestCase
 {
@@ -183,7 +183,7 @@ final class BranchFloorAgreementTest extends TestCase
             self::assertIsArray($row, $what);
             self::assertIsString($row['branch'], $what);
             $blockedBy = $row['php_blocked_by'];
-            // The schema leaves the value open: lockrot writes only these.
+            // The schema leaves the value open, so a floor source that lockrot adds must join this list.
             self::assertContains($blockedBy, [PhpFloor::PROJECT, PhpFloor::TARGET, null], $what);
             // The row's verdict is its two answers read in S8's order, and null is no answer.
             $composed = $row['admits_project_php'] === false ? PhpFloor::PROJECT : ($row['admits_target_php'] === false ? PhpFloor::TARGET : null);

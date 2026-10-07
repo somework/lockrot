@@ -73,7 +73,7 @@ final class PluginTest extends TestCase
     public function testComposerLockrotRunsThroughThePlugin(): void
     {
         // These assertions depend on the GitHub-derived verdict for phpzip/phpzip, so the test needs a
-        // token. The other tests assert generic shapes that hold whatever the GitHub activity data says.
+        // token.
         if (getenv('GITHUB_TOKEN') === false || getenv('GITHUB_TOKEN') === '') {
             self::markTestSkipped('set GITHUB_TOKEN: anonymous GitHub requests hit the 60/h rate limit and change the expected verdicts');
         }
@@ -172,8 +172,8 @@ final class PluginTest extends TestCase
 
         $stderr = $require->getErrorOutput();
         self::assertSame(0, $require->getExitCode(), $stderr);
-        // `composer require phpzip/phpzip` also locks its grandt/* dependencies, so the counts are not
-        // "1 of N".
+        // `composer require phpzip/phpzip` also locks its grandt/* dependencies, and lockrot flags them
+        // too, so the counts are not "1 of N".
         self::assertMatchesRegularExpression('/lockrot: dependency rot in \d+ of \d+ changed packages?/', $stderr);
         self::assertStringContainsString('phpzip/phpzip 2.0.8', $stderr);
         self::assertStringContainsString('Run composer lockrot for details.', $stderr);

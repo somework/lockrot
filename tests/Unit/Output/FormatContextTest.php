@@ -137,8 +137,8 @@ final class FormatContextTest extends TestCase
     }
 
     /**
-     * The mapping's first rule wins: a finding the baseline accepted is a note even when
-     * `--fail-on=unchecked` makes it an error for carrying S10.
+     * The mapping's first rule wins: a finding the baseline accepted is a note, although without the
+     * baseline `--fail-on=unchecked` makes it an error for carrying S10.
      */
     public function testUnderUncheckedAFindingTheBaselineKnowsStaysANote(): void
     {

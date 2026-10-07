@@ -80,7 +80,7 @@ final class ReportTest extends TestCase
     public function testWithinOnePriorityAndVerdictDirectComesBeforeTransitive(): void
     {
         // Both dev and stale, so both land on the `low` floor: the only thing left to order them by
-        // is direct-before-transitive, which has to beat the alphabetical package name.
+        // is direct-before-transitive, which beats the alphabetical package name.
         $report = $this->report(
             $this->transitive('vendor/aaa-transitive', Verdict::STALE, true),
             (new FindingBuilder())->withPackage('vendor/zzz-direct')->withVerdict(Verdict::STALE)->withChain(['vendor/zzz-direct'])->withDev(true)->build()
@@ -306,7 +306,7 @@ final class ReportTest extends TestCase
     }
 
     /**
-     * `flagged_verdicts` is the vocabulary, not a setting: a consumer deciding what counts as a
+     * `flagged_verdicts` is the vocabulary, not a setting: a consumer that decides what counts as a
      * finding does not need the severity order. `unknown` is the case it
      * settles — a package lockrot could not check is a note, not a finding.
      */
@@ -334,6 +334,7 @@ final class ReportTest extends TestCase
             $this->finding('vendor/worse', Verdict::ABANDONED),
             $this->finding('vendor/fresh', Verdict::LEFT_BEHIND)
         );
+        // An earlier baseline, when vendor/worse was only stale.
         $before = $this->report($this->finding('vendor/known', Verdict::STALE), $this->finding('vendor/worse', Verdict::STALE));
         $compared = $report->withBaseline(BaselineComparison::compare(
             Baseline::fromReport($before),

@@ -91,7 +91,7 @@ final class FindingTest extends TestCase
         }
     }
 
-    /** A row without the fix keys (a hand-built signal) is an advisory nothing fixes. A list that is not one is no advisory. */
+    /** A row without the fix keys (an earlier report, a hand-built signal) is an advisory nothing fixes. A list that is not one is no advisory. */
     public function testAnAdvisoryRowWithoutFixKeysCountsAsUnfixedAndAMalformedListAsNone(): void
     {
         $bare = (new FindingBuilder())->withVerdict(Verdict::LEFT_BEHIND)->withSignals([new Signal('S9', 'warn', 'x', ['advisories' => [['id' => 'PKSA-1']]])])->build();
@@ -133,7 +133,7 @@ final class FindingTest extends TestCase
 
     /**
      * The constraint S8 suggests is printed for a direct requirement — the project's own line in
-     * composer.json — and not for a transitive one, whose parent owns the requirement; the data
+     * composer.json — and not for a transitive one, whose parent owns the requirement. The data
      * keeps it either way.
      */
     public function testALeftBehindDirectRequirementSaysWhatToRequire(): void
@@ -248,8 +248,8 @@ final class FindingTest extends TestCase
     /**
      * symfony/http-foundation v3.4.18 on the 3.x branch the upstream left: one CVE fixed by
      * v3.4.47 (on the branch — reachable), three by v8.1.7 (the fix the branch will not get). The
-     * three earn the raise, and the clause names the branch, since "no fix expected" alone would
-     * contradict "fixed by v8.1.7" on the same line.
+     * three earn the raise, and the clause names the branch, since "no fix expected" alone
+     * contradicts "fixed by v8.1.7" on the same line.
      */
     public function testOnALeftBehindBranchOnlyAFixOnTheBranchCounts(): void
     {

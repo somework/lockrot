@@ -14,8 +14,8 @@ final class ConsoleMarkupTest extends TestCase
 {
     /**
      * Text that lockrot did not write, escaped and rendered, is the same text, coloured or not.
-     * symfony/console 5.4's own escape() leaves some of these inputs half-live. A regular expression
-     * exhausts PCRE's JIT on the long run of `<b`.
+     * symfony/console 5.4's own escape() leaves some of these inputs half-live. The run of `<b` is
+     * long enough to exhaust PCRE's JIT in a regular expression that reads the tags.
      *
      * @dataProvider textsThatLookLikeMarkup
      */

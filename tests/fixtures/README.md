@@ -11,7 +11,7 @@ default acceptance fixtures (wallabag/wallabag, nextcloud/3rdparty, matomo-org/m
 laravel/laravel, BookStackApp/BookStack). Packagist p2 bodies are trimmed to the keys lockrot reads (`name`,
 `version`, `version_normalized`, `time`, `abandoned`, `source`, `require`, `type`, `extra`) and
 GitHub repo bodies are trimmed to `full_name`, `archived`, `disabled`, `pushed_at`,
-`default_branch`; `security-advisories` is stripped from p2 responses. Both `{name}.json` and
+`default_branch`. `security-advisories` is stripped from p2 responses. Both `{name}.json` and
 `{name}~dev.json` are recorded for every package name in the fixture locks, including 404s
 and empty bodies (the status is stored in the envelope), so the fixture server can answer either
 file for any name without falling through to the real Packagist endpoint. `extra` is kept
@@ -61,9 +61,9 @@ review the diff package by package, and give the reason for each change in the c
   validating against the current schemas is a compatibility break to raise, not a fixture to
   refresh.
 - `schema-widening/` — two hand-written schemas for `SchemaWideningTest`'s relation changes: the
-  relation keywords of a `-2` report (`allOf` groups, `not`, `uniqueItems`, `minProperties`,
+  relation keywords that a later report schema can use (`allOf` groups, `not`, `uniqueItems`, `minProperties`,
   `multipleOf`, an open set, an `x-known-keys` map and an `x-rendered-from` string) and a closed map
-  keyed by package name with no `x-known-keys`, as a `-2` baseline holds its findings.
+  keyed by package name with no `x-known-keys`, the way a baseline can hold its findings.
 - `big-summary.json`, `phar-summary.json`, `skeletons-summary.json`, `summary.json`,
   `top500.json`, `liveness.py`, `pre8.py` — research artefacts kept for provenance. No test reads
   them.

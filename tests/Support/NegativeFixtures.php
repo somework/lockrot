@@ -13,8 +13,8 @@ use Lockrot\Json\Schemas;
  * object `{"strict": <bool>, "error": <string or null>}`, removed before validation, or an entry in
  * the directory's `EXPECT.json` (strict when the file name ends in `.strict.json`). A strict
  * expectation is validated against the strict twin ({@see ValidatesJsonSchemas::strictTwin()}), any
- * other as published. A fixture passes when one of its errors contains the error it names,
- * case-insensitive. A file with no expectation is an error of the fixture set.
+ * other as published. A fixture passes when it has at least one error and, if it names an error,
+ * one of its errors contains it, case-insensitive. A file with no expectation is an error of the fixture set.
  */
 final class NegativeFixtures
 {

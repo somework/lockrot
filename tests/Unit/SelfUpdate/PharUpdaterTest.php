@@ -134,7 +134,7 @@ final class PharUpdaterTest extends TestCase
      * Asserts that $message carries each of $fragments, in this order and without overlapping.
      * The messages are built by concatenation, and a reader needs every part of them in the
      * right place: the path before what is wrong with it, the URL before what to do with it. This
-     * says that much without pinning the wording in between.
+     * assertion says that much without pinning the wording in between.
      *
      * @param list<string> $fragments
      */
@@ -355,12 +355,8 @@ final class PharUpdaterTest extends TestCase
     /**
      * The last step can still fail after a verified download — a target that cannot be written over
      * although its directory can. That must be reported, and must not leave the temporary archive
-     * next to the PHAR.
-     *
-     * The message is matched whole because both paths in it are what a reader needs — what could
-     * not be written, and what it would have been written from — and because that also pins the
-     * name the staged archive is given: beside the PHAR, under its own name, ending in `.phar` so
-     * the runtime will open it at all.
+     * next to the PHAR. The message is matched whole: it names what could not be written and the
+     * staged archive it came from, beside the PHAR, ending in `.phar` so that the runtime opens it.
      */
     public function testAReplaceThatCannotCompleteIsReportedAndLeavesNoTemporaryFile(): void
     {
@@ -465,9 +461,9 @@ final class PharUpdaterTest extends TestCase
      * A process running from a PHAR loses every class it has not loaded once that file is swapped,
      * so the swap must be the last step. Composing the message is the one step between staging and
      * the swap that loads a class of its own, `Composer\Semver\Comparator`: a prepended autoloader
-     * records what the target file held when that class resolved. `--force` skips
-     * isUpdateAvailable(), so the message is the run's first use of the comparison, hence the
-     * separate process.
+     * records what the target file held when that class resolved: the old bytes if the message
+     * comes first, the new ones if the swap does. `--force` skips isUpdateAvailable(), so the
+     * message is the run's first use of the comparison: the separate process has not loaded it.
      *
      * @runInSeparateProcess
      *

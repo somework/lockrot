@@ -20,8 +20,10 @@ use PHPUnit\Framework\TestCase;
  * release's schema accepted, the current one accepts, and what an earlier release wrote still
  * validates. {@see SchemaWidening} holds each release's schemas (`schemas/<version>/`) to the current
  * file on every branch. Each document that a release PHAR wrote over wallabag's lock (`<version>/`,
- * bin/record-schema-evolution) is validated against its schema. The forward direction does not hold:
- * a current document can carry an S10 or an empty chain.
+ * bin/record-schema-evolution) is validated against its schema as published and against the strict
+ * twin, which also catches a field that an older document carries and the current schema stopped
+ * listing. The forward direction does not hold: the oldest schemas list S1–S9 and demand a non-empty
+ * `chain`, and a current document can carry S10 or an empty chain.
  */
 final class SchemaEvolutionTest extends TestCase
 {

@@ -109,6 +109,7 @@ final class PathTest extends TestCase
         self::assertNotSame($expected, Path::canonical($dir.'/ci/other.json'));
     }
 
+    /** A missing directory cannot be resolved, so the path is compared as spelled, still case-insensitively. */
     public function testCanonicalFallsBackToTheSpellingWhenTheDirectoryDoesNotExist(): void
     {
         $dir = $this->tempDir();
