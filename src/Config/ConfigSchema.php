@@ -11,7 +11,8 @@ use Lockrot\Json\SchemaPayload;
 use Lockrot\Json\Schemas;
 
 /**
- * The validator is the justinrainbow/json-schema that Composer bundles.
+ * Validates `extra.lockrot` against resources/lockrot-config-1.schema.json, with the
+ * justinrainbow/json-schema validator that Composer bundles.
  *
  * The published schema leaves `format` open, so an editor with an older copy does not flag a format
  * that a later release adds. lockrot reads it strictly ({@see KnownValues::closed()}), so a mistyped
@@ -27,7 +28,7 @@ final class ConfigSchema
 
     private static ?object $schema = null;
 
-    /** @param array<string, mixed> $lockrotExtra */
+    /** @param array<string, mixed> $lockrotExtra `extra.lockrot` of composer.json, not the whole `extra` */
     public static function validate(array $lockrotExtra): void
     {
         // The validator reads JSON objects as PHP objects, and composer.json arrives as arrays.
