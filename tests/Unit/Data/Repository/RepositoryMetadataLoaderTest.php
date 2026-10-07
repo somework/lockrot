@@ -9,6 +9,7 @@ use Composer\IO\NullIO;
 use Composer\Package\BasePackage;
 use Composer\Repository\ArrayRepository;
 use Composer\Repository\ComposerRepository;
+use Composer\Semver\Comparator;
 use Lockrot\Clock;
 use Lockrot\Data\Http\RecordedHttpClient;
 use Lockrot\Data\Repository\MetadataFailure;
@@ -85,7 +86,7 @@ final class RepositoryMetadataLoaderTest extends TestCase
 
     public function testPhpzipIsFoundWithStableRelease(): void
     {
-        $batch = $this->loader()->load(['phpzip/phpzip']);
+        $batch = $this->loader()->load(self::names(['phpzip/phpzip']));
 
         $meta = $batch->metadata()['phpzip/phpzip'] ?? null;
         self::assertNotNull($meta);
@@ -101,7 +102,7 @@ final class RepositoryMetadataLoaderTest extends TestCase
     {
         // lox/xhprof has no tagged release at all, so the loader's pass 1 (stable stabilities)
         // finds nothing for it and it is resolved entirely from {name}~dev.json in pass 2.
-        $batch = $this->loader()->load(['lox/xhprof']);
+        $batch = $this->loader()->load(self::names(['lox/xhprof']));
 
         $meta = $batch->metadata()['lox/xhprof'] ?? null;
         self::assertNotNull($meta);
@@ -125,7 +126,7 @@ final class RepositoryMetadataLoaderTest extends TestCase
             $loader = new RepositoryMetadataLoader($server->repositories(), Clock::fixed(self::FIXED));
             $server->resetRequestCount();
 
-            $batch = $loader->load($names);
+            $batch = $loader->load(self::names($names));
 
             foreach ($names as $name) {
                 self::assertArrayHasKey($name, $batch->metadata(), $name.' should have resolved');
@@ -144,7 +145,7 @@ final class RepositoryMetadataLoaderTest extends TestCase
 
     public function testWallabagRulerzHasNoStableRelease(): void
     {
-        $batch = $this->loader()->load(['wallabag/rulerz']);
+        $batch = $this->loader()->load(self::names(['wallabag/rulerz']));
 
         $meta = $batch->metadata()['wallabag/rulerz'] ?? null;
         self::assertNotNull($meta);
@@ -153,10 +154,9 @@ final class RepositoryMetadataLoaderTest extends TestCase
 
     public function testNonexistentPackageIsNotFoundAndNotFailed(): void
     {
-        // The absent name is listed twice and sits ahead of a name that does resolve: duplicates
-        // are collapsed before anything is queried, and one unresolved name in a chunk must not
-        // stop the rest of that chunk.
-        $batch = $this->loader()->load(['nonexistent/zzz', 'nonexistent/zzz', 'phpzip/phpzip']);
+        // The absent name sits ahead of a name that does resolve: one unresolved name in a chunk
+        // must not stop the rest of that chunk.
+        $batch = $this->loader()->load(self::names(['nonexistent/zzz', 'phpzip/phpzip']));
 
         self::assertSame(['nonexistent/zzz'], $batch->notFound());
         self::assertSame([], $batch->failed());
@@ -176,7 +176,7 @@ final class RepositoryMetadataLoaderTest extends TestCase
             Clock::fixed(self::FIXED)
         );
 
-        $batch = $loader->load(['phpzip/phpzip']);
+        $batch = $loader->load(self::names(['phpzip/phpzip']));
 
         self::assertSame([], $batch->notFound());
         self::assertSame([], $batch->metadata());
@@ -195,7 +195,7 @@ final class RepositoryMetadataLoaderTest extends TestCase
                 Clock::fixed(self::FIXED)
             );
 
-            $batch = $loader->load(['one/pkg', 'two/pkg']);
+            $batch = $loader->load(self::names(['one/pkg', 'two/pkg']));
 
             self::assertSame([], $batch->failed());
             self::assertSame([], $batch->notFound());
@@ -211,7 +211,7 @@ final class RepositoryMetadataLoaderTest extends TestCase
     {
         $names = \array_slice($this->wallabagNames(), 0, 25);
 
-        $batch = $this->loader()->load($names);
+        $batch = $this->loader()->load(self::names($names));
 
         foreach ($names as $name) {
             self::assertArrayHasKey($name, $batch->metadata(), $name.' should have resolved');
@@ -229,7 +229,7 @@ final class RepositoryMetadataLoaderTest extends TestCase
         $names = $this->wallabagNames();
 
         for ($i = 1; $i <= 3; ++$i) {
-            $batch = $this->loader()->load($names);
+            $batch = $this->loader()->load(self::names($names));
 
             self::assertCount(\count($names), $batch->metadata(), 'load #'.$i.' should resolve every name');
             self::assertSame([], $batch->failed(), 'load #'.$i.' should have no failures');
@@ -252,7 +252,7 @@ final class RepositoryMetadataLoaderTest extends TestCase
 
         try {
             $loader = new RepositoryMetadataLoader($server->repositories(), Clock::fixed(self::FIXED));
-            $batch = $loader->load($names);
+            $batch = $loader->load(self::names($names));
 
             self::assertCount(\count($names), $batch->metadata());
             self::assertLessThan(64 * 1024 * 1024, memory_get_peak_usage(true));
@@ -268,7 +268,7 @@ final class RepositoryMetadataLoaderTest extends TestCase
         $server = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK]);
         $loader = new RepositoryMetadataLoader($server->repositories(), Clock::fixed(self::FIXED));
 
-        $batch = $loader->load(['phpzip/phpzip', 'wallabag/rulerz']);
+        $batch = $loader->load(self::names(['phpzip/phpzip', 'wallabag/rulerz']));
 
         self::assertSame([], $batch->notFound());
         self::assertSame([], $batch->metadata());
@@ -314,7 +314,7 @@ final class RepositoryMetadataLoaderTest extends TestCase
         $server->start();
         $loader = new RepositoryMetadataLoader($server->repositories(), Clock::fixed(self::FIXED));
 
-        $batch = $loader->load(['test/empty-versions']);
+        $batch = $loader->load(self::names(['test/empty-versions']));
 
         self::assertSame([], $batch->notFound());
         self::assertSame([], $batch->metadata());
@@ -344,13 +344,13 @@ final class RepositoryMetadataLoaderTest extends TestCase
         $server->start();
         try {
             $onlineLoader = new RepositoryMetadataLoader($server->repositories(), Clock::fixed(self::FIXED));
-            $onlineLoader->load(['ralouphie/getallheaders']);
+            $onlineLoader->load(self::names(['ralouphie/getallheaders']));
 
             putenv('COMPOSER_DISABLE_NETWORK=1');
             try {
                 $loader = new RepositoryMetadataLoader($server->repositories(), Clock::fixed(self::FIXED), true);
 
-                $batch = $loader->load(['phpzip/phpzip', 'lox/xhprof']);
+                $batch = $loader->load(self::names(['phpzip/phpzip', 'lox/xhprof']));
 
                 self::assertSame([], $batch->metadata());
                 self::assertSame([], $batch->notFound());
@@ -375,13 +375,13 @@ final class RepositoryMetadataLoaderTest extends TestCase
         $server->start();
         try {
             $onlineLoader = new RepositoryMetadataLoader($server->repositories(), Clock::fixed(self::FIXED));
-            $warm = $onlineLoader->load(['phpzip/phpzip']);
+            $warm = $onlineLoader->load(self::names(['phpzip/phpzip']));
             self::assertArrayHasKey('phpzip/phpzip', $warm->metadata());
 
             putenv('COMPOSER_DISABLE_NETWORK=1');
             try {
                 $offlineLoader = new RepositoryMetadataLoader($server->repositories(), Clock::fixed(self::FIXED), true);
-                $batch = $offlineLoader->load(['phpzip/phpzip']);
+                $batch = $offlineLoader->load(self::names(['phpzip/phpzip']));
 
                 self::assertSame([], $batch->failed());
                 self::assertSame([], $batch->notFound());
@@ -398,7 +398,7 @@ final class RepositoryMetadataLoaderTest extends TestCase
     {
         $loader = new RepositoryMetadataLoader([], Clock::fixed(self::FIXED));
 
-        $batch = $loader->load(['a/b', 'c/d']);
+        $batch = $loader->load(self::names(['a/b', 'c/d']));
 
         self::assertSame(['a/b', 'c/d'], $batch->notFound());
         self::assertSame([], $batch->failed());
@@ -407,7 +407,7 @@ final class RepositoryMetadataLoaderTest extends TestCase
 
     public function testDataDateEqualsTheFixedClock(): void
     {
-        $batch = $this->loader()->load(['phpzip/phpzip']);
+        $batch = $this->loader()->load(self::names(['phpzip/phpzip']));
 
         $meta = $batch->metadata()['phpzip/phpzip'] ?? null;
         self::assertNotNull($meta);
@@ -428,7 +428,7 @@ final class RepositoryMetadataLoaderTest extends TestCase
                 Clock::fixed(self::FIXED)
             );
 
-            $batch = $loader->load(['phpzip/phpzip', 'wallabag/rulerz']);
+            $batch = $loader->load(self::names(['phpzip/phpzip', 'wallabag/rulerz']));
 
             self::assertSame([], $batch->failed());
             self::assertSame([], $batch->notFound());
@@ -451,7 +451,7 @@ final class RepositoryMetadataLoaderTest extends TestCase
                 Clock::fixed(self::FIXED)
             );
 
-            $batch = $loader->load(['phpzip/phpzip']);
+            $batch = $loader->load(self::names(['phpzip/phpzip']));
 
             self::assertSame([], $batch->failed());
             self::assertSame([], $batch->notFound());
@@ -477,7 +477,7 @@ final class RepositoryMetadataLoaderTest extends TestCase
                 Clock::fixed(self::FIXED)
             );
 
-            $meta = $loader->load(['dup/pkg'])->metadata()['dup/pkg'] ?? null;
+            $meta = $loader->load(self::names(['dup/pkg']))->metadata()['dup/pkg'] ?? null;
 
             self::assertNotNull($meta);
             self::assertSame('1.0.0', $meta->lastStableVersion());
@@ -498,7 +498,7 @@ final class RepositoryMetadataLoaderTest extends TestCase
             $laterChunk = \array_slice($names, RepositoryMetadataLoader::CHUNK_SIZE);
             $loader = new RepositoryMetadataLoader([$this->repositoryFailingFor($server, $names[0])], Clock::fixed(self::FIXED));
 
-            $batch = $loader->load($names);
+            $batch = $loader->load(self::names($names));
 
             foreach ($firstChunk as $name) {
                 self::assertSame(self::CHUNK_FAILURE, $batch->failed()[$name] ?? null, $name.' shares the failing chunk');
@@ -525,7 +525,7 @@ final class RepositoryMetadataLoaderTest extends TestCase
             $names = \array_slice($this->wallabagNames(), 0, 2);
             $loader = new RepositoryMetadataLoader([$this->repositoryFailingFor($server, $names[0])], Clock::fixed(self::FIXED), true);
 
-            $failed = $loader->load($names)->failed();
+            $failed = $loader->load(self::names($names))->failed();
 
             self::assertSame(self::CHUNK_FAILURE, $failed[$names[0]] ?? null);
             self::assertSame(MetadataFailure::FETCH_FAILED, MetadataFailure::reason($failed[$names[0]]));
@@ -547,7 +547,7 @@ final class RepositoryMetadataLoaderTest extends TestCase
             $thrown = 'The "https://ci-user:s3cr3t@repo.example.com/p2/x.json?token=t0k3n" file could not be downloaded: error adding trust anchors from file: /Users/igor/certs/ca.pem';
             $loader = new RepositoryMetadataLoader([$this->repositoryFailingFor($server, $names[0], $thrown)], Clock::fixed(self::FIXED));
 
-            $failed = $loader->load($names)->failed();
+            $failed = $loader->load(self::names($names))->failed();
 
             self::assertSame('The "https://repo.example.com/p2/x.json" file could not be downloaded: error adding trust anchors from file: .../ca.pem', $failed[$names[0]] ?? null);
         } finally {
@@ -572,7 +572,7 @@ final class RepositoryMetadataLoaderTest extends TestCase
         try {
             $loader = new RepositoryMetadataLoader($server->repositories(), Clock::fixed(self::FIXED));
 
-            $meta = $loader->load(['alias/pkg'])->metadata()['alias/pkg'] ?? null;
+            $meta = $loader->load(self::names(['alias/pkg']))->metadata()['alias/pkg'] ?? null;
 
             self::assertNotNull($meta);
             self::assertSame(1, $meta->releaseCount());
@@ -594,7 +594,7 @@ final class RepositoryMetadataLoaderTest extends TestCase
      */
     public function testRealDevOnlyPackageWithBranchAliasIsCountedOnce(): void
     {
-        $meta = $this->loader()->load(['wallabag/rulerz'])->metadata()['wallabag/rulerz'] ?? null;
+        $meta = $this->loader()->load(self::names(['wallabag/rulerz']))->metadata()['wallabag/rulerz'] ?? null;
 
         self::assertNotNull($meta);
         self::assertFalse($meta->hasStableRelease());
@@ -620,7 +620,7 @@ final class RepositoryMetadataLoaderTest extends TestCase
             $loader = new RepositoryMetadataLoader($server->repositories(), Clock::fixed(self::FIXED), false, $deadline);
             $server->resetRequestCount();
 
-            $batch = $loader->load(['phpzip/phpzip', 'lox/xhprof']);
+            $batch = $loader->load(self::names(['phpzip/phpzip', 'lox/xhprof']));
 
             self::assertSame([], $batch->metadata());
             self::assertSame([], $batch->notFound());
@@ -653,7 +653,7 @@ final class RepositoryMetadataLoaderTest extends TestCase
             $names = \array_slice($this->wallabagNames(), 0, 25);
             $loader = new RepositoryMetadataLoader($server->repositories(), Clock::fixed(self::FIXED), false, $deadline);
 
-            $batch = $loader->load($names);
+            $batch = $loader->load(self::names($names));
 
             self::assertCount(20, $batch->metadata());
             $failed = $batch->failed();
@@ -695,7 +695,7 @@ final class RepositoryMetadataLoaderTest extends TestCase
             $names = array_merge($firstChunk, $secondChunk);
             $loader = new RepositoryMetadataLoader($server->repositories(), Clock::fixed(self::FIXED), false, $deadline);
 
-            $batch = $loader->load($names);
+            $batch = $loader->load(self::names($names));
 
             self::assertSame([], $batch->notFound());
             foreach (\array_slice($firstChunk, 0, 9) as $name) {
@@ -837,5 +837,32 @@ final class RepositoryMetadataLoaderTest extends TestCase
             }
         }
         rmdir($dir);
+    }
+
+    /** The installed version reaches PackageMetadata, which keeps the stable releases above it. */
+    public function testTheInstalledVersionDecidesWhichReleasesAreKept(): void
+    {
+        $kept = $this->loader()->load(['phpzip/phpzip' => '2.0.0.0'])->metadata()['phpzip/phpzip'] ?? null;
+        $parent = $this->loader()->load(['phpzip/phpzip' => null])->metadata()['phpzip/phpzip'] ?? null;
+
+        self::assertNotNull($kept);
+        self::assertNotNull($parent);
+        $releases = $kept->releasesAbove();
+        self::assertNotNull($releases);
+        self::assertNotSame([], $releases);
+        foreach ($releases as $release) {
+            self::assertTrue(Comparator::greaterThan($release->normalized(), '2.0.0.0'), $release->pretty());
+        }
+        self::assertNull($parent->releasesAbove());
+    }
+
+    /**
+     * @param list<string> $names
+     *
+     * @return array<string, null> each name with no installed version, so no release list is kept
+     */
+    private static function names(array $names): array
+    {
+        return array_fill_keys($names, null);
     }
 }

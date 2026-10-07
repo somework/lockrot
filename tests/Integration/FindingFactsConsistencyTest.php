@@ -365,10 +365,10 @@ final class FindingFactsConsistencyTest extends TestCase
                 $this->name = $name;
             }
 
-            public function load(array $names): MetadataBatch
+            public function load(array $installedByName): MetadataBatch
             {
-                $batch = $this->loader->load($names);
-                if (!\in_array($this->name, $names, true)) {
+                $batch = $this->loader->load($installedByName);
+                if (!\array_key_exists($this->name, $installedByName)) {
                     return $batch;
                 }
                 $metadata = $batch->metadata();

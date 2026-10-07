@@ -56,11 +56,11 @@ final class RepositoryMetadataLoader implements MetadataLoaderInterface
      * repository could not answer, absent or failed, stays in the queue for the next one. A failure
      * reason is reported only when no repository resolved the name.
      *
-     * @param list<string> $names
+     * @param array<string, ?string> $installedByName
      */
-    public function load(array $names): MetadataBatch
+    public function load(array $installedByName): MetadataBatch
     {
-        $remaining = array_values(array_unique($names));
+        $remaining = array_map('strval', array_keys($installedByName));
         $metadata = [];
         $reasons = [];
 
@@ -68,7 +68,7 @@ final class RepositoryMetadataLoader implements MetadataLoaderInterface
             if ($remaining === [] || !$repository instanceof ComposerRepository) {
                 continue;
             }
-            $batch = $this->loadFromRepository($repository, $remaining);
+            $batch = $this->loadFromRepository($repository, $remaining, $installedByName);
             $metadata += $batch->metadata();
             foreach ($batch->failed() as $name => $reason) {
                 $reasons[$name] = $reason;
@@ -118,13 +118,14 @@ final class RepositoryMetadataLoader implements MetadataLoaderInterface
      * {@see Deadline} marks each name that no chunk received as failed with
      * {@see MetadataLoaderInterface::BUDGET_REASON} and starts no further chunk in either pass.
      *
-     * @param list<string> $remaining
+     * @param list<string>           $remaining
+     * @param array<string, ?string> $installedByName
      *
      * @return MetadataBatch notFound() carries the names that this repository reported as absent
      */
-    private function loadFromRepository(ComposerRepository $repository, array $remaining): MetadataBatch
+    private function loadFromRepository(ComposerRepository $repository, array $remaining, array $installedByName): MetadataBatch
     {
-        $pass1 = $this->loadChunked($repository, $remaining, self::STABLE_STABILITIES, false);
+        $pass1 = $this->loadChunked($repository, $remaining, self::STABLE_STABILITIES, false, $installedByName);
         if ($pass1->budgetExhausted()) {
             // Pass 2 must not run. A name that pass 1 reached but sent to needDev() never had its dev
             // file requested, so it fails with BUDGET_REASON instead of surfacing as notFound().
@@ -136,7 +137,7 @@ final class RepositoryMetadataLoader implements MetadataLoaderInterface
             return new MetadataBatch($pass1->metadata(), $pass1->stillRemaining(), $failed);
         }
 
-        $pass2 = $this->loadChunked($repository, $pass1->needDev(), self::DEV_ONLY_STABILITIES, true);
+        $pass2 = $this->loadChunked($repository, $pass1->needDev(), self::DEV_ONLY_STABILITIES, true, $installedByName);
 
         // The unions are safe: a name reaches pass 2 only through needDev(), which is disjoint from
         // the metadata and the failed names of pass 1.
@@ -155,8 +156,9 @@ final class RepositoryMetadataLoader implements MetadataLoaderInterface
      *
      * @param list<string>                $names
      * @param array<'alpha'|'beta'|'dev'|'RC'|'stable', 0|5|10|15|20> $acceptableStabilities
+     * @param array<string, ?string>      $installedByName
      */
-    private function loadChunked(ComposerRepository $repository, array $names, array $acceptableStabilities, bool $isDevOnlyPass): ChunkPassResult
+    private function loadChunked(ComposerRepository $repository, array $names, array $acceptableStabilities, bool $isDevOnlyPass, array $installedByName): ChunkPassResult
     {
         $metadata = [];
         $failed = [];
@@ -210,7 +212,7 @@ final class RepositoryMetadataLoader implements MetadataLoaderInterface
                     }
                     continue;
                 }
-                $metadata[$name] = PackageMetadata::fromPackages($name, $versions, $now);
+                $metadata[$name] = PackageMetadata::fromPackages($name, $versions, $now, $installedByName[$name] ?? null);
             }
         }
 

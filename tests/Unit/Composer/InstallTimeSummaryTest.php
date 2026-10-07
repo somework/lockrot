@@ -262,9 +262,9 @@ final class InstallTimeSummaryTest extends TestCase
                 $this->reason = $reason;
             }
 
-            public function load(array $names): MetadataBatch
+            public function load(array $installedByName): MetadataBatch
             {
-                return new MetadataBatch([], [], array_fill_keys($names, $this->reason));
+                return new MetadataBatch([], [], array_fill_keys(array_keys($installedByName), $this->reason));
             }
         };
     }

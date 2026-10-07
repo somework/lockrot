@@ -14,6 +14,12 @@ use Lockrot\Lock\LockedPackage;
 /** @internal */
 final class PackageFacts
 {
+    /** `metadata.status` of SPEC-0.14 5.5. */
+    public const METADATA_READ = 'read';
+    public const METADATA_UNAVAILABLE = 'unavailable';
+    public const METADATA_NOT_FOUND = 'not_found';
+    public const METADATA_NOT_FROM_COMPOSER_REPOSITORY = 'not_from_composer_repository';
+
     private LockedPackage $package;
     private ?PackageMetadata $metadata;
     private ?RepositoryActivity $activity;
@@ -22,6 +28,7 @@ final class PackageFacts
     private ?string $activityNotChecked;
     private ?AbandonedIgnoreMatch $abandonedIgnore;
     private ?AdvisoryNameCoverage $advisoryCoverage;
+    private bool $metadataFailed;
 
     /**
      * @param list<Advisory> $advisories         only those that affect the installed version: S9 does not filter them
@@ -29,9 +36,11 @@ final class PackageFacts
      *                                           ({@see \Lockrot\Analyzer\Analyzer::activityNotCheckedReasons()}).
      *                                           An answer of "no such repository" is a check that ran.
      * @param ?AbandonedIgnoreMatch $abandonedIgnore  the patterns of Composer's abandoned ignore list that match the name
+     * @param bool                  $metadataFailed   a repository that lists the package did not serve its metadata
      */
-    public function __construct(LockedPackage $package, ?PackageMetadata $metadata, ?RepositoryActivity $activity, array $advisories = [], ?string $activityNotChecked = null, ?AbandonedIgnoreMatch $abandonedIgnore = null, ?AdvisoryNameCoverage $advisoryCoverage = null)
+    public function __construct(LockedPackage $package, ?PackageMetadata $metadata, ?RepositoryActivity $activity, array $advisories = [], ?string $activityNotChecked = null, ?AbandonedIgnoreMatch $abandonedIgnore = null, ?AdvisoryNameCoverage $advisoryCoverage = null, bool $metadataFailed = false)
     {
+        $this->metadataFailed = $metadataFailed;
         $this->package = $package;
         $this->metadata = $metadata;
         $this->activity = $activity;
@@ -76,6 +85,19 @@ final class PackageFacts
     public function advisories(): array
     {
         return $this->advisories;
+    }
+
+    /** @return self::METADATA_* */
+    public function metadataStatus(): string
+    {
+        if (!$this->package->isFromComposerRepository()) {
+            return self::METADATA_NOT_FROM_COMPOSER_REPOSITORY;
+        }
+        if ($this->metadata !== null) {
+            return self::METADATA_READ;
+        }
+
+        return $this->metadataFailed ? self::METADATA_UNAVAILABLE : self::METADATA_NOT_FOUND;
     }
 
     public function hasData(): bool

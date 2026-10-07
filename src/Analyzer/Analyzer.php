@@ -171,7 +171,7 @@ final class Analyzer
             $repo = $repoByPackage[$package->name()] ?? null;
             $act = $repo !== null ? ($activity[$repo->key()] ?? null) : null;
             $entry = $allowlisted[$package->name()];
-            $facts = new PackageFacts($package, $meta, $act, $advisories->for($package->name()), $notChecked[$package->name()] ?? null, $abandonedIgnore[$package->name()], $advisories->coverage()->for($package->name()));
+            $facts = new PackageFacts($package, $meta, $act, $advisories->for($package->name()), $notChecked[$package->name()] ?? null, $abandonedIgnore[$package->name()], $advisories->coverage()->for($package->name()), isset($batch->failed()[$package->name()]));
             $factsByPackage[$package->name()] = $facts;
             $findings[] = $this->buildFinding($facts, $entry, $graph, $batch);
             if (!$package->isFromComposerRepository()) {
@@ -228,7 +228,7 @@ final class Analyzer
         $failed = [];
         $missing = $this->parents->missingCandidates($children, $metadata);
         if ($missing !== [] && !$this->deadline->isPast()) {
-            $batch = $this->metadata->load($missing);
+            $batch = $this->metadata->load(array_fill_keys($missing, null));
             $metadata += $batch->metadata();
             foreach ($batch->failed() as $name => $reason) {
                 if (MetadataFailure::reason($reason) !== MetadataFailure::INSTALL_TIME_BUDGET) {
@@ -243,14 +243,14 @@ final class Analyzer
     /** @param list<LockedPackage> $packages */
     private function fetchMetadata(array $packages): MetadataBatch
     {
-        $names = [];
+        $installed = [];
         foreach ($packages as $package) {
             if ($package->isFromComposerRepository()) {
-                $names[] = $package->name();
+                $installed[$package->name()] = $package->normalizedVersion() ?? $package->version();
             }
         }
 
-        return $this->metadata->load($names);
+        return $this->metadata->load($installed);
     }
 
     /**

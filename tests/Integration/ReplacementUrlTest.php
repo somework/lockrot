@@ -96,8 +96,9 @@ final class ReplacementUrlTest extends TestCase
                 $this->metadata = $metadata;
             }
 
-            public function load(array $names): MetadataBatch
+            public function load(array $installedByName): MetadataBatch
             {
+                $names = array_keys($installedByName);
                 return new MetadataBatch(array_intersect_key($this->metadata, array_flip($names)), array_values(array_diff($names, array_keys($this->metadata))), []);
             }
         };

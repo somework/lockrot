@@ -34,7 +34,7 @@ use PHPUnit\Framework\TestCase;
 
 final class AnalyzerSplitPackagesTest extends TestCase
 {
-    /** @var list<list<string>> every load() call's names, in order */
+    /** @var list<array<string, ?string>> every load() call's installed versions by name, in order */
     private array $asked = [];
 
     /**
@@ -48,12 +48,12 @@ final class AnalyzerSplitPackagesTest extends TestCase
         return new class ($answers, $asked) implements MetadataLoaderInterface {
             /** @var list<MetadataBatch> */
             private array $answers;
-            /** @var list<list<string>> */
+            /** @var list<array<string, ?string>> */
             private array $asked;
 
             /**
              * @param list<MetadataBatch>  $answers
-             * @param list<list<string>>   $asked
+             * @param list<array<string, ?string>> $asked
              */
             public function __construct(array $answers, array &$asked)
             {
@@ -61,12 +61,12 @@ final class AnalyzerSplitPackagesTest extends TestCase
                 $this->asked = &$asked;
             }
 
-            public function load(array $names): MetadataBatch
+            public function load(array $installedByName): MetadataBatch
             {
-                $this->asked[] = $names;
+                $this->asked[] = $installedByName;
                 $call = \count($this->asked) - 1;
 
-                return $this->answers[$call] ?? new MetadataBatch([], $names, []);
+                return $this->answers[$call] ?? new MetadataBatch([], array_keys($installedByName), []);
             }
         };
     }
@@ -169,7 +169,7 @@ final class AnalyzerSplitPackagesTest extends TestCase
         $report = $this->analyzer($loader, new MonorepoParents(['laravel/framework' => ['illuminate/contracts']]), new Thresholds(1, 1))
             ->analyze($this->lock('illuminate/contracts@v8.83.27'), ProjectConfig::fromArray(['require' => ['illuminate/contracts' => '^8.0']]), false);
 
-        self::assertSame([['illuminate/contracts'], ['laravel/framework']], $this->asked, 'the lock first, then the parent');
+        self::assertSame([['illuminate/contracts' => '8.83.27.0'], ['laravel/framework' => null]], $this->asked, 'the lock first with its versions, then the parent for its dates only');
         $finding = self::finding($report, 'illuminate/contracts');
         self::assertSame(Verdict::LEFT_BEHIND, $finding->verdict());
         $s8 = self::signal($finding, Signal::S8);
@@ -189,7 +189,7 @@ final class AnalyzerSplitPackagesTest extends TestCase
         $report = $this->analyzer($loader, new MonorepoParents(['laravel/framework' => ['illuminate/contracts']]), new Thresholds(1, 1))
             ->analyze($this->lock('illuminate/contracts@v8.83.27', 'laravel/framework@v8.83.29'), ProjectConfig::empty(), false);
 
-        self::assertSame([['illuminate/contracts', 'laravel/framework']], $this->asked);
+        self::assertSame([['illuminate/contracts', 'laravel/framework']], array_map('array_keys', $this->asked));
         $s8 = self::signal(self::finding($report, 'illuminate/contracts'), Signal::S8);
         self::assertNotNull($s8);
         self::assertSame('laravel/framework', $s8->data()['dated_by']);
@@ -204,7 +204,7 @@ final class AnalyzerSplitPackagesTest extends TestCase
         $this->analyzer($loader, new MonorepoParents(['laravel/framework' => ['illuminate/contracts']]), new Thresholds())
             ->analyze($this->lock('vendor/pkg@1.0.0'), ProjectConfig::empty(), false);
 
-        self::assertSame([['vendor/pkg']], $this->asked);
+        self::assertSame([['vendor/pkg']], array_map('array_keys', $this->asked));
     }
 
     public function testAParentTheRepositoriesDoNotListIsNoFailure(): void
@@ -250,7 +250,7 @@ final class AnalyzerSplitPackagesTest extends TestCase
 
         $report = $analyzer->analyzePackages($lock->packages(false), $lock, ProjectConfig::empty(), false);
 
-        self::assertSame([['illuminate/contracts']], $this->asked, 'no second request once the budget is gone');
+        self::assertSame([['illuminate/contracts']], array_map('array_keys', $this->asked), 'no second request once the budget is gone');
         self::assertNull(self::signal(self::finding($report, 'illuminate/contracts'), Signal::S8));
         self::assertNotContains('Repository metadata unavailable for laravel/framework, which dates the packages split out of it: '.MetadataLoaderInterface::BUDGET_REASON, $report->notes());
     }

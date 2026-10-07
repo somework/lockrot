@@ -25,6 +25,10 @@ interface MetadataLoaderInterface
     /** The repository lists the name, but no version is left after filtering in either pass. */
     public const NO_VERSIONS_REASON = 'repository listed the package but returned no versions';
 
-    /** @param list<string> $names */
-    public function load(array $names): MetadataBatch;
+    /**
+     * @param array<string, ?string> $installedByName package name => the version the lock installs,
+     *                                                null for a package whose dates alone are read (a
+     *                                                monorepo parent): its metadata keeps no release list
+     */
+    public function load(array $installedByName): MetadataBatch;
 }
