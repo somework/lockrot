@@ -1058,7 +1058,9 @@ final class LockrotCommandTest extends TestCase
 
     /**
      * Decorated, the warning is coloured by lockrot itself, whole and on stderr alone. The key is
-     * thousands of `<b`, a text that exhausts PCRE's JIT in Symfony's tag formatter.
+     * thousands of `<b`, a text that exhausts PCRE's JIT in Symfony's tag formatter. Through that
+     * formatter the closing tag prints literally and the style runs on into the report, so the test
+     * gives stdout and stderr one formatter.
      */
     public function testADecoratedWarningIsColouredWholeAndNothingLeaksOntoTheReport(): void
     {
