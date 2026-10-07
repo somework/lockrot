@@ -75,8 +75,8 @@ carries `User-Agent: lockrot`.
 
 - When both exist, lockrot sends only Composer's header.
 
-- Exception: when Composer's entry for the host is a client certificate, or custom headers that
-  carry no credential header, lockrot still sends its own header, because Composer adds none.
+- Exception: Composer's entry for the host can be a client certificate, or custom headers without a
+  credential header. Then Composer adds no credential header, and lockrot sends its own.
 
 - lockrot exchanges a `bitbucket-oauth` consumer for a bearer token, once per run, the first time
   it asks about a Bitbucket repository: a `client_credentials` request to
@@ -127,8 +127,8 @@ carries `User-Agent: lockrot`.
   answer for the URL is cached, lockrot uses it, and the footer shows its age. A 404 is an answer,
   and lockrot caches it.
 
-- With Composer's cache disabled (`composer --no-cache`), lockrot keeps answers in memory for the run
-  and writes nothing.
+-  With Composer's cache disabled (`composer --no-cache`), lockrot keeps answers in memory for the
+  run and writes nothing.
 
 - `composer clear-cache` clears lockrot's cache with Composer's. To refetch repository activity
   alone, delete the `lockrot` directory under the path `composer config cache-dir` prints.
@@ -138,8 +138,8 @@ carries `User-Agent: lockrot`.
 The footer states the report's date, in UTC, and its sources
 ([Reading the table](example-run.md#the-table-format)).
 
-When any activity answer came from the cache, the parenthesis after the date in the footer reads
-`package repositories; repository activity from lockrot's cache, up to N h old`: N is the age of
+When any activity answer came from the cache, the footer's parenthesis reads
+`package repositories; repository activity from lockrot's cache, up to N h old`. N is the age of
 the oldest cached answer in whole hours, rounded up, at least 1. `--format=json` carries that
 answer's fetch time as `activity_cache_oldest_at`, null when every answer was fetched during the
 run.

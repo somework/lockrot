@@ -69,8 +69,8 @@ time. Then run:
 
     tools/corpus/corpus diff base head
 
-`diff` refuses two runs that differ in day, token mode or cache, and two runs of the same archive. It
-also refuses two runs that are further apart than lockrot keeps a repository answer, because they
+`diff` refuses two runs that differ in day, token mode or cache, and two runs of the same archive.
+It also refuses two runs that are further apart than lockrot keeps a repository answer, because they
 then read different upstream data.
 
 The exit codes are:
@@ -99,8 +99,8 @@ still audits and reports the other projects.
 `corpus.lock.json` pins the real projects of the corpus in these ways:
 
 - **Pinned by git:** the recorded locks under `tests/fixtures/apps` and `tests/fixtures/skeletons`.
-- **Pinned by commit:** every other project, by a commit SHA and a sha256 for its `composer.lock` and
-  its `composer.json`, both fetched at that commit.
+-  **Pinned by commit:** every other project, by a commit SHA and a sha256 for its `composer.lock`
+  and its `composer.json`, both fetched at that commit.
 
 Only `corpus refresh --today <date>` moves a pin. It marks a project that was renamed, archived or
 lost its lock as `unavailable` and keeps it. A shrinking corpus must show as a line in a diff,

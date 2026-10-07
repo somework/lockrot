@@ -228,7 +228,7 @@ each release publishes beside the archive: `{"php": "7.4.0", "selfupdate-key": "
   and the error names the tag.
 
 - If `self-update` cannot read the release metadata of a next-major release that it only suggests,
-  it prints a line that says so, and the update within the running major version goes ahead.
+  it prints a line about it. The update within the running major version continues.
 
 The release metadata is not signed: it decides which release is tried, and the checksum and the
 signature decide whether one is installed. What doctored metadata can and cannot do is in
@@ -286,8 +286,9 @@ unique prefix such as `self-up` runs `self-update`.
 `self-update` cannot replace the archive by itself when:
 
 - it is stranded by a key rotation (exit `2`, and the message names the key it does not carry)
-- the self-update key was compromised: replace every archive on the old key this way, whatever its
-  version ([SECURITY.md](https://github.com/somework/lockrot/blob/main/SECURITY.md#key-custody-and-rotation))
+-  the self-update key was compromised: replace every archive on the old key this way, whatever its
+  version
+  ([SECURITY.md](https://github.com/somework/lockrot/blob/main/SECURITY.md#key-custody-and-rotation))
 - an installed release refuses to start
 - it predates the [release rules](#which-release-it-installs) and the release it takes was signed
   after a key rotation, or it is the 0.6.0 archive (Older releases under

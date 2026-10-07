@@ -118,13 +118,13 @@ lockrot: unknown key extra.lockrot.ignore[1].expire ignored (did you mean expire
   digit-only top-level key such as `"5"` disappears without a warning.
 - **Effect.** A warning only. The run goes on, the report and the exit code are unchanged, and
   nothing reaches stdout.
-- **Reserved names never warn.** `extensions` at the top level, whose contents lockrot does not
-  check, and any key that starts with lower-case `x-` (`x-ci`, or `x-ticket` inside an `ignore` entry)
-  ([reserved names](compatibility.md#names-reserved-for-extensions)).
-- **When.** `composer lockrot` and the PHAR print the lines on every run, `--explain` and
-  `--generate-baseline` included, once the configuration has loaded and before lockrot reads the lock.
-  The [install-time summary](install-time.md) prints them above its block whenever it runs, even
-  when nothing is flagged. `LOCKROT_DISABLE` suppresses them, and `-q` silences them with
+-  **Reserved names never warn.** `extensions` at the top level, whose contents lockrot does not
+  check, and any key that starts with lower-case `x-` (`x-ci`, or `x-ticket` inside an `ignore`
+  entry) ([reserved names](compatibility.md#names-reserved-for-extensions)).
+-  **When.** `composer lockrot` and the PHAR print the lines on every run, `--explain` and
+  `--generate-baseline` included, once the configuration has loaded and before lockrot reads the
+  lock. The [install-time summary](install-time.md) prints them above its block whenever it runs,
+  even when nothing is flagged. `LOCKROT_DISABLE` suppresses them, and `-q` silences them with
   everything else lockrot prints.
 - **How a key is printed.** As written, with every byte that a terminal can act on escaped (control
   bytes, invalid UTF-8, bidirectional controls, and a backslash as `\\`), so two keys never print
@@ -163,11 +163,11 @@ composer lockrot --format=github --fail-on=high --target-php=8.4 \
   parent project, and the path is then relative to it. The PHAR never walks up.
 - **Directories.** The directory must exist, and lockrot creates none (`mkdir -p` first). lockrot
   needs write access to the directory, not only to the file. lockrot replaces an existing file.
-- **Writing.** lockrot writes the files after stdout, in the order given. A new file gets the umask
-  default.
-  [What lockrot does and does not do](https://github.com/somework/lockrot/blob/main/SECURITY.md#what-lockrot-does-and-does-not-do)
-  covers the atomic replace, a leftover `*.tmp` file and what a replaced file keeps.
-  Each file gets a line on stderr: `lockrot: sarif report written to lockrot.sarif`.
+-  **Writing.** lockrot writes the files after stdout, in the order given. A new file gets the umask
+  default. [What lockrot does and does not
+  do](https://github.com/somework/lockrot/blob/main/SECURITY.md#what-lockrot-does-and-does-not-do)
+  covers the atomic replace, a leftover `*.tmp` file and what a replaced file keeps. Each file gets
+  a line on stderr: `lockrot: sarif report written to lockrot.sarif`.
 - **Exit code.** `0` or `1` by `--fail-on`, as without `--output`. A file that cannot be written is
   exit `2` with the reason. Files written before it stay, and outside `--generate-baseline` stdout
   already has the report.
@@ -176,7 +176,8 @@ composer lockrot --format=github --fail-on=high --target-php=8.4 \
   baseline comparison, and then the baseline. A report that fails stops the run before lockrot
   replaces the baseline. Under `LOCKROT_DISABLE`, lockrot writes nothing.
 
-lockrot refuses these values before the analysis starts (exit `2`, nothing fetched, nothing written):
+lockrot refuses these values before the analysis starts (exit `2`, nothing fetched, nothing
+written):
 
 | Refused | Detail |
 |---|---|
@@ -190,8 +191,8 @@ lockrot refuses these values before the analysis starts (exit `2`, nothing fetch
 | A place that cannot take the file | A directory that does not exist, or a path that exists and is not a regular file, such as a directory, `/dev/stdout` or a pipe |
 
 Two paths can prove to be one file once lockrot writes the first (on macOS, `café.json` spelled
-precomposed and decomposed). Then the run stops with exit `2` before the second overwrites the first. The
-files already written stay.
+precomposed and decomposed). Then the run stops with exit `2` before the second overwrites the
+first. The files already written stay.
 
 lockrot never writes `composer.json` or `composer.lock`.
 [SECURITY.md](https://github.com/somework/lockrot/blob/main/SECURITY.md#what-lockrot-does-and-does-not-do)
