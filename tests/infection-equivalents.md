@@ -100,6 +100,9 @@ start the reason with `in method():`.
 - `src/Filesystem/Path.php` CastString `return strpos($path, $root) === 0 ? (string) substr($path, \strlen($root)) : null;` — `$root` ends in `/` and `$path` does not, so `$path` is longer and `substr()` never returns false.
 - `src/Filesystem/Path.php` LogicalOr, DecrementInteger x2 `if ($a['ino'] === 0 || $b['ino'] === 0) {` — the filesystems of CI and of developers report an inode. Only a Windows filesystem without a file index reaches the fallback.
 - `src/Graph/DependencyGraph.php` ReturnRemoval `return $this->trees[$root];` — a memo. The edges do not change, so the tree is the same.
+- `src/Graph/DependencyGraph.php` TrueValue `$present[$package->name()] = true;` — a set. Only `isset()` reads it.
+- `src/Graph/DependencyGraph.php` ArrayItemRemoval `foreach (isset($present[$name]) ? [$name] : ($satisfiedBy[$name] ?? [$name]) as $package) {` — a name that no locked package satisfies has no edges: a walk follows only an existing edge, and `namedIn()` answers only for a package with edges.
+- `src/Graph/DependencyGraph.php` TrueValue `$resolved[$package] = true;` — a set. Only its keys are read.
 - `src/Html/ReportDocument.php` Continue_ `continue;` — in details(): the skipped packages are the end of the sorted list, so `break` selects the same packages.
 - `src/Json/JsonReader.php` ReturnRemoval `return false;` — for an empty array, `array_keys([]) === range(0, -1)` is false, so the method returns false too.
 - `src/Lock/ConfiguredRepositories.php` CastString `$host = (string) preg_replace('{:\d+$}', '', strtolower($parts[0]));` — the pattern is a literal, so `preg_replace()` never returns null.
@@ -112,6 +115,10 @@ start the reason with `in method():`.
 - `src/Output/ReportTarget.php` GreaterThan `if (strpos($spec, $known.':') === 0 && \strlen($known) > \strlen($format)) {` — two format names of one length cannot both start a spec before its colon, so `>=` picks the same name.
 - `src/Output/TableFormatter.php` CastString `return $finding->verdict().' (was '.(string) $baseline->previousVerdictOf($finding->package()).')';` — `previousVerdictOf()` is not null for a verdict that worsened. The cast is for the type.
 - `src/Output/TerminalWidth.php` Coalesce `$width = self::fromEnv($env) ?? self::fromConsoleTerminal($env) ?? self::fromApplication($application) ?? FormatContext::DEFAULT_WIDTH;` — `fromConsoleTerminal()` gives null when `COLUMNS` is set, so the order of the first two steps does not matter.
+
+## src/Security
+
+- `src/Security/FixFinder.php` CastString `$newest[(string) $key] = $branch['highest']['pretty'];` — PHP stores a decimal string key such as `"1"` as an int, so the cast changes no key. The cast is for the type.
 
 ## src/SelfUpdate
 

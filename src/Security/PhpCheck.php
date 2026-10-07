@@ -46,7 +46,7 @@ final class PhpCheck
         $release = $php === null ? null : PhpFloor::pointOf($php);
         $raiseTo = null;
         $raiseSize = null;
-        if ($allows === false && $project !== null && $release !== null && version_compare($release, $project, '>')) {
+        if ($project !== null && $release !== null && version_compare($release, $project, '>')) {
             $raiseTo = '>='.preg_replace('/\.0$/', '', $release);
             $raiseSize = self::size($project, $release);
         }

@@ -151,6 +151,7 @@ final class FixFinderTest extends TestCase
         self::assertNotNull($gets);
         self::assertNull($gets->version());
         self::assertSame([], $gets->clears());
+        self::assertFalse($gets->clearsAll());
         self::assertFalse($gets->phpCheck()->targetRuns());
         self::assertSame('~8.0.0', $gets->phpCheck()->requires());
         $fix = $fixes->forAdvisory('A');
@@ -375,6 +376,10 @@ final class FixFinderTest extends TestCase
         self::assertSame([], $unread->branches(), 'unread releases give no branch rows');
         self::assertNull($unread->gets());
 
+        $unparsed = PackageMetadata::fromPackages('a/b', [], new \DateTimeImmutable(self::NOW), null);
+        $listless = $this->finder($floor, [])->find(new PackageFacts(self::locked(['name' => 'a/b', 'version' => '1.0.0', 'notification-url' => self::PACKAGIST]), $unparsed, null, [$ranged]));
+        self::assertSame(Fix::RELEASES_UNKNOWN, $listless->forAdvisory('A')->reason(), 'metadata with no release list');
+
         $vcs = self::locked(['name' => 'a/b', 'version' => '1.0.0', 'source' => ['type' => 'git', 'url' => 'https://example.org/a/b.git', 'reference' => 'x']]);
         self::assertFalse($vcs->isFromComposerRepository());
         $outside = $this->finder($floor, [])->find(new PackageFacts($vcs, null, null, [$ranged]));
@@ -394,6 +399,57 @@ final class FixFinderTest extends TestCase
         self::assertNotNull($row);
         self::assertSame([0, 1, 2], [$row->fixed(), $row->unknown(), $row->of()]);
         self::assertNull($fixes->move());
+    }
+
+    /** A branch whose newest release is still inside the range fixes nothing, whatever it holds. */
+    public function testABranchThatFixesNothingHasNoClassAndNoPartial(): void
+    {
+        $fixes = $this->find(
+            ['name' => 'a/b', 'version' => '1.0.0'],
+            [['1.0.0', null], ['1.1.0', null], ['2.0.0', null], ['3.0.0', '>=8.1']],
+            ['A' => '<3.0.0'],
+            new PhpFloor('8.4', '>=7.2')
+        );
+
+        $two = $fixes->branches()[1];
+        self::assertSame('2.x', $two->branch());
+        self::assertSame([0, null, null, null], [$two->fixed(), $two->fixKind(), $two->lowest(), $two->candidate()]);
+        $move = $fixes->move();
+        self::assertNotNull($move);
+        self::assertSame(Fix::RAISE_PHP, $move->kind());
+        self::assertNull($fixes->partial(), '1.1.0 is an update that clears nothing');
+    }
+
+    /** A range that comes back: the branch fixes it only from the release after the last affected one. */
+    public function testABranchsLowerBoundLiesAboveTheLastAffectedRelease(): void
+    {
+        $fixes = $this->find(
+            ['name' => 'a/b', 'version' => '2.3.0'],
+            [['2.3.0', null], ['2.4.0', null], ['2.5.0', null], ['2.6.0', null], ['2.7.0', null]],
+            ['A' => '<2.4.0 || >=2.5.0,<2.7.0'],
+            new PhpFloor('8.4', '>=7.2')
+        );
+
+        $row = $fixes->installedBranch();
+        self::assertNotNull($row);
+        self::assertSame('2.7.0', $row->lowest(), '2.5.0 and 2.6.0 are affected again');
+    }
+
+    /** Among two raise-php candidates, the one that nothing holds is easier. */
+    public function testAFreeRaisePhpIsEasierThanAHeldOne(): void
+    {
+        $fixes = $this->find(
+            ['name' => 'a/b', 'version' => '1.0.0'],
+            [['1.0.0', '>=7.2'], ['2.0.0', '>=8.1'], ['3.0.0', '>=8.1']],
+            ['A' => '<2.0.0'],
+            new PhpFloor('8.4', '>=7.2'),
+            [['name' => 'c/c', 'version' => '1.0.0', 'conflict' => ['a/b' => '2.0.0']]]
+        );
+
+        $fix = $fixes->forAdvisory('A');
+        self::assertSame(Fix::RAISE_PHP, $fix->kind());
+        self::assertSame('3.0.0', $fix->version());
+        self::assertSame([], $fix->heldBy());
     }
 
     /** guzzle-5: wallabag's guzzlehttp/guzzle 5.3.4; the root requires ^5.3, 6.x fixes it. */

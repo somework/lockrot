@@ -228,12 +228,12 @@ final class ProjectConfigTest extends TestCase
     {
         $cfg = ProjectConfig::fromArray([
             'require' => ['php' => '^8.1', 'ext-intl' => '*', 'Twig/Twig' => '^2.0', 'broken/value' => ['^1']],
-            'require-dev' => ['phpunit/phpunit' => '^9.6'],
+            'require-dev' => ['phpunit/phpunit' => '^9.6', 'mockery/mockery' => '^1.6'],
             'conflict' => ['symfony/symfony' => '*'],
         ]);
 
         self::assertSame(['twig/twig' => '^2.0'], $cfg->constraints(ProjectConfig::REQUIRE));
-        self::assertSame(['phpunit/phpunit' => '^9.6'], $cfg->constraints(ProjectConfig::REQUIRE_DEV));
+        self::assertSame(['phpunit/phpunit' => '^9.6', 'mockery/mockery' => '^1.6'], $cfg->constraints(ProjectConfig::REQUIRE_DEV));
         self::assertSame(['symfony/symfony' => '*'], $cfg->constraints(ProjectConfig::CONFLICT));
         self::assertSame([], ProjectConfig::empty()->constraints(ProjectConfig::REQUIRE));
         self::assertSame(['Twig/Twig', 'broken/value'], $cfg->directRequires(), 'the names stay as written');

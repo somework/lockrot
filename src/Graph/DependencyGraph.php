@@ -61,7 +61,7 @@ final class DependencyGraph
         ];
         $roots = $sections[ProjectConfig::REQUIRE];
         if ($includeDev) {
-            $roots = array_values(array_unique(array_merge($roots, $sections[ProjectConfig::REQUIRE_DEV])));
+            $roots = array_merge($roots, $sections[ProjectConfig::REQUIRE_DEV]);
         }
         $graph = new self($edges, $roots);
         foreach ($sections as $section => $names) {
@@ -90,7 +90,7 @@ final class DependencyGraph
             }
         }
 
-        return array_map('strval', array_keys($resolved));
+        return array_keys($resolved);
     }
 
     /**

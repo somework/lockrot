@@ -77,6 +77,6 @@ final class LinkIndex
         } catch (\UnexpectedValueException $e) {
             $constraint = null;
         }
-        $this->links[strtolower($target)][] = [$holder, $constraint];
+        $this->links[$target][] = [$holder, $constraint];
     }
 }

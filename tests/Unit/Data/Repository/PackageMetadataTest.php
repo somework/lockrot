@@ -105,6 +105,29 @@ final class PackageMetadataTest extends TestCase
         self::assertSame(['php', 'c/d'], $meta->newestRequires());
     }
 
+    public function testAReleaseDatedAtTheRunClockIsTheNewestStableRelease(): void
+    {
+        $history = $this->history();
+        $history[] = $this->release(['version' => '2.0.1', 'time' => self::NOW]);
+        $newest = PackageMetadata::fromPackages('a/b', $history, new \DateTimeImmutable(self::NOW), '1.2.0.0')->newestStable();
+
+        self::assertNotNull($newest);
+        self::assertSame('2.0.1', $newest->pretty());
+    }
+
+    /** Two tags that normalise to one version: the first one that the repository lists stands for it. */
+    public function testTheFirstTagOfAVersionStandsForIt(): void
+    {
+        $versions = [
+            $this->release(['version' => '1.0.0', 'time' => '2020-01-01T00:00:00+00:00']),
+            $this->release(['version' => 'v1.2.0', 'time' => '2021-01-01T00:00:00+00:00', 'require' => ['a/x' => '^1']]),
+            $this->release(['version' => '1.2.0', 'time' => '2021-01-02T00:00:00+00:00', 'require' => ['b/y' => '^1']]),
+        ];
+
+        self::assertSame(['v1.2.0'], self::versions(PackageMetadata::fromPackages('a/b', $versions, new \DateTimeImmutable(self::NOW), '1.0.0.0')->releasesAbove() ?? []));
+        self::assertSame(['a/x'], PackageMetadata::fromPackages('a/b', $versions, new \DateTimeImmutable(self::NOW), '1.2.0.0')->installedRequires());
+    }
+
     public function testAnInstalledReleaseTheRepositoryDoesNotListHasNoRequireNames(): void
     {
         $meta = PackageMetadata::fromPackages('a/b', $this->history(), new \DateTimeImmutable(self::NOW), '1.1.5.0');

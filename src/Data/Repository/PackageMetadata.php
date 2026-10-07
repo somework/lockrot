@@ -355,12 +355,11 @@ final class PackageMetadata
         $snapshot = VersionParser::parseStability($installed) === 'dev';
         $above = [];
         foreach ($stable as $normalized => $release) {
-            $normalized = (string) $normalized;
             if ($snapshot || Comparator::greaterThan($normalized, $installed)) {
                 $above[] = $this->stableRelease($normalized, $release, $sharedCommit);
             }
         }
-        usort($above, static fn (StableRelease $a, StableRelease $b): int => Comparator::lessThan($a->normalized(), $b->normalized()) ? -1 : 1);
+        usort($above, static fn (StableRelease $a, StableRelease $b): int => version_compare($a->normalized(), $b->normalized()));
         $this->releasesAbove = $above;
     }
 
@@ -375,10 +374,10 @@ final class PackageMetadata
         return new StableRelease($normalized, $release[0]->getPrettyVersion(), $shared ? null : $release[1], $release[2], $shared);
     }
 
-    /** @return list<string> */
+    /** @return list<string> in lower case: Composer's ArrayLoader lowercases every link target */
     private static function requireNames(BasePackage $version): array
     {
-        return array_map('strtolower', array_map('strval', array_keys($version->getRequires())));
+        return array_keys($version->getRequires());
     }
 
     /**
