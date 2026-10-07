@@ -77,13 +77,6 @@ jobs:
           vendor/bin/phpunit -c phpunit.core-coverage.xml.dist --coverage-clover build/clover-core.xml
           composer global require --no-interaction "rregeer/phpunit-coverage-check:^0.3"
           $(composer global config bin-dir --absolute)/coverage-check build/clover-core.xml 94
-  # Mutation testing is a separate job, so a style or type error does not wait for it. One run over
-  # the whole src tree is too slow for one job, so each shard runs the same configuration over a
-  # group of src directories. Each shard has its own minimum MSI, one
-  # below a measured covered MSI, because the shards have unequal populations. infection.json5 keeps
-  # the whole-tree threshold for a local run. Every directory of src must belong to one shard: a
-  # directory in none is never mutated. Measurements: https://github.com/somework/lockrot/pull/65
-  #
   # The full run collects coverage once for all shards. Keep its --exclude-group list equal to
   # testFrameworkOptions in infection.json5: each shard reads this coverage as its own run's. A pull
   # request does not use it: most of its shards mutate nothing.
@@ -107,6 +100,12 @@ jobs:
     # stops a runaway run. Measurements: https://github.com/somework/lockrot/pull/6 and
     # https://github.com/somework/lockrot/pull/10
     timeout-minutes: 50
+    # A separate job, so a style or type error does not wait for it. One run over the whole src tree
+    # is too slow for one job, so each shard mutates a group of src directories. A shard's min_msi is
+    # its measured covered MSI rounded down, minus one, and a shard cut from another keeps that one's.
+    # Every src directory must belong to one shard: a directory in none is never mutated.
+    # infection.json5 keeps the whole-tree threshold for a local run.
+    # Measurements: https://github.com/somework/lockrot/pull/65
     strategy:
       fail-fast: false
       matrix:
@@ -212,6 +211,7 @@ jobs:
       # AI sessions on this repository load .claude/rules/. Hold it to the budget that
       # https://github.com/somework/lockrot/pull/66 set.
       - name: .claude/rules/ stays within its line budget
+        shell: bash
         env: {BUDGET: '440'}
         run: |
           lines=$(find .claude/rules -name '*.md' -exec cat {} + | wc -l)

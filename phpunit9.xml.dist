@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Keep in step with phpunit.xml.dist. PHPUnit 9.6, on the PHP 7.4 and 8.0 legs, reads
      <coverage><include> where PHPUnit 10+ reads <source><include>. It cannot load the extension of
-     phpunit.xml.dist, which uses the PHPUnit 10 extension API. -->
+     phpunit.xml.dist, which uses the PHPUnit 10 extension API and acts
+     only under Infection. -->
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          bootstrap="vendor/autoload.php" colors="true" failOnWarning="true"
          beStrictAboutOutputDuringTests="true">

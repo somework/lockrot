@@ -7,12 +7,11 @@ on:
 # (lockrot.phar.sig.json) is for self-update (ReleaseKey::PEM), and the build checks it against the
 # key that the previous release's archive carries. Thus a key rotation that skips its transition
 # release, or a secret that does not match the key in the field, fails the build.
-#
-# Signing and attestation run for a tag and for a dispatch from the default branch, where a key
-# rotation is rehearsed. They never run for a dispatch from another branch: a write-access dispatch
-# must not mint a release-signed archive out of arbitrary code.
 env:
   LOCKROT_SIGNING_KEY: 39ECC3F64AE8D06A9A63FD99AB6F7F52AE513141
+  # Signing and attestation run for a tag and for a dispatch from the default branch, where a key
+  # rotation is rehearsed. They never run for a dispatch from another branch: a write-access dispatch
+  # must not mint a release-signed archive out of arbitrary code.
   SIGN: ${{ startsWith(github.ref, 'refs/tags/') || github.ref == format('refs/heads/{0}', github.event.repository.default_branch) }}
 jobs:
   phar:
@@ -65,12 +64,6 @@ jobs:
       # `{"sha384": "<base64>"}` format, for Lockrot\SelfUpdate\ReleaseSignatureVerifier. The private
       # key lives in a throw-away directory that the trap removes on every exit. openssl reads the
       # passphrase from the environment, never from an argument.
-      #
-      # lockrot.phar.meta.json lets self-update choose a release without a download. It holds the
-      # lowest PHP that the archive runs on (config.platform.php of build/phar/composer.json) and the
-      # SHA-256 fingerprint of the signing key. The fingerprint comes from the private key that signed,
-      # not from the committed key file, so a rotation's transition release names its real signer.
-      # The upload glob build/lockrot.phar* omits the .pub files.
       - name: Sign the PHAR for self-update
         if: env.SIGN == 'true'
         env:
@@ -84,16 +77,17 @@ jobs:
           build/selfupdate-signature.php wrap build/lockrot.phar.sig.bin > build/lockrot.phar.sig.json
           rm build/lockrot.phar.sig.bin
           openssl pkey -in "$KEYDIR/key.pem" -passin env:SELFUPDATE_PASSPHRASE -pubout -out build/selfupdate-signer.pub
+          # lockrot.phar.meta.json lets self-update choose a release without a download: the lowest PHP
+          # the archive runs on, and the SHA-256 fingerprint of the signing key. The fingerprint comes
+          # from the key that signed, not from the committed key file, so a rotation's transition
+          # release names its real signer. The upload glob build/lockrot.phar* omits the .pub files.
           build/selfupdate-signature.php describe build/phar/composer.json build/selfupdate-signer.pub > build/lockrot.phar.meta.json
       # The checks use the key that the previous release carries (lockrot-selfupdate-key.pub at the
-      # newest earlier v* tag), because every archive in the field verifies this release with it.
-      # openssl checks the signature against it and against the signer's public half. The archive's
-      # own verifier class checks it again, and the description must name it. A rotation done in one
-      # step fails these checks, as it must: no archive in the field can follow it.
-      #
-      # A rotation's transition release carries the new key and the previous key's signature, so it
-      # passes, and `verify` reports a transition release. The next release must then carry the new
-      # key's signature (SECURITY.md).
+      # newest earlier v* tag): every archive in the field verifies this release with it. openssl, the
+      # archive's own verifier class and the description all check it, so a one-step rotation fails,
+      # as it must. A transition release carries the new key and the previous key's signature, so it
+      # passes and `verify` reports it. The next release must carry the new key's signature
+      # (SECURITY.md).
       - name: Verify the self-update signature with the key the previous release carries
         if: env.SIGN == 'true'
         run: |
