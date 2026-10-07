@@ -11,7 +11,7 @@ use Lockrot\Data\Repository\MetadataLoaderInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/** The strings below are literals, so a template that changes in RunNote fails here and not in the output of every format. */
+/** This test's strings are literals, so a template that changes in RunNote fails here and not in the output of every format. */
 final class RunNoteTest extends TestCase
 {
     private const BUDGET = 'not checked: install-time budget exhausted';

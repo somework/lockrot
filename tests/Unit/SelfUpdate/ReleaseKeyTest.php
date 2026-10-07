@@ -30,7 +30,7 @@ final class ReleaseKeyTest extends TestCase
     /**
      * The fingerprint SECURITY.md and every release's `lockrot.phar.meta.json` name, the same value
      * `openssl pkey -pubin -in lockrot-selfupdate-key.pub -outform DER | sha256sum` prints. A
-     * rotation changes it, and this line with it.
+     * rotation changes it, and this test's expected value with it.
      */
     public function testTheBuiltInKeyFingerprintIsPinned(): void
     {

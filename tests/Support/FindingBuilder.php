@@ -11,7 +11,7 @@ use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
 
 /**
- * The one place the test suite constructs a {@see Finding}. The defaults: `vendor/pkg` 1.0.0, ok, no
+ * Builds a {@see Finding} for a test. The defaults: `vendor/pkg` 1.0.0, ok, no
  * signals, a chain of the package alone, no data date. Every optional argument keeps the
  * constructor's own default. Each with*() returns a new builder.
  */
