@@ -198,6 +198,7 @@ own requirement is `lock.php`. Each branch row in the JSON carries:
 | `admits_target_php`, `admits_project_php` | Whether the branch's php admits that floor. Null where there is nothing to test: the branch requires no PHP, its requirement cannot be parsed, or the floor is missing. Null never means admitted |
 | `php_blocked_by` | `project` when the branch misses the project's floor, whether or not it also misses the target. Else `target` when it misses the target. Else null: the branch is within reach. A null `admits_*` blocks nothing. An [open set](schema.md#open-sets) |
 | `misses_target_php`, `misses_project_php` | Which side of that floor the branch's php lies on. Null exactly where the matching `admits_*` is not false. An [open set](schema.md#open-sets) |
+| `highest_commit_date` | The commit date of the highest tag when other tags share its commit, so it is not a release date. Null when the tag has a release date or no date |
 
 | `misses_*` | The branch's php admits | Example against the floor |
 |---|---|---|
@@ -523,7 +524,8 @@ furthest behind phpdocumentor/reflection-common 2.2.0 at 5.4
 For each package, lockrot takes the years from the installed version's release to the package's
 newest release (the date S2 reads). It counts years of 365.25 days, never below zero, and sums them
 over the packages the run analysed. The installed version's date is the lock's `time`, or its
-[monorepo parent's](#dates-from-the-monorepo). The number does not read the clock.
+[monorepo parent's](#dates-from-the-monorepo). The number does not read the clock. The package
+furthest behind is the one with the highest value, and a tie goes to the first package name.
 
 The unit is the *libyear* of [libyear.com](https://libyear.com/), after [Cox, Bouwers, van Eekelen
 and Visser, *Measuring Dependency Freshness in Software Systems*, ICSE

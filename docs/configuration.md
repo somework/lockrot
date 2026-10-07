@@ -85,6 +85,9 @@ Join the directory to the option (`--working-dir=app` or `-dapp`): Composer 2.2 
 | `LOCKROT_GITLAB_TOKEN`, else `GITLAB_TOKEN` | Personal access token, sent to gitlab.com only. Without credentials, GitLab hides the archived flag (S3). A self-hosted instance uses Composer's `gitlab-token` or `gitlab-oauth` ([credentials](internals.md#repository-hosts-and-credentials)) |
 | `COMPOSER` | The manifest, as for every Composer command: `COMPOSER=alt.json composer lockrot` reads `extra.lockrot` from `alt.json`, analyses `alt.lock` and looks for the baseline next to `alt.json` |
 
+When `COMPOSER_ROOT_VERSION` is unset, lockrot sets it to `1.0.0` for the run, so Composer does not
+probe version control for the project's version.
+
 Variables that start with `LOCKROT_X_` are reserved for your own tooling
 ([reserved names](compatibility.md#names-reserved-for-extensions)).
 
