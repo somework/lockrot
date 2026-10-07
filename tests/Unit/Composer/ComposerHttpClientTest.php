@@ -450,10 +450,8 @@ final class ScriptedDownloader extends HttpDownloader
      * ever arrived" case.
      *
      * @param ?int $index
-     *
-     * @return void
      */
-    public function wait($index = null)
+    public function wait($index = null): void
     {
         ++$this->waits;
         $pending = $this->pending;

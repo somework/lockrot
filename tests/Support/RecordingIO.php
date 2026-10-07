@@ -39,10 +39,8 @@ final class RecordingIO extends BufferIO
      * @param string|string[] $messages
      * @param bool            $newline
      * @param int             $verbosity
-     *
-     * @return void
      */
-    public function writeError($messages, $newline = true, $verbosity = self::NORMAL)
+    public function writeError($messages, $newline = true, $verbosity = self::NORMAL): void
     {
         $this->record($messages, (int) $verbosity);
         parent::writeError($messages, (bool) $newline, (int) $verbosity);
@@ -55,10 +53,8 @@ final class RecordingIO extends BufferIO
      * @param string|string[] $messages
      * @param bool            $newline
      * @param int             $verbosity
-     *
-     * @return void
      */
-    public function writeErrorRaw($messages, $newline = true, $verbosity = self::NORMAL)
+    public function writeErrorRaw($messages, $newline = true, $verbosity = self::NORMAL): void
     {
         $this->record($messages, (int) $verbosity);
         parent::writeErrorRaw($messages, (bool) $newline, (int) $verbosity);

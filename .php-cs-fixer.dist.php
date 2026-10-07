@@ -25,5 +25,10 @@ return (new PhpCsFixer\Config())
         'ordered_imports' => true,
         'final_class' => false,
         'native_function_invocation' => ['include' => ['@compiler_optimized']],
+        // allow_mixed keeps `@param mixed`: PHP 7.4 has no native `mixed` type.
+        'no_superfluous_phpdoc_tags' => ['allow_mixed' => true],
+        'phpdoc_no_empty_return' => true,
+        'no_empty_comment' => true,
+        'no_empty_phpdoc' => true,
     ])
     ->setFinder($finder);
