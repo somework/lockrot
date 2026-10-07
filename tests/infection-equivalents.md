@@ -1,13 +1,15 @@
 # Mutants no test can observe
 
 Each entry is a mutant that escapes the mutation gate (`infection.json5`), with the reason that no
-test can tell it from the original code. "Hard to test" is not "equivalent". Write an entry as
+test that Infection runs can tell it from the original code. "Hard to test" is not "equivalent".
+Write an entry as
 
     - `src/Path/File.php` Mutator `the mutated line, as in the source` — reason
 
 `tools/mutation/pr_gate.py` reads the file, the mutators and the code span. Put several mutators of
-one line before one code span. Write "Mutator x2" for a mutant that escapes twice. If the line
-occurs more than once in its file, name its method in the reason as `method()`.
+one line before one code span, and quote a line that holds a backtick in a double-backtick span.
+Write "Mutator x2" for a mutant that escapes twice. If the line occurs more than once in its file,
+start the reason with `in method():`.
 
 ## src/Allowlist
 
@@ -69,7 +71,7 @@ occurs more than once in its file, name its method in the reason as `method()`.
 - `src/Data/Forge/ActivityFetchPlanner.php` TrueValue `$seen[$repo->key()] = true;` — a set. Only `isset()` reads it.
 - `src/Data/Forge/RepoLocator.php` CastString `$bareHost = (string) preg_replace('{:\d+$}', '', $lowerHost);` — the pattern is a literal, so `preg_replace()` never returns null.
 - `src/Data/Forge/SupportSource.php` CastString `$url = (string) preg_replace('{/(?:-/)?(?:tree|src)/[^/]+$}', '', $url);` — the pattern is a literal, so `preg_replace()` never returns null.
-- `src/Data/Http/HttpResult.php` GreaterThan `if ($at === false || ($errors !== false && $errors['warning_count'] > 0)) {` — on PHP 8.2 and later `getLastErrors()` returns false when it has nothing to report. The 7.4 leg of the test matrix kills it.
+- `src/Data/Http/HttpResult.php` GreaterThan `if ($at === false || ($errors !== false && $errors['warning_count'] > 0)) {` — `getLastErrors()` returns false when it has nothing to report. The 7.4 leg of the test matrix kills it.
 - `src/Data/Php/PhpReleaseDates.php` CastString, Concat `$dates[(string) $minor] = new \DateTimeImmutable($date.'T00:00:00+00:00');` — PHP never casts a key with a dot to an int, and the date parser reads the date and the time in either order.
 - `src/Data/Repository/MonorepoParents.php` ReturnRemoval `return [];` — with no split package to date, the loop selects nothing and the method returns `[]` too.
 - `src/Data/Repository/PackageMetadata.php` TrueValue `$replaces[$link->getTarget()] = true;` — a set. Only `array_keys()` reads it.

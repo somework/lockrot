@@ -59,4 +59,4 @@ A comment or docblock has at most six lines of text, tag lines not counted. A fi
 `CONTRIBUTING.md` points to can be longer. A longer reason goes in a repository Markdown file or
 the PR, and the comment links it. A ledger (`tests/infection-equivalents.md`) is the one list of
 its sites. Other files link it. Each entry names the file, the mutator and the mutated line, with
-no line number, date, version or measurement.
+no line number, date, lockrot version or measurement.

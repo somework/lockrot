@@ -90,11 +90,18 @@ class TheKey(Gate):
     def test_a_text_that_is_not_unique_needs_the_method_its_reason_names(self):
         documented = log((13, 'IncrementInteger', '        return 1;'))
         other_method = log((18, 'IncrementInteger', '        return 1;'))
-        ledger = '- `src/Signal/Openness.php` IncrementInteger `return 1;` -- in minor() only.\n'
+        ledger = '- `src/Signal/Openness.php` IncrementInteger `return 1;` -- in minor(): unlike patch().\n'
         self.assertEqual(0, self.run_gate([documented], ledger)[0])
         self.assertEqual(1, self.run_gate([other_method], ledger)[0])
-        unnamed = '- `src/Signal/Openness.php` IncrementInteger `return 1;` -- why.\n'
+        unnamed = '- `src/Signal/Openness.php` IncrementInteger `return 1;` -- why, unlike minor().\n'
         self.assertEqual(1, self.run_gate([documented], unnamed)[0])
+
+    def test_a_line_that_holds_a_backtick_goes_in_a_double_backtick_span(self):
+        with open(os.path.join(self.root, 'src', 'Signal', 'Openness.php'), 'a', encoding='utf-8') as handle:
+            handle.write("$fence = str_repeat('`', 3);\n")
+        fence = log((21, 'IncrementInteger', "$fence = str_repeat('`', 3);"))
+        ledger = "- `src/Signal/Openness.php` IncrementInteger ``$fence = str_repeat('`', 3);`` -- why.\n"
+        self.assertEqual(0, self.run_gate([fence], ledger)[0])
 
     def test_a_unique_line_is_not_covered_by_an_entry_for_another_line_of_its_method(self):
         escape = log((6, 'Plus', "        $parts = explode('.', $v);"))
