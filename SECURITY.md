@@ -55,7 +55,7 @@ How lockrot writes a report or a baseline:
   over the target. lockrot creates the temporary file exclusively, so it never follows a file or
   symlink that is already at that name. lockrot needs write access to that directory.
 
--  A run that stops during a write can leave a `*.tmp` file beside the target. `self-update` stages
+- A run that stops during a write can leave a `*.tmp` file beside the target. `self-update` stages
   the new archive beside the PHAR ([Keeping it updated](docs/phar.md#keeping-it-updated)).
 
 - lockrot writes an absolute path where it points, inside the project or not.
@@ -117,7 +117,7 @@ vulnerabilities with `composer audit`.
   signature, and installs nothing when either fails
   ([Keeping it updated](docs/phar.md#keeping-it-updated)).
 
--  **What a signature does not prove.** It proves that the bytes are a lockrot release, not that
+- **What a signature does not prove.** It proves that the bytes are a lockrot release, not that
   they are the newest one. Which release is newest comes from GitHub's release API, over TLS.
 
 - **The release metadata is not signed.** `lockrot.phar.meta.json` names a release's lowest PHP
@@ -153,7 +153,7 @@ The self-update key:
   `lockrot-selfupdate-key.pub` at the previous `v*` tag and its release metadata names that key.
   Every archive in the field verifies with that key.
 
--  A planned rotation ships the new key in a transition release, signed with the old key. An archive
+- A planned rotation ships the new key in a transition release, signed with the old key. An archive
   on the old key skips each later release, because the metadata of that release names the new key.
   The archive installs the transition release and verifies with the new key from then on. The
   transition release's changelog names the new fingerprint.

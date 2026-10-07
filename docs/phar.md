@@ -219,7 +219,7 @@ release each rule held back:
 
 `--allow-major` takes the newest release of the next major version that has a stable release, and
 no further: from 1.x it installs the newest 2.x even when 3.0 exists. `self-update` suggests
-`--allow-major` only when that option installs a release.
+`--allow-major` only when a run with that option can install a release.
 
 The PHP floor and the signing key come from the release metadata, `lockrot.phar.meta.json`, which
 each release publishes beside the archive: `{"php": "7.4.0", "selfupdate-key": "sha256:…"}`.
@@ -286,7 +286,7 @@ unique prefix such as `self-up` runs `self-update`.
 `self-update` cannot replace the archive by itself when:
 
 - it is stranded by a key rotation (exit `2`, and the message names the key it does not carry)
--  the self-update key was compromised: replace every archive on the old key this way, whatever its
+- the self-update key was compromised: replace every archive on the old key this way, whatever its
   version
   ([SECURITY.md](https://github.com/somework/lockrot/blob/main/SECURITY.md#key-custody-and-rotation))
 - an installed release refuses to start

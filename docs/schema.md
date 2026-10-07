@@ -364,7 +364,7 @@ repository, so the same lock and manifest give the same `origin` on every machin
 
 | Key | Type | Holds |
 |---|---|---|
-| `kind` | string | How a repository served the entry. An open set |
+| `kind` | string | Where the lock entry came from. An open set |
 | `registry` | string or null | The known host that the notification-url reports to, or null. A label: build no URL from it. An open set |
 | `package_url` | string or null | The package's page on `registry`, for a registry that keeps a public page per package name, when the lock's name is a package name. Null otherwise. Link it only when it is a string, and never build one |
 | `local` | boolean | Whether Composer installed the package from the machine it ran on: a `path` or `artifact` repository, or a dist or source that is a path or a `file://` URL, such as a VCS checkout on the disk |

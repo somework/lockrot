@@ -556,7 +556,7 @@ applies. So a `path` entry on `dev-main` counts as `not_from_composer_repository
 The keys are an [open set](schema.md#open-sets): read one you do not know as another way a package
 went unmeasured ([compatibility.md](compatibility.md#open-sets)).
 
--  **Lower bounds.** When the newest tag has no trusted date, lockrot measures the package to the
+- **Lower bounds.** When the newest tag has no trusted date, lockrot measures the package to the
   newest release above the installed version that has a trusted date. That release can be on a
   higher branch or on the installed branch. A tag's commit is never younger than the release it
   names, so the value is a lower bound. The HTML report marks it "at least".

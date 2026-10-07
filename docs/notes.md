@@ -13,7 +13,7 @@ do, what each gap does to findings, and what to do about it.
 |---|---|---|---|---|
 | [`offline`](#offline) | `--offline`: metadata came from Composer's cache | no | S10 `offline` where activity is not cached | Run once online to fill the caches ([working offline](internals.md#working-offline)) |
 | [`metadata_unavailable`](#metadata_unavailable) | Metadata did not arrive for some packages | yes | Those packages are `unknown` | Depends on the [`reason`](#metadata_unavailable) |
-| [`monorepo_parent_unavailable`](#monorepo_parent_unavailable) | A monorepo's metadata did not arrive | yes | The split packages of that parent stay unmeasured, with S10 `undated_releases` | Rerun |
+| [`monorepo_parent_unavailable`](#monorepo_parent_unavailable) | A monorepo's metadata did not arrive | yes | The split packages whose dates need that parent stay unmeasured, with S10 `undated_releases` | Rerun |
 | [`advisory_ignore_unreadable`](#advisory_ignore_unreadable) | Composer rejected the advisory ignore settings | no | Every advisory counts, ignored ones included | Fix `config.policy` or `config.audit`, as the note's `message` says |
 | [`advisories_unavailable`](#advisories_unavailable) | A Composer repository's advisory request failed | yes when unreachable, no for any other error the repository raised, such as an answer lockrot could not read | That repository's advisories are missing | Rerun. For any other error, check the repository that `composer_repository` names |
 | [`advisories_not_checked`](#advisories_not_checked) | Advisories were not looked up, or only partly | no | A priority that an advisory can raise stays one step lower | `offline`: run online. `composer_too_old`: use Composer 2.4 or newer. `install_time_budget`: raise the [budget](install-time.md#time-budget) |
@@ -86,7 +86,7 @@ metadata did not arrive.
 - `data`: `parent`, the monorepo, with a `reason` and a `message` as in
   [metadata unavailable](#metadata_unavailable). `reason` is never `install_time_budget`: when the
   install-time budget runs out first, lockrot does not ask the parent and writes no note.
-- Findings: the split packages of that parent stay unmeasured. S2 and S8 cannot read their
+- Findings: the split packages whose dates need that parent stay unmeasured. S2 and S8 cannot read their
   undated branches, and those findings carry S10 `undated_releases`
   ([what was not checked](verdicts.md#what-was-not-checked)).
 - `sets_network_failures`: yes.
@@ -102,7 +102,7 @@ Composer 2.10 or newer rejected the project's advisory policy (`config.policy`, 
 as its fallback), so lockrot ignores no advisory.
 
 - `data`: `message`, the first line of what Composer said. It can be empty.
-- Findings: an advisory that the policy ignores by id or by severity also raises the priority.
+- Findings: an advisory that the policy ignores also raises the priority.
 - `sets_network_failures`: no.
 
 ### Advisories unavailable {#advisories_unavailable}
@@ -122,7 +122,7 @@ The advisory lookup did not run, or stopped before it asked every repository.
 - `data`: `reason`, and `composer_repositories_checked`: how many advisory-capable repositories
   lockrot asked before the check stopped, whatever each returned. A repository that failed has its
   own [`advisories_unavailable`](#advisories_unavailable) note.
--  Findings: a priority that an advisory can raise ([no fix
+- Findings: a priority that an advisory can raise ([no fix
   expected](verdicts.md#security-advisories)) stays one step lower.
 - `sets_network_failures`: no.
 

@@ -127,7 +127,7 @@ carries `User-Agent: lockrot`.
   answer for the URL is cached, lockrot uses it, and the footer shows its age. A 404 is an answer,
   and lockrot caches it.
 
--  With Composer's cache disabled (`composer --no-cache`), lockrot keeps answers in memory for the
+- With Composer's cache disabled (`composer --no-cache`), lockrot keeps answers in memory for the
   run and writes nothing.
 
 - `composer clear-cache` clears lockrot's cache with Composer's. To refetch repository activity

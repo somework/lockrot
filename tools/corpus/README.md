@@ -24,8 +24,8 @@ document is judged, never a match on the sentence that the check is about to rea
 selects a document, its assertion must return a verdict. A sentence that does not parse is a problem
 (`unparsable`), not a smaller population.
 
-This inversion is the whole design. A check that counts its own skips can stop checking and still
-print `none`.
+This inversion is the whole design. A check that decides whether to look by matching the text that it
+reads can stop checking and still print `none`.
 
 These layers support it:
 
@@ -99,7 +99,7 @@ still audits and reports the other projects.
 `corpus.lock.json` pins the real projects of the corpus in these ways:
 
 - **Pinned by git:** the recorded locks under `tests/fixtures/apps` and `tests/fixtures/skeletons`.
--  **Pinned by commit:** every other project, by a commit SHA and a sha256 for its `composer.lock`
+- **Pinned by commit:** every other project, by a commit SHA and a sha256 for its `composer.lock`
   and its `composer.json`, both fetched at that commit.
 
 Only `corpus refresh --today <date>` moves a pin. It marks a project that was renamed, archived or

@@ -118,10 +118,10 @@ lockrot: unknown key extra.lockrot.ignore[1].expire ignored (did you mean expire
   digit-only top-level key such as `"5"` disappears without a warning.
 - **Effect.** A warning only. The run goes on, the report and the exit code are unchanged, and
   nothing reaches stdout.
--  **Reserved names never warn.** `extensions` at the top level, whose contents lockrot does not
+- **Reserved names never warn.** `extensions` at the top level, whose contents lockrot does not
   check, and any key that starts with lower-case `x-` (`x-ci`, or `x-ticket` inside an `ignore`
   entry) ([reserved names](compatibility.md#names-reserved-for-extensions)).
--  **When.** `composer lockrot` and the PHAR print the lines on every run, `--explain` and
+- **When.** `composer lockrot` and the PHAR print the lines on every run, `--explain` and
   `--generate-baseline` included, once the configuration has loaded and before lockrot reads the
   lock. The [install-time summary](install-time.md) prints them above its block whenever it runs,
   even when nothing is flagged. `LOCKROT_DISABLE` suppresses them, and `-q` silences them with
@@ -163,7 +163,7 @@ composer lockrot --format=github --fail-on=high --target-php=8.4 \
   parent project, and the path is then relative to it. The PHAR never walks up.
 - **Directories.** The directory must exist, and lockrot creates none (`mkdir -p` first). lockrot
   needs write access to the directory, not only to the file. lockrot replaces an existing file.
--  **Writing.** lockrot writes the files after stdout, in the order given. A new file gets the umask
+- **Writing.** lockrot writes the files after stdout, in the order given. A new file gets the umask
   default. [What lockrot does and does not
   do](https://github.com/somework/lockrot/blob/main/SECURITY.md#what-lockrot-does-and-does-not-do)
   covers the atomic replace, a leftover `*.tmp` file and what a replaced file keeps. Each file gets
