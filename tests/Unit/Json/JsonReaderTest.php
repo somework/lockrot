@@ -83,6 +83,7 @@ final class JsonReaderTest extends TestCase
             self::fail('Expected a ConfigException.');
         } catch (ConfigException $e) {
             self::assertMatchesRegularExpression('{^Cannot read '.preg_quote($path, '{').': .+}', $e->getMessage());
+            self::assertSame(0, $e->getCode());
             self::assertInstanceOf(\RuntimeException::class, $e->getPrevious());
         } finally {
             restore_error_handler();
