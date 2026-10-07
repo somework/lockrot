@@ -57,6 +57,10 @@ reviews:
     - '!build/phar/composer.lock'
     # tools/score/sweep.py's output, gzipped (gzip -9n): the sweep stream. SweepDifferentialTest reads it.
     - '!tests/fixtures/score/sweep-rows.txt.gz'
+    # tools/corpus/floor.py's output, gzipped (gzip -9n): the corpus floor. CorpusFloorTest reads it.
+    - '!tests/fixtures/corpus/report-1-floor.json.gz'
+    # Written only by tools/fixtures/record-legacy-priority.php on a v0.13.0 checkout.
+    - '!tests/fixtures/legacy/priority-0.13.0.json'
     # Re-recorded from a real run. The numbers in it are output, not prose.
     - '!docs/example-run.md'
     # Recorded with asciinema and rendered with agg by bin/record-demo.
