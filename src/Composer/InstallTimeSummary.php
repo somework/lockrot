@@ -32,11 +32,9 @@ use Lockrot\Output\TerminalText;
  * Runs on InstallerEvents::PRE_OPERATIONS_EXEC and prints the install-time block, see
  * docs/install-time.md.
  *
- * The analysis reads the project's own RepositoryManager repositories. During `update` and
- * `require` their ComposerRepository instances fetched the metadata of these packages,
- * and each one serves a file that it fetched in this process without a request. A cold
- * `composer install` runs under {@see LockrotConfig::installTimeBudgetSeconds()}
- * (docs/install-time.md#time-budget).
+ * During `update` and `require`, the project's ComposerRepository instances fetched the metadata
+ * of these packages, and each one serves a file that it fetched in this process without a
+ * request. A cold `composer install` runs under {@see LockrotConfig::installTimeBudgetSeconds()}.
  *
  * @internal
  */
