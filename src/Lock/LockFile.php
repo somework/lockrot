@@ -60,8 +60,8 @@ final class LockFile
                 if ($loaded instanceof AliasPackage) {
                     $loaded = $loaded->getAliasOf();
                 }
-                // Unreachable: ArrayLoader::load() returns a CompletePackage. The check narrows the
-                // type for PHPStan.
+                // Unreachable: with its default class, ArrayLoader::load() returns a CompletePackage or
+                // an alias of one, which the unwrap removes. The check narrows the type for PHPStan.
                 if (!$loaded instanceof CompletePackage) {
                     throw new ConfigException(\sprintf(
                         'composer.lock entry #%d in %s cannot be loaded: loader returned %s instead of a CompletePackage',

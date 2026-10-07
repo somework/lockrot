@@ -168,13 +168,11 @@ final class TableFormatter implements FormatterInterface
     }
 
     /**
-     * With $cut, a word longer than $wrap is cut, so a row is never wider than the terminal. The
-     * summary passes false: a path split across two lines cannot be copied. The text is wrapped
-     * before it is escaped, because the added backslashes do not print. `wordwrap()` counts bytes,
-     * which can only wrap earlier than the display width needs. The chain separator is its own
-     * token and is never cut. A non-ASCII word longer than $wrap is cut mid-codepoint, because
-     * lockrot does not require ext-mbstring. Each line is right-trimmed, so spaces in the text do
-     * not pad its end.
+     * With $cut, a word longer than $wrap is cut, so a row is never wider than the terminal. Without
+     * it, a path stays whole, so a reader can copy it. The text is wrapped before it is escaped: the
+     * added backslashes do not print. `wordwrap()` counts bytes, which can only wrap early. The chain
+     * separator is its own token and is never cut. A non-ASCII word is cut mid-codepoint: lockrot
+     * does not require ext-mbstring. Each line is right-trimmed, so spaces do not pad its end.
      *
      * @return list<string>
      */

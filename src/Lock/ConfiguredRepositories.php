@@ -276,7 +276,7 @@ final class ConfiguredRepositories
         return strpbrk($configured, '~$') === false && self::localKey($configured) === self::localKey($source);
     }
 
-    /** Host without port, and path: one key over https and ssh alike. Null for a local path. */
+    /** The host without its port, and the path: one key for https and ssh alike. Null for a local path. */
     private static function remoteKey(string $url): ?string
     {
         $parts = preg_match('{^[A-Za-z]:[\\\\/]}', $url) === 1 ? null : RepoLocator::hostAndPath($url);
@@ -294,7 +294,7 @@ final class ConfiguredRepositories
         return (string) preg_replace('{/\.git$}', '', rtrim(str_replace('\\', '/', $path), '/'));
     }
 
-    /** Whether a local dist file lies inside the directory. Null for a `~` or a variable, which lockrot does not expand. */
+    /** Whether a local dist file lies inside $directory. Null when $directory names `~` or a variable, which lockrot does not expand. */
     private static function inside(string $directory, ?string $file): ?bool
     {
         if (strpbrk($directory, '~$') !== false) {

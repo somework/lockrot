@@ -31,7 +31,7 @@ final class Explanation
     private string $targetPhp;
     private Report $report;
     private ?string $projectPhp;
-    /** Built from the same target and project php as S8's floor ({@see \Lockrot\Signal\SignalSet::default()}). */
+    /** Must be built from the same target and project php as S8's floor ({@see \Lockrot\Signal\SignalSet::default()}). */
     private PhpFloor $floor;
 
     /**

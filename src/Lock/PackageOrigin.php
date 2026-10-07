@@ -25,7 +25,7 @@ final class PackageOrigin
     /** What the schemas list in `x-known-values`. It is not the order that {@see of()} decides in. */
     public const KINDS = [self::PACKAGIST, self::COMPOSER, self::PATH, self::VCS, self::ARTIFACT, self::PACKAGE, self::UNKNOWN];
 
-    /** The registries that lockrot names, by the host of a notification-url. No other host is written. */
+    /** The registries that lockrot names, by the host of a notification-url. lockrot writes no other host. */
     public const REGISTRIES = ['packagist.org', 'repo.packagist.com', 'wp-packages.org', 'packages.drupal.org'];
 
     /** The registries that keep a public page per package name. */

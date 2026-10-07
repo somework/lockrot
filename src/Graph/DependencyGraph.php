@@ -78,7 +78,8 @@ final class DependencyGraph
 
     /**
      * Each direct requirement that reaches $target, with a shortest chain from it to $target, keyed
-     * and sorted by name. A direct package maps to itself with a one-element chain.
+     * and sorted by name. A $target that is a direct requirement maps to itself with a one-element
+     * chain.
      *
      * Do not rebuild a finding's chain from this method: with several equally short paths from one
      * root, its single-source tree can pick a different one than {@see shortestChain()}.

@@ -11,8 +11,8 @@ use Lockrot\Exception\ConfigException;
  * formats that annotate a line. The scan reads text, because a decoded structure has no lines. It
  * accepts a `"name"` member only at depth 3 inside `packages` or `packages-dev`, because `authors[]`
  * and `extra.thanks.name` hold other names. The depth does not depend on indentation, so a
- * reformatted lock still resolves. A lock with no line breaks yields no lines, and the
- * formats then omit the line number.
+ * reformatted lock still resolves. A `"name"` member that does not stand alone on its line, as in a
+ * minified lock, yields no line, and the formats then omit the line number.
  *
  * @internal
  */

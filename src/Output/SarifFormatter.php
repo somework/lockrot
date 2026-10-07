@@ -34,7 +34,8 @@ final class SarifFormatter implements FormatterInterface
     private const RANK_STEP = 25.0;
 
     /**
-     * The rule text per verdict, as {short, full}: docs/verdicts.md#the-nine-verdicts.
+     * The rule text per verdict, as {short, full}, that a code-scanning alert shows. Keep it true to
+     * docs/verdicts.md#the-nine-verdicts: no test compares the two.
      *
      * @var array<string, array{0: string, 1: string}>
      */
@@ -251,7 +252,7 @@ final class SarifFormatter implements FormatterInterface
     {
         // PRESERVE_ZERO_FRACTION writes `rank` as 100.0, not 100, the float that SARIF types it as.
         $json = JsonWriter::encode($document, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_PRESERVE_ZERO_FRACTION);
-        // Report data always encodes. This guard keeps a failure from becoming the string "false".
+        // Report data always encodes. Without this guard, a failure prints an empty document.
         if ($json === null) {
             throw new \RuntimeException('Cannot encode report as SARIF: '.json_last_error_msg());
         }

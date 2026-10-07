@@ -10,6 +10,7 @@ use Lockrot\Exception\ConfigException;
 interface SignatureVerifierInterface
 {
     /**
+     * @param string $archive       the bytes of the downloaded archive, not a path
      * @param string $signatureFile the body of the release's `lockrot.phar.sig.json`
      * @param string $signatureUrl  where the signature came from, for the message
      *

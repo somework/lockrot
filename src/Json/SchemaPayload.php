@@ -12,8 +12,7 @@ use Lockrot\Exception\ConfigException;
  * and `json_decode()` hides a key that starts with a NUL byte (the decode returns null) and throws
  * on a number too large for a float. Here the key is a ConfigException, and the number (INF)
  * reaches the schema, which rejects it. The top level always becomes an object, so a caller must
- * check first that it read an object. Below it, `[]` stays an array and an object passes through
- * unchanged.
+ * check first that it read an object. Below it, `[]` stays an array.
  *
  * @internal
  */

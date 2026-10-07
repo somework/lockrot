@@ -65,8 +65,8 @@ final class PharUpdater
     }
 
     /**
-     * @return string|null the message to report, or null when the running build is current and
-     *                     nothing was downloaded, written or replaced
+     * @return string|null the message to report, or null when $release is not newer and $force is
+     *                     false: nothing was downloaded, written or replaced
      *
      * @throws ConfigException on every failure, with the running PHAR untouched
      */
@@ -229,8 +229,9 @@ final class PharUpdater
     }
 
     /**
-     * Reads the first 64-hex token of the `.sha256` file: the name after the hash in its
-     * `sha256sum` output is not stable across releases.
+     * Reads the first 64-hex token of the `.sha256` file: the name after the hash is not stable
+     * across releases. The archive is the download from the URL that the same release lists, so
+     * the name is not needed.
      */
     private static function expectedHash(string $checksumFile, string $url): string
     {

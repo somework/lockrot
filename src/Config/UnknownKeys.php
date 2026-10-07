@@ -48,7 +48,8 @@ final class UnknownKeys
     public const RESERVED_PREFIX = 'x-';
 
     /**
-     * A shorter key is in too many known keys to say which was meant: `on` is in `fail-on`.
+     * The substring rule skips a shorter key: it is in too many known keys to say which was meant
+     * (`on` is in `fail-on`).
      */
     private const MIN_SUBSTRING = 3;
 

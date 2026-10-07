@@ -19,7 +19,7 @@ use Lockrot\Lock\LockedPackage;
  */
 final class MonorepoParents
 {
-    /** @var array<string, list<string>> parent package name => the packages that the snapshot lists for it */
+    /** @var array<string, list<string>> parent package name => the packages that resources/monorepo-parents.json lists for it */
     private array $candidates;
 
     /** @param array<string, list<string>> $candidates */
