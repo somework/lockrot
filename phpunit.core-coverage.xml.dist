@@ -16,6 +16,7 @@
         <include>
             <directory>src/Verdict</directory>
             <directory>src/Signal</directory>
+            <directory>src/Security</directory>
             <directory>src/Analyzer</directory>
             <directory>src/Data/Repository</directory>
             <directory>src/Data/Forge</directory>
