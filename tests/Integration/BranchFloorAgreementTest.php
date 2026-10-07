@@ -213,8 +213,8 @@ final class BranchFloorAgreementTest extends TestCase
     {
         $clock = Clock::fixed(self::NOW);
         $auth = ForgeAuth::withTokens(new Tokens('recorded', null));
-        // Offline: S8 reads only the repository metadata, and a fixture without recorded forge
-        // envelopes would only add S10 rows.
+        // Offline: S8 reads only the repository metadata. If a fixture has no recorded forge
+        // envelopes, the analysis will only add S10 rows.
         $analyzer = new Analyzer(
             $loader,
             new ActivityClient(new RecordedHttpClient(self::FIXTURES.'http/github'), $auth),

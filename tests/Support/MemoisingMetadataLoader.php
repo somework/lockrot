@@ -8,14 +8,11 @@ use Lockrot\Data\Repository\MetadataBatch;
 use Lockrot\Data\Repository\MetadataLoaderInterface;
 
 /**
- * A loader that asks the one behind it for a package once and remembers the answer.
- *
- * `LockrotCommandTest` runs the command end to end over a large real lock. Fetching every package
- * from the fixture HTTP server again in each test is slow, and mutation testing pays that cost once
- * per mutant, because it re-runs the covering tests for every mutated line. Remembering weakens
- * nothing: the fixture server is static, the clock is fixed, and the loader has its own tests that
- * fetch for real. The memory is per package name, so a run that asks for other names (`--no-dev`,
- * an `--explain` of one package) fetches only the rest.
+ * Asks the loader behind it for each package once: `LockrotCommandTest` runs over a large real lock,
+ * and mutation testing re-runs it for every mutant. Remembering weakens nothing: the fixture server
+ * is static, the clock is fixed, and the loader has its own tests that fetch for real. The memory is
+ * per package name, so a run that asks for other names (`--no-dev`, an `--explain` of one package)
+ * fetches only the rest.
  */
 final class MemoisingMetadataLoader implements MetadataLoaderInterface
 {
