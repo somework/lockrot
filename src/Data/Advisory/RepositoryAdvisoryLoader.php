@@ -59,6 +59,10 @@ final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
         }
         $whyUnreadable = $this->ignore->whyUnreadable();
         $notes = $whyUnreadable === null ? [] : [RunNote::advisoryIgnoreUnreadable($whyUnreadable)];
+        $disabledBy = $this->ignore->disabledBy();
+        if ($disabledBy !== null) {
+            $notes[] = RunNote::advisoriesDisabledByPolicy($disabledBy['policy_key'], $disabledBy['value']);
+        }
         $outside = $this->scope === AdvisoryCoverage::SCOPE_COMPOSER_REPOSITORIES ? array_fill_keys($notFromComposerRepository, true) : [];
         $asked = array_diff_key($versionByName, $outside);
 
@@ -83,10 +87,6 @@ final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
      */
     private function notAskedReason(array $asked): ?array
     {
-        $disabledBy = $this->ignore->disabledBy();
-        if ($disabledBy !== null) {
-            return [AdvisoryCoverage::DISABLED_BY_POLICY, RunNote::advisoriesDisabledByPolicy($disabledBy['policy_key'], $disabledBy['value'])];
-        }
         if ($this->offline) {
             return [AdvisoryCoverage::OFFLINE, RunNote::advisoriesNotChecked(RunNote::ADVISORIES_OFFLINE, 0)];
         }
@@ -241,8 +241,11 @@ final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
             $installed = isset($outside[$name]) ? null : $this->normalized($versionByName[$name] ?? null);
             $versions = $installed === null ? [] : array_merge([$installed], $aliasVersionsByName[$name] ?? []);
             foreach ($byId as $copies) {
-                if ($this->ignore->match($name, $copies[0]) === null) {
-                    $kept[$name][] = Advisory::fromComposer($copies[0]);
+                foreach ($copies as $copy) {
+                    if ($this->ignore->match($name, $copy) === null) {
+                        $kept[$name][] = Advisory::fromComposer($copy);
+                        break;
+                    }
                 }
                 // Composer's Auditor judges each repository's record on its own: one that no rule
                 // ignores is reported, whatever another repository's record of the id says.
@@ -309,7 +312,7 @@ final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
         foreach ($versionByName as $name => $version) {
             $name = (string) $name;
             $byName[$name] = isset($outside[$name])
-                ? self::outsideCoverage($repositories, $notAsked)
+                ? self::outsideCoverage($repositories)
                 : $this->nameCoverage($name, $version, $repositories, $answers, $notAsked);
         }
         $other = \count($this->repositories) - \count($repositories);
@@ -318,16 +321,16 @@ final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
     }
 
     /** @param list<array{composer_repository: string, outcome: string, reason: ?string, message: ?string, records: ?int, packages_with_records: ?int}> $repositories */
-    private static function outsideCoverage(array $repositories, ?string $notAsked): AdvisoryNameCoverage
+    private static function outsideCoverage(array $repositories): AdvisoryNameCoverage
     {
         $feeds = [];
         foreach ($repositories as $repository) {
-            if (\in_array($repository['outcome'], [AdvisoryCoverage::ANSWERED, AdvisoryCoverage::FAILED], true)) {
+            if ($repository['outcome'] !== AdvisoryCoverage::NO_FEED) {
                 $feeds[] = ['composer_repository' => $repository['composer_repository'], 'answer' => AdvisoryCoverage::NOT_ASKED, 'reason' => AdvisoryCoverage::NOT_FROM_COMPOSER_REPOSITORY, 'message' => null, 'records' => null];
             }
         }
 
-        return new AdvisoryNameCoverage($feeds, null, $notAsked === AdvisoryCoverage::DISABLED_BY_POLICY ? $notAsked : AdvisoryCoverage::NOT_FROM_COMPOSER_REPOSITORY);
+        return new AdvisoryNameCoverage($feeds, null, AdvisoryCoverage::NOT_FROM_COMPOSER_REPOSITORY);
     }
 
     /**

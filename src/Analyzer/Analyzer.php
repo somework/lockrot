@@ -268,7 +268,7 @@ final class Analyzer
         $outside = [];
         $aliasVersions = [];
         foreach ($packages as $package) {
-            $versionByName[$package->name()] = $package->version();
+            $versionByName[$package->name()] = $package->normalizedVersion() ?? $package->version();
             if (!$package->isFromComposerRepository()) {
                 $outside[] = $package->name();
             }

@@ -339,8 +339,8 @@ the field. A non-empty list, the `no fix expected` clause and the `no_fix_expect
 - **Accepted advisories.** Silence an advisory where `composer audit` silences it:
   `config.policy.advisories` (`ignore-id`, `ignore`, `ignore-severity`) on Composer 2.10 and later,
   `config.audit.ignore` from 2.6 and `config.audit.ignore-severity` from 2.9. What audit drops on
-  the Composer that runs lockrot, lockrot drops. When Composer rejects the policy section, lockrot ignores no advisory and says so in a
-  [note](notes.md#advisory_ignore_unreadable).
+  the Composer that runs lockrot, lockrot drops. When Composer rejects the policy section, lockrot
+  ignores no advisory and says so in a [note](notes.md#advisory_ignore_unreadable).
 
 - **Baseline.** The [baseline](baseline.md) stays keyed on the verdict, so a baselined finding is
   `known` whatever S9 adds to its priority.

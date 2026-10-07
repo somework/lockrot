@@ -27,6 +27,7 @@ final class LockedPackage
     private $abandonedInLock;
     /** @var list<string> */
     private array $aliasVersions = [];
+    private ?string $normalizedVersion = null;
 
     /**
      * @param list<string> $requires
@@ -82,7 +83,7 @@ final class LockedPackage
             $repositoryUrl = SupportSource::url($package->getSupport());
         }
 
-        return new self(
+        $locked = new self(
             $package->getName(),
             $package->getPrettyVersion(),
             $time,
@@ -94,6 +95,9 @@ final class LockedPackage
             $dev,
             $package->isAbandoned() ? ($package->getReplacementPackage() ?? true) : false
         );
+        $locked->normalizedVersion = $package->getVersion();
+
+        return $locked;
     }
 
     public function name(): string
@@ -145,6 +149,13 @@ final class LockedPackage
 
         return $copy;
     }
+
+    /** The version Composer matches advisories on: the lock's `version_normalized`, null for a package built without a loader. */
+    public function normalizedVersion(): ?string
+    {
+        return $this->normalizedVersion;
+    }
+
     /**
      * The normalised versions of the aliases that Composer's loader builds for the entry
      * (`extra.branch-alias`, `default-branch`). `composer audit` matches an advisory against them too.

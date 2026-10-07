@@ -10,16 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Verdict changes
 
 - **All formats:** a package installed from vcs or a path can now be `vulnerable`, because its name
-  is asked for advisories (see Security).
+  is asked for advisories (see Security), so `--fail-on` can fail where 0.13 passed. Action: set
+  `extra.lockrot.advisory-lookup` to `composer-repositories` to keep 0.13's boundary.
   ([Which advisories count](docs/verdicts.md#which-advisories-count))
 - **All formats:** lockrot reads Composer's abandoned ignore list (`config.policy.abandoned.ignore`
   on Composer 2.10+, else `config.audit.ignore-abandoned` from 2.9), as `composer audit` does: a
   listed package's abandoned marking no longer counts. An archived repository still does.
   ([Abandoned](docs/verdicts.md#abandoned))
-- **All formats:** when Composer's policy turns advisories off (`config.policy: false`,
-  `policy.advisories: false`, `policy.advisories.audit: ignore` or `COMPOSER_POLICY=0`), lockrot
-  asks no repository and raises no S9, and the note `advisories_disabled_by_policy` says so.
-  ([Run notes](docs/notes.md#advisories_disabled_by_policy))
 - **All formats:** a package marked abandoned only in `composer.lock` no longer carries S10 for its
   repository activity: S1 decides it, as for a package that its repository marks. So
   `--fail-on=unchecked` can pass where 0.13 failed.
@@ -32,6 +29,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   tell now reach each Composer repository that publishes advisories. Action: set
   `extra.lockrot.advisory-lookup` to `composer-repositories` to keep 0.13's boundary.
   ([What lockrot contacts](https://github.com/somework/lockrot/blob/v0.14.0/SECURITY.md#what-lockrot-does-and-does-not-do))
+
+### Added
+
+- **All formats:** the run note `advisories_disabled_by_policy` names the Composer setting
+  (`config.policy: false`, `policy.advisories: false`, `policy.advisories.audit: ignore` or
+  `COMPOSER_POLICY=0`) that stops Composer from warning about advisories. lockrot still asks, and
+  every advisory still counts. ([Run notes](docs/notes.md#advisories_disabled_by_policy))
 
 ## [0.13.0] - 2026-10-01
 

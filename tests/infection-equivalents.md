@@ -127,7 +127,6 @@ start the reason with `in method():`.
 - `src/Signal/PhpFloor.php` ReturnRemoval `return null;` — in parse(): composer/semver reads null as `""` and throws, and the `catch` returns the same value.
 - `src/Signal/PhpFloor.php` ReturnRemoval `return [null, null];` — in project(): composer/semver reads null as `""` and throws, and the `catch` returns the same value.
 - `src/Signal/Rule/LeftBehindRule.php` LessThanOrEqualTo `if ($release['at'] === null || !ReleaseBranch::isAbove((string) $key, $branch) || $release['at'] <= $ownAt) {` — a higher branch released at the instant of the installed branch cannot be alive while the installed branch is old enough for S8.
-- `src/Signal/Rule/NotCheckedRule.php` Foreach_ `foreach ($unchecked as $entry) {` — in withoutMaintenanceGaps(): every S10 entry that the rule writes is a maintenance check, so the kept list is empty either way.
 
 ## src/Verdict
 
