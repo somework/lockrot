@@ -1,8 +1,8 @@
 name: CI
-# A pull request runs once, on its pull_request event, so CI does not check a branch with an open
-# PR twice per push. main runs on push for the post-merge record. A release/** push runs the
-# mutation gate over the whole tree. A new push to a PR cancels the run for the old head, because
-# the ruleset waits for the new head's checks. On main, every push keeps its own run.
+# A push runs CI only on main and release/**, so another branch with an open PR runs once per push,
+# on its pull_request event. A push to main or release/** runs the mutation gate over the whole
+# tree. A tag runs phar.yml, not this file. A new push to a PR cancels the run for the old head,
+# because the ruleset waits for the new head's checks. On main, every push keeps its own run.
 on:
   push:
     branches: [main, 'release/**']
@@ -69,22 +69,24 @@ jobs:
         run: vendor/bin/phpunit --coverage-text --only-summary-for-coverage-text
       # coverage-check reads the clover "elements" metric (methods, statements and conditionals), not
       # PHPUnit's line percentage. Some branches cannot run on the runner, for example PharUpdater's
-      # Windows copy(), short-write and chmod-refused branches. Keep the gate some points below the
-      # measured value, so that a new file does not move it.
-      # Measurement: https://github.com/somework/lockrot/commit/238255e817a6f43a84b3f4fb3e484463457a313c
+      # Windows copy(), short-write and chmod-refused branches. Keep the gate about three points below
+      # the measured value, so that a new file does not fail it.
+      # Measurement: https://github.com/somework/lockrot/commit/3700c976d5897e2bef16bc5eb4e05620c557176a
       - name: Core coverage gate
         run: |
           vendor/bin/phpunit -c phpunit.core-coverage.xml.dist --coverage-clover build/clover-core.xml
           composer global require --no-interaction "rregeer/phpunit-coverage-check:^0.3"
           $(composer global config bin-dir --absolute)/coverage-check build/clover-core.xml 94
-  # Mutation testing is a separate job, so a style or type error does not wait for it. Each shard runs
-  # the same configuration over a group of src directories. Each shard has its own minimum MSI, one
+  # Mutation testing is a separate job, so a style or type error does not wait for it. One run over
+  # the whole src tree is too slow for one job, so each shard runs the same configuration over a
+  # group of src directories. Each shard has its own minimum MSI, one
   # below a measured covered MSI, because the shards have unequal populations. infection.json5 keeps
   # the whole-tree threshold for a local run. Every directory of src must belong to one shard: a
   # directory in none is never mutated. Measurements: https://github.com/somework/lockrot/pull/65
   #
-  # The full run collects coverage once for all shards, with the PHPUnit groups that infection.json5
-  # passes to Infection. A pull request does not use it: most of its shards mutate nothing.
+  # The full run collects coverage once for all shards. Keep its --exclude-group list equal to
+  # testFrameworkOptions in infection.json5: each shard reads this coverage as its own run's. A pull
+  # request does not use it: most of its shards mutate nothing.
   mutation-coverage:
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
@@ -102,7 +104,8 @@ jobs:
     if: ${{ !cancelled() && needs.mutation-coverage.result != 'failure' }}
     runs-on: ubuntu-latest
     # Keep the cap far above a shard's run time: a slow runner cancels a green shard. The cap only
-    # stops a runaway run. Measurements: https://github.com/somework/lockrot/pull/6, /pull/10
+    # stops a runaway run. Measurements: https://github.com/somework/lockrot/pull/6 and
+    # https://github.com/somework/lockrot/pull/10
     timeout-minutes: 50
     strategy:
       fail-fast: false
@@ -206,13 +209,14 @@ jobs:
         with: {python-version-file: .python-version, cache: pip, cache-dependency-path: docs/requirements.txt}
       - run: pip install -r docs/requirements.txt
       - run: mkdocs build --strict
-      # .claude/rules/ loads into every AI session that works on this repository: hold it to the
-      # budget that https://github.com/somework/lockrot/pull/66 set.
-      - name: .claude/rules/ stays within 440 lines
+      # AI sessions on this repository load .claude/rules/. Hold it to the budget that
+      # https://github.com/somework/lockrot/pull/66 set.
+      - name: .claude/rules/ stays within its line budget
+        env: {BUDGET: '440'}
         run: |
           lines=$(find .claude/rules -name '*.md' -exec cat {} + | wc -l)
-          echo "$lines of 440 lines in .claude/rules/"
-          test "$lines" -le 440
+          echo "$lines of $BUDGET lines in .claude/rules/"
+          test "$lines" -le "$BUDGET"
   # This job proves that the corpus checks read lockrot's output at all. Every problem key that a
   # check can emit has a recorded document mutated to emit that key, or a reason why no mutation can
   # reach it. The recorded pages are frozen, so a reworded sentence in src/Output/ shows as
