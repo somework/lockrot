@@ -48,6 +48,7 @@ final class AnalyzerGradeTest extends TestCase
         yield 'a release outside the range fixes the advisory' => ['vendor/update', 'medium', null, 8];
         yield 'no release fixes the advisory: it counts twice' => ['vendor/none', 'high', null, 16];
         yield 'the fixing release needs a PHP that the target does not run: it counts twice' => ['vendor/blocked', 'high', null, 16];
+        yield 'the advisory with the most points decides' => ['vendor/two', 'high', null, 16];
         yield 'no release metadata' => ['vendor/absent', 'unknown', null, 0];
         yield 'an entry accepts the whole package' => ['vendor/accepted', 'finished', null, 0];
         yield 'packages-dev halves the whole score' => ['vendor/devtool', 'medium', null, 8];
@@ -77,11 +78,12 @@ final class AnalyzerGradeTest extends TestCase
                 self::locked('vendor/accepted'),
                 self::locked('vendor/orphan'),
                 self::locked('vendor/stale'),
+                self::locked('vendor/two'),
             ],
             'packages-dev' => [self::locked('vendor/devtool')],
         ]);
         $project = ProjectConfig::fromArray([
-            'require' => ['vendor/update' => '^1.0', 'vendor/none' => '^1.0', 'vendor/blocked' => '^1.0', 'vendor/absent' => '^1.0', 'vendor/accepted' => '^1.0', 'vendor/stale' => '^1.0'],
+            'require' => ['vendor/update' => '^1.0', 'vendor/none' => '^1.0', 'vendor/blocked' => '^1.0', 'vendor/absent' => '^1.0', 'vendor/accepted' => '^1.0', 'vendor/stale' => '^1.0', 'vendor/two' => '^1.0'],
             'require-dev' => ['vendor/devtool' => '^1.0'],
         ]);
         $metadata = [
@@ -91,6 +93,7 @@ final class AnalyzerGradeTest extends TestCase
             'vendor/accepted' => self::metadata('vendor/accepted', [['1.0.0', null, self::OLD]]),
             'vendor/orphan' => self::metadata('vendor/orphan', [['1.0.0', null, self::OLD]]),
             'vendor/stale' => self::metadata('vendor/stale', [['1.0.0', null, self::OLD]]),
+            'vendor/two' => self::metadata('vendor/two', [['1.0.0', null, self::RECENT], ['1.1.0', null, self::RECENT]]),
             'vendor/devtool' => self::metadata('vendor/devtool', [['1.0.0', null, self::RECENT], ['1.1.0', null, self::RECENT]]),
         ];
         $advisories = new AdvisoryBatch([
@@ -98,6 +101,7 @@ final class AnalyzerGradeTest extends TestCase
             'vendor/none' => [self::advisory('PKSA-none', 'medium', '<2.0.0')],
             'vendor/blocked' => [self::advisory('PKSA-blocked', 'medium', '<1.1.0')],
             'vendor/devtool' => [self::advisory('PKSA-dev', 'high', '<1.1.0')],
+            'vendor/two' => [self::advisory('PKSA-two-low', 'low', '<1.1.0'), self::advisory('PKSA-two-high', 'high', '<1.1.0')],
         ]);
         $clock = Clock::fixed(self::NOW);
         $auth = ForgeAuth::withTokens(new Tokens('t', null));

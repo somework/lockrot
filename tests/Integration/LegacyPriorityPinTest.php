@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Integration;
 
+use Composer\Repository\AdvisoryProviderInterface;
 use Lockrot\Allowlist\BuiltinAllowlist;
 use Lockrot\Analyzer\Analyzer;
 use Lockrot\Clock;
@@ -42,6 +43,9 @@ final class LegacyPriorityPinTest extends TestCase
 
     public static function setUpBeforeClass(): void
     {
+        if (!interface_exists(AdvisoryProviderInterface::class)) {
+            self::markTestSkipped('Composer 2.2 has no advisory API, and the pins were recorded with advisories.');
+        }
         $locks = array_map(static fn (string $dir): string => $dir.'/composer.lock', self::dirs());
         self::$server = FixtureRepositoryServer::fromLockFiles($locks);
         $served = [];

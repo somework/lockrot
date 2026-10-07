@@ -759,6 +759,13 @@ final class FindingTest extends TestCase
         self::assertNull($finding->lead());
     }
 
+    public function testAFindingBuiltWithItsFlagsReadsItsMaintenanceAsJudged(): void
+    {
+        $finding = new Finding('vendor/pkg', '1.0.0', Verdict::OK, [], ['vendor/pkg'], null, null, null, false, [], null, null, null, FlagSet::fromSignals([], null, []));
+
+        self::assertSame('ok', $finding->grade());
+    }
+
     public function testWithSignalsKeepsTheScore(): void
     {
         $signals = [new Signal(Signal::S8, Signal::LEVEL_WARN, 'left behind')];
