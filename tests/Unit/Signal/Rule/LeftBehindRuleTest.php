@@ -423,4 +423,77 @@ final class LeftBehindRuleTest extends TestCase
         self::assertSame('>=7.2', $signal->data()['newest_php']);
         self::assertSame('^2.0', $signal->data()['suggested_constraint']);
     }
+
+    /**
+     * The S8 keys that report-2 adds (SPEC-0.14 2.1): computed here, not written, because
+     * report-1's S8 is closed.
+     */
+    public function testTheReadingCarriesTheReachableBranchsPhpAndWhatAdmitsIt(): void
+    {
+        $meta = F::metadata([['3.4.1', '2026-06-01', '>=8.4'], ['2.9.0', '2026-03-01', '>=7.4'], ['1.9.2', '2019-03-02', '>=7.1']]);
+        $facts = F::facts(F::package(['version' => '1.9.2']), $meta);
+
+        $reading = $this->rule(new PhpFloor('8.4', '>=8.1'))->reading($facts);
+
+        self::assertNotNull($reading);
+        self::assertSame('>=7.4', $reading->reachablePhp());
+        self::assertSame(['project' => true, 'target' => true], $reading->reachableAdmits());
+        self::assertSame('2.x', $reading->signal()->data()['reachable_branch']);
+    }
+
+    public function testTheReachableAdmitsAnswersEachFloorOnItsOwn(): void
+    {
+        $meta = F::metadata([['2.9.0', '2026-03-01', '>=7.4 <8.4'], ['1.9.2', '2019-03-02', '>=7.1']]);
+        $facts = F::facts(F::package(['version' => '1.9.2']), $meta);
+
+        $reading = $this->rule(new PhpFloor('8.3', null))->reading($facts);
+
+        self::assertNotNull($reading);
+        self::assertSame(['project' => null, 'target' => true], $reading->reachableAdmits(), 'no require.php gives no answer, never "admitted"');
+    }
+
+    public function testTheReadingCarriesTheAgesOfTheNewestAndTheReachableBranch(): void
+    {
+        $meta = F::metadata([['3.4.1', '2026-06-01', '>=8.5'], ['2.9.0', '2025-09-14', '>=7.4'], ['1.9.2', '2019-03-02', '>=7.1']]);
+        $facts = F::facts(F::package(['version' => '1.9.2']), $meta);
+
+        $reading = $this->rule(new PhpFloor('8.4', '>=8.1'))->reading($facts);
+
+        self::assertNotNull($reading);
+        self::assertSame(0.3, $reading->newestYears());
+        self::assertSame(1.0, $reading->reachableYears());
+        self::assertSame('2.x', $reading->signal()->data()['reachable_branch']);
+        self::assertSame('3.x', $reading->signal()->data()['newest_branch']);
+    }
+
+    public function testWithNoReachableBranchItsKeysAreNull(): void
+    {
+        $meta = F::metadata([['3.4.1', '2026-06-01', '>=8.5'], ['1.9.2', '2019-03-02', '>=7.1']]);
+        $facts = F::facts(F::package(['version' => '1.9.2']), $meta);
+
+        $reading = $this->rule(new PhpFloor('8.4', '>=8.1'))->reading($facts);
+
+        self::assertNotNull($reading);
+        self::assertNull($reading->reachablePhp());
+        self::assertNull($reading->reachableAdmits());
+        self::assertNull($reading->reachableYears());
+        self::assertSame(0.3, $reading->newestYears());
+    }
+
+    /** report-1's strict twin closes S8's data: the new keys stay out of the signal. */
+    public function testTheSignalIsTheReadingsAndWritesNoNewKey(): void
+    {
+        $meta = F::metadata([['3.4.1', '2026-06-01', '>=8.4'], ['1.9.2', '2019-03-02', '>=7.1']]);
+        $facts = F::facts(F::package(['version' => '1.9.2']), $meta);
+        $rule = $this->rule(new PhpFloor('8.4', '>=8.1'));
+
+        $reading = $rule->reading($facts);
+
+        self::assertNotNull($reading);
+        self::assertEquals($rule->evaluate($facts), $reading->signal());
+        foreach (['reachable_php', 'reachable_admits', 'newest_years', 'reachable_years'] as $key) {
+            self::assertArrayNotHasKey($key, $reading->signal()->data());
+        }
+        self::assertNull($rule->reading(F::facts(F::package(['version' => '3.4.1']), $meta)));
+    }
 }

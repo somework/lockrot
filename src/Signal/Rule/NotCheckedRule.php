@@ -63,6 +63,22 @@ final class NotCheckedRule implements SignalRule
     }
 
     /**
+     * The S10 entry for release data that a repository listing the package did not serve, beside a
+     * counted advisory: every fix is unknown then (SPEC-0.14 5.5). report-1's S10 has no `releases`
+     * check, so {@see evaluate()} leaves it out and report-2 adds it.
+     *
+     * @return array{check: string, reason: string, blocks: list<string>}|null
+     */
+    public static function releasesUnchecked(PackageFacts $facts): ?array
+    {
+        if ($facts->advisories() === [] || $facts->metadataStatus() !== PackageFacts::METADATA_UNAVAILABLE) {
+            return null;
+        }
+
+        return ['check' => 'releases', 'reason' => 'releases_unknown', 'blocks' => [Signal::S9]];
+    }
+
+    /**
      * The signals with S10's maintenance entries dropped, and S10 with them when nothing is left.
      * An S10 entry for any other check stays: a raised S1 decides nothing about it
      * (docs/verdicts.md#what-was-not-checked).

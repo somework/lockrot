@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Signal\Rule;
 
+use Lockrot\Data\Advisory\Advisory;
 use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\Rule\NotCheckedRule;
@@ -165,5 +166,38 @@ final class NotCheckedRuleTest extends TestCase
         self::assertCount(1, $kept);
         self::assertSame('advisories not checked (offline), so S9 could not be read', $kept[0]->summary());
         self::assertSame(['unchecked' => [['check' => 'advisories', 'reason' => 'offline', 'blocks' => ['S9']]], 'blocks' => ['S9']], $kept[0]->data());
+    }
+
+    /**
+     * SPEC-0.14 5.5: release data that a Composer repository listing the package did not serve
+     * leaves every fix unknown, so S9 is incomplete. Computed here, written by report-2 only:
+     * report-1's S10 `check` list has no `releases`.
+     */
+    public function testUnservedReleaseDataBesideACountedAdvisoryIsAReleasesGap(): void
+    {
+        $advisory = new Advisory('PKSA-1', null, null, null, 'high', null, null);
+        $unavailable = new PackageFacts(F::package(), null, null, [$advisory], null, null, null, true);
+
+        self::assertSame(['check' => 'releases', 'reason' => 'releases_unknown', 'blocks' => [Signal::S9]], NotCheckedRule::releasesUnchecked($unavailable));
+        self::assertSame(PackageFacts::METADATA_UNAVAILABLE, $unavailable->metadataStatus());
+        self::assertNull($this->rule()->evaluate($unavailable), 'the signal itself does not carry it');
+    }
+
+    /** @dataProvider noReleasesGap */
+    #[DataProvider('noReleasesGap')]
+    public function testNoOtherMetadataStatusIsAReleasesGap(PackageFacts $facts, string $status): void
+    {
+        self::assertSame($status, $facts->metadataStatus());
+        self::assertNull(NotCheckedRule::releasesUnchecked($facts));
+    }
+
+    /** @return iterable<string, array{PackageFacts, string}> */
+    public static function noReleasesGap(): iterable
+    {
+        $advisory = new Advisory('PKSA-1', null, null, null, 'high', null, null);
+        yield 'read' => [new PackageFacts(F::package(), self::dated(), null, [$advisory]), PackageFacts::METADATA_READ];
+        yield 'not found' => [new PackageFacts(F::package(), null, null, [$advisory]), PackageFacts::METADATA_NOT_FOUND];
+        yield 'not from a Composer repository' => [new PackageFacts(F::package(['fromComposerRepository' => false]), null, null, [$advisory], null, null, null, true), PackageFacts::METADATA_NOT_FROM_COMPOSER_REPOSITORY];
+        yield 'unavailable with no counted advisory' => [new PackageFacts(F::package(), null, null, [], null, null, null, true), PackageFacts::METADATA_UNAVAILABLE];
     }
 }
