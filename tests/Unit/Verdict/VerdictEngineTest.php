@@ -18,7 +18,7 @@ final class VerdictEngineTest extends TestCase
      * @dataProvider cases
      */
     #[DataProvider('cases')]
-    public function testDecide(array $signals, bool $allowlisted, bool $hasData, string $expected): void
+    public function testDecideGivesTheVerdictOfEachSignalSet(array $signals, bool $allowlisted, bool $hasData, string $expected): void
     {
         self::assertSame($expected, (new VerdictEngine())->decide($signals, $allowlisted, $hasData));
     }
@@ -51,7 +51,7 @@ final class VerdictEngineTest extends TestCase
         yield 'old-promise beats stale' => [[$s('S5', $w), $s('S2', $w)], false, true, Verdict::OLD_PROMISE];
         yield 'silent beats pinned' => [[$s('S2', $h), $s('S4', $h), $s('S6', $w)], false, true, Verdict::SILENT];
         yield 'lock-only signals without data still verdict' => [[$s('S6', $w)], false, false, Verdict::PINNED];
-        // S7 describes what a package pulls in; it never decides what the package itself is.
+        // S7 describes what a package pulls in. It never decides what the package itself is.
         yield 'S7 alone is ok' => [[$s('S7', Signal::LEVEL_INFO)], false, true, Verdict::OK];
         yield 'S7 without data is still unknown' => [[$s('S7', Signal::LEVEL_INFO)], false, false, Verdict::UNKNOWN];
         yield 'S7 next to stale stays stale' => [[$s('S2', $w), $s('S7', Signal::LEVEL_INFO)], false, true, Verdict::STALE];
@@ -59,7 +59,7 @@ final class VerdictEngineTest extends TestCase
         yield 'duplicate S2 signal ids: last one wins' => [[$s('S2', $w), $s('S2', $h), $s('S4', $h)], false, true, Verdict::SILENT];
     }
 
-    public function testSeverityOrderAndFlagged(): void
+    public function testTheSeverityOrderRanksEveryVerdictAndMarksTheFlaggedOnes(): void
     {
         self::assertGreaterThan(Verdict::severity(Verdict::SILENT), Verdict::severity(Verdict::ABANDONED));
         self::assertGreaterThan(Verdict::severity(Verdict::PINNED), Verdict::severity(Verdict::SILENT));

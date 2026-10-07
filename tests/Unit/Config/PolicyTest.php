@@ -35,12 +35,12 @@ final class PolicyTest extends TestCase
         return LockrotConfig::fromSources([], [], ['fail-on' => $failOn, 'strict-network' => $strict], '8.4.0', null);
     }
 
-    public function testNoneNeverFails(): void
+    public function testFailOnNoneNeverFails(): void
     {
         self::assertSame(0, Policy::exitCode($this->report([Verdict::ABANDONED]), $this->config('none')));
     }
 
-    public function testThresholdInclusive(): void
+    public function testAVerdictThresholdFailsOnItsOwnVerdictAndAbove(): void
     {
         self::assertSame(1, Policy::exitCode($this->report([Verdict::SILENT]), $this->config('silent')));
         self::assertSame(1, Policy::exitCode($this->report([Verdict::ABANDONED]), $this->config('silent')));
@@ -80,7 +80,7 @@ final class PolicyTest extends TestCase
         self::assertSame(1, Policy::exitCode($report, $this->config('medium')), 'a/fresh is new and medium');
     }
 
-    public function testStrictNetwork(): void
+    public function testStrictNetworkFailsARunWithAFailedLookup(): void
     {
         self::assertSame(0, Policy::exitCode($this->report([], true), $this->config('none')));
         self::assertSame(1, Policy::exitCode($this->report([], true), $this->config('none', true)));
