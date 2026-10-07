@@ -22,6 +22,8 @@
 # recipe. The release workflow pins it with `tools: composer:<version>` in .github/workflows/phar.yml,
 # and the script prints the version that it ran with. PHP only runs Box: the phar-reproducible job
 # in .github/workflows/ci.yml rebuilds on another PHP and compares the bytes.
+# composer.json stays in the archive for byte parity with earlier archives, although nothing reads
+# it at runtime.
 set -euo pipefail
 # Set unconditionally: a value that the caller exported (common with path repositories) changes
 # installed.php and the hash.

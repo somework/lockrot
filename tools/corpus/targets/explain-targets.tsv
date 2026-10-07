@@ -1,11 +1,10 @@
 # The explain targets: one (project, package) pair per line, tab separated.
 #
-# Hand-picked on 2026-09-23 out of the 4,124 findings of the 39-project corpus, chosen to span all
-# nine verdicts, all five priorities and all ten signals S1-S10 across 24 of the 39 projects. There
-# is no generator and there cannot be one: regenerating the list from a run's findings would reduce
-# it to whatever the corpus happens to contain that day, which is the opposite of what it is for.
+# Hand-picked to span every verdict, every priority and every signal. There is no generator and
+# there cannot be one: a list regenerated from a run's findings holds only what the corpus contains
+# that day, the opposite of what it is for.
 #
-# It decays, because a refreshed corpus may no longer install the package a line names. That decay
+# It decays, because a refreshed corpus can drop the package that a line names. That decay
 # is meant to be read, not guessed at: `corpus explain` records every target it could not render,
 # and `corpus check` reports the pairs it did not get.
 BookStackApp_BookStack	socialiteproviders/discord

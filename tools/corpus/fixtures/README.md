@@ -19,7 +19,7 @@ this fixture happens to need, because `replaces` is a union over every version e
 shared-commit rule counts tags — a parent with a hand-picked version list would answer differently
 from the one lockrot reads, which is the one thing a recorded fixture may not do.
 
-## `explain/` — 10 pages and the documents they were rendered from
+## `explain/` — the pages and the documents they were rendered from
 
 One pair per rendered shape, so that every catalogued phrase carrying a minimum has a document to
 match and every check's selector fires at least once. `index.json` says which shape each covers.
