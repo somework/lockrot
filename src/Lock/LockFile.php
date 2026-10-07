@@ -55,8 +55,9 @@ final class LockFile
                         $e->getMessage()
                     ), 0, $e);
                 }
-                // A package that declares extra.branch-alias loads as an alias package. Unwrap it, so
-                // that the entry's own version, require and source fields are read.
+                // A package that declares `extra.branch-alias`, or is a `default-branch`, loads as an
+                // alias package. Unwrap it, so that the entry's own version, require and source fields
+                // are read, and keep the alias version: `composer audit` matches advisories on it.
                 $aliasVersions = [];
                 if ($loaded instanceof AliasPackage) {
                     $aliasVersions[] = $loaded->getVersion();

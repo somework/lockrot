@@ -34,7 +34,6 @@ final class AdvisoryCoverage
     public const OFFLINE = 'offline';
     public const COMPOSER_TOO_OLD = 'composer_too_old';
     public const INSTALL_TIME_BUDGET = 'install_time_budget';
-    public const DISABLED_BY_POLICY = 'disabled_by_policy';
     public const NOT_FROM_COMPOSER_REPOSITORY = 'not_from_composer_repository';
     public const UNPARSEABLE_VERSION = 'unparseable_version';
     public const LOOKUP_FAILED = 'lookup_failed';

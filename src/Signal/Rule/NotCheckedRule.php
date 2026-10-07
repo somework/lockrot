@@ -81,13 +81,17 @@ final class NotCheckedRule implements SignalRule
             }
             /** @var list<array{check: string, reason: string, blocks: list<string>}> $unchecked {@see signalOf()} writes it */
             $unchecked = $signal->data()['unchecked'];
+            // signalOf() joins one summary per entry, in entry order.
+            $summaries = explode('; ', $signal->summary());
             $entries = [];
-            foreach ($unchecked as $entry) {
+            $entrySummaries = [];
+            foreach ($unchecked as $index => $entry) {
                 if (!\in_array($entry['check'], self::MAINTENANCE_CHECKS, true)) {
                     $entries[] = $entry;
+                    $entrySummaries[] = $summaries[$index] ?? self::summaryOf($entry);
                 }
             }
-            $rebuilt = self::signalOf($entries);
+            $rebuilt = self::signalOf($entries, $entrySummaries);
             if ($rebuilt !== null) {
                 $kept[] = $rebuilt;
             }
@@ -96,20 +100,22 @@ final class NotCheckedRule implements SignalRule
         return $kept;
     }
 
-    /** @param list<array{check: string, reason: string, blocks: list<string>}> $unchecked */
-    private static function signalOf(array $unchecked): ?Signal
+    /**
+     * @param list<array{check: string, reason: string, blocks: list<string>}> $unchecked
+     * @param list<string>|null                                                $summaries one per entry, else the rule's own words
+     */
+    private static function signalOf(array $unchecked, ?array $summaries = null): ?Signal
     {
         if ($unchecked === []) {
             return null;
         }
         $blocks = [];
-        $summaries = [];
         foreach ($unchecked as $entry) {
             foreach ($entry['blocks'] as $id) {
                 $blocks[] = $id;
             }
-            $summaries[] = self::summaryOf($entry);
         }
+        $summaries ??= array_map([self::class, 'summaryOf'], $unchecked);
 
         return new Signal(Signal::S10, Signal::LEVEL_INFO, implode('; ', $summaries), ['unchecked' => $unchecked, 'blocks' => $blocks]);
     }
