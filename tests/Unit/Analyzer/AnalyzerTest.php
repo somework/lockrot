@@ -141,7 +141,7 @@ final class AnalyzerTest extends TestCase
                 $this->asked = $asked;
             }
 
-            public function load(array $versionByName): AdvisoryBatch
+            public function load(array $versionByName, array $notFromComposerRepository = []): AdvisoryBatch
             {
                 if ($this->asked !== null) {
                     $this->asked->exchangeArray($versionByName);
@@ -193,7 +193,7 @@ final class AnalyzerTest extends TestCase
 
         $report = $analyzer->analyze($lock, $project, false);
 
-        self::assertSame(['vendor/direct' => '1.0.0'], $asked->getArrayCopy(), 'only Composer-repository packages are asked for');
+        self::assertSame(['vendor/direct' => '1.0.0', 'vendor/local' => '1.0.0'], $asked->getArrayCopy(), 'every package the run checks, whatever its origin');
         $finding = $report->findings()[0];
         self::assertSame('vendor/direct', $finding->package());
         self::assertSame(Verdict::ABANDONED, $finding->verdict());

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Config;
 
 use Lockrot\Config\LockrotConfig;
+use Lockrot\Data\Advisory\AdvisoryCoverage;
 use Lockrot\Exception\ConfigException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -43,6 +44,39 @@ final class LockrotConfigTest extends TestCase
         self::assertFalse($cfg->installTimeStrict());
         self::assertSame(5, $cfg->installTimeBudgetSeconds());
         self::assertNull($cfg->baseline());
+    }
+
+    public function testTheAdvisoryLookupScopeAndWhereItCameFrom(): void
+    {
+        $default = LockrotConfig::fromSources([], [], [], '8.5.10', null);
+        self::assertSame([AdvisoryCoverage::SCOPE_ALL, AdvisoryCoverage::SOURCE_DEFAULT], [$default->advisoryLookup(), $default->advisoryLookupSource()]);
+
+        $all = LockrotConfig::fromSources(['advisory-lookup' => 'all'], [], [], '8.5.10', null);
+        self::assertSame([AdvisoryCoverage::SCOPE_ALL, AdvisoryCoverage::SOURCE_CONFIG], [$all->advisoryLookup(), $all->advisoryLookupSource()], 'the default value, written: from the config');
+
+        $scoped = LockrotConfig::fromSources(['advisory-lookup' => 'composer-repositories'], [], [], '8.5.10', null);
+        self::assertSame([AdvisoryCoverage::SCOPE_COMPOSER_REPOSITORIES, AdvisoryCoverage::SOURCE_CONFIG], [$scoped->advisoryLookup(), $scoped->advisoryLookupSource()]);
+    }
+
+    /**
+     * @param mixed $value
+     *
+     * @dataProvider invalidAdvisoryLookups
+     */
+    #[DataProvider('invalidAdvisoryLookups')]
+    public function testAnAdvisoryLookupOutsideBothValuesNamesThem($value): void
+    {
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('advisory-lookup must be one of all, composer-repositories; got ');
+        LockrotConfig::fromSources(['advisory-lookup' => $value], [], [], '8.5.10', null);
+    }
+
+    /** @return iterable<string, array{mixed}> */
+    public static function invalidAdvisoryLookups(): iterable
+    {
+        yield 'the underscore spelling' => ['composer_repositories'];
+        yield 'an empty string' => [''];
+        yield 'not a string' => [true];
     }
 
     public function testBaselinePathFromExtraAndCliWithCliWinning(): void

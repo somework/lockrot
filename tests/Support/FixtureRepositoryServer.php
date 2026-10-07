@@ -37,6 +37,20 @@ final class FixtureRepositoryServer
         <?php
         header('Connection: close');
         $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && $path === '/api/security-advisories/') {
+            $names = isset($_POST['packages']) && is_array($_POST['packages']) ? array_values($_POST['packages']) : [];
+            file_put_contents(__DIR__.'/advisory-requests.log', json_encode($names)."\n", FILE_APPEND);
+            $known = json_decode((string) @file_get_contents(__DIR__.'/advisories.json'), true);
+            $answer = [];
+            foreach ($names as $name) {
+                if (is_array($known) && array_key_exists($name, $known)) {
+                    $answer[$name] = $known[$name];
+                }
+            }
+            header('Content-Type: application/json');
+            echo json_encode(['advisories' => $answer]);
+            exit;
+        }
         $file = $path === null ? null : __DIR__.$path;
         if ($file === null || !is_file($file)) {
             http_response_code(404);
@@ -114,6 +128,67 @@ final class FixtureRepositoryServer
             $decoded['security-advisories'] = $advisories;
             file_put_contents($file, (string) json_encode($decoded));
         }
+    }
+
+    /**
+     * Turns the fixture into a repository that publishes security advisories through an API, as
+     * packagist.org does: `security-advisories.api-url` in `packages.json`, and a POST route that
+     * answers each requested name found in $advisoriesByName and leaves out every other name. With
+     * no requested name found, the answer is `{"advisories": []}`, a list, as packagist.org sends
+     * it. Each POST is logged for {@see advisoryRequests()}. Call before {@see start()}.
+     *
+     * @param array<string, list<array<string, mixed>>> $advisoriesByName advisory records per package name, `[]` for a name the repository knows with no record
+     * @param list<string>                              $availablePatterns `available-package-patterns`: Composer asks only for the names they match
+     */
+    public function withAdvisoryApi(array $advisoriesByName, array $availablePatterns = []): void
+    {
+        $root = ['metadata-url' => '/p2/%package%.json', 'security-advisories' => ['api-url' => '/api/security-advisories/']];
+        if ($availablePatterns !== []) {
+            $root['available-package-patterns'] = $availablePatterns;
+        }
+        self::writeJson($this->docroot.'/packages.json', $root);
+        self::writeJson($this->docroot.'/advisories.json', (object) $advisoriesByName);
+    }
+
+    /**
+     * {@see withAdvisoryApi()} with the answer that `bin/record-fixtures` recorded for a fixture
+     * directory: every advisory that packagist.org held for each of its locked names.
+     */
+    public function withRecordedAdvisoryApi(string $fixtureDir, string $recordingDir = __DIR__.'/../fixtures/http/advisories'): void
+    {
+        $path = $recordingDir.'/'.basename($fixtureDir).'.json';
+        $raw = is_file($path) ? file_get_contents($path) : false;
+        $result = $raw === false ? null : HttpResult::fromEnvelopeJson('https://packagist.org/api/security-advisories/', $raw);
+        $answer = $result === null || $result->body() === null ? null : json_decode($result->body(), true);
+        if (!\is_array($answer) || !\is_array($answer['advisories'] ?? null)) {
+            throw new \RuntimeException('no recorded advisory answer for '.$fixtureDir.'; run bin/record-fixtures '.$fixtureDir);
+        }
+        /** @var array<string, list<array<string, mixed>>> $advisories */
+        $advisories = $answer['advisories'];
+        $this->withAdvisoryApi($advisories);
+    }
+
+    /**
+     * The package names of each advisory POST answered so far, in order.
+     *
+     * @return list<list<string>>
+     */
+    public function advisoryRequests(): array
+    {
+        $log = $this->docroot.'/advisory-requests.log';
+        $raw = is_file($log) ? file_get_contents($log) : false;
+        if ($raw === false) {
+            return [];
+        }
+        $requests = [];
+        foreach (explode("\n", trim($raw)) as $line) {
+            $names = json_decode($line, true);
+            if (\is_array($names)) {
+                $requests[] = array_values(array_filter($names, 'is_string'));
+            }
+        }
+
+        return $requests;
     }
 
     /** Serve a `packages.json` that is not JSON — what a misconfigured private repository answers with. Call before {@see start()}. */
@@ -216,11 +291,17 @@ final class FixtureRepositoryServer
 
     private static function writePackagesJson(string $docroot): void
     {
-        $body = json_encode(['metadata-url' => '/p2/%package%.json']);
+        self::writeJson($docroot.'/packages.json', ['metadata-url' => '/p2/%package%.json']);
+    }
+
+    /** @param mixed $value */
+    private static function writeJson(string $path, $value): void
+    {
+        $body = json_encode($value);
         if ($body === false) {
-            throw new \RuntimeException('cannot encode packages.json for the fixture repository server');
+            throw new \RuntimeException('cannot encode '.basename($path).' for the fixture repository server');
         }
-        file_put_contents($docroot.'/packages.json', $body);
+        file_put_contents($path, $body);
     }
 
     private static function writeEnvelopeIfOk(string $docroot, string $envelopeDir, string $name, string $suffix): void
