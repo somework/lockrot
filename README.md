@@ -7,7 +7,7 @@
 [![License](https://img.shields.io/packagist/l/somework/lockrot.svg?style=flat-square)](LICENSE)
 
 **lockrot finds the packages in `composer.lock` that nobody maintains, including the ones
-`composer audit` passes because no maintainer marked them abandoned.**
+that `composer audit` passes because no maintainer marked them abandoned.**
 
 Each finding carries its evidence and the dependency chain that pulled it in. lockrot reads
 `composer.lock` and `composer.json` and writes neither.

@@ -154,13 +154,12 @@ The self-update key:
   Every archive in the field verifies with that key.
 
 - A planned rotation ships the new key in a transition release, signed with the old key. An archive
-  on the old key skips the later releases, whose metadata names the new key. It installs the
+  on the old key skips the releases after the transition release, whose metadata names the new key. It installs the
   transition release and verifies with the new key from then on. The transition release's
   changelog names the new fingerprint.
 
-- An archive is stranded when it can install no release. This happens when a newer release is
-  signed with a key that the archive does not carry, and no transition release is available
-  (missing, pulled, or it needs a newer PHP). `self-update` and `self-update --check` exit `2` and
+- An archive is stranded when a newer release is signed with a key that the archive does not carry,
+  and no transition release is available (missing, pulled, or it needs a newer PHP). `self-update` and `self-update --check` exit `2` and
   say so. Reinstall the archive [by hand](docs/phar.md#reinstalling-by-hand).
 
 - A compromised key cannot vouch for a transition release. We pull every release that the key

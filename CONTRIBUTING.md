@@ -1,6 +1,7 @@
 # Contributing to lockrot
 
-Build lockrot, run the checks CI runs, and change it without breaking a promise it makes to users.
+Build lockrot, run the checks that CI runs, and change lockrot so that it keeps every promise that it
+makes to users.
 What semantic versioning covers is in [What 1.0 freezes](docs/compatibility.md#what-10-freezes), and
 your duties when a change touches it are under [Backward compatibility](#backward-compatibility).
 How to write docs, comments, tests and changelog entries is in [the rule files](#writing-the-changelog-and-the-docs).
@@ -283,7 +284,7 @@ Run it before a release that changes one of these:
 - the signals (`src/Signal/`)
 - a sentence that lockrot prints
 
-A full run needs `GITHUB_TOKEN` and the network:
+A full run needs `GITHUB_TOKEN` and the network, and takes hours:
 
 ```bash
 tools/corpus/corpus fetch
