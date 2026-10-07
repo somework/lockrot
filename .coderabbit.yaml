@@ -142,13 +142,15 @@ reviews:
         parenthesis count as one word), a modal other than must/can/will (could as a past), a
         contraction, e.g./i.e./etc., "note that/simply/just/in order to", a semicolon outside code,
         a tense other than simple (has read, is reading), a passive with a known actor (a state
-        such as abandoned or flagged is not a passive), an -ing form other than a noun, a technical
+        such as abandoned or graded is not a passive), an -ing form other than a noun, a technical
         name or missing/remaining/during, "by design/deliberately/on purpose/by choice", a time word
         (now, no longer, used to, currently, recently, not yet, until now) outside CHANGELOG.md, a
         count of a set other than the closed sets and exit codes, file:line references, a line
         number or "above/below" that points at other text. Prose terms (flag only in that meaning):
-        finding (not issue/problem/result), flagged (not failing), verdict (not status/state),
-        signal (not check/rule), level or priority (not severity), severity order (not ladder), run
+        finding (not issue/problem/result), flag (not cause/issue), lead (not verdict), score (not
+        priority/rank), verdict (not status/state), grade (not severity/level), graded (not
+        flagged/failing), verdict order (not severity order/ladder), severity (only an advisory's
+        bucket, not grade/level), signal (not check/rule), level or priority (not severity), run
         note (not warning/error), repository host (not forge/code host), the lock (not lock file),
         direct requirement (not direct dependency), target PHP (not PHP floor), libyears (not
         libyear). Never swap unchecked, unmeasured and unknown.
