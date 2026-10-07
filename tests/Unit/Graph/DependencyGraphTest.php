@@ -213,8 +213,8 @@ final class DependencyGraphTest extends TestCase
 
         self::assertSame(['friendsofphp/proxy-manager-lts'], $graph->shortestChain('friendsofphp/proxy-manager-lts'));
         self::assertSame(['friendsofphp/proxy-manager-lts' => ['friendsofphp/proxy-manager-lts']], $graph->chainsTo('friendsofphp/proxy-manager-lts'));
-        self::assertSame([DependencyGraph::REQUIRE], $graph->namedIn('friendsofphp/proxy-manager-lts'));
-        self::assertSame([DependencyGraph::REQUIRE], $graph->namedIn('laminas/laminas-code'));
+        self::assertSame([ProjectConfig::REQUIRE], $graph->namedIn('friendsofphp/proxy-manager-lts'));
+        self::assertSame([ProjectConfig::REQUIRE], $graph->namedIn('laminas/laminas-code'));
     }
 
     /** Composer compares package names case-insensitively, and the lock writes them in lower case. */
@@ -228,7 +228,7 @@ final class DependencyGraphTest extends TestCase
 
         self::assertSame(['foo/bar'], $graph->shortestChain('foo/bar'));
         self::assertSame(['foo/bar', 'vendor/dep'], $graph->shortestChain('vendor/dep'));
-        self::assertSame([DependencyGraph::REQUIRE], $graph->namedIn('foo/bar'));
+        self::assertSame([ProjectConfig::REQUIRE], $graph->namedIn('foo/bar'));
     }
 
     /** Both sections are read whatever `--dev` says, in the order require, require-dev. */
@@ -249,13 +249,13 @@ final class DependencyGraphTest extends TestCase
 
         foreach ([false, true] as $dev) {
             $graph = DependencyGraph::fromLock($lock, $project, $dev);
-            self::assertSame([DependencyGraph::REQUIRE, DependencyGraph::REQUIRE_DEV], $graph->namedIn('vendor/both'));
-            self::assertSame([DependencyGraph::REQUIRE], $graph->namedIn('vendor/prod'));
-            self::assertSame([DependencyGraph::REQUIRE_DEV], $graph->namedIn('vendor/split'));
+            self::assertSame([ProjectConfig::REQUIRE, ProjectConfig::REQUIRE_DEV], $graph->namedIn('vendor/both'));
+            self::assertSame([ProjectConfig::REQUIRE], $graph->namedIn('vendor/prod'));
+            self::assertSame([ProjectConfig::REQUIRE_DEV], $graph->namedIn('vendor/split'));
             self::assertSame([], $graph->namedIn('vendor/deep'));
             self::assertSame([], $graph->namedIn('vendor/not-in-lock'));
         }
-        self::assertSame([DependencyGraph::REQUIRE_DEV], DependencyGraph::fromLock($lock, $project, true)->namedIn('vendor/tool'));
+        self::assertSame([ProjectConfig::REQUIRE_DEV], DependencyGraph::fromLock($lock, $project, true)->namedIn('vendor/tool'));
         self::assertSame(['vendor/split'], DependencyGraph::fromLock($lock, $project, true)->shortestChain('vendor/split'));
         self::assertSame([], DependencyGraph::fromLock($lock, $project, false)->shortestChain('vendor/split'), 'a require-dev root is walked only with --dev');
     }
