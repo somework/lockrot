@@ -74,7 +74,7 @@ that pins it. Write "this job checks X", not "the only check of X".
 | flag | One fact of the closed flag set (`abandoned` … `vulnerable`) that signals raise, in flag order | cause, issue, verdict |
 | lead | The first counted maintenance flag of a finding, or null | verdict |
 | vulnerable | The flag of a finding with at least one counted advisory | insecure, affected |
-| score | The sum of the points of a finding's counted flags under the score model (`score.total`) | priority, rank |
+| score | The number that the score model computes from a finding's counted flags (`score.total`) | priority, rank |
 | verdict | What a finding's score says: a grade, or `finished`, `unknown` or `ok` at score 0 | status, state |
 | grade | A verdict from a score of 1 or more: `critical`, `high`, `medium`, `low` | severity, level |
 | graded | A finding whose verdict is a grade | flagged, failing, bad |

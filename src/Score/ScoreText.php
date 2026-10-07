@@ -8,11 +8,9 @@ namespace Lockrot\Score;
  * The one score line, text grammar 1, rendered from the score object's fields alone:
  *
  *     4 = ((left-behind 16 + stale 2 [¼ of 8]) ÷ 2 transitive) ÷ 2 dev (4.5, rounded down)
- *     0 (left-behind accepted)
  *
- * `÷` binds to the operand before it, and `+` binds last. With this reading, every line evaluates to
- * `exact`, so the dev halving wraps any body of more than one atom. ScoreText prints no halving that
- * removes nothing. A change to this grammar bumps `score_text_grammar`.
+ * `÷` binds to the operand before it and `+` binds last, so every line evaluates to `exact`. A
+ * halving that removes nothing is not printed. A change to this grammar bumps `score_text_grammar`.
  *
  * @internal
  */

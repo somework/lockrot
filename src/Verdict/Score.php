@@ -68,12 +68,18 @@ final class Score
      * @param list<Advisory> $advisories  the counted advisories. A severity is a Composer word: the
      *                                    engine reads its bucket ({@see Severity::fromComposer()})
      *
-     * @throws \InvalidArgumentException for a reach that is not direct, transitive or unreached
+     * @throws \InvalidArgumentException for a reach that is not direct, transitive or unreached, or a
+     *                                   fix kind outside {@see ScoreModel::FIX_KINDS}
      */
     public static function compute(array $maintenance, array $advisories, string $reach, bool $dev): self
     {
         if (!\in_array($reach, [self::DIRECT, self::TRANSITIVE, self::UNREACHED], true)) {
             throw new \InvalidArgumentException('not a reach: '.$reach);
+        }
+        foreach ($advisories as $advisory) {
+            if (!\in_array($advisory['fix_kind'], ScoreModel::FIX_KINDS, true)) {
+                throw new \InvalidArgumentException('not a fix kind: '.$advisory['fix_kind']);
+            }
         }
         $advisories = array_map(static fn (array $advisory): array => array_merge($advisory, ['severity' => Severity::fromComposer($advisory['severity'])->bucket()]), $advisories);
         $terms = [];

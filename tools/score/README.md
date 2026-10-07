@@ -14,7 +14,13 @@ stream with the PHP engine row by row.
 
 `tests/fixtures/score/sweep-rows.txt.gz` holds the stream (`gzip -9n`). `sweep-rows.txt.sha256` holds
 the sha256 of the uncompressed stream, never of the `.gz`: two gzip builds can write different bytes.
-`tests/Support/ScoreSweep.php` gives the commands that write both files.
+If the stream changes, write both files again:
+
+```sh
+python3 tools/score/sweep.py > rows.txt
+sha256sum rows.txt | cut -d' ' -f1 > tests/fixtures/score/sweep-rows.txt.sha256
+gzip -9n < rows.txt > tests/fixtures/score/sweep-rows.txt.gz
+```
 
 ## The axes
 

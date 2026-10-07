@@ -5,10 +5,14 @@ declare(strict_types=1);
 namespace Lockrot\Allowlist;
 
 use Composer\Semver\VersionParser;
+use Lockrot\Verdict\FlagSet;
+use Lockrot\Verdict\ScoreModel;
 
 /** @internal */
 final class AllowlistEntry
 {
+    private const LIVENESS = [FlagSet::ABANDONED, FlagSet::SILENT, FlagSet::STALE];
+
     private static ?VersionParser $parser = null;
 
     private string $pattern;
@@ -85,5 +89,22 @@ final class AllowlistEntry
     public function acceptsAll(): bool
     {
         return $this->flags === null;
+    }
+
+    /**
+     * A listed liveness word also accepts the words after it: `abandoned` accepts `silent` and
+     * `stale`, and `silent` accepts `stale`. No entry accepts `vulnerable`.
+     */
+    public function accepts(string $flag): bool
+    {
+        if (!isset(ScoreModel::POINTS[$flag])) {
+            return false;
+        }
+        if ($this->flags === null || \in_array($flag, $this->flags, true)) {
+            return true;
+        }
+        $at = array_search($flag, self::LIVENESS, true);
+
+        return $at !== false && array_intersect(\array_slice(self::LIVENESS, 0, $at), $this->flags) !== [];
     }
 }

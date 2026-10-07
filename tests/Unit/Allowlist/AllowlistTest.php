@@ -7,6 +7,7 @@ namespace Lockrot\Tests\Unit\Allowlist;
 use Lockrot\Allowlist\Allowlist;
 use Lockrot\Allowlist\AllowlistEntry;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class AllowlistTest extends TestCase
@@ -121,6 +122,32 @@ final class AllowlistTest extends TestCase
 
         self::assertSame(['stale'], $entry->flags());
         self::assertFalse($entry->acceptsAll());
+    }
+
+    /**
+     * @dataProvider covers
+     *
+     * @param list<string>|null $listed
+     * @param list<string>      $accepted
+     */
+    #[DataProvider('covers')]
+    public function testALivenessWordAlsoAcceptsTheWordsAfterIt(?array $listed, array $accepted): void
+    {
+        $entry = new AllowlistEntry('vendor/*', null, 'kept', null, 'config', $listed);
+        $flags = ['abandoned', 'silent', 'pinned', 'left-behind', 'old-promise', 'stale', 'vulnerable'];
+
+        self::assertSame($accepted, array_values(array_filter($flags, [$entry, 'accepts'])));
+    }
+
+    /** @return iterable<string, array{list<string>|null, list<string>}> */
+    public static function covers(): iterable
+    {
+        yield 'every maintenance flag' => [null, ['abandoned', 'silent', 'pinned', 'left-behind', 'old-promise', 'stale']];
+        yield 'abandoned' => [['abandoned'], ['abandoned', 'silent', 'stale']];
+        yield 'silent' => [['silent'], ['silent', 'stale']];
+        yield 'stale' => [['stale'], ['stale']];
+        yield 'pinned and stale' => [['pinned', 'stale'], ['pinned', 'stale']];
+        yield 'nothing' => [[], []];
     }
 
     public function testATypeOfTheBuiltinListAcceptsEveryFlag(): void

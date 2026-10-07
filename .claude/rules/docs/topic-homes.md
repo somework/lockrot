@@ -17,7 +17,7 @@ fact in full twice only when a test reads every copy. Link the home's anchor whe
 | The `--fail-on` choice, and the value for snippets | `ci.md` (opening) | `configuration.md#fail-on-values` lists accepted values only. Every snippet uses the recommended value |
 | How each format marks a finding (levels, SARIF ranks) | `ci.md#how-each-format-marks-a-finding` | `compatibility.md#severity-mapping`: the promise and a link |
 | Each output format | its `ci.md` section | README: one list line |
-| Verdicts, and what "finding" / "flagged" mean | `verdicts.md#the-nine-verdicts` | README: one-line meanings, no thresholds |
+| Verdicts, and what "finding" / "graded" mean | `verdicts.md#the-nine-verdicts` | README: one-line meanings, no thresholds |
 | Signals, and S6 data (`#what-s6-carries`) | `verdicts.md#the-signals` | Links |
 | Priority | `verdicts.md#priority` | One sentence |
 | Security advisories and Composer's advisory settings | `verdicts.md#security-advisories` | `configuration.md#the-allowlist`: one sentence and a link |

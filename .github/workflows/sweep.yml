@@ -2,7 +2,8 @@
 # with the stream that tools/score/sweep.py prints, and checks the structured basis on every score.
 # The default suite reads a sample only. The paths filter starts it on a pull request that changes
 # the score engine. It has no branches filter: that filter reads the base branch, and a stacked pull
-# request has another base. GitHub starts schedule and workflow_dispatch only from the default branch.
+# request has another base. GitHub runs schedule on the default branch. workflow_dispatch needs this
+# file on the default branch, and then runs on the branch that you select.
 name: sweep
 on:
   pull_request:
@@ -10,6 +11,8 @@ on:
       - 'src/Score/**'
       - 'src/Verdict/**'
       - 'src/Security/Severity.php'
+      - 'src/Allowlist/AllowlistEntry.php'
+      - 'src/Signal/Signal.php'
       - 'src/Config/Gate.php'
       - 'tools/score/**'
       - 'tests/fixtures/score/**'
