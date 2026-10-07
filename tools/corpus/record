@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
-# Records the offline fixtures from a finished corpus run.
-# Usage: tools/corpus/record --work <dir> --out <report run> --explain-out <explain run>
-# Run it when lockrot changes a sentence that a check reads, or when a new check needs a document
-# for its poison.
+# Records the offline fixtures from a finished corpus run:
+#   tools/corpus/record --work <dir> --out <report run> --explain-out <explain run>
+# Run it when lockrot changes a sentence that a check reads, or when a new check needs a document.
 # Never edit a recorded fixture: one that does not match its source is worth less than none.
-# Keep the p2 documents minified, `__unset` sentinels included: expanding them removes the one thing
-# that the reader under test must get right.
+# Keep the p2 documents minified, `__unset` sentinels included: the reader under test must get
+# them right.
 
 import argparse
 import os
@@ -57,7 +56,7 @@ def main(argv: 'list[str]') -> int:
     return 0
 
 
-# Record Composer's answers here and never compute them in the test, which makes it a tautology.
+# Record Composer's answers here. A test that computes them with the code under test is a tautology.
 def _write_semver_oracle(cache: str) -> None:
     import glob
     import re as _re

@@ -10,6 +10,7 @@ not comparable. Both non-zero codes fail a gate.
 import sys
 from typing import TYPE_CHECKING
 
+# A runtime import of Census makes checks.py and report.py an import cycle.
 if TYPE_CHECKING:
     from .checks import Census
 
