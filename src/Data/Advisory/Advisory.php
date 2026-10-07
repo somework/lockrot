@@ -96,6 +96,12 @@ final class Advisory
         return $this->affectedVersions->matches(new Constraint('==', $normalized));
     }
 
+    /** Null when the advisory gives no affected range. */
+    public function affectedRange(): ?ConstraintInterface
+    {
+        return $this->affectedVersions;
+    }
+
     /** @return array{id: string, cve: ?string, title: ?string, link: ?string, severity: ?string, reported_at: ?string, affected_versions: ?string} */
     public function toArray(): array
     {
