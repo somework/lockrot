@@ -9,7 +9,7 @@ use Lockrot\Signal\PhpFloor;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/** The `php_check` of SPEC-0.14 5.3: what a release needs against the project's floor point. */
+/** The `php_check`: what a release needs against the project's floor point. */
 final class PhpCheckTest extends TestCase
 {
     /**
@@ -31,5 +31,7 @@ final class PhpCheckTest extends TestCase
         yield 'a patch' => ['>=8.1.0', '>=8.1.5', '>=8.1.5', PhpCheck::PATCH];
         yield 'a release the project admits' => ['>=8.2', '>=8.1', null, null];
         yield 'no project floor' => [null, '>=8.2', null, null];
+        yield 'alternatives that skip the project floor' => ['>=7.4', '7.1.* || >=8.1', '>=8.1', PhpCheck::MAJOR];
+        yield 'alternatives with a gap at the project floor' => ['^7.4 || ^8.0', '>=7.1,!=7.4.0', '>=7.4.1', PhpCheck::PATCH];
     }
 }
