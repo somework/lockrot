@@ -52,6 +52,12 @@ final class Score
         $this->dev = $dev;
     }
 
+    /** @return Advisory */
+    public static function advisory(string $id, string $severity, string $fixKind): array
+    {
+        return ['id' => $id, 'severity' => $severity, 'fix_kind' => $fixKind];
+    }
+
     public static function of(FlagSet $flags, string $reach, bool $dev): self
     {
         return self::compute($flags->countedMaintenance(), $flags->advisories(), $reach, $dev);

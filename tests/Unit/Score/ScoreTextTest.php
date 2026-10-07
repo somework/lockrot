@@ -89,17 +89,18 @@ final class ScoreTextTest extends TestCase
      * @param array<string, mixed> $term
      */
     #[DataProvider('malformed')]
-    public function testAFieldOfTheWrongTypeIsRefused(array $term): void
+    public function testAFieldOfTheWrongTypeIsRefused(array $term, string $message): void
     {
         $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage($message);
         ScoreText::render(['total' => 16, 'exact' => 16, 'terms' => [$term], 'modifiers' => [], 'accepted' => []]);
     }
 
-    /** @return iterable<string, array{array<string, mixed>}> */
+    /** @return iterable<string, array{array<string, mixed>, string}> */
     public static function malformed(): iterable
     {
-        yield 'points as a string' => [['part' => 'maintenance', 'flag' => 'old-promise', 'role' => 'lead', 'points' => '16']];
-        yield 'a flag as a number' => [['part' => 'maintenance', 'flag' => 16, 'role' => 'lead', 'points' => 16]];
+        yield 'points as a string' => [['part' => 'maintenance', 'flag' => 'old-promise', 'role' => 'lead', 'points' => '16'], "not a number: '16'"];
+        yield 'a flag as a number' => [['part' => 'maintenance', 'flag' => 16, 'role' => 'lead', 'points' => 16], 'not a string: 16'];
     }
 
     public function testAShareWithNoGlyphIsRefused(): void
@@ -108,6 +109,7 @@ final class ScoreTextTest extends TestCase
         $score['terms'][1]['divisor'] = 2;
 
         $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('text grammar 1 has no glyph for a share of 1/2');
         ScoreText::render($score);
     }
 }

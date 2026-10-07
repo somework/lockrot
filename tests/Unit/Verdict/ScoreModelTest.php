@@ -103,21 +103,54 @@ final class ScoreModelTest extends TestCase
         self::assertNull(ScoreModel::band(0));
     }
 
+    /**
+     * The largest maintenance under each lead: every set of other flags that holds no exclusive
+     * group, the first set in enumeration order winning a tie.
+     */
+    public function testTheLargestMaintenanceUnderEachLeadIsTheEngines(): void
+    {
+        $groups = JsonPath::arrayAt(ScoreModel::toArray(), ['exclusive_groups']);
+        $maintenance = array_keys(ScoreModel::POINTS);
+        foreach ($maintenance as $lead) {
+            $others = array_values(array_diff($maintenance, [$lead]));
+            $best = [0, []];
+            foreach (self::subsets($others) as $subset) {
+                $flags = array_values(array_intersect($maintenance, array_merge([$lead], $subset)));
+                $held = false;
+                foreach ($groups as $i => $group) {
+                    $ids = [];
+                    foreach (array_keys(JsonPath::arrayAt($groups, [$i, 'flag_ids'])) as $k) {
+                        $ids[] = JsonPath::stringAt($groups, [$i, 'flag_ids', $k]);
+                    }
+                    $held = $held || \count(array_intersect($ids, $flags)) >= (JsonPath::stringAt($groups, [$i, 'id']) === 'liveness' ? 2 : \count($ids));
+                }
+                $score = Score::compute($flags, [], 'direct', false);
+                if (!$held && $score->lead() === $lead && $score->total() > $best[0]) {
+                    $best = [$score->total(), $flags];
+                }
+            }
+            self::assertSame($best, ScoreModel::MAX_MAINTENANCE[$lead], $lead);
+        }
+    }
+
     public function testAWordThatIsNoGradeHasNoFloor(): void
     {
         $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('not a grade: ok');
         ScoreModel::floorOf('ok');
     }
 
     public function testAWordThatIsNoGradeHasNoBandAbove(): void
     {
         $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('not a grade: finished');
         ScoreModel::nextBand('finished');
     }
 
     public function testTheEngineRefusesAReachThatItDoesNotKnow(): void
     {
         $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('not a reach: indirect');
         Score::compute(['stale'], [], 'indirect', false);
     }
 
@@ -400,6 +433,22 @@ final class ScoreModelTest extends TestCase
         }
 
         return $rules;
+    }
+
+    /**
+     * @param list<string> $items
+     *
+     * @return list<list<string>> every subset, in the order of a binary count with the first item as the high bit
+     */
+    private static function subsets(array $items): array
+    {
+        $subsets = [[]];
+        foreach (array_reverse($items) as $item) {
+            $with = array_map(static fn (array $subset): array => array_merge([$item], $subset), $subsets);
+            $subsets = array_merge($subsets, $with);
+        }
+
+        return $subsets;
     }
 
     /** @param list<string> $flags */

@@ -12,7 +12,7 @@ use Lockrot\Verdict\ScoreModel;
 
 /**
  * The sweep of score model 1 in PHP: the enumeration that tools/score/sweep.py walks, in its order, and
- * the canonical row of each evaluated score. tools/score/sweep.py documents the row's 14 fields.
+ * the canonical row of each evaluated score. tools/score/README.md documents the fields of the row.
  * tests/fixtures/score/sweep-rows.txt.gz holds the rows that sweep.py prints. Regenerate it with:
  *
  *     python3 tools/score/sweep.py > rows.txt
