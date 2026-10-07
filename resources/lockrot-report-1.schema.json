@@ -2094,7 +2094,7 @@
       }
     },
     "noteAdvisoriesDisabledByPolicy": {
-      "description": "`advisories_disabled_by_policy`: the project's Composer policy stops Composer from warning about security advisories. Information only, written when the lookup ran: lockrot asked its repositories as usual, and the advisories they returned count. `policy_key` is the setting that does it: `policy`, `policy.advisories`, `policy.advisories.audit` or the `COMPOSER_POLICY` environment variable. `value` is its value: `false`, or `ignore` for the audit mode. An open set of keys: show one you do not know as written.",
+      "description": "`advisories_disabled_by_policy`: the project's Composer policy stops Composer from warning about security advisories. The note is information only. lockrot writes it only when the lookup ran. lockrot asked its repositories as usual, and the advisories they returned count. `policy_key` names the setting: `policy`, `policy.advisories`, `policy.advisories.audit` or the `COMPOSER_POLICY` environment variable. `value` is `false`, or `ignore` for the audit mode. The keys are an open set. Show a key you do not know as written.",
       "type": "object",
       "required": [
         "policy_key",
