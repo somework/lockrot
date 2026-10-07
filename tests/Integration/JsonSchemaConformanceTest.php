@@ -1041,8 +1041,8 @@ final class JsonSchemaConformanceTest extends TestCase
         $explained['notes'] = $decoded['notes'];
         $explained['note_details'] = $decoded['note_details'];
         $this->assertValid(Schemas::EXPLAIN, (string) json_encode($explained), 'every code in an explanation', true);
-        $this->assertValid(Schemas::EXPLAIN, self::changed($explained, ['note_details', 7, 'data', 'forge_id'], 'forgejo'), 'an explanation with a forge a later release adds');
-        self::assertNotSame([], $this->errors(Schemas::EXPLAIN, self::changed($explained, ['note_details', 7, 'data', 'forge_id'], 'forgejo'), true));
+        $this->assertValid(Schemas::EXPLAIN, self::changed($explained, ['note_details', 8, 'data', 'forge_id'], 'forgejo'), 'an explanation with a forge a later release adds');
+        self::assertNotSame([], $this->errors(Schemas::EXPLAIN, self::changed($explained, ['note_details', 8, 'data', 'forge_id'], 'forgejo'), true));
         unset($explained['note_details']);
         $this->assertValid(Schemas::EXPLAIN, (string) json_encode($explained), 'an explanation written before note_details', true);
     }
