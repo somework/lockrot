@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 /** .claude/rules/tests.md, "Hermetic by default": a test reads the clock through `Clock::fixed()` or `LOCKROT_TODAY`. */
 final class HermeticTestsTest extends TestCase
 {
-    private const REAL_CLOCK = '{(?<![\w>:$])(?:time\(\)|(?:gm)?date\(\s*[\'"][^\'"]*[\'"]\s*\)|strtotime\(|mktime\()|new\s+\\\\?DateTime(?:Immutable)?\(\s*(?:[\'"](?:now|today|tomorrow|yesterday|midnight)[\'"]\s*(?:,[^)]*)?)?\)|new\s+(?:\\\\?Lockrot\\\\)?Clock\(\s*\)|Clock::fromEnvironment\(\s*\[\s*\]}';
+    private const REAL_CLOCK = '{(?<![\w>:$])(?:time\(\)|(?:gm)?date\(\s*[\'"][^\'"]*[\'"]\s*\)|strtotime\(|mktime\()|new\s+\\\\?DateTime(?:Immutable)?\(\s*(?:[\'"](?:now|today|tomorrow|yesterday|midnight)[\'"]\s*(?:,[^)]*)?)?\)|new\s+(?:\\\\?Lockrot\\\\)?Clock\(\s*(?:null\s*)?\)|Clock::fromEnvironment\(\s*\[(?![^\]]*LOCKROT_TODAY)[^\]]*\]}';
 
     /** Tests of the real clock and of a file modification time, relative to tests/. */
     private const ALLOWED = ['Unit/ClockTest.php', 'Unit/SelfUpdate/PharUpdaterTest.php'];
