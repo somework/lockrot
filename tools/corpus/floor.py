@@ -1,0 +1,75 @@
+#!/usr/bin/env python3
+"""Writes tests/fixtures/corpus/report-1-floor.json.gz from lockrot.dev's watch reports.
+
+Usage: python3 tools/corpus/floor.py <lockrot.dev checkout> <commit> <out.json.gz>
+
+The tool reads `data/reports/watch/*.json` at <commit> with `git show`, so the checkout's working
+tree stays as it is. Every report must be report-1. Each finding keeps the facts the 0.14 engine
+reads and what 0.13 recorded: its signals without their summaries, its verdict and its priority.
+The output is gzipped with no name and no time, as `gzip -n` writes it, so a rebuild from the same
+commit is byte for byte equal. Standard library only.
+"""
+import gzip
+import io
+import json
+import subprocess
+import sys
+
+REPOSITORY = 'https://github.com/somework/lockrot.dev'
+WATCH = 'data/reports/watch/'
+REPORT_1 = 'https://lockrot.dev/schema/report-1.json'
+FINDING_KEYS = ('package', 'version', 'direct', 'dev', 'chain', 'verdict', 'priority')
+
+
+def git(checkout, *args):
+    return subprocess.run(['git', '-C', checkout] + list(args), check=True, capture_output=True).stdout
+
+
+def report_names(checkout, commit):
+    paths = git(checkout, 'ls-tree', '--name-only', commit, WATCH).decode('utf-8').split('\n')
+    return sorted(path for path in paths if path.endswith('.json') and not path.endswith('/manifest.json'))
+
+
+def reduce_report(name, page):
+    report = page['data']['report']
+    if report.get('$schema') != REPORT_1:
+        raise SystemExit('%s is not a report-1 document' % name)
+    findings = []
+    for finding in report['findings']:
+        reduced = {key: finding[key] for key in FINDING_KEYS}
+        reduced['signals'] = [{'id': s['id'], 'level': s['level'], 'data': s['data']} for s in finding['signals']]
+        reduced['allowlist_reason'] = finding['allowlist_reason']
+        findings.append(reduced)
+    return {
+        'name': name,
+        'lockrot': report['lockrot']['version'],
+        'generated_at': report['generated_at'],
+        'target_php': report['run']['target_php'],
+        'findings': findings,
+    }
+
+
+def main(argv):
+    if len(argv) != 3:
+        raise SystemExit(__doc__.split('\n\n')[1])
+    checkout, commit, out = argv
+    commit = git(checkout, 'rev-parse', '--verify', commit + '^{commit}').decode('ascii').strip()
+    reports = []
+    for path in report_names(checkout, commit):
+        name = path[len(WATCH):-len('.json')]
+        reports.append(reduce_report(name, json.loads(git(checkout, 'show', commit + ':' + path))))
+    floor = {
+        'generated_from': {'repository': REPOSITORY, 'commit': commit, 'path': WATCH, 'tool': 'tools/corpus/floor.py'},
+        'reports': reports,
+    }
+    body = json.dumps(floor, ensure_ascii=False, separators=(',', ':')).encode('utf-8') + b'\n'
+    buffer = io.BytesIO()
+    with gzip.GzipFile(filename='', mode='wb', fileobj=buffer, mtime=0, compresslevel=9) as handle:
+        handle.write(body)
+    with open(out, 'wb') as handle:
+        handle.write(buffer.getvalue())
+    print('%d reports, %d findings' % (len(reports), sum(len(r['findings']) for r in reports)))
+
+
+if __name__ == '__main__':
+    main(sys.argv[1:])
