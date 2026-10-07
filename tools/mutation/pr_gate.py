@@ -24,7 +24,7 @@ HEADER = re.compile(r'^\d+\) \S*?/?(src/\S+\.php):(\d+)\s+\[M\] (\w+) \[ID\]')
 SECTION = re.compile(r'^([A-Z][A-Za-z ]+) mutants:$')
 MUTATOR = r'[A-Z]\w*(?: x\d+)?'
 ENTRY = re.compile(
-    r'^- `(?P<path>src/[\w/]+\.php)` (?P<mutators>' + MUTATOR + r'(?:(?:,| and|, and) ' + MUTATOR + r')*) `(?P<code>[^`]+)`(?P<reason>.*)$'
+    r'^- `(?P<path>src/[\w/]+\.php)` (?P<mutators>' + MUTATOR + r'(?:(?:,| and|, and) ' + MUTATOR + r')*) (?P<fence>`+) ?(?P<code>.+?) ?(?P=fence)(?!`)(?P<reason>.*)$'
 )
 FUNCTION = re.compile(r'\bfunction\s+(\w+)\s*\(')
 Key = Tuple[str, str, str]
@@ -92,7 +92,7 @@ class Source:
     def keys(self, path: str, mutator: str, line: int, text: str, methods: Tuple[str, ...] = ()) -> List[Key]:
         """The one key a mutant answers to: the line's text when it is unique in the file, else the
         enclosing method. Never both: the method would let one documented mutant cover another line.
-        An entry has no line: of the methods that hold its text, it takes the one its reason names."""
+        An entry has no line: of the methods that hold its text, it takes the one its reason opens with."""
         occurrences = [n for n, candidate in enumerate(self.lines(path), 1) if normalise(candidate) == text]
         if text and len(occurrences) == 1:
             return [(path, mutator, 'text:' + text)]
@@ -123,7 +123,8 @@ def allowances(markdown: str, source: Source) -> List[list]:
         match = ENTRY.match(entry)
         if not match:
             continue
-        methods = tuple(re.findall(r'\b(\w+)\(\)', match.group('reason')))
+        named = re.match(r'\W*in (\w+)\(\):', match.group('reason'))
+        methods = (named.group(1),) if named else ()
         for mutator in re.finditer(r'([A-Z]\w*)(?: x(\d+))?', match.group('mutators')):
             keys = source.keys(match.group('path'), mutator.group(1), 0, normalise(match.group('code')), methods)
             if keys:
