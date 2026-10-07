@@ -33,9 +33,9 @@ final class AnalyzerBootstrapTest extends TestCase
     private function emptyLoader(): MetadataLoaderInterface
     {
         return new class () implements MetadataLoaderInterface {
-            public function load(array $names): MetadataBatch
+            public function load(array $installedByName): MetadataBatch
             {
-                return new MetadataBatch([], $names, []);
+                return new MetadataBatch([], array_keys($installedByName), []);
             }
         };
     }

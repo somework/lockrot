@@ -13,8 +13,9 @@ use Lockrot\Lock\PackageOrigin;
 
 /**
  * Keeps scalars only, so that a large lock costs little memory: fromPackages() retains no
- * per-release object. The exceptions are a date per stable tag of a monorepo parent
- * ({@see $releaseDates}) and the stable tags that share a commit ({@see $sharedCommitVersions}).
+ * Composer object. The exceptions are a date per stable tag of a monorepo parent
+ * ({@see $releaseDates}), the stable tags that share a commit ({@see $sharedCommitVersions}) and
+ * the release scan's five fields per release above the installed one ({@see $releasesAbove}).
  *
  * @internal
  */
@@ -80,6 +81,19 @@ final class PackageMetadata
      * @var array<string, true>
      */
     private array $sharedCommitVersions;
+    /**
+     * The stable releases above the installed version, ascending: every stable release for a
+     * branch snapshot. Null when the load named no installed version (a monorepo parent) or it
+     * does not parse.
+     *
+     * @var list<StableRelease>|null
+     */
+    private ?array $releasesAbove = null;
+    /** @var list<string>|null the installed release's `require` names, null when that release is not among those read */
+    private ?array $installedRequires = null;
+    private ?StableRelease $newestStable = null;
+    /** @var list<string>|null */
+    private ?array $newestRequires = null;
 
     /**
      * @param array<array-key, array{version: string, at: ?\DateTimeImmutable, highest: array{normalized: string, pretty: string, at: ?\DateTimeImmutable}, dated_by?: string, php: ?string}> $latestStableByBranch
@@ -133,9 +147,11 @@ final class PackageMetadata
      * release names no repository, {@see repositoryUrl()} is null, not an older release's URL, and
      * {@see \Lockrot\Lock\LockedPackage::repositoryUrl()} is the fallback.
      *
-     * @param list<BasePackage> $versions the releases of one package, with no AliasPackage
+     * @param list<BasePackage> $versions         the releases of one package, with no AliasPackage
+     * @param \DateTimeImmutable $dataDate         the run clock: a release dated after it is not the newest stable one
+     * @param ?string           $installedVersion the version the lock installs, null to keep dates only (a monorepo parent)
      */
-    public static function fromPackages(string $name, array $versions, \DateTimeImmutable $dataDate): self
+    public static function fromPackages(string $name, array $versions, \DateTimeImmutable $dataDate, ?string $installedVersion = null): self
     {
         $abandoned = false;
         $replacement = null;
@@ -156,6 +172,8 @@ final class PackageMetadata
         $commitByVersion = [];
         // Dated or not, unlike $commitByVersion: the shared-commit tags are read from it.
         $commitOfTag = [];
+        /** @var array<string, array{0: BasePackage, 1: ?\DateTimeImmutable, 2: ?string}> $stable by normalized version: the release, its date, its php */
+        $stable = [];
 
         foreach ($versions as $version) {
             foreach ($version->getReplaces() as $link) {
@@ -208,6 +226,7 @@ final class PackageMetadata
                     // The php requirement stays with the release that the branch names: a project that
                     // moves onto the branch must satisfy it ({@see \Lockrot\Signal\PhpFloor}).
                     $php = self::phpOf($version);
+                    $stable[$normalized] ??= [$version, $releaseDate, $php];
                     $entry = $byBranch[$branch] ?? null;
                     if ($entry === null) {
                         $byBranch[$branch] = ['version' => $pretty, 'at' => $releaseDate, 'highest' => $tag, 'php' => $php];
@@ -275,7 +294,7 @@ final class PackageMetadata
         // Packagist lists as the default branch.
         $anchor = $highestStable ?? ($versions[0] ?? null);
 
-        return new self(
+        $metadata = new self(
             $name,
             $abandoned,
             $replacement,
@@ -294,6 +313,72 @@ final class PackageMetadata
             $sharedCommitVersions,
             $abandonedBy
         );
+        if ($installedVersion !== null) {
+            $metadata->keepReleases($versions, $stable, $sharedCommitVersions, $dataDate, $installedVersion);
+        }
+
+        return $metadata;
+    }
+
+    /**
+     * The release scan's lists: the stable releases above the installed one, and for C08 the
+     * `require` names of the installed release and of the newest stable release on the run clock.
+     * Nothing else per release (DECISIONS.md 2.34).
+     *
+     * @param list<BasePackage>                                                     $versions
+     * @param array<string, array{0: BasePackage, 1: ?\DateTimeImmutable, 2: ?string}> $stable
+     * @param array<string, true>                                                   $sharedCommit
+     */
+    private function keepReleases(array $versions, array $stable, array $sharedCommit, \DateTimeImmutable $now, string $installedVersion): void
+    {
+        $newest = null;
+        foreach ($stable as $normalized => [$version, $at]) {
+            if (($at === null || $at <= $now) && ($newest === null || Comparator::greaterThan($normalized, $newest->getVersion()))) {
+                $newest = $version;
+            }
+        }
+        if ($newest !== null) {
+            $this->newestStable = $this->stableRelease($newest->getVersion(), $stable[$newest->getVersion()], $sharedCommit);
+            $this->newestRequires = self::requireNames($newest);
+        }
+        try {
+            $installed = (new VersionParser())->normalize($installedVersion);
+        } catch (\UnexpectedValueException $e) {
+            return;
+        }
+        foreach ($versions as $version) {
+            if ($version->getVersion() === $installed) {
+                $this->installedRequires = self::requireNames($version);
+                break;
+            }
+        }
+        $snapshot = VersionParser::parseStability($installed) === 'dev';
+        $above = [];
+        foreach ($stable as $normalized => $release) {
+            $normalized = (string) $normalized;
+            if ($snapshot || Comparator::greaterThan($normalized, $installed)) {
+                $above[] = $this->stableRelease($normalized, $release, $sharedCommit);
+            }
+        }
+        usort($above, static fn (StableRelease $a, StableRelease $b): int => Comparator::lessThan($a->normalized(), $b->normalized()) ? -1 : 1);
+        $this->releasesAbove = $above;
+    }
+
+    /**
+     * @param array{0: BasePackage, 1: ?\DateTimeImmutable, 2: ?string} $release
+     * @param array<string, true>                                     $sharedCommit
+     */
+    private function stableRelease(string $normalized, array $release, array $sharedCommit): StableRelease
+    {
+        $shared = isset($sharedCommit[$normalized]);
+
+        return new StableRelease($normalized, $release[0]->getPrettyVersion(), $shared ? null : $release[1], $release[2], $shared);
+    }
+
+    /** @return list<string> */
+    private static function requireNames(BasePackage $version): array
+    {
+        return array_map('strtolower', array_map('strval', array_keys($version->getRequires())));
     }
 
     /**
@@ -381,7 +466,7 @@ final class PackageMetadata
             $lastStableDatedBy = $parent->name;
         }
 
-        return new self(
+        $dated = new self(
             $this->name,
             $this->abandoned,
             $this->replacement,
@@ -400,6 +485,15 @@ final class PackageMetadata
             $this->sharedCommitVersions,
             $this->abandonedBy
         );
+        $dated->installedRequires = $this->installedRequires;
+        $dated->newestStable = $this->newestStable;
+        $dated->newestRequires = $this->newestRequires;
+        $dated->releasesAbove = $this->releasesAbove === null ? null : array_map(
+            static fn (StableRelease $release): StableRelease => $release->sharedCommit() ? $release->withDate($parent->releaseDateOf($release->normalized())) : $release,
+            $this->releasesAbove
+        );
+
+        return $dated;
     }
 
     /**
@@ -544,6 +638,30 @@ final class PackageMetadata
     public function releaseDatesBy(): ?string
     {
         return $this->releaseDatesBy;
+    }
+
+    /** @return list<StableRelease>|null {@see $releasesAbove} */
+    public function releasesAbove(): ?array
+    {
+        return $this->releasesAbove;
+    }
+
+    /** @return list<string>|null lowercased, null when the installed release is not among the releases read */
+    public function installedRequires(): ?array
+    {
+        return $this->installedRequires;
+    }
+
+    /** The highest stable release not dated after the run clock. Null with no stable release, or when the load kept no lists. */
+    public function newestStable(): ?StableRelease
+    {
+        return $this->newestStable;
+    }
+
+    /** @return list<string>|null lowercased: the `require` names of {@see newestStable()} */
+    public function newestRequires(): ?array
+    {
+        return $this->newestRequires;
     }
 
     /**

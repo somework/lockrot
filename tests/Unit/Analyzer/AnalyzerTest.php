@@ -34,6 +34,7 @@ use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Output\FormatContext;
 use Lockrot\Output\TableFormatter;
+use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
@@ -99,7 +100,7 @@ final class AnalyzerTest extends TestCase
                 $this->batch = $batch;
             }
 
-            public function load(array $names): MetadataBatch
+            public function load(array $installedByName): MetadataBatch
             {
                 return $this->batch;
             }
@@ -176,6 +177,25 @@ final class AnalyzerTest extends TestCase
         self::assertNotNull($local);
         self::assertNull($local->metadata(), 'a path package has no repository metadata');
         self::assertNull($analysis->facts('vendor/absent'));
+    }
+
+    /** The release scan reads why a package has no metadata: SPEC-0.14 5.5's `metadata.status`. */
+    public function testTheFactsSayWhetherTheMetadataFailedOrWasNotFound(): void
+    {
+        $lock = LockFile::fromArray(['packages' => [
+            ['name' => 'vendor/failed', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/'],
+            ['name' => 'vendor/absent', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/'],
+        ]]);
+        $analyzer = $this->analyzer($this->loader([], ['vendor/absent'], ['vendor/failed' => 'HTTP 500']), $this->http([]), true, new Allowlist([]));
+
+        $analysis = $analyzer->analyzeWithFacts($lock->packages(false), $lock, ProjectConfig::empty(), false);
+
+        $failed = $analysis->facts('vendor/failed');
+        $absent = $analysis->facts('vendor/absent');
+        self::assertNotNull($failed);
+        self::assertNotNull($absent);
+        self::assertSame(PackageFacts::METADATA_UNAVAILABLE, $failed->metadataStatus());
+        self::assertSame(PackageFacts::METADATA_NOT_FOUND, $absent->metadataStatus());
     }
 
     public function testAdvisoriesReachTheFindingAsS9AndRaiseAnAbandonedPackage(): void

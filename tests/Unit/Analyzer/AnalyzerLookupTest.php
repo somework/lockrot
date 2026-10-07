@@ -95,7 +95,7 @@ final class AnalyzerLookupTest extends TestCase
                 $this->batch = $batch;
             }
 
-            public function load(array $names): MetadataBatch
+            public function load(array $installedByName): MetadataBatch
             {
                 return $this->batch;
             }
