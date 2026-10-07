@@ -15,13 +15,13 @@ use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Baseline\BaselineEntry;
 use Lockrot\Config\Gate;
+use Lockrot\Legacy\Priority013;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
-use Lockrot\Verdict\Priority;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\TestCase;
 
@@ -197,11 +197,11 @@ final class ReportTest extends TestCase
         $report = new Report([], [], new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), 0, 0);
         self::assertSame(
             [
-                Priority::CRITICAL => 0,
-                Priority::HIGH => 0,
-                Priority::MEDIUM => 0,
-                Priority::LOW => 0,
-                Priority::NONE => 0,
+                Priority013::CRITICAL => 0,
+                Priority013::HIGH => 0,
+                Priority013::MEDIUM => 0,
+                Priority013::LOW => 0,
+                Priority013::NONE => 0,
             ],
             $report->byPriority()
         );
@@ -216,7 +216,7 @@ final class ReportTest extends TestCase
             $this->finding('vendor/d', Verdict::OK)
         );
         self::assertSame(
-            [Priority::CRITICAL => 1, Priority::HIGH => 1, Priority::MEDIUM => 0, Priority::LOW => 1, Priority::NONE => 1],
+            [Priority013::CRITICAL => 1, Priority013::HIGH => 1, Priority013::MEDIUM => 0, Priority013::LOW => 1, Priority013::NONE => 1],
             $report->byPriority()
         );
     }
@@ -498,10 +498,10 @@ final class ReportTest extends TestCase
         self::assertSame([], $array['unattributed']);
         self::assertIsArray($array['priorities']);
         self::assertSame(
-            [Priority::CRITICAL, Priority::HIGH, Priority::MEDIUM, Priority::LOW, Priority::NONE],
+            [Priority013::CRITICAL, Priority013::HIGH, Priority013::MEDIUM, Priority013::LOW, Priority013::NONE],
             array_keys($array['priorities'])
         );
-        self::assertSame(1, $array['priorities'][Priority::CRITICAL]);
+        self::assertSame(1, $array['priorities'][Priority013::CRITICAL]);
         self::assertSame('2026-09-14T00:00:00+00:00', $array['generated_at']);
         self::assertNull($array['activity_cache_oldest_at']);
         self::assertSame(5, $array['packages_checked']);

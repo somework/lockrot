@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Signal;
 
+use Lockrot\Clock;
+use Lockrot\Data\Php\PhpReleaseDates;
 use Lockrot\Signal\PackageFacts;
+use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\SignalRule;
 use Lockrot\Signal\SignalSet;
+use Lockrot\Signal\Thresholds;
 use PHPUnit\Framework\TestCase;
 
 final class SignalSetTest extends TestCase
@@ -39,5 +43,28 @@ final class SignalSetTest extends TestCase
         $signals = $set->evaluate(FactsBuilder::facts(FactsBuilder::package()));
 
         self::assertSame([Signal::S1, Signal::S3, Signal::S6], array_map(static fn (Signal $s): string => $s->id(), $signals));
+    }
+
+    public function testTheDefaultSetKeepsTheTargetAndTheProjectPhpForTheFixKinds(): void
+    {
+        $floor = SignalSet::default(Clock::fixed('2026-10-01T00:00:00+00:00'), new Thresholds(), '8.4', PhpReleaseDates::load(), '>=8.2')->phpFloor();
+
+        self::assertSame('8.2.0', $floor->lowestAsString());
+        self::assertFalse($floor->admitsTarget('<8.4'));
+    }
+
+    public function testASetBuiltWithoutAFloorHasNoTargetAndNoProjectPhp(): void
+    {
+        $floor = (new SignalSet([]))->phpFloor();
+
+        self::assertNull($floor->lowestAsString());
+        self::assertNull($floor->admitsTarget('<8.4'));
+    }
+
+    public function testASetKeepsTheFloorItWasGiven(): void
+    {
+        $floor = new PhpFloor('8.4');
+
+        self::assertSame($floor, (new SignalSet([], $floor))->phpFloor());
     }
 }

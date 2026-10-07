@@ -8,6 +8,7 @@ use Lockrot\Analyzer\LibyearsMeasurement;
 use Lockrot\Lock\PackageOrigin;
 use Lockrot\Signal\Signal;
 use Lockrot\Verdict\Finding;
+use Lockrot\Verdict\FlagSet;
 use Lockrot\Verdict\Verdict;
 
 /**
@@ -33,6 +34,8 @@ final class FindingBuilder
     private ?LibyearsMeasurement $libyears = null;
     private ?PackageOrigin $origin = null;
     private ?string $replacementNamedBy = null;
+    private ?FlagSet $flags = null;
+    private bool $maintenanceJudged = true;
 
     public function withPackage(string $package): self
     {
@@ -141,8 +144,17 @@ final class FindingBuilder
         return $clone;
     }
 
+    public function withFlags(?FlagSet $flags, bool $maintenanceJudged = true): self
+    {
+        $clone = clone $this;
+        $clone->flags = $flags;
+        $clone->maintenanceJudged = $maintenanceJudged;
+
+        return $clone;
+    }
+
     public function build(): Finding
     {
-        return new Finding($this->package, $this->version, $this->verdict, $this->signals, $this->chain, $this->allowlistReason, $this->dataDate, $this->note, $this->dev, $this->directDependents, $this->libyears, $this->origin, $this->replacementNamedBy);
+        return new Finding($this->package, $this->version, $this->verdict, $this->signals, $this->chain, $this->allowlistReason, $this->dataDate, $this->note, $this->dev, $this->directDependents, $this->libyears, $this->origin, $this->replacementNamedBy, $this->flags, $this->maintenanceJudged);
     }
 }

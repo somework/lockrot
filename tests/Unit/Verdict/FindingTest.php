@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Verdict;
 
+use Lockrot\Allowlist\AllowlistEntry;
 use Lockrot\Analyzer\Libyears;
 use Lockrot\Analyzer\LibyearsMeasurement;
+use Lockrot\Legacy\Priority013;
 use Lockrot\Signal\Signal;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\Origins;
 use Lockrot\Verdict\Finding;
-use Lockrot\Verdict\Priority;
+use Lockrot\Verdict\FlagSet;
+use Lockrot\Verdict\Score;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -61,8 +64,8 @@ final class FindingTest extends TestCase
         $transitiveDev = (new FindingBuilder())->withVerdict(Verdict::ABANDONED)->withSignals($signals)->withChain(['root/app', 'vendor/pkg'])->withDev(true)->withDirectDependents(['root/app'])->build();
 
         self::assertTrue($direct->hasUnfixableAdvisory());
-        self::assertSame(Priority::CRITICAL, $direct->priority());
-        self::assertSame(Priority::HIGH, $transitiveDev->priority(), 'medium raised one step');
+        self::assertSame(Priority013::CRITICAL, $direct->priority());
+        self::assertSame(Priority013::HIGH, $transitiveDev->priority(), 'medium raised one step');
         self::assertSame('marked abandoned by its repository; 1 security advisory affects 1.0.0 (CVE-2024-0001); no fix expected', $direct->ownEvidence());
         self::assertSame($direct->ownEvidence(), $direct->evidence());
     }
@@ -74,10 +77,10 @@ final class FindingTest extends TestCase
         $ok = (new FindingBuilder())->withSignals([$s9])->withDirectDependents(['vendor/pkg'])->build();
 
         self::assertFalse($pinned->hasUnfixableAdvisory());
-        self::assertSame(Priority::HIGH, $pinned->priority());
+        self::assertSame(Priority013::HIGH, $pinned->priority());
         self::assertSame('pinned to branch snapshot dev-main; 1 security advisory affects 1.0.0 (CVE-2024-0001)', $pinned->ownEvidence());
         self::assertFalse($ok->hasUnfixableAdvisory());
-        self::assertSame(Priority::NONE, $ok->priority());
+        self::assertSame(Priority013::NONE, $ok->priority());
         self::assertSame('1 security advisory affects 1.0.0 (CVE-2024-0001)', $ok->ownEvidence());
     }
 
@@ -167,10 +170,10 @@ final class FindingTest extends TestCase
         $finished = (new FindingBuilder())->withPackage('guzzlehttp/guzzle')->withVersion('6.5.5')->withVerdict(Verdict::FINISHED)->withSignals([$s8warn, $s9])->withChain(['guzzlehttp/guzzle'])->withAllowlistReason('frozen')->withDirectDependents(['guzzlehttp/guzzle'])->build();
 
         self::assertTrue($leftBehind->hasUnfixableAdvisory());
-        self::assertSame(Priority::CRITICAL, $leftBehind->priority(), 'high raised to critical');
+        self::assertSame(Priority013::CRITICAL, $leftBehind->priority(), 'high raised to critical');
         self::assertSame($s8warn->summary().'; '.$s5->summary().'; '.$s9->summary().'; no fix expected', $leftBehind->ownEvidence());
         self::assertFalse($oldPromise->hasUnfixableAdvisory(), 'an open php constraint says nothing about whether a fix is coming');
-        self::assertSame(Priority::HIGH, $oldPromise->priority());
+        self::assertSame(Priority013::HIGH, $oldPromise->priority());
         self::assertFalse($finished->hasUnfixableAdvisory(), 'an allowlisted package is never raised: the allowlist decided');
     }
 
@@ -241,7 +244,7 @@ final class FindingTest extends TestCase
         $abandoned = (new FindingBuilder())->withPackage('swiftmailer/swiftmailer')->withVersion('v6.1.3')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('S1', 'high', 'marked abandoned by its repository'), $s9])->withChain(['swiftmailer/swiftmailer'])->withDirectDependents(['swiftmailer/swiftmailer'])->build();
 
         self::assertFalse($abandoned->hasUnfixableAdvisory());
-        self::assertSame(Priority::CRITICAL, $abandoned->priority(), 'the base, not a raise');
+        self::assertSame(Priority013::CRITICAL, $abandoned->priority(), 'the base, not a raise');
         self::assertSame('marked abandoned by its repository; 1 security advisory affects v6.1.3 (CVE-2024-28859); fixed by 6.3.0', $abandoned->ownEvidence());
     }
 
@@ -258,12 +261,12 @@ final class FindingTest extends TestCase
         $finding = (new FindingBuilder())->withPackage('symfony/http-foundation')->withVersion('v3.4.18')->withVerdict(Verdict::LEFT_BEHIND)->withSignals([$s8, $s9])->withChain(['symfony/http-foundation'])->withDirectDependents(['symfony/http-foundation'])->build();
 
         self::assertTrue($finding->hasUnfixableAdvisory());
-        self::assertSame(Priority::CRITICAL, $finding->priority());
+        self::assertSame(Priority013::CRITICAL, $finding->priority());
         self::assertStringEndsWith('; 3 fixed by v8.1.7, 1 fixed by v3.4.47; no fix expected on 3.x', $finding->ownEvidence());
 
         $allOnBranch = (new FindingBuilder())->withPackage('symfony/http-foundation')->withVersion('v3.4.18')->withVerdict(Verdict::LEFT_BEHIND)->withSignals([$s8, new Signal('S9', 'warn', '1 security advisory affects v3.4.18 (a); fixed by v3.4.47', ['advisories' => [self::fixed('v3.4.47', true)]])])->withChain(['symfony/http-foundation'])->withDirectDependents(['symfony/http-foundation'])->build();
         self::assertFalse($allOnBranch->hasUnfixableAdvisory(), 'a composer update inside the constraint gets the fix');
-        self::assertSame(Priority::HIGH, $allOnBranch->priority());
+        self::assertSame(Priority013::HIGH, $allOnBranch->priority());
         self::assertStringEndsWith('; fixed by v3.4.47', $allOnBranch->ownEvidence());
 
         $openEverywhere = (new FindingBuilder())->withPackage('symfony/http-foundation')->withVersion('v3.4.18')->withVerdict(Verdict::LEFT_BEHIND)->withSignals([$s8, new Signal('S9', 'warn', '1 security advisory affects v3.4.18 (a)', ['advisories' => [self::OPEN]])])->withChain(['symfony/http-foundation'])->withDirectDependents(['symfony/http-foundation'])->build();
@@ -305,34 +308,34 @@ final class FindingTest extends TestCase
         $finding = (new FindingBuilder())->withVersion('1.2.3')->withVerdict(Verdict::ABANDONED)->build();
         self::assertFalse($finding->isDev());
         self::assertTrue($finding->isDirect());
-        self::assertSame(Priority::CRITICAL, $finding->priority());
+        self::assertSame(Priority013::CRITICAL, $finding->priority());
     }
 
     public function testDevIsTheLastConstructorParameterAndLowersThePriority(): void
     {
         $finding = (new FindingBuilder())->withVersion('1.2.3')->withVerdict(Verdict::ABANDONED)->withDev(true)->build();
         self::assertTrue($finding->isDev());
-        self::assertSame(Priority::HIGH, $finding->priority());
+        self::assertSame(Priority013::HIGH, $finding->priority());
     }
 
     public function testATransitiveDevFindingIsLoweredTwice(): void
     {
         $finding = (new FindingBuilder())->withVersion('1.2.3')->withVerdict(Verdict::ABANDONED)->withChain(['vendor/root', 'vendor/pkg'])->withDev(true)->build();
         self::assertFalse($finding->isDirect());
-        self::assertSame(Priority::MEDIUM, $finding->priority());
+        self::assertSame(Priority013::MEDIUM, $finding->priority());
     }
 
     public function testAnEmptyChainCountsAsTransitive(): void
     {
         $finding = (new FindingBuilder())->withVersion('1.2.3')->withVerdict(Verdict::ABANDONED)->withChain([])->build();
         self::assertFalse($finding->isDirect());
-        self::assertSame(Priority::HIGH, $finding->priority());
+        self::assertSame(Priority013::HIGH, $finding->priority());
     }
 
     public function testAnUnflaggedFindingHasNoPriority(): void
     {
         $finding = (new FindingBuilder())->withVersion('1.2.3')->build();
-        self::assertSame(Priority::NONE, $finding->priority());
+        self::assertSame(Priority013::NONE, $finding->priority());
     }
 
     /**
@@ -360,7 +363,7 @@ final class FindingTest extends TestCase
             ['package', 'version', 'verdict', 'priority', 'direct', 'dev', 'from_composer_repository', 'origin', 'replacement', 'replacement_url', 'signals', 'chain', 'direct_dependents', 'evidence', 'allowlist_reason', 'note', 'data_date', 'libyears', 'libyears_unmeasured', 'priority_basis', 'no_fix_expected'],
             array_keys($array)
         );
-        self::assertSame(Priority::LOW, $array['priority']);
+        self::assertSame(Priority013::LOW, $array['priority']);
         self::assertFalse($array['direct']);
         self::assertTrue($array['dev']);
     }
@@ -484,7 +487,7 @@ final class FindingTest extends TestCase
         self::assertSame([], $original->signals());
         self::assertSame([$s7], $annotated->signals());
         self::assertSame(Verdict::OK, $annotated->verdict());
-        self::assertSame(Priority::NONE, $annotated->priority());
+        self::assertSame(Priority013::NONE, $annotated->priority());
         self::assertSame('pulls in 1 flagged package: vendor/dep (stale)', $annotated->evidence());
         self::assertTrue($annotated->isDev());
         self::assertSame($at, $annotated->dataDate());
@@ -624,7 +627,7 @@ final class FindingTest extends TestCase
         $finding = (new FindingBuilder())->withPackage('symfony/http-foundation')->withVersion('v3.4.18')->withVerdict(Verdict::LEFT_BEHIND)->withSignals([$s9])->withChain(['laravel/framework', 'symfony/http-foundation'])->build();
 
         self::assertSame(['base' => 'high', 'steps' => [['reason' => 'transitive', 'from' => 'high', 'to' => 'medium'], ['reason' => 'no_fix_expected', 'from' => 'medium', 'to' => 'high']]], $finding->toArray()['priority_basis']);
-        self::assertSame(Priority::HIGH, $finding->priority());
+        self::assertSame(Priority013::HIGH, $finding->priority());
     }
 
     /** A lock read without its composer.json: nothing reaches the package, and the step says so rather than `transitive`. */
@@ -671,5 +674,97 @@ final class FindingTest extends TestCase
         );
         self::assertSame('allowlisted: interfaces', $allowlistedWithoutEvidence->evidenceLine());
         self::assertSame('last release 2022-05-20 (4.3 years ago)', $notAllowlisted->evidenceLine());
+    }
+
+    /** @return iterable<string, array{\Closure(Finding): mixed}> */
+    public static function scoreReaders(): iterable
+    {
+        yield 'grade' => [static fn (Finding $finding) => $finding->grade()];
+        yield 'lead' => [static fn (Finding $finding) => $finding->lead()];
+        yield 'isGraded' => [static fn (Finding $finding) => $finding->isGraded()];
+        yield 'score' => [static fn (Finding $finding) => $finding->score()];
+    }
+
+    /**
+     * @param \Closure(Finding): mixed $read
+     *
+     * @dataProvider scoreReaders
+     */
+    #[DataProvider('scoreReaders')]
+    public function testAFindingBuiltWithoutItsFlagsRefusesToGrade(\Closure $read): void
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('vendor/pkg was built without its flags, so it has no score.');
+
+        $read((new FindingBuilder())->build());
+    }
+
+    /** @return iterable<string, array{list<string>, bool, string, string, int}> */
+    public static function reaches(): iterable
+    {
+        yield 'direct' => [['vendor/pkg'], false, Score::DIRECT, 'high', 16];
+        yield 'transitive' => [['vendor/root', 'vendor/pkg'], false, Score::TRANSITIVE, 'medium', 8];
+        yield 'unreached' => [[], false, Score::UNREACHED, 'medium', 8];
+        yield 'direct dev' => [['vendor/pkg'], true, Score::DIRECT, 'medium', 8];
+        yield 'transitive dev' => [['vendor/root', 'vendor/pkg'], true, Score::TRANSITIVE, 'low', 4];
+    }
+
+    /**
+     * @param list<string> $chain
+     *
+     * @dataProvider reaches
+     */
+    #[DataProvider('reaches')]
+    public function testTheScoreTakesItsReachFromTheChainAndItsDevHalvingFromTheLock(array $chain, bool $dev, string $reach, string $grade, int $total): void
+    {
+        $signals = [new Signal(Signal::S8, Signal::LEVEL_WARN, 'left behind')];
+        $finding = (new FindingBuilder())->withVerdict(Verdict::LEFT_BEHIND)->withSignals($signals)->withChain($chain)->withDev($dev)->withFlags(FlagSet::fromSignals($signals, null, []))->build();
+
+        self::assertSame($reach, $finding->score()->reach());
+        self::assertSame($dev, $finding->score()->isDev());
+        self::assertSame($total, $finding->score()->total());
+        self::assertSame($grade, $finding->grade());
+        self::assertSame(FlagSet::LEFT_BEHIND, $finding->lead());
+        self::assertTrue($finding->isGraded());
+    }
+
+    public function testAVulnerableOnlyFindingIsGradedWithNoLeadAndKeepsItsCauseWord(): void
+    {
+        $flags = FlagSet::fromSignals([], null, [Score::advisory('PKSA-1', 'critical', 'update')]);
+        $finding = (new FindingBuilder())->withFlags($flags)->build();
+
+        self::assertSame(Verdict::OK, $finding->verdict());
+        self::assertSame('critical', $finding->grade());
+        self::assertNull($finding->lead());
+        self::assertTrue($finding->isGraded());
+    }
+
+    /** @return iterable<string, array{?AllowlistEntry, bool, string}> */
+    public static function zeroes(): iterable
+    {
+        yield 'nothing counts' => [null, true, 'ok'];
+        yield 'no release metadata' => [null, false, 'unknown'];
+        yield 'an entry accepts the whole package' => [new AllowlistEntry('vendor/pkg', null, 'interfaces', null, 'builtin'), true, 'finished'];
+        yield 'an entry accepts the whole package, no release metadata' => [new AllowlistEntry('vendor/pkg', null, 'interfaces', null, 'builtin'), false, 'finished'];
+    }
+
+    /** @dataProvider zeroes */
+    #[DataProvider('zeroes')]
+    public function testAScoreOfZeroSaysWhy(?AllowlistEntry $entry, bool $maintenanceJudged, string $verdict): void
+    {
+        $finding = (new FindingBuilder())->withFlags(FlagSet::fromSignals([], $entry, []), $maintenanceJudged)->build();
+
+        self::assertSame($verdict, $finding->grade());
+        self::assertFalse($finding->isGraded());
+        self::assertNull($finding->lead());
+    }
+
+    public function testWithSignalsKeepsTheScore(): void
+    {
+        $signals = [new Signal(Signal::S8, Signal::LEVEL_WARN, 'left behind')];
+        $finding = (new FindingBuilder())->withSignals($signals)->withFlags(FlagSet::fromSignals($signals, null, []))->build();
+
+        self::assertSame($finding->score(), $finding->withSignals([])->score());
+        self::assertSame('high', $finding->withSignals([])->grade());
     }
 }

@@ -109,7 +109,7 @@ jobs:
       fail-fast: false
       matrix:
         shard:
-          - {name: verdicts and output, filter: 'src/Verdict src/Score src/Output src/Html src/Explain src/Security', min_msi: 98}
+          - {name: verdicts and output, filter: 'src/Verdict src/Score src/Legacy src/Output src/Html src/Explain src/Security', min_msi: 98}
           - {name: signals and analyzer, filter: 'src/Signal src/Analyzer', min_msi: 98}
           - {name: composer and self-update, filter: 'src/Composer src/Config src/SelfUpdate', min_msi: 96}
           - {name: repository data, filter: 'src/Data/Repository', min_msi: 96}

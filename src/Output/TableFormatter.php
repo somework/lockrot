@@ -6,8 +6,8 @@ namespace Lockrot\Output;
 
 use Lockrot\Analyzer\Report;
 use Lockrot\Baseline\BaselineComparison;
+use Lockrot\Legacy\Priority013;
 use Lockrot\Verdict\Finding;
-use Lockrot\Verdict\Priority;
 
 /**
  * The `table` format, a list grouped by priority (docs/example-run.md#the-table-format). A row is
@@ -79,7 +79,7 @@ final class TableFormatter implements FormatterInterface
     }
 
     /**
-     * Groups in {@see Priority::all()} order. Inside a group, the order is the report's.
+     * Groups in {@see Priority013::all()} order. Inside a group, the order is the report's.
      *
      * @param list<Finding> $rows
      *
@@ -87,7 +87,7 @@ final class TableFormatter implements FormatterInterface
      */
     private function groups(array $rows): array
     {
-        $groups = array_fill_keys(Priority::all(), []);
+        $groups = array_fill_keys(Priority013::all(), []);
         foreach ($rows as $finding) {
             $groups[$finding->priority()][] = $finding;
         }
@@ -97,7 +97,7 @@ final class TableFormatter implements FormatterInterface
 
     private static function header(string $priority, int $count): string
     {
-        return ($priority === Priority::NONE ? 'not flagged' : $priority).' ('.$count.')';
+        return ($priority === Priority013::NONE ? 'not flagged' : $priority).' ('.$count.')';
     }
 
     /**
@@ -157,10 +157,10 @@ final class TableFormatter implements FormatterInterface
     private function styled(Finding $finding, string $escapedLabel): string
     {
         $priority = $finding->priority();
-        if ($priority === Priority::CRITICAL || $priority === Priority::HIGH) {
+        if ($priority === Priority013::CRITICAL || $priority === Priority013::HIGH) {
             return '<fg=red>'.$escapedLabel.'</fg=red>';
         }
-        if ($priority === Priority::MEDIUM) {
+        if ($priority === Priority013::MEDIUM) {
             return '<fg=yellow>'.$escapedLabel.'</fg=yellow>';
         }
 

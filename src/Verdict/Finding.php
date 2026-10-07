@@ -8,7 +8,12 @@ use Composer\Package\Loader\ValidatingArrayLoader;
 use Lockrot\Analyzer\Libyears;
 use Lockrot\Analyzer\LibyearsMeasurement;
 use Lockrot\Data\Repository\ReleaseBranch;
+use Lockrot\Legacy\NoFix013;
+use Lockrot\Legacy\Priority013;
+use Lockrot\Legacy\PriorityBasis013;
+use Lockrot\Legacy\Verdict013;
 use Lockrot\Lock\PackageOrigin;
+use Lockrot\Score\ScoreBasis;
 use Lockrot\Signal\Signal;
 
 /** @internal */
@@ -57,13 +62,17 @@ final class Finding
     private PackageOrigin $origin;
     /** The registry that named the replacement, which decides where it is linked. */
     private ?string $replacementNamedBy;
+    /** Null for a finding built without its flags. */
+    private ?Score $score = null;
+    private ?string $grade = null;
 
     /**
      * @param list<Signal> $signals
      * @param list<string> $chain
      * @param list<string> $directDependents
+     * @param bool         $maintenanceJudged lockrot read the release metadata
      */
-    public function __construct(string $package, string $version, string $verdict, array $signals, array $chain, ?string $allowlistReason, ?\DateTimeImmutable $dataDate, ?string $note = null, bool $dev = false, array $directDependents = [], ?LibyearsMeasurement $libyears = null, ?PackageOrigin $origin = null, ?string $replacementNamedBy = null)
+    public function __construct(string $package, string $version, string $verdict, array $signals, array $chain, ?string $allowlistReason, ?\DateTimeImmutable $dataDate, ?string $note = null, bool $dev = false, array $directDependents = [], ?LibyearsMeasurement $libyears = null, ?PackageOrigin $origin = null, ?string $replacementNamedBy = null, ?FlagSet $flags = null, bool $maintenanceJudged = true)
     {
         $origin ??= PackageOrigin::unattributed();
         $fromComposerRepository = $origin->isComposerRepository();
@@ -91,6 +100,20 @@ final class Finding
         $this->libyears = $libyears;
         $this->origin = $origin;
         $this->replacementNamedBy = $replacementNamedBy;
+        if ($flags !== null) {
+            $this->score = Score::of($flags, self::reachOf($chain), $dev);
+            $this->grade = ScoreBasis::verdict($this->score, $flags, $maintenanceJudged);
+        }
+    }
+
+    /** @param list<string> $chain */
+    private static function reachOf(array $chain): string
+    {
+        if (\count($chain) === 1) {
+            return Score::DIRECT;
+        }
+
+        return $chain === [] ? Score::UNREACHED : Score::TRANSITIVE;
     }
 
     /**
@@ -117,9 +140,46 @@ final class Finding
         return $this->version;
     }
 
+    /** The cause word that report-1 writes. */
     public function verdict(): string
     {
         return $this->verdict;
+    }
+
+    /** The verdict of the score: a grade, else `finished`, `unknown` or `ok`. */
+    public function grade(): string
+    {
+        if ($this->grade === null) {
+            throw $this->unscored();
+        }
+
+        return $this->grade;
+    }
+
+    /** The first counted maintenance flag, null when none counts. */
+    public function lead(): ?string
+    {
+        return $this->score()->lead();
+    }
+
+    public function isGraded(): bool
+    {
+        return $this->score()->grade() !== null;
+    }
+
+    /** @throws \LogicException for a finding built without its flags */
+    public function score(): Score
+    {
+        if ($this->score === null) {
+            throw $this->unscored();
+        }
+
+        return $this->score;
+    }
+
+    private function unscored(): \LogicException
+    {
+        return new \LogicException(\sprintf('%s was built without its flags, so it has no score.', $this->package));
     }
 
     /** @return list<Signal> */
@@ -206,9 +266,9 @@ final class Finding
         return $this->priorityBasis()->priority();
     }
 
-    public function priorityBasis(): PriorityBasis
+    public function priorityBasis(): PriorityBasis013
     {
-        return Priority::basis($this->verdict, $this->isDirect(), $this->dev, $this->hasUnfixableAdvisory(), $this->chain !== []);
+        return Priority013::basis($this->verdict, $this->isDirect(), $this->dev, $this->hasUnfixableAdvisory(), $this->chain !== []);
     }
 
     /** Rules: docs/verdicts.md#security-advisories. */
@@ -224,7 +284,7 @@ final class Finding
      */
     public function noFixExpected(): ?array
     {
-        if (!\in_array($this->verdict, self::NO_FIX_VERDICTS, true) || !Verdict::flagged($this->verdict)) {
+        if (!\in_array($this->verdict, self::NO_FIX_VERDICTS, true) || !Verdict013::flagged($this->verdict)) {
             return null;
         }
         // Only S9 knows whether a null fixed_by was looked for. Without the key, nothing says that it was.
@@ -244,16 +304,16 @@ final class Finding
     private function noFixReason(array $row, bool $releasesRead): string
     {
         if ($this->verdict === Verdict::LEFT_BEHIND && ($row['fixed_by'] ?? null) !== null) {
-            return NoFix::NOT_ON_INSTALLED_BRANCH;
+            return NoFix013::NOT_ON_INSTALLED_BRANCH;
         }
         if (!$releasesRead) {
-            return NoFix::RELEASES_UNKNOWN;
+            return NoFix013::RELEASES_UNKNOWN;
         }
         if (($row['affected_versions'] ?? null) === null) {
-            return NoFix::AFFECTED_RANGE_UNKNOWN;
+            return NoFix013::AFFECTED_RANGE_UNKNOWN;
         }
 
-        return NoFix::NO_RELEASE_FIXES;
+        return NoFix013::NO_RELEASE_FIXES;
     }
 
     /** The clause texts: docs/verdicts.md#security-advisories. */
@@ -263,7 +323,7 @@ final class Finding
         if ($list === null || $list === []) {
             return null;
         }
-        if (\in_array(NoFix::NOT_ON_INSTALLED_BRANCH, array_column($list, 'reason'), true)) {
+        if (\in_array(NoFix013::NOT_ON_INSTALLED_BRANCH, array_column($list, 'reason'), true)) {
             $branch = ReleaseBranch::of($this->version);
 
             return $branch === null ? 'no fix expected' : 'no fix expected on '.ReleaseBranch::label($branch);

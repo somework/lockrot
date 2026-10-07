@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Verdict;
 
 use Lockrot\Exception\ConfigException;
+use Lockrot\Legacy\Priority013;
 use Lockrot\Signal\Signal;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
-use Lockrot\Verdict\Priority;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -95,7 +95,7 @@ final class FailOnTest extends TestCase
         yield 'an unflagged verdict' => [Verdict::UNKNOWN];
         yield 'ok' => [Verdict::OK];
         yield 'finished' => [Verdict::FINISHED];
-        yield 'the priority none is not a level' => [Priority::NONE.' '];
+        yield 'the priority none is not a level' => [Priority013::NONE.' '];
         yield 'empty' => [''];
         yield 'case matters' => ['High'];
     }
@@ -124,7 +124,7 @@ final class FailOnTest extends TestCase
 
     public function testAPriorityThresholdIsInclusiveAndReadsThePriority(): void
     {
-        $high = FailOn::fromString(Priority::HIGH);
+        $high = FailOn::fromString(Priority013::HIGH);
         self::assertFalse($high->isNone());
         self::assertTrue($high->reaches(self::finding(Verdict::ABANDONED)), 'critical reaches high');
         self::assertTrue($high->reaches(self::finding(Verdict::PINNED)), 'high, direct prod');
@@ -133,11 +133,11 @@ final class FailOnTest extends TestCase
         self::assertFalse($high->reaches(self::finding(Verdict::STALE)), 'stale, direct prod: medium');
         self::assertFalse($high->reaches(self::finding(Verdict::OK)), 'no priority at all');
 
-        self::assertTrue(FailOn::fromString(Priority::LOW)->reaches(self::finding(Verdict::STALE, ['a/root', 'a/pkg'], true)));
-        self::assertFalse(FailOn::fromString(Priority::LOW)->reaches(self::finding(Verdict::FINISHED)));
-        self::assertTrue(FailOn::fromString(Priority::CRITICAL)->reaches(self::finding(Verdict::SILENT)));
-        self::assertFalse(FailOn::fromString(Priority::CRITICAL)->reaches(self::finding(Verdict::SILENT, ['a/root', 'a/pkg'])));
-        self::assertTrue(FailOn::fromString(Priority::MEDIUM)->reaches(self::finding(Verdict::STALE)));
-        self::assertFalse(FailOn::fromString(Priority::MEDIUM)->reaches(self::finding(Verdict::STALE, ['a/root', 'a/pkg'])));
+        self::assertTrue(FailOn::fromString(Priority013::LOW)->reaches(self::finding(Verdict::STALE, ['a/root', 'a/pkg'], true)));
+        self::assertFalse(FailOn::fromString(Priority013::LOW)->reaches(self::finding(Verdict::FINISHED)));
+        self::assertTrue(FailOn::fromString(Priority013::CRITICAL)->reaches(self::finding(Verdict::SILENT)));
+        self::assertFalse(FailOn::fromString(Priority013::CRITICAL)->reaches(self::finding(Verdict::SILENT, ['a/root', 'a/pkg'])));
+        self::assertTrue(FailOn::fromString(Priority013::MEDIUM)->reaches(self::finding(Verdict::STALE)));
+        self::assertFalse(FailOn::fromString(Priority013::MEDIUM)->reaches(self::finding(Verdict::STALE, ['a/root', 'a/pkg'])));
     }
 }

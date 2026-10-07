@@ -37,6 +37,9 @@ final class ScoreModel
 
     public const GRADES = ['critical', 'high', 'medium', 'low'];
 
+    /** The verdicts in sort order. The verdicts of one group sort as equals. */
+    public const VERDICT_ORDER = [['critical'], ['high'], ['medium'], ['low'], ['unknown'], ['finished', 'ok']];
+
     /** The floor of each grade's band, worst first. */
     public const BANDS = ['critical' => 32, 'high' => 16, 'medium' => 8, 'low' => 1];
 
@@ -166,7 +169,7 @@ final class ScoreModel
             'bar_overflow' => 'clip',
             'exclusive_groups' => self::EXCLUSIVE_GROUPS,
             'sort' => [
-                ['key' => 'verdict', 'path' => 'verdict', 'dir' => 'order', 'order' => [['critical'], ['high'], ['medium'], ['low'], ['unknown'], ['finished', 'ok']], 'default' => null, 'collation' => null],
+                ['key' => 'verdict', 'path' => 'verdict', 'dir' => 'order', 'order' => self::VERDICT_ORDER, 'default' => null, 'collation' => null],
                 ['key' => 'security', 'path' => 'score.parts.security.contribution', 'dir' => 'desc', 'default' => 0, 'collation' => null],
                 ['key' => 'score', 'path' => 'score.exact', 'dir' => 'desc', 'default' => 0, 'collation' => null],
                 ['key' => 'direct', 'path' => 'direct', 'dir' => 'true_first', 'default' => null, 'collation' => null],

@@ -13,6 +13,9 @@ use Lockrot\Data\Forge\RepoRef;
 use Lockrot\Data\Repository\MetadataFailure;
 use Lockrot\Json\KnownValues;
 use Lockrot\Json\Schemas;
+use Lockrot\Legacy\NoFix013;
+use Lockrot\Legacy\Priority013;
+use Lockrot\Legacy\PriorityBasis013;
 use Lockrot\Lock\PackageOrigin;
 use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\Rule\NotCheckedRule;
@@ -20,9 +23,6 @@ use Lockrot\Signal\Rule\PinnedRule;
 use Lockrot\Tests\Support\ClosedSets;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Verdict\FailOn;
-use Lockrot\Verdict\NoFix;
-use Lockrot\Verdict\Priority;
-use Lockrot\Verdict\PriorityBasis;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
@@ -67,8 +67,8 @@ final class ClosedSetsTest extends TestCase
     /**
      * The values report-1 and explain-1 list for three open sets whose PHP lists later releases
      * retire, frozen here so their rows outlive the constants: `run.fail_on_kind`
-     * ({@see FailOn::KINDS}), a `priority_basis` step's `reason` ({@see PriorityBasis::STEPS}) and a
-     * `no_fix_expected` item's `reason` ({@see NoFix::REASONS}). Every other `-1` row reads its live
+     * ({@see FailOn::KINDS}), a `priority_basis` step's `reason` ({@see PriorityBasis013::STEPS}) and a
+     * `no_fix_expected` item's `reason` ({@see NoFix013::REASONS}). Every other `-1` row reads its live
      * constant while its file is still widened under its number.
      */
     private const FAIL_ON_KINDS_1 = ['none', 'verdict', 'priority', 'unchecked'];
@@ -105,10 +105,10 @@ final class ClosedSetsTest extends TestCase
 
     public function testThePrioritiesAreFrozenInTheirOrder(): void
     {
-        self::assertSame(self::PRIORITIES, Priority::all());
-        $priorities = Priority::all();
+        self::assertSame(self::PRIORITIES, Priority013::all());
+        $priorities = Priority013::all();
         for ($i = 0, $last = \count($priorities) - 1; $i < $last; ++$i) {
-            self::assertGreaterThan(Priority::rank($priorities[$i + 1]), Priority::rank($priorities[$i]), $priorities[$i]);
+            self::assertGreaterThan(Priority013::rank($priorities[$i + 1]), Priority013::rank($priorities[$i]), $priorities[$i]);
         }
     }
 
@@ -138,11 +138,11 @@ final class ClosedSetsTest extends TestCase
     {
         $report = self::schema(Schemas::REPORT, 1);
         $explain = self::schema(Schemas::EXPLAIN, 1);
-        $flagged = array_values(array_diff(Priority::all(), [Priority::NONE]));
+        $flagged = array_values(array_diff(Priority013::all(), [Priority013::NONE]));
 
         self::assertSame(['critical', 'high', 'medium', 'low'], $flagged);
-        self::assertSame(['transitive', 'unreached', 'dev', 'no_fix_expected'], PriorityBasis::STEPS, 'in the order the steps apply');
-        self::assertSame(['not_on_installed_branch', 'releases_unknown', 'affected_range_unknown', 'no_release_fixes'], NoFix::REASONS, 'in the order the first that applies is picked');
+        self::assertSame(['transitive', 'unreached', 'dev', 'no_fix_expected'], PriorityBasis013::STEPS, 'in the order the steps apply');
+        self::assertSame(['not_on_installed_branch', 'releases_unknown', 'affected_range_unknown', 'no_release_fixes'], NoFix013::REASONS, 'in the order the first that applies is picked');
         foreach (['report' => $report, 'explain' => $explain] as $document => $schema) {
             self::assertSame($flagged, JsonPath::arrayAt($schema, ['definitions', 'flaggedPriority', 'enum']), $document);
             self::assertSame(['$ref' => '#/definitions/flaggedPriority'], JsonPath::arrayAt($schema, ['definitions', 'priorityStep', 'properties', 'from']), $document);
@@ -583,7 +583,7 @@ final class ClosedSetsTest extends TestCase
         $config = self::schema(Schemas::CONFIG, 1);
         $topLevelKeys = self::keys(JsonPath::arrayAt($config, ['properties']));
         $ignoreKeys = self::keys(JsonPath::arrayAt($config, ['properties', 'ignore', 'items', 'properties']));
-        $names = array_merge(Verdict::all(), Priority::all(), FailOn::allowed(), LockrotConfig::FORMATS, ClosedSets::signalIds(), [PhpFloor::PROJECT, PhpFloor::TARGET, PhpFloor::NEEDS_NEWER, PhpFloor::STOPS_BEFORE, PhpFloor::SKIPS, PhpFloor::UNSATISFIABLE], Libyears::REASONS, PriorityBasis::STEPS, NoFix::REASONS, Gate::MODES, FailOn::KINDS, Gate::TRIPS, Gate::EXEMPTIONS, RunNote::CODES, RepoRef::FORGES, MetadataFailure::REASONS, RunNote::ADVISORIES_NOT_CHECKED_REASONS, RunNote::REPOSITORY_ACTIVITY_NOT_CHECKED_REASONS, PackageOrigin::KINDS, PackageOrigin::REGISTRIES, $topLevelKeys, $ignoreKeys);
+        $names = array_merge(Verdict::all(), Priority013::all(), FailOn::allowed(), LockrotConfig::FORMATS, ClosedSets::signalIds(), [PhpFloor::PROJECT, PhpFloor::TARGET, PhpFloor::NEEDS_NEWER, PhpFloor::STOPS_BEFORE, PhpFloor::SKIPS, PhpFloor::UNSATISFIABLE], Libyears::REASONS, PriorityBasis013::STEPS, NoFix013::REASONS, Gate::MODES, FailOn::KINDS, Gate::TRIPS, Gate::EXEMPTIONS, RunNote::CODES, RepoRef::FORGES, MetadataFailure::REASONS, RunNote::ADVISORIES_NOT_CHECKED_REASONS, RunNote::REPOSITORY_ACTIVITY_NOT_CHECKED_REASONS, PackageOrigin::KINDS, PackageOrigin::REGISTRIES, $topLevelKeys, $ignoreKeys);
 
         foreach ($names as $name) {
             self::assertStringNotContainsString(':', $name, '<vendor>:<name> is reserved for names that are not lockrot\'s');

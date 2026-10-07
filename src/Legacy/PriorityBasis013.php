@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Lockrot\Verdict;
+namespace Lockrot\Legacy;
 
 /**
  * The fields: docs/schema.md#how-a-priority-was-reached.
  *
  * @internal
  */
-final class PriorityBasis
+final class PriorityBasis013
 {
     public const STEP_TRANSITIVE = 'transitive';
     public const STEP_UNREACHED = 'unreached';

@@ -4,42 +4,51 @@ declare(strict_types=1);
 
 namespace Lockrot\Verdict;
 
-/** @internal */
+use Lockrot\Legacy\Verdict013;
+
+/**
+ * The cause word that {@see Finding::verdict()} returns. Report-1's readers, which read it until they
+ * move to {@see Finding::grade()}, call these delegates.
+ *
+ * @internal
+ */
 final class Verdict
 {
-    public const ABANDONED = 'abandoned';
-    public const SILENT = 'silent';
-    public const PINNED = 'pinned';
-    public const LEFT_BEHIND = 'left-behind';
-    public const OLD_PROMISE = 'old-promise';
-    public const STALE = 'stale';
-    public const UNKNOWN = 'unknown';
-    public const FINISHED = 'finished';
-    public const OK = 'ok';
+    public const ABANDONED = Verdict013::ABANDONED;
+    public const SILENT = Verdict013::SILENT;
+    public const PINNED = Verdict013::PINNED;
+    public const LEFT_BEHIND = Verdict013::LEFT_BEHIND;
+    public const OLD_PROMISE = Verdict013::OLD_PROMISE;
+    public const STALE = Verdict013::STALE;
+    public const UNKNOWN = Verdict013::UNKNOWN;
+    public const FINISHED = Verdict013::FINISHED;
+    public const OK = Verdict013::OK;
 
-    private const SEVERITY = [
-        self::ABANDONED => 60, self::SILENT => 50, self::PINNED => 40, self::LEFT_BEHIND => 35, self::OLD_PROMISE => 30,
-        self::STALE => 20, self::UNKNOWN => 10, self::FINISHED => 0, self::OK => 0,
-    ];
-
+    /** @deprecated misreads a grade: call {@see Verdict013::severity()} on a cause word */
     public static function severity(string $verdict): int
     {
-        return self::SEVERITY[$verdict] ?? 0;
+        return Verdict013::severity($verdict);
     }
 
-    /** @return list<string> */
+    /**
+     * @deprecated misreads a grade: call {@see Verdict013::all()}
+     *
+     * @return list<string>
+     */
     public static function all(): array
     {
-        return array_keys(self::SEVERITY);
+        return Verdict013::all();
     }
 
+    /** @deprecated misreads a grade: call {@see Verdict013::isValid()} on a cause word */
     public static function isValid(string $verdict): bool
     {
-        return isset(self::SEVERITY[$verdict]);
+        return Verdict013::isValid($verdict);
     }
 
+    /** @deprecated misreads a grade: call {@see Verdict013::flagged()} on a cause word, or {@see Finding::isGraded()} */
     public static function flagged(string $verdict): bool
     {
-        return self::severity($verdict) >= self::SEVERITY[self::STALE];
+        return Verdict013::flagged($verdict);
     }
 }

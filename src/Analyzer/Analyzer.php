@@ -28,12 +28,17 @@ use Lockrot\Graph\DependencyGraph;
 use Lockrot\Lock\LockedPackage;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
+use Lockrot\Security\FixFinder;
+use Lockrot\Security\LinkIndex;
+use Lockrot\Security\Severity;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\Rule\AbandonedRule;
 use Lockrot\Signal\Rule\NotCheckedRule;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Verdict\Finding;
+use Lockrot\Verdict\FlagSet;
+use Lockrot\Verdict\Score;
 use Lockrot\Verdict\VerdictEngine;
 
 /** @internal */
@@ -163,6 +168,7 @@ final class Analyzer
         $notes = array_merge($notes, $activityNotes);
         $activity = $activityBatch->activity();
 
+        $fixes = new FixFinder($this->signals->phpFloor(), LinkIndex::of($lock, $project));
         $findings = [];
         $factsByPackage = [];
         $notInRepository = 0;
@@ -173,7 +179,7 @@ final class Analyzer
             $entry = $allowlisted[$package->name()];
             $facts = new PackageFacts($package, $meta, $act, $advisories->for($package->name()), $notChecked[$package->name()] ?? null, $abandonedIgnore[$package->name()], $advisories->coverage()->for($package->name()), isset($batch->failed()[$package->name()]));
             $factsByPackage[$package->name()] = $facts;
-            $findings[] = $this->buildFinding($facts, $entry, $graph, $batch);
+            $findings[] = $this->buildFinding($facts, $entry, $graph, $batch, $fixes);
             if (!$package->isFromComposerRepository()) {
                 ++$notInRepository;
             }
@@ -383,7 +389,7 @@ final class Analyzer
         return [$batch, $notes];
     }
 
-    private function buildFinding(PackageFacts $facts, ?AllowlistEntry $entry, DependencyGraph $graph, MetadataBatch $batch): Finding
+    private function buildFinding(PackageFacts $facts, ?AllowlistEntry $entry, DependencyGraph $graph, MetadataBatch $batch, FixFinder $fixes): Finding
     {
         $package = $facts->package();
         $meta = $facts->metadata();
@@ -419,8 +425,26 @@ final class Analyzer
             array_keys($graph->chainsTo($package->name())),
             Libyears::measure($package, $meta),
             $package->origin(),
-            AbandonedRule::replacementNamedBy($facts)
+            AbandonedRule::replacementNamedBy($facts),
+            FlagSet::fromSignals($signals, $entry, self::countedAdvisories($facts, $fixes)),
+            $meta !== null
         );
+    }
+
+    /**
+     * The advisories that affect the installed version, as the score reads them.
+     *
+     * @return list<array{id: string, severity: string, fix_kind: string}>
+     */
+    private static function countedAdvisories(PackageFacts $facts, FixFinder $fixes): array
+    {
+        $found = $fixes->find($facts);
+        $counted = [];
+        foreach ($facts->advisories() as $advisory) {
+            $counted[] = Score::advisory($advisory->id(), Severity::fromComposer($advisory->severity())->bucket(), $found->forAdvisory($advisory->id())->kind());
+        }
+
+        return $counted;
     }
 
     /**

@@ -17,6 +17,7 @@ use Lockrot\Data\Forge\Tokens;
 use Lockrot\Data\Http\RecordedHttpClient;
 use Lockrot\Data\Php\PhpReleaseDates;
 use Lockrot\Data\Repository\RepositoryMetadataLoader;
+use Lockrot\Legacy\Priority013;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Signal\Signal;
@@ -27,7 +28,6 @@ use Lockrot\Tests\Support\Golden;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\MemoisingMetadataLoader;
 use Lockrot\Verdict\Finding;
-use Lockrot\Verdict\Priority;
 use Lockrot\Verdict\Verdict;
 use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
@@ -141,11 +141,11 @@ final class AcceptanceTest extends TestCase
             // lowered one step for being transitive -> high; phpzip/phpzip is reached through
             // wallabag/phpepub and silent -> the same one-step drop to high. The lock is analysed with
             // includeDev = false, so every row here is a prod row.
-            self::assertSame(Priority::HIGH, $f['wallabag/rulerz']->priority());
+            self::assertSame(Priority013::HIGH, $f['wallabag/rulerz']->priority());
             self::assertTrue($f['wallabag/rulerz']->isDirect());
-            self::assertSame(Priority::HIGH, $f['hoa/ruler']->priority());
+            self::assertSame(Priority013::HIGH, $f['hoa/ruler']->priority());
             self::assertSame(['wallabag/rulerz', 'hoa/ruler'], $f['hoa/ruler']->chain());
-            self::assertSame(Priority::HIGH, $f['phpzip/phpzip']->priority());
+            self::assertSame(Priority013::HIGH, $f['phpzip/phpzip']->priority());
             self::assertSame(['wallabag/phpepub', 'phpzip/phpzip'], $f['phpzip/phpzip']->chain());
             self::assertFalse($f['phpzip/phpzip']->isDev());
             // Transitive exposure (S7). hoa/ruler is reached from two root requires, so the second
@@ -189,10 +189,10 @@ final class AcceptanceTest extends TestCase
             // package here that is abandoned *and* direct *and* prod — the only way to reach
             // critical. Named rather than asserted positionally so a shift in the recorded data says
             // which package moved.
-            self::assertSame(Priority::CRITICAL, $f['sensio/framework-extra-bundle']->priority());
+            self::assertSame(Priority013::CRITICAL, $f['sensio/framework-extra-bundle']->priority());
             self::assertTrue($f['sensio/framework-extra-bundle']->isDirect());
             self::assertSame('sensio/framework-extra-bundle', $report->findings()[0]->package());
-            self::assertSame(Priority::CRITICAL, $report->findings()[0]->priority());
+            self::assertSame(Priority013::CRITICAL, $report->findings()[0]->priority());
             self::assertFalse($report->hadNetworkFailures(), implode("\n", $report->notes()));
             // The PHAR runs under PHP's default 128M memory_limit: analysing wallabag's lock must not
             // retain the expanded Packagist release history.
@@ -213,10 +213,10 @@ final class AcceptanceTest extends TestCase
     {
         $f = $this->byName($this->analyze('apps/wallabag_wallabag'));
         $expected = [
-            'wallabag/rulerz' => [false, null, null, '2023-12-24T00:53:44+00:00', Priority::HIGH],
-            'wallabag/rulerz-bundle' => [false, null, null, '2023-12-24T22:23:50+00:00', Priority::HIGH],
-            'wallabag/rulerz-bridge' => [false, null, null, '2023-12-24T01:18:26+00:00', Priority::MEDIUM],
-            'friendsofsymfony/oauth-server-bundle' => [true, '2019-01-23T15:23:04+00:00', '1.6.2', '2022-03-24T10:22:23+00:00', Priority::HIGH],
+            'wallabag/rulerz' => [false, null, null, '2023-12-24T00:53:44+00:00', Priority013::HIGH],
+            'wallabag/rulerz-bundle' => [false, null, null, '2023-12-24T22:23:50+00:00', Priority013::HIGH],
+            'wallabag/rulerz-bridge' => [false, null, null, '2023-12-24T01:18:26+00:00', Priority013::MEDIUM],
+            'friendsofsymfony/oauth-server-bundle' => [true, '2019-01-23T15:23:04+00:00', '1.6.2', '2022-03-24T10:22:23+00:00', Priority013::HIGH],
         ];
         foreach ($expected as $package => [$released, $lastRelease, $lastVersion, $snapshotTime, $priority]) {
             $s6 = self::signal($f[$package], Signal::S6);
