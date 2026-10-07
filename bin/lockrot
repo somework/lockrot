@@ -99,10 +99,8 @@ $application = new class () extends \Composer\Console\Application {
 
     /**
      * Every registration passes the allowlist: Composer's doRun() turns each `scripts` entry of the
-     * inspected project into a command. symfony/console 7.4 adds addCommand() and deprecates add(),
-     * and Composer calls addCommand() when `method_exists()` finds it, so add() forwards here. Keep
-     * the `method_exists()` check on the parent class: on 7.4 the parent add() calls addCommand()
-     * again, and the calls recurse without end.
+     * inspected project into a command. This class declares addCommand(), so Composer calls it on
+     * every symfony/console version, and add() forwards to it.
      */
     public function add(\Symfony\Component\Console\Command\Command $command): ?\Symfony\Component\Console\Command\Command
     {
@@ -115,6 +113,8 @@ $application = new class () extends \Composer\Console\Application {
             return null;
         }
 
+        // Keep this check on the parent class: before symfony/console 7.4 the parent has no
+        // addCommand(), and on 7.4 the parent add() calls addCommand() again without end.
         return method_exists(\Composer\Console\Application::class, 'addCommand')
             ? parent::addCommand($command)
             : parent::add($command);

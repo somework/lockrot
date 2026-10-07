@@ -4,10 +4,9 @@
 #   tools/report/update-renderer v1.2.3           a release of somework/lockrot-report
 #   tools/report/update-renderer --from-dir DIR   a local dist/, for development only. It is not attested.
 #
-# The page that `--format=html` writes comes from https://github.com/somework/lockrot-report. This
-# script vendors its report.html and manifest, so the PHAR builds without node. It verifies once, when
-# the files come in, the build provenance attestation of the release and every file against the sha256
-# in the manifest. RendererManifestTest checks the sha256 on every run.
+# The page that `--format=html` writes comes from https://github.com/somework/lockrot-report. The
+# vendored files let the PHAR build without node. CONTRIBUTING, "The HTML report page", lists the
+# checks.
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 

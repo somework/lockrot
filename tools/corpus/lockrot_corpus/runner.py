@@ -58,8 +58,8 @@ def token_from_environment(anon: bool) -> 'str | None':
 # own. Otherwise an `--anon` run can authenticate while its manifest says anonymous.
 INHERITED = ('LOCKROT_GITHUB_TOKEN', 'GITHUB_TOKEN', 'LOCKROT_GITLAB_TOKEN', 'GITLAB_TOKEN',
              'COMPOSER_AUTH',
-             # Not credentials: LOCKROT_DISABLE skips the command and LOCKROT_FAIL_ON changes
-             # the exit code that the manifest records.
+             # Not credentials: LOCKROT_DISABLE skips the command. The runner passes no --fail-on,
+             # so an inherited LOCKROT_FAIL_ON changes the exit code that the manifest records.
              'LOCKROT_DISABLE', 'LOCKROT_FAIL_ON')
 
 
@@ -180,7 +180,6 @@ def run_reports(phar: str, projects_dir: str, out_dir: str, cache_root: str, tod
         write_text_atomic(os.path.join(out_dir, project + '.err'),
                           finished.stderr.decode('utf-8', 'replace'))
         if finished.returncode not in (0, 1, 2, 3, 4):
-            # Any exit code outside this tuple means that the process failed, not that lockrot answered.
             _record(manifest, project, 'failed', exit_code=finished.returncode,
                     seconds=time.time() - started)
             note('%s: lockrot exited %d; stderr kept in %s.err' % (project, finished.returncode, project))
