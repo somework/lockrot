@@ -10,8 +10,8 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
- * The frozen priority rules over the corpus floor: each finding's priority as report-1 recorded it,
- * and the findings whose priority reached a threshold that their grade does not reach.
+ * The frozen priority rules over the corpus floor. Each finding gets the priority that report-1
+ * recorded. The findings whose priority reaches a threshold that their grade does not reach are named.
  */
 final class LegacyPriority013Test extends TestCase
 {

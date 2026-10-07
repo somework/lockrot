@@ -30,7 +30,7 @@ use Lockrot\Verdict\Verdict;
 use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\TestCase;
 
-/** A package whose only fact is a counted advisory has the cause word `ok` and a grade. */
+/** A package whose only fact is a counted advisory has the report-1 verdict `ok` and a grade. */
 final class GradePredicateTest extends TestCase
 {
     private const NOW = '2026-10-01T00:00:00+00:00';
@@ -49,7 +49,7 @@ final class GradePredicateTest extends TestCase
         self::assertSame(['critical' => 0, 'high' => 1, 'medium' => 1, 'low' => 0, 'unknown' => 0, 'finished' => 0, 'ok' => 1], $report->byGrade());
     }
 
-    public function testByVerdictCountsTheCauseWord(): void
+    public function testByVerdictCountsTheReport1Verdicts(): void
     {
         $counts = self::report()->byVerdict();
 

@@ -18,8 +18,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * The order of the graded view: the verdict, then the security points, the score, direct before
- * transitive, and the name. `run.score_model.sort` publishes the same keys, and a re-sort by them
- * gives the same order (I20).
+ * transitive, and the name. A re-sort by the keys of `ScoreModel::toArray()['sort']` gives the same
+ * order.
  */
 final class SortTest extends TestCase
 {
@@ -80,8 +80,8 @@ final class SortTest extends TestCase
     }
 
     /**
-     * I20: the keys that `run.score_model.sort` publishes, read as a consumer reads them, sort every
-     * corpus report's findings into the engine's order.
+     * The keys of `ScoreModel::toArray()['sort']`, read by path as a consumer reads them, sort every
+     * corpus report's findings into the order of `Report::sorted()`.
      *
      * @dataProvider corpusReports
      */
@@ -120,7 +120,7 @@ final class SortTest extends TestCase
     }
 
     /**
-     * The fields that `run.score_model.sort` names, by path, as report-2 writes them.
+     * The fields that `ScoreModel::toArray()['sort']` names, by path.
      *
      * @return array<string, mixed>
      */

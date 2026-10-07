@@ -7,8 +7,7 @@ namespace Lockrot\Verdict;
 use Lockrot\Legacy\Verdict013;
 
 /**
- * The cause word that {@see Finding::verdict()} returns. Report-1's readers, which read it until they
- * move to {@see Finding::grade()}, call these delegates.
+ * The report-1 verdicts that {@see Finding::verdict()} returns.
  *
  * @internal
  */
@@ -24,7 +23,7 @@ final class Verdict
     public const FINISHED = Verdict013::FINISHED;
     public const OK = Verdict013::OK;
 
-    /** @deprecated misreads a grade: call {@see Verdict013::severity()} on a cause word */
+    /** @deprecated misreads a grade: call {@see Verdict013::severity()} on a report-1 verdict */
     public static function severity(string $verdict): int
     {
         return Verdict013::severity($verdict);
@@ -40,13 +39,13 @@ final class Verdict
         return Verdict013::all();
     }
 
-    /** @deprecated misreads a grade: call {@see Verdict013::isValid()} on a cause word */
+    /** @deprecated misreads a grade: call {@see Verdict013::isValid()} on a report-1 verdict */
     public static function isValid(string $verdict): bool
     {
         return Verdict013::isValid($verdict);
     }
 
-    /** @deprecated misreads a grade: call {@see Verdict013::flagged()} on a cause word, or {@see Finding::isGraded()} */
+    /** @deprecated misreads a grade: call {@see Verdict013::flagged()} on a report-1 verdict, or {@see Finding::isGraded()} */
     public static function flagged(string $verdict): bool
     {
         return Verdict013::flagged($verdict);

@@ -24,16 +24,29 @@ final class CorpusFloorTest extends TestCase
         self::assertSame(['0.13.0'], array_values(array_unique(array_column($reports, 'lockrot'))));
     }
 
-    public function testTheLeadOfEveryFlaggedFindingIsTheCauseWordThatReport1Recorded(): void
+    public function testTheProvenanceNamesThisFloor(): void
+    {
+        $provenance = json_decode((string) file_get_contents(CorpusFloor::PROVENANCE), true, 512, \JSON_THROW_ON_ERROR);
+        self::assertIsArray($provenance);
+        $reports = CorpusFloor::reports();
+
+        self::assertSame(hash_file('sha256', CorpusFloor::PATH), $provenance['sha256']);
+        self::assertSame(\count($reports), $provenance['reports']);
+        self::assertSame(array_sum(array_map(static fn (array $report): int => \count($report['findings']), $reports)), $provenance['findings']);
+    }
+
+    /** Report-1 gives a priority to a flagged finding only, so the recorded priority selects them. */
+    public function testTheLeadOfEveryFlaggedFindingIsTheReport1VerdictThatTheFloorRecorded(): void
     {
         $flagged = 0;
         foreach (CorpusFloor::reports() as $report) {
             foreach ($report['findings'] as $recorded) {
-                if (!Verdict013::flagged($recorded['verdict'])) {
+                if ($recorded['priority'] === Priority013::NONE) {
+                    self::assertFalse(Verdict013::flagged($recorded['verdict']), $report['name'].' '.$recorded['package']);
                     continue;
                 }
                 ++$flagged;
-                $finding = CorpusFloor::finding($recorded);
+                $finding = CorpusFloor::finding($recorded, CorpusFloor::advisories($recorded));
                 self::assertSame($recorded['verdict'], $finding->verdict(), $report['name'].' '.$recorded['package'].': the first-match engine');
                 self::assertSame($recorded['verdict'], $finding->lead(), $report['name'].' '.$recorded['package']);
             }
@@ -52,7 +65,7 @@ final class CorpusFloorTest extends TestCase
         $kept = 0;
         foreach (CorpusFloor::reports() as $report) {
             foreach ($report['findings'] as $recorded) {
-                if (!Verdict013::flagged($recorded['verdict'])) {
+                if ($recorded['priority'] === Priority013::NONE) {
                     continue;
                 }
                 $what = $report['name'].' '.$recorded['package'];
@@ -68,7 +81,6 @@ final class CorpusFloorTest extends TestCase
                 }
                 ++$kept;
                 self::assertSame($recorded['priority'], $rotOnly, $what);
-                self::assertNotSame(Priority013::NONE, $rotOnly, $what);
             }
         }
         self::assertGreaterThan(0, $raised);

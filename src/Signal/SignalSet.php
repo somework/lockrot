@@ -25,7 +25,7 @@ final class SignalSet
 
     /**
      * @param list<SignalRule> $rules
-     * @param ?PhpFloor        $floor the floor that S8 and the fix kinds read, null for no target and no project PHP
+     * @param ?PhpFloor        $floor the target and the project PHP, null for neither
      */
     public function __construct(array $rules, ?PhpFloor $floor = null)
     {

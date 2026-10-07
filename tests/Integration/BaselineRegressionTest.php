@@ -29,10 +29,7 @@ use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
-/**
- * A package whose only fact is an advisory has a grade and the cause word `ok`. The baseline writer
- * reads the cause word, so baseline-1, whose verdicts are cause words, never holds the package.
- */
+/** A package whose only fact is an advisory is not written into a baseline-1 file, and is not new on the next run. */
 final class BaselineRegressionTest extends TestCase
 {
     use ValidatesJsonSchemas;
@@ -70,9 +67,14 @@ final class BaselineRegressionTest extends TestCase
 
     protected function tearDown(): void
     {
-        chdir($this->cwd);
+        if ($this->cwd !== '') {
+            chdir($this->cwd);
+        }
         if ($this->server !== null) {
             $this->server->stop();
+        }
+        if ($this->dir === '' || !is_dir($this->dir)) {
+            return;
         }
         foreach ((array) glob($this->dir.'/*') as $file) {
             unlink((string) $file);
@@ -83,7 +85,7 @@ final class BaselineRegressionTest extends TestCase
     public function testAGeneratedBaselineIsBaseline1AndTheVulnerableOnlyPackageIsNotNewOnTheNextRun(): void
     {
         $report = $this->jsonRun(['--format' => 'json', '--target-php' => '8.4']);
-        self::assertSame('ok', self::finding($report, self::SEEDED)['verdict'], 'the seeded package has the cause word ok');
+        self::assertSame('ok', self::finding($report, self::SEEDED)['verdict'], 'the seeded package has the report-1 verdict ok');
         $signals = self::finding($report, self::SEEDED)['signals'];
         self::assertIsArray($signals);
         self::assertSame(['S9'], array_column($signals, 'id'), 'the seeded advisory is its only fact');

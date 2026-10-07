@@ -65,8 +65,8 @@ final class Report
     }
 
     /**
-     * The order of {@see sorted()}: the keys of {@see ScoreModel::toArray()} `sort`, which a consumer
-     * re-sorts by. Descending keys take the other finding's value, ascending keys their own.
+     * The order of {@see sorted()}: the keys of {@see ScoreModel::toArray()} `sort`. Descending keys
+     * take the other finding's value, ascending keys their own.
      */
     public static function compareGraded(Finding $a, Finding $b): int
     {

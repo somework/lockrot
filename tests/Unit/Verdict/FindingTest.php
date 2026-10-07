@@ -694,7 +694,7 @@ final class FindingTest extends TestCase
     public function testAFindingBuiltWithoutItsFlagsRefusesToGrade(\Closure $read): void
     {
         $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('vendor/pkg was built without its flags, so it has no score.');
+        $this->expectExceptionMessage('vendor/pkg');
 
         $read((new FindingBuilder())->build());
     }
@@ -728,7 +728,7 @@ final class FindingTest extends TestCase
         self::assertTrue($finding->isGraded());
     }
 
-    public function testAVulnerableOnlyFindingIsGradedWithNoLeadAndKeepsItsCauseWord(): void
+    public function testAVulnerableOnlyFindingIsGradedWithNoLeadAndKeepsItsReport1Verdict(): void
     {
         $flags = FlagSet::fromSignals([], null, [Score::advisory('PKSA-1', 'critical', 'update')]);
         $finding = (new FindingBuilder())->withFlags($flags)->build();

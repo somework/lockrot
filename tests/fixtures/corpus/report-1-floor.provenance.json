@@ -1,0 +1,9 @@
+{
+    "repository": "https://github.com/somework/lockrot.dev",
+    "commit": "dd1ca766ff88cb1ffb883f2bc854b0d15fd68105",
+    "path": "data/reports/watch/",
+    "tool": "tools/corpus/floor.py",
+    "reports": 49,
+    "findings": 5376,
+    "sha256": "181ec7bb1a34d641600b5e80c6b9302314017718112ad5ea36cac053de18ac64"
+}
