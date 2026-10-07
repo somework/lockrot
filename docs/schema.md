@@ -1,6 +1,6 @@
 ---
 title: JSON schemas — lockrot report, explanation, baseline and configuration
-description: The published JSON Schema of every lockrot document, what can change under a schema number, which value sets grow, how to validate in CI, and the report's fields.
+description: The published JSON Schema of every lockrot document. What a schema number allows, which value sets grow, CI validation and the report's fields.
 ---
 
 # JSON schemas
