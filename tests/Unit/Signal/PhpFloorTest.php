@@ -290,8 +290,8 @@ final class PhpFloorTest extends TestCase
     }
 
     /**
-     * The display rows of the floor point, which lockrot-report's display rule reads: it drops a
-     * trailing `.0` patch when it prints the point and keeps any other patch.
+     * The display rows of the floor point that the golden file pins: the `printed` column has no
+     * trailing `.0` patch and keeps any other patch.
      */
     public function testTheDisplayRowsOfTheFloorPointAreRecorded(): void
     {

@@ -321,9 +321,9 @@ final class PackageMetadata
     }
 
     /**
-     * The release scan's lists: the stable releases above the installed one, and for the next step's `through[]` the
-     * `require` names of the installed release and of the newest stable release on the run clock.
-     * Nothing else per release.
+     * The release scan's lists: the stable releases above the installed one, and the `require`
+     * names of the installed release and of the newest stable release on the run clock. Nothing
+     * else per release.
      *
      * @param list<BasePackage>                                                     $versions
      * @param array<string, array{0: BasePackage, 1: ?\DateTimeImmutable, 2: ?string}> $stable

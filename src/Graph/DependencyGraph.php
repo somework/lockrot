@@ -38,21 +38,23 @@ final class DependencyGraph
     /**
      * A required name resolves to the locked package of that name, else to every locked package that
      * replaces or provides it, as Composer's solver reads the lock. Root names are compared in lower
-     * case, as Composer compares them. Names resolve against packages and packages-dev whatever
-     * $includeDev says, so `namedIn()` gives one answer for both runs.
+     * case, as Composer compares them. Names resolve against the packages that the run installs:
+     * without $includeDev, a prod provider wins over a dev package of the name. `namedIn()` reads
+     * both root sections whatever $includeDev says.
      */
     public static function fromLock(LockFile $lock, ProjectConfig $project, bool $includeDev): self
     {
+        $packages = $lock->packages($includeDev);
         $present = [];
         $satisfiedBy = [];
-        foreach ($lock->packages(true) as $package) {
+        foreach ($packages as $package) {
             $present[$package->name()] = true;
             foreach (array_keys($package->replaces() + $package->provides()) as $name) {
                 $satisfiedBy[$name][] = $package->name();
             }
         }
         $edges = [];
-        foreach ($lock->packages($includeDev) as $package) {
+        foreach ($packages as $package) {
             $edges[$package->name()] = self::resolve($package->requires(), $present, $satisfiedBy);
         }
         $sections = [

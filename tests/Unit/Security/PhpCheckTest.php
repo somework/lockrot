@@ -33,5 +33,9 @@ final class PhpCheckTest extends TestCase
         yield 'no project floor' => [null, '>=8.2', null, null];
         yield 'alternatives that skip the project floor' => ['>=7.4', '7.1.* || >=8.1', '>=8.1', PhpCheck::MAJOR];
         yield 'alternatives with a gap at the project floor' => ['^7.4 || ^8.0', '>=7.1,!=7.4.0', '>=7.4.1', PhpCheck::PATCH];
+        yield 'a range that holds no stable version' => ['>=7.4', '>7.4.0 <7.4.1 || >=8.1', '>=8.1', PhpCheck::MAJOR];
+        yield 'two holes above the project floor' => ['>=7.4', '>=7.3 !=7.4.0 !=7.4.1', '>=7.4.2', PhpCheck::PATCH];
+        yield 'a patch suffix at the project floor' => ['>=7.4', '>=7.4.0-p1', '>=7.4.1', PhpCheck::PATCH];
+        yield 'a dev branch' => ['>=7.4', '7.4.x-dev', null, null];
     }
 }
