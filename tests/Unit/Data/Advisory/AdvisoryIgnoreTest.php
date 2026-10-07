@@ -220,6 +220,10 @@ final class AdvisoryIgnoreTest extends TestCase
         self::assertSame(['policy_key' => 'policy.advisories', 'value' => false], self::read(['policy' => ['advisories' => false]])->disabledBy());
         self::assertSame(['policy_key' => 'policy.advisories.audit', 'value' => 'ignore'], self::read(['policy' => ['advisories' => ['audit' => 'ignore']]])->disabledBy());
         self::assertNull(self::read(['policy' => ['advisories' => ['audit' => 'report']]])->disabledBy());
+        $auditOff = self::read(['policy' => ['advisories' => ['audit' => 'ignore', 'ignore-id' => ['PKSA-1' => 'reviewed']]]]);
+        self::assertSame(AdvisoryIgnoreMatch::ID, self::record($auditOff->match('vendor/pkg', $this->full('PKSA-1', null, null)))[0] ?? null, 'the lists still apply when the audit mode is ignore');
+        self::assertNull(self::read(['policy' => false, 'audit' => ['ignore' => ['PKSA-1']]])->match('vendor/pkg', $this->full('PKSA-1', null, null)), 'policy: false gives Composer no list');
+        self::assertNull(self::read(['policy' => false])->whyUnreadable());
         self::assertNull(self::read(['policy' => ['abandoned' => false]])->disabledBy(), 'another list off');
     }
 

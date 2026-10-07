@@ -286,12 +286,12 @@ final class AnalyzerLookupTest extends TestCase
 
         $analyzer->analyze($lock, ProjectConfig::empty(), false);
 
-        self::assertSame(['vendor/pkg' => '1.0.0', 'acme/fork' => '2.0.0'], $asked['names'], 'a packages-dev name only with --dev');
+        self::assertSame(['vendor/pkg' => '1.0.0.0', 'acme/fork' => '2.0.0.0'], $asked['names'], 'a packages-dev name only with --dev');
         self::assertSame(['acme/fork'], $asked['outside']);
 
         $analyzer->analyze($lock, ProjectConfig::empty(), true);
 
-        self::assertSame(['vendor/pkg' => '1.0.0', 'acme/fork' => '2.0.0', 'vendor/devtool' => '3.0.0'], $asked['names']);
+        self::assertSame(['vendor/pkg' => '1.0.0.0', 'acme/fork' => '2.0.0.0', 'vendor/devtool' => '3.0.0.0'], $asked['names']);
     }
 
     public function testThePackagesOutsideEveryComposerRepositoryAreNotedUnderBothScopes(): void

@@ -636,7 +636,8 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
         self::assertFalse($batch->complete());
     }
 
-    public function testAPolicyThatTurnsAdvisoriesOffAsksNothingAndNotesWhichKey(): void
+    /** Composer's policy stops blocking, never `composer audit`: lockrot still asks and counts. */
+    public function testAPolicyThatTurnsComposersAdvisoryChecksOffStillAsksAndNotesTheKey(): void
     {
         if (!interface_exists(AdvisoryProviderInterface::class)) {
             self::markTestSkipped('Composer without the advisory API');
@@ -646,10 +647,9 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
 
         $batch = (new RepositoryAdvisoryLoader([$spy], false, null, $ignore))->load(['doctrine/cache' => '2.2.0']);
 
-        self::assertSame([], $calls->getArrayCopy());
-        self::assertSame([[AdvisoryCoverage::NOT_ASKED, AdvisoryCoverage::DISABLED_BY_POLICY]], self::outcomes($batch));
-        self::assertSame(AdvisoryCoverage::DISABLED_BY_POLICY, self::nameCoverage($batch, 'doctrine/cache')->reason());
-        self::assertSame([], self::nameCoverage($batch, 'doctrine/cache')->feeds());
+        self::assertSame(['hasSecurityAdvisories', 'getSecurityAdvisories'], $calls->getArrayCopy());
+        self::assertSame([[AdvisoryCoverage::ANSWERED, null]], self::outcomes($batch));
+        self::assertNull(self::nameCoverage($batch, 'doctrine/cache')->reason());
         self::assertSame([RunNote::ADVISORIES_DISABLED_BY_POLICY], array_map(static fn (RunNote $note): string => $note->code(), $batch->notes()));
         self::assertSame(['policy_key' => 'policy.advisories.audit', 'value' => 'ignore'], $batch->notes()[0]->data());
         self::assertSame([false], self::networkFailures($batch));
@@ -725,6 +725,7 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
 
         self::assertSame(['PKSA-shared'], array_map(static fn (Advisory $a): string => $a->id(), $batch->for('doctrine/cache')));
         self::assertSame([], $batch->ignored('doctrine/cache'));
+        self::assertSame(['PKSA-shared'], array_map(static fn (Advisory $a): string => $a->id(), $batch->every('doctrine/cache')), 'every() keeps an id that one record keeps');
         self::assertSame([], $both->for('doctrine/cache'), 'the control: its only record is ignored');
         self::assertCount(1, $both->ignored('doctrine/cache'));
 
@@ -765,6 +766,16 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
         self::assertTrue($batch->complete());
         self::assertSame([[AdvisoryCoverage::NO_FEED, null], [AdvisoryCoverage::ANSWERED, null]], self::outcomes($batch));
         self::assertNull(self::nameCoverage($batch, 'doctrine/cache')->reason());
+    }
+
+    public function testAVcsOnlyLockUnderTheComposerRepositoriesScopeHasANotAskedFeedPerRepository(): void
+    {
+        $server = $this->api(['acme/fork' => []]);
+
+        $batch = (new RepositoryAdvisoryLoader($server->repositories(), false, null, null, AdvisoryCoverage::SCOPE_COMPOSER_REPOSITORIES, AdvisoryCoverage::SOURCE_CONFIG))->load(['acme/fork' => '1.0.0'], ['acme/fork']);
+
+        self::assertSame([], $server->advisoryRequests());
+        self::assertSame([['composer_repository' => $server->repositories()[0]->getRepoName(), 'answer' => AdvisoryCoverage::NOT_ASKED, 'reason' => AdvisoryCoverage::NOT_FROM_COMPOSER_REPOSITORY, 'message' => null, 'records' => null]], self::nameCoverage($batch, 'acme/fork')->feeds());
     }
 
     public function testNoNameToAskKeepsTheConfiguredScope(): void
