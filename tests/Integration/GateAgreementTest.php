@@ -73,7 +73,8 @@ final class GateAgreementTest extends TestCase
 
     /**
      * Every fixture lock served at once, as BranchFloorAgreementTest serves them, in a process of
-     * its own: memory_get_peak_usage() is a whole-process mark that PHPUnit never resets.
+     * its own: that much metadata leaves Composer's caches high under the 128 MB memory_limit that
+     * the suite's tests share.
      *
      * @runInSeparateProcess
      */

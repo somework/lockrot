@@ -32,7 +32,7 @@ final class GithubFormatterTest extends TestCase
     protected function tearDown(): void
     {
         foreach ($this->tempDirs as $dir) {
-            // scandir(), not glob(): a directory name here may hold a backslash, which glob() reads as an escape.
+            // scandir(), not glob(): a directory name here can hold a backslash, which glob() reads as an escape.
             foreach (is_dir($dir) ? array_diff((array) scandir($dir), ['.', '..']) : [] as $file) {
                 unlink($dir.'/'.$file);
             }

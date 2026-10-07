@@ -1522,7 +1522,7 @@ final class LockrotCommandTest extends TestCase
         $golden = JsonPath::arrayAt(JsonPath::decodeFile(__DIR__.'/../../fixtures/golden/wallabag.json'), ['verdicts']);
         ksort($verdicts);
         ksort($golden);
-        self::assertSame($golden, $verdicts, 'the command path agrees with golden/wallabag.json');
+        self::assertSame($golden, $verdicts, 'tests/fixtures/golden/wallabag.json: rewrite it with LOCKROT_REWRITE_GOLDEN=1 vendor/bin/phpunit --filter testWallabagKeepsItsVerdictsPrioritiesAndExposure, then review the diff');
         $flagged = JsonPath::arrayAt($json, ['run', 'flagged_verdicts']);
 
         return self::$wallabagTotals = [

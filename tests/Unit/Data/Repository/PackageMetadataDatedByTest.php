@@ -198,7 +198,7 @@ final class PackageMetadataDatedByTest extends TestCase
     public function testAParentThatDatesNoBranchStillHandsOverItsReleaseDates(): void
     {
         // No branch in common, so the branch view and the package's own age stay as they were —
-        // but the installed version may be one of the parent's releases all the same (a tag on a
+        // but the installed version can be one of the parent's releases all the same (a tag on a
         // shared commit under a branch whose highest tag is not), and its date travels.
         $child = $this->child();
         $parent = PackageMetadata::fromPackages('laravel/framework', [

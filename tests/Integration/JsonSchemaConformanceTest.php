@@ -228,7 +228,7 @@ final class JsonSchemaConformanceTest extends TestCase
         $run = JsonPath::arrayAt($decoded, ['run']);
         self::assertSame('8.4', $run['target_php']);
         // A display name, not a vendor/name: `extra.lockrot.project` lets a project carry a name that
-        // is not its package name, which a vendor/name type would reject.
+        // is not its package name, which a vendor/name type rejects.
         self::assertSame('Acme internal API', $run['project']);
         // What Composer calls the project, beside what the report calls it: the manifest's own
         // name, whatever extra.lockrot.project says.
