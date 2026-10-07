@@ -16,7 +16,8 @@ use Lockrot\Lock\ProjectConfig;
  * says. `composer update` resolves with dev packages, so a dev package that holds a fix is a
  * holder. A link on a name that no package of the lock carries is also a link on each package that
  * replaces or provides that name at `self.version`: Composer satisfies the name with that package,
- * at the package's own version (https://getcomposer.org/doc/04-schema.md#replace).
+ * at the package's own version (https://getcomposer.org/doc/04-schema.md#replace). A conflict
+ * applies only through a replaced name: Composer reads no conflict on a provided one.
  *
  * @internal
  */
@@ -26,7 +27,7 @@ final class LinkIndex
 
     /** @var array<string, list<array{0: int, 1: Holder, 2: ?ConstraintInterface}>> package name => its links in index order, with the parsed constraint */
     private array $links = [];
-    /** @var array<string, list<string>> package => the names it replaces or provides at its own version */
+    /** @var array<string, array<string, bool>> package => each name it replaces or provides at its own version => whether it replaces it */
     private array $alsoNamed = [];
     private int $added = 0;
 
@@ -53,9 +54,11 @@ final class LinkIndex
                     }
                 }
             }
-            foreach ($package->replaces() + $package->provides() as $name => $constraint) {
-                if (!isset($locked[$name]) && strtolower($constraint) === self::SELF_VERSION) {
-                    $index->alsoNamed[$package->name()][] = (string) $name;
+            foreach ([[$package->provides(), false], [$package->replaces(), true]] as [$names, $replaced]) {
+                foreach ($names as $name => $constraint) {
+                    if (!isset($locked[$name]) && strtolower($constraint) === self::SELF_VERSION) {
+                        $index->alsoNamed[$package->name()][$name] = $replaced;
+                    }
                 }
             }
         }
@@ -75,10 +78,12 @@ final class LinkIndex
     {
         $package = strtolower($package);
         $release = new Constraint('==', $normalized);
-        $links = [];
-        foreach (array_merge([$package], $this->alsoNamed[$package] ?? []) as $name) {
+        $links = $this->links[$package] ?? [];
+        foreach ($this->alsoNamed[$package] ?? [] as $name => $replaced) {
             foreach ($this->links[$name] ?? [] as $link) {
-                $links[] = $link;
+                if ($replaced || $link[1]->link() !== Holder::CONFLICT) {
+                    $links[] = $link;
+                }
             }
         }
         usort($links, static fn (array $a, array $b): int => $a[0] <=> $b[0]);
