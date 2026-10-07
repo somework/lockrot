@@ -1,7 +1,7 @@
 """The framework's own invariants, on synthetic documents that do not mention lockrot.
 
-Every test is a negative case: the framework makes absence loud, so a suite that proves only the
-happy path would miss its purpose.
+Every test is a negative case: the framework makes absence loud, and a suite that proves only the
+happy path misses that purpose.
 """
 
 import unittest

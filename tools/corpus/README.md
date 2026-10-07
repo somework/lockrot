@@ -30,7 +30,7 @@ print `none`.
 These layers support it:
 
 - **Dated floors.** Each check declares the smallest population that it expects, with the date of
-  the measurement. A check that selects far fewer documents has been disabled, and the run says so
+  the measurement. A check that selects far fewer documents is disabled, and the run says so
   instead of passing.
 - **A phrase census that fails both ways.** Every pattern lives in `lockrot_corpus/catalog.py` with
   a declared fixture minimum or a dated `unexercised` marker. A marked phrase that starts to match
@@ -99,8 +99,8 @@ still audits and reports the other projects.
 `corpus.lock.json` pins the real projects of the corpus in these ways:
 
 - **Pinned by git:** the recorded locks under `tests/fixtures/apps` and `tests/fixtures/skeletons`.
-- **Pinned by commit:** a sha256 for `composer.lock` and one for `composer.json`, both fetched from
-  that one ref.
+- **Pinned by commit:** every other project, by a commit SHA and a sha256 for its `composer.lock` and
+  its `composer.json`, both fetched at that commit.
 
 Only `corpus refresh --today <date>` moves a pin. It marks a project that was renamed, archived or
 lost its lock as `unavailable` and keeps it. A shrinking corpus must show as a line in a diff,

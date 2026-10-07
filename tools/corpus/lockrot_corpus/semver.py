@@ -1,7 +1,7 @@
 """Composer's version semantics, re-derived here and not asked of Composer.
 
 A checker that imports `composer/semver` or `Lockrot\\Data\\Repository\\ReleaseBranch` agrees with
-lockrot because it called lockrot, and no test could tell the difference. Each function here is
+lockrot because it called lockrot, and no test can tell the difference. Each function here is
 checked against the recorded oracle in fixtures/semver-oracle.json, because p2 documents carry
 Composer's own `version_normalized`. None means "does not parse", and a caller must not turn it
 into a default: a parse regression then reads as a corpus of dev versions and prints a clean census.
@@ -119,7 +119,7 @@ def release_branch(normalized: object) -> 'str | None':
 def branch_is_above(key: str, other: str) -> bool:
     """Whether branch `key` is above `other`.
 
-    Keys compare as strings split on dots, numeric per component. A comparison on mixed types could
+    Keys compare as strings split on dots, numeric per component. A comparison on mixed types can
     order `'0.0.3'` and `'0.3'` differently from lockrot's own comparisons.
     """
     return _branch_tuple(key) > _branch_tuple(other)

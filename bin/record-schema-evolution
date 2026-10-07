@@ -30,6 +30,7 @@ baseline=lockrot-schema-evolution-baseline.json
 #   wallabag/rulerz a pinned branch snapshot, javibravo/simpleue silent with S5, scheb/2fa-backup-code
 #   left-behind with S8 and, where the release has it, S10, spomky-labs/otphp left-behind with a
 #   security advisory.
+#   The list does not cover every verdict or priority: the report carries those.
 packages=(doctrine/cache sensio/framework-extra-bundle wallabag/rulerz javibravo/simpleue scheb/2fa-backup-code spomky-labs/otphp)
 
 # A recorded version is frozen. A document there that stops validating is a compatibility break to

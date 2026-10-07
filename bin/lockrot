@@ -63,7 +63,10 @@ unset($lockrotArgv);
 // own release date, and its doRun() adds a PHP-version line and a "diagnose" hint after the version.
 // Both methods have no return type in the older supported Composer, so this subclass can declare one.
 $application = new class () extends \Composer\Console\Application {
-    /** Only primary names: aliases (`rot`, `selfupdate`) travel with their command. */
+    /**
+     * Only primary names: aliases (`rot`, `selfupdate`) travel with their command. `list` stays: its
+     * output is how a user finds `self-update`.
+     */
     private const KEEP = ['lockrot', 'self-update', 'help', 'list', 'completion', '_complete'];
 
     private bool $manifestHidden = false;
@@ -72,8 +75,8 @@ $application = new class () extends \Composer\Console\Application {
     private $previousComposerEnv = false;
 
     /**
-     * This method filters the commands and does not hide them, because a single-command application
-     * has no command names and `lockrot.phar self-update` is unreachable. `lockrot.phar update`
+     * This method filters the commands and does not hide them: a single-command application has no
+     * command names, and in it `lockrot.phar self-update` is unreachable. `lockrot.phar update`
      * must never run a Composer update on the inspected project, so the method drops every Composer
      * project command. It drops Composer's `self-update`, which frees it and its `selfupdate` alias
      * for lockrot's own command.
@@ -95,13 +98,11 @@ $application = new class () extends \Composer\Console\Application {
     }
 
     /**
-     * The same allowlist applies to every later registration. Composer's `doRun()` turns each entry of
-     * the inspected project's `scripts` into a command, and lockrot must not run that project.
-     *
-     * symfony/console below 7.4 has only add(). Version 7.4 and later have addCommand() and deprecate
-     * add(). Composer calls addCommand() when `method_exists()` finds it. This class declares it, so that
-     * test is true on every version, and add() forwards to addCommand(), which picks the registration
-     * path that the running symfony/console has.
+     * Every registration passes the allowlist: Composer's doRun() turns each `scripts` entry of the
+     * inspected project into a command. symfony/console 7.4 adds addCommand() and deprecates add(),
+     * and Composer calls addCommand() when `method_exists()` finds it, so add() forwards here. Keep
+     * the `method_exists()` check on the parent class: on 7.4 the parent add() calls addCommand()
+     * again, and the calls recurse without end.
      */
     public function add(\Symfony\Component\Console\Command\Command $command): ?\Symfony\Component\Console\Command\Command
     {
@@ -186,8 +187,8 @@ $application = new class () extends \Composer\Console\Application {
      * also load the project's autoloader for each `scripts` entry that looks like a class name, which
      * runs the project's code even with `--no-plugins`. Both steps need `is_file()` on the file that
      * COMPOSER names: the null device makes it false, while `file_exists()` stays true and keeps the
-     * "no composer.json" walk-up quiet. doRunCommand() restores COMPOSER, so the command still reads
-     * the project.
+     * "no composer.json" walk-up quiet. doRunCommand() restores COMPOSER, so the command reads the
+     * project and its repositories. The finally restores it where no command runs.
      */
     public function doRun(\Symfony\Component\Console\Input\InputInterface $input, \Symfony\Component\Console\Output\OutputInterface $output): int
     {

@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# Records the offline fixtures from a finished corpus run.
+# Usage: tools/corpus/record --work <dir> --out <report run> --explain-out <explain run>
+# Run it when lockrot changes a sentence that a check reads, or when a new check needs a document
+# for its poison.
 # Never edit a recorded fixture: one that does not match its source is worth less than none.
 # Keep the p2 documents minified, `__unset` sentinels included: expanding them removes the one thing
 # that the reader under test must get right.
@@ -169,8 +173,10 @@ def _choose_claims(claims: 'list', cache: str) -> dict:
 
 
 def _has_unset(package: str, cache: str) -> bool:
-    """Ask before anything is written: a fixture chosen for a property that it lacks leaves the reader
-    under test with nothing to read.
+    """Whether the cached document uses the `__unset` sentinel on a key that the recording keeps.
+
+    The caller asks before it writes anything: a fixture chosen for a property that it lacks proves
+    nothing.
     """
     document = read_json(os.path.join(cache, 'repo', PACKAGIST_HOST,
                                       'provider-%s.json' % package.replace('/', '~')))
