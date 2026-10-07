@@ -83,8 +83,19 @@ final class PackageMetadataTest extends TestCase
 
         self::assertNull($meta->releasesAbove());
         self::assertNull($meta->installedRequires());
-        self::assertNull($meta->newestStable());
         self::assertNull($meta->newestRequires());
+    }
+
+    /** Nothing else per release: the release scan's lists are the last three. Add a field only with a reason. */
+    public function testItKeepsOnlyTheListsTheReleaseScanReads(): void
+    {
+        $kept = array_map(static fn (\ReflectionProperty $property): string => $property->getName(), (new \ReflectionClass(PackageMetadata::class))->getProperties());
+
+        self::assertSame([
+            'name', 'abandoned', 'replacement', 'abandonedBy', 'hasStableRelease', 'lastStableReleaseAt', 'lastStableVersion', 'releaseCount',
+            'repositoryUrl', 'type', 'dataDate', 'latestStableByBranch', 'replaces', 'lastStableDatedBy', 'releaseDates', 'releaseDatesBy',
+            'sharedCommitVersions', 'releasesAbove', 'installedRequires', 'newestRequires',
+        ], $kept);
     }
 
     public function testAnInstalledVersionThatDoesNotParseKeepsNoReleaseList(): void
@@ -98,20 +109,15 @@ final class PackageMetadataTest extends TestCase
         $meta = PackageMetadata::fromPackages('a/b', $this->history(), new \DateTimeImmutable(self::NOW), '1.2.0.0');
 
         self::assertSame(['php', 'psr/log', 'c/d'], $meta->installedRequires());
-        $newest = $meta->newestStable();
-        self::assertNotNull($newest);
-        self::assertSame('v2.0.0', $newest->pretty(), 'by version, among the releases not dated after the run clock');
-        self::assertSame(['php', 'c/d'], $meta->newestRequires());
+        self::assertSame(['php', 'c/d'], $meta->newestRequires(), 'v2.0.0: by version, among the releases not dated after the run clock');
     }
 
     public function testAReleaseDatedAtTheRunClockIsTheNewestStableRelease(): void
     {
         $history = $this->history();
-        $history[] = $this->release(['version' => '2.0.1', 'time' => self::NOW]);
-        $newest = PackageMetadata::fromPackages('a/b', $history, new \DateTimeImmutable(self::NOW), '1.2.0.0')->newestStable();
+        $history[] = $this->release(['version' => '2.0.1', 'time' => self::NOW, 'require' => ['e/f' => '^1']]);
 
-        self::assertNotNull($newest);
-        self::assertSame('2.0.1', $newest->pretty());
+        self::assertSame(['e/f'], PackageMetadata::fromPackages('a/b', $history, new \DateTimeImmutable(self::NOW), '1.2.0.0')->newestRequires());
     }
 
     /** Two tags that normalise to one version: the first one that the repository lists stands for it. */

@@ -71,14 +71,12 @@ final class PhpCheck
             return null;
         }
         foreach (Intervals::get($constraint)['numeric'] as $interval) {
-            $start = $interval->getStart();
-            $point = PhpFloor::pointOf($start->getOperator().$start->getVersion());
+            $point = PhpFloor::pointOf($interval->getStart()->getVersion());
             if ($point === null) {
                 continue;
             }
-            [$major, $minor, $patch] = explode('.', $point);
-            foreach ([$point, $major.'.'.$minor.'.'.((int) $patch + 1)] as $candidate) {
-                if (version_compare($candidate, $project, '>') && $constraint->matches(new Constraint('==', $candidate.'.0'))) {
+            foreach ([$point, PhpFloor::pointOf('>'.$point)] as $candidate) {
+                if ($candidate !== null && version_compare($candidate, $project, '>') && $constraint->matches(new Constraint('==', $candidate.'.0'))) {
                     return $candidate;
                 }
             }

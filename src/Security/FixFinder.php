@@ -68,16 +68,17 @@ final class FixFinder
         foreach ($ranges as $id => $range) {
             $fixes[$id] = $this->fixOf($range, $candidates, $newest, $installedBranch);
         }
-        $move = self::easiest($candidates, $ranged);
         $byBranch = [];
         foreach ($candidates as $candidate) {
             $byBranch[$candidate->branchKey()][] = $candidate;
         }
         $onInstalled = $installedBranch === null ? [] : ($byBranch[$installedBranch] ?? []);
+        $rows = self::branches($newest, $byBranch, $installedBranch, $ranged, \count($advisories));
+        $move = self::move($rows, \count($ranged));
 
         return new PackageFixes(
             $fixes,
-            $this->branches($newest, $byBranch, $installedBranch, $ranged, \count($advisories)),
+            $rows,
             $this->gets($onInstalled, $ranged, \count($advisories)),
             $move,
             self::partial($move, $onInstalled, $ranged, \count($advisories))
@@ -150,8 +151,29 @@ final class FixFinder
     }
 
     /**
-     * One row per branch the package has, highest first. A branch's lower bound is the lowest
-     * release from which every release up to its newest lies outside every range its newest clears.
+     * The security move: of the branches whose lower bound clears every counted range, the easiest
+     * lower bound, then the lowest release. A constraint from that bound admits no release up to the
+     * branch's newest that a counted range holds. Null with no range or no such branch.
+     *
+     * @param list<BranchFixes> $rows highest branch first
+     */
+    private static function move(array $rows, int $ranged): ?Candidate
+    {
+        $best = null;
+        foreach (array_reverse($rows) as $row) {
+            $candidate = $row->candidate();
+            if ($candidate !== null && $row->fixed() === $ranged && ($best === null || $candidate->easeRank() < $best->easeRank())) {
+                $best = $candidate;
+            }
+        }
+
+        return $best;
+    }
+
+    /**
+     * One row per branch the package has, highest first. A row fixes the ranges that its newest
+     * release lies outside. Its lower bound is the lowest release from which every release up to the
+     * newest lies outside them, and the row's class is that release's class.
      *
      * @param array<string, string>               $newest
      * @param array<string, list<Candidate>>      $byBranch ascending per branch
@@ -159,7 +181,7 @@ final class FixFinder
      *
      * @return list<BranchFixes>
      */
-    private function branches(array $newest, array $byBranch, ?string $installedBranch, array $ranged, int $of): array
+    private static function branches(array $newest, array $byBranch, ?string $installedBranch, array $ranged, int $of): array
     {
         $keys = array_map('strval', array_keys($newest));
         usort($keys, static fn (string $a, string $b): int => version_compare($b, $a));
@@ -169,9 +191,7 @@ final class FixFinder
             $top = $candidates === [] ? null : $candidates[\count($candidates) - 1];
             $cleared = $top === null ? [] : self::cleared($top, $ranged);
             $lowest = null;
-            $fixKind = null;
-            if ($top !== null && $cleared !== []) {
-                $fixKind = $this->branchClass($top->php());
+            if ($cleared !== []) {
                 $kept = array_intersect_key($ranged, array_flip($cleared));
                 foreach (array_reverse($candidates) as $candidate) {
                     if (!self::clearsAll($candidate, $kept)) {
@@ -180,20 +200,10 @@ final class FixFinder
                     $lowest = $candidate;
                 }
             }
-            $rows[] = new BranchFixes(ReleaseBranch::label($key), $key === $installedBranch, \count($cleared), $of - \count($ranged), $of, $fixKind, $lowest, $newest[$key], $cleared);
+            $rows[] = new BranchFixes(ReleaseBranch::label($key), $key === $installedBranch, \count($cleared), $of - \count($ranged), $of, $lowest, $newest[$key], $cleared);
         }
 
         return $rows;
-    }
-
-    /** @return Fix::UPDATE|Fix::RAISE_PHP|Fix::BLOCKED */
-    private function branchClass(?string $php): string
-    {
-        if ($this->floor->admitsTarget($php) === false) {
-            return Fix::BLOCKED;
-        }
-
-        return $this->floor->admitsProject($php) === false ? Fix::RAISE_PHP : Fix::UPDATE;
     }
 
     /**

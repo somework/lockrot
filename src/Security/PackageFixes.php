@@ -79,9 +79,9 @@ final class PackageFixes
     }
 
     /**
-     * The easiest candidate outside every counted range, the lowest at its ease. Null when no
-     * candidate clears them all, or no counted advisory has a range. The move's lower bound is
-     * the move layer's.
+     * The easiest branch lower bound that clears every counted range, the lowest at its ease: the
+     * installed or a higher branch's {@see BranchFixes::candidate()}. Null when no branch clears
+     * them all, or no counted advisory has a range.
      */
     public function move(): ?Candidate
     {

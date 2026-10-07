@@ -47,15 +47,25 @@ final class LinkIndexTest extends TestCase
         $index = LinkIndex::of(
             LockFile::fromArray(['packages' => [
                 ['name' => 'laravel/framework', 'version' => 'v12.68.0', 'replace' => ['illuminate/support' => 'self.version', 'illuminate/database' => 'self.version']],
-                ['name' => 'x/scim', 'version' => '1.0.0', 'require' => ['illuminate/support' => '^10.0|^11.0|^12.0', 'illuminate/database' => '^12.0']],
+                ['name' => 'y/z', 'version' => '1.0.0', 'require' => ['laravel/framework' => '^12.0']],
+                ['name' => 'x/scim', 'version' => '1.0.0', 'require' => ['illuminate/support' => '^12.0', 'illuminate/database' => '^12.0']],
+                ['name' => 'x/old', 'version' => '1.0.0', 'require' => ['illuminate/support' => '^10.0|^11.0|^12.0']],
+                ['name' => 'x/guard', 'version' => '1.0.0', 'conflict' => ['illuminate/database' => '>=13.0']],
             ]]),
             ProjectConfig::fromArray(['name' => 'acme/app', 'require' => ['illuminate/support' => '^12.0']])
         );
 
         $holders = $index->excluding('laravel/framework', '13.0.0.0');
         self::assertSame(
-            [[Holder::ROOT, 'acme/app', '^12.0'], [Holder::PACKAGE, 'x/scim', '^10.0|^11.0|^12.0']],
-            array_map(static fn (Holder $holder): array => [$holder->source(), $holder->package(), $holder->constraint()], $holders)
+            [
+                [Holder::ROOT, 'acme/app', Holder::REQUIRE, '^12.0'],
+                [Holder::PACKAGE, 'y/z', Holder::REQUIRE, '^12.0'],
+                [Holder::PACKAGE, 'x/scim', Holder::REQUIRE, '^12.0'],
+                [Holder::PACKAGE, 'x/old', Holder::REQUIRE, '^10.0|^11.0|^12.0'],
+                [Holder::PACKAGE, 'x/guard', Holder::CONFLICT, '>=13.0'],
+            ],
+            array_map(static fn (Holder $holder): array => [$holder->source(), $holder->package(), $holder->link(), $holder->constraint()], $holders),
+            'in index order, a link that reads the same once'
         );
         self::assertSame([], $index->excluding('laravel/framework', '12.70.0.0'));
     }

@@ -91,7 +91,6 @@ final class PackageMetadata
     private ?array $releasesAbove = null;
     /** @var list<string>|null the installed release's `require` names, null when that release is not among those read */
     private ?array $installedRequires = null;
-    private ?StableRelease $newestStable = null;
     /** @var list<string>|null */
     private ?array $newestRequires = null;
 
@@ -338,7 +337,6 @@ final class PackageMetadata
             }
         }
         if ($newest !== null) {
-            $this->newestStable = $this->stableRelease($newest->getVersion(), $stable[$newest->getVersion()], $sharedCommit);
             $this->newestRequires = self::requireNames($newest);
         }
         try {
@@ -485,7 +483,6 @@ final class PackageMetadata
             $this->abandonedBy
         );
         $dated->installedRequires = $this->installedRequires;
-        $dated->newestStable = $this->newestStable;
         $dated->newestRequires = $this->newestRequires;
         $dated->releasesAbove = $this->releasesAbove === null ? null : array_map(
             static fn (StableRelease $release): StableRelease => $release->sharedCommit() ? $release->withDate($parent->releaseDateOf($release->normalized())) : $release,
@@ -651,13 +648,7 @@ final class PackageMetadata
         return $this->installedRequires;
     }
 
-    /** The highest stable release not dated after the run clock. Null with no stable release, or when the load kept no lists. */
-    public function newestStable(): ?StableRelease
-    {
-        return $this->newestStable;
-    }
-
-    /** @return list<string>|null lowercased: the `require` names of {@see newestStable()} */
+    /** @return list<string>|null lowercased: the `require` names of the highest stable release not dated after the run clock */
     public function newestRequires(): ?array
     {
         return $this->newestRequires;
