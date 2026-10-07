@@ -66,8 +66,8 @@ final class LockrotCommandTest extends TestCase
         self::$server = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK, self::LARAVEL_LOCK]);
         self::$server->start();
         // One loader for the class, which remembers its answers: the tests run the command over the
-        // same two fixture locks, and fetching their metadata again for each test is slow. A mutation run pays that
-        // again per mutant. RepositoryMetadataLoaderTest tests what loading does.
+        // same two fixture locks, and a fetch of their metadata for each test is slow, under Infection
+        // once per mutant. RepositoryMetadataLoaderTest tests what loading does.
         self::$loader = new MemoisingMetadataLoader(
             new RepositoryMetadataLoader(self::$server->repositories(), Clock::fixed(self::FIXED_NOW))
         );
