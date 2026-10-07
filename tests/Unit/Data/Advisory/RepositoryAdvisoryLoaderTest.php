@@ -450,7 +450,7 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
         self::assertSame(['doctrine/cache', 'doctrine/annotations', 'acme/unknown'], $server->advisoryRequests()[0]);
         self::assertSame(['PKSA-cache-1'], array_map(static fn (Advisory $a): string => $a->id(), $batch->for('doctrine/cache')), 'attributed to the installed version here');
         self::assertSame(['PKSA-cache-1', 'PKSA-cache-2'], array_map(static fn (Advisory $a): string => $a->id(), $batch->every('doctrine/cache')), 'every version is kept');
-        self::assertSame(['answer' => AdvisoryCoverage::ANSWERED, 'reason' => null, 'records' => 2], self::feed($batch, 'doctrine/cache', 0));
+        self::assertSame([['composer_repository' => $server->repositories()[0]->getRepoName(), 'answer' => AdvisoryCoverage::ANSWERED, 'reason' => null, 'message' => null, 'records' => 2]], self::nameCoverage($batch, 'doctrine/cache')->feeds());
         self::assertSame(['answer' => AdvisoryCoverage::ANSWERED, 'reason' => null, 'records' => 0], self::feed($batch, 'doctrine/annotations', 0), 'a known name echoed with []');
         self::assertSame(['answer' => AdvisoryCoverage::ANSWERED, 'reason' => null, 'records' => 0], self::feed($batch, 'acme/unknown', 0), 'an unknown name the answer leaves out');
         self::assertSame(2, self::nameCoverage($batch, 'doctrine/cache')->records());
@@ -459,6 +459,9 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
         $repository = $batch->coverage()->repositories()[0];
         self::assertSame($server->repositories()[0]->getRepoName(), $repository['composer_repository']);
         self::assertSame([AdvisoryCoverage::ANSWERED, null, null, 2, 1], [$repository['outcome'], $repository['reason'], $repository['message'], $repository['records'], $repository['packages_with_records']]);
+        $two = $this->api(['doctrine/cache' => [self::record('PKSA-cache-1', '*', [])], 'doctrine/annotations' => [self::record('PKSA-annotations-1', '*', [])]]);
+        $both = (new RepositoryAdvisoryLoader($two->repositories()))->load(['doctrine/cache' => '2.2.0', 'doctrine/annotations' => '2.0.2']);
+        self::assertSame([2, 2], [$both->coverage()->repositories()[0]['records'], $both->coverage()->repositories()[0]['packages_with_records']]);
         self::assertSame(0, $batch->coverage()->otherRepositories());
         self::assertSame([AdvisoryCoverage::SCOPE_ALL, AdvisoryCoverage::SOURCE_DEFAULT], [$batch->coverage()->scope(), $batch->coverage()->scopeSource()]);
     }
@@ -496,14 +499,14 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
 
     public function testTwoRepositoriesServingOneIdCountItOnceForTheName(): void
     {
-        $first = $this->api(['doctrine/cache' => [self::record('PKSA-cache-1', '>=2.0,<2.3', [])]]);
+        $first = $this->api(['doctrine/cache' => [self::record('PKSA-cache-1', '>=2.0,<2.3', []), self::record('PKSA-cache-8', '<1.0', [])]]);
         $second = $this->api(['doctrine/cache' => [self::record('PKSA-cache-1', '>=2.0,<2.3', []), self::record('PKSA-cache-9', '<1.0', [])]]);
 
         $batch = (new RepositoryAdvisoryLoader(array_merge($first->repositories(), $second->repositories())))->load(['doctrine/cache' => '2.2.0']);
 
-        self::assertSame(1, self::feed($batch, 'doctrine/cache', 0)['records']);
+        self::assertSame(2, self::feed($batch, 'doctrine/cache', 0)['records']);
         self::assertSame(2, self::feed($batch, 'doctrine/cache', 1)['records']);
-        self::assertSame(2, self::nameCoverage($batch, 'doctrine/cache')->records(), 'PKSA-cache-1 counts once');
+        self::assertSame(3, self::nameCoverage($batch, 'doctrine/cache')->records(), 'PKSA-cache-1 counts once');
         self::assertCount(1, $batch->for('doctrine/cache'));
     }
 
@@ -514,7 +517,9 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
 
         $batch = (new RepositoryAdvisoryLoader(array_merge($unreachable->repositories(), $answering->repositories())))->load(['doctrine/cache' => '2.2.0']);
 
-        $failed = self::feed($batch, 'doctrine/cache', 0);
+        $failed = self::nameCoverage($batch, 'doctrine/cache')->feeds()[0];
+        self::assertSame($batch->coverage()->repositories()[0]['composer_repository'], $failed['composer_repository']);
+        self::assertSame($batch->coverage()->repositories()[0]['message'], $failed['message']);
         self::assertSame([AdvisoryCoverage::FAILED, AdvisoryCoverage::LOOKUP_FAILED, null], [$failed['answer'], $failed['reason'], $failed['records']]);
         self::assertSame(AdvisoryCoverage::ANSWERED, self::feed($batch, 'doctrine/cache', 1)['answer']);
         self::assertSame(AdvisoryCoverage::LOOKUP_FAILED, self::nameCoverage($batch, 'doctrine/cache')->reason());
@@ -716,6 +721,10 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
         self::assertSame([], $batch->ignored('doctrine/cache'));
         self::assertSame([], $both->for('doctrine/cache'), 'the control: its only record is ignored');
         self::assertCount(1, $both->ignored('doctrine/cache'));
+
+        $other = $this->api(['doctrine/cache' => [self::record('PKSA-shared', '>=2.0,<2.3', ['cve' => 'CVE-2024-0010'])]]);
+        $twice = (new RepositoryAdvisoryLoader(array_merge($first->repositories(), $other->repositories()), false, null, AdvisoryIgnore::fromRaw(['CVE-2024-0009' => 'first', 'CVE-2024-0010' => 'second'], [])))->load(['doctrine/cache' => '2.2.0']);
+        self::assertSame(['first'], array_map(static fn (IgnoredAdvisory $i): ?string => $i->match()->reason(), $twice->ignored('doctrine/cache')), 'both records ignored: the first one is kept');
     }
 
     public function testAFilteredRepositoryIsNamedOnlyWhenItWrapsAnAdvisoryCapableOne(): void
