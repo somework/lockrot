@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Security;
 
 /**
- * One link of the lock that excludes a candidate release: a `held_by[]` entry of SPEC-0.14 5.3,
+ * One link of the lock that excludes a candidate release: a `held_by[]` entry,
  * without its `holder` block, which the report fills from the holder's own finding.
  *
  * @internal

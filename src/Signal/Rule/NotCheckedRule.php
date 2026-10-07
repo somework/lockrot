@@ -64,7 +64,7 @@ final class NotCheckedRule implements SignalRule
 
     /**
      * The S10 entry for release data that a repository listing the package did not serve, beside a
-     * counted advisory: every fix is unknown then (SPEC-0.14 5.5). report-1's S10 has no `releases`
+     * counted advisory: every fix is unknown then. report-1's S10 has no `releases`
      * check, so {@see evaluate()} leaves it out and report-2 adds it.
      *
      * @return array{check: string, reason: string, blocks: list<string>}|null

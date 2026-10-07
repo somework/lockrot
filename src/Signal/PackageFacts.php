@@ -14,7 +14,7 @@ use Lockrot\Lock\LockedPackage;
 /** @internal */
 final class PackageFacts
 {
-    /** `metadata.status` of SPEC-0.14 5.5. */
+    /** The value of `metadata.status`. */
     public const METADATA_READ = 'read';
     public const METADATA_UNAVAILABLE = 'unavailable';
     public const METADATA_NOT_FOUND = 'not_found';

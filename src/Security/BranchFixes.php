@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Security;
 
 /**
- * A release branch's `fixes` (SPEC-0.14 7.6.2 and maintainer rule P2): what a move onto the branch
+ * A release branch's `fixes`: what a move onto the branch
  * clears, from its lower bound, and what holds that move.
  *
  * @internal

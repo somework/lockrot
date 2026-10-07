@@ -26,10 +26,10 @@ use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\TestCase;
 
 /**
- * The floor point moves what a branch row admits only at the edge (items/C67.md 3.5). Over the 12
- * fixture apps, no row's `admits_project_php` or `misses_project_php` moves from what v0.13.0 wrote.
- * tests/fixtures/corpus/floor-point-before.json is that snapshot; the pull request that adds this
- * test gives the command that recorded it.
+ * The floor point moves what a branch row admits only at the edge. Over the fixture apps, no row's
+ * `admits_project_php` or `misses_project_php` moves from the recorded snapshot
+ * tests/fixtures/corpus/floor-point-before.json. The pull request that adds this test gives the
+ * command that recorded it: https://github.com/somework/lockrot/pull/<PR>.
  */
 final class FloorPointCorpusTest extends TestCase
 {
@@ -71,7 +71,7 @@ final class FloorPointCorpusTest extends TestCase
             $server->stop();
         }
 
-        self::assertSame(self::keyed($before['rows']), self::keyed($after), 'a branch row moved: compare it with items/C67.md 3.5 before re-recording the snapshot');
+        self::assertSame(self::keyed($before['rows']), self::keyed($after), 'a branch row moved: check the floor point rule in docs/verdicts.md#within-reach before you re-record the snapshot');
     }
 
     /**

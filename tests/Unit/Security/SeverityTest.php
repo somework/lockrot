@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 final class SeverityTest extends TestCase
 {
     /**
-     * SPEC-0.14 5.2: each Composer value, its bucket, points, gate rank and SARIF numbers.
+     * Each Composer value, its bucket, points, gate rank and SARIF numbers.
      *
      * @dataProvider buckets
      */
@@ -54,7 +54,7 @@ final class SeverityTest extends TestCase
         self::assertSame([0, 1, 2, 3, 4], $positions);
     }
 
-    /** The display order breaks ties; the gate rank compares thresholds, and there unrated equals medium. */
+    /** The display order breaks ties. The gate rank compares thresholds, and there unrated equals medium. */
     public function testUnratedAndMediumShareAGateRankButNotADisplayPosition(): void
     {
         $medium = Severity::fromComposer('medium');

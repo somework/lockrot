@@ -179,7 +179,7 @@ final class AnalyzerTest extends TestCase
         self::assertNull($analysis->facts('vendor/absent'));
     }
 
-    /** The release scan reads why a package has no metadata: SPEC-0.14 5.5's `metadata.status`. */
+    /** The release scan reads why a package has no metadata. */
     public function testTheFactsSayWhetherTheMetadataFailedOrWasNotFound(): void
     {
         $lock = LockFile::fromArray(['packages' => [

@@ -425,7 +425,7 @@ final class LeftBehindRuleTest extends TestCase
     }
 
     /**
-     * The S8 keys that report-2 adds (SPEC-0.14 2.1): computed here, not written, because
+     * The S8 keys that report-2 adds: computed here, not written, because
      * report-1's S8 is closed.
      */
     public function testTheReadingCarriesTheReachableBranchsPhpAndWhatAdmitsIt(): void

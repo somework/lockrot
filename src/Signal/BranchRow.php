@@ -10,7 +10,7 @@ use Lockrot\Security\BranchFixes;
 use Lockrot\Security\PackageFixes;
 
 /**
- * One release branch of a package as the details block shows it (SPEC-0.14 7.6.2): its newest
+ * One release branch of a package as the details block shows it: its newest
  * releases, its php with each floor's answer, the age of its newest release and what a move onto
  * it fixes. The floor answers are {@see PhpFloor}'s, so S8 and the rows read one point.
  *
@@ -41,7 +41,7 @@ final class BranchRow
 
     /**
      * Highest branch first, the keys ordered as the versions they are (`10` above `9`, `0.3` above
-     * `0.0.3`). Empty when the package's metadata was not read.
+     * `0.0.3`). Empty when lockrot did not read the package's metadata.
      *
      * @param ?Signal       $s8    the package's S8: it dates a branch whose highest tag has no trusted date
      * @param ?PackageFixes $fixes the release scan of the package, null when it has no counted advisory
@@ -167,7 +167,7 @@ final class BranchRow
         return $this->missesProjectPhp;
     }
 
-    /** The age of the branch's newest release on the run clock, one decimal; null with no date for the branch. */
+    /** The age of the branch's newest release on the run clock, to one decimal. Null with no date for the branch. */
     public function releasedYears(): ?float
     {
         return $this->releasedYears;

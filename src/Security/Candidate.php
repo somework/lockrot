@@ -8,8 +8,8 @@ use Lockrot\Data\Repository\ReleaseBranch;
 use Lockrot\Data\Repository\StableRelease;
 
 /**
- * A release the scan could move to, with its class and what holds it (SPEC-0.14 5.3). The class
- * reads only PHP; the links fill {@see heldBy()} for every class.
+ * A release the scan could move to, with its class and what holds it. The class
+ * reads only PHP. The links fill {@see heldBy()} for every class.
  *
  * @internal
  */

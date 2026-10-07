@@ -14,7 +14,7 @@ use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\PhpFloor;
 
 /**
- * The release scan of SPEC-0.14 5.3: which release fixes each counted advisory, how hard it is to
+ * The release scan: which release fixes each counted advisory, how hard it is to
  * reach, and what holds it. lockrot reads the lock as it is and does not solve dependencies: a
  * class checks the lock's links on the package, not the fixing release's own requirements.
  *
@@ -150,7 +150,7 @@ final class FixFinder
     }
 
     /**
-     * One row per branch the package has, highest first (P2). A branch's lower bound is the lowest
+     * One row per branch the package has, highest first. A branch's lower bound is the lowest
      * release from which every release up to its newest lies outside every range its newest clears.
      *
      * @param array<string, string>               $newest

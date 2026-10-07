@@ -168,8 +168,8 @@ measure S2, and [S10](#what-was-not-checked) says so.
 S8 tells you to follow the newest higher branch that releases and whose php requirement admits
 both of these floors:
 
-- the project's own `require.php` as `composer.json` writes it, read as the lowest version it
-  names.
+- the project's own `require.php` as `composer.json` writes it, read as the lowest stable version
+  it admits: `>=8.2` is `8.2.0`, `>7.1` is `7.1.1`.
 
 - the target PHP ([`target-php`](configuration.md#extralockrot-keys) or its option and environment
   override, else `config.platform.php`, else the running PHP), as a whole minor: a branch outside

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Security;
 
 /**
- * The severity bucket of an advisory and the numbers each bucket carries (SPEC-0.14 5.2). The
+ * The severity bucket of an advisory and the numbers each bucket carries. The
  * display order breaks ties and orders rows. The gate rank compares thresholds, where unrated
  * equals medium. Never swap the two.
  *
