@@ -55,8 +55,8 @@ How lockrot writes a report or a baseline:
   over the target. lockrot creates the temporary file exclusively, so it never follows a file or
   symlink that is already at that name. lockrot needs write access to that directory.
 
-- A run that stops during a write can leave a `*.tmp` file beside the target. `self-update` stages the
-  new archive beside the PHAR ([Keeping it updated](docs/phar.md#keeping-it-updated)).
+-  A run that stops during a write can leave a `*.tmp` file beside the target. `self-update` stages
+  the new archive beside the PHAR ([Keeping it updated](docs/phar.md#keeping-it-updated)).
 
 - lockrot writes an absolute path where it points, inside the project or not.
 
@@ -117,8 +117,8 @@ vulnerabilities with `composer audit`.
   signature, and installs nothing when either fails
   ([Keeping it updated](docs/phar.md#keeping-it-updated)).
 
-- **What a signature does not prove.** It proves that the bytes are a lockrot release, not that they are
-  the newest one. Which release is newest comes from GitHub's release API, over TLS.
+-  **What a signature does not prove.** It proves that the bytes are a lockrot release, not that
+  they are the newest one. Which release is newest comes from GitHub's release API, over TLS.
 
 - **The release metadata is not signed.** `lockrot.phar.meta.json` names a release's lowest PHP
   and the fingerprint of the key that signed it. It decides only which release `self-update` tries,
@@ -153,14 +153,15 @@ The self-update key:
   `lockrot-selfupdate-key.pub` at the previous `v*` tag and its release metadata names that key.
   Every archive in the field verifies with that key.
 
-- A planned rotation ships the new key in a transition release, signed with the old key. An archive
-  on the old key skips the releases after the transition release, whose metadata names the new key. It installs the
-  transition release and verifies with the new key from then on. The transition release's
-  changelog names the new fingerprint.
+-  A planned rotation ships the new key in a transition release, signed with the old key. An archive
+  on the old key skips each later release, because the metadata of that release names the new key.
+  The archive installs the transition release and verifies with the new key from then on. The
+  transition release's changelog names the new fingerprint.
 
-- An archive is stranded when a newer release is signed with a key that the archive does not carry,
-  and no transition release is available (missing, pulled, or it needs a newer PHP). `self-update` and `self-update --check` exit `2` and
-  say so. Reinstall the archive [by hand](docs/phar.md#reinstalling-by-hand).
+- An archive is stranded when a newer release that it can take is signed with a key that the
+  archive does not carry, and `self-update` finds no release to install. The transition release can
+  be missing, pulled or need a newer PHP. `self-update` and `self-update --check` exit `2` and say
+  so. Reinstall the archive [by hand](docs/phar.md#reinstalling-by-hand).
 
 - A compromised key cannot vouch for a transition release. We pull every release that the key
   signed. Reinstall every archive that carries the key by hand, whatever its version, from a

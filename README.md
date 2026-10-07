@@ -72,9 +72,9 @@ installed and, for a complete run, a GitHub token in `GITHUB_TOKEN`
     runs on another PHP in production, pass `--target-php=<version>`.
 
     lockrot groups flagged findings by priority. Each row gives the verdict, the package, how the
-    project reaches it (`direct` or `via …`) and the evidence. The summary block under the list counts every
-    verdict, sums the [libyears](https://lockrot.dev/verdicts/#libyears), and names the direct
-    requirements that pull in the most flagged packages.
+    project reaches it (`direct` or `via …`) and the evidence. The summary block under the list
+    counts every verdict, sums the [libyears](https://lockrot.dev/verdicts/#libyears), and names the
+    direct requirements that pull in the most flagged packages.
 
     ![composer lockrot on a real project: the grouped list, the summary block and the footer](docs/assets/lockrot-demo.gif)
 
@@ -178,10 +178,11 @@ On other CI systems, use the PHAR or the Docker image `ghcr.io/somework/lockrot`
 
 ## Not every finding is a problem
 
-- **Baseline:** accept findings with `--generate-baseline` ([Baseline](https://lockrot.dev/baseline/)).
-- **Allowlist:** packages on the built-in allowlist (`psr/*`, `symfony/polyfill-*` and others) report
-  as `finished`. Add your own under `extra.lockrot.ignore`, each with a `package` and a `reason`
-  ([The allowlist](https://lockrot.dev/configuration/#the-allowlist)).
+-  **Baseline:** accept findings with `--generate-baseline`
+  ([Baseline](https://lockrot.dev/baseline/)).
+-  **Allowlist:** packages on the built-in allowlist (`psr/*`, `symfony/polyfill-*` and others)
+  report as `finished`. Add your own under `extra.lockrot.ignore`, each with a `package` and a
+  `reason` ([The allowlist](https://lockrot.dev/configuration/#the-allowlist)).
 
 ## Configuration
 

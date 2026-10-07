@@ -271,8 +271,8 @@ steps:
 | `invocations[].toolExecutionNotifications` | The report's notes |
 
 `originalUriBaseIds.%SRCROOT%` is the directory that the lock's path is relative to (the directory
-that lockrot runs in, or the lock's own when it lies outside it), as an absolute `file://` URL on the
-machine that ran lockrot. Code scanning resolves the lock's path against it. To publish the file
+that lockrot runs in, or the lock's own when it lies outside it), as an absolute `file://` URL on
+the machine that ran lockrot. Code scanning resolves the lock's path against it. To publish the file
 anywhere else, strip it first ([what a report reveals](schema.md#where-a-package-came-from)):
 
 ```bash
@@ -383,11 +383,12 @@ one CI artifact and attaches to a ticket.
     path: lockrot-report.html
 ```
 
-The page is [lockrot-report](https://github.com/somework/lockrot-report), vendored at the
-version that the [changelog](changelog.md) names. That repository describes what the page shows and
-how to navigate it. The page carries the run as JSON in `<script id="lockrot-data" type="application/json">`,
-and that document's `report` key is the [report-1 document](schema.md), the part of the page that
-is [contract](compatibility.md#what-is-not-contract).
+The page is [lockrot-report](https://github.com/somework/lockrot-report), vendored at the version
+that the [changelog](changelog.md) names. That repository describes what the page shows and how to
+navigate it. The page carries the run as JSON in
+`<script id="lockrot-data" type="application/json">`, and that document's `report` key is the
+[report-1 document](schema.md), the part of the page that is
+[contract](compatibility.md#what-is-not-contract).
 
 Without `--all` the page carries release detail for flagged packages and for unflagged ones with an
 advisory. `--all` adds that detail for every package, so the file grows with the lock.

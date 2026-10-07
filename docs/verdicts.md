@@ -65,7 +65,8 @@ Severity order, used by [`--fail-on`](ci.md), the baseline and the report's sort
 
 - S2's `data` is the release it measures from (`last_version`, `last_release`), the `years` since
   it, and `dated_by`: the [monorepo parent](#dates-from-the-monorepo) that dated it, else null.
-  [schema.md](schema.md#signal-data) types the `data` of every signal.
+  `report-1.json` types the `data` of every signal ([Signal data](schema.md#signal-data)). The
+  S6, S8 and S9 sections of this page give their fields.
 
 ## Abandoned, and where to
 
@@ -141,8 +142,7 @@ from the [example run](example-run.md):
 
 - S8's `data` names the installed `branch`, its newest stable release (`branch_last_version`,
   `branch_last_release`) and the `years` since it, the higher branch the second clause names
-  (`newest_branch`, `newest_version`, `newest_release`) and `dated_by`. [schema.md](schema.md#signal-data)
-  types the fields for a branch within reach.
+  (`newest_branch`, `newest_version`, `newest_release`) and `dated_by`.
 
 S8 is not measured for:
 
@@ -182,7 +182,8 @@ names the branch within reach. Abridged from the [example run](example-run.md):
 
 If no branch that releases is within reach, S8's clause ends `no releasing branch within reach`
 and suggests nothing: the way forward is a PHP upgrade. The verdict stays `left-behind`.
-[schema.md](schema.md#signal-data) types S8's `data`. The report's `run` carries
+`report-1.json` types S8's `data`, `suggested_constraint` included
+([Signal data](schema.md#signal-data)). The report's `run` carries
 the two floors as `target_php` and `project_php`.
 
 #### The PHP test in `--explain` {#the-php-test-in-explain}
@@ -338,7 +339,8 @@ the field. A non-empty list, the `no fix expected` clause and the `no_fix_expect
 - **Baseline.** The [baseline](baseline.md) stays keyed on the verdict, so a baselined finding is
   `known` whatever S9 adds to its priority.
 
-lockrot does not check advisories (S9) in these cases, and a [note](notes.md#advisories_not_checked) says so:
+lockrot does not check advisories (S9) in these cases, and a [note](notes.md#advisories_not_checked)
+says so:
 
 - Composer older than 2.4.
 
@@ -402,7 +404,8 @@ section in [ci.md](ci.md#choosing-a-format) shows where the priority appears.
 ## Transitive exposure
 
 You can act only on what `composer.json` names. For a transitive finding, the report says which
-direct requirements pull it in. For a direct requirement, it says which flagged packages it pulls in.
+direct requirements pull it in. For a direct requirement, it says which flagged packages it pulls
+in.
 
 ### Every direct requirement that reaches a package
 
@@ -418,8 +421,9 @@ it.
 ### S7 on the direct requirement
 
 Each direct requirement whose subtree holds attributed flagged packages gets S7. S7 lists them in
-report order, with the shortest chain to each. A flagged package that the project requires
-directly counts under no requirement, its own included, whoever else reaches it. Abridged from the [example run](example-run.md):
+report order, with the shortest chain to each. A flagged package that the project requires directly
+counts under no requirement, its own included, whoever else reaches it. Abridged from the [example
+run](example-run.md):
 
 ```text
   pinned       wallabag/rulerz-bundle dev-master  direct
@@ -508,8 +512,8 @@ signal under `blocks`.
 
 ## Libyears
 
-Libyears give one number for how far behind the whole lock is, apart from the verdicts. Abridged
-from the [example run](example-run.md):
+Libyears give one number for how far behind the whole lock is. The number decides no verdict.
+Abridged from the [example run](example-run.md):
 
 ```text
 libyears: 181.7 behind across 194 of 200 packages · 113.6 from direct requirements ·
@@ -552,10 +556,10 @@ applies. So a `path` entry on `dev-main` counts as `not_from_composer_repository
 The keys are an [open set](schema.md#open-sets): read one you do not know as another way a package
 went unmeasured ([compatibility.md](compatibility.md#open-sets)).
 
-- **Lower bounds.** When the newest tag has no trusted date, lockrot measures the package to the
+-  **Lower bounds.** When the newest tag has no trusted date, lockrot measures the package to the
   newest release above the installed version that has a trusted date. That release can be on a
-  higher branch or on the installed branch. A tag's commit is never younger than the release it names, so the value is a lower bound.
-  The HTML report marks it "at least".
+  higher branch or on the installed branch. A tag's commit is never younger than the release it
+  names, so the value is a lower bound. The HTML report marks it "at least".
 
 - **Ahead of the newest release.** A package locked on a pre-release above it, or on a tag that
   the repository does not list, counts as zero.

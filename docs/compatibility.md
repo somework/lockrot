@@ -86,10 +86,10 @@ The order decides:
 ### Open sets
 
 The sets that [Open sets](schema.md#open-sets) lists grow in minor releases. The [closed
-sets](#closed-sets-and-their-order) do not. Read a value that you do not know as that page says. A
-`priority_basis` step whose `reason` you do not know still shows its direction: compare `from` and
-`to`. In lockrot's own input an unknown format name is an error: `--format`, `--output` and
-`extra.lockrot.format` accept only the names the release knows.
+sets](#closed-sets-and-their-order) do not. Read a value that you do not know as [Open
+sets](schema.md#open-sets) says. A `priority_basis` step whose `reason` you do not know still shows
+its direction: compare `from` and `to`. In lockrot's own input an unknown format name is an error:
+`--format`, `--output` and `extra.lockrot.format` accept only the names the release knows.
 
 A minor release can split a `libyears_unmeasured` reason, `no_stable_release_date` included, into
 narrower ones, which moves findings out of the old `libyears.unmeasured` key.
@@ -310,7 +310,7 @@ A committed baseline does not make an upgrade silent. A package that a release s
     - is removed only in the next major version, and no sooner than six months after it was
       deprecated
 - Exit codes and format names never get a new meaning.
-- A JSON field is never deprecated on its own. lockrot keeps writing it, the schema marks it
+- A JSON field is never deprecated on its own. lockrot continues to write it, the schema marks it
   `x-deprecated: true`, and it disappears only with report-2. A draft-04 validator ignores
   `x-deprecated`, as it ignores `x-known-values`.
 - A signal is retired, never removed.

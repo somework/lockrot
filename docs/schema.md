@@ -46,7 +46,8 @@ The report, the explanation and the baseline file open with a `$schema` key that
 An editor that reads `$schema` completes and checks these documents as you edit them.
 
 `extra.lockrot` sits inside `composer.json`, which has a schema of its own, so it carries no
-`$schema`. Map `config-1.json` to the `extra.lockrot` path in the JSON schema settings of your editor.
+`$schema`. Map `config-1.json` to the `extra.lockrot` path in the JSON schema settings of your
+editor.
 
 ## The number, and what can change under it {#the-number-and-what-may-change-under-it}
 
@@ -329,7 +330,7 @@ still typed and still written.
 | S8 | `newest_php` | 0.11.0 | The php requirement of the newest branch's release. Null when it requires no PHP |
 | S8 | `newest_within_reach` | 0.11.0 | Whether the newest branch's php requirement admits both the project's own `require.php` and the target PHP ([Within reach](verdicts.md#within-reach)) |
 | S8 | `floor_php`, `floor_source` | 0.11.0 | What holds the newest branch back, and which floor that is (`project` or `target`, an open set). Both null when it is within reach |
-| S8 | `reachable_branch`, `reachable_version`, `reachable_release` | 0.11.0 | The newest releasing higher branch within reach, the one that `suggested_constraint` follows. Null when none is |
+| S8 | `reachable_branch`, `reachable_version`, `reachable_release` | 0.11.0 | The newest higher branch that releases and is within reach, the one that `suggested_constraint` follows. Null when none is |
 | S9 | `releases_read` | 0.13.0 | True when lockrot read the releases and compared them with the installed version, so a null `fixed_by` means none fixes it. False with no metadata or an incomparable version ([Security advisories](verdicts.md#security-advisories)) |
 | S10 | `unchecked`, `blocks` | 0.11.0 | See [What was not checked](verdicts.md#what-was-not-checked) |
 

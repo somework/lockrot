@@ -131,8 +131,8 @@ a lock, or lower it to spend less time on the check.
 ```
 
 `install-time-strict` needs a `fail-on`, from `LOCKROT_FAIL_ON` or `extra.lockrot.fail-on`. Without
-one, lockrot stops nothing. When a finding reaches `fail-on`, lockrot stops the transaction before any
-package operation runs, and Composer exits `1`. [Choosing `--fail-on`](ci.md) covers the values.
+one, lockrot stops nothing. When a finding reaches `fail-on`, lockrot stops the transaction before
+any package operation runs, and Composer exits `1`. [Choosing `--fail-on`](ci.md) covers the values.
 
 - A finding in the [baseline](baseline.md#install-time) does not stop the install unless its
   verdict is worse than the baseline recorded. The block lists both kinds.
@@ -160,8 +160,8 @@ A baseline covers only flagged findings. The allowlist clears a `fail-on: unchec
 ## Under `--dry-run` {#a-note-on-the-dry-run-development-flag}
 
 Under `composer require --dev … --dry-run`, lockrot treats a package that is absent from the lock on
-disk as production, so its [priority](verdicts.md#priority) can read one step high. `composer lockrot` on
-the real lock has the flag.
+disk as production, so its [priority](verdicts.md#priority) can read one step high.
+`composer lockrot` on the real lock has the flag.
 
 ## Related
 
