@@ -1489,6 +1489,7 @@ final class JsonSchemaConformanceTest extends TestCase
             'report-1/verdict-outside-the-closed-set.json' => [true, false],
         ], $outcomes);
 
+        // The strict-only fixture is valid as published: only the strict twin rejects it.
         [$json] = NegativeFixtures::read($rows['baseline-1/envelope-gains-a-key.strict.json'][0]);
         $this->assertValid(Schemas::BASELINE, $json, 'a strict-only fixture as published');
         // The rejected one is rejected for the error it names, and a fixture naming another is not a pass.

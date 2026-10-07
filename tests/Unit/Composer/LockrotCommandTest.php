@@ -1520,11 +1520,7 @@ final class LockrotCommandTest extends TestCase
         }
         $json = json_decode($tester->getDisplay(), true);
         self::assertIsArray($json);
-        $verdicts = array_column(JsonPath::arrayAt($json, ['findings']), 'verdict', 'package');
-        $golden = JsonPath::arrayAt(JsonPath::decodeFile(__DIR__.'/../../fixtures/golden/wallabag.json'), ['verdicts']);
-        ksort($verdicts);
-        ksort($golden);
-        self::assertSame($golden, $verdicts, 'tests/fixtures/golden/wallabag.json: rewrite it with LOCKROT_REWRITE_GOLDEN=1 vendor/bin/phpunit --filter testWallabagKeepsItsVerdictsPrioritiesAndExposure, then review the diff');
+        $verdicts = self::assertVerdictsMatchTheGolden($json);
         $flagged = JsonPath::arrayAt($json, ['run', 'flagged_verdicts']);
 
         return self::$wallabagTotals = [
@@ -1532,6 +1528,29 @@ final class LockrotCommandTest extends TestCase
             \count(array_keys($verdicts, 'abandoned', true)),
             \count(array_filter($verdicts, static fn ($verdict): bool => \in_array($verdict, $flagged, true))),
         ];
+    }
+
+    /**
+     * @param array<mixed, mixed> $json a report of the wallabag fixture
+     *
+     * @return array<mixed> the verdict per package
+     */
+    private static function assertVerdictsMatchTheGolden(array $json): array
+    {
+        $verdicts = array_column(JsonPath::arrayAt($json, ['findings']), 'verdict', 'package');
+        $golden = JsonPath::arrayAt(JsonPath::decodeFile(__DIR__.'/../../fixtures/golden/wallabag.json'), ['verdicts']);
+        ksort($verdicts);
+        ksort($golden);
+        self::assertSame($golden, $verdicts, 'tests/fixtures/golden/wallabag.json: rewrite it with LOCKROT_REWRITE_GOLDEN=1 vendor/bin/phpunit --filter testWallabagKeepsItsVerdictsPrioritiesAndExposure, then review the diff');
+
+        return $verdicts;
+    }
+
+    /** @param array<mixed, mixed> $json a report of the wallabag fixture */
+    private function assertWallabagReport(array $json): void
+    {
+        self::assertVerdictsMatchTheGolden($json);
+        self::assertSame($this->wallabagTotals()[1], JsonPath::intAt($json, ['counts', 'abandoned']));
     }
 
     /** @param array<mixed, mixed> $json a report of the wallabag fixture */
@@ -1990,7 +2009,7 @@ final class LockrotCommandTest extends TestCase
         self::assertSame("lockrot: json report written to r.json\n", $stderr);
         $json = $this->readJsonFile($dir.'/r.json');
         self::assertIsArray($json['counts']);
-        self::assertAbandonedCountAgreesWithTheFindings($json);
+        $this->assertWallabagReport($json);
     }
 
     /** Without --output nothing new reaches stderr: a report run says nothing there. */
@@ -2332,7 +2351,7 @@ final class LockrotCommandTest extends TestCase
         $json = $this->readJsonFile($dir.'/r.json');
         self::assertNull($json['baseline']);
         self::assertIsArray($json['counts']);
-        self::assertAbandonedCountAgreesWithTheFindings($json);
+        $this->assertWallabagReport($json);
     }
 
     public function testAReportThatCannotBeWrittenUnderGenerateBaselineLeavesTheBaselineAlone(): void
