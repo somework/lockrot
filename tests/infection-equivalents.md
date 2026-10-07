@@ -7,8 +7,7 @@ Write an entry as
     - `src/Path/File.php` Mutator `the mutated line, as in the source` — reason
 
 `tools/mutation/pr_gate.py` reads the file, the mutators and the code span. Put several mutators of
-one line before one code span, and quote a line that holds a backtick in a double-backtick span.
-Write "Mutator x2" for a mutant that escapes twice. If the line occurs more than once in its file,
+one line before one code span. Quote a line that holds a backtick in a double-backtick span. Write "Mutator x2" for a mutant that escapes twice. If the line occurs more than once in its file,
 start the reason with `in method():`.
 
 ## src/Allowlist
