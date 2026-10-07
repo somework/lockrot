@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Verdict changes
+
+- **All formats:** a package installed from vcs or a path can now be `vulnerable`, because its name
+  is asked for advisories (see Security).
+  ([Which advisories count](docs/verdicts.md#which-advisories-count))
+- **All formats:** lockrot reads Composer's abandoned ignore list (`config.policy.abandoned.ignore`
+  on Composer 2.10+, `config.audit.ignore-abandoned` on 2.9), as `composer audit` does: a listed
+  package's abandoned marking no longer counts. An archived repository still does.
+  ([Abandoned](docs/verdicts.md#abandoned))
+
+### Security
+
+- **All formats:** security advisories are looked up by name for every package the run checks,
+  whatever its origin (packages-dev with `--dev`), so the names of packages installed from vcs, path
+  or archives now reach each Composer repository that publishes advisories. Action: set
+  `extra.lockrot.advisory-lookup` to `composer-repositories` to keep 0.13's boundary.
+  ([What lockrot contacts](https://github.com/somework/lockrot/blob/v0.14.0/SECURITY.md#what-lockrot-does-and-does-not-do))
+
 ## [0.13.0] - 2026-10-01
 
 Act if you publish reports, set `COMPOSER` or an invalid `LOCKROT_FAIL_ON` or `LOCKROT_TARGET_PHP`,
