@@ -29,7 +29,7 @@ use PHPUnit\Framework\TestCase;
  * The floor point moves what a branch row admits only at the edge. Over the fixture apps, no row's
  * `admits_project_php` or `misses_project_php` moves from the recorded snapshot
  * tests/fixtures/corpus/floor-point-before.json. The pull request that adds this test gives the
- * command that recorded it: https://github.com/somework/lockrot/pull/<PR>.
+ * command that recorded it: https://github.com/somework/lockrot/pull/72.
  */
 final class FloorPointCorpusTest extends TestCase
 {
