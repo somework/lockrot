@@ -22,7 +22,7 @@ final class Golden
         $json = json_encode($actual, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_PRESERVE_ZERO_FRACTION | \JSON_THROW_ON_ERROR)."\n";
         if (getenv('LOCKROT_REWRITE_GOLDEN') === '1') {
             Assert::assertNotFalse(file_put_contents($path, $json), 'cannot write '.$path);
-            Assert::markTestIncomplete('rewrote tests/fixtures/golden/'.$file.': review the diff');
+            Assert::fail('rewrote tests/fixtures/golden/'.$file.'; review the diff and run again without LOCKROT_REWRITE_GOLDEN');
         }
         $command = 'rewrite it with LOCKROT_REWRITE_GOLDEN=1 vendor/bin/phpunit --filter '.$test.', then review the diff';
 
