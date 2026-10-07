@@ -181,7 +181,8 @@ the running file exactly as it was.
 - **What `--force` takes.** Only that one release. If the
   [release rules](#which-release-it-installs) hold it back, or the running major version has none,
   it exits `2` and looks no further down. A build whose release was withdrawn goes back to the
-  newest release left in its major version, never to an older major version.
+  newest release left in its major version, never to an older major version. The release metadata
+  is not signed, so a doctored copy cannot walk a reinstall further down.
 
 - **Where it writes.** Only the PHAR's own directory, which must be writable. `self-update` checks
   it before it downloads the archive (`--check` does not need it).
@@ -267,9 +268,9 @@ The exit `2` causes include:
 - the chosen release lacks an asset, or its release metadata cannot be read
 - a checksum mismatch, a signature that does not verify, a PHP whose openssl extension is missing
   or has no SHA-384, or a download PHP cannot open
-- an archive stranded by a key rotation, under `--check` too: a key that the archive does not carry
+- an archive stranded by a key rotation, under `--check` too. A key that the archive does not carry
   is all that holds back a newer release in the running major version (or the next one with
-  `--allow-major`), and `self-update` finds no release to install
+  `--allow-major`). `self-update` finds no release to install
 - an unwritable PHAR directory, or a file that cannot be written or moved beside the PHAR
 - `--force` when the newest release at or below the running version, in its major version, is
   missing or held back

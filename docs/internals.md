@@ -50,7 +50,8 @@ lockrot never uses an older release's URL. It asks no host about a package that:
 
 - has no such URL, or one that names none of github.com, bitbucket.org or a host in
   `gitlab-domains`, so lockrot does not query GitHub Enterprise (`github-domains`) or Bitbucket
-  Server
+  Server. A URL with a port, such as `gitlab.com:443`, is another host to Composer and to lockrot,
+  so it gets no `GITLAB_TOKEN`.
 - is allowlisted
 - is not from a Composer repository
 
