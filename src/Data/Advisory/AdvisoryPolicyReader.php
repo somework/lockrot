@@ -16,14 +16,16 @@ interface AdvisoryPolicyReader
 {
     /** Composer 2.10 and later: `AdvisoriesPolicyConfig`. */
     public const POLICY = 'policy';
-    /** Composer 2.9.2 to 2.9: `AuditConfig::fromConfig()`, which applies the `apply` scopes. */
+    /** Composer 2.9.2 and later 2.9 releases: `AuditConfig::fromConfig()`, which applies the `apply` scopes. */
     public const AUDIT_CONFIG = 'audit_config';
     /** Composer 2.9.0 and 2.9.1: the raw `audit.ignore` and `audit.ignore-severity`, no package names. */
     public const AUDIT_SECTION = 'audit_section';
-    /** Composer 2.4 to 2.8: the raw `audit.ignore`, no package names. */
+    /** Composer 2.6 to 2.8: the raw `audit.ignore`, no package names. */
     public const AUDIT_IGNORE = 'audit_ignore';
+    /** Composer 2.4 and 2.5: no ignore list. */
+    public const NONE = 'none';
 
-    /** @return self::POLICY|self::AUDIT_CONFIG|self::AUDIT_SECTION|self::AUDIT_IGNORE */
+    /** @return self::POLICY|self::AUDIT_CONFIG|self::AUDIT_SECTION|self::AUDIT_IGNORE|self::NONE */
     public function api(): string;
 
     /**

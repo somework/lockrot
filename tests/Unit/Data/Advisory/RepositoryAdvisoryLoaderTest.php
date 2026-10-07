@@ -6,6 +6,7 @@ namespace Lockrot\Tests\Unit\Data\Advisory;
 
 use Composer\Repository\AdvisoryProviderInterface;
 use Composer\Repository\ArrayRepository;
+use Composer\Repository\FilterRepository;
 use Lockrot\Analyzer\RunNote;
 use Lockrot\Data\Advisory\Advisory;
 use Lockrot\Data\Advisory\AdvisoryBatch;
@@ -514,7 +515,7 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
         $batch = (new RepositoryAdvisoryLoader(array_merge($unreachable->repositories(), $answering->repositories())))->load(['doctrine/cache' => '2.2.0']);
 
         $failed = self::feed($batch, 'doctrine/cache', 0);
-        self::assertSame([AdvisoryCoverage::FAILED, AdvisoryCoverage::TRANSPORT, null], [$failed['answer'], $failed['reason'], $failed['records']]);
+        self::assertSame([AdvisoryCoverage::FAILED, AdvisoryCoverage::LOOKUP_FAILED, null], [$failed['answer'], $failed['reason'], $failed['records']]);
         self::assertSame(AdvisoryCoverage::ANSWERED, self::feed($batch, 'doctrine/cache', 1)['answer']);
         self::assertSame(AdvisoryCoverage::LOOKUP_FAILED, self::nameCoverage($batch, 'doctrine/cache')->reason());
         self::assertSame(0, self::nameCoverage($batch, 'doctrine/cache')->records(), 'what the other feed returned still counts');
@@ -535,7 +536,8 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
 
         $batch = (new RepositoryAdvisoryLoader($corrupt->repositories()))->load(['doctrine/cache' => '2.2.0']);
 
-        self::assertSame(['answer' => AdvisoryCoverage::FAILED, 'reason' => AdvisoryCoverage::INVALID_RESPONSE, 'records' => null], self::feed($batch, 'doctrine/cache', 0));
+        self::assertSame(['answer' => AdvisoryCoverage::FAILED, 'reason' => AdvisoryCoverage::LOOKUP_FAILED, 'records' => null], self::feed($batch, 'doctrine/cache', 0));
+        self::assertSame([[AdvisoryCoverage::FAILED, AdvisoryCoverage::INVALID_RESPONSE]], self::outcomes($batch));
         self::assertNull(self::nameCoverage($batch, 'doctrine/cache')->records(), 'no feed answered');
         self::assertSame(AdvisoryCoverage::LOOKUP_FAILED, self::nameCoverage($batch, 'doctrine/cache')->reason());
         self::assertSame([false], self::networkFailures($batch));
@@ -674,6 +676,52 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
         self::assertSame(['PKSA-core', 'PKSA-main'], array_map(static fn (Advisory $a): string => $a->id(), $alias->for('acme/core')), 'a branch alias reads as the highest version of its line');
         self::assertSame([], $main->for('acme/core'), 'Composer matches a dev branch against no numeric range');
         self::assertSame(2, self::nameCoverage($main, 'acme/core')->records());
+    }
+
+    public function testAnAliasVersionIsAttributedAsComposerAttributesIt(): void
+    {
+        $server = $this->api(['acme/core' => [self::record('PKSA-core', '>=4.3.0,<4.4.13', [])]]);
+
+        $batch = (new RepositoryAdvisoryLoader($server->repositories()))->load(['acme/core' => 'dev-main'], [], ['acme/core' => ['4.3.9999999.9999999-dev']]);
+
+        self::assertSame(['PKSA-core'], array_map(static fn (Advisory $a): string => $a->id(), $batch->for('acme/core')), 'dev-main aliased 4.3.x-dev reads as its alias too');
+    }
+
+    public function testEachRepositorysRecordIsAttributedByItsOwnRange(): void
+    {
+        $first = $this->api(['doctrine/cache' => [self::record('PKSA-shared', '<1.0', [])]]);
+        $second = $this->api(['doctrine/cache' => [self::record('PKSA-shared', '>=2.0,<2.3', [])]]);
+
+        $batch = (new RepositoryAdvisoryLoader(array_merge($first->repositories(), $second->repositories())))->load(['doctrine/cache' => '2.2.0']);
+
+        self::assertSame(['PKSA-shared'], array_map(static fn (Advisory $a): string => $a->id(), $batch->for('doctrine/cache')), 'the second repository\'s range affects 2.2.0');
+        self::assertTrue($batch->for('doctrine/cache')[0]->affects('2.2.0.0'));
+    }
+
+    public function testAFilteredRepositoryIsNamedOnlyWhenItWrapsAnAdvisoryCapableOne(): void
+    {
+        if (!interface_exists(AdvisoryProviderInterface::class)) {
+            self::markTestSkipped('Composer without the advisory API');
+        }
+        $vcs = new class () extends ArrayRepository {
+            public function getRepoName(): string
+            {
+                throw new \LogicException('a vcs repository is never named: its driver can start network I/O');
+            }
+        };
+        [$feed] = self::spy();
+
+        $batch = (new RepositoryAdvisoryLoader([new FilterRepository($vcs, ['only' => ['acme/*']]), new FilterRepository($feed, ['only' => ['acme/*']])]))->load(['acme/pkg' => '1.0.0']);
+
+        self::assertSame(1, $batch->coverage()->otherRepositories());
+        self::assertSame([[AdvisoryCoverage::ANSWERED, null]], self::outcomes($batch));
+    }
+
+    public function testNoNameToAskKeepsTheConfiguredScope(): void
+    {
+        $batch = (new RepositoryAdvisoryLoader([], false, null, null, AdvisoryCoverage::SCOPE_COMPOSER_REPOSITORIES, AdvisoryCoverage::SOURCE_CONFIG))->load([]);
+
+        self::assertSame([AdvisoryCoverage::SCOPE_COMPOSER_REPOSITORIES, AdvisoryCoverage::SOURCE_CONFIG], [$batch->coverage()->scope(), $batch->coverage()->scopeSource()]);
     }
 
     public function testAnUnparseableVersionIsAskedButNotAttributed(): void

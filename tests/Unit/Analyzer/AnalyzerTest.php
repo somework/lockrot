@@ -141,7 +141,7 @@ final class AnalyzerTest extends TestCase
                 $this->asked = $asked;
             }
 
-            public function load(array $versionByName, array $notFromComposerRepository = []): AdvisoryBatch
+            public function load(array $versionByName, array $notFromComposerRepository = [], array $aliasVersionsByName = []): AdvisoryBatch
             {
                 if ($this->asked !== null) {
                     $this->asked->exchangeArray($versionByName);

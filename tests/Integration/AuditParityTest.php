@@ -8,6 +8,7 @@ use Composer\Advisory\AuditConfig;
 use Composer\Advisory\Auditor;
 use Composer\Config;
 use Composer\IO\BufferIO;
+use Composer\Package\AliasPackage;
 use Composer\Package\Loader\ArrayLoader;
 use Composer\Package\PackageInterface;
 use Composer\Policy\PolicyConfig;
@@ -15,6 +16,7 @@ use Composer\Repository\AdvisoryProviderInterface;
 use Composer\Repository\RepositorySet;
 use Lockrot\Data\Advisory\AdvisoryIgnore;
 use Lockrot\Data\Advisory\RepositoryAdvisoryLoader;
+use Lockrot\Lock\LockFile;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
 use PHPUnit\Framework\TestCase;
 
@@ -22,8 +24,6 @@ use PHPUnit\Framework\TestCase;
  * The installed-version result of lockrot's one lookup equals what Composer's own `Auditor`
  * reports, counted and ignored, for each lock and config of the table. Keyed by capability:
  * Composer 2.2 has no advisory API, 2.4 to 2.9 read `config.audit`, 2.10 and later the policy API.
- * CI runs Composer 2.2 and the newest release, so the 2.4 to 2.9 leg runs only by hand on such a
- * Composer.
  */
 final class AuditParityTest extends TestCase
 {
@@ -35,6 +35,7 @@ final class AuditParityTest extends TestCase
         ['name' => 'acme/main', 'version' => 'dev-main', 'notification-url' => 'https://packagist.org/downloads/'],
         ['name' => 'acme/local', 'version' => '1.0.0', 'dist' => ['type' => 'path', 'url' => '../local']],
         ['name' => 'acme/clean', 'version' => '3.0.0', 'notification-url' => 'https://packagist.org/downloads/'],
+        ['name' => 'acme/branch', 'version' => 'dev-main', 'notification-url' => 'https://packagist.org/downloads/', 'extra' => ['branch-alias' => ['dev-main' => '4.3.x-dev']]],
     ];
 
     private static ?FixtureRepositoryServer $server = null;
@@ -62,6 +63,10 @@ final class AuditParityTest extends TestCase
             ],
             'acme/local' => [self::record('acme/local', 'PKSA-l1', '<2.0', 'high', null, 'GHSA-l1')],
             'acme/clean' => [],
+            'acme/branch' => [
+                self::record('acme/branch', 'PKSA-b1', '>=4.3.0,<4.4.13', 'high', null, 'GHSA-b1'),
+                self::record('acme/branch', 'PKSA-b2', '<4.0', 'high', null, 'GHSA-b2'),
+            ],
         ]);
         self::$server->start();
     }
@@ -191,12 +196,20 @@ final class AuditParityTest extends TestCase
         return $config;
     }
 
-    /** @return list<PackageInterface> */
+    /** @return list<PackageInterface> each entry, and the package an alias wraps, as Composer's locked repository holds them */
     private static function packages(): array
     {
         $loader = new ArrayLoader();
+        $packages = [];
+        foreach (self::LOCK as $entry) {
+            $package = $loader->load($entry);
+            $packages[] = $package;
+            if ($package instanceof AliasPackage) {
+                $packages[] = $package->getAliasOf();
+            }
+        }
 
-        return array_map(static fn (array $entry): PackageInterface => $loader->load($entry), self::LOCK);
+        return $packages;
     }
 
     /**
@@ -243,10 +256,12 @@ final class AuditParityTest extends TestCase
     {
         self::assertNotNull(self::$server);
         $versions = [];
-        foreach (self::LOCK as $entry) {
-            $versions[$entry['name']] = $entry['version'];
+        $aliases = [];
+        foreach (LockFile::fromArray(['packages' => self::LOCK])->packages(false) as $package) {
+            $versions[$package->name()] = $package->version();
+            $aliases[$package->name()] = $package->aliasVersions();
         }
-        $batch = (new RepositoryAdvisoryLoader(self::$server->repositories(), false, null, AdvisoryIgnore::fromConfig($config)))->load($versions, ['acme/local']);
+        $batch = (new RepositoryAdvisoryLoader(self::$server->repositories(), false, null, AdvisoryIgnore::fromConfig($config)))->load($versions, ['acme/local'], $aliases);
         $counted = [];
         $ignored = [];
         foreach (array_keys($versions) as $name) {

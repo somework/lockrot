@@ -11,9 +11,8 @@ use Composer\Semver\Constraint\MatchAllConstraint;
 use Composer\Semver\VersionParser;
 
 /**
- * The only class that calls the version-specific Composer API of the abandoned ignore list.
- * phpstan analyses against the newest Composer, so the Composer 2.9 calls carry ignore rules in
- * phpstan.neon.dist.
+ * Calls the version-specific Composer API of the abandoned ignore list. phpstan analyses against
+ * the newest Composer, so the Composer 2.9 calls carry ignore rules in phpstan.neon.dist.
  *
  * @internal
  */
@@ -49,7 +48,7 @@ final class ComposerAbandonedPolicyReader implements AbandonedPolicyReader
         return $rules;
     }
 
-    /** Composer 2.9.2 renamed the property when it added `apply` scopes to the list. */
+    /** The list is `ignoreAbandonedForAudit` on Composer 2.9.2 and later, `ignoreAbandonedPackages` on 2.9.0 and 2.9.1. */
     public function auditConfigList(Config $config): array
     {
         $auditConfig = AuditConfig::fromConfig($config);

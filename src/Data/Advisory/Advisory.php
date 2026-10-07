@@ -43,7 +43,8 @@ final class Advisory
             return new self($advisory->advisoryId, null, null, null, null, null, $advisory->affectedVersions);
         }
 
-        return new self($advisory->advisoryId, $advisory->cve, $advisory->title, $advisory->link, $advisory->severity, $advisory->reportedAt, $advisory->affectedVersions);
+        // SecurityAdvisory has no severity on Composer 2.4 to 2.6.
+        return new self($advisory->advisoryId, $advisory->cve, $advisory->title, $advisory->link, $advisory->severity ?? null, $advisory->reportedAt, $advisory->affectedVersions);
     }
 
     public function id(): string

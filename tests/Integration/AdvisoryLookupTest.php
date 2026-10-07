@@ -28,8 +28,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * The one advisory lookup of a run, counted on the recorded wallabag fixture: one POST per
- * advisory-capable repository, every package the run checks by name (Q7), packages-dev only with
- * `--dev` (O14). Re-record the answer with `bin/record-fixtures tests/fixtures/apps/wallabag_wallabag`.
+ * advisory-capable repository, every package the run checks by name, packages-dev only with
+ * `--dev`. Re-record the answer with `bin/record-fixtures tests/fixtures/apps/wallabag_wallabag`.
  */
 final class AdvisoryLookupTest extends TestCase
 {

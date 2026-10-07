@@ -266,14 +266,18 @@ final class Analyzer
         }
         $versionByName = [];
         $outside = [];
+        $aliasVersions = [];
         foreach ($packages as $package) {
             $versionByName[$package->name()] = $package->version();
             if (!$package->isFromComposerRepository()) {
                 $outside[] = $package->name();
             }
+            if ($package->aliasVersions() !== []) {
+                $aliasVersions[$package->name()] = $package->aliasVersions();
+            }
         }
 
-        return $this->advisories->load($versionByName, $outside);
+        return $this->advisories->load($versionByName, $outside, $aliasVersions);
     }
 
     /**

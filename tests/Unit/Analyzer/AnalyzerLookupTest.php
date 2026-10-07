@@ -40,7 +40,7 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Which lookups the analyzer runs for a package: the repository activity (C69, partial
- * allowlist entries) and the advisory names (Q7, O14).
+ * allowlist entries) and the advisory names.
  */
 final class AnalyzerLookupTest extends TestCase
 {
@@ -221,7 +221,7 @@ final class AnalyzerLookupTest extends TestCase
         self::assertSame([['check' => 'repository_activity', 'reason' => 'fetch_failed', 'blocks' => [Signal::S3, Signal::S4]]], $finding->signals()[0]->data()['unchecked']);
     }
 
-    /** 0.13's rule where S1 counts: no candidate in a tokenless run, and no S10 for what it did not ask. */
+    /** Where S1 counts, a tokenless run asks nothing about the package and raises no S10 for it. */
     public function testACountedMarkingKeepsItsBehaviour(): void
     {
         /** @var \ArrayObject<int, string> $requested */
@@ -261,7 +261,7 @@ final class AnalyzerLookupTest extends TestCase
                 $this->asked = $asked;
             }
 
-            public function load(array $versionByName, array $notFromComposerRepository = []): AdvisoryBatch
+            public function load(array $versionByName, array $notFromComposerRepository = [], array $aliasVersionsByName = []): AdvisoryBatch
             {
                 $this->asked['names'] = $versionByName;
                 $this->asked['outside'] = $notFromComposerRepository;

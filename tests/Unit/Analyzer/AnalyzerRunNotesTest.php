@@ -321,7 +321,7 @@ final class AnalyzerRunNotesTest extends TestCase
                 $this->batch = $batch;
             }
 
-            public function load(array $versionByName, array $notFromComposerRepository = []): AdvisoryBatch
+            public function load(array $versionByName, array $notFromComposerRepository = [], array $aliasVersionsByName = []): AdvisoryBatch
             {
                 return $this->batch;
             }

@@ -25,6 +25,8 @@ final class LockedPackage
     private bool $dev;
     /** @var bool|string */
     private $abandonedInLock;
+    /** @var list<string> */
+    private array $aliasVersions = [];
 
     /**
      * @param list<string> $requires
@@ -143,6 +145,26 @@ final class LockedPackage
 
         return $copy;
     }
+    /**
+     * The normalised versions of the aliases that Composer's loader builds for the entry
+     * (`extra.branch-alias`, `default-branch`). `composer audit` matches an advisory against them too.
+     *
+     * @param list<string> $versions
+     */
+    public function withAliasVersions(array $versions): self
+    {
+        $copy = clone $this;
+        $copy->aliasVersions = $versions;
+
+        return $copy;
+    }
+
+    /** @return list<string> */
+    public function aliasVersions(): array
+    {
+        return $this->aliasVersions;
+    }
+
     public function withDev(bool $dev): self
     {
         $copy = clone $this;

@@ -95,7 +95,7 @@ final class AbandonedRuleTest extends TestCase
         self::assertSame('https://packagist.org/packages/other/pkg', $record->replacementUrl());
     }
 
-    public function testTheRecordOfAMarkingInTheLock(): void
+    public function testAMarkingInTheLockGivesARecordMarkedByTheLock(): void
     {
         $record = AbandonedRule::ignored(self::listed(F::package(['abandonedInLock' => true])));
 

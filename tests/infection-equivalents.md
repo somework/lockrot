@@ -19,7 +19,6 @@ start the reason with `in method():`.
 ## src/Analyzer
 
 - `src/Analyzer/Analyzer.php` ReturnRemoval `return [$metadata, []];` — in dateSplitPackages(): with no package to date, the rest of the method finds no candidate and makes no request.
-- `src/Analyzer/Analyzer.php` UnwrapArrayValues `$signals = array_values(array_filter($signals, static fn (Signal $signal): bool => $signal->id() !== Signal::S10));` — `SignalSet::evaluate()` sorts the signals and S10 is the last one, so the filter leaves the keys `0..n-1`.
 - `src/Analyzer/Libyears.php` GreaterThan `if ($newest === null || $release['at'] > $newest) {` — on a tie the two dates are the same instant, and nothing reads which release gave it.
 - `src/Analyzer/Libyears.php` LessThan `if ($behind > 0.0 && ($worst === null || $behind > $worst[1] || ($behind === $worst[1] && strcmp($finding->package(), $worst[0]->package()) < 0))) {` — two findings of one report never share a package name, so `strcmp()` never returns 0 here.
 - `src/Analyzer/Report.php` UnwrapArrayValues `return array_values(array_filter($this->findings, static fn (Finding $f): bool => Verdict::flagged($f->verdict())));` — the findings are sorted with every flagged one first, so the filter leaves the keys `0..n-1`.
