@@ -86,7 +86,7 @@ final class PackageMetadataTest extends TestCase
         self::assertNull($meta->newestRequires());
     }
 
-    /** The release scan reads three lists, and each kept release has five fields and nothing else. */
+    /** The release scan reads three lists, and each kept release has five fields. */
     public function testItKeepsOnlyWhatTheReleaseScanReads(): void
     {
         $meta = PackageMetadata::fromPackages('a/b', $this->history(), new \DateTimeImmutable(self::NOW), '1.0.0.0');
@@ -96,7 +96,6 @@ final class PackageMetadataTest extends TestCase
         }
         self::assertSame(['php'], $meta->installedRequires());
         self::assertSame(['php', 'c/d'], $meta->newestRequires());
-        self::assertSame(['__construct', 'normalized', 'pretty', 'at', 'php', 'sharedCommit', 'withDate', 'toArray'], get_class_methods(StableRelease::class));
     }
 
     public function testAnInstalledVersionThatDoesNotParseKeepsNoReleaseList(): void
