@@ -42,11 +42,17 @@ final class InstallTimeSummary
 {
     /** @var callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, Tokens, Clock, Deadline, ?string): Analyzer */
     private $analyzerFactory;
+    /** @var null|callable(): float */
+    private $monotonicNow;
 
-    /** @param null|callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, Tokens, Clock, Deadline, ?string): Analyzer $analyzerFactory */
-    public function __construct(?callable $analyzerFactory = null)
+    /**
+     * @param null|callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, Tokens, Clock, Deadline, ?string): Analyzer $analyzerFactory
+     * @param null|callable(): float $monotonicNow monotonic seconds, hrtime() when null
+     */
+    public function __construct(?callable $analyzerFactory = null, ?callable $monotonicNow = null)
     {
         $this->analyzerFactory = $analyzerFactory ?? [ServiceFactory::class, 'createAnalyzer'];
+        $this->monotonicNow = $monotonicNow;
     }
 
     public function onPreOperationsExec(InstallerEvent $event): void
@@ -120,7 +126,7 @@ final class InstallTimeSummary
         $lock = (is_file($lockPath) ? LockFile::fromFile($lockPath) : LockFile::empty())->withPackages($packages);
         $packages = self::withDevFlagsFrom($lock, $packages);
 
-        $deadline = Deadline::inSeconds((float) $lockrot->installTimeBudgetSeconds());
+        $deadline = Deadline::inSeconds((float) $lockrot->installTimeBudgetSeconds(), $this->monotonicNow);
         $composer = $event->getComposer();
         $config = $composer->getConfig();
         $repositories = array_values($composer->getRepositoryManager()->getRepositories());
