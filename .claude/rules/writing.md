@@ -16,7 +16,7 @@ recording.
   "in order to". Do not use a phrasal verb or a noun where one verb says the same. Write "omit",
   not "leave out", and "validates", not "performs validation of".
 - Use the simple tenses and the active voice. Use the passive only when the actor is unknown:
-  "lockrot reads the lock", not "the lock is read". A state (`abandoned`, flagged) is not a passive.
+  "lockrot reads the lock", not "the lock is read". A state (`abandoned`, graded) is not a passive.
 - Use the -ing form only as a noun (a heading, the wording), in a technical name (breaking change,
   signing key) or as "missing", "remaining", "during". Write "before you commit", not "before
   committing", and "a test that reads the lock", not "a test reading the lock".
@@ -71,12 +71,18 @@ that pins it. Write "this job checks X", not "the only check of X".
 | Term | Meaning | Not, in this meaning |
 |---|---|---|
 | finding | One entry in a report's `findings`, one per analysed package, `ok` included | issue, problem, result |
-| flagged | A finding whose verdict is in `run.flagged_verdicts` (`verdicts.md#the-nine-verdicts`) | failing, bad |
-| verdict | What lockrot observed about a package: one value of the closed verdict set | status, state |
-| severity order | The order of the verdicts that `--fail-on` and the sort read | priority, ladder |
+| flag | One fact of the closed flag set (`abandoned` … `vulnerable`) that signals raise, in flag order | cause, issue, verdict |
+| lead | The first counted maintenance flag of a finding, or null | verdict, cause word |
+| vulnerable | The flag of a finding with at least one counted advisory | insecure, affected |
+| score | The points that a finding's counted flags add up to under the score model (`score.total`) | priority, rank |
+| verdict | What a finding's score says: a grade, or `finished`, `unknown` or `ok` at score 0 | status, state |
+| grade | A verdict from a score of 1 or more: `critical`, `high`, `medium`, `low` | severity, level |
+| graded | A finding whose verdict is a grade | flagged, failing, bad |
+| verdict order | The order of the verdicts that the sort and `--fail-on` read | severity order, ladder |
+| severity | The bucket of an advisory: `critical`, `high`, `medium`, `unrated`, `low` | grade, level |
+| priority | The alias of the verdict in report-2: the grade, else `none` | severity, urgency |
 | signal | One observation with an id (`S2`, `S8` …) and its data (`verdicts.md#the-signals`) | check, rule |
 | level | One value of the closed level set on a signal. For a SARIF or annotation level, name the format | severity |
-| priority | How much a finding matters to the project (`verdicts.md#priority`) | severity, urgency |
 | run note | An entry in a report's `notes`: about the run, not about a package (`notes.md`) | warning, error |
 | repository host | The service that hosts a package's source repository | forge, code host |
 | the lock | `composer.lock` | lock file, lockfile |
