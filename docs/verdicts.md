@@ -470,8 +470,7 @@ a package:
 
 Fan-in counts the run's direct requirements, so under `--dev` `require-dev` counts too: a package
 can be attributed without `--dev` and shared with it. A flagged transitive package no direct
-requirement reaches is in neither list: every one in a run without `composer.json`, and one the
-project reaches only through a name it provides or replaces.
+requirement reaches is in neither list: every one in a run without `composer.json`.
 
 ### The `pulled in by:` line
 
@@ -482,9 +481,10 @@ package, and lockrot prints the line only when some flagged package is attribute
 
 Limits:
 
-- The graph is the lock's `require` edges. A requirement met through `replace` or `provide` (a
-  virtual package such as `psr/log-implementation`) adds no edge, so a provider can list fewer
-  parents than pull it in. The `via` column reads `?` when nothing reaches the package.
+- The graph is the lock's `require` edges. A requirement on a name that no locked package carries
+  leads to each package that replaces or provides it (a virtual package such as
+  `psr/log-implementation`), whatever version that package provides. The `via` column reads `?`
+  when nothing reaches the package.
 
 - At install time, lockrot analyses only the packages that the transaction touches. A direct
   requirement gets S7 only when it is in the transaction, and the [compact block](install-time.md)
