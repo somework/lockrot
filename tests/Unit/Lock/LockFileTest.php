@@ -339,4 +339,23 @@ final class LockFileTest extends TestCase
         $byName['acme/plain']->withAliasVersions(['9999999-dev']);
         self::assertSame([], $byName['acme/plain']->aliasVersions(), 'a copy, never the original');
     }
+
+    public function testAnEntryKeepsTheConstraintsOfItsLinks(): void
+    {
+        $lock = LockFile::fromArray(['packages' => [[
+            'name' => 'vendor/pkg',
+            'version' => '1.0.0',
+            'require' => ['php' => '>=7.4', 'ext-json' => '*', 'Vendor/Dep' => '^1.2|^2.0'],
+            'conflict' => ['vendor/bad' => '<1.4'],
+            'replace' => ['vendor/old' => 'self.version'],
+            'provide' => ['psr/log-implementation' => '1.0|2.0'],
+        ]]]);
+        $pkg = $lock->find('vendor/pkg');
+        self::assertNotNull($pkg);
+
+        self::assertSame(['vendor/dep' => '^1.2|^2.0'], $pkg->requireConstraints());
+        self::assertSame(['vendor/bad' => '<1.4'], $pkg->conflicts());
+        self::assertSame(['vendor/old' => 'self.version'], $pkg->replaces());
+        self::assertSame(['psr/log-implementation' => '1.0|2.0'], $pkg->provides());
+    }
 }
