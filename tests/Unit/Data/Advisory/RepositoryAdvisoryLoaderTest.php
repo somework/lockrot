@@ -628,6 +628,8 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
         $batch = (new RepositoryAdvisoryLoader([$spy, $other], true, null, AdvisoryIgnore::unreadable('bad')))->load(['doctrine/cache' => '2.2.0']);
 
         self::assertSame([], $calls->getArrayCopy(), 'not even hasSecurityAdvisories()');
+        $policyOff = (new RepositoryAdvisoryLoader([$spy], true, null, AdvisoryIgnore::disabled('policy', false)))->load(['doctrine/cache' => '2.2.0']);
+        self::assertSame([RunNote::ADVISORIES_NOT_CHECKED], array_map(static fn (RunNote $note): string => $note->code(), $policyOff->notes()), 'no claim that lockrot checked what it did not ask');
         self::assertSame([[AdvisoryCoverage::NOT_ASKED, AdvisoryCoverage::OFFLINE], [AdvisoryCoverage::NOT_ASKED, AdvisoryCoverage::OFFLINE]], self::outcomes($batch));
         self::assertSame([RunNote::ADVISORY_IGNORE_UNREADABLE, RunNote::ADVISORIES_NOT_CHECKED], array_map(static fn (RunNote $note): string => $note->code(), $batch->notes()));
         self::assertSame('spy repo (https://spy.example/)', $batch->coverage()->repositories()[0]['composer_repository'], 'credentials stripped');

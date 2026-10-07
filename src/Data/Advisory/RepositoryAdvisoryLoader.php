@@ -59,10 +59,6 @@ final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
         }
         $whyUnreadable = $this->ignore->whyUnreadable();
         $notes = $whyUnreadable === null ? [] : [RunNote::advisoryIgnoreUnreadable($whyUnreadable)];
-        $disabledBy = $this->ignore->disabledBy();
-        if ($disabledBy !== null) {
-            $notes[] = RunNote::advisoriesDisabledByPolicy($disabledBy['policy_key'], $disabledBy['value']);
-        }
         $outside = $this->scope === AdvisoryCoverage::SCOPE_COMPOSER_REPOSITORIES ? array_fill_keys($notFromComposerRepository, true) : [];
         $asked = array_diff_key($versionByName, $outside);
 
@@ -73,6 +69,10 @@ final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
             return new AdvisoryBatch([], $note === null ? $notes : array_merge($notes, [$note]), [], [], $this->coverage($this->notAsked($reason), $versionByName, $outside, [], $reason));
         }
 
+        $disabledBy = $this->ignore->disabledBy();
+        if ($disabledBy !== null) {
+            $notes[] = RunNote::advisoriesDisabledByPolicy($disabledBy['policy_key'], $disabledBy['value']);
+        }
         [$repositories, $answers, $askNotes] = $this->ask(array_keys($asked));
 
         return $this->batch($versionByName, $outside, $aliasVersionsByName, $repositories, $answers, array_merge($notes, $askNotes));
