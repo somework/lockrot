@@ -147,7 +147,7 @@ final class ScoreModelTest extends TestCase
 
     /**
      * I26: under a partial ignore[] entry, moving up the liveness words (none, stale, silent,
-     * abandoned) never lowers the score, for every other flag set, advisory, reach and dev.
+     * abandoned) never lowers the score, beside the other flags, advisories, reaches and dev of this test.
      *
      * @dataProvider partialEntries
      *
@@ -158,7 +158,7 @@ final class ScoreModelTest extends TestCase
     {
         foreach ([[], ['pinned'], ['left-behind'], ['old-promise'], ['pinned', 'old-promise'], ['left-behind', 'old-promise']] as $others) {
             foreach ([[], [['medium', 'update']]] as $advisories) {
-                foreach (['direct', 'transitive'] as $reach) {
+                foreach (['direct', 'transitive', 'unreached'] as $reach) {
                     foreach ([false, true] as $dev) {
                         $previous = 0;
                         foreach (self::LIVENESS as $live) {
@@ -259,7 +259,7 @@ final class ScoreModelTest extends TestCase
      * @dataProvider fixKinds
      */
     #[DataProvider('fixKinds')]
-    public function testAReachableLowAdvisoryNeverMovesABand(string $fix): void
+    public function testALowAdvisoryMovesABandOnlyWhenNothingFixesIt(string $fix): void
     {
         if (\in_array($fix, ['none', 'blocked'], true)) {
             self::assertSame(8, self::total(['stale'], [['low', $fix]], 'transitive', false), 'two low-band parts make medium: stale 4 + low 4');

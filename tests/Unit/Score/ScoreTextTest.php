@@ -10,9 +10,8 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
- * The one grammar (text grammar 1): the score line of every worked row of the score specification,
- * the unreached and the score-0 shapes. The line is a contract: lockrot-report renders the same
- * line from the same object.
+ * The one grammar (text grammar 1): the score line of each worked row of score model 1, of the
+ * unreached shape and of the score-0 shape. The line is a contract that other renderers match.
  */
 final class ScoreTextTest extends TestCase
 {
@@ -54,6 +53,7 @@ final class ScoreTextTest extends TestCase
         yield 'mautic/core-lib: an unknown fix does not double' => [['pinned'], [['high', 'unknown']], 'direct', false, null, '32 = pinned 16 + vulnerable 16 [high advisory]'];
         yield 'abandoned + a critical advisory nothing fixes' => [['abandoned'], [['critical', 'none']], 'direct', false, null, '96 = abandoned 32 + vulnerable 64 [critical advisory 32 × 2: no reachable fix]'];
         yield 'transitive abandoned + a medium advisory nothing fixes' => [['abandoned'], [['medium', 'none']], 'transitive', false, null, '32 = abandoned 32 ÷ 2 transitive + vulnerable 16 [medium advisory 8 × 2: no reachable fix]'];
+        yield 'a high advisory held by an abandoned holder: no × 2' => [[], [['high', 'upgrade']], 'direct', false, null, '16 = vulnerable 16 [high advisory]'];
         yield 'one high advisory no release fixes' => [[], [['high', 'none']], 'direct', false, null, '32 = vulnerable 32 [high advisory 16 × 2: no reachable fix]'];
         yield 'twig on php 8.0: blocked' => [[], [['critical', 'blocked']], 'direct', false, null, '64 = vulnerable 64 [critical advisory 32 × 2: no reachable fix]'];
         yield 'twig as packages-dev' => [[], [['critical', 'raise-php']], 'direct', true, null, '16 = vulnerable 32 [critical advisory] ÷ 2 dev'];

@@ -1,37 +1,7 @@
 #!/usr/bin/env python3
 """The sweep row stream of score model 1, which the PHP sweep differential compares row by row.
 
-It walks every flag set x advisory set x dev combination, direct or transitive, and prints one row per evaluated score.
-The axes:
-
-  base         every combination, direct or transitive
-  unreached    the unreached variant of each transitive row
-  under        an abandoned row with a hidden silent or stale reading
-  under_entry  the same, under an ignore[] entry that accepts the hidden word
-  accepted     a base row with one of its flags accepted by an ignore[] entry
-
-Row: 14 fields joined by `|`, in this order. No field holds `|`, `,` or `:`, except as the separators of the list.
-  1 axis
-  2 flags        the maintenance flags in enumeration order (liveness word, pinned, left-behind, old-promise), joined by `,`
-  3 advisories   `severity:fix_kind` per advisory, joined by `,` (ids are A0, A1 in that order)
-  4 reach        direct, transitive or unreached
-  5 dev          1 or 0
-  6 under        the hidden liveness word (silent, stale), else `-`
-  7 accepted     the accepted flag (the hidden word on `under_entry`), else `-`
-  8 exact        the exact score in integer half points (36.5 -> 73)
-  9 total        the score
- 10 grade        the band of the score, `-` at 0
- 11 decided_by   `-` when the score has none
- 12 without      `id:total:verdict` per without[] row in its order, `+` appended when at_least, verdict `-` when null
- 13 if_counted   `flag:total:verdict` per accepted[] row in its order (`+` when at_least)
- 14 gate         the grade gate without a baseline entry: one digit per grade value in critical, high, medium, low order, 1 fails
-Every empty list and every null is `-`. Lines end in LF, the stream ends in LF, UTF-8 (all ASCII).
-
-  python3 tools/score/sweep.py > rows.txt   the stream
-  python3 tools/score/sweep.py --sha256     the counts per axis and the sha256 of the uncompressed stream
-
-tests/fixtures/score/sweep-rows.txt.gz holds the stream (`gzip -9n`), and sweep-rows.txt.sha256 the sha256 of the
-uncompressed stream, never of the .gz, which differs between gzip builds. Standard library only.
+tools/score/README.md gives the axes, the 14 fields of a row and the commands. Standard library only.
 """
 import hashlib
 import itertools
