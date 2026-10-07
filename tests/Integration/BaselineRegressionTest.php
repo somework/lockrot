@@ -7,6 +7,7 @@ namespace Lockrot\Tests\Integration;
 use Composer\Config;
 use Composer\Console\Application;
 use Composer\IO\IOInterface;
+use Composer\Repository\AdvisoryProviderInterface;
 use Lockrot\Allowlist\BuiltinAllowlist;
 use Lockrot\Analyzer\Analyzer;
 use Lockrot\Clock;
@@ -43,6 +44,9 @@ final class BaselineRegressionTest extends TestCase
 
     protected function setUp(): void
     {
+        if (!interface_exists(AdvisoryProviderInterface::class)) {
+            self::markTestSkipped('Composer 2.2 has no advisory API, so no advisory reaches the seeded package.');
+        }
         $this->server = FixtureRepositoryServer::fromLockFiles([self::FIXTURE.'/composer.lock']);
         $this->server->withAdvisoryApi([self::SEEDED => [[
             'advisoryId' => 'PKSA-seeded-1',

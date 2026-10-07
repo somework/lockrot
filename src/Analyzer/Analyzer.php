@@ -168,7 +168,8 @@ final class Analyzer
         $notes = array_merge($notes, $activityNotes);
         $activity = $activityBatch->activity();
 
-        $fixes = new FixFinder($this->signals->phpFloor(), LinkIndex::of($lock, $project));
+        // LinkIndex parses every link of the lock. A run without a counted advisory needs none of them.
+        $fixes = $advisories->byName() === [] ? null : new FixFinder($this->signals->phpFloor(), LinkIndex::of($lock, $project));
         $findings = [];
         $factsByPackage = [];
         $notInRepository = 0;
@@ -389,7 +390,7 @@ final class Analyzer
         return [$batch, $notes];
     }
 
-    private function buildFinding(PackageFacts $facts, ?AllowlistEntry $entry, DependencyGraph $graph, MetadataBatch $batch, FixFinder $fixes): Finding
+    private function buildFinding(PackageFacts $facts, ?AllowlistEntry $entry, DependencyGraph $graph, MetadataBatch $batch, ?FixFinder $fixes): Finding
     {
         $package = $facts->package();
         $meta = $facts->metadata();
@@ -436,8 +437,11 @@ final class Analyzer
      *
      * @return list<array{id: string, severity: string, fix_kind: string}>
      */
-    private static function countedAdvisories(PackageFacts $facts, FixFinder $fixes): array
+    private static function countedAdvisories(PackageFacts $facts, ?FixFinder $fixes): array
     {
+        if ($fixes === null) {
+            return [];
+        }
         $found = $fixes->find($facts);
         $counted = [];
         foreach ($facts->advisories() as $advisory) {
