@@ -41,11 +41,7 @@ final class TransactionPackages
             // Defensive: Transaction::calculateOperations() emits a separate InstallOperation for
             // the package that an alias points at. Unwrapping keeps the package's own version,
             // require and source fields.
-            $aliasVersions = [];
             if ($package instanceof AliasPackage) {
-                if (!$package->isRootPackageAlias()) {
-                    $aliasVersions[] = $package->getVersion();
-                }
                 $package = $package->getAliasOf();
             }
             // The solver produces CompletePackage only, so this narrows the type for PHPStan.
@@ -55,10 +51,9 @@ final class TransactionPackages
             }
             $name = $package->getName();
             if (isset($packages[$name])) {
-                $packages[$name] = $packages[$name]->withAliasVersions(array_values(array_unique(array_merge($packages[$name]->aliasVersions(), $aliasVersions))));
                 continue;
             }
-            $packages[$name] = LockedPackage::fromPackage($package, false)->withAliasVersions($aliasVersions);
+            $packages[$name] = LockedPackage::fromPackage($package, false);
         }
 
         return array_values($packages);

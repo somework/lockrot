@@ -2094,7 +2094,7 @@
       }
     },
     "noteAdvisoriesDisabledByPolicy": {
-      "description": "`advisories_disabled_by_policy`: Composer's audit policy turns security advisories off, so lockrot asked no repository about them and no finding carries S9. `policy_key` is the setting that does it: `policy`, `policy.advisories`, `policy.advisories.audit` or the `COMPOSER_POLICY` environment variable. `value` is its value: `false`, or `ignore` for the audit mode.",
+      "description": "`advisories_disabled_by_policy`: Composer's audit policy turns security advisories off, so lockrot asked no repository about them and no finding carries S9. `policy_key` is the setting that does it: `policy`, `policy.advisories`, `policy.advisories.audit` or the `COMPOSER_POLICY` environment variable. `value` is its value: `false`, or `ignore` for the audit mode. An open set of keys: show one you do not know as written.",
       "type": "object",
       "required": [
         "policy_key",

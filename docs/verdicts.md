@@ -68,8 +68,6 @@ Severity order, used by [`--fail-on`](ci.md), the baseline and the report's sort
   `report-1.json` types the `data` of every signal ([Signal data](schema.md#signal-data)). The
   S6, S8 and S9 sections of this page give their fields.
 
-<a id="abandoned"></a>
-
 ## Abandoned, and where to
 
 `abandoned` covers two cases: a package whose repository names a successor, and one that names
@@ -83,6 +81,11 @@ nothing. The report tells them apart here:
 | S9 clause | `no fix expected; migrate to symfony/mailer` on an advisory no release fixes |
 
 If the successor is already in the lock, remove the old package.
+
+### Composer's abandoned ignore list {#abandoned}
+
+lockrot reads Composer's abandoned ignore list as `composer audit` reads it: a listed package raises
+no S1.
 
 ## Pinned: what S6 carries {#what-s6-carries}
 
@@ -265,8 +268,6 @@ request on it.
 
 - S2 and S8 carry the parent as `dated_by`, and `--explain` marks the branch rows it supplied.
 
-<a id="which-advisories-count"></a>
-
 ## Security advisories
 
 `composer audit` reports the vulnerability. S9 carries the same advisories on the finding and says
@@ -356,6 +357,11 @@ says so:
 If lockrot cannot reach a repository for advisories, the run gets a
 [note](notes.md#advisories_unavailable) and, under `--strict-network`, exit `1`
 ([exit codes](ci.md#exit-codes)).
+
+### Which advisories count {#which-advisories-count}
+
+lockrot asks for the advisories of every package that the run checks, whatever its origin, unless
+`extra.lockrot.advisory-lookup` is `composer-repositories`.
 
 ## Priority
 

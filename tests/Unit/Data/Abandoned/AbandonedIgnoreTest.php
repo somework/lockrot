@@ -297,6 +297,9 @@ final class AbandonedIgnoreTest extends TestCase
         self::assertSame([['pattern' => 'a/pkg', 'reason' => 'why', 'constraints' => []]], self::rules($ignore, 'a/pkg'));
         self::assertSame([['pattern' => 'b/pkg', 'reason' => null, 'constraints' => []]], self::rules($ignore, 'b/pkg'));
         self::assertNull($ignore->match('why'), 'a reason is not a pattern');
+
+        $numeric = AbandonedIgnore::fromConfig(new Config(false), self::reader(AbandonedPolicyReader::AUDIT_CONFIG, ['123' => null]));
+        self::assertSame([['pattern' => '123', 'reason' => null, 'constraints' => []]], self::rules($numeric, '123'), 'PHP turns the key into an integer: the pattern stays a string');
     }
 
     public function testComposer29RejectingTheListGivesNoListAndWhy(): void

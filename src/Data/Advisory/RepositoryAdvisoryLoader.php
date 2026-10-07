@@ -239,18 +239,23 @@ final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
             $installed = isset($outside[$name]) ? null : $this->normalized($versionByName[$name] ?? null);
             $versions = $installed === null ? [] : array_merge([$installed], $aliasVersionsByName[$name] ?? []);
             foreach ($byId as $copies) {
-                $match = $this->ignore->match($name, $copies[0]);
-                if ($match === null) {
+                if ($this->ignore->match($name, $copies[0]) === null) {
                     $kept[$name][] = Advisory::fromComposer($copies[0]);
                 }
-                $affecting = self::affecting($copies, $versions);
-                if ($affecting === null) {
-                    continue;
+                // Composer's Auditor judges each repository's record on its own: one that no rule
+                // ignores is reported, whatever another repository's record of the id says.
+                $firstIgnored = null;
+                foreach (self::affecting($copies, $versions) as $copy) {
+                    $match = $this->ignore->match($name, $copy);
+                    if ($match === null) {
+                        $counted[$name][] = Advisory::fromComposer($copy);
+                        $firstIgnored = null;
+                        break;
+                    }
+                    $firstIgnored ??= new IgnoredAdvisory(Advisory::fromComposer($copy), $match);
                 }
-                if ($match === null) {
-                    $counted[$name][] = Advisory::fromComposer($affecting);
-                } else {
-                    $ignored[$name][] = new IgnoredAdvisory(Advisory::fromComposer($affecting), $match);
+                if ($firstIgnored !== null) {
+                    $ignored[$name][] = $firstIgnored;
                 }
             }
         }
@@ -261,18 +266,20 @@ final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
     /**
      * @param list<PartialSecurityAdvisory> $copies
      * @param list<string>                  $versions
+     *
+     * @return list<PartialSecurityAdvisory> the records whose range holds one of the versions
      */
-    private static function affecting(array $copies, array $versions): ?PartialSecurityAdvisory
+    private static function affecting(array $copies, array $versions): array
     {
-        foreach ($copies as $advisory) {
+        return array_values(array_filter($copies, static function (PartialSecurityAdvisory $advisory) use ($versions): bool {
             foreach ($versions as $version) {
                 if ($advisory->affectedVersions->matches(new Constraint('==', $version))) {
-                    return $advisory;
+                    return true;
                 }
             }
-        }
 
-        return null;
+            return false;
+        }));
     }
 
     private function normalized(?string $version): ?string

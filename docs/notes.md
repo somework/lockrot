@@ -99,8 +99,9 @@ one for the PHAR, the image and the Action.
 
 ### Advisory ignore list unreadable {#advisory_ignore_unreadable}
 
-Composer rejected the project's advisory ignore settings (`config.policy`, or `config.audit` as
-its fallback), so lockrot ignores no advisory.
+Composer rejected the project's advisory ignore settings (`config.policy` on Composer 2.10 and
+later, with `config.audit` as its fallback, or `config.audit` on 2.9), so lockrot ignores no
+advisory.
 
 - `data`: `message`, the first line of what Composer said. It can be empty.
 - Findings: advisories that the policy would ignore also raise the priority.

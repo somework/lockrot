@@ -39,7 +39,7 @@ use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Which lookups the analyzer runs for a package: the repository activity (C69, partial
+ * Which lookups the analyzer runs for a package: the repository activity (Composer's abandoned ignore list, partial
  * allowlist entries) and the advisory names.
  */
 final class AnalyzerLookupTest extends TestCase
@@ -153,10 +153,7 @@ final class AnalyzerLookupTest extends TestCase
         return AbandonedIgnore::of(AbandonedIgnoreMatch::BY_POLICY, [['pattern' => 'vendor/pkg', 'reason' => 'migration planned', 'constraints' => []]]);
     }
 
-    /**
-     * An entry that accepts `stale` only cannot hide an archived repository: the lookup runs. The
-     * counted `abandoned` belongs to the flag set (PR 4b) and to config-2 (PR 6a).
-     */
+    /** An entry that accepts `stale` only cannot hide an archived repository: the lookup runs. */
     public function testAnEntryForSomeFlagsStillAsksTheRepositoryHost(): void
     {
         /** @var \ArrayObject<int, string> $requested */

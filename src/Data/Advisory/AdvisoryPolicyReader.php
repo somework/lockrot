@@ -22,7 +22,7 @@ interface AdvisoryPolicyReader
     public const AUDIT_SECTION = 'audit_section';
     /** Composer 2.6 to 2.8: the raw `audit.ignore`, no package names. */
     public const AUDIT_IGNORE = 'audit_ignore';
-    /** Composer 2.4 and 2.5: no ignore list. */
+    /** Composer 2.2 to 2.5: no ignore list. */
     public const NONE = 'none';
 
     /** @return self::POLICY|self::AUDIT_CONFIG|self::AUDIT_SECTION|self::AUDIT_IGNORE|self::NONE */
