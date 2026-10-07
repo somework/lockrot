@@ -43,7 +43,7 @@ final class TerminalWidth
 
     /**
      * symfony/console 5.4 `Terminal::getWidth()`. Terminal reads `COLUMNS` more leniently than
-     * {@see fromEnv()}: `abc` becomes 0, and the clamp in {@see detect()} then picks the
+     * {@see fromEnv()}: `abc` becomes 0, and with 0 the clamp in {@see detect()} picks the
      * narrowest width, not the default. So a `COLUMNS` that is set but rejected skips this step.
      *
      * @param array<string, string> $env

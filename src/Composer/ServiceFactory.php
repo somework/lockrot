@@ -124,9 +124,9 @@ final class ServiceFactory
     /**
      * HTTP for repository activity only. The deadline cuts each activity request to the time left
      * ({@see ComposerHttpClient::timeoutSeconds()}). Repository metadata requests come from the
-     * project's own ComposerRepository instances, whose HttpDownloader timeouts lockrot cannot set,
-     * so the deadline check between chunks of {@see \Lockrot\Data\Repository\RepositoryMetadataLoader}
-     * bounds them.
+     * project's own ComposerRepository instances, whose HttpDownloader timeouts lockrot cannot set.
+     * There, the deadline check of {@see \Lockrot\Data\Repository\RepositoryMetadataLoader} stops
+     * the later chunks, not a request in flight.
      */
     public static function createHttp(IOInterface $io, Config $config, LockrotConfig $lockrot, Clock $clock, ?Deadline $deadline = null): CachingHttpClient
     {
@@ -137,8 +137,8 @@ final class ServiceFactory
 
     /**
      * `composer --no-cache` sets COMPOSER_CACHE_DIR=/dev/null, which makes Composer\Cache::isEnabled()
-     * false. The fallback is a memory cache, because a cache in sys_get_temp_dir() writes to
-     * disk after the user asked for no cache.
+     * false. The fallback is a memory cache, not one in sys_get_temp_dir(): the user asked for no
+     * cache on disk.
      */
     public static function createCache(IOInterface $io, Config $config): CacheInterface
     {

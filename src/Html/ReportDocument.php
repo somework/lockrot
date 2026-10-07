@@ -90,7 +90,7 @@ final class ReportDocument
 
     /**
      * A flagged package, or an unflagged one with an advisory: a package on a branch that still gets
-     * security releases is `ok`, and without `--all` its advisories are absent.
+     * security releases is `ok`, and this puts its advisories on the page without `--all`.
      */
     private static function worthExplaining(Finding $finding): bool
     {
