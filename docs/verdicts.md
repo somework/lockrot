@@ -523,8 +523,7 @@ furthest behind phpdocumentor/reflection-common 2.2.0 at 5.4
 For each package, lockrot takes the years from the installed version's release to the package's
 newest release (the date S2 reads). It counts years of 365.25 days, never below zero, and sums them
 over the packages the run analysed. The installed version's date is the lock's `time`, or its
-[monorepo parent's](#dates-from-the-monorepo). The number does not read the clock: it changes only
-when the lock changes or a package releases.
+[monorepo parent's](#dates-from-the-monorepo). The number does not read the clock.
 
 The unit is the *libyear* of [libyear.com](https://libyear.com/), after [Cox, Bouwers, van Eekelen
 and Visser, *Measuring Dependency Freshness in Software Systems*, ICSE
