@@ -25,7 +25,7 @@ Every later run (plugin or PHAR) reads `lockrot-baseline.json`, or the file `--b
 | `new` | is flagged and not in the baseline | When it reaches `--fail-on`, as without a baseline |
 | `worsened` | is in the baseline at a less severe verdict than its current one | When it reaches `--fail-on` |
 | `known` | is in the baseline at its current verdict or a more severe one | Never |
-| `stale` (not the `stale` verdict) | is a baseline entry for a package that is not in `composer.lock` | Never. A [run note](notes.md) reports it (in `json`: `baseline.stale`) |
+| `stale` (not the `stale` verdict) | is a baseline entry for a package that is not in `composer.lock` | Never. The output reports it as a note (in `json`: `baseline.stale`) |
 
 ## What `--generate-baseline` does
 

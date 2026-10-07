@@ -127,8 +127,8 @@ carries `User-Agent: lockrot`.
   answer for the URL is cached, lockrot uses it, and the footer shows its age. A 404 is an answer,
   and lockrot caches it.
 
-- With Composer's cache disabled (`composer --no-cache`), answers are kept in memory for the run and
-  nothing is written.
+- With Composer's cache disabled (`composer --no-cache`), lockrot keeps answers in memory for the run
+  and writes nothing.
 
 - `composer clear-cache` clears lockrot's cache with Composer's. To refetch repository activity
   alone, delete the `lockrot` directory under the path `composer config cache-dir` prints.
@@ -138,7 +138,7 @@ carries `User-Agent: lockrot`.
 The footer states the report's date, in UTC, and its sources
 ([Reading the table](example-run.md#the-table-format)).
 
-When any activity answer came from the cache, the parenthesis reads
+When any activity answer came from the cache, the parenthesis after the date in the footer reads
 `package repositories; repository activity from lockrot's cache, up to N h old`: N is the age of
 the oldest cached answer in whole hours, rounded up, at least 1. `--format=json` carries that
 answer's fetch time as `activity_cache_oldest_at`, null when every answer was fetched during the
@@ -176,7 +176,7 @@ run.
   missing from it carries S10 with reason `offline`
   ([What was not checked](verdicts.md#what-was-not-checked)).
 
-- Advisories are not checked ([Advisories not checked](notes.md#advisories_not_checked)).
+- lockrot does not check advisories ([Advisories not checked](notes.md#advisories_not_checked)).
 
 - The report carries the [Offline](notes.md#offline) note. Activity missing from lockrot's cache
   also shows in the [Unreachable](notes.md#repository_activity_unreachable) note. With
@@ -189,7 +189,7 @@ lockrot reads a repository that publishes a `metadata-url` (Composer's v2 "p2" p
 package file at a time, so memory stays flat on a large lock.
 
 Composer loads a repository without one (a Composer v1-style or static repository, including
-`packages.json`-only Satis output) whole before lockrot can look up any name. Its full package
+`packages.json`-only Satis output) whole before lockrot can find any name in it. Its full package
 list stays in memory for the run.
 
 ## Related

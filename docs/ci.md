@@ -230,9 +230,9 @@ The shape of one annotation:
   `(via a > b, also via c, d)` ([transitive exposure](verdicts.md#transitive-exposure)).
 - The report's notes, the stale-baseline note included, follow as `::notice title=lockrot::`
   lines.
-- The output ends with plain log lines, not annotations: the `pulled in by:` line, a count of the
-  advisories on packages that the report does not flag with a pointer to `composer audit`, and the
-  summary line with the full counts.
+- The output ends with plain log lines, not annotations. These are the `pulled in by:` line, a count
+  of the advisories on packages that the report does not flag, and the summary line with the full
+  counts. The count line points to `composer audit`.
 - GitHub displays a limited number of annotations per step. The step log holds every line, and
   `--format=sarif` uploads the complete set.
 
@@ -385,7 +385,7 @@ one CI artifact and attaches to a ticket.
 
 The page is [lockrot-report](https://github.com/somework/lockrot-report), vendored at the
 version that the [changelog](changelog.md) names. That repository describes what the page shows and
-how to navigate it. It carries the run as JSON in `<script id="lockrot-data" type="application/json">`,
+how to navigate it. The page carries the run as JSON in `<script id="lockrot-data" type="application/json">`,
 and that document's `report` key is the [report-1 document](schema.md), the part of the page that
 is [contract](compatibility.md#what-is-not-contract).
 

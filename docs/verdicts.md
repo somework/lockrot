@@ -49,7 +49,7 @@ Severity order, used by [`--fail-on`](ci.md), the baseline and the report's sort
 
 | Signal | What it observes | Reads | Decides |
 |---|---|---|---|
-| S1 | The Composer repository marks the package abandoned, sometimes naming a replacement. Without repository metadata, the lock's own `abandoned` mark | Composer repository, else the lock | `abandoned` |
+| S1 | The Composer repository marks the package abandoned, and sometimes names a replacement. Without repository metadata, the lock's own `abandoned` mark | Composer repository, else the lock | `abandoned` |
 | S2 | Time since the package's newest release (pre-releases count, branches do not), against `release-warn-years` / `release-high-years` | Composer repository | `silent`, `stale` |
 | S3 | The repository is archived on its host | Repository host ([which hosts, which credentials](internals.md#repository-hosts-and-credentials)) | `abandoned` |
 | S4 | Time since the repository's last activity on any branch, against `push-warn-years` / `push-high-years` ([what each host reports](internals.md#repository-hosts-and-credentials)) | Repository host | `silent`, `stale` |
@@ -75,7 +75,7 @@ nothing. The report tells them apart here:
 | Where | What it says |
 |---|---|
 | Evidence | The repository's replacement text as written: `replacement: symfony/mailer`, or free text such as `replacement: Symfony` |
-| JSON | `replacement`, `replacement_url` and the root `abandoned` counts ([schema.md](schema.md#each-finding)) |
+| JSON | `replacement`, `replacement_url` and the root `abandoned` counts ([schema.md](schema.md#what-the-report-schema-types)) |
 | Summary line | `abandoned N (M with a replacement)`, the parenthesis only when M is not zero |
 | S9 clause | `no fix expected; migrate to symfony/mailer` on an advisory no release fixes |
 
@@ -141,8 +141,8 @@ from the [example run](example-run.md):
 
 - S8's `data` names the installed `branch`, its newest stable release (`branch_last_version`,
   `branch_last_release`) and the `years` since it, the higher branch the second clause names
-  (`newest_branch`, `newest_version`, `newest_release`) and `dated_by`. [Within
-  reach](#within-reach) gives the fields for a branch within reach.
+  (`newest_branch`, `newest_version`, `newest_release`) and `dated_by`. [schema.md](schema.md#signal-data)
+  types the fields for a branch within reach.
 
 S8 is not measured for:
 
@@ -284,7 +284,7 @@ gets `no fix expected`, and the priority rises one step, `critical` at most:
 
 | Verdict | A fix counts when it is | Clause |
 |---|---|---|
-| `abandoned`, `silent` | In either release above | `no fix expected`, or `no fix expected; migrate to <successor>` when the repository [names one](#abandoned-and-where-to) |
+| `abandoned`, `silent` | In either release that S9 checks | `no fix expected`, or `no fix expected; migrate to <successor>` when the repository [names one](#abandoned-and-where-to) |
 | `left-behind` | On the installed branch | `no fix expected on <branch>` when a higher branch has the fix, else `no fix expected` |
 | Any other verdict | lockrot makes no fix prediction and never raises the priority | none |
 
@@ -315,7 +315,7 @@ the field. A non-empty list, the `no fix expected` clause and the `no_fix_expect
 | `id` | The repository's advisory id, such as `PKSA-kbc7-dq62-pt7d` |
 | `cve`, `title`, `link`, `severity`, `reported_at` | The advisory's CVE, title, page, severity and report date. Each null where the repository gives none |
 | `affected_versions` | The affected range, as Composer prints it. Null when the advisory gives none |
-| `fixed_by` | The first of the two releases above that is outside the range. Null when neither is |
+| `fixed_by` | Of the two releases that S9 checks, the first that is outside the range. Null when neither is |
 | `fixed_on_branch` | True when `fixed_by` is the highest stable tag on the installed branch |
 
 - **Naming.** The evidence names each advisory by its CVE, else its repository id, worst severity
@@ -338,7 +338,7 @@ the field. A non-empty list, the `no fix expected` clause and the `no_fix_expect
 - **Baseline.** The [baseline](baseline.md) stays keyed on the verdict, so a baselined finding is
   `known` whatever S9 adds to its priority.
 
-lockrot does not look up S9 in these cases, and a [note](notes.md#advisories_not_checked) says so:
+lockrot does not check advisories (S9) in these cases, and a [note](notes.md#advisories_not_checked) says so:
 
 - Composer older than 2.4.
 
@@ -381,7 +381,7 @@ Development packages are in the run only with `--dev` or `include-dev`.
 `--format=json` writes the walk on every finding as `priority_basis`: the `base`, then each step in
 rule order as `{reason, from, to}`. The `reason` is `transitive`, `unreached` (nothing reaches the
 package), `dev` or `no_fix_expected`. The JSON records a step whenever its rule applies, also when
-the level cannot move. Take a transitive `left-behind` finding with an advisory that no reachable
+the priority cannot move. Take a transitive `left-behind` finding with an advisory that no reachable
 release fixes. Its base is `high`, a `transitive` step goes from `high` to `medium`, and a
 `no_fix_expected` step goes from `medium` to `high`.
 
@@ -419,7 +419,7 @@ it.
 
 Each direct requirement whose subtree holds attributed flagged packages gets S7. S7 lists them in
 report order, with the shortest chain to each. A flagged package that the project requires
-directly counts under no other requirement. Abridged from the [example run](example-run.md):
+directly counts under no requirement, its own included, whoever else reaches it. Abridged from the [example run](example-run.md):
 
 ```text
   pinned       wallabag/rulerz-bundle dev-master  direct
@@ -553,8 +553,8 @@ The keys are an [open set](schema.md#open-sets): read one you do not know as ano
 went unmeasured ([compatibility.md](compatibility.md#open-sets)).
 
 - **Lower bounds.** When the newest tag has no trusted date, lockrot measures the package to the
-  newest trusted date of a release above the installed version, on a higher branch or higher on its
-  own. A tag's commit is never younger than the release it names, so the value is a lower bound.
+  newest release above the installed version that has a trusted date. That release can be on a
+  higher branch or on the installed branch. A tag's commit is never younger than the release it names, so the value is a lower bound.
   The HTML report marks it "at least".
 
 - **Ahead of the newest release.** A package locked on a pre-release above it, or on a tag that

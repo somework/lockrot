@@ -71,15 +71,15 @@ The `1` in `report-1.json` is the `lockrot.schema` value the document carries.
 
 Objects are open, and so are these sets of values, which grow in minor releases:
 
-- signal ids: a signal's `id` and S10's `blocks`;
-- S10's `check` and `reason`;
-- S6's `reason`, and S8's `floor_source`;
-- a finding's `libyears_unmeasured`, and the keys of the report's `libyears.unmeasured`;
-- a `priority_basis` step's `reason`, and a `no_fix_expected` item's `reason`;
-- `run.mode`, `run.fail_on_kind` and `gate.tripped_by`, and a finding's `gate.exempt_by`;
-- a finding's `origin.kind` and `origin.registry`;
-- a run note's `code`, and the `forge_id` and `reason` in its `data`;
-- the explanation's `php_blocked_by`, `misses_target_php` and `misses_project_php`;
+- signal ids: a signal's `id` and S10's `blocks`
+- S10's `check` and `reason`
+- S6's `reason`, and S8's `floor_source`
+- a finding's `libyears_unmeasured`, and the keys of the report's `libyears.unmeasured`
+- a `priority_basis` step's `reason`, and a `no_fix_expected` item's `reason`
+- `run.mode`, `run.fail_on_kind` and `gate.tripped_by`, and a finding's `gate.exempt_by`
+- a finding's `origin.kind` and `origin.registry`
+- a run note's `code`, and the `forge_id` and `reason` in its `data`
+- the explanation's `php_blocked_by`, `misses_target_php` and `misses_project_php`
 - the configuration's `format`, and format names wherever lockrot writes one.
 
 Repository hosts are an open set only in a run note's `forge_id`, and Composer registries only in a
@@ -416,7 +416,7 @@ Read a kind that you do not know by `from_composer_repository`. Show it as writt
   still list the package is the finding's `note`.
 
 - **`replacement_url`** is the page that packagist.org keeps for an abandoned finding's
-  `replacement`. It is a string when the registry that named the replacement is packagist.org, and
+  `replacement`. It is a string only when the registry that named the replacement is packagist.org,
   null otherwise. That registry is the one whose metadata marked the package abandoned or, with no
   metadata, the one that the lock entry came from. lockrot does not check that the page exists.
   Link it only when it is a string, and never build one from `replacement`.

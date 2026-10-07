@@ -115,7 +115,7 @@ lockrot: unknown key extra.lockrot.ignore[1].expire ignored (did you mean expire
 
 - **What is checked.** Top-level keys against the key table, and the keys of each `ignore` entry
   against `package`, `reason`, `version` and `expires`. lockrot does not check the environment. A
-  digit-only top-level key such as `"5"` is dropped without a warning.
+  digit-only top-level key such as `"5"` disappears without a warning.
 - **Effect.** A warning only. The run goes on, the report and the exit code are unchanged, and
   nothing reaches stdout.
 - **Reserved names never warn.** `extensions` at the top level, whose contents lockrot does not
@@ -189,8 +189,8 @@ lockrot refuses these values before the analysis starts (exit `2`, nothing fetch
 | The same file twice | Compared case-insensitively on every system (`r.json` and `R.json`), and on disk for files that exist |
 | A place that cannot take the file | A directory that does not exist, or a path that exists and is not a regular file, such as a directory, `/dev/stdout` or a pipe |
 
-Two paths that prove to be one file once lockrot writes the first (on macOS, `café.json` spelled
-precomposed and decomposed) stop the run with exit `2` before the second overwrites the first. The
+Two paths can prove to be one file once lockrot writes the first (on macOS, `café.json` spelled
+precomposed and decomposed). Then the run stops with exit `2` before the second overwrites the first. The
 files already written stay.
 
 lockrot never writes `composer.json` or `composer.lock`.
