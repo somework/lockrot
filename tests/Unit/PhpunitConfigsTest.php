@@ -18,9 +18,12 @@ final class PhpunitConfigsTest extends TestCase
     {
         $excluded = [];
         foreach (self::CONFIGS as $config) {
-            $xml = simplexml_load_file(__DIR__.'/../../'.$config);
-            self::assertNotFalse($xml, $config);
-            $excluded[$config] = array_map('strval', $xml->xpath('/phpunit/groups/exclude/group') ?: []);
+            $document = new \DOMDocument();
+            self::assertTrue($document->load(__DIR__.'/../../'.$config), $config);
+            $excluded[$config] = [];
+            foreach ((new \DOMXPath($document))->query('/phpunit/groups/exclude/group') ?: [] as $group) {
+                $excluded[$config][] = (string) $group->nodeValue;
+            }
         }
 
         self::assertContains('sweep', $excluded['phpunit.xml.dist']);
