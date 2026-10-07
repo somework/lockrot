@@ -1,0 +1,160 @@
+{
+    "phpseclib/phpseclib": {
+        "fixes": {
+            "PKSA-12sz-bcny-pk4m": [
+                "update",
+                "3.0.57",
+                []
+            ]
+        },
+        "branches": {
+            "4.x": [
+                1,
+                1,
+                "4.0.1",
+                "update",
+                "upgrade"
+            ],
+            "3.x": [
+                1,
+                1,
+                "3.0.57",
+                "update",
+                "update"
+            ],
+            "2.x": [
+                0,
+                1,
+                null,
+                null,
+                null
+            ],
+            "1.x": [
+                0,
+                1,
+                null,
+                null,
+                null
+            ],
+            "0.3.x": [
+                0,
+                1,
+                null,
+                null,
+                null
+            ]
+        },
+        "gets": [
+            "3.0.57",
+            true
+        ],
+        "move": [
+            "update",
+            "3.0.57"
+        ],
+        "partial": null
+    },
+    "spomky-labs/otphp": {
+        "fixes": {
+            "PKSA-kbc7-dq62-pt7d": [
+                "upgrade",
+                "11.4.3",
+                [
+                    "scheb/2fa-google-authenticator require"
+                ]
+            ],
+            "PKSA-qv5y-crcz-9nxw": [
+                "upgrade",
+                "11.4.3",
+                [
+                    "scheb/2fa-google-authenticator require"
+                ]
+            ]
+        },
+        "branches": {
+            "11.x": [
+                2,
+                2,
+                "11.4.3",
+                "update",
+                "upgrade"
+            ],
+            "10.x": [
+                0,
+                2,
+                null,
+                null,
+                null
+            ],
+            "9.x": [
+                0,
+                2,
+                null,
+                null,
+                null
+            ],
+            "8.x": [
+                0,
+                2,
+                null,
+                null,
+                null
+            ],
+            "7.x": [
+                0,
+                2,
+                null,
+                null,
+                null
+            ],
+            "6.x": [
+                0,
+                2,
+                null,
+                null,
+                null
+            ],
+            "5.x": [
+                0,
+                2,
+                null,
+                null,
+                null
+            ],
+            "4.x": [
+                0,
+                2,
+                null,
+                null,
+                null
+            ],
+            "3.x": [
+                0,
+                2,
+                null,
+                null,
+                null
+            ],
+            "2.x": [
+                0,
+                2,
+                null,
+                null,
+                null
+            ],
+            "1.x": [
+                0,
+                2,
+                null,
+                null,
+                null
+            ]
+        },
+        "gets": null,
+        "move": [
+            "upgrade",
+            "11.4.3"
+        ],
+        "partial": null
+    }
+}
