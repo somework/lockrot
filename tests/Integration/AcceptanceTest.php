@@ -251,16 +251,15 @@ final class AcceptanceTest extends TestCase
         self::assertSame(0, $report->byVerdict()[Verdict::SILENT]);
     }
 
-    public function testMatomoXhprofIsPinned(): void
+    public function testMatomoXhprofIsAbandonedWithItsBranchPinUnderneath(): void
     {
         $f = $this->byName($this->analyze('apps/matomo-org_matomo'));
-        // lox/xhprof is marked abandoned on Packagist (S1) and its GitHub repo is archived (S3),
-        // which outrank the S6 "pinned to dev-master" signal in VerdictEngine precedence ->
-        // ABANDONED rather than PINNED. The S6 signal (dev-master pin) still fires underneath.
+        // lox/xhprof carries S1 (abandoned on Packagist) and S3 (archived) as well as S6 (a
+        // dev-master pin), and the verdict is abandoned.
         self::assertSame(Verdict::ABANDONED, $f['lox/xhprof']->verdict());
         self::assertStringContainsString('dev-master', $f['lox/xhprof']->evidence());
         $ids = array_map(static fn ($s) => $s->id(), $f['lox/xhprof']->signals());
-        self::assertContains('S6', $ids, 'pinned-to-branch signal should still fire underneath the abandoned verdict');
+        self::assertContains('S6', $ids, 'the pinned-to-branch signal fires under the abandoned verdict');
         $s6 = self::signal($f['lox/xhprof'], Signal::S6);
         self::assertNotNull($s6);
         self::assertSame('branch_snapshot', $s6->data()['reason']);

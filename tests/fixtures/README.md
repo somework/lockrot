@@ -25,8 +25,8 @@ recording run hit a transport failure (timeout, DNS, ...) and is fetched again r
 as recorded.
 
 Packagist/GitHub data moves over time. The per-package results over these fixtures are in
-`golden/`. After a re-recording, rewrite them with `LOCKROT_REWRITE_GOLDEN=1 vendor/bin/phpunit`,
-review the diff package by package, and give the reason for each change in the commit message.
+`golden/`. After a re-recording, rewrite them with `LOCKROT_REWRITE_GOLDEN=1 vendor/bin/phpunit
+--testsuite integration`, review the diff package by package, and give the reason for each change in the commit message.
 
 ## Other fixtures
 

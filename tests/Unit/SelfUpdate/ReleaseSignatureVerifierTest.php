@@ -183,8 +183,8 @@ final class ReleaseSignatureVerifierTest extends TestCase
 
     /**
      * A block that is well-formed base64 but not a key openssl can load has no fingerprint either.
-     * A fingerprint of it matches no release's description, so every release is passed over as
-     * signed with another key, not the error that verify() reports for the same key.
+     * Given one, it will match no release's description, and every release will read as signed
+     * with another key instead of giving the error that verify() reports for the same key.
      */
     public function testAKeyOpensslCannotLoadHasNoFingerprint(): void
     {

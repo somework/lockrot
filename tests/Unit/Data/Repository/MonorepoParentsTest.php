@@ -196,8 +196,8 @@ final class MonorepoParentsTest extends TestCase
 
     /**
      * The batch is scanned for a package whose `replace` names the child, not for the first package
-     * that is not the child. A tool listed before the monorepo must not be taken for the parent,
-     * which leaves the child undated.
+     * that is not the child. A tool listed before the monorepo must not be taken for the parent:
+     * taken for it, the tool leaves the child undated.
      */
     public function testAPackageThatDoesNotReplaceTheChildIsSteppedOverEvenWhenItComesFirst(): void
     {

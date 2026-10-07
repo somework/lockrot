@@ -84,9 +84,9 @@ final class InstalledReleaseTest extends TestCase
 
     public function testASharedCommitLeavesTheInstalledVersionUndated(): void
     {
-        // the package's own newest release had to be dated by the parent, and the parent does not
-        // list this version: the lock's date is the commit its tags share, and measuring from it
-        // adds that artefact to every number read off it
+        // The parent dates the package's own newest release but does not list this version, so the
+        // lock's date is the commit that its tags share. A measurement from that date will add the
+        // artefact to every number read off it.
         $installed = InstalledRelease::of(
             F::package(['version' => 'v5.13.2', 'time' => self::LOCKED_AT]),
             self::metadata('laravel/framework', ['5.13.3.0' => '2024-11-21T00:00:00+00:00'], ['5.13.2.0' => true])
