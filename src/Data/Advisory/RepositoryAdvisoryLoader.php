@@ -205,7 +205,9 @@ final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
                     $records[$name][$advisory->advisoryId][] = $advisory;
                     $ids[$advisory->advisoryId] = true;
                 }
-                $withRecords += $advisories === [] ? 0 : 1;
+                if ($advisories !== []) {
+                    ++$withRecords;
+                }
             }
             $repository['records'] = \count($ids);
             $repository['packages_with_records'] = $withRecords;

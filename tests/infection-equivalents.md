@@ -82,6 +82,18 @@ start the reason with `in method():`.
 - `src/Data/Repository/RepositoryMetadataLoader.php` TrueValue `$seen[$id] = true;` — a set. Only `isset()` reads it.
 - `src/Data/Repository/RepositoryUrl.php` DecrementInteger `return strncmp($shown, '...', 3) === 0;` — nothing that `shown()` returns starts with `..` and no third dot.
 - `src/Data/Repository/RepositoryUrl.php` LessThan `return $at !== null && ($line === null || $at < $line) ? $at : null;` — in closer(): one pattern finds both offsets, each at its own character, so they are never equal.
+- `src/Data/Abandoned/ComposerAbandonedPolicyReader.php` CastString `$rules[] = ['pattern' => (string) $pattern, 'reason' => $reason, 'constraints' => $constraints];` — Composer's `Config::merge()` renumbers an integer key, so no pattern reaches the reader as an integer.
+- `src/Data/Abandoned/ComposerAbandonedPolicyReader.php` UnwrapArrayFilter `return array_filter($config, 'is_string', \ARRAY_FILTER_USE_KEY);` — Composer's policy readers look up named keys only, so an integer key that the filter drops changes nothing.
+- `src/Data/Advisory/AdvisoryIgnore.php` FalseValue `return new self([], [], false);` — the flag sets only the `by` of a match, and an empty list matches nothing.
+- `src/Data/Advisory/AdvisoryIgnore.php` FalseValue `return new self([], [], false, $why);` — the flag sets only the `by` of a match, and an empty list matches nothing.
+- `src/Data/Advisory/AdvisoryIgnore.php` TrueValue `return new self([], [], true, null, ['policy_key' => $policyKey, 'value' => $value]);` — the flag sets only the `by` of a match, and an empty list matches nothing.
+- `src/Data/Advisory/AdvisoryIgnore.php` CastString `$ids[(string) $key] = \is_string($reason) ? $reason : null;` — PHP stores a numeric string key as an integer either way, and `array_key_exists()` finds it by the string.
+- `src/Data/Advisory/ComposerAdvisoryPolicyReader.php` UnwrapArrayFilter x2 `$advisories = AdvisoriesPolicyConfig::fromRawConfig(array_filter($policy, 'is_string', \ARRAY_FILTER_USE_KEY), array_filter($audit, 'is_string', \ARRAY_FILTER_USE_KEY), new VersionParser());` — Composer's policy readers look up named keys only, so an integer key that the filter drops changes nothing.
+- `src/Data/Advisory/RepositoryAdvisoryLoader.php` TrueValue `$ids[$advisory->advisoryId] = true;` — only the keys are counted.
+- `src/Data/Advisory/RepositoryAdvisoryLoader.php` CastString `$name = (string) $name;` — in attribute(): a package name holds a `/`, so PHP never stores it as an integer key.
+- `src/Data/Advisory/RepositoryAdvisoryLoader.php` CastString `$name = (string) $name;` — in coverage(): a package name holds a `/`, so PHP never stores it as an integer key.
+- `src/Data/Advisory/RepositoryAdvisoryLoader.php` UnwrapArrayValues `return array_values(array_filter($copies, static function (PartialSecurityAdvisory $advisory) use ($versions): bool {` — the caller only iterates the result with `foreach`.
+- `src/Data/Advisory/RepositoryAdvisoryLoader.php` UnwrapArrayUnique `$feeds[] = ['composer_repository' => $repository['composer_repository'], 'answer' => AdvisoryCoverage::ANSWERED, 'reason' => null, 'message' => null, 'records' => \count(array_unique($records))];` — Composer's answer lists an advisory once per name and repository.
 
 ## src/Filesystem, src/Graph, src/Html, src/Json, src/Lock
 
@@ -115,6 +127,7 @@ start the reason with `in method():`.
 - `src/Signal/PhpFloor.php` ReturnRemoval `return null;` — in parse(): composer/semver reads null as `""` and throws, and the `catch` returns the same value.
 - `src/Signal/PhpFloor.php` ReturnRemoval `return [null, null];` — in project(): composer/semver reads null as `""` and throws, and the `catch` returns the same value.
 - `src/Signal/Rule/LeftBehindRule.php` LessThanOrEqualTo `if ($release['at'] === null || !ReleaseBranch::isAbove((string) $key, $branch) || $release['at'] <= $ownAt) {` — a higher branch released at the instant of the installed branch cannot be alive while the installed branch is old enough for S8.
+- `src/Signal/Rule/NotCheckedRule.php` Foreach_ `foreach ($unchecked as $entry) {` — in withoutMaintenanceGaps(): every S10 entry that the rule writes is a maintenance check, so the kept list is empty either way.
 
 ## src/Verdict
 
