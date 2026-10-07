@@ -178,6 +178,19 @@ final class ScoreModelTest extends TestCase
         self::assertSame(['id' => 'B', 'severity' => 'unrated', 'fix_kind' => 'none'], Score::compute([], [['id' => 'B', 'severity' => 'unknown', 'fix_kind' => 'none']], 'direct', false)->deciding());
     }
 
+    public function testAnAdvisoryRowKeepsItsId(): void
+    {
+        self::assertSame(['id' => 'GHSA-a', 'severity' => 'high', 'fix_kind' => 'blocked'], Score::advisory('GHSA-a', 'high', 'blocked'));
+    }
+
+    public function testTheLeadIsTheFirstCountedFlagInFlagOrderWhateverTheInputOrder(): void
+    {
+        $score = Score::compute(['old-promise', 'pinned', 'abandoned'], [], 'direct', false);
+
+        self::assertSame('abandoned', $score->lead());
+        self::assertSame(['abandoned', 'pinned', 'old-promise'], array_column($score->maintenanceTerms(), 'flag'));
+    }
+
     /**
      * I26: under a partial ignore[] entry, moving up the liveness words (none, stale, silent,
      * abandoned) never lowers the score, beside the other flags, advisories, reaches and dev of this test.
