@@ -1,0 +1,54 @@
+{
+    "rows": [
+        {
+            "require_php": "^7.2",
+            "project_php_lowest": "7.2.0",
+            "printed": "7.2"
+        },
+        {
+            "require_php": ">=7.2.5",
+            "project_php_lowest": "7.2.5",
+            "printed": "7.2.5"
+        },
+        {
+            "require_php": ">7.1",
+            "project_php_lowest": "7.1.1",
+            "printed": "7.1.1"
+        },
+        {
+            "require_php": "~8.0.0",
+            "project_php_lowest": "8.0.0",
+            "printed": "8.0"
+        },
+        {
+            "require_php": ">=7.4.0-RC1",
+            "project_php_lowest": "7.4.0",
+            "printed": "7.4"
+        },
+        {
+            "require_php": "7.*",
+            "project_php_lowest": "7.0.0",
+            "printed": "7.0"
+        },
+        {
+            "require_php": "*",
+            "project_php_lowest": null,
+            "printed": null
+        },
+        {
+            "require_php": "<8",
+            "project_php_lowest": null,
+            "printed": null
+        },
+        {
+            "require_php": "whatever",
+            "project_php_lowest": null,
+            "printed": null
+        },
+        {
+            "require_php": null,
+            "project_php_lowest": null,
+            "printed": null
+        }
+    ]
+}

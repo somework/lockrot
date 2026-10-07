@@ -16,17 +16,17 @@ final class Golden
     private const DIRECTORY = __DIR__.'/../fixtures/golden/';
 
     /** @param array<mixed> $actual */
-    public static function assertMatches(string $file, array $actual, string $test): void
+    public static function assertMatches(string $file, array $actual, string $test, string $directory = self::DIRECTORY): void
     {
-        $path = self::DIRECTORY.$file;
+        $path = $directory.$file;
         $json = json_encode($actual, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_PRESERVE_ZERO_FRACTION | \JSON_THROW_ON_ERROR)."\n";
         if (getenv('LOCKROT_REWRITE_GOLDEN') === '1') {
             Assert::assertNotFalse(file_put_contents($path, $json), 'cannot write '.$path);
-            Assert::fail('rewrote tests/fixtures/golden/'.$file.'; review the diff and run again without LOCKROT_REWRITE_GOLDEN');
+            Assert::fail('rewrote '.$path.'; review the diff and run again without LOCKROT_REWRITE_GOLDEN');
         }
         $command = 'rewrite it with LOCKROT_REWRITE_GOLDEN=1 vendor/bin/phpunit --filter '.$test.', then review the diff';
 
         Assert::assertFileExists($path, $command);
-        Assert::assertSame(file_get_contents($path), $json, 'tests/fixtures/golden/'.$file.': '.$command);
+        Assert::assertSame(file_get_contents($path), $json, $path.': '.$command);
     }
 }
