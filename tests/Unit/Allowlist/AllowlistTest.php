@@ -106,4 +106,28 @@ final class AllowlistTest extends TestCase
         self::assertFalse($entry->isExpired($at));
         self::assertTrue($entry->isExpired($at->modify('+1 second')));
     }
+
+    public function testAnEntryWithoutFlagsAcceptsEveryMaintenanceFlag(): void
+    {
+        $entry = new AllowlistEntry('vendor/*', null, 'finished', null, 'config');
+
+        self::assertNull($entry->flags());
+        self::assertTrue($entry->acceptsAll());
+    }
+
+    public function testAnEntryWithFlagsAcceptsOnlyThose(): void
+    {
+        $entry = new AllowlistEntry('vendor/*', null, 'stale is fine', null, 'config', ['stale']);
+
+        self::assertSame(['stale'], $entry->flags());
+        self::assertFalse($entry->acceptsAll());
+    }
+
+    public function testATypeOfTheBuiltinListAcceptsEveryFlag(): void
+    {
+        $entry = (new Allowlist([]))->match(F::package(['type' => 'metapackage']), null, $this->now);
+
+        self::assertNotNull($entry);
+        self::assertTrue($entry->acceptsAll());
+    }
 }

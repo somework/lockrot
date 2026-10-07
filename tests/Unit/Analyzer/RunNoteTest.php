@@ -142,6 +142,20 @@ final class RunNoteTest extends TestCase
             false,
             ['reason' => 'install_time_budget', 'composer_repositories_checked' => 2],
         ];
+        yield 'advisories off by the audit mode' => [
+            static fn (): RunNote => RunNote::advisoriesDisabledByPolicy('policy.advisories.audit', 'ignore'),
+            'advisories_disabled_by_policy',
+            "security advisories not checked: Composer's audit policy turns them off (policy.advisories.audit: ignore)",
+            false,
+            ['policy_key' => 'policy.advisories.audit', 'value' => 'ignore'],
+        ];
+        yield 'advisories off by the environment' => [
+            static fn (): RunNote => RunNote::advisoriesDisabledByPolicy('COMPOSER_POLICY', false),
+            'advisories_disabled_by_policy',
+            "security advisories not checked: Composer's audit policy turns them off (COMPOSER_POLICY: false)",
+            false,
+            ['policy_key' => 'COMPOSER_POLICY', 'value' => false],
+        ];
         yield 'activity past the budget' => [
             static fn (): RunNote => RunNote::repositoryActivityNotChecked(),
             'repository_activity_not_checked',
@@ -237,6 +251,7 @@ final class RunNoteTest extends TestCase
             'metadata_unavailable',
             'monorepo_parent_unavailable',
             'advisory_ignore_unreadable',
+            'advisories_disabled_by_policy',
             'advisories_unavailable',
             'advisories_not_checked',
             'repository_activity_not_checked',

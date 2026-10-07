@@ -9,7 +9,11 @@ use Composer\Repository\ArrayRepository;
 use Lockrot\Analyzer\RunNote;
 use Lockrot\Data\Advisory\Advisory;
 use Lockrot\Data\Advisory\AdvisoryBatch;
+use Lockrot\Data\Advisory\AdvisoryCoverage;
 use Lockrot\Data\Advisory\AdvisoryIgnore;
+use Lockrot\Data\Advisory\AdvisoryIgnoreMatch;
+use Lockrot\Data\Advisory\AdvisoryNameCoverage;
+use Lockrot\Data\Advisory\IgnoredAdvisory;
 use Lockrot\Data\Advisory\RepositoryAdvisoryLoader;
 use Lockrot\Deadline;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
@@ -99,20 +103,32 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
         self::assertSame([], $batch->for('symfony/console'));
     }
 
-    public function testIgnoredAdvisoriesAreDroppedByIdCveSourceIdPackageOrSeverity(): void
+    public function testIgnoredAdvisoriesLeaveTheCountAndAreKeptWithTheirRecord(): void
     {
         if (!interface_exists(AdvisoryProviderInterface::class)) {
             self::markTestSkipped('Composer without the advisory API');
         }
         $repositories = $this->server()->repositories();
-        $ids = static fn (AdvisoryIgnore $ignore): array => array_map(static fn (Advisory $a): string => $a->id(), (new RepositoryAdvisoryLoader($repositories, false, null, $ignore))->load(['doctrine/cache' => '2.2.0'])->for('doctrine/cache'));
+        $load = static fn (AdvisoryIgnore $ignore): AdvisoryBatch => (new RepositoryAdvisoryLoader($repositories, false, null, $ignore))->load(['doctrine/cache' => '2.2.0']);
+        $ids = static fn (AdvisoryBatch $batch): array => array_map(static fn (Advisory $a): string => $a->id(), $batch->for('doctrine/cache'));
+        $ignored = static fn (AdvisoryBatch $batch): array => array_map(static fn (IgnoredAdvisory $i): array => [$i->advisory()->id(), $i->match()->kind()], $batch->ignored('doctrine/cache'));
 
-        self::assertSame(['PKSA-cache-3'], $ids(AdvisoryIgnore::fromRaw(['PKSA-cache-1'], [])), 'by advisory id');
-        self::assertSame(['PKSA-cache-3'], $ids(AdvisoryIgnore::fromRaw(['CVE-2024-0001' => 'accepted risk'], [])), 'by CVE, map form');
-        self::assertSame(['PKSA-cache-1'], $ids(AdvisoryIgnore::fromRaw(['GHSA-cache-3'], [])), 'by source id');
-        self::assertSame([], $ids(AdvisoryIgnore::fromRaw(['doctrine/cache'], [])), 'by package');
-        self::assertSame([], $ids(AdvisoryIgnore::fromRaw([], ['high'])), 'by severity');
-        self::assertSame(['PKSA-cache-1', 'PKSA-cache-3'], $ids(AdvisoryIgnore::fromRaw(['PKSA-cache-2'], ['low'])), 'nothing matching');
+        $byId = $load(AdvisoryIgnore::fromRaw(['PKSA-cache-1' => 'reviewed'], []));
+        self::assertSame(['PKSA-cache-3'], $ids($byId), 'by advisory id');
+        self::assertSame([['PKSA-cache-1', AdvisoryIgnoreMatch::ID]], $ignored($byId));
+        self::assertSame('reviewed', $byId->ignored('doctrine/cache')[0]->match()->reason());
+        self::assertSame('CVE-2024-0001', $byId->ignored('doctrine/cache')[0]->advisory()->cve());
+        self::assertSame([['PKSA-cache-1', AdvisoryIgnoreMatch::CVE]], $ignored($load(AdvisoryIgnore::fromRaw(['CVE-2024-0001' => 'accepted risk'], []))), 'by CVE, map form');
+        self::assertSame([['PKSA-cache-3', AdvisoryIgnoreMatch::REMOTE_ID]], $ignored($load(AdvisoryIgnore::fromRaw(['GHSA-cache-3'], []))), 'by source id');
+        self::assertSame([], $ids($load(AdvisoryIgnore::fromRaw(['doctrine/cache'], []))), 'by package');
+        self::assertSame([['PKSA-cache-1', AdvisoryIgnoreMatch::SEVERITY], ['PKSA-cache-3', AdvisoryIgnoreMatch::SEVERITY]], $ignored($load(AdvisoryIgnore::fromRaw([], ['high']))), 'by severity');
+        $nothing = $load(AdvisoryIgnore::fromRaw(['PKSA-cache-2'], ['low']));
+        self::assertSame(['PKSA-cache-1', 'PKSA-cache-3'], $ids($nothing), 'an ignored advisory that does not affect the installed version');
+        self::assertSame([], $nothing->ignored('doctrine/cache'), 'only an advisory that affects the installed version is listed as ignored');
+        self::assertSame(['PKSA-cache-1', 'PKSA-cache-3'], array_map(static fn (Advisory $a): string => $a->id(), $nothing->every('doctrine/cache')), 'every version, without the ignored one');
+        $coverage = $byId->coverage()->for('doctrine/cache');
+        self::assertNotNull($coverage);
+        self::assertSame(3, $coverage->records(), 'an ignored advisory is still a record');
     }
 
     public function testAnUnreadableIgnoreListIsANoteOnTheBatch(): void
@@ -120,7 +136,7 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
         if (!interface_exists(AdvisoryProviderInterface::class)) {
             self::markTestSkipped('Composer without the advisory API');
         }
-        $loader = new RepositoryAdvisoryLoader($this->server()->repositories(), false, null, new AdvisoryIgnore([], [], 'Unknown key "licenses"'));
+        $loader = new RepositoryAdvisoryLoader($this->server()->repositories(), false, null, AdvisoryIgnore::unreadable('Unknown key "licenses"'));
 
         $batch = $loader->load(['doctrine/cache' => '2.2.0']);
 
@@ -362,7 +378,335 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
             self::assertSame(['security advisories not checked (needs Composer 2.4 or newer); a priority they would raise stays one step lower'], self::texts($batch));
             self::assertSame(['reason' => 'composer_too_old', 'composer_repositories_checked' => 0], $batch->notes()[0]->data());
             self::assertSame([], $batch->byName());
+            self::assertSame(AdvisoryCoverage::COMPOSER_TOO_OLD, self::nameCoverage($batch, 'doctrine/cache')->reason());
+            self::assertSame([], $batch->coverage()->repositories(), 'Composer 2.2 names no repository advisory-capable');
         }
+    }
+
+    /** @var list<FixtureRepositoryServer> */
+    private array $started = [];
+
+    protected function tearDown(): void
+    {
+        foreach ($this->started as $server) {
+            $server->stop();
+        }
+        $this->started = [];
+    }
+
+    /**
+     * A started repository that serves advisories through an API, as packagist.org does.
+     *
+     * @param array<string, list<array<string, mixed>>> $advisories
+     * @param list<string>                              $patterns
+     */
+    private function api(array $advisories, array $patterns = []): FixtureRepositoryServer
+    {
+        if (!interface_exists(AdvisoryProviderInterface::class)) {
+            self::markTestSkipped('Composer without the advisory API');
+        }
+        $server = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK]);
+        $server->withAdvisoryApi($advisories, $patterns);
+        $server->start();
+        $this->started[] = $server;
+
+        return $server;
+    }
+
+    /** @return array{answer: string, reason: ?string, records: ?int} */
+    private static function feed(AdvisoryBatch $batch, string $name, int $index): array
+    {
+        $coverage = $batch->coverage()->for($name);
+        self::assertNotNull($coverage, $name.' has a record');
+        $feed = $coverage->feeds()[$index] ?? null;
+        self::assertNotNull($feed, $name.' has feed '.$index);
+
+        return ['answer' => $feed['answer'], 'reason' => $feed['reason'], 'records' => $feed['records']];
+    }
+
+    private static function nameCoverage(AdvisoryBatch $batch, string $name): AdvisoryNameCoverage
+    {
+        $coverage = $batch->coverage()->for($name);
+        self::assertNotNull($coverage, $name.' has a record');
+
+        return $coverage;
+    }
+
+    /** @return list<array{string, ?string}> each repository's outcome and reason, in configured order */
+    private static function outcomes(AdvisoryBatch $batch): array
+    {
+        return array_map(static fn (array $repository): array => [$repository['outcome'], $repository['reason']], $batch->coverage()->repositories());
+    }
+
+    public function testOneRequestPerRepositoryAsksEveryNameForEveryVersion(): void
+    {
+        $server = $this->api(['doctrine/cache' => [self::record('PKSA-cache-1', '>=2.0,<2.3', []), self::record('PKSA-cache-2', '<2.0', [])], 'doctrine/annotations' => []]);
+
+        $batch = (new RepositoryAdvisoryLoader($server->repositories()))->load(['doctrine/cache' => '2.2.0', 'doctrine/annotations' => '2.0.2', 'acme/unknown' => '1.0.0']);
+
+        self::assertCount(1, $server->advisoryRequests(), 'one POST for the whole run');
+        self::assertSame(['doctrine/cache', 'doctrine/annotations', 'acme/unknown'], $server->advisoryRequests()[0]);
+        self::assertSame(['PKSA-cache-1'], array_map(static fn (Advisory $a): string => $a->id(), $batch->for('doctrine/cache')), 'attributed to the installed version here');
+        self::assertSame(['PKSA-cache-1', 'PKSA-cache-2'], array_map(static fn (Advisory $a): string => $a->id(), $batch->every('doctrine/cache')), 'every version is kept');
+        self::assertSame(['answer' => AdvisoryCoverage::ANSWERED, 'reason' => null, 'records' => 2], self::feed($batch, 'doctrine/cache', 0));
+        self::assertSame(['answer' => AdvisoryCoverage::ANSWERED, 'reason' => null, 'records' => 0], self::feed($batch, 'doctrine/annotations', 0), 'a known name echoed with []');
+        self::assertSame(['answer' => AdvisoryCoverage::ANSWERED, 'reason' => null, 'records' => 0], self::feed($batch, 'acme/unknown', 0), 'an unknown name the answer leaves out');
+        self::assertSame(2, self::nameCoverage($batch, 'doctrine/cache')->records());
+        self::assertNull(self::nameCoverage($batch, 'doctrine/cache')->reason());
+        self::assertTrue($batch->complete());
+        $repository = $batch->coverage()->repositories()[0];
+        self::assertSame($server->repositories()[0]->getRepoName(), $repository['composer_repository']);
+        self::assertSame([AdvisoryCoverage::ANSWERED, null, null, 2, 1], [$repository['outcome'], $repository['reason'], $repository['message'], $repository['records'], $repository['packages_with_records']]);
+        self::assertSame(0, $batch->coverage()->otherRepositories());
+        self::assertSame([AdvisoryCoverage::SCOPE_ALL, AdvisoryCoverage::SOURCE_DEFAULT], [$batch->coverage()->scope(), $batch->coverage()->scopeSource()]);
+    }
+
+    public function testAnAnswerWithOnlyUnknownNamesIsAList(): void
+    {
+        $server = $this->api(['doctrine/cache' => []]);
+
+        $batch = (new RepositoryAdvisoryLoader($server->repositories()))->load(['acme/unknown' => '1.0.0']);
+
+        self::assertSame([], self::texts($batch));
+        self::assertSame(['answer' => AdvisoryCoverage::ANSWERED, 'reason' => null, 'records' => 0], self::feed($batch, 'acme/unknown', 0));
+        self::assertTrue($batch->complete());
+    }
+
+    public function testAMetadataPathRepositoryCountsTheRecordsOfThePackageFile(): void
+    {
+        $batch = (new RepositoryAdvisoryLoader($this->server()->repositories()))->load(['doctrine/cache' => '2.2.0', 'symfony/console' => 'v5.4.47']);
+
+        self::assertSame(['answer' => AdvisoryCoverage::ANSWERED, 'reason' => null, 'records' => 3], self::feed($batch, 'doctrine/cache', 0));
+        self::assertSame(['answer' => AdvisoryCoverage::ANSWERED, 'reason' => null, 'records' => 0], self::feed($batch, 'symfony/console', 0));
+        self::assertSame(['PKSA-cache-1', 'PKSA-cache-3'], array_map(static fn (Advisory $a): string => $a->id(), $batch->for('doctrine/cache')));
+    }
+
+    public function testANameOutsideTheRepositorysPatternsIsNeverSentAndCountsNoRecord(): void
+    {
+        $server = $this->api(['doctrine/cache' => [self::record('PKSA-cache-1', '>=2.0,<2.3', [])], 'symfony/console' => [self::record('PKSA-console', '*', [])]], ['doctrine/*']);
+
+        $batch = (new RepositoryAdvisoryLoader($server->repositories()))->load(['doctrine/cache' => '2.2.0', 'symfony/console' => 'v5.4.47']);
+
+        self::assertSame([['doctrine/cache']], $server->advisoryRequests());
+        self::assertSame(['answer' => AdvisoryCoverage::ANSWERED, 'reason' => null, 'records' => 0], self::feed($batch, 'symfony/console', 0), 'lockrot cannot see the filter: the same answer as no record');
+        self::assertSame([], $batch->for('symfony/console'));
+    }
+
+    public function testTwoRepositoriesServingOneIdCountItOnceForTheName(): void
+    {
+        $first = $this->api(['doctrine/cache' => [self::record('PKSA-cache-1', '>=2.0,<2.3', [])]]);
+        $second = $this->api(['doctrine/cache' => [self::record('PKSA-cache-1', '>=2.0,<2.3', []), self::record('PKSA-cache-9', '<1.0', [])]]);
+
+        $batch = (new RepositoryAdvisoryLoader(array_merge($first->repositories(), $second->repositories())))->load(['doctrine/cache' => '2.2.0']);
+
+        self::assertSame(1, self::feed($batch, 'doctrine/cache', 0)['records']);
+        self::assertSame(2, self::feed($batch, 'doctrine/cache', 1)['records']);
+        self::assertSame(2, self::nameCoverage($batch, 'doctrine/cache')->records(), 'PKSA-cache-1 counts once');
+        self::assertCount(1, $batch->for('doctrine/cache'));
+    }
+
+    public function testATransportFailureOnOneOfTwoRepositoriesIsAFailedFeedAndANetworkFailure(): void
+    {
+        $unreachable = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK]);
+        $answering = $this->api(['doctrine/cache' => []]);
+
+        $batch = (new RepositoryAdvisoryLoader(array_merge($unreachable->repositories(), $answering->repositories())))->load(['doctrine/cache' => '2.2.0']);
+
+        $failed = self::feed($batch, 'doctrine/cache', 0);
+        self::assertSame([AdvisoryCoverage::FAILED, AdvisoryCoverage::TRANSPORT, null], [$failed['answer'], $failed['reason'], $failed['records']]);
+        self::assertSame(AdvisoryCoverage::ANSWERED, self::feed($batch, 'doctrine/cache', 1)['answer']);
+        self::assertSame(AdvisoryCoverage::LOOKUP_FAILED, self::nameCoverage($batch, 'doctrine/cache')->reason());
+        self::assertSame(0, self::nameCoverage($batch, 'doctrine/cache')->records(), 'what the other feed returned still counts');
+        self::assertSame([[AdvisoryCoverage::FAILED, AdvisoryCoverage::TRANSPORT], [AdvisoryCoverage::ANSWERED, null]], self::outcomes($batch));
+        $message = $batch->coverage()->repositories()[0]['message'];
+        self::assertIsString($message);
+        self::assertStringNotContainsString("\n", $message);
+        self::assertSame([true], self::networkFailures($batch));
+        self::assertFalse($batch->complete());
+    }
+
+    public function testAnAnswerLockrotCannotReadIsAnInvalidResponseAndNoNetworkFailure(): void
+    {
+        $corrupt = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK]);
+        $corrupt->withCorruptPackagesJson();
+        $corrupt->start();
+        $this->started[] = $corrupt;
+
+        $batch = (new RepositoryAdvisoryLoader($corrupt->repositories()))->load(['doctrine/cache' => '2.2.0']);
+
+        self::assertSame(['answer' => AdvisoryCoverage::FAILED, 'reason' => AdvisoryCoverage::INVALID_RESPONSE, 'records' => null], self::feed($batch, 'doctrine/cache', 0));
+        self::assertNull(self::nameCoverage($batch, 'doctrine/cache')->records(), 'no feed answered');
+        self::assertSame(AdvisoryCoverage::LOOKUP_FAILED, self::nameCoverage($batch, 'doctrine/cache')->reason());
+        self::assertSame([false], self::networkFailures($batch));
+    }
+
+    public function testTheDeadlineBetweenTwoRepositoriesLeavesTheSecondNotAsked(): void
+    {
+        $first = $this->api(['doctrine/cache' => []]);
+        $second = $this->api(['doctrine/cache' => []]);
+        $calls = 0;
+        $now = static function () use (&$calls): float {
+            return ++$calls <= 2 ? 0.0 : 10.0;
+        };
+
+        $batch = (new RepositoryAdvisoryLoader(array_merge($first->repositories(), $second->repositories()), false, Deadline::inSeconds(1.0, $now)))->load(['doctrine/cache' => '2.2.0']);
+
+        self::assertSame([[AdvisoryCoverage::ANSWERED, null], [AdvisoryCoverage::NOT_ASKED, AdvisoryCoverage::INSTALL_TIME_BUDGET]], self::outcomes($batch));
+        self::assertCount(1, self::nameCoverage($batch, 'doctrine/cache')->feeds(), 'only the feed reached before the deadline');
+        self::assertSame(AdvisoryCoverage::INSTALL_TIME_BUDGET, self::nameCoverage($batch, 'doctrine/cache')->reason());
+        self::assertSame([], $second->advisoryRequests());
+        self::assertSame([self::BUDGET_NOTE], self::texts($batch));
+        self::assertFalse($batch->complete());
+    }
+
+    /** @return array{AdvisoryProviderInterface&\Composer\Repository\RepositoryInterface, \ArrayObject<int, string>} */
+    private static function spy(bool $hasFeed = true): array
+    {
+        /** @var \ArrayObject<int, string> $calls */
+        $calls = new \ArrayObject();
+        $repository = new class ($calls, $hasFeed) extends ArrayRepository implements AdvisoryProviderInterface {
+            /** @var \ArrayObject<int, string> */
+            private \ArrayObject $calls;
+            private bool $hasFeed;
+
+            /** @param \ArrayObject<int, string> $calls */
+            public function __construct(\ArrayObject $calls, bool $hasFeed)
+            {
+                parent::__construct();
+                $this->calls = $calls;
+                $this->hasFeed = $hasFeed;
+            }
+
+            public function getRepoName(): string
+            {
+                return 'spy repo (https://user:secret@spy.example/?token=x)';
+            }
+
+            public function hasSecurityAdvisories(): bool
+            {
+                $this->calls->append('hasSecurityAdvisories');
+
+                return $this->hasFeed;
+            }
+
+            public function getSecurityAdvisories(array $packageConstraintMap, bool $allowPartialAdvisories = false): array
+            {
+                $this->calls->append('getSecurityAdvisories');
+
+                return ['namesFound' => [], 'advisories' => []];
+            }
+        };
+
+        return [$repository, $calls];
+    }
+
+    public function testOfflineAsksNoRepositoryAndRecordsEachAsNotAsked(): void
+    {
+        if (!interface_exists(AdvisoryProviderInterface::class)) {
+            self::markTestSkipped('Composer without the advisory API');
+        }
+        [$spy, $calls] = self::spy();
+
+        $batch = (new RepositoryAdvisoryLoader([$spy], true))->load(['doctrine/cache' => '2.2.0']);
+
+        self::assertSame([], $calls->getArrayCopy(), 'not even hasSecurityAdvisories()');
+        self::assertSame([[AdvisoryCoverage::NOT_ASKED, AdvisoryCoverage::OFFLINE]], self::outcomes($batch));
+        self::assertSame('spy repo (https://spy.example/)', $batch->coverage()->repositories()[0]['composer_repository'], 'credentials stripped');
+        self::assertSame([], self::nameCoverage($batch, 'doctrine/cache')->feeds());
+        self::assertSame(AdvisoryCoverage::OFFLINE, self::nameCoverage($batch, 'doctrine/cache')->reason());
+        self::assertNull(self::nameCoverage($batch, 'doctrine/cache')->records());
+        self::assertFalse($batch->complete());
+    }
+
+    public function testAPolicyThatTurnsAdvisoriesOffAsksNothingAndNotesWhichKey(): void
+    {
+        if (!interface_exists(AdvisoryProviderInterface::class)) {
+            self::markTestSkipped('Composer without the advisory API');
+        }
+        [$spy, $calls] = self::spy();
+        $ignore = AdvisoryIgnore::disabled('policy.advisories.audit', 'ignore');
+
+        $batch = (new RepositoryAdvisoryLoader([$spy], false, null, $ignore))->load(['doctrine/cache' => '2.2.0']);
+
+        self::assertSame([], $calls->getArrayCopy());
+        self::assertSame([[AdvisoryCoverage::NOT_ASKED, AdvisoryCoverage::DISABLED_BY_POLICY]], self::outcomes($batch));
+        self::assertSame(AdvisoryCoverage::DISABLED_BY_POLICY, self::nameCoverage($batch, 'doctrine/cache')->reason());
+        self::assertSame([], self::nameCoverage($batch, 'doctrine/cache')->feeds());
+        self::assertSame([RunNote::ADVISORIES_DISABLED_BY_POLICY], array_map(static fn (RunNote $note): string => $note->code(), $batch->notes()));
+        self::assertSame(['policy_key' => 'policy.advisories.audit', 'value' => 'ignore'], $batch->notes()[0]->data());
+        self::assertSame([false], self::networkFailures($batch));
+    }
+
+    public function testNoRepositoryWithAFeedIsNoFeedAndAVcsRepositoryIsCountedNeverNamed(): void
+    {
+        if (!interface_exists(AdvisoryProviderInterface::class)) {
+            self::markTestSkipped('Composer without the advisory API');
+        }
+        [$withoutFeed] = self::spy(false);
+        $vcs = new class () extends ArrayRepository {
+            public function getRepoName(): string
+            {
+                throw new \LogicException('a vcs repository is never named: its driver can start network I/O');
+            }
+        };
+
+        $batch = (new RepositoryAdvisoryLoader([$vcs, $withoutFeed]))->load(['doctrine/cache' => '2.2.0']);
+
+        self::assertSame(1, $batch->coverage()->otherRepositories());
+        self::assertSame([[AdvisoryCoverage::NO_FEED, null]], self::outcomes($batch));
+        self::assertSame(AdvisoryCoverage::NO_FEED, self::nameCoverage($batch, 'doctrine/cache')->reason());
+        self::assertSame([], self::nameCoverage($batch, 'doctrine/cache')->feeds());
+        self::assertFalse($batch->complete());
+
+        $none = (new RepositoryAdvisoryLoader([$vcs]))->load(['doctrine/cache' => '2.2.0']);
+        self::assertSame([], $none->coverage()->repositories());
+        self::assertSame(AdvisoryCoverage::NO_FEED, self::nameCoverage($none, 'doctrine/cache')->reason());
+    }
+
+    public function testBranchSnapshotsAreAttributedAsComposerAttributesThem(): void
+    {
+        $server = $this->api(['acme/core' => [self::record('PKSA-core', '>=4.3.0,<4.4.13', []), self::record('PKSA-main', '<5.0', [])]]);
+
+        $alias = (new RepositoryAdvisoryLoader($server->repositories()))->load(['acme/core' => '4.3.x-dev']);
+        $main = (new RepositoryAdvisoryLoader($server->repositories()))->load(['acme/core' => 'dev-main']);
+
+        self::assertSame(['PKSA-core', 'PKSA-main'], array_map(static fn (Advisory $a): string => $a->id(), $alias->for('acme/core')), 'a branch alias reads as the highest version of its line');
+        self::assertSame([], $main->for('acme/core'), 'Composer matches a dev branch against no numeric range');
+        self::assertSame(2, self::nameCoverage($main, 'acme/core')->records());
+    }
+
+    public function testAnUnparseableVersionIsAskedButNotAttributed(): void
+    {
+        $server = $this->api(['doctrine/cache' => [self::record('PKSA-cache-1', '*', [])]]);
+
+        $batch = (new RepositoryAdvisoryLoader($server->repositories()))->load(['doctrine/cache' => 'not a version']);
+
+        self::assertSame([['doctrine/cache']], $server->advisoryRequests());
+        self::assertSame([], $batch->for('doctrine/cache'));
+        self::assertSame([], $batch->ignored('doctrine/cache'));
+        self::assertSame(AdvisoryCoverage::UNPARSEABLE_VERSION, self::nameCoverage($batch, 'doctrine/cache')->reason());
+        self::assertSame(['answer' => AdvisoryCoverage::ANSWERED, 'reason' => null, 'records' => 1], self::feed($batch, 'doctrine/cache', 0));
+    }
+
+    public function testTheComposerRepositoriesScopeAsksOnlyNamesFromAComposerRepository(): void
+    {
+        $server = $this->api(['acme/fork' => [self::record('PKSA-fork', '*', [])], 'doctrine/cache' => []]);
+        $versions = ['doctrine/cache' => '2.2.0', 'acme/fork' => '1.0.0'];
+
+        $scoped = (new RepositoryAdvisoryLoader($server->repositories(), false, null, null, AdvisoryCoverage::SCOPE_COMPOSER_REPOSITORIES, AdvisoryCoverage::SOURCE_CONFIG))->load($versions, ['acme/fork']);
+
+        self::assertSame([['doctrine/cache']], $server->advisoryRequests());
+        self::assertSame([], $scoped->for('acme/fork'));
+        self::assertSame(['answer' => AdvisoryCoverage::NOT_ASKED, 'reason' => AdvisoryCoverage::NOT_FROM_COMPOSER_REPOSITORY, 'records' => null], self::feed($scoped, 'acme/fork', 0));
+        self::assertSame(AdvisoryCoverage::NOT_FROM_COMPOSER_REPOSITORY, self::nameCoverage($scoped, 'acme/fork')->reason());
+        self::assertNull(self::nameCoverage($scoped, 'acme/fork')->records());
+        self::assertSame([AdvisoryCoverage::SCOPE_COMPOSER_REPOSITORIES, AdvisoryCoverage::SOURCE_CONFIG], [$scoped->coverage()->scope(), $scoped->coverage()->scopeSource()]);
+        self::assertNull(self::nameCoverage($scoped, 'doctrine/cache')->reason());
+
+        $all = (new RepositoryAdvisoryLoader($server->repositories()))->load($versions, ['acme/fork']);
+
+        self::assertSame(['PKSA-fork'], array_map(static fn (Advisory $a): string => $a->id(), $all->for('acme/fork')), 'the default scope asks a package from vcs by name');
+        self::assertNull(self::nameCoverage($all, 'acme/fork')->reason());
     }
 
     /** @return list<string> */
