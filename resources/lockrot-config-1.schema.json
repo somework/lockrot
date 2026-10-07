@@ -6,7 +6,7 @@
   "type": "object",
   "properties": {
     "advisory-lookup": {
-      "description": "Which package names the advisory lookup sends to each Composer repository that publishes advisories. `all` (the default) sends the name of every package the run checks, whatever its origin, as `composer audit` does: a package installed from vcs, a path or an archive included, and a packages-dev one only with `--dev`. `composer-repositories` sends only the names of packages that a Composer repository serves; every other package is not asked.",
+      "description": "Which package names the advisory lookup sends to each Composer repository that publishes advisories. `all` (the default) sends the name of every package the run checks, whatever its origin, as `composer audit` does: a package installed from vcs, a path or an archive included, and a packages-dev one only with `--dev`. `composer-repositories` sends only the names of packages that a Composer repository serves, and asks about no other package.",
       "type": "string",
       "enum": [
         "all",

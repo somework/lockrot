@@ -68,6 +68,8 @@ Severity order, used by [`--fail-on`](ci.md), the baseline and the report's sort
   `report-1.json` types the `data` of every signal ([Signal data](schema.md#signal-data)). The
   S6, S8 and S9 sections of this page give their fields.
 
+<a id="abandoned"></a>
+
 ## Abandoned, and where to
 
 `abandoned` covers two cases: a package whose repository names a successor, and one that names
@@ -262,6 +264,8 @@ request on it.
   branch in an install-time run that has spent its [budget](install-time.md#time-budget).
 
 - S2 and S8 carry the parent as `dated_by`, and `--explain` marks the branch rows it supplied.
+
+<a id="which-advisories-count"></a>
 
 ## Security advisories
 
