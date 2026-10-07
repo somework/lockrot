@@ -219,8 +219,8 @@ jobs:
           test "$lines" -le "$BUDGET"
   # This job proves that the corpus checks read lockrot's output at all. Every problem key that a
   # check can emit has a recorded document mutated to emit that key, or a reason why no mutation can
-  # reach it. The job uses no network, token or clock and installs nothing: the tool is stdlib-only
-  # Python.
+  # reach it. The tests use no network, token or clock, and need no package: the tool is
+  # stdlib-only Python.
   corpus-selftest:
     runs-on: ubuntu-latest
     steps:
