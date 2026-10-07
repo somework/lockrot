@@ -2,6 +2,8 @@
 *.phar binary
 # The documents older releases wrote are checked against the sha256 their recording took.
 /tests/fixtures/schema-evolution/** -text
+# tools/score/sweep.py writes the sweep stream. SweepDifferentialTest compares it row by row.
+/tests/fixtures/score/sweep-rows.txt.gz binary linguist-generated
 
 /tests export-ignore
 /build export-ignore

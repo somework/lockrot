@@ -1,0 +1,32 @@
+# This workflow runs the sweep group on one leg. The group compares every score of score model 1
+# with the stream that tools/score/sweep.py prints, and checks the structured basis on every score.
+# The default suite reads a sample only. The paths filter starts it on a pull request that changes
+# the score engine. It has no branches filter: that filter reads the base branch, and a stacked pull
+# request has another base. GitHub starts schedule and workflow_dispatch only from the default branch.
+name: sweep
+on:
+  pull_request:
+    paths:
+      - 'src/Score/**'
+      - 'src/Verdict/**'
+      - 'src/Config/Gate.php'
+      - 'tools/score/**'
+      - 'tests/fixtures/score/**'
+  schedule:
+    - cron: '17 4 * * 1'
+  workflow_dispatch:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+jobs:
+  sweep:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+          tools: composer:v2
+      - run: composer update --no-interaction --prefer-dist
+      - run: vendor/bin/phpunit --group sweep

@@ -8,9 +8,9 @@
     // endless loop per test instead. Evidence: https://github.com/somework/lockrot/pull/65
     "timeout": 600,
     // The covers-nothing group adds no line to the coverage, so the coverage run skips it. The
-    // option replaces the exclude list of phpunit.xml.dist, so it repeats e2e and network. Use one
-    // flag per group: PHPUnit warns on a comma list, and failOnWarning then fails every run.
-    "testFrameworkOptions": "--exclude-group=e2e --exclude-group=network --exclude-group=covers-nothing",
+    // option replaces the exclude list of phpunit.xml.dist, so it repeats e2e, network and sweep.
+    // Use one flag per group: PHPUnit warns on a comma list, and failOnWarning then fails every run.
+    "testFrameworkOptions": "--exclude-group=e2e --exclude-group=network --exclude-group=sweep --exclude-group=covers-nothing",
     "logs": {
         "text": "build/infection.log"
     },
