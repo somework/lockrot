@@ -30,7 +30,6 @@ use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Security\FixFinder;
 use Lockrot\Security\LinkIndex;
-use Lockrot\Security\Severity;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\Rule\AbandonedRule;
 use Lockrot\Signal\Rule\NotCheckedRule;
@@ -413,7 +412,7 @@ final class Analyzer
             $note = 'not found in the repository';
         }
 
-        return new Finding(
+        $finding = new Finding(
             $package->name(),
             $package->version(),
             $verdict,
@@ -426,10 +425,10 @@ final class Analyzer
             array_keys($graph->chainsTo($package->name())),
             Libyears::measure($package, $meta),
             $package->origin(),
-            AbandonedRule::replacementNamedBy($facts),
-            FlagSet::fromSignals($signals, $entry, self::countedAdvisories($facts, $fixes)),
-            $facts->metadataStatus() === PackageFacts::METADATA_READ
+            AbandonedRule::replacementNamedBy($facts)
         );
+
+        return $finding->withFlags(FlagSet::fromSignals($signals, $entry, self::countedAdvisories($facts, $fixes)), $facts->metadataStatus() === PackageFacts::METADATA_READ);
     }
 
     /**
@@ -445,7 +444,7 @@ final class Analyzer
         $found = $fixes->find($facts);
         $counted = [];
         foreach ($facts->advisories() as $advisory) {
-            $counted[] = Score::advisory($advisory->id(), Severity::fromComposer($advisory->severity())->bucket(), $found->forAdvisory($advisory->id())->kind());
+            $counted[] = Score::advisory($advisory->id(), $advisory->severity() ?? '', $found->forAdvisory($advisory->id())->kind());
         }
 
         return $counted;

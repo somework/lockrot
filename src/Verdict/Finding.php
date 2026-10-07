@@ -70,9 +70,8 @@ final class Finding
      * @param list<Signal> $signals
      * @param list<string> $chain
      * @param list<string> $directDependents
-     * @param bool         $maintenanceJudged lockrot read the release metadata
      */
-    public function __construct(string $package, string $version, string $verdict, array $signals, array $chain, ?string $allowlistReason, ?\DateTimeImmutable $dataDate, ?string $note = null, bool $dev = false, array $directDependents = [], ?LibyearsMeasurement $libyears = null, ?PackageOrigin $origin = null, ?string $replacementNamedBy = null, ?FlagSet $flags = null, bool $maintenanceJudged = true)
+    public function __construct(string $package, string $version, string $verdict, array $signals, array $chain, ?string $allowlistReason, ?\DateTimeImmutable $dataDate, ?string $note = null, bool $dev = false, array $directDependents = [], ?LibyearsMeasurement $libyears = null, ?PackageOrigin $origin = null, ?string $replacementNamedBy = null)
     {
         $origin ??= PackageOrigin::unattributed();
         $fromComposerRepository = $origin->isComposerRepository();
@@ -100,10 +99,16 @@ final class Finding
         $this->libyears = $libyears;
         $this->origin = $origin;
         $this->replacementNamedBy = $replacementNamedBy;
-        if ($flags !== null) {
-            $this->score = Score::of($flags, self::reachOf($chain), $dev);
-            $this->grade = ScoreBasis::verdict($this->score, $flags, $maintenanceJudged);
-        }
+    }
+
+    /** @param bool $maintenanceJudged lockrot read the release metadata */
+    public function withFlags(FlagSet $flags, bool $maintenanceJudged): self
+    {
+        $clone = clone $this;
+        $clone->score = Score::of($flags, self::reachOf($this->chain), $this->dev);
+        $clone->grade = ScoreBasis::verdict($clone->score, $flags, $maintenanceJudged);
+
+        return $clone;
     }
 
     /** @param list<string> $chain */
@@ -146,7 +151,11 @@ final class Finding
         return $this->verdict;
     }
 
-    /** The verdict of the score: a grade, else `finished`, `unknown` or `ok`. */
+    /**
+     * The verdict of the score: a grade, else `finished`, `unknown` or `ok`.
+     *
+     * @throws \LogicException for a finding built without its flags
+     */
     public function grade(): string
     {
         if ($this->grade === null) {
@@ -156,12 +165,17 @@ final class Finding
         return $this->grade;
     }
 
-    /** The first counted maintenance flag, null when none counts. */
+    /**
+     * The first counted maintenance flag, null when none counts.
+     *
+     * @throws \LogicException for a finding built without its flags
+     */
     public function lead(): ?string
     {
         return $this->score()->lead();
     }
 
+    /** @throws \LogicException for a finding built without its flags */
     public function isGraded(): bool
     {
         return $this->score()->grade() !== null;

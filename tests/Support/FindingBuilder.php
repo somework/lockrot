@@ -13,8 +13,9 @@ use Lockrot\Verdict\Verdict;
 
 /**
  * Builds a {@see Finding} for a test. The defaults: `vendor/pkg` 1.0.0, ok, no
- * signals, a chain of the package alone, no data date. Every optional argument keeps the
- * constructor's own default. Each with*() returns a new builder.
+ * signals, a chain of the package alone, no data date, no flags. A finding without flags throws
+ * on grade(), lead(), isGraded() and score(). Every optional argument keeps the constructor's own
+ * default. Each with*() returns a new builder.
  */
 final class FindingBuilder
 {
@@ -155,6 +156,8 @@ final class FindingBuilder
 
     public function build(): Finding
     {
-        return new Finding($this->package, $this->version, $this->verdict, $this->signals, $this->chain, $this->allowlistReason, $this->dataDate, $this->note, $this->dev, $this->directDependents, $this->libyears, $this->origin, $this->replacementNamedBy, $this->flags, $this->maintenanceJudged);
+        $finding = new Finding($this->package, $this->version, $this->verdict, $this->signals, $this->chain, $this->allowlistReason, $this->dataDate, $this->note, $this->dev, $this->directDependents, $this->libyears, $this->origin, $this->replacementNamedBy);
+
+        return $this->flags === null ? $finding : $finding->withFlags($this->flags, $this->maintenanceJudged);
     }
 }

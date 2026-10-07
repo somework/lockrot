@@ -68,6 +68,6 @@ final class FindingBuilderTest extends TestCase
         yield 'libyears' => [static fn (FindingBuilder $b): FindingBuilder => $b->withLibyears($libyears), new Finding('vendor/pkg', '1.0.0', Verdict::OK, [], ['vendor/pkg'], null, null, null, false, [], $libyears)];
         yield 'origin' => [static fn (FindingBuilder $b): FindingBuilder => $b->withOrigin($origin), new Finding('vendor/pkg', '1.0.0', Verdict::OK, [], ['vendor/pkg'], null, null, null, false, [], null, $origin)];
         yield 'replacement named by' => [static fn (FindingBuilder $b): FindingBuilder => $b->withReplacementNamedBy(PackageOrigin::PACKAGIST), new Finding('vendor/pkg', '1.0.0', Verdict::OK, [], ['vendor/pkg'], null, null, null, false, [], null, null, PackageOrigin::PACKAGIST)];
-        yield 'flags' => [static fn (FindingBuilder $b): FindingBuilder => $b->withFlags($flags, false), new Finding('vendor/pkg', '1.0.0', Verdict::OK, [], ['vendor/pkg'], null, null, null, false, [], null, null, null, $flags, false)];
+        yield 'flags' => [static fn (FindingBuilder $b): FindingBuilder => $b->withFlags($flags, false), (new Finding('vendor/pkg', '1.0.0', Verdict::OK, [], ['vendor/pkg'], null, null))->withFlags($flags, false)];
     }
 }

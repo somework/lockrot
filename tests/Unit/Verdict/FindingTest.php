@@ -759,11 +759,15 @@ final class FindingTest extends TestCase
         self::assertNull($finding->lead());
     }
 
-    public function testAFindingBuiltWithItsFlagsReadsItsMaintenanceAsJudged(): void
+    public function testWithFlagsReturnsAGradedCopyAndKeepsTheFindingItWasCalledOn(): void
     {
-        $finding = new Finding('vendor/pkg', '1.0.0', Verdict::OK, [], ['vendor/pkg'], null, null, null, false, [], null, null, null, FlagSet::fromSignals([], null, []));
+        $finding = (new FindingBuilder())->build();
+        $graded = $finding->withFlags(FlagSet::fromSignals([], null, []), false);
 
-        self::assertSame('ok', $finding->grade());
+        self::assertNotSame($finding, $graded);
+        self::assertSame('unknown', $graded->grade());
+        $this->expectException(\LogicException::class);
+        $finding->grade();
     }
 
     public function testWithSignalsKeepsTheScore(): void
