@@ -62,9 +62,10 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
             'advisoryId' => $id,
             'packageName' => 'doctrine/cache',
             'remoteId' => $id,
+            'title' => 'Title of '.$id,
             'link' => 'https://example.test/'.$id,
             'affectedVersions' => $affected,
-            'sources' => [['name' => 'FriendsOfPHP/security-advisories', 'remoteId' => $id]],
+            'sources' => [['name' => 'FriendsOfPHP/security-advisories', 'remoteId' => 'FOP-'.$id]],
             'reportedAt' => '2024-03-01 12:00:00',
             'severity' => 'high',
         ], $extra);

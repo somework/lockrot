@@ -105,6 +105,22 @@ as its fallback), so lockrot ignores no advisory.
 - Findings: advisories that the policy would ignore also raise the priority.
 - `sets_network_failures`: no.
 
+### Advisories disabled by policy {#advisories_disabled_by_policy}
+
+Composer's audit policy turns security advisories off, so lockrot asks no repository about them.
+No finding carries S9.
+
+- `data`: `policy_key`, the setting that turns them off, and `value`, its value.
+- Findings: no advisory counts, and a priority that an advisory can raise stays lower.
+- `sets_network_failures`: no.
+
+| `policy_key` | `value` |
+|---|---|
+| `policy` | `false` |
+| `policy.advisories` | `false` |
+| `policy.advisories.audit` | `ignore` |
+| `COMPOSER_POLICY` | `false`: the variable is `0`, `false` or `off` |
+
 ### Advisories unavailable {#advisories_unavailable}
 
 One Composer repository did not return advisories. lockrot still asked the other repositories.

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Config;
 
+use Lockrot\Data\Advisory\AdvisoryCoverage;
 use Lockrot\Data\Php\PhpReleaseDates;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Signal\Thresholds;
@@ -34,8 +35,10 @@ final class LockrotConfig
     private bool $installTimeStrict;
     private int $installTimeBudgetSeconds;
     private Thresholds $thresholds;
+    private string $advisoryLookup;
+    private string $advisoryLookupSource;
 
-    private function __construct(string $failOn, string $targetPhp, bool $includeDev, bool $offline, bool $strictNetwork, string $format, ?string $baseline, bool $disabled, bool $installTime, bool $installTimeStrict, int $installTimeBudgetSeconds, Thresholds $thresholds, ?string $project = null)
+    private function __construct(string $failOn, string $targetPhp, bool $includeDev, bool $offline, bool $strictNetwork, string $format, ?string $baseline, bool $disabled, bool $installTime, bool $installTimeStrict, int $installTimeBudgetSeconds, Thresholds $thresholds, ?string $project = null, string $advisoryLookup = AdvisoryCoverage::SCOPE_ALL, string $advisoryLookupSource = AdvisoryCoverage::SOURCE_DEFAULT)
     {
         $this->project = $project;
         $this->failOn = $failOn;
@@ -50,6 +53,8 @@ final class LockrotConfig
         $this->installTimeStrict = $installTimeStrict;
         $this->installTimeBudgetSeconds = $installTimeBudgetSeconds;
         $this->thresholds = $thresholds;
+        $this->advisoryLookup = $advisoryLookup;
+        $this->advisoryLookupSource = $advisoryLookupSource;
     }
 
     /**
@@ -64,6 +69,7 @@ final class LockrotConfig
         $targetPhp = self::resolveTargetPhp($extra, $env, $cli, $runtimePhp, $platformPhp);
         $format = self::resolveFormat($extra, $cli);
         $includeDev = ($cli['dev'] ?? null) === true || ($extra['include-dev'] ?? false) === true;
+        $advisoryLookup = self::resolveAdvisoryLookup($extra);
 
         return new self(
             $failOn,
@@ -78,8 +84,29 @@ final class LockrotConfig
             ($extra['install-time-strict'] ?? false) === true,
             self::resolveInstallTimeBudget($extra),
             Thresholds::fromArray($extra),
-            $project
+            $project,
+            $advisoryLookup ?? AdvisoryCoverage::SCOPE_ALL,
+            $advisoryLookup === null ? AdvisoryCoverage::SOURCE_DEFAULT : AdvisoryCoverage::SOURCE_CONFIG
         );
+    }
+
+    /**
+     * No option or environment variable: which repositories learn the project's package names is
+     * the project's decision. See docs/verdicts.md#which-advisories-count.
+     *
+     * @param array<string, mixed> $extra
+     */
+    private static function resolveAdvisoryLookup(array $extra): ?string
+    {
+        if (!\array_key_exists('advisory-lookup', $extra)) {
+            return null;
+        }
+        $value = $extra['advisory-lookup'];
+        if (!\in_array($value, AdvisoryCoverage::SCOPES, true)) {
+            throw new ConfigException(\sprintf('advisory-lookup must be one of %s; got %s', implode(', ', AdvisoryCoverage::SCOPES), \is_string($value) ? '"'.$value.'"' : var_export($value, true)));
+        }
+
+        return $value;
     }
 
     /**
@@ -303,5 +330,17 @@ final class LockrotConfig
     public function thresholds(): Thresholds
     {
         return $this->thresholds;
+    }
+
+    /** One of {@see AdvisoryCoverage::SCOPES}. */
+    public function advisoryLookup(): string
+    {
+        return $this->advisoryLookup;
+    }
+
+    /** `config` when `extra.lockrot.advisory-lookup` sets the scope, else `default`. */
+    public function advisoryLookupSource(): string
+    {
+        return $this->advisoryLookupSource;
     }
 }

@@ -236,16 +236,21 @@ final class AbandonedIgnoreTest extends TestCase
     }
 
     /**
-     * @param array<mixed>|\Throwable $list what Composer 2.9's AuditConfig holds
+     * @param AbandonedPolicyReader::POLICY|AbandonedPolicyReader::AUDIT_CONFIG|AbandonedPolicyReader::NONE $api
+     * @param array<mixed>|\Throwable                                                                     $list what Composer 2.9's AuditConfig holds
      */
     private static function reader(string $api, $list = []): AbandonedPolicyReader
     {
         return new class ($api, $list) implements AbandonedPolicyReader {
+            /** @var AbandonedPolicyReader::POLICY|AbandonedPolicyReader::AUDIT_CONFIG|AbandonedPolicyReader::NONE */
             private string $api;
             /** @var array<mixed>|\Throwable */
             private $list;
 
-            /** @param array<mixed>|\Throwable $list */
+            /**
+             * @param AbandonedPolicyReader::POLICY|AbandonedPolicyReader::AUDIT_CONFIG|AbandonedPolicyReader::NONE $api
+             * @param array<mixed>|\Throwable $list
+             */
             public function __construct(string $api, $list)
             {
                 $this->api = $api;

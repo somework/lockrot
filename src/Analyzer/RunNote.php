@@ -23,6 +23,7 @@ final class RunNote
     public const METADATA_UNAVAILABLE = 'metadata_unavailable';
     public const MONOREPO_PARENT_UNAVAILABLE = 'monorepo_parent_unavailable';
     public const ADVISORY_IGNORE_UNREADABLE = 'advisory_ignore_unreadable';
+    public const ADVISORIES_DISABLED_BY_POLICY = 'advisories_disabled_by_policy';
     public const ADVISORIES_UNAVAILABLE = 'advisories_unavailable';
     public const ADVISORIES_NOT_CHECKED = 'advisories_not_checked';
     public const REPOSITORY_ACTIVITY_NOT_CHECKED = 'repository_activity_not_checked';
@@ -40,6 +41,7 @@ final class RunNote
         self::METADATA_UNAVAILABLE,
         self::MONOREPO_PARENT_UNAVAILABLE,
         self::ADVISORY_IGNORE_UNREADABLE,
+        self::ADVISORIES_DISABLED_BY_POLICY,
         self::ADVISORIES_UNAVAILABLE,
         self::ADVISORIES_NOT_CHECKED,
         self::REPOSITORY_ACTIVITY_NOT_CHECKED,
@@ -147,6 +149,20 @@ final class RunNote
     public static function advisoryIgnoreUnreadable(string $message): self
     {
         return self::of(self::ADVISORY_IGNORE_UNREADABLE, \sprintf("Composer's advisory ignore list not read (%s); every advisory counts", $message), false, ['message' => $message]);
+    }
+
+    /**
+     * @param string      $policyKey the setting that turns advisories off: `policy`, `policy.advisories`, `policy.advisories.audit` or `COMPOSER_POLICY`
+     * @param bool|string $value     its value
+     */
+    public static function advisoriesDisabledByPolicy(string $policyKey, $value): self
+    {
+        return self::of(
+            self::ADVISORIES_DISABLED_BY_POLICY,
+            \sprintf("security advisories not checked: Composer's audit policy turns them off (%s: %s)", $policyKey, \is_bool($value) ? var_export($value, true) : $value),
+            false,
+            ['policy_key' => $policyKey, 'value' => $value]
+        );
     }
 
     /**

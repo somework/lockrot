@@ -1789,6 +1789,18 @@
           "properties": {
             "code": {
               "enum": [
+                "advisories_disabled_by_policy"
+              ]
+            },
+            "data": {
+              "$ref": "#/definitions/noteAdvisoriesDisabledByPolicy"
+            }
+          }
+        },
+        {
+          "properties": {
+            "code": {
+              "enum": [
                 "advisories_unavailable"
               ]
             },
@@ -1891,6 +1903,7 @@
                   "metadata_unavailable",
                   "monorepo_parent_unavailable",
                   "advisory_ignore_unreadable",
+                  "advisories_disabled_by_policy",
                   "advisories_unavailable",
                   "advisories_not_checked",
                   "repository_activity_not_checked",
@@ -1915,6 +1928,7 @@
         "metadata_unavailable",
         "monorepo_parent_unavailable",
         "advisory_ignore_unreadable",
+        "advisories_disabled_by_policy",
         "advisories_unavailable",
         "advisories_not_checked",
         "repository_activity_not_checked",
@@ -2076,6 +2090,25 @@
         "message": {
           "description": "Composer's own words about the project's `audit` or `policy` configuration, the first line, possibly empty; they quote that configuration, never a repository. Not contract.",
           "type": "string"
+        }
+      }
+    },
+    "noteAdvisoriesDisabledByPolicy": {
+      "description": "`advisories_disabled_by_policy`: Composer's audit policy turns security advisories off, so lockrot asked no repository about them and no finding carries S9. `policy_key` is the setting that does it: `policy`, `policy.advisories`, `policy.advisories.audit` or the `COMPOSER_POLICY` environment variable. `value` is its value: `false`, or `ignore` for the audit mode.",
+      "type": "object",
+      "required": [
+        "policy_key",
+        "value"
+      ],
+      "properties": {
+        "policy_key": {
+          "type": "string"
+        },
+        "value": {
+          "type": [
+            "boolean",
+            "string"
+          ]
         }
       }
     },
