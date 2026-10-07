@@ -19,6 +19,7 @@
             <directory>src/Analyzer</directory>
             <directory>src/Data/Repository</directory>
             <directory>src/Data/Forge</directory>
+            <!-- src/Lock covers LockLineIndex, so it needs no <file> entry. -->
             <directory>src/Lock</directory>
             <!-- The plugin bootstrap (LockrotPlugin, CommandProvider, LockrotCommand, ServiceFactory)
                  stays out: only the e2e group runs it, and this gate excludes that group. -->

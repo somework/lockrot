@@ -176,8 +176,8 @@ reviews:
     - path: '.claude/rules/**'
       instructions: |
         Flag a rule that a reviewer cannot check from a diff, a rule that repeats another rule file
-        instead of linking it, and growth: the whole directory has a budget of 440 lines (wc -l),
-        so ask what an addition replaces.
+        instead of linking it, and growth: the whole directory has the line budget that the CI
+        budget step in ci.yml's docs job holds, so ask what an addition replaces.
 
   pre_merge_checks:
     # Off: .claude/rules/code-comments.md makes no comment the default, so per-function coverage

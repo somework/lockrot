@@ -1,8 +1,10 @@
 """Every pattern that a check matches against lockrot's rendered output.
 
 Each phrase declares the number of fixture documents that it must match, or a dated `unexercised`
-marker that a test asserts matches none. A check must not compile a pattern of its own:
-tests/test_catalog_census.py fails on a regex call outside the modules that it allows.
+marker that a test asserts matches none. A minimum of zero that turns a red test green is not
+allowed: the dated marker is the only way to say that a phrase cannot be exercised. A check must not
+compile a pattern of its own: tests/test_catalog_census.py fails on a regex call outside the modules
+that it allows.
 """
 
 import re
