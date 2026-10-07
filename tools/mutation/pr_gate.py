@@ -91,8 +91,8 @@ class Source:
 
     def keys(self, path: str, mutator: str, line: int, text: str, methods: Tuple[str, ...] = ()) -> List[Key]:
         """The one key a mutant answers to: the line's text when it is unique in the file, else the
-        enclosing method with the text. Never the method alone: it would let one documented mutant
-        cover another line. An entry has no line: of the methods that hold its text, it takes the one
+        enclosing method with the text. The method alone lets one documented mutant cover another
+        line. An entry has no line: of the methods that hold its text, it takes the one
         its reason opens with."""
         occurrences = [n for n, candidate in enumerate(self.lines(path), 1) if normalise(candidate) == text]
         if text and len(occurrences) == 1:
