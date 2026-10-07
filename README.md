@@ -178,9 +178,9 @@ On other CI systems, use the PHAR or the Docker image `ghcr.io/somework/lockrot`
 
 ## Not every finding is a problem
 
--  **Baseline:** accept findings with `--generate-baseline`
+- **Baseline:** accept findings with `--generate-baseline`
   ([Baseline](https://lockrot.dev/baseline/)).
--  **Allowlist:** packages on the built-in allowlist (`psr/*`, `symfony/polyfill-*` and others)
+- **Allowlist:** packages on the built-in allowlist (`psr/*`, `symfony/polyfill-*` and others)
   report as `finished`. Add your own under `extra.lockrot.ignore`, each with a `package` and a
   `reason` ([The allowlist](https://lockrot.dev/configuration/#the-allowlist)).
 

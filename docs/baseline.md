@@ -132,7 +132,7 @@ reports accepted findings as `new` or `worsened`:
   reverse is safe: lockrot measures `stale` entries against the whole `composer.lock`,
   `packages-dev` included.
 
--  **The target PHP.** Pass the same `--target-php` or `LOCKROT_TARGET_PHP`, or set the `target-php`
+- **The target PHP.** Pass the same `--target-php` or `LOCKROT_TARGET_PHP`, or set the `target-php`
   key so both runs read it. Without any of them, lockrot uses `config.platform.php`, else the PHP
   that runs it, and that PHP can differ between your machine and CI
   ([`target-php`](configuration.md#extralockrot-keys)).

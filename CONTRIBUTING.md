@@ -1,7 +1,7 @@
 # Contributing to lockrot
 
-Build lockrot, run the checks that CI runs, and change lockrot so that it keeps every promise that
-it makes to users. What semantic versioning covers is in [What 1.0
+Build lockrot and run the checks that CI runs. Change lockrot only in ways that keep its promises
+to users. What semantic versioning covers is in [What 1.0
 freezes](docs/compatibility.md#what-10-freezes), and your duties when a change touches it are under
 [Backward compatibility](#backward-compatibility). How to write docs, comments, tests and changelog
 entries is in [the rule files](#writing-the-changelog-and-the-docs).
@@ -114,7 +114,7 @@ Your duties when a change touches the contract:
 The canonical list of what lockrot reads, writes and contacts is
 [What lockrot does and does not do](SECURITY.md#what-lockrot-does-and-does-not-do).
 
--  A change that writes anything that the list does not name (a new file, a created directory, a
+- A change that writes anything that the list does not name (a new file, a created directory, a
   cache in another place) changes that promise. It needs the maintainer's decision before review,
   and it updates `SECURITY.md` in the same branch.
 - Every file that lockrot writes into a project goes through `Lockrot\Filesystem\AtomicWriter`.
@@ -263,7 +263,7 @@ of it as `resources/report/report.html` and `manifest.json`, so the PHAR builds 
 tools/report/update-renderer vX.Y.Z
 ```
 
--  The script needs `gh`. It verifies the build provenance of the release, the page against the
+- The script needs `gh`. It verifies the build provenance of the release, the page against the
   sha256 in its manifest, and that the manifest names the requested version.
   `tests/Unit/Output/RendererManifestTest.php` rechecks the page against the manifest on every run.
 - `--from-dir DIR` vendors a local build for development. It is not attested. Never release with it.
