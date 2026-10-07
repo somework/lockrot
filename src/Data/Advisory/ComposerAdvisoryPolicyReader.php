@@ -23,14 +23,14 @@ final class ComposerAdvisoryPolicyReader implements AdvisoryPolicyReader
         if (class_exists(AdvisoriesPolicyConfig::class)) {
             return self::POLICY;
         }
-        if (class_exists(AuditConfig::class) && property_exists(AuditConfig::class, 'ignoreListForAudit')) {
-            return self::AUDIT_CONFIG;
+        if (!class_exists(AuditConfig::class)) {
+            return self::AUDIT_IGNORE;
         }
 
-        return self::RAW;
+        return property_exists(AuditConfig::class, 'ignoreListForAudit') ? self::AUDIT_CONFIG : self::AUDIT_SECTION;
     }
 
-    /** Not `PolicyConfig::fromConfig()`: a bad `malware` section or custom list there would empty the advisory list. */
+    /** Not `PolicyConfig::fromConfig()`: there a bad `malware` section or custom list empties the advisory list too. */
     public function policy(array $policy, array $audit): array
     {
         $advisories = AdvisoriesPolicyConfig::fromRawConfig(array_filter($policy, 'is_string', \ARRAY_FILTER_USE_KEY), array_filter($audit, 'is_string', \ARRAY_FILTER_USE_KEY), new VersionParser());

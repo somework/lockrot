@@ -23,6 +23,7 @@ final class AdvisoryIgnore
     /** @var array<string, ?string> */
     private array $severities;
     private bool $fromPolicy;
+    private bool $packageRules;
     private ?string $whyUnreadable;
     /** @var array{policy_key: string, value: bool|string}|null */
     private ?array $disabledBy;
@@ -31,12 +32,14 @@ final class AdvisoryIgnore
      * @param array<string, ?string>                              $list
      * @param array<string, ?string>                              $severities
      * @param array{policy_key: string, value: bool|string}|null $disabledBy
+     * @param bool                                                $packageRules whether a package name in $list ignores the package's advisories: Composer 2.9.2 and later
      */
-    private function __construct(array $list, array $severities, bool $fromPolicy, ?string $whyUnreadable = null, ?array $disabledBy = null)
+    private function __construct(array $list, array $severities, bool $fromPolicy, ?string $whyUnreadable = null, ?array $disabledBy = null, bool $packageRules = true)
     {
         $this->list = $list;
         $this->severities = $severities;
         $this->fromPolicy = $fromPolicy;
+        $this->packageRules = $packageRules;
         $this->whyUnreadable = $whyUnreadable;
         $this->disabledBy = $disabledBy;
     }
@@ -75,9 +78,8 @@ final class AdvisoryIgnore
 
                 return new self($lists['list'], $lists['severities'], false);
             }
-            $audit = $config->get('audit');
 
-            return \is_array($audit) ? self::fromRaw(\is_array($audit['ignore'] ?? null) ? $audit['ignore'] : [], \is_array($audit['ignore-severity'] ?? null) ? $audit['ignore-severity'] : []) : self::none();
+            return self::fromAuditSection($config, $api === AdvisoryPolicyReader::AUDIT_SECTION);
         } catch (\Throwable $e) {
             return self::unreadable((string) strtok($e->getMessage(), "\r\n"));
         }
@@ -106,8 +108,22 @@ final class AdvisoryIgnore
         return new self($lists['list'], $lists['severities'], isset($policy['advisories']));
     }
 
+    /** Composer 2.4 to 2.9.1 read `config.audit` raw, and none of them ignores by package name. */
+    private static function fromAuditSection(Config $config, bool $severities): self
+    {
+        $audit = $config->get('audit');
+        if (!\is_array($audit)) {
+            return self::none();
+        }
+        $ignore = \is_array($audit['ignore'] ?? null) ? self::keysOrValues($audit['ignore']) : [];
+        $ignoreSeverity = $severities && \is_array($audit['ignore-severity'] ?? null) ? self::keysOrValues($audit['ignore-severity']) : [];
+
+        return new self($ignore, $ignoreSeverity, false, null, null, false);
+    }
+
     /**
-     * Each list is a plain list of strings or a map of string to reason, as on Composer 2.4 to 2.9.
+     * Each list is a plain list of strings or a map of string to reason. A package name ignores the
+     * package, as on Composer 2.9.2 and later.
      *
      * @param array<mixed> $ignore
      * @param array<mixed> $ignoreSeverity
@@ -124,7 +140,7 @@ final class AdvisoryIgnore
      */
     public function match(string $package, PartialSecurityAdvisory $advisory): ?AdvisoryIgnoreMatch
     {
-        $match = $this->listed(AdvisoryIgnoreMatch::PACKAGE, $package);
+        $match = $this->packageRules ? $this->listed(AdvisoryIgnoreMatch::PACKAGE, $package) : null;
         $match = $this->listed(AdvisoryIgnoreMatch::ID, $advisory->advisoryId) ?? $match;
         if (!$advisory instanceof SecurityAdvisory) {
             return $match;

@@ -6,7 +6,7 @@ namespace Lockrot\Signal;
 
 /**
  * Composer's abandoned ignore list removed this package's S1. The record keeps the list's match and
- * the marking S1 would have carried, so the fact is still shown, from one place
+ * the marking that S1 carries without the list, so the fact is still shown, from one place
  * (docs/verdicts.md#abandoned).
  *
  * @internal
@@ -44,7 +44,7 @@ final class AbandonedIgnored
         return $this->rules;
     }
 
-    /** `repository` or `lock`: the source S1 would have read. */
+    /** `repository` or `lock`: the source that S1 reads. */
     public function markedBy(): string
     {
         return $this->markedBy;

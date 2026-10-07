@@ -79,8 +79,8 @@ final class AdvisoryCoverage
 
     /**
      * `composer_repository` is Composer's name for the repository, credentials stripped.
-     * `records` counts the distinct advisory ids returned for every asked name and
-     * `packages_with_records` the names with at least one; both null unless `answered`.
+     * `records` counts the distinct advisory ids returned for every asked name, and
+     * `packages_with_records` the names with at least one. Both are null unless `answered`.
      *
      * @return list<array{composer_repository: string, outcome: string, reason: ?string, message: ?string, records: ?int, packages_with_records: ?int}>
      */

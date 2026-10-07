@@ -176,8 +176,10 @@ final class AuditParityTest extends TestCase
         }
         $audit = $config->get('audit');
         $audit = \is_array($audit) ? $audit : [];
+        // Composer 2.4 to 2.8 take severities from the command line only.
+        $severities = class_exists(AuditConfig::class) && \is_array($audit['ignore-severity'] ?? null) ? $audit['ignore-severity'] : [];
 
-        return [\is_array($audit['ignore'] ?? null) ? $audit['ignore'] : [], \is_array($audit['ignore-severity'] ?? null) ? $audit['ignore-severity'] : []];
+        return [\is_array($audit['ignore'] ?? null) ? $audit['ignore'] : [], $severities];
     }
 
     /** @param array<string, mixed> $section */

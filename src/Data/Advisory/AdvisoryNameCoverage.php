@@ -28,8 +28,8 @@ final class AdvisoryNameCoverage
 
     /**
      * `answer` is `answered`, `failed` or `not_asked`. `records` counts the distinct advisory ids
-     * the feed returned for the name, for every version, before the ignore lists; null unless
-     * `answered`. `reason` and `message` say why a feed failed or was not asked.
+     * the feed returned for the name, for every version, before the ignore lists. It is null
+     * unless `answered`. `reason` and `message` say why a feed failed or was not asked.
      *
      * @return list<array{composer_repository: string, answer: string, reason: ?string, message: ?string, records: ?int}>
      */
