@@ -23,7 +23,8 @@ use PHPUnit\Framework\TestCase;
 /**
  * The installed-version result of lockrot's one lookup equals what Composer's own `Auditor`
  * reports, counted and ignored, for each lock and config of the table. Keyed by capability:
- * Composer 2.2 has no advisory API, 2.4 to 2.9 read `config.audit`, 2.10 and later the policy API.
+ * Composer 2.2 has no advisory API, 2.4 and 2.5 no ignore list, 2.6 to 2.9 read `config.audit`, 2.10
+ * and later the policy API.
  */
 final class AuditParityTest extends TestCase
 {
@@ -97,7 +98,7 @@ final class AuditParityTest extends TestCase
         ];
     }
 
-    /** @return iterable<string, array<string, mixed>> the `config` sections that every Composer from 2.4 reads */
+    /** @return iterable<string, array<string, mixed>> the `config` sections of the table */
     private static function auditConfigs(): iterable
     {
         yield 'no ignore list' => [];
@@ -166,7 +167,7 @@ final class AuditParityTest extends TestCase
     }
 
     /**
-     * What Composer 2.4 to 2.9's AuditCommand passes the Auditor: the lists AuditConfig keeps for
+     * What Composer 2.6 to 2.9's AuditCommand passes the Auditor: the lists AuditConfig keeps for
      * audit on 2.9.2 and later, else the raw `config.audit` lists.
      *
      * @return array{array<mixed>, array<mixed>}
@@ -181,7 +182,7 @@ final class AuditParityTest extends TestCase
         }
         $audit = $config->get('audit');
         $audit = \is_array($audit) ? $audit : [];
-        // Composer 2.4 to 2.8 take severities from the command line only.
+        // Composer 2.6 to 2.8 read no `audit.ignore-severity`.
         $severities = class_exists(AuditConfig::class) && \is_array($audit['ignore-severity'] ?? null) ? $audit['ignore-severity'] : [];
 
         return [\is_array($audit['ignore'] ?? null) ? $audit['ignore'] : [], $severities];

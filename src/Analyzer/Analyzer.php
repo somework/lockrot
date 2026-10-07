@@ -272,9 +272,7 @@ final class Analyzer
             if (!$package->isFromComposerRepository()) {
                 $outside[] = $package->name();
             }
-            if ($package->aliasVersions() !== []) {
-                $aliasVersions[$package->name()] = $package->aliasVersions();
-            }
+            $aliasVersions[$package->name()] = $package->aliasVersions();
         }
 
         return $this->advisories->load($versionByName, $outside, $aliasVersions);

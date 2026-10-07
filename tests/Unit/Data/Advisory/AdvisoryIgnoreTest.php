@@ -324,11 +324,18 @@ final class AdvisoryIgnoreTest extends TestCase
     public function testARawListIsReadWholeAsComposerReadsIt(): void
     {
         $config = new Config(false);
-        $config->merge(['config' => ['audit' => ['ignore' => ['CVE-2024-0001', 'CVE-2024-0002' => 'reviewed']]]]);
+        $config->merge(['config' => ['audit' => ['ignore' => ['CVE-2024-0001', 'CVE-2024-0002' => 'reviewed'], 'ignore-severity' => ['low', ['apply' => 'audit']]]]]);
 
         $ignore = AdvisoryIgnore::fromConfig($config, self::reader(AdvisoryPolicyReader::AUDIT_IGNORE, new \LogicException('never asked')));
 
         self::assertNull($ignore->match('vendor/pkg', $this->full('PKSA-2', 'CVE-2024-0001', null)), 'an int key inside a map is no id');
         self::assertNotNull($ignore->match('vendor/pkg', $this->full('PKSA-3', 'CVE-2024-0002', null)));
+
+        $section = AdvisoryIgnore::fromConfig($config, self::reader(AdvisoryPolicyReader::AUDIT_SECTION, new \LogicException('never asked')));
+        self::assertSame(AdvisoryIgnoreMatch::SEVERITY, self::record($section->match('vendor/pkg', $this->full('PKSA-4', null, 'low')))[0] ?? null, 'a severity list keeps its strings, and an object in it is no severity');
+
+        $list = new Config(false);
+        $list->merge(['config' => ['audit' => ['ignore' => ['CVE-2024-0001', ['apply' => 'audit']]]]]);
+        self::assertNotNull(AdvisoryIgnore::fromConfig($list, self::reader(AdvisoryPolicyReader::AUDIT_IGNORE, new \LogicException('never asked')))->match('vendor/pkg', $this->full('PKSA-2', 'CVE-2024-0001', null)), 'an object in a list is no id');
     }
 }

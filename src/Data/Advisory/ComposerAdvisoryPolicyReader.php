@@ -24,7 +24,7 @@ final class ComposerAdvisoryPolicyReader implements AdvisoryPolicyReader
             return self::POLICY;
         }
         if (!class_exists(AuditConfig::class)) {
-            return (new \ReflectionMethod(Auditor::class, 'audit'))->getNumberOfParameters() > 5 ? self::AUDIT_IGNORE : self::NONE;
+            return class_exists(Auditor::class) && (new \ReflectionMethod(Auditor::class, 'audit'))->getNumberOfParameters() > 5 ? self::AUDIT_IGNORE : self::NONE;
         }
 
         return property_exists(AuditConfig::class, 'ignoreListForAudit') ? self::AUDIT_CONFIG : self::AUDIT_SECTION;

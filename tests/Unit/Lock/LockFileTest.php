@@ -333,5 +333,7 @@ final class LockFileTest extends TestCase
         self::assertSame('dev-main', $byName['acme/aliased']->version());
         self::assertSame(['4.3.9999999.9999999-dev'], $byName['acme/aliased']->aliasVersions());
         self::assertSame([], $byName['acme/plain']->aliasVersions());
+        $byName['acme/plain']->withAliasVersions(['9999999-dev']);
+        self::assertSame([], $byName['acme/plain']->aliasVersions(), 'a copy, never the original');
     }
 }

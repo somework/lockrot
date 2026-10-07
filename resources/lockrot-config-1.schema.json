@@ -6,7 +6,7 @@
   "type": "object",
   "properties": {
     "advisory-lookup": {
-      "description": "Which package names the advisory lookup sends to each Composer repository that publishes advisories. `all`, the default, sends every package the run checks, whatever its origin. `composer-repositories` sends only the packages that a Composer repository serves.",
+      "description": "Which package names the advisory lookup sends to each Composer repository that publishes advisories. `all`, the default, sends every package the run checks, whatever its origin. `composer-repositories` sends only the packages that lockrot attributes to a Composer repository.",
       "type": "string",
       "enum": [
         "all",

@@ -547,14 +547,16 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
     {
         $first = $this->api(['doctrine/cache' => []]);
         $second = $this->api(['doctrine/cache' => []]);
+        $third = $this->api(['doctrine/cache' => []]);
         $calls = 0;
         $now = static function () use (&$calls): float {
             return ++$calls <= 2 ? 0.0 : 10.0;
         };
 
-        $batch = (new RepositoryAdvisoryLoader(array_merge($first->repositories(), $second->repositories()), false, Deadline::inSeconds(1.0, $now)))->load(['doctrine/cache' => '2.2.0']);
+        $batch = (new RepositoryAdvisoryLoader(array_merge($first->repositories(), $second->repositories(), $third->repositories()), false, Deadline::inSeconds(1.0, $now)))->load(['doctrine/cache' => '2.2.0']);
 
-        self::assertSame([[AdvisoryCoverage::ANSWERED, null], [AdvisoryCoverage::NOT_ASKED, AdvisoryCoverage::INSTALL_TIME_BUDGET]], self::outcomes($batch));
+        self::assertSame([[AdvisoryCoverage::ANSWERED, null], [AdvisoryCoverage::NOT_ASKED, AdvisoryCoverage::INSTALL_TIME_BUDGET], [AdvisoryCoverage::NOT_ASKED, AdvisoryCoverage::INSTALL_TIME_BUDGET]], self::outcomes($batch));
+        self::assertSame([], $third->advisoryRequests());
         self::assertCount(1, self::nameCoverage($batch, 'doctrine/cache')->feeds(), 'only the feed reached before the deadline');
         self::assertSame(AdvisoryCoverage::INSTALL_TIME_BUDGET, self::nameCoverage($batch, 'doctrine/cache')->reason());
         self::assertSame([], $second->advisoryRequests());
@@ -610,10 +612,12 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
         }
         [$spy, $calls] = self::spy();
 
-        $batch = (new RepositoryAdvisoryLoader([$spy], true))->load(['doctrine/cache' => '2.2.0']);
+        [$other] = self::spy();
+        $batch = (new RepositoryAdvisoryLoader([$spy, $other], true, null, AdvisoryIgnore::unreadable('bad')))->load(['doctrine/cache' => '2.2.0']);
 
         self::assertSame([], $calls->getArrayCopy(), 'not even hasSecurityAdvisories()');
-        self::assertSame([[AdvisoryCoverage::NOT_ASKED, AdvisoryCoverage::OFFLINE]], self::outcomes($batch));
+        self::assertSame([[AdvisoryCoverage::NOT_ASKED, AdvisoryCoverage::OFFLINE], [AdvisoryCoverage::NOT_ASKED, AdvisoryCoverage::OFFLINE]], self::outcomes($batch));
+        self::assertSame([RunNote::ADVISORY_IGNORE_UNREADABLE, RunNote::ADVISORIES_NOT_CHECKED], array_map(static fn (RunNote $note): string => $note->code(), $batch->notes()));
         self::assertSame('spy repo (https://spy.example/)', $batch->coverage()->repositories()[0]['composer_repository'], 'credentials stripped');
         self::assertSame([], self::nameCoverage($batch, 'doctrine/cache')->feeds());
         self::assertSame(AdvisoryCoverage::OFFLINE, self::nameCoverage($batch, 'doctrine/cache')->reason());
@@ -698,6 +702,22 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
         self::assertTrue($batch->for('doctrine/cache')[0]->affects('2.2.0.0'));
     }
 
+    /** Composer judges each repository's record of an id on its own: a record no rule ignores counts. */
+    public function testARecordThatNoRuleIgnoresCountsWhateverAnotherRepositorysRecordSays(): void
+    {
+        $first = $this->api(['doctrine/cache' => [self::record('PKSA-shared', '>=2.0,<2.3', ['cve' => 'CVE-2024-0009'])]]);
+        $second = $this->api(['doctrine/cache' => [self::record('PKSA-shared', '>=2.0,<2.3', [])]]);
+        $ignore = AdvisoryIgnore::fromRaw(['CVE-2024-0009' => 'reviewed'], []);
+
+        $batch = (new RepositoryAdvisoryLoader(array_merge($first->repositories(), $second->repositories()), false, null, $ignore))->load(['doctrine/cache' => '2.2.0']);
+        $both = (new RepositoryAdvisoryLoader($first->repositories(), false, null, $ignore))->load(['doctrine/cache' => '2.2.0']);
+
+        self::assertSame(['PKSA-shared'], array_map(static fn (Advisory $a): string => $a->id(), $batch->for('doctrine/cache')));
+        self::assertSame([], $batch->ignored('doctrine/cache'));
+        self::assertSame([], $both->for('doctrine/cache'), 'the control: its only record is ignored');
+        self::assertCount(1, $both->ignored('doctrine/cache'));
+    }
+
     public function testAFilteredRepositoryIsNamedOnlyWhenItWrapsAnAdvisoryCapableOne(): void
     {
         if (!interface_exists(AdvisoryProviderInterface::class)) {
@@ -717,11 +737,27 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
         self::assertSame([[AdvisoryCoverage::ANSWERED, null]], self::outcomes($batch));
     }
 
+    public function testARepositoryWithoutAFeedLeavesTheLookupComplete(): void
+    {
+        if (!interface_exists(AdvisoryProviderInterface::class)) {
+            self::markTestSkipped('Composer without the advisory API');
+        }
+        [$withoutFeed] = self::spy(false);
+        $answering = $this->api(['doctrine/cache' => []]);
+
+        $batch = (new RepositoryAdvisoryLoader(array_merge([$withoutFeed], $answering->repositories())))->load(['doctrine/cache' => '2.2.0']);
+
+        self::assertTrue($batch->complete());
+        self::assertSame([[AdvisoryCoverage::NO_FEED, null], [AdvisoryCoverage::ANSWERED, null]], self::outcomes($batch));
+        self::assertNull(self::nameCoverage($batch, 'doctrine/cache')->reason());
+    }
+
     public function testNoNameToAskKeepsTheConfiguredScope(): void
     {
         $batch = (new RepositoryAdvisoryLoader([], false, null, null, AdvisoryCoverage::SCOPE_COMPOSER_REPOSITORIES, AdvisoryCoverage::SOURCE_CONFIG))->load([]);
 
         self::assertSame([AdvisoryCoverage::SCOPE_COMPOSER_REPOSITORIES, AdvisoryCoverage::SOURCE_CONFIG], [$batch->coverage()->scope(), $batch->coverage()->scopeSource()]);
+        self::assertSame([[], 0], [$batch->coverage()->repositories(), $batch->coverage()->otherRepositories()]);
     }
 
     public function testAnUnparseableVersionIsAskedButNotAttributed(): void
@@ -746,7 +782,7 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
 
         self::assertSame([['doctrine/cache']], $server->advisoryRequests());
         self::assertSame([], $scoped->for('acme/fork'));
-        self::assertSame(['answer' => AdvisoryCoverage::NOT_ASKED, 'reason' => AdvisoryCoverage::NOT_FROM_COMPOSER_REPOSITORY, 'records' => null], self::feed($scoped, 'acme/fork', 0));
+        self::assertSame([['composer_repository' => $server->repositories()[0]->getRepoName(), 'answer' => AdvisoryCoverage::NOT_ASKED, 'reason' => AdvisoryCoverage::NOT_FROM_COMPOSER_REPOSITORY, 'message' => null, 'records' => null]], self::nameCoverage($scoped, 'acme/fork')->feeds());
         self::assertSame(AdvisoryCoverage::NOT_FROM_COMPOSER_REPOSITORY, self::nameCoverage($scoped, 'acme/fork')->reason());
         self::assertNull(self::nameCoverage($scoped, 'acme/fork')->records());
         self::assertSame([AdvisoryCoverage::SCOPE_COMPOSER_REPOSITORIES, AdvisoryCoverage::SOURCE_CONFIG], [$scoped->coverage()->scope(), $scoped->coverage()->scopeSource()]);

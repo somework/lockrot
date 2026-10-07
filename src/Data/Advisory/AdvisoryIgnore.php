@@ -96,7 +96,7 @@ final class AdvisoryIgnore
     {
         $raw = $config->get('policy');
         if ($raw === false) {
-            return self::disabled(($config->raw()['config']['policy'] ?? true) === false ? 'policy' : 'COMPOSER_POLICY', false);
+            return self::disabled(($config->raw()['config']['policy'] ?? null) === false ? 'policy' : 'COMPOSER_POLICY', false);
         }
         $policy = \is_array($raw) ? $raw : [];
         if (($policy['advisories'] ?? null) === false) {
@@ -119,7 +119,7 @@ final class AdvisoryIgnore
             return self::none();
         }
         $ignore = \is_array($audit['ignore'] ?? null) ? self::idsAsComposerReadsThem($audit['ignore']) : [];
-        $ignoreSeverity = $severities && \is_array($audit['ignore-severity'] ?? null) ? array_fill_keys(array_map('strval', array_filter($audit['ignore-severity'], 'is_scalar')), null) : [];
+        $ignoreSeverity = $severities && \is_array($audit['ignore-severity'] ?? null) ? self::stringValues($audit['ignore-severity']) : [];
 
         return new self($ignore, $ignoreSeverity, false, null, null, false);
     }
@@ -134,7 +134,7 @@ final class AdvisoryIgnore
     private static function idsAsComposerReadsThem(array $list): array
     {
         if (array_values($list) === $list) {
-            return array_fill_keys(array_map('strval', array_filter($list, 'is_scalar')), null);
+            return self::stringValues($list);
         }
         $ids = [];
         foreach ($list as $key => $reason) {
@@ -142,6 +142,23 @@ final class AdvisoryIgnore
         }
 
         return $ids;
+    }
+
+    /**
+     * @param array<mixed> $list
+     *
+     * @return array<string, null>
+     */
+    private static function stringValues(array $list): array
+    {
+        $values = [];
+        foreach ($list as $value) {
+            if (\is_string($value)) {
+                $values[$value] = null;
+            }
+        }
+
+        return $values;
     }
 
     /**
