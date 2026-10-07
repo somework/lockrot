@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Lockrot\Verdict;
 
+use Lockrot\Security\Severity;
+
 /**
- * The score of one finding under {@see ScoreModel}, in integer half points: the lead maintenance flag in
- * full, a quarter of each other counted one, the highest-scoring counted advisory, reach halving
- * maintenance, packages-dev halving the whole, one floor at the end. Every quarter of a weight is
- * whole, so every value is on the half-point grid.
+ * The score of one finding under {@see ScoreModel}, in integer half points. The lead maintenance flag
+ * counts in full, and each other counted one adds a quarter. The highest-scoring counted advisory
+ * adds its points. Reach halves maintenance, and packages-dev halves the whole. The total is floored
+ * once. Every quarter of a weight is whole, so every value stays on the half-point grid.
  *
  * @internal
  *
@@ -57,7 +59,8 @@ final class Score
 
     /**
      * @param list<string>   $maintenance the counted maintenance flags, in any order
-     * @param list<Advisory> $advisories  the counted advisories
+     * @param list<Advisory> $advisories  the counted advisories. A severity is a Composer word: the
+     *                                    engine reads its bucket ({@see Severity::fromComposer()})
      *
      * @throws \InvalidArgumentException for a reach that is not direct, transitive or unreached
      */
@@ -66,6 +69,7 @@ final class Score
         if (!\in_array($reach, [self::DIRECT, self::TRANSITIVE, self::UNREACHED], true)) {
             throw new \InvalidArgumentException('not a reach: '.$reach);
         }
+        $advisories = array_map(static fn (array $advisory): array => array_merge($advisory, ['severity' => Severity::fromComposer($advisory['severity'])->bucket()]), $advisories);
         $terms = [];
         foreach (array_intersect(array_keys(ScoreModel::POINTS), $maintenance) as $flag) {
             $divisor = $terms === [] ? 1 : ScoreModel::CORROBORATING_DIVISOR;
@@ -169,7 +173,7 @@ final class Score
         return intdiv($this->exactHalves(), 2);
     }
 
-    /** The band of the total, null at 0. */
+    /** Null at 0. */
     public function grade(): ?string
     {
         return ScoreModel::band($this->total());

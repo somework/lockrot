@@ -2,15 +2,15 @@
 """The sweep row stream of score model 1, which the PHP sweep differential compares row by row.
 
 It walks every flag set x advisory set x dev combination, direct or transitive, and prints one row per evaluated score.
-Five axes:
+The axes:
 
-  base         every combination, direct or transitive (47,612 rows)
-  unreached    the unreached variant of each transitive row (23,806)
-  under        an abandoned row with a hidden silent or stale reading (35,712)
-  under_entry  the same, under an ignore[] entry that accepts the hidden word (35,712)
-  accepted     a base row with one of its flags accepted by an ignore[] entry (91,264)
+  base         every combination, direct or transitive
+  unreached    the unreached variant of each transitive row
+  under        an abandoned row with a hidden silent or stale reading
+  under_entry  the same, under an ignore[] entry that accepts the hidden word
+  accepted     a base row with one of its flags accepted by an ignore[] entry
 
-Row: 14 fields joined by `|`, in this order. No field can hold `|`, `,` or `:` other than as the separators below.
+Row: 14 fields joined by `|`, in this order. No field holds `|`, `,` or `:`, except as the separators of the list.
   1 axis
   2 flags        the maintenance flags in enumeration order (liveness word, pinned, left-behind, old-promise), joined by `,`
   3 advisories   `severity:fix_kind` per advisory, joined by `,` (ids are A0, A1 in that order)
@@ -35,9 +35,12 @@ uncompressed stream, never of the .gz, which differs between gzip builds. Standa
 """
 import hashlib
 import itertools
+import os
 import sys
 
-import model as M
+# Safe-path mode (python3 -I or -P) leaves the script's directory off sys.path.
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import model as M  # noqa: E402
 
 ARGS = sys.argv[1:]
 

@@ -7,10 +7,10 @@ namespace Lockrot\Verdict;
 use Lockrot\Security\Severity;
 
 /**
- * Score model 1: the weights, the bands, the severities, the fix kinds and the sixteen rules that turn
- * a finding's flags into a grade, and the self-describing `run.score_model` that a report publishes.
- * Weights are fixed per model, never configurable. A change to a number, a band floor or a rule
- * bumps {@see self::ID}.
+ * Score model 1: the weights, bands, severities and fix kinds, and the rules in {@see self::RULES}.
+ * They turn a finding's flags into a grade. {@see toArray()} writes the self-describing
+ * `run.score_model`. Weights are fixed per model, never configurable. A change to a number, a band
+ * floor or a rule bumps {@see self::ID}.
  *
  * @internal
  */
@@ -19,7 +19,6 @@ final class ScoreModel
     public const ID = 1;
     public const SCORE_TEXT_GRAMMAR = 1;
 
-    /** Lists, sums, pills, gates and the baseline cover read this order. */
     public const FLAG_ORDER = [FlagSet::ABANDONED, FlagSet::SILENT, FlagSet::PINNED, FlagSet::LEFT_BEHIND, FlagSet::OLD_PROMISE, FlagSet::STALE, FlagSet::VULNERABLE];
 
     /** The maintenance flags in flag order. Their points never increase along it. */
@@ -62,7 +61,7 @@ final class ScoreModel
         'security-exempt-from-reach', 'sum', 'divide-dev', 'floor-once', 'band-floors', 'zero-verdicts', 'sort', 'gate-bounded-new', 'baseline-cover',
     ];
 
-    /** The flag sets that lockrot's signals never raise together. */
+    /** The flag sets that lockrot's signals never raise together at the default thresholds. */
     private const EXCLUSIVE_GROUPS = [
         ['id' => 'liveness', 'flag_ids' => [FlagSet::ABANDONED, FlagSet::SILENT, FlagSet::STALE], 'holds_unless' => null],
         ['id' => 'branch', 'flag_ids' => [FlagSet::PINNED, FlagSet::LEFT_BEHIND], 'holds_unless' => null],
@@ -305,8 +304,8 @@ final class ScoreModel
     }
 
     /**
-     * The most a maintenance part with this lead can score, and the flag set that reaches it: every
-     * set of other flags that holds no exclusive group, the first set found winning a tie.
+     * The most that a maintenance part with this lead can score, and the flag set that reaches it. It
+     * tries every set of other flags that holds no exclusive group. On a tie, the first set wins.
      *
      * @return array{int, list<string>}
      */

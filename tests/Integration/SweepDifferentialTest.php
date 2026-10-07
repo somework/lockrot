@@ -10,8 +10,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * The sweep differential: PHP regenerates the enumeration of tools/score/sweep.py and prints each row
- * as the committed stream holds it. JSON and a hash alone would hide which row differs, so a
- * mismatch shows the first differing row and its neighbours. ScoreSweep names the command that
+ * as the committed stream holds it. JSON and a hash alone hide which row differs, so a mismatch shows
+ * the first differing row and its neighbours. ScoreSweep names the command that
  * regenerates the stream.
  */
 final class SweepDifferentialTest extends TestCase
