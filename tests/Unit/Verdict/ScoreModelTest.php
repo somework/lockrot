@@ -154,6 +154,13 @@ final class ScoreModelTest extends TestCase
         Score::compute(['stale'], [], 'indirect', false);
     }
 
+    public function testTheEngineRefusesAFixKindThatItDoesNotKnow(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('not a fix kind: patch');
+        Score::compute([], [Score::advisory('GHSA-a', 'high', 'patch')], 'direct', false);
+    }
+
     public function testTwoEqualAdvisoriesTieOnTheLowerId(): void
     {
         $score = Score::compute([], [['id' => 'GHSA-b', 'severity' => 'high', 'fix_kind' => 'update'], ['id' => 'GHSA-a', 'severity' => 'high', 'fix_kind' => 'update'], ['id' => 'GHSA-c', 'severity' => 'medium', 'fix_kind' => 'none']], 'direct', false);

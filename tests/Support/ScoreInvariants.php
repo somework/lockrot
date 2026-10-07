@@ -10,7 +10,8 @@ use Lockrot\Verdict\ScoreModel;
 
 /**
  * The invariants I0 to I17b of the structured basis, checked on one sweep input and its score object,
- * except I12b and I14 to I15b. ScoreInterpreterTest checks I12b: it derives every rerun again.
+ * except I14 to I15b. The accepted set comes from AllowlistEntry::accepts(). ScoreInterpreter keeps its
+ * own copy of the cover, because it reads only the decoded model.
  *
  * @phpstan-import-type Inputs from ScoreSweep
  * @phpstan-import-type Graded from ScoreBasis
@@ -106,10 +107,7 @@ final class ScoreInvariants
      */
     private static function reference(array $inputs): int
     {
-        $liveness = ['abandoned', 'silent', 'stale'];
-        $at = array_search($inputs['accepted'], $liveness, true);
-        $accepted = $inputs['accepted'] === null ? [] : ($at === false ? [$inputs['accepted']] : \array_slice($liveness, $at));
-        $counted = array_values(array_diff(array_intersect(array_keys(ScoreModel::POINTS), $inputs['flags']), $accepted));
+        $counted = self::counted($inputs, $inputs['flags']);
         $quarters = $counted === [] ? 0 : 3 * ScoreModel::POINTS[$counted[0]] + array_sum(array_map(static fn (string $f): int => ScoreModel::POINTS[$f], $counted));
         $security = 0;
         foreach ($inputs['advisories'] as [$severity, $fix]) {
@@ -217,6 +215,9 @@ final class ScoreInvariants
             $bad[] = 'I12 one flag row per term, in terms order';
         }
         foreach ($s['without'] as $w) {
+            if ($w['revealed'] !== self::revealed($inputs, $w['remove']['id'])) {
+                $bad[] = 'I12b revealed of row '.$w['remove']['id'];
+            }
             if ($w['total'] > $s['total'] || $w['at_least'] !== false || $w['verdict'] !== ScoreModel::band($w['total'])) {
                 $bad[] = 'I12 row '.$w['remove']['id'];
             }
@@ -226,6 +227,39 @@ final class ScoreInvariants
         }
 
         return $bad;
+    }
+
+    /**
+     * The hidden liveness word that a without[abandoned] row restores: `accepted` when the entry
+     * accepts it, else its role among the maintenance flags that count once `abandoned` is gone.
+     *
+     * @param Inputs $inputs
+     *
+     * @return list<array{flag: string, role: string}>
+     */
+    private static function revealed(array $inputs, string $removed): array
+    {
+        $word = $inputs['under'];
+        if ($removed !== 'abandoned' || $word === null) {
+            return [];
+        }
+        $counted = self::counted($inputs, array_merge(array_diff($inputs['flags'], ['abandoned']), [$word]));
+        $at = array_search($word, $counted, true);
+
+        return [['flag' => $word, 'role' => $at === false ? 'accepted' : ($at === 0 ? 'lead' : 'corroborating')]];
+    }
+
+    /**
+     * @param Inputs       $inputs
+     * @param list<string> $flags
+     *
+     * @return list<string> the maintenance flags of $flags that the row's entry does not accept, in flag order
+     */
+    private static function counted(array $inputs, array $flags): array
+    {
+        $entry = ScoreSweep::entry($inputs);
+
+        return array_values(array_filter(array_keys(ScoreModel::POINTS), static fn (string $f): bool => \in_array($f, $flags, true) && ($entry === null || !$entry->accepts($f))));
     }
 
     /**

@@ -9,6 +9,7 @@ use Lockrot\Score\ScoreBasis;
 use Lockrot\Signal\Signal;
 use Lockrot\Tests\Support\ScoreSweep;
 use Lockrot\Verdict\FlagSet;
+use Lockrot\Verdict\Score;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -307,6 +308,35 @@ final class ScoreBasisOracleTest extends TestCase
         yield 'without pinned, S8 unread' => [[['S6', 'high']], null, ['s8_unread' => true], 'pinned', true];
         yield 'without pinned, S8 read' => [[['S6', 'high']], null, [], 'pinned', false];
         yield 'without old-promise, S8 unread' => [[['S5', 'high']], null, ['s8_unread' => true, 'liveness_complete' => false], 'old-promise', false];
+    }
+
+    /**
+     * The band of the total, else the score-0 word of the condition: `finished` when the entry accepts
+     * the whole package or a fired flag, `unknown` when lockrot read no release metadata, else `ok`.
+     *
+     * @dataProvider verdicts
+     *
+     * @param list<array{string, string}> $signals
+     * @param list<string>|null           $entryFlags
+     */
+    #[DataProvider('verdicts')]
+    public function testAVerdictIsTheBandElseTheScoreZeroWordOfItsCondition(array $signals, bool $entry, ?array $entryFlags, bool $judged, string $verdict): void
+    {
+        $flags = FlagSet::fromSignals(self::signalsOf($signals), $entry ? new AllowlistEntry('a/b', null, 'kept', null, 'config', $entryFlags) : null, []);
+
+        self::assertSame($verdict, ScoreBasis::verdict(Score::of($flags, 'direct', false), $flags, $judged));
+    }
+
+    /** @return iterable<string, array{list<array{string, string}>, bool, list<string>|null, bool, string}> */
+    public static function verdicts(): iterable
+    {
+        yield 'graded, no release metadata' => [[['S6', 'high']], false, null, false, 'high'];
+        yield 'nothing fired' => [[], false, null, true, 'ok'];
+        yield 'nothing fired, no release metadata' => [[], false, null, false, 'unknown'];
+        yield 'the entry accepts a fired flag' => [[['S2', 'warn']], true, ['stale'], false, 'finished'];
+        yield 'the entry accepts the whole package' => [[], true, null, false, 'finished'];
+        yield 'the entry accepts every maintenance flag by name' => [[], true, ['abandoned', 'silent', 'pinned', 'left-behind', 'old-promise', 'stale'], true, 'finished'];
+        yield 'the entry accepts nothing that fired' => [[], true, ['pinned'], true, 'ok'];
     }
 
     /**

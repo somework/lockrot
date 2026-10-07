@@ -41,6 +41,7 @@
         "ext-openssl": "Lets lockrot.phar self-update verify release signatures; checked at runtime, the plugin itself never needs it"
     },
     "require-dev": {
+        "ext-zlib": "*",
         "composer/composer": "^2.2",
         "friendsofphp/php-cs-fixer": "^3.70",
         "nikic/php-parser": "^5.1",

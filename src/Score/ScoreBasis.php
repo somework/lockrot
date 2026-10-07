@@ -18,8 +18,8 @@ use Lockrot\Verdict\ScoreModel;
  *
  * @phpstan-type Context array{maintenance_judged: bool, advisories_complete: bool, liveness_complete: bool, s3_unread: bool, s8_unread: bool}
  * @phpstan-type Modifier array{reason: string, applies_to: string, divide_by: int, before: int|float, after: int|float}
- * @phpstan-type Accepted array{flag: string, weight: int, if_counted: array{total: int, verdict: ?string, role: ?string, at_least: bool, modifiers: list<Modifier>}}
- * @phpstan-type Without array{remove: array{kind: string, id: string}, revealed: list<array{flag: string, role: string}>, total: int, verdict: ?string, lead: ?string, deciding_advisory: ?string, at_least: bool}
+ * @phpstan-type Accepted array{flag: string, weight: int, if_counted: array{total: int, verdict: string, role: ?string, at_least: bool, modifiers: list<Modifier>}}
+ * @phpstan-type Without array{remove: array{kind: string, id: string}, revealed: list<array{flag: string, role: string}>, total: int, verdict: string, lead: ?string, deciding_advisory: ?string, at_least: bool}
  * @phpstan-type MaintenanceTerm array{part: 'maintenance', flag: string, role: string, weight: int, divisor: int, points: int, contribution: int|float}
  * @phpstan-type SecurityTerm array{part: 'security', flag: string, role: string, advisory: string, severity: string, fix_kind: string, weight: int, multiplier: int, points: int, contribution: int|float}
  * @phpstan-type Term MaintenanceTerm|SecurityTerm
@@ -52,6 +52,22 @@ final class ScoreBasis
     public static function of(FlagSet $flags, string $reach, bool $dev, array $context): self
     {
         return new self($flags, Score::of($flags, $reach, $dev), $context);
+    }
+
+    /**
+     * The band of the total, else the score-0 word: `finished` when the entry accepts the whole
+     * package or a fired flag, `unknown` when lockrot read no release metadata, else `ok`.
+     */
+    public static function verdict(Score $score, FlagSet $flags, bool $maintenanceJudged): string
+    {
+        if ($score->grade() !== null) {
+            return $score->grade();
+        }
+        if ($flags->accepted() !== [] || $flags->acceptSet() === array_keys(ScoreModel::POINTS)) {
+            return 'finished';
+        }
+
+        return $maintenanceJudged ? 'ok' : 'unknown';
     }
 
     /**
@@ -142,14 +158,15 @@ final class ScoreBasis
     {
         $rows = [];
         foreach ($this->flags->accepted() as $flag) {
-            $rerun = Score::of($this->flags->counting($flag), $this->score->reach(), $this->score->isDev());
+            $counting = $this->flags->counting($flag);
+            $rerun = Score::of($counting, $this->score->reach(), $this->score->isDev());
             $role = null;
             foreach ($rerun->maintenanceTerms() as $term) {
                 $role = $term['flag'] === $flag ? $term['role'] : $role;
             }
             $rows[] = ['flag' => $flag, 'weight' => ScoreModel::POINTS[$flag], 'if_counted' => [
                 'total' => $rerun->total(),
-                'verdict' => $rerun->grade(),
+                'verdict' => self::verdict($rerun, $counting, $this->context['maintenance_judged']),
                 'role' => $role,
                 'at_least' => $flag === FlagSet::STALE && (!$this->context['liveness_complete'] || $this->context['s3_unread']),
                 'modifiers' => self::modifiers($rerun),
@@ -201,7 +218,7 @@ final class ScoreBasis
             'remove' => ['kind' => $kind, 'id' => $id],
             'revealed' => array_map(static fn (string $flag): array => ['flag' => $flag, 'role' => $roles[$flag] ?? 'accepted'], $revealed),
             'total' => $rerun->total(),
-            'verdict' => $rerun->grade(),
+            'verdict' => self::verdict($rerun, $flags, $this->context['maintenance_judged']),
             'lead' => $rerun->lead(),
             'deciding_advisory' => $rerun->deciding()['id'] ?? null,
             'at_least' => $atLeast,

@@ -31,9 +31,6 @@ final class FlagSet
     public const MARKED = 'marked';
     public const ARCHIVED = 'archived';
 
-    /** An entry that lists a liveness word also accepts the words after it (rule `counted`). */
-    private const LIVENESS = [self::ABANDONED, self::SILENT, self::STALE];
-
     private const RAISES = [Signal::S5 => self::OLD_PROMISE, Signal::S6 => self::PINNED, Signal::S8 => self::LEFT_BEHIND];
 
     /** @var array<string, string> the level of each signal that fired, by id */
@@ -166,18 +163,6 @@ final class FlagSet
     /** @return list<string> */
     private static function acceptedBy(?AllowlistEntry $entry): array
     {
-        if ($entry === null) {
-            return [];
-        }
-        $listed = $entry->flags() ?? array_keys(ScoreModel::POINTS);
-        $accepted = $listed;
-        foreach ($listed as $flag) {
-            $at = array_search($flag, self::LIVENESS, true);
-            if ($at !== false) {
-                $accepted = array_merge($accepted, \array_slice(self::LIVENESS, $at));
-            }
-        }
-
-        return array_values(array_intersect(array_keys(ScoreModel::POINTS), $accepted));
+        return $entry === null ? [] : array_values(array_filter(array_keys(ScoreModel::POINTS), [$entry, 'accepts']));
     }
 }

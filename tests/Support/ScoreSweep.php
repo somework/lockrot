@@ -12,12 +12,8 @@ use Lockrot\Verdict\ScoreModel;
 
 /**
  * The sweep of score model 1 in PHP: the enumeration that tools/score/sweep.py walks, in its order, and
- * the canonical row of each evaluated score. tools/score/README.md documents the fields of the row.
- * tests/fixtures/score/sweep-rows.txt.gz holds the rows that sweep.py prints. Regenerate it with:
- *
- *     python3 tools/score/sweep.py > rows.txt
- *     sha256sum rows.txt | cut -d' ' -f1 > tests/fixtures/score/sweep-rows.txt.sha256
- *     gzip -9n < rows.txt > tests/fixtures/score/sweep-rows.txt.gz
+ * the canonical row of each evaluated score. tools/score/README.md documents the row and the commands
+ * that write tests/fixtures/score/sweep-rows.txt.gz.
  *
  * @phpstan-import-type Graded from ScoreBasis
  * @phpstan-import-type Zero from ScoreBasis
@@ -37,6 +33,9 @@ final class ScoreSweep
 
     /** The context of every sweep row: maintenance judged, a complete advisory lookup, both liveness signals read. */
     public const CONTEXT = ['maintenance_judged' => true, 'advisories_complete' => true, 'liveness_complete' => true, 's3_unread' => false, 's8_unread' => false];
+
+    /** @var array<string, string>|null several tests read the sample: decompress the golden once per process */
+    private static ?array $sample = null;
 
     /**
      * Every input of the sweep, in the order of tools/score/sweep.py.
@@ -131,9 +130,18 @@ final class ScoreSweep
         if ($inputs['under'] !== null) {
             $signals = array_merge($signals, self::signalsOf($inputs['under']));
         }
-        $entry = $inputs['accepted'] === null ? null : new AllowlistEntry('acme/package', null, 'the sweep accepts it', null, 'project', [$inputs['accepted']]);
 
-        return FlagSet::fromSignals($signals, $entry, self::advisories($inputs['advisories']));
+        return FlagSet::fromSignals($signals, self::entry($inputs), self::advisories($inputs['advisories']));
+    }
+
+    /**
+     * The `ignore[]` entry of a row: it lists the accepted flag, or there is none.
+     *
+     * @param Inputs $inputs
+     */
+    public static function entry(array $inputs): ?AllowlistEntry
+    {
+        return $inputs['accepted'] === null ? null : new AllowlistEntry('acme/package', null, 'the sweep accepts it', null, 'project', [$inputs['accepted']]);
     }
 
     /**
@@ -289,6 +297,9 @@ final class ScoreSweep
      */
     public static function sample(): array
     {
+        if (self::$sample !== null) {
+            return self::$sample;
+        }
         $seen = [];
         $rows = [];
         foreach (self::golden() as $row) {
@@ -299,7 +310,7 @@ final class ScoreSweep
             }
         }
 
-        return $rows;
+        return self::$sample = $rows;
     }
 
     /** @param mixed $value an exact, a contribution, a before or an after: a multiple of 0.5 */
