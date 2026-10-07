@@ -64,19 +64,19 @@ final class LockrotConfigTest extends TestCase
      * @dataProvider invalidAdvisoryLookups
      */
     #[DataProvider('invalidAdvisoryLookups')]
-    public function testAnAdvisoryLookupOutsideBothValuesNamesThem($value): void
+    public function testAnAdvisoryLookupOutsideBothValuesNamesThem($value, string $message): void
     {
         $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage('advisory-lookup must be one of all, composer-repositories; got ');
+        $this->expectExceptionMessage($message);
         LockrotConfig::fromSources(['advisory-lookup' => $value], [], [], '8.5.10', null);
     }
 
-    /** @return iterable<string, array{mixed}> */
+    /** @return iterable<string, array{mixed, string}> */
     public static function invalidAdvisoryLookups(): iterable
     {
-        yield 'the underscore spelling' => ['composer_repositories'];
-        yield 'an empty string' => [''];
-        yield 'not a string' => [true];
+        yield 'the underscore spelling' => ['composer_repositories', 'advisory-lookup must be one of all, composer-repositories; got "composer_repositories"'];
+        yield 'an empty string' => ['', 'advisory-lookup must be one of all, composer-repositories; got ""'];
+        yield 'not a string' => [true, 'advisory-lookup must be one of all, composer-repositories; got true'];
     }
 
     public function testBaselinePathFromExtraAndCliWithCliWinning(): void

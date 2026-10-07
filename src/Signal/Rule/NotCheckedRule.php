@@ -79,8 +79,10 @@ final class NotCheckedRule implements SignalRule
                 $kept[] = $signal;
                 continue;
             }
+            /** @var list<array{check: string, reason: string, blocks: list<string>}> $unchecked {@see signalOf()} writes it */
+            $unchecked = $signal->data()['unchecked'];
             $entries = [];
-            foreach (self::entries($signal) as $entry) {
+            foreach ($unchecked as $entry) {
                 if (!\in_array($entry['check'], self::MAINTENANCE_CHECKS, true)) {
                     $entries[] = $entry;
                 }
@@ -92,20 +94,6 @@ final class NotCheckedRule implements SignalRule
         }
 
         return $kept;
-    }
-
-    /** @return list<array{check: string, reason: string, blocks: list<string>}> */
-    private static function entries(Signal $signal): array
-    {
-        $entries = [];
-        $unchecked = $signal->data()['unchecked'] ?? [];
-        foreach (\is_array($unchecked) ? $unchecked : [] as $entry) {
-            if (\is_array($entry) && \is_string($entry['check'] ?? null) && \is_string($entry['reason'] ?? null) && \is_array($entry['blocks'] ?? null)) {
-                $entries[] = ['check' => $entry['check'], 'reason' => $entry['reason'], 'blocks' => array_values(array_filter($entry['blocks'], 'is_string'))];
-            }
-        }
-
-        return $entries;
     }
 
     /** @param list<array{check: string, reason: string, blocks: list<string>}> $unchecked */
