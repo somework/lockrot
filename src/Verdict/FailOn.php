@@ -10,6 +10,7 @@ use Lockrot\Signal\Signal;
 /**
  * The accepted values: docs/configuration.md#fail-on-values. The verdict and priority vocabularies
  * must not overlap, because one option serves both. The priority `none` is not a threshold.
+ * {@see \Lockrot\Config\Gate::decide()}, not this class, exempts a finding that the baseline accepted.
  *
  * @internal
  */

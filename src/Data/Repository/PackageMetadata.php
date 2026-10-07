@@ -340,7 +340,7 @@ final class PackageMetadata
      * date takes the parent's entry for the same branch and names the parent under `dated_by`. The
      * last release and the per-release dates ({@see releaseDateOf()}) follow. A branch that the
      * parent does not date stays as it was, and a package that the parent does not replace comes
-     * back unchanged. Immutable: it returns a new object. See docs/verdicts.md#dates-from-the-monorepo.
+     * back unchanged. Immutable: this object stays unchanged. See docs/verdicts.md#dates-from-the-monorepo.
      */
     public function datedBy(self $parent): self
     {

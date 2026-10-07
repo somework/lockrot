@@ -117,10 +117,9 @@ final class ExplainFormatter
     }
 
     /**
-     * Scalars are joined as `key value` on one line, the advisory list (S9) takes one line per
-     * advisory, and anything else is JSON. S6 skips a null value: its release facts are null
-     * when unknown or not applicable, and they bury the facts a reader wants
-     * (docs/verdicts.md#what-s6-carries). S9 skips `releases_read`. The JSON carries every key.
+     * S6 skips a null value: its release facts are null when unknown or not applicable, and they
+     * bury the facts a reader wants (docs/verdicts.md#what-s6-carries). S9 skips `releases_read`.
+     * The JSON carries every key.
      *
      * @return list<string>
      */

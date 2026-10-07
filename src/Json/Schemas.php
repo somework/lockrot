@@ -10,7 +10,7 @@ namespace Lockrot\Json;
  * ({@see \Lockrot\Output\JsonFormatter::SCHEMA}, {@see \Lockrot\Baseline\Baseline::SCHEMA}), and
  * each number ships as its own file ({@see path()}) whose `id` is the same URL. The number and the
  * open sets: docs/schema.md#the-number-and-what-may-change-under-it and docs/schema.md#open-sets.
- * The sets are read strictly by {@see KnownValues}.
+ * {@see KnownValues} gives the strict reading that lockrot uses to validate `extra.lockrot`.
  *
  * @internal
  */
@@ -25,7 +25,7 @@ final class Schemas
 
     /**
      * The numbers that lockrot ships a schema file for, per document. A number stays once its file
-     * has shipped.
+     * has shipped: a document written under it validates against that file.
      */
     private const NUMBERS = [
         self::REPORT => [1],

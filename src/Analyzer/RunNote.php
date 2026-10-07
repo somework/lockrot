@@ -33,8 +33,7 @@ final class RunNote
     public const NOT_FROM_COMPOSER_REPOSITORY = 'not_from_composer_repository';
     /**
      * The codes that lockrot writes, as the schemas list them in `x-known-values`, in the order of
-     * the analyzer's passes. A report keeps the activity notes of one repository host together, so
-     * the codes of two hosts interleave.
+     * the analyzer's passes. In a report, the notes of two repository hosts can interleave.
      */
     public const CODES = [
         self::OFFLINE,
@@ -106,8 +105,8 @@ final class RunNote
     }
 
     /**
-     * One count per distinct message, in package order. With a single message, the sentence omits its
-     * count.
+     * One count per distinct message, in package order. With a single message, the text omits the
+     * per-message count.
      *
      * @param array<string, string> $failed package name => the message {@see \Lockrot\Data\Repository\MetadataBatch::failed()} gives
      */

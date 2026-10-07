@@ -102,8 +102,8 @@ final class AgeMeasure
 
     /**
      * The newest dated stable release on the installed version's branch ({@see ReleaseBranch}):
-     * the release S8 judges. A branch whose highest tag is undated, or an installed version above
-     * every listed tag, has no reading. See docs/verdicts.md#left-behind.
+     * the release S8 judges. An undated highest tag hides how much newer the branch's last release
+     * is, so that branch has no reading, and neither has an installed version above every listed tag. See docs/verdicts.md#left-behind.
      *
      * @param ?string $metadataStatus as for {@see release()}
      */

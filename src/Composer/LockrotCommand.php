@@ -57,7 +57,7 @@ final class LockrotCommand extends BaseCommand
     private $analyzerFactory;
 
     /**
-     * A failure of initialize(), rethrown in execute() so that its catch blocks choose the line and
+     * A failure before parent::initialize(), rethrown in execute() so that its catch blocks choose the line and
      * the exit code.
      */
     private ?\Throwable $bootstrapError = null;
@@ -397,9 +397,9 @@ final class LockrotCommand extends BaseCommand
     /**
      * The files that an `--output` must not name, besides each composer.json and composer.lock that
      * {@see ReportTargets} refuses by name: docs/configuration.md#writing-reports-to-files.
-     * The order sets the reason that a refusal prints: without `COMPOSER`, the composer.json and
-     * composer.lock of the working directory come before the `COMPOSER` pair. A path entry also
-     * catches a second name of the file on disk, which a refusal by name misses.
+     * The order sets the reason that a refusal prints: the working directory's composer.json and
+     * composer.lock come before the pair that `COMPOSER` names, so without `COMPOSER` they keep the
+     * plain reason. A path entry also catches a second name of the file on disk.
      *
      * @return list<array{0: string, 1: string}> path, reason
      */

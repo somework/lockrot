@@ -406,9 +406,9 @@ final class Analyzer
     }
 
     /**
-     * The offline and budget reasons state why the metadata is missing, so a prefix reads
-     * "Repository metadata unavailable: offline: ...". Every other reason is a bare message that
-     * needs the prefix to make sense on a finding.
+     * The offline and budget reasons state why the metadata is missing, so they get no prefix: with
+     * it they read "Repository metadata unavailable: offline: ...". Every other reason is a bare
+     * message that needs the prefix to make sense on a finding.
      */
     private function metadataFailureNote(string $reason): string
     {

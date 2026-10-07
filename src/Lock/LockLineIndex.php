@@ -12,7 +12,7 @@ use Lockrot\Exception\ConfigException;
  * accepts a `"name"` member only at depth 3 inside `packages` or `packages-dev`, because `authors[]`
  * and `extra.thanks.name` hold other names. The depth does not depend on indentation, so a
  * reformatted lock still resolves. A `"name"` member that does not stand alone on its line, as in a
- * minified lock, yields no line, and the formats then omit the line number.
+ * minified lock, yields no line: {@see lineOf()} returns null.
  *
  * @internal
  */

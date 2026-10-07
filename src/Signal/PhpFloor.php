@@ -13,9 +13,7 @@ use Lockrot\Data\Php\PhpReleaseDates;
 /**
  * The PHP that a release branch must admit before the project can move onto it: the project's own
  * `require.php` and the target PHP. Composer enforces only the target. The project's floor is a
- * promise that its maintainers keep. {@see \Lockrot\Signal\Rule\LeftBehindRule} holds the branch
- * it names to both, and {@see \Lockrot\Explain\Explanation::toArray()} shows every branch's answer.
- * See docs/verdicts.md#within-reach.
+ * promise that its maintainers keep. See docs/verdicts.md#within-reach.
  *
  * @internal
  */
@@ -145,6 +143,7 @@ final class PhpFloor
     }
 
     /**
+     * Correct only for a $php that admits none of $floor: an admitting $php can read as `skips`.
      * The floor is the target minor (`>=8.4.0.0-dev <8.5.0.0-dev`) or the project's point
      * (`== 8.2.0.0-dev`). Both include their lower bound, and only the target excludes its upper
      * bound.

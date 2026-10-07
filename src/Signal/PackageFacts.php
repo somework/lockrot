@@ -20,7 +20,7 @@ final class PackageFacts
     private ?string $activityNotChecked;
 
     /**
-     * @param list<Advisory> $advisories
+     * @param list<Advisory> $advisories         only those that affect the installed version: S9 does not filter them
      * @param ?string        $activityNotChecked why the repository was never asked about, null when it was
      *                                           ({@see \Lockrot\Analyzer\Analyzer::activityNotCheckedReasons()}).
      *                                           An answer of "no such repository" is a check that ran.

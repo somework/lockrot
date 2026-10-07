@@ -56,11 +56,11 @@ final class ReleaseSignatureVerifier implements SignatureVerifierInterface
 
     /**
      * The DER is the base64 between the armour lines, so the release workflow computes the same
-     * value without openssl. lockrot reads only a `PUBLIC KEY` block: an `RSA PUBLIC KEY` block
-     * holds the same key in PKCS#1, whose hash differs and mismatches every description in silence.
-     * With openssl present the key must also load, so a damaged key is an error and not a
-     * fingerprint that no release names. Without openssl, `--check` still gets its fingerprint.
-     * base64_decode() skips the line breaks of the block even in strict mode.
+     * value without openssl. base64_decode() skips the line breaks of the block even in strict mode.
+     * lockrot reads only a `PUBLIC KEY` block: an `RSA PUBLIC KEY` block holds the same key in
+     * PKCS#1, whose hash differs and mismatches every description in silence. With openssl present
+     * the key must also load, so a damaged key is an error and not a fingerprint that no release
+     * names. Without openssl, `--check` still gets its fingerprint.
      */
     public function keyFingerprint(): string
     {

@@ -116,8 +116,7 @@ final class LockedPackage
         return $this->requires;
     }
     /**
-     * The lock entry's `source` URL, else its `support.source` reduced to the repository. It is the
-     * fallback for {@see \Lockrot\Data\Repository\PackageMetadata::repositoryUrl()}.
+     * The lock entry's `source` URL, else its `support.source` reduced to the repository.
      */
     public function repositoryUrl(): ?string
     {

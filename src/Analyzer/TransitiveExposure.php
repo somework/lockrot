@@ -24,8 +24,8 @@ final class TransitiveExposure
     /**
      * A flagged transitive package reached from more direct requirements than this is shared
      * infrastructure, such as a framework's contracts reached from every bundle, and counts under
-     * no parent: docs/verdicts.md#shared-packages-and-unattributed. The JSON document states the
-     * cap as `exposure_rule.max_fan_in`.
+     * no parent: docs/verdicts.md#shared-packages-and-unattributed. Keep the cap in the gap between
+     * the fan-in of an ordinary flagged package and that of shared infrastructure.
      */
     public const MAX_FAN_IN = 8;
 

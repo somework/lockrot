@@ -54,7 +54,7 @@ final class FormatContext
      * @param null|string $lockPath         absolute path of the analysed lock, null when unknown
      * @param string      $failOn           one of {@see FailOn::allowed()}
      * @param int         $terminalWidth    columns for `table`, raised to MIN_WIDTH when lower
-     * @param null|string $projectDirectory absolute path that {@see lockName()} is relative to
+     * @param null|string $projectDirectory absolute path of the directory lockrot runs in, null when unknown
      */
     public static function create(?string $lockPath, string $failOn, string $toolVersion = Version::STRING, int $terminalWidth = self::DEFAULT_WIDTH, ?string $projectDirectory = null): self
     {
@@ -86,7 +86,7 @@ final class FormatContext
         return $this->lockName;
     }
 
-    /** The directory that {@see lockName()} is relative to, spelled as given. */
+    /** The directory that {@see lockName()} is relative to, spelled as given. Null when no lock is known. */
     public function lockDirectory(): ?string
     {
         return $this->lockDirectory;

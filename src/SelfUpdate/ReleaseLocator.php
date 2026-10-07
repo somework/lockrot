@@ -28,7 +28,7 @@ final class ReleaseLocator
     public const DEFAULT_URL = 'https://api.github.com/repos/somework/lockrot/releases?per_page=100';
     /** The page size that DEFAULT_URL asks for: a page with fewer entries is the last one. */
     public const PER_PAGE = 100;
-    /** A bound on the list, whatever GitHub answers. */
+    /** A bound on the list, whatever GitHub answers: MAX_PAGES pages reach far past any update. */
     public const MAX_PAGES = 10;
     public const PHAR_ASSET = 'lockrot.phar';
     public const CHECKSUM_ASSET = 'lockrot.phar.sha256';
@@ -85,7 +85,7 @@ final class ReleaseLocator
      * Walks the releases newest first and returns the first one that can be installed, or null when
      * the build is current in its line. Each release passed over leaves a note ({@see notes()}).
      * With $force, the newest release at or below the running version is also a candidate, in the
-     * running major only: an unsigned description can lie and must not walk a reinstall further
+     * running major only. An unsigned description can lie and must not walk a reinstall further
      * down. With $allowMajor, the lowest higher major with a stable release is also a candidate.
      *
      * @return ?Release the release to install, null when none is newer
@@ -146,8 +146,8 @@ final class ReleaseLocator
      * Ends a walk that found nothing to install. That means "current in its line" unless this
      * throws.
      *
-     * @param bool $stranded a release that the walk can take is signed with a key this archive does
-     *                       not carry
+     * @param bool $stranded a newer release that passes every other rule is signed with a key that
+     *                       this archive does not carry
      *
      * @throws ConfigException
      */
