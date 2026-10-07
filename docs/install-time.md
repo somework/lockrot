@@ -138,9 +138,8 @@ any package operation runs, and Composer exits `1`. [Choosing `--fail-on`](ci.md
   verdict is worse than the baseline recorded. The block lists both kinds.
 - A gap in what the run could see stops the install only through `fail-on: unchecked`, which
   matches every finding that carries S10 ([what was not checked](verdicts.md#what-was-not-checked)).
-  Such a finding can be `ok` and missing from the block. Advisory
-  gaps and `metadata_unavailable` do not stop the install on their own, and `--strict-network` has
-  no install-time counterpart.
+  Such a finding can be `ok` and missing from the block. Advisory gaps and `metadata_unavailable` do
+  not stop the install on their own, and `--strict-network` has no install-time counterpart.
 - lockrot never stops a `--dry-run`, since no operation is about to run.
 
 A stopped `composer require` or `composer update` leaves `composer.lock` updated (and, for

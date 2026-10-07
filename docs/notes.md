@@ -102,7 +102,7 @@ Composer 2.10 or newer rejected the project's advisory policy (`config.policy`, 
 as its fallback), so lockrot ignores no advisory.
 
 - `data`: `message`, the first line of what Composer said. It can be empty.
-- Findings: an advisory that the policy ignores also raises the priority.
+- Findings: advisories that the policy would ignore also raise the priority.
 - `sets_network_failures`: no.
 
 ### Advisories unavailable {#advisories_unavailable}
