@@ -124,7 +124,8 @@ jobs:
         continue-on-error: true
         env: {GH_TOKEN: '${{ secrets.SITE_DISPATCH_TOKEN }}'}
         run: gh api repos/somework/lockrot.dev/dispatches -f event_type=lockrot-release
-  # The PHAR is built on PHP 8.4 but must run on the plugin's floor; run it once on PHP 7.4.
+  # The phar job builds on PHP 8.4, and the archive must run on the floor of the plugin. This job runs
+  # it once on PHP 7.4.
   smoke-php74:
     needs: phar
     runs-on: ubuntu-latest

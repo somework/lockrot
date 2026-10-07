@@ -20,7 +20,7 @@
     // tests/infection-equivalents.md gives the reason that each tolerated escape is equivalent.
     // The floor is the whole-tree MSI rounded down, minus one. A few new escapes then do not fail
     // the gate, and the floor does not move with each new test.
-    // Evidence: https://github.com/somework/lockrot/commit/71d0e6e81cdaea30048807b86673f6b97a887b57
+    // Evidence: https://github.com/somework/lockrot/commit/05655c2a7a5f7b3189f45fcee13607f2b2cbeaa7
     "minMsi": 97,
     "minCoveredMsi": 97
 }

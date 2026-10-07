@@ -205,7 +205,7 @@ reviews:
     # follow, and they are the loudest voice in every review.
     ruff:
       enabled: false
-    # The prose here is hand-wrapped, and mkdocs build --strict is the linter that CI runs on it.
+    # The Markdown is hand-wrapped. mkdocs build --strict in CI checks docs/.
     markdownlint:
       enabled: false
     languagetool:
