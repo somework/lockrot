@@ -1117,6 +1117,7 @@
             },
             "require-dev": {
                 "composer/composer": "^2.2",
+                "ext-zlib": "*",
                 "friendsofphp/php-cs-fixer": "^3.70",
                 "nikic/php-parser": "^5.1",
                 "phpstan/phpstan": "^2.1",
