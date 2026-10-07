@@ -138,7 +138,7 @@ final class NotCheckedRuleTest extends TestCase
 
     public function testAPackageWithoutMetadataIsNotToldItsAgeWasNotRead(): void
     {
-        // Nothing is known about it at all, which is what `unknown` says. The run's notes carry why.
+        // Its activity is dated, but without its metadata the verdict is `unknown`, which says that already. The run's notes carry why.
         $signal = $this->rule()->evaluate(new PackageFacts(F::package(), null, F::activity(false, '2026-09-01T00:00:00+00:00'), []));
 
         self::assertNull($signal);

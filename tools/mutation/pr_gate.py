@@ -91,8 +91,9 @@ class Source:
 
     def keys(self, path: str, mutator: str, line: int, text: str, methods: Tuple[str, ...] = ()) -> List[Key]:
         """The one key a mutant answers to: the line's text when it is unique in the file, else the
-        enclosing method. Never both: the method would let one documented mutant cover another line.
-        An entry has no line: of the methods that hold its text, it takes the one its reason opens with."""
+        enclosing method with the text. Never the method alone: it would let one documented mutant
+        cover another line. An entry has no line: of the methods that hold its text, it takes the one
+        its reason opens with."""
         occurrences = [n for n, candidate in enumerate(self.lines(path), 1) if normalise(candidate) == text]
         if text and len(occurrences) == 1:
             return [(path, mutator, 'text:' + text)]
@@ -100,7 +101,7 @@ class Source:
             method = self.method(path, line)
         else:
             method = next((m for m in (self.method(path, n) for n in occurrences) if m in methods), '')
-        return [(path, mutator, 'method:' + method)] if method else []
+        return [(path, mutator, 'method:' + method + ' text:' + text)] if method else []
 
 
 def entries(markdown: str) -> List[str]:
