@@ -974,11 +974,7 @@ final class InstallTimeSummaryTest extends TestCase
         $io = new BufferIO();
         $event = $this->event($io, new Transaction([], [$this->loadPackage(self::PHPZIP)]));
 
-        $remaining = $this->remainingAtHandOver($event);
-
-        self::assertNotNull($remaining);
-        self::assertGreaterThan(0.0, $remaining);
-        self::assertLessThanOrEqual(1.0, $remaining);
+        self::assertSame(1.0, $this->remainingAtHandOver($event));
     }
 
     public function testInstallTimeBudgetDefaultsToFiveSeconds(): void
@@ -987,11 +983,7 @@ final class InstallTimeSummaryTest extends TestCase
         $io = new BufferIO();
         $event = $this->event($io, new Transaction([], [$this->loadPackage(self::PHPZIP)]));
 
-        $remaining = $this->remainingAtHandOver($event);
-
-        self::assertNotNull($remaining);
-        self::assertGreaterThan(4.0, $remaining);
-        self::assertLessThanOrEqual(5.0, $remaining);
+        self::assertSame(5.0, $this->remainingAtHandOver($event));
     }
 
     private ?float $remainingAtHandOver = null;
@@ -999,7 +991,8 @@ final class InstallTimeSummaryTest extends TestCase
     /** The seconds the deadline has left when the factory gets it, read before the analysis runs. */
     private function remainingAtHandOver(InstallerEvent $event): ?float
     {
-        (new InstallTimeSummary(\Closure::fromCallable([$this, 'recordingAnalyzerFactory'])))->onPreOperationsExec($event);
+        $monotonicNow = static fn (): float => 1000.0;
+        (new InstallTimeSummary(\Closure::fromCallable([$this, 'recordingAnalyzerFactory']), $monotonicNow))->onPreOperationsExec($event);
 
         return $this->remainingAtHandOver;
     }
