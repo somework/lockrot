@@ -184,7 +184,7 @@ If no branch that releases is within reach, S8's clause ends `no releasing branc
 and suggests nothing: the way forward is a PHP upgrade. The verdict stays `left-behind`.
 `report-1.json` types S8's `data`, `suggested_constraint` included
 ([Signal data](schema.md#signal-data)). The report's `run` carries
-the two floors as `target_php` and `project_php`.
+the target PHP as `target_php`, and the project's `require.php` constraint as `project_php`.
 
 #### The PHP test in `--explain` {#the-php-test-in-explain}
 

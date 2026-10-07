@@ -267,9 +267,9 @@ The exit `2` causes include:
 - the chosen release lacks an asset, or its release metadata cannot be read
 - a checksum mismatch, a signature that does not verify, a PHP whose openssl extension is missing
   or has no SHA-384, or a download PHP cannot open
-- an archive stranded by a key rotation, under `--check` too: the archive does not carry the key of
-  a newer release that it can take, in the running major version (or the next one with
-  `--allow-major`), and `self-update` finds no other release to install
+- an archive stranded by a key rotation, under `--check` too: a key that the archive does not carry
+  is all that holds back a newer release in the running major version (or the next one with
+  `--allow-major`), and `self-update` finds no release to install
 - an unwritable PHAR directory, or a file that cannot be written or moved beside the PHAR
 - `--force` when the newest release at or below the running version, in its major version, is
   missing or held back

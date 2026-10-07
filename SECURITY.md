@@ -158,8 +158,8 @@ The self-update key:
   The archive installs the transition release and verifies with the new key from then on. The
   transition release's changelog names the new fingerprint.
 
-- An archive is stranded when a newer release that it can take is signed with a key that the
-  archive does not carry, and `self-update` finds no release to install. The transition release can
+- An archive is stranded when a key that the archive does not carry is all that holds back a newer
+  release, and `self-update` finds no release to install. The transition release can
   be missing, pulled or need a newer PHP. `self-update` and `self-update --check` exit `2` and say
   so. Reinstall the archive [by hand](docs/phar.md#reinstalling-by-hand).
 
