@@ -139,7 +139,7 @@ final class AnalyzerSplitPackagesTest extends TestCase
     }
 
     /**
-     * The activity stage adds its own notes (no GitHub token here).
+     * The notes about repository metadata. The activity stage adds its own (no GitHub token here).
      *
      * @return list<string>
      */

@@ -47,7 +47,7 @@ final class JsonReaderTest extends TestCase
      */
     public function testUnreadableFileThrows(): void
     {
-        // Infection's include interceptor reports a mode-0000 file as missing: the UnreadableFiles test covers the branch there.
+        // Infection's include interceptor reads a mode-0000 file as missing: testAFileThatExistsAndCannotBeReadIsRefused covers this branch.
         if (getenv('INFECTION') === '1') {
             self::markTestSkipped('a mode-0000 file reads as missing under Infection');
         }

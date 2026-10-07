@@ -94,7 +94,8 @@ final class JsonSchemaConformanceTest extends TestCase
     {
         $lockFiles = array_map(static fn (string $dir): string => self::FIXTURES.$dir.'/composer.lock', self::DIRS);
         self::$server = FixtureRepositoryServer::fromLockFiles($lockFiles);
-        // S9 needs an advisory on an installed version: doctrine/cache 2.2.0 is in wallabag's lock.
+        // S9 needs an advisory on an installed version: the range covers the doctrine/cache version in
+        // wallabag's lock.
         self::$server->withSecurityAdvisories([
             'doctrine/cache' => [[
                 'advisoryId' => 'PKSA-cache-1',
@@ -661,7 +662,7 @@ final class JsonSchemaConformanceTest extends TestCase
             'a release with no tag in its repository' => ['reason' => 'no_stable_release'],
             'no metadata, so nothing known' => ['has_stable_release' => null],
             'a tagged snapshot' => ['has_stable_release' => true, 'last_stable_release' => '2019-01-23T15:23:04+00:00', 'last_stable_version' => '1.6.2', 'last_stable_dated_by' => 'vendor/monorepo'],
-            'a document written before 0.13.0' => array_fill_keys(['reason', 'has_stable_release', 'last_stable_release', 'last_stable_version', 'last_stable_dated_by', 'snapshot_time'], self::ABSENT),
+            'a document without the S6 keys' => array_fill_keys(['reason', 'has_stable_release', 'last_stable_release', 'last_stable_version', 'last_stable_dated_by', 'snapshot_time'], self::ABSENT),
         ];
         foreach ($valid as $what => $change) {
             $document = self::withRulerzS6($json, $change);
@@ -685,7 +686,8 @@ final class JsonSchemaConformanceTest extends TestCase
 
     /**
      * `from_composer_repository` is a boolean on every finding lockrot writes, and optional in both
-     * schemas, so a finding without it still validates. Null and a word do not.
+     * schemas, so a finding that an earlier release wrote without it still validates. Null and a word
+     * do not.
      */
     public function testAFindingSaysWhetherARepositoryWasAskedAboutItAsABoolean(): void
     {
@@ -706,7 +708,7 @@ final class JsonSchemaConformanceTest extends TestCase
     /**
      * `libyears_unmeasured` is an open set in both schemas: a reason a later release adds, and null,
      * validate against the published schema, and the strict twin holds the value to the reasons this
-     * release writes. A finding without the key validates against both.
+     * release writes. A finding that an earlier release wrote without the key validates against both.
      */
     public function testAFindingSaysWhyItsLibyearsAreNullAsAnOpenCode(): void
     {
@@ -773,7 +775,8 @@ final class JsonSchemaConformanceTest extends TestCase
     /**
      * `priority_basis` in both schemas: a step reason that a later release adds validates against the
      * published schema, and the strict twin holds the reason to the ones this release writes. `none`
-     * is no step's `from` or `to` in either. A finding without the key validates against both.
+     * is no step's `from` or `to` in either. A finding that an earlier release wrote without the key
+     * validates against both.
      */
     public function testAFindingSaysHowItsPriorityWasReached(): void
     {
@@ -813,7 +816,8 @@ final class JsonSchemaConformanceTest extends TestCase
     /**
      * `no_fix_expected` in both schemas: null, an empty list and a list of `{id, reason}` validate.
      * A no-fix reason that a later release adds passes the published schema, and the strict twin
-     * rejects a typo in one. A finding without the key validates against both.
+     * rejects a typo in one. A finding that an earlier release wrote without the key validates against
+     * both.
      */
     public function testAFindingNamesTheAdvisoriesNoFixIsExpectedFor(): void
     {
@@ -888,7 +892,8 @@ final class JsonSchemaConformanceTest extends TestCase
      * The gate's inputs in `run`, the root `gate` and each finding's `gate`: four open vocabularies
      * (`run.mode`, `run.fail_on_kind`, `gate.tripped_by`'s items, a finding's `gate.exempt_by`) take
      * a value that a later release adds, and the strict twin holds each to the values this release
-     * writes. A cause listed twice fails. A document without the fields validates against both.
+     * writes. A cause listed twice fails. A document that an earlier release wrote
+     * without the fields validates against both.
      */
     public function testTheGateAndWhatItWasToldAreTypedAndTheirVocabulariesOpen(): void
     {
@@ -1266,8 +1271,8 @@ final class JsonSchemaConformanceTest extends TestCase
     /**
      * A lock-only run: lockrot needs no composer.json ({@see ProjectConfig::fromFile()}), and
      * without one there are no direct requirements, so nothing reaches any package and every
-     * finding carries an empty chain. wallabag's lock has 200 of them, and the document has to
-     * validate all the same — the published schema cannot demand a chain the run cannot have.
+     * finding carries an empty chain. The document must validate all the same: the published schema
+     * cannot demand a chain the run cannot have.
      */
     public function testALockWithoutItsComposerJsonValidates(): void
     {
@@ -1438,7 +1443,7 @@ final class JsonSchemaConformanceTest extends TestCase
     {
         $rows = NegativeFixtures::rows(self::NEGATIVE);
 
-        return $rows === [] ? ['(none yet)' => ['']] : $rows;
+        return $rows === [] ? ['(no fixture)' => ['']] : $rows;
     }
 
     /**
@@ -1448,7 +1453,7 @@ final class JsonSchemaConformanceTest extends TestCase
     public function testEveryNegativeFixtureIsRejectedWithTheErrorItNames(string $path): void
     {
         if ($path === '') {
-            self::assertSame(['.gitkeep'], array_values(array_diff(scandir(self::NEGATIVE) ?: [], ['.', '..'])), 'no negative fixture yet');
+            self::assertSame(['.gitkeep'], array_values(array_diff(scandir(self::NEGATIVE) ?: [], ['.', '..'])), 'the directory holds only its .gitkeep');
 
             return;
         }

@@ -368,8 +368,8 @@ final class PharTest extends TestCase
 
     /**
      * A real PHAR replaces itself with a different, valid archive and then must finish. A separate
-     * process shows what happens after the swap, when the code the running archive still has to load
-     * is no longer the code its manifest describes.
+     * process shows what happens after the swap, when the code that the running archive loads next
+     * differs from the code its manifest describes.
      *
      * The replacement is `minimal.phar`, which has nothing of lockrot in it. An archive with the
      * same classes at the same offsets hides the failure this test exists for.
@@ -639,8 +639,10 @@ final class PharTest extends TestCase
     }
 
     /**
-     * A signature is by the test release key, or, for a channel that stands in for a substituted or
-     * rotated release, by a key of the same shape that is not it. The description names whichever
+     * Writes one channel: per release the archive, its `sha256sum` file, its signature and its
+     * `lockrot.phar.meta.json` under `<channel>/v<version>/`, and the release list as
+     * `<channel>/releases.json`. A signature is by the test release key, or, for a channel that
+     * stands in for a substituted or rotated release, by a key of the same shape that is not it. The description names whichever
      * key the channel says, which need not be the signer.
      *
      * @param list<array{0: string, 1: string, 2: string, 3: string}> $releases archive, version, signer, described key

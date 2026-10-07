@@ -81,6 +81,8 @@ final class AnalyzerTest extends TestCase
     }
 
     /**
+     * Ignores the requested names and returns the same prepared batch on every call.
+     *
      * @param array<string, PackageMetadata> $metadata
      * @param list<string>                   $notFound
      * @param array<string, string>          $failed
@@ -262,7 +264,8 @@ final class AnalyzerTest extends TestCase
         // vendor/direct is released 2024-01-10 with "php": ">=7.4", after PHP 8.0's GA (2020-11-26), the
         // line S5 reads for a target of 8.4. A release of the PHP 8 era is no old promise, so S5 stays
         // quiet and the verdict is OK. vendor/transitive (2015, ">=5.3.0") is the old promise here, but
-        // `silent` outranks it. The fixture is shared, so the interaction is documented here.
+        // `silent` outranks it. LockFileTest, DependencyGraphTest and ProjectConfigTest read the same
+        // fixture: change this assertion, not the fixture.
         self::assertSame(Verdict::OK, $byName['vendor/direct']->verdict());
         self::assertSame(Verdict::SILENT, $byName['vendor/transitive']->verdict());
         self::assertSame(['vendor/direct', 'vendor/transitive'], $byName['vendor/transitive']->chain());
@@ -280,7 +283,7 @@ final class AnalyzerTest extends TestCase
         self::assertSame(1, $report->notFromComposerRepository());
         self::assertFalse($report->hadNetworkFailures());
         // Sort order is priority desc, then severity desc, then direct first, then name asc.
-        // Nothing in the lock reaches vendor/snapshot, so its chain is empty, it counts as transitive
+        // vendor/snapshot is pinned, but nothing in the lock reaches it, so its chain is empty, it counts as transitive
         // and its `high` base drops to `medium`. The two unflagged rows follow, unknown ahead of ok.
         self::assertSame(Priority::HIGH, $byName['vendor/transitive']->priority());
         self::assertSame(Priority::NONE, $byName['vendor/direct']->priority());
@@ -421,8 +424,8 @@ final class AnalyzerTest extends TestCase
 
     public function testTheOfflineReasonIsReportedWithoutASecondPrefix(): void
     {
-        // OFFLINE_NOT_FOUND_REASON already reads as a complete statement, so prefixing it would
-        // produce "Repository metadata unavailable: offline: not present in Composer's cache".
+        // OFFLINE_NOT_FOUND_REASON already reads as a complete statement, and a prefix gives
+        // "Repository metadata unavailable: offline: not present in Composer's cache".
         $lock = LockFile::fromArray(['packages' => [['name' => 'vendor/direct', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/']]]);
         $failed = ['vendor/direct' => MetadataLoaderInterface::OFFLINE_NOT_FOUND_REASON];
 
@@ -445,7 +448,7 @@ final class AnalyzerTest extends TestCase
         return $this->analyzer($this->loader(['vendor/pkg' => $meta]), $this->http($map), $token, new Allowlist([]))->analyze($lock, ProjectConfig::empty(), false);
     }
 
-    /** The lock's `time` and the newest stable release are two years apart: a swapped or dropped argument reads as zero or null. */
+    /** The lock's `time` and the newest stable release are two years apart: a swapped or dropped argument of {@see \Lockrot\Analyzer\Libyears::measure()} reads as zero or null. */
     public function testAFindingCarriesTheLibyearsBetweenItsLockTimeAndTheNewestStableRelease(): void
     {
         $lock = LockFile::fromArray(['packages' => [
@@ -538,8 +541,8 @@ final class AnalyzerTest extends TestCase
     }
 
     /**
-     * Install time checks only the packages in the transaction, but the chain still has to be
-     * resolved through the whole lock — the mini fixture's vendor/transitive is pulled in by
+     * Install time checks only the packages in the transaction, but the chain still resolves
+     * through the whole lock — the mini fixture's vendor/transitive is pulled in by
      * vendor/direct, which is not part of the subset handed to analyzePackages().
      */
     public function testAnalyzePackagesChecksOnlyTheSubsetButResolvesChainsThroughTheFullLock(): void
@@ -819,7 +822,7 @@ final class AnalyzerTest extends TestCase
         self::assertStringContainsString('repository archived on GitLab', $withToken->evidence());
     }
 
-    /** Each forge reports its own cap and its own failures, GitHub first, then GitLab, then Bitbucket. */
+    /** Each repository host reports its own cap and its own failures, GitHub first, then GitLab, then Bitbucket. */
     public function testEveryForgeGetsItsOwnNotes(): void
     {
         $packages = [self::locked('vendor/gh'), self::locked('vendor/gl'), self::locked('vendor/bb')];

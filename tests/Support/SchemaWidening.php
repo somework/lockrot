@@ -11,7 +11,7 @@ use Lockrot\Json\KnownValues;
  * states for one schema number, checked on the two schema files rather than on documents.
  *
  * {@see narrowings()} lists every way the newer schema is narrower, node by node. It fails closed on
- * a keyword outside COMPARED: one in the newer schema is reported unless the older node carries it
+ * a keyword outside COMPARED and ANNOTATIONS: one in the newer schema is reported unless the older node carries it
  * with the same value. Where it cannot be exact, it reports.
  */
 final class SchemaWidening

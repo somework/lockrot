@@ -12,8 +12,9 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * docs/compatibility.md states the order of the closed sets lockrot freezes for 1.x, and
- * docs/verdicts.md states the severity order. Both are read here against the code. ClosedSetsTest
- * holds the code and the schemas to the same lists.
+ * docs/verdicts.md states the severity order. Both are read here against the code, so a page and
+ * the engine cannot disagree about which verdict is worse. ClosedSetsTest holds the code and the
+ * schemas to the same lists.
  *
  * `mkdocs build --strict` in CI checks that every page is in the navigation and every link's anchor
  * exists, through the `validation` block in mkdocs.yml.

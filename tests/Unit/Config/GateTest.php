@@ -23,7 +23,8 @@ use PHPUnit\Framework\TestCase;
  * {@see Gate::decide()} decides a run's pass or fail and each finding's standing against fail-on.
  * Over every fail-on value, every baseline standing, both --strict-network settings, both network
  * outcomes and both modes, the gate gives the exit code of `oracleExitCode()` and
- * `oracleGenerateExitCode()`, and its fields hold to one another.
+ * `oracleGenerateExitCode()`, and its fields hold to one another. Do not change an oracle to match
+ * the gate: the oracles state the exit-code rule on their own, and prove nothing once they follow it.
  */
 final class GateTest extends TestCase
 {

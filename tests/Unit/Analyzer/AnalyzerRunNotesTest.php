@@ -148,6 +148,7 @@ final class AnalyzerRunNotesTest extends TestCase
         self::assertSame(['vendor/one' => NotCheckedRule::FETCH_FAILED, 'vendor/two' => NotCheckedRule::FETCH_FAILED], self::activityReasons($analysis, ['vendor/one', 'vendor/two', 'vendor/fine']));
     }
 
+    /** A 404 without rate limiting has no reason on its finding: the note is its only record. */
     public function testARepositoryThatAnswered404IsTypedOnlyInItsNote(): void
     {
         $packages = [self::locked('vendor/gone')];
@@ -183,6 +184,7 @@ final class AnalyzerRunNotesTest extends TestCase
         self::assertSame([NotCheckedRule::RATE_BUDGET => 2, NotCheckedRule::NO_TOKEN => 1], $reasons);
     }
 
+    /** Every package whose repository was never asked carries the reason of the note, not only the first. */
     public function testAnExhaustedBudgetSaysTheActivityWasNotChecked(): void
     {
         $packages = [self::locked('vendor/a'), self::locked('vendor/b')];

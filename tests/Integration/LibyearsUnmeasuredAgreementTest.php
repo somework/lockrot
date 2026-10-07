@@ -180,7 +180,8 @@ final class LibyearsUnmeasuredAgreementTest extends TestCase
     }
 
     /**
-     * How an unmeasured finding is filed off what the finding says: the note, then the version.
+     * An independent filing of an unmeasured finding off what it says: the note, then the version.
+     * Do not align it with Libyears::measure(): the agreement then proves nothing.
      *
      * @param array<mixed, mixed> $row
      */

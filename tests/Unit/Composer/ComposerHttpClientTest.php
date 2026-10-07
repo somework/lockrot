@@ -140,7 +140,7 @@ final class ComposerHttpClientTest extends TestCase
      * origin the four characters of `api.` are stripped down to decides whose credentials are
      * inspected. A `client-certificate` entry under bitbucket.org adds no credential header of its
      * own, so lockrot's token must stay. Read under any other origin, the entry is not found and
-     * the token is dropped from a request nothing then authenticates.
+     * the token can be dropped from a request that nothing then authenticates.
      */
     public function testTheApiHostFallsBackToTheExactSiteHostWhoseCredentialsDecide(): void
     {
@@ -405,7 +405,7 @@ final class ComposerHttpClientTest extends TestCase
     }
 }
 
-/** See {@see ComposerHttpClientTest::clientWith()}. */
+/** A downloader that answers each URL from a script, leaves an unscripted URL pending, and records every request and wait(). */
 final class ScriptedDownloader extends HttpDownloader
 {
     /** @var list<array{url: string, options: array<string, mixed>}> the requests add() saw, in order */

@@ -48,7 +48,7 @@ use PHPUnit\Framework\TestCase;
  * together, and the annotation level that the machine formats print.
  *
  * It covers nothing: Infection skips a mutant whose covering tests together outlast its timeout, and
- * this sweep would push every line of the gate past it. GateTest and ReportTest kill those mutants.
+ * this sweep pushes every line of the gate past it. GateTest and ReportTest kill those mutants.
  *
  * @coversNothing
  *
@@ -73,7 +73,7 @@ final class GateAgreementTest extends TestCase
 
     /**
      * Every fixture lock served at once, as BranchFloorAgreementTest serves them, in a process of
-     * its own for the same memory reason.
+     * its own: memory_get_peak_usage() is a whole-process mark that PHPUnit never resets.
      *
      * @runInSeparateProcess
      */
@@ -194,7 +194,7 @@ final class GateAgreementTest extends TestCase
         $this->seen['tripped_by '.json_encode($trippedBy)] = true;
 
         $oracle = $mode === Gate::MODE_CHECK ? self::oracleExitCode($report, $failOn, $strict) : ($strict && $report->hadNetworkFailures() ? 1 : 0);
-        $this->same($oracle, $gate['fails'] ? 1 : 0, $what.': the exit code the run returned before the gate');
+        $this->same($oracle, $gate['fails'] ? 1 : 0, $what.': the exit code of oracleExitCode()');
     }
 
     /**
@@ -235,9 +235,9 @@ final class GateAgreementTest extends TestCase
     }
 
     /**
-     * The baseline this report would write, with the first finding more severe than `stale` accepted
-     * only at `stale` (so it is worsened) and the second of the other flagged ones left out (so it is
-     * new); every other one is known. Null when the lock has nothing flagged.
+     * The baseline that this report writes, with the first finding more severe than `stale` accepted
+     * only at `stale` (so it is worsened) and the second of the other flagged ones omitted (so it is
+     * new). Every other one is known. Null when the lock has nothing flagged.
      */
     private static function changedBaseline(Report $report): ?Baseline
     {

@@ -73,7 +73,7 @@ final class LeftBehindRuleTest extends TestCase
 
     public function testJustPastTheHighThresholdIsHigh(): void
     {
-        // Five calendar years back is 1826 days, a hair under 5 × 365.25; one more day crosses it.
+        // Five calendar years back is 1826 days, a hair under 5 × 365.25. One more day crosses it.
         $meta = F::metadata([['2.0.0', '2024-01-10'], ['1.9.2', '2021-09-13T00:00:00+00:00']]);
 
         $signal = $this->rule()->evaluate(F::facts(F::package(['version' => '1.9.2']), $meta));

@@ -50,7 +50,7 @@ final class FixtureRepositoryServer
     private string $docroot;
     private string $cacheDir;
     private PhpBuiltinServer $server;
-    /** @var list<string> every package name the docroot may serve, whatever the recorded envelopes hold */
+    /** @var list<string> every package name that the docroot can serve, whatever the recorded envelopes hold */
     private array $names;
 
     /** @param list<string> $names */

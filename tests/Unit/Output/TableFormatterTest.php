@@ -187,7 +187,7 @@ final class TableFormatterTest extends TestCase
         $out = $this->formatter(60)->format($this->report(), true);
         $rows = $this->rowRegion($out);
 
-        // every row of every group, not just the first one: the tail of line 1 only wraps on a row
+        // every row of every group, not only the first one: the tail of line 1 only wraps on a row
         // with a long chain, and those are not in the critical group
         foreach (['critical (1)', 'high (1)', 'medium (1)', 'low (1)', 'not flagged (2)'] as $header) {
             self::assertContains($header, $rows, 'the measured region has to span every group');
@@ -207,8 +207,8 @@ final class TableFormatterTest extends TestCase
     }
 
     /**
-     * Baseline annotations push the label column to 21, so the indent is 25 and the narrowest
-     * terminal lockrot accepts leaves 15 columns for the text. The floor takes over at 20 and
+     * Baseline annotations push the label column to 21, so the indent is 25, and the narrowest
+     * terminal lockrot accepts has 15 columns after it. The floor raises that to 20 and
      * the row overruns the terminal, rather than the text being squeezed into nothing.
      */
     public function testAVeryNarrowTerminalStillLeavesTwentyColumnsForTheText(): void
@@ -505,7 +505,7 @@ final class TableFormatterTest extends TestCase
 
     /**
      * The report is written straight to the output with no trailing newline of its own, so the
-     * document has to end with one or the shell prompt lands on the last line.
+     * document must end with one, or the shell prompt lands on the last line.
      */
     public function testEveryRenderedReportEndsWithASingleNewline(): void
     {

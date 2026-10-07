@@ -156,6 +156,7 @@ final class AdvisoryRuleTest extends TestCase
         self::assertTrue(self::row($signal, 0)['fixed_on_branch'], 'the branch\'s highest tag is the package\'s: one candidate, named once');
     }
 
+    /** Nothing to check against: no metadata, a branch snapshot with no branch, or a range that covers every listed release. */
     public function testWithoutAFixingReleaseTheRowsSayNullAndTheSummaryAddsNothing(): void
     {
         $range = $this->ranged('CVE-1', '>=1.0.0');
