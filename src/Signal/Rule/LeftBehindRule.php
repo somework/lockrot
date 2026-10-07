@@ -12,6 +12,7 @@ use Lockrot\Clock;
 use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Data\Repository\ReleaseBranch;
 use Lockrot\Signal\AgeMeasure;
+use Lockrot\Signal\LeftBehindReading;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\Signal;
@@ -47,6 +48,14 @@ final class LeftBehindRule implements SignalRule
     }
 
     public function evaluate(PackageFacts $facts): ?Signal
+    {
+        $reading = $this->reading($facts);
+
+        return $reading === null ? null : $reading->signal();
+    }
+
+    /** The signal and the keys report-2 adds to it, null where S8 does not fire. */
+    public function reading(PackageFacts $facts): ?LeftBehindReading
     {
         $metadata = $facts->metadata();
         $branch = ReleaseBranch::of($facts->package()->version());
@@ -110,7 +119,7 @@ final class LeftBehindRule implements SignalRule
                 : \sprintf('; %s released %s (%s)', ReleaseBranch::label($reachable['branch']), $reachable['version'], $reachable['at']->format('Y-m-d'));
         }
 
-        return new Signal(Signal::S8, $level, $summary, [
+        $signal = new Signal(Signal::S8, $level, $summary, [
             'branch' => ReleaseBranch::label($branch),
             'branch_last_release' => $ownAt->format(\DATE_ATOM),
             'branch_last_version' => $reading->version(),
@@ -128,6 +137,14 @@ final class LeftBehindRule implements SignalRule
             'suggested_constraint' => $reachable === null ? null : $this->suggestedConstraint($facts->package()->name(), $reachable['version']),
             'dated_by' => $datedBy,
         ]);
+
+        return new LeftBehindReading(
+            $signal,
+            $reachable === null ? null : $reachable['php'],
+            $reachable === null ? null : ['project' => $this->floor->admitsProject($reachable['php']), 'target' => $this->floor->admitsTarget($reachable['php'])],
+            $this->clock->tenthsSince($newest['at']) / 10,
+            $reachable === null ? null : $this->clock->tenthsSince($reachable['at']) / 10
+        );
     }
 
     /** Released within `release-warn-years` of today: the branch is still where fixes land. */

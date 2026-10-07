@@ -6,9 +6,11 @@ namespace Lockrot\Explain;
 
 use Lockrot\Analyzer\Report;
 use Lockrot\Analyzer\RunNote;
+use Lockrot\Clock;
 use Lockrot\Data\Repository\InstalledRelease;
 use Lockrot\Data\Repository\ReleaseBranch;
 use Lockrot\Data\Repository\RepositoryUrl;
+use Lockrot\Signal\BranchRow;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\Thresholds;
@@ -93,36 +95,28 @@ final class Explanation
      */
     public function branches(): array
     {
-        $metadata = $this->facts->metadata();
-        if ($metadata === null) {
-            return [];
-        }
-        $installed = $this->installedBranch();
-        $byBranch = $metadata->latestStableByBranch();
-        $keys = [];
-        foreach (array_keys($byBranch) as $key) {
-            $keys[] = (string) $key;
-        }
-        // Highest branch first, the keys ordered as the versions they are (`10` above `9`, `0.3` above `0.0.3`).
-        usort($keys, static fn (string $a, string $b): int => version_compare($b, $a));
         $rows = [];
-        foreach ($keys as $key) {
-            $release = $byBranch[$key];
-            $sharedCommit = $release['highest']['at'] === null && $release['version'] === $release['highest']['pretty'];
+        foreach ($this->rows() as $row) {
             $rows[] = [
-                'branch' => ReleaseBranch::label($key),
-                'installed' => $key === $installed,
-                'highest' => $release['highest']['pretty'],
-                'highest_released' => $release['highest']['at'],
-                'highest_commit_date' => $sharedCommit ? $release['at'] : null,
-                'newest_dated' => $release['version'],
-                'newest_dated_released' => $release['at'],
-                'dated_by' => $release['dated_by'] ?? null,
-                'php' => $release['php'] ?? null,
+                'branch' => $row->branch(),
+                'installed' => $row->installed(),
+                'highest' => $row->highest(),
+                'highest_released' => $row->highestReleased(),
+                'highest_commit_date' => $row->highestCommitDate(),
+                'newest_dated' => $row->newestDated(),
+                'newest_dated_released' => $row->newestDatedReleased(),
+                'dated_by' => $row->datedBy(),
+                'php' => $row->php(),
             ];
         }
 
         return $rows;
+    }
+
+    /** @return list<BranchRow> */
+    private function rows(): array
+    {
+        return BranchRow::all($this->facts, $this->floor, new Clock($this->report->generatedAt()));
     }
 
     /**
@@ -170,22 +164,22 @@ final class Explanation
         $activity = $this->facts->activity();
         $installed = InstalledRelease::of($package, $metadata);
         $branches = [];
-        foreach ($this->branches() as $row) {
+        foreach ($this->rows() as $row) {
             $branches[] = [
-                'branch' => $row['branch'],
-                'installed' => $row['installed'],
-                'highest' => $row['highest'],
-                'highest_released' => self::date($row['highest_released']),
-                'highest_commit_date' => self::date($row['highest_commit_date']),
-                'newest_dated' => $row['newest_dated'],
-                'newest_dated_released' => self::date($row['newest_dated_released']),
-                'dated_by' => $row['dated_by'],
-                'php' => $row['php'],
-                'admits_target_php' => $this->floor->admitsTarget($row['php']),
-                'admits_project_php' => $this->floor->admitsProject($row['php']),
-                'php_blocked_by' => $this->floor->blocking($row['php']),
-                'misses_target_php' => $this->floor->missesTarget($row['php']),
-                'misses_project_php' => $this->floor->missesProject($row['php']),
+                'branch' => $row->branch(),
+                'installed' => $row->installed(),
+                'highest' => $row->highest(),
+                'highest_released' => self::date($row->highestReleased()),
+                'highest_commit_date' => self::date($row->highestCommitDate()),
+                'newest_dated' => $row->newestDated(),
+                'newest_dated_released' => self::date($row->newestDatedReleased()),
+                'dated_by' => $row->datedBy(),
+                'php' => $row->php(),
+                'admits_target_php' => $row->admitsTargetPhp(),
+                'admits_project_php' => $row->admitsProjectPhp(),
+                'php_blocked_by' => $row->phpBlockedBy(),
+                'misses_target_php' => $row->missesTargetPhp(),
+                'misses_project_php' => $row->missesProjectPhp(),
             ];
         }
 
