@@ -60,8 +60,11 @@ def main(argv):
         raise SystemExit(__doc__.split('\n\n')[1])
     checkout, commit, out = argv
     commit = git(checkout, 'rev-parse', '--verify', commit + '^{commit}').decode('ascii').strip()
+    paths = report_names(checkout, commit)
+    if not paths:
+        raise SystemExit('no watch report under %s at %s' % (WATCH, commit))
     reports = []
-    for path in report_names(checkout, commit):
+    for path in paths:
         name = path[len(WATCH):-len('.json')]
         reports.append(reduce_report(name, json.loads(git(checkout, 'show', commit + ':' + path))))
     floor = {
