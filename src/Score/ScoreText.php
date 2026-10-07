@@ -11,9 +11,9 @@ namespace Lockrot\Score;
  *     4 = ((left-behind 16 + stale 2 [¼ of 8]) ÷ 2 transitive) ÷ 2 dev (4.5, rounded down)
  *     0 (left-behind accepted)
  *
- * Read with `÷` binding to the operand before it and `+` lowest, every line evaluates to `exact`, so
- * the dev halving wraps any body that is more than one atom. A halving that removes nothing is not
- * printed. A change to this grammar bumps `score_text_grammar`.
+ * `÷` binds to the operand before it, and `+` binds last. With this reading, every line evaluates to
+ * `exact`, so the dev halving wraps any body of more than one atom. ScoreText prints no halving that
+ * removes nothing. A change to this grammar bumps `score_text_grammar`.
  *
  * @internal
  */
@@ -94,7 +94,7 @@ final class ScoreText
     private static function security(array $term): string
     {
         $note = self::text($term['severity']).' advisory';
-        if ($term['multiplier'] !== 1) {
+        if (self::number($term['multiplier']) !== '1') {
             $note .= ' '.self::number($term['weight']).' × '.self::number($term['multiplier']).': no reachable fix';
         }
 

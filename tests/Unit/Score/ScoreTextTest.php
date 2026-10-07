@@ -23,7 +23,7 @@ final class ScoreTextTest extends TestCase
      * @param list<array{string, string}> $advisories
      */
     #[DataProvider('workedRows')]
-    public function testTheScoreLineOfAWorkedRow(array $flags, array $advisories, string $reach, bool $dev, ?string $accepted, string $line): void
+    public function testAWorkedRowPrintsItsScoreLine(array $flags, array $advisories, string $reach, bool $dev, ?string $accepted, string $line): void
     {
         $inputs = ['axis' => 'base', 'flags' => $flags, 'advisories' => $advisories, 'reach' => $reach, 'dev' => $dev, 'under' => null, 'accepted' => $accepted];
         $score = ScoreSweep::basis($inputs)->toArray();

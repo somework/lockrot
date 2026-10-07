@@ -1,6 +1,6 @@
 """Score model 1 as the sweep evaluates it: the engine, the score object, the one grammar and the grade gate.
 
-tools/score/sweep.py imports it. It reads no file, and it imports only the Python standard library.
+It reads no file, and it imports only the Python standard library.
 """
 from fractions import Fraction as Fr
 
@@ -35,8 +35,8 @@ def adv_points(a):
 
 
 def engine(flags, advs, reach, dev, accepted=(), under=None):
-    """reach: direct, transitive or unreached. under: the liveness word that S2 and S4 give on their own, which
-    `abandoned` hides. accepted: the allowlist entry's whole accepted set, which every rerun applies."""
+    """reach: direct, transitive or unreached. under: the liveness word that S2 and S4 give alone. `abandoned` hides it.
+    accepted: the whole accepted set of the allowlist entry. Every rerun applies it."""
     E = _engine(flags, advs, reach, dev, accepted)
     E['under'] = under if 'abandoned' in flags else None
     E['accept_set'] = frozenset(accepted)
@@ -129,11 +129,11 @@ def part_status(E, part, ctx):
         return 'none' if ctx['maint_judged'] else 'not_judged'
     if E['sp'] > 0:
         return 'counted'
-    return {'complete': 'clear', 'partial': 'unchecked', 'not_run': 'unchecked', 'disabled': 'disabled'}[ctx.get('check', 'complete')]
+    return {'complete': 'clear', 'partial': 'unchecked', 'not_run': 'unchecked'}[ctx.get('check', 'complete')]
 
 
 def score_obj(E, ctx):
-    """ctx: allowlisted, maint_judged, check, liveness_complete"""
+    """ctx: allowlisted, maint_judged, check, liveness_complete, s2_level, s3_unread, s8_unread"""
     terms = terms_of(E)
     mc, sc = E['mp'] * E['r'] * E['d'], E['sp'] * E['d']
     total, exact = E['total'], E['exact']
@@ -156,7 +156,7 @@ def score_obj(E, ctx):
 
 
 def accepted_of(E, ctx):
-    """`at_least` only on `stale` decided without S4 or with S3 unread: a lookup could add S4 (silent) or S3 (abandoned)."""
+    """`at_least` is set only on `stale` with S4 or S3 unread. A lookup can add S4 (silent) or S3 (abandoned)."""
     acc = []
     for f in E['accepted']:
         E2 = engine(E['flags'], E['cadvs'], E['reach'], E['dev'], accepted=[x for x in E['accept_set'] if x != f], under=E['under'])
@@ -169,8 +169,8 @@ def accepted_of(E, ctx):
 
 
 def without_flags(E, f):
-    """the flag set with f's raising signals removed, derived again: removing `abandoned` (S1, S3) leaves S2 and S4,
-    which give back the liveness word that abandoned hid (`revealed`)."""
+    """The flag set without the signals that raise f, derived again. Without `abandoned` (S1, S3), S2 and S4 give back
+    the liveness word that abandoned hid (`revealed`)."""
     fl = [x for x in E['flags'] if x != f]
     revealed = []
     if f == 'abandoned' and E['under'] and E['under'] not in fl:
@@ -186,8 +186,8 @@ def revealed_of(E2, revealed):
 
 
 def without_of(E, ctx):
-    """One row per counted flag when the finding has two or more terms, and one row for the deciding advisory whenever two
-    or more advisories count. Every row is an engine rerun under the entry's whole accepted set, never a subtraction."""
+    """One row per counted flag when the finding has two or more terms. One row for the deciding advisory when two or
+    more advisories count. Every row is an engine rerun under the whole accepted set of the entry."""
     rows = []
     nterms = len(E['mterms']) + (1 if E['dec'] else 0)
     acc = E['accept_set']
@@ -217,8 +217,8 @@ def fmt(x):
 
 
 def text_php(E):
-    """ScoreText, text grammar 1. The dev halving wraps the body in parentheses unless the body is one term: one
-    maintenance term with no printed reach halving, or the security term alone."""
+    """ScoreText, text grammar 1. The dev halving wraps the body in parentheses, unless the body is one term. That term
+    is one maintenance term with no printed reach halving, or the security term alone."""
     parts = [f"{t['flag']} {fmt(t['points'])}" if t['role'] == 'lead' else f"{t['flag']} {fmt(t['points'])} [¼ of {t['weight']}]"
              for t in E['mterms']]
     m = ' + '.join(parts)
@@ -247,7 +247,7 @@ def covered(flag, entry_first):
 
 def gate_basis(E, entry, ctx):
     """entry None: no baseline entry. entry = dict(first=<recorded lead or None>, acc_advs=set of known advisory ids).
-    _unc and _ua are the uncovered counted maintenance flags and the advisories the baseline does not know."""
+    _unc: the uncovered counted maintenance flags. _ua: the advisories that the baseline does not know."""
     cm = [f for f in E['flags'] if f in MAINT and f not in E['accepted']]
     if entry is None:
         return dict(score=E['total'], verdict=band(E['total']), cap=None, limited_by=None, new=None, _unc=cm, _ua=list(E['cadvs']), _cadvs=list(E['cadvs']))
@@ -262,8 +262,8 @@ def gate_basis(E, entry, ctx):
 
 
 def grade_marks(G, s, value, has_entry):
-    """The error records of a grade value T: the lead and the security term of gate.basis.new (the score's own terms
-    without a baseline entry) whose contribution is at least half of T's floor without an entry, a quarter under one."""
+    """The error records of a grade value T: the lead and the security term of gate.basis.new, or of the score without
+    a baseline entry. A record needs a contribution of half of T's floor, or a quarter of it under an entry."""
     T = FLOOR[value]
     share = Fr(1, 4) if has_entry else Fr(1, 2)
     src = G['new']['terms'] if has_entry else s.get('terms', [])
@@ -273,7 +273,7 @@ def grade_marks(G, s, value, has_entry):
 
 def gate_obj(G, s, gates, checks=None):
     """gates: run.gates as (value, kind), at most one per kind. fails reads the gate score, the uncovered flags and the
-    unknown advisories. An unchecked value names the blocked signals once each as {kind: signal, id}."""
+    unknown advisories. An unchecked value names each blocked signal once as {kind: signal, id}."""
     has_entry = G['new'] is not None
     by, reaches = [], False
     cm = [t['flag'] for t in s.get('terms', []) if t['part'] == 'maintenance']

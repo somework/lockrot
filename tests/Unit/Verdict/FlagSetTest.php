@@ -163,7 +163,7 @@ final class FlagSetTest extends TestCase
 
     /**
      * Composer's abandoned ignore list removes S1, never the flag: the flags come from the signals
-     * that remain (C69).
+     * that remain.
      *
      * @dataProvider ignoredMarking
      *

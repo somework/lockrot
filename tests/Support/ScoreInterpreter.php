@@ -6,7 +6,7 @@ namespace Lockrot\Tests\Support;
 
 /**
  * A second engine that reads only a decoded `run.score_model` and a finding's facts, as a consumer
- * would. It shares no code with src/: it computes in exact fractions, not in half points, and takes
+ * does. It shares no code with src/: it computes in exact fractions, not in half points, and takes
  * every number, order and divisor from the model. ScoreInterpreterTest asserts that it gives the
  * sweep row of ScoreSweep on every input.
  *

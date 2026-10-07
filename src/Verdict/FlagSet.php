@@ -9,9 +9,9 @@ use Lockrot\Signal\Signal;
 
 /**
  * The flags of one finding, derived from its signals. S2 and S4 collapse into one liveness word
- * (stale, silent), and S1 or S3 make it `abandoned`, which hides the word S2 and S4 give. An allowlist
- * entry accepts maintenance flags, which stay listed. Composer's abandoned ignore list keeps S1 out of
- * the signals, so the flags follow from the signals that remain.
+ * (stale, silent). S1 or S3 make it `abandoned`, which hides the word that S2 and S4 give. An
+ * allowlist entry accepts maintenance flags, and they stay listed. A marking that Composer's abandoned
+ * ignore list removes is no S1, so it raises no flag here.
  *
  * @internal
  *
@@ -145,7 +145,7 @@ final class FlagSet
         return new self($this->signals, $this->acceptSet, array_values(array_filter($this->advisories, static fn (array $advisory): bool => $advisory['id'] !== $id)));
     }
 
-    /** The same facts with $flag no longer accepted: what the flag adds if counted. */
+    /** The same facts with $flag counted, not accepted: what the flag adds if counted. */
     public function counting(string $flag): self
     {
         return new self($this->signals, array_values(array_diff($this->acceptSet, [$flag])), $this->advisories);

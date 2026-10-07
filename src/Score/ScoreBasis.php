@@ -9,8 +9,8 @@ use Lockrot\Verdict\Score;
 use Lockrot\Verdict\ScoreModel;
 
 /**
- * The structured basis of a score, `finding.score`: every number the engine used, after every step,
- * so a consumer draws, words and compares without a second engine. Every counterfactual
+ * The structured basis of a score, `finding.score`: every number that the engine used, after every
+ * step. A consumer draws, words and compares it without a second engine. Every counterfactual
  * (`without[]`, `accepted[].if_counted`) is an engine rerun on the flags derived again, never a
  * subtraction. The engine counts in integer half points. {@see toArray()} writes a half as 0.5.
  *
@@ -45,7 +45,8 @@ final class ScoreBasis
     /**
      * @param Context $context `maintenance_judged`: the release metadata was read; `advisories_complete`:
      *                         every advisory feed answered; `liveness_complete`: S2 and S4 were both read;
-     *                         `s3_unread`: no S3 answer; `s8_unread`: a tag could be left behind unseen
+     *                         `s3_unread`: no S3 answer; `s8_unread`: S8 cannot date a branch that a
+     *                         tag can land on
      */
     public static function of(FlagSet $flags, string $reach, bool $dev, array $context): self
     {

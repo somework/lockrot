@@ -13,8 +13,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * The invariants I0 to I17b on every score of the sweep: the base enumeration and its three extra
- * axes, in integer half points. One method per axis iterates its rows, because a data set per row
- * would fork one process per row. ScoreBasisSampleTest runs every 1,000th row in the default suite.
+ * axes, in integer half points. One method per axis iterates its rows: a data set per row forks one
+ * process per row. ScoreBasisSampleTest runs a sample (ScoreSweep::SAMPLE) in the default suite.
  *
  * It covers nothing and runs only in the sweep group (sweep.yml): Infection skips a mutant whose
  * covering tests together outlast its timeout.

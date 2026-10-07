@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Verdict;
 
+use Lockrot\Allowlist\AllowlistEntry;
 use Lockrot\Security\Severity;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\ScoreSweep;
+use Lockrot\Verdict\FlagSet;
 use Lockrot\Verdict\Score;
 use Lockrot\Verdict\ScoreModel;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -126,6 +128,61 @@ final class ScoreModelTest extends TestCase
         self::assertSame('GHSA-a', $score->deciding()['id'] ?? null);
         self::assertSame(['GHSA-b', 'GHSA-c'], $score->tied(), 'a medium advisory nothing fixes scores 16 too, and comes after by severity');
         self::assertSame(3, $score->advisoryCount());
+    }
+
+    /**
+     * The engine reads a Composer severity word by its bucket: `moderate` is medium, an empty word is
+     * unrated, and a tie of equal points goes by the bucket order, then by the id.
+     */
+    public function testASeverityWordTiesByItsBucket(): void
+    {
+        $moderate = Score::compute([], [['id' => 'A', 'severity' => 'medium', 'fix_kind' => 'update'], ['id' => 'B', 'severity' => 'moderate', 'fix_kind' => 'update']], 'direct', false);
+        $unrated = Score::compute([], [['id' => 'B', 'severity' => '', 'fix_kind' => 'update'], ['id' => 'A', 'severity' => 'medium', 'fix_kind' => 'update']], 'direct', false);
+
+        self::assertSame(['id' => 'A', 'severity' => 'medium', 'fix_kind' => 'update'], $moderate->deciding());
+        self::assertSame(['B'], $moderate->tied());
+        self::assertSame(['id' => 'A', 'severity' => 'medium', 'fix_kind' => 'update'], $unrated->deciding());
+        self::assertSame(['id' => 'B', 'severity' => 'unrated', 'fix_kind' => 'none'], Score::compute([], [['id' => 'B', 'severity' => 'unknown', 'fix_kind' => 'none']], 'direct', false)->deciding());
+    }
+
+    /**
+     * I26: under a partial ignore[] entry, moving up the liveness words (none, stale, silent,
+     * abandoned) never lowers the score, for every other flag set, advisory, reach and dev.
+     *
+     * @dataProvider partialEntries
+     *
+     * @param list<string> $entry
+     */
+    #[DataProvider('partialEntries')]
+    public function testMovingUpTheLivenessWordsNeverLowersAScoreUnderAPartialEntry(array $entry): void
+    {
+        foreach ([[], ['pinned'], ['left-behind'], ['old-promise'], ['pinned', 'old-promise'], ['left-behind', 'old-promise']] as $others) {
+            foreach ([[], [['medium', 'update']]] as $advisories) {
+                foreach (['direct', 'transitive'] as $reach) {
+                    foreach ([false, true] as $dev) {
+                        $previous = 0;
+                        foreach (self::LIVENESS as $live) {
+                            $signals = [];
+                            foreach (array_merge($live === null ? [] : [$live], $others) as $flag) {
+                                $signals = array_merge($signals, ScoreSweep::signalsOf($flag));
+                            }
+                            $flags = FlagSet::fromSignals($signals, new AllowlistEntry('acme/package', null, 'kept', null, 'project', $entry), ScoreSweep::advisories($advisories));
+                            $total = Score::of($flags, $reach, $dev)->total();
+                            self::assertGreaterThanOrEqual($previous, $total, implode(',', $entry).': '.($live ?? 'none').' with '.self::label($others, $advisories, $reach, $dev));
+                            $previous = $total;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /** @return iterable<string, array{list<string>}> each non-empty set of liveness words, and two entries with other flags */
+    public static function partialEntries(): iterable
+    {
+        foreach ([['stale'], ['silent'], ['abandoned'], ['silent', 'stale'], ['abandoned', 'stale'], ['abandoned', 'silent'], ['abandoned', 'silent', 'stale'], ['old-promise', 'silent'], ['pinned', 'stale']] as $entry) {
+            yield implode(',', $entry) => [$entry];
+        }
     }
 
     public function testTheLargestTotalIsAbandonedPinnedOldPromiseAndACriticalAdvisoryNothingFixes(): void

@@ -9,8 +9,8 @@ use Lockrot\Tests\Support\ScoreSweep;
 use PHPUnit\Framework\TestCase;
 
 /**
- * The invariants I0 to I17b on every 1,000th row of each sweep axis, in the default suite. The sweep
- * group (ScoreBasisTest) checks every row.
+ * The invariants I0 to I17b on a sample of each sweep axis (ScoreSweep::SAMPLE), in the default suite.
+ * The sweep group (ScoreBasisTest) checks every row.
  */
 final class ScoreBasisSampleTest extends TestCase
 {
