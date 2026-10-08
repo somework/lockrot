@@ -101,7 +101,7 @@ final class ExplanationTest extends TestCase
         self::assertIsArray($meta['branches']);
         self::assertSame(
             ['branch' => '10.x', 'installed' => true, 'highest' => '10.49.0', 'highest_released' => null, 'highest_commit_date' => '2023-06-05T12:46:42+00:00', 'newest_dated' => '10.49.0', 'newest_dated_released' => '2023-06-05T12:46:42+00:00', 'dated_by' => null, 'php' => null, 'admits_target_php' => null, 'admits_project_php' => null, 'php_blocked_by' => null, 'misses_target_php' => null, 'misses_project_php' => null],
-            array_diff_key($meta['branches'][0], ['released_years' => true, 'fixes' => true])
+            array_diff_key(JsonPath::arrayAt($meta, ['branches', 0]), ['released_years' => true, 'fixes' => true])
         );
     }
 
@@ -253,7 +253,7 @@ final class ExplanationTest extends TestCase
         self::assertIsArray($meta['branches']);
         self::assertSame(
             ['branch' => '10.x', 'installed' => true, 'highest' => 'v10.50.3', 'highest_released' => '2026-08-12T03:46:26+00:00', 'highest_commit_date' => null, 'newest_dated' => 'v10.50.3', 'newest_dated_released' => '2026-08-12T03:46:26+00:00', 'dated_by' => 'laravel/framework', 'php' => null, 'admits_target_php' => null, 'admits_project_php' => null, 'php_blocked_by' => null, 'misses_target_php' => null, 'misses_project_php' => null],
-            array_diff_key($meta['branches'][0], ['released_years' => true, 'fixes' => true])
+            array_diff_key(JsonPath::arrayAt($meta, ['branches', 0]), ['released_years' => true, 'fixes' => true])
         );
     }
 
@@ -376,7 +376,7 @@ final class ExplanationTest extends TestCase
         $explanation = new Explanation($this->finding('1.0.0', Verdict::OK), F::facts(F::package()), new Thresholds(), '8.4', $this->report(), '^7.2.5 || ^8.0');
 
         self::assertSame('^7.2.5 || ^8.0', $explanation->projectPhp());
-        self::assertSame('^7.2.5 || ^8.0', $explanation->toArray()['run']['project_php']);
+        self::assertSame('^7.2.5 || ^8.0', JsonPath::stringAt($explanation->toArray(), ['run', 'project_php']));
         self::assertNull((new Explanation($this->finding('1.0.0', Verdict::OK), F::facts(F::package()), new Thresholds(), '8.4', $this->report()))->projectPhp());
     }
 

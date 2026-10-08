@@ -152,7 +152,7 @@ final class GateAgreementTest extends TestCase
     {
         $run = JsonPath::arrayAt($document, ['run']);
         $this->same($failOn->value(), $run['fail_on'], $what);
-        $this->same(['none' => [], 'priority' => ['grade'], 'verdict' => ['flag'], 'unchecked' => ['unchecked']][$failOn->kind()], array_column($run['gates'], 'kind'), $what);
+        $this->same(['none' => [], 'priority' => ['grade'], 'verdict' => ['flag'], 'unchecked' => ['unchecked']][$failOn->kind()], JsonPath::column($run, ['gates'], 'kind'), $what);
         $this->same($strict, $run['strict_network'], $what);
         $this->same($mode, $run['mode'], $what);
         $gate = JsonPath::arrayAt($document, ['gate']);

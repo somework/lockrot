@@ -516,7 +516,7 @@ final class LockrotCommandTest extends TestCase
         self::assertIsArray($json['metadata']);
         self::assertTrue($json['metadata']['abandoned']);
         self::assertIsArray($json['metadata']['branches']);
-        self::assertSame('8.4', $json['run']['target_php']);
+        self::assertSame('8.4', JsonPath::stringAt($json, ['run', 'target_php']));
     }
 
     /**
@@ -532,7 +532,7 @@ final class LockrotCommandTest extends TestCase
         self::assertSame(0, $code, $stdout);
         $json = json_decode($stdout, true);
         self::assertIsArray($json);
-        self::assertSame('>=8.2', $json['run']['project_php']);
+        self::assertSame('>=8.2', JsonPath::stringAt($json, ['run', 'project_php']));
         $rows = self::admission($json);
         self::assertSame(['>=8.4.1', true, false, 'project', null, 'needs_newer'], $rows['8.x'] ?? null);
         self::assertSame(['>=7.2.5', true, true, null, null, null], $rows['5.x'] ?? null, 'the installed branch');
@@ -1542,7 +1542,7 @@ final class LockrotCommandTest extends TestCase
         $verdicts = [];
         foreach (JsonPath::arrayAt($json, ['findings']) as $finding) {
             self::assertIsArray($finding);
-            $verdicts[$finding['package']] = $finding['lead'] ?? $finding['verdict'];
+            $verdicts[JsonPath::stringAt($finding, ['package'])] = $finding['lead'] ?? $finding['verdict'];
         }
         $golden = JsonPath::arrayAt(JsonPath::decodeFile(__DIR__.'/../../fixtures/golden/wallabag.json'), ['verdicts']);
         ksort($verdicts);
@@ -2770,7 +2770,7 @@ final class LockrotCommandTest extends TestCase
             self::assertSame(0, $code, $stderr);
             $explained = json_decode($stdout, true);
             self::assertIsArray($explained);
-            self::assertSame('>=8.2', $explained['run']['project_php'], 'the report and --explain name the same floor');
+            self::assertSame('>=8.2', JsonPath::stringAt($explained, ['run', 'project_php']), 'the report and --explain name the same floor');
         });
     }
 

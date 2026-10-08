@@ -123,7 +123,11 @@ final class SortTest extends TestCase
         self::assertIsArray($findings);
         $keys = ScoreModel::toArray()['sort'];
         self::assertIsArray($keys);
-        $resorted = $findings;
+        $resorted = [];
+        foreach ($findings as $finding) {
+            self::assertIsArray($finding);
+            $resorted[] = $finding;
+        }
         usort($resorted, static function (array $a, array $b) use ($keys): int {
             foreach ($keys as $key) {
                 self::assertIsArray($key);

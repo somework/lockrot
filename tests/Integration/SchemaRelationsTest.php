@@ -101,9 +101,22 @@ final class SchemaRelationsTest extends TestCase
         $validator = new Validator();
         $document = json_decode('{"a": "x", "b": null, "c": 1}');
         $validator->validate($document, $break);
-        $errors = array_map(static fn (array $error): string => (string) $error['message'], $validator->getErrors());
+        $errors = self::messages($validator);
 
         self::assertSame(['#/allOf/0' => true], self::markers($errors, self::BROKEN, $relations));
+    }
+
+    /** @return list<string> */
+    private static function messages(Validator $validator): array
+    {
+        $messages = [];
+        foreach ($validator->getErrors() as $error) {
+            self::assertIsArray($error);
+            self::assertIsString($error['message'] ?? null);
+            $messages[] = $error['message'];
+        }
+
+        return $messages;
     }
 
     /** @return list<string> */
@@ -127,7 +140,7 @@ final class SchemaRelationsTest extends TestCase
         $validator = new Validator();
         $validator->validate($document, self::$schemas[$mode]);
 
-        return array_map(static fn (array $error): string => (string) $error['message'], $validator->getErrors());
+        return self::messages($validator);
     }
 
     /**

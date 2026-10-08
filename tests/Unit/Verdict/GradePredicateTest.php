@@ -26,6 +26,7 @@ use Lockrot\Signal\Signal;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\FakeHttpClient;
+use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
 use Lockrot\Verdict\VerdictEngine;
@@ -71,9 +72,9 @@ final class GradePredicateTest extends TestCase
         }
 
         self::assertNotNull($s7, 'the parent of a graded package carries S7');
-        self::assertSame(1, $s7['flagged']);
-        self::assertSame(['package' => 'vendor/vulnerable', 'verdict' => 'high', 'lead' => null, 'flag_ids' => ['vulnerable']], array_intersect_key($s7['packages'][0], array_flip(['package', 'verdict', 'lead', 'flag_ids'])));
-        self::assertSame(1, $report->toArray()['counts']['high']);
+        self::assertSame(1, JsonPath::intAt($s7, ['flagged']));
+        self::assertSame(['package' => 'vendor/vulnerable', 'verdict' => 'high', 'lead' => null, 'flag_ids' => ['vulnerable']], array_intersect_key(JsonPath::arrayAt($s7, ['packages', 0]), array_flip(['package', 'verdict', 'lead', 'flag_ids'])));
+        self::assertSame(1, JsonPath::intAt($report->toArray(), ['counts', 'high']));
     }
 
     private static function report(bool $transitive = false): Report
