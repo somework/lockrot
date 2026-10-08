@@ -6,6 +6,7 @@ namespace Lockrot\Tests\Integration;
 
 use Composer\Repository\AdvisoryProviderInterface;
 use Lockrot\Allowlist\BuiltinAllowlist;
+use Lockrot\Analyzer\Analysis;
 use Lockrot\Analyzer\Analyzer;
 use Lockrot\Clock;
 use Lockrot\Data\Advisory\RepositoryAdvisoryLoader;
@@ -16,14 +17,23 @@ use Lockrot\Data\Forge\RepoLocator;
 use Lockrot\Data\Forge\Tokens;
 use Lockrot\Data\Http\RecordedHttpClient;
 use Lockrot\Data\Php\PhpReleaseDates;
+use Lockrot\Data\Repository\MetadataBatch;
+use Lockrot\Data\Repository\MetadataLoaderInterface;
 use Lockrot\Data\Repository\RepositoryMetadataLoader;
+use Lockrot\Explain\Explanation;
+use Lockrot\Legacy\NoFix013;
+use Lockrot\Legacy\Priority013;
+use Lockrot\Legacy\PriorityBasis013;
+use Lockrot\Legacy\Verdict013;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\JsonPath;
+use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\ScoreModel;
+use Lockrot\Verdict\Verdict;
 use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\TestCase;
 
@@ -39,13 +49,17 @@ final class ScoreFactsConsistencyTest extends TestCase
     private const FIXTURES = __DIR__.'/../fixtures/';
     private const NOW = '2026-09-14T00:00:00+00:00';
     private const WALLABAG = 'apps/wallabag_wallabag';
+    /** Abandoned in wallabag's lock: the analyses fail its metadata. */
+    private const METADATA_FAILS = 'hoa/compiler';
 
     /**
      * Advisories on wallabag packages, each with the fix kind the recorded releases give it:
      * update on the installed branch, upgrade to a higher branch, raise-php above the project's
      * `>=8.2` and blocked under target PHP 8.2 (8.x needs PHP 8.4), none (every release affected).
+     * The metadata of {@see METADATA_FAILS} fails, so its fix is unknown and its releases unread.
      */
     private const WALLABAG_ADVISORIES = [
+        self::METADATA_FAILS => ['>=3.0', 'high'],
         'doctrine/dbal' => ['3.10.5', 'medium'],
         'doctrine/event-manager' => ['<2.0', 'critical'],
         'scheb/2fa-bundle' => ['<8.0.0', 'high'],
@@ -87,16 +101,22 @@ final class ScoreFactsConsistencyTest extends TestCase
             'drupal' => [$drupal, 'apps/drupal_drupal', true, false, '8.4'],
         ];
         $seen = ['severities' => [], 'fix kinds' => [], 'modifiers' => [], 'multipliers' => []];
+        $legacySeen = [];
         $broken = [];
         foreach ($runs as $run => [$server, $dir, $withManifest, $dev, $target]) {
-            foreach (self::findings($server, $dir, $withManifest, $dev, $target) as $finding) {
-                foreach (self::violations($finding, $seen) as $violation) {
-                    $broken[] = $run.' '.JsonPath::stringAt($finding, ['package']).': '.$violation;
+            $analysis = self::analysis($server, $dir, $withManifest, $dev, $target);
+            foreach (self::findings($analysis, $dir) as $finding) {
+                $package = JsonPath::stringAt($finding, ['package']);
+                foreach (array_merge(self::violations($finding, $seen), self::legacyViolations($analysis, $package, $finding, $target, $legacySeen)) as $violation) {
+                    $broken[] = $run.' '.$package.': '.$violation;
                 }
             }
         }
 
         self::assertSame([], $broken);
+        foreach (array_merge(PriorityBasis013::STEPS, array_diff(NoFix013::REASONS, [NoFix013::AFFECTED_RANGE_UNKNOWN])) as $reason) {
+            self::assertArrayHasKey($reason, $legacySeen, 'the analyses give '.$reason.', or the legacy rules prove little: '.json_encode($legacySeen));
+        }
         self::assertSame(['critical', 'high', 'low', 'medium', 'unrated'], self::sortedKeys($seen['severities']));
         self::assertSame(['blocked', 'none', 'raise-php', 'unknown', 'update', 'upgrade'], self::sortedKeys($seen['fix kinds']));
         self::assertSame(['dev', 'transitive', 'unreached'], self::sortedKeys($seen['modifiers']));
@@ -336,14 +356,140 @@ final class ScoreFactsConsistencyTest extends TestCase
         return $server;
     }
 
-    /** @return list<array<mixed, mixed>> the findings of the report-2 document */
-    private static function findings(FixtureRepositoryServer $server, string $dir, bool $withManifest, bool $dev, string $target): array
+    /**
+     * The legacy facts that the text formats and explain-2's `legacy` block print, checked against
+     * the finding's report-2 fields: the 0.13 priority basis folds to its priority with one step
+     * for each fact that holds, and the no-fix list names each unfixed S9 row with its reason.
+     *
+     * @param array<mixed, mixed> $row the report-2 finding
+     * @param array<string, int>  $seen every step and no-fix reason the analyses gave
+     *
+     * @return list<string>
+     */
+    private static function legacyViolations(Analysis $analysis, string $package, array $row, string $target, array &$seen): array
+    {
+        $finding = $analysis->finding($package);
+        $facts = $analysis->facts($package);
+        self::assertNotNull($finding);
+        self::assertNotNull($facts);
+        $out = [];
+        $check = static function (bool $holds, string $what) use (&$out): void {
+            if (!$holds) {
+                $out[] = $what;
+            }
+        };
+        $basis = $finding->priorityBasis();
+        $at = $basis->base();
+        $reasons = [];
+        foreach ($basis->steps() as $step) {
+            $check($at === $step['from'], 'each legacy step starts where the last ended');
+            $at = $step['to'];
+            $reasons[] = $step['reason'];
+            $seen[$step['reason']] = ($seen[$step['reason']] ?? 0) + 1;
+        }
+        $check($basis->priority() === $at, 'the legacy steps fold to the legacy priority');
+        $noFix = $finding->noFixExpected();
+        $verdict = $finding->verdict();
+        $check((!\in_array($verdict, Finding::NO_FIX_VERDICTS, true) || !Verdict013::flagged($verdict)) === ($noFix === null), 'the no-fix list is null exactly off the no-fix verdicts');
+        $expected = [];
+        if (Verdict013::flagged($verdict)) {
+            if ($row['direct'] !== true) {
+                $expected[] = $row['chain'] === [] ? PriorityBasis013::STEP_UNREACHED : PriorityBasis013::STEP_TRANSITIVE;
+            }
+            if ($row['dev'] === true) {
+                $expected[] = PriorityBasis013::STEP_DEV;
+            }
+            if (\is_array($noFix) && $noFix !== []) {
+                $expected[] = PriorityBasis013::STEP_NO_FIX_EXPECTED;
+            }
+        } else {
+            $check(Priority013::NONE === $basis->base(), 'an unflagged legacy verdict has no priority');
+        }
+        $check($expected === $reasons, 'one legacy step for each fact that holds, in order: '.json_encode($reasons));
+        $check((\is_array($noFix) && $noFix !== []) === (strpos($finding->evidence(), 'no fix expected') !== false), 'the evidence says no fix expected exactly when the list names one');
+
+        $facts013 = $finding->advisoryFacts013();
+        $rows = [];
+        foreach ($facts013->rows() as $advisory) {
+            $rows[$advisory['id']] = $advisory;
+        }
+        $s9 = [];
+        foreach (self::rows($row, ['signals']) as $signal) {
+            if ($signal['id'] === 'S9') {
+                $s9 = array_column(self::rows($signal, ['data', 'advisories']), 'id');
+            }
+        }
+        $legacyIds = array_map('strval', array_keys($rows));
+        sort($legacyIds);
+        sort($s9);
+        $check($legacyIds === $s9, 'the legacy rows are the S9 rows');
+        if (\is_array($noFix)) {
+            $unfixed = array_keys(array_filter($rows, static fn (array $advisory): bool => $verdict === Verdict::LEFT_BEHIND ? $advisory['fixed_on_branch'] !== true : $advisory['fixed_by'] === null));
+            $check($unfixed === array_column($noFix, 'id'), 'the no-fix list names every unfixed legacy row, and only those');
+        }
+        foreach (\is_array($noFix) ? $noFix : [] as $item) {
+            $advisory = $rows[$item['id']] ?? null;
+            $seen[$item['reason']] = ($seen[$item['reason']] ?? 0) + 1;
+            if ($advisory === null) {
+                $check(false, 'a no-fix id names a legacy row: '.$item['id']);
+                continue;
+            }
+            $read = $facts013->releasesRead();
+            switch ($item['reason']) {
+                case NoFix013::NOT_ON_INSTALLED_BRANCH:
+                    $check($verdict === Verdict::LEFT_BEHIND && $advisory['fixed_by'] !== null && $advisory['fixed_on_branch'] === false, 'not_on_installed_branch: left-behind, fixed off the branch');
+                    break;
+                case NoFix013::RELEASES_UNKNOWN:
+                    $check(!$read && $advisory['fixed_by'] === null, 'releases_unknown: the releases were not read');
+                    break;
+                case NoFix013::AFFECTED_RANGE_UNKNOWN:
+                    $check($read && $advisory['affected_versions'] === null && $advisory['fixed_by'] === null, 'affected_range_unknown: no range');
+                    break;
+                case NoFix013::NO_RELEASE_FIXES:
+                    $check($read && $advisory['fixed_by'] === null && $advisory['affected_versions'] !== null, 'no_release_fixes: read, ranged and unfixed');
+                    break;
+                default:
+                    $check(false, 'a no-fix reason this release does not write: '.$item['reason']);
+            }
+        }
+
+        if (Verdict013::flagged($verdict) || $s9 !== []) {
+            $legacy = (new Explanation($finding, $facts, new Thresholds(), $target, $analysis->report()))->toArray()['legacy'] ?? null;
+            $check($legacy === ['verdict' => $verdict, 'priority' => $basis->priority(), 'basis' => $basis->toArray()], 'explain-2\'s legacy block is the finding\'s legacy view');
+        }
+
+        return $out;
+    }
+
+    private static function analysis(FixtureRepositoryServer $server, string $dir, bool $withManifest, bool $dev, string $target): Analysis
     {
         $clock = Clock::fixed(self::NOW);
         $auth = ForgeAuth::withTokens(new Tokens('recorded', null));
         $project = $withManifest ? ProjectConfig::fromFile(self::FIXTURES.$dir.'/composer.json') : ProjectConfig::empty();
+        $failing = new class (new RepositoryMetadataLoader($server->repositories(), $clock), self::METADATA_FAILS) implements MetadataLoaderInterface {
+            private MetadataLoaderInterface $loader;
+            private string $name;
+
+            public function __construct(MetadataLoaderInterface $loader, string $name)
+            {
+                $this->loader = $loader;
+                $this->name = $name;
+            }
+
+            public function load(array $installedByName): MetadataBatch
+            {
+                $batch = $this->loader->load($installedByName);
+                if (!\array_key_exists($this->name, $installedByName)) {
+                    return $batch;
+                }
+                $metadata = $batch->metadata();
+                unset($metadata[$this->name]);
+
+                return new MetadataBatch($metadata, $batch->notFound(), array_merge($batch->failed(), [$this->name => 'HTTP 500']));
+            }
+        };
         $analyzer = new Analyzer(
-            new RepositoryMetadataLoader($server->repositories(), $clock),
+            $failing,
             new ActivityClient(new RecordedHttpClient(self::FIXTURES.'http/github'), $auth),
             new ActivityFetchPlanner($auth),
             new RepoLocator(),
@@ -354,8 +500,15 @@ final class ScoreFactsConsistencyTest extends TestCase
             false,
             new RepositoryAdvisoryLoader($server->repositories())
         );
-        $report = $analyzer->analyze(LockFile::fromFile(self::FIXTURES.$dir.'/composer.lock'), $project, $dev);
-        $document = json_decode((string) json_encode($report->toArray()), true);
+        $lock = LockFile::fromFile(self::FIXTURES.$dir.'/composer.lock');
+
+        return $analyzer->analyzeWithFacts($lock->packages($dev), $lock, $project, $dev);
+    }
+
+    /** @return list<array<mixed, mixed>> the findings of the report-2 document */
+    private static function findings(Analysis $analysis, string $dir): array
+    {
+        $document = json_decode((string) json_encode($analysis->report()->toArray()), true);
         self::assertIsArray($document);
         $findings = self::rows($document, ['findings']);
         self::assertNotSame([], $findings, $dir);
