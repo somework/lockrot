@@ -187,7 +187,7 @@ final class JsonSchemaConformanceTest extends TestCase
     public function testTheHtmlPageEmbedsADocumentThatValidates(string $dir): void
     {
         $analysis = self::analysis($dir);
-        $page = (new HtmlFormatter(new PageData($analysis, new Thresholds(), '8.4')))->format($analysis->report());
+        $page = (new HtmlFormatter(new PageData($analysis, new Thresholds(), '8.4'), [JsonFormatter::SCHEMA]))->format($analysis->report());
 
         $matched = preg_match('{<script id="lockrot-data" type="application/json">(.*?)</script>}s', $page, $m);
         self::assertSame(1, $matched, $dir.' carries exactly one payload');

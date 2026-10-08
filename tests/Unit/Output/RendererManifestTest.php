@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Output;
 
+use Lockrot\Analyzer\Report;
+use Lockrot\Exception\ConfigException;
+use Lockrot\Output\HtmlFormatter;
 use Lockrot\Output\JsonFormatter;
 use PHPUnit\Framework\TestCase;
 
@@ -76,14 +79,21 @@ final class RendererManifestTest extends TestCase
         }
     }
 
-    public function testTheManifestReadsTheReportSchemaLockrotWrites(): void
+    public function testHtmlRefusesUnlessTheManifestReadsTheReportSchemaLockrotWrites(): void
     {
         $schema = self::manifest()['schema'] ?? null;
         self::assertIsArray($schema);
         $majors = $schema['report'] ?? null;
         self::assertIsArray($majors);
 
-        self::assertContains(JsonFormatter::SCHEMA, $majors);
+        $renders = true;
+        try {
+            (new HtmlFormatter())->format(new Report([], [], new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), 0, 0));
+        } catch (ConfigException $refused) {
+            $renders = false;
+        }
+
+        self::assertSame(\in_array(JsonFormatter::SCHEMA, $majors, true), $renders, 'html refuses unless the manifest lists the report number lockrot writes');
     }
 
     public function testNothingElseIsVendored(): void

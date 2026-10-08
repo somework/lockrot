@@ -7,9 +7,11 @@ namespace Lockrot\Tests\Unit\Output;
 use Lockrot\Analyzer\Analysis;
 use Lockrot\Analyzer\LibyearsMeasurement;
 use Lockrot\Analyzer\Report;
+use Lockrot\Exception\ConfigException;
 use Lockrot\Html\PageData;
 use Lockrot\Output\Formatters;
 use Lockrot\Output\HtmlFormatter;
+use Lockrot\Output\JsonFormatter;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\FindingBuilder;
@@ -35,7 +37,7 @@ final class HtmlFormatterTest extends TestCase
 
     private function page(Report $report, bool $showAll = false): string
     {
-        return (new HtmlFormatter())->format($report, $showAll);
+        return (new HtmlFormatter(null, [JsonFormatter::SCHEMA]))->format($report, $showAll);
     }
 
     /** @return array<mixed, mixed> */
@@ -47,6 +49,14 @@ final class HtmlFormatterTest extends TestCase
         self::assertIsArray($decoded, 'the payload is valid JSON: '.json_last_error_msg());
 
         return $decoded;
+    }
+
+    public function testThePageRefusesAReportItsVendoredRendererCannotRead(): void
+    {
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('html needs a lockrot-report release that reads report-2 (this build vendors one that reads [1]); use --format=json meanwhile');
+
+        (new HtmlFormatter())->format(new Report([], [], new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), 0, 0));
     }
 
     public function testThePageIsOneFileWithItsStylesAndScriptInline(): void
@@ -135,7 +145,7 @@ final class HtmlFormatterTest extends TestCase
 
     public function testTheTitleIsEscapedLikeEverythingElse(): void
     {
-        $page = (new HtmlFormatter())->format($this->report([], 0));
+        $page = (new HtmlFormatter(null, [JsonFormatter::SCHEMA]))->format($this->report([], 0));
 
         self::assertStringNotContainsString('<title></title>', $page);
         self::assertStringContainsString('lockrot: nothing flagged in 0 packages', $page);
@@ -147,7 +157,7 @@ final class HtmlFormatterTest extends TestCase
 
         // The run settings and each finding's standing against the baseline live in the report.
         self::assertSame(['report', 'details'], array_keys($payload));
-        self::assertSame('https://lockrot.dev/schema/report-1.json', J::stringAt($payload, ['report', '$schema']));
+        self::assertSame('https://lockrot.dev/schema/report-2.json', J::stringAt($payload, ['report', '$schema']));
         self::assertSame([], J::arrayAt($payload, ['details']), 'no facts were passed, so there is nothing to explain');
     }
 
@@ -162,7 +172,7 @@ final class HtmlFormatterTest extends TestCase
             'vendor/rotten' => F::facts(F::package(['name' => 'vendor/rotten']), F::metadata([['1.0.0', '2020-01-01T00:00:00+00:00']])),
             'vendor/fine' => F::facts(F::package(['name' => 'vendor/fine']), F::metadata([['1.0.0', '2026-01-01T00:00:00+00:00']])),
         ];
-        $formatter = new HtmlFormatter(new PageData(new Analysis($report, $facts), new Thresholds(), '8.4'));
+        $formatter = new HtmlFormatter(new PageData(new Analysis($report, $facts), new Thresholds(), '8.4'), [JsonFormatter::SCHEMA]);
 
         self::assertSame(['vendor/rotten'], array_keys(J::arrayAt(self::payloadOf($formatter->format($report)), ['details'])));
         self::assertSame(['vendor/rotten', 'vendor/fine'], array_keys(J::arrayAt(self::payloadOf($formatter->format($report, true)), ['details'])));
