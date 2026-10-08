@@ -238,15 +238,15 @@ final class LockrotCommand extends BaseCommand
                 $lockrot->project() ?? $project->name(),
                 $project->name(),
                 $lockrot->targetPhp(),
+                $lockrot->targetPhpSource(),
                 $lockPath,
                 $failOn,
+                $lockrot->failOnSource(),
                 $lockrot->thresholds(),
                 // The project's require.php, which the page and --explain test branch rows against.
                 $project->requirePhp(),
                 $lockrot->strictNetwork(),
                 $generate ? Gate::MODE_GENERATE_BASELINE : Gate::MODE_CHECK,
-                $lockrot->targetPhpSource(),
-                $lockrot->failOnSource(),
                 $lockrot->includeDev()
             ));
 
@@ -337,14 +337,14 @@ final class LockrotCommand extends BaseCommand
             $lockrot->project() ?? $project->name(),
             $project->name(),
             $lockrot->targetPhp(),
+            $lockrot->targetPhpSource(),
             null,
             FailOn::fromString($lockrot->failOn()),
+            $lockrot->failOnSource(),
             $lockrot->thresholds(),
             $project->requirePhp(),
             $lockrot->strictNetwork(),
             Gate::MODE_CHECK,
-            $lockrot->targetPhpSource(),
-            $lockrot->failOnSource(),
             $lockrot->includeDev()
         ));
         $explanation = new Explanation($finding, $facts, $lockrot->thresholds(), $lockrot->targetPhp(), $report, $project->requirePhp());

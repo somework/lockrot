@@ -66,7 +66,7 @@ final class ReportDocumentTest extends TestCase
     /** The report carries the run settings. The page payload keeps no second copy of them. */
     public function testThePayloadKeepsNoSecondCopyOfTheRun(): void
     {
-        $report = $this->report([])->withRun(new RunSettings('Acme app', 'acme/app', '8.4', '/home/someone/acme/composer.lock', FailOn::none(), new Thresholds(), '^8.2'));
+        $report = $this->report([])->withRun(new RunSettings('Acme app', 'acme/app', '8.4', RunSettings::SOURCE_OPTION, '/home/someone/acme/composer.lock', FailOn::none(), RunSettings::SOURCE_OPTION, new Thresholds(), '^8.2'));
 
         $document = (new ReportDocument($report))->toArray();
 

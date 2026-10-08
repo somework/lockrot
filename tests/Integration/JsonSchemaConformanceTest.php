@@ -227,7 +227,7 @@ final class JsonSchemaConformanceTest extends TestCase
         $report = self::analysis('apps/wallabag_wallabag')->report();
         $previous = Baseline::fromReport($report);
         $report = $report
-            ->withRun(new RunSettings('Acme internal API', 'acme/internal-api', '8.4', '/home/someone/clients/acme/composer.lock', FailOn::fromString('silent'), new Thresholds(2, 4, 2, 4), '>=8.2'))
+            ->withRun(new RunSettings('Acme internal API', 'acme/internal-api', '8.4', RunSettings::SOURCE_OPTION, '/home/someone/clients/acme/composer.lock', FailOn::fromString('silent'), RunSettings::SOURCE_OPTION, new Thresholds(2, 4, 2, 4), '>=8.2'))
             ->withBaseline(BaselineComparison::compare($previous, $report, 'lockrot-baseline.json', []));
 
         $json = (new JsonFormatter())->format($report);
@@ -824,7 +824,7 @@ final class JsonSchemaConformanceTest extends TestCase
     {
         $report = self::analysis('apps/wallabag_wallabag')->report();
         $report = $report
-            ->withRun(new RunSettings(null, null, '8.4', null, FailOn::fromString(Verdict::STALE), new Thresholds(), null, true))
+            ->withRun(new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, FailOn::fromString(Verdict::STALE), RunSettings::SOURCE_OPTION, new Thresholds(), null, true))
             ->withBaseline(BaselineComparison::compare(Baseline::fromReport($report), $report, 'lockrot-baseline.json', []));
         $decoded = json_decode((new JsonFormatter())->format($report), true);
         self::assertIsArray($decoded);
@@ -1207,7 +1207,7 @@ final class JsonSchemaConformanceTest extends TestCase
 
         // What the command records for a lock read without its manifest: no name to display and
         // no root package, both written as null — the null branch of each must validate too.
-        $json = (new JsonFormatter())->format($analysis->report()->withRun(new RunSettings(null, null, '8.4', null, FailOn::none(), null)));
+        $json = (new JsonFormatter())->format($analysis->report()->withRun(new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, FailOn::none(), RunSettings::SOURCE_OPTION, null)));
 
         $decoded = json_decode($json, true);
         self::assertIsArray($decoded);

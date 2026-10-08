@@ -129,7 +129,7 @@ final class GateAgreementTest extends TestCase
                     foreach ([false, true] as $strict) {
                         foreach (Gate::MODES as $mode) {
                             $what = \sprintf('%s fail-on=%s strict=%d network_failures=%d baseline=%d %s', $dir, $value, $strict, $networkFailures, $baseline !== null, $mode);
-                            $withRun = $compared->withRun(new RunSettings(null, null, '8.4', null, $failOn, new Thresholds(), null, $strict, $mode));
+                            $withRun = $compared->withRun(new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, $failOn, RunSettings::SOURCE_OPTION, new Thresholds(), null, $strict, $mode));
                             $this->holds($withRun->toArray(), $compared, $levels, $failOn, $strict, $mode, $what);
                             // One document per lock and mode through both schemas: the fields' shape
                             // does not depend on the threshold, and validating every document is slow.

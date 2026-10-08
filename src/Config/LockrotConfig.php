@@ -38,7 +38,9 @@ final class LockrotConfig
     private Thresholds $thresholds;
     private string $advisoryLookup;
     private string $advisoryLookupSource;
+    /** @var RunSettings::SOURCE_OPTION|RunSettings::SOURCE_ENV|RunSettings::SOURCE_CONFIG|RunSettings::SOURCE_DEFAULT */
     private string $failOnSource = RunSettings::SOURCE_DEFAULT;
+    /** @var RunSettings::SOURCE_OPTION|RunSettings::SOURCE_ENV|RunSettings::SOURCE_CONFIG|RunSettings::SOURCE_PLATFORM|RunSettings::SOURCE_RUNTIME */
     private string $targetPhpSource = RunSettings::SOURCE_RUNTIME;
 
     private function __construct(string $failOn, string $targetPhp, bool $includeDev, bool $offline, bool $strictNetwork, string $format, ?string $baseline, bool $disabled, bool $installTime, bool $installTimeStrict, int $installTimeBudgetSeconds, Thresholds $thresholds, ?string $project = null, string $advisoryLookup = AdvisoryCoverage::SCOPE_ALL, string $advisoryLookupSource = AdvisoryCoverage::SOURCE_DEFAULT)
@@ -174,8 +176,7 @@ final class LockrotConfig
      * @param array<string, mixed> $env
      * @param array<string, mixed> $cli
      *
-     * @return array{string, string} a verdict, a priority or `none`, as {@see FailOn::fromString()}
-     *                               accepts them, and its source (option, env, config, default)
+     * @return array{string, RunSettings::SOURCE_OPTION|RunSettings::SOURCE_ENV|RunSettings::SOURCE_CONFIG|RunSettings::SOURCE_DEFAULT} a verdict, a priority or `none`, as {@see FailOn::fromString()} accepts them, and its source
      */
     private static function resolveFailOn(array $extra, array $env, array $cli): array
     {
@@ -201,7 +202,7 @@ final class LockrotConfig
      * @param array<string, mixed> $env
      * @param array<string, mixed> $cli
      *
-     * @return array{string, string} the target minor and its source (option, env, config, platform, runtime)
+     * @return array{string, RunSettings::SOURCE_OPTION|RunSettings::SOURCE_ENV|RunSettings::SOURCE_CONFIG|RunSettings::SOURCE_PLATFORM|RunSettings::SOURCE_RUNTIME} the target minor and its source
      */
     private static function resolveTargetPhp(array $extra, array $env, array $cli, string $runtimePhp, ?string $platformPhp): array
     {
@@ -296,9 +297,12 @@ final class LockrotConfig
     /**
      * As {@see pick()}, with the key of the candidate that won, else $defaultSource.
      *
-     * @param array<string, mixed> $candidates by source, first wins
+     * @template S of string
      *
-     * @return array{string, string}
+     * @param array<S, mixed> $candidates by source, first wins
+     * @param S               $defaultSource
+     *
+     * @return array{string, S}
      */
     private static function pickWithSource(array $candidates, string $default, string $defaultSource): array
     {
@@ -321,13 +325,21 @@ final class LockrotConfig
         return $this->targetPhp;
     }
 
-    /** The source that set {@see failOn()}: one of the `RunSettings::SOURCE_*` values option, env, config or default. */
+    /**
+     * The source that set {@see failOn()}.
+     *
+     * @return RunSettings::SOURCE_OPTION|RunSettings::SOURCE_ENV|RunSettings::SOURCE_CONFIG|RunSettings::SOURCE_DEFAULT
+     */
     public function failOnSource(): string
     {
         return $this->failOnSource;
     }
 
-    /** The source that set {@see targetPhp()}: option, env, config, platform or runtime. */
+    /**
+     * The source that set {@see targetPhp()}.
+     *
+     * @return RunSettings::SOURCE_OPTION|RunSettings::SOURCE_ENV|RunSettings::SOURCE_CONFIG|RunSettings::SOURCE_PLATFORM|RunSettings::SOURCE_RUNTIME
+     */
     public function targetPhpSource(): string
     {
         return $this->targetPhpSource;

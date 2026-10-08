@@ -67,7 +67,7 @@ final class RunSettingsTest extends TestCase
     #[DataProvider('gates')]
     public function testOneGateEntryStandsForTheFailOnValue(string $failOn, string $kinds): void
     {
-        $run = new RunSettings(null, null, '8.4', null, FailOn::fromString($failOn), new Thresholds(), null, false, 'check', RunSettings::SOURCE_OPTION, RunSettings::SOURCE_OPTION);
+        $run = new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, FailOn::fromString($failOn), RunSettings::SOURCE_OPTION, new Thresholds(), null, false, 'check');
 
         self::assertSame($kinds, json_encode($run->toArray()['gates']));
     }
@@ -83,8 +83,8 @@ final class RunSettingsTest extends TestCase
 
     public function testTheProjectsLowestPhpIsTheFloorsStablePoint(): void
     {
-        $run = new RunSettings(null, null, '8.4', null, null, null, '^7.2 || ^8.0.0');
-        $none = new RunSettings(null, null, '8.4', null, null, null, null);
+        $run = new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, null, RunSettings::SOURCE_DEFAULT, null, '^7.2 || ^8.0.0');
+        $none = new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, null, RunSettings::SOURCE_DEFAULT, null);
 
         self::assertSame('7.2.0', $run->toArray()['project_php_lowest']);
         self::assertNull($none->toArray()['project_php_lowest']);
@@ -92,9 +92,21 @@ final class RunSettingsTest extends TestCase
 
     public function testTheRunKeysAreReport2sInOrder(): void
     {
-        $keys = array_keys((new RunSettings(null, null, '8.4', null, null, null))->toArray(['counted' => 0]));
+        $keys = array_keys((new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, null, RunSettings::SOURCE_DEFAULT, null))->toArray(['counted' => 0]));
 
         self::assertSame(['project', 'root_package', 'target_php', 'target_php_source', 'project_php', 'project_php_lowest', 'lock_file', 'fail_on', 'fail_on_source', 'gates',
             'strict_network', 'mode', 'include_dev', 'thresholds', 'flag_ids', 'verdicts', 'graded_verdicts', 'signal_ids', 'fix_model', 'text_grammar', 'score_model', 'score_rules_used'], $keys);
+    }
+
+    /** A run that records a target PHP or a fail-on records the source that set it: no default stands in. */
+    public function testEachSourceIsAnArgumentBesideItsValue(): void
+    {
+        $names = array_map(static fn (\ReflectionParameter $p): string => $p->getName(), (new \ReflectionMethod(RunSettings::class, '__construct'))->getParameters());
+        $optional = array_map(static fn (\ReflectionParameter $p): string => $p->getName(), array_filter((new \ReflectionMethod(RunSettings::class, '__construct'))->getParameters(), static fn (\ReflectionParameter $p): bool => $p->isOptional()));
+
+        self::assertSame(['targetPhp', 'targetPhpSource'], \array_slice($names, (int) array_search('targetPhp', $names, true), 2));
+        self::assertSame(['failOn', 'failOnSource'], \array_slice($names, (int) array_search('failOn', $names, true), 2));
+        self::assertNotContains('targetPhpSource', $optional);
+        self::assertNotContains('failOnSource', $optional);
     }
 }

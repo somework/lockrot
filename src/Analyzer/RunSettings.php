@@ -51,11 +51,13 @@ final class RunSettings
     private bool $includeDev;
 
     /**
-     * @param string $mode one of {@see Gate::MODES}
+     * @param self::SOURCE_* $targetPhpSource what set `$targetPhp`
+     * @param self::SOURCE_* $failOnSource    what set `$failOn`
+     * @param string         $mode            one of {@see Gate::MODES}
      *
      * @throws \InvalidArgumentException for a mode not in {@see Gate::MODES}
      */
-    public function __construct(?string $project, ?string $rootPackage, ?string $targetPhp, ?string $lockPath, ?FailOn $failOn, ?Thresholds $thresholds, ?string $projectPhp = null, bool $strictNetwork = false, string $mode = Gate::MODE_CHECK, string $targetPhpSource = self::SOURCE_RUNTIME, string $failOnSource = self::SOURCE_DEFAULT, bool $includeDev = false)
+    public function __construct(?string $project, ?string $rootPackage, ?string $targetPhp, string $targetPhpSource, ?string $lockPath, ?FailOn $failOn, string $failOnSource, ?Thresholds $thresholds, ?string $projectPhp = null, bool $strictNetwork = false, string $mode = Gate::MODE_CHECK, bool $includeDev = false)
     {
         if (!\in_array($mode, Gate::MODES, true)) {
             throw new \InvalidArgumentException(\sprintf('no run in mode "%s"; the modes are %s', $mode, implode(', ', Gate::MODES)));
