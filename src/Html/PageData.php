@@ -19,17 +19,33 @@ final class PageData
     private ?Thresholds $thresholds;
     private ?string $targetPhp;
     private ?string $projectPhp;
+    /** @var list<int>|null */
+    private ?array $reads;
 
+    /** @param list<int>|null $reads the report schema numbers the renderer reads, its manifest's unless given */
     public function __construct(
         ?Analysis $analysis = null,
         ?Thresholds $thresholds = null,
         ?string $targetPhp = null,
-        ?string $projectPhp = null
+        ?string $projectPhp = null,
+        ?array $reads = null
     ) {
         $this->analysis = $analysis;
         $this->thresholds = $thresholds;
         $this->targetPhp = $targetPhp;
         $this->projectPhp = $projectPhp;
+        $this->reads = $reads;
+    }
+
+    /**
+     * The report schema numbers the page's renderer reads; null leaves them to the vendored
+     * renderer's manifest.
+     *
+     * @return list<int>|null
+     */
+    public function reads(): ?array
+    {
+        return $this->reads;
     }
 
     public static function none(): self

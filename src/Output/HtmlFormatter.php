@@ -43,7 +43,7 @@ final class HtmlFormatter implements FormatterInterface
     public function __construct(?PageData $page = null, ?array $reads = null)
     {
         $this->page = $page ?? PageData::none();
-        $this->reads = $reads ?? self::manifestReads();
+        $this->reads = $reads ?? $this->page->reads() ?? self::manifestReads();
     }
 
     /** @throws ConfigException when the vendored renderer does not read the schema lockrot writes */

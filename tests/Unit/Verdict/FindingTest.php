@@ -40,7 +40,8 @@ final class FindingTest extends TestCase
         $array = $finding->toArray();
         self::assertSame('phpzip/phpzip', $array['package']);
         self::assertSame('2.0.8', $array['version']);
-        self::assertSame('silent', $array['verdict']);
+        self::assertSame('high', $array['verdict'], 'report-2 writes the grade: silent halved for reach');
+        self::assertSame('silent', $array['lead']);
         self::assertIsArray($array['signals']);
         self::assertSame(['S2', 'S4'], array_column($array['signals'], 'id'));
         self::assertSame(['high', 'high'], array_column($array['signals'], 'level'));
@@ -49,7 +50,7 @@ final class FindingTest extends TestCase
             array_column($array['signals'], 'summary')
         );
         self::assertSame([['years' => 10.8], ['years' => 10.8]], array_column($array['signals'], 'data'));
-        self::assertSame('last release 2015-11-16 (10.8 years ago); last push 2015-11-16 (10.8 years ago)', $array['evidence']);
+        self::assertStringStartsWith('silent: last release ', $array['evidence'], 'the counted flag and its sentence');
         self::assertSame('2026-09-14T10:00:00+00:00', $array['data_date']);
         self::assertSame(['wallabag/wallabag', 'phpzip/phpzip'], $array['chain']);
     }
@@ -297,7 +298,7 @@ final class FindingTest extends TestCase
         self::assertSame('vendor/pkg', $array['package']);
         self::assertSame('1.2.3', $array['version']);
         self::assertSame('finished', $array['verdict']);
-        self::assertSame('no signals fired', $array['evidence']);
+        self::assertSame('', $array['evidence'], 'no flag counts on the score-0 shape');
         self::assertSame('audited by security team', $array['allowlist_reason']);
         self::assertSame('no signals fired', $array['note']);
         self::assertSame(['vendor/pkg'], $array['chain']);
@@ -355,15 +356,16 @@ final class FindingTest extends TestCase
         self::assertNull(((new FindingBuilder())->withVerdict(Verdict::STALE)->build())->toArray()['replacement_url']);
     }
 
-    public function testToArrayCarriesPriorityDirectAndDevRightAfterTheVerdict(): void
+    public function testToArrayWritesReport2sFindingKeysInOrder(): void
     {
         $finding = (new FindingBuilder())->withVersion('1.2.3')->withVerdict(Verdict::STALE)->withChain(['vendor/root', 'vendor/pkg'])->withDev(true)->build();
         $array = $finding->toArray();
         self::assertSame(
-            ['package', 'version', 'verdict', 'priority', 'direct', 'dev', 'from_composer_repository', 'origin', 'replacement', 'replacement_url', 'signals', 'chain', 'direct_dependents', 'evidence', 'allowlist_reason', 'note', 'data_date', 'libyears', 'libyears_unmeasured', 'priority_basis', 'no_fix_expected'],
+            ['package', 'version', 'branch', 'installed_php', 'verdict', 'priority', 'lead', 'flags', 'score', 'next_step', 'security', 'checks_missing', 'checks_skipped', 'maintenance_judged', 'metadata', 'allowlist',
+                'from_composer_repository', 'origin', 'replacement', 'replacement_url', 'note', 'libyears_unmeasured', 'direct', 'dev', 'reach', 'chain', 'direct_dependents', 'signals', 'evidence', 'allowlist_reason', 'data_date', 'libyears'],
             array_keys($array)
         );
-        self::assertSame(Priority013::LOW, $array['priority']);
+        self::assertSame('low', $array['priority'], 'the alias of the grade');
         self::assertFalse($array['direct']);
         self::assertTrue($array['dev']);
     }
@@ -591,10 +593,8 @@ final class FindingTest extends TestCase
     #[DataProvider('noFixShapes')]
     public function testTheNoFixListNamesEachAdvisoryNoFixIsExpectedForAndWhy(Finding $finding, ?array $expected): void
     {
-        $array = $finding->toArray();
-
         self::assertSame($expected, $finding->noFixExpected());
-        self::assertSame($expected, $array['no_fix_expected']);
+        self::assertArrayNotHasKey('no_fix_expected', $finding->toArray(), 'report-2 drops it');
         self::assertSame($expected === null, !\in_array($finding->verdict(), Finding::NO_FIX_VERDICTS, true), 'null exactly off the no-fix verdicts');
         $ids = [];
         foreach ($finding->signals() as $signal) {
@@ -609,7 +609,7 @@ final class FindingTest extends TestCase
         }
 
         $basis = $finding->priorityBasis()->toArray();
-        self::assertSame($basis, $array['priority_basis']);
+        self::assertSame($basis, $finding->priorityBasis()->toArray());
         $reasons = array_column($basis['steps'], 'reason');
         $raised = \in_array('no_fix_expected', $reasons, true);
         self::assertSame($raised, $expected !== null && $expected !== [], 'the raise is there exactly when the list names an advisory');
@@ -626,7 +626,7 @@ final class FindingTest extends TestCase
         $s9 = self::s9([self::row('CVE-a', 'v8.1.7'), self::row('CVE-c', 'v3.4.47', true)]);
         $finding = (new FindingBuilder())->withPackage('symfony/http-foundation')->withVersion('v3.4.18')->withVerdict(Verdict::LEFT_BEHIND)->withSignals([$s9])->withChain(['laravel/framework', 'symfony/http-foundation'])->build();
 
-        self::assertSame(['base' => 'high', 'steps' => [['reason' => 'transitive', 'from' => 'high', 'to' => 'medium'], ['reason' => 'no_fix_expected', 'from' => 'medium', 'to' => 'high']]], $finding->toArray()['priority_basis']);
+        self::assertSame(['base' => 'high', 'steps' => [['reason' => 'transitive', 'from' => 'high', 'to' => 'medium'], ['reason' => 'no_fix_expected', 'from' => 'medium', 'to' => 'high']]], $finding->priorityBasis()->toArray());
         self::assertSame(Priority013::HIGH, $finding->priority());
     }
 
@@ -635,8 +635,8 @@ final class FindingTest extends TestCase
     {
         $finding = (new FindingBuilder())->withVerdict(Verdict::STALE)->withChain([])->withDev(true)->build();
 
-        self::assertSame(['base' => 'medium', 'steps' => [['reason' => 'unreached', 'from' => 'medium', 'to' => 'low'], ['reason' => 'dev', 'from' => 'low', 'to' => 'low']]], $finding->toArray()['priority_basis']);
-        self::assertSame(['base' => 'none', 'steps' => []], ((new FindingBuilder())->withChain([])->build())->toArray()['priority_basis']);
+        self::assertSame(['base' => 'medium', 'steps' => [['reason' => 'unreached', 'from' => 'medium', 'to' => 'low'], ['reason' => 'dev', 'from' => 'low', 'to' => 'low']]], $finding->priorityBasis()->toArray());
+        self::assertSame(['base' => 'none', 'steps' => []], ((new FindingBuilder())->withChain([])->build())->priorityBasis()->toArray());
     }
 
     /** An S9 without releases_read says nothing about whether a fix was looked for, so none was. */

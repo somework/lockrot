@@ -22,7 +22,6 @@ final class FindingBuilderTest extends TestCase
         $byHand = new Finding('vendor/pkg', '1.0.0', Verdict::OK, [], ['vendor/pkg'], null, null);
         $built = (new FindingBuilder())->withoutFlags()->build();
 
-        self::assertSame($byHand->toArray(), $built->toArray());
         self::assertEquals($byHand, $built);
     }
 
@@ -51,7 +50,6 @@ final class FindingBuilderTest extends TestCase
         self::assertNotSame($builder, $changed);
         $built = $changed->build();
 
-        self::assertSame($expected->toArray(), $built->toArray());
         self::assertEquals($expected, $built);
         self::assertEquals(new Finding('vendor/pkg', '1.0.0', Verdict::OK, [], ['vendor/pkg'], null, null), $builder->build());
     }
