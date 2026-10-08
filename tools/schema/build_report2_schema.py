@@ -148,9 +148,9 @@ defs['years']['description'] = ('Years elapsed on the run clock (`Clock::yearsSi
                                 'The one-decimal rule is stated, not encoded: `multipleOf: 0.1` has no exact binary form and standard validators (ajv, '
                                 'python-jsonschema) reject a third of all tenths with it (attack round 1); only `multipleOf: 0.5` is used, which is exact.')
 defs['years'].pop('multipleOf', None)
-defs['advisoriesNotCheckedReason'] = open_set(['offline', 'composer_too_old', 'install_time_budget', 'lookup_failed'],
+defs['advisoriesNotCheckedReason'] = open_set(['offline', 'composer_too_old', 'install_time_budget'],
     "Why security advisories were not checked (§5.1): `offline` (`--offline`; advisories are never served from a cache), `composer_too_old` "
-    "(Composer below 2.4 has no advisory API), `install_time_budget` (the install-time budget ran out), `lookup_failed` (a repository threw). "
+    "(Composer below 2.4 has no advisory API), `install_time_budget` (the install-time budget ran out). "
     "An open set: read a reason you do not know as another reason.")
 defs['flag'] = closed(FLAGS, 'A flag id (§2.1), in the frozen flag order `abandoned silent pinned left-behind old-promise stale vulnerable`. Closed: a new flag is a report-3 event (§3.7, §8.2).')
 defs['maintenanceFlag'] = closed(MAINT, 'A maintenance flag id: the flag order without `vulnerable` (§2.1). The same closed set as `flag`, restricted; the values `lead`, an accepted flag and a baseline entry can name.')
