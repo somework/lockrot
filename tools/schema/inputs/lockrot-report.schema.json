@@ -1,0 +1,2228 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "https://lockrot.dev/schema/report-1.json",
+  "title": "lockrot report",
+  "description": "The document `composer lockrot --format=json` prints. Objects are open: a field added later validates against this file unchanged; the number in the id changes only when a field is removed or renamed.",
+  "type": "object",
+  "required": [
+    "lockrot",
+    "generated_at",
+    "activity_cache_oldest_at",
+    "packages_checked",
+    "include_dev",
+    "not_from_composer_repository",
+    "network_failures",
+    "counts",
+    "priorities",
+    "exposure",
+    "baseline",
+    "notes",
+    "findings"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "lockrot": {
+      "$ref": "#/definitions/envelope"
+    },
+    "generated_at": {
+      "$ref": "#/definitions/dateTime"
+    },
+    "run": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/run"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "activity_cache_oldest_at": {
+      "description": "Fetch time of the oldest repository-activity answer served from lockrot's cache; null when every answer was fetched in this run.",
+      "oneOf": [
+        {
+          "$ref": "#/definitions/dateTime"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "packages_checked": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "include_dev": {
+      "type": "boolean"
+    },
+    "not_from_composer_repository": {
+      "description": "How many of the packages checked lockrot asked no repository about: the lock entry carries no Composer notification-url — a path, vcs, artifact or inline package entry, or a package from a `type: composer` repository that advertises no notify URL. Equals the number of findings whose `from_composer_repository` is false.",
+      "type": "integer",
+      "minimum": 0
+    },
+    "network_failures": {
+      "type": "boolean"
+    },
+    "counts": {
+      "description": "Findings per verdict, every verdict present.",
+      "type": "object",
+      "required": [
+        "abandoned",
+        "silent",
+        "pinned",
+        "left-behind",
+        "old-promise",
+        "stale",
+        "unknown",
+        "finished",
+        "ok"
+      ],
+      "properties": {
+        "abandoned": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "silent": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "pinned": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "left-behind": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "old-promise": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "stale": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unknown": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "finished": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ok": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "abandoned": {
+      "description": "The abandoned count split by what the reader can do about it: `with_replacement` is how many of the `abandoned` findings carry a `replacement` that names a package, the rest name none (or free text). `total` equals counts.abandoned. Absent from documents written before 0.11.0.",
+      "type": "object",
+      "required": [
+        "total",
+        "with_replacement"
+      ],
+      "properties": {
+        "total": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "with_replacement": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "priorities": {
+      "description": "Findings per priority, every priority present.",
+      "type": "object",
+      "required": [
+        "critical",
+        "high",
+        "medium",
+        "low",
+        "none"
+      ],
+      "properties": {
+        "critical": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "high": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "medium": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "low": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "none": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "exposure": {
+      "description": "Direct requirements that pull in attributable flagged packages (see `exposure_rule`), with how many, most first, then by name: the same count S7 carries on the requirement's finding. A direct requirement appears here only when it pulls in such a package; a flagged direct requirement that pulls in none is not listed, and its own verdict is on its finding.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "package",
+          "flagged"
+        ],
+        "properties": {
+          "package": {
+            "$ref": "#/definitions/packageName"
+          },
+          "flagged": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      }
+    },
+    "exposure_rule": {
+      "description": "The rule `exposure` and S7 attribute by: a flagged package that is not a direct requirement counts under each direct requirement it is reachable from when there is at least one and at most `max_fan_in` of them. The direct requirements are this run's: `require-dev` counts when `include_dev` is true. The value is what this run used, not a promise; a minor release may change it. Absent from documents written before 0.13.0.",
+      "type": "object",
+      "required": [
+        "max_fan_in"
+      ],
+      "properties": {
+        "max_fan_in": {
+          "description": "The most direct requirements a flagged transitive package may be reached from and still be attributed to each of them; above it the package is shared infrastructure and is listed under `unattributed`.",
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "unattributed": {
+      "description": "Flagged transitive packages reached from more than `exposure_rule.max_fan_in` direct requirements, in report order: counted under no entry of `exposure` and in no S7. A flagged package no direct requirement reaches (an empty `chain`, as in a lock-only run) is in neither list. Absent from documents written before 0.13.0.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "package",
+          "verdict",
+          "fan_in"
+        ],
+        "properties": {
+          "package": {
+            "$ref": "#/definitions/packageName"
+          },
+          "verdict": {
+            "$ref": "#/definitions/verdict"
+          },
+          "fan_in": {
+            "description": "How many direct requirements of this run reach the package: the length of its finding's `direct_dependents`, `require-dev` included when `include_dev` is true.",
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      }
+    },
+    "libyears": {
+      "description": "How far behind the lock is, in libyears: for each measured finding, the years (365.25 days) between the installed version's release and the package's newest stable release, never below zero, summed. Derived from `findings`: `total` is the sum of the unrounded per-finding values (so the sum of the printed two-decimal values agrees with it to within 0.005 per measured finding), `direct_requirements` the same over `direct: true`, `measured` the number of findings whose `libyears` is not null, `unmeasured` the null ones by reason, `furthest_behind` the greatest above zero (ties to the first package name; null when nothing was measured or nothing is behind). Every drift counts, healthy patches included: this is not a measure of rot or of security, and not php-libyear's number, which sums composer.json's direct requirements (require and require-dev) and scores an undated package as zero. Absent from documents written before 0.11.0.",
+      "type": "object",
+      "required": [
+        "total",
+        "direct_requirements",
+        "measured",
+        "unmeasured",
+        "furthest_behind"
+      ],
+      "properties": {
+        "total": {
+          "description": "Sum over every measured finding, two decimals; null when `measured` is 0, since a run that could measure nothing has no sum — 0 is the answer of a run that measured packages and found none behind.",
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "direct_requirements": {
+          "description": "Sum over the measured findings with `direct: true`, two decimals: the nearest number to php-libyear's. Null on the same terms as `total`.",
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "measured": {
+          "description": "Findings whose `libyears` is not null. `measured` plus every value in `unmeasured` is the number of findings.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "unmeasured": {
+          "description": "Findings with `libyears: null`, by the first reason that applies. Every non-null `libyears_unmeasured` on a finding is one of these keys, and each count is the number of findings carrying it. A later minor release may add a key, always written from then on but never added to `required`, since 0.13 documents would then fail. These keys are not a pattern plus x-known-values set: `required` lists the ones this release writes.",
+          "type": "object",
+          "required": [
+            "branch_snapshot",
+            "no_stable_release_date",
+            "not_from_composer_repository",
+            "metadata_unavailable"
+          ],
+          "properties": {
+            "branch_snapshot": {
+              "description": "A dev pin (`dev-main`, `2.x-dev`): a commit date, not a release date.",
+              "type": "integer",
+              "minimum": 0
+            },
+            "no_stable_release_date": {
+              "description": "No date to trust for one end: no stable release; the newest one undated with nothing dated above the installed version (when something dated is, its date is used and the value is a lower bound); the installed version dated only by a commit its tags share and not by its monorepo parent either (where the parent lists the version, its date is the installed version's); or the lock entry without a `time`.",
+              "type": "integer",
+              "minimum": 0
+            },
+            "not_from_composer_repository": {
+              "description": "No metadata was asked for: the lock entry carries no Composer notification-url — a path, vcs, artifact or inline package entry, or a package from a `type: composer` repository that advertises no notify URL.",
+              "type": "integer",
+              "minimum": 0
+            },
+            "metadata_unavailable": {
+              "description": "Metadata was asked for and did not come: not listed, offline, budget, transport.",
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "furthest_behind": {
+          "description": "The measured finding furthest behind, ties to the first package name; null when nothing was measured or nothing measured is behind.",
+          "oneOf": [
+            {
+              "type": "object",
+              "required": [
+                "package",
+                "version",
+                "libyears"
+              ],
+              "properties": {
+                "package": {
+                  "$ref": "#/definitions/packageName"
+                },
+                "version": {
+                  "type": "string"
+                },
+                "libyears": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "baseline": {
+      "description": "How the run compared with the baseline file, null when none was used.",
+      "oneOf": [
+        {
+          "$ref": "#/definitions/baselineComparison"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "gate": {
+      "description": "Whether the run failed and why, decided over this document's findings, their standings against the baseline and `network_failures` by `run.fail_on`, `run.strict_network` and `run.mode`. Each finding's `gate` says where that finding stands. Null exactly where `run` is null or carries no `fail_on`, which outside a test is nowhere. Optional: documents written before 0.13.0 do not carry it; from 0.13.0 on it is always written.",
+      "oneOf": [
+        {
+          "$ref": "#/definitions/gate"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "notes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "note_details": {
+      "description": "The run's notes, typed: one entry per `notes` string, at the same index, with the same text. A code can repeat — once per forge, per Composer repository, per monorepo parent — so an entry is identified by its index, never by its code. `network_failures` is true exactly when some entry's `sets_network_failures` is. Optional: documents written before 0.13.0 do not carry it, and there `notes` is untyped text; from 0.13.0 on it is always written, `[]` when `notes` is.",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/noteDetail"
+      }
+    },
+    "findings": {
+      "description": "One per analysed package, in report order: priority, then verdict severity, direct before transitive, then name.",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/finding"
+      }
+    }
+  },
+  "definitions": {
+    "envelope": {
+      "type": "object",
+      "required": [
+        "version",
+        "schema"
+      ],
+      "properties": {
+        "version": {
+          "description": "The lockrot release that wrote the document.",
+          "type": "string",
+          "minLength": 1
+        },
+        "schema": {
+          "description": "The document schema number this file describes.",
+          "type": "integer",
+          "enum": [
+            1
+          ]
+        }
+      }
+    },
+    "dateTime": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "date": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+    },
+    "packageName": {
+      "description": "A Composer package name, vendor/name.",
+      "type": "string",
+      "pattern": "^[^\\/]+\\/[^\\/]+$"
+    },
+    "verdict": {
+      "type": "string",
+      "enum": [
+        "abandoned",
+        "silent",
+        "pinned",
+        "left-behind",
+        "old-promise",
+        "stale",
+        "unknown",
+        "finished",
+        "ok"
+      ]
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "critical",
+        "high",
+        "medium",
+        "low",
+        "none"
+      ]
+    },
+    "flaggedPriority": {
+      "description": "The priority order without `none`: the levels a step of a finding's `priority_basis` moves between. The same order as `priority`, restricted; not a set of its own.",
+      "type": "string",
+      "enum": [
+        "critical",
+        "high",
+        "medium",
+        "low"
+      ]
+    },
+    "priorityStep": {
+      "description": "One step of a finding's `priority_basis`: why it was taken, and the level before and after it. A step that could not move the level has `from` equal to `to`; up or down is the direction from `from` to `to` in the priority order.",
+      "type": "object",
+      "required": [
+        "reason",
+        "from",
+        "to"
+      ],
+      "properties": {
+        "reason": {
+          "description": "Why the step was taken: `transitive` (no direct requirement names the package, and one reaches it: `chain` has two or more entries), `unreached` (no direct requirement the run knows reaches it: `chain` is empty, as in a run without composer.json; the same step down as `transitive`, named apart so the page need not read `chain`), `dev` (the finding's `dev` is true) or `no_fix_expected` (the finding's `no_fix_expected` names an advisory). The first three lower the level one step, never below `low`; the last raises it one step, never above `critical`. An open set: a later release can add a step; read an unknown value as \"other\" and show it as written with its `from` and `to`.",
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "x-known-values": [
+            "transitive",
+            "unreached",
+            "dev",
+            "no_fix_expected"
+          ]
+        },
+        "from": {
+          "$ref": "#/definitions/flaggedPriority"
+        },
+        "to": {
+          "$ref": "#/definitions/flaggedPriority"
+        }
+      }
+    },
+    "noFixAdvisory": {
+      "description": "One advisory a finding's `no_fix_expected` names, and why no fix is expected for it.",
+      "type": "object",
+      "required": [
+        "id",
+        "reason"
+      ],
+      "properties": {
+        "id": {
+          "description": "The `id` of one of this finding's S9 advisories (`data.advisories[].id`), unique within the finding. Not promised to be a Packagist id: any Composer repository can serve advisories.",
+          "type": "string"
+        },
+        "reason": {
+          "description": "Why no fix is expected, the first that applies: `not_on_installed_branch` (the finding is left-behind and the advisory's `fixed_by` names a release on a higher branch, which the installed branch will not get), `releases_unknown` (S9's `releases_read` is false: the release list was not read or the installed version could not be compared, so no fix was looked for, and this is not a prediction), `affected_range_unknown` (the advisory's `affected_versions` is null, so no release can be read as fixing it), `no_release_fixes` (the releases were read, the range is known, and no listed release above the installed version is outside it). An open set: a later release can add a reason; read an unknown value as \"other\" and show it as written.",
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "x-known-values": [
+            "not_on_installed_branch",
+            "releases_unknown",
+            "affected_range_unknown",
+            "no_release_fixes"
+          ]
+        }
+      }
+    },
+    "signalId": {
+      "description": "A signal identifier: `S` and a number for lockrot's own, as `docs/verdicts.md` lists them, or `<vendor>:<name>` for one that does not come from lockrot. An open set: a later release under this schema number can add an id, so read one you do not know as \"other\". `x-known-values` lists the ids this release writes; read it as the enum to hold a document to them.",
+      "type": "string",
+      "pattern": "^(S[1-9][0-9]*|[a-z0-9][a-z0-9_.-]*:[a-z0-9][a-z0-9_.-]*)$",
+      "x-known-values": [
+        "S1",
+        "S2",
+        "S3",
+        "S4",
+        "S5",
+        "S6",
+        "S7",
+        "S8",
+        "S9",
+        "S10"
+      ]
+    },
+    "level": {
+      "type": "string",
+      "enum": [
+        "info",
+        "warn",
+        "high"
+      ]
+    },
+    "years": {
+      "description": "Years elapsed, one decimal.",
+      "type": "number",
+      "minimum": 0
+    },
+    "datedBy": {
+      "description": "The monorepo the dates were read from through its `replace` list (a package split out of laravel/framework or symfony/symfony), null when they are the package's own.",
+      "oneOf": [
+        {
+          "$ref": "#/definitions/packageName"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "baselineComparison": {
+      "type": "object",
+      "required": [
+        "path",
+        "known",
+        "new",
+        "worsened",
+        "stale"
+      ],
+      "properties": {
+        "path": {
+          "description": "The baseline file as a report names it: the configured path when it is relative, the path relative to the project directory when an absolute one is inside it, and the file name alone otherwise, so a report never locates the machine that wrote it.",
+          "type": "string"
+        },
+        "known": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "new": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "worsened": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "stale": {
+          "description": "Baselined package names absent from the analysed lock.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/packageName"
+          }
+        }
+      }
+    },
+    "finding": {
+      "type": "object",
+      "required": [
+        "package",
+        "version",
+        "verdict",
+        "priority",
+        "direct",
+        "dev",
+        "signals",
+        "chain",
+        "direct_dependents",
+        "evidence",
+        "allowlist_reason",
+        "note",
+        "data_date"
+      ],
+      "properties": {
+        "package": {
+          "$ref": "#/definitions/packageName"
+        },
+        "version": {
+          "type": "string"
+        },
+        "verdict": {
+          "$ref": "#/definitions/verdict"
+        },
+        "priority": {
+          "$ref": "#/definitions/priority"
+        },
+        "direct": {
+          "type": "boolean"
+        },
+        "dev": {
+          "description": "Listed under packages-dev in the lock.",
+          "type": "boolean"
+        },
+        "from_composer_repository": {
+          "description": "True when the lock entry carries a Composer `notification-url`. Composer writes one only for a package served by a `type: composer` repository that advertises a notify URL (`notify-batch` or `notify` in its packages.json); packagist.org and Private Packagist do. lockrot asks a repository for metadata, advisories and repository activity only about such an entry. False otherwise: a `path`, `vcs`, `artifact` or inline `package` repository entry, and also a package from a `type: composer` repository that advertises no notify URL (asset-packagist.org; a Satis build without `notify-batch`). lockrot asked no repository about a false entry, so the finding has no metadata, advisories, activity or libyears. True does not mean packagist.org. Stays a boolean for 1.x: the finer account of where an entry came from is `origin`, and this key is true exactly when `origin.kind` is `packagist` or `composer`. Same value as the `--explain` document's `lock.from_composer_repository`. Absent from documents written before 0.13.0; from 0.13.0 on every finding carries it.",
+          "type": "boolean"
+        },
+        "origin": {
+          "description": "Where the lock entry came from: its kind, the registry where lockrot can name it, and the package's page there. `from_composer_repository` is true exactly when `origin.kind` is `packagist` or `composer`, and the root `not_from_composer_repository` counts the other findings. Optional: documents written before 0.13.0 do not carry it; from 0.13.0 on every finding does.",
+          "$ref": "#/definitions/packageOrigin"
+        },
+        "replacement": {
+          "description": "On an abandoned finding, the package its repository names as the replacement, when that is a Composer package name (Packagist's field is free text; `Symfony` or a sentence stays in the evidence and is null here). Null on every other finding. Absent from documents written before 0.11.0.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/packageName"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "replacement_url": {
+          "description": "The page packagist.org keeps for `replacement`, an absolute https URL lockrot writes when packagist.org is the registry that named the replacement: the one whose metadata marked the package abandoned or, where lockrot read no metadata, the one the lock entry came from. Null when `replacement` is null, and for every other registry: Private Packagist keeps no public page, and WP Packages marks no package abandoned. lockrot does not ask whether the page exists. Show a link only when it is a string; read it, never build it from `replacement`. Optional: documents written before 0.13.0 do not carry it.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "signals": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/signal"
+          }
+        },
+        "chain": {
+          "description": "From the direct requirement down to this package; one element when it is direct. Empty when no direct requirement reaches the package: a run over a composer.lock with no composer.json beside it has no direct requirements at all, and a lock can hold a package only the skipped require-dev asks for.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/packageName"
+          }
+        },
+        "direct_dependents": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/packageName"
+          }
+        },
+        "evidence": {
+          "type": "string"
+        },
+        "allowlist_reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "note": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data_date": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/dateTime"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "libyears": {
+          "description": "Years (365.25 days) between the installed version's release and the package's newest stable release — or, when that release carries no date lockrot trusts, the newest trusted date of a release above the installed version, a lower bound — at least 0, two decimals. Null when not measured; from 0.13.0 on, `libyears_unmeasured` says why. Absent from documents written before 0.11.0.",
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "libyears_unmeasured": {
+          "description": "Why `libyears` is null: the key of the report's `libyears.unmeasured` this finding is counted under. The reason is the first that applies, in this order: 1. not_from_composer_repository (no metadata was asked for: exactly the findings whose `from_composer_repository` is false, the lock entry carrying no Composer notification-url); 2. metadata_unavailable (asked for and did not come); 3. branch_snapshot (the installed version is a branch); 4. no_stable_release_date (no date lockrot trusts for one of the two ends; the code does not say which). The order of `x-known-values` is the block's key order, not this precedence. Null exactly where `libyears` is a number, 0 included. Counting findings by this value gives `libyears.unmeasured` key for key. An open set: a later minor release may add a reason, or split one into narrower ones, which moves findings out of the old code. Read a value you do not know as another reason the package was not measured. Optional: documents written before 0.13.0 do not carry it; from 0.13.0 on every finding does, as a string or null.",
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]*$",
+              "x-known-values": [
+                "branch_snapshot",
+                "no_stable_release_date",
+                "not_from_composer_repository",
+                "metadata_unavailable"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "priority_basis": {
+          "description": "How `priority` was reached: `base`, the level the verdict starts at (`none` for an unflagged verdict), and `steps`, each step taken from it in the order they apply: the reach step (`transitive` or `unreached`) exactly when `direct` is false, then `dev`, then `no_fix_expected`. A step is recorded whenever its fact holds on a flagged finding, also when it cannot move the level: a `dev` step at `low`, a `no_fix_expected` step at `critical`. The first step's `from` is `base`, each later one's is the previous step's `to`, and `priority` is the last step's `to`, or `base` when there are none. An unflagged verdict (`unknown`, `finished`, `ok`, so every allowlisted finding) gives `{\"base\": \"none\", \"steps\": []}`. Optional: documents written before 0.13.0 do not carry it; from 0.13.0 on every finding does.",
+          "type": "object",
+          "required": [
+            "base",
+            "steps"
+          ],
+          "properties": {
+            "base": {
+              "$ref": "#/definitions/priority"
+            },
+            "steps": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/priorityStep"
+              }
+            }
+          }
+        },
+        "no_fix_expected": {
+          "description": "The advisories on this finding lockrot expects no fix for, in the order of S9's `data.advisories` (worst severity first). Absent: a document written before 0.13.0. Null: the verdict makes no fix prediction, which is every verdict but `abandoned`, `silent` and `left-behind`. Empty: one of those three verdicts, and every S9 advisory is fixed by a release the verdict lets the project reach, or the finding carries no S9. Non-empty: the advisories no fix is expected for; they raise the priority one step (the `no_fix_expected` step of `priority_basis`) and put `no fix expected` in the evidence. On a left-behind finding only a fix on the installed branch counts as reachable; on an abandoned or silent one, any listed release above the installed version.",
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/noFixAdvisory"
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "baseline": {
+          "$ref": "#/definitions/baselineStanding"
+        },
+        "gate": {
+          "description": "Where the finding stands against `run.fail_on`. Null exactly where the root `gate` is null. Optional: documents written before 0.13.0 do not carry it; from 0.13.0 on every finding does.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/findingGate"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "signal": {
+      "type": "object",
+      "required": [
+        "id",
+        "level",
+        "summary",
+        "data"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/signalId"
+        },
+        "level": {
+          "$ref": "#/definitions/level"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "data": {
+          "type": "object"
+        }
+      },
+      "anyOf": [
+        {
+          "properties": {
+            "id": {
+              "enum": [
+                "S1"
+              ]
+            },
+            "data": {
+              "$ref": "#/definitions/s1"
+            }
+          }
+        },
+        {
+          "properties": {
+            "id": {
+              "enum": [
+                "S2"
+              ]
+            },
+            "data": {
+              "$ref": "#/definitions/s2"
+            }
+          }
+        },
+        {
+          "properties": {
+            "id": {
+              "enum": [
+                "S3"
+              ]
+            },
+            "data": {
+              "$ref": "#/definitions/s3"
+            }
+          }
+        },
+        {
+          "properties": {
+            "id": {
+              "enum": [
+                "S4"
+              ]
+            },
+            "data": {
+              "$ref": "#/definitions/s4"
+            }
+          }
+        },
+        {
+          "properties": {
+            "id": {
+              "enum": [
+                "S5"
+              ]
+            },
+            "data": {
+              "$ref": "#/definitions/s5"
+            }
+          }
+        },
+        {
+          "properties": {
+            "id": {
+              "enum": [
+                "S6"
+              ]
+            },
+            "data": {
+              "$ref": "#/definitions/s6"
+            }
+          }
+        },
+        {
+          "properties": {
+            "id": {
+              "enum": [
+                "S7"
+              ]
+            },
+            "data": {
+              "$ref": "#/definitions/s7"
+            }
+          }
+        },
+        {
+          "properties": {
+            "id": {
+              "enum": [
+                "S8"
+              ]
+            },
+            "data": {
+              "$ref": "#/definitions/s8"
+            }
+          }
+        },
+        {
+          "properties": {
+            "id": {
+              "enum": [
+                "S9"
+              ]
+            },
+            "data": {
+              "$ref": "#/definitions/s9"
+            }
+          }
+        },
+        {
+          "properties": {
+            "id": {
+              "enum": [
+                "S10"
+              ]
+            },
+            "data": {
+              "$ref": "#/definitions/s10"
+            }
+          }
+        },
+        {
+          "description": "A signal whose id this schema does not list, from a later release or not from lockrot: its data is any object. Every id the schema lists is typed by its own branch above and cannot take this one.",
+          "not": {
+            "properties": {
+              "id": {
+                "enum": [
+                  "S1",
+                  "S2",
+                  "S3",
+                  "S4",
+                  "S5",
+                  "S6",
+                  "S7",
+                  "S8",
+                  "S9",
+                  "S10"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "s1": {
+      "description": "Marked abandoned by its repository.",
+      "type": "object",
+      "required": [
+        "replacement"
+      ],
+      "properties": {
+        "replacement": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "s2": {
+      "description": "No release for years.",
+      "type": "object",
+      "required": [
+        "last_release",
+        "last_version",
+        "years",
+        "dated_by"
+      ],
+      "properties": {
+        "last_release": {
+          "$ref": "#/definitions/dateTime"
+        },
+        "last_version": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "years": {
+          "$ref": "#/definitions/years"
+        },
+        "dated_by": {
+          "$ref": "#/definitions/datedBy"
+        }
+      }
+    },
+    "s3": {
+      "description": "Repository archived.",
+      "type": "object",
+      "required": [
+        "repo",
+        "host"
+      ],
+      "properties": {
+        "repo": {
+          "type": "string"
+        },
+        "host": {
+          "type": "string"
+        }
+      }
+    },
+    "s4": {
+      "description": "No push for years.",
+      "type": "object",
+      "required": [
+        "last_push",
+        "repo",
+        "host",
+        "years"
+      ],
+      "properties": {
+        "last_push": {
+          "$ref": "#/definitions/dateTime"
+        },
+        "repo": {
+          "type": "string"
+        },
+        "host": {
+          "type": "string"
+        },
+        "years": {
+          "$ref": "#/definitions/years"
+        }
+      }
+    },
+    "s5": {
+      "description": "Written for an older PHP major and released before the target's major existed, with a php constraint that admits the target only because it has no upper bound.",
+      "type": "object",
+      "required": [
+        "target_php",
+        "ga_date",
+        "php_constraint",
+        "released"
+      ],
+      "properties": {
+        "target_php": {
+          "type": "string"
+        },
+        "target_major": {
+          "description": "The first release of the target's major, `8.0` for a target of `8.4`; its GA is the date the release is held against. Optional: documents written before 0.11.0 do not carry it.",
+          "type": "string"
+        },
+        "ga_date": {
+          "description": "GA of target_major. Documents written before 0.11.0 carry the target minor's GA here instead, and no target_major.",
+          "$ref": "#/definitions/date"
+        },
+        "php_constraint": {
+          "type": "string"
+        },
+        "written_for_php": {
+          "description": "The PHP major of the constraint's lower bound, null when it has none (`*`). Optional: documents written before 0.11.0 do not carry it.",
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "released": {
+          "$ref": "#/definitions/dateTime"
+        }
+      }
+    },
+    "s6": {
+      "description": "Pinned to a branch snapshot, or no tagged release.",
+      "type": "object",
+      "required": [
+        "version"
+      ],
+      "properties": {
+        "version": {
+          "type": "string"
+        },
+        "reason": {
+          "description": "Which of S6's two cases fired. `branch_snapshot`: the installed version is a branch (`dev-main`, `2.x-dev`); it is checked first, so a snapshot of a package that never released is `branch_snapshot` with has_stable_release false. `no_stable_release`: the installed version is not a branch and the repository lists no tagged version. An open set: read a value you do not know as another reason S6 fired. Optional: documents written before 0.13.0 do not carry it.",
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "x-known-values": [
+            "branch_snapshot",
+            "no_stable_release"
+          ]
+        },
+        "has_stable_release": {
+          "description": "Whether the repository lists any tagged version (a pre-release counts, a branch does not), as the explanation's metadata.has_stable_release. Null, not false, when lockrot loaded no repository metadata for the package, for example a `vcs` or `path` entry, a package the repository does not list, or metadata that did not load (the report's notes say which); null only ever comes with reason branch_snapshot. Optional: documents written before 0.13.0 do not carry it.",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "last_stable_release": {
+          "description": "The newest dated tagged release, as the explanation's metadata.last_stable_release: not necessarily the highest tag. Null when there is no tagged release, when no repository metadata was loaded, and when the highest tag carries no date lockrot trusts (undated, or on a commit other tags share) and no monorepo parent dates it; last_stable_dated_by names such a parent. Optional: documents written before 0.13.0 do not carry it.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/dateTime"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "last_stable_version": {
+          "description": "The version last_stable_release dates; null exactly when it is. Optional: documents written before 0.13.0 do not carry it.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "last_stable_dated_by": {
+          "description": "The monorepo parent whose tag dates last_stable_release, null when the date is the package's own or there is none. Optional: documents written before 0.13.0 do not carry it.",
+          "$ref": "#/definitions/datedBy"
+        },
+        "snapshot_time": {
+          "description": "For reason branch_snapshot, the lock's `time`: the date of the commit the branch pointed at, not a release. Null for reason no_stable_release, and when the lock entry carries no time. Optional: documents written before 0.13.0 do not carry it.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/dateTime"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "s7": {
+      "description": "A direct requirement pulling in flagged transitive packages.",
+      "type": "object",
+      "required": [
+        "flagged",
+        "packages"
+      ],
+      "properties": {
+        "flagged": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "packages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "package",
+              "verdict",
+              "chain"
+            ],
+            "properties": {
+              "package": {
+                "$ref": "#/definitions/packageName"
+              },
+              "verdict": {
+                "$ref": "#/definitions/verdict"
+              },
+              "chain": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/definitions/packageName"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "s8": {
+      "description": "The installed release branch stopped while a higher one kept releasing.",
+      "type": "object",
+      "required": [
+        "branch",
+        "branch_last_release",
+        "branch_last_version",
+        "years",
+        "newest_branch",
+        "newest_version",
+        "newest_release",
+        "suggested_constraint",
+        "dated_by"
+      ],
+      "properties": {
+        "branch": {
+          "type": "string"
+        },
+        "branch_last_release": {
+          "$ref": "#/definitions/dateTime"
+        },
+        "branch_last_version": {
+          "type": "string"
+        },
+        "years": {
+          "$ref": "#/definitions/years"
+        },
+        "newest_branch": {
+          "type": "string"
+        },
+        "newest_version": {
+          "type": "string"
+        },
+        "newest_release": {
+          "$ref": "#/definitions/dateTime"
+        },
+        "newest_php": {
+          "description": "The php requirement of the newest branch's release as the repository lists it, null when it requires no PHP. Optional: documents written before 0.11.0 do not carry it.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newest_within_reach": {
+          "description": "Whether the project can move onto the newest branch: its php requirement admits the project's own require.php and the target PHP. Optional: documents written before 0.11.0 do not carry it.",
+          "type": "boolean"
+        },
+        "floor_php": {
+          "description": "What holds the newest branch back when it is out of reach: the project's require.php as written, or the target PHP minor; null when within reach. Optional: documents written before 0.11.0 do not carry it.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "floor_source": {
+          "description": "Which floor floor_php is; null when the newest branch is within reach. An open set: a later release can add a floor, so read a value you do not know as \"other\". Optional: documents written before 0.11.0 do not carry it.",
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]*$",
+              "x-known-values": [
+                "project",
+                "target"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "reachable_branch": {
+          "description": "The newest releasing higher branch within reach, the one suggested_constraint follows; the newest branch itself when that is within reach, null when none is. Optional: documents written before 0.11.0 do not carry it.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "reachable_version": {
+          "description": "Optional: documents written before 0.11.0 do not carry it.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "reachable_release": {
+          "description": "Optional: documents written before 0.11.0 do not carry it.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/dateTime"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "suggested_constraint": {
+          "description": "A caret constraint that follows the newest releasing branch within reach, null when there is none or Composer cannot suggest one.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "dated_by": {
+          "$ref": "#/definitions/datedBy"
+        }
+      }
+    },
+    "s10": {
+      "description": "A check the verdict rests on did not run. Informational: it never decides a verdict, and it is carried only where the missing check could have changed one — not on a package the repository already marks abandoned, nor on an allowlisted one.",
+      "type": "object",
+      "required": [
+        "unchecked",
+        "blocks"
+      ],
+      "properties": {
+        "unchecked": {
+          "description": "One entry per check that did not run.",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "check",
+              "reason",
+              "blocks"
+            ],
+            "properties": {
+              "check": {
+                "description": "`repository_activity` is the forge round behind S3 and S4; `release_dates` is the package's own age, which the repository dates only by a commit its tags share. An open set: a later release can add a check, so read one you do not know as \"other\".",
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]*$",
+                "x-known-values": [
+                  "repository_activity",
+                  "release_dates"
+                ]
+              },
+              "reason": {
+                "description": "Why it did not run. An open set: a later release can add a reason, so read one you do not know as \"other\".",
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]*$",
+                "x-known-values": [
+                  "no_token",
+                  "anonymous_budget",
+                  "install_time_budget",
+                  "rate_limit",
+                  "fetch_failed",
+                  "offline",
+                  "undated_releases"
+                ]
+              },
+              "blocks": {
+                "description": "The signals that could not be read without it.",
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "$ref": "#/definitions/signalId"
+                }
+              }
+            }
+          }
+        },
+        "blocks": {
+          "description": "Every signal the missing checks blocked, flattened.",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/signalId"
+          }
+        }
+      }
+    },
+    "s9": {
+      "description": "Security advisories on the installed version.",
+      "type": "object",
+      "required": [
+        "advisories"
+      ],
+      "properties": {
+        "advisories": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "cve",
+              "title",
+              "link",
+              "severity",
+              "reported_at",
+              "affected_versions",
+              "fixed_by",
+              "fixed_on_branch"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "cve": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "title": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "link": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "severity": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "reported_at": {
+                "oneOf": [
+                  {
+                    "$ref": "#/definitions/dateTime"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "affected_versions": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "fixed_by": {
+                "description": "The lowest listed release the advisory does not affect, null when none.",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "fixed_on_branch": {
+                "description": "Whether fixed_by is on the installed release branch.",
+                "type": "boolean"
+              }
+            }
+          }
+        },
+        "releases_read": {
+          "description": "Whether a fix was looked for: true when the repository's releases were read and the installed version compared with them, so a null `fixed_by` means no listed release above the installed version fixes the advisory; false when the metadata was not loaded or the installed version could not be read as a version, so every `fixed_by` is null without a release having been checked. Optional: documents written before 0.13.0 do not carry it.",
+          "type": "boolean"
+        }
+      }
+    },
+    "run": {
+      "description": "What the run was told to do. Every verdict depends on it: the thresholds decide stale from silent, the target PHP decides whether a release predates it. Optional, because reports written before 0.10.0 do not carry it.",
+      "type": "object",
+      "required": [
+        "project",
+        "target_php",
+        "lock_file",
+        "fail_on",
+        "thresholds",
+        "flagged_verdicts"
+      ],
+      "properties": {
+        "project": {
+          "description": "What the report calls this project: composer.json's own `name`, or whatever `extra.lockrot.project` says instead. A display name, not an identifier — a package inside a monorepo or a private project is routinely called something that is not a vendor/name. Null where the manifest has no name and the config says nothing.",
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "root_package": {
+          "description": "What Composer calls this project: the `name` of the manifest Composer reads (composer.json, or the file `COMPOSER` names), exactly as written, whatever `extra.lockrot.project` says. `project` is what the report calls the project; this is the root package's own name. Not checked against the vendor/name form. Null where the manifest has no `name` (absent, empty or not a string), or where no composer.json was read (a lock-only run). One of the keys in `run` a document may omit, with `project_php`, `fail_on_kind`, `strict_network` and `mode`: reports written before 0.13.0 do not carry it; from 0.13.0 on it is always written.",
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "target_php": {
+          "description": "The PHP version the project targets, as --target-php, config.platform.php or the running PHP gave it.",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "project_php": {
+          "description": "The project's own `require.php`, exactly as the manifest Composer reads writes it (composer.json, or the file `COMPOSER` names): a constraint such as `>=8.2` or `^7.4 || ^8.0`, not a version, neither normalised nor checked. The second PHP floor, beside `target_php`, that left-behind (S8) holds a higher branch against, by the lowest PHP it promises. The same value `--explain` writes as `project_php`. Null where the manifest has no `require.php` (absent, empty or not a string), or where no composer.json was read (a lock-only run). Optional: reports written before 0.13.0 do not carry it; from 0.13.0 on it is always written.",
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "lock_file": {
+          "description": "The name of the lock the report describes, never its path: a published report must not carry the directory it ran in.",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "fail_on": {
+          "description": "The fail-on threshold the run was given: `none`, a flagged verdict, a priority other than `none`, or `unchecked`; `fail_on_kind` says which.",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "fail_on_kind": {
+          "description": "Which kind of threshold `fail_on` is: `none`, which no finding reaches; `verdict`, reached by a finding whose verdict is at least as severe; `priority`, reached by a finding whose priority is at least as high; `unchecked`, reached by a finding carrying S10, whatever its verdict. Null exactly where `fail_on` is null, which outside a test is nowhere. An open set: a later minor release may add a kind of threshold; read a value you do not know as another kind of threshold. Optional: documents written before 0.13.0 do not carry it; from 0.13.0 on it is always written.",
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]*$",
+              "x-known-values": [
+                "none",
+                "verdict",
+                "priority",
+                "unchecked"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "strict_network": {
+          "description": "Whether `--strict-network` was on: then a lookup that failed (the root `network_failures`) fails the run on its own. Optional: documents written before 0.13.0 do not carry it; from 0.13.0 on it is always written.",
+          "type": "boolean"
+        },
+        "mode": {
+          "description": "What the run was asked to do: `check`, the run that judges its findings against `fail_on`, or `generate_baseline` (`--generate-baseline`), which records them in the baseline file and judges none. An open set: a later minor release may add a kind of run; read a value you do not know as another kind of run. Optional: documents written before 0.13.0 do not carry it; from 0.13.0 on it is always written.",
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "x-known-values": [
+            "check",
+            "generate_baseline"
+          ]
+        },
+        "thresholds": {
+          "description": "The ages, in years, that separate one verdict from the next.",
+          "oneOf": [
+            {
+              "type": "object",
+              "required": [
+                "release-warn-years",
+                "release-high-years",
+                "push-warn-years",
+                "push-high-years"
+              ],
+              "properties": {
+                "release-warn-years": {
+                  "$ref": "#/definitions/years"
+                },
+                "release-high-years": {
+                  "$ref": "#/definitions/years"
+                },
+                "push-warn-years": {
+                  "$ref": "#/definitions/years"
+                },
+                "push-high-years": {
+                  "$ref": "#/definitions/years"
+                }
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "flagged_verdicts": {
+          "description": "The verdicts this run counted as findings, biggest first. Not a setting but the vocabulary used, so a reader need not know the severity ladder by heart.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/verdict"
+          }
+        }
+      }
+    },
+    "baselineStanding": {
+      "description": "Where one finding stands against the baseline, null when the run read none or the baseline says nothing about this package.",
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "status",
+            "previous_verdict"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "known",
+                "new",
+                "worsened"
+              ]
+            },
+            "previous_verdict": {
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/verdict"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "gate": {
+      "description": "The run's gate: whether it failed, what failed it, and whether it judged its findings at all.",
+      "type": "object",
+      "required": [
+        "fails",
+        "tripped_by",
+        "fail_on_applied"
+      ],
+      "properties": {
+        "fails": {
+          "description": "The gate's decision. True: the run exits 1, unless it then fails to write a file or the baseline, in which case it exits 2 and says so on stderr. False: it exits 0, under the same proviso. True exactly when `tripped_by` is not empty.",
+          "type": "boolean"
+        },
+        "tripped_by": {
+          "description": "What failed the run, each cause once: `strict_network`, `run.strict_network` is true and `network_failures` is true; `fail_on`, at least one finding's `gate.fails` is true. Both are listed when both hold. Empty exactly when `fails` is false. lockrot writes them in the order of `x-known-values`; do not rely on the position. An open set: a later minor release may add a cause; read a value you do not know as another condition that failed the run.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$",
+            "x-known-values": [
+              "strict_network",
+              "fail_on"
+            ]
+          }
+        },
+        "fail_on_applied": {
+          "description": "Whether the run judged its findings against `run.fail_on`: true in a `check` run, `fail_on` none included; false in a `generate_baseline` run, where only `--strict-network` can fail it. Where it is false no finding's `gate.fails` is true.",
+          "type": "boolean"
+        }
+      }
+    },
+    "findingGate": {
+      "description": "Where one finding stands against `run.fail_on`.",
+      "type": "object",
+      "required": [
+        "reaches_fail_on",
+        "fails",
+        "exempt_by"
+      ],
+      "properties": {
+        "reaches_fail_on": {
+          "description": "Whether the finding is at or above `run.fail_on`: a verdict at least as severe as a verdict threshold, a priority at least as high as a priority threshold, or, under `unchecked`, S10 among its signals. Always false under `none`. Decided in every mode, whether or not the run applied fail-on.",
+          "type": "boolean"
+        },
+        "fails": {
+          "description": "Whether this finding fails the run: exactly when `reaches_fail_on` is true, `exempt_by` is null and the root `gate.fail_on_applied` is true.",
+          "type": "boolean"
+        },
+        "exempt_by": {
+          "description": "What keeps a finding that reaches fail-on from failing the run, or null. `baseline`: the baseline accepted it, its `baseline.status` is `known`; a `worsened` finding is not exempt. Non-null only where `reaches_fail_on` is true. Only what exempts this one finding is recorded here: a run that applies fail-on to no finding says so in the root `gate.fail_on_applied`. An open set: a later minor release may add an exemption; read a value you do not know as exempt for another reason.",
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]*$",
+              "x-known-values": [
+                "baseline"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "packageOrigin": {
+      "description": "Where a lock entry came from, as lockrot tells it from the entry and the manifest's own `repositories`, without asking any repository: `kind`, the `registry` where lockrot can name it, and the package's page there. Nothing in it is copied from the entry's URLs or the manifest's: a login, an organisation or a machine path is never written. Open: a later minor release may add a member.",
+      "type": "object",
+      "required": [
+        "kind",
+        "registry",
+        "package_url"
+      ],
+      "properties": {
+        "kind": {
+          "$ref": "#/definitions/originKind"
+        },
+        "registry": {
+          "$ref": "#/definitions/originRegistry"
+        },
+        "package_url": {
+          "description": "The package's page on `registry`, an absolute https URL lockrot writes for a registry that keeps a public page per package name (`packagist.org`, `wp-packages.org`), from the name the lock records. Null for any other registry, for a name that is not a Composer package name, and for every kind but `packagist` and `composer`. It is the page the registry keeps for that name; whether this run's repositories still list the package is the finding's `note`. Show a link only when it is a string; read it, never build it, from `registry`, the name or anything else.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "local": {
+          "description": "Whether Composer installed the package from the machine it ran on rather than from a server: a `path` or `artifact` repository, or a dist or source that is a path or a `file://` URL (a VCS repository checked out on the disk). Where it is true, `lock.repository` and `metadata.repository` in an explanation show the path by its last segment (`.../lib`). Optional: documents written before 0.13.0 do not carry it; from 0.13.0 on every origin does.",
+          "type": "boolean"
+        }
+      }
+    },
+    "originKind": {
+      "description": "What lockrot could tell about where the lock entry came from. `packagist`: its notification-url reports to packagist.org (packagist.org, or a mirror that keeps packagist.org's notify URL). `composer`: its notification-url reports to any other host (Private Packagist, WP Packages, Drupal, a Satis with a notify URL, a registry lockrot does not know, or a definition that declares one itself). These two are exactly the kinds whose `from_composer_repository` is true. `path`: its dist is a local directory (a `path` repository). `vcs`: its source is a VCS repository the manifest lists. `artifact`: its dist is an archive inside an `artifact` repository the manifest lists. `package`: an inline `package` definition in the manifest gives exactly this entry. `unknown`: none of these could be decided: a `type: composer` repository that advertises no notify URL (asset-packagist.org, a Satis without one, some packagist mirrors), a repository listed before the one that matches that could have served the name, a VCS repository renamed or removed since, or a run without composer.json. lockrot's kinds are lower-case words; `<vendor>:<name>` is reserved for a kind that does not come from lockrot. A kind keeps its meaning and its `from_composer_repository` value. An open set: a later minor release can add a kind, which may take entries out of `unknown`; read one you do not know by `from_composer_repository`, show it as written, and link nothing. The order of `x-known-values` is not the order lockrot decides in.",
+      "type": "string",
+      "pattern": "^([a-z][a-z0-9_]*|[a-z0-9][a-z0-9_.-]*:[a-z0-9][a-z0-9_.-]*)$",
+      "x-known-values": [
+        "packagist",
+        "composer",
+        "path",
+        "vcs",
+        "artifact",
+        "package",
+        "unknown"
+      ]
+    },
+    "originRegistry": {
+      "description": "The Composer repository the entry came from, named by the host its notification-url reports to, when lockrot knows it: `packagist.org`, `repo.packagist.com` (Private Packagist; the organisation is never written), `wp-packages.org` or `packages.drupal.org`. `packagist.org` exactly when `kind` is `packagist`. Null for every other kind, and for a Composer repository lockrot does not know, whose host is not written: a private registry's host stays out of a published report. A label, never a template: build no URL from it. An open set: a later minor release can name another registry.",
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$",
+          "x-known-values": [
+            "packagist.org",
+            "repo.packagist.com",
+            "wp-packages.org",
+            "packages.drupal.org"
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "noteDetail": {
+      "description": "One thing the run could not see: `code` says what, `data` the facts, typed per code by the branches below, and `text` the sentence every format prints. A note whose code this schema does not list carries any object as its `data`: show its `text`, link its `docs_url` when it is not null, ignore its `data`, and still honour its `sets_network_failures`.",
+      "type": "object",
+      "required": [
+        "code",
+        "text",
+        "docs_url",
+        "sets_network_failures",
+        "data"
+      ],
+      "properties": {
+        "code": {
+          "$ref": "#/definitions/noteCode"
+        },
+        "text": {
+          "description": "Exactly the `notes` string at the same index: prose, not contract. Key on `code` and `data`, never on the wording.",
+          "type": "string"
+        },
+        "docs_url": {
+          "description": "An absolute https URL on lockrot.dev for this code; null means no page, show no link; read it, never build it. Every URL lockrot has written keeps resolving for all of 1.x, though the page it opens may change.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "sets_network_failures": {
+          "description": "Whether this note is part of why the root `network_failures` is true, the flag `--strict-network` fails on and the install-time summary's \"could not be checked\" block reads. True for `metadata_unavailable` (every reason, `offline` and `install_time_budget` included), `monorepo_parent_unavailable`, `repository_activity_rate_limited`, `repository_activity_unreachable`, and an `advisories_unavailable` whose repository could not be reached; false for an `advisories_unavailable` whose repository answered with something lockrot could not read, and for every other code. The root `network_failures` is true exactly when some entry's is.",
+          "type": "boolean"
+        },
+        "data": {
+          "description": "The facts behind the note, typed per `code`; `{}` for a code that has none. Every key a listed code's data declares is always written.",
+          "type": "object"
+        }
+      },
+      "anyOf": [
+        {
+          "properties": {
+            "code": {
+              "enum": [
+                "offline"
+              ]
+            },
+            "data": {
+              "$ref": "#/definitions/noteOffline"
+            }
+          }
+        },
+        {
+          "properties": {
+            "code": {
+              "enum": [
+                "metadata_unavailable"
+              ]
+            },
+            "data": {
+              "$ref": "#/definitions/noteMetadataUnavailable"
+            }
+          }
+        },
+        {
+          "properties": {
+            "code": {
+              "enum": [
+                "monorepo_parent_unavailable"
+              ]
+            },
+            "data": {
+              "$ref": "#/definitions/noteMonorepoParentUnavailable"
+            }
+          }
+        },
+        {
+          "properties": {
+            "code": {
+              "enum": [
+                "advisory_ignore_unreadable"
+              ]
+            },
+            "data": {
+              "$ref": "#/definitions/noteAdvisoryIgnoreUnreadable"
+            }
+          }
+        },
+        {
+          "properties": {
+            "code": {
+              "enum": [
+                "advisories_unavailable"
+              ]
+            },
+            "data": {
+              "$ref": "#/definitions/noteAdvisoriesUnavailable"
+            }
+          }
+        },
+        {
+          "properties": {
+            "code": {
+              "enum": [
+                "advisories_not_checked"
+              ]
+            },
+            "data": {
+              "$ref": "#/definitions/noteAdvisoriesNotChecked"
+            }
+          }
+        },
+        {
+          "properties": {
+            "code": {
+              "enum": [
+                "repository_activity_not_checked"
+              ]
+            },
+            "data": {
+              "$ref": "#/definitions/noteRepositoryActivityNotChecked"
+            }
+          }
+        },
+        {
+          "properties": {
+            "code": {
+              "enum": [
+                "repository_activity_anonymous_cap"
+              ]
+            },
+            "data": {
+              "$ref": "#/definitions/noteRepositoryActivityAnonymousCap"
+            }
+          }
+        },
+        {
+          "properties": {
+            "code": {
+              "enum": [
+                "repository_activity_rate_limited"
+              ]
+            },
+            "data": {
+              "$ref": "#/definitions/noteRepositoryActivityRateLimited"
+            }
+          }
+        },
+        {
+          "properties": {
+            "code": {
+              "enum": [
+                "repository_activity_unreachable"
+              ]
+            },
+            "data": {
+              "$ref": "#/definitions/noteRepositoryActivityUnreachable"
+            }
+          }
+        },
+        {
+          "properties": {
+            "code": {
+              "enum": [
+                "repository_activity_not_found"
+              ]
+            },
+            "data": {
+              "$ref": "#/definitions/noteRepositoryActivityNotFound"
+            }
+          }
+        },
+        {
+          "properties": {
+            "code": {
+              "enum": [
+                "not_from_composer_repository"
+              ]
+            },
+            "data": {
+              "$ref": "#/definitions/noteNotFromComposerRepository"
+            }
+          }
+        },
+        {
+          "description": "A note whose code this schema does not list, from a later release or not from lockrot: its data is any object. Every code the schema lists is typed by its own branch above and cannot take this one.",
+          "not": {
+            "properties": {
+              "code": {
+                "enum": [
+                  "offline",
+                  "metadata_unavailable",
+                  "monorepo_parent_unavailable",
+                  "advisory_ignore_unreadable",
+                  "advisories_unavailable",
+                  "advisories_not_checked",
+                  "repository_activity_not_checked",
+                  "repository_activity_anonymous_cap",
+                  "repository_activity_rate_limited",
+                  "repository_activity_unreachable",
+                  "repository_activity_not_found",
+                  "not_from_composer_repository"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "noteCode": {
+      "description": "What a run note is about. lockrot's codes are lower-case words; `<vendor>:<name>` is reserved for a note that does not come from lockrot, as it is for a signal id. A kind, not an identifier: a run writes one code once per forge, per Composer repository or per monorepo parent it concerns. A code keeps its meaning (a new meaning gets a new code) and is retired, never removed or reused. An open set: a later minor release can add a code; read one you do not know as another thing the run could not see.",
+      "type": "string",
+      "pattern": "^([a-z][a-z0-9_]*|[a-z0-9][a-z0-9_.-]*:[a-z0-9][a-z0-9_.-]*)$",
+      "x-known-values": [
+        "offline",
+        "metadata_unavailable",
+        "monorepo_parent_unavailable",
+        "advisory_ignore_unreadable",
+        "advisories_unavailable",
+        "advisories_not_checked",
+        "repository_activity_not_checked",
+        "repository_activity_anonymous_cap",
+        "repository_activity_rate_limited",
+        "repository_activity_unreachable",
+        "repository_activity_not_found",
+        "not_from_composer_repository"
+      ]
+    },
+    "forgeId": {
+      "description": "The kind of repository host a note is about: `github`, `gitlab` (gitlab.com and every host in Composer's `gitlab-domains`) or `bitbucket`. An open set: a later release can add a host; read one you do not know as \"other\". The display name (`GitHub`) is the explanation's `activity.forge`, which is not this set.",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "x-known-values": [
+        "github",
+        "gitlab",
+        "bitbucket"
+      ]
+    },
+    "metadataFailureReason": {
+      "description": "Why metadata did not come: `offline` (`--offline`, and Composer's cache had no copy), `install_time_budget` (the install-time budget ran out before the package was asked for), `no_versions` (the repository lists the package, and no version it serves is left), `fetch_failed` (any failure not given a more specific reason: a transport error, or what a repository threw, also under `--offline`; a later minor release may move cases out of it into new reasons). `message` carries the words. An open set: read a reason you do not know as another failure.",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "x-known-values": [
+        "offline",
+        "install_time_budget",
+        "no_versions",
+        "fetch_failed"
+      ]
+    },
+    "advisoriesNotCheckedReason": {
+      "description": "Why security advisories were not checked: `offline` (`--offline`; advisories are never served from a cache), `composer_too_old` (Composer below 2.4 has no advisory API), `install_time_budget` (the install-time budget ran out). An open set: read a reason you do not know as another reason.",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "x-known-values": [
+        "offline",
+        "composer_too_old",
+        "install_time_budget"
+      ]
+    },
+    "repositoryActivityNotCheckedReason": {
+      "description": "Why no repository host was asked about activity at all: `install_time_budget` (the metadata pass used the whole install-time budget). An open set: read a reason you do not know as another reason.",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "x-known-values": [
+        "install_time_budget"
+      ]
+    },
+    "forgeRepository": {
+      "description": "One repository on a repository host, with the keys S3 and S4 use: `host` as Composer names it (`github.com`, `gitlab.example.org`, possibly with a port or a path prefix) and `repo`, the path there (`owner/repo`, or `group/sub/project` on GitLab).",
+      "type": "object",
+      "required": [
+        "host",
+        "repo"
+      ],
+      "properties": {
+        "host": {
+          "type": "string"
+        },
+        "repo": {
+          "type": "string"
+        }
+      }
+    },
+    "failedForgeRepository": {
+      "description": "One repository on a repository host that got no answer, with what the host said or the transport error, as `forgeRepository` plus `message`.",
+      "type": "object",
+      "required": [
+        "host",
+        "repo",
+        "message"
+      ],
+      "properties": {
+        "host": {
+          "type": "string"
+        },
+        "repo": {
+          "type": "string"
+        },
+        "message": {
+          "description": "Foreign text — a repository's, a host's or Composer's own words — possibly empty, as a report may quote it: every URL in it without its userinfo, query and fragment, and every path on the machine down to its last segment (`.../name`); a message lockrot could not read whole is `(withheld: lockrot could not redact this message)`. Not contract.",
+          "type": "string"
+        }
+      }
+    },
+    "noteOffline": {
+      "description": "`offline`: the run was `--offline`, so repository metadata came from Composer's cache. No parameters.",
+      "type": "object",
+      "properties": {}
+    },
+    "noteMetadataUnavailable": {
+      "description": "`metadata_unavailable`: metadata was asked for and did not come for `package_count` packages. `reasons` groups them by message, in the order the text lists them, and their `package_count`s sum to the note's. Each such finding is `unknown`, with `libyears_unmeasured` `metadata_unavailable`.",
+      "type": "object",
+      "required": [
+        "package_count",
+        "reasons"
+      ],
+      "properties": {
+        "package_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "reasons": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "reason",
+              "message",
+              "package_count"
+            ],
+            "properties": {
+              "reason": {
+                "$ref": "#/definitions/metadataFailureReason"
+              },
+              "message": {
+                "description": "Foreign text — a repository's, a host's or Composer's own words — possibly empty, as a report may quote it: every URL in it without its userinfo, query and fragment, and every path on the machine down to its last segment (`.../name`); a message lockrot could not read whole is `(withheld: lockrot could not redact this message)`. Not contract.",
+                "type": "string"
+              },
+              "package_count": {
+                "type": "integer",
+                "minimum": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "noteMonorepoParentUnavailable": {
+      "description": "`monorepo_parent_unavailable`: the monorepo whose tags date the packages split out of it could not be loaded, so their dates are their own. `parent` is the package a finding's `dated_by` would have named.",
+      "type": "object",
+      "required": [
+        "parent",
+        "reason",
+        "message"
+      ],
+      "properties": {
+        "parent": {
+          "$ref": "#/definitions/packageName"
+        },
+        "reason": {
+          "$ref": "#/definitions/metadataFailureReason"
+        },
+        "message": {
+          "description": "Foreign text — a repository's, a host's or Composer's own words — possibly empty, as a report may quote it: every URL in it without its userinfo, query and fragment, and every path on the machine down to its last segment (`.../name`); a message lockrot could not read whole is `(withheld: lockrot could not redact this message)`. Not contract.",
+          "type": "string"
+        }
+      }
+    },
+    "noteAdvisoryIgnoreUnreadable": {
+      "description": "`advisory_ignore_unreadable`: Composer rejected the project's advisory ignore configuration, so every advisory counts. `message` is the first line of what Composer said.",
+      "type": "object",
+      "required": [
+        "message"
+      ],
+      "properties": {
+        "message": {
+          "description": "Composer's own words about the project's `audit` or `policy` configuration, the first line, possibly empty; they quote that configuration, never a repository. Not contract.",
+          "type": "string"
+        }
+      }
+    },
+    "noteAdvisoriesUnavailable": {
+      "description": "`advisories_unavailable`: one Composer repository did not return advisories, and the others were still asked. `composer_repository` is Composer's name for it, its URL cut as `message` cuts one; `message` the first line of the error, or its class when it has none.",
+      "type": "object",
+      "required": [
+        "composer_repository",
+        "message"
+      ],
+      "properties": {
+        "composer_repository": {
+          "type": "string"
+        },
+        "message": {
+          "description": "Foreign text — a repository's, a host's or Composer's own words — possibly empty, as a report may quote it: every URL in it without its userinfo, query and fragment, and every path on the machine down to its last segment (`.../name`); a message lockrot could not read whole is `(withheld: lockrot could not redact this message)`. Not contract.",
+          "type": "string"
+        }
+      }
+    },
+    "noteAdvisoriesNotChecked": {
+      "description": "`advisories_not_checked`: no advisory was looked for past this point, so a priority an advisory would raise stays one step lower. `composer_repositories_checked` counts the advisory-capable repositories lockrot asked before the check stopped, whatever each gave: advisories, none at all, or a failure, which has its own `advisories_unavailable` note. Always 0 for `offline` and `composer_too_old`; above 0 under `install_time_budget`, the check was partial: the advisories those repositories returned are in the findings, and the rest were never asked.",
+      "type": "object",
+      "required": [
+        "reason",
+        "composer_repositories_checked"
+      ],
+      "properties": {
+        "reason": {
+          "$ref": "#/definitions/advisoriesNotCheckedReason"
+        },
+        "composer_repositories_checked": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "noteRepositoryActivityNotChecked": {
+      "description": "`repository_activity_not_checked`: no repository host was asked about activity; the findings it concerns carry S10 with the same `reason`.",
+      "type": "object",
+      "required": [
+        "reason"
+      ],
+      "properties": {
+        "reason": {
+          "$ref": "#/definitions/repositoryActivityNotCheckedReason"
+        }
+      }
+    },
+    "noteRepositoryActivityAnonymousCap": {
+      "description": "`repository_activity_anonymous_cap`: without credentials for the host the run asked only about candidate packages, and at most a budget of them: `checked` were asked, `skipped_no_token` were not candidates (S10 `no_token` on their findings) and `skipped_budget` were candidates beyond the budget (S10 `anonymous_budget`). The text prints the two skipped counts as one sum. GitLab has no cap.",
+      "type": "object",
+      "required": [
+        "forge_id",
+        "checked",
+        "skipped_no_token",
+        "skipped_budget"
+      ],
+      "properties": {
+        "forge_id": {
+          "$ref": "#/definitions/forgeId"
+        },
+        "checked": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "skipped_no_token": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "skipped_budget": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "noteRepositoryActivityRateLimited": {
+      "description": "`repository_activity_rate_limited`: a host of this kind answered \"too many requests\". `repositories` lists every repository of this kind of host that got no answer, on each of its hosts, with its own message; the text's count is its length. Every package on this kind of host whose activity is missing carries S10 `rate_limit`, one whose repository answered 404 (listed under `repository_activity_not_found`) included.",
+      "type": "object",
+      "required": [
+        "forge_id",
+        "repositories"
+      ],
+      "properties": {
+        "forge_id": {
+          "$ref": "#/definitions/forgeId"
+        },
+        "repositories": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/failedForgeRepository"
+          }
+        }
+      }
+    },
+    "noteRepositoryActivityUnreachable": {
+      "description": "`repository_activity_unreachable`: the host did not answer for `repositories`, each with its own message; the text prints their count and the first one's message. Their findings carry S10 `fetch_failed`.",
+      "type": "object",
+      "required": [
+        "forge_id",
+        "repositories"
+      ],
+      "properties": {
+        "forge_id": {
+          "$ref": "#/definitions/forgeId"
+        },
+        "repositories": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/failedForgeRepository"
+          }
+        }
+      }
+    },
+    "noteRepositoryActivityNotFound": {
+      "description": "`repository_activity_not_found`: the host answered 404 for `repositories` (private, renamed or removed). An answer, not a network failure; where the host did not also rate-limit, this is the only record of them: their findings carry no S10 and their explanation's `activity` is null.",
+      "type": "object",
+      "required": [
+        "forge_id",
+        "repositories"
+      ],
+      "properties": {
+        "forge_id": {
+          "$ref": "#/definitions/forgeId"
+        },
+        "repositories": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/forgeRepository"
+          }
+        }
+      }
+    },
+    "noteNotFromComposerRepository": {
+      "description": "`not_from_composer_repository`: `package_count` packages carry no Composer notification-url, and lockrot asked no repository about them. Equal to the report's `not_from_composer_repository`.",
+      "type": "object",
+      "required": [
+        "package_count"
+      ],
+      "properties": {
+        "package_count": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    }
+  }
+}

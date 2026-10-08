@@ -62,6 +62,14 @@ reviews:
     - '!tests/fixtures/corpus/report-1-floor.provenance.json'
     # Written only by tools/fixtures/record-legacy-priority.php on a v0.13.0 checkout.
     - '!tests/fixtures/legacy/priority-0.13.0.json'
+    # Written only by tools/schema/build_report2_schema.py and build_other_schemas.py. CI rebuilds them and fails on a diff.
+    - '!resources/lockrot-report-2.schema.json'
+    - '!resources/lockrot-explain-2.schema.json'
+    # Written only by tools/schema/make_negatives.py and make_negatives_other.py. CI rebuilds them and fails on a diff.
+    - '!tests/fixtures/schema/negative/**'
+    # Written only by tools/schema/project_fixtures.py from the reference model's cases.
+    - '!tests/fixtures/flags/**'
+    - '!tests/fixtures/schema/documents/**'
     # Re-recorded from a real run. The numbers in it are output, not prose.
     - '!docs/example-run.md'
     # Recorded with asciinema and rendered with agg by bin/record-demo.

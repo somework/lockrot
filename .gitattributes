@@ -8,6 +8,12 @@
 /tests/fixtures/corpus/report-1-floor.json.gz binary linguist-generated
 /tests/fixtures/corpus/report-1-floor.provenance.json linguist-generated
 /tests/fixtures/legacy/priority-0.13.0.json linguist-generated
+# tools/schema's builders, negative generators and fixture projection: CI rebuilds the first two and fails on a diff.
+/resources/lockrot-report-2.schema.json linguist-generated
+/resources/lockrot-explain-2.schema.json linguist-generated
+/tests/fixtures/schema/negative/** linguist-generated
+/tests/fixtures/schema/documents/** linguist-generated
+/tests/fixtures/flags/** linguist-generated
 
 /tests export-ignore
 /build export-ignore
