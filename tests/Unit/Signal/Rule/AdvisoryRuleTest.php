@@ -6,8 +6,13 @@ namespace Lockrot\Tests\Unit\Signal\Rule;
 
 use Composer\Semver\VersionParser;
 use Lockrot\Data\Advisory\Advisory;
+use Lockrot\Data\Advisory\AdvisoryCoverage;
+use Lockrot\Data\Advisory\AdvisoryNameCoverage;
+use Lockrot\Data\Repository\StableRelease;
+use Lockrot\Security\Candidate;
 use Lockrot\Security\Fix;
 use Lockrot\Security\Holder;
+use Lockrot\Security\PackageFixes;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\Rule\AdvisoryRule;
 use Lockrot\Signal\Signal;
@@ -334,5 +339,72 @@ final class AdvisoryRuleTest extends TestCase
             ['source' => Holder::ROOT, 'package' => null, 'version' => null, 'link' => Holder::REQUIRE_DEV, 'constraint' => '^1.0', 'holder' => null],
             AdvisoryRule::heldBy(new Holder(Holder::ROOT, 'acme/app', null, Holder::REQUIRE_DEV, '^1.0'))
         );
+    }
+
+    /** Two advisories of one severity sort by their points, which the fix kind doubles. */
+    public function testPointsOrderTheRowsOfOneSeverity(): void
+    {
+        $range = (new VersionParser())->parseConstraints('<2.0');
+        $advisories = [new Advisory('PKSA-a', null, null, null, 'moderate', null, $range), new Advisory('PKSA-b', null, null, null, 'moderate', null, $range)];
+        $update = Fix::to(new Candidate(new StableRelease('2.0.0.0', '2.0.0', null, null, false), '2', Fix::UPDATE, []), '2.0.0', '1');
+        $facts = (new PackageFacts(F::package(['version' => '1.0.0']), null, null, $advisories))
+            ->withFixes(new PackageFixes(['PKSA-a' => $update, 'PKSA-b' => Fix::none()], [], null, null, null));
+
+        $signal = (new AdvisoryRule())->evaluate($facts);
+
+        self::assertNotNull($signal);
+        self::assertSame(['PKSA-b' => 16, 'PKSA-a' => 8], array_column(JsonPath::arrayAt($signal->data(), ['advisories']), 'points', 'id'));
+    }
+
+    public function testAFixHeldByALinkNamesTheHolder(): void
+    {
+        $holder = new Holder(Holder::PACKAGE, 'acme/b', '2.0.0', Holder::REQUIRE, '^1.0');
+        $upgrade = Fix::to(new Candidate(new StableRelease('2.0.0.0', '2.0.0', null, null, false), '2', Fix::UPGRADE, [$holder]), '2.0.0', '1');
+        $facts = (new PackageFacts(F::package(['version' => '1.0.0']), null, null, [new Advisory('PKSA-a', null, null, null, 'high', null, (new VersionParser())->parseConstraints('<2.0'))]))
+            ->withFixes(new PackageFixes(['PKSA-a' => $upgrade], [], null, null, null));
+
+        $signal = (new AdvisoryRule())->evaluate($facts);
+
+        self::assertNotNull($signal);
+        self::assertSame([AdvisoryRule::heldBy($holder)], JsonPath::arrayAt($signal->data(), ['advisories', 0, 'fix', 'held_by']));
+    }
+
+    public function testAnIdThatLooksLikeANumberStaysAString(): void
+    {
+        $signal = (new AdvisoryRule())->evaluate(new PackageFacts(F::package(['version' => '1.0.0']), null, null, [$this->advisory('42')]));
+
+        self::assertNotNull($signal);
+        self::assertSame('42', JsonPath::arrayAt($signal->data(), ['advisories', 0])['id']);
+    }
+
+    public function testTheDataIsCompleteWhenEveryFeedAnswered(): void
+    {
+        $coverage = static fn (?string $reason): AdvisoryNameCoverage => new AdvisoryNameCoverage([], 0, $reason);
+        $facts = static fn (?string $reason): PackageFacts => new PackageFacts(F::package(['version' => '1.0.0']), null, null, [new Advisory('PKSA-a', null, null, null, 'high', null)], null, null, $coverage($reason));
+
+        $complete = (new AdvisoryRule())->evaluate($facts(null));
+        $partial = (new AdvisoryRule())->evaluate($facts(AdvisoryCoverage::LOOKUP_FAILED));
+
+        self::assertNotNull($complete);
+        self::assertNotNull($partial);
+        self::assertTrue($complete->data()['complete']);
+        self::assertFalse($partial->data()['complete']);
+    }
+
+    /**
+     * @dataProvider titles
+     */
+    #[DataProvider('titles')]
+    public function testATitleDropsOnlyALeadingCveAndColon(?string $cve, string $title, string $expected): void
+    {
+        self::assertSame($expected, AdvisoryRule::title($cve, $title));
+    }
+
+    /** @return iterable<string, array{?string, string, string}> */
+    public static function titles(): iterable
+    {
+        yield 'a leading CVE and colon' => ['CVE-2024-1', 'CVE-2024-1:  a   title ', 'a title'];
+        yield 'a leading CVE without a colon' => ['CVE-2024-1', 'CVE-2024-1 a title', 'CVE-2024-1 a title'];
+        yield 'no CVE' => [null, 'a title', 'a title'];
     }
 }
