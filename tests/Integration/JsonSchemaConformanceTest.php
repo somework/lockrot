@@ -199,6 +199,19 @@ final class JsonSchemaConformanceTest extends TestCase
         $this->assertValid(Schemas::REPORT, $report, $dir.' (html payload)', true);
 
         self::assertNotSame([], (array) $payload->details, $dir.' explains the packages it flagged');
+        $explain = JsonPath::decodeFile(Schemas::path(Schemas::EXPLAIN, ExplainFormatter::SCHEMA));
+        foreach ((array) $payload->details as $package => $detail) {
+            self::assertInstanceOf(\stdClass::class, $detail);
+            foreach (['metadata' => 'repositoryMetadata', 'lock' => 'lock'] as $key => $definition) {
+                if ($key === 'metadata' && $detail->metadata === null) {
+                    continue;
+                }
+                $part = json_decode((string) json_encode(['definitions' => $explain['definitions'], '$ref' => '#/definitions/'.$definition]));
+                self::assertIsObject($part);
+                $this->assertValidAgainst($part, (string) json_encode($detail->{$key}), $dir.' details '.$package.' '.$key);
+                $this->assertValidAgainst($part, (string) json_encode($detail->{$key}), $dir.' details '.$package.' '.$key, true);
+            }
+        }
         self::assertNoteDetailsAgree(self::decoded($report), $dir.' (html payload)');
         self::assertDoesNotMatchRegularExpression('{<script[^>]+src=}i', $page, $dir.' fetches no script');
         self::assertDoesNotMatchRegularExpression('{<link[^>]+rel="stylesheet"}i', $page, $dir.' fetches no stylesheet');
