@@ -16,8 +16,6 @@ use Lockrot\Verdict\ScoreModel;
  */
 final class Report2Root
 {
-    private const FIX_KINDS = ['update', 'upgrade', 'raise-php', 'unknown', 'blocked', 'none'];
-
     /**
      * Per flag: the graded findings that count it, the findings it leads, the fired flags the
      * allowlist accepts and the counting findings by grade. `vulnerable` leads nothing and no entry
@@ -172,7 +170,7 @@ final class Report2Root
         $packages = ['vulnerable' => 0, 'unchecked' => 0, 'ignored' => 0, 'clear' => 0];
         $advisories = ['counted' => 0, 'ignored' => 0];
         $severities = array_fill_keys(Severity::DISPLAY_ORDER, 0);
-        $fixes = array_fill_keys(self::FIX_KINDS, 0);
+        $fixes = array_fill_keys(ScoreModel::FIX_KINDS, 0);
         $updateNow = [];
         foreach ($findings as $finding) {
             $security = self::map($finding, 'security');
