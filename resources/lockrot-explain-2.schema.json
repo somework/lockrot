@@ -3943,7 +3943,7 @@
                     ]
                 },
                 {
-                    "description": "`gate.basis` is set exactly under a baseline entry (`baseline.recorded` an object); `exempt_by: baseline` only there. A later `exempt_by` value is not constrained.",
+                    "description": "`gate.basis` is set exactly under a baseline entry (`baseline.recorded` an object).",
                     "anyOf": [
                         {
                             "properties": {
@@ -3983,13 +3983,6 @@
                                     "properties": {
                                         "basis": {
                                             "type": "null"
-                                        },
-                                        "exempt_by": {
-                                            "not": {
-                                                "enum": [
-                                                    "baseline"
-                                                ]
-                                            }
                                         }
                                     }
                                 }

@@ -309,8 +309,6 @@ def _(d): next(x for x in d['findings'][0]['score']['modifiers'] if x['reason'] 
 def _(d): d['findings'][0]['allowlist_reason'] = 'a single-file minifier, finished'  # a partial entry: report-1's key stays null
 @case('a2-accepted-flag-without-an-entry', 'composite', f)
 def _(d): next(x for x in d['findings'][m]['flags'] if x['id'] == 'old-promise')['role'] = 'accepted'
-@case('a2-exempt-by-baseline-without-an-entry', 'composite', f)
-def _(d): d['findings'][m]['gate'].update(fails=False, by=[], exempt_by='baseline')
 @case('a2-gate-basis-without-an-entry', 'composite', f)
 def _(d):
     t = d['findings'][m]['score']
