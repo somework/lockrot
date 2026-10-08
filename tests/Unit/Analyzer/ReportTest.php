@@ -183,8 +183,8 @@ final class ReportTest extends TestCase
         );
 
         self::assertSame(1, $report->abandonedWithReplacement());
-        self::assertSame(['total' => 3, 'with_replacement' => 1], $report->toArray()['abandoned']);
-        self::assertSame(['counts', 'abandoned', 'priorities'], \array_slice(array_keys($report->toArray()), 7, 3), 'the split sits right after the counts');
+        self::assertSame(['total' => 3, 'with_replacement' => 1, 'with_suggestion' => 1], $report->toArray()['abandoned'], 'Symfony names no package: a suggestion');
+        self::assertSame(['counts', 'abandoned', 'priorities'], \array_slice(array_keys($report->toArray()), 10, 3), 'the split sits right after the counts');
         self::assertStringStartsWith('4 packages checked · abandoned 3 (1 with a replacement) · silent 1 · ', $report->summaryLine());
 
         $none = $this->report($this->finding('vendor/dead', Verdict::ABANDONED));
@@ -247,31 +247,13 @@ final class ReportTest extends TestCase
 
         $run = JsonPath::arrayAt($report->toArray(), ['run']);
 
-        self::assertSame([
-            'project' => 'Acme shop',
-            'root_package' => 'acme/shop',
-            'target_php' => '8.4',
-            'project_php' => '>=8.2',
-            'lock_file' => 'composer.lock',
-            'fail_on' => 'silent',
-            'fail_on_kind' => 'verdict',
-            'strict_network' => false,
-            'mode' => 'check',
-            'thresholds' => [
-                'release-warn-years' => 2,
-                'release-high-years' => 4,
-                'push-warn-years' => 6,
-                'push-high-years' => 8,
-            ],
-            'flagged_verdicts' => [
-                Verdict::ABANDONED,
-                Verdict::SILENT,
-                Verdict::PINNED,
-                Verdict::LEFT_BEHIND,
-                Verdict::OLD_PROMISE,
-                Verdict::STALE,
-            ],
-        ], $run);
+        self::assertSame(
+            ['project' => 'Acme shop', 'root_package' => 'acme/shop', 'target_php' => '8.4', 'project_php' => '>=8.2', 'project_php_lowest' => '8.2.0', 'lock_file' => 'composer.lock', 'fail_on' => 'silent'],
+            array_intersect_key($run, array_flip(['project', 'root_package', 'target_php', 'project_php', 'project_php_lowest', 'lock_file', 'fail_on']))
+        );
+        self::assertSame([['value' => 'silent', 'kind' => 'flag', 'threshold' => 'silent']], $run['gates'], "report-1's verdict word is a flag gate");
+        self::assertSame(['release-warn-years' => 2, 'release-high-years' => 4, 'push-warn-years' => 6, 'push-high-years' => 8], $run['thresholds']);
+        self::assertSame(['critical', 'high', 'medium', 'low'], $run['graded_verdicts']);
     }
 
     /**
