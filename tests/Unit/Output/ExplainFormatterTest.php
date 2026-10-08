@@ -333,17 +333,17 @@ final class ExplainFormatterTest extends TestCase
         $encoded = (new ExplainFormatter())->json($explanation);
         $json = json_decode($encoded, true);
 
-        self::assertStringStartsWith("{\n    \"\$schema\": \"https://lockrot.dev/schema/explain-1.json\",\n    \"lockrot\": {\n", $encoded, 'pretty-printed');
+        self::assertStringStartsWith("{\n    \"\$schema\": \"https://lockrot.dev/schema/explain-2.json\",\n    \"lockrot\": {\n", $encoded, 'pretty-printed');
         self::assertStringEndsWith("}\n", $encoded);
         self::assertStringContainsString('"https://github.com/vendor/pkg.git"', $encoded, 'slashes unescaped');
         self::assertIsArray($json);
-        self::assertSame(['version' => Version::STRING, 'schema' => 1], $json['lockrot']);
+        self::assertSame(['version' => Version::STRING, 'schema' => 2], $json['lockrot']);
         self::assertSame('vendor/pkg', $json['package']);
         self::assertIsArray($json['finding']);
         self::assertSame('ok', $json['finding']['verdict']);
         self::assertIsArray($json['metadata']);
         self::assertIsArray($json['metadata']['branches']);
-        self::assertSame([['branch' => '1.x', 'installed' => true, 'highest' => '1.0.0', 'highest_released' => '2026-01-01T00:00:00+00:00', 'highest_commit_date' => null, 'newest_dated' => '1.0.0', 'newest_dated_released' => '2026-01-01T00:00:00+00:00', 'dated_by' => null, 'php' => null, 'admits_target_php' => null, 'admits_project_php' => null, 'php_blocked_by' => null, 'misses_target_php' => null, 'misses_project_php' => null]], $json['metadata']['branches']);
+        self::assertSame([['branch' => '1.x', 'installed' => true, 'highest' => '1.0.0', 'highest_released' => '2026-01-01T00:00:00+00:00', 'highest_commit_date' => null, 'newest_dated' => '1.0.0', 'newest_dated_released' => '2026-01-01T00:00:00+00:00', 'dated_by' => null, 'php' => null, 'admits_target_php' => null, 'admits_project_php' => null, 'php_blocked_by' => null, 'misses_target_php' => null, 'misses_project_php' => null, 'released_years' => 0.7, 'fixes' => null]], $json['metadata']['branches']);
     }
 
     /** A split package dated by its monorepo: the rows read the parent's dates, and a footnote says whose they are. */
