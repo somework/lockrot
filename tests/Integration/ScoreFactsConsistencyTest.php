@@ -143,7 +143,7 @@ final class ScoreFactsConsistencyTest extends TestCase
 
         $check($f['verdict'] === self::band($score['total']), 'the grade is the band of the total');
         $check($score['total'] === (int) floor($score['exact']), 'the total is the exact score rounded down');
-        $check($score['rounded_down'] === ($score['exact'] != $score['total']), 'rounded_down says whether the exact score was whole');
+        $check($score['rounded_down'] === ($score['exact'] !== $score['total']), 'rounded_down says whether the exact score was whole');
         $maintenance = array_values(array_filter($terms, static fn (array $term): bool => $term['part'] === 'maintenance'));
         $security = array_values(array_filter($terms, static fn (array $term): bool => $term['part'] === 'security'));
         foreach ($maintenance as $i => $term) {
