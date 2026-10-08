@@ -1538,7 +1538,12 @@ final class LockrotCommandTest extends TestCase
      */
     private static function assertVerdictsMatchTheGolden(array $json): array
     {
-        $verdicts = array_column(JsonPath::arrayAt($json, ['findings']), 'verdict', 'package');
+        // report-1's verdict word: the lead of a graded finding, the score-0 word of the rest.
+        $verdicts = [];
+        foreach (JsonPath::arrayAt($json, ['findings']) as $finding) {
+            self::assertIsArray($finding);
+            $verdicts[$finding['package']] = $finding['lead'] ?? $finding['verdict'];
+        }
         $golden = JsonPath::arrayAt(JsonPath::decodeFile(__DIR__.'/../../fixtures/golden/wallabag.json'), ['verdicts']);
         ksort($verdicts);
         ksort($golden);
