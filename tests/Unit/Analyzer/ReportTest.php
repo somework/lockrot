@@ -22,6 +22,7 @@ use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
+use Lockrot\Verdict\ScoreModel;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\TestCase;
 
@@ -301,7 +302,7 @@ final class ReportTest extends TestCase
         self::assertNotContains(Verdict::OK, $flagged);
         foreach (array_keys($flagged) as $at) {
             $verdict = JsonPath::stringAt($flagged, [$at]);
-            self::assertTrue(Verdict::flagged($verdict), $verdict.' is not a flagged verdict');
+            self::assertContains($verdict, ScoreModel::GRADES);
         }
     }
 
@@ -325,15 +326,11 @@ final class ReportTest extends TestCase
             ['vendor/known', 'vendor/worse', 'vendor/fresh']
         ));
 
-        $standings = [];
-        foreach (array_keys(JsonPath::arrayAt($compared->toArray(), ['findings'])) as $at) {
-            $standings[JsonPath::stringAt($compared->toArray(), ['findings', $at, 'package'])]
-                = JsonPath::arrayAt($compared->toArray(), ['findings', $at, 'baseline']);
+        foreach (JsonPath::arrayAt($compared->toArray(), ['findings']) as $finding) {
+            self::assertIsArray($finding);
+            self::assertNull($finding['baseline'], "report-2 writes a finding's standing from baseline-2 on");
         }
-
-        self::assertSame(['status' => 'known', 'previous_verdict' => Verdict::STALE], $standings['vendor/known']);
-        self::assertSame(['status' => 'worsened', 'previous_verdict' => Verdict::STALE], $standings['vendor/worse']);
-        self::assertSame(['status' => 'new', 'previous_verdict' => null], $standings['vendor/fresh']);
+        self::assertIsArray($compared->toArray()['baseline'], 'the root block names the file the run read');
     }
 
     public function testAFindingWithoutABaselineStandsNowhere(): void
@@ -390,7 +387,7 @@ final class ReportTest extends TestCase
         self::assertNull($report->gate());
         self::assertArrayHasKey('gate', $document);
         self::assertSame(['fails' => false, 'tripped_by' => []], \array_slice(JsonPath::arrayAt($document, ['gate']), 0, 2, true), 'report-2 always writes the gate');
-        self::assertNull(JsonPath::arrayAt($document, ['findings', 0])['gate']);
+        self::assertSame(['reaches_fail_on' => false, 'fails' => false, 'exempt_by' => null, 'by' => [], 'basis' => null], JsonPath::arrayAt($document, ['findings', 0, 'gate']));
     }
 
     /** Without `run` the gate has nothing to read: null at the root and on every finding, never absent. */
@@ -404,7 +401,7 @@ final class ReportTest extends TestCase
         self::assertSame(['fails' => false, 'tripped_by' => []], \array_slice(JsonPath::arrayAt($document, ['gate']), 0, 2, true), 'report-2 always writes the gate');
         $at = array_search('baseline', array_keys($document), true);
         self::assertIsInt($at);
-        self::assertSame(['baseline', 'gate', 'notes'], \array_slice(array_keys($document), $at, 3), 'after the baseline block');
+        self::assertSame(['baseline', 'gate', 'security'], \array_slice(array_keys($document), $at, 3), 'after the baseline block');
         $finding = JsonPath::arrayAt($document, ['findings', 0]);
         self::assertArrayHasKey('gate', $finding);
         self::assertNull($finding['gate']);
@@ -422,7 +419,7 @@ final class ReportTest extends TestCase
         $before = $report->toArray();
 
         self::assertSame(['fails' => true, 'tripped_by' => ['fail_on'], 'fail_on_applied' => true], \array_slice(JsonPath::arrayAt($before, ['gate']), 0, 3, true));
-        self::assertSame(['reaches_fail_on' => true, 'fails' => true, 'exempt_by' => null], JsonPath::arrayAt($before, ['findings', 0, 'gate']));
+        self::assertSame(['reaches_fail_on' => true, 'fails' => true, 'exempt_by' => null], \array_slice(JsonPath::arrayAt($before, ['findings', 0, 'gate']), 0, 3, true));
         self::assertSame(['reaches_fail_on' => false, 'fails' => false, 'exempt_by' => null], JsonPath::arrayAt($before, ['findings', 1, 'gate']));
 
         $compared = $report->withBaseline(BaselineComparison::compare(Baseline::fromReport($report), $report, 'lockrot-baseline.json', ['vendor/known', 'vendor/fine']));
