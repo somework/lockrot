@@ -13,6 +13,7 @@ use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\Origins;
 use Lockrot\Verdict\Finding;
+use Lockrot\Verdict\FindingDetails;
 use Lockrot\Verdict\FlagSet;
 use Lockrot\Verdict\Score;
 use Lockrot\Verdict\Verdict;
@@ -769,6 +770,31 @@ final class FindingTest extends TestCase
         self::assertSame('unknown', $graded->grade());
         $this->expectException(\LogicException::class);
         $finding->grade();
+    }
+
+    /**
+     * Maintenance is judged exactly when the repository metadata was read: the details and the
+     * flags of one finding cannot say otherwise.
+     *
+     * @dataProvider mismatchedJudgements
+     */
+    #[DataProvider('mismatchedJudgements')]
+    public function testAJudgementTheDetailsContradictIsRefused(string $status, bool $maintenanceJudged, bool $detailsFirst): void
+    {
+        $finding = (new FindingBuilder())->withoutFlags()->build();
+        $details = new FindingDetails($status, null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [], null);
+        $flags = FlagSet::fromSignals([], null, []);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $detailsFirst ? $finding->withDetails($details)->withFlags($flags, $maintenanceJudged) : $finding->withFlags($flags, $maintenanceJudged)->withDetails($details);
+    }
+
+    /** @return iterable<string, array{string, bool, bool}> */
+    public static function mismatchedJudgements(): iterable
+    {
+        yield 'judged, the metadata unavailable' => ['unavailable', true, false];
+        yield 'not judged, the metadata read' => ['read', false, false];
+        yield 'the details first' => ['read', false, true];
     }
 
     public function testWithSignalsKeepsTheScore(): void

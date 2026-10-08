@@ -6,9 +6,11 @@ namespace Lockrot\Tests\Support;
 
 use Lockrot\Allowlist\AllowlistEntry;
 use Lockrot\Analyzer\LibyearsMeasurement;
+use Lockrot\Data\Repository\ReleaseBranch;
 use Lockrot\Lock\PackageOrigin;
 use Lockrot\Signal\Signal;
 use Lockrot\Verdict\Finding;
+use Lockrot\Verdict\FindingDetails;
 use Lockrot\Verdict\FlagSet;
 use Lockrot\Verdict\Verdict;
 
@@ -187,7 +189,7 @@ final class FindingBuilder
     {
         $finding = new Finding($this->package, $this->version, $this->verdict, $this->signals, $this->chain, $this->allowlistReason, $this->dataDate, $this->note, $this->dev, $this->directDependents, $this->libyears, $this->origin, $this->replacementNamedBy);
         if ($this->flags !== null) {
-            return $finding->withFlags($this->flags, $this->maintenanceJudged);
+            return $finding->withFlags($this->flags, $this->maintenanceJudged)->withDetails(self::detailsOf($finding, $this->maintenanceJudged));
         }
         if ($this->unscored) {
             return $finding;
@@ -198,6 +200,25 @@ final class FindingBuilder
             $flags = FlagSet::fromSignals(array_map(static fn (array $raise): Signal => new Signal($raise[0], $raise[1], 'set by the verdict'), self::RAISED_BY[$this->verdict]), $entry, []);
         }
 
-        return $finding->withFlags($flags, $this->verdict !== Verdict::UNKNOWN);
+        return $finding->withFlags($flags, $this->verdict !== Verdict::UNKNOWN)->withDetails(self::detailsOf($finding, $this->verdict !== Verdict::UNKNOWN));
+    }
+
+    /**
+     * The details of a finding whose advisory lookup answered and whose release scan found no
+     * branch: the metadata is read exactly when maintenance is judged.
+     */
+    public static function detailsOf(Finding $finding, bool $maintenanceJudged): FindingDetails
+    {
+        $status = $maintenanceJudged ? 'read' : (!$finding->isFromComposerRepository() ? 'not_from_composer_repository' : ($finding->note() === 'not found in the repository' ? 'not_found' : 'unavailable'));
+        $skipped = [];
+        if ($status !== 'read') {
+            $skipped[] = ['check' => 'release_metadata', 'reason' => $status, 'blocks' => [Signal::S2, Signal::S8]];
+        } elseif (ReleaseBranch::of($finding->version()) === null) {
+            $skipped[] = ['check' => 'release_branch', 'reason' => 'branch_snapshot', 'blocks' => [Signal::S8]];
+        }
+        $reason = $finding->allowlistReason();
+        $entry = $reason === null ? null : new AllowlistEntry($finding->package(), null, $reason, null, AllowlistEntry::BY_PROJECT);
+
+        return new FindingDetails($status, $status === 'unavailable' ? 'fetch_failed' : null, null, $skipped, ['requires' => null, 'target_runs' => null, 'project_allows' => null], $entry, 'complete', null, [], null);
     }
 }

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Lockrot\Verdict;
 
 use Composer\Package\Loader\ValidatingArrayLoader;
-use Lockrot\Allowlist\AllowlistEntry;
 use Lockrot\Analyzer\Libyears;
 use Lockrot\Analyzer\LibyearsMeasurement;
 use Lockrot\Data\Repository\ReleaseBranch;
@@ -141,9 +140,16 @@ final class Finding
         return $this->advisoryFacts013;
     }
 
-    /** @param bool $maintenanceJudged lockrot read the release metadata */
+    /**
+     * @param bool $maintenanceJudged lockrot read the release metadata
+     *
+     * @throws \InvalidArgumentException when the finding's details say otherwise
+     */
     public function withFlags(FlagSet $flags, bool $maintenanceJudged): self
     {
+        if ($this->details !== null) {
+            self::assertJudgement($this->details, $maintenanceJudged);
+        }
         $clone = clone $this;
         $clone->score = Score::of($flags, self::reachOf($this->chain), $this->dev);
         $clone->grade = ScoreBasis::verdict($clone->score, $flags, $maintenanceJudged);
@@ -554,34 +560,38 @@ final class Finding
         return ($evidence === '' ? '' : $evidence.'; ').'allowlisted: '.$this->allowlistReason;
     }
 
-    /** A copy with the facts report-2 writes beside the signals. */
+    /**
+     * A copy with the facts report-2 writes beside the signals.
+     *
+     * @throws \InvalidArgumentException when the metadata status contradicts the flags' judgement
+     */
     public function withDetails(FindingDetails $details): self
     {
+        if ($this->score !== null) {
+            self::assertJudgement($details, $this->maintenanceJudged);
+        }
         $clone = clone $this;
         $clone->details = $details;
 
         return $clone;
     }
 
-    /**
-     * The analyzer's facts, else what the finding's own fields say: a finding built without them
-     * has no release scan and no advisory lookup.
-     */
+    /** @throws \LogicException for a finding built without the analyzer's facts */
     public function details(): FindingDetails
     {
-        if ($this->details !== null) {
-            return $this->details;
+        if ($this->details === null) {
+            throw new \LogicException('The finding of '.$this->package.' was built without its details.');
         }
-        $status = !$this->isFromComposerRepository() ? 'not_from_composer_repository' : ($this->maintenanceJudged ? 'read' : ($this->note === 'not found in the repository' ? 'not_found' : 'unavailable'));
-        $skipped = [];
-        if ($status !== 'read') {
-            $skipped[] = ['check' => 'release_metadata', 'reason' => $status, 'blocks' => [Signal::S2, Signal::S8]];
-        } elseif (ReleaseBranch::of($this->version) === null) {
-            $skipped[] = ['check' => 'release_branch', 'reason' => 'branch_snapshot', 'blocks' => [Signal::S8]];
-        }
-        $entry = $this->allowlistReason === null ? null : new AllowlistEntry($this->package, null, $this->allowlistReason, null, AllowlistEntry::BY_PROJECT);
 
-        return new FindingDetails($status, $status === 'unavailable' ? 'fetch_failed' : null, null, $skipped, ['requires' => null, 'target_runs' => null, 'project_allows' => null], $entry, 'not_run', 'composer_too_old', [], null);
+        return $this->details;
+    }
+
+    /** Maintenance is judged exactly when the repository metadata was read. */
+    private static function assertJudgement(FindingDetails $details, bool $maintenanceJudged): void
+    {
+        if (($details->metadataStatus() === 'read') !== $maintenanceJudged) {
+            throw new \InvalidArgumentException(\sprintf('Metadata status "%s" contradicts maintenance_judged %s.', $details->metadataStatus(), $maintenanceJudged ? 'true' : 'false'));
+        }
     }
 
     /**
