@@ -30,9 +30,6 @@ use Lockrot\Signal\Signal;
  */
 final class FindingDetails
 {
-    /** The fix kinds, easiest first: `security.fix_kind` with no move is the hardest of its advisories'. */
-    private const EASE = [Fix::UPDATE, Fix::UPGRADE, Fix::RAISE_PHP, Fix::UNKNOWN, Fix::BLOCKED, Fix::NONE];
-
     private string $metadataStatus;
     private ?string $metadataReason;
     private ?string $metadataMessage;
@@ -201,10 +198,11 @@ final class FindingDetails
             return $out + ['ignored' => $ignored, 'ignored_count' => \count($ignored)];
         }
         $counts = self::counts($rows);
+        // With no move, `fix_kind` is the hardest kind of its advisories: FIX_KINDS runs easiest first.
         $hardest = 0;
         foreach ($rows as $row) {
             $fix = \is_array($row['fix'] ?? null) ? $row['fix'] : [];
-            $hardest = max($hardest, (int) array_search($fix['kind'] ?? Fix::UNKNOWN, self::EASE, true));
+            $hardest = max($hardest, (int) array_search($fix['kind'] ?? Fix::UNKNOWN, ScoreModel::FIX_KINDS, true));
         }
         $worst = self::worst($counts);
         $installed = $this->fixes === null ? null : $this->fixes->installedBranch();
@@ -215,7 +213,7 @@ final class FindingDetails
             'counts' => $counts,
             'ignored' => $ignored,
             'ignored_count' => \count($ignored),
-            'fix_kind' => self::EASE[$hardest],
+            'fix_kind' => ScoreModel::FIX_KINDS[$hardest],
             'installed_branch_fixes' => $branch === null || $installed === null ? null : self::branchFixes($installed),
             'move_in' => null,
             'gets' => $gets === null ? null : [
