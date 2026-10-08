@@ -512,7 +512,7 @@ final class LockrotCommandTest extends TestCase
         self::assertSame(2, $json['lockrot']['schema']);
         self::assertSame('doctrine/annotations', $json['package']);
         self::assertIsArray($json['finding']);
-        self::assertSame('abandoned', $json['finding']['verdict']);
+        self::assertSame('abandoned', $json['finding']['lead']);
         self::assertIsArray($json['metadata']);
         self::assertTrue($json['metadata']['abandoned']);
         self::assertIsArray($json['metadata']['branches']);
@@ -1562,10 +1562,10 @@ final class LockrotCommandTest extends TestCase
     /** @param array<mixed, mixed> $json a report of the wallabag fixture */
     private static function assertAbandonedCountAgreesWithTheFindings(array $json): void
     {
-        $verdicts = array_column(JsonPath::arrayAt($json, ['findings']), 'verdict', 'package');
+        $leads = array_column(JsonPath::arrayAt($json, ['findings']), 'lead', 'package');
 
-        self::assertSame('abandoned', $verdicts['doctrine/annotations'] ?? null);
-        self::assertSame(\count(array_keys($verdicts, 'abandoned', true)), JsonPath::intAt($json, ['counts', 'abandoned']));
+        self::assertSame('abandoned', $leads['doctrine/annotations'] ?? null);
+        self::assertSame(\count(array_keys($leads, 'abandoned', true)), JsonPath::intAt($json, ['flags', 'abandoned', 'leading']));
     }
 
     /** @return array<string, mixed> */
