@@ -558,6 +558,80 @@ def _(d):
     d['note_details'].append(n); d['notes'].append('t')
 
 
+# ---------------------------------------------------------------------------------------------- relations no other case breaks
+# Each case changes one value of a valid document so that one relation of report-2 fails; SchemaRelationsTest finds the
+# relation each case breaks.
+@case('relation-factbaseline-0-0', 'C-baselined-dagger', 'findings[0].flags[1].baseline.covered_by')
+def _(d): d['findings'][0]['flags'][1]['baseline']['covered_by'] = None
+@case('relation-partmaintenance-alone-0', 'B-dev-dagger', 'findings[0].score.parts.maintenance.alone.verdict')
+def _(d): d['findings'][0]['score']['parts']['maintenance']['alone']['verdict'] = None
+@case('relation-partmaintenance-0', 'stale-only', 'findings[0].score.parts.maintenance.contribution')
+def _(d): d['findings'][0]['score']['parts']['maintenance']['contribution'] = 0
+@case('relation-partsecurity-alone-0', 'B-dev-dagger', 'findings[0].score.parts.security.alone.verdict')
+def _(d): d['findings'][0]['score']['parts']['security']['alone']['verdict'] = None
+@case('relation-partsecurity-0', 'stale-only', 'findings[0].score.parts.security.contribution')
+def _(d): d['findings'][0]['score']['parts']['security']['contribution'] = 1
+@case('relation-ifapplied-0-0', 'partial-op-dagger', 'findings[0].next_step.if_applied.total')
+def _(d): d['findings'][0]['next_step']['if_applied']['total'] = 1
+@case('relation-throughentry-0', 'rounded-dev-dagger', 'findings[0].next_step.through[0].newest_requires')
+def _(d): d['findings'][0]['next_step']['through'][0]['newest_requires'] = None
+@case('relation-throughentry-1', 'rounded-dev-dagger', 'findings[0].next_step.through[0].installed_requires')
+def _(d): d['findings'][0]['next_step']['through'][0]['installed_requires'] = False
+@case('relation-move-1', 'C-baselined-dagger', 'findings[0].next_step.replacement')
+def _(d): d['findings'][0]['next_step']['replacement'] = None
+@case('relation-move-2', 'stale-only', 'findings[0].next_step.constraint')
+def _(d): d['findings'][0]['next_step']['constraint'] = 'x'
+@case('relation-move-3', 'rounded-dev-dagger', 'findings[0].next_step.php_check')
+def _(d): d['findings'][0]['next_step']['php_check'] = None
+@case('relation-move-5', 'rounded-dev-dagger', 'findings[0].next_step.clears')
+def _(d): d['findings'][0]['next_step']['clears'] = []
+@case('relation-move-6', 'D-partial-dagger', 'findings[0].next_step.latest')
+def _(d): d['findings'][0]['next_step']['latest'] = None
+@case('relation-move-7', 'E-ignored-dagger', 'findings[0].next_step.commands')
+def _(d): d['findings'][0]['next_step']['commands'] = []
+@case('relation-move-9', 'rounded-dev-dagger', 'findings[0].next_step.if_applied.at_most')
+def _(d): d['findings'][0]['next_step']['if_applied']['at_most'] = True
+@case('relation-move-10', 'stale-only', 'findings[0].next_step.crosses_major')
+def _(d): d['findings'][0]['next_step']['crosses_major'] = True
+@case('relation-branchfixes-if-applied-0-0', 'composite', 'findings[6].security.installed_branch_fixes.if_applied.total')
+def _(d): d['findings'][6]['security']['installed_branch_fixes']['if_applied']['total'] = 1
+@case('relation-branchfixes-0', 'A-blocked-dagger', 'findings[0].security.installed_branch_fixes.lowest')
+def _(d): d['findings'][0]['security']['installed_branch_fixes']['lowest'] = 'x'
+@case('relation-securityvulnerable-partial-0-if-applied-0', 'partial-op-dagger', 'findings[0].security.partial.if_applied.total')
+def _(d): d['findings'][0]['security']['partial']['if_applied']['total'] = 0
+@case('relation-findingbaseline-0-recorded-0-0', 'C-baselined-dagger', 'findings[0].baseline.recorded.lead')
+def _(d): d['findings'][0]['baseline']['recorded']['lead'] = None
+@case('relation-findingbaseline-0-1', 'A-baselined-dagger', 'findings[0].baseline.recorded')
+def _(d): d['findings'][0]['baseline']['recorded'] = None
+@case('relation-findinggate-basis-0-2', 'A-baselined-dagger', 'findings[0].gate.basis.verdict')
+def _(d): d['findings'][0]['gate']['basis']['verdict'] = None
+@case('relation-findinggate-basis-0-3', 'A-baselined-dagger', 'findings[0].gate.basis.new.total')
+def _(d): d['findings'][0]['gate']['basis']['new']['total'] = 0
+@case('relation-findinggate-0', 'baseline-read-score0', 'findings[0].gate.exempt_by')
+def _(d): d['findings'][0]['gate']['exempt_by'] = 'x'
+@case('relation-s9fix-0', 'E-ignored-dagger', 'findings[0].signals[0].data.advisories[0].fix.reason')
+def _(d): d['findings'][0]['signals'][0]['data']['advisories'][0]['fix']['reason'] = 'x'
+@case('relation-s9fix-1', 'E-ignored-dagger', 'findings[0].signals[0].data.advisories[0].fix.on_installed_branch')
+def _(d): d['findings'][0]['signals'][0]['data']['advisories'][0]['fix']['on_installed_branch'] = None
+@case('relation-run-3', 'baseline-read-score0', 'run.graded_verdicts')
+def _(d): d['run']['graded_verdicts'] = ['high', 'medium', 'low']
+@case('relation-s6-0', 'composite-generate-baseline', 'findings[3].signals[1].data.last_stable_version')
+def _(d): d['findings'][3]['signals'][1]['data']['last_stable_version'] = None
+@case('relation-finding-3', 'E-ignored-dagger', 'findings[0].security.installed_branch_fixes')
+def _(d): d['findings'][0]['security']['installed_branch_fixes'] = None
+@case('relation-finding-23', 'partial-op-dagger', 'findings[0].security.partial.if_applied.verdict')
+def _(d): d['findings'][0]['security']['partial']['if_applied']['verdict'] = 'high'
+@case('relation-finding-26', 'B-baselined-dagger', 'findings[0].gate.basis.new.terms[0].weight')
+def _(d): d['findings'][0]['gate']['basis']['new']['terms'][0]['weight'] = 5
+@case('relation-finding-42', 'stale-only', 'findings[0].flags[0]')
+def _(d): d['findings'][0]['flags'][0]['degree']['liveness_complete'] = False
+@case('relation-move-4', 'composite', 'findings[4].next_step.if_applied')
+def _(d): d['findings'][4]['next_step']['if_applied'] = {'total': 2, 'verdict': 'low', 'lead': 'stale', 'deciding_advisory': None, 'at_most': False, 'assumes': ['clears_hold', 'composer_resolves']}
+@case('relation-finding-43', 'stale-only', 'findings[0].checks_missing')
+def _(d): d['findings'][0]['checks_missing'] = [{'check': 'release_dates', 'reason': 'undated_releases', 'blocks': ['S2', 'S8']}]
+@case('relation-s9fix-2', 'composite', 'findings[6].signals[0].data.advisories[0].fix')
+def _(d): d['findings'][6]['signals'][0]['data']['advisories'][0]['fix'] = {'kind': 'none', 'to_branch': None, 'version': 'v5.4.52', 'newest': 'v5.4.53', 'on_installed_branch': True, 'php': '>=7.2.5', 'held_by': [], 'reason': 'no_release_outside_range'}
+
 if __name__ == '__main__':
     os.makedirs(OUT, exist_ok=True)
     for old in glob.glob(os.path.join(OUT, '*.json')):
