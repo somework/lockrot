@@ -425,7 +425,7 @@ final class ReportTest extends TestCase
         $compared = $report->withBaseline(BaselineComparison::compare(Baseline::fromReport($report), $report, 'lockrot-baseline.json', ['vendor/known', 'vendor/fine']));
         $after = $compared->toArray();
 
-        self::assertSame(['fails' => false, 'tripped_by' => [], 'fail_on_applied' => true], $after['gate']);
+        self::assertSame(['fails' => false, 'tripped_by' => [], 'fail_on_applied' => true], \array_slice(JsonPath::arrayAt($after, ['gate']), 0, 3, true));
         self::assertSame(['reaches_fail_on' => true, 'fails' => false, 'exempt_by' => 'baseline'], JsonPath::arrayAt($after, ['findings', 0, 'gate']));
         $gate = $compared->gate();
         self::assertNotNull($gate);
@@ -487,7 +487,7 @@ final class ReportTest extends TestCase
         self::assertSame(1, $array['not_from_composer_repository']);
         self::assertTrue($array['network_failures']);
         self::assertNull($array['baseline']);
-        self::assertNull($array['run'], 'a report nothing told about the run says so rather than guessing');
+        self::assertSame(['runtime', 'default'], [$array['run']['target_php_source'], $array['run']['fail_on_source']], 'a report nothing told about the run names the defaults');
         self::assertSame(['Repository metadata unavailable for 1 package: HTTP 503'], $array['notes']);
         self::assertIsArray($array['findings']);
         self::assertCount(1, $array['findings']);
@@ -693,7 +693,7 @@ final class ReportTest extends TestCase
             $this->reachedFrom('vendor/leaf', Verdict::STALE, 'root/r01')
         );
 
-        self::assertSame([['package' => 'vendor/shared', 'verdict' => 'abandoned', 'fan_in' => 9]], $report->toArray()['unattributed']);
+        self::assertSame([['package' => 'vendor/shared', 'verdict' => 'high', 'lead' => 'abandoned', 'flag_ids' => ['abandoned'], 'fan_in' => 9]], $report->toArray()['unattributed']);
         self::assertSame(['root/r01' => 1], $report->exposure());
         self::assertSame('pulled in by: root/r01 1', $report->exposureSummaryLine());
         self::assertSame([['package' => 'root/r01', 'flagged' => 1]], $report->toArray()['exposure']);
