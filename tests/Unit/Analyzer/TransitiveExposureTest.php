@@ -11,7 +11,10 @@ use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Signal\Signal;
 use Lockrot\Tests\Support\FindingBuilder;
+use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Verdict\Finding;
+use Lockrot\Verdict\FlagSet;
+use Lockrot\Verdict\Score;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\TestCase;
 
@@ -302,5 +305,22 @@ final class TransitiveExposureTest extends TestCase
             'pulls in 5 flagged packages: vendor/a-stale (stale), vendor/b-stale (stale), vendor/c-stale (stale), vendor/d-stale (stale), vendor/e-stale (stale)',
             $s7->summary()
         );
+    }
+
+    /** A package graded by its advisories alone has no lead: the summary names it `vulnerable`. */
+    public function testAPackageGradedByItsAdvisoriesAloneIsNamedVulnerable(): void
+    {
+        $packages = [['name' => 'root/a', 'version' => '1.0.0', 'require' => ['vendor/leaf' => '^1']], ['name' => 'vendor/leaf', 'version' => '1.0.0']];
+        $graph = DependencyGraph::fromLock(LockFile::fromArray(['packages' => $packages]), ProjectConfig::fromArray(['require' => ['root/a' => '^1']]), false);
+        $s9 = new Signal(Signal::S9, Signal::LEVEL_HIGH, '1 advisory', ['advisories' => [['id' => 'PKSA-1', 'severity' => 'high']], 'releases_read' => true, 'complete' => true]);
+        $leaf = (new FindingBuilder())->withPackage('vendor/leaf')->withSignals([$s9])->withChain($graph->shortestChain('vendor/leaf'))->withDirectDependents(['root/a'])
+            ->withFlags(FlagSet::fromSignals([$s9], null, [Score::advisory('PKSA-1', 'high', 'update')]))->build();
+        $findings = [$this->finding($graph, 'root/a', Verdict::OK), $leaf];
+
+        $a = self::s7($this->byName(TransitiveExposure::attach($findings, $graph))['root/a']);
+
+        self::assertNotNull($a);
+        self::assertSame('pulls in 1 flagged package: vendor/leaf (vulnerable)', $a->summary());
+        self::assertNull(JsonPath::arrayAt($a->data(), ['packages', 0])['lead']);
     }
 }

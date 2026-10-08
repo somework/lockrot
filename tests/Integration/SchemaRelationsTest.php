@@ -8,6 +8,8 @@ use JsonSchema\Validator;
 use Lockrot\Json\Schemas;
 use Lockrot\Output\JsonFormatter;
 use Lockrot\Tests\Support\NegativeFixtures;
+use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -18,7 +20,17 @@ use PHPUnit\Framework\TestCase;
  * A copy of the schema replaces each relation with itself plus a marker: an `enum` of one word
  * that names the relation. One validation of a document then names every relation that the
  * document breaks, or every relation that it reaches on an object.
+ *
+ * It covers nothing: it validates every case document and negative fixture against an instrumented
+ * copy of report-2, which outlasts the timeout of a mutation run. SchemaRelationsTest guards the
+ * schema, not the code.
+ *
+ * @coversNothing
+ *
+ * @group covers-nothing
  */
+#[CoversNothing]
+#[Group('covers-nothing')]
 final class SchemaRelationsTest extends TestCase
 {
     private const DOCUMENTS = __DIR__.'/../fixtures/schema/documents/cases';

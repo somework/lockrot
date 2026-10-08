@@ -20,4 +20,12 @@ final class RepoRefTest extends TestCase
         self::assertSame('last commit', (new RepoRef(RepoRef::BITBUCKET, 'bitbucket.org', 'w/r'))->activityWording());
         self::assertSame('gitlab.example.com/gitlab/g/p', (new RepoRef(RepoRef::GITLAB, 'gitlab.example.com/gitlab', 'g/p'))->key());
     }
+
+    /** S4's `activity`: what the date of each host measures. */
+    public function testTheEventIsAPushOnGitHubAndACommitElsewhere(): void
+    {
+        self::assertSame('push', (new RepoRef(RepoRef::GITHUB, 'github.com', 'o/r'))->event());
+        self::assertSame('commit', (new RepoRef(RepoRef::GITLAB, 'gitlab.com', 'g/s/p'))->event());
+        self::assertSame('commit', (new RepoRef(RepoRef::BITBUCKET, 'bitbucket.org', 'w/r'))->event());
+    }
 }

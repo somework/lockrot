@@ -22,13 +22,25 @@ use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Verdict\VerdictEngine;
+use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
  * The `summary` of S1 to S6 and S8 says nothing that the signal's `data` does not hold: each one
  * rebuilds byte for byte from the `data` of the report-2 document, over every finding of every
  * fixture app and skeleton. The reference sentences below read the document only.
+ *
+ * It covers nothing: it rebuilds every summary of every fixture app, which pushes the signal rules
+ * past the timeout of a mutation run. The unit tests of each rule and FlagSentenceTest kill those
+ * mutants.
+ *
+ * @coversNothing
+ *
+ * @group covers-nothing
  */
+#[CoversNothing]
+#[Group('covers-nothing')]
 final class SignalSentenceTest extends TestCase
 {
     private const FIXTURES = __DIR__.'/../fixtures/';
