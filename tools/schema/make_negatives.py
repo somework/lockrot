@@ -115,7 +115,7 @@ def _(d): d['flags']['vulnerable']['leading'] = 3  # vulnerable is never a lead
 
 # required keys (every key always written)
 @case('missing-next-step', 'composite', f + '.next_step')
-def _(d): d['findings'][m]['do'] = d['findings'][m].pop('next_step')  # revision 2's name
+def _(d): d['findings'][m]['do'] = d['findings'][m].pop('next_step')  # another key in place of the required next_step
 @case('missing-score-band', 'composite', f + '.score.band: The property band is required')
 def _(d): del d['findings'][m]['score']['band']
 @case('term-without-contribution', 'composite', f + '.score.terms[0].contribution: The property contribution is required')
@@ -195,7 +195,7 @@ def _(d): rule(d, 'divide-reach')['id'] = 'divide-reachx'  # well-formed: the pu
 @case('strict-move-kind-unknown', 'composite', f + '.next_step.kind', strict=True)
 def _(d): d['findings'][m]['next_step']['kind'] = 'upgrade-major'
 @case('strict-flag-weight-revision-2', 'composite', f + '.flags[0]: The property weight is not defined', strict=True)
-def _(d): d['findings'][m]['flags'][0].update(weight=16, points=16)  # revision 2 had both on flags[]; terms[] holds them now
+def _(d): d['findings'][m]['flags'][0].update(weight=16, points=16)  # a flag carries no weight or points: score.terms[] holds them
 @case('strict-security-summary', 'composite', 'The property summary is not defined', strict=True)
 def _(d): d['findings'][m]['security']['summary'] = 'dropped in round 2'
 @case('strict-divisor-three', 'composite', f + '.score.terms[1].divisor: Does not have a value in the enumeration', strict=True)
@@ -212,13 +212,13 @@ def _(d): d['findings'][m]['security']['move_in'] = 'security'  # closed: it poi
 @case('ignored-by-malformed', 'E-ignored-dagger', 'findings[0].security.ignored[0].by: Does not match the regex pattern')
 def _(d): d['findings'][0]['security']['ignored'][0]['by'] = 'Audit Ignore'
 @case('ignored-matched-the-value', 'E-ignored-dagger', 'findings[0].security.ignored[0].matched: Does not match the regex pattern')
-def _(d): d['findings'][0]['security']['ignored'][0]['matched'] = 'PKSA-ign0-0000-0000'  # revision 3's IGN fixture: the value, not what it matched on
+def _(d): d['findings'][0]['security']['ignored'][0]['matched'] = 'PKSA-ign0-0000-0000'  # matched names the kind of match, not the matched value
 @case('ignored-severity-moderate', 'E-ignored-dagger', 'findings[0].security.ignored[0].severity: Does not have a value')
 def _(d): d['findings'][0]['security']['ignored'][0]['severity'] = 'moderate'  # the bucket
 @case('points-from-missing', 'composite', 'run.score_model.flags[0].points_from: The property points_from is required')
 def _(d): del d['run']['score_model']['flags'][0]['points_from']  # every row writes every key
 @case('rank-null', 'composite', f + '.rank: NULL value found')
-def _(d): d['findings'][m]['rank'] = None  # an int >= 1 in every report (18 fixture variants wrote null)
+def _(d): d['findings'][m]['rank'] = None  # an int >= 1 in every report
 @case('strict-ignored-by-config-prefix', 'E-ignored-dagger', 'findings[0].security.ignored[0].by: Does not have a value in the enumeration', strict=True)
 def _(d): d['findings'][0]['security']['ignored'][0]['by'] = 'config.audit.ignore'  # well-formed, not a reserved name
 
@@ -241,7 +241,7 @@ def _(d): d['findings'][m]['next_step']['clears_all'] = False
 def _(d): d['findings'][POLY]['allowlist']['reason_id'] = None  # a lockrot-authored reason has an id
 
 
-# each documents a rule report-2 now holds that only explain-2 held, or that neither held (forbidden documents both accepted)
+# each plants one rule that report-2 and explain-2 both hold
 @case('a1-headline-years-value-without-source', 'composite', f + '.flags[0]')
 def _(d): d['findings'][m]['flags'][0]['headline']['source'] = None  # a years value always names its reading
 @case('a1-flag-vulnerable-years-headline', 'composite', f + '.flags[2]')
@@ -363,7 +363,7 @@ def _(d): d['run']['score_rules_used']['split-reach'] = 0  # a well-formed later
 def _(d): d['findings'][POLY]['allowlist']['reason_id'] = 'symfony-later-polyfills'
 
 
-# each plants one rule the attack found accepted by the published and the strict schema although the spec forbids it
+# each plants one rule of the spec that both the published and the strict schema hold
 c_, e_ = DEBUG, YAML
 fc = 'findings[%d]' % c_
 @case('a3-zero-word-finished-without-entry', 'ok-unchecked', 'findings[0]')
@@ -460,7 +460,7 @@ def _(d):
     d['findings'][c_]['maintenance_judged'] = False
     d['findings'][c_]['metadata'].update(status='unavailable', reason=None)
 
-# each plants one rule the round-4 schema lens found accepted (published and strict) although a field description or the spec states it
+# each plants one rule that a field description or the spec states, held by the published and the strict schema
 tw, fo_ = TWIG, 'findings[%d]' % TWIG
 WHOLE = dict(by='project', pattern='symfony/debug', version=None, reason='kept on purpose', reason_id=None, reason_by='user', expires=None, flag_ids=None)
 @case('a4-evidence-on-a-score-0-finding', 'ok-unchecked', 'findings[0]')
@@ -613,8 +613,8 @@ def _(d): d['findings'][0]['signals'][0]['data']['advisories'][0]['fix']['on_ins
 def _(d): d['run']['graded_verdicts'] = ['high', 'medium', 'low']
 @case('relation-s6-0', 'composite-generate-baseline', 'findings[3].signals[1].data.last_stable_version')
 def _(d): d['findings'][3]['signals'][1]['data']['last_stable_version'] = None
-@case('relation-finding-3', 'E-ignored-dagger', 'findings[0]')
-def _(d): d['findings'][0]['branch'] = None
+@case('relation-finding-3', 'E-ignored-dagger', 'findings[0].security.installed_branch_fixes')
+def _(d): d['findings'][0]['security']['installed_branch_fixes'] = None
 @case('relation-branchfixes-1', 'composite', 'findings[6].security.installed_branch_fixes')
 def _(d): d['findings'][6]['security']['installed_branch_fixes']['fix_kind'] = 'blocked'
 @case('relation-finding-23', 'partial-op-dagger', 'findings[0].security.partial.if_applied.verdict')
@@ -629,6 +629,10 @@ def _(d): d['findings'][4]['next_step']['if_applied'] = {'total': 2, 'verdict': 
 def _(d): d['findings'][0]['checks_missing'] = [{'check': 'release_dates', 'reason': 'undated_releases', 'blocks': ['S2', 'S8']}]
 @case('relation-s9fix-2', 'composite', 'findings[6].signals[0].data.advisories[0].fix')
 def _(d): d['findings'][6]['signals'][0]['data']['advisories'][0]['fix'] = {'kind': 'none', 'to_branch': None, 'version': 'v5.4.52', 'newest': 'v5.4.53', 'on_installed_branch': True, 'php': '>=7.2.5', 'held_by': [], 'reason': 'no_release_outside_range'}
+
+# P1: Composer's policy never stops the advisory lookup, so the strict twin knows no check value that says it did
+@case('strict-p1-security-check-disabled', 'ok-unchecked', 'findings[0].security.check', strict=True)
+def _(d): d['findings'][0]['security']['check'] = 'disabled'
 
 if __name__ == '__main__':
     os.makedirs(OUT, exist_ok=True)
