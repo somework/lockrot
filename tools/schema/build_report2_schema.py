@@ -1,17 +1,16 @@
-"""Builds resources/lockrot-report-2.schema.json (here: r3/schema/lockrot-report-2.schema.json) from SPEC-flags-r3 §7.6, §8.2
-and the field reference as code in spec_flags_r3.py (KEYS, CLOSED, KNOWN, SIG_KEYS, RUN_KEYS, ROOT_KEYS).
+"""Builds resources/lockrot-report-2.schema.json (draft-04).
 
-Conventions kept from report-1 (resources/lockrot-report.schema.json, src/Json/Schemas.php, src/Json/KnownValues.php):
+Conventions kept from report-1 (src/Json/Schemas.php, src/Json/KnownValues.php):
   draft-04, `id` = https://lockrot.dev/schema/report-2.json, objects open (no additionalProperties: false; the tests' strict
   twin adds it), closed sets as `enum`, open sets as a string `pattern` plus `x-known-values` (KnownValues::closed reads
   the list as the enum), nullable values as `oneOf [.., {type: null}]` or a type list, shared shapes under `definitions`,
   signals and notes typed per id/code by `anyOf` branches with a generic branch for an id/code the schema does not list.
-Conventions report-2 adds (§7.6, §7.11, §8.2): every key is always written (so every key is `required`; report-1 kept late
-  keys optional), every rendered string carries `x-rendered-from`, discriminated shapes (`score`, `terms[]`, `security`)
-  are `oneOf` branches, half-point numbers carry `multipleOf: 0.5`, and integer parameters of score model 1 that a model
-  change may move carry `x-known-values` (published: any integer; strict twin: model 1's values).
+Conventions report-2 adds: every key is always written (so every key is `required`), every rendered string carries
+  `x-rendered-from`, discriminated shapes (`score`, `terms[]`, `security`) are `oneOf` branches, half-point numbers carry
+  `multipleOf: 0.5`, and integer parameters of score model 1 that a model change can move carry `x-known-values`
+  (published: any integer; strict twin: model 1's values).
 
-Usage: python3 build_report2_schema.py  ->  lockrot-report-2.schema.json beside this file
+Usage: python3 tools/schema/build_report2_schema.py
 """
 import json, os, copy
 
@@ -19,7 +18,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.normpath(os.path.join(HERE, '..', '..'))
 OUT = os.path.join(REPO, 'resources', 'lockrot-report-2.schema.json')
 import hashlib
-# attack round 3 (9.I5): the report-1 file is read from a committed, hash-pinned copy of the 0.13.0 file (tools/schema/inputs/ in the
+# the report-1 file is read from a committed, hash-pinned copy of the 0.13.0 file (tools/schema/inputs/ in the
 # repository; inputs/ here), never from the live resources/ file, so a later widening of report-1 cannot change a report-2 rebuild
 INPUTS = os.path.join(HERE, 'inputs')
 PINNED = json.load(open(os.path.join(INPUTS, 'SHA256SUMS.json')))
@@ -45,8 +44,8 @@ RULE_KINDS = ['select', 'share', 'lookup', 'multiply', 'max', 'divide', 'exempt'
 WHY_IDS = ['accepted-facts-shown-not-counted', 'strongest-fact-in-full', 'correlated-evidence', 'severity-points', 'one-band-up',
            'one-number-per-part', 'reach-halves-maintenance', 'exploitability-independent-of-reach', 'parts-add', 'dev-halves-total',
            'two-floor-parts-make-next', 'integer-band-edges', 'score-zero-says-why', 'advisory-findings-first', 'new-fact-sets-level', 'recorded-lead-covers-below']
-SNAKE = '^[a-z][a-z0-9_]*$'          # reason-like open values (§8.2: "reason-like values use underscores")
-HYPHEN = '^[a-z][a-z0-9-]*$'         # flag-like open values (§8.2: "flag-like values keep hyphens")
+SNAKE = '^[a-z][a-z0-9_]*$'          # reason-like open values ("reason-like values use underscores")
+HYPHEN = '^[a-z][a-z0-9-]*$'         # flag-like open values ("flag-like values keep hyphens")
 DOTTED = '^[a-z][a-z0-9_.-]*$'       # a Composer config key (`policy.advisories`, `audit.ignore-severity`)
 POLICY_KEY = '^([a-z][a-z0-9_.-]*|[A-Z][A-Z0-9_]*)$'  # P1: a Composer config key, or the environment variable COMPOSER_POLICY
 NOT_CONTRACT = 'Prose, not contract; key on the fields it is rendered from (§7.11).'
@@ -132,7 +131,7 @@ HALF = {'type': 'number', 'minimum': 0, 'multipleOf': 0.5}
 
 defs = {}
 
-# ------------------------------------------------------------------------------------------------ basic vocabularies
+# basic vocabularies
 defs['envelope'] = obj('Who wrote the document and under which schema number (§8.1).', {
     'version': d('The lockrot release that wrote the document.', {'type': 'string', 'minLength': 1}),
     'schema': d('The document schema number this file describes: 2 (§8.1; report-1 documents name report-1.json).', {'type': 'integer', 'enum': [2]}),
@@ -165,7 +164,7 @@ defs['branchLabel'] = d("A release branch as `ReleaseBranch::label()` writes it 
 defs['halfPoints'] = d('A score number in half points (§8.2 "Numbers"): exact, dyadic, `multipleOf: 0.5` (`run.score_model.exact_unit`); a whole value is written as an integer.', HALF)
 defs['advisoryId'] = d("An advisory's `id` as its Composer repository serves it (Packagist: `PKSA-…`); not promised to be a Packagist id (report-1's S9 rule).", {'type': 'string', 'minLength': 1})
 
-# ------------------------------------------------------------------------------------------------ facts named by moves and gates
+# facts named by moves and gates
 FACT_KIND = closed(['flag', 'advisory'], ('What the fact is (§5.6, §6.4): a `flag` (its `id` a flag id) or an `advisory` (its `id` an S9 row id). '
     'Closed (§8.2, schema round): the same pair as `without[].remove.kind`; a score has two fact spaces, and a third would be a report-3 event like a new flag.'))
 defs['factKind'] = FACT_KIND
@@ -196,7 +195,7 @@ defs['addedFact'] = obj("A fact the move would raise (§5.6 `adds[]`); every sur
         "An open set (§8.2): read an unknown basis as another reason.")),
 })
 
-# ------------------------------------------------------------------------------------------------ baseline per fact
+# baseline per fact
 defs['factBaseline'] = nul("A fact's state against the baseline entry (§6.4 \"Per fact\"): on each counted maintenance flag's `flags[].baseline` and on each S9 row's `baseline`. "
                            "Null without a baseline, and always null on the `vulnerable` flag (its advisories carry theirs).",
     obj('A fact\'s baseline state.', {
@@ -207,7 +206,7 @@ defs['factBaseline'] = nul("A fact's state against the baseline entry (§6.4 \"P
         'covered_by': nul('The recorded flag above a `covered` flag ("stale (baseline: below the recorded old-promise)"); null for every other state.', ref('maintenanceFlag')),
     }))
 
-# ------------------------------------------------------------------------------------------------ holders and php checks
+# holders and php checks
 HOLDER_MOVE = obj("The holder's own move, `{kind, to_branch, constraint}` of its `next_step`, so a sentence writes \"its own move, require ^4.4.51\" without reading another finding (§5.3, round 2).", {
     'kind': open_set(['replace', 'find-alternative', 'tag', 'require', 'update', 'raise-php', 'test', 'blocked', 'no-tag', 'no-move', 'no-fix', 'no-single-fix'],
                      "The holder's `next_step.kind` (an open set, as `next_step.kind`).", HYPHEN),
@@ -240,8 +239,8 @@ defs['phpCheck'] = obj(("What the release a move names needs from PHP (§5.3): s
     'raise_size': nul('How far the floor moves: closed `major minor patch` (§8.2); null when no raise is needed.', closed(['major', 'minor', 'patch'])),
 })
 
-# ------------------------------------------------------------------------------------------------ the score
-# attack round 3 (9.S4): one known-values list per part, so a strict reader never takes `lead` for a security term's role
+# the score
+# one known-values list per part, so a strict reader never takes `lead` for a security term's role
 TERM_ROLE = open_set(['lead', 'corroborating'], ("The maintenance term's role (§3.2): `lead` (the first counted maintenance flag, in full) or `corroborating` (every other counted "
                      "maintenance flag, at its share). Open with `x-known-values` (§8.2), so a model change cannot force report-3."))
 TERM_ROLE_SECURITY = open_set(['security'], ("The security term's role (§3.2): `security` (the deciding advisory). Open with `x-known-values` (§8.2), so a model change "
@@ -339,7 +338,7 @@ defs['withoutRow'] = obj("A counterfactual (§3.2 `without[]`): an engine rerun 
 }, allOf=[{'description': ZERO_OR_GRADE_DESC, 'anyOf': ZERO_OR_GRADE}])
 SCORE_TEXT = rendered("The score line, `ScoreText` text grammar 1 (§3.2 \"The one grammar\"); evaluates back to `exact`, its head to `total` (I17b). JSON writes `÷ ¼ ×` as \\u escapes. Never empty.",
                       ['score.terms', 'score.modifiers', 'score.accepted', 'score.exact', 'score.total', 'score.rounded_down'])
-SCORE_TEXT['minLength'] = 1  # attack round 3 (9.S5)
+SCORE_TEXT['minLength'] = 1
 SCORE_ZERO_TEXT = rendered("The score-0 line, `ScoreText` text grammar 1 (§3.2): `0`, then the accepted flags (`0 (left-behind accepted)`).", ['score.total', 'score.accepted'])
 defs['scoreGraded'] = obj("The graded score shape (§3.2, §7.6): told from the score-0 shape by the presence of `terms` (`'terms' in score`; `total` alone cannot discriminate).", {
     'model': d('The score model id the score was computed under (`run.score_model.id`); grades compare only between equal models (§8.2).', INT1),
@@ -366,7 +365,7 @@ defs['scoreZero'] = obj("The score-0 shape `{model, total: 0, exact: 0, accepted
 defs['score'] = d("The score basis as data (§3.2, §7.6): two shapes, discriminated by the presence of `terms` (I4: the score-0 shape appears exactly when there is no term).",
                   {'oneOf': [ref('scoreGraded'), ref('scoreZero')]})
 
-# ------------------------------------------------------------------------------------------------ the move
+# the move
 MOVE_KINDS = ['replace', 'find-alternative', 'tag', 'require', 'update', 'raise-php', 'test', 'blocked', 'no-tag', 'no-move', 'no-fix', 'no-single-fix']
 defs['ifApplied'] = nul(("The score after the move (§5.6): an engine rerun on the finding's facts minus `clears[]` plus `adds[]`. Null for `replace find-alternative test blocked` "
                          "and the `no-*` kinds (the package leaves, or nothing is cleared). Never claims that Composer resolves the move."),
@@ -404,7 +403,7 @@ defs['replacement'] = nul("The replacement a `replace` move names (§5.6 `replac
 }))
 
 
-# review round 3 (C08): does the newest stable release of each direct dependent still require the package?
+# does the newest stable release of each direct dependent still require the package?
 defs['throughEntry'] = obj("One direct dependent of a transitive package, and whether its newest stable release still requires the package.", {
     'package': d('The direct dependent: a requirement of the root that reaches the package (`direct_dependents`, in its order).', ref('packageName')),
     'installed_version': nul('Its locked version; null when the lock does not list it.', {'type': 'string', 'minLength': 1}),
@@ -480,14 +479,14 @@ def move_props(with_also):
         p['also'] = arr("The other part's move, the same object without `also` (§5.6 rule 3); empty when the lead move's `clears` and `unverified` hold every fact of that part.", ref('alsoMove'))
     p['text'] = rendered('The `do:` line, `MoveText` (§5.6, §7.11; versioned by `run.text_grammar`); never empty. A renderer that does not know `kind` (or a `no-move` `reason`) prints this string (§7.9).',
                          [('next_step' if with_also else 'next_step.also[]'), 'package', 'direct', 'direct_dependents', 'run.target_php', 'run.project_php_lowest'])
-    p['text']['minLength'] = 1  # attack round 3 (9.S5)
+    p['text']['minLength'] = 1
     return p
 
 
 defs['move'] = obj("The single best move (§5.6): evidence, never the verdict and never a gate input; the only place a move is published (`security.move_in` points here, I19).", move_props(True))
 defs['alsoMove'] = obj("A move that follows the lead move in `also[]` (§5.6 rule 3): the move object without `also`.", move_props(False))
 
-# ------------------------------------------------------------------------------------------------ security
+# security
 defs['branchFixes'] = obj(("How many counted advisories one branch fixes, and the way out on it (§7.6 the details block `fixes`, §5.3 `installed_branch_fixes`; "
                             "round 4 names). The installed row's `fixes` is `security.installed_branch_fixes` (I19)."), {
     'fixed': d("On a branch that holds a release above the installed one: the counted advisories the branch's newest release lies outside (the branch has a lower bound "
@@ -536,8 +535,8 @@ SEC_COMMON = {
 defs['securityVulnerable'] = obj("`status: vulnerable` (§7.6): whenever an advisory counts, even on a partial lookup. `vulnerable`'s facts live here and in the S9 rows (§2.1).", dict({
     'status': closed(['vulnerable'], 'The discriminator (closed, §8.2): an advisory counts.'),
 }, **{
-    # critic round 2 (11.CR3, the coverage gate): an advisory counts only when a lookup returned it, so this shape's lookup is
-    # `complete` or `partial` (never `not_run`), and an incomplete one stopped part-way (`install_time_budget`,
+    # an advisory counts only when a lookup returned it, so this shape's lookup is
+    # `complete` or `partial` (never `not_run`), and an incomplete one stopped part-way (`install_time_budget`
     # `lookup_failed`; `offline` and `composer_too_old` look nothing up). Still open sets: the strict
     # reading holds lockrot's output to the values this shape can take
     'check': open_set(['complete', 'partial'], ("How the advisory lookup went: `complete`, or `partial` (a Composer repository did not return advisories, or "
@@ -586,7 +585,7 @@ defs['securityClear'] = obj("`status: clear` (§7.6): nothing counts and the loo
 })
 defs['securityUnchecked'] = obj("`status: unchecked` (§7.6, round 4): nothing counts and the lookup did not complete, so nothing is promised clear.", {
     'status': closed(['unchecked'], 'The discriminator (closed, §8.2).'),
-    # critic round 2 (11.CR3): a complete lookup with nothing counted is `clear`, so this shape's lookup never is
+    # a complete lookup with nothing counted is `clear`, so this shape's lookup never is
     'check': open_set(['partial', 'not_run'], ("How the advisory lookup went: `partial` or `not_run`; a complete lookup with nothing counted is `clear`. "
                       "An open set.")),
     'complete': SEC_COMMON['complete'], 'unchecked_reason': SEC_COMMON['unchecked_reason'],
@@ -595,7 +594,7 @@ defs['securityUnchecked'] = obj("`status: unchecked` (§7.6, round 4): nothing c
 defs['security'] = d("The finding's advisories (§5.3, §7.6), told apart by `status` (closed: `vulnerable clear unchecked`). Two shapes: `vulnerable` carries the counts, the fix and the move pointer; `clear` and `unchecked` share the short shape.",
                      {'oneOf': [ref('securityVulnerable'), ref('securityClear'), ref('securityUnchecked')]})
 
-# ------------------------------------------------------------------------------------------------ flags on a finding
+# flags on a finding
 defs['headline'] = obj(("The pill qualifier, chosen by lockrot, never by the page (§2.1): `{unit, value, source}`. `unit` and `source` are closed (§8.2); "
                         "the branches below type `value` and `source` per unit."), {
     'unit': closed(['years', 'php', 'reason', 'advisories'], 'What `value` measures. Closed.'),
@@ -628,7 +627,7 @@ defs['findingFlag'] = obj("A fired flag (§2.1, §7.6): facts only, no weight or
                 {'oneOf': [ref('degreeAbandoned'), ref('degreeLiveness'), {'type': 'null'}]}),
     'headline': ref('headline'),
     'summary': dict(rendered('The flag sentence, `FlagSentence` (§7.11); never empty. The `vulnerable` sentence also reads `security`, `branch` and the deciding term\'s `severity` in `score.terms`.', ['flags[].signal_ids', 'signals[].data', 'flags[].degree.liveness_complete', 'security', 'branch', 'score.terms']), minLength=1),
-}, anyOf=[  # attack round 1: the flag id fixes its degree and its headline unit, in both published schemas (explain-2 had this alone)
+}, anyOf=[  # the flag id fixes its degree and its headline unit, in both published schemas
     {'description': '`abandoned`: reasons in its degree, headline `reason` archived or marked.',
      'properties': {'id': {'enum': ['abandoned']}, 'degree': ref('degreeAbandoned'),
                     'headline': {'properties': {'unit': {'enum': ['reason']}, 'value': {'enum': ['archived', 'marked']}}}}},
@@ -643,8 +642,8 @@ defs['findingFlag'] = obj("A fired flag (§2.1, §7.6): facts only, no weight or
      'properties': {'id': {'enum': ['vulnerable']}, 'degree': {'type': 'null'}, 'baseline': {'type': 'null'}, 'headline': {'properties': {'unit': {'enum': ['advisories']}}}}},
 ])
 
-# ------------------------------------------------------------------------------------------------ checks
-# attack round 1: two lists, as explain-2 had them (one shared entry gave each field the union of both vocabularies)
+# checks
+# two lists: one shared entry would give each field the union of both vocabularies
 defs['checkMissing'] = obj("A check that did not run and raised S10 (S10's `unchecked[]` entry, restated as `checks_missing[]`; `--fail-on=unchecked` reads it).", {
     'check': open_set(['repository_activity', 'release_dates', 'releases'], ("S10's check id: `repository_activity` (S3, S4), `release_dates` (the package's "
                       "age, dated only by a shared commit), `releases` (S9's fix part: releases could not be read). An open set.")),
@@ -662,7 +661,7 @@ defs['checkSkipped'] = obj("A check lockrot chose not to run (§2.3): a decision
     'blocks': arr('The signals it left unread.', ref('signalId'), minItems=1, uniqueItems=True),
 })
 
-# ------------------------------------------------------------------------------------------------ allowlist, metadata, baseline, gate on a finding
+# allowlist, metadata, baseline, gate on a finding
 defs['allowlist'] = nul("The allowlist entry that accepts maintenance flags of this package (§6.5, revision 3); null when none does. `allowlist_reason` stays as an alias for report-1 readers.",
     obj('An allowlist entry.', {
         'by': closed(['builtin', 'project', 'type'], "Who accepted: the built-in finished list, the project's `extra.lockrot.ignore[]`, or an entry lockrot makes for a package type. Closed (§8.2); the one vocabulary for who accepted a flag."),
@@ -744,7 +743,7 @@ defs['findingGate'] = obj("Where the finding stands against the gate values (§6
     })),
 })
 
-# ------------------------------------------------------------------------------------------------ signals
+# signals
 def sig_data(desc, props):
     return obj(desc, props)
 
@@ -871,7 +870,7 @@ defs['signal'] = obj("A signal (§2.1, §7.6): S1–S10 as in report-1, with the
 
 defs['activityEvent'] = open_set(['push', 'commit'], "What a forge's activity date measures: the last `push` (GitHub) or the last `commit` (GitLab, Bitbucket), as `RepoRef` words it. An open set.")
 
-# ------------------------------------------------------------------------------------------------ finding
+# finding
 FINDING = {
     'package': ref('packageName'),
     'version': d('The installed version.', {'type': 'string', 'minLength': 1}),
@@ -936,7 +935,7 @@ defs['packageOrigin']['properties']['local']['description'] = ("Whether Composer
     "dist or source that is a path or `file://` URL) (report-1).")
 defs['packageOrigin']['description'] = defs['packageOrigin']['description'].replace(' Open: a later minor release may add a member.', '') + ' Open: a later minor release may add a member.'
 
-# ------------------------------------------------------------------------------------------------ the score model (§3.7)
+# the score model
 SHARE = obj('A fraction.', {'num': d('Numerator.', INT1), 'den': d('Denominator.', INT1)})
 RULE_PARAMS = {
     'order': open_set(['flag_order'], 'The order a `select` or `cover` rule walks (`flag_order`). Open.'),
@@ -1060,7 +1059,7 @@ defs['scoreModel'] = obj(("The score model, self-described (§3.7): ordered flag
     'docs': d('The page that explains this model, versioned by model (`https://lockrot.dev/verdicts/model-1/`).', {'type': 'string', 'minLength': 1}),
 })
 
-# ------------------------------------------------------------------------------------------------ run
+# run
 R1RUN = R1['definitions']['run']['properties']
 defs['gateValue'] = obj("One parsed `--fail-on` value (§6.1): `run.gates[]`.", {
     'value': d('The value as parsed: trimmed, lower-cased (`high`, `left-behind`, `vulnerable-high`, `unchecked`).', {'type': 'string', 'pattern': HYPHEN}),
@@ -1119,7 +1118,7 @@ RUN_RELATION = {'description': '`fail_on` is `none` exactly when `gates` is empt
 defs['run']['allOf'] = [RUN_RELATION]
 defs['run']['properties']['project']['description'] = "What the report calls the project: composer.json's `name`, or `extra.lockrot.project` (report-1); null where neither says."
 
-# ------------------------------------------------------------------------------------------------ root blocks
+# root blocks
 COUNT = lambda what: d(what, INT0)
 defs['rootFlagMaintenance'] = obj("A maintenance flag's root counts (§7.6).", {
     'carrying': COUNT('Graded findings with this flag counted.'),
@@ -1194,7 +1193,7 @@ LIBY = copy.deepcopy(R1['properties']['libyears'])
 LIBY['required'] = LIBY['required'] + ['packages']
 LIBY['properties']['packages'] = d('The number of findings in the document (`packages_checked`): `measured` plus the `unmeasured` counts (all 108 generated documents; attack round 1 corrected this description).', INT0)
 LIBY['description'] = LIBY['description'].replace(' Absent from documents written before 0.11.0.', '') + ' report-2 adds `packages`.'
-# attack round 2: report-2 sums the published values, so a total row equals the column above it (report-1 summed the unrounded ones)
+# report-2 sums the published values, so a total row equals the column above it (report-1 summed the unrounded ones)
 _old_rule = ("`total` is the sum of the unrounded per-finding values (so the sum of the printed two-decimal values agrees with it to within 0.005 per "
              "measured finding), `direct_requirements` the same over `direct: true`")
 assert _old_rule in LIBY['description'], 'report-1 libyears wording changed'
@@ -1285,7 +1284,7 @@ for (where, member), text in R1_MEMBERS.items():
         node = defs[where]['properties']
     node[member] = dict({'description': text}, **{k: v for k, v in node[member].items() if k != 'description'})
 
-# r3 schema round: the cross-field relations of §8.2 ("What the schemas check"), the same groups explain-2 carries,
+# the cross-field relations, the same groups that explain-2 carries
 # applied through a name map so both schemas hold one set of rules (revision 3's report-2 schema had none)
 def add_relations_r2(defs):
     import sys as _sys
@@ -1300,7 +1299,7 @@ def add_relations_r2(defs):
         'securityVulnerable': defs['securityVulnerable'], 'securityOther': defs['securityClear'],
         'findingBaseline': defs['findingBaseline'], 'flagBaseline': defs['factBaseline'], 'allowlist': defs['allowlist'], 's9row': s9,
         'scoreGraded': defs['scoreGraded'], 'modifier': defs['modifier'], 'withoutRow': defs['withoutRow'], 'gateValue': defs['gateValue'],
-        'findingFlag': defs['findingFlag'],  # attack round 3
+        'findingFlag': defs['findingFlag'],
     }
     BO.add_relations(view)
     # the clear/unchecked shapes are two definitions here (one in explain-2): each takes the same groups
@@ -1417,7 +1416,7 @@ ROOT_RELATIONS = [
      'anyOf': [{'properties': {'include_dev': {'enum': [True]}, 'run': {'properties': {'include_dev': {'enum': [True]}}}}},
                {'properties': {'include_dev': {'enum': [False]}, 'run': {'properties': {'include_dev': {'enum': [False]}}}}}]},
 ]
-# attack round 3 (9.S2): the run gate's relations (Gate::decide), stated in rootGate's descriptions and now encoded
+# the run gate's relations (Gate::decide), stated in rootGate's descriptions and encoded here
 _P = lambda **k: {'properties': k}
 _E = lambda *v: {'enum': list(v)}
 _NOT = lambda *v: {'not': {'enum': list(v)}}
@@ -1472,7 +1471,7 @@ if __name__ == '__main__':
     check_descriptions(schema, '#', miss)
     # anyOf branches restate discriminators without descriptions on purpose; report everything else
     miss = [m for m in miss if '/anyOf[' not in m and '/not/' not in m]
-    # attack round 2: the shipping pass (ship_text.py): no description cites the spec or its review rounds
+    # the shipping pass (ship_text.py): no description cites the spec or its review rounds
     from ship_text import ship_schema, leftovers
     ship_schema(schema)
     lo = leftovers(schema)

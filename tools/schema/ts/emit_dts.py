@@ -1,25 +1,19 @@
-"""critic round 2 (11.CR5): the TypeScript contract of report-2, prototyped.
+"""The TypeScript contract of report-2, prototyped from resources/lockrot-report-2.schema.json.
 
-§8.4 plans `resources/lockrot-report-2.d.ts`: hand-written, every key required, discriminated unions, open sets as
-`Known | (string & {})`. A hand-written file drifts from the schema in exactly the places a compiler cannot see (a property
-typed `string` where the schema has a closed set, a known value the union lacks), and compiling recorded documents against
-it proves only that they are assignable. So the contract is split in two:
+A hand-written d.ts drifts from the schema where a compiler cannot see it (a property typed `string` where the schema has
+a closed set, a known value the union lacks), so the contract is split in two:
 
-  lockrot-report-2.known.d.ts   GENERATED at build time (tools/schema): one literal union per `enum` and `x-known-values` node
-                                of report-2 (closed: the literals; open: `Known | (string & {})`, or `(number & {})` for the
-                                three integer sets), named by the node; `known-map.json` records pointer -> name -> values
+  lockrot-report-2.known.d.ts   generated: one literal union per `enum` and `x-known-values` node of report-2 (closed: the
+                                literals; open: `Known | (string & {})`, or `(number & {})` for the integer sets), named
+                                by the node; `known-map.json` records pointer -> name -> values
   lockrot-report-2.d.ts         the object shapes, which import every union from the file above and never spell a literal
-                                set. This script emits the prototype PR 7 starts from (every report-2 definition an
-                                interface or a union of interfaces, every required key required, `oneOf`/`anyOf` a union,
-                                relation `allOf` groups ignored: they are rules, not shapes); after PR 7 it is hand-kept
+                                set: every report-2 definition an interface or a union of interfaces, every required
+                                key required, `oneOf`/`anyOf` a union, relation `allOf` groups ignored
   probes.generated.ts           one type-level equality per union pointer the shapes can reach by indexed access
                                 (`Equal<NonNullable<Finding['reach']>, FindingReach>`), so `tsc --strict` fails when a
                                 hand edit types a closed or open set as `string`, or the union and the schema disagree
 
-union_parity.js (the PR 7 test) reads the generated unions back through the TypeScript compiler API and asserts each equals
-its schema node, and dts_check.js compiles the d.ts, the probes and every report-2 document (`satisfies Report2`).
-
-  python3 emit_dts.py      writes the three files and known-map.json next to it
+  python3 tools/schema/ts/emit_dts.py      writes the three files and known-map.json to types/
 """
 import json
 import os
@@ -190,7 +184,7 @@ def obj(node, ptr, expr):
 
 
 out = ['// The TypeScript contract of lockrot report-2 (https://lockrot.dev/schema/report-2.json): the object shapes.',
-       '// Prototype emitted by r3/schema/ts/emit_dts.py; every literal set is imported from lockrot-report-2.known.d.ts,',
+       '// Prototype emitted by tools/schema/ts/emit_dts.py; every literal set is imported from lockrot-report-2.known.d.ts,',
        '// which is generated from the schema at build time. Relation rules (the schema\'s allOf groups) are not types.',
        "import type * as K from './lockrot-report-2.known';", '']
 body = []
@@ -202,7 +196,7 @@ root = T({k: v for k, v in S.items() if k not in ('definitions', 'allOf')}, '#',
 body.append('export type Report2 = %s;' % root)
 open(os.path.join(OUT, 'lockrot-report-2.d.ts'), 'w').write('\n'.join(out + body) + '\n')
 
-known = ['// GENERATED from lockrot-report-2.schema.json by r3/schema/ts/emit_dts.py (tools/schema in lockrot): do not edit.',
+known = ['// GENERATED from lockrot-report-2.schema.json by tools/schema/ts/emit_dts.py: do not edit.',
          '// One literal union per enum (closed) and x-known-values (open: a later release may add a value) node.', '']
 for k in KNOWN:
     lits = ' | '.join(lit(v) for v in k['values'])
