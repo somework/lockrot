@@ -207,18 +207,18 @@ final class AcceptanceTest extends TestCase
      * wallabag/rulerz-* list dev branches and not one tag, friendsofsymfony/oauth-server-bundle has
      * tags and its newest dated one is 1.6.2 (2.0.0-alpha.0 is higher, and older). S6 checks the
      * snapshot first, so all four are `branch_snapshot`. has_stable_release tells the
-     * never-released three apart.
+     * never-released three apart, and the 2019 tag of the fourth is older than its 2022 snapshot.
      */
     public function testWallabagSnapshotsSayWhetherThePackageEverReleased(): void
     {
         $f = $this->byName($this->analyze('apps/wallabag_wallabag'));
         $expected = [
-            'wallabag/rulerz' => [false, null, null, '2023-12-24T00:53:44+00:00', Priority013::HIGH],
-            'wallabag/rulerz-bundle' => [false, null, null, '2023-12-24T22:23:50+00:00', Priority013::HIGH],
-            'wallabag/rulerz-bridge' => [false, null, null, '2023-12-24T01:18:26+00:00', Priority013::MEDIUM],
-            'friendsofsymfony/oauth-server-bundle' => [true, '2019-01-23T15:23:04+00:00', '1.6.2', '2022-03-24T10:22:23+00:00', Priority013::HIGH],
+            'wallabag/rulerz' => [false, null, null, '2023-12-24T00:53:44+00:00', Priority013::HIGH, null],
+            'wallabag/rulerz-bundle' => [false, null, null, '2023-12-24T22:23:50+00:00', Priority013::HIGH, null],
+            'wallabag/rulerz-bridge' => [false, null, null, '2023-12-24T01:18:26+00:00', Priority013::MEDIUM, null],
+            'friendsofsymfony/oauth-server-bundle' => [true, '2019-01-23T15:23:04+00:00', '1.6.2', '2022-03-24T10:22:23+00:00', Priority013::HIGH, 'older'],
         ];
-        foreach ($expected as $package => [$released, $lastRelease, $lastVersion, $snapshotTime, $priority]) {
+        foreach ($expected as $package => [$released, $lastRelease, $lastVersion, $snapshotTime, $priority, $tagRelation]) {
             $s6 = self::signal($f[$package], Signal::S6);
             self::assertNotNull($s6, $package);
             self::assertSame([
@@ -229,6 +229,7 @@ final class AcceptanceTest extends TestCase
                 'last_stable_version' => $lastVersion,
                 'last_stable_dated_by' => null,
                 'snapshot_time' => $snapshotTime,
+                'tag_relation' => $tagRelation,
             ], $s6->data(), $package);
             self::assertSame('pinned to branch snapshot dev-master', $s6->summary(), $package);
             self::assertSame(Verdict::PINNED, $f[$package]->verdict(), $package);
@@ -318,6 +319,7 @@ final class AcceptanceTest extends TestCase
             self::assertSame($report->packagesChecked(), $measured + array_sum($block->unmeasured()), $dir.': every package is measured or has a reason');
             // The block is the arithmetic over the printed findings, to within the rounding of each value.
             self::assertEqualsWithDelta($block->toArray()['total'], $sum, 0.005 * $measured, $dir);
+            ksort($packages);
             $golden[$dir] = ['block' => $block->toArray(), 'packages' => $packages];
         }
         Golden::assertMatches('libyears.json', $golden, 'testLibyearsOnTheRecordedFixtures');
@@ -328,7 +330,8 @@ final class AcceptanceTest extends TestCase
         $report = $this->analyze('apps/wallabag_wallabag');
         $json = json_encode($report->toArray());
         $text = strtolower($json === false ? '' : $json);
-        foreach (['vulnerab', 'broken', 'insecure', 'dead'] as $banned) {
+        // `vulnerable` is a flag id that every report-2 document lists (docs/verdicts.md#flags).
+        foreach (['broken', 'insecure', 'dead'] as $banned) {
             self::assertStringNotContainsString($banned, $text, 'banned wording: '.$banned);
         }
     }
