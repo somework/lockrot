@@ -6585,7 +6585,7 @@
           "$ref": "#/definitions/fixKind"
         },
         "installed_branch_fixes": {
-          "description": "The installed branch row's `fixes`; null when `branch` is (a snapshot), and when no release data was read.",
+          "description": "The installed branch row's `fixes`; null exactly when `branch` is (a snapshot).",
           "oneOf": [
             {
               "$ref": "#/definitions/branchFixes"
@@ -10775,12 +10775,19 @@
           ]
         },
         {
-          "description": "`security.installed_branch_fixes` is null when `branch` is (a snapshot), and when no release data was read.",
+          "description": "`security.installed_branch_fixes` is null exactly when `branch` is (a snapshot).",
           "anyOf": [
             {
               "properties": {
                 "branch": {
                   "type": "string"
+                },
+                "security": {
+                  "properties": {
+                    "installed_branch_fixes": {
+                      "type": "object"
+                    }
+                  }
                 }
               }
             },

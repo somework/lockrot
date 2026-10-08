@@ -548,7 +548,7 @@ defs['securityVulnerable'] = obj("`status: vulnerable` (§7.6): whenever an advi
     'counts': obj('Counted advisories per severity, every severity present.', {k: d(f'Counted `{k}` advisories.', INT0) for k in SEVERITIES}),
     'ignored': SEC_COMMON['ignored'], 'ignored_count': SEC_COMMON['ignored_count'],
     'fix_kind': d("The `fix_kind` of the move `move_in` names (round 3; I19), else, with no move, the hardest per-advisory kind (§5.3).", ref('fixKind')),
-    'installed_branch_fixes': nul("The installed branch row's `fixes` (§5.3, round 4; I19); null when `branch` is (a snapshot), and when no release data was read.", ref('branchFixes')),
+    'installed_branch_fixes': nul("The installed branch row's `fixes` (§5.3, round 4; I19); null exactly when `branch` is (a snapshot).", ref('branchFixes')),
     'move_in': nul("Where the move that clears the advisories is published: `next_step` or `also` (`next_step.also[0]`), or null when no move clears them (§5.3; replaces revision 3's copy `move`). Closed (§8.2, schema round): it points into this document's own structure.",
                    closed(['next_step', 'also'])),
     'gets': nul(("What `composer update <pkg>` installs on the installed branch, judged against the target, never `require.php` (§5.3, round 3): `{version, php_check, clears[], clears_all}`; "
@@ -1282,7 +1282,7 @@ for (where, member), text in R1_MEMBERS.items():
     node[member] = dict({'description': text}, **{k: v for k, v in node[member].items() if k != 'description'})
 
 # the cross-field relations, the same groups that explain-2 carries
-# applied through a name map so both schemas hold one set of rules (revision 3's report-2 schema had none)
+# applied through a name map so both schemas hold one set of rules
 def add_relations_r2(defs):
     import sys as _sys
     _sys.path.insert(0, HERE)
@@ -1310,7 +1310,7 @@ add_relations_r2(defs)
 
 
 def add_relations_round4(defs):
-    """attack round 4: the rules the field descriptions state and draft-04 can say, which no earlier group unencoded."""
+    """The rules that the field descriptions state and draft-04 can say, beyond the other relation groups."""
     import build_other_schemas as BO
     P, E, NOT, NULL, STR, OBJ, MIN1, EMPTY, CONTAINS, NONE, relate = (BO.P, BO.E, BO.NOT, BO.NULL, BO.STR, BO.OBJ, BO.MIN1, BO.EMPTY, BO.CONTAINS,
                                                                           BO.NONE, BO.relate)
