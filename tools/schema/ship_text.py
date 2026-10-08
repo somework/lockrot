@@ -1,23 +1,25 @@
-"""attack round 2 (implementer: the published descriptions cited the spec and its review process): the shipping pass
-over every description string of a schema, applied as the builders write the files. The builders keep their provenance
-notes in Python comments; a shipped description says what a field is, never which spec section or review round put it
-there. `SHIP_BANNED` is the check SchemaDescriptionsTest runs (§8.6)."""
+"""The shipping pass over every description string of a schema, applied as the builders write the files.
+
+The builders keep their provenance notes in Python comments. A shipped description says what a field is, never which
+design section or review put it there. `SHIP_BANNED` is the pattern that SchemaDescriptionsTest applies to the shipped
+files.
+"""
 import re
 
-# attack round 3 (9.C4): revision-3 with a hyphen, measured counts ("79 of 79"), "generated", lockrot.dev's, and a parenthesis opened by a
+# revision-3 with a hyphen, measured counts ("79 of 79"), "generated", lockrot.dev's, and a parenthesis opened by a
 # verb whose subject the token pass removed ("(calls them …")
 SHIP_BANNED = re.compile(r'§|SPEC|\bround \d|attack round|schema round|critic round|revision[- ]?\d|‡|r3/|\bcorpus\b|\bI\d+[a-c]?\b'
                          r'|\b\d+ of \d+\b|\bgenerated\b|lockrot\.dev\'s|\((?:calls|says)\b'
-                         # critic round 2 (11.CR10): history an editor shows on hover ("config-1 unchanged."), internal PHP symbols
+                         # history an editor shows on hover ("config-1 unchanged."), internal PHP symbols
                          # (`Legacy\Priority013`, `ReleaseBranch::label`) and repository-relative doc paths a consumer cannot open
                          r'|config-1 unchanged|report-1 unchanged|\b[A-Z][A-Za-z]+(?:\\[A-Z][A-Za-z0-9]+)+|::[a-z]+|docs/[a-z-]+\.md'
-                         # a backticked PHP class name; the grammar names a renderer implements are public (§7.11)
+                         # a backticked PHP class name; the grammar names a renderer implements are public
                          r'|`(?!(?:FlagSentence|GateText|MoveText|ScoreText|SignalSentence|NoteSentence|RunGateText|AgeText|GitHub|GitLab)`)[A-Z][a-z]+[A-Z][A-Za-z]*`'
-                         # 0.14 sync: an item id of the 0.14 design (C69, W12) is review history, as a spec section is
+                         # an item id of the design (C69, W12) is review history, as a spec section is
                          r'|\b[CW]\d{2}\b'
-                         # 2026-10-05: a maintainer decision id (Q1-Q8, O1-O15) is review history too
+                         # a maintainer decision id (Q1-Q8, O1-O15) is review history too
                          r'|\b[QO]\d{1,2}\b'
-                         # review round 3: the history of drafts that never shipped ("Renamed from `do`.", "`move` are gone", "is dropped:")
+                         # the history of drafts that never shipped ("Renamed from `do`.", "`move` are gone", "is dropped:")
                          r'|[Rr]enamed from|\bare gone\b|\bis gone\b|\bis dropped[:.]|\bwas flagged\b')
 TOKEN = r'(?:§\s?\d+(?:\.\d+)*(?:\s?"[^"]*")?(?:\'s)?|SPEC(?:-flags r3)?(?:\s?§\s?\d+(?:\.\d+)*)?|(?:attack |schema |critic )?round(?: \d+)?|revision \d+|I\d+[a-c]?|the critic round)'
 PURE = re.compile(r'^\s*' + TOKEN + r'(?:\s*(?:,|;|and)\s*' + TOKEN + r')*\s*$')
@@ -36,7 +38,7 @@ def _paren(m):
 
 
 MANUAL = [  # running-text references the token pass cannot rewrite on its own
-    (re.compile(r'\s*\((?:C\d\d|W12)\b[^()]*\)'), ''),  # 0.14 sync: "(C77)", "(C77 R5)", "(W12, in C77's frame)"
+    (re.compile(r'\s*\((?:C\d\d|W12)\b[^()]*\)'), ''),  # a parenthesis that opens with an item id: "(C77)", "(C77 R5)", "(W12, in C77's frame)"
     (re.compile(r'\s*\((?:C\d\d|W12)\b[^()]*\([^()]*\)[^()]*\)'), ''),
     (re.compile(r"\bSPEC\.md §4\.1's two vocabularies\b"), "Composer's two vocabularies"),
     (re.compile(r'\s*\(lockrot 0\.14\.0; SPEC-flags r3 §7\.6, §8\.2\)'), ' (lockrot 0.14.0)'),
@@ -65,7 +67,7 @@ MANUAL = [  # running-text references the token pass cannot rewrite on its own
     (re.compile(r' \(SPEC root block(?:, §7\.6, §8\.2)?\)'), ''),
     (re.compile(r' Open with `x-known-values` \((?:§8\.2, )?revision 2 had it closed\),'), ' Open with `x-known-values`,'),
     (re.compile(r'An open set \(§8\.2 lists the rule ids as open; §3\.7 cal'), 'An open set (cal'),
-    # critic round 2 (11.CR10): each internal symbol, history note or repository path rewritten as what the field is
+    # each internal symbol, history note or repository path rewritten as what the field is
     (re.compile(r'by the quoting rules of `docs/schema\.md`'), 'by the quoting rules of https://lockrot.dev/schema/'),
     (re.compile(r'as `docs/verdicts\.md` lists them'), 'as https://lockrot.dev/verdicts/#the-signals lists them'),
     (re.compile(r'\(docs/install-time\.md#install-time-strict\)'), '(https://lockrot.dev/install-time/#install-time-strict)'),
@@ -98,8 +100,8 @@ def ship(text):
     return t
 
 
-CHANGED = []  # attack round 3 (9.C4): descriptions the token pass changed, which a hand rewrite must cover (builders assert it is empty)
-# attack round 3 (9.C4): the shipped texts whose stripping removed more than references (a quoted section title) and were read and kept;
+CHANGED = []  # descriptions the token pass changed, which a hand rewrite must cover (builders assert it is empty)
+# the shipped texts whose stripping removed more than references (a quoted section title) and were read and kept
 # a new one fails the build until it is rewritten in its builder or added here after reading it
 HAND_SHIPPED = {
     '031139ebd7a0007a',

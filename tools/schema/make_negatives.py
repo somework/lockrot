@@ -1,11 +1,12 @@
-"""Negative fixtures for lockrot-report-2.schema.json: each is a valid generated report-2 document with ONE planted defect.
+"""Negative fixtures for resources/lockrot-report-2.schema.json: each is a valid report-2 document with one planted defect.
 
-Each file carries `"$expect": {"strict": bool, "error": "<substring>"}`; validate.php --expect-invalid removes the key,
-validates (the strict twin when asked) and passes the fixture only when an error message names the substring, so a
-fixture rejected for some other reason than the one planted does not count.
+Each file carries `"$expect": {"strict": bool, "error": "<substring>"}`. The PHP test removes the key, validates (the
+strict twin when asked) and passes the fixture only when an error message names the substring, so a fixture rejected
+for another reason than the one planted does not count.
 
-Usage: python3 make_negatives.py   ->  negative/report-2/NN-<name>.json  (and a first pass asserting each base is valid is
-validate.php's job on r3/docs/)
+Usage: python3 tools/schema/make_negatives.py
+    reads  tests/fixtures/schema/documents/cases/<base>.json
+    writes tests/fixtures/schema/negative/report-2/NN-<name>.json
 """
 import json, os, copy, glob
 
@@ -54,7 +55,7 @@ def case(name, base, error, strict=False):
 
 m = MONO
 f = 'findings[%d]' % m
-# ---------------------------------------------------------------------------------------------- closed sets (§8.2)
+# closed sets
 @case('verdict-cause-word', 'composite', f + '.verdict')
 def _(d): d['findings'][m]['verdict'] = 'left-behind'  # 0.13's cause word: report-2's verdict is a grade
 @case('lead-vulnerable', 'composite', 'findings[%d].lead' % TWIG)
@@ -62,7 +63,7 @@ def _(d): d['findings'][TWIG]['lead'] = 'vulnerable'  # lead is a maintenance fl
 @case('reach-unknown-value', 'composite', f + '.reach')
 def _(d): d['findings'][m]['reach'] = 'indirect'
 @case('flag-id-archived', 'composite', 'findings[%d].flags[0].id' % DEBUG)
-def _(d): d['findings'][DEBUG]['flags'][0]['id'] = 'archived'  # S3 is a degree of abandoned, not a flag (§2.2)
+def _(d): d['findings'][DEBUG]['flags'][0]['id'] = 'archived'  # S3 is a degree of abandoned, not a flag
 @case('headline-unit-days', 'composite', f + '.flags[0].headline.unit')
 def _(d): d['findings'][m]['flags'][0]['headline']['unit'] = 'days'
 @case('headline-source-commit', 'composite', f + '.flags[0].headline.source')
@@ -82,7 +83,7 @@ def _(d): d['findings'][TWIG]['next_step']['held_by'][0]['link'] = 'suggest'
 @case('security-status-ignored', 'composite', 'findings[%d].security.status' % POLY)
 def _(d): d['findings'][POLY]['security']['status'] = 'ignored'
 @case('security-worst-moderate', 'composite', f + '.security.worst')
-def _(d): d['findings'][m]['security']['worst'] = 'moderate'  # Composer's raw word; the bucket is medium (§5.2)
+def _(d): d['findings'][m]['security']['worst'] = 'moderate'  # Composer's raw word; the bucket is medium
 @case('metadata-status-missing', 'composite', f + '.metadata.status')
 def _(d): d['findings'][m]['metadata']['status'] = 'missing'
 @case('allowlist-by-user', 'composite', 'findings[%d].allowlist.by: Does not have a value' % POLY)
@@ -90,7 +91,7 @@ def _(d): d['findings'][POLY]['allowlist']['by'] = 'user'
 @case('allowlist-reason-by-project', 'composite', 'findings[%d].allowlist.reason_by: Does not have a value' % POLY)
 def _(d): d['findings'][POLY]['allowlist']['reason_by'] = 'project'
 @case('baseline-status-accepted', 'B-baselined-dagger', 'findings[0].baseline.status: Does not have a value')
-def _(d): d['findings'][0]['baseline']['status'] = 'accepted'  # the baseline's word is known (round 3)
+def _(d): d['findings'][0]['baseline']['status'] = 'accepted'  # the baseline's word is known
 @case('gate-limited-by-new', 'B-baselined-dagger', 'findings[0].gate.basis.limited_by: Does not have a value')
 def _(d): d['findings'][0]['gate']['basis']['limited_by'] = 'new'
 @case('target-php-source-composer', 'composite', 'run.target_php_source')
@@ -102,7 +103,7 @@ def _(d): sig(d['findings'][DEBUG], 'S1')['data']['marked_by'] = 'registry'
 @case('s7-verdict-cause-word', 'composite', 'data.packages[0].verdict: Does not have a value')
 def _(d): sig(d['findings'][OAUTH], 'S7')['data']['packages'][0]['verdict'] = 'stale'  # report-2: the grade
 @case('accepted-vulnerable', 'psr-log', 'findings[0].score.accepted[0].flag: Does not have a value')
-def _(d): d['findings'][0]['score']['accepted'][0]['flag'] = 'vulnerable'  # the allowlist accepts maintenance flags only (§6.5)
+def _(d): d['findings'][0]['score']['accepted'][0]['flag'] = 'vulnerable'  # the allowlist accepts maintenance flags only
 @case('envelope-schema-1', 'composite', 'lockrot.schema')
 def _(d): d['lockrot']['schema'] = 1
 @case('schema-url-report-1', 'composite', '$schema')
@@ -112,7 +113,7 @@ def _(d): d['findings'][m]['priority'] = 'urgent'
 @case('root-flags-vulnerable-leading', 'composite', 'flags.vulnerable.leading')
 def _(d): d['flags']['vulnerable']['leading'] = 3  # vulnerable is never a lead
 
-# ---------------------------------------------------------------------------------------------- required keys (every key always written)
+# required keys (every key always written)
 @case('missing-next-step', 'composite', f + '.next_step')
 def _(d): d['findings'][m]['do'] = d['findings'][m].pop('next_step')  # revision 2's name
 @case('missing-score-band', 'composite', f + '.score.band: The property band is required')
@@ -130,17 +131,17 @@ def _(d): d['counts'] = {k: 0 for k in ['abandoned', 'silent', 'pinned', 'left-b
 @case('s8-without-reachable-admits', 'composite', 'data.reachable_admits: The property reachable_admits is required')
 def _(d): del sig(d['findings'][m], 'S8')['data']['reachable_admits']
 @case('s10-without-blocks', 'ok-unchecked', 'data.blocks: The property blocks is required')
-def _(d): del sig(d['findings'][0], 'S10')['data']['blocks']  # the critic round's defect (5.CR1)
+def _(d): del sig(d['findings'][0], 'S10')['data']['blocks']
 @case('s7-flags-not-flag-ids', 'composite', 'flag_ids: The property flag_ids is required')
 def _(d):
     p = sig(d['findings'][OAUTH], 'S7')['data']['packages'][0]
-    p['flags'] = p.pop('flag_ids')  # every list of bare flag ids is flag_ids (§8.2)
+    p['flags'] = p.pop('flag_ids')  # every list of bare flag ids is flag_ids
 @case('run-without-score-model', 'composite', 'run.score_model')
-def _(d): d['run']['score_model_id'] = d['run'].pop('score_model')['id']  # round 3's case runs (4.C5)
+def _(d): d['run']['score_model_id'] = d['run'].pop('score_model')['id']
 @case('rule-divide-without-by', 'composite', 'rules[6].by: The property by is required')
 def _(d): del rule(d, 'divide-reach')['by']  # a page renders an unknown rule's arithmetic from its kind's parameters
 
-# ---------------------------------------------------------------------------------------------- one name, one type
+# one name, one type
 @case('score-total-not-integer', 'composite', f + '.score.total: Double value found, but an integer is required')
 def _(d): d['findings'][m]['score']['total'] = 36.5
 @case('score-total-string', 'composite', f + '.score.total: String value found, but an integer is required')
@@ -148,11 +149,11 @@ def _(d): d['findings'][m]['score']['total'] = '36'
 @case('score-exact-quarter', 'composite', f + '.score.exact: Must be a multiple of 0.5')
 def _(d): d['findings'][m]['score']['exact'] = 36.25  # half points only (multipleOf 0.5)
 @case('band-to-next-half', 'composite', 'findings[%d].score.band.to_next: Double value found' % CSSMIN)
-def _(d): d['findings'][CSSMIN]['score']['band']['to_next'] = 13.5  # to_next is measured from total, an integer (round 2)
+def _(d): d['findings'][CSSMIN]['score']['band']['to_next'] = 13.5  # to_next is measured from total, an integer
 @case('modifier-divide-by-string', 'composite', 'findings[%d].score.modifiers[0].divide_by: String value found' % POLY)
 def _(d): d['findings'][POLY]['score']['modifiers'][0]['divide_by'] = '2'
 @case('commands-as-strings', 'composite', f + '.next_step.commands[0]')
-def _(d): d['findings'][m]['next_step']['commands'] = ['composer require symfony/monolog-bridge:^5.4.52']  # argv lists (round 4)
+def _(d): d['findings'][m]['next_step']['commands'] = ['composer require symfony/monolog-bridge:^5.4.52']  # argv lists
 @case('s9-fix-as-string', 'composite', 'advisories[0].fix: String value found, but an object is required')
 def _(d): sig(d['findings'][m], 'S9')['data']['advisories'][0]['fix'] = 'upgrade'  # fix is always the object, fix_kind the string
 @case('score-model-id-string', 'composite', 'run.score_model.id')
@@ -164,7 +165,7 @@ def _(d): d['findings'][YAML]['security']['ignored_count'] = '0'
 @case('headline-php-string', 'composite', f + '.flags[1].headline.value: String value found, but an integer is required')
 def _(d): d['findings'][m]['flags'][1]['headline']['value'] = '5'  # unit php: an integer major
 
-# ---------------------------------------------------------------------------------------------- shapes and discriminators
+# shapes and discriminators
 @case('score-zero-with-terms', 'psr-log', 'findings[0].score: Matched a schema which it should not')
 def _(d): d['findings'][0]['score']['terms'] = []  # 'terms' in score is the discriminator
 @case('score-zero-shape-nonzero-total', 'psr-log', 'findings[0].score.total: Does not have a value in the enumeration [0]')
@@ -172,17 +173,17 @@ def _(d): d['findings'][0]['score']['total'] = 3
 @case('security-clear-on-partial-lookup', 'composite', 'findings[%d].security.check: Does not have a value in the enumeration ["complete"]' % DEBUG)
 def _(d):
     s = d['findings'][DEBUG]['security']
-    s['check'], s['complete'] = 'partial', False  # clear only on a complete lookup (I21, round 4)
+    s['check'], s['complete'] = 'partial', False  # clear only on a complete lookup
 @case('abandoned-without-degree', 'composite', 'findings[%d].flags[0].degree: NULL value found' % DEBUG)
 def _(d): d['findings'][DEBUG]['flags'][0]['degree'] = None  # abandoned carries {reasons, liveness_complete}
 @case('gate-by-without-facts', 'composite', f + '.gate.by[0].facts')
-def _(d): d['findings'][m]['gate']['by'][0]['facts'] = []  # a failing value names at least one fact (I15b)
+def _(d): d['findings'][m]['gate']['by'][0]['facts'] = []  # a failing value names at least one fact
 @case('checks-skipped-without-blocks', 'composite', 'findings[%d].checks_skipped[0].blocks' % POLY)
 def _(d): d['findings'][POLY]['checks_skipped'][0]['blocks'] = []
 
-# ---------------------------------------------------------------------------------------------- open sets: malformed, or unknown under the strict twin
+# open sets: malformed, or unknown under the strict twin
 @case('fail-on-not-canonical', 'composite', 'run.fail_on')
-def _(d): d['run']['fail_on'] = 'High, vulnerable-high'  # canonical: lower case, no spaces (§6.1)
+def _(d): d['run']['fail_on'] = 'High, vulnerable-high'  # canonical: lower case, no spaces
 @case('rule-id-malformed', 'composite', 'rules[6].id: Does not match the regex pattern')
 def _(d): rule(d, 'divide-reach')['id'] = 'Divide Reach'
 @case('next-step-kind-malformed', 'composite', f + '.next_step.kind')
@@ -198,13 +199,12 @@ def _(d): d['findings'][m]['flags'][0].update(weight=16, points=16)  # revision 
 @case('strict-security-summary', 'composite', 'The property summary is not defined', strict=True)
 def _(d): d['findings'][m]['security']['summary'] = 'dropped in round 2'
 @case('strict-divisor-three', 'composite', f + '.score.terms[1].divisor: Does not have a value in the enumeration', strict=True)
-def _(d):  # model 1's divisors are 1 and 4 (x-known-values); attack round 3: a later divisor comes with a later model id (§3.7)
+def _(d):  # model 1's divisors are 1 and 4 (x-known-values); a later divisor comes with a later model id
     d['findings'][m]['score']['terms'][1]['divisor'] = 3
     d['findings'][m]['score']['model'] = 2
 
-# ---------------------------------------------------------------------------------------------- schema round
 @case('clears-kind-signal', 'composite', f + '.next_step.clears[0].kind: Does not have a value')
-def _(d): d['findings'][m]['next_step']['clears'][0]['kind'] = 'signal'  # fact kinds are closed (§8.2, schema round)
+def _(d): d['findings'][m]['next_step']['clears'][0]['kind'] = 'signal'  # fact kinds are closed
 @case('worsened-by-kind-check', 'B-baselined-dagger', 'findings[0].baseline.worsened_by[0].kind: Does not have a value')
 def _(d): d['findings'][0]['baseline']['worsened_by'][0]['kind'] = 'check'
 @case('move-in-security', 'composite', f + '.security.move_in')
@@ -214,19 +214,19 @@ def _(d): d['findings'][0]['security']['ignored'][0]['by'] = 'Audit Ignore'
 @case('ignored-matched-the-value', 'E-ignored-dagger', 'findings[0].security.ignored[0].matched: Does not match the regex pattern')
 def _(d): d['findings'][0]['security']['ignored'][0]['matched'] = 'PKSA-ign0-0000-0000'  # revision 3's IGN fixture: the value, not what it matched on
 @case('ignored-severity-moderate', 'E-ignored-dagger', 'findings[0].security.ignored[0].severity: Does not have a value')
-def _(d): d['findings'][0]['security']['ignored'][0]['severity'] = 'moderate'  # the bucket (§5.2)
+def _(d): d['findings'][0]['security']['ignored'][0]['severity'] = 'moderate'  # the bucket
 @case('points-from-missing', 'composite', 'run.score_model.flags[0].points_from: The property points_from is required')
-def _(d): del d['run']['score_model']['flags'][0]['points_from']  # every row writes every key (schema round)
+def _(d): del d['run']['score_model']['flags'][0]['points_from']  # every row writes every key
 @case('rank-null', 'composite', f + '.rank: NULL value found')
 def _(d): d['findings'][m]['rank'] = None  # an int >= 1 in every report (18 fixture variants wrote null)
 @case('strict-ignored-by-config-prefix', 'E-ignored-dagger', 'findings[0].security.ignored[0].by: Does not have a value in the enumeration', strict=True)
-def _(d): d['findings'][0]['security']['ignored'][0]['by'] = 'config.audit.ignore'  # well-formed, not one of SPEC.md §4.1's names
+def _(d): d['findings'][0]['security']['ignored'][0]['by'] = 'config.audit.ignore'  # well-formed, not a reserved name
 
 @case('gates-hold-none', 'composite', 'run.gates[0]')
-def _(d): d['run']['gates'] = [{'value': 'none', 'kind': 'grade', 'threshold': None}]  # --fail-on=none writes gates: [] (§6.1, schema round)
+def _(d): d['run']['gates'] = [{'value': 'none', 'kind': 'grade', 'threshold': None}]  # --fail-on=none writes gates: []
 
 
-# ---------------------------------------------------------------------------------------------- relations (§8.2 "What the schemas check"; schema round)
+# relations
 @case('relation-priority-not-the-grade', 'composite', f + '.priority: Does not have a value in the enumeration ["critical"]')
 def _(d): d['findings'][m]['priority'] = 'high'  # the alias equals the grade
 @case('relation-judged-without-metadata', 'composite', f + '.maintenance_judged: Does not have a value in the enumeration [false]')
@@ -238,19 +238,18 @@ def _(d): d['findings'][m]['next_step']['reason'] = 'package_quiet'  # reason on
 @case('relation-clears-all-false-with-nothing-left', 'composite', f + '.next_step.clears_all: Does not have a value in the enumeration [true]')
 def _(d): d['findings'][m]['next_step']['clears_all'] = False
 @case('relation-builtin-entry-without-reason-id', 'composite', 'findings[%d].allowlist.reason_id: NULL value found, but a string is required' % POLY)
-def _(d): d['findings'][POLY]['allowlist']['reason_id'] = None  # a lockrot-authored reason has an id (§6.5)
+def _(d): d['findings'][POLY]['allowlist']['reason_id'] = None  # a lockrot-authored reason has an id
 
 
-# ---------------------------------------------------------------------------------------------- attack round 1
 # each documents a rule report-2 now holds that only explain-2 held, or that neither held (forbidden documents both accepted)
 @case('a1-headline-years-value-without-source', 'composite', f + '.flags[0]')
-def _(d): d['findings'][m]['flags'][0]['headline']['source'] = None  # a years value always names its reading (§7.6)
+def _(d): d['findings'][m]['flags'][0]['headline']['source'] = None  # a years value always names its reading
 @case('a1-flag-vulnerable-years-headline', 'composite', f + '.flags[2]')
 def _(d): d['findings'][m]['flags'][2]['headline'] = {'unit': 'years', 'value': 10.9, 'source': 'release'}  # vulnerable's unit is advisories
 @case('a1-flag-old-promise-years-headline', 'composite', f + '.flags[1]')
 def _(d): d['findings'][m]['flags'][1]['headline'] = {'unit': 'years', 'value': 10.9, 'source': 'release'}  # old-promise's unit is php
 @case('a1-flags-identical-copy', 'composite', f + '.flags: There are no duplicates allowed')
-def _(d): d['findings'][m]['flags'].insert(1, copy.deepcopy(d['findings'][m]['flags'][0]))  # uniqueItems catches an identical copy only (attack round 2: "each flag once" is ScoreContractTest's)
+def _(d): d['findings'][m]['flags'].insert(1, copy.deepcopy(d['findings'][m]['flags'][0]))  # uniqueItems catches an identical copy only ("each flag once" is ScoreContractTest's)
 @case('a1-flag-signals-empty', 'composite', f + '.flags[0].signal_ids: There must be a minimum of 1 items')
 def _(d): d['findings'][m]['flags'][0]['signal_ids'] = []
 @case('a1-without-total-0-graded', 'composite', f + '.score')
@@ -260,11 +259,11 @@ def _(d): d['findings'][0]['score']['accepted'][0]['if_counted'].update(total=0,
 @case('a1-exact-below-1-on-the-graded-shape', 'composite', f + '.score')
 def _(d): d['findings'][m]['score']['exact'] = 0.5
 @case('a1-gate-threshold-null-on-a-grade', 'composite', 'run.gates[0]')
-def _(d): d['run']['gates'][0]['threshold'] = None  # null exactly for unchecked (§6.1)
+def _(d): d['run']['gates'][0]['threshold'] = None  # null exactly for unchecked
 @case('a1-gate-kind-hyphen', 'composite', 'run.gates[0].kind: Does not match the regex pattern')
-def _(d): d['run']['gates'][0]['kind'] = 'abandoned-since'  # gate kinds are reason-like: underscores (§8.2)
+def _(d): d['run']['gates'][0]['kind'] = 'abandoned-since'  # gate kinds are reason-like: underscores
 @case('a1-allowlist-project-pattern-null', 'D-partial-dagger', 'findings[0].allowlist')
-def _(d): d['findings'][0]['allowlist']['pattern'] = None  # null exactly on a type entry (§6.5)
+def _(d): d['findings'][0]['allowlist']['pattern'] = None  # null exactly on a type entry
 @case('a1-recorded-flags-vulnerable', 'C-baselined-dagger', 'findings[0].baseline')
 def _(d): d['findings'][0]['baseline']['recorded']['flags']['vulnerable'] = {'known_since': None}  # a baseline stores maintenance flags only
 @case('a1-recorded-flags-empty-map', 'C-baselined-dagger', 'findings[0].baseline')
@@ -275,7 +274,7 @@ def _(d): sig(d['findings'][DEBUG], 'S1')['data']['replacement_url'] = 'ftp://pa
 def _(d): d['findings'][TWIG]['next_step']['held_by'][0]['constraint'] = ''
 # open sets stay open as published (each strict-only: published valid, the strict twin rejects the unknown value)
 @case('strict-a1-security-status-later-value', 'composite', 'score.parts.security.status', strict=True)
-def _(d): d['findings'][m]['score']['parts']['security']['status'] = 'estimated'  # a later status for a counted advisory (§8.2)
+def _(d): d['findings'][m]['score']['parts']['security']['status'] = 'estimated'  # a later status for a counted advisory
 @case('strict-a1-gate-kind-later-value', 'composite', 'run.gates[0].kind', strict=True)
 def _(d): d['run']['gates'][0].update(kind='abandoned_since')
 @case('strict-a1-checks-skipped-check-releases', 'scope-registries-dagger', 'findings[0].checks_skipped[0].check', strict=True)
@@ -285,8 +284,7 @@ def _(d): d['findings'][POLY]['allowlist']['reason_id'] = 'php-fig-extra'
 
 
 
-# ---------------------------------------------------------------------------------------------- attack round 2
-# each plants one rule §8.2 had filed as engine-only or left out, now a relation of report-2 (and of explain-2, which copies it)
+# each plants one rule that a relation of report-2 holds (and of explain-2, which copies it)
 @case('a2-vulnerable-status-without-flag', 'composite', f)
 def _(d): d['findings'][m]['flags'] = [x for x in d['findings'][m]['flags'] if x['id'] != 'vulnerable']
 @case('a2-vulnerable-flag-on-a-clear-finding', 'composite', 'findings[%d]' % DEBUG)
@@ -365,7 +363,6 @@ def _(d): d['run']['score_rules_used']['split-reach'] = 0  # a well-formed later
 def _(d): d['findings'][POLY]['allowlist']['reason_id'] = 'symfony-later-polyfills'
 
 
-# ---------------------------------------------------------------------------------------------- attack round 3
 # each plants one rule the attack found accepted by the published and the strict schema although the spec forbids it
 c_, e_ = DEBUG, YAML
 fc = 'findings[%d]' % c_
@@ -463,7 +460,6 @@ def _(d):
     d['findings'][c_]['maintenance_judged'] = False
     d['findings'][c_]['metadata'].update(status='unavailable', reason=None)
 
-# ---------------------------------------------------------------------------------------------- attack round 4 (10.S1)
 # each plants one rule the round-4 schema lens found accepted (published and strict) although a field description or the spec states it
 tw, fo_ = TWIG, 'findings[%d]' % TWIG
 WHOLE = dict(by='project', pattern='symfony/debug', version=None, reason='kept on purpose', reason_id=None, reason_by='user', expires=None, flag_ids=None)
@@ -543,8 +539,8 @@ def _(d): d['run']['project_php_lowest'] = '7.2.0.0'
 def _(d): sig(d['findings'][c_], 'S3')['data']['forge'] = None
 
 
-# ---------------------------------------------------------------------------------------------- 0.14 sync (2026-10-03): the item fields and Q2
-# Q2: every recorded entry comes from a baseline-2 file, so its dates, target and fix model are never null
+# the item fields
+# every recorded entry comes from a baseline-2 file, so its dates, target and fix model are never null
 @case('q2-recorded-target-php-null', 'B-baselined-dagger', 'findings[0].baseline')
 def _(d): d['findings'][0]['baseline']['recorded']['target_php'] = None
 @case('q2-recorded-fix-model-null', 'B-baselined-dagger', 'findings[0].baseline')
@@ -558,7 +554,7 @@ def _(d):
     d['note_details'].append(n); d['notes'].append('t')
 
 
-# ---------------------------------------------------------------------------------------------- relations no other case breaks
+# relations no other case breaks
 # Each case changes one value of a valid document so that one relation of report-2 fails; SchemaRelationsTest finds the
 # relation each case breaks.
 @case('relation-factbaseline-0-0', 'C-baselined-dagger', 'findings[0].flags[1].baseline.covered_by')

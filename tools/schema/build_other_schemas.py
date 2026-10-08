@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Builds lockrot-explain-2, lockrot-baseline-2 and lockrot-config-2 (draft-04) from SPEC-flags-r3.md.
+"""Builds resources/lockrot-explain-2.schema.json (draft-04).
 
-The report-1/explain-1/baseline-1/config-1 files in the lockrot worktree are read (never written) so that every
-definition the 0.14 documents keep unchanged keeps its published wording; everything report-2 adds is written here,
-one description per property, from the spec sections named in each description.
+explain-2 copies the finding, signal, note and run definitions of resources/lockrot-report-2.schema.json, so build
+that file first. The explain-1 file is read from the committed copy under inputs/, so a definition that explain-2
+keeps unchanged keeps its published wording. Everything explain-2 adds is written here, one description per property.
 
-Writes only beside this file: lockrot-explain-2.schema.json, lockrot-baseline-2.schema.json, lockrot-config-2.schema.json.
+Usage: python3 tools/schema/build_other_schemas.py
 """
 import copy
 import json
@@ -16,7 +16,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.normpath(os.path.join(HERE, '..', '..'))
 RESOURCES = os.path.join(REPO, 'resources')
 REPORT2 = os.path.join(RESOURCES, 'lockrot-report-2.schema.json')
-# attack round 3 (9.I5): the 0.13.0 -1 files from committed, hash-pinned copies (inputs/, tools/schema/inputs/ in the repository), read
+# the 0.13.0 -1 files from committed, hash-pinned copies (inputs/, tools/schema/inputs/ in the repository), read
 # relative to this script; a later widening of a -1 file never changes a -2 rebuild
 import hashlib
 INPUTS = os.path.join(HERE, 'inputs')
@@ -34,7 +34,7 @@ E1 = pinned('lockrot-explain.schema.json')
 D1 = R1['definitions']
 DRAFT = 'http://json-schema.org/draft-04/schema#'
 
-# ------------------------------------------------------------------------------------------------ vocabularies (§2.1, §5.2, §8.2)
+# vocabularies
 FLAGS = ['abandoned', 'silent', 'pinned', 'left-behind', 'old-promise', 'stale', 'vulnerable']
 MAINT = FLAGS[:6]
 VERDICTS = ['critical', 'high', 'medium', 'low', 'unknown', 'finished', 'ok']
@@ -46,12 +46,12 @@ MOVE_KINDS = ['replace', 'find-alternative', 'tag', 'require', 'update', 'raise-
 V013_VERDICTS = ['abandoned', 'silent', 'pinned', 'left-behind', 'old-promise', 'stale', 'unknown', 'finished', 'ok']
 PRIORITIES = ['critical', 'high', 'medium', 'low', 'none']
 REASON = '^[a-z][a-z0-9_]*$'           # reason-like open values (underscores), the repo's style
-FLAGLIKE = '^[a-z][a-z0-9-]*$'         # flag-like open values keep hyphens (raise-php), §8.2
+FLAGLIKE = '^[a-z][a-z0-9-]*$'         # flag-like open values keep hyphens (raise-php)
 SIGNAL_IDS = ['S%d' % i for i in range(1, 11)]
 PROSE = 'prose, not contract; key on the fields'
 
 
-# ------------------------------------------------------------------------------------------------ helpers
+# helpers
 def ref(name, desc=None):
     out = {}
     if desc:
@@ -148,7 +148,7 @@ def kept(name):
     return strip_optional(copy.deepcopy(D1[name]))
 
 
-# ------------------------------------------------------------------------------------------------ shared definitions
+# shared definitions
 def shared_definitions():
     D = {}
     D['dateTime'] = {'description': 'An ISO 8601 date and time with an offset, as `DATE_ATOM` writes it.', 'type': 'string', 'format': 'date-time'}
@@ -241,9 +241,8 @@ def shared_definitions():
     return D
 
 
-# attack round 1: the finding, signal, note and run definitions explain-2 built here (a second copy of report-2's, which
-# drifted from it in 189 places) are gone: explain_schema() copies report-2's own. This file keeps the relation groups
-# (add_relations, applied to report-2 through a name map), the explain-only definitions, baseline-2 and config-2.
+# explain_schema copies report-2's own finding, signal, note and run definitions, so the two cannot drift. This file
+# keeps the relation groups (add_relations, applied to report-2 through a name map) and the explain-only definitions.
 
 
 def explain_metadata():
@@ -287,7 +286,7 @@ def explain_activity():
     return act
 
 
-# ------------------------------------------------------------------------------------------------ the field reference's relations (§7.6, I14, I18, I21)
+# the field reference's relations
 def P(**props):
     """a branch that only constrains properties (no `type`: the strict twin leaves it as it is)."""
     return {'properties': props}
@@ -476,7 +475,7 @@ def add_relations_round3(D):
     fb = inner(D['findingBaseline'])
     relate(fb, 'A `known` finding has nothing new against its entry: no new, re-rated or fix-lost advisory (each would be a `worsened_by` entry).',
            [P(status=NOT('known')), P(status=E('known'), advisories_now=P(new=E(0), re_rated=E(0), fix_lost=E(0)))])
-    # attack round 3, found while re-running the lens's own mutation sets: four more rules draft-04 can say
+    # four more rules that draft-04 can say
     SIG_OF = {'abandoned': ['S1', 'S3', 'S2', 'S4'], 'silent': ['S2', 'S4'], 'stale': ['S2', 'S4'], 'pinned': ['S6'], 'left-behind': ['S8'],
               'old-promise': ['S5'], 'vulnerable': ['S9']}
     relate(f, ['An accepted flag fired: each `score.accepted[].flag` has its `flags[]` entry.',
@@ -514,12 +513,12 @@ def add_relations(D):
            [P(metadata=P(status=E('read')), maintenance_judged=E(True)), P(metadata=P(status=NOT('read')), maintenance_judged=E(False))])
     relate(f, '`security.installed_branch_fixes` is null exactly when `branch` is (a snapshot; I21).',
            [P(branch=STR, security=P(installed_branch_fixes=OBJ)), P(branch=NULL, security=P(installed_branch_fixes=NULL))])
-    # attack round 2: the first term's flag is the lead itself (six-way enumeration), not just some maintenance term
+    # the first term's flag is the lead itself (six-way enumeration), not just some maintenance term
     relate(f, '`lead` is null exactly when no maintenance term counts; when set, the first term is the lead\'s own maintenance term (I6).',
            [P(lead=NULL, score=P(terms={'items': P(part=E('security'))}))]
            + [{'properties': {'lead': E(m), 'score': {'required': ['terms'], 'properties': {'terms': {'items': [P(part=E('maintenance'), flag=E(m))]}}}}} for m in MAINT])
     relate(f, 'An advisory counts (`security.status` vulnerable) exactly when the security part counts.',
-           # attack round 1: parts.security.status is open: a status a later release adds for a vulnerable finding validates (§8.2)
+           # parts.security.status is open: a status a later release adds for a vulnerable finding validates
            [P(security=P(status=E('vulnerable')), score={'required': ['terms'], 'properties': {'parts': P(security=P(status={'anyOf': [
                E('counted'), NOT('counted', 'clear', 'unchecked')]}))}}),
             P(security=P(status=E('clear', 'unchecked')), score={'anyOf': [{'not': {'required': ['terms']}}, P(parts=P(security=P(status=NOT('counted'))))]})])
@@ -527,7 +526,7 @@ def add_relations(D):
     add_relations_round3(D)
     for name in ('nextStep', 'move'):
         m = D[name]
-        # every relation keyed on an open set constrains its known values only: a kind a later release adds is free (§8.2)
+        # every relation keyed on an open set constrains its known values only: a kind a later release adds is free
         others = lambda *ks: E(*[k for k in MOVE_KINDS if k not in ks])
         relate(m, '`reason` is set exactly on `no-move` (I18); a kind this schema does not list is not constrained.',
                [P(kind=E('no-move'), reason=STR), P(kind=others('no-move'), reason=NULL), P(kind=NOT(*MOVE_KINDS))])
@@ -546,7 +545,7 @@ def add_relations(D):
         relate(m, '`latest` is set on `tag` and `test`, on a `blocked` move from `pinned`, and nowhere else.',
                [P(kind=E('tag', 'test'), latest=OBJ), P(kind=E('blocked'), source=E('pinned'), latest=OBJ), P(kind=E('blocked'), source=NOT('pinned'), latest=NULL),
                 P(kind=others('tag', 'test', 'blocked'), latest=NULL), P(kind=NOT(*MOVE_KINDS))])
-        # review round 3 (C08): the lead move of a transitive package may end with `composer why-not` checks, whatever its kind
+        # the lead move of a transitive package may end with `composer why-not` checks, whatever its kind
         relate(m, 'Kinds without a command write none but `composer why-not` checks; `update` always writes one (a transitive package included).',
                [P(kind=E(*NO_COMMAND), commands={'items': {'items': [{'enum': ['composer']}, {'enum': ['why-not']}]}}), P(kind=E('update'), commands=MIN1),
                 P(kind=NOT(*(NO_COMMAND + ['update'])))])
@@ -555,7 +554,7 @@ def add_relations(D):
         relate(m, '`if_applied.at_most` is true exactly when `unverified` is not empty (I14).',
                [P(if_applied=NULL), P(if_applied=P(at_most=E(True)), unverified=MIN1), P(if_applied=P(at_most=E(False)), unverified=EMPTY)])
         relate(m, '`crosses_major` is null when the move names no branch.', [P(to_branch=NULL, crosses_major=NULL), P(to_branch=STR)])
-        # attack round 2: `merged` holding vulnerable makes it a security move too
+        # `merged` holding vulnerable makes it a security move too
         relate(m, 'A security move carries its fix kind: `source` or `merged` holds `vulnerable`.',
                [P(source=E('vulnerable'), fix_kind=STR), P(merged=CONTAINS(E('vulnerable')), fix_kind=STR), P(source=NOT('vulnerable'), merged=NONE(E('vulnerable')))])
     relate(inner(D['gateBasis']), ['`verdict` is null exactly at gate score 0 (I21).', '`limited_by` is `cap` whenever `new.total` is 0.'],
@@ -565,7 +564,7 @@ def add_relations(D):
            [P(fails=E(True), reaches_fail_on=E(True), exempt_by=NULL), P(fails=E(False), exempt_by=NULL),
             P(fails=E(False), reaches_fail_on=E(True), exempt_by=STR)])
     relate(D['band'], '`next` and `to_next` are null together, at the top band.', [P(next=NULL, to_next=NULL), P(next=STR, to_next={'type': 'integer'})])
-    # attack round 2: the floor and the next band follow each other (model 1's bands are a closed table of four)
+    # the floor and the next band follow each other (model 1's bands are a closed table of four)
     relate(D['band'], '`floor` and `next` name adjacent bands: 32 at the top, 16 below critical, 8 below high, 1 below medium.',
            [P(floor=E(32), next=NULL), P(floor=E(16), next=E('critical')), P(floor=E(8), next=E('high')), P(floor=E(1), next=E('medium')),
             P(floor=NOT(32, 16, 8, 1))])
@@ -653,7 +652,7 @@ def explain_schema():
     D['explainRun'] = {'description': ('What an `--explain` run read, and every field `score_model` refers to (§7.7, §8.3): the explain text renders from this '
                                        'block and the finding alone. Each key is report-2\'s `run` key of the same name, typed by the same schema.'),
                        'type': 'object', 'required': list(EXPLAIN_RUN_KEYS), 'properties': {k: run['properties'][k] for k in EXPLAIN_RUN_KEYS},
-                       'allOf': copy.deepcopy(run.get('allOf', []))}  # attack round 2: the run relation (`none` ⇔ no gate) too
+                       'allOf': copy.deepcopy(run.get('allOf', []))}  # the run relation (`none` ⇔ no gate) too
     lock = strip_optional(copy.deepcopy(E1['properties']['lock']))
     lock['properties']['php']['description'] = lock['properties']['php'].get('description', 'The entry\'s php requirement, null when it has none.')
     for k, dsc in [('dev', 'Whether the entry is in packages-dev.'), ('branch_snapshot', 'Whether the installed version is a branch snapshot.'),
@@ -704,7 +703,7 @@ def explain_schema():
     return root
 
 
-# r3 schema round: properties the -1 files left undescribed (report-1 described the object, not each member); every -2
+# properties the -1 files left undescribed (report-1 described the object, not each member); every -2
 # property carries a description, as the report-2 builder already checks
 MEMBER_DESCRIPTIONS = {
     ('definitions', 'forgeRepository', 'host'): 'The host as Composer names it (`github.com`, possibly with a port or a path prefix).',
@@ -747,7 +746,7 @@ def main():
     from ship_text import ship_schema, leftovers
     for doc in out.values():
         describe_members(doc)
-        ship_schema(doc)  # attack round 2: the shipping pass
+        ship_schema(doc)  # the shipping pass
         lo = leftovers(doc)
         assert not lo, lo[:5]
     for name, doc in out.items():
