@@ -185,7 +185,8 @@ final class Explanation
             ] + $this->rowExtras($row);
         }
 
-        $run = $this->report->run() ?? new RunSettings(null, null, $this->targetPhp, null, null, $this->thresholds, $this->projectPhp);
+        // Both command paths give the report its run. A caller that skips them passed the target PHP to the constructor.
+        $run = $this->report->run() ?? new RunSettings(null, null, $this->targetPhp, RunSettings::SOURCE_OPTION, null, null, RunSettings::SOURCE_DEFAULT, $this->thresholds, $this->projectPhp);
         $runKeys = ['target_php', 'target_php_source', 'project_php', 'project_php_lowest', 'include_dev', 'thresholds', 'flag_ids', 'verdicts', 'graded_verdicts', 'signal_ids', 'fail_on', 'fail_on_source', 'gates', 'fix_model', 'text_grammar', 'score_model'];
         $runArray = $run->toArray();
         $basis = $this->finding->priorityBasis();

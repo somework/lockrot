@@ -470,7 +470,7 @@ final class Report
     {
         $gate = $this->gate();
         $findings = array_values($this->findingRows($gate));
-        $run = $this->run ?? new RunSettings(null, null, null, null, null, null);
+        $run = $this->run ?? new RunSettings(null, null, null, RunSettings::SOURCE_RUNTIME, null, null, RunSettings::SOURCE_DEFAULT, null);
         $graded = array_filter($this->findings, static fn (Finding $f): bool => $f->isGraded());
         $multi = array_filter($graded, static fn (Finding $f): bool => \count($f->flagIds()) >= 2);
         $flags = Report2Root::flags($findings);

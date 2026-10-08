@@ -244,7 +244,7 @@ final class ReportTest extends TestCase
     public function testTheReportRecordsWhatTheRunWasToldToDo(): void
     {
         $report = $this->report($this->finding('vendor/a', Verdict::SILENT))
-            ->withRun(new RunSettings('Acme shop', 'acme/shop', '8.4', '/home/someone/clients/acme/composer.lock', FailOn::fromString('silent'), new Thresholds(2, 4, 6, 8), '>=8.2'));
+            ->withRun(new RunSettings('Acme shop', 'acme/shop', '8.4', RunSettings::SOURCE_OPTION, '/home/someone/clients/acme/composer.lock', FailOn::fromString('silent'), RunSettings::SOURCE_OPTION, new Thresholds(2, 4, 6, 8), '>=8.2'));
 
         $run = JsonPath::arrayAt($report->toArray(), ['run']);
 
@@ -263,7 +263,7 @@ final class ReportTest extends TestCase
      */
     public function testARunWithoutAManifestNameWritesARootPackageOfNull(): void
     {
-        $run = JsonPath::arrayAt($this->report()->withRun(new RunSettings('Acme shop', null, null, null, null, null))->toArray(), ['run']);
+        $run = JsonPath::arrayAt($this->report()->withRun(new RunSettings('Acme shop', null, null, RunSettings::SOURCE_RUNTIME, null, null, RunSettings::SOURCE_DEFAULT, null))->toArray(), ['run']);
 
         self::assertArrayHasKey('root_package', $run);
         self::assertNull($run['root_package']);
@@ -278,7 +278,7 @@ final class ReportTest extends TestCase
      */
     public function testTheRunNamesTheLockAndNeverLocatesIt(): void
     {
-        $report = $this->report()->withRun(new RunSettings(null, null, null, '/srv/deploy/acme-bank/composer.lock', FailOn::none(), null));
+        $report = $this->report()->withRun(new RunSettings(null, null, null, RunSettings::SOURCE_RUNTIME, '/srv/deploy/acme-bank/composer.lock', FailOn::none(), RunSettings::SOURCE_OPTION, null));
 
         $json = json_encode($report->toArray());
 
@@ -295,7 +295,7 @@ final class ReportTest extends TestCase
      */
     public function testTheRunNamesTheGradedVerdicts(): void
     {
-        $graded = JsonPath::arrayAt($this->report()->withRun(new RunSettings(null, null, null, null, null, null))->toArray(), ['run', 'graded_verdicts']);
+        $graded = JsonPath::arrayAt($this->report()->withRun(new RunSettings(null, null, null, RunSettings::SOURCE_RUNTIME, null, null, RunSettings::SOURCE_DEFAULT, null))->toArray(), ['run', 'graded_verdicts']);
 
         self::assertNotContains(Verdict::UNKNOWN, $graded);
         self::assertNotContains(Verdict::FINISHED, $graded);
@@ -347,7 +347,7 @@ final class ReportTest extends TestCase
     public function testTheRunOutlivesWithBaseline(): void
     {
         $report = $this->report($this->finding('vendor/a', Verdict::SILENT))
-            ->withRun(new RunSettings(null, null, '8.3', null, FailOn::none(), null));
+            ->withRun(new RunSettings(null, null, '8.3', RunSettings::SOURCE_OPTION, null, FailOn::none(), RunSettings::SOURCE_OPTION, null));
 
         $compared = $report->withBaseline(BaselineComparison::compare(
             Baseline::fromReport($report),
@@ -361,7 +361,7 @@ final class ReportTest extends TestCase
 
     public function testTheRunSaysHowItWasToldToGate(): void
     {
-        $run = JsonPath::arrayAt($this->report()->withRun(new RunSettings(null, null, null, null, FailOn::fromString('high'), null, null, true, Gate::MODE_GENERATE_BASELINE))->toArray(), ['run']);
+        $run = JsonPath::arrayAt($this->report()->withRun(new RunSettings(null, null, null, RunSettings::SOURCE_RUNTIME, null, FailOn::fromString('high'), RunSettings::SOURCE_OPTION, null, null, true, Gate::MODE_GENERATE_BASELINE))->toArray(), ['run']);
 
         self::assertSame('high', $run['fail_on']);
         self::assertSame('grade', JsonPath::stringAt($run, ['gates', 0, 'kind']));
@@ -374,13 +374,13 @@ final class ReportTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('"pull_request"');
 
-        new RunSettings(null, null, null, null, FailOn::none(), null, null, false, 'pull_request');
+        new RunSettings(null, null, null, RunSettings::SOURCE_RUNTIME, null, FailOn::none(), RunSettings::SOURCE_OPTION, null, null, false, 'pull_request');
     }
 
     /** A run told no fail-on, which only a test builds, has no gate kind and writes a gate that does not fail. */
     public function testARunWithoutAFailOnHasNoGateKindAndAGateThatDoesNotFail(): void
     {
-        $report = $this->report($this->finding('vendor/a', Verdict::SILENT))->withRun(new RunSettings(null, null, null, null, null, null));
+        $report = $this->report($this->finding('vendor/a', Verdict::SILENT))->withRun(new RunSettings(null, null, null, RunSettings::SOURCE_RUNTIME, null, null, RunSettings::SOURCE_DEFAULT, null));
         $document = $report->toArray();
 
         self::assertSame([], JsonPath::arrayAt($document, ['run', 'gates']));
@@ -415,7 +415,7 @@ final class ReportTest extends TestCase
     public function testTheGateIsDecidedOverTheReportAsItStands(): void
     {
         $report = $this->report($this->finding('vendor/known', Verdict::ABANDONED), $this->finding('vendor/fine', Verdict::OK))
-            ->withRun(new RunSettings(null, null, null, null, FailOn::fromString(Verdict::SILENT), null));
+            ->withRun(new RunSettings(null, null, null, RunSettings::SOURCE_RUNTIME, null, FailOn::fromString(Verdict::SILENT), RunSettings::SOURCE_OPTION, null));
         $before = $report->toArray();
 
         self::assertSame(['fails' => true, 'tripped_by' => ['fail_on'], 'fail_on_applied' => true], \array_slice(JsonPath::arrayAt($before, ['gate']), 0, 3, true));
@@ -524,7 +524,7 @@ final class ReportTest extends TestCase
         self::assertSame('{"package_count":2}', json_encode(JsonPath::arrayAt($details, [2])['data']));
         self::assertSame([], (new Report([], [], $at, 0, 0))->toArray()['note_details']);
 
-        $withRun = $report->withRun(new RunSettings(null, null, '8.4', null, FailOn::none(), new Thresholds()));
+        $withRun = $report->withRun(new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, FailOn::none(), RunSettings::SOURCE_OPTION, new Thresholds()));
         $withBaseline = $withRun->withBaseline(BaselineComparison::compare(Baseline::fromReport($report), $report, 'lockrot-baseline.json', []));
         foreach ([$withRun, $withBaseline] as $copy) {
             self::assertSame($failing, $copy->runNotes());

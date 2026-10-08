@@ -103,7 +103,7 @@ final class ClosedSetsTest extends TestCase
     public function testTheFlaggedVerdictsAreTheFirstSix(): void
     {
         self::assertSame(self::FLAGGED, array_values(array_filter(Verdict::all(), [Verdict::class, 'flagged'])));
-        self::assertSame(['critical', 'high', 'medium', 'low'], (new RunSettings(null, null, null, null, null, null))->toArray()['graded_verdicts'], "report-2's run names the grades");
+        self::assertSame(['critical', 'high', 'medium', 'low'], (new RunSettings(null, null, null, RunSettings::SOURCE_RUNTIME, null, null, RunSettings::SOURCE_DEFAULT, null))->toArray()['graded_verdicts'], "report-2's run names the grades");
     }
 
     public function testThePrioritiesAreFrozenInTheirOrder(): void
