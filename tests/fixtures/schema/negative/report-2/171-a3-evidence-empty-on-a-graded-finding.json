@@ -1,0 +1,4124 @@
+{
+ "$expect": {
+  "strict": false,
+  "error": "findings[2]"
+ },
+ "$schema": "https://lockrot.dev/schema/report-2.json",
+ "lockrot": {
+  "version": "0.14.0",
+  "schema": 2
+ },
+ "generated_at": "2026-10-01T17:41:20+00:00",
+ "run": {
+  "project": "lockrot/composite",
+  "root_package": "lockrot/composite",
+  "target_php": "8.4",
+  "target_php_source": "option",
+  "project_php": null,
+  "project_php_lowest": null,
+  "lock_file": "composer.lock",
+  "fail_on": "high",
+  "fail_on_source": "option",
+  "gates": [
+   {
+    "value": "high",
+    "kind": "grade",
+    "threshold": "high"
+   }
+  ],
+  "strict_network": false,
+  "mode": "check",
+  "include_dev": false,
+  "thresholds": {
+   "release-warn-years": 3,
+   "release-high-years": 5,
+   "push-warn-years": 3,
+   "push-high-years": 5
+  },
+  "flag_ids": [
+   "abandoned",
+   "silent",
+   "pinned",
+   "left-behind",
+   "old-promise",
+   "stale",
+   "vulnerable"
+  ],
+  "verdicts": [
+   "critical",
+   "high",
+   "medium",
+   "low",
+   "unknown",
+   "finished",
+   "ok"
+  ],
+  "graded_verdicts": [
+   "critical",
+   "high",
+   "medium",
+   "low"
+  ],
+  "signal_ids": [
+   "S1",
+   "S2",
+   "S3",
+   "S4",
+   "S5",
+   "S6",
+   "S7",
+   "S8",
+   "S9",
+   "S10"
+  ],
+  "fix_model": 1,
+  "text_grammar": 1,
+  "score_model": {
+   "id": 1,
+   "score_text_grammar": 1,
+   "flag_order": [
+    "abandoned",
+    "silent",
+    "pinned",
+    "left-behind",
+    "old-promise",
+    "stale",
+    "vulnerable"
+   ],
+   "parts": [
+    {
+     "id": "maintenance",
+     "flag_ids": [
+      "abandoned",
+      "silent",
+      "pinned",
+      "left-behind",
+      "old-promise",
+      "stale"
+     ],
+     "combine": "lead_plus_share"
+    },
+    {
+     "id": "security",
+     "flag_ids": [
+      "vulnerable"
+     ],
+     "combine": "max"
+    }
+   ],
+   "flags": [
+    {
+     "id": "abandoned",
+     "part": "maintenance",
+     "points": 32,
+     "band": "critical",
+     "can_corroborate": false,
+     "corroborating_points": null,
+     "max_maintenance": 40,
+     "max_maintenance_flags": [
+      "abandoned",
+      "left-behind",
+      "old-promise"
+     ],
+     "raised_by": [
+      "S1",
+      "S3"
+     ],
+     "thresholds": [],
+     "basis": {
+      "v013_base": "critical",
+      "points": "band_floor"
+     },
+     "points_from": null
+    },
+    {
+     "id": "silent",
+     "part": "maintenance",
+     "points": 32,
+     "band": "critical",
+     "can_corroborate": false,
+     "corroborating_points": null,
+     "max_maintenance": 40,
+     "max_maintenance_flags": [
+      "silent",
+      "pinned",
+      "old-promise"
+     ],
+     "raised_by": [
+      "S2",
+      "S4"
+     ],
+     "thresholds": [
+      "release-high-years",
+      "push-high-years"
+     ],
+     "basis": {
+      "v013_base": "critical",
+      "points": "band_floor"
+     },
+     "points_from": null
+    },
+    {
+     "id": "pinned",
+     "part": "maintenance",
+     "points": 16,
+     "band": "high",
+     "can_corroborate": true,
+     "corroborating_points": 4,
+     "max_maintenance": 22,
+     "max_maintenance_flags": [
+      "pinned",
+      "old-promise",
+      "stale"
+     ],
+     "raised_by": [
+      "S6"
+     ],
+     "thresholds": [],
+     "basis": {
+      "v013_base": "high",
+      "points": "band_floor"
+     },
+     "points_from": null
+    },
+    {
+     "id": "left-behind",
+     "part": "maintenance",
+     "points": 16,
+     "band": "high",
+     "can_corroborate": true,
+     "corroborating_points": 4,
+     "max_maintenance": 20,
+     "max_maintenance_flags": [
+      "left-behind",
+      "old-promise"
+     ],
+     "raised_by": [
+      "S8"
+     ],
+     "thresholds": [
+      "release-warn-years"
+     ],
+     "basis": {
+      "v013_base": "high",
+      "points": "band_floor"
+     },
+     "points_from": null
+    },
+    {
+     "id": "old-promise",
+     "part": "maintenance",
+     "points": 16,
+     "band": "high",
+     "can_corroborate": true,
+     "corroborating_points": 4,
+     "max_maintenance": 18,
+     "max_maintenance_flags": [
+      "old-promise",
+      "stale"
+     ],
+     "raised_by": [
+      "S5"
+     ],
+     "thresholds": [],
+     "basis": {
+      "v013_base": "high",
+      "points": "band_floor"
+     },
+     "points_from": null
+    },
+    {
+     "id": "stale",
+     "part": "maintenance",
+     "points": 8,
+     "band": "medium",
+     "can_corroborate": true,
+     "corroborating_points": 2,
+     "max_maintenance": 8,
+     "max_maintenance_flags": [
+      "stale"
+     ],
+     "raised_by": [
+      "S2",
+      "S4"
+     ],
+     "thresholds": [
+      "release-warn-years",
+      "push-warn-years"
+     ],
+     "basis": {
+      "v013_base": "medium",
+      "points": "band_floor"
+     },
+     "points_from": null
+    },
+    {
+     "id": "vulnerable",
+     "part": "security",
+     "points": null,
+     "band": null,
+     "can_corroborate": false,
+     "corroborating_points": null,
+     "max_maintenance": null,
+     "max_maintenance_flags": null,
+     "raised_by": [
+      "S9"
+     ],
+     "thresholds": [],
+     "basis": {
+      "v013_base": null,
+      "points": "severities"
+     },
+     "points_from": "severities"
+    }
+   ],
+   "severities": [
+    {
+     "id": "critical",
+     "points": 32,
+     "band": "critical",
+     "points_no_reachable_fix": 64,
+     "band_no_reachable_fix": "critical",
+     "gate_rank": 4,
+     "counts_as": null,
+     "basis": {
+      "points": "band_floor"
+     }
+    },
+    {
+     "id": "high",
+     "points": 16,
+     "band": "high",
+     "points_no_reachable_fix": 32,
+     "band_no_reachable_fix": "critical",
+     "gate_rank": 3,
+     "counts_as": null,
+     "basis": {
+      "points": "band_floor"
+     }
+    },
+    {
+     "id": "medium",
+     "points": 8,
+     "band": "medium",
+     "points_no_reachable_fix": 16,
+     "band_no_reachable_fix": "high",
+     "gate_rank": 2,
+     "counts_as": null,
+     "basis": {
+      "points": "band_floor"
+     }
+    },
+    {
+     "id": "unrated",
+     "points": 8,
+     "band": "medium",
+     "points_no_reachable_fix": 16,
+     "band_no_reachable_fix": "high",
+     "gate_rank": 2,
+     "counts_as": "medium",
+     "basis": {
+      "points": "counts_as"
+     }
+    },
+    {
+     "id": "low",
+     "points": 2,
+     "band": "low",
+     "points_no_reachable_fix": 4,
+     "band_no_reachable_fix": "low",
+     "gate_rank": 1,
+     "counts_as": null,
+     "basis": {
+      "points": "share",
+      "of": "medium",
+      "share": {
+       "num": 1,
+       "den": 4
+      }
+     }
+    }
+   ],
+   "fix_kinds": [
+    {
+     "id": "update",
+     "ease": 1,
+     "doubles": false
+    },
+    {
+     "id": "upgrade",
+     "ease": 2,
+     "doubles": false
+    },
+    {
+     "id": "raise-php",
+     "ease": 3,
+     "doubles": false
+    },
+    {
+     "id": "unknown",
+     "ease": 4,
+     "doubles": false
+    },
+    {
+     "id": "blocked",
+     "ease": 5,
+     "doubles": true
+    },
+    {
+     "id": "none",
+     "ease": 6,
+     "doubles": true
+    }
+   ],
+   "bands": [
+    {
+     "verdict": "critical",
+     "floor": 32
+    },
+    {
+     "verdict": "high",
+     "floor": 16
+    },
+    {
+     "verdict": "medium",
+     "floor": 8
+    },
+    {
+     "verdict": "low",
+     "floor": 1
+    }
+   ],
+   "zero_verdicts": [
+    {
+     "verdict": "finished",
+     "when": "allowlisted"
+    },
+    {
+     "verdict": "unknown",
+     "when": "no_metadata"
+    },
+    {
+     "verdict": "ok",
+     "when": "otherwise"
+    }
+   ],
+   "exact_unit": 0.5,
+   "rounding": "floor_once",
+   "max_total": 104,
+   "bar_max": 64,
+   "bar_overflow": "clip",
+   "exclusive_groups": [
+    {
+     "id": "liveness",
+     "flag_ids": [
+      "abandoned",
+      "silent",
+      "stale"
+     ],
+     "holds_unless": null
+    },
+    {
+     "id": "branch",
+     "flag_ids": [
+      "pinned",
+      "left-behind"
+     ],
+     "holds_unless": null
+    },
+    {
+     "id": "release_age",
+     "flag_ids": [
+      "silent",
+      "left-behind"
+     ],
+     "holds_unless": null
+    },
+    {
+     "id": "release_push",
+     "flag_ids": [
+      "left-behind",
+      "stale"
+     ],
+     "holds_unless": {
+      "threshold": "push-warn-years",
+      "below": "release-warn-years"
+     }
+    }
+   ],
+   "sort": [
+    {
+     "key": "verdict",
+     "path": "verdict",
+     "dir": "order",
+     "order": [
+      [
+       "critical"
+      ],
+      [
+       "high"
+      ],
+      [
+       "medium"
+      ],
+      [
+       "low"
+      ],
+      [
+       "unknown"
+      ],
+      [
+       "finished",
+       "ok"
+      ]
+     ],
+     "default": null,
+     "collation": null
+    },
+    {
+     "key": "security",
+     "path": "score.parts.security.contribution",
+     "dir": "desc",
+     "default": 0,
+     "collation": null
+    },
+    {
+     "key": "score",
+     "path": "score.exact",
+     "dir": "desc",
+     "default": 0,
+     "collation": null
+    },
+    {
+     "key": "direct",
+     "path": "direct",
+     "dir": "true_first",
+     "default": null,
+     "collation": null
+    },
+    {
+     "key": "package",
+     "path": "package",
+     "dir": "asc",
+     "collation": "bytes",
+     "default": null
+    }
+   ],
+   "rules": [
+    {
+     "id": "counted",
+     "stage": 1,
+     "kind": "select",
+     "applies_to": "flags",
+     "accept_group": "liveness",
+     "accept_covers": "listed_and_below",
+     "why": "accepted-facts-shown-not-counted",
+     "doc": "score-counted",
+     "illustration": null
+    },
+    {
+     "id": "lead-first",
+     "stage": 2,
+     "kind": "select",
+     "applies_to": "maintenance",
+     "order": "flag_order",
+     "share": {
+      "num": 1,
+      "den": 1
+     },
+     "why": "strongest-fact-in-full",
+     "doc": "score-lead-first",
+     "illustration": null
+    },
+    {
+     "id": "corroborating-share",
+     "stage": 3,
+     "kind": "share",
+     "applies_to": "maintenance",
+     "share": {
+      "num": 1,
+      "den": 4
+     },
+     "why": "correlated-evidence",
+     "doc": "score-corroborating-share",
+     "illustration": {
+      "lead": "left-behind",
+      "flag": "old-promise",
+      "weight": 16,
+      "points": 4
+     }
+    },
+    {
+     "id": "advisory-points",
+     "stage": 4,
+     "kind": "lookup",
+     "applies_to": "security",
+     "table": "severities",
+     "why": "severity-points",
+     "doc": "score-advisory-points",
+     "illustration": null
+    },
+    {
+     "id": "no-reachable-fix-multiplier",
+     "stage": 5,
+     "kind": "multiply",
+     "applies_to": "advisory",
+     "factor": 2,
+     "when_fix": [
+      "none",
+      "blocked"
+     ],
+     "why": "one-band-up",
+     "doc": "score-no-reachable-fix-multiplier",
+     "illustration": {
+      "severity": "high",
+      "before": 16,
+      "after": 32,
+      "band_before": "high",
+      "band_after": "critical"
+     }
+    },
+    {
+     "id": "security-max",
+     "stage": 6,
+     "kind": "max",
+     "applies_to": "security",
+     "tie_break": [
+      {
+       "key": "points",
+       "dir": "desc",
+       "collation": null
+      },
+      {
+       "key": "severity",
+       "dir": "order",
+       "collation": null
+      },
+      {
+       "key": "id",
+       "dir": "asc",
+       "collation": "bytes"
+      }
+     ],
+     "why": "one-number-per-part",
+     "doc": "score-security-max",
+     "illustration": null
+    },
+    {
+     "id": "divide-reach",
+     "stage": 7,
+     "kind": "divide",
+     "applies_to": "maintenance",
+     "by": 2,
+     "when": [
+      "transitive",
+      "unreached"
+     ],
+     "why": "reach-halves-maintenance",
+     "doc": "score-divide-reach",
+     "illustration": {
+      "flag": "abandoned",
+      "before": 32,
+      "after": 16,
+      "band_before": "critical",
+      "band_after": "high"
+     }
+    },
+    {
+     "id": "security-exempt-from-reach",
+     "stage": 8,
+     "kind": "exempt",
+     "applies_to": "security",
+     "of": "divide-reach",
+     "why": "exploitability-independent-of-reach",
+     "doc": "score-security-exempt-from-reach",
+     "illustration": {
+      "severity": "critical",
+      "reach": "transitive",
+      "total": 32
+     }
+    },
+    {
+     "id": "sum",
+     "stage": 9,
+     "kind": "combine",
+     "applies_to": "total",
+     "op": "sum",
+     "ratio_from": "medium",
+     "why": "parts-add",
+     "doc": "score-sum",
+     "illustration": {
+      "maintenance": 16,
+      "security": 16,
+      "total": 32,
+      "band": "critical",
+      "low_maintenance": 4,
+      "low_security": 4,
+      "low_total": 8,
+      "low_band": "medium"
+     }
+    },
+    {
+     "id": "divide-dev",
+     "stage": 10,
+     "kind": "divide",
+     "applies_to": "total",
+     "by": 2,
+     "when": [
+      "dev"
+     ],
+     "why": "dev-halves-total",
+     "doc": "score-divide-dev",
+     "illustration": {
+      "before": 32,
+      "after": 16,
+      "band_before": "critical",
+      "band_after": "high"
+     }
+    },
+    {
+     "id": "floor-once",
+     "stage": 11,
+     "kind": "floor",
+     "applies_to": "total",
+     "why": "integer-band-edges",
+     "doc": "score-floor-once",
+     "illustration": {
+      "exact": 4.5,
+      "total": 4
+     }
+    },
+    {
+     "id": "band-floors",
+     "stage": 12,
+     "kind": "band",
+     "applies_to": "total",
+     "ratio": 2,
+     "ratio_from": "medium",
+     "why": "two-floor-parts-make-next",
+     "doc": "score-band-floors",
+     "illustration": null
+    },
+    {
+     "id": "zero-verdicts",
+     "stage": 13,
+     "kind": "zero",
+     "applies_to": "total",
+     "table": "zero_verdicts",
+     "why": "score-zero-says-why",
+     "doc": "score-zero-verdicts",
+     "illustration": null
+    },
+    {
+     "id": "sort",
+     "stage": 14,
+     "kind": "order",
+     "applies_to": "findings",
+     "why": "advisory-findings-first",
+     "doc": "score-sort",
+     "illustration": null
+    },
+    {
+     "id": "gate-bounded-new",
+     "stage": 15,
+     "kind": "gate",
+     "applies_to": "gate",
+     "cap_multiplier": 2,
+     "why": "new-fact-sets-level",
+     "doc": "score-gate-bounded-new",
+     "illustration": {
+      "score": 36,
+      "new": 16,
+      "gate": 32
+     }
+    },
+    {
+     "id": "baseline-cover",
+     "stage": 16,
+     "kind": "cover",
+     "applies_to": "gate",
+     "order": "flag_order",
+     "covers": "listed_and_below",
+     "why": "recorded-lead-covers-below",
+     "doc": "score-baseline-cover",
+     "illustration": null
+    }
+   ],
+   "docs": "https://lockrot.dev/verdicts/model-1/"
+  },
+  "score_rules_used": {
+   "counted": 0,
+   "lead-first": 4,
+   "corroborating-share": 4,
+   "advisory-points": 4,
+   "no-reachable-fix-multiplier": 0,
+   "security-max": 2,
+   "divide-reach": 0,
+   "security-exempt-from-reach": 1,
+   "sum": 1,
+   "divide-dev": 0,
+   "floor-once": 0,
+   "band-floors": 7,
+   "zero-verdicts": 0,
+   "sort": null,
+   "gate-bounded-new": 0,
+   "baseline-cover": 0
+  }
+ },
+ "activity_cache_oldest_at": "2026-10-01T16:03:43+00:00",
+ "activity_cache_age_hours": 1.6,
+ "packages_checked": 7,
+ "packages_flagged": 7,
+ "packages_multi_flag": 4,
+ "include_dev": false,
+ "not_from_composer_repository": 0,
+ "network_failures": false,
+ "counts": {
+  "critical": 3,
+  "high": 2,
+  "medium": 0,
+  "low": 2,
+  "unknown": 0,
+  "finished": 0,
+  "ok": 0
+ },
+ "abandoned": {
+  "total": 1,
+  "with_replacement": 1,
+  "with_suggestion": 0
+ },
+ "priorities": {
+  "critical": 3,
+  "high": 2,
+  "medium": 0,
+  "low": 2,
+  "none": 0
+ },
+ "flags": {
+  "abandoned": {
+   "carrying": 1,
+   "leading": 1,
+   "accepted": {
+    "all": 0,
+    "in_graded": 0
+   },
+   "by_verdict": {
+    "critical": 1,
+    "high": 0,
+    "medium": 0,
+    "low": 0
+   }
+  },
+  "silent": {
+   "carrying": 0,
+   "leading": 0,
+   "accepted": {
+    "all": 0,
+    "in_graded": 0
+   },
+   "by_verdict": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0
+   }
+  },
+  "pinned": {
+   "carrying": 1,
+   "leading": 1,
+   "accepted": {
+    "all": 0,
+    "in_graded": 0
+   },
+   "by_verdict": {
+    "critical": 0,
+    "high": 1,
+    "medium": 0,
+    "low": 0
+   }
+  },
+  "left-behind": {
+   "carrying": 1,
+   "leading": 1,
+   "accepted": {
+    "all": 0,
+    "in_graded": 0
+   },
+   "by_verdict": {
+    "critical": 1,
+    "high": 0,
+    "medium": 0,
+    "low": 0
+   }
+  },
+  "old-promise": {
+   "carrying": 3,
+   "leading": 1,
+   "accepted": {
+    "all": 0,
+    "in_graded": 0
+   },
+   "by_verdict": {
+    "critical": 2,
+    "high": 1,
+    "medium": 0,
+    "low": 0
+   }
+  },
+  "stale": {
+   "carrying": 2,
+   "leading": 0,
+   "accepted": {
+    "all": 0,
+    "in_graded": 0
+   },
+   "by_verdict": {
+    "critical": 0,
+    "high": 2,
+    "medium": 0,
+    "low": 0
+   }
+  },
+  "vulnerable": {
+   "carrying": 4,
+   "leading": null,
+   "accepted": null,
+   "by_verdict": {
+    "critical": 2,
+    "high": 0,
+    "medium": 0,
+    "low": 2
+   }
+  }
+ },
+ "exposure": [
+  {
+   "package": "friendsofsymfony/oauth-server-bundle",
+   "flagged": 1
+  }
+ ],
+ "exposure_rule": {
+  "max_fan_in": 8
+ },
+ "unattributed": [
+  {
+   "package": "league/config",
+   "verdict": "medium",
+   "lead": "stale",
+   "flag_ids": [
+    "stale"
+   ],
+   "fan_in": 9
+  }
+ ],
+ "libyears": {
+  "total": 17.85,
+  "direct_requirements": 17.85,
+  "measured": 5,
+  "unmeasured": {
+   "branch_snapshot": 1,
+   "no_stable_release_date": 1,
+   "not_from_composer_repository": 0,
+   "metadata_unavailable": 0
+  },
+  "furthest_behind": {
+   "package": "symfony/monolog-bridge",
+   "version": "v2.6.13",
+   "libyears": 10.62
+  },
+  "packages": 7
+ },
+ "baseline": null,
+ "gate": {
+  "fails": true,
+  "tripped_by": [
+   "fail_on"
+  ],
+  "fail_on_applied": true,
+  "reaching": 5,
+  "failing": 5,
+  "exempt": {
+   "baseline": 0
+  }
+ },
+ "security": {
+  "check": "complete",
+  "packages": {
+   "vulnerable": 4,
+   "unchecked": 0,
+   "ignored": 0,
+   "clear": 3
+  },
+  "advisories": {
+   "counted": 20,
+   "ignored": 0
+  },
+  "severities": {
+   "critical": 1,
+   "high": 4,
+   "medium": 4,
+   "unrated": 2,
+   "low": 9
+  },
+  "fixes": {
+   "update": 2,
+   "upgrade": 1,
+   "raise-php": 1,
+   "unknown": 0,
+   "blocked": 0,
+   "none": 0
+  },
+  "update_now": [
+   "symfony/yaml",
+   "symfony/polyfill-intl-idn"
+  ],
+  "update_now_command": [
+   "composer",
+   "update",
+   "symfony/yaml",
+   "symfony/polyfill-intl-idn"
+  ],
+  "fix_unknown": 0
+ },
+ "data_date": "2026-10-01T17:39:31+00:00",
+ "notes": [],
+ "note_details": [],
+ "findings": [
+  {
+   "package": "twig/twig",
+   "version": "v2.16.1",
+   "branch": "2.x",
+   "installed_php": {
+    "requires": ">=7.1.3",
+    "target_runs": true,
+    "project_allows": true
+   },
+   "verdict": "critical",
+   "priority": "critical",
+   "lead": null,
+   "rank": 1,
+   "flags": [
+    {
+     "id": "vulnerable",
+     "role": "security",
+     "baseline": null,
+     "signal_ids": [
+      "S9"
+     ],
+     "degree": null,
+     "headline": {
+      "unit": "advisories",
+      "value": 15,
+      "source": null
+     },
+     "summary": "15 advisories: 1 critical, 3 high, 4 medium, 2 unrated, 5 low — none fixed on 2.x; worst: CVE-2026-46633 PHP code injection via `{% use %}` template name"
+    }
+   ],
+   "score": {
+    "model": 1,
+    "total": 32,
+    "exact": 32,
+    "rounded_down": false,
+    "band": {
+     "floor": 32,
+     "next": null,
+     "to_next": null
+    },
+    "decided_by": "security",
+    "parts": {
+     "maintenance": {
+      "status": "none",
+      "contribution": 0,
+      "alone": {
+       "total": 0,
+       "verdict": null
+      }
+     },
+     "security": {
+      "status": "counted",
+      "contribution": 32,
+      "alone": {
+       "total": 32,
+       "verdict": "critical"
+      },
+      "of": 15,
+      "tied": []
+     }
+    },
+    "terms": [
+     {
+      "part": "security",
+      "flag": "vulnerable",
+      "role": "security",
+      "advisory": "PKSA-h8hf-ytnd-5t9q",
+      "severity": "critical",
+      "fix_kind": "raise-php",
+      "weight": 32,
+      "multiplier": 1,
+      "points": 32,
+      "contribution": 32
+     }
+    ],
+    "modifiers": [],
+    "accepted": [],
+    "without": [
+     {
+      "remove": {
+       "kind": "advisory",
+       "id": "PKSA-h8hf-ytnd-5t9q"
+      },
+      "revealed": [],
+      "total": 16,
+      "verdict": "high",
+      "lead": null,
+      "deciding_advisory": "PKSA-8zx5-v2nz-58pb",
+      "at_least": false
+     }
+    ],
+    "text": "32 = vulnerable 32 [critical advisory]"
+   },
+   "next_step": {
+    "kind": "raise-php",
+    "source": "vulnerable",
+    "merged": [],
+    "fix_kind": "raise-php",
+    "reason": null,
+    "replacement": null,
+    "quiet_years": null,
+    "to_branch": "3.x",
+    "version": "v3.27.0",
+    "newest": "v3.30.0",
+    "constraint": "^3.27.0",
+    "latest": null,
+    "php_check": {
+     "requires": ">=8.1.0",
+     "project_allows": false,
+     "target_runs": true,
+     "raise_to": ">=8.1",
+     "raise_size": "major"
+    },
+    "crosses_major": true,
+    "held_by": [
+     {
+      "source": "root",
+      "package": null,
+      "version": null,
+      "link": "require",
+      "constraint": "^2.0",
+      "holder": null
+     },
+     {
+      "source": "package",
+      "package": "symfony/twig-bridge",
+      "version": "v3.4.47",
+      "link": "require",
+      "constraint": "^1.41|^2.10",
+      "holder": {
+       "verdict": "high",
+       "lead": "left-behind",
+       "flag_ids": [
+        "left-behind",
+        "old-promise",
+        "vulnerable"
+       ],
+       "replacement": null,
+       "next_step": {
+        "kind": "require",
+        "to_branch": "4.x",
+        "constraint": "^4.4.51"
+       }
+      }
+     }
+    ],
+    "clears": [
+     {
+      "kind": "advisory",
+      "id": "PKSA-h8hf-ytnd-5t9q",
+      "basis": "outside_range"
+     },
+     {
+      "kind": "advisory",
+      "id": "PKSA-8zx5-v2nz-58pb",
+      "basis": "outside_range"
+     },
+     {
+      "kind": "advisory",
+      "id": "PKSA-gw7n-z4yx-7xjt",
+      "basis": "outside_range"
+     },
+     {
+      "kind": "advisory",
+      "id": "PKSA-dpx1-78wg-1kqs",
+      "basis": "outside_range"
+     },
+     {
+      "kind": "advisory",
+      "id": "PKSA-fbvq-z33h-r2np",
+      "basis": "outside_range"
+     },
+     {
+      "kind": "advisory",
+      "id": "PKSA-1tmc-rt7x-12w6",
+      "basis": "outside_range"
+     },
+     {
+      "kind": "advisory",
+      "id": "PKSA-xx6c-6d96-db2w",
+      "basis": "outside_range"
+     },
+     {
+      "kind": "advisory",
+      "id": "PKSA-3mcc-k66d-pydb",
+      "basis": "outside_range"
+     },
+     {
+      "kind": "advisory",
+      "id": "PKSA-g9zw-qxh8-pq8w",
+      "basis": "outside_range"
+     },
+     {
+      "kind": "advisory",
+      "id": "PKSA-sjvz-tbbr-vwth",
+      "basis": "outside_range"
+     },
+     {
+      "kind": "advisory",
+      "id": "PKSA-n14z-jjjg-g8vd",
+      "basis": "outside_range"
+     },
+     {
+      "kind": "advisory",
+      "id": "PKSA-yhcn-xrg3-68b1",
+      "basis": "outside_range"
+     },
+     {
+      "kind": "advisory",
+      "id": "PKSA-2wrf-1xmk-1pky",
+      "basis": "outside_range"
+     },
+     {
+      "kind": "advisory",
+      "id": "PKSA-yd6k-t2gh-1m43",
+      "basis": "outside_range"
+     },
+     {
+      "kind": "advisory",
+      "id": "PKSA-kvv6-36cr-fkzb",
+      "basis": "outside_range"
+     }
+    ],
+    "unverified": [],
+    "adds": [],
+    "leaves": [],
+    "clears_all": true,
+    "if_applied": {
+     "total": 0,
+     "verdict": "ok",
+     "lead": null,
+     "deciding_advisory": null,
+     "at_most": false,
+     "assumes": [
+      "clears_hold",
+      "composer_resolves"
+     ]
+    },
+    "composer_moves_because": [
+     "holders",
+     "crosses_major"
+    ],
+    "commands": [
+     [
+      "composer",
+      "require",
+      "php:>=8.1",
+      "--no-update"
+     ],
+     [
+      "composer",
+      "require",
+      "twig/twig:^3.27.0"
+     ]
+    ],
+    "through": [],
+    "also": [],
+    "text": "raise require.php to >=8.1, then require twig/twig ^3.27.0 — clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+   },
+   "security": {
+    "status": "vulnerable",
+    "check": "complete",
+    "complete": true,
+    "unchecked_reason": null,
+    "worst": "critical",
+    "counts": {
+     "critical": 1,
+     "high": 3,
+     "medium": 4,
+     "unrated": 2,
+     "low": 5
+    },
+    "ignored": [],
+    "ignored_count": 0,
+    "fix_kind": "raise-php",
+    "installed_branch_fixes": {
+     "fixed": 0,
+     "unknown": 0,
+     "of": 15,
+     "fix_kind": null,
+     "lowest": null,
+     "newest": "v2.16.1",
+     "held_by": [],
+     "if_applied": null
+    },
+    "move_in": "next_step",
+    "gets": null,
+    "partial": null
+   },
+   "checks_missing": [],
+   "checks_skipped": [],
+   "maintenance_judged": true,
+   "metadata": {
+    "status": "read",
+    "reason": null,
+    "message": null
+   },
+   "allowlist": null,
+   "from_composer_repository": true,
+   "origin": {
+    "kind": "packagist",
+    "registry": "packagist.org",
+    "package_url": "https://packagist.org/packages/twig/twig",
+    "local": false
+   },
+   "replacement": null,
+   "replacement_url": null,
+   "note": null,
+   "libyears_unmeasured": null,
+   "direct": true,
+   "dev": false,
+   "reach": "direct",
+   "chain": [
+    "twig/twig"
+   ],
+   "direct_dependents": [
+    "symfony/twig-bridge",
+    "twig/twig"
+   ],
+   "signals": [
+    {
+     "id": "S9",
+     "level": "high",
+     "summary": "15 advisories: 1 critical, 3 high, 4 medium, 2 unrated, 5 low — none fixed on 2.x; worst: CVE-2026-46633 PHP code injection via `{% use %}` template name",
+     "data": {
+      "advisories": [
+       {
+        "id": "PKSA-h8hf-ytnd-5t9q",
+        "cve": "CVE-2026-46633",
+        "title": "PHP code injection via `{% use %}` template name",
+        "link": "https://symfony.com/cve-2026-46633",
+        "reported_at": "2026-05-20T08:00:00+00:00",
+        "severity": "critical",
+        "severity_published": "critical",
+        "affected_versions": ">=1.0.0,<2.0.0|>=2.0.0,<3.0.0|>=3.0.0,<3.26.0",
+        "counted": true,
+        "points": 32,
+        "deciding": true,
+        "fix": {
+         "kind": "raise-php",
+         "to_branch": "3.x",
+         "version": "v3.26.0",
+         "newest": "v3.30.0",
+         "on_installed_branch": false,
+         "php": ">=8.1.0",
+         "held_by": [
+          {
+           "source": "root",
+           "package": null,
+           "version": null,
+           "link": "require",
+           "constraint": "^2.0",
+           "holder": null
+          },
+          {
+           "source": "package",
+           "package": "symfony/twig-bridge",
+           "version": "v3.4.47",
+           "link": "require",
+           "constraint": "^1.41|^2.10",
+           "holder": {
+            "verdict": "high",
+            "lead": "left-behind",
+            "flag_ids": [
+             "left-behind",
+             "old-promise",
+             "vulnerable"
+            ],
+            "replacement": null,
+            "next_step": {
+             "kind": "require",
+             "to_branch": "4.x",
+             "constraint": "^4.4.51"
+            }
+           }
+          }
+         ],
+         "reason": null
+        },
+        "baseline": null
+       },
+       {
+        "id": "PKSA-8zx5-v2nz-58pb",
+        "cve": "CVE-2026-49981",
+        "title": "Twig: Sandbox filter, tag and function allow-list bypass when sandbox state changes between renders for a cached `Template`",
+        "link": "https://github.com/advisories/GHSA-529h-vh3j-85hq",
+        "reported_at": "2026-07-01T18:55:49+00:00",
+        "severity": "high",
+        "severity_published": "high",
+        "affected_versions": "<=3.26.0",
+        "counted": true,
+        "points": 16,
+        "deciding": false,
+        "fix": {
+         "kind": "raise-php",
+         "to_branch": "3.x",
+         "version": null,
+         "newest": "v3.30.0",
+         "on_installed_branch": false,
+         "php": ">=8.1.0",
+         "held_by": [
+          {
+           "source": "root",
+           "package": null,
+           "version": null,
+           "link": "require",
+           "constraint": "^2.0",
+           "holder": null
+          },
+          {
+           "source": "package",
+           "package": "symfony/twig-bridge",
+           "version": "v3.4.47",
+           "link": "require",
+           "constraint": "^1.41|^2.10",
+           "holder": {
+            "verdict": "high",
+            "lead": "left-behind",
+            "flag_ids": [
+             "left-behind",
+             "old-promise",
+             "vulnerable"
+            ],
+            "replacement": null,
+            "next_step": {
+             "kind": "require",
+             "to_branch": "4.x",
+             "constraint": "^4.4.51"
+            }
+           }
+          }
+         ],
+         "reason": null
+        },
+        "baseline": null
+       },
+       {
+        "id": "PKSA-dpx1-78wg-1kqs",
+        "cve": "CVE-2026-47732",
+        "title": "Sandbox: multiple `__toString()` policy bypasses via unguarded string coercion points",
+        "link": "https://symfony.com/cve-2026-47732",
+        "reported_at": "2026-05-20T08:00:00+00:00",
+        "severity": "high",
+        "severity_published": "high",
+        "affected_versions": ">=1.0.0,<2.0.0|>=2.0.0,<3.0.0|>=3.0.0,<3.26.0",
+        "counted": true,
+        "points": 16,
+        "deciding": false,
+        "fix": {
+         "kind": "raise-php",
+         "to_branch": "3.x",
+         "version": "v3.26.0",
+         "newest": "v3.30.0",
+         "on_installed_branch": false,
+         "php": ">=8.1.0",
+         "held_by": [
+          {
+           "source": "root",
+           "package": null,
+           "version": null,
+           "link": "require",
+           "constraint": "^2.0",
+           "holder": null
+          },
+          {
+           "source": "package",
+           "package": "symfony/twig-bridge",
+           "version": "v3.4.47",
+           "link": "require",
+           "constraint": "^1.41|^2.10",
+           "holder": {
+            "verdict": "high",
+            "lead": "left-behind",
+            "flag_ids": [
+             "left-behind",
+             "old-promise",
+             "vulnerable"
+            ],
+            "replacement": null,
+            "next_step": {
+             "kind": "require",
+             "to_branch": "4.x",
+             "constraint": "^4.4.51"
+            }
+           }
+          }
+         ],
+         "reason": null
+        },
+        "baseline": null
+       },
+       {
+        "id": "PKSA-gw7n-z4yx-7xjt",
+        "cve": "CVE-2026-24425",
+        "title": "Possible sandbox bypass when using a source policy",
+        "link": "https://symfony.com/cve-2026-24425",
+        "reported_at": "2026-05-20T08:00:00+00:00",
+        "severity": "high",
+        "severity_published": "high",
+        "affected_versions": ">=2.16.0,<3.0.0|>=3.9.0,<3.26.0",
+        "counted": true,
+        "points": 16,
+        "deciding": false,
+        "fix": {
+         "kind": "raise-php",
+         "to_branch": "3.x",
+         "version": "v3.26.0",
+         "newest": "v3.30.0",
+         "on_installed_branch": false,
+         "php": ">=8.1.0",
+         "held_by": [
+          {
+           "source": "root",
+           "package": null,
+           "version": null,
+           "link": "require",
+           "constraint": "^2.0",
+           "holder": null
+          },
+          {
+           "source": "package",
+           "package": "symfony/twig-bridge",
+           "version": "v3.4.47",
+           "link": "require",
+           "constraint": "^1.41|^2.10",
+           "holder": {
+            "verdict": "high",
+            "lead": "left-behind",
+            "flag_ids": [
+             "left-behind",
+             "old-promise",
+             "vulnerable"
+            ],
+            "replacement": null,
+            "next_step": {
+             "kind": "require",
+             "to_branch": "4.x",
+             "constraint": "^4.4.51"
+            }
+           }
+          }
+         ],
+         "reason": null
+        },
+        "baseline": null
+       },
+       {
+        "id": "PKSA-1tmc-rt7x-12w6",
+        "cve": "CVE-2026-48806",
+        "title": "Sandbox `__toString()` policy bypass via dynamic mapping keys",
+        "link": "https://symfony.com/blog/cve-2026-48806-sandbox-tostring-policy-bypass-via-dynamic-mapping-keys",
+        "reported_at": "2026-05-27T15:00:00+00:00",
+        "severity": "medium",
+        "severity_published": "medium",
+        "affected_versions": ">=1.0.0,<2.0.0|>=2.0.0,<3.0.0|>=3.0.0,<3.27.0",
+        "counted": true,
+        "points": 8,
+        "deciding": false,
+        "fix": {
+         "kind": "raise-php",
+         "to_branch": "3.x",
+         "version": "v3.27.0",
+         "newest": "v3.30.0",
+         "on_installed_branch": false,
+         "php": ">=8.1.0",
+         "held_by": [
+          {
+           "source": "root",
+           "package": null,
+           "version": null,
+           "link": "require",
+           "constraint": "^2.0",
+           "holder": null
+          },
+          {
+           "source": "package",
+           "package": "symfony/twig-bridge",
+           "version": "v3.4.47",
+           "link": "require",
+           "constraint": "^1.41|^2.10",
+           "holder": {
+            "verdict": "high",
+            "lead": "left-behind",
+            "flag_ids": [
+             "left-behind",
+             "old-promise",
+             "vulnerable"
+            ],
+            "replacement": null,
+            "next_step": {
+             "kind": "require",
+             "to_branch": "4.x",
+             "constraint": "^4.4.51"
+            }
+           }
+          }
+         ],
+         "reason": null
+        },
+        "baseline": null
+       },
+       {
+        "id": "PKSA-3mcc-k66d-pydb",
+        "cve": "CVE-2026-46638",
+        "title": "`{% sandbox %}{% include %}` skips checkSecurity() on cached templates (incomplete fix for CVE-2024-45411)",
+        "link": "https://symfony.com/cve-2026-46638",
+        "reported_at": "2026-05-20T08:00:00+00:00",
+        "severity": "medium",
+        "severity_published": "medium",
+        "affected_versions": ">=1.0.0,<2.0.0|>=2.0.0,<3.0.0|>=3.0.0,<3.26.0",
+        "counted": true,
+        "points": 8,
+        "deciding": false,
+        "fix": {
+         "kind": "raise-php",
+         "to_branch": "3.x",
+         "version": "v3.26.0",
+         "newest": "v3.30.0",
+         "on_installed_branch": false,
+         "php": ">=8.1.0",
+         "held_by": [
+          {
+           "source": "root",
+           "package": null,
+           "version": null,
+           "link": "require",
+           "constraint": "^2.0",
+           "holder": null
+          },
+          {
+           "source": "package",
+           "package": "symfony/twig-bridge",
+           "version": "v3.4.47",
+           "link": "require",
+           "constraint": "^1.41|^2.10",
+           "holder": {
+            "verdict": "high",
+            "lead": "left-behind",
+            "flag_ids": [
+             "left-behind",
+             "old-promise",
+             "vulnerable"
+            ],
+            "replacement": null,
+            "next_step": {
+             "kind": "require",
+             "to_branch": "4.x",
+             "constraint": "^4.4.51"
+            }
+           }
+          }
+         ],
+         "reason": null
+        },
+        "baseline": null
+       },
+       {
+        "id": "PKSA-fbvq-z33h-r2np",
+        "cve": "CVE-2026-48808",
+        "title": "Sandbox property allowlist bypass via the `column` filter under `SourcePolicyInterface`",
+        "link": "https://symfony.com/blog/cve-2026-48808-sandbox-property-allowlist-bypass-via-the-column-filter-under-sourcepolicyinterface",
+        "reported_at": "2026-05-27T15:00:00+00:00",
+        "severity": "medium",
+        "severity_published": "medium",
+        "affected_versions": ">=1.0.0,<2.0.0|>=2.0.0,<3.0.0|>=3.0.0,<3.27.0",
+        "counted": true,
+        "points": 8,
+        "deciding": false,
+        "fix": {
+         "kind": "raise-php",
+         "to_branch": "3.x",
+         "version": "v3.27.0",
+         "newest": "v3.30.0",
+         "on_installed_branch": false,
+         "php": ">=8.1.0",
+         "held_by": [
+          {
+           "source": "root",
+           "package": null,
+           "version": null,
+           "link": "require",
+           "constraint": "^2.0",
+           "holder": null
+          },
+          {
+           "source": "package",
+           "package": "symfony/twig-bridge",
+           "version": "v3.4.47",
+           "link": "require",
+           "constraint": "^1.41|^2.10",
+           "holder": {
+            "verdict": "high",
+            "lead": "left-behind",
+            "flag_ids": [
+             "left-behind",
+             "old-promise",
+             "vulnerable"
+            ],
+            "replacement": null,
+            "next_step": {
+             "kind": "require",
+             "to_branch": "4.x",
+             "constraint": "^4.4.51"
+            }
+           }
+          }
+         ],
+         "reason": null
+        },
+        "baseline": null
+       },
+       {
+        "id": "PKSA-xx6c-6d96-db2w",
+        "cve": "CVE-2026-48807",
+        "title": "Sandbox `__toString()` policy bypass via `Traversable` in `join`/`replace` and `in`/`not in` operators",
+        "link": "https://symfony.com/blog/cve-2026-48807-sandbox-tostring-policy-bypass-via-traversable-in-join-replace-and-in-not-in-operators",
+        "reported_at": "2026-05-27T15:00:00+00:00",
+        "severity": "medium",
+        "severity_published": "medium",
+        "affected_versions": ">=1.0.0,<2.0.0|>=2.0.0,<3.0.0|>=3.0.0,<3.27.0",
+        "counted": true,
+        "points": 8,
+        "deciding": false,
+        "fix": {
+         "kind": "raise-php",
+         "to_branch": "3.x",
+         "version": "v3.27.0",
+         "newest": "v3.30.0",
+         "on_installed_branch": false,
+         "php": ">=8.1.0",
+         "held_by": [
+          {
+           "source": "root",
+           "package": null,
+           "version": null,
+           "link": "require",
+           "constraint": "^2.0",
+           "holder": null
+          },
+          {
+           "source": "package",
+           "package": "symfony/twig-bridge",
+           "version": "v3.4.47",
+           "link": "require",
+           "constraint": "^1.41|^2.10",
+           "holder": {
+            "verdict": "high",
+            "lead": "left-behind",
+            "flag_ids": [
+             "left-behind",
+             "old-promise",
+             "vulnerable"
+            ],
+            "replacement": null,
+            "next_step": {
+             "kind": "require",
+             "to_branch": "4.x",
+             "constraint": "^4.4.51"
+            }
+           }
+          }
+         ],
+         "reason": null
+        },
+        "baseline": null
+       },
+       {
+        "id": "PKSA-kvv6-36cr-fkzb",
+        "cve": "CVE-2026-46627",
+        "title": "Sandbox does not protect against resource exhaustion",
+        "link": "https://symfony.com/cve-2026-46627",
+        "reported_at": "2026-05-20T08:00:00+00:00",
+        "severity": "unrated",
+        "severity_published": null,
+        "affected_versions": ">=1.0.0,<2.0.0|>=2.0.0,<3.0.0|>=3.0.0,<3.26.0",
+        "counted": true,
+        "points": 8,
+        "deciding": false,
+        "fix": {
+         "kind": "raise-php",
+         "to_branch": "3.x",
+         "version": "v3.26.0",
+         "newest": "v3.30.0",
+         "on_installed_branch": false,
+         "php": ">=8.1.0",
+         "held_by": [
+          {
+           "source": "root",
+           "package": null,
+           "version": null,
+           "link": "require",
+           "constraint": "^2.0",
+           "holder": null
+          },
+          {
+           "source": "package",
+           "package": "symfony/twig-bridge",
+           "version": "v3.4.47",
+           "link": "require",
+           "constraint": "^1.41|^2.10",
+           "holder": {
+            "verdict": "high",
+            "lead": "left-behind",
+            "flag_ids": [
+             "left-behind",
+             "old-promise",
+             "vulnerable"
+            ],
+            "replacement": null,
+            "next_step": {
+             "kind": "require",
+             "to_branch": "4.x",
+             "constraint": "^4.4.51"
+            }
+           }
+          }
+         ],
+         "reason": null
+        },
+        "baseline": null
+       },
+       {
+        "id": "PKSA-yd6k-t2gh-1m43",
+        "cve": "CVE-2026-46636",
+        "title": "Sandbox filter, tag and function allow-list bypass when sandbox state changes between renders",
+        "link": "https://symfony.com/blog/cve-2026-46636-sandbox-filter-tag-and-function-allow-list-bypass-when-sandbox-state-changes-between-renders",
+        "reported_at": "2026-05-27T15:00:00+00:00",
+        "severity": "unrated",
+        "severity_published": null,
+        "affected_versions": ">=1.0.0,<2.0.0|>=2.0.0,<3.0.0|>=3.0.0,<3.27.0",
+        "counted": true,
+        "points": 8,
+        "deciding": false,
+        "fix": {
+         "kind": "raise-php",
+         "to_branch": "3.x",
+         "version": "v3.27.0",
+         "newest": "v3.30.0",
+         "on_installed_branch": false,
+         "php": ">=8.1.0",
+         "held_by": [
+          {
+           "source": "root",
+           "package": null,
+           "version": null,
+           "link": "require",
+           "constraint": "^2.0",
+           "holder": null
+          },
+          {
+           "source": "package",
+           "package": "symfony/twig-bridge",
+           "version": "v3.4.47",
+           "link": "require",
+           "constraint": "^1.41|^2.10",
+           "holder": {
+            "verdict": "high",
+            "lead": "left-behind",
+            "flag_ids": [
+             "left-behind",
+             "old-promise",
+             "vulnerable"
+            ],
+            "replacement": null,
+            "next_step": {
+             "kind": "require",
+             "to_branch": "4.x",
+             "constraint": "^4.4.51"
+            }
+           }
+          }
+         ],
+         "reason": null
+        },
+        "baseline": null
+       },
+       {
+        "id": "PKSA-2wrf-1xmk-1pky",
+        "cve": "CVE-2024-51755",
+        "title": "Unguarded calls to __isset() and to array-accesses when the sandbox is enabled",
+        "link": "https://symfony.com/blog/cve-2024-51755-unguarded-calls-to-isset-and-to-array-accesses-in-a-sandbox",
+        "reported_at": "2024-11-06T08:00:00+00:00",
+        "severity": "low",
+        "severity_published": "low",
+        "affected_versions": ">=1.0.0,<2.0.0|>=2.0.0,<3.0.0|>=3.0.0,<3.11.2|>=3.12.0,<3.14.1",
+        "counted": true,
+        "points": 2,
+        "deciding": false,
+        "fix": {
+         "kind": "raise-php",
+         "to_branch": "3.x",
+         "version": "v3.14.1",
+         "newest": "v3.30.0",
+         "on_installed_branch": false,
+         "php": ">=8.1.0",
+         "held_by": [
+          {
+           "source": "root",
+           "package": null,
+           "version": null,
+           "link": "require",
+           "constraint": "^2.0",
+           "holder": null
+          },
+          {
+           "source": "package",
+           "package": "symfony/twig-bridge",
+           "version": "v3.4.47",
+           "link": "require",
+           "constraint": "^1.41|^2.10",
+           "holder": {
+            "verdict": "high",
+            "lead": "left-behind",
+            "flag_ids": [
+             "left-behind",
+             "old-promise",
+             "vulnerable"
+            ],
+            "replacement": null,
+            "next_step": {
+             "kind": "require",
+             "to_branch": "4.x",
+             "constraint": "^4.4.51"
+            }
+           }
+          }
+         ],
+         "reason": null
+        },
+        "baseline": null
+       },
+       {
+        "id": "PKSA-g9zw-qxh8-pq8w",
+        "cve": "CVE-2026-48805",
+        "title": "Sandbox state regression in deprecated internal wrappers in `src/Resources/core.php`",
+        "link": "https://symfony.com/blog/cve-2026-48805-sandbox-state-regression-in-deprecated-internal-wrappers-in-src-resources-core-php",
+        "reported_at": "2026-05-27T15:00:00+00:00",
+        "severity": "low",
+        "severity_published": "low",
+        "affected_versions": ">=1.0.0,<2.0.0|>=2.0.0,<3.0.0|>=3.0.0,<3.27.0",
+        "counted": true,
+        "points": 2,
+        "deciding": false,
+        "fix": {
+         "kind": "raise-php",
+         "to_branch": "3.x",
+         "version": "v3.27.0",
+         "newest": "v3.30.0",
+         "on_installed_branch": false,
+         "php": ">=8.1.0",
+         "held_by": [
+          {
+           "source": "root",
+           "package": null,
+           "version": null,
+           "link": "require",
+           "constraint": "^2.0",
+           "holder": null
+          },
+          {
+           "source": "package",
+           "package": "symfony/twig-bridge",
+           "version": "v3.4.47",
+           "link": "require",
+           "constraint": "^1.41|^2.10",
+           "holder": {
+            "verdict": "high",
+            "lead": "left-behind",
+            "flag_ids": [
+             "left-behind",
+             "old-promise",
+             "vulnerable"
+            ],
+            "replacement": null,
+            "next_step": {
+             "kind": "require",
+             "to_branch": "4.x",
+             "constraint": "^4.4.51"
+            }
+           }
+          }
+         ],
+         "reason": null
+        },
+        "baseline": null
+       },
+       {
+        "id": "PKSA-n14z-jjjg-g8vd",
+        "cve": "CVE-2026-46635",
+        "title": "Sandbox property allowlist bypass via the `column` filter (array_column on objects)",
+        "link": "https://symfony.com/cve-2026-46635",
+        "reported_at": "2026-05-20T08:00:00+00:00",
+        "severity": "low",
+        "severity_published": "low",
+        "affected_versions": ">=1.0.0,<2.0.0|>=2.0.0,<3.0.0|>=3.0.0,<3.26.0",
+        "counted": true,
+        "points": 2,
+        "deciding": false,
+        "fix": {
+         "kind": "raise-php",
+         "to_branch": "3.x",
+         "version": "v3.26.0",
+         "newest": "v3.30.0",
+         "on_installed_branch": false,
+         "php": ">=8.1.0",
+         "held_by": [
+          {
+           "source": "root",
+           "package": null,
+           "version": null,
+           "link": "require",
+           "constraint": "^2.0",
+           "holder": null
+          },
+          {
+           "source": "package",
+           "package": "symfony/twig-bridge",
+           "version": "v3.4.47",
+           "link": "require",
+           "constraint": "^1.41|^2.10",
+           "holder": {
+            "verdict": "high",
+            "lead": "left-behind",
+            "flag_ids": [
+             "left-behind",
+             "old-promise",
+             "vulnerable"
+            ],
+            "replacement": null,
+            "next_step": {
+             "kind": "require",
+             "to_branch": "4.x",
+             "constraint": "^4.4.51"
+            }
+           }
+          }
+         ],
+         "reason": null
+        },
+        "baseline": null
+       },
+       {
+        "id": "PKSA-sjvz-tbbr-vwth",
+        "cve": "CVE-2026-46628",
+        "title": "The `spaceless` filter implicitly marks its output as safe",
+        "link": "https://symfony.com/cve-2026-46628",
+        "reported_at": "2026-05-20T08:00:00+00:00",
+        "severity": "low",
+        "severity_published": "low",
+        "affected_versions": ">=1.0.0,<2.0.0|>=2.0.0,<3.0.0|>=3.0.0,<3.26.0",
+        "counted": true,
+        "points": 2,
+        "deciding": false,
+        "fix": {
+         "kind": "raise-php",
+         "to_branch": "3.x",
+         "version": "v3.26.0",
+         "newest": "v3.30.0",
+         "on_installed_branch": false,
+         "php": ">=8.1.0",
+         "held_by": [
+          {
+           "source": "root",
+           "package": null,
+           "version": null,
+           "link": "require",
+           "constraint": "^2.0",
+           "holder": null
+          },
+          {
+           "source": "package",
+           "package": "symfony/twig-bridge",
+           "version": "v3.4.47",
+           "link": "require",
+           "constraint": "^1.41|^2.10",
+           "holder": {
+            "verdict": "high",
+            "lead": "left-behind",
+            "flag_ids": [
+             "left-behind",
+             "old-promise",
+             "vulnerable"
+            ],
+            "replacement": null,
+            "next_step": {
+             "kind": "require",
+             "to_branch": "4.x",
+             "constraint": "^4.4.51"
+            }
+           }
+          }
+         ],
+         "reason": null
+        },
+        "baseline": null
+       },
+       {
+        "id": "PKSA-yhcn-xrg3-68b1",
+        "cve": "CVE-2024-51754",
+        "title": "Unguarded calls to __toString() when nesting an object into an array",
+        "link": "https://symfony.com/blog/cve-2024-51754-unguarded-calls-to-tostring-in-a-sandbox-when-an-object-is-in-an-array-or-an-argument-list",
+        "reported_at": "2024-11-06T08:00:00+00:00",
+        "severity": "low",
+        "severity_published": "low",
+        "affected_versions": ">=1.0.0,<2.0.0|>=2.0.0,<3.0.0|>=3.0.0,<3.11.2|>=3.12.0,<3.14.1",
+        "counted": true,
+        "points": 2,
+        "deciding": false,
+        "fix": {
+         "kind": "raise-php",
+         "to_branch": "3.x",
+         "version": "v3.14.1",
+         "newest": "v3.30.0",
+         "on_installed_branch": false,
+         "php": ">=8.1.0",
+         "held_by": [
+          {
+           "source": "root",
+           "package": null,
+           "version": null,
+           "link": "require",
+           "constraint": "^2.0",
+           "holder": null
+          },
+          {
+           "source": "package",
+           "package": "symfony/twig-bridge",
+           "version": "v3.4.47",
+           "link": "require",
+           "constraint": "^1.41|^2.10",
+           "holder": {
+            "verdict": "high",
+            "lead": "left-behind",
+            "flag_ids": [
+             "left-behind",
+             "old-promise",
+             "vulnerable"
+            ],
+            "replacement": null,
+            "next_step": {
+             "kind": "require",
+             "to_branch": "4.x",
+             "constraint": "^4.4.51"
+            }
+           }
+          }
+         ],
+         "reason": null
+        },
+        "baseline": null
+       }
+      ],
+      "releases_read": true,
+      "complete": true
+     }
+    }
+   ],
+   "evidence": "vulnerable: 15 advisories: 1 critical, 3 high, 4 medium, 2 unrated, 5 low — none fixed on 2.x; worst: CVE-2026-46633 PHP code injection via `{% use %}` template name",
+   "allowlist_reason": null,
+   "data_date": "2026-10-01T17:41:20+00:00",
+   "libyears": 2.04,
+   "baseline": null,
+   "gate": {
+    "reaches_fail_on": true,
+    "fails": true,
+    "exempt_by": null,
+    "by": [
+     {
+      "value": "high",
+      "kind": "grade",
+      "facts": [
+       {
+        "kind": "advisory",
+        "id": "PKSA-h8hf-ytnd-5t9q"
+       }
+      ]
+     }
+    ],
+    "basis": null
+   }
+  },
+  {
+   "package": "symfony/monolog-bridge",
+   "version": "v2.6.13",
+   "branch": "2.x",
+   "installed_php": {
+    "requires": ">=5.3.3",
+    "target_runs": true,
+    "project_allows": true
+   },
+   "verdict": "critical",
+   "priority": "critical",
+   "lead": "left-behind",
+   "rank": 2,
+   "flags": [
+    {
+     "id": "left-behind",
+     "role": "lead",
+     "baseline": null,
+     "signal_ids": [
+      "S8"
+     ],
+     "degree": null,
+     "headline": {
+      "unit": "years",
+      "value": 6.9,
+      "source": "branch"
+     },
+     "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
+    },
+    {
+     "id": "old-promise",
+     "role": "corroborating",
+     "baseline": null,
+     "signal_ids": [
+      "S5"
+     ],
+     "degree": null,
+     "headline": {
+      "unit": "php",
+      "value": 5,
+      "source": null
+     },
+     "summary": "released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
+    },
+    {
+     "id": "vulnerable",
+     "role": "security",
+     "baseline": null,
+     "signal_ids": [
+      "S9"
+     ],
+     "degree": null,
+     "headline": {
+      "unit": "advisories",
+      "value": 1,
+      "source": null
+     },
+     "summary": "1 advisory: 1 high — none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener"
+    }
+   ],
+   "score": {
+    "model": 1,
+    "total": 36,
+    "exact": 36,
+    "rounded_down": false,
+    "band": {
+     "floor": 32,
+     "next": null,
+     "to_next": null
+    },
+    "decided_by": "combination",
+    "parts": {
+     "maintenance": {
+      "status": "counted",
+      "contribution": 20,
+      "alone": {
+       "total": 20,
+       "verdict": "high"
+      }
+     },
+     "security": {
+      "status": "counted",
+      "contribution": 16,
+      "alone": {
+       "total": 16,
+       "verdict": "high"
+      },
+      "of": 1,
+      "tied": []
+     }
+    },
+    "terms": [
+     {
+      "part": "maintenance",
+      "flag": "left-behind",
+      "role": "lead",
+      "weight": 16,
+      "divisor": 1,
+      "points": 16,
+      "contribution": 16
+     },
+     {
+      "part": "maintenance",
+      "flag": "old-promise",
+      "role": "corroborating",
+      "weight": 16,
+      "divisor": 4,
+      "points": 4,
+      "contribution": 4
+     },
+     {
+      "part": "security",
+      "flag": "vulnerable",
+      "role": "security",
+      "advisory": "PKSA-4wjj-gy1p-ft3r",
+      "severity": "high",
+      "fix_kind": "upgrade",
+      "weight": 16,
+      "multiplier": 1,
+      "points": 16,
+      "contribution": 16
+     }
+    ],
+    "modifiers": [],
+    "accepted": [],
+    "without": [
+     {
+      "remove": {
+       "kind": "flag",
+       "id": "left-behind"
+      },
+      "revealed": [],
+      "total": 32,
+      "verdict": "critical",
+      "lead": "old-promise",
+      "deciding_advisory": "PKSA-4wjj-gy1p-ft3r",
+      "at_least": false
+     },
+     {
+      "remove": {
+       "kind": "flag",
+       "id": "old-promise"
+      },
+      "revealed": [],
+      "total": 32,
+      "verdict": "critical",
+      "lead": "left-behind",
+      "deciding_advisory": "PKSA-4wjj-gy1p-ft3r",
+      "at_least": false
+     },
+     {
+      "remove": {
+       "kind": "flag",
+       "id": "vulnerable"
+      },
+      "revealed": [],
+      "total": 20,
+      "verdict": "high",
+      "lead": "left-behind",
+      "deciding_advisory": null,
+      "at_least": false
+     }
+    ],
+    "text": "36 = left-behind 16 + old-promise 4 [¼ of 16] + vulnerable 16 [high advisory]"
+   },
+   "next_step": {
+    "kind": "require",
+    "source": "left-behind",
+    "merged": [
+     "vulnerable"
+    ],
+    "fix_kind": "upgrade",
+    "reason": null,
+    "replacement": null,
+    "quiet_years": null,
+    "to_branch": "5.x",
+    "version": "v5.4.52",
+    "newest": "v5.4.52",
+    "constraint": "^5.4.52",
+    "latest": null,
+    "php_check": {
+     "requires": ">=7.2.5",
+     "project_allows": true,
+     "target_runs": true,
+     "raise_to": null,
+     "raise_size": null
+    },
+    "crosses_major": true,
+    "held_by": [
+     {
+      "source": "root",
+      "package": null,
+      "version": null,
+      "link": "require",
+      "constraint": "^2.6",
+      "holder": null
+     }
+    ],
+    "clears": [
+     {
+      "kind": "flag",
+      "id": "left-behind",
+      "basis": "branch_releasing"
+     },
+     {
+      "kind": "flag",
+      "id": "old-promise",
+      "basis": "released_after_ga"
+     },
+     {
+      "kind": "advisory",
+      "id": "PKSA-4wjj-gy1p-ft3r",
+      "basis": "outside_range"
+     }
+    ],
+    "unverified": [],
+    "adds": [],
+    "leaves": [],
+    "clears_all": true,
+    "if_applied": {
+     "total": 0,
+     "verdict": "ok",
+     "lead": null,
+     "deciding_advisory": null,
+     "at_most": false,
+     "assumes": [
+      "clears_hold",
+      "composer_resolves"
+     ]
+    },
+    "composer_moves_because": [
+     "crosses_major"
+    ],
+    "commands": [
+     [
+      "composer",
+      "require",
+      "symfony/monolog-bridge:^5.4.52"
+     ]
+    ],
+    "through": [],
+    "also": [],
+    "text": "require symfony/monolog-bridge ^5.4.52 — clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.6); a new major brings its own requirements, which lockrot does not solve"
+   },
+   "security": {
+    "status": "vulnerable",
+    "check": "complete",
+    "complete": true,
+    "unchecked_reason": null,
+    "worst": "high",
+    "counts": {
+     "critical": 0,
+     "high": 1,
+     "medium": 0,
+     "unrated": 0,
+     "low": 0
+    },
+    "ignored": [],
+    "ignored_count": 0,
+    "fix_kind": "upgrade",
+    "installed_branch_fixes": {
+     "fixed": 0,
+     "unknown": 0,
+     "of": 1,
+     "fix_kind": null,
+     "lowest": null,
+     "newest": "v2.8.52",
+     "held_by": [],
+     "if_applied": null
+    },
+    "move_in": "next_step",
+    "gets": {
+     "version": "v2.8.52",
+     "php_check": {
+      "requires": ">=5.3.9",
+      "project_allows": true,
+      "target_runs": true,
+      "raise_to": null,
+      "raise_size": null
+     },
+     "clears": [],
+     "clears_all": false
+    },
+    "partial": null
+   },
+   "checks_missing": [],
+   "checks_skipped": [],
+   "maintenance_judged": true,
+   "metadata": {
+    "status": "read",
+    "reason": null,
+    "message": null
+   },
+   "allowlist": null,
+   "from_composer_repository": true,
+   "origin": {
+    "kind": "packagist",
+    "registry": "packagist.org",
+    "package_url": "https://packagist.org/packages/symfony/monolog-bridge",
+    "local": false
+   },
+   "replacement": null,
+   "replacement_url": null,
+   "note": null,
+   "libyears_unmeasured": null,
+   "direct": true,
+   "dev": false,
+   "reach": "direct",
+   "chain": [
+    "symfony/monolog-bridge"
+   ],
+   "direct_dependents": [
+    "symfony/monolog-bridge"
+   ],
+   "signals": [
+    {
+     "id": "S5",
+     "level": "warn",
+     "summary": "released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+     "data": {
+      "target_php": "8.4",
+      "target_major": "8.0",
+      "ga_date": "2020-11-26",
+      "php_constraint": ">=5.3.3",
+      "written_for_php": 5,
+      "released": "2015-06-25T11:21:15+00:00"
+     }
+    },
+    {
+     "id": "S8",
+     "level": "high",
+     "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
+     "data": {
+      "branch": "2.x",
+      "branch_last_release": "2019-11-13T08:36:42+00:00",
+      "branch_last_version": "v2.8.52",
+      "years": 6.9,
+      "newest_branch": "6.x",
+      "newest_version": "v6.4.45",
+      "newest_release": "2026-08-30T01:18:12+00:00",
+      "newest_php": ">=8.1",
+      "newest_within_reach": false,
+      "floor_php": ">=7.2.5",
+      "floor_source": "project",
+      "reachable_branch": "5.x",
+      "reachable_version": "v5.4.52",
+      "reachable_release": "2026-05-07T16:46:23+00:00",
+      "suggested_constraint": "^5.4",
+      "dated_by": "symfony/symfony",
+      "reachable_php": ">=7.2.5",
+      "reachable_admits": {
+       "project": true,
+       "target": true
+      },
+      "newest_years": 0.1,
+      "reachable_years": 0.4
+     }
+    },
+    {
+     "id": "S9",
+     "level": "high",
+     "summary": "1 advisory: 1 high — none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
+     "data": {
+      "advisories": [
+       {
+        "id": "PKSA-4wjj-gy1p-ft3r",
+        "cve": "CVE-2026-45077",
+        "title": "Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
+        "link": "https://symfony.com/cve-2026-45077",
+        "reported_at": "2026-05-20T08:00:00+00:00",
+        "severity": "high",
+        "severity_published": "high",
+        "affected_versions": ">=2.0.0,<3.0.0|>=3.0.0,<4.0.0|>=4.0.0,<5.0.0|>=5.0.0,<5.1.0|>=5.1.0,<5.2.0|>=5.2.0,<5.3.0|>=5.3.0,<5.4.0|>=5.4.0,<5.4.52|>=6.0.0,<6.1.0|>=6.1.0,<6.2.0|>=6.2.0,<6.3.0|>=6.3.0,<6.4.0|>=6.4.0,<6.4.40|>=7.0.0,<7.1.0|>=7.1.0,<7.2.0|>=7.2.0,<7.3.0|>=7.3.0,<7.4.0|>=7.4.0,<7.4.12|>=8.0.0,<8.0.12",
+        "counted": true,
+        "points": 16,
+        "deciding": true,
+        "fix": {
+         "kind": "upgrade",
+         "to_branch": "5.x",
+         "version": "v5.4.52",
+         "newest": "v5.4.52",
+         "on_installed_branch": false,
+         "php": ">=7.2.5",
+         "held_by": [
+          {
+           "source": "root",
+           "package": null,
+           "version": null,
+           "link": "require",
+           "constraint": "^2.6",
+           "holder": null
+          }
+         ],
+         "reason": null
+        },
+        "baseline": null
+       }
+      ],
+      "releases_read": true,
+      "complete": true
+     }
+    }
+   ],
+   "evidence": "left-behind: branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07); old-promise: released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; vulnerable: 1 advisory: 1 high — none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
+   "allowlist_reason": null,
+   "data_date": "2026-10-01T17:39:31+00:00",
+   "libyears": 10.62,
+   "baseline": null,
+   "gate": {
+    "reaches_fail_on": true,
+    "fails": true,
+    "exempt_by": null,
+    "by": [
+     {
+      "value": "high",
+      "kind": "grade",
+      "facts": [
+       {
+        "kind": "flag",
+        "id": "left-behind"
+       },
+       {
+        "kind": "advisory",
+        "id": "PKSA-4wjj-gy1p-ft3r"
+       }
+      ]
+     }
+    ],
+    "basis": null
+   }
+  },
+  {
+   "package": "symfony/debug",
+   "version": "v3.4.47",
+   "branch": "3.x",
+   "installed_php": {
+    "requires": "^5.5.9|>=7.0.8",
+    "target_runs": true,
+    "project_allows": true
+   },
+   "verdict": "critical",
+   "priority": "critical",
+   "lead": "abandoned",
+   "rank": 3,
+   "flags": [
+    {
+     "id": "abandoned",
+     "role": "lead",
+     "baseline": null,
+     "signal_ids": [
+      "S1",
+      "S3",
+      "S2",
+      "S4"
+     ],
+     "degree": {
+      "reasons": [
+       "marked",
+       "archived"
+      ],
+      "liveness_complete": true
+     },
+     "headline": {
+      "unit": "reason",
+      "value": "archived",
+      "source": null
+     },
+     "summary": "marked abandoned by its registry, replacement: symfony/error-handler; its repository is archived on GitHub; last release 2022-07-28 (4.2 years ago); last push 2022-07-29 (4.2 years ago)"
+    },
+    {
+     "id": "old-promise",
+     "role": "corroborating",
+     "baseline": null,
+     "signal_ids": [
+      "S5"
+     ],
+     "degree": null,
+     "headline": {
+      "unit": "php",
+      "value": 5,
+      "source": null
+     },
+     "summary": "released 2020-10-24 for PHP 5 (php \"^5.5.9|>=7.0.8\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
+    }
+   ],
+   "score": {
+    "model": 1,
+    "total": 36,
+    "exact": 36,
+    "rounded_down": false,
+    "band": {
+     "floor": 32,
+     "next": null,
+     "to_next": null
+    },
+    "decided_by": "maintenance",
+    "parts": {
+     "maintenance": {
+      "status": "counted",
+      "contribution": 36,
+      "alone": {
+       "total": 36,
+       "verdict": "critical"
+      }
+     },
+     "security": {
+      "status": "clear",
+      "contribution": 0,
+      "alone": {
+       "total": 0,
+       "verdict": null
+      },
+      "of": 0,
+      "tied": []
+     }
+    },
+    "terms": [
+     {
+      "part": "maintenance",
+      "flag": "abandoned",
+      "role": "lead",
+      "weight": 32,
+      "divisor": 1,
+      "points": 32,
+      "contribution": 32
+     },
+     {
+      "part": "maintenance",
+      "flag": "old-promise",
+      "role": "corroborating",
+      "weight": 16,
+      "divisor": 4,
+      "points": 4,
+      "contribution": 4
+     }
+    ],
+    "modifiers": [],
+    "accepted": [],
+    "without": [
+     {
+      "remove": {
+       "kind": "flag",
+       "id": "abandoned"
+      },
+      "revealed": [
+       {
+        "flag": "stale",
+        "role": "corroborating"
+       }
+      ],
+      "total": 18,
+      "verdict": "high",
+      "lead": "old-promise",
+      "deciding_advisory": null,
+      "at_least": false
+     },
+     {
+      "remove": {
+       "kind": "flag",
+       "id": "old-promise"
+      },
+      "revealed": [],
+      "total": 32,
+      "verdict": "critical",
+      "lead": "abandoned",
+      "deciding_advisory": null,
+      "at_least": false
+     }
+    ],
+    "text": "36 = abandoned 32 + old-promise 4 [¼ of 16]"
+   },
+   "next_step": {
+    "kind": "replace",
+    "source": "abandoned",
+    "merged": [],
+    "fix_kind": null,
+    "reason": null,
+    "replacement": {
+     "package": "symfony/error-handler",
+     "suggestion": "symfony/error-handler",
+     "url": "https://packagist.org/packages/symfony/error-handler",
+     "named_by": "repository",
+     "finding": null
+    },
+    "quiet_years": null,
+    "to_branch": null,
+    "version": null,
+    "newest": null,
+    "constraint": null,
+    "latest": null,
+    "php_check": null,
+    "crosses_major": null,
+    "held_by": [],
+    "clears": [],
+    "unverified": [],
+    "adds": [],
+    "leaves": [
+     {
+      "kind": "flag",
+      "id": "abandoned"
+     },
+     {
+      "kind": "flag",
+      "id": "old-promise"
+     }
+    ],
+    "clears_all": false,
+    "if_applied": null,
+    "composer_moves_because": [],
+    "commands": [],
+    "through": [],
+    "also": [],
+    "text": "replace with symfony/error-handler (named by its registry)"
+   },
+   "security": {
+    "status": "clear",
+    "check": "complete",
+    "complete": true,
+    "unchecked_reason": null,
+    "ignored": [],
+    "ignored_count": 0
+   },
+   "checks_missing": [],
+   "checks_skipped": [],
+   "maintenance_judged": true,
+   "metadata": {
+    "status": "read",
+    "reason": null,
+    "message": null
+   },
+   "allowlist": null,
+   "from_composer_repository": true,
+   "origin": {
+    "kind": "packagist",
+    "registry": "packagist.org",
+    "package_url": "https://packagist.org/packages/symfony/debug",
+    "local": false
+   },
+   "replacement": "symfony/error-handler",
+   "replacement_url": "https://packagist.org/packages/symfony/error-handler",
+   "note": null,
+   "libyears_unmeasured": null,
+   "direct": true,
+   "dev": false,
+   "reach": "direct",
+   "chain": [
+    "symfony/debug"
+   ],
+   "direct_dependents": [
+    "symfony/console",
+    "symfony/debug",
+    "symfony/http-kernel"
+   ],
+   "signals": [
+    {
+     "id": "S1",
+     "level": "high",
+     "summary": "marked abandoned by its repository, replacement: symfony/error-handler",
+     "data": {
+      "replacement": "symfony/error-handler",
+      "marked_by": "repository",
+      "replacement_url": "https://packagist.org/packages/symfony/error-handler"
+     }
+    },
+    {
+     "id": "S2",
+     "level": "warn",
+     "summary": "last release 2022-07-28 (4.2 years ago)",
+     "data": {
+      "last_release": "2022-07-28T16:29:46+00:00",
+      "last_version": "v4.4.44",
+      "years": 4.2,
+      "dated_by": null
+     }
+    },
+    {
+     "id": "S3",
+     "level": "high",
+     "summary": "repository archived on GitHub",
+     "data": {
+      "repo": "symfony/debug",
+      "host": "github.com",
+      "forge": "github"
+     }
+    },
+    {
+     "id": "S4",
+     "level": "warn",
+     "summary": "last push 2022-07-29 (4.2 years ago)",
+     "data": {
+      "last_push": "2022-07-29T12:25:06+00:00",
+      "repo": "symfony/debug",
+      "host": "github.com",
+      "years": 4.2,
+      "forge": "github",
+      "activity": "push"
+     }
+    },
+    {
+     "id": "S5",
+     "level": "warn",
+     "summary": "released 2020-10-24 for PHP 5 (php \"^5.5.9|>=7.0.8\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+     "data": {
+      "target_php": "8.4",
+      "target_major": "8.0",
+      "ga_date": "2020-11-26",
+      "php_constraint": "^5.5.9|>=7.0.8",
+      "written_for_php": 5,
+      "released": "2020-10-24T10:57:07+00:00"
+     }
+    }
+   ],
+   "evidence": "",
+   "allowlist_reason": null,
+   "data_date": "2026-10-01T17:41:20+00:00",
+   "libyears": 1.76,
+   "baseline": null,
+   "gate": {
+    "reaches_fail_on": true,
+    "fails": true,
+    "exempt_by": null,
+    "by": [
+     {
+      "value": "high",
+      "kind": "grade",
+      "facts": [
+       {
+        "kind": "flag",
+        "id": "abandoned"
+       }
+      ]
+     }
+    ],
+    "basis": null
+   }
+  },
+  {
+   "package": "friendsofsymfony/oauth-server-bundle",
+   "version": "dev-master",
+   "branch": null,
+   "installed_php": {
+    "requires": "^7.2 || ^8.0",
+    "target_runs": true,
+    "project_allows": true
+   },
+   "verdict": "high",
+   "priority": "high",
+   "lead": "pinned",
+   "rank": 4,
+   "flags": [
+    {
+     "id": "pinned",
+     "role": "lead",
+     "baseline": null,
+     "signal_ids": [
+      "S6"
+     ],
+     "degree": null,
+     "headline": {
+      "unit": "reason",
+      "value": "branch_snapshot",
+      "source": null
+     },
+     "summary": "pinned to branch snapshot dev-master"
+    },
+    {
+     "id": "stale",
+     "role": "corroborating",
+     "baseline": null,
+     "signal_ids": [
+      "S2"
+     ],
+     "degree": {
+      "liveness_complete": true
+     },
+     "headline": {
+      "unit": "years",
+      "value": 7.7,
+      "source": "release"
+     },
+     "summary": "last release 2019-01-23 (7.7 years ago)"
+    }
+   ],
+   "score": {
+    "model": 1,
+    "total": 18,
+    "exact": 18,
+    "rounded_down": false,
+    "band": {
+     "floor": 16,
+     "next": "critical",
+     "to_next": 14
+    },
+    "decided_by": "maintenance",
+    "parts": {
+     "maintenance": {
+      "status": "counted",
+      "contribution": 18,
+      "alone": {
+       "total": 18,
+       "verdict": "high"
+      }
+     },
+     "security": {
+      "status": "clear",
+      "contribution": 0,
+      "alone": {
+       "total": 0,
+       "verdict": null
+      },
+      "of": 0,
+      "tied": []
+     }
+    },
+    "terms": [
+     {
+      "part": "maintenance",
+      "flag": "pinned",
+      "role": "lead",
+      "weight": 16,
+      "divisor": 1,
+      "points": 16,
+      "contribution": 16
+     },
+     {
+      "part": "maintenance",
+      "flag": "stale",
+      "role": "corroborating",
+      "weight": 8,
+      "divisor": 4,
+      "points": 2,
+      "contribution": 2
+     }
+    ],
+    "modifiers": [],
+    "accepted": [],
+    "without": [
+     {
+      "remove": {
+       "kind": "flag",
+       "id": "pinned"
+      },
+      "revealed": [],
+      "total": 8,
+      "verdict": "medium",
+      "lead": "stale",
+      "deciding_advisory": null,
+      "at_least": false
+     },
+     {
+      "remove": {
+       "kind": "flag",
+       "id": "stale"
+      },
+      "revealed": [],
+      "total": 16,
+      "verdict": "high",
+      "lead": "pinned",
+      "deciding_advisory": null,
+      "at_least": false
+     }
+    ],
+    "text": "18 = pinned 16 + stale 2 [¼ of 8]"
+   },
+   "next_step": {
+    "kind": "blocked",
+    "source": "pinned",
+    "merged": [],
+    "fix_kind": null,
+    "reason": null,
+    "replacement": null,
+    "quiet_years": null,
+    "to_branch": "1.x",
+    "version": null,
+    "newest": "1.6.2",
+    "constraint": null,
+    "latest": {
+     "version": "1.6.2",
+     "released": "2019-01-23T15:23:04+00:00",
+     "is_installed": false,
+     "relation": "older",
+     "snapshot_time": "2022-03-24T10:22:23+00:00"
+    },
+    "php_check": {
+     "requires": "^5.5|^7.0",
+     "project_allows": true,
+     "target_runs": false,
+     "raise_to": null,
+     "raise_size": null
+    },
+    "crosses_major": null,
+    "held_by": [],
+    "clears": [],
+    "unverified": [],
+    "adds": [],
+    "leaves": [
+     {
+      "kind": "flag",
+      "id": "pinned"
+     },
+     {
+      "kind": "flag",
+      "id": "stale"
+     }
+    ],
+    "clears_all": false,
+    "if_applied": null,
+    "composer_moves_because": [],
+    "commands": [],
+    "through": [],
+    "also": [],
+    "text": "no move runs on the target: the newest tag, 1.6.2, needs php ^5.5|^7.0 and the target php 8.4 does not run it; replace it"
+   },
+   "security": {
+    "status": "clear",
+    "check": "complete",
+    "complete": true,
+    "unchecked_reason": null,
+    "ignored": [],
+    "ignored_count": 0
+   },
+   "checks_missing": [],
+   "checks_skipped": [
+    {
+     "check": "release_branch",
+     "reason": "branch_snapshot",
+     "blocks": [
+      "S8"
+     ]
+    }
+   ],
+   "maintenance_judged": true,
+   "metadata": {
+    "status": "read",
+    "reason": null,
+    "message": null
+   },
+   "allowlist": null,
+   "from_composer_repository": true,
+   "origin": {
+    "kind": "packagist",
+    "registry": "packagist.org",
+    "package_url": "https://packagist.org/packages/friendsofsymfony/oauth-server-bundle",
+    "local": false
+   },
+   "replacement": null,
+   "replacement_url": null,
+   "note": null,
+   "libyears_unmeasured": "branch_snapshot",
+   "direct": true,
+   "dev": false,
+   "reach": "direct",
+   "chain": [
+    "friendsofsymfony/oauth-server-bundle"
+   ],
+   "direct_dependents": [
+    "friendsofsymfony/oauth-server-bundle"
+   ],
+   "signals": [
+    {
+     "id": "S2",
+     "level": "high",
+     "summary": "last release 2019-01-23 (7.7 years ago)",
+     "data": {
+      "last_release": "2019-01-23T15:23:04+00:00",
+      "last_version": "1.6.2",
+      "years": 7.7,
+      "dated_by": null
+     }
+    },
+    {
+     "id": "S6",
+     "level": "warn",
+     "summary": "pinned to branch snapshot dev-master",
+     "data": {
+      "version": "dev-master",
+      "reason": "branch_snapshot",
+      "has_stable_release": true,
+      "last_stable_release": "2019-01-23T15:23:04+00:00",
+      "last_stable_version": "1.6.2",
+      "last_stable_dated_by": null,
+      "snapshot_time": "2022-03-24T10:22:23+00:00",
+      "tag_relation": "older"
+     }
+    },
+    {
+     "id": "S7",
+     "level": "info",
+     "summary": "pulls in 1 flagged package: friendsofsymfony/oauth2-php (stale)",
+     "data": {
+      "flagged": 1,
+      "packages": [
+       {
+        "package": "friendsofsymfony/oauth2-php",
+        "chain": [
+         "friendsofsymfony/oauth-server-bundle",
+         "friendsofsymfony/oauth2-php"
+        ],
+        "verdict": "low",
+        "lead": "stale",
+        "flag_ids": [
+         "stale"
+        ]
+       }
+      ]
+     }
+    }
+   ],
+   "evidence": "pinned: pinned to branch snapshot dev-master; stale: last release 2019-01-23 (7.7 years ago)",
+   "allowlist_reason": null,
+   "data_date": "2026-10-01T17:39:46+00:00",
+   "libyears": null,
+   "baseline": null,
+   "gate": {
+    "reaches_fail_on": true,
+    "fails": true,
+    "exempt_by": null,
+    "by": [
+     {
+      "value": "high",
+      "kind": "grade",
+      "facts": [
+       {
+        "kind": "flag",
+        "id": "pinned"
+       }
+      ]
+     }
+    ],
+    "basis": null
+   }
+  },
+  {
+   "package": "tubalmartin/cssmin",
+   "version": "v4.1.1",
+   "branch": "4.x",
+   "installed_php": {
+    "requires": ">=5.3.2",
+    "target_runs": true,
+    "project_allows": true
+   },
+   "verdict": "high",
+   "priority": "high",
+   "lead": "old-promise",
+   "rank": 5,
+   "flags": [
+    {
+     "id": "old-promise",
+     "role": "lead",
+     "baseline": null,
+     "signal_ids": [
+      "S5"
+     ],
+     "degree": null,
+     "headline": {
+      "unit": "php",
+      "value": 5,
+      "source": null
+     },
+     "summary": "released 2018-01-15 for PHP 5 (php \">=5.3.2\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
+    },
+    {
+     "id": "stale",
+     "role": "corroborating",
+     "baseline": null,
+     "signal_ids": [
+      "S2"
+     ],
+     "degree": {
+      "liveness_complete": true
+     },
+     "headline": {
+      "unit": "years",
+      "value": 8.7,
+      "source": "release"
+     },
+     "summary": "last release 2018-01-15 (8.7 years ago)"
+    }
+   ],
+   "score": {
+    "model": 1,
+    "total": 18,
+    "exact": 18,
+    "rounded_down": false,
+    "band": {
+     "floor": 16,
+     "next": "critical",
+     "to_next": 14
+    },
+    "decided_by": "maintenance",
+    "parts": {
+     "maintenance": {
+      "status": "counted",
+      "contribution": 18,
+      "alone": {
+       "total": 18,
+       "verdict": "high"
+      }
+     },
+     "security": {
+      "status": "clear",
+      "contribution": 0,
+      "alone": {
+       "total": 0,
+       "verdict": null
+      },
+      "of": 0,
+      "tied": []
+     }
+    },
+    "terms": [
+     {
+      "part": "maintenance",
+      "flag": "old-promise",
+      "role": "lead",
+      "weight": 16,
+      "divisor": 1,
+      "points": 16,
+      "contribution": 16
+     },
+     {
+      "part": "maintenance",
+      "flag": "stale",
+      "role": "corroborating",
+      "weight": 8,
+      "divisor": 4,
+      "points": 2,
+      "contribution": 2
+     }
+    ],
+    "modifiers": [],
+    "accepted": [],
+    "without": [
+     {
+      "remove": {
+       "kind": "flag",
+       "id": "old-promise"
+      },
+      "revealed": [],
+      "total": 8,
+      "verdict": "medium",
+      "lead": "stale",
+      "deciding_advisory": null,
+      "at_least": false
+     },
+     {
+      "remove": {
+       "kind": "flag",
+       "id": "stale"
+      },
+      "revealed": [],
+      "total": 16,
+      "verdict": "high",
+      "lead": "old-promise",
+      "deciding_advisory": null,
+      "at_least": false
+     }
+    ],
+    "text": "18 = old-promise 16 + stale 2 [¼ of 8]"
+   },
+   "next_step": {
+    "kind": "test",
+    "source": "old-promise",
+    "merged": [],
+    "fix_kind": null,
+    "reason": null,
+    "replacement": null,
+    "quiet_years": null,
+    "to_branch": null,
+    "version": null,
+    "newest": null,
+    "constraint": null,
+    "latest": {
+     "version": "v4.1.1",
+     "released": "2018-01-15T15:26:51+00:00",
+     "is_installed": true,
+     "relation": null,
+     "snapshot_time": null
+    },
+    "php_check": null,
+    "crosses_major": null,
+    "held_by": [],
+    "clears": [],
+    "unverified": [],
+    "adds": [],
+    "leaves": [
+     {
+      "kind": "flag",
+      "id": "old-promise"
+     },
+     {
+      "kind": "flag",
+      "id": "stale"
+     }
+    ],
+    "clears_all": false,
+    "if_applied": null,
+    "composer_moves_because": [],
+    "commands": [],
+    "through": [],
+    "also": [],
+    "text": "test it on PHP 8.4 — v4.1.1 is its newest release"
+   },
+   "security": {
+    "status": "clear",
+    "check": "complete",
+    "complete": true,
+    "unchecked_reason": null,
+    "ignored": [],
+    "ignored_count": 0
+   },
+   "checks_missing": [],
+   "checks_skipped": [],
+   "maintenance_judged": true,
+   "metadata": {
+    "status": "read",
+    "reason": null,
+    "message": null
+   },
+   "allowlist": null,
+   "from_composer_repository": true,
+   "origin": {
+    "kind": "packagist",
+    "registry": "packagist.org",
+    "package_url": "https://packagist.org/packages/tubalmartin/cssmin",
+    "local": false
+   },
+   "replacement": null,
+   "replacement_url": null,
+   "note": null,
+   "libyears_unmeasured": null,
+   "direct": true,
+   "dev": false,
+   "reach": "direct",
+   "chain": [
+    "tubalmartin/cssmin"
+   ],
+   "direct_dependents": [
+    "tubalmartin/cssmin"
+   ],
+   "signals": [
+    {
+     "id": "S2",
+     "level": "high",
+     "summary": "last release 2018-01-15 (8.7 years ago)",
+     "data": {
+      "last_release": "2018-01-15T15:26:51+00:00",
+      "last_version": "v4.1.1",
+      "years": 8.7,
+      "dated_by": null
+     }
+    },
+    {
+     "id": "S5",
+     "level": "warn",
+     "summary": "released 2018-01-15 for PHP 5 (php \">=5.3.2\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+     "data": {
+      "target_php": "8.4",
+      "target_major": "8.0",
+      "ga_date": "2020-11-26",
+      "php_constraint": ">=5.3.2",
+      "written_for_php": 5,
+      "released": "2018-01-15T15:26:51+00:00"
+     }
+    }
+   ],
+   "evidence": "old-promise: released 2018-01-15 for PHP 5 (php \">=5.3.2\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; stale: last release 2018-01-15 (8.7 years ago)",
+   "allowlist_reason": null,
+   "data_date": "2026-10-01T17:40:04+00:00",
+   "libyears": 0,
+   "baseline": null,
+   "gate": {
+    "reaches_fail_on": true,
+    "fails": true,
+    "exempt_by": null,
+    "by": [
+     {
+      "value": "high",
+      "kind": "grade",
+      "facts": [
+       {
+        "kind": "flag",
+        "id": "old-promise"
+       }
+      ]
+     }
+    ],
+    "basis": null
+   }
+  },
+  {
+   "package": "symfony/yaml",
+   "version": "v5.4.23",
+   "branch": "5.x",
+   "installed_php": {
+    "requires": ">=7.2.5",
+    "target_runs": true,
+    "project_allows": true
+   },
+   "verdict": "low",
+   "priority": "low",
+   "lead": null,
+   "rank": 6,
+   "flags": [
+    {
+     "id": "vulnerable",
+     "role": "security",
+     "baseline": null,
+     "signal_ids": [
+      "S9"
+     ],
+     "degree": null,
+     "headline": {
+      "unit": "advisories",
+      "value": 3,
+      "source": null
+     },
+     "summary": "3 advisories: 3 low — all fixed on 5.x; worst: CVE-2026-45133 YAML Parser Stack Exhaustion via Unbounded Recursion in Nested Blocks, Sequences, and Mappings"
+    }
+   ],
+   "score": {
+    "model": 1,
+    "total": 2,
+    "exact": 2,
+    "rounded_down": false,
+    "band": {
+     "floor": 1,
+     "next": "medium",
+     "to_next": 6
+    },
+    "decided_by": "security",
+    "parts": {
+     "maintenance": {
+      "status": "none",
+      "contribution": 0,
+      "alone": {
+       "total": 0,
+       "verdict": null
+      }
+     },
+     "security": {
+      "status": "counted",
+      "contribution": 2,
+      "alone": {
+       "total": 2,
+       "verdict": "low"
+      },
+      "of": 3,
+      "tied": [
+       "PKSA-ft77-7h5f-p3r6",
+       "PKSA-v5yj-8nmz-sk2q"
+      ]
+     }
+    },
+    "terms": [
+     {
+      "part": "security",
+      "flag": "vulnerable",
+      "role": "security",
+      "advisory": "PKSA-b14r-zh1d-vdrc",
+      "severity": "low",
+      "fix_kind": "update",
+      "weight": 2,
+      "multiplier": 1,
+      "points": 2,
+      "contribution": 2
+     }
+    ],
+    "modifiers": [],
+    "accepted": [],
+    "without": [
+     {
+      "remove": {
+       "kind": "advisory",
+       "id": "PKSA-b14r-zh1d-vdrc"
+      },
+      "revealed": [],
+      "total": 2,
+      "verdict": "low",
+      "lead": null,
+      "deciding_advisory": "PKSA-ft77-7h5f-p3r6",
+      "at_least": false
+     }
+    ],
+    "text": "2 = vulnerable 2 [low advisory]"
+   },
+   "next_step": {
+    "kind": "update",
+    "source": "vulnerable",
+    "merged": [],
+    "fix_kind": "update",
+    "reason": null,
+    "replacement": null,
+    "quiet_years": null,
+    "to_branch": "5.x",
+    "version": "v5.4.52",
+    "newest": "v5.4.53",
+    "constraint": null,
+    "latest": null,
+    "php_check": {
+     "requires": ">=7.2.5",
+     "project_allows": true,
+     "target_runs": true,
+     "raise_to": null,
+     "raise_size": null
+    },
+    "crosses_major": false,
+    "held_by": [],
+    "clears": [
+     {
+      "kind": "advisory",
+      "id": "PKSA-v5yj-8nmz-sk2q",
+      "basis": "outside_range"
+     },
+     {
+      "kind": "advisory",
+      "id": "PKSA-ft77-7h5f-p3r6",
+      "basis": "outside_range"
+     },
+     {
+      "kind": "advisory",
+      "id": "PKSA-b14r-zh1d-vdrc",
+      "basis": "outside_range"
+     }
+    ],
+    "unverified": [],
+    "adds": [],
+    "leaves": [],
+    "clears_all": true,
+    "if_applied": {
+     "total": 0,
+     "verdict": "ok",
+     "lead": null,
+     "deciding_advisory": null,
+     "at_most": false,
+     "assumes": [
+      "clears_hold"
+     ]
+    },
+    "composer_moves_because": [],
+    "commands": [
+     [
+      "composer",
+      "update",
+      "symfony/yaml"
+     ]
+    ],
+    "through": [],
+    "also": [],
+    "text": "composer update symfony/yaml (gets v5.4.53) — clears 3 advisories"
+   },
+   "security": {
+    "status": "vulnerable",
+    "check": "complete",
+    "complete": true,
+    "unchecked_reason": null,
+    "worst": "low",
+    "counts": {
+     "critical": 0,
+     "high": 0,
+     "medium": 0,
+     "unrated": 0,
+     "low": 3
+    },
+    "ignored": [],
+    "ignored_count": 0,
+    "fix_kind": "update",
+    "installed_branch_fixes": {
+     "fixed": 3,
+     "unknown": 0,
+     "of": 3,
+     "fix_kind": "update",
+     "lowest": "v5.4.52",
+     "newest": "v5.4.53",
+     "held_by": [],
+     "if_applied": {
+      "total": 0,
+      "verdict": "ok",
+      "at_most": false,
+      "assumes": [
+       "clears_hold"
+      ]
+     }
+    },
+    "move_in": "next_step",
+    "gets": {
+     "version": "v5.4.53",
+     "php_check": {
+      "requires": ">=7.2.5",
+      "project_allows": true,
+      "target_runs": true,
+      "raise_to": null,
+      "raise_size": null
+     },
+     "clears": [
+      {
+       "kind": "advisory",
+       "id": "PKSA-v5yj-8nmz-sk2q",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-ft77-7h5f-p3r6",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-b14r-zh1d-vdrc",
+       "basis": "outside_range"
+      }
+     ],
+     "clears_all": true
+    },
+    "partial": null
+   },
+   "checks_missing": [],
+   "checks_skipped": [],
+   "maintenance_judged": true,
+   "metadata": {
+    "status": "read",
+    "reason": null,
+    "message": null
+   },
+   "allowlist": null,
+   "from_composer_repository": true,
+   "origin": {
+    "kind": "packagist",
+    "registry": "packagist.org",
+    "package_url": "https://packagist.org/packages/symfony/yaml",
+    "local": false
+   },
+   "replacement": null,
+   "replacement_url": null,
+   "note": null,
+   "libyears_unmeasured": null,
+   "direct": true,
+   "dev": false,
+   "reach": "direct",
+   "chain": [
+    "symfony/yaml"
+   ],
+   "direct_dependents": [
+    "symfony/yaml"
+   ],
+   "signals": [
+    {
+     "id": "S9",
+     "level": "warn",
+     "summary": "3 advisories: 3 low — all fixed on 5.x; worst: CVE-2026-45133 YAML Parser Stack Exhaustion via Unbounded Recursion in Nested Blocks, Sequences, and Mappings",
+     "data": {
+      "advisories": [
+       {
+        "id": "PKSA-b14r-zh1d-vdrc",
+        "cve": "CVE-2026-45133",
+        "title": "YAML Parser Stack Exhaustion via Unbounded Recursion in Nested Blocks, Sequences, and Mappings",
+        "link": "https://symfony.com/cve-2026-45133",
+        "reported_at": "2026-05-20T08:00:00+00:00",
+        "severity": "low",
+        "severity_published": "low",
+        "affected_versions": ">=2.0.0,<3.0.0|>=3.0.0,<4.0.0|>=4.0.0,<5.0.0|>=5.0.0,<5.1.0|>=5.1.0,<5.2.0|>=5.2.0,<5.3.0|>=5.3.0,<5.4.0|>=5.4.0,<5.4.52|>=6.0.0,<6.1.0|>=6.1.0,<6.2.0|>=6.2.0,<6.3.0|>=6.3.0,<6.4.0|>=6.4.0,<6.4.40|>=7.0.0,<7.1.0|>=7.1.0,<7.2.0|>=7.2.0,<7.3.0|>=7.3.0,<7.4.0|>=7.4.0,<7.4.12|>=8.0.0,<8.0.12",
+        "counted": true,
+        "points": 2,
+        "deciding": true,
+        "fix": {
+         "kind": "update",
+         "to_branch": "5.x",
+         "version": "v5.4.52",
+         "newest": "v5.4.53",
+         "on_installed_branch": true,
+         "php": ">=7.2.5",
+         "held_by": [],
+         "reason": null
+        },
+        "baseline": null
+       },
+       {
+        "id": "PKSA-ft77-7h5f-p3r6",
+        "cve": "CVE-2026-45305",
+        "title": "YAML Parser ReDoS via Catastrophic Backtracking in Parser::cleanup() Regex",
+        "link": "https://symfony.com/cve-2026-45305",
+        "reported_at": "2026-05-20T08:00:00+00:00",
+        "severity": "low",
+        "severity_published": "low",
+        "affected_versions": ">=2.0.0,<3.0.0|>=3.0.0,<4.0.0|>=4.0.0,<5.0.0|>=5.0.0,<5.1.0|>=5.1.0,<5.2.0|>=5.2.0,<5.3.0|>=5.3.0,<5.4.0|>=5.4.0,<5.4.52|>=6.0.0,<6.1.0|>=6.1.0,<6.2.0|>=6.2.0,<6.3.0|>=6.3.0,<6.4.0|>=6.4.0,<6.4.40|>=7.0.0,<7.1.0|>=7.1.0,<7.2.0|>=7.2.0,<7.3.0|>=7.3.0,<7.4.0|>=7.4.0,<7.4.12|>=8.0.0,<8.0.12",
+        "counted": true,
+        "points": 2,
+        "deciding": false,
+        "fix": {
+         "kind": "update",
+         "to_branch": "5.x",
+         "version": "v5.4.52",
+         "newest": "v5.4.53",
+         "on_installed_branch": true,
+         "php": ">=7.2.5",
+         "held_by": [],
+         "reason": null
+        },
+        "baseline": null
+       },
+       {
+        "id": "PKSA-v5yj-8nmz-sk2q",
+        "cve": "CVE-2026-45304",
+        "title": "YAML Parser Exponential Memory Allocation via Recursive Collection-Alias Expansion (\"Billion Laughs\")",
+        "link": "https://symfony.com/cve-2026-45304",
+        "reported_at": "2026-05-20T08:00:00+00:00",
+        "severity": "low",
+        "severity_published": "low",
+        "affected_versions": ">=2.0.0,<3.0.0|>=3.0.0,<4.0.0|>=4.0.0,<5.0.0|>=5.0.0,<5.1.0|>=5.1.0,<5.2.0|>=5.2.0,<5.3.0|>=5.3.0,<5.4.0|>=5.4.0,<5.4.52|>=6.0.0,<6.1.0|>=6.1.0,<6.2.0|>=6.2.0,<6.3.0|>=6.3.0,<6.4.0|>=6.4.0,<6.4.40|>=7.0.0,<7.1.0|>=7.1.0,<7.2.0|>=7.2.0,<7.3.0|>=7.3.0,<7.4.0|>=7.4.0,<7.4.12|>=8.0.0,<8.0.12",
+        "counted": true,
+        "points": 2,
+        "deciding": false,
+        "fix": {
+         "kind": "update",
+         "to_branch": "5.x",
+         "version": "v5.4.52",
+         "newest": "v5.4.53",
+         "on_installed_branch": true,
+         "php": ">=7.2.5",
+         "held_by": [],
+         "reason": null
+        },
+        "baseline": null
+       }
+      ],
+      "releases_read": true,
+      "complete": true
+     }
+    }
+   ],
+   "evidence": "vulnerable: 3 advisories: 3 low — all fixed on 5.x; worst: CVE-2026-45133 YAML Parser Stack Exhaustion via Unbounded Recursion in Nested Blocks, Sequences, and Mappings",
+   "allowlist_reason": null,
+   "data_date": "2026-10-01T17:41:33+00:00",
+   "libyears": 3.43,
+   "baseline": null,
+   "gate": {
+    "reaches_fail_on": false,
+    "fails": false,
+    "exempt_by": null,
+    "by": [],
+    "basis": null
+   }
+  },
+  {
+   "package": "symfony/polyfill-intl-idn",
+   "version": "v1.37.0",
+   "branch": "1.x",
+   "installed_php": {
+    "requires": ">=7.2",
+    "target_runs": true,
+    "project_allows": true
+   },
+   "verdict": "low",
+   "priority": "low",
+   "lead": null,
+   "rank": 7,
+   "flags": [
+    {
+     "id": "vulnerable",
+     "role": "security",
+     "baseline": null,
+     "signal_ids": [
+      "S9"
+     ],
+     "degree": null,
+     "headline": {
+      "unit": "advisories",
+      "value": 1,
+      "source": null
+     },
+     "summary": "1 advisory: 1 low — all fixed on 1.x; advisory: CVE-2026-46644 symfony/polyfill-intl-idn accepts xn-- labels whose Punycode payload decodes to ASCII-only: insecure equivalence"
+    }
+   ],
+   "score": {
+    "model": 1,
+    "total": 2,
+    "exact": 2,
+    "rounded_down": false,
+    "band": {
+     "floor": 1,
+     "next": "medium",
+     "to_next": 6
+    },
+    "decided_by": "security",
+    "parts": {
+     "maintenance": {
+      "status": "none",
+      "contribution": 0,
+      "alone": {
+       "total": 0,
+       "verdict": null
+      }
+     },
+     "security": {
+      "status": "counted",
+      "contribution": 2,
+      "alone": {
+       "total": 2,
+       "verdict": "low"
+      },
+      "of": 1,
+      "tied": []
+     }
+    },
+    "terms": [
+     {
+      "part": "security",
+      "flag": "vulnerable",
+      "role": "security",
+      "advisory": "PKSA-dwsq-ppd2-mb1x",
+      "severity": "low",
+      "fix_kind": "update",
+      "weight": 2,
+      "multiplier": 1,
+      "points": 2,
+      "contribution": 2
+     }
+    ],
+    "modifiers": [
+     {
+      "reason": "transitive",
+      "applies_to": "maintenance",
+      "divide_by": 2,
+      "before": 0,
+      "after": 0
+     }
+    ],
+    "accepted": [],
+    "without": [],
+    "text": "2 = vulnerable 2 [low advisory]"
+   },
+   "next_step": {
+    "kind": "update",
+    "source": "vulnerable",
+    "merged": [],
+    "fix_kind": "update",
+    "reason": null,
+    "replacement": null,
+    "quiet_years": null,
+    "to_branch": "1.x",
+    "version": "v1.38.1",
+    "newest": "v1.43.0",
+    "constraint": null,
+    "latest": null,
+    "php_check": {
+     "requires": ">=7.2",
+     "project_allows": true,
+     "target_runs": true,
+     "raise_to": null,
+     "raise_size": null
+    },
+    "crosses_major": false,
+    "held_by": [],
+    "clears": [
+     {
+      "kind": "advisory",
+      "id": "PKSA-dwsq-ppd2-mb1x",
+      "basis": "outside_range"
+     }
+    ],
+    "unverified": [],
+    "adds": [],
+    "leaves": [],
+    "clears_all": true,
+    "if_applied": {
+     "total": 0,
+     "verdict": "finished",
+     "lead": null,
+     "deciding_advisory": null,
+     "at_most": false,
+     "assumes": [
+      "clears_hold"
+     ]
+    },
+    "composer_moves_because": [],
+    "commands": [
+     [
+      "composer",
+      "update",
+      "symfony/polyfill-intl-idn"
+     ],
+     [
+      "composer",
+      "why-not",
+      "guzzlehttp/guzzle",
+      "8.2.0"
+     ]
+    ],
+    "through": [
+     {
+      "package": "guzzlehttp/guzzle",
+      "installed_version": "6.5.8",
+      "installed_requires": true,
+      "newest_stable": {
+       "version": "8.2.0",
+       "released": "2026-09-06T13:55:09+00:00"
+      },
+      "newest_requires": false,
+      "newest_requires_unmeasured": null
+     }
+    ],
+    "also": [],
+    "text": "composer update symfony/polyfill-intl-idn (gets v1.43.0) — clears the advisory"
+   },
+   "security": {
+    "status": "vulnerable",
+    "check": "complete",
+    "complete": true,
+    "unchecked_reason": null,
+    "worst": "low",
+    "counts": {
+     "critical": 0,
+     "high": 0,
+     "medium": 0,
+     "unrated": 0,
+     "low": 1
+    },
+    "ignored": [],
+    "ignored_count": 0,
+    "fix_kind": "update",
+    "installed_branch_fixes": {
+     "fixed": 1,
+     "unknown": 0,
+     "of": 1,
+     "fix_kind": "update",
+     "lowest": "v1.38.1",
+     "newest": "v1.43.0",
+     "held_by": [],
+     "if_applied": {
+      "total": 0,
+      "verdict": "finished",
+      "at_most": false,
+      "assumes": [
+       "clears_hold"
+      ]
+     }
+    },
+    "move_in": "next_step",
+    "gets": {
+     "version": "v1.43.0",
+     "php_check": {
+      "requires": ">=7.2",
+      "project_allows": true,
+      "target_runs": true,
+      "raise_to": null,
+      "raise_size": null
+     },
+     "clears": [
+      {
+       "kind": "advisory",
+       "id": "PKSA-dwsq-ppd2-mb1x",
+       "basis": "outside_range"
+      }
+     ],
+     "clears_all": true
+    },
+    "partial": null
+   },
+   "checks_missing": [],
+   "checks_skipped": [
+    {
+     "check": "repository_activity",
+     "reason": "allowlisted",
+     "blocks": [
+      "S3",
+      "S4"
+     ]
+    }
+   ],
+   "maintenance_judged": true,
+   "metadata": {
+    "status": "read",
+    "reason": null,
+    "message": null
+   },
+   "allowlist": {
+    "by": "builtin",
+    "pattern": "symfony/polyfill-*",
+    "version": null,
+    "reason": "polyfills for PHP extensions; released with Symfony and complete for the API of the extension they replace",
+    "reason_id": "symfony-extension-polyfills",
+    "reason_by": "lockrot",
+    "expires": null,
+    "flag_ids": null
+   },
+   "from_composer_repository": true,
+   "origin": {
+    "kind": "packagist",
+    "registry": "packagist.org",
+    "package_url": "https://packagist.org/packages/symfony/polyfill-intl-idn",
+    "local": false
+   },
+   "replacement": null,
+   "replacement_url": null,
+   "note": null,
+   "libyears_unmeasured": "no_stable_release_date",
+   "direct": false,
+   "dev": false,
+   "reach": "transitive",
+   "chain": [
+    "guzzlehttp/guzzle",
+    "symfony/polyfill-intl-idn"
+   ],
+   "direct_dependents": [
+    "guzzlehttp/guzzle"
+   ],
+   "signals": [
+    {
+     "id": "S9",
+     "level": "warn",
+     "summary": "1 advisory: 1 low — all fixed on 1.x; advisory: CVE-2026-46644 symfony/polyfill-intl-idn accepts xn-- labels whose Punycode payload decodes to ASCII-only: insecure equivalence",
+     "data": {
+      "advisories": [
+       {
+        "id": "PKSA-dwsq-ppd2-mb1x",
+        "cve": "CVE-2026-46644",
+        "title": "symfony/polyfill-intl-idn accepts xn-- labels whose Punycode payload decodes to ASCII-only: insecure equivalence",
+        "link": "https://symfony.com/cve-2026-46644",
+        "reported_at": "2026-05-26T08:00:00+00:00",
+        "severity": "low",
+        "severity_published": "low",
+        "affected_versions": ">=1.17.1,<1.38.1",
+        "counted": true,
+        "points": 2,
+        "deciding": true,
+        "fix": {
+         "kind": "update",
+         "to_branch": "1.x",
+         "version": "v1.38.1",
+         "newest": "v1.43.0",
+         "on_installed_branch": true,
+         "php": ">=7.2",
+         "held_by": [],
+         "reason": null
+        },
+        "baseline": null
+       }
+      ],
+      "releases_read": true,
+      "complete": true
+     }
+    }
+   ],
+   "evidence": "vulnerable: 1 advisory: 1 low — all fixed on 1.x; advisory: CVE-2026-46644 symfony/polyfill-intl-idn accepts xn-- labels whose Punycode payload decodes to ASCII-only: insecure equivalence",
+   "allowlist_reason": "polyfills for PHP extensions; released with Symfony and complete for the API of the extension they replace",
+   "data_date": "2026-10-01T17:41:20+00:00",
+   "libyears": null,
+   "baseline": null,
+   "gate": {
+    "reaches_fail_on": false,
+    "fails": false,
+    "exempt_by": null,
+    "by": [],
+    "basis": null
+   }
+  }
+ ]
+}

@@ -61,6 +61,16 @@ jobs:
       - run: vendor/bin/php-cs-fixer fix --dry-run --diff
       - run: vendor/bin/phpstan analyse --memory-limit=1G
       - run: vendor/bin/phpstan analyse -c phpstan.tests.neon.dist --memory-limit=1G
+      # tools/schema writes the -2 schemas and their negative fixtures (tools/schema/README.md). An edit
+      # of a generated file, or a builder change committed without its output, fails here.
+      - name: The generated schemas and negatives match tools/schema
+        run: |
+          python3 tools/schema/build_report2_schema.py
+          python3 tools/schema/build_other_schemas.py
+          python3 tools/schema/make_negatives.py
+          python3 tools/schema/make_negatives_other.py explain-2
+          git add --intent-to-add tests/fixtures/schema/negative
+          git diff --exit-code -- resources/lockrot-report-2.schema.json resources/lockrot-explain-2.schema.json tests/fixtures/schema/negative
       - name: composer-require-checker
         run: |
           composer global require --no-interaction "maglnet/composer-require-checker:^4.24"
