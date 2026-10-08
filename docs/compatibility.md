@@ -59,6 +59,7 @@ Nothing is added to these sets, removed from them or reordered within 1.x:
 
 - Verdicts, most severe first: `abandoned`, `silent`, `pinned`, `left-behind`, `old-promise`, `stale`, `unknown`, `finished`, `ok`.
 - Priorities, highest first: `critical`, `high`, `medium`, `low`, `none`.
+- Grades, highest first: `critical`, `high`, `medium`, `low`.
 - Signal levels, lowest first: `info`, `warn`, `high`.
 - A finding's standing against the baseline: `known`, `new`, `worsened`.
 - A `priority_basis` step's `from` and `to`: the priority order without `none`.
@@ -67,11 +68,11 @@ The document number `lockrot.schema` is `1` for all of 1.x. A new verdict, prior
 standing needs report-2 and lockrot 2.0. [verdicts.md](verdicts.md#the-nine-verdicts) says what each
 value means.
 
-- The flagged verdicts are `abandoned` to `stale`: the ones `run.flagged_verdicts` lists, a baseline
-  entry holds and `--fail-on` accepts.
+- The flagged verdicts are `abandoned` to `stale`: the ones a baseline entry holds and `--fail-on`
+  accepts. report-2 lists its grades in `run.graded_verdicts` and its flags in `run.flag_ids`.
 
 - `finished` and `ok` share the lowest severity: no threshold and no comparison tells them apart.
-  Where lockrot lists verdicts — `counts`, `run.flagged_verdicts`, the schema enums, this page —
+  Where lockrot lists verdicts — `counts`, `run.graded_verdicts`, the schema enums, this page —
   `finished` comes before `ok`. In SARIF output, the SARIF rules appear in the order the results
   first use them.
 

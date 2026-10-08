@@ -136,22 +136,48 @@ The canonical list of what lockrot reads, writes and contacts is
 ## Changing a schema
 
 The published schemas are `resources/lockrot-<document>-<number>.schema.json`, one file per
-document and schema number. Under one schema number they only widen:
-`tests/Integration/SchemaEvolutionTest.php` holds them to every release's copy in
-`tests/fixtures/schema-evolution/schemas/<version>/`. It also holds them to the documents that
-older release PHARs wrote, in `tests/fixtures/schema-evolution/<version>/`. Pinned hashes freeze
-both fixture sets. If the test fails, fix the schema change, never the fixture.
+document and schema number. `tools/schema/` writes the files from number 2 on and their negative
+fixtures ([tools/schema/README.md](tools/schema/README.md)). Do not edit one of those files by
+hand. The `-1` files keep the bytes that v0.13.0 published.
+
+To change a generated schema:
+
+1. Edit its builder in `tools/schema/`.
+2. Rebuild the schemas and the negatives:
+
+    ```bash
+    python3 tools/schema/build_report2_schema.py
+    python3 tools/schema/build_other_schemas.py
+    python3 tools/schema/make_negatives.py
+    python3 tools/schema/make_negatives_other.py explain-2
+    ```
+
+3. Commit the builder and what it wrote in one commit.
+
+The CI step "The generated schemas and negatives match tools/schema" runs the same commands and
+fails on a difference. `tests/Integration/SchemaRebuildTest.php` proves that the step catches a
+hand edit.
+
+Under one schema number the files only widen: `tests/Integration/SchemaEvolutionTest.php` holds
+them to every release's copy in `tests/fixtures/schema-evolution/schemas/<version>/`. It also holds
+them to the documents that older release PHARs wrote, in `tests/fixtures/schema-evolution/<version>/`.
+Pinned hashes freeze both fixture sets. If the test fails, fix the schema change, never the fixture.
 
 | Change | Also required |
 |---|---|
-| A new value in an open set | Add it to that node's `x-known-values`, never to an `enum`. `tests/Unit/Verdict/ClosedSetsTest.php` holds each list to the code |
-| A new open set | Register its node, pattern, values and doc phrase in `openSets()` in `ClosedSetsTest`. Name it in the list after "Objects are open" in [Open sets](docs/schema.md#open-sets), which `ClosedSetsTest` reads |
+| A new value in an open set | Add it to the builder's `x-known-values` list, never to an `enum`. `tests/Unit/Json/KnownValuesRegistryTest.php` holds each list to the code |
+| A new open set | Add a row for its place to `KnownValuesRegistryTest`. Name it in the list after "Objects are open" in [Open sets](docs/schema.md#open-sets), which `ClosedSetsTest` reads |
+| A new relation (a described `allOf` entry) | Add a case that breaks it to `tools/schema/make_negatives.py`. `SchemaRelationsTest` needs a document that reaches each relation and a negative that breaks it |
+| A new description | Keep it free of design references and draft history: `SchemaDescriptionsTest` applies the pattern of `tools/schema/ship_text.py` |
 | A new signal | [Adding a signal](#adding-a-signal) |
 | A new run note code | [Adding a run note code](#adding-a-run-note-code) |
 | A new value in a closed set | Not possible under the same schema number ([Closed sets](docs/compatibility.md#closed-sets-and-their-order)) |
 
 The widening check reads `x-known-values` as an enum on both sides: a value added there is a
-widening, a value dropped is a narrowing.
+widening, a value dropped is a narrowing. `ClosedSetsTest` keeps its checks of the `-1` files.
+
+The steps below name the schema files. For a file from number 2 on, make each edit in its builder
+and rebuild.
 
 ### Adding a signal
 
