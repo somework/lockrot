@@ -15,6 +15,8 @@ start the reason with `in method():`.
 - `src/Allowlist/AllowlistEntry.php` AssignCoalesce `$parser = self::$parser ??= new VersionParser();` — a memo. `VersionParser` has no state, so a new instance normalises the same way.
 - `src/Allowlist/ProjectIgnoreList.php` DecrementInteger `if (!checkdate((int) $matches[2], (int) $matches[3], (int) $matches[1])) {` — `(int)` of the whole `YYYY-MM-DD` match is the year, so `$matches[0]` and `$matches[1]` give the same integer.
 - `src/Allowlist/ProjectIgnoreList.php` Concat `return new \DateTimeImmutable($expires.'T23:59:59+00:00');` — the PHP date parser reads the date and the time in either order, so the swapped operands give the same instant.
+- `src/Allowlist/BuiltinAllowlist.php` CastString `$ids[] = (string) $entry->reasonId();` — every built-in entry has an id, because `load()` rejects an entry without one, so the cast never changes a value.
+- `src/Allowlist/BuiltinAllowlist.php` CastString `$ids[] = (string) AllowlistEntry::forType($type)->reasonId();` — `forType()` always sets the id `type-<type>`, so the cast never changes a value.
 
 ## src/Analyzer
 
@@ -51,6 +53,7 @@ start the reason with `in method():`.
 - `src/Composer/LockrotCommand.php` Ternary, FalseValue `$composer = method_exists($this, 'tryComposer') ? $this->tryComposer() : $this->getComposer(false);` — the vendored Composer has `tryComposer()`, and its `getComposer(false)` calls `tryComposer()`.
 - `src/Composer/SelfUpdateCommand.php` FalseValue `$phar = $this->runningPhar ?? \Phar::running(false);` — the two calls differ only inside a running PHAR. Infection does not run the e2e `PharTest`.
 - `src/Composer/SelfUpdateCommand.php` FunctionCallRemoval `class_exists(TerminalText::class);` — the call loads the class before the archive is replaced. From the source tree the autoloader also finds it later.
+- `src/Composer/LockrotCommand.php` Coalesce `$lockrot->project() ?? $project->name(),` — in explain(): explain-2 writes no `run.project`, so no output reads the project name of this run.
 
 ## src/Config
 
@@ -116,6 +119,7 @@ start the reason with `in method():`.
 - `src/Output/ReportTarget.php` GreaterThan `if (strpos($spec, $known.':') === 0 && \strlen($known) > \strlen($format)) {` — two format names of one length cannot both start a spec before its colon, so `>=` picks the same name.
 - `src/Output/TableFormatter.php` CastString `return $finding->verdict().' (was '.(string) $baseline->previousVerdictOf($finding->package()).')';` — `previousVerdictOf()` is not null for a verdict that worsened. The cast is for the type.
 - `src/Output/TerminalWidth.php` Coalesce `$width = self::fromEnv($env) ?? self::fromConsoleTerminal($env) ?? self::fromApplication($application) ?? FormatContext::DEFAULT_WIDTH;` — `fromConsoleTerminal()` gives null when `COLUMNS` is set, so the order of the first two steps does not matter.
+- `src/Output/HtmlFormatter.php` UnwrapArrayFilter UnwrapArrayValues `return \is_array($reads) ? array_values(array_filter($reads, 'is_int')) : [];` — the vendored manifest lists its report numbers as a JSON list of integers, so the filter keeps every item and the keys stay `0..n-1`.
 
 ## src/Security
 

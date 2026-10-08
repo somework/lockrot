@@ -12,6 +12,7 @@ use Lockrot\Signal\Rule\PinnedRule;
 use Lockrot\Signal\Signal;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class PinnedRuleTest extends TestCase
@@ -116,6 +117,31 @@ final class PinnedRuleTest extends TestCase
             'snapshot_time' => '2022-03-24T10:22:23+00:00',
             'tag_relation' => 'older',
         ], $signal->data());
+    }
+
+    /**
+     * The newest tag's date against the snapshot's commit date.
+     *
+     * @dataProvider tagDates
+     */
+    #[DataProvider('tagDates')]
+    public function testTheTagRelationComparesTheNewestTagWithTheSnapshot(string $tagged, string $relation): void
+    {
+        $signal = (new PinnedRule())->evaluate(F::facts(
+            F::package(['version' => 'dev-master', 'time' => '2022-03-24T10:22:23+00:00']),
+            F::metadata([['dev-master', '2022-03-24T10:22:23+00:00'], ['1.6.2', $tagged]])
+        ));
+
+        self::assertNotNull($signal);
+        self::assertSame($relation, $signal->data()['tag_relation']);
+    }
+
+    /** @return iterable<string, array{string, string}> */
+    public static function tagDates(): iterable
+    {
+        yield 'a tag after the snapshot' => ['2023-01-01T00:00:00+00:00', 'newer'];
+        yield 'a tag on the snapshot date' => ['2022-03-24T10:22:23+00:00', 'same'];
+        yield 'a tag before the snapshot' => ['2019-01-23T15:23:04+00:00', 'older'];
     }
 
     /** A vcs or path entry, or metadata that did not load: has_stable_release is null, never false. */

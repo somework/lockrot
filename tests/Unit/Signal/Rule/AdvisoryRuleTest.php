@@ -6,11 +6,14 @@ namespace Lockrot\Tests\Unit\Signal\Rule;
 
 use Composer\Semver\VersionParser;
 use Lockrot\Data\Advisory\Advisory;
+use Lockrot\Security\Fix;
+use Lockrot\Security\Holder;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\Rule\AdvisoryRule;
 use Lockrot\Signal\Signal;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class AdvisoryRuleTest extends TestCase
@@ -276,5 +279,60 @@ final class AdvisoryRuleTest extends TestCase
 
         self::assertNotNull($signal);
         self::assertStringEndsWith('(A, B, C)', $signal->summary());
+    }
+
+    /** The rows stand in the tie-break order of the deciding advisory: points, then severity, then id. */
+    public function testTheRowsAreInPointsThenSeverityThenIdOrder(): void
+    {
+        $advisories = [
+            $this->advisory('PKSA-d', null, 'low'),
+            $this->advisory('PKSA-c', null, null),
+            $this->advisory('PKSA-b', null, 'moderate'),
+            $this->advisory('PKSA-a', null, 'moderate'),
+            $this->advisory('PKSA-e', null, 'critical'),
+        ];
+
+        $signal = (new AdvisoryRule())->evaluate(new PackageFacts(F::package(['version' => 'v1.2.3']), null, null, $advisories));
+
+        self::assertNotNull($signal);
+        $rows = JsonPath::arrayAt($signal->data(), ['advisories']);
+        self::assertSame(['PKSA-e', 'PKSA-a', 'PKSA-b', 'PKSA-c', 'PKSA-d'], array_column($rows, 'id'));
+        self::assertSame([32, 8, 8, 8, 2], array_column($rows, 'points'));
+    }
+
+    /**
+     * Without the release scan, a ranged advisory's fix is unknown for the reason its origin gives.
+     *
+     * @dataProvider origins
+     */
+    #[DataProvider('origins')]
+    public function testAnUnscannedFixNamesWhyItIsUnknown(bool $fromComposerRepository, string $reason): void
+    {
+        $advisory = new Advisory('PKSA-1', null, null, null, 'high', null, (new VersionParser())->parseConstraints('<2.0'));
+        $facts = new PackageFacts(F::package(['version' => '1.0.0', 'fromComposerRepository' => $fromComposerRepository]), null, null, [$advisory]);
+
+        $signal = (new AdvisoryRule())->evaluate($facts);
+
+        self::assertNotNull($signal);
+        self::assertSame($reason, JsonPath::stringAt($signal->data(), ['advisories', 0, 'fix', 'reason']));
+    }
+
+    /** @return iterable<string, array{bool, string}> */
+    public static function origins(): iterable
+    {
+        yield 'from a Composer repository' => [true, Fix::RELEASES_UNKNOWN];
+        yield 'from vcs or a path' => [false, Fix::NOT_FROM_COMPOSER_REPOSITORY];
+    }
+
+    public function testAHolderEntryNamesThePackageExceptForTheRoot(): void
+    {
+        self::assertSame(
+            ['source' => Holder::PACKAGE, 'package' => 'acme/b', 'version' => '2.0.0', 'link' => Holder::REQUIRE, 'constraint' => '^1.0', 'holder' => null],
+            AdvisoryRule::heldBy(new Holder(Holder::PACKAGE, 'acme/b', '2.0.0', Holder::REQUIRE, '^1.0'))
+        );
+        self::assertSame(
+            ['source' => Holder::ROOT, 'package' => null, 'version' => null, 'link' => Holder::REQUIRE_DEV, 'constraint' => '^1.0', 'holder' => null],
+            AdvisoryRule::heldBy(new Holder(Holder::ROOT, 'acme/app', null, Holder::REQUIRE_DEV, '^1.0'))
+        );
     }
 }
