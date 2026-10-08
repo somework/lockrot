@@ -53,6 +53,24 @@ final class SchemaRebuildTest extends TestCase
         self::assertSame(0, $step->getExitCode(), $step->getOutput().$step->getErrorOutput());
     }
 
+    /**
+     * A local run catches a stale generated file, as the CI step does: a fresh build equals the
+     * committed schemas and negatives, file for file.
+     */
+    public function testAFreshBuildEqualsTheCommittedFiles(): void
+    {
+        $this->build();
+        $built = array_merge(['resources/lockrot-report-2.schema.json', 'resources/lockrot-explain-2.schema.json'], self::filesUnder($this->dir, 'tests/fixtures/schema/negative'));
+        $committed = array_merge(['resources/lockrot-report-2.schema.json', 'resources/lockrot-explain-2.schema.json'], self::filesUnder(self::ROOT, 'tests/fixtures/schema/negative/report-2'), self::filesUnder(self::ROOT, 'tests/fixtures/schema/negative/explain-2'));
+        sort($built);
+        sort($committed);
+
+        self::assertSame($committed, $built, 'the builders write the committed files and no other');
+        foreach ($built as $path) {
+            self::assertSame((string) file_get_contents(self::ROOT.'/'.$path), (string) file_get_contents($this->dir.'/'.$path), $path.' differs from a fresh build: rerun the builders in tools/schema');
+        }
+    }
+
     public function testTheStepFailsOnAOneByteEditOfAGeneratedSchema(): void
     {
         $this->build();
@@ -120,6 +138,22 @@ final class SchemaRebuildTest extends TestCase
         $git = new Process(array_merge(['git'], $arguments), $this->dir);
         $git->run();
         self::assertSame(0, $git->getExitCode(), $git->getErrorOutput());
+    }
+
+    /** @return list<string> the files under $base/$path, relative to $base */
+    private static function filesUnder(string $base, string $path): array
+    {
+        $files = [];
+        foreach (is_dir($base.'/'.$path) ? scandir($base.'/'.$path) ?: [] : [] as $entry) {
+            if ($entry === '.' || $entry === '..') {
+                continue;
+            }
+            $files = is_dir($base.'/'.$path.'/'.$entry)
+                ? array_merge($files, self::filesUnder($base, $path.'/'.$entry))
+                : array_merge($files, [$path.'/'.$entry]);
+        }
+
+        return $files;
     }
 
     private static function copyTree(string $from, string $to): void
