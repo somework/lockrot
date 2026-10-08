@@ -30,6 +30,8 @@ use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\MemoisingMetadataLoader;
 use Lockrot\Tests\Support\ValidatesJsonSchemas;
 use Lockrot\Verdict\VerdictEngine;
+use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 
@@ -41,7 +43,17 @@ use PHPUnit\Framework\TestCase;
  *
  * Both sides get the same floors, so the agreement is tested where both sides see the same floor.
  * This test holds S8 to the project's php over the fixtures.
+ *
+ * It covers nothing: it validates an explanation per branch of every fixture app, which pushes the
+ * lines it covers past the timeout of a mutation run. PhpFloorTest, BranchRowTest and
+ * ExplanationTest kill those mutants.
+ *
+ * @coversNothing
+ *
+ * @group covers-nothing
  */
+#[CoversNothing]
+#[Group('covers-nothing')]
 final class BranchFloorAgreementTest extends TestCase
 {
     use ValidatesJsonSchemas;

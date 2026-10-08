@@ -33,7 +33,9 @@ use Lockrot\Tests\Support\ReportSample;
 use Lockrot\Tests\Support\ValidatesJsonSchemas;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\VerdictEngine;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -43,7 +45,17 @@ use PHPUnit\Framework\TestCase;
  * Every fixture lock with an entry that carries no notification-url is analysed, and all four are
  * read against each other and against the lock entry — with the exact number of such entries per
  * fixture, so the check cannot pass on 0 == 0.
+ *
+ * It covers nothing: it validates every fixture app's report and explanations, which pushes the
+ * lines it covers past the timeout of a mutation run. The unit tests of the finding and its origin
+ * kill those mutants.
+ *
+ * @coversNothing
+ *
+ * @group covers-nothing
  */
+#[CoversNothing]
+#[Group('covers-nothing')]
 final class FromComposerRepositoryTest extends TestCase
 {
     use ValidatesJsonSchemas;

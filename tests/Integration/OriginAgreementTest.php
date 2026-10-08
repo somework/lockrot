@@ -32,7 +32,9 @@ use Lockrot\Tests\Support\ReportSample;
 use Lockrot\Tests\Support\ValidatesJsonSchemas;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\VerdictEngine;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -40,7 +42,16 @@ use PHPUnit\Framework\TestCase;
  * document says about the same entry: `from_composer_repository`, the note, the root count, the
  * libyears bucket, the page's `details` and the explanation. The kinds per fixture are counted
  * exactly, so the check cannot pass on zero; nothing asks a repository, since an origin needs none.
+ *
+ * It covers nothing: it validates every fixture app's report, which pushes the lines it covers past
+ * the timeout of a mutation run. The unit tests of the finding and its origin kill those mutants.
+ *
+ * @coversNothing
+ *
+ * @group covers-nothing
  */
+#[CoversNothing]
+#[Group('covers-nothing')]
 final class OriginAgreementTest extends TestCase
 {
     use ValidatesJsonSchemas;
