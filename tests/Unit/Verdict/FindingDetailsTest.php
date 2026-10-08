@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Verdict;
 
+use Lockrot\Data\Advisory\Advisory;
 use Lockrot\Data\Advisory\AdvisoryCoverage;
+use Lockrot\Data\Advisory\AdvisoryIgnoreMatch;
 use Lockrot\Data\Advisory\AdvisoryNameCoverage;
+use Lockrot\Data\Advisory\IgnoredAdvisory;
 use Lockrot\Lock\LockFile;
 use Lockrot\Security\Fix;
 use Lockrot\Security\PackageFixes;
@@ -98,5 +101,23 @@ final class FindingDetailsTest extends TestCase
         $details = new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [], null);
 
         self::assertSame('1 advisory: 1 high; advisory: CVE-2026-1 a title', $details->vulnerableSummary($rows, null, 'high'));
+    }
+
+    /** An advisory that Composer's audit ignore list keeps out of S9 is listed with its cleaned title. */
+    public function testAnIgnoredAdvisoryIsListedWithItsMatch(): void
+    {
+        $advisory = new Advisory('PKSA-i', 'CVE-2024-9', 'CVE-2024-9: an  ignored title', null, 'moderate', null);
+        $ignored = new IgnoredAdvisory($advisory, new AdvisoryIgnoreMatch(AdvisoryIgnoreMatch::CVE, 'CVE-2024-9', 'not used here', AdvisoryIgnoreMatch::BY_AUDIT));
+        $lock = LockFile::fromArray(['packages' => [['name' => 'vendor/a', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/']]]);
+        $package = $lock->find('vendor/a');
+        self::assertNotNull($package);
+
+        $security = FindingDetails::of(new PackageFacts($package, null, null, []), null, new PhpFloor('8.4', null), [$ignored], [], null)->security([], null);
+
+        self::assertSame(1, $security['ignored_count']);
+        self::assertSame(
+            [['id' => 'PKSA-i', 'cve' => 'CVE-2024-9', 'title' => 'an ignored title', 'severity' => 'medium', 'by' => AdvisoryIgnoreMatch::BY_AUDIT, 'matched' => AdvisoryIgnoreMatch::CVE, 'reason' => 'not used here']],
+            $security['ignored']
+        );
     }
 }
