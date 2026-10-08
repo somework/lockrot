@@ -152,30 +152,35 @@ final class GateAgreementTest extends TestCase
     {
         $run = JsonPath::arrayAt($document, ['run']);
         $this->same($failOn->value(), $run['fail_on'], $what);
-        $this->same(FailOn::fromString($failOn->value())->kind(), $run['fail_on_kind'], $what);
+        $this->same(['none' => [], 'priority' => ['grade'], 'verdict' => ['flag'], 'unchecked' => ['unchecked']][$failOn->kind()], array_column($run['gates'], 'kind'), $what);
         $this->same($strict, $run['strict_network'], $what);
         $this->same($mode, $run['mode'], $what);
         $gate = JsonPath::arrayAt($document, ['gate']);
-        $this->same(['fails', 'tripped_by', 'fail_on_applied'], array_keys($gate), $what);
+        $this->same(['fails', 'tripped_by', 'fail_on_applied', 'reaching', 'failing', 'exempt'], array_keys($gate), $what);
         $trippedBy = JsonPath::arrayAt($gate, ['tripped_by']);
         $applied = $gate['fail_on_applied'];
         $this->same($mode === Gate::MODE_CHECK, $applied, $what);
 
         $anyFails = false;
-        foreach (JsonPath::arrayAt($document, ['findings']) as $at => $row) {
+        $byPackage = [];
+        foreach ($report->findings() as $finding) {
+            $byPackage[$finding->package()] = $finding;
+        }
+        foreach (JsonPath::arrayAt($document, ['findings']) as $row) {
             if (!\is_array($row)) {
                 $this->same('an object', $row, $what.': a finding');
 
                 continue;
             }
-            $finding = $report->findings()[$at];
+            $finding = $byPackage[JsonPath::stringAt($row, ['package'])];
             $where = $what.' '.$finding->package();
             $standing = JsonPath::arrayAt($row, ['gate']);
-            $this->seen['finding '.json_encode($standing)] = true;
+            $this->seen['finding '.json_encode(\array_slice($standing, 0, 3, true))] = true;
             ['reaches_fail_on' => $reaches, 'fails' => $fails, 'exempt_by' => $exemptBy] = $standing;
+            $this->same([[], null], [$standing['by'], $standing['basis']], $where.': the gate values and the basis wait for their pull requests');
             $this->same($failOn->reaches($finding), $reaches, $where);
             $this->same($reaches && $exemptBy === null && $applied, $fails, $where.': fails');
-            $status = $row['baseline'] === null ? null : JsonPath::stringAt($row, ['baseline', 'status']);
+            $status = $report->baseline() === null ? null : $report->baseline()->statusOf($finding->package());
             $this->same($status === 'known' && $reaches, $exemptBy === Gate::EXEMPT_BASELINE, $where.': exempt by the baseline');
             if ($exemptBy !== null) {
                 $this->same(true, $reaches, $where.': only what reaches is exempt');
