@@ -475,7 +475,7 @@ final class LockrotCommandTest extends TestCase
         self::assertIsArray($json);
         self::assertIsArray($json['lockrot']);
         self::assertIsArray($json['counts']);
-        self::assertSame(1, $json['lockrot']['schema']);
+        self::assertSame(2, $json['lockrot']['schema']);
         self::assertAbandonedCountAgreesWithTheFindings($json);
     }
 
@@ -509,7 +509,7 @@ final class LockrotCommandTest extends TestCase
         $json = json_decode($stdout, true);
         self::assertIsArray($json);
         self::assertIsArray($json['lockrot']);
-        self::assertSame(1, $json['lockrot']['schema']);
+        self::assertSame(2, $json['lockrot']['schema']);
         self::assertSame('doctrine/annotations', $json['package']);
         self::assertIsArray($json['finding']);
         self::assertSame('abandoned', $json['finding']['verdict']);
@@ -532,7 +532,7 @@ final class LockrotCommandTest extends TestCase
         self::assertSame(0, $code, $stdout);
         $json = json_decode($stdout, true);
         self::assertIsArray($json);
-        self::assertSame('>=8.2', $json['project_php']);
+        self::assertSame('>=8.2', $json['run']['project_php']);
         $rows = self::admission($json);
         self::assertSame(['>=8.4.1', true, false, 'project', null, 'needs_newer'], $rows['8.x'] ?? null);
         self::assertSame(['>=7.2.5', true, true, null, null, null], $rows['5.x'] ?? null, 'the installed branch');
@@ -1556,7 +1556,7 @@ final class LockrotCommandTest extends TestCase
     private function assertWallabagReport(array $json): void
     {
         self::assertVerdictsMatchTheGolden($json);
-        self::assertSame($this->wallabagTotals()[1], JsonPath::intAt($json, ['counts', 'abandoned']));
+        self::assertSame($this->wallabagTotals()[1], \count(array_filter(JsonPath::arrayAt($json, ['findings']), static fn ($f): bool => \is_array($f) && $f['lead'] === 'abandoned')));
     }
 
     /** @param array<mixed, mixed> $json a report of the wallabag fixture */
@@ -2770,7 +2770,7 @@ final class LockrotCommandTest extends TestCase
             self::assertSame(0, $code, $stderr);
             $explained = json_decode($stdout, true);
             self::assertIsArray($explained);
-            self::assertSame('>=8.2', $explained['project_php'], 'the report and --explain name the same floor');
+            self::assertSame('>=8.2', $explained['run']['project_php'], 'the report and --explain name the same floor');
         });
     }
 
