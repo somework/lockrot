@@ -36,7 +36,7 @@ final class Allowlist
         }
         foreach ([$package->type(), $metadata !== null ? $metadata->type() : null] as $type) {
             if ($type !== null && \in_array($type, $this->finishedTypes, true)) {
-                return new AllowlistEntry('type:'.$type, null, 'package type "'.$type.'" only lists dependencies', null, 'builtin');
+                return AllowlistEntry::forType($type);
             }
         }
 

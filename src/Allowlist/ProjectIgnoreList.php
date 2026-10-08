@@ -54,7 +54,7 @@ final class ProjectIgnoreList
             throw new ConfigException(\sprintf('extra.lockrot.ignore[%s] (%s) "version" must be a string', $index, $package));
         }
 
-        return new AllowlistEntry($package, $version, $reason, self::expires($index, $package, $row['expires'] ?? null), 'project');
+        return new AllowlistEntry($package, $version, $reason, self::expires($index, $package, $row['expires'] ?? null), AllowlistEntry::BY_PROJECT);
     }
 
     /** @param mixed $expires */

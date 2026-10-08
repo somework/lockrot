@@ -50,10 +50,28 @@ final class AllowlistTest extends TestCase
         $list = new Allowlist([]);
         $metapackageEntry = $list->match(F::package(['type' => 'metapackage']), null, $this->now);
         self::assertNotNull($metapackageEntry);
-        self::assertSame('type:metapackage', $metapackageEntry->pattern());
+        self::assertNull($metapackageEntry->pattern(), 'a type entry matches no name');
+        self::assertSame(AllowlistEntry::BY_TYPE, $metapackageEntry->by());
+        self::assertSame(AllowlistEntry::REASON_BY_LOCKROT, $metapackageEntry->reasonBy());
+        self::assertSame('type-metapackage', $metapackageEntry->reasonId());
         self::assertSame('package type "metapackage" only lists dependencies', $metapackageEntry->reason(), 'the reason names the type that matched');
         self::assertNotNull($list->match(F::package(['name' => 'symfony/twig-pack']), F::metadata([['v1.0.1', '2020-10-19']], false, null, 'symfony-pack'), $this->now));
         self::assertNull($list->match(F::package(), F::metadata([['1.0.0', '2020-01-01']]), $this->now));
+    }
+
+    public function testAnEntryWritesWhoAcceptedAndWhoseWordsTheReasonIs(): void
+    {
+        $project = new AllowlistEntry('tubalmartin/cssmin', null, 'a single-file minifier, finished', new \DateTimeImmutable('2027-03-31T23:59:59+00:00'), AllowlistEntry::BY_PROJECT, ['stale']);
+        $builtin = new AllowlistEntry('psr/*', null, 'interfaces', null, AllowlistEntry::BY_BUILTIN, null, 'php-fig-interfaces');
+
+        self::assertSame(
+            ['by' => 'project', 'pattern' => 'tubalmartin/cssmin', 'version' => null, 'reason' => 'a single-file minifier, finished', 'reason_id' => null, 'reason_by' => 'user', 'expires' => '2027-03-31', 'flag_ids' => ['stale']],
+            $project->toArray()
+        );
+        self::assertSame(
+            ['by' => 'builtin', 'pattern' => 'psr/*', 'version' => null, 'reason' => 'interfaces', 'reason_id' => 'php-fig-interfaces', 'reason_by' => 'lockrot', 'expires' => null, 'flag_ids' => null],
+            $builtin->toArray()
+        );
     }
 
     public function testWildcardPrefixPattern(): void

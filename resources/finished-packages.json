@@ -1,12 +1,13 @@
 {
-    "_schema": "list of {pattern, version?, reason}; pattern supports * wildcards; version pins one exact release",
+    "_schema": "list of {id, pattern, version?, reason}; id names lockrot's reason (finding.allowlist.reason_id); pattern supports * wildcards; version pins one exact release; the first entry that matches wins",
     "entries": [
-        {"pattern": "psr/*", "reason": "PHP-FIG interface packages are complete by design; versions change only when the interface changes"},
-        {"pattern": "fig/*", "reason": "PHP-FIG utility packages are complete by design"},
-        {"pattern": "symfony/polyfill-*", "reason": "polyfills for older PHP versions; intentionally frozen once the target PHP is covered"},
-        {"pattern": "symfony/*-pack", "reason": "Symfony packs are metapackages that only list dependencies"},
-        {"pattern": "ralouphie/getallheaders", "reason": "single-function polyfill for getallheaders(); complete"},
-        {"pattern": "paragonie/random_compat", "version": "9.99.100", "reason": "intentionally empty package: PHP 7+ has random_bytes() built in"},
-        {"pattern": "paragonie/random_compat", "version": "9.99.99", "reason": "intentionally empty package: PHP 7+ has random_bytes() built in"}
+        {"id": "php-fig-interfaces", "pattern": "psr/*", "reason": "PHP-FIG interface packages are complete by design; versions change only when the interface changes"},
+        {"id": "php-fig-utilities", "pattern": "fig/*", "reason": "PHP-FIG utility packages are complete by design"},
+        {"id": "symfony-polyfills", "pattern": "symfony/polyfill-php*", "reason": "polyfills for older PHP versions; intentionally frozen once the target PHP is covered"},
+        {"id": "symfony-extension-polyfills", "pattern": "symfony/polyfill-*", "reason": "polyfills for PHP extensions; released with Symfony and complete for the API of the extension they replace"},
+        {"id": "symfony-packs", "pattern": "symfony/*-pack", "reason": "Symfony packs are metapackages that only list dependencies"},
+        {"id": "getallheaders-polyfill", "pattern": "ralouphie/getallheaders", "reason": "single-function polyfill for getallheaders(); complete"},
+        {"id": "random-compat-empty", "pattern": "paragonie/random_compat", "version": "9.99.100", "reason": "intentionally empty package: PHP 7+ has random_bytes() built in"},
+        {"id": "random-compat-empty", "pattern": "paragonie/random_compat", "version": "9.99.99", "reason": "intentionally empty package: PHP 7+ has random_bytes() built in"}
     ]
 }
