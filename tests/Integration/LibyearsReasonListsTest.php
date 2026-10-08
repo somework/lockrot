@@ -7,8 +7,6 @@ namespace Lockrot\Tests\Integration;
 use Lockrot\Analyzer\Libyears;
 use Lockrot\Json\KnownValues;
 use Lockrot\Json\Schemas;
-use Lockrot\Output\ExplainFormatter;
-use Lockrot\Output\JsonFormatter;
 use Lockrot\Tests\Support\JsonPath;
 use PHPUnit\Framework\TestCase;
 
@@ -16,7 +14,8 @@ use PHPUnit\Framework\TestCase;
  * The reasons a package goes unmeasured are listed in the code, both schemas'
  * `libyears_unmeasured`, and the report block's `required` and `properties`. All list them in one
  * order, the block's key order. The order they are checked in is a different list, a numbered list
- * in the field's description that names the same reasons.
+ * in the field's description that names the same reasons. The `-1` files hold the lists here, and
+ * KnownValuesRegistryTest holds the numbered files from 2 on.
  */
 final class LibyearsReasonListsTest extends TestCase
 {
@@ -30,8 +29,8 @@ final class LibyearsReasonListsTest extends TestCase
 
     public function testEveryListOfReasonsIsTheCodesInItsOrder(): void
     {
-        $report = JsonPath::decodeFile(Schemas::path(Schemas::REPORT, JsonFormatter::SCHEMA));
-        $explain = JsonPath::decodeFile(Schemas::path(Schemas::EXPLAIN, ExplainFormatter::SCHEMA));
+        $report = JsonPath::decodeFile(Schemas::path(Schemas::REPORT, 1));
+        $explain = JsonPath::decodeFile(Schemas::path(Schemas::EXPLAIN, 1));
         $field = ['definitions', 'finding', 'properties', 'libyears_unmeasured', 'oneOf', 0, KnownValues::KEYWORD];
         $block = ['properties', 'libyears', 'properties', 'unmeasured'];
 
@@ -49,7 +48,7 @@ final class LibyearsReasonListsTest extends TestCase
         sort($reasons);
         self::assertSame($reasons, $sorted);
 
-        $description = JsonPath::stringAt(JsonPath::decodeFile(Schemas::path(Schemas::REPORT, JsonFormatter::SCHEMA)), ['definitions', 'finding', 'properties', 'libyears_unmeasured', 'description']);
+        $description = JsonPath::stringAt(JsonPath::decodeFile(Schemas::path(Schemas::REPORT, 1)), ['definitions', 'finding', 'properties', 'libyears_unmeasured', 'description']);
         preg_match_all('/(\d)\. ([a-z_]+)/', $description, $matches);
         self::assertSame(['1', '2', '3', '4'], $matches[1]);
         self::assertSame(self::PRECEDENCE, $matches[2]);

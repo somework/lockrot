@@ -110,6 +110,36 @@ final class SortTest extends TestCase
         self::assertSame(array_column($rows, 'package'), array_column($resorted, 'package'));
     }
 
+    /**
+     * The findings of the report-2 document stand in the order that the keys of `run.score_model.sort`
+     * give when they read the document's own fields by path.
+     *
+     * @dataProvider corpusReports
+     */
+    #[DataProvider('corpusReports')]
+    public function testTheReport2FindingsStandInThePublishedOrder(Report $report): void
+    {
+        $findings = $report->toArray()['findings'];
+        self::assertIsArray($findings);
+        $keys = ScoreModel::toArray()['sort'];
+        self::assertIsArray($keys);
+        $resorted = $findings;
+        usort($resorted, static function (array $a, array $b) use ($keys): int {
+            foreach ($keys as $key) {
+                self::assertIsArray($key);
+                self::assertIsString($key['path']);
+                $order = self::compareByKey($key, self::at($a, $key['path']) ?? $key['default'], self::at($b, $key['path']) ?? $key['default']);
+                if ($order !== 0) {
+                    return $order;
+                }
+            }
+
+            return 0;
+        });
+
+        self::assertSame(array_column($findings, 'package'), array_column($resorted, 'package'));
+    }
+
     /** wallabag's twig carries a critical advisory, which no other critical finding there outweighs. */
     public function testWallabagsTwigIsTheFirstFindingOfItsCorpusReport(): void
     {
@@ -134,6 +164,24 @@ final class SortTest extends TestCase
             'direct' => $finding->isDirect(),
             'package' => $finding->package(),
         ];
+    }
+
+    /**
+     * @param array<mixed, mixed> $finding
+     *
+     * @return mixed the value at a dotted path, null when a step is missing
+     */
+    private static function at(array $finding, string $path)
+    {
+        $node = $finding;
+        foreach (explode('.', $path) as $step) {
+            if (!\is_array($node) || !\array_key_exists($step, $node)) {
+                return null;
+            }
+            $node = $node[$step];
+        }
+
+        return $node;
     }
 
     /**
