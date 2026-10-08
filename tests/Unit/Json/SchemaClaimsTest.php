@@ -6,6 +6,7 @@ namespace Lockrot\Tests\Unit\Json;
 
 use Lockrot\Json\Schemas;
 use Lockrot\Output\JsonFormatter;
+use Lockrot\Tests\Support\JsonPath;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -13,7 +14,8 @@ use PHPUnit\Framework\TestCase;
  * "else null", "never") is held by the schema or listed with the reason it is not: a relation that
  * names the property in backticks encodes it, the property's own keywords hold it
  * ({@see STRUCTURAL}), or draft-04 cannot say it ({@see ENGINE}: arithmetic, list equality, a value
- * in another object or outside the document, or prose that states no cross-field rule).
+ * in another object or outside the document, or prose that states no cross-field rule). A claim that
+ * this head writes a placeholder for is listed with the pull request that restores it ({@see PLACEHOLDERS}).
  */
 final class SchemaClaimsTest extends TestCase
 {
@@ -74,7 +76,6 @@ final class SchemaClaimsTest extends TestCase
         'allowlist/oneOf/0.flag_ids' => 'the config file is outside the document',
         'metadata.status' => 'encoded (finding: read ⇔ maintenance_judged); the origin clause is engine',
         'findingBaseline/oneOf/0/properties/recorded/oneOf/0.fix_model' => 'the baseline file is outside the document',
-        'findingGate.exempt_by' => 'encoded (finding: exempt_by baseline only under an entry)',
         's1.replacement' => 'PROSE: "never markup"',
         's1.replacement_url' => 'PROSE: "show a link only when it is a string"',
         's6.snapshot_time' => 'S6 reason against the lock time (outside)',
@@ -113,6 +114,22 @@ final class SchemaClaimsTest extends TestCase
         '#/properties/libyears/properties/unmeasured.no_stable_release_date' => 'PROSE: what the reason covers',
     ];
 
+    /**
+     * The claims that this head writes a placeholder for, by the pull request that restores the
+     * rule, and the text of the strict relation that the schema leaves out until then (null when
+     * no relation says it).
+     */
+    private const PLACEHOLDERS = [
+        'findingGate.by' => ['PR 6a: gate.by names the values a failing finding fails', 'names the values it fails'],
+        'findingGate.exempt_by' => ['PR 5: exempt_by baseline only under a baseline entry', '`exempt_by: baseline` only there'],
+        'finding.next_step' => ['PR 4c: a graded finding has a move', 'and `next_step` agree'],
+        'heldBy.holder' => ['PR 4c: the holder object, filled in a second pass', null],
+        'branchFixes.lowest' => ['PR 4c: the easiest release of the window (P2b)', null],
+        'branchFixes.if_applied' => ['PR 4c: the score after a move to the candidate', null],
+        'securityVulnerable.fix_kind' => ['PR 4c: the fix_kind of the move that move_in names', null],
+        'rootSecurity.update_now' => ['PR 4c: counted from the move fix_kind', null],
+    ];
+
     /** The claims that a relation of another definition encodes. */
     private const ENCODED_AT = [
         'partMaintenance.status' => 'scoreGraded: the maintenance part counts exactly when a maintenance term exists; partMaintenance: counts exactly when it contributes',
@@ -132,6 +149,24 @@ final class SchemaClaimsTest extends TestCase
         $claims = self::claims(self::schema());
 
         self::assertSame([], array_values(array_diff(array_merge(array_keys(self::STRUCTURAL), array_keys(self::ENGINE), array_keys(self::ENCODED_AT)), array_keys($claims))));
+    }
+
+    public function testEachPlaceholderIsAPropertyThatNoRelationEncodes(): void
+    {
+        $schema = self::schema();
+        $relations = self::allRelations($schema);
+
+        self::assertNotSame([], $relations);
+        foreach (self::PLACEHOLDERS as $key => [$restoredBy, $strict]) {
+            [$definition, $property] = explode('.', $key);
+            self::assertTrue(JsonPath::has($schema, ['definitions', $definition, 'properties', $property]), $key.' is a property of the schema');
+            if ($strict === null) {
+                continue;
+            }
+            foreach ($relations as $relation) {
+                self::assertStringNotContainsString($strict, $relation, $key.' is encoded: take it off PLACEHOLDERS ('.$restoredBy.')');
+            }
+        }
     }
 
     public function testAClaimWithoutARelationIsFound(): void
@@ -206,6 +241,9 @@ final class SchemaClaimsTest extends TestCase
     /** @param list<string> $relations */
     private static function classOf(string $key, string $name, array $relations): string
     {
+        if (isset(self::PLACEHOLDERS[$key])) {
+            return 'placeholder';
+        }
         foreach ($relations as $relation) {
             if (preg_match('{[`.]'.preg_quote($name, '{').'`}', $relation) === 1) {
                 return 'encoded';
@@ -219,6 +257,26 @@ final class SchemaClaimsTest extends TestCase
         }
 
         return isset(self::ENGINE[$key]) ? 'engine' : 'unclassified';
+    }
+
+    /**
+     * The descriptions of every `allOf` entry and `anyOf` branch in the schema.
+     *
+     * @param mixed $node
+     *
+     * @return list<string>
+     */
+    private static function allRelations($node): array
+    {
+        if (!\is_array($node)) {
+            return [];
+        }
+        $out = self::relations($node);
+        foreach ($node as $child) {
+            $out = array_merge($out, self::allRelations($child));
+        }
+
+        return $out;
     }
 
     /**
