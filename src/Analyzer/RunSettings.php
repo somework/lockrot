@@ -29,7 +29,7 @@ final class RunSettings
     public const SOURCE_RUNTIME = 'runtime';
     public const SOURCE_DEFAULT = 'default';
 
-    /** The version of the fix classification: baselines compare fixes only under equal fix models. */
+    /** The version of the fix classification. A change of the fix kinds or of their rules raises it. */
     public const FIX_MODEL = 1;
     /** The version of the sentence grammars. ScoreText has its own, in the score model. */
     public const TEXT_GRAMMAR = 1;

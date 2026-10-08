@@ -137,13 +137,13 @@ removes or redefines.
 
 | report-1 | report-2 |
 |---|---|
-| a finding's `verdict` (a word such as `stale`) | `lead`, the first counted maintenance flag. `verdict` is the grade |
+| a finding's `verdict` from `abandoned` to `stale` | `lead`, the first counted maintenance flag. `verdict` is the grade, and `unknown`, `finished` and `ok` stay in `verdict` |
 | `priority_basis` | `score`: its terms, its modifiers and its `text` |
 | `no_fix_expected` | `security` and the `fix` of each S9 row |
 | S9's `fixed_by` and `fixed_on_branch` | the `fix` of each S9 row |
 | `run.flagged_verdicts` | `run.graded_verdicts` for the grades, `run.flag_ids` for the flags |
 | `run.fail_on_kind` | `run.gates[].kind` |
-| the cause keys of `counts` | `flags.<flag>.leading`. `counts` holds the verdicts |
+| the cause keys of `counts` | the root `flags.<flag>.leading`. `counts` holds the verdicts |
 | `baseline.previous_verdict` | `baseline.recorded.lead` |
 
 ## What the report schema types

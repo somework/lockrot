@@ -38,8 +38,8 @@ final class BuiltinAllowlistTest extends TestCase
         self::assertNull($list->match(F::package(['name' => 'phpzip/phpzip', 'version' => '2.0.8']), null, $now));
     }
 
-    /** The reason ids are what a page words lockrot's reasons by: SPEC section 6.5 names these nine. */
-    public function testTheNineReasonIdsAreTheSevenBuiltinEntriesAndTheTwoTypes(): void
+    /** The reason ids are what a page words lockrot's reasons by: the built-in entries in file order, then the types. */
+    public function testTheReasonIdsAreTheBuiltinEntriesThenTheTypes(): void
     {
         self::assertSame(
             ['php-fig-interfaces', 'php-fig-utilities', 'symfony-polyfills', 'symfony-extension-polyfills', 'symfony-packs', 'getallheaders-polyfill', 'random-compat-empty', 'type-metapackage', 'type-symfony-pack'],
@@ -74,9 +74,9 @@ final class BuiltinAllowlistTest extends TestCase
     }
 
     /**
-     * I24 over the corpus floor: a reason that calls a package frozen matches only the PHP
-     * polyfills, which a target PHP covers. The extension polyfills keep releasing, so the old
-     * shared reason was false for them.
+     * Over the corpus floor, a reason that calls a package frozen matches only the PHP polyfills,
+     * which a target PHP covers. The extension polyfills keep releasing, so a frozen reason is
+     * false for them.
      */
     public function testOnTheCorpusFloorOnlyThePhpPolyfillsReadFrozen(): void
     {

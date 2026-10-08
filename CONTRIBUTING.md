@@ -235,12 +235,13 @@ fix that only moves packages to `finished` or `ok` can ship in a patch.
 ### Contributing a finished package
 
 ```json
-{"pattern": "psr/*", "reason": "PHP-FIG interface packages are complete by design; versions change only when the interface changes"}
+{"pattern": "psr/*", "id": "php-fig-interfaces", "reason": "PHP-FIG interface packages are complete by design; versions change only when the interface changes"}
 ```
 
 | Field | Meaning |
 |---|---|
 | `pattern` | Package name. `*` is a wildcard |
+| `id` | Required. A short kebab-case name for the reason, which report-2 writes as `allowlist.reason_id`. A new id also goes into the `x-known-values` list of `allowlist.reason_id` in `tools/schema/build_report2_schema.py`: rebuild after you add it |
 | `version` | Optional. It pins one exact release |
 | `reason` | One line on why the package is finished rather than stalled. Reviewers refuse "it is fine" |
 

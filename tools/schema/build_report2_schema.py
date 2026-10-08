@@ -67,8 +67,8 @@ def _class_without(ch, alphabet='abcdefghijklmnopqrstuvwxyz0123456789'):
 
 
 def rule_id_except(word):
-    """the rule-id grammar `^[a-z][a-z0-9]*(-[a-z0-9]+)*$` minus the one id `word`, with no lookahead (critic round 2, 11.CR6:
-    `(?!sort$)` is the only lookahead in any lockrot schema, and RE2-based validators (Go's regexp) cannot compile it).
+    """the rule-id grammar `^[a-z][a-z0-9]*(-[a-z0-9]+)*$` minus the one id `word`, with no lookahead: RE2-based
+    validators (Go's regexp) cannot compile one.
     A first segment that differs from `word` at some position, or extends it, or `word` itself followed by a further segment."""
     seg = []
     seg.append(_class_without(word[0], 'abcdefghijklmnopqrstuvwxyz') + '[a-z0-9]*')
@@ -1313,7 +1313,7 @@ add_relations_r2(defs)
 
 
 def add_relations_round4(defs):
-    """attack round 4 (10.S1): the rules the field descriptions state and draft-04 can say, which round 3 still left unencoded."""
+    """attack round 4: the rules the field descriptions state and draft-04 can say, which no earlier group unencoded."""
     import build_other_schemas as BO
     P, E, NOT, NULL, STR, OBJ, MIN1, EMPTY, CONTAINS, NONE, relate = (BO.P, BO.E, BO.NOT, BO.NULL, BO.STR, BO.OBJ, BO.MIN1, BO.EMPTY, BO.CONTAINS,
                                                                           BO.NONE, BO.relate)

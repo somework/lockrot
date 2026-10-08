@@ -41,7 +41,7 @@ Severity order, used by [`--fail-on`](ci.md), the baseline and the report's sort
 - `--fail-on=unchecked` reads S10, not the verdict, so it can fail a finding of any verdict but
   `finished`. See [What was not checked](#what-was-not-checked).
 
-- Where lockrot lists verdicts (`counts`, `run.graded_verdicts`, the schema enums, this page),
+- Where lockrot lists verdicts (`counts`, `run.verdicts`, the schema enums, this page),
   `finished` comes before `ok`. Which orders are frozen is in
   [compatibility.md](compatibility.md#closed-sets-and-their-order).
 

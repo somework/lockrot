@@ -51,7 +51,7 @@ final class CompatibilityPageTest extends TestCase
 
         foreach (self::VERDICT_PAGES as $page) {
             $text = self::prose($page);
-            self::assertStringContainsString('`counts`, `run.graded_verdicts`, the schema enums, this page', $text, $page);
+            self::assertStringContainsString('`counts`, `run.verdicts`, the schema enums, this page', $text, $page);
             self::assertDoesNotMatchRegularExpression('/Where lockrot lists verdicts[^.;]*SARIF/', $text, $page.' lists the SARIF rules among the verdict-ordered lists');
         }
     }
