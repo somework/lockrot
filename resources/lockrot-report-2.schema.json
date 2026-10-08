@@ -1041,14 +1041,13 @@
       ]
     },
     "advisoriesNotCheckedReason": {
-      "description": "Why security advisories were not checked: `offline` (`--offline`; advisories are never served from a cache), `composer_too_old` (Composer below 2.4 has no advisory API), `install_time_budget` (the install-time budget ran out), `lookup_failed` (a repository threw). An open set: read a reason you do not know as another reason.",
+      "description": "Why security advisories were not checked: `offline` (`--offline`; advisories are never served from a cache), `composer_too_old` (Composer below 2.4 has no advisory API), `install_time_budget` (the install-time budget ran out). An open set: read a reason you do not know as another reason.",
       "type": "string",
       "pattern": "^[a-z][a-z0-9_]*$",
       "x-known-values": [
         "offline",
         "composer_too_old",
-        "install_time_budget",
-        "lookup_failed"
+        "install_time_budget"
       ]
     },
     "flag": {
