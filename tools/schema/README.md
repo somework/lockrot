@@ -30,8 +30,8 @@ python3 tools/schema/make_negatives_other.py explain-2
 | `project_fixtures.py` | the reference model's `cases.json` and `docs/` | `tests/fixtures/flags/`, `tests/fixtures/schema/documents/` |
 
 `ship_text.py` is the shipping pass that both builders apply to every description: it removes the
-references a published description must not hold. `tests/Unit/Json/SchemaDescriptionsTest.php`
-runs its expression `SHIP_BANNED` over every generated file.
+references a published description must not hold. A unit test applies its expression `SHIP_BANNED`
+to every generated file (`CONTRIBUTING.md`, "Changing a schema").
 
 ## The pinned inputs
 
@@ -44,9 +44,8 @@ change of a `-1` file cannot change a `-2` file.
 
 Each negative fixture is a valid document with one planted defect. A report-2 fixture carries its
 expected error in a root `$expect` object. An explain-2 fixture has its entry in `EXPECT.json`, and a
-file name that ends in `.strict.json` is read against the strict twin.
-`JsonSchemaConformanceTest::testEveryNegativeFixtureIsRejectedWithTheErrorItNames` validates each one
-and needs the error that it names.
+file name that ends in `.strict.json` is read against the strict twin. The conformance test
+validates each fixture and needs the error that it names.
 
 ## The projected fixtures
 
