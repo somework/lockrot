@@ -137,7 +137,7 @@ removes or redefines.
 
 | report-1 | report-2 |
 |---|---|
-| a finding's `verdict` from `abandoned` to `stale` | `lead`, the first counted maintenance flag. `verdict` is the grade, and `unknown`, `finished` and `ok` stay in `verdict` |
+| a finding's `verdict` from `abandoned` to `stale` | [`lead`](verdicts.md#flags). `verdict` is the grade, and `unknown`, `finished` and `ok` stay in `verdict` |
 | `priority_basis` | `score`: its terms, its modifiers and its `text` |
 | `no_fix_expected` | `security` and the `fix` of each S9 row |
 | S9's `fixed_by` and `fixed_on_branch` | the `fix` of each S9 row |

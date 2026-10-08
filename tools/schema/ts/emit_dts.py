@@ -194,6 +194,7 @@ for name, node in D.items():
     body.append('export type %s = %s;' % (tn, ty))
 root = T({k: v for k, v in S.items() if k not in ('definitions', 'allOf')}, '#', 'R.Report2')
 body.append('export type Report2 = %s;' % root)
+os.makedirs(OUT, exist_ok=True)
 open(os.path.join(OUT, 'lockrot-report-2.d.ts'), 'w').write('\n'.join(out + body) + '\n')
 
 known = ['// GENERATED from lockrot-report-2.schema.json by tools/schema/ts/emit_dts.py: do not edit.',
