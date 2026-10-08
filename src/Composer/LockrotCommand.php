@@ -323,7 +323,21 @@ final class LockrotCommand extends BaseCommand
         if ($finding === null || $facts === null) {
             throw new ConfigException($name.' was not analysed');
         }
-        $explanation = new Explanation($finding, $facts, $lockrot->thresholds(), $lockrot->targetPhp(), $analysis->report(), $project->requirePhp());
+        $report = $analysis->report()->withRun(new RunSettings(
+            $lockrot->project() ?? $project->name(),
+            $project->name(),
+            $lockrot->targetPhp(),
+            null,
+            FailOn::fromString($lockrot->failOn()),
+            $lockrot->thresholds(),
+            $project->requirePhp(),
+            $lockrot->strictNetwork(),
+            Gate::MODE_CHECK,
+            $lockrot->targetPhpSource(),
+            $lockrot->failOnSource(),
+            $lockrot->includeDev()
+        ));
+        $explanation = new Explanation($finding, $facts, $lockrot->thresholds(), $lockrot->targetPhp(), $report, $project->requirePhp());
         $formatter = new ExplainFormatter();
         $output->write(
             $format === 'json' ? $formatter->json($explanation) : ConsoleMarkup::render($formatter->text($explanation), $output->isDecorated()),

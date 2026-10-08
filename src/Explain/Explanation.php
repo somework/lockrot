@@ -6,6 +6,7 @@ namespace Lockrot\Explain;
 
 use Lockrot\Analyzer\Report;
 use Lockrot\Analyzer\RunNote;
+use Lockrot\Analyzer\RunSettings;
 use Lockrot\Clock;
 use Lockrot\Data\Repository\InstalledRelease;
 use Lockrot\Data\Repository\ReleaseBranch;
@@ -15,6 +16,7 @@ use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Verdict\Finding;
+use Lockrot\Verdict\FindingDetails;
 
 /**
  * What it shows: docs/configuration.md#explaining-one-package. The finding is the report's and the
@@ -180,13 +182,18 @@ final class Explanation
                 'php_blocked_by' => $row->phpBlockedBy(),
                 'misses_target_php' => $row->missesTargetPhp(),
                 'misses_project_php' => $row->missesProjectPhp(),
-            ];
+            ] + $this->rowExtras($row);
         }
+
+        $run = $this->report->run() ?? new RunSettings(null, null, $this->targetPhp, null, null, $this->thresholds, $this->projectPhp);
+        $runKeys = ['target_php', 'target_php_source', 'project_php', 'project_php_lowest', 'include_dev', 'thresholds', 'flag_ids', 'verdicts', 'graded_verdicts', 'signal_ids', 'fail_on', 'fail_on_source', 'gates', 'fix_model', 'text_grammar', 'score_model'];
+        $runArray = $run->toArray();
+        $basis = $this->finding->priorityBasis();
 
         return [
             'package' => $package->name(),
             'version' => $package->version(),
-            'finding' => $this->finding->toArray(),
+            'finding' => $this->report->findingRows()[$package->name()] ?? $this->finding->toArray(),
             'lock' => [
                 'php' => $package->requirePhp(),
                 'released' => self::date($package->time()),
@@ -196,7 +203,7 @@ final class Explanation
                 'branch_snapshot' => $package->isBranchSnapshot(),
                 'type' => $package->type(),
             ],
-            'metadata' => $metadata === null ? null : [
+            'metadata' => $metadata === null || $this->finding->details()->metadataStatus() !== PackageFacts::METADATA_READ ? null : [
                 'abandoned' => $metadata->isAbandoned(),
                 'replacement' => $metadata->replacement(),
                 'releases_listed' => $metadata->releaseCount(),
@@ -211,6 +218,7 @@ final class Explanation
                 'type' => $metadata->type(),
                 'data_date' => self::date($metadata->dataDate()),
                 'branches' => $branches,
+                'installed_branch' => $this->installedBranch() === null ? null : ReleaseBranch::label((string) $this->installedBranch()),
             ],
             'activity' => $activity === null ? null : [
                 'forge' => $activity->ref()->forgeLabel(),
@@ -220,18 +228,34 @@ final class Explanation
                 'fetched_at' => self::date($activity->fetchedAt()),
                 'from_cache' => $activity->fromCache(),
             ],
-            'thresholds' => [
-                'release-warn-years' => $this->thresholds->releaseWarnYears(),
-                'release-high-years' => $this->thresholds->releaseHighYears(),
-                'push-warn-years' => $this->thresholds->pushWarnYears(),
-                'push-high-years' => $this->thresholds->pushHighYears(),
-            ],
-            'target_php' => $this->targetPhp,
-            'project_php' => $this->projectPhp,
+            'run' => array_intersect_key($runArray, array_flip($runKeys)),
+            'legacy' => ['verdict' => $this->finding->verdict(), 'priority' => $basis->priority(), 'basis' => $basis->toArray()],
             'generated_at' => self::date($this->report->generatedAt()),
             'notes' => $this->report->notes(),
             'note_details' => array_map(static fn (RunNote $note): array => $note->toArray(), $this->report->runNotes()),
         ];
+    }
+
+    /**
+     * What a branch fixes of the counted advisories, null when none counts. The years are the age
+     * of the branch's newest release on the run clock.
+     *
+     * @return array{released_years: int|float|null, fixes: array<string, mixed>|null}
+     */
+    private function rowExtras(BranchRow $row): array
+    {
+        $fixes = $this->finding->details()->fixes();
+        $released = $row->highestReleased();
+        $out = ['released_years' => $released === null ? null : (new Clock($this->report->generatedAt()))->tenthsSince($released) / 10, 'fixes' => null];
+        if ($fixes !== null) {
+            foreach ($fixes->branches() as $branch) {
+                if ($branch->branch() === $row->branch()) {
+                    $out['fixes'] = FindingDetails::branchFixes($branch);
+                }
+            }
+        }
+
+        return $out;
     }
 
     private static function date(?\DateTimeImmutable $date): ?string
