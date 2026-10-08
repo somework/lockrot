@@ -238,17 +238,11 @@ final class JsonSchemaConformanceTest extends TestCase
         self::assertSame('composer.lock', $run['lock_file'], 'the lock is named, never located');
         self::assertStringNotContainsString('/home/someone', $json, 'and no path reaches the document');
         self::assertSame(2, JsonPath::arrayAt($decoded, ['run', 'thresholds'])['release-warn-years']);
-        self::assertNotContains('unknown', JsonPath::arrayAt($decoded, ['run', 'flagged_verdicts']));
+        self::assertNotContains('unknown', JsonPath::arrayAt($decoded, ['run', 'graded_verdicts']));
 
-        $standings = [];
-        foreach (array_keys(JsonPath::arrayAt($decoded, ['findings'])) as $at) {
-            $finding = JsonPath::arrayAt($decoded, ['findings', $at]);
-            if (\is_array($finding['baseline'] ?? null)) {
-                $standings[JsonPath::stringAt($decoded, ['findings', $at, 'baseline', 'status'])] = true;
-            }
-        }
-        self::assertNotSame([], $standings, 'the findings carry their standing, not just the totals');
-        self::assertSame(['known'], array_keys($standings), 'a baseline written from this very report knows all of them');
+        $gate = JsonPath::arrayAt($decoded, ['gate']);
+        self::assertGreaterThan(0, $gate['reaching'], 'wallabag has silent packages');
+        self::assertSame($gate['reaching'], JsonPath::arrayAt($gate, ['exempt'])['baseline'], 'a baseline written from this very report exempts every finding that reaches the gate');
     }
 
     /**
@@ -269,16 +263,17 @@ final class JsonSchemaConformanceTest extends TestCase
         $graph = DependencyGraph::fromLock(LockFile::fromArray(['packages' => $packages]), ProjectConfig::fromArray(['require' => $roots]), false);
         $at = new \DateTimeImmutable(self::NOW);
         $findings = [];
+        $stale = [new Signal(Signal::S2, Signal::LEVEL_WARN, 'no release for 3.0 years', ['last_release' => '2023-09-14T00:00:00+00:00', 'last_version' => '1.0.0', 'years' => 3.0, 'dated_by' => null])];
         foreach (array_merge(['vendor/shared', 'vendor/leaf'], array_keys($roots)) as $package) {
             $verdict = strpos($package, 'vendor/') === 0 ? Verdict::STALE : Verdict::OK;
-            $findings[] = (new FindingBuilder())->withPackage($package)->withVerdict($verdict)->withChain($graph->shortestChain($package))->withDataDate($at)->withDirectDependents(array_keys($graph->chainsTo($package)))->build();
+            $findings[] = (new FindingBuilder())->withPackage($package)->withVerdict($verdict)->withSignals($verdict === Verdict::STALE ? $stale : [])->withChain($graph->shortestChain($package))->withDataDate($at)->withDirectDependents(array_keys($graph->chainsTo($package)))->build();
         }
         $report = new Report(TransitiveExposure::attach($findings, $graph), [], $at, \count($findings), 0);
 
         $json = (new JsonFormatter())->format($report);
         $decoded = json_decode($json, true);
         self::assertIsArray($decoded);
-        self::assertSame([['package' => 'vendor/shared', 'verdict' => 'stale', 'fan_in' => 9]], $decoded['unattributed']);
+        self::assertSame([['package' => 'vendor/shared', 'verdict' => 'low', 'lead' => 'stale', 'flag_ids' => ['stale'], 'fan_in' => 9]], $decoded['unattributed']);
         self::assertSame(['max_fan_in' => 8], $decoded['exposure_rule']);
         self::assertSame([['package' => 'root/r01', 'flagged' => 1]], $decoded['exposure']);
         $this->assertValid(Schemas::REPORT, $json, 'a report with an unattributed package');
@@ -662,7 +657,6 @@ final class JsonSchemaConformanceTest extends TestCase
             'a release with no tag in its repository' => ['reason' => 'no_stable_release'],
             'no metadata, so nothing known' => ['has_stable_release' => null],
             'a tagged snapshot' => ['has_stable_release' => true, 'last_stable_release' => '2019-01-23T15:23:04+00:00', 'last_stable_version' => '1.6.2', 'last_stable_dated_by' => 'vendor/monorepo'],
-            'a document without the S6 keys' => array_fill_keys(['reason', 'has_stable_release', 'last_stable_release', 'last_stable_version', 'last_stable_dated_by', 'snapshot_time'], self::ABSENT),
         ];
         foreach ($valid as $what => $change) {
             $document = self::withRulerzS6($json, $change);
@@ -678,6 +672,7 @@ final class JsonSchemaConformanceTest extends TestCase
             'reason as a number' => ['reason' => 6],
             'reason in capitals' => ['reason' => 'Branch snapshot'],
             'reason empty' => ['reason' => ''],
+            'a document without the S6 keys' => array_fill_keys(['reason', 'has_stable_release', 'last_stable_release', 'last_stable_version', 'last_stable_dated_by', 'snapshot_time'], self::ABSENT),
         ];
         foreach ($invalid as $what => $change) {
             self::assertNotSame([], $this->errors(Schemas::REPORT, self::withRulerzS6($json, $change), false), $what);
@@ -685,21 +680,18 @@ final class JsonSchemaConformanceTest extends TestCase
     }
 
     /**
-     * `from_composer_repository` is a boolean on every finding lockrot writes, and optional in both
-     * schemas, so a finding that an earlier release wrote without it still validates. Null and a word
-     * do not.
+     * `from_composer_repository` is a boolean that both schemas require on every finding. False
+     * holds only with the origin and the metadata status that say so, so false alone fails. Null, a
+     * word and a missing key fail.
      */
     public function testAFindingSaysWhetherARepositoryWasAskedAboutItAsABoolean(): void
     {
         foreach (self::documentsFor('doctrine/cache') as $schema => [$decoded, $path]) {
             self::assertTrue(JsonPath::arrayAt($decoded, $path)['from_composer_repository'], $schema.': wallabag\'s packages all come from Packagist');
-            foreach ([true, false, self::ABSENT] as $value) {
-                $what = $schema.' '.var_export($value, true);
-                $changed = self::withFindingKey($decoded, $path, 'from_composer_repository', $value);
-                $this->assertValid($schema, $changed, $what);
-                $this->assertValid($schema, $changed, $what, true);
-            }
-            foreach ([null, 'yes', 1] as $value) {
+            $changed = self::withFindingKey($decoded, $path, 'from_composer_repository', true);
+            $this->assertValid($schema, $changed, $schema.' true');
+            $this->assertValid($schema, $changed, $schema.' true', true);
+            foreach ([false, self::ABSENT, null, 'yes', 1] as $value) {
                 self::assertNotSame([], $this->errors($schema, self::withFindingKey($decoded, $path, 'from_composer_repository', $value), false), $schema.' '.var_export($value, true));
             }
         }
@@ -708,14 +700,14 @@ final class JsonSchemaConformanceTest extends TestCase
     /**
      * `libyears_unmeasured` is an open set in both schemas: a reason a later release adds, and null,
      * validate against the published schema, and the strict twin holds the value to the reasons this
-     * release writes. A finding that an earlier release wrote without the key validates against both.
+     * release writes. Both schemas require the key.
      */
     public function testAFindingSaysWhyItsLibyearsAreNullAsAnOpenCode(): void
     {
         $documents = self::documentsFor('wallabag/rulerz');
         foreach ($documents as $schema => [$decoded, $path]) {
             self::assertSame(Libyears::BRANCH_SNAPSHOT, JsonPath::arrayAt($decoded, $path)['libyears_unmeasured'], $schema.': rulerz is a branch snapshot');
-            foreach (array_merge(Libyears::REASONS, [null, self::ABSENT]) as $value) {
+            foreach (array_merge(Libyears::REASONS, [null]) as $value) {
                 $what = $schema.' '.var_export($value, true);
                 $changed = self::withFindingKey($decoded, $path, 'libyears_unmeasured', $value);
                 $this->assertValid($schema, $changed, $what);
@@ -727,7 +719,7 @@ final class JsonSchemaConformanceTest extends TestCase
                 $errors = $this->errors($schema, $changed, true);
                 self::assertNotSame([], array_filter($errors, static fn (string $error): bool => strpos($error, 'libyears_unmeasured') !== false), $schema.' '.$value.': '.implode("\n", $errors));
             }
-            foreach (['Branch-Snapshot', '', 1, false] as $value) {
+            foreach (['Branch-Snapshot', '', 1, false, self::ABSENT] as $value) {
                 self::assertNotSame([], $this->errors($schema, self::withFindingKey($decoded, $path, 'libyears_unmeasured', $value), false), $schema.' '.var_export($value, true));
             }
         }
@@ -772,86 +764,7 @@ final class JsonSchemaConformanceTest extends TestCase
         return [Schemas::REPORT => [$report, ['findings', 0]], Schemas::EXPLAIN => [$explain, ['finding']]];
     }
 
-    /**
-     * `priority_basis` in both schemas: a step reason that a later release adds validates against the
-     * published schema, and the strict twin holds the reason to the ones this release writes. `none`
-     * is no step's `from` or `to` in either. A finding that an earlier release wrote without the key
-     * validates against both.
-     */
-    public function testAFindingSaysHowItsPriorityWasReached(): void
-    {
-        if (!interface_exists(AdvisoryProviderInterface::class)) {
-            self::markTestSkipped('Composer 2.2 has no advisory API, so doctrine/cache carries no S9.');
-        }
-        foreach (self::documentsFor('doctrine/cache') as $schema => [$decoded, $path]) {
-            $basis = JsonPath::arrayAt($decoded, array_merge($path, ['priority_basis']));
-            self::assertSame(['base' => 'critical', 'steps' => [['reason' => 'transitive', 'from' => 'critical', 'to' => 'high'], ['reason' => 'no_fix_expected', 'from' => 'high', 'to' => 'critical']]], $basis, $schema.': doctrine/cache, abandoned, transitive, one advisory no release fixes');
-            $withStep = static fn (array $step): array => ['base' => 'high', 'steps' => [$step]];
-            foreach ([self::ABSENT, ['base' => 'none', 'steps' => []], $withStep(['reason' => 'dev', 'from' => 'high', 'to' => 'medium'])] as $value) {
-                $what = $schema.' '.json_encode($value);
-                $changed = self::withFindingKey($decoded, $path, 'priority_basis', $value);
-                $this->assertValid($schema, $changed, $what);
-                $this->assertValid($schema, $changed, $what, true);
-            }
-            $unknown = self::withFindingKey($decoded, $path, 'priority_basis', $withStep(['reason' => 'vendored', 'from' => 'high', 'to' => 'medium']));
-            $this->assertValid($schema, $unknown, $schema.': a step reason a later release adds');
-            $typo = self::withFindingKey($decoded, $path, 'priority_basis', $withStep(['reason' => 'transitve', 'from' => 'high', 'to' => 'medium']));
-            $this->assertValid($schema, $typo, $schema.': the published schema cannot tell a typo from a new reason');
-            $errors = $this->errors($schema, $typo, true);
-            self::assertNotSame([], array_filter($errors, static fn (string $error): bool => strpos($error, 'reason') !== false), $schema.': '.implode("\n", $errors));
-            foreach ([
-                'from none' => $withStep(['reason' => 'dev', 'from' => 'none', 'to' => 'low']),
-                'to none' => $withStep(['reason' => 'dev', 'from' => 'low', 'to' => 'none']),
-                'a step without its to' => $withStep(['reason' => 'dev', 'from' => 'high']),
-                'a base outside the order' => ['base' => 'urgent', 'steps' => []],
-                'no steps' => ['base' => 'high'],
-                'null' => null,
-                'a reason in capitals' => $withStep(['reason' => 'Dev', 'from' => 'high', 'to' => 'medium']),
-            ] as $what => $value) {
-                self::assertNotSame([], $this->errors($schema, self::withFindingKey($decoded, $path, 'priority_basis', $value), false), $schema.' '.$what);
-            }
-        }
-    }
-
-    /**
-     * `no_fix_expected` in both schemas: null, an empty list and a list of `{id, reason}` validate.
-     * A no-fix reason that a later release adds passes the published schema, and the strict twin
-     * rejects a typo in one. A finding that an earlier release wrote without the key validates against
-     * both.
-     */
-    public function testAFindingNamesTheAdvisoriesNoFixIsExpectedFor(): void
-    {
-        if (!interface_exists(AdvisoryProviderInterface::class)) {
-            self::markTestSkipped('Composer 2.2 has no advisory API, so doctrine/cache carries no S9.');
-        }
-        foreach (self::documentsFor('doctrine/cache') as $schema => [$decoded, $path]) {
-            self::assertSame([['id' => 'PKSA-cache-1', 'reason' => 'no_release_fixes']], JsonPath::arrayAt($decoded, $path)['no_fix_expected'], $schema.': 2.2.0 is the highest release, and the range covers it');
-            $item = static fn (string $reason): array => [['id' => 'PKSA-cache-1', 'reason' => $reason]];
-            foreach ([self::ABSENT, null, [], $item('releases_unknown'), $item('not_on_installed_branch')] as $value) {
-                $what = $schema.' '.json_encode($value);
-                $changed = self::withFindingKey($decoded, $path, 'no_fix_expected', $value);
-                $this->assertValid($schema, $changed, $what);
-                $this->assertValid($schema, $changed, $what, true);
-            }
-            $this->assertValid($schema, self::withFindingKey($decoded, $path, 'no_fix_expected', $item('withdrawn_upstream')), $schema.': a reason a later release adds');
-            $typo = self::withFindingKey($decoded, $path, 'no_fix_expected', $item('releses_unknown'));
-            $this->assertValid($schema, $typo, $schema.': the published schema cannot tell a typo from a new reason');
-            $errors = $this->errors($schema, $typo, true);
-            self::assertNotSame([], array_filter($errors, static fn (string $error): bool => strpos($error, 'reason') !== false), $schema.': '.implode("\n", $errors));
-            foreach ([
-                'an item without its reason' => [['id' => 'PKSA-cache-1']],
-                'an item without its id' => [['reason' => 'no_release_fixes']],
-                'a bare id' => ['PKSA-cache-1'],
-                'a boolean' => true,
-                'a count' => 1,
-                'an empty reason' => $item(''),
-            ] as $what => $value) {
-                self::assertNotSame([], $this->errors($schema, self::withFindingKey($decoded, $path, 'no_fix_expected', $value), false), $schema.' '.$what);
-            }
-        }
-    }
-
-    /** S9's `releases_read` is an optional boolean in the report schema. The explain schema types signal data as any object. */
+    /** S9's `releases_read` is a required boolean in the report schema. The explain schema types signal data as any object. */
     public function testS9SaysWhetherTheReleasesWereRead(): void
     {
         if (!interface_exists(AdvisoryProviderInterface::class)) {
@@ -879,21 +792,20 @@ final class JsonSchemaConformanceTest extends TestCase
 
             return (string) json_encode($report);
         };
-        foreach ([true, false, self::ABSENT] as $value) {
+        foreach ([true, false] as $value) {
             $this->assertValid(Schemas::REPORT, $withValue($value), var_export($value, true));
             $this->assertValid(Schemas::REPORT, $withValue($value), var_export($value, true), true);
         }
-        foreach ([null, 'yes', 1] as $value) {
+        foreach ([null, 'yes', 1, self::ABSENT] as $value) {
             self::assertNotSame([], $this->errors(Schemas::REPORT, $withValue($value), false), var_export($value, true));
         }
     }
 
     /**
      * The gate's inputs in `run`, the root `gate` and each finding's `gate`: four open vocabularies
-     * (`run.mode`, `run.fail_on_kind`, `gate.tripped_by`'s items, a finding's `gate.exempt_by`) take
+     * (`run.mode`, `run.gates[].kind`, `gate.tripped_by`'s items, a finding's `gate.exempt_by`) take
      * a value that a later release adds, and the strict twin holds each to the values this release
-     * writes. A cause listed twice fails. A document that an earlier release wrote
-     * without the fields validates against both.
+     * writes. A cause listed twice fails, and so does a null in place of a gate.
      */
     public function testTheGateAndWhatItWasToldAreTypedAndTheirVocabulariesOpen(): void
     {
@@ -903,22 +815,34 @@ final class JsonSchemaConformanceTest extends TestCase
             ->withBaseline(BaselineComparison::compare(Baseline::fromReport($report), $report, 'lockrot-baseline.json', []));
         $decoded = json_decode((new JsonFormatter())->format($report), true);
         self::assertIsArray($decoded);
-        self::assertSame(['fails' => false, 'tripped_by' => [], 'fail_on_applied' => true], $decoded['gate'], 'a baseline written from this report accepts every finding');
-        self::assertSame(['reaches_fail_on' => true, 'fails' => false, 'exempt_by' => 'baseline'], JsonPath::arrayAt($decoded, ['findings', 0, 'gate']));
+        $gate = JsonPath::arrayAt($decoded, ['gate']);
+        $keys = array_flip(['fails', 'tripped_by', 'fail_on_applied', 'failing']);
+        self::assertSame(['fails' => false, 'tripped_by' => [], 'fail_on_applied' => true, 'failing' => 0], array_intersect_key($gate, $keys), 'a baseline written from this report accepts every finding');
+        self::assertSame($gate['reaching'], JsonPath::arrayAt($gate, ['exempt'])['baseline']);
+        $at = null;
+        foreach (JsonPath::arrayAt($decoded, ['findings']) as $i => $finding) {
+            self::assertIsArray($finding);
+            if (JsonPath::arrayAt($finding, ['gate'])['reaches_fail_on'] === true) {
+                $at = $i;
+                break;
+            }
+        }
+        self::assertIsInt($at, 'a wallabag finding reaches --fail-on=stale');
+        self::assertSame(['reaches_fail_on' => true, 'fails' => false, 'exempt_by' => 'baseline'], array_intersect_key(JsonPath::arrayAt($decoded, ['findings', $at, 'gate']), array_flip(['reaches_fail_on', 'fails', 'exempt_by'])));
         $this->assertValid(Schemas::REPORT, (string) json_encode($decoded), 'the gate');
         $this->assertValid(Schemas::REPORT, (string) json_encode($decoded), 'the gate', true);
 
-        $failing = self::changed($decoded, ['gate'], ['fails' => true, 'tripped_by' => ['strict_network', 'fail_on'], 'fail_on_applied' => true]);
-        $this->assertValid(Schemas::REPORT, $failing, 'both causes', true);
+        // A failing gate names its cause, and a cause other than `fail_on` needs no failing finding.
+        $failed = self::setAt($decoded, ['gate', 'fails'], true);
         $open = [
-            'run.mode' => [['run', 'mode'], 'pull_request', 'generate_baselin'],
-            'run.fail_on_kind' => [['run', 'fail_on_kind'], 'licence', 'verdicts'],
-            'gate.tripped_by' => [['gate', 'tripped_by'], ['budget_exceeded'], ['failon']],
-            'exempt_by' => [['findings', 0, 'gate', 'exempt_by'], 'ignore_list', 'baselined'],
+            'run.mode' => [$decoded, ['run', 'mode'], 'pull_request', 'generate_baselin'],
+            'run.gates[].kind' => [$decoded, ['run', 'gates', 0, 'kind'], 'licence', 'verdicts'],
+            'gate.tripped_by' => [$failed, ['gate', 'tripped_by'], ['budget_exceeded'], ['failon']],
+            'exempt_by' => [$decoded, ['findings', $at, 'gate', 'exempt_by'], 'ignore_list', 'baselined'],
         ];
-        foreach ($open as $what => [$path, $later, $typo]) {
-            $this->assertValid(Schemas::REPORT, self::changed($decoded, $path, $later), $what.': a value a later release adds');
-            $mistyped = self::changed($decoded, $path, $typo);
+        foreach ($open as $what => [$base, $path, $later, $typo]) {
+            $this->assertValid(Schemas::REPORT, self::changed($base, $path, $later), $what.': a value a later release adds');
+            $mistyped = self::changed($base, $path, $typo);
             $this->assertValid(Schemas::REPORT, $mistyped, $what.': the published schema cannot tell a typo from a new value');
             $errors = $this->errors(Schemas::REPORT, $mistyped, true);
             self::assertNotSame([], array_filter($errors, static fn (string $error): bool => strpos($error, (string) end($path)) !== false), $what.': '.implode("\n", $errors));
@@ -926,33 +850,18 @@ final class JsonSchemaConformanceTest extends TestCase
         foreach ([
             'a cause listed twice' => [['gate', 'tripped_by'], ['fail_on', 'fail_on']],
             'fails as a word' => [['gate', 'fails'], 'yes'],
-            'the gate without fail_on_applied' => [['gate'], ['fails' => false, 'tripped_by' => []]],
+            'the gate without fail_on_applied' => [['gate'], array_diff_key($gate, ['fail_on_applied' => true])],
             'a cause in capitals' => [['gate', 'tripped_by'], ['Fail_on']],
-            'a finding gate without exempt_by' => [['findings', 0, 'gate'], ['reaches_fail_on' => true, 'fails' => false]],
-            'reaches_fail_on as null' => [['findings', 0, 'gate', 'reaches_fail_on'], null],
+            'a finding gate without exempt_by' => [['findings', $at, 'gate'], ['reaches_fail_on' => true, 'fails' => false, 'by' => [], 'basis' => null]],
+            'reaches_fail_on as null' => [['findings', $at, 'gate', 'reaches_fail_on'], null],
             'strict_network as null' => [['run', 'strict_network'], null],
             'an empty mode' => [['run', 'mode'], ''],
-            'a kind that is a number' => [['run', 'fail_on_kind'], 1],
+            'a kind that is a number' => [['run', 'gates', 0, 'kind'], 1],
+            'a null gate' => [['gate'], null],
+            'a null finding gate' => [['findings', $at, 'gate'], null],
+            'null gates' => [['run', 'gates'], null],
         ] as $what => [$path, $value]) {
             self::assertNotSame([], $this->errors(Schemas::REPORT, self::changed($decoded, $path, $value), false), $what);
-        }
-
-        $before = $decoded;
-        unset($before['gate']);
-        $run = JsonPath::arrayAt($before, ['run']);
-        unset($run['mode'], $run['strict_network'], $run['fail_on_kind']);
-        $before['run'] = $run;
-        $findings = JsonPath::arrayAt($before, ['findings']);
-        foreach ($findings as $at => $finding) {
-            self::assertIsArray($finding);
-            unset($finding['gate']);
-            $findings[$at] = $finding;
-        }
-        $before['findings'] = $findings;
-        $this->assertValid(Schemas::REPORT, (string) json_encode($before), 'a document written before the gate');
-        $this->assertValid(Schemas::REPORT, (string) json_encode($before), 'a document written before the gate', true);
-        foreach ([['gate'], ['findings', 0, 'gate'], ['run', 'fail_on_kind']] as $path) {
-            $this->assertValid(Schemas::REPORT, self::changed($decoded, $path, null), implode('.', $path).' null', true);
         }
     }
 
@@ -961,7 +870,7 @@ final class JsonSchemaConformanceTest extends TestCase
      * and each open vocabulary with a value that a later release adds: the published schema takes
      * it, the strict twin, which reads `x-known-values` as the enum, does not. A code that the schema
      * does not list carries any object. A listed code keeps its `data` typed. A document without the
-     * field validates.
+     * field fails.
      */
     public function testARunNotesDataIsTypedPerCodeAndItsVocabulariesAreOpen(): void
     {
@@ -1027,10 +936,9 @@ final class JsonSchemaConformanceTest extends TestCase
             self::assertNotSame([], $this->errors(Schemas::REPORT, self::changed($decoded, $path, $value), false), $what);
         }
 
-        $before = $decoded;
-        unset($before['note_details']);
-        $this->assertValid(Schemas::REPORT, (string) json_encode($before), 'a document written before note_details');
-        $this->assertValid(Schemas::REPORT, (string) json_encode($before), 'a document written before note_details', true);
+        $without = $decoded;
+        unset($without['note_details']);
+        self::assertNotSame([], $this->errors(Schemas::REPORT, (string) json_encode($without), false), 'a report without note_details');
 
         $analysis = self::analysis('apps/wallabag_wallabag');
         $finding = $analysis->finding('doctrine/cache');
@@ -1044,7 +952,7 @@ final class JsonSchemaConformanceTest extends TestCase
         $this->assertValid(Schemas::EXPLAIN, self::changed($explained, ['note_details', 8, 'data', 'forge_id'], 'forgejo'), 'an explanation with a forge a later release adds');
         self::assertNotSame([], $this->errors(Schemas::EXPLAIN, self::changed($explained, ['note_details', 8, 'data', 'forge_id'], 'forgejo'), true));
         unset($explained['note_details']);
-        $this->assertValid(Schemas::EXPLAIN, (string) json_encode($explained), 'an explanation written before note_details', true);
+        self::assertNotSame([], $this->errors(Schemas::EXPLAIN, (string) json_encode($explained), false), 'an explanation without note_details');
     }
 
     /** @return array<mixed, mixed> */
@@ -1391,38 +1299,40 @@ final class JsonSchemaConformanceTest extends TestCase
 
     /**
      * The validation helper picks the file of the number a document names, not the newest one. A
-     * temporary copy of resources/ holds a report-2 file beside report-1, and the report-2 file
-     * rejects every document. A report-1 document validates against report-1, and a document that
-     * names report-2 is held to report-2. A document that names no number takes the one given, and
-     * a document that names another number than the one given fails.
+     * temporary copy of resources/ holds a file for the next number beside the current one, and that
+     * file rejects every document. A document that lockrot writes validates against its own number,
+     * and a document that names the next number is held to that file. A document that names no
+     * number takes the one given, and a document that names another number than the one given fails.
      */
     public function testADocumentIsHeldToTheFileOfTheNumberItNamesWhileANewerFileSitsBesideIt(): void
     {
+        $current = JsonFormatter::SCHEMA;
+        $next = $current + 1;
         $dir = sys_get_temp_dir().'/lockrot-numbered-'.bin2hex(random_bytes(8));
         mkdir($dir);
         try {
-            copy(Schemas::path(Schemas::REPORT, 1), $dir.'/lockrot-report-1.schema.json');
-            file_put_contents($dir.'/lockrot-report-2.schema.json', (string) json_encode(['$schema' => 'http://json-schema.org/draft-04/schema#', 'id' => Schemas::url(Schemas::REPORT, 2), 'not' => new \stdClass()]));
+            copy(Schemas::path(Schemas::REPORT, $current), $dir.'/'.Schemas::fileName(Schemas::REPORT, $current));
+            file_put_contents($dir.'/'.Schemas::fileName(Schemas::REPORT, $next), (string) json_encode(['$schema' => 'http://json-schema.org/draft-04/schema#', 'id' => Schemas::url(Schemas::REPORT, $next), 'not' => new \stdClass()]));
 
             $report = (new JsonFormatter())->format(self::analysis('skeletons/laravel')->report());
-            self::assertStringStartsWith("{\n    \"\$schema\": \"https://lockrot.dev/schema/report-1.json\",\n", $report);
-            $report1 = self::schemaFileFor(Schemas::REPORT, $report, null, $dir);
-            self::assertSame($dir.'/lockrot-report-1.schema.json', $report1);
-            $this->assertValidAgainst(self::schemaAt($report1), $report, 'report-1 beside report-2');
-            $this->assertValidAgainst(self::schemaAt($report1), $report, 'report-1 beside report-2', true);
+            self::assertStringStartsWith("{\n    \"\$schema\": \"".Schemas::url(Schemas::REPORT, $current)."\",\n", $report);
+            $own = self::schemaFileFor(Schemas::REPORT, $report, null, $dir);
+            self::assertSame($dir.'/'.Schemas::fileName(Schemas::REPORT, $current), $own);
+            $this->assertValidAgainst(self::schemaAt($own), $report, 'the current number beside the next');
+            $this->assertValidAgainst(self::schemaAt($own), $report, 'the current number beside the next', true);
 
             $decoded = self::decoded($report);
-            $naming2 = (string) json_encode(['$schema' => Schemas::url(Schemas::REPORT, 2)] + $decoded);
-            $report2 = self::schemaFileFor(Schemas::REPORT, $naming2, null, $dir);
-            self::assertSame($dir.'/lockrot-report-2.schema.json', $report2);
-            self::assertNotSame([], $this->errorsAgainst(self::schemaAt($report2), $naming2, false), 'held to report-2');
+            $namingNext = (string) json_encode(['$schema' => Schemas::url(Schemas::REPORT, $next)] + $decoded);
+            $nextFile = self::schemaFileFor(Schemas::REPORT, $namingNext, null, $dir);
+            self::assertSame($dir.'/'.Schemas::fileName(Schemas::REPORT, $next), $nextFile);
+            self::assertNotSame([], $this->errorsAgainst(self::schemaAt($nextFile), $namingNext, false), 'held to the next number');
 
             unset($decoded['$schema'], $decoded['lockrot']);
             $unnamed = (string) json_encode($decoded);
-            self::assertSame($dir.'/lockrot-report-2.schema.json', self::schemaFileFor(Schemas::REPORT, $unnamed, 2, $dir), 'no number named: the one given');
-            self::assertSame($dir.'/lockrot-report-1.schema.json', self::schemaFileFor(Schemas::REPORT, (string) json_encode(['lockrot' => ['schema' => 1]] + $decoded), null, $dir), 'lockrot.schema names it');
+            self::assertSame($nextFile, self::schemaFileFor(Schemas::REPORT, $unnamed, $next, $dir), 'no number named: the one given');
+            self::assertSame($own, self::schemaFileFor(Schemas::REPORT, (string) json_encode(['lockrot' => ['schema' => $current]] + $decoded), null, $dir), 'lockrot.schema names it');
 
-            foreach ([[$report, 2, 'a number the document contradicts'], [$unnamed, null, 'no number at all']] as [$json, $number, $what]) {
+            foreach ([[$report, $next, 'a number the document contradicts'], [$unnamed, null, 'no number at all']] as [$json, $number, $what]) {
                 try {
                     self::schemaFileFor(Schemas::REPORT, $json, $number, $dir);
                 } catch (AssertionFailedError $expected) {
