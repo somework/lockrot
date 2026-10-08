@@ -640,8 +640,8 @@ def closure(defs, names):
 
 def explain_schema():
     """explain-2 types the report-2 finding, its signals, notes and the run block with report-2's own
-    definitions, copied byte for byte from lockrot-report-2.schema.json (built first by build_report2_schema.py). Revision 3's
-    second builder typed the same finding differently in 189 places; SchemaParity in run_all.sh asserts the copies are equal."""
+    definitions, copied byte for byte from lockrot-report-2.schema.json (built first by
+    build_report2_schema.py). SchemaParityTest asserts that the copies are equal."""
     R2 = json.load(open(REPORT2))
     RD = R2['definitions']
     D = {}

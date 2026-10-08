@@ -70,11 +70,13 @@ final class LockrotCommand extends BaseCommand
      */
     private ?array $envSnapshot = null;
 
-    /** @param null|callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, Tokens, Clock, Deadline, ?string): Analyzer $analyzerFactory */
     /** @var list<int>|null */
     private ?array $htmlReads;
 
-    /** @param list<int>|null $htmlReads the report numbers the html renderer reads, its manifest's unless given */
+    /**
+     * @param null|callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, Tokens, Clock, Deadline, ?string): Analyzer $analyzerFactory
+     * @param list<int>|null                                                                                                       $htmlReads       the report numbers the html renderer reads, its manifest's unless given
+     */
     public function __construct(?callable $analyzerFactory = null, ?array $htmlReads = null)
     {
         $this->htmlReads = $htmlReads;

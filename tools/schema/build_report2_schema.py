@@ -979,9 +979,7 @@ defs['scoreRule'] = obj(("One rule of the model (§3.7 `rules[]`): in `stage` or
 }, **RULE_PARAMS), required=['id', 'stage', 'kind', 'applies_to', 'why', 'doc', 'illustration'],
     anyOf=[{'properties': {'kind': {'enum': [k]}}, 'required': KIND_REQUIRES.get(k, [])} for k in RULE_KINDS] + [{
         'description': 'A rule kind this schema does not list: no parameter is required.', 'not': {'properties': {'kind': {'enum': RULE_KINDS}}}}])
-for k in KIND_REQUIRES:  # draft-04 rejects an empty `required`
-    pass
-for br in defs['scoreRule']['anyOf']:
+for br in defs['scoreRule']['anyOf']:  # draft-04 rejects an empty `required`
     if 'required' in br and not br['required']:
         del br['required']
 defs['scoreModel'] = obj(("The score model, self-described (§3.7): ordered flags, severities, fix kinds and bands, the rules with ids and illustrations, the sort keys with JSON paths. "
@@ -1245,7 +1243,6 @@ ROOT = {
     'note_details': arr('The run notes, typed (report-1; §6.2 adds six codes).', ref('noteDetail')),
     'findings': arr('One per analysed package, in `rank` order (§3.2, I20).', ref('finding')),
 }
-ROOT['exposure']['description'] = ROOT['exposure']['description']
 ROOT['activity_cache_oldest_at']['description'] = R1['properties']['activity_cache_oldest_at']['description'] + ' (report-1)'
 
 # report-1 copies that carried no description on some members (report-1 described the object, not each member)
@@ -1470,7 +1467,7 @@ def check_descriptions(node, path, missing):
 if __name__ == '__main__':
     miss = []
     check_descriptions(schema, '#', miss)
-    # anyOf branches restate discriminators without descriptions on purpose; report everything else
+    # an anyOf branch restates a discriminator that its definition describes, so it needs no description
     miss = [m for m in miss if '/anyOf[' not in m and '/not/' not in m]
     # the shipping pass (ship_text.py): no description cites the spec or its review rounds
     from ship_text import ship_schema, leftovers

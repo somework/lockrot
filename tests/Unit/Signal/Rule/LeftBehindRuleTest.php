@@ -424,10 +424,7 @@ final class LeftBehindRuleTest extends TestCase
         self::assertSame('^2.0', $signal->data()['suggested_constraint']);
     }
 
-    /**
-     * The S8 keys that report-2 adds: computed here, not written, because
-     * report-1's S8 is closed.
-     */
+    /** The S8 keys that report-2 adds, which the signal's data carries. */
     public function testTheReadingCarriesTheReachableBranchsPhpAndWhatAdmitsIt(): void
     {
         $meta = F::metadata([['3.4.1', '2026-06-01', '>=8.4'], ['2.9.0', '2026-03-01', '>=7.4'], ['1.9.2', '2019-03-02', '>=7.1']]);
@@ -480,8 +477,8 @@ final class LeftBehindRuleTest extends TestCase
         self::assertSame(0.3, $reading->newestYears());
     }
 
-    /** report-1's strict twin closes S8's data: the new keys stay out of the signal. */
-    public function testTheSignalIsTheReadingsAndWritesNoNewKey(): void
+    /** report-2's S8 carries the reachable branch's keys of the reading behind it. */
+    public function testTheSignalWritesTheReadingsKeys(): void
     {
         $meta = F::metadata([['3.4.1', '2026-06-01', '>=8.4'], ['1.9.2', '2019-03-02', '>=7.1']]);
         $facts = F::facts(F::package(['version' => '1.9.2']), $meta);
