@@ -36,7 +36,7 @@ final class AdvisoryRuleTest extends TestCase
         self::assertSame(['C-1', 'H-1', 'H-2', 'M-1', 'L-1', 'N-1'], array_column(AdvisoryRule::legacy($facts)[1]->rows(), 'id'), 'the JSON list is ordered the same way');
     }
 
-    /** report-2's rows: the severity bucket beside Composer's word, the points and the fix. */
+    /** report-2's rows: the severity bucket beside Composer's word, the points and the fix. The finding marks the deciding row. */
     public function testARowCarriesTheBucketThePointsAndTheFix(): void
     {
         $advisory = new Advisory('PKSA-1', 'CVE-2024-0001', 'CVE-2024-0001:  a   title ', null, 'moderate', null);
@@ -49,7 +49,7 @@ final class AdvisoryRuleTest extends TestCase
         self::assertSame(['advisories', 'releases_read', 'complete'], array_keys($signal->data()));
         self::assertSame([
             'id' => 'PKSA-1', 'cve' => 'CVE-2024-0001', 'title' => 'a title', 'link' => null, 'reported_at' => null,
-            'severity' => 'medium', 'severity_published' => 'moderate', 'affected_versions' => null, 'counted' => true, 'points' => 8, 'deciding' => true,
+            'severity' => 'medium', 'severity_published' => 'moderate', 'affected_versions' => null, 'counted' => true, 'points' => 8,
             'fix' => ['kind' => 'unknown', 'to_branch' => null, 'version' => null, 'newest' => null, 'on_installed_branch' => null, 'php' => null, 'held_by' => [], 'reason' => 'affected_range_unknown'],
             'baseline' => null,
         ], JsonPath::arrayAt($signal->data(), ['advisories', 0]));

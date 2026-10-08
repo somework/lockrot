@@ -64,4 +64,11 @@ final class SeverityTest extends TestCase
         self::assertSame($medium->points(), $unrated->points());
         self::assertLessThan($unrated->displayPosition(), $medium->displayPosition());
     }
+
+    public function testWorstOfIsTheFirstBucketInTheDisplayOrder(): void
+    {
+        self::assertSame(Severity::UNRATED, Severity::worstOf([Severity::LOW, Severity::UNRATED, Severity::LOW]));
+        self::assertSame(Severity::CRITICAL, Severity::worstOf([Severity::MEDIUM, Severity::CRITICAL, Severity::HIGH]));
+        self::assertNull(Severity::worstOf([]));
+    }
 }

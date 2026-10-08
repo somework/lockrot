@@ -291,16 +291,10 @@ final class FindingDetails
         return $counts;
     }
 
-    /** @param array<string, int> $counts */
+    /** @param array<string, int> $counts every severity, from rows that hold at least one */
     private static function worst(array $counts): string
     {
-        foreach (Severity::DISPLAY_ORDER as $severity) {
-            if (($counts[$severity] ?? 0) > 0) {
-                return $severity;
-            }
-        }
-
-        return Severity::LOW;
+        return Severity::worstOf(array_keys(array_filter($counts))) ?? Severity::LOW;
     }
 
     /**
@@ -333,17 +327,11 @@ final class FindingDetails
     private static function ignored(IgnoredAdvisory $ignored): array
     {
         $advisory = $ignored->advisory();
-        $title = $advisory->title();
-        $cve = $advisory->cve();
-        if ($title !== null) {
-            $title = trim((string) preg_replace('/\s+/u', ' ', $title));
-            $title = $cve !== null && strpos($title, $cve.': ') === 0 ? substr($title, \strlen($cve) + 2) : $title;
-        }
 
         return [
             'id' => $advisory->id(),
-            'cve' => $cve,
-            'title' => $title,
+            'cve' => $advisory->cve(),
+            'title' => AdvisoryRule::title($advisory->cve(), $advisory->title()),
             'severity' => Severity::fromComposer($advisory->severity())->bucket(),
             'by' => $ignored->match()->by(),
             'matched' => $ignored->match()->kind(),

@@ -797,6 +797,20 @@ final class FindingTest extends TestCase
         yield 'the details first' => ['read', false, true];
     }
 
+    /** The written S9 rows mark as deciding the advisory that the score's security term counts. */
+    public function testTheDecidingS9RowIsTheScoresDecidingAdvisory(): void
+    {
+        $row = static fn (string $id, string $severity, int $points): array => ['id' => $id, 'cve' => null, 'title' => null, 'link' => null, 'reported_at' => null, 'severity' => $severity, 'severity_published' => $severity, 'affected_versions' => null, 'counted' => true, 'points' => $points, 'fix' => ['kind' => 'update'], 'baseline' => null];
+        $signals = [new Signal(Signal::S9, Signal::LEVEL_HIGH, '2 advisories', ['advisories' => [$row('PKSA-a', 'critical', 32), $row('PKSA-b', 'low', 2)], 'releases_read' => true, 'complete' => true])];
+        $flags = FlagSet::fromSignals($signals, null, [Score::advisory('PKSA-b', 'low', 'update'), Score::advisory('PKSA-a', 'critical', 'update')]);
+
+        $document = (new FindingBuilder())->withSignals($signals)->withFlags($flags)->build()->toArray();
+
+        $rows = JsonPath::arrayAt($document, ['signals', 0, 'data', 'advisories']);
+        self::assertSame(['PKSA-a' => true, 'PKSA-b' => false], array_column($rows, 'deciding', 'id'));
+        self::assertSame(['points', 'deciding', 'fix'], \array_slice(array_keys(JsonPath::arrayAt($rows, [0])), 9, 3), 'deciding follows points');
+    }
+
     public function testWithSignalsKeepsTheScore(): void
     {
         $signals = [new Signal(Signal::S8, Signal::LEVEL_WARN, 'left behind')];
