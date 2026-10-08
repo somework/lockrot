@@ -21,6 +21,9 @@ final class Signal
     public const S9 = 'S9';
     /** Never decides a verdict: docs/verdicts.md#what-was-not-checked. */
     public const S10 = 'S10';
+
+    /** lockrot's own signal ids, in order: report-2's `run.signal_ids`. */
+    public const IDS = [self::S1, self::S2, self::S3, self::S4, self::S5, self::S6, self::S7, self::S8, self::S9, self::S10];
     public const LEVEL_INFO = 'info';
     public const LEVEL_WARN = 'warn';
     public const LEVEL_HIGH = 'high';

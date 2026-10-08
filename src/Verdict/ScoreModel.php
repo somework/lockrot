@@ -228,6 +228,25 @@ final class ScoreModel
         return $rows;
     }
 
+    /**
+     * Every rule id in stage order, keyed by itself: 0 findings each, and null for `sort`, which
+     * orders and changes no number. A report fills in its own counts.
+     *
+     * @return array<string, int|null>
+     */
+    public static function rulesUnused(): array
+    {
+        $used = [];
+        foreach (self::rules() as $rule) {
+            $id = $rule['id'];
+            if (\is_string($id)) {
+                $used[$id] = $id === 'sort' ? null : 0;
+            }
+        }
+
+        return $used;
+    }
+
     /** @return list<array<string, mixed>> */
     private static function rules(): array
     {
