@@ -44,6 +44,9 @@ final class SchemaRelationsTest extends TestCase
     {
         $schema = json_decode((string) file_get_contents(Schemas::path(Schemas::REPORT, JsonFormatter::SCHEMA)), true);
         self::assertIsArray($schema);
+        $published = json_decode((string) json_encode($schema));
+        self::assertIsObject($published);
+        self::$schemas['published'] = $published;
         foreach (['none', 'break', 'reach'] as $mode) {
             $relations = [];
             $instrumented = json_decode((string) json_encode(self::instrument($schema, '#', $mode, $relations)));
@@ -81,7 +84,7 @@ final class SchemaRelationsTest extends TestCase
         self::assertNotSame([], $documents);
         foreach ($documents as $path) {
             $json = (string) file_get_contents($path);
-            self::assertSame([], self::errors('none', $json), basename($path).' is valid without its relations');
+            self::assertSame([], self::errors('published', $json), basename($path).' is valid against report-2');
             $reached += self::markers(self::errors('reach', $json), self::REACHED);
         }
 
