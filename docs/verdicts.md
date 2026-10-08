@@ -41,9 +41,15 @@ Severity order, used by [`--fail-on`](ci.md), the baseline and the report's sort
 - `--fail-on=unchecked` reads S10, not the verdict, so it can fail a finding of any verdict but
   `finished`. See [What was not checked](#what-was-not-checked).
 
-- Where lockrot lists verdicts (`counts`, `run.flagged_verdicts`, the schema enums, this page),
+- Where lockrot lists verdicts (`counts`, `run.graded_verdicts`, the schema enums, this page),
   `finished` comes before `ok`. Which orders are frozen is in
   [compatibility.md](compatibility.md#closed-sets-and-their-order).
+
+## Flags
+
+A report-2 finding lists each flag that fired in `flags`, in flag order: `abandoned`, `silent`,
+`pinned`, `left-behind`, `old-promise`, `stale`, `vulnerable`. Its `lead` is the first counted
+maintenance flag, and [the score](#score) turns the counted flags into its grade.
 
 ## The signals
 

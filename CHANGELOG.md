@@ -9,6 +9,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Verdict changes
 
+- **Breaking:** **All formats:** a finding lists every flag that fired (`abandoned`, `silent`,
+  `pinned`, `left-behind`, `old-promise`, `stale`, and the new `vulnerable`). Accepted flags stay
+  listed, muted. Action: read `flags` where you read the verdict, or `lead` for 0.13's word.
+  ([Flags](docs/verdicts.md#flags))
+- **Breaking:** **All formats:** the verdict is a grade (`critical` … `low`; `ok`, `finished` or
+  `unknown` at 0) scored from the flags, printed as a sum (`36 = left-behind 16 + old-promise 4 [¼
+  of 16] + vulnerable 16 [high advisory]`). `priority` stays as an alias. Action: replace `.verdict
+  == "<word>"` with `.lead == "<word>"`. ([The score](docs/verdicts.md#score))
+- **Breaking:** **All formats:** a counted security advisory flags the package `vulnerable` and adds
+  its severity's points, doubled when no release fixes it or none runs on the target PHP.
+  `ignore[]` entries no longer hide advisories. `vulnerable` decides at once: 0.14 changes every verdict anyway
+  ([Verdict changes](docs/compatibility.md#verdict-changes)). Action: run once without a gate and
+  read the vulnerable rows.
+- **Breaking:** **All formats:** the raise for advisories not fixed on the installed branch is gone,
+  so a left-behind package with only medium or low advisories can drop a band. Action: if you gate
+  at `critical` or `high`, run once without the gate and compare each finding's verdict.
+  ([The score](docs/verdicts.md#score))
 - **All formats:** a package installed from vcs or a path can now be `vulnerable`, because its name
   is asked for advisories (see Security), so `--fail-on` can fail where 0.13 passed. Action: set
   `extra.lockrot.advisory-lookup` to `composer-repositories` to keep 0.13's boundary.
@@ -45,6 +62,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (`config.policy: false`, `policy.advisories: false`, `policy.advisories.audit: ignore` or
   `COMPOSER_POLICY=0`) that stops Composer from warning about advisories. lockrot still asks, and
   every advisory still counts. ([Run notes](docs/notes.md#advisories_disabled_by_policy))
+
+### Changed
+
+- **Breaking:** **json:** report-2: `verdict` is a grade, and `lead`, `flags`, `score`,
+  `next_step`, `security`, `checks_missing` and `run.score_model` join it. `run.gates[]` carry a
+  kind, and `evidence` holds the counted flags' summaries only. Action: assert `."$schema" ==
+  "https://lockrot.dev/schema/report-2.json"` first, then read `[.flags[].summary]`.
+  ([Schema](docs/schema.md#migrating-from-report-1))
+- **All formats:** findings sort by verdict, then advisory severity, then score.
+
+### Removed
+
+- **Breaking:** **json:** `priority_basis`, `no_fix_expected`, `run.flagged_verdicts`,
+  `run.fail_on_kind`, S9's `fixed_by` and `fixed_on_branch`, `baseline.previous_verdict` and the
+  cause keys of `counts`. Action: read `score`, `security`, `run.flag_ids`, `run.gates[].kind`,
+  `baseline.recorded.lead` and `flags.<flag>.leading`.
+  ([Migrating](docs/schema.md#migrating-from-report-1))
+
+### Fixed
+
+- **All formats:** Symfony's extension polyfills keep their place on the built-in finished list
+  under their own reason, because "intentionally frozen" was false for them.
 
 ## [0.13.0] - 2026-10-01
 

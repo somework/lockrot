@@ -81,6 +81,14 @@ Objects are open, and so are these sets of values, which grow in minor releases:
 - a finding's `origin.kind` and `origin.registry`
 - a run note's `code`, and the `forge_id` and `reason` in its `data`
 - the explanation's `php_blocked_by`, `misses_target_php` and `misses_project_php`
+- in report-2, `run.gates[].kind` and a finding's `gate.by[].kind`
+- in report-2, a flag's `role` and its `headline.value`, a score term's `role`, a modifier's
+  `reason` and `applies_to`, and the `status` of each score part
+- in report-2, `security.check` and `security.unchecked_reason`, an S9 fix's `reason`, and an
+  ignored advisory's `by` and `matched`
+- in report-2, the `check` and `reason` of `checks_missing[]` and `checks_skipped[]`, S6's
+  `tag_relation`, and an allowlist entry's `reason_id`
+- in report-2, the words of `run.score_model`
 - the configuration's `format`, and format names wherever lockrot writes one.
 
 Repository hosts are an open set only in a run note's `forge_id`, and Composer registries only in a
@@ -120,6 +128,23 @@ closed set needs a new schema number.
 !!! note "Older releases"
     A copy of a schema taken before 0.13.0 spells these sets as enums, and rejects a value that a
     later release adds until you refresh it.
+
+## Migrating from report-1
+
+A report-2 document names `https://lockrot.dev/schema/report-2.json` in `$schema`. Check that URL
+before you read a field. This table names the field to read for each report-1 field that report-2
+removes or redefines.
+
+| report-1 | report-2 |
+|---|---|
+| a finding's `verdict` (a word such as `stale`) | `lead`, the first counted maintenance flag. `verdict` is the grade |
+| `priority_basis` | `score`: its terms, its modifiers and its `text` |
+| `no_fix_expected` | `security` and the `fix` of each S9 row |
+| S9's `fixed_by` and `fixed_on_branch` | the `fix` of each S9 row |
+| `run.flagged_verdicts` | `run.graded_verdicts` for the grades, `run.flag_ids` for the flags |
+| `run.fail_on_kind` | `run.gates[].kind` |
+| the cause keys of `counts` | `flags.<flag>.leading`. `counts` holds the verdicts |
+| `baseline.previous_verdict` | `baseline.recorded.lead` |
 
 ## What the report schema types
 
