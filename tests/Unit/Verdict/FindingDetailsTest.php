@@ -78,4 +78,25 @@ final class FindingDetailsTest extends TestCase
 
         self::assertSame(['requires' => '>=7.1.3', 'target_runs' => true, 'project_allows' => true], $installed);
     }
+
+    /** A package the advisory lookup leaves out by scope or version skips the check, with the reason. */
+    public function testAnAdvisoryLookupLeftOutIsASkippedCheck(): void
+    {
+        $lock = LockFile::fromArray(['packages' => [['name' => 'vendor/a', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/']]]);
+        $package = $lock->find('vendor/a');
+        self::assertNotNull($package);
+        $facts = new PackageFacts($package, null, null, [], null, null, new AdvisoryNameCoverage([], null, 'unparseable_version'));
+
+        $skipped = FindingDetails::of($facts, null, new PhpFloor('8.4', null), [], [], null)->skipped();
+
+        self::assertContains(['check' => 'advisories', 'reason' => 'unparseable_version', 'blocks' => ['S9']], $skipped);
+    }
+
+    public function testASnapshotsVulnerableSummaryHasNoBranchClause(): void
+    {
+        $rows = [['id' => 'PKSA-a', 'cve' => 'CVE-2026-1', 'title' => 'a title', 'severity' => 'high', 'counted' => true, 'deciding' => true, 'fix' => ['kind' => 'unknown', 'on_installed_branch' => null]]];
+        $details = new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [], null);
+
+        self::assertSame('1 advisory: 1 high; advisory: CVE-2026-1 a title', $details->vulnerableSummary($rows, null, 'high'));
+    }
 }

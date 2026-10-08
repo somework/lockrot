@@ -811,6 +811,26 @@ final class FindingTest extends TestCase
         self::assertSame(['points', 'deciding', 'fix'], \array_slice(array_keys(JsonPath::arrayAt($rows, [0])), 9, 3), 'deciding follows points');
     }
 
+    /** A silent or stale flag that no S2 or S4 reading dates has a headline in years with no value. */
+    public function testALivenessFlagWithoutAReadingHasNoYears(): void
+    {
+        $document = (new FindingBuilder())->withVerdict(Verdict::STALE)->build()->toArray();
+
+        self::assertSame(['unit' => 'years', 'value' => null, 'source' => null], JsonPath::arrayAt($document, ['flags', 0, 'headline']));
+    }
+
+    /** A hand-written report-1 S9 keeps its rows with an id as report-1's facts, and drops the rest. */
+    public function testReport1S9RowsWithoutAnIdAreDropped(): void
+    {
+        $row = ['id' => 'PKSA-1', 'cve' => null, 'title' => null, 'link' => null, 'severity' => 'high', 'reported_at' => null, 'affected_versions' => null, 'fixed_by' => null, 'fixed_on_branch' => false];
+        $signal = new Signal(Signal::S9, Signal::LEVEL_WARN, '1 advisory', ['advisories' => [['severity' => 'low'], $row], 'releases_read' => true]);
+
+        $facts = (new FindingBuilder())->withSignals([$signal])->build()->advisoryFacts013();
+
+        self::assertSame([$row], $facts->rows());
+        self::assertTrue($facts->releasesRead());
+    }
+
     public function testWithSignalsKeepsTheScore(): void
     {
         $signals = [new Signal(Signal::S8, Signal::LEVEL_WARN, 'left behind')];

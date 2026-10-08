@@ -308,7 +308,7 @@ final class LockrotConfig
     {
         foreach ($candidates as $source => $candidate) {
             if (\is_string($candidate) && $candidate !== '') {
-                return [$candidate, (string) $source];
+                return [$candidate, $source];
             }
         }
 
