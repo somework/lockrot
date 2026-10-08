@@ -85,10 +85,10 @@ final class PluginTest extends TestCase
         self::assertIsArray($json, $run->getErrorOutput().$run->getOutput());
         self::assertIsArray($json['findings']);
         self::assertIsArray($json['notes']);
-        $verdicts = array_column($json['findings'], 'verdict', 'package');
+        $verdicts = array_column($json['findings'], 'lead', 'package');
         // A shared CI token can be rate-limited by the time this runs, which drops the S4 (repository
         // push) signal. S2 (no release within the threshold) and S5 (old release, open-ended constraint) still fire.
-        // They give old-promise, which outranks stale, so phpzip lands on old-promise or silent only.
+        // They give the lead old-promise, which outranks stale, so phpzip leads with old-promise or silent only.
         $rateLimited = (bool) preg_grep('/rate limit/', $json['notes']);
         if ($rateLimited) {
             self::assertSame('old-promise', $verdicts['phpzip/phpzip'], (string) json_encode($json['notes']));
