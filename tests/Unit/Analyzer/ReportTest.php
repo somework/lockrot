@@ -188,7 +188,7 @@ final class ReportTest extends TestCase
         self::assertStringStartsWith('4 packages checked · abandoned 3 (1 with a replacement) · silent 1 · ', $report->summaryLine());
 
         $none = $this->report($this->finding('vendor/dead', Verdict::ABANDONED));
-        self::assertSame(['total' => 1, 'with_replacement' => 0], $none->toArray()['abandoned']);
+        self::assertSame(['total' => 1, 'with_replacement' => 0, 'with_suggestion' => 0], $none->toArray()['abandoned']);
         self::assertStringStartsWith('1 packages checked · abandoned 1 · silent 0', $none->summaryLine(), 'a zero is not said');
     }
 
@@ -294,7 +294,7 @@ final class ReportTest extends TestCase
      */
     public function testTheRunNamesWhichVerdictsAreFindings(): void
     {
-        $flagged = JsonPath::arrayAt($this->report()->withRun(new RunSettings(null, null, null, null, null, null))->toArray(), ['run', 'flagged_verdicts']);
+        $flagged = JsonPath::arrayAt($this->report()->withRun(new RunSettings(null, null, null, null, null, null))->toArray(), ['run', 'graded_verdicts']);
 
         self::assertNotContains(Verdict::UNKNOWN, $flagged);
         self::assertNotContains(Verdict::FINISHED, $flagged);
@@ -367,7 +367,7 @@ final class ReportTest extends TestCase
         $run = JsonPath::arrayAt($this->report()->withRun(new RunSettings(null, null, null, null, FailOn::fromString('high'), null, null, true, Gate::MODE_GENERATE_BASELINE))->toArray(), ['run']);
 
         self::assertSame('high', $run['fail_on']);
-        self::assertSame('priority', $run['fail_on_kind']);
+        self::assertSame('grade', JsonPath::stringAt($run, ['gates', 0, 'kind']));
         self::assertTrue($run['strict_network']);
         self::assertSame('generate_baseline', $run['mode']);
     }
@@ -389,7 +389,7 @@ final class ReportTest extends TestCase
         self::assertNull(JsonPath::arrayAt($document, ['run'])['fail_on_kind']);
         self::assertNull($report->gate());
         self::assertArrayHasKey('gate', $document);
-        self::assertNull($document['gate']);
+        self::assertSame(['fails' => false, 'tripped_by' => []], \array_slice(JsonPath::arrayAt($document, ['gate']), 0, 2, true), 'report-2 always writes the gate');
         self::assertNull(JsonPath::arrayAt($document, ['findings', 0])['gate']);
     }
 
@@ -401,7 +401,7 @@ final class ReportTest extends TestCase
 
         self::assertNull($report->gate());
         self::assertArrayHasKey('gate', $document);
-        self::assertNull($document['gate']);
+        self::assertSame(['fails' => false, 'tripped_by' => []], \array_slice(JsonPath::arrayAt($document, ['gate']), 0, 2, true), 'report-2 always writes the gate');
         $at = array_search('baseline', array_keys($document), true);
         self::assertIsInt($at);
         self::assertSame(['baseline', 'gate', 'notes'], \array_slice(array_keys($document), $at, 3), 'after the baseline block');
@@ -421,7 +421,7 @@ final class ReportTest extends TestCase
             ->withRun(new RunSettings(null, null, null, null, FailOn::fromString(Verdict::SILENT), null));
         $before = $report->toArray();
 
-        self::assertSame(['fails' => true, 'tripped_by' => ['fail_on'], 'fail_on_applied' => true], $before['gate']);
+        self::assertSame(['fails' => true, 'tripped_by' => ['fail_on'], 'fail_on_applied' => true], \array_slice(JsonPath::arrayAt($before, ['gate']), 0, 3, true));
         self::assertSame(['reaches_fail_on' => true, 'fails' => true, 'exempt_by' => null], JsonPath::arrayAt($before, ['findings', 0, 'gate']));
         self::assertSame(['reaches_fail_on' => false, 'fails' => false, 'exempt_by' => null], JsonPath::arrayAt($before, ['findings', 1, 'gate']));
 
@@ -448,7 +448,7 @@ final class ReportTest extends TestCase
         self::assertSame(4.0, $block->direct());
         self::assertSame(2, $block->measured());
         self::assertSame(1, $block->unmeasured()[Libyears::BRANCH_SNAPSHOT]);
-        self::assertSame($block->toArray(), $report->toArray()['libyears']);
+        self::assertSame(array_diff_key($block->toArray(), ['total' => true, 'direct_requirements' => true]), array_diff_key(JsonPath::arrayAt($report->toArray(), ['libyears']), ['total' => true, 'direct_requirements' => true, 'packages' => true]), 'report-2 sums the published values');
         // and the block a consumer reads is recomputable from the findings it reads
         $sum = 0.0;
         foreach (JsonPath::arrayAt($report->toArray(), ['findings']) as $finding) {
