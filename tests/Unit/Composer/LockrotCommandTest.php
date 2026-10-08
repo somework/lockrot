@@ -14,6 +14,7 @@ use Lockrot\Allowlist\BuiltinAllowlist;
 use Lockrot\Analyzer\Analyzer;
 use Lockrot\Clock;
 use Lockrot\Composer\LockrotCommand;
+use Lockrot\Output\JsonFormatter;
 use Lockrot\Composer\ServiceFactory;
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Data\Forge\ActivityClient;
@@ -154,13 +155,13 @@ final class LockrotCommandTest extends TestCase
     /** @param callable(IOInterface, Config, list<\Composer\Repository\RepositoryInterface>, LockrotConfig, Tokens, Clock): Analyzer $factory */
     private function buildCommand(callable $factory): LockrotCommand
     {
-        return $this->register(new LockrotCommand($factory));
+        return $this->register(new LockrotCommand($factory, [JsonFormatter::SCHEMA]));
     }
 
     /** The command the plugin registers: no analyzer factory, so the command uses its own default wiring. */
     private function buildDefaultCommand(): LockrotCommand
     {
-        return $this->register(new LockrotCommand());
+        return $this->register(new LockrotCommand(null, [JsonFormatter::SCHEMA]));
     }
 
     private function register(LockrotCommand $command): LockrotCommand
