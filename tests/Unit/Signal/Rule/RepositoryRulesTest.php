@@ -22,7 +22,7 @@ final class RepositoryRulesTest extends TestCase
         self::assertSame(Signal::S3, $signal->id());
         self::assertSame(Signal::LEVEL_HIGH, $signal->level());
         self::assertSame('repository archived on GitHub', $signal->summary());
-        self::assertSame(['repo' => 'vendor/pkg', 'host' => 'github.com'], $signal->data());
+        self::assertSame(['repo' => 'vendor/pkg', 'host' => 'github.com', 'forge' => 'github'], $signal->data());
         self::assertNull((new ArchivedRule())->evaluate(F::facts(F::package(), null, F::activity(false, '2020-01-01'))));
         self::assertNull((new ArchivedRule())->evaluate(F::facts(F::package())));
     }
@@ -40,6 +40,8 @@ final class RepositoryRulesTest extends TestCase
             'repo' => 'vendor/pkg',
             'host' => 'github.com',
             'years' => 10.8,
+            'forge' => 'github',
+            'activity' => 'push',
         ], $high->data());
         $warn = $rule->evaluate(F::facts(F::package(), null, F::activity(false, '2022-01-01')));
         self::assertNotNull($warn);
@@ -55,7 +57,7 @@ final class RepositoryRulesTest extends TestCase
         $archived = (new ArchivedRule())->evaluate(F::facts(F::package(), null, F::activity(true, '2020-01-01', RepoRef::GITLAB)));
         self::assertNotNull($archived);
         self::assertSame('repository archived on GitLab', $archived->summary());
-        self::assertSame(['repo' => 'vendor/pkg', 'host' => 'gitlab.com'], $archived->data());
+        self::assertSame(['repo' => 'vendor/pkg', 'host' => 'gitlab.com', 'forge' => 'gitlab'], $archived->data());
 
         $rule = new NoPushRule(Clock::fixed(F::NOW), new Thresholds());
         foreach ([RepoRef::GITLAB => 'gitlab.com', RepoRef::BITBUCKET => 'bitbucket.org'] as $forge => $host) {
@@ -63,6 +65,7 @@ final class RepositoryRulesTest extends TestCase
             self::assertNotNull($signal);
             self::assertSame('last commit 2015-11-16 (10.8 years ago)', $signal->summary(), $forge);
             self::assertSame($host, $signal->data()['host'], $forge);
+            self::assertSame([$forge, 'commit'], [$signal->data()['forge'], $signal->data()['activity']], $forge);
         }
     }
 

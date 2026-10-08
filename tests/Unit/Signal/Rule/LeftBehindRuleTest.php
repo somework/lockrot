@@ -48,7 +48,7 @@ final class LeftBehindRuleTest extends TestCase
             'reachable_release' => '2026-06-01T00:00:00+00:00',
             'suggested_constraint' => '^3.4',
             'dated_by' => null,
-        ], $signal->data());
+        ], array_diff_key($signal->data(), array_flip(['reachable_php', 'reachable_admits', 'newest_years', 'reachable_years'])));
     }
 
     public function testWarnBetweenThreeAndFiveYears(): void
@@ -490,10 +490,14 @@ final class LeftBehindRuleTest extends TestCase
         $reading = $rule->reading($facts);
 
         self::assertNotNull($reading);
-        self::assertEquals($rule->evaluate($facts), $reading->signal());
-        foreach (['reachable_php', 'reachable_admits', 'newest_years', 'reachable_years'] as $key) {
-            self::assertArrayNotHasKey($key, $reading->signal()->data());
-        }
+        $signal = $rule->evaluate($facts);
+        self::assertNotNull($signal);
+        self::assertSame($reading->signal()->data() + [
+            'reachable_php' => $reading->reachablePhp(),
+            'reachable_admits' => $reading->reachableAdmits(),
+            'newest_years' => $reading->newestYears(),
+            'reachable_years' => $reading->reachableYears(),
+        ], $signal->data(), 'S8 writes the reading behind it');
         self::assertNull($rule->reading(F::facts(F::package(['version' => '3.4.1']), $meta)));
     }
 }

@@ -32,6 +32,7 @@ use Lockrot\Security\FixFinder;
 use Lockrot\Security\LinkIndex;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\Rule\AbandonedRule;
+use Lockrot\Signal\Rule\AdvisoryRule;
 use Lockrot\Signal\Rule\NotCheckedRule;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\SignalSet;
@@ -391,6 +392,9 @@ final class Analyzer
 
     private function buildFinding(PackageFacts $facts, ?AllowlistEntry $entry, DependencyGraph $graph, MetadataBatch $batch, ?FixFinder $fixes): Finding
     {
+        if ($fixes !== null && $facts->advisories() !== []) {
+            $facts = $facts->withFixes($fixes->find($facts));
+        }
         $package = $facts->package();
         $meta = $facts->metadata();
         $activity = $facts->activity();
@@ -425,10 +429,11 @@ final class Analyzer
             array_keys($graph->chainsTo($package->name())),
             Libyears::measure($package, $meta),
             $package->origin(),
-            AbandonedRule::replacementNamedBy($facts)
+            AbandonedRule::replacementNamedBy($facts),
+            AdvisoryRule::legacy($facts)[1]
         );
 
-        return $finding->withFlags(FlagSet::fromSignals($signals, $entry, self::countedAdvisories($facts, $fixes)), $facts->metadataStatus() === PackageFacts::METADATA_READ);
+        return $finding->withFlags(FlagSet::fromSignals($signals, $entry, self::countedAdvisories($facts)), $facts->metadataStatus() === PackageFacts::METADATA_READ);
     }
 
     /**
@@ -436,12 +441,12 @@ final class Analyzer
      *
      * @return list<array{id: string, severity: string, fix_kind: string}>
      */
-    private static function countedAdvisories(PackageFacts $facts, ?FixFinder $fixes): array
+    private static function countedAdvisories(PackageFacts $facts): array
     {
-        if ($fixes === null) {
+        $found = $facts->fixes();
+        if ($found === null) {
             return [];
         }
-        $found = $fixes->find($facts);
         $counted = [];
         foreach ($facts->advisories() as $advisory) {
             $counted[] = Score::advisory($advisory->id(), $advisory->severity() ?? '', $found->forAdvisory($advisory->id())->kind());

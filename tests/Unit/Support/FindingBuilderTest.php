@@ -20,10 +20,20 @@ final class FindingBuilderTest extends TestCase
     public function testTheDefaultsAreTheFindingWrittenByHand(): void
     {
         $byHand = new Finding('vendor/pkg', '1.0.0', Verdict::OK, [], ['vendor/pkg'], null, null);
-        $built = (new FindingBuilder())->build();
+        $built = (new FindingBuilder())->withoutFlags()->build();
 
         self::assertSame($byHand->toArray(), $built->toArray());
         self::assertEquals($byHand, $built);
+    }
+
+    public function testWithoutItsFlagsAFindingTakesThemFromItsSignalsOrItsVerdict(): void
+    {
+        self::assertSame(['stale'], (new FindingBuilder())->withVerdict(Verdict::STALE)->build()->flagIds());
+        self::assertSame('stale', (new FindingBuilder())->withVerdict(Verdict::STALE)->build()->lead());
+        self::assertSame(['old-promise'], (new FindingBuilder())->withVerdict(Verdict::STALE)->withSignals([new Signal(Signal::S5, Signal::LEVEL_WARN, 'old')])->build()->flagIds());
+        self::assertSame('ok', (new FindingBuilder())->build()->grade());
+        self::assertSame('unknown', (new FindingBuilder())->withVerdict(Verdict::UNKNOWN)->build()->grade());
+        self::assertSame('finished', (new FindingBuilder())->withVerdict(Verdict::STALE)->withAllowlistReason('kept')->build()->grade());
     }
 
     /**
@@ -36,7 +46,7 @@ final class FindingBuilderTest extends TestCase
     #[DataProvider('oneFieldEach')]
     public function testEachWithChangesOneFieldOnly(\Closure $with, Finding $expected): void
     {
-        $builder = new FindingBuilder();
+        $builder = (new FindingBuilder())->withoutFlags();
         $changed = $with($builder);
         self::assertNotSame($builder, $changed);
         $built = $changed->build();
