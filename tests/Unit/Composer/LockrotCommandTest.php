@@ -516,7 +516,7 @@ final class LockrotCommandTest extends TestCase
         self::assertIsArray($json['metadata']);
         self::assertTrue($json['metadata']['abandoned']);
         self::assertIsArray($json['metadata']['branches']);
-        self::assertSame('8.4', $json['target_php']);
+        self::assertSame('8.4', $json['run']['target_php']);
     }
 
     /**
