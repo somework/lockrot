@@ -11,20 +11,35 @@ use Lockrot\Verdict\ScoreModel;
 /** @internal */
 final class AllowlistEntry
 {
+    /** Who accepted: the built-in finished list, the project's `extra.lockrot.ignore[]`, or a package type. */
+    public const BY_BUILTIN = 'builtin';
+    public const BY_PROJECT = 'project';
+    public const BY_TYPE = 'type';
+
+    /** Whose words the reason is. */
+    public const REASON_BY_USER = 'user';
+    public const REASON_BY_LOCKROT = 'lockrot';
+
     private const LIVENESS = [FlagSet::ABANDONED, FlagSet::SILENT, FlagSet::STALE];
 
     private static ?VersionParser $parser = null;
 
-    private string $pattern;
+    /** Null on a type entry, which matches a package type, not a name. */
+    private ?string $pattern;
     private ?string $version;
     private string $reason;
     private ?\DateTimeImmutable $expires;
     private string $source;
     /** @var list<string>|null */
     private ?array $flags;
+    private ?string $reasonId;
 
-    /** @param list<string>|null $flags the maintenance flags the entry accepts, null for every one */
-    public function __construct(string $pattern, ?string $version, string $reason, ?\DateTimeImmutable $expires, string $source, ?array $flags = null)
+    /**
+     * @param string            $source   one of the `BY_*` constants
+     * @param list<string>|null $flags    the maintenance flags the entry accepts, null for every one
+     * @param ?string           $reasonId the id of a reason lockrot wrote, null for a user's reason
+     */
+    public function __construct(?string $pattern, ?string $version, string $reason, ?\DateTimeImmutable $expires, string $source, ?array $flags = null, ?string $reasonId = null)
     {
         $this->pattern = $pattern;
         $this->version = $version;
@@ -32,11 +47,18 @@ final class AllowlistEntry
         $this->expires = $expires;
         $this->source = $source;
         $this->flags = $flags;
+        $this->reasonId = $reasonId;
+    }
+
+    /** The entry lockrot makes for a package of a type that only lists dependencies. */
+    public static function forType(string $type): self
+    {
+        return new self(null, null, 'package type "'.$type.'" only lists dependencies', null, self::BY_TYPE, null, 'type-'.$type);
     }
 
     public function matches(string $name, string $version): bool
     {
-        if (!fnmatch($this->pattern, $name)) {
+        if ($this->pattern === null || !fnmatch($this->pattern, $name)) {
             return false;
         }
         if ($this->version === null) {
@@ -55,7 +77,7 @@ final class AllowlistEntry
         return $this->expires !== null && $this->expires < $now;
     }
 
-    public function pattern(): string
+    public function pattern(): ?string
     {
         return $this->pattern;
     }
@@ -78,6 +100,23 @@ final class AllowlistEntry
     public function source(): string
     {
         return $this->source;
+    }
+
+    /** One of the `BY_*` constants. */
+    public function by(): string
+    {
+        return $this->source;
+    }
+
+    /** A project entry holds the user's words, every other entry lockrot's. */
+    public function reasonBy(): string
+    {
+        return $this->source === self::BY_PROJECT ? self::REASON_BY_USER : self::REASON_BY_LOCKROT;
+    }
+
+    public function reasonId(): ?string
+    {
+        return $this->reasonId;
     }
 
     /** @return list<string>|null null when the entry accepts every maintenance flag */
@@ -106,5 +145,20 @@ final class AllowlistEntry
         $at = array_search($flag, self::LIVENESS, true);
 
         return $at !== false && array_intersect(\array_slice(self::LIVENESS, 0, $at), $this->flags) !== [];
+    }
+
+    /** @return array{by: string, pattern: ?string, version: ?string, reason: string, reason_id: ?string, reason_by: string, expires: ?string, flag_ids: list<string>|null} */
+    public function toArray(): array
+    {
+        return [
+            'by' => $this->source,
+            'pattern' => $this->pattern,
+            'version' => $this->version,
+            'reason' => $this->reason,
+            'reason_id' => $this->reasonId,
+            'reason_by' => $this->reasonBy(),
+            'expires' => $this->expires === null ? null : $this->expires->format('Y-m-d'),
+            'flag_ids' => $this->flags,
+        ];
     }
 }
