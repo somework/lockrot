@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Lockrot\Output;
 
 use Lockrot\Analyzer\Report;
+use Lockrot\Exception\ConfigException;
 use Lockrot\Html\PageData;
 use Lockrot\Html\ReportDocument;
+use Lockrot\Json\JsonReader;
 use Lockrot\Json\JsonWriter;
 use Lockrot\Verdict\Verdict;
 
@@ -25,19 +27,31 @@ final class HtmlFormatter implements FormatterInterface
 {
     private const TEMPLATE = __DIR__.'/../../resources/report/report.html';
 
+    private const MANIFEST = __DIR__.'/../../resources/report/manifest.json';
+
     private PageData $page;
+    /** @var list<int> */
+    private array $reads;
 
     /**
      * Takes no FormatContext: the report holds what the page needs, and a second copy can disagree
      * with it.
+     *
+     * @param list<int>|null $reads the report schema numbers the vendored renderer reads, its
+     *                              manifest's `schema.report` unless given
      */
-    public function __construct(?PageData $page = null)
+    public function __construct(?PageData $page = null, ?array $reads = null)
     {
         $this->page = $page ?? PageData::none();
+        $this->reads = $reads ?? self::manifestReads();
     }
 
+    /** @throws ConfigException when the vendored renderer does not read the schema lockrot writes */
     public function format(Report $report, bool $showAll = false): string
     {
+        if (!\in_array(JsonFormatter::SCHEMA, $this->reads, true)) {
+            throw new ConfigException(\sprintf('html needs a lockrot-report release that reads report-%d (this build vendors one that reads [%s]); use --format=json meanwhile', JsonFormatter::SCHEMA, implode(', ', $this->reads)));
+        }
         $document = new ReportDocument($report, $this->page);
 
         return strtr(self::template(), [
@@ -102,6 +116,15 @@ final class HtmlFormatter implements FormatterInterface
     private static function text(string $value): string
     {
         return htmlspecialchars($value, \ENT_QUOTES | \ENT_SUBSTITUTE, 'UTF-8');
+    }
+
+    /** @return list<int> */
+    private static function manifestReads(): array
+    {
+        $schema = JsonReader::readObject(self::MANIFEST)['schema'] ?? null;
+        $reads = \is_array($schema) ? ($schema['report'] ?? null) : null;
+
+        return \is_array($reads) ? array_values(array_filter($reads, 'is_int')) : [];
     }
 
     private static function template(): string
