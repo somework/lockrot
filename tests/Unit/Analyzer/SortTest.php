@@ -132,7 +132,7 @@ final class SortTest extends TestCase
             foreach ($keys as $key) {
                 self::assertIsArray($key);
                 self::assertIsString($key['path']);
-                $order = self::compareByKey($key, self::at($a, $key['path']) ?? $key['default'], self::at($b, $key['path']) ?? $key['default']);
+                $order = self::compareByKey($key, self::valueAt($a, $key['path']) ?? $key['default'], self::valueAt($b, $key['path']) ?? $key['default']);
                 if ($order !== 0) {
                     return $order;
                 }
@@ -175,7 +175,7 @@ final class SortTest extends TestCase
      *
      * @return mixed the value at a dotted path, null when a step is missing
      */
-    private static function at(array $finding, string $path)
+    private static function valueAt(array $finding, string $path)
     {
         $node = $finding;
         foreach (explode('.', $path) as $step) {
