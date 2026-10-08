@@ -56,7 +56,9 @@ use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
 use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\AssertionFailedError;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -66,7 +68,17 @@ use PHPUnit\Framework\TestCase;
  * copy of the schema keeps validating) and against a strict twin with `additionalProperties: false`
  * on every declared object. A field that a formatter gains without the schema fails here. The JSON
  * samples in docs/ are validated the same way.
+ *
+ * It covers nothing: Infection skips a mutant whose covering tests together outlast its timeout, and
+ * the report-2 validations of this sweep push every line of the analyzer and the writers past it.
+ * The unit tests of the writers and ScoreFactsConsistencyTest kill those mutants.
+ *
+ * @coversNothing
+ *
+ * @group covers-nothing
  */
+#[CoversNothing]
+#[Group('covers-nothing')]
 final class JsonSchemaConformanceTest extends TestCase
 {
     use AssertsNoteDetails;
