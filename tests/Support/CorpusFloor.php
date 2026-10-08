@@ -100,6 +100,8 @@ final class CorpusFloor
         $judged = $finding['verdict'] !== 'unknown';
         $verdict = (new VerdictEngine())->decide($signals, $entry !== null, $judged);
 
-        return (new Finding($finding['package'], $finding['version'], $verdict, $signals, $finding['chain'], $reason, null, null, $finding['dev']))->withFlags(FlagSet::fromSignals($signals, $entry, $advisories), $judged);
+        $built = new Finding($finding['package'], $finding['version'], $verdict, $signals, $finding['chain'], $reason, null, null, $finding['dev']);
+
+        return $built->withFlags(FlagSet::fromSignals($signals, $entry, $advisories), $judged)->withDetails(FindingBuilder::detailsOf($built, $judged));
     }
 }
