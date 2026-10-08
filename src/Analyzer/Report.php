@@ -426,6 +426,39 @@ final class Report
         return $list;
     }
 
+    /** The run settings the report was told, null when nothing told it. */
+    public function run(): ?RunSettings
+    {
+        return $this->run;
+    }
+
+    /**
+     * report-2's finding objects in the order of {@see sorted()}, each with its rank, baseline and
+     * gate, keyed by package name.
+     *
+     * @return array<string, array<string, mixed>>
+     */
+    public function findingRows(?Gate $gate = null): array
+    {
+        $gate ??= $this->gate();
+        $standings = [];
+        foreach ($gate === null ? [] : $gate->standings() as $at => $standing) {
+            $standings[$this->findings[$at]->package()] = $standing;
+        }
+        $rows = [];
+        foreach ($this->sorted() as $at => $finding) {
+            $row = $finding->toArray();
+            $standing = $standings[$finding->package()] ?? null;
+            $lead = array_search('lead', array_keys($row), true) + 1;
+            $rows[$finding->package()] = \array_slice($row, 0, $lead, true) + ['rank' => $at + 1] + \array_slice($row, $lead, null, true) + [
+                'baseline' => null,
+                'gate' => ['reaches_fail_on' => $standing !== null && $standing->reachesFailOn(), 'fails' => $standing !== null && $standing->fails(), 'exempt_by' => $standing === null ? null : $standing->exemptBy(), 'by' => [], 'basis' => null],
+            ];
+        }
+
+        return $rows;
+    }
+
     /**
      * report-2 without `$schema` and `lockrot`, which the writer adds. Findings come in the order of
      * {@see sorted()}, each with its rank. A finding's gate is the report-1 gate's standing, so the
@@ -436,20 +469,7 @@ final class Report
     public function toArray(): array
     {
         $gate = $this->gate();
-        $standings = [];
-        foreach ($gate === null ? [] : $gate->standings() as $at => $standing) {
-            $standings[$this->findings[$at]->package()] = $standing;
-        }
-        $findings = [];
-        foreach ($this->sorted() as $at => $finding) {
-            $row = $finding->toArray();
-            $standing = $standings[$finding->package()] ?? null;
-            $lead = array_search('lead', array_keys($row), true) + 1;
-            $findings[] = \array_slice($row, 0, $lead, true) + ['rank' => $at + 1] + \array_slice($row, $lead, null, true) + [
-                'baseline' => null,
-                'gate' => ['reaches_fail_on' => $standing !== null && $standing->reachesFailOn(), 'fails' => $standing !== null && $standing->fails(), 'exempt_by' => $standing === null ? null : $standing->exemptBy(), 'by' => [], 'basis' => null],
-            ];
-        }
+        $findings = array_values($this->findingRows($gate));
         $run = $this->run ?? new RunSettings(null, null, null, null, null, null);
         $graded = array_filter($this->findings, static fn (Finding $f): bool => $f->isGraded());
         $multi = array_filter($graded, static fn (Finding $f): bool => \count($f->flagIds()) >= 2);
