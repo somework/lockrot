@@ -154,7 +154,7 @@ final class ScoreFactsConsistencyTest extends TestCase
         $exact = self::number($score, ['exact']);
         $check($verdict === self::band($total), 'the grade is the band of the total');
         $check($total === (int) floor($exact), 'the total is the exact score rounded down');
-        $check(JsonPath::boolAt($score, ['rounded_down']) === ($exact !== $total), 'rounded_down says whether the exact score was whole');
+        $check(JsonPath::boolAt($score, ['rounded_down']) === ($exact !== (float) $total), 'rounded_down says whether the exact score was whole');
         $terms = self::rows($score, ['terms']);
         $maintenance = array_values(array_filter($terms, static fn (array $term): bool => JsonPath::stringAt($term, ['part']) === 'maintenance'));
         $security = array_values(array_filter($terms, static fn (array $term): bool => JsonPath::stringAt($term, ['part']) === 'security'));
@@ -198,6 +198,20 @@ final class ScoreFactsConsistencyTest extends TestCase
             $check(JsonPath::stringAt($modifier, ['applies_to']) === ($reason === 'dev' ? 'total' : 'maintenance'), $reason.' applies to');
             $check(abs(self::number($modifier, ['after']) - self::number($modifier, ['before']) / JsonPath::intAt($modifier, ['divide_by'])) < 1e-9, $reason.' halves');
         }
+        $running = (float) self::points($maintenance);
+        foreach (self::rows($score, ['modifiers']) as $modifier) {
+            if (JsonPath::stringAt($modifier, ['reason']) === 'dev') {
+                $running += self::points($security);
+                $check(abs(self::number($modifier, ['before']) - $running) < 1e-9, 'dev halves the total');
+            } else {
+                $check(abs(self::number($modifier, ['before']) - $running) < 1e-9, 'the reach halves the maintenance points');
+            }
+            $running = self::number($modifier, ['after']);
+        }
+        if (!\in_array('dev', array_column(self::rows($score, ['modifiers']), 'reason'), true)) {
+            $running += self::points($security);
+        }
+        $check(abs($exact - $running) < 1e-9, 'the exact score is the terms after the halvings');
         // A halving is listed whenever its fact holds and a term exists, even when it halves 0.
         $reach = JsonPath::stringAt($f, ['reach']);
         $expected = \in_array($reach, ['transitive', 'unreached'], true) ? [$reach] : [];
@@ -238,6 +252,17 @@ final class ScoreFactsConsistencyTest extends TestCase
         }
 
         return (float) $value;
+    }
+
+    /** @param list<array<mixed, mixed>> $terms */
+    private static function points(array $terms): int
+    {
+        $points = 0;
+        foreach ($terms as $term) {
+            $points += JsonPath::intAt($term, ['points']);
+        }
+
+        return $points;
     }
 
     private static function band(int $total): string
