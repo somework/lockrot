@@ -77,7 +77,9 @@ final class FindingDetails
         $coverage = $facts->advisoryCoverage();
         $reason = $coverage === null ? 'composer_too_old' : $coverage->reason();
         $requires = $package->requirePhp();
-        $check = $reason === null ? 'complete' : ($facts->advisories() !== [] ? 'partial' : 'not_run');
+        // A lookup that some feed answered is partial, whether or not that feed counted an advisory.
+        $answered = $coverage !== null && $coverage->records() !== null;
+        $check = $reason === null ? 'complete' : ($answered || $facts->advisories() !== [] ? 'partial' : 'not_run');
 
         $details = new self(
             $status,
