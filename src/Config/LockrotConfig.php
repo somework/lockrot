@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Config;
 
+use Lockrot\Analyzer\RunSettings;
 use Lockrot\Data\Advisory\AdvisoryCoverage;
 use Lockrot\Data\Php\PhpReleaseDates;
 use Lockrot\Exception\ConfigException;
@@ -37,6 +38,8 @@ final class LockrotConfig
     private Thresholds $thresholds;
     private string $advisoryLookup;
     private string $advisoryLookupSource;
+    private string $failOnSource = RunSettings::SOURCE_DEFAULT;
+    private string $targetPhpSource = RunSettings::SOURCE_RUNTIME;
 
     private function __construct(string $failOn, string $targetPhp, bool $includeDev, bool $offline, bool $strictNetwork, string $format, ?string $baseline, bool $disabled, bool $installTime, bool $installTimeStrict, int $installTimeBudgetSeconds, Thresholds $thresholds, ?string $project = null, string $advisoryLookup = AdvisoryCoverage::SCOPE_ALL, string $advisoryLookupSource = AdvisoryCoverage::SOURCE_DEFAULT)
     {
@@ -64,14 +67,14 @@ final class LockrotConfig
      */
     public static function fromSources(array $extra, array $env, array $cli, string $runtimePhp, ?string $platformPhp): self
     {
-        $failOn = self::resolveFailOn($extra, $env, $cli);
+        [$failOn, $failOnSource] = self::resolveFailOn($extra, $env, $cli);
         $project = self::resolveProject($extra);
-        $targetPhp = self::resolveTargetPhp($extra, $env, $cli, $runtimePhp, $platformPhp);
+        [$targetPhp, $targetPhpSource] = self::resolveTargetPhp($extra, $env, $cli, $runtimePhp, $platformPhp);
         $format = self::resolveFormat($extra, $cli);
         $includeDev = ($cli['dev'] ?? null) === true || ($extra['include-dev'] ?? false) === true;
         $advisoryLookup = self::resolveAdvisoryLookup($extra);
 
-        return new self(
+        $config = new self(
             $failOn,
             $targetPhp,
             $includeDev,
@@ -88,6 +91,10 @@ final class LockrotConfig
             $advisoryLookup ?? AdvisoryCoverage::SCOPE_ALL,
             $advisoryLookup === null ? AdvisoryCoverage::SOURCE_DEFAULT : AdvisoryCoverage::SOURCE_CONFIG
         );
+        $config->failOnSource = $failOnSource;
+        $config->targetPhpSource = $targetPhpSource;
+
+        return $config;
     }
 
     /**
@@ -167,9 +174,10 @@ final class LockrotConfig
      * @param array<string, mixed> $env
      * @param array<string, mixed> $cli
      *
-     * @return string a verdict, a priority or `none`, as {@see FailOn::fromString()} accepts them
+     * @return array{string, string} a verdict, a priority or `none`, as {@see FailOn::fromString()}
+     *                               accepts them, and its source (option, env, config, default)
      */
-    private static function resolveFailOn(array $extra, array $env, array $cli): string
+    private static function resolveFailOn(array $extra, array $env, array $cli): array
     {
         // `--fail-on=` arrives as an empty string. If it falls through to the next source, a
         // typo turns a gated build into an ungated one.
@@ -183,27 +191,36 @@ final class LockrotConfig
             throw new ConfigException(\sprintf('LOCKROT_FAIL_ON must be one of %s; got "%s"', implode(', ', FailOn::allowed()), $fromEnv));
         }
 
-        return FailOn::fromString(self::pick([$cli['fail-on'] ?? null, $env['LOCKROT_FAIL_ON'] ?? null, $extra['fail-on'] ?? null], self::FAIL_ON_NONE))->value();
+        [$value, $source] = self::pickWithSource([RunSettings::SOURCE_OPTION => $cli['fail-on'] ?? null, RunSettings::SOURCE_ENV => $env['LOCKROT_FAIL_ON'] ?? null, RunSettings::SOURCE_CONFIG => $extra['fail-on'] ?? null], self::FAIL_ON_NONE, RunSettings::SOURCE_DEFAULT);
+
+        return [FailOn::fromString($value)->value(), $source];
     }
 
     /**
      * @param array<string, mixed> $extra
      * @param array<string, mixed> $env
      * @param array<string, mixed> $cli
+     *
+     * @return array{string, string} the target minor and its source (option, env, config, platform, runtime)
      */
-    private static function resolveTargetPhp(array $extra, array $env, array $cli, string $runtimePhp, ?string $platformPhp): string
+    private static function resolveTargetPhp(array $extra, array $env, array $cli, string $runtimePhp, ?string $platformPhp): array
     {
         // Whenever it is set, like LOCKROT_FAIL_ON in resolveFailOn().
         $fromEnv = $env['LOCKROT_TARGET_PHP'] ?? null;
         if (\is_string($fromEnv) && $fromEnv !== '' && !self::looksLikePhpVersion($fromEnv)) {
             throw new ConfigException('LOCKROT_TARGET_PHP must look like "8.4"; got "'.$fromEnv.'"');
         }
-        $target = self::pick([$cli['target-php'] ?? null, $env['LOCKROT_TARGET_PHP'] ?? null, $extra['target-php'] ?? null, $platformPhp], $runtimePhp);
+        [$target, $source] = self::pickWithSource([
+            RunSettings::SOURCE_OPTION => $cli['target-php'] ?? null,
+            RunSettings::SOURCE_ENV => $env['LOCKROT_TARGET_PHP'] ?? null,
+            RunSettings::SOURCE_CONFIG => $extra['target-php'] ?? null,
+            RunSettings::SOURCE_PLATFORM => $platformPhp,
+        ], $runtimePhp, RunSettings::SOURCE_RUNTIME);
         if (!self::looksLikePhpVersion($target)) {
             throw new ConfigException('target-php must look like "8.4"; got "'.$target.'"');
         }
 
-        return PhpReleaseDates::minorOf($target);
+        return [PhpReleaseDates::minorOf($target), $source];
     }
 
     private static function looksLikePhpVersion(string $value): bool
@@ -276,6 +293,24 @@ final class LockrotConfig
         return $default;
     }
 
+    /**
+     * As {@see pick()}, with the key of the candidate that won, else $defaultSource.
+     *
+     * @param array<string, mixed> $candidates by source, first wins
+     *
+     * @return array{string, string}
+     */
+    private static function pickWithSource(array $candidates, string $default, string $defaultSource): array
+    {
+        foreach ($candidates as $source => $candidate) {
+            if (\is_string($candidate) && $candidate !== '') {
+                return [$candidate, (string) $source];
+            }
+        }
+
+        return [$default, $defaultSource];
+    }
+
     /** A verdict, a priority or `none`, as {@see FailOn::fromString()} reads it. */
     public function failOn(): string
     {
@@ -284,6 +319,18 @@ final class LockrotConfig
     public function targetPhp(): string
     {
         return $this->targetPhp;
+    }
+
+    /** The source that set {@see failOn()}: one of the `RunSettings::SOURCE_*` values option, env, config or default. */
+    public function failOnSource(): string
+    {
+        return $this->failOnSource;
+    }
+
+    /** The source that set {@see targetPhp()}: option, env, config, platform or runtime. */
+    public function targetPhpSource(): string
+    {
+        return $this->targetPhpSource;
     }
     public function includeDev(): bool
     {
