@@ -24,6 +24,7 @@ use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\ScoreModel;
 use Lockrot\Verdict\Verdict;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class ReportTest extends TestCase
@@ -794,5 +795,40 @@ final class ReportTest extends TestCase
         self::assertSame('2026-09-13T20:00:00+00:00', $report->toArray()['activity_cache_oldest_at']);
         $withBaseline = $report->withBaseline(BaselineComparison::compare(Baseline::of([], '2026-09-14T00:00:00+00:00'), $report, 'lockrot-baseline.json', []));
         self::assertSame($oldest, $withBaseline->activityCacheOldestAt());
+    }
+
+    /**
+     * The age in hours to one decimal, from the generation time back to the oldest cached answer.
+     *
+     * @dataProvider cacheAges
+     */
+    #[DataProvider('cacheAges')]
+    public function testTheActivityCacheAgeIsHoursToOneDecimal(string $oldest, float $hours): void
+    {
+        $report = new Report([], [], new \DateTimeImmutable('2026-09-14T12:00:00+00:00'), 0, 0, null, new \DateTimeImmutable($oldest));
+
+        self::assertSame($hours, $report->toArray()['activity_cache_age_hours']);
+    }
+
+    /** @return iterable<string, array{string, float}> */
+    public static function cacheAges(): iterable
+    {
+        yield 'an hour and a half' => ['2026-09-14T10:30:00+00:00', 1.5];
+        yield 'rounded up at the second decimal' => ['2026-09-14T09:57:00+00:00', 2.1];
+        yield 'rounded down at the second decimal' => ['2026-09-14T09:53:24+00:00', 2.1];
+        yield 'just below a half tenth' => ['2026-09-14T09:57:01+00:00', 2.0];
+        yield 'a clock that runs backwards' => ['2026-09-14T13:00:00+00:00', 0.0];
+    }
+
+    public function testFlaggedCountsTheGradedAndMultiFlagThoseWithTwoFlagsOrMore(): void
+    {
+        $two = (new FindingBuilder())->withPackage('vendor/two')->withSignals([new Signal(Signal::S2, Signal::LEVEL_WARN, 'old', ['years' => 3.0]), new Signal(Signal::S5, Signal::LEVEL_WARN, 'old promise')])->build();
+        $one = $this->finding('vendor/one', Verdict::STALE);
+        $none = $this->finding('vendor/none', Verdict::OK);
+
+        $document = $this->report($two, $one, $none)->toArray();
+
+        self::assertSame(2, \count($two->flagIds()), 'the fixture counts two flags');
+        self::assertSame([2, 1], [$document['packages_flagged'], $document['packages_multi_flag']]);
     }
 }

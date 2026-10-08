@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Analyzer;
 
 use Lockrot\Analyzer\Report2Root;
+use Lockrot\Tests\Support\JsonPath;
 use PHPUnit\Framework\TestCase;
 
 /** The root blocks that report-2 sums from its findings. */
@@ -57,5 +58,110 @@ final class Report2RootTest extends TestCase
         self::assertSame('not_run', Report2Root::security([$finding('not_run')])['check']);
         self::assertSame('complete', Report2Root::security([])['check']);
         self::assertNull(Report2Root::security([])['update_now_command']);
+    }
+
+    public function testFlagsCountCarryingLeadingAcceptedAndGrades(): void
+    {
+        $findings = [
+            self::graded('high', 'silent', ['stale']),
+            self::graded('medium', 'silent', ['stale', 'pinned']),
+            ['verdict' => 'finished', 'lead' => null, 'score' => [], 'flags' => [['id' => 'stale', 'role' => 'accepted'], ['id' => 'pinned', 'role' => 'lead']]],
+        ];
+
+        $flags = Report2Root::flags($findings);
+
+        self::assertSame(['carrying' => 2, 'leading' => 2, 'accepted' => ['all' => 0, 'in_graded' => 0], 'by_verdict' => ['critical' => 0, 'high' => 1, 'medium' => 1, 'low' => 0]], $flags['silent']);
+        self::assertSame(['all' => 3, 'in_graded' => 2], $flags['stale']['accepted']);
+        self::assertSame(['all' => 1, 'in_graded' => 1], $flags['pinned']['accepted']);
+        self::assertSame(['carrying' => 2, 'leading' => null, 'accepted' => null, 'by_verdict' => ['critical' => 0, 'high' => 1, 'medium' => 1, 'low' => 0]], $flags['vulnerable']);
+    }
+
+    public function testAbandonedCountsTheReplacementsAndTheSuggestions(): void
+    {
+        $abandoned = static fn (?string $replacement, array $signals): array => ['score' => ['terms' => [['flag' => 'abandoned']]], 'replacement' => $replacement, 'signals' => $signals];
+        $s1 = static fn (?string $suggestion): array => ['id' => 'S1', 'data' => ['replacement' => $suggestion]];
+        $findings = [
+            $abandoned('acme/new', [$s1('acme/other')]),
+            $abandoned(null, [$s1('acme/next')]),
+            $abandoned(null, [$s1('acme/later')]),
+            $abandoned(null, [$s1(null)]),
+            $abandoned(null, [['id' => 'S5', 'data' => ['replacement' => 'acme/not-s1']]]),
+            ['score' => ['terms' => [['flag' => 'stale']]], 'replacement' => null, 'signals' => [$s1('acme/not-abandoned')]],
+        ];
+
+        self::assertSame(['total' => 5, 'with_replacement' => 1, 'with_suggestion' => 2], Report2Root::abandoned($findings, ['abandoned' => ['carrying' => 5]]));
+        self::assertSame(0, Report2Root::abandoned([], ['abandoned' => []])['total']);
+    }
+
+    public function testLibyearsSumsThePublishedValuesToTwoDecimals(): void
+    {
+        $findings = [
+            ['direct' => true, 'libyears' => 1.111],
+            ['direct' => false, 'libyears' => 2.227],
+            ['libyears' => 1.0],
+            ['direct' => true, 'libyears' => null],
+        ];
+
+        self::assertSame(['unmeasured' => [], 'total' => 4.34, 'direct_requirements' => 1.11, 'packages' => 4], Report2Root::libyears(['unmeasured' => []], $findings));
+        self::assertSame(['total' => 2.23, 'direct_requirements' => 0.0, 'packages' => 1], Report2Root::libyears([], [['direct' => false, 'libyears' => 2.227]]));
+        self::assertSame(['total' => null, 'direct_requirements' => null, 'packages' => 1], Report2Root::libyears([], [['direct' => true, 'libyears' => null]]));
+    }
+
+    public function testTheDataDateIsTheOldestAndKeepsTheFirstOfOneInstant(): void
+    {
+        $findings = [
+            ['data_date' => '2026-03-01T00:00:00+00:00'],
+            ['data_date' => '2026-01-01T00:00:00+00:00'],
+            ['data_date' => null],
+            ['data_date' => '2026-01-01T01:00:00+01:00'],
+            ['data_date' => '2026-02-01T00:00:00+00:00'],
+        ];
+
+        self::assertSame('2026-01-01T00:00:00+00:00', Report2Root::dataDate($findings));
+        self::assertNull(Report2Root::dataDate([['data_date' => null]]));
+    }
+
+    public function testAFindingWithoutAGateNeitherReachesNorFails(): void
+    {
+        self::assertSame(['reaching' => 0, 'failing' => 0, 'exempt' => ['baseline' => 0]], \array_slice(Report2Root::gate(['fails' => false, 'tripped_by' => [], 'fail_on_applied' => true], [['package' => 'acme/a']]), 3));
+    }
+
+    /** Values that lockrot does not write count from zero: a status, a severity or a fix kind of a later release. */
+    public function testSecurityCountsAValueItDoesNotListFromZero(): void
+    {
+        $findings = [
+            ['package' => 'acme/a', 'security' => ['status' => 'acme:waived', 'check' => 'complete', 'ignored_count' => 0]],
+            ['package' => 'acme/b', 'security' => ['status' => 'vulnerable', 'check' => 'complete', 'ignored_count' => 0, 'counts' => ['acme:severe' => 2, 'high' => 'x'], 'fix_kind' => 'acme:patch']],
+        ];
+
+        $security = Report2Root::security($findings);
+
+        self::assertSame(1, JsonPath::intAt($security, ['packages', 'acme:waived']));
+        self::assertSame(2, JsonPath::intAt($security, ['severities', 'acme:severe']));
+        self::assertSame(0, JsonPath::intAt($security, ['severities', 'high']));
+        self::assertSame(2, JsonPath::intAt($security, ['advisories', 'counted']));
+        self::assertSame(1, JsonPath::intAt($security, ['fixes', 'acme:patch']));
+    }
+
+    /**
+     * A graded finding that counts `silent` and `vulnerable`, with the flags its allowlist accepts.
+     *
+     * @param list<string> $accepted
+     *
+     * @return array<string, mixed>
+     */
+    private static function graded(string $verdict, string $lead, array $accepted): array
+    {
+        $flags = [];
+        foreach ($accepted as $id) {
+            $flags[] = ['id' => $id, 'role' => 'accepted'];
+        }
+
+        return [
+            'verdict' => $verdict,
+            'lead' => $lead,
+            'score' => ['terms' => [['flag' => 'silent'], ['flag' => 'vulnerable'], ['part' => 'maintenance']]],
+            'flags' => $flags,
+        ];
     }
 }

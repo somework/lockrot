@@ -265,4 +265,20 @@ final class HtmlFormatterTest extends TestCase
     {
         self::assertInstanceOf(HtmlFormatter::class, Formatters::for('html'));
     }
+
+    /** The numbers given to the formatter win over the page's, which win over the manifest's. */
+    public function testTheReadsGivenToTheFormatterWinOverThePages(): void
+    {
+        $report = new Report([], [], new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), 0, 0);
+
+        $this->expectException(ConfigException::class);
+        (new HtmlFormatter(new PageData(null, null, null, null, [JsonFormatter::SCHEMA]), [1]))->format($report);
+    }
+
+    public function testThePagesReadsWinOverTheManifests(): void
+    {
+        $report = new Report([], [], new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), 0, 0);
+
+        self::assertStringContainsString('<html', (new HtmlFormatter(new PageData(null, null, null, null, [JsonFormatter::SCHEMA])))->format($report));
+    }
 }

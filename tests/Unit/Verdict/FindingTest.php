@@ -7,7 +7,12 @@ namespace Lockrot\Tests\Unit\Verdict;
 use Lockrot\Allowlist\AllowlistEntry;
 use Lockrot\Analyzer\Libyears;
 use Lockrot\Analyzer\LibyearsMeasurement;
+use Lockrot\Data\Advisory\Advisory;
 use Lockrot\Legacy\Priority013;
+use Lockrot\Lock\LockFile;
+use Lockrot\Signal\PackageFacts;
+use Lockrot\Signal\PhpFloor;
+use Lockrot\Signal\Rule\NotCheckedRule;
 use Lockrot\Signal\Signal;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\JsonPath;
@@ -786,6 +791,7 @@ final class FindingTest extends TestCase
         $flags = FlagSet::fromSignals([], null, []);
 
         $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(\sprintf('Metadata status "%s" contradicts maintenance_judged %s.', $status, $maintenanceJudged ? 'true' : 'false'));
         $detailsFirst ? $finding->withDetails($details)->withFlags($flags, $maintenanceJudged) : $finding->withFlags($flags, $maintenanceJudged)->withDetails($details);
     }
 
@@ -829,6 +835,52 @@ final class FindingTest extends TestCase
 
         self::assertSame([$row], $facts->rows());
         self::assertTrue($facts->releasesRead());
+    }
+
+    /**
+     * Release data that a counted advisory needed and did not get is an S10 entry: added to the
+     * finding's S10, or an S10 of its own.
+     *
+     * @dataProvider s10s
+     */
+    #[DataProvider('s10s')]
+    public function testUnreadReleasesForACountedAdvisoryAreAnS10Entry(bool $withS10): void
+    {
+        $lock = LockFile::fromArray(['packages' => [['name' => 'vendor/pkg', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/']]]);
+        $package = $lock->find('vendor/pkg');
+        self::assertNotNull($package);
+        $facts = new PackageFacts($package, null, null, [new Advisory('PKSA-1', null, null, null, 'high', null)], null, null, null, true);
+        $activity = ['check' => 'repository_activity', 'reason' => 'no_token', 'blocks' => ['S3', 'S4']];
+        $signals = $withS10 ? [new Signal(Signal::S10, Signal::LEVEL_INFO, 'activity not checked', ['unchecked' => [$activity], 'blocks' => ['S3', 'S4']])] : [];
+        $finding = (new FindingBuilder())->withVerdict(Verdict::UNKNOWN)->withSignals($signals)->build()
+            ->withDetails(FindingDetails::of($facts, null, new PhpFloor('8.4', null), [], $signals, 'HTTP 503'));
+
+        $s10 = JsonPath::arrayAt($finding->toArray(), ['signals', 0]);
+
+        $releases = ['check' => 'releases', 'reason' => 'releases_unknown', 'blocks' => ['S9']];
+        self::assertSame(Signal::S10, $s10['id']);
+        self::assertSame($withS10 ? ['unchecked' => [$activity, $releases], 'blocks' => ['S3', 'S4', 'S9']] : ['unchecked' => [$releases], 'blocks' => ['S9']], $s10['data']);
+        self::assertSame($withS10 ? 'activity not checked; '.NotCheckedRule::RELEASES_WORDS : NotCheckedRule::RELEASES_WORDS, $s10['summary']);
+    }
+
+    /** @return iterable<string, array{bool}> */
+    public static function s10s(): iterable
+    {
+        yield 'beside an S10 entry' => [true];
+        yield 'with no S10' => [false];
+    }
+
+    /** The vulnerable flag reads S9, counts its advisories and names the deciding one as worst when it is. */
+    public function testTheVulnerableFlagReadsS9(): void
+    {
+        $row = static fn (string $id, string $severity, int $points): array => ['id' => $id, 'cve' => null, 'title' => 't', 'link' => null, 'reported_at' => null, 'severity' => $severity, 'severity_published' => $severity, 'affected_versions' => null, 'counted' => true, 'points' => $points, 'fix' => ['kind' => 'update'], 'baseline' => null];
+        $signals = [new Signal(Signal::S9, Signal::LEVEL_HIGH, '2 advisories', ['advisories' => [$row('PKSA-a', 'high', 16), $row('PKSA-b', 'low', 2)], 'releases_read' => true, 'complete' => true])];
+        $flags = FlagSet::fromSignals($signals, null, [Score::advisory('PKSA-a', 'high', 'update'), Score::advisory('PKSA-b', 'low', 'update')]);
+
+        $flag = JsonPath::arrayAt((new FindingBuilder())->withSignals($signals)->withFlags($flags)->build()->toArray(), ['flags', 0]);
+
+        self::assertSame(['vulnerable', 'security', ['S9'], ['unit' => 'advisories', 'value' => 2, 'source' => null]], [$flag['id'], $flag['role'], $flag['signal_ids'], $flag['headline']]);
+        self::assertStringContainsString('; worst: PKSA-a t', JsonPath::stringAt($flag, ['summary']));
     }
 
     public function testWithSignalsKeepsTheScore(): void

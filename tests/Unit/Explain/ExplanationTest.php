@@ -9,6 +9,8 @@ use Lockrot\Analyzer\LibyearsMeasurement;
 use Lockrot\Analyzer\Report;
 use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Explain\Explanation;
+use Lockrot\Security\BranchFixes;
+use Lockrot\Security\PackageFixes;
 use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\Rule\PinnedRule;
 use Lockrot\Signal\Signal;
@@ -18,6 +20,7 @@ use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\Notes;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
 use Lockrot\Verdict\Finding;
+use Lockrot\Verdict\FindingDetails;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\TestCase;
 
@@ -417,5 +420,19 @@ final class ExplanationTest extends TestCase
         }
 
         return $rows;
+    }
+
+    /** Each branch row carries the fixes of the release scan's row for the same branch, null on the others. */
+    public function testEachBranchRowCarriesItsOwnFixes(): void
+    {
+        $two = new BranchFixes('2.x', false, 1, 0, 1, null, '2.1.0', ['PKSA-a']);
+        $one = new BranchFixes('1.x', true, 0, 0, 1, null, '1.5.0', []);
+        $details = new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [], new PackageFixes([], [$two, $one], null, null, null));
+        $finding = $this->finding('1.4.0', Verdict::LEFT_BEHIND)->withDetails($details);
+        $metadata = F::metadata([['3.0.0', '2026-01-01T00:00:00+00:00'], ['2.1.0', '2024-01-01T00:00:00+00:00'], ['1.5.0', '2021-06-01T00:00:00+00:00'], ['1.4.0', '2020-01-01T00:00:00+00:00']]);
+
+        $branches = JsonPath::arrayAt((new Explanation($finding, F::facts(F::package(['version' => '1.4.0']), $metadata), new Thresholds(), '8.4', $this->report()))->toArray(), ['metadata', 'branches']);
+
+        self::assertSame(['3.x' => null, '2.x' => FindingDetails::branchFixes($two), '1.x' => FindingDetails::branchFixes($one)], array_column($branches, 'fixes', 'branch'));
     }
 }
