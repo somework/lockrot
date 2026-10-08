@@ -177,7 +177,7 @@ final class ExplanationTest extends TestCase
         self::assertSame(['release-warn-years' => 2, 'release-high-years' => 4, 'push-warn-years' => 3, 'push-high-years' => 5], JsonPath::arrayAt($array, ['run', 'thresholds']));
         self::assertSame('8.3', JsonPath::stringAt($array, ['run', 'target_php']));
         self::assertNull(JsonPath::arrayAt($array, ['run'])['project_php'], 'no project php was given');
-        self::assertSame(['verdict' => 'left-behind', 'priority' => $explanation->finding()->priority()], array_slice(JsonPath::arrayAt($array, ['legacy']), 0, 2), "report-1's reading");
+        self::assertSame(['verdict' => 'left-behind', 'priority' => $explanation->finding()->priority()], \array_slice(JsonPath::arrayAt($array, ['legacy']), 0, 2), "report-1's reading");
         self::assertSame(F::NOW, $array['generated_at']);
         self::assertSame(['a note'], $array['notes']);
         self::assertSame(['a note'], array_column(JsonPath::arrayAt($array, ['note_details']), 'text'), 'the same notes, typed');
