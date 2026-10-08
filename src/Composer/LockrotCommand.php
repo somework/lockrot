@@ -71,8 +71,13 @@ final class LockrotCommand extends BaseCommand
     private ?array $envSnapshot = null;
 
     /** @param null|callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, Tokens, Clock, Deadline, ?string): Analyzer $analyzerFactory */
-    public function __construct(?callable $analyzerFactory = null)
+    /** @var list<int>|null */
+    private ?array $htmlReads;
+
+    /** @param list<int>|null $htmlReads the report numbers the html renderer reads, its manifest's unless given */
+    public function __construct(?callable $analyzerFactory = null, ?array $htmlReads = null)
     {
+        $this->htmlReads = $htmlReads;
         $this->analyzerFactory = $analyzerFactory ?? [ServiceFactory::class, 'createAnalyzer'];
         parent::__construct('lockrot');
     }
@@ -242,7 +247,7 @@ final class LockrotCommand extends BaseCommand
 
             $page = $analysis === null
                 ? null
-                : new PageData($analysis, $lockrot->thresholds(), $lockrot->targetPhp(), $project->requirePhp());
+                : new PageData($analysis, $lockrot->thresholds(), $lockrot->targetPhp(), $project->requirePhp(), $this->htmlReads);
             $showAll = $input->getOption('all') === true;
             // The annotation formats name the lock relative to the directory lockrot runs in, as the
             // checkout does. A file has no terminal, so a table in one uses the default width: the
