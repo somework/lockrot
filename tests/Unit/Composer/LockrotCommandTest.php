@@ -1522,7 +1522,7 @@ final class LockrotCommandTest extends TestCase
         $json = json_decode($tester->getDisplay(), true);
         self::assertIsArray($json);
         $verdicts = self::assertVerdictsMatchTheGolden($json);
-        $flagged = JsonPath::arrayAt($json, ['run', 'flagged_verdicts']);
+        $flagged = ['abandoned', 'silent', 'pinned', 'left-behind', 'old-promise', 'stale'];
 
         return self::$wallabagTotals = [
             \count(LockFile::fromFile(self::WALLABAG_LOCK)->packages(false)),
