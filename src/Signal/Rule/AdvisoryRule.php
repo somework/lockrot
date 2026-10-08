@@ -41,11 +41,7 @@ final class AdvisoryRule implements SignalRule
         }
         $legacy = self::legacy($facts);
         $rows = self::rows($facts);
-        $worst = null;
-        foreach ($rows as $row) {
-            $worst ??= $row['severity'];
-            $worst = array_search($row['severity'], Severity::DISPLAY_ORDER, true) < array_search($worst, Severity::DISPLAY_ORDER, true) ? $row['severity'] : $worst;
-        }
+        $worst = Severity::worstOf(array_map(static fn (Advisory $advisory): string => Severity::fromComposer($advisory->severity())->bucket(), $advisories));
         $coverage = $facts->advisoryCoverage();
 
         return new Signal(Signal::S9, \in_array($worst, [Severity::CRITICAL, Severity::HIGH], true) ? Signal::LEVEL_HIGH : Signal::LEVEL_WARN, $legacy[0], [
@@ -108,21 +104,19 @@ final class AdvisoryRule implements SignalRule
 
     /**
      * One row per counted advisory, in the tie-break order of the deciding advisory: points
-     * descending, then the severity display order, then the id.
+     * descending, then the severity display order, then the id. The finding marks the deciding
+     * row from its score ({@see \Lockrot\Verdict\Finding::toArray()}).
      *
      * @return list<array<string, mixed>>
      */
     private static function rows(PackageFacts $facts): array
     {
         $fixes = $facts->fixes();
-        $kinds = [];
         $byId = [];
         foreach ($facts->advisories() as $advisory) {
             $fix = $fixes === null ? self::unknownFix($facts, $advisory) : $fixes->forAdvisory($advisory->id());
-            $kinds[] = Score::advisory($advisory->id(), $advisory->severity() ?? '', $fix->kind());
             $byId[$advisory->id()] = [$advisory, $fix];
         }
-        $deciding = Score::compute([], $kinds, Score::DIRECT, false)->deciding();
         $rows = [];
         foreach ($byId as $id => [$advisory, $fix]) {
             $bucket = Severity::fromComposer($advisory->severity())->bucket();
@@ -138,7 +132,6 @@ final class AdvisoryRule implements SignalRule
                 'affected_versions' => $raw['affected_versions'],
                 'counted' => true,
                 'points' => ScoreModel::advisoryPoints($bucket, $fix->kind()),
-                'deciding' => $deciding !== null && $deciding['id'] === (string) $id,
                 'fix' => self::fix($fix),
                 'baseline' => null,
             ];
@@ -198,7 +191,7 @@ final class AdvisoryRule implements SignalRule
     }
 
     /** Trimmed, runs of blanks collapsed, a leading `<cve>: ` removed, so `{cve} {title}` never prints the CVE twice. */
-    private static function title(?string $cve, ?string $title): ?string
+    public static function title(?string $cve, ?string $title): ?string
     {
         if ($title === null) {
             return null;

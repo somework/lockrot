@@ -686,7 +686,11 @@ final class Finding
     {
         $out = [];
         foreach ($this->signals as $signal) {
-            $out[] = ['id' => $signal->id(), 'level' => $signal->level(), 'summary' => $signal->summary(), 'data' => $signal->data()];
+            $data = $signal->data();
+            if ($signal->id() === Signal::S9) {
+                $data['advisories'] = $this->decidingMarked($data['advisories'] ?? []);
+            }
+            $out[] = ['id' => $signal->id(), 'level' => $signal->level(), 'summary' => $signal->summary(), 'data' => $data];
         }
         $releases = $details->releasesUnchecked();
         if ($releases === null) {
@@ -733,6 +737,32 @@ final class Finding
                 'headline' => self::headline($flag, $flags, $data),
                 'summary' => FlagSentence::maintenance($flag, $data),
             ];
+        }
+
+        return $out;
+    }
+
+    /**
+     * The S9 rows with `deciding` after `points`: true on the advisory that the score's security
+     * term counts, so the row and the term cannot name two advisories.
+     *
+     * @param mixed $rows
+     *
+     * @return list<array<string, mixed>>
+     */
+    private function decidingMarked($rows): array
+    {
+        $deciding = $this->score === null ? null : $this->score->deciding();
+        $out = [];
+        foreach (self::rows($rows) as $row) {
+            $marked = [];
+            foreach ($row as $key => $value) {
+                $marked[$key] = $value;
+                if ($key === 'points') {
+                    $marked['deciding'] = $deciding !== null && $deciding['id'] === ($row['id'] ?? null);
+                }
+            }
+            $out[] = $marked;
         }
 
         return $out;

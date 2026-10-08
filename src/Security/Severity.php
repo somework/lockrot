@@ -86,6 +86,22 @@ final class Severity
         return self::BUCKETS[$this->bucket]['sarif_rank'];
     }
 
+    /**
+     * The first of the buckets in {@see self::DISPLAY_ORDER}, null for none.
+     *
+     * @param list<string> $buckets
+     */
+    public static function worstOf(array $buckets): ?string
+    {
+        foreach (self::DISPLAY_ORDER as $bucket) {
+            if (\in_array($bucket, $buckets, true)) {
+                return $bucket;
+            }
+        }
+
+        return null;
+    }
+
     /** The bucket's index in {@see self::DISPLAY_ORDER}: lower comes first. */
     public function displayPosition(): int
     {
