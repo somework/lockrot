@@ -34,6 +34,7 @@ final class PinnedRuleTest extends TestCase
             'last_stable_version' => null,
             'last_stable_dated_by' => null,
             'snapshot_time' => null,
+            'tag_relation' => null,
         ], $signal->data());
     }
 
@@ -50,6 +51,7 @@ final class PinnedRuleTest extends TestCase
             'last_stable_version' => null,
             'last_stable_dated_by' => null,
             'snapshot_time' => null,
+            'tag_relation' => null,
         ], $signal->data());
     }
 
@@ -93,6 +95,7 @@ final class PinnedRuleTest extends TestCase
             'last_stable_version' => null,
             'last_stable_dated_by' => null,
             'snapshot_time' => '2023-12-24T00:53:44+00:00',
+            'tag_relation' => null,
         ], $signal->data());
     }
 
@@ -112,6 +115,7 @@ final class PinnedRuleTest extends TestCase
             'last_stable_version' => '1.6.2',
             'last_stable_dated_by' => null,
             'snapshot_time' => '2022-03-24T10:22:23+00:00',
+            'tag_relation' => 'older',
         ], $signal->data());
     }
 
@@ -139,6 +143,7 @@ final class PinnedRuleTest extends TestCase
             'last_stable_version' => null,
             'last_stable_dated_by' => null,
             'snapshot_time' => '2024-05-06T07:08:09+00:00',
+            'tag_relation' => null,
         ], $signal->data());
     }
 
@@ -166,6 +171,7 @@ final class PinnedRuleTest extends TestCase
             'last_stable_version' => null,
             'last_stable_dated_by' => null,
             'snapshot_time' => '2024-01-01T00:00:00+00:00',
+            'tag_relation' => null,
         ], $signal->data());
     }
 
@@ -197,6 +203,7 @@ final class PinnedRuleTest extends TestCase
             'last_stable_version' => 'v1.31.0',
             'last_stable_dated_by' => 'symfony/polyfill',
             'snapshot_time' => null,
+            'tag_relation' => null,
         ], $signal->data());
     }
 

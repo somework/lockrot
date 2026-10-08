@@ -89,13 +89,13 @@ final class TransitiveExposureTest extends TestCase
         self::assertSame(Signal::LEVEL_INFO, $a->level());
         self::assertSame('pulls in 1 flagged package: vendor/leaf (stale)', $a->summary());
         self::assertSame(
-            ['flagged' => 1, 'packages' => [['package' => 'vendor/leaf', 'verdict' => Verdict::STALE, 'chain' => ['root/a', 'vendor/leaf']]]],
+            ['flagged' => 1, 'packages' => [['package' => 'vendor/leaf', 'chain' => ['root/a', 'vendor/leaf'], 'verdict' => 'low', 'lead' => 'stale', 'flag_ids' => ['stale']]]],
             $a->data()
         );
         $b = self::s7($f['root/b']);
         self::assertNotNull($b);
         // The chain is from this parent, not the one the finding's own chain starts from.
-        self::assertSame([['package' => 'vendor/leaf', 'verdict' => Verdict::STALE, 'chain' => ['root/b', 'vendor/mid', 'vendor/leaf']]], $b->data()['packages']);
+        self::assertSame([['package' => 'vendor/leaf', 'chain' => ['root/b', 'vendor/mid', 'vendor/leaf'], 'verdict' => 'low', 'lead' => 'stale', 'flag_ids' => ['stale']]], $b->data()['packages']);
         self::assertNull(self::s7($f['vendor/mid']));
         self::assertNull(self::s7($f['vendor/lonely']));
         self::assertSame([$stale], $f['vendor/leaf']->signals());

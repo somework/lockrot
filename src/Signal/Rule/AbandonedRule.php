@@ -30,7 +30,13 @@ final class AbandonedRule implements SignalRule
             $summary .= ', replacement: '.$marking['replacement'];
         }
 
-        return new Signal(Signal::S1, Signal::LEVEL_HIGH, $summary, ['replacement' => $marking['replacement']]);
+        $successor = Finding::successorOf($facts->package()->name(), $marking['replacement']);
+
+        return new Signal(Signal::S1, Signal::LEVEL_HIGH, $summary, [
+            'marked_by' => $marking['marked_by'],
+            'replacement' => $marking['replacement'],
+            'replacement_url' => $successor === null ? null : PackageOrigin::replacementPage(self::replacementNamedBy($facts), $successor),
+        ]);
     }
 
     /** The marking that the list kept out of S1. Null when the list does not match, or nobody marked the package. */

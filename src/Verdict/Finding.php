@@ -8,6 +8,7 @@ use Composer\Package\Loader\ValidatingArrayLoader;
 use Lockrot\Analyzer\Libyears;
 use Lockrot\Analyzer\LibyearsMeasurement;
 use Lockrot\Data\Repository\ReleaseBranch;
+use Lockrot\Legacy\AdvisoryFacts013;
 use Lockrot\Legacy\NoFix013;
 use Lockrot\Legacy\Priority013;
 use Lockrot\Legacy\PriorityBasis013;
@@ -62,6 +63,8 @@ final class Finding
     private PackageOrigin $origin;
     /** The registry that named the replacement, which decides where it is linked. */
     private ?string $replacementNamedBy;
+    /** report-1's S9 facts, which the report-1 readers read: S9's data is report-2's. */
+    private AdvisoryFacts013 $advisoryFacts013;
     /** Null for a finding built without its flags. */
     private ?Score $score = null;
     private ?string $grade = null;
@@ -71,7 +74,7 @@ final class Finding
      * @param list<string> $chain
      * @param list<string> $directDependents
      */
-    public function __construct(string $package, string $version, string $verdict, array $signals, array $chain, ?string $allowlistReason, ?\DateTimeImmutable $dataDate, ?string $note = null, bool $dev = false, array $directDependents = [], ?LibyearsMeasurement $libyears = null, ?PackageOrigin $origin = null, ?string $replacementNamedBy = null)
+    public function __construct(string $package, string $version, string $verdict, array $signals, array $chain, ?string $allowlistReason, ?\DateTimeImmutable $dataDate, ?string $note = null, bool $dev = false, array $directDependents = [], ?LibyearsMeasurement $libyears = null, ?PackageOrigin $origin = null, ?string $replacementNamedBy = null, ?AdvisoryFacts013 $advisoryFacts013 = null)
     {
         $origin ??= PackageOrigin::unattributed();
         $fromComposerRepository = $origin->isComposerRepository();
@@ -99,6 +102,38 @@ final class Finding
         $this->libyears = $libyears;
         $this->origin = $origin;
         $this->replacementNamedBy = $replacementNamedBy;
+        $this->advisoryFacts013 = $advisoryFacts013 ?? self::legacyFactsOf($signals);
+    }
+
+    /**
+     * A finding built without report-1's S9 facts takes them from an S9 that still carries them, so
+     * a report-1 S9 written by hand reads as it always did.
+     *
+     * @param list<Signal> $signals
+     */
+    private static function legacyFactsOf(array $signals): AdvisoryFacts013
+    {
+        foreach ($signals as $signal) {
+            if ($signal->id() === Signal::S9) {
+                $data = $signal->data();
+                $rows = [];
+                foreach (\is_array($data['advisories'] ?? null) ? $data['advisories'] : [] as $row) {
+                    if (\is_array($row) && \is_string($row['id'] ?? null)) {
+                        $rows[] = $row;
+                    }
+                }
+
+                /** @var list<array{id: string, cve: ?string, title: ?string, link: ?string, severity: ?string, reported_at: ?string, affected_versions: ?string, fixed_by: ?string, fixed_on_branch: bool}> $rows */
+                return new AdvisoryFacts013($rows, ($data['releases_read'] ?? false) === true);
+            }
+        }
+
+        return AdvisoryFacts013::none();
+    }
+
+    public function advisoryFacts013(): AdvisoryFacts013
+    {
+        return $this->advisoryFacts013;
     }
 
     /** @param bool $maintenanceJudged lockrot read the release metadata */
@@ -173,6 +208,24 @@ final class Finding
     public function lead(): ?string
     {
         return $this->score()->lead();
+    }
+
+    /**
+     * The counted flags in flag order: the maintenance terms, then `vulnerable` when an advisory counts.
+     *
+     * @return list<string>
+     *
+     * @throws \LogicException for a finding built without its flags
+     */
+    public function flagIds(): array
+    {
+        $score = $this->score();
+        $ids = array_column($score->maintenanceTerms(), 'flag');
+        if ($score->deciding() !== null) {
+            $ids[] = FlagSet::VULNERABLE;
+        }
+
+        return $ids;
     }
 
     /** @throws \LogicException for a finding built without its flags */
@@ -431,13 +484,7 @@ final class Finding
     /** @return array<string, mixed> */
     private function advisoryData(): array
     {
-        foreach ($this->signals as $signal) {
-            if ($signal->id() === Signal::S9) {
-                return $signal->data();
-            }
-        }
-
-        return [];
+        return $this->advisoryFacts013->data();
     }
 
     /** Every signal but S7, the deciding ones ({@see self::DECIDING}) first. The note when there is none. */

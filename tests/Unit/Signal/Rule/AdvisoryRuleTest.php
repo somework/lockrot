@@ -9,6 +9,7 @@ use Lockrot\Data\Advisory\Advisory;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\Rule\AdvisoryRule;
 use Lockrot\Signal\Signal;
+use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
 use PHPUnit\Framework\TestCase;
 
@@ -31,8 +32,28 @@ final class AdvisoryRuleTest extends TestCase
 
         self::assertNotNull($signal);
         self::assertSame('6 security advisories affect 1.0.0 (C-1, H-1, H-2 and 3 more)', $signal->summary());
-        self::assertIsArray($signal->data()['advisories']);
-        self::assertSame(['C-1', 'H-1', 'H-2', 'M-1', 'L-1', 'N-1'], array_column($signal->data()['advisories'], 'id'), 'the JSON list is ordered the same way');
+        self::assertIsArray(AdvisoryRule::legacy($facts)[1]->rows());
+        self::assertSame(['C-1', 'H-1', 'H-2', 'M-1', 'L-1', 'N-1'], array_column(AdvisoryRule::legacy($facts)[1]->rows(), 'id'), 'the JSON list is ordered the same way');
+    }
+
+    /** report-2's rows: the severity bucket beside Composer's word, the points and the fix. */
+    public function testARowCarriesTheBucketThePointsAndTheFix(): void
+    {
+        $advisory = new Advisory('PKSA-1', 'CVE-2024-0001', 'CVE-2024-0001:  a   title ', null, 'moderate', null);
+        $facts = new PackageFacts(F::package(['version' => 'v1.2.3']), null, null, [$advisory]);
+
+        $signal = (new AdvisoryRule())->evaluate($facts);
+
+        self::assertNotNull($signal);
+        self::assertSame(Signal::LEVEL_WARN, $signal->level(), 'a medium advisory');
+        self::assertSame(['advisories', 'releases_read', 'complete'], array_keys($signal->data()));
+        self::assertSame([
+            'id' => 'PKSA-1', 'cve' => 'CVE-2024-0001', 'title' => 'a title', 'link' => null, 'reported_at' => null,
+            'severity' => 'medium', 'severity_published' => 'moderate', 'affected_versions' => null, 'counted' => true, 'points' => 8, 'deciding' => true,
+            'fix' => ['kind' => 'unknown', 'to_branch' => null, 'version' => null, 'newest' => null, 'on_installed_branch' => null, 'php' => null, 'held_by' => [], 'reason' => 'affected_range_unknown'],
+            'baseline' => null,
+        ], JsonPath::arrayAt($signal->data(), ['advisories', 0]));
+        self::assertFalse($signal->data()['complete'], 'no lookup coverage');
     }
 
     public function testNoAdvisoriesIsNull(): void
@@ -48,7 +69,7 @@ final class AdvisoryRuleTest extends TestCase
 
         self::assertNotNull($signal);
         self::assertSame(Signal::S9, $signal->id());
-        self::assertSame(Signal::LEVEL_WARN, $signal->level());
+        self::assertSame(Signal::LEVEL_HIGH, $signal->level(), 'a high advisory');
         self::assertSame('1 security advisory affects v1.2.3 (CVE-2024-0001)', $signal->summary());
         self::assertSame(['advisories' => [[
             'id' => 'PKSA-1',
@@ -60,7 +81,7 @@ final class AdvisoryRuleTest extends TestCase
             'affected_versions' => null,
             'fixed_by' => null,
             'fixed_on_branch' => false,
-        ]], 'releases_read' => false], $signal->data());
+        ]], 'releases_read' => false], AdvisoryRule::legacy($facts)[1]->data());
     }
 
     /**
@@ -81,18 +102,17 @@ final class AdvisoryRuleTest extends TestCase
         ] as $case => [$facts, $read]) {
             $signal = (new AdvisoryRule())->evaluate($facts);
             self::assertNotNull($signal, $case);
-            self::assertSame($read, $signal->data()['releases_read'], $case);
-            self::assertSame(['advisories', 'releases_read'], array_keys($signal->data()), $case.': next to the rows');
-            self::assertNull(self::row($signal, 0)['fixed_by'], $case.': nothing fixes it either way');
+            self::assertSame($read, AdvisoryRule::legacy($facts)[1]->releasesRead(), $case);
+            self::assertSame(['advisories', 'releases_read'], array_keys(AdvisoryRule::legacy($facts)[1]->data()), $case.': next to the rows');
+            self::assertNull(self::row($facts, 0)['fixed_by'], $case.': nothing fixes it either way');
         }
     }
 
     /** @return array<mixed, mixed> */
-    private static function row(Signal $signal, int $i): array
+    private static function row(PackageFacts $facts, int $i): array
     {
-        $rows = $signal->data()['advisories'];
-        self::assertIsArray($rows);
-        self::assertIsArray($rows[$i]);
+        $rows = AdvisoryRule::legacy($facts)[1]->rows();
+        self::assertArrayHasKey($i, $rows);
 
         return $rows[$i];
     }
@@ -117,9 +137,9 @@ final class AdvisoryRuleTest extends TestCase
 
         self::assertNotNull($signal);
         self::assertSame('4 security advisories affect v3.4.18 (CVE-2024-50345, CVE-2025-64500, CVE-2019-18888 and 1 more); 2 fixed by v8.1.7, 1 fixed by v3.4.47', $signal->summary());
-        self::assertIsArray($signal->data()['advisories']);
+        self::assertIsArray(AdvisoryRule::legacy($facts)[1]->rows());
         $rows = [];
-        foreach ($signal->data()['advisories'] as $row) {
+        foreach (AdvisoryRule::legacy($facts)[1]->rows() as $row) {
             self::assertIsArray($row);
             $rows[] = [$row['id'], $row['fixed_by'], $row['fixed_on_branch']];
         }
@@ -153,7 +173,7 @@ final class AdvisoryRuleTest extends TestCase
 
         self::assertNotNull($signal);
         self::assertSame('1 security advisory affects 6.1.3 (CVE-2024-28859); fixed by 6.3.0', $signal->summary());
-        self::assertTrue(self::row($signal, 0)['fixed_on_branch'], 'the branch\'s highest tag is the package\'s: one candidate, named once');
+        self::assertTrue(self::row($facts, 0)['fixed_on_branch'], 'the branch\'s highest tag is the package\'s: one candidate, named once');
     }
 
     /** Nothing to check against: no metadata, a branch snapshot with no branch, or a range that covers every listed release. */
@@ -170,7 +190,7 @@ final class AdvisoryRuleTest extends TestCase
             $signal = (new AdvisoryRule())->evaluate($facts);
             self::assertNotNull($signal, $case);
             self::assertSame('1 security advisory affects '.$facts->package()->version().' (CVE-1)', $signal->summary(), $case);
-            self::assertNull(self::row($signal, 0)['fixed_by'], $case);
+            self::assertNull(self::row($facts, 0)['fixed_by'], $case);
         }
     }
 
@@ -191,8 +211,8 @@ final class AdvisoryRuleTest extends TestCase
             $signal = (new AdvisoryRule())->evaluate($facts);
             self::assertNotNull($signal, $case);
             self::assertSame('1 security advisory affects '.$facts->package()->version().' (CVE-1)', $signal->summary(), $case);
-            self::assertNull(self::row($signal, 0)['fixed_by'], $case);
-            self::assertFalse(self::row($signal, 0)['fixed_on_branch'], $case);
+            self::assertNull(self::row($facts, 0)['fixed_by'], $case);
+            self::assertFalse(self::row($facts, 0)['fixed_on_branch'], $case);
         }
     }
 
@@ -206,7 +226,7 @@ final class AdvisoryRuleTest extends TestCase
 
         self::assertNotNull($signal);
         self::assertSame('1 security advisory affects 1.9.5 (CVE-1); fixed by 2.0.0', $signal->summary());
-        self::assertFalse(self::row($signal, 0)['fixed_on_branch'], '1.9.0 spares the range but is below 1.9.5: not the branch\'s fix');
+        self::assertFalse(self::row($facts, 0)['fixed_on_branch'], '1.9.0 spares the range but is below 1.9.5: not the branch\'s fix');
     }
 
     /** A branch snapshot has no branch, but the package's highest tag can still carry the fix. */
@@ -219,7 +239,7 @@ final class AdvisoryRuleTest extends TestCase
 
         self::assertNotNull($signal);
         self::assertSame('1 security advisory affects dev-main (CVE-1); fixed by 2.0.0', $signal->summary());
-        self::assertFalse(self::row($signal, 0)['fixed_on_branch']);
+        self::assertFalse(self::row($facts, 0)['fixed_on_branch']);
     }
 
     public function testThreeAdvisoriesAreAllNamedAndAnIdStandsInForAMissingCve(): void
@@ -244,8 +264,8 @@ final class AdvisoryRuleTest extends TestCase
 
         self::assertNotNull($signal);
         self::assertSame('5 security advisories affect 1.0.0 (CVE-2024-0001, CVE-2024-0002, CVE-2024-0003 and 2 more)', $signal->summary());
-        self::assertIsArray($signal->data()['advisories']);
-        self::assertCount(5, $signal->data()['advisories']);
+        self::assertIsArray(AdvisoryRule::legacy($facts)[1]->rows());
+        self::assertCount(5, AdvisoryRule::legacy($facts)[1]->rows());
     }
 
     public function testExactlyThreeAreNotCounted(): void

@@ -56,11 +56,25 @@ final class PinnedRule implements SignalRule
             'last_stable_version' => $metadata === null ? null : $metadata->lastStableVersion(),
             'last_stable_dated_by' => $metadata === null ? null : $metadata->lastStableDatedBy(),
             'snapshot_time' => self::date($snapshotTime),
+            'tag_relation' => self::tagRelation($metadata === null ? null : $metadata->lastStableReleaseAt(), $snapshotTime),
         ];
     }
 
     private static function date(?\DateTimeImmutable $date): ?string
     {
         return $date === null ? null : $date->format(\DATE_ATOM);
+    }
+
+    /** How the newest tag's date relates to the snapshot's commit date; null when either is missing. */
+    private static function tagRelation(?\DateTimeImmutable $tag, ?\DateTimeImmutable $snapshot): ?string
+    {
+        if ($tag === null || $snapshot === null) {
+            return null;
+        }
+        if ($tag < $snapshot) {
+            return 'older';
+        }
+
+        return $tag > $snapshot ? 'newer' : 'same';
     }
 }

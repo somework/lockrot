@@ -534,7 +534,7 @@ final class ExplainFormatterTest extends TestCase
         $facts = F::facts(F::package(['version' => '1.0.0']), F::metadata([['1.0.0', '2026-01-01T00:00:00+00:00']], true));
         $s1 = (new AbandonedRule())->evaluate($facts);
         self::assertNotNull($s1);
-        self::assertSame(['replacement' => null], $s1->data());
+        self::assertSame(['marked_by' => 'repository', 'replacement' => null, 'replacement_url' => null], $s1->data());
         $finding = (new FindingBuilder())->withVerdict(Verdict::ABANDONED)->withSignals([$s1])->withDataDate(new \DateTimeImmutable(F::NOW))->build();
 
         $text = $this->plain(new Explanation($finding, $facts, new Thresholds(), '8.4', $this->report()));

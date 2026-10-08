@@ -62,7 +62,7 @@ final class AbandonedRuleTest extends TestCase
         self::assertNotNull($signal);
         self::assertSame(Signal::S1, $signal->id());
         self::assertSame('marked abandoned in composer.lock, replacement: other/pkg', $signal->summary());
-        self::assertSame(['replacement' => 'other/pkg'], $signal->data());
+        self::assertSame(['marked_by' => 'lock', 'replacement' => 'other/pkg', 'replacement_url' => 'https://packagist.org/packages/other/pkg'], $signal->data());
     }
 
     private static function listed(LockedPackage $package, ?PackageMetadata $metadata = null): PackageFacts

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Support;
 
+use Lockrot\Allowlist\AllowlistEntry;
 use Lockrot\Analyzer\LibyearsMeasurement;
 use Lockrot\Lock\PackageOrigin;
 use Lockrot\Signal\Signal;
@@ -13,9 +14,9 @@ use Lockrot\Verdict\Verdict;
 
 /**
  * Builds a {@see Finding} for a test. The defaults: `vendor/pkg` 1.0.0, ok, no
- * signals, a chain of the package alone, no data date, no flags. A finding without flags throws
- * on grade(), lead(), isGraded() and score(). Every optional argument keeps the constructor's own
- * default. Each with*() returns a new builder.
+ * signals, a chain of the package alone, no data date, flags from the signals or the verdict ({@see build()}).
+ * A finding built {@see withoutFlags()} throws on grade(), lead(), isGraded() and score(). Every
+ * optional argument keeps the constructor's own default. Each with*() returns a new builder.
  */
 final class FindingBuilder
 {
@@ -37,6 +38,20 @@ final class FindingBuilder
     private ?string $replacementNamedBy = null;
     private ?FlagSet $flags = null;
     private bool $maintenanceJudged = true;
+    private bool $unscored = false;
+
+    /**
+     * The signals that raise each report-1 verdict word as its flag, for a finding a test builds
+     * by its verdict alone: its lead is then that word, as the analyzer's would be.
+     */
+    private const RAISED_BY = [
+        Verdict::ABANDONED => [[Signal::S1, Signal::LEVEL_HIGH]],
+        Verdict::SILENT => [[Signal::S2, Signal::LEVEL_HIGH], [Signal::S4, Signal::LEVEL_HIGH]],
+        Verdict::PINNED => [[Signal::S6, Signal::LEVEL_WARN]],
+        Verdict::LEFT_BEHIND => [[Signal::S8, Signal::LEVEL_WARN]],
+        Verdict::OLD_PROMISE => [[Signal::S5, Signal::LEVEL_WARN]],
+        Verdict::STALE => [[Signal::S2, Signal::LEVEL_WARN]],
+    ];
 
     public function withPackage(string $package): self
     {
@@ -154,10 +169,35 @@ final class FindingBuilder
         return $clone;
     }
 
+    /** A finding built without its flags, which has no score: what a caller that skips the analyzer gets. */
+    public function withoutFlags(): self
+    {
+        $clone = clone $this;
+        $clone->unscored = true;
+
+        return $clone;
+    }
+
+    /**
+     * Without {@see withFlags()}, the flags come from the signals, else from a report-1 verdict
+     * word ({@see RAISED_BY}). An allowlist reason accepts the whole package, no advisory counts and
+     * the verdict `unknown` means the metadata was not read.
+     */
     public function build(): Finding
     {
         $finding = new Finding($this->package, $this->version, $this->verdict, $this->signals, $this->chain, $this->allowlistReason, $this->dataDate, $this->note, $this->dev, $this->directDependents, $this->libyears, $this->origin, $this->replacementNamedBy);
+        if ($this->flags !== null) {
+            return $finding->withFlags($this->flags, $this->maintenanceJudged);
+        }
+        if ($this->unscored) {
+            return $finding;
+        }
+        $entry = $this->allowlistReason === null ? null : new AllowlistEntry($this->package, null, $this->allowlistReason, null, AllowlistEntry::BY_PROJECT);
+        $flags = FlagSet::fromSignals($this->signals, $entry, []);
+        if ($flags->fired() === [] && isset(self::RAISED_BY[$this->verdict])) {
+            $flags = FlagSet::fromSignals(array_map(static fn (array $raise): Signal => new Signal($raise[0], $raise[1], 'set by the verdict'), self::RAISED_BY[$this->verdict]), $entry, []);
+        }
 
-        return $this->flags === null ? $finding : $finding->withFlags($this->flags, $this->maintenanceJudged);
+        return $finding->withFlags($flags, $this->verdict !== Verdict::UNKNOWN);
     }
 }

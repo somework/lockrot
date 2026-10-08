@@ -51,7 +51,17 @@ final class LeftBehindRule implements SignalRule
     {
         $reading = $this->reading($facts);
 
-        return $reading === null ? null : $reading->signal();
+        if ($reading === null) {
+            return null;
+        }
+        $signal = $reading->signal();
+
+        return new Signal(Signal::S8, $signal->level(), $signal->summary(), $signal->data() + [
+            'reachable_php' => $reading->reachablePhp(),
+            'reachable_admits' => $reading->reachableAdmits(),
+            'newest_years' => $reading->newestYears(),
+            'reachable_years' => $reading->reachableYears(),
+        ]);
     }
 
     /** The signal and the keys report-2 adds to it, null where S8 does not fire. */

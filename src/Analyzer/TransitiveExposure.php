@@ -7,7 +7,7 @@ namespace Lockrot\Analyzer;
 use Lockrot\Graph\DependencyGraph;
 use Lockrot\Signal\Signal;
 use Lockrot\Verdict\Finding;
-use Lockrot\Verdict\Verdict;
+use Lockrot\Verdict\FlagSet;
 
 /**
  * Signal S7, the parent-side view of transitive exposure (docs/verdicts.md#transitive-exposure).
@@ -38,7 +38,7 @@ final class TransitiveExposure
     {
         $parents = \count($finding->directDependents());
 
-        return Verdict::flagged($finding->verdict())
+        return $finding->isGraded()
             && !$finding->isDirect()
             && $parents > 0
             && $parents <= self::MAX_FAN_IN;
@@ -51,7 +51,7 @@ final class TransitiveExposure
      */
     public static function sharedAboveCap(Finding $finding): bool
     {
-        return Verdict::flagged($finding->verdict())
+        return $finding->isGraded()
             && !$finding->isDirect()
             && \count($finding->directDependents()) > self::MAX_FAN_IN;
     }
@@ -111,19 +111,24 @@ final class TransitiveExposure
     {
         $packages = [];
         foreach ($descendants as [$finding, $chain]) {
-            $packages[] = ['package' => $finding->package(), 'verdict' => $finding->verdict(), 'chain' => $chain];
+            $packages[] = ['package' => $finding->package(), 'chain' => $chain, 'verdict' => $finding->grade(), 'lead' => $finding->lead(), 'flag_ids' => $finding->flagIds()];
         }
 
         return new Signal(Signal::S7, Signal::LEVEL_INFO, self::summary($packages), ['flagged' => \count($packages), 'packages' => $packages]);
     }
 
-    /** @param non-empty-list<array{package: string, verdict: string, chain: list<string>}> $packages */
+    /**
+     * Names each package by its lead, which is report-1's verdict word on every package report-1
+     * flagged, and a package graded by its advisories alone by `vulnerable`.
+     *
+     * @param non-empty-list<array{package: string, chain: list<string>, verdict: string, lead: ?string, flag_ids: list<string>}> $packages
+     */
     private static function summary(array $packages): string
     {
         $count = \count($packages);
         $named = [];
         foreach (\array_slice($packages, 0, self::SUMMARY_NAMES) as $package) {
-            $named[] = $package['package'].' ('.$package['verdict'].')';
+            $named[] = $package['package'].' ('.($package['lead'] ?? FlagSet::VULNERABLE).')';
         }
         $summary = \sprintf('pulls in %d flagged %s: %s', $count, $count === 1 ? 'package' : 'packages', implode(', ', $named));
         if ($count > self::SUMMARY_NAMES) {

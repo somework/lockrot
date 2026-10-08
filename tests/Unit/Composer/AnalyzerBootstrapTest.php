@@ -67,7 +67,7 @@ final class AnalyzerBootstrapTest extends TestCase
 
         $analyzer = AnalyzerBootstrap::create($factory, new NullIO(), new Config(false, sys_get_temp_dir()), [], $project, $lockrot, [], Deadline::never());
 
-        $patterns = array_map(static fn (AllowlistEntry $e): string => $e->pattern(), $analyzer->allowlist()->entries());
+        $patterns = array_map(static fn (AllowlistEntry $e): ?string => $e->pattern(), $analyzer->allowlist()->entries());
         self::assertContains('vendor/builtin', $patterns, "the factory-built analyzer's own allowlist entry must survive the merge");
         self::assertContains('vendor/project', $patterns, 'the project ignore list must be merged in');
     }

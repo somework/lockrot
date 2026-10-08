@@ -10,6 +10,7 @@ use Lockrot\Data\Advisory\AdvisoryNameCoverage;
 use Lockrot\Data\Forge\RepositoryActivity;
 use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Lock\LockedPackage;
+use Lockrot\Security\PackageFixes;
 
 /** @internal */
 final class PackageFacts
@@ -29,6 +30,7 @@ final class PackageFacts
     private ?AbandonedIgnoreMatch $abandonedIgnore;
     private ?AdvisoryNameCoverage $advisoryCoverage;
     private bool $metadataFailed;
+    private ?PackageFixes $fixes = null;
 
     /**
      * @param list<Advisory> $advisories         only those that affect the installed version: S9 does not filter them
@@ -48,6 +50,21 @@ final class PackageFacts
         $this->activityNotChecked = $activityNotChecked;
         $this->abandonedIgnore = $abandonedIgnore;
         $this->advisoryCoverage = $advisoryCoverage;
+    }
+
+    /** A copy that carries what the release scan found for the counted advisories. */
+    public function withFixes(PackageFixes $fixes): self
+    {
+        $copy = clone $this;
+        $copy->fixes = $fixes;
+
+        return $copy;
+    }
+
+    /** Null when the run counted no advisory, so the release scan did not run. */
+    public function fixes(): ?PackageFixes
+    {
+        return $this->fixes;
     }
 
     public function abandonedIgnore(): ?AbandonedIgnoreMatch

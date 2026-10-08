@@ -23,6 +23,8 @@ final class RepoRef
 
     /** GitLab and Bitbucket have no push date: the newest commit on any branch is the closest. */
     private const ACTIVITY = [self::GITHUB => 'last push', self::GITLAB => 'last commit', self::BITBUCKET => 'last commit'];
+    /** What the activity date measures: GitHub reports the last push, GitLab and Bitbucket the last commit. */
+    private const EVENT = [self::GITHUB => 'push', self::GITLAB => 'commit', self::BITBUCKET => 'commit'];
 
     private string $forge;
     private string $host;
@@ -68,6 +70,12 @@ final class RepoRef
     public static function label(string $forge): string
     {
         return self::LABEL[$forge];
+    }
+
+    /** `push` or `commit`: S4's `activity`. */
+    public function event(): string
+    {
+        return self::EVENT[$this->forge];
     }
 
     public function activityWording(): string

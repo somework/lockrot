@@ -11,6 +11,7 @@ use Lockrot\Data\Repository\RepositoryUrl;
 use Lockrot\Explain\Explanation;
 use Lockrot\Json\JsonWriter;
 use Lockrot\Json\Schemas;
+use Lockrot\Legacy\SignalData013;
 use Lockrot\Signal\Signal;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
@@ -107,8 +108,8 @@ final class ExplainFormatter
         }
         $lines = ['signals'];
         foreach ($finding->signals() as $signal) {
-            $lines[] = \sprintf('%s%s %-4s %s', self::INDENT, $signal->id(), $signal->level(), self::escape($signal->summary()));
-            foreach ($this->signalData($signal) as $line) {
+            $lines[] = \sprintf('%s%s %-4s %s', self::INDENT, $signal->id(), SignalData013::level($signal), self::escape($signal->summary()));
+            foreach ($this->signalData($signal, $finding) as $line) {
                 $lines[] = self::DATA_INDENT.self::escape($line);
             }
         }
@@ -123,12 +124,12 @@ final class ExplainFormatter
      *
      * @return list<string>
      */
-    private function signalData(Signal $signal): array
+    private function signalData(Signal $signal, Finding $finding): array
     {
         $scalars = [];
         $lines = [];
         $skipNulls = $signal->id() === Signal::S6;
-        foreach ($signal->data() as $key => $value) {
+        foreach (SignalData013::of($signal, $finding->advisoryFacts013()) as $key => $value) {
             if ($key === self::RELEASES_READ && $signal->id() === Signal::S9) {
                 continue;
             }

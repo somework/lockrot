@@ -696,7 +696,7 @@ final class FindingTest extends TestCase
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('vendor/pkg');
 
-        $read((new FindingBuilder())->build());
+        $read((new FindingBuilder())->withoutFlags()->build());
     }
 
     /** @return iterable<string, array{list<string>, bool, string, string, int}> */
@@ -761,7 +761,7 @@ final class FindingTest extends TestCase
 
     public function testWithFlagsReturnsAGradedCopyAndKeepsTheFindingItWasCalledOn(): void
     {
-        $finding = (new FindingBuilder())->build();
+        $finding = (new FindingBuilder())->withoutFlags()->build();
         $graded = $finding->withFlags(FlagSet::fromSignals([], null, []), false);
 
         self::assertNotSame($finding, $graded);
