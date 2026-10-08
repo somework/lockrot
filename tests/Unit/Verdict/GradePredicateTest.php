@@ -22,6 +22,7 @@ use Lockrot\Data\Repository\MetadataLoaderInterface;
 use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
+use Lockrot\Signal\Signal;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\FakeHttpClient;
@@ -57,14 +58,33 @@ final class GradePredicateTest extends TestCase
         self::assertSame(1, $counts[Verdict::STALE]);
     }
 
-    private static function report(): Report
+    public function testAVulnerableOnlyTransitivePackageCountsInItsParentsS7AndInTheCounts(): void
+    {
+        $report = self::report(true);
+        $parent = self::named($report, 'vendor/fresh');
+
+        $s7 = null;
+        foreach ($parent->signals() as $signal) {
+            if ($signal->id() === Signal::S7) {
+                $s7 = $signal->data();
+            }
+        }
+
+        self::assertNotNull($s7, 'the parent of a graded package carries S7');
+        self::assertSame(1, $s7['flagged']);
+        self::assertSame(['package' => 'vendor/vulnerable', 'verdict' => 'high', 'lead' => null, 'flag_ids' => ['vulnerable']], array_intersect_key($s7['packages'][0], array_flip(['package', 'verdict', 'lead', 'flag_ids'])));
+        self::assertSame(1, $report->toArray()['counts']['high']);
+    }
+
+    private static function report(bool $transitive = false): Report
     {
         $lock = LockFile::fromArray(['packages' => [
             ['name' => 'vendor/vulnerable', 'version' => '2.0.0', 'notification-url' => 'https://packagist.org/downloads/'],
             ['name' => 'vendor/stale', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/'],
-            ['name' => 'vendor/fresh', 'version' => '3.0.0', 'notification-url' => 'https://packagist.org/downloads/'],
+            ['name' => 'vendor/fresh', 'version' => '3.0.0', 'notification-url' => 'https://packagist.org/downloads/', 'require' => $transitive ? ['vendor/vulnerable' => '^2.0'] : []],
         ]]);
-        $project = ProjectConfig::fromArray(['require' => ['vendor/vulnerable' => '^2.0', 'vendor/stale' => '^1.0', 'vendor/fresh' => '^3.0']]);
+        $require = ['vendor/vulnerable' => '^2.0', 'vendor/stale' => '^1.0', 'vendor/fresh' => '^3.0'];
+        $project = ProjectConfig::fromArray(['require' => $transitive ? array_diff_key($require, ['vendor/vulnerable' => true]) : $require]);
         $metadata = [
             'vendor/vulnerable' => self::metadata('vendor/vulnerable', '2026-08-01T00:00:00+00:00', '2.0.0'),
             'vendor/stale' => self::metadata('vendor/stale', '2022-01-01T00:00:00+00:00', '1.0.0'),
