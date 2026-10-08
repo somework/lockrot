@@ -11,6 +11,7 @@ use Lockrot\Data\Abandoned\AbandonedIgnore;
 use Lockrot\Data\Abandoned\AbandonedIgnoreMatch;
 use Lockrot\Data\Advisory\AdvisoryBatch;
 use Lockrot\Data\Advisory\AdvisoryLoaderInterface;
+use Lockrot\Data\Advisory\IgnoredAdvisory;
 use Lockrot\Data\Forge\ActivityBatch;
 use Lockrot\Data\Forge\ActivityClient;
 use Lockrot\Data\Forge\ActivityFetchPlan;
@@ -37,6 +38,7 @@ use Lockrot\Signal\Rule\NotCheckedRule;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Verdict\Finding;
+use Lockrot\Verdict\FindingDetails;
 use Lockrot\Verdict\FlagSet;
 use Lockrot\Verdict\Score;
 use Lockrot\Verdict\VerdictEngine;
@@ -180,7 +182,7 @@ final class Analyzer
             $entry = $allowlisted[$package->name()];
             $facts = new PackageFacts($package, $meta, $act, $advisories->for($package->name()), $notChecked[$package->name()] ?? null, $abandonedIgnore[$package->name()], $advisories->coverage()->for($package->name()), isset($batch->failed()[$package->name()]));
             $factsByPackage[$package->name()] = $facts;
-            $findings[] = $this->buildFinding($facts, $entry, $graph, $batch, $fixes);
+            $findings[] = $this->buildFinding($facts, $entry, $graph, $batch, $fixes, $advisories->ignored($package->name()));
             if (!$package->isFromComposerRepository()) {
                 ++$notInRepository;
             }
@@ -390,7 +392,8 @@ final class Analyzer
         return [$batch, $notes];
     }
 
-    private function buildFinding(PackageFacts $facts, ?AllowlistEntry $entry, DependencyGraph $graph, MetadataBatch $batch, ?FixFinder $fixes): Finding
+    /** @param list<IgnoredAdvisory> $ignored */
+    private function buildFinding(PackageFacts $facts, ?AllowlistEntry $entry, DependencyGraph $graph, MetadataBatch $batch, ?FixFinder $fixes, array $ignored): Finding
     {
         if ($fixes !== null && $facts->advisories() !== []) {
             $facts = $facts->withFixes($fixes->find($facts));
@@ -433,7 +436,9 @@ final class Analyzer
             AdvisoryRule::legacy($facts)[1]
         );
 
-        return $finding->withFlags(FlagSet::fromSignals($signals, $entry, self::countedAdvisories($facts)), $facts->metadataStatus() === PackageFacts::METADATA_READ);
+        return $finding
+            ->withFlags(FlagSet::fromSignals($signals, $entry, self::countedAdvisories($facts)), $facts->metadataStatus() === PackageFacts::METADATA_READ)
+            ->withDetails(FindingDetails::of($facts, $entry, $this->signals->phpFloor(), $ignored, $signals, $batch->failed()[$package->name()] ?? null));
     }
 
     /**

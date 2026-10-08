@@ -413,13 +413,13 @@ final class Report
         return $list;
     }
 
-    /** @return list<array{package: string, verdict: string, fan_in: int}> */
+    /** @return list<array{package: string, verdict: string, lead: ?string, flag_ids: list<string>, fan_in: int}> */
     private function unattributedList(): array
     {
         $list = [];
         foreach ($this->findings as $finding) {
             if (TransitiveExposure::sharedAboveCap($finding)) {
-                $list[] = ['package' => $finding->package(), 'verdict' => $finding->verdict(), 'fan_in' => \count($finding->directDependents())];
+                $list[] = ['package' => $finding->package(), 'verdict' => $finding->grade(), 'lead' => $finding->lead(), 'flag_ids' => $finding->flagIds(), 'fan_in' => \count($finding->directDependents())];
             }
         }
 
@@ -427,57 +427,61 @@ final class Report
     }
 
     /**
-     * Null when the run read no baseline or the baseline has nothing on this package.
+     * report-2 without `$schema` and `lockrot`, which the writer adds. Findings come in the order of
+     * {@see sorted()}, each with its rank. A finding's gate is the report-1 gate's standing, so the
+     * document agrees with the exit code.
      *
-     * @return array{status: string, previous_verdict: ?string}|null
+     * @return array<string, mixed>
      */
-    private function baselineStateOf(Finding $finding): ?array
-    {
-        if ($this->baseline === null) {
-            return null;
-        }
-        $status = $this->baseline->statusOf($finding->package());
-
-        return $status === null ? null : [
-            'status' => $status,
-            'previous_verdict' => $this->baseline->previousVerdictOf($finding->package()),
-        ];
-    }
-
-    /** @return array<string, mixed> */
     public function toArray(): array
     {
-        $counts = $this->byVerdict();
         $gate = $this->gate();
-        $standings = $gate === null ? null : $gate->standings();
+        $standings = [];
+        foreach ($gate === null ? [] : $gate->standings() as $at => $standing) {
+            $standings[$this->findings[$at]->package()] = $standing;
+        }
+        $findings = [];
+        foreach ($this->sorted() as $at => $finding) {
+            $row = $finding->toArray();
+            $standing = $standings[$finding->package()] ?? null;
+            $lead = array_search('lead', array_keys($row), true) + 1;
+            $findings[] = \array_slice($row, 0, $lead, true) + ['rank' => $at + 1] + \array_slice($row, $lead, null, true) + [
+                'baseline' => null,
+                'gate' => ['reaches_fail_on' => $standing !== null && $standing->reachesFailOn(), 'fails' => $standing !== null && $standing->fails(), 'exempt_by' => $standing === null ? null : $standing->exemptBy(), 'by' => [], 'basis' => null],
+            ];
+        }
+        $run = $this->run ?? new RunSettings(null, null, null, null, null, null);
+        $graded = array_filter($this->findings, static fn (Finding $f): bool => $f->isGraded());
+        $multi = array_filter($graded, static fn (Finding $f): bool => \count($f->flagIds()) >= 2);
+        $flags = Report2Root::flags($findings);
+        $oldest = $this->activityCacheOldestAt;
 
         return [
             'generated_at' => $this->generatedAt->format(\DATE_ATOM),
-            'run' => $this->run === null ? null : $this->run->toArray(),
-            'activity_cache_oldest_at' => $this->activityCacheOldestAt === null ? null : $this->activityCacheOldestAt->format(\DATE_ATOM),
+            'run' => $run->toArray(ScoreRulesUsed::of($findings)),
+            'activity_cache_oldest_at' => $oldest === null ? null : $oldest->format(\DATE_ATOM),
+            'activity_cache_age_hours' => $oldest === null ? null : round(max(0, $this->generatedAt->getTimestamp() - $oldest->getTimestamp()) / 3600, 1),
             'packages_checked' => $this->packagesChecked,
+            'packages_flagged' => \count($graded),
+            'packages_multi_flag' => \count($multi),
             'include_dev' => $this->includesDev,
             'not_from_composer_repository' => $this->notFromComposerRepository,
             'network_failures' => $this->hadNetworkFailures(),
-            'counts' => $counts,
-            'abandoned' => ['total' => $counts[Verdict::ABANDONED], 'with_replacement' => $this->abandonedWithReplacement()],
-            'priorities' => $this->byPriority(),
+            'counts' => $this->byGrade(),
+            'abandoned' => Report2Root::abandoned($findings, $flags),
+            'priorities' => Report2Root::priorities($findings),
+            'flags' => $flags,
             'exposure' => $this->exposureList(),
             'exposure_rule' => ['max_fan_in' => TransitiveExposure::MAX_FAN_IN],
             'unattributed' => $this->unattributedList(),
-            'libyears' => $this->libyears()->toArray(),
+            'libyears' => Report2Root::libyears($this->libyears()->toArray(), $findings),
             'baseline' => $this->baseline === null ? null : $this->baseline->toArray(),
-            'gate' => $gate === null ? null : $gate->toArray(),
+            'gate' => Report2Root::gate($gate === null ? ['fails' => false, 'tripped_by' => [], 'fail_on_applied' => $run->mode() === Gate::MODE_CHECK] : $gate->toArray(), $findings),
+            'security' => Report2Root::security($findings),
+            'data_date' => Report2Root::dataDate($findings),
             'notes' => $this->notes(),
             'note_details' => array_map(static fn (RunNote $note): array => $note->toArray(), $this->notes),
-            'findings' => array_map(
-                fn (Finding $f, int $at): array => $f->toArray() + [
-                    'baseline' => $this->baselineStateOf($f),
-                    'gate' => $standings === null ? null : $standings[$at]->toArray(),
-                ],
-                $this->findings,
-                array_keys($this->findings)
-            ),
+            'findings' => $findings,
         ];
     }
 }

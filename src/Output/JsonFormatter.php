@@ -19,7 +19,7 @@ final class JsonFormatter implements FormatterInterface
 {
     /** @see Version::STRING The release number lives there. This is its published alias. */
     public const VERSION = Version::STRING;
-    public const SCHEMA = 1;
+    public const SCHEMA = 2;
 
     public function format(Report $report, bool $showAll = false): string
     {

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Verdict;
 
 use Composer\Package\Loader\ValidatingArrayLoader;
+use Lockrot\Allowlist\AllowlistEntry;
 use Lockrot\Analyzer\Libyears;
 use Lockrot\Analyzer\LibyearsMeasurement;
 use Lockrot\Data\Repository\ReleaseBranch;
@@ -15,6 +16,7 @@ use Lockrot\Legacy\PriorityBasis013;
 use Lockrot\Legacy\Verdict013;
 use Lockrot\Lock\PackageOrigin;
 use Lockrot\Score\ScoreBasis;
+use Lockrot\Signal\Rule\NotCheckedRule;
 use Lockrot\Signal\Signal;
 
 /** @internal */
@@ -68,6 +70,9 @@ final class Finding
     /** Null for a finding built without its flags. */
     private ?Score $score = null;
     private ?string $grade = null;
+    private ?FlagSet $flags = null;
+    private bool $maintenanceJudged = true;
+    private ?FindingDetails $details = null;
 
     /**
      * @param list<Signal> $signals
@@ -142,6 +147,8 @@ final class Finding
         $clone = clone $this;
         $clone->score = Score::of($flags, self::reachOf($this->chain), $this->dev);
         $clone->grade = ScoreBasis::verdict($clone->score, $flags, $maintenanceJudged);
+        $clone->flags = $flags;
+        $clone->maintenanceJudged = $maintenanceJudged;
 
         return $clone;
     }
@@ -429,13 +436,6 @@ final class Finding
         return $replacement;
     }
 
-    private function replacementUrl(): ?string
-    {
-        $successor = $this->successor();
-
-        return $successor === null ? null : PackageOrigin::replacementPage($this->replacementNamedBy, $successor);
-    }
-
     private function replacement(): ?string
     {
         foreach ($this->signals as $signal) {
@@ -554,30 +554,259 @@ final class Finding
         return ($evidence === '' ? '' : $evidence.'; ').'allowlisted: '.$this->allowlistReason;
     }
 
-    /** @return array<string, mixed> */
+    /** A copy with the facts report-2 writes beside the signals. */
+    public function withDetails(FindingDetails $details): self
+    {
+        $clone = clone $this;
+        $clone->details = $details;
+
+        return $clone;
+    }
+
+    /**
+     * The analyzer's facts, else what the finding's own fields say: a finding built without them
+     * has no release scan and no advisory lookup.
+     */
+    public function details(): FindingDetails
+    {
+        if ($this->details !== null) {
+            return $this->details;
+        }
+        $status = !$this->isFromComposerRepository() ? 'not_from_composer_repository' : ($this->maintenanceJudged ? 'read' : ($this->note === 'not found in the repository' ? 'not_found' : 'unavailable'));
+        $skipped = [];
+        if ($status !== 'read') {
+            $skipped[] = ['check' => 'release_metadata', 'reason' => $status, 'blocks' => [Signal::S2, Signal::S8]];
+        } elseif (ReleaseBranch::of($this->version) === null) {
+            $skipped[] = ['check' => 'release_branch', 'reason' => 'branch_snapshot', 'blocks' => [Signal::S8]];
+        }
+        $entry = $this->allowlistReason === null ? null : new AllowlistEntry($this->package, null, $this->allowlistReason, null, AllowlistEntry::BY_PROJECT);
+
+        return new FindingDetails($status, $status === 'unavailable' ? 'fetch_failed' : null, null, $skipped, ['requires' => null, 'target_runs' => null, 'project_allows' => null], $entry, 'not_run', 'composer_too_old', [], null);
+    }
+
+    /**
+     * report-2's finding object without `rank`, `baseline` and `gate`, which the report writes.
+     *
+     * @return array<string, mixed>
+     *
+     * @throws \LogicException for a finding built without its flags
+     */
     public function toArray(): array
     {
-        $signals = [];
-        foreach ($this->signals as $signal) {
-            $signals[] = ['id' => $signal->id(), 'level' => $signal->level(), 'summary' => $signal->summary(), 'data' => $signal->data()];
+        $details = $this->details();
+        $score = $this->score();
+        $flags = $this->flags ?? FlagSet::fromSignals($this->signals, null, []);
+        $signals = $this->signalsOut($details);
+        $data = array_column($signals, 'data', 'id');
+        $checksMissing = self::checks($data[Signal::S10]['unchecked'] ?? []);
+        $checks = array_merge($details->skipped(), $checksMissing);
+        $livenessComplete = true;
+        $s3Unread = false;
+        foreach ($checks as $check) {
+            $livenessComplete = $livenessComplete && array_intersect($check['blocks'], [Signal::S2, Signal::S4]) === [];
+            $s3Unread = $s3Unread || \in_array(Signal::S3, $check['blocks'], true);
         }
+        $branchKey = ReleaseBranch::of($this->version);
+        $branch = $branchKey === null ? null : ReleaseBranch::label($branchKey);
+        $basis = ScoreBasis::of($flags, self::reachOf($this->chain), $this->dev, [
+            'maintenance_judged' => $this->maintenanceJudged,
+            'advisories_complete' => $details->advisoriesComplete(),
+            'liveness_complete' => $livenessComplete,
+            's3_unread' => $s3Unread,
+            's8_unread' => $branchKey === null && !$this->maintenanceJudged,
+        ])->toArray();
+        $rows = self::rows($data[Signal::S9]['advisories'] ?? []);
+        $security = $details->security($rows, $branch);
+        $flagsOut = $this->flagsOut($flags, $basis, $data, $livenessComplete, $branch);
+        $counted = array_column(self::rows($basis['terms'] ?? []), 'flag');
+        $evidence = [];
+        foreach ($flagsOut as $flag) {
+            if (\in_array($flag['id'], $counted, true)) {
+                $evidence[] = (string) self::scalarOrNull($flag['id']).': '.(string) self::scalarOrNull($flag['summary']);
+            }
+        }
+        $entry = $details->entry();
+        $successor = \in_array(FlagSet::ABANDONED, $counted, true) ? self::successorOf($this->package, $this->replacement()) : null;
         $libyears = $this->libyears->years();
+        $grade = $this->grade();
 
         return [
-            'package' => $this->package, 'version' => $this->version, 'verdict' => $this->verdict,
-            'priority' => $this->priority(), 'direct' => $this->isDirect(), 'dev' => $this->dev,
+            'package' => $this->package,
+            'version' => $this->version,
+            'branch' => $branch,
+            'installed_php' => $details->installedPhp(),
+            'verdict' => $grade,
+            'priority' => $this->isGraded() ? $grade : 'none',
+            'lead' => $this->lead(),
+            'flags' => $flagsOut,
+            'score' => $basis,
+            'next_step' => null,
+            'security' => $security,
+            'checks_missing' => $checksMissing,
+            'checks_skipped' => $details->skipped(),
+            'maintenance_judged' => $this->maintenanceJudged,
+            'metadata' => $details->metadata(),
+            'allowlist' => $entry === null ? null : $entry->toArray(),
             'from_composer_repository' => $this->isFromComposerRepository(),
             'origin' => $this->origin->toArray(),
-            'replacement' => $this->successor(),
-            'replacement_url' => $this->replacementUrl(),
-            'signals' => $signals, 'chain' => $this->chain, 'direct_dependents' => $this->directDependents,
-            'evidence' => $this->evidence(),
-            'allowlist_reason' => $this->allowlistReason, 'note' => $this->note,
+            'replacement' => $successor,
+            'replacement_url' => $successor === null ? null : PackageOrigin::replacementPage($this->replacementNamedBy, $successor),
+            'note' => $this->note,
+            'libyears_unmeasured' => $this->libyears->unmeasuredReason(),
+            'direct' => $this->isDirect(),
+            'dev' => $this->dev,
+            'reach' => self::reachOf($this->chain),
+            'chain' => $this->chain,
+            'direct_dependents' => $this->directDependents,
+            'signals' => $signals,
+            'evidence' => implode('; ', $evidence),
+            'allowlist_reason' => $entry !== null && $entry->acceptsAll() ? $entry->reason() : null,
             'data_date' => $this->dataDate === null ? null : $this->dataDate->format(\DATE_ATOM),
             'libyears' => $libyears === null ? null : round($libyears, 2),
-            'libyears_unmeasured' => $this->libyears->unmeasuredReason(),
-            'priority_basis' => $this->priorityBasis()->toArray(),
-            'no_fix_expected' => $this->noFixExpected(),
         ];
+    }
+
+    /**
+     * The signals as report-2 writes them: S10 gains the release data a counted advisory needed
+     * and did not get.
+     *
+     * @return list<array{id: string, level: string, summary: string, data: array<string, mixed>}>
+     */
+    private function signalsOut(FindingDetails $details): array
+    {
+        $out = [];
+        foreach ($this->signals as $signal) {
+            $out[] = ['id' => $signal->id(), 'level' => $signal->level(), 'summary' => $signal->summary(), 'data' => $signal->data()];
+        }
+        $releases = $details->releasesUnchecked();
+        if ($releases === null) {
+            return $out;
+        }
+        foreach ($out as $i => $signal) {
+            if ($signal['id'] === Signal::S10) {
+                $unchecked = array_merge(self::checks($signal['data']['unchecked'] ?? []), [$releases]);
+                $out[$i]['data'] = ['unchecked' => $unchecked, 'blocks' => array_values(array_unique(array_merge(...array_column($unchecked, 'blocks'))))];
+                $out[$i]['summary'] .= '; '.NotCheckedRule::RELEASES_WORDS;
+
+                return $out;
+            }
+        }
+        $out[] = ['id' => Signal::S10, 'level' => Signal::LEVEL_INFO, 'summary' => NotCheckedRule::RELEASES_WORDS, 'data' => ['unchecked' => [$releases], 'blocks' => $releases['blocks']]];
+
+        return $out;
+    }
+
+    /**
+     * @param array<string, mixed>                $basis
+     * @param array<string, array<string, mixed>> $data
+     *
+     * @return list<array<string, mixed>>
+     */
+    private function flagsOut(FlagSet $flags, array $basis, array $data, bool $livenessComplete, ?string $branch): array
+    {
+        $roles = array_column(self::rows($basis['terms'] ?? []), 'role', 'flag');
+        $out = [];
+        foreach ($flags->fired() as $flag) {
+            $ids = array_values(array_filter(FlagSentence::SIGNALS[$flag], static fn (string $id): bool => isset($data[$id])));
+            if ($flag === FlagSet::VULNERABLE) {
+                $rows = self::rows($data[Signal::S9]['advisories'] ?? []);
+                $summary = $this->details()->vulnerableSummary($rows, $branch, (string) $this->decidingSeverity($basis));
+                $out[] = ['id' => $flag, 'role' => $roles[$flag] ?? 'security', 'baseline' => null, 'signal_ids' => [Signal::S9], 'degree' => null, 'headline' => ['unit' => 'advisories', 'value' => \count($rows), 'source' => null], 'summary' => $summary];
+                continue;
+            }
+            $out[] = [
+                'id' => $flag,
+                'role' => $roles[$flag] ?? 'accepted',
+                'baseline' => null,
+                'signal_ids' => $ids,
+                'degree' => $flag === FlagSet::ABANDONED ? ['reasons' => $flags->reasons(), 'liveness_complete' => $livenessComplete] : (\in_array($flag, [FlagSet::SILENT, FlagSet::STALE], true) ? ['liveness_complete' => $livenessComplete] : null),
+                'headline' => self::headline($flag, $flags, $data),
+                'summary' => FlagSentence::maintenance($flag, $data),
+            ];
+        }
+
+        return $out;
+    }
+
+    /** @param array<string, mixed> $basis */
+    private function decidingSeverity(array $basis): ?string
+    {
+        foreach (self::rows($basis['terms'] ?? []) as $term) {
+            if (($term['part'] ?? null) === 'security' && \is_string($term['severity'] ?? null)) {
+                return $term['severity'];
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param array<string, array<string, mixed>> $data
+     *
+     * @return array{unit: string, value: int|float|string|null, source: ?string}
+     */
+    private static function headline(string $flag, FlagSet $flags, array $data): array
+    {
+        switch ($flag) {
+            case FlagSet::ABANDONED:
+                return ['unit' => 'reason', 'value' => \in_array(FlagSet::ARCHIVED, $flags->reasons(), true) ? 'archived' : 'marked', 'source' => null];
+            case FlagSet::PINNED:
+                return ['unit' => 'reason', 'value' => self::scalarOrNull($data[Signal::S6]['reason'] ?? null), 'source' => null];
+            case FlagSet::LEFT_BEHIND:
+                return ['unit' => 'years', 'value' => self::scalarOrNull($data[Signal::S8]['years'] ?? null), 'source' => 'branch'];
+            case FlagSet::OLD_PROMISE:
+                return ['unit' => 'php', 'value' => self::scalarOrNull($data[Signal::S5]['written_for_php'] ?? null), 'source' => null];
+            default:
+                $release = self::scalarOrNull($data[Signal::S2]['years'] ?? null);
+                $push = self::scalarOrNull($data[Signal::S4]['years'] ?? null);
+                if ($release === null && $push === null) {
+                    return ['unit' => 'years', 'value' => null, 'source' => null];
+                }
+
+                return $push !== null && ($release === null || $push > $release) ? ['unit' => 'years', 'value' => $push, 'source' => 'push'] : ['unit' => 'years', 'value' => $release, 'source' => 'release'];
+        }
+    }
+
+    /**
+     * @param mixed $value
+     *
+     * @return int|float|string|null
+     */
+    private static function scalarOrNull($value)
+    {
+        return \is_int($value) || \is_float($value) || \is_string($value) ? $value : null;
+    }
+
+    /**
+     * @param mixed $value a list of objects from a signal's data or the score basis
+     *
+     * @return list<array<string, mixed>>
+     */
+    private static function rows($value): array
+    {
+        $rows = [];
+        foreach (\is_array($value) ? $value : [] as $row) {
+            if (\is_array($row)) {
+                $rows[] = array_filter($row, 'is_string', \ARRAY_FILTER_USE_KEY);
+            }
+        }
+
+        return $rows;
+    }
+
+    /**
+     * @param mixed $value S10's `unchecked` list
+     *
+     * @return list<array{check: string, reason: string, blocks: list<string>}>
+     */
+    private static function checks($value): array
+    {
+        $checks = [];
+        foreach (self::rows($value) as $row) {
+            $blocks = array_values(array_filter(\is_array($row['blocks'] ?? null) ? $row['blocks'] : [], 'is_string'));
+            $checks[] = ['check' => (string) self::scalarOrNull($row['check'] ?? null), 'reason' => (string) self::scalarOrNull($row['reason'] ?? null), 'blocks' => $blocks];
+        }
+
+        return $checks;
     }
 }
