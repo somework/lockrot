@@ -2,9 +2,9 @@
 
 These scripts write the schemas of the schema number 2 documents and their negative fixtures. Every
 `resources/lockrot-*-2.schema.json` file is generated: edit its builder, rebuild, and commit the
-builder and its output together. CI runs the four build commands and fails when the result differs
-from the committed files (`.github/workflows/ci.yml`, the step "The generated schemas and negatives
-match tools/schema"). The `-1` files are not generated. `CONTRIBUTING.md`, "Changing a schema", holds
+builder and its output together. CI runs the commands under "Commands" and fails when the result
+differs from the committed files (`.github/workflows/ci.yml`, the step "The generated schemas and
+negatives match tools/schema"). The `-1` files are not generated. `CONTRIBUTING.md`, "Changing a schema", holds
 their checklist.
 
 The scripts use the Python standard library only.

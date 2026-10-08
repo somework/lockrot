@@ -21,10 +21,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   stay in `verdict`. ([The score](docs/verdicts.md#score))
 - **Breaking:** **All formats:** a counted security advisory flags the package `vulnerable` and adds
   its severity's points, doubled when no release fixes it or none runs on the target PHP.
-  `ignore[]` entries no longer hide advisories. Unlike a new signal, which first ships as evidence
-  only, `vulnerable` decides at once, because 0.14 changes every verdict anyway
-  ([Verdict changes](docs/compatibility.md#verdict-changes)). Action: run once without a gate and
-  read the vulnerable rows.
+  `ignore[]` entries no longer hide advisories. Action: run once without a gate and read the
+  vulnerable rows.
+  ([Verdict changes](docs/compatibility.md#verdict-changes))
 - **Breaking:** **All formats:** the raise for advisories not fixed on the installed branch is gone,
   so a left-behind package with only medium or low advisories can drop a grade. Action: if you gate
   at `critical` or `high`, run once without the gate and compare each finding's verdict.

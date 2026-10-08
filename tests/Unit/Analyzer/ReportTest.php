@@ -289,28 +289,28 @@ final class ReportTest extends TestCase
     }
 
     /**
-     * `flagged_verdicts` is the vocabulary, not a setting: a consumer that decides what counts as a
-     * finding does not need the severity order. `unknown` is the case it
-     * settles — a package lockrot could not check is a note, not a finding.
+     * `graded_verdicts` is the vocabulary, not a setting: a consumer that decides what is graded
+     * does not need the verdict order. `unknown` is the case it settles: a package that lockrot
+     * could not check has no grade.
      */
-    public function testTheRunNamesWhichVerdictsAreFindings(): void
+    public function testTheRunNamesTheGradedVerdicts(): void
     {
-        $flagged = JsonPath::arrayAt($this->report()->withRun(new RunSettings(null, null, null, null, null, null))->toArray(), ['run', 'graded_verdicts']);
+        $graded = JsonPath::arrayAt($this->report()->withRun(new RunSettings(null, null, null, null, null, null))->toArray(), ['run', 'graded_verdicts']);
 
-        self::assertNotContains(Verdict::UNKNOWN, $flagged);
-        self::assertNotContains(Verdict::FINISHED, $flagged);
-        self::assertNotContains(Verdict::OK, $flagged);
-        foreach (array_keys($flagged) as $at) {
-            $verdict = JsonPath::stringAt($flagged, [$at]);
+        self::assertNotContains(Verdict::UNKNOWN, $graded);
+        self::assertNotContains(Verdict::FINISHED, $graded);
+        self::assertNotContains(Verdict::OK, $graded);
+        foreach (array_keys($graded) as $at) {
+            $verdict = JsonPath::stringAt($graded, [$at]);
             self::assertContains($verdict, ScoreModel::GRADES);
         }
     }
 
     /**
-     * The `baseline` block gives the totals. A reader filtering for what is new needs the same
-     * judgement per finding, which the totals cannot give.
+     * report-2 writes a finding's standing against the baseline from baseline-2 on: with a
+     * baseline-1 file, the root block names the file and each finding's `baseline` is null.
      */
-    public function testEachFindingCarriesItsStandingAgainstTheBaseline(): void
+    public function testAFindingWritesNoStandingAgainstABaseline1File(): void
     {
         $report = $this->report(
             $this->finding('vendor/known', Verdict::STALE),
@@ -377,8 +377,8 @@ final class ReportTest extends TestCase
         new RunSettings(null, null, null, null, FailOn::none(), null, null, false, 'pull_request');
     }
 
-    /** A run told no fail-on, which only a test builds, has no kind and no gate. */
-    public function testARunWithoutAFailOnHasNoKindAndNoGate(): void
+    /** A run told no fail-on, which only a test builds, has no gate kind and writes a gate that does not fail. */
+    public function testARunWithoutAFailOnHasNoGateKindAndAGateThatDoesNotFail(): void
     {
         $report = $this->report($this->finding('vendor/a', Verdict::SILENT))->withRun(new RunSettings(null, null, null, null, null, null));
         $document = $report->toArray();
@@ -390,8 +390,8 @@ final class ReportTest extends TestCase
         self::assertSame(['reaches_fail_on' => false, 'fails' => false, 'exempt_by' => null, 'by' => [], 'basis' => null], JsonPath::arrayAt($document, ['findings', 0, 'gate']));
     }
 
-    /** Without `run` the gate has nothing to read: null at the root and on every finding, never absent. */
-    public function testAReportWithoutARunHasNoGate(): void
+    /** Without `run` the gate has nothing to read: the root and each finding carry a gate that does not fail. */
+    public function testAReportWithoutARunWritesAGateThatDoesNotFail(): void
     {
         $report = $this->report($this->finding('vendor/a', Verdict::SILENT));
         $document = $report->toArray();
