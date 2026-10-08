@@ -95,10 +95,11 @@ final class RunSettings
      * holds every rule id at 0, and `sort` at null.
      *
      * @param array<string, int|null>|null $scoreRulesUsed
+     * @param ?bool                        $includeDev     whether the report analysed packages-dev, which wins over the setting
      *
      * @return array<string, mixed>
      */
-    public function toArray(?array $scoreRulesUsed = null): array
+    public function toArray(?array $scoreRulesUsed = null, ?bool $includeDev = null): array
     {
         $thresholds = $this->thresholds ?? new Thresholds();
         $failOn = $this->failOn === null ? FailOn::fromString('none') : $this->failOn;
@@ -117,7 +118,7 @@ final class RunSettings
             'gates' => self::gates($failOn),
             'strict_network' => $this->strictNetwork,
             'mode' => $this->mode,
-            'include_dev' => $this->includeDev,
+            'include_dev' => $includeDev ?? $this->includeDev,
             'thresholds' => [
                 'release-warn-years' => $thresholds->releaseWarnYears(),
                 'release-high-years' => $thresholds->releaseHighYears(),

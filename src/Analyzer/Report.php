@@ -478,7 +478,7 @@ final class Report
 
         return [
             'generated_at' => $this->generatedAt->format(\DATE_ATOM),
-            'run' => $run->toArray(ScoreRulesUsed::of($findings)),
+            'run' => $run->toArray(ScoreRulesUsed::of($findings), $this->includesDev),
             'activity_cache_oldest_at' => $oldest === null ? null : $oldest->format(\DATE_ATOM),
             'activity_cache_age_hours' => $oldest === null ? null : round(max(0, $this->generatedAt->getTimestamp() - $oldest->getTimestamp()) / 3600, 1),
             'packages_checked' => $this->packagesChecked,

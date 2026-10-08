@@ -89,7 +89,8 @@ final class BaselineRegressionTest extends TestCase
     public function testAGeneratedBaselineIsBaseline1AndTheVulnerableOnlyPackageIsNotNewOnTheNextRun(): void
     {
         $report = $this->jsonRun(['--format' => 'json', '--target-php' => '8.4']);
-        self::assertSame('ok', self::finding($report, self::SEEDED)['verdict'], 'the seeded package has the report-1 verdict ok');
+        self::assertNull(self::finding($report, self::SEEDED)['lead'], 'no maintenance flag: report-1 called the seeded package ok');
+        self::assertContains(self::finding($report, self::SEEDED)['verdict'], ['critical', 'high', 'medium', 'low'], 'report-2 grades it by its advisory');
         $signals = self::finding($report, self::SEEDED)['signals'];
         self::assertIsArray($signals);
         self::assertSame(['S9'], array_column($signals, 'id'), 'the seeded advisory is its only fact');
