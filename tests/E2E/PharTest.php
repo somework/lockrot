@@ -104,7 +104,9 @@ final class PharTest extends TestCase
         self::assertIsArray($json, $process->getErrorOutput());
         $counts = $json['counts'];
         self::assertIsArray($counts);
-        self::assertSame(0, $counts['abandoned']);
+        self::assertSame(['critical', 'high', 'medium', 'low', 'unknown', 'finished', 'ok'], array_keys($counts));
+        self::assertIsArray($json['findings']);
+        self::assertNotContains('abandoned', array_column($json['findings'], 'lead'));
     }
 
     public function testListShowsOnlyTheTwoLockrotCommands(): void
