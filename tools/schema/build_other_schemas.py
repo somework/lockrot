@@ -511,8 +511,8 @@ def add_relations(D):
             P(direct=E(False), reach=E('unreached'), chain=EMPTY)])
     relate(f, 'Maintenance is judged exactly when repository metadata was read.',
            [P(metadata=P(status=E('read')), maintenance_judged=E(True)), P(metadata=P(status=NOT('read')), maintenance_judged=E(False))])
-    relate(f, '`security.installed_branch_fixes` is null exactly when `branch` is (a snapshot; I21).',
-           [P(branch=STR, security=P(installed_branch_fixes=OBJ)), P(branch=NULL, security=P(installed_branch_fixes=NULL))])
+    relate(f, '`security.installed_branch_fixes` is null when `branch` is (a snapshot), and when no release data was read.',
+           [P(branch=STR), P(branch=NULL, security=P(installed_branch_fixes=NULL))])
     # the first term's flag is the lead itself (six-way enumeration), not just some maintenance term
     relate(f, '`lead` is null exactly when no maintenance term counts; when set, the first term is the lead\'s own maintenance term (I6).',
            [P(lead=NULL, score=P(terms={'items': P(part=E('security'))}))]

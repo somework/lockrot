@@ -613,8 +613,10 @@ def _(d): d['findings'][0]['signals'][0]['data']['advisories'][0]['fix']['on_ins
 def _(d): d['run']['graded_verdicts'] = ['high', 'medium', 'low']
 @case('relation-s6-0', 'composite-generate-baseline', 'findings[3].signals[1].data.last_stable_version')
 def _(d): d['findings'][3]['signals'][1]['data']['last_stable_version'] = None
-@case('relation-finding-3', 'E-ignored-dagger', 'findings[0].security.installed_branch_fixes')
-def _(d): d['findings'][0]['security']['installed_branch_fixes'] = None
+@case('relation-finding-3', 'E-ignored-dagger', 'findings[0]')
+def _(d): d['findings'][0]['branch'] = None
+@case('relation-branchfixes-1', 'composite', 'findings[6].security.installed_branch_fixes')
+def _(d): d['findings'][6]['security']['installed_branch_fixes']['fix_kind'] = 'blocked'
 @case('relation-finding-23', 'partial-op-dagger', 'findings[0].security.partial.if_applied.verdict')
 def _(d): d['findings'][0]['security']['partial']['if_applied']['verdict'] = 'high'
 @case('relation-finding-26', 'B-baselined-dagger', 'findings[0].gate.basis.new.terms[0].weight')
