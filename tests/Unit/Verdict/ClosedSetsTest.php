@@ -74,6 +74,9 @@ final class ClosedSetsTest extends TestCase
     private const FAIL_ON_KINDS_1 = ['none', 'verdict', 'priority', 'unchecked'];
     private const PRIORITY_STEPS_1 = ['transitive', 'unreached', 'dev', 'no_fix_expected'];
     private const NO_FIX_REASONS_1 = ['not_on_installed_branch', 'releases_unknown', 'affected_range_unknown', 'no_release_fixes'];
+    /** The note codes lockrot 0.13.0 wrote: the `-1` files keep their 0.13.0 bytes, and RunNote::CODES writes one more. */
+    private const NOTE_CODES_1 = ['offline', 'metadata_unavailable', 'monorepo_parent_unavailable', 'advisory_ignore_unreadable', 'advisories_unavailable', 'advisories_not_checked',
+        'repository_activity_not_checked', 'repository_activity_anonymous_cap', 'repository_activity_rate_limited', 'repository_activity_unreachable', 'repository_activity_not_found', 'not_from_composer_repository'];
     /** A synthetic schema holding one integer set, the shape report-2's divisors and multipliers take. */
     private const INTEGER_SET = self::ROOT.'tests/fixtures/schema/closed-sets/integer-set.schema.json';
 
@@ -100,7 +103,7 @@ final class ClosedSetsTest extends TestCase
     public function testTheFlaggedVerdictsAreTheFirstSix(): void
     {
         self::assertSame(self::FLAGGED, array_values(array_filter(Verdict::all(), [Verdict::class, 'flagged'])));
-        self::assertSame(self::FLAGGED, (new RunSettings(null, null, null, null, null, null))->toArray()['flagged_verdicts']);
+        self::assertSame(['critical', 'high', 'medium', 'low'], (new RunSettings(null, null, null, null, null, null))->toArray()['graded_verdicts'], "report-2's run names the grades");
     }
 
     public function testThePrioritiesAreFrozenInTheirOrder(): void
@@ -309,7 +312,7 @@ final class ClosedSetsTest extends TestCase
     private static function noteVocabularies(): array
     {
         return [
-            'noteCode' => [self::NOTE_CODE, RunNote::CODES],
+            'noteCode' => [self::NOTE_CODE, self::NOTE_CODES_1],
             'forgeId' => [self::WORD, RepoRef::FORGES],
             'metadataFailureReason' => [self::WORD, MetadataFailure::REASONS],
             'advisoriesNotCheckedReason' => [self::WORD, RunNote::ADVISORIES_NOT_CHECKED_REASONS],
@@ -343,7 +346,7 @@ final class ClosedSetsTest extends TestCase
             $unknown = array_pop($anyOf);
             self::assertIsArray($unknown);
             self::assertSame(['description', 'not'], array_keys($unknown), $document.': the last branch holds only its not');
-            self::assertSame(['properties' => ['code' => ['enum' => RunNote::CODES]]], $unknown['not'], $document);
+            self::assertSame(['properties' => ['code' => ['enum' => self::NOTE_CODES_1]]], $unknown['not'], $document);
             $codes = [];
             foreach ($anyOf as $index => $branch) {
                 self::assertIsArray($branch);
@@ -353,7 +356,7 @@ final class ClosedSetsTest extends TestCase
                 $codes[] = $code;
                 self::assertSame('#/definitions/note'.str_replace('_', '', ucwords($code, '_')), JsonPath::stringAt($branch, ['properties', 'data', '$ref']), $document.' '.$code);
             }
-            self::assertSame(RunNote::CODES, $codes, $document);
+            self::assertSame(self::NOTE_CODES_1, $codes, $document);
         }
         foreach (array_keys(JsonPath::arrayAt($report, ['definitions'])) as $name) {
             if (strpos((string) $name, 'note') === 0 || \in_array($name, ['forgeId', 'forgeRepository', 'failedForgeRepository', 'metadataFailureReason', 'advisoriesNotCheckedReason', 'repositoryActivityNotCheckedReason'], true)) {
@@ -426,8 +429,9 @@ final class ClosedSetsTest extends TestCase
         }
 
         $found = [];
+        // The -2 drafts have their own registry, generated from the schema walk (ClosedSetsTest2).
         foreach ([Schemas::REPORT, Schemas::EXPLAIN, Schemas::CONFIG, Schemas::BASELINE] as $document) {
-            foreach (Schemas::numbers($document) as $number) {
+            foreach ([1] as $number) {
                 foreach (self::withKnownValues(self::schema($document, $number), '#') as $path) {
                     $found[] = $document.'-'.$number.' '.$path;
                 }
