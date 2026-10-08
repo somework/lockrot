@@ -28,8 +28,8 @@ final class Schemas
      * has shipped: a document written under it validates against that file.
      */
     private const NUMBERS = [
-        self::REPORT => [1],
-        self::EXPLAIN => [1],
+        self::REPORT => [1, 2],
+        self::EXPLAIN => [1, 2],
         self::BASELINE => [1],
         self::CONFIG => [1],
     ];

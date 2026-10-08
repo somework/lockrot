@@ -37,6 +37,9 @@ final class NotCheckedRule implements SignalRule
         self::OFFLINE => 'the run is offline',
     ];
 
+    /** The words of the S10 entry for release data a counted advisory needed. */
+    public const RELEASES_WORDS = 'the releases were not read, so S9 could not judge a fix';
+
     /** The S10 checks about the package's upkeep, which a raised S1 makes moot. */
     private const MAINTENANCE_CHECKS = ['repository_activity', 'release_dates'];
 
@@ -65,7 +68,7 @@ final class NotCheckedRule implements SignalRule
     /**
      * The S10 entry for release data that a repository listing the package did not serve, beside a
      * counted advisory: every fix is unknown then. report-1's S10 has no `releases`
-     * check, so {@see evaluate()} leaves it out and report-2 adds it.
+     * check, so {@see evaluate()} leaves it out and report-2's finding adds it.
      *
      * @return array{check: string, reason: string, blocks: list<string>}|null
      */
