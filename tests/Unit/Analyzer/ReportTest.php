@@ -404,7 +404,7 @@ final class ReportTest extends TestCase
         self::assertSame(['baseline', 'gate', 'security'], \array_slice(array_keys($document), $at, 3), 'after the baseline block');
         $finding = JsonPath::arrayAt($document, ['findings', 0]);
         self::assertArrayHasKey('gate', $finding);
-        self::assertNull($finding['gate']);
+        self::assertSame([[], null], [$finding['gate']['by'], $finding['gate']['basis']]);
         self::assertSame(['baseline', 'gate'], \array_slice(array_keys($finding), -2), 'after the finding\'s baseline standing');
     }
 
@@ -420,7 +420,7 @@ final class ReportTest extends TestCase
 
         self::assertSame(['fails' => true, 'tripped_by' => ['fail_on'], 'fail_on_applied' => true], \array_slice(JsonPath::arrayAt($before, ['gate']), 0, 3, true));
         self::assertSame(['reaches_fail_on' => true, 'fails' => true, 'exempt_by' => null], \array_slice(JsonPath::arrayAt($before, ['findings', 0, 'gate']), 0, 3, true));
-        self::assertSame(['reaches_fail_on' => false, 'fails' => false, 'exempt_by' => null], JsonPath::arrayAt($before, ['findings', 1, 'gate']));
+        self::assertSame(['reaches_fail_on' => false, 'fails' => false, 'exempt_by' => null], \array_slice(JsonPath::arrayAt($before, ['findings', 1, 'gate']), 0, 3, true));
 
         $compared = $report->withBaseline(BaselineComparison::compare(Baseline::fromReport($report), $report, 'lockrot-baseline.json', ['vendor/known', 'vendor/fine']));
         $after = $compared->toArray();
@@ -469,7 +469,7 @@ final class ReportTest extends TestCase
         );
         $array = $report->toArray();
         self::assertSame(
-            ['generated_at', 'run', 'activity_cache_oldest_at', 'packages_checked', 'include_dev', 'not_from_composer_repository', 'network_failures', 'counts', 'abandoned', 'priorities', 'exposure', 'exposure_rule', 'unattributed', 'libyears', 'baseline', 'gate', 'notes', 'note_details', 'findings'],
+            ['generated_at', 'run', 'activity_cache_oldest_at', 'activity_cache_age_hours', 'packages_checked', 'packages_flagged', 'packages_multi_flag', 'include_dev', 'not_from_composer_repository', 'network_failures', 'counts', 'abandoned', 'priorities', 'flags', 'exposure', 'exposure_rule', 'unattributed', 'libyears', 'baseline', 'gate', 'security', 'data_date', 'notes', 'note_details', 'findings'],
             array_keys($array)
         );
         // The literal, not the constant: the document states the value it attributed by.
