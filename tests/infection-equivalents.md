@@ -26,6 +26,32 @@ start the reason with `in method():`.
 - `src/Analyzer/Report.php` UnwrapArrayValues `return array_values(array_filter($this->findings, static fn (Finding $f): bool => Verdict013::flagged($f->verdict())));` — the findings are sorted with every flagged one first, so the filter leaves the keys `0..n-1`.
 - `src/Analyzer/Report.php` UnwrapArrayValues `return array_values(array_filter($this->sorted(), static fn (Finding $f): bool => $f->isGraded()));` — `sorted()` puts every graded finding first, so the filter leaves the keys `0..n-1`.
 - `src/Analyzer/RunSettings.php` UnwrapArrayValues `'flagged_verdicts' => array_values(array_filter(Verdict::all(), [Verdict::class, 'flagged'])),` — the flagged verdicts come first in `Verdict::SEVERITY`, so the filter leaves the keys `0..n-1`. The call keeps the JSON a list if that order changes.
+- `src/Analyzer/Report.php` DecrementInteger and IncrementInteger `'activity_cache_age_hours' => $oldest === null ? null : round(max(0, $this->generatedAt->getTimestamp() - $oldest->getTimestamp()) / 3600, 1),` — `max(0, …)` clamps an age that a backwards clock makes negative, and a bound of one second either way rounds to `0.0` at one decimal.
+- `src/Analyzer/Report2Root.php` CastInt `$acceptedGraded[self::str($flag, 'id')] += (int) $graded;` — PHP adds `true` as 1 and `false` as 0, so the cast changes no count.
+- `src/Analyzer/Report2Root.php` CastInt `$withSuggestion += (int) (self::str($signal, 'id') === 'S1' && self::str(self::map($signal, 'data'), 'replacement') !== '');` — PHP adds `true` as 1 and `false` as 0, so the cast changes no count.
+- `src/Analyzer/Report2Root.php` CastInt `$reaching += (int) (($standing['reaches_fail_on'] ?? false) === true);` — PHP adds `true` as 1 and `false` as 0, so the cast changes no count.
+- `src/Analyzer/Report2Root.php` CastInt `$failing += (int) (($standing['fails'] ?? false) === true);` — PHP adds `true` as 1 and `false` as 0, so the cast changes no count.
+- `src/Analyzer/Report2Root.php` CastInt `$packages['ignored'] += (int) ($ignored > 0);` — PHP adds `true` as 1 and `false` as 0, so the cast changes no count.
+- `src/Analyzer/Report2Root.php` TrueValue `$checks[self::str($security, 'check')] = true;` — `security()` reads only the keys of `$checks`.
+- `src/Analyzer/Report2Root.php` CastString `'check' => \count($checks) === 1 ? (string) array_key_first($checks) : ($checks === [] ? 'complete' : 'partial'),` — every check value is a word, so its key is never an integer.
+- `src/Analyzer/Report2Root.php` UnwrapArrayValues `return array_values(array_filter(array_map(static fn (array $term): string => self::str($term, 'flag'), self::rows(self::map($finding, 'score'), 'terms'))));` — each caller iterates the flags or searches them, and neither reads the keys.
+- `src/Analyzer/Report2Root.php` UnwrapArrayFilter `return \is_array($row[$key] ?? null) ? array_filter($row[$key], 'is_string', \ARRAY_FILTER_USE_KEY) : [];` — report-2's objects have string keys only, so the filter keeps every member.
+- `src/Analyzer/Report2Root.php` UnwrapArrayFilter `$rows[] = array_filter($item, 'is_string', \ARRAY_FILTER_USE_KEY);` — report-2's objects have string keys only, so the filter keeps every member.
+- `src/Analyzer/ScoreRulesUsed.php` IncrementInteger, DecrementInteger and CastInt `$used['security-max'] += (int) ((self::map($parts['security'] ?? null)['of'] ?? 0) >= 2);` — a missing `of` reads as 1 or -1 under the integer mutants, below 2 like 0. PHP adds `true` as 1 and `false` as 0, so the cast changes no count.
+- `src/Analyzer/ScoreRulesUsed.php` UnwrapArrayFilter `return \is_array($value) ? array_filter($value, 'is_string', \ARRAY_FILTER_USE_KEY) : [];` — report-2's objects have string keys only, so the filter keeps every member.
+- `src/Analyzer/ScoreRulesUsed.php` UnwrapArrayFilter, UnwrapArrayMap and UnwrapArrayValues `return \is_array($value) ? array_values(array_map([self::class, 'map'], array_filter($value, 'is_array'))) : [];` — report-2's lists hold objects with string keys only, so the filter, the map and the reindexing keep them as they are.
+- `src/Analyzer/ScoreRulesUsed.php` CastInt `$used['counted'] += (int) ($accepted !== []);` — PHP adds `true` as 1 and `false` as 0, so the cast changes no count.
+- `src/Analyzer/ScoreRulesUsed.php` CastInt `$used['divide-reach'] += (int) $rerunHalves('applies_to', 'maintenance');` — PHP adds `true` as 1 and `false` as 0, so the cast changes no count.
+- `src/Analyzer/ScoreRulesUsed.php` CastInt `$used['divide-dev'] += (int) $rerunHalves('reason', 'dev');` — PHP adds `true` as 1 and `false` as 0, so the cast changes no count.
+- `src/Analyzer/ScoreRulesUsed.php` CastInt `$used['lead-first'] += (int) self::any($terms, 'role', 'lead');` — PHP adds `true` as 1 and `false` as 0, so the cast changes no count.
+- `src/Analyzer/ScoreRulesUsed.php` CastInt `$used['corroborating-share'] += (int) self::any($terms, 'role', 'corroborating');` — PHP adds `true` as 1 and `false` as 0, so the cast changes no count.
+- `src/Analyzer/ScoreRulesUsed.php` CastInt `$used['advisory-points'] += (int) $security;` — PHP adds `true` as 1 and `false` as 0, so the cast changes no count.
+- `src/Analyzer/ScoreRulesUsed.php` CastInt `$used['no-reachable-fix-multiplier'] += (int) self::any($terms, 'multiplier', 2);` — PHP adds `true` as 1 and `false` as 0, so the cast changes no count.
+- `src/Analyzer/ScoreRulesUsed.php` CastInt `$used['divide-reach'] += (int) (self::halves($modifiers, 'applies_to', 'maintenance') || $rerunHalves('applies_to', 'maintenance'));` — PHP adds `true` as 1 and `false` as 0, so the cast changes no count.
+- `src/Analyzer/ScoreRulesUsed.php` CastInt `$used['security-exempt-from-reach'] += (int) ($security && ($finding['reach'] ?? null) !== 'direct');` — PHP adds `true` as 1 and `false` as 0, so the cast changes no count.
+- `src/Analyzer/ScoreRulesUsed.php` CastInt `$used['sum'] += (int) ((self::map($parts['maintenance'] ?? null)['status'] ?? null) === 'counted' && (self::map($parts['security'] ?? null)['status'] ?? null) === 'counted');` — PHP adds `true` as 1 and `false` as 0, so the cast changes no count.
+- `src/Analyzer/ScoreRulesUsed.php` CastInt `$used['divide-dev'] += (int) (self::any($modifiers, 'reason', 'dev') || $rerunHalves('reason', 'dev'));` — PHP adds `true` as 1 and `false` as 0, so the cast changes no count.
+- `src/Analyzer/ScoreRulesUsed.php` CastInt `$used['floor-once'] += (int) (($score['rounded_down'] ?? false) === true);` — PHP adds `true` as 1 and `false` as 0, so the cast changes no count.
 
 ## src/Baseline
 
@@ -119,7 +145,7 @@ start the reason with `in method():`.
 - `src/Output/ReportTarget.php` GreaterThan `if (strpos($spec, $known.':') === 0 && \strlen($known) > \strlen($format)) {` — two format names of one length cannot both start a spec before its colon, so `>=` picks the same name.
 - `src/Output/TableFormatter.php` CastString `return $finding->verdict().' (was '.(string) $baseline->previousVerdictOf($finding->package()).')';` — `previousVerdictOf()` is not null for a verdict that worsened. The cast is for the type.
 - `src/Output/TerminalWidth.php` Coalesce `$width = self::fromEnv($env) ?? self::fromConsoleTerminal($env) ?? self::fromApplication($application) ?? FormatContext::DEFAULT_WIDTH;` — `fromConsoleTerminal()` gives null when `COLUMNS` is set, so the order of the first two steps does not matter.
-- `src/Output/HtmlFormatter.php` UnwrapArrayFilter UnwrapArrayValues `return \is_array($reads) ? array_values(array_filter($reads, 'is_int')) : [];` — the vendored manifest lists its report numbers as a JSON list of integers, so the filter keeps every item and the keys stay `0..n-1`.
+- `src/Output/HtmlFormatter.php` UnwrapArrayFilter and UnwrapArrayValues `return \is_array($reads) ? array_values(array_filter($reads, 'is_int')) : [];` — the vendored manifest lists its report numbers as a JSON list of integers, so the filter keeps every item and the keys stay `0..n-1`.
 
 ## src/Security
 
@@ -142,3 +168,10 @@ start the reason with `in method():`.
 ## src/Verdict
 
 - `src/Verdict/Finding.php` LogicalAnd `return \is_string($replacement) && $replacement !== '' ? $replacement : null;` — in replacement(): `successor()` is the one caller and needs a `/`, so an empty string and null give the same answer.
+- `src/Verdict/Finding.php` Coalesce `$out[] = ['id' => $flag, 'role' => $roles[$flag] ?? 'security', 'baseline' => null, 'signal_ids' => [Signal::S9], 'degree' => null, 'headline' => ['unit' => 'advisories', 'value' => \count($rows), 'source' => null], 'summary' => $summary];` — the vulnerable flag fires only with a counted advisory, so the score has its security term and that term has its role.
+- `src/Verdict/Finding.php` Continue_ `continue;` — in flagsOut(): `vulnerable` is the last flag of the fired order, so `break` also ends the loop after it.
+- `src/Verdict/Finding.php` LogicalAnd `if (($term['part'] ?? null) === 'security' && \is_string($term['severity'] ?? null)) {` — only a security term carries a severity, so either operand alone picks the same term.
+- `src/Verdict/FindingDetails.php` CastString `$skipped[] = ['check' => 'advisories', 'reason' => (string) $advisoryReason, 'blocks' => [Signal::S9]];` — the `in_array()` guard admits two strings only.
+- `src/Verdict/FindingDetails.php` DecrementInteger `$hardest = 0;` — `security()` returns before the loop when no row counts, and every kind has an index of 0 or more, so the maximum is the same.
+- `src/Verdict/FlagSentence.php` DecrementInteger `if (($counts[$severity] ?? 0) > 0) {` — a missing severity reads as -1, which is not above 0 either.
+- `src/Verdict/FlagSentence.php` GreaterThan `$label = $fixed > 0 && $kind !== null && $kind !== Fix::UPDATE ? ' ('.(self::FIX_LABEL[$kind] ?? $kind).')' : '';` — with no advisory fixed, the "none fixed" clause carries no label.

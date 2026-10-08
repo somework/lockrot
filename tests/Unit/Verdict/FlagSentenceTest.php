@@ -39,6 +39,7 @@ final class FlagSentenceTest extends TestCase
         yield 'a reachable branch below the newest' => [[], $head."; 3.x released 3.4.1 (2026-06-01), needs php >=8.5 above the target's php 8.4; 2.x released 2.9.0 (2026-03-01)"];
         yield 'the project floor holds it' => [['floor_source' => 'project', 'floor_php' => '8.2'], $head."; 3.x released 3.4.1 (2026-06-01), needs php >=8.5 above the project's php 8.2; 2.x released 2.9.0 (2026-03-01)"];
         yield 'no branch within reach' => [['reachable_branch' => null], $head."; 3.x released 3.4.1 (2026-06-01), needs php >=8.5 above the target's php 8.4; no releasing branch within reach"];
+        yield 'no word on the reach of the newest' => [['newest_within_reach' => null], $head."; 3.x released 3.4.1 (2026-06-01), needs php >=8.5 above the target's php 8.4; 2.x released 2.9.0 (2026-03-01)"];
         yield 'a release dated by the monorepo' => [['newest_within_reach' => true, 'dated_by' => 'acme/monorepo'], 'branch 1.x last released 2019-03-02 (7.5 years ago, dated by acme/monorepo); 3.x released 3.4.1 (2026-06-01)'];
     }
 
@@ -80,6 +81,7 @@ final class FlagSentenceTest extends TestCase
         yield 'all fixed by an update' => [$one, $oneCount, 'high', 'high', '1.x', ['fixed' => 1, 'unknown' => 0, 'of' => 1, 'fix_kind' => 'update'], '1 advisory: 1 high — all fixed on 1.x; advisory: CVE-1 title of PKSA-a'];
         yield 'all fixed by an upgrade' => [$one, $oneCount, 'high', 'high', '1.x', ['fixed' => 1, 'unknown' => 0, 'of' => 1, 'fix_kind' => 'upgrade'], '1 advisory: 1 high — all fixed on 1.x (upgrade); advisory: CVE-1 title of PKSA-a'];
         yield 'some fixed by a kind of a later release' => [$two, $counts, 'high', 'high', '2.x', ['fixed' => 1, 'unknown' => 0, 'of' => 2, 'fix_kind' => 'acme:patch'], '2 advisories: 1 high, 1 medium — 1 of 2 fixed on 2.x (acme:patch); worst: PKSA-b title of PKSA-b'];
+        yield 'all fixed by a php floor raise' => [$one, $oneCount, 'high', 'high', '1.x', ['fixed' => 1, 'unknown' => 0, 'of' => 1, 'fix_kind' => 'raise-php'], '1 advisory: 1 high — all fixed on 1.x (php floor raise); advisory: CVE-1 title of PKSA-a'];
         yield 'some not known' => [$two, $counts, 'high', 'high', '2.x', ['fixed' => 1, 'unknown' => 1, 'of' => 2, 'fix_kind' => 'blocked'], '2 advisories: 1 high, 1 medium — 1 of 2 fixed on 2.x (blocked); 1 not known; worst: PKSA-b title of PKSA-b'];
         yield 'none known' => [$one, $oneCount, 'high', 'high', '1.x', ['fixed' => 0, 'unknown' => 1, 'of' => 1, 'fix_kind' => null], '1 advisory: 1 high — fix not known on 1.x; advisory: CVE-1 title of PKSA-a'];
         yield 'a branch without its row' => [$one, $oneCount, 'high', 'high', '1.x', null, '1 advisory: 1 high; advisory: CVE-1 title of PKSA-a'];

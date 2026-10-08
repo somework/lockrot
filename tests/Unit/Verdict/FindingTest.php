@@ -850,16 +850,18 @@ final class FindingTest extends TestCase
         $package = $lock->find('vendor/pkg');
         self::assertNotNull($package);
         $facts = new PackageFacts($package, null, null, [new Advisory('PKSA-1', null, null, null, 'high', null)], null, null, null, true);
-        $activity = ['check' => 'repository_activity', 'reason' => 'no_token', 'blocks' => ['S3', 'S4']];
-        $signals = $withS10 ? [new Signal(Signal::S10, Signal::LEVEL_INFO, 'activity not checked', ['unchecked' => [$activity], 'blocks' => ['S3', 'S4']])] : [];
+        $activity = ['check' => 'repository_activity', 'reason' => 'no_token', 'blocks' => ['S9', 'S3', 'S4']];
+        $signals = $withS10 ? [new Signal(Signal::S10, Signal::LEVEL_INFO, 'activity not checked', ['unchecked' => [$activity], 'blocks' => ['S9', 'S3', 'S4']])] : [];
         $finding = (new FindingBuilder())->withVerdict(Verdict::UNKNOWN)->withSignals($signals)->build()
             ->withDetails(FindingDetails::of($facts, null, new PhpFloor('8.4', null), [], $signals, 'HTTP 503'));
 
-        $s10 = JsonPath::arrayAt($finding->toArray(), ['signals', 0]);
+        $written = JsonPath::arrayAt($finding->toArray(), ['signals']);
+        $s10 = JsonPath::arrayAt($written, [0]);
 
         $releases = ['check' => 'releases', 'reason' => 'releases_unknown', 'blocks' => ['S9']];
         self::assertSame(Signal::S10, $s10['id']);
-        self::assertSame($withS10 ? ['unchecked' => [$activity, $releases], 'blocks' => ['S3', 'S4', 'S9']] : ['unchecked' => [$releases], 'blocks' => ['S9']], $s10['data']);
+        self::assertCount(1, $written, 'one S10');
+        self::assertSame($withS10 ? ['unchecked' => [$activity, $releases], 'blocks' => ['S9', 'S3', 'S4']] : ['unchecked' => [$releases], 'blocks' => ['S9']], $s10['data']);
         self::assertSame($withS10 ? 'activity not checked; '.NotCheckedRule::RELEASES_WORDS : NotCheckedRule::RELEASES_WORDS, $s10['summary']);
     }
 
