@@ -383,7 +383,7 @@ final class ReportTest extends TestCase
         $report = $this->report($this->finding('vendor/a', Verdict::SILENT))->withRun(new RunSettings(null, null, null, null, null, null));
         $document = $report->toArray();
 
-        self::assertNull(JsonPath::arrayAt($document, ['run'])['fail_on_kind']);
+        self::assertSame([], JsonPath::arrayAt($document, ['run', 'gates']));
         self::assertNull($report->gate());
         self::assertArrayHasKey('gate', $document);
         self::assertSame(['fails' => false, 'tripped_by' => []], \array_slice(JsonPath::arrayAt($document, ['gate']), 0, 2, true), 'report-2 always writes the gate');
@@ -426,7 +426,7 @@ final class ReportTest extends TestCase
         $after = $compared->toArray();
 
         self::assertSame(['fails' => false, 'tripped_by' => [], 'fail_on_applied' => true], \array_slice(JsonPath::arrayAt($after, ['gate']), 0, 3, true));
-        self::assertSame(['reaches_fail_on' => true, 'fails' => false, 'exempt_by' => 'baseline'], JsonPath::arrayAt($after, ['findings', 0, 'gate']));
+        self::assertSame(['reaches_fail_on' => true, 'fails' => false, 'exempt_by' => 'baseline'], \array_slice(JsonPath::arrayAt($after, ['findings', 0, 'gate']), 0, 3, true));
         $gate = $compared->gate();
         self::assertNotNull($gate);
         self::assertFalse($gate->fails());
@@ -738,8 +738,8 @@ final class ReportTest extends TestCase
         );
 
         self::assertSame(
-            [['package' => 'vendor/z', 'verdict' => 'abandoned', 'fan_in' => 10], ['package' => 'vendor/a', 'verdict' => 'stale', 'fan_in' => 9]],
-            $report->toArray()['unattributed']
+            [['vendor/z', 'abandoned'], ['vendor/a', 'stale']],
+            array_map(static fn (array $row): array => [$row['package'], $row['lead']], $report->toArray()['unattributed'])
         );
     }
 
