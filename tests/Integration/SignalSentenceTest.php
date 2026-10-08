@@ -20,6 +20,7 @@ use Lockrot\Lock\ProjectConfig;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
+use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\TestCase;
 
@@ -47,14 +48,15 @@ final class SignalSentenceTest extends TestCase
         try {
             foreach ($dirs as $dir) {
                 foreach (self::signals($server, $dir) as [$package, $signal]) {
-                    $id = (string) $signal['id'];
+                    $id = JsonPath::stringAt($signal, ['id']);
                     if (!isset($rebuilt[$id])) {
                         continue;
                     }
-                    $data = \is_array($signal['data']) ? $signal['data'] : [];
+                    $data = JsonPath::arrayAt($signal, ['data']);
                     $sentence = self::sentence($id, $data);
-                    if ($sentence !== $signal['summary']) {
-                        $differ[] = basename($dir).' '.$package.' '.$id.': "'.$signal['summary'].'" rebuilt as "'.$sentence.'"';
+                    $summary = JsonPath::stringAt($signal, ['summary']);
+                    if ($sentence !== $summary) {
+                        $differ[] = basename($dir).' '.$package.' '.$id.': "'.$summary.'" rebuilt as "'.$sentence.'"';
                         continue;
                     }
                     ++$rebuilt[$id];
@@ -68,7 +70,7 @@ final class SignalSentenceTest extends TestCase
         self::assertSame([], array_keys(array_filter($rebuilt, static fn (int $count): bool => $count === 0)), 'every signal occurs in the fixtures');
     }
 
-    /** @return iterable<array{string, array<string, mixed>}> the package and each signal of the report-2 document */
+    /** @return iterable<array{string, array<mixed, mixed>}> the package and each signal of the report-2 document */
     private static function signals(FixtureRepositoryServer $server, string $dir): iterable
     {
         $clock = Clock::fixed(self::NOW);
@@ -87,14 +89,16 @@ final class SignalSentenceTest extends TestCase
         $report = $analyzer->analyze(LockFile::fromFile($dir.'/composer.lock'), ProjectConfig::fromFile($dir.'/composer.json'), false);
         $document = json_decode((string) json_encode($report->toArray()), true);
         self::assertIsArray($document);
-        foreach ($document['findings'] as $finding) {
-            foreach ($finding['signals'] as $signal) {
-                yield [$finding['package'], $signal];
+        foreach (JsonPath::arrayAt($document, ['findings']) as $finding) {
+            self::assertIsArray($finding);
+            foreach (JsonPath::arrayAt($finding, ['signals']) as $signal) {
+                self::assertIsArray($signal);
+                yield [JsonPath::stringAt($finding, ['package']), $signal];
             }
         }
     }
 
-    /** @param array<string, mixed> $d */
+    /** @param array<mixed, mixed> $d */
     private static function sentence(string $id, array $d): string
     {
         switch ($id) {
@@ -103,50 +107,64 @@ final class SignalSentenceTest extends TestCase
 
                 return 'marked abandoned '.(($d['marked_by'] ?? null) === 'lock' ? 'in composer.lock' : 'by its repository').$replacement;
             case 'S2':
-                return 'last release '.self::ago($d['last_release'], $d['years'], $d['dated_by'] ?? null);
+                return 'last release '.self::ago($d, 'last_release', $d['dated_by'] ?? null);
             case 'S3':
-                return 'repository archived on '.self::FORGE_LABELS[$d['forge']];
+                return 'repository archived on '.self::FORGE_LABELS[self::text($d, 'forge')];
             case 'S4':
-                return 'last '.$d['activity'].' '.self::ago($d['last_push'], $d['years'], null);
+                return 'last '.self::text($d, 'activity').' '.self::ago($d, 'last_push', null);
             case 'S5':
                 $written = $d['written_for_php'] ?? null;
+                $constraint = self::text($d, 'php_constraint');
 
                 return \sprintf(
                     'released %s %s, before PHP %s existed (%s GA %s); admits %s untested',
-                    substr((string) $d['released'], 0, 10),
-                    $written === null || $written === 0 ? 'with php "'.$d['php_constraint'].'"' : 'for PHP '.$written.' (php "'.$d['php_constraint'].'")',
-                    explode('.', (string) $d['target_major'])[0],
-                    $d['target_major'],
-                    $d['ga_date'],
-                    $d['target_php']
+                    substr(self::text($d, 'released'), 0, 10),
+                    $written === null || $written === 0 || !\is_int($written) ? 'with php "'.$constraint.'"' : 'for PHP '.$written.' (php "'.$constraint.'")',
+                    explode('.', self::text($d, 'target_major'))[0],
+                    self::text($d, 'target_major'),
+                    self::text($d, 'ga_date'),
+                    self::text($d, 'target_php')
                 );
             case 'S6':
-                return $d['reason'] === 'branch_snapshot' ? 'pinned to branch snapshot '.$d['version'] : 'no tagged release in its repository';
+                return self::text($d, 'reason') === 'branch_snapshot' ? 'pinned to branch snapshot '.self::text($d, 'version') : 'no tagged release in its repository';
             default:
                 return self::s8($d);
         }
     }
 
-    /** @param array<string, mixed> $d */
+    /** @param array<mixed, mixed> $d */
     private static function s8(array $d): string
     {
-        $sentence = \sprintf('branch %s last released %s; %s released %s (%s)', $d['branch'], self::ago($d['branch_last_release'], $d['years'], $d['dated_by'] ?? null), $d['newest_branch'], $d['newest_version'], substr((string) $d['newest_release'], 0, 10));
-        if ($d['newest_within_reach'] === true) {
+        $sentence = \sprintf('branch %s last released %s; %s released %s (%s)', self::text($d, 'branch'), self::ago($d, 'branch_last_release', $d['dated_by'] ?? null), self::text($d, 'newest_branch'), self::text($d, 'newest_version'), substr(self::text($d, 'newest_release'), 0, 10));
+        if (($d['newest_within_reach'] ?? null) === true) {
             return $sentence;
         }
-        $floor = $d['floor_source'] === 'project' ? "the project's php " : 'the target PHP ';
-        $sentence .= ', needs php '.$d['newest_php'].' above '.$floor.$d['floor_php'];
+        $floor = self::text($d, 'floor_source') === 'project' ? "the project's php " : 'the target PHP ';
+        $sentence .= ', needs php '.self::text($d, 'newest_php').' above '.$floor.self::text($d, 'floor_php');
+        if (($d['reachable_branch'] ?? null) === null) {
+            return $sentence.'; no releasing branch within reach';
+        }
 
-        return $sentence.($d['reachable_branch'] === null ? '; no releasing branch within reach' : \sprintf('; %s released %s (%s)', $d['reachable_branch'], $d['reachable_version'], substr((string) $d['reachable_release'], 0, 10)));
+        return $sentence.\sprintf('; %s released %s (%s)', self::text($d, 'reachable_branch'), self::text($d, 'reachable_version'), substr(self::text($d, 'reachable_release'), 0, 10));
     }
 
     /**
-     * @param mixed $date
-     * @param mixed $years
-     * @param mixed $datedBy
+     * @param array<mixed, mixed> $d
+     * @param mixed               $datedBy
      */
-    private static function ago($date, $years, $datedBy): string
+    private static function ago(array $d, string $dateKey, $datedBy): string
     {
-        return \sprintf('%s (%.1f years ago%s)', substr((string) $date, 0, 10), $years, \is_string($datedBy) ? ', dated by '.$datedBy : '');
+        $years = $d['years'] ?? null;
+        if (!\is_int($years) && !\is_float($years)) {
+            self::fail('years is no number');
+        }
+
+        return \sprintf('%s (%.1f years ago%s)', substr(self::text($d, $dateKey), 0, 10), $years, \is_string($datedBy) ? ', dated by '.$datedBy : '');
+    }
+
+    /** @param array<mixed, mixed> $d */
+    private static function text(array $d, string $key): string
+    {
+        return JsonPath::stringAt($d, [$key]);
     }
 }

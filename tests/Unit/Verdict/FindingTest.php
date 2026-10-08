@@ -10,6 +10,7 @@ use Lockrot\Analyzer\LibyearsMeasurement;
 use Lockrot\Legacy\Priority013;
 use Lockrot\Signal\Signal;
 use Lockrot\Tests\Support\FindingBuilder;
+use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\Origins;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\FlagSet;
@@ -50,7 +51,7 @@ final class FindingTest extends TestCase
             array_column($array['signals'], 'summary')
         );
         self::assertSame([['years' => 10.8], ['years' => 10.8]], array_column($array['signals'], 'data'));
-        self::assertStringStartsWith('silent: last release ', $array['evidence'], 'the counted flag and its sentence');
+        self::assertStringStartsWith('silent: last release ', JsonPath::stringAt($array, ['evidence']), 'the counted flag and its sentence');
         self::assertSame('2026-09-14T10:00:00+00:00', $array['data_date']);
         self::assertSame(['wallabag/wallabag', 'phpzip/phpzip'], $array['chain']);
     }

@@ -404,7 +404,7 @@ final class ReportTest extends TestCase
         self::assertSame(['baseline', 'gate', 'security'], \array_slice(array_keys($document), $at, 3), 'after the baseline block');
         $finding = JsonPath::arrayAt($document, ['findings', 0]);
         self::assertArrayHasKey('gate', $finding);
-        self::assertSame([[], null], [$finding['gate']['by'], $finding['gate']['basis']]);
+        self::assertSame([[], null], [JsonPath::arrayAt($finding, ['gate', 'by']), JsonPath::arrayAt($finding, ['gate'])['basis']]);
         self::assertSame(['baseline', 'gate'], \array_slice(array_keys($finding), -2), 'after the finding\'s baseline standing');
     }
 
@@ -487,7 +487,7 @@ final class ReportTest extends TestCase
         self::assertSame(1, $array['not_from_composer_repository']);
         self::assertTrue($array['network_failures']);
         self::assertNull($array['baseline']);
-        self::assertSame(['runtime', 'default'], [$array['run']['target_php_source'], $array['run']['fail_on_source']], 'a report nothing told about the run names the defaults');
+        self::assertSame(['runtime', 'default'], [JsonPath::stringAt($array, ['run', 'target_php_source']), JsonPath::stringAt($array, ['run', 'fail_on_source'])], 'a report nothing told about the run names the defaults');
         self::assertSame(['Repository metadata unavailable for 1 package: HTTP 503'], $array['notes']);
         self::assertIsArray($array['findings']);
         self::assertCount(1, $array['findings']);
@@ -739,7 +739,7 @@ final class ReportTest extends TestCase
 
         self::assertSame(
             [['vendor/z', 'abandoned'], ['vendor/a', 'stale']],
-            array_map(static fn (array $row): array => [$row['package'], $row['lead']], $report->toArray()['unattributed'])
+            array_map(null, JsonPath::column($report->toArray(), ['unattributed'], 'package'), JsonPath::column($report->toArray(), ['unattributed'], 'lead'))
         );
     }
 

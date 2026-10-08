@@ -45,7 +45,7 @@ final class CaseHydrator
     private const PACKAGIST = 'https://packagist.org/downloads/';
 
     /**
-     * @return array<string, mixed> the case with that id
+     * @return array<mixed, mixed> the case with that id
      */
     public static function case(string $id): array
     {
@@ -58,7 +58,7 @@ final class CaseHydrator
     }
 
     /**
-     * @param array<string, mixed> $case
+     * @param array<mixed, mixed> $case
      *
      * @throws \InvalidArgumentException for a case without an `inputs` block
      */
@@ -73,7 +73,9 @@ final class CaseHydrator
         $package = JsonPath::stringAt($entries, [0, 'name']);
         $activity = \is_array($inputs['activity'] ?? null) ? $inputs['activity'] : null;
         $lock = self::lock($entries, $activity);
-        $project = ProjectConfig::fromArray(JsonPath::arrayAt($inputs, ['root']));
+        /** @var array<string, mixed> $root */
+        $root = JsonPath::arrayAt($inputs, ['root']);
+        $project = ProjectConfig::fromArray($root);
         $clock = Clock::fixed(JsonPath::stringAt(JsonPath::decodeFile(self::PROVENANCE), ['source', 'model_run_date']).'T00:00:00+00:00');
         $locked = $lock->find($package);
         if ($locked === null) {
@@ -121,7 +123,7 @@ final class CaseHydrator
                 $locked['notification-url'] = self::PACKAGIST;
             }
             if ($i === 0 && $activity !== null) {
-                $locked['source'] = ['type' => 'git', 'url' => 'https://'.$activity['host'].'/'.$activity['repo'].'.git', 'reference' => 'case'];
+                $locked['source'] = ['type' => 'git', 'url' => 'https://'.JsonPath::stringAt($activity, ['host']).'/'.JsonPath::stringAt($activity, ['repo']).'.git', 'reference' => 'case'];
             }
             if (($entry['dev'] ?? false) === true) {
                 $dev[] = $locked;
@@ -143,16 +145,12 @@ final class CaseHydrator
         $versions = [];
         foreach ($releases as $release) {
             self::assertArray($release);
-            $loaded = (new ArrayLoader())->load([
+            $versions[] = (new ArrayLoader())->load([
                 'name' => $package,
-                'version' => $release['version'],
-                'time' => $release['time'],
+                'version' => JsonPath::stringAt($release, ['version']),
+                'time' => JsonPath::stringAt($release, ['time']),
                 'require' => \is_string($release['php'] ?? null) ? ['php' => $release['php']] : [],
             ]);
-            if (!$loaded instanceof BasePackage) {
-                throw new \UnexpectedValueException('release '.$release['version'].' of '.$package.' does not load');
-            }
-            $versions[] = $loaded;
         }
 
         return $versions;
@@ -170,11 +168,11 @@ final class CaseHydrator
         foreach ($records as $record) {
             self::assertArray($record);
             $advisories[] = new Advisory(
-                $record['id'],
-                $record['cve'] ?? null,
-                $record['title'] ?? null,
-                $record['link'] ?? null,
-                $record['severity'] ?? null,
+                JsonPath::stringAt($record, ['id']),
+                self::optional($record, 'cve'),
+                self::optional($record, 'title'),
+                self::optional($record, 'link'),
+                self::optional($record, 'severity'),
                 \is_string($record['reported_at'] ?? null) ? new \DateTimeImmutable($record['reported_at']) : null,
                 \is_string($record['affected_versions'] ?? null) ? $parser->parseConstraints($record['affected_versions']) : null
             );
@@ -193,7 +191,7 @@ final class CaseHydrator
         if ($activity === null || ($activity['host'] ?? null) !== 'github.com') {
             return [];
         }
-        $url = 'https://api.github.com/repos/'.$activity['repo'];
+        $url = 'https://api.github.com/repos/'.JsonPath::stringAt($activity, ['repo']);
 
         return [$url => FakeHttpClient::ok($url, (string) json_encode(['archived' => $activity['archived'] ?? false, 'pushed_at' => $activity['pushed_at'] ?? null]))];
     }
@@ -234,6 +232,12 @@ final class CaseHydrator
                 return $this->batch;
             }
         };
+    }
+
+    /** @param array<mixed, mixed> $row */
+    private static function optional(array $row, string $key): ?string
+    {
+        return \is_string($row[$key] ?? null) ? $row[$key] : null;
     }
 
     /**

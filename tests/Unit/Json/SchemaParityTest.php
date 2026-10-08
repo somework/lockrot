@@ -20,7 +20,7 @@ final class SchemaParityTest extends TestCase
     /** The roots whose definitions explain-2 copies from report-2. */
     private const SHARED_ROOTS = ['finding', 'noteDetail', 'scoreModel'];
 
-    /** @var array<string, array<string, mixed>> by document */
+    /** @var array<string, array<mixed, mixed>> by path */
     private static array $schemas = [];
 
     public function testExplainCopiesEveryDefinitionTheFindingReachesByteForByte(): void
@@ -138,7 +138,7 @@ final class SchemaParityTest extends TestCase
         }
     }
 
-    /** @return array<string, mixed> */
+    /** @return array<mixed, mixed> */
     private static function decode(string $path): array
     {
         if (!isset(self::$schemas[$path])) {
@@ -150,7 +150,7 @@ final class SchemaParityTest extends TestCase
         return self::$schemas[$path];
     }
 
-    /** @return array<string, mixed> */
+    /** @return array<mixed, mixed> */
     private static function definitions(string $document, int $number): array
     {
         $definitions = self::decode(Schemas::path($document, $number))['definitions'] ?? null;
@@ -160,9 +160,9 @@ final class SchemaParityTest extends TestCase
     }
 
     /**
-     * @param array<string, mixed> $definitions
+     * @param array<mixed, mixed> $definitions
      *
-     * @return array<string, mixed>
+     * @return array<mixed, mixed>
      */
     private static function properties(array $definitions, string $name): array
     {
@@ -177,8 +177,8 @@ final class SchemaParityTest extends TestCase
     /**
      * The definitions that the roots reach through `#/definitions/` references, roots included.
      *
-     * @param array<string, mixed> $definitions
-     * @param list<string>         $roots
+     * @param array<mixed, mixed> $definitions
+     * @param list<string>        $roots
      *
      * @return list<string> sorted
      */

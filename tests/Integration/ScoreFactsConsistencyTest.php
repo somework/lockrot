@@ -22,6 +22,7 @@ use Lockrot\Lock\ProjectConfig;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
+use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Verdict\ScoreModel;
 use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\TestCase;
@@ -90,7 +91,7 @@ final class ScoreFactsConsistencyTest extends TestCase
         foreach ($runs as $run => [$server, $dir, $withManifest, $dev, $target]) {
             foreach (self::findings($server, $dir, $withManifest, $dev, $target) as $finding) {
                 foreach (self::violations($finding, $seen) as $violation) {
-                    $broken[] = $run.' '.$finding['package'].': '.$violation;
+                    $broken[] = $run.' '.JsonPath::stringAt($finding, ['package']).': '.$violation;
                 }
             }
         }
@@ -103,7 +104,7 @@ final class ScoreFactsConsistencyTest extends TestCase
     }
 
     /**
-     * @param array<string, mixed>                   $f
+     * @param array<mixed, mixed>                    $f
      * @param array<string, array<int|string, true>> $seen
      *
      * @return list<string>
@@ -111,76 +112,132 @@ final class ScoreFactsConsistencyTest extends TestCase
     private static function violations(array $f, array &$seen): array
     {
         $out = [];
-        $score = $f['score'];
-        $terms = $score['terms'] ?? null;
-        $graded = \in_array($f['verdict'], ScoreModel::GRADES, true);
         $check = static function (bool $holds, string $what) use (&$out): void {
             if (!$holds) {
                 $out[] = $what;
             }
         };
-        $check($f['priority'] === ($graded ? $f['verdict'] : 'none'), 'priority is the grade, else none');
-        $check($graded === \is_array($terms), 'a graded score has terms, a score-0 one has none');
-        $check($graded === ($score['total'] >= 1), 'a graded score totals 1 or more');
+        $verdict = JsonPath::stringAt($f, ['verdict']);
+        $score = JsonPath::arrayAt($f, ['score']);
+        $graded = \in_array($verdict, ScoreModel::GRADES, true);
+        $total = JsonPath::intAt($score, ['total']);
+        $check(JsonPath::stringAt($f, ['priority']) === ($graded ? $verdict : 'none'), 'priority is the grade, else none');
+        $check($graded === JsonPath::has($score, ['terms']), 'a graded score has terms, a score-0 one has none');
+        $check($graded === ($total >= 1), 'a graded score totals 1 or more');
         $rows = [];
-        foreach ($f['signals'] as $signal) {
-            if ($signal['id'] === 'S9') {
-                $rows = $signal['data']['advisories'];
+        foreach (self::rows($f, ['signals']) as $signal) {
+            if (JsonPath::stringAt($signal, ['id']) === 'S9') {
+                $rows = self::rows($signal, ['data', 'advisories']);
             }
         }
-        $severityPoints = array_column(ScoreModel::toArray()['severities'], 'points', 'id');
-        foreach ($rows as $row) {
-            $seen['severities'][$row['severity']] = true;
-            $seen['fix kinds'][$row['fix']['kind']] = true;
-            $doubles = \in_array($row['fix']['kind'], ScoreModel::DOUBLING, true);
-            $check($row['points'] === $severityPoints[$row['severity']] * ($doubles ? 2 : 1), 'S9 row '.$row['id'].' points');
+        $severityPoints = [];
+        foreach (self::rows(ScoreModel::toArray(), ['severities']) as $severity) {
+            $severityPoints[JsonPath::stringAt($severity, ['id'])] = JsonPath::intAt($severity, ['points']);
         }
-        $deciding = array_values(array_filter($rows, static fn (array $row): bool => $row['deciding'] === true));
+        $deciding = [];
+        foreach ($rows as $row) {
+            $severity = JsonPath::stringAt($row, ['severity']);
+            $kind = JsonPath::stringAt($row, ['fix', 'kind']);
+            $seen['severities'][$severity] = true;
+            $seen['fix kinds'][$kind] = true;
+            $doubles = \in_array($kind, ScoreModel::DOUBLING, true);
+            $check(JsonPath::intAt($row, ['points']) === $severityPoints[$severity] * ($doubles ? 2 : 1), 'S9 row '.JsonPath::stringAt($row, ['id']).' points');
+            if (JsonPath::boolAt($row, ['deciding'])) {
+                $deciding[] = JsonPath::stringAt($row, ['id']);
+            }
+        }
         $check(\count($deciding) === ($rows === [] ? 0 : 1), 'one deciding S9 row');
         if (!$graded) {
             return $out;
         }
 
-        $check($f['verdict'] === self::band($score['total']), 'the grade is the band of the total');
-        $check($score['total'] === (int) floor($score['exact']), 'the total is the exact score rounded down');
-        $check($score['rounded_down'] === ($score['exact'] !== $score['total']), 'rounded_down says whether the exact score was whole');
-        $maintenance = array_values(array_filter($terms, static fn (array $term): bool => $term['part'] === 'maintenance'));
-        $security = array_values(array_filter($terms, static fn (array $term): bool => $term['part'] === 'security'));
+        $exact = self::number($score, ['exact']);
+        $check($verdict === self::band($total), 'the grade is the band of the total');
+        $check($total === (int) floor($exact), 'the total is the exact score rounded down');
+        $check(JsonPath::boolAt($score, ['rounded_down']) === ($exact !== $total), 'rounded_down says whether the exact score was whole');
+        $terms = self::rows($score, ['terms']);
+        $maintenance = array_values(array_filter($terms, static fn (array $term): bool => JsonPath::stringAt($term, ['part']) === 'maintenance'));
+        $security = array_values(array_filter($terms, static fn (array $term): bool => JsonPath::stringAt($term, ['part']) === 'security'));
         foreach ($maintenance as $i => $term) {
-            $check($term['role'] === ($i === 0 ? 'lead' : 'corroborating'), $term['flag'].' role');
-            $check($term['divisor'] === ($i === 0 ? 1 : 4), $term['flag'].' divisor');
-            $check($term['weight'] === ScoreModel::POINTS[$term['flag']], $term['flag'].' weight');
-            $check($term['points'] === intdiv($term['weight'], $term['divisor']), $term['flag'].' points');
+            $flag = JsonPath::stringAt($term, ['flag']);
+            $divisor = JsonPath::intAt($term, ['divisor']);
+            $check(JsonPath::stringAt($term, ['role']) === ($i === 0 ? 'lead' : 'corroborating'), $flag.' role');
+            $check($divisor === ($i === 0 ? 1 : 4), $flag.' divisor');
+            $check(JsonPath::intAt($term, ['weight']) === ScoreModel::POINTS[$flag], $flag.' weight');
+            $check(JsonPath::intAt($term, ['points']) === intdiv(JsonPath::intAt($term, ['weight']), $divisor), $flag.' points');
         }
-        $check($f['lead'] === ($maintenance[0]['flag'] ?? null), 'the lead is the first maintenance term');
+        $lead = $f['lead'] ?? null;
+        $check($lead === ($maintenance === [] ? null : JsonPath::stringAt($maintenance[0], ['flag'])), 'the lead is the first maintenance term');
         $check(\count($security) <= 1, 'one security term at most');
-        $check(($f['security']['status'] === 'vulnerable') === ($security !== []), 'a security term exactly when vulnerable');
+        $check((JsonPath::stringAt($f, ['security', 'status']) === 'vulnerable') === ($security !== []), 'a security term exactly when vulnerable');
         foreach ($security as $term) {
-            $seen['multipliers'][$term['multiplier']] = true;
-            $check($term['advisory'] === ($deciding[0]['id'] ?? null), 'the security term is the deciding S9 row');
-            $check($term['weight'] === $severityPoints[$term['severity']], 'security weight');
-            $check($term['multiplier'] === (\in_array($term['fix_kind'], ScoreModel::DOUBLING, true) ? 2 : 1), 'security multiplier');
-            $check($term['points'] === $term['weight'] * $term['multiplier'], 'security points');
+            $multiplier = JsonPath::intAt($term, ['multiplier']);
+            $weight = JsonPath::intAt($term, ['weight']);
+            $seen['multipliers'][$multiplier] = true;
+            $check(JsonPath::stringAt($term, ['advisory']) === ($deciding[0] ?? null), 'the security term is the deciding S9 row');
+            $check($weight === $severityPoints[JsonPath::stringAt($term, ['severity'])], 'security weight');
+            $check($multiplier === (\in_array(JsonPath::stringAt($term, ['fix_kind']), ScoreModel::DOUBLING, true) ? 2 : 1), 'security multiplier');
+            $check(JsonPath::intAt($term, ['points']) === $weight * $multiplier, 'security points');
         }
         $roles = [];
-        foreach ($f['flags'] as $flag) {
-            if ($flag['role'] !== 'accepted') {
-                $roles[$flag['id']] = $flag['role'];
+        foreach (self::rows($f, ['flags']) as $flag) {
+            if (JsonPath::stringAt($flag, ['role']) !== 'accepted') {
+                $roles[JsonPath::stringAt($flag, ['id'])] = JsonPath::stringAt($flag, ['role']);
             }
         }
-        $check($roles === array_column($terms, 'role', 'flag'), 'the counted flags are the terms, with their roles');
+        $termRoles = [];
+        foreach ($terms as $term) {
+            $termRoles[JsonPath::stringAt($term, ['flag'])] = JsonPath::stringAt($term, ['role']);
+        }
+        $check($roles === $termRoles, 'the counted flags are the terms, with their roles');
         $reasons = [];
-        foreach ($score['modifiers'] as $modifier) {
-            $seen['modifiers'][$modifier['reason']] = true;
-            $reasons[] = $modifier['reason'];
-            $check($modifier['applies_to'] === ($modifier['reason'] === 'dev' ? 'total' : 'maintenance'), $modifier['reason'].' applies to');
-            $check(abs($modifier['after'] - $modifier['before'] / $modifier['divide_by']) < 1e-9, $modifier['reason'].' halves');
+        foreach (self::rows($score, ['modifiers']) as $modifier) {
+            $reason = JsonPath::stringAt($modifier, ['reason']);
+            $seen['modifiers'][$reason] = true;
+            $reasons[] = $reason;
+            $check(JsonPath::stringAt($modifier, ['applies_to']) === ($reason === 'dev' ? 'total' : 'maintenance'), $reason.' applies to');
+            $check(abs(self::number($modifier, ['after']) - self::number($modifier, ['before']) / JsonPath::intAt($modifier, ['divide_by'])) < 1e-9, $reason.' halves');
         }
         // A halving is listed whenever its fact holds and a term exists, even when it halves 0.
-        $reach = \in_array($f['reach'], ['transitive', 'unreached'], true) ? [$f['reach']] : [];
-        $check($reasons === array_merge($reach, $f['dev'] ? ['dev'] : []), 'the halvings follow the reach and dev');
+        $reach = JsonPath::stringAt($f, ['reach']);
+        $expected = \in_array($reach, ['transitive', 'unreached'], true) ? [$reach] : [];
+        $check($reasons === array_merge($expected, JsonPath::boolAt($f, ['dev']) ? ['dev'] : []), 'the halvings follow the reach and dev');
 
         return $out;
+    }
+
+    /**
+     * @param array<mixed, mixed> $data
+     * @param list<int|string>    $path
+     *
+     * @return list<array<mixed, mixed>>
+     */
+    private static function rows(array $data, array $path): array
+    {
+        $rows = [];
+        foreach (JsonPath::arrayAt($data, $path) as $row) {
+            self::assertIsArray($row);
+            $rows[] = $row;
+        }
+
+        return $rows;
+    }
+
+    /**
+     * @param array<mixed, mixed> $data
+     * @param list<int|string>    $path
+     */
+    private static function number(array $data, array $path): float
+    {
+        $value = $data;
+        foreach ($path as $key) {
+            $value = \is_array($value) ? ($value[$key] ?? null) : null;
+        }
+        if (!\is_int($value) && !\is_float($value)) {
+            self::fail(implode('.', $path).' is no number');
+        }
+
+        return (float) $value;
     }
 
     private static function band(int $total): string
@@ -254,7 +311,7 @@ final class ScoreFactsConsistencyTest extends TestCase
         return $server;
     }
 
-    /** @return list<array<string, mixed>> the findings of the report-2 document */
+    /** @return list<array<mixed, mixed>> the findings of the report-2 document */
     private static function findings(FixtureRepositoryServer $server, string $dir, bool $withManifest, bool $dev, string $target): array
     {
         $clock = Clock::fixed(self::NOW);
@@ -275,8 +332,9 @@ final class ScoreFactsConsistencyTest extends TestCase
         $report = $analyzer->analyze(LockFile::fromFile(self::FIXTURES.$dir.'/composer.lock'), $project, $dev);
         $document = json_decode((string) json_encode($report->toArray()), true);
         self::assertIsArray($document);
-        self::assertNotSame([], $document['findings'], $dir);
+        $findings = self::rows($document, ['findings']);
+        self::assertNotSame([], $findings, $dir);
 
-        return $document['findings'];
+        return $findings;
     }
 }
