@@ -195,8 +195,9 @@ final class AcceptanceTest extends TestCase
             self::assertSame(Priority013::CRITICAL, $report->findings()[0]->priority());
             self::assertFalse($report->hadNetworkFailures(), implode("\n", $report->notes()));
             // The PHAR runs under PHP's default 128M memory_limit: analysing wallabag's lock must not
-            // retain the expanded Packagist release history.
-            self::assertLessThan(64 * 1024 * 1024, memory_get_peak_usage(true), 'peak memory');
+            // retain the expanded Packagist release history. The exact peak, not the allocated chunks,
+            // whose 2M rounding moves with the PHP version and the dependency set.
+            self::assertLessThan(64 * 1024 * 1024, memory_get_peak_usage(), 'peak memory');
         } finally {
             $server->stop();
         }
