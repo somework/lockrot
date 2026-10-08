@@ -145,12 +145,12 @@ final class CaseHydrator
         $versions = [];
         foreach ($releases as $release) {
             self::assertArray($release);
+            // A null time is an undated release: Composer's loader reads one without a `time` key.
             $versions[] = (new ArrayLoader())->load([
                 'name' => $package,
                 'version' => JsonPath::stringAt($release, ['version']),
-                'time' => JsonPath::stringAt($release, ['time']),
                 'require' => \is_string($release['php'] ?? null) ? ['php' => $release['php']] : [],
-            ]);
+            ] + (\is_string($release['time'] ?? null) ? ['time' => $release['time']] : []));
         }
 
         return $versions;
