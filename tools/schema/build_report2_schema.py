@@ -548,7 +548,7 @@ defs['securityVulnerable'] = obj("`status: vulnerable` (§7.6): whenever an advi
     'counts': obj('Counted advisories per severity, every severity present.', {k: d(f'Counted `{k}` advisories.', INT0) for k in SEVERITIES}),
     'ignored': SEC_COMMON['ignored'], 'ignored_count': SEC_COMMON['ignored_count'],
     'fix_kind': d("The `fix_kind` of the move `move_in` names (round 3; I19), else, with no move, the hardest per-advisory kind (§5.3).", ref('fixKind')),
-    'installed_branch_fixes': nul("The installed branch row's `fixes` (§5.3, round 4; I19); null exactly when `branch` is (a snapshot).", ref('branchFixes')),
+    'installed_branch_fixes': nul("The installed branch row's `fixes` (§5.3, round 4; I19); null when `branch` is (a snapshot), and when no release data was read.", ref('branchFixes')),
     'move_in': nul("Where the move that clears the advisories is published: `next_step` or `also` (`next_step.also[0]`), or null when no move clears them (§5.3; replaces revision 3's copy `move`). Closed (§8.2, schema round): it points into this document's own structure.",
                    closed(['next_step', 'also'])),
     'gets': nul(("What `composer update <pkg>` installs on the installed branch, judged against the target, never `require.php` (§5.3, round 3): `{version, php_check, clears[], clears_all}`; "
@@ -1394,6 +1394,7 @@ def add_relations_round4(defs):
     relate(defs['branchFixes'], 'A branch that fixes nothing has no class, no candidate, no holder and no score after it; a branch that fixes one or more has a class '
                                 'and a newest release (its candidate can be null: the whole branch fixes them).',
            [P(fixed=E(0), fix_kind=NULL, lowest=NULL, held_by=EMPTY, if_applied=NULL), P(fixed={'minimum': 1}, fix_kind=STR, newest=STR)])
+    relate(defs['branchFixes'], 'A `blocked` branch has no score after it: `if_applied` is null.', [P(fix_kind=NOT('blocked')), P(if_applied=NULL)])
     rec = BO.inner(BO.inner(defs['findingBaseline'])['properties']['recorded'])
     relate(rec, '`lead` is null exactly when `flags` is (an advisory-only entry).', [P(lead=NULL, flags=NULL), P(lead=STR, flags=OBJ)])
     thr = [(g, g) for g in BO.GRADES] + [(m, m) for m in BO.MAINT] + [('vulnerable', 'low')] + [('vulnerable-' + x, x) for x in ('medium', 'high', 'critical')]

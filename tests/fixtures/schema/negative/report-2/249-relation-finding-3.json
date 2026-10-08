@@ -1,7 +1,7 @@
 {
  "$expect": {
   "strict": false,
-  "error": "findings[0].security.installed_branch_fixes"
+  "error": "findings[0]"
  },
  "$schema": "https://lockrot.dev/schema/report-2.json",
  "lockrot": {
@@ -968,7 +968,7 @@
   {
    "package": "symfony/yaml",
    "version": "v5.4.23",
-   "branch": "5.x",
+   "branch": null,
    "installed_php": {
     "requires": ">=7.2.5",
     "target_runs": true,
@@ -1152,7 +1152,23 @@
     ],
     "ignored_count": 1,
     "fix_kind": "update",
-    "installed_branch_fixes": null,
+    "installed_branch_fixes": {
+     "fixed": 3,
+     "unknown": 0,
+     "of": 3,
+     "fix_kind": "update",
+     "lowest": "v5.4.52",
+     "newest": "v5.4.53",
+     "held_by": [],
+     "if_applied": {
+      "total": 0,
+      "verdict": "ok",
+      "at_most": false,
+      "assumes": [
+       "clears_hold"
+      ]
+     }
+    },
     "move_in": "next_step",
     "gets": {
      "version": "v5.4.53",

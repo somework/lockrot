@@ -1894,6 +1894,29 @@
                             }
                         }
                     ]
+                },
+                {
+                    "description": "A `blocked` branch has no score after it: `if_applied` is null.",
+                    "anyOf": [
+                        {
+                            "properties": {
+                                "fix_kind": {
+                                    "not": {
+                                        "enum": [
+                                            "blocked"
+                                        ]
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "properties": {
+                                "if_applied": {
+                                    "type": "null"
+                                }
+                            }
+                        }
+                    ]
                 }
             ]
         },
@@ -3141,19 +3164,12 @@
                     ]
                 },
                 {
-                    "description": "`security.installed_branch_fixes` is null exactly when `branch` is (a snapshot).",
+                    "description": "`security.installed_branch_fixes` is null when `branch` is (a snapshot), and when no release data was read.",
                     "anyOf": [
                         {
                             "properties": {
                                 "branch": {
                                     "type": "string"
-                                },
-                                "security": {
-                                    "properties": {
-                                        "installed_branch_fixes": {
-                                            "type": "object"
-                                        }
-                                    }
                                 }
                             }
                         },
@@ -16721,7 +16737,7 @@
                     "$ref": "#/definitions/fixKind"
                 },
                 "installed_branch_fixes": {
-                    "description": "The installed branch row's `fixes`; null exactly when `branch` is (a snapshot).",
+                    "description": "The installed branch row's `fixes`; null when `branch` is (a snapshot), and when no release data was read.",
                     "oneOf": [
                         {
                             "$ref": "#/definitions/branchFixes"
