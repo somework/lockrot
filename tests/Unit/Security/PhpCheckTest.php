@@ -39,4 +39,11 @@ final class PhpCheckTest extends TestCase
         yield 'a patch suffix at the project floor' => ['>=7.4', '>=7.4.0-p1', '>=7.4.1', PhpCheck::PATCH];
         yield 'a dev branch' => ['>=7.4', '7.4.x-dev', null, null];
     }
+
+    public function testAStarRequirePhpAllowsTheReleaseAndAsksNoRaise(): void
+    {
+        $check = PhpCheck::of('>=8.1.0', new PhpFloor('8.4', '*'))->toArray();
+
+        self::assertSame(['requires' => '>=8.1.0', 'project_allows' => true, 'target_runs' => true, 'raise_to' => null, 'raise_size' => null], $check);
+    }
 }

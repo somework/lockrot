@@ -307,4 +307,30 @@ final class PhpFloorTest extends TestCase
 
         Golden::assertMatches('php-versions.json', ['rows' => $rows], 'testTheDisplayRowsOfTheFloorPointAreRecorded', \dirname(__DIR__, 2).'/fixtures/contract/en/');
     }
+
+    /**
+     * `require.php: "*"` has no lowest PHP, yet it admits every release, so report-2's
+     * `project_allows` is true. `admitsProject()` keeps null for it: explain-1 prints that answer.
+     *
+     * @dataProvider projectAnswers
+     */
+    #[DataProvider('projectAnswers')]
+    public function testAllowsProjectReadsAStarAsAdmittingEveryRelease(?string $requirePhp, ?string $releasePhp, ?bool $allows, ?bool $admits): void
+    {
+        $floor = new PhpFloor('8.4', $requirePhp);
+
+        self::assertSame([$allows, $admits], [$floor->allowsProject($releasePhp), $floor->admitsProject($releasePhp)]);
+    }
+
+    /** @return iterable<string, array{?string, ?string, ?bool, ?bool}> */
+    public static function projectAnswers(): iterable
+    {
+        yield 'a star' => ['*', '>=8.1', true, null];
+        yield 'a star with spaces' => [' * ', '>=8.1', true, null];
+        yield 'a star and a release with no php' => ['*', null, null, null];
+        yield 'a floor the release admits' => ['>=8.2', '>=8.1', true, true];
+        yield 'a floor the release excludes' => ['>=7.4', '>=8.1', false, false];
+        yield 'no lower bound' => ['<9', '>=8.1', null, null];
+        yield 'no require.php' => [null, '>=8.1', null, null];
+    }
 }

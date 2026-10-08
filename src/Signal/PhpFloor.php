@@ -36,6 +36,7 @@ final class PhpFloor
     private ?Constraint $projectLowest;
     private ?string $projectPoint;
     private ?string $projectPhp;
+    private bool $projectAny;
 
     /**
      * @param ?string $targetPhp  the run's target PHP, `8.4` or `8.4.7`
@@ -46,6 +47,7 @@ final class PhpFloor
         $this->parser = new VersionParser();
         [$this->targetMinor, $this->targetLabel] = $this->target($targetPhp);
         [$this->projectPoint, $this->projectPhp] = $this->project($projectPhp);
+        $this->projectAny = $projectPhp !== null && trim($projectPhp) === '*';
         $this->projectLowest = $this->projectPoint === null ? null : new Constraint('==', $this->projectPoint.'.0');
     }
 
@@ -82,6 +84,19 @@ final class PhpFloor
     public function admitsProject(?string $constraint): ?bool
     {
         return $this->projectAdmits($this->parse($constraint));
+    }
+
+    /**
+     * report-2's `project_allows`: {@see admitsProject()}, except that `require.php: "*"` admits
+     * every release that states its php. explain-1 keeps the null of {@see admitsProject()}.
+     */
+    public function allowsProject(?string $constraint): ?bool
+    {
+        if ($this->projectAny && $this->parse($constraint) !== null) {
+            return true;
+        }
+
+        return $this->admitsProject($constraint);
     }
 
     /** Null is no answer, never "admitted": docs/verdicts.md#the-php-test-in-explain. */

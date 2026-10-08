@@ -7,13 +7,14 @@ namespace Lockrot\Tests\Unit\Verdict;
 use Lockrot\Data\Advisory\AdvisoryCoverage;
 use Lockrot\Data\Advisory\AdvisoryNameCoverage;
 use Lockrot\Lock\LockFile;
+use Lockrot\Security\Fix;
+use Lockrot\Security\PackageFixes;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\PhpFloor;
 use Lockrot\Verdict\FindingDetails;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/** `security.check` says how far the advisory lookup went for the package, whatever it counted. */
 final class FindingDetailsTest extends TestCase
 {
     /** @return iterable<string, array{list<array{composer_repository: string, answer: string, reason: ?string, message: ?string, records: ?int}>, ?int, ?string, string}> */
@@ -27,6 +28,8 @@ final class FindingDetailsTest extends TestCase
     }
 
     /**
+     * `security.check` says how far the advisory lookup went for the package, whatever it counted.
+     *
      * @param list<array{composer_repository: string, answer: string, reason: ?string, message: ?string, records: ?int}> $feeds
      *
      * @dataProvider lookups
@@ -42,5 +45,37 @@ final class FindingDetailsTest extends TestCase
         $security = FindingDetails::of($facts, null, new PhpFloor('8.4', null), [], [], null)->security([], null);
 
         self::assertSame($check, $security['check']);
+    }
+
+    /**
+     * Unread release data gives no fix (SPEC §5.3): the installed branch still has a row, with no
+     * advisory fixed on it and each counted advisory not known.
+     */
+    public function testUnreadReleasesGiveTheInstalledBranchARowWithNoFixKnown(): void
+    {
+        $rows = [['id' => 'PKSA-a', 'severity' => 'high', 'counted' => true, 'fix' => ['kind' => 'unknown', 'on_installed_branch' => null, 'reason' => 'releases_unknown']]];
+        $details = new FindingDetails('unavailable', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [], new PackageFixes(['PKSA-a' => Fix::unknown(Fix::RELEASES_UNKNOWN)], [], null, null, null));
+
+        $security = $details->security($rows, '1.x');
+
+        self::assertSame(
+            ['fixed' => 0, 'unknown' => 1, 'of' => 1, 'fix_kind' => null, 'lowest' => null, 'newest' => null, 'held_by' => [], 'if_applied' => null],
+            $security['installed_branch_fixes']
+        );
+        self::assertStringContainsString(' — fix not known on 1.x;', $details->vulnerableSummary($rows, '1.x', 'high'));
+        self::assertNull($details->security($rows, null)['installed_branch_fixes'], 'a branch snapshot has no installed branch');
+    }
+
+    /** Case `A-php-star‡`: the project's `require.php` is `*`, which admits the installed release. */
+    public function testAStarRequirePhpAllowsTheInstalledRelease(): void
+    {
+        $lock = LockFile::fromArray(['packages' => [['name' => 'twig/twig', 'version' => 'v1.44.8', 'require' => ['php' => '>=7.1.3'], 'notification-url' => 'https://packagist.org/downloads/']]]);
+        $package = $lock->find('twig/twig');
+        self::assertNotNull($package);
+        $facts = new PackageFacts($package, null, null, [], null, null, null);
+
+        $installed = FindingDetails::of($facts, null, new PhpFloor('8.4', '*'), [], [], null)->installedPhp();
+
+        self::assertSame(['requires' => '>=7.1.3', 'target_runs' => true, 'project_allows' => true], $installed);
     }
 }
