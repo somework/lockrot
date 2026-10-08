@@ -242,7 +242,10 @@ final class LockrotCommand extends BaseCommand
                 // The project's require.php, which the page and --explain test branch rows against.
                 $project->requirePhp(),
                 $lockrot->strictNetwork(),
-                $generate ? Gate::MODE_GENERATE_BASELINE : Gate::MODE_CHECK
+                $generate ? Gate::MODE_GENERATE_BASELINE : Gate::MODE_CHECK,
+                $lockrot->targetPhpSource(),
+                $lockrot->failOnSource(),
+                $lockrot->includeDev()
             ));
 
             $page = $analysis === null

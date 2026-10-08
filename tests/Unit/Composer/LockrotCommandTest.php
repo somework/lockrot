@@ -442,6 +442,17 @@ final class LockrotCommandTest extends TestCase
         self::assertStringContainsString('(php \\">=', $stdout);
     }
 
+    /** A report names where its target PHP and its `--fail-on` value came from. */
+    public function testTheReportNamesTheSourceOfItsTargetPhpAndItsFailOn(): void
+    {
+        chdir(__DIR__.'/../../fixtures/apps/wallabag_wallabag');
+        [, $stdout] = $this->runRecordingWriteOptions(['--format' => 'json', '--target-php' => '8.4', '--fail-on' => 'silent'], $this->loader());
+
+        $json = json_decode($stdout, true);
+        self::assertIsArray($json, $stdout);
+        self::assertSame(['option', 'option'], [JsonPath::stringAt($json, ['run', 'target_php_source']), JsonPath::stringAt($json, ['run', 'fail_on_source'])]);
+    }
+
     /** The block sums what the run analysed: `--dev` adds the development packages to it, and nothing else moves. */
     public function testDevPackagesEnterTheLibyearsBlockOnlyWithDev(): void
     {
