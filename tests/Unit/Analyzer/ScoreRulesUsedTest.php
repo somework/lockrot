@@ -100,4 +100,20 @@ final class ScoreRulesUsedTest extends TestCase
 
         self::assertSame([2, 3, 3, null], [$used['zero-verdicts'], $used['band-floors'], $used['lead-first'], $used['sort']]);
     }
+
+    /** Each rule adds up over the findings: every case twice counts twice. */
+    public function testEveryRuleAddsUpOverTheFindings(): void
+    {
+        $findings = [];
+        $expected = ScoreModel::rulesUnused();
+        foreach (self::findings() as [$finding, $used]) {
+            $findings[] = $finding;
+            $findings[] = $finding;
+            foreach ($used as $rule => $count) {
+                $expected[$rule] = (int) $expected[$rule] + 2 * $count;
+            }
+        }
+
+        self::assertSame($expected, ScoreRulesUsed::of($findings));
+    }
 }

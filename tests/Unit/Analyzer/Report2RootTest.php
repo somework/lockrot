@@ -85,7 +85,7 @@ final class Report2RootTest extends TestCase
             $abandoned(null, [$s1('acme/next')]),
             $abandoned(null, [$s1('acme/later')]),
             $abandoned(null, [$s1(null)]),
-            $abandoned(null, [['id' => 'S5', 'data' => ['replacement' => 'acme/not-s1']]]),
+            $abandoned(null, [['id' => 'S5', 'data' => ['replacement' => 'acme/not-s1']], ['id' => 'S2', 'data' => []], ['id' => 'S4', 'data' => []]]),
             ['score' => ['terms' => [['flag' => 'stale']]], 'replacement' => null, 'signals' => [$s1('acme/not-abandoned')]],
         ];
 
@@ -98,11 +98,12 @@ final class Report2RootTest extends TestCase
         $findings = [
             ['direct' => true, 'libyears' => 1.111],
             ['direct' => false, 'libyears' => 2.227],
+            ['direct' => true, 'libyears' => 0.5],
             ['libyears' => 1.0],
             ['direct' => true, 'libyears' => null],
         ];
 
-        self::assertSame(['unmeasured' => [], 'total' => 4.34, 'direct_requirements' => 1.11, 'packages' => 4], Report2Root::libyears(['unmeasured' => []], $findings));
+        self::assertSame(['unmeasured' => [], 'total' => 4.84, 'direct_requirements' => 1.61, 'packages' => 5], Report2Root::libyears(['unmeasured' => []], $findings));
         self::assertSame(['total' => 2.23, 'direct_requirements' => 0.0, 'packages' => 1], Report2Root::libyears([], [['direct' => false, 'libyears' => 2.227]]));
         self::assertSame(['total' => null, 'direct_requirements' => null, 'packages' => 1], Report2Root::libyears([], [['direct' => true, 'libyears' => null]]));
     }
