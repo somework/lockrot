@@ -109,7 +109,7 @@ final class YearsOnTheRunClockTest extends TestCase
             'json' => new JsonFormatter(),
             'gitlab' => new GitlabFormatter(FormatContext::create(null, LockrotConfig::FAIL_ON_NONE)),
             'sarif' => new SarifFormatter(FormatContext::create(null, LockrotConfig::FAIL_ON_NONE)),
-            'html' => new HtmlFormatter(),
+            'html' => new HtmlFormatter(null, [JsonFormatter::SCHEMA]),
         ];
         $previous = \ini_get('serialize_precision');
         foreach ($writers as $name => $writer) {

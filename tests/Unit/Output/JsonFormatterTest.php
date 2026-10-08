@@ -26,10 +26,11 @@ final class JsonFormatterTest extends TestCase
         self::assertIsArray($json['findings']);
         self::assertIsArray($json['findings'][0]);
         self::assertIsArray($json['counts']);
-        self::assertSame(1, $json['lockrot']['schema']);
-        self::assertSame('stale', $json['findings'][0]['verdict']);
+        self::assertSame(2, $json['lockrot']['schema']);
+        self::assertSame('stale', $json['findings'][0]['lead']);
+        self::assertSame('medium', $json['findings'][0]['verdict'], 'stale 8 is medium');
         self::assertSame(['n'], $json['notes']);
-        self::assertSame(1, $json['counts']['stale']);
+        self::assertSame(1, $json['counts']['medium']);
     }
 
     public function testJsonCarriesThePriorityOnEveryFindingAndTheReportTotals(): void
@@ -58,9 +59,8 @@ final class JsonFormatterTest extends TestCase
         self::assertTrue($json['findings'][1]['dev']);
         self::assertIsArray($json['priorities']);
         self::assertSame(['critical' => 1, 'high' => 0, 'medium' => 1, 'low' => 0, 'none' => 0], $json['priorities']);
-        // Both fields are additive, so the schema number does not move.
         self::assertIsArray($json['lockrot']);
-        self::assertSame(1, $json['lockrot']['schema']);
+        self::assertSame(2, $json['lockrot']['schema']);
     }
 
     public function testFactory(): void
@@ -105,6 +105,6 @@ final class JsonFormatterTest extends TestCase
         self::assertStringEndsWith("}\n", $out);
         $json = json_decode($out, true);
         self::assertIsArray($json);
-        self::assertSame(['version' => Version::STRING, 'schema' => 1], $json['lockrot']);
+        self::assertSame(['version' => Version::STRING, 'schema' => 2], $json['lockrot']);
     }
 }
