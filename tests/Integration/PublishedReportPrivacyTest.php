@@ -29,6 +29,7 @@ use Lockrot\Json\Schemas;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Output\ExplainFormatter;
+use Lockrot\Output\JsonFormatter;
 use Lockrot\Output\FormatContext;
 use Lockrot\Output\Formatters;
 use Lockrot\Output\InstallSummaryFormatter;
@@ -82,7 +83,7 @@ final class PublishedReportPrivacyTest extends TestCase
         $written = [];
         foreach (self::FORMATS as $format) {
             $context = FormatContext::create($this->dir.'/composer.lock', 'none', '0.13.0', 200, $this->dir);
-            $written[$format] = Formatters::for($format, $context, new PageData($analysis, new Thresholds(), '8.4'))->format($report, true);
+            $written[$format] = Formatters::for($format, $context, new PageData($analysis, new Thresholds(), '8.4', null, [JsonFormatter::SCHEMA]))->format($report, true);
         }
         $written['install-time'] = implode("\n", (new InstallSummaryFormatter())->format($report));
         foreach ($report->findings() as $finding) {
