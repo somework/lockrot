@@ -429,7 +429,7 @@ final class ClosedSetsTest extends TestCase
         }
 
         $found = [];
-        // The -2 drafts have their own registry, generated from the schema walk (ClosedSetsTest2).
+        // The files from number 2 on have their own registry: KnownValuesRegistryTest.
         foreach ([Schemas::REPORT, Schemas::EXPLAIN, Schemas::CONFIG, Schemas::BASELINE] as $document) {
             foreach ([1] as $number) {
                 foreach (self::withKnownValues(self::schema($document, $number), '#') as $path) {
