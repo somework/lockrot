@@ -352,7 +352,7 @@ final class FindingTest extends TestCase
         self::assertNull($abandoned($s1('symfony/mailer'), 'repo.packagist.com')->toArray()['replacement_url'], 'Private Packagist named it, and keeps no public page');
         self::assertNull($abandoned($s1('symfony/mailer'), null)->toArray()['replacement_url'], 'no registry lockrot knows named it');
         self::assertNull($abandoned($s1('Symfony'), 'packagist.org')->toArray()['replacement_url'], 'free text is not a package');
-        self::assertNull($abandoned($s1('symfony/mailer'), 'packagist.org', Verdict::SILENT)->toArray()['replacement_url'], 'only an abandoned finding has a successor');
+        self::assertSame('https://packagist.org/packages/symfony/mailer', $abandoned($s1('symfony/mailer'), 'packagist.org', Verdict::SILENT)->toArray()['replacement_url'], 'S1 raises abandoned, which counts whatever the report-1 verdict');
         self::assertNull(((new FindingBuilder())->withVerdict(Verdict::STALE)->build())->toArray()['replacement_url']);
     }
 
