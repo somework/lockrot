@@ -75,7 +75,7 @@ final class JsonSchemaConformanceTest extends TestCase
     private const DOCS = __DIR__.'/../../docs/';
     private const RESOURCES = __DIR__.'/../../resources/';
     /** The schema numbers each document ships a file for. */
-    private const NUMBERS = [Schemas::REPORT => [1], Schemas::EXPLAIN => [1], Schemas::BASELINE => [1], Schemas::CONFIG => [1]];
+    private const NUMBERS = [Schemas::REPORT => [1, 2], Schemas::EXPLAIN => [1, 2], Schemas::BASELINE => [1], Schemas::CONFIG => [1]];
     /** The negative fixtures: one directory per document and number ({@see NegativeFixtures}). */
     private const NEGATIVE = self::FIXTURES.'schema/negative';
     /** The runner's own fixtures, which prove it can fail. */
@@ -170,7 +170,7 @@ final class JsonSchemaConformanceTest extends TestCase
     {
         $json = (new JsonFormatter())->format(self::analysis($dir)->report());
 
-        self::assertStringStartsWith("{\n    \"\$schema\": \"https://lockrot.dev/schema/report-1.json\",\n", $json);
+        self::assertStringStartsWith("{\n    \"\$schema\": \"https://lockrot.dev/schema/report-2.json\",\n", $json);
         $this->assertValid(Schemas::REPORT, $json, $dir);
         $this->assertValid(Schemas::REPORT, $json, $dir, true);
         self::assertNoteDetailsAgree(self::decoded($json), $dir);
@@ -1176,7 +1176,7 @@ final class JsonSchemaConformanceTest extends TestCase
             self::assertNotNull($facts, $package);
             $json = (new ExplainFormatter())->json(new Explanation($finding, $facts, new Thresholds(), '8.4', $analysis->report()));
 
-            self::assertStringStartsWith("{\n    \"\$schema\": \"https://lockrot.dev/schema/explain-1.json\",\n", $json);
+            self::assertStringStartsWith("{\n    \"\$schema\": \"https://lockrot.dev/schema/explain-2.json\",\n", $json);
             $this->assertValid(Schemas::EXPLAIN, $json, $package);
             $this->assertValid(Schemas::EXPLAIN, $json, $package, true);
             self::assertNoteDetailsAgree(self::decoded($json), $package);
