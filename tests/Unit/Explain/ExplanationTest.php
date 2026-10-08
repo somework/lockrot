@@ -101,7 +101,7 @@ final class ExplanationTest extends TestCase
         self::assertIsArray($meta['branches']);
         self::assertSame(
             ['branch' => '10.x', 'installed' => true, 'highest' => '10.49.0', 'highest_released' => null, 'highest_commit_date' => '2023-06-05T12:46:42+00:00', 'newest_dated' => '10.49.0', 'newest_dated_released' => '2023-06-05T12:46:42+00:00', 'dated_by' => null, 'php' => null, 'admits_target_php' => null, 'admits_project_php' => null, 'php_blocked_by' => null, 'misses_target_php' => null, 'misses_project_php' => null],
-            $meta['branches'][0]
+            array_diff_key($meta['branches'][0], ['released_years' => true, 'fixes' => true])
         );
     }
 
@@ -148,10 +148,11 @@ final class ExplanationTest extends TestCase
 
         $array = $explanation->toArray();
 
-        self::assertSame(['package', 'version', 'finding', 'lock', 'metadata', 'activity', 'thresholds', 'target_php', 'project_php', 'generated_at', 'notes', 'note_details'], array_keys($array));
+        self::assertSame(['package', 'version', 'finding', 'lock', 'metadata', 'activity', 'run', 'legacy', 'generated_at', 'notes', 'note_details'], array_keys($array));
         self::assertSame('vendor/pkg', $array['package']);
-        self::assertSame($finding = $explanation->finding()->toArray(), $array['finding'], 'the finding as --format=json carries it');
-        self::assertSame(Verdict::LEFT_BEHIND, $finding['verdict']);
+        $finding = $array['finding'];
+        self::assertIsArray($finding);
+        self::assertSame(Verdict::LEFT_BEHIND, $finding['lead'], 'the finding as --format=json carries it');
         self::assertSame(['php' => '>=7.1', 'released' => '2021-06-01T00:00:00+00:00', 'repository' => 'https://github.com/vendor/pkg.git', 'from_composer_repository' => true, 'dev' => false, 'branch_snapshot' => false, 'type' => 'library'], $array['lock']);
         self::assertSame([
             'abandoned' => false,
@@ -167,14 +168,16 @@ final class ExplanationTest extends TestCase
             'type' => 'library',
             'data_date' => F::NOW,
             'branches' => [
-                ['branch' => '2.x', 'installed' => false, 'highest' => '2.1.0', 'highest_released' => '2026-01-01T00:00:00+00:00', 'highest_commit_date' => null, 'newest_dated' => '2.1.0', 'newest_dated_released' => '2026-01-01T00:00:00+00:00', 'dated_by' => null, 'php' => null, 'admits_target_php' => null, 'admits_project_php' => null, 'php_blocked_by' => null, 'misses_target_php' => null, 'misses_project_php' => null],
-                ['branch' => '1.x', 'installed' => true, 'highest' => '1.5.0', 'highest_released' => '2021-06-01T00:00:00+00:00', 'highest_commit_date' => null, 'newest_dated' => '1.5.0', 'newest_dated_released' => '2021-06-01T00:00:00+00:00', 'dated_by' => null, 'php' => null, 'admits_target_php' => null, 'admits_project_php' => null, 'php_blocked_by' => null, 'misses_target_php' => null, 'misses_project_php' => null],
+                ['branch' => '2.x', 'installed' => false, 'highest' => '2.1.0', 'highest_released' => '2026-01-01T00:00:00+00:00', 'highest_commit_date' => null, 'newest_dated' => '2.1.0', 'newest_dated_released' => '2026-01-01T00:00:00+00:00', 'dated_by' => null, 'php' => null, 'admits_target_php' => null, 'admits_project_php' => null, 'php_blocked_by' => null, 'misses_target_php' => null, 'misses_project_php' => null, 'released_years' => 0.7, 'fixes' => null],
+                ['branch' => '1.x', 'installed' => true, 'highest' => '1.5.0', 'highest_released' => '2021-06-01T00:00:00+00:00', 'highest_commit_date' => null, 'newest_dated' => '1.5.0', 'newest_dated_released' => '2021-06-01T00:00:00+00:00', 'dated_by' => null, 'php' => null, 'admits_target_php' => null, 'admits_project_php' => null, 'php_blocked_by' => null, 'misses_target_php' => null, 'misses_project_php' => null, 'released_years' => 5.3, 'fixes' => null],
             ],
+            'installed_branch' => '1.x',
         ], $array['metadata']);
         self::assertSame(['forge' => 'GitHub', 'repository' => 'vendor/pkg', 'archived' => false, 'pushed_at' => '2026-02-01T00:00:00+00:00', 'fetched_at' => F::NOW, 'from_cache' => false], $array['activity']);
-        self::assertSame(['release-warn-years' => 2, 'release-high-years' => 4, 'push-warn-years' => 3, 'push-high-years' => 5], $array['thresholds']);
-        self::assertSame('8.3', $array['target_php']);
-        self::assertNull($array['project_php'], 'no project php was given');
+        self::assertSame(['release-warn-years' => 2, 'release-high-years' => 4, 'push-warn-years' => 3, 'push-high-years' => 5], JsonPath::arrayAt($array, ['run', 'thresholds']));
+        self::assertSame('8.3', JsonPath::stringAt($array, ['run', 'target_php']));
+        self::assertNull(JsonPath::arrayAt($array, ['run'])['project_php'], 'no project php was given');
+        self::assertSame(['verdict' => 'left-behind', 'priority' => $explanation->finding()->priority()], array_slice(JsonPath::arrayAt($array, ['legacy']), 0, 2), "report-1's reading");
         self::assertSame(F::NOW, $array['generated_at']);
         self::assertSame(['a note'], $array['notes']);
         self::assertSame(['a note'], array_column(JsonPath::arrayAt($array, ['note_details']), 'text'), 'the same notes, typed');
@@ -250,7 +253,7 @@ final class ExplanationTest extends TestCase
         self::assertIsArray($meta['branches']);
         self::assertSame(
             ['branch' => '10.x', 'installed' => true, 'highest' => 'v10.50.3', 'highest_released' => '2026-08-12T03:46:26+00:00', 'highest_commit_date' => null, 'newest_dated' => 'v10.50.3', 'newest_dated_released' => '2026-08-12T03:46:26+00:00', 'dated_by' => 'laravel/framework', 'php' => null, 'admits_target_php' => null, 'admits_project_php' => null, 'php_blocked_by' => null, 'misses_target_php' => null, 'misses_project_php' => null],
-            $meta['branches'][0]
+            array_diff_key($meta['branches'][0], ['released_years' => true, 'fixes' => true])
         );
     }
 
@@ -373,7 +376,7 @@ final class ExplanationTest extends TestCase
         $explanation = new Explanation($this->finding('1.0.0', Verdict::OK), F::facts(F::package()), new Thresholds(), '8.4', $this->report(), '^7.2.5 || ^8.0');
 
         self::assertSame('^7.2.5 || ^8.0', $explanation->projectPhp());
-        self::assertSame('^7.2.5 || ^8.0', $explanation->toArray()['project_php']);
+        self::assertSame('^7.2.5 || ^8.0', $explanation->toArray()['run']['project_php']);
         self::assertNull((new Explanation($this->finding('1.0.0', Verdict::OK), F::facts(F::package()), new Thresholds(), '8.4', $this->report()))->projectPhp());
     }
 
