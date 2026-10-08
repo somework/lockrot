@@ -44,7 +44,7 @@ final class PhpCheck
      */
     public static function of(?string $php, PhpFloor $floor): self
     {
-        $allows = $floor->admitsProject($php);
+        $allows = $floor->allowsProject($php);
         $project = $floor->lowestAsString();
         $release = $allows === false && $php !== null && $project !== null ? self::pointAbove($php, $project) : null;
         $raiseTo = null;

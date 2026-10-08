@@ -86,7 +86,7 @@ final class FindingDetails
             $status === PackageFacts::METADATA_UNAVAILABLE && $metadataFailure !== null ? MetadataFailure::reason($metadataFailure) : null,
             $status === PackageFacts::METADATA_UNAVAILABLE ? $metadataFailure : null,
             self::skippedChecks($facts, $entry, $signals, $reason),
-            ['requires' => $requires, 'target_runs' => $requires === null ? null : $floor->admitsTarget($requires), 'project_allows' => $requires === null ? null : $floor->admitsProject($requires)],
+            ['requires' => $requires, 'target_runs' => $requires === null ? null : $floor->admitsTarget($requires), 'project_allows' => $requires === null ? null : $floor->allowsProject($requires)],
             $entry,
             $check,
             $reason,
@@ -207,7 +207,6 @@ final class FindingDetails
             $hardest = max($hardest, (int) array_search($fix['kind'] ?? Fix::UNKNOWN, ScoreModel::FIX_KINDS, true));
         }
         $worst = self::worst($counts);
-        $installed = $this->fixes === null ? null : $this->fixes->installedBranch();
         $gets = $this->fixes === null ? null : $this->fixes->gets();
 
         return $out + [
@@ -216,7 +215,7 @@ final class FindingDetails
             'ignored' => $ignored,
             'ignored_count' => \count($ignored),
             'fix_kind' => ScoreModel::FIX_KINDS[$hardest],
-            'installed_branch_fixes' => $branch === null || $installed === null ? null : self::branchFixes($installed),
+            'installed_branch_fixes' => $this->installedBranchFixes($rows, $branch),
             'move_in' => null,
             'gets' => $gets === null ? null : [
                 'version' => $gets->version(),
@@ -236,7 +235,7 @@ final class FindingDetails
     public function vulnerableSummary(array $rows, ?string $branch, string $decidingSeverity): string
     {
         $counts = self::counts($rows);
-        $installed = $branch === null || $this->fixes === null ? null : $this->fixes->installedBranch();
+        $installed = $this->installedBranchFixes($rows, $branch);
 
         return FlagSentence::vulnerable(
             $rows,
@@ -244,8 +243,36 @@ final class FindingDetails
             self::worst($counts),
             $decidingSeverity,
             $branch,
-            $installed === null ? null : ['fixed' => $installed->fixed(), 'unknown' => $installed->unknown(), 'of' => $installed->of(), 'fix_kind' => $installed->fixKind()]
+            $installed === null ? null : ['fixed' => $installed['fixed'], 'unknown' => $installed['unknown'], 'of' => $installed['of'], 'fix_kind' => $installed['fix_kind']]
         );
+    }
+
+    /**
+     * The installed branch's `fixes`, null only for a branch snapshot. With no release data the
+     * scan has no branch row, so the S9 rows give it: unread release data gives no fix (SPEC §5.3).
+     *
+     * @param list<array<string, mixed>> $rows
+     *
+     * @return ?array{fixed: int, unknown: int, of: int, fix_kind: ?string, lowest: ?string, newest: ?string, held_by: list<array<string, mixed>>, if_applied: null}
+     */
+    private function installedBranchFixes(array $rows, ?string $branch): ?array
+    {
+        if ($branch === null) {
+            return null;
+        }
+        $installed = $this->fixes === null ? null : $this->fixes->installedBranch();
+        if ($installed !== null) {
+            return self::branchFixes($installed);
+        }
+        $fixed = 0;
+        $unknown = 0;
+        foreach ($rows as $row) {
+            $fix = \is_array($row['fix'] ?? null) ? $row['fix'] : [];
+            $fixed += ($fix['on_installed_branch'] ?? null) === true ? 1 : 0;
+            $unknown += ($fix['kind'] ?? Fix::UNKNOWN) === Fix::UNKNOWN ? 1 : 0;
+        }
+
+        return ['fixed' => $fixed, 'unknown' => $unknown, 'of' => \count($rows), 'fix_kind' => null, 'lowest' => null, 'newest' => null, 'held_by' => [], 'if_applied' => null];
     }
 
     /**
@@ -279,7 +306,7 @@ final class FindingDetails
     /**
      * A branch row's `fixes`. The score after a move to its candidate waits for the move.
      *
-     * @return array<string, mixed>
+     * @return array{fixed: int, unknown: int, of: int, fix_kind: ?string, lowest: ?string, newest: ?string, held_by: list<array<string, mixed>>, if_applied: null}
      */
     public static function branchFixes(BranchFixes $row): array
     {
