@@ -49,6 +49,7 @@ use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\NegativeFixtures;
+use Lockrot\Tests\Support\ReportSample;
 use Lockrot\Tests\Support\ValidatesJsonSchemas;
 use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
@@ -558,8 +559,9 @@ final class JsonSchemaConformanceTest extends TestCase
 
     private static function wallabagReport(): \stdClass
     {
-        return self::object(json_decode((new JsonFormatter())->format(self::analysis('apps/wallabag_wallabag')->report())));
+        return self::object(json_decode((string) json_encode(ReportSample::of(self::decoded((new JsonFormatter())->format(self::analysis('apps/wallabag_wallabag')->report()))))));
     }
+
 
     private static function withNewValues(\stdClass $document): \stdClass
     {
@@ -660,7 +662,7 @@ final class JsonSchemaConformanceTest extends TestCase
      */
     public function testS6DataIsTypedButItsReasonIsOpen(): void
     {
-        $json = (new JsonFormatter())->format(self::analysis('apps/wallabag_wallabag')->report());
+        $json = (string) json_encode(ReportSample::of(self::decoded((new JsonFormatter())->format(self::analysis('apps/wallabag_wallabag')->report())), ['wallabag/rulerz']));
         $unknown = self::withRulerzS6($json, ['reason' => 'something_new']);
         $this->assertValid(Schemas::REPORT, $unknown, 'a reason this release does not know');
         $errors = $this->errors(Schemas::REPORT, $unknown, true);
@@ -771,6 +773,7 @@ final class JsonSchemaConformanceTest extends TestCase
         $at = array_search($package, array_column($findings, 'package'), true);
         self::assertIsInt($at, $package);
         $report['findings'] = array_merge([$findings[$at]], array_values(array_diff_key($findings, [$at => true])));
+        $report = ReportSample::of($report);
         $explain = json_decode((new ExplainFormatter())->json(new Explanation($finding, $facts, new Thresholds(), '8.4', $analysis->report())), true);
         self::assertIsArray($explain);
 
@@ -826,8 +829,7 @@ final class JsonSchemaConformanceTest extends TestCase
         $report = $report
             ->withRun(new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, FailOn::fromString(Verdict::STALE), RunSettings::SOURCE_OPTION, new Thresholds(), null, true))
             ->withBaseline(BaselineComparison::compare(Baseline::fromReport($report), $report, 'lockrot-baseline.json', []));
-        $decoded = json_decode((new JsonFormatter())->format($report), true);
-        self::assertIsArray($decoded);
+        $decoded = ReportSample::of(self::decoded((new JsonFormatter())->format($report)));
         $gate = JsonPath::arrayAt($decoded, ['gate']);
         $keys = array_flip(['fails', 'tripped_by', 'fail_on_applied', 'failing']);
         self::assertSame(['fails' => false, 'tripped_by' => [], 'fail_on_applied' => true, 'failing' => 0], array_intersect_key($gate, $keys), 'a baseline written from this report accepts every finding');
@@ -887,7 +889,7 @@ final class JsonSchemaConformanceTest extends TestCase
      */
     public function testARunNotesDataIsTypedPerCodeAndItsVocabulariesAreOpen(): void
     {
-        $decoded = self::decoded((new JsonFormatter())->format(self::analysis('apps/wallabag_wallabag')->report()));
+        $decoded = ReportSample::of(self::decoded((new JsonFormatter())->format(self::analysis('apps/wallabag_wallabag')->report())));
         $repo = new RepoRef(RepoRef::GITLAB, 'gitlab.example.org', 'team/app');
         $notes = [
             RunNote::offline(),
