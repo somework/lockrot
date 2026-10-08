@@ -90,7 +90,7 @@ def boolean(desc):
 
 
 def half(desc, minimum=0):
-    """a number in half points (§8.2: exact, contribution, before, after carry multipleOf 0.5)."""
+    """a number in half points (exact, contribution, before, after carry multipleOf 0.5)."""
     out = {'description': desc, 'type': 'number', 'multipleOf': 0.5}
     if minimum is not None:
         out['minimum'] = minimum
@@ -112,7 +112,7 @@ def array(desc, items, **kw):
 
 
 def rendered(desc, paths):
-    """a human string (§7.11): a rendering of the listed fields of the same object or of `run`."""
+    """a human string: a rendering of the listed fields of the same object or of `run`."""
     return {'description': desc + ' ' + PROSE[0].upper() + PROSE[1:] + '.', 'type': 'string', 'x-rendered-from': paths}
 
 
@@ -316,7 +316,7 @@ def inner(node):
 
 def relate(node, desc, *branches_lists):
     """one allOf entry per branch list; `desc` is one description per entry (a list), or one string for a single entry
-    (attack round 2: two entries never share a description, so each describes the relation it holds)."""
+    (two entries never share a description, so each describes the relation it holds)."""
     node.setdefault('allOf', [])
     descs = desc if isinstance(desc, list) else [desc] * len(branches_lists)
     assert len(descs) == len(branches_lists) and (isinstance(desc, list) or len(branches_lists) == 1), (desc, len(branches_lists))
@@ -325,7 +325,7 @@ def relate(node, desc, *branches_lists):
 
 
 def CONTAINS(x):
-    """draft-04's "some item is x": not every item is not x (attack round 2)."""
+    """draft-04's "some item is x": not every item is not x."""
     return {'not': {'items': {'not': x}}}
 
 
@@ -339,8 +339,8 @@ MAX_OF = {'high': 31, 'medium': 15, 'low': 7}
 
 
 def add_relations_round2(D):
-    """attack round 2: the cross-field rules §8.2 filed as engine-only or left out, which draft-04 can say: `contains` as
-    not/items/not, equality over a closed set by enumeration, and, on an open set, a constraint keyed on its listed values only."""
+    """Cross-field rules that draft-04 can say: `contains` as not/items/not, equality over a closed set by enumeration,
+    and, on an open set, a constraint keyed on its listed values only."""
     f = D['finding']
     relate(f, ['The `vulnerable` flag fires exactly when `security.status` is `vulnerable`.',
                'The verdict is the band of `score.total` under score model 1: critical from 32, high 16 to 31, medium 8 to 15, low 1 to 7, a score-0 word at 0.',
@@ -408,14 +408,14 @@ MODEL_NOT_1 = P(score=P(model=NOT(1)))
 
 
 def BAND_OF(tkey, vkey, zero):
-    """attack round 3: `vkey` is the band of `tkey` under score model 1 (critical from 32, high 16-31, medium 8-15, low 1-7), and at 0
+    """`vkey` is the band of `tkey` under score model 1 (critical from 32, high 16-31, medium 8-15, low 1-7), and at 0
     `zero` (the score-0 words, or null for a part or a gate basis)."""
     return [{'properties': {vkey: E(g), tkey: dict(minimum=MIN_OF[g], **({'maximum': MAX_OF[g]} if g in MAX_OF else {}))}} for g in GRADES] \
         + [{'properties': {tkey: E(0), vkey: zero}}]
 
 
 def add_relations_round3(D):
-    """attack round 3 (9.S1-9.S5): the rules §8.2 still filed as engine-only though draft-04 can say them: the score-0 word follows its
+    """the rules still filed as engine-only though draft-04 can say them: the score-0 word follows its
     condition; every rerun's verdict is the band of its total; the band object follows the verdict; the gate basis's own arithmetic; the
     baseline marks follow the standing; the model-1 weight tables; `worst` follows `counts`; S9's level follows `worst`; a graded finding
     has evidence."""
@@ -639,7 +639,7 @@ def closure(defs, names):
 
 
 def explain_schema():
-    """attack round 1: explain-2 types the report-2 finding, its signals, notes and the run block with report-2's own
+    """explain-2 types the report-2 finding, its signals, notes and the run block with report-2's own
     definitions, copied byte for byte from lockrot-report-2.schema.json (built first by build_report2_schema.py). Revision 3's
     second builder typed the same finding differently in 189 places; SchemaParity in run_all.sh asserts the copies are equal."""
     R2 = json.load(open(REPORT2))

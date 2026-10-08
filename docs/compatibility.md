@@ -72,7 +72,7 @@ value means.
   accepts. report-2 lists its grades in `run.graded_verdicts` and its flags in `run.flag_ids`.
 
 - `finished` and `ok` share the lowest severity: no threshold and no comparison tells them apart.
-  Where lockrot lists verdicts — `counts`, `run.graded_verdicts`, the schema enums, this page —
+  Where lockrot lists verdicts — `counts`, `run.verdicts`, the schema enums, this page —
   `finished` comes before `ok`. In SARIF output, the SARIF rules appear in the order the results
   first use them.
 

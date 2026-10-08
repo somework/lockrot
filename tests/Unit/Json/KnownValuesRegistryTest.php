@@ -33,12 +33,12 @@ use PHPUnit\Framework\TestCase;
  * Each open set of a numbered schema from 2 on lists in `x-known-values` exactly the values that
  * lockrot writes there: the list of the class that writes the value, or the values that
  * {@see ScoreModel::toArray()} writes at that place. The registry has one row per place that the
- * schema walk finds. A place that a later pull request fills holds a literal and names that pull
- * request. The `-1` files are frozen and {@see \Lockrot\Tests\Unit\Verdict\ClosedSetsTest} reads them.
+ * schema walk finds. A place that no lockrot code writes yet holds a literal from the schema,
+ * marked {@see LATER}, until a writer and its list exist. The `-1` files are frozen and {@see \Lockrot\Tests\Unit\Verdict\ClosedSetsTest} reads them.
  */
 final class KnownValuesRegistryTest extends TestCase
 {
-    private const LATER = 'a later pull request writes it';
+    private const LATER = 'no lockrot code writes it';
 
     /**
      * Every place that holds `x-known-values`, as a JSON pointer under the schema root, in any

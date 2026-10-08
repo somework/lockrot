@@ -19,6 +19,8 @@ fact in full twice only when a test reads every copy. Link the home's anchor whe
 | Each output format | its `ci.md` section | README: one list line |
 | Verdicts, and what "finding" / "graded" mean | `verdicts.md#the-nine-verdicts` | README: one-line meanings, no thresholds |
 | Signals, and S6 data (`#what-s6-carries`) | `verdicts.md#the-signals` | Links |
+| Flags, and the `lead` of a finding | `verdicts.md#flags` | Links |
+| Moving from report-1 to report-2 | `schema.md#migrating-from-report-1` | CHANGELOG: links |
 | Priority | `verdicts.md#priority` | One sentence |
 | Security advisories and Composer's advisory settings | `verdicts.md#security-advisories` | `configuration.md#the-allowlist`: one sentence and a link |
 | `unchecked` and S10 | `verdicts.md#what-was-not-checked` | Links |
