@@ -407,4 +407,13 @@ final class AdvisoryRuleTest extends TestCase
         yield 'a leading CVE without a colon' => ['CVE-2024-1', 'CVE-2024-1 a title', 'CVE-2024-1 a title'];
         yield 'no CVE' => [null, 'a title', 'a title'];
     }
+
+    public function testReport1FactsOfAPackageWithoutAdvisoriesAreEmpty(): void
+    {
+        [$summary, $facts] = AdvisoryRule::legacy(F::facts(F::package()));
+
+        self::assertSame('', $summary);
+        self::assertSame([], $facts->rows());
+        self::assertFalse($facts->releasesRead());
+    }
 }

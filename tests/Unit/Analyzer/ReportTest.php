@@ -831,4 +831,15 @@ final class ReportTest extends TestCase
         self::assertSame(2, \count($two->flagIds()), 'the fixture counts two flags');
         self::assertSame([2, 1], [$document['packages_flagged'], $document['packages_multi_flag']]);
     }
+
+    /** `rank` stands right after `lead`, where report-2 orders it. */
+    public function testRankFollowsLead(): void
+    {
+        $keys = array_keys(JsonPath::arrayAt($this->report($this->finding('vendor/a', Verdict::STALE))->toArray(), ['findings', 0]));
+        $at = array_search('lead', $keys, true);
+
+        self::assertIsInt($at);
+        self::assertSame('rank', $keys[$at + 1]);
+        self::assertSame('flags', $keys[$at + 2]);
+    }
 }

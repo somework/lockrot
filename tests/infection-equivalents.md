@@ -52,6 +52,8 @@ start the reason with `in method():`.
 - `src/Analyzer/ScoreRulesUsed.php` CastInt `$used['sum'] += (int) ((self::map($parts['maintenance'] ?? null)['status'] ?? null) === 'counted' && (self::map($parts['security'] ?? null)['status'] ?? null) === 'counted');` — PHP adds `true` as 1 and `false` as 0, so the cast changes no count.
 - `src/Analyzer/ScoreRulesUsed.php` CastInt `$used['divide-dev'] += (int) (self::any($modifiers, 'reason', 'dev') || $rerunHalves('reason', 'dev'));` — PHP adds `true` as 1 and `false` as 0, so the cast changes no count.
 - `src/Analyzer/ScoreRulesUsed.php` CastInt `$used['floor-once'] += (int) (($score['rounded_down'] ?? false) === true);` — PHP adds `true` as 1 and `false` as 0, so the cast changes no count.
+- `src/Analyzer/Analyzer.php` LogicalAnd `if ($fixes !== null && $facts->advisories() !== []) {` — a package with no advisory gets an empty scan, which writes the same finding as no scan: no row, no branch fix, no gets.
+- `src/Analyzer/Report.php` AssignCoalesce `$gate ??= $this->gate();` — the gate is derived from the report alone, so computing it again gives the gate that the caller passed.
 
 ## src/Baseline
 
