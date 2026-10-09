@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Score;
 
+use Lockrot\Score\MaintenanceTerm;
 use Lockrot\Score\ScoreText;
 use Lockrot\Tests\Support\ScoreSweep;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -25,10 +26,10 @@ final class ScoreTextTest extends TestCase
     public function testAWorkedRowPrintsItsScoreLine(array $flags, array $advisories, string $reach, bool $dev, ?string $accepted, string $line): void
     {
         $inputs = ['axis' => 'base', 'flags' => $flags, 'advisories' => $advisories, 'reach' => $reach, 'dev' => $dev, 'under' => null, 'accepted' => $accepted];
-        $score = ScoreSweep::basis($inputs)->toArray();
+        $basis = ScoreSweep::basis($inputs);
 
-        self::assertSame($line, $score['text']);
-        self::assertSame($line, ScoreText::render($score));
+        self::assertSame($line, ScoreText::render($basis));
+        self::assertSame($line, $basis->toArray()['text']);
     }
 
     /** @return iterable<string, array{list<string>, list<array{string, string}>, string, bool, ?string, string}> */
@@ -72,44 +73,26 @@ final class ScoreTextTest extends TestCase
 
     public function testAScoreWithNoTermReadsZero(): void
     {
-        self::assertSame('0', ScoreText::render(['model' => 1, 'total' => 0, 'exact' => 0, 'accepted' => [], 'text' => '']));
+        self::assertSame('0', ScoreText::render(ScoreSweep::basis(['axis' => 'base', 'flags' => [], 'advisories' => [], 'reach' => 'direct', 'dev' => false, 'under' => null, 'accepted' => null])));
     }
 
     public function testAZeroEffectReachHalvingIsNotPrinted(): void
     {
-        $score = ScoreSweep::graded(ScoreSweep::basis(['axis' => 'base', 'flags' => [], 'advisories' => [['high', 'update']], 'reach' => 'unreached', 'dev' => false, 'under' => null, 'accepted' => null])->toArray());
+        $basis = ScoreSweep::basis(['axis' => 'base', 'flags' => [], 'advisories' => [['high', 'update']], 'reach' => 'unreached', 'dev' => false, 'under' => null, 'accepted' => null]);
 
-        self::assertSame([['reason' => 'unreached', 'applies_to' => 'maintenance', 'divide_by' => 2, 'before' => 0, 'after' => 0]], $score['modifiers']);
-        self::assertSame('16 = vulnerable 16 [high advisory]', ScoreText::render($score));
-    }
-
-    /**
-     * @dataProvider malformed
-     *
-     * @param array<string, mixed> $term
-     */
-    #[DataProvider('malformed')]
-    public function testAFieldOfTheWrongTypeIsRefused(array $term, string $message): void
-    {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage($message);
-        ScoreText::render(['total' => 16, 'exact' => 16, 'terms' => [$term], 'modifiers' => [], 'accepted' => []]);
-    }
-
-    /** @return iterable<string, array{array<string, mixed>, string}> */
-    public static function malformed(): iterable
-    {
-        yield 'points as a string' => [['part' => 'maintenance', 'flag' => 'old-promise', 'role' => 'lead', 'points' => '16'], "not a number: '16'"];
-        yield 'a flag as a number' => [['part' => 'maintenance', 'flag' => 16, 'role' => 'lead', 'points' => 16], 'not a string: 16'];
+        self::assertSame([['reason' => 'unreached', 'applies_to' => 'maintenance', 'divide_by' => 2, 'before' => 0, 'after' => 0]], ScoreSweep::graded($basis->toArray())['modifiers']);
+        self::assertSame('16 = vulnerable 16 [high advisory]', ScoreText::render($basis));
     }
 
     public function testAShareWithNoGlyphIsRefused(): void
     {
-        $score = ScoreSweep::graded(ScoreSweep::basis(['axis' => 'base', 'flags' => ['old-promise', 'stale'], 'advisories' => [], 'reach' => 'direct', 'dev' => false, 'under' => null, 'accepted' => null])->toArray());
-        $score['terms'][1]['divisor'] = 2;
-
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('text grammar 1 has no glyph for a share of 1/2');
-        ScoreText::render($score);
+        ScoreText::corroborating(new MaintenanceTerm('stale', 'corroborating', 8, 2, 4, 8));
+    }
+
+    public function testAQuarterShareNamesItsGlyphAndWeight(): void
+    {
+        self::assertSame('stale 2 [¼ of 8]', ScoreText::corroborating(new MaintenanceTerm('stale', 'corroborating', 8, 4, 2, 4)));
     }
 }
