@@ -2,6 +2,8 @@
 
 Each entry is a mutant that escapes the mutation gate (`infection.json5`), with the reason that no
 test that Infection runs can tell it from the original code. "Hard to test" is not "equivalent".
+An entry still counts against its shard's MSI in the full run, so restructure new code before you
+add an entry for it.
 Write an entry as
 
     - `src/Path/File.php` Mutator `the mutated line, as in the source` — reason

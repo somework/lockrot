@@ -138,6 +138,14 @@ class TheVerdict(Gate):
         self.assertEqual(0, code)
         self.assertIn('No mutant escaped', summary)
 
+    def test_the_summary_counts_the_documented_escapes_against_the_full_run(self):
+        escapes = log((7, 'Plus', 'return (int) $parts[0] + 0;'), (7, 'CastInt', 'return (int) $parts[0] + 0;'))
+        ledger = '- `src/Signal/Openness.php` Plus `return (int) $parts[0] + 0;` -- why.\n'
+        _, partly = self.run_gate([escapes], ledger)
+        _, none = self.run_gate([escapes], '')
+        self.assertIn('1 escaped mutant(s) have an entry.', partly)
+        self.assertNotIn('have an entry.', none)
+
     def test_a_missing_log_is_an_error_not_a_pass(self):
         code, _ = pr_gate.main([os.path.join(self.root, 'absent.log'), os.path.join(self.root, 'absent.md')], self.root)
         self.assertEqual(2, code)
