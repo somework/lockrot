@@ -29,7 +29,7 @@ final class ScoreTextTest extends TestCase
         $basis = ScoreSweep::basis($inputs);
 
         self::assertSame($line, ScoreText::render($basis));
-        self::assertSame($line, $basis->toArray()['text']);
+        self::assertSame($line, ScoreSweep::decoded($basis)['text']);
     }
 
     /** @return iterable<string, array{list<string>, list<array{string, string}>, string, bool, ?string, string}> */
@@ -80,7 +80,7 @@ final class ScoreTextTest extends TestCase
     {
         $basis = ScoreSweep::basis(['axis' => 'base', 'flags' => [], 'advisories' => [['high', 'update']], 'reach' => 'unreached', 'dev' => false, 'under' => null, 'accepted' => null]);
 
-        self::assertSame([['reason' => 'unreached', 'applies_to' => 'maintenance', 'divide_by' => 2, 'before' => 0, 'after' => 0]], ScoreSweep::graded($basis->toArray())['modifiers']);
+        self::assertSame([['reason' => 'unreached', 'applies_to' => 'maintenance', 'divide_by' => 2, 'before' => 0, 'after' => 0]], ScoreSweep::graded(ScoreSweep::decoded($basis))['modifiers']);
         self::assertSame('16 = vulnerable 16 [high advisory]', ScoreText::render($basis));
     }
 

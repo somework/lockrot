@@ -57,8 +57,8 @@ final class ReportDocumentTest extends TestCase
         $document = $this->document($report)->toArray();
 
         self::assertSame(
-            ['$schema' => 'https://lockrot.dev/schema/report-2.json', 'lockrot' => ['version' => Version::STRING, 'schema' => 2]] + $report->toArray(),
-            J::arrayAt($document, ['report']),
+            J::decoded(['$schema' => 'https://lockrot.dev/schema/report-2.json', 'lockrot' => ['version' => Version::STRING, 'schema' => 2]] + $report->toArray()),
+            J::decoded(J::arrayAt($document, ['report'])),
             'a consumer pulling the payload out of the page gets the published document'
         );
     }

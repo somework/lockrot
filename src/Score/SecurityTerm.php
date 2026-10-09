@@ -72,7 +72,7 @@ final class SecurityTerm implements Term
     }
 
     /** @return Shape */
-    public function toArray(): array
+    public function jsonSerialize(): array
     {
         return [
             'part' => 'security',

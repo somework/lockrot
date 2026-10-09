@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Integration;
 
-use Lockrot\Score\ScoreBasis;
 use Lockrot\Tests\Support\ScoreInvariants;
 use Lockrot\Tests\Support\ScoreSweep;
 use PHPUnit\Framework\Attributes\CoversNothing;
@@ -23,8 +22,8 @@ use PHPUnit\Framework\TestCase;
  *
  * @group sweep
  *
- * @phpstan-import-type Graded from ScoreBasis
- * @phpstan-import-type Zero from ScoreBasis
+ * @phpstan-import-type Graded from ScoreSweep
+ * @phpstan-import-type Zero from ScoreSweep
  */
 #[CoversNothing]
 #[Group('sweep')]
@@ -71,7 +70,7 @@ final class ScoreBasisTest extends TestCase
             if ($inputs['axis'] !== $axis) {
                 continue;
             }
-            $score = ScoreSweep::basis($inputs)->toArray();
+            $score = ScoreSweep::decoded(ScoreSweep::basis($inputs));
             $bad = ScoreInvariants::violations($inputs, $score);
             if ($bad !== []) {
                 self::fail(ScoreSweep::format($inputs, $score).': '.implode('; ', $bad));

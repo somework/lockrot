@@ -673,7 +673,7 @@ final class Finding
             'priority' => $this->gradeOrNone(),
             'lead' => $this->lead(),
             'flags' => $flagsOut,
-            'score' => $basis->toArray(),
+            'score' => $basis,
             'next_step' => null,
             'security' => $details->security($rows, $branch),
             'checks_missing' => $checksMissing,

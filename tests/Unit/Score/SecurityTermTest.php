@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Score;
 
 use Lockrot\Score\SecurityTerm;
+use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\ScoreSweep;
 use PHPUnit\Framework\TestCase;
 
@@ -17,7 +18,7 @@ final class SecurityTermTest extends TestCase
 
         self::assertCount(2, $terms);
         self::assertInstanceOf(SecurityTerm::class, $terms[1]);
-        self::assertSame(['part' => 'security', 'flag' => 'vulnerable', 'role' => 'security', 'advisory' => 'A0', 'severity' => 'critical', 'fix_kind' => 'none', 'weight' => 32, 'multiplier' => 2, 'points' => 64, 'contribution' => 64], $terms[1]->toArray());
+        self::assertSame(['part' => 'security', 'flag' => 'vulnerable', 'role' => 'security', 'advisory' => 'A0', 'severity' => 'critical', 'fix_kind' => 'none', 'weight' => 32, 'multiplier' => 2, 'points' => 64, 'contribution' => 64], JsonPath::decoded($terms[1]));
     }
 
     /** The worked row "twig as packages-dev": dev halves the contribution, not the points. */
@@ -26,7 +27,7 @@ final class SecurityTermTest extends TestCase
         $term = ScoreSweep::basis(['axis' => 'base', 'flags' => [], 'advisories' => [['critical', 'raise-php']], 'reach' => 'direct', 'dev' => true, 'under' => null, 'accepted' => null])->terms()[0];
 
         self::assertInstanceOf(SecurityTerm::class, $term);
-        self::assertSame(['part' => 'security', 'flag' => 'vulnerable', 'role' => 'security', 'advisory' => 'A0', 'severity' => 'critical', 'fix_kind' => 'raise-php', 'weight' => 32, 'multiplier' => 1, 'points' => 32, 'contribution' => 16], $term->toArray());
+        self::assertSame(['part' => 'security', 'flag' => 'vulnerable', 'role' => 'security', 'advisory' => 'A0', 'severity' => 'critical', 'fix_kind' => 'raise-php', 'weight' => 32, 'multiplier' => 1, 'points' => 32, 'contribution' => 16], JsonPath::decoded($term));
         self::assertSame('critical', $term->severity());
         self::assertSame(1, $term->multiplier());
         self::assertSame(32, $term->weight());

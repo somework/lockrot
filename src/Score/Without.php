@@ -11,7 +11,7 @@ namespace Lockrot\Score;
  *
  * @phpstan-type Shape array{remove: array{kind: string, id: string}, revealed: list<array{flag: string, role: string}>, total: int, verdict: string, lead: ?string, deciding_advisory: ?string, at_least: bool}
  */
-final class Without
+final class Without implements \JsonSerializable
 {
     private string $kind;
     private string $id;
@@ -40,7 +40,7 @@ final class Without
     }
 
     /** @return Shape */
-    public function toArray(): array
+    public function jsonSerialize(): array
     {
         return [
             'remove' => ['kind' => $this->kind, 'id' => $this->id],

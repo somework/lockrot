@@ -12,12 +12,12 @@ namespace Lockrot\Score;
  * @phpstan-import-type Shape from MaintenanceTerm as MaintenanceShape
  * @phpstan-import-type Shape from SecurityTerm as SecurityShape
  */
-interface Term
+interface Term extends \JsonSerializable
 {
     public function flag(): string;
 
     public function role(): string;
 
     /** @return MaintenanceShape|SecurityShape */
-    public function toArray(): array;
+    public function jsonSerialize(): array;
 }

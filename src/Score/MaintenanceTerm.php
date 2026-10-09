@@ -64,7 +64,7 @@ final class MaintenanceTerm implements Term
     }
 
     /** @return Shape */
-    public function toArray(): array
+    public function jsonSerialize(): array
     {
         return [
             'part' => 'maintenance',

@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Support;
 
-use Lockrot\Score\Accepted;
-use Lockrot\Score\ScoreBasis;
-use Lockrot\Score\SecurityTerm;
 use Lockrot\Verdict\ScoreModel;
 
 /**
@@ -15,10 +12,10 @@ use Lockrot\Verdict\ScoreModel;
  * own copy of the cover, because it reads only the decoded model.
  *
  * @phpstan-import-type Inputs from ScoreSweep
- * @phpstan-import-type Graded from ScoreBasis
- * @phpstan-import-type Zero from ScoreBasis
- * @phpstan-import-type Shape from SecurityTerm as SecurityTermShape
- * @phpstan-import-type Shape from Accepted as AcceptedShape
+ * @phpstan-import-type Graded from ScoreSweep
+ * @phpstan-import-type Zero from ScoreSweep
+ * @phpstan-import-type SecurityTerm from ScoreSweep
+ * @phpstan-import-type Accepted from ScoreSweep
  */
 final class ScoreInvariants
 {
@@ -122,7 +119,7 @@ final class ScoreInvariants
 
     /**
      * @param Inputs       $inputs
-     * @param SecurityTermShape $term
+     * @param SecurityTerm $term
      * @param list<string> $tied
      *
      * @return list<string>

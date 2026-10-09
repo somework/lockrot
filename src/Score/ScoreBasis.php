@@ -18,18 +18,10 @@ use Lockrot\Verdict\ScoreModel;
  *
  * @phpstan-type Context array{maintenance_judged: bool, advisories_complete: bool, liveness_complete: bool, s3_unread: bool, s8_unread: bool}
  *
- * @phpstan-import-type Shape from MaintenanceTerm as MaintenanceShape
- * @phpstan-import-type Shape from SecurityTerm as SecurityShape
- * @phpstan-import-type Shape from Modifier as ModifierShape
- * @phpstan-import-type Shape from Accepted as AcceptedShape
- * @phpstan-import-type Shape from Without as WithoutShape
- * @phpstan-import-type Shape from Part as PartShape
- * @phpstan-import-type Shape from SecurityPart as SecurityPartShape
- *
- * @phpstan-type Graded array{model: int, total: int, exact: int|float, rounded_down: bool, band: array{floor: int, next: ?string, to_next: ?int}, decided_by: string, parts: array{maintenance: PartShape, security: SecurityPartShape}, terms: list<MaintenanceShape|SecurityShape>, modifiers: list<ModifierShape>, accepted: list<AcceptedShape>, without: list<WithoutShape>, text: string}
- * @phpstan-type Zero array{model: int, total: int, exact: int, accepted: list<AcceptedShape>, text: string}
+ * @phpstan-type Graded array{model: int, total: int, exact: int|float, rounded_down: bool, band: array{floor: int, next: ?string, to_next: ?int}, decided_by: string, parts: array{maintenance: Part, security: Part}, terms: list<Term>, modifiers: list<Modifier>, accepted: list<Accepted>, without: list<Without>, text: string}
+ * @phpstan-type Zero array{model: int, total: int, exact: int, accepted: list<Accepted>, text: string}
  */
-final class ScoreBasis
+final class ScoreBasis implements \JsonSerializable
 {
     private FlagSet $flags;
     private Score $score;
@@ -45,7 +37,7 @@ final class ScoreBasis
     /** @var list<Without> */
     private array $without = [];
     private Part $maintenancePart;
-    private SecurityPart $securityPart;
+    private Part $securityPart;
 
     /** @param Context $context */
     private function __construct(FlagSet $flags, Score $score, array $context)
@@ -54,8 +46,8 @@ final class ScoreBasis
         $this->score = $score;
         $this->context = $context;
         $this->accepted = $this->acceptedRows();
-        $this->maintenancePart = new Part($this->maintenanceStatus(), $score->maintenanceHalves());
-        $this->securityPart = new SecurityPart(new Part($this->securityStatus(), $score->securityHalves()), $score->advisoryCount(), $score->tied());
+        $this->maintenancePart = Part::maintenance($this->maintenanceStatus(), $score->maintenanceHalves());
+        $this->securityPart = Part::security($this->securityStatus(), $score->securityHalves(), $score->advisoryCount(), $score->tied());
         if ($score->grade() !== null) {
             $this->maintenanceTerms = $this->maintenanceTermsOf();
             $this->securityTerm = $this->securityTermOf();
@@ -163,7 +155,7 @@ final class ScoreBasis
         return $this->maintenancePart;
     }
 
-    public function securityPart(): SecurityPart
+    public function securityPart(): Part
     {
         return $this->securityPart;
     }
@@ -173,13 +165,12 @@ final class ScoreBasis
      *
      * @return Graded|Zero
      */
-    public function toArray(): array
+    public function jsonSerialize(): array
     {
         $score = $this->score;
         $grade = $score->grade();
-        $accepted = array_map(static fn (Accepted $row): array => $row->toArray(), $this->accepted);
         if ($grade === null) {
-            return ['model' => ScoreModel::ID, 'total' => 0, 'exact' => 0, 'accepted' => $accepted, 'text' => ScoreText::render($this)];
+            return ['model' => ScoreModel::ID, 'total' => 0, 'exact' => 0, 'accepted' => $this->accepted, 'text' => ScoreText::render($this)];
         }
         $total = $score->total();
         $next = ScoreModel::nextBand($grade);
@@ -191,11 +182,11 @@ final class ScoreBasis
             'rounded_down' => $this->roundedDown(),
             'band' => ['floor' => ScoreModel::floorOf($grade), 'next' => $next, 'to_next' => $next === null ? null : ScoreModel::floorOf($next) - $total],
             'decided_by' => self::decidedBy($grade, $score->maintenanceHalves(), $score->securityHalves()),
-            'parts' => ['maintenance' => $this->maintenancePart->toArray(), 'security' => $this->securityPart->toArray()],
-            'terms' => array_map(static fn (Term $term): array => $term->toArray(), $this->terms()),
-            'modifiers' => array_map(static fn (Modifier $modifier): array => $modifier->toArray(), $this->modifiers),
-            'accepted' => $accepted,
-            'without' => array_map(static fn (Without $row): array => $row->toArray(), $this->without),
+            'parts' => ['maintenance' => $this->maintenancePart, 'security' => $this->securityPart],
+            'terms' => $this->terms(),
+            'modifiers' => $this->modifiers,
+            'accepted' => $this->accepted,
+            'without' => $this->without,
             'text' => ScoreText::render($this),
         ];
     }

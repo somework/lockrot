@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Score;
 
 use Lockrot\Score\MaintenanceTerm;
+use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\ScoreSweep;
 use PHPUnit\Framework\TestCase;
 
@@ -17,8 +18,8 @@ final class MaintenanceTermTest extends TestCase
 
         self::assertCount(2, $terms);
         self::assertInstanceOf(MaintenanceTerm::class, $terms[0]);
-        self::assertSame(['part' => 'maintenance', 'flag' => 'left-behind', 'role' => 'lead', 'weight' => 16, 'divisor' => 1, 'points' => 16, 'contribution' => 4], $terms[0]->toArray());
-        self::assertSame(['part' => 'maintenance', 'flag' => 'stale', 'role' => 'corroborating', 'weight' => 8, 'divisor' => 4, 'points' => 2, 'contribution' => 0.5], $terms[1]->toArray());
+        self::assertSame(['part' => 'maintenance', 'flag' => 'left-behind', 'role' => 'lead', 'weight' => 16, 'divisor' => 1, 'points' => 16, 'contribution' => 4], JsonPath::decoded($terms[0]));
+        self::assertSame(['part' => 'maintenance', 'flag' => 'stale', 'role' => 'corroborating', 'weight' => 8, 'divisor' => 4, 'points' => 2, 'contribution' => 0.5], JsonPath::decoded($terms[1]));
     }
 
     public function testTheGettersGiveTheEngineNumbers(): void

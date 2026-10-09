@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Score;
 
 use Lockrot\Score\Modifier;
+use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\ScoreSweep;
 use PHPUnit\Framework\TestCase;
 
@@ -16,8 +17,8 @@ final class ModifierTest extends TestCase
         $modifiers = ScoreSweep::basis(['axis' => 'base', 'flags' => ['left-behind', 'stale'], 'advisories' => [], 'reach' => 'transitive', 'dev' => true, 'under' => null, 'accepted' => null])->modifiers();
 
         self::assertCount(2, $modifiers);
-        self::assertSame(['reason' => 'transitive', 'applies_to' => 'maintenance', 'divide_by' => 2, 'before' => 18, 'after' => 9], $modifiers[0]->toArray());
-        self::assertSame(['reason' => 'dev', 'applies_to' => 'total', 'divide_by' => 2, 'before' => 9, 'after' => 4.5], $modifiers[1]->toArray());
+        self::assertSame(['reason' => 'transitive', 'applies_to' => 'maintenance', 'divide_by' => 2, 'before' => 18, 'after' => 9], JsonPath::decoded($modifiers[0]));
+        self::assertSame(['reason' => 'dev', 'applies_to' => 'total', 'divide_by' => 2, 'before' => 9, 'after' => 4.5], JsonPath::decoded($modifiers[1]));
         self::assertTrue($modifiers[0]->isReach());
         self::assertFalse($modifiers[0]->isDev());
         self::assertTrue($modifiers[1]->isDev());
@@ -28,7 +29,7 @@ final class ModifierTest extends TestCase
     {
         self::assertFalse(Modifier::reach('unreached', 0, 0)->changes());
         self::assertTrue(Modifier::reach('transitive', 2, 1)->changes());
-        self::assertSame(['reason' => 'dev', 'applies_to' => 'total', 'divide_by' => 2, 'before' => 0, 'after' => 0], Modifier::dev(0, 0)->toArray());
+        self::assertSame(['reason' => 'dev', 'applies_to' => 'total', 'divide_by' => 2, 'before' => 0, 'after' => 0], JsonPath::decoded(Modifier::dev(0, 0)));
         self::assertSame('unreached', Modifier::reach('unreached', 0, 0)->reason());
         self::assertSame(2, Modifier::dev(4, 2)->divideBy());
     }

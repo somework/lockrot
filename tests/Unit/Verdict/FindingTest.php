@@ -267,8 +267,8 @@ final class FindingTest extends TestCase
 
         $basis = $finding->scoreBasis();
 
-        self::assertSame($finding->toArray()['score'], $basis->toArray());
-        self::assertTrue($basis->accepted()[0]->toArray()['if_counted']['at_least'], 'S10 blocks S4, so counting stale gives at least this total');
+        self::assertSame(JsonPath::decoded($basis), JsonPath::decoded($finding->toArray())['score']);
+        self::assertTrue(JsonPath::boolAt(JsonPath::decoded($basis), ['accepted', 0, 'if_counted', 'at_least']), 'S10 blocks S4, so counting stale gives at least this total');
     }
 
     /** The security standing reads the S9 rows: an advisory row makes the package vulnerable. */
@@ -1001,7 +1001,7 @@ final class FindingTest extends TestCase
         $entry = new AllowlistEntry('vendor/pkg', null, 'kept', null, AllowlistEntry::BY_PROJECT, [FlagSet::STALE]);
         $finding = (new FindingBuilder())->withVersion($version)->withSignals($signals)->withFlags(FlagSet::fromSignals($signals, $entry, []), $judged)->build();
 
-        $document = $finding->toArray();
+        $document = JsonPath::decoded($finding->toArray());
 
         self::assertSame($unchecked, $document['checks_missing']);
         self::assertSame(['liveness_complete' => $livenessComplete], JsonPath::arrayAt($document, ['flags', 0, 'degree']));
@@ -1049,7 +1049,7 @@ final class FindingTest extends TestCase
     {
         $signals = [new Signal(Signal::S1, Signal::LEVEL_HIGH, 'marked', ['marked_by' => 'lock']), new Signal(Signal::S6, Signal::LEVEL_WARN, 'pinned', ['reason' => 'branch_snapshot', 'version' => $version])];
         $finding = (new FindingBuilder())->withVersion($version)->withSignals($signals)->withFlags(FlagSet::fromSignals($signals, null, []), $judged)->build();
-        $without = JsonPath::arrayAt($finding->toArray(), ['score', 'without']);
+        $without = JsonPath::arrayAt(JsonPath::decoded($finding->toArray()), ['score', 'without']);
 
         self::assertSame(FlagSet::PINNED, JsonPath::stringAt($without, [1, 'remove', 'id']));
         self::assertSame($atLeast, JsonPath::boolAt($without, [1, 'at_least']));

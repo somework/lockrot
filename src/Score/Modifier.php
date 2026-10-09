@@ -13,7 +13,7 @@ use Lockrot\Verdict\ScoreModel;
  *
  * @phpstan-type Shape array{reason: string, applies_to: string, divide_by: int, before: int|float, after: int|float}
  */
-final class Modifier
+final class Modifier implements \JsonSerializable
 {
     private const MAINTENANCE = 'maintenance';
     private const TOTAL = 'total';
@@ -72,7 +72,7 @@ final class Modifier
     }
 
     /** @return Shape */
-    public function toArray(): array
+    public function jsonSerialize(): array
     {
         return [
             'reason' => $this->reason,

@@ -9,11 +9,9 @@ namespace Lockrot\Score;
  *
  * @internal
  *
- * @phpstan-import-type Shape from Modifier as ModifierShape
- *
- * @phpstan-type Shape array{flag: string, weight: int, if_counted: array{total: int, verdict: string, role: ?string, at_least: bool, modifiers: list<ModifierShape>}}
+ * @phpstan-type Shape array{flag: string, weight: int, if_counted: array{total: int, verdict: string, role: ?string, at_least: bool, modifiers: list<Modifier>}}
  */
-final class Accepted
+final class Accepted implements \JsonSerializable
 {
     private string $flag;
     private int $weight;
@@ -52,14 +50,14 @@ final class Accepted
     }
 
     /** @return Shape */
-    public function toArray(): array
+    public function jsonSerialize(): array
     {
         return ['flag' => $this->flag, 'weight' => $this->weight, 'if_counted' => [
             'total' => $this->total,
             'verdict' => $this->verdict,
             'role' => $this->role,
             'at_least' => $this->atLeast,
-            'modifiers' => array_map(static fn (Modifier $modifier): array => $modifier->toArray(), $this->modifiers),
+            'modifiers' => $this->modifiers,
         ]];
     }
 }
