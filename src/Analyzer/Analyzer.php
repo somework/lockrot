@@ -9,6 +9,7 @@ use Lockrot\Allowlist\AllowlistEntry;
 use Lockrot\Clock;
 use Lockrot\Data\Abandoned\AbandonedIgnore;
 use Lockrot\Data\Abandoned\AbandonedIgnoreMatch;
+use Lockrot\Data\Advisory\Advisory;
 use Lockrot\Data\Advisory\AdvisoryBatch;
 use Lockrot\Data\Advisory\AdvisoryLoaderInterface;
 use Lockrot\Data\Advisory\IgnoredAdvisory;
@@ -31,6 +32,7 @@ use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Security\FixFinder;
 use Lockrot\Security\LinkIndex;
+use Lockrot\Security\PackageFixes;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\Rule\AbandonedRule;
 use Lockrot\Signal\Rule\AdvisoryRule;
@@ -395,8 +397,11 @@ final class Analyzer
     /** @param list<IgnoredAdvisory> $ignored */
     private function buildFinding(PackageFacts $facts, ?AllowlistEntry $entry, DependencyGraph $graph, MetadataBatch $batch, ?FixFinder $fixes, array $ignored): Finding
     {
+        $counted = [];
         if ($fixes !== null && $facts->advisories() !== []) {
-            $facts = $facts->withFixes($fixes->find($facts));
+            $found = $fixes->find($facts);
+            $facts = $facts->withFixes($found);
+            $counted = self::countedAdvisories($facts->advisories(), $found);
         }
         $package = $facts->package();
         $meta = $facts->metadata();
@@ -437,23 +442,21 @@ final class Analyzer
         );
 
         return $finding
-            ->withFlags(FlagSet::fromSignals($signals, $entry, self::countedAdvisories($facts)), $facts->metadataStatus() === PackageFacts::METADATA_READ)
+            ->withFlags(FlagSet::fromSignals($signals, $entry, $counted), $facts->metadataStatus() === PackageFacts::METADATA_READ)
             ->withDetails(FindingDetails::of($facts, $entry, $this->signals->phpFloor(), $ignored, $signals, $batch->failed()[$package->name()] ?? null));
     }
 
     /**
      * The advisories that affect the installed version, as the score reads them.
      *
+     * @param list<Advisory> $advisories
+     *
      * @return list<array{id: string, severity: string, fix_kind: string}>
      */
-    private static function countedAdvisories(PackageFacts $facts): array
+    private static function countedAdvisories(array $advisories, PackageFixes $found): array
     {
-        $found = $facts->fixes();
-        if ($found === null) {
-            return [];
-        }
         $counted = [];
-        foreach ($facts->advisories() as $advisory) {
+        foreach ($advisories as $advisory) {
             $counted[] = Score::advisory($advisory->id(), $advisory->severity() ?? '', $found->forAdvisory($advisory->id())->kind());
         }
 
