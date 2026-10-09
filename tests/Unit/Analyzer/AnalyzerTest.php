@@ -32,6 +32,7 @@ use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Deadline;
 use Lockrot\Legacy\Priority013;
 use Lockrot\Lock\LockFile;
+use Lockrot\Lock\PackageOrigin;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Output\FormatContext;
 use Lockrot\Output\TableFormatter;
@@ -196,6 +197,18 @@ final class AnalyzerTest extends TestCase
         self::assertNotNull($absent);
         self::assertSame(PackageFacts::METADATA_UNAVAILABLE, $failed->metadataStatus());
         self::assertSame(PackageFacts::METADATA_NOT_FOUND, $absent->metadataStatus());
+    }
+
+    public function testAFindingTakesItsOriginFromTheRepositoriesOfTheProject(): void
+    {
+        $lock = LockFile::fromArray(['packages' => [
+            ['name' => 'acme/private', 'version' => '1.0.0', 'source' => ['type' => 'git', 'url' => 'https://github.com/acme/private.git', 'reference' => 'a1b2c3d']],
+        ]]);
+        $project = ProjectConfig::fromArray(['repositories' => [['type' => 'vcs', 'url' => 'https://github.com/acme/private.git']]]);
+
+        $report = $this->analyzer($this->loader(), $this->http([]), true, new Allowlist([]))->analyze($lock, $project, false);
+
+        self::assertSame(PackageOrigin::VCS, $report->findings()[0]->origin()->kind());
     }
 
     public function testAdvisoriesReachTheFindingAsS9AndRaiseAnAbandonedPackage(): void
