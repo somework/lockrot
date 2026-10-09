@@ -104,7 +104,8 @@ final class Report2Root
     }
 
     /**
-     * report-1's block with `packages`, its sums over the written two-decimal values.
+     * report-1's block with `packages`, its sums over the written two-decimal values. The sums add
+     * whole hundredths, so the float error of a long sum stays out of the written number.
      *
      * @param list<Finding> $findings
      *
@@ -119,16 +120,17 @@ final class Report2Root
             if ($years === null) {
                 continue;
             }
-            $total = ($total ?? 0) + $years;
+            $hundredths = round($years * 100);
+            $total = ($total ?? 0) + $hundredths;
             if ($finding->isDirect()) {
-                $direct = ($direct ?? 0) + $years;
+                $direct = ($direct ?? 0) + $hundredths;
             }
         }
         if ($total !== null) {
             $direct ??= 0;
         }
 
-        return array_merge($libyears->toArray(), ['total' => $total === null ? null : round($total, 2), 'direct_requirements' => $direct === null ? null : round($direct, 2), 'packages' => \count($findings)]);
+        return array_merge($libyears->toArray(), ['total' => $total === null ? null : $total / 100.0, 'direct_requirements' => $direct === null ? null : $direct / 100.0, 'packages' => \count($findings)]);
     }
 
     /**
@@ -173,7 +175,7 @@ final class Report2Root
         foreach ($findings as $finding) {
             $standing = $finding->securityStanding();
             $checks[$standing->check()] = $standing->check();
-            $packages[$standing->status()] = ($packages[$standing->status()] ?? 0) + 1;
+            ++$packages[$standing->status()];
             $packages['ignored'] += $standing->ignoredCount() > 0 ? 1 : 0;
             $advisories['ignored'] += $standing->ignoredCount();
             $kind = $standing->fixKind();

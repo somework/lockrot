@@ -198,6 +198,7 @@ final class FindingDetailsTest extends TestCase
         self::assertSame(1, $standing->ignoredCount());
         self::assertSame(['critical' => 0, 'high' => 0, 'medium' => 0, 'unrated' => 0, 'low' => 2, 'acme:severe' => 1], $standing->counts());
         self::assertSame('raise-php', $standing->fixKind());
+        self::assertSame(1, $details->security($rows, null)['ignored_count'], 'a vulnerable package counts its ignored advisories too');
     }
 
     /** With no counted row, the lookup decides the status, and nothing is counted or fixed. */

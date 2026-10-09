@@ -160,6 +160,8 @@ final class Report2RootTest extends TestCase
         self::assertSame(array_merge(array_keys(Libyears::fromFindings($findings)->toArray()), ['packages']), array_keys($block), 'the sums replace the block\'s own keys in place');
         self::assertSame(['total' => 2.23, 'direct_requirements' => 0.0, 'packages' => 1], $only($finding(false, 2.227)));
         self::assertSame(['total' => null, 'direct_requirements' => null, 'packages' => 1], $only($finding(true, null)));
+        $pair = [$finding(true, 1.114), $finding(true, 1.114), $finding(false, 1.114), $finding(false, 0.286)];
+        self::assertSame(['total' => 3.62, 'direct_requirements' => 2.22, 'packages' => 4], array_intersect_key(Report2Root::libyears(Libyears::fromFindings($pair), $pair), ['total' => 0, 'direct_requirements' => 0, 'packages' => 0]), 'the sums add the written values, not the measured 3.628');
     }
 
     /** report-2 writes the date to the second: of two dates in one second, the first stays. */

@@ -36,12 +36,6 @@ final class ScoreRulesUsed
                 ++$used['zero-verdicts'];
                 continue;
             }
-            $lead = 0;
-            $corroborating = 0;
-            foreach ($score->maintenanceTerms() as $term) {
-                $lead += $term->isLead() ? 1 : 0;
-                $corroborating += $term->isLead() ? 0 : 1;
-            }
             $security = $score->securityTerm();
             $reach = false;
             $dev = false;
@@ -50,8 +44,10 @@ final class ScoreRulesUsed
                 $dev = $dev || $modifier->isDev();
             }
             ++$used['band-floors'];
-            $used['lead-first'] += $lead > 0 ? 1 : 0;
-            $used['corroborating-share'] += $corroborating > 0 ? 1 : 0;
+            // The first maintenance term is the lead, and each other one corroborates it.
+            $maintenance = \count($score->maintenanceTerms());
+            $used['lead-first'] += $maintenance > 0 ? 1 : 0;
+            $used['corroborating-share'] += $maintenance > 1 ? 1 : 0;
             $used['advisory-points'] += $security === null ? 0 : 1;
             $used['no-reachable-fix-multiplier'] += $security !== null && $security->multiplier() === ScoreModel::NO_REACHABLE_FIX_FACTOR ? 1 : 0;
             $used['security-max'] += $score->securityPart()->of() >= 2 ? 1 : 0;
