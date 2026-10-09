@@ -632,7 +632,7 @@ final class Finding
         $evidence = [];
         foreach ($flagsOut as $flag) {
             if (\in_array($flag['id'], $counted, true)) {
-                $evidence[] = (string) self::scalarOrNull($flag['id']).': '.(string) self::scalarOrNull($flag['summary']);
+                $evidence[] = \sprintf('%s: %s', self::scalarOrNull($flag['id']), self::scalarOrNull($flag['summary']));
             }
         }
         $entry = $details->entry();
