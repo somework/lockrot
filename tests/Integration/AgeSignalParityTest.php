@@ -32,6 +32,8 @@ use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\Golden;
 use Lockrot\Tests\Unit\Signal\FactsBuilder;
 use Lockrot\Verdict\VerdictEngine;
+use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -39,7 +41,16 @@ use PHPUnit\Framework\TestCase;
  * version, years, `dated_by` and level from {@see AgeMeasure}, so S2 fires exactly when the release
  * reading has a level, S4 exactly when the push reading has one, and S8 only when the branch
  * reading has one.
+ *
+ * It covers nothing: its sweep over every fixture app pushes the lines it covers past the timeout
+ * of a mutation run. The unit tests of each age rule kill those mutants.
+ *
+ * @coversNothing
+ *
+ * @group covers-nothing
  */
+#[CoversNothing]
+#[Group('covers-nothing')]
 final class AgeSignalParityTest extends TestCase
 {
     private const FIXTURES = __DIR__.'/../fixtures/';

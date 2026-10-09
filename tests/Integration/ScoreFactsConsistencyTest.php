@@ -35,6 +35,8 @@ use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\ScoreModel;
 use Lockrot\Verdict\Verdict;
 use Lockrot\Verdict\VerdictEngine;
+use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -43,7 +45,16 @@ use PHPUnit\Framework\TestCase;
  * its role's divisor, the security term is the deciding S9 row, and the halvings follow the reach
  * and `dev`. The runs seed advisories so that every severity and every fix kind occurs, and each
  * halving and each advisory multiplier occurs at least once.
+ *
+ * It covers nothing: its five analyses push the lines they cover past the timeout of a mutation
+ * run. ScoreModelTest, FindingTest and the writer tests kill those mutants.
+ *
+ * @coversNothing
+ *
+ * @group covers-nothing
  */
+#[CoversNothing]
+#[Group('covers-nothing')]
 final class ScoreFactsConsistencyTest extends TestCase
 {
     private const FIXTURES = __DIR__.'/../fixtures/';

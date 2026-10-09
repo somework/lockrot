@@ -9,6 +9,8 @@ use Lockrot\Json\Schemas;
 use Lockrot\Output\JsonFormatter;
 use Lockrot\Tests\Support\CaseHydrator;
 use Lockrot\Tests\Support\JsonPath;
+use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /** A committed case, run through the real analyzer, gives the score its document records. */
@@ -56,7 +58,16 @@ final class CaseHydratorTest extends TestCase
         self::assertContains(JsonPath::stringAt($case, ['finding', 'package']), $packages);
     }
 
-    /** Every case's recorded `finding`, with or without inputs, is a report-2 finding. */
+    /**
+     * Every case's recorded `finding`, with or without inputs, is a report-2 finding. It covers
+     * nothing: its validations outlast the timeout of a mutation run, and they read no product code.
+     *
+     * @coversNothing
+     *
+     * @group covers-nothing
+     */
+    #[CoversNothing]
+    #[Group('covers-nothing')]
     public function testEveryCaseFindingValidatesAgainstReport2(): void
     {
         $schema = JsonPath::decodeFile(Schemas::path(Schemas::REPORT, JsonFormatter::SCHEMA));

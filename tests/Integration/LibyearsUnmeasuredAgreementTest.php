@@ -33,6 +33,8 @@ use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\MemoisingMetadataLoader;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\VerdictEngine;
+use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 
@@ -42,7 +44,16 @@ use PHPUnit\Framework\TestCase;
  * findings' codes counted, which is wiring: both read one stored value), the facts the analysis was
  * decided on, read here without {@see Libyears::measure()}, the `rule012()` filing of each finding
  * off its note and version, and the `--explain` document's copy of the finding.
+ *
+ * It covers nothing: its sweep over every fixture app pushes the lines it covers past the timeout
+ * of a mutation run. LibyearsTest and the report tests kill those mutants.
+ *
+ * @coversNothing
+ *
+ * @group covers-nothing
  */
+#[CoversNothing]
+#[Group('covers-nothing')]
 final class LibyearsUnmeasuredAgreementTest extends TestCase
 {
     private const FIXTURES = __DIR__.'/../fixtures/';

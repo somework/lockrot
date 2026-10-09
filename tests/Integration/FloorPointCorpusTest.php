@@ -23,6 +23,8 @@ use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Verdict\VerdictEngine;
+use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -30,7 +32,16 @@ use PHPUnit\Framework\TestCase;
  * `admits_project_php` or `misses_project_php` moves from the recorded snapshot
  * tests/fixtures/corpus/floor-point-before.json. The pull request that adds this test gives the
  * command that recorded it: https://github.com/somework/lockrot/pull/72.
+ *
+ * It covers nothing: its sweep over every fixture app pushes the lines it covers past the timeout
+ * of a mutation run. PhpFloorTest and BranchRowTest kill those mutants.
+ *
+ * @coversNothing
+ *
+ * @group covers-nothing
  */
+#[CoversNothing]
+#[Group('covers-nothing')]
 final class FloorPointCorpusTest extends TestCase
 {
     private const FIXTURES = __DIR__.'/../fixtures/';
