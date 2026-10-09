@@ -103,24 +103,54 @@ final class RunSettings
      */
     public function toArray(?array $scoreRulesUsed = null, ?bool $includeDev = null): array
     {
-        $thresholds = $this->thresholds ?? new Thresholds();
-        $failOn = $this->failOn === null ? FailOn::fromString('none') : $this->failOn;
-        $model = ScoreModel::toArray();
+        return ['project' => $this->project, 'root_package' => $this->rootPackage]
+            + $this->php()
+            + ['lock_file' => $this->lockFile]
+            + $this->failOnKeys()
+            + ['strict_network' => $this->strictNetwork, 'mode' => $this->mode, 'include_dev' => $includeDev ?? $this->includeDev]
+            + $this->model()
+            + ['score_rules_used' => $scoreRulesUsed ?? ScoreModel::rulesUnused()];
+    }
 
+    /**
+     * explain-2's `run`: the settings that judge one package, in the order of {@see toArray()}.
+     *
+     * @return array<string, mixed>
+     */
+    public function toExplainArray(): array
+    {
+        return $this->php() + $this->failOnKeys() + ['include_dev' => $this->includeDev] + $this->model();
+    }
+
+    /** @return array{target_php: string, target_php_source: string, project_php: ?string, project_php_lowest: ?string} */
+    private function php(): array
+    {
         return [
-            'project' => $this->project,
-            'root_package' => $this->rootPackage,
             'target_php' => PhpReleaseDates::minorOf($this->targetPhp ?? \PHP_VERSION),
             'target_php_source' => $this->targetPhp === null ? self::SOURCE_RUNTIME : $this->targetPhpSource,
             'project_php' => $this->projectPhp,
             'project_php_lowest' => (new PhpFloor(null, $this->projectPhp))->lowestAsString(),
-            'lock_file' => $this->lockFile,
+        ];
+    }
+
+    /** @return array{fail_on: string, fail_on_source: string, gates: list<array{value: string, kind: string, threshold: ?string}>} */
+    private function failOnKeys(): array
+    {
+        $failOn = $this->failOn === null ? FailOn::fromString('none') : $this->failOn;
+
+        return [
             'fail_on' => $failOn->value(),
             'fail_on_source' => $this->failOn === null ? self::SOURCE_DEFAULT : $this->failOnSource,
             'gates' => self::gates($failOn),
-            'strict_network' => $this->strictNetwork,
-            'mode' => $this->mode,
-            'include_dev' => $includeDev ?? $this->includeDev,
+        ];
+    }
+
+    /** @return array<string, mixed> */
+    private function model(): array
+    {
+        $thresholds = $this->thresholds ?? new Thresholds();
+
+        return [
             'thresholds' => [
                 'release-warn-years' => $thresholds->releaseWarnYears(),
                 'release-high-years' => $thresholds->releaseHighYears(),
@@ -133,8 +163,7 @@ final class RunSettings
             'signal_ids' => Signal::IDS,
             'fix_model' => self::FIX_MODEL,
             'text_grammar' => self::TEXT_GRAMMAR,
-            'score_model' => $model,
-            'score_rules_used' => $scoreRulesUsed ?? ScoreModel::rulesUnused(),
+            'score_model' => ScoreModel::toArray(),
         ];
     }
 

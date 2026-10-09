@@ -75,12 +75,11 @@ final class ReportDocument
             if ($facts === null) {
                 continue;
             }
-            $explained = (new Explanation($finding, $facts, $thresholds, $targetPhp, $this->report, $this->page->projectPhp()))->toArray();
-            $metadata = $explained['metadata'] ?? null;
+            $explanation = new Explanation($finding, $facts, $thresholds, $targetPhp, $this->report, $this->page->projectPhp());
             $details[$finding->package()] = [
-                'metadata' => \is_array($metadata) ? $metadata : null,
-                'lock' => $explained['lock'] ?? null,
-                'activity' => $explained['activity'] ?? null,
+                'metadata' => $explanation->metadata(),
+                'lock' => $explanation->lock(),
+                'activity' => $explanation->activity(),
                 'repository_link' => self::linkable(self::repositoryOf($facts)),
             ];
         }
