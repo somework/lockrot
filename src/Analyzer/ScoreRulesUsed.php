@@ -26,7 +26,9 @@ final class ScoreRulesUsed
         foreach ($findings as $finding) {
             $score = self::map($finding['score'] ?? null);
             $accepted = self::list($score['accepted'] ?? null);
-            $used['counted'] += (int) ($accepted !== []);
+            if ($accepted !== []) {
+                ++$used['counted'];
+            }
             $rerunHalves = static function (string $key, string $value) use ($accepted): bool {
                 foreach ($accepted as $row) {
                     foreach (self::list(self::map($row['if_counted'] ?? null)['modifiers'] ?? null) as $modifier) {
@@ -39,8 +41,12 @@ final class ScoreRulesUsed
                 return false;
             };
             if (!isset($score['terms'])) {
-                $used['divide-reach'] += (int) $rerunHalves('applies_to', 'maintenance');
-                $used['divide-dev'] += (int) $rerunHalves('reason', 'dev');
+                if ($rerunHalves('applies_to', 'maintenance')) {
+                    ++$used['divide-reach'];
+                }
+                if ($rerunHalves('reason', 'dev')) {
+                    ++$used['divide-dev'];
+                }
                 ++$used['zero-verdicts'];
                 continue;
             }
@@ -49,16 +55,37 @@ final class ScoreRulesUsed
             $parts = self::map($score['parts'] ?? null);
             $security = self::any($terms, 'part', 'security');
             ++$used['band-floors'];
-            $used['lead-first'] += (int) self::any($terms, 'role', 'lead');
-            $used['corroborating-share'] += (int) self::any($terms, 'role', 'corroborating');
-            $used['advisory-points'] += (int) $security;
-            $used['no-reachable-fix-multiplier'] += (int) self::any($terms, 'multiplier', 2);
-            $used['security-max'] += (int) ((self::map($parts['security'] ?? null)['of'] ?? 0) >= 2);
-            $used['divide-reach'] += (int) (self::halves($modifiers, 'applies_to', 'maintenance') || $rerunHalves('applies_to', 'maintenance'));
-            $used['security-exempt-from-reach'] += (int) ($security && ($finding['reach'] ?? null) !== 'direct');
-            $used['sum'] += (int) ((self::map($parts['maintenance'] ?? null)['status'] ?? null) === 'counted' && (self::map($parts['security'] ?? null)['status'] ?? null) === 'counted');
-            $used['divide-dev'] += (int) (self::any($modifiers, 'reason', 'dev') || $rerunHalves('reason', 'dev'));
-            $used['floor-once'] += (int) (($score['rounded_down'] ?? false) === true);
+            if (self::any($terms, 'role', 'lead')) {
+                ++$used['lead-first'];
+            }
+            if (self::any($terms, 'role', 'corroborating')) {
+                ++$used['corroborating-share'];
+            }
+            if ($security) {
+                ++$used['advisory-points'];
+            }
+            if (self::any($terms, 'multiplier', 2)) {
+                ++$used['no-reachable-fix-multiplier'];
+            }
+            $advisories = self::map($parts['security'] ?? null)['of'] ?? null;
+            if (\is_int($advisories) && $advisories >= 2) {
+                ++$used['security-max'];
+            }
+            if (self::halves($modifiers, 'applies_to', 'maintenance') || $rerunHalves('applies_to', 'maintenance')) {
+                ++$used['divide-reach'];
+            }
+            if ($security && ($finding['reach'] ?? null) !== 'direct') {
+                ++$used['security-exempt-from-reach'];
+            }
+            if ((self::map($parts['maintenance'] ?? null)['status'] ?? null) === 'counted' && (self::map($parts['security'] ?? null)['status'] ?? null) === 'counted') {
+                ++$used['sum'];
+            }
+            if (self::any($modifiers, 'reason', 'dev') || $rerunHalves('reason', 'dev')) {
+                ++$used['divide-dev'];
+            }
+            if (($score['rounded_down'] ?? false) === true) {
+                ++$used['floor-once'];
+            }
         }
 
         return $used;
@@ -98,7 +125,11 @@ final class ScoreRulesUsed
      */
     private static function map($value): array
     {
-        return \is_array($value) ? array_filter($value, 'is_string', \ARRAY_FILTER_USE_KEY) : [];
+        if (!\is_array($value)) {
+            return [];
+        }
+        /** @var array<string, mixed> $value report-2 writes objects with string keys only */
+        return $value;
     }
 
     /**
@@ -108,6 +139,13 @@ final class ScoreRulesUsed
      */
     private static function list($value): array
     {
-        return \is_array($value) ? array_values(array_map([self::class, 'map'], array_filter($value, 'is_array'))) : [];
+        $rows = [];
+        foreach (\is_array($value) ? $value : [] as $item) {
+            if (\is_array($item)) {
+                $rows[] = self::map($item);
+            }
+        }
+
+        return $rows;
     }
 }
