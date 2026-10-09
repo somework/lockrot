@@ -879,11 +879,11 @@ final class FindingTest extends TestCase
         $signals = [new Signal(Signal::S9, Signal::LEVEL_HIGH, '2 advisories', ['advisories' => [$row('PKSA-a', 'high', 16), $row('PKSA-b', 'low', 2)], 'releases_read' => true, 'complete' => true])];
         $flags = FlagSet::fromSignals($signals, null, [Score::advisory('PKSA-a', 'high', 'update'), Score::advisory('PKSA-b', 'low', 'update')]);
 
-        $flag = JsonPath::arrayAt((new FindingBuilder())->withSignals($signals)->withFlags($flags)->build()->toArray(), ['flags', 0]);
+        $document = (new FindingBuilder())->withSignals($signals)->withFlags($flags)->build()->toArray();
+        $flag = JsonPath::arrayAt($document, ['flags', 0]);
 
         self::assertSame(['vulnerable', 'security', ['S9'], ['unit' => 'advisories', 'value' => 2, 'source' => null]], [$flag['id'], $flag['role'], $flag['signal_ids'], $flag['headline']]);
         self::assertStringContainsString('; worst: PKSA-a t', JsonPath::stringAt($flag, ['summary']));
-        $document = (new FindingBuilder())->withSignals($signals)->withFlags($flags)->build()->toArray();
         self::assertSame(['critical' => 0, 'high' => 1, 'medium' => 0, 'unrated' => 0, 'low' => 1], JsonPath::arrayAt($document, ['security', 'counts']), 'security counts the S9 rows');
     }
 

@@ -43,11 +43,9 @@ use PHPUnit\Framework\TestCase;
  * Each finding's score agrees with its flags, its security block and its S9 rows, by the score
  * model's tables: the grade is the band of the total, each term carries its flag's weight and
  * its role's divisor, the security term is the deciding S9 row, and the halvings follow the reach
- * and `dev`. The runs seed advisories so that every severity and every fix kind occurs, and each
- * halving and each advisory multiplier occurs at least once.
- *
- * It covers nothing: its five analyses push the lines they cover past the timeout of a mutation
- * run. ScoreModelTest, FindingTest and the writer tests kill those mutants.
+ * and `dev`. The seeded advisories make every severity, fix kind, halving and multiplier occur.
+ * It covers nothing: its analyses outlast the timeout of a mutation run (https://github.com/somework/lockrot/pull/75).
+ * ScoreModelTest, FindingTest and the writer tests kill those mutants.
  *
  * @coversNothing
  *

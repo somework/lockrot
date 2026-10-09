@@ -100,7 +100,7 @@ def ship(text):
     return t
 
 
-CHANGED = []  # descriptions the token pass changed, which a hand rewrite must cover (builders assert it is empty)
+CHANGED = []  # descriptions that lost words to the token pass: ship_schema refuses each one whose hash HAND_SHIPPED lacks
 # the shipped texts whose stripping removed more than references (a quoted section title) and were read and kept
 # a new one fails the build until it is rewritten in its builder or added here after reading it
 HAND_SHIPPED = {
