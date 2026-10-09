@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Verdict;
 
+use Lockrot\Allowlist\AllowlistEntry;
 use Lockrot\Data\Advisory\Advisory;
 use Lockrot\Data\Advisory\AdvisoryCoverage;
 use Lockrot\Data\Advisory\AdvisoryIgnoreMatch;
 use Lockrot\Data\Advisory\AdvisoryNameCoverage;
 use Lockrot\Data\Advisory\IgnoredAdvisory;
+use Lockrot\Data\Repository\MetadataLoaderInterface;
 use Lockrot\Data\Repository\StableRelease;
 use Lockrot\Lock\LockFile;
 use Lockrot\Security\BranchFixes;
@@ -21,7 +23,9 @@ use Lockrot\Security\PhpCheck;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\Rule\AdvisoryRule;
+use Lockrot\Signal\Signal;
 use Lockrot\Tests\Support\JsonPath;
+use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
 use Lockrot\Verdict\FindingDetails;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -174,5 +178,70 @@ final class FindingDetailsTest extends TestCase
         self::assertSame(3, JsonPath::intAt($security, ['counts', 'low']));
         self::assertSame('low', $security['worst']);
         self::assertSame('unknown', $security['fix_kind'], 'a row with no kind reads as unknown');
+    }
+
+    /**
+     * `metadata.reason` and `metadata.message` say why an unavailable answer failed, and are null
+     * for every other status.
+     *
+     * @param array{status: string, reason: ?string, message: ?string} $metadata
+     *
+     * @dataProvider metadataAnswers
+     */
+    #[DataProvider('metadataAnswers')]
+    public function testTheMetadataReasonExplainsAnUnavailableAnswerOnly(PackageFacts $facts, ?string $failure, array $metadata): void
+    {
+        self::assertSame($metadata, FindingDetails::of($facts, null, new PhpFloor('8.4', null), [], [], $failure)->metadata());
+    }
+
+    /** @return iterable<string, array{PackageFacts, ?string, array{status: string, reason: ?string, message: ?string}}> */
+    public static function metadataAnswers(): iterable
+    {
+        $offline = MetadataLoaderInterface::OFFLINE_NOT_FOUND_REASON;
+        $unavailable = new PackageFacts(F::package(), null, null, [], null, null, null, true);
+        yield 'unavailable, offline' => [$unavailable, $offline, ['status' => 'unavailable', 'reason' => 'offline', 'message' => $offline]];
+        yield 'unavailable, with no answer' => [$unavailable, null, ['status' => 'unavailable', 'reason' => null, 'message' => null]];
+        yield 'read' => [F::facts(F::package(), F::metadata([['1.0.0', '2026-01-01T00:00:00+00:00']])), $offline, ['status' => 'read', 'reason' => null, 'message' => null]];
+    }
+
+    /**
+     * A check that did not run and raised no S10 is a skipped check, with its reason and the
+     * signals it blocks.
+     *
+     * @param list<Signal>                                                $signals
+     * @param list<array{check: string, reason: string, blocks: list<string>}> $skipped
+     *
+     * @dataProvider skips
+     */
+    #[DataProvider('skips')]
+    public function testEachCheckThatDidNotRunIsSkippedWithItsReason(PackageFacts $facts, ?AllowlistEntry $entry, array $signals, array $skipped): void
+    {
+        self::assertSame($skipped, FindingDetails::of($facts, $entry, new PhpFloor('8.4', null), [], $signals, null)->skipped());
+    }
+
+    /** @return iterable<string, array{PackageFacts, ?AllowlistEntry, list<Signal>, list<array{check: string, reason: string, blocks: list<string>}>}> */
+    public static function skips(): iterable
+    {
+        $metadata = F::metadata([['1.0.0', '2026-01-01T00:00:00+00:00']]);
+        $read = F::facts(F::package(), $metadata);
+        $asked = F::facts(F::package(), $metadata, F::activity(false, '2026-01-01T00:00:00+00:00'));
+        $activity = static fn (string $reason): array => ['check' => 'repository_activity', 'reason' => $reason, 'blocks' => ['S3', 'S4']];
+        $s10 = static fn ($unchecked): Signal => new Signal(Signal::S10, Signal::LEVEL_INFO, 'not checked', ['unchecked' => $unchecked]);
+        $whole = new AllowlistEntry('vendor/pkg', null, 'kept on purpose', null, AllowlistEntry::BY_PROJECT);
+        $silentOnly = new AllowlistEntry('vendor/pkg', null, 'kept on purpose', null, AllowlistEntry::BY_PROJECT, ['silent']);
+
+        yield 'every check ran' => [$asked, null, [], []];
+        yield 'no repository to ask' => [$read, null, [], [$activity('no_repository')]];
+        yield 'a whole-package entry' => [$read, $whole, [], [$activity('allowlisted')]];
+        yield 'an entry that accepts some flags' => [$read, $silentOnly, [], [$activity('no_repository')]];
+        yield 'the reason the facts give' => [new PackageFacts(F::package(), $metadata, null, [], 'no_token'), null, [], [$activity('no_token')]];
+        yield 'S10 holds the activity gap' => [$read, null, [new Signal(Signal::S2, Signal::LEVEL_WARN, 'old'), $s10(['not a gap', ['check' => 'repository_activity', 'reason' => 'no_token', 'blocks' => ['S3', 'S4']]])], []];
+        yield 'S10 without a list' => [$read, null, [$s10('none')], [$activity('no_repository')]];
+        yield 'S10 holds another gap' => [$read, null, [$s10([['check' => 'releases', 'reason' => 'releases_unknown', 'blocks' => ['S9']]])], [$activity('no_repository')]];
+        yield 'not from a Composer repository' => [F::facts(F::package(['fromComposerRepository' => false])), null, [], [
+            $activity('not_from_composer_repository'),
+            ['check' => 'release_metadata', 'reason' => 'not_from_composer_repository', 'blocks' => ['S2', 'S8']],
+        ]];
+        yield 'a branch snapshot' => [F::facts(F::package(['version' => 'dev-main']), $metadata, F::activity(false, null)), null, [], [['check' => 'release_branch', 'reason' => 'branch_snapshot', 'blocks' => ['S8']]]];
     }
 }

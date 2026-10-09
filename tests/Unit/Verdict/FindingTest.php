@@ -883,6 +883,8 @@ final class FindingTest extends TestCase
 
         self::assertSame(['vulnerable', 'security', ['S9'], ['unit' => 'advisories', 'value' => 2, 'source' => null]], [$flag['id'], $flag['role'], $flag['signal_ids'], $flag['headline']]);
         self::assertStringContainsString('; worst: PKSA-a t', JsonPath::stringAt($flag, ['summary']));
+        $document = (new FindingBuilder())->withSignals($signals)->withFlags($flags)->build()->toArray();
+        self::assertSame(['critical' => 0, 'high' => 1, 'medium' => 0, 'unrated' => 0, 'low' => 1], JsonPath::arrayAt($document, ['security', 'counts']), 'security counts the S9 rows');
     }
 
     public function testWithSignalsKeepsTheScore(): void
@@ -892,5 +894,195 @@ final class FindingTest extends TestCase
 
         self::assertSame($finding->score(), $finding->withSignals([])->score());
         self::assertSame('high', $finding->withSignals([])->grade());
+    }
+
+    public function testWithDetailsKeepsTheFindingItWasCalledOn(): void
+    {
+        $finding = (new FindingBuilder())->build();
+        $before = $finding->details();
+        $details = new FindingDetails('read', null, null, [], ['requires' => '>=8.1', 'target_runs' => true, 'project_allows' => null], null, 'complete', null, [], null);
+
+        $copy = $finding->withDetails($details);
+
+        self::assertSame($before, $finding->details());
+        self::assertSame($details, $copy->details());
+    }
+
+    /**
+     * A check that blocks S2 or S4 leaves liveness incomplete, and one that blocks S3 leaves S3
+     * unread. An accepted `stale` counts at least its rerun when either holds.
+     *
+     * @param list<list<string>> $blocks the blocks of each S10 gap
+     *
+     * @dataProvider livenessGaps
+     */
+    #[DataProvider('livenessGaps')]
+    public function testTheChecksThatDidNotRunSayWhetherLivenessIsComplete(string $version, bool $judged, array $blocks, bool $livenessComplete, bool $atLeast): void
+    {
+        $unchecked = [];
+        foreach ($blocks as $i => $blocked) {
+            $unchecked[] = ['check' => 'gap-'.$i, 'reason' => 'no_token', 'blocks' => $blocked];
+        }
+        $signals = [new Signal(Signal::S2, Signal::LEVEL_WARN, 'old', ['last_release' => '2021-05-05T00:00:00+00:00', 'years' => 5.4, 'dated_by' => null])];
+        if ($unchecked !== []) {
+            $signals[] = new Signal(Signal::S10, Signal::LEVEL_INFO, 'not checked', ['unchecked' => $unchecked]);
+        }
+        $entry = new AllowlistEntry('vendor/pkg', null, 'kept', null, AllowlistEntry::BY_PROJECT, [FlagSet::STALE]);
+        $finding = (new FindingBuilder())->withVersion($version)->withSignals($signals)->withFlags(FlagSet::fromSignals($signals, $entry, []), $judged)->build();
+
+        $document = $finding->toArray();
+
+        self::assertSame($unchecked, $document['checks_missing']);
+        self::assertSame(['liveness_complete' => $livenessComplete], JsonPath::arrayAt($document, ['flags', 0, 'degree']));
+        self::assertSame($atLeast, JsonPath::arrayAt($document, ['score', 'accepted', 0, 'if_counted'])['at_least']);
+    }
+
+    /** @return iterable<string, array{string, bool, list<list<string>>, bool, bool}> */
+    public static function livenessGaps(): iterable
+    {
+        yield 'every check ran' => ['1.0.0', true, [], true, false];
+        yield 'S3 unread' => ['1.0.0', true, [['S3']], true, true];
+        yield 'a gap that blocks neither' => ['1.0.0', true, [['S8']], true, false];
+        yield 'S2 blocked' => ['1.0.0', true, [['S2']], false, true];
+        yield 'S4 blocked' => ['1.0.0', true, [['S4']], false, true];
+        yield 'S3 unread, then S2 blocked' => ['1.0.0', true, [['S3'], ['S2']], false, true];
+        yield 'S2 blocked, then S3 unread' => ['1.0.0', true, [['S2'], ['S3']], false, true];
+        yield 'a skipped branch check beside S3 unread' => ['dev-main', true, [['S3']], true, true];
+        yield 'skipped release metadata beside S3 unread' => ['1.0.0', false, [['S3']], false, true];
+    }
+
+    /** S10's gaps keep their string blocks, and a gap without a check or a reason keeps empty words. */
+    public function testChecksMissingReadsS10sGapsAsWritten(): void
+    {
+        $signals = [new Signal(Signal::S10, Signal::LEVEL_INFO, 'not checked', ['unchecked' => [
+            ['check' => 'repository_activity', 'reason' => 'no_token', 'blocks' => ['S3', 5, 'S4']],
+            ['blocks' => ['S9']],
+        ]])];
+
+        $document = (new FindingBuilder())->withSignals($signals)->build()->toArray();
+
+        self::assertSame([
+            ['check' => 'repository_activity', 'reason' => 'no_token', 'blocks' => ['S3', 'S4']],
+            ['check' => '', 'reason' => '', 'blocks' => ['S9']],
+        ], $document['checks_missing']);
+    }
+
+    /**
+     * Without pinned, the score counts at least its rerun when S8 cannot date the tag's branch: a
+     * branch snapshot whose metadata was not read.
+     *
+     * @dataProvider snapshots
+     */
+    #[DataProvider('snapshots')]
+    public function testAPinnedRemovalCountsAtLeastWhenS8IsUnread(string $version, bool $judged, bool $atLeast): void
+    {
+        $signals = [new Signal(Signal::S1, Signal::LEVEL_HIGH, 'marked', ['marked_by' => 'lock']), new Signal(Signal::S6, Signal::LEVEL_WARN, 'pinned', ['reason' => 'branch_snapshot', 'version' => $version])];
+        $finding = (new FindingBuilder())->withVersion($version)->withSignals($signals)->withFlags(FlagSet::fromSignals($signals, null, []), $judged)->build();
+        $without = JsonPath::arrayAt($finding->toArray(), ['score', 'without']);
+
+        self::assertSame(FlagSet::PINNED, JsonPath::stringAt($without, [1, 'remove', 'id']));
+        self::assertSame($atLeast, JsonPath::boolAt($without, [1, 'at_least']));
+    }
+
+    /** @return iterable<string, array{string, bool, bool}> */
+    public static function snapshots(): iterable
+    {
+        yield 'a snapshot, metadata not read' => ['dev-main', false, true];
+        yield 'a snapshot, metadata read' => ['dev-main', true, false];
+        yield 'a tag, metadata not read' => ['1.0.0', false, false];
+    }
+
+    /**
+     * @param list<Signal>                                                        $signals
+     * @param array{unit: string, value: int|float|string|null, source: ?string} $headline
+     *
+     * @dataProvider headlines
+     */
+    #[DataProvider('headlines')]
+    public function testEachFlagHasItsHeadline(array $signals, string $flag, array $headline): void
+    {
+        $flags = JsonPath::arrayAt((new FindingBuilder())->withSignals($signals)->build()->toArray(), ['flags']);
+
+        self::assertSame($flag, JsonPath::stringAt($flags, [0, 'id']));
+        self::assertSame($headline, JsonPath::arrayAt($flags, [0, 'headline']));
+    }
+
+    /** @return iterable<string, array{list<Signal>, string, array{unit: string, value: int|float|string|null, source: ?string}}> */
+    public static function headlines(): iterable
+    {
+        $s2 = static fn (string $level, $years): Signal => new Signal(Signal::S2, $level, 'old', ['last_release' => '2021-05-05T00:00:00+00:00', 'years' => $years]);
+        $s4 = static fn (string $level, $years): Signal => new Signal(Signal::S4, $level, 'quiet', ['last_push' => '2022-01-10T00:00:00+00:00', 'years' => $years, 'activity' => 'push']);
+        yield 'marked abandoned' => [[new Signal(Signal::S1, Signal::LEVEL_HIGH, 'marked', [])], FlagSet::ABANDONED, ['unit' => 'reason', 'value' => 'marked', 'source' => null]];
+        yield 'archived' => [[new Signal(Signal::S3, Signal::LEVEL_HIGH, 'archived', [])], FlagSet::ABANDONED, ['unit' => 'reason', 'value' => 'archived', 'source' => null]];
+        yield 'pinned' => [[new Signal(Signal::S6, Signal::LEVEL_WARN, 'pinned', ['reason' => 'branch_snapshot'])], FlagSet::PINNED, ['unit' => 'reason', 'value' => 'branch_snapshot', 'source' => null]];
+        yield 'pinned for a reason that is no word' => [[new Signal(Signal::S6, Signal::LEVEL_WARN, 'pinned', ['reason' => ['x']])], FlagSet::PINNED, ['unit' => 'reason', 'value' => null, 'source' => null]];
+        yield 'an old promise' => [[new Signal(Signal::S5, Signal::LEVEL_WARN, 'old promise', ['written_for_php' => '7.0'])], FlagSet::OLD_PROMISE, ['unit' => 'php', 'value' => '7.0', 'source' => null]];
+        yield 'stale by its release' => [[$s2(Signal::LEVEL_WARN, 5.4)], FlagSet::STALE, ['unit' => 'years', 'value' => 5.4, 'source' => 'release']];
+        yield 'stale by whole years' => [[$s2(Signal::LEVEL_WARN, 6)], FlagSet::STALE, ['unit' => 'years', 'value' => 6, 'source' => 'release']];
+        yield 'the release is older' => [[$s2(Signal::LEVEL_HIGH, 5.4), $s4(Signal::LEVEL_HIGH, 4.7)], FlagSet::SILENT, ['unit' => 'years', 'value' => 5.4, 'source' => 'release']];
+        yield 'the push is older' => [[$s2(Signal::LEVEL_HIGH, 4.7), $s4(Signal::LEVEL_HIGH, 5.4)], FlagSet::SILENT, ['unit' => 'years', 'value' => 5.4, 'source' => 'push']];
+        yield 'as old as each other' => [[$s2(Signal::LEVEL_HIGH, 5.0), $s4(Signal::LEVEL_HIGH, 5.0)], FlagSet::SILENT, ['unit' => 'years', 'value' => 5.0, 'source' => 'release']];
+        yield 'the push alone' => [[$s2(Signal::LEVEL_HIGH, null), $s4(Signal::LEVEL_HIGH, 3.0)], FlagSet::SILENT, ['unit' => 'years', 'value' => 3.0, 'source' => 'push']];
+        yield 'years that are no number' => [[$s2(Signal::LEVEL_WARN, ['x'])], FlagSet::STALE, ['unit' => 'years', 'value' => null, 'source' => null]];
+    }
+
+    /** Abandoned reads the signals that fired in its order, and every fired flag is written. */
+    public function testAbandonedNamesItsSignalsAndItsDegree(): void
+    {
+        $signals = [
+            new Signal(Signal::S1, Signal::LEVEL_HIGH, 'marked', ['marked_by' => 'lock']),
+            new Signal(Signal::S2, Signal::LEVEL_HIGH, 'old', ['last_release' => '2021-05-05T00:00:00+00:00', 'years' => 5.4]),
+            new Signal(Signal::S6, Signal::LEVEL_WARN, 'pinned', ['reason' => 'no_stable_release', 'version' => '1.0.0']),
+        ];
+
+        $flags = JsonPath::arrayAt((new FindingBuilder())->withSignals($signals)->build()->toArray(), ['flags']);
+
+        self::assertSame([FlagSet::ABANDONED, FlagSet::PINNED], array_column($flags, 'id'));
+        self::assertSame(['S1', 'S2'], JsonPath::arrayAt($flags, [0, 'signal_ids']));
+        self::assertSame(['reasons' => ['marked'], 'liveness_complete' => true], JsonPath::arrayAt($flags, [0, 'degree']));
+    }
+
+    /** A written S9 row keeps its named keys only. */
+    public function testAWrittenS9RowKeepsItsNamedKeys(): void
+    {
+        $signals = [new Signal(Signal::S9, Signal::LEVEL_HIGH, '1 advisory', ['advisories' => [['id' => 'PKSA-a', 'severity' => 'high', 0 => 'stray']], 'releases_read' => true])];
+
+        $document = (new FindingBuilder())->withSignals($signals)->build()->toArray();
+
+        self::assertSame(['id' => 'PKSA-a', 'severity' => 'high'], JsonPath::arrayAt($document, ['signals', 0, 'data', 'advisories', 0]));
+    }
+
+    /**
+     * Unread release data joins the finding's S10 after the other signals, and the S10 blocks are
+     * each blocked signal once.
+     *
+     * @param list<Signal> $signals
+     * @param list<string> $blocks
+     *
+     * @dataProvider releasesBeside
+     */
+    #[DataProvider('releasesBeside')]
+    public function testUnreadReleasesKeepTheOtherSignals(array $signals, array $blocks): void
+    {
+        $lock = LockFile::fromArray(['packages' => [['name' => 'vendor/pkg', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/']]]);
+        $package = $lock->find('vendor/pkg');
+        self::assertNotNull($package);
+        $facts = new PackageFacts($package, null, null, [new Advisory('PKSA-1', null, null, null, 'high', null)], null, null, null, true);
+        $finding = (new FindingBuilder())->withVerdict(Verdict::UNKNOWN)->withSignals($signals)->build()
+            ->withDetails(FindingDetails::of($facts, null, new PhpFloor('8.4', null), [], $signals, 'HTTP 503'));
+
+        $written = JsonPath::arrayAt($finding->toArray(), ['signals']);
+
+        self::assertSame([Signal::S6, Signal::S10], array_column($written, 'id'));
+        self::assertSame($blocks, JsonPath::arrayAt($written, [1, 'data', 'blocks']));
+    }
+
+    /** @return iterable<string, array{list<Signal>, list<string>}> */
+    public static function releasesBeside(): iterable
+    {
+        $s6 = new Signal(Signal::S6, Signal::LEVEL_WARN, 'pinned', ['reason' => 'no_stable_release', 'version' => '1.0.0']);
+        $gaps = [['check' => 'a', 'reason' => 'no_token', 'blocks' => ['S9']], ['check' => 'b', 'reason' => 'no_token', 'blocks' => ['S9', 'S4']]];
+        yield 'beside an S10 whose gaps share a block' => [[$s6, new Signal(Signal::S10, Signal::LEVEL_INFO, 'not checked', ['unchecked' => $gaps, 'blocks' => ['S9', 'S4']])], ['S9', 'S4']];
+        yield 'with no S10' => [[$s6], ['S9']];
     }
 }
