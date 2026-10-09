@@ -45,7 +45,9 @@ final class Report2Root
             foreach (self::rows($finding, 'flags') as $flag) {
                 if (self::str($flag, 'role') === 'accepted') {
                     ++$acceptedAll[self::str($flag, 'id')];
-                    $acceptedGraded[self::str($flag, 'id')] += (int) $graded;
+                    if ($graded) {
+                        ++$acceptedGraded[self::str($flag, 'id')];
+                    }
                 }
             }
         }
@@ -82,7 +84,9 @@ final class Report2Root
                 continue;
             }
             foreach (self::rows($finding, 'signals') as $signal) {
-                $withSuggestion += (int) (self::str($signal, 'id') === 'S1' && self::str(self::map($signal, 'data'), 'replacement') !== '');
+                if (self::str($signal, 'id') === 'S1' && self::str(self::map($signal, 'data'), 'replacement') !== '') {
+                    ++$withSuggestion;
+                }
             }
         }
 
@@ -148,8 +152,12 @@ final class Report2Root
         $exempt = ['baseline' => 0];
         foreach ($findings as $finding) {
             $standing = self::map($finding, 'gate');
-            $reaching += (int) (($standing['reaches_fail_on'] ?? false) === true);
-            $failing += (int) (($standing['fails'] ?? false) === true);
+            if (($standing['reaches_fail_on'] ?? false) === true) {
+                ++$reaching;
+            }
+            if (($standing['fails'] ?? false) === true) {
+                ++$failing;
+            }
             $by = self::str($standing, 'exempt_by');
             if ($by !== '') {
                 $exempt[$by] = ($exempt[$by] ?? 0) + 1;
@@ -175,10 +183,13 @@ final class Report2Root
         foreach ($findings as $finding) {
             $security = self::map($finding, 'security');
             $status = self::str($security, 'status');
-            $checks[self::str($security, 'check')] = true;
+            $check = self::str($security, 'check');
+            $checks[$check] = $check;
             $packages[$status] = ($packages[$status] ?? 0) + 1;
             $ignored = self::int($security, 'ignored_count');
-            $packages['ignored'] += (int) ($ignored > 0);
+            if ($ignored > 0) {
+                ++$packages['ignored'];
+            }
             $advisories['ignored'] += $ignored;
             if ($status !== 'vulnerable') {
                 continue;
@@ -195,7 +206,7 @@ final class Report2Root
         }
 
         return [
-            'check' => \count($checks) === 1 ? (string) array_key_first($checks) : ($checks === [] ? 'complete' : 'partial'),
+            'check' => \count($checks) === 1 ? reset($checks) : ($checks === [] ? 'complete' : 'partial'),
             'packages' => $packages,
             'advisories' => $advisories,
             'severities' => $severities,
@@ -227,7 +238,15 @@ final class Report2Root
      */
     private static function countedFlags(array $finding): array
     {
-        return array_values(array_filter(array_map(static fn (array $term): string => self::str($term, 'flag'), self::rows(self::map($finding, 'score'), 'terms'))));
+        $flags = [];
+        foreach (self::rows(self::map($finding, 'score'), 'terms') as $term) {
+            $flag = self::str($term, 'flag');
+            if ($flag !== '') {
+                $flags[] = $flag;
+            }
+        }
+
+        return $flags;
     }
 
     /** @param array<string, mixed> $row */
@@ -249,7 +268,12 @@ final class Report2Root
      */
     private static function map(array $row, string $key): array
     {
-        return \is_array($row[$key] ?? null) ? array_filter($row[$key], 'is_string', \ARRAY_FILTER_USE_KEY) : [];
+        $value = $row[$key] ?? null;
+        if (!\is_array($value)) {
+            return [];
+        }
+        /** @var array<string, mixed> $value report-2 writes objects with string keys only */
+        return $value;
     }
 
     /**
@@ -262,7 +286,8 @@ final class Report2Root
         $rows = [];
         foreach (\is_array($row[$key] ?? null) ? $row[$key] : [] as $item) {
             if (\is_array($item)) {
-                $rows[] = array_filter($item, 'is_string', \ARRAY_FILTER_USE_KEY);
+                /** @var array<string, mixed> $item report-2 writes objects with string keys only */
+                $rows[] = $item;
             }
         }
 
