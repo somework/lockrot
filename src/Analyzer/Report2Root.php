@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace Lockrot\Analyzer;
 
+use Lockrot\Config\Gate;
 use Lockrot\Security\Severity;
+use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\FlagSet;
 use Lockrot\Verdict\ScoreModel;
 
 /**
- * report-2's root blocks, each counted from the finding objects the report writes, so a block
- * cannot disagree with its findings.
+ * report-2's root blocks, each counted from the findings that the report writes. RootRecountTest
+ * counts each block again from the written `findings[]`. Pass the findings in the written order:
+ * the libyears sums, `update_now` and the first of two equal data dates follow it.
  *
  * @internal
  */
@@ -21,9 +24,9 @@ final class Report2Root
      * allowlist accepts and the counting findings by grade. `vulnerable` leads nothing and no entry
      * accepts it.
      *
-     * @param list<array<string, mixed>> $findings
+     * @param list<Finding> $findings
      *
-     * @return array<string, array<string, mixed>>
+     * @return array<string, array{carrying: int, leading: ?int, accepted: ?array{all: int, in_graded: int}, by_verdict: array<string, int>}>
      */
     public static function flags(array $findings): array
     {
@@ -33,22 +36,17 @@ final class Report2Root
         $acceptedGraded = $carrying;
         $byVerdict = array_fill_keys(ScoreModel::FLAG_ORDER, array_fill_keys(ScoreModel::GRADES, 0));
         foreach ($findings as $finding) {
-            $graded = isset(self::map($finding, 'score')['terms']);
-            foreach (self::countedFlags($finding) as $flag) {
+            foreach ($finding->flagIds() as $flag) {
                 ++$carrying[$flag];
-                ++$byVerdict[$flag][self::str($finding, 'verdict')];
+                ++$byVerdict[$flag][$finding->grade()];
             }
-            $lead = self::str($finding, 'lead');
-            if ($lead !== '') {
+            $lead = $finding->lead();
+            if ($lead !== null) {
                 ++$leading[$lead];
             }
-            foreach (self::rows($finding, 'flags') as $flag) {
-                if (self::str($flag, 'role') === 'accepted') {
-                    ++$acceptedAll[self::str($flag, 'id')];
-                    if ($graded) {
-                        ++$acceptedGraded[self::str($flag, 'id')];
-                    }
-                }
+            foreach ($finding->flags()->accepted() as $flag) {
+                ++$acceptedAll[$flag];
+                $acceptedGraded[$flag] += $finding->isGraded() ? 1 : 0;
             }
         }
         $out = [];
@@ -66,35 +64,32 @@ final class Report2Root
     }
 
     /**
-     * @param list<array<string, mixed>>           $findings
-     * @param array<string, array<string, mixed>> $flags
+     * @param list<Finding> $findings
      *
      * @return array{total: int, with_replacement: int, with_suggestion: int}
      */
-    public static function abandoned(array $findings, array $flags): array
+    public static function abandoned(array $findings): array
     {
+        $total = 0;
         $withReplacement = 0;
         $withSuggestion = 0;
         foreach ($findings as $finding) {
-            if (!\in_array(FlagSet::ABANDONED, self::countedFlags($finding), true)) {
+            if (!\in_array(FlagSet::ABANDONED, $finding->flagIds(), true)) {
                 continue;
             }
-            if (self::str($finding, 'replacement') !== '') {
+            ++$total;
+            if ($finding->countedSuccessor() !== null) {
                 ++$withReplacement;
-                continue;
-            }
-            foreach (self::rows($finding, 'signals') as $signal) {
-                if (self::str($signal, 'id') === 'S1' && self::str(self::map($signal, 'data'), 'replacement') !== '') {
-                    ++$withSuggestion;
-                }
+            } elseif ($finding->replacement() !== null) {
+                ++$withSuggestion;
             }
         }
 
-        return ['total' => self::int($flags[FlagSet::ABANDONED], 'carrying'), 'with_replacement' => $withReplacement, 'with_suggestion' => $withSuggestion];
+        return ['total' => $total, 'with_replacement' => $withReplacement, 'with_suggestion' => $withSuggestion];
     }
 
     /**
-     * @param list<array<string, mixed>> $findings
+     * @param list<Finding> $findings
      *
      * @return array<string, int>
      */
@@ -102,31 +97,30 @@ final class Report2Root
     {
         $counts = array_fill_keys(array_merge(ScoreModel::GRADES, ['none']), 0);
         foreach ($findings as $finding) {
-            ++$counts[self::str($finding, 'priority')];
+            ++$counts[$finding->gradeOrNone()];
         }
 
         return $counts;
     }
 
     /**
-     * report-1's block with `packages`, its sums over the published two-decimal values.
+     * report-1's block with `packages`, its sums over the written two-decimal values.
      *
-     * @param array<string, mixed>       $libyears
-     * @param list<array<string, mixed>> $findings
+     * @param list<Finding> $findings
      *
      * @return array<string, mixed>
      */
-    public static function libyears(array $libyears, array $findings): array
+    public static function libyears(Libyears $libyears, array $findings): array
     {
         $total = null;
         $direct = null;
         foreach ($findings as $finding) {
-            $years = $finding['libyears'] ?? null;
-            if (!\is_int($years) && !\is_float($years)) {
+            $years = $finding->libyearsRounded();
+            if ($years === null) {
                 continue;
             }
             $total = ($total ?? 0) + $years;
-            if (($finding['direct'] ?? false) === true) {
+            if ($finding->isDirect()) {
                 $direct = ($direct ?? 0) + $years;
             }
         }
@@ -134,41 +128,37 @@ final class Report2Root
             $direct ??= 0;
         }
 
-        return array_merge($libyears, ['total' => $total === null ? null : round($total, 2), 'direct_requirements' => $direct === null ? null : round($direct, 2), 'packages' => \count($findings)]);
+        return array_merge($libyears->toArray(), ['total' => $total === null ? null : round($total, 2), 'direct_requirements' => $direct === null ? null : round($direct, 2), 'packages' => \count($findings)]);
     }
 
     /**
-     * The report-1 gate with the finding counts.
+     * The report-1 gate with the counts of the findings' standings. Without a gate, no finding
+     * reaches fail-on, and the run applies fail-on in the check mode.
      *
-     * @param array{fails: bool, tripped_by: list<string>, fail_on_applied: bool} $gate
-     * @param list<array<string, mixed>>                                          $findings
+     * @param string $mode one of {@see Gate::MODES}
      *
-     * @return array<string, mixed>
+     * @return array{fails: bool, tripped_by: list<string>, fail_on_applied: bool, reaching: int, failing: int, exempt: array<string, int>}
      */
-    public static function gate(array $gate, array $findings): array
+    public static function gate(?Gate $gate, string $mode): array
     {
         $reaching = 0;
         $failing = 0;
-        $exempt = ['baseline' => 0];
-        foreach ($findings as $finding) {
-            $standing = self::map($finding, 'gate');
-            if (($standing['reaches_fail_on'] ?? false) === true) {
-                ++$reaching;
-            }
-            if (($standing['fails'] ?? false) === true) {
-                ++$failing;
-            }
-            $by = self::str($standing, 'exempt_by');
-            if ($by !== '') {
+        $exempt = [Gate::EXEMPT_BASELINE => 0];
+        foreach ($gate === null ? [] : $gate->standings() as $standing) {
+            $reaching += $standing->reachesFailOn() ? 1 : 0;
+            $failing += $standing->fails() ? 1 : 0;
+            $by = $standing->exemptBy();
+            if ($by !== null) {
                 $exempt[$by] = ($exempt[$by] ?? 0) + 1;
             }
         }
+        $base = $gate === null ? ['fails' => false, 'tripped_by' => [], 'fail_on_applied' => $mode === Gate::MODE_CHECK] : $gate->toArray();
 
-        return $gate + ['reaching' => $reaching, 'failing' => $failing, 'exempt' => $exempt];
+        return $base + ['reaching' => $reaching, 'failing' => $failing, 'exempt' => $exempt];
     }
 
     /**
-     * @param list<array<string, mixed>> $findings
+     * @param list<Finding> $findings
      *
      * @return array<string, mixed>
      */
@@ -181,27 +171,22 @@ final class Report2Root
         $fixes = array_fill_keys(ScoreModel::FIX_KINDS, 0);
         $updateNow = [];
         foreach ($findings as $finding) {
-            $security = self::map($finding, 'security');
-            $status = self::str($security, 'status');
-            $check = self::str($security, 'check');
-            $checks[$check] = $check;
-            $packages[$status] = ($packages[$status] ?? 0) + 1;
-            $ignored = self::int($security, 'ignored_count');
-            if ($ignored > 0) {
-                ++$packages['ignored'];
-            }
-            $advisories['ignored'] += $ignored;
-            if ($status !== 'vulnerable') {
+            $standing = $finding->securityStanding();
+            $checks[$standing->check()] = $standing->check();
+            $packages[$standing->status()] = ($packages[$standing->status()] ?? 0) + 1;
+            $packages['ignored'] += $standing->ignoredCount() > 0 ? 1 : 0;
+            $advisories['ignored'] += $standing->ignoredCount();
+            $kind = $standing->fixKind();
+            if ($kind === null) {
                 continue;
             }
-            foreach (self::map($security, 'counts') as $severity => $count) {
-                $severities[$severity] = ($severities[$severity] ?? 0) + (\is_int($count) ? $count : 0);
-                $advisories['counted'] += \is_int($count) ? $count : 0;
+            foreach ($standing->counts() as $severity => $count) {
+                $severities[$severity] = ($severities[$severity] ?? 0) + $count;
+                $advisories['counted'] += $count;
             }
-            $kind = self::str($security, 'fix_kind');
             $fixes[$kind] = ($fixes[$kind] ?? 0) + 1;
             if ($kind === 'update') {
-                $updateNow[] = self::str($finding, 'package');
+                $updateNow[] = $finding->package();
             }
         }
 
@@ -217,80 +202,21 @@ final class Report2Root
         ];
     }
 
-    /** @param list<array<string, mixed>> $findings */
+    /**
+     * The oldest data date, to the second as report-2 writes it. Of two in one second, the first.
+     *
+     * @param list<Finding> $findings
+     */
     public static function dataDate(array $findings): ?string
     {
         $oldest = null;
         foreach ($findings as $finding) {
-            $date = self::str($finding, 'data_date');
-            if ($date !== '' && ($oldest === null || new \DateTimeImmutable($date) < new \DateTimeImmutable($oldest))) {
+            $date = $finding->dataDate();
+            if ($date !== null && ($oldest === null || $date->getTimestamp() < $oldest->getTimestamp())) {
                 $oldest = $date;
             }
         }
 
-        return $oldest;
-    }
-
-    /**
-     * @param array<string, mixed> $finding
-     *
-     * @return list<string>
-     */
-    private static function countedFlags(array $finding): array
-    {
-        $flags = [];
-        foreach (self::rows(self::map($finding, 'score'), 'terms') as $term) {
-            $flag = self::str($term, 'flag');
-            if ($flag !== '') {
-                $flags[] = $flag;
-            }
-        }
-
-        return $flags;
-    }
-
-    /** @param array<string, mixed> $row */
-    private static function str(array $row, string $key): string
-    {
-        return \is_string($row[$key] ?? null) ? $row[$key] : '';
-    }
-
-    /** @param array<string, mixed> $row */
-    private static function int(array $row, string $key): int
-    {
-        return \is_int($row[$key] ?? null) ? $row[$key] : 0;
-    }
-
-    /**
-     * @param array<string, mixed> $row
-     *
-     * @return array<string, mixed>
-     */
-    private static function map(array $row, string $key): array
-    {
-        $value = $row[$key] ?? null;
-        if (!\is_array($value)) {
-            return [];
-        }
-        /** @var array<string, mixed> $value report-2 writes objects with string keys only */
-        return $value;
-    }
-
-    /**
-     * @param array<string, mixed> $row
-     *
-     * @return list<array<string, mixed>>
-     */
-    private static function rows(array $row, string $key): array
-    {
-        $rows = [];
-        foreach (\is_array($row[$key] ?? null) ? $row[$key] : [] as $item) {
-            if (\is_array($item)) {
-                /** @var array<string, mixed> $item report-2 writes objects with string keys only */
-                $rows[] = $item;
-            }
-        }
-
-        return $rows;
+        return $oldest === null ? null : $oldest->format(\DATE_ATOM);
     }
 }

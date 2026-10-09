@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Lockrot\Analyzer;
 
+use Lockrot\Score\Accepted;
+use Lockrot\Score\Modifier;
+use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\ScoreModel;
 
 /**
@@ -16,7 +19,7 @@ use Lockrot\Verdict\ScoreModel;
 final class ScoreRulesUsed
 {
     /**
-     * @param list<array<string, mixed>> $findings report-2's finding objects
+     * @param list<Finding> $findings
      *
      * @return array<string, int|null>
      */
@@ -24,128 +27,60 @@ final class ScoreRulesUsed
     {
         $used = ScoreModel::rulesUnused();
         foreach ($findings as $finding) {
-            $score = self::map($finding['score'] ?? null);
-            $accepted = self::list($score['accepted'] ?? null);
-            if ($accepted !== []) {
-                ++$used['counted'];
-            }
-            $rerunHalves = static function (string $key, string $value) use ($accepted): bool {
-                foreach ($accepted as $row) {
-                    foreach (self::list(self::map($row['if_counted'] ?? null)['modifiers'] ?? null) as $modifier) {
-                        if (($modifier[$key] ?? null) === $value && ($modifier['before'] ?? null) !== ($modifier['after'] ?? null)) {
-                            return true;
-                        }
-                    }
-                }
-
-                return false;
-            };
-            if (!isset($score['terms'])) {
-                if ($rerunHalves('applies_to', 'maintenance')) {
-                    ++$used['divide-reach'];
-                }
-                if ($rerunHalves('reason', 'dev')) {
-                    ++$used['divide-dev'];
-                }
+            $score = $finding->scoreBasis();
+            $accepted = $score->accepted();
+            $used['counted'] += $accepted === [] ? 0 : 1;
+            if (!$score->isGraded()) {
+                $used['divide-reach'] += self::rerunHalves($accepted, 'isReach') ? 1 : 0;
+                $used['divide-dev'] += self::rerunHalves($accepted, 'isDev') ? 1 : 0;
                 ++$used['zero-verdicts'];
                 continue;
             }
-            $terms = self::list($score['terms']);
-            $modifiers = self::list($score['modifiers'] ?? null);
-            $parts = self::map($score['parts'] ?? null);
-            $security = self::any($terms, 'part', 'security');
+            $lead = 0;
+            $corroborating = 0;
+            foreach ($score->maintenanceTerms() as $term) {
+                $lead += $term->isLead() ? 1 : 0;
+                $corroborating += $term->isLead() ? 0 : 1;
+            }
+            $security = $score->securityTerm();
+            $reach = false;
+            $dev = false;
+            foreach ($score->modifiers() as $modifier) {
+                $reach = $reach || ($modifier->isReach() && $modifier->changes());
+                $dev = $dev || $modifier->isDev();
+            }
             ++$used['band-floors'];
-            if (self::any($terms, 'role', 'lead')) {
-                ++$used['lead-first'];
-            }
-            if (self::any($terms, 'role', 'corroborating')) {
-                ++$used['corroborating-share'];
-            }
-            if ($security) {
-                ++$used['advisory-points'];
-            }
-            if (self::any($terms, 'multiplier', 2)) {
-                ++$used['no-reachable-fix-multiplier'];
-            }
-            $advisories = self::map($parts['security'] ?? null)['of'] ?? null;
-            if (\is_int($advisories) && $advisories >= 2) {
-                ++$used['security-max'];
-            }
-            if (self::halves($modifiers, 'applies_to', 'maintenance') || $rerunHalves('applies_to', 'maintenance')) {
-                ++$used['divide-reach'];
-            }
-            if ($security && ($finding['reach'] ?? null) !== 'direct') {
-                ++$used['security-exempt-from-reach'];
-            }
-            if ((self::map($parts['maintenance'] ?? null)['status'] ?? null) === 'counted' && (self::map($parts['security'] ?? null)['status'] ?? null) === 'counted') {
-                ++$used['sum'];
-            }
-            if (self::any($modifiers, 'reason', 'dev') || $rerunHalves('reason', 'dev')) {
-                ++$used['divide-dev'];
-            }
-            if (($score['rounded_down'] ?? false) === true) {
-                ++$used['floor-once'];
-            }
+            $used['lead-first'] += $lead > 0 ? 1 : 0;
+            $used['corroborating-share'] += $corroborating > 0 ? 1 : 0;
+            $used['advisory-points'] += $security === null ? 0 : 1;
+            $used['no-reachable-fix-multiplier'] += $security !== null && $security->multiplier() === ScoreModel::NO_REACHABLE_FIX_FACTOR ? 1 : 0;
+            $used['security-max'] += $score->securityPart()->of() >= 2 ? 1 : 0;
+            $used['divide-reach'] += $reach || self::rerunHalves($accepted, 'isReach') ? 1 : 0;
+            $used['security-exempt-from-reach'] += $security !== null && !$finding->isDirect() ? 1 : 0;
+            $used['sum'] += $score->maintenancePart()->isCounted() && $score->securityPart()->isCounted() ? 1 : 0;
+            $used['divide-dev'] += $dev || self::rerunHalves($accepted, 'isDev') ? 1 : 0;
+            $used['floor-once'] += $score->roundedDown() ? 1 : 0;
         }
 
         return $used;
     }
 
     /**
-     * @param list<array<string, mixed>> $rows
-     * @param mixed                      $value
+     * Whether the rerun of an accepted flag halves its number by the kind of modifier.
+     *
+     * @param list<Accepted>          $accepted
+     * @param 'isReach'|'isDev' $kind
      */
-    private static function any(array $rows, string $key, $value): bool
+    private static function rerunHalves(array $accepted, string $kind): bool
     {
-        foreach ($rows as $row) {
-            if (($row[$key] ?? null) === $value) {
-                return true;
+        foreach ($accepted as $row) {
+            foreach ($row->modifiers() as $modifier) {
+                if ($modifier->{$kind}() && $modifier->changes()) {
+                    return true;
+                }
             }
         }
 
         return false;
-    }
-
-    /** @param list<array<string, mixed>> $modifiers */
-    private static function halves(array $modifiers, string $key, string $value): bool
-    {
-        foreach ($modifiers as $modifier) {
-            if (($modifier[$key] ?? null) === $value && ($modifier['before'] ?? null) !== ($modifier['after'] ?? null)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * @param mixed $value
-     *
-     * @return array<string, mixed>
-     */
-    private static function map($value): array
-    {
-        if (!\is_array($value)) {
-            return [];
-        }
-        /** @var array<string, mixed> $value report-2 writes objects with string keys only */
-        return $value;
-    }
-
-    /**
-     * @param mixed $value
-     *
-     * @return list<array<string, mixed>>
-     */
-    private static function list($value): array
-    {
-        $rows = [];
-        foreach (\is_array($value) ? $value : [] as $item) {
-            if (\is_array($item)) {
-                $rows[] = self::map($item);
-            }
-        }
-
-        return $rows;
     }
 }

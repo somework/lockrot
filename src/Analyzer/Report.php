@@ -469,16 +469,15 @@ final class Report
     public function toArray(): array
     {
         $gate = $this->gate();
-        $findings = array_values($this->findingRows($gate));
+        $sorted = $this->sorted();
         $run = $this->run ?? new RunSettings(null, null, null, RunSettings::SOURCE_RUNTIME, null, null, RunSettings::SOURCE_DEFAULT, null);
         $graded = array_filter($this->findings, static fn (Finding $f): bool => $f->isGraded());
         $multi = array_filter($graded, static fn (Finding $f): bool => \count($f->flagIds()) >= 2);
-        $flags = Report2Root::flags($findings);
         $oldest = $this->activityCacheOldestAt;
 
         return [
             'generated_at' => $this->generatedAt->format(\DATE_ATOM),
-            'run' => $run->toArray(ScoreRulesUsed::of($findings), $this->includesDev),
+            'run' => $run->toArray(ScoreRulesUsed::of($sorted), $this->includesDev),
             'activity_cache_oldest_at' => $oldest === null ? null : $oldest->format(\DATE_ATOM),
             'activity_cache_age_hours' => $oldest === null ? null : round(max(0, $this->generatedAt->getTimestamp() - $oldest->getTimestamp()) / 3600, 1),
             'packages_checked' => $this->packagesChecked,
@@ -488,20 +487,20 @@ final class Report
             'not_from_composer_repository' => $this->notFromComposerRepository,
             'network_failures' => $this->hadNetworkFailures(),
             'counts' => $this->byGrade(),
-            'abandoned' => Report2Root::abandoned($findings, $flags),
-            'priorities' => Report2Root::priorities($findings),
-            'flags' => $flags,
+            'abandoned' => Report2Root::abandoned($sorted),
+            'priorities' => Report2Root::priorities($sorted),
+            'flags' => Report2Root::flags($sorted),
             'exposure' => $this->exposureList(),
             'exposure_rule' => ['max_fan_in' => TransitiveExposure::MAX_FAN_IN],
             'unattributed' => $this->unattributedList(),
-            'libyears' => Report2Root::libyears($this->libyears()->toArray(), $findings),
+            'libyears' => Report2Root::libyears($this->libyears(), $sorted),
             'baseline' => $this->baseline === null ? null : $this->baseline->toArray(),
-            'gate' => Report2Root::gate($gate === null ? ['fails' => false, 'tripped_by' => [], 'fail_on_applied' => $run->mode() === Gate::MODE_CHECK] : $gate->toArray(), $findings),
-            'security' => Report2Root::security($findings),
-            'data_date' => Report2Root::dataDate($findings),
+            'gate' => Report2Root::gate($gate, $run->mode()),
+            'security' => Report2Root::security($sorted),
+            'data_date' => Report2Root::dataDate($sorted),
             'notes' => $this->notes(),
             'note_details' => array_map(static fn (RunNote $note): array => $note->toArray(), $this->notes),
-            'findings' => $findings,
+            'findings' => array_values($this->findingRows($gate)),
         ];
     }
 }
