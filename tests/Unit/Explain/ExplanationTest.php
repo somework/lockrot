@@ -7,6 +7,7 @@ namespace Lockrot\Tests\Unit\Explain;
 use Composer\Package\Loader\ArrayLoader;
 use Lockrot\Analyzer\LibyearsMeasurement;
 use Lockrot\Analyzer\Report;
+use Lockrot\Analyzer\RunSettings;
 use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Explain\Explanation;
 use Lockrot\Security\BranchFixes;
@@ -434,5 +435,25 @@ final class ExplanationTest extends TestCase
         $branches = JsonPath::arrayAt((new Explanation($finding, F::facts(F::package(['version' => '1.4.0']), $metadata), new Thresholds(), '8.4', $this->report()))->toArray(), ['metadata', 'branches']);
 
         self::assertSame(['3.x' => null, '2.x' => FindingDetails::branchFixes($two), '1.x' => FindingDetails::branchFixes($one)], array_column($branches, 'fixes', 'branch'));
+    }
+
+    /**
+     * The report's run and its row of the finding come first. The run carries the keys that
+     * explain-2 lists, and the legacy block keeps report-1's reading.
+     */
+    public function testTheReportsRunAndRowComeFirst(): void
+    {
+        $finding = $this->finding('1.0.0', Verdict::STALE);
+        $run = new RunSettings('/app', 'root/app', '8.1', RunSettings::SOURCE_OPTION, '/app/composer.lock', null, RunSettings::SOURCE_DEFAULT, new Thresholds(), null);
+        $report = (new Report([$finding], [], new \DateTimeImmutable(F::NOW), 1, 0))->withRun($run);
+
+        $array = (new Explanation($finding, F::facts(F::package()), new Thresholds(), '8.4', $report))->toArray();
+
+        self::assertSame('8.1', JsonPath::stringAt($array, ['run', 'target_php']));
+        self::assertSame(1, JsonPath::intAt($array, ['finding', 'rank']), "the report's row of the finding");
+        $keys = array_keys(JsonPath::arrayAt($array, ['run']));
+        sort($keys);
+        self::assertSame(['fail_on', 'fail_on_source', 'fix_model', 'flag_ids', 'gates', 'graded_verdicts', 'include_dev', 'project_php', 'project_php_lowest', 'score_model', 'signal_ids', 'target_php', 'target_php_source', 'text_grammar', 'thresholds', 'verdicts'], $keys);
+        self::assertSame(['verdict', 'priority', 'basis'], array_keys(JsonPath::arrayAt($array, ['legacy'])));
     }
 }

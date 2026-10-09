@@ -43,6 +43,35 @@ final class FlagSentenceTest extends TestCase
         yield 'a release dated by the monorepo' => [['newest_within_reach' => true, 'dated_by' => 'acme/monorepo'], 'branch 1.x last released 2019-03-02 (7.5 years ago, dated by acme/monorepo); 3.x released 3.4.1 (2026-06-01)'];
     }
 
+    /**
+     * @param array<string, array<string, mixed>> $data
+     *
+     * @dataProvider signalSentences
+     */
+    #[DataProvider('signalSentences')]
+    public function testEachSignalGivesItsClauseOfTheSentence(string $flag, array $data, string $sentence): void
+    {
+        self::assertSame($sentence, FlagSentence::maintenance($flag, $data));
+    }
+
+    /** @return iterable<string, array{string, array<string, array<string, mixed>>, string}> */
+    public static function signalSentences(): iterable
+    {
+        yield 'marked in the lock' => [FlagSet::ABANDONED, [Signal::S1 => ['marked_by' => 'lock', 'replacement' => null]], 'marked abandoned in composer.lock'];
+        yield 'marked by the registry, with a replacement' => [FlagSet::ABANDONED, [Signal::S1 => ['marked_by' => 'registry', 'replacement' => 'acme/next']], 'marked abandoned by its registry, replacement: acme/next'];
+        yield 'an empty replacement names none' => [FlagSet::ABANDONED, [Signal::S1 => ['marked_by' => 'registry', 'replacement' => '']], 'marked abandoned by its registry'];
+        yield 'archived on GitLab' => [FlagSet::ABANDONED, [Signal::S3 => ['forge' => 'gitlab']], 'its repository is archived on GitLab'];
+        yield 'archived with no host named' => [FlagSet::ABANDONED, [Signal::S3 => []], 'its repository is archived on GitHub'];
+        yield 'marked and archived' => [FlagSet::ABANDONED, [Signal::S1 => ['marked_by' => 'lock'], Signal::S3 => ['forge' => 'github']], 'marked abandoned in composer.lock; its repository is archived on GitHub'];
+        yield 'an old promise' => [FlagSet::OLD_PROMISE, [Signal::S5 => [
+            'released' => '2016-05-01T10:00:00+00:00', 'written_for_php' => '7.0', 'php_constraint' => '>=5.6', 'target_major' => '8.0', 'ga_date' => '2020-11-26', 'target_php' => '8.4',
+        ]], 'released 2016-05-01 for PHP 7.0 (php ">=5.6"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested'];
+        yield 'pinned to a branch snapshot' => [FlagSet::PINNED, [Signal::S6 => ['reason' => 'branch_snapshot', 'version' => 'dev-main']], 'pinned to branch snapshot dev-main'];
+        yield 'pinned with no tagged release' => [FlagSet::PINNED, [Signal::S6 => ['reason' => 'no_stable_release', 'version' => '1.0.0-beta1']], 'pinned to 1.0.0-beta1'];
+        yield 'whole years' => [FlagSet::STALE, [Signal::S2 => ['last_release' => '2021-05-05T00:00:00+00:00', 'years' => 5]], 'last release 2021-05-05 (5.0 years ago)'];
+        yield 'years that are no number print as given' => [FlagSet::STALE, [Signal::S2 => ['last_release' => '2021-05-05T00:00:00+00:00', 'years' => '5']], 'last release 2021-05-05 (5 years ago)'];
+    }
+
     public function testTheSilentSentenceReadsBothDates(): void
     {
         $data = [
