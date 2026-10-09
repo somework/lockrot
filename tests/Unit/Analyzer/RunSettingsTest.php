@@ -109,4 +109,15 @@ final class RunSettingsTest extends TestCase
         self::assertNotContains('targetPhpSource', $optional);
         self::assertNotContains('failOnSource', $optional);
     }
+
+    /** The run's own include_dev, unless the report that writes it says otherwise. */
+    public function testIncludeDevIsTheRunsUnlessTheReportGivesIt(): void
+    {
+        $default = new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, null, RunSettings::SOURCE_DEFAULT, null);
+        $withDev = new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, null, RunSettings::SOURCE_DEFAULT, null, null, false, 'check', true);
+
+        self::assertFalse($default->toArray()['include_dev']);
+        self::assertTrue($withDev->toArray()['include_dev']);
+        self::assertFalse($withDev->toArray(null, false)['include_dev']);
+    }
 }
