@@ -154,6 +154,10 @@ def summary(found: List[Escape], claims: List[list], source: Source) -> Tuple[in
     head = ('{} escaped mutant(s) no entry of tests/infection-equivalents.md accounts for: kill them with a test, '
             'or document why no test can.\n\n'.format(undocumented) if undocumented
             else 'Every escaped mutant is one tests/infection-equivalents.md accounts for.\n\n')
+    documented = len(found) - undocumented
+    if documented:
+        head += ('{} escaped mutant(s) have an entry. Each one still lowers this shard\'s MSI in the full run, '
+                 'which a pull request does not check.\n\n'.format(documented))
     return (1 if undocumented else 0), head + '\n'.join(rows) + '\n'
 
 
