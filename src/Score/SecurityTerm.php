@@ -16,6 +16,8 @@ use Lockrot\Verdict\FlagSet;
  */
 final class SecurityTerm implements Term
 {
+    public const ROLE = 'security';
+
     private string $advisory;
     private string $severity;
     private string $fixKind;
@@ -46,7 +48,7 @@ final class SecurityTerm implements Term
 
     public function role(): string
     {
-        return 'security';
+        return self::ROLE;
     }
 
     public function severity(): string

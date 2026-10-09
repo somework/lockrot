@@ -189,32 +189,25 @@ final class FindingDetails
      */
     public function security(array $rows, ?string $branch): array
     {
+        $standing = $this->standing($rows);
         $out = [
-            'status' => $rows !== [] ? 'vulnerable' : ($this->check === 'complete' ? 'clear' : 'unchecked'),
+            'status' => $standing->status(),
             'check' => $this->check,
             'complete' => $this->check === 'complete',
             'unchecked_reason' => $this->uncheckedReason,
         ];
         $ignored = array_map([self::class, 'ignored'], $this->ignored);
-        if ($rows === []) {
-            return $out + ['ignored' => $ignored, 'ignored_count' => \count($ignored)];
+        if (!$standing->isVulnerable()) {
+            return $out + ['ignored' => $ignored, 'ignored_count' => $standing->ignoredCount()];
         }
-        $counts = self::counts($rows);
-        // With no move, `fix_kind` is the hardest kind of its advisories: FIX_KINDS runs easiest first.
-        $hardest = 0;
-        foreach ($rows as $row) {
-            $fix = \is_array($row['fix'] ?? null) ? $row['fix'] : [];
-            $hardest = max($hardest, (int) array_search($fix['kind'] ?? Fix::UNKNOWN, ScoreModel::FIX_KINDS, true));
-        }
-        $worst = self::worst($counts);
         $gets = $this->fixes === null ? null : $this->fixes->gets();
 
         return $out + [
-            'worst' => $worst,
-            'counts' => $counts,
+            'worst' => self::worst($standing->counts()),
+            'counts' => $standing->counts(),
             'ignored' => $ignored,
-            'ignored_count' => \count($ignored),
-            'fix_kind' => ScoreModel::FIX_KINDS[$hardest],
+            'ignored_count' => $standing->ignoredCount(),
+            'fix_kind' => $standing->fixKind(),
             'installed_branch_fixes' => $this->installedBranchFixes($rows, $branch),
             'move_in' => null,
             'gets' => $gets === null ? null : [
@@ -225,6 +218,22 @@ final class FindingDetails
             ],
             'partial' => null,
         ];
+    }
+
+    /** @param list<array<string, mixed>> $rows the S9 rows, each with its `severity` bucket and `fix` */
+    public function standing(array $rows): SecurityStanding
+    {
+        if ($rows === []) {
+            return new SecurityStanding($this->check === 'complete' ? 'clear' : 'unchecked', $this->check, \count($this->ignored), self::counts([]), null);
+        }
+        // With no move, `fix_kind` is the hardest kind of its advisories: FIX_KINDS runs easiest first.
+        $hardest = 0;
+        foreach ($rows as $row) {
+            $fix = \is_array($row['fix'] ?? null) ? $row['fix'] : [];
+            $hardest = max($hardest, (int) array_search($fix['kind'] ?? Fix::UNKNOWN, ScoreModel::FIX_KINDS, true));
+        }
+
+        return new SecurityStanding(SecurityStanding::VULNERABLE, $this->check, \count($this->ignored), self::counts($rows), ScoreModel::FIX_KINDS[$hardest]);
     }
 
     /**

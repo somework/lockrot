@@ -147,10 +147,7 @@ start the reason with `in method():`.
 
 ## src/Verdict
 
-- `src/Verdict/Finding.php` LogicalAnd `return \is_string($replacement) && $replacement !== '' ? $replacement : null;` — in replacement(): `successor()` is the one caller and needs a `/`, so an empty string and null give the same answer.
-- `src/Verdict/Finding.php` Coalesce `$out[] = ['id' => $flag, 'role' => $roles[$flag] ?? 'security', 'baseline' => null, 'signal_ids' => [Signal::S9], 'degree' => null, 'headline' => ['unit' => 'advisories', 'value' => \count($rows), 'source' => null], 'summary' => $summary];` — the vulnerable flag fires only with a counted advisory, so the score has its security term and that term has its role.
 - `src/Verdict/Finding.php` Continue_ `continue;` — in flagsOut(): `vulnerable` is the last flag of the fired order, so `break` also ends the loop after it.
-- `src/Verdict/Finding.php` LogicalAnd `if (($term['part'] ?? null) === 'security' && \is_string($term['severity'] ?? null)) {` — only a security term carries a severity, so either operand alone picks the same term.
 - `src/Verdict/FindingDetails.php` CastString `$skipped[] = ['check' => 'advisories', 'reason' => (string) $advisoryReason, 'blocks' => [Signal::S9]];` — the `in_array()` guard admits two strings only.
 - `src/Verdict/FindingDetails.php` DecrementInteger `$hardest = 0;` — `security()` returns before the loop when no row counts, and every kind has an index of 0 or more, so the maximum is the same.
 - `src/Verdict/FlagSentence.php` DecrementInteger `if (($counts[$severity] ?? 0) > 0) {` — a missing severity reads as -1, which is not above 0 either.

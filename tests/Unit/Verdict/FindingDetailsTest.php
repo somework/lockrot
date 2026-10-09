@@ -180,6 +180,40 @@ final class FindingDetailsTest extends TestCase
         self::assertSame('unknown', $security['fix_kind'], 'a row with no kind reads as unknown');
     }
 
+    /** The standing that report-2's root counts: the status, the counts and the hardest fix kind of the counted rows. */
+    public function testTheStandingOfCountedRowsIsVulnerableWithTheHardestKind(): void
+    {
+        $ignored = new IgnoredAdvisory(new Advisory('PKSA-i', null, null, null, 'low', null), new AdvisoryIgnoreMatch(AdvisoryIgnoreMatch::ID, 'PKSA-i', null, AdvisoryIgnoreMatch::BY_AUDIT));
+        $details = new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'partial', 'lookup_failed', [$ignored], null);
+        $rows = [
+            ['id' => 'PKSA-a', 'severity' => 'acme:severe', 'fix' => ['kind' => 'update']],
+            ['id' => 'PKSA-b', 'severity' => 'low', 'fix' => ['kind' => 'raise-php']],
+            ['id' => 'PKSA-c', 'severity' => 'low', 'fix' => ['kind' => 'upgrade']],
+        ];
+
+        $standing = $details->standing($rows);
+
+        self::assertSame('vulnerable', $standing->status());
+        self::assertSame('partial', $standing->check());
+        self::assertSame(1, $standing->ignoredCount());
+        self::assertSame(['critical' => 0, 'high' => 0, 'medium' => 0, 'unrated' => 0, 'low' => 2, 'acme:severe' => 1], $standing->counts());
+        self::assertSame('raise-php', $standing->fixKind());
+    }
+
+    /** With no counted row, the lookup decides the status, and nothing is counted or fixed. */
+    public function testTheStandingWithNoRowFollowsTheLookup(): void
+    {
+        $details = static fn (string $check): FindingDetails => new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, $check, null, [], null);
+
+        self::assertSame('clear', $details('complete')->standing([])->status());
+        self::assertSame('unchecked', $details('partial')->standing([])->status());
+        self::assertSame('unchecked', $details('not_run')->standing([])->status());
+        self::assertSame('not_run', $details('not_run')->standing([])->check());
+        self::assertSame(0, $details('complete')->standing([])->ignoredCount());
+        self::assertNull($details('complete')->standing([])->fixKind());
+        self::assertSame([], array_filter($details('complete')->standing([])->counts()));
+    }
+
     /**
      * `metadata.reason` and `metadata.message` say why an unavailable answer failed, and are null
      * for every other status.

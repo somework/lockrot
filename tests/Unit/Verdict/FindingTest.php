@@ -213,6 +213,77 @@ final class FindingTest extends TestCase
         self::assertSame('marked abandoned by its repository, replacement: Symfony; '.$s9->summary().'; no fix expected', $freeText->ownEvidence(), 'free text is not a package to migrate to; the clause stays bare and the text is still read as text above it');
     }
 
+    /** S1's replacement is the repository's free text, and an empty one names nothing. */
+    public function testTheReplacementIsS1sNonEmptyText(): void
+    {
+        $abandoned = static fn (Signal $signal): Finding => (new FindingBuilder())->withVerdict(Verdict::ABANDONED)->withSignals([$signal])->build();
+
+        self::assertSame('Symfony', $abandoned(new Signal('S1', 'high', 'marked abandoned', ['replacement' => 'Symfony']))->replacement());
+        self::assertNull($abandoned(new Signal('S1', 'high', 'marked abandoned', ['replacement' => '']))->replacement());
+        self::assertNull($abandoned(new Signal('S1', 'high', 'marked abandoned', ['replacement' => null]))->replacement());
+        self::assertNull($abandoned(new Signal('S3', 'high', 'repository archived', []))->replacement());
+    }
+
+    /** report-2's `replacement` names the successor only while `abandoned` counts. */
+    public function testTheCountedSuccessorNeedsACountedAbandoned(): void
+    {
+        $s1 = new Signal('S1', 'high', 'marked abandoned', ['replacement' => 'symfony/mailer']);
+        $counted = (new FindingBuilder())->withVerdict(Verdict::ABANDONED)->withSignals([$s1])->build();
+        $accepted = (new FindingBuilder())->withVerdict(Verdict::ABANDONED)->withSignals([$s1])->withAllowlistReason('kept on purpose')->build();
+
+        self::assertSame('symfony/mailer', $counted->countedSuccessor());
+        self::assertNull($accepted->countedSuccessor());
+        self::assertSame(['abandoned'], $accepted->flags()->accepted());
+    }
+
+    public function testThePriorityIsTheGradeOrNone(): void
+    {
+        self::assertSame('high', (new FindingBuilder())->withVerdict(Verdict::OLD_PROMISE)->build()->gradeOrNone());
+        self::assertSame('none', (new FindingBuilder())->build()->gradeOrNone());
+    }
+
+    public function testTheLibyearsAreWrittenToTwoDecimals(): void
+    {
+        self::assertSame(1.24, (new FindingBuilder())->withLibyears(LibyearsMeasurement::of(1.236))->build()->libyearsRounded());
+        self::assertNull((new FindingBuilder())->withLibyears(LibyearsMeasurement::unmeasured(Libyears::NO_STABLE_RELEASE_DATE))->build()->libyearsRounded());
+    }
+
+    public function testAFindingWithoutFlagsHasNoFlagSet(): void
+    {
+        $flags = FlagSet::fromSignals([new Signal('S5', 'warn', 'old promise')], null, []);
+
+        self::assertSame($flags, (new FindingBuilder())->withFlags($flags)->build()->flags());
+        $this->expectException(\LogicException::class);
+        (new FindingBuilder())->withoutFlags()->build()->flags();
+    }
+
+    /** The typed score is the one that the finding writes, worded with the checks that did not run. */
+    public function testTheScoreBasisIsTheWrittenScore(): void
+    {
+        $s10 = new Signal('S10', 'info', 'repository activity not checked', ['unchecked' => [['check' => 'repository_activity', 'reason' => 'no_token', 'blocks' => ['S3', 'S4']]], 'blocks' => ['S3', 'S4']]);
+        $finding = (new FindingBuilder())->withSignals([new Signal('S5', 'warn', 'old promise'), new Signal('S2', 'warn', 'no release'), $s10])
+            ->withFlags(FlagSet::fromSignals([new Signal('S5', 'warn', 'old promise'), new Signal('S2', 'warn', 'no release')], new AllowlistEntry('vendor/pkg', null, 'slow on purpose', null, AllowlistEntry::BY_PROJECT, ['stale']), []))
+            ->build();
+
+        $basis = $finding->scoreBasis();
+
+        self::assertSame($finding->toArray()['score'], $basis->toArray());
+        self::assertTrue($basis->accepted()[0]->toArray()['if_counted']['at_least'], 'S10 blocks S4, so counting stale gives at least this total');
+    }
+
+    /** The security standing reads the S9 rows: an advisory row makes the package vulnerable. */
+    public function testTheSecurityStandingCountsTheS9Rows(): void
+    {
+        $s9 = new Signal('S9', 'warn', '1 advisory', ['advisories' => [['id' => 'PKSA-a', 'severity' => 'high', 'fix' => ['kind' => 'upgrade']]]]);
+
+        $standing = (new FindingBuilder())->withSignals([$s9])->build()->securityStanding();
+
+        self::assertSame('vulnerable', $standing->status());
+        self::assertSame(1, $standing->counts()['high']);
+        self::assertSame('upgrade', $standing->fixKind());
+        self::assertSame('clear', (new FindingBuilder())->build()->securityStanding()->status());
+    }
+
     /**
      * Packagist's `replacement` is free text. swiftmailer names `symfony/mailer`,
      * sensio/framework-extra-bundle names `Symfony`, doctrine/inflector `EnglishInflector from the
