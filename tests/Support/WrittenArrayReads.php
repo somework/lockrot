@@ -17,23 +17,18 @@ use PhpParser\NodeVisitor\ParentConnectingVisitor;
 use PhpParser\ParserFactory;
 
 /**
- * Finds the places where src/ reads an array that lockrot wrote: the result of a writer method
- * ({@see WRITER_METHODS}). The analysis follows the result through variables, properties, array
- * elements, `foreach`, callbacks and the class's own methods. It does not leave the file.
- *
- * A read is a key or an index (`$row['id']`), a keyed destructuring or a key function such as
- * `array_column()`. Only a writer file can read. Outside a writer, no code calls `jsonSerialize()`,
- * because the encoder walks the tree. In every file, a written array must not go to a method of
- * another object or to a class that is not a writer. The analysis cannot follow it there.
- *
- * The taint is flow-insensitive: a name that holds a written array once stays tainted in its method.
+ * Finds where src/ reads an array that a writer method wrote ({@see WRITER_METHODS}). The taint
+ * follows variables, properties, elements, `foreach`, callbacks and own methods, flow-insensitive.
+ * A read is a key, a keyed destructuring or a key function. Only a writer file can read, and only
+ * a writer calls `jsonSerialize()`. No file passes a written array to another object's method or
+ * to a class that is not a writer or its listed holder: the analysis does not leave the file.
  */
 final class WrittenArrayReads
 {
     private const WRITER_METHODS = ['toarray', 'jsonserialize', 'findingrows', 'toexplainarray'];
     /** The functions whose result holds the rows or the keys of their array argument. */
-    private const PASS_ON = ['array_values', 'array_slice', 'array_splice', 'array_merge', 'array_replace', 'array_filter', 'array_reverse', 'array_unique', 'array_pad', 'array_chunk', 'reset', 'end', 'current', 'next', 'prev', 'iterator_to_array', 'array_pop', 'array_shift'];
-    private const KEY_FUNCTIONS = ['array_key_exists', 'key_exists', 'array_column', 'array_intersect_key', 'array_diff_key', 'array_keys', 'extract'];
+    private const PASS_ON = ['array_values', 'array_slice', 'array_splice', 'array_merge', 'array_replace', 'array_filter', 'array_reverse', 'array_unique', 'array_pad', 'array_chunk', 'reset', 'end', 'current', 'next', 'prev', 'iterator_to_array', 'array_pop', 'array_shift', 'array_merge_recursive', 'array_replace_recursive', 'array_combine'];
+    private const KEY_FUNCTIONS = ['array_key_exists', 'key_exists', 'array_column', 'array_intersect_key', 'array_diff_key', 'array_keys', 'extract', 'array_key_first', 'array_key_last'];
     /** The callback argument of each function and the callback parameters that get its array's rows. */
     private const CALLBACKS = [
         'array_map' => [0, [0]],
@@ -57,13 +52,16 @@ final class WrittenArrayReads
     /** Whether a pass added a tainted parameter, return or property, which the next pass reads. */
     private bool $changed = false;
     private string $class = '';
+    /** @var array<string, list<string>> */
+    private array $holders = [];
 
     /**
-     * @param callable(string): bool $isWriter whether a fully qualified class name is a writer
+     * @param callable(string): bool       $isWriter whether a fully qualified class name is a writer
+     * @param array<string, list<string>> $holders  per class, the writers that can pass it a written array
      *
      * @return list<string> one line per violation: the line number and what the code does
      */
-    public static function inSource(string $source, callable $isWriter): array
+    public static function inSource(string $source, callable $isWriter, array $holders = []): array
     {
         $statements = (new ParserFactory())->createForNewestSupportedVersion()->parse($source);
         if ($statements === null) {
@@ -75,6 +73,7 @@ final class WrittenArrayReads
             $name = $class->namespacedName === null ? '' : $class->namespacedName->toString();
             $scan = new self();
             $scan->class = $name;
+            $scan->holders = $holders;
             $violations = array_merge($violations, $scan->inClass($class, $isWriter($name), $isWriter));
         }
 
@@ -148,7 +147,9 @@ final class WrittenArrayReads
         if ($node instanceof Node\Stmt\Foreach_ && $this->isTainted($node->expr)) {
             $this->taint($node->valueVar);
         }
-        if ($node instanceof Node\Stmt\Return_ && $node->expr !== null && $this->isTainted($node->expr) && !isset($this->returns[$method])) {
+        $returned = $node instanceof Node\Stmt\Return_ && !self::inClosure($node) ? $node->expr : null;
+        $returned = $node instanceof Expr\Yield_ || $node instanceof Expr\YieldFrom ? ($node instanceof Expr\Yield_ ? $node->value : $node->expr) : $returned;
+        if ($returned !== null && $this->isTainted($returned) && !isset($this->returns[$method])) {
             $this->returns[$method] = true;
             $this->changed = true;
         }
@@ -160,7 +161,7 @@ final class WrittenArrayReads
             }
         }
         $own = $this->ownMethod($node);
-        if ($own !== null && ($node instanceof Expr\MethodCall || $node instanceof Expr\StaticCall)) {
+        if ($own !== null && ($node instanceof Expr\MethodCall || $node instanceof Expr\StaticCall || $node instanceof Expr\New_)) {
             foreach ($node->getArgs() as $at => $arg) {
                 if ($this->isTainted($arg->value) && !isset($this->params[$own][$at])) {
                     $this->params[$own][$at] = true;
@@ -181,6 +182,15 @@ final class WrittenArrayReads
         $tainted = false;
         foreach ($args as $i => $arg) {
             $tainted = $tainted || ($i !== $at && $this->isTainted($arg->value));
+        }
+        $own = $callback === null ? null : $this->ownCallable($callback);
+        if ($tainted && $own !== null) {
+            foreach ($positions as $position) {
+                if (!isset($this->params[$own][$position])) {
+                    $this->params[$own][$position] = true;
+                    $this->changed = true;
+                }
+            }
         }
         if (!$tainted || !($callback instanceof Expr\Closure || $callback instanceof Expr\ArrowFunction)) {
             return;
@@ -217,12 +227,66 @@ final class WrittenArrayReads
         }
         if (($node instanceof Expr\StaticCall || $node instanceof Expr\New_) && $node->class instanceof Name && $this->ownMethod($node) === null && !$node->class->isSpecialClassName()) {
             $class = $node->class->toString();
-            if (strncmp($class, 'Lockrot\\', 8) === 0 && !$isWriter($class) && $this->anyTainted($node->getArgs())) {
+            if ($this->isForeign($class, $isWriter) && $this->anyTainted($node->getArgs())) {
+                return 'passes a written array to '.$class;
+            }
+        }
+        if ($node instanceof Expr\FuncCall && $node->name instanceof Name && isset(self::CALLBACKS[$node->name->toLowerString()])) {
+            $args = $node->getArgs();
+            $callback = $args[self::CALLBACKS[$node->name->toLowerString()][0]]->value ?? null;
+            $class = $callback instanceof Expr\Array_ && $this->ownCallable($callback) === null ? self::callableClass($callback) : null;
+            if ($class !== null && $this->isForeign($class, $isWriter) && $this->anyTainted($args)) {
                 return 'passes a written array to '.$class;
             }
         }
 
         return null;
+    }
+
+    /** @param callable(string): bool $isWriter */
+    private function isForeign(string $class, callable $isWriter): bool
+    {
+        return strncmp($class, 'Lockrot\\', 8) === 0 && !$isWriter($class) && !\in_array($this->class, $this->holders[$class] ?? [], true);
+    }
+
+    /** The own method of a callable array: `[$this, 'm']`, `[self::class, 'm']` or the own class name. */
+    private function ownCallable(Expr $callback): ?string
+    {
+        $class = $callback instanceof Expr\Array_ ? self::callableClass($callback) : null;
+        $method = $callback instanceof Expr\Array_ ? ($callback->items[1]->value ?? null) : null;
+        if ($class === null || !$method instanceof Node\Scalar\String_) {
+            return null;
+        }
+
+        return \in_array(strtolower($class), ['$this', 'self', 'static'], true) || $class === $this->class ? strtolower($method->value) : null;
+    }
+
+    /** The class of a two-item callable array, `$this` for the object itself. */
+    private static function callableClass(Expr\Array_ $callback): ?string
+    {
+        $target = \count($callback->items) === 2 ? ($callback->items[0]->value ?? null) : null;
+        if ($target instanceof Expr\Variable && $target->name === 'this') {
+            return '$this';
+        }
+        if ($target instanceof Expr\ClassConstFetch && $target->class instanceof Name && $target->name instanceof Node\Identifier && $target->name->toLowerString() === 'class') {
+            return $target->class->toString();
+        }
+
+        return null;
+    }
+
+    private static function inClosure(Node $node): bool
+    {
+        for ($parent = $node->getAttribute('parent'); $parent instanceof Node; $parent = $parent->getAttribute('parent')) {
+            if ($parent instanceof Expr\Closure || $parent instanceof Expr\ArrowFunction) {
+                return true;
+            }
+            if ($parent instanceof ClassMethod) {
+                return false;
+            }
+        }
+
+        return false;
     }
 
     /** Whether the key is the target of an assignment or an unset. Both write the array and do not read it. */
@@ -301,6 +365,11 @@ final class WrittenArrayReads
         if ($expr instanceof Expr\FuncCall && $expr->name instanceof Name && $expr->name->toLowerString() === 'array_map') {
             $callback = $expr->getArgs()[0]->value ?? null;
 
+            $own = $callback === null ? null : $this->ownCallable($callback);
+            if ($own !== null) {
+                return isset($this->returns[$own]);
+            }
+
             return $callback instanceof Expr\ArrowFunction ? $this->isTainted($callback->expr) : ($callback instanceof Expr\Closure && $this->returnsTainted($callback));
         }
 
@@ -348,9 +417,15 @@ final class WrittenArrayReads
         }
     }
 
-    /** The own method that `$this->m()`, `self::m()`, `static::m()` or a call by the class's own name names, lower case. */
+    /**
+     * The lower-case name of the method that an own call targets. Own calls are `$this->m()`,
+     * `self::m()`, `static::m()`, a call by the class's own name and a `new` of the class itself.
+     */
     private function ownMethod(Node $node): ?string
     {
+        if ($node instanceof Expr\New_ && $node->class instanceof Name && (\in_array($node->class->toLowerString(), ['self', 'static'], true) || $node->class->toString() === $this->class)) {
+            return '__construct';
+        }
         if ($node instanceof Expr\MethodCall && $node->var instanceof Expr\Variable && $node->var->name === 'this' && $node->name instanceof Node\Identifier) {
             return $node->name->toLowerString();
         }
@@ -367,6 +442,9 @@ final class WrittenArrayReads
             return '$'.$node->name;
         }
         if ($node instanceof Expr\PropertyFetch && $node->var instanceof Expr\Variable && $node->var->name === 'this' && $node->name instanceof Node\Identifier) {
+            return '->'.$node->name->toString();
+        }
+        if ($node instanceof Expr\StaticPropertyFetch && $node->name instanceof Node\VarLikeIdentifier) {
             return '->'.$node->name->toString();
         }
 

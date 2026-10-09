@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Verdict;
 
 /**
- * Where one finding stands on security. FindingDetails::security() writes it into the finding's
- * `security`, and Report2Root::security() counts it.
+ * Where one finding stands on security.
  *
  * @internal
  */

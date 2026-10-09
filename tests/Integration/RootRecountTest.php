@@ -20,8 +20,8 @@ use PHPUnit\Framework\TestCase;
  * Each root block of report-2 and `run.score_rules_used` agree with the written `findings[]`: a
  * reader that decodes the document and counts again gets the written block. The documents are the
  * cases of tests/fixtures/flags/cases.json, each under fail-on values that make findings reach the
- * gate, and once with a baseline of its own findings that exempts them. AppRootRecountTest checks
- * the fixture apps.
+ * gate. Each case also runs with a baseline of its own findings, which exempts them.
+ * AppRootRecountTest checks the fixture apps.
  */
 final class RootRecountTest extends TestCase
 {

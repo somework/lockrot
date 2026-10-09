@@ -275,8 +275,8 @@ final class RootRecount
     }
 
     /**
-     * Every rule of score model 1 in model order. `sort` changes no number, and no finding uses the
-     * two gate rules.
+     * Every rule of the score model in model order. `sort` changes no number. A finding's numbers
+     * show no gate rule, so each gate rule stays at 0.
      *
      * @param list<array<mixed, mixed>> $findings
      *
