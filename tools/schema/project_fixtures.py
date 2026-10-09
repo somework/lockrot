@@ -156,8 +156,9 @@ def project_s10(f, proj):
         words = [w for _, w in kept]
         s10 = copy.deepcopy(s10) if s10 is not None else {'id': 'S10', 'level': 'info', 'summary': '', 'data': {}}
         s10['data'] = {'unchecked': [e for e, _ in kept], 'blocks': blocks}
-        if all(w is not None for w in words):
-            s10['summary'] = '; '.join(words)
+        if any(w is None for w in words):
+            raise SystemExit('%s: an S10 entry has no summary clause: %r' % (f['package'], [e for e, w in kept if w is None]))
+        s10['summary'] = '; '.join(words)
         signals.append(s10)
     f['signals'] = signals
 
