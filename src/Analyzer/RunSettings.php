@@ -145,7 +145,7 @@ final class RunSettings
         ];
     }
 
-    /** @return array<string, mixed> */
+    /** @return array{thresholds: array<string, int>, flag_ids: list<string>, verdicts: list<string>, graded_verdicts: list<string>, signal_ids: list<string>, fix_model: int, text_grammar: int, score_model: array<string, mixed>} */
     private function model(): array
     {
         $thresholds = $this->thresholds ?? new Thresholds();

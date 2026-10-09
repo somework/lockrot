@@ -160,7 +160,7 @@ final class Report2Root
     /**
      * @param list<Finding> $findings
      *
-     * @return array<string, mixed>
+     * @return array{check: string, packages: array<string, int>, advisories: array{counted: int, ignored: int}, severities: array<string, int>, fixes: array<string, int>, update_now: list<string>, update_now_command: ?list<string>, fix_unknown: int}
      */
     public static function security(array $findings): array
     {
