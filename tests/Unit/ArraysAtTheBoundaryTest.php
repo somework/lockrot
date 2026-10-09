@@ -16,7 +16,6 @@ use PHPUnit\Framework\TestCase;
  */
 final class ArraysAtTheBoundaryTest extends TestCase
 {
-    /** The classes that write a document. */
     private const WRITERS = [
         'Lockrot\Analyzer\Report',
         'Lockrot\Baseline\BaselineFile',
@@ -25,6 +24,8 @@ final class ArraysAtTheBoundaryTest extends TestCase
         'Lockrot\Json\JsonWriter',
         // Writes report-2's `signals[].data.advisories[]`.
         'Lockrot\Signal\Rule\AdvisoryRule',
+        // Holds report-2's `signals[].data` as its rule wrote it.
+        'Lockrot\Signal\Signal',
     ];
     /** The namespaces whose every class writes a document: the formatters and report-1. */
     private const WRITER_NAMESPACES = ['Lockrot\Output\\', 'Lockrot\Legacy\\'];
@@ -69,7 +70,8 @@ final class ArraysAtTheBoundaryTest extends TestCase
         'Verdict/ScoreModel.php' => 6,
     ];
 
-    private const MIXED_MAP = 'array<string, mixed>';
+    /** Any spacing of `array<string, mixed>`. */
+    private const MIXED_MAP = '/array<\\s*string\\s*,\\s*mixed\\s*>/';
 
     public function testOnlyAWriterReadsAnArrayThatLockrotWrote(): void
     {
@@ -87,13 +89,15 @@ final class ArraysAtTheBoundaryTest extends TestCase
     {
         $counts = [];
         foreach (self::sourceFiles() as $relative => $path) {
-            $count = substr_count(self::read($path), self::MIXED_MAP);
+            $count = preg_match_all(self::MIXED_MAP, self::read($path));
             if ($count > 0 || isset(self::CEILINGS[$relative])) {
                 $counts[$relative] = $count;
             }
         }
 
-        self::assertSame(self::CEILINGS, $counts, 'A count above its ceiling needs a typed object. A count below it lowers the ceiling here.');
+        $ceilings = self::CEILINGS;
+        ksort($ceilings);
+        self::assertSame($ceilings, $counts, 'A count above its ceiling needs a typed object. A count below it lowers the ceiling here.');
     }
 
     public static function isWriter(string $class): bool
@@ -134,7 +138,12 @@ final class ArraysAtTheBoundaryTest extends TestCase
         yield 'a key function and a keyed destructuring' => ['    public function a($o) { $t = $o->toArray(); [\'id\' => $id] = $t; return array_column($t, \'id\'); }', ['6: destructures a written array', '6: passes a written array to array_column()']];
         yield 'a static call to a class that is not a writer' => ['    public function a($o) { return Other::count($o->toArray()); }', ['6: passes a written array to Lockrot\Domain\Other']];
         yield 'a new object of a class that is not a writer' => ['    public function a($o) { return new Other([\'row\' => $o->toArray()]); }', ['6: passes a written array to Lockrot\Domain\Other']];
-        yield 'a writer may get it' => ['    public function a($o) { return \Lockrot\Output\X::f($o->toArray()); }', []];
+        yield 'a written array as an element of a list' => ['    public function a($fs) { $rows = []; foreach ($fs as $f) { $rows[] = $f->toArray(); } return $rows[0][\'id\']; }', ['6: reads a key of a written array']];
+        yield 'a list mapped from the objects and array_push()' => ["    public function a(\$fs) { \$rows = array_map(static fn (\$f) => \$f->toArray(), \$fs); \$more = []; array_push(\$more, \$fs[0]->toArray()); return \$rows[0]['id'].\$more[0]['id']; }", ['6: reads a key of a written array', '6: reads a key of a written array']];
+        yield 'a keyed destructuring in a foreach' => ['    public function a($o) { foreach ($o->findingRows() as [\'package\' => $name]) { echo $name; } }', ['6: destructures a written array']];
+        yield 'an instance call of another object' => ['    public function a($o, $other) { return $other->count($o->toArray()); }', ['6: passes a written array to ->count()']];
+        yield 'a call by the class name is an own call' => ["    public function a(\$o) { return Reader::b(\$o->toArray()); }\n    private static function b(array \$row) { return \$row['id']; }", ['7: reads a key of a written array']];
+        yield 'a writer can get it' => ['    public function a($o) { return \Lockrot\Output\X::f($o->toArray()); }', []];
         yield 'a key written into the array is no read' => ['    public function a($o) { $row = $o->toArray(); $row[\'extra\'] = 1; unset($row[\'id\']); return $row; }', []];
         yield 'the encoded string is no array' => ['    public function a($o) { $json = json_encode($o->toArray()); return $json[0].Other::save($json); }', []];
         yield 'an array that the code built is no written array' => ['    public function a($o) { $row = [\'id\' => $o->id()]; return $row[\'id\']; }', []];

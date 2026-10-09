@@ -12,8 +12,8 @@ use Lockrot\Verdict\ScoreModel;
 
 /**
  * report-2's root blocks, each counted from the findings that the report writes. RootRecountTest
- * counts each block again from the written `findings[]`. Pass the findings in the written order:
- * the libyears sums, `update_now` and the first of two equal data dates follow it.
+ * counts each block again from the written `findings[]`. Pass the findings in the written order.
+ * The libyears sums, `update_now` and the first of two equal data dates follow that order.
  *
  * @internal
  */

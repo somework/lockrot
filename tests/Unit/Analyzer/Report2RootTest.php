@@ -96,10 +96,7 @@ final class Report2RootTest extends TestCase
         self::assertSame([], $security['update_now']);
     }
 
-    /**
-     * silent leads a critical finding that accepts pinned. old-promise leads a high finding that
-     * accepts stale, and a critical one with a high advisory. stale alone, accepted, is finished.
-     */
+    /** The findings cover an accepted flag in a graded finding and in a finished one. */
     public function testFlagsCountCarryingLeadingAcceptedAndGrades(): void
     {
         $s = static fn (string $id, string $level): Signal => new Signal($id, $level, $id);

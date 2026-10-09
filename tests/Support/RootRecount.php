@@ -42,7 +42,7 @@ final class RootRecount
             'gate' => $gate,
             'security' => self::security($findings),
             'data_date' => self::dataDate($findings),
-            'run.score_rules_used' => self::scoreRulesUsed($findings, JsonPath::arrayAt($document, ['run', 'score_rules_used'])),
+            'run.score_rules_used' => self::scoreRulesUsed($findings),
         ];
         $written = [
             'flags' => $document['flags'] ?? null,
@@ -275,17 +275,17 @@ final class RootRecount
     }
 
     /**
-     * Every rule that a finding's numbers show, keyed as the written block keys them: a rule that
-     * the findings cannot show keeps its written value.
+     * Every rule of score model 1 in model order. `sort` changes no number, and no finding uses the
+     * two gate rules.
      *
      * @param list<array<mixed, mixed>> $findings
-     * @param array<mixed, mixed>       $written
      *
-     * @return array<mixed, mixed>
+     * @return array<string, int|null>
      */
-    private static function scoreRulesUsed(array $findings, array $written): array
+    private static function scoreRulesUsed(array $findings): array
     {
-        $used = array_fill_keys(['counted', 'lead-first', 'corroborating-share', 'advisory-points', 'no-reachable-fix-multiplier', 'security-max', 'divide-reach', 'security-exempt-from-reach', 'sum', 'divide-dev', 'floor-once', 'band-floors', 'zero-verdicts'], 0);
+        $used = array_fill_keys(['counted', 'lead-first', 'corroborating-share', 'advisory-points', 'no-reachable-fix-multiplier', 'security-max', 'divide-reach', 'security-exempt-from-reach', 'sum', 'divide-dev', 'floor-once', 'band-floors', 'zero-verdicts'], 0)
+            + ['sort' => null, 'gate-bounded-new' => 0, 'baseline-cover' => 0];
         foreach ($findings as $finding) {
             $score = self::map($finding, 'score');
             $accepted = self::rows($score, 'accepted');
@@ -325,7 +325,7 @@ final class RootRecount
             $used['floor-once'] += ($score['rounded_down'] ?? false) === true ? 1 : 0;
         }
 
-        return array_merge($written, $used);
+        return $used;
     }
 
     /**

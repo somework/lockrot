@@ -7,7 +7,7 @@ namespace Lockrot\Score;
 use Lockrot\Verdict\ScoreModel;
 
 /**
- * What one part, maintenance or security, adds to the score, and the grade it would give alone.
+ * What one part, maintenance or security, adds to the score, and the grade that the part gives alone.
  * The security part also counts the advisories and names the ones tied with the deciding one.
  *
  * @internal

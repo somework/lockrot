@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
 
 final class AcceptedTest extends TestCase
 {
-    /** The worked row "an accepted flag after the line": stale counted would corroborate old-promise. */
+    /** The worked row "an accepted flag after the line": the rerun counts stale as a corroborating flag. */
     public function testAnAcceptedFlagWritesItsRerunInOrder(): void
     {
         $accepted = ScoreSweep::basis(['axis' => 'base', 'flags' => ['old-promise', 'stale'], 'advisories' => [], 'reach' => 'direct', 'dev' => false, 'under' => null, 'accepted' => 'stale'])->accepted();

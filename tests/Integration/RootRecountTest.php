@@ -6,18 +6,22 @@ namespace Lockrot\Tests\Integration;
 
 use Lockrot\Analyzer\Report;
 use Lockrot\Analyzer\RunSettings;
+use Lockrot\Baseline\Baseline;
+use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Output\JsonFormatter;
 use Lockrot\Tests\Support\CaseHydrator;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\RootRecount;
 use Lockrot\Verdict\FailOn;
+use Lockrot\Verdict\Finding;
 use PHPUnit\Framework\TestCase;
 
 /**
  * Each root block of report-2 and `run.score_rules_used` agree with the written `findings[]`: a
  * reader that decodes the document and counts again gets the written block. The documents are the
  * cases of tests/fixtures/flags/cases.json, each under fail-on values that make findings reach the
- * gate. AppRootRecountTest checks the fixture apps.
+ * gate, and once with a baseline of its own findings that exempts them. AppRootRecountTest checks
+ * the fixture apps.
  */
 final class RootRecountTest extends TestCase
 {
@@ -26,13 +30,15 @@ final class RootRecountTest extends TestCase
     public function testEveryRootBlockOfEveryCaseRecountsFromItsFindings(): void
     {
         $mismatches = [];
-        $seen = ['vulnerable' => 0, 'reaching' => 0, 'libyears' => 0, 'data_date' => 0];
+        $seen = ['vulnerable' => 0, 'reaching' => 0, 'failing' => 0, 'exempt' => 0, 'libyears' => 0, 'data_date' => 0];
         foreach (self::documents() as $label => $document) {
             foreach (RootRecount::mismatches($document) as $mismatch) {
                 $mismatches[] = $label.' '.$mismatch;
             }
             $seen['vulnerable'] += JsonPath::intAt($document, ['security', 'packages', 'vulnerable']);
             $seen['reaching'] += JsonPath::intAt($document, ['gate', 'reaching']);
+            $seen['failing'] += JsonPath::intAt($document, ['gate', 'failing']);
+            $seen['exempt'] += JsonPath::intAt($document, ['gate', 'exempt', 'baseline']);
             $seen['libyears'] += \is_float(JsonPath::arrayAt($document, ['libyears'])['total'] ?? null) ? 1 : 0;
             $seen['data_date'] += \is_string($document['data_date'] ?? null) ? 1 : 0;
         }
@@ -57,6 +63,10 @@ final class RootRecountTest extends TestCase
                 $run = new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, FailOn::fromString($failOn), RunSettings::SOURCE_OPTION, null);
                 yield $id.' --fail-on='.$failOn => self::decode($report->withRun($run));
             }
+            $names = array_map(static fn (Finding $finding): string => $finding->package(), $report->findings());
+            $known = $report->withBaseline(BaselineComparison::compare(Baseline::fromReport($report), $report, 'lockrot-baseline.json', $names));
+            $run = new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, FailOn::fromString('low'), RunSettings::SOURCE_OPTION, null);
+            yield $id.' with its own baseline' => self::decode($known->withRun($run));
         }
         self::assertGreaterThan(0, $cases);
     }

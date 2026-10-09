@@ -17,20 +17,22 @@ use PhpParser\NodeVisitor\ParentConnectingVisitor;
 use PhpParser\ParserFactory;
 
 /**
- * Finds the places where src/ reads an array that lockrot wrote: the result of a `toArray()`,
- * `jsonSerialize()` or `findingRows()` call. The analysis follows the result through variables,
- * properties, `foreach`, callbacks and the class's own methods, and does not leave the file.
+ * Finds the places where src/ reads an array that lockrot wrote: the result of a writer method
+ * ({@see WRITER_METHODS}). The analysis follows the result through variables, properties, array
+ * elements, `foreach`, callbacks and the class's own methods. It does not leave the file.
  *
- * A read is a key or an index (`$row['id']`), a keyed destructuring, or a key function such as
- * `array_column()`. A reader is allowed only in a writer file. In every file, a written array must
- * not go to a static call or a `new` of a class that is not a writer, because the analysis cannot
- * follow it there. Outside a writer, no code calls `jsonSerialize()`: the encoder walks the tree.
+ * A read is a key or an index (`$row['id']`), a keyed destructuring or a key function such as
+ * `array_column()`. Only a writer file can read. Outside a writer, no code calls `jsonSerialize()`,
+ * because the encoder walks the tree. In every file, a written array must not go to a method of
+ * another object or to a class that is not a writer. The analysis cannot follow it there.
+ *
+ * The taint is flow-insensitive: a name that holds a written array once stays tainted in its method.
  */
 final class WrittenArrayReads
 {
-    private const WRITER_METHODS = ['toarray', 'jsonserialize', 'findingrows'];
+    private const WRITER_METHODS = ['toarray', 'jsonserialize', 'findingrows', 'toexplainarray'];
     /** The functions whose result holds the rows or the keys of their array argument. */
-    private const PASS_ON = ['array_values', 'array_slice', 'array_splice', 'array_merge', 'array_replace', 'array_filter', 'array_reverse', 'array_unique', 'array_pad', 'array_chunk', 'reset', 'end', 'current', 'next', 'prev', 'iterator_to_array', 'array_pop', 'array_shift', 'compact'];
+    private const PASS_ON = ['array_values', 'array_slice', 'array_splice', 'array_merge', 'array_replace', 'array_filter', 'array_reverse', 'array_unique', 'array_pad', 'array_chunk', 'reset', 'end', 'current', 'next', 'prev', 'iterator_to_array', 'array_pop', 'array_shift'];
     private const KEY_FUNCTIONS = ['array_key_exists', 'key_exists', 'array_column', 'array_intersect_key', 'array_diff_key', 'array_keys', 'extract'];
     /** The callback argument of each function and the callback parameters that get its array's rows. */
     private const CALLBACKS = [
@@ -41,7 +43,7 @@ final class WrittenArrayReads
         'usort' => [1, [0, 1]],
         'uasort' => [1, [0, 1]],
     ];
-    /** A bound on the passes over one class: each pass taints at least one more name. */
+    /** A bound on the passes over one class: each pass taints at least one more name or position. */
     private const PASSES = 50;
 
     /** @var array<string, true> the tainted variables and `$this` properties of the method in scope, `$name` or `->name` */
@@ -52,7 +54,9 @@ final class WrittenArrayReads
     private array $returns = [];
     /** @var array<string, true> the `$this` properties that hold a written array */
     private array $properties = [];
+    /** Whether a pass added a tainted parameter, return or property, which the next pass reads. */
     private bool $changed = false;
+    private string $class = '';
 
     /**
      * @param callable(string): bool $isWriter whether a fully qualified class name is a writer
@@ -69,7 +73,9 @@ final class WrittenArrayReads
         $violations = [];
         foreach ((new NodeFinder())->findInstanceOf($statements, ClassLike::class) as $class) {
             $name = $class->namespacedName === null ? '' : $class->namespacedName->toString();
-            $violations = array_merge($violations, (new self())->inClass($class, $isWriter($name), $isWriter));
+            $scan = new self();
+            $scan->class = $name;
+            $violations = array_merge($violations, $scan->inClass($class, $isWriter($name), $isWriter));
         }
 
         return $violations;
@@ -86,15 +92,16 @@ final class WrittenArrayReads
         foreach ($class->getMethods() as $method) {
             $methods[$method->name->toLowerString()] = $method;
         }
-        for ($pass = 0; $pass < self::PASSES; ++$pass) {
+        $pass = 0;
+        do {
+            if (++$pass > self::PASSES) {
+                throw new \LogicException('the taint of '.$this->class.' does not settle');
+            }
             $this->changed = false;
             foreach ($methods as $name => $method) {
                 $this->taintMethod($name, $method);
             }
-            if (!$this->changed) {
-                break;
-            }
-        }
+        } while ($this->changed);
         $violations = [];
         foreach ($methods as $name => $method) {
             $this->taintMethod($name, $method);
@@ -147,6 +154,10 @@ final class WrittenArrayReads
         }
         if ($node instanceof Expr\FuncCall && $node->name instanceof Name) {
             $this->spreadToCallback($node->name->toLowerString(), $node->getArgs());
+            $args = $node->getArgs();
+            if ($node->name->toLowerString() === 'array_push' && isset($args[0]) && $this->anyTainted(\array_slice($args, 1))) {
+                $this->taint($args[0]->value);
+            }
         }
         $own = $this->ownMethod($node);
         if ($own !== null && ($node instanceof Expr\MethodCall || $node instanceof Expr\StaticCall)) {
@@ -187,7 +198,9 @@ final class WrittenArrayReads
         if (!$mayRead && ($node instanceof Expr\MethodCall || $node instanceof Expr\NullsafeMethodCall || $node instanceof Expr\StaticCall) && $node->name instanceof Node\Identifier && $node->name->toLowerString() === 'jsonserialize') {
             return 'calls jsonSerialize(): only the encoder walks the tree';
         }
-        if (!$mayRead && $node instanceof Expr\ArrayDimFetch && !self::isWritten($node) && $this->isTainted($node->var)) {
+        $parent = $node->getAttribute('parent');
+        $inner = $parent instanceof Expr\ArrayDimFetch && $parent->var === $node;
+        if (!$mayRead && $node instanceof Expr\ArrayDimFetch && !$inner && !self::isWritten($node) && $this->isTainted($node->var)) {
             return 'reads a key of a written array';
         }
         if (!$mayRead && $node instanceof Expr\FuncCall && $node->name instanceof Name && \in_array($node->name->toLowerString(), self::KEY_FUNCTIONS, true) && $this->anyTainted($node->getArgs())) {
@@ -195,6 +208,12 @@ final class WrittenArrayReads
         }
         if (!$mayRead && $node instanceof Expr\Assign && ($node->var instanceof Expr\List_ || $node->var instanceof Expr\Array_) && $this->isTainted($node->expr)) {
             return 'destructures a written array';
+        }
+        if (!$mayRead && $node instanceof Node\Stmt\Foreach_ && ($node->valueVar instanceof Expr\List_ || $node->valueVar instanceof Expr\Array_) && $this->isTainted($node->expr)) {
+            return 'destructures a written array';
+        }
+        if (($node instanceof Expr\MethodCall || $node instanceof Expr\NullsafeMethodCall) && $this->ownMethod($node) === null && $node->name instanceof Node\Identifier && $this->anyTainted($node->getArgs())) {
+            return 'passes a written array to ->'.$node->name->toString().'()';
         }
         if (($node instanceof Expr\StaticCall || $node instanceof Expr\New_) && $node->class instanceof Name && $this->ownMethod($node) === null && !$node->class->isSpecialClassName()) {
             $class = $node->class->toString();
@@ -206,7 +225,7 @@ final class WrittenArrayReads
         return null;
     }
 
-    /** Whether the key is the target of an assignment or an unset, which writes the array, not reads it. */
+    /** Whether the key is the target of an assignment or an unset. Both write the array and do not read it. */
     private static function isWritten(Expr\ArrayDimFetch $node): bool
     {
         $child = $node;
@@ -235,8 +254,11 @@ final class WrittenArrayReads
     }
 
     /**
-     * Whether the value of $expr is a written array or a part of one. A call returns one only when
-     * it is a writer call, an own method that returns one, or a function that passes its array on.
+     * Whether the value of $expr is a written array or a part of one. These calls return one:
+     *
+     * - a writer method, or an own method that returns a written array
+     * - a function of {@see PASS_ON} with a written array argument
+     * - `array_map()` whose callback returns a written array
      */
     private function isTainted(Expr $expr): bool
     {
@@ -276,6 +298,22 @@ final class WrittenArrayReads
         if ($expr instanceof Expr\FuncCall && $expr->name instanceof Name && \in_array($expr->name->toLowerString(), self::PASS_ON, true)) {
             return $this->anyTainted($expr->getArgs());
         }
+        if ($expr instanceof Expr\FuncCall && $expr->name instanceof Name && $expr->name->toLowerString() === 'array_map') {
+            $callback = $expr->getArgs()[0]->value ?? null;
+
+            return $callback instanceof Expr\ArrowFunction ? $this->isTainted($callback->expr) : ($callback instanceof Expr\Closure && $this->returnsTainted($callback));
+        }
+
+        return false;
+    }
+
+    private function returnsTainted(Expr\Closure $closure): bool
+    {
+        foreach ((new NodeFinder())->findInstanceOf($closure->stmts, Node\Stmt\Return_::class) as $return) {
+            if ($return->expr !== null && $this->isTainted($return->expr)) {
+                return true;
+            }
+        }
 
         return false;
     }
@@ -294,25 +332,29 @@ final class WrittenArrayReads
         return $key !== null && isset($this->tainted[$key]);
     }
 
+    /** A written array stored into an element taints the whole array that holds it. */
     private function taint(?Node $target): void
     {
+        while ($target instanceof Expr\ArrayDimFetch) {
+            $target = $target->var;
+        }
         $key = $target === null ? null : self::key($target);
         if ($key !== null && !isset($this->tainted[$key])) {
             $this->tainted[$key] = true;
-            if (strncmp($key, '->', 2) === 0) {
+            if (strncmp($key, '->', 2) === 0 && !isset($this->properties[substr($key, 2)])) {
                 $this->properties[substr($key, 2)] = true;
+                $this->changed = true;
             }
-            $this->changed = true;
         }
     }
 
-    /** The own method that a `$this->m()`, `self::m()` or `static::m()` call names, lower case. */
+    /** The own method that `$this->m()`, `self::m()`, `static::m()` or a call by the class's own name names, lower case. */
     private function ownMethod(Node $node): ?string
     {
         if ($node instanceof Expr\MethodCall && $node->var instanceof Expr\Variable && $node->var->name === 'this' && $node->name instanceof Node\Identifier) {
             return $node->name->toLowerString();
         }
-        if ($node instanceof Expr\StaticCall && $node->class instanceof Name && \in_array($node->class->toLowerString(), ['self', 'static'], true) && $node->name instanceof Node\Identifier) {
+        if ($node instanceof Expr\StaticCall && $node->class instanceof Name && (\in_array($node->class->toLowerString(), ['self', 'static'], true) || $node->class->toString() === $this->class) && $node->name instanceof Node\Identifier) {
             return $node->name->toLowerString();
         }
 
