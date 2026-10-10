@@ -41,8 +41,8 @@ final class Report2RootTest extends TestCase
         $baseline = Baseline::of([new BaselineEntry('vendor/known', '1.0.0', Verdict::ABANDONED, '2026-01-15')], self::AT);
         $compared = $report->withBaseline(BaselineComparison::compare($baseline, $report, 'lockrot-baseline.json', ['vendor/known', 'vendor/new', 'vendor/fine']));
 
-        $check = Report2Root::gate(Gate::decide($compared, FailOn::fromString('low'), false, Gate::MODE_CHECK), Gate::MODE_CHECK);
-        $generate = Report2Root::gate(Gate::decide($compared, FailOn::fromString('low'), false, Gate::MODE_GENERATE_BASELINE), Gate::MODE_GENERATE_BASELINE);
+        $check = Report2Root::toGateArray(Gate::decide($compared, FailOn::fromString('low'), false, Gate::MODE_CHECK), Gate::MODE_CHECK);
+        $generate = Report2Root::toGateArray(Gate::decide($compared, FailOn::fromString('low'), false, Gate::MODE_GENERATE_BASELINE), Gate::MODE_GENERATE_BASELINE);
 
         self::assertSame(['fails' => true, 'tripped_by' => ['fail_on'], 'fail_on_applied' => true, 'reaching' => 2, 'failing' => 1, 'exempt' => ['baseline' => 1]], $check);
         self::assertSame(['fails' => false, 'tripped_by' => [], 'fail_on_applied' => false, 'reaching' => 2, 'failing' => 0, 'exempt' => ['baseline' => 1]], $generate);
@@ -50,8 +50,8 @@ final class Report2RootTest extends TestCase
 
     public function testWithoutAGateNothingReachesAndTheModeSaysWhetherFailOnApplies(): void
     {
-        self::assertSame(['fails' => false, 'tripped_by' => [], 'fail_on_applied' => true, 'reaching' => 0, 'failing' => 0, 'exempt' => ['baseline' => 0]], Report2Root::gate(null, Gate::MODE_CHECK));
-        self::assertFalse(Report2Root::gate(null, Gate::MODE_GENERATE_BASELINE)['fail_on_applied']);
+        self::assertSame(['fails' => false, 'tripped_by' => [], 'fail_on_applied' => true, 'reaching' => 0, 'failing' => 0, 'exempt' => ['baseline' => 0]], Report2Root::toGateArray(null, Gate::MODE_CHECK));
+        self::assertFalse(Report2Root::toGateArray(null, Gate::MODE_GENERATE_BASELINE)['fail_on_applied']);
     }
 
     public function testSecuritySumsTheVulnerableFindingsOnly(): void

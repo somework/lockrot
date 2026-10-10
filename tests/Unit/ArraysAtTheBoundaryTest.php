@@ -38,43 +38,55 @@ final class ArraysAtTheBoundaryTest extends TestCase
         'Allowlist/ProjectIgnoreList.php' => 1,
         'Analyzer/Libyears.php' => 1,
         'Analyzer/Report.php' => 2,
-        'Analyzer/Report2Root.php' => 1,
         'Analyzer/RunNote.php' => 4,
         'Analyzer/RunSettings.php' => 3,
-        'Baseline/Baseline.php' => 4,
+        'Baseline/Baseline.php' => 5,
         'Baseline/BaselineComparison.php' => 1,
         'Baseline/BaselineFile.php' => 1,
         'Baseline/BaselineSchema.php' => 3,
         'Clock.php' => 1,
         'Composer/AnalyzerBootstrap.php' => 1,
+        'Composer/ComposerHttpClient.php' => 1,
         'Composer/LockrotCommand.php' => 1,
         'Config/ConfigSchema.php' => 1,
         'Config/LockrotConfig.php' => 18,
-        'Data/Abandoned/ComposerAbandonedPolicyReader.php' => 1,
+        'Config/UnknownKeys.php' => 1,
+        'Data/Abandoned/AbandonedIgnore.php' => 1,
+        'Data/Abandoned/AbandonedPolicyReader.php' => 3,
+        'Data/Abandoned/ComposerAbandonedPolicyReader.php' => 2,
+        'Data/Advisory/AdvisoryIgnore.php' => 5,
+        'Data/Advisory/AdvisoryPolicyReader.php' => 2,
         'Data/Forge/ForgeApi.php' => 1,
+        'Data/Forge/SupportSource.php' => 1,
         'Data/Forge/Tokens.php' => 2,
         'Data/Http/HttpResult.php' => 4,
+        'Data/Repository/PackageMetadata.php' => 1,
         'Explain/Explanation.php' => 3,
         'Html/ReportDocument.php' => 2,
-        'Json/JsonReader.php' => 2,
+        'Json/JsonReader.php' => 4,
+        'Json/KnownValues.php' => 1,
+        'Json/SchemaPayload.php' => 2,
         'Legacy/SignalData013.php' => 1,
+        'Lock/ConfiguredRepositories.php' => 1,
         'Lock/LockFile.php' => 1,
         'Lock/ProjectConfig.php' => 6,
+        'Output/ExplainFormatter.php' => 1,
         'Output/GitlabFormatter.php' => 2,
         'Output/HtmlFormatter.php' => 1,
         'Output/SarifFormatter.php' => 4,
+        'SelfUpdate/ReleaseLocator.php' => 9,
         'Signal/Rule/AdvisoryRule.php' => 3,
         'Signal/Rule/PinnedRule.php' => 1,
         'Signal/Signal.php' => 3,
         'Signal/Thresholds.php' => 1,
-        'Verdict/Finding.php' => 8,
+        'Verdict/Finding.php' => 10,
         'Verdict/FindingDetails.php' => 9,
         'Verdict/FlagSentence.php' => 4,
         'Verdict/ScoreModel.php' => 6,
     ];
 
-    /** Any spacing of `array<string, mixed>`. */
-    private const MIXED_MAP = '/array<\\s*string\\s*,\\s*mixed\\s*>/';
+    /** Any spacing of `array<string, mixed>`, `array<array-key, mixed>` and `array<mixed…>`. */
+    private const MIXED_MAP = '/array<\\s*(?:mixed\\b[^>]*|(?:string|array-key)\\s*,\\s*mixed\\s*)>/';
 
     public function testOnlyAWriterReadsAnArrayThatLockrotWrote(): void
     {
@@ -103,6 +115,13 @@ final class ArraysAtTheBoundaryTest extends TestCase
         self::assertSame($ceilings, $counts, 'A count above its ceiling needs a typed object. A count below it lowers the ceiling here.');
     }
 
+    public function testTheCeilingCountsEachSpellingOfAMixedArray(): void
+    {
+        $annotations = '@var array<string, mixed> @var array<array-key,mixed> @var array<mixed> @var array<mixed, mixed> @var array<string, int> @var array<string>';
+
+        self::assertSame(4, preg_match_all(self::MIXED_MAP, $annotations));
+    }
+
     public static function isWriter(string $class): bool
     {
         foreach (self::WRITER_NAMESPACES as $namespace) {
@@ -120,7 +139,7 @@ final class ArraysAtTheBoundaryTest extends TestCase
      * @dataProvider sources
      */
     #[DataProvider('sources')]
-    public function testTheScanFollowsAWrittenArrayToEachRead(string $body, array $expected): void
+    public function testTheScanAllowsAWrittenArrayOnlyInAWriterPosition(string $body, array $expected): void
     {
         $source = "<?php\nnamespace Lockrot\\Domain;\nfinal class Reader\n{\n    private array \$kept = [];\n".$body."\n}\n";
 
@@ -130,32 +149,49 @@ final class ArraysAtTheBoundaryTest extends TestCase
     /** @return iterable<string, array{string, list<string>}> */
     public static function sources(): iterable
     {
-        yield 'a key of the call itself' => ['    public function a($o) { return $o->toArray()[\'id\']; }', ['6: reads a key of a written array']];
-        yield 'a key through a variable and array_values()' => ['    public function a($o) { $rows = array_values($o->findingRows()); return $rows[0]; }', ['6: reads a key of a written array']];
-        yield 'a key of each row of a foreach' => ["    public function a(\$o) {\n        foreach (\$o->toArray() as \$row) {\n            echo \$row['id'];\n        }\n    }", ['8: reads a key of a written array']];
-        yield 'a key in a callback' => ['    public function a($o) { return array_map(static fn (array $row) => $row[\'id\'], $o->toArray()); }', ['6: reads a key of a written array']];
-        yield 'a key in an own method that gets the array' => ["    public function a(\$o) { return \$this->b(1, \$o->toArray()); }\n    private function b(int \$n, array \$row) { return \$row['id']; }", ['7: reads a key of a written array']];
+        $outside = 'uses a written array outside a return, an array item or a writer';
+        $returns = 'returns a written array from a method that is not a writer';
+        yield 'a key of the call itself' => ['    public function a($o) { return $o->toArray()[\'id\']; }', ['6: '.$outside]];
+        yield 'a variable and array_values()' => ['    public function a($o) { $rows = array_values($o->findingRows()); return $rows[0]; }', ['6: '.$outside]];
+        yield 'a foreach' => ["    public function a(\$o) {\n        foreach (\$o->toArray() as \$row) {\n            echo \$row['id'];\n        }\n    }", ['7: '.$outside]];
+        yield 'the array argument of array_map()' => ['    public function a($o) { return array_map(static fn (array $row) => $row[\'id\'], $o->toArray()); }', ['6: '.$outside]];
+        yield 'an argument of an own method' => ["    public function a(\$o) { return \$this->b(1, \$o->toArray()); }\n    private function b(int \$n, array \$row) { return \$row['id']; }", ['6: '.$outside]];
         yield 'a call of jsonSerialize()' => ['    public function a($o) { return \\count($o->jsonSerialize()); }', ['6: calls jsonSerialize(): only the encoder walks the tree']];
-        yield 'a key of an own method that returns the array' => ["    public function a(\$o) { return self::b(\$o)['id']; }\n    private static function b(\$o) { return \$o->toArray() ?? []; }", ['6: reads a key of a written array']];
-        yield 'a key of a property that holds the array' => ["    public function a(\$o) { \$this->kept = \$o->toArray(); }\n    public function b() { return \$this->kept['id']; }", ['7: reads a key of a written array']];
-        yield 'a key function and a keyed destructuring' => ['    public function a($o) { $t = $o->toArray(); [\'id\' => $id] = $t; return array_column($t, \'id\'); }', ['6: destructures a written array', '6: passes a written array to array_column()']];
+        yield 'a return of a method that is not a writer' => ["    public function a(\$o) { return self::b(\$o)['id']; }\n    private static function b(\$o) { return \$o->toArray() ?? []; }", ['7: '.$returns]];
+        yield 'a property' => ["    public function a(\$o) { \$this->kept = \$o->toArray(); }\n    public function b() { return \$this->kept['id']; }", ['6: '.$outside]];
         yield 'a static call to a class that is not a writer' => ['    public function a($o) { return Other::count($o->toArray()); }', ['6: passes a written array to Lockrot\Domain\Other']];
-        yield 'a new object of a class that is not a writer' => ['    public function a($o) { return new Other([\'row\' => $o->toArray()]); }', ['6: passes a written array to Lockrot\Domain\Other']];
-        yield 'a written array as an element of a list' => ['    public function a($fs) { $rows = []; foreach ($fs as $f) { $rows[] = $f->toArray(); } return $rows[0][\'id\']; }', ['6: reads a key of a written array']];
-        yield 'a list mapped from the objects and array_push()' => ["    public function a(\$fs) { \$rows = array_map(static fn (\$f) => \$f->toArray(), \$fs); \$more = []; array_push(\$more, \$fs[0]->toArray()); return \$rows[0]['id'].\$more[0]['id']; }", ['6: reads a key of a written array', '6: reads a key of a written array']];
-        yield 'a keyed destructuring in a foreach' => ['    public function a($o) { foreach ($o->findingRows() as [\'package\' => $name]) { echo $name; } }', ['6: destructures a written array']];
-        yield 'an instance call of another object' => ['    public function a($o, $other) { return $other->count($o->toArray()); }', ['6: passes a written array to ->count()']];
-        yield 'a call by the class name is an own call' => ["    public function a(\$o) { return Reader::b(\$o->toArray()); }\n    private static function b(array \$row) { return \$row['id']; }", ['7: reads a key of a written array']];
-        yield 'a callable array of an own method' => ["    public function a(\$o) { return array_map([self::class, 'b'], \$o->findingRows()); }\n    private static function b(array \$row) { return \$row['package']; }", ['7: reads a key of a written array']];
-        yield 'a callable array of the object and usort()' => ["    public function a(\$o) { \$rows = \$o->toArray(); usort(\$rows, [\$this, 'b']); return \$rows; }\n    private function b(array \$x, array \$y) { return \$x['score'] <=> \$y['score']; }", ['7: reads a key of a written array', '7: reads a key of a written array']];
-        yield 'a callable array of another class' => ['    public function a($o) { return array_map([Other::class, \'id\'], $o->toArray()); }', ['6: passes a written array to Lockrot\Domain\Other']];
-        yield 'a new object of the class itself' => ["    private array \$row;\n    private function __construct(array \$row) { \$this->row = \$row; }\n    public static function of(\$o) { return new static(\$o->toArray()); }\n    public function id() { return \$this->row['id']; }", ['9: reads a key of a written array']];
-        yield 'a generator yields a written array' => ["    public function a(\$o) { yield \$o->toArray(); }\n    public function b(\$o) { foreach (\$this->a(\$o) as \$row) { return \$row['id']; } }", ['7: reads a key of a written array']];
+        yield 'an array item of a new object of a class that is not a writer' => ['    public function a($o) { return new Other([\'row\' => $o->toArray()]); }', ['6: passes a written array to Lockrot\Domain\Other']];
+        yield 'an element of a list in a variable' => ['    public function a($fs) { $rows = []; foreach ($fs as $f) { $rows[] = $f->toArray(); } return $rows[0][\'id\']; }', ['6: '.$outside]];
+        yield 'a list mapped into a variable and array_push()' => ["    public function a(\$fs) { \$rows = array_map(static fn (\$f) => \$f->toArray(), \$fs); \$more = []; array_push(\$more, \$fs[0]->toArray()); return \$rows[0]['id'].\$more[0]['id']; }", ['6: '.$outside, '6: '.$outside]];
+        yield 'a method of another object' => ['    public function a($o, $other) { return $other->count($o->toArray()); }', ['6: passes a written array to ->count()']];
+        yield 'a call by the class name' => ["    public function a(\$o) { return Reader::b(\$o->toArray()); }\n    private static function b(array \$row) { return \$row['id']; }", ['6: '.$outside]];
+        yield 'a new object of the class itself' => ["    private array \$row;\n    private function __construct(array \$row) { \$this->row = \$row; }\n    public static function of(\$o) { return new static(\$o->toArray()); }\n    public function id() { return \$this->row['id']; }", ['8: passes a written array to static']];
+        yield 'a yield' => ["    public function a(\$o) { yield \$o->toArray(); }\n    public function b(\$o) { foreach (\$this->a(\$o) as \$row) { return \$row['id']; } }", ['6: '.$outside]];
+        yield 'json_encode() and json_decode()' => ['    public function a($o) { return json_decode(json_encode($o->toArray()), true)[\'id\']; }', ['6: '.$outside]];
+        yield 'a key compared in a foreach' => ['    public function a($o) { foreach ($o->toArray() as $k => $v) { if ($k === \'id\') { return $v; } } }', ['6: '.$outside]];
+        yield 'an ArrayObject' => ['    public function a($o) { return (new \ArrayObject($o->toArray()))[\'id\']; }', ['6: passes a written array to ArrayObject']];
+        yield 'an object cast' => ['    public function a($o) { return ((object) $o->toArray())->id; }', ['6: '.$outside]];
+        yield 'a property of another object' => ['    public function a($o) { $b = new \stdClass(); $b->rows = $o->toArray(); return $b->rows[\'id\']; }', ['6: '.$outside]];
+        yield 'a by-reference out parameter' => ["    public function a(\$o) { \$this->b(\$o, \$rows); return \$rows['id']; }\n    private function b(\$o, &\$out) { \$out = \$o->toArray(); }", ['7: '.$outside]];
+        yield 'a closure in a variable' => ['    public function a($o) { $f = static fn (array $r) => $r[\'id\']; return $f($o->toArray()); }', ['6: '.$outside]];
+        yield 'call_user_func()' => ["    public function a(\$o) { return call_user_func([\$this, 'b'], \$o->toArray()); }\n    private function b(array \$row) { return \$row['id']; }", ['6: '.$outside]];
+        yield 'array_walk_recursive()' => ['    public function a($o) { $rows = $o->toArray(); array_walk_recursive($rows, static function ($v, $k) { if ($k === \'id\') { echo $v; } }); }', ['6: '.$outside]];
+        yield 'value reads' => ['    public function a($o) { return [in_array(\'abandoned\', $o->toArray(), true), isset(array_flip($o->toArray())[\'x\']), array_diff_assoc($o->toArray(), []), array_intersect_assoc($o->toArray(), [])]; }', ['6: '.$outside, '6: '.$outside, '6: '.$outside, '6: '.$outside]];
+        yield 'a writer method by the naming rule' => ['    public function a($e) { return $e->toDetailsArray()[\'lock\']; }', ['6: '.$outside]];
         yield 'a listed holder can get it' => ['    public function a($o) { return new Holder($o->toArray()); }', []];
         yield 'a writer can get it' => ['    public function a($o) { return \Lockrot\Output\X::f($o->toArray()); }', []];
-        yield 'a key written into the array is no read' => ['    public function a($o) { $row = $o->toArray(); $row[\'extra\'] = 1; unset($row[\'id\']); return $row; }', []];
-        yield 'the encoded string is no array' => ['    public function a($o) { $json = json_encode($o->toArray()); return $json[0].Other::save($json); }', []];
+        yield 'a writer method returns it in an array, a ternary and a mapped list' => ['    public function toArray($o, $fs) { return [\'a\' => $o->toArray(), \'b\' => $o ? $o->findingRows() : null, \'c\' => array_map(static fn ($f) => $f->toArray(), $fs), \'d\' => array_map(static function ($f) { return $f->toArray(); }, $fs)]; }', []];
+        yield 'a writer method returns array_merge() and a union' => ['    public function toListArray($o) { return array_merge([\'x\' => 1], $o->toArray() ?? []) + [\'y\' => $o->toArray()]; }', []];
         yield 'an array that the code built is no written array' => ['    public function a($o) { $row = [\'id\' => $o->id()]; return $row[\'id\']; }', []];
+    }
+
+    public function testAWriterPassesAWrittenArrayOnlyToAWriter(): void
+    {
+        $source = "<?php\nnamespace Lockrot\\Output;\nuse Lockrot\\Domain\\Other;\nfinal class W\n{\n"
+            ."    public function a(\$o, \$other) { \$rows = \$o->toArray(); echo \$rows['id']; return [Other::f(\$rows), \$other->g(\$o->toArray()), \$this->h(\$rows), \\Lockrot\\Json\\JsonWriter::encode(\$rows)]; }\n"
+            ."}\n";
+
+        self::assertSame(['6: passes a written array to Lockrot\Domain\Other', '6: passes a written array to ->g()'], WrittenArrayReads::inSource($source, [self::class, 'isWriter']));
     }
 
     /** @return array<string, string> each .php file under src/ by its path below src/, sorted */

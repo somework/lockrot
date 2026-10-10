@@ -109,7 +109,7 @@ final class Report2Root
      *
      * @param list<Finding> $findings
      *
-     * @return array<string, mixed>
+     * @return array{total: ?float, direct_requirements: ?float, measured: int, unmeasured: array<string, int>, furthest_behind: ?array{package: string, version: string, libyears: ?float}, packages: int}
      */
     public static function libyears(Libyears $libyears, array $findings): array
     {
@@ -130,7 +130,16 @@ final class Report2Root
             $direct ??= 0;
         }
 
-        return array_merge($libyears->toArray(), ['total' => $total === null ? null : $total / 100.0, 'direct_requirements' => $direct === null ? null : $direct / 100.0, 'packages' => \count($findings)]);
+        $worst = $libyears->worst();
+
+        return [
+            'total' => $total === null ? null : $total / 100.0,
+            'direct_requirements' => $direct === null ? null : $direct / 100.0,
+            'measured' => $libyears->measured(),
+            'unmeasured' => $libyears->unmeasured(),
+            'furthest_behind' => $worst === null ? null : ['package' => $worst->package(), 'version' => $worst->version(), 'libyears' => $worst->libyearsRounded()],
+            'packages' => \count($findings),
+        ];
     }
 
     /**
@@ -141,7 +150,7 @@ final class Report2Root
      *
      * @return array{fails: bool, tripped_by: list<string>, fail_on_applied: bool, reaching: int, failing: int, exempt: array<string, int>}
      */
-    public static function gate(?Gate $gate, string $mode): array
+    public static function toGateArray(?Gate $gate, string $mode): array
     {
         $reaching = 0;
         $failing = 0;
@@ -154,9 +163,7 @@ final class Report2Root
                 $exempt[$by] = ($exempt[$by] ?? 0) + 1;
             }
         }
-        $base = $gate === null ? ['fails' => false, 'tripped_by' => [], 'fail_on_applied' => $mode === Gate::MODE_CHECK] : $gate->toArray();
-
-        return $base + ['reaching' => $reaching, 'failing' => $failing, 'exempt' => $exempt];
+        return ($gate === null ? ['fails' => false, 'tripped_by' => [], 'fail_on_applied' => $mode === Gate::MODE_CHECK] : $gate->toArray()) + ['reaching' => $reaching, 'failing' => $failing, 'exempt' => $exempt];
     }
 
     /**

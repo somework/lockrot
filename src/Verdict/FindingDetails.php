@@ -187,7 +187,7 @@ final class FindingDetails
      *
      * @return array<string, mixed>
      */
-    public function security(array $rows, ?string $branch): array
+    public function toSecurityArray(array $rows, ?string $branch): array
     {
         $standing = $this->standing($rows);
         $out = [

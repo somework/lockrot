@@ -76,12 +76,7 @@ final class ReportDocument
                 continue;
             }
             $explanation = new Explanation($finding, $facts, $thresholds, $targetPhp, $this->report, $this->page->projectPhp());
-            $details[$finding->package()] = [
-                'metadata' => $explanation->metadata(),
-                'lock' => $explanation->lock(),
-                'activity' => $explanation->activity(),
-                'repository_link' => self::linkable(self::repositoryOf($facts)),
-            ];
+            $details[$finding->package()] = $explanation->toDetailsArray() + ['repository_link' => self::linkable(self::repositoryOf($facts))];
         }
 
         return $details;

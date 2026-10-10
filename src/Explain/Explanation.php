@@ -23,6 +23,10 @@ use Lockrot\Verdict\FindingDetails;
  * facts are the ones the rules read ({@see \Lockrot\Analyzer\Analysis}).
  *
  * @internal
+ *
+ * @phpstan-type Lock array{php: ?string, released: ?string, repository: ?string, from_composer_repository: bool, dev: bool, branch_snapshot: bool, type: ?string}
+ * @phpstan-type Metadata array<string, mixed>
+ * @phpstan-type Activity array{forge: string, repository: string, archived: bool, pushed_at: ?string, fetched_at: ?string, from_cache: bool}
  */
 final class Explanation
 {
@@ -181,8 +185,18 @@ final class Explanation
         ];
     }
 
-    /** @return array{php: ?string, released: ?string, repository: ?string, from_composer_repository: bool, dev: bool, branch_snapshot: bool, type: ?string} */
-    public function lock(): array
+    /**
+     * The blocks that the HTML report puts beside a finding.
+     *
+     * @return array{metadata: ?Metadata, lock: Lock, activity: ?Activity}
+     */
+    public function toDetailsArray(): array
+    {
+        return ['metadata' => $this->metadata(), 'lock' => $this->lock(), 'activity' => $this->activity()];
+    }
+
+    /** @return Lock */
+    private function lock(): array
     {
         $package = $this->facts->package();
 
@@ -200,9 +214,9 @@ final class Explanation
     /**
      * The repository metadata with the branch rows, null when lockrot did not read it.
      *
-     * @return ?array<string, mixed>
+     * @return ?Metadata
      */
-    public function metadata(): ?array
+    private function metadata(): ?array
     {
         $metadata = $this->facts->metadata();
         if ($metadata === null || $this->finding->details()->metadataStatus() !== PackageFacts::METADATA_READ) {
@@ -248,8 +262,8 @@ final class Explanation
         ];
     }
 
-    /** @return ?array{forge: string, repository: string, archived: bool, pushed_at: ?string, fetched_at: ?string, from_cache: bool} */
-    public function activity(): ?array
+    /** @return ?Activity */
+    private function activity(): ?array
     {
         $activity = $this->facts->activity();
 

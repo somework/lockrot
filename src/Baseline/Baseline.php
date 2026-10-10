@@ -149,15 +149,10 @@ final class Baseline
     /** @return array<string, mixed> */
     public function toArray(): array
     {
-        $findings = [];
-        foreach ($this->entries as $package => $entry) {
-            $findings[$package] = $entry->toArray();
-        }
-
         return [
             'lockrot' => ['version' => $this->toolVersion, 'schema' => self::SCHEMA],
             'generated_at' => $this->generatedAt,
-            'findings' => $findings,
+            'findings' => array_map(static fn (BaselineEntry $entry): array => $entry->toArray(), $this->entries),
         ];
     }
 }

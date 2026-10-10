@@ -495,7 +495,7 @@ final class Report
             'unattributed' => $this->unattributedList(),
             'libyears' => Report2Root::libyears($this->libyears(), $sorted),
             'baseline' => $this->baseline === null ? null : $this->baseline->toArray(),
-            'gate' => Report2Root::gate($gate, $run->mode()),
+            'gate' => Report2Root::toGateArray($gate, $run->mode()),
             'security' => Report2Root::security($sorted),
             'data_date' => Report2Root::dataDate($sorted),
             'notes' => $this->notes(),

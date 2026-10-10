@@ -675,7 +675,7 @@ final class Finding
             'flags' => $flagsOut,
             'score' => $basis,
             'next_step' => null,
-            'security' => $details->security($rows, $branch),
+            'security' => $details->toSecurityArray($rows, $branch),
             'checks_missing' => $checksMissing,
             'checks_skipped' => $details->skipped(),
             'maintenance_judged' => $this->maintenanceJudged,

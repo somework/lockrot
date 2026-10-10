@@ -108,7 +108,7 @@ final class RunSettings
             + ['lock_file' => $this->lockFile]
             + $this->failOnKeys()
             + ['strict_network' => $this->strictNetwork, 'mode' => $this->mode, 'include_dev' => $includeDev ?? $this->includeDev]
-            + $this->model()
+            + $this->toModelArray()
             + ['score_rules_used' => $scoreRulesUsed ?? ScoreModel::rulesUnused()];
     }
 
@@ -119,7 +119,7 @@ final class RunSettings
      */
     public function toExplainArray(): array
     {
-        return $this->php() + $this->failOnKeys() + ['include_dev' => $this->includeDev] + $this->model();
+        return $this->php() + $this->failOnKeys() + ['include_dev' => $this->includeDev] + $this->toModelArray();
     }
 
     /** @return array{target_php: string, target_php_source: string, project_php: ?string, project_php_lowest: ?string} */
@@ -146,7 +146,7 @@ final class RunSettings
     }
 
     /** @return array{thresholds: array<string, int>, flag_ids: list<string>, verdicts: list<string>, graded_verdicts: list<string>, signal_ids: list<string>, fix_model: int, text_grammar: int, score_model: array<string, mixed>} */
-    private function model(): array
+    private function toModelArray(): array
     {
         $thresholds = $this->thresholds ?? new Thresholds();
 
