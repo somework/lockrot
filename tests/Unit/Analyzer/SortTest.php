@@ -9,6 +9,7 @@ use Lockrot\Analyzer\Report;
 use Lockrot\Signal\Signal;
 use Lockrot\Tests\Support\CorpusFloor;
 use Lockrot\Tests\Support\FindingBuilder;
+use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\FlagSet;
 use Lockrot\Verdict\Score;
@@ -119,7 +120,7 @@ final class SortTest extends TestCase
     #[DataProvider('corpusReports')]
     public function testTheReport2FindingsStandInThePublishedOrder(Report $report): void
     {
-        $findings = $report->toArray()['findings'];
+        $findings = JsonPath::decoded($report->toArray())['findings'];
         self::assertIsArray($findings);
         $keys = ScoreModel::toArray()['sort'];
         self::assertIsArray($keys);

@@ -12,27 +12,32 @@ use Lockrot\Verdict\ScoreModel;
  * The structured basis of a score, `finding.score`: every number that the engine used, after every
  * step. A consumer draws, words and compares it without a second engine. Every counterfactual
  * (`without[]`, `accepted[].if_counted`) is an engine rerun on the flags derived again, never a
- * subtraction. The engine counts in integer half points. {@see toArray()} writes a half as 0.5.
+ * subtraction. The engine counts in integer half points ({@see HalfPoints}).
  *
  * @internal
  *
  * @phpstan-type Context array{maintenance_judged: bool, advisories_complete: bool, liveness_complete: bool, s3_unread: bool, s8_unread: bool}
- * @phpstan-type Modifier array{reason: string, applies_to: string, divide_by: int, before: int|float, after: int|float}
- * @phpstan-type Accepted array{flag: string, weight: int, if_counted: array{total: int, verdict: string, role: ?string, at_least: bool, modifiers: list<Modifier>}}
- * @phpstan-type Without array{remove: array{kind: string, id: string}, revealed: list<array{flag: string, role: string}>, total: int, verdict: string, lead: ?string, deciding_advisory: ?string, at_least: bool}
- * @phpstan-type MaintenanceTerm array{part: 'maintenance', flag: string, role: string, weight: int, divisor: int, points: int, contribution: int|float}
- * @phpstan-type SecurityTerm array{part: 'security', flag: string, role: string, advisory: string, severity: string, fix_kind: string, weight: int, multiplier: int, points: int, contribution: int|float}
- * @phpstan-type Term MaintenanceTerm|SecurityTerm
- * @phpstan-type Part array{status: string, contribution: int|float, alone: array{total: int, verdict: ?string}}
- * @phpstan-type Graded array{model: int, total: int, exact: int|float, rounded_down: bool, band: array{floor: int, next: ?string, to_next: ?int}, decided_by: string, parts: array{maintenance: Part, security: array{status: string, contribution: int|float, alone: array{total: int, verdict: ?string}, of: int, tied: list<string>}}, terms: list<Term>, modifiers: list<Modifier>, accepted: list<Accepted>, without: list<Without>, text: string}
+ *
+ * @phpstan-type Graded array{model: int, total: int, exact: int|float, rounded_down: bool, band: array{floor: int, next: ?string, to_next: ?int}, decided_by: string, parts: array{maintenance: Part, security: Part}, terms: list<Term>, modifiers: list<Modifier>, accepted: list<Accepted>, without: list<Without>, text: string}
  * @phpstan-type Zero array{model: int, total: int, exact: int, accepted: list<Accepted>, text: string}
  */
-final class ScoreBasis
+final class ScoreBasis implements \JsonSerializable
 {
     private FlagSet $flags;
     private Score $score;
     /** @var Context */
     private array $context;
+    /** @var list<MaintenanceTerm> */
+    private array $maintenanceTerms = [];
+    private ?SecurityTerm $securityTerm = null;
+    /** @var list<Modifier> */
+    private array $modifiers = [];
+    /** @var list<Accepted> */
+    private array $accepted;
+    /** @var list<Without> */
+    private array $without = [];
+    private Part $maintenancePart;
+    private Part $securityPart;
 
     /** @param Context $context */
     private function __construct(FlagSet $flags, Score $score, array $context)
@@ -40,6 +45,15 @@ final class ScoreBasis
         $this->flags = $flags;
         $this->score = $score;
         $this->context = $context;
+        $this->accepted = $this->acceptedRows();
+        $this->maintenancePart = Part::maintenance($this->maintenanceStatus(), $score->maintenanceHalves());
+        $this->securityPart = Part::security($this->securityStatus(), $score->securityHalves(), $score->advisoryCount(), $score->tied());
+        if ($score->grade() !== null) {
+            $this->maintenanceTerms = $this->maintenanceTermsOf();
+            $this->securityTerm = $this->securityTermOf();
+            $this->modifiers = self::modifiersOf($score);
+            $this->without = $this->withoutRows();
+        }
     }
 
     /**
@@ -70,91 +84,153 @@ final class ScoreBasis
         return $maintenanceJudged ? 'ok' : 'unknown';
     }
 
+    /** False for a score of 0, which writes only `model`, `total`, `exact`, `accepted` and `text`. */
+    public function isGraded(): bool
+    {
+        return $this->score->grade() !== null;
+    }
+
+    public function total(): int
+    {
+        return $this->score->total();
+    }
+
+    public function exactHalves(): int
+    {
+        return $this->score->exactHalves();
+    }
+
+    public function roundedDown(): bool
+    {
+        return $this->score->exactHalves() !== 2 * $this->score->total();
+    }
+
+    /** @return list<MaintenanceTerm> in flag order, the lead first. Empty for a score of 0. */
+    public function maintenanceTerms(): array
+    {
+        return $this->maintenanceTerms;
+    }
+
+    public function securityTerm(): ?SecurityTerm
+    {
+        return $this->securityTerm;
+    }
+
+    /** @return list<Term> the maintenance terms, then the security term. Empty for a score of 0. */
+    public function terms(): array
+    {
+        return $this->securityTerm === null ? $this->maintenanceTerms : array_merge($this->maintenanceTerms, [$this->securityTerm]);
+    }
+
+    /**
+     * Each halving whose fact holds, in application order: reach on maintenance, then dev on the
+     * total. The list holds a halving that removes nothing. Empty for a score of 0.
+     *
+     * @return list<Modifier>
+     */
+    public function modifiers(): array
+    {
+        return $this->modifiers;
+    }
+
+    /** @return list<Accepted> one per accepted flag that fired, in flag order */
+    public function accepted(): array
+    {
+        return $this->accepted;
+    }
+
+    /**
+     * One row per counted flag when the score has two or more terms, and one for the deciding
+     * advisory whenever two or more advisories count. Empty for a score of 0.
+     *
+     * @return list<Without>
+     */
+    public function without(): array
+    {
+        return $this->without;
+    }
+
+    public function maintenancePart(): Part
+    {
+        return $this->maintenancePart;
+    }
+
+    public function securityPart(): Part
+    {
+        return $this->securityPart;
+    }
+
     /**
      * The graded shape when a term exists, else the score-0 shape `{model, total, exact, accepted, text}`.
      *
      * @return Graded|Zero
      */
-    public function toArray(): array
+    public function jsonSerialize(): array
     {
         $score = $this->score;
         $grade = $score->grade();
         if ($grade === null) {
-            $zero = ['model' => ScoreModel::ID, 'total' => 0, 'exact' => 0, 'accepted' => $this->accepted()];
-
-            return $zero + ['text' => ScoreText::render($zero)];
+            return ['model' => ScoreModel::ID, 'total' => 0, 'exact' => 0, 'accepted' => $this->accepted, 'text' => ScoreText::render($this)];
         }
         $total = $score->total();
         $next = ScoreModel::nextBand($grade);
-        $maintenance = $score->maintenanceHalves();
-        $security = $score->securityHalves();
-        $out = [
+
+        return [
             'model' => ScoreModel::ID,
             'total' => $total,
-            'exact' => self::number($score->exactHalves()),
-            'rounded_down' => $score->exactHalves() !== 2 * $total,
+            'exact' => HalfPoints::json($score->exactHalves()),
+            'rounded_down' => $this->roundedDown(),
             'band' => ['floor' => ScoreModel::floorOf($grade), 'next' => $next, 'to_next' => $next === null ? null : ScoreModel::floorOf($next) - $total],
-            'decided_by' => self::decidedBy($grade, $maintenance, $security),
-            'parts' => [
-                'maintenance' => ['status' => $this->maintenanceStatus(), 'contribution' => self::number($maintenance), 'alone' => self::alone($maintenance)],
-                'security' => ['status' => $this->securityStatus(), 'contribution' => self::number($security), 'alone' => self::alone($security), 'of' => $score->advisoryCount(), 'tied' => $score->tied()],
-            ],
+            'decided_by' => $this->decidedBy($grade),
+            'parts' => ['maintenance' => $this->maintenancePart, 'security' => $this->securityPart],
             'terms' => $this->terms(),
-            'modifiers' => self::modifiers($score),
-            'accepted' => $this->accepted(),
-            'without' => $this->without(),
+            'modifiers' => $this->modifiers,
+            'accepted' => $this->accepted,
+            'without' => $this->without,
+            'text' => ScoreText::render($this),
         ];
-
-        return $out + ['text' => ScoreText::render($out)];
     }
 
-    /** @return list<Term> */
-    private function terms(): array
+    /** @return list<MaintenanceTerm> */
+    private function maintenanceTermsOf(): array
     {
         $score = $this->score;
         $terms = [];
         foreach ($score->maintenanceTerms() as $term) {
-            $terms[] = ['part' => 'maintenance'] + $term + ['contribution' => self::number($score->halveForDev($score->halveForReach(2 * $term['points'])))];
-        }
-        $deciding = $score->deciding();
-        if ($deciding !== null) {
-            $multiplier = \in_array($deciding['fix_kind'], ScoreModel::DOUBLING, true) ? ScoreModel::NO_REACHABLE_FIX_FACTOR : 1;
-            $terms[] = [
-                'part' => 'security', 'flag' => FlagSet::VULNERABLE, 'role' => 'security', 'advisory' => $deciding['id'], 'severity' => $deciding['severity'], 'fix_kind' => $deciding['fix_kind'],
-                'weight' => intdiv($score->securityPointsHalves(), 2 * $multiplier), 'multiplier' => $multiplier, 'points' => intdiv($score->securityPointsHalves(), 2), 'contribution' => self::number($score->securityHalves()),
-            ];
+            $terms[] = new MaintenanceTerm($term['flag'], $term['role'], $term['weight'], $term['divisor'], $term['points'], $score->halveForDev($score->halveForReach(2 * $term['points'])));
         }
 
         return $terms;
     }
 
-    /**
-     * Each halving whose fact holds on a score with a term, in application order: reach on
-     * maintenance, then dev on the total. The list holds a halving that removes nothing, with
-     * `before` equal to `after`.
-     *
-     * @return list<Modifier>
-     */
-    private static function modifiers(Score $score): array
+    private function securityTermOf(): ?SecurityTerm
+    {
+        $score = $this->score;
+        $deciding = $score->deciding();
+        if ($deciding === null) {
+            return null;
+        }
+        $multiplier = \in_array($deciding['fix_kind'], ScoreModel::DOUBLING, true) ? ScoreModel::NO_REACHABLE_FIX_FACTOR : 1;
+
+        return new SecurityTerm($deciding['id'], $deciding['severity'], $deciding['fix_kind'], intdiv($score->securityPointsHalves(), 2 * $multiplier), $multiplier, intdiv($score->securityPointsHalves(), 2), $score->securityHalves());
+    }
+
+    /** @return list<Modifier> */
+    private static function modifiersOf(Score $score): array
     {
         $modifiers = [];
         if ($score->reach() !== Score::DIRECT) {
-            $modifiers[] = ['reason' => $score->reach(), 'applies_to' => 'maintenance', 'divide_by' => ScoreModel::REACH_DIVISOR, 'before' => self::number($score->maintenancePointsHalves()), 'after' => self::number($score->reachedHalves())];
+            $modifiers[] = Modifier::reach($score->reach(), $score->maintenancePointsHalves(), $score->reachedHalves());
         }
         if ($score->isDev()) {
-            $before = $score->reachedHalves() + $score->securityPointsHalves();
-            $modifiers[] = ['reason' => 'dev', 'applies_to' => 'total', 'divide_by' => ScoreModel::DEV_DIVISOR, 'before' => self::number($before), 'after' => self::number($score->exactHalves())];
+            $modifiers[] = Modifier::dev($score->reachedHalves() + $score->securityPointsHalves(), $score->exactHalves());
         }
 
         return $modifiers;
     }
 
-    /**
-     * One row per accepted flag that fired, in flag order, with the rerun that counts it.
-     *
-     * @return list<Accepted>
-     */
-    private function accepted(): array
+    /** @return list<Accepted> */
+    private function acceptedRows(): array
     {
         $rows = [];
         foreach ($this->flags->accepted() as $flag) {
@@ -164,25 +240,22 @@ final class ScoreBasis
             foreach ($rerun->maintenanceTerms() as $term) {
                 $role = $term['flag'] === $flag ? $term['role'] : $role;
             }
-            $rows[] = ['flag' => $flag, 'weight' => ScoreModel::POINTS[$flag], 'if_counted' => [
-                'total' => $rerun->total(),
-                'verdict' => self::verdict($rerun, $counting, $this->context['maintenance_judged']),
-                'role' => $role,
-                'at_least' => $flag === FlagSet::STALE && (!$this->context['liveness_complete'] || $this->context['s3_unread']),
-                'modifiers' => self::modifiers($rerun),
-            ]];
+            $rows[] = new Accepted(
+                $flag,
+                ScoreModel::POINTS[$flag],
+                $rerun->total(),
+                self::verdict($rerun, $counting, $this->context['maintenance_judged']),
+                $role,
+                $flag === FlagSet::STALE && (!$this->context['liveness_complete'] || $this->context['s3_unread']),
+                self::modifiersOf($rerun)
+            );
         }
 
         return $rows;
     }
 
-    /**
-     * One row per counted flag when the score has two or more terms, and one for the deciding advisory
-     * whenever two or more advisories count.
-     *
-     * @return list<Without>
-     */
-    private function without(): array
+    /** @return list<Without> */
+    private function withoutRows(): array
     {
         $score = $this->score;
         $rows = [];
@@ -204,25 +277,22 @@ final class ScoreBasis
         return $rows;
     }
 
-    /**
-     * @param list<string> $revealed the words that the removal restores
-     *
-     * @return Without
-     */
-    private function rerun(string $kind, string $id, FlagSet $flags, array $revealed, bool $atLeast): array
+    /** @param list<string> $revealed the words that the removal restores */
+    private function rerun(string $kind, string $id, FlagSet $flags, array $revealed, bool $atLeast): Without
     {
         $rerun = Score::of($flags, $this->score->reach(), $this->score->isDev());
         $roles = array_column($rerun->maintenanceTerms(), 'role', 'flag');
 
-        return [
-            'remove' => ['kind' => $kind, 'id' => $id],
-            'revealed' => array_map(static fn (string $flag): array => ['flag' => $flag, 'role' => $roles[$flag] ?? 'accepted'], $revealed),
-            'total' => $rerun->total(),
-            'verdict' => self::verdict($rerun, $flags, $this->context['maintenance_judged']),
-            'lead' => $rerun->lead(),
-            'deciding_advisory' => $rerun->deciding()['id'] ?? null,
-            'at_least' => $atLeast,
-        ];
+        return new Without(
+            $kind,
+            $id,
+            array_map(static fn (string $flag): array => ['flag' => $flag, 'role' => $roles[$flag] ?? 'accepted'], $revealed),
+            $rerun->total(),
+            self::verdict($rerun, $flags, $this->context['maintenance_judged']),
+            $rerun->lead(),
+            $rerun->deciding()['id'] ?? null,
+            $atLeast
+        );
     }
 
     /**
@@ -241,7 +311,7 @@ final class ScoreBasis
     private function maintenanceStatus(): string
     {
         if ($this->score->maintenanceTerms() !== []) {
-            return 'counted';
+            return Part::COUNTED;
         }
         if ($this->flags->accepted() !== []) {
             return 'accepted';
@@ -253,32 +323,20 @@ final class ScoreBasis
     private function securityStatus(): string
     {
         if ($this->score->deciding() !== null) {
-            return 'counted';
+            return Part::COUNTED;
         }
 
         return $this->context['advisories_complete'] ? 'clear' : 'unchecked';
     }
 
-    private static function decidedBy(string $grade, int $maintenance, int $security): string
+    private function decidedBy(string $grade): string
     {
-        $byMaintenance = ScoreModel::band(intdiv($maintenance, 2)) === $grade;
-        $bySecurity = ScoreModel::band(intdiv($security, 2)) === $grade;
+        $byMaintenance = $this->maintenancePart->aloneVerdict() === $grade;
+        $bySecurity = $this->securityPart->aloneVerdict() === $grade;
         if ($byMaintenance) {
             return $bySecurity ? 'either' : 'maintenance';
         }
 
         return $bySecurity ? 'security' : 'combination';
-    }
-
-    /** @return array{total: int, verdict: ?string} */
-    private static function alone(int $halves): array
-    {
-        return ['total' => intdiv($halves, 2), 'verdict' => ScoreModel::band(intdiv($halves, 2))];
-    }
-
-    /** @return int|float PHP's `/` gives an integer for a whole quotient and an exact float for a half */
-    private static function number(int $halves)
-    {
-        return $halves / 2;
     }
 }

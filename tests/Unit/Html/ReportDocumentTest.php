@@ -10,6 +10,7 @@ use Lockrot\Analyzer\RunSettings;
 use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Data\Repository\PackageMetadata;
+use Lockrot\Explain\Explanation;
 use Lockrot\Html\PageData;
 use Lockrot\Html\ReportDocument;
 use Lockrot\Signal\PackageFacts;
@@ -57,8 +58,8 @@ final class ReportDocumentTest extends TestCase
         $document = $this->document($report)->toArray();
 
         self::assertSame(
-            ['$schema' => 'https://lockrot.dev/schema/report-2.json', 'lockrot' => ['version' => Version::STRING, 'schema' => 2]] + $report->toArray(),
-            J::arrayAt($document, ['report']),
+            J::decoded(['$schema' => 'https://lockrot.dev/schema/report-2.json', 'lockrot' => ['version' => Version::STRING, 'schema' => 2]] + $report->toArray()),
+            J::decoded(J::arrayAt($document, ['report'])),
             'a consumer pulling the payload out of the page gets the published document'
         );
     }
@@ -118,6 +119,20 @@ final class ReportDocumentTest extends TestCase
         self::assertSame(['2.x', '1.x'], J::column($detail, ['metadata', 'branches'], 'branch'));
         self::assertSame([false, true], J::column($detail, ['metadata', 'branches'], 'installed'));
         self::assertArrayNotHasKey('finding', $detail, 'the report already carries it');
+    }
+
+    /** A detail is explain-2's `lock`, `metadata` and `activity` of the package, from the same writers. */
+    public function testADetailHoldsTheLockTheMetadataAndTheActivityOfExplain(): void
+    {
+        $report = $this->report([$this->finding('vendor/pkg', Verdict::LEFT_BEHIND, [], '1.4.0')]);
+        $facts = ['vendor/pkg' => F::facts(F::package(['version' => '1.4.0']), F::metadata([['1.5.0', '2021-06-01T00:00:00+00:00']]), F::activity(true, '2022-02-02T00:00:00+00:00'))];
+        $explained = (new Explanation($report->findings()[0], $facts['vendor/pkg'], new Thresholds(), '8.4', $report))->toArray();
+
+        $detail = J::arrayAt($this->document($report, $facts)->toArray(), ['details', 'vendor/pkg']);
+
+        self::assertSame(['metadata', 'lock', 'activity', 'repository_link'], array_keys($detail));
+        self::assertSame(J::decoded([$explained['metadata'], $explained['lock'], $explained['activity']]), J::decoded([$detail['metadata'], $detail['lock'], $detail['activity']]));
+        self::assertTrue(J::boolAt($detail, ['activity', 'archived']));
     }
 
     /**

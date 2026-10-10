@@ -15,6 +15,7 @@ use Lockrot\Legacy\PriorityBasis013;
 use Lockrot\Legacy\Verdict013;
 use Lockrot\Lock\PackageOrigin;
 use Lockrot\Score\ScoreBasis;
+use Lockrot\Score\SecurityTerm;
 use Lockrot\Signal\Rule\NotCheckedRule;
 use Lockrot\Signal\Signal;
 
@@ -257,6 +258,26 @@ final class Finding
         return $this->score;
     }
 
+    /** @throws \LogicException for a finding built without its flags */
+    public function flags(): FlagSet
+    {
+        if ($this->flags === null) {
+            throw $this->unscored();
+        }
+
+        return $this->flags;
+    }
+
+    /**
+     * report-2's `priority`: the grade, else `none`.
+     *
+     * @throws \LogicException for a finding built without its flags
+     */
+    public function gradeOrNone(): string
+    {
+        return $this->isGraded() ? $this->grade() : 'none';
+    }
+
     private function unscored(): \LogicException
     {
         return new \LogicException(\sprintf('%s was built without its flags, so it has no score.', $this->package));
@@ -319,6 +340,14 @@ final class Finding
     public function libyears(): ?float
     {
         return $this->libyears->years();
+    }
+
+    /** The years that report-2 writes, rounded to two decimals. */
+    public function libyearsRounded(): ?float
+    {
+        $years = $this->libyears->years();
+
+        return $years === null ? null : round($years, 2);
     }
 
     /** One of {@see Libyears::REASONS}, null exactly when {@see libyears()} is a number. */
@@ -429,6 +458,16 @@ final class Finding
         return self::successorOf($this->package, $this->replacement());
     }
 
+    /**
+     * report-2's `replacement`: the successor, when `abandoned` counts.
+     *
+     * @throws \LogicException for a finding built without its flags
+     */
+    public function countedSuccessor(): ?string
+    {
+        return \in_array(FlagSet::ABANDONED, $this->flagIds(), true) ? self::successorOf($this->package, $this->replacement()) : null;
+    }
+
     /** The replacement when it names another Composer package, else null. */
     public static function successorOf(string $package, ?string $replacement): ?string
     {
@@ -442,7 +481,8 @@ final class Finding
         return $replacement;
     }
 
-    private function replacement(): ?string
+    /** S1's replacement as the repository writes it, free text. Null when S1 names none. */
+    public function replacement(): ?string
     {
         foreach ($this->signals as $signal) {
             if ($signal->id() === Signal::S1) {
@@ -604,31 +644,17 @@ final class Finding
     public function toArray(): array
     {
         $details = $this->details();
-        $score = $this->score();
-        $flags = $this->flags ?? FlagSet::fromSignals($this->signals, null, []);
+        $flags = $this->flags();
         $signals = $this->signalsOut($details);
         $data = array_column($signals, 'data', 'id');
         $checksMissing = self::checks($data[Signal::S10]['unchecked'] ?? []);
-        $checks = array_merge($details->skipped(), $checksMissing);
-        $livenessComplete = true;
-        $s3Unread = false;
-        foreach ($checks as $check) {
-            $livenessComplete = $livenessComplete && array_intersect($check['blocks'], [Signal::S2, Signal::S4]) === [];
-            $s3Unread = $s3Unread || \in_array(Signal::S3, $check['blocks'], true);
-        }
+        $context = $this->context($details, $checksMissing);
         $branchKey = ReleaseBranch::of($this->version);
         $branch = $branchKey === null ? null : ReleaseBranch::label($branchKey);
-        $basis = ScoreBasis::of($flags, self::reachOf($this->chain), $this->dev, [
-            'maintenance_judged' => $this->maintenanceJudged,
-            'advisories_complete' => $details->advisoriesComplete(),
-            'liveness_complete' => $livenessComplete,
-            's3_unread' => $s3Unread,
-            's8_unread' => $branchKey === null && !$this->maintenanceJudged,
-        ])->toArray();
+        $basis = $this->scoreBasisOf($context);
         $rows = self::rows($data[Signal::S9]['advisories'] ?? []);
-        $security = $details->security($rows, $branch);
-        $flagsOut = $this->flagsOut($flags, $basis, $data, $livenessComplete, $branch);
-        $counted = array_column(self::rows($basis['terms'] ?? []), 'flag');
+        $flagsOut = $this->flagsOut($flags, $basis, $data, $context['liveness_complete'], $branch);
+        $counted = $this->flagIds();
         $evidence = [];
         foreach ($flagsOut as $flag) {
             if (\in_array($flag['id'], $counted, true)) {
@@ -636,22 +662,20 @@ final class Finding
             }
         }
         $entry = $details->entry();
-        $successor = \in_array(FlagSet::ABANDONED, $counted, true) ? self::successorOf($this->package, $this->replacement()) : null;
-        $libyears = $this->libyears->years();
-        $grade = $this->grade();
+        $successor = $this->countedSuccessor();
 
         return [
             'package' => $this->package,
             'version' => $this->version,
             'branch' => $branch,
             'installed_php' => $details->installedPhp(),
-            'verdict' => $grade,
-            'priority' => $this->isGraded() ? $grade : 'none',
+            'verdict' => $this->grade(),
+            'priority' => $this->gradeOrNone(),
             'lead' => $this->lead(),
             'flags' => $flagsOut,
             'score' => $basis,
             'next_step' => null,
-            'security' => $security,
+            'security' => $details->toSecurityArray($rows, $branch),
             'checks_missing' => $checksMissing,
             'checks_skipped' => $details->skipped(),
             'maintenance_judged' => $this->maintenanceJudged,
@@ -672,7 +696,62 @@ final class Finding
             'evidence' => implode('; ', $evidence),
             'allowlist_reason' => $entry !== null && $entry->acceptsAll() ? $entry->reason() : null,
             'data_date' => $this->dataDate === null ? null : $this->dataDate->format(\DATE_ATOM),
-            'libyears' => $libyears === null ? null : round($libyears, 2),
+            'libyears' => $this->libyearsRounded(),
+        ];
+    }
+
+    /**
+     * `finding.score`, worded with the checks that did not run.
+     *
+     * @throws \LogicException for a finding built without its flags or its details
+     */
+    public function scoreBasis(): ScoreBasis
+    {
+        $details = $this->details();
+        $data = array_column($this->signalsOut($details), 'data', 'id');
+
+        return $this->scoreBasisOf($this->context($details, self::checks($data[Signal::S10]['unchecked'] ?? [])));
+    }
+
+    /** @param array{maintenance_judged: bool, advisories_complete: bool, liveness_complete: bool, s3_unread: bool, s8_unread: bool} $context */
+    private function scoreBasisOf(array $context): ScoreBasis
+    {
+        return ScoreBasis::of($this->flags(), self::reachOf($this->chain), $this->dev, $context);
+    }
+
+    /**
+     * Where the finding stands on security, from its S9 rows.
+     *
+     * @throws \LogicException for a finding built without its details
+     */
+    public function securityStanding(): SecurityStanding
+    {
+        $details = $this->details();
+        $data = array_column($this->signalsOut($details), 'data', 'id');
+
+        return $details->standing(self::rows($data[Signal::S9]['advisories'] ?? []));
+    }
+
+    /**
+     * @param list<array{check: string, reason: string, blocks: list<string>}> $checksMissing S10's checks as report-2 writes them
+     *
+     * @return array{maintenance_judged: bool, advisories_complete: bool, liveness_complete: bool, s3_unread: bool, s8_unread: bool}
+     */
+    private function context(FindingDetails $details, array $checksMissing): array
+    {
+        $livenessComplete = true;
+        $s3Unread = false;
+        foreach (array_merge($details->skipped(), $checksMissing) as $check) {
+            $livenessComplete = $livenessComplete && array_intersect($check['blocks'], [Signal::S2, Signal::S4]) === [];
+            $s3Unread = $s3Unread || \in_array(Signal::S3, $check['blocks'], true);
+        }
+
+        return [
+            'maintenance_judged' => $this->maintenanceJudged,
+            'advisories_complete' => $details->advisoriesComplete(),
+            'liveness_complete' => $livenessComplete,
+            's3_unread' => $s3Unread,
+            's8_unread' => ReleaseBranch::of($this->version) === null && !$this->maintenanceJudged,
         ];
     }
 
@@ -711,21 +790,24 @@ final class Finding
     }
 
     /**
-     * @param array<string, mixed>                $basis
      * @param array<string, array<string, mixed>> $data
      *
      * @return list<array<string, mixed>>
      */
-    private function flagsOut(FlagSet $flags, array $basis, array $data, bool $livenessComplete, ?string $branch): array
+    private function flagsOut(FlagSet $flags, ScoreBasis $basis, array $data, bool $livenessComplete, ?string $branch): array
     {
-        $roles = array_column(self::rows($basis['terms'] ?? []), 'role', 'flag');
+        $roles = [];
+        foreach ($basis->maintenanceTerms() as $term) {
+            $roles[$term->flag()] = $term->role();
+        }
+        $security = $basis->securityTerm();
         $out = [];
         foreach ($flags->fired() as $flag) {
             $ids = array_values(array_filter(FlagSentence::SIGNALS[$flag], static fn (string $id): bool => isset($data[$id])));
             if ($flag === FlagSet::VULNERABLE) {
                 $rows = self::rows($data[Signal::S9]['advisories'] ?? []);
-                $summary = $this->details()->vulnerableSummary($rows, $branch, (string) $this->decidingSeverity($basis));
-                $out[] = ['id' => $flag, 'role' => $roles[$flag] ?? 'security', 'baseline' => null, 'signal_ids' => [Signal::S9], 'degree' => null, 'headline' => ['unit' => 'advisories', 'value' => \count($rows), 'source' => null], 'summary' => $summary];
+                $summary = $this->details()->vulnerableSummary($rows, $branch, $security === null ? '' : $security->severity());
+                $out[] = ['id' => $flag, 'role' => SecurityTerm::ROLE, 'baseline' => null, 'signal_ids' => [Signal::S9], 'degree' => null, 'headline' => ['unit' => 'advisories', 'value' => \count($rows), 'source' => null], 'summary' => $summary];
                 continue;
             }
             $out[] = [
@@ -766,18 +848,6 @@ final class Finding
         }
 
         return $out;
-    }
-
-    /** @param array<string, mixed> $basis */
-    private function decidingSeverity(array $basis): ?string
-    {
-        foreach (self::rows($basis['terms'] ?? []) as $term) {
-            if (($term['part'] ?? null) === 'security' && \is_string($term['severity'] ?? null)) {
-                return $term['severity'];
-            }
-        }
-
-        return null;
     }
 
     /**

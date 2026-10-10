@@ -318,10 +318,20 @@ final class AcceptanceTest extends TestCase
             $measured = \count(array_filter($packages, static fn ($libyears): bool => $libyears !== null));
             self::assertSame($block->measured(), $measured, $dir);
             self::assertSame($report->packagesChecked(), $measured + array_sum($block->unmeasured()), $dir.': every package is measured or has a reason');
+            $total = $block->total();
+            $direct = $block->direct();
+            $worst = $block->worst();
+            $rounded = [
+                'total' => $total === null ? null : round($total, 2),
+                'direct_requirements' => $direct === null ? null : round($direct, 2),
+                'measured' => $block->measured(),
+                'unmeasured' => $block->unmeasured(),
+                'furthest_behind' => $worst === null ? null : ['package' => $worst->package(), 'version' => $worst->version(), 'libyears' => $worst->libyearsRounded()],
+            ];
             // The block is the arithmetic over the printed findings, to within the rounding of each value.
-            self::assertEqualsWithDelta($block->toArray()['total'], $sum, 0.005 * $measured, $dir);
+            self::assertEqualsWithDelta($rounded['total'], $sum, 0.005 * $measured, $dir);
             ksort($packages);
-            $golden[$dir] = ['block' => $block->toArray(), 'packages' => $packages];
+            $golden[$dir] = ['block' => $rounded, 'packages' => $packages];
         }
         Golden::assertMatches('libyears.json', $golden, 'testLibyearsOnTheRecordedFixtures');
     }
