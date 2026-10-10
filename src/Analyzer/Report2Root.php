@@ -28,7 +28,7 @@ final class Report2Root
      *
      * @return array<string, array{carrying: int, leading: ?int, accepted: ?array{all: int, in_graded: int}, by_verdict: array<string, int>}>
      */
-    public static function flags(array $findings): array
+    public static function toFlagsArray(array $findings): array
     {
         $carrying = array_fill_keys(ScoreModel::FLAG_ORDER, 0);
         $leading = $carrying;
@@ -68,7 +68,7 @@ final class Report2Root
      *
      * @return array{total: int, with_replacement: int, with_suggestion: int}
      */
-    public static function abandoned(array $findings): array
+    public static function toAbandonedArray(array $findings): array
     {
         $total = 0;
         $withReplacement = 0;
@@ -93,7 +93,7 @@ final class Report2Root
      *
      * @return array<string, int>
      */
-    public static function priorities(array $findings): array
+    public static function toPrioritiesArray(array $findings): array
     {
         $counts = array_fill_keys(array_merge(ScoreModel::GRADES, ['none']), 0);
         foreach ($findings as $finding) {
@@ -111,7 +111,7 @@ final class Report2Root
      *
      * @return array{total: ?float, direct_requirements: ?float, measured: int, unmeasured: array<string, int>, furthest_behind: ?array{package: string, version: string, libyears: ?float}, packages: int}
      */
-    public static function libyears(Libyears $libyears, array $findings): array
+    public static function toLibyearsArray(Libyears $libyears, array $findings): array
     {
         $total = null;
         $direct = null;
@@ -171,7 +171,7 @@ final class Report2Root
      *
      * @return array{check: string, packages: array<string, int>, advisories: array{counted: int, ignored: int}, severities: array<string, int>, fixes: array<string, int>, update_now: list<string>, update_now_command: ?list<string>, fix_unknown: int}
      */
-    public static function security(array $findings): array
+    public static function toSecurityArray(array $findings): array
     {
         $checks = [];
         $packages = ['vulnerable' => 0, 'unchecked' => 0, 'ignored' => 0, 'clear' => 0];

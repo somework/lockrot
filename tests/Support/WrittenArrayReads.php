@@ -16,11 +16,11 @@ use PhpParser\NodeVisitor\ParentConnectingVisitor;
 use PhpParser\ParserFactory;
 
 /**
- * Finds where src/ uses an array that a writer method wrote ({@see WRITER_METHOD}). Outside a
- * writer class, such a call stands only as an array item, as the return value of a writer method,
- * as an argument of `array_merge()` or of a writer or a listed holder, or as the body of an
- * `array_map()` callback. The last three count only when their call stands in one of these
- * positions, and a ternary branch or a side of `??` or `+` counts as the whole expression.
+ * Finds where src/ uses the array of a writer method ({@see WRITER_METHOD}). Outside a writer class,
+ * the array goes only to a writer method's return or to an argument of a writer or a listed holder.
+ * On the way it can pass the nodes of {@see through()}. A writer class hands the array, a key of it
+ * or one variable that holds them only to a writer. It returns them only from a writer method or a
+ * private method.
  */
 final class WrittenArrayReads
 {
@@ -89,8 +89,15 @@ final class WrittenArrayReads
         return $violations;
     }
 
+    /** A call of a writer method, or a callable array of one. */
     private static function isSource(Node $node): bool
     {
+        if ($node instanceof Expr\Array_ && \count($node->items) === 2) {
+            $method = $node->items[1]->value ?? null;
+
+            return $method instanceof Node\Scalar\String_ && preg_match(self::WRITER_METHOD, $method->value) === 1;
+        }
+
         return ($node instanceof Expr\MethodCall || $node instanceof Expr\NullsafeMethodCall || $node instanceof Expr\StaticCall)
             && $node->name instanceof Node\Identifier
             && preg_match(self::WRITER_METHOD, $node->name->toString()) === 1;
@@ -119,18 +126,22 @@ final class WrittenArrayReads
     /** What is wrong where a writer class hands on the array of a writer method, or null. */
     private function passedOn(Node $call): ?string
     {
-        [$parent, $child] = self::position($call);
+        [$parent, $child] = self::pastKeys(...self::position($call));
         $uses = [$parent];
         if ($parent instanceof Expr\Assign && $parent->expr === $child && $parent->var instanceof Expr\Variable && \is_string($parent->var->name)) {
             $uses = [];
             $method = self::method($parent);
             foreach ((new NodeFinder())->findInstanceOf($method === null ? [] : ($method->stmts ?? []), Expr\Variable::class) as $variable) {
                 if ($variable->name === $parent->var->name && $variable !== $parent->var) {
-                    $uses[] = self::position($variable)[0];
+                    $uses[] = self::pastKeys(...self::position($variable))[0];
                 }
             }
         }
         foreach ($uses as $use) {
+            $method = $use instanceof Node\Stmt\Return_ ? self::method($use) : null;
+            if ($method !== null && !$method->isPrivate() && preg_match(self::WRITER_METHOD, $method->name->toString()) !== 1) {
+                return 'returns a written array from a method that is not a writer';
+            }
             $target = $use instanceof Node\Arg ? $this->target($use) : null;
             if ($target !== null && $target !== '') {
                 return 'passes a written array to '.$target;
@@ -141,8 +152,21 @@ final class WrittenArrayReads
     }
 
     /**
-     * The node that takes the value of $expr, past a ternary branch, a side of `??` or `+`, an array item,
-     * an argument of `array_merge()` and the body of an `array_map()` callback.
+     * The position past each key read: the value under a key of a written array is written too.
+     *
+     * @return array{Node|null, Node}
+     */
+    private static function pastKeys(?Node $parent, Node $child): array
+    {
+        while ($parent instanceof Expr\ArrayDimFetch && $parent->var === $child) {
+            [$parent, $child] = self::position($parent);
+        }
+
+        return [$parent, $child];
+    }
+
+    /**
+     * The node that takes the value of $expr past the nodes of {@see through()}.
      *
      * @return array{Node|null, Node} the node and its child that holds the value
      */
@@ -162,7 +186,11 @@ final class WrittenArrayReads
         return [null, $child];
     }
 
-    /** The node whose position counts for $child inside $parent, or null when $parent takes the value. */
+    /**
+     * The node whose position counts for $child inside $parent, or null when $parent takes the value.
+     * A ternary branch, a side of `??` or `+` and an array item pass the position on. So do an
+     * argument of `array_merge()` and an `array_map()` callback with its body.
+     */
     private static function through(Node $parent, Node $child): ?Node
     {
         if ($parent instanceof Expr\Ternary && ($parent->if === $child || $parent->else === $child || ($parent->if === null && $parent->cond === $child))) {
@@ -178,6 +206,10 @@ final class WrittenArrayReads
         }
         if ($parent instanceof Node\Arg && !$parent->unpack) {
             $call = $parent->getAttribute('parent');
+
+            if ($call instanceof Expr\FuncCall && $child instanceof Expr\Array_ && self::mappedBy($child) === $call) {
+                return $call;
+            }
 
             return $call instanceof Expr\FuncCall && self::isFunction($call, 'array_merge') ? $call : null;
         }
@@ -200,8 +232,8 @@ final class WrittenArrayReads
     }
 
     /**
-     * The class or method that an argument goes to: an empty string for a writer or a listed holder,
-     * null for an own call or a function.
+     * The class or method that an argument goes to. It is an empty string for a writer or a listed
+     * holder, and null for an own call or a function.
      */
     private function target(Node\Arg $arg): ?string
     {

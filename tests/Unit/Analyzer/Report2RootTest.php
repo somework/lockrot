@@ -63,7 +63,7 @@ final class Report2RootTest extends TestCase
             self::withDetails((new FindingBuilder())->withPackage('acme/d')->build(), 'complete', 1),
         ];
 
-        $security = Report2Root::security($findings);
+        $security = Report2Root::toSecurityArray($findings);
 
         self::assertSame('complete', $security['check']);
         self::assertSame(['vulnerable' => 3, 'unchecked' => 0, 'ignored' => 2, 'clear' => 1], $security['packages']);
@@ -79,17 +79,17 @@ final class Report2RootTest extends TestCase
     {
         $finding = fn (string $check): Finding => self::withDetails((new FindingBuilder())->build(), $check, 0);
 
-        self::assertSame('partial', Report2Root::security([$finding('complete'), $finding('not_run')])['check']);
-        self::assertSame('not_run', Report2Root::security([$finding('not_run')])['check']);
-        self::assertSame(['vulnerable' => 0, 'unchecked' => 1, 'ignored' => 0, 'clear' => 0], Report2Root::security([$finding('not_run')])['packages']);
-        self::assertSame('complete', Report2Root::security([])['check']);
-        self::assertNull(Report2Root::security([])['update_now_command']);
+        self::assertSame('partial', Report2Root::toSecurityArray([$finding('complete'), $finding('not_run')])['check']);
+        self::assertSame('not_run', Report2Root::toSecurityArray([$finding('not_run')])['check']);
+        self::assertSame(['vulnerable' => 0, 'unchecked' => 1, 'ignored' => 0, 'clear' => 0], Report2Root::toSecurityArray([$finding('not_run')])['packages']);
+        self::assertSame('complete', Report2Root::toSecurityArray([])['check']);
+        self::assertNull(Report2Root::toSecurityArray([])['update_now_command']);
     }
 
     /** A severity outside the display order counts from zero after the listed ones. */
     public function testSecurityCountsASeverityItDoesNotListFromZero(): void
     {
-        $security = Report2Root::security([self::vulnerable('acme/a', [['acme:severe', 'upgrade'], ['acme:severe', 'upgrade']])]);
+        $security = Report2Root::toSecurityArray([self::vulnerable('acme/a', [['acme:severe', 'upgrade'], ['acme:severe', 'upgrade']])]);
 
         self::assertSame(['critical' => 0, 'high' => 0, 'medium' => 0, 'unrated' => 0, 'low' => 0, 'acme:severe' => 2], $security['severities']);
         self::assertSame(2, JsonPath::intAt($security, ['advisories', 'counted']));
@@ -109,7 +109,7 @@ final class Report2RootTest extends TestCase
             $finding(FlagSet::fromSignals([$s('S2', 'warn')], $entry('stale'), [])),
         ];
 
-        $flags = Report2Root::flags($findings);
+        $flags = Report2Root::toFlagsArray($findings);
 
         self::assertSame(['carrying' => 1, 'leading' => 1, 'accepted' => ['all' => 0, 'in_graded' => 0], 'by_verdict' => ['critical' => 1, 'high' => 0, 'medium' => 0, 'low' => 0]], $flags['silent']);
         self::assertSame(['carrying' => 2, 'leading' => 2, 'accepted' => ['all' => 0, 'in_graded' => 0], 'by_verdict' => ['critical' => 1, 'high' => 1, 'medium' => 0, 'low' => 0]], $flags['old-promise']);
@@ -132,8 +132,8 @@ final class Report2RootTest extends TestCase
             (new FindingBuilder())->withVerdict(Verdict::STALE)->build(),
         ];
 
-        self::assertSame(['total' => 4, 'with_replacement' => 1, 'with_suggestion' => 2], Report2Root::abandoned($findings));
-        self::assertSame(['total' => 0, 'with_replacement' => 0, 'with_suggestion' => 0], Report2Root::abandoned([]));
+        self::assertSame(['total' => 4, 'with_replacement' => 1, 'with_suggestion' => 2], Report2Root::toAbandonedArray($findings));
+        self::assertSame(['total' => 0, 'with_replacement' => 0, 'with_suggestion' => 0], Report2Root::toAbandonedArray([]));
     }
 
     public function testPrioritiesCountTheGradesAndNone(): void
@@ -145,7 +145,7 @@ final class Report2RootTest extends TestCase
             (new FindingBuilder())->build(),
         ];
 
-        self::assertSame(['critical' => 1, 'high' => 2, 'medium' => 0, 'low' => 0, 'none' => 1], Report2Root::priorities($findings));
+        self::assertSame(['critical' => 1, 'high' => 2, 'medium' => 0, 'low' => 0, 'none' => 1], Report2Root::toPrioritiesArray($findings));
     }
 
     public function testLibyearsSumsTheWrittenValuesToTwoDecimals(): void
@@ -153,18 +153,38 @@ final class Report2RootTest extends TestCase
         $finding = static fn (bool $direct, ?float $years): Finding => (new FindingBuilder())->withChain($direct ? ['vendor/pkg'] : ['vendor/root', 'vendor/pkg'])
             ->withLibyears($years === null ? LibyearsMeasurement::unmeasured(Libyears::NO_STABLE_RELEASE_DATE) : LibyearsMeasurement::of($years))->build();
         $findings = [$finding(true, 1.111), $finding(false, 2.227), $finding(true, 0.5), $finding(false, 1.0), $finding(true, null)];
-        $block = Report2Root::libyears(Libyears::fromFindings($findings), $findings);
-        $only = static fn (Finding $one): array => array_intersect_key(Report2Root::libyears(Libyears::fromFindings([$one]), [$one]), ['total' => 0, 'direct_requirements' => 0, 'packages' => 0]);
+        $block = Report2Root::toLibyearsArray(Libyears::fromFindings($findings), $findings);
+        $only = static fn (Finding $one): array => array_intersect_key(Report2Root::toLibyearsArray(Libyears::fromFindings([$one]), [$one]), ['total' => 0, 'direct_requirements' => 0, 'packages' => 0]);
 
         self::assertSame(['total' => 4.84, 'direct_requirements' => 1.61, 'packages' => 5], array_intersect_key($block, ['total' => 0, 'direct_requirements' => 0, 'packages' => 0]));
-        self::assertSame(array_merge(array_keys(Libyears::fromFindings($findings)->toArray()), ['packages']), array_keys($block), 'the sums replace the block\'s own keys in place');
+        self::assertSame(['total', 'direct_requirements', 'measured', 'unmeasured', 'furthest_behind', 'packages'], array_keys($block));
         self::assertSame(['total' => 2.23, 'direct_requirements' => 0.0, 'packages' => 1], $only($finding(false, 2.227)));
         self::assertSame(['total' => null, 'direct_requirements' => null, 'packages' => 1], $only($finding(true, null)));
         $pair = [$finding(true, 1.114), $finding(true, 1.114), $finding(false, 1.114), $finding(false, 0.286)];
-        self::assertSame(['total' => 3.62, 'direct_requirements' => 2.22, 'packages' => 4], array_intersect_key(Report2Root::libyears(Libyears::fromFindings($pair), $pair), ['total' => 0, 'direct_requirements' => 0, 'packages' => 0]), 'the sums add the written values, not the measured 3.628');
+        self::assertSame(['total' => 3.62, 'direct_requirements' => 2.22, 'packages' => 4], array_intersect_key(Report2Root::toLibyearsArray(Libyears::fromFindings($pair), $pair), ['total' => 0, 'direct_requirements' => 0, 'packages' => 0]), 'the sums add the written values, not the measured 3.628');
     }
 
     /** report-2 writes the date to the second: of two dates in one second, the first stays. */
+    public function testLibyearsWritesTheBlockTheSchemaDescribes(): void
+    {
+        $finding = static fn (string $package, LibyearsMeasurement $years, bool $direct, string $version): Finding => (new FindingBuilder())->withPackage($package)->withVersion($version)
+            ->withChain($direct ? [$package] : ['vendor/root', $package])->withLibyears($years)->build();
+        $findings = [
+            $finding('smalot/pdfparser', LibyearsMeasurement::of(4.7123), true, 'v1.1.0'),
+            $finding('psr/log', LibyearsMeasurement::of(3.36), false, '1.1.4'),
+            $finding('wallabag/rulerz', LibyearsMeasurement::unmeasured(Libyears::BRANCH_SNAPSHOT), true, 'dev-master'),
+        ];
+
+        self::assertSame([
+            'total' => 8.07,
+            'direct_requirements' => 4.71,
+            'measured' => 2,
+            'unmeasured' => [Libyears::BRANCH_SNAPSHOT => 1, Libyears::NO_STABLE_RELEASE_DATE => 0, Libyears::NOT_FROM_COMPOSER_REPOSITORY => 0, Libyears::METADATA_UNAVAILABLE => 0],
+            'furthest_behind' => ['package' => 'smalot/pdfparser', 'version' => 'v1.1.0', 'libyears' => 4.71],
+            'packages' => 3,
+        ], Report2Root::toLibyearsArray(Libyears::fromFindings($findings), $findings));
+    }
+
     public function testTheDataDateIsTheOldestAndKeepsTheFirstOfOneSecond(): void
     {
         $at = static fn (?string $date): Finding => (new FindingBuilder())->withDataDate($date === null ? null : new \DateTimeImmutable($date))->build();

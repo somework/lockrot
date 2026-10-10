@@ -10,8 +10,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Arrays exist only at the JSON boundary: a domain object computes each value, and only a writer
- * reads an array that lockrot wrote ({@see WrittenArrayReads}). The count of `array<string, mixed>`
- * in each file of src/ stays at its ceiling. Lower a ceiling when the count drops, and never raise
+ * reads an array that lockrot wrote ({@see WrittenArrayReads}). The count of {@see MIXED_MAP} in
+ * each file of src/ stays at its ceiling. Lower a ceiling when the count drops, and never raise
  * one: a new value gets a typed object.
  */
 final class ArraysAtTheBoundaryTest extends TestCase
@@ -36,7 +36,6 @@ final class ArraysAtTheBoundaryTest extends TestCase
     /** A file of src/ that is not listed has a ceiling of 0. */
     private const CEILINGS = [
         'Allowlist/ProjectIgnoreList.php' => 1,
-        'Analyzer/Libyears.php' => 1,
         'Analyzer/Report.php' => 2,
         'Analyzer/RunNote.php' => 4,
         'Analyzer/RunSettings.php' => 3,
@@ -100,7 +99,7 @@ final class ArraysAtTheBoundaryTest extends TestCase
         self::assertSame([], $violations, 'Read the value from the domain object that computes it.');
     }
 
-    public function testEachFileKeepsItsCountOfStringKeyedMixedArraysAtItsCeiling(): void
+    public function testEachFileKeepsItsCountOfMixedArraysAtItsCeiling(): void
     {
         $counts = [];
         foreach (self::sourceFiles() as $relative => $path) {
@@ -177,6 +176,8 @@ final class ArraysAtTheBoundaryTest extends TestCase
         yield 'call_user_func()' => ["    public function a(\$o) { return call_user_func([\$this, 'b'], \$o->toArray()); }\n    private function b(array \$row) { return \$row['id']; }", ['6: '.$outside]];
         yield 'array_walk_recursive()' => ['    public function a($o) { $rows = $o->toArray(); array_walk_recursive($rows, static function ($v, $k) { if ($k === \'id\') { echo $v; } }); }', ['6: '.$outside]];
         yield 'value reads' => ['    public function a($o) { return [in_array(\'abandoned\', $o->toArray(), true), isset(array_flip($o->toArray())[\'x\']), array_diff_assoc($o->toArray(), []), array_intersect_assoc($o->toArray(), [])]; }', ['6: '.$outside, '6: '.$outside, '6: '.$outside, '6: '.$outside]];
+        yield 'a callable array of a writer method' => ['    public function a($os) { return array_map([$os[0], \'toArray\'], $os)[0][\'x\']; }', ['6: '.$outside]];
+        yield 'a writer method returns a list mapped by a callable array' => ['    public function toListArray($os) { return array_map([$this, \'toRowArray\'], $os); }', []];
         yield 'a writer method by the naming rule' => ['    public function a($e) { return $e->toDetailsArray()[\'lock\']; }', ['6: '.$outside]];
         yield 'a listed holder can get it' => ['    public function a($o) { return new Holder($o->toArray()); }', []];
         yield 'a writer can get it' => ['    public function a($o) { return \Lockrot\Output\X::f($o->toArray()); }', []];
@@ -185,13 +186,31 @@ final class ArraysAtTheBoundaryTest extends TestCase
         yield 'an array that the code built is no written array' => ['    public function a($o) { $row = [\'id\' => $o->id()]; return $row[\'id\']; }', []];
     }
 
-    public function testAWriterPassesAWrittenArrayOnlyToAWriter(): void
+    /**
+     * @param list<string> $expected each violation as "line: what the code does"
+     *
+     * @dataProvider writerSources
+     */
+    #[DataProvider('writerSources')]
+    public function testAWriterHandsAWrittenArrayOnlyToAWriter(string $body, array $expected): void
     {
-        $source = "<?php\nnamespace Lockrot\\Output;\nuse Lockrot\\Domain\\Other;\nfinal class W\n{\n"
-            ."    public function a(\$o, \$other) { \$rows = \$o->toArray(); echo \$rows['id']; return [Other::f(\$rows), \$other->g(\$o->toArray()), \$this->h(\$rows), \\Lockrot\\Json\\JsonWriter::encode(\$rows)]; }\n"
-            ."}\n";
+        $source = "<?php\nnamespace Lockrot\\Output;\nuse Lockrot\\Domain\\Other;\nfinal class W\n{\n".$body."\n}\n";
 
-        self::assertSame(['6: passes a written array to Lockrot\Domain\Other', '6: passes a written array to ->g()'], WrittenArrayReads::inSource($source, [self::class, 'isWriter']));
+        self::assertSame($expected, WrittenArrayReads::inSource($source, [self::class, 'isWriter']));
+    }
+
+    /** @return iterable<string, array{string, list<string>}> */
+    public static function writerSources(): iterable
+    {
+        $other = 'passes a written array to Lockrot\Domain\Other';
+        $returns = 'returns a written array from a method that is not a writer';
+        yield 'the call, a variable and another object' => ["    public function a(\$o, \$other) { \$rows = \$o->toArray(); echo \$rows['id']; return [Other::f(\$rows), \$other->g(\$o->toArray()), \$this->h(\$rows), \\Lockrot\\Json\\JsonWriter::encode(\$rows)]; }", ['6: '.$other, '6: passes a written array to ->g()']];
+        yield 'a key of the call' => ["    public function a(\$o) { return Other::f(\$o->toArray()['findings']); }", ['6: '.$other]];
+        yield 'a key of a variable' => ["    public function a(\$o) { \$rows = \$o->toArray(); return Other::f(\$rows['findings']); }", ['6: '.$other]];
+        yield 'a variable that holds a key' => ["    public function a(\$o) { \$rows = \$o->toArray()['findings']; return Other::f(\$rows); }", ['6: '.$other]];
+        yield 'a public method that is not a writer' => ["    public function rows(\$o): array { return \$o->toArray(); }", ['6: '.$returns]];
+        yield 'a public method that returns a key' => ["    public function rowOf(\$o): array { \$rows = \$o->findingRows(); return \$rows['x']; }", ['6: '.$returns]];
+        yield 'a private method can return it' => ["    private function rows(\$o): array { return \$o->toArray(); }", []];
     }
 
     /** @return array<string, string> each .php file under src/ by its path below src/, sorted */
