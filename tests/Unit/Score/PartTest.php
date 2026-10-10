@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Score;
 
+use Lockrot\Json\JsonWriter;
 use Lockrot\Score\Part;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\ScoreSweep;
@@ -31,7 +32,12 @@ final class PartTest extends TestCase
         self::assertNull(Part::maintenance('counted', 9)->of());
     }
 
-    public function testAlonePartGivesTheGradeOfItsWholePoints(): void
+    public function testAnEmptyTieIsWrittenAsAList(): void
+    {
+        self::assertSame('{"status":"clear","contribution":0,"alone":{"total":0,"verdict":null},"of":0,"tied":[]}', JsonWriter::encode(Part::security('clear', 0, 0, []), 0));
+    }
+
+    public function testAPartAloneGivesTheGradeOfItsWholePoints(): void
     {
         self::assertSame([4, 'low'], [Part::maintenance('counted', 9)->aloneTotal(), Part::maintenance('counted', 9)->aloneVerdict()]);
         self::assertSame([32, 'critical'], [Part::security('counted', 64, 2, [])->aloneTotal(), Part::security('counted', 64, 2, [])->aloneVerdict()]);

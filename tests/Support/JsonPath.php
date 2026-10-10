@@ -21,6 +21,8 @@ final class JsonPath
 
     /**
      * A value as a reader of its JSON gets it: written by the writers' encoder, then decoded.
+     * The decoded array is the same for `{}` and `[]`. For a shape that can hold an empty map,
+     * assert the bytes of {@see JsonWriter::encode()} too.
      *
      * @param mixed $value an array or a \JsonSerializable tree
      *
