@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Analyzer;
 
 use Lockrot\Score\Accepted;
+use Lockrot\Score\MaintenanceTerm;
 use Lockrot\Score\Modifier;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\ScoreModel;
@@ -31,8 +32,8 @@ final class ScoreRulesUsed
             $accepted = $score->accepted();
             $used['counted'] += $accepted === [] ? 0 : 1;
             if (!$score->isGraded()) {
-                $used['divide-reach'] += self::rerunHalves($accepted, 'isReach') ? 1 : 0;
-                $used['divide-dev'] += self::rerunHalves($accepted, 'isDev') ? 1 : 0;
+                $used['divide-reach'] += self::rerunHalves($accepted, static fn (Modifier $modifier): bool => $modifier->isReach()) ? 1 : 0;
+                $used['divide-dev'] += self::rerunHalves($accepted, static fn (Modifier $modifier): bool => $modifier->isDev()) ? 1 : 0;
                 ++$used['zero-verdicts'];
                 continue;
             }
@@ -44,17 +45,16 @@ final class ScoreRulesUsed
                 $dev = $dev || $modifier->isDev();
             }
             ++$used['band-floors'];
-            // The first maintenance term is the lead, and each other one corroborates it.
-            $maintenance = \count($score->maintenanceTerms());
-            $used['lead-first'] += $maintenance > 0 ? 1 : 0;
-            $used['corroborating-share'] += $maintenance > 1 ? 1 : 0;
+            $leads = \count(array_filter($score->maintenanceTerms(), static fn (MaintenanceTerm $term): bool => $term->isLead()));
+            $used['lead-first'] += $leads > 0 ? 1 : 0;
+            $used['corroborating-share'] += \count($score->maintenanceTerms()) > $leads ? 1 : 0;
             $used['advisory-points'] += $security === null ? 0 : 1;
             $used['no-reachable-fix-multiplier'] += $security !== null && $security->multiplier() === ScoreModel::NO_REACHABLE_FIX_FACTOR ? 1 : 0;
             $used['security-max'] += $score->securityPart()->of() >= 2 ? 1 : 0;
-            $used['divide-reach'] += $reach || self::rerunHalves($accepted, 'isReach') ? 1 : 0;
+            $used['divide-reach'] += $reach || self::rerunHalves($accepted, static fn (Modifier $modifier): bool => $modifier->isReach()) ? 1 : 0;
             $used['security-exempt-from-reach'] += $security !== null && !$finding->isDirect() ? 1 : 0;
             $used['sum'] += $score->maintenancePart()->isCounted() && $score->securityPart()->isCounted() ? 1 : 0;
-            $used['divide-dev'] += $dev || self::rerunHalves($accepted, 'isDev') ? 1 : 0;
+            $used['divide-dev'] += $dev ? 1 : 0;
             $used['floor-once'] += $score->roundedDown() ? 1 : 0;
         }
 
@@ -64,14 +64,14 @@ final class ScoreRulesUsed
     /**
      * Whether the rerun of an accepted flag halves its number by the kind of modifier.
      *
-     * @param list<Accepted>          $accepted
-     * @param 'isReach'|'isDev' $kind
+     * @param list<Accepted>             $accepted
+     * @param \Closure(Modifier): bool $isKind
      */
-    private static function rerunHalves(array $accepted, string $kind): bool
+    private static function rerunHalves(array $accepted, \Closure $isKind): bool
     {
         foreach ($accepted as $row) {
             foreach ($row->modifiers() as $modifier) {
-                if ($modifier->{$kind}() && $modifier->changes()) {
+                if ($isKind($modifier) && $modifier->changes()) {
                     return true;
                 }
             }
