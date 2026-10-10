@@ -185,10 +185,10 @@ final class Report2Root
             ++$packages[$standing->status()];
             $packages['ignored'] += $standing->ignoredCount() > 0 ? 1 : 0;
             $advisories['ignored'] += $standing->ignoredCount();
-            $kind = $standing->fixKind();
-            if ($kind === null) {
+            if (!$standing->isVulnerable()) {
                 continue;
             }
+            $kind = $standing->fixKind();
             foreach ($standing->counts() as $severity => $count) {
                 $severities[$severity] = ($severities[$severity] ?? 0) + $count;
                 $advisories['counted'] += $count;

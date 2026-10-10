@@ -59,11 +59,22 @@ final class Part implements \JsonSerializable
         return $this->of;
     }
 
+    /** The whole points of the part alone, its half point dropped. */
+    public function aloneTotal(): int
+    {
+        return intdiv($this->contributionHalves, 2);
+    }
+
+    /** The grade that the part gives alone, null below the lowest band. */
+    public function aloneVerdict(): ?string
+    {
+        return ScoreModel::band($this->aloneTotal());
+    }
+
     /** @return Shape|SecurityShape */
     public function jsonSerialize(): array
     {
-        $alone = intdiv($this->contributionHalves, 2);
-        $out = ['status' => $this->status, 'contribution' => HalfPoints::json($this->contributionHalves), 'alone' => ['total' => $alone, 'verdict' => ScoreModel::band($alone)]];
+        $out = ['status' => $this->status, 'contribution' => HalfPoints::json($this->contributionHalves), 'alone' => ['total' => $this->aloneTotal(), 'verdict' => $this->aloneVerdict()]];
 
         return $this->of === null ? $out : $out + ['of' => $this->of, 'tied' => $this->tied];
     }

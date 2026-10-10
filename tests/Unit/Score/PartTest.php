@@ -30,4 +30,11 @@ final class PartTest extends TestCase
         self::assertFalse(Part::security('clear', 0, 0, [])->isCounted());
         self::assertNull(Part::maintenance('counted', 9)->of());
     }
+
+    public function testAlonePartGivesTheGradeOfItsWholePoints(): void
+    {
+        self::assertSame([4, 'low'], [Part::maintenance('counted', 9)->aloneTotal(), Part::maintenance('counted', 9)->aloneVerdict()]);
+        self::assertSame([32, 'critical'], [Part::security('counted', 64, 2, [])->aloneTotal(), Part::security('counted', 64, 2, [])->aloneVerdict()]);
+        self::assertSame([0, null], [Part::maintenance('none', 0)->aloneTotal(), Part::maintenance('none', 0)->aloneVerdict()]);
+    }
 }

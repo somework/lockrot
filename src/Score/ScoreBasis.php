@@ -181,7 +181,7 @@ final class ScoreBasis implements \JsonSerializable
             'exact' => HalfPoints::json($score->exactHalves()),
             'rounded_down' => $this->roundedDown(),
             'band' => ['floor' => ScoreModel::floorOf($grade), 'next' => $next, 'to_next' => $next === null ? null : ScoreModel::floorOf($next) - $total],
-            'decided_by' => self::decidedBy($grade, $score->maintenanceHalves(), $score->securityHalves()),
+            'decided_by' => $this->decidedBy($grade),
             'parts' => ['maintenance' => $this->maintenancePart, 'security' => $this->securityPart],
             'terms' => $this->terms(),
             'modifiers' => $this->modifiers,
@@ -329,10 +329,10 @@ final class ScoreBasis implements \JsonSerializable
         return $this->context['advisories_complete'] ? 'clear' : 'unchecked';
     }
 
-    private static function decidedBy(string $grade, int $maintenance, int $security): string
+    private function decidedBy(string $grade): string
     {
-        $byMaintenance = ScoreModel::band(intdiv($maintenance, 2)) === $grade;
-        $bySecurity = ScoreModel::band(intdiv($security, 2)) === $grade;
+        $byMaintenance = $this->maintenancePart->aloneVerdict() === $grade;
+        $bySecurity = $this->securityPart->aloneVerdict() === $grade;
         if ($byMaintenance) {
             return $bySecurity ? 'either' : 'maintenance';
         }

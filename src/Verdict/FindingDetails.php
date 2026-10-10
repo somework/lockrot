@@ -224,7 +224,7 @@ final class FindingDetails
     public function standing(array $rows): SecurityStanding
     {
         if ($rows === []) {
-            return new SecurityStanding($this->check === 'complete' ? 'clear' : 'unchecked', $this->check, \count($this->ignored), self::counts([]), null);
+            return SecurityStanding::notVulnerable($this->check, \count($this->ignored), self::counts([]));
         }
         // With no move, `fix_kind` is the hardest kind of its advisories: FIX_KINDS runs easiest first.
         $hardest = 0;
@@ -233,7 +233,7 @@ final class FindingDetails
             $hardest = max($hardest, (int) array_search($fix['kind'] ?? Fix::UNKNOWN, ScoreModel::FIX_KINDS, true));
         }
 
-        return new SecurityStanding(SecurityStanding::VULNERABLE, $this->check, \count($this->ignored), self::counts($rows), ScoreModel::FIX_KINDS[$hardest]);
+        return SecurityStanding::vulnerable($this->check, \count($this->ignored), self::counts($rows), ScoreModel::FIX_KINDS[$hardest]);
     }
 
     /**

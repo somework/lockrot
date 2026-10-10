@@ -20,13 +20,8 @@ final class SecurityStanding
     private array $counts;
     private ?string $fixKind;
 
-    /**
-     * @param string             $status `vulnerable`, `clear` or `unchecked`
-     * @param string             $check  `complete`, `partial` or `not_run`
-     * @param array<string, int> $counts the counted advisories by severity, every severity in display order first
-     * @param ?string            $fixKind the hardest fix kind of the counted advisories, null when none counts
-     */
-    public function __construct(string $status, string $check, int $ignoredCount, array $counts, ?string $fixKind)
+    /** @param array<string, int> $counts */
+    private function __construct(string $status, string $check, int $ignoredCount, array $counts, ?string $fixKind)
     {
         $this->status = $status;
         $this->check = $check;
@@ -35,11 +30,33 @@ final class SecurityStanding
         $this->fixKind = $fixKind;
     }
 
+    /**
+     * @param string             $check   `complete`, `partial` or `not_run`
+     * @param array<string, int> $counts  the counted advisories by severity, every severity in display order first
+     * @param string             $fixKind the hardest fix kind of the counted advisories
+     */
+    public static function vulnerable(string $check, int $ignoredCount, array $counts, string $fixKind): self
+    {
+        return new self(self::VULNERABLE, $check, $ignoredCount, $counts, $fixKind);
+    }
+
+    /**
+     * No advisory counts: `clear` after a complete check, else `unchecked`.
+     *
+     * @param string             $check  `complete`, `partial` or `not_run`
+     * @param array<string, int> $counts every severity in display order, at zero
+     */
+    public static function notVulnerable(string $check, int $ignoredCount, array $counts): self
+    {
+        return new self($check === 'complete' ? 'clear' : 'unchecked', $check, $ignoredCount, $counts, null);
+    }
+
     public function status(): string
     {
         return $this->status;
     }
 
+    /** @phpstan-assert-if-true !null $this->fixKind() */
     public function isVulnerable(): bool
     {
         return $this->status === self::VULNERABLE;
