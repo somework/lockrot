@@ -49,8 +49,8 @@ final class RootRecount
     }
 
     /**
-     * The counters that {@see mismatches()} compares, by their paths in the recounted blocks. It adds
-     * `data_date.distinct`, the data dates beyond the first, and `flags.accepted.in_score_0`. A flag,
+     * Returns the counters that {@see mismatches()} compares, by their paths in the recounted blocks,
+     * with `data_date.distinct`, the data dates beyond the first, and `flags.accepted.in_score_0`. A flag,
      * a grade, a severity and a fix kind below a root block read `*`, so one counter sums them. A
      * number counts as itself rounded up, a list as its length and any other value except null as 1.
      *

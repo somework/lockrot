@@ -84,9 +84,9 @@ final class RootRecountTest extends TestCase
     }
 
     /**
-     * An abandoned package with a replacement and one with a suggestion, at two data dates. A flag
-     * accepted in a graded finding and in a score-0 one. An ignored advisory beside one whose fix
-     * is unknown.
+     * The findings hold an abandoned package with a replacement and one with a suggestion, at two
+     * data dates. One flag is accepted in a graded finding and in a score-0 one. One finding has an
+     * ignored advisory and a counted one whose fix is unknown.
      *
      * @return list<Finding>
      */

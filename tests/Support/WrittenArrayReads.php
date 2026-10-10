@@ -18,14 +18,16 @@ use PhpParser\ParserFactory;
 /**
  * Finds where src/ uses the array of a writer method ({@see WRITER_METHOD}). Outside a writer class,
  * the array goes only to a writer method's return or to an argument of a writer or a listed holder.
- * On the way it can pass the nodes of {@see through()}. A writer class hands the array, a key of it
- * or one variable that holds them only to a writer. It returns them only from a writer method or a
- * private method.
+ * On the way it can pass the nodes of {@see through()}. A writer class gives the array, a key or a
+ * copy of it and one variable that holds them only to a writer. It returns or yields them only from
+ * a writer method or a private method.
  */
 final class WrittenArrayReads
 {
     private const WRITER_METHOD = '/^(to\w*array|jsonserialize|findingrows)$/i';
     private const OUTSIDE = 'uses a written array outside a return, an array item or a writer';
+    /** The functions whose result holds rows or keys of their array argument. */
+    private const COPIES = ['array_values', 'array_filter', 'array_slice', 'array_reverse', 'array_column', 'array_replace', 'array_unique', 'iterator_to_array', 'reset', 'end', 'current'];
 
     /** @var callable(string): bool */
     private $isWriter;
@@ -92,10 +94,11 @@ final class WrittenArrayReads
     /** A call of a writer method, or a callable array of one. */
     private static function isSource(Node $node): bool
     {
-        if ($node instanceof Expr\Array_ && \count($node->items) === 2) {
-            $method = $node->items[1]->value ?? null;
+        if ($node instanceof Expr\Array_ && \count($node->items) === 2 && $node->items[0] !== null && $node->items[1] !== null && $node->items[0]->key === null && $node->items[1]->key === null) {
+            $target = $node->items[0]->value;
+            $method = $node->items[1]->value;
 
-            return $method instanceof Node\Scalar\String_ && preg_match(self::WRITER_METHOD, $method->value) === 1;
+            return !$target instanceof Node\Scalar && !$target instanceof Expr\Array_ && $method instanceof Node\Scalar\String_ && preg_match(self::WRITER_METHOD, $method->value) === 1;
         }
 
         return ($node instanceof Expr\MethodCall || $node instanceof Expr\NullsafeMethodCall || $node instanceof Expr\StaticCall)
@@ -123,22 +126,23 @@ final class WrittenArrayReads
         return 'passes a written array to '.$target;
     }
 
-    /** What is wrong where a writer class hands on the array of a writer method, or null. */
+    /** What is wrong where a writer class gives the array of a writer method to a class that is not a writer, or null. */
     private function passedOn(Node $call): ?string
     {
-        [$parent, $child] = self::pastKeys(...self::position($call));
+        [$parent, $child] = self::onward(...self::position($call));
         $uses = [$parent];
-        if ($parent instanceof Expr\Assign && $parent->expr === $child && $parent->var instanceof Expr\Variable && \is_string($parent->var->name)) {
+        $names = self::assigned($parent, $child);
+        if ($names !== []) {
             $uses = [];
-            $method = self::method($parent);
+            $method = $parent === null ? null : self::method($parent);
             foreach ((new NodeFinder())->findInstanceOf($method === null ? [] : ($method->stmts ?? []), Expr\Variable::class) as $variable) {
-                if ($variable->name === $parent->var->name && $variable !== $parent->var) {
-                    $uses[] = self::pastKeys(...self::position($variable))[0];
+                if (\in_array($variable->name, $names, true) && !self::isShadowed($variable)) {
+                    $uses[] = self::onward(...self::position($variable))[0];
                 }
             }
         }
         foreach ($uses as $use) {
-            $method = $use instanceof Node\Stmt\Return_ ? self::method($use) : null;
+            $method = $use instanceof Node\Stmt\Return_ || $use instanceof Expr\Yield_ || $use instanceof Expr\YieldFrom ? self::method($use) : null;
             if ($method !== null && !$method->isPrivate() && preg_match(self::WRITER_METHOD, $method->name->toString()) !== 1) {
                 return 'returns a written array from a method that is not a writer';
             }
@@ -152,17 +156,64 @@ final class WrittenArrayReads
     }
 
     /**
-     * The position past each key read: the value under a key of a written array is written too.
+     * The position past each key read and each copy of {@see COPIES}: a key or a copy of a written
+     * array is written too.
      *
      * @return array{Node|null, Node}
      */
-    private static function pastKeys(?Node $parent, Node $child): array
+    private static function onward(?Node $parent, Node $child): array
     {
-        while ($parent instanceof Expr\ArrayDimFetch && $parent->var === $child) {
-            [$parent, $child] = self::position($parent);
+        while (true) {
+            $call = $parent instanceof Node\Arg ? $parent->getAttribute('parent') : null;
+            if ($parent instanceof Expr\ArrayDimFetch && $parent->var === $child) {
+                [$parent, $child] = self::position($parent);
+            } elseif ($call instanceof Expr\FuncCall && $call->name instanceof Name && \in_array($call->name->toLowerString(), self::COPIES, true)) {
+                [$parent, $child] = self::position($call);
+            } else {
+                return [$parent, $child];
+            }
+        }
+    }
+
+    /**
+     * The variables that an assignment of $child puts the array into: the target, the root of a
+     * key target, a union with `+=` or the variables of a destructuring.
+     *
+     * @return list<string>
+     */
+    private static function assigned(?Node $parent, Node $child): array
+    {
+        if (!($parent instanceof Expr\Assign || $parent instanceof Expr\AssignOp\Plus) || $parent->expr !== $child) {
+            return [];
+        }
+        $targets = $parent->var instanceof Expr\List_ || $parent->var instanceof Expr\Array_ ? array_map(static fn (?Node\ArrayItem $item): ?Expr => $item === null ? null : $item->value, $parent->var->items) : [$parent->var];
+        $names = [];
+        foreach ($targets as $target) {
+            while ($target instanceof Expr\ArrayDimFetch) {
+                $target = $target->var;
+            }
+            if ($target instanceof Expr\Variable && \is_string($target->name)) {
+                $names[] = $target->name;
+            }
         }
 
-        return [$parent, $child];
+        return $names;
+    }
+
+    /** Whether a closure or an arrow function inside the method binds the name of $variable as a parameter. */
+    private static function isShadowed(Expr\Variable $variable): bool
+    {
+        $function = self::function($variable);
+        if (!$function instanceof Expr\Closure && !$function instanceof Expr\ArrowFunction) {
+            return false;
+        }
+        foreach ($function->getParams() as $param) {
+            if ($param->var instanceof Expr\Variable && $param->var->name === $variable->name) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -188,8 +239,8 @@ final class WrittenArrayReads
 
     /**
      * The node whose position counts for $child inside $parent, or null when $parent takes the value.
-     * A ternary branch, a side of `??` or `+` and an array item pass the position on. So do an
-     * argument of `array_merge()` and an `array_map()` callback with its body.
+     * A ternary branch, a side of `??` or `+` and an array item keep the position of the value. So
+     * do an argument of `array_merge()` and an `array_map()` callback with its body.
      */
     private static function through(Node $parent, Node $child): ?Node
     {

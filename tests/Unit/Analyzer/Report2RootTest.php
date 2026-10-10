@@ -164,7 +164,6 @@ final class Report2RootTest extends TestCase
         self::assertSame(['total' => 3.62, 'direct_requirements' => 2.22, 'packages' => 4], array_intersect_key(Report2Root::toLibyearsArray(Libyears::fromFindings($pair), $pair), ['total' => 0, 'direct_requirements' => 0, 'packages' => 0]), 'the sums add the written values, not the measured 3.628');
     }
 
-    /** report-2 writes the date to the second: of two dates in one second, the first stays. */
     public function testLibyearsWritesTheBlockTheSchemaDescribes(): void
     {
         $finding = static fn (string $package, LibyearsMeasurement $years, bool $direct, string $version): Finding => (new FindingBuilder())->withPackage($package)->withVersion($version)
@@ -185,6 +184,7 @@ final class Report2RootTest extends TestCase
         ], Report2Root::toLibyearsArray(Libyears::fromFindings($findings), $findings));
     }
 
+    /** report-2 writes the date to the second: of two dates in one second, the first stays. */
     public function testTheDataDateIsTheOldestAndKeepsTheFirstOfOneSecond(): void
     {
         $at = static fn (?string $date): Finding => (new FindingBuilder())->withDataDate($date === null ? null : new \DateTimeImmutable($date))->build();

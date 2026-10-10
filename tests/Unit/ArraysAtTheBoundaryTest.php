@@ -177,6 +177,7 @@ final class ArraysAtTheBoundaryTest extends TestCase
         yield 'array_walk_recursive()' => ['    public function a($o) { $rows = $o->toArray(); array_walk_recursive($rows, static function ($v, $k) { if ($k === \'id\') { echo $v; } }); }', ['6: '.$outside]];
         yield 'value reads' => ['    public function a($o) { return [in_array(\'abandoned\', $o->toArray(), true), isset(array_flip($o->toArray())[\'x\']), array_diff_assoc($o->toArray(), []), array_intersect_assoc($o->toArray(), [])]; }', ['6: '.$outside, '6: '.$outside, '6: '.$outside, '6: '.$outside]];
         yield 'a callable array of a writer method' => ['    public function a($os) { return array_map([$os[0], \'toArray\'], $os)[0][\'x\']; }', ['6: '.$outside]];
+        yield 'a list of method names is no callable' => ['    public function a($m) { return [in_array($m, [\'toArray\', \'toListArray\'], true), Other::f([\'name\' => \'x\', \'method\' => \'jsonSerialize\'])]; }', []];
         yield 'a writer method returns a list mapped by a callable array' => ['    public function toListArray($os) { return array_map([$this, \'toRowArray\'], $os); }', []];
         yield 'a writer method by the naming rule' => ['    public function a($e) { return $e->toDetailsArray()[\'lock\']; }', ['6: '.$outside]];
         yield 'a listed holder can get it' => ['    public function a($o) { return new Holder($o->toArray()); }', []];
@@ -211,6 +212,13 @@ final class ArraysAtTheBoundaryTest extends TestCase
         yield 'a public method that is not a writer' => ["    public function rows(\$o): array { return \$o->toArray(); }", ['6: '.$returns]];
         yield 'a public method that returns a key' => ["    public function rowOf(\$o): array { \$rows = \$o->findingRows(); return \$rows['x']; }", ['6: '.$returns]];
         yield 'a private method can return it' => ["    private function rows(\$o): array { return \$o->toArray(); }", []];
+        yield 'a copy that array_values() makes' => ["    public function rows(\$o): array { return array_values(\$o->toArray()); }", ['6: '.$returns]];
+        yield 'a copy of a key' => ["    public function a(\$o) { return Other::f(array_values(\$o->toArray()['findings'])); }", ['6: '.$other]];
+        yield 'a destructured key' => ["    public function a(\$o) { ['findings' => \$f] = \$o->toArray(); return Other::f(\$f); }", ['6: '.$other]];
+        yield 'an element of a list' => ["    public function rows(\$fs): array { \$rows = []; foreach (\$fs as \$x) { \$rows[] = \$x->toArray(); } return \$rows; }", ['6: '.$returns]];
+        yield 'a union' => ["    public function a(\$o) { \$rows = []; \$rows += \$o->toArray(); return Other::f(\$rows); }", ['6: '.$other]];
+        yield 'a yield' => ["    public function rows(\$fs): iterable { foreach (\$fs as \$f) { yield \$f->toArray(); } }", ['6: '.$returns]];
+        yield 'a parameter of an arrow function with the same name' => ["    public function a(\$o, \$items) { \$row = \$o->toArray(); echo \$row['id']; return array_map(static fn (\$row) => Other::f(\$row), \$items); }", []];
     }
 
     /** @return array<string, string> each .php file under src/ by its path below src/, sorted */
