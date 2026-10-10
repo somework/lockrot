@@ -161,6 +161,7 @@ final class Report2RootTest extends TestCase
         self::assertSame(['total' => 2.23, 'direct_requirements' => 0.0, 'packages' => 1], $only($finding(false, 2.227)));
         self::assertSame(['total' => null, 'direct_requirements' => null, 'packages' => 1], $only($finding(true, null)));
         $pair = [$finding(true, 1.114), $finding(true, 1.114), $finding(false, 1.114), $finding(false, 0.286)];
+        self::assertSame(11.04, Report2Root::toLibyearsArray(Libyears::fromFindings([$finding(true, 8.53), $finding(true, 2.51)]), [$finding(true, 8.53), $finding(true, 2.51)])['direct_requirements'], 'the direct sum adds whole hundredths too');
         self::assertSame(['total' => 3.62, 'direct_requirements' => 2.22, 'packages' => 4], array_intersect_key(Report2Root::toLibyearsArray(Libyears::fromFindings($pair), $pair), ['total' => 0, 'direct_requirements' => 0, 'packages' => 0]), 'the sums add the written values, not the measured 3.628');
     }
 
@@ -169,17 +170,17 @@ final class Report2RootTest extends TestCase
         $finding = static fn (string $package, LibyearsMeasurement $years, bool $direct, string $version): Finding => (new FindingBuilder())->withPackage($package)->withVersion($version)
             ->withChain($direct ? [$package] : ['vendor/root', $package])->withLibyears($years)->build();
         $findings = [
-            $finding('smalot/pdfparser', LibyearsMeasurement::of(4.7123), true, 'v1.1.0'),
+            $finding('smalot/pdfparser', LibyearsMeasurement::of(4.7156), true, 'v1.1.0'),
             $finding('psr/log', LibyearsMeasurement::of(3.36), false, '1.1.4'),
             $finding('wallabag/rulerz', LibyearsMeasurement::unmeasured(Libyears::BRANCH_SNAPSHOT), true, 'dev-master'),
         ];
 
         self::assertSame([
-            'total' => 8.07,
-            'direct_requirements' => 4.71,
+            'total' => 8.08,
+            'direct_requirements' => 4.72,
             'measured' => 2,
             'unmeasured' => [Libyears::BRANCH_SNAPSHOT => 1, Libyears::NO_STABLE_RELEASE_DATE => 0, Libyears::NOT_FROM_COMPOSER_REPOSITORY => 0, Libyears::METADATA_UNAVAILABLE => 0],
-            'furthest_behind' => ['package' => 'smalot/pdfparser', 'version' => 'v1.1.0', 'libyears' => 4.71],
+            'furthest_behind' => ['package' => 'smalot/pdfparser', 'version' => 'v1.1.0', 'libyears' => 4.72],
             'packages' => 3,
         ], Report2Root::toLibyearsArray(Libyears::fromFindings($findings), $findings));
     }
