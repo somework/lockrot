@@ -25,31 +25,13 @@ final class RootRecount
      */
     public static function mismatches(array $document): array
     {
-        $findings = [];
-        foreach (JsonPath::arrayAt($document, ['findings']) as $finding) {
-            if (!\is_array($finding)) {
-                throw new \UnexpectedValueException('a finding is not an object');
-            }
-            $findings[] = $finding;
-        }
-        $libyears = self::libyears($findings);
-        $gate = self::gate($findings);
-        $expected = [
-            'flags' => self::flags($findings),
-            'abandoned' => self::abandoned($findings),
-            'priorities' => self::priorities($findings),
-            'libyears' => $libyears,
-            'gate' => $gate,
-            'security' => self::security($findings),
-            'data_date' => self::dataDate($findings),
-            'run.score_rules_used' => self::scoreRulesUsed($findings),
-        ];
+        $expected = self::recounted(self::findings($document));
         $written = [
             'flags' => $document['flags'] ?? null,
             'abandoned' => $document['abandoned'] ?? null,
             'priorities' => $document['priorities'] ?? null,
-            'libyears' => array_intersect_key(JsonPath::arrayAt($document, ['libyears']), $libyears),
-            'gate' => array_intersect_key(JsonPath::arrayAt($document, ['gate']), $gate),
+            'libyears' => array_intersect_key(JsonPath::arrayAt($document, ['libyears']), $expected['libyears']),
+            'gate' => array_intersect_key(JsonPath::arrayAt($document, ['gate']), $expected['gate']),
             'security' => $document['security'] ?? null,
             'data_date' => $document['data_date'] ?? null,
             'run.score_rules_used' => JsonPath::arrayAt($document, ['run', 'score_rules_used']),
@@ -64,6 +46,93 @@ final class RootRecount
         }
 
         return $bad;
+    }
+
+    /**
+     * Each counter that {@see mismatches()} compares, by its path in the recounted blocks, and the
+     * facts that only two findings show. A flag, a grade, a severity and a fix kind below a root
+     * block read `*`, so one counter sums them. A number counts as itself, a list as its length, and any other
+     * value that is not null as 1.
+     *
+     * @param array<mixed, mixed> $document a decoded report-2 document
+     *
+     * @return array<string, int>
+     */
+    public static function counters(array $document): array
+    {
+        $findings = self::findings($document);
+        $counters = [];
+        self::count(self::recounted($findings), '', $counters);
+        foreach (array_keys($counters) as $path) {
+            foreach (array_keys($counters) as $other) {
+                if (strncmp($other, $path.'.', \strlen($path) + 1) === 0) {
+                    // A null where another flag writes a block is no counter.
+                    unset($counters[$path]);
+                }
+            }
+        }
+        $dates = array_unique(array_filter(array_map(static fn (array $finding): string => self::str($finding, 'data_date'), $findings)));
+        $counters['data_date.distinct'] = max(0, \count($dates) - 1);
+        $counters['flags.accepted.in_score_0'] = 0;
+        foreach ($findings as $finding) {
+            $counters['flags.accepted.in_score_0'] += !isset(self::map($finding, 'score')['terms']) && self::any(self::rows($finding, 'flags'), 'role', 'accepted') ? 1 : 0;
+        }
+
+        return $counters;
+    }
+
+    /**
+     * @param array<mixed, mixed> $document
+     *
+     * @return list<array<mixed, mixed>>
+     */
+    private static function findings(array $document): array
+    {
+        $findings = [];
+        foreach (JsonPath::arrayAt($document, ['findings']) as $finding) {
+            if (!\is_array($finding)) {
+                throw new \UnexpectedValueException('a finding is not an object');
+            }
+            $findings[] = $finding;
+        }
+
+        return $findings;
+    }
+
+    /**
+     * @param list<array<mixed, mixed>> $findings
+     *
+     * @return array{flags: mixed, abandoned: mixed, priorities: mixed, libyears: array<string, mixed>, gate: array<string, mixed>, security: mixed, data_date: ?string, 'run.score_rules_used': mixed}
+     */
+    private static function recounted(array $findings): array
+    {
+        return [
+            'flags' => self::flags($findings),
+            'abandoned' => self::abandoned($findings),
+            'priorities' => self::priorities($findings),
+            'libyears' => self::libyears($findings),
+            'gate' => self::gate($findings),
+            'security' => self::security($findings),
+            'data_date' => self::dataDate($findings),
+            'run.score_rules_used' => self::scoreRulesUsed($findings),
+        ];
+    }
+
+    /**
+     * @param mixed             $value
+     * @param array<string, int> $counters
+     */
+    private static function count($value, string $path, array &$counters): void
+    {
+        if (\is_array($value) && array_values($value) !== $value) {
+            foreach ($value as $key => $item) {
+                $name = $path !== '' && \in_array($key, array_merge(self::FLAG_ORDER, self::SEVERITIES, self::FIX_KINDS, ['none']), true) ? '*' : (string) $key;
+                self::count($item, ltrim($path.'.'.$name, '.'), $counters);
+            }
+
+            return;
+        }
+        $counters[$path] = ($counters[$path] ?? 0) + (\is_int($value) ? $value : (\is_array($value) ? \count($value) : ($value === null ? 0 : 1)));
     }
 
     /**
