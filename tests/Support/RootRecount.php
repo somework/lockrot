@@ -49,10 +49,10 @@ final class RootRecount
     }
 
     /**
-     * Each counter that {@see mismatches()} compares, by its path in the recounted blocks, and the
-     * facts that only two findings show. A flag, a grade, a severity and a fix kind below a root
-     * block read `*`, so one counter sums them. A number counts as itself, a list as its length, and any other
-     * value that is not null as 1.
+     * The counters that {@see mismatches()} compares, by their paths in the recounted blocks. It adds
+     * `data_date.distinct`, the data dates beyond the first, and `flags.accepted.in_score_0`. A flag,
+     * a grade, a severity and a fix kind below a root block read `*`, so one counter sums them. A
+     * number counts as itself rounded up, a list as its length and any other value except null as 1.
      *
      * @param array<mixed, mixed> $document a decoded report-2 document
      *
@@ -132,7 +132,7 @@ final class RootRecount
 
             return;
         }
-        $counters[$path] = ($counters[$path] ?? 0) + (\is_int($value) ? $value : (\is_array($value) ? \count($value) : ($value === null ? 0 : 1)));
+        $counters[$path] = ($counters[$path] ?? 0) + (\is_int($value) || \is_float($value) ? (int) ceil($value) : (\is_array($value) ? \count($value) : ($value === null ? 0 : 1)));
     }
 
     /**

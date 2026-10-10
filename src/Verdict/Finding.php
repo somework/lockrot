@@ -651,7 +651,7 @@ final class Finding
         $context = $this->context($details, $checksMissing);
         $branchKey = ReleaseBranch::of($this->version);
         $branch = $branchKey === null ? null : ReleaseBranch::label($branchKey);
-        $basis = $this->scoreBasis();
+        $basis = $this->scoreBasisOf($context);
         $rows = self::rows($data[Signal::S9]['advisories'] ?? []);
         $flagsOut = $this->flagsOut($flags, $basis, $data, $context['liveness_complete'], $branch);
         $counted = $this->flagIds();
@@ -710,7 +710,13 @@ final class Finding
         $details = $this->details();
         $data = array_column($this->signalsOut($details), 'data', 'id');
 
-        return ScoreBasis::of($this->flags(), self::reachOf($this->chain), $this->dev, $this->context($details, self::checks($data[Signal::S10]['unchecked'] ?? [])));
+        return $this->scoreBasisOf($this->context($details, self::checks($data[Signal::S10]['unchecked'] ?? [])));
+    }
+
+    /** @param array{maintenance_judged: bool, advisories_complete: bool, liveness_complete: bool, s3_unread: bool, s8_unread: bool} $context */
+    private function scoreBasisOf(array $context): ScoreBasis
+    {
+        return ScoreBasis::of($this->flags(), self::reachOf($this->chain), $this->dev, $context);
     }
 
     /**
