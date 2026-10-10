@@ -651,7 +651,7 @@ final class Finding
         $context = $this->context($details, $checksMissing);
         $branchKey = ReleaseBranch::of($this->version);
         $branch = $branchKey === null ? null : ReleaseBranch::label($branchKey);
-        $basis = ScoreBasis::of($flags, self::reachOf($this->chain), $this->dev, $context);
+        $basis = $this->scoreBasis();
         $rows = self::rows($data[Signal::S9]['advisories'] ?? []);
         $flagsOut = $this->flagsOut($flags, $basis, $data, $context['liveness_complete'], $branch);
         $counted = $this->flagIds();
@@ -720,9 +720,10 @@ final class Finding
      */
     public function securityStanding(): SecurityStanding
     {
-        $data = array_column($this->signalsOut($this->details()), 'data', 'id');
+        $details = $this->details();
+        $data = array_column($this->signalsOut($details), 'data', 'id');
 
-        return $this->details()->standing(self::rows($data[Signal::S9]['advisories'] ?? []));
+        return $details->standing(self::rows($data[Signal::S9]['advisories'] ?? []));
     }
 
     /**

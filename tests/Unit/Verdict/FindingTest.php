@@ -257,18 +257,18 @@ final class FindingTest extends TestCase
         (new FindingBuilder())->withoutFlags()->build()->flags();
     }
 
-    /** The typed score is the one that the finding writes, worded with the checks that did not run. */
-    public function testTheScoreBasisIsTheWrittenScore(): void
+    /** The finding writes its typed score, worded with the checks that did not run. */
+    public function testTheWrittenScoreIsWordedWithTheChecksThatDidNotRun(): void
     {
         $s10 = new Signal('S10', 'info', 'repository activity not checked', ['unchecked' => [['check' => 'repository_activity', 'reason' => 'no_token', 'blocks' => ['S3', 'S4']]], 'blocks' => ['S3', 'S4']]);
         $finding = (new FindingBuilder())->withSignals([new Signal('S5', 'warn', 'old promise'), new Signal('S2', 'warn', 'no release'), $s10])
             ->withFlags(FlagSet::fromSignals([new Signal('S5', 'warn', 'old promise'), new Signal('S2', 'warn', 'no release')], new AllowlistEntry('vendor/pkg', null, 'slow on purpose', null, AllowlistEntry::BY_PROJECT, ['stale']), []))
             ->build();
 
-        $basis = $finding->scoreBasis();
+        $written = JsonPath::decoded($finding->toArray());
 
-        self::assertSame(JsonPath::decoded($basis), JsonPath::decoded($finding->toArray())['score']);
-        self::assertTrue(JsonPath::boolAt(JsonPath::decoded($basis), ['accepted', 0, 'if_counted', 'at_least']), 'S10 blocks S4, so counting stale gives at least this total');
+        self::assertTrue(JsonPath::boolAt($written, ['score', 'accepted', 0, 'if_counted', 'at_least']), 'S10 blocks S4, so counting stale gives at least this total');
+        self::assertSame(JsonPath::decoded($finding->scoreBasis()), $written['score']);
     }
 
     /** The security standing reads the S9 rows: an advisory row makes the package vulnerable. */
