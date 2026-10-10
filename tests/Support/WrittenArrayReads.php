@@ -97,7 +97,7 @@ final class WrittenArrayReads
     }
 
     /** What is wrong where a class that is not a writer calls a writer method, or null. */
-    private function misplaced(Expr $call): ?string
+    private function misplaced(Node $call): ?string
     {
         if (($call instanceof Expr\MethodCall || $call instanceof Expr\NullsafeMethodCall || $call instanceof Expr\StaticCall) && $call->name instanceof Node\Identifier && $call->name->toLowerString() === 'jsonserialize') {
             return 'calls jsonSerialize(): only the encoder walks the tree';
@@ -117,7 +117,7 @@ final class WrittenArrayReads
     }
 
     /** What is wrong where a writer class hands on the array of a writer method, or null. */
-    private function passedOn(Expr $call): ?string
+    private function passedOn(Node $call): ?string
     {
         [$parent, $child] = self::position($call);
         $uses = [$parent];
