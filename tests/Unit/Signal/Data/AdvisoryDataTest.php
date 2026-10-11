@@ -13,7 +13,7 @@ use Lockrot\Signal\Data\AdvisoryData;
 use Lockrot\Signal\Data\AdvisoryRow;
 use PHPUnit\Framework\TestCase;
 
-/** The deciding S9 row of twig/twig v2.16.1 in case A of tests/fixtures/flags/cases.json. */
+/** The deciding S9 row of twig/twig in case A of tests/fixtures/flags/cases.json. */
 final class AdvisoryDataTest extends TestCase
 {
     private const FIX = '{"kind":"raise-php","to_branch":"3.x","version":"v3.26.0","newest":"v3.30.0","on_installed_branch":false,"php":">=8.1.0","held_by":[{"source":"root","package":null,"version":null,"link":"require","constraint":"^2.0","holder":null},{"source":"package","package":"symfony/twig-bridge","version":"v3.4.47","link":"require","constraint":"^1.41|^2.10","holder":null}],"reason":null}';

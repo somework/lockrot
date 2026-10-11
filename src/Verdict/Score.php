@@ -39,7 +39,7 @@ final class Score
 
     /**
      * @param list<string> $maintenance the counted maintenance flags in flag order
-     * @param ?Advisory    $deciding    its severity a bucket
+     * @param ?Advisory    $deciding    with the severity bucket, not Composer's word
      * @param list<string> $tied
      */
     private function __construct(array $maintenance, ?array $deciding, array $tied, int $advisories, string $reach, bool $dev)
@@ -57,7 +57,7 @@ final class Score
         $this->deciding = $deciding === null ? null : $this->securityTerm($deciding);
     }
 
-    /** @param Advisory $advisory its severity a bucket */
+    /** @param Advisory $advisory with the severity bucket, not Composer's word */
     private function securityTerm(array $advisory): SecurityTerm
     {
         $multiplier = \in_array($advisory['fix_kind'], ScoreModel::DOUBLING, true) ? ScoreModel::NO_REACHABLE_FIX_FACTOR : 1;

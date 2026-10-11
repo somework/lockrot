@@ -264,14 +264,16 @@ final class FindingDetails
         if ($installed !== null) {
             return $installed;
         }
-        $fixed = 0;
+        $clears = [];
         $unknown = 0;
         foreach ($rows as $row) {
-            $fixed += $row->fix()->onInstalledBranch() === true ? 1 : 0;
+            if ($row->fix()->onInstalledBranch() === true) {
+                $clears[] = $row->id();
+            }
             $unknown += $row->fix()->kind() === Fix::UNKNOWN ? 1 : 0;
         }
 
-        return BranchFixes::installedFromRows($branch, $fixed, $unknown, \count($rows));
+        return BranchFixes::installedFromRows($branch, $clears, $unknown, \count($rows));
     }
 
     /**

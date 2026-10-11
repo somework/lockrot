@@ -9,9 +9,9 @@ use Lockrot\Signal\Signal;
 use Lockrot\Verdict\FlagSet;
 
 /**
- * A signal's data as report-1 wrote it, S9 apart: without the keys report-2 adds, and with S7's
- * packages named by their report-1 word. S9's report-1 rows are {@see AdvisoryFacts013}. The
- * `--explain` text prints this view until it reads report-2's.
+ * A signal's data as report-1 wrote it, for every signal but S9: without the keys report-2 adds,
+ * and with S7's packages named by their report-1 word. S9's report-1 rows are
+ * {@see AdvisoryFacts013}. The `--explain` text prints this view.
  *
  * @internal
  */

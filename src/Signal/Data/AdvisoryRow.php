@@ -8,6 +8,7 @@ use Lockrot\Security\Fix;
 
 /**
  * One counted advisory of S9: `signals[].data.advisories[]` (docs/verdicts.md#security-advisories).
+ * `deciding` is false on a row that {@see withDeciding()} did not mark.
  *
  * @internal
  */

@@ -8,7 +8,7 @@ use Lockrot\Json\JsonWriter;
 use Lockrot\Signal\Data\OldPromiseData;
 use PHPUnit\Framework\TestCase;
 
-/** The S5 data of paragonie/random_compat v9.99.100 in the BookStack fixture app, with `--dev`. */
+/** The S5 data of paragonie/random_compat in the BookStack fixture app, with `--dev`. */
 final class OldPromiseDataTest extends TestCase
 {
     public function testItWritesTheS5KeysInOrder(): void

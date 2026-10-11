@@ -188,10 +188,7 @@ final class ScoreModelTest extends TestCase
         self::assertSame(['B', 'unrated', 'none'], self::deciding(Score::compute([], [['id' => 'B', 'severity' => 'unknown', 'fix_kind' => 'none']], 'direct', false)));
     }
 
-    /**
-     * Score builds the terms that report-2 writes: each maintenance term with its contribution after
-     * the reach and dev halvings, and the deciding advisory with the doubling of no reachable fix.
-     */
+    /** A term carries its contribution after the halvings, so a reader does not compute it again. */
     public function testTheEngineBuildsTheTermsItCounts(): void
     {
         $score = Score::compute(['stale', 'left-behind'], [Score::advisory('A', 'critical', 'none'), Score::advisory('B', 'low', 'update')], 'transitive', true);

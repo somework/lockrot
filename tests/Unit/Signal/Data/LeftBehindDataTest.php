@@ -8,7 +8,7 @@ use Lockrot\Json\JsonWriter;
 use Lockrot\Signal\Data\LeftBehindData;
 use PHPUnit\Framework\TestCase;
 
-/** The S8 data of doctrine/collections 1.8.0 in the PrestaShop fixture app, with `--dev`. */
+/** The S8 data of doctrine/collections in the PrestaShop fixture app, with `--dev`. */
 final class LeftBehindDataTest extends TestCase
 {
     public function testItWritesTheS8KeysInOrder(): void

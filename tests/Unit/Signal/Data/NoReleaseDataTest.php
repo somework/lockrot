@@ -8,7 +8,7 @@ use Lockrot\Json\JsonWriter;
 use Lockrot\Signal\Data\NoReleaseData;
 use PHPUnit\Framework\TestCase;
 
-/** The S2 data of socialiteproviders/discord 4.2.0 in the BookStack fixture app, with `--dev`. */
+/** The S2 data of socialiteproviders/discord in the BookStack fixture app, with `--dev`. */
 final class NoReleaseDataTest extends TestCase
 {
     public function testItWritesTheS2KeysInOrderWithTheirNulls(): void

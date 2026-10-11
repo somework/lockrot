@@ -9,7 +9,7 @@ use Lockrot\Signal\Data\ExposedPackage;
 use Lockrot\Signal\Data\ExposureData;
 use PHPUnit\Framework\TestCase;
 
-/** The S7 data of ssddanbrown/asserthtml v3.2.0 in the BookStack fixture app, with `--dev`. */
+/** The S7 data of ssddanbrown/asserthtml in the BookStack fixture app, with `--dev`. */
 final class ExposureDataTest extends TestCase
 {
     public function testItWritesTheCountAndEachPackageInOrder(): void

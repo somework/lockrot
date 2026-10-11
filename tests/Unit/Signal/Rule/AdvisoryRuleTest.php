@@ -92,7 +92,9 @@ final class AdvisoryRuleTest extends TestCase
         self::assertSame(Signal::S9, $signal->id());
         self::assertSame(Signal::LEVEL_HIGH, $signal->level(), 'a high advisory');
         self::assertSame('1 security advisory affects v1.2.3 (CVE-2024-0001)', $signal->summary());
-        self::assertSame(['advisories' => [[
+        $legacy = AdvisoryRule::legacy($facts)[1];
+        self::assertFalse($legacy->releasesRead());
+        self::assertSame([[
             'id' => 'PKSA-1',
             'cve' => 'CVE-2024-0001',
             'title' => 'Title of PKSA-1',
@@ -102,7 +104,7 @@ final class AdvisoryRuleTest extends TestCase
             'affected_versions' => null,
             'fixed_by' => null,
             'fixed_on_branch' => false,
-        ]], 'releases_read' => false], AdvisoryRule::legacy($facts)[1]->data());
+        ]], $legacy->rows());
     }
 
     /**
@@ -124,7 +126,6 @@ final class AdvisoryRuleTest extends TestCase
             $signal = (new AdvisoryRule())->evaluate($facts);
             self::assertNotNull($signal, $case);
             self::assertSame($read, AdvisoryRule::legacy($facts)[1]->releasesRead(), $case);
-            self::assertSame(['advisories', 'releases_read'], array_keys(AdvisoryRule::legacy($facts)[1]->data()), $case.': next to the rows');
             self::assertNull(self::row($facts, 0)['fixed_by'], $case.': nothing fixes it either way');
         }
     }

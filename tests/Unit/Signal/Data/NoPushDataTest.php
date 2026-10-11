@@ -8,7 +8,7 @@ use Lockrot\Json\JsonWriter;
 use Lockrot\Signal\Data\NoPushData;
 use PHPUnit\Framework\TestCase;
 
-/** The S4 data of willdurand/jsonp-callback-validator v1.1.0 in the PrestaShop fixture app, with `--dev`. */
+/** The S4 data of willdurand/jsonp-callback-validator in the PrestaShop fixture app, with `--dev`. */
 final class NoPushDataTest extends TestCase
 {
     public function testItWritesTheS4KeysInOrder(): void

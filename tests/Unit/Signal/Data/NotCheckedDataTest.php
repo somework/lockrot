@@ -9,7 +9,7 @@ use Lockrot\Signal\Data\Check;
 use Lockrot\Signal\Data\NotCheckedData;
 use PHPUnit\Framework\TestCase;
 
-/** The S10 data of fakerphp/faker v1.24.1 in the BookStack fixture app, with `--dev`. */
+/** The S10 data of fakerphp/faker in the BookStack fixture app, with `--dev`. */
 final class NotCheckedDataTest extends TestCase
 {
     public function testItWritesTheChecksAndTheSignalsTheyBlock(): void

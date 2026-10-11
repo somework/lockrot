@@ -61,14 +61,4 @@ final class AdvisoryFacts013
     {
         return $this->releasesRead;
     }
-
-    /**
-     * S9's data as report-1 wrote it, empty when no advisory counts.
-     *
-     * @return array{advisories: list<Row013>, releases_read: bool}|array{}
-     */
-    public function data(): array
-    {
-        return $this->rows === [] ? [] : ['advisories' => $this->rows, 'releases_read' => $this->releasesRead];
-    }
 }

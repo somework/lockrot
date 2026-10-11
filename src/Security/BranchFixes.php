@@ -39,12 +39,13 @@ final class BranchFixes
     }
 
     /**
-     * The installed branch's row when the release scan did not run, counted from the S9 rows. It
-     * has no lower bound: unread release data gives no fix (SPEC §5.3).
+     * The installed branch's row when the release scan did not run, counted from the S9 rows.
+     *
+     * @param list<string> $clears the ids of the counted advisories that the installed branch fixes
      */
-    public static function installedFromRows(string $branch, int $fixed, int $unknown, int $of): self
+    public static function installedFromRows(string $branch, array $clears, int $unknown, int $of): self
     {
-        return new self($branch, true, $fixed, $unknown, $of, null, null, []);
+        return new self($branch, true, \count($clears), $unknown, $of, null, null, $clears);
     }
 
     /** `ReleaseBranch::label()`, `2.x`. */

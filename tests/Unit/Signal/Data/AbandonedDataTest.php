@@ -8,7 +8,7 @@ use Lockrot\Json\JsonWriter;
 use Lockrot\Signal\Data\AbandonedData;
 use PHPUnit\Framework\TestCase;
 
-/** The S1 data of doctrine/cache 2.2.0 in the PrestaShop fixture app. */
+/** The S1 data of doctrine/cache in the PrestaShop fixture app, with `--dev`. */
 final class AbandonedDataTest extends TestCase
 {
     public function testItWritesTheS1KeysInOrderWithTheirNulls(): void
