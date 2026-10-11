@@ -7,6 +7,8 @@ namespace Lockrot\Signal;
 use Lockrot\Data\Abandoned\AbandonedIgnoreMatch;
 use Lockrot\Data\Advisory\Advisory;
 use Lockrot\Data\Advisory\AdvisoryNameCoverage;
+use Lockrot\Data\Forge\ActivityLookup;
+use Lockrot\Data\Forge\LocatedRepository;
 use Lockrot\Data\Forge\RepositoryActivity;
 use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Lock\LockedPackage;
@@ -31,12 +33,12 @@ final class PackageFacts
     private ?AdvisoryNameCoverage $advisoryCoverage;
     private bool $metadataFailed;
     private ?PackageFixes $fixes = null;
+    private ?ActivityLookup $lookup = null;
 
     /**
      * @param list<Advisory> $advisories         only those that affect the installed version: S9 does not filter them
-     * @param ?string        $activityNotChecked why the repository was never asked about, null when it was
-     *                                           ({@see \Lockrot\Analyzer\Analyzer::activityNotCheckedReasons()}).
-     *                                           An answer of "no such repository" is a check that ran.
+     * @param ?string        $activityNotChecked why the activity was not read, null when it was: one
+     *                                           reason of {@see ActivityLookup::reason()}
      * @param ?AbandonedIgnoreMatch $abandonedIgnore  the patterns of Composer's abandoned ignore list that match the name
      * @param bool                  $metadataFailed   a repository that lists the package did not serve its metadata
      */
@@ -59,6 +61,34 @@ final class PackageFacts
         $copy->fixes = $fixes;
 
         return $copy;
+    }
+
+    /** A copy whose activity, and the reason it was not read, come from the lookup. */
+    public function withActivityLookup(ActivityLookup $lookup): self
+    {
+        $copy = clone $this;
+        $copy->lookup = $lookup;
+        $copy->activity = $lookup->activity();
+        $copy->activityNotChecked = $lookup->reason();
+
+        return $copy;
+    }
+
+    /**
+     * The lookup that {@see withActivityLookup()} gave. Facts built without one read their activity
+     * and its reason, and place no repository.
+     */
+    public function activityLookup(): ActivityLookup
+    {
+        if ($this->lookup !== null) {
+            return $this->lookup;
+        }
+        if ($this->activity !== null) {
+            return ActivityLookup::read($this->activity, false);
+        }
+        $reason = $this->activityNotChecked ?? ($this->package->isFromComposerRepository() ? ActivityLookup::NO_REPOSITORY : ActivityLookup::NOT_FROM_COMPOSER_REPOSITORY);
+
+        return ActivityLookup::notRead($reason, LocatedRepository::none(null));
     }
 
     /** Null when the run counted no advisory, so the release scan did not run. */

@@ -467,7 +467,7 @@ final class FindingTest extends TestCase
         $finding = (new FindingBuilder())->withVersion('1.2.3')->withVerdict(Verdict::STALE)->withChain(['vendor/root', 'vendor/pkg'])->withDev(true)->build();
         $array = $finding->toArray();
         self::assertSame(
-            ['package', 'version', 'branch', 'installed_php', 'verdict', 'priority', 'lead', 'flags', 'score', 'next_step', 'security', 'checks_missing', 'checks_skipped', 'maintenance_judged', 'metadata', 'allowlist',
+            ['package', 'version', 'branch', 'installed_php', 'verdict', 'priority', 'lead', 'flags', 'score', 'next_step', 'security', 'checks_missing', 'checks_skipped', 'maintenance_judged', 'metadata', 'activity', 'allowlist',
                 'from_composer_repository', 'origin', 'replacement', 'replacement_url', 'note', 'libyears_unmeasured', 'direct', 'dev', 'reach', 'chain', 'direct_dependents', 'signals', 'evidence', 'allowlist_reason', 'data_date', 'libyears'],
             array_keys($array)
         );

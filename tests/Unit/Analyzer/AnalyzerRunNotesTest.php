@@ -79,8 +79,8 @@ final class AnalyzerRunNotesTest extends TestCase
     }
 
     /**
-     * Every package on the rate-limited repository host carries `rate_limit`, the 404 one included:
-     * the analyzer asks about the rate limit first.
+     * Every package without an answer on the rate-limited repository host carries `rate_limit`. The
+     * 404 is an answer, so its package carries `repository_not_found`.
      */
     public function testTheActivityNotesListEachRepositoryAndAgreeWithEachPackagesReason(): void
     {
@@ -116,9 +116,9 @@ final class AnalyzerRunNotesTest extends TestCase
         self::assertTrue($report->hadNetworkFailures());
 
         self::assertSame(
-            ['vendor/down' => NotCheckedRule::RATE_LIMIT, 'vendor/gone' => NotCheckedRule::RATE_LIMIT, 'vendor/limited' => NotCheckedRule::RATE_LIMIT],
+            ['vendor/down' => NotCheckedRule::RATE_LIMIT, 'vendor/gone' => 'repository_not_found', 'vendor/limited' => NotCheckedRule::RATE_LIMIT],
             self::activityReasons($analysis, ['vendor/limited', 'vendor/down', 'vendor/gone']),
-            'rate_limit on the forge is the union of the rate-limited note and the not-found one'
+            'rate_limit on the forge is the rate-limited note; the not-found note names the answer'
         );
     }
 
@@ -148,8 +148,8 @@ final class AnalyzerRunNotesTest extends TestCase
         self::assertSame(['vendor/one' => NotCheckedRule::FETCH_FAILED, 'vendor/two' => NotCheckedRule::FETCH_FAILED], self::activityReasons($analysis, ['vendor/one', 'vendor/two', 'vendor/fine']));
     }
 
-    /** A 404 without rate limiting has no reason on its finding: the note is its only record. */
-    public function testARepositoryThatAnswered404IsTypedOnlyInItsNote(): void
+    /** A 404 is an answer: its finding carries `repository_not_found`, and the note names the repository. */
+    public function testARepositoryThatAnswered404IsTypedInItsNoteAndOnItsFinding(): void
     {
         $packages = [self::locked('vendor/gone')];
         $metadata = new MetadataBatch(['vendor/gone' => self::metadata('vendor/gone', 'https://github.com/owner/gone.git')], [], []);
@@ -157,7 +157,7 @@ final class AnalyzerRunNotesTest extends TestCase
         $analysis = $this->analyze($packages, $metadata, $this->http([]), true);
 
         self::assertSame(['forge_id' => 'github', 'repositories' => [['host' => 'github.com', 'repo' => 'owner/gone']]], $analysis->report()->runNotes()[0]->data());
-        self::assertSame([], self::activityReasons($analysis, ['vendor/gone']));
+        self::assertSame(['vendor/gone' => 'repository_not_found'], self::activityReasons($analysis, ['vendor/gone']));
         self::assertFalse($analysis->report()->hadNetworkFailures());
     }
 
@@ -212,7 +212,11 @@ final class AnalyzerRunNotesTest extends TestCase
             'vendor/b' => self::metadata('vendor/b', 'https://github.com/vendor/b.git'),
         ], [], []);
 
-        $analysis = $this->analyze($packages, $metadata, $this->http([]), true, null, false, true);
+        $offline = [
+            'https://api.github.com/repos/vendor/a' => [0, ''],
+            'https://api.github.com/repos/vendor/b' => [0, ''],
+        ];
+        $analysis = $this->analyze($packages, $metadata, $this->http($offline), true, null, false, true);
 
         self::assertSame(RunNote::OFFLINE, $analysis->report()->runNotes()[0]->code());
         self::assertSame(['vendor/a' => NotCheckedRule::OFFLINE, 'vendor/b' => NotCheckedRule::OFFLINE], self::activityReasons($analysis, ['vendor/a', 'vendor/b']));

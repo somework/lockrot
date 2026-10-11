@@ -10,6 +10,9 @@ use Lockrot\Data\Advisory\AdvisoryCoverage;
 use Lockrot\Data\Advisory\AdvisoryIgnoreMatch;
 use Lockrot\Data\Advisory\AdvisoryNameCoverage;
 use Lockrot\Data\Advisory\IgnoredAdvisory;
+use Lockrot\Data\Forge\ActivityLookup;
+use Lockrot\Data\Forge\RepoRef;
+use Lockrot\Data\Forge\RepositoryActivity;
 use Lockrot\Data\Repository\MetadataLoaderInterface;
 use Lockrot\Data\Repository\StableRelease;
 use Lockrot\Lock\LockFile;
@@ -278,6 +281,34 @@ final class FindingDetailsTest extends TestCase
             ['check' => 'release_metadata', 'reason' => 'not_from_composer_repository', 'blocks' => ['S2', 'S8']],
         ]];
         yield 'a branch snapshot' => [F::facts(F::package(['version' => 'dev-main']), $metadata, F::activity(false, null)), null, [], [['check' => 'release_branch', 'reason' => 'branch_snapshot', 'blocks' => ['S8']]]];
+        $gitlab = new RepositoryActivity(new RepoRef(RepoRef::GITLAB, 'gitlab.com', 'group/pkg'), null, null, new \DateTimeImmutable(F::NOW));
+        yield 'a read without the archived flag' => [(new PackageFacts(F::package(), $metadata, null, []))->withActivityLookup(ActivityLookup::read($gitlab, false)), null, [], [['check' => 'repository_archived', 'reason' => 'no_token', 'blocks' => ['S3']]]];
+        yield 'an authenticated read without the archived flag' => [(new PackageFacts(F::package(), $metadata, null, []))->withActivityLookup(ActivityLookup::read($gitlab, true)), null, [], [['check' => 'repository_archived', 'reason' => 'fetch_failed', 'blocks' => ['S3']]]];
+        yield 'a 404' => [(new PackageFacts(F::package(), $metadata, null, []))->withActivityLookup(ActivityLookup::notFound(new RepoRef(RepoRef::GITHUB, 'github.com', 'vendor/pkg'))), null, [], [$activity('repository_not_found')]];
+        yield 'S10 holds the origin gaps' => [F::facts(F::package(['fromComposerRepository' => false])), null, [$s10([
+            ['check' => 'release_metadata', 'reason' => 'not_from_composer_repository', 'blocks' => ['S2', 'S8']],
+            ['check' => 'repository_activity', 'reason' => 'not_from_composer_repository', 'blocks' => ['S3', 'S4']],
+        ])], []];
+    }
+
+    public function testTheActivityOfFactsWithoutALookupIsTheReasonDecidedBeforeAnyRequest(): void
+    {
+        $whole = new AllowlistEntry('vendor/pkg', null, 'kept on purpose', null, AllowlistEntry::BY_PROJECT);
+        $activity = static fn (PackageFacts $facts, ?AllowlistEntry $entry): array => JsonPath::decoded(FindingDetails::of($facts, $entry, new PhpFloor('8.4', null), [], [], null)->activity());
+
+        self::assertSame(['not_read', 'allowlisted'], \array_slice(array_values($activity(F::facts(F::package()), $whole)), 0, 2));
+        self::assertSame(['not_read', 'no_repository'], \array_slice(array_values($activity(F::facts(F::package()), null)), 0, 2));
+        self::assertSame(['not_read', 'not_from_composer_repository'], \array_slice(array_values($activity(F::facts(F::package(['fromComposerRepository' => false])), null)), 0, 2));
+        self::assertSame(['not_read', 'no_token'], \array_slice(array_values($activity(new PackageFacts(F::package(), null, null, [], 'no_token'), $whole)), 0, 2), 'the reason the facts give wins');
+        self::assertSame(['read', null], \array_slice(array_values($activity(F::facts(F::package(), null, F::activity(false, null)), $whole)), 0, 2));
+    }
+
+    public function testDetailsBuiltWithoutALookupRefuseToWriteTheActivity(): void
+    {
+        $details = new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [], null);
+
+        $this->expectException(\LogicException::class);
+        $details->activity();
     }
 
     /**
