@@ -122,8 +122,8 @@ final class ReportDocumentTest extends TestCase
         self::assertArrayNotHasKey('finding', $detail, 'the report already carries it');
     }
 
-    /** A detail is explain-2's `lock`, `metadata` and `activity` of the package, from the same writers. */
-    public function testADetailHoldsTheLockTheMetadataAndTheActivityOfExplain(): void
+    /** A detail is explain-2's `lock` and `metadata` of the package, from the same writers. The finding holds `activity`. */
+    public function testADetailHoldsTheLockAndTheMetadataOfExplain(): void
     {
         $report = $this->report([$this->finding('vendor/pkg', Verdict::LEFT_BEHIND, [], '1.4.0')]);
         $facts = ['vendor/pkg' => F::facts(F::package(['version' => '1.4.0']), F::metadata([['1.5.0', '2021-06-01T00:00:00+00:00']]), F::activity(true, '2022-02-02T00:00:00+00:00'))];
@@ -131,9 +131,9 @@ final class ReportDocumentTest extends TestCase
 
         $detail = J::arrayAt($this->document($report, $facts)->toArray(), ['details', 'vendor/pkg']);
 
-        self::assertSame(['metadata', 'lock', 'activity', 'repository_link'], array_keys($detail));
-        self::assertSame(J::decoded([$explained['metadata'], $explained['lock'], $explained['activity']]), J::decoded([$detail['metadata'], $detail['lock'], $detail['activity']]));
-        self::assertTrue(J::boolAt($detail, ['activity', 'archived']));
+        self::assertSame(['metadata', 'lock', 'repository_link'], array_keys($detail));
+        self::assertSame(J::decoded([$explained['metadata'], $explained['lock']]), J::decoded([$detail['metadata'], $detail['lock']]));
+        self::assertArrayHasKey('activity', J::decoded($explained['finding']), 'the page reads the activity from the finding');
     }
 
     /**

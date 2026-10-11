@@ -133,7 +133,7 @@ final class FlagSentence
             return 'last release '.self::ago($d->lastRelease(), $d->years(), $d->datedBy());
         }
         if ($d instanceof NoPushData) {
-            return 'last '.$d->activity().' '.self::ago($d->lastPush(), $d->years(), null);
+            return 'last '.$d->event().' '.self::ago($d->lastPush(), $d->years(), null);
         }
         if ($d instanceof OldPromiseData) {
             $major = explode('.', $d->targetMajor())[0];

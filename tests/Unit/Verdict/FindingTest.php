@@ -1114,7 +1114,7 @@ final class FindingTest extends TestCase
     public static function headlines(): iterable
     {
         $s2 = static fn (string $level, $years): Signal => new Signal($level, 'old', SignalDataStub::of(Signal::S2, ['last_release' => '2021-05-05T00:00:00+00:00', 'years' => $years]));
-        $s4 = static fn (string $level, $years): Signal => new Signal($level, 'quiet', SignalDataStub::of(Signal::S4, ['last_push' => '2022-01-10T00:00:00+00:00', 'years' => $years, 'activity' => 'push']));
+        $s4 = static fn (string $level, $years): Signal => new Signal($level, 'quiet', SignalDataStub::of(Signal::S4, ['last_push' => '2022-01-10T00:00:00+00:00', 'years' => $years, 'event' => 'push']));
         yield 'marked abandoned' => [[new Signal(Signal::LEVEL_HIGH, 'marked', SignalDataStub::of(Signal::S1, []))], FlagSet::ABANDONED, ['unit' => 'reason', 'value' => 'marked', 'source' => null]];
         yield 'archived' => [[new Signal(Signal::LEVEL_HIGH, 'archived', SignalDataStub::of(Signal::S3, []))], FlagSet::ABANDONED, ['unit' => 'reason', 'value' => 'archived', 'source' => null]];
         yield 'pinned' => [[new Signal(Signal::LEVEL_WARN, 'pinned', SignalDataStub::of(Signal::S6, ['reason' => 'branch_snapshot']))], FlagSet::PINNED, ['unit' => 'reason', 'value' => 'branch_snapshot', 'source' => null]];

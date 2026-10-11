@@ -58,7 +58,7 @@ final class SignalDataStub
             case Signal::S3:
                 return new ArchivedData(self::str($d, 'repo', 'vendor/pkg'), self::str($d, 'host', 'github.com'), self::str($d, 'forge', 'github'));
             case Signal::S4:
-                return new NoPushData(self::str($d, 'last_push', self::DATE), self::str($d, 'repo', 'vendor/pkg'), self::str($d, 'host', 'github.com'), self::float($d, 'years'), self::str($d, 'forge', 'github'), self::str($d, 'activity', 'push'));
+                return new NoPushData(self::str($d, 'last_push', self::DATE), self::str($d, 'repo', 'vendor/pkg'), self::str($d, 'host', 'github.com'), self::float($d, 'years'), self::str($d, 'forge', 'github'), self::str($d, 'event', 'push'));
             case Signal::S5:
                 $written = $d['written_for_php'] ?? null;
 
