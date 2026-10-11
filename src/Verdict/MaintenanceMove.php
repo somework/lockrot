@@ -13,7 +13,7 @@ use Lockrot\Signal\Data\OldPromiseData;
 use Lockrot\Signal\Data\PinnedData;
 
 /**
- * The move of the lead maintenance flag (SPEC §5.6, "Candidate moves, by source flag"). A marking
+ * The move of the lead maintenance flag (docs/verdicts.md#move). A marking
  * that Composer's abandoned ignore list removes raises no S1, so it never names a replacement.
  *
  * @internal

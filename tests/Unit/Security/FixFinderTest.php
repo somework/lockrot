@@ -514,7 +514,7 @@ final class FixFinderTest extends TestCase
         self::assertSame(Fix::NONE, $fixes->forAdvisory('A')->kind(), '2.7.0 brings the advisory back, so 2.4.0 fixes nothing');
     }
 
-    /** P2b step 5: an advisory's fix is the easiest release from which the rest of its branch lies outside the range. */
+    /** An advisory's fix is the easiest release from which the rest of its branch lies outside the range. */
     public function testAnAdvisoryThatALaterReleaseReintroducesIsFixedOnTheNextBranch(): void
     {
         $fixes = $this->find(
@@ -529,7 +529,7 @@ final class FixFinderTest extends TestCase
     }
 
     /**
-     * P2b: the row's candidate is the easiest release in the branch's safe window, then the lowest.
+     * The row's candidate is the easiest release in the branch's safe window, then the lowest.
      * A conflict `<1.4.5` holds 1.4.3 and 1.4.4, and 1.4.5 to 1.4.9 are free.
      */
     public function testTheCandidateIsTheEasiestReleaseOfTheWindow(): void
@@ -569,7 +569,7 @@ final class FixFinderTest extends TestCase
     }
 
     /**
-     * P2b: the window starts above every advisory on its own versions. prestashop-v1's
+     * The window starts above every advisory on its own versions. prestashop-v1's
      * symfony/http-client 4.4.26: `^5.4.47` admits 5.4.47 to 5.4.52, inside an advisory that 4.4.26
      * does not count.
      */
@@ -613,6 +613,24 @@ final class FixFinderTest extends TestCase
         $row = $fixes->installedBranch();
         self::assertNotNull($row);
         self::assertSame(['1.1.0', 1], [$row->lowest(), $row->fixed()]);
+    }
+
+    /** No row fixes an advisory with no range, so no row fixes every counted advisory and there is no security move. */
+    public function testAnAdvisoryWithNoRangeLeavesNoSecurityMove(): void
+    {
+        $fixes = $this->find(
+            ['name' => 'a/b', 'version' => '1.0.0'],
+            [['1.0.0', null], ['1.1.0', null]],
+            ['A' => '<1.1.0'],
+            new PhpFloor('8.4', null),
+            [],
+            [],
+            [],
+            [new Advisory('B', null, null, null, 'high', null, null)]
+        );
+
+        self::assertNull($fixes->move());
+        self::assertSame(Fix::UPDATE, $fixes->forAdvisory('A')->kind());
     }
 
     /** Among two raise-php candidates, the one that nothing holds is easier. */

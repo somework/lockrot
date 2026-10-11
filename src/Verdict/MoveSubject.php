@@ -39,7 +39,6 @@ final class MoveSubject
         return $this->package;
     }
 
-    /** The installed version. */
     public function version(): string
     {
         return $this->version;

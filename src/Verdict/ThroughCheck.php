@@ -8,7 +8,7 @@ use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Lock\LockFile;
 
 /**
- * C08: for a transitive package, whether each direct dependent's newest stable release still
+ * For a transitive package, whether each direct dependent's newest stable release still
  * requires it. It reads the `require` names of the metadata that the run already loaded, so it
  * makes no request.
  *

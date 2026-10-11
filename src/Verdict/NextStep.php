@@ -11,7 +11,7 @@ use Lockrot\Security\Fix;
 use Lockrot\Signal\BranchRow;
 
 /**
- * The one producer of a finding's moves (SPEC §5.6, "Choice of move"): a security move of class
+ * The one producer of a finding's moves (docs/verdicts.md#move): a security move of class
  * `update` leads, else the move of the larger part, a tie to the lower score after it, then
  * security's. Two moves to one branch merge into the tightest constraint. The other part's move
  * follows in `also[]` unless the lead already clears or leaves unverified every fact of that part.
@@ -20,7 +20,7 @@ use Lockrot\Signal\BranchRow;
  */
 final class NextStep
 {
-    /** @param list<ThroughEntry> $through the lead move's C08 entries */
+    /** @param list<ThroughEntry> $through the lead move's `through[]` entries */
     public static function plan(MoveContext $context, array $through): Moves
     {
         $finding = $context->finding();
@@ -39,7 +39,10 @@ final class NextStep
         $otherRow = $other === null ? null : $other->row();
         if ($other !== null && $main->isRowMove() && $other->isRowMove() && $mainRow !== null && $otherRow !== null && $mainRow->branch() === $otherRow->branch()) {
             if (version_compare((string) self::lowerOf($other), (string) self::lowerOf($main), '>')) {
-                $main = $main->to($mainRow, $other->lower(), $other->constraint());
+                $lower = $other->lower();
+                $kind = $lower === null ? $main->kind() : MaintenanceMove::kindOf($lower, $mainRow);
+                $constraint = \in_array($kind, [Move::REQUIRE, Move::RAISE_PHP], true) ? ($other->constraint() ?? ($lower === null ? null : '^'.ltrim($lower->release()->pretty(), 'vV'))) : null;
+                $main = MoveDraft::of($kind, $main->source())->to($mainRow, $lower, $constraint)->withFixKind($main->fixKind());
             }
             $merged = [$other->source()];
             $other = null;
@@ -64,6 +67,9 @@ final class NextStep
             $moveIn = Moves::IN_ALSO;
         }
         $lead = $lead->asLead($finding->isDirect() ? [] : $through, $also);
+        foreach (array_merge([$lead], $also) as $move) {
+            $partial = $partial !== null && $move->kind() === Move::UPDATE && $move->version() === $partial->version() ? null : $partial;
+        }
         $published = $moveIn === Moves::IN_NEXT_STEP ? $lead : ($moveIn === Moves::IN_ALSO ? $also[0] : null);
 
         return new Moves($lead, $moveIn, $published === null ? $fixKind : $published->fixKind(), $partial, $rows);
@@ -71,7 +77,7 @@ final class NextStep
 
     /**
      * The security move: the release scan's pick, the easiest row candidate, then the lowest
-     * release (P2b). With none, why: no release outside the ranges, no single one, or no release
+     * release. With none, why: no release outside the ranges, no single one, or no release
      * data.
      */
     private static function securityDraft(MoveContext $context): MoveDraft
@@ -100,7 +106,7 @@ final class NextStep
         return MoveDraft::of(array_keys($kinds) === [Fix::NONE] ? Move::NO_FIX : Move::NO_SINGLE_FIX, FlagSet::VULNERABLE)->withFixKind(ScoreModel::FIX_KINDS[$hardest]);
     }
 
-    /** A move to a row's candidate: `composer update` on the installed row, `require ^{lowest}` above it (P2b). */
+    /** A move to a row's candidate: `composer update` on the installed row, `require ^{lowest}` above it. */
     private static function toCandidate(BranchRow $row, \Lockrot\Security\Candidate $candidate): MoveDraft
     {
         $kind = MaintenanceMove::kindOf($candidate, $row);
@@ -110,7 +116,7 @@ final class NextStep
     }
 
     /**
-     * Each row's score after a move to its candidate (P2), judged as the move to it is.
+     * Each row's score after a move to its candidate, judged as the move to it is.
      *
      * @return array<string, IfApplied>
      */
@@ -134,7 +140,7 @@ final class NextStep
     }
 
     /**
-     * `security.partial`, judged as an `update` move to that release (I14c). Null beside a security
+     * `security.partial`, judged as an `update` move to that release. Null beside a security
      * move that is that update.
      */
     private static function partial(MoveContext $context, ?MoveDraft $security): ?SecurityPartial

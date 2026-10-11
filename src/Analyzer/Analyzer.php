@@ -52,7 +52,6 @@ use Lockrot\Verdict\MoveSubject;
 use Lockrot\Verdict\NextStep;
 use Lockrot\Verdict\Score;
 use Lockrot\Verdict\ThroughCheck;
-use Lockrot\Verdict\ThroughEntry;
 use Lockrot\Verdict\VerdictEngine;
 
 /** @internal */
@@ -196,7 +195,7 @@ final class Analyzer
             $factsByPackage[$package->name()] = $facts;
             $every = $advisories->every($package->name());
             $finding = $this->buildFinding($facts, $entry, $graph, $batch, $fixes, $advisories->ignored($package->name()), $every);
-            $findings[] = $finding->withMoves($this->moves($finding, $facts, $finder, ThroughCheck::of($package->name(), $finding->isDirect(), $finding->directDependents(), $lock, $metadata), $every));
+            $findings[] = $finding->withMoves($this->moves($finding, $facts, $finder, $lock, $metadata, $every));
             if (!$package->isFromComposerRepository()) {
                 ++$notInRepository;
             }
@@ -469,10 +468,10 @@ final class Analyzer
     /**
      * The finding's moves (`next_step`) from its facts, its release scan and the run's floors.
      *
-     * @param list<ThroughEntry> $through
-     * @param list<Advisory>     $every   every advisory of the package on any version
+     * @param array<string, PackageMetadata> $metadata by package name, what the run read
+     * @param list<Advisory>                 $every    every advisory of the package on any version
      */
-    private function moves(Finding $finding, PackageFacts $facts, FixFinder $finder, array $through, array $every): Moves
+    private function moves(Finding $finding, PackageFacts $facts, FixFinder $finder, LockFile $lock, array $metadata, array $every): Moves
     {
         if (!$finding->isGraded()) {
             return Moves::none();
@@ -489,12 +488,6 @@ final class Analyzer
                 $ranges[$advisory->id()] = $advisory->affectedRange();
             }
         }
-        $own = [];
-        foreach ($every as $advisory) {
-            if ($advisory->affectedRange() !== null && !isset($ranges[$advisory->id()])) {
-                $own[] = $advisory->affectedRange();
-            }
-        }
         $subject = new MoveSubject($finding->package(), $finding->version(), $finding->isDirect(), $finding->directDependents(), $floor->php(PhpFloor::TARGET), $floor->lowestAsString());
         $context = new MoveContext(
             $finding,
@@ -508,11 +501,11 @@ final class Analyzer
             $this->signals->thresholds()->releaseWarnYears(),
             $this->signals->targetMajorGa(),
             $ranges,
-            $own,
+            FixFinder::otherVersionRanges($facts->advisories(), $every),
             $details->advisoriesComplete()
         );
 
-        return NextStep::plan($context, $through);
+        return NextStep::plan($context, ThroughCheck::of($finding->package(), $finding->isDirect(), $finding->directDependents(), $lock, $metadata));
     }
 
     /**

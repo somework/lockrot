@@ -16,8 +16,9 @@ use Lockrot\Signal\Data\NoReleaseData;
 
 /**
  * Judges a {@see MoveDraft}: what it clears for every version it admits, what it leaves, adds and
- * cannot check, its PHP, what holds it, its commands as argv lists and the score after it (SPEC
- * §5.6). lockrot does not solve dependencies: `assumes` says what the rerun takes as given.
+ * cannot check, its PHP, what holds it, its commands as argv lists and the score after it
+ * (docs/verdicts.md#move). lockrot does not solve dependencies: `assumes` says what the rerun takes as
+ * given.
  *
  * @internal
  */
@@ -27,7 +28,7 @@ final class MoveBuilder
     private const ACTIONS = [Move::REQUIRE, Move::RAISE_PHP, Move::TAG, Move::REPLACE, Move::FIND_ALTERNATIVE, Move::TEST];
 
     /**
-     * @param list<string> $merged  the sources merged into the draft
+     * @param list<string> $merged
      * @param ?string      $fixKind the security fix kind, written when the move comes from `vulnerable`
      */
     public static function build(MoveDraft $draft, array $merged, ?string $fixKind, MoveContext $context): Move
@@ -41,7 +42,7 @@ final class MoveBuilder
         $unverified = [];
         $adds = [];
         if ($draft->isRowMove() && $row !== null) {
-            [$clears, $unverified] = self::clearsFor($row, $lower, self::countedMaintenance($finding), $context->advisoryIds(), $context);
+            [$clears, $unverified] = self::clearsFor($row, $lower, self::countedMaintenance($finding), $context->advisoryIds(), $context, $kind === Move::UPDATE ? $context->updateTarget($row) : $row->highest());
         }
         $phpCheck = null;
         if ($row !== null && (\in_array($kind, [Move::UPDATE, Move::REQUIRE, Move::RAISE_PHP, Move::BLOCKED], true) || $draft->source() === FlagSet::PINNED)) {
@@ -89,7 +90,7 @@ final class MoveBuilder
             $kind === Move::FIND_ALTERNATIVE && $draft->source() === FlagSet::SILENT && $s2 !== null ? $s2->years() : null,
             $toBranch,
             $version,
-            $row !== null && \in_array($kind, [Move::UPDATE, Move::REQUIRE, Move::RAISE_PHP, Move::BLOCKED], true) ? $row->highest() : null,
+            $row === null ? null : ($kind === Move::UPDATE ? $context->updateTarget($row) : (\in_array($kind, [Move::REQUIRE, Move::RAISE_PHP, Move::BLOCKED], true) ? $row->highest() : null)),
             $constraint,
             $latest,
             $phpCheck,
@@ -118,10 +119,11 @@ final class MoveBuilder
      *
      * @param list<string> $flags
      * @param list<string> $advisories ids
+     * @param ?string      $newest     the highest release the move admits, the row's newest by default
      *
      * @return array{0: list<MoveFact>, 1: list<MoveFact>}
      */
-    public static function clearsFor(BranchRow $row, ?Candidate $lower, array $flags, array $advisories, MoveContext $context): array
+    public static function clearsFor(BranchRow $row, ?Candidate $lower, array $flags, array $advisories, MoveContext $context, ?string $newest = null): array
     {
         $clears = [];
         $unverified = [];
@@ -138,7 +140,7 @@ final class MoveBuilder
             }
         }
         $ranges = $context->ranges();
-        $newest = $context->release($row->highest());
+        $newest = $context->release($newest ?? $row->highest());
         foreach ($advisories as $id) {
             $range = $ranges[$id] ?? null;
             if ($range === null) {

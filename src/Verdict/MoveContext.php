@@ -179,6 +179,18 @@ final class MoveContext
         return $release !== null;
     }
 
+    /**
+     * What `composer update` installs on the row: the release `security.gets` names on the installed
+     * branch, which the lock's links allow, else the row's newest.
+     */
+    public function updateTarget(BranchRow $row): string
+    {
+        $gets = $this->fixes === null ? null : $this->fixes->gets();
+        $version = $gets === null || !$row->installed() ? null : $gets->version();
+
+        return $version ?? $row->highest();
+    }
+
     /** The row's date, or S8's date for the same branch when the row has none. */
     public function releasedAt(BranchRow $row): ?\DateTimeImmutable
     {

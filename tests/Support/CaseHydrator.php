@@ -36,7 +36,7 @@ use Lockrot\Verdict\VerdictEngine;
  * writes for it. The case's `inputs` block (tools/schema/project_fixtures.py) holds the root
  * `composer.json`, the lock entries with the case's package first, that package's releases with
  * their dates and `php`, its abandoned marking, its advisories, its repository activity, the
- * `require` names of the direct dependents that C08 measured and the run settings. A test can add
+ * `require` names of the direct dependents that `through[]` measured and the run settings. A test can add
  * `other_advisories`: advisories on other versions of the package, which none of its own counts.
  * `run.advisories_unchecked` says why the advisory lookup did not run, such as `offline`.
  * The loaders answer from the block: only the case's package and those dependents have metadata,

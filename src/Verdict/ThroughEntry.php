@@ -7,7 +7,7 @@ namespace Lockrot\Verdict;
 use Lockrot\Data\Repository\StableRelease;
 
 /**
- * One direct dependent of a transitive package on its lead move (`next_step.through[]`, C08): does
+ * One direct dependent of a transitive package on its lead move (`next_step.through[]`): does
  * the dependent's newest stable release still require the package? lockrot does not run the
  * solver, so a dependent that dropped it gets a `composer why-not` command, never a claim that it
  * installs.

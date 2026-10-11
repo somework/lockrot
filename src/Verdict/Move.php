@@ -11,7 +11,7 @@ use Lockrot\Security\PhpCheck;
 /**
  * One move of `next_step`, or an entry of its `also[]`: what to run, what it clears, leaves and
  * adds, what holds it, and the score after it. `next_step` is the only place a move is published:
- * `security.move_in` points at it (SPEC §5.6).
+ * `security.move_in` points at it (docs/verdicts.md#move).
  *
  * @internal
  *
@@ -137,7 +137,7 @@ final class Move implements \JsonSerializable
     }
 
     /**
-     * The lead move: its C08 entries, the `composer why-not` command of each dependent whose newest
+     * The lead move: its `through[]` entries, the `composer why-not` command of each dependent whose newest
      * release no longer requires the package, and the other part's move.
      *
      * @param list<ThroughEntry> $through

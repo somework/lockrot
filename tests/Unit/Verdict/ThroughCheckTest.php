@@ -14,7 +14,7 @@ use Lockrot\Verdict\ThroughCheck;
 use PHPUnit\Framework\TestCase;
 
 /**
- * C08 (SPEC §5.6): for a package the project does not require, whether each direct dependent's
+ * For a package the project does not require, whether each direct dependent's
  * newest stable release still requires it. lockrot reads the `require` names of the metadata it
  * already loaded.
  */
@@ -89,6 +89,23 @@ final class ThroughCheckTest extends TestCase
         self::assertSame([true, null, null, 'no_stable_release'], [$entries[0]['installed_requires'], $entries[0]['newest_stable'], $entries[0]['newest_requires'], $entries[0]['newest_requires_unmeasured']]);
     }
 
+    /** A newest release on a commit that other tags share keeps its metadata time: it is out on the run date. */
+    public function testANewestReleaseOnASharedCommitIsMeasured(): void
+    {
+        $versions = [];
+        foreach (['1.0.0' => ['a/b' => '^1.0'], '2.0.0' => [], '2.0.1' => [], '2.0.2' => []] as $version => $require) {
+            $loaded = (new ArrayLoader())->load(['name' => 'd/x', 'version' => $version, 'time' => '2026-01-01T00:00:00+00:00', 'require' => $require, 'source' => ['type' => 'git', 'url' => 'https://github.com/d/x.git', 'reference' => $version === '1.0.0' ? 'one' : 'shared']]);
+            self::assertInstanceOf(BasePackage::class, $loaded);
+            $versions[] = $loaded;
+        }
+        $metadata = PackageMetadata::fromPackages('d/x', $versions, new \DateTimeImmutable(self::NOW), '1.0.0.0');
+        $lock = LockFile::fromArray(['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'notification-url' => self::PACKAGIST], ['name' => 'd/x', 'version' => '1.0.0', 'notification-url' => self::PACKAGIST]]]);
+
+        $entry = JsonPath::decoded(ThroughCheck::of('a/b', false, ['d/x'], $lock, ['d/x' => $metadata])[0]);
+
+        self::assertSame([false, '2.0.2'], [$entry['newest_requires'], JsonPath::stringAt($entry, ['newest_stable', 'version'])]);
+    }
+
     /** An undated newest release is not known to be out on the run date. */
     public function testAnUndatedNewestReleaseIsNoStableRelease(): void
     {
@@ -125,7 +142,7 @@ final class ThroughCheckTest extends TestCase
     /**
      * One dependent d/x of a/b, through which a/b comes in.
      *
-     * @param array<string, list<array{0: string, 1: ?string, 2: bool}>|null> $dependents d/x's releases: version, date or null, whether it requires a/b; null for no metadata
+     * @param array<string, list<array{0: string, 1: ?string, 2: bool}>|null> $dependents d/x's releases: version, date or null, and whether it requires a/b, or null for no metadata
      * @param list<string>                                                   $outside    the dependents installed from vcs
      *
      * @return list<array<string, mixed>>

@@ -68,13 +68,7 @@ final class FixFinder
         }
         /** @var array<string, ConstraintInterface> $ranged */
         $ranged = array_filter($ranges, static fn (?ConstraintInterface $range): bool => $range !== null);
-        $own = [];
-        foreach ($every as $advisory) {
-            $range = $advisory->affectedRange();
-            if ($range !== null && !isset($ranges[$advisory->id()])) {
-                $own[] = $range;
-            }
-        }
+        $own = self::otherVersionRanges($advisories, $every);
         $byBranch = [];
         foreach ($candidates as $candidate) {
             $byBranch[$candidate->branchKey()][] = $candidate;
@@ -86,7 +80,7 @@ final class FixFinder
         }
         $onInstalled = $installedBranch === null ? [] : ($byBranch[$installedBranch] ?? []);
         $rows = self::branches($newest, $byBranch, $installedBranch, $ranged, $own, \count($advisories));
-        $move = self::move($rows, \count($ranged));
+        $move = self::move($rows, \count($advisories));
 
         return new PackageFixes(
             $fixes,
@@ -95,6 +89,28 @@ final class FixFinder
             $move,
             self::partial($move, $onInstalled, $ranged, \count($advisories))
         );
+    }
+
+    /**
+     * The ranges of the advisories that $counted does not hold: they raise every window.
+     *
+     * @param list<Advisory> $counted
+     * @param list<Advisory> $every
+     *
+     * @return list<ConstraintInterface>
+     */
+    public static function otherVersionRanges(array $counted, array $every): array
+    {
+        $ids = array_map(static fn (Advisory $advisory): string => $advisory->id(), $counted);
+        $own = [];
+        foreach ($every as $advisory) {
+            $range = $advisory->affectedRange();
+            if ($range !== null && !\in_array($advisory->id(), $ids, true)) {
+                $own[] = $range;
+            }
+        }
+
+        return $own;
     }
 
     /**
@@ -207,13 +223,14 @@ final class FixFinder
      * range holds. Null with no range or no such row.
      *
      * @param list<BranchFixes> $rows highest branch first
+     * @param int               $of   the counted advisories: a row with no range for one of them fixes not all
      */
-    private static function move(array $rows, int $ranged): ?Candidate
+    private static function move(array $rows, int $of): ?Candidate
     {
         $best = null;
         foreach (array_reverse($rows) as $row) {
             $candidate = $row->candidate();
-            if ($candidate !== null && $row->fixed() === $ranged && ($best === null || $candidate->easeRank() < $best->easeRank())) {
+            if ($candidate !== null && $row->fixed() === $of && ($best === null || $candidate->easeRank() < $best->easeRank())) {
                 $best = $candidate;
             }
         }

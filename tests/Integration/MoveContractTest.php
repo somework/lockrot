@@ -10,7 +10,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
- * `next_step` against SPEC §5.6 on every fixture document: each committed case, the composite
+ * `next_step` against docs/verdicts.md#move on every fixture document: each committed case, the composite
  * report, and each case with an `inputs` block as the real analyzer writes it. The invariants are
  * I14 to I14f, I18 and I19. The model reference compares the analyzer's move with the case's own
  * where the inputs can say it.

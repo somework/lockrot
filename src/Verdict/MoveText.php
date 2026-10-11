@@ -9,7 +9,7 @@ use Lockrot\Security\Holder;
 
 /**
  * `next_step.text`, text grammar 1: rendered from the move object, the package and the run alone.
- * It is prose, not contract. A renderer that meets an unknown kind prints it.
+ * A renderer that meets an unknown kind prints it.
  *
  * @internal
  */

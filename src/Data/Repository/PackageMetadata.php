@@ -340,7 +340,9 @@ final class PackageMetadata
         }
         if ($newest !== null) {
             $this->newestRequires = self::requireNames($newest);
-            $this->newestStable = $this->stableRelease($newest->getVersion(), $stable[$newest->getVersion()], $sharedCommit);
+            // The dependent check asks only whether the release is out on the run date, so a shared commit's date is enough.
+            [, $at, $php] = $stable[$newest->getVersion()];
+            $this->newestStable = new StableRelease($newest->getVersion(), $newest->getPrettyVersion(), $at, $php, isset($sharedCommit[$newest->getVersion()]));
         }
         try {
             $installed = (new VersionParser())->normalize($installedVersion);

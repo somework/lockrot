@@ -14,7 +14,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
- * `next_step` as the real analyzer writes it (SPEC §5.6), on the committed cases and on small locks
+ * `next_step` as the real analyzer writes it (docs/verdicts.md#move), on the committed cases and on small locks
  * that each test writes. The base lock: a/b 1.0.0 on 1.x, last released 2020, while 2.x needs
  * php >=8.1 above the project's >=7.4 and released in 2026.
  */
@@ -132,7 +132,7 @@ final class MoveTest extends TestCase
         }
     }
 
-    /** C69: Composer's list ignores the marking, so the archived repository alone leads, and the ignored replacement is never the move. */
+    /** Composer's list ignores the marking, so the archived repository alone leads, and the ignored replacement is never the move. */
     public function testAnIgnoredMarkingNeverNamesItsReplacement(): void
     {
         $move = JsonPath::arrayAt(self::hydrated(CaseHydrator::case('ignored-marking-archived‡')), ['next_step']);
@@ -162,7 +162,7 @@ final class MoveTest extends TestCase
         self::assertSame('no move runs on the target: 2.x needs php >=9.0 and the target php 8.4 does not run it', $move['text']);
     }
 
-    /** A security move of class `update` leads, whatever the part sizes; the left-behind move follows in also[]. */
+    /** A security move of class `update` leads, whatever the part sizes, and the left-behind move follows in also[]. */
     public function testAnUpdateLeadsAndTheBranchMoveFollows(): void
     {
         $finding = self::analyse(['advisories' => [self::ADVISORY]]);
@@ -220,6 +220,32 @@ final class MoveTest extends TestCase
         self::assertSame('test it on PHP 8.4 — 1.0.0 is its newest release', $move['text']);
     }
 
+    /** `composer update` installs the highest release the lock's links allow: a conflict holds 1.9.5, so it gets 1.9.0. */
+    public function testAnUpdateGetsTheReleaseTheLinksAllow(): void
+    {
+        $move = JsonPath::arrayAt(self::analyse([
+            'lock' => [[], ['name' => 'c/c', 'version' => '1.0.0', 'dev' => false, 'conflict' => ['a/b' => '>=1.9.5']]],
+            'releases' => [self::release('1.0.0', '2019-01-01', '>=7.2'), self::release('1.9.0', '2020-01-01', '>=7.2'), self::release('1.9.5', '2020-02-01', '>=7.2'), self::release('2.3.0', '2026-06-01', '>=8.1')],
+            'advisories' => [self::ADVISORY],
+        ]), ['next_step']);
+
+        self::assertSame(['update', '1.9.0', '1.9.0'], [$move['kind'], $move['version'], $move['newest']]);
+        self::assertStringStartsWith('composer update a/b (gets 1.9.0)', JsonPath::stringAt($move, ['text']));
+    }
+
+    /** `security.partial` is null beside a move that is `composer update` to the same release. */
+    public function testNoPartialStandsBesideAnUpdateToTheSameRelease(): void
+    {
+        $finding = self::analyse([
+            'releases' => [self::release('1.0.0', '2019-01-01', '>=7.2'), self::release('1.5.0', '2021-06-01', '>=7.2')],
+            'advisories' => [['id' => 'PKSA-a', 'severity' => 'high', 'affected_versions' => '<1.5.0'], ['id' => 'PKSA-b', 'severity' => 'high', 'affected_versions' => '<9.0']],
+        ]);
+        $moves = array_merge([$finding['next_step']], JsonPath::arrayAt($finding, ['next_step', 'also']));
+
+        self::assertContains(['update', '1.5.0'], array_map(static fn (array $move): array => [$move['kind'], $move['version']], $moves));
+        self::assertNull($finding['security']['partial']);
+    }
+
     /** With no release read, the test move names the installed release, dated as S5 reads it. */
     public function testAnOldPromiseWithoutReleaseDataTestsTheInstalledOne(): void
     {
@@ -247,8 +273,8 @@ final class MoveTest extends TestCase
     }
 
     /**
-     * The base lock with $over replacing its parts: `lock` entries merge into the base entry, a null
-     * root requirement removes it.
+     * The base lock with $over replacing its parts: the first `lock` entry merges into the base entry
+     * and the others follow it, and a null root requirement removes it.
      *
      * @param array<string, mixed> $over
      *
@@ -267,7 +293,7 @@ final class MoveTest extends TestCase
         foreach ($over as $key => $value) {
             if ($key === 'lock') {
                 self::assertIsArray($value);
-                $inputs['lock'][0] = $value[0] + $inputs['lock'][0];
+                $inputs['lock'] = array_merge([$value[0] + $inputs['lock'][0]], \array_slice($value, 1));
             } elseif ($key === 'root') {
                 self::assertIsArray($value);
                 $inputs['root']['require'] = array_filter($value['require'] + $inputs['root']['require'], static fn ($constraint): bool => $constraint !== null);
