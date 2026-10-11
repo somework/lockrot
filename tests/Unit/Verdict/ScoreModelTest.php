@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Verdict;
 
 use Lockrot\Allowlist\AllowlistEntry;
+use Lockrot\Score\CountedAdvisory;
+use Lockrot\Score\MaintenanceTerm;
 use Lockrot\Security\Severity;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\ScoreSweep;
@@ -158,14 +160,16 @@ final class ScoreModelTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('not a fix kind: patch');
-        Score::compute([], [Score::advisory('GHSA-a', 'high', 'patch')], 'direct', false);
+        Score::compute([], [new CountedAdvisory('GHSA-a', 'high', 'patch')], 'direct', false);
     }
 
     public function testTwoEqualAdvisoriesTieOnTheLowerId(): void
     {
-        $score = Score::compute([], [['id' => 'GHSA-b', 'severity' => 'high', 'fix_kind' => 'update'], ['id' => 'GHSA-a', 'severity' => 'high', 'fix_kind' => 'update'], ['id' => 'GHSA-c', 'severity' => 'medium', 'fix_kind' => 'none']], 'direct', false);
+        $score = Score::compute([], [new CountedAdvisory('GHSA-b', 'high', 'update'), new CountedAdvisory('GHSA-a', 'high', 'update'), new CountedAdvisory('GHSA-c', 'medium', 'none')], 'direct', false);
 
-        self::assertSame('GHSA-a', $score->deciding()['id'] ?? null);
+        $deciding = $score->deciding();
+        self::assertNotNull($deciding);
+        self::assertSame('GHSA-a', $deciding->advisory());
         self::assertSame(['GHSA-b', 'GHSA-c'], $score->tied(), 'a medium advisory nothing fixes scores 16 too, and comes after by severity');
         self::assertSame(3, $score->advisoryCount());
     }
@@ -176,18 +180,38 @@ final class ScoreModelTest extends TestCase
      */
     public function testASeverityWordTiesByItsBucket(): void
     {
-        $moderate = Score::compute([], [['id' => 'A', 'severity' => 'medium', 'fix_kind' => 'update'], ['id' => 'B', 'severity' => 'moderate', 'fix_kind' => 'update']], 'direct', false);
-        $unrated = Score::compute([], [['id' => 'B', 'severity' => '', 'fix_kind' => 'update'], ['id' => 'A', 'severity' => 'medium', 'fix_kind' => 'update']], 'direct', false);
+        $moderate = Score::compute([], [new CountedAdvisory('A', 'medium', 'update'), new CountedAdvisory('B', 'moderate', 'update')], 'direct', false);
+        $unrated = Score::compute([], [new CountedAdvisory('B', '', 'update'), new CountedAdvisory('A', 'medium', 'update')], 'direct', false);
 
-        self::assertSame(['id' => 'A', 'severity' => 'medium', 'fix_kind' => 'update'], $moderate->deciding());
+        self::assertSame(['A', 'medium', 'update'], self::deciding($moderate));
         self::assertSame(['B'], $moderate->tied());
-        self::assertSame(['id' => 'A', 'severity' => 'medium', 'fix_kind' => 'update'], $unrated->deciding());
-        self::assertSame(['id' => 'B', 'severity' => 'unrated', 'fix_kind' => 'none'], Score::compute([], [['id' => 'B', 'severity' => 'unknown', 'fix_kind' => 'none']], 'direct', false)->deciding());
+        self::assertSame(['A', 'medium', 'update'], self::deciding($unrated));
+        self::assertSame(['B', 'unrated', 'none'], self::deciding(Score::compute([], [new CountedAdvisory('B', 'unknown', 'none')], 'direct', false)));
     }
 
-    public function testAnAdvisoryRowKeepsItsId(): void
+    /** A term carries its contribution after the halvings, so a reader does not compute it again. */
+    public function testTheEngineBuildsTheTermsItCounts(): void
     {
-        self::assertSame(['id' => 'GHSA-a', 'severity' => 'high', 'fix_kind' => 'blocked'], Score::advisory('GHSA-a', 'high', 'blocked'));
+        $score = Score::compute(['stale', 'left-behind'], [new CountedAdvisory('A', 'critical', 'none'), new CountedAdvisory('B', 'low', 'update')], 'transitive', true);
+
+        self::assertSame([
+            ['part' => 'maintenance', 'flag' => 'left-behind', 'role' => 'lead', 'weight' => 16, 'divisor' => 1, 'points' => 16, 'contribution' => 4],
+            ['part' => 'maintenance', 'flag' => 'stale', 'role' => 'corroborating', 'weight' => 8, 'divisor' => 4, 'points' => 2, 'contribution' => 0.5],
+        ], JsonPath::decoded($score->maintenanceTerms()));
+        self::assertSame(
+            ['part' => 'security', 'flag' => 'vulnerable', 'role' => 'security', 'advisory' => 'A', 'severity' => 'critical', 'fix_kind' => 'none', 'weight' => 32, 'multiplier' => 2, 'points' => 64, 'contribution' => 32],
+            JsonPath::decoded($score->deciding())
+        );
+        self::assertNull(Score::compute(['stale'], [], 'direct', false)->deciding());
+    }
+
+    /** @return array{string, string, string} the deciding advisory's id, severity bucket and fix kind */
+    private static function deciding(Score $score): array
+    {
+        $deciding = $score->deciding();
+        self::assertNotNull($deciding);
+
+        return [$deciding->advisory(), $deciding->severity(), $deciding->fixKind()];
     }
 
     public function testTheLeadIsTheFirstCountedFlagInFlagOrderWhateverTheInputOrder(): void
@@ -195,7 +219,7 @@ final class ScoreModelTest extends TestCase
         $score = Score::compute(['old-promise', 'pinned', 'abandoned'], [], 'direct', false);
 
         self::assertSame('abandoned', $score->lead());
-        self::assertSame(['abandoned', 'pinned', 'old-promise'], array_column($score->maintenanceTerms(), 'flag'));
+        self::assertSame(['abandoned', 'pinned', 'old-promise'], array_map(static fn (MaintenanceTerm $term): string => $term->flag(), $score->maintenanceTerms()));
     }
 
     /**

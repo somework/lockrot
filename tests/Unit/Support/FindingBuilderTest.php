@@ -9,6 +9,7 @@ use Lockrot\Lock\PackageOrigin;
 use Lockrot\Signal\Signal;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\Origins;
+use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\FlagSet;
 use Lockrot\Verdict\Verdict;
@@ -29,7 +30,7 @@ final class FindingBuilderTest extends TestCase
     {
         self::assertSame(['stale'], (new FindingBuilder())->withVerdict(Verdict::STALE)->build()->flagIds());
         self::assertSame('stale', (new FindingBuilder())->withVerdict(Verdict::STALE)->build()->lead());
-        self::assertSame(['old-promise'], (new FindingBuilder())->withVerdict(Verdict::STALE)->withSignals([new Signal(Signal::S5, Signal::LEVEL_WARN, 'old')])->build()->flagIds());
+        self::assertSame(['old-promise'], (new FindingBuilder())->withVerdict(Verdict::STALE)->withSignals([new Signal(Signal::LEVEL_WARN, 'old', SignalDataStub::of(Signal::S5, []))])->build()->flagIds());
         self::assertSame('ok', (new FindingBuilder())->build()->grade());
         self::assertSame('unknown', (new FindingBuilder())->withVerdict(Verdict::UNKNOWN)->build()->grade());
         self::assertSame('finished', (new FindingBuilder())->withVerdict(Verdict::STALE)->withAllowlistReason('kept')->build()->grade());
@@ -57,7 +58,7 @@ final class FindingBuilderTest extends TestCase
     /** @return iterable<string, array{\Closure(FindingBuilder): FindingBuilder, Finding}> */
     public static function oneFieldEach(): iterable
     {
-        $signals = [new Signal(Signal::S2, Signal::LEVEL_WARN, 'old')];
+        $signals = [new Signal(Signal::LEVEL_WARN, 'old', SignalDataStub::of(Signal::S2, []))];
         $at = new \DateTimeImmutable('2026-09-14T00:00:00+00:00');
         $libyears = LibyearsMeasurement::of(2.74);
         $origin = Origins::of(false);

@@ -73,4 +73,16 @@ final class AdvisoryTest extends TestCase
 
         self::assertSame('PKSA-abcd-1234', Advisory::fromComposer($composer)->label());
     }
+
+    /** The S9 row and report-1's row write the date and the range in one form each. */
+    public function testItGivesTheWrittenFormsOfItsDateAndRange(): void
+    {
+        $range = (new VersionParser())->parseConstraints('>=1.0,<1.2.3');
+        $advisory = new Advisory('PKSA-1', null, null, null, null, new \DateTimeImmutable('2024-03-01T12:00:00+02:00'), $range);
+
+        self::assertSame('2024-03-01T12:00:00+02:00', $advisory->reportedAtText());
+        self::assertSame('>=1.0,<1.2.3', $advisory->affectedVersionsText());
+        self::assertNull((new Advisory('PKSA-2', null, null, null, null, null))->reportedAtText());
+        self::assertNull((new Advisory('PKSA-2', null, null, null, null, null))->affectedVersionsText());
+    }
 }

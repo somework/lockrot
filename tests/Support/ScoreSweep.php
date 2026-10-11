@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Support;
 
 use Lockrot\Allowlist\AllowlistEntry;
+use Lockrot\Score\CountedAdvisory;
 use Lockrot\Score\ScoreBasis;
+use Lockrot\Score\ScoreContext;
 use Lockrot\Signal\Signal;
 use Lockrot\Verdict\FlagSet;
 use Lockrot\Verdict\ScoreModel;
@@ -26,7 +28,6 @@ use Lockrot\Verdict\ScoreModel;
  * @phpstan-type Part array{status: string, contribution: int|float, alone: array{total: int, verdict: ?string}}
  * @phpstan-type Graded array{model: int, total: int, exact: int|float, rounded_down: bool, band: array{floor: int, next: ?string, to_next: ?int}, decided_by: string, parts: array{maintenance: Part, security: array{status: string, contribution: int|float, alone: array{total: int, verdict: ?string}, of: int, tied: list<string>}}, terms: list<Term>, modifiers: list<Modifier>, accepted: list<Accepted>, without: list<Without>, text: string}
  * @phpstan-type Zero array{model: int, total: int, exact: int, accepted: list<Accepted>, text: string}
- * @phpstan-type Advisory array{id: string, severity: string, fix_kind: string}
  * @phpstan-type Inputs array{axis: string, flags: list<string>, advisories: list<array{string, string}>, reach: string, dev: bool, under: ?string, accepted: ?string}
  */
 final class ScoreSweep
@@ -40,7 +41,7 @@ final class ScoreSweep
     public const SAMPLE = 1000;
 
     /** The context of every sweep row: maintenance judged, a complete advisory lookup, both liveness signals read. */
-    public const CONTEXT = ['maintenance_judged' => true, 'advisories_complete' => true, 'liveness_complete' => true, 's3_unread' => false, 's8_unread' => false];
+    private const CONTEXT = ['maintenance_judged' => true, 'advisories_complete' => true, 'liveness_complete' => true, 's3_unread' => false, 's8_unread' => false];
 
     /** @var array<string, string>|null several tests read the sample: decompress the golden once per process */
     private static ?array $sample = null;
@@ -153,15 +154,27 @@ final class ScoreSweep
     }
 
     /**
+     * The checks of a run where every check ran, with the facts that a test sets.
+     *
+     * @param array<string, bool> $set keys of {@see self::CONTEXT}
+     */
+    public static function context(array $set = []): ScoreContext
+    {
+        $c = $set + self::CONTEXT;
+
+        return new ScoreContext($c['maintenance_judged'], $c['advisories_complete'], $c['liveness_complete'], $c['s3_unread'], $c['s8_unread']);
+    }
+
+    /**
      * @param list<array{string, string}> $advisories
      *
-     * @return list<Advisory>
+     * @return list<CountedAdvisory>
      */
     public static function advisories(array $advisories): array
     {
         $out = [];
         foreach ($advisories as $i => [$severity, $fix]) {
-            $out[] = ['id' => 'A'.$i, 'severity' => $severity, 'fix_kind' => $fix];
+            $out[] = new CountedAdvisory('A'.$i, $severity, $fix);
         }
 
         return $out;
@@ -172,17 +185,17 @@ final class ScoreSweep
     {
         switch ($flag) {
             case 'abandoned':
-                return [new Signal(Signal::S1, Signal::LEVEL_HIGH, 'marked abandoned by its repository')];
+                return [new Signal(Signal::LEVEL_HIGH, 'marked abandoned by its repository', SignalDataStub::of(Signal::S1, []))];
             case 'silent':
-                return [new Signal(Signal::S2, Signal::LEVEL_HIGH, 'no release'), new Signal(Signal::S4, Signal::LEVEL_HIGH, 'no push')];
+                return [new Signal(Signal::LEVEL_HIGH, 'no release', SignalDataStub::of(Signal::S2, [])), new Signal(Signal::LEVEL_HIGH, 'no push', SignalDataStub::of(Signal::S4, []))];
             case 'stale':
-                return [new Signal(Signal::S2, Signal::LEVEL_WARN, 'no release')];
+                return [new Signal(Signal::LEVEL_WARN, 'no release', SignalDataStub::of(Signal::S2, []))];
             case 'pinned':
-                return [new Signal(Signal::S6, Signal::LEVEL_HIGH, 'branch snapshot')];
+                return [new Signal(Signal::LEVEL_HIGH, 'branch snapshot', SignalDataStub::of(Signal::S6, []))];
             case 'left-behind':
-                return [new Signal(Signal::S8, Signal::LEVEL_HIGH, 'branch left behind')];
+                return [new Signal(Signal::LEVEL_HIGH, 'branch left behind', SignalDataStub::of(Signal::S8, []))];
             case 'old-promise':
-                return [new Signal(Signal::S5, Signal::LEVEL_HIGH, 'old promise')];
+                return [new Signal(Signal::LEVEL_HIGH, 'old promise', SignalDataStub::of(Signal::S5, []))];
         }
         throw new \InvalidArgumentException('no signal raises '.$flag);
     }
@@ -190,7 +203,7 @@ final class ScoreSweep
     /** @param Inputs $inputs */
     public static function basis(array $inputs): ScoreBasis
     {
-        return ScoreBasis::of(self::flagSet($inputs), $inputs['reach'], $inputs['dev'], self::CONTEXT);
+        return ScoreBasis::of(self::flagSet($inputs), $inputs['reach'], $inputs['dev'], self::context());
     }
 
     /**

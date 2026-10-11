@@ -5,8 +5,18 @@ declare(strict_types=1);
 namespace Lockrot\Verdict;
 
 use Lockrot\Data\Forge\RepoRef;
+use Lockrot\Security\BranchFixes;
 use Lockrot\Security\Fix;
 use Lockrot\Security\Severity;
+use Lockrot\Signal\Data\AbandonedData;
+use Lockrot\Signal\Data\AdvisoryRow;
+use Lockrot\Signal\Data\ArchivedData;
+use Lockrot\Signal\Data\LeftBehindData;
+use Lockrot\Signal\Data\NoPushData;
+use Lockrot\Signal\Data\NoReleaseData;
+use Lockrot\Signal\Data\OldPromiseData;
+use Lockrot\Signal\Data\PinnedData;
+use Lockrot\Signal\Data\SignalData;
 use Lockrot\Signal\Signal;
 
 /**
@@ -33,14 +43,20 @@ final class FlagSentence
     ];
 
     /**
-     * @param array<string, array<string, mixed>> $data the data of each signal that fired, by id
+     * @param list<SignalData> $data the data of each signal that fired
+     *
+     * @throws \LogicException for the data of a signal that no maintenance flag reads
      */
     public static function maintenance(string $flag, array $data): string
     {
+        $byId = [];
+        foreach ($data as $d) {
+            $byId[$d->signalId()] = $d;
+        }
         $parts = [];
         foreach (self::SIGNALS[$flag] ?? [] as $id) {
-            if (isset($data[$id])) {
-                $parts[] = self::signal($id, $data[$id]);
+            if (isset($byId[$id])) {
+                $parts[] = self::signal($byId[$id]);
             }
         }
 
@@ -51,11 +67,12 @@ final class FlagSentence
      * The `vulnerable` sentence: the counted advisories by severity, what the installed branch
      * fixes, and the deciding advisory, called "worst" only when its severity is the worst.
      *
-     * @param list<array<string, mixed>>                                                    $rows     the S9 rows, the deciding one marked
-     * @param array<string, int>                                                            $counts   counted advisories per severity
-     * @param ?array{fixed: int, unknown: int, of: int, fix_kind: ?string}                  $installed the installed branch row's fixes
+     * @param list<AdvisoryRow>  $rows   the S9 rows, the deciding one marked
+     * @param array<string, int> $counts counted advisories per severity
+     *
+     * @throws \LogicException for rows that mark no deciding advisory
      */
-    public static function vulnerable(array $rows, array $counts, string $worst, string $decidingSeverity, ?string $branch, ?array $installed): string
+    public static function vulnerable(array $rows, array $counts, string $worst, string $decidingSeverity, ?string $branch, ?BranchFixes $installed): string
     {
         $n = \count($rows);
         $listed = [];
@@ -64,29 +81,33 @@ final class FlagSentence
                 $listed[] = $counts[$severity].' '.$severity;
             }
         }
-        $deciding = $rows[0];
+        $deciding = null;
         foreach ($rows as $row) {
-            if (($row['deciding'] ?? false) === true) {
+            if ($row->isDeciding()) {
                 $deciding = $row;
             }
         }
+        if ($deciding === null) {
+            throw new \LogicException('The S9 rows mark no deciding advisory for the vulnerable sentence.');
+        }
         $word = $n === 1 ? 'advisory' : ($decidingSeverity === $worst ? 'worst' : 'weighs most');
-        $name = \is_string($deciding['cve'] ?? null) ? $deciding['cve'] : self::scalar($deciding['id'] ?? '');
 
-        return \sprintf('%d %s: %s%s; %s: %s %s', $n, $n === 1 ? 'advisory' : 'advisories', implode(', ', $listed), self::branchTail($branch, $installed), $word, $name, self::scalar($deciding['title'] ?? ''));
+        return \sprintf('%d %s: %s%s; %s: %s %s', $n, $n === 1 ? 'advisory' : 'advisories', implode(', ', $listed), self::branchTail($branch, $installed), $word, $deciding->cve() ?? $deciding->id(), (string) $deciding->title());
     }
 
-    /** @param ?array{fixed: int, unknown: int, of: int, fix_kind: ?string} $installed */
-    private static function branchTail(?string $branch, ?array $installed): string
+    private static function branchTail(?string $branch, ?BranchFixes $installed): string
     {
         if ($branch === null || $installed === null) {
             return '';
         }
-        ['fixed' => $fixed, 'unknown' => $unknown, 'of' => $of, 'fix_kind' => $kind] = $installed;
+        $fixed = $installed->fixed();
+        $unknown = $installed->unknown();
+        $of = $installed->of();
+        $kind = $installed->fixKind();
         if ($unknown === $of) {
             return ' — fix not known on '.$branch;
         }
-        $label = $fixed > 0 && $kind !== null && $kind !== Fix::UPDATE ? ' ('.(self::FIX_LABEL[$kind] ?? $kind).')' : '';
+        $label = $fixed > 0 && $kind !== null && $kind !== Fix::UPDATE ? ' ('.self::FIX_LABEL[$kind].')' : '';
         if ($fixed === 0) {
             $tail = ' — none fixed on '.$branch;
         } elseif ($fixed === $of) {
@@ -98,59 +119,56 @@ final class FlagSentence
         return $tail.($unknown > 0 ? \sprintf('; %d not known', $unknown) : '');
     }
 
-    /** @param array<string, mixed> $d */
-    private static function signal(string $id, array $d): string
+    private static function signal(SignalData $d): string
     {
-        switch ($id) {
-            case Signal::S1:
-                $by = ($d['marked_by'] ?? null) === 'lock' ? 'in composer.lock' : 'by its registry';
+        if ($d instanceof AbandonedData) {
+            $replacement = $d->replacement();
 
-                return 'marked abandoned '.$by.(\is_string($d['replacement'] ?? null) && $d['replacement'] !== '' ? ', replacement: '.$d['replacement'] : '');
-            case Signal::S3:
-                return 'its repository is archived on '.RepoRef::label(self::scalar($d['forge'] ?? RepoRef::GITHUB));
-            case Signal::S2:
-                return 'last release '.self::ago(self::scalar($d['last_release'] ?? ''), $d['years'] ?? null, $d['dated_by'] ?? null);
-            case Signal::S4:
-                return 'last '.self::scalar($d['activity'] ?? 'push').' '.self::ago(self::scalar($d['last_push'] ?? ''), $d['years'] ?? null, null);
-            case Signal::S5:
-                $major = explode('.', self::scalar($d['target_major'] ?? ''))[0];
-
-                return \sprintf('released %s for PHP %s (php "%s"), before PHP %s existed (%s GA %s); admits %s untested', substr(self::scalar($d['released'] ?? ''), 0, 10), self::scalar($d['written_for_php'] ?? null), self::scalar($d['php_constraint'] ?? null), $major, self::scalar($d['target_major'] ?? null), self::scalar($d['ga_date'] ?? null), self::scalar($d['target_php'] ?? null));
-            case Signal::S6:
-                return 'pinned to '.(($d['reason'] ?? null) === 'branch_snapshot' ? 'branch snapshot ' : '').self::scalar($d['version'] ?? null);
-            default:
-                return self::s8($d);
+            return 'marked abandoned '.($d->markedBy() === 'lock' ? 'in composer.lock' : 'by its registry').($replacement !== null && $replacement !== '' ? ', replacement: '.$replacement : '');
         }
+        if ($d instanceof ArchivedData) {
+            return 'its repository is archived on '.RepoRef::label($d->forge());
+        }
+        if ($d instanceof NoReleaseData) {
+            return 'last release '.self::ago($d->lastRelease(), $d->years(), $d->datedBy());
+        }
+        if ($d instanceof NoPushData) {
+            return 'last '.$d->activity().' '.self::ago($d->lastPush(), $d->years(), null);
+        }
+        if ($d instanceof OldPromiseData) {
+            $major = explode('.', $d->targetMajor())[0];
+
+            return \sprintf('released %s for PHP %s (php "%s"), before PHP %s existed (%s GA %s); admits %s untested', substr($d->released(), 0, 10), (string) $d->writtenForPhp(), $d->phpConstraint(), $major, $d->targetMajor(), $d->gaDate(), $d->targetPhp());
+        }
+        if ($d instanceof PinnedData) {
+            return 'pinned to '.($d->reason() === 'branch_snapshot' ? 'branch snapshot ' : '').$d->version();
+        }
+
+        if ($d instanceof LeftBehindData) {
+            return self::s8($d);
+        }
+
+        throw new \LogicException('Only the data of a maintenance signal has a maintenance sentence.');
     }
 
-    /** @param array<string, mixed> $d */
-    private static function s8(array $d): string
+    private static function s8(LeftBehindData $d): string
     {
-        $out = 'branch '.self::scalar($d['branch'] ?? null).' last released '.self::ago(self::scalar($d['branch_last_release'] ?? ''), $d['years'] ?? null, $d['dated_by'] ?? null);
-        $newest = \sprintf('%s released %s (%s)', self::scalar($d['newest_branch'] ?? null), self::scalar($d['newest_version'] ?? null), substr(self::scalar($d['newest_release'] ?? ''), 0, 10));
-        if (($d['newest_within_reach'] ?? false) === true) {
+        $out = 'branch '.$d->branch().' last released '.self::ago($d->branchLastRelease(), $d->years(), $d->datedBy());
+        $newest = \sprintf('%s released %s (%s)', $d->newestBranch(), $d->newestVersion(), substr($d->newestRelease(), 0, 10));
+        if ($d->newestWithinReach()) {
             return $out.'; '.$newest;
         }
-        $out .= \sprintf("; %s, needs php %s above the %s's php %s", $newest, self::scalar($d['newest_php'] ?? null), ($d['floor_source'] ?? null) === 'project' ? 'project' : 'target', self::scalar($d['floor_php'] ?? null));
-        if (\is_string($d['reachable_branch'] ?? null)) {
-            return $out.\sprintf('; %s released %s (%s)', $d['reachable_branch'], self::scalar($d['reachable_version'] ?? null), substr(self::scalar($d['reachable_release'] ?? ''), 0, 10));
+        $out .= \sprintf("; %s, needs php %s above the %s's php %s", $newest, (string) $d->newestPhp(), $d->floorSource() === 'project' ? 'project' : 'target', (string) $d->floorPhp());
+        $reachable = $d->reachable();
+        if ($reachable !== null) {
+            return $out.\sprintf('; %s released %s (%s)', $reachable->branch(), $reachable->version(), substr($reachable->release(), 0, 10));
         }
 
         return $out.'; no releasing branch within reach';
     }
 
-    /**
-     * @param mixed $years
-     * @param mixed $datedBy
-     */
-    private static function ago(string $date, $years, $datedBy): string
+    private static function ago(string $date, ?float $years, ?string $datedBy): string
     {
-        return substr($date, 0, 10).' ('.(\is_int($years) || \is_float($years) ? \sprintf('%.1f', $years) : self::scalar($years)).' years ago'.(\is_string($datedBy) ? ', dated by '.$datedBy.')' : ')');
-    }
-
-    /** @param mixed $value */
-    private static function scalar($value): string
-    {
-        return \is_scalar($value) ? (string) $value : '';
+        return substr($date, 0, 10).' ('.($years === null ? '' : \sprintf('%.1f', $years)).' years ago'.($datedBy === null ? ')' : ', dated by '.$datedBy.')');
     }
 }

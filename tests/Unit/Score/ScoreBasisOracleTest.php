@@ -8,6 +8,7 @@ use Lockrot\Allowlist\AllowlistEntry;
 use Lockrot\Score\ScoreBasis;
 use Lockrot\Signal\Signal;
 use Lockrot\Tests\Support\ScoreSweep;
+use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Verdict\FlagSet;
 use Lockrot\Verdict\Score;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -176,7 +177,7 @@ final class ScoreBasisOracleTest extends TestCase
     public function testAWholePackageEntryListsEveryFiredMaintenanceFlagAsAccepted(): void
     {
         $flags = FlagSet::fromSignals(self::signalsOf([['S5', 'high'], ['S2', 'warn']]), new AllowlistEntry('vendor/pkg', null, 'finished', null, 'builtin'), ScoreSweep::advisories([['low', 'update']]));
-        $score = ScoreSweep::graded(ScoreSweep::decoded(ScoreBasis::of($flags, 'direct', false, ScoreSweep::CONTEXT)));
+        $score = ScoreSweep::graded(ScoreSweep::decoded(ScoreBasis::of($flags, 'direct', false, ScoreSweep::context())));
 
         self::assertSame(['old-promise', 'stale'], array_column($score['accepted'], 'flag'));
         self::assertSame([18, 10], array_column(array_column($score['accepted'], 'if_counted'), 'total'));
@@ -245,7 +246,7 @@ final class ScoreBasisOracleTest extends TestCase
     {
         $entry = $entryFlags === null ? null : new AllowlistEntry('vendor/pkg', null, 'kept on purpose', null, 'project', $entryFlags === [] ? null : $entryFlags);
         $flags = FlagSet::fromSignals(self::signalsOf($signals), $entry, ScoreSweep::advisories($advisories));
-        $parts = ScoreSweep::graded(ScoreSweep::decoded(ScoreBasis::of($flags, 'direct', false, $context + ScoreSweep::CONTEXT)))['parts'];
+        $parts = ScoreSweep::graded(ScoreSweep::decoded(ScoreBasis::of($flags, 'direct', false, ScoreSweep::context($context))))['parts'];
 
         self::assertSame($maintenance, $parts['maintenance']['status']);
         self::assertSame($security, $parts['security']['status']);
@@ -277,7 +278,7 @@ final class ScoreBasisOracleTest extends TestCase
     {
         $entry = $entryFlags === null ? null : new AllowlistEntry('vendor/pkg', null, 'kept on purpose', null, 'project', $entryFlags);
         $flags = FlagSet::fromSignals(self::signalsOf($signals), $entry, ScoreSweep::advisories([['medium', 'update']]));
-        $score = ScoreSweep::graded(ScoreSweep::decoded(ScoreBasis::of($flags, 'direct', false, $context + ScoreSweep::CONTEXT)));
+        $score = ScoreSweep::graded(ScoreSweep::decoded(ScoreBasis::of($flags, 'direct', false, ScoreSweep::context($context))));
 
         $found = null;
         foreach ($score['without'] as $without) {
@@ -368,7 +369,7 @@ final class ScoreBasisOracleTest extends TestCase
      */
     private static function signalsOf(array $signals): array
     {
-        return array_map(static fn (array $s): Signal => new Signal($s[0], $s[1], $s[0].' fired'), $signals);
+        return array_map(static fn (array $s): Signal => new Signal($s[1], $s[0].' fired', SignalDataStub::of($s[0], [])), $signals);
     }
 
     private static function grade(int $total): ?string

@@ -6,6 +6,7 @@ namespace Lockrot\Signal\Rule;
 
 use Lockrot\Lock\PackageOrigin;
 use Lockrot\Signal\AbandonedIgnored;
+use Lockrot\Signal\Data\AbandonedData;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\SignalRule;
@@ -32,11 +33,11 @@ final class AbandonedRule implements SignalRule
 
         $successor = Finding::successorOf($facts->package()->name(), $marking['replacement']);
 
-        return new Signal(Signal::S1, Signal::LEVEL_HIGH, $summary, [
-            'marked_by' => $marking['marked_by'],
-            'replacement' => $marking['replacement'],
-            'replacement_url' => $successor === null ? null : PackageOrigin::replacementPage(self::replacementNamedBy($facts), $successor),
-        ]);
+        return new Signal(Signal::LEVEL_HIGH, $summary, new AbandonedData(
+            $marking['marked_by'],
+            $marking['replacement'],
+            $successor === null ? null : PackageOrigin::replacementPage(self::replacementNamedBy($facts), $successor)
+        ));
     }
 
     /** The marking that the list kept out of S1. Null when the list does not match, or nobody marked the package. */

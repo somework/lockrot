@@ -6,6 +6,7 @@ namespace Lockrot\Signal\Rule;
 
 use Lockrot\Data\Php\PhpReleaseDates;
 use Lockrot\Signal\ConstraintOpenness;
+use Lockrot\Signal\Data\OldPromiseData;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\SignalRule;
@@ -58,13 +59,13 @@ final class OldPromiseRule implements SignalRule
             $this->targetPhp
         );
 
-        return new Signal(Signal::S5, Signal::LEVEL_WARN, $summary, [
-            'target_php' => $this->targetPhp,
-            'target_major' => $this->targetMajor,
-            'ga_date' => $ga->format('Y-m-d'),
-            'php_constraint' => $constraint,
-            'written_for_php' => $writtenFor === null || $writtenFor === 0 ? null : $writtenFor,
-            'released' => $released->format(\DATE_ATOM),
-        ]);
+        return new Signal(Signal::LEVEL_WARN, $summary, new OldPromiseData(
+            $this->targetPhp,
+            $this->targetMajor,
+            $ga->format('Y-m-d'),
+            $constraint,
+            $writtenFor === null || $writtenFor === 0 ? null : $writtenFor,
+            $released->format(\DATE_ATOM)
+        ));
     }
 }

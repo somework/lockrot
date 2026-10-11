@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Lockrot\Verdict;
 
+use Lockrot\Score\CountedAdvisory;
+use Lockrot\Score\MaintenanceTerm;
+use Lockrot\Score\SecurityTerm;
 use Lockrot\Security\Severity;
 
 /**
@@ -13,9 +16,6 @@ use Lockrot\Security\Severity;
  * once. Every quarter of a weight is whole, so every value stays on the half-point grid.
  *
  * @internal
- *
- * @phpstan-type Advisory array{id: string, severity: string, fix_kind: string}
- * @phpstan-type MaintenanceTerm array{flag: string, role: string, weight: int, divisor: int, points: int}
  */
 final class Score
 {
@@ -28,9 +28,8 @@ final class Score
     public const CORROBORATING = 'corroborating';
 
     /** @var list<MaintenanceTerm> */
-    private array $terms;
-    /** @var ?Advisory */
-    private ?array $deciding;
+    private array $terms = [];
+    private ?SecurityTerm $deciding;
     /** @var list<string> */
     private array $tied;
     private int $advisories;
@@ -38,24 +37,32 @@ final class Score
     private bool $dev;
 
     /**
-     * @param list<MaintenanceTerm> $terms
-     * @param ?Advisory             $deciding
-     * @param list<string>          $tied
+     * @param list<string>     $maintenance the counted maintenance flags, in any order
+     * @param ?CountedAdvisory $deciding    with the severity bucket, not Composer's word
+     * @param list<string>     $tied
      */
-    private function __construct(array $terms, ?array $deciding, array $tied, int $advisories, string $reach, bool $dev)
+    private function __construct(array $maintenance, ?CountedAdvisory $deciding, array $tied, int $advisories, string $reach, bool $dev)
     {
-        $this->terms = $terms;
-        $this->deciding = $deciding;
         $this->tied = $tied;
         $this->advisories = $advisories;
         $this->reach = $reach;
         $this->dev = $dev;
+        foreach (array_intersect(array_keys(ScoreModel::POINTS), $maintenance) as $flag) {
+            $divisor = $this->terms === [] ? 1 : ScoreModel::CORROBORATING_DIVISOR;
+            $weight = ScoreModel::POINTS[$flag];
+            $points = intdiv($weight, $divisor);
+            $this->terms[] = new MaintenanceTerm($flag, $this->terms === [] ? self::LEAD : self::CORROBORATING, $weight, $divisor, $points, $this->halveForDev($this->halveForReach(2 * $points)));
+        }
+        $this->deciding = $deciding === null ? null : $this->securityTerm($deciding);
     }
 
-    /** @return Advisory */
-    public static function advisory(string $id, string $severity, string $fixKind): array
+    /** @param CountedAdvisory $advisory with the severity bucket, not Composer's word */
+    private function securityTerm(CountedAdvisory $advisory): SecurityTerm
     {
-        return ['id' => $id, 'severity' => $severity, 'fix_kind' => $fixKind];
+        $multiplier = \in_array($advisory->fixKind(), ScoreModel::DOUBLING, true) ? ScoreModel::NO_REACHABLE_FIX_FACTOR : 1;
+        $points = ScoreModel::advisoryPoints($advisory->severity(), $advisory->fixKind());
+
+        return new SecurityTerm($advisory->id(), $advisory->severity(), $advisory->fixKind(), intdiv($points, $multiplier), $multiplier, $points, $this->halveForDev(2 * $points));
     }
 
     public static function of(FlagSet $flags, string $reach, bool $dev): self
@@ -64,9 +71,9 @@ final class Score
     }
 
     /**
-     * @param list<string>   $maintenance the counted maintenance flags, in any order
-     * @param list<Advisory> $advisories  the counted advisories. A severity is a Composer word: the
-     *                                    engine reads its bucket ({@see Severity::fromComposer()})
+     * @param list<string>          $maintenance the counted maintenance flags, in any order
+     * @param list<CountedAdvisory> $advisories  the counted advisories. A severity is a Composer word: the
+     *                                           engine reads its bucket ({@see Severity::fromComposer()})
      *
      * @throws \InvalidArgumentException for a reach that is not direct, transitive or unreached, or a
      *                                   fix kind outside {@see ScoreModel::FIX_KINDS}
@@ -77,34 +84,28 @@ final class Score
             throw new \InvalidArgumentException('not a reach: '.$reach);
         }
         foreach ($advisories as $advisory) {
-            if (!\in_array($advisory['fix_kind'], ScoreModel::FIX_KINDS, true)) {
-                throw new \InvalidArgumentException('not a fix kind: '.$advisory['fix_kind']);
+            if (!\in_array($advisory->fixKind(), ScoreModel::FIX_KINDS, true)) {
+                throw new \InvalidArgumentException('not a fix kind: '.$advisory->fixKind());
             }
         }
-        $advisories = array_map(static fn (array $advisory): array => array_merge($advisory, ['severity' => Severity::fromComposer($advisory['severity'])->bucket()]), $advisories);
-        $terms = [];
-        foreach (array_intersect(array_keys(ScoreModel::POINTS), $maintenance) as $flag) {
-            $divisor = $terms === [] ? 1 : ScoreModel::CORROBORATING_DIVISOR;
-            $weight = ScoreModel::POINTS[$flag];
-            $terms[] = ['flag' => $flag, 'role' => $terms === [] ? self::LEAD : self::CORROBORATING, 'weight' => $weight, 'divisor' => $divisor, 'points' => intdiv($weight, $divisor)];
-        }
-        usort($advisories, static function (array $a, array $b): int {
-            return ScoreModel::advisoryPoints($b['severity'], $b['fix_kind']) <=> ScoreModel::advisoryPoints($a['severity'], $a['fix_kind'])
-                ?: array_search($a['severity'], ScoreModel::SEVERITIES, true) <=> array_search($b['severity'], ScoreModel::SEVERITIES, true)
-                ?: strcmp($a['id'], $b['id']);
+        $advisories = array_map(static fn (CountedAdvisory $advisory): CountedAdvisory => $advisory->bucketed(), $advisories);
+        usort($advisories, static function (CountedAdvisory $a, CountedAdvisory $b): int {
+            return ScoreModel::advisoryPoints($b->severity(), $b->fixKind()) <=> ScoreModel::advisoryPoints($a->severity(), $a->fixKind())
+                ?: array_search($a->severity(), ScoreModel::SEVERITIES, true) <=> array_search($b->severity(), ScoreModel::SEVERITIES, true)
+                ?: strcmp($a->id(), $b->id());
         });
         $deciding = $advisories[0] ?? null;
         $tied = [];
         if ($deciding !== null) {
-            $points = ScoreModel::advisoryPoints($deciding['severity'], $deciding['fix_kind']);
+            $points = ScoreModel::advisoryPoints($deciding->severity(), $deciding->fixKind());
             foreach (\array_slice($advisories, 1) as $advisory) {
-                if (ScoreModel::advisoryPoints($advisory['severity'], $advisory['fix_kind']) === $points) {
-                    $tied[] = $advisory['id'];
+                if (ScoreModel::advisoryPoints($advisory->severity(), $advisory->fixKind()) === $points) {
+                    $tied[] = $advisory->id();
                 }
             }
         }
 
-        return new self($terms, $deciding, $tied, \count($advisories), $reach, $dev);
+        return new self($maintenance, $deciding, $tied, \count($advisories), $reach, $dev);
     }
 
     /** @return list<MaintenanceTerm> the counted maintenance flags in flag order, the lead first */
@@ -113,8 +114,8 @@ final class Score
         return $this->terms;
     }
 
-    /** @return ?Advisory the advisory that the security part takes: the most points, then the severity order, then the lowest id */
-    public function deciding(): ?array
+    /** The advisory that the security part takes: the most points, then the severity order, then the lowest id. */
+    public function deciding(): ?SecurityTerm
     {
         return $this->deciding;
     }
@@ -132,7 +133,7 @@ final class Score
 
     public function lead(): ?string
     {
-        return $this->terms[0]['flag'] ?? null;
+        return $this->terms === [] ? null : $this->terms[0]->flag();
     }
 
     public function reach(): string
@@ -148,13 +149,13 @@ final class Score
     /** The maintenance points before any halving. */
     public function maintenancePointsHalves(): int
     {
-        return 2 * array_sum(array_column($this->terms, 'points'));
+        return 2 * array_sum(array_map(static fn (MaintenanceTerm $term): int => $term->points(), $this->terms));
     }
 
     /** The deciding advisory's points, × 2 with no reachable fix, before the dev halving. */
     public function securityPointsHalves(): int
     {
-        return $this->deciding === null ? 0 : 2 * ScoreModel::advisoryPoints($this->deciding['severity'], $this->deciding['fix_kind']);
+        return $this->deciding === null ? 0 : 2 * $this->deciding->points();
     }
 
     /** The maintenance points after the reach halving, before the dev halving. */
@@ -191,12 +192,12 @@ final class Score
         return ScoreModel::band($this->total());
     }
 
-    public function halveForReach(int $halves): int
+    private function halveForReach(int $halves): int
     {
         return $this->reach === self::DIRECT ? $halves : intdiv($halves, ScoreModel::REACH_DIVISOR);
     }
 
-    public function halveForDev(int $halves): int
+    private function halveForDev(int $halves): int
     {
         return $this->dev ? intdiv($halves, ScoreModel::DEV_DIVISOR) : $halves;
     }

@@ -4,7 +4,13 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Verdict;
 
+use Lockrot\Security\BranchFixes;
+use Lockrot\Signal\Data\AdvisoryData;
+use Lockrot\Signal\Data\AdvisoryRow;
 use Lockrot\Signal\Signal;
+use Lockrot\Tests\Support\CaseHydrator;
+use Lockrot\Tests\Support\JsonPath;
+use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Verdict\FlagSentence;
 use Lockrot\Verdict\FlagSet;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -28,7 +34,7 @@ final class FlagSentenceTest extends TestCase
     #[DataProvider('leftBehind')]
     public function testTheLeftBehindSentenceNamesWhatIsWithinReach(array $change, string $sentence): void
     {
-        self::assertSame($sentence, FlagSentence::maintenance(FlagSet::LEFT_BEHIND, [Signal::S8 => array_merge(self::S8, $change)]));
+        self::assertSame($sentence, FlagSentence::maintenance(FlagSet::LEFT_BEHIND, [SignalDataStub::of(Signal::S8, array_merge(self::S8, $change))]));
     }
 
     /** @return iterable<string, array{array<string, mixed>, string}> */
@@ -38,7 +44,7 @@ final class FlagSentenceTest extends TestCase
         yield 'the newest branch within reach' => [['newest_within_reach' => true], $head.'; 3.x released 3.4.1 (2026-06-01)'];
         yield 'a reachable branch below the newest' => [[], $head."; 3.x released 3.4.1 (2026-06-01), needs php >=8.5 above the target's php 8.4; 2.x released 2.9.0 (2026-03-01)"];
         yield 'the project floor holds it' => [['floor_source' => 'project', 'floor_php' => '8.2'], $head."; 3.x released 3.4.1 (2026-06-01), needs php >=8.5 above the project's php 8.2; 2.x released 2.9.0 (2026-03-01)"];
-        yield 'no branch within reach' => [['reachable_branch' => null], $head."; 3.x released 3.4.1 (2026-06-01), needs php >=8.5 above the target's php 8.4; no releasing branch within reach"];
+        yield 'no branch within reach' => [['reachable_branch' => null, 'reachable_version' => null, 'reachable_release' => null], $head."; 3.x released 3.4.1 (2026-06-01), needs php >=8.5 above the target's php 8.4; no releasing branch within reach"];
         yield 'no word on the reach of the newest' => [['newest_within_reach' => null], $head."; 3.x released 3.4.1 (2026-06-01), needs php >=8.5 above the target's php 8.4; 2.x released 2.9.0 (2026-03-01)"];
         yield 'a release dated by the monorepo' => [['newest_within_reach' => true, 'dated_by' => 'acme/monorepo'], 'branch 1.x last released 2019-03-02 (7.5 years ago, dated by acme/monorepo); 3.x released 3.4.1 (2026-06-01)'];
     }
@@ -51,7 +57,12 @@ final class FlagSentenceTest extends TestCase
     #[DataProvider('signalSentences')]
     public function testEachSignalGivesItsClauseOfTheSentence(string $flag, array $data, string $sentence): void
     {
-        self::assertSame($sentence, FlagSentence::maintenance($flag, $data));
+        $typed = [];
+        foreach ($data as $id => $fields) {
+            $typed[] = SignalDataStub::of($id, $fields);
+        }
+
+        self::assertSame($sentence, FlagSentence::maintenance($flag, $typed));
     }
 
     /** @return iterable<string, array{string, array<string, array<string, mixed>>, string}> */
@@ -64,12 +75,18 @@ final class FlagSentenceTest extends TestCase
         yield 'archived with no host named' => [FlagSet::ABANDONED, [Signal::S3 => []], 'its repository is archived on GitHub'];
         yield 'marked and archived' => [FlagSet::ABANDONED, [Signal::S1 => ['marked_by' => 'lock'], Signal::S3 => ['forge' => 'github']], 'marked abandoned in composer.lock; its repository is archived on GitHub'];
         yield 'an old promise' => [FlagSet::OLD_PROMISE, [Signal::S5 => [
-            'released' => '2016-05-01T10:00:00+00:00', 'written_for_php' => '7.0', 'php_constraint' => '>=5.6', 'target_major' => '8.0', 'ga_date' => '2020-11-26', 'target_php' => '8.4',
-        ]], 'released 2016-05-01 for PHP 7.0 (php ">=5.6"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested'];
+            'released' => '2016-05-01T10:00:00+00:00', 'written_for_php' => 7, 'php_constraint' => '>=5.6', 'target_major' => '8.0', 'ga_date' => '2020-11-26', 'target_php' => '8.4',
+        ]], 'released 2016-05-01 for PHP 7 (php ">=5.6"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested'];
         yield 'pinned to a branch snapshot' => [FlagSet::PINNED, [Signal::S6 => ['reason' => 'branch_snapshot', 'version' => 'dev-main']], 'pinned to branch snapshot dev-main'];
         yield 'pinned with no tagged release' => [FlagSet::PINNED, [Signal::S6 => ['reason' => 'no_stable_release', 'version' => '1.0.0-beta1']], 'pinned to 1.0.0-beta1'];
         yield 'whole years' => [FlagSet::STALE, [Signal::S2 => ['last_release' => '2021-05-05T00:00:00+00:00', 'years' => 5]], 'last release 2021-05-05 (5.0 years ago)'];
-        yield 'years that are no number print as given' => [FlagSet::STALE, [Signal::S2 => ['last_release' => '2021-05-05T00:00:00+00:00', 'years' => '5']], 'last release 2021-05-05 (5 years ago)'];
+    }
+
+    public function testOnlyTheMaintenanceSignalsHaveASentenceHere(): void
+    {
+        $this->expectException(\LogicException::class);
+
+        FlagSentence::maintenance(FlagSet::VULNERABLE, [new AdvisoryData([], true, true)]);
     }
 
     public function testTheSilentSentenceReadsBothDates(): void
@@ -79,7 +96,7 @@ final class FlagSentenceTest extends TestCase
             Signal::S4 => ['last_push' => '2022-01-10T00:00:00+00:00', 'years' => 4.7, 'activity' => 'commit'],
         ];
 
-        self::assertSame('last release 2021-05-05 (5.4 years ago); last commit 2022-01-10 (4.7 years ago)', FlagSentence::maintenance(FlagSet::SILENT, $data));
+        self::assertSame('last release 2021-05-05 (5.4 years ago); last commit 2022-01-10 (4.7 years ago)', FlagSentence::maintenance(FlagSet::SILENT, [SignalDataStub::of(Signal::S4, $data[Signal::S4]), SignalDataStub::of(Signal::S2, $data[Signal::S2])]));
     }
 
     /**
@@ -92,7 +109,11 @@ final class FlagSentenceTest extends TestCase
     #[DataProvider('vulnerable')]
     public function testTheVulnerableSentence(array $rows, array $counts, string $worst, string $deciding, ?string $branch, ?array $installed, string $sentence): void
     {
-        self::assertSame($sentence, FlagSentence::vulnerable($rows, $counts, $worst, $deciding, $branch, $installed));
+        $typed = array_map(static fn (array $row): AdvisoryRow => SignalDataStub::row($row)->withDeciding(($row['deciding'] ?? false) === true), $rows);
+        $clears = \array_slice(['PKSA-a', 'PKSA-b'], 0, $installed === null ? 0 : $installed['fixed']);
+        $row = $installed === null ? null : new BranchFixes('x', true, $installed['unknown'], $installed['of'], $installed['fix_kind'] === null ? null : SignalDataStub::fix(['kind' => $installed['fix_kind']])->candidate(), null, $clears);
+
+        self::assertSame($sentence, FlagSentence::vulnerable($typed, $counts, $worst, $deciding, $branch, $row));
     }
 
     /** @return iterable<string, array{list<array<string, mixed>>, array<string, int>, string, string, ?string, ?array{fixed: int, unknown: int, of: int, fix_kind: ?string}, string}> */
@@ -109,15 +130,53 @@ final class FlagSentenceTest extends TestCase
         yield 'one advisory, none fixed on the branch' => [$one, $oneCount, 'high', 'high', '1.x', ['fixed' => 0, 'unknown' => 0, 'of' => 1, 'fix_kind' => null], '1 advisory: 1 high — none fixed on 1.x; advisory: CVE-1 title of PKSA-a'];
         yield 'all fixed by an update' => [$one, $oneCount, 'high', 'high', '1.x', ['fixed' => 1, 'unknown' => 0, 'of' => 1, 'fix_kind' => 'update'], '1 advisory: 1 high — all fixed on 1.x; advisory: CVE-1 title of PKSA-a'];
         yield 'all fixed by an upgrade' => [$one, $oneCount, 'high', 'high', '1.x', ['fixed' => 1, 'unknown' => 0, 'of' => 1, 'fix_kind' => 'upgrade'], '1 advisory: 1 high — all fixed on 1.x (upgrade); advisory: CVE-1 title of PKSA-a'];
-        yield 'some fixed by a kind of a later release' => [$two, $counts, 'high', 'high', '2.x', ['fixed' => 1, 'unknown' => 0, 'of' => 2, 'fix_kind' => 'acme:patch'], '2 advisories: 1 high, 1 medium — 1 of 2 fixed on 2.x (acme:patch); worst: PKSA-b title of PKSA-b'];
         yield 'all fixed by a php floor raise' => [$one, $oneCount, 'high', 'high', '1.x', ['fixed' => 1, 'unknown' => 0, 'of' => 1, 'fix_kind' => 'raise-php'], '1 advisory: 1 high — all fixed on 1.x (php floor raise); advisory: CVE-1 title of PKSA-a'];
         yield 'some not known' => [$two, $counts, 'high', 'high', '2.x', ['fixed' => 1, 'unknown' => 1, 'of' => 2, 'fix_kind' => 'blocked'], '2 advisories: 1 high, 1 medium — 1 of 2 fixed on 2.x (blocked); 1 not known; worst: PKSA-b title of PKSA-b'];
         yield 'none known' => [$one, $oneCount, 'high', 'high', '1.x', ['fixed' => 0, 'unknown' => 1, 'of' => 1, 'fix_kind' => null], '1 advisory: 1 high — fix not known on 1.x; advisory: CVE-1 title of PKSA-a'];
         yield 'a branch without its row' => [$one, $oneCount, 'high', 'high', '1.x', null, '1 advisory: 1 high; advisory: CVE-1 title of PKSA-a'];
         yield 'counts that leave severities out' => [$one, ['high' => 1], 'high', 'high', null, null, '1 advisory: 1 high; advisory: CVE-1 title of PKSA-a'];
-        yield 'rows without the deciding key name the first' => [[['id' => 'PKSA-a', 'cve' => 'CVE-1', 'title' => 'a'], ['id' => 'PKSA-b', 'cve' => 'CVE-2', 'title' => 'b']], $counts, 'high', 'high', null, null, '2 advisories: 1 high, 1 medium; worst: CVE-1 a'];
         yield 'a branch row of a snapshot' => [$one, $oneCount, 'high', 'high', null, ['fixed' => 0, 'unknown' => 1, 'of' => 1, 'fix_kind' => null], '1 advisory: 1 high; advisory: CVE-1 title of PKSA-a'];
         yield 'fixed with no class, from the S9 rows' => [$two, $counts, 'high', 'high', '2.x', ['fixed' => 1, 'unknown' => 0, 'of' => 2, 'fix_kind' => null], '2 advisories: 1 high, 1 medium — 1 of 2 fixed on 2.x; worst: PKSA-b title of PKSA-b'];
-        yield 'no row marked deciding names the first' => [[$row('PKSA-a', 'CVE-1', false), $row('PKSA-b', null, false)], $counts, 'high', 'high', null, null, '2 advisories: 1 high, 1 medium; worst: CVE-1 title of PKSA-a'];
+    }
+
+    /** The data of a signal that the flag does not read adds nothing, whatever the flag. */
+    public function testAFlagReadsOnlyTheDataOfItsOwnSignals(): void
+    {
+        self::assertSame('', FlagSentence::maintenance(FlagSet::STALE, [SignalDataStub::of(Signal::S6, ['reason' => 'branch_snapshot', 'version' => 'dev-main'])]));
+    }
+
+    /** Without the deciding row the sentence and the score could name two advisories. */
+    public function testTheVulnerableSentenceNeedsTheDecidingRow(): void
+    {
+        $rows = [SignalDataStub::row(['id' => 'PKSA-a', 'cve' => 'CVE-1']), SignalDataStub::row(['id' => 'PKSA-b'])];
+
+        $this->expectException(\LogicException::class);
+
+        FlagSentence::vulnerable($rows, ['high' => 1, 'medium' => 1], 'high', 'high', null, null);
+    }
+
+    /** Case A of tests/fixtures/flags/cases.json: its recorded S9 rows give its recorded `flags[].summary`. */
+    public function testTheVulnerableSentenceOfCaseA(): void
+    {
+        $finding = JsonPath::arrayAt(CaseHydrator::case('A'), ['finding']);
+        self::assertSame(Signal::S9, JsonPath::stringAt($finding, ['signals', 0, 'id']));
+        $rows = [];
+        $counts = [];
+        $deciding = '';
+        foreach (JsonPath::arrayAt($finding, ['signals', 0, 'data', 'advisories']) as $i => $row) {
+            $path = ['signals', 0, 'data', 'advisories', $i];
+            $severity = JsonPath::stringAt($finding, array_merge($path, ['severity']));
+            $marked = JsonPath::boolAt($finding, array_merge($path, ['deciding']));
+            $rows[] = SignalDataStub::row(['id' => JsonPath::stringAt($finding, array_merge($path, ['id'])), 'cve' => JsonPath::stringAt($finding, array_merge($path, ['cve'])), 'title' => JsonPath::stringAt($finding, array_merge($path, ['title'])), 'severity' => $severity])->withDeciding($marked);
+            $counts[$severity] = ($counts[$severity] ?? 0) + 1;
+            $deciding = $marked ? $severity : $deciding;
+        }
+        $installed = ['security', 'installed_branch_fixes'];
+        self::assertSame(0, JsonPath::intAt($finding, array_merge($installed, ['fixed'])), 'the case fixes nothing on its branch, so the row clears no id');
+        $row = new BranchFixes('2.x', true, JsonPath::intAt($finding, array_merge($installed, ['unknown'])), JsonPath::intAt($finding, array_merge($installed, ['of'])), null, null, []);
+
+        $sentence = FlagSentence::vulnerable($rows, $counts, JsonPath::stringAt($finding, ['security', 'worst']), $deciding, JsonPath::stringAt($finding, ['branch']), $row);
+
+        self::assertSame(JsonPath::stringAt($finding, ['flags', 0, 'summary']), $sentence);
     }
 }

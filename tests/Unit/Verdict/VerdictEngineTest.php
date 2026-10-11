@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Verdict;
 
 use Lockrot\Signal\Signal;
+use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Verdict\Verdict;
 use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -28,7 +29,7 @@ final class VerdictEngineTest extends TestCase
     {
         $h = Signal::LEVEL_HIGH;
         $w = Signal::LEVEL_WARN;
-        $s = static fn (string $id, string $l = Signal::LEVEL_HIGH): Signal => new Signal($id, $l, $id);
+        $s = static fn (string $id, string $l = Signal::LEVEL_HIGH): Signal => new Signal($l, $id, SignalDataStub::of($id, []));
         yield 'nothing' => [[], false, true, Verdict::OK];
         yield 'no data' => [[], false, false, Verdict::UNKNOWN];
         yield 'allowlisted beats silent' => [[$s('S2', $h), $s('S4', $h)], true, true, Verdict::FINISHED];

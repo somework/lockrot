@@ -18,6 +18,7 @@ use Lockrot\Signal\Signal;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\JsonPath as J;
+use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
 use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
@@ -101,7 +102,7 @@ final class ReportDocumentTest extends TestCase
      */
     public function testAnUnflaggedPackageCarryingAnAdvisoryIsExplainedAnyway(): void
     {
-        $advisory = new Signal(Signal::S9, Signal::LEVEL_WARN, '1 security advisory affects 1.0.0', ['advisories' => []]);
+        $advisory = new Signal(Signal::LEVEL_WARN, '1 security advisory affects 1.0.0', SignalDataStub::of(Signal::S9, ['advisories' => []]));
         $report = $this->report([$this->finding('vendor/patched', Verdict::OK, [$advisory])]);
         $facts = ['vendor/patched' => F::facts(F::package(['name' => 'vendor/patched']), F::metadata([['1.0.0', '2026-01-01T00:00:00+00:00']]))];
 

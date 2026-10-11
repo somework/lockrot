@@ -148,7 +148,7 @@ start the reason with `in method():`.
 ## src/Verdict
 
 - `src/Verdict/Finding.php` Continue_ `continue;` — in flagsOut(): `vulnerable` is the last flag of the fired order, so `break` also ends the loop after it.
-- `src/Verdict/FindingDetails.php` CastString `$skipped[] = ['check' => 'advisories', 'reason' => (string) $advisoryReason, 'blocks' => [Signal::S9]];` — the `in_array()` guard admits two strings only.
+- `src/Verdict/FindingDetails.php` CastString `$skipped[] = new Check('advisories', (string) $advisoryReason, [Signal::S9]);` — the `in_array()` guard admits two strings only.
 - `src/Verdict/FindingDetails.php` DecrementInteger `$hardest = 0;` — `standing()` returns before the loop when no row counts, and every kind has an index of 0 or more, so the maximum is the same.
 - `src/Verdict/FlagSentence.php` DecrementInteger `if (($counts[$severity] ?? 0) > 0) {` — a missing severity reads as -1, which is not above 0 either.
-- `src/Verdict/FlagSentence.php` GreaterThan `$label = $fixed > 0 && $kind !== null && $kind !== Fix::UPDATE ? ' ('.(self::FIX_LABEL[$kind] ?? $kind).')' : '';` — with no advisory fixed, the "none fixed" clause carries no label.
+- `src/Verdict/FlagSentence.php` GreaterThan `$label = $fixed > 0 && $kind !== null && $kind !== Fix::UPDATE ? ' ('.self::FIX_LABEL[$kind].')' : '';` — with no advisory fixed, the "none fixed" clause carries no label.

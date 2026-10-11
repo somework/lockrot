@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Verdict;
 
+use Lockrot\Score\CountedAdvisory;
 use Lockrot\Security\Severity;
 
 /**
@@ -301,7 +302,7 @@ final class ScoreModel
 
                 return ['exact' => $score->exactHalves() / 2, 'total' => $score->total()];
             case 'sum':
-                $low = Score::compute([FlagSet::STALE], [Score::advisory('A', 'low', 'none')], Score::TRANSITIVE, false);
+                $low = Score::compute([FlagSet::STALE], [new CountedAdvisory('A', 'low', 'none')], Score::TRANSITIVE, false);
                 $total = self::total([FlagSet::LEFT_BEHIND], ['high', 'update']);
 
                 return [
@@ -334,6 +335,6 @@ final class ScoreModel
      */
     private static function total(array $maintenance, ?array $advisory = null, string $reach = Score::DIRECT, bool $dev = false): int
     {
-        return Score::compute($maintenance, $advisory === null ? [] : [Score::advisory('A', $advisory[0], $advisory[1])], $reach, $dev)->total();
+        return Score::compute($maintenance, $advisory === null ? [] : [new CountedAdvisory('A', $advisory[0], $advisory[1])], $reach, $dev)->total();
     }
 }

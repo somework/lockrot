@@ -10,8 +10,9 @@ use Lockrot\Data\Advisory\Advisory;
 use Lockrot\Data\Repository\ReleaseBranch;
 use Lockrot\Legacy\AdvisoryFacts013;
 use Lockrot\Security\Fix;
-use Lockrot\Security\Holder;
 use Lockrot\Security\Severity;
+use Lockrot\Signal\Data\AdvisoryData;
+use Lockrot\Signal\Data\AdvisoryRow;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\SignalRule;
@@ -44,11 +45,11 @@ final class AdvisoryRule implements SignalRule
         $worst = Severity::worstOf(array_map(static fn (Advisory $advisory): string => Severity::fromComposer($advisory->severity())->bucket(), $advisories));
         $coverage = $facts->advisoryCoverage();
 
-        return new Signal(Signal::S9, \in_array($worst, [Severity::CRITICAL, Severity::HIGH], true) ? Signal::LEVEL_HIGH : Signal::LEVEL_WARN, $legacy[0], [
-            'advisories' => $rows,
-            'releases_read' => $legacy[1]->releasesRead(),
-            'complete' => $coverage !== null && $coverage->reason() === null,
-        ]);
+        return new Signal(\in_array($worst, [Severity::CRITICAL, Severity::HIGH], true) ? Signal::LEVEL_HIGH : Signal::LEVEL_WARN, $legacy[0], new AdvisoryData(
+            $rows,
+            $legacy[1]->releasesRead(),
+            $coverage !== null && $coverage->reason() === null
+        ));
     }
 
     /**
@@ -78,28 +79,27 @@ final class AdvisoryRule implements SignalRule
         );
 
         [$onBranch, $inPackage, $read] = self::fixCandidates($facts);
-        $rows = [];
+        $fixes = [];
         $fixedBy = [];
         foreach ($advisories as $advisory) {
-            $row = $advisory->toArray();
-            $row['fixed_by'] = null;
-            $row['fixed_on_branch'] = false;
+            $fixed = null;
+            $onFixBranch = false;
             if ($onBranch !== null && $advisory->affects($onBranch['normalized']) === false) {
-                $row['fixed_by'] = $onBranch['pretty'];
-                $row['fixed_on_branch'] = true;
+                $fixed = $onBranch['pretty'];
+                $onFixBranch = true;
             } elseif ($inPackage !== null && $advisory->affects($inPackage['normalized']) === false) {
-                $row['fixed_by'] = $inPackage['pretty'];
+                $fixed = $inPackage['pretty'];
             }
-            if ($row['fixed_by'] !== null) {
-                $fixedBy[$row['fixed_by']] = ($fixedBy[$row['fixed_by']] ?? 0) + 1;
+            if ($fixed !== null) {
+                $fixedBy[$fixed] = ($fixedBy[$fixed] ?? 0) + 1;
             }
-            $rows[] = $row;
+            $fixes[] = [$advisory, $fixed, $onFixBranch];
         }
         if ($fixedBy !== []) {
             $summary .= '; '.self::fixedClause($fixedBy, $count);
         }
 
-        return [$summary, new AdvisoryFacts013($rows, $read)];
+        return [$summary, AdvisoryFacts013::of($fixes, $read)];
     }
 
     /**
@@ -107,7 +107,7 @@ final class AdvisoryRule implements SignalRule
      * descending, then the severity display order, then the id. The finding marks the deciding
      * row from its score ({@see \Lockrot\Verdict\Finding::toArray()}).
      *
-     * @return list<array<string, mixed>>
+     * @return list<AdvisoryRow>
      */
     private static function rows(PackageFacts $facts): array
     {
@@ -120,26 +120,23 @@ final class AdvisoryRule implements SignalRule
         $rows = [];
         foreach ($byId as $id => [$advisory, $fix]) {
             $bucket = Severity::fromComposer($advisory->severity())->bucket();
-            $raw = $advisory->toArray();
-            $rows[] = [
-                'id' => (string) $id,
-                'cve' => $advisory->cve(),
-                'title' => self::title($advisory->cve(), $advisory->title()),
-                'link' => $advisory->link(),
-                'reported_at' => $raw['reported_at'],
-                'severity' => $bucket,
-                'severity_published' => $advisory->severity(),
-                'affected_versions' => $raw['affected_versions'],
-                'counted' => true,
-                'points' => ScoreModel::advisoryPoints($bucket, $fix->kind()),
-                'fix' => self::fix($fix),
-                'baseline' => null,
-            ];
+            $rows[] = new AdvisoryRow(
+                (string) $id,
+                $advisory->cve(),
+                self::title($advisory->cve(), $advisory->title()),
+                $advisory->link(),
+                $advisory->reportedAtText(),
+                $bucket,
+                $advisory->severity(),
+                $advisory->affectedVersionsText(),
+                ScoreModel::advisoryPoints($bucket, $fix->kind()),
+                $fix
+            );
         }
-        usort($rows, static function (array $a, array $b): int {
-            return $b['points'] <=> $a['points']
-                ?: array_search($a['severity'], Severity::DISPLAY_ORDER, true) <=> array_search($b['severity'], Severity::DISPLAY_ORDER, true)
-                ?: strcmp($a['id'], $b['id']);
+        usort($rows, static function (AdvisoryRow $a, AdvisoryRow $b): int {
+            return $b->points() <=> $a->points()
+                ?: array_search($a->severity(), Severity::DISPLAY_ORDER, true) <=> array_search($b->severity(), Severity::DISPLAY_ORDER, true)
+                ?: strcmp($a->id(), $b->id());
         });
 
         return $rows;
@@ -153,41 +150,6 @@ final class AdvisoryRule implements SignalRule
         }
 
         return Fix::unknown($facts->package()->isFromComposerRepository() ? Fix::RELEASES_UNKNOWN : Fix::NOT_FROM_COMPOSER_REPOSITORY);
-    }
-
-    /** @return array<string, mixed> */
-    private static function fix(Fix $fix): array
-    {
-        return [
-            'kind' => $fix->kind(),
-            'to_branch' => $fix->toBranch(),
-            'version' => $fix->version(),
-            'newest' => $fix->newest(),
-            'on_installed_branch' => $fix->onInstalledBranch(),
-            'php' => $fix->php(),
-            'held_by' => array_map([self::class, 'heldBy'], $fix->heldBy()),
-            'reason' => $fix->reason(),
-        ];
-    }
-
-    /**
-     * A `held_by[]` entry. A root link names no package: the holder is composer.json. `holder`
-     * stays null until the report fills it from the holder's own finding.
-     *
-     * @return array<string, mixed>
-     */
-    public static function heldBy(Holder $holder): array
-    {
-        $root = $holder->source() === Holder::ROOT;
-
-        return [
-            'source' => $holder->source(),
-            'package' => $root ? null : $holder->package(),
-            'version' => $root ? null : $holder->version(),
-            'link' => $holder->link(),
-            'constraint' => $holder->constraint(),
-            'holder' => null,
-        ];
     }
 
     /** Trimmed, runs of blanks collapsed, a leading `<cve>: ` removed, so `{cve} {title}` never prints the CVE twice. */

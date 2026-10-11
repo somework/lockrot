@@ -9,12 +9,13 @@ use Lockrot\Graph\DependencyGraph;
 use Lockrot\Legacy\Priority013;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
+use Lockrot\Score\CountedAdvisory;
 use Lockrot\Signal\Signal;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\JsonPath;
+use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\FlagSet;
-use Lockrot\Verdict\Score;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\TestCase;
 
@@ -76,7 +77,7 @@ final class TransitiveExposureTest extends TestCase
     public function testEveryRootReachingAFlaggedPackageGetsS7WithItsOwnChain(): void
     {
         $graph = $this->graph();
-        $stale = new Signal(Signal::S2, Signal::LEVEL_WARN, 'last release 2022-05-20 (4.3 years ago)');
+        $stale = new Signal(Signal::LEVEL_WARN, 'last release 2022-05-20 (4.3 years ago)', SignalDataStub::of(Signal::S2, []));
         $findings = [
             $this->finding($graph, 'root/a', Verdict::OK),
             $this->finding($graph, 'root/b', Verdict::OK),
@@ -93,12 +94,12 @@ final class TransitiveExposureTest extends TestCase
         self::assertSame('pulls in 1 flagged package: vendor/leaf (stale)', $a->summary());
         self::assertSame(
             ['flagged' => 1, 'packages' => [['package' => 'vendor/leaf', 'chain' => ['root/a', 'vendor/leaf'], 'verdict' => 'low', 'lead' => 'stale', 'flag_ids' => ['stale']]]],
-            $a->data()
+            JsonPath::decoded($a->data())
         );
         $b = self::s7($f['root/b']);
         self::assertNotNull($b);
         // The chain is from this parent, not the one the finding's own chain starts from.
-        self::assertSame([['package' => 'vendor/leaf', 'chain' => ['root/b', 'vendor/mid', 'vendor/leaf'], 'verdict' => 'low', 'lead' => 'stale', 'flag_ids' => ['stale']]], $b->data()['packages']);
+        self::assertSame([['package' => 'vendor/leaf', 'chain' => ['root/b', 'vendor/mid', 'vendor/leaf'], 'verdict' => 'low', 'lead' => 'stale', 'flag_ids' => ['stale']]], JsonPath::decoded($b->data())['packages']);
         self::assertNull(self::s7($f['vendor/mid']));
         self::assertNull(self::s7($f['vendor/lonely']));
         self::assertSame([$stale], $f['vendor/leaf']->signals());
@@ -107,10 +108,10 @@ final class TransitiveExposureTest extends TestCase
     public function testS7IsAppendedAfterThePackagesOwnSignalsAndLeavesTheVerdictAlone(): void
     {
         $graph = $this->graph();
-        $own = new Signal(Signal::S6, Signal::LEVEL_WARN, 'pinned to branch snapshot dev-main');
+        $own = new Signal(Signal::LEVEL_WARN, 'pinned to branch snapshot dev-main', SignalDataStub::of(Signal::S6, []));
         $findings = [
             $this->finding($graph, 'root/a', Verdict::PINNED, [$own]),
-            $this->finding($graph, 'vendor/leaf', Verdict::ABANDONED, [new Signal(Signal::S1, Signal::LEVEL_HIGH, 'marked abandoned by its repository')]),
+            $this->finding($graph, 'vendor/leaf', Verdict::ABANDONED, [new Signal(Signal::LEVEL_HIGH, 'marked abandoned by its repository', SignalDataStub::of(Signal::S1, []))]),
         ];
 
         $f = $this->byName(TransitiveExposure::attach($findings, $graph));
@@ -125,7 +126,7 @@ final class TransitiveExposureTest extends TestCase
     {
         $graph = $this->graph();
         $findings = [
-            $this->finding($graph, 'root/a', Verdict::STALE, [new Signal(Signal::S2, Signal::LEVEL_WARN, 'old')]),
+            $this->finding($graph, 'root/a', Verdict::STALE, [new Signal(Signal::LEVEL_WARN, 'old', SignalDataStub::of(Signal::S2, []))]),
             $this->finding($graph, 'root/b', Verdict::OK),
         ];
 
@@ -149,7 +150,7 @@ final class TransitiveExposureTest extends TestCase
         // The install-time path analyses only the transaction: root/b is in the lock and reaches
         // the leaf, but it is not in the list, so no finding for it appears.
         $graph = $this->graph();
-        $findings = [$this->finding($graph, 'vendor/leaf', Verdict::STALE, [new Signal(Signal::S2, Signal::LEVEL_WARN, 'old')])];
+        $findings = [$this->finding($graph, 'vendor/leaf', Verdict::STALE, [new Signal(Signal::LEVEL_WARN, 'old', SignalDataStub::of(Signal::S2, []))])];
 
         $result = TransitiveExposure::attach($findings, $graph);
 
@@ -181,8 +182,8 @@ final class TransitiveExposureTest extends TestCase
             'pulls in 7 flagged packages: vendor/z-abandoned (abandoned), vendor/f-silent (silent), vendor/a-stale (stale), vendor/b-stale (stale), vendor/c-stale (stale) and 2 more',
             $s7->summary()
         );
-        self::assertSame(7, $s7->data()['flagged']);
-        $pulledIn = $s7->data()['packages'];
+        self::assertSame(7, JsonPath::decoded($s7->data())['flagged']);
+        $pulledIn = JsonPath::decoded($s7->data())['packages'];
         self::assertIsArray($pulledIn);
         self::assertCount(7, $pulledIn);
     }
@@ -198,7 +199,7 @@ final class TransitiveExposureTest extends TestCase
             $packages[] = ['name' => $root, 'version' => '1.0.0', 'require' => $i === 1 ? ['vendor/shared' => '^1', 'vendor/leaf' => '^1'] : ['vendor/shared' => '^1']];
         }
         $graph = DependencyGraph::fromLock(LockFile::fromArray(['packages' => $packages]), ProjectConfig::fromArray(['require' => $roots]), false);
-        $stale = new Signal(Signal::S2, Signal::LEVEL_WARN, 'old');
+        $stale = new Signal(Signal::LEVEL_WARN, 'old', SignalDataStub::of(Signal::S2, []));
         $findings = [$this->finding($graph, 'vendor/shared', Verdict::STALE, [$stale]), $this->finding($graph, 'vendor/leaf', Verdict::STALE, [$stale])];
         foreach (array_keys($roots) as $root) {
             $findings[] = $this->finding($graph, $root, Verdict::OK);
@@ -269,7 +270,7 @@ final class TransitiveExposureTest extends TestCase
             $packages[] = ['name' => $root, 'version' => '1.0.0', 'require' => ['vendor/shared' => '^1']];
         }
         $graph = DependencyGraph::fromLock(LockFile::fromArray(['packages' => $packages]), ProjectConfig::fromArray(['require' => $roots]), false);
-        $findings = [$this->finding($graph, 'vendor/shared', Verdict::STALE, [new Signal(Signal::S2, Signal::LEVEL_WARN, 'old')])];
+        $findings = [$this->finding($graph, 'vendor/shared', Verdict::STALE, [new Signal(Signal::LEVEL_WARN, 'old', SignalDataStub::of(Signal::S2, []))])];
         foreach (array_keys($roots) as $root) {
             $findings[] = $this->finding($graph, $root, Verdict::OK);
         }
@@ -312,15 +313,15 @@ final class TransitiveExposureTest extends TestCase
     {
         $packages = [['name' => 'root/a', 'version' => '1.0.0', 'require' => ['vendor/leaf' => '^1']], ['name' => 'vendor/leaf', 'version' => '1.0.0']];
         $graph = DependencyGraph::fromLock(LockFile::fromArray(['packages' => $packages]), ProjectConfig::fromArray(['require' => ['root/a' => '^1']]), false);
-        $s9 = new Signal(Signal::S9, Signal::LEVEL_HIGH, '1 advisory', ['advisories' => [['id' => 'PKSA-1', 'severity' => 'high']], 'releases_read' => true, 'complete' => true]);
+        $s9 = new Signal(Signal::LEVEL_HIGH, '1 advisory', SignalDataStub::of(Signal::S9, ['advisories' => [['id' => 'PKSA-1', 'severity' => 'high']], 'releases_read' => true, 'complete' => true]));
         $leaf = (new FindingBuilder())->withPackage('vendor/leaf')->withSignals([$s9])->withChain($graph->shortestChain('vendor/leaf'))->withDirectDependents(['root/a'])
-            ->withFlags(FlagSet::fromSignals([$s9], null, [Score::advisory('PKSA-1', 'high', 'update')]))->build();
+            ->withFlags(FlagSet::fromSignals([$s9], null, [new CountedAdvisory('PKSA-1', 'high', 'update')]))->build();
         $findings = [$this->finding($graph, 'root/a', Verdict::OK), $leaf];
 
         $a = self::s7($this->byName(TransitiveExposure::attach($findings, $graph))['root/a']);
 
         self::assertNotNull($a);
         self::assertSame('pulls in 1 flagged package: vendor/leaf (vulnerable)', $a->summary());
-        self::assertNull(JsonPath::arrayAt($a->data(), ['packages', 0])['lead']);
+        self::assertNull(JsonPath::arrayAt(JsonPath::decoded($a->data()), ['packages', 0])['lead']);
     }
 }

@@ -9,6 +9,7 @@ use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Signal\Rule\NoReleaseRule;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\Thresholds;
+use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
 use PHPUnit\Framework\TestCase;
 
@@ -31,7 +32,7 @@ final class NoReleaseRuleTest extends TestCase
             'last_version' => '2.0.8',
             'years' => 10.8,
             'dated_by' => null,
-        ], $signal->data());
+        ], JsonPath::decoded($signal->data()));
     }
 
     public function testWarnBetweenThreeAndFive(): void
@@ -68,6 +69,6 @@ final class NoReleaseRuleTest extends TestCase
 
         self::assertNotNull($signal);
         self::assertSame('last release 2021-11-20 (4.8 years ago, dated by laravel/framework)', $signal->summary());
-        self::assertSame(['last_release' => '2021-11-20T15:55:41+00:00', 'last_version' => 'v8.83.29', 'years' => 4.8, 'dated_by' => 'laravel/framework'], $signal->data());
+        self::assertSame(['last_release' => '2021-11-20T15:55:41+00:00', 'last_version' => 'v8.83.29', 'years' => 4.8, 'dated_by' => 'laravel/framework'], JsonPath::decoded($signal->data()));
     }
 }

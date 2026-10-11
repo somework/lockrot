@@ -11,6 +11,7 @@ use Lockrot\Signal\AbandonedIgnored;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\Rule\AbandonedRule;
 use Lockrot\Signal\Signal;
+use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
 use PHPUnit\Framework\TestCase;
 
@@ -23,7 +24,7 @@ final class AbandonedRuleTest extends TestCase
         self::assertSame(Signal::S1, $signal->id());
         self::assertSame(Signal::LEVEL_HIGH, $signal->level());
         self::assertSame('marked abandoned by its repository, replacement: other/pkg', $signal->summary());
-        self::assertSame('other/pkg', $signal->data()['replacement']);
+        self::assertSame('other/pkg', JsonPath::decoded($signal->data())['replacement']);
     }
 
     public function testNotFlagged(): void
@@ -62,7 +63,7 @@ final class AbandonedRuleTest extends TestCase
         self::assertNotNull($signal);
         self::assertSame(Signal::S1, $signal->id());
         self::assertSame('marked abandoned in composer.lock, replacement: other/pkg', $signal->summary());
-        self::assertSame(['marked_by' => 'lock', 'replacement' => 'other/pkg', 'replacement_url' => 'https://packagist.org/packages/other/pkg'], $signal->data());
+        self::assertSame(['marked_by' => 'lock', 'replacement' => 'other/pkg', 'replacement_url' => 'https://packagist.org/packages/other/pkg'], JsonPath::decoded($signal->data()));
     }
 
     private static function listed(LockedPackage $package, ?PackageMetadata $metadata = null): PackageFacts

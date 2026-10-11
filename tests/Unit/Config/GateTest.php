@@ -14,6 +14,7 @@ use Lockrot\Config\Policy;
 use Lockrot\Signal\Signal;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\Notes;
+use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
@@ -186,7 +187,7 @@ final class GateTest extends TestCase
             $findings[] = (new FindingBuilder())->withPackage('v/'.$verdict)->withVerdict($verdict)->withChain(['v/'.$verdict])->withDataDate($at)->build();
             $findings[] = (new FindingBuilder())->withPackage('v/'.$verdict.'-deep')->withVerdict($verdict)->withChain(['v/root', 'v/'.$verdict.'-deep'])->withDataDate($at)->withDev(true)->build();
         }
-        $notChecked = new Signal(Signal::S10, Signal::LEVEL_INFO, 'repository activity not checked', ['unchecked' => [], 'blocks' => ['S3', 'S4']]);
+        $notChecked = new Signal(Signal::LEVEL_INFO, 'repository activity not checked', SignalDataStub::of(Signal::S10, ['unchecked' => [], 'blocks' => ['S3', 'S4']]));
         $findings[] = (new FindingBuilder())->withPackage('v/ok-unchecked')->withSignals([$notChecked])->withChain(['v/ok-unchecked'])->withDataDate($at)->build();
         $report = new Report($findings, $networkFailures ? [Notes::text('a lookup failed', true)] : [], $at, \count($findings), 0);
         if ($baseline === 'none') {

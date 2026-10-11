@@ -7,6 +7,7 @@ namespace Lockrot\Tests\Unit\Verdict;
 use Lockrot\Allowlist\AllowlistEntry;
 use Lockrot\Clock;
 use Lockrot\Data\Abandoned\AbandonedIgnoreMatch;
+use Lockrot\Score\CountedAdvisory;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\Rule\AbandonedRule;
 use Lockrot\Signal\Rule\ArchivedRule;
@@ -14,6 +15,7 @@ use Lockrot\Signal\Rule\NoPushRule;
 use Lockrot\Signal\Rule\NoReleaseRule;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\Thresholds;
+use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
 use Lockrot\Verdict\FlagSet;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -81,7 +83,7 @@ final class FlagSetTest extends TestCase
 
         self::assertSame(['pinned', 'left-behind', 'old-promise', 'stale', 'vulnerable'], $flags->fired());
         self::assertSame(['pinned', 'left-behind', 'old-promise', 'stale'], $flags->countedMaintenance());
-        self::assertSame([self::advisory('A0')], $flags->advisories());
+        self::assertEquals([self::advisory('A0')], $flags->advisories());
         self::assertSame([], FlagSet::fromSignals(self::signals([['S9', 'warn']]), null, [])->fired(), 'S9 without a counted advisory raises nothing');
     }
 
@@ -132,7 +134,7 @@ final class FlagSetTest extends TestCase
         self::assertSame(['silent', 'old-promise', 'vulnerable'], $flags->without('abandoned')->fired());
         self::assertSame(['abandoned', 'vulnerable'], $flags->without('old-promise')->fired());
         self::assertSame(['abandoned', 'old-promise'], $flags->without('vulnerable')->fired());
-        self::assertSame([self::advisory('A1')], $flags->withoutAdvisory('A0')->advisories());
+        self::assertEquals([self::advisory('A1')], $flags->withoutAdvisory('A0')->advisories());
 
         $silent = FlagSet::fromSignals(self::signals([['S2', 'high'], ['S4', 'high'], ['S6', 'high']]), null, []);
         self::assertSame(['pinned'], $silent->without('silent')->fired());
@@ -216,12 +218,11 @@ final class FlagSetTest extends TestCase
      */
     private static function signals(array $signals): array
     {
-        return array_map(static fn (array $s): Signal => new Signal($s[0], $s[1], $s[0].' fired'), $signals);
+        return array_map(static fn (array $s): Signal => new Signal($s[1], $s[0].' fired', SignalDataStub::of($s[0], [])), $signals);
     }
 
-    /** @return array{id: string, severity: string, fix_kind: string} */
-    private static function advisory(string $id): array
+    private static function advisory(string $id): CountedAdvisory
     {
-        return ['id' => $id, 'severity' => 'high', 'fix_kind' => 'update'];
+        return new CountedAdvisory($id, 'high', 'update');
     }
 }

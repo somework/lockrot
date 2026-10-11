@@ -13,6 +13,7 @@ use Lockrot\Exception\ConfigException;
 use Lockrot\Output\FormatContext;
 use Lockrot\Signal\Signal;
 use Lockrot\Tests\Support\FindingBuilder;
+use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
@@ -129,7 +130,7 @@ final class FormatContextTest extends TestCase
     public function testUnderUncheckedAnUnflaggedFindingWhoseCheckDidNotRunIsAnError(): void
     {
         $context = FormatContext::create(null, FailOn::UNCHECKED, Version::STRING);
-        $unchecked = (new FindingBuilder())->withPackage('a/b')->withSignals([new Signal(Signal::S10, Signal::LEVEL_INFO, 'not checked')])->withChain(['a/b'])->withDataDate(new \DateTimeImmutable(self::AT))->build();
+        $unchecked = (new FindingBuilder())->withPackage('a/b')->withSignals([new Signal(Signal::LEVEL_INFO, 'not checked', SignalDataStub::of(Signal::S10, []))])->withChain(['a/b'])->withDataDate(new \DateTimeImmutable(self::AT))->build();
 
         self::assertSame(FormatContext::LEVEL_ERROR, $context->levelOf($unchecked));
         self::assertSame(FormatContext::LEVEL_WARNING, $context->levelOf($this->finding('a/c', Verdict::ABANDONED)), 'flagged without S10');
@@ -143,7 +144,7 @@ final class FormatContextTest extends TestCase
     public function testUnderUncheckedAFindingTheBaselineKnowsStaysANote(): void
     {
         $context = FormatContext::create(null, FailOn::UNCHECKED, Version::STRING);
-        $unchecked = (new FindingBuilder())->withPackage('a/b')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal(Signal::S10, Signal::LEVEL_INFO, 'not checked')])->withChain(['a/b'])->withDataDate(new \DateTimeImmutable(self::AT))->build();
+        $unchecked = (new FindingBuilder())->withPackage('a/b')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal(Signal::LEVEL_INFO, 'not checked', SignalDataStub::of(Signal::S10, []))])->withChain(['a/b'])->withDataDate(new \DateTimeImmutable(self::AT))->build();
 
         self::assertSame(FormatContext::LEVEL_ERROR, $context->levelOf($unchecked), 'without the baseline');
         self::assertSame(FormatContext::LEVEL_NOTE, $context->levelOf($unchecked, $this->comparison([['a/b', Verdict::ABANDONED]], $this->report($unchecked))));

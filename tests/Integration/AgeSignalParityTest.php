@@ -30,6 +30,7 @@ use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\Golden;
+use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Tests\Unit\Signal\FactsBuilder;
 use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\Attributes\CoversNothing;
@@ -151,7 +152,7 @@ final class AgeSignalParityTest extends TestCase
                     foreach ($finding->signals() as $published) {
                         if (\in_array($published->id(), [Signal::S2, Signal::S4, Signal::S8], true)) {
                             $fired[basename($dir)][$finding->package()] = trim(($fired[basename($dir)][$finding->package()] ?? '').' '.$published->id());
-                            self::assertSame($signals[$published->id()]->data(), $published->data(), $what);
+                            self::assertSame(SignalDataStub::fields($signals[$published->id()]), SignalDataStub::fields($published), $what);
                             self::assertSame($signals[$published->id()]->level(), $published->level(), $what);
                         }
                     }
@@ -194,7 +195,7 @@ final class AgeSignalParityTest extends TestCase
     /** @param array<string, string> $keys the reading's part => the signal's data key */
     private static function assertReading(AgeReading $reading, Signal $signal, array $keys, string $what): void
     {
-        $data = $signal->data();
+        $data = SignalDataStub::fields($signal);
         self::assertSame($reading->level(), $signal->level(), $what.': level');
         self::assertSame($reading->years(), $data['years'], $what.': years');
         $at = $reading->at();

@@ -128,7 +128,7 @@ final class ScoreInvariants
     {
         $points = [];
         foreach (ScoreSweep::advisories($inputs['advisories']) as $a) {
-            $points[$a['id']] = [ScoreModel::advisoryPoints($a['severity'], $a['fix_kind']), array_search($a['severity'], ScoreModel::SEVERITIES, true), $a['id']];
+            $points[$a->id()] = [ScoreModel::advisoryPoints($a->severity(), $a->fixKind()), array_search($a->severity(), ScoreModel::SEVERITIES, true), $a->id()];
         }
         $best = max(array_merge([0], array_column($points, 0)));
         $others = array_keys(array_filter($points, static fn (array $p, string $id): bool => $p[0] === $best && $id !== $term['advisory'], \ARRAY_FILTER_USE_BOTH));

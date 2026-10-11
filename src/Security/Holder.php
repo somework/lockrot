@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace Lockrot\Security;
 
 /**
- * One link of the lock that excludes a candidate release: a `held_by[]` entry,
- * without its `holder` block, which the report fills from the holder's own finding.
+ * One link of the lock that excludes a candidate release: a `held_by[]` entry. A root link names no
+ * package there, because the holder is composer.json. `holder` stays null until the report fills it
+ * from the holder's own finding.
  *
  * @internal
  */
-final class Holder
+final class Holder implements \JsonSerializable
 {
     public const ROOT = 'root';
     public const PACKAGE = 'package';
@@ -69,15 +70,18 @@ final class Holder
         return $this->constraint;
     }
 
-    /** @return array{source: string, package: ?string, version: ?string, link: string, constraint: string} */
-    public function toArray(): array
+    /** @return array{source: string, package: ?string, version: ?string, link: string, constraint: string, holder: null} */
+    public function jsonSerialize(): array
     {
+        $root = $this->source === self::ROOT;
+
         return [
             'source' => $this->source,
-            'package' => $this->package,
-            'version' => $this->version,
+            'package' => $root ? null : $this->package,
+            'version' => $root ? null : $this->version,
             'link' => $this->link,
             'constraint' => $this->constraint,
+            'holder' => null,
         ];
     }
 }

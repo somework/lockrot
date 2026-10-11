@@ -12,6 +12,7 @@ use Lockrot\Signal\Signal;
 use Lockrot\Signal\SignalRule;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
+use Lockrot\Tests\Support\SignalDataStub;
 use PHPUnit\Framework\TestCase;
 
 final class SignalSetTest extends TestCase
@@ -35,10 +36,10 @@ final class SignalSetTest extends TestCase
         };
 
         $set = new SignalSet([
-            $rule(new Signal(Signal::S6, Signal::LEVEL_WARN, 'six')),
-            $rule(new Signal(Signal::S3, Signal::LEVEL_HIGH, 'three')),
+            $rule(new Signal(Signal::LEVEL_WARN, 'six', SignalDataStub::of(Signal::S6, []))),
+            $rule(new Signal(Signal::LEVEL_HIGH, 'three', SignalDataStub::of(Signal::S3, []))),
             $rule(null),
-            $rule(new Signal(Signal::S1, Signal::LEVEL_HIGH, 'one')),
+            $rule(new Signal(Signal::LEVEL_HIGH, 'one', SignalDataStub::of(Signal::S1, []))),
         ]);
         $signals = $set->evaluate(FactsBuilder::facts(FactsBuilder::package()));
 

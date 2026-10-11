@@ -15,6 +15,7 @@ use Lockrot\Signal\Rule\NoReleaseRule;
 use Lockrot\Signal\Rule\NotCheckedRule;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\Thresholds;
+use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -44,7 +45,7 @@ final class NotCheckedReachabilityTest extends TestCase
         $signal = (new NotCheckedRule())->evaluate($facts);
 
         self::assertNotNull($signal, 'the shape is one S10 is raised on, or this test proves nothing');
-        $blocks = $signal->data()['blocks'];
+        $blocks = JsonPath::decoded($signal->data())['blocks'];
         self::assertIsArray($blocks);
         self::assertNotSame([], $blocks);
         foreach ($blocks as $id) {

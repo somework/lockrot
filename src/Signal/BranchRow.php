@@ -8,6 +8,7 @@ use Lockrot\Clock;
 use Lockrot\Data\Repository\ReleaseBranch;
 use Lockrot\Security\BranchFixes;
 use Lockrot\Security\PackageFixes;
+use Lockrot\Signal\Data\LeftBehindData;
 
 /**
  * One release branch of a package as the details block shows it: its newest
@@ -62,7 +63,7 @@ final class BranchRow
         foreach ($fixes === null ? [] : $fixes->branches() as $branchFixes) {
             $fixesByBranch[$branchFixes->branch()] = $branchFixes;
         }
-        $s8Data = $s8 === null ? [] : $s8->data();
+        $s8Data = $s8 === null ? null : $s8->data();
         $rows = [];
         foreach ($keys as $key) {
             $release = $byBranch[$key];
@@ -83,8 +84,8 @@ final class BranchRow
             $row->missesTargetPhp = $floor->missesTarget($row->php);
             $row->missesProjectPhp = $floor->missesProject($row->php);
             $released = $row->highestReleased;
-            if ($released === null && ($s8Data['newest_branch'] ?? null) === $row->branch && \is_string($s8Data['newest_release'] ?? null)) {
-                $released = new \DateTimeImmutable($s8Data['newest_release']);
+            if ($released === null && $s8Data instanceof LeftBehindData && $s8Data->newestBranch() === $row->branch) {
+                $released = new \DateTimeImmutable($s8Data->newestRelease());
             }
             $row->releasedYears = $released === null ? null : $clock->tenthsSince($released) / 10;
             $row->fixes = $fixesByBranch[$row->branch] ?? null;

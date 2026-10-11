@@ -28,6 +28,7 @@ use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\MemoisingMetadataLoader;
+use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Tests\Support\ValidatesJsonSchemas;
 use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\Attributes\CoversNothing;
@@ -106,7 +107,7 @@ final class BranchFloorAgreementTest extends TestCase
                         }
                         foreach ($finding->signals() as $signal) {
                             if ($signal->id() === Signal::S8) {
-                                $source = $this->agree($signal->data(), $rows, $target, $projectPhp, $what.' '.$finding->package());
+                                $source = $this->agree(SignalDataStub::fields($signal), $rows, $target, $projectPhp, $what.' '.$finding->package());
                                 $sources[$source ?? 'null'] = true;
                             }
                         }

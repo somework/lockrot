@@ -10,8 +10,12 @@ use Lockrot\Data\Repository\MetadataFailure;
 use Lockrot\Data\Repository\ReleaseBranch;
 use Lockrot\Security\BranchFixes;
 use Lockrot\Security\Fix;
+use Lockrot\Security\Holder;
 use Lockrot\Security\PackageFixes;
 use Lockrot\Security\Severity;
+use Lockrot\Signal\Data\AdvisoryRow;
+use Lockrot\Signal\Data\Check;
+use Lockrot\Signal\Data\NotCheckedData;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\Rule\AdvisoryRule;
@@ -25,8 +29,6 @@ use Lockrot\Signal\Signal;
  * own fields ({@see Finding::details()}).
  *
  * @internal
- *
- * @phpstan-type Check array{check: string, reason: string, blocks: list<string>}
  */
 final class FindingDetails
 {
@@ -43,8 +45,7 @@ final class FindingDetails
     /** @var list<IgnoredAdvisory> */
     private array $ignored;
     private ?PackageFixes $fixes;
-    /** @var ?Check */
-    private ?array $releasesUnchecked = null;
+    private ?Check $releasesUnchecked = null;
 
     /**
      * @param list<Check>                                                   $skipped
@@ -98,8 +99,8 @@ final class FindingDetails
         return $details;
     }
 
-    /** @return ?Check the S10 entry for release data a counted advisory needed and did not get */
-    public function releasesUnchecked(): ?array
+    /** The S10 entry for release data a counted advisory needed and did not get. */
+    public function releasesUnchecked(): ?Check
     {
         return $this->releasesUnchecked;
     }
@@ -118,10 +119,10 @@ final class FindingDetails
     {
         $inS10 = [];
         foreach ($signals as $signal) {
-            if ($signal->id() === Signal::S10) {
-                $gaps = $signal->data()['unchecked'] ?? [];
-                foreach (\is_array($gaps) ? $gaps : [] as $gap) {
-                    $inS10[] = \is_array($gap) ? ($gap['check'] ?? null) : null;
+            $data = $signal->data();
+            if ($data instanceof NotCheckedData) {
+                foreach ($data->checks() as $gap) {
+                    $inS10[] = $gap->check();
                 }
             }
         }
@@ -131,15 +132,15 @@ final class FindingDetails
             if ($activity === null) {
                 $activity = $entry !== null && $entry->acceptsAll() ? 'allowlisted' : ($facts->package()->isFromComposerRepository() ? 'no_repository' : 'not_from_composer_repository');
             }
-            $skipped[] = ['check' => 'repository_activity', 'reason' => $activity, 'blocks' => [Signal::S3, Signal::S4]];
+            $skipped[] = new Check('repository_activity', $activity, [Signal::S3, Signal::S4]);
         }
         if ($facts->metadataStatus() !== PackageFacts::METADATA_READ) {
-            $skipped[] = ['check' => 'release_metadata', 'reason' => $facts->metadataStatus(), 'blocks' => [Signal::S2, Signal::S8]];
+            $skipped[] = new Check('release_metadata', $facts->metadataStatus(), [Signal::S2, Signal::S8]);
         } elseif (ReleaseBranch::of($facts->package()->version()) === null) {
-            $skipped[] = ['check' => 'release_branch', 'reason' => 'branch_snapshot', 'blocks' => [Signal::S8]];
+            $skipped[] = new Check('release_branch', 'branch_snapshot', [Signal::S8]);
         }
         if (\in_array($advisoryReason, ['not_from_composer_repository', 'unparseable_version'], true)) {
-            $skipped[] = ['check' => 'advisories', 'reason' => (string) $advisoryReason, 'blocks' => [Signal::S9]];
+            $skipped[] = new Check('advisories', (string) $advisoryReason, [Signal::S9]);
         }
 
         return $skipped;
@@ -183,7 +184,7 @@ final class FindingDetails
      * report-2's `security`: `vulnerable` with the counts, the fix and the release scan when an
      * advisory counts, else `clear` on a complete lookup and `unchecked` on any other.
      *
-     * @param list<array<string, mixed>> $rows the S9 rows, each with its `severity` bucket and `fix`
+     * @param list<AdvisoryRow> $rows
      *
      * @return array<string, mixed>
      */
@@ -201,6 +202,7 @@ final class FindingDetails
             return $out + ['ignored' => $ignored, 'ignored_count' => $standing->ignoredCount()];
         }
         $gets = $this->fixes === null ? null : $this->fixes->gets();
+        $installed = $this->installedBranchFixes($rows, $branch);
 
         return $out + [
             'worst' => self::worst($standing->counts()),
@@ -208,7 +210,7 @@ final class FindingDetails
             'ignored' => $ignored,
             'ignored_count' => $standing->ignoredCount(),
             'fix_kind' => $standing->fixKind(),
-            'installed_branch_fixes' => $this->installedBranchFixes($rows, $branch),
+            'installed_branch_fixes' => $installed === null ? null : self::branchFixes($installed),
             'move_in' => null,
             'gets' => $gets === null ? null : [
                 'version' => $gets->version(),
@@ -220,7 +222,7 @@ final class FindingDetails
         ];
     }
 
-    /** @param list<array<string, mixed>> $rows the S9 rows, each with its `severity` bucket and `fix` */
+    /** @param list<AdvisoryRow> $rows */
     public function standing(array $rows): SecurityStanding
     {
         if ($rows === []) {
@@ -229,8 +231,7 @@ final class FindingDetails
         // With no move, `fix_kind` is the hardest kind of its advisories: FIX_KINDS runs easiest first.
         $hardest = 0;
         foreach ($rows as $row) {
-            $fix = \is_array($row['fix'] ?? null) ? $row['fix'] : [];
-            $hardest = max($hardest, (int) array_search($fix['kind'] ?? Fix::UNKNOWN, ScoreModel::FIX_KINDS, true));
+            $hardest = max($hardest, (int) array_search($row->fix()->kind(), ScoreModel::FIX_KINDS, true));
         }
 
         return SecurityStanding::vulnerable($this->check, \count($this->ignored), self::counts($rows), ScoreModel::FIX_KINDS[$hardest]);
@@ -239,53 +240,44 @@ final class FindingDetails
     /**
      * `flags[vulnerable].summary`, from the S9 rows and the installed branch row.
      *
-     * @param list<array<string, mixed>> $rows
+     * @param list<AdvisoryRow> $rows the deciding one marked
      */
     public function vulnerableSummary(array $rows, ?string $branch, string $decidingSeverity): string
     {
         $counts = self::counts($rows);
-        $installed = $this->installedBranchFixes($rows, $branch);
 
-        return FlagSentence::vulnerable(
-            $rows,
-            $counts,
-            self::worst($counts),
-            $decidingSeverity,
-            $branch,
-            $installed === null ? null : ['fixed' => $installed['fixed'], 'unknown' => $installed['unknown'], 'of' => $installed['of'], 'fix_kind' => $installed['fix_kind']]
-        );
+        return FlagSentence::vulnerable($rows, $counts, self::worst($counts), $decidingSeverity, $branch, $this->installedBranchFixes($rows, $branch));
     }
 
     /**
      * The installed branch's `fixes`, null only for a branch snapshot. With no release data the
      * scan has no branch row, so the S9 rows give it: unread release data gives no fix (SPEC §5.3).
      *
-     * @param list<array<string, mixed>> $rows
-     *
-     * @return ?array{fixed: int, unknown: int, of: int, fix_kind: ?string, lowest: ?string, newest: ?string, held_by: list<array<string, mixed>>, if_applied: null}
+     * @param list<AdvisoryRow> $rows
      */
-    private function installedBranchFixes(array $rows, ?string $branch): ?array
+    private function installedBranchFixes(array $rows, ?string $branch): ?BranchFixes
     {
         if ($branch === null) {
             return null;
         }
         $installed = $this->fixes === null ? null : $this->fixes->installedBranch();
         if ($installed !== null) {
-            return self::branchFixes($installed);
+            return $installed;
         }
-        $fixed = 0;
+        $clears = [];
         $unknown = 0;
         foreach ($rows as $row) {
-            $fix = \is_array($row['fix'] ?? null) ? $row['fix'] : [];
-            $fixed += ($fix['on_installed_branch'] ?? null) === true ? 1 : 0;
-            $unknown += ($fix['kind'] ?? Fix::UNKNOWN) === Fix::UNKNOWN ? 1 : 0;
+            if ($row->fix()->onInstalledBranch() === true) {
+                $clears[] = $row->id();
+            }
+            $unknown += $row->fix()->kind() === Fix::UNKNOWN ? 1 : 0;
         }
 
-        return ['fixed' => $fixed, 'unknown' => $unknown, 'of' => \count($rows), 'fix_kind' => null, 'lowest' => null, 'newest' => null, 'held_by' => [], 'if_applied' => null];
+        return BranchFixes::installedFromRows($branch, $clears, $unknown, \count($rows));
     }
 
     /**
-     * @param list<array<string, mixed>> $rows
+     * @param list<AdvisoryRow> $rows
      *
      * @return array<string, int> every severity in display order
      */
@@ -293,8 +285,7 @@ final class FindingDetails
     {
         $counts = array_fill_keys(Severity::DISPLAY_ORDER, 0);
         foreach ($rows as $row) {
-            $severity = \is_string($row['severity'] ?? null) ? $row['severity'] : Severity::UNRATED;
-            $counts[$severity] = ($counts[$severity] ?? 0) + 1;
+            $counts[$row->severity()] = ($counts[$row->severity()] ?? 0) + 1;
         }
 
         return $counts;
@@ -309,7 +300,7 @@ final class FindingDetails
     /**
      * A branch row's `fixes`. The score after a move to its candidate waits for the move.
      *
-     * @return array{fixed: int, unknown: int, of: int, fix_kind: ?string, lowest: ?string, newest: ?string, held_by: list<array<string, mixed>>, if_applied: null}
+     * @return array{fixed: int, unknown: int, of: int, fix_kind: ?string, lowest: ?string, newest: ?string, held_by: list<Holder>, if_applied: null}
      */
     public static function branchFixes(BranchFixes $row): array
     {
@@ -322,7 +313,7 @@ final class FindingDetails
             'fix_kind' => $row->fixKind(),
             'lowest' => $row->lowest(),
             'newest' => $row->newest(),
-            'held_by' => $candidate === null ? [] : array_map([AdvisoryRule::class, 'heldBy'], $candidate->heldBy()),
+            'held_by' => $candidate === null ? [] : $candidate->heldBy(),
             'if_applied' => null,
         ];
     }

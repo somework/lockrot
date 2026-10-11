@@ -7,7 +7,9 @@ namespace Lockrot\Tests\Support;
 use Lockrot\Allowlist\AllowlistEntry;
 use Lockrot\Analyzer\LibyearsMeasurement;
 use Lockrot\Data\Repository\ReleaseBranch;
+use Lockrot\Legacy\AdvisoryFacts013;
 use Lockrot\Lock\PackageOrigin;
+use Lockrot\Signal\Data\Check;
 use Lockrot\Signal\Signal;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\FindingDetails;
@@ -38,6 +40,7 @@ final class FindingBuilder
     private ?LibyearsMeasurement $libyears = null;
     private ?PackageOrigin $origin = null;
     private ?string $replacementNamedBy = null;
+    private ?AdvisoryFacts013 $advisoryFacts013 = null;
     private ?FlagSet $flags = null;
     private bool $maintenanceJudged = true;
     private bool $unscored = false;
@@ -162,6 +165,15 @@ final class FindingBuilder
         return $clone;
     }
 
+    /** report-1's S9 facts, which the priority and the no-fix clause read. */
+    public function withAdvisoryFacts013(AdvisoryFacts013 $facts): self
+    {
+        $clone = clone $this;
+        $clone->advisoryFacts013 = $facts;
+
+        return $clone;
+    }
+
     public function withFlags(?FlagSet $flags, bool $maintenanceJudged = true): self
     {
         $clone = clone $this;
@@ -187,7 +199,7 @@ final class FindingBuilder
      */
     public function build(): Finding
     {
-        $finding = new Finding($this->package, $this->version, $this->verdict, $this->signals, $this->chain, $this->allowlistReason, $this->dataDate, $this->note, $this->dev, $this->directDependents, $this->libyears, $this->origin, $this->replacementNamedBy);
+        $finding = new Finding($this->package, $this->version, $this->verdict, $this->signals, $this->chain, $this->allowlistReason, $this->dataDate, $this->note, $this->dev, $this->directDependents, $this->libyears, $this->origin, $this->replacementNamedBy, $this->advisoryFacts013);
         if ($this->flags !== null) {
             return $finding->withFlags($this->flags, $this->maintenanceJudged)->withDetails(self::detailsOf($finding, $this->maintenanceJudged));
         }
@@ -197,7 +209,7 @@ final class FindingBuilder
         $entry = $this->allowlistReason === null ? null : new AllowlistEntry($this->package, null, $this->allowlistReason, null, AllowlistEntry::BY_PROJECT);
         $flags = FlagSet::fromSignals($this->signals, $entry, []);
         if ($flags->fired() === [] && isset(self::RAISED_BY[$this->verdict])) {
-            $flags = FlagSet::fromSignals(array_map(static fn (array $raise): Signal => new Signal($raise[0], $raise[1], 'set by the verdict'), self::RAISED_BY[$this->verdict]), $entry, []);
+            $flags = FlagSet::fromSignals(array_map(static fn (array $raise): Signal => new Signal($raise[1], 'set by the verdict', SignalDataStub::of($raise[0], [])), self::RAISED_BY[$this->verdict]), $entry, []);
         }
 
         return $finding->withFlags($flags, $this->verdict !== Verdict::UNKNOWN)->withDetails(self::detailsOf($finding, $this->verdict !== Verdict::UNKNOWN));
@@ -212,9 +224,9 @@ final class FindingBuilder
         $status = $maintenanceJudged ? 'read' : (!$finding->isFromComposerRepository() ? 'not_from_composer_repository' : ($finding->note() === 'not found in the repository' ? 'not_found' : 'unavailable'));
         $skipped = [];
         if ($status !== 'read') {
-            $skipped[] = ['check' => 'release_metadata', 'reason' => $status, 'blocks' => [Signal::S2, Signal::S8]];
+            $skipped[] = new Check('release_metadata', $status, [Signal::S2, Signal::S8]);
         } elseif (ReleaseBranch::of($finding->version()) === null) {
-            $skipped[] = ['check' => 'release_branch', 'reason' => 'branch_snapshot', 'blocks' => [Signal::S8]];
+            $skipped[] = new Check('release_branch', 'branch_snapshot', [Signal::S8]);
         }
         $reason = $finding->allowlistReason();
         $entry = $reason === null ? null : new AllowlistEntry($finding->package(), null, $reason, null, AllowlistEntry::BY_PROJECT);

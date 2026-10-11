@@ -10,6 +10,7 @@ use Lockrot\Output\InstallSummaryFormatter;
 use Lockrot\Signal\Signal;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\Notes;
+use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -179,10 +180,10 @@ final class InstallSummaryFormatterTest extends TestCase
     /** The block is read in passing: the chain stays, the other parents and what a package pulls in (S7) do not. */
     public function testAFindingLineKeepsTheChainButNeitherTheOtherParentsNorS7(): void
     {
-        $s7 = new Signal(Signal::S7, Signal::LEVEL_INFO, 'pulls in 1 flagged package: vendor/b (abandoned)', ['flagged' => 1, 'packages' => []]);
+        $s7 = new Signal(Signal::LEVEL_INFO, 'pulls in 1 flagged package: vendor/b (abandoned)', SignalDataStub::of(Signal::S7, ['flagged' => 1, 'packages' => []]));
         $report = $this->report([
             (new FindingBuilder())->withPackage('vendor/b')->withVersion('2.0.0')->withVerdict(Verdict::ABANDONED)->withChain(['vendor/a', 'vendor/b'])->withNote('marked abandoned by its repository')->withDirectDependents(['vendor/a', 'vendor/c'])->build(),
-            (new FindingBuilder())->withPackage('vendor/a')->withVerdict(Verdict::STALE)->withSignals([new Signal('S2', 'warn', 'last release 2022-05-20 (4.3 years ago)'), $s7])->withChain(['vendor/a'])->withDirectDependents(['vendor/a'])->build(),
+            (new FindingBuilder())->withPackage('vendor/a')->withVerdict(Verdict::STALE)->withSignals([new Signal('warn', 'last release 2022-05-20 (4.3 years ago)', SignalDataStub::of('S2', [])), $s7])->withChain(['vendor/a'])->withDirectDependents(['vendor/a'])->build(),
         ], [], 3);
 
         $lines = (new InstallSummaryFormatter())->format($report);

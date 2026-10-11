@@ -718,6 +718,6 @@ final class FixFinderTest extends TestCase
      */
     private static function holders(array $holders): array
     {
-        return array_map(static fn (Holder $holder): array => $holder->toArray(), $holders);
+        return array_map(static fn (Holder $holder): array => ['source' => $holder->source(), 'package' => $holder->package(), 'version' => $holder->version(), 'link' => $holder->link(), 'constraint' => $holder->constraint()], $holders);
     }
 }

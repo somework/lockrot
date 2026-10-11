@@ -10,6 +10,12 @@ use Lockrot\Analyzer\LibyearsMeasurement;
 use Lockrot\Data\Advisory\Advisory;
 use Lockrot\Legacy\Priority013;
 use Lockrot\Lock\LockFile;
+use Lockrot\Score\CountedAdvisory;
+use Lockrot\Signal\Data\AdvisoryData;
+use Lockrot\Signal\Data\AdvisoryRow;
+use Lockrot\Signal\Data\LeftBehindData;
+use Lockrot\Signal\Data\PinnedData;
+use Lockrot\Signal\Data\SignalData;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\Rule\NotCheckedRule;
@@ -17,6 +23,7 @@ use Lockrot\Signal\Signal;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\Origins;
+use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\FindingDetails;
 use Lockrot\Verdict\FlagSet;
@@ -36,15 +43,26 @@ final class FindingTest extends TestCase
         return ['id' => 'PKSA-fixed-'.$by, 'fixed_by' => $by, 'fixed_on_branch' => $onBranch];
     }
 
+    /**
+     * S9's data with the ids of report-1's rows, which the test passes to
+     * {@see FindingBuilder::withAdvisoryFacts013()}.
+     *
+     * @param list<array<string, mixed>>|string $rows a string is no list, so S9 has no row
+     */
+    private static function s9Data($rows): SignalData
+    {
+        return SignalDataStub::of(Signal::S9, ['advisories' => \is_array($rows) ? array_map(static fn (array $row): array => ['id' => $row['id']], $rows) : $rows]);
+    }
+
     public function testEvidenceAndArray(): void
     {
         $signals = [
-            new Signal('S2', 'high', 'last release 2015-11-16 (10.8 years ago)', ['years' => 10.8]),
-            new Signal('S4', 'high', 'last push 2015-11-16 (10.8 years ago)', ['years' => 10.8]),
+            new Signal('high', 'last release 2015-11-16 (10.8 years ago)', SignalDataStub::of('S2', ['years' => 10.8])),
+            new Signal('high', 'last push 2015-11-16 (10.8 years ago)', SignalDataStub::of('S4', ['years' => 10.8])),
         ];
         $finding = (new FindingBuilder())->withPackage('phpzip/phpzip')->withVersion('2.0.8')->withVerdict(Verdict::SILENT)->withSignals($signals)->withChain(['wallabag/wallabag', 'phpzip/phpzip'])->withDataDate(new \DateTimeImmutable('2026-09-14T10:00:00+00:00'))->build();
         self::assertSame('last release 2015-11-16 (10.8 years ago); last push 2015-11-16 (10.8 years ago)', $finding->evidence());
-        $array = $finding->toArray();
+        $array = JsonPath::decoded($finding->toArray());
         self::assertSame('phpzip/phpzip', $array['package']);
         self::assertSame('2.0.8', $array['version']);
         self::assertSame('high', $array['verdict'], 'report-2 writes the grade: silent halved for reach');
@@ -56,7 +74,7 @@ final class FindingTest extends TestCase
             ['last release 2015-11-16 (10.8 years ago)', 'last push 2015-11-16 (10.8 years ago)'],
             array_column($array['signals'], 'summary')
         );
-        self::assertSame([['years' => 10.8], ['years' => 10.8]], array_column($array['signals'], 'data'));
+        self::assertSame([10.8, 10.8], array_column(array_column($array['signals'], 'data'), 'years'));
         self::assertStringStartsWith('silent: last release ', JsonPath::stringAt($array, ['evidence']), 'the counted flag and its sentence');
         self::assertSame('2026-09-14T10:00:00+00:00', $array['data_date']);
         self::assertSame(['wallabag/wallabag', 'phpzip/phpzip'], $array['chain']);
@@ -65,11 +83,12 @@ final class FindingTest extends TestCase
     public function testAnAdvisoryOnAnAbandonedPackageRaisesThePriorityAndSaysNoFixIsExpected(): void
     {
         $signals = [
-            new Signal('S1', 'high', 'marked abandoned by its repository'),
-            new Signal('S9', 'warn', '1 security advisory affects 1.0.0 (CVE-2024-0001)', ['advisories' => [self::OPEN]]),
+            new Signal('high', 'marked abandoned by its repository', SignalDataStub::of('S1', [])),
+            new Signal('warn', '1 security advisory affects 1.0.0 (CVE-2024-0001)', self::s9Data([self::OPEN])),
         ];
-        $direct = (new FindingBuilder())->withVerdict(Verdict::ABANDONED)->withSignals($signals)->withDirectDependents(['vendor/pkg'])->build();
-        $transitiveDev = (new FindingBuilder())->withVerdict(Verdict::ABANDONED)->withSignals($signals)->withChain(['root/app', 'vendor/pkg'])->withDev(true)->withDirectDependents(['root/app'])->build();
+        $legacy = SignalDataStub::legacy([self::OPEN]);
+        $direct = (new FindingBuilder())->withVerdict(Verdict::ABANDONED)->withSignals($signals)->withDirectDependents(['vendor/pkg'])->withAdvisoryFacts013($legacy)->build();
+        $transitiveDev = (new FindingBuilder())->withVerdict(Verdict::ABANDONED)->withSignals($signals)->withChain(['root/app', 'vendor/pkg'])->withDev(true)->withDirectDependents(['root/app'])->withAdvisoryFacts013($legacy)->build();
 
         self::assertTrue($direct->hasUnfixableAdvisory());
         self::assertSame(Priority013::CRITICAL, $direct->priority());
@@ -80,9 +99,9 @@ final class FindingTest extends TestCase
 
     public function testAnAdvisoryAloneChangesNeitherThePriorityNorTheWording(): void
     {
-        $s9 = new Signal('S9', 'warn', '1 security advisory affects 1.0.0 (CVE-2024-0001)', ['advisories' => [self::OPEN]]);
-        $pinned = (new FindingBuilder())->withVersion('dev-main')->withVerdict(Verdict::PINNED)->withSignals([new Signal('S6', 'warn', 'pinned to branch snapshot dev-main'), $s9])->withDirectDependents(['vendor/pkg'])->build();
-        $ok = (new FindingBuilder())->withSignals([$s9])->withDirectDependents(['vendor/pkg'])->build();
+        $s9 = new Signal('warn', '1 security advisory affects 1.0.0 (CVE-2024-0001)', self::s9Data([self::OPEN]));
+        $pinned = (new FindingBuilder())->withVersion('dev-main')->withVerdict(Verdict::PINNED)->withSignals([new Signal('warn', 'pinned to branch snapshot dev-main', SignalDataStub::of('S6', [])), $s9])->withDirectDependents(['vendor/pkg'])->withAdvisoryFacts013(SignalDataStub::legacyOf(['advisories' => [self::OPEN]]))->build();
+        $ok = (new FindingBuilder())->withSignals([$s9])->withDirectDependents(['vendor/pkg'])->withAdvisoryFacts013(SignalDataStub::legacyOf(['advisories' => [self::OPEN]]))->build();
 
         self::assertFalse($pinned->hasUnfixableAdvisory());
         self::assertSame(Priority013::HIGH, $pinned->priority());
@@ -95,9 +114,9 @@ final class FindingTest extends TestCase
     public function testTheNoFixVerdictsAreExactlyTheThreeWithNoUpstreamToWaitFor(): void
     {
         self::assertSame([Verdict::ABANDONED, Verdict::SILENT, Verdict::LEFT_BEHIND], Finding::NO_FIX_VERDICTS);
-        $s9 = new Signal('S9', 'warn', 'advisory', ['advisories' => [self::OPEN]]);
+        $s9 = new Signal('warn', 'advisory', self::s9Data([self::OPEN]));
         foreach (Verdict::all() as $verdict) {
-            $finding = (new FindingBuilder())->withVerdict($verdict)->withSignals([$s9])->build();
+            $finding = (new FindingBuilder())->withVerdict($verdict)->withSignals([$s9])->withAdvisoryFacts013(SignalDataStub::legacyOf(['advisories' => [self::OPEN]]))->build();
             self::assertSame(\in_array($verdict, Finding::NO_FIX_VERDICTS, true), $finding->hasUnfixableAdvisory(), $verdict);
         }
     }
@@ -105,36 +124,36 @@ final class FindingTest extends TestCase
     /** A row without the fix keys (an earlier report, a hand-built signal) is an advisory nothing fixes. A list that is not one is no advisory. */
     public function testAnAdvisoryRowWithoutFixKeysCountsAsUnfixedAndAMalformedListAsNone(): void
     {
-        $bare = (new FindingBuilder())->withVerdict(Verdict::LEFT_BEHIND)->withSignals([new Signal('S9', 'warn', 'x', ['advisories' => [['id' => 'PKSA-1']]])])->build();
+        $bare = (new FindingBuilder())->withVerdict(Verdict::LEFT_BEHIND)->withSignals([new Signal('warn', 'x', self::s9Data([['id' => 'PKSA-1']]))])->withAdvisoryFacts013(SignalDataStub::legacyOf(['advisories' => [['id' => 'PKSA-1']]]))->build();
         self::assertTrue($bare->hasUnfixableAdvisory());
         self::assertSame('x; no fix expected', $bare->ownEvidence());
 
-        $fixedSomewhere = (new FindingBuilder())->withVerdict(Verdict::LEFT_BEHIND)->withSignals([new Signal('S9', 'warn', 'x', ['advisories' => [['id' => 'PKSA-1', 'fixed_by' => '2.0.0']]])])->build();
+        $fixedSomewhere = (new FindingBuilder())->withVerdict(Verdict::LEFT_BEHIND)->withSignals([new Signal('warn', 'x', self::s9Data([['id' => 'PKSA-1', 'fixed_by' => '2.0.0']]))])->withAdvisoryFacts013(SignalDataStub::legacyOf(['advisories' => [['id' => 'PKSA-1', 'fixed_by' => '2.0.0']]]))->build();
         self::assertSame('x; no fix expected on 1.x', $fixedSomewhere->ownEvidence(), 'no fixed_on_branch key reads as off the branch');
 
-        $onBranchAndOpen = (new FindingBuilder())->withVerdict(Verdict::LEFT_BEHIND)->withSignals([new Signal('S9', 'warn', 'x', ['advisories' => [self::fixed('1.9.0', true), self::OPEN]])])->build();
+        $onBranchAndOpen = (new FindingBuilder())->withVerdict(Verdict::LEFT_BEHIND)->withSignals([new Signal('warn', 'x', self::s9Data([self::fixed('1.9.0', true), self::OPEN]))])->withAdvisoryFacts013(SignalDataStub::legacyOf(['advisories' => [self::fixed('1.9.0', true), self::OPEN]]))->build();
         self::assertSame('x; no fix expected', $onBranchAndOpen->ownEvidence(), 'a fix on the branch is not the kind that qualifies the clause');
 
-        $malformed = (new FindingBuilder())->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('S9', 'warn', 'x', ['advisories' => 'not a list'])])->build();
+        $malformed = (new FindingBuilder())->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('warn', 'x', self::s9Data('not a list'))])->withAdvisoryFacts013(SignalDataStub::legacyOf(['advisories' => 'not a list']))->build();
         self::assertFalse($malformed->hasUnfixableAdvisory());
     }
 
     /** The label's reason is read first: S6 before S5 on a pinned finding, S8 before S5 on a left-behind one. */
     public function testTheSignalThatDecidedTheVerdictOpensTheEvidence(): void
     {
-        $s5 = new Signal('S5', 'warn', 'released 2020-09-28, before PHP 8.4 GA (2024-11-21); php constraint ">=7.3" has no upper bound');
-        $s6 = new Signal('S6', 'warn', 'pinned to branch snapshot dev-master');
-        $s8 = new Signal('S8', 'high', 'branch 3.x last released 2020-09-28 (6.0 years ago); 7.x released 7.0.0 (2026-02-06)');
-        $s7 = new Signal('S7', 'info', 'pulls in 1 flagged package: a/b (stale)');
+        $s5 = new Signal('warn', 'released 2020-09-28, before PHP 8.4 GA (2024-11-21); php constraint ">=7.3" has no upper bound', SignalDataStub::of('S5', []));
+        $s6 = new Signal('warn', 'pinned to branch snapshot dev-master', SignalDataStub::of('S6', []));
+        $s8 = new Signal('high', 'branch 3.x last released 2020-09-28 (6.0 years ago); 7.x released 7.0.0 (2026-02-06)', SignalDataStub::of('S8', []));
+        $s7 = new Signal('info', 'pulls in 1 flagged package: a/b (stale)', SignalDataStub::of('S7', []));
 
         $pinned = (new FindingBuilder())->withVersion('dev-master')->withVerdict(Verdict::PINNED)->withSignals([$s5, $s6, $s7])->build();
         $leftBehind = (new FindingBuilder())->withVersion('3.1.1')->withVerdict(Verdict::LEFT_BEHIND)->withSignals([$s5, $s8])->withChain(['root/app', 'vendor/pkg'])->build();
-        $oldPromise = (new FindingBuilder())->withVersion('3.1.1')->withVerdict(Verdict::OLD_PROMISE)->withSignals([$s5, new Signal('S2', 'warn', 'last release 2022-01-01 …')])->build();
+        $oldPromise = (new FindingBuilder())->withVersion('3.1.1')->withVerdict(Verdict::OLD_PROMISE)->withSignals([$s5, new Signal('warn', 'last release 2022-01-01 …', SignalDataStub::of('S2', []))])->build();
 
         self::assertSame($s6->summary().'; '.$s5->summary().'; '.$s7->summary(), $pinned->evidence(), 'S7 still closes the line');
         self::assertSame($s8->summary().'; '.$s5->summary(), $leftBehind->ownEvidence());
         self::assertSame($s5->summary().'; last release 2022-01-01 …', $oldPromise->ownEvidence(), 'signal order when the deciding one is already first');
-        $signals = $pinned->toArray()['signals'];
+        $signals = JsonPath::decoded($pinned->toArray())['signals'];
         self::assertIsArray($signals);
         self::assertSame(['S5', 'S6', 'S7'], array_column($signals, 'id'), 'the JSON keeps signal order');
 
@@ -149,33 +168,37 @@ final class FindingTest extends TestCase
      */
     public function testALeftBehindDirectRequirementSaysWhatToRequire(): void
     {
-        $s8 = new Signal('S8', 'warn', 'branch 6.x last released 2022-06-20 (4.2 years ago); 8.x released 8.2.0 (2026-09-06)', ['suggested_constraint' => '^8.2']);
-        $s5 = new Signal('S5', 'warn', 'released 2022-06-20, before PHP 8.4 GA (2024-11-21); php constraint ">=5.5" has no upper bound');
+        $s8 = new Signal('warn', 'branch 6.x last released 2022-06-20 (4.2 years ago); 8.x released 8.2.0 (2026-09-06)', SignalDataStub::of('S8', ['reachable_branch' => '8.x', 'suggested_constraint' => '^8.2']));
+        $s5 = new Signal('warn', 'released 2022-06-20, before PHP 8.4 GA (2024-11-21); php constraint ">=5.5" has no upper bound', SignalDataStub::of('S5', []));
 
         $direct = (new FindingBuilder())->withPackage('guzzlehttp/guzzle')->withVersion('6.5.8')->withVerdict(Verdict::LEFT_BEHIND)->withSignals([$s5, $s8])->withChain(['guzzlehttp/guzzle'])->build();
         $transitive = (new FindingBuilder())->withPackage('guzzlehttp/guzzle')->withVersion('6.5.8')->withVerdict(Verdict::LEFT_BEHIND)->withSignals([$s5, $s8])->withChain(['root/app', 'guzzlehttp/guzzle'])->build();
         $finished = (new FindingBuilder())->withPackage('guzzlehttp/guzzle')->withVersion('6.5.8')->withVerdict(Verdict::FINISHED)->withSignals([$s8])->withChain(['guzzlehttp/guzzle'])->withAllowlistReason('frozen')->build();
-        $noConstraint = (new FindingBuilder())->withPackage('guzzlehttp/guzzle')->withVersion('6.5.8')->withVerdict(Verdict::LEFT_BEHIND)->withSignals([new Signal('S8', 'warn', $s8->summary())])->withChain(['guzzlehttp/guzzle'])->build();
+        $noConstraint = (new FindingBuilder())->withPackage('guzzlehttp/guzzle')->withVersion('6.5.8')->withVerdict(Verdict::LEFT_BEHIND)->withSignals([new Signal('warn', $s8->summary(), SignalDataStub::of('S8', []))])->withChain(['guzzlehttp/guzzle'])->build();
+        $nullConstraint = (new FindingBuilder())->withPackage('guzzlehttp/guzzle')->withVersion('6.5.8')->withVerdict(Verdict::LEFT_BEHIND)->withSignals([new Signal('warn', $s8->summary(), SignalDataStub::of('S8', []))])->withChain(['guzzlehttp/guzzle'])->build();
+        $emptyConstraint = (new FindingBuilder())->withPackage('guzzlehttp/guzzle')->withVersion('6.5.8')->withVerdict(Verdict::LEFT_BEHIND)->withSignals([new Signal('warn', $s8->summary(), SignalDataStub::of('S8', ['reachable_branch' => '8.x', 'suggested_constraint' => '']))])->withChain(['guzzlehttp/guzzle'])->build();
 
         self::assertSame($s8->summary().'; require ^8.2 to follow; '.$s5->summary(), $direct->ownEvidence());
         self::assertSame($s8->summary().'; '.$s5->summary(), $transitive->ownEvidence(), 'not the project\'s line to change');
         self::assertSame($s8->summary(), $finished->ownEvidence(), 'the allowlist decided; nothing to follow');
         self::assertSame($s8->summary(), $noConstraint->ownEvidence(), 'no constraint on the signal, no clause');
-        $signals = $direct->toArray()['signals'];
+        self::assertSame($s8->summary(), $nullConstraint->ownEvidence(), 'a null constraint, no clause');
+        self::assertSame($s8->summary(), $emptyConstraint->ownEvidence(), 'an empty constraint, no clause');
+        $signals = JsonPath::decoded($direct->toArray())['signals'];
         self::assertIsArray($signals);
-        self::assertSame(['id' => 'S8', 'level' => 'warn', 'summary' => $s8->summary(), 'data' => ['suggested_constraint' => '^8.2']], $signals[1] ?? null, 'the data travels into --format=json');
+        self::assertSame('^8.2', JsonPath::stringAt($signals, [1, 'data', 'suggested_constraint']), 'the data travels into --format=json');
     }
 
     /** S8 at either level makes the verdict `left-behind` ({@see VerdictEngine}). The raise follows the verdict, not the signal. */
     public function testAnAdvisoryOnALeftBehindBranchIsUnfixableAtEitherLevel(): void
     {
-        $s9 = new Signal('S9', 'warn', '14 security advisories affect 6.5.5 (CVE-a, CVE-b, CVE-c and 11 more)', ['advisories' => [self::OPEN]]);
-        $s8warn = new Signal('S8', 'warn', 'branch 6.x last released 2022-06-20 (4.2 years ago); 8.x released 8.2.0 (2026-09-06)');
-        $s5 = new Signal('S5', 'warn', 'released 2020-06-16, before PHP 8.4 GA (2024-11-21); php constraint ">=5.5" has no upper bound');
+        $s9 = new Signal('warn', '14 security advisories affect 6.5.5 (CVE-a, CVE-b, CVE-c and 11 more)', self::s9Data([self::OPEN]));
+        $s8warn = new Signal('warn', 'branch 6.x last released 2022-06-20 (4.2 years ago); 8.x released 8.2.0 (2026-09-06)', SignalDataStub::of('S8', []));
+        $s5 = new Signal('warn', 'released 2020-06-16, before PHP 8.4 GA (2024-11-21); php constraint ">=5.5" has no upper bound', SignalDataStub::of('S5', []));
 
-        $leftBehind = (new FindingBuilder())->withPackage('guzzlehttp/guzzle')->withVersion('6.5.5')->withVerdict(Verdict::LEFT_BEHIND)->withSignals([$s5, $s8warn, $s9])->withChain(['guzzlehttp/guzzle'])->withDirectDependents(['guzzlehttp/guzzle'])->build();
-        $oldPromise = (new FindingBuilder())->withPackage('guzzlehttp/guzzle')->withVersion('6.5.5')->withVerdict(Verdict::OLD_PROMISE)->withSignals([$s5, $s9])->withChain(['guzzlehttp/guzzle'])->withDirectDependents(['guzzlehttp/guzzle'])->build();
-        $finished = (new FindingBuilder())->withPackage('guzzlehttp/guzzle')->withVersion('6.5.5')->withVerdict(Verdict::FINISHED)->withSignals([$s8warn, $s9])->withChain(['guzzlehttp/guzzle'])->withAllowlistReason('frozen')->withDirectDependents(['guzzlehttp/guzzle'])->build();
+        $leftBehind = (new FindingBuilder())->withPackage('guzzlehttp/guzzle')->withVersion('6.5.5')->withVerdict(Verdict::LEFT_BEHIND)->withSignals([$s5, $s8warn, $s9])->withChain(['guzzlehttp/guzzle'])->withDirectDependents(['guzzlehttp/guzzle'])->withAdvisoryFacts013(SignalDataStub::legacyOf(['advisories' => [self::OPEN]]))->build();
+        $oldPromise = (new FindingBuilder())->withPackage('guzzlehttp/guzzle')->withVersion('6.5.5')->withVerdict(Verdict::OLD_PROMISE)->withSignals([$s5, $s9])->withChain(['guzzlehttp/guzzle'])->withDirectDependents(['guzzlehttp/guzzle'])->withAdvisoryFacts013(SignalDataStub::legacyOf(['advisories' => [self::OPEN]]))->build();
+        $finished = (new FindingBuilder())->withPackage('guzzlehttp/guzzle')->withVersion('6.5.5')->withVerdict(Verdict::FINISHED)->withSignals([$s8warn, $s9])->withChain(['guzzlehttp/guzzle'])->withAllowlistReason('frozen')->withDirectDependents(['guzzlehttp/guzzle'])->withAdvisoryFacts013(SignalDataStub::legacyOf(['advisories' => [self::OPEN]]))->build();
 
         self::assertTrue($leftBehind->hasUnfixableAdvisory());
         self::assertSame(Priority013::CRITICAL, $leftBehind->priority(), 'high raised to critical');
@@ -192,15 +215,15 @@ final class FindingTest extends TestCase
      */
     public function testAnAbandonedPackageWithAReplacementSaysWhereToMigrate(): void
     {
-        $s9 = new Signal('S9', 'warn', '1 security advisory affects v5.4.12 (CVE-2016-10074)', ['advisories' => [self::OPEN]]);
-        $replaced = new Signal('S1', 'high', 'marked abandoned by its repository, replacement: symfony/mailer', ['replacement' => 'symfony/mailer']);
-        $bare = new Signal('S1', 'high', 'marked abandoned by its repository', ['replacement' => '']);
+        $s9 = new Signal('warn', '1 security advisory affects v5.4.12 (CVE-2016-10074)', self::s9Data([self::OPEN]));
+        $replaced = new Signal('high', 'marked abandoned by its repository, replacement: symfony/mailer', SignalDataStub::of('S1', ['replacement' => 'symfony/mailer']));
+        $bare = new Signal('high', 'marked abandoned by its repository', SignalDataStub::of('S1', ['replacement' => '']));
 
-        $withReplacement = (new FindingBuilder())->withPackage('swiftmailer/swiftmailer')->withVersion('v5.4.12')->withVerdict(Verdict::ABANDONED)->withSignals([$replaced, $s9])->withChain(['root/app', 'swiftmailer/swiftmailer'])->build();
-        $withoutReplacement = (new FindingBuilder())->withPackage('swiftmailer/swiftmailer')->withVersion('v5.4.12')->withVerdict(Verdict::ABANDONED)->withSignals([$bare, $s9])->withChain(['swiftmailer/swiftmailer'])->build();
-        $silent = (new FindingBuilder())->withPackage('swiftmailer/swiftmailer')->withVersion('v5.4.12')->withVerdict(Verdict::SILENT)->withSignals([$replaced, $s9])->withChain(['swiftmailer/swiftmailer'])->build();
-        $itself = (new FindingBuilder())->withPackage('swiftmailer/swiftmailer')->withVersion('v5.4.12')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('S1', 'high', 'marked abandoned by its repository, replacement: swiftmailer/swiftmailer', ['replacement' => 'swiftmailer/swiftmailer']), $s9])->withChain(['swiftmailer/swiftmailer'])->build();
-        $fixed = (new FindingBuilder())->withPackage('swiftmailer/swiftmailer')->withVersion('v5.4.12')->withVerdict(Verdict::ABANDONED)->withSignals([$replaced, new Signal('S9', 'warn', 'x; fixed by 6.3.0', ['advisories' => [self::fixed('6.3.0', false)]])])->withChain(['swiftmailer/swiftmailer'])->build();
+        $withReplacement = (new FindingBuilder())->withPackage('swiftmailer/swiftmailer')->withVersion('v5.4.12')->withVerdict(Verdict::ABANDONED)->withSignals([$replaced, $s9])->withChain(['root/app', 'swiftmailer/swiftmailer'])->withAdvisoryFacts013(SignalDataStub::legacyOf(['advisories' => [self::OPEN]]))->build();
+        $withoutReplacement = (new FindingBuilder())->withPackage('swiftmailer/swiftmailer')->withVersion('v5.4.12')->withVerdict(Verdict::ABANDONED)->withSignals([$bare, $s9])->withChain(['swiftmailer/swiftmailer'])->withAdvisoryFacts013(SignalDataStub::legacyOf(['advisories' => [self::OPEN]]))->build();
+        $silent = (new FindingBuilder())->withPackage('swiftmailer/swiftmailer')->withVersion('v5.4.12')->withVerdict(Verdict::SILENT)->withSignals([$replaced, $s9])->withChain(['swiftmailer/swiftmailer'])->withAdvisoryFacts013(SignalDataStub::legacyOf(['advisories' => [self::OPEN]]))->build();
+        $itself = (new FindingBuilder())->withPackage('swiftmailer/swiftmailer')->withVersion('v5.4.12')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('high', 'marked abandoned by its repository, replacement: swiftmailer/swiftmailer', SignalDataStub::of('S1', ['replacement' => 'swiftmailer/swiftmailer'])), $s9])->withChain(['swiftmailer/swiftmailer'])->withAdvisoryFacts013(SignalDataStub::legacyOf(['advisories' => [self::OPEN]]))->build();
+        $fixed = (new FindingBuilder())->withPackage('swiftmailer/swiftmailer')->withVersion('v5.4.12')->withVerdict(Verdict::ABANDONED)->withSignals([$replaced, new Signal('warn', 'x; fixed by 6.3.0', self::s9Data([self::fixed('6.3.0', false)]))])->withChain(['swiftmailer/swiftmailer'])->withAdvisoryFacts013(SignalDataStub::legacyOf(['advisories' => [self::fixed('6.3.0', false)]]))->build();
 
         self::assertSame($replaced->summary().'; '.$s9->summary().'; no fix expected; migrate to symfony/mailer', $withReplacement->ownEvidence(), 'transitive or not: the replacement is where the fix is');
         self::assertTrue($withReplacement->hasUnfixableAdvisory());
@@ -209,7 +232,7 @@ final class FindingTest extends TestCase
         self::assertSame($replaced->summary().'; x; fixed by 6.3.0', $fixed->ownEvidence(), 'the fix is out: nothing to migrate for');
         self::assertSame('marked abandoned by its repository, replacement: swiftmailer/swiftmailer; '.$s9->summary().'; no fix expected', $itself->ownEvidence(), 'a repository naming the package itself names nowhere to migrate');
 
-        $freeText = (new FindingBuilder())->withPackage('sensiolabs/framework-extra-bundle')->withVersion('v6.2.10')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('S1', 'high', 'marked abandoned by its repository, replacement: Symfony', ['replacement' => 'Symfony']), $s9])->withChain(['sensiolabs/framework-extra-bundle'])->build();
+        $freeText = (new FindingBuilder())->withPackage('sensiolabs/framework-extra-bundle')->withVersion('v6.2.10')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('high', 'marked abandoned by its repository, replacement: Symfony', SignalDataStub::of('S1', ['replacement' => 'Symfony'])), $s9])->withChain(['sensiolabs/framework-extra-bundle'])->withAdvisoryFacts013(SignalDataStub::legacyOf(['advisories' => [self::OPEN]]))->build();
         self::assertSame('marked abandoned by its repository, replacement: Symfony; '.$s9->summary().'; no fix expected', $freeText->ownEvidence(), 'free text is not a package to migrate to; the clause stays bare and the text is still read as text above it');
     }
 
@@ -218,16 +241,16 @@ final class FindingTest extends TestCase
     {
         $abandoned = static fn (Signal $signal): Finding => (new FindingBuilder())->withVerdict(Verdict::ABANDONED)->withSignals([$signal])->build();
 
-        self::assertSame('Symfony', $abandoned(new Signal('S1', 'high', 'marked abandoned', ['replacement' => 'Symfony']))->replacement());
-        self::assertNull($abandoned(new Signal('S1', 'high', 'marked abandoned', ['replacement' => '']))->replacement());
-        self::assertNull($abandoned(new Signal('S1', 'high', 'marked abandoned', ['replacement' => null]))->replacement());
-        self::assertNull($abandoned(new Signal('S3', 'high', 'repository archived', []))->replacement());
+        self::assertSame('Symfony', $abandoned(new Signal('high', 'marked abandoned', SignalDataStub::of('S1', ['replacement' => 'Symfony'])))->replacement());
+        self::assertNull($abandoned(new Signal('high', 'marked abandoned', SignalDataStub::of('S1', ['replacement' => ''])))->replacement());
+        self::assertNull($abandoned(new Signal('high', 'marked abandoned', SignalDataStub::of('S1', ['replacement' => null])))->replacement());
+        self::assertNull($abandoned(new Signal('high', 'repository archived', SignalDataStub::of('S3', [])))->replacement());
     }
 
     /** report-2's `replacement` names the successor only while `abandoned` counts. */
     public function testTheCountedSuccessorNeedsACountedAbandoned(): void
     {
-        $s1 = new Signal('S1', 'high', 'marked abandoned', ['replacement' => 'symfony/mailer']);
+        $s1 = new Signal('high', 'marked abandoned', SignalDataStub::of('S1', ['replacement' => 'symfony/mailer']));
         $counted = (new FindingBuilder())->withVerdict(Verdict::ABANDONED)->withSignals([$s1])->build();
         $accepted = (new FindingBuilder())->withVerdict(Verdict::ABANDONED)->withSignals([$s1])->withAllowlistReason('kept on purpose')->build();
 
@@ -250,7 +273,7 @@ final class FindingTest extends TestCase
 
     public function testAFindingWithoutFlagsHasNoFlagSet(): void
     {
-        $flags = FlagSet::fromSignals([new Signal('S5', 'warn', 'old promise')], null, []);
+        $flags = FlagSet::fromSignals([new Signal('warn', 'old promise', SignalDataStub::of('S5', []))], null, []);
 
         self::assertSame($flags, (new FindingBuilder())->withFlags($flags)->build()->flags());
         $this->expectException(\LogicException::class);
@@ -260,9 +283,9 @@ final class FindingTest extends TestCase
     /** The finding writes its typed score, worded with the checks that did not run. */
     public function testTheWrittenScoreIsWordedWithTheChecksThatDidNotRun(): void
     {
-        $s10 = new Signal('S10', 'info', 'repository activity not checked', ['unchecked' => [['check' => 'repository_activity', 'reason' => 'no_token', 'blocks' => ['S3', 'S4']]], 'blocks' => ['S3', 'S4']]);
-        $finding = (new FindingBuilder())->withSignals([new Signal('S5', 'warn', 'old promise'), new Signal('S2', 'warn', 'no release'), $s10])
-            ->withFlags(FlagSet::fromSignals([new Signal('S5', 'warn', 'old promise'), new Signal('S2', 'warn', 'no release')], new AllowlistEntry('vendor/pkg', null, 'slow on purpose', null, AllowlistEntry::BY_PROJECT, ['stale']), []))
+        $s10 = new Signal('info', 'repository activity not checked', SignalDataStub::of('S10', ['unchecked' => [['check' => 'repository_activity', 'reason' => 'no_token', 'blocks' => ['S3', 'S4']]], 'blocks' => ['S3', 'S4']]));
+        $finding = (new FindingBuilder())->withSignals([new Signal('warn', 'old promise', SignalDataStub::of('S5', [])), new Signal('warn', 'no release', SignalDataStub::of('S2', [])), $s10])
+            ->withFlags(FlagSet::fromSignals([new Signal('warn', 'old promise', SignalDataStub::of('S5', [])), new Signal('warn', 'no release', SignalDataStub::of('S2', []))], new AllowlistEntry('vendor/pkg', null, 'slow on purpose', null, AllowlistEntry::BY_PROJECT, ['stale']), []))
             ->build();
 
         $written = JsonPath::decoded($finding->toArray());
@@ -274,9 +297,9 @@ final class FindingTest extends TestCase
     /** The security standing reads the S9 rows: an advisory row makes the package vulnerable. */
     public function testTheSecurityStandingCountsTheS9Rows(): void
     {
-        $s9 = new Signal('S9', 'warn', '1 advisory', ['advisories' => [['id' => 'PKSA-a', 'severity' => 'high', 'fix' => ['kind' => 'upgrade']]]]);
+        $s9 = new Signal('warn', '1 advisory', SignalDataStub::of('S9', ['advisories' => [['id' => 'PKSA-a', 'severity' => 'high', 'fix' => ['kind' => 'upgrade']]]]));
 
-        $standing = (new FindingBuilder())->withSignals([$s9])->build()->securityStanding();
+        $standing = (new FindingBuilder())->withSignals([$s9])->withAdvisoryFacts013(SignalDataStub::legacyOf(['advisories' => [['id' => 'PKSA-a', 'severity' => 'high', 'fix' => ['kind' => 'upgrade']]]]))->build()->securityStanding();
 
         self::assertSame('vulnerable', $standing->status());
         self::assertSame(1, $standing->counts()['high']);
@@ -292,7 +315,7 @@ final class FindingTest extends TestCase
      */
     public function testTheSuccessorIsTheReplacementWhenItNamesAPackage(): void
     {
-        $s1 = static fn (string $replacement): Signal => new Signal('S1', 'high', 'marked abandoned by its repository, replacement: '.$replacement, ['replacement' => $replacement]);
+        $s1 = static fn (string $replacement): Signal => new Signal('high', 'marked abandoned by its repository, replacement: '.$replacement, SignalDataStub::of('S1', ['replacement' => $replacement]));
         $abandoned = static fn (Signal $signal): Finding => (new FindingBuilder())->withPackage('vendor/old')->withVerdict(Verdict::ABANDONED)->withSignals([$signal])->withChain(['vendor/old'])->build();
 
         self::assertSame('symfony/mailer', $abandoned($s1('symfony/mailer'))->successor());
@@ -300,14 +323,14 @@ final class FindingTest extends TestCase
         self::assertNull($abandoned($s1('Symfony'))->successor(), 'a vendor is not a package');
         self::assertNull($abandoned($s1('EnglishInflector from the String component'))->successor(), 'a sentence is not a package');
         self::assertNull($abandoned($s1('vendor/Bad Name'))->successor(), 'a name Composer rejects is not one either');
-        self::assertNull($abandoned(new Signal('S1', 'high', 'marked abandoned by its repository', ['replacement' => null]))->successor(), 'none named');
+        self::assertNull($abandoned(new Signal('high', 'marked abandoned by its repository', SignalDataStub::of('S1', ['replacement' => null])))->successor(), 'none named');
         self::assertSame('marked abandoned by its repository, replacement: Symfony', $abandoned($s1('Symfony'))->evidence(), 'the free text is still read as text');
 
         self::assertNull($abandoned($s1('vendor/old'))->successor(), 'a package is not its own successor');
         self::assertNull($abandoned($s1('Vendor/Old'))->successor(), 'Composer reads a package name without case, and so does this');
         self::assertSame('marked abandoned by its repository, replacement: vendor/old', $abandoned($s1('vendor/old'))->evidence(), 'the free text is still read as text');
 
-        $archivedOnly = (new FindingBuilder())->withPackage('vendor/old')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('S3', 'high', 'repository archived', [])])->withChain(['vendor/old'])->build();
+        $archivedOnly = (new FindingBuilder())->withPackage('vendor/old')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('high', 'repository archived', SignalDataStub::of('S3', []))])->withChain(['vendor/old'])->build();
         self::assertNull($archivedOnly->successor(), 'an archived repository names nothing');
         $silent = (new FindingBuilder())->withPackage('vendor/old')->withVerdict(Verdict::SILENT)->withSignals([$s1('symfony/mailer')])->withChain(['vendor/old'])->build();
         self::assertNull($silent->successor(), 'only an abandoned finding has a successor, whatever S1 says underneath');
@@ -319,8 +342,8 @@ final class FindingTest extends TestCase
      */
     public function testAnAdvisoryAlreadyFixedByAListedReleaseNeitherRaisesNorSaysNoFixExpected(): void
     {
-        $s9 = new Signal('S9', 'warn', '1 security advisory affects v6.1.3 (CVE-2024-28859); fixed by 6.3.0', ['advisories' => [self::fixed('6.3.0', false)]]);
-        $abandoned = (new FindingBuilder())->withPackage('swiftmailer/swiftmailer')->withVersion('v6.1.3')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('S1', 'high', 'marked abandoned by its repository'), $s9])->withChain(['swiftmailer/swiftmailer'])->withDirectDependents(['swiftmailer/swiftmailer'])->build();
+        $s9 = new Signal('warn', '1 security advisory affects v6.1.3 (CVE-2024-28859); fixed by 6.3.0', self::s9Data([self::fixed('6.3.0', false)]));
+        $abandoned = (new FindingBuilder())->withPackage('swiftmailer/swiftmailer')->withVersion('v6.1.3')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('high', 'marked abandoned by its repository', SignalDataStub::of('S1', [])), $s9])->withChain(['swiftmailer/swiftmailer'])->withDirectDependents(['swiftmailer/swiftmailer'])->withAdvisoryFacts013(SignalDataStub::legacyOf(['advisories' => [self::fixed('6.3.0', false)]]))->build();
 
         self::assertFalse($abandoned->hasUnfixableAdvisory());
         self::assertSame(Priority013::CRITICAL, $abandoned->priority(), 'the base, not a raise');
@@ -335,23 +358,23 @@ final class FindingTest extends TestCase
      */
     public function testOnALeftBehindBranchOnlyAFixOnTheBranchCounts(): void
     {
-        $s8 = new Signal('S8', 'high', 'branch 3.x last released 2020-10-24 (5.9 years ago); 8.x released v8.1.7 (2026-09-14)');
-        $s9 = new Signal('S9', 'warn', '4 security advisories affect v3.4.18 (a, b, c and 1 more); 3 fixed by v8.1.7, 1 fixed by v3.4.47', ['advisories' => [self::fixed('v8.1.7', false), self::fixed('v8.1.7', false), self::fixed('v8.1.7', false), self::fixed('v3.4.47', true)]]);
-        $finding = (new FindingBuilder())->withPackage('symfony/http-foundation')->withVersion('v3.4.18')->withVerdict(Verdict::LEFT_BEHIND)->withSignals([$s8, $s9])->withChain(['symfony/http-foundation'])->withDirectDependents(['symfony/http-foundation'])->build();
+        $s8 = new Signal('high', 'branch 3.x last released 2020-10-24 (5.9 years ago); 8.x released v8.1.7 (2026-09-14)', SignalDataStub::of('S8', []));
+        $s9 = new Signal('warn', '4 security advisories affect v3.4.18 (a, b, c and 1 more); 3 fixed by v8.1.7, 1 fixed by v3.4.47', self::s9Data([self::fixed('v8.1.7', false), self::fixed('v8.1.7', false), self::fixed('v8.1.7', false), self::fixed('v3.4.47', true)]));
+        $finding = (new FindingBuilder())->withPackage('symfony/http-foundation')->withVersion('v3.4.18')->withVerdict(Verdict::LEFT_BEHIND)->withSignals([$s8, $s9])->withChain(['symfony/http-foundation'])->withDirectDependents(['symfony/http-foundation'])->withAdvisoryFacts013(SignalDataStub::legacyOf(['advisories' => [self::fixed('v8.1.7', false), self::fixed('v8.1.7', false), self::fixed('v8.1.7', false), self::fixed('v3.4.47', true)]]))->build();
 
         self::assertTrue($finding->hasUnfixableAdvisory());
         self::assertSame(Priority013::CRITICAL, $finding->priority());
         self::assertStringEndsWith('; 3 fixed by v8.1.7, 1 fixed by v3.4.47; no fix expected on 3.x', $finding->ownEvidence());
 
-        $allOnBranch = (new FindingBuilder())->withPackage('symfony/http-foundation')->withVersion('v3.4.18')->withVerdict(Verdict::LEFT_BEHIND)->withSignals([$s8, new Signal('S9', 'warn', '1 security advisory affects v3.4.18 (a); fixed by v3.4.47', ['advisories' => [self::fixed('v3.4.47', true)]])])->withChain(['symfony/http-foundation'])->withDirectDependents(['symfony/http-foundation'])->build();
+        $allOnBranch = (new FindingBuilder())->withPackage('symfony/http-foundation')->withVersion('v3.4.18')->withVerdict(Verdict::LEFT_BEHIND)->withSignals([$s8, new Signal('warn', '1 security advisory affects v3.4.18 (a); fixed by v3.4.47', self::s9Data([self::fixed('v3.4.47', true)]))])->withChain(['symfony/http-foundation'])->withDirectDependents(['symfony/http-foundation'])->withAdvisoryFacts013(SignalDataStub::legacyOf(['advisories' => [self::fixed('v3.4.47', true)]]))->build();
         self::assertFalse($allOnBranch->hasUnfixableAdvisory(), 'a composer update inside the constraint gets the fix');
         self::assertSame(Priority013::HIGH, $allOnBranch->priority());
         self::assertStringEndsWith('; fixed by v3.4.47', $allOnBranch->ownEvidence());
 
-        $openEverywhere = (new FindingBuilder())->withPackage('symfony/http-foundation')->withVersion('v3.4.18')->withVerdict(Verdict::LEFT_BEHIND)->withSignals([$s8, new Signal('S9', 'warn', '1 security advisory affects v3.4.18 (a)', ['advisories' => [self::OPEN]])])->withChain(['symfony/http-foundation'])->withDirectDependents(['symfony/http-foundation'])->build();
+        $openEverywhere = (new FindingBuilder())->withPackage('symfony/http-foundation')->withVersion('v3.4.18')->withVerdict(Verdict::LEFT_BEHIND)->withSignals([$s8, new Signal('warn', '1 security advisory affects v3.4.18 (a)', self::s9Data([self::OPEN]))])->withChain(['symfony/http-foundation'])->withDirectDependents(['symfony/http-foundation'])->withAdvisoryFacts013(SignalDataStub::legacyOf(['advisories' => [self::OPEN]]))->build();
         self::assertStringEndsWith('(a); no fix expected', $openEverywhere->ownEvidence(), 'nothing fixes it anywhere: no branch to point away from');
 
-        $abandonedWithAFixElsewhere = (new FindingBuilder())->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('S1', 'high', 'marked abandoned by its repository'), new Signal('S9', 'warn', '2 security advisories affect 1.0.0 (a, b); 1 fixed by 2.0.0', ['advisories' => [self::fixed('2.0.0', false), self::OPEN]])])->withDirectDependents(['vendor/pkg'])->build();
+        $abandonedWithAFixElsewhere = (new FindingBuilder())->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('high', 'marked abandoned by its repository', SignalDataStub::of('S1', [])), new Signal('warn', '2 security advisories affect 1.0.0 (a, b); 1 fixed by 2.0.0', self::s9Data([self::fixed('2.0.0', false), self::OPEN]))])->withDirectDependents(['vendor/pkg'])->withAdvisoryFacts013(SignalDataStub::legacyOf(['advisories' => [self::fixed('2.0.0', false), self::OPEN]]))->build();
         self::assertTrue($abandonedWithAFixElsewhere->hasUnfixableAdvisory(), 'one of the two has no fix at all');
         self::assertStringEndsWith('; 1 fixed by 2.0.0; no fix expected', $abandonedWithAFixElsewhere->ownEvidence(), 'an abandoned package has no branch to qualify with');
     }
@@ -423,7 +446,7 @@ final class FindingTest extends TestCase
      */
     public function testAReplacementNamedByPackagistIsLinkedThere(): void
     {
-        $s1 = static fn (string $replacement): Signal => new Signal('S1', 'high', 'marked abandoned by its repository, replacement: '.$replacement, ['replacement' => $replacement]);
+        $s1 = static fn (string $replacement): Signal => new Signal('high', 'marked abandoned by its repository, replacement: '.$replacement, SignalDataStub::of('S1', ['replacement' => $replacement]));
         $abandoned = static fn (Signal $signal, ?string $namedBy, string $verdict = Verdict::ABANDONED): Finding => (new FindingBuilder())->withPackage('vendor/old')->withVerdict($verdict)->withSignals([$signal])->withChain(['vendor/old'])->withReplacementNamedBy($namedBy)->build();
 
         self::assertSame('https://packagist.org/packages/symfony/mailer', $abandoned($s1('symfony/mailer'), 'packagist.org')->toArray()['replacement_url']);
@@ -457,7 +480,7 @@ final class FindingTest extends TestCase
         self::assertTrue($asked->toArray()['from_composer_repository']);
         self::assertFalse($notAsked->isFromComposerRepository());
         self::assertFalse($notAsked->toArray()['from_composer_repository']);
-        self::assertFalse($notAsked->withSignals([new Signal(Signal::S7, Signal::LEVEL_INFO, 'pulls in 1 flagged package: a/b (stale)')])->toArray()['from_composer_repository'], 'S7 keeps it');
+        self::assertFalse($notAsked->withSignals([new Signal(Signal::LEVEL_INFO, 'pulls in 1 flagged package: a/b (stale)', SignalDataStub::of(Signal::S7, []))])->toArray()['from_composer_repository'], 'S7 keeps it');
         // A note other than that one is no claim about the lock entry: metadata can fail for a
         // package a repository was asked about.
         $failed = (new FindingBuilder())->withPackage('vendor/gone')->withVerdict(Verdict::UNKNOWN)->withChain(['vendor/gone'])->withNote('Repository metadata unavailable: HTTP 503')->build();
@@ -559,7 +582,7 @@ final class FindingTest extends TestCase
     {
         $at = new \DateTimeImmutable('2026-09-14T10:00:00+00:00');
         $original = (new FindingBuilder())->withDataDate($at)->withDev(true)->withDirectDependents(['vendor/pkg'])->build();
-        $s7 = new Signal(Signal::S7, Signal::LEVEL_INFO, 'pulls in 1 flagged package: vendor/dep (stale)', ['flagged' => 1, 'packages' => []]);
+        $s7 = new Signal(Signal::LEVEL_INFO, 'pulls in 1 flagged package: vendor/dep (stale)', SignalDataStub::of(Signal::S7, ['flagged' => 1, 'packages' => []]));
 
         $annotated = $original->withSignals([$s7]);
 
@@ -576,12 +599,12 @@ final class FindingTest extends TestCase
 
     public function testTheNoteSurvivesS7AndOwnEvidenceLeavesS7Out(): void
     {
-        $s7 = new Signal(Signal::S7, Signal::LEVEL_INFO, 'pulls in 2 flagged packages: a/b (stale), c/d (stale)', ['flagged' => 2, 'packages' => []]);
+        $s7 = new Signal(Signal::LEVEL_INFO, 'pulls in 2 flagged packages: a/b (stale), c/d (stale)', SignalDataStub::of(Signal::S7, ['flagged' => 2, 'packages' => []]));
         $unchecked = (new FindingBuilder())->withPackage('local/pkg')->withVersion('dev-main')->withVerdict(Verdict::UNKNOWN)->withSignals([$s7])->withChain(['local/pkg'])->withNote('not from a Composer repository, not checked')->withOrigin(Origins::of(false))->build();
         self::assertSame('not from a Composer repository, not checked; pulls in 2 flagged packages: a/b (stale), c/d (stale)', $unchecked->evidence());
         self::assertSame('not from a Composer repository, not checked', $unchecked->ownEvidence());
 
-        $own = new Signal('S2', 'warn', 'last release 2022-05-20 (4.3 years ago)');
+        $own = new Signal('warn', 'last release 2022-05-20 (4.3 years ago)', SignalDataStub::of('S2', []));
         $stale = (new FindingBuilder())->withVerdict(Verdict::STALE)->withSignals([$own, $s7])->withNote('a note nobody reads')->build();
         self::assertSame('last release 2022-05-20 (4.3 years ago); pulls in 2 flagged packages: a/b (stale), c/d (stale)', $stale->evidence());
         self::assertSame('last release 2022-05-20 (4.3 years ago)', $stale->ownEvidence());
@@ -604,7 +627,7 @@ final class FindingTest extends TestCase
     /** @param list<array<string, mixed>> $rows */
     private static function s9(array $rows, bool $releasesRead = true): Signal
     {
-        return new Signal(Signal::S9, Signal::LEVEL_WARN, \count($rows).' security advisories affect the installed version', ['advisories' => $rows, 'releases_read' => $releasesRead]);
+        return new Signal(Signal::LEVEL_WARN, \count($rows).' security advisories affect the installed version', SignalDataStub::of(Signal::S9, ['advisories' => array_map(static fn (array $row): array => ['id' => $row['id']], $rows), 'releases_read' => $releasesRead]));
     }
 
     /**
@@ -612,41 +635,41 @@ final class FindingTest extends TestCase
      */
     public static function noFixShapes(): iterable
     {
-        $s8 = new Signal(Signal::S8, Signal::LEVEL_HIGH, 'branch 3.x last released 2020-10-24 (5.9 years ago); 8.x released v8.1.7 (2026-09-14)');
-        $s1 = new Signal(Signal::S1, Signal::LEVEL_HIGH, 'marked abandoned by its repository');
-        $s2 = new Signal(Signal::S2, Signal::LEVEL_HIGH, 'last release 2015-11-16 (10.8 years ago)');
-        $s7 = new Signal(Signal::S7, Signal::LEVEL_INFO, 'pulls in 1 flagged package: a/b (stale)');
+        $s8 = new Signal(Signal::LEVEL_HIGH, 'branch 3.x last released 2020-10-24 (5.9 years ago); 8.x released v8.1.7 (2026-09-14)', SignalDataStub::of(Signal::S8, []));
+        $s1 = new Signal(Signal::LEVEL_HIGH, 'marked abandoned by its repository', SignalDataStub::of(Signal::S1, []));
+        $s2 = new Signal(Signal::LEVEL_HIGH, 'last release 2015-11-16 (10.8 years ago)', SignalDataStub::of(Signal::S2, []));
+        $s7 = new Signal(Signal::LEVEL_INFO, 'pulls in 1 flagged package: a/b (stale)', SignalDataStub::of(Signal::S7, []));
 
         yield 'http-foundation left behind, fixed on its branch and on 8.x' => [
-            (new FindingBuilder())->withPackage('symfony/http-foundation')->withVersion('v3.4.18')->withVerdict(Verdict::LEFT_BEHIND)->withSignals([$s8, self::s9([self::row('CVE-a', 'v8.1.7'), self::row('CVE-b', 'v8.1.7'), self::row('CVE-c', 'v3.4.47', true), self::row('CVE-d')])])->withChain(['laravel/framework', 'symfony/http-foundation'])->build(),
+            (new FindingBuilder())->withPackage('symfony/http-foundation')->withVersion('v3.4.18')->withVerdict(Verdict::LEFT_BEHIND)->withSignals([$s8, self::s9([self::row('CVE-a', 'v8.1.7'), self::row('CVE-b', 'v8.1.7'), self::row('CVE-c', 'v3.4.47', true), self::row('CVE-d')])])->withChain(['laravel/framework', 'symfony/http-foundation'])->withAdvisoryFacts013(SignalDataStub::legacy([self::row('CVE-a', 'v8.1.7'), self::row('CVE-b', 'v8.1.7'), self::row('CVE-c', 'v3.4.47', true), self::row('CVE-d')], true))->build(),
             [['id' => 'CVE-a', 'reason' => 'not_on_installed_branch'], ['id' => 'CVE-b', 'reason' => 'not_on_installed_branch'], ['id' => 'CVE-d', 'reason' => 'no_release_fixes']],
         ];
         yield 'abandoned, fixed by v6.3.0' => [
-            (new FindingBuilder())->withPackage('swiftmailer/swiftmailer')->withVersion('v6.1.3')->withVerdict(Verdict::ABANDONED)->withSignals([$s1, self::s9([self::row('CVE-2024-28859', '6.3.0', true)])])->withChain(['swiftmailer/swiftmailer'])->build(),
+            (new FindingBuilder())->withPackage('swiftmailer/swiftmailer')->withVersion('v6.1.3')->withVerdict(Verdict::ABANDONED)->withSignals([$s1, self::s9([self::row('CVE-2024-28859', '6.3.0', true)])])->withChain(['swiftmailer/swiftmailer'])->withAdvisoryFacts013(SignalDataStub::legacy([self::row('CVE-2024-28859', '6.3.0', true)], true))->build(),
             [],
         ];
         yield 'abandoned, no listed release fixes it' => [
-            (new FindingBuilder())->withVerdict(Verdict::ABANDONED)->withSignals([$s1, self::s9([self::row('PKSA-1')])])->build(),
+            (new FindingBuilder())->withVerdict(Verdict::ABANDONED)->withSignals([$s1, self::s9([self::row('PKSA-1')])])->withAdvisoryFacts013(SignalDataStub::legacy([self::row('PKSA-1')], true))->build(),
             [['id' => 'PKSA-1', 'reason' => 'no_release_fixes']],
         ];
         yield 'abandoned, the releases were not read' => [
-            (new FindingBuilder())->withVerdict(Verdict::ABANDONED)->withSignals([$s1, self::s9([self::row('PKSA-1'), self::row('PKSA-2', null, false, null)], false)])->withChain(['root/app', 'vendor/pkg'])->build(),
+            (new FindingBuilder())->withVerdict(Verdict::ABANDONED)->withSignals([$s1, self::s9([self::row('PKSA-1'), self::row('PKSA-2', null, false, null)], false)])->withChain(['root/app', 'vendor/pkg'])->withAdvisoryFacts013(SignalDataStub::legacy([self::row('PKSA-1'), self::row('PKSA-2', null, false, null)], false))->build(),
             [['id' => 'PKSA-1', 'reason' => 'releases_unknown'], ['id' => 'PKSA-2', 'reason' => 'releases_unknown']],
         ];
         yield 'silent, a partial advisory with no range' => [
-            (new FindingBuilder())->withVerdict(Verdict::SILENT)->withSignals([$s2, self::s9([self::row('PKSA-1', null, false, null), self::row('PKSA-2')])])->build(),
+            (new FindingBuilder())->withVerdict(Verdict::SILENT)->withSignals([$s2, self::s9([self::row('PKSA-1', null, false, null), self::row('PKSA-2')])])->withAdvisoryFacts013(SignalDataStub::legacy([self::row('PKSA-1', null, false, null), self::row('PKSA-2')], true))->build(),
             [['id' => 'PKSA-1', 'reason' => 'affected_range_unknown'], ['id' => 'PKSA-2', 'reason' => 'no_release_fixes']],
         ];
         yield 'stale, nothing fixes it' => [
-            (new FindingBuilder())->withVerdict(Verdict::STALE)->withSignals([$s2, self::s9([self::row('PKSA-1')])])->build(),
+            (new FindingBuilder())->withVerdict(Verdict::STALE)->withSignals([$s2, self::s9([self::row('PKSA-1')])])->withAdvisoryFacts013(SignalDataStub::legacy([self::row('PKSA-1')], true))->build(),
             null,
         ];
         yield 'allowlisted' => [
-            (new FindingBuilder())->withVerdict(Verdict::FINISHED)->withSignals([$s8, self::s9([self::row('PKSA-1')])])->withAllowlistReason('frozen')->build(),
+            (new FindingBuilder())->withVerdict(Verdict::FINISHED)->withSignals([$s8, self::s9([self::row('PKSA-1')])])->withAllowlistReason('frozen')->withAdvisoryFacts013(SignalDataStub::legacy([self::row('PKSA-1')], true))->build(),
             null,
         ];
         yield 'ok' => [
-            (new FindingBuilder())->withSignals([self::s9([self::row('PKSA-1')])])->build(),
+            (new FindingBuilder())->withSignals([self::s9([self::row('PKSA-1')])])->withAdvisoryFacts013(SignalDataStub::legacy([self::row('PKSA-1')], true))->build(),
             null,
         ];
         yield 'abandoned with no advisory' => [
@@ -654,11 +677,11 @@ final class FindingTest extends TestCase
             [],
         ];
         yield 'a direct requirement carrying S7' => [
-            (new FindingBuilder())->withVerdict(Verdict::ABANDONED)->withSignals([$s1, self::s9([self::row('PKSA-1')]), $s7])->build(),
+            (new FindingBuilder())->withVerdict(Verdict::ABANDONED)->withSignals([$s1, self::s9([self::row('PKSA-1')]), $s7])->withAdvisoryFacts013(SignalDataStub::legacy([self::row('PKSA-1')], true))->build(),
             [['id' => 'PKSA-1', 'reason' => 'no_release_fixes']],
         ];
         yield 'reached by nothing' => [
-            (new FindingBuilder())->withVerdict(Verdict::SILENT)->withSignals([$s2, self::s9([self::row('PKSA-1')])])->withChain([])->withDev(true)->build(),
+            (new FindingBuilder())->withVerdict(Verdict::SILENT)->withSignals([$s2, self::s9([self::row('PKSA-1')])])->withChain([])->withDev(true)->withAdvisoryFacts013(SignalDataStub::legacy([self::row('PKSA-1')], true))->build(),
             [['id' => 'PKSA-1', 'reason' => 'no_release_fixes']],
         ];
     }
@@ -677,7 +700,7 @@ final class FindingTest extends TestCase
         $ids = [];
         foreach ($finding->signals() as $signal) {
             if ($signal->id() === Signal::S9) {
-                $rows = $signal->data()['advisories'];
+                $rows = JsonPath::decoded($signal->data())['advisories'];
                 self::assertIsArray($rows);
                 $ids = array_column($rows, 'id');
             }
@@ -702,7 +725,7 @@ final class FindingTest extends TestCase
     public function testTheBasisOfATransitiveLeftBehindPackageRaisedBackUp(): void
     {
         $s9 = self::s9([self::row('CVE-a', 'v8.1.7'), self::row('CVE-c', 'v3.4.47', true)]);
-        $finding = (new FindingBuilder())->withPackage('symfony/http-foundation')->withVersion('v3.4.18')->withVerdict(Verdict::LEFT_BEHIND)->withSignals([$s9])->withChain(['laravel/framework', 'symfony/http-foundation'])->build();
+        $finding = (new FindingBuilder())->withPackage('symfony/http-foundation')->withVersion('v3.4.18')->withVerdict(Verdict::LEFT_BEHIND)->withSignals([$s9])->withChain(['laravel/framework', 'symfony/http-foundation'])->withAdvisoryFacts013(SignalDataStub::legacy([self::row('CVE-a', 'v8.1.7'), self::row('CVE-c', 'v3.4.47', true)], true))->build();
 
         self::assertSame(['base' => 'high', 'steps' => [['reason' => 'transitive', 'from' => 'high', 'to' => 'medium'], ['reason' => 'no_fix_expected', 'from' => 'medium', 'to' => 'high']]], $finding->priorityBasis()->toArray());
         self::assertSame(Priority013::HIGH, $finding->priority());
@@ -720,28 +743,15 @@ final class FindingTest extends TestCase
     /** An S9 without releases_read says nothing about whether a fix was looked for, so none was. */
     public function testAnS9WithoutReleasesReadReadsAsNotLookedFor(): void
     {
-        $finding = (new FindingBuilder())->withVerdict(Verdict::ABANDONED)->withSignals([new Signal(Signal::S9, Signal::LEVEL_WARN, 'x', ['advisories' => [self::row('PKSA-1')]])])->build();
+        $finding = (new FindingBuilder())->withVerdict(Verdict::ABANDONED)->withSignals([new Signal(Signal::LEVEL_WARN, 'x', self::s9Data([self::row('PKSA-1')]))])->withAdvisoryFacts013(SignalDataStub::legacyOf(['advisories' => [self::row('PKSA-1')]]))->build();
 
         self::assertSame([['id' => 'PKSA-1', 'reason' => 'releases_unknown']], $finding->noFixExpected());
     }
 
-    /** A row without a string id is nothing the list could name, so it is no advisory, as a row that is not an array is none. */
-    public function testAnAdvisoryRowWithoutAnIdIsNoAdvisory(): void
-    {
-        $rows = [['fixed_by' => null, 'fixed_on_branch' => false], ['id' => 7, 'fixed_by' => null], 'not a row', self::row('PKSA-1')];
-        $finding = (new FindingBuilder())->withVerdict(Verdict::ABANDONED)->withSignals([new Signal(Signal::S9, Signal::LEVEL_WARN, 'x', ['advisories' => $rows, 'releases_read' => true])])->build();
-
-        self::assertSame([['id' => 'PKSA-1', 'reason' => 'no_release_fixes']], $finding->noFixExpected());
-
-        $idless = (new FindingBuilder())->withVerdict(Verdict::ABANDONED)->withSignals([self::s9([['fixed_by' => null]])])->build();
-        self::assertSame([], $idless->noFixExpected());
-        self::assertFalse($idless->hasUnfixableAdvisory());
-    }
-
     public function testEvidenceLineAppendsTheAllowlistReasonAfterEverythingElse(): void
     {
-        $own = new Signal('S2', 'warn', 'last release 2022-05-20 (4.3 years ago)');
-        $s7 = new Signal(Signal::S7, 'info', 'pulls in 1 flagged package: vendor/leaf (stale)');
+        $own = new Signal('warn', 'last release 2022-05-20 (4.3 years ago)', SignalDataStub::of('S2', []));
+        $s7 = new Signal('info', 'pulls in 1 flagged package: vendor/leaf (stale)', SignalDataStub::of(Signal::S7, []));
         $allowlisted = (new FindingBuilder())->withVerdict(Verdict::FINISHED)->withSignals([$own, $s7])->withAllowlistReason('interfaces')->build();
         $allowlistedWithoutEvidence = (new FindingBuilder())->withVerdict(Verdict::FINISHED)->withAllowlistReason('interfaces')->build();
         $notAllowlisted = (new FindingBuilder())->withVerdict(Verdict::STALE)->withSignals([$own])->build();
@@ -795,7 +805,7 @@ final class FindingTest extends TestCase
     #[DataProvider('reaches')]
     public function testTheScoreTakesItsReachFromTheChainAndItsDevHalvingFromTheLock(array $chain, bool $dev, string $reach, string $grade, int $total): void
     {
-        $signals = [new Signal(Signal::S8, Signal::LEVEL_WARN, 'left behind')];
+        $signals = [new Signal(Signal::LEVEL_WARN, 'left behind', SignalDataStub::of(Signal::S8, []))];
         $finding = (new FindingBuilder())->withVerdict(Verdict::LEFT_BEHIND)->withSignals($signals)->withChain($chain)->withDev($dev)->withFlags(FlagSet::fromSignals($signals, null, []))->build();
 
         self::assertSame($reach, $finding->score()->reach());
@@ -808,7 +818,7 @@ final class FindingTest extends TestCase
 
     public function testAVulnerableOnlyFindingIsGradedWithNoLeadAndKeepsItsReport1Verdict(): void
     {
-        $flags = FlagSet::fromSignals([], null, [Score::advisory('PKSA-1', 'critical', 'update')]);
+        $flags = FlagSet::fromSignals([], null, [new CountedAdvisory('PKSA-1', 'critical', 'update')]);
         $finding = (new FindingBuilder())->withFlags($flags)->build();
 
         self::assertSame(Verdict::OK, $finding->verdict());
@@ -878,34 +888,51 @@ final class FindingTest extends TestCase
     public function testTheDecidingS9RowIsTheScoresDecidingAdvisory(): void
     {
         $row = static fn (string $id, string $severity, int $points): array => ['id' => $id, 'cve' => null, 'title' => null, 'link' => null, 'reported_at' => null, 'severity' => $severity, 'severity_published' => $severity, 'affected_versions' => null, 'counted' => true, 'points' => $points, 'fix' => ['kind' => 'update'], 'baseline' => null];
-        $signals = [new Signal(Signal::S9, Signal::LEVEL_HIGH, '2 advisories', ['advisories' => [$row('PKSA-a', 'critical', 32), $row('PKSA-b', 'low', 2)], 'releases_read' => true, 'complete' => true])];
-        $flags = FlagSet::fromSignals($signals, null, [Score::advisory('PKSA-b', 'low', 'update'), Score::advisory('PKSA-a', 'critical', 'update')]);
+        $signals = [new Signal(Signal::LEVEL_HIGH, '2 advisories', SignalDataStub::of(Signal::S9, ['advisories' => [$row('PKSA-a', 'critical', 32), $row('PKSA-b', 'low', 2)], 'releases_read' => true, 'complete' => true]))];
+        $flags = FlagSet::fromSignals($signals, null, [new CountedAdvisory('PKSA-b', 'low', 'update'), new CountedAdvisory('PKSA-a', 'critical', 'update')]);
 
-        $document = (new FindingBuilder())->withSignals($signals)->withFlags($flags)->build()->toArray();
+        $document = JsonPath::decoded((new FindingBuilder())->withSignals($signals)->withFlags($flags)->build()->toArray());
 
         $rows = JsonPath::arrayAt($document, ['signals', 0, 'data', 'advisories']);
         self::assertSame(['PKSA-a' => true, 'PKSA-b' => false], array_column($rows, 'deciding', 'id'));
         self::assertSame(['points', 'deciding', 'fix'], \array_slice(array_keys(JsonPath::arrayAt($rows, [0])), 9, 3), 'deciding follows points');
     }
 
+    /**
+     * The written signals mark the deciding S9 row. The rules' signals and the typed lookup read
+     * the rows as the rule built them, none marked.
+     */
+    public function testOnlyTheWrittenSignalsMarkTheDecidingRow(): void
+    {
+        $signals = [new Signal(Signal::LEVEL_HIGH, '2 advisories', SignalDataStub::of(Signal::S9, ['advisories' => [['id' => 'PKSA-a', 'severity' => 'critical', 'fix' => ['kind' => 'update']], ['id' => 'PKSA-b', 'severity' => 'low', 'fix' => ['kind' => 'update']]]]))];
+        $flags = FlagSet::fromSignals($signals, null, [new CountedAdvisory('PKSA-b', 'low', 'update'), new CountedAdvisory('PKSA-a', 'critical', 'update')]);
+        $finding = (new FindingBuilder())->withSignals($signals)->withFlags($flags)->build();
+
+        $own = $finding->signalData(AdvisoryData::class);
+        $written = $finding->writtenSignals()[0]->data();
+
+        self::assertNotNull($own);
+        self::assertSame([false, false], array_map(static fn (AdvisoryRow $row): bool => $row->isDeciding(), $own->rows()));
+        self::assertInstanceOf(AdvisoryData::class, $written);
+        self::assertSame([true, false], array_map(static fn (AdvisoryRow $row): bool => $row->isDeciding(), $written->rows()));
+    }
+
+    /** The typed lookup gives the data of the signal of that class, null when no such signal fired. */
+    public function testTheTypedLookupFindsASignalByItsDataClass(): void
+    {
+        $s6 = new Signal(Signal::LEVEL_WARN, 'pinned to branch snapshot dev-main', SignalDataStub::of(Signal::S6, ['version' => 'dev-main']));
+        $finding = (new FindingBuilder())->withVerdict(Verdict::PINNED)->withSignals([$s6])->build();
+
+        self::assertSame($s6->data(), $finding->signalData(PinnedData::class));
+        self::assertNull($finding->signalData(LeftBehindData::class));
+    }
+
     /** A silent or stale flag that no S2 or S4 reading dates has a headline in years with no value. */
     public function testALivenessFlagWithoutAReadingHasNoYears(): void
     {
-        $document = (new FindingBuilder())->withVerdict(Verdict::STALE)->build()->toArray();
+        $document = JsonPath::decoded((new FindingBuilder())->withVerdict(Verdict::STALE)->build()->toArray());
 
         self::assertSame(['unit' => 'years', 'value' => null, 'source' => null], JsonPath::arrayAt($document, ['flags', 0, 'headline']));
-    }
-
-    /** A hand-written report-1 S9 keeps its rows with an id as report-1's facts, and drops the rest. */
-    public function testReport1S9RowsWithoutAnIdAreDropped(): void
-    {
-        $row = ['id' => 'PKSA-1', 'cve' => null, 'title' => null, 'link' => null, 'severity' => 'high', 'reported_at' => null, 'affected_versions' => null, 'fixed_by' => null, 'fixed_on_branch' => false];
-        $signal = new Signal(Signal::S9, Signal::LEVEL_WARN, '1 advisory', ['advisories' => [['severity' => 'low'], $row], 'releases_read' => true]);
-
-        $facts = (new FindingBuilder())->withSignals([$signal])->build()->advisoryFacts013();
-
-        self::assertSame([$row], $facts->rows());
-        self::assertTrue($facts->releasesRead());
     }
 
     /**
@@ -922,11 +949,11 @@ final class FindingTest extends TestCase
         self::assertNotNull($package);
         $facts = new PackageFacts($package, null, null, [new Advisory('PKSA-1', null, null, null, 'high', null)], null, null, null, true);
         $activity = ['check' => 'repository_activity', 'reason' => 'no_token', 'blocks' => ['S9', 'S3', 'S4']];
-        $signals = $withS10 ? [new Signal(Signal::S10, Signal::LEVEL_INFO, 'activity not checked', ['unchecked' => [$activity], 'blocks' => ['S9', 'S3', 'S4']])] : [];
+        $signals = $withS10 ? [new Signal(Signal::LEVEL_INFO, 'activity not checked', SignalDataStub::of(Signal::S10, ['unchecked' => [$activity], 'blocks' => ['S9', 'S3', 'S4']]))] : [];
         $finding = (new FindingBuilder())->withVerdict(Verdict::UNKNOWN)->withSignals($signals)->build()
             ->withDetails(FindingDetails::of($facts, null, new PhpFloor('8.4', null), [], $signals, 'HTTP 503'));
 
-        $written = JsonPath::arrayAt($finding->toArray(), ['signals']);
+        $written = JsonPath::arrayAt(JsonPath::decoded($finding->toArray()), ['signals']);
         $s10 = JsonPath::arrayAt($written, [0]);
 
         $releases = ['check' => 'releases', 'reason' => 'releases_unknown', 'blocks' => ['S9']];
@@ -947,10 +974,10 @@ final class FindingTest extends TestCase
     public function testTheVulnerableFlagReadsS9(): void
     {
         $row = static fn (string $id, string $severity, int $points): array => ['id' => $id, 'cve' => null, 'title' => 't', 'link' => null, 'reported_at' => null, 'severity' => $severity, 'severity_published' => $severity, 'affected_versions' => null, 'counted' => true, 'points' => $points, 'fix' => ['kind' => 'update'], 'baseline' => null];
-        $signals = [new Signal(Signal::S9, Signal::LEVEL_HIGH, '2 advisories', ['advisories' => [$row('PKSA-a', 'high', 16), $row('PKSA-b', 'low', 2)], 'releases_read' => true, 'complete' => true])];
-        $flags = FlagSet::fromSignals($signals, null, [Score::advisory('PKSA-a', 'high', 'update'), Score::advisory('PKSA-b', 'low', 'update')]);
+        $signals = [new Signal(Signal::LEVEL_HIGH, '2 advisories', SignalDataStub::of(Signal::S9, ['advisories' => [$row('PKSA-a', 'high', 16), $row('PKSA-b', 'low', 2)], 'releases_read' => true, 'complete' => true]))];
+        $flags = FlagSet::fromSignals($signals, null, [new CountedAdvisory('PKSA-a', 'high', 'update'), new CountedAdvisory('PKSA-b', 'low', 'update')]);
 
-        $document = (new FindingBuilder())->withSignals($signals)->withFlags($flags)->build()->toArray();
+        $document = JsonPath::decoded((new FindingBuilder())->withSignals($signals)->withFlags($flags)->build()->toArray());
         $flag = JsonPath::arrayAt($document, ['flags', 0]);
 
         self::assertSame(['vulnerable', 'security', ['S9'], ['unit' => 'advisories', 'value' => 2, 'source' => null]], [$flag['id'], $flag['role'], $flag['signal_ids'], $flag['headline']]);
@@ -960,7 +987,7 @@ final class FindingTest extends TestCase
 
     public function testWithSignalsKeepsTheScore(): void
     {
-        $signals = [new Signal(Signal::S8, Signal::LEVEL_WARN, 'left behind')];
+        $signals = [new Signal(Signal::LEVEL_WARN, 'left behind', SignalDataStub::of(Signal::S8, []))];
         $finding = (new FindingBuilder())->withSignals($signals)->withFlags(FlagSet::fromSignals($signals, null, []))->build();
 
         self::assertSame($finding->score(), $finding->withSignals([])->score());
@@ -994,9 +1021,9 @@ final class FindingTest extends TestCase
         foreach ($blocks as $i => $blocked) {
             $unchecked[] = ['check' => 'gap-'.$i, 'reason' => 'no_token', 'blocks' => $blocked];
         }
-        $signals = [new Signal(Signal::S2, Signal::LEVEL_WARN, 'old', ['last_release' => '2021-05-05T00:00:00+00:00', 'years' => 5.4, 'dated_by' => null])];
+        $signals = [new Signal(Signal::LEVEL_WARN, 'old', SignalDataStub::of(Signal::S2, ['last_release' => '2021-05-05T00:00:00+00:00', 'years' => 5.4, 'dated_by' => null]))];
         if ($unchecked !== []) {
-            $signals[] = new Signal(Signal::S10, Signal::LEVEL_INFO, 'not checked', ['unchecked' => $unchecked]);
+            $signals[] = new Signal(Signal::LEVEL_INFO, 'not checked', SignalDataStub::of(Signal::S10, ['unchecked' => $unchecked]));
         }
         $entry = new AllowlistEntry('vendor/pkg', null, 'kept', null, AllowlistEntry::BY_PROJECT, [FlagSet::STALE]);
         $finding = (new FindingBuilder())->withVersion($version)->withSignals($signals)->withFlags(FlagSet::fromSignals($signals, $entry, []), $judged)->build();
@@ -1022,19 +1049,19 @@ final class FindingTest extends TestCase
         yield 'skipped release metadata beside S3 unread' => ['1.0.0', false, [['S3']], false, true];
     }
 
-    /** S10's gaps keep their string blocks, and a gap without a check or a reason keeps empty words. */
-    public function testChecksMissingReadsS10sGapsAsWritten(): void
+    /** S10's gaps keep their check, their reason and their blocks. */
+    public function testChecksMissingWritesS10sChecks(): void
     {
-        $signals = [new Signal(Signal::S10, Signal::LEVEL_INFO, 'not checked', ['unchecked' => [
-            ['check' => 'repository_activity', 'reason' => 'no_token', 'blocks' => ['S3', 5, 'S4']],
-            ['blocks' => ['S9']],
-        ]])];
+        $signals = [new Signal(Signal::LEVEL_INFO, 'not checked', SignalDataStub::of(Signal::S10, ['unchecked' => [
+            ['check' => 'repository_activity', 'reason' => 'no_token', 'blocks' => ['S3', 'S4']],
+            ['check' => 'advisories', 'reason' => 'offline', 'blocks' => ['S9']],
+        ]]))];
 
-        $document = (new FindingBuilder())->withSignals($signals)->build()->toArray();
+        $document = JsonPath::decoded((new FindingBuilder())->withSignals($signals)->build()->toArray());
 
         self::assertSame([
             ['check' => 'repository_activity', 'reason' => 'no_token', 'blocks' => ['S3', 'S4']],
-            ['check' => '', 'reason' => '', 'blocks' => ['S9']],
+            ['check' => 'advisories', 'reason' => 'offline', 'blocks' => ['S9']],
         ], $document['checks_missing']);
     }
 
@@ -1047,7 +1074,7 @@ final class FindingTest extends TestCase
     #[DataProvider('snapshots')]
     public function testAPinnedRemovalCountsAtLeastWhenS8IsUnread(string $version, bool $judged, bool $atLeast): void
     {
-        $signals = [new Signal(Signal::S1, Signal::LEVEL_HIGH, 'marked', ['marked_by' => 'lock']), new Signal(Signal::S6, Signal::LEVEL_WARN, 'pinned', ['reason' => 'branch_snapshot', 'version' => $version])];
+        $signals = [new Signal(Signal::LEVEL_HIGH, 'marked', SignalDataStub::of(Signal::S1, ['marked_by' => 'lock'])), new Signal(Signal::LEVEL_WARN, 'pinned', SignalDataStub::of(Signal::S6, ['reason' => 'branch_snapshot', 'version' => $version]))];
         $finding = (new FindingBuilder())->withVersion($version)->withSignals($signals)->withFlags(FlagSet::fromSignals($signals, null, []), $judged)->build();
         $without = JsonPath::arrayAt(JsonPath::decoded($finding->toArray()), ['score', 'without']);
 
@@ -1081,29 +1108,28 @@ final class FindingTest extends TestCase
     /** @return iterable<string, array{list<Signal>, string, array{unit: string, value: int|float|string|null, source: ?string}}> */
     public static function headlines(): iterable
     {
-        $s2 = static fn (string $level, $years): Signal => new Signal(Signal::S2, $level, 'old', ['last_release' => '2021-05-05T00:00:00+00:00', 'years' => $years]);
-        $s4 = static fn (string $level, $years): Signal => new Signal(Signal::S4, $level, 'quiet', ['last_push' => '2022-01-10T00:00:00+00:00', 'years' => $years, 'activity' => 'push']);
-        yield 'marked abandoned' => [[new Signal(Signal::S1, Signal::LEVEL_HIGH, 'marked', [])], FlagSet::ABANDONED, ['unit' => 'reason', 'value' => 'marked', 'source' => null]];
-        yield 'archived' => [[new Signal(Signal::S3, Signal::LEVEL_HIGH, 'archived', [])], FlagSet::ABANDONED, ['unit' => 'reason', 'value' => 'archived', 'source' => null]];
-        yield 'pinned' => [[new Signal(Signal::S6, Signal::LEVEL_WARN, 'pinned', ['reason' => 'branch_snapshot'])], FlagSet::PINNED, ['unit' => 'reason', 'value' => 'branch_snapshot', 'source' => null]];
-        yield 'pinned for a reason that is no word' => [[new Signal(Signal::S6, Signal::LEVEL_WARN, 'pinned', ['reason' => ['x']])], FlagSet::PINNED, ['unit' => 'reason', 'value' => null, 'source' => null]];
-        yield 'an old promise' => [[new Signal(Signal::S5, Signal::LEVEL_WARN, 'old promise', ['written_for_php' => '7.0'])], FlagSet::OLD_PROMISE, ['unit' => 'php', 'value' => '7.0', 'source' => null]];
+        $s2 = static fn (string $level, $years): Signal => new Signal($level, 'old', SignalDataStub::of(Signal::S2, ['last_release' => '2021-05-05T00:00:00+00:00', 'years' => $years]));
+        $s4 = static fn (string $level, $years): Signal => new Signal($level, 'quiet', SignalDataStub::of(Signal::S4, ['last_push' => '2022-01-10T00:00:00+00:00', 'years' => $years, 'activity' => 'push']));
+        yield 'marked abandoned' => [[new Signal(Signal::LEVEL_HIGH, 'marked', SignalDataStub::of(Signal::S1, []))], FlagSet::ABANDONED, ['unit' => 'reason', 'value' => 'marked', 'source' => null]];
+        yield 'archived' => [[new Signal(Signal::LEVEL_HIGH, 'archived', SignalDataStub::of(Signal::S3, []))], FlagSet::ABANDONED, ['unit' => 'reason', 'value' => 'archived', 'source' => null]];
+        yield 'pinned' => [[new Signal(Signal::LEVEL_WARN, 'pinned', SignalDataStub::of(Signal::S6, ['reason' => 'branch_snapshot']))], FlagSet::PINNED, ['unit' => 'reason', 'value' => 'branch_snapshot', 'source' => null]];
+        yield 'an old promise' => [[new Signal(Signal::LEVEL_WARN, 'old promise', SignalDataStub::of(Signal::S5, ['written_for_php' => 7]))], FlagSet::OLD_PROMISE, ['unit' => 'php', 'value' => 7, 'source' => null]];
         yield 'stale by its release' => [[$s2(Signal::LEVEL_WARN, 5.4)], FlagSet::STALE, ['unit' => 'years', 'value' => 5.4, 'source' => 'release']];
-        yield 'stale by whole years' => [[$s2(Signal::LEVEL_WARN, 6)], FlagSet::STALE, ['unit' => 'years', 'value' => 6, 'source' => 'release']];
+        yield 'stale by whole years' => [[$s2(Signal::LEVEL_WARN, 6.0)], FlagSet::STALE, ['unit' => 'years', 'value' => 6.0, 'source' => 'release']];
         yield 'the release is older' => [[$s2(Signal::LEVEL_HIGH, 5.4), $s4(Signal::LEVEL_HIGH, 4.7)], FlagSet::SILENT, ['unit' => 'years', 'value' => 5.4, 'source' => 'release']];
         yield 'the push is older' => [[$s2(Signal::LEVEL_HIGH, 4.7), $s4(Signal::LEVEL_HIGH, 5.4)], FlagSet::SILENT, ['unit' => 'years', 'value' => 5.4, 'source' => 'push']];
         yield 'as old as each other' => [[$s2(Signal::LEVEL_HIGH, 5.0), $s4(Signal::LEVEL_HIGH, 5.0)], FlagSet::SILENT, ['unit' => 'years', 'value' => 5.0, 'source' => 'release']];
         yield 'the push alone' => [[$s2(Signal::LEVEL_HIGH, null), $s4(Signal::LEVEL_HIGH, 3.0)], FlagSet::SILENT, ['unit' => 'years', 'value' => 3.0, 'source' => 'push']];
-        yield 'years that are no number' => [[$s2(Signal::LEVEL_WARN, ['x'])], FlagSet::STALE, ['unit' => 'years', 'value' => null, 'source' => null]];
+        yield 'no years' => [[$s2(Signal::LEVEL_WARN, null)], FlagSet::STALE, ['unit' => 'years', 'value' => null, 'source' => null]];
     }
 
     /** Abandoned reads the signals that fired in its order, and every fired flag is written. */
     public function testAbandonedNamesItsSignalsAndItsDegree(): void
     {
         $signals = [
-            new Signal(Signal::S1, Signal::LEVEL_HIGH, 'marked', ['marked_by' => 'lock']),
-            new Signal(Signal::S2, Signal::LEVEL_HIGH, 'old', ['last_release' => '2021-05-05T00:00:00+00:00', 'years' => 5.4]),
-            new Signal(Signal::S6, Signal::LEVEL_WARN, 'pinned', ['reason' => 'no_stable_release', 'version' => '1.0.0']),
+            new Signal(Signal::LEVEL_HIGH, 'marked', SignalDataStub::of(Signal::S1, ['marked_by' => 'lock'])),
+            new Signal(Signal::LEVEL_HIGH, 'old', SignalDataStub::of(Signal::S2, ['last_release' => '2021-05-05T00:00:00+00:00', 'years' => 5.4])),
+            new Signal(Signal::LEVEL_WARN, 'pinned', SignalDataStub::of(Signal::S6, ['reason' => 'no_stable_release', 'version' => '1.0.0'])),
         ];
 
         $flags = JsonPath::arrayAt((new FindingBuilder())->withSignals($signals)->build()->toArray(), ['flags']);
@@ -1111,16 +1137,6 @@ final class FindingTest extends TestCase
         self::assertSame([FlagSet::ABANDONED, FlagSet::PINNED], array_column($flags, 'id'));
         self::assertSame(['S1', 'S2'], JsonPath::arrayAt($flags, [0, 'signal_ids']));
         self::assertSame(['reasons' => ['marked'], 'liveness_complete' => true], JsonPath::arrayAt($flags, [0, 'degree']));
-    }
-
-    /** A written S9 row keeps its named keys only. */
-    public function testAWrittenS9RowKeepsItsNamedKeys(): void
-    {
-        $signals = [new Signal(Signal::S9, Signal::LEVEL_HIGH, '1 advisory', ['advisories' => [['id' => 'PKSA-a', 'severity' => 'high', 0 => 'stray']], 'releases_read' => true])];
-
-        $document = (new FindingBuilder())->withSignals($signals)->build()->toArray();
-
-        self::assertSame(['id' => 'PKSA-a', 'severity' => 'high'], JsonPath::arrayAt($document, ['signals', 0, 'data', 'advisories', 0]));
     }
 
     /**
@@ -1142,7 +1158,7 @@ final class FindingTest extends TestCase
         $finding = (new FindingBuilder())->withVerdict(Verdict::UNKNOWN)->withSignals($signals)->build()
             ->withDetails(FindingDetails::of($facts, null, new PhpFloor('8.4', null), [], $signals, 'HTTP 503'));
 
-        $written = JsonPath::arrayAt($finding->toArray(), ['signals']);
+        $written = JsonPath::arrayAt(JsonPath::decoded($finding->toArray()), ['signals']);
 
         self::assertSame([Signal::S6, Signal::S10], array_column($written, 'id'));
         self::assertSame($blocks, JsonPath::arrayAt($written, [1, 'data', 'blocks']));
@@ -1151,9 +1167,9 @@ final class FindingTest extends TestCase
     /** @return iterable<string, array{list<Signal>, list<string>}> */
     public static function releasesBeside(): iterable
     {
-        $s6 = new Signal(Signal::S6, Signal::LEVEL_WARN, 'pinned', ['reason' => 'no_stable_release', 'version' => '1.0.0']);
+        $s6 = new Signal(Signal::LEVEL_WARN, 'pinned', SignalDataStub::of(Signal::S6, ['reason' => 'no_stable_release', 'version' => '1.0.0']));
         $gaps = [['check' => 'a', 'reason' => 'no_token', 'blocks' => ['S9']], ['check' => 'b', 'reason' => 'no_token', 'blocks' => ['S9', 'S4']]];
-        yield 'beside an S10 whose gaps share a block' => [[$s6, new Signal(Signal::S10, Signal::LEVEL_INFO, 'not checked', ['unchecked' => $gaps, 'blocks' => ['S9', 'S4']])], ['S9', 'S4']];
+        yield 'beside an S10 whose gaps share a block' => [[$s6, new Signal(Signal::LEVEL_INFO, 'not checked', SignalDataStub::of(Signal::S10, ['unchecked' => $gaps, 'blocks' => ['S9', 'S4']]))], ['S9', 'S4']];
         yield 'with no S10' => [[$s6], ['S9']];
     }
 }

@@ -36,7 +36,7 @@ final class LinkIndexTest extends TestCase
 
         self::assertSame(
             [['source' => Holder::PACKAGE, 'package' => 'scheb/2fa-email', 'version' => 'v5.13.2', 'link' => Holder::REQUIRE, 'constraint' => 'self.version']],
-            array_map(static fn (Holder $holder): array => $holder->toArray(), $index->excluding('scheb/2fa-bundle', '5.13.3.0'))
+            array_map(static fn (Holder $holder): array => ['source' => $holder->source(), 'package' => $holder->package(), 'version' => $holder->version(), 'link' => $holder->link(), 'constraint' => $holder->constraint()], $index->excluding('scheb/2fa-bundle', '5.13.3.0'))
         );
         self::assertSame([], $index->excluding('scheb/2fa-bundle', '5.13.2.0'));
     }

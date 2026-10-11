@@ -4,40 +4,48 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Legacy;
 
-use Lockrot\Legacy\AdvisoryFacts013;
 use Lockrot\Legacy\SignalData013;
+use Lockrot\Signal\Data\AbandonedData;
+use Lockrot\Signal\Data\ExposedPackage;
+use Lockrot\Signal\Data\ExposureData;
+use Lockrot\Signal\Data\NoReleaseData;
 use Lockrot\Signal\Signal;
+use Lockrot\Tests\Support\SignalDataStub;
 use PHPUnit\Framework\TestCase;
 
 /** The report-1 view of a signal's data, which the text formats print. */
 final class SignalData013Test extends TestCase
 {
-    private const ROW013 = ['id' => 'PKSA-1', 'cve' => null, 'title' => 'a title', 'link' => null, 'severity' => 'high', 'reported_at' => null, 'affected_versions' => '<2.0', 'fixed_by' => '2.0.0', 'fixed_on_branch' => true];
-
-    public function testS9sReport2RowsGiveWayToTheReport1Rows(): void
+    public function testTheKeysThatReport2AddsAreLeftOut(): void
     {
-        $signal = new Signal(Signal::S9, Signal::LEVEL_HIGH, '1 advisory', ['advisories' => [['id' => 'PKSA-1', 'fix' => ['kind' => 'update']]], 'releases_read' => true, 'complete' => true]);
+        $signal = new Signal(Signal::LEVEL_HIGH, 'marked abandoned', new AbandonedData('lock', 'acme/next', 'https://packagist.org/packages/acme/next'));
 
-        $data = SignalData013::of($signal, new AdvisoryFacts013([self::ROW013], true));
-
-        self::assertSame(['advisories' => [self::ROW013], 'releases_read' => true], $data);
-        self::assertSame(Signal::LEVEL_WARN, SignalData013::level($signal));
+        self::assertSame(['replacement' => 'acme/next'], SignalData013::toReport1Array($signal));
     }
 
-    public function testS9RowsWithoutAFixAreKept(): void
+    public function testS7NamesEachPackageByItsReport1Word(): void
     {
-        $rows = [['id' => 'PKSA-1', 'fixed_by' => null]];
-        $signal = new Signal(Signal::S9, Signal::LEVEL_WARN, '1 advisory', ['advisories' => $rows, 'releases_read' => false]);
+        $signal = new Signal(Signal::LEVEL_INFO, 'pulls in 2 flagged packages', new ExposureData([
+            new ExposedPackage('acme/old', ['acme/app', 'acme/old'], 'low', 'stale', ['stale']),
+            new ExposedPackage('acme/unsafe', ['acme/app', 'acme/unsafe'], 'high', null, ['vulnerable']),
+        ]));
 
-        self::assertSame(['advisories' => $rows, 'releases_read' => false], SignalData013::of($signal, new AdvisoryFacts013([self::ROW013], true)));
+        self::assertSame(['flagged' => 2, 'packages' => [
+            ['package' => 'acme/old', 'verdict' => 'stale', 'chain' => ['acme/app', 'acme/old']],
+            ['package' => 'acme/unsafe', 'verdict' => 'vulnerable', 'chain' => ['acme/app', 'acme/unsafe']],
+        ]], SignalData013::toReport1Array($signal));
     }
 
-    public function testAnotherSignalKeepsItsOwnAdvisoriesKey(): void
+    public function testASignalThatReport2AddsNoKeyToKeepsAll(): void
     {
-        $data = ['advisories' => [['id' => 'PKSA-1', 'fix' => ['kind' => 'update']]]];
-        $signal = new Signal(Signal::S5, Signal::LEVEL_WARN, 'old promise', $data);
+        $signal = new Signal(Signal::LEVEL_WARN, 'last release 2021-05-05', new NoReleaseData('2021-05-05T00:00:00+00:00', '1.0.0', 5.0, null));
 
-        self::assertSame($data, SignalData013::of($signal, new AdvisoryFacts013([self::ROW013], true)));
-        self::assertSame(Signal::LEVEL_WARN, SignalData013::level(new Signal(Signal::S5, Signal::LEVEL_WARN, 'old promise')));
+        self::assertSame(['last_release' => '2021-05-05T00:00:00+00:00', 'last_version' => '1.0.0', 'years' => 5.0, 'dated_by' => null], SignalData013::toReport1Array($signal));
+    }
+
+    public function testReport1sS9LevelIsWarnWhateverTheSeverity(): void
+    {
+        self::assertSame(Signal::LEVEL_WARN, SignalData013::level(new Signal(Signal::LEVEL_HIGH, '1 advisory', SignalDataStub::of(Signal::S9, []))));
+        self::assertSame(Signal::LEVEL_HIGH, SignalData013::level(new Signal(Signal::LEVEL_HIGH, 'marked abandoned', SignalDataStub::of(Signal::S1, []))));
     }
 }

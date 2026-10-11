@@ -6,6 +6,7 @@ namespace Lockrot\Signal\Rule;
 
 use Lockrot\Clock;
 use Lockrot\Signal\AgeMeasure;
+use Lockrot\Signal\Data\NoPushData;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\SignalRule;
@@ -34,9 +35,13 @@ final class NoPushRule implements SignalRule
         }
         $last = $reading->measuredAt();
 
-        return new Signal(Signal::S4, $level, \sprintf('%s %s (%.1f years ago)', $activity->ref()->activityWording(), $last->format('Y-m-d'), $reading->years()), [
-            'last_push' => $last->format(\DATE_ATOM), 'repo' => $activity->repo(), 'host' => $activity->ref()->host(), 'years' => $reading->years(),
-            'forge' => $activity->ref()->forge(), 'activity' => $activity->ref()->event(),
-        ]);
+        return new Signal($level, \sprintf('%s %s (%.1f years ago)', $activity->ref()->activityWording(), $last->format('Y-m-d'), $reading->years()), new NoPushData(
+            $last->format(\DATE_ATOM),
+            $activity->repo(),
+            $activity->ref()->host(),
+            $reading->years(),
+            $activity->ref()->forge(),
+            $activity->ref()->event()
+        ));
     }
 }

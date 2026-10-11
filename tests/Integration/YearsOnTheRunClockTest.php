@@ -19,6 +19,7 @@ use Lockrot\Signal\Rule\NoReleaseRule;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\FindingBuilder;
+use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Tests\Unit\Signal\FactsBuilder;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -77,7 +78,7 @@ final class YearsOnTheRunClockTest extends TestCase
 
         self::assertNotNull($signal);
         self::assertSame(Signal::LEVEL_WARN, $signal->level());
-        self::assertSame(5.0, $signal->data()['years']);
+        self::assertSame(5.0, SignalDataStub::fields($signal)['years']);
         self::assertSame('last release 2021-10-18 (5.0 years ago)', $signal->summary());
         self::assertStringContainsString('"years": 5,', (new JsonFormatter())->format(self::report([$signal])));
     }
@@ -97,7 +98,7 @@ final class YearsOnTheRunClockTest extends TestCase
         foreach ([new NoPushRule($clock, $thresholds), new LeftBehindRule($clock, $thresholds)] as $rule) {
             $signal = $rule->evaluate($facts);
             self::assertNotNull($signal);
-            self::assertSame(3.1, $signal->data()['years']);
+            self::assertSame(3.1, SignalDataStub::fields($signal)['years']);
             self::assertStringContainsString('(3.1 years ago', $signal->summary());
         }
     }

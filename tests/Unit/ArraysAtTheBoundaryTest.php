@@ -19,16 +19,10 @@ final class ArraysAtTheBoundaryTest extends TestCase
     private const WRITERS = [
         'Lockrot\Analyzer\Report',
         'Lockrot\Baseline\BaselineFile',
+        'Lockrot\Composer\ComposerCacheAdapter',
         'Lockrot\Explain\Explanation',
         'Lockrot\Html\ReportDocument',
         'Lockrot\Json\JsonWriter',
-        // Writes report-2's `signals[].data.advisories[]`.
-        'Lockrot\Signal\Rule\AdvisoryRule',
-    ];
-    /** Per class, the writers that can pass it a written array. */
-    private const HOLDERS = [
-        // A signal holds report-2's `signals[].data` as its rule wrote it.
-        'Lockrot\Signal\Signal' => ['Lockrot\Signal\Rule\AdvisoryRule'],
     ];
     /** The namespaces whose every class writes a document: the formatters and report-1. */
     private const WRITER_NAMESPACES = ['Lockrot\Output\\', 'Lockrot\Legacy\\'];
@@ -69,18 +63,13 @@ final class ArraysAtTheBoundaryTest extends TestCase
         'Lock/ConfiguredRepositories.php' => 1,
         'Lock/LockFile.php' => 1,
         'Lock/ProjectConfig.php' => 6,
-        'Output/ExplainFormatter.php' => 1,
         'Output/GitlabFormatter.php' => 2,
         'Output/HtmlFormatter.php' => 1,
         'Output/SarifFormatter.php' => 4,
         'SelfUpdate/ReleaseLocator.php' => 9,
-        'Signal/Rule/AdvisoryRule.php' => 3,
-        'Signal/Rule/PinnedRule.php' => 1,
-        'Signal/Signal.php' => 3,
         'Signal/Thresholds.php' => 1,
-        'Verdict/Finding.php' => 10,
-        'Verdict/FindingDetails.php' => 9,
-        'Verdict/FlagSentence.php' => 4,
+        'Verdict/Finding.php' => 2,
+        'Verdict/FindingDetails.php' => 2,
         'Verdict/ScoreModel.php' => 6,
     ];
 
@@ -91,7 +80,7 @@ final class ArraysAtTheBoundaryTest extends TestCase
     {
         $violations = [];
         foreach (self::sourceFiles() as $relative => $path) {
-            foreach (WrittenArrayReads::inSource(self::read($path), [self::class, 'isWriter'], self::HOLDERS) as $violation) {
+            foreach (WrittenArrayReads::inSource(self::read($path), [self::class, 'isWriter']) as $violation) {
                 $violations[] = $relative.':'.$violation;
             }
         }
@@ -150,6 +139,7 @@ final class ArraysAtTheBoundaryTest extends TestCase
     {
         $outside = 'uses a written array outside a return, an array item or a writer';
         $returns = 'returns a written array from a method that is not a writer';
+        $encodes = 'encodes JSON outside a writer: only a writer calls the encoder';
         yield 'a key of the call itself' => ['    public function a($o) { return $o->toArray()[\'id\']; }', ['6: '.$outside]];
         yield 'a variable and array_values()' => ['    public function a($o) { $rows = array_values($o->findingRows()); return $rows[0]; }', ['6: '.$outside]];
         yield 'a foreach' => ["    public function a(\$o) {\n        foreach (\$o->toArray() as \$row) {\n            echo \$row['id'];\n        }\n    }", ['7: '.$outside]];
@@ -166,7 +156,10 @@ final class ArraysAtTheBoundaryTest extends TestCase
         yield 'a call by the class name' => ["    public function a(\$o) { return Reader::b(\$o->toArray()); }\n    private static function b(array \$row) { return \$row['id']; }", ['6: '.$outside]];
         yield 'a new object of the class itself' => ["    private array \$row;\n    private function __construct(array \$row) { \$this->row = \$row; }\n    public static function of(\$o) { return new static(\$o->toArray()); }\n    public function id() { return \$this->row['id']; }", ['8: passes a written array to static']];
         yield 'a yield' => ["    public function a(\$o) { yield \$o->toArray(); }\n    public function b(\$o) { foreach (\$this->a(\$o) as \$row) { return \$row['id']; } }", ['6: '.$outside]];
-        yield 'json_encode() and json_decode()' => ['    public function a($o) { return json_decode(json_encode($o->toArray()), true)[\'id\']; }', ['6: '.$outside]];
+        yield 'json_encode() and json_decode()' => ['    public function a($o) { return json_decode(json_encode($o->toArray()), true)[\'id\']; }', ['6: '.$encodes, '6: '.$outside]];
+        yield 'a round trip of a signal\'s data through json_encode()' => ['    public function a($s) { return json_decode(json_encode($s->data()), true)[\'replacement\']; }', ['6: '.$encodes]];
+        yield 'a round trip of a signal\'s data through the JSON writer' => ['    public function a($s) { return json_decode(\\Lockrot\\Json\\JsonWriter::encode($s->data()), true)[\'replacement\']; }', ['6: '.$encodes]];
+        yield 'a key of the report-1 view of a signal' => ['    public function a($s) { return \\Lockrot\\Legacy\\SignalData013::toReport1Array($s)[\'replacement\']; }', ['6: '.$outside]];
         yield 'a key compared in a foreach' => ['    public function a($o) { foreach ($o->toArray() as $k => $v) { if ($k === \'id\') { return $v; } } }', ['6: '.$outside]];
         yield 'an ArrayObject' => ['    public function a($o) { return (new \ArrayObject($o->toArray()))[\'id\']; }', ['6: passes a written array to ArrayObject']];
         yield 'an object cast' => ['    public function a($o) { return ((object) $o->toArray())->id; }', ['6: '.$outside]];
@@ -213,6 +206,8 @@ final class ArraysAtTheBoundaryTest extends TestCase
         yield 'a public method that returns a key' => ["    public function rowOf(\$o): array { \$rows = \$o->findingRows(); return \$rows['x']; }", ['6: '.$returns]];
         yield 'a private method can return it' => ["    private function rows(\$o): array { return \$o->toArray(); }", []];
         yield 'a copy that array_values() makes' => ["    public function rows(\$o): array { return array_values(\$o->toArray()); }", ['6: '.$returns]];
+        yield 'a copy that array_diff_key() makes' => ["    public function rows(\$o): array { return array_diff_key(\$o->jsonSerialize(), ['x' => true]); }", ['6: '.$returns]];
+        yield 'copies that keep keys or rows' => ["    public function a(\$o) { return [Other::f(array_intersect_key(\$o->toArray(), [])), Other::g(array_diff(\$o->toArray(), [])), Other::h(array_chunk(\$o->toArray(), 2)), Other::i(array_pop(\$o->toArray()))]; }", ['6: '.$other, '6: '.$other, '6: '.$other, '6: '.$other]];
         yield 'a copy of a key' => ["    public function a(\$o) { return Other::f(array_values(\$o->toArray()['findings'])); }", ['6: '.$other]];
         yield 'a destructured key' => ["    public function a(\$o) { ['findings' => \$f] = \$o->toArray(); return Other::f(\$f); }", ['6: '.$other]];
         yield 'an element of a list' => ["    public function rows(\$fs): array { \$rows = []; foreach (\$fs as \$x) { \$rows[] = \$x->toArray(); } return \$rows; }", ['6: '.$returns]];

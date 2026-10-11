@@ -20,11 +20,12 @@ use Lockrot\Security\Gets;
 use Lockrot\Security\Holder;
 use Lockrot\Security\PackageFixes;
 use Lockrot\Security\PhpCheck;
+use Lockrot\Signal\Data\AdvisoryRow;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\PhpFloor;
-use Lockrot\Signal\Rule\AdvisoryRule;
 use Lockrot\Signal\Signal;
 use Lockrot\Tests\Support\JsonPath;
+use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
 use Lockrot\Verdict\FindingDetails;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -68,16 +69,16 @@ final class FindingDetailsTest extends TestCase
      */
     public function testUnreadReleasesGiveTheInstalledBranchARowWithNoFixKnown(): void
     {
-        $rows = [['id' => 'PKSA-a', 'severity' => 'high', 'counted' => true, 'fix' => ['kind' => 'unknown', 'on_installed_branch' => null, 'reason' => 'releases_unknown']]];
+        $rows = self::rows([['id' => 'PKSA-a', 'severity' => 'high', 'counted' => true, 'fix' => ['kind' => 'unknown', 'on_installed_branch' => null, 'reason' => 'releases_unknown']]]);
         $details = new FindingDetails('unavailable', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [], new PackageFixes(['PKSA-a' => Fix::unknown(Fix::RELEASES_UNKNOWN)], [], null, null, null));
 
         $security = $details->toSecurityArray($rows, '1.x');
 
         self::assertSame(
             ['fixed' => 0, 'unknown' => 1, 'of' => 1, 'fix_kind' => null, 'lowest' => null, 'newest' => null, 'held_by' => [], 'if_applied' => null],
-            $security['installed_branch_fixes']
+            JsonPath::decoded($security['installed_branch_fixes'])
         );
-        self::assertStringContainsString(' — fix not known on 1.x;', $details->vulnerableSummary($rows, '1.x', 'high'));
+        self::assertStringContainsString(' — fix not known on 1.x;', $details->vulnerableSummary([$rows[0]->withDeciding(true)], '1.x', 'high'));
         self::assertNull($details->toSecurityArray($rows, null)['installed_branch_fixes'], 'a branch snapshot has no installed branch');
     }
 
@@ -104,12 +105,12 @@ final class FindingDetailsTest extends TestCase
 
         $skipped = FindingDetails::of($facts, null, new PhpFloor('8.4', null), [], [], null)->skipped();
 
-        self::assertContains(['check' => 'advisories', 'reason' => 'unparseable_version', 'blocks' => ['S9']], $skipped);
+        self::assertContains(['check' => 'advisories', 'reason' => 'unparseable_version', 'blocks' => ['S9']], JsonPath::decoded($skipped));
     }
 
     public function testASnapshotsVulnerableSummaryHasNoBranchClause(): void
     {
-        $rows = [['id' => 'PKSA-a', 'cve' => 'CVE-2026-1', 'title' => 'a title', 'severity' => 'high', 'counted' => true, 'deciding' => true, 'fix' => ['kind' => 'unknown', 'on_installed_branch' => null]]];
+        $rows = self::rows([['id' => 'PKSA-a', 'cve' => 'CVE-2026-1', 'title' => 'a title', 'severity' => 'high', 'counted' => true, 'deciding' => true, 'fix' => ['kind' => 'unknown', 'on_installed_branch' => null]]]);
         $details = new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [], null);
 
         self::assertSame('1 advisory: 1 high; advisory: CVE-2026-1 a title', $details->vulnerableSummary($rows, null, 'high'));
@@ -138,20 +139,20 @@ final class FindingDetailsTest extends TestCase
     {
         $holder = new Holder(Holder::PACKAGE, 'acme/b', '2.0.0', Holder::REQUIRE, '^1.0');
         $candidate = new Candidate(new StableRelease('1.2.0.0', '1.2.0', null, '>=8.1', false), '1', Fix::UPGRADE, [$holder]);
-        $branch = new BranchFixes('1.x', true, 1, 0, 2, $candidate, '1.3.0', ['PKSA-a']);
+        $branch = new BranchFixes('1.x', true, 0, 2, $candidate, '1.3.0', ['PKSA-a']);
         $gets = new Gets('1.3.0', PhpCheck::of('>=8.1', new PhpFloor('8.4', '>=8.1')), ['PKSA-a'], false);
         $details = new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [], new PackageFixes([], [$branch], $gets, null, null));
-        $rows = [
+        $rows = self::rows([
             ['id' => 'PKSA-a', 'severity' => 'medium', 'fix' => ['kind' => 'upgrade', 'on_installed_branch' => true]],
             ['id' => 'PKSA-b', 'severity' => 'low', 'fix' => ['kind' => 'update', 'on_installed_branch' => true]],
-        ];
+        ]);
 
         $security = $details->toSecurityArray($rows, '1.x');
 
         self::assertSame('medium', $security['worst']);
         self::assertSame(['critical' => 0, 'high' => 0, 'medium' => 1, 'unrated' => 0, 'low' => 1], $security['counts']);
         self::assertSame('upgrade', $security['fix_kind']);
-        self::assertSame(['fixed' => 1, 'unknown' => 0, 'of' => 2, 'fix_kind' => 'upgrade', 'lowest' => '1.2.0', 'newest' => '1.3.0', 'held_by' => [AdvisoryRule::heldBy($holder)], 'if_applied' => null], $security['installed_branch_fixes']);
+        self::assertSame(['fixed' => 1, 'unknown' => 0, 'of' => 2, 'fix_kind' => 'upgrade', 'lowest' => '1.2.0', 'newest' => '1.3.0', 'held_by' => [JsonPath::decoded($holder)], 'if_applied' => null], JsonPath::decoded($security['installed_branch_fixes']));
         self::assertSame([
             'version' => '1.3.0',
             'php_check' => ['requires' => '>=8.1', 'project_allows' => true, 'target_runs' => true, 'raise_to' => null, 'raise_size' => null],
@@ -164,16 +165,16 @@ final class FindingDetailsTest extends TestCase
     public function testTheS9RowsCountTheFixedAndTheUnknown(): void
     {
         $details = new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [], null);
-        $rows = [
+        $rows = self::rows([
             ['id' => 'PKSA-a', 'severity' => 'acme:severe', 'fix' => ['kind' => 'update', 'on_installed_branch' => true]],
             ['id' => 'PKSA-b', 'severity' => 'low', 'fix' => ['kind' => 'update', 'on_installed_branch' => true]],
             ['id' => 'PKSA-c', 'severity' => 'low', 'fix' => ['kind' => 'unknown', 'on_installed_branch' => null]],
             ['id' => 'PKSA-d', 'severity' => 'low', 'fix' => []],
-        ];
+        ]);
 
         $security = $details->toSecurityArray($rows, '1.x');
 
-        self::assertSame(['fixed' => 2, 'unknown' => 2, 'of' => 4], \array_slice(JsonPath::arrayAt($security, ['installed_branch_fixes']), 0, 3));
+        self::assertSame(['fixed' => 2, 'unknown' => 2, 'of' => 4], \array_slice(JsonPath::arrayAt(JsonPath::decoded($security), ['installed_branch_fixes']), 0, 3));
         self::assertSame(1, JsonPath::intAt($security, ['counts', 'acme:severe']));
         self::assertSame(3, JsonPath::intAt($security, ['counts', 'low']));
         self::assertSame('low', $security['worst']);
@@ -185,11 +186,11 @@ final class FindingDetailsTest extends TestCase
     {
         $ignored = new IgnoredAdvisory(new Advisory('PKSA-i', null, null, null, 'low', null), new AdvisoryIgnoreMatch(AdvisoryIgnoreMatch::ID, 'PKSA-i', null, AdvisoryIgnoreMatch::BY_AUDIT));
         $details = new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'partial', 'lookup_failed', [$ignored], null);
-        $rows = [
+        $rows = self::rows([
             ['id' => 'PKSA-a', 'severity' => 'acme:severe', 'fix' => ['kind' => 'update']],
             ['id' => 'PKSA-b', 'severity' => 'low', 'fix' => ['kind' => 'raise-php']],
             ['id' => 'PKSA-c', 'severity' => 'low', 'fix' => ['kind' => 'upgrade']],
-        ];
+        ]);
 
         $standing = $details->standing($rows);
 
@@ -251,7 +252,7 @@ final class FindingDetailsTest extends TestCase
     #[DataProvider('skips')]
     public function testEachCheckThatDidNotRunIsSkippedWithItsReason(PackageFacts $facts, ?AllowlistEntry $entry, array $signals, array $skipped): void
     {
-        self::assertSame($skipped, FindingDetails::of($facts, $entry, new PhpFloor('8.4', null), [], $signals, null)->skipped());
+        self::assertSame($skipped, JsonPath::decoded(FindingDetails::of($facts, $entry, new PhpFloor('8.4', null), [], $signals, null)->skipped()));
     }
 
     /** @return iterable<string, array{PackageFacts, ?AllowlistEntry, list<Signal>, list<array{check: string, reason: string, blocks: list<string>}>}> */
@@ -261,7 +262,7 @@ final class FindingDetailsTest extends TestCase
         $read = F::facts(F::package(), $metadata);
         $asked = F::facts(F::package(), $metadata, F::activity(false, '2026-01-01T00:00:00+00:00'));
         $activity = static fn (string $reason): array => ['check' => 'repository_activity', 'reason' => $reason, 'blocks' => ['S3', 'S4']];
-        $s10 = static fn ($unchecked): Signal => new Signal(Signal::S10, Signal::LEVEL_INFO, 'not checked', ['unchecked' => $unchecked]);
+        $s10 = static fn ($unchecked): Signal => new Signal(Signal::LEVEL_INFO, 'not checked', SignalDataStub::of(Signal::S10, ['unchecked' => $unchecked]));
         $whole = new AllowlistEntry('vendor/pkg', null, 'kept on purpose', null, AllowlistEntry::BY_PROJECT);
         $silentOnly = new AllowlistEntry('vendor/pkg', null, 'kept on purpose', null, AllowlistEntry::BY_PROJECT, ['silent']);
 
@@ -270,13 +271,22 @@ final class FindingDetailsTest extends TestCase
         yield 'a whole-package entry' => [$read, $whole, [], [$activity('allowlisted')]];
         yield 'an entry that accepts some flags' => [$read, $silentOnly, [], [$activity('no_repository')]];
         yield 'the reason the facts give' => [new PackageFacts(F::package(), $metadata, null, [], 'no_token'), null, [], [$activity('no_token')]];
-        yield 'S10 holds the activity gap' => [$read, null, [new Signal(Signal::S2, Signal::LEVEL_WARN, 'old'), $s10(['not a gap', ['check' => 'repository_activity', 'reason' => 'no_token', 'blocks' => ['S3', 'S4']]])], []];
-        yield 'S10 without a list' => [$read, null, [$s10('none')], [$activity('no_repository')]];
+        yield 'S10 holds the activity gap' => [$read, null, [new Signal(Signal::LEVEL_WARN, 'old', SignalDataStub::of(Signal::S2, [])), $s10([['check' => 'repository_activity', 'reason' => 'no_token', 'blocks' => ['S3', 'S4']]])], []];
         yield 'S10 holds another gap' => [$read, null, [$s10([['check' => 'releases', 'reason' => 'releases_unknown', 'blocks' => ['S9']]])], [$activity('no_repository')]];
         yield 'not from a Composer repository' => [F::facts(F::package(['fromComposerRepository' => false])), null, [], [
             $activity('not_from_composer_repository'),
             ['check' => 'release_metadata', 'reason' => 'not_from_composer_repository', 'blocks' => ['S2', 'S8']],
         ]];
         yield 'a branch snapshot' => [F::facts(F::package(['version' => 'dev-main']), $metadata, F::activity(false, null)), null, [], [['check' => 'release_branch', 'reason' => 'branch_snapshot', 'blocks' => ['S8']]]];
+    }
+
+    /**
+     * @param list<array<string, mixed>> $rows each with its `deciding` mark when it has one
+     *
+     * @return list<AdvisoryRow>
+     */
+    private static function rows(array $rows): array
+    {
+        return array_map(static fn (array $row): AdvisoryRow => SignalDataStub::row($row)->withDeciding(($row['deciding'] ?? false) === true), $rows);
     }
 }

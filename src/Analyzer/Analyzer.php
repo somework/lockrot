@@ -30,6 +30,7 @@ use Lockrot\Graph\DependencyGraph;
 use Lockrot\Lock\LockedPackage;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
+use Lockrot\Score\CountedAdvisory;
 use Lockrot\Security\FixFinder;
 use Lockrot\Security\LinkIndex;
 use Lockrot\Security\PackageFixes;
@@ -451,13 +452,13 @@ final class Analyzer
      *
      * @param list<Advisory> $advisories
      *
-     * @return list<array{id: string, severity: string, fix_kind: string}>
+     * @return list<CountedAdvisory>
      */
     private static function countedAdvisories(array $advisories, PackageFixes $found): array
     {
         $counted = [];
         foreach ($advisories as $advisory) {
-            $counted[] = Score::advisory($advisory->id(), $advisory->severity() ?? '', $found->forAdvisory($advisory->id())->kind());
+            $counted[] = new CountedAdvisory($advisory->id(), $advisory->severity() ?? '', $found->forAdvisory($advisory->id())->kind());
         }
 
         return $counted;

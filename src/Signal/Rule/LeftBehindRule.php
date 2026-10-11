@@ -12,7 +12,8 @@ use Lockrot\Clock;
 use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Data\Repository\ReleaseBranch;
 use Lockrot\Signal\AgeMeasure;
-use Lockrot\Signal\LeftBehindReading;
+use Lockrot\Signal\Data\LeftBehindData;
+use Lockrot\Signal\Data\ReachableBranch;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\Signal;
@@ -48,24 +49,6 @@ final class LeftBehindRule implements SignalRule
     }
 
     public function evaluate(PackageFacts $facts): ?Signal
-    {
-        $reading = $this->reading($facts);
-
-        if ($reading === null) {
-            return null;
-        }
-        $signal = $reading->signal();
-
-        return new Signal(Signal::S8, $signal->level(), $signal->summary(), $signal->data() + [
-            'reachable_php' => $reading->reachablePhp(),
-            'reachable_admits' => $reading->reachableAdmits(),
-            'newest_years' => $reading->newestYears(),
-            'reachable_years' => $reading->reachableYears(),
-        ]);
-    }
-
-    /** The signal and the keys report-2 adds to it, null where S8 does not fire. */
-    public function reading(PackageFacts $facts): ?LeftBehindReading
     {
         $metadata = $facts->metadata();
         $branch = ReleaseBranch::of($facts->package()->version());
@@ -129,32 +112,30 @@ final class LeftBehindRule implements SignalRule
                 : \sprintf('; %s released %s (%s)', ReleaseBranch::label($reachable['branch']), $reachable['version'], $reachable['at']->format('Y-m-d'));
         }
 
-        $signal = new Signal(Signal::S8, $level, $summary, [
-            'branch' => ReleaseBranch::label($branch),
-            'branch_last_release' => $ownAt->format(\DATE_ATOM),
-            'branch_last_version' => $reading->version(),
-            'years' => $reading->years(),
-            'newest_branch' => ReleaseBranch::label($newest['branch']),
-            'newest_version' => $newest['version'],
-            'newest_release' => $newest['at']->format(\DATE_ATOM),
-            'newest_php' => $newest['php'],
-            'newest_within_reach' => $blocking === null,
-            'floor_php' => $blocking === null ? null : $this->floor->php($blocking),
-            'floor_source' => $blocking,
-            'reachable_branch' => $reachable === null ? null : ReleaseBranch::label($reachable['branch']),
-            'reachable_version' => $reachable === null ? null : $reachable['version'],
-            'reachable_release' => $reachable === null ? null : $reachable['at']->format(\DATE_ATOM),
-            'suggested_constraint' => $reachable === null ? null : $this->suggestedConstraint($facts->package()->name(), $reachable['version']),
-            'dated_by' => $datedBy,
-        ]);
-
-        return new LeftBehindReading(
-            $signal,
-            $reachable === null ? null : $reachable['php'],
-            $reachable === null ? null : ['project' => $this->floor->admitsProject($reachable['php']), 'target' => $this->floor->admitsTarget($reachable['php'])],
+        return new Signal($level, $summary, new LeftBehindData(
+            ReleaseBranch::label($branch),
+            $ownAt->format(\DATE_ATOM),
+            $reading->version(),
+            $reading->years(),
+            $datedBy,
+            ReleaseBranch::label($newest['branch']),
+            $newest['version'],
+            $newest['at']->format(\DATE_ATOM),
+            $newest['php'],
             $this->clock->tenthsSince($newest['at']) / 10,
-            $reachable === null ? null : $this->clock->tenthsSince($reachable['at']) / 10
-        );
+            $blocking === null,
+            $blocking === null ? null : $this->floor->php($blocking),
+            $blocking,
+            $reachable === null ? null : new ReachableBranch(
+                ReleaseBranch::label($reachable['branch']),
+                $reachable['version'],
+                $reachable['at']->format(\DATE_ATOM),
+                $this->clock->tenthsSince($reachable['at']) / 10,
+                $reachable['php'],
+                ['project' => $this->floor->admitsProject($reachable['php']), 'target' => $this->floor->admitsTarget($reachable['php'])],
+                $this->suggestedConstraint($facts->package()->name(), $reachable['version'])
+            )
+        ));
     }
 
     /** Released within `release-warn-years` of today: the branch is still where fixes land. */

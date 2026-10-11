@@ -67,7 +67,7 @@ final class GradePredicateTest extends TestCase
         $s7 = null;
         foreach ($parent->signals() as $signal) {
             if ($signal->id() === Signal::S7) {
-                $s7 = $signal->data();
+                $s7 = JsonPath::decoded($signal->data());
             }
         }
 

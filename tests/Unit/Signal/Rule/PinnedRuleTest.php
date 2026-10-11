@@ -35,7 +35,7 @@ final class PinnedRuleTest extends TestCase
             'last_stable_dated_by' => null,
             'snapshot_time' => null,
             'tag_relation' => null,
-        ], $signal->data());
+        ], JsonPath::decoded($signal->data()));
     }
 
     public function testNoTaggedRelease(): void
@@ -52,7 +52,7 @@ final class PinnedRuleTest extends TestCase
             'last_stable_dated_by' => null,
             'snapshot_time' => null,
             'tag_relation' => null,
-        ], $signal->data());
+        ], JsonPath::decoded($signal->data()));
     }
 
     /**
@@ -96,7 +96,7 @@ final class PinnedRuleTest extends TestCase
             'last_stable_dated_by' => null,
             'snapshot_time' => '2023-12-24T00:53:44+00:00',
             'tag_relation' => null,
-        ], $signal->data());
+        ], JsonPath::decoded($signal->data()));
     }
 
     /** friendsofsymfony/oauth-server-bundle on dev-master: tags exist, the newest dated is 1.6.2. */
@@ -116,7 +116,7 @@ final class PinnedRuleTest extends TestCase
             'last_stable_dated_by' => null,
             'snapshot_time' => '2022-03-24T10:22:23+00:00',
             'tag_relation' => 'older',
-        ], $signal->data());
+        ], JsonPath::decoded($signal->data()));
     }
 
     /**
@@ -133,7 +133,7 @@ final class PinnedRuleTest extends TestCase
         ));
 
         self::assertNotNull($signal);
-        self::assertSame($relation, $signal->data()['tag_relation']);
+        self::assertSame($relation, JsonPath::decoded($signal->data())['tag_relation']);
     }
 
     /** @return iterable<string, array{string, string}> */
@@ -149,7 +149,7 @@ final class PinnedRuleTest extends TestCase
     {
         $signal = (new PinnedRule())->evaluate(F::facts(F::package(['version' => 'dev-main', 'time' => '2026-01-02T03:04:05+00:00', 'fromComposerRepository' => false])));
         self::assertNotNull($signal);
-        $data = $signal->data();
+        $data = JsonPath::decoded($signal->data());
         self::assertArrayHasKey('has_stable_release', $data);
         self::assertNull($data['has_stable_release']);
         self::assertSame('2026-01-02T03:04:05+00:00', $data['snapshot_time'], 'the lock still dates the commit');
@@ -169,7 +169,7 @@ final class PinnedRuleTest extends TestCase
             'last_stable_dated_by' => null,
             'snapshot_time' => '2024-05-06T07:08:09+00:00',
             'tag_relation' => null,
-        ], $signal->data());
+        ], JsonPath::decoded($signal->data()));
     }
 
     /**
@@ -197,7 +197,7 @@ final class PinnedRuleTest extends TestCase
             'last_stable_dated_by' => null,
             'snapshot_time' => '2024-01-01T00:00:00+00:00',
             'tag_relation' => null,
-        ], $signal->data());
+        ], JsonPath::decoded($signal->data()));
     }
 
     /** A split package's snapshot, its newest release dated by the monorepo it was split from. */
@@ -229,7 +229,7 @@ final class PinnedRuleTest extends TestCase
             'last_stable_dated_by' => 'symfony/polyfill',
             'snapshot_time' => null,
             'tag_relation' => null,
-        ], $signal->data());
+        ], JsonPath::decoded($signal->data()));
     }
 
     /** The lock's time is a snapshot's commit date; for a tag it is not a snapshot's, and S6 leaves it out. */
@@ -237,9 +237,9 @@ final class PinnedRuleTest extends TestCase
     {
         $signal = (new PinnedRule())->evaluate(F::facts(F::package(['version' => '1.0.0', 'time' => '2020-01-01T00:00:00+00:00']), F::metadata([['dev-main', '2020-01-01T00:00:00+00:00']])));
         self::assertNotNull($signal);
-        self::assertSame(PinnedRule::REASON_NO_STABLE_RELEASE, $signal->data()['reason']);
-        self::assertFalse($signal->data()['has_stable_release']);
-        self::assertNull($signal->data()['snapshot_time']);
+        self::assertSame(PinnedRule::REASON_NO_STABLE_RELEASE, JsonPath::decoded($signal->data())['reason']);
+        self::assertFalse(JsonPath::decoded($signal->data())['has_stable_release']);
+        self::assertNull(JsonPath::decoded($signal->data())['snapshot_time']);
     }
 
     public function testTaggedPackageIsNull(): void

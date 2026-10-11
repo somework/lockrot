@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Lockrot\Legacy;
 
+use Lockrot\Data\Advisory\Advisory;
+use Lockrot\Verdict\Verdict;
+
 /**
  * The advisory facts that report-1 wrote in S9's data and report-2 does not: per advisory the
  * highest tag outside its range (`fixed_by`), whether that tag is on the installed branch
@@ -33,6 +36,21 @@ final class AdvisoryFacts013
         return new self([], false);
     }
 
+    /**
+     * @param list<array{Advisory, ?string, bool}> $fixes per advisory in report-1's order: the highest tag outside its range, and
+     *                                                    whether that tag is on the installed branch
+     */
+    public static function of(array $fixes, bool $releasesRead): self
+    {
+        return new self(array_map(static fn (array $fix): array => self::row(...$fix), $fixes), $releasesRead);
+    }
+
+    /** @return Row013 */
+    private static function row(Advisory $advisory, ?string $fixedBy, bool $onBranch): array
+    {
+        return $advisory->toArray() + ['fixed_by' => $fixedBy, 'fixed_on_branch' => $onBranch];
+    }
+
     /** @return list<Row013> */
     public function rows(): array
     {
@@ -46,12 +64,29 @@ final class AdvisoryFacts013
     }
 
     /**
-     * S9's data as report-1 wrote it, empty when no advisory counts.
+     * The advisories that no release fixes, each with the first reason of {@see NoFix013::REASONS}
+     * that applies. Under `left-behind` only a fix on the installed branch counts.
      *
-     * @return array{advisories: list<Row013>, releases_read: bool}|array{}
+     * @return list<array{id: string, reason: string}>
      */
-    public function data(): array
+    public function noFixExpected(string $verdict): array
     {
-        return $this->rows === [] ? [] : ['advisories' => $this->rows, 'releases_read' => $this->releasesRead];
+        $leftBehind = $verdict === Verdict::LEFT_BEHIND;
+        $list = [];
+        foreach ($this->rows as $row) {
+            if ($leftBehind ? $row['fixed_on_branch'] : $row['fixed_by'] !== null) {
+                continue;
+            }
+            if ($leftBehind && $row['fixed_by'] !== null) {
+                $reason = NoFix013::NOT_ON_INSTALLED_BRANCH;
+            } elseif (!$this->releasesRead) {
+                $reason = NoFix013::RELEASES_UNKNOWN;
+            } else {
+                $reason = $row['affected_versions'] === null ? NoFix013::AFFECTED_RANGE_UNKNOWN : NoFix013::NO_RELEASE_FIXES;
+            }
+            $list[] = ['id' => $row['id'], 'reason' => $reason];
+        }
+
+        return $list;
     }
 }

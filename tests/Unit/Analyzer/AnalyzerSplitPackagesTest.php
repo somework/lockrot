@@ -26,6 +26,7 @@ use Lockrot\Signal\Signal;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\FakeHttpClient;
+use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
@@ -175,7 +176,7 @@ final class AnalyzerSplitPackagesTest extends TestCase
         $s8 = self::signal($finding, Signal::S8);
         self::assertNotNull($s8);
         self::assertSame('branch 8.x last released 2024-11-20 (1.8 years ago, dated by laravel/framework); 13.x released v13.24.0 (2026-09-01)', $s8->summary());
-        self::assertSame('laravel/framework', $s8->data()['dated_by']);
+        self::assertSame('laravel/framework', JsonPath::decoded($s8->data())['dated_by']);
         self::assertSame(1, $report->packagesChecked(), 'the parent is not a package of the lock');
         self::assertSame([], self::metadataNotes($report));
         self::assertFalse($report->hadNetworkFailures());
@@ -192,7 +193,7 @@ final class AnalyzerSplitPackagesTest extends TestCase
         self::assertSame([['illuminate/contracts', 'laravel/framework']], array_map('array_keys', $this->asked));
         $s8 = self::signal(self::finding($report, 'illuminate/contracts'), Signal::S8);
         self::assertNotNull($s8);
-        self::assertSame('laravel/framework', $s8->data()['dated_by']);
+        self::assertSame('laravel/framework', JsonPath::decoded($s8->data())['dated_by']);
         self::assertSame(2, $report->packagesChecked());
     }
 
