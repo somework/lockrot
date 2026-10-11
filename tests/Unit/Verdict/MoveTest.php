@@ -220,6 +220,15 @@ final class MoveTest extends TestCase
         self::assertSame('test it on PHP 8.4 — 1.0.0 is its newest release', $move['text']);
     }
 
+    /** With no release read, the test move names the installed release, dated as S5 reads it. */
+    public function testAnOldPromiseWithoutReleaseDataTestsTheInstalledOne(): void
+    {
+        $move = JsonPath::arrayAt(self::analyse(['releases' => null]), ['next_step']);
+
+        self::assertSame('test', $move['kind']);
+        self::assertSame(['version' => '1.0.0', 'released' => '2019-01-01T00:00:00+00:00', 'is_installed' => true, 'relation' => null, 'snapshot_time' => null], $move['latest']);
+    }
+
     /**
      * @param array<mixed, mixed> $case
      *
