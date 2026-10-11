@@ -6,10 +6,12 @@ namespace Lockrot\Tests\Unit\Analyzer;
 
 use Lockrot\Allowlist\AllowlistEntry;
 use Lockrot\Analyzer\Report;
+use Lockrot\Score\CountedAdvisory;
 use Lockrot\Signal\Signal;
 use Lockrot\Tests\Support\CorpusFloor;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\JsonPath;
+use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\FlagSet;
 use Lockrot\Verdict\Score;
@@ -35,14 +37,14 @@ final class SortTest extends TestCase
     {
         yield 'critical before high' => [self::graded('vendor/b', [Signal::S1]), self::graded('vendor/a', [Signal::S8])];
         yield 'high before medium' => [self::graded('vendor/b', [Signal::S8]), self::graded('vendor/a', [Signal::S2])];
-        yield 'medium before low' => [self::graded('vendor/b', [Signal::S2]), self::graded('vendor/a', [], [Score::advisory('PKSA-1', 'low', 'update')])];
-        yield 'low before unknown' => [self::graded('vendor/b', [], [Score::advisory('PKSA-1', 'low', 'update')]), self::graded('vendor/a', [], [], null, false)];
+        yield 'medium before low' => [self::graded('vendor/b', [Signal::S2]), self::graded('vendor/a', [], [new CountedAdvisory('PKSA-1', 'low', 'update')])];
+        yield 'low before unknown' => [self::graded('vendor/b', [], [new CountedAdvisory('PKSA-1', 'low', 'update')]), self::graded('vendor/a', [], [], null, false)];
         yield 'unknown before finished' => [self::graded('vendor/b', [], [], null, false), self::graded('vendor/a', [Signal::S2], [], self::entry('vendor/a'))];
         yield 'unknown before ok' => [self::graded('vendor/b', [], [], null, false), self::graded('vendor/a', [])];
         yield 'finished and ok as one group: by name' => [self::graded('vendor/a', []), self::graded('vendor/b', [Signal::S2], [], self::entry('vendor/b'))];
         yield 'ok and finished as one group: by name' => [self::graded('vendor/a', [Signal::S2], [], self::entry('vendor/a')), self::graded('vendor/b', [])];
-        yield 'in one band, the security points first' => [self::graded('vendor/b', [], [Score::advisory('PKSA-1', 'high', 'update')]), self::graded('vendor/a', [Signal::S8], [Score::advisory('PKSA-2', 'low', 'update')])];
-        yield 'the security points after the dev halving' => [self::graded('vendor/a', [], [Score::advisory('PKSA-1', 'medium', 'update')]), self::graded('vendor/b', [], [Score::advisory('PKSA-2', 'high', 'update')], null, true, null, true)];
+        yield 'in one band, the security points first' => [self::graded('vendor/b', [], [new CountedAdvisory('PKSA-1', 'high', 'update')]), self::graded('vendor/a', [Signal::S8], [new CountedAdvisory('PKSA-2', 'low', 'update')])];
+        yield 'the security points after the dev halving' => [self::graded('vendor/a', [], [new CountedAdvisory('PKSA-1', 'medium', 'update')]), self::graded('vendor/b', [], [new CountedAdvisory('PKSA-2', 'high', 'update')], null, true, null, true)];
         yield 'with equal security points, the higher score first' => [self::graded('vendor/b', [Signal::S8, Signal::S5]), self::graded('vendor/a', [Signal::S8])];
         yield 'a half point counts' => [self::graded('vendor/b', [Signal::S8, Signal::S5], [], null, true, ['vendor/root', 'vendor/b'], true), self::graded('vendor/a', [Signal::S8], [], null, true, ['vendor/root', 'vendor/a'], true)];
         yield 'with an equal score, direct first' => [self::graded('vendor/b', [Signal::S2]), self::graded('vendor/a', [Signal::S8], [], null, true, ['vendor/root', 'vendor/a'])];
@@ -64,7 +66,7 @@ final class SortTest extends TestCase
     public function testSortedKeepsEveryFindingAndGradedOnlyTheGradedOnesInTheSameOrder(): void
     {
         $ok = self::graded('vendor/ok', []);
-        $low = self::graded('vendor/low', [], [Score::advisory('PKSA-1', 'low', 'update')]);
+        $low = self::graded('vendor/low', [], [new CountedAdvisory('PKSA-1', 'low', 'update')]);
         $high = self::graded('vendor/high', [Signal::S8]);
         $report = new Report([$ok, $low, $high], [], new \DateTimeImmutable(self::NOW), 3, 0);
 
@@ -227,12 +229,12 @@ final class SortTest extends TestCase
 
     /**
      * @param list<string>                                              $fired      the ids of the signals that fired
-     * @param list<array{id: string, severity: string, fix_kind: string}> $advisories
+     * @param list<CountedAdvisory> $advisories
      * @param list<string>|null                                         $chain      the package alone when null
      */
     private static function graded(string $package, array $fired, array $advisories = [], ?AllowlistEntry $entry = null, bool $judged = true, ?array $chain = null, bool $dev = false): Finding
     {
-        $signals = array_map(static fn (string $id): Signal => new Signal($id, Signal::LEVEL_WARN, ''), $fired);
+        $signals = array_map(static fn (string $id): Signal => new Signal(Signal::LEVEL_WARN, '', SignalDataStub::of($id, [])), $fired);
 
         return (new FindingBuilder())->withPackage($package)->withSignals($signals)->withChain($chain ?? [$package])->withDev($dev)
             ->withFlags(FlagSet::fromSignals($signals, $entry, $advisories), $judged)->build();

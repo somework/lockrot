@@ -102,7 +102,7 @@ final class ReportDocumentTest extends TestCase
      */
     public function testAnUnflaggedPackageCarryingAnAdvisoryIsExplainedAnyway(): void
     {
-        $advisory = new Signal(Signal::S9, Signal::LEVEL_WARN, '1 security advisory affects 1.0.0', SignalDataStub::of(Signal::S9, ['advisories' => []]));
+        $advisory = new Signal(Signal::LEVEL_WARN, '1 security advisory affects 1.0.0', SignalDataStub::of(Signal::S9, ['advisories' => []]));
         $report = $this->report([$this->finding('vendor/patched', Verdict::OK, [$advisory])]);
         $facts = ['vendor/patched' => F::facts(F::package(['name' => 'vendor/patched']), F::metadata([['1.0.0', '2026-01-01T00:00:00+00:00']]))];
 

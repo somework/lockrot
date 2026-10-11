@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Lockrot\Signal\Data;
 
+use Lockrot\Signal\Signal;
+
 /** @internal */
 final class ArchivedData implements SignalData
 {
@@ -16,6 +18,11 @@ final class ArchivedData implements SignalData
         $this->repo = $repo;
         $this->host = $host;
         $this->forge = $forge;
+    }
+
+    public function signalId(): string
+    {
+        return Signal::S3;
     }
 
     public function forge(): string

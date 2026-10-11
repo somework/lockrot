@@ -79,9 +79,9 @@ final class GithubFormatterTest extends TestCase
         $at = new \DateTimeImmutable(self::AT);
 
         return new Report([
-            (new FindingBuilder())->withPackage('acme/abandoned')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('S1', 'high', 'marked abandoned by its repository')])->withChain(['acme/abandoned'])->withDataDate($at)->build(),
-            (new FindingBuilder())->withPackage('acme/silent')->withVersion('2.0.8')->withVerdict(Verdict::SILENT)->withSignals([new Signal('S2', 'high', 'last release 2015-11-16 (10.8 years ago)')])->withChain(['a/parent', 'acme/silent'])->withDataDate($at)->build(),
-            (new FindingBuilder())->withPackage('acme/absent')->withVersion('3.0.0')->withVerdict(Verdict::STALE)->withSignals([new Signal('S2', 'warn', 'last release 2022-05-20 (4.3 years ago)')])->withChain(['acme/absent'])->withDataDate($at)->build(),
+            (new FindingBuilder())->withPackage('acme/abandoned')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('high', 'marked abandoned by its repository', SignalDataStub::of('S1', []))])->withChain(['acme/abandoned'])->withDataDate($at)->build(),
+            (new FindingBuilder())->withPackage('acme/silent')->withVersion('2.0.8')->withVerdict(Verdict::SILENT)->withSignals([new Signal('high', 'last release 2015-11-16 (10.8 years ago)', SignalDataStub::of('S2', []))])->withChain(['a/parent', 'acme/silent'])->withDataDate($at)->build(),
+            (new FindingBuilder())->withPackage('acme/absent')->withVersion('3.0.0')->withVerdict(Verdict::STALE)->withSignals([new Signal('warn', 'last release 2022-05-20 (4.3 years ago)', SignalDataStub::of('S2', []))])->withChain(['acme/absent'])->withDataDate($at)->build(),
             (new FindingBuilder())->withPackage('acme/fine')->withVersion('4.0.0')->withChain(['acme/fine'])->withDataDate($at)->build(),
         ], Notes::texts(['GitHub token not set: repository activity checked only for 2 candidate packages']), $at, 4, 0);
     }
@@ -111,9 +111,9 @@ final class GithubFormatterTest extends TestCase
     {
         $at = new \DateTimeImmutable(self::AT);
         $report = new Report([
-            (new FindingBuilder())->withPackage('acme/abandoned')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('S1', 'high', 'marked abandoned by its repository')])->withChain(['acme/abandoned'])->withDataDate($at)->build(),
+            (new FindingBuilder())->withPackage('acme/abandoned')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('high', 'marked abandoned by its repository', SignalDataStub::of('S1', []))])->withChain(['acme/abandoned'])->withDataDate($at)->build(),
             // Transitive and development-only: two steps below critical.
-            (new FindingBuilder())->withPackage('acme/silent')->withVersion('2.0.8')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('S1', 'high', 'marked abandoned by its repository')])->withChain(['a/parent', 'acme/silent'])->withDataDate($at)->withDev(true)->build(),
+            (new FindingBuilder())->withPackage('acme/silent')->withVersion('2.0.8')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('high', 'marked abandoned by its repository', SignalDataStub::of('S1', []))])->withChain(['a/parent', 'acme/silent'])->withDataDate($at)->withDev(true)->build(),
             (new FindingBuilder())->withPackage('acme/fine')->withVersion('4.0.0')->withChain(['acme/fine'])->withDataDate($at)->build(),
         ], [], $at, 3, 0);
 
@@ -179,7 +179,7 @@ final class GithubFormatterTest extends TestCase
     {
         $at = new \DateTimeImmutable(self::AT);
         $report = new Report([
-            (new FindingBuilder())->withPackage('acme/abandoned')->withVerdict(Verdict::STALE)->withSignals([new Signal('S2', 'warn', "100% behind, see http://x:8080, line 1\nline 2")])->withChain(['acme/abandoned'])->withDataDate($at)->build(),
+            (new FindingBuilder())->withPackage('acme/abandoned')->withVerdict(Verdict::STALE)->withSignals([new Signal('warn', "100% behind, see http://x:8080, line 1\nline 2", SignalDataStub::of('S2', []))])->withChain(['acme/abandoned'])->withDataDate($at)->build(),
         ], Notes::texts(["note with 100% and a comma, and a colon: here\nand a second line"]), $at, 1, 0);
 
         $out = $this->formatter(LockrotConfig::FAIL_ON_NONE, $this->lockPath())->format($report);
@@ -321,8 +321,8 @@ final class GithubFormatterTest extends TestCase
     {
         $at = new \DateTimeImmutable('2026-09-14T06:00:00+00:00');
         $report = new Report([
-            (new FindingBuilder())->withPackage('acme/leaf')->withVerdict(Verdict::STALE)->withSignals([new Signal('S2', 'warn', 'last release 2022-05-20 (4.3 years ago)')])->withChain(['a/parent', 'acme/leaf'])->withDataDate($at)->withDirectDependents(['a/parent', 'b/parent'])->build(),
-            (new FindingBuilder())->withPackage('acme/twice')->withVerdict(Verdict::STALE)->withSignals([new Signal('S2', 'warn', 'last release 2022-05-20 (4.3 years ago)')])->withChain(['acme/twice'])->withDataDate($at)->withDirectDependents(['acme/twice', 'b/parent'])->build(),
+            (new FindingBuilder())->withPackage('acme/leaf')->withVerdict(Verdict::STALE)->withSignals([new Signal('warn', 'last release 2022-05-20 (4.3 years ago)', SignalDataStub::of('S2', []))])->withChain(['a/parent', 'acme/leaf'])->withDataDate($at)->withDirectDependents(['a/parent', 'b/parent'])->build(),
+            (new FindingBuilder())->withPackage('acme/twice')->withVerdict(Verdict::STALE)->withSignals([new Signal('warn', 'last release 2022-05-20 (4.3 years ago)', SignalDataStub::of('S2', []))])->withChain(['acme/twice'])->withDataDate($at)->withDirectDependents(['acme/twice', 'b/parent'])->build(),
         ], [], $at, 2, 0);
         $lines = explode("\n", trim($this->formatter(LockrotConfig::FAIL_ON_NONE, null)->format($report)));
 
@@ -344,7 +344,7 @@ final class GithubFormatterTest extends TestCase
         $at = new \DateTimeImmutable('2026-09-14T06:00:00+00:00');
         $evil = "evil/root\n::error file=.github/workflows/ci.yml,line=1::injected";
         $report = new Report([
-            (new FindingBuilder())->withPackage('acme/leaf')->withVerdict(Verdict::STALE)->withSignals([new Signal('S2', 'warn', 'old')])->withChain([$evil, 'acme/leaf'])->withDataDate($at)->withDirectDependents([$evil])->build(),
+            (new FindingBuilder())->withPackage('acme/leaf')->withVerdict(Verdict::STALE)->withSignals([new Signal('warn', 'old', SignalDataStub::of('S2', []))])->withChain([$evil, 'acme/leaf'])->withDataDate($at)->withDirectDependents([$evil])->build(),
         ], [], $at, 1, 0);
         $lines = explode("\n", trim($this->formatter(LockrotConfig::FAIL_ON_NONE, null)->format($report)));
 
@@ -361,7 +361,7 @@ final class GithubFormatterTest extends TestCase
     {
         $at = new \DateTimeImmutable('2026-09-14T06:00:00+00:00');
         $report = new Report([
-            (new FindingBuilder())->withPackage('acme/root')->withVerdict(Verdict::STALE)->withSignals([new Signal('S2', 'warn', 'old'), new Signal(Signal::S7, Signal::LEVEL_INFO, 'pulls in 1 flagged package: acme/leaf (stale)', SignalDataStub::of(Signal::S7, ['flagged' => 1, 'packages' => []]))])->withChain(['acme/root'])->withDataDate($at)->withDirectDependents(['acme/root'])->build(),
+            (new FindingBuilder())->withPackage('acme/root')->withVerdict(Verdict::STALE)->withSignals([new Signal('warn', 'old', SignalDataStub::of('S2', [])), new Signal(Signal::LEVEL_INFO, 'pulls in 1 flagged package: acme/leaf (stale)', SignalDataStub::of(Signal::S7, ['flagged' => 1, 'packages' => []]))])->withChain(['acme/root'])->withDataDate($at)->withDirectDependents(['acme/root'])->build(),
         ], [], $at, 1, 0);
         $lines = explode("\n", trim($this->formatter(LockrotConfig::FAIL_ON_NONE, null)->format($report)));
 
@@ -373,7 +373,7 @@ final class GithubFormatterTest extends TestCase
         $at = new \DateTimeImmutable(self::AT);
         $parent = "evil/root\r\ninjected";
         $report = new Report([
-            (new FindingBuilder())->withPackage('acme/leaf')->withVerdict(Verdict::STALE)->withSignals([new Signal('S2', 'warn', 'old')])->withChain([$parent, 'acme/leaf'])->withDataDate($at)->withDirectDependents([$parent])->build(),
+            (new FindingBuilder())->withPackage('acme/leaf')->withVerdict(Verdict::STALE)->withSignals([new Signal('warn', 'old', SignalDataStub::of('S2', []))])->withChain([$parent, 'acme/leaf'])->withDataDate($at)->withDirectDependents([$parent])->build(),
         ], [], $at, 1, 0);
 
         $lines = explode("\n", trim($this->formatter(LockrotConfig::FAIL_ON_NONE, null)->format($report)));

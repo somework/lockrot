@@ -43,16 +43,20 @@ final class FlagSentence
     ];
 
     /**
-     * @param array<string, SignalData> $data the data of each signal that fired, by id
+     * @param list<SignalData> $data the data of each signal that fired
      *
      * @throws \LogicException for the data of a signal that no maintenance flag reads
      */
     public static function maintenance(string $flag, array $data): string
     {
+        $byId = [];
+        foreach ($data as $d) {
+            $byId[$d->signalId()] = $d;
+        }
         $parts = [];
         foreach (self::SIGNALS[$flag] ?? [] as $id) {
-            if (isset($data[$id])) {
-                $parts[] = self::signal($data[$id]);
+            if (isset($byId[$id])) {
+                $parts[] = self::signal($byId[$id]);
             }
         }
 
@@ -65,6 +69,8 @@ final class FlagSentence
      *
      * @param list<AdvisoryRow>  $rows   the S9 rows, the deciding one marked
      * @param array<string, int> $counts counted advisories per severity
+     *
+     * @throws \LogicException for rows that mark no deciding advisory
      */
     public static function vulnerable(array $rows, array $counts, string $worst, string $decidingSeverity, ?string $branch, ?BranchFixes $installed): string
     {
@@ -75,11 +81,14 @@ final class FlagSentence
                 $listed[] = $counts[$severity].' '.$severity;
             }
         }
-        $deciding = $rows[0];
+        $deciding = null;
         foreach ($rows as $row) {
             if ($row->isDeciding()) {
                 $deciding = $row;
             }
+        }
+        if ($deciding === null) {
+            throw new \LogicException('The S9 rows mark no deciding advisory for the vulnerable sentence.');
         }
         $word = $n === 1 ? 'advisory' : ($decidingSeverity === $worst ? 'worst' : 'weighs most');
 
@@ -150,9 +159,9 @@ final class FlagSentence
             return $out.'; '.$newest;
         }
         $out .= \sprintf("; %s, needs php %s above the %s's php %s", $newest, (string) $d->newestPhp(), $d->floorSource() === 'project' ? 'project' : 'target', (string) $d->floorPhp());
-        $reachable = $d->reachableBranch();
+        $reachable = $d->reachable();
         if ($reachable !== null) {
-            return $out.\sprintf('; %s released %s (%s)', $reachable, (string) $d->reachableVersion(), substr((string) $d->reachableRelease(), 0, 10));
+            return $out.\sprintf('; %s released %s (%s)', $reachable->branch(), $reachable->version(), substr($reachable->release(), 0, 10));
         }
 
         return $out.'; no releasing branch within reach';

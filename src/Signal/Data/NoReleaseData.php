@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Lockrot\Signal\Data;
 
+use Lockrot\Signal\Signal;
+
 /** @internal */
 final class NoReleaseData implements SignalData
 {
@@ -19,6 +21,11 @@ final class NoReleaseData implements SignalData
         $this->lastVersion = $lastVersion;
         $this->years = $years;
         $this->datedBy = $datedBy;
+    }
+
+    public function signalId(): string
+    {
+        return Signal::S2;
     }
 
     public function lastRelease(): string

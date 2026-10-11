@@ -10,7 +10,6 @@ use Lockrot\Legacy\Compare013;
 use Lockrot\Legacy\Priority013;
 use Lockrot\Legacy\Verdict013;
 use Lockrot\Signal\Data\AdvisoryData;
-use Lockrot\Signal\Signal;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\ScoreModel;
 use Lockrot\Verdict\Verdict;
@@ -265,12 +264,10 @@ final class Report
             if (Verdict013::flagged($finding->verdict())) {
                 continue;
             }
-            foreach ($finding->signals() as $signal) {
-                if ($signal->id() === Signal::S9) {
-                    ++$packages;
-                    $data = $signal->data();
-                    $advisories += $data instanceof AdvisoryData ? \count($data->rows()) : 0;
-                }
+            $s9 = $finding->signalData(AdvisoryData::class);
+            if ($s9 !== null) {
+                ++$packages;
+                $advisories += \count($s9->rows());
             }
         }
         if ($packages === 0) {

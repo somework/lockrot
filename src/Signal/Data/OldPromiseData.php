@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Lockrot\Signal\Data;
 
+use Lockrot\Signal\Signal;
+
 /** @internal */
 final class OldPromiseData implements SignalData
 {
@@ -27,6 +29,11 @@ final class OldPromiseData implements SignalData
         $this->phpConstraint = $phpConstraint;
         $this->writtenForPhp = $writtenForPhp;
         $this->released = $released;
+    }
+
+    public function signalId(): string
+    {
+        return Signal::S5;
     }
 
     public function targetPhp(): string

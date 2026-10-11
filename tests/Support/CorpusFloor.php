@@ -6,13 +6,13 @@ namespace Lockrot\Tests\Support;
 
 use Lockrot\Allowlist\AllowlistEntry;
 use Lockrot\Legacy\AdvisoryFacts013;
+use Lockrot\Score\CountedAdvisory;
 use Lockrot\Security\Fix;
 use Lockrot\Security\Severity;
 use Lockrot\Signal\Data\AdvisoryData;
 use Lockrot\Signal\Signal;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\FlagSet;
-use Lockrot\Verdict\Score;
 use Lockrot\Verdict\ScoreModel;
 use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\Assert;
@@ -63,16 +63,16 @@ final class CorpusFloor
     {
         $signals = [];
         foreach ($finding['signals'] as $signal) {
-            $data = null;
+            $data = SignalDataStub::of($signal['id'], []);
             if ($signal['id'] === Signal::S9) {
                 $rows = [];
                 foreach (self::advisories($finding) as $advisory) {
-                    $bucket = Severity::fromComposer($advisory['severity'])->bucket();
-                    $rows[] = SignalDataStub::row(['id' => $advisory['id'], 'severity' => $bucket, 'points' => ScoreModel::advisoryPoints($bucket, Fix::UNKNOWN)]);
+                    $bucket = $advisory->bucketed()->severity();
+                    $rows[] = SignalDataStub::row(['id' => $advisory->id(), 'severity' => $bucket, 'points' => ScoreModel::advisoryPoints($bucket, Fix::UNKNOWN)]);
                 }
                 $data = new AdvisoryData($rows, ($signal['data']['releases_read'] ?? false) === true, true);
             }
-            $signals[] = new Signal($signal['id'], $signal['level'], '', $data);
+            $signals[] = new Signal($signal['level'], '', $data);
         }
 
         return $signals;
@@ -102,7 +102,7 @@ final class CorpusFloor
      *
      * @param FloorFinding $finding
      *
-     * @return list<array{id: string, severity: string, fix_kind: string}>
+     * @return list<CountedAdvisory>
      */
     public static function advisories(array $finding): array
     {
@@ -118,7 +118,7 @@ final class CorpusFloor
                 Assert::assertIsString($row['id']);
                 $severity = $row['severity'] ?? '';
                 Assert::assertIsString($severity);
-                $advisories[] = Score::advisory($row['id'], $severity, 'unknown');
+                $advisories[] = new CountedAdvisory($row['id'], $severity, 'unknown');
             }
         }
 
@@ -132,7 +132,7 @@ final class CorpusFloor
      * lockrot did not read.
      *
      * @param FloorFinding $finding
-     * @param list<array{id: string, severity: string, fix_kind: string}> $advisories
+     * @param list<CountedAdvisory> $advisories
      */
     public static function finding(array $finding, array $advisories = []): Finding
     {

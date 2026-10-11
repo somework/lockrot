@@ -13,6 +13,7 @@ use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Data\Repository\ReleaseBranch;
 use Lockrot\Signal\AgeMeasure;
 use Lockrot\Signal\Data\LeftBehindData;
+use Lockrot\Signal\Data\ReachableBranch;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\Signal;
@@ -111,27 +112,29 @@ final class LeftBehindRule implements SignalRule
                 : \sprintf('; %s released %s (%s)', ReleaseBranch::label($reachable['branch']), $reachable['version'], $reachable['at']->format('Y-m-d'));
         }
 
-        return new Signal(Signal::S8, $level, $summary, new LeftBehindData(
+        return new Signal($level, $summary, new LeftBehindData(
             ReleaseBranch::label($branch),
             $ownAt->format(\DATE_ATOM),
             $reading->version(),
             $reading->years(),
+            $datedBy,
             ReleaseBranch::label($newest['branch']),
             $newest['version'],
             $newest['at']->format(\DATE_ATOM),
             $newest['php'],
+            $this->clock->tenthsSince($newest['at']) / 10,
             $blocking === null,
             $blocking === null ? null : $this->floor->php($blocking),
             $blocking,
-            $reachable === null ? null : ReleaseBranch::label($reachable['branch']),
-            $reachable === null ? null : $reachable['version'],
-            $reachable === null ? null : $reachable['at']->format(\DATE_ATOM),
-            $reachable === null ? null : $this->suggestedConstraint($facts->package()->name(), $reachable['version']),
-            $datedBy,
-            $reachable === null ? null : $reachable['php'],
-            $reachable === null ? null : ['project' => $this->floor->admitsProject($reachable['php']), 'target' => $this->floor->admitsTarget($reachable['php'])],
-            $this->clock->tenthsSince($newest['at']) / 10,
-            $reachable === null ? null : $this->clock->tenthsSince($reachable['at']) / 10
+            $reachable === null ? null : new ReachableBranch(
+                ReleaseBranch::label($reachable['branch']),
+                $reachable['version'],
+                $reachable['at']->format(\DATE_ATOM),
+                $this->clock->tenthsSince($reachable['at']) / 10,
+                $reachable['php'],
+                ['project' => $this->floor->admitsProject($reachable['php']), 'target' => $this->floor->admitsTarget($reachable['php'])],
+                $this->suggestedConstraint($facts->package()->name(), $reachable['version'])
+            )
         ));
     }
 

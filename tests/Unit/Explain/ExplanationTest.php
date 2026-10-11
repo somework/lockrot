@@ -146,7 +146,7 @@ final class ExplanationTest extends TestCase
 
     public function testToArrayCarriesTheFindingTheFactsAndTheRun(): void
     {
-        $signal = new Signal(Signal::S8, Signal::LEVEL_WARN, 'branch 1.x last released 2021-06-01 (5.3 years ago); 2.x released 2.1.0 (2026-01-01)', SignalDataStub::of(Signal::S8, ['branch' => '1.x']));
+        $signal = new Signal(Signal::LEVEL_WARN, 'branch 1.x last released 2021-06-01 (5.3 years ago); 2.x released 2.1.0 (2026-01-01)', SignalDataStub::of(Signal::S8, ['branch' => '1.x']));
         $metadata = F::metadata([['2.1.0', '2026-01-01T00:00:00+00:00'], ['1.5.0', '2021-06-01T00:00:00+00:00']]);
         $package = F::package(['version' => '1.5.0', 'php' => '>=7.1', 'time' => '2021-06-01T00:00:00+00:00']);
         $explanation = new Explanation($this->finding('1.5.0', Verdict::LEFT_BEHIND, [$signal]), F::facts($package, $metadata, F::activity(false, '2026-02-01T00:00:00+00:00')), new Thresholds(2, 4, 3, 5), '8.3', $this->report());
@@ -427,8 +427,8 @@ final class ExplanationTest extends TestCase
     /** Each branch row carries the fixes of the release scan's row for the same branch, null on the others. */
     public function testEachBranchRowCarriesItsOwnFixes(): void
     {
-        $two = new BranchFixes('2.x', false, 1, 0, 1, null, '2.1.0', ['PKSA-a']);
-        $one = new BranchFixes('1.x', true, 0, 0, 1, null, '1.5.0', []);
+        $two = new BranchFixes('2.x', false, 0, 1, null, '2.1.0', ['PKSA-a']);
+        $one = new BranchFixes('1.x', true, 0, 1, null, '1.5.0', []);
         $details = new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [], new PackageFixes([], [$two, $one], null, null, null));
         $finding = $this->finding('1.4.0', Verdict::LEFT_BEHIND)->withDetails($details);
         $metadata = F::metadata([['3.0.0', '2026-01-01T00:00:00+00:00'], ['2.1.0', '2024-01-01T00:00:00+00:00'], ['1.5.0', '2021-06-01T00:00:00+00:00'], ['1.4.0', '2020-01-01T00:00:00+00:00']]);

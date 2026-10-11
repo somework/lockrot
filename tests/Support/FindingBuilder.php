@@ -209,7 +209,7 @@ final class FindingBuilder
         $entry = $this->allowlistReason === null ? null : new AllowlistEntry($this->package, null, $this->allowlistReason, null, AllowlistEntry::BY_PROJECT);
         $flags = FlagSet::fromSignals($this->signals, $entry, []);
         if ($flags->fired() === [] && isset(self::RAISED_BY[$this->verdict])) {
-            $flags = FlagSet::fromSignals(array_map(static fn (array $raise): Signal => new Signal($raise[0], $raise[1], 'set by the verdict'), self::RAISED_BY[$this->verdict]), $entry, []);
+            $flags = FlagSet::fromSignals(array_map(static fn (array $raise): Signal => new Signal($raise[1], 'set by the verdict', SignalDataStub::of($raise[0], [])), self::RAISED_BY[$this->verdict]), $entry, []);
         }
 
         return $finding->withFlags($flags, $this->verdict !== Verdict::UNKNOWN)->withDetails(self::detailsOf($finding, $this->verdict !== Verdict::UNKNOWN));

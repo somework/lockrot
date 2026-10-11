@@ -6,11 +6,12 @@ namespace Lockrot\Tests\Unit\Analyzer;
 
 use Lockrot\Allowlist\AllowlistEntry;
 use Lockrot\Analyzer\ScoreRulesUsed;
+use Lockrot\Score\CountedAdvisory;
 use Lockrot\Signal\Signal;
 use Lockrot\Tests\Support\FindingBuilder;
+use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\FlagSet;
-use Lockrot\Verdict\Score;
 use Lockrot\Verdict\ScoreModel;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -121,11 +122,11 @@ final class ScoreRulesUsedTest extends TestCase
     {
         $fired = [];
         foreach ($signals as $id => $level) {
-            $fired[] = new Signal($id, $level, $id);
+            $fired[] = new Signal($level, $id, SignalDataStub::of($id, []));
         }
         $counted = [];
         foreach ($advisories as $i => [$severity, $kind]) {
-            $counted[] = Score::advisory('PKSA-'.$i, $severity, $kind);
+            $counted[] = new CountedAdvisory('PKSA-'.$i, $severity, $kind);
         }
         $entry = $accepted === null ? null : new AllowlistEntry('vendor/pkg', null, 'kept', null, AllowlistEntry::BY_PROJECT, [$accepted]);
 

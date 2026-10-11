@@ -85,7 +85,10 @@ final class ScoreInterpreter
     public function row(array $facts): string
     {
         $accepted = $this->cover($facts['accepted']);
-        $advisories = ScoreSweep::advisories($facts['advisories']);
+        $advisories = [];
+        foreach ($facts['advisories'] as $i => [$severity, $fix]) {
+            $advisories[] = ['id' => 'A'.$i, 'severity' => $severity, 'fix_kind' => $fix];
+        }
         $run = $this->run($facts['flags'], $advisories, $accepted, $facts['reach'], $facts['dev']);
 
         $without = [];

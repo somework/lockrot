@@ -116,7 +116,7 @@ final class TransitiveExposure
             $packages[] = new ExposedPackage($finding->package(), $chain, $finding->grade(), $finding->lead(), $finding->flagIds());
         }
 
-        return new Signal(Signal::S7, Signal::LEVEL_INFO, self::summary($packages), new ExposureData($packages));
+        return new Signal(Signal::LEVEL_INFO, self::summary($packages), new ExposureData($packages));
     }
 
     /**

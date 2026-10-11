@@ -19,6 +19,6 @@ final class ArchivedRule implements SignalRule
             return null;
         }
 
-        return new Signal(Signal::S3, Signal::LEVEL_HIGH, 'repository archived on '.$activity->ref()->forgeLabel(), new ArchivedData($activity->repo(), $activity->ref()->host(), $activity->ref()->forge()));
+        return new Signal(Signal::LEVEL_HIGH, 'repository archived on '.$activity->ref()->forgeLabel(), new ArchivedData($activity->repo(), $activity->ref()->host(), $activity->ref()->forge()));
     }
 }

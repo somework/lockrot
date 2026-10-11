@@ -81,9 +81,9 @@ final class SarifFormatterTest extends TestCase
         $at = new \DateTimeImmutable(self::AT);
 
         return new Report([
-            (new FindingBuilder())->withPackage('acme/abandoned')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('S1', 'high', 'marked abandoned by its repository')])->withChain(['acme/abandoned'])->withDataDate($at)->build(),
-            (new FindingBuilder())->withPackage('acme/also-abandoned')->withVersion('1.1.0')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('S3', 'high', 'repository archived')])->withChain(['acme/also-abandoned'])->withDataDate($at)->build(),
-            (new FindingBuilder())->withPackage('acme/silent')->withVersion('2.0.8')->withVerdict(Verdict::SILENT)->withSignals([new Signal('S2', 'high', 'last release 2015-11-16'), new Signal('S4', 'high', 'last push 2015-11-16')])->withChain(['a/parent', 'acme/silent'])->withDataDate($at)->build(),
+            (new FindingBuilder())->withPackage('acme/abandoned')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('high', 'marked abandoned by its repository', SignalDataStub::of('S1', []))])->withChain(['acme/abandoned'])->withDataDate($at)->build(),
+            (new FindingBuilder())->withPackage('acme/also-abandoned')->withVersion('1.1.0')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('high', 'repository archived', SignalDataStub::of('S3', []))])->withChain(['acme/also-abandoned'])->withDataDate($at)->build(),
+            (new FindingBuilder())->withPackage('acme/silent')->withVersion('2.0.8')->withVerdict(Verdict::SILENT)->withSignals([new Signal('high', 'last release 2015-11-16', SignalDataStub::of('S2', [])), new Signal('high', 'last push 2015-11-16', SignalDataStub::of('S4', []))])->withChain(['a/parent', 'acme/silent'])->withDataDate($at)->build(),
             (new FindingBuilder())->withPackage('acme/fine')->withVersion('4.0.0')->withChain(['acme/fine'])->withDataDate($at)->build(),
         ], Notes::texts(['GitHub token not set: repository activity checked only for 2 candidate packages']), $at, 4, 0);
     }
@@ -262,10 +262,10 @@ final class SarifFormatterTest extends TestCase
         $at = new \DateTimeImmutable(self::AT);
 
         return new Report([
-            (new FindingBuilder())->withPackage('acme/abandoned')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('S1', 'high', 'marked abandoned by its repository')])->withChain(['acme/abandoned'])->withDataDate($at)->build(),
-            (new FindingBuilder())->withPackage('acme/transitive')->withVersion('5.0.0')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('S1', 'high', 'marked abandoned by its repository')])->withChain(['a/parent', 'acme/transitive'])->withDataDate($at)->build(),
-            (new FindingBuilder())->withPackage('acme/dev-only')->withVersion('2.0.0')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('S1', 'high', 'marked abandoned by its repository')])->withChain(['a/parent', 'acme/dev-only'])->withDataDate($at)->withDev(true)->build(),
-            (new FindingBuilder())->withPackage('acme/stale')->withVersion('3.0.0')->withVerdict(Verdict::STALE)->withSignals([new Signal('S2', 'warn', 'last release 2022-05-20')])->withChain(['a/parent', 'acme/stale'])->withDataDate($at)->build(),
+            (new FindingBuilder())->withPackage('acme/abandoned')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('high', 'marked abandoned by its repository', SignalDataStub::of('S1', []))])->withChain(['acme/abandoned'])->withDataDate($at)->build(),
+            (new FindingBuilder())->withPackage('acme/transitive')->withVersion('5.0.0')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('high', 'marked abandoned by its repository', SignalDataStub::of('S1', []))])->withChain(['a/parent', 'acme/transitive'])->withDataDate($at)->build(),
+            (new FindingBuilder())->withPackage('acme/dev-only')->withVersion('2.0.0')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('high', 'marked abandoned by its repository', SignalDataStub::of('S1', []))])->withChain(['a/parent', 'acme/dev-only'])->withDataDate($at)->withDev(true)->build(),
+            (new FindingBuilder())->withPackage('acme/stale')->withVersion('3.0.0')->withVerdict(Verdict::STALE)->withSignals([new Signal('warn', 'last release 2022-05-20', SignalDataStub::of('S2', []))])->withChain(['a/parent', 'acme/stale'])->withDataDate($at)->build(),
             (new FindingBuilder())->withPackage('acme/fine')->withVersion('4.0.0')->withChain(['acme/fine'])->withDataDate($at)->build(),
         ], [], $at, 5, 0);
     }
@@ -443,7 +443,7 @@ final class SarifFormatterTest extends TestCase
         $at = new \DateTimeImmutable(self::AT);
         $findings = [];
         foreach (Verdict::all() as $index => $verdict) {
-            $findings[] = (new FindingBuilder())->withPackage('acme/pkg'.$index)->withVersion('1.0.'.$index)->withVerdict($verdict)->withSignals([new Signal('S2', 'warn', 'last release 2015-11-16')])->withChain(['acme/pkg'.$index])->withDataDate($at)->build();
+            $findings[] = (new FindingBuilder())->withPackage('acme/pkg'.$index)->withVersion('1.0.'.$index)->withVerdict($verdict)->withSignals([new Signal('warn', 'last release 2015-11-16', SignalDataStub::of('S2', []))])->withChain(['acme/pkg'.$index])->withDataDate($at)->build();
         }
 
         return new Report($findings, [], $at, \count($findings), 0);
@@ -571,7 +571,7 @@ final class SarifFormatterTest extends TestCase
     {
         $at = new \DateTimeImmutable('2026-09-14T06:00:00+00:00');
         $report = new Report([
-            (new FindingBuilder())->withPackage('acme/root')->withVerdict(Verdict::STALE)->withSignals([new Signal('S2', 'warn', 'old'), new Signal(Signal::S7, Signal::LEVEL_INFO, 'pulls in 1 flagged package: acme/leaf (stale)', SignalDataStub::of(Signal::S7, ['flagged' => 1, 'packages' => []]))])->withChain(['acme/root'])->withDataDate($at)->withDirectDependents(['acme/root'])->build(),
+            (new FindingBuilder())->withPackage('acme/root')->withVerdict(Verdict::STALE)->withSignals([new Signal('warn', 'old', SignalDataStub::of('S2', [])), new Signal(Signal::LEVEL_INFO, 'pulls in 1 flagged package: acme/leaf (stale)', SignalDataStub::of(Signal::S7, ['flagged' => 1, 'packages' => []]))])->withChain(['acme/root'])->withDataDate($at)->withDirectDependents(['acme/root'])->build(),
         ], [], $at, 1, 0);
         $sarif = $this->formatter(LockrotConfig::FAIL_ON_NONE, null)->format($report);
         $this->assertValidSarif($sarif);

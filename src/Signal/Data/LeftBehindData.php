@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Lockrot\Signal\Data;
 
+use Lockrot\Signal\Signal;
+
 /**
  * The installed branch, the newest higher branch and the branch within reach
- * (docs/verdicts.md#left-behind). Each fact of the branch within reach is null when no branch is
- * within reach.
+ * (docs/verdicts.md#left-behind).
  *
  * @internal
  */
@@ -17,72 +18,57 @@ final class LeftBehindData implements SignalData
     private string $branchLastRelease;
     private ?string $branchLastVersion;
     private ?float $years;
+    private ?string $datedBy;
     private string $newestBranch;
     private string $newestVersion;
     private string $newestRelease;
     private ?string $newestPhp;
+    private float $newestYears;
     private bool $newestWithinReach;
     private ?string $floorPhp;
     private ?string $floorSource;
-    private ?string $reachableBranch;
-    private ?string $reachableVersion;
-    private ?string $reachableRelease;
-    private ?string $suggestedConstraint;
-    private ?string $datedBy;
-    private ?string $reachablePhp;
-    /** @var array{project: ?bool, target: ?bool}|null */
-    private ?array $reachableAdmits;
-    private float $newestYears;
-    private ?float $reachableYears;
+    private ?ReachableBranch $reachable;
 
     /**
      * Each date is an ISO 8601 date and time, and each age is in years on the run clock.
      *
-     * @param ?string                                   $floorSource     `project` or `target`: the floor that the newest branch's php is above, null when it is within reach
-     * @param array{project: ?bool, target: ?bool}|null $reachableAdmits whether each floor admits the reachable branch's php, null for a floor lockrot could not compare
+     * @param ?string $floorSource `project` or `target`: the floor that the newest branch's php is above, null when it is within reach
      */
     public function __construct(
         string $branch,
         string $branchLastRelease,
         ?string $branchLastVersion,
         ?float $years,
+        ?string $datedBy,
         string $newestBranch,
         string $newestVersion,
         string $newestRelease,
         ?string $newestPhp,
+        float $newestYears,
         bool $newestWithinReach,
         ?string $floorPhp,
         ?string $floorSource,
-        ?string $reachableBranch,
-        ?string $reachableVersion,
-        ?string $reachableRelease,
-        ?string $suggestedConstraint,
-        ?string $datedBy,
-        ?string $reachablePhp,
-        ?array $reachableAdmits,
-        float $newestYears,
-        ?float $reachableYears
+        ?ReachableBranch $reachable
     ) {
         $this->branch = $branch;
         $this->branchLastRelease = $branchLastRelease;
         $this->branchLastVersion = $branchLastVersion;
         $this->years = $years;
+        $this->datedBy = $datedBy;
         $this->newestBranch = $newestBranch;
         $this->newestVersion = $newestVersion;
         $this->newestRelease = $newestRelease;
         $this->newestPhp = $newestPhp;
+        $this->newestYears = $newestYears;
         $this->newestWithinReach = $newestWithinReach;
         $this->floorPhp = $floorPhp;
         $this->floorSource = $floorSource;
-        $this->reachableBranch = $reachableBranch;
-        $this->reachableVersion = $reachableVersion;
-        $this->reachableRelease = $reachableRelease;
-        $this->suggestedConstraint = $suggestedConstraint;
-        $this->datedBy = $datedBy;
-        $this->reachablePhp = $reachablePhp;
-        $this->reachableAdmits = $reachableAdmits;
-        $this->newestYears = $newestYears;
-        $this->reachableYears = $reachableYears;
+        $this->reachable = $reachable;
+    }
+
+    public function signalId(): string
+    {
+        return Signal::S8;
     }
 
     public function branch(): string
@@ -98,6 +84,11 @@ final class LeftBehindData implements SignalData
     public function years(): ?float
     {
         return $this->years;
+    }
+
+    public function datedBy(): ?string
+    {
+        return $this->datedBy;
     }
 
     public function newestBranch(): string
@@ -120,6 +111,11 @@ final class LeftBehindData implements SignalData
         return $this->newestPhp;
     }
 
+    public function newestYears(): float
+    {
+        return $this->newestYears;
+    }
+
     public function newestWithinReach(): bool
     {
         return $this->newestWithinReach;
@@ -135,55 +131,17 @@ final class LeftBehindData implements SignalData
         return $this->floorSource;
     }
 
-    public function reachableBranch(): ?string
+    /** Null when no branch is within reach. */
+    public function reachable(): ?ReachableBranch
     {
-        return $this->reachableBranch;
-    }
-
-    public function reachableVersion(): ?string
-    {
-        return $this->reachableVersion;
-    }
-
-    public function reachableRelease(): ?string
-    {
-        return $this->reachableRelease;
-    }
-
-    public function suggestedConstraint(): ?string
-    {
-        return $this->suggestedConstraint;
-    }
-
-    public function datedBy(): ?string
-    {
-        return $this->datedBy;
-    }
-
-    public function reachablePhp(): ?string
-    {
-        return $this->reachablePhp;
-    }
-
-    /** @return array{project: ?bool, target: ?bool}|null */
-    public function reachableAdmits(): ?array
-    {
-        return $this->reachableAdmits;
-    }
-
-    public function newestYears(): float
-    {
-        return $this->newestYears;
-    }
-
-    public function reachableYears(): ?float
-    {
-        return $this->reachableYears;
+        return $this->reachable;
     }
 
     /** @return array{branch: string, branch_last_release: string, branch_last_version: ?string, years: ?float, newest_branch: string, newest_version: string, newest_release: string, newest_php: ?string, newest_within_reach: bool, floor_php: ?string, floor_source: ?string, reachable_branch: ?string, reachable_version: ?string, reachable_release: ?string, suggested_constraint: ?string, dated_by: ?string, reachable_php: ?string, reachable_admits: array{project: ?bool, target: ?bool}|null, newest_years: float, reachable_years: ?float} */
     public function jsonSerialize(): array
     {
+        $reachable = $this->reachable;
+
         return [
             'branch' => $this->branch,
             'branch_last_release' => $this->branchLastRelease,
@@ -196,15 +154,15 @@ final class LeftBehindData implements SignalData
             'newest_within_reach' => $this->newestWithinReach,
             'floor_php' => $this->floorPhp,
             'floor_source' => $this->floorSource,
-            'reachable_branch' => $this->reachableBranch,
-            'reachable_version' => $this->reachableVersion,
-            'reachable_release' => $this->reachableRelease,
-            'suggested_constraint' => $this->suggestedConstraint,
+            'reachable_branch' => $reachable === null ? null : $reachable->branch(),
+            'reachable_version' => $reachable === null ? null : $reachable->version(),
+            'reachable_release' => $reachable === null ? null : $reachable->release(),
+            'suggested_constraint' => $reachable === null ? null : $reachable->suggestedConstraint(),
             'dated_by' => $this->datedBy,
-            'reachable_php' => $this->reachablePhp,
-            'reachable_admits' => $this->reachableAdmits,
+            'reachable_php' => $reachable === null ? null : $reachable->php(),
+            'reachable_admits' => $reachable === null ? null : $reachable->admits(),
             'newest_years' => $this->newestYears,
-            'reachable_years' => $this->reachableYears,
+            'reachable_years' => $reachable === null ? null : $reachable->years(),
         ];
     }
 }

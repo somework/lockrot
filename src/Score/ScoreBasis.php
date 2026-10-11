@@ -16,8 +16,6 @@ use Lockrot\Verdict\ScoreModel;
  *
  * @internal
  *
- * @phpstan-type Context array{maintenance_judged: bool, advisories_complete: bool, liveness_complete: bool, s3_unread: bool, s8_unread: bool}
- *
  * @phpstan-type Graded array{model: int, total: int, exact: int|float, rounded_down: bool, band: array{floor: int, next: ?string, to_next: ?int}, decided_by: string, parts: array{maintenance: Part, security: Part}, terms: list<Term>, modifiers: list<Modifier>, accepted: list<Accepted>, without: list<Without>, text: string}
  * @phpstan-type Zero array{model: int, total: int, exact: int, accepted: list<Accepted>, text: string}
  */
@@ -25,8 +23,7 @@ final class ScoreBasis implements \JsonSerializable
 {
     private FlagSet $flags;
     private Score $score;
-    /** @var Context */
-    private array $context;
+    private ScoreContext $context;
     /** @var list<MaintenanceTerm> */
     private array $maintenanceTerms = [];
     private ?SecurityTerm $securityTerm = null;
@@ -39,8 +36,7 @@ final class ScoreBasis implements \JsonSerializable
     private Part $maintenancePart;
     private Part $securityPart;
 
-    /** @param Context $context */
-    private function __construct(FlagSet $flags, Score $score, array $context)
+    private function __construct(FlagSet $flags, Score $score, ScoreContext $context)
     {
         $this->flags = $flags;
         $this->score = $score;
@@ -56,14 +52,7 @@ final class ScoreBasis implements \JsonSerializable
         }
     }
 
-    /**
-     * @param Context $context `maintenance_judged`: lockrot read the release metadata.
-     *                         `advisories_complete`: every advisory feed answered.
-     *                         `liveness_complete`: lockrot read S2 and S4.
-     *                         `s3_unread`: no S3 answer.
-     *                         `s8_unread`: S8 cannot date a branch that a tag can land on.
-     */
-    public static function of(FlagSet $flags, string $reach, bool $dev, array $context): self
+    public static function of(FlagSet $flags, string $reach, bool $dev, ScoreContext $context): self
     {
         return new self($flags, Score::of($flags, $reach, $dev), $context);
     }
@@ -220,9 +209,9 @@ final class ScoreBasis implements \JsonSerializable
                 $flag,
                 ScoreModel::POINTS[$flag],
                 $rerun->total(),
-                self::verdict($rerun, $counting, $this->context['maintenance_judged']),
+                self::verdict($rerun, $counting, $this->context->maintenanceJudged()),
                 $role,
-                $flag === FlagSet::STALE && (!$this->context['liveness_complete'] || $this->context['s3_unread']),
+                $flag === FlagSet::STALE && (!$this->context->livenessComplete() || $this->context->s3Unread()),
                 self::modifiersOf($rerun)
             );
         }
@@ -268,7 +257,7 @@ final class ScoreBasis implements \JsonSerializable
             $id,
             array_map(static fn (string $flag): array => ['flag' => $flag, 'role' => $roles[$flag] ?? 'accepted'], $revealed),
             $rerun->total(),
-            self::verdict($rerun, $flags, $this->context['maintenance_judged']),
+            self::verdict($rerun, $flags, $this->context->maintenanceJudged()),
             $rerun->lead(),
             $deciding === null ? null : $deciding->advisory(),
             $atLeast
@@ -282,10 +271,10 @@ final class ScoreBasis implements \JsonSerializable
     private function atLeast(string $flag): bool
     {
         if ($flag === FlagSet::ABANDONED) {
-            return !$this->context['liveness_complete'] && \in_array($this->flags->releaseLevel(), [null, 'high'], true);
+            return !$this->context->livenessComplete() && \in_array($this->flags->releaseLevel(), [null, 'high'], true);
         }
 
-        return $flag === FlagSet::PINNED && $this->context['s8_unread'];
+        return $flag === FlagSet::PINNED && $this->context->s8Unread();
     }
 
     private function maintenanceStatus(): string
@@ -297,7 +286,7 @@ final class ScoreBasis implements \JsonSerializable
             return 'accepted';
         }
 
-        return $this->context['maintenance_judged'] ? 'none' : 'not_judged';
+        return $this->context->maintenanceJudged() ? 'none' : 'not_judged';
     }
 
     private function securityStatus(): string
@@ -306,7 +295,7 @@ final class ScoreBasis implements \JsonSerializable
             return Part::COUNTED;
         }
 
-        return $this->context['advisories_complete'] ? 'clear' : 'unchecked';
+        return $this->context->advisoriesComplete() ? 'clear' : 'unchecked';
     }
 
     private function decidedBy(string $grade): string

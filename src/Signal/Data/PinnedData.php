@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Lockrot\Signal\Data;
 
+use Lockrot\Signal\Signal;
+
 /**
  * Without metadata every release fact is null, never `has_stable_release: false`, which claims
  * that the package never released (docs/verdicts.md#what-s6-carries).
@@ -36,6 +38,11 @@ final class PinnedData implements SignalData
         $this->lastStableDatedBy = $lastStableDatedBy;
         $this->snapshotTime = $snapshotTime;
         $this->tagRelation = $tagRelation;
+    }
+
+    public function signalId(): string
+    {
+        return Signal::S6;
     }
 
     public function version(): string

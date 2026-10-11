@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Lockrot\Signal\Data;
 
+use Lockrot\Signal\Signal;
+
 /** @internal */
 final class AdvisoryData implements SignalData
 {
@@ -22,6 +24,11 @@ final class AdvisoryData implements SignalData
         $this->rows = $rows;
         $this->releasesRead = $releasesRead;
         $this->complete = $complete;
+    }
+
+    public function signalId(): string
+    {
+        return Signal::S9;
     }
 
     /** @return list<AdvisoryRow> */

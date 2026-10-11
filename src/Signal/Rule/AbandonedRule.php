@@ -33,7 +33,7 @@ final class AbandonedRule implements SignalRule
 
         $successor = Finding::successorOf($facts->package()->name(), $marking['replacement']);
 
-        return new Signal(Signal::S1, Signal::LEVEL_HIGH, $summary, new AbandonedData(
+        return new Signal(Signal::LEVEL_HIGH, $summary, new AbandonedData(
             $marking['marked_by'],
             $marking['replacement'],
             $successor === null ? null : PackageOrigin::replacementPage(self::replacementNamedBy($facts), $successor)

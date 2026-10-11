@@ -14,7 +14,6 @@ final class BranchFixes
 {
     private string $branch;
     private bool $installed;
-    private int $fixed;
     private int $unknown;
     private int $of;
     private ?Candidate $candidate;
@@ -26,11 +25,10 @@ final class BranchFixes
      * @param ?Candidate   $candidate the branch's lower bound with its class and holders, null when the branch fixes nothing
      * @param list<string> $clears    the ids of the counted advisories that the branch fixes
      */
-    public function __construct(string $branch, bool $installed, int $fixed, int $unknown, int $of, ?Candidate $candidate, ?string $newest, array $clears)
+    public function __construct(string $branch, bool $installed, int $unknown, int $of, ?Candidate $candidate, ?string $newest, array $clears)
     {
         $this->branch = $branch;
         $this->installed = $installed;
-        $this->fixed = $fixed;
         $this->unknown = $unknown;
         $this->of = $of;
         $this->candidate = $candidate;
@@ -45,7 +43,7 @@ final class BranchFixes
      */
     public static function installedFromRows(string $branch, array $clears, int $unknown, int $of): self
     {
-        return new self($branch, true, \count($clears), $unknown, $of, null, null, $clears);
+        return new self($branch, true, $unknown, $of, null, null, $clears);
     }
 
     /** `ReleaseBranch::label()`, `2.x`. */
@@ -65,7 +63,7 @@ final class BranchFixes
      */
     public function fixed(): int
     {
-        return $this->fixed;
+        return \count($this->clears);
     }
 
     /** Counted advisories with no affected range: lockrot cannot judge them on any branch. */

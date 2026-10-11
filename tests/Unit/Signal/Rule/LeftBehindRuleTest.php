@@ -435,9 +435,11 @@ final class LeftBehindRuleTest extends TestCase
 
         $data = $this->data($this->rule(new PhpFloor('8.4', '>=8.1')), $facts);
 
-        self::assertSame('>=7.4', $data->reachablePhp());
-        self::assertSame(['project' => true, 'target' => true], $data->reachableAdmits());
-        self::assertSame('2.x', $data->reachableBranch());
+        $reachable = $data->reachable();
+        self::assertNotNull($reachable);
+        self::assertSame('>=7.4', $reachable->php());
+        self::assertSame(['project' => true, 'target' => true], $reachable->admits());
+        self::assertSame('2.x', $reachable->branch());
     }
 
     public function testTheReachableAdmitsAnswersEachFloorOnItsOwn(): void
@@ -447,7 +449,9 @@ final class LeftBehindRuleTest extends TestCase
 
         $data = $this->data($this->rule(new PhpFloor('8.3', null)), $facts);
 
-        self::assertSame(['project' => null, 'target' => true], $data->reachableAdmits(), 'no require.php gives no answer, never "admitted"');
+        $reachable = $data->reachable();
+        self::assertNotNull($reachable);
+        self::assertSame(['project' => null, 'target' => true], $reachable->admits(), 'no require.php gives no answer, never "admitted"');
     }
 
     public function testTheDataCarriesTheAgesOfTheNewestAndTheReachableBranch(): void
@@ -457,9 +461,11 @@ final class LeftBehindRuleTest extends TestCase
 
         $data = $this->data($this->rule(new PhpFloor('8.4', '>=8.1')), $facts);
 
+        $reachable = $data->reachable();
+        self::assertNotNull($reachable);
         self::assertSame(0.3, $data->newestYears());
-        self::assertSame(1.0, $data->reachableYears());
-        self::assertSame('2.x', $data->reachableBranch());
+        self::assertSame(1.0, $reachable->years());
+        self::assertSame('2.x', $reachable->branch());
         self::assertSame('3.x', $data->newestBranch());
     }
 
@@ -470,9 +476,7 @@ final class LeftBehindRuleTest extends TestCase
 
         $data = $this->data($this->rule(new PhpFloor('8.4', '>=8.1')), $facts);
 
-        self::assertNull($data->reachablePhp());
-        self::assertNull($data->reachableAdmits());
-        self::assertNull($data->reachableYears());
+        self::assertNull($data->reachable());
         self::assertSame(0.3, $data->newestYears());
     }
 

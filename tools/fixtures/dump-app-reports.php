@@ -84,7 +84,7 @@ try {
         $years = 0;
         foreach ($report->findings() as $finding) {
             foreach ($finding->signals() as $signal) {
-                // A JSON round trip reads both the array data of a base checkout and the typed data of the head.
+                // The script reads `years` from the encoded data, so it runs on any checkout.
                 $data = json_decode((string) json_encode($signal->data()), true);
                 if (\is_array($data) && \array_key_exists('years', $data)) {
                     ++$years;

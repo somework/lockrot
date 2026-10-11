@@ -16,6 +16,7 @@ use Lockrot\Legacy\Verdict013;
 use Lockrot\Lock\PackageOrigin;
 use Lockrot\Score\MaintenanceTerm;
 use Lockrot\Score\ScoreBasis;
+use Lockrot\Score\ScoreContext;
 use Lockrot\Score\SecurityTerm;
 use Lockrot\Signal\Data\AbandonedData;
 use Lockrot\Signal\Data\AdvisoryData;
@@ -31,11 +32,7 @@ use Lockrot\Signal\Data\SignalData;
 use Lockrot\Signal\Rule\NotCheckedRule;
 use Lockrot\Signal\Signal;
 
-/**
- * @internal
- *
- * @phpstan-import-type Row013 from AdvisoryFacts013
- */
+/** @internal */
 final class Finding
 {
     /**
@@ -273,10 +270,29 @@ final class Finding
         return new \LogicException(\sprintf('%s was built without its flags, so it has no score.', $this->package));
     }
 
-    /** @return list<Signal> */
+    /**
+     * The rules' signals. Their S9 rows mark no deciding advisory, and their S10 lacks the release
+     * data that a counted advisory needed: {@see self::writtenSignals()} adds both.
+     *
+     * @return list<Signal>
+     */
     public function signals(): array
     {
         return $this->signals;
+    }
+
+    /**
+     * The data of the rules' signal of that class ({@see self::signals()}), null when it did not fire.
+     *
+     * @template T of SignalData
+     *
+     * @param class-string<T> $class
+     *
+     * @return ?T
+     */
+    public function signalData(string $class): ?SignalData
+    {
+        return self::dataIn($this->signals, $class);
     }
 
     /** @return list<string> */
@@ -386,33 +402,8 @@ final class Finding
         if (!\in_array($this->verdict, self::NO_FIX_VERDICTS, true) || !Verdict013::flagged($this->verdict)) {
             return null;
         }
-        // Only S9 knows whether a null fixed_by was looked for.
-        $releasesRead = $this->advisoryFacts013->releasesRead();
-        $list = [];
-        foreach ($this->advisoryFacts013->rows() as $row) {
-            $fixed = $this->verdict === Verdict::LEFT_BEHIND ? $row['fixed_on_branch'] : $row['fixed_by'] !== null;
-            if (!$fixed) {
-                $list[] = ['id' => $row['id'], 'reason' => $this->noFixReason($row, $releasesRead)];
-            }
-        }
 
-        return $list;
-    }
-
-    /** @param Row013 $row */
-    private function noFixReason(array $row, bool $releasesRead): string
-    {
-        if ($this->verdict === Verdict::LEFT_BEHIND && $row['fixed_by'] !== null) {
-            return NoFix013::NOT_ON_INSTALLED_BRANCH;
-        }
-        if (!$releasesRead) {
-            return NoFix013::RELEASES_UNKNOWN;
-        }
-        if ($row['affected_versions'] === null) {
-            return NoFix013::AFFECTED_RANGE_UNKNOWN;
-        }
-
-        return NoFix013::NO_RELEASE_FIXES;
+        return $this->advisoryFacts013->noFixExpected($this->verdict);
     }
 
     /** The clause texts: docs/verdicts.md#security-advisories. */
@@ -474,29 +465,24 @@ final class Finding
     /** S1's replacement as the repository writes it, free text. Null when S1 names none. */
     public function replacement(): ?string
     {
-        foreach ($this->signals as $signal) {
-            $data = $signal->data();
-            if ($data instanceof AbandonedData) {
-                $replacement = $data->replacement();
+        $s1 = $this->signalData(AbandonedData::class);
+        $replacement = $s1 === null ? null : $s1->replacement();
 
-                return $replacement !== null && $replacement !== '' ? $replacement : null;
-            }
-        }
-
-        return null;
+        return $replacement !== null && $replacement !== '' ? $replacement : null;
     }
 
     /**
      * Only a direct requirement gets the clause: a transitive package's parent owns its requirement.
      * See docs/verdicts.md#left-behind.
      */
-    private function followClause(Signal $s8): ?string
+    private function followClause(): ?string
     {
-        $data = $s8->data();
-        if ($this->verdict !== Verdict::LEFT_BEHIND || !$this->isDirect() || !$data instanceof LeftBehindData) {
+        $s8 = $this->signalData(LeftBehindData::class);
+        $reachable = $s8 === null ? null : $s8->reachable();
+        if ($this->verdict !== Verdict::LEFT_BEHIND || !$this->isDirect() || $reachable === null) {
             return null;
         }
-        $constraint = $data->suggestedConstraint();
+        $constraint = $reachable->suggestedConstraint();
 
         return $constraint !== null && $constraint !== '' ? 'require '.$constraint.' to follow' : null;
     }
@@ -507,7 +493,7 @@ final class Finding
         $parts = [];
         foreach ($this->ownSignalsDecidingFirst() as $signal) {
             $parts[] = $signal->summary();
-            if ($signal->id() === Signal::S8 && ($clause = $this->followClause($signal)) !== null) {
+            if ($signal->id() === Signal::S8 && ($clause = $this->followClause()) !== null) {
                 $parts[] = $clause;
             }
             if ($signal->id() === Signal::S9 && ($clause = $this->noFixClause()) !== null) {
@@ -613,7 +599,7 @@ final class Finding
     {
         $details = $this->details();
         $flags = $this->flags();
-        $signals = $this->signalsOut($details);
+        $signals = $this->writtenSignals();
         $checksMissing = self::checksOf($signals);
         $context = $this->context($details, $checksMissing);
         $branchKey = ReleaseBranch::of($this->version);
@@ -639,7 +625,7 @@ final class Finding
             'verdict' => $this->grade(),
             'priority' => $this->gradeOrNone(),
             'lead' => $this->lead(),
-            'flags' => $this->flagsOut($flags, $basis, $signals, $summaries, \count($rows), $context['liveness_complete']),
+            'flags' => $this->flagsOut($flags, $basis, $signals, $summaries, \count($rows), $context->livenessComplete()),
             'score' => $basis,
             'next_step' => null,
             'security' => $details->toSecurityArray($rows, $branch),
@@ -674,13 +660,10 @@ final class Finding
      */
     public function scoreBasis(): ScoreBasis
     {
-        $details = $this->details();
-
-        return $this->scoreBasisOf($this->context($details, self::checksOf($this->signalsOut($details))));
+        return $this->scoreBasisOf($this->context($this->details(), self::checksOf($this->writtenSignals())));
     }
 
-    /** @param array{maintenance_judged: bool, advisories_complete: bool, liveness_complete: bool, s3_unread: bool, s8_unread: bool} $context */
-    private function scoreBasisOf(array $context): ScoreBasis
+    private function scoreBasisOf(ScoreContext $context): ScoreBasis
     {
         return ScoreBasis::of($this->flags(), self::reachOf($this->chain), $this->dev, $context);
     }
@@ -692,17 +675,13 @@ final class Finding
      */
     public function securityStanding(): SecurityStanding
     {
-        $details = $this->details();
-
-        return $details->standing(self::rowsOf($this->signalsOut($details)));
+        return $this->details()->standing(self::rowsOf($this->writtenSignals()));
     }
 
     /**
      * @param list<Check> $checksMissing S10's checks as report-2 writes them
-     *
-     * @return array{maintenance_judged: bool, advisories_complete: bool, liveness_complete: bool, s3_unread: bool, s8_unread: bool}
      */
-    private function context(FindingDetails $details, array $checksMissing): array
+    private function context(FindingDetails $details, array $checksMissing): ScoreContext
     {
         $livenessComplete = true;
         $s3Unread = false;
@@ -711,13 +690,7 @@ final class Finding
             $s3Unread = $s3Unread || \in_array(Signal::S3, $check->blocks(), true);
         }
 
-        return [
-            'maintenance_judged' => $this->maintenanceJudged,
-            'advisories_complete' => $details->advisoriesComplete(),
-            'liveness_complete' => $livenessComplete,
-            's3_unread' => $s3Unread,
-            's8_unread' => ReleaseBranch::of($this->version) === null && !$this->maintenanceJudged,
-        ];
+        return new ScoreContext($this->maintenanceJudged, $details->advisoriesComplete(), $livenessComplete, $s3Unread, ReleaseBranch::of($this->version) === null && !$this->maintenanceJudged);
     }
 
     /**
@@ -726,28 +699,30 @@ final class Finding
      * counted advisory needed and did not get.
      *
      * @return list<Signal>
+     *
+     * @throws \LogicException for a finding built without its details
      */
-    private function signalsOut(FindingDetails $details): array
+    public function writtenSignals(): array
     {
         $deciding = $this->score === null ? null : $this->score->deciding();
         $out = [];
         foreach ($this->signals as $signal) {
             $data = $signal->data();
-            $out[] = $data instanceof AdvisoryData ? new Signal($signal->id(), $signal->level(), $signal->summary(), $data->withDeciding($deciding === null ? null : $deciding->advisory())) : $signal;
+            $out[] = $data instanceof AdvisoryData ? new Signal($signal->level(), $signal->summary(), $data->withDeciding($deciding === null ? null : $deciding->advisory())) : $signal;
         }
-        $releases = $details->releasesUnchecked();
+        $releases = $this->details()->releasesUnchecked();
         if ($releases === null) {
             return $out;
         }
         foreach ($out as $i => $signal) {
             $data = $signal->data();
             if ($data instanceof NotCheckedData) {
-                $out[$i] = new Signal(Signal::S10, $signal->level(), $signal->summary().'; '.NotCheckedRule::RELEASES_WORDS, new NotCheckedData(array_merge($data->checks(), [$releases])));
+                $out[$i] = new Signal($signal->level(), $signal->summary().'; '.NotCheckedRule::RELEASES_WORDS, new NotCheckedData(array_merge($data->checks(), [$releases])));
 
                 return $out;
             }
         }
-        $out[] = new Signal(Signal::S10, Signal::LEVEL_INFO, NotCheckedRule::RELEASES_WORDS, new NotCheckedData([$releases]));
+        $out[] = new Signal(Signal::LEVEL_INFO, NotCheckedRule::RELEASES_WORDS, new NotCheckedData([$releases]));
 
         return $out;
     }
@@ -762,7 +737,7 @@ final class Finding
      */
     private function flagSummaries(FlagSet $flags, ScoreBasis $basis, array $signals, array $rows, ?string $branch): array
     {
-        $data = self::dataById($signals);
+        $data = array_map(static fn (Signal $signal): SignalData => $signal->data(), $signals);
         $security = $basis->securityTerm();
         $summaries = [];
         foreach ($flags->fired() as $flag) {
@@ -787,7 +762,6 @@ final class Finding
             $roles[$term->flag()] = $term->role();
         }
         $fired = array_map(static fn (Signal $signal): string => $signal->id(), $signals);
-        $data = self::dataById($signals);
         $out = [];
         foreach ($flags->fired() as $flag) {
             if ($flag === FlagSet::VULNERABLE) {
@@ -800,7 +774,7 @@ final class Finding
                 'baseline' => null,
                 'signal_ids' => array_values(array_intersect(FlagSentence::SIGNALS[$flag], $fired)),
                 'degree' => $flag === FlagSet::ABANDONED ? ['reasons' => $flags->reasons(), 'liveness_complete' => $livenessComplete] : (\in_array($flag, [FlagSet::SILENT, FlagSet::STALE], true) ? ['liveness_complete' => $livenessComplete] : null),
-                'headline' => self::headline($flag, $flags, $data),
+                'headline' => self::headline($flag, $flags, $signals),
                 'summary' => $summaries[$flag],
             ];
         }
@@ -809,32 +783,32 @@ final class Finding
     }
 
     /**
-     * @param array<string, SignalData> $data
+     * @param list<Signal> $signals
      *
      * @return array{unit: string, value: int|float|string|null, source: ?string}
      */
-    private static function headline(string $flag, FlagSet $flags, array $data): array
+    private static function headline(string $flag, FlagSet $flags, array $signals): array
     {
         switch ($flag) {
             case FlagSet::ABANDONED:
                 return ['unit' => 'reason', 'value' => \in_array(FlagSet::ARCHIVED, $flags->reasons(), true) ? 'archived' : 'marked', 'source' => null];
             case FlagSet::PINNED:
-                $s6 = $data[Signal::S6] ?? null;
+                $s6 = self::dataIn($signals, PinnedData::class);
 
-                return ['unit' => 'reason', 'value' => $s6 instanceof PinnedData ? $s6->reason() : null, 'source' => null];
+                return ['unit' => 'reason', 'value' => $s6 === null ? null : $s6->reason(), 'source' => null];
             case FlagSet::LEFT_BEHIND:
-                $s8 = $data[Signal::S8] ?? null;
+                $s8 = self::dataIn($signals, LeftBehindData::class);
 
-                return ['unit' => 'years', 'value' => $s8 instanceof LeftBehindData ? $s8->years() : null, 'source' => 'branch'];
+                return ['unit' => 'years', 'value' => $s8 === null ? null : $s8->years(), 'source' => 'branch'];
             case FlagSet::OLD_PROMISE:
-                $s5 = $data[Signal::S5] ?? null;
+                $s5 = self::dataIn($signals, OldPromiseData::class);
 
-                return ['unit' => 'php', 'value' => $s5 instanceof OldPromiseData ? $s5->writtenForPhp() : null, 'source' => null];
+                return ['unit' => 'php', 'value' => $s5 === null ? null : $s5->writtenForPhp(), 'source' => null];
             default:
-                $s2 = $data[Signal::S2] ?? null;
-                $s4 = $data[Signal::S4] ?? null;
-                $release = $s2 instanceof NoReleaseData ? $s2->years() : null;
-                $push = $s4 instanceof NoPushData ? $s4->years() : null;
+                $s2 = self::dataIn($signals, NoReleaseData::class);
+                $s4 = self::dataIn($signals, NoPushData::class);
+                $release = $s2 === null ? null : $s2->years();
+                $push = $s4 === null ? null : $s4->years();
                 if ($release === null && $push === null) {
                     return ['unit' => 'years', 'value' => null, 'source' => null];
                 }
@@ -844,21 +818,23 @@ final class Finding
     }
 
     /**
-     * @param list<Signal> $signals
+     * @template T of SignalData
      *
-     * @return array<string, SignalData>
+     * @param list<Signal>    $signals
+     * @param class-string<T> $class
+     *
+     * @return ?T
      */
-    private static function dataById(array $signals): array
+    private static function dataIn(array $signals, string $class): ?SignalData
     {
-        $data = [];
         foreach ($signals as $signal) {
-            $payload = $signal->data();
-            if ($payload !== null) {
-                $data[$signal->id()] = $payload;
+            $data = $signal->data();
+            if ($data instanceof $class) {
+                return $data;
             }
         }
 
-        return $data;
+        return null;
     }
 
     /**
@@ -868,14 +844,9 @@ final class Finding
      */
     private static function rowsOf(array $signals): array
     {
-        foreach ($signals as $signal) {
-            $data = $signal->data();
-            if ($data instanceof AdvisoryData) {
-                return $data->rows();
-            }
-        }
+        $s9 = self::dataIn($signals, AdvisoryData::class);
 
-        return [];
+        return $s9 === null ? [] : $s9->rows();
     }
 
     /**
@@ -885,13 +856,8 @@ final class Finding
      */
     private static function checksOf(array $signals): array
     {
-        foreach ($signals as $signal) {
-            $data = $signal->data();
-            if ($data instanceof NotCheckedData) {
-                return $data->checks();
-            }
-        }
+        $s10 = self::dataIn($signals, NotCheckedData::class);
 
-        return [];
+        return $s10 === null ? [] : $s10->checks();
     }
 }

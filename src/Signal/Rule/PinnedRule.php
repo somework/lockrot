@@ -32,10 +32,10 @@ final class PinnedRule implements SignalRule
             // The lock dates a snapshot by the commit the branch pointed at. That is not a release date.
             $snapshotTime = InstalledRelease::of($package, $metadata)->lockTime();
 
-            return new Signal(Signal::S6, Signal::LEVEL_WARN, 'pinned to branch snapshot '.$package->version(), self::data($package, $metadata, self::REASON_BRANCH_SNAPSHOT, $snapshotTime));
+            return new Signal(Signal::LEVEL_WARN, 'pinned to branch snapshot '.$package->version(), self::data($package, $metadata, self::REASON_BRANCH_SNAPSHOT, $snapshotTime));
         }
         if ($metadata !== null && !$metadata->hasStableRelease()) {
-            return new Signal(Signal::S6, Signal::LEVEL_WARN, 'no tagged release in its repository', self::data($package, $metadata, self::REASON_NO_STABLE_RELEASE, null));
+            return new Signal(Signal::LEVEL_WARN, 'no tagged release in its repository', self::data($package, $metadata, self::REASON_NO_STABLE_RELEASE, null));
         }
 
         return null;

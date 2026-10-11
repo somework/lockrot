@@ -19,6 +19,7 @@ use Lockrot\Output\ExplainFormatter;
 use Lockrot\Signal\Data\Check;
 use Lockrot\Signal\Data\LeftBehindData;
 use Lockrot\Signal\Data\NotCheckedData;
+use Lockrot\Signal\Data\ReachableBranch;
 use Lockrot\Signal\Rule\AbandonedRule;
 use Lockrot\Signal\Rule\AdvisoryRule;
 use Lockrot\Signal\Rule\PinnedRule;
@@ -60,9 +61,9 @@ final class ExplainFormatterTest extends TestCase
      */
     public function testAFlaggedPackageReadsVerdictSignalsDataAndBranches(): void
     {
-        $s8 = new Signal(Signal::S8, Signal::LEVEL_WARN, 'branch 1.x last released 2021-06-01 (5.3 years ago); 2.x released 2.1.0 (2026-01-01)', new LeftBehindData('1.x', '2021-06-01T00:00:00+00:00', '1.5.0', 5.3, '2.x', '2.1.0', '2026-01-01T00:00:00+00:00', '>=8.1', true, null, null, '2.x', '2.1.0', '2026-01-01T00:00:00+00:00', null, null, '>=8.1', ['project' => true, 'target' => true], 0.7, 0.7));
-        $s9 = new Signal(Signal::S9, Signal::LEVEL_WARN, '2 security advisories affect 1.5.0 (CVE-2026-1, PKSA-2)');
-        $s10 = new Signal(Signal::S10, Signal::LEVEL_INFO, 'repository activity not checked (no token for the repository host), so S3 and S4 could not be read', new NotCheckedData([new Check('repository_activity', 'no_token', [Signal::S3, Signal::S4])]));
+        $s8 = new Signal(Signal::LEVEL_WARN, 'branch 1.x last released 2021-06-01 (5.3 years ago); 2.x released 2.1.0 (2026-01-01)', new LeftBehindData('1.x', '2021-06-01T00:00:00+00:00', '1.5.0', 5.3, null, '2.x', '2.1.0', '2026-01-01T00:00:00+00:00', '>=8.1', 0.7, true, null, null, new ReachableBranch('2.x', '2.1.0', '2026-01-01T00:00:00+00:00', 0.7, '>=8.1', ['project' => true, 'target' => true], null)));
+        $s9 = new Signal(Signal::LEVEL_WARN, '2 security advisories affect 1.5.0 (CVE-2026-1, PKSA-2)', SignalDataStub::of(Signal::S9, []));
+        $s10 = new Signal(Signal::LEVEL_INFO, 'repository activity not checked (no token for the repository host), so S3 and S4 could not be read', new NotCheckedData([new Check('repository_activity', 'no_token', [Signal::S3, Signal::S4])]));
         $legacy = SignalDataStub::legacy([
             ['id' => 'PKSA-1', 'cve' => 'CVE-2026-1', 'severity' => 'high', 'fixed_by' => '2.1.0', 'fixed_on_branch' => false, 'reported_at' => '2026-03-01T00:00:00+00:00', 'link' => 'https://example.test/a'],
             ['id' => 'PKSA-2', 'cve' => '', 'severity' => null, 'fixed_by' => null, 'fixed_on_branch' => false],
@@ -134,7 +135,7 @@ final class ExplainFormatterTest extends TestCase
             $s9 = (new AdvisoryRule())->evaluate($facts);
             self::assertNotNull($s9);
             self::assertSame($read, JsonPath::decoded($s9->data())['releases_read'], $case);
-            $finding = (new FindingBuilder())->withVerdict(Verdict::ABANDONED)->withSignals([new Signal(Signal::S1, Signal::LEVEL_HIGH, 'marked abandoned by its repository'), $s9])->withDataDate(new \DateTimeImmutable(F::NOW))->withAdvisoryFacts013(AdvisoryRule::legacy($facts)[1])->build();
+            $finding = (new FindingBuilder())->withVerdict(Verdict::ABANDONED)->withSignals([new Signal(Signal::LEVEL_HIGH, 'marked abandoned by its repository', SignalDataStub::of(Signal::S1, [])), $s9])->withDataDate(new \DateTimeImmutable(F::NOW))->withAdvisoryFacts013(AdvisoryRule::legacy($facts)[1])->build();
 
             $text = $this->plain(new Explanation($finding, $facts, new Thresholds(), '8.4', $this->report()));
 
@@ -155,7 +156,7 @@ final class ExplainFormatterTest extends TestCase
     #[DataProvider('textsThatLookLikeMarkup')]
     public function testTextThatLooksLikeMarkupPrintsAsWrittenAndLeavesNoStyleBehind(string $text): void
     {
-        $finding = (new FindingBuilder())->withPackage('vendor/'.$text)->withVersion($text)->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('S1', 'high', 'marked abandoned: '.$text)])->withChain(['vendor/'.$text])->withDataDate(new \DateTimeImmutable(F::NOW))->withNote('lookup: '.$text)->build();
+        $finding = (new FindingBuilder())->withPackage('vendor/'.$text)->withVersion($text)->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('high', 'marked abandoned: '.$text, SignalDataStub::of('S1', []))])->withChain(['vendor/'.$text])->withDataDate(new \DateTimeImmutable(F::NOW))->withNote('lookup: '.$text)->build();
         $explanation = new Explanation($finding, F::facts(F::package(['version' => '1.0.0'])), new Thresholds(), '8.4', $this->report(['run: '.$text]));
 
         $markup = (new ExplainFormatter())->text($explanation);

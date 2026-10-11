@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Lockrot\Signal\Data;
 
+use Lockrot\Signal\Signal;
+
 /** @internal */
 final class NotCheckedData implements SignalData
 {
@@ -14,6 +16,11 @@ final class NotCheckedData implements SignalData
     public function __construct(array $checks)
     {
         $this->checks = $checks;
+    }
+
+    public function signalId(): string
+    {
+        return Signal::S10;
     }
 
     /** @return non-empty-list<Check> */

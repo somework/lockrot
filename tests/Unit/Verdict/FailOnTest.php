@@ -32,10 +32,10 @@ final class FailOnTest extends TestCase
     public function testUncheckedFailsOnTheFindingsThatCarryS10(): void
     {
         $threshold = FailOn::fromString(FailOn::UNCHECKED);
-        $notChecked = new Signal(Signal::S10, Signal::LEVEL_INFO, 'repository activity not checked', SignalDataStub::of(Signal::S10, ['unchecked' => [], 'blocks' => ['S3', 'S4']]));
+        $notChecked = new Signal(Signal::LEVEL_INFO, 'repository activity not checked', SignalDataStub::of(Signal::S10, ['unchecked' => [], 'blocks' => ['S3', 'S4']]));
         $ok = (new FindingBuilder())->withPackage('vendor/ok')->withChain(['vendor/ok'])->build();
         $okUnchecked = (new FindingBuilder())->withPackage('vendor/ok')->withSignals([$notChecked])->withChain(['vendor/ok'])->build();
-        $abandoned = (new FindingBuilder())->withPackage('vendor/gone')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal(Signal::S1, Signal::LEVEL_HIGH, 'marked abandoned', SignalDataStub::of(Signal::S1, []))])->withChain(['vendor/gone'])->build();
+        $abandoned = (new FindingBuilder())->withPackage('vendor/gone')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal(Signal::LEVEL_HIGH, 'marked abandoned', SignalDataStub::of(Signal::S1, []))])->withChain(['vendor/gone'])->build();
 
         self::assertTrue($threshold->reaches($okUnchecked), 'the check behind this ok did not run');
         self::assertFalse($threshold->reaches($ok), 'checked, and nothing was found');

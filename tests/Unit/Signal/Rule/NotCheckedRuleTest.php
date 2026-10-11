@@ -12,6 +12,7 @@ use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\Rule\NotCheckedRule;
 use Lockrot\Signal\Signal;
 use Lockrot\Tests\Support\JsonPath;
+use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -160,7 +161,7 @@ final class NotCheckedRuleTest extends TestCase
     public function testDroppingTheMaintenanceGapsKeepsAnyOtherEntryWithItsSummary(): void
     {
         $advisories = new Check('advisories', 'offline', [Signal::S9]);
-        $s10 = new Signal(Signal::S10, Signal::LEVEL_INFO, 'repository activity not checked (the run is offline), so S3 and S4 could not be read; advisories not checked (offline), so S9 could not be read', new NotCheckedData([
+        $s10 = new Signal(Signal::LEVEL_INFO, 'repository activity not checked (the run is offline), so S3 and S4 could not be read; advisories not checked (offline), so S9 could not be read', new NotCheckedData([
             new Check('repository_activity', 'offline', [Signal::S3, Signal::S4]),
             $advisories,
         ]));
@@ -176,8 +177,8 @@ final class NotCheckedRuleTest extends TestCase
 
     public function testAnS10OfMaintenanceChecksAloneGoesWhileTheOtherSignalsStay(): void
     {
-        $s2 = new Signal(Signal::S2, Signal::LEVEL_WARN, 'last release 2021-05-05 (5.4 years ago)');
-        $s10 = new Signal(Signal::S10, Signal::LEVEL_INFO, 'not checked', new NotCheckedData([
+        $s2 = new Signal(Signal::LEVEL_WARN, 'last release 2021-05-05 (5.4 years ago)', SignalDataStub::of(Signal::S2, []));
+        $s10 = new Signal(Signal::LEVEL_INFO, 'not checked', new NotCheckedData([
             new Check('repository_activity', 'no_token', [Signal::S3, Signal::S4]),
             new Check('release_dates', 'undated_releases', [Signal::S2, Signal::S8]),
         ]));

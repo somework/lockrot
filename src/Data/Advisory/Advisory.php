@@ -102,6 +102,18 @@ final class Advisory
         return $this->affectedVersions;
     }
 
+    /** The date as report-1's row and the S9 row write it. */
+    public function reportedAtText(): ?string
+    {
+        return $this->reportedAt === null ? null : $this->reportedAt->format(\DATE_ATOM);
+    }
+
+    /** The affected range as report-1's row and the S9 row write it. */
+    public function affectedVersionsText(): ?string
+    {
+        return $this->affectedVersions === null ? null : $this->affectedVersions->getPrettyString();
+    }
+
     /** @return array{id: string, cve: ?string, title: ?string, link: ?string, severity: ?string, reported_at: ?string, affected_versions: ?string} */
     public function toArray(): array
     {
@@ -111,8 +123,8 @@ final class Advisory
             'title' => $this->title,
             'link' => $this->link,
             'severity' => $this->severity,
-            'reported_at' => $this->reportedAt === null ? null : $this->reportedAt->format(\DATE_ATOM),
-            'affected_versions' => $this->affectedVersions === null ? null : $this->affectedVersions->getPrettyString(),
+            'reported_at' => $this->reportedAtText(),
+            'affected_versions' => $this->affectedVersionsText(),
         ];
     }
 }

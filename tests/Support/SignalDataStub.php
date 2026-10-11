@@ -23,14 +23,16 @@ use Lockrot\Signal\Data\NoReleaseData;
 use Lockrot\Signal\Data\NotCheckedData;
 use Lockrot\Signal\Data\OldPromiseData;
 use Lockrot\Signal\Data\PinnedData;
+use Lockrot\Signal\Data\ReachableBranch;
 use Lockrot\Signal\Data\SignalData;
 use Lockrot\Signal\Signal;
+use Lockrot\Verdict\ScoreModel;
 use PHPUnit\Framework\Assert;
 
 /**
  * Builds the typed data of a signal for a test from the keys that the test sets, as report-2
  * writes them. Each key that the test omits takes a neutral value: a null, false, an empty list,
- * an empty text or a date of 2021-05-05.
+ * an empty text or a date of 2021-05-05. A key that the data does not write fails the test.
  */
 final class SignalDataStub
 {
@@ -38,6 +40,15 @@ final class SignalDataStub
 
     /** @param array<string, mixed> $d */
     public static function of(string $id, array $d): SignalData
+    {
+        $data = self::build($id, $d);
+        self::assertWrites($data->jsonSerialize(), $d);
+
+        return $data;
+    }
+
+    /** @param array<string, mixed> $d */
+    private static function build(string $id, array $d): SignalData
     {
         switch ($id) {
             case Signal::S1:
@@ -64,29 +75,34 @@ final class SignalDataStub
 
                 return new ExposureData($packages === [] ? [new ExposedPackage('vendor/dep', ['vendor/pkg', 'vendor/dep'], 'low', 'stale', ['stale'])] : $packages);
             case Signal::S8:
-                $admits = $d['reachable_admits'] ?? null;
+                $admits = \is_array($d['reachable_admits'] ?? null) ? $d['reachable_admits'] : [];
+                $reachable = self::opt($d, 'reachable_branch');
+                $orphans = array_intersect(array_keys(array_filter($d, static fn ($v): bool => $v !== null)), ['reachable_version', 'reachable_release', 'reachable_years', 'reachable_php', 'reachable_admits', 'suggested_constraint']);
+                Assert::assertTrue($reachable !== null || $orphans === [], 'A fact of the branch within reach needs reachable_branch: '.implode(', ', $orphans));
 
                 return new LeftBehindData(
                     self::str($d, 'branch', '1.x'),
                     self::str($d, 'branch_last_release', self::DATE),
                     self::opt($d, 'branch_last_version'),
                     self::float($d, 'years'),
+                    self::opt($d, 'dated_by'),
                     self::str($d, 'newest_branch', '2.x'),
                     self::str($d, 'newest_version', '2.0.0'),
                     self::str($d, 'newest_release', self::DATE),
                     self::opt($d, 'newest_php'),
+                    self::float($d, 'newest_years') ?? 0.0,
                     ($d['newest_within_reach'] ?? false) === true,
                     self::opt($d, 'floor_php'),
                     self::opt($d, 'floor_source'),
-                    self::opt($d, 'reachable_branch'),
-                    self::opt($d, 'reachable_version'),
-                    self::opt($d, 'reachable_release'),
-                    self::opt($d, 'suggested_constraint'),
-                    self::opt($d, 'dated_by'),
-                    self::opt($d, 'reachable_php'),
-                    \is_array($admits) ? ['project' => self::optBool($admits, 'project'), 'target' => self::optBool($admits, 'target')] : null,
-                    self::float($d, 'newest_years') ?? 0.0,
-                    self::float($d, 'reachable_years')
+                    $reachable === null ? null : new ReachableBranch(
+                        $reachable,
+                        self::str($d, 'reachable_version', '1.5.0'),
+                        self::str($d, 'reachable_release', self::DATE),
+                        self::float($d, 'reachable_years') ?? 0.0,
+                        self::opt($d, 'reachable_php'),
+                        ['project' => self::optBool($admits, 'project'), 'target' => self::optBool($admits, 'target')],
+                        self::opt($d, 'suggested_constraint')
+                    )
                 );
             case Signal::S9:
                 return new AdvisoryData(array_map([self::class, 'row'], self::list($d, 'advisories')), ($d['releases_read'] ?? false) === true, ($d['complete'] ?? false) === true);
@@ -105,29 +121,43 @@ final class SignalDataStub
      */
     public static function fields(Signal $signal): array
     {
-        $data = $signal->data();
-        Assert::assertNotNull($data, 'the signal carries no data');
-
-        return $data->jsonSerialize();
+        return $signal->data()->jsonSerialize();
     }
 
-    /** @param array<string, mixed> $d an S9 row, its `fix` as `{kind, ...}` */
+    /**
+     * @param array<string, mixed> $d an S9 row, its `fix` as `{kind, ...}`. Without `points` the row
+     *                                takes the points of its severity and fix.
+     */
     public static function row(array $d): AdvisoryRow
     {
-        $points = $d['points'] ?? 0;
-
-        return new AdvisoryRow(
+        $severity = self::str($d, 'severity', 'unrated');
+        $fix = self::fix(\is_array($d['fix'] ?? null) ? $d['fix'] : []);
+        $points = $d['points'] ?? null;
+        $row = new AdvisoryRow(
             self::str($d, 'id', 'PKSA-1'),
             self::opt($d, 'cve'),
             self::opt($d, 'title'),
             self::opt($d, 'link'),
             self::opt($d, 'reported_at'),
-            self::str($d, 'severity', 'unrated'),
+            $severity,
             self::opt($d, 'severity_published'),
             self::opt($d, 'affected_versions'),
-            \is_int($points) ? $points : 0,
-            self::fix(\is_array($d['fix'] ?? null) ? $d['fix'] : [])
+            \is_int($points) ? $points : ScoreModel::advisoryPoints($severity, $fix->kind()),
+            $fix
         );
+        self::assertWrites($row->jsonSerialize(), $d);
+
+        return $row;
+    }
+
+    /**
+     * @param array<string, mixed> $written
+     * @param array<mixed, mixed>  $set
+     */
+    private static function assertWrites(array $written, array $set): void
+    {
+        $unknown = array_diff(array_map('strval', array_keys($set)), array_keys($written));
+        Assert::assertSame([], array_values($unknown), 'The data does not write these keys: '.implode(', ', $unknown));
     }
 
     /**

@@ -16,6 +16,7 @@ use Lockrot\Config\Gate;
 use Lockrot\Data\Advisory\Advisory;
 use Lockrot\Data\Advisory\AdvisoryIgnoreMatch;
 use Lockrot\Data\Advisory\IgnoredAdvisory;
+use Lockrot\Score\CountedAdvisory;
 use Lockrot\Signal\Signal;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\JsonPath;
@@ -24,7 +25,6 @@ use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\FindingDetails;
 use Lockrot\Verdict\FlagSet;
-use Lockrot\Verdict\Score;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\TestCase;
 
@@ -100,13 +100,13 @@ final class Report2RootTest extends TestCase
     /** The findings cover an accepted flag in a graded finding and in a finished one. */
     public function testFlagsCountCarryingLeadingAcceptedAndGrades(): void
     {
-        $s = static fn (string $id, string $level): Signal => new Signal($id, $level, $id);
+        $s = static fn (string $id, string $level): Signal => new Signal($level, $id, SignalDataStub::of($id, []));
         $entry = static fn (string $flag): AllowlistEntry => new AllowlistEntry('vendor/pkg', null, 'kept', null, AllowlistEntry::BY_PROJECT, [$flag]);
         $finding = static fn (FlagSet $flags): Finding => (new FindingBuilder())->withFlags($flags)->build();
         $findings = [
             $finding(FlagSet::fromSignals([$s('S2', 'high'), $s('S4', 'high'), $s('S6', 'warn')], $entry('pinned'), [])),
             $finding(FlagSet::fromSignals([$s('S5', 'warn'), $s('S2', 'warn')], $entry('stale'), [])),
-            $finding(FlagSet::fromSignals([$s('S5', 'warn')], null, [Score::advisory('PKSA-a', 'high', 'update')])),
+            $finding(FlagSet::fromSignals([$s('S5', 'warn')], null, [new CountedAdvisory('PKSA-a', 'high', 'update')])),
             $finding(FlagSet::fromSignals([$s('S2', 'warn')], $entry('stale'), [])),
         ];
 
@@ -123,7 +123,7 @@ final class Report2RootTest extends TestCase
     public function testAbandonedCountsTheReplacementsAndTheSuggestions(): void
     {
         $abandoned = static fn (?string $replacement, ?string $reason = null): Finding => (new FindingBuilder())->withPackage('acme/old')->withVerdict(Verdict::ABANDONED)->withChain(['acme/old'])
-            ->withSignals([new Signal('S1', 'high', 'marked abandoned', SignalDataStub::of('S1', ['replacement' => $replacement]))])->withAllowlistReason($reason)->build();
+            ->withSignals([new Signal('high', 'marked abandoned', SignalDataStub::of('S1', ['replacement' => $replacement]))])->withAllowlistReason($reason)->build();
         $findings = [
             $abandoned('acme/new'),
             $abandoned('Symfony'),
@@ -214,7 +214,7 @@ final class Report2RootTest extends TestCase
         foreach ($advisories as $i => [$severity, $kind]) {
             $rows[] = ['id' => 'PKSA-'.$i, 'severity' => $severity, 'fix' => ['kind' => $kind]];
         }
-        $finding = (new FindingBuilder())->withPackage($package)->withChain([$package])->withSignals([new Signal('S9', 'warn', 'advisories', SignalDataStub::of('S9', ['advisories' => $rows]))])->build();
+        $finding = (new FindingBuilder())->withPackage($package)->withChain([$package])->withSignals([new Signal('warn', 'advisories', SignalDataStub::of('S9', ['advisories' => $rows]))])->build();
 
         return self::withDetails($finding, 'complete', $ignored);
     }

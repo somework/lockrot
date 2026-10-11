@@ -23,4 +23,13 @@ final class BranchFixesTest extends TestCase
         self::assertNull($row->newest());
         self::assertSame(['PKSA-a'], $row->clears());
     }
+
+    /** The count of fixed advisories is the count of the ids the branch clears, so the two cannot disagree. */
+    public function testItCountsTheAdvisoriesThatItClears(): void
+    {
+        $row = new BranchFixes('2.x', false, 0, 3, null, '2.1.0', ['PKSA-a', 'PKSA-b']);
+
+        self::assertSame(2, $row->fixed());
+        self::assertSame([0, 3], [$row->unknown(), $row->of()]);
+    }
 }

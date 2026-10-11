@@ -30,15 +30,12 @@ final class Signal implements \JsonSerializable
     public const LEVEL_WARN = 'warn';
     public const LEVEL_HIGH = 'high';
 
-    private string $id;
     private string $level;
     private string $summary;
-    private ?SignalData $data;
+    private SignalData $data;
 
-    /** @param ?SignalData $data the class of the signal's id. Without it the signal writes an empty `data`. */
-    public function __construct(string $id, string $level, string $summary, ?SignalData $data = null)
+    public function __construct(string $level, string $summary, SignalData $data)
     {
-        $this->id = $id;
         $this->level = $level;
         $this->summary = $summary;
         $this->data = $data;
@@ -46,7 +43,7 @@ final class Signal implements \JsonSerializable
 
     public function id(): string
     {
-        return $this->id;
+        return $this->data->signalId();
     }
 
     public function level(): string
@@ -59,7 +56,7 @@ final class Signal implements \JsonSerializable
         return $this->summary;
     }
 
-    public function data(): ?SignalData
+    public function data(): SignalData
     {
         return $this->data;
     }
@@ -69,9 +66,9 @@ final class Signal implements \JsonSerializable
         return $this->level === self::LEVEL_HIGH;
     }
 
-    /** @return array{id: string, level: string, summary: string, data: SignalData|array{}} */
+    /** @return array{id: string, level: string, summary: string, data: SignalData} */
     public function jsonSerialize(): array
     {
-        return ['id' => $this->id, 'level' => $this->level, 'summary' => $this->summary, 'data' => $this->data ?? []];
+        return ['id' => $this->id(), 'level' => $this->level, 'summary' => $this->summary, 'data' => $this->data];
     }
 }

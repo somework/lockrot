@@ -78,7 +78,7 @@ final class FindingDetailsTest extends TestCase
             ['fixed' => 0, 'unknown' => 1, 'of' => 1, 'fix_kind' => null, 'lowest' => null, 'newest' => null, 'held_by' => [], 'if_applied' => null],
             JsonPath::decoded($security['installed_branch_fixes'])
         );
-        self::assertStringContainsString(' — fix not known on 1.x;', $details->vulnerableSummary($rows, '1.x', 'high'));
+        self::assertStringContainsString(' — fix not known on 1.x;', $details->vulnerableSummary([$rows[0]->withDeciding(true)], '1.x', 'high'));
         self::assertNull($details->toSecurityArray($rows, null)['installed_branch_fixes'], 'a branch snapshot has no installed branch');
     }
 
@@ -139,7 +139,7 @@ final class FindingDetailsTest extends TestCase
     {
         $holder = new Holder(Holder::PACKAGE, 'acme/b', '2.0.0', Holder::REQUIRE, '^1.0');
         $candidate = new Candidate(new StableRelease('1.2.0.0', '1.2.0', null, '>=8.1', false), '1', Fix::UPGRADE, [$holder]);
-        $branch = new BranchFixes('1.x', true, 1, 0, 2, $candidate, '1.3.0', ['PKSA-a']);
+        $branch = new BranchFixes('1.x', true, 0, 2, $candidate, '1.3.0', ['PKSA-a']);
         $gets = new Gets('1.3.0', PhpCheck::of('>=8.1', new PhpFloor('8.4', '>=8.1')), ['PKSA-a'], false);
         $details = new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [], new PackageFixes([], [$branch], $gets, null, null));
         $rows = self::rows([
@@ -262,7 +262,7 @@ final class FindingDetailsTest extends TestCase
         $read = F::facts(F::package(), $metadata);
         $asked = F::facts(F::package(), $metadata, F::activity(false, '2026-01-01T00:00:00+00:00'));
         $activity = static fn (string $reason): array => ['check' => 'repository_activity', 'reason' => $reason, 'blocks' => ['S3', 'S4']];
-        $s10 = static fn ($unchecked): Signal => new Signal(Signal::S10, Signal::LEVEL_INFO, 'not checked', SignalDataStub::of(Signal::S10, ['unchecked' => $unchecked]));
+        $s10 = static fn ($unchecked): Signal => new Signal(Signal::LEVEL_INFO, 'not checked', SignalDataStub::of(Signal::S10, ['unchecked' => $unchecked]));
         $whole = new AllowlistEntry('vendor/pkg', null, 'kept on purpose', null, AllowlistEntry::BY_PROJECT);
         $silentOnly = new AllowlistEntry('vendor/pkg', null, 'kept on purpose', null, AllowlistEntry::BY_PROJECT, ['silent']);
 
@@ -271,7 +271,7 @@ final class FindingDetailsTest extends TestCase
         yield 'a whole-package entry' => [$read, $whole, [], [$activity('allowlisted')]];
         yield 'an entry that accepts some flags' => [$read, $silentOnly, [], [$activity('no_repository')]];
         yield 'the reason the facts give' => [new PackageFacts(F::package(), $metadata, null, [], 'no_token'), null, [], [$activity('no_token')]];
-        yield 'S10 holds the activity gap' => [$read, null, [new Signal(Signal::S2, Signal::LEVEL_WARN, 'old'), $s10([['check' => 'repository_activity', 'reason' => 'no_token', 'blocks' => ['S3', 'S4']]])], []];
+        yield 'S10 holds the activity gap' => [$read, null, [new Signal(Signal::LEVEL_WARN, 'old', SignalDataStub::of(Signal::S2, [])), $s10([['check' => 'repository_activity', 'reason' => 'no_token', 'blocks' => ['S3', 'S4']]])], []];
         yield 'S10 holds another gap' => [$read, null, [$s10([['check' => 'releases', 'reason' => 'releases_unknown', 'blocks' => ['S9']]])], [$activity('no_repository')]];
         yield 'not from a Composer repository' => [F::facts(F::package(['fromComposerRepository' => false])), null, [], [
             $activity('not_from_composer_repository'),

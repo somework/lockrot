@@ -59,7 +59,7 @@ final class OldPromiseRule implements SignalRule
             $this->targetPhp
         );
 
-        return new Signal(Signal::S5, Signal::LEVEL_WARN, $summary, new OldPromiseData(
+        return new Signal(Signal::LEVEL_WARN, $summary, new OldPromiseData(
             $this->targetPhp,
             $this->targetMajor,
             $ga->format('Y-m-d'),

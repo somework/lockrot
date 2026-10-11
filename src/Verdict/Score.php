@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Verdict;
 
+use Lockrot\Score\CountedAdvisory;
 use Lockrot\Score\MaintenanceTerm;
 use Lockrot\Score\SecurityTerm;
 use Lockrot\Security\Severity;
@@ -15,8 +16,6 @@ use Lockrot\Security\Severity;
  * once. Every quarter of a weight is whole, so every value stays on the half-point grid.
  *
  * @internal
- *
- * @phpstan-type Advisory array{id: string, severity: string, fix_kind: string}
  */
 final class Score
 {
@@ -38,11 +37,11 @@ final class Score
     private bool $dev;
 
     /**
-     * @param list<string> $maintenance the counted maintenance flags, in any order
-     * @param ?Advisory    $deciding    with the severity bucket, not Composer's word
-     * @param list<string> $tied
+     * @param list<string>     $maintenance the counted maintenance flags, in any order
+     * @param ?CountedAdvisory $deciding    with the severity bucket, not Composer's word
+     * @param list<string>     $tied
      */
-    private function __construct(array $maintenance, ?array $deciding, array $tied, int $advisories, string $reach, bool $dev)
+    private function __construct(array $maintenance, ?CountedAdvisory $deciding, array $tied, int $advisories, string $reach, bool $dev)
     {
         $this->tied = $tied;
         $this->advisories = $advisories;
@@ -57,19 +56,13 @@ final class Score
         $this->deciding = $deciding === null ? null : $this->securityTerm($deciding);
     }
 
-    /** @param Advisory $advisory with the severity bucket, not Composer's word */
-    private function securityTerm(array $advisory): SecurityTerm
+    /** @param CountedAdvisory $advisory with the severity bucket, not Composer's word */
+    private function securityTerm(CountedAdvisory $advisory): SecurityTerm
     {
-        $multiplier = \in_array($advisory['fix_kind'], ScoreModel::DOUBLING, true) ? ScoreModel::NO_REACHABLE_FIX_FACTOR : 1;
-        $points = ScoreModel::advisoryPoints($advisory['severity'], $advisory['fix_kind']);
+        $multiplier = \in_array($advisory->fixKind(), ScoreModel::DOUBLING, true) ? ScoreModel::NO_REACHABLE_FIX_FACTOR : 1;
+        $points = ScoreModel::advisoryPoints($advisory->severity(), $advisory->fixKind());
 
-        return new SecurityTerm($advisory['id'], $advisory['severity'], $advisory['fix_kind'], intdiv($points, $multiplier), $multiplier, $points, $this->halveForDev(2 * $points));
-    }
-
-    /** @return Advisory */
-    public static function advisory(string $id, string $severity, string $fixKind): array
-    {
-        return ['id' => $id, 'severity' => $severity, 'fix_kind' => $fixKind];
+        return new SecurityTerm($advisory->id(), $advisory->severity(), $advisory->fixKind(), intdiv($points, $multiplier), $multiplier, $points, $this->halveForDev(2 * $points));
     }
 
     public static function of(FlagSet $flags, string $reach, bool $dev): self
@@ -78,9 +71,9 @@ final class Score
     }
 
     /**
-     * @param list<string>   $maintenance the counted maintenance flags, in any order
-     * @param list<Advisory> $advisories  the counted advisories. A severity is a Composer word: the
-     *                                    engine reads its bucket ({@see Severity::fromComposer()})
+     * @param list<string>          $maintenance the counted maintenance flags, in any order
+     * @param list<CountedAdvisory> $advisories  the counted advisories. A severity is a Composer word: the
+     *                                           engine reads its bucket ({@see Severity::fromComposer()})
      *
      * @throws \InvalidArgumentException for a reach that is not direct, transitive or unreached, or a
      *                                   fix kind outside {@see ScoreModel::FIX_KINDS}
@@ -91,23 +84,23 @@ final class Score
             throw new \InvalidArgumentException('not a reach: '.$reach);
         }
         foreach ($advisories as $advisory) {
-            if (!\in_array($advisory['fix_kind'], ScoreModel::FIX_KINDS, true)) {
-                throw new \InvalidArgumentException('not a fix kind: '.$advisory['fix_kind']);
+            if (!\in_array($advisory->fixKind(), ScoreModel::FIX_KINDS, true)) {
+                throw new \InvalidArgumentException('not a fix kind: '.$advisory->fixKind());
             }
         }
-        $advisories = array_map(static fn (array $advisory): array => array_merge($advisory, ['severity' => Severity::fromComposer($advisory['severity'])->bucket()]), $advisories);
-        usort($advisories, static function (array $a, array $b): int {
-            return ScoreModel::advisoryPoints($b['severity'], $b['fix_kind']) <=> ScoreModel::advisoryPoints($a['severity'], $a['fix_kind'])
-                ?: array_search($a['severity'], ScoreModel::SEVERITIES, true) <=> array_search($b['severity'], ScoreModel::SEVERITIES, true)
-                ?: strcmp($a['id'], $b['id']);
+        $advisories = array_map(static fn (CountedAdvisory $advisory): CountedAdvisory => $advisory->bucketed(), $advisories);
+        usort($advisories, static function (CountedAdvisory $a, CountedAdvisory $b): int {
+            return ScoreModel::advisoryPoints($b->severity(), $b->fixKind()) <=> ScoreModel::advisoryPoints($a->severity(), $a->fixKind())
+                ?: array_search($a->severity(), ScoreModel::SEVERITIES, true) <=> array_search($b->severity(), ScoreModel::SEVERITIES, true)
+                ?: strcmp($a->id(), $b->id());
         });
         $deciding = $advisories[0] ?? null;
         $tied = [];
         if ($deciding !== null) {
-            $points = ScoreModel::advisoryPoints($deciding['severity'], $deciding['fix_kind']);
+            $points = ScoreModel::advisoryPoints($deciding->severity(), $deciding->fixKind());
             foreach (\array_slice($advisories, 1) as $advisory) {
-                if (ScoreModel::advisoryPoints($advisory['severity'], $advisory['fix_kind']) === $points) {
-                    $tied[] = $advisory['id'];
+                if (ScoreModel::advisoryPoints($advisory->severity(), $advisory->fixKind()) === $points) {
+                    $tied[] = $advisory->id();
                 }
             }
         }

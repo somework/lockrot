@@ -45,7 +45,7 @@ final class AdvisoryRule implements SignalRule
         $worst = Severity::worstOf(array_map(static fn (Advisory $advisory): string => Severity::fromComposer($advisory->severity())->bucket(), $advisories));
         $coverage = $facts->advisoryCoverage();
 
-        return new Signal(Signal::S9, \in_array($worst, [Severity::CRITICAL, Severity::HIGH], true) ? Signal::LEVEL_HIGH : Signal::LEVEL_WARN, $legacy[0], new AdvisoryData(
+        return new Signal(\in_array($worst, [Severity::CRITICAL, Severity::HIGH], true) ? Signal::LEVEL_HIGH : Signal::LEVEL_WARN, $legacy[0], new AdvisoryData(
             $rows,
             $legacy[1]->releasesRead(),
             $coverage !== null && $coverage->reason() === null
@@ -120,17 +120,15 @@ final class AdvisoryRule implements SignalRule
         $rows = [];
         foreach ($byId as $id => [$advisory, $fix]) {
             $bucket = Severity::fromComposer($advisory->severity())->bucket();
-            $reportedAt = $advisory->reportedAt();
-            $range = $advisory->affectedRange();
             $rows[] = new AdvisoryRow(
                 (string) $id,
                 $advisory->cve(),
                 self::title($advisory->cve(), $advisory->title()),
                 $advisory->link(),
-                $reportedAt === null ? null : $reportedAt->format(\DATE_ATOM),
+                $advisory->reportedAtText(),
                 $bucket,
                 $advisory->severity(),
-                $range === null ? null : $range->getPrettyString(),
+                $advisory->affectedVersionsText(),
                 ScoreModel::advisoryPoints($bucket, $fix->kind()),
                 $fix
             );

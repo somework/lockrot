@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Lockrot\Signal\Data;
 
+use Lockrot\Signal\Signal;
+
 /** @internal */
 final class NoPushData implements SignalData
 {
@@ -26,6 +28,11 @@ final class NoPushData implements SignalData
         $this->years = $years;
         $this->forge = $forge;
         $this->activity = $activity;
+    }
+
+    public function signalId(): string
+    {
+        return Signal::S4;
     }
 
     public function lastPush(): string

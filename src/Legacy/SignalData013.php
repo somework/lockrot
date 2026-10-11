@@ -33,7 +33,7 @@ final class SignalData013
     }
 
     /** @return array<string, mixed> */
-    public static function of(Signal $signal): array
+    public static function toReport1Array(Signal $signal): array
     {
         $data = $signal->data();
         if ($data instanceof ExposureData) {
@@ -45,6 +45,6 @@ final class SignalData013
             return ['flagged' => \count($packages), 'packages' => $packages];
         }
 
-        return $data === null ? [] : array_diff_key($data->jsonSerialize(), array_flip(self::ADDED[$signal->id()] ?? []));
+        return array_diff_key($data->jsonSerialize(), array_flip(self::ADDED[$signal->id()] ?? []));
     }
 }

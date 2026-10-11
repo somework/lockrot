@@ -200,7 +200,7 @@ final class FixFinder
                     $lowest = $candidate;
                 }
             }
-            $rows[] = new BranchFixes(ReleaseBranch::label($key), $key === $installedBranch, \count($cleared), $of - \count($ranged), $of, $lowest, $newest[$key], $cleared);
+            $rows[] = new BranchFixes(ReleaseBranch::label($key), $key === $installedBranch, $of - \count($ranged), $of, $lowest, $newest[$key], $cleared);
         }
 
         return $rows;

@@ -131,7 +131,7 @@ final class ExplainFormatter
         $scalars = [];
         $lines = [];
         $skipNulls = $signal->id() === Signal::S6;
-        foreach (SignalData013::of($signal) as $key => $value) {
+        foreach (SignalData013::toReport1Array($signal) as $key => $value) {
             if ($value === null && $skipNulls) {
                 continue;
             }

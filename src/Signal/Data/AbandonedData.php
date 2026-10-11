@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Lockrot\Signal\Data;
 
+use Lockrot\Signal\Signal;
+
 /** @internal */
 final class AbandonedData implements SignalData
 {
@@ -17,6 +19,11 @@ final class AbandonedData implements SignalData
         $this->markedBy = $markedBy;
         $this->replacement = $replacement;
         $this->replacementUrl = $replacementUrl;
+    }
+
+    public function signalId(): string
+    {
+        return Signal::S1;
     }
 
     public function markedBy(): string

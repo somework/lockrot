@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Verdict;
 
 use Lockrot\Allowlist\AllowlistEntry;
+use Lockrot\Score\CountedAdvisory;
 use Lockrot\Signal\Signal;
 
 /**
@@ -14,8 +15,6 @@ use Lockrot\Signal\Signal;
  * ignore list removes is no S1, so it raises no flag here.
  *
  * @internal
- *
- * @phpstan-import-type Advisory from Score
  */
 final class FlagSet
 {
@@ -37,7 +36,7 @@ final class FlagSet
     private array $signals;
     /** @var list<string> */
     private array $acceptSet;
-    /** @var list<Advisory> */
+    /** @var list<CountedAdvisory> */
     private array $advisories;
     /** @var list<string> */
     private array $fired;
@@ -46,7 +45,7 @@ final class FlagSet
     /**
      * @param array<string, string> $signals
      * @param list<string>          $acceptSet
-     * @param list<Advisory>        $advisories
+     * @param list<CountedAdvisory>        $advisories
      */
     private function __construct(array $signals, array $acceptSet, array $advisories)
     {
@@ -66,7 +65,7 @@ final class FlagSet
 
     /**
      * @param list<Signal>   $signals    the finding's signals: S1 to S6 and S8 raise flags, the others none
-     * @param list<Advisory> $advisories the counted advisories: they raise `vulnerable`, which no entry accepts
+     * @param list<CountedAdvisory> $advisories the counted advisories: they raise `vulnerable`, which no entry accepts
      */
     public static function fromSignals(array $signals, ?AllowlistEntry $entry, array $advisories): self
     {
@@ -102,7 +101,7 @@ final class FlagSet
         return $this->acceptSet;
     }
 
-    /** @return list<Advisory> */
+    /** @return list<CountedAdvisory> */
     public function advisories(): array
     {
         return $this->advisories;
@@ -139,7 +138,7 @@ final class FlagSet
 
     public function withoutAdvisory(string $id): self
     {
-        return new self($this->signals, $this->acceptSet, array_values(array_filter($this->advisories, static fn (array $advisory): bool => $advisory['id'] !== $id)));
+        return new self($this->signals, $this->acceptSet, array_values(array_filter($this->advisories, static fn (CountedAdvisory $advisory): bool => $advisory->id() !== $id)));
     }
 
     /** The same facts with $flag counted, not accepted: what the flag adds if counted. */

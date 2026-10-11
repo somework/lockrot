@@ -129,7 +129,7 @@ final class NotCheckedRule implements SignalRule
         }
         $summaries ??= array_map([self::class, 'summaryOf'], $unchecked);
 
-        return new Signal(Signal::S10, Signal::LEVEL_INFO, implode('; ', $summaries), new NotCheckedData($unchecked));
+        return new Signal(Signal::LEVEL_INFO, implode('; ', $summaries), new NotCheckedData($unchecked));
     }
 
     private static function summaryOf(Check $entry): string

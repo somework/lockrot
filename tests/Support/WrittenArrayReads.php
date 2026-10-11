@@ -20,14 +20,22 @@ use PhpParser\ParserFactory;
  * the array goes only to a writer method's return or to an argument of a writer or a listed holder.
  * On the way it can pass the nodes of {@see through()}. A writer class gives the array, a key or a
  * copy of it and one variable that holds them only to a writer. It returns or yields them only from
- * a writer method or a private method.
+ * a writer method or a private method. Only a writer class calls a JSON encoder ({@see ENCODERS}).
  */
 final class WrittenArrayReads
 {
     private const WRITER_METHOD = '/^(to\w*array|jsonserialize|findingrows)$/i';
     private const OUTSIDE = 'uses a written array outside a return, an array item or a writer';
+    private const ENCODES = 'encodes JSON outside a writer: only a writer calls the encoder';
     /** The functions whose result holds rows or keys of their array argument. */
-    private const COPIES = ['array_values', 'array_filter', 'array_slice', 'array_reverse', 'array_column', 'array_replace', 'array_unique', 'iterator_to_array', 'reset', 'end', 'current'];
+    private const COPIES = [
+        'array_values', 'array_filter', 'array_slice', 'array_reverse', 'array_column', 'array_replace', 'array_unique', 'iterator_to_array', 'reset', 'end', 'current', 'next', 'prev',
+        'array_diff', 'array_diff_assoc', 'array_diff_key', 'array_diff_uassoc', 'array_diff_ukey', 'array_udiff', 'array_udiff_assoc', 'array_udiff_uassoc',
+        'array_intersect', 'array_intersect_assoc', 'array_intersect_key', 'array_intersect_uassoc', 'array_intersect_ukey', 'array_uintersect', 'array_uintersect_assoc', 'array_uintersect_uassoc',
+        'array_change_key_case', 'array_chunk', 'array_pad', 'array_pop', 'array_shift', 'array_splice',
+    ];
+    /** A function or `Class::method` that encodes a value as JSON: its decoded result reads the keys of a written array. */
+    private const ENCODERS = ['json_encode', 'Lockrot\\Json\\JsonWriter::encode'];
 
     /** @var callable(string): bool */
     private $isWriter;
@@ -81,6 +89,11 @@ final class WrittenArrayReads
     {
         $isWriter = ($this->isWriter)($this->class);
         $violations = [];
+        if (!$isWriter) {
+            foreach ((new NodeFinder())->find($class->getMethods(), static fn (Node $node): bool => self::isEncoder($node)) as $call) {
+                $violations[] = $call->getStartLine().': '.self::ENCODES;
+            }
+        }
         foreach ((new NodeFinder())->find($class->getMethods(), static fn (Node $node): bool => self::isSource($node)) as $call) {
             $violation = $isWriter ? $this->passedOn($call) : $this->misplaced($call);
             if ($violation !== null) {
@@ -89,6 +102,16 @@ final class WrittenArrayReads
         }
 
         return $violations;
+    }
+
+    private static function isEncoder(Node $node): bool
+    {
+        if ($node instanceof Expr\FuncCall && $node->name instanceof Name) {
+            return \in_array($node->name->toLowerString(), self::ENCODERS, true);
+        }
+
+        return $node instanceof Expr\StaticCall && $node->class instanceof Name && $node->name instanceof Node\Identifier
+            && \in_array($node->class->toString().'::'.$node->name->toLowerString(), self::ENCODERS, true);
     }
 
     /** A call of a writer method, or a callable array of one. */
