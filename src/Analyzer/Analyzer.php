@@ -478,10 +478,6 @@ final class Analyzer
         }
         $floor = $this->signals->phpFloor();
         $details = $finding->details();
-        $s8 = null;
-        foreach ($finding->signals() as $signal) {
-            $s8 = $signal->id() === Signal::S8 ? $signal : $s8;
-        }
         $ranges = [];
         foreach ($facts->advisories() as $advisory) {
             if ($advisory->affectedRange() !== null) {
@@ -493,7 +489,7 @@ final class Analyzer
             $finding,
             $subject,
             $facts->metadata(),
-            BranchRow::all($facts, $floor, $this->clock, $s8, $details->fixes()),
+            BranchRow::all($facts, $floor, $this->clock, null, $details->fixes()),
             $details->fixes(),
             $finder,
             $floor,

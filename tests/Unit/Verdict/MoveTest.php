@@ -61,9 +61,9 @@ final class MoveTest extends TestCase
                     continue;
                 }
                 $span = new MultiConstraint([new Constraint('>=', $parser->normalize(JsonPath::stringAt($move, ['version']))), new Constraint('<=', $parser->normalize(JsonPath::stringAt($move, ['newest'])))]);
-                $range = $ranges[$fact['id']];
+                $range = $ranges[JsonPath::stringAt($fact, ['id'])];
                 self::assertIsString($range);
-                self::assertFalse(Intervals::haveIntersections($parser->parseConstraints($range), $span), $id.': '.$fact['id'].' in '.$move['version'].' to '.$move['newest']);
+                self::assertFalse(Intervals::haveIntersections($parser->parseConstraints($range), $span), $id.': '.JsonPath::stringAt($fact, ['id']).' in '.JsonPath::stringAt($move, ['version']).' to '.JsonPath::stringAt($move, ['newest']));
             }
         }
     }
@@ -89,6 +89,14 @@ final class MoveTest extends TestCase
         self::assertSame(['next_step', 'raise-php'], [JsonPath::stringAt($finding, ['security', 'move_in']), JsonPath::stringAt($finding, ['security', 'fix_kind'])]);
         self::assertSame(['holders', 'crosses_major'], $move['composer_moves_because']);
         self::assertSame(['clears_hold', 'composer_resolves'], JsonPath::arrayAt($move, ['if_applied', 'assumes']));
+        self::assertSame('symfony/twig-bridge', JsonPath::stringAt($move, ['held_by', 1, 'package']));
+        self::assertTrue(JsonPath::has($move, ['held_by', 1, 'holder', 'verdict']), 'the second pass names the holder\'s own finding');
+        foreach (JsonPath::arrayAt($finding, ['signals']) as $signal) {
+            self::assertIsArray($signal);
+            if ($signal['id'] === 'S9') {
+                self::assertTrue(JsonPath::has($signal, ['data', 'advisories', 0, 'fix', 'held_by', 1, 'holder', 'verdict']), 'and so does each S9 row');
+            }
+        }
     }
 
     /**
@@ -173,7 +181,7 @@ final class MoveTest extends TestCase
         self::assertSame(['raise-php'], array_column(JsonPath::arrayAt($move, ['also']), 'kind'));
         self::assertArrayNotHasKey('through', JsonPath::arrayAt($move, ['also', 0]));
         self::assertSame('composer update a/b (gets 1.9.0) — clears the advisory; left-behind, old-promise stay', $move['text']);
-        self::assertSame(['next_step', 'update', null], [JsonPath::stringAt($finding, ['security', 'move_in']), JsonPath::stringAt($finding, ['security', 'fix_kind']), $finding['security']['partial']]);
+        self::assertSame(['next_step', 'update', null], [JsonPath::stringAt($finding, ['security', 'move_in']), JsonPath::stringAt($finding, ['security', 'fix_kind']), JsonPath::arrayAt($finding, ['security'])['partial']]);
     }
 
     /** Release data that never came names no move: lockrot claims nothing about releases it did not read. */
@@ -242,8 +250,8 @@ final class MoveTest extends TestCase
         ]);
         $moves = array_merge([$finding['next_step']], JsonPath::arrayAt($finding, ['next_step', 'also']));
 
-        self::assertContains(['update', '1.5.0'], array_map(static fn (array $move): array => [$move['kind'], $move['version']], $moves));
-        self::assertNull($finding['security']['partial']);
+        self::assertContains(['update', '1.5.0'], array_map(static fn ($move): array => \is_array($move) ? [$move['kind'], $move['version']] : [], $moves));
+        self::assertNull(JsonPath::arrayAt($finding, ['security'])['partial']);
     }
 
     /** With no release read, the test move names the installed release, dated as S5 reads it. */
@@ -282,9 +290,10 @@ final class MoveTest extends TestCase
      */
     private static function analyse(array $over): array
     {
-        $inputs = [
-            'root' => ['name' => 'acme/app', 'require' => ['php' => '>=7.4', 'a/b' => '^1.0']],
-            'lock' => [['name' => 'a/b', 'version' => '1.0.0', 'time' => '2019-01-01T00:00:00+00:00', 'php' => '>=7.2', 'dev' => false, 'origin' => 'packagist']],
+        $entry = ['name' => 'a/b', 'version' => '1.0.0', 'time' => '2019-01-01T00:00:00+00:00', 'php' => '>=7.2', 'dev' => false, 'origin' => 'packagist'];
+        $others = [];
+        $require = ['php' => '>=7.4', 'a/b' => '^1.0'];
+        $rest = [
             'releases' => [self::release('1.0.0', '2019-01-01', '>=7.2'), self::release('1.9.0', '2020-01-01', '>=7.2'), self::release('2.0.0', '2026-05-01', '>=8.1'), self::release('2.3.0', '2026-06-01', '>=8.1')],
             'advisories' => [],
             'activity' => null,
@@ -293,14 +302,18 @@ final class MoveTest extends TestCase
         foreach ($over as $key => $value) {
             if ($key === 'lock') {
                 self::assertIsArray($value);
-                $inputs['lock'] = array_merge([$value[0] + $inputs['lock'][0]], \array_slice($value, 1));
+                self::assertIsArray($value[0]);
+                $entry = $value[0] + $entry;
+                $others = \array_slice($value, 1);
             } elseif ($key === 'root') {
                 self::assertIsArray($value);
-                $inputs['root']['require'] = array_filter($value['require'] + $inputs['root']['require'], static fn ($constraint): bool => $constraint !== null);
+                self::assertIsArray($value['require']);
+                $require = array_filter($value['require'] + $require, static fn ($constraint): bool => $constraint !== null);
             } else {
-                $inputs[$key] = $value;
+                $rest[$key] = $value;
             }
         }
+        $inputs = ['root' => ['name' => 'acme/app', 'require' => $require], 'lock' => array_merge([$entry], $others)] + $rest;
 
         return self::hydrated(['id' => 'move', 'inputs' => $inputs]);
     }

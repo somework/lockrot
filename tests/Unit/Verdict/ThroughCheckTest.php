@@ -136,7 +136,8 @@ final class ThroughCheckTest extends TestCase
         $move = JsonPath::arrayAt($finding, ['next_step']);
 
         self::assertSame([false], array_column(JsonPath::arrayAt($move, ['through']), 'newest_requires'));
-        self::assertSame(['composer', 'why-not', 'guzzlehttp/guzzle', '8.2.0'], $move['commands'][\count($move['commands']) - 1]);
+        $commands = JsonPath::arrayAt($move, ['commands']);
+        self::assertSame(['composer', 'why-not', 'guzzlehttp/guzzle', '8.2.0'], end($commands));
     }
 
     /**
@@ -145,7 +146,7 @@ final class ThroughCheckTest extends TestCase
      * @param array<string, list<array{0: string, 1: ?string, 2: bool}>|null> $dependents d/x's releases: version, date or null, and whether it requires a/b, or null for no metadata
      * @param list<string>                                                   $outside    the dependents installed from vcs
      *
-     * @return list<array<string, mixed>>
+     * @return list<array<mixed, mixed>>
      */
     private static function check(array $dependents, array $outside = []): array
     {
@@ -166,9 +167,7 @@ final class ThroughCheckTest extends TestCase
         }
         $entries = [];
         foreach (ThroughCheck::of('a/b', false, array_keys($dependents), LockFile::fromArray(['packages' => $packages]), $metadata) as $entry) {
-            $decoded = JsonPath::decoded($entry);
-            self::assertIsArray($decoded);
-            $entries[] = $decoded;
+            $entries[] = JsonPath::decoded($entry);
         }
 
         return $entries;

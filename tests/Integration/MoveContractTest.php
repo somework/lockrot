@@ -119,7 +119,8 @@ final class MoveContractTest extends TestCase
                 self::assertStringStartsWith('flag ', $extra, 'an unverified fact outside them is a flag the move may raise');
             }
             self::assertSame([], array_intersect($adds, array_merge($clears, $unverified, $leaves)), 'adds is disjoint from all three');
-            foreach ($move['adds'] as $add) {
+            foreach (JsonPath::arrayAt($move, ['adds']) as $add) {
+                self::assertIsArray($add);
                 self::assertNotContains($add['id'], $fired, 'adds names no fact that fired');
             }
             self::assertSame($clears !== [] && $leaves === [] && $unverified === [], $move['clears_all']);
@@ -130,17 +131,20 @@ final class MoveContractTest extends TestCase
             if ($ifApplied === null) {
                 continue;
             }
+            self::assertIsArray($ifApplied);
+            $assumes = $ifApplied['assumes'];
+            self::assertIsArray($assumes);
             self::assertNotSame([], $clears, 'a rerun only with a non-empty clears');
             self::assertSame($unverified !== [], $ifApplied['at_most'], 'at_most exactly when a fact is unverified');
-            self::assertContains('clears_hold', $ifApplied['assumes']);
-            self::assertSame($move['held_by'] !== [] || $move['composer_moves_because'] !== [], \in_array('composer_resolves', $ifApplied['assumes'], true));
+            self::assertContains('clears_hold', $assumes);
+            self::assertSame($move['held_by'] !== [] || $move['composer_moves_because'] !== [], \in_array('composer_resolves', $assumes, true));
             if ($ifApplied['verdict'] === 'finished') {
                 self::assertNotNull($finding['allowlist'], 'finished only under an allowlist entry');
             }
         }
-        $partial = JsonPath::has($finding, ['security', 'partial']) ? $finding['security']['partial'] : null;
+        $partial = JsonPath::arrayAt($finding, ['security'])['partial'] ?? null;
         if (\is_array($partial)) {
-            self::assertSame($partial['unverified'] !== [], $partial['if_applied']['at_most'], 'I14c');
+            self::assertSame(JsonPath::arrayAt($partial, ['unverified']) !== [], JsonPath::boolAt($partial, ['if_applied', 'at_most']));
             foreach (self::moves($finding) as $move) {
                 self::assertFalse($move['kind'] === 'update' && $move['version'] === $partial['version'], 'no partial beside an update move to the same release');
             }
@@ -161,13 +165,13 @@ final class MoveContractTest extends TestCase
         $graded = \in_array($finding['verdict'], ['critical', 'high', 'medium', 'low'], true);
         self::assertSame($graded, $finding['next_step'] !== null, 'a grade has a move, a score-0 word none');
         foreach (self::moves($finding) as $i => $move) {
-            $kind = $move['kind'];
+            $kind = JsonPath::stringAt($move, ['kind']);
             self::assertSame(\in_array($kind, ['require', 'raise-php'], true), \is_string($move['constraint']), ''.$kind.' and its constraint');
             if (\in_array($kind, self::BRANCH_KINDS, true)) {
                 self::assertNotNull($move['php_check'], ''.$kind.' names a branch, so it has php_check');
             }
             self::assertSame($kind === 'no-move', $move['reason'] !== null, 'reason exactly on no-move');
-            foreach ($move['commands'] as $argv) {
+            foreach (JsonPath::arrayAt($move, ['commands']) as $argv) {
                 self::assertIsArray($argv);
                 self::assertSame('composer', $argv[0] ?? null);
                 self::assertSame(array_values($argv), $argv);
@@ -175,7 +179,9 @@ final class MoveContractTest extends TestCase
                     self::assertIsString($argument);
                 }
                 if ($finding['reach'] !== 'direct') {
-                    self::assertFalse($argv[1] === 'require' && strpos($argv[2], $finding['package'].':') === 0, 'no root requirement of a package the project does not require');
+                    $target = $argv[2] ?? '';
+                    self::assertIsString($target);
+                    self::assertFalse($argv[1] === 'require' && strpos($target, JsonPath::stringAt($finding, ['package']).':') === 0, 'no root requirement of a package the project does not require');
                 }
             }
             self::assertSame($i === 0, \array_key_exists('through', $move), 'through[] on the lead move only');
@@ -205,8 +211,8 @@ final class MoveContractTest extends TestCase
         $move = null;
         if ($security['move_in'] === 'next_step') {
             $move = JsonPath::arrayAt($finding, ['next_step']);
-            $cleared = array_column(array_filter($move['clears'], static fn (array $fact): bool => $fact['kind'] === 'advisory'), 'id');
-            self::assertTrue($move['source'] === 'vulnerable' || \in_array('vulnerable', $move['merged'], true) || array_diff(self::advisoryIds($finding), $cleared) === [], 'move_in names the move that clears the advisories');
+            $cleared = self::advisoryClears($move);
+            self::assertTrue($move['source'] === 'vulnerable' || \in_array('vulnerable', JsonPath::arrayAt($move, ['merged']), true) || array_diff(self::advisoryIds($finding), $cleared) === [], 'move_in names the move that clears the advisories');
         } elseif ($security['move_in'] === 'also') {
             $move = JsonPath::arrayAt($finding, ['next_step', 'also', 0]);
             self::assertSame('vulnerable', $move['source']);
@@ -217,7 +223,7 @@ final class MoveContractTest extends TestCase
         self::assertSame($move['fix_kind'], $security['fix_kind'], 'security.fix_kind is the fix kind of that move');
         $gets = $security['gets'];
         if ($move['kind'] === 'update' && \is_array($gets) && $move['source'] === 'vulnerable') {
-            self::assertSame(array_column($gets['clears'], 'id'), array_column(array_filter($move['clears'], static fn (array $fact): bool => $fact['kind'] === 'advisory'), 'id'), 'an update clears what gets clears');
+            self::assertSame(self::advisoryClears($gets), self::advisoryClears($move), 'an update clears what gets clears');
         }
         $installed = $security['installed_branch_fixes'];
         if (\is_array($installed) && $move['source'] === 'vulnerable' && $move['merged'] === [] && $move['to_branch'] === $finding['branch'] && \in_array($move['kind'], ['update', 'require', 'raise-php'], true)) {
@@ -260,12 +266,16 @@ final class MoveContractTest extends TestCase
      */
     private static function moves(array $finding): array
     {
-        $lead = $finding['next_step'];
-        if (!\is_array($lead)) {
+        if (!\is_array($finding['next_step'])) {
             return [];
         }
+        $moves = [JsonPath::arrayAt($finding, ['next_step'])];
+        foreach (JsonPath::arrayAt($finding, ['next_step', 'also']) as $also) {
+            self::assertIsArray($also);
+            $moves[] = $also;
+        }
 
-        return array_merge([$lead], array_values(JsonPath::arrayAt($lead, ['also'])));
+        return $moves;
     }
 
     /**
@@ -279,7 +289,7 @@ final class MoveContractTest extends TestCase
         foreach (JsonPath::has($finding, ['score', 'terms']) ? JsonPath::arrayAt($finding, ['score', 'terms']) : [] as $term) {
             self::assertIsArray($term);
             if ($term['part'] === 'maintenance') {
-                $facts[] = 'flag '.$term['flag'];
+                $facts[] = 'flag '.JsonPath::stringAt($term, ['flag']);
             }
         }
         foreach (self::advisoryIds($finding) as $id) {
@@ -299,7 +309,7 @@ final class MoveContractTest extends TestCase
         foreach (JsonPath::arrayAt($finding, ['signals']) as $signal) {
             self::assertIsArray($signal);
             if ($signal['id'] === 'S9') {
-                return array_column(JsonPath::arrayAt($signal, ['data', 'advisories']), 'id');
+                return self::ids(JsonPath::arrayAt($signal, ['data', 'advisories']), static fn (): bool => true);
             }
         }
 
@@ -314,8 +324,42 @@ final class MoveContractTest extends TestCase
     private static function keys($facts): array
     {
         self::assertIsArray($facts);
+        $keys = [];
+        foreach ($facts as $fact) {
+            self::assertIsArray($fact);
+            $keys[] = JsonPath::stringAt($fact, ['kind']).' '.JsonPath::stringAt($fact, ['id']);
+        }
 
-        return array_map(static fn (array $fact): string => $fact['kind'].' '.$fact['id'], $facts);
+        return $keys;
+    }
+
+    /**
+     * @param array<mixed, mixed> $move a move, or `security.gets`
+     *
+     * @return list<string> the advisory ids that it clears
+     */
+    private static function advisoryClears(array $move): array
+    {
+        return self::ids(JsonPath::arrayAt($move, ['clears']), static fn (array $fact): bool => $fact['kind'] === 'advisory');
+    }
+
+    /**
+     * @param array<mixed, mixed>               $rows
+     * @param callable(array<mixed, mixed>): bool $keep
+     *
+     * @return list<string> the `id` of each row that $keep keeps
+     */
+    private static function ids(array $rows, callable $keep): array
+    {
+        $ids = [];
+        foreach ($rows as $row) {
+            self::assertIsArray($row);
+            if ($keep($row)) {
+                $ids[] = JsonPath::stringAt($row, ['id']);
+            }
+        }
+
+        return $ids;
     }
 
     /**
@@ -344,10 +388,10 @@ final class MoveContractTest extends TestCase
             }
             self::assertSame($entry['installed_requires'] === false, $entry['newest_requires_unmeasured'] === 'through_other_package');
             if ($entry['newest_requires'] === false) {
-                $whyNot[] = ['composer', 'why-not', $entry['package'], $entry['newest_stable']['version']];
+                $whyNot[] = ['composer', 'why-not', $entry['package'], JsonPath::stringAt($entry, ['newest_stable', 'version'])];
             }
         }
-        self::assertSame($whyNot, array_values(array_filter($move['commands'], static fn (array $argv): bool => $argv[1] === 'why-not')));
+        self::assertSame($whyNot, array_values(array_filter(JsonPath::arrayAt($move, ['commands']), static fn ($argv): bool => \is_array($argv) && ($argv[1] ?? null) === 'why-not')));
     }
 
     /**
@@ -402,18 +446,27 @@ final class MoveContractTest extends TestCase
         if (\is_array($move['replacement'])) {
             unset($move['replacement']['url'], $move['replacement']['finding']);
         }
-        $move['held_by'] = array_map(static function (array $holder): array {
+        $holders = [];
+        foreach (JsonPath::arrayAt($move, ['held_by']) as $holder) {
+            self::assertIsArray($holder);
             unset($holder['holder']);
-
-            return $holder;
-        }, $move['held_by']);
+            $holders[] = $holder;
+        }
+        $move['held_by'] = $holders;
         foreach (['clears', 'unverified', 'leaves', 'adds'] as $list) {
-            $keys = array_map(static fn (array $fact): string => (string) json_encode($fact), $move[$list]);
+            $keys = [];
+            foreach (JsonPath::arrayAt($move, [$list]) as $fact) {
+                $keys[] = (string) json_encode($fact);
+            }
             sort($keys);
             $move[$list] = $keys;
         }
         if (\array_key_exists('also', $move)) {
-            $move['also'] = array_map([self::class, 'comparable'], $move['also']);
+            $also = [];
+            foreach (JsonPath::arrayAt($move, ['also']) as $each) {
+                $also[] = self::comparable($each);
+            }
+            $move['also'] = $also;
         }
 
         return $move;

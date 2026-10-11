@@ -154,9 +154,6 @@ final class SchemaClaimsTest extends TestCase
         foreach (self::PLACEHOLDERS as $key => [$restoredBy, $strict]) {
             [$definition, $property] = explode('.', $key);
             self::assertTrue(JsonPath::has($schema, ['definitions', $definition, 'properties', $property]), $key.' is a property of the schema');
-            if ($strict === null) {
-                continue;
-            }
             foreach ($relations as $relation) {
                 self::assertStringNotContainsString($strict, $relation, $key.' is encoded: take it off PLACEHOLDERS ('.$restoredBy.')');
             }

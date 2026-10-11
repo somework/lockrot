@@ -22,6 +22,7 @@ start the reason with `in method():`.
 
 ## src/Analyzer
 
+- `src/Analyzer/Analyzer.php` ReturnRemoval `return Moves::none();` — in moves(): a finding with no counted fact has no lead and no advisory, so `NextStep::plan()` names no move either.
 - `src/Analyzer/Analyzer.php` ReturnRemoval `return [$metadata, []];` — in dateSplitPackages(): with no package to date, the rest of the method finds no candidate and makes no request.
 - `src/Analyzer/Libyears.php` GreaterThan `if ($newest === null || $release['at'] > $newest) {` — on a tie the two dates are the same instant, and nothing reads which release gave it.
 - `src/Analyzer/Libyears.php` LessThan `if ($behind > 0.0 && ($worst === null || $behind > $worst[1] || ($behind === $worst[1] && strcmp($finding->package(), $worst[0]->package()) < 0))) {` — two findings of one report never share a package name, so `strcmp()` never returns 0 here.
@@ -138,6 +139,8 @@ start the reason with `in method():`.
 
 ## src/Signal
 
+- `src/Signal/Data/AdvisoryData.php` CloneRemoval `$clone = clone $this;` — in withFindings(): the finding replaces the old payload, and nothing reads it again.
+- `src/Signal/Data/AdvisoryRow.php` CloneRemoval `$clone = clone $this;` — in withFindings(): the payload replaces the old row, and nothing reads it again.
 - `src/Signal/ConstraintOpenness.php` CastInt `$targetMajor = (int) explode('.', PhpReleaseDates::minorOf($targetPhp))[0];` — numeric strings compare as numbers.
 - `src/Signal/ConstraintOpenness.php` CastInt, DecrementInteger, IncrementInteger `$lowerMajor = $lower->isZero() ? 0 : (int) explode('.', $lower->getVersion())[0];` — numeric strings compare as numbers, and 0 moved by 1 stays below every PHP major.
 - `src/Signal/ConstraintOpenness.php` ConcatOperandRemoval `$target = new Constraint('==', $this->parser->normalize(PhpReleaseDates::minorOf($targetPhp).'.0'));` — `normalize('8.4')` equals `normalize('8.4.0')`.

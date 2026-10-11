@@ -58,17 +58,19 @@ final class ValidateSignalsTest extends TestCase
     #[DataProvider('findings')]
     public function testEverySignalHasExactlyItsDataKeys(array $finding): void
     {
-        $signals = JsonPath::arrayAt($finding, ['signals']);
-        foreach ($signals as $signal) {
+        $ids = [];
+        foreach (JsonPath::arrayAt($finding, ['signals']) as $signal) {
             self::assertIsArray($signal);
             $data = JsonPath::arrayAt($signal, ['data']);
-            $expected = self::KEYS[$signal['id']];
+            $id = JsonPath::stringAt($signal, ['id']);
+            $ids[] = $id;
+            $expected = self::KEYS[$id];
             sort($expected);
             $actual = array_keys($data);
             sort($actual);
-            self::assertSame($expected, $actual, $signal['id']);
+            self::assertSame($expected, $actual, $id);
         }
-        self::assertSame(\count($signals), \count(array_unique(array_column($signals, 'id'))), 'each signal once');
+        self::assertSame(\count($ids), \count(array_unique($ids)), 'each signal once');
     }
 
     /**
@@ -93,7 +95,7 @@ final class ValidateSignalsTest extends TestCase
                     self::assertSame($expected, $keys);
                     self::assertContains($package['verdict'], self::GRADES);
                 }
-                self::assertSame(\count($packages), $signal['data']['flagged']);
+                self::assertSame(\count($packages), JsonPath::intAt($signal, ['data', 'flagged']));
                 ++$checked;
             }
             if ($signal['id'] === 'S10') {
@@ -105,11 +107,11 @@ final class ValidateSignalsTest extends TestCase
                     $expected = self::S10_ENTRY;
                     sort($expected);
                     self::assertSame($expected, $keys);
-                    $union = array_merge($union, $entry['blocks']);
+                    $union = array_merge($union, JsonPath::arrayAt($entry, ['blocks']));
                 }
-                $blocks = $signal['data']['blocks'];
+                $blocks = JsonPath::arrayAt($signal, ['data', 'blocks']);
                 sort($blocks);
-                $union = array_values(array_unique($union));
+                $union = array_values(array_unique(array_map(static fn ($block): string => \is_string($block) ? $block : '', $union)));
                 sort($union);
                 self::assertSame($union, $blocks);
                 ++$checked;
